@@ -515,6 +515,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         }
     }
 
+
     @PermitAll
     @Override
     public Environment loadEnvironment( final String environmentId ) throws EnvironmentNotFoundException
@@ -553,6 +554,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         notifyOnEnvironmentDestroyed( environmentId );
     }
 
+
     @PermitAll
     @Override
     public Set<Environment> getEnvironments()
@@ -590,6 +592,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         Preconditions.checkNotNull( blueprint, "Invalid blueprint" );
 
         blueprintDataService.persist( blueprint );
+    }
+
+    @RolesAllowed( "Environment-Management|A|Write" )
+    @Override
+    public Blueprint getBlueprint( final UUID id ) throws EnvironmentManagerException
+    {
+        Preconditions.checkNotNull( id, "Blueprint ID could not be null" );
+        return blueprintDataService.find( id );
     }
 
 
@@ -819,6 +829,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
     //************ utility methods
+
 
     @PermitAll
     protected EnvironmentCreationWorkflow getEnvironmentCreationWorkflow( final EnvironmentImpl environment,
@@ -1073,7 +1084,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
     protected Long getUserId()
     {
-        return (long)0;//getUser().getId();
+        return ( long ) 0;//getUser().getId();
     }
 
 

@@ -360,22 +360,6 @@ public class Template
     @Override
     public String toString()
     {
-        return "Template{" +
-                "templateName='" + pk.getTemplateName() + '\'' +
-                ", parentTemplateName='" + parentTemplateName + '\'' +
-                ", lxcArch='" + pk.getLxcArch() + '\'' +
-                ", lxcUtsname='" + lxcUtsname + '\'' +
-                ", subutaiConfigPath='" + subutaiConfigPath + '\'' +
-                ", subutaiParent='" + subutaiParent + '\'' +
-                ", subutaiGitBranch='" + subutaiGitBranch + '\'' +
-                ", subutaiGitUuid='" + subutaiGitUuid + '\'' +
-                ", children=" + children +
-                ", products=" + products +
-                ", md5sum='" + pk.getMd5sum() + '\'' +
-                ", templateVersion='" + pk.getTemplateVersion() + '\'' +
-                ", faisUsingThisTemplate=" + faisUsingThisTemplate +
-                ", peerId=" + peerId +
-                ", remote=" + remote +
-                '}';
+        return pk.getTemplateName();
     }
 }

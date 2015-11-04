@@ -3,7 +3,11 @@ package io.subutai.core.environment.ui.forms;
 
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.subutai.common.environment.Blueprint;
+import io.subutai.common.environment.ContainerDistributionType;
 import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.protocol.PlacementStrategy;
 import io.subutai.common.util.CollectionUtil;
@@ -17,6 +21,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Notification;
@@ -27,6 +32,8 @@ import com.vaadin.ui.VerticalLayout;
 
 public class BlueprintForm
 {
+    private static final Logger LOG = LoggerFactory.getLogger( BlueprintForm.class );
+
     private static final String BLUEPRINT = "Blueprint";
     private static final String SAVE = "Save";
     private static final String PLEASE_PROVIDE_A_BLUEPRINT = "Please provide a blueprint";
@@ -35,7 +42,7 @@ public class BlueprintForm
     private static final String VIEW_BLUEPRINTS = "View blueprints";
     private static final String NAME = "Name";
     private static final String BUILD = "Build";
-    private static final String BUILD_DISTRIBUTION = "Create";
+    private static final String EDIT = "Edit";
     private static final String VIEW = "View";
     private static final String DELETE = "Delete";
     private static final String GROW = "Grow";
@@ -110,6 +117,25 @@ public class BlueprintForm
         } );
 
         contentRoot.addComponent( viewBlueprintsButton );
+
+
+        Button createButton = new Button( "Create" );
+        createButton.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( final Button.ClickEvent event )
+            {
+                Blueprint b = new Blueprint( "Custom blueprint", "192.168.0.1/24", null );
+                b.setId( UUID.randomUUID() );
+                b.setType( ContainerDistributionType.CUSTOM );
+                editBlueprint( b );
+            }
+        } );
+
+        contentRoot.addComponent( createButton );
+
+        contentRoot.setComponentAlignment( createButton, Alignment.TOP_LEFT );
+
         contentRoot.addComponent( blueprintsTable );
 
         updateBlueprintsTable();
@@ -163,17 +189,28 @@ public class BlueprintForm
                     }
                 } );
 
-                final Button buildDistribution = new Button( BUILD_DISTRIBUTION );
-                buildDistribution.setId( blueprint.getName() + "-create" );
-                buildDistribution.addClickListener( new Button.ClickListener()
+                Button edit = null;
+                if ( blueprint.getType() == ContainerDistributionType.CUSTOM )
                 {
-                    @Override
-                    public void buttonClick( final Button.ClickEvent clickEvent )
+                    edit = new Button( EDIT );
+                    edit.setId( blueprint.getName() + "-edit" );
+                    edit.addClickListener( new Button.ClickListener()
                     {
-                        buildDistribution( blueprint, false );
-                    }
-                } );
-
+                        @Override
+                        public void buttonClick( final Button.ClickEvent clickEvent )
+                        {
+                            try
+                            {
+                                Blueprint b = environmentManager.getBlueprint( blueprint.getId() );
+                                editBlueprint( b );
+                            }
+                            catch ( EnvironmentManagerException e )
+                            {
+                                Notification.show( "Unexpected error. Could not edit blueprint." );
+                            }
+                        }
+                    } );
+                }
                 final Button grow = new Button( GROW );
                 grow.setId( blueprint.getName() + "-grow" );
                 grow.addClickListener( new Button.ClickListener()
@@ -187,7 +224,7 @@ public class BlueprintForm
 
 
                 blueprintsTable.addItem( new Object[] {
-                        blueprint.getName(), view, delete, build, buildDistribution, grow
+                        blueprint.getName(), view, edit, delete, build, grow
                 }, null );
             }
         }
@@ -205,9 +242,9 @@ public class BlueprintForm
     }
 
 
-    private void buildDistribution( Blueprint blueprint, boolean grow )
+    private void editBlueprint( Blueprint blueprint )
     {
-        contentRoot.getUI().addWindow( new DistributionWindow( blueprint, peerManager, environmentManager, grow ) );
+        contentRoot.getUI().addWindow( new BlueprintEditorWindow( blueprint, peerManager, environmentManager ) );
     }
 
 
@@ -216,9 +253,9 @@ public class BlueprintForm
         Table table = new Table( caption );
         table.addContainerProperty( NAME, String.class, null );
         table.addContainerProperty( VIEW, Button.class, null );
+        table.addContainerProperty( EDIT, Button.class, null );
         table.addContainerProperty( DELETE, Button.class, null );
         table.addContainerProperty( BUILD, Button.class, null );
-        table.addContainerProperty( BUILD_DISTRIBUTION, Button.class, null );
         table.addContainerProperty( GROW, Button.class, null );
         table.setPageLength( 10 );
         table.setSelectable( false );

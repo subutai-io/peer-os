@@ -77,14 +77,7 @@ public class BaseMetric
     @JsonIgnore
     public Double getAvailableSpace()
     {
-        if ( disk != null )
-        {
-            return disk.getAvailableSpace();
-        }
-        else
-        {
-            return 0.0;
-        }
+        return disk != null ? disk.getAvailableSpace() : 0;
     }
 
 
@@ -114,5 +107,17 @@ public class BaseMetric
     public String getCpuModel()
     {
         return cpu != null ? cpu.model : null;
+    }
+
+
+    public Double getFreeRam()
+    {
+        return ram != null ? ram.free : 0;
+    }
+
+
+    public Double getTotalSpace()
+    {
+        return disk != null ? disk.getTotal() : 0;
     }
 }

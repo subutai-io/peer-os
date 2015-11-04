@@ -59,15 +59,6 @@ public class ResourceHostMetric extends BaseMetric
     @Override
     public String toString()
     {
-        return String.format( "%s on %s", hostName, peerId );
-    }
-
-
-    public String getDescription()
-    {
-        return String
-                .format( "Hostname: %s<br/> RAM: %.3f/%.3fGb<br/> Disk: %.3f/%.3fGb<br/> CPU: %s<br/> Containers #: %d",
-                        hostName, ram.getTotal() / GB_DIVIDER, ram.getFree() / GB_DIVIDER, disk.getTotal() / GB_DIVIDER,
-                        disk.getUsed() / GB_DIVIDER, cpu.getModel(), containersCount );
+        return hostName != null ? hostName : hostId;
     }
 }

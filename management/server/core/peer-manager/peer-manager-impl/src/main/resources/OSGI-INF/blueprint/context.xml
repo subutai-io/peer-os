@@ -75,6 +75,7 @@
     <argument ref="localPeer" />
     <argument ref="daoManagerPeer" />
     <argument ref="messageResponseListener" />
+    <argument ref="templateRegistry" />
     <argument ref="securityManager" />
     <argument ref="jsonProvider" />
   </bean>

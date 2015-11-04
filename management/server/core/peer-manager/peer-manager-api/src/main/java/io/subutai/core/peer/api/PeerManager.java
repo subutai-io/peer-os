@@ -18,6 +18,7 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.RegistrationData;
 import io.subutai.common.protocol.N2NConfig;
+import io.subutai.common.protocol.Template;
 import io.subutai.common.security.PublicKeyContainer;
 
 
@@ -143,4 +144,8 @@ public interface PeerManager
     ResourceHostMetrics getResourceHostMetrics();
 
     HostInterfaces getInterfaces();
+
+    List<Template> getTemplates();
+
+    Template getTemplateByName( String name );
 }

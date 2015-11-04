@@ -51,6 +51,7 @@ import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.peer.RegistrationData;
 import io.subutai.common.peer.RegistrationStatus;
 import io.subutai.common.protocol.N2NConfig;
+import io.subutai.common.protocol.Template;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.settings.ChannelSettings;
 import io.subutai.common.util.N2NUtil;
@@ -67,6 +68,7 @@ import io.subutai.core.peer.impl.container.CreateEnvironmentContainerGroupReques
 import io.subutai.core.peer.impl.container.DestroyEnvironmentContainerGroupRequestListener;
 import io.subutai.core.peer.impl.dao.PeerDAO;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
+import io.subutai.core.registry.api.TemplateRegistry;
 import io.subutai.core.security.api.SecurityManager;
 
 
@@ -80,6 +82,7 @@ public class PeerManagerImpl implements PeerManager
 
     public static final String PEER_SUBNET_MASK = "255.255.255.0";
     private static final int N2N_PORT = 5000;
+    private TemplateRegistry templateRegistry;
 
     protected PeerDAO peerDAO;
     protected LocalPeer localPeer;
@@ -93,8 +96,8 @@ public class PeerManagerImpl implements PeerManager
 
 
     public PeerManagerImpl( final Messenger messenger, LocalPeer localPeer, DaoManager daoManager,
-                            MessageResponseListener messageResponseListener, SecurityManager securityManager,
-                            Object provider )
+                            MessageResponseListener messageResponseListener, TemplateRegistry templateRegistry,
+                            SecurityManager securityManager, Object provider )
     {
         this.messenger = messenger;
         this.localPeer = localPeer;
@@ -102,6 +105,7 @@ public class PeerManagerImpl implements PeerManager
         this.messageResponseListener = messageResponseListener;
         this.securityManager = securityManager;
         this.provider = provider;
+        this.templateRegistry = templateRegistry;
     }
 
 
@@ -795,6 +799,20 @@ public class PeerManagerImpl implements PeerManager
     public HostInterfaces getInterfaces()
     {
         return localPeer.getInterfaces();
+    }
+
+
+    @Override
+    public List<Template> getTemplates()
+    {
+        return templateRegistry.getAllTemplates();
+    }
+
+
+    @Override
+    public Template getTemplateByName( final String name )
+    {
+        return templateRegistry.getTemplate( name );
     }
 }
 

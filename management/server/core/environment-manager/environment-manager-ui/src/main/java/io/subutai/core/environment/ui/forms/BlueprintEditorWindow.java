@@ -1,10 +1,16 @@
 package io.subutai.core.environment.ui.forms;
 
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.net.util.SubnetUtils;
@@ -20,6 +26,7 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Slider;
 import com.vaadin.ui.Table;
@@ -28,6 +35,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
 import io.subutai.common.environment.Blueprint;
+import io.subutai.common.environment.ContainerType;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.environment.Topology;
@@ -37,40 +45,41 @@ import io.subutai.common.network.Gateway;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
+import io.subutai.common.protocol.Template;
 import io.subutai.common.util.CollectionUtil;
+import io.subutai.common.util.JsonUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.peer.api.PeerManager;
 
 
-public class DistributionWindow extends Window
+public class BlueprintEditorWindow extends Window
 {
-
-
-    enum ContainerType
-    {
-        TINY, SMALL, MEDIUM, HUGE
-    }
-
+    private static final Logger LOG = LoggerFactory.getLogger( BlueprintEditorWindow.class );
 
     private static final String DEFAULT_SUBNET_CIDR = "192.168.1.2/24";
+    private static final Double GB_DIVIDER = 1024.0 * 1024.0 * 1024.0;
     private final Blueprint blueprint;
     private final PeerManager peerManager;
+    private final EnvironmentManager environmentManager;
+    private final TextField nameTxt;
     private Table placementTable;
-    private Button buildBtn;
-    private ComboBox envCombo;
+    private Button saveBtn;
     private TextField subnetTxt;
+    Map<String, ResourceHostMetric> metrics = new ConcurrentHashMap<>();
 
 
-    public DistributionWindow( final Blueprint blueprint, final PeerManager peerManager,
-                               final EnvironmentManager environmentManager, final boolean grow )
+    public BlueprintEditorWindow( final Blueprint blueprint, final PeerManager peerManager,
+                                  final EnvironmentManager environmentManager )
     {
 
         this.blueprint = blueprint;
         this.peerManager = peerManager;
+        this.environmentManager = environmentManager;
 
-        setCaption( "Distribution" );
+        initMetrics();
+        setCaption( "Blueprint Editor" );
         setWidth( "800px" );
         setHeight( "600px" );
         setModal( true );
@@ -93,90 +102,105 @@ public class DistributionWindow extends Window
 
         content.addComponent( placementTable );
 
-        buildBtn = new Button( grow ? "Grow" : "Build" );
-        buildBtn.setId( "buildButton" );
-        buildBtn.setEnabled( false );
-        buildBtn.addClickListener( new Button.ClickListener()
+        saveBtn = new Button( "Save" );
+        saveBtn.setId( "saveButton" );
+        saveBtn.setEnabled( true );
+        saveBtn.addClickListener( new Button.ClickListener()
         {
             @Override
             public void buttonClick( final Button.ClickEvent event )
             {
-                buildProcessTrigger( environmentManager, grow );
+                //buildProcessTrigger( environmentManager, grow );
+                final Blueprint blueprint1 = getBlueprint();
+                LOG.info( JsonUtil.toJson( blueprint1 ) );
+                try
+                {
+                    environmentManager.saveBlueprint( blueprint1 );
+                    Notification.show( "Blueprint saved successfully." );
+                }
+                catch ( EnvironmentManagerException e )
+                {
+                    Notification.show( "Error occured on saving blueprint.", Notification.Type.ERROR_MESSAGE );
+                }
             }
         } );
 
-        if ( grow )
+        Button closeBtn = new Button( "Close" );
+        closeBtn.setId( "closeButton" );
+        closeBtn.setEnabled( true );
+        closeBtn.addClickListener( new Button.ClickListener()
         {
-            envCombo = new ComboBox( "Environments" );
-            envCombo.setId( "envCb" );
-            envCombo.setImmediate( true );
-            envCombo.setTextInputAllowed( false );
-            envCombo.setNullSelectionAllowed( false );
-            envCombo.setRequired( true );
-            for ( Environment environment : environmentManager.getEnvironments() )
+            @Override
+            public void buttonClick( final Button.ClickEvent event )
             {
-                envCombo.addItem( environment );
-                envCombo.setItemCaption( environment, environment.getName() );
+                close();
             }
-            content.addComponent( envCombo );
-        }
-        else
-        {
-            subnetTxt = new TextField( "Subnet CIDR" );
-            subnetTxt.setId( "subnetTxt" );
-            subnetTxt.setImmediate( true );
-            subnetTxt.setValue( DEFAULT_SUBNET_CIDR );
-            content.addComponent( subnetTxt );
-        }
-        content.addComponent( buildBtn );
-        content.setComponentAlignment( buildBtn, Alignment.TOP_RIGHT );
+        } );
+
+
+        nameTxt = new TextField( "Blueprint name" );
+        nameTxt.setId( "nameTxt" );
+        nameTxt.setImmediate( true );
+        nameTxt.setValue( blueprint.getName() );
+        content.addComponent( nameTxt );
+
+        subnetTxt = new TextField( "Subnet CIDR" );
+        subnetTxt.setId( "subnetTxt" );
+        subnetTxt.setImmediate( true );
+        subnetTxt.setValue( blueprint.getCidr() );
+        content.addComponent( subnetTxt );
+
+
+        HorizontalLayout buttons = new HorizontalLayout();
+        buttons.setSpacing( true );
+        buttons.addComponent( saveBtn );
+        buttons.addComponent( closeBtn );
+
+        content.addComponent( buttons );
+
+        content.setComponentAlignment( buttons, Alignment.TOP_RIGHT );
+
+        initNodeGroupsTable();
 
         setContent( content );
     }
 
 
-    private void buildProcessTrigger( final EnvironmentManager environmentManager, final boolean grow )
+    private void initMetrics()
     {
-        Map<Peer, Set<NodeGroup>> placements = getPlacements();
-
-        if ( placements == null )
+        new Thread( new Runnable()
         {
-            Notification.show( "Failed to obtain topology", Notification.Type.ERROR_MESSAGE );
-        }
-        else if ( grow && envCombo.getValue() == null )
-        {
-            Notification.show( "Please, select environment to grow" );
-        }
-        else if ( !grow && Strings.isNullOrEmpty( subnetTxt.getValue() ) )
-        {
-            Notification.show( "Please, enter subnet CIDR" );
-        }
-        else
-        {
-            Topology topology = new Topology();
-            constructTopology( topology, placements );
-
-            try
+            @Override
+            public void run()
             {
-                if ( grow )
+                Set<String> peers = new HashSet<String>();
+                for ( NodeGroup nodeGroup : blueprint.getNodeGroups() )
                 {
-                    Environment environment = ( Environment ) envCombo.getValue();
-                    environmentManager.growEnvironment( environment.getId(), topology, true );
-                    Notification.show( "Environment growth started" );
-                }
-                else
-                {
-                    checkPickedSubnetValidity( topology, environmentManager );
+                    ResourceHostMetric m = new ResourceHostMetric();
+                    m.setPeerId( nodeGroup.getPeerId() );
+                    m.setHostId( nodeGroup.getHostId() );
+                    metrics.put( nodeGroup.getHostId(), m );
+                    peers.add( nodeGroup.getPeerId() );
                 }
 
-                close();
+                for ( String peerId : peers )
+                {
+                    try
+                    {
+                        Peer peer = peerManager.getPeer( peerId );
+                        ResourceHostMetrics rm = peer.getResourceHostMetrics();
+                        for ( ResourceHostMetric m : rm.getResources() )
+                        {
+                            metrics.put( m.getHostId(), m );
+                        }
+                    }
+                    catch ( Exception ignore )
+                    {
+                        // ignore
+                    }
+                }
             }
-            catch ( Exception e )
-            {
-                Notification.show( String.format( "Failed to %s environment: %s", grow ? "grow" : "create",
-                        ExceptionUtils.getRootCauseMessage( e ) ), Notification.Type.ERROR_MESSAGE );
-            }
-        }
+        } ).start();
     }
 
 
@@ -233,6 +257,32 @@ public class DistributionWindow extends Window
         }
 
         return usedGateways;
+    }
+
+
+    private Blueprint getBlueprint()
+    {
+        Set<NodeGroup> nodeGroups = new HashSet();
+
+        for ( Object itemId : placementTable.getItemIds() )
+        {
+            Item item = placementTable.getItem( itemId );
+            String peerName = item.getItemProperty( "Host" ).getValue().toString();
+            int amount = Integer.parseInt( item.getItemProperty( "Amount" ).getValue().toString() );
+            String nodeGroupName = item.getItemProperty( "Name" ).getValue().toString();
+            String templateName = item.getItemProperty( "Template" ).getValue().toString();
+            ContainerType type = ( ContainerType ) item.getItemProperty( "Type" ).getValue();
+            String hostId = ( ( ResourceHostMetric ) item.getItemProperty( "Host" ).getValue() ).getHostId();
+            String peerId = ( ( ResourceHostMetric ) item.getItemProperty( "Host" ).getValue() ).getPeerId();
+            NodeGroup nodeGroup = new NodeGroup( nodeGroupName, templateName, type, amount, 0, 0, peerId, hostId );
+            nodeGroups.add( nodeGroup );
+        }
+
+        final Blueprint b = new Blueprint( nameTxt.getValue(), subnetTxt.getValue(), nodeGroups );
+
+        b.setId( this.blueprint.getId() );
+        b.setType( this.blueprint.getType() );
+        return b;
     }
 
 
@@ -293,11 +343,12 @@ public class DistributionWindow extends Window
     private Table createPlacementTable()
     {
         final Table table = new Table();
+        table.addContainerProperty( "Template", Template.class, null );
         table.addContainerProperty( "Name", String.class, null );
         table.addContainerProperty( "Amount", Integer.class, null );
         table.addContainerProperty( "Peer", String.class, null );
         table.addContainerProperty( "Host", ResourceHostMetric.class, null );
-        table.addContainerProperty( "Type", ComboBox.class, null );
+        table.addContainerProperty( "Type", ContainerType.class, null );
         table.addContainerProperty( "Remove", Button.class, null );
         table.setPageLength( 10 );
         table.setSelectable( false );
@@ -316,7 +367,8 @@ public class DistributionWindow extends Window
                     Item item = ( Item ) table.getItem( itemId );
                     Property property = item.getItemProperty( propertyId );
                     ResourceHostMetric metric = ( ResourceHostMetric ) property.getValue();
-                    return metric.getDescription();
+
+                    return getResourceHostDescription( metric );
                 }
                 return null;
             }
@@ -325,31 +377,50 @@ public class DistributionWindow extends Window
     }
 
 
-    private void populateNodeGroupsTable( final Table nodeGroupsTable )
+    private String getResourceHostDescription( final ResourceHostMetric metric )
     {
-        for ( NodeGroup nodeGroup : blueprint.getNodeGroups() )
+        if ( metric == null )
         {
-            Slider slider = new Slider( 1, nodeGroup.getNumberOfContainers() );
-            slider.setWidth( 100, Unit.PIXELS );
-            slider.setOrientation( SliderOrientation.HORIZONTAL );
-            slider.setValue( ( double ) nodeGroup.getNumberOfContainers() );
-
-            ComboBox peersCombo = createPeersComboBox();
-            peersCombo.setId( "peersCombo" );
-            ComboBox typesCombo = createTypesComboBox();
-            typesCombo.setId( "typesCombo" );
-
-            Button placeBtn = createPlaceButton( nodeGroup, slider, typesCombo, peersCombo );
-
-            nodeGroupsTable.addItem( new Object[] {
-                    nodeGroup.getName(), slider, peersCombo, typesCombo, placeBtn
-            }, null );
+            return "";
         }
+        ResourceHostMetric m = metrics.get( metric.getHostId() );
+        return String
+                .format( "Hostname: %s<br/> RAM: %.3f/%.3fGb<br/> Disk: %.3f/%.3fGb<br/> CPU: %s<br/> Containers #: %d",
+                        m.getHostName(), m.getTotalRam() / GB_DIVIDER, m.getFreeRam() / GB_DIVIDER,
+                        m.getTotalSpace() / GB_DIVIDER, m.getAvailableSpace() / GB_DIVIDER, m.getCpuModel(),
+                        m.getContainersCount() );
     }
 
 
-    private Button createPlaceButton( final NodeGroup nodeGroup, final Slider slider, final ComboBox type,
-                                      final ComboBox peersCombo )
+    private void populateNodeGroupsTable( final Table nodeGroupsTable )
+    {
+        //        for ( NodeGroup nodeGroup : blueprint.getNodeGroups() )
+        //        {
+        TextField nodeGroupNameField = new TextField( null, "Sample node group" );
+        Slider slider = new Slider( 1, 10 );
+        slider.setWidth( 100, Unit.PIXELS );
+        slider.setOrientation( SliderOrientation.HORIZONTAL );
+        slider.setValue( ( double ) 1 );
+
+        ComboBox peersCombo = createPeersComboBox();
+        peersCombo.setId( "peersCombo" );
+        ComboBox typesCombo = createTypesComboBox();
+        typesCombo.setId( "typesCombo" );
+
+        ComboBox templatesCombo = createTemplatesComboBox();
+        typesCombo.setId( "templatesCombo" );
+
+        Button placeBtn = createPlaceButton( templatesCombo, nodeGroupNameField, slider, typesCombo, peersCombo );
+
+        nodeGroupsTable.addItem( new Object[] {
+                templatesCombo, nodeGroupNameField, slider, peersCombo, typesCombo, placeBtn
+        }, null );
+        //        }
+    }
+
+
+    private Button createPlaceButton( final ComboBox templatesCombo, final TextField nodeGroup, final Slider slider,
+                                      final ComboBox type, final ComboBox peersCombo )
     {
         Button placeButton = new Button( "Place" );
         placeButton.setId( "placeButton" );
@@ -374,7 +445,7 @@ public class DistributionWindow extends Window
                 }
                 else
                 {
-                    placeNodeGroup( nodeGroup, slider, type.getValue().toString(),
+                    placeNodeGroup( templatesCombo, nodeGroup, slider, type,
                             ( ResourceHostMetric ) peersCombo.getValue() );
                 }
             }
@@ -384,9 +455,14 @@ public class DistributionWindow extends Window
     }
 
 
-    private void placeNodeGroup( NodeGroup nodeGroup, final Slider slider, String type, ResourceHostMetric metric )
+    private void placeNodeGroup( final ComboBox templatesCombo, TextField nodeGroupNameField, final Slider slider,
+                                 ComboBox type, ResourceHostMetric metric )
     {
-        final String rowId = String.format( "%s-%s-%s", nodeGroup.getName(), metric.getPeerId(), metric.getHostId() );
+        //TODO: check uniqueness of nodeGroupName
+        final String nodeGroupName = nodeGroupNameField.getValue();
+
+        final String rowId = String.format( "%s-%s-%s", nodeGroupName, metric.getPeerId(), metric.getHostId() );
+
         Button removeBtn = new Button( "Remove" );
         removeBtn.setId( "removeButton" );
 
@@ -403,7 +479,6 @@ public class DistributionWindow extends Window
                 slider.setValue( slider.getMax() );
                 slider.setMin( 1 );
                 placementTable.removeItem( rowId );
-                updateBuildButton();
             }
         } );
 
@@ -412,8 +487,8 @@ public class DistributionWindow extends Window
         if ( row == null )
         {
             placementTable.addItem( new Object[] {
-                    nodeGroup.getName(), amount, peerManager.getPeer( metric.getPeerId() ).getPeerInfo().getIp(),
-                    metric, createTypesComboBox(), removeBtn
+                    templatesCombo.getValue(), nodeGroupName, amount,
+                    peerManager.getPeer( metric.getPeerId() ).getPeerInfo().getIp(), metric, type.getValue(), removeBtn
             }, rowId );
         }
         else
@@ -427,14 +502,44 @@ public class DistributionWindow extends Window
         slider.setMin( Math.min( slider.getMin(), newMax ) );
         slider.setMax( newMax );
         slider.setValue( newMax );
-
-        updateBuildButton();
     }
 
 
-    private void updateBuildButton()
+    private void initNodeGroupsTable()
     {
-        buildBtn.setEnabled( !CollectionUtil.isCollectionEmpty( placementTable.getItemIds() ) );
+        for ( NodeGroup nodeGroup : this.blueprint.getNodeGroups() )
+        {
+            final String nodeGroupName = nodeGroup.getName();
+
+            String peerId = nodeGroup.getPeerId();
+            String hostId = nodeGroup.getHostId();
+            Peer peer = peerManager.getPeer( peerId );
+            ResourceHostMetric metric = metrics.get( hostId );
+            int amount = nodeGroup.getNumberOfContainers();
+            ContainerType type = nodeGroup.getType();
+            final String rowId = String.format( "%s-%s-%s", nodeGroupName, peerId, hostId );
+
+
+            Button removeBtn = new Button( "Remove" );
+            removeBtn.setId( "removeButton-" + rowId );
+
+
+            removeBtn.addClickListener( new Button.ClickListener()
+            {
+                @Override
+                public void buttonClick( final Button.ClickEvent event )
+                {
+                    Item row = placementTable.getItem( rowId );
+                    placementTable.removeItem( rowId );
+                }
+            } );
+
+
+            placementTable.addItem( new Object[] {
+                    peerManager.getTemplateByName( nodeGroup.getTemplateName() ), nodeGroupName, amount,
+                    peer.getPeerInfo().getIp(), metric, type, removeBtn
+            }, rowId );
+        }
     }
 
 
@@ -493,10 +598,28 @@ public class DistributionWindow extends Window
     }
 
 
+    private ComboBox createTemplatesComboBox()
+    {
+        ComboBox typesCombo = new ComboBox();
+        typesCombo.setNullSelectionAllowed( false );
+        typesCombo.setTextInputAllowed( false );
+        typesCombo.setImmediate( true );
+        typesCombo.setRequired( true );
+
+        for ( Template t : peerManager.getTemplates() )
+        {
+            typesCombo.addItem( t );
+        }
+
+        return typesCombo;
+    }
+
+
     private Table createNodeGroupsTable()
     {
         Table table = new Table();
-        table.addContainerProperty( "Name", String.class, null );
+        table.addContainerProperty( "Template", ComboBox.class, null );
+        table.addContainerProperty( "Name", TextField.class, null );
         table.addContainerProperty( "Amount", Slider.class, null );
         table.addContainerProperty( "Host", ComboBox.class, null );
         table.addContainerProperty( "Type", ComboBox.class, null );

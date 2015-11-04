@@ -137,5 +137,14 @@ public class BlueprintDataService
             daoManager.closeEntityManager( em );
         }
     }
+
+
+    public Blueprint find( final UUID id )
+    {
+        EntityManager em = daoManager.getEntityManagerFromFactory();
+        EnvironmentBlueprintEntity r = em.find( EnvironmentBlueprintEntity.class, id.toString() );
+        Blueprint blueprint = JsonUtil.fromJson( r.getInfo(), Blueprint.class );
+        return blueprint;
+    }
 }
 
