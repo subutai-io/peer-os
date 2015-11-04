@@ -107,24 +107,29 @@ public interface IdentityManager
     @PermitAll
     List<Role> getAllRoles();
 
+
     /* *************************************************
-         */
+     */
     void removeRole( long roleId );
+
 
     /* *************************************************
      */
     Permission createPermission( int objectId, int scope, boolean read, boolean write, boolean update, boolean delete );
 
+
     /* *************************************************
      */
     void assignRolePermission( long roleId, Permission permission );
+
 
     /* *************************************************
      */
     void removePermission( long permissionId );
 
+
     /* *************************************************
      */
-    UserToken createUserToken( User user, String token, String secret, String issuer,Date validDate);
+    UserToken createUserToken( User user, String token, String secret, String issuer,int tokenType,Date validDate);
 
 }

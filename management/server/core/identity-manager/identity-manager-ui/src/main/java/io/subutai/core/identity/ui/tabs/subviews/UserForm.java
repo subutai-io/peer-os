@@ -122,7 +122,7 @@ public class UserForm extends Window
         };
 
         final Button saveButton = new Button( "Save user", saveListener );
-        final Button cancelButton = new Button( "Cancel", cancelListener );
+        final Button cancelButton = new Button( "Close", cancelListener );
         saveButton.setStyleName( Reindeer.BUTTON_DEFAULT );
 
 		for (int i = 1; i < 3; ++i)

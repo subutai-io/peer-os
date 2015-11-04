@@ -275,10 +275,14 @@ public class MainUI extends UI implements ViewChangeListener
             if ( request.getWrappedSession().getAttribute( "userSessionData")!=null )
             {
                 user = (User) request.getWrappedSession().getAttribute( "userSessionData");
+                username.setValue( user.getUserName());
             }
         }
+        else
+        {
+            username.setValue( user.getUserName());
+        }
 
-        username.setValue( user.getUserName());
 
         MenuBar.Command cmd = new MenuBar.Command()
         {

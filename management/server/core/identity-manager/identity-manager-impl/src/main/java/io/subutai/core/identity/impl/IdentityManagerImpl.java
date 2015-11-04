@@ -103,7 +103,7 @@ public class IdentityManagerImpl implements IdentityManager
             //***********************************************************
 
             //***Create Token *******************************************
-            createUserToken( internal ,"" ,"" ,"", TokenType.Session,null);
+            createUserToken( internal ,"" ,"" ,"", TokenType.Permanent.getId(),null);
             //***********************************************************
 
             //***********************************************************
@@ -149,13 +149,13 @@ public class IdentityManagerImpl implements IdentityManager
                     //*********************************************
                     for ( int a = 0; a < permsp.length; a++ )
                     {
-                        if(permsp[a] != PermissionObject.IdentityManagement ||
-                                permsp[a] != PermissionObject.KarafServerAdministration ||
-                                permsp[a] != PermissionObject.KarafServerManagement    ||
-                                permsp[a] != PermissionObject.PeerManagement ||
+                        if(permsp[a] != PermissionObject.IdentityManagement &&
+                                permsp[a] != PermissionObject.KarafServerAdministration &&
+                                permsp[a] != PermissionObject.KarafServerManagement    &&
+                                permsp[a] != PermissionObject.PeerManagement &&
                                 permsp[a] != PermissionObject.ResourceManagement     )
                         {
-                            Permission per = createPermission( permsp[a].getId(), 1, true, true, true, true );
+                            Permission per = createPermission( permsp[a].getId(), 3, true, true, true, true );
                             assignRolePermission( role.getId(), per );
                         }
                     }
@@ -168,8 +168,8 @@ public class IdentityManagerImpl implements IdentityManager
                     //*********************************************
                     for ( int a = 0; a < permsp.length; a++ )
                     {
-                        if(permsp[a] != PermissionObject.IdentityManagement ||
-                                permsp[a] != PermissionObject.KarafServerAdministration ||
+                        if(permsp[a] != PermissionObject.IdentityManagement &&
+                                permsp[a] != PermissionObject.KarafServerAdministration &&
                                 permsp[a] != PermissionObject.KarafServerManagement     )
                         {
                             Permission per = createPermission( permsp[a].getId(), 1, true, true, true, true );
@@ -290,7 +290,7 @@ public class IdentityManagerImpl implements IdentityManager
             if( Strings.isNullOrEmpty(secret))
                 secret =  UUID.randomUUID().toString();
             if(validDate == null)
-                validDate = DateUtils.addHours( new Date(System.currentTimeMillis()),2);
+                validDate = DateUtils.addHours( new Date(System.currentTimeMillis()),1);
 
             userToken.setToken(token );
             userToken.setHashAlgorithm( "HS256" );
@@ -344,7 +344,7 @@ public class IdentityManagerImpl implements IdentityManager
 
             if(uToken == null)
             {
-                uToken = createUserToken( user, "", "", "" ,null);
+                uToken = createUserToken( user, "", "", "" ,TokenType.Session.getId(),null);
             }
 
             token = uToken.getFullToken();

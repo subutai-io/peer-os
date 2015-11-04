@@ -342,10 +342,12 @@ public class RoleForm extends Window
 								if (PermissionObject.values()[object - 1] == PermissionObject.KarafServerAdministration)
 								{
 									perms.add("admin");
-								} else if (PermissionObject.values()[object - 1] == PermissionObject.KarafServerManagement)
+								}
+                                else if (PermissionObject.values()[object - 1] == PermissionObject.KarafServerManagement)
 								{
 									perms.add("manager");
-								} else
+								}
+                                else
 								{
 									String permString = "";
 
@@ -556,6 +558,12 @@ public class RoleForm extends Window
 		permTable.addContainerProperty ("Update", CheckBox.class, null);
 		permTable.addContainerProperty ("Delete", CheckBox.class, null);
 		permTable.addContainerProperty ("Remove", Button.class, null);
+
+        permTable.setColumnWidth("Scope",70  );
+        permTable.setColumnWidth("Read",35  );
+        permTable.setColumnWidth("Write",35  );
+        permTable.setColumnWidth("Update",35  );
+        permTable.setColumnWidth("Delete",35  );
 
 		allPerms.addContainerProperty("Permission", String.class, null);
 		allPerms.addContainerProperty ("Add", Button.class, null);
