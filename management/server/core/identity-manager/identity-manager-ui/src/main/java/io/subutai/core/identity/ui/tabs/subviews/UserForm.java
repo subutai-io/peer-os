@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.vaadin.data.Item;
 import com.vaadin.ui.*;
 import io.subutai.common.security.objects.UserStatus;
 import io.subutai.core.identity.api.IdentityManager;
