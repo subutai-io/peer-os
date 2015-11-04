@@ -224,6 +224,12 @@ public class RoleForm extends Window
         permTable.setColumnWidth("Delete",46  );
         permTable.setColumnWidth("Remove",62  );
 
+        permTable.setColumnWidth("Scope",70  );
+        permTable.setColumnWidth("Read",35  );
+        permTable.setColumnWidth("Write",35  );
+        permTable.setColumnWidth("Update",35  );
+        permTable.setColumnWidth("Delete",35  );
+
 		allPerms.addContainerProperty("Permission", String.class, null);
 		allPerms.addContainerProperty ("Add", Button.class, null);
 
