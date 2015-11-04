@@ -1,0 +1,14 @@
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+  <reference id="broker" availability="mandatory"
+             interface="io.subutai.core.broker.api.Broker" />
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="broker/gen-client-certs">
+      <action class="io.subutai.core.broker.cli.GenClientCertsCommand">
+        <argument ref="broker" />
+      </action>
+    </command>
+  </command-bundle>
+
+</blueprint>

@@ -70,6 +70,8 @@ public class BrokerImpl implements Broker
     private final String truststore;
     private final String truststorePassword;
     private final String caCertificate;
+    private final String caPrivateKey;
+    private final String caPrivateKeyPassword;
     private ByteMessagePostProcessor byteMessagePostProcessor;
     private TextMessagePostProcessor textMessagePostProcessor;
     private SslContext customSslContext;
@@ -79,13 +81,18 @@ public class BrokerImpl implements Broker
 
 
     public BrokerImpl( final String brokerUrl, final String keystore, final String keystorePassword,
-                       final String truststore, final String truststorePassword, final String caCertificate )
+                       final String truststore, final String truststorePassword, final String caCertificate,
+                       final String caPrivateKey, final String caPrivateKeyPassword )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( brokerUrl ), "Invalid broker URL" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( keystore ), "Invalid keystore path" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( keystorePassword ), "Invalid keystore password" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( truststore ), "Invalid truststore path" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( truststorePassword ), "Invalid truststore password" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( caCertificate ), "Invalid CA certificate" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( caPrivateKey ), "Invalid CA private key" );
+        Preconditions
+                .checkArgument( !Strings.isNullOrEmpty( caPrivateKeyPassword ), "Invalid CA private key password" );
 
         this.brokerUrl = brokerUrl;
         this.messageRouter = new MessageRoutingListener();
@@ -94,23 +101,27 @@ public class BrokerImpl implements Broker
         this.truststore = String.format( "%s/%s", Common.SUBUTAI_APP_CERTS_PATH, truststore );
         this.truststorePassword = truststorePassword;
         this.caCertificate = String.format( "%s/%s", Common.SUBUTAI_APP_CERTS_PATH, caCertificate );
+        this.caPrivateKey = String.format( "%s/%s", Common.SUBUTAI_APP_CERTS_PATH, caPrivateKey );
+        this.caPrivateKeyPassword = caPrivateKeyPassword;
     }
 
 
     @Override
-    public ClientCredentials createNewClientCredentials( String clientId ) throws BrokerException
+    public ClientCredentials createNewClientCredentials( String clientId, String password ) throws BrokerException
     {
         try
         {
             KeyPair keyPair = sslUtil.generateKeyPair( "RSA", 2048 );
             CertificateData certData = new CertificateData();
             certData.setCommonName( String.format( "client-%s", clientId ) );
-            X509Certificate certificate = sslUtil.generateSelfSignedCertificate( keyPair, certData );
+            KeyPair caKey = sslUtil.loadEncryptedRsaPrivateKey( caPrivateKey, caPrivateKeyPassword );
+            X509Certificate certificate = sslUtil.generateCaKeySignedCertificate( keyPair, certData, caKey );
             String clientCert = sslUtil.convertToPem( certificate );
-            String clientKey = sslUtil.convertToPem( keyPair.getPrivate() );
+            String clientKey = sslUtil.encryptKey( keyPair.getPrivate(), password );
             String caCert = new String( Files.readAllBytes( Paths.get( caCertificate ) ) );
-            //add client certificate to broker truststore
-            registerClientCertificateWithBroker( String.format( "client-%s", clientId ), certificate );
+
+            //disabled since client certs are signed by CA key now
+            //registerClientCertificateWithBroker( String.format( "client-%s", clientId ), certificate );
 
             return new ClientCredentials( clientCert, clientKey, caCert );
         }
