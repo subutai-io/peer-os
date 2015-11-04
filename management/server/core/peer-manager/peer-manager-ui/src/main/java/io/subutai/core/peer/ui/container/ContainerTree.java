@@ -108,6 +108,7 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
                                 ResourceHost resourceHost = ( ResourceHost ) host;
                                 final ResourceHostMetric metric = resourceHost.getHostMetric();
 
+                                result.append( getText( "<br>ARCH: %s", resourceHost.getArch() ) );
                                 result.append( getText( "<br>CPU model: %s", metric.getCpuModel() ) );
                                 result.append( getText( "<br>CPU load: %.2f", metric.getUsedCpu() ) );
                                 result.append( getText( "<br>Total RAM: %.3f Gb",
