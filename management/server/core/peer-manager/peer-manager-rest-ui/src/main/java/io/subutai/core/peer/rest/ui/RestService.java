@@ -31,7 +31,7 @@ public interface RestService
 
     @PUT
     @Path( "approve" )
-    @Produces( { MediaType.APPLICATION_JSON } )
+    @Produces( { MediaType.TEXT_PLAIN } )
     public Response approveForRegistrationRequest( @FormParam( "approvePeerId" ) String approvePeerId );
 
     @GET
