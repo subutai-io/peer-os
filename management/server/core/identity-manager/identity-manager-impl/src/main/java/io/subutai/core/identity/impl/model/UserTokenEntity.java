@@ -11,9 +11,9 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
-import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 
+import io.subutai.common.security.objects.TokenType;
 import io.subutai.common.security.token.TokenUtil;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserToken;
@@ -35,7 +35,7 @@ public class UserTokenEntity implements UserToken
     private String secret;
 
     @Column( name = "type" )
-    private String type;
+    private int type;
 
     @Column( name = "hash_algorithm" )
     private String hashAlgorithm;
@@ -57,7 +57,7 @@ public class UserTokenEntity implements UserToken
     {
         String str = "";
 
-        str += "{\"typ\":\""+type+"\",";
+        str += "{\"typ\":\"JWT\",";
         str +=  "\"alg\":\""+hashAlgorithm+"\"}";
 
         return str;
@@ -114,20 +114,6 @@ public class UserTokenEntity implements UserToken
 
 
     @Override
-    public String getType()
-    {
-        return type;
-    }
-
-
-    @Override
-    public void setType( final String type )
-    {
-        this.type = type;
-    }
-
-
-    @Override
     public String getHashAlgorithm()
     {
         return hashAlgorithm;
@@ -180,5 +166,25 @@ public class UserTokenEntity implements UserToken
     public void setUser( final User user )
     {
         this.user = user;
+    }
+
+
+    @Override
+    public int getType()
+    {
+        return type;
+    }
+
+
+    @Override
+    public void setType( final int type )
+    {
+        this.type = type;
+    }
+
+    @Override
+    public String getTypeName()
+    {
+        return TokenType.values()[type-1].getName();
     }
 }

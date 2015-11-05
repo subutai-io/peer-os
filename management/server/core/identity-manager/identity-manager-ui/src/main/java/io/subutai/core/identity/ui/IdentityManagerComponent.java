@@ -31,11 +31,13 @@ public class IdentityManagerComponent extends CustomComponent implements Disposa
         //      PermissionsTab permissionsTab = new PermissionsTab( identityManager );
         UsersTab usersTab = new UsersTab( identityManager );
         RolesTab rolesTab = new RolesTab( identityManager );
-        //TokensTab tokensTab = new TokensTab( identityManager );
+        TokensTab tokensTab = new TokensTab( identityManager );
 
         sheet.addTab( usersTab, "User management space." ).setId( "UsersTab" );
 
         sheet.addTab( rolesTab, "Roles management space" ).setId( "RolesManagement" );
+
+        sheet.addTab( tokensTab, "Tokens management space").setId( "Tokens" );
         // TODO uncomment when permissions will be fully implemented
         //        sheet.addTab( permissionsTab, "Permission edition space." ).setId( "PermissionsTab" );
 

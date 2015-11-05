@@ -2,24 +2,27 @@ package io.subutai.core.identity.ui.tabs;
 
 
 import com.vaadin.data.Item;
-import com.vaadin.data.Property;
 import com.vaadin.ui.*;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
+import io.subutai.core.identity.api.model.UserToken;
 import io.subutai.server.ui.component.ConfirmationDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.Date;
 import java.sql.Timestamp;
-import java.util.UUID;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.Calendar;
 
 public class TokensTab extends Panel
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( TokensTab.class );
     private static final String USER_NAME = "User name";
     private static final String TOKEN_NAME = "Token name";
-    private static final String IP_RANGE = "Ip range";
-    private static final String TTL = "TTL";
+   /* private static final String IP_RANGE = "Ip range";
+    private static final String TTL = "TTL";*/
     private static final String CREATE_DATE = "Create date";
     private static final String STATUS = "Status";
 
@@ -27,12 +30,14 @@ public class TokensTab extends Panel
 
     private GridLayout installationControls;
     private HorizontalLayout rangeButtons;
+/*
     private TextField ipRangeStartTxtFld;
     private TextField ipRangeEndTxtFld;
+*/
     private TextField validityPeriodTxtFld;
     private TextField tokenNameTxtFld;
-    private TextField editIpRangeStartTxtFld;
-    private TextField editIpRangeEndTxtFld;
+/*    private TextField editIpRangeStartTxtFld;
+    private TextField editIpRangeEndTxtFld;*/
     private TextField editValidityPeriodTxtFld;
     private TextField editTokenTxtFld;
     private TextField statusTxtFld;
@@ -52,7 +57,7 @@ public class TokensTab extends Panel
         installationControls.setSpacing( true );
         installationControls.setMargin( true );
 
-        ipRangeStartTxtFld = new TextField( "Enter IP range start" );
+/*        ipRangeStartTxtFld = new TextField( "Enter IP range start" );
         ipRangeStartTxtFld.setId( "IpRangeStart" );
         ipRangeStartTxtFld.setInputPrompt( "IP range start" );
         ipRangeStartTxtFld.setRequired( true );
@@ -62,7 +67,7 @@ public class TokensTab extends Panel
         ipRangeEndTxtFld.setId( "IpRangeEnd" );
         ipRangeEndTxtFld.setInputPrompt( "IP range end" );
         ipRangeEndTxtFld.setRequired( true );
-        ipRangeEndTxtFld.setValue( "*" );
+        ipRangeEndTxtFld.setValue( "*" );*/
 
         validityPeriodTxtFld = new TextField( "Enter validity period (hours)" );
         validityPeriodTxtFld.setId( "ValidityPeriod" );
@@ -82,35 +87,7 @@ public class TokensTab extends Panel
         statusTxtFld.setReadOnly( false );
         statusTxtFld.setRequired( false );
 
-        generateTokenBtn = new Button( "Add Token" );
-        generateTokenBtn.setId( "AddToken" );
-        generateTokenBtn.addStyleName( "default" );
-        generateTokenBtn.addClickListener( new Button.ClickListener()
-        {
-            @Override
-            public void buttonClick( final Button.ClickEvent clickEvent )
-            {
-                Timestamp datetime = new Timestamp( System.currentTimeMillis() );
-                String uuid = UUID.randomUUID().toString();
 
-                /*
-                IUserChannelToken userChannelToken = channelManager.getChannelTokenManager().createUserChannelToken();
-
-                userChannelToken.setUserId( userId );
-                userChannelToken.setToken( uuid );
-                userChannelToken.setTokenName( tokenNameTxtFld.getValue() );
-                userChannelToken.setValidPeriod( Short.valueOf( validityPeriodTxtFld.getValue() ) );
-                userChannelToken.setIpRangeStart( ipRangeStartTxtFld.getValue() );
-                userChannelToken.setIpRangeEnd( ipRangeEndTxtFld.getValue() );
-                userChannelToken.setStatus( ( short ) 1 );
-                userChannelToken.setDate( datetime );
-
-                channelManager.getChannelTokenManager().saveUserChannelToken( userChannelToken );
-
-                setUserChannelList();
-                */
-            }
-        } );
 
         userCombo = new ComboBox( "Users" );
         userCombo.setId( "UserCombo" );
@@ -118,7 +95,18 @@ public class TokensTab extends Panel
         userCombo.setNullSelectionAllowed( false );
         userCombo.setTextInputAllowed( false );
         userCombo.setWidth( 200, Unit.PIXELS );
-        userCombo.addValueChangeListener( new Property.ValueChangeListener()
+        boolean set = false;
+        for (User u : identityManager.getAllUsers())
+		{
+			userCombo.addItem (u);
+			userCombo.setItemCaption (u, u.getUserName());
+			if (!set)
+			{
+				userCombo.setValue (u);
+				set = true;
+			}
+		}
+/*        userCombo.addValueChangeListener( new Property.ValueChangeListener()
         {
             @Override
             public void valueChange( Property.ValueChangeEvent event )
@@ -127,7 +115,7 @@ public class TokensTab extends Panel
                 //userName = selectedUser.getUsername();
                 //userId = selectedUser.getId();
             }
-        } );
+        } );*/
         //----------------------------------------------------------------------------------------------
         /*
         if ( user.isAdmin() )
@@ -150,7 +138,7 @@ public class TokensTab extends Panel
 
 
 
-        editIpRangeStartTxtFld = new TextField( "Enter IP range start" );
+/*        editIpRangeStartTxtFld = new TextField( "Enter IP range start" );
         editIpRangeStartTxtFld.setId( "EditIpRangeStart" );
         editIpRangeStartTxtFld.setInputPrompt( "IP range start" );
         editIpRangeStartTxtFld.setRequired( true );
@@ -159,7 +147,7 @@ public class TokensTab extends Panel
         editIpRangeEndTxtFld = new TextField( "Enter IP range end" );
         editIpRangeEndTxtFld.setId( "EditIpRangeEnd" );
         editIpRangeEndTxtFld.setInputPrompt( "IP range end" );
-        editIpRangeEndTxtFld.setRequired( true );
+        editIpRangeEndTxtFld.setRequired( true );*/
 
 
         editValidityPeriodTxtFld = new TextField( "Enter validity period (hours)" );
@@ -175,24 +163,185 @@ public class TokensTab extends Panel
         editTokenTxtFld.setWidth( 280, Unit.PIXELS );
 
         rangeButtons = new HorizontalLayout();
+        rangeButtons.setSpacing (true);
         rangeButtons.addComponent( tokenNameTxtFld );
-        rangeButtons.addComponent( ipRangeStartTxtFld );
-        rangeButtons.addComponent( ipRangeEndTxtFld );
+        /*rangeButtons.addComponent( ipRangeStartTxtFld );
+        rangeButtons.addComponent( ipRangeEndTxtFld );*/
         rangeButtons.addComponent( validityPeriodTxtFld );
         rangeButtons.addComponent( userCombo );
 
         tokenTable = new Table( "Token table" );
         // Define two columns for the built-in container
-        tokenTable.addContainerProperty( "User Name", String.class, null );
+        tokenTable.addContainerProperty( "Username", String.class, null );
         tokenTable.addContainerProperty( "Token Name", String.class, null );
-        tokenTable.addContainerProperty( IP_RANGE, String.class, null );
-        tokenTable.addContainerProperty( "TTL", String.class, null );
-        tokenTable.addContainerProperty( CREATE_DATE, String.class, null );
-        tokenTable.addContainerProperty( STATUS, String.class, null );
-        tokenTable.addContainerProperty( "Token", String.class, null );
+        tokenTable.addContainerProperty( "TTL/Date", String.class, null );
+        tokenTable.addContainerProperty( "Type", String.class, null );
+        tokenTable.addContainerProperty( "Hash Algo", String.class, null );
+        tokenTable.addContainerProperty( "Issuer", String.class, null );
+        tokenTable.addContainerProperty( "Token", Button.class, null );
         tokenTable.addContainerProperty( "Edit", Button.class, null );
         tokenTable.addContainerProperty( "Delete", Button.class, null );
         tokenTable.setHeight( "500px" );
+
+		generateTokenBtn = new Button( "Add Token" );
+		generateTokenBtn.setId( "AddToken" );
+		generateTokenBtn.addStyleName( "default" );
+		generateTokenBtn.addClickListener( new Button.ClickListener()
+		{
+			@Override
+			public void buttonClick( final Button.ClickEvent clickEvent )
+			{
+				// TODO: check if already exists or not
+				Timestamp datetime = new Timestamp( System.currentTimeMillis() );
+				final String uuid = UUID.randomUUID().toString();
+				Date newDate = new Date (datetime.getTime());
+				java.util.Calendar cal = Calendar.getInstance();
+				cal.setTime (newDate);
+				cal.add (Calendar.HOUR_OF_DAY, Integer.parseInt(validityPeriodTxtFld.getValue()));
+				newDate = new Date (cal.getTime().getTime());
+				final UserToken userToken = identityManager.createUserToken ((User) userCombo.getValue(), tokenNameTxtFld.getValue(), null, "issuer", 1, newDate); // TODO: fix issuer and type
+				// TODO: add token to db
+				Object newItemId = tokenTable.addItem();
+				Item row = tokenTable.getItem (newItemId);
+				row.getItemProperty ("Username").setValue (userToken.getUser().getUserName());
+				row.getItemProperty ("Token Name").setValue (userToken.getToken());
+				String date = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format (userToken.getValidDate());
+				row.getItemProperty ("TTL/Date").setValue (date);
+				row.getItemProperty ("Type").setValue (String.valueOf (userToken.getType()));
+				row.getItemProperty ("Hash Algo").setValue (userToken.getHashAlgorithm());
+				row.getItemProperty ("Issuer").setValue (userToken.getIssuer());
+				Button generate = new Button ("Show Token");
+				generate.addClickListener (new Button.ClickListener()
+				{
+					@Override
+					public void buttonClick (Button.ClickEvent event)
+					{
+						final Window window = new Window ("Full token");
+						window.center();
+						window.setClosable (false);
+						window.addStyleName ("default");
+						VerticalLayout content = new VerticalLayout();
+						content.setSpacing (true);
+						content.setMargin (true);
+						Label token = new Label (userToken.getFullToken());
+						Button close = new Button ("Close");
+						close.addClickListener (new Button.ClickListener()
+						{
+							@Override
+							public void buttonClick (Button.ClickEvent event)
+							{
+								window.close();
+							}
+						});
+						content.addComponent (token);
+						content.addComponent (close);
+						content.setComponentAlignment (token, Alignment.BOTTOM_CENTER);
+						content.setComponentAlignment (close, Alignment.BOTTOM_CENTER);
+						window.setContent (content);
+						UI.getCurrent().addWindow (window);
+					}
+				});
+				row.getItemProperty ("Token").setValue (generate);
+				final Button edit = new Button ("Edit");
+				edit.setData (newItemId);
+				edit.addClickListener (new Button.ClickListener()
+				{
+					@Override
+					public void buttonClick (Button.ClickEvent event)
+					{
+						final Window window = new Window ("Edit token info");
+						window.center();
+						window.setClosable (false);
+						window.addStyleName ("default");
+						VerticalLayout content = new VerticalLayout();
+						content.setSpacing (true);
+						content.setMargin (true);
+						HorizontalLayout fieldGrid = new HorizontalLayout();
+						fieldGrid.setSpacing (true);
+						final TextField editTokenName = new TextField ("Edit token name");
+						editTokenName.setValue (tokenTable.getItem (edit.getData()).getItemProperty ("Token Name").getValue().toString());
+
+						final ComboBox editUser = new ComboBox ("Switch user");
+						boolean set = false;
+						for (User u : identityManager.getAllUsers())
+						{
+							editUser.addItem (u);
+							editUser.setItemCaption (u, u.getUserName());
+							if (u.getUserName() == tokenTable.getItem (edit.getData()).getItemProperty ("Username").getValue())
+							{
+								set = true;
+								editUser.setValue (u);
+							}
+						}
+						if (!set)
+						{
+							editUser.setValue (identityManager.getAllUsers().get (0));
+						}
+						fieldGrid.addComponent (editTokenName);
+						fieldGrid.addComponent (editUser);
+						Button close = new Button ("Close");
+						close.addClickListener (new Button.ClickListener()
+						{
+							@Override
+							public void buttonClick (Button.ClickEvent event)
+							{
+								window.close();
+							}
+						});
+						Button save = new Button ("Save");
+						save.addStyleName ("default");
+						save.addClickListener (new Button.ClickListener()
+						{
+							@Override
+							public void buttonClick (Button.ClickEvent event)
+							{
+								// TODO: add checks
+								userToken.setUser ((User) editUser.getValue());
+								userToken.setToken (editTokenName.getValue());
+								// TODO: save in db
+							}
+						});
+						content.addComponent (fieldGrid);
+						content.addComponent (close);
+						content.setComponentAlignment (fieldGrid, Alignment.BOTTOM_CENTER);
+						content.setComponentAlignment (close, Alignment.BOTTOM_CENTER);
+						window.setContent (content);
+						UI.getCurrent().addWindow (window);
+					}
+				});
+				row.getItemProperty ("Edit").setValue (edit);
+				final Button delete = new Button ("Delete");
+				delete.setData (newItemId);
+				delete.addClickListener (new Button.ClickListener()
+				{
+					@Override
+					public void buttonClick (Button.ClickEvent event)
+					{
+						// TODO: delete token from where it is stored
+						tokenTable.removeItem (delete.getData());
+					}
+				});
+				row.getItemProperty ("Delete").setValue (delete);
+				/*
+				IUserChannelToken userChannelToken = channelManager.getChannelTokenManager().createUserChannelToken();
+
+                userChannelToken.setUserId( userId );
+                userChannelToken.setToken( uuid );
+                userChannelToken.setTokenName( tokenNameTxtFld.getValue() );
+                userChannelToken.setValidPeriod( Short.valueOf( validityPeriodTxtFld.getValue() ) );
+                userChannelToken.setIpRangeStart( ipRangeStartTxtFld.getValue() );
+                userChannelToken.setIpRangeEnd( ipRangeEndTxtFld.getValue() );
+                userChannelToken.setStatus( ( short ) 1 );
+                userChannelToken.setDate( datetime );
+
+                channelManager.getChannelTokenManager().saveUserChannelToken( userChannelToken );
+
+                setUserChannelList();
+                */
+			}
+		} );
+
+
 
         //--------------------------------------------------------------------------------
 
@@ -211,13 +360,13 @@ public class TokensTab extends Panel
     }
 
 
-    private Table createTokensTable( String caption )
+    private Table createTokensTable ( String caption )
     {
         Table table = new Table( caption );
         table.addContainerProperty( USER_NAME, String.class, null );
         table.addContainerProperty( TOKEN_NAME, String.class, null );
-        table.addContainerProperty( IP_RANGE, String.class, null );
-        table.addContainerProperty( TTL, String.class, null );
+//        table.addContainerProperty( IP_RANGE, String.class, null );
+       // table.addContainerProperty( TTL, String.class, null );
         table.addContainerProperty( CREATE_DATE, String.class, null );
         table.addContainerProperty( STATUS, String.class, null );
         table.addContainerProperty( "", Button.class, null );
@@ -259,9 +408,11 @@ public class TokensTab extends Panel
         //editIpRangeEndTxtFld.setValue( userChannelToken.getIpRangeEnd() );
         //editValidityPeriodTxtFld.setValue( Short.toString( userChannelToken.getValidPeriod() ) );
 
+		content.setSpacing (true);
+		content.setMargin (true);
         content.addComponent( editTokenTxtFld );
-        content.addComponent( editIpRangeStartTxtFld );
-        content.addComponent( editIpRangeEndTxtFld );
+/*        content.addComponent( editIpRangeStartTxtFld );
+        content.addComponent( editIpRangeEndTxtFld );*/
         content.addComponent( editValidityPeriodTxtFld );
         content.addComponent( editSubBtn );
 
