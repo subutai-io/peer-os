@@ -5,7 +5,7 @@
   <parent>
     <groupId>io.subutai</groupId>
     <artifactId>mgmt-server-parent</artifactId>
-    <version>4.0.0-RC2</version>
+    <version>4.0.0-RC3</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
@@ -16,6 +16,7 @@
   <packaging>pom</packaging>
 
   <modules>
+    <module>blueprint-authz</module>
     <module>file-tracker</module>
     <module>git-manager</module>
     <module>lxc-quota-manager</module>
@@ -36,7 +37,7 @@
     <module>identity-manager</module>
     <module>channel-manager</module>
     <module>http-context-manager</module>
-    <module>subutai-cli-rbac</module>
+    <module>cli-controller</module>
     <module>key-server</module>
     <module>security-manager</module>
     <module>node-registration</module>

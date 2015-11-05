@@ -32,6 +32,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
+import io.subutai.common.host.HostId;
 import io.subutai.common.host.Interface;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.mdc.SubutaiExecutors;
@@ -39,6 +40,7 @@ import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
 import io.subutai.common.network.VniVlanMapping;
+import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.Disposable;
 import io.subutai.common.protocol.N2NConfig;
@@ -263,9 +265,9 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     }
 
 
-    public void cleanupEnvironmentNetworkSettings( final String environmentId ) throws PeerException
+    public void cleanupEnvironmentNetworkSettings( final EnvironmentId environmentId ) throws PeerException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
         try
         {
@@ -293,7 +295,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
 
 
     @Override
-    public void removeTunnel( final String tunnelIp ) throws PeerException
+    public void removeTunnel( final String tunnelIp )
     {
         try
         {
@@ -309,9 +311,9 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
                 }
             }
         }
-        catch ( NetworkManagerException e )
+        catch ( PeerException | NetworkManagerException e )
         {
-            throw new PeerException( "Error removing tunnel", e );
+            LOG.warn( "Error removing tunnel", e );
         }
     }
 
@@ -409,12 +411,12 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
 
 
     @Override
-    public int reserveVni( final Vni vni ) throws PeerException
+    public Vni reserveVni( final Vni vni ) throws PeerException
     {
         Preconditions.checkNotNull( vni, "Invalid vni" );
 
         //need to execute sequentially since other parallel executions can take the same VNI
-        Future<Integer> future = queueSequentialTask( new ReserveVniTask( getNetworkManager(), vni, this ) );
+        Future<Vni> future = queueSequentialTask( new ReserveVniTask( getNetworkManager(), vni, this ) );
 
         try
         {
@@ -576,15 +578,22 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
 
 
     @Override
-    public void removeN2NConnection( final N2NConfig config ) throws PeerException
+    public void removeN2NConnection( final N2NConfig config )
     {
         try
         {
             getNetworkManager().removeN2NConnection( config.getInterfaceName(), config.getCommunityName() );
         }
-        catch ( NetworkManagerException e )
+        catch ( PeerException | NetworkManagerException e )
         {
-            throw new PeerException( "Unable remove host from n2n tunnel.", e );
+            LOG.warn( "Unable remove host from n2n tunnel.", e );
         }
+    }
+
+
+    @Override
+    public boolean isConnected()
+    {
+        return getPeer().isConnected( new HostId( getId() ) );
     }
 }

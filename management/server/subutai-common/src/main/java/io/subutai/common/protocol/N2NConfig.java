@@ -17,6 +17,7 @@ public class N2NConfig
     private String communityName;
     private String address;
     private String sharedKey;
+    private String environmentId;
 
 
     public N2NConfig()
@@ -24,10 +25,12 @@ public class N2NConfig
     }
 
 
-    public N2NConfig( final String peerId, final String superNodeIp, final int n2nPort, final String interfaceName,
-                      final String communityName, final String address, final String sharedKey )
+    public N2NConfig( final String peerId, final String environmentId, final String superNodeIp, final int n2nPort,
+                      final String interfaceName, final String communityName, final String address,
+                      final String sharedKey )
     {
         this.peerId = peerId;
+        this.environmentId = environmentId;
         this.superNodeIp = superNodeIp;
         this.n2NPort = n2nPort;
         this.interfaceName = interfaceName;
@@ -151,5 +154,11 @@ public class N2NConfig
     public int hashCode()
     {
         return address.hashCode();
+    }
+
+
+    public String getEnvironmentId()
+    {
+        return environmentId;
     }
 }

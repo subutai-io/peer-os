@@ -5,7 +5,7 @@
   <parent>
     <artifactId>repository-manager</artifactId>
     <groupId>io.subutai</groupId>
-    <version>4.0.0-RC2</version>
+    <version>4.0.0-RC3</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -21,7 +21,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>subutai-cli-rbac</artifactId>
+      <artifactId>cli-controller</artifactId>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>

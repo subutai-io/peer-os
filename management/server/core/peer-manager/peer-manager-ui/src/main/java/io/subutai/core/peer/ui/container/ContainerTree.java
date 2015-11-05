@@ -20,22 +20,24 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.Tree;
 
 import io.subutai.common.host.Interface;
+import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.settings.Common;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hostregistry.api.HostRegistry;
-import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.ManagementHost;
-import io.subutai.common.peer.ResourceHost;
 import io.subutai.server.ui.component.ConcurrentComponent;
 
 
 public class ContainerTree extends ConcurrentComponent implements HostListener
 {
+    private static final String VALUE_PROPERTY = "value";
+    private static final String ICON_PROPERTY = "icon";
 
     private static final Logger LOG = LoggerFactory.getLogger( ContainerTree.class.getName() );
     private final LocalPeer localPeer;
@@ -60,11 +62,11 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
     private void initView( final HostRegistry hostRegistry )
     {
         container = new HierarchicalContainer();
-        container.addContainerProperty( "value", Host.class, null );
-        container.addContainerProperty( "icon", Resource.class, new ThemeResource( "img/lxc/physical.png" ) );
+        container.addContainerProperty( VALUE_PROPERTY, Host.class, null );
+        container.addContainerProperty( ICON_PROPERTY, Resource.class, new ThemeResource( "img/lxc/physical.png" ) );
 
         tree.setContainerDataSource( getNodeContainer() );
-        tree.setItemIconPropertyId( "icon" );
+        tree.setItemIconPropertyId( ICON_PROPERTY );
         tree.setItemDescriptionGenerator( new AbstractSelect.ItemDescriptionGenerator()
         {
 
@@ -75,7 +77,7 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
                 StringBuilder result = new StringBuilder();
                 if ( item != null )
                 {
-                    Host host = ( Host ) item.getItemProperty( "value" ).getValue();
+                    Host host = ( Host ) item.getItemProperty( VALUE_PROPERTY ).getValue();
                     if ( host != null )
                     {
                         try
@@ -139,9 +141,9 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
                     Set<Host> selectedList = new HashSet<>();
                     for ( Object o : ( Iterable<?> ) t.getValue() )
                     {
-                        if ( tree.getItem( o ).getItemProperty( "value" ).getValue() != null )
+                        if ( tree.getItem( o ).getItemProperty( VALUE_PROPERTY ).getValue() != null )
                         {
-                            Host host = ( Host ) tree.getItem( o ).getItemProperty( "value" ).getValue();
+                            Host host = ( Host ) tree.getItem( o ).getItemProperty( VALUE_PROPERTY ).getValue();
                             selectedList.add( host );
                         }
                     }
@@ -149,6 +151,28 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
                 }
             }
         } );
+
+        //added this to insert static CSS ids to tree items since we can not set HTML element ids for them
+        tree.setItemStyleGenerator( new Tree.ItemStyleGenerator()
+        {
+
+            public String getStyle( Tree tree, Object itemId )
+            {
+
+                Item item = tree.getItem( itemId );
+                if ( item != null )
+                {
+                    Host host = ( Host ) item.getItemProperty( VALUE_PROPERTY ).getValue();
+                    if ( host != null )
+                    {
+                        return "hostname_" + host.getHostname();
+                    }
+                }
+
+                return null;
+            }
+        } );
+
         addComponent( tree );
 
         final ContainerTree currentTree = this;
@@ -179,6 +203,11 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
         {
             LOG.warn( "Error accessing management host" );
         }
+
+        for ( ResourceHost rh : localPeer.getResourceHosts() )
+        {
+            tree.expandItem( rh.getId() );
+        }
     }
 
 
@@ -207,7 +236,7 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
                 {
                     managementHostItem = container.addItem( managementHost.getId() );
                     container.setChildrenAllowed( managementHost.getId(), true );
-                    managementHostItem.getItemProperty( "value" ).setValue( managementHost );
+                    managementHostItem.getItemProperty( VALUE_PROPERTY ).setValue( managementHost );
                     tree.setItemCaption( managementHost.getId(),
                             String.format( localPeer.getPeerInfo().getName(), localPeer.getPeerInfo().getId() ) );
                 }
@@ -222,14 +251,15 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
             {
                 String itemId = ( String ) itemObj;
                 Item item = container.getItem( itemId );
-                Object o = item.getItemProperty( "value" ).getValue();
+                Object o = item.getItemProperty( VALUE_PROPERTY ).getValue();
                 if ( ( o instanceof Host ) && ( ( ( Host ) o ).isConnected() ) )
                 {
-                    item.getItemProperty( "icon" ).setValue( new ThemeResource( "img/lxc/virtual.png" ) );
+                    item.getItemProperty( ICON_PROPERTY ).setValue( new ThemeResource( "img/lxc/virtual.png" ) );
                 }
                 else
                 {
-                    item.getItemProperty( "icon" ).setValue( new ThemeResource( "img/lxc/virtual_offline.png" ) );
+                    item.getItemProperty( ICON_PROPERTY )
+                        .setValue( new ThemeResource( "img/lxc/virtual_offline.png" ) );
                 }
             }
         }
@@ -254,7 +284,7 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
             resourceHostItem = container.addItem( rh.getId() );
         }
         tree.setItemCaption( rh.getId(), rh.getHostname() );
-        resourceHostItem.getItemProperty( "value" ).setValue( rh );
+        resourceHostItem.getItemProperty( VALUE_PROPERTY ).setValue( rh );
         if ( managementHostItem != null )
         {
             container.setParent( rh.getId(), managementHost.getId() );
@@ -271,9 +301,10 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
                     container.setChildrenAllowed( ch.getId(), false );
                 }
                 tree.setItemCaption( ch.getId(), ch.getHostname() );
-                containerHostItem.getItemProperty( "value" ).setValue( ch );
+                containerHostItem.getItemProperty( VALUE_PROPERTY ).setValue( ch );
                 container.setParent( ch.getId(), rh.getId() );
             }
+            tree.expandItem( rh.getId() );
         }
         else
         {
@@ -292,7 +323,7 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
             for ( final Object id : ids )
             {
                 Item item = container.getItem( id );
-                ContainerHost containerHost = ( ContainerHost ) item.getItemProperty( "value" ).getValue();
+                ContainerHost containerHost = ( ContainerHost ) item.getItemProperty( VALUE_PROPERTY ).getValue();
                 if ( !rh.getContainerHosts().contains( containerHost ) )
                 {
                     container.removeItem( item );

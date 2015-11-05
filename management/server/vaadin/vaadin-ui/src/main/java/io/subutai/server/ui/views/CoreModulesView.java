@@ -4,16 +4,9 @@ package io.subutai.server.ui.views;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.naming.NamingException;
-
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
-import io.subutai.common.util.ServiceLocator;
-import io.subutai.core.identity.api.IdentityManager;
-import io.subutai.core.identity.api.PortalModuleScope;
-import io.subutai.core.identity.api.Role;
-import io.subutai.core.identity.api.User;
 import io.subutai.server.ui.MainUI;
 import io.subutai.server.ui.api.PortalModule;
 import io.subutai.server.ui.api.PortalModuleListener;
@@ -32,6 +25,7 @@ import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 
 
+
 public class CoreModulesView extends VerticalLayout implements View, PortalModuleListener
 {
 
@@ -41,7 +35,6 @@ public class CoreModulesView extends VerticalLayout implements View, PortalModul
     private HashMap<String, PortalModule> modules = new HashMap<>();
     private HashMap<String, AbstractLayout> moduleViews = new HashMap<>();
     private static PortalModuleService portalModuleService = null;
-    private static final ServiceLocator serviceLocator = new ServiceLocator();
 
 
     public CoreModulesView()
@@ -64,25 +57,12 @@ public class CoreModulesView extends VerticalLayout implements View, PortalModul
                 AbstractLayout layout = moduleViews.get( entry.getKey() );
                 if ( layout != null )
                 {
-                    layout.setVisible( false );
+                    layout.setVisible( true );
                 }
             }
 
-            IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
-            User user = identityManager.getUser();
-            for ( final Role role : user.getRoles() )
-            {
-                for ( final PortalModuleScope module : role.getAccessibleModules() )
-                {
-                    AbstractLayout layout = moduleViews.get( module.getModuleKey() );
-                    if ( layout != null )
-                    {
-                        layout.setVisible( true );
-                    }
-                }
-            }
         }
-        catch ( NamingException e )
+        catch ( Exception e )
         {
             LOG.error( "Error getting identityManager service", e );
         }
@@ -147,7 +127,6 @@ public class CoreModulesView extends VerticalLayout implements View, PortalModul
                 if ( serviceReference != null )
                 {
                     portalModuleService = PortalModuleService.class.cast( ctx.getService( serviceReference ) );
-                    //                    return PortalModuleService.class.cast( ctx.getService( serviceReference ) );
                 }
             }
         }
@@ -171,7 +150,7 @@ public class CoreModulesView extends VerticalLayout implements View, PortalModul
             }
         } );
         moduleViews.put( module.getId(), moduleView );
-        modulesLayout.addComponent( moduleView );
+        modulesLayout.addComponent( moduleView, getPortalModuleService().getCoreModules().indexOf( module ) );
     }
 
 

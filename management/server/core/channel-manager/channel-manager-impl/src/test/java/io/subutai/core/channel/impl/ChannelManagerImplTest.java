@@ -9,7 +9,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import io.subutai.common.dao.DaoManager;
-import io.subutai.core.channel.api.token.ChannelTokenManager;
 
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
@@ -24,15 +23,11 @@ public class ChannelManagerImplTest
     DaoManager daoManager;
     @Mock
     EntityManagerFactory entityManagerFactory;
-    @Mock
-    ChannelTokenManager channelTokenManager;
 
     @Before
     public void setUp() throws Exception
     {
         channelManager = new ChannelManagerImpl();
-        channelManager.setDaoManager( daoManager );
-        channelManager.setChannelTokenManager( channelTokenManager );
     }
 
 
@@ -50,20 +45,6 @@ public class ChannelManagerImplTest
     public void testDestroy() throws Exception
     {
         channelManager.destroy();
-    }
-
-
-    @Test
-    public void testGetDaoManager() throws Exception
-    {
-        assertNotNull(channelManager.getDaoManager());
-    }
-
-
-    @Test
-    public void testGetChannelTokenManager() throws Exception
-    {
-        assertNotNull( channelManager.getChannelTokenManager() );
     }
 
 

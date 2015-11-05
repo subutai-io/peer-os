@@ -6,12 +6,11 @@
   <persistence-unit name="identityManagerPUnit" transaction-type="RESOURCE_LOCAL">
     <non-jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=openjpa/subutaiDS)
     </non-jta-data-source>
-    <class>io.subutai.core.identity.impl.entity.UserEntity</class>
-    <class>io.subutai.core.identity.impl.entity.RoleEntity</class>
-    <class>io.subutai.core.identity.impl.entity.PermissionEntity</class>
-    <class>io.subutai.core.identity.impl.entity.PortalModuleScopeEntity</class>
-    <class>io.subutai.core.identity.impl.entity.RestEndpointScopeEntity</class>
-    <class>io.subutai.core.identity.impl.entity.CliCommandEntity</class>
+      <class>io.subutai.core.identity.impl.model.UserEntity</class>
+      <class>io.subutai.core.identity.impl.model.RoleEntity</class>
+      <class>io.subutai.core.identity.impl.model.SessionEntity</class>
+      <class>io.subutai.core.identity.impl.model.UserTokenEntity</class>
+      <class>io.subutai.core.identity.impl.model.PermissionEntity</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
       <!--<property name="openjpa.Log" value="DefaultLevel=WARN, Runtime=INFO, Tool=INFO, SQL=INFO" /> -->

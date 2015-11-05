@@ -38,6 +38,7 @@ public class SecurityManagerImpl implements SecurityManager
     private SecretKeyStoreDAO secretKeyStoreDAO = null;
     private KeyStoreManager keyStoreManager = null;
     private CertificateManager certificateManager = null;
+    private Object provider;
 
 
     /* *****************************
@@ -53,7 +54,7 @@ public class SecurityManagerImpl implements SecurityManager
      *
      */
     public SecurityManagerImpl( String ownerPublicKeyringFile, String secretKeyringFile, String publicKeyringFile,
-                                String secretKeyringPwd )
+                                String secretKeyringPwd, Object provider )
     {
         keyData = new SecurityKeyData();
 
@@ -71,7 +72,7 @@ public class SecurityManagerImpl implements SecurityManager
     {
         securityManagerDAO = new SecurityManagerDAOImpl( daoManager );
         secretKeyStoreDAO = new SecretKeyStoreDAOImpl( daoManager );
-        keyManager = new KeyManagerImpl( securityManagerDAO, secretKeyStoreDAO, keyServer, keyData );
+        keyManager = new KeyManagerImpl( securityManagerDAO, secretKeyStoreDAO, keyServer, keyData, provider );
         encryptionTool = new EncryptionToolImpl( ( KeyManagerImpl ) keyManager );
         keyStoreManager = new KeyStoreManagerImpl();
         certificateManager = new CertificateManagerImpl();

@@ -12,7 +12,7 @@ import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.test.SystemOutRedirectTest;
 import io.subutai.core.identity.api.IdentityManager;
-import io.subutai.core.identity.api.User;
+import io.subutai.core.identity.api.model.User;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
@@ -57,7 +57,7 @@ public class HostsCommandTest extends SystemOutRedirectTest
         command = new HostsCommand();
         command.setPeerManager( peerManager );
         command.setIdentityManager( identityManager );
-        when( identityManager.getUser() ).thenReturn( user );
+        //when( identityManager.getUser() ).thenReturn( user );
         when( peerManager.getLocalPeer() ).thenReturn( localPeer );
         when( localPeer.getManagementHost() ).thenReturn( managementHost );
         when( localPeer.getResourceHosts() ).thenReturn( Sets.newHashSet( resourceHost ) );
@@ -65,7 +65,7 @@ public class HostsCommandTest extends SystemOutRedirectTest
         when( managementHost.getHostname() ).thenReturn( MGMT_HOST_HOSTNAME );
         when( resourceHost.getHostname() ).thenReturn( RESOURCE_HOST_HOSTNAME );
         when( containerHost.getHostname() ).thenReturn( CONTAINER_HOST_HOSTNAME );
-        when( user.getUsername() ).thenReturn( USERNAME );
+        //when( user.getUsername() ).thenReturn( USERNAME );
         when( managementHost.getId() ).thenReturn( ID );
         when( resourceHost.getId() ).thenReturn( ID );
         when( containerHost.getId() ).thenReturn( ID );

@@ -40,6 +40,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 import io.subutai.common.security.crypto.certificate.CertificateData;
+import io.subutai.common.settings.Common;
 import io.subutai.core.broker.api.Broker;
 import io.subutai.core.broker.api.BrokerException;
 import io.subutai.core.broker.api.ByteMessageListener;
@@ -88,12 +89,11 @@ public class BrokerImpl implements Broker
 
         this.brokerUrl = brokerUrl;
         this.messageRouter = new MessageRoutingListener();
-        //todo prefix store paths with Common.SUBUTAI_APP_DATA_PATH
-        this.keystore = keystore;
+        this.keystore = String.format( "%s/%s", Common.SUBUTAI_APP_CERTS_PATH, keystore );
         this.keystorePassword = keystorePassword;
-        this.truststore = truststore;
+        this.truststore = String.format( "%s/%s", Common.SUBUTAI_APP_CERTS_PATH, truststore );
         this.truststorePassword = truststorePassword;
-        this.caCertificate = caCertificate;
+        this.caCertificate = String.format( "%s/%s", Common.SUBUTAI_APP_CERTS_PATH, caCertificate );
     }
 
 

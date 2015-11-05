@@ -1,6 +1,5 @@
 package io.subutai.core.identity.rest;
 
-
 import io.subutai.core.identity.api.IdentityManager;
 
 
@@ -16,8 +15,8 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public String getKey( final String username )
+    public String getToken( final String userName, final String password )
     {
-        return identityManager.getUserKey(username);
+        return identityManager.getUserToken( userName,password );
     }
 }

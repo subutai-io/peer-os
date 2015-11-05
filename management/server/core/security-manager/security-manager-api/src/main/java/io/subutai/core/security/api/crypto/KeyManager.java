@@ -122,4 +122,6 @@ public interface KeyManager
      *
      */
     public PGPPublicKey getRemoteHostPublicKey( String hostId, String ip );
+
+    public String getFingerprint( String hostId );
 }

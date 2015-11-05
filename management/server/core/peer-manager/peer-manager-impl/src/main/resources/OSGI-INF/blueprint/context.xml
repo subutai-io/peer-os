@@ -7,6 +7,10 @@
            xmlns:authz="http://aries.apache.org/xmlns/authorization/v1.0.0"
     >
 
+  <!-- ***************************************************************** -->
+  <authz:enable/>
+  <!-- ***************************************************************** -->
+
   <!-- Allow the use of system properties -->
   <ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]" />
 

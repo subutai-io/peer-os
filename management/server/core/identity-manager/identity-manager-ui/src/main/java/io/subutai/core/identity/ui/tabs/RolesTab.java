@@ -1,19 +1,15 @@
 package io.subutai.core.identity.ui.tabs;
 
 
+import com.vaadin.ui.*;
 import io.subutai.core.identity.api.IdentityManager;
-import io.subutai.core.identity.api.Role;
+import io.subutai.core.identity.api.model.Role;
 import io.subutai.core.identity.ui.tabs.subviews.RoleForm;
 
-import com.google.common.collect.Sets;
+
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.CustomComponent;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Table;
-import com.vaadin.ui.VerticalLayout;
 
 
 public class RolesTab extends CustomComponent implements TabCallback<BeanItem<Role>>
@@ -34,7 +30,7 @@ public class RolesTab extends CustomComponent implements TabCallback<BeanItem<Ro
     private BeanItemContainer<Role> beans;
     private Button newBean;
     private RoleForm form;
-
+	private BeanItem <Role> setRole;
 
     public RolesTab( final IdentityManager identityManager )
     {
@@ -52,10 +48,8 @@ public class RolesTab extends CustomComponent implements TabCallback<BeanItem<Ro
         beans = new BeanItemContainer<>( Role.class );
 
         beans.addAll( identityManager.getAllRoles() );
-        //        beans.addNestedContainerProperty( "permissionGroup.name" );
+        //beans.addNestedContainerProperty( "permissionGroup.name" );
 
-        // A layout for the table and form
-        HorizontalLayout layout = new HorizontalLayout();
 
         // Bind a table to it
         rolesTable = new Table( "Permissions", beans );
@@ -64,12 +58,6 @@ public class RolesTab extends CustomComponent implements TabCallback<BeanItem<Ro
         rolesTable.setColumnHeader( "name", "Name" );
         rolesTable.setBuffered( false );
 
-        // Create a form for editing a selected or new item.
-        // It is invisible until actually used.
-        form = new RoleForm( this, Sets.newHashSet( identityManager.getAllPermissions() ),
-                identityManager.getAllPortalModules(), identityManager.getAllRestEndpoints(),
-                identityManager.getAllCliCommands() );
-        form.setVisible( false );
 
         // When the user selects an item, show it in the form
         rolesTable.addValueChangeListener( new Property.ValueChangeListener()
@@ -83,8 +71,7 @@ public class RolesTab extends CustomComponent implements TabCallback<BeanItem<Ro
                     form.setVisible( false );
                     return;
                 }
-                BeanItem<Role> permission = beans.getItem( rolesTable.getValue() );
-                form.setRole( permission, false );
+                setRole = new BeanItem<> (beans.getItem (rolesTable.getValue()).getBean());
                 refreshControls( FormState.STATE_EXISTING_ENTITY_SELECTED );
                 //                rolesTable.select( null );
             }
@@ -102,7 +89,7 @@ public class RolesTab extends CustomComponent implements TabCallback<BeanItem<Ro
             {
 
                 // Create a new item; this will create a new bean
-                BeanItem<Role> newPermission = new BeanItem<>( identityManager.createRole( "" ) );
+                //BeanItem<Role> newPermission = new BeanItem<>( identityManager.createRole( "" ) );
 
                 // The form was opened for editing a new item
                 refreshControls( FormState.STATE_NEW_ENTITY );
@@ -110,17 +97,16 @@ public class RolesTab extends CustomComponent implements TabCallback<BeanItem<Ro
 
                 // Make the form a bit nicer
                 //this is an example for future how to improve UI
-                form.setRole( newPermission, true );
+                //form.setRole( newPermission, true );
             }
         } );
 
-        layout.addComponent( rolesTable );
-        layout.addComponent( form );
 
-        layout.setSpacing( true );
 
-        vlayout.addComponent( layout );
-        vlayout.addComponent( newBean );
+        vlayout.setSpacing (true);
+        vlayout.setMargin (true);
+		vlayout.addComponent( newBean );
+        vlayout.addComponent( rolesTable );
 
         setCompositionRoot( vlayout );
     }
@@ -138,29 +124,33 @@ public class RolesTab extends CustomComponent implements TabCallback<BeanItem<Ro
         switch ( state )
         {
             case STATE_EXISTING_ENTITY_SELECTED:
-                newBean.setEnabled( false );
-                form.setVisible( true );
-                rolesTable.setEnabled( false );
+            	form = new RoleForm (this);
+            	form.setRole (setRole);
+                newBean.setEnabled(false);
+				UI.getCurrent().addWindow (form);
+				rolesTable.setEnabled(false);
                 break;
             case STATE_SAVE_EXISTING_ENTITY:
             case STATE_SAVE_NEW_ENTITY:
                 newBean.setEnabled( true );
                 rolesTable.setEnabled( true );
-                form.setVisible( false );
+                form.close();
                 break;
             case STATE_REMOVE_ENTITY:
                 newBean.setEnabled( true );
-                form.setVisible( false );
+                form.close();
                 rolesTable.setEnabled( true );
                 break;
             case STATE_NEW_ENTITY:
-                form.setVisible( true );
+				form = new RoleForm (this);
+				form.setRole (setRole);
+				UI.getCurrent().addWindow(form);
                 newBean.setEnabled( false );
                 rolesTable.setEnabled( false );
                 //                rolesTable.select( null );
                 break;
             case STATE_CANCEL:
-                form.setVisible( false );
+                form.close();
                 newBean.setEnabled( true );
                 rolesTable.setEnabled( true );
                 break;
@@ -171,7 +161,7 @@ public class RolesTab extends CustomComponent implements TabCallback<BeanItem<Ro
     @Override
     public void saveOperation( final BeanItem<Role> value, final boolean newValue )
     {
-        identityManager.updateRole( value.getBean() );
+        //identityManager.updateRole( value.getBean() );
         if ( newValue )
         {
             beans.addBean( value.getBean() );
@@ -189,7 +179,7 @@ public class RolesTab extends CustomComponent implements TabCallback<BeanItem<Ro
     {
         if ( !newValue )
         {
-            identityManager.deleteRole( value.getBean() );
+            //identityManager.deleteRole( value.getBean() );
             beans.removeItem( value.getBean() );
         }
         refreshControls( FormState.STATE_REMOVE_ENTITY );
@@ -201,4 +191,10 @@ public class RolesTab extends CustomComponent implements TabCallback<BeanItem<Ro
     {
         refreshControls( FormState.STATE_CANCEL );
     }
+
+
+    public IdentityManager getIdentityManager()
+	{
+		return this.identityManager;
+	}
 }

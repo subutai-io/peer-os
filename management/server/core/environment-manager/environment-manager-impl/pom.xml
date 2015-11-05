@@ -5,7 +5,7 @@
   <parent>
     <artifactId>environment-manager</artifactId>
     <groupId>io.subutai</groupId>
-    <version>4.0.0-RC2</version>
+    <version>4.0.0-RC3</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -71,12 +71,6 @@
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-all</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.shiro</groupId>
-      <artifactId>shiro-core</artifactId>
-      <version>${org.apache.shiro.version}</version>
       <scope>test</scope>
     </dependency>
 

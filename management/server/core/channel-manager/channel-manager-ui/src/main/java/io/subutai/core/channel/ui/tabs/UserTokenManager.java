@@ -6,9 +6,8 @@ import java.util.List;
 import java.util.UUID;
 
 import io.subutai.core.channel.api.ChannelManager;
-import io.subutai.core.channel.api.entity.IUserChannelToken;
 import io.subutai.core.identity.api.IdentityManager;
-import io.subutai.core.identity.api.User;
+import io.subutai.core.identity.api.model.User;
 import io.subutai.server.ui.component.ConfirmationDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,7 +64,7 @@ public class UserTokenManager extends Panel
     {
         this.channelManager = channelManager;
         this.identityManager = identityManager;
-        user = identityManager.getUser();
+        //user = identityManager.getUser();
 
 
         installationControls = new GridLayout( 1, 2 );
@@ -113,7 +112,7 @@ public class UserTokenManager extends Panel
             {
                 Timestamp datetime = new Timestamp( System.currentTimeMillis() );
                 String uuid = UUID.randomUUID().toString();
-
+                /*
                 IUserChannelToken userChannelToken = channelManager.getChannelTokenManager().createUserChannelToken();
 
                 userChannelToken.setUserId( userId );
@@ -128,6 +127,7 @@ public class UserTokenManager extends Panel
                 channelManager.getChannelTokenManager().saveUserChannelToken( userChannelToken );
 
                 setUserChannelList();
+                */
             }
         } );
 
@@ -143,24 +143,24 @@ public class UserTokenManager extends Panel
             public void valueChange( Property.ValueChangeEvent event )
             {
                 User selectedUser = ( User ) event.getProperty().getValue();
-                userName = selectedUser.getUsername();
-                userId = selectedUser.getId();
+                //userName = selectedUser.getUsername();
+                //userId = selectedUser.getId();
             }
         } );
         //----------------------------------------------------------------------------------------------
-        if ( user.isAdmin() )
+        //if ( user.isAdmin() )
         {
             userCombo.setVisible( true );
 
-            List<User> userList = identityManager.getAllUsers();
+            //List<User> userList = identityManager.getAllUsers();
 
-            for ( User user : userList )
+           // for ( User user : userList )
             {
                 userCombo.addItem( user );
-                userCombo.setItemCaption( user, user.getUsername() );
+                //userCombo.setItemCaption( user, user.getUsername() );
             }
         }
-        else
+        //else
         {
             userCombo.setVisible( false );
         }
@@ -214,8 +214,8 @@ public class UserTokenManager extends Panel
 
         //--------------------------------------------------------------------------------
 
-        userName = user.getUsername();
-        userId = user.getId();
+        //userName = user.getUsername();
+        //userId = user.getId();
         setUserChannelList();
         //--------------------------------------------------------------------------------
 
@@ -258,15 +258,9 @@ public class UserTokenManager extends Panel
     }
 
 
-    private void setValues( IUserChannelToken userChannelToken )
-    {
-        //ignore
-    }
-
-
     private void openEditWindow( final Button.ClickEvent clickEvent )
     {
-        final IUserChannelToken userChannelToken = ( IUserChannelToken ) clickEvent.getButton().getData();
+        //final IUserChannelToken userChannelToken = ( IUserChannelToken ) clickEvent.getButton().getData();
 
         subWindow = new Window();
 
@@ -278,6 +272,7 @@ public class UserTokenManager extends Panel
         VerticalLayout content = new VerticalLayout();
         content.setMargin( true );
 
+        /*
         editTokenTxtFld.setValue( userChannelToken.getTokenName() );
         editIpRangeStartTxtFld.setValue( userChannelToken.getIpRangeStart() );
         editIpRangeEndTxtFld.setValue( userChannelToken.getIpRangeEnd() );
@@ -322,23 +317,23 @@ public class UserTokenManager extends Panel
         subWindow.setModal( true );
         subWindow.setImmediate( true );
         subWindow.setContent( content );
-        UI.getCurrent().addWindow( subWindow );
+        UI.getCurrent().addWindow( subWindow );*/
     }
 
 
     private void setUserChannelList()
     {
-        List<IUserChannelToken> userChannelTokenList = null;
 
-        if ( user.isAdmin() )
-        {
-            userChannelTokenList = channelManager.getChannelTokenManager().getAllUserChannelTokenData();
-        }
-        else
-        {
-            userChannelTokenList = channelManager.getChannelTokenManager().getUserChannelTokenData( user.getId() );
-        }
 
+        //if ( user.isAdmin() )
+        {
+            //userChannelTokenList = channelManager.getChannelTokenManager().getAllUserChannelTokenData();
+        }
+        //else
+        {
+            //userChannelTokenList = channelManager.getChannelTokenManager().getUserChannelTokenData( user.getId() );
+        }
+        /*
         if ( userChannelTokenList != null )
         {
             tokenTable.removeAllItems();
@@ -390,7 +385,7 @@ public class UserTokenManager extends Panel
                 } );
 
                 tokenTable.addItem( new Object[] {
-                        identityManager.getUser( userChannelToken.getUserId() ).getUsername(),
+                        //identityManager.getUser( userChannelToken.getUserId() ).getUsername(),
                         userChannelToken.getTokenName(),
                         userChannelToken.getIpRangeStart() + "-" + userChannelToken.getIpRangeEnd(),
                         Short.toString( userChannelToken.getValidPeriod() ), userChannelToken.getDate().toString(),
@@ -398,6 +393,6 @@ public class UserTokenManager extends Panel
                         editBtn, removeBtn
                 }, userChannelToken);
             }
-        }
+        }*/
     }
 }

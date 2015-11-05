@@ -26,6 +26,7 @@ import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.Interface;
+import io.subutai.common.host.NullInterface;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.Peer;
 
@@ -169,10 +170,11 @@ public abstract class AbstractSubutaiHost implements Host
 
 
     @Override
-    public boolean isConnected()
-    {
-        return getPeer().isConnected( this );
-    }
+    public abstract boolean isConnected();
+    //    {
+    //        return getPeer().isConnected( this );
+    //    }
+    //
 
 
     public long getLastHeartbeat()
@@ -221,8 +223,8 @@ public abstract class AbstractSubutaiHost implements Host
     @Override
     public Interface getInterfaceByName( final String interfaceName )
     {
-        Interface result = null;
-        for ( Iterator<Interface> i = getInterfaces().iterator(); result == null && i.hasNext(); )
+        Interface result = NullInterface.getInstance();
+        for ( Iterator<Interface> i = getInterfaces().iterator(); result instanceof NullInterface && i.hasNext(); )
         {
             Interface n = i.next();
             if ( n.getName().equalsIgnoreCase( interfaceName ) )

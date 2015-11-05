@@ -1,0 +1,64 @@
+package io.subutai.core.identity.api.model;
+
+
+import java.util.Date;
+
+
+/**
+ *
+ */
+public interface UserToken
+{
+    //***********************************
+    String getHeader();
+
+    //***********************************
+    String getClaims();
+
+    //***********************************
+    String getFullToken();
+
+    //***********************************
+    String getToken();
+
+    //***********************************
+    void setToken( String token );
+
+    //***********************************
+    String getSecret();
+
+    //***********************************
+    void setSecret( String secret );
+
+    //***********************************
+    int getType();
+
+    //***********************************
+    void setType( int type );
+
+    //***********************************
+    String getHashAlgorithm();
+
+    //***********************************
+    void setHashAlgorithm( String hashAlgorithm );
+
+    //***********************************
+    String getIssuer();
+
+    //***********************************
+    void setIssuer( String issuer );
+
+    //***********************************
+    Date getValidDate();
+
+    //***********************************
+    void setValidDate( Date validDate );
+
+    //***********************************
+    User getUser();
+
+    //***********************************
+    void setUser( User user );
+
+    String getTypeName();
+}

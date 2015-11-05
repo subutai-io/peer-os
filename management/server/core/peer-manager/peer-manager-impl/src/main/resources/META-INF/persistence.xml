@@ -10,6 +10,7 @@
     <class>io.subutai.core.peer.impl.entity.ManagementHostEntity</class>
     <class>io.subutai.core.peer.impl.entity.ResourceHostEntity</class>
     <class>io.subutai.core.peer.impl.entity.ContainerHostEntity</class>
+    <class>io.subutai.core.peer.impl.entity.TunnelEntity</class>
     <class>io.subutai.core.peer.impl.entity.PeerData</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>

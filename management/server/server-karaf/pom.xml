@@ -5,7 +5,7 @@
   <parent>
     <groupId>io.subutai</groupId>
     <artifactId>mgmt-server-parent</artifactId>
-    <version>4.0.0-RC2</version>
+    <version>4.0.0-RC3</version>
   </parent>
 
   <artifactId>subutai</artifactId>
@@ -65,14 +65,17 @@
       <type>xml</type>
       <scope>runtime</scope>
     </dependency>
+
+    <!-- ***********************************************
     <dependency>
-      <groupId>org.apache.shiro</groupId>
-      <artifactId>shiro-features</artifactId>
-      <version>${org.apache.shiro.version}</version>
-      <classifier>features</classifier>
-      <type>xml</type>
-      <scope>runtime</scope>
+      <groupId>org.apache.aries.blueprint</groupId>
+      <artifactId>org.apache.aries.blueprint.authz</artifactId>
+      <version>1.0.1-SNAPSHOT</version>
+      <systemPath</systemPath>
+      <scope>system</scope>
     </dependency>
+     *********************************************** -->
+
   </dependencies>
 
   <build>
@@ -82,24 +85,85 @@
         <artifactId>maven-resources-plugin</artifactId>
         <executions>
           <execution>
-            <id>copy-resources</id>
+            <id>copy-bin</id>
             <phase>prepare-package</phase>
             <goals>
               <goal>copy-resources</goal>
             </goals>
             <configuration>
-              <outputDirectory>${project.basedir}/target/assembly</outputDirectory>
+              <outputDirectory>${project.basedir}/target/assembly/bin</outputDirectory>
               <overwrite>true</overwrite>
               <resources>
                 <resource>
-                  <directory>${project.basedir}/src/main/assembly</directory>
+                  <directory>${project.basedir}/src/main/assembly/bin</directory>
+                  <filtering>false</filtering>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+          <execution>
+            <id>copy-etc</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.basedir}/target/assembly/etc/subutai-mng</outputDirectory>
+              <overwrite>true</overwrite>
+              <resources>
+                <resource>
+                  <directory>${project.basedir}/target/assembly/etc</directory>
                   <filtering>false</filtering>
                 </resource>
                 <resource>
-                  <directory>${project.basedir}/src/main/filtered-assembly</directory>
-                  <filtering>true</filtering>
+                  <directory>${project.basedir}/src/main/assembly/etc</directory>
+                  <filtering>false</filtering>
                 </resource>
               </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.8</version>
+        <executions>
+          <execution>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <tasks>
+                <delete>
+                  <fileset dir="${project.basedir}/target/assembly/etc" includes="*.*" />
+                </delete>
+              </tasks>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>vaadin-ui</artifactId>
+                  <destFileName>vaadin-ui.war</destFileName>
+                  <outputDirectory>target/assembly/deploy</outputDirectory>
+                  <type>war</type>
+                </artifactItem>
+              </artifactItems>
             </configuration>
           </execution>
         </executions>
@@ -117,13 +181,12 @@
             <feature>ssh</feature>
             <feature>subutai-application</feature>
             <feature>openjpa</feature>
-            <feature>aries-annotation</feature>
+            <feature>aries-annotation</feature>fea
             <feature>http</feature>
             <feature>jndi</feature>
             <feature>transaction</feature>
             <feature>jdbc</feature>
-            <feature>shiro-core</feature>
-            <feature>shiro-ehcache</feature>
+
           </bootFeatures>
         </configuration>
         <executions>
@@ -140,7 +203,6 @@
                 <descriptor>mvn:org.apache.karaf.features/enterprise/${karaf.version}/xml/features</descriptor>
                 <descriptor>mvn:org.apache.karaf.features/spring/${karaf.version}/xml/features</descriptor>
                 <descriptor>mvn:org.apache.cxf.karaf/apache-cxf/${org.apache.cxf.version}/xml/features</descriptor>
-                <descriptor>mvn:org.apache.shiro/shiro-features/${org.apache.shiro.version}/xml/features</descriptor>
                 <descriptor>mvn:${project.groupId}/subutai-application/${project.version}/xml/features</descriptor>
               </descriptors>
               <features>
@@ -149,8 +211,6 @@
                 <feature>war</feature>
                 <feature>ssh</feature>
                 <feature>cxf</feature>
-                <feature>shiro-core</feature>
-                <feature>shiro-ehcache</feature>
                 <feature>jdbc</feature>
                 <feature>openjpa</feature>
                 <feature>subutai-application</feature>

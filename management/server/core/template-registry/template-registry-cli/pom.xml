@@ -6,7 +6,7 @@
   <parent>
     <groupId>io.subutai</groupId>
     <artifactId>template-registry-parent</artifactId>
-    <version>4.0.0-RC2</version>
+    <version>4.0.0-RC3</version>
   </parent>
 
   <artifactId>template-registry-cli</artifactId>
@@ -21,7 +21,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>subutai-cli-rbac</artifactId>
+      <artifactId>cli-controller</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>

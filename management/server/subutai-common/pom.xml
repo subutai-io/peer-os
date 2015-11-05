@@ -6,7 +6,7 @@
   <parent>
     <groupId>io.subutai</groupId>
     <artifactId>mgmt-server-parent</artifactId>
-    <version>4.0.0-RC2</version>
+    <version>4.0.0-RC3</version>
   </parent>
 
   <artifactId>subutai-common</artifactId>
@@ -33,6 +33,11 @@
       <groupId>org.codehaus.jackson</groupId>
       <artifactId>jackson-jaxrs</artifactId>
       <version>${jackson-jaxrs.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>${jackson.version}</version>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
@@ -128,12 +133,18 @@
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcprov-ext-jdk15on</artifactId>
     </dependency>
-
     <dependency>
-    	<groupId>org.apache.aries.blueprint</groupId>
-    	<artifactId>org.apache.aries.blueprint.authz</artifactId>
-    	<version>1.0.0</version>
+      <groupId>javax.annotation</groupId>
+      <artifactId>javax.annotation-api</artifactId>
+      <version>1.2</version>
     </dependency>
+
+    <!--******** WT Library ****************-->
+    <dependency>
+      <groupId>com.nimbusds</groupId>
+      <artifactId>nimbus-jose-jwt</artifactId>
+    </dependency>
+    <!--************************************-->
 
   </dependencies>
 

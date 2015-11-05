@@ -22,9 +22,13 @@ import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.metric.ProcessResourceUsage;
+import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.ContainerId;
+import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.PeerId;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.quota.CpuQuotaInfo;
@@ -63,6 +67,9 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
 
     @Transient
     private volatile ContainerHostState state = ContainerHostState.STOPPED;
+
+    @Transient
+    private ContainerId containerId;
 
 
     protected ContainerHostEntity()
@@ -158,7 +165,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     @Override
     public void setDefaultGateway( final String gatewayIp ) throws PeerException
     {
-        getPeer().setDefaultGateway( this, gatewayIp );
+        getPeer().setDefaultGateway( new ContainerGateway( getContainerId(), gatewayIp ) );
     }
 
 
@@ -209,7 +216,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
 
     public void dispose() throws PeerException
     {
-        getPeer().destroyContainer( this );
+        getPeer().destroyContainer( getContainerId() );
     }
 
 
@@ -217,7 +224,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     public void start() throws PeerException
     {
         Peer peer = getPeer();
-        peer.startContainer( this );
+        peer.startContainer( getContainerId() );
     }
 
 
@@ -225,7 +232,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     public void stop() throws PeerException
     {
         Peer peer = getPeer();
-        peer.stopContainer( this );
+        peer.stopContainer( getContainerId() );
     }
 
 
@@ -244,7 +251,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     public ProcessResourceUsage getProcessResourceUsage( final int processPid ) throws PeerException
     {
         Peer peer = getPeer();
-        return peer.getProcessResourceUsage( this, processPid );
+        return peer.getProcessResourceUsage( getContainerId(), processPid );
     }
 
 
@@ -343,5 +350,23 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     public DiskQuota getAvailableDiskQuota( final DiskPartition diskPartition ) throws PeerException
     {
         return getPeer().getAvailableDiskQuota( this, diskPartition );
+    }
+
+
+    @Override
+    public boolean isConnected()
+    {
+        return ContainerHostState.RUNNING.equals( getStatus() );
+    }
+
+
+    public ContainerId getContainerId()
+    {
+        if ( containerId == null )
+        {
+            containerId =
+                    new ContainerId( getId(), new PeerId( getPeerId() ), new EnvironmentId( getEnvironmentId() ) );
+        }
+        return containerId;
     }
 }

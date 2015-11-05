@@ -7,19 +7,6 @@ import java.util.Set;
 
 import javax.naming.NamingException;
 
-import io.subutai.common.host.ContainerHostState;
-import io.subutai.common.host.HostInfo;
-import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.protocol.Disposable;
-import io.subutai.common.settings.Common;
-import io.subutai.common.util.CollectionUtil;
-import io.subutai.common.util.ServiceLocator;
-import io.subutai.common.host.ContainerHostInfo;
-import io.subutai.core.hostregistry.api.HostListener;
-import io.subutai.core.hostregistry.api.HostRegistry;
-import io.subutai.common.host.ResourceHostInfo;
-import io.subutai.common.peer.HostNotFoundException;
-import io.subutai.core.peer.api.PeerManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +22,20 @@ import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Tree;
+
+import io.subutai.common.host.ContainerHostInfo;
+import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.ResourceHostInfo;
+import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.HostNotFoundException;
+import io.subutai.common.protocol.Disposable;
+import io.subutai.common.settings.Common;
+import io.subutai.common.util.CollectionUtil;
+import io.subutai.common.util.ServiceLocator;
+import io.subutai.core.hostregistry.api.HostListener;
+import io.subutai.core.hostregistry.api.HostRegistry;
+import io.subutai.core.peer.api.PeerManager;
 
 
 /**
@@ -115,9 +116,36 @@ public class HostTree extends ConcurrentComponent implements HostListener, Dispo
                 }
             }
         } );
+
+        //added this to insert static CSS ids to tree items since we can not set HTML element ids for them
+        tree.setItemStyleGenerator( new Tree.ItemStyleGenerator()
+        {
+
+            public String getStyle( Tree tree, Object itemId )
+            {
+
+                Item item = tree.getItem( itemId );
+                if ( item != null )
+                {
+                    HostInfo host = ( HostInfo ) item.getItemProperty( VALUE_PROPERTY ).getValue();
+                    if ( host != null )
+                    {
+                        return "hostname_" + host.getHostname();
+                    }
+                }
+
+                return null;
+            }
+        } );
+
         addComponent( tree );
 
         hostRegistry.addHostListener( this );
+
+        for ( ResourceHostInfo hostInfo : hostRegistry.getResourceHostsInfo() )
+        {
+            tree.expandItem( hostInfo.getId() );
+        }
     }
 
 
@@ -271,6 +299,7 @@ public class HostTree extends ConcurrentComponent implements HostListener, Dispo
 
                             presentHosts.add( containerHostInfo );
                         }
+                        tree.expandItem( resourceHostInfo.getId() );
                     }
                     else
                     {

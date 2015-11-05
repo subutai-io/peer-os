@@ -28,7 +28,7 @@ public class DestroyContainerWrapperTask implements Callable<ContainerHost>
     @Override
     public ContainerHost call() throws Exception
     {
-        localPeer.destroyContainer( containerHost );
+        localPeer.destroyContainer( containerHost.getContainerId() );
 
         return containerHost;
     }

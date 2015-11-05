@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.subutai</groupId>
   <artifactId>mgmt-parent</artifactId>
-  <version>4.0.0-RC2</version>
+  <version>4.0.0-RC3</version>
 
   <name>Subutai Server Project Parent</name>
 
@@ -84,12 +84,11 @@
     <com.jayway.awaitility.version>1.5.0</com.jayway.awaitility.version>
     <junit.version>4.11</junit.version>
 
-    <!-- apache shiro -->
-    <org.apache.shiro.version>1.2.3</org.apache.shiro.version>
+    <!-- bouncycastle -->
     <org.bouncycastle.version>1.52</org.bouncycastle.version>
 
     <!-- JWT lib -->
-    <nimbus.jwt.version>3.10</nimbus.jwt.version>
+    <nimbus.jwt.version>4.3.1</nimbus.jwt.version>
     <!-- Jackson JSON lib lib -->
     <jackson.version>2.6.1</jackson.version>
     <jackson-jaxrs.version>1.9.13</jackson-jaxrs.version>
@@ -108,6 +107,12 @@
   <dependencyManagement>
     <dependencies>
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <!-- blueprint-authz -->
+      <dependency>
+        <groupId>org.apache.aries.blueprint</groupId>
+        <artifactId>org.apache.aries.blueprint.authz</artifactId>
+        <version>1.0.1-CUSTOM</version>
+      </dependency>
       <!-- subutai-common -->
       <dependency>
         <groupId>${project.groupId}</groupId>
@@ -131,7 +136,7 @@
 
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>subutai-cli-rbac</artifactId>
+        <artifactId>cli-controller</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -756,6 +761,14 @@
         <version>3.1.0</version>
       </dependency>
 
+      <!-- ~~~~~~~~Security Annotation ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <dependency>
+        <groupId>javax.annotation</groupId>
+        <artifactId>javax.annotation-api</artifactId>
+        <version>1.2</version>
+      </dependency>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- subutai-common -->
       <dependency>
@@ -935,16 +948,6 @@
         <version>1.9.13</version>
       </dependency>
 
-      <dependency>
-        <groupId>org.apache.shiro</groupId>
-        <artifactId>shiro-core</artifactId>
-        <version>${org.apache.shiro.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.shiro</groupId>
-        <artifactId>shiro-web</artifactId>
-        <version>${org.apache.shiro.version}</version>
-      </dependency>
       <dependency>
         <groupId>com.nimbusds</groupId>
         <artifactId>nimbus-jose-jwt</artifactId>

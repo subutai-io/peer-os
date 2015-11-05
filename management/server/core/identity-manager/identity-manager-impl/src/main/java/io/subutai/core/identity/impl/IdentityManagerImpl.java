@@ -1,302 +1,378 @@
 package io.subutai.core.identity.impl;
 
 
-import java.io.Serializable;
-import java.nio.charset.Charset;
+import java.io.IOException;
+import java.security.AccessControlContext;
+import java.security.AccessControlException;
+import java.security.AccessController;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.Random;
+import java.util.UUID;
 
-import javax.sql.DataSource;
+import io.subutai.common.dao.DaoManager;
+import io.subutai.common.security.objects.PermissionOperation;
+import io.subutai.common.security.objects.PermissionScope;
+import io.subutai.common.security.objects.TokenType;
+import io.subutai.common.security.objects.UserStatus;
+import io.subutai.common.security.objects.UserType;
+import io.subutai.common.security.token.TokenUtil;
+import io.subutai.core.identity.api.model.Session;
+import io.subutai.core.identity.api.model.UserToken;
+import io.subutai.core.identity.impl.dao.IdentityDataServiceImpl;
+import io.subutai.core.identity.impl.model.PermissionEntity;
+import io.subutai.core.identity.impl.model.RoleEntity;
+import io.subutai.core.identity.impl.model.SessionEntity;
+import io.subutai.core.identity.impl.model.UserEntity;
+
+import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
+import javax.security.auth.Subject;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.NameCallback;
+import javax.security.auth.callback.PasswordCallback;
+import javax.security.auth.callback.UnsupportedCallbackException;
+import javax.security.auth.login.LoginContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.felix.gogo.api.CommandSessionListener;
-import org.apache.felix.service.command.CommandSession;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.UsernamePasswordToken;
-import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
-import org.apache.shiro.crypto.hash.Sha256Hash;
-import org.apache.shiro.mgt.DefaultSecurityManager;
-import org.apache.shiro.mgt.SecurityManager;
-import org.apache.shiro.realm.Realm;
-import org.apache.shiro.session.Session;
-import org.apache.shiro.session.SessionListener;
-import org.apache.shiro.session.UnknownSessionException;
-import org.apache.shiro.session.mgt.DefaultSessionManager;
-import org.apache.shiro.subject.Subject;
-import org.apache.shiro.util.SimpleByteSource;
+import org.apache.commons.lang.time.DateUtils;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
+import com.google.common.base.Strings;
 
-import io.subutai.common.dao.DaoManager;
-import io.subutai.common.security.NullSubutaiLoginContext;
-import io.subutai.common.security.SubutaiLoginContext;
-import io.subutai.common.security.SubutaiThreadContext;
-import io.subutai.common.settings.CLISettings;
-import io.subutai.common.settings.ChannelSettings;
-import io.subutai.common.util.SecurityUtil;
-import io.subutai.core.identity.api.CliCommand;
 import io.subutai.core.identity.api.IdentityManager;
-import io.subutai.core.identity.api.Permission;
-import io.subutai.core.identity.api.PermissionGroup;
-import io.subutai.core.identity.api.PortalModuleScope;
-import io.subutai.core.identity.api.RestEndpointScope;
-import io.subutai.core.identity.api.Role;
-import io.subutai.core.identity.api.Roles;
-import io.subutai.core.identity.api.User;
-import io.subutai.core.identity.impl.dao.CliCommandDataService;
-import io.subutai.core.identity.impl.dao.PermissionDataService;
-import io.subutai.core.identity.impl.dao.PortalModuleDataService;
-import io.subutai.core.identity.impl.dao.RestEndpointDataService;
-import io.subutai.core.identity.impl.dao.RoleDataService;
-import io.subutai.core.identity.impl.dao.UserDataService;
-import io.subutai.core.identity.impl.entity.CliCommandEntity;
-import io.subutai.core.identity.impl.entity.PermissionEntity;
-import io.subutai.core.identity.impl.entity.PermissionPK;
-import io.subutai.core.identity.impl.entity.PortalModuleScopeEntity;
-import io.subutai.core.identity.impl.entity.RestEndpointScopeEntity;
-import io.subutai.core.identity.impl.entity.RoleEntity;
-import io.subutai.core.identity.impl.entity.UserEntity;
+import io.subutai.core.identity.api.dao.IdentityDataService;
+import io.subutai.core.identity.api.model.Permission;
+import io.subutai.core.identity.api.model.Role;
+import io.subutai.core.identity.api.model.User;
+import io.subutai.common.security.objects.PermissionObject;
+import io.subutai.common.security.objects.RoleType;
+import io.subutai.core.identity.impl.model.UserTokenEntity;
 
 
 /**
- * Implementation of Identity Manager
+ *
+ *
  */
-public class IdentityManagerImpl implements IdentityManager, CommandSessionListener
+@PermitAll
+public class IdentityManagerImpl implements IdentityManager
 {
-    private static final Logger LOG = LoggerFactory.getLogger( IdentityManagerImpl.class );
 
-    private final DaoManager daoManager;
-    private final DataSource dataSource;
-    private DefaultSecurityManager securityManager;
+    private static final Logger LOGGER = LoggerFactory.getLogger( IdentityManagerImpl.class.getName() );
 
-    private UserDataService userDataService;
-    private PermissionDataService permissionDataService;
-    private RoleDataService roleDataService;
-    private CliCommandDataService cliCommandDataService;
-    private PortalModuleDataService portalModuleDataService;
-    private RestEndpointDataService restEndpointDataService;
+    private IdentityDataService identityDataService = null;
+    private DaoManager daoManager = null;
 
 
-    private String getSimpleSalt( String username )
+    /* *************************************************
+     */
+    public IdentityManagerImpl()
     {
-        return "random_salt_value_" + username;
+
     }
-
-
-    public IdentityManagerImpl( final DaoManager daoManager, final DataSource dataSource )
-    {
-        this.daoManager = daoManager;
-        this.dataSource = dataSource;
-    }
-
 
     public void init()
     {
-        LOG.info( "Initializing identity manager..." );
+        createDefaultUsers();
+    }
 
-        userDataService = new UserDataService( daoManager );
-        permissionDataService = new PermissionDataService( daoManager.getEntityManagerFactory() );
-        roleDataService = new RoleDataService( daoManager.getEntityManagerFactory() );
-        cliCommandDataService = new CliCommandDataService( daoManager.getEntityManagerFactory() );
-        portalModuleDataService = new PortalModuleDataService( daoManager.getEntityManagerFactory() );
-        restEndpointDataService = new RestEndpointDataService( daoManager.getEntityManagerFactory() );
+    public void destroy()
+    {
 
-
-        securityManager = new DefaultSecurityManager();
-
-        DefaultSessionManager sessionManager = new DefaultSessionManager();
-        sessionManager.setGlobalSessionTimeout( 3600000 );
-
-        securityManager.setSessionManager( sessionManager );
-
-        SubutaiJdbcRealm realm = new SubutaiJdbcRealm( dataSource );
-        realm.setPermissionsLookupEnabled( false );
-        realm.setAuthenticationQuery( "select password, salt from subutai_user where user_name = ?" );
-        realm.setUserRolesQuery(
-                "select r.role_name from subutai_user_role r inner join subutai_user u on u.user_id = r.user_id where"
-                        + " u.user_name = ?" );
-        realm.setPermissionsQuery( "select permission from subutai_roles_permissions where role_name = ?" );
+    }
+    //*****************************************************
 
 
-        HashedCredentialsMatcher credentialsMatcher = new HashedCredentialsMatcher();
-        credentialsMatcher.setHashAlgorithmName( "SHA-256" );
-        credentialsMatcher.setHashIterations( 1 );
 
-        realm.setCredentialsMatcher( credentialsMatcher );
+    //*****************************************************
+    private void createDefaultUsers()
+    {
+        identityDataService = new IdentityDataServiceImpl( daoManager );
 
+        if ( identityDataService.getAllUsers().size() < 1 )
+        {
 
-        securityManager.setRealms( Sets.<Realm>newHashSet( realm, new TokenRealm( this ) ) );
+            //***Create User ********************************************
+            User internal = createUser( "internal", "internal", "Internal User", "internal@subutai.io" ,1);
+            User admin    = createUser( "admin", "secret", "Administrator", "admin@subutai.io" ,2);
+            User manager  = createUser( "manager","manager", "Manager", "manager@subutai.io" ,2);
+            User karaf    = createUser( "karaf", "karaf", "Karaf Manager", "karaf@subutai.io" ,2);
+            //***********************************************************
 
+            //***Create Token *******************************************
+            createUserToken( internal ,"" ,"" ,"", TokenType.Permanent.getId(),null);
+            //***********************************************************
 
-        checkDefaultUser( "karaf" );
-        checkDefaultUser( "admin" );
+            //***********************************************************
+            RoleType roleTypes[] = RoleType.values();
+            PermissionObject permsp[] = PermissionObject.values();
 
-        List<SessionListener> sessionListeners = new ArrayList<>();
-        sessionListeners.add( new SubutaiSessionListener() );
+            Role role = null;
+            for ( int x = 0; x < roleTypes.length; x++ )
+            {
+                role = createRole( roleTypes[x].getName(), ( short ) roleTypes[x].getId() );
 
-        DefaultSecurityManager defaultSecurityManager = securityManager;
-        ( ( DefaultSessionManager ) defaultSecurityManager.getSessionManager() )
-                .setSessionListeners( sessionListeners );
+                if(roleTypes[x] == RoleType.KarafManager)
+                {
+                    assignUserRole( karaf.getId(), role );
+                    assignUserRole( admin.getId(), role );
 
-        LOG.info( String.format( "Identity manager initialized: %s", securityManager ) );
+                    //*********************************************
+                    Permission per;
+                    per = createPermission( PermissionObject.KarafServerAdministration.getId() , 1, true, true, true, true );
+                    assignRolePermission( role.getId(), per );
+
+                    per = createPermission( PermissionObject.KarafServerManagement.getId() , 1, true, true, true, true );
+                    assignRolePermission( role.getId(), per );
+                    //*********************************************
+                }
+                else if(roleTypes[x] == RoleType.Administrator)
+                {
+                    assignUserRole( admin.getId(), role );
+
+                    //*********************************************
+                    for ( int a = 0; a < permsp.length; a++ )
+                    {
+                        Permission per = createPermission( permsp[a].getId(), 1, true, true, true, true );
+
+                        assignRolePermission( role.getId(), per );
+                    }
+                    //*********************************************
+                }
+                else if(roleTypes[x] == RoleType.Manager)
+                {
+                    assignUserRole( manager.getId(), role );
+
+                    //*********************************************
+                    for ( int a = 0; a < permsp.length; a++ )
+                    {
+                        if(permsp[a] != PermissionObject.IdentityManagement &&
+                                permsp[a] != PermissionObject.KarafServerAdministration &&
+                                permsp[a] != PermissionObject.KarafServerManagement    &&
+                                permsp[a] != PermissionObject.PeerManagement &&
+                                permsp[a] != PermissionObject.ResourceManagement     )
+                        {
+                            Permission per = createPermission( permsp[a].getId(), 3, true, true, true, true );
+                            assignRolePermission( role.getId(), per );
+                        }
+                    }
+                    //*********************************************
+                }
+                else if(roleTypes[x] == RoleType.Internal)
+                {
+                    assignUserRole( internal.getId(), role );
+
+                    //*********************************************
+                    for ( int a = 0; a < permsp.length; a++ )
+                    {
+                        if(permsp[a] != PermissionObject.IdentityManagement &&
+                                permsp[a] != PermissionObject.KarafServerAdministration &&
+                                permsp[a] != PermissionObject.KarafServerManagement     )
+                        {
+                            Permission per = createPermission( permsp[a].getId(), 1, true, true, true, true );
+                            assignRolePermission( role.getId(), per );
+                        }
+                    }
+                    //*********************************************
+
+                }
+            }
+
+        }
     }
 
 
-    /**
-     * Check if user has access to the Rest service
-     *
-     * @param user User
-     * @param restURL String
-     *
-     * @return short
+    /* *************************************************
      */
-    public short checkRestPermissions( User user, String restURL )
+    private CallbackHandler getCalbackHandler( final String userName, final String password )
     {
-        short status = 0;
-
-        if ( user != null )
+        CallbackHandler callbackHandler = new CallbackHandler()
         {
-            Set<Role> roles = user.getRoles();
-
-            for ( Role role : roles )
+            public void handle( Callback[] callbacks ) throws IOException, UnsupportedCallbackException
             {
-                Set<RestEndpointScope> restEndpointScopeList = role.getAccessibleRestEndpoints();
-                status = checkRestEndpointScope( restURL, restEndpointScopeList, status );
-
-                if ( status == 1 )
+                for ( Callback callback : callbacks )
                 {
+                    if ( callback instanceof NameCallback )
+                    {
+                        ( ( NameCallback ) callback ).setName( userName );
+                    }
+                    else if ( callback instanceof PasswordCallback )
+                    {
+                        ( ( PasswordCallback ) callback ).setPassword( password.toCharArray() );
+                    }
+                    else
+                    {
+                        throw new UnsupportedCallbackException( callback );
+                    }
+                }
+            }
+        };
+
+        return callbackHandler;
+    }
+
+
+    /* *************************************************
+     */
+    @PermitAll
+    @Override
+    public User login( String userName, String password )
+    {
+        try
+        {
+            User user = null;
+
+            CallbackHandler ch = getCalbackHandler( userName, password );
+            Subject subject = new Subject();
+            LoginContext loginContext = new LoginContext( "karaf", subject, ch );
+            loginContext.login();
+
+            while(subject.getPrivateCredentials().iterator().hasNext())
+            {
+                Object obj = subject.getPrivateCredentials().iterator().next();
+
+                if(obj instanceof UserEntity)
+                {
+                    user = (User)obj;
+                    user.setSubject( subject );
                     break;
                 }
             }
-        }
 
-        return status;
+            return user;
+        }
+        catch ( Exception ex )
+        {
+            return null;
+        }
     }
 
 
-    private short checkRestEndpointScope( final String restURL, final Set<RestEndpointScope> restEndpointScopeList,
-                                          final short status )
-    {
-        if ( restEndpointScopeList != null )
-        {
-            for ( RestEndpointScope restEndpointScope : restEndpointScopeList )
-            {
-                if ( restEndpointScope.getRestEndpoint().contains( "{*}" ) )
-                {
-                    return 1;
-                }
-            }
-        }
-        return status;
-    }
-
-
-    private void checkDefaultUser( String username )
-    {
-
-        User user = userDataService.findByUsername( username );
-        LOG.info( String.format( "User: [%s] [%s]", username, user ) );
-        if ( user != null )
-        {
-            return;
-        }
-        LOG.info( String.format( "User not found. Adding new user: [%s] ", username ) );
-        RoleEntity adminRole = roleDataService.find( "admin" );
-        adminRole = initAdminRole( adminRole );
-
-        RoleEntity managerRole = roleDataService.find( "manager" );
-        if ( managerRole == null )
-        {
-            managerRole = new RoleEntity();
-            managerRole.setName( "manager" );
-            roleDataService.update( managerRole );
-        }
-
-        String password = "secret";
-        String salt = getSimpleSalt( username );
-        user = new UserEntity();
-        user.setUsername( username );
-        user.setFullname( "Full name of: " + username );
-        user.setEmail( username + "@subutai.at" );
-        user.setPassword( saltedHash( password, new SimpleByteSource( salt ).getBytes() ) );
-        user.setSalt( salt );
-        user.addRole( adminRole );
-        user.addRole( managerRole );
-        userDataService.update( user );
-        LOG.debug( String.format( "User: %s", user.getId() ) );
-    }
-
-
-    private RoleEntity initAdminRole( final RoleEntity adminRolePersisted )
-    {
-        if ( adminRolePersisted == null )
-        {
-            RoleEntity adminRole = new RoleEntity();
-            adminRole.setName( "admin" );
-
-            for ( final String uri : ChannelSettings.REST_URL )
-            {
-                if ( uri.length() == 0 )
-                {
-                    continue;
-                }
-                RestEndpointScopeEntity restEndpointScopeEntity = new RestEndpointScopeEntity( uri );
-                restEndpointDataService.update( restEndpointScopeEntity );
-                adminRole.addRestEndpointScope( restEndpointScopeEntity );
-            }
-
-            for ( final Map.Entry<String, Set<String>> scopes : CLISettings.CLI_CMD_MAP.entrySet() )
-            {
-                Set<String> names = scopes.getValue();
-                for ( final String name : names )
-                {
-                    CliCommandEntity cliCommandEntity = new CliCommandEntity( scopes.getKey(), name );
-                    cliCommandDataService.update( cliCommandEntity );
-                    adminRole.addCliCommand( cliCommandEntity );
-                }
-            }
-
-            roleDataService.update( adminRole );
-            return adminRole;
-        }
-        return adminRolePersisted;
-    }
-
-
+    /* *************************************************
+     */
+    @PermitAll
     @Override
-    public SecurityManager getSecurityManager()
+    public Session startSession( User user )
     {
-        return securityManager;
+        try
+        {
+            Session userSession = new SessionEntity();
+            userSession.setUser( user );
+
+            identityDataService.persistSession( userSession );
+
+            return userSession;
+        }
+        catch ( Exception ex )
+        {
+            return null;
+        }
     }
 
 
+    /* *************************************************
+     */
+    @RolesAllowed( "Identity-Management|A|Write" )
     @Override
-    public User getUser()
+    public UserToken createUserToken( User user, String token, String secret, String issuer,int tokenType ,Date validDate)
     {
-        SubutaiLoginContext loginContext = getSubutaiLoginContext();
+        try
+        {
+            UserToken userToken = new UserTokenEntity();
 
-        if ( loginContext instanceof NullSubutaiLoginContext )
+            if( Strings.isNullOrEmpty(token))
+                token =  UUID.randomUUID().toString();
+            if( Strings.isNullOrEmpty(issuer))
+                issuer =  "io.subutai";
+            if( Strings.isNullOrEmpty(secret))
+                secret =  UUID.randomUUID().toString();
+            if(validDate == null)
+                validDate = DateUtils.addHours( new Date(System.currentTimeMillis()),1);
+
+            userToken.setToken(token );
+            userToken.setHashAlgorithm( "HS256" );
+            userToken.setIssuer( issuer );
+            userToken.setSecret(secret);
+            userToken.setUser( user );
+            userToken.setType( tokenType );
+            userToken.setValidDate( validDate );
+
+            identityDataService.persistUserToken( userToken );
+
+            return userToken;
+        }
+        catch( Exception ex )
         {
             return null;
         }
 
-        if ( isAuthenticated( loginContext.getSessionId() ) )
+    }
+
+
+    /* *************************************************
+     */
+    @PermitAll
+    @Override
+    public void logout()
+    {
+        try
         {
-            ClassLoader cl = Thread.currentThread().getContextClassLoader();
-            Thread.currentThread().setContextClassLoader( this.getClass().getClassLoader() );
-            try
+            //loginContext.logout();
+        }
+        catch ( Exception e )
+        {
+        }
+    }
+
+
+    /* *************************************************
+     */
+    @PermitAll
+    @Override
+    public String getUserToken( String userName, String password )
+    {
+        String token = "";
+
+        User user = authenticateUser( userName, password );
+
+        if(user!=null)
+        {
+            UserToken uToken = identityDataService.getUserToken( user.getId() );
+
+            if(uToken == null)
             {
-                return userDataService.findByUsername( loginContext.getUsername() );
+                uToken = createUserToken( user, "", "", "" ,TokenType.Session.getId(),null);
             }
-            finally
+
+            token = uToken.getFullToken();
+        }
+
+        return token;
+
+    }
+
+    /* *************************************************
+     */
+    @PermitAll
+    @Override
+    public User authenticateByToken( String token )
+    {
+        String subject = TokenUtil.getSubject( token);
+
+        UserToken userToken = identityDataService.getValidUserToken( subject );
+
+        if(userToken!=null)
+        {
+            if ( !TokenUtil.verifySignature( token, userToken.getSecret() ) )
             {
-                Thread.currentThread().setContextClassLoader( cl );
+                return null;
+            }
+            else
+            {
+                return userToken.getUser();
             }
         }
         else
@@ -305,449 +381,309 @@ public class IdentityManagerImpl implements IdentityManager, CommandSessionListe
         }
     }
 
-
-    private SubutaiLoginContext getSubutaiLoginContext()
-    {
-        return SubutaiThreadContext.get();
-    }
-
-
+    /* *************************************************
+     */
+    @PermitAll
     @Override
-    public Serializable login( final String username, final String password )
+    public User authenticateUser( String userName, String password )
     {
-        UsernamePasswordToken usernamePasswordToken = new UsernamePasswordToken( username, password );
+        User user = null;
 
-        SecurityUtils.setSecurityManager( securityManager );
-        Subject subject = SecurityUtils.getSubject();
+        if(userName.equalsIgnoreCase( "token" ))
+        {
+            user = authenticateByToken(password);
+        }
+        else
+        {
+            user = identityDataService.getUserByUsername( userName );
 
-        Session session = null;
-        try
-        {
-            subject.login( usernamePasswordToken );
-            session = subject.getSession();
-            return session.getId();
-        }
-        catch ( UnknownSessionException e )
-        {
-            LOG.warn( "Exception getting session #login", e );
-            subject = new Subject.Builder().buildSubject();
-            subject.login( usernamePasswordToken );
-            session = subject.getSession( true );
-            return session.getId();
-        }
-        finally
-        {
-            if ( session != null )
+            if ( user != null )
             {
-                SubutaiLoginContext loginContext =
-                        new SubutaiLoginContext( session.getId().toString(), subject.getPrincipal().toString(), null );
-                SubutaiThreadContext.set( loginContext );
-            }
-        }
-    }
-
-
-    public Serializable loginWithToken( final String username )
-    {
-        UserToken userToken = new UserToken( username );
-
-        SecurityUtils.setSecurityManager( securityManager );
-        Subject subject = SecurityUtils.getSubject();
-
-        Session session = null;
-        try
-        {
-            subject.login( userToken );
-            session = subject.getSession();
-            return session.getId();
-        }
-        catch ( UnknownSessionException e )
-        {
-            subject = new Subject.Builder().buildSubject();
-            subject.login( userToken );
-            session = subject.getSession( true );
-            return session.getId();
-        }
-        finally
-        {
-            if ( session != null )
-            {
-                SubutaiLoginContext loginContext =
-                        new SubutaiLoginContext( session.getId().toString(), subject.getPrincipal().toString(), null );
-                SubutaiThreadContext.set( loginContext );
-            }
-        }
-    }
-
-
-    private boolean isAuthenticated( final Serializable sessionId )
-    {
-
-        Subject subject = getSubject( sessionId );
-
-        return subject != null && subject.isAuthenticated();
-    }
-
-
-    @Override
-    public boolean isAuthenticated()
-    {
-        SubutaiLoginContext loginContext = getSubutaiLoginContext();
-
-        return !( loginContext instanceof NullSubutaiLoginContext ) && isAuthenticated( loginContext.getSessionId() );
-    }
-
-
-    @Override
-    public Set<String> getRoles( final Serializable shiroSessionId )
-    {
-        Set<String> result = new HashSet<>();
-        Subject subject = getSubject( shiroSessionId );
-
-        for ( Roles role : Roles.values() )
-        {
-            if ( subject.hasRole( role.getRoleName() ) )
-            {
-                result.add( role.getRoleName() );
-            }
-        }
-        return result;
-    }
-
-
-    @Override
-    public boolean updateUserPortalModule( String moduleKey, String moduleName )
-    {
-        ClassLoader cl = IdentityManagerImpl.class.getClassLoader();
-        Thread.currentThread().setContextClassLoader( IdentityManagerImpl.class.getClassLoader() );
-        try
-        {
-            LOG.debug( "Saving new portal module: ", moduleName );
-            PortalModuleScopeEntity portalModuleScope = new PortalModuleScopeEntity( moduleKey, moduleName );
-            portalModuleDataService.update( portalModuleScope );
-            List<Role> roles = roleDataService.getAll();
-            for ( Role roleEntity : roles )
-            {
-                if ( roleEntity.getName().equalsIgnoreCase( Roles.ADMIN.getRoleName() ) )
+                if ( !user.getPassword().equals( password )
+                        || user.getStatus() == UserStatus.Disabled.getId() )
                 {
-                    roleEntity.addPortalModule( portalModuleScope );
-                    roleDataService.update( roleEntity );
+                    return null;
                 }
             }
+            else
+            {
+                return null;
+            }
         }
-        catch ( Exception e )
-        {
-            LOG.error( "Error updating portalModule for role", e );
-        }
-        finally
-        {
-            Thread.currentThread().setContextClassLoader( cl );
-        }
-        return true;
-    }
 
-
-    @Override
-    public Subject getSubject( Serializable sessionId )
-    {
-        return new Subject.Builder( securityManager ).sessionId( sessionId ).buildSubject();
-    }
-
-
-    @Override
-    public void touch( Serializable sessionId )
-    {
-        Subject subject = getSubject( sessionId );
-        if ( subject != null && subject.isAuthenticated() )
-        {
-            subject.getSession().touch();
-        }
-    }
-
-
-    @Override
-    public void logout( Serializable sessionId )
-    {
-        Subject subject = this.getSubject( sessionId );
-        subject.logout();
-    }
-
-
-    @Override
-    public List<User> getAllUsers()
-    {
-        List<User> result = new ArrayList<>();
-        result.addAll( userDataService.getAll() );
-        return result;
-    }
-
-
-    @Override
-    public boolean addUser( final String username, final String fullname, final String password, final String email )
-    {
-        String salt = getSimpleSalt( username );
-        UserEntity user = new UserEntity();
-        user.setUsername( username );
-        user.setEmail( email );
-        user.setFullname( fullname );
-        user.setSalt( salt );
-        user.setPassword( saltedHash( password, salt.getBytes( Charset.forName( "UTF-8" ) ) ) );
-
-        userDataService.persist( user );
-        return user.getId() != null;
-    }
-
-
-    @Override
-    public User getUser( final String username )
-    {
-        return userDataService.findByUsername( username );
-    }
-
-
-    @Override
-    public String getUserKey( final String username )
-    {
-        User user = userDataService.findByUsername( username );
-        return user.getKey();
-    }
-
-
-    @Override
-    public User createMockUser( final String username, final String fullName, final String password,
-                                final String email )
-    {
-        String salt = getSimpleSalt( username );
-        UserEntity user = new UserEntity();
-        user.setUsername( username );
-        user.setEmail( email );
-        user.setFullname( fullName );
-        user.setSalt( salt );
-        user.setPassword( saltedHash( password, salt.getBytes() ) );
         return user;
     }
 
 
+    /* *************************************************
+     */
+    @PermitAll
     @Override
-    public boolean updateUser( final User user )
+    public List<User> getAllUsers()
     {
-        //TODO check for right function operation...
-        if ( !( user instanceof UserEntity ) )
+        List<User> result = new ArrayList<>();
+        result.addAll( identityDataService.getAllUsers() );
+        return result;
+    }
+
+
+
+    /* *************************************************
+     */
+    @PermitAll
+    @Override
+    public User getLoggedUser()
+    {
+        User user = null;
+        try
         {
-            return false;
+            AccessControlContext acc =  AccessController.getContext();
+            if  (acc == null)
+            {
+                throw  new  RuntimeException("access control context is null");
+            }
+
+            Subject  subject=  Subject.getSubject(acc);
+            if  (subject == null)
+            {
+                throw  new  RuntimeException("subject is null");
+            }
+
+            while(subject.getPrivateCredentials().iterator().hasNext())
+            {
+                Object obj = subject.getPrivateCredentials().iterator().next();
+
+                if(obj instanceof UserEntity)
+                {
+                    user = (User)obj;
+                    user.setSubject( subject );
+                    break;
+                }
+            }
+
+            return user;
+        }
+        catch(RuntimeException ex)
+        {
+            return null;
+        }
+        catch(Exception ex)
+        {
+            return null;
+        }
+    }
+
+    /* *************************************************
+     */
+    @RolesAllowed( "Identity-Management|A|Write" )
+    @Override
+    public User createUser( String userName, String password, String fullName, String email, int type )
+    {
+        //***************Cannot use TOKEN keyword *******
+        if(userName.equalsIgnoreCase( "token" ))
+        {
+            throw new IllegalArgumentException("Cannot use TOKEN keyword.");
+        }
+        //***********************************************
+
+        if(Strings.isNullOrEmpty( password ))
+        {
+            password = Integer.toString( ( new Random() ).nextInt());
         }
 
-        if ( isPasswordChanged( user ) )
+        User user = new UserEntity();
+        user.setUserName( userName );
+        user.setPassword( password );
+        user.setEmail( email );
+        user.setFullName( fullName );
+        user.setType( type );
+
+        identityDataService.persistUser( user );
+
+        return user;
+    }
+
+
+    /* *************************************************
+     */
+    @RolesAllowed( "Identity-Management|A|Write" )
+    @Override
+    public void assignUserRole( long userId, Role role )
+    {
+        identityDataService.assignUserRole( userId, role );
+    }
+
+
+    /* *************************************************
+     */
+    @RolesAllowed( "Identity-Management|A|Delete" )
+    @Override
+    public void removeUser( long userId )
+    {
+        //******Cannot remove Internal User *************
+        User user = identityDataService.getUser( userId );
+        if(user.getType() == UserType.Internal.getId() )
         {
-            user.setSalt( getSimpleSalt( user.getUsername() ) );
-            user.setPassword( saltedHash( user.getPassword(),
-                    ( ( UserEntity ) user ).getSalt().getBytes( Charset.forName( "UTF-8" ) ) ) );
+            throw new AccessControlException("Internal User cannot be removed");
+        }
+        //***********************************************
+
+        identityDataService.removeUser( userId );
+    }
+
+
+    /* *************************************************
+     */
+    @PermitAll
+    @Override
+    public boolean isUserPermitted( User user ,PermissionObject permObj, PermissionScope permScope, PermissionOperation permOp )
+    {
+        boolean isPermitted = false;
+
+        List<Role> roles = user.getRoles();
+
+        for(Role role:roles)
+        {
+            for(Permission permission:role.getPermissions())
+            {
+                if(permission.getId() == permObj.getId() && permission.getScope() == permScope.getId())
+                {
+                    switch ( permOp )
+                    {
+                        case Read:
+                            return permission.isRead();
+                        case Write:
+                            return permission.isWrite() ;
+                        case Update:
+                            return permission.isUpdate();
+                        case Delete:
+                            return permission.isDelete();
+                    }
+                }
+            }
         }
 
-        userDataService.update( user );
-        return true;
+        return isPermitted;
     }
 
 
-    private boolean isPasswordChanged( final User user )
-    {
-        if ( user.getId() != null )
-        {
-            User entity = userDataService.find( user.getId() );
-            return !entity.getPassword().equals( user.getPassword() );
-        }
-        else
-        {
-            return true;
-        }
-    }
-
-
+    /* *************************************************
+     */
+    @RolesAllowed( "Identity-Management|A|Write" )
     @Override
-    public User getUser( final Long id )
+    public Role createRole( String roleName, short roleType )
     {
-        return userDataService.find( id );
+        Role role = new RoleEntity();
+        role.setName( roleName );
+        role.setType( roleType );
+
+        identityDataService.persistRole( role );
+
+        return role;
     }
 
 
-    @Override
-    public boolean deleteUser( final User user )
-    {
-        if ( !( user instanceof UserEntity ) )
-        {
-            return false;
-        }
-        userDataService.remove( user.getId() );
-        return true;
-    }
-
-
-    @Override
-    public List<CliCommand> getAllCliCommands()
-    {
-        List<CliCommand> cliCommands = new ArrayList<>();
-        cliCommands.addAll( cliCommandDataService.getAll() );
-        return cliCommands;
-    }
-
-
-    @Override
-    public CliCommand createCliCommand( final String scope, final String name )
-    {
-        return new CliCommandEntity( scope, name );
-    }
-
-
-    @Override
-    public boolean updateCliCommand( final CliCommand cliCommand )
-    {
-        if ( cliCommand instanceof CliCommandEntity )
-        {
-            cliCommandDataService.update( ( CliCommandEntity ) cliCommand );
-            return true;
-        }
-        return false;
-    }
-
-
-    @Override
-    public Set<RestEndpointScope> getAllRestEndpoints()
-    {
-        Set<RestEndpointScope> restEndpointScopes = Sets.newHashSet();
-        restEndpointScopes.addAll( restEndpointDataService.getAll() );
-        return restEndpointScopes;
-    }
-
-
-    @Override
-    public Set<PortalModuleScope> getAllPortalModules()
-    {
-        Set<PortalModuleScope> portalModules = Sets.newHashSet();
-        portalModules.addAll( portalModuleDataService.getAll() );
-        return portalModules;
-    }
-
-
-    @Override
-    public List<Permission> getAllPermissions()
-    {
-        List<Permission> permissions = Lists.newArrayList();
-        permissions.addAll( permissionDataService.getAll() );
-        return permissions;
-    }
-
-
-    @Override
-    public Permission createPermission( final String permissionName, final PermissionGroup permissionGroup,
-                                        final String description )
-    {
-        return new PermissionEntity( permissionName, permissionGroup, description );
-    }
-
-
-    @Override
-    public boolean updatePermission( final Permission permission )
-    {
-        if ( !( permission instanceof PermissionEntity ) )
-        {
-            return false;
-        }
-        permissionDataService.update( ( PermissionEntity ) permission );
-        return true;
-    }
-
-
-    @Override
-    public Permission getPermission( final String name, final PermissionGroup permissionGroup )
-    {
-        return permissionDataService.find( new PermissionPK( name, permissionGroup ) );
-    }
-
-
-    @Override
-    public boolean deletePermission( final Permission permission )
-    {
-        if ( !( permission instanceof PermissionEntity ) )
-        {
-            return false;
-        }
-        permissionDataService.remove( new PermissionPK( permission.getName(), permission.getPermissionGroup() ) );
-        return true;
-    }
-
-
+    /* *************************************************
+     */
+    @PermitAll
     @Override
     public List<Role> getAllRoles()
     {
-        List<Role> roles = Lists.newArrayList();
-        roles.addAll( roleDataService.getAll() );
-        return roles;
+        return identityDataService.getAllRoles();
     }
 
 
+    /* *************************************************
+     */
+    @RolesAllowed( "Identity-Management|A|Delete" )
     @Override
-    public Role createRole( final String roleName )
+    public void removeRole( long roleId )
     {
-        return new RoleEntity( roleName );
-    }
+        //******Cannot remove Internal Role *************
+        Role role = identityDataService.getRole( roleId );
 
-
-    @Override
-    public boolean updateRole( final Role role )
-    {
-        LOG.debug( String.format( "Updating role: %s", role.getName() ) );
-        if ( !( role instanceof RoleEntity ) )
+        if(role.getType() == RoleType.Internal.getId() )
         {
-            return false;
+            throw new AccessControlException("Internal Role cannot be removed");
         }
-        roleDataService.update( role );
-        return true;
+        //***********************************************
+
+        identityDataService.removeRole( roleId );
     }
 
 
+    /* *************************************************
+     */
+    @RolesAllowed( "Identity-Management|A|Write" )
     @Override
-    public Role getRole( final String name )
+    public Permission createPermission( int objectId, int scope, boolean read, boolean write, boolean update,
+                                        boolean delete )
     {
-        return roleDataService.find( name );
+        Permission permission = new PermissionEntity();
+        permission.setObject( objectId );
+        permission.setScope( scope );
+        permission.setRead( read );
+        permission.setWrite( write );
+        permission.setUpdate( update );
+        permission.setDelete( delete );
+
+        identityDataService.persistPermission( permission );
+
+        return permission;
     }
 
 
+    /* *************************************************
+     */
+    @RolesAllowed( "Identity-Management|A|Write" )
     @Override
-    public void deleteRole( final Role role )
+    public void assignRolePermission( long roleId, Permission permission )
     {
-        roleDataService.remove( role.getName() );
+        identityDataService.assignRolePermission( roleId, permission );
     }
 
 
-    private String saltedHash( String password, byte[] salt )
-    {
-        Sha256Hash sha256Hash = new Sha256Hash( password, salt );
-        return sha256Hash.toHex();
-    }
-
-
+    /* *************************************************
+     */
+    @RolesAllowed( "Identity-Management|A|Delete" )
     @Override
-    public void beforeExecute( final CommandSession commandSession, final CharSequence charSequence )
+    public void removePermission( long permissionId )
     {
-        SubutaiLoginContext loginContext = SecurityUtil.getSubutaiLoginContext();
-        if ( !( loginContext instanceof NullSubutaiLoginContext ) && isAuthenticated( loginContext.getSessionId() ) )
-        {
-            SubutaiThreadContext.set( loginContext );
-            touch( loginContext.getSessionId() );
-        }
+        identityDataService.removePermission( permissionId );
     }
 
 
+    /* *************************************************
+     */
+    @PermitAll
     @Override
-    public void afterExecute( final CommandSession commandSession, final CharSequence charSequence, final Exception e )
+    public List<Permission> getAllPermissions()
     {
-        //ignore
+        return identityDataService.getAllPermissions();
     }
 
 
+    /* *************************************************
+     */
     @Override
-    public void afterExecute( final CommandSession commandSession, final CharSequence charSequence, final Object o )
+    public IdentityDataService getIdentityDataService()
     {
-        //ignore
+        return identityDataService;
     }
+
+    /* *************************************************
+     */
+    public DaoManager getDaoManager()
+    {
+        return daoManager;
+    }
+
+
+    /* *************************************************
+     */
+    public void setDaoManager( DaoManager daoManager )
+    {
+        this.daoManager = daoManager;
+    }
+
 }

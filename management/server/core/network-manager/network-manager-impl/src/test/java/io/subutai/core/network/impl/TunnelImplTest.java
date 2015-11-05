@@ -3,6 +3,8 @@ package io.subutai.core.network.impl;
 
 import org.junit.Test;
 
+import io.subutai.core.peer.api.Tunnel;
+
 import static org.junit.Assert.assertEquals;
 
 
@@ -17,7 +19,7 @@ public class TunnelImplTest
     @Test
     public void testProperties() throws Exception
     {
-        TunnelImpl tunnel = new TunnelImpl( TUNNEL_NAME, TUNNEL_IP );
+        Tunnel tunnel = new Tunnel( TUNNEL_NAME, TUNNEL_IP );
 
         assertEquals( TUNNEL_NAME, tunnel.getTunnelName() );
         assertEquals( TUNNEL_IP, tunnel.getTunnelIp() );

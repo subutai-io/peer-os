@@ -14,13 +14,13 @@ public class RemoveKeysStep
 {
 
     private final EnvironmentImpl environment;
-//    private final LocalPeer localPeer;
+    //    private final LocalPeer localPeer;
 
 
     public RemoveKeysStep( final EnvironmentImpl environment/*, final LocalPeer localPeer*/ )
     {
         this.environment = environment;
-//        this.localPeer = localPeer;
+        //        this.localPeer = localPeer;
     }
 
 
@@ -28,11 +28,11 @@ public class RemoveKeysStep
     {
 
         Set<Peer> peers = Sets.newHashSet( environment.getPeers() );
-//        peers.add( localPeer );
+        //        peers.add( localPeer );
 
         for ( final Peer peer : peers )
         {
-            peer.removeEnvironmentKeyPair( environment.getId() );
+            peer.removeEnvironmentKeyPair( environment.getEnvironmentId() );
         }
     }
 }

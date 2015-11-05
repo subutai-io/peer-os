@@ -1,6 +1,8 @@
 package io.subutai.common.network;
 
 
+import org.codehaus.jackson.annotate.JsonProperty;
+
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 
@@ -10,12 +12,16 @@ import io.subutai.common.util.NumUtil;
 
 public class Vni
 {
+    @JsonProperty( "vni" )
     private final long vni;
+    @JsonProperty( "environmentId" )
     private final String environmentId;
-    private int vlan = Common.MIN_VLAN_ID - 1;
+    @JsonProperty( "vlan" )
+    private int vlan = Common.MIN_VLAN_ID;
 
 
-    public Vni( final long vni, final int vlan, final String environmentId )
+    public Vni( @JsonProperty( "vni" ) final long vni, @JsonProperty( "vlan" ) final int vlan,
+                @JsonProperty( "environmentId" ) final String environmentId )
     {
         this( vni, environmentId );
 

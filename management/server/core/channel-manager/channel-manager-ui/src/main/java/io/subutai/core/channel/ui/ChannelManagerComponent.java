@@ -34,7 +34,7 @@ public class ChannelManagerComponent extends CustomComponent implements Disposab
 
 
         //--------------------------------------------------------------------------------------------
-        if(identityManager.getUser().isAdmin())
+        //if(identityManager.getUser().isAdmin())
         {
             sheet.addTab( portManager, "Port Manager" ).setId( "PortManager" );
         }

@@ -6,7 +6,7 @@
   <parent>
     <groupId>io.subutai</groupId>
     <artifactId>vaadin-osgi-parent</artifactId>
-    <version>4.0.0-RC2</version>
+    <version>4.0.0-RC3</version>
   </parent>
   <artifactId>vaadin-ui</artifactId>
   <packaging>war</packaging>
@@ -58,8 +58,10 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>identity-manager-impl</artifactId>
+      <artifactId>identity-manager-api</artifactId>
+      <scope>provided</scope>
     </dependency>
+
     <!-- Vaadin dependencies -->
     <dependency>
       <groupId>com.vaadin</groupId>
@@ -101,6 +103,11 @@
       <scope>provided</scope>
     </dependency>
 
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>jsp-api</artifactId>
+      <version>2.0</version>
+    </dependency>
 
     <dependency>
       <groupId>javax.servlet</groupId>
@@ -128,7 +135,7 @@
             <!-- Add Embed lib -->
             <Embed-Directory>WEB-INF/lib</Embed-Directory>
             <Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
-            <Import-Package>*;resolution:=optional</Import-Package>
+            <Import-Package>io.subutai.core.identity.api;*;resolution:=optional</Import-Package>
             <Export-Package>
               com.vaadin.shared.*;
               com.vaadin.ui.*;

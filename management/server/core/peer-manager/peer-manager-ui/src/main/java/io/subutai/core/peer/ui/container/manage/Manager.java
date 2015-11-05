@@ -372,7 +372,7 @@ public class Manager extends VerticalLayout
                     showHideIndicator( true );
                     try
                     {
-                        localPeer.destroyContainer( containerHost );
+                        localPeer.destroyContainer( containerHost.getContainerId() );
                         getUI().access( updateTable );
                     }
                     catch ( PeerException e )
@@ -411,7 +411,7 @@ public class Manager extends VerticalLayout
                     showHideIndicator( true );
                     try
                     {
-                        localPeer.startContainer( containerHost );
+                        localPeer.startContainer( containerHost.getContainerId() );
                         getUI().access( updateViews );
                     }
                     catch ( PeerException e )
@@ -451,7 +451,7 @@ public class Manager extends VerticalLayout
                     showHideIndicator( true );
                     try
                     {
-                        localPeer.stopContainer( containerHost );
+                        localPeer.stopContainer( containerHost.getContainerId() );
                         getUI().access( updateViews );
                     }
                     catch ( PeerException e )

@@ -35,6 +35,7 @@ import io.subutai.common.metric.OwnerResourceUsage;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
@@ -47,7 +48,7 @@ import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.StringUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.identity.api.IdentityManager;
-import io.subutai.core.identity.api.User;
+import io.subutai.core.identity.api.model.User;
 import io.subutai.core.metric.api.AlertListener;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
@@ -217,13 +218,6 @@ public class MonitorImpl implements Monitor
 
             //*********construct Secure Header ****************************
             Map<String, String> headers = Maps.newHashMap();
-            String envId = environmentId.toString();
-            String envheaderTarget = peer.getId() + "-" + envId;
-            String envheaderSource = peerManager.getLocalPeer().getId() + "-" + envId;
-
-            headers.put( Common.HEADER_SPECIAL, "ENC" );
-            headers.put( Common.HEADER_ENV_ID_TARGET, envheaderTarget );
-            headers.put( Common.HEADER_ENV_ID_SOURCE, envheaderSource );
             //*************************************************************
 
             //send request and obtain metrics
@@ -546,13 +540,6 @@ public class MonitorImpl implements Monitor
         {
             //*********construct Secure Header ****************************
             Map<String, String> headers = Maps.newHashMap();
-            String envId = environmentId;
-            String envheaderTarget = peer.getId() + "-" + envId;
-            String envheaderSource = peerManager.getLocalPeer().getId() + "-" + envId;
-
-            headers.put( Common.HEADER_SPECIAL, "ENC" );
-            headers.put( Common.HEADER_ENV_ID_TARGET, envheaderTarget );
-            headers.put( Common.HEADER_ENV_ID_SOURCE, envheaderSource );
             //*************************************************************
 
             peer.sendRequest( new MonitoringActivationRequest( containerHosts, monitoringSettings ),
@@ -595,29 +582,35 @@ public class MonitorImpl implements Monitor
 
 
     @Override
-    public ProcessResourceUsage getProcessResourceUsage( final ContainerHost containerHost, final int processPid )
+    public ProcessResourceUsage getProcessResourceUsage( final ContainerId containerId, int pid )
             throws MonitorException
     {
-        Preconditions.checkNotNull( containerHost );
-        Preconditions.checkArgument( processPid > 0 );
+        Preconditions.checkNotNull( containerId );
+        Preconditions.checkArgument( pid > 0 );
         try
         {
-            ResourceHost resourceHost =
-                    peerManager.getLocalPeer().getResourceHostByContainerName( containerHost.getHostname() );
-            CommandResult commandResult = resourceHost
-                    .execute( commands.getProcessResourceUsageCommand( containerHost.getHostname(), processPid ) );
+
+            Host c = peerManager.getLocalPeer().bindHost( containerId );
+            ResourceHost resourceHost = peerManager.getLocalPeer().getResourceHostByContainerName( c.getHostname() );
+
+            CommandResult commandResult =
+                    resourceHost.execute( commands.getProcessResourceUsageCommand( c.getHostname(), pid ) );
             if ( !commandResult.hasSucceeded() )
             {
                 throw new MonitorException(
-                        String.format( "Error getting process resource usage of pid=%d on %s: %s %s", processPid,
-                                containerHost.getHostname(), commandResult.getStatus(), commandResult.getStdErr() ) );
+                        String.format( "Error getting process resource usage of pid=%d on %s: %s %s", pid,
+                                c.getHostname(), commandResult.getStatus(), commandResult.getStdErr() ) );
             }
-            return JsonUtil.fromJson( commandResult.getStdOut(), ProcessResourceUsage.class );
+
+            ProcessResourceUsage result = JsonUtil.fromJson( commandResult.getStdOut(), ProcessResourceUsage.class );
+            result.setContainerId( containerId );
+
+            return result;
         }
         catch ( Exception e )
         {
             LOG.error( String.format( "Could not obtain process resource usage for container %s, pid %d",
-                    containerHost.getHostname(), processPid ), e );
+                    containerId.getId(), pid ), e );
             throw new MonitorException( e );
         }
     }
@@ -730,13 +723,6 @@ public class MonitorImpl implements Monitor
 
                 //*********construct Secure Header ****************************
                 Map<String, String> headers = Maps.newHashMap();
-                String envId = containerHost.getEnvironmentId().toString();
-                String envheaderTarget = creatorPeer.getId() + "-" + envId;
-                String envheaderSource = peerManager.getLocalPeer().getId() + "-" + envId;
-
-                headers.put( Common.HEADER_SPECIAL, "ENC" );
-                headers.put( Common.HEADER_ENV_ID_TARGET, envheaderTarget );
-                headers.put( Common.HEADER_ENV_ID_SOURCE, envheaderSource );
                 //*************************************************************
 
 
@@ -764,23 +750,23 @@ public class MonitorImpl implements Monitor
         {
             //obtain user from environment
             Environment environment = environmentManager.loadEnvironment( metric.getEnvironmentId() );
-            User user = identityManager.getUser( environment.getUserId() );
+            //User user = identityManager.getUser( environment.getUserId() );
 
-            if ( user == null )
+            //if ( user == null )
             {
                 throw new MonitorException(
                         String.format( "Failed to retrieve environment's '%s' user", environment.getName() ) );
             }
             //login under him
-            identityManager.loginWithToken( user.getUsername() );
+            //identityManager.loginWithToken( user.getUsername() );
 
             //search for subscriber if not found then no-op
-            Set<String> subscribersIds = monitorDao.getEnvironmentSubscribersIds( metric.getEnvironmentId() );
-            for ( String subscriberId : subscribersIds )
-            {
+            //Set<String> subscribersIds = monitorDao.getEnvironmentSubscribersIds( metric.getEnvironmentId() );
+            //for ( String subscriberId : subscribersIds )
+            //{
                 //notify subscriber on alert
-                notifyListener( metric, subscriberId );
-            }
+                //notifyListener( metric, subscriberId );
+            //}
         }
         catch ( MonitorException e )
         {
