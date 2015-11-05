@@ -3,13 +3,21 @@ package io.subutai.core.identity.rest.ui;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import io.subutai.core.identity.api.IdentityManager;
-import io.subutai.core.identity.api.User;
+import com.google.gson.reflect.TypeToken;
+import io.subutai.common.environment.NodeGroup;
+import io.subutai.core.identity.api.*;
+import io.subutai.core.identity.rest.ui.model.CliCommandJson;
+import io.subutai.core.identity.rest.ui.model.PortalModuleScopeJson;
+import io.subutai.core.identity.rest.ui.model.RestEndpointScopeJson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import io.subutai.common.util.JsonUtil;
 
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 
 public class RestServiceImpl implements RestService
@@ -75,7 +83,9 @@ public class RestServiceImpl implements RestService
     }
 
     @Override
-    public Response setUser( final String username, final String fullName, final String password, final String email )
+    public Response setUser( final String username, final String fullName,
+                             final String password, final String email,
+                             final String rolesJson, final Long userId )
     {
         try
         {
@@ -84,9 +94,121 @@ public class RestServiceImpl implements RestService
             Preconditions.checkArgument(!Strings.isNullOrEmpty(password));
             Preconditions.checkArgument(!Strings.isNullOrEmpty(email));
 
-            //User newUser = identityManager.createMockUser( username, fullName, password, email );
+            //JsonUtil.<DiskPartition>fromJson(diskPartition, new TypeToken<DiskPartition>() {}.getType());
+            User newUser;
 
-            identityManager.addUser(username, fullName, password, email);
+            if(userId == null || userId <= 0){
+                newUser = identityManager.createMockUser(username, fullName, password, email );
+            } else {
+                newUser = identityManager.getUser(userId);
+                newUser.setFullname(fullName);
+                newUser.setEmail(email);
+                newUser.setPassword(password);
+            }
+
+            List<String> roles = (ArrayList<String>)JsonUtil.fromJson(rolesJson, new TypeToken<ArrayList<String>>() {}.getType());
+
+            for( String roleName : roles ) {
+                Role role = identityManager.getRole(roleName);
+                newUser.addRole(role);
+            }
+            //Role role = identityManager.getRole("admin");
+            //newUser.addRole(role);
+
+            //identityManager.addUser(username, fullName, password, email);
+            identityManager.updateUser(newUser);
+
+            return Response.ok().build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error setting new user #setUser", e );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+    @Override
+    public Response deleteUser( final Long userId )
+    {
+        try
+        {
+            User userToDelete = identityManager.getUser(userId);
+
+            identityManager.deleteUser( userToDelete );
+
+            return Response.ok().build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error setting new user #setUser", e );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+    @Override
+    public Response saveRole( final String rolename, final String modulesJson,
+                             final String endpointJson, final String cliCommandsJson )
+    {
+        try
+        {
+            Preconditions.checkArgument(!Strings.isNullOrEmpty(rolename));
+
+            //JsonUtil.<DiskPartition>fromJson(diskPartition, new TypeToken<DiskPartition>() {}.getType());
+            Role role = identityManager.getRole(rolename);
+
+            if(role == null) {
+                role = identityManager.createRole(rolename);
+            }
+
+            if(!Strings.isNullOrEmpty(cliCommandsJson)) {
+                List<CliCommand> cliCommands = JsonUtil.fromJson(
+                    cliCommandsJson, new TypeToken<ArrayList<CliCommandJson>>() {}.getType()
+                );
+                role.clearCliCommands();
+                for(CliCommand cliCommand: cliCommands) {
+                    role.addCliCommand(cliCommand);
+                }
+            }
+
+            if(!Strings.isNullOrEmpty(modulesJson)) {
+                List<PortalModuleScope> modules = JsonUtil.fromJson(
+                    modulesJson, new TypeToken<ArrayList<PortalModuleScopeJson>>() {}.getType()
+                );
+                role.clearPortalModules();
+                for(PortalModuleScope module: modules) {
+                    role.addPortalModule(module);
+                }
+            }
+
+            if(!Strings.isNullOrEmpty(endpointJson)) {
+                List<RestEndpointScope> endpoints = JsonUtil.fromJson(
+                        endpointJson, new TypeToken<ArrayList<RestEndpointScopeJson>>() {}.getType()
+                );
+                role.clearRestEndpointScopes();
+                for(RestEndpointScope endpoint: endpoints) {
+                    role.addRestEndpointScope(endpoint);
+                }
+            }
+
+            identityManager.updateRole(role);
+
+            return Response.ok().build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error setting new role #createRole", e );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+    @Override
+    public Response deleteRole( final String roleName )
+    {
+        try
+        {
+            Role role = identityManager.getRole( roleName );
+
+            identityManager.deleteRole(role );
 
             return Response.ok().build();
         }

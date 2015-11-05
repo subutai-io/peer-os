@@ -14,14 +14,32 @@ public interface RestService
     @POST
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response setUser( @FormParam( "username" ) String username,
-                                   @FormParam( "full_name" ) String fullName,
-                                   @FormParam( "password" ) String password,
-                                   @FormParam( "email" ) String email);
+                             @FormParam( "full_name" ) String fullName,
+                             @FormParam( "password" ) String password,
+                             @FormParam( "email" ) String email,
+                             @FormParam( "roles" ) String roles,
+                             @FormParam( "user_id" ) Long userId );
+
+    @DELETE
+    @Path( "/{userId}" )
+    public Response deleteUser( @PathParam( "userId" ) Long userId );
 
     @GET
     @Path( "roles" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response getRoles();
+
+    @POST
+    @Path( "roles" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response saveRole( @FormParam( "rolename" ) String rolename,
+                             @FormParam( "modules" ) String modulesJson,
+                             @FormParam( "endpoint" ) String endpointJson,
+                             @FormParam( "cli_commands" ) String cliCommandsJson );
+
+    @DELETE
+    @Path( "roles/{roleName}" )
+    public Response deleteRole( @PathParam( "roleName" ) String roleName );
 
     @GET
     @Path( "permissions" )
