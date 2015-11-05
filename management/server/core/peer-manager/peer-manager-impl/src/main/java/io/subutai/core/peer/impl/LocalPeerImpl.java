@@ -52,6 +52,7 @@ import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.Interface;
 import io.subutai.common.host.ResourceHostInfo;
+import io.subutai.common.metric.HostMetric;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.metric.ResourceHostMetrics;
@@ -304,7 +305,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             ( ( AbstractSubutaiHost ) resourceHost ).setPeer( this );
             final ResourceHostEntity resourceHostEntity = ( ResourceHostEntity ) resourceHost;
             resourceHostEntity.setRegistry( templateRegistry );
-            resourceHostEntity.setMonitor( monitor );
+//            resourceHostEntity.setMonitor( monitor );
             resourceHostEntity.setHostRegistry( hostRegistry );
         }
     }
@@ -1645,6 +1646,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
      *  Create PEK
      */
 
+
     @RolesAllowed( "Environment-Management|A|Write" )
     @Override
     public PublicKeyContainer createEnvironmentKeyPair( EnvironmentId envId ) throws PeerException
@@ -1750,22 +1752,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public ResourceHostMetrics getResourceHostMetrics()
     {
-        ResourceHostMetrics result = new ResourceHostMetrics();
-
-        for ( ResourceHost resourceHost : getResourceHosts() )
-        {
-            if ( resourceHost.isConnected() )
-            {
-
-                final ResourceHostMetric hostMetric = resourceHost.getHostMetric();
-                //TODO: please remove following 2 lines after implementation of host metric script: subutai stats
-                // system [hostname]
-                hostMetric.setHostName( resourceHost.getHostname() );
-                hostMetric.setHostId( resourceHost.getId() );
-                result.addMetric( hostMetric );
-            }
-        }
-
+        ResourceHostMetrics result = monitor.getResourceHostMetrics( true );
         return result;
     }
 

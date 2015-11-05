@@ -25,6 +25,10 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>peer-manager-api</artifactId>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>metric-api</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>${project.groupId}</groupId>

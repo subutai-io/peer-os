@@ -108,7 +108,7 @@ public class RestServiceImplTest
     @Before
     public void setUp() throws Exception
     {
-        restService = spy( new RestServiceImpl( peerManager/*, httpContextManager, securityManager*/ ) );
+        restService = spy( new RestServiceImpl( peerManager/*, httpContextManager, securityManager*/ , null) );
         restService.jsonUtil = jsonUtil;
         restService.restUtil = restUtil;
         when( containerId.getId() ).thenReturn( CONTAINER_ID );

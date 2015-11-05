@@ -28,6 +28,7 @@ import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInfoModel;
 import io.subutai.common.host.HostInterfaces;
+import io.subutai.common.metric.HostMetric;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.Gateway;
@@ -323,12 +324,12 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
-
     @Override
     public void removeEnvironmentKeyPair( final EnvironmentId environmentId ) throws PeerException
     {
         new PeerWebClient( peerInfo.getIp(), provider ).removeEnvironmentKeyPair( environmentId );
     }
+
 
     @RolesAllowed( "Environment-Management|A|Delete" )
     @Override
@@ -538,6 +539,7 @@ public class RemotePeerImpl implements RemotePeer
             throw new PeerException( "Error obtaining container cpu quota", e );
         }
     }
+
 
     @RolesAllowed( "Environment-Management|A|Update" )
     @Override
@@ -1153,10 +1155,10 @@ public class RemotePeerImpl implements RemotePeer
         {
             //*********construct Secure Header ****************************
             Map<String, String> headers = Maps.newHashMap();
-//
-//            headers.put( Common.HEADER_SPECIAL, "ENC" );
-//            headers.put( Common.HEADER_PEER_ID_SOURCE, localPeer.getId() );
-//            headers.put( Common.HEADER_PEER_ID_TARGET, peerInfo.getId() );
+            //
+            //            headers.put( Common.HEADER_SPECIAL, "ENC" );
+            //            headers.put( Common.HEADER_PEER_ID_SOURCE, localPeer.getId() );
+            //            headers.put( Common.HEADER_PEER_ID_TARGET, peerInfo.getId() );
             //*************************************************************
             Map<String, String> params = Maps.newHashMap();
             params.put( "peerIps", jsonUtil.to( peerIps ) );
@@ -1291,6 +1293,13 @@ public class RemotePeerImpl implements RemotePeer
     {
         return new PeerWebClient( peerInfo.getIp(), provider ).getResourceHostMetrics();
     }
+
+
+//    @Override
+//    public HostMetric getHostMetric( final String hostId )
+//    {
+//        return new PeerWebClient( peerInfo.getIp(), provider ).getHostMetric( hostId );
+//    }
 
 
     @Override

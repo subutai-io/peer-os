@@ -21,14 +21,12 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.gson.reflect.TypeToken;
 
-import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInterfaces;
-import io.subutai.common.metric.ProcessResourceUsage;
+import io.subutai.common.metric.HostMetric;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.ContainerGateway;
-import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.PeerPolicy;
@@ -40,9 +38,9 @@ import io.subutai.common.quota.RamQuota;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
+import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.core.peer.api.Tunnel;
 
 
 public class RestServiceImpl implements RestService
@@ -51,11 +49,13 @@ public class RestServiceImpl implements RestService
     private PeerManager peerManager;
     protected JsonUtil jsonUtil = new JsonUtil();
     protected RestUtil restUtil = new RestUtil();
+    private Monitor monitor;
 
 
-    public RestServiceImpl( final PeerManager peerManager )
+    public RestServiceImpl( final PeerManager peerManager, final Monitor monitor)
     {
         this.peerManager = peerManager;
+        this.monitor = monitor;
     }
 
 
@@ -144,63 +144,63 @@ public class RestServiceImpl implements RestService
 
 
     //*************************************************************************************
-    @Override
-    public void destroyContainer( final ContainerId containerId )
-    {
-        Preconditions.checkNotNull( containerId );
-        try
-        {
-            peerManager.destroyContainer( containerId );
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( "Error destroying container #destroyContainer", e );
-            Response response = Response.serverError().entity( e.toString() ).build();
-            throw new WebApplicationException( response );
-        }
-    }
-
-
-    @Override
-    public void startContainer( final ContainerId containerId )
-    {
-        Preconditions.checkNotNull( containerId );
-        try
-        {
-            peerManager.startContainer( containerId );
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( "Error starting container #startContainer", e );
-            Response response = Response.serverError().entity( e.toString() ).build();
-            throw new WebApplicationException( response );
-        }
-    }
-
-
-    @Override
-    public void stopContainer( final ContainerId containerId )
-    {
-        Preconditions.checkNotNull( containerId );
-        try
-        {
-            peerManager.stopContainer( containerId );
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( "Error stopping container #stopContainer", e );
-            Response response = Response.serverError().entity( e.toString() ).build();
-            throw new WebApplicationException( response );
-        }
-    }
-
-
-    @Override
-    public ContainerHostState getContainerState( final ContainerId containerId )
-    {
-        Preconditions.checkNotNull( containerId );
-        return peerManager.getContainerState( containerId );
-    }
+//    @Override
+//    public void destroyContainer( final ContainerId containerId )
+//    {
+//        Preconditions.checkNotNull( containerId );
+//        try
+//        {
+//            peerManager.destroyContainer( containerId );
+//        }
+//        catch ( Exception e )
+//        {
+//            LOGGER.error( "Error destroying container #destroyContainer", e );
+//            Response response = Response.serverError().entity( e.toString() ).build();
+//            throw new WebApplicationException( response );
+//        }
+//    }
+//
+//
+//    @Override
+//    public void startContainer( final ContainerId containerId )
+//    {
+//        Preconditions.checkNotNull( containerId );
+//        try
+//        {
+//            peerManager.startContainer( containerId );
+//        }
+//        catch ( Exception e )
+//        {
+//            LOGGER.error( "Error starting container #startContainer", e );
+//            Response response = Response.serverError().entity( e.toString() ).build();
+//            throw new WebApplicationException( response );
+//        }
+//    }
+//
+//
+//    @Override
+//    public void stopContainer( final ContainerId containerId )
+//    {
+//        Preconditions.checkNotNull( containerId );
+//        try
+//        {
+//            peerManager.stopContainer( containerId );
+//        }
+//        catch ( Exception e )
+//        {
+//            LOGGER.error( "Error stopping container #stopContainer", e );
+//            Response response = Response.serverError().entity( e.toString() ).build();
+//            throw new WebApplicationException( response );
+//        }
+//    }
+//
+//
+//    @Override
+//    public ContainerHostState getContainerState( final ContainerId containerId )
+//    {
+//        Preconditions.checkNotNull( containerId );
+//        return peerManager.getContainerState( containerId );
+//    }
 
 
     @Override
@@ -279,23 +279,23 @@ public class RestServiceImpl implements RestService
     }
 
 
-    @Override
-    public ProcessResourceUsage getProcessResourceUsage( ContainerId containerId, int pid )
-    {
-        try
-        {
-            Preconditions.checkNotNull( containerId );
-            Preconditions.checkArgument( pid > 0 );
-
-            return peerManager.getProcessResourceUsage( containerId, pid );
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( "Error getting processing resource usage #getProcessResourceUsage", e );
-            throw new WebApplicationException(
-                    Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build() );
-        }
-    }
+//    @Override
+//    public ProcessResourceUsage getProcessResourceUsage( ContainerId containerId, int pid )
+//    {
+//        try
+//        {
+//            Preconditions.checkNotNull( containerId );
+//            Preconditions.checkArgument( pid > 0 );
+//
+//            return peerManager.getProcessResourceUsage( containerId, pid );
+//        }
+//        catch ( Exception e )
+//        {
+//            LOGGER.error( "Error getting processing resource usage #getProcessResourceUsage", e );
+//            throw new WebApplicationException(
+//                    Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build() );
+//        }
+//    }
 
 
     @Override
@@ -683,6 +683,13 @@ public class RestServiceImpl implements RestService
         {
             throw new WebApplicationException( e );
         }
+    }
+
+
+    @Override
+    public HostMetric getHostMetric( final String hostId )
+    {
+        return monitor.getHostMetric( hostId );
     }
 
 

@@ -9,6 +9,7 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.Interface;
+import io.subutai.common.metric.HostMetric;
 
 
 /**
@@ -51,4 +52,6 @@ public interface Host extends HostInfo, Serializable
     public String getMacByInterfaceName( String interfaceName );
 
     Interface getInterfaceByName( String interfaceName );
+
+//    HostMetric getHostMetric();
 }

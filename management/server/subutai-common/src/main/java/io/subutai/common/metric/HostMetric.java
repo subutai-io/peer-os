@@ -17,8 +17,11 @@ import com.google.gson.annotations.SerializedName;
  */
 @XmlRootElement
 @XmlAccessorType( XmlAccessType.FIELD )
-public class BaseMetric
+public class HostMetric
 {
+    @JsonIgnore
+    private String peerId;
+
     @JsonIgnore
     protected String hostId;
     @Expose
@@ -39,14 +42,26 @@ public class BaseMetric
     protected Disk disk;
 
 
-    public BaseMetric()
+    public HostMetric()
     {
     }
 
 
-    public BaseMetric( final Ram ram )
+    public HostMetric( final Ram ram )
     {
         this.ram = ram;
+    }
+
+
+    public String getPeerId()
+    {
+        return peerId;
+    }
+
+
+    public void setPeerId( final String peerId )
+    {
+        this.peerId = peerId;
     }
 
 
@@ -107,6 +122,13 @@ public class BaseMetric
     public String getCpuModel()
     {
         return cpu != null ? cpu.model : null;
+    }
+
+
+    @JsonIgnore
+    public int getCpuCore()
+    {
+        return cpu != null ? cpu.coreCount : 0;
     }
 
 

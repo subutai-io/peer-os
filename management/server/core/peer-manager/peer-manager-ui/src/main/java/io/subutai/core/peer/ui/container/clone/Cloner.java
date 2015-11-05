@@ -443,16 +443,16 @@ public class Cloner extends VerticalLayout
     }
 
 
-    private List<ResourceHostMetric> fillInServerMetrics()
-    {
-        List<ResourceHostMetric> result = new ArrayList<>();
-
-        for ( ResourceHost host : localPeer.getResourceHosts() )
-        {
-            result.add( host.getHostMetric() );
-        }
-        return result;
-    }
+//    private List<ResourceHostMetric> fillInServerMetrics()
+//    {
+//        List<ResourceHostMetric> result = new ArrayList<>();
+//
+//        for ( ResourceHost host : localPeer.getResourceHosts() )
+//        {
+//            result.add( host.getHostMetric() );
+//        }
+//        return result;
+//    }
 
 
     private void show( String msg )

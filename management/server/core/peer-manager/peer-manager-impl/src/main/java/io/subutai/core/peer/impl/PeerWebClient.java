@@ -16,6 +16,7 @@ import com.google.common.base.Preconditions;
 
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInterfaces;
+import io.subutai.common.metric.HostMetric;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.Gateway;
@@ -23,6 +24,7 @@ import io.subutai.common.network.Vni;
 import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
+import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.N2NConfig;
@@ -336,5 +338,15 @@ public class PeerWebClient
         {
             throw new PeerException( "Error on reserving VNI", e );
         }
+    }
+
+
+    public HostMetric getHostMetric( final String hostId )
+    {
+        String path = String.format( "/metric/%s", hostId );
+
+        WebClient client = WebClientBuilder.buildPeerWebClient( host, path, provider );
+
+        return client.get( HostMetric.class );
     }
 }

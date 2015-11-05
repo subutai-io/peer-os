@@ -46,6 +46,7 @@
 
   <bean id="environmentRestServiceImpl" class="io.subutai.core.peer.rest.EnvironmentRestServiceImpl">
     <argument ref="peerManager" />
+    <argument ref="monitor" />
   </bean>
 
   <bean id="registrationServiceImpl" class="io.subutai.core.peer.rest.RegistrationServiceImpl">
@@ -54,11 +55,13 @@
 
   <reference id="peerManager" availability="mandatory"
              interface="io.subutai.core.peer.api.PeerManager" />
+  <reference id="monitor" availability="mandatory"
+             interface="io.subutai.core.metric.api.Monitor" />
 
-<!--  <reference id="httpContextManager" availability="mandatory"
-             interface="io.subutai.core.http.manager.api.HttpContextManager" />
+  <!--  <reference id="httpContextManager" availability="mandatory"
+               interface="io.subutai.core.http.manager.api.HttpContextManager" />
 
-  <reference id="securityManager" availability="mandatory"
-             interface="io.subutai.core.security.api.SecurityManager" />-->
+    <reference id="securityManager" availability="mandatory"
+               interface="io.subutai.core.security.api.SecurityManager" />-->
 
 </blueprint>

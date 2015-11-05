@@ -21,6 +21,7 @@ import com.vaadin.ui.Tree;
 
 import io.subutai.common.host.Interface;
 import io.subutai.common.host.ResourceHostInfo;
+import io.subutai.common.metric.HostMetric;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
@@ -29,6 +30,7 @@ import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.settings.Common;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hostregistry.api.HostRegistry;
+import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.server.ui.component.ConcurrentComponent;
@@ -45,12 +47,14 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
     private HierarchicalContainer container;
     private Set<Host> selectedHosts = new HashSet<>();
     private Item managementHostItem;
+    private Monitor monitor;
 
 
-    public ContainerTree( LocalPeer localPeer, final HostRegistry hostRegistry )
+    public ContainerTree( LocalPeer localPeer, final HostRegistry hostRegistry, final Monitor monitor )
     {
 
         this.localPeer = localPeer;
+        this.monitor = monitor;
         setSizeFull();
         setMargin( true );
 
@@ -106,10 +110,11 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
                             {
 
                                 ResourceHost resourceHost = ( ResourceHost ) host;
-                                final ResourceHostMetric metric = resourceHost.getHostMetric();
+                                final HostMetric metric = monitor.getHostMetric( resourceHost.getId() );
 
                                 result.append( getText( "<br>ARCH: %s", resourceHost.getArch() ) );
                                 result.append( getText( "<br>CPU model: %s", metric.getCpuModel() ) );
+                                result.append( getText( "<br>CPU core(s): %d", metric.getCpuCore() ) );
                                 result.append( getText( "<br>CPU load: %.2f", metric.getUsedCpu() ) );
                                 result.append( getText( "<br>Total RAM: %.3f Gb",
                                         metric.getTotalRam() / 1024 / 1024 / 1024 ) );

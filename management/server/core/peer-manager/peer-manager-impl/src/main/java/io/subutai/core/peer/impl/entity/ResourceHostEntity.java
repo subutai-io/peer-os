@@ -38,6 +38,7 @@ import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.ResourceHostInfo;
+import io.subutai.common.metric.HostMetric;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.HostNotFoundException;
@@ -76,11 +77,11 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     @Transient
     protected ExecutorService singleThreadExecutorService = Executors.newSingleThreadExecutor();
 
-    @Transient
-    protected ScheduledExecutorService stateUpdateExecutorService;
+//    @Transient
+//    protected ScheduledExecutorService stateUpdateExecutorService;
 
-    @Transient
-    private Monitor monitor;
+//    @Transient
+//    private Monitor monitor;
 
     @Transient
     protected CommandUtil commandUtil = new CommandUtil();
@@ -91,9 +92,9 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     @Transient
     protected HostRegistry hostRegistry;
 
-    @Transient
-    volatile private ResourceHostMetric metric = new ResourceHostMetric();
-
+//    @Transient
+//    volatile private ResourceHostMetric metric = new ResourceHostMetric();
+//
 
     protected ResourceHostEntity()
     {
@@ -105,9 +106,9 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     public void init()
     {
         super.init();
-        stateUpdateExecutorService = Executors.newScheduledThreadPool( 10 );
-        stateUpdateExecutorService
-                .scheduleWithFixedDelay( new HostMetricUpdater( this, monitor ), 10, 60, TimeUnit.SECONDS );
+//        stateUpdateExecutorService = Executors.newScheduledThreadPool( 10 );
+//        stateUpdateExecutorService
+//                .scheduleWithFixedDelay( new HostMetricUpdater( this, monitor ), 10, 60, TimeUnit.SECONDS );
     }
 
 
@@ -142,7 +143,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     public void dispose()
     {
         singleThreadExecutorService.shutdown();
-        stateUpdateExecutorService.shutdown();
+//        stateUpdateExecutorService.shutdown();
     }
 
 
@@ -197,18 +198,18 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         return ContainerHostState.UNKNOWN;
     }
 
-
-    @Override
-    public ResourceHostMetric getHostMetric()
-    {
-        return metric;
-    }
-
-
-    public void setHostMetric( final ResourceHostMetric metric )
-    {
-        this.metric = metric;
-    }
+//
+//    @Override
+//    public ResourceHostMetric getHostMetric()
+//    {
+//        return metric;
+//    }
+//
+//
+//    public void setHostMetric( final ResourceHostMetric metric )
+//    {
+//        this.metric = metric;
+//    }
 
 
     public Set<ContainerHost> getContainerHosts()
@@ -469,12 +470,12 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         this.hostRegistry = hostRegistry;
     }
 
-
-    public void setMonitor( final Monitor monitor )
-    {
-        this.monitor = monitor;
-    }
-
+//
+//    public void setMonitor( final Monitor monitor )
+//    {
+//        this.monitor = monitor;
+//    }
+//
 
     public void addContainerHost( ContainerHostEntity host )
     {
@@ -522,40 +523,40 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
-    private class HostMetricUpdater implements Runnable
-    {
-        private final ResourceHostEntity host;
-        private final Monitor monitor;
-
-
-        public HostMetricUpdater( final ResourceHostEntity resourceHostEntity, final Monitor monitor )
-        {
-            this.host = resourceHostEntity;
-            this.monitor = monitor;
-        }
-
-
-        @Override
-        public void run()
-        {
-            if ( !host.isConnected() )
-            {
-                LOG.debug( String.format( "Updating metrics for resource host %s failed. Host disconnected",
-                        host.getHostname() ) );
-                return;
-            }
-            try
-            {
-                final ResourceHostMetric resourceHostMetric = monitor.getResourceHostMetric( host );
-                resourceHostMetric.setPeerId( peerId );
-                resourceHostMetric.setContainersCount( host.getContainers().size() );
-                host.setHostMetric( resourceHostMetric );
-                LOG.debug( String.format( "Updating metrics for resource host %s succeeded.", host.getHostname() ) );
-            }
-            catch ( MonitorException e )
-            {
-                LOG.error( String.format( "Updating metrics for resource host %s failed.", host.getHostname() ), e );
-            }
-        }
-    }
+//    private class HostMetricUpdater implements Runnable
+//    {
+//        private final ResourceHostEntity host;
+//        private final Monitor monitor;
+//
+//
+//        public HostMetricUpdater( final ResourceHostEntity resourceHostEntity, final Monitor monitor )
+//        {
+//            this.host = resourceHostEntity;
+//            this.monitor = monitor;
+//        }
+//
+//
+//        @Override
+//        public void run()
+//        {
+//            if ( !host.isConnected() )
+//            {
+//                LOG.debug( String.format( "Updating metrics for resource host %s failed. Host disconnected",
+//                        host.getHostname() ) );
+//                return;
+//            }
+//            try
+//            {
+//                final ResourceHostMetric resourceHostMetric = monitor.getResourceHostMetric( host );
+//                resourceHostMetric.setPeerId( peerId );
+//                resourceHostMetric.setContainersCount( host.getContainers().size() );
+//                host.setHostMetric( resourceHostMetric );
+//                LOG.debug( String.format( "Updating metrics for resource host %s succeeded.", host.getHostname() ) );
+//            }
+//            catch ( MonitorException e )
+//            {
+//                LOG.error( String.format( "Updating metrics for resource host %s failed.", host.getHostname() ), e );
+//            }
+//        }
+//    }
 }

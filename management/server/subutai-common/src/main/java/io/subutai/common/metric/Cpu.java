@@ -20,6 +20,9 @@ public class Cpu
     @Expose
     @JsonProperty
     Double idle = 0.0;
+    @Expose
+    @JsonProperty
+    int coreCount = 0;
 
 
     public String getModel()
@@ -46,12 +49,25 @@ public class Cpu
     }
 
 
+    public int getCoreCount()
+    {
+        return coreCount;
+    }
+
+
+    public void setCoreCount( final int coreCount )
+    {
+        this.coreCount = coreCount;
+    }
+
+
     @Override
     public String toString()
     {
         final StringBuffer sb = new StringBuffer( "CPU{" );
         sb.append( "model='" ).append( model ).append( '\'' );
         sb.append( ", idle=" ).append( idle );
+        sb.append( ", coreCount=" ).append( coreCount );
         sb.append( '}' );
         return sb.toString();
     }

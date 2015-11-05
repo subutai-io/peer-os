@@ -10,6 +10,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Runo;
 
 import io.subutai.common.util.ServiceLocator;
+import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.peer.ui.PeerManagerPortalModule;
 import io.subutai.core.peer.ui.container.clone.Cloner;
@@ -29,6 +30,7 @@ public class ContainerComponent extends CustomComponent
 
         final StrategyManager strategyManager = serviceLocator.getService( StrategyManager.class );
         final PeerManager peerManager = serviceLocator.getService( PeerManager.class );
+        final Monitor monitor = serviceLocator.getService( Monitor.class );
 
         setHeight( 100, Unit.PERCENTAGE );
 
@@ -38,7 +40,7 @@ public class ContainerComponent extends CustomComponent
 
 
         final ContainerTree containerTree =
-                new ContainerTree( peerManager.getLocalPeer(), peerManagerPortalModule.getHostRegistry() );
+                new ContainerTree( peerManager.getLocalPeer(), peerManagerPortalModule.getHostRegistry(), monitor );
 
         VerticalLayout treeLayout = new VerticalLayout();
         treeLayout.addComponent( containerTree );

@@ -19,6 +19,7 @@ import javax.ws.rs.core.Response;
 
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInterfaces;
+import io.subutai.common.metric.HostMetric;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.Gateway;
@@ -176,38 +177,38 @@ public interface RestService
     //*********** Environment Specific REST - BEGIN ***************
 
 
-    @POST
-    @Path( "container/destroy" )
-    @Consumes( MediaType.APPLICATION_JSON )
-    @Produces( MediaType.APPLICATION_JSON )
-    public void destroyContainer( ContainerId containerId );
-
-    @POST
-    @Path( "container/start" )
-    @Consumes( MediaType.APPLICATION_JSON )
-    @Produces( MediaType.APPLICATION_JSON )
-    public void startContainer( ContainerId containerId );
-
-    @POST
-    @Path( "container/stop" )
-    @Consumes( MediaType.APPLICATION_JSON )
-    @Produces( MediaType.APPLICATION_JSON )
-    public void stopContainer( ContainerId containerId );
-
-    @POST
-    @Path( "container/state" )
-    @Consumes( MediaType.APPLICATION_JSON )
-    @Produces( MediaType.APPLICATION_JSON )
-    public ContainerHostState getContainerState( ContainerId containerId );
-
-
-    @GET
-    @Path( "container/{id}/usage/{pid}" )
-    @Consumes( MediaType.APPLICATION_JSON )
-    @Produces( MediaType.APPLICATION_JSON )
-    ProcessResourceUsage getProcessResourceUsage( @PathParam( "id" ) ContainerId containerId,
-                                                  @PathParam( "pid" ) int pid );
-
+//    @POST
+//    @Path( "container/destroy" )
+//    @Consumes( MediaType.APPLICATION_JSON )
+//    @Produces( MediaType.APPLICATION_JSON )
+//    public void destroyContainer( ContainerId containerId );
+//
+//    @POST
+//    @Path( "container/start" )
+//    @Consumes( MediaType.APPLICATION_JSON )
+//    @Produces( MediaType.APPLICATION_JSON )
+//    public void startContainer( ContainerId containerId );
+//
+//    @POST
+//    @Path( "container/stop" )
+//    @Consumes( MediaType.APPLICATION_JSON )
+//    @Produces( MediaType.APPLICATION_JSON )
+//    public void stopContainer( ContainerId containerId );
+//
+//    @POST
+//    @Path( "container/state" )
+//    @Consumes( MediaType.APPLICATION_JSON )
+//    @Produces( MediaType.APPLICATION_JSON )
+//    public ContainerHostState getContainerState( ContainerId containerId );
+//
+//
+//    @GET
+//    @Path( "container/{id}/usage/{pid}" )
+//    @Consumes( MediaType.APPLICATION_JSON )
+//    @Produces( MediaType.APPLICATION_JSON )
+//    ProcessResourceUsage getProcessResourceUsage( @PathParam( "id" ) ContainerId containerId,
+//                                                  @PathParam( "pid" ) int pid );
+//
     @GET
     @Path( "container/quota/ram/available" )
     @Produces( MediaType.APPLICATION_JSON )
@@ -289,6 +290,12 @@ public interface RestService
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
     ResourceHostMetrics getResources();
+
+    @GET
+    @Path( "metrics/{hostId}" )
+    @Consumes( MediaType.APPLICATION_JSON )
+    @Produces( MediaType.APPLICATION_JSON )
+    HostMetric getHostMetric( @PathParam( "hostId" ) String hostId );
 
     //*********** Environment Specific REST - END ***************
 
