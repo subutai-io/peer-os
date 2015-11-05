@@ -172,6 +172,13 @@ public class RoleEntity implements Role
 
 
     @Override
+    public void clearCliCommands()
+    {
+        cliCommands.clear();
+    }
+
+
+    @Override
     public Set<PortalModuleScope> getAccessibleModules()
     {
         Set<PortalModuleScope> portalModules = new HashSet<>();

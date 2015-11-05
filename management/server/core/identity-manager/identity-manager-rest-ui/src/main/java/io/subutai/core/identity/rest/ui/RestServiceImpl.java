@@ -164,16 +164,17 @@ public class RestServiceImpl implements RestService
                 List<CliCommand> cliCommands = JsonUtil.fromJson(
                     cliCommandsJson, new TypeToken<ArrayList<CliCommandJson>>() {}.getType()
                 );
+                role.clearCliCommands();
                 for(CliCommand cliCommand: cliCommands) {
                     role.addCliCommand(cliCommand);
                 }
-                //role.setCliCommands(cliCommands);
             }
 
             if(!Strings.isNullOrEmpty(modulesJson)) {
                 List<PortalModuleScope> modules = JsonUtil.fromJson(
                     modulesJson, new TypeToken<ArrayList<PortalModuleScopeJson>>() {}.getType()
                 );
+                role.clearPortalModules();
                 for(PortalModuleScope module: modules) {
                     role.addPortalModule(module);
                 }
@@ -183,6 +184,7 @@ public class RestServiceImpl implements RestService
                 List<RestEndpointScope> endpoints = JsonUtil.fromJson(
                         endpointJson, new TypeToken<ArrayList<RestEndpointScopeJson>>() {}.getType()
                 );
+                role.clearRestEndpointScopes();
                 for(RestEndpointScope endpoint: endpoints) {
                     role.addRestEndpointScope(endpoint);
                 }

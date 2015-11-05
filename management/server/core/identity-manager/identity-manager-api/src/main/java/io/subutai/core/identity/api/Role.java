@@ -22,6 +22,8 @@ public interface Role extends Serializable
 
     public void setCliCommands( List<CliCommand> cliCommands );
 
+    public void clearCliCommands();
+
     public void addPortalModule( PortalModuleScope portalModule );
 
     public Set<PortalModuleScope> getAccessibleModules();
