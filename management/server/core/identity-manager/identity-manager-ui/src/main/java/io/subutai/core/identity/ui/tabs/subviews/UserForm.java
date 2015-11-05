@@ -58,7 +58,6 @@ public class UserForm extends Window
         this.identityManager = identityManager;
         permissionsContainer = new BeanContainer<>( Role.class );
         permissionsContainer.setBeanIdProperty( "name" );
-        //permissionsContainer.addAll( roles );
         rolesSelector.setContainerDataSource( permissionsContainer );
         rolesSelector.setItemCaptionPropertyId( "name" );
 
@@ -171,6 +170,7 @@ public class UserForm extends Window
                 }
             }
         } );
+        removeButton.setEnabled( false );
 
         userName = new TextField( "Username" );
         userName.setRequired( true );

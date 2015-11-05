@@ -52,13 +52,15 @@ public class RoleForm extends Window
 			{
 				int scope = (int) event.getProperty().getValue();
 				p.setScope (scope);
-				for (Permission perm : perms)
+
+				/*
+                for (Permission perm : perms)
 				{
 					if (p.getId() == perm.getId())
 					{
 						perm.setScope (scope);
 					}
-				}
+				}*/
 			}
 		});
 		row.getItemProperty("Scope").setValue(scopes);
@@ -72,13 +74,15 @@ public class RoleForm extends Window
 			{
 				boolean v = (boolean) event.getProperty().getValue();
 				p.setRead (v);
+
+                /*
 				for (Permission perm : perms)
 				{
 					if (p.getId() == perm.getId())
 					{
 						perm.setRead(v);
 					}
-				}
+				}*/
 			}
 		});
 		row.getItemProperty("Read").setValue(read);
@@ -92,13 +96,15 @@ public class RoleForm extends Window
 			{
 				boolean v = (boolean) event.getProperty().getValue();
 				p.setWrite(v);
-				for (Permission perm : perms)
+
+                /*
+                for (Permission perm : perms)
 				{
 					if (p.getId() == perm.getId())
 					{
 						perm.setWrite(v);
 					}
-				}
+				}*/
 			}
 		});
 		row.getItemProperty ("Write").setValue (write);
@@ -111,14 +117,15 @@ public class RoleForm extends Window
 			public void valueChange (Property.ValueChangeEvent event)
 			{
 				boolean v = (boolean) event.getProperty().getValue();
-				p.setUpdate(v);
+				/*
+                p.setUpdate(v);
 				for (Permission perm : perms)
 				{
 					if (p.getId() == perm.getId())
 					{
 						perm.setUpdate(v);
 					}
-				}
+				}*/
 			}
 		});
 		row.getItemProperty ("Update").setValue (update);
@@ -130,7 +137,8 @@ public class RoleForm extends Window
 			@Override
 			public void valueChange (Property.ValueChangeEvent event)
 			{
-				boolean v = (boolean) event.getProperty().getValue();
+				/*
+                boolean v = (boolean) event.getProperty().getValue();
 				p.setDelete (v);
 				for (Permission perm : perms)
 				{
@@ -138,7 +146,7 @@ public class RoleForm extends Window
 					{
 						perm.setDelete(v);
 					}
-				}
+				}*/
 			}
 		});
 		row.getItemProperty ("Delete").setValue (delete);
@@ -152,14 +160,15 @@ public class RoleForm extends Window
 			@Override
 			public void buttonClick (Button.ClickEvent event)
 			{
-				for (int i = 0; i < perms.size(); ++i)
+				/*
+                for (int i = 0; i < perms.size(); ++i)
 				{
 					if (perms.get (i).getId() == p.getId())
 					{
 						perms.remove (i);
 						break;
 					}
-				}
+				}*/
 				permTable.removeItem (remove.getData());
 			}
 		});
@@ -181,7 +190,9 @@ public class RoleForm extends Window
 			{
 				@Override
 				public void buttonClick (Button.ClickEvent event)
-				{}
+				{
+
+                }
 			});
 			row.getItemProperty ("Add").setValue( add );
 		}
@@ -192,7 +203,8 @@ public class RoleForm extends Window
 	{
 		this.currentRole = role;
 		this.perms.clear();
-		for (Permission p : currentRole.getBean().getPermissions())
+
+        for (Permission p : currentRole.getBean().getPermissions())
 		{
 			this.perms.add (p);
 			this.addRow(p);
@@ -202,10 +214,10 @@ public class RoleForm extends Window
 	public RoleForm (final RolesTab callback)
 	{
 		this.setClosable (false);
-        this.setHeight( "300px" );
         this.addStyleName ("default");
 		this.center();
-		VerticalLayout content = new VerticalLayout();
+
+        VerticalLayout content = new VerticalLayout();
 		content.setSpacing (true);
 		content.setMargin (true);
 		permTable.addContainerProperty ("Permission", String.class, null);
@@ -215,23 +227,20 @@ public class RoleForm extends Window
 		permTable.addContainerProperty ("Update", CheckBox.class, null);
 		permTable.addContainerProperty ("Delete", CheckBox.class, null);
 		permTable.addContainerProperty ("Remove", Button.class, null);
-        permTable.getContainerProperty( null,"Remove" );
 
-        permTable.setColumnWidth("Scope",110  );
+
+        permTable.setColumnWidth("Scope",114  );
         permTable.setColumnWidth("Read",34  );
         permTable.setColumnWidth("Write",46  );
         permTable.setColumnWidth("Update",49  );
         permTable.setColumnWidth("Delete",46  );
         permTable.setColumnWidth("Remove",62  );
+        permTable.setHeight( "250px" );
 
-        permTable.setColumnWidth("Scope",70  );
-        permTable.setColumnWidth("Read",35  );
-        permTable.setColumnWidth("Write",35  );
-        permTable.setColumnWidth("Update",35  );
-        permTable.setColumnWidth("Delete",35  );
 
 		allPerms.addContainerProperty("Permission", String.class, null);
 		allPerms.addContainerProperty ("Add", Button.class, null);
+        allPerms.setHeight( "250px" );
 
 		addPerms (callback);
 		Button close = new Button ("Close");
@@ -258,12 +267,12 @@ public class RoleForm extends Window
 		buttonGrid.addComponent(close);
 		buttonGrid.addComponent(save);
 		HorizontalLayout tableGrid = new HorizontalLayout();
-		tableGrid.setSpacing (true);
+        tableGrid.setSpacing (true);
 		tableGrid.addComponent(permTable);
 		tableGrid.addComponent (allPerms);
 		content.addComponent (buttonGrid);
 		content.addComponent (tableGrid);
-		this.setContent (content);
+        this.setContent (content);
 	}
 
 }
