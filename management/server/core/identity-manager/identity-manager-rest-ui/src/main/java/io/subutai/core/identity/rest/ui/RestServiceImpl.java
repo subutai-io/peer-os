@@ -5,9 +5,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.gson.reflect.TypeToken;
 import io.subutai.common.environment.NodeGroup;
-import io.subutai.core.identity.api.IdentityManager;
-import io.subutai.core.identity.api.Role;
-import io.subutai.core.identity.api.User;
+import io.subutai.core.identity.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import io.subutai.common.util.JsonUtil;
@@ -134,6 +132,75 @@ public class RestServiceImpl implements RestService
             User userToDelete = identityManager.getUser(userId);
 
             identityManager.deleteUser( userToDelete );
+
+            return Response.ok().build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error setting new user #setUser", e );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+    @Override
+    public Response saveRole( final String rolename, final String modulesJson,
+                             final String endpointJson, final String cliCommandsJson )
+    {
+        try
+        {
+            Preconditions.checkArgument(!Strings.isNullOrEmpty(rolename));
+
+            //JsonUtil.<DiskPartition>fromJson(diskPartition, new TypeToken<DiskPartition>() {}.getType());
+            Role role = identityManager.getRole(rolename);
+
+            if(role == null) {
+                role = identityManager.createRole(rolename);
+            }
+
+            if(!Strings.isNullOrEmpty(cliCommandsJson)) {
+                List<CliCommand> cliCommands = (ArrayList<CliCommand>)JsonUtil.fromJson(
+                    cliCommandsJson, new TypeToken<ArrayList<CliCommand>>() {}.getType()
+                );
+                role.setCliCommands(cliCommands);
+            }
+
+            if(!Strings.isNullOrEmpty(modulesJson)) {
+                List<PortalModuleScope> modules = (ArrayList<PortalModuleScope>)JsonUtil.fromJson(
+                    modulesJson, new TypeToken<ArrayList<PortalModuleScope>>() {}.getType()
+                );
+                for(PortalModuleScope module: modules) {
+                    role.addPortalModule(module);
+                }
+            }
+
+            if(!Strings.isNullOrEmpty(endpointJson)) {
+                List<RestEndpointScope> endpoints = (ArrayList<RestEndpointScope>)JsonUtil.fromJson(
+                        endpointJson, new TypeToken<ArrayList<RestEndpointScope>>() {}.getType()
+                );
+                for(RestEndpointScope endpoint: endpoints) {
+                    role.addRestEndpointScope(endpoint);
+                }
+            }
+
+            identityManager.updateRole(role);
+
+            return Response.ok().build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error setting new user #createRole", e );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+    @Override
+    public Response deleteRole( final String roleName )
+    {
+        try
+        {
+            Role role = identityManager.getRole( roleName );
+
+            identityManager.deleteRole(role );
 
             return Response.ok().build();
         }

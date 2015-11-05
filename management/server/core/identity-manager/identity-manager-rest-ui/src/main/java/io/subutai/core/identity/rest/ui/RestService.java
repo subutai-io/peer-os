@@ -29,6 +29,18 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response getRoles();
 
+    @POST
+    @Path( "roles" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response saveRole( @FormParam( "rolename" ) String rolename,
+                             @FormParam( "modules" ) String modulesJson,
+                             @FormParam( "endpoint" ) String endpointJson,
+                             @FormParam( "cli_commands" ) String cliCommandsJson );
+
+    @DELETE
+    @Path( "roles/{roleName}" )
+    public Response deleteRole( @PathParam( "roleName" ) String roleName );
+
     @GET
     @Path( "permissions" )
     @Produces( { MediaType.APPLICATION_JSON } )
