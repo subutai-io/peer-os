@@ -5,7 +5,7 @@
     <parent>
         <artifactId>identity-manager-parent</artifactId>
         <groupId>io.subutai</groupId>
-        <version>4.0.0-RC2</version>
+        <version>4.0.0-RC3</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -29,20 +29,6 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.shiro</groupId>
-            <artifactId>shiro-core</artifactId>
-            <version>${org.apache.shiro.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.shiro</groupId>
-            <artifactId>shiro-ehcache</artifactId>
-            <version>${org.apache.shiro.version}</version>
-            <scope>provided</scope>
         </dependency>
 
 
