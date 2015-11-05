@@ -151,6 +151,12 @@ public class RoleEntity implements Role
         {
             cliCommands.add( ( CliCommandEntity ) cliCommand );
         }
+        else
+        {
+            // @todo need to arrange with core (from frontend)
+            CliCommandEntity entity = new CliCommandEntity( cliCommand.getScope(), cliCommand.getName() );
+            cliCommands.add(entity);
+        }
     }
 
 
@@ -181,12 +187,20 @@ public class RoleEntity implements Role
         {
             throw new IllegalArgumentException( "Module could not be null." );
         }
-        if ( !( module instanceof PortalModuleScopeEntity ) )
+
+        if ( module instanceof PortalModuleScopeEntity )
         {
-            throw new IllegalArgumentException( "Module is not instance of PortalModuleScopeEntity" );
+            //throw new IllegalArgumentException( "Module is not instance of PortalModuleScopeEntity" );
+            accessibleModules.add( ( PortalModuleScopeEntity ) module );
         }
-        LOG.debug( "Adding accessible module to role", module.getModuleName() );
-        accessibleModules.add( ( PortalModuleScopeEntity ) module );
+        else
+        {
+            // @todo need to arrange with core (from frontend)
+            PortalModuleScopeEntity entity = new PortalModuleScopeEntity( module.getModuleKey(), module.getModuleName() );
+            accessibleModules.add(entity);
+        }
+        //LOG.debug( "Adding accessible module to role", module.getModuleName() );
+
     }
 
 
@@ -204,11 +218,17 @@ public class RoleEntity implements Role
         {
             throw new IllegalArgumentException( "Endpoint cannot be null" );
         }
-        if ( !( endpointScope instanceof RestEndpointScopeEntity ) )
+        if ( endpointScope instanceof RestEndpointScopeEntity )
         {
-            throw new ClassCastException( "RestEndpointScope is not instance of RestEndpointScopeEntity" );
+            //throw new ClassCastException( "RestEndpointScope is not instance of RestEndpointScopeEntity" );
+            accessibleRestEndpoints.add( ( RestEndpointScopeEntity ) endpointScope );
         }
-        accessibleRestEndpoints.add( ( RestEndpointScopeEntity ) endpointScope );
+        else
+        {
+            // @todo need to arrange with core (from frontend)
+            RestEndpointScopeEntity entity = new RestEndpointScopeEntity( endpointScope.getRestEndpoint() );
+            accessibleRestEndpoints.add(entity);
+        }
     }
 
 

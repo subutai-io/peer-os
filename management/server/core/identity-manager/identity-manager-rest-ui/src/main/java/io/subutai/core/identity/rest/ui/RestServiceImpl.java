@@ -6,6 +6,9 @@ import com.google.common.base.Strings;
 import com.google.gson.reflect.TypeToken;
 import io.subutai.common.environment.NodeGroup;
 import io.subutai.core.identity.api.*;
+import io.subutai.core.identity.rest.ui.model.CliCommandJson;
+import io.subutai.core.identity.rest.ui.model.PortalModuleScopeJson;
+import io.subutai.core.identity.rest.ui.model.RestEndpointScopeJson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import io.subutai.common.util.JsonUtil;
@@ -158,15 +161,18 @@ public class RestServiceImpl implements RestService
             }
 
             if(!Strings.isNullOrEmpty(cliCommandsJson)) {
-                List<CliCommand> cliCommands = (ArrayList<CliCommand>)JsonUtil.fromJson(
-                    cliCommandsJson, new TypeToken<ArrayList<CliCommand>>() {}.getType()
+                List<CliCommand> cliCommands = JsonUtil.fromJson(
+                    cliCommandsJson, new TypeToken<ArrayList<CliCommandJson>>() {}.getType()
                 );
-                role.setCliCommands(cliCommands);
+                for(CliCommand cliCommand: cliCommands) {
+                    role.addCliCommand(cliCommand);
+                }
+                //role.setCliCommands(cliCommands);
             }
 
             if(!Strings.isNullOrEmpty(modulesJson)) {
-                List<PortalModuleScope> modules = (ArrayList<PortalModuleScope>)JsonUtil.fromJson(
-                    modulesJson, new TypeToken<ArrayList<PortalModuleScope>>() {}.getType()
+                List<PortalModuleScope> modules = JsonUtil.fromJson(
+                    modulesJson, new TypeToken<ArrayList<PortalModuleScopeJson>>() {}.getType()
                 );
                 for(PortalModuleScope module: modules) {
                     role.addPortalModule(module);
@@ -174,8 +180,8 @@ public class RestServiceImpl implements RestService
             }
 
             if(!Strings.isNullOrEmpty(endpointJson)) {
-                List<RestEndpointScope> endpoints = (ArrayList<RestEndpointScope>)JsonUtil.fromJson(
-                        endpointJson, new TypeToken<ArrayList<RestEndpointScope>>() {}.getType()
+                List<RestEndpointScope> endpoints = JsonUtil.fromJson(
+                        endpointJson, new TypeToken<ArrayList<RestEndpointScopeJson>>() {}.getType()
                 );
                 for(RestEndpointScope endpoint: endpoints) {
                     role.addRestEndpointScope(endpoint);
@@ -188,7 +194,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error setting new user #createRole", e );
+            LOGGER.error( "Error setting new role #createRole", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
