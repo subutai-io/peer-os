@@ -57,8 +57,9 @@ public class UsersTab extends CustomComponent implements TabCallback<BeanItem<Us
 
         // Bind a table to it
         usersTable = new Table( "Users", beans );
-        usersTable.setVisibleColumns( new Object[] { "userName", "fullName", "email", "typeName" ,"statusName" } );
+        usersTable.setVisibleColumns( new Object[] { "id","userName", "fullName", "email", "typeName" ,"statusName" } );
         usersTable.setPageLength( 7 );
+        usersTable.setColumnHeader( "id", "id" );
         usersTable.setColumnHeader( "userName", "Username" );
         usersTable.setColumnHeader( "fullName", "Full name" );
         usersTable.setColumnHeader( "email", "Email" );

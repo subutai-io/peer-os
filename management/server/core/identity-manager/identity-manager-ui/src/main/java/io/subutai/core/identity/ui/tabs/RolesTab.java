@@ -53,8 +53,9 @@ public class RolesTab extends CustomComponent implements TabCallback<BeanItem<Ro
 
         // Bind a table to it
         rolesTable = new Table( "Permissions", beans );
-        rolesTable.setVisibleColumns( new Object[] { "name" } );
+        rolesTable.setVisibleColumns( new Object[] { "id","name" } );
         rolesTable.setPageLength( 7 );
+        rolesTable.setColumnHeader( "id", "id" );
         rolesTable.setColumnHeader( "name", "Name" );
         rolesTable.setBuffered( false );
 

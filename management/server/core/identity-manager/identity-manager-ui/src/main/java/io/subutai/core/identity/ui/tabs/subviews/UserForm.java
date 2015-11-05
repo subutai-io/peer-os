@@ -46,7 +46,7 @@ public class UserForm extends Window
     private PasswordField confirmPassword;
     private ComboBox status = new ComboBox ("Status");;
     private TwinColSelect rolesSelector;
-    private final BeanContainer<String, Role> permissionsContainer;
+    private final BeanContainer<String, Role> rolesContainer;
 
 
     public UserForm( TabCallback<BeanItem<User>> callback, IdentityManager identityManager )
@@ -56,9 +56,9 @@ public class UserForm extends Window
 		this.center();
         init();
         this.identityManager = identityManager;
-        permissionsContainer = new BeanContainer<>( Role.class );
-        permissionsContainer.setBeanIdProperty( "name" );
-        rolesSelector.setContainerDataSource( permissionsContainer );
+        rolesContainer = new BeanContainer<>( Role.class );
+        rolesContainer.setBeanIdProperty( "name" );
+        rolesSelector.setContainerDataSource( rolesContainer );
         rolesSelector.setItemCaptionPropertyId( "name" );
 
         this.callback = callback;
@@ -223,6 +223,8 @@ public class UserForm extends Window
         rolesSelector.setHeight ("200px");
         rolesSelector.setItemCaptionMode(AbstractSelect.ItemCaptionMode.PROPERTY);
         rolesSelector.setItemCaptionPropertyId( "name" );
+        rolesSelector.setLeftColumnCaption( "All Roles" );
+        rolesSelector.setRightColumnCaption( "Assigned Roles" );
     }
 
 
@@ -232,8 +234,8 @@ public class UserForm extends Window
         if ( user != null )
         {
             List<Role> roles = identityManager.getAllRoles();
-            permissionsContainer.removeAllItems();
-            permissionsContainer.addAll( roles );
+            rolesContainer.removeAllItems();
+            rolesContainer.addAll( roles );
             userFieldGroup.setItemDataSource( user );
 
             userFieldGroup.bind( userName, "userName" );
