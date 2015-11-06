@@ -25,16 +25,15 @@ import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
+import org.bouncycastle.openssl.PEMEncryptor;
 import org.bouncycastle.openssl.PEMParser;
-import org.bouncycastle.openssl.PKCS8Generator;
+import org.bouncycastle.openssl.jcajce.JcaMiscPEMGenerator;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
-import org.bouncycastle.openssl.jcajce.JcaPKCS8Generator;
 import org.bouncycastle.openssl.jcajce.JceOpenSSLPKCS8DecryptorProviderBuilder;
-import org.bouncycastle.openssl.jcajce.JceOpenSSLPKCS8EncryptorBuilder;
+import org.bouncycastle.openssl.jcajce.JcePEMEncryptorBuilder;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.InputDecryptorProvider;
-import org.bouncycastle.operator.OutputEncryptor;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.pkcs.PKCS8EncryptedPrivateKeyInfo;
 import org.bouncycastle.util.io.pem.PemObject;
@@ -187,12 +186,10 @@ public class SslUtil
     {
         try
         {
-            JceOpenSSLPKCS8EncryptorBuilder encryptorBuilder =
-                    new JceOpenSSLPKCS8EncryptorBuilder( PKCS8Generator.PBE_SHA1_3DES );
-            encryptorBuilder.setRandom( new SecureRandom() );
-            encryptorBuilder.setPasssword( password.toCharArray() );
-            OutputEncryptor oe = encryptorBuilder.build();
-            JcaPKCS8Generator gen = new JcaPKCS8Generator( privateKey, oe );
+            JcePEMEncryptorBuilder encryptorBuilder = new JcePEMEncryptorBuilder( "DES-EDE3-CBC" );
+            encryptorBuilder.setSecureRandom( new SecureRandom() );
+            PEMEncryptor encryptor = encryptorBuilder.build( password.toCharArray() );
+            JcaMiscPEMGenerator gen = new JcaMiscPEMGenerator( privateKey, encryptor );
             PemObject obj = gen.generate();
             StringWriter sw = new StringWriter();
             JcaPEMWriter pemWrt = new JcaPEMWriter( sw );
