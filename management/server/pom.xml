@@ -20,6 +20,7 @@
     <module>subutai-common-datasource</module>
     <module>subutai-features</module>
     <module>server-karaf</module>
+    <module>webui</module>
   </modules>
 
   <description>Parent project for the Subutai Server Artifacts</description>

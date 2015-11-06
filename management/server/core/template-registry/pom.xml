@@ -19,6 +19,5 @@
     <module>template-registry-impl</module>
     <module>template-registry-cli</module>
     <module>template-registry-rest</module>
-    <module>template-registry-rest-ui</module>
   </modules>
 </project>
