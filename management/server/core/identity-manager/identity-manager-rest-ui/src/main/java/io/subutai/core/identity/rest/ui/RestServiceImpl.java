@@ -53,12 +53,7 @@ public class RestServiceImpl implements RestService
 
         try
         {
-            String response = String.format("{\"permissions\": %s, \"portalModules\": %s, \"endpoints\": %s, \"commands\": %s",
-                    jsonUtil.toJson(identityManager.getAllPermissions()),
-                    jsonUtil.toJson(identityManager.getAllPortalModules()),
-                    jsonUtil.toJson(identityManager.getAllRestEndpoints()),
-                    jsonUtil.toJson(identityManager.getAllCliCommands()));
-            return Response.ok( response ).build();
+            return Response.ok( jsonUtil.toJson(identityManager.getAllPermissions()) ).build();
         }
         catch ( Exception e )
         {
@@ -95,28 +90,28 @@ public class RestServiceImpl implements RestService
             Preconditions.checkArgument(!Strings.isNullOrEmpty(email));
 
             //JsonUtil.<DiskPartition>fromJson(diskPartition, new TypeToken<DiskPartition>() {}.getType());
-            User newUser;
-
-            if(userId == null || userId <= 0){
-                newUser = identityManager.createMockUser(username, fullName, password, email );
-            } else {
-                newUser = identityManager.getUser(userId);
-                newUser.setFullname(fullName);
-                newUser.setEmail(email);
-                newUser.setPassword(password);
-            }
-
-            List<String> roles = (ArrayList<String>)JsonUtil.fromJson(rolesJson, new TypeToken<ArrayList<String>>() {}.getType());
-
-            for( String roleName : roles ) {
-                Role role = identityManager.getRole(roleName);
-                newUser.addRole(role);
-            }
-            //Role role = identityManager.getRole("admin");
-            //newUser.addRole(role);
-
-            //identityManager.addUser(username, fullName, password, email);
-            identityManager.updateUser(newUser);
+//            User newUser;
+//
+//            if(userId == null || userId <= 0){
+//                newUser = identityManager.createMockUser(username, fullName, password, email );
+//            } else {
+//                newUser = identityManager.getUser(userId);
+//                newUser.setFullname(fullName);
+//                newUser.setEmail(email);
+//                newUser.setPassword(password);
+//            }
+//
+//            List<String> roles = (ArrayList<String>)JsonUtil.fromJson(rolesJson, new TypeToken<ArrayList<String>>() {}.getType());
+//
+//            for( String roleName : roles ) {
+//                Role role = identityManager.getRole(roleName);
+//                newUser.addRole(role);
+//            }
+//            //Role role = identityManager.getRole("admin");
+//            //newUser.addRole(role);
+//
+//            //identityManager.addUser(username, fullName, password, email);
+//            identityManager.updateUser(newUser);
 
             return Response.ok().build();
         }
@@ -132,9 +127,9 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            User userToDelete = identityManager.getUser(userId);
+            //User userToDelete = identityManager.getUser(userId);
 
-            identityManager.deleteUser( userToDelete );
+            identityManager.removeUser( userId );
 
             return Response.ok().build();
         }
@@ -154,43 +149,43 @@ public class RestServiceImpl implements RestService
             Preconditions.checkArgument(!Strings.isNullOrEmpty(rolename));
 
             //JsonUtil.<DiskPartition>fromJson(diskPartition, new TypeToken<DiskPartition>() {}.getType());
-            Role role = identityManager.getRole(rolename);
-
-            if(role == null) {
-                role = identityManager.createRole(rolename);
-            }
-
-            if(!Strings.isNullOrEmpty(cliCommandsJson)) {
-                List<CliCommand> cliCommands = JsonUtil.fromJson(
-                    cliCommandsJson, new TypeToken<ArrayList<CliCommandJson>>() {}.getType()
-                );
-                role.clearCliCommands();
-                for(CliCommand cliCommand: cliCommands) {
-                    role.addCliCommand(cliCommand);
-                }
-            }
-
-            if(!Strings.isNullOrEmpty(modulesJson)) {
-                List<PortalModuleScope> modules = JsonUtil.fromJson(
-                    modulesJson, new TypeToken<ArrayList<PortalModuleScopeJson>>() {}.getType()
-                );
-                role.clearPortalModules();
-                for(PortalModuleScope module: modules) {
-                    role.addPortalModule(module);
-                }
-            }
-
-            if(!Strings.isNullOrEmpty(endpointJson)) {
-                List<RestEndpointScope> endpoints = JsonUtil.fromJson(
-                        endpointJson, new TypeToken<ArrayList<RestEndpointScopeJson>>() {}.getType()
-                );
-                role.clearRestEndpointScopes();
-                for(RestEndpointScope endpoint: endpoints) {
-                    role.addRestEndpointScope(endpoint);
-                }
-            }
-
-            identityManager.updateRole(role);
+//            Role role = identityManager.getRole(rolename);
+//
+//            if(role == null) {
+//                role = identityManager.createRole(rolename);
+//            }
+//
+//            if(!Strings.isNullOrEmpty(cliCommandsJson)) {
+//                List<CliCommand> cliCommands = JsonUtil.fromJson(
+//                    cliCommandsJson, new TypeToken<ArrayList<CliCommandJson>>() {}.getType()
+//                );
+//                role.clearCliCommands();
+//                for(CliCommand cliCommand: cliCommands) {
+//                    role.addCliCommand(cliCommand);
+//                }
+//            }
+//
+//            if(!Strings.isNullOrEmpty(modulesJson)) {
+//                List<PortalModuleScope> modules = JsonUtil.fromJson(
+//                    modulesJson, new TypeToken<ArrayList<PortalModuleScopeJson>>() {}.getType()
+//                );
+//                role.clearPortalModules();
+//                for(PortalModuleScope module: modules) {
+//                    role.addPortalModule(module);
+//                }
+//            }
+//
+//            if(!Strings.isNullOrEmpty(endpointJson)) {
+//                List<RestEndpointScope> endpoints = JsonUtil.fromJson(
+//                        endpointJson, new TypeToken<ArrayList<RestEndpointScopeJson>>() {}.getType()
+//                );
+//                role.clearRestEndpointScopes();
+//                for(RestEndpointScope endpoint: endpoints) {
+//                    role.addRestEndpointScope(endpoint);
+//                }
+//            }
+//
+//            identityManager.updateRole(role);
 
             return Response.ok().build();
         }
@@ -202,13 +197,13 @@ public class RestServiceImpl implements RestService
     }
 
     @Override
-    public Response deleteRole( final String roleName )
+    public Response deleteRole( final Long roleId )
     {
         try
         {
-            Role role = identityManager.getRole( roleName );
+            //Role role = identityManager.getRole( roleName );
 
-            identityManager.deleteRole(role );
+            identityManager.removeRole(roleId );
 
             return Response.ok().build();
         }

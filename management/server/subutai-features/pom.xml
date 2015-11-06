@@ -446,10 +446,10 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>identity-manager-rest</artifactId>
     </dependency>
-    <!--<dependency>-->
-      <!--<groupId>${project.groupId}</groupId>-->
-      <!--<artifactId>identity-manager-rest-ui</artifactId>-->
-    <!--</dependency>-->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>identity-manager-rest-ui</artifactId>
+    </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 

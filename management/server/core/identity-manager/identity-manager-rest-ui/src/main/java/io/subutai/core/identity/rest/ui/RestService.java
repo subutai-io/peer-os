@@ -38,8 +38,8 @@ public interface RestService
                              @FormParam( "cli_commands" ) String cliCommandsJson );
 
     @DELETE
-    @Path( "roles/{roleName}" )
-    public Response deleteRole( @PathParam( "roleName" ) String roleName );
+    @Path( "roles/{roleId}" )
+    public Response deleteRole( @PathParam( "roleId" ) Long roleName );
 
     @GET
     @Path( "permissions" )
