@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html ng-app="subutai-app">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{{ Page.title() }}</title>
+
+    <!-- BASE -->
+    <link href="assets-angular/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets-angular/font-awesome/css/font-awesome.css" rel="stylesheet">
+    <link href="assets-angular/css/animate.css" rel="stylesheet">
+    <link href="assets-angular/css/style.css" rel="stylesheet">
+
+    <link href="assets-angular/css/subutai.css" rel="stylesheet">
+    <!-- ENDBASE -->
+
+
+    <!-- DIRS -->
+    <link href="subutai-app/common/directives/col-select/col-select.css" rel="stylesheet">
+    <link href="assets-angular/css/plugins/chosen/chosen.css" rel="stylesheet">
+    <!-- END DIRS -->
+
+
+    <link href="assets-angular/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <!--<link href="assets/css/jquery.dataTables.css" rel="stylesheet">-->
+    <!--<link href="assets/css/jquery.dataTables_themeroller.css" rel="stylesheet">-->
+    <link href="https://cdn.datatables.net/responsive/1.0.6/css/dataTables.responsive.css" rel="stylesheet">
+
+
+    <link href="assets/css/plugins/jsTree/style.css" rel="stylesheet">
+    <link href="assets-angular/css/plugins/chosen/chosen.css" rel="stylesheet">
+
+    <link href="assets/css/plugins/iCheck/custom.css" rel="stylesheet">
+    <link href="assets/css/plugins/sweetalert/sweetalert.css" rel="stylesheet">
+    <link href="assets/css/plugins/ionRangeSlider/ion.rangeSlider.css" rel="stylesheet">
+    <link href="assets/css/plugins/ionRangeSlider/ion.rangeSlider.skinNice.css" rel="stylesheet">
+
+    <link href="assets/css/plugins/vtortola.ng-terminal.css" rel="stylesheet">	
+
+    <link href="assets/css/jquery.mCustomScrollbar.min.css">
+    <link href="assets/css/custom.css" rel="stylesheet">
+
+    <!--Used for nested comboxbox control-->
+    <link href="assets-angular/css/plugins/angular-nested-combobox/nestedCombobox.css" rel="stylesheet"/>
+
+    <!--bootstrap-multiselect-->
+    <link href="assets/css/plugins/bootstrap-multiselect/bootstrap-multiselect.css">
+</head>
+
+<body class="top-navigation">
+
+<div id="wrapper">
+    <div ng-include="'subutai-app/common/partials/topnav.html'"></div>
+
+    <div id="page-wrapper" class="gray-bg">
+
+        <div ui-view></div>
+
+        <div ng-include="'subutai-app/common/partials/footer.html'"></div>
+    </div>
+</div>
+
+
+<!-- BASE -->
+<script src="assets-angular/js/jquery/jquery-2.1.1.min.js"></script>
+<script src="assets-angular/js/bootstrap/bootstrap.min.js"></script>
+
+
+<!-- Angular deps -->
+<script src="assets-angular/js/angular/angular.min.js"></script>
+<script src="assets-angular/js/angular/angular-animate.min.js"></script>
+<script src="assets-angular/js/ui-router/angular-ui-router.min.js"></script>
+<script src="assets-angular/js/angular/angular-resource.min.js"></script>
+<script src="assets-angular/js/plugins/oclazyload/dist/ocLazyLoad.min.js"></script>
+<script src="assets-angular/js/angular-translate/angular-translate.min.js"></script> <!-- still not used -->
+<script src="assets-angular/js/plugins/angular-notify/angular-notify.min.js"></script> <!-- still not used -->
+
+<script src="assets-angular/js/bootstrap/ui-bootstrap-tpls-0.12.0.min.js"></script>
+
+<script src="subutai-app/subutai-app.js"></script>
+<script src="subutai-app/wol/controller.js"></script>
+<script src="subutai-app/wol/service.js"></script>
+<script src="subutai-app/common/directives/col-select/col-select.js"></script>
+<!-- ENDBASE -->
+
+
+<!-- extra libs -->
+<script src="assets-angular/js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+<script src="assets-angular/js/plugins/pace/pace.min.js"></script>
+<script src="assets-angular/js/resizer.js"></script>
+
+
+<script src="assets-angular/js/plugins/chosen/chosen.js"></script>
+<script src="assets-angular/js/plugins/chosen/chosen.jquery.js"></script>
+
+
+<script src="assets/js/plugins/jsTree/jstree.min.js"></script>
+<script src="assets-angular/js/plugins/uiTree/angular-ui-tree.min.js"></script>
+<script src="assets/js/jquery.mCustomScrollbar.js"></script>
+<script src="assets/js/jquery.mCustomScrollbar.concat.min.js"></script>
+
+
+<!--<script src="assets/js/plugins/dataTables/jquery.dataTables.js"></script>-->
+<script src="assets/js/jquery.dataTables.js"></script>
+<script src="assets/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="assets/js/plugins/dataTables/angular-datatables.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/1.0.6/js/dataTables.responsive.js"></script>
+
+<script src="assets/js/plugins/sweetalert/sweetalert.min.js"></script>
+<script src="assets/js/plugins/sweetalert/angular-sweetalert.min.js"></script>
+<script src="assets/js/plugins/ionRangeSlider/ion.rangeSlider.min.js"></script>
+
+
+<!-- our scripts -->
+<script src="assets-angular/js/subutai.js"></script>
+
+<!--bootstrap multiselect-->
+<script src="assets/js/plugins/bootstrap-multiselect/bootstrap-multiselect.js"></script>
+
+<!--directive dep-->
+<script src="assets-angular/js/directives.js"></script>
+<script src="assets-angular/js/plugins/iCheck/icheck.min.js"></script>
+
+<!--&lt;!&ndash;selectr&ndash;&gt;-->
+<!--<script src="assets/js/plugins/selectr/selectr.js"></script>-->
+
+<!--chosen-->
+<script src="assets/js/plugins/chosen/chosen.jquery.js"></script>
+<script src="assets/js/plugins/chosen/chosen.js"></script>
+
+<script src="assets-angular/js/jsTree.directive.js"></script>
+<script src="assets-angular/js/plugins/chartJs/Chart.min.js"></script>
+<script src="assets-angular/js/plugins/datapicker/bootstrap-datepicker.js"></script>
+
+</body>
+
+</html>
