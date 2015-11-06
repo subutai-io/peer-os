@@ -213,7 +213,10 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
     public Set<ContainerHost> getContainerHosts()
     {
-        return containersHosts;
+        synchronized ( containersHosts )
+        {
+            return Sets.newConcurrentHashSet( containersHosts );
+        }
     }
 
 
@@ -384,7 +387,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     public Set<ContainerHost> getContainerHostsByEnvironmentId( final String environmentId )
     {
         Set<ContainerHost> result = new HashSet<>();
-        for ( ContainerHost containerHost : containersHosts )
+        for ( ContainerHost containerHost : getContainerHosts() )
         {
             if ( environmentId.equals( containerHost.getEnvironmentId() ) )
             {
@@ -399,7 +402,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     public Set<ContainerHost> getContainerHostsByOwnerId( final String ownerId )
     {
         Set<ContainerHost> result = new HashSet<>();
-        for ( ContainerHost containerHost : containersHosts )
+        for ( ContainerHost containerHost : getContainerHosts() )
         {
             if ( ownerId.equals( containerHost.getOwnerId() ) )
             {
@@ -482,7 +485,10 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
         host.setParent( this );
 
-        containersHosts.add( host );
+        synchronized ( containersHosts )
+        {
+            containersHosts.add( host );
+        }
     }
 
 
@@ -511,6 +517,26 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
                 }
             }
         }
+
+        //remove containers that are missing in heartbeat
+        for ( ContainerHost containerHost : getContainerHosts() )
+        {
+            boolean found = false;
+            for ( ContainerHostInfo info : resourceHostInfo.getContainers() )
+            {
+                if ( info.getId().equals( containerHost.getId() ) )
+                {
+                    found = true;
+                    break;
+                }
+            }
+            if ( !found )
+            {
+                removeContainerHost( ( ContainerHostEntity ) containerHost );
+            }
+        }
+
+
         return result;
     }
 

@@ -49,7 +49,6 @@ import io.subutai.core.identity.api.model.Permission;
 import io.subutai.core.identity.api.model.Role;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.common.security.objects.PermissionObject;
-import io.subutai.common.security.objects.RoleType;
 import io.subutai.core.identity.impl.model.UserTokenEntity;
 
 
@@ -94,9 +93,13 @@ public class IdentityManagerImpl implements IdentityManager
 
         if ( identityDataService.getAllUsers().size() < 1 )
         {
+            PermissionObject permsp[] = PermissionObject.values();
+            Role role = null;
+            Permission per = null;
+
 
             //***Create User ********************************************
-            User internal = createUser( "internal", "internal", "Internal User", "internal@subutai.io" ,1);
+            User internal = createUser( "internal", "internal", "System User", "internal@subutai.io" ,1);
             User admin    = createUser( "admin", "secret", "Administrator", "admin@subutai.io" ,2);
             User manager  = createUser( "manager","manager", "Manager", "manager@subutai.io" ,2);
             User karaf    = createUser( "karaf", "karaf", "Karaf Manager", "karaf@subutai.io" ,2);
@@ -106,81 +109,65 @@ public class IdentityManagerImpl implements IdentityManager
             createUserToken( internal ,"" ,"" ,"", TokenType.Permanent.getId(),null);
             //***********************************************************
 
-            //***********************************************************
-            RoleType roleTypes[] = RoleType.values();
-            PermissionObject permsp[] = PermissionObject.values();
 
-            Role role = null;
-            for ( int x = 0; x < roleTypes.length; x++ )
+            //****Create Roles ******************************************
+            role = createRole( "Karaf-Manager", UserType.Regular.getId() );
+            assignUserRole( karaf.getId(), role );
+            assignUserRole( admin.getId(), role );
+
+            per = createPermission( PermissionObject.KarafServerAdministration.getId() , 1, true, true, true, true );
+            assignRolePermission( role.getId(), per );
+
+            per = createPermission( PermissionObject.KarafServerManagement.getId() , 1, true, true, true, true );
+            assignRolePermission( role.getId(), per );
+            //*********************************************
+
+            //*********************************************
+            role = createRole( "Administrator", UserType.Regular.getId() );
+            assignUserRole( admin.getId(), role );
+
+            for ( int a = 0; a < permsp.length; a++ )
             {
-                role = createRole( roleTypes[x].getName(), ( short ) roleTypes[x].getId() );
+                per = createPermission( permsp[a].getId(), 1, true, true, true, true );
+                assignRolePermission( role.getId(), per );
+            }
+            //*********************************************
 
-                if(roleTypes[x] == RoleType.KarafManager)
+            //*********************************************
+            role = createRole( "Manager", UserType.Regular.getId() );
+            assignUserRole( manager.getId(), role );
+
+            //*********************************************
+            for ( int a = 0; a < permsp.length; a++ )
+            {
+                if(permsp[a] != PermissionObject.IdentityManagement &&
+                        permsp[a] != PermissionObject.KarafServerAdministration &&
+                        permsp[a] != PermissionObject.KarafServerManagement    &&
+                        permsp[a] != PermissionObject.PeerManagement &&
+                        permsp[a] != PermissionObject.ResourceManagement     )
                 {
-                    assignUserRole( karaf.getId(), role );
-                    assignUserRole( admin.getId(), role );
-
-                    //*********************************************
-                    Permission per;
-                    per = createPermission( PermissionObject.KarafServerAdministration.getId() , 1, true, true, true, true );
+                    per = createPermission( permsp[a].getId(), 3, true, true, true, true );
                     assignRolePermission( role.getId(), per );
-
-                    per = createPermission( PermissionObject.KarafServerManagement.getId() , 1, true, true, true, true );
-                    assignRolePermission( role.getId(), per );
-                    //*********************************************
-                }
-                else if(roleTypes[x] == RoleType.Administrator)
-                {
-                    assignUserRole( admin.getId(), role );
-
-                    //*********************************************
-                    for ( int a = 0; a < permsp.length; a++ )
-                    {
-                        Permission per = createPermission( permsp[a].getId(), 1, true, true, true, true );
-
-                        assignRolePermission( role.getId(), per );
-                    }
-                    //*********************************************
-                }
-                else if(roleTypes[x] == RoleType.Manager)
-                {
-                    assignUserRole( manager.getId(), role );
-
-                    //*********************************************
-                    for ( int a = 0; a < permsp.length; a++ )
-                    {
-                        if(permsp[a] != PermissionObject.IdentityManagement &&
-                                permsp[a] != PermissionObject.KarafServerAdministration &&
-                                permsp[a] != PermissionObject.KarafServerManagement    &&
-                                permsp[a] != PermissionObject.PeerManagement &&
-                                permsp[a] != PermissionObject.ResourceManagement     )
-                        {
-                            Permission per = createPermission( permsp[a].getId(), 3, true, true, true, true );
-                            assignRolePermission( role.getId(), per );
-                        }
-                    }
-                    //*********************************************
-                }
-                else if(roleTypes[x] == RoleType.Internal)
-                {
-                    assignUserRole( internal.getId(), role );
-
-                    //*********************************************
-                    for ( int a = 0; a < permsp.length; a++ )
-                    {
-                        if(permsp[a] != PermissionObject.IdentityManagement &&
-                                permsp[a] != PermissionObject.KarafServerAdministration &&
-                                permsp[a] != PermissionObject.KarafServerManagement     )
-                        {
-                            Permission per = createPermission( permsp[a].getId(), 1, true, true, true, true );
-                            assignRolePermission( role.getId(), per );
-                        }
-                    }
-                    //*********************************************
-
                 }
             }
+            //*********************************************
 
+            //*********************************************
+            role = createRole( "Internal-System", UserType.System.getId() );
+            assignUserRole( internal.getId(), role );
+
+            //*********************************************
+            for ( int a = 0; a < permsp.length; a++ )
+            {
+                if(permsp[a] != PermissionObject.IdentityManagement &&
+                        permsp[a] != PermissionObject.KarafServerAdministration &&
+                        permsp[a] != PermissionObject.KarafServerManagement     )
+                {
+                    per = createPermission( permsp[a].getId(), 1, true, true, true, true );
+                    assignRolePermission( role.getId(), per );
+                }
+            }
+            //*********************************************
         }
     }
 
@@ -443,7 +430,7 @@ public class IdentityManagerImpl implements IdentityManager
                 throw  new  RuntimeException("access control context is null");
             }
 
-            Subject  subject=  Subject.getSubject(acc);
+            Subject subject = Subject.getSubject(acc);
             if  (subject == null)
             {
                 throw  new  RuntimeException("subject is null");
@@ -472,6 +459,7 @@ public class IdentityManagerImpl implements IdentityManager
             return null;
         }
     }
+
 
     /* *************************************************
      */
@@ -518,11 +506,77 @@ public class IdentityManagerImpl implements IdentityManager
      */
     @RolesAllowed( "Identity-Management|A|Delete" )
     @Override
+    public void removeUserRole( long userId, Role role )
+    {
+        identityDataService.removeUserRole( userId, role );
+    }
+
+
+    /* *************************************************
+     */
+    @RolesAllowed( "Identity-Management|A|Delete" )
+    @Override
+    public void removeUserAllRoles( long userId )
+    {
+        identityDataService.removeUserAllRoles( userId );
+    }
+
+
+    /* *************************************************
+     */
+    @PermitAll
+    @Override
+    public boolean changeUserPassword( long userId, String oldPassword , String newPassword )
+    {
+        User user = identityDataService.getUser( userId );
+
+        //******Cannot update Internal User *************
+        if(user.getType() == UserType.System.getId() )
+        {
+            throw new AccessControlException("Internal User cannot be updated");
+        }
+
+        //***********************************************
+        if(!user.getPassword().equals( oldPassword ))
+        {
+            throw new AccessControlException("Invalid old password specified");
+        }
+        else
+        {
+            user.setPassword( newPassword );
+            identityDataService.updateUser( user );
+            return true;
+        }
+        //***********************************************
+    }
+
+
+    /* *************************************************
+     */
+    @RolesAllowed( "Identity-Management|A|Update" )
+    @Override
+    public void updateUser( User user )
+    {
+        //******Cannot update Internal User *************
+        if(user.getType() == UserType.System.getId() )
+        {
+            throw new AccessControlException("Internal User cannot be updated");
+        }
+        //***********************************************
+
+        identityDataService.updateUser( user );
+    }
+
+
+    /* *************************************************
+     */
+    @RolesAllowed( "Identity-Management|A|Delete" )
+    @Override
     public void removeUser( long userId )
     {
         //******Cannot remove Internal User *************
         User user = identityDataService.getUser( userId );
-        if(user.getType() == UserType.Internal.getId() )
+        if(user.getType() == UserType.System.getId() )
         {
             throw new AccessControlException("Internal User cannot be removed");
         }
@@ -571,7 +625,7 @@ public class IdentityManagerImpl implements IdentityManager
      */
     @RolesAllowed( "Identity-Management|A|Write" )
     @Override
-    public Role createRole( String roleName, short roleType )
+    public Role createRole( String roleName, int roleType )
     {
         Role role = new RoleEntity();
         role.setName( roleName );
@@ -581,6 +635,7 @@ public class IdentityManagerImpl implements IdentityManager
 
         return role;
     }
+
 
 
     /* *************************************************
@@ -593,6 +648,24 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
+
+    /* *************************************************
+     */
+    @RolesAllowed( "Identity-Management|A|Update" )
+    @Override
+    public void updateRole( Role role )
+    {
+        //******Cannot update Internal Role *************
+        if(role.getType() == UserType.System.getId() )
+        {
+            throw new AccessControlException("Internal Role cannot be updated");
+        }
+        //***********************************************
+
+        identityDataService.updateRole( role );
+    }
+
+
     /* *************************************************
      */
     @RolesAllowed( "Identity-Management|A|Delete" )
@@ -602,7 +675,7 @@ public class IdentityManagerImpl implements IdentityManager
         //******Cannot remove Internal Role *************
         Role role = identityDataService.getRole( roleId );
 
-        if(role.getType() == RoleType.Internal.getId() )
+        if(role.getType() == UserType.System.getId() )
         {
             throw new AccessControlException("Internal Role cannot be removed");
         }

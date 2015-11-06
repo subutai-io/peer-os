@@ -478,12 +478,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         executorService.shutdown();
 
-        // updating resource host entities
-        for ( ResourceHost resourceHost : containerDistribution.keySet() )
-        {
-            resourceHostDataService.saveOrUpdate( resourceHost );
-        }
-
         return result;
     }
 
@@ -824,14 +818,17 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     @RolesAllowed( "Environment-Management|A|Write" )
     @Override
-    public void setDefaultGateway( final ContainerGateway gateway ) throws PeerException
+    public void setDefaultGateway( final ContainerHost host, final String gatewayIp ) throws PeerException
     {
-        Preconditions.checkNotNull( gateway, "Invalid gateway" );
+
+        Preconditions.checkNotNull( host, "Invalid container host" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( gatewayIp ) && gatewayIp.matches( Common.IP_REGEX ),
+                "Invalid gateway IP" );
 
         try
         {
-            commandUtil.execute( new RequestBuilder( String.format( "route add default gw %s %s", gateway.getGateway(),
-                    Common.DEFAULT_CONTAINER_INTERFACE ) ), bindHost( gateway.getContainerId() ) );
+            commandUtil.execute( new RequestBuilder( String.format( "route add default gw %s %s", gatewayIp,
+                    Common.DEFAULT_CONTAINER_INTERFACE ) ), bindHost( host.getId() ) );
         }
         catch ( CommandException e )
         {

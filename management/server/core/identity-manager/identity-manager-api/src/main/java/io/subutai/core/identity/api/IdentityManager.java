@@ -4,7 +4,6 @@ package io.subutai.core.identity.api;
 import java.util.Date;
 import java.util.List;
 
-import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 
 import io.subutai.common.security.objects.PermissionObject;
@@ -25,12 +24,11 @@ public interface IdentityManager
 {
     /* *************************************************
      */
-    @PermitAll
     List<Permission> getAllPermissions();
 
     /* *************************************************
-         *
-         */
+     *
+     */
     public IdentityDataService getIdentityDataService();
 
 
@@ -46,15 +44,15 @@ public interface IdentityManager
 
     /* *************************************************
      */
-    @PermitAll
     String getUserToken( String userName, String password );
 
     /* *************************************************
-         */
+     */
     User authenticateByToken( String token );
 
+
     /* *************************************************
-         */
+     */
     User authenticateUser( String userName, String password );
 
 
@@ -70,13 +68,34 @@ public interface IdentityManager
 
     /* *************************************************
      */
-    @PermitAll
     User getLoggedUser();
 
+
     /* *************************************************
-         *
-         */
+     *
+     */
     User createUser( String userName, String password, String fullName, String email, int type );
+
+
+    /* *************************************************
+     */
+    void removeUserRole( long userId, Role role );
+
+
+    /* *************************************************
+     */
+    void removeUserAllRoles( long userId );
+
+
+
+    /* *************************************************
+     */
+    boolean changeUserPassword( long userId, String oldPassword, String newPassword );
+
+
+    /* *************************************************
+     */
+    void updateUser( User user );
 
 
     /* *************************************************
@@ -86,14 +105,14 @@ public interface IdentityManager
 
     /* *************************************************
      */
-    @RolesAllowed( "Identity-Management|A|Delete" )
     boolean isUserPermitted( User user, PermissionObject permObj, PermissionScope permScope,
                              PermissionOperation permOp );
 
+
     /* *************************************************
-         *
-         */
-    Role createRole( String roleName, short roleType );
+     *
+     */
+    Role createRole( String roleName, int roleType );
 
 
     /* *************************************************
@@ -104,8 +123,12 @@ public interface IdentityManager
 
     /* *************************************************
      */
-    @PermitAll
     List<Role> getAllRoles();
+
+
+    /* *************************************************
+     */
+    void updateRole( Role role );
 
 
     /* *************************************************

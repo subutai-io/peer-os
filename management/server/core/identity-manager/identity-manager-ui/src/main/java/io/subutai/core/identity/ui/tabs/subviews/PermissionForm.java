@@ -68,7 +68,7 @@ public class PermissionForm extends VerticalLayout
 
     private ComboBox permissionGroup =
             //new ComboBox( "", new BeanItemContainer<>( PermissionGroup.class, EnumSet.allOf( PermissionGroup.class ) ) )
-    new ComboBox( "" )
+            new ComboBox( "" )
             {
                 {
                     setItemCaptionMode( ItemCaptionMode.PROPERTY );

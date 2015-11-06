@@ -116,7 +116,7 @@ public class LoginView extends VerticalLayout implements View
                 try
                 {
                     IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
-                    User user = identityManager.authenticateUser(  username.getValue(), password.getValue() );
+                    User user = identityManager.login(  username.getValue(), password.getValue() );
 
                     if(user!=null)
                     {
