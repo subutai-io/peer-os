@@ -16,9 +16,9 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import io.subutai.common.security.objects.UserType;
 import io.subutai.core.identity.api.model.Permission;
 import io.subutai.core.identity.api.model.Role;
-import io.subutai.core.identity.impl.model.PermissionEntity;
 
 
 /**
@@ -38,7 +38,7 @@ public class RoleEntity implements Role
     private String name;
 
     @Column( name = "type" )
-    private Short type = 1;
+    private int type = 1;
 
 
     //*********************************************
@@ -78,16 +78,22 @@ public class RoleEntity implements Role
 
 
     @Override
-    public Short getType()
+    public int getType()
     {
         return type;
     }
 
 
     @Override
-    public void setType( final Short type )
+    public void setType( final int type )
     {
         this.type = type;
+    }
+
+    @Override
+    public String getTypeName()
+    {
+        return UserType.values()[type-1].getName();
     }
 
 

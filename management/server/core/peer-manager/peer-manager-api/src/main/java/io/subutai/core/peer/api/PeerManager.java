@@ -131,8 +131,6 @@ public interface PeerManager
 
     Set<Gateway> getGateways() throws PeerException;
 
-    void setDefaultGateway( ContainerGateway gateway ) throws PeerException;
-
     Set<Vni> getReservedVnis() throws PeerException;
 
     Vni reserveVni( Vni vni ) throws PeerException;

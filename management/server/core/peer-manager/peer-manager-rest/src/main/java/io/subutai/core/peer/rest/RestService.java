@@ -95,9 +95,9 @@ public interface RestService
 
     @POST
     @Path( "container/gateway" )
-    @Consumes( MediaType.APPLICATION_JSON )
-    @Produces( MediaType.APPLICATION_JSON )
-    void setDefaultGateway( ContainerGateway gateway );
+    Response setDefaultGateway( @FormParam( "containerId" ) String containerId,
+                                @FormParam( "gatewayIp" ) String gatewayIp );
+
 
     @POST
     @Path( "gateways" )

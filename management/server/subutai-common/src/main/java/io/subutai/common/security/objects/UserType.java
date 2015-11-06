@@ -6,8 +6,8 @@ package io.subutai.common.security.objects;
  */
 public enum UserType
 {
-    Internal(1,"Internal"),
-    System(2,"System");
+    System(1,"System"),
+    Regular(2,"Regular");
 
     private String name;
     private int id;

@@ -745,14 +745,6 @@ public class PeerManagerImpl implements PeerManager
         return localPeer.getGateways();
     }
 
-
-    @Override
-    public void setDefaultGateway( final ContainerGateway gateway ) throws PeerException
-    {
-        localPeer.setDefaultGateway( gateway );
-    }
-
-
     @Override
     public Set<Vni> getReservedVnis() throws PeerException
     {

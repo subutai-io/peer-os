@@ -51,9 +51,9 @@ public class UserForm extends Window
 
     public UserForm( TabCallback<BeanItem<User>> callback, IdentityManager identityManager )
     {
-		this.setClosable (false);
-		this.addStyleName ("default");
-		this.center();
+        this.setClosable (false);
+        this.addStyleName ("default");
+        this.center();
         init();
         this.identityManager = identityManager;
         rolesContainer = new BeanContainer<>( Role.class );
@@ -88,11 +88,11 @@ public class UserForm extends Window
                     if ( callback != null )
                     {
                         User user = userFieldGroup.getItemDataSource().getBean();
-                        //user.removeAllRoles();
+                        identityManager.removeUserAllRoles( user.getId() );
                         for ( final String roleName : selectedRoleNames )
                         {
                             BeanItem beanItem = ( BeanItem ) rolesSelector.getItem( roleName );
-                            //user.addRole( ( Role ) beanItem.getBean() );
+                            identityManager.assignUserRole( user.getId(), ( Role )beanItem );
                         }
                         callback.saveOperation( userFieldGroup.getItemDataSource(), newValue );
                         Notification.show( "Successfully saved." );
@@ -123,23 +123,11 @@ public class UserForm extends Window
         final Button cancelButton = new Button( "Close", cancelListener );
         saveButton.setStyleName( Reindeer.BUTTON_DEFAULT );
 
-		for (int i = 1; i < 3; ++i)
-		{
-			status.addItem (i);
-			switch (i)
-			{
-				case (1):
-				{
-					status.setItemCaption (1, "Active");
-					break;
-				}
-				case (2):
-				{
-					status.setItemCaption (2, "Disabled");
-					break;
-				}
-			}
-		}
+        for (int i = 0; i < UserStatus.values().length; ++i)
+        {
+            status.addItem (i-1);
+            status.setItemCaption( i - 1, UserStatus.values()[i].getName() );
+        }
 
         HorizontalLayout buttons = new HorizontalLayout( saveButton, cancelButton, removeButton );
         buttons.setSpacing( true );
@@ -147,12 +135,12 @@ public class UserForm extends Window
         form = new FormLayout();
         form.addComponents( userName, fullName, email, password, confirmPassword, status, rolesSelector );
 
-		VerticalLayout content = new VerticalLayout();
-		content.setSpacing (true);
-		content.setMargin (true);
+        VerticalLayout content = new VerticalLayout();
+        content.setSpacing (true);
+        content.setMargin (true);
         content.addComponents(buttons, form);
 
-		this.setContent (content);
+        this.setContent (content);
     }
 
 
@@ -202,14 +190,13 @@ public class UserForm extends Window
             }
         } );
 
-
         confirmPassword = new PasswordField( "Confirm password" );
         confirmPassword.setRequired( true );
         confirmPassword.setRequiredError( "Please enter password confirm." );
         confirmPassword.setInputPrompt( "Confirm password" );
 
-		status.setNullSelectionAllowed (false);
-		status.setTextInputAllowed (false);
+        status.setNullSelectionAllowed (false);
+        status.setTextInputAllowed (false);
 
         ComboBox cbUserStatus = new ComboBox("Some caption");
         cbUserStatus.setNullSelectionAllowed(false);
@@ -242,15 +229,24 @@ public class UserForm extends Window
             userFieldGroup.bind( fullName, "fullName" );
             userFieldGroup.bind( email, "email" );
             userFieldGroup.bind( password, "password" );
+            userFieldGroup.bind( status , "status" );
+
             confirmPassword.setValue( user.getBean().getPassword() );
-			status.setValue (user.getBean().getStatus());
+
+            status.setValue (user.getBean().getStatus());
             if ( newValue )
             {
+                status.setVisible( false );
                 password.setValue( "" );
                 confirmPassword.setValue( "" );
             }
+            else
+            {
+                status.setVisible( true );
+            }
+
             // Pre-select user roles
-            User userBean = user.getBean();
+            User userBean = user. getBean();
             Set<String> roleNames = new HashSet<>();
             for ( final Role role : userBean.getRoles() )
             {

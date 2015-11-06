@@ -52,6 +52,7 @@ import io.subutai.common.quota.QuotaType;
 import io.subutai.common.quota.RamQuota;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.settings.ChannelSettings;
+import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SecuritySettings;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.JsonUtil;
@@ -1202,24 +1203,36 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Read" )
     @Override
-    public void setDefaultGateway( final ContainerGateway gateway ) throws PeerException
+    public void setDefaultGateway( final ContainerHost containerHost, final String gatewayIp ) throws PeerException
     {
-        Preconditions.checkNotNull( gateway, "Gateway is null" );
+        Preconditions.checkNotNull( containerHost, "Container host is null" );
+        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
 
-        String path = "/container/gateway";
+        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( gatewayIp ) && gatewayIp.matches( Common.IP_REGEX ),
+                "Invalid gateway IP" );
+
+        String path = "peer/container/gateway";
+
+        Map<String, String> params = Maps.newHashMap();
+        params.put( "containerId", host.getId() );
+        params.put( "gatewayIp", gatewayIp );
+
+        //*********construct Secure Header ****************************
+        Map<String, String> headers = Maps.newHashMap();
+        //*************************************************************
 
         try
         {
-            new PeerWebClient( peerInfo.getIp(), provider ).setDefaultGateway( gateway );
+            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
+            post( path, alias, params, headers );
         }
         catch ( Exception e )
         {
             throw new PeerException( "Error setting container gateway ip", e );
         }
     }
-
 
     @Override
     public Set<Vni> getReservedVnis() throws PeerException

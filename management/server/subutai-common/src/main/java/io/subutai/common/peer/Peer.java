@@ -88,7 +88,7 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
     /**
      * Sets default gateway for the container
      */
-    public void setDefaultGateway( ContainerGateway gateway ) throws PeerException;
+    public void setDefaultGateway( ContainerHost host, String gatewayIp ) throws PeerException;
 
     /**
      * Cleans up environment networking settings. This method is called when an environment is being destroyed to clean
