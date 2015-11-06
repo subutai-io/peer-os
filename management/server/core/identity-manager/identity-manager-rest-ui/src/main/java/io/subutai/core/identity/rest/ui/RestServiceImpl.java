@@ -5,11 +5,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.gson.reflect.TypeToken;
 import io.subutai.core.identity.api.*;
-import io.subutai.core.identity.api.model.Role;
-import io.subutai.core.identity.api.model.User;
-import io.subutai.core.identity.rest.ui.model.CliCommandJson;
-import io.subutai.core.identity.rest.ui.model.PortalModuleScopeJson;
-import io.subutai.core.identity.rest.ui.model.RestEndpointScopeJson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import io.subutai.common.util.JsonUtil;
@@ -52,7 +47,7 @@ public class RestServiceImpl implements RestService
 
         try
         {
-            return Response.ok( jsonUtil.toJson(identityManager.getAllPermissions()) ).build();
+            return Response.ok( jsonUtil.to(identityManager.getAllPermissions()) ).build();
         }
         catch ( Exception e )
         {
