@@ -325,6 +325,11 @@
         <artifactId>broker-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>broker-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- host registry -->
@@ -690,10 +695,10 @@
       </dependency>
       <!-- Json Mapper -->
       <dependency>
-       	<groupId>org.codehaus.jackson</groupId>
-       	<artifactId>jackson-jaxrs</artifactId>
-       	<version>${jackson-jaxrs.version}</version>
-       </dependency>
+        <groupId>org.codehaus.jackson</groupId>
+        <artifactId>jackson-jaxrs</artifactId>
+        <version>${jackson-jaxrs.version}</version>
+      </dependency>
 
       <dependency>
         <groupId>com.fasterxml.jackson.jaxrs</groupId>

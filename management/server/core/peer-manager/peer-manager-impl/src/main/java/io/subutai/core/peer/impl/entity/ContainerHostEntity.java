@@ -165,7 +165,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     @Override
     public void setDefaultGateway( final String gatewayIp ) throws PeerException
     {
-        getPeer().setDefaultGateway( new ContainerGateway( getContainerId(), gatewayIp ) );
+        getPeer().setDefaultGateway( this, gatewayIp );
     }
 
 

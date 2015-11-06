@@ -56,11 +56,13 @@ public class BrokerImplTest
     private static final String BROKER_URL = "vm://localhost";
     private static final String KEYSTORE = "path/to/keystore";
     private static final String CA_CERTIFICATE = "path/to/cert";
+    private static final String CA_KEY = "path/to/ca/key";
     private static final String KEYSTORE_PASSWORD = "pwd";
     private static final int MESSAGE_TIMEOUT = 10;
     private static final String TOPIC = "topic";
     private static final String TEXT_MESSAGE = "message";
     private static final byte[] BYTE_MESSAGE = { 0 };
+    private static final String CA_KEY_PASSWORD = "pwd";
     @Mock
     MessageRoutingListener messageRouter;
 
@@ -112,7 +114,7 @@ public class BrokerImplTest
     public void setUp() throws Exception
     {
         broker = spy( new BrokerImpl( BROKER_URL, KEYSTORE, KEYSTORE_PASSWORD, KEYSTORE, KEYSTORE_PASSWORD,
-                CA_CERTIFICATE ) );
+                CA_CERTIFICATE, CA_KEY, CA_KEY_PASSWORD ) );
         broker.messageSender = messageSender;
         doReturn( systemUsage ).when( brokerService ).getSystemUsage();
         doReturn( memoryUsage ).when( systemUsage ).getMemoryUsage();

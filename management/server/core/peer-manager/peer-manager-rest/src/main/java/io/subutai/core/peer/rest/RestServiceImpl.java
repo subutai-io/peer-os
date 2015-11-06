@@ -510,18 +510,20 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public void setDefaultGateway( final ContainerGateway gateway )
+    public Response setDefaultGateway( final String containerId, final String gatewayIp )
     {
-        Preconditions.checkNotNull( gateway, "Gateway is null" );
-
         try
         {
-            peerManager.setDefaultGateway( gateway );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
+
+            LocalPeer localPeer = peerManager.getLocalPeer();
+            localPeer.getContainerHostById( containerId ).setDefaultGateway( gatewayIp );
+            return Response.ok().build();
         }
         catch ( Exception e )
         {
             LOGGER.error( "Error setting default gateway #setDefaultGateway", e );
-            throw new WebApplicationException( e );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
 

@@ -57,8 +57,9 @@ public class UsersTab extends CustomComponent implements TabCallback<BeanItem<Us
 
         // Bind a table to it
         usersTable = new Table( "Users", beans );
-        usersTable.setVisibleColumns( new Object[] { "userName", "fullName", "email", "typeName" ,"statusName" } );
+        usersTable.setVisibleColumns( new Object[] { "id","userName", "fullName", "email", "typeName" ,"statusName" } );
         usersTable.setPageLength( 7 );
+        usersTable.setColumnHeader( "id", "id" );
         usersTable.setColumnHeader( "userName", "Username" );
         usersTable.setColumnHeader( "fullName", "Full name" );
         usersTable.setColumnHeader( "email", "Email" );
@@ -108,9 +109,9 @@ public class UsersTab extends CustomComponent implements TabCallback<BeanItem<Us
             }
         } );
 
-		vlayout.addComponent( newBean );
-		vlayout.setSpacing (true);
-		vlayout.setMargin (true);
+        vlayout.addComponent( newBean );
+        vlayout.setSpacing (true);
+        vlayout.setMargin (true);
         layout.addComponent( usersTable );
 
         layout.setSpacing( true );
@@ -133,10 +134,10 @@ public class UsersTab extends CustomComponent implements TabCallback<BeanItem<Us
         switch ( state )
         {
             case STATE_EXISTING_ENTITY_SELECTED:
-            	form = new UserForm (this, identityManager);
-				form.setUser (userBean, false);
-				UI.getCurrent().addWindow (form);
-				newBean.setEnabled(false);
+                form = new UserForm (this, identityManager);
+                form.setUser (userBean, false);
+                UI.getCurrent().addWindow (form);
+                newBean.setEnabled(false);
                 usersTable.setEnabled( false );
                 break;
             case STATE_SAVE_EXISTING_ENTITY:
@@ -151,9 +152,9 @@ public class UsersTab extends CustomComponent implements TabCallback<BeanItem<Us
                 usersTable.setEnabled(true);
                 break;
             case STATE_NEW_ENTITY:
-				form = new UserForm (this, identityManager);
-				form.setUser (userBean, false);
-				UI.getCurrent().addWindow(form);
+                form = new UserForm (this, identityManager);
+                form.setUser (userBean, false);
+                UI.getCurrent().addWindow(form);
                 newBean.setEnabled( false );
                 usersTable.setEnabled( false );
                 break;
@@ -169,11 +170,12 @@ public class UsersTab extends CustomComponent implements TabCallback<BeanItem<Us
     @Override
     public void saveOperation( final BeanItem<User> value, final boolean newValue )
     {
-        //identityManager.updateUser( value.getBean() );
+        identityManager.updateUser( value.getBean() );
+
         if ( newValue )
         {
             beans.removeAllItems();
-            //beans.addAll( identityManager.getAllUsers() );
+            beans.addAll( identityManager.getAllUsers() );
             refreshControls( FormState.STATE_SAVE_NEW_ENTITY, null );
         }
         else
@@ -188,7 +190,7 @@ public class UsersTab extends CustomComponent implements TabCallback<BeanItem<Us
     {
         if ( !newValue )
         {
-            //identityManager.deleteUser( value.getBean() );
+            identityManager.removeUser( value.getBean().getId() );
             beans.removeItem( value.getBean() );
         }
         refreshControls( FormState.STATE_REMOVE_ENTITY, null );
