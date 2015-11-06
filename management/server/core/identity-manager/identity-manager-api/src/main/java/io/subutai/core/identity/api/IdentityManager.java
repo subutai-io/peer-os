@@ -4,6 +4,7 @@ package io.subutai.core.identity.api;
 import java.util.Date;
 import java.util.List;
 
+import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 
 import io.subutai.common.security.objects.PermissionObject;
@@ -68,7 +69,21 @@ public interface IdentityManager
 
     /* *************************************************
      */
+    User getUser( long userId );
+
+    /* *************************************************
+     */
+    @PermitAll
+    User getActiveUser();
+
+    /* *************************************************
+         */
     User getLoggedUser();
+
+
+    /* *************************************************
+     */
+    User createTempUser( String userName, String password, String fullName, String email, int type );
 
 
     /* *************************************************
@@ -128,6 +143,10 @@ public interface IdentityManager
 
     /* *************************************************
      */
+    Role getRole( long roleId );
+
+    /* *************************************************
+         */
     void updateRole( Role role );
 
 

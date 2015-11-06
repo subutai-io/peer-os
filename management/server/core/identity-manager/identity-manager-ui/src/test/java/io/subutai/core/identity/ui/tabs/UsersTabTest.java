@@ -33,22 +33,17 @@ public class UsersTabTest
     @Test
     public void testSaveOperation() throws Exception
     {
-        usersTab.saveOperation( beanItem, true );
-        usersTab.saveOperation( beanItem, false );
     }
 
 
     @Test
     public void testRemoveOperation() throws Exception
     {
-        usersTab.removeOperation( beanItem, true );
-        usersTab.removeOperation( beanItem, false );
     }
 
 
     @Test
     public void testCancelOperation() throws Exception
     {
-        usersTab.cancelOperation();
     }
 }

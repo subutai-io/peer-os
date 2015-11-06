@@ -79,6 +79,7 @@ public class UserForm extends Window
                 try
                 {
                     userFieldGroup.commit();
+
                     Collection<String> selectedRoleNames = ( Collection<String> ) rolesSelector.getValue();
                     if ( selectedRoleNames.isEmpty() )
                     {
@@ -88,13 +89,18 @@ public class UserForm extends Window
                     if ( callback != null )
                     {
                         User user = userFieldGroup.getItemDataSource().getBean();
-                        identityManager.removeUserAllRoles( user.getId() );
+                        //identityManager.removeUserAllRoles( user.getId() );
+                        userFieldGroup.getItemDataSource().getBean().getRoles().clear();
                         for ( final String roleName : selectedRoleNames )
                         {
                             BeanItem beanItem = ( BeanItem ) rolesSelector.getItem( roleName );
-                            identityManager.assignUserRole( user.getId(), ( Role )beanItem );
+                            //identityManager.assignUserRole( user.getId(), ( Role )beanItem.getBean() );
+                            userFieldGroup.getItemDataSource().getBean().getRoles().add(( Role )beanItem.getBean());
                         }
+
                         callback.saveOperation( userFieldGroup.getItemDataSource(), newValue );
+
+
                         Notification.show( "Successfully saved." );
                     }
                 }
@@ -125,8 +131,8 @@ public class UserForm extends Window
 
         for (int i = 0; i < UserStatus.values().length; ++i)
         {
-            status.addItem (i-1);
-            status.setItemCaption( i - 1, UserStatus.values()[i].getName() );
+            status.addItem (i+1);
+            status.setItemCaption( i + 1, UserStatus.values()[i].getName() );
         }
 
         HorizontalLayout buttons = new HorizontalLayout( saveButton, cancelButton, removeButton );
@@ -198,13 +204,6 @@ public class UserForm extends Window
         status.setNullSelectionAllowed (false);
         status.setTextInputAllowed (false);
 
-        ComboBox cbUserStatus = new ComboBox("Some caption");
-        cbUserStatus.setNullSelectionAllowed(false);
-
-        cbUserStatus.addItem( UserStatus.Active.getName());
-        cbUserStatus.addItem(UserStatus.Disabled.getName());
-
-
         rolesSelector = new TwinColSelect( "User roles" );
         rolesSelector.setWidth ("500px");
         rolesSelector.setHeight ("200px");
@@ -223,13 +222,14 @@ public class UserForm extends Window
             List<Role> roles = identityManager.getAllRoles();
             rolesContainer.removeAllItems();
             rolesContainer.addAll( roles );
-            userFieldGroup.setItemDataSource( user );
+            userFieldGroup.setItemDataSource( user.getBean() );
 
             userFieldGroup.bind( userName, "userName" );
             userFieldGroup.bind( fullName, "fullName" );
             userFieldGroup.bind( email, "email" );
             userFieldGroup.bind( password, "password" );
             userFieldGroup.bind( status , "status" );
+
 
             confirmPassword.setValue( user.getBean().getPassword() );
 
@@ -239,14 +239,18 @@ public class UserForm extends Window
                 status.setVisible( false );
                 password.setValue( "" );
                 confirmPassword.setValue( "" );
+                userName.setReadOnly( false );
+                removeButton.setVisible( false );
             }
             else
             {
                 status.setVisible( true );
+                userName.setReadOnly( true );
+                removeButton.setVisible( true );
             }
 
             // Pre-select user roles
-            User userBean = user. getBean();
+            User userBean = user.getBean();
             Set<String> roleNames = new HashSet<>();
             for ( final Role role : userBean.getRoles() )
             {
@@ -254,16 +258,6 @@ public class UserForm extends Window
             }
             rolesSelector.setValue( roleNames );
 
-            if ( !newValue )
-            {
-                userName.setReadOnly( true );
-                removeButton.setVisible( true );
-            }
-            else
-            {
-                userName.setReadOnly( false );
-                removeButton.setVisible( false );
-            }
         }
     }
 }
