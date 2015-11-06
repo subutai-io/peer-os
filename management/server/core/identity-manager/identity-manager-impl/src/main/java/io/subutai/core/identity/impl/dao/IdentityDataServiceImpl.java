@@ -82,6 +82,32 @@ public class IdentityDataServiceImpl implements IdentityDataService
         userDAOService.update( user );
     }
 
+
+    /* *************************************************
+     *
+     */
+    @Override
+    public void removeUserRole( long userId, Role role)
+    {
+        User user = userDAOService.find( userId );
+
+        user.getRoles().remove( role );
+        userDAOService.update( user );
+    }
+
+    /* *************************************************
+     *
+     */
+    @Override
+    public void removeUserAllRoles( long userId)
+    {
+        User user = userDAOService.find( userId );
+
+        user.getRoles().clear();
+        userDAOService.update( user );
+    }
+
+
     /* *************************************************
      */
     @Override
