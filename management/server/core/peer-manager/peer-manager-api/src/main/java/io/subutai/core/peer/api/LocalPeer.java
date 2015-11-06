@@ -1,6 +1,7 @@
 package io.subutai.core.peer.api;
 
 
+import java.util.List;
 import java.util.Set;
 
 import io.subutai.common.network.DomainLoadBalanceStrategy;
@@ -11,6 +12,7 @@ import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.protocol.Template;
 
 
@@ -177,4 +179,12 @@ public interface LocalPeer extends Peer
     Set<ContainerHost> findContainersByEnvironmentId( final String environmentId );
 
     Set<ContainerHost> findContainersByOwnerId( final String ownerId );
+
+    List<N2NConfig> setupN2NConnection( String environmentId, Set<Peer> peers ) throws PeerException;
+
+    void addToTunnel( N2NConfig config ) throws PeerException;
+
+    List<Template> getTemplates();
+
+    Template getTemplateByName( String templateName );
 }

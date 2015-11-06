@@ -189,10 +189,11 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
         this.environment = environment;
     }
 
+
     @Override
     public void setDefaultGateway( final String gatewayIp ) throws PeerException
     {
-        getPeer().setDefaultGateway( this, gatewayIp );
+        getPeer().setDefaultGateway( new ContainerGateway( getContainerId(), gatewayIp ) );
     }
 
 

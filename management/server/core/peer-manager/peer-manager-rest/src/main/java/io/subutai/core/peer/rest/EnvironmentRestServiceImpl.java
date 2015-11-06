@@ -12,6 +12,7 @@ import com.google.common.base.Preconditions;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerId;
+import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.PeerManager;
 
 
@@ -22,10 +23,10 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
 {
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentRestServiceImpl.class );
 
-    private PeerManager peerManager;
+    private LocalPeer peerManager;
 
 
-    public EnvironmentRestServiceImpl( final PeerManager peerManager )
+    public EnvironmentRestServiceImpl( final LocalPeer peerManager )
     {
         this.peerManager = peerManager;
     }

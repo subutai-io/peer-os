@@ -36,7 +36,6 @@ import io.subutai.common.peer.PeerStatus;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.security.utils.io.HexUtil;
 import io.subutai.common.settings.ChannelSettings;
-import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SecuritySettings;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
@@ -382,16 +381,16 @@ public class PeerRegisterForm extends CustomComponent
     {
         if ( remotePeerInfo != null )
         {
-            remotePeerInfo.setStatus( PeerStatus.REQUEST_SENT );
-            try
-            {
-                module.getPeerManager().register( remotePeerInfo );
-            }
-            catch ( PeerException e )
-            {
-                Notification.show( "Couldn't register peer. " + e.getMessage(), Notification.Type.WARNING_MESSAGE );
-                LOG.error( "Couldn't register peer", e );
-            }
+//            remotePeerInfo.setStatus( PeerStatus.REQUEST_SENT );
+//            try
+//            {
+//                module.getPeerManager().register( remotePeerInfo );
+//            }
+//            catch ( PeerException e )
+//            {
+//                Notification.show( "Couldn't register peer. " + e.getMessage(), Notification.Type.WARNING_MESSAGE );
+//                LOG.error( "Couldn't register peer", e );
+//            }
         }
     }
 

@@ -1,21 +1,12 @@
 package io.subutai.core.environment.impl.workflow.construction;
 
-import java.util.Map;
-import java.util.Set;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.servicemix.beanflow.Workflow;
 
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-
-import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.Topology;
-import io.subutai.common.peer.Peer;
-import io.subutai.common.peer.PeerException;
 import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;

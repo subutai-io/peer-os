@@ -13,6 +13,7 @@ import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.N2NConfig;
+import io.subutai.common.protocol.Tunnel;
 
 
 /**

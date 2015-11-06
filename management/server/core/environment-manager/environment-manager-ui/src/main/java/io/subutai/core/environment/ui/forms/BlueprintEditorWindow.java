@@ -536,7 +536,7 @@ public class BlueprintEditorWindow extends Window
 
 
             placementTable.addItem( new Object[] {
-                    peerManager.getTemplateByName( nodeGroup.getTemplateName() ), nodeGroupName, amount,
+                    peerManager.getLocalPeer().getTemplateByName( nodeGroup.getTemplateName() ), nodeGroupName, amount,
                     peer.getPeerInfo().getIp(), metric, type, removeBtn
             }, rowId );
         }
@@ -606,7 +606,7 @@ public class BlueprintEditorWindow extends Window
         typesCombo.setImmediate( true );
         typesCombo.setRequired( true );
 
-        for ( Template t : peerManager.getTemplates() )
+        for ( Template t : peerManager.getLocalPeer().getTemplates() )
         {
             typesCombo.addItem( t );
         }

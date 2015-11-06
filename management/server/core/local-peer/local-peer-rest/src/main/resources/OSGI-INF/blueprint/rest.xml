@@ -1,0 +1,69 @@
+<blueprint xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:jaxrs="http://cxf.apache.org/blueprint/jaxrs"
+           xmlns:cxf="http://cxf.apache.org/blueprint/core" xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+
+  http://cxf.apache.org/blueprint/jaxrs http://cxf.apache.org/schemas/blueprint/jaxrs.xsd">
+
+  <cxf:bus id="cxfBusPeerManager">
+    <cxf:features>
+      <cxf:logging />
+    </cxf:features>
+  </cxf:bus>
+
+  <jaxrs:server address="/v1/peer" id="peerRestService">
+    <jaxrs:serviceBeans>
+      <ref component-id="peerRestServiceImpl" />
+    </jaxrs:serviceBeans>
+    <jaxrs:providers>
+      <bean class="org.codehaus.jackson.jaxrs.JacksonJsonProvider" />
+    </jaxrs:providers>
+  </jaxrs:server>
+
+<!--
+  <jaxrs:server address="/v1/env" id="environmentRestService">
+    <jaxrs:serviceBeans>
+      <ref component-id="environmentRestServiceImpl" />
+    </jaxrs:serviceBeans>
+    <jaxrs:providers>
+      <bean class="org.codehaus.jackson.jaxrs.JacksonJsonProvider" />
+    </jaxrs:providers>
+  </jaxrs:server>
+
+  <jaxrs:server address="/v1/registration" id="registrationService">
+    <jaxrs:serviceBeans>
+      <ref component-id="registrationServiceImpl" />
+    </jaxrs:serviceBeans>
+    <jaxrs:providers>
+      <bean class="org.codehaus.jackson.jaxrs.JacksonJsonProvider" />
+    </jaxrs:providers>
+  </jaxrs:server>
+-->
+
+  <!--<bean id="jsonProvider" class="org.codehaus.jackson.jaxrs.JacksonJsonProvider" />-->
+
+  <bean id="peerRestServiceImpl" class="io.subutai.core.localpeer.rest.RestServiceImpl">
+    <argument ref="localPeer" />
+  </bean>
+
+  <!--<bean id="environmentRestServiceImpl" class="io.subutai.core.peer.rest.EnvironmentRestServiceImpl">-->
+    <!--<argument ref="peerManager" />-->
+  <!--</bean>-->
+
+  <!--<bean id="registrationServiceImpl" class="io.subutai.core.peer.rest.RegistrationServiceImpl">-->
+    <!--<argument ref="peerManager" />-->
+  <!--</bean>-->
+
+  <reference id="localPeer" availability="mandatory"
+             interface="io.subutai.core.peer.api.LocalPeer" />
+
+  <reference id="monitor" availability="mandatory"
+             interface="io.subutai.core.metric.api.Monitor" />
+
+  <!--  <reference id="httpContextManager" availability="mandatory"
+               interface="io.subutai.core.http.manager.api.HttpContextManager" />
+
+    <reference id="securityManager" availability="mandatory"
+               interface="io.subutai.core.security.api.SecurityManager" />-->
+
+</blueprint>

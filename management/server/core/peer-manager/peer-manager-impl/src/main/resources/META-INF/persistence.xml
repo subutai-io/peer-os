@@ -6,10 +6,6 @@
   <persistence-unit name="peerManagerPUnit" transaction-type="RESOURCE_LOCAL">
     <non-jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=openjpa/subutaiDS)
     </non-jta-data-source>
-    <class>io.subutai.core.peer.impl.entity.AbstractSubutaiHost</class>
-    <class>io.subutai.core.peer.impl.entity.ManagementHostEntity</class>
-    <class>io.subutai.core.peer.impl.entity.ResourceHostEntity</class>
-    <class>io.subutai.core.peer.impl.entity.ContainerHostEntity</class>
     <class>io.subutai.core.peer.impl.entity.TunnelEntity</class>
     <class>io.subutai.core.peer.impl.entity.PeerData</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>

@@ -49,18 +49,8 @@
   <reference id="securityManager" availability="mandatory"
              interface="io.subutai.core.security.api.SecurityManager" />
 
-  <bean id="localPeer" class="io.subutai.core.peer.impl.LocalPeerImpl" init-method="init"
-        destroy-method="dispose" scope="singleton" activation="eager">
-    <argument ref="daoManagerPeer" />
-    <argument ref="templateRegistry" />
-    <argument ref="quotaManager" />
-    <argument ref="strategyManager" />
-    <argument ref="commandExecutor" />
-    <argument ref="hostRegistry" />
-    <argument ref="monitor" />
-    <argument ref="securityManager" />
-    <property name="externalIpInterface" value="${externalIpInterface}" />
-  </bean>
+  <reference id="localPeer" availability="mandatory"
+             interface="io.subutai.core.peer.api.LocalPeer" />
 
   <bean id="messageResponseListener" class="io.subutai.core.peer.impl.request.MessageResponseListener"
         destroy-method="dispose" scope="singleton" activation="eager">
@@ -92,8 +82,6 @@
     <reference-listener ref="peerManager"
                         bind-method="addRequestListener" unbind-method="removeRequestListener" />
   </reference-list>
-
-  <service ref="localPeer" interface="io.subutai.core.hostregistry.api.HostListener" />
 
   <service ref="messageResponseListener" interface="io.subutai.core.messenger.api.MessageListener" />
 

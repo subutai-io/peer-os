@@ -48,11 +48,11 @@ public interface RestService
     @Produces( MediaType.APPLICATION_JSON )
     public PeerInfo getPeerInfo();
 
-    @GET
-    @Path( "registered_peers" )
-    @Produces( MediaType.APPLICATION_JSON )
-    public List<PeerInfo> getRegisteredPeers();
-
+//    @GET
+//    @Path( "registered_peers" )
+//    @Produces( MediaType.APPLICATION_JSON )
+//    public List<PeerInfo> getRegisteredPeers();
+//
 
     @GET
     @Path( "peer_policy" )
@@ -166,10 +166,10 @@ public interface RestService
     //                                                   @FormParam( "cert" ) String certHEX );
 
 
-    @PUT
-    @Path( "update" )
-    @Produces( MediaType.APPLICATION_JSON )
-    public Response updatePeer( @FormParam( "peer" ) String peer );
+//    @PUT
+//    @Path( "update" )
+//    @Produces( MediaType.APPLICATION_JSON )
+//    public Response updatePeer( @FormParam( "peer" ) String peer );
 
     //*************** Peer Registration Handshake REST - END ***************************
 

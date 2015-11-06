@@ -11,8 +11,6 @@ import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
-import io.subutai.common.security.PublicKeyContainer;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.peer.api.LocalPeer;
 
 

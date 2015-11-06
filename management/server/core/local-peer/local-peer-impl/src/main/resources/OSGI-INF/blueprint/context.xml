@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint default-activation="eager"
+           xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:jpa="http://aries.apache.org/xmlns/jpa/v1.0.0"
+           xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
+           xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0"
+           xmlns:authz="http://aries.apache.org/xmlns/authorization/v1.0.0"
+    >
+
+  <!-- ***************************************************************** -->
+  <authz:enable />
+  <!-- ***************************************************************** -->
+
+  <!-- Allow the use of system properties -->
+  <ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]" />
+
+  <cm:property-placeholder persistent-id="peer" update-strategy="none">
+    <cm:default-properties>
+      <cm:property name="externalIpInterface" value="eth1" />
+    </cm:default-properties>
+  </cm:property-placeholder>
+
+  <!-- ***************************************************************** -->
+  <bean id="daoManagerPeer" init-method="init" class="io.subutai.common.dao.DaoManager" scope="prototype">
+    <jpa:unit unitname="localPeerPUnit" property="entityManagerFactory" />
+  </bean>
+  <!-- ***************************************************************** -->
+
+  <reference id="messenger" availability="mandatory"
+             interface="io.subutai.core.messenger.api.Messenger" />
+
+  <reference id="commandExecutor" interface="io.subutai.core.executor.api.CommandExecutor" />
+
+  <reference id="templateRegistry" interface="io.subutai.core.registry.api.TemplateRegistry" />
+
+  <reference id="hostRegistry" interface="io.subutai.core.hostregistry.api.HostRegistry" />
+
+  <reference id="strategyManager" interface="io.subutai.core.strategy.api.StrategyManager" />
+
+  <reference id="quotaManager" availability="mandatory"
+             interface="io.subutai.core.lxc.quota.api.QuotaManager" />
+
+  <reference id="monitor" availability="optional"
+             interface="io.subutai.core.metric.api.Monitor" />
+
+  <reference id="identityManager" availability="mandatory"
+             interface="io.subutai.core.identity.api.IdentityManager" />
+
+  <reference id="securityManager" availability="mandatory"
+             interface="io.subutai.core.security.api.SecurityManager" />
+
+  <bean id="localPeer" class="io.subutai.core.localpeer.impl.LocalPeerImpl" init-method="init"
+        destroy-method="dispose" scope="singleton" activation="eager">
+    <argument ref="daoManagerPeer" />
+    <argument ref="templateRegistry" />
+    <argument ref="quotaManager" />
+    <argument ref="strategyManager" />
+    <argument ref="commandExecutor" />
+    <argument ref="hostRegistry" />
+    <argument ref="monitor" />
+    <argument ref="securityManager" />
+    <property name="externalIpInterface" value="${externalIpInterface}" />
+  </bean>
+
+<!--
+  <service ref="localPeer" interface="io.subutai.core.hostregistry.api.HostListener" />
+-->
+  <!--
+
+    <bean id="messageResponseListener" class="io.subutai.core.peer.impl.request.MessageResponseListener"
+          destroy-method="dispose" scope="singleton" activation="eager">
+      <argument ref="messenger" />
+    </bean>
+  -->
+
+  <!--
+    <bean id="jsonProvider" class="org.codehaus.jackson.jaxrs.JacksonJsonProvider" />
+  -->
+
+  <!-- <bean id="messageRequestListener" class="io.subutai.core.localpeer.impl.request.MessageRequestListener"
+         destroy-method="dispose" scope="singleton" activation="eager">
+     <argument ref="peerManager" />
+     <argument ref="messenger" />
+   </bean>
+ -->
+  <!--
+    <reference-list id="peerMsgLstnr"
+                    interface="io.subutai.core.peer.api.RequestListener"
+                    availability="optional" ext:proxy-method="classes">
+      <reference-listener ref="peerManager"
+                          bind-method="addRequestListener" unbind-method="removeRequestListener" />
+    </reference-list>
+  -->
+
+  <!--
+    <service ref="messageResponseListener" interface="io.subutai.core.messenger.api.MessageListener" />
+  -->
+
+  <service ref="localPeer" interface="io.subutai.core.peer.api.LocalPeer" />
+
+  <!--
+    <service ref="messageRequestListener" interface="io.subutai.core.messenger.api.MessageListener" />
+  -->
+
+</blueprint>

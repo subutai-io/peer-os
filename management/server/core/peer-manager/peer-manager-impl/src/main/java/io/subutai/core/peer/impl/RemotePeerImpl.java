@@ -28,7 +28,6 @@ import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInfoModel;
 import io.subutai.common.host.HostInterfaces;
-import io.subutai.common.metric.HostMetric;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.Gateway;
@@ -321,6 +320,33 @@ public class RemotePeerImpl implements RemotePeer
         else
         {
             new EnvironmentWebClient( provider ).destroyContainer( peerInfo.getIp(), containerId );
+        }
+    }
+
+
+    @Override
+    public void setDefaultGateway( final ContainerGateway containerGateway ) throws PeerException
+    {
+        Preconditions.checkNotNull( containerGateway, "Container host is null" );
+
+        String path = "peer/container/gateway";
+
+        Map<String, String> params = Maps.newHashMap();
+        params.put( "containerId", containerGateway.getContainerId().getId() );
+        params.put( "gatewayIp", containerGateway.getGateway() );
+
+        //*********construct Secure Header ****************************
+        Map<String, String> headers = Maps.newHashMap();
+        //*************************************************************
+
+        try
+        {
+            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
+            post( path, alias, params, headers );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Error setting container gateway ip", e );
         }
     }
 
@@ -1204,37 +1230,6 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void setDefaultGateway( final ContainerHost containerHost, final String gatewayIp ) throws PeerException
-    {
-        Preconditions.checkNotNull( containerHost, "Container host is null" );
-        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
-
-        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( gatewayIp ) && gatewayIp.matches( Common.IP_REGEX ),
-                "Invalid gateway IP" );
-
-        String path = "peer/container/gateway";
-
-        Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId() );
-        params.put( "gatewayIp", gatewayIp );
-
-        //*********construct Secure Header ****************************
-        Map<String, String> headers = Maps.newHashMap();
-        //*************************************************************
-
-        try
-        {
-            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
-            post( path, alias, params, headers );
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException( "Error setting container gateway ip", e );
-        }
-    }
-
-    @Override
     public Set<Vni> getReservedVnis() throws PeerException
     {
         return new PeerWebClient( peerInfo.getIp(), provider ).getReservedVnis();
@@ -1308,11 +1303,11 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
-//    @Override
-//    public HostMetric getHostMetric( final String hostId )
-//    {
-//        return new PeerWebClient( peerInfo.getIp(), provider ).getHostMetric( hostId );
-//    }
+    //    @Override
+    //    public HostMetric getHostMetric( final String hostId )
+    //    {
+    //        return new PeerWebClient( peerInfo.getIp(), provider ).getHostMetric( hostId );
+    //    }
 
 
     @Override

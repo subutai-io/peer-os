@@ -8,7 +8,7 @@ import io.subutai.common.network.Vni;
 import io.subutai.common.network.VniVlanMapping;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentId;
-import io.subutai.core.peer.api.Tunnel;
+import io.subutai.common.protocol.Tunnel;
 
 
 public interface NetworkManager

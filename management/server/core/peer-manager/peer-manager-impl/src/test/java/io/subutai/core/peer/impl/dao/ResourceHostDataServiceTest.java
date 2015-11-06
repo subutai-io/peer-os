@@ -12,7 +12,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import io.subutai.core.peer.impl.dao.ResourceHostDataService;
 import io.subutai.core.peer.impl.entity.ResourceHostEntity;
 
 import static org.mockito.Matchers.anyString;

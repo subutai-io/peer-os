@@ -8,8 +8,6 @@ import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.wol.api.WolManagerException;
-import io.subutai.core.wol.impl.Commands;
-import io.subutai.core.wol.impl.WolImpl;
 
 import java.util.ArrayList;
 

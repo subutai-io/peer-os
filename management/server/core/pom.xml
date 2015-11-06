@@ -22,6 +22,7 @@
     <module>git-manager</module>
     <module>lxc-quota-manager</module>
     <module>network-manager</module>
+    <module>local-peer</module>
     <module>peer-manager</module>
     <module>strategy-manager</module>
     <module>template-registry</module>

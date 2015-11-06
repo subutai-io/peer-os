@@ -1142,10 +1142,12 @@ public class MonitorImpl implements Monitor
                 for ( ResourceHost resourceHost : peerManager.getLocalPeer().getResourceHosts() )
                 {
                     ResourceHostMetric resourceHostMetric = monitor.fetchResourceHostMetric( resourceHost );
+                    resourceHostMetric.setHostId( resourceHost.getId() );
                     monitor.updateHostMetric( resourceHostMetric );
                     for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
                     {
                         HostMetric hostMetric = monitor.fetchContainerHostMetric( resourceHost, containerHost );
+                        hostMetric.setHostId( containerHost.getId() );
                         monitor.updateHostMetric( hostMetric );
                     }
                 }
