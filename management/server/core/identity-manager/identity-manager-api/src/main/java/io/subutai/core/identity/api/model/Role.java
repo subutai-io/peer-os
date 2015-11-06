@@ -8,9 +8,9 @@ import io.subutai.core.identity.api.model.Permission;
 public interface Role
 {
 
-    public abstract void setType( final Short type );
+    public abstract void setType( final int type );
 
-    public abstract Short getType();
+    public abstract int getType();
 
     public abstract void setName( final String name );
 
@@ -19,6 +19,8 @@ public interface Role
     public abstract void setId( final Long id );
 
     public abstract Long getId();
+
+    String getTypeName();
 
     List<Permission> getPermissions();
 

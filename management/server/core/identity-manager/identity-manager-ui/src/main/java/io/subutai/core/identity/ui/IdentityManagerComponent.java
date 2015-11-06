@@ -3,6 +3,7 @@ package io.subutai.core.identity.ui;
 
 import io.subutai.common.protocol.Disposable;
 import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.ui.tabs.PasswordTab;
 import io.subutai.core.identity.ui.tabs.RolesTab;
 import io.subutai.core.identity.ui.tabs.TokensTab;
 import io.subutai.core.identity.ui.tabs.UsersTab;
@@ -27,19 +28,15 @@ public class IdentityManagerComponent extends CustomComponent implements Disposa
         sheet.setStyleName( Runo.TABSHEET_SMALL );
         sheet.setSizeFull();
 
-        // TODO uncomment when permissions will be fully implemented
-        //      PermissionsTab permissionsTab = new PermissionsTab( identityManager );
         UsersTab usersTab = new UsersTab( identityManager );
         RolesTab rolesTab = new RolesTab( identityManager );
         TokensTab tokensTab = new TokensTab( identityManager );
+        PasswordTab passwordTab = new PasswordTab( identityManager );
 
         sheet.addTab( usersTab, "User management space." ).setId( "UsersTab" );
-
         sheet.addTab( rolesTab, "Roles management space" ).setId( "RolesManagement" );
-
         sheet.addTab( tokensTab, "Tokens management space").setId( "Tokens" );
-        // TODO uncomment when permissions will be fully implemented
-        //        sheet.addTab( permissionsTab, "Permission edition space." ).setId( "PermissionsTab" );
+        sheet.addTab( passwordTab, "Password management space").setId ( "Password" );
 
         verticalLayout.addComponent( sheet );
 

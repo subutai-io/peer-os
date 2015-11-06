@@ -33,7 +33,19 @@ public interface IdentityDataService
     void assignUserRole( long userId, Role role );
 
 
-    /* ******User *************************************
+    /* *************************************************
+     *
+     */
+    void removeUserRole( long userId, Role role );
+
+
+    /* *************************************************
+     *
+     */
+    void removeUserAllRoles( long userId );
+
+
+    /* *************************************************
      *
      */
     List<User> getAllUsers();
