@@ -63,6 +63,11 @@ public interface IdentityManager
 
     /* *************************************************
      */
+    User getUser(long userId);
+
+
+    /* *************************************************
+     */
     void assignUserRole( long userId, Role role );
 
 
@@ -124,6 +129,11 @@ public interface IdentityManager
     /* *************************************************
      */
     List<Role> getAllRoles();
+
+
+    /* *************************************************
+     */
+    Role getRole(long roleId);
 
 
     /* *************************************************

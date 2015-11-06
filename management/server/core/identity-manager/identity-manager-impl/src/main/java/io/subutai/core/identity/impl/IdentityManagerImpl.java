@@ -414,6 +414,13 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
+    /* *************************************************
+     */
+    @PermitAll
+    @Override
+    public User getUser(long userId) { return identityDataService.getUser(userId ); }
+
+
 
     /* *************************************************
      */
@@ -646,6 +653,14 @@ public class IdentityManagerImpl implements IdentityManager
     {
         return identityDataService.getAllRoles();
     }
+
+
+
+    /* *************************************************
+     */
+    @PermitAll
+    @Override
+    public Role getRole(long roleId) { return identityDataService.getRole(roleId); }
 
 
 

@@ -4,8 +4,9 @@ package io.subutai.core.identity.rest.ui;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.gson.reflect.TypeToken;
-import io.subutai.common.environment.NodeGroup;
 import io.subutai.core.identity.api.*;
+import io.subutai.core.identity.api.model.Role;
+import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.rest.ui.model.CliCommandJson;
 import io.subutai.core.identity.rest.ui.model.PortalModuleScopeJson;
 import io.subutai.core.identity.rest.ui.model.RestEndpointScopeJson;
@@ -16,8 +17,6 @@ import io.subutai.common.util.JsonUtil;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 
 public class RestServiceImpl implements RestService
@@ -93,24 +92,19 @@ public class RestServiceImpl implements RestService
 //            User newUser;
 //
 //            if(userId == null || userId <= 0){
-//                newUser = identityManager.createMockUser(username, fullName, password, email );
+//                newUser = identityManager.createUser(username, password, fullName, email, UserType.Regular.getId() );
 //            } else {
-//                newUser = identityManager.getUser(userId);
-//                newUser.setFullname(fullName);
-//                newUser.setEmail(email);
-//                newUser.setPassword(password);
+//                //newUser = jsonUtil.fromJson(username, new TypeToken<User>(){}.getType());
 //            }
 //
-//            List<String> roles = (ArrayList<String>)JsonUtil.fromJson(rolesJson, new TypeToken<ArrayList<String>>() {}.getType());
+//            List<Role> roles = jsonUtil.fromJson(rolesJson, new TypeToken<ArrayList<Role>>(){}.getType());
 //
-//            for( String roleName : roles ) {
-//                Role role = identityManager.getRole(roleName);
-//                newUser.addRole(role);
-//            }
-//            //Role role = identityManager.getRole("admin");
-//            //newUser.addRole(role);
-//
-//            //identityManager.addUser(username, fullName, password, email);
+//            newUser.removeUserAllRoles();
+//            newUser.setRoles(roles);
+////            for( String roleName : roles ) {
+////                Role role = identityManager.getRole(roleName);
+////                newUser.addRole(role);
+////            }
 //            identityManager.updateUser(newUser);
 
             return Response.ok().build();
@@ -129,7 +123,7 @@ public class RestServiceImpl implements RestService
         {
             //User userToDelete = identityManager.getUser(userId);
 
-            identityManager.removeUser( userId );
+            identityManager.removeUser(userId);
 
             return Response.ok().build();
         }
@@ -203,7 +197,7 @@ public class RestServiceImpl implements RestService
         {
             //Role role = identityManager.getRole( roleName );
 
-            identityManager.removeRole(roleId );
+            identityManager.removeRole(roleId);
 
             return Response.ok().build();
         }
