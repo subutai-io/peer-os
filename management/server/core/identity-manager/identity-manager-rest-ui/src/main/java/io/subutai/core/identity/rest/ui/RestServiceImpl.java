@@ -4,7 +4,10 @@ package io.subutai.core.identity.rest.ui;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.gson.reflect.TypeToken;
+import io.subutai.common.security.objects.UserType;
 import io.subutai.core.identity.api.*;
+import io.subutai.core.identity.api.model.Role;
+import io.subutai.core.identity.api.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import io.subutai.common.util.JsonUtil;
@@ -62,7 +65,7 @@ public class RestServiceImpl implements RestService
 
         try
         {
-            return Response.ok(jsonUtil.to( identityManager.getAllRoles() )).build();
+            return Response.ok(jsonUtil.to(identityManager.getAllRoles())).build();
         }
         catch ( Exception e )
         {
@@ -84,23 +87,19 @@ public class RestServiceImpl implements RestService
             Preconditions.checkArgument(!Strings.isNullOrEmpty(email));
 
             //JsonUtil.<DiskPartition>fromJson(diskPartition, new TypeToken<DiskPartition>() {}.getType());
-//            User newUser;
-//
-//            if(userId == null || userId <= 0){
-//                newUser = identityManager.createUser(username, password, fullName, email, UserType.Regular.getId() );
-//            } else {
-//                //newUser = jsonUtil.fromJson(username, new TypeToken<User>(){}.getType());
-//            }
-//
-//            List<Role> roles = jsonUtil.fromJson(rolesJson, new TypeToken<ArrayList<Role>>(){}.getType());
-//
-//            newUser.removeUserAllRoles();
-//            newUser.setRoles(roles);
-////            for( String roleName : roles ) {
-////                Role role = identityManager.getRole(roleName);
-////                newUser.addRole(role);
-////            }
-//            identityManager.updateUser(newUser);
+            User newUser;
+
+            if(userId == null || userId <= 0){
+                newUser = identityManager.createUser(username, password, fullName, email, UserType.Regular.getId() );
+            } else {
+                newUser = identityManager.getUser( userId );
+            }
+
+            List<Role> roles = jsonUtil.fromJson(rolesJson, new TypeToken<ArrayList<Role>>(){}.getType());
+
+            identityManager.removeUserAllRoles( newUser.getId() );
+            newUser.setRoles(roles);
+            identityManager.updateUser(newUser);
 
             return Response.ok().build();
         }
