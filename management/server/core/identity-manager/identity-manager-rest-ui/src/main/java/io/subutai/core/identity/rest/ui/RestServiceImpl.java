@@ -81,18 +81,31 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            Preconditions.checkArgument(!Strings.isNullOrEmpty(username));
-            Preconditions.checkArgument(!Strings.isNullOrEmpty(fullName));
-            Preconditions.checkArgument(!Strings.isNullOrEmpty(password));
-            Preconditions.checkArgument(!Strings.isNullOrEmpty(email));
+//            User testUser = JsonUtil.<User>fromJson(username, new TypeToken<User>() {}.getType());
+//            testUser.setFullName(fullName);
 
-            //JsonUtil.<DiskPartition>fromJson(diskPartition, new TypeToken<DiskPartition>() {}.getType());
             User newUser;
 
             if(userId == null || userId <= 0){
+                Preconditions.checkArgument(!Strings.isNullOrEmpty(username));
+                Preconditions.checkArgument(!Strings.isNullOrEmpty(fullName));
+                Preconditions.checkArgument(!Strings.isNullOrEmpty(password));
+                Preconditions.checkArgument(!Strings.isNullOrEmpty(email));
                 newUser = identityManager.createUser(username, password, fullName, email, UserType.Regular.getId() );
             } else {
-                newUser = identityManager.getUser( userId );
+                newUser = identityManager.getUser(userId );
+
+                if(!Strings.isNullOrEmpty(fullName)) {
+                    newUser.setFullName(fullName);
+                }
+
+                if(!Strings.isNullOrEmpty(email)) {
+                    newUser.setEmail(email);
+                }
+
+                if(!Strings.isNullOrEmpty(password)) {
+                    newUser.setPassword(password);
+                }
             }
 
             List<Role> roles = jsonUtil.fromJson(rolesJson, new TypeToken<ArrayList<Role>>(){}.getType());
