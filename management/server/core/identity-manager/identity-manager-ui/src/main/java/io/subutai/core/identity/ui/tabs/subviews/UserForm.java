@@ -89,12 +89,10 @@ public class UserForm extends Window
                     if ( callback != null )
                     {
                         User user = userFieldGroup.getItemDataSource().getBean();
-                        //identityManager.removeUserAllRoles( user.getId() );
                         userFieldGroup.getItemDataSource().getBean().getRoles().clear();
                         for ( final String roleName : selectedRoleNames )
                         {
                             BeanItem beanItem = ( BeanItem ) rolesSelector.getItem( roleName );
-                            //identityManager.assignUserRole( user.getId(), ( Role )beanItem.getBean() );
                             userFieldGroup.getItemDataSource().getBean().getRoles().add(( Role )beanItem.getBean());
                         }
 

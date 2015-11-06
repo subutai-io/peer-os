@@ -5,7 +5,6 @@ import java.util.*;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
-import com.vaadin.data.util.BeanContainer;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.ui.*;
 
@@ -25,9 +24,6 @@ public class RoleForm extends Window
 	private List <Permission> perms = new ArrayList<>();
 	private BeanItem <Role> currentRole;
     private TextField roleName;
-    private BeanFieldGroup<Role> roleFieldGroup = new BeanFieldGroup<>( Role.class );
-    private BeanContainer<String, Permission> permissionContainer;
-
 
     public RoleForm (final RolesTab callback, IdentityManager identityManager )
     {
@@ -50,12 +46,6 @@ public class RoleForm extends Window
         roleName.setInputPrompt( "Role name" );
         roleName.setRequiredError( "Please enter role name." );
 
-        permissionContainer = new BeanContainer<>( Permission.class );
-        permissionContainer.setBeanIdProperty( "permission" );
-        permTable.setContainerDataSource( permissionContainer );
-
-
-        /*
         permTable.addContainerProperty ("Permission", String.class, null);
 		permTable.addContainerProperty ("Scope", ComboBox.class, null);
 		permTable.addContainerProperty ("Read", CheckBox.class, null);
@@ -64,14 +54,13 @@ public class RoleForm extends Window
 		permTable.addContainerProperty ("Delete", CheckBox.class, null);
 		permTable.addContainerProperty ("Remove", Button.class, null);
 
-
 		permTable.setColumnWidth("Scope",114  );
 		permTable.setColumnWidth("Read",34  );
 		permTable.setColumnWidth("Write",46  );
 		permTable.setColumnWidth("Update",49  );
 		permTable.setColumnWidth("Delete",46  );
 		permTable.setColumnWidth("Remove",62  );
-		*/
+
         permTable.setHeight( "250px" );
 
 
@@ -138,17 +127,6 @@ public class RoleForm extends Window
 			@Override
 			public void valueChange (Property.ValueChangeEvent event)
 			{
-				int scope = (int) event.getProperty().getValue();
-				p.setScope (scope);
-
-				/*
-                for (Permission perm : perms)
-				{
-					if (p.getId() == perm.getId())
-					{
-						perm.setScope (scope);
-					}
-				}*/
 			}
 		});
 		row.getItemProperty("Scope").setValue(scopes);
@@ -160,17 +138,6 @@ public class RoleForm extends Window
 			@Override
 			public void valueChange (Property.ValueChangeEvent event)
 			{
-				boolean v = (boolean) event.getProperty().getValue();
-				p.setRead (v);
-
-                /*
-				for (Permission perm : perms)
-				{
-					if (p.getId() == perm.getId())
-					{
-						perm.setRead(v);
-					}
-				}*/
 			}
 		});
 		row.getItemProperty("Read").setValue(read);
@@ -182,17 +149,6 @@ public class RoleForm extends Window
 			@Override
 			public void valueChange (Property.ValueChangeEvent event)
 			{
-				boolean v = (boolean) event.getProperty().getValue();
-				p.setWrite(v);
-
-                /*
-                for (Permission perm : perms)
-				{
-					if (p.getId() == perm.getId())
-					{
-						perm.setWrite(v);
-					}
-				}*/
 			}
 		});
 		row.getItemProperty ("Write").setValue (write);
@@ -204,16 +160,6 @@ public class RoleForm extends Window
 			@Override
 			public void valueChange (Property.ValueChangeEvent event)
 			{
-				boolean v = (boolean) event.getProperty().getValue();
-				/*
-                p.setUpdate(v);
-				for (Permission perm : perms)
-				{
-					if (p.getId() == perm.getId())
-					{
-						perm.setUpdate(v);
-					}
-				}*/
 			}
 		});
 		row.getItemProperty ("Update").setValue (update);
@@ -225,16 +171,6 @@ public class RoleForm extends Window
 			@Override
 			public void valueChange (Property.ValueChangeEvent event)
 			{
-				/*
-                boolean v = (boolean) event.getProperty().getValue();
-				p.setDelete (v);
-				for (Permission perm : perms)
-				{
-					if (p.getId() == perm.getId())
-					{
-						perm.setDelete(v);
-					}
-				}*/
 			}
 		});
 		row.getItemProperty ("Delete").setValue (delete);
@@ -248,17 +184,8 @@ public class RoleForm extends Window
 			@Override
 			public void buttonClick (Button.ClickEvent event)
 			{
-				/*
-                for (int i = 0; i < perms.size(); ++i)
-				{
-					if (perms.get (i).getId() == p.getId())
-					{
-						perms.remove (i);
-						break;
-					}
-				}*/
-				permTable.removeItem (remove.getData());
-			}
+                	    
+            }
 		});
 		row.getItemProperty ("Remove").setValue (remove);
 	}
@@ -289,21 +216,12 @@ public class RoleForm extends Window
 
 	public void setRole (BeanItem <Role> role, boolean newValue )
 	{
-        roleFieldGroup.setItemDataSource( role.getBean() );
-        roleFieldGroup.bind( roleName, "name" );
+        roleName.setValue( role.getBean().getName() );
 
-        List<Permission> permissions = role.getBean().getPermissions();
-
-        //permissionContainer.addAll( permissions );
-        //permissionContainer.add
-		/*
-        this.currentRole = role;
-		this.perms.clear();
-
-		for (Permission p : currentRole.getBean().getPermissions())
+		for (Permission p : role.getBean().getPermissions())
 		{
 			this.perms.add (p);
 			this.addRow(p);
-		}*/
+		}
 	}
 }
