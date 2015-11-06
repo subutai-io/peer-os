@@ -123,7 +123,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error setting new user #setUser", e );
+            LOGGER.error( "Error deleting user #deleteUser", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
@@ -197,7 +197,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error setting new user #setUser", e );
+            LOGGER.error( "Error deleting role #deleteRole", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
