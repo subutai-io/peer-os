@@ -108,10 +108,17 @@ public class RestServiceImpl implements RestService
                 }
             }
 
-            List<Role> roles = jsonUtil.fromJson(rolesJson, new TypeToken<ArrayList<Role>>(){}.getType());
+            if(!Strings.isNullOrEmpty(rolesJson)) {
+                ArrayList<Long> roles = jsonUtil.fromJson(
+                    rolesJson, new TypeToken<ArrayList<Long>>() {}.getType()
+                );
 
-            identityManager.removeUserAllRoles( newUser.getId() );
-            newUser.setRoles(roles);
+                identityManager.removeUserAllRoles(newUser.getId());
+                for (Long roleId : roles) {
+                    Role role = identityManager.getRole(roleId);
+                    identityManager.assignUserRole(newUser.getId(), role);
+                }
+            }
             identityManager.updateUser(newUser);
 
             return Response.ok().build();

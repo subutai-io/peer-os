@@ -470,7 +470,8 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    @RolesAllowed( "Identity-Management|A|Write" )
+    //@RolesAllowed( "Identity-Management|A|Write" )
+    @PermitAll
     @Override
     public User createUser( String userName, String password, String fullName, String email, int type )
     {
@@ -501,7 +502,8 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    @RolesAllowed( "Identity-Management|A|Write" )
+    //@RolesAllowed( "Identity-Management|A|Write" )
+    @PermitAll
     @Override
     public void assignUserRole( long userId, Role role )
     {
@@ -511,7 +513,8 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    @RolesAllowed( "Identity-Management|A|Delete" )
+    //@RolesAllowed( "Identity-Management|A|Delete" )
+    @PermitAll
     @Override
     public void removeUserRole( long userId, Role role )
     {
@@ -521,7 +524,8 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    @RolesAllowed( "Identity-Management|A|Delete" )
+    //@RolesAllowed( "Identity-Management|A|Delete" )
+    @PermitAll
     @Override
     public void removeUserAllRoles( long userId )
     {
@@ -560,7 +564,8 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    @RolesAllowed( "Identity-Management|A|Update" )
+    //@RolesAllowed( "Identity-Management|A|Update" )
+    @PermitAll
     @Override
     public void updateUser( User user )
     {
@@ -577,7 +582,8 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    @RolesAllowed( "Identity-Management|A|Delete" )
+    //@RolesAllowed( "Identity-Management|A|Delete" )
+    @PermitAll
     @Override
     public void removeUser( long userId )
     {
@@ -630,7 +636,8 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    @RolesAllowed( "Identity-Management|A|Write" )
+    //@RolesAllowed( "Identity-Management|A|Write" )
+    @PermitAll
     @Override
     public Role createRole( String roleName, int roleType )
     {
@@ -658,7 +665,6 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    @PermitAll
     @Override
     public Role getRole(long roleId) { return identityDataService.getRole(roleId); }
 
@@ -666,7 +672,7 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    @RolesAllowed( "Identity-Management|A|Update" )
+    //@RolesAllowed( "Identity-Management|A|Update" ) @todo
     @Override
     public void updateRole( Role role )
     {
@@ -683,7 +689,8 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    @RolesAllowed( "Identity-Management|A|Delete" )
+    //@RolesAllowed( "Identity-Management|A|Delete" )
+    @PermitAll
     @Override
     public void removeRole( long roleId )
     {
@@ -702,7 +709,8 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    @RolesAllowed( "Identity-Management|A|Write" )
+    //@RolesAllowed( "Identity-Management|A|Write" )
+    @PermitAll
     @Override
     public Permission createPermission( int objectId, int scope, boolean read, boolean write, boolean update,
                                         boolean delete )
@@ -723,7 +731,8 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    @RolesAllowed( "Identity-Management|A|Write" )
+    //@RolesAllowed( "Identity-Management|A|Write" )
+    @PermitAll
     @Override
     public void assignRolePermission( long roleId, Permission permission )
     {
@@ -733,7 +742,8 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    @RolesAllowed( "Identity-Management|A|Delete" )
+    //@RolesAllowed( "Identity-Management|A|Delete" )
+    @PermitAll
     @Override
     public void removePermission( long permissionId )
     {
