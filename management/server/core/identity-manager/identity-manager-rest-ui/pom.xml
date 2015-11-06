@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>identity-manager</artifactId>
+    <artifactId>identity-manager-rest-ui</artifactId>
     <name>Subutai Identity Manager REST UI</name>
     <description>Subutai Identity Manager REST UI</description>
     <packaging>bundle</packaging>
