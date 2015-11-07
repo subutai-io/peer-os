@@ -1,14 +1,12 @@
 package io.subutai.core.environment.rest.ui;
 
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import javax.ws.rs.core.Response;
 
 import io.subutai.common.environment.*;
+import io.subutai.common.protocol.Template;
 import io.subutai.common.quota.DiskPartition;
 import io.subutai.common.quota.DiskQuota;
 import io.subutai.common.quota.DiskQuotaUnit;
@@ -58,6 +56,24 @@ public class RestServiceImpl implements RestService
         this.environmentManager = environmentManager;
         this.peerManager = peerManager;
         this.templateRegistry = templateRegistry;
+    }
+
+    @Override
+    public Response listTemplates()
+    {
+        List<String> templates = new ArrayList<>();
+        for ( Template template : templateRegistry.getAllTemplates() )
+        {
+            templates.add( template.getTemplateName() );
+        }
+        if ( !templates.isEmpty() )
+        {
+            return Response.ok().entity( JsonUtil.toJson( templates ) ).build();
+        }
+        else
+        {
+            return Response.status( Response.Status.NOT_FOUND ).build();
+        }
     }
 
     @Override

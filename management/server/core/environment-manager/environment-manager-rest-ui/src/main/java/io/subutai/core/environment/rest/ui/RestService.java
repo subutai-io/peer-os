@@ -21,6 +21,11 @@ public interface RestService
     public Response listEnvironments();
 
     @GET
+    @Path( "templates" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response listTemplates();
+
+    @GET
     @Path( "domain" )
     @Produces( { MediaType.TEXT_PLAIN } )
     public Response getDefaultDomainName();
