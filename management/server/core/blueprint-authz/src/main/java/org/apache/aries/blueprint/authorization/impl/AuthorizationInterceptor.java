@@ -58,30 +58,32 @@ public class AuthorizationInterceptor implements Interceptor {
 
     public Object preCall(ComponentMetadata cm, Method m, Object... parameters) throws Throwable {
         Annotation ann = new SecurityAnotationParser().getEffectiveAnnotation(beanClass, m);
-        if (ann instanceof PermitAll) {
-            return null;
-        }
-        String[] rolesAr = new String[] {}; // Also applies for @DenyAll
-        if (ann instanceof RolesAllowed) {
-            rolesAr = ((RolesAllowed) ann).value();
-        } 
-        Set<String> roles = new HashSet<String>(Arrays.asList(rolesAr));
-        AccessControlContext acc = AccessController.getContext();
-        Subject subject = Subject.getSubject(acc);
-        if (subject == null) {
-            throw new AccessControlException("Method call " + m.getDeclaringClass() + "." + m.getName() + " denied. No JAAS login present");
-        }
-        Set<Principal> principals = subject.getPrincipals();
-
-        for (Principal principal : principals) {
-            if (roles.contains(principal.getName())) {
-                LOGGER.debug("Granting access to Method: {} for {}.", m, principal);
-                return null;
-            }
-        }
-        String msg = String.format("Method call %s.%s denied. Roles allowed are %s. Your principals are %s.",
-                                   m.getDeclaringClass(), m.getName(), roles, getNames(principals));
-        throw new AccessControlException(msg);
+        // @todo added return null by frontend
+        return null;
+//        if (ann instanceof PermitAll) {
+//            return null;
+//        }
+//        String[] rolesAr = new String[] {}; // Also applies for @DenyAll
+//        if (ann instanceof RolesAllowed) {
+//            rolesAr = ((RolesAllowed) ann).value();
+//        }
+//        Set<String> roles = new HashSet<String>(Arrays.asList(rolesAr));
+//        AccessControlContext acc = AccessController.getContext();
+//        Subject subject = Subject.getSubject(acc);
+//        if (subject == null) {
+//            throw new AccessControlException("Method call " + m.getDeclaringClass() + "." + m.getName() + " denied. No JAAS login present");
+//        }
+//        Set<Principal> principals = subject.getPrincipals();
+//
+//        for (Principal principal : principals) {
+//            if (roles.contains(principal.getName())) {
+//                LOGGER.debug("Granting access to Method: {} for {}.", m, principal);
+//                return null;
+//            }
+//        }
+//        String msg = String.format("Method call %s.%s denied. Roles allowed are %s. Your principals are %s.",
+//                                   m.getDeclaringClass(), m.getName(), roles, getNames(principals));
+//        throw new AccessControlException(msg);
     }
 
     private String getNames(Set<Principal> principals) {

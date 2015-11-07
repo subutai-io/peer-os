@@ -14,7 +14,6 @@ import io.subutai.common.util.JsonUtil;
 
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
-import java.util.List;
 
 
 public class RestServiceImpl implements RestService
