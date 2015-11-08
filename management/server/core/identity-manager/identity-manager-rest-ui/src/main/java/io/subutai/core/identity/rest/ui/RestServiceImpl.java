@@ -6,6 +6,7 @@ import com.google.common.base.Strings;
 import com.google.gson.reflect.TypeToken;
 import io.subutai.common.security.objects.UserType;
 import io.subutai.core.identity.api.*;
+import io.subutai.core.identity.api.model.Permission;
 import io.subutai.core.identity.api.model.Role;
 import io.subutai.core.identity.api.model.User;
 import org.slf4j.Logger;
@@ -134,8 +135,6 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            //User userToDelete = identityManager.getUser(userId);
-
             identityManager.removeUser(userId);
 
             return Response.ok().build();
@@ -148,51 +147,31 @@ public class RestServiceImpl implements RestService
     }
 
     @Override
-    public Response saveRole( final String rolename, final String modulesJson,
-                             final String endpointJson, final String cliCommandsJson )
+    public Response saveRole( final String rolename, final String permissionJson, final Long roleId )
     {
         try
         {
             Preconditions.checkArgument(!Strings.isNullOrEmpty(rolename));
 
-            //JsonUtil.<DiskPartition>fromJson(diskPartition, new TypeToken<DiskPartition>() {}.getType());
-//            Role role = identityManager.getRole(rolename);
-//
-//            if(role == null) {
-//                role = identityManager.createRole(rolename);
-//            }
-//
-//            if(!Strings.isNullOrEmpty(cliCommandsJson)) {
-//                List<CliCommand> cliCommands = JsonUtil.fromJson(
-//                    cliCommandsJson, new TypeToken<ArrayList<CliCommandJson>>() {}.getType()
-//                );
-//                role.clearCliCommands();
-//                for(CliCommand cliCommand: cliCommands) {
-//                    role.addCliCommand(cliCommand);
-//                }
-//            }
-//
-//            if(!Strings.isNullOrEmpty(modulesJson)) {
-//                List<PortalModuleScope> modules = JsonUtil.fromJson(
-//                    modulesJson, new TypeToken<ArrayList<PortalModuleScopeJson>>() {}.getType()
-//                );
-//                role.clearPortalModules();
-//                for(PortalModuleScope module: modules) {
-//                    role.addPortalModule(module);
-//                }
-//            }
-//
-//            if(!Strings.isNullOrEmpty(endpointJson)) {
-//                List<RestEndpointScope> endpoints = JsonUtil.fromJson(
-//                        endpointJson, new TypeToken<ArrayList<RestEndpointScopeJson>>() {}.getType()
-//                );
-//                role.clearRestEndpointScopes();
-//                for(RestEndpointScope endpoint: endpoints) {
-//                    role.addRestEndpointScope(endpoint);
-//                }
-//            }
-//
-//            identityManager.updateRole(role);
+            Role role;
+
+            if(roleId == null || roleId <= 0){
+                role = identityManager.createRole( rolename, UserType.Regular.getId() );
+            } else {
+                role = identityManager.getRole(roleId);
+            }
+
+            if(!Strings.isNullOrEmpty(permissionJson)) {
+                ArrayList<Permission> permissions = JsonUtil.fromJson(
+                    permissionJson, new TypeToken<ArrayList<Permission>>() {}.getType()
+                );
+
+                for(Permission permission : permissions) {
+                    identityManager.assignRolePermission(role.getId(), permission);
+                }
+            }
+
+            identityManager.updateRole(role);
 
             return Response.ok().build();
         }
@@ -208,8 +187,6 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            //Role role = identityManager.getRole( roleName );
-
             identityManager.removeRole(roleId);
 
             return Response.ok().build();

@@ -33,9 +33,8 @@ public interface RestService
     @Path( "roles" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response saveRole( @FormParam( "rolename" ) String rolename,
-                             @FormParam( "modules" ) String modulesJson,
-                             @FormParam( "endpoint" ) String endpointJson,
-                             @FormParam( "cli_commands" ) String cliCommandsJson );
+                              @FormParam( "permission" ) String permissionJson,
+                              @FormParam( "role_id" ) Long roleId );
 
     @DELETE
     @Path( "roles/{roleId}" )
