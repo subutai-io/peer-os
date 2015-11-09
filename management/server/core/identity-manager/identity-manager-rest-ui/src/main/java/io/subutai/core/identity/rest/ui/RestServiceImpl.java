@@ -13,6 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import io.subutai.common.util.JsonUtil;
 
+import io.subutai.core.identity.rest.ui.PermissionJson;
+
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 
@@ -162,12 +164,21 @@ public class RestServiceImpl implements RestService
             }
 
             if(!Strings.isNullOrEmpty(permissionJson)) {
-                ArrayList<Permission> permissions = JsonUtil.fromJson(
-                    permissionJson, new TypeToken<ArrayList<Permission>>() {}.getType()
+                ArrayList<PermissionJson> permissions = JsonUtil.fromJson(
+                    permissionJson, new TypeToken<ArrayList<PermissionJson>>() {}.getType()
                 );
 
-                for(Permission permission : permissions) {
-                    identityManager.assignRolePermission(role.getId(), permission);
+                identityManager.removeAllRolePermissions(role.getId());
+                for(PermissionJson permission : permissions) {
+                    Permission newPermission = identityManager.createPermission(
+                        permission.getObject(),
+                        permission.getScope(),
+                        permission.getRead(),
+                        permission.getWrite(),
+                        permission.getUpdate(),
+                        permission.getDelete()
+                    );
+                    identityManager.assignRolePermission(role.getId(), newPermission);
                 }
             }
 

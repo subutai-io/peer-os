@@ -158,6 +158,11 @@ public interface IdentityManager
 
     /* *************************************************
      */
+    void removeAllRolePermissions( long roleId );
+
+
+    /* *************************************************
+     */
     void removePermission( long permissionId );
 
 

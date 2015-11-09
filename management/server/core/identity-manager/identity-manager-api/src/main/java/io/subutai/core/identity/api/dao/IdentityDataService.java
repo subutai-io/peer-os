@@ -103,6 +103,12 @@ public interface IdentityDataService
     void assignRolePermission( long roleId, Permission permission );
 
 
+    /* *************************************************
+     *
+     */
+    void removeAllRolePermissions( long roleId );
+
+
     /*
      * ******Permission*********************************
      */

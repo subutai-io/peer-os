@@ -732,6 +732,16 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
+    @RolesAllowed( "Identity-Management|A|Write" )
+    @Override
+    public void removeAllRolePermissions( long roleId )
+    {
+        identityDataService.removeAllRolePermissions( roleId );
+    }
+
+
+    /* *************************************************
+     */
     @RolesAllowed( "Identity-Management|A|Delete" )
     @Override
     public void removePermission( long permissionId )

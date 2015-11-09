@@ -200,6 +200,17 @@ public class IdentityDataServiceImpl implements IdentityDataService
         roleDAOService.update( role );
     }
 
+    /* *************************************************
+     *
+     */
+    @Override
+    public void removeAllRolePermissions( long roleId )
+    {
+        Role role = roleDAOService.find( roleId );
+        role.getPermissions().clear();
+        roleDAOService.update( role );
+    }
+
 
     /*
      * ******Permission*********************************
