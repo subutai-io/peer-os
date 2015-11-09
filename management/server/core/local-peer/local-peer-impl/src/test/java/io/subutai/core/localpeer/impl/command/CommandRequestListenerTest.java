@@ -64,7 +64,7 @@ public class CommandRequestListenerTest
     @Before
     public void setUp() throws Exception
     {
-        listener = new CommandRequestListener( localPeer, peerManager );
+        listener = new CommandRequestListener();
         when( payload.getMessage( CommandRequest.class ) ).thenReturn( commandRequest );
         when( peerManager.getPeer( any( String.class ) ) ).thenReturn( sourcePeer );
         when( localPeer.bindHost( any( String.class ) ) ).thenReturn( host );
@@ -97,7 +97,7 @@ public class CommandRequestListenerTest
     public void testCommandRequestCallback() throws Exception
     {
         CommandRequestListener.CommandRequestCallback callback =
-                new CommandRequestListener.CommandRequestCallback( commandRequest, sourcePeer , localPeer );
+                new CommandRequestListener.CommandRequestCallback( commandRequest, sourcePeer );
         when( commandRequest.getEnvironmentId() ).thenReturn( UUID.randomUUID().toString() );
 
         callback.onResponse( response, commandResult );
