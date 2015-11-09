@@ -3,6 +3,13 @@ package io.subutai.core.localpeer.impl.command;
 
 import java.util.Map;
 
+import javax.naming.NamingException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Maps;
+
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
@@ -10,31 +17,36 @@ import io.subutai.common.command.Response;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
-import io.subutai.core.peer.api.LocalPeer;
+import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.localpeer.impl.RecipientType;
 import io.subutai.core.localpeer.impl.Timeouts;
+import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.Payload;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.peer.api.RequestListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.Maps;
 
 
 public class CommandRequestListener extends RequestListener
 {
     private static final Logger LOG = LoggerFactory.getLogger( CommandRequestListener.class.getName() );
 
-    private LocalPeer localPeer;
-    private PeerManager peerManager;
+
+    protected PeerManager getPeerManager() throws PeerException
+    {
+        try
+        {
+            return ServiceLocator.getServiceNoCache( PeerManager.class );
+        }
+        catch ( NamingException e )
+        {
+            throw new PeerException( e );
+        }
+    }
 
 
-    public CommandRequestListener( final LocalPeer localPeer, final PeerManager peerManager )
+    public CommandRequestListener()
     {
         super( RecipientType.COMMAND_REQUEST.name() );
-        this.localPeer = localPeer;
-        this.peerManager = peerManager;
     }
 
 
@@ -47,11 +59,11 @@ public class CommandRequestListener extends RequestListener
         {
             try
             {
-                Peer sourcePeer = peerManager.getPeer( payload.getSourcePeerId() );
+                Peer sourcePeer = getPeerManager().getPeer( payload.getSourcePeerId() );
+                LocalPeer localPeer = getPeerManager().getLocalPeer();
                 Host host = localPeer.bindHost( commandRequest.getHostId() );
-
                 localPeer.executeAsync( commandRequest.getRequestBuilder(), host,
-                        new CommandRequestCallback( commandRequest, sourcePeer,localPeer ) );
+                        new CommandRequestCallback( commandRequest, sourcePeer ) );
             }
             catch ( CommandException e )
             {
@@ -71,19 +83,17 @@ public class CommandRequestListener extends RequestListener
     {
         private final CommandRequest commandRequest;
         private final Peer sourcePeer;
-        private Peer localPeer;
 
 
-        public CommandRequestCallback( final CommandRequest commandRequest, final Peer sourcePeer, Peer localPeer)
+        public CommandRequestCallback( final CommandRequest commandRequest, final Peer sourcePeer )
         {
             this.commandRequest = commandRequest;
             this.sourcePeer = sourcePeer;
-            this.localPeer = localPeer;
         }
 
 
         @Override
-        public void onResponse( final Response response, final CommandResult commandResult)
+        public void onResponse( final Response response, final CommandResult commandResult )
         {
             try
             {

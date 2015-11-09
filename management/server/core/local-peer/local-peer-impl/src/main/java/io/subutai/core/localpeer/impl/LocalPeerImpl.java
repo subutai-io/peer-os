@@ -96,9 +96,13 @@ import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hostregistry.api.HostRegistry;
+import io.subutai.core.localpeer.impl.command.CommandRequestListener;
+import io.subutai.core.localpeer.impl.command.CommandResponseListener;
 import io.subutai.core.localpeer.impl.container.ContainersDestructionResultImpl;
 import io.subutai.core.localpeer.impl.container.CreateContainerWrapperTask;
+import io.subutai.core.localpeer.impl.container.CreateEnvironmentContainerGroupRequestListener;
 import io.subutai.core.localpeer.impl.container.DestroyContainerWrapperTask;
+import io.subutai.core.localpeer.impl.container.DestroyEnvironmentContainerGroupRequestListener;
 import io.subutai.core.localpeer.impl.dao.ManagementHostDataService;
 import io.subutai.core.localpeer.impl.dao.ResourceHostDataService;
 import io.subutai.core.localpeer.impl.dao.TunnelDataService;
@@ -151,7 +155,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     protected ExceptionUtil exceptionUtil = new ExceptionUtil();
     protected Set<RequestListener> requestListeners = Sets.newHashSet();
     protected PeerInfo peerInfo;
+    protected CommandResponseListener commandResponseListener;
     private SecurityManager securityManager;
+
 
     protected boolean initialized = false;
 
@@ -183,6 +189,19 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 + "******************************************" );
 
         hostRegistry.addHostListener( this );
+
+
+        //add command request listener
+        addRequestListener( new CommandRequestListener() );
+        //add command response listener
+        commandResponseListener = new CommandResponseListener();
+        addRequestListener( commandResponseListener );
+        //add create container requests listener
+        addRequestListener( new CreateEnvironmentContainerGroupRequestListener( this ) );
+        //add destroy environment containers requests listener
+        addRequestListener( new DestroyEnvironmentContainerGroupRequestListener( this ) );
+
+
         //        PeerDAO peerDAO;
         try
         {
@@ -212,7 +231,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 managementHost.init();
                 this.peerInfo = managementHost.getPeerInfo();
             }
-            else {
+            else
+            {
                 this.peerInfo = initPeerInfo();
             }
 
