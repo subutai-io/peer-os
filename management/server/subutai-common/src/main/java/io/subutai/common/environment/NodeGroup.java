@@ -44,8 +44,7 @@ public class NodeGroup
 
 
     public NodeGroup( final String name, final String templateName, final ContainerType type,
-                      final int numberOfContainers, final int sshGroupId, final int hostsGroupId, final String peerId,
-                      final String hostId )
+                      final int numberOfContainers, final int sshGroupId, final int hostsGroupId)
     {
         this.name = name;
         this.templateName = templateName;
@@ -53,8 +52,6 @@ public class NodeGroup
         this.numberOfContainers = numberOfContainers;
         this.sshGroupId = sshGroupId;
         this.hostsGroupId = hostsGroupId;
-        this.peerId = peerId;
-        this.hostId = hostId;
     }
 
 

@@ -127,7 +127,7 @@ public class BlueprintForm
             {
                 Blueprint b = new Blueprint( "Custom blueprint", "192.168.0.1/24", null );
                 b.setId( UUID.randomUUID() );
-                b.setType( ContainerDistributionType.CUSTOM );
+                b.setContainerDistributionType( ContainerDistributionType.CUSTOM );
                 editBlueprint( b );
             }
         } );
@@ -190,27 +190,24 @@ public class BlueprintForm
                 } );
 
                 Button edit = null;
-                if ( blueprint.getType() == ContainerDistributionType.CUSTOM )
+                edit = new Button( EDIT );
+                edit.setId( blueprint.getName() + "-edit" );
+                edit.addClickListener( new Button.ClickListener()
                 {
-                    edit = new Button( EDIT );
-                    edit.setId( blueprint.getName() + "-edit" );
-                    edit.addClickListener( new Button.ClickListener()
+                    @Override
+                    public void buttonClick( final Button.ClickEvent clickEvent )
                     {
-                        @Override
-                        public void buttonClick( final Button.ClickEvent clickEvent )
+                        try
                         {
-                            try
-                            {
-                                Blueprint b = environmentManager.getBlueprint( blueprint.getId() );
-                                editBlueprint( b );
-                            }
-                            catch ( EnvironmentManagerException e )
-                            {
-                                Notification.show( "Unexpected error. Could not edit blueprint." );
-                            }
+                            Blueprint b = environmentManager.getBlueprint( blueprint.getId() );
+                            editBlueprint( b );
                         }
-                    } );
-                }
+                        catch ( EnvironmentManagerException e )
+                        {
+                            Notification.show( "Unexpected error. Could not edit blueprint." );
+                        }
+                    }
+                } );
                 final Button grow = new Button( GROW );
                 grow.setId( blueprint.getName() + "-grow" );
                 grow.addClickListener( new Button.ClickListener()

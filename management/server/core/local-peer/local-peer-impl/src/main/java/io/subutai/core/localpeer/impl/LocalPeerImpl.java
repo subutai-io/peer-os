@@ -188,8 +188,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         LOG.debug( "********************************************** Initializing peer "
                 + "******************************************" );
 
-        hostRegistry.addHostListener( this );
-
 
         //add command request listener
         addRequestListener( new CommandRequestListener() );
@@ -261,6 +259,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             throw new LocalPeerInitializationError( "Failed to init Local Peer", e );
         }
+        hostRegistry.addHostListener( this );
+
+
+        addRequestListener( new CreateEnvironmentContainerGroupRequestListener( this ) );
+        //add destroy environment containers requests listener
+        addRequestListener( new DestroyEnvironmentContainerGroupRequestListener( this ) );
     }
 
 
