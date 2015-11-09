@@ -10,7 +10,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import io.subutai.core.metric.api.MonitorException;
 
-import io.subutai.core.peer.api.Payload;
+import io.subutai.common.peer.Payload;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;

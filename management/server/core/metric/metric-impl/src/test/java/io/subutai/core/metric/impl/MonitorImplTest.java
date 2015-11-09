@@ -49,9 +49,9 @@ import io.subutai.core.metric.api.AlertListener;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.metric.api.MonitoringSettings;
-import io.subutai.core.peer.api.LocalPeer;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.core.peer.api.RemotePeer;
+import io.subutai.common.peer.RemotePeer;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;

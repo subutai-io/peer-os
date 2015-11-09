@@ -10,9 +10,9 @@ import com.google.common.collect.Sets;
 
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.core.metric.api.MonitoringSettings;
-import io.subutai.core.peer.api.Payload;
+import io.subutai.common.peer.Payload;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.core.peer.api.RequestListener;
+import io.subutai.common.peer.RequestListener;
 
 
 public class MonitoringActivationListener extends RequestListener

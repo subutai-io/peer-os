@@ -2,14 +2,13 @@ package io.subutai.core.metric.impl;
 
 
 import java.util.Set;
-import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import io.subutai.core.peer.api.Payload;
+import io.subutai.common.peer.Payload;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;

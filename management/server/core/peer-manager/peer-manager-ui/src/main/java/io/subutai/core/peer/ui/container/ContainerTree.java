@@ -30,8 +30,8 @@ import io.subutai.common.settings.Common;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.metric.api.Monitor;
-import io.subutai.core.peer.api.LocalPeer;
-import io.subutai.core.peer.api.ManagementHost;
+import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.peer.ManagementHost;
 import io.subutai.server.ui.component.ConcurrentComponent;
 
 

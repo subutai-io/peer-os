@@ -8,7 +8,7 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
-import io.subutai.core.peer.api.ManagementHost;
+import io.subutai.common.peer.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.wol.api.WolManager;
 import io.subutai.core.wol.api.WolManagerException;

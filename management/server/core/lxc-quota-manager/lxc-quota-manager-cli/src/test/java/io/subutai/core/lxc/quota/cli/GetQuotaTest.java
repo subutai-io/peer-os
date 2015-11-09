@@ -14,7 +14,7 @@ import io.subutai.common.quota.DiskQuota;
 import io.subutai.common.quota.QuotaException;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 
-import io.subutai.core.peer.api.LocalPeer;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.core.peer.api.PeerManager;
 
 import static org.mockito.Mockito.when;

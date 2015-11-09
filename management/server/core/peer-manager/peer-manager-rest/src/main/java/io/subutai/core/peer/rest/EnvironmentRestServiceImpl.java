@@ -12,8 +12,7 @@ import com.google.common.base.Preconditions;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerId;
-import io.subutai.core.peer.api.LocalPeer;
-import io.subutai.core.peer.api.PeerManager;
+import io.subutai.common.peer.LocalPeer;
 
 
 /**

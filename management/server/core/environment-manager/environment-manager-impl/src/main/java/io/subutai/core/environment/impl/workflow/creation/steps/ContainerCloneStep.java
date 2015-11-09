@@ -27,7 +27,7 @@ import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.creation.steps.helpers.CreatePeerNodeGroupsTask;
 import io.subutai.core.environment.impl.workflow.creation.steps.helpers.NodeGroupBuildResult;
-import io.subutai.core.peer.api.LocalPeer;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.core.registry.api.TemplateRegistry;
 
 

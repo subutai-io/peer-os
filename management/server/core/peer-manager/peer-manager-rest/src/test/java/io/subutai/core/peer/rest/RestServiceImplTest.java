@@ -30,8 +30,8 @@
 //import io.subutai.common.util.JsonUtil;
 //import io.subutai.common.util.RestUtil;
 //import io.subutai.core.http.manager.api.HttpContextManager;
-//import io.subutai.core.peer.api.LocalPeer;
-//import io.subutai.core.peer.api.ManagementHost;
+//import io.subutai.common.peer.LocalPeer;
+//import io.subutai.common.peer.ManagementHost;
 //import io.subutai.core.peer.api.PeerManager;
 //import io.subutai.core.security.api.SecurityManager;
 //

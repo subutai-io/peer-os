@@ -62,44 +62,23 @@
     <property name="externalIpInterface" value="${externalIpInterface}" />
   </bean>
 
-<!--
   <service ref="localPeer" interface="io.subutai.core.hostregistry.api.HostListener" />
--->
-  <!--
 
-    <bean id="messageResponseListener" class="io.subutai.core.peer.impl.request.MessageResponseListener"
-          destroy-method="dispose" scope="singleton" activation="eager">
-      <argument ref="messenger" />
-    </bean>
-  -->
+  <bean id="messageRequestListener" class="io.subutai.core.localpeer.impl.request.MessageRequestListener"
+        destroy-method="dispose" scope="singleton" activation="eager">
+    <argument ref="localPeer" />
+    <argument ref="messenger" />
+  </bean>
 
-  <!--
-    <bean id="jsonProvider" class="org.codehaus.jackson.jaxrs.JacksonJsonProvider" />
-  -->
+  <reference-list id="peerMsgLstnr"
+                  interface="io.subutai.common.peer.RequestListener"
+                  availability="optional" ext:proxy-method="classes">
+    <reference-listener ref="peerManager"
+                        bind-method="addRequestListener" unbind-method="removeRequestListener" />
+  </reference-list>
 
-  <!-- <bean id="messageRequestListener" class="io.subutai.core.localpeer.impl.request.MessageRequestListener"
-         destroy-method="dispose" scope="singleton" activation="eager">
-     <argument ref="peerManager" />
-     <argument ref="messenger" />
-   </bean>
- -->
-  <!--
-    <reference-list id="peerMsgLstnr"
-                    interface="io.subutai.core.peer.api.RequestListener"
-                    availability="optional" ext:proxy-method="classes">
-      <reference-listener ref="peerManager"
-                          bind-method="addRequestListener" unbind-method="removeRequestListener" />
-    </reference-list>
-  -->
+  <service ref="localPeer" interface="io.subutai.common.peer.LocalPeer" />
 
-  <!--
-    <service ref="messageResponseListener" interface="io.subutai.core.messenger.api.MessageListener" />
-  -->
-
-  <service ref="localPeer" interface="io.subutai.core.peer.api.LocalPeer" />
-
-  <!--
-    <service ref="messageRequestListener" interface="io.subutai.core.messenger.api.MessageListener" />
-  -->
+  <service ref="messageRequestListener" interface="io.subutai.core.messenger.api.MessageListener" />
 
 </blueprint>

@@ -13,7 +13,6 @@ import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.creation.steps.*;
 import io.subutai.core.network.api.NetworkManager;
-import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registry.api.TemplateRegistry;
 

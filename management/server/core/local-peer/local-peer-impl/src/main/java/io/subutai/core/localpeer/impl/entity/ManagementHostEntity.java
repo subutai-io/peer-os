@@ -55,7 +55,7 @@ import io.subutai.core.localpeer.impl.tasks.ReserveVniTask;
 import io.subutai.core.localpeer.impl.tasks.SetupTunnelsTask;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
-import io.subutai.core.peer.api.ManagementHost;
+import io.subutai.common.peer.ManagementHost;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.core.repository.api.RepositoryException;
 import io.subutai.core.repository.api.RepositoryManager;

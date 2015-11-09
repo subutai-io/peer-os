@@ -9,7 +9,6 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.N2NConfig;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
-import io.subutai.core.peer.api.LocalPeer;
 
 
 public class CleanupN2NStep

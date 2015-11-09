@@ -2,7 +2,6 @@ package io.subutai.core.localpeer.rest;
 
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -22,7 +21,6 @@ import com.google.common.base.Strings;
 import com.google.gson.reflect.TypeToken;
 
 import io.subutai.common.host.HostInterfaces;
-import io.subutai.common.metric.HostMetric;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
@@ -37,9 +35,7 @@ import io.subutai.common.quota.RamQuota;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
-import io.subutai.core.metric.api.Monitor;
-import io.subutai.core.peer.api.LocalPeer;
-import io.subutai.core.peer.api.PeerManager;
+import io.subutai.common.peer.LocalPeer;
 
 
 public class RestServiceImpl implements RestService

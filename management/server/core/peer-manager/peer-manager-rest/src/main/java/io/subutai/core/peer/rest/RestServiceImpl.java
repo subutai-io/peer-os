@@ -2,7 +2,6 @@ package io.subutai.core.peer.rest;
 
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -38,8 +37,7 @@ import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.metric.api.Monitor;
-import io.subutai.core.peer.api.LocalPeer;
-import io.subutai.core.peer.api.PeerManager;
+import io.subutai.common.peer.LocalPeer;
 
 
 public class RestServiceImpl implements RestService

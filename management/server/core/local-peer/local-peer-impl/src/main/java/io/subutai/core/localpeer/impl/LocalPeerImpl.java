@@ -48,6 +48,7 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
+import io.subutai.common.environment.ContainersDestructionResultImpl;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
@@ -69,9 +70,13 @@ import io.subutai.common.peer.ContainersDestructionResult;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
+import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.peer.ManagementHost;
+import io.subutai.common.peer.Payload;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
+import io.subutai.common.peer.RequestListener;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.protocol.Disposable;
@@ -97,8 +102,6 @@ import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.localpeer.impl.command.CommandRequestListener;
-import io.subutai.core.localpeer.impl.command.CommandResponseListener;
-import io.subutai.core.localpeer.impl.container.ContainersDestructionResultImpl;
 import io.subutai.core.localpeer.impl.container.CreateContainerWrapperTask;
 import io.subutai.core.localpeer.impl.container.CreateEnvironmentContainerGroupRequestListener;
 import io.subutai.core.localpeer.impl.container.DestroyContainerWrapperTask;
@@ -114,10 +117,6 @@ import io.subutai.core.localpeer.impl.entity.TunnelEntity;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
-import io.subutai.core.peer.api.LocalPeer;
-import io.subutai.core.peer.api.ManagementHost;
-import io.subutai.core.peer.api.Payload;
-import io.subutai.core.peer.api.RequestListener;
 import io.subutai.core.registry.api.TemplateRegistry;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
@@ -155,7 +154,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     protected ExceptionUtil exceptionUtil = new ExceptionUtil();
     protected Set<RequestListener> requestListeners = Sets.newHashSet();
     protected PeerInfo peerInfo;
-    protected CommandResponseListener commandResponseListener;
     private SecurityManager securityManager;
 
 
@@ -194,8 +192,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         //add command request listener
         addRequestListener( new CommandRequestListener() );
         //add command response listener
-        commandResponseListener = new CommandResponseListener();
-        addRequestListener( commandResponseListener );
+
         //add create container requests listener
         addRequestListener( new CreateEnvironmentContainerGroupRequestListener( this ) );
         //add destroy environment containers requests listener

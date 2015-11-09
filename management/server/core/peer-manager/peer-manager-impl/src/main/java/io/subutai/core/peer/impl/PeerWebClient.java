@@ -24,7 +24,6 @@ import io.subutai.common.network.Vni;
 import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
-import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.N2NConfig;

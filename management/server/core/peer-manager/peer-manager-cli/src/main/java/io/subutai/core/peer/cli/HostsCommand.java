@@ -11,8 +11,8 @@ import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
-import io.subutai.core.peer.api.LocalPeer;
-import io.subutai.core.peer.api.ManagementHost;
+import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.peer.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.common.peer.ResourceHost;
 

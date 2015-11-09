@@ -2,23 +2,12 @@ package io.subutai.core.peer.api;
 
 
 import java.util.List;
-import java.util.Set;
 
-import io.subutai.common.host.ContainerHostState;
-import io.subutai.common.host.HostInterfaces;
-import io.subutai.common.metric.ProcessResourceUsage;
-import io.subutai.common.metric.ResourceHostMetrics;
-import io.subutai.common.network.Gateway;
-import io.subutai.common.network.Vni;
-import io.subutai.common.peer.ContainerId;
-import io.subutai.common.peer.EnvironmentId;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.RegistrationData;
-import io.subutai.common.protocol.N2NConfig;
-import io.subutai.common.protocol.Template;
-import io.subutai.common.security.PublicKeyContainer;
 
 
 public interface PeerManager

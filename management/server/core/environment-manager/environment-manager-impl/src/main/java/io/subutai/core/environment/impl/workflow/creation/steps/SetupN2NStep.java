@@ -30,7 +30,7 @@ import io.subutai.common.util.N2NUtil;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.entity.PeerConfImpl;
-import io.subutai.core.peer.api.LocalPeer;
+import io.subutai.common.peer.LocalPeer;
 
 
 /**

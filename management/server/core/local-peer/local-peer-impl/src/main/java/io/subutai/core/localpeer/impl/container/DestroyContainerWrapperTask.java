@@ -6,7 +6,7 @@ import java.util.concurrent.Callable;
 import com.google.common.base.Preconditions;
 
 import io.subutai.common.peer.ContainerHost;
-import io.subutai.core.peer.api.LocalPeer;
+import io.subutai.common.peer.LocalPeer;
 
 
 public class DestroyContainerWrapperTask implements Callable<ContainerHost>

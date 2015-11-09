@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.Tunnel;
-import io.subutai.core.peer.api.ManagementHost;
+import io.subutai.common.peer.ManagementHost;
 import io.subutai.core.network.api.NetworkManager;
 
 

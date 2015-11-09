@@ -30,6 +30,10 @@ import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
+import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.peer.MessageRequest;
+import io.subutai.common.peer.MessageResponse;
+import io.subutai.common.peer.Payload;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
@@ -45,17 +49,12 @@ import io.subutai.common.util.RestUtil;
 import io.subutai.core.messenger.api.Message;
 import io.subutai.core.messenger.api.MessageException;
 import io.subutai.core.messenger.api.Messenger;
-import io.subutai.core.peer.api.LocalPeer;
-import io.subutai.core.peer.api.Payload;
 import io.subutai.core.peer.impl.command.BlockingCommandCallback;
 import io.subutai.core.peer.impl.command.CommandResponseListener;
-import io.subutai.core.peer.impl.request.MessageRequest;
-import io.subutai.core.peer.impl.request.MessageResponse;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
-import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
@@ -376,15 +375,15 @@ public class RemotePeerImplTest
     }
 
 
-//    @Test
-//    public void testIsConnected() throws Exception
-//    {
-//        assertTrue( remotePeer.isConnected( containerHost.getContainerId() ) );
-//
-//        throwException();
-//
-//        //assertFalse( remotePeer.isConnected( containerHost ) );
-//    }
+    //    @Test
+    //    public void testIsConnected() throws Exception
+    //    {
+    //        assertTrue( remotePeer.isConnected( containerHost.getContainerId() ) );
+    //
+    //        throwException();
+    //
+    //        //assertFalse( remotePeer.isConnected( containerHost ) );
+    //    }
 
 
     @Test( expected = PeerException.class )
