@@ -1,4 +1,4 @@
-package io.subutai.core.peer.impl.entity;
+package io.subutai.core.localpeer.impl.entity;
 
 
 import java.util.Set;
@@ -112,7 +112,7 @@ public class ResourceHostEntityTest
 
         resourceHostEntity = new ResourceHostEntity( PEER_ID, hostInfo );
         resourceHostEntity.setHostRegistry( hostRegistry );
-        resourceHostEntity.setMonitor( monitor );
+//        resourceHostEntity.setMonitor( monitor );
         resourceHostEntity.setRegistry( registry );
         resourceHostEntity.setPeer( peer );
         resourceHostEntity.singleThreadExecutorService = singleThreadExecutorService;

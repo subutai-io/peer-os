@@ -1,9 +1,8 @@
-package io.subutai.core.peer.impl;
+package io.subutai.core.localpeer.impl;
 
 
 import org.junit.Test;
 
-import io.subutai.core.peer.impl.RecipientType;
 
 
 public class RecipientTypeTest

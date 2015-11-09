@@ -1,4 +1,4 @@
-package io.subutai.core.peer.impl;
+package io.subutai.core.localpeer.impl;
 
 
 import java.util.HashMap;
@@ -52,18 +52,17 @@ import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.http.manager.api.HttpContextManager;
 import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.localpeer.impl.dao.ManagementHostDataService;
+import io.subutai.core.localpeer.impl.dao.ResourceHostDataService;
+import io.subutai.core.localpeer.impl.entity.ContainerHostEntity;
+import io.subutai.core.localpeer.impl.entity.ManagementHostEntity;
+import io.subutai.core.localpeer.impl.entity.ResourceHostEntity;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.peer.api.Payload;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.peer.api.RequestListener;
-import io.subutai.core.peer.impl.dao.ManagementHostDataService;
-import io.subutai.core.peer.impl.dao.PeerDAO;
-import io.subutai.core.peer.impl.dao.ResourceHostDataService;
-import io.subutai.core.peer.impl.entity.ContainerHostEntity;
-import io.subutai.core.peer.impl.entity.ManagementHostEntity;
-import io.subutai.core.peer.impl.entity.ResourceHostEntity;
 import io.subutai.core.registry.api.TemplateRegistry;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.KeyManager;
@@ -265,7 +264,7 @@ public class LocalPeerImplTest
     {
         doReturn( managementHostDataService ).when( localPeer ).createManagementHostDataService();
         doReturn( resourceHostDataService ).when( localPeer ).createResourceHostDataService();
-        doNothing().when( localPeer ).initPeerInfo( any( PeerDAO.class ) );
+//        doNothing().when( localPeer ).initPeerInfo( any( PeerDAO.class ) );
 
         localPeer.init();
     }

@@ -1,4 +1,4 @@
-package io.subutai.core.peer.impl.command;
+package io.subutai.core.localpeer.impl.command;
 
 
 import java.util.UUID;
@@ -8,10 +8,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import io.subutai.core.peer.impl.command.CommandResponse;
-import io.subutai.core.peer.impl.command.CommandResultImpl;
-import io.subutai.core.peer.impl.command.ResponseImpl;
 
 import static junit.framework.TestCase.assertEquals;
 

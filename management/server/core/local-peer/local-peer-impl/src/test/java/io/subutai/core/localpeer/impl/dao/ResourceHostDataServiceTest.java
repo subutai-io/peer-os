@@ -1,4 +1,4 @@
-package io.subutai.core.peer.impl.dao;
+package io.subutai.core.localpeer.impl.dao;
 
 
 import javax.persistence.EntityManager;
@@ -12,8 +12,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import io.subutai.core.peer.impl.dao.ResourceHostDataService;
-import io.subutai.core.peer.impl.entity.ResourceHostEntity;
+
+import io.subutai.core.localpeer.impl.entity.ResourceHostEntity;
 
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
