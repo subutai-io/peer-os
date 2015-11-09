@@ -125,8 +125,8 @@ public class RolesTab extends CustomComponent implements TabCallback<BeanItem<Ro
         switch ( state )
         {
             case STATE_EXISTING_ENTITY_SELECTED:
-            	form = new RoleForm (this);
-            	form.setRole (setRole);
+            	form = new RoleForm (this, identityManager );
+            	form.setRole (setRole,false);
                 newBean.setEnabled(false);
 				UI.getCurrent().addWindow (form);
 				rolesTable.setEnabled(false);
@@ -143,12 +143,11 @@ public class RolesTab extends CustomComponent implements TabCallback<BeanItem<Ro
                 rolesTable.setEnabled( true );
                 break;
             case STATE_NEW_ENTITY:
-				form = new RoleForm (this);
-				form.setRole (setRole);
+				form = new RoleForm (this,identityManager);
+                form.setRole (setRole,true);
 				UI.getCurrent().addWindow(form);
                 newBean.setEnabled( false );
                 rolesTable.setEnabled( false );
-                //                rolesTable.select( null );
                 break;
             case STATE_CANCEL:
                 form.close();
@@ -180,7 +179,7 @@ public class RolesTab extends CustomComponent implements TabCallback<BeanItem<Ro
     {
         if ( !newValue )
         {
-            //identityManager.deleteRole( value.getBean() );
+            identityManager.removeRole( value.getBean().getId() );
             beans.removeItem( value.getBean() );
         }
         refreshControls( FormState.STATE_REMOVE_ENTITY );
