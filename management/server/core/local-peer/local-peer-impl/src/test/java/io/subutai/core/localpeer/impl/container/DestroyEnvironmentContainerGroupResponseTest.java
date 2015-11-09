@@ -11,6 +11,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import com.google.common.collect.Sets;
 
+import io.subutai.common.environment.DestroyEnvironmentContainerGroupResponse;
 import io.subutai.common.peer.ContainerHost;
 
 import static junit.framework.TestCase.assertEquals;

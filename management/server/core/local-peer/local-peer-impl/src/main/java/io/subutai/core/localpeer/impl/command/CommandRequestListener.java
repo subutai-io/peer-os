@@ -1,29 +1,29 @@
 package io.subutai.core.localpeer.impl.command;
 
 
-import java.util.Map;
-
 import javax.naming.NamingException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Maps;
-
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
+import io.subutai.common.command.CommandRequest;
+import io.subutai.common.command.CommandResponse;
 import io.subutai.common.command.CommandResult;
+import io.subutai.common.command.CommandResultImpl;
 import io.subutai.common.command.Response;
+import io.subutai.common.command.ResponseImpl;
 import io.subutai.common.peer.Host;
+import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.peer.Payload;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.RequestListener;
+import io.subutai.common.peer.Timeouts;
 import io.subutai.common.util.ServiceLocator;
-import io.subutai.core.localpeer.impl.RecipientType;
-import io.subutai.core.localpeer.impl.Timeouts;
-import io.subutai.core.peer.api.LocalPeer;
-import io.subutai.core.peer.api.Payload;
+import io.subutai.common.peer.RecipientType;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.core.peer.api.RequestListener;
 
 
 public class CommandRequestListener extends RequestListener
@@ -97,15 +97,10 @@ public class CommandRequestListener extends RequestListener
         {
             try
             {
-                //*********construct Secure Header ****************************
-                Map<String, String> headers = Maps.newHashMap();
-                //**************************************************************************
-
-
                 sourcePeer.sendRequest(
                         new CommandResponse( commandRequest.getRequestId(), new ResponseImpl( response ),
                                 new CommandResultImpl( commandResult ) ), RecipientType.COMMAND_RESPONSE.name(),
-                        Timeouts.COMMAND_REQUEST_MESSAGE_TIMEOUT, headers );
+                        Timeouts.COMMAND_REQUEST_MESSAGE_TIMEOUT, null );
             }
             catch ( PeerException e )
             {

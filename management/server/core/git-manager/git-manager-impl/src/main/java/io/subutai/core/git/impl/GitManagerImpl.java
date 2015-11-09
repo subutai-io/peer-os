@@ -20,7 +20,7 @@ import io.subutai.core.git.api.GitChangedFile;
 import io.subutai.core.git.api.GitException;
 import io.subutai.core.git.api.GitFileStatus;
 import io.subutai.core.git.api.GitManager;
-import io.subutai.core.peer.api.ManagementHost;
+import io.subutai.common.peer.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
 
 import com.google.common.base.Preconditions;

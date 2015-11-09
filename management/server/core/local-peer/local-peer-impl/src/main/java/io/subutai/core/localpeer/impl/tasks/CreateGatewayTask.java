@@ -8,7 +8,7 @@ import io.subutai.common.network.Gateway;
 import io.subutai.common.peer.PeerException;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
-import io.subutai.core.peer.api.ManagementHost;
+import io.subutai.common.peer.ManagementHost;
 
 
 public class CreateGatewayTask implements Callable<Boolean>

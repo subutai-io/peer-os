@@ -13,8 +13,8 @@ import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.test.SystemOutRedirectTest;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
-import io.subutai.core.peer.api.LocalPeer;
-import io.subutai.core.peer.api.ManagementHost;
+import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.peer.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.common.peer.ResourceHost;
 

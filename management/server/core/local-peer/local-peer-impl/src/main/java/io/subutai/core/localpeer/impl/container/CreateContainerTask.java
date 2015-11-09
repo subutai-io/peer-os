@@ -21,7 +21,7 @@ import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.NumUtil;
-import io.subutai.core.peer.api.ContainerCreationException;
+import io.subutai.common.peer.ContainerCreationException;
 
 
 public class CreateContainerTask implements Callable<ContainerHost>

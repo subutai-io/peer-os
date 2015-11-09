@@ -12,16 +12,18 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
+import io.subutai.common.command.CommandRequest;
+import io.subutai.common.command.CommandResponse;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.command.Response;
 import io.subutai.common.peer.Host;
+import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.peer.Payload;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
-import io.subutai.core.localpeer.impl.RecipientType;
-import io.subutai.core.localpeer.impl.Timeouts;
-import io.subutai.core.peer.api.LocalPeer;
-import io.subutai.core.peer.api.Payload;
+import io.subutai.common.peer.RecipientType;
+import io.subutai.common.peer.Timeouts;
 import io.subutai.core.peer.api.PeerManager;
 
 import static org.mockito.Matchers.any;

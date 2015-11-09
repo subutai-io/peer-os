@@ -23,7 +23,7 @@ import io.subutai.core.messenger.api.Message;
 import io.subutai.core.messenger.api.MessageException;
 import io.subutai.core.messenger.api.MessageListener;
 import io.subutai.core.messenger.api.MessageStatus;
-import io.subutai.core.peer.api.LocalPeer;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.core.peer.api.PeerManager;
 
 import static junit.framework.Assert.assertEquals;

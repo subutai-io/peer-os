@@ -7,16 +7,19 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.subutai.common.cache.ExpiringCache;
+import io.subutai.common.peer.MessageRequest;
+import io.subutai.common.peer.MessageResponse;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.RecipientType;
 import io.subutai.common.protocol.Disposable;
 import io.subutai.core.messenger.api.Message;
 import io.subutai.core.messenger.api.MessageListener;
 import io.subutai.core.messenger.api.MessageStatus;
 import io.subutai.core.messenger.api.Messenger;
-import io.subutai.core.peer.impl.RecipientType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 public class MessageResponseListener extends MessageListener implements Disposable

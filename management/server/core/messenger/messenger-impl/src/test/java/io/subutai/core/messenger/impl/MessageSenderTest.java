@@ -21,7 +21,7 @@ import com.google.common.collect.Sets;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.util.RestUtil;
-import io.subutai.core.peer.api.LocalPeer;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.core.peer.api.PeerManager;
 
 import static org.mockito.Matchers.anyString;

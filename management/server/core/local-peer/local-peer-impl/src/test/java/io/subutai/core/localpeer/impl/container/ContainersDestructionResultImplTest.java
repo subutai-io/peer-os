@@ -9,6 +9,7 @@ import org.mockito.Mock;
 
 import com.google.common.collect.Sets;
 
+import io.subutai.common.environment.ContainersDestructionResultImpl;
 import io.subutai.common.peer.ContainerHost;
 
 import static junit.framework.TestCase.assertEquals;

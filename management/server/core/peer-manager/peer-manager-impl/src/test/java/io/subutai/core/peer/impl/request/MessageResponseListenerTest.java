@@ -13,6 +13,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import io.subutai.common.cache.ExpiringCache;
+import io.subutai.common.peer.MessageRequest;
+import io.subutai.common.peer.MessageResponse;
 import io.subutai.common.peer.PeerException;
 import io.subutai.core.messenger.api.Message;
 import io.subutai.core.messenger.api.MessageException;

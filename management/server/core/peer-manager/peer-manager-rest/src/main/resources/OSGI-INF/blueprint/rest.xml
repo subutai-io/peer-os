@@ -55,7 +55,7 @@
   </bean>
 
   <reference id="localPeer" availability="mandatory"
-             interface="io.subutai.core.peer.api.LocalPeer" />
+             interface="io.subutai.common.peer.LocalPeer" />
 
   <reference id="peerManager" availability="mandatory"
              interface="io.subutai.core.peer.api.PeerManager" />

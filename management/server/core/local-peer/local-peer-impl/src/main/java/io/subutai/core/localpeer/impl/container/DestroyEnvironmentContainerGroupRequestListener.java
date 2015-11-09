@@ -4,11 +4,13 @@ package io.subutai.core.localpeer.impl.container;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.subutai.common.environment.DestroyEnvironmentContainerGroupRequest;
+import io.subutai.common.environment.DestroyEnvironmentContainerGroupResponse;
 import io.subutai.common.peer.ContainersDestructionResult;
-import io.subutai.core.peer.api.LocalPeer;
-import io.subutai.core.localpeer.impl.RecipientType;
-import io.subutai.core.peer.api.Payload;
-import io.subutai.core.peer.api.RequestListener;
+import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.peer.RecipientType;
+import io.subutai.common.peer.Payload;
+import io.subutai.common.peer.RequestListener;
 
 
 public class DestroyEnvironmentContainerGroupRequestListener extends RequestListener

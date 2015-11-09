@@ -6,6 +6,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import io.subutai.common.environment.CreateEnvironmentContainerGroupResponse;
 import io.subutai.common.host.HostInfoModel;
 
 import com.google.common.collect.Sets;

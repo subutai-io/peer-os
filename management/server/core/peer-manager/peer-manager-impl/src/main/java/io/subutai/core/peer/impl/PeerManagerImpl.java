@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.security.PermitAll;
-import javax.annotation.security.RolesAllowed;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +18,8 @@ import com.google.common.collect.Lists;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.peer.Encrypted;
+import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.peer.ManagementHost;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
@@ -28,18 +29,11 @@ import io.subutai.common.peer.RegistrationStatus;
 import io.subutai.common.settings.ChannelSettings;
 import io.subutai.common.util.SecurityUtilities;
 import io.subutai.core.messenger.api.Messenger;
-import io.subutai.core.peer.api.LocalPeer;
-import io.subutai.core.peer.api.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.peer.api.RegistrationClient;
-import io.subutai.core.peer.api.RequestListener;
-import io.subutai.core.peer.impl.command.CommandRequestListener;
 import io.subutai.core.peer.impl.command.CommandResponseListener;
-import io.subutai.core.peer.impl.container.CreateEnvironmentContainerGroupRequestListener;
-import io.subutai.core.peer.impl.container.DestroyEnvironmentContainerGroupRequestListener;
 import io.subutai.core.peer.impl.dao.PeerDAO;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
-import io.subutai.core.registry.api.TemplateRegistry;
 import io.subutai.core.security.api.SecurityManager;
 
 
@@ -51,7 +45,6 @@ public class PeerManagerImpl implements PeerManager
 {
     private static final Logger LOG = LoggerFactory.getLogger( PeerManagerImpl.class );
 
-    private TemplateRegistry templateRegistry;
 
     protected PeerDAO peerDAO;
     protected LocalPeer localPeer;
@@ -65,8 +58,8 @@ public class PeerManagerImpl implements PeerManager
 
 
     public PeerManagerImpl( final Messenger messenger, LocalPeer localPeer, DaoManager daoManager,
-                            MessageResponseListener messageResponseListener, TemplateRegistry templateRegistry,
-                            SecurityManager securityManager, Object provider )
+                            MessageResponseListener messageResponseListener, SecurityManager securityManager,
+                            Object provider )
     {
         this.messenger = messenger;
         this.localPeer = localPeer;
@@ -74,7 +67,9 @@ public class PeerManagerImpl implements PeerManager
         this.messageResponseListener = messageResponseListener;
         this.securityManager = securityManager;
         this.provider = provider;
-        this.templateRegistry = templateRegistry;
+        //todo expose CommandResponseListener as service "RequestListener" and inject here
+        commandResponseListener = new CommandResponseListener();
+        localPeer.addRequestListener( commandResponseListener );
     }
 
 
@@ -88,16 +83,6 @@ public class PeerManagerImpl implements PeerManager
         {
             LOG.error( "Error initializing peer dao", e );
         }
-
-        //add command request listener
-        addRequestListener( new CommandRequestListener( localPeer, this ) );
-        //add command response listener
-        commandResponseListener = new CommandResponseListener();
-        addRequestListener( commandResponseListener );
-        //add create container requests listener
-        addRequestListener( new CreateEnvironmentContainerGroupRequestListener( localPeer ) );
-        //add destroy environment containers requests listener
-        addRequestListener( new DestroyEnvironmentContainerGroupRequestListener( localPeer ) );
     }
 
 
@@ -107,12 +92,12 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-//    @RolesAllowed( "Peer-Management|A|Write" )
-//    @Override
-//    public boolean register( final PeerInfo peerInfo )
-//    {
-//        return peerDAO.saveInfo( SOURCE_REMOTE_PEER, peerInfo.getId(), peerInfo );
-//    }
+    //    @RolesAllowed( "Peer-Management|A|Write" )
+    //    @Override
+    //    public boolean register( final PeerInfo peerInfo )
+    //    {
+    //        return peerDAO.saveInfo( SOURCE_REMOTE_PEER, peerInfo.getId(), peerInfo );
+    //    }
 
 
     private void register( final String keyPhrase, final RegistrationData registrationData ) throws PeerException
@@ -450,18 +435,6 @@ public class PeerManagerImpl implements PeerManager
     public PeerInfo getLocalPeerInfo()
     {
         return localPeer.getPeerInfo();
-    }
-
-
-    public void addRequestListener( RequestListener listener )
-    {
-        localPeer.addRequestListener( listener );
-    }
-
-
-    public void removeRequestListener( RequestListener listener )
-    {
-        localPeer.removeRequestListener( listener );
     }
 
 

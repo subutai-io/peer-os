@@ -3,6 +3,7 @@ package io.subutai.core.localpeer.impl;
 
 import org.junit.Test;
 
+import io.subutai.common.peer.RecipientType;
 
 
 public class RecipientTypeTest

@@ -19,20 +19,19 @@ import io.subutai.common.dao.DaoManager;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.PeerPolicy;
+import io.subutai.common.peer.RequestListener;
 import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.localpeer.impl.LocalPeerImpl;
 import io.subutai.core.localpeer.impl.entity.ManagementHostEntity;
+import io.subutai.core.localpeer.impl.request.MessageRequestListener;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.messenger.api.Messenger;
 import io.subutai.core.metric.api.Monitor;
-import io.subutai.core.peer.api.RequestListener;
 import io.subutai.core.peer.impl.command.CommandResponseListener;
 import io.subutai.core.peer.impl.dao.PeerDAO;
-import io.subutai.core.peer.impl.request.MessageRequestListener;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
-import io.subutai.core.registry.api.TemplateRegistry;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.strategy.api.StrategyManager;
 
@@ -63,8 +62,7 @@ public class PeerManagerImplTest
     QuotaManager quotaManager;
     @Mock
     Monitor monitor;
-    @Mock
-    TemplateRegistry templateRegistry;
+
     @Mock
     CommandExecutor commandExecutor;
     @Mock
@@ -103,8 +101,8 @@ public class PeerManagerImplTest
     public void setUp() throws Exception
     {
         peerManager =
-                spy( new PeerManagerImpl( messenger, localPeer, daoManager, messageResponseListener, templateRegistry,
-                        securityManager, null ) );
+                spy( new PeerManagerImpl( messenger, localPeer, daoManager, messageResponseListener, securityManager,
+                        null ) );
 
 
         peerManager.commandResponseListener = commandResponseListener;
@@ -229,23 +227,5 @@ public class PeerManagerImplTest
     public void testGetLocalPeerInfo() throws Exception
     {
         assertEquals( peerInfo, peerManager.getLocalPeerInfo() );
-    }
-
-
-    @Test
-    public void testAddRequestListener() throws Exception
-    {
-        peerManager.addRequestListener( requestListener );
-
-        verify( localPeer ).addRequestListener( requestListener );
-    }
-
-
-    @Test
-    public void testRemoveListener() throws Exception
-    {
-        peerManager.removeRequestListener( requestListener );
-
-        verify( localPeer ).removeRequestListener( requestListener );
     }
 }

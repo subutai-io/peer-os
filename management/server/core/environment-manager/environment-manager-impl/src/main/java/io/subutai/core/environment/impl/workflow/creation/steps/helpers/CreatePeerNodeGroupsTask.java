@@ -14,7 +14,7 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.exception.NodeGroupBuildException;
-import io.subutai.core.peer.api.LocalPeer;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.core.registry.api.TemplateRegistry;
 
 
