@@ -22,13 +22,14 @@ import io.subutai.common.peer.PeerPolicy;
 import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.localpeer.impl.LocalPeerImpl;
+import io.subutai.core.localpeer.impl.entity.ManagementHostEntity;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.messenger.api.Messenger;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.peer.api.RequestListener;
 import io.subutai.core.peer.impl.command.CommandResponseListener;
 import io.subutai.core.peer.impl.dao.PeerDAO;
-import io.subutai.core.peer.impl.entity.ManagementHostEntity;
 import io.subutai.core.peer.impl.request.MessageRequestListener;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
 import io.subutai.core.registry.api.TemplateRegistry;
@@ -102,8 +103,8 @@ public class PeerManagerImplTest
     public void setUp() throws Exception
     {
         peerManager =
-                spy( new PeerManagerImpl( messenger, localPeer, daoManager, messageResponseListener, securityManager,
-                        null ) );
+                spy( new PeerManagerImpl( messenger, localPeer, daoManager, messageResponseListener, templateRegistry,
+                        securityManager, null ) );
 
 
         peerManager.commandResponseListener = commandResponseListener;
@@ -135,15 +136,6 @@ public class PeerManagerImplTest
         peerManager.destroy();
 
         verify( commandResponseListener ).dispose();
-    }
-
-
-    @Test
-    public void testRegister() throws Exception
-    {
-        peerManager.register( peerInfo );
-
-        verify( peerDAO ).saveInfo( anyString(), anyString(), eq( peerInfo ) );
     }
 
 

@@ -1,4 +1,4 @@
-package io.subutai.core.peer.impl.tasks;
+package io.subutai.core.localpeer.impl.tasks;
 
 
 import org.junit.Before;

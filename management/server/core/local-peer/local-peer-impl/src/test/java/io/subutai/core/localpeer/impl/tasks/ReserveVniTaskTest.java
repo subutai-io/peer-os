@@ -1,4 +1,4 @@
-package io.subutai.core.peer.impl.tasks;
+package io.subutai.core.localpeer.impl.tasks;
 
 
 import java.util.UUID;
@@ -10,8 +10,8 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import io.subutai.common.network.Vni;
+import io.subutai.core.localpeer.impl.entity.ManagementHostEntity;
 import io.subutai.core.network.api.NetworkManager;
-import io.subutai.core.peer.impl.entity.ManagementHostEntity;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
