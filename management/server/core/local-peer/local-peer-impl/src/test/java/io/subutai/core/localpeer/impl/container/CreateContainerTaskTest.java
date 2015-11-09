@@ -1,4 +1,4 @@
-package io.subutai.core.peer.impl.container;
+package io.subutai.core.localpeer.impl.container;
 
 
 import java.util.UUID;
@@ -19,6 +19,7 @@ import io.subutai.common.protocol.Template;
 import io.subutai.common.settings.Common;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
+import io.subutai.core.localpeer.impl.container.CreateContainerTask;
 
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;

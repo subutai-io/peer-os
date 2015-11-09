@@ -1,4 +1,4 @@
-package io.subutai.core.peer.impl.container;
+package io.subutai.core.localpeer.impl.container;
 
 
 import java.util.UUID;

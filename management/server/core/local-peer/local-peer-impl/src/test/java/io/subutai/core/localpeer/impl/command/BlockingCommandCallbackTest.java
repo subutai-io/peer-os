@@ -1,4 +1,4 @@
-package io.subutai.core.peer.impl.command;
+package io.subutai.core.localpeer.impl.command;
 
 
 import java.util.concurrent.Semaphore;

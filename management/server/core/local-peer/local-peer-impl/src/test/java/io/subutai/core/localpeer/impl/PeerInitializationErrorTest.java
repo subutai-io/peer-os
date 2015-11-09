@@ -1,4 +1,4 @@
-package io.subutai.core.peer.impl;
+package io.subutai.core.localpeer.impl;
 
 
 import org.junit.Before;
@@ -7,7 +7,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import io.subutai.core.peer.impl.PeerInitializationError;
 
 import static junit.framework.TestCase.assertEquals;
 
@@ -19,13 +18,13 @@ public class PeerInitializationErrorTest
     @Mock
     RuntimeException cause;
 
-    PeerInitializationError error;
+    LocalPeerInitializationError error;
 
 
     @Before
     public void setUp() throws Exception
     {
-        error = new PeerInitializationError( ERR_MSG, cause );
+        error = new LocalPeerInitializationError( ERR_MSG, cause );
     }
 
 

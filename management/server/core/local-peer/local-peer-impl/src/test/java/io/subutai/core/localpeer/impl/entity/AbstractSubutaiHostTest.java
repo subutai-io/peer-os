@@ -1,4 +1,4 @@
-package io.subutai.core.peer.impl.entity;
+package io.subutai.core.localpeer.impl.entity;
 
 
 import java.util.UUID;
@@ -17,6 +17,7 @@ import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.Interface;
 import io.subutai.common.peer.Peer;
+import io.subutai.core.localpeer.impl.entity.AbstractSubutaiHost;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;

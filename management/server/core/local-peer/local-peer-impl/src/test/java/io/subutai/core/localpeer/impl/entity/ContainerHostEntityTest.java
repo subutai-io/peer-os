@@ -1,4 +1,4 @@
-package io.subutai.core.peer.impl.entity;
+package io.subutai.core.localpeer.impl.entity;
 
 
 import java.util.Set;
