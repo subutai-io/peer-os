@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import io.subutai.common.environment.Blueprint;
 import io.subutai.common.environment.ContainerDistributionType;
+import io.subutai.common.environment.ContainerType;
 import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.protocol.PlacementStrategy;
 import io.subutai.common.util.CollectionUtil;
@@ -16,6 +17,7 @@ import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registry.api.TemplateRegistry;
+import io.subutai.core.strategy.api.StrategyManager;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
@@ -52,6 +54,7 @@ public class BlueprintForm
     private final EnvironmentManager environmentManager;
     private final PeerManager peerManager;
     private final TemplateRegistry templateRegistry;
+    private final StrategyManager strategyManager;
     private TextArea blueprintTxtArea;
     private Table blueprintsTable;
     private Gson gson =
@@ -59,11 +62,12 @@ public class BlueprintForm
 
 
     public BlueprintForm( EnvironmentManager environmentManager, PeerManager peerManager,
-                          TemplateRegistry templateRegistry )
+                          TemplateRegistry templateRegistry, StrategyManager strategyManager)
     {
         this.environmentManager = environmentManager;
         this.peerManager = peerManager;
         this.templateRegistry = templateRegistry;
+        this.strategyManager = strategyManager;
         contentRoot = new VerticalLayout();
 
         contentRoot.setSpacing( true );
@@ -235,7 +239,7 @@ public class BlueprintForm
 
     private void buildBlueprint( Blueprint blueprint, boolean grow )
     {
-        contentRoot.getUI().addWindow( new TopologyWindow( blueprint, peerManager, environmentManager, grow ) );
+        contentRoot.getUI().addWindow( new TopologyWindow( blueprint, peerManager, environmentManager, strategyManager, grow ) );
     }
 
 
@@ -265,8 +269,7 @@ public class BlueprintForm
 
     private Blueprint getSampleBlueprint()
     {
-        NodeGroup nodeGroup =
-                new NodeGroup( "Sample node group", "master", 2, 0, 0, new PlacementStrategy( "ROUND_ROBIN" ) );
+        NodeGroup nodeGroup = new NodeGroup( "Sample node group", "master", ContainerType.TINY, 2, 0, 0 );
         return new Blueprint( "Sample blueprint", Sets.newHashSet( nodeGroup ) );
     }
 
@@ -330,12 +333,6 @@ public class BlueprintForm
                             Notification
                                     .show( String.format( "Template %s does not exist", nodeGroup.getTemplateName() ),
                                             Notification.Type.ERROR_MESSAGE );
-                            return;
-                        }
-                        else if ( nodeGroup.getContainerPlacementStrategy() == null )
-                        {
-                            Notification.show( "Invalid node container placement strategy",
-                                    Notification.Type.ERROR_MESSAGE );
                             return;
                         }
                     }

@@ -126,7 +126,7 @@ public class RegistrationForm extends CustomComponent
         requestsTable.addContainerProperty( "ID", String.class, "UNKNOWN" );
         requestsTable.addContainerProperty( "Name", String.class, null );
         requestsTable.addContainerProperty( "Host", String.class, null );
-//        requestsTable.addContainerProperty( "Key phrase", String.class, null );
+        //        requestsTable.addContainerProperty( "Key phrase", String.class, null );
         requestsTable.addContainerProperty( "Status", RegistrationStatus.class, null );
         requestsTable.addContainerProperty( "Action", RequestActionsComponent.class, null );
 
@@ -184,11 +184,13 @@ public class RegistrationForm extends CustomComponent
             };
             RequestActionsComponent actionsComponent =
                     new RequestActionsComponent( module, registrationData, listener );
+
+            String rowId = registrationData.getPeerInfo().getId();
             requestsTable.addItem( new Object[] {
                     registrationData.getPeerInfo().getId(), registrationData.getPeerInfo().getName(),
-                    registrationData.getPeerInfo().getIp(),/* registrationData.getKeyPhrase(),*/
-                    registrationData.getStatus(), actionsComponent
-            }, registrationData.getPeerInfo().getId() );
+                    registrationData.getPeerInfo().getIp(), registrationData.getStatus(), actionsComponent
+            }, rowId );
+            LOG.debug( String.format( "Size: %d. %s", requestsTable.size(), rowId ) );
         }
     }
 
