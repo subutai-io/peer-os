@@ -7,6 +7,8 @@ import java.util.Set;
 
 import javax.ws.rs.core.MediaType;
 
+import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +47,7 @@ public class PeerWebClient
     public PeerWebClient( final String host, final Object provider )
     {
         this.host = host;
-        this.provider = provider;
+        this.provider = new JacksonJsonProvider();
     }
 
 
