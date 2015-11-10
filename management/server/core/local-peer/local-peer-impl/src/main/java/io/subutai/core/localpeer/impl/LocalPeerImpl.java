@@ -186,7 +186,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         LOG.debug( "********************************************** Initializing peer "
                 + "******************************************" );
 
-
         //add command request listener
         addRequestListener( new CommandRequestListener() );
         //add command response listener
@@ -197,25 +196,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         addRequestListener( new DestroyEnvironmentContainerGroupRequestListener( this ) );
 
 
-        //        PeerDAO peerDAO;
         try
         {
 
             tunnelDataService = createTunnelDataService();
-
-            //                        peerDAO = new PeerDAO( daoManager );
-            //
-            //
-            //                        List<PeerInfo> result = peerDAO.getInfo( PeerManager.SOURCE_LOCAL_PEER,
-            // PeerInfo.class );
-            //                        if ( result.isEmpty() )
-            //                        {
-            //                            initPeerInfo( peerDAO );
-            //                        }
-            //                        else
-            //                        {
-            //                            peerInfo = result.get( 0 );
-            //                        }
 
             managementHostDataService = createManagementHostDataService();
             Collection<ManagementHostEntity> allManagementHostEntity = managementHostDataService.getAll();
@@ -242,8 +226,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
             for ( ResourceHost resourceHost : getResourceHosts() )
             {
-                ( ( ResourceHostEntity ) resourceHost ).init();
-
                 for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
                 {
                     LOG.debug( String.format( "%s %s", resourceHost.getHostname(), containerHost.getHostname() ) );
@@ -1146,7 +1128,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 {
                     LOG.debug( "Host not found in #onHeartbeat", e );
                     host = new ResourceHostEntity( getId(), resourceHostInfo );
-                    host.init();
                     resourceHostDataService.persist( host );
                     addResourceHost( host );
                     Set<ResourceHost> a = Sets.newHashSet();
