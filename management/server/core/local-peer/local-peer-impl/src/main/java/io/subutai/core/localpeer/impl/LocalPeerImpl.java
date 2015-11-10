@@ -512,11 +512,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         executorService.shutdown();
 
-        // updating resource host entities
-        for ( ResourceHost resourceHost : containerDistribution.keySet() )
-        {
-            resourceHostDataService.saveOrUpdate( resourceHost );
-        }
 
         return result;
     }
