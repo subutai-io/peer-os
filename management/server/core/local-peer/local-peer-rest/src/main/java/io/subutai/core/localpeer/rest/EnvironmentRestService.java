@@ -1,4 +1,4 @@
-package io.subutai.core.peer.rest;
+package io.subutai.core.localpeer.rest;
 
 
 import javax.ws.rs.Consumes;

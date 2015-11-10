@@ -89,7 +89,7 @@ public class RegistrationClientImpl implements RegistrationClient
         Response response = client.post( registrationData );
         if ( response.getStatus() != Response.Status.NO_CONTENT.getStatusCode() )
         {
-            throw new PeerException( "Error on sending un-register request: " + response.getEntity().toString() );
+            throw new PeerException( "Error on sending un-register request: " + response.readEntity( String.class ) );
         }
     }
 

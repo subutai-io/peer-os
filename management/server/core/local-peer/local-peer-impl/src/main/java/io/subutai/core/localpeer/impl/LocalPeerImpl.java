@@ -1905,6 +1905,27 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
+    @Override
+    public boolean isPeerUsed( final String peerId )
+    {
+        return findContainersByPeerId( peerId ).size() > 0;
+    }
+
+
+    private Set<ContainerHost> findContainersByPeerId( final String peerId )
+    {
+        Preconditions.checkNotNull( peerId );
+
+        Set<ContainerHost> result = new HashSet<>();
+
+        for ( ResourceHost resourceHost : resourceHosts )
+        {
+            result.addAll( resourceHost.getContainerHostsByPeerId( peerId ) );
+        }
+        return result;
+    }
+
+
     private class SetupN2NConnectionTask implements Callable<N2NConfig>
     {
         private Peer peer;

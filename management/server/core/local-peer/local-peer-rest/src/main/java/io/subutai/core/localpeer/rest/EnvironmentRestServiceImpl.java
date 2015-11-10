@@ -1,4 +1,4 @@
-package io.subutai.core.peer.rest;
+package io.subutai.core.localpeer.rest;
 
 
 import javax.ws.rs.WebApplicationException;
@@ -22,12 +22,12 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
 {
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentRestServiceImpl.class );
 
-    private LocalPeer peerManager;
+    private LocalPeer localPeer;
 
 
-    public EnvironmentRestServiceImpl( final LocalPeer peerManager )
+    public EnvironmentRestServiceImpl( final LocalPeer localPeer )
     {
-        this.peerManager = peerManager;
+        this.localPeer = localPeer;
     }
 
 
@@ -37,7 +37,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         Preconditions.checkNotNull( containerId );
         try
         {
-            peerManager.destroyContainer( containerId );
+            localPeer.destroyContainer( containerId );
         }
         catch ( Exception e )
         {
@@ -54,7 +54,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         Preconditions.checkNotNull( containerId );
         try
         {
-            peerManager.startContainer( containerId );
+            localPeer.startContainer( containerId );
         }
         catch ( Exception e )
         {
@@ -71,7 +71,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         Preconditions.checkNotNull( containerId );
         try
         {
-            peerManager.stopContainer( containerId );
+            localPeer.stopContainer( containerId );
         }
         catch ( Exception e )
         {
@@ -86,7 +86,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
     public ContainerHostState getContainerState( final ContainerId containerId )
     {
         Preconditions.checkNotNull( containerId );
-        return peerManager.getContainerState( containerId );
+        return localPeer.getContainerState( containerId );
     }
 
 
@@ -98,7 +98,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
 
         try
         {
-            return peerManager.getProcessResourceUsage( containerId, pid );
+            return localPeer.getProcessResourceUsage( containerId, pid );
         }
         catch ( Exception e )
         {

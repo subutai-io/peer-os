@@ -20,7 +20,7 @@
     </jaxrs:providers>
   </jaxrs:server>
 
-<!--
+
   <jaxrs:server address="/v1/env" id="environmentRestService">
     <jaxrs:serviceBeans>
       <ref component-id="environmentRestServiceImpl" />
@@ -30,15 +30,6 @@
     </jaxrs:providers>
   </jaxrs:server>
 
-  <jaxrs:server address="/v1/registration" id="registrationService">
-    <jaxrs:serviceBeans>
-      <ref component-id="registrationServiceImpl" />
-    </jaxrs:serviceBeans>
-    <jaxrs:providers>
-      <bean class="org.codehaus.jackson.jaxrs.JacksonJsonProvider" />
-    </jaxrs:providers>
-  </jaxrs:server>
--->
 
   <!--<bean id="jsonProvider" class="org.codehaus.jackson.jaxrs.JacksonJsonProvider" />-->
 
@@ -46,24 +37,11 @@
     <argument ref="localPeer" />
   </bean>
 
-  <!--<bean id="environmentRestServiceImpl" class="io.subutai.core.peer.rest.EnvironmentRestServiceImpl">-->
-    <!--<argument ref="peerManager" />-->
-  <!--</bean>-->
-
-  <!--<bean id="registrationServiceImpl" class="io.subutai.core.peer.rest.RegistrationServiceImpl">-->
-    <!--<argument ref="peerManager" />-->
-  <!--</bean>-->
+  <bean id="environmentRestServiceImpl" class="io.subutai.core.localpeer.rest.EnvironmentRestServiceImpl">
+    <argument ref="localPeer" />
+  </bean>
 
   <reference id="localPeer" availability="mandatory"
              interface="io.subutai.common.peer.LocalPeer" />
-
-  <reference id="monitor" availability="mandatory"
-             interface="io.subutai.core.metric.api.Monitor" />
-
-  <!--  <reference id="httpContextManager" availability="mandatory"
-               interface="io.subutai.core.http.manager.api.HttpContextManager" />
-
-    <reference id="securityManager" availability="mandatory"
-               interface="io.subutai.core.security.api.SecurityManager" />-->
 
 </blueprint>

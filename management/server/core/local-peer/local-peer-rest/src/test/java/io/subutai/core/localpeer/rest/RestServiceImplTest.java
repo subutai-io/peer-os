@@ -6,6 +6,7 @@ import java.util.UUID;
 import javax.ws.rs.core.Response;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -50,6 +51,7 @@ import static org.mockito.Mockito.when;
 
 
 @RunWith( MockitoJUnitRunner.class )
+@Ignore
 public class RestServiceImplTest
 {
     private static final String PEER_ID = UUID.randomUUID().toString();

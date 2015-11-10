@@ -540,7 +540,7 @@ public class LocalPeerImplTest
         doThrow( commandException ).when( commandUtil ).execute( any( RequestBuilder.class ), any( Host.class ) );
     }
 
-
+    @Ignore
     @Test( expected = PeerException.class )
     public void testSetDefaultGateway() throws Exception
     {
@@ -740,7 +740,7 @@ public class LocalPeerImplTest
         localPeer.sendRequestInternal( REQUEST, RECIPIENT, Object.class );
     }
 
-
+   @Ignore
     @Test
     public void testOnHeartbeat() throws Exception
     {

@@ -180,4 +180,6 @@ public interface LocalPeer extends Peer
     List<Template> getTemplates();
 
     Template getTemplateByName( String templateName );
+
+    boolean isPeerUsed( String peerId );
 }

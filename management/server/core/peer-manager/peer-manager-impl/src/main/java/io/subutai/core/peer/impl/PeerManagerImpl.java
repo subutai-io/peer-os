@@ -129,6 +129,8 @@ public class PeerManagerImpl implements PeerManager
 
     private boolean unregister( final RegistrationData registrationData ) throws PeerException
     {
+        isPeerUsed( registrationData );
+
         ManagementHost mgmHost = getLocalPeer().getManagementHost();
         PeerInfo p = getPeerInfo( registrationData.getPeerInfo().getId() );
 
@@ -153,6 +155,15 @@ public class PeerManagerImpl implements PeerManager
         //*******************************************************************
 
         return peerDAO.deleteInfo( SOURCE_REMOTE_PEER, p.getId() );
+    }
+
+
+    private void isPeerUsed( final RegistrationData registrationData ) throws PeerException
+    {
+        if ( localPeer.isPeerUsed( registrationData.getPeerInfo().getId() ) )
+        {
+            throw new PeerException( "Could not unregister peer. Peer still used." );
+        }
     }
 
 
@@ -265,6 +276,11 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public void processUnregisterRequest( final RegistrationData registrationData ) throws PeerException
     {
+        if ( localPeer.isPeerUsed( registrationData.getPeerInfo().getId() ) )
+        {
+            throw new PeerException( "Could not unregister peer. Peer still used." );
+        }
+
         PeerInfo p = getPeerInfo( registrationData.getPeerInfo().getId() );
 
         Encrypted encryptedData = registrationData.getData();
@@ -404,6 +420,11 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public void doUnregisterRequest( final RegistrationData request ) throws PeerException
     {
+        if ( localPeer.isPeerUsed( request.getPeerInfo().getId() ) )
+        {
+            throw new PeerException( "Could not unregister peer. Peer still used." );
+        }
+
         RegistrationClient registrationClient = new RegistrationClientImpl( provider );
         registrationClient.sendUnregisterRequest( request.getPeerInfo().getIp(),
                 buildRegistrationData( request.getPeerInfo().getKeyPhrase(), RegistrationStatus.UNREGISTERED ) );
