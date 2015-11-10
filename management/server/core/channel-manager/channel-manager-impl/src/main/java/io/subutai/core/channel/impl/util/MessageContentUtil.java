@@ -37,11 +37,10 @@ public class MessageContentUtil
     private static final Logger LOG = LoggerFactory.getLogger( MessageContentUtil.class );
 
 
-    public static void abortChain(Message message,int errorStatus, String error)
+    public static void abortChain( Message message, int errorStatus, String error )
     {
         HttpServletResponse response = ( HttpServletResponse ) message.getExchange().getInMessage()
-                                                                      .get( AbstractHTTPDestination
-                                                                              .HTTP_RESPONSE );
+                                                                      .get( AbstractHTTPDestination.HTTP_RESPONSE );
         try
         {
             response.setStatus( errorStatus );
@@ -55,8 +54,8 @@ public class MessageContentUtil
         }
 
         message.getInterceptorChain().abort();
-
     }
+
 
     public static int checkUrlAccessibility( final int currentStatus, final URL url, final String basePath )
     {
@@ -109,7 +108,11 @@ public class MessageContentUtil
 
             if ( data != null )
             {
+                LOG.debug( new String( data ) );
                 message.setContent( InputStream.class, new ByteArrayInputStream( data ) );
+            }
+            else {
+                LOG.warn( "Decrypted data is NULL!!!" );
             }
         }
         catch ( IOException e )
