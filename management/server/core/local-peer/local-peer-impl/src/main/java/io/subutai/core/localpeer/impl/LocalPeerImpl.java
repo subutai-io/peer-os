@@ -1119,25 +1119,28 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
             else
             {
-                ResourceHostEntity host;
-                try
+                if ( managementHost != null )
                 {
-                    host = ( ResourceHostEntity ) getResourceHostByName( resourceHostInfo.getHostname() );
-                }
-                catch ( HostNotFoundException e )
-                {
-                    LOG.debug( "Host not found in #onHeartbeat", e );
-                    host = new ResourceHostEntity( getId(), resourceHostInfo );
-                    resourceHostDataService.persist( host );
-                    addResourceHost( host );
-                    Set<ResourceHost> a = Sets.newHashSet();
-                    a.add( host );
-                    setResourceHostTransientFields( a );
-                }
-                if ( host.updateHostInfo( resourceHostInfo ) )
-                {
-                    resourceHostDataService.update( host );
-                    LOG.debug( String.format( "Resource host %s updated.", host.getId() ) );
+                    ResourceHostEntity host;
+                    try
+                    {
+                        host = ( ResourceHostEntity ) getResourceHostByName( resourceHostInfo.getHostname() );
+                    }
+                    catch ( HostNotFoundException e )
+                    {
+                        LOG.debug( "Host not found in #onHeartbeat", e );
+                        host = new ResourceHostEntity( getId(), resourceHostInfo );
+                        resourceHostDataService.persist( host );
+                        addResourceHost( host );
+                        Set<ResourceHost> a = Sets.newHashSet();
+                        a.add( host );
+                        setResourceHostTransientFields( a );
+                    }
+                    if ( host.updateHostInfo( resourceHostInfo ) )
+                    {
+                        resourceHostDataService.update( host );
+                        LOG.debug( String.format( "Resource host %s updated.", host.getId() ) );
+                    }
                 }
             }
         }
