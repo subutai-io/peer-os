@@ -37,11 +37,10 @@ public class MessageContentUtil
     private static final Logger LOG = LoggerFactory.getLogger( MessageContentUtil.class );
 
 
-    public static void abortChain(Message message,int errorStatus, String error)
+    public static void abortChain( Message message, int errorStatus, String error )
     {
         HttpServletResponse response = ( HttpServletResponse ) message.getExchange().getInMessage()
-                                                                      .get( AbstractHTTPDestination
-                                                                              .HTTP_RESPONSE );
+                                                                      .get( AbstractHTTPDestination.HTTP_RESPONSE );
         try
         {
             response.setStatus( errorStatus );
@@ -55,8 +54,8 @@ public class MessageContentUtil
         }
 
         message.getInterceptorChain().abort();
-
     }
+
 
     public static int checkUrlAccessibility( final int currentStatus, final URL url, final String basePath )
     {
@@ -96,20 +95,26 @@ public class MessageContentUtil
     {
 
         InputStream is = message.getContent( InputStream.class );
+
         CachedOutputStream os = new CachedOutputStream();
 
         LOG.debug( String.format( "Decrypting IDs: %s -> %s", hostIdSource, hostIdTarget ) );
         try
         {
-            IOUtils.copyAndCloseInput( is, os );
+            int copied = IOUtils.copyAndCloseInput( is, os );
             os.flush();
 
-            byte[] data = decryptData( securityManager, hostIdSource, hostIdTarget, os.getBytes() );
+            byte[] data = copied > 0 ? decryptData( securityManager, hostIdSource, hostIdTarget, os.getBytes() ) : null;
             org.apache.commons.io.IOUtils.closeQuietly( os );
 
             if ( data != null )
             {
+                LOG.debug( String.format( "Decrypted payload: \"%s\"", new String( data ) ) );
                 message.setContent( InputStream.class, new ByteArrayInputStream( data ) );
+            }
+            else
+            {
+                LOG.warn( "Decrypted data is NULL!!!" );
             }
         }
         catch ( IOException e )
@@ -193,15 +198,20 @@ public class MessageContentUtil
             CachedOutputStream csnew = ( CachedOutputStream ) message.getContent( OutputStream.class );
 
             byte[] originalMessage = org.apache.commons.io.IOUtils.toByteArray( csnew.getInputStream() );
+            LOG.debug( String.format( "Original payload: \"%s\"", new String( originalMessage ) ) );
+
             csnew.flush();
             org.apache.commons.io.IOUtils.closeQuietly( cs );
             org.apache.commons.io.IOUtils.closeQuietly( csnew );
 
             //do something with original message to produce finalMessage
-            byte[] finalMessage = encryptData( securityManager, hostIdSource, hostIdTarget, ip, originalMessage );
+            byte[] finalMessage = originalMessage.length > 0 ?
+                                  encryptData( securityManager, hostIdSource, hostIdTarget, ip, originalMessage ) :
+                                  null;
 
             if ( finalMessage != null )
             {
+
                 InputStream replaceInStream = new ByteArrayInputStream( finalMessage );
 
                 org.apache.commons.io.IOUtils.copy( replaceInStream, os );
@@ -211,6 +221,7 @@ public class MessageContentUtil
                 os.flush();
                 message.setContent( OutputStream.class, os );
             }
+
 
             org.apache.commons.io.IOUtils.closeQuietly( os );
         }
