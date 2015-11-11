@@ -328,7 +328,7 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
             for ( final Object id : ids )
             {
                 Item item = container.getItem( id );
-                ContainerHost containerHost = ( ContainerHost ) item.getItemProperty( VALUE_PROPERTY ).getValue();
+                Object containerHost = item.getItemProperty( VALUE_PROPERTY ).getValue();
                 if ( !rh.getContainerHosts().contains( containerHost ) )
                 {
                     container.removeItem( item );
