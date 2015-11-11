@@ -101,14 +101,10 @@ public class MessageContentUtil
         LOG.debug( String.format( "Decrypting IDs: %s -> %s", hostIdSource, hostIdTarget ) );
         try
         {
-            int r = IOUtils.copyAndCloseInput( is, os );
+            int copied = IOUtils.copyAndCloseInput( is, os );
             os.flush();
 
-            if ( r <= 0 )
-            {
-                return; // return, nothing to decrypt
-            }
-            byte[] data = decryptData( securityManager, hostIdSource, hostIdTarget, os.getBytes() );
+            byte[] data = copied > 0 ? decryptData( securityManager, hostIdSource, hostIdTarget, os.getBytes() ) : null;
             org.apache.commons.io.IOUtils.closeQuietly( os );
 
             if ( data != null )
@@ -208,12 +204,10 @@ public class MessageContentUtil
             org.apache.commons.io.IOUtils.closeQuietly( cs );
             org.apache.commons.io.IOUtils.closeQuietly( csnew );
 
-            if ( originalMessage.length <= 0 )
-            {
-                return; // return, nothing encrypt
-            }
             //do something with original message to produce finalMessage
-            byte[] finalMessage = encryptData( securityManager, hostIdSource, hostIdTarget, ip, originalMessage );
+            byte[] finalMessage = originalMessage.length > 0 ?
+                                  encryptData( securityManager, hostIdSource, hostIdTarget, ip, originalMessage ) :
+                                  null;
 
             if ( finalMessage != null )
             {

@@ -84,7 +84,7 @@
     <com.jayway.awaitility.version>1.5.0</com.jayway.awaitility.version>
     <junit.version>4.11</junit.version>
 
-    <vaadin-version>7.3.3</vaadin-version>
+    <vaadin-version>7.5.8</vaadin-version>
 
     <!-- bouncycastle -->
     <org.bouncycastle.version>1.52</org.bouncycastle.version>
