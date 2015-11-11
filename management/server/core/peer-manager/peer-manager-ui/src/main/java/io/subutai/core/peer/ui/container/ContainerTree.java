@@ -123,9 +123,9 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
                                         metric.getAvailableSpace() / 1024 / 1024 / 1024 ) );
                             }
                         }
-                        catch ( Exception e )
+                        catch ( Exception ignore )
                         {
-                            LOG.warn( "Host description generation problem: " + e.getMessage() );
+                            // ignore
                         }
                     }
                 }
