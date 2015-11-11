@@ -3,9 +3,9 @@ package io.subutai.core.executor.rest.ui;
 
 import java.util.Set;
 
-import javax.ws.rs.FormParam;
 import javax.ws.rs.core.Response;
 
+import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,6 +16,7 @@ import io.subutai.common.util.JsonUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hostregistry.api.HostRegistry;
+import io.subutai.common.command.RequestBuilder;
 
 
 public class RestServiceImpl implements RestService
@@ -37,10 +38,20 @@ public class RestServiceImpl implements RestService
     }
 
     @Override
-    public Response saveBlueprint( final String content )
+    public Response executeCommand( final String hostId, final String content )
     {
-//        commandExecutor.executeAsync( hostInfo.getId(), requestBuilder, this );
-        return Response.ok().entity( JsonUtil.toJson( "ok" ) ).build();
+        try {
+            Preconditions.checkNotNull( hostId, "Invalid host id" );
+
+            RequestBuilder command = new RequestBuilder( content );
+            commandExecutor.executeAsync( hostId, command );
+            return Response.ok().entity( JsonUtil.toJson( "ok" ) ).build();
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error on execute command #executeCommand", e );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity(e.toString()).build();
+        }
     }
 
 

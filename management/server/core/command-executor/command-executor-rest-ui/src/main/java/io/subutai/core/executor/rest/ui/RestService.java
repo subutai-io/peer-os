@@ -14,7 +14,8 @@ public interface RestService
 {
     @POST
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response saveBlueprint( @FormParam( "command" ) String content );
+    public Response executeCommand( @FormParam( "hostId" ) String hostId,
+                                   @FormParam( "command" ) String content );
 
     @GET
     @Path( "resource_hosts" )
