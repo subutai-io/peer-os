@@ -47,7 +47,7 @@ public class PeerWebClient
     public PeerWebClient( final String host, final Object provider )
     {
         this.host = host;
-        this.provider = new JacksonJsonProvider();
+        this.provider = provider;
     }
 
 

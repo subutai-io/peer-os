@@ -95,23 +95,29 @@ public class MessageContentUtil
     {
 
         InputStream is = message.getContent( InputStream.class );
+
         CachedOutputStream os = new CachedOutputStream();
 
         LOG.debug( String.format( "Decrypting IDs: %s -> %s", hostIdSource, hostIdTarget ) );
         try
         {
-            IOUtils.copyAndCloseInput( is, os );
+            int r = IOUtils.copyAndCloseInput( is, os );
             os.flush();
 
+            if ( r <= 0 )
+            {
+                return; // return, nothing to decrypt
+            }
             byte[] data = decryptData( securityManager, hostIdSource, hostIdTarget, os.getBytes() );
             org.apache.commons.io.IOUtils.closeQuietly( os );
 
             if ( data != null )
             {
-                LOG.debug( new String( data ) );
+                LOG.debug( String.format( "Decrypted payload: \"%s\"", new String( data ) ) );
                 message.setContent( InputStream.class, new ByteArrayInputStream( data ) );
             }
-            else {
+            else
+            {
                 LOG.warn( "Decrypted data is NULL!!!" );
             }
         }
@@ -196,15 +202,22 @@ public class MessageContentUtil
             CachedOutputStream csnew = ( CachedOutputStream ) message.getContent( OutputStream.class );
 
             byte[] originalMessage = org.apache.commons.io.IOUtils.toByteArray( csnew.getInputStream() );
+            LOG.debug( String.format( "Original payload: \"%s\"", new String( originalMessage ) ) );
+
             csnew.flush();
             org.apache.commons.io.IOUtils.closeQuietly( cs );
             org.apache.commons.io.IOUtils.closeQuietly( csnew );
 
+            if ( originalMessage.length <= 0 )
+            {
+                return; // return, nothing encrypt
+            }
             //do something with original message to produce finalMessage
             byte[] finalMessage = encryptData( securityManager, hostIdSource, hostIdTarget, ip, originalMessage );
 
             if ( finalMessage != null )
             {
+
                 InputStream replaceInStream = new ByteArrayInputStream( finalMessage );
 
                 org.apache.commons.io.IOUtils.copy( replaceInStream, os );
@@ -214,6 +227,7 @@ public class MessageContentUtil
                 os.flush();
                 message.setContent( OutputStream.class, os );
             }
+
 
             org.apache.commons.io.IOUtils.closeQuietly( os );
         }
