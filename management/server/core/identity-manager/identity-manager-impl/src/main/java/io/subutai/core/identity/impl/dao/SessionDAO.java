@@ -2,8 +2,11 @@ package io.subutai.core.identity.impl.dao;
 
 
 import java.util.List;
+
 import javax.persistence.EntityManager;
+
 import com.google.common.collect.Lists;
+
 import io.subutai.common.dao.DaoManager;
 import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.identity.impl.model.SessionEntity;
@@ -14,7 +17,7 @@ import io.subutai.core.identity.impl.model.SessionEntity;
  */
 class SessionDAO
 {
-    private DaoManager daoManager= null;
+    private DaoManager daoManager = null;
 
 
     /* *************************************************
@@ -46,6 +49,7 @@ class SessionDAO
         }
         return result;
     }
+
 
     /* *************************************************
      *
@@ -162,5 +166,4 @@ class SessionDAO
             daoManager.closeEntityManager( em );
         }
     }
-
 }

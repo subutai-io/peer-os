@@ -1,5 +1,6 @@
 package io.subutai.core.identity.api.model;
 
+
 import java.util.List;
 
 import io.subutai.core.identity.api.model.Permission;
@@ -22,9 +23,9 @@ public interface Role
 
     String getTypeName();
 
+    // TODO: delete methods related to join table
     List<Permission> getPermissions();
 
     void setPermissions( List<Permission> permissions );
-
 }
 

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+
 import javax.naming.NamingException;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
@@ -13,12 +14,17 @@ import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.LoginException;
+
+import io.subutai.core.identity.api.model.RolePermission;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.apache.karaf.jaas.boot.principal.RolePrincipal;
 import org.apache.karaf.jaas.boot.principal.UserPrincipal;
 import org.apache.karaf.jaas.config.JaasRealm;
 import org.apache.karaf.jaas.modules.AbstractKarafLoginModule;
+
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Permission;
@@ -29,6 +35,7 @@ import io.subutai.core.identity.api.model.User;
 public class SystemLoginModule extends AbstractKarafLoginModule
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( SystemLoginModule.class.getName() );
+
 
     @Override
     public void initialize( Subject subject, CallbackHandler callbackHandler, Map<String, ?> sharedState,
@@ -63,9 +70,9 @@ public class SystemLoginModule extends AbstractKarafLoginModule
         {
             // **************************************
             callbackHandler.handle( callbacks );
-            user = ( (NameCallback) callbacks[0] ).getName();
+            user = ( ( NameCallback ) callbacks[0] ).getName();
 
-            char[] tmpPassword = ( (PasswordCallback) callbacks[1] ).getPassword();
+            char[] tmpPassword = ( ( PasswordCallback ) callbacks[1] ).getPassword();
             if ( tmpPassword == null )
             {
                 tmpPassword = new char[0];
@@ -75,7 +82,7 @@ public class SystemLoginModule extends AbstractKarafLoginModule
 
             // **************************************
             IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
-            User loggedUser     = identityManager.authenticateUser( user, password );
+            User loggedUser = identityManager.authenticateUser( user, password );
             //Session userSession = identityManager.startSession(loggedUser);
             //userSession.setSubject( subject );
             // **************************************
@@ -92,13 +99,14 @@ public class SystemLoginModule extends AbstractKarafLoginModule
                 List<Role> roles = loggedUser.getRoles();
                 for ( Role role : roles )
                 {
-                    List<Permission> permissions = role.getPermissions();
-
-                    for(Permission permission:permissions)
+                    //List<Permission> permissions = role.getPermissions();
+                    List<RolePermission> permissions =
+                            identityManager.getIdentityDataService().getAllRolePermissions( role.getId() );
+                    for ( RolePermission permission : permissions )
                     {
                         List<String> perms = permission.asString();
 
-                        for(String perm:perms)
+                        for ( String perm : perms )
                         {
                             principals.add( new RolePrincipal( perm ) );
                         }
@@ -118,8 +126,8 @@ public class SystemLoginModule extends AbstractKarafLoginModule
         }
         catch ( UnsupportedCallbackException unsupportedCallbackException )
         {
-            throw new LoginException( unsupportedCallbackException.getMessage()
-                    + " not available to obtain information from user." );
+            throw new LoginException(
+                    unsupportedCallbackException.getMessage() + " not available to obtain information from user." );
         }
         catch ( Exception e )
         {
@@ -176,5 +184,4 @@ public class SystemLoginModule extends AbstractKarafLoginModule
         LOGGER.debug( "Invoking checkPassword." );
         return super.checkPassword( plain, encrypted );
     }
-
 }

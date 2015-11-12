@@ -1,40 +1,35 @@
 package io.subutai.core.identity.impl.model;
 
 
+import io.subutai.common.security.objects.PermissionObject;
+import io.subutai.core.identity.api.model.RolePermission;
+
+import javax.persistence.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.Access;
-import javax.persistence.AccessType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
 
-import io.subutai.common.security.objects.PermissionObject;
-import io.subutai.core.identity.api.model.Permission;
-
-
-/**
- *
- */
 @Entity
-@Table( name = "permission" )
+@Table( name = "role_permission" )
 @Access( AccessType.FIELD )
-public class PermissionEntity implements Permission
+public class RolePermissionEntity implements RolePermission
 {
+
+
     @Id
     @GeneratedValue( strategy = GenerationType.IDENTITY )
-    @Column( name = "id" )
-    private long id;
+    private Long id;
 
-    @Column( name = "object" )
-    private int object;
+
+    @Column( name = "permission_id" )
+    private Long permissionId;
+
+    @Column( name = "role_id" )
+    private Long roleId;
 
     @Column( name = "scope" )
-    private int scope = 1;
+    private int scope;
 
     @Column( name = "read" )
     private boolean read = false;
@@ -48,99 +43,92 @@ public class PermissionEntity implements Permission
     @Column( name = "delete" )
     private boolean delete = false;
 
+    @Column( name = "role_object" )
+    private String roleObject;
 
-    @Override
-    public Long getId()
+
+    @Column( name = "perm_object" )
+    private int permObject;
+
+
+    public Long getPermissionId()
     {
-        return id;
+        return permissionId;
     }
 
 
-    @Override
-    public void setId( final Long id )
+    public void setPermissionId( Long permissionId )
     {
-        this.id = id;
+        this.permissionId = permissionId;
     }
 
 
-    @Override
-    public int getObject()
+    public Long getRoleId()
     {
-        return object;
+        return roleId;
     }
 
 
-    @Override
-    public void setObject( int object )
+    public void setRoleId( Long roleId )
     {
-        this.object = object;
+        this.roleId = roleId;
     }
 
 
-    @Override
     public int getScope()
     {
         return scope;
     }
 
 
-    @Override
     public void setScope( int scope )
     {
         this.scope = scope;
     }
 
 
-    @Override
     public boolean isRead()
     {
         return read;
     }
 
 
-    @Override
     public void setRead( boolean read )
     {
         this.read = read;
     }
 
 
-    @Override
     public boolean isWrite()
     {
         return write;
     }
 
 
-    @Override
     public void setWrite( boolean write )
     {
         this.write = write;
     }
 
 
-    @Override
     public boolean isUpdate()
     {
         return update;
     }
 
 
-    @Override
     public void setUpdate( boolean update )
     {
         this.update = update;
     }
 
 
-    @Override
     public boolean isDelete()
     {
         return delete;
     }
 
 
-    @Override
     public void setDelete( boolean delete )
     {
         this.delete = delete;
@@ -150,21 +138,51 @@ public class PermissionEntity implements Permission
     @Override
     public String getObjectName()
     {
-        return PermissionObject.values()[object - 1].getName();
+        return roleObject;
     }
 
 
-    // TODO: delete this method
+    @Override
+    public void setObjectName( String obj )
+    {
+        this.roleObject = obj;
+    }
+
+
+    public Long getId()
+    {
+        return id;
+    }
+
+
+    public void setId( Long id )
+    {
+        this.id = id;
+    }
+
+
+    public int getPermObject()
+    {
+        return permObject;
+    }
+
+
+    public void setPermObject( int permObject )
+    {
+        this.permObject = permObject;
+    }
+
+
     @Override
     public List<String> asString()
     {
         List<String> perms = new ArrayList<>();
 
-        if ( PermissionObject.values()[object - 1] == PermissionObject.KarafServerAdministration )
+        if ( PermissionObject.values()[permObject - 1] == PermissionObject.KarafServerAdministration )
         {
             perms.add( "admin" );
         }
-        else if ( PermissionObject.values()[object - 1] == PermissionObject.KarafServerManagement )
+        else if ( PermissionObject.values()[permObject - 1] == PermissionObject.KarafServerManagement )
         {
             perms.add( "manager" );
         }
@@ -172,7 +190,7 @@ public class PermissionEntity implements Permission
         {
             String permString = "";
 
-            permString += ( PermissionObject.values() )[object - 1].getName() + "|A|";
+            permString += ( PermissionObject.values() )[permObject - 1].getName() + "|A|";
             //permString +="|"+(PermissionScope.values())[scope-1].getName()+"|";
 
             if ( read )

@@ -1,7 +1,9 @@
 package io.subutai.core.identity.impl.model;
 
+
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
@@ -27,7 +29,7 @@ import io.subutai.core.identity.api.model.User;
  * Implementation of User interface. Used for storing user information.
  */
 @Entity
-@Table( name = "userl" )
+@Table( name = "user" )
 @Access( AccessType.FIELD )
 public class UserEntity implements User
 {
@@ -51,10 +53,10 @@ public class UserEntity implements User
     @Column( name = "email" )
     private String email;
 
-    @Column(name = "type")
+    @Column( name = "type" )
     private int type = 2; // System User
 
-    @Column(name = "status")
+    @Column( name = "status" )
     private int status = 1; // Active
 
 
@@ -64,10 +66,10 @@ public class UserEntity implements User
     //************************************
 
     //*********************************************
-    @ManyToMany (targetEntity=RoleEntity.class,fetch = FetchType.EAGER)
+    @ManyToMany( targetEntity = RoleEntity.class, fetch = FetchType.EAGER )
     @JoinTable( name = "user_roles",
             joinColumns = { @JoinColumn( name = "user_id", referencedColumnName = "id" ) },
-            inverseJoinColumns = { @JoinColumn( name = "role_id", referencedColumnName = "id" ) })
+            inverseJoinColumns = { @JoinColumn( name = "role_id", referencedColumnName = "id" ) } )
     private List<Role> roles = new ArrayList<>();
     //*********************************************
 
@@ -156,7 +158,6 @@ public class UserEntity implements User
     }
 
 
-
     @Override
     public List<Role> getRoles()
     {
@@ -169,6 +170,7 @@ public class UserEntity implements User
     {
         this.roles = roles;
     }
+
 
     @Override
     public Subject getSubject()
@@ -221,12 +223,13 @@ public class UserEntity implements User
     @Override
     public String getStatusName()
     {
-        return UserStatus.values()[status-1].getName();
+        return UserStatus.values()[status - 1].getName();
     }
+
 
     @Override
     public String getTypeName()
     {
-        return UserType.values()[type-1].getName();
+        return UserType.values()[type - 1].getName();
     }
 }
