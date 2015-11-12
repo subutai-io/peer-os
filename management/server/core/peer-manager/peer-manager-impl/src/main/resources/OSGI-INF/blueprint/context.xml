@@ -50,6 +50,9 @@
   <reference id="localPeer" availability="mandatory"
              interface="io.subutai.common.peer.LocalPeer" />
 
+  <reference id="httpContextManager" availability="mandatory"
+             interface="io.subutai.core.http.manager.api.HttpContextManager" />
+
   <bean id="messageResponseListener" class="io.subutai.core.peer.impl.request.MessageResponseListener"
         destroy-method="dispose" scope="singleton" activation="eager">
     <argument ref="messenger" />
@@ -61,6 +64,7 @@
         class="io.subutai.core.peer.impl.PeerManagerImpl">
     <argument ref="messenger" />
     <argument ref="localPeer" />
+    <argument ref="httpContextManager" />
     <argument ref="daoManagerPeer" />
     <argument ref="messageResponseListener" />
     <argument ref="securityManager" />
