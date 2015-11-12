@@ -40,15 +40,19 @@ public class UserTokenEntity implements UserToken
     @Column( name = "hash_algorithm" )
     private String hashAlgorithm;
 
-    @Column( name = "issuer")
+    @Column( name = "issuer" )
     private String issuer;
 
-    @Column( name = "valid_date")
+    @Column( name = "valid_date" )
     private Date validDate;
 
-    @OneToOne(cascade= CascadeType.ALL, targetEntity = UserEntity.class)
-    @JoinColumn(name="user_id", nullable=true, insertable=true, updatable=true )
-    private User user;
+	/*@OneToOne (cascade = CascadeType.ALL, targetEntity = UserEntity.class)
+    @JoinColumn (name = "user_id", nullable = true, insertable = true, updatable = true)
+	private User user;*/
+
+
+    @Column( name = "user_id" )
+    private long userId;
 
 
     //***********************************
@@ -58,7 +62,7 @@ public class UserTokenEntity implements UserToken
         String str = "";
 
         str += "{\"typ\":\"JWT\",";
-        str +=  "\"alg\":\""+hashAlgorithm+"\"}";
+        str += "\"alg\":\"" + hashAlgorithm + "\"}";
 
         return str;
     }
@@ -70,17 +74,18 @@ public class UserTokenEntity implements UserToken
     {
         String str = "";
 
-        str += "{\"iss\":\""+issuer+"\",";
-        str +=  "\"sub\":\""+token+"\"}";
+        str += "{\"iss\":\"" + issuer + "\",";
+        str += "\"sub\":\"" + token + "\"}";
 
         return str;
     }
+
 
     //***********************************
     @Override
     public String getFullToken()
     {
-        return TokenUtil.createToken(getHeader(),getClaims(),secret );
+        return TokenUtil.createToken( getHeader(), getClaims(), secret );
     }
     //***********************************
 
@@ -155,18 +160,18 @@ public class UserTokenEntity implements UserToken
     }
 
 
-    @Override
-    public User getUser()
-    {
-        return user;
-    }
+	/*@Override
+	public User getUser ()
+	{
+		return user;
+	}
 
 
-    @Override
-    public void setUser( final User user )
-    {
-        this.user = user;
-    }
+	@Override
+	public void setUser (final User user)
+	{
+		this.user = user;
+	}*/
 
 
     @Override
@@ -182,9 +187,24 @@ public class UserTokenEntity implements UserToken
         this.type = type;
     }
 
+
     @Override
     public String getTypeName()
     {
-        return TokenType.values()[type-1].getName();
+        return TokenType.values()[type - 1].getName();
+    }
+
+
+    @Override
+    public long getUserId()
+    {
+        return userId;
+    }
+
+
+    @Override
+    public void setUserId( long userId )
+    {
+        this.userId = userId;
     }
 }

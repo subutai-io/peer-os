@@ -15,5 +15,5 @@ public interface RestService
     @POST
     @Path( "gettoken" )
     @Produces( { MediaType.TEXT_PLAIN } )
-    public String getToken( @FormParam( "username" ) String userName,@FormParam( "password" ) String password  );
+    public String getToken( @FormParam( "username" ) String userName, @FormParam( "password" ) String password );
 }

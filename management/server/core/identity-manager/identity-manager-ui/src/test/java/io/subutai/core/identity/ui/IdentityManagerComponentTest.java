@@ -20,6 +20,7 @@ public class IdentityManagerComponentTest
     @Mock
     IdentityManager identityManager;
 
+
     @Before
     public void setUp() throws Exception
     {

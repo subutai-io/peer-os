@@ -23,6 +23,7 @@ public class UsersTabTest
     @Mock
     BeanItem<User> beanItem;
 
+
     @Before
     public void setUp() throws Exception
     {

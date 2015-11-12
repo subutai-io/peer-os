@@ -54,7 +54,7 @@ public class IdentityManagerPortalModuleTest
     @Test
     public void testGetId() throws Exception
     {
-        assertEquals("Identity Manager",identityManagerPortalModule.getId());
+        assertEquals( "Identity Manager", identityManagerPortalModule.getId() );
     }
 
 
