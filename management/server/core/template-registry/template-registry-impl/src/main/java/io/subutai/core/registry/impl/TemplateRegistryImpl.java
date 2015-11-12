@@ -28,11 +28,9 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
-import io.subutai.common.cache.ExpiringCache;
+import io.subutai.common.dao.DaoManager;
 import io.subutai.common.datatypes.TemplateVersion;
-import io.subutai.common.exception.DaoException;
 import io.subutai.common.protocol.Template;
-import io.subutai.common.protocol.api.TemplateService;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.StringUtil;
 import io.subutai.core.git.api.GitChangedFile;
@@ -40,6 +38,7 @@ import io.subutai.core.git.api.GitException;
 import io.subutai.core.git.api.GitManager;
 import io.subutai.core.registry.api.RegistryException;
 import io.subutai.core.registry.api.TemplateRegistry;
+import io.subutai.core.registry.impl.dao.TemplateDataService;
 
 
 /**
@@ -53,22 +52,33 @@ public class TemplateRegistryImpl implements TemplateRegistry
     private static final String LXC_ARCH_IS_NULL_MSG = "Lxc Arch is null or empty";
     private static final String TEMPLATE_NOT_FOUND_MSG = "Template %s not found";
     private static final String REPO_ROOT_PATH = String.format( "%s/git/subutai.git/", Common.SUBUTAI_APP_DATA_PATH );
-    private final ExpiringCache<String, Boolean> templateDownloadTokens = new ExpiringCache<>();
+    private DaoManager daoManager;
+    private GitManager gitManager;
+    protected TemplateDataService templateService;
 
 
-    public void setTemplateService( final TemplateService templateDAO )
+    public TemplateRegistryImpl( DaoManager daoManager, GitManager gitManager )
     {
-        this.templateService = templateDAO;
+        this.daoManager = daoManager;
+        this.gitManager = gitManager;
     }
 
 
-    protected TemplateService templateService;
-
-    private GitManager gitManager;
-
-
-    public TemplateRegistryImpl() throws DaoException
+    protected TemplateDataService createTemplateDataService()
     {
+        return new TemplateDataService( daoManager.getEntityManagerFactory() );
+    }
+
+
+    public GitManager getGitManager()
+    {
+        return gitManager;
+    }
+
+
+    public void init()
+    {
+        templateService = createTemplateDataService();
     }
 
 
@@ -828,42 +838,6 @@ public class TemplateRegistryImpl implements TemplateRegistry
         {
             return Collections.emptyList();
         }
-    }
-
-
-    public GitManager getGitManager()
-    {
-        return gitManager;
-    }
-
-
-    public void setGitManager( final GitManager gitManager )
-    {
-        this.gitManager = gitManager;
-    }
-
-
-    public void init()
-    {
-        try
-        {
-            LOG.warn( "Printing saved templates..." );
-            List<Template> templates = templateService.getAllTemplates();
-            for ( Template template1 : templates )
-            {
-                LOG.warn( template1.getTemplateName() );
-            }
-        }
-        catch ( DaoException e )
-        {
-            LOG.error( "Error while saving template: ", e );
-        }
-    }
-
-
-    public void dispose()
-    {
-        templateDownloadTokens.dispose();
     }
 
 

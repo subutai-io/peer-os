@@ -269,7 +269,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         peerInfo = new PeerInfo();
         peerInfo.setId( securityManager.getKeyManager().getPeerId() );
-        peerInfo.setName( "Local Subutai server" );
         peerInfo.setOwnerId( securityManager.getKeyManager().getOwnerId() );
         setPeerIp();
         peerInfo.setName( String.format( "Peer %s", peerInfo.getId() ) );

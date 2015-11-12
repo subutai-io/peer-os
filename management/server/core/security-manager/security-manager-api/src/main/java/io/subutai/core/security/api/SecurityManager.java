@@ -5,6 +5,7 @@ import io.subutai.core.security.api.crypto.CertificateManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.security.api.crypto.KeyStoreManager;
+import io.subutai.core.security.api.jetty.HttpContextManager;
 
 
 /**
@@ -36,4 +37,5 @@ public interface SecurityManager
      */
     public CertificateManager getCertificateManager();
 
+    public HttpContextManager getHttpContextManager();
 }

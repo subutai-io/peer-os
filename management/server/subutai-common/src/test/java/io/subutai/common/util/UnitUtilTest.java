@@ -24,11 +24,6 @@ public class UnitUtilTest
         assertNotNull( UnitUtil.convert( 5.5, UnitUtil.Unit.B, UnitUtil.Unit.MB ) );
         assertNotNull( UnitUtil.convert( 5.5, UnitUtil.Unit.B, UnitUtil.Unit.GB ) );
 
-        assertNotNull( UnitUtil.convert( 5.5, UnitUtil.Unit.KB, UnitUtil.Unit.B ) );
-        assertNotNull( UnitUtil.convert( 5.5, UnitUtil.Unit.KB, UnitUtil.Unit.KB ) );
-        assertNotNull( UnitUtil.convert( 5.5, UnitUtil.Unit.KB, UnitUtil.Unit.MB ) );
-        assertNotNull( UnitUtil.convert( 5.5, UnitUtil.Unit.KB, UnitUtil.Unit.GB ) );
-
         assertNotNull( UnitUtil.convert( 5.5, UnitUtil.Unit.MB, UnitUtil.Unit.B ) );
         assertNotNull( UnitUtil.convert( 5.5, UnitUtil.Unit.MB, UnitUtil.Unit.KB ) );
         assertNotNull( UnitUtil.convert( 5.5, UnitUtil.Unit.MB, UnitUtil.Unit.MB ) );

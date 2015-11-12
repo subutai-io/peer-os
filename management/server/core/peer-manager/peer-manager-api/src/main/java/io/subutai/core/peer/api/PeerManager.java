@@ -16,13 +16,6 @@ public interface PeerManager
     public static final String SOURCE_LOCAL_PEER = "PEER_LOCAL";
 
     /**
-     * Registers remote peer
-     */
-    //    boolean register( RegistrationRequest registrationRequest );
-
-    //    boolean register( PeerInfo peerInfo, String cert );
-
-    /**
      * Updates peer metadata
      */
     boolean update( PeerInfo peerInfo );
@@ -46,19 +39,6 @@ public interface PeerManager
      */
     public PeerInfo getPeerInfo( String id );
 
-
-    //    void register( String keyPhrase, RegistrationData registrationData ) throws PeerException;
-
-    //    /**
-    //     * Unregisters peer
-    //     */
-    //    @Deprecated
-    //    boolean unregister( PeerInfo peerInfo, String keyPhrase ) throws PeerException;
-    //
-    //    //
-    //    @Deprecated
-    //    boolean unregister( String id ) throws PeerException;
-
     /**
      * Returns peer instance by peer id
      */
@@ -74,9 +54,6 @@ public interface PeerManager
      * Returns local peer instance
      */
     public LocalPeer getLocalPeer();
-
-//    List<N2NConfig> setupN2NConnection( final String environmentId, final Set<Peer> peers ) throws PeerException;
-
 
     void doRegistrationRequest( String destinationHost, String keyPhrase ) throws PeerException;
 
@@ -96,42 +73,5 @@ public interface PeerManager
 
     void processRejectRequest( RegistrationData registrationData ) throws PeerException;
 
-//    @Deprecated
-//    boolean register( PeerInfo remotePeerInfo ) throws PeerException;
-
-//    void startContainer( ContainerId containerId ) throws PeerException;
-//
-//    void stopContainer( ContainerId containerId ) throws PeerException;
-//
-//    void destroyContainer( ContainerId containerId ) throws PeerException;
-//
-//    ContainerHostState getContainerState( ContainerId containerId );
-
     String getPeerIdByIp( String ip ) throws PeerException;
-
-//    ProcessResourceUsage getProcessResourceUsage( ContainerId containerId, int pid ) throws PeerException;
-
-//    void removeEnvironmentKeyPair( EnvironmentId environmentId ) throws PeerException;
-
-//    PublicKeyContainer createEnvironmentKeyPair( EnvironmentId environmentId ) throws PeerException;
-
-//    Set<Gateway> getGateways() throws PeerException;
-
-//    Set<Vni> getReservedVnis() throws PeerException;
-
-//    Vni reserveVni( Vni vni ) throws PeerException;
-
-//    void cleanupEnvironmentNetworkSettings( EnvironmentId environmentId ) throws PeerException;
-
-//    void removeN2NConnection( EnvironmentId environmentId ) throws PeerException;
-
-//    void addToTunnel( N2NConfig config ) throws PeerException;
-
-//    ResourceHostMetrics getResourceHostMetrics();
-
-//    HostInterfaces getInterfaces();
-
-//    List<Template> getTemplates();
-
-//    Template getTemplateByName( String name );
 }
