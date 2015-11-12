@@ -13,17 +13,19 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import com.google.common.collect.Lists;
+
+import io.subutai.common.dao.DaoManager;
 import io.subutai.common.datatypes.TemplateVersion;
 import io.subutai.common.exception.DaoException;
 import io.subutai.common.protocol.Template;
-import io.subutai.common.protocol.api.TemplateService;
 import io.subutai.common.settings.Common;
 import io.subutai.core.git.api.GitChangedFile;
 import io.subutai.core.git.api.GitException;
 import io.subutai.core.git.api.GitManager;
 import io.subutai.core.registry.api.RegistryException;
-
-import com.google.common.collect.Lists;
+import io.subutai.core.registry.impl.dao.TemplateDataService;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -32,7 +34,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -45,8 +48,9 @@ import static org.mockito.Mockito.when;
 public class TemplateRegistryImplTest
 {
     private TemplateRegistryImpl templateRegistry;
-    private TemplateService templateService;
 
+    @Mock
+    TemplateDataService templateService;
     @Mock
     TemplateVersion templateVersion;
     @Mock
@@ -55,15 +59,16 @@ public class TemplateRegistryImplTest
     GitManager gitManager;
     @Mock
     GitChangedFile gitChangedFile;
+    @Mock
+    DaoManager daoManager;
 
 
     @Before
     public void setUp() throws Exception
     {
-        templateRegistry = new TemplateRegistryImpl();
-        templateService = mock( TemplateService.class );
-        templateRegistry.setTemplateService( templateService );
-        templateRegistry.setGitManager( gitManager );
+        templateRegistry = spy( new TemplateRegistryImpl( daoManager, gitManager ) );
+        templateRegistry.templateService = templateService;
+        doReturn( templateService ).when( templateRegistry ).createTemplateDataService();
     }
 
 
@@ -450,14 +455,7 @@ public class TemplateRegistryImplTest
         when( templateService.getAllTemplates() ).thenReturn( myList );
 
         templateRegistry.init();
-        verify( templateService ).getAllTemplates();
-    }
-
-
-    @Test
-    public void testDispose()
-    {
-        templateRegistry.dispose();
+        verify( templateRegistry ).createTemplateDataService();
     }
 
 
