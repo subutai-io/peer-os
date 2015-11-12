@@ -28,6 +28,7 @@ import io.subutai.common.peer.RegistrationData;
 import io.subutai.common.peer.RegistrationStatus;
 import io.subutai.common.settings.ChannelSettings;
 import io.subutai.common.util.SecurityUtilities;
+import io.subutai.core.http.manager.api.HttpContextManager;
 import io.subutai.core.messenger.api.Messenger;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.peer.api.RegistrationClient;
@@ -55,17 +56,19 @@ public class PeerManagerImpl implements PeerManager
     private SecurityManager securityManager;
     private Object provider;
     private Map<String, RegistrationData> registrationRequests = new ConcurrentHashMap<>();
+    HttpContextManager httpContextManager;
 
 
-    public PeerManagerImpl( final Messenger messenger, LocalPeer localPeer, DaoManager daoManager,
-                            MessageResponseListener messageResponseListener, SecurityManager securityManager,
-                            Object provider )
+    public PeerManagerImpl( final Messenger messenger, LocalPeer localPeer, HttpContextManager httpContextManager,
+                            DaoManager daoManager, MessageResponseListener messageResponseListener,
+                            SecurityManager securityManager, Object provider )
     {
         this.messenger = messenger;
         this.localPeer = localPeer;
         this.daoManager = daoManager;
         this.messageResponseListener = messageResponseListener;
         this.securityManager = securityManager;
+        this.httpContextManager = httpContextManager;
         this.provider = provider;
         //todo expose CommandResponseListener as service "RequestListener" and inject here
         commandResponseListener = new CommandResponseListener();
@@ -114,6 +117,7 @@ public class PeerManagerImpl implements PeerManager
             securityManager.getKeyStoreManager()
                            .importCertAsTrusted( ChannelSettings.SECURE_PORT_X2, registrationData.getPeerInfo().getId(),
                                    decryptedCert );
+            httpContextManager.reloadKeyStore();
 
             registrationData.getPeerInfo().setKeyPhrase( keyPhrase );
             peerDAO.saveInfo( SOURCE_REMOTE_PEER, registrationData.getPeerInfo().getId(),
@@ -127,6 +131,7 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
+    //TODO:Remove x509 cert from keystore
     private boolean unregister( final RegistrationData registrationData ) throws PeerException
     {
         isPeerUsed( registrationData );
