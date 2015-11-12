@@ -1,18 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:jpa="http://aries.apache.org/xmlns/jpa/v1.0.0">
 
-  <reference id="templateService"
-             interface="io.subutai.common.protocol.api.TemplateService"
-             availability="mandatory" />
+  <!-- ***************************************************************** -->
+  <bean id="daoManager" init-method="init" class="io.subutai.common.dao.DaoManager" scope="prototype">
+    <jpa:unit unitname="commonServicePUnit" property="entityManagerFactory" />
+  </bean>
+  <!-- ***************************************************************** -->
 
   <reference id="gitManager"
              interface="io.subutai.core.git.api.GitManager"
              availability="optional" />
 
   <bean id="templateRegistry" scope="singleton" activation="eager"
-        class="io.subutai.core.registry.impl.TemplateRegistryImpl" init-method="init" destroy-method="dispose">
-    <property name="templateService" ref="templateService" />
-    <property name="gitManager" ref="gitManager" />
+        class="io.subutai.core.registry.impl.TemplateRegistryImpl" init-method="init">
+    <argument ref="daoManager" />
+    <argument ref="gitManager" />
   </bean>
 
   <service ref="templateRegistry"
