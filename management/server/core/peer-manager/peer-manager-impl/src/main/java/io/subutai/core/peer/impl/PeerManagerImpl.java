@@ -114,6 +114,7 @@ public class PeerManagerImpl implements PeerManager
             securityManager.getKeyStoreManager()
                            .importCertAsTrusted( ChannelSettings.SECURE_PORT_X2, registrationData.getPeerInfo().getId(),
                                    decryptedCert );
+            securityManager.getHttpContextManager().reloadKeyStore();
 
             registrationData.getPeerInfo().setKeyPhrase( keyPhrase );
             peerDAO.saveInfo( SOURCE_REMOTE_PEER, registrationData.getPeerInfo().getId(),
@@ -127,6 +128,7 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
+    //TODO:Remove x509 cert from keystore
     private boolean unregister( final RegistrationData registrationData ) throws PeerException
     {
         isPeerUsed( registrationData );

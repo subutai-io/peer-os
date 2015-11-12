@@ -13,12 +13,14 @@ import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.security.api.crypto.KeyStoreManager;
 import io.subutai.core.security.api.dao.SecretKeyStoreDAO;
 import io.subutai.core.security.api.dao.SecurityManagerDAO;
+import io.subutai.core.security.api.jetty.HttpContextManager;
 import io.subutai.core.security.impl.crypto.CertificateManagerImpl;
 import io.subutai.core.security.impl.crypto.EncryptionToolImpl;
 import io.subutai.core.security.impl.crypto.KeyManagerImpl;
 import io.subutai.core.security.impl.crypto.KeyStoreManagerImpl;
 import io.subutai.core.security.impl.dao.SecretKeyStoreDAOImpl;
 import io.subutai.core.security.impl.dao.SecurityManagerDAOImpl;
+import io.subutai.core.security.impl.jetty.HttpContextManagerImpl;
 import io.subutai.core.security.impl.model.SecurityKeyData;
 
 
@@ -39,15 +41,7 @@ public class SecurityManagerImpl implements SecurityManager
     private KeyStoreManager keyStoreManager = null;
     private CertificateManager certificateManager = null;
     private Object provider;
-
-
-    /* *****************************
-     *
-     */
-    public SecurityManagerImpl()
-    {
-
-    }
+    private HttpContextManager httpContextManager;
 
 
     /* *****************************
@@ -62,6 +56,8 @@ public class SecurityManagerImpl implements SecurityManager
         keyData.setSecretKeyringFile( secretKeyringFile );
         keyData.setPublicKeyringFile( publicKeyringFile );
         keyData.setSecretKeyringPwd( secretKeyringPwd );
+
+        httpContextManager = new HttpContextManagerImpl();
     }
 
 
@@ -223,5 +219,12 @@ public class SecurityManagerImpl implements SecurityManager
     public void setCertificateManager( final CertificateManager certificateManager )
     {
         this.certificateManager = certificateManager;
+    }
+
+
+    @Override
+    public HttpContextManager getHttpContextManager()
+    {
+        return httpContextManager;
     }
 }

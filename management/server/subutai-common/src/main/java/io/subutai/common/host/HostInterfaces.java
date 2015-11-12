@@ -57,7 +57,7 @@ public class HostInterfaces
         for ( Iterator<HostInterface> i = interfaces.iterator(); i.hasNext() && result == null; )
         {
             HostInterface c = i.next();
-            if ( name.equals( c.getIp() ) )
+            if ( name.equals( c.getName() ) )
             {
                 result = c;
             }
