@@ -10,18 +10,18 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import org.apache.cxf.jaxrs.client.WebClient;
+
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import io.subutai.common.exception.HTTPException;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerInfo;
-import io.subutai.common.util.RestUtil;
 
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -40,12 +40,13 @@ public class RemotePeerMessageSenderTest
 
     @Mock
     Peer peer;
-    @Mock
-    RestUtil restUtil;
+
     @Mock
     MessengerDao messengerDao;
     @Mock
     PeerInfo peerInfo;
+    @Mock
+    WebClient webClient;
 
 
     RemotePeerMessageSender remotePeerMessageSender;
@@ -60,30 +61,28 @@ public class RemotePeerMessageSenderTest
         when( peerInfo.getId() ).thenReturn( uuid );
 
         envelope = new Envelope( message, TARGET_PEER_ID, RECIPIENT, TIME_TO_LIVE, HEADERS );
-        remotePeerMessageSender =
-                new RemotePeerMessageSender( restUtil, messengerDao, peer, Sets.newHashSet( envelope ), uuid );
+        remotePeerMessageSender = spy( new RemotePeerMessageSender( messengerDao, peer, Sets.newHashSet( envelope ) ) );
 
         when( peer.getPeerInfo() ).thenReturn( peerInfo );
         when( peerInfo.getIp() ).thenReturn( IP );
+        doReturn( webClient ).when( remotePeerMessageSender ).getWebClient( anyString() );
     }
 
 
     @Test
     public void testCall() throws Exception
     {
-        boolean result = remotePeerMessageSender.call();
+        remotePeerMessageSender.call();
 
-        assertTrue( result );
-        //verify( restUtil ).request( isA( RestUtil.RequestType.class ), anyString(), anyString(), anyMap(), anyMap() );
-        //verify( messengerDao ).markAsSent( envelope );
+        verify( webClient ).post( anyString() );
+        verify( messengerDao ).markAsSent( envelope );
     }
 
 
     @Test
     public void testCallException() throws Exception
     {
-        when( restUtil.request( any( RestUtil.RequestType.class ), anyString(), anyString(), anyMap(), anyMap() ) )
-                .thenThrow( new HTTPException( "" ) );
+        doThrow( new RuntimeException() ).when( webClient ).post( anyString() );
 
         remotePeerMessageSender.call();
 

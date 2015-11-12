@@ -22,6 +22,7 @@ import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.peer.RequestListener;
 import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hostregistry.api.HostRegistry;
+import io.subutai.core.http.manager.api.HttpContextManager;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.localpeer.impl.LocalPeerImpl;
 import io.subutai.core.localpeer.impl.entity.ManagementHostEntity;
@@ -93,6 +94,8 @@ public class PeerManagerImplTest
     ManagementHostEntity managementHost;
     @Mock
     Set<RequestListener> requestListeners;
+    @Mock
+    HttpContextManager httpContextManager;
 
     PeerManagerImpl peerManager;
 
@@ -101,8 +104,8 @@ public class PeerManagerImplTest
     public void setUp() throws Exception
     {
         peerManager =
-                spy( new PeerManagerImpl( messenger, localPeer, daoManager, messageResponseListener, securityManager,
-                        null ) );
+                spy( new PeerManagerImpl( messenger, localPeer, httpContextManager, daoManager, messageResponseListener,
+                        securityManager, null ) );
 
 
         peerManager.commandResponseListener = commandResponseListener;
