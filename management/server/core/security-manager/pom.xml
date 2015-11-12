@@ -17,8 +17,8 @@
     <module>security-manager-impl</module>
     <module>security-manager-api</module>
     <module>security-manager-rest</module>
+    <module>http-context-factory</module>
   </modules>
   <packaging>pom</packaging>
-
 
 </project>
