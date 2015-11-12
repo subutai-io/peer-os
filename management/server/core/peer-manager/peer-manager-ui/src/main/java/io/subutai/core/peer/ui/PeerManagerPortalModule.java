@@ -2,15 +2,16 @@ package io.subutai.core.peer.ui;
 
 
 import java.io.File;
+
 import com.vaadin.ui.Component;
+
 import io.subutai.common.util.FileUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.hostregistry.api.HostRegistry;
-import io.subutai.core.http.manager.api.HttpContextManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registry.api.TemplateRegistry;
-import io.subutai.server.ui.api.PortalModule;
 import io.subutai.core.security.api.SecurityManager;
+import io.subutai.server.ui.api.PortalModule;
 
 
 public class PeerManagerPortalModule implements PortalModule
@@ -22,7 +23,6 @@ public class PeerManagerPortalModule implements PortalModule
     private TemplateRegistry registry;
     private HostRegistry hostRegistry;
     private EnvironmentManager environmentManager;
-    private HttpContextManager httpContextManager;
     private SecurityManager securityManager;
 
 
@@ -77,7 +77,6 @@ public class PeerManagerPortalModule implements PortalModule
     }
 
 
-
     public void init()
     {
 
@@ -121,17 +120,5 @@ public class PeerManagerPortalModule implements PortalModule
     public Boolean isCorePlugin()
     {
         return true;
-    }
-
-
-    public HttpContextManager getHttpContextManager()
-    {
-        return httpContextManager;
-    }
-
-
-    public void setHttpContextManager( final HttpContextManager httpContextManager )
-    {
-        this.httpContextManager = httpContextManager;
     }
 }

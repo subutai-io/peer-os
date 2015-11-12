@@ -33,9 +33,11 @@ import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
+import io.subutai.common.peer.Payload;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerId;
 import io.subutai.common.peer.PeerInfo;
+import io.subutai.common.peer.RequestListener;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.protocol.Template;
@@ -50,7 +52,6 @@ import io.subutai.common.util.ExceptionUtil;
 import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
-import io.subutai.core.http.manager.api.HttpContextManager;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.localpeer.impl.dao.ManagementHostDataService;
 import io.subutai.core.localpeer.impl.dao.ResourceHostDataService;
@@ -60,9 +61,7 @@ import io.subutai.core.localpeer.impl.entity.ResourceHostEntity;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
-import io.subutai.common.peer.Payload;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.common.peer.RequestListener;
 import io.subutai.core.registry.api.TemplateRegistry;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.KeyManager;
@@ -177,8 +176,6 @@ public class LocalPeerImplTest
     ResourceHostInfo resourceHostInfo;
     @Mock
     DaoManager daoManager;
-    @Mock
-    HttpContextManager httpContextManager;
 
     @Mock
     SecurityManager securityManager;
@@ -263,7 +260,7 @@ public class LocalPeerImplTest
     {
         doReturn( managementHostDataService ).when( localPeer ).createManagementHostDataService();
         doReturn( resourceHostDataService ).when( localPeer ).createResourceHostDataService();
-//        doNothing().when( localPeer ).initPeerInfo( any( PeerDAO.class ) );
+        //        doNothing().when( localPeer ).initPeerInfo( any( PeerDAO.class ) );
 
         localPeer.init();
     }
@@ -540,6 +537,7 @@ public class LocalPeerImplTest
         doThrow( commandException ).when( commandUtil ).execute( any( RequestBuilder.class ), any( Host.class ) );
     }
 
+
     @Ignore
     @Test( expected = PeerException.class )
     public void testSetDefaultGateway() throws Exception
@@ -740,7 +738,8 @@ public class LocalPeerImplTest
         localPeer.sendRequestInternal( REQUEST, RECIPIENT, Object.class );
     }
 
-   @Ignore
+
+    @Ignore
     @Test
     public void testOnHeartbeat() throws Exception
     {
@@ -766,7 +765,6 @@ public class LocalPeerImplTest
         verify( resourceHost ).updateHostInfo( resourceHostInfo );
 
         doThrow( new HostNotFoundException( "" ) ).when( localPeer ).getResourceHostById( anyString() );
-
     }
 
 
