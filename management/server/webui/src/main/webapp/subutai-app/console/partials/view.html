@@ -1,0 +1,60 @@
+<div id="identity" ng-controller="ConsoleViewCtrl as consoleViewCtrl">
+	<div id="sidebar">
+		<h3>Console for</h3>
+		<div class="form-group">
+			<select class="form-control" ng-model="consoleViewCtrl.currentType" ng-change="consoleViewCtrl.getSubMenuTree()">
+				<option value="environments">Environments</option>
+				<option value="resourceHosts">Resource hosts</option>
+			</select>
+		</div>		
+		<div ui-tree>
+			<ol ui-tree-nodes="" ng-model="consoleViewCtrl.resourceHosts" id="tree-root" class="b-nodes-tree">
+				<li ng-repeat="node in consoleViewCtrl.resourceHosts" 
+					ui-tree-node 
+					data-nodrag 
+					collapsed="true" 
+					ng-include="'subutai-app/console/partials/nodes_renderer.html'">
+				</li>
+			</ol>
+		</div>
+	</div>
+	<div id="content">
+		<div class="row wrapper border-bottom white-bg page-heading">
+			<div class="col-lg-9">
+				<h2>Console layout</h2>
+				<ol class="breadcrumb">
+					<li>
+					<a href="index.html">Home</a>
+					</li>
+					<li class="active">
+					<strong>Console layout</strong>
+					</li>
+				</ol>
+			</div>
+		</div>
+		<div class="wrapper-content animated fadeInRight">
+			<div class="row white-bg">
+				<tabset>
+					<tab ng-repeat="console in consoleViewCtrl.activeConsole" heading="{{ console.title }}">
+						<div class="col-md-12">
+							<div id="term_demo">
+								<terminal terminal-class="modern-terminal" terminal-config="modern">
+								<!--<p class="click-me">Click me to start commanding !</p>-->
+								</terminal>
+							</div>
+						</div>
+					</tab>
+				</tabset>				
+			</div>
+		</div>
+	</div>
+
+	<div id="sidebar-resizer"
+		resizer="vertical"
+		resizer-width="6"
+		resizer-left="#sidebar"
+		resizer-right="#content"
+		resizer-max="400">
+
+	</div>
+</div>

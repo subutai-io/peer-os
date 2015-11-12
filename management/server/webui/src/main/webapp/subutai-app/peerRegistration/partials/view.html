@@ -1,0 +1,131 @@
+<div ng-controller="PeerRegistrationCtrl as peerRegistrationCtrl">
+	<div id="identity">
+		<div class="row wrapper border-bottom white-bg page-heading">
+			<div class="col-lg-9">
+				<h2>Peer registration</h2>
+				<ol class="breadcrumb">
+					<li>
+						<a href="/">Home</a>
+					</li>
+					<li class="active">
+						<strong>Peer registration</strong>
+					</li>
+				</ol>
+			</div>
+		</div>
+		<div class="animated fadeIn wrapper-content">
+
+			<div class="row">
+				<div id="resizable-pane" class="col-lg-7 fullWidthPane">
+					<div class="white-bg ibox float-e-margins">
+						<div class="panel-body">
+							<div class="ibox-title">
+								<div class="ibox-tools">
+									<button type="button" class="btn btn-primary" ng-click="peerRegistrationCtrl.addPanel('createPeer')">Create new Peer</button>
+								</div>
+							</div>
+							<table class="table">
+								<thead>
+									<tr>
+										<th>Name</th>
+										<th>IP</th>
+										<th>Key Phrase</th>
+										<th>Status</th>
+										<th></th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr ng-repeat = "(key, peer) in peerRegistrationCtrl.peersList">
+										<td class="project-title">
+											<a href="">{{peer.name}}</a>
+										</td>
+										<td class="project-completion">
+											{{peer.ip}}
+										</td>
+										<td class="project-completion">
+											{{peer.keyPhrase}}
+										</td>
+										<td class="project-completion">
+											{{peer.status}}
+										</td>
+										<td class="project-actions">
+											<span ng-show="peer.status == 'REQUESTED'">
+												<a class="btn btn-white btn-sm" type="button" ng-click="peerRegistrationCtrl.rejectPeerRequest(peer.id)">
+													<i class="fa fa-times"></i> Reject 
+												</a>
+												<a class="btn btn-white btn-sm" type="button" ng-click="peerRegistrationCtrl.approvePeerRequest(peer.id)">
+													<i class="fa fa-check-square"></i> Approve 
+												</a>
+											</span>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-lg-5">
+					<div id="create-peer-form" class="white-bg ibox float-e-margins" style="visibility: hidden;  display: none;">
+						<div class="ibox-title">
+							<h5>Create Peer</h5>
+							<div class="ibox-tools dropdown">
+								<a ng-click="closePanel('createPeer')"><i class="fa fa-times"></i></a>
+							</div>
+						</div>
+						<form ng-submit="peerRegistrationCtrl.addPeer(newPeer)">								
+							<div class="ibox-content">
+								<div class="row">
+									<div class="form-group">
+										<input type="text" 
+											placeholder="Enter IP" 
+											class="form-control" 
+											ng-model="newPeer.ip" required>
+									</div>
+									<div class="form-group">
+										<input type="text" 
+											placeholder="Secret keyphrase" 
+											class="form-control" 
+											ng-model="newPeer.keyphrase" required>
+									</div>
+								</div>
+							</div>
+							<div class="modal-footer">
+								<button type="submit" class="btn btn-primary">
+									Save changes
+								</button>
+								<button type="button" class="btn btn-white" ng-click="closePanel('createPeer')">
+									Close
+								</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!--Modal Panles-->
+
+	<!--Environment tag modal-->
+	<div class="modal inmodal" id="environmentTag" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog modal-sm">
+			<div class="modal-content animated bounceInRight">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+					<h5>Environment Tag</h5>
+				</div>
+				<div class="modal-body">
+					<div class="row text-center">
+						..................
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-white" data-dismiss="modal">Cancel</button>
+					<button type="button" class="btn btn-primary">Confirm</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div>

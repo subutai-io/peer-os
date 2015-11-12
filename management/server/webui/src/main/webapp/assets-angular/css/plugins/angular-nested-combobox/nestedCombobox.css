@@ -1,0 +1,120 @@
+body {
+    font-size: 14px;
+    font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+p,
+a {
+    font-size: 14px;
+    line-height: 20px;
+}
+
+.custom-select {
+    position: relative;
+    padding: 0 10px;
+    height: 32px;
+    font-size: 13px;
+    display: block;
+    line-height: 14px;
+    color: #333333;
+    vertical-align: middle;
+    background-color: #ffffff;
+    border: 1px solid #cccccc;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    -webkit-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+    transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+}
+
+.custom-select p {
+    line-height: 32px;
+    margin: 0;
+}
+
+.custom-select > span {
+    position: absolute;
+    right: 6px;
+    top: 4px;
+}
+
+.custom-select .list {
+    box-sizing: content-box;
+    position: absolute;
+    top: 32px;
+    left: -1px;
+    background-color: #FFF;
+    border: 1px solid #cccccc;
+    width: auto;
+    z-index: 1100;
+    overflow-x: hidden;
+    max-height: 200px;
+    min-width: 100%;
+    -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+}
+
+.custom-select .list ul {
+    list-style: none;
+    padding: 0;
+    width: 100%;
+    margin: 0;
+}
+
+.custom-select .list ul li a {
+    display: block;
+    color: #333333;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.custom-select .list ul li a span {
+    padding-left: 15px;
+}
+
+.custom-select .list ul li a:hover {
+    background-color: #cccccc;
+    color: #333333;
+}
+
+.custom-select .list ul li a.root {
+    padding-left: 10px;
+}
+
+.custom-select .list ul li.active > a {
+    background-color: #cccccc;
+    color: #333333;
+}
+
+.custom-select .list ul li ul li a {
+    font-weight: normal;
+}
+
+.custom-select .list ul li ul li a span {
+    padding-left: 30px;
+}
+
+.custom-select .list ul li ul li li a span {
+    padding-left: 45px;
+}
+
+.custom-select .list ul li ul li li a li a span {
+    padding-left: 60px;
+}
+
+.custom-select .icon-sort-down {
+    background: url('icn.png') no-repeat 0 -12px #ffffff;
+    height: 20px;
+    width: 10px;
+    display: block;
+}
+
+.custom-select:focus {
+    border-color: #1f1f1f;
+}
+
+.custom-select[disabled],
+.custom-select[readonly],
+fieldset[disabled] .custom-select {
+    cursor: not-allowed;
+    background-color: #eeeeee;
+}

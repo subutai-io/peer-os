@@ -1,0 +1,161 @@
+<div ng-controller="MetricsCtrl as metricsCtrl">
+	<div id="sidebar">
+
+		<div class="scrollableDiv">
+			<js-tree tree-data="json"
+				tree-src="subutai-app/metrics/dummy-api/treedata.json"
+				tree-events="activate_node:selectedNode">
+			</js-tree>
+		</div>
+		<form name="form">
+			<select class="form-control m-b"
+				id="envDropdown"
+				ng-change="metricsCtrl.buildEnvChart()"
+				ng-model="metricsCtrl.envDropdown"
+				ng-options="env.name for env in metricsCtrl.environments"></select>
+		</form>
+
+	</div>
+	<div id="content" class="metricsWrapper">
+		<div class="row wrapper border-bottom white-bg page-heading">
+			<div class="col-lg-9">
+				<h2>Monitoring</h2>
+				<ol class="breadcrumb">
+					<li>
+					<a href="index.html">Home</a>
+					</li>
+					<li class="active">
+					<strong>Monitoring</strong>
+					</li>
+				</ol>
+			</div>
+		</div>
+		<div class="wrapper wrapper-content animated fadeInRight">
+			<div class="row">
+				<ul class="nav nav-tabs" id="metricsTab">
+					<li class="active"><a href="#cpu" data-toggle="tab">CPU</a></li>
+					<li><a href="#ram" data-toggle="tab">RAM</a></li>
+					<li><a href="#dataset" data-toggle="tab">DATASET</a></li>
+				</ul>
+
+				<div class="tab-content">
+					<div class="tab-pane active" id="cpu">
+						<div class="ibox float-e-margins">
+							<div class="ibox-title">
+								<h5>CPU <small>metrics</small></h5>
+								<div class="ibox-tools">
+									<a class="collapse-link">
+										<i class="fa fa-chevron-up"></i>
+									</a>
+									<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+										<i class="fa fa-wrench"></i>
+									</a>
+									<ul class="dropdown-menu dropdown-user">
+										<li><a href="#">Config option 1</a>
+										</li>
+										<li><a href="#">Config option 2</a>
+										</li>
+									</ul>
+									<a class="close-link">
+										<i class="fa fa-times"></i>
+									</a>
+								</div>
+							</div>
+							<div class="ibox-content">
+
+								<canvas linechart options="metricsCtrl.chartOptions"
+									data="metricsCtrl.cpuData"
+									id="cpuCanvas"></canvas>
+							</div>
+						</div>
+
+					</div>
+
+					<div class="tab-pane" id="ram">
+						<div class="ibox float-e-margins">
+							<div class="ibox-title">
+								<h5>RAM <small>metrics</small></h5>
+								<div class="ibox-tools">
+									<a class="collapse-link">
+										<i class="fa fa-chevron-up"></i>
+									</a>
+									<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+										<i class="fa fa-wrench"></i>
+									</a>
+									<ul class="dropdown-menu dropdown-user">
+										<li><a href="#">Config option 1</a>
+										</li>
+										<li><a href="#">Config option 2</a>
+										</li>
+									</ul>
+									<a class="close-link">
+										<i class="fa fa-times"></i>
+									</a>
+								</div>
+							</div>
+							<div class="ibox-content">
+								<canvas linechart options="metricsCtrl.chartOptions"
+									data="metricsCtrl.ramData"
+									id="ramCanvas"></canvas>
+							</div>
+						</div>
+
+					</div>
+					<div class="tab-pane" id="dataset">
+						<div class="ibox float-e-margins">
+							<div class="ibox-title">
+								<h5>DATASET <small>metrics</small></h5>
+								<div class="ibox-tools">
+									<a class="collapse-link">
+										<i class="fa fa-chevron-up"></i>
+									</a>
+									<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+										<i class="fa fa-wrench"></i>
+									</a>
+									<ul class="dropdown-menu dropdown-user">
+										<li><a href="#">Config option 1</a>
+										</li>
+										<li><a href="#">Config option 2</a>
+										</li>
+									</ul>
+									<a class="close-link">
+										<i class="fa fa-times"></i>
+									</a>
+								</div>
+							</div>
+							<div class="ibox-content">
+								<canvas linechart options="metricsCtrl.chartOptions"
+									data="metricsCtrl.datasetData"
+									id="datasetCanvas"></canvas>
+							</div>
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div id="sidebar-resizer"
+		resizer="vertical"
+		resizer-width="6"
+		resizer-left="#sidebar"
+		resizer-right="#content"
+		resizer-max="400">
+	</div>
+
+</div>
+
+
+<script type="text/javascript">
+
+$(document).ready(function(){
+		$('.chosen-select').chosen();
+
+		$('#metricsTab a').click(function (e) {
+				e.preventDefault();
+				$(this).tab('show');
+				});
+		});
+
+</script>

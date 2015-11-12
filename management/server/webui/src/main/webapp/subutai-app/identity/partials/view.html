@@ -1,0 +1,258 @@
+<div id="identity" ng-controller="IdentityCtrl as identityCtrl">
+	<div class="row wrapper border-bottom white-bg page-heading">
+		<div class="col-lg-9">
+			<h2>User identity</h2>
+			<ol class="breadcrumb">
+				<li>
+					<a href="/">Home</a>
+				</li>
+				<li class="active">
+					<strong>User identity</strong>
+				</li>
+			</ol>
+		</div>
+	</div>
+	<div class="animated fadeIn wrapper-content">
+
+		<div class="row">
+			<div id="resizable-pane" class="col-lg-7 fullWidthPane">
+				<div class="white-bg ibox float-e-margins">
+					<div class="ibox-title ibox-tools-right">
+
+						<div class="ibox-tools dropdown">
+							<a ng-click="identityCtrl.addNewPanel()"><i class="fa fa-plus-square"></i></a>
+						</div>
+					</div>
+
+					<div class="panel-body">
+						<tabset>
+							<tab heading="User management" active="identityCtrl.isUser">
+								<div>
+									<table datatable="" 
+										dt-options="identityCtrl.dtOptions" 
+										dt-columns="identityCtrl.dtColumns" 
+										dt-instance="identityCtrl.dtInstance" 
+										class="table table-striped table-hover">
+									</table>
+								</div>
+							</tab>
+
+							<tab heading="Roles management" active="identityCtrl.isRole">
+								<table class="table">
+									<thead>
+										<tr>
+											<th>ID</th>
+											<th>name</th>
+											<th>edit</th>
+										</tr>
+									</thead>
+									<tbody>
+									<tr ng-repeat="(key, role) in identityCtrl.roles">
+										<td>{{role.id}}</td>
+										<td>{{role.name}}</td>
+										<td>
+											<button class="btn btn-warning" ng-click="identityCtrl.editRole(role)">
+												<i class="fa fa-edit"></i>
+											</button>
+											&nbsp;
+											<button class="btn btn-danger" ng-click="identityCtrl.deleteRole(role.id, key)">
+												<i class="fa fa-trash-o"></i>
+											</button>
+										</td>
+									</tr>
+
+									</tbody>
+								</table>
+							</tab>
+						</tabset>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-lg-5">
+				<div id="user-form" class="white-bg ibox float-e-margins" style="visibility: hidden;  display: none;">
+					<div class="ibox-title">
+						<h5>User registration</h5>
+						<div class="ibox-tools dropdown">
+							<a ng-click="identityCtrl.closePane()"><i class="fa fa-times"></i></a>
+						</div>
+					</div>
+
+					<div class="ibox-content">
+
+						<form class="form-horizontal" ng-submit="identityCtrl.addUser()" name="addUserForm">
+
+							<div class="form-group">
+								<label class="col-sm-3 control-label required-label">Username</label>
+								<div class="col-sm-9">
+									<input type="text" 
+										placeholder="Username" 
+										class="form-control" 
+										ng-model="identityCtrl.user2Add.userName" 
+										required 
+										ng-readonly="!identityCtrl.editUserName">
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Full name</label>
+
+								<div class="col-sm-9">
+									<input type="text" placeholder="Full name" class="form-control" ng-model="identityCtrl.user2Add.fullName" required>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-3 control-label required-label">Email</label>
+
+								<div class="col-sm-9">
+									<input type="email" placeholder="email@mail.com" class="form-control" ng-model="identityCtrl.user2Add.email" required>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-3 control-label required-label">Password</label>
+
+								<div class="col-sm-9">
+									<input type="password" 
+										placeholder="***********" 
+										class="form-control" 
+										ng-model="identityCtrl.user2Add.password" 
+										id="js-password" 
+										required>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-3 control-label required-label">Confirm Password</label>
+
+								<div class="col-sm-9">
+									<input type="password" 
+									placeholder="***********" 
+									class="form-control" 
+									ng-model="identityCtrl.user2Add.confirm_password" 
+									pw-check="js-password" 
+									name="confirm_password" 
+									ng-attr-required="identityCtrl.user2Add.password.length > 0">
+									<span class="help-inline text-danger" ng-show="addUserForm.confirm_password.$error.pwmatch">Passwords don't match.</span>
+								</div>
+							</div>
+
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Roles</label>
+							</div>
+							<div class="form-group">
+								<div class="col-sm-2"></div>
+								<div class="col-sm-10">
+									<col-select></col-select>
+								</div>
+							</div>
+							<div class="hr-line-dashed"></div>
+							<div class="form-group">
+								<div class="col-sm-9 col-sm-offset-3">
+									<button class="btn btn-primary btn-md" type="submit">Save user</button>
+									<button class="btn btn-primary btn-md" ng-click="identityCtrl.closePane()">Cancel</button>
+								</div>
+							</div>
+
+						</form>
+					</div>
+				</div>
+
+				<div id="role-form" class="white-bg ibox float-e-margins" style="visibility: hidden; display: none;">
+
+					<div class="ibox-title">
+						<h5>Roles registration</h5>
+						<div class="ibox-tools dropdown">
+							<a ng-click="identityCtrl.closePane()"><i class="fa fa-times"></i></a>
+						</div>
+					</div>
+
+					<div class="ibox-content">
+
+						<form class="form-horizontal" ng-submit="identityCtrl.addRole()">
+
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Role name</label>
+								<div class="col-sm-9">
+									<input type="text" 
+										placeholder="Role name" 
+										class="form-control" 
+										ng-model="identityCtrl.role2Add.name" 
+										required>
+								</div>
+							</div>							
+
+							<table class="table">
+								<thead>
+									<tr>
+										<th>Name</th>
+										<th></th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr ng-repeat="permission in identityCtrl.permissions2Add" ng-if="!permission.selected">
+										<td>{{permission.name}}</td>
+										<td>
+											<button 
+												class="btn btn-primary btn-md editRoleBtn" 
+												ng-click="identityCtrl.addPermission2Stack(permission)">
+												Add
+											</button>
+										</td>
+									</tr>
+
+								</tbody>
+							</table>
+
+							<div class="hr-line-dashed"></div>
+
+							<table class="table">
+								<thead>
+									<tr>
+										<th>Name</th>
+										<th>Read</th>
+										<th>Write</th>
+										<th>Update</th>
+										<th>Delete</th>
+										<th></th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr ng-repeat="permission in identityCtrl.permissions2Add" ng-if="permission.selected">
+										<td>{{permission.name}}</td>
+										<td>
+											<input type="checkbox" ng-model="permission.read">
+										</td>
+										<td>
+											<input type="checkbox" ng-model="permission.write">
+										</td>
+										<td>
+											<input type="checkbox" ng-model="permission.update">
+										</td>
+										<td>
+											<input type="checkbox" ng-model="permission.delete">
+										</td>
+										<td>
+											<button 
+												class="btn btn-danger btn-md editRoleBtn" 
+												ng-click="identityCtrl.addPermission2Stack(permission)">
+												<i class="fa fa-times"></i>
+											</button>
+										</td>
+									</tr>
+
+								</tbody>
+							</table>							
+
+							<div class="hr-line-dashed"></div>
+							<div class="form-group">
+								<div class="col-sm-9 col-sm-offset-3">
+									<button class="btn btn-primary btn-md" type="submit">Save role</button>
+									<button class="btn btn-primary btn-md" ng-click="identityCtrl.closePane()">Cancel</button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+</div>

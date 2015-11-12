@@ -1,0 +1,66 @@
+#sidebar {
+    background-color: #2F4050;
+    color: #A7B1C2;
+    position: absolute;
+    top: 0px;
+    bottom: 0;
+    left: 0;
+    width: 300px;
+    padding: 10px;
+    overflow: hidden;
+}
+#content {
+    position: absolute;
+    top: 0px;
+    bottom: 0;
+    left: 306px /* 200 + 6*/;
+    right: 0;
+    overflow: hidden;
+
+}
+
+#sidebar-resizer {
+    background-color: #2F4050;
+    position: absolute;
+    top: 0px;
+    bottom: 0;
+    left: 300px;
+    width: 6px;
+    cursor: e-resize;
+}
+
+#sidebar-resizer:hover, #preview-resizer:hover { background-color: #676A6C; }
+
+.ibox-tools-right
+{ float: right; }
+
+.ibox-tools-right a {
+    color: #F8AC59;
+    font-size: 20px;
+}
+
+.required-label:after {
+    content:" *";
+    color: red;
+}
+
+.animated { visibility: visible !important; }
+
+.nav-tabs {
+	margin-bottom: 20px;
+}
+
+.myColumns{
+    min-height: 200px;
+}
+
+    .myColumns .subCol{
+    width: 360px;
+    min-height: 70px;
+    float: left;
+    margin-right: 50px;
+}
+.myColumns .subCol div{
+    width: 300px;
+    float: left;
+}

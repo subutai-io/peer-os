@@ -1,0 +1,17 @@
+[
+  {
+    "id": "01",
+    "name": "Resource Host Hadoop1",
+    "color": "{'color':'#6666FF'}"
+  },
+  {
+    "id": "02",
+    "name": "Resource Host Cassandra2",
+    "color": "{'color':'#FF9966'}"
+  },
+  {
+    "id": "03",
+    "name": "Resource Host Spark3",
+    "color": "{'color':'#00CC99'}"
+  }
+]

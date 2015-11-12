@@ -1,0 +1,17 @@
+<div class="ms-container" ng-controller="ColSelectCtrl as colSelectCtrl">
+	<div class="ms-selectable">
+		<ul tabindex="-1" class="ms-list">
+
+			<li class="ms-elem-selectable" ng-repeat="role in colSelectCtrl.roles" ng-if="!role.selected" ng-click="colSelectCtrl.colSelect(role.id)">
+				<span>{{ role.role }}</span>
+			</li>
+		</ul>
+	</div>
+	<div class="ms-selection">
+		<ul tabindex="-1" class="ms-list">
+			<li class="ms-elem-selection ms-selected" ng-repeat="role in colSelectCtrl.roles" ng-if="role.selected" ng-click="colSelectCtrl.colSelect(role.id)">
+				<span>{{ role.role }}</span>
+			</li>
+		</ul>
+	</div>
+</div>

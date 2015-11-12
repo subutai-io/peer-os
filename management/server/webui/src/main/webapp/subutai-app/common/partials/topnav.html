@@ -1,0 +1,63 @@
+<div class="row border-bottom white-bg">
+	<nav class="navbar navbar-static-top" role="navigation">
+		<div class="navbar-header">
+			<button aria-controls="navbar" aria-expanded="false" data-target="#navbar" data-toggle="collapse"
+				class="navbar-toggle collapsed" type="button">
+				<i class="fa fa-reorder"></i>
+			</button>
+			<a href="/" class="navbar-brand">Inspinia</a>
+		</div>
+		<div class="navbar-collapse collapse" id="navbar">
+			<ul class="nav navbar-nav">
+				<li class="dropdown">
+					<a aria-expanded="false" role="button" class="dropdown-toggle"
+					data-toggle="dropdown"> Environment <span class="caret"></span></a>
+					<ul role="menu" class="dropdown-menu">
+						<li><a ui-sref="environment">Environment Manager</a></li>
+						<li><a ui-sref="console">Console</a></li>
+					</ul>
+				</li>
+				<li class="dropdown">
+					<a aria-expanded="false" role="button" class="dropdown-toggle"
+						data-toggle="dropdown"> Peers <span class="caret"></span></a>
+					<ul role="menu" class="dropdown-menu">
+						<li><a ui-sref="peer-registration">Peer Registration</a></li>
+						<!--<li><a ui-sref="registry">Template Registry </a></li>
+						<li><a ui-sref="peers">Peer</a></li>
+						<li><a href="">Console</a></li>-->
+					</ul>
+				</li>
+				<li class="dropdown">
+					<a aria-expanded="false" role="button" class="dropdown-toggle"
+						data-toggle="dropdown"> Security <span class="caret"></span></a>
+					<ul role="menu" class="dropdown-menu">
+						<li><a ui-sref="identity">Identity Manager</a></li>
+						<!--<li><a ui-sref="channel-manager">ChannelManager</a></li>
+						<li ng-controller="wolViewCtrl"><a ng-click="openWolModal()">WOL</a></li>-->
+					</ul>
+				</li>
+				<li class="dropdown">
+					<a aria-expanded="false" role="button" class="dropdown-toggle"
+						data-toggle="dropdown"> Monitoring <span class="caret"></span></a>
+					<ul role="menu" class="dropdown-menu">
+						<li><a ui-sref="metrics">Monitor</a></li>
+						<li><a ui-sref="tracker">Tracker</a></li>
+					</ul>
+				</li>
+				<li>
+					<a ui-sref="plugins">Modules</a>
+				</li>
+				<li>
+					<a ui-sref="pluginsPage">Plugins front</a>
+				</li>
+			</ul>
+			<ul class="nav navbar-top-links navbar-right">
+				<li>
+				<a href="login.html">
+					<i class="fa fa-sign-out"></i> Log in
+				</a>
+				</li>
+			</ul>
+		</div>
+	</nav>
+</div>

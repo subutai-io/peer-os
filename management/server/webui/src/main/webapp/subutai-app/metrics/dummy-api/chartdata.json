@@ -1,0 +1,45 @@
+[{
+  "id": "lxc1",
+  "metrics": [
+    {
+      "time": 9.00,
+      "cpu": 15,
+      "ram": 10,
+      "dataset": 100
+    },
+    {
+      "time": 9.30,
+      "cpu": 100,
+      "ram": 20,
+      "dataset": 200
+    },
+    {
+      "time": 10.00,
+      "cpu": 155,
+      "ram": 56,
+      "dataset": 50
+    }
+  ]
+}, {
+  "id": "lxc2",
+  "metrics": [
+    {
+      "time": 9.00,
+      "cpu": 5,
+      "ram": 55,
+      "dataset": 99
+    },
+    {
+      "time": 9.30,
+      "cpu": 78,
+      "ram": 12,
+      "dataset": 123
+    },
+    {
+      "time": 10.00,
+      "cpu": 7,
+      "ram": 5,
+      "dataset": 66
+    }
+  ]
+}]

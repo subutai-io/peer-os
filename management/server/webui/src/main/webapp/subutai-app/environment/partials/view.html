@@ -1,0 +1,332 @@
+<div ng-controller="EnvironmentViewCtrl as environmentViewCtrl">
+	<div id="identity">
+		<div class="row wrapper border-bottom white-bg page-heading">
+			<div class="col-lg-9">
+				<h2>Environment Manager</h2>
+				<ol class="breadcrumb">
+					<li>
+						<a href="/">Home</a>
+					</li>
+					<li class="active">
+						<strong>Environment Manager</strong>
+					</li>
+				</ol>
+			</div>
+		</div>
+		<div class="animated fadeIn wrapper-content">
+
+			<div class="row">
+				<div id="resizable-pane" class="col-lg-7 fullWidthPane">
+					<div class="white-bg ibox float-e-margins">
+						<div class="panel-body">
+
+							<tabset>
+								<!-- Blueprints tab-->
+								<tab heading="Blueprints">
+									<div ng-include src="'subutai-app/environment/partials/blueprintsTab.html'"></div>
+								</tab>
+
+								<!-- Environment tab-->
+								<tab heading="Environments">
+									<div ng-include src="'subutai-app/environment/partials/environmentsTab.html'" class="table-responsive"></div>
+								</tab>
+
+								<!-- EnvironmentContainer tab-->
+								<tab heading="Environment container quote">
+									<div ng-include src="'subutai-app/environment/partials/envQuotaTab.html'"></div>
+								</tab>
+							</tabset>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-lg-5">
+					<div id="create-blueprint-form" class="white-bg ibox float-e-margins" style="visibility: hidden;  display: none;">
+						<div class="ibox-title">
+							<h5>Create blueprint</h5>
+							<div class="ibox-tools dropdown">
+								<a ng-click="closePanel('createBlueprint')"><i class="fa fa-times"></i></a>
+							</div>
+						</div>
+						<div class="ibox-content">
+							<div class="row">
+								<form ng-submit="showCase.addBlueprint()">								
+									<div class="col-md-6">
+										<div class="form-group">
+											<input type="text" 
+												placeholder="Enter blueprint name" 
+												class="form-control" 
+												ng-model="environmentViewCtrl.blueprintFrom.name" required>
+										</div>
+										<div class="form-group">
+											<label>Node list</label>
+											<div class="row ibox-content">
+												<ul class="tag-list" style="padding: 0">
+													<li ng-repeat="(key, blueprintNode) in environmentViewCtrl.nodeList">
+														<a href ng-click="environmentViewCtrl.setNodeData(key)">
+															<i class="fa fa-cube"></i> {{ blueprintNode.name }}
+														</a>
+													</li>
+												</ul>
+											</div>
+										</div>
+									</div>
+									<div class="col-md-6">
+										<div class="form-group">
+											<input type="text" 
+												placeholder="Enter node name" 
+												class="form-control" 
+												ng-model="environmentViewCtrl.blueprintFrom.currentNode.name" required>
+										</div>
+
+										<div class="form-group">
+											<select class="form-control" 
+												ng-model="environmentViewCtrl.blueprintFrom.currentNode.templateName"
+											>
+												<option ng-repeat="template in environmentViewCtrl.templates" value="{{ template }}">
+													{{ template }}
+												</option>
+											</select>
+										</div>
+
+										<div class="form-group">
+											<input type="number" 
+												placeholder="Enter number of containers" 
+												class="form-control" 
+												ng-model="environmentViewCtrl.blueprintFrom.currentNode.numberOfContainers" required>
+										</div>
+
+										<div class="form-group">
+											<input type="text" 
+											placeholder="Enter SSH group ID" 
+											class="form-control" 
+											ng-model="environmentViewCtrl.blueprintFrom.currentNode.sshGroupId" required>											
+										</div>
+
+										<div class="form-group">
+											<input type="text" 
+												placeholder="Enter host group ID" 
+												class="form-control"
+												ng-model="environmentViewCtrl.blueprintFrom.currentNode.hostsGroupId" required>												
+										</div>
+
+										<div class="form-group">
+											<select class="form-control" 
+												ng-model="environmentViewCtrl.blueprintFrom.currentNode.containerPlacementStrategy.strategyId"
+											>
+												<option value="ROUND_ROBIN">TINY</option>
+												<option value="ROUND_ROBIN">MEDIUM</option>
+												<option value="ROUND_ROBIN">LARGE</option>
+												<option value="ROUND_ROBIN">HUGE</option>
+											</select>
+										</div>
+
+										<button type="button" class="btn btn-outline btn-primary" ng-click="environmentViewCtrl.addNewNode(environmentViewCtrl.nodeStatus)">
+											<i class="fa fa-arrow-left"></i> {{ environmentViewCtrl.nodeStatus }} node list
+										</button>
+									</div>
+								</form>
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-primary" ng-click="environmentViewCtrl.addBlueprint()">
+								Save changes
+							</button>
+							<button type="button" class="btn btn-white" ng-click="closePanel('createBlueprint')">
+								Close
+							</button>
+						</div>
+					</div>
+
+					<div id="build-blueprint-form" class="white-bg ibox float-e-margins" style="visibility: hidden; display: none;">
+						<div class="ibox-title">
+							<h5>Build blueprint</h5>
+							<div class="ibox-tools dropdown">
+								<a ng-click="closePanel('buildBlueprint')"><i class="fa fa-times"></i></a>
+							</div>
+						</div>
+						<div class="ibox-content">
+							<div class="row">
+								<div class="col-lg-12">
+									<div class="ibox float-e-margins">
+										<table class="table table-bordered ibox-content">
+											<tr>
+												<th>Name</th>
+												<th>Amount</th>
+												<th>Peer</th>
+												<th></th>
+											</tr>
+											<tr ng-repeat="(key, nodeGroups) in environmentViewCtrl.createEnviromentInfo">
+												<td>{{ nodeGroups.name }}</td>
+												<td>
+													<input type="range" 
+													ng-show="nodeGroups.numberOfContainers > 0" 
+													min="1" 
+													max="{{ nodeGroups.numberOfContainers }}" 
+													ng-model="environmentViewCtrl.transportNodes[key].numberOfContainers">
+
+													<input type="range" 
+													ng-show="nodeGroups.numberOfContainers <= 0" 
+													min="0" max="0">
+
+													{{ environmentViewCtrl.transportNodes[key].numberOfContainers }}
+												</td>
+												<td>
+													<select class="form-control" 
+													ng-model="environmentViewCtrl.transportNodes[key].peer">
+														<option 
+														ng-repeat="(peerId, peer) in environmentViewCtrl.peers" 
+														value="{{ peerId }}">
+															{{ peer }}
+														</option>
+													</select>
+												</td>
+												<td>
+													<a href class="btn btn-white btn-sm" 
+													ng-click="environmentViewCtrl.placeNode(environmentViewCtrl.transportNodes[key], nodeGroups, key)">
+														<i class="fa fa-arrow-down"></i> Place
+													</a>
+												</td>
+											</tr>
+										</table>
+
+										<table class="table table-bordered ibox-content">
+											<tr>
+												<th>Name</th>
+												<th>Amount</th>
+												<th>Peer</th>
+												<th></th>
+											</tr>
+											<tr ng-repeat="(key, nodeToCreate) in environmentViewCtrl.nodesToCreate">
+												<td>{{ nodeToCreate.name }}</td>
+												<td>{{ nodeToCreate.numberOfContainers }}</td>
+												<td>{{ nodeToCreate.peer }}</td>
+												<td>
+													<a href class="btn btn-white btn-sm" ng-click="environmentViewCtrl.removeNode(key)">
+														<i class="fa fa-arrow-up"></i> Remove
+													</a>
+												</td>
+											</tr>
+										</table>
+
+										<div ng-show="environmentViewCtrl.addBlueprintType == 'build'">
+											<label>Subnet CIDR</label>
+											<input placeholder="Enter Subnet CIDR" 
+											class="form-control" 
+											ng-model="environmentViewCtrl.subnetCIDR">
+										</div>
+
+										<div ng-show="environmentViewCtrl.addBlueprintType == 'grow'">
+											<label>Environment</label>
+											<select class="form-control" 
+											ng-model="environmentViewCtrl.environmentToGrow">
+												<option 
+												ng-repeat="(key, environment) in environmentViewCtrl.environments" 
+												value="{{ environment.id }}">
+													{{ environment.name }}
+												</option>
+											</select>											
+										</div>										
+
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-white" ng-click="closePanel('buildBlueprint')">Close</button>
+							<button type="button" class="btn btn-primary" ng-click="environmentViewCtrl.buildBlueprint()" ng-show="environmentViewCtrl.addBlueprintType == 'build'">
+								Build
+							</button>
+							<button type="button" class="btn btn-primary" ng-click="environmentViewCtrl.growBlueprint()" ng-show="environmentViewCtrl.addBlueprintType == 'grow'">
+								Grow
+							</button>
+						</div>
+					</div>
+
+					<div id="environment-containers-form" class="white-bg ibox float-e-margins" style="visibility: hidden;  display: none;">
+
+						<div class="ibox-title">
+							<h5>Environment containers</h5>
+							<div class="ibox-tools dropdown">
+								<a ng-click="closePanel('envContainers')"><i class="fa fa-times"></i></a>
+							</div>
+						</div>
+						<div class="ibox-content table-responsive">
+							<div class="row">
+								<table class="table table-bordered ibox-content">
+									<tr>
+										<th>Id</th>
+										<th>Template</th>
+										<th>Hostname</th>
+										<th>IP</th>
+										<th></th>
+									</tr>
+									<tr ng-repeat="(key, container) in environmentViewCtrl.containers">
+										<td>{{ container.id }}</td>
+										<td>{{ container.templateName }}</td>
+										<td>{{ container.hostname }}</td>
+										<td>{{ container.ip }}</td>
+										<td>
+											<a class="btn btn-outline btn-default btn-sm" data-toggle="modal" data-target="#environmentTag">
+												Tags
+											</a><br/>
+											<a class="btn btn-outline btn-default btn-sm" ng-click="environmentViewCtrl.containerAction(key)">
+												<span ng-show="container.state === undefined"></span>
+												<span ng-show="container.state == 'RUNNING'">Stop</span>
+												<span ng-show="container.state == 'STOPPED'">Start</span>
+											</a><br/>
+											<a class="btn btn-outline btn-danger btn-sm" ng-click="environmentViewCtrl.destroyContainer(container.id, key)">
+												Destroy
+											</a>
+										</td>
+									</tr>
+								</table>
+							</div>
+						</div>
+					</div>
+
+					<div id="environment-sshkey-form" class="white-bg ibox float-e-margins" style="visibility: hidden;  display: none;">
+						<div class="ibox-title">
+							<h5>Environment SSH Keys</h5>
+							<div class="ibox-tools dropdown">
+								<a ng-click="closePanel('envSshKey')"><i class="fa fa-times"></i></a>
+							</div>
+						</div>
+						<div class="ibox-content">
+							<div class="row">
+								<label>SSH Key</label>
+								<textarea class="form-control" ng-model="environmentViewCtrl.enviromentSSHKey.key"></textarea><br>
+								<a href="" class="btn btn-outline btn-default btn-sm" ng-click="environmentViewCtrl.addSshKey()">Add key</a>
+								<a href="" class="btn btn-outline btn-danger btn-sm" ng-click="environmentViewCtrl.removeSshKey()">Remove key</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!--Modal Panles-->
+
+	<!--Environment tag modal-->
+	<div class="modal inmodal" id="environmentTag" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog modal-sm">
+			<div class="modal-content animated bounceInRight">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+					<h5>Environment Tag</h5>
+				</div>
+				<div class="modal-body">
+					<div class="row text-center">
+						..................
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-white" data-dismiss="modal">Cancel</button>
+					<button type="button" class="btn btn-primary">Confirm</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div>

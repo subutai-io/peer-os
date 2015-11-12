@@ -1,0 +1,16 @@
+{
+  "data": [
+            {
+              "name": "Spark",
+              "action": "Remove"
+            },
+            {
+              "name": "Cassandra",
+              "action": "Remove"
+            },
+            {
+              "name": "Oozie",
+              "action": "Remove"
+            }
+          ]
+}
