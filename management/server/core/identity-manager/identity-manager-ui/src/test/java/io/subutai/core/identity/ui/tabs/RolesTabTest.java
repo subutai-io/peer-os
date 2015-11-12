@@ -17,11 +17,12 @@ import com.vaadin.data.util.BeanItem;
 public class RolesTabTest
 {
     private RolesTab rolesTab;
-    
+
     @Mock
     IdentityManager identityManager;
     @Mock
     BeanItem<Role> beanItem;
+
 
     @Before
     public void setUp() throws Exception

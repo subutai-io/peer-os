@@ -19,8 +19,8 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>subutai-common</artifactId>
-	  <version>4.0.0-RC3</version>
-	</dependency>
+      <version>4.0.0-RC3</version>
+    </dependency>
   </dependencies>
 
   <build>

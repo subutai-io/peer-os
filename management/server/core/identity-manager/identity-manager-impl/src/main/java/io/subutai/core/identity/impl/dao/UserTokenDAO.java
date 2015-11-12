@@ -65,11 +65,13 @@ public class UserTokenDAO
         UserToken result = find( token );
         try
         {
-            if(result!=null)
+            if ( result != null )
             {
-                Date curDate = new Date(System.currentTimeMillis());
-                if(!result.getValidDate().after( curDate ))
+                Date curDate = new Date( System.currentTimeMillis() );
+                if ( !result.getValidDate().after( curDate ) )
+                {
                     return null;
+                }
             }
         }
         catch ( Exception e )
@@ -80,7 +82,6 @@ public class UserTokenDAO
     }
 
 
-
     /* *************************************************
      *
      */
@@ -89,9 +90,11 @@ public class UserTokenDAO
         EntityManager em = daoManager.getEntityManagerFromFactory();
 
         List<UserToken> result = Lists.newArrayList();
+        Query query = null;
         try
         {
-            result = em.createQuery( "select h from UserTokenEntity h", UserToken.class ).getResultList();
+            query = em.createQuery( "select h from UserTokenEntity h", UserTokenEntity.class );
+            result = ( List<UserToken> ) query.getResultList();
         }
         catch ( Exception e )
         {
@@ -155,23 +158,10 @@ public class UserTokenDAO
     /* *************************************************
      *
      */
-    public void update( final UserToken item )
+    public void update( final UserToken item, final String oldName )
     {
-        EntityManager em = daoManager.getEntityManagerFromFactory();
-        try
-        {
-            daoManager.startTransaction( em );
-            em.merge( item );
-            daoManager.commitTransaction( em );
-        }
-        catch ( Exception e )
-        {
-            daoManager.rollBackTransaction( em );
-        }
-        finally
-        {
-            daoManager.closeEntityManager( em );
-        }
+        remove( oldName );
+        persist( item );
     }
 
 
@@ -186,10 +176,10 @@ public class UserTokenDAO
         {
             List<UserToken> result = null;
             Query qr = em.createQuery( "select h from UserTokenEntity h where h.user.id=:userId", UserToken.class );
-            qr.setParameter( "userId",userId );
+            qr.setParameter( "userId", userId );
             result = qr.getResultList();
 
-            if(result!=null)
+            if ( result != null )
             {
                 tk = result.get( 0 );
             }
@@ -205,6 +195,7 @@ public class UserTokenDAO
         return tk;
     }
 
+
     /* *************************************************
      *
      */
@@ -215,12 +206,14 @@ public class UserTokenDAO
         try
         {
             List<UserToken> result = null;
-            Query qr = em.createQuery( "select h from UserTokenEntity h where h.user.id=:userId and h.validDate>=:validDate", UserToken.class );
-            qr.setParameter( "userId",userId );
-            qr.setParameter( "validDate",new Date(System.currentTimeMillis()));
+            Query qr = em.createQuery(
+                    "select h from UserTokenEntity h where h.user.id=:userId and h.validDate>=:validDate",
+                    UserToken.class );
+            qr.setParameter( "userId", userId );
+            qr.setParameter( "validDate", new Date( System.currentTimeMillis() ) );
             result = qr.getResultList();
 
-            if(result!=null)
+            if ( result != null )
             {
                 tk = result.get( 0 );
             }

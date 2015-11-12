@@ -59,7 +59,8 @@ public class UsersTab extends CustomComponent implements TabCallback<BeanItem<Us
 
         // Bind a table to it
         usersTable = new Table( "Users", beans );
-        usersTable.setVisibleColumns( new Object[] { "id","userName", "fullName", "email", "typeName" ,"statusName" } );
+        usersTable
+                .setVisibleColumns( new Object[] { "id", "userName", "fullName", "email", "typeName", "statusName" } );
         usersTable.setPageLength( 7 );
         usersTable.setColumnHeader( "id", "id" );
         usersTable.setColumnHeader( "userName", "Username" );
@@ -82,7 +83,7 @@ public class UsersTab extends CustomComponent implements TabCallback<BeanItem<Us
                     return;
                 }
                 BeanItem<User> userBean = beans.getItem( usersTable.getValue() );
-                refreshControls( FormState.STATE_EXISTING_ENTITY_SELECTED, userBean);
+                refreshControls( FormState.STATE_EXISTING_ENTITY_SELECTED, userBean );
                 //                usersTable.select( null );
             }
         } );
@@ -97,8 +98,9 @@ public class UsersTab extends CustomComponent implements TabCallback<BeanItem<Us
         {
             public void buttonClick( Button.ClickEvent event )
             {
-                 //Create a new item; this will create a new bean
-                BeanItem<User> newUser = new BeanItem(identityManager.createTempUser( "","","","", UserType.Regular.getId() ));
+                //Create a new item; this will create a new bean
+                BeanItem<User> newUser =
+                        new BeanItem( identityManager.createTempUser( "", "", "", "", UserType.Regular.getId() ) );
 
                 // The form was opened for editing a new item
                 refreshControls( FormState.STATE_NEW_ENTITY, newUser );
@@ -106,8 +108,8 @@ public class UsersTab extends CustomComponent implements TabCallback<BeanItem<Us
         } );
 
         vlayout.addComponent( newBean );
-        vlayout.setSpacing (true);
-        vlayout.setMargin (true);
+        vlayout.setSpacing( true );
+        vlayout.setMargin( true );
         layout.addComponent( usersTable );
 
         layout.setSpacing( true );
@@ -130,27 +132,27 @@ public class UsersTab extends CustomComponent implements TabCallback<BeanItem<Us
         switch ( state )
         {
             case STATE_EXISTING_ENTITY_SELECTED:
-                form = new UserForm (this, identityManager);
+                form = new UserForm( this, identityManager );
                 form.setUser( userBean, false );
                 UI.getCurrent().addWindow( form );
-                newBean.setEnabled(false);
+                newBean.setEnabled( false );
                 usersTable.setEnabled( false );
                 break;
             case STATE_SAVE_EXISTING_ENTITY:
             case STATE_SAVE_NEW_ENTITY:
                 newBean.setEnabled( true );
-                form.setUser (userBean, true);
+                form.setUser( userBean, true );
                 usersTable.setEnabled( true );
                 form.close();
                 break;
             case STATE_REMOVE_ENTITY:
                 newBean.setEnabled( true );
                 form.close();
-                usersTable.setEnabled(true);
+                usersTable.setEnabled( true );
                 break;
             case STATE_NEW_ENTITY:
-                form = new UserForm (this, identityManager);
-                form.setUser (userBean, true);
+                form = new UserForm( this, identityManager );
+                form.setUser( userBean, true );
                 UI.getCurrent().addWindow( form );
                 newBean.setEnabled( false );
                 usersTable.setEnabled( false );

@@ -8,6 +8,7 @@ import javax.persistence.EntityManager;
 import com.google.common.collect.Lists;
 
 import io.subutai.common.dao.DaoManager;
+import io.subutai.core.identity.api.model.Permission;
 import io.subutai.core.identity.api.model.Role;
 import io.subutai.core.identity.impl.model.RoleEntity;
 
@@ -17,7 +18,7 @@ import io.subutai.core.identity.impl.model.RoleEntity;
  */
 class RoleDAO
 {
-    private DaoManager daoManager= null;
+    private DaoManager daoManager = null;
 
 
     /* *************************************************
@@ -143,4 +144,30 @@ class RoleDAO
         }
     }
 
+
+    /* *************************************************
+         *
+         */
+    public void persistByName( String newName, int newType )
+    {
+        EntityManager em = daoManager.getEntityManagerFromFactory();
+        Role newRole = new RoleEntity();
+        newRole.setName( newName );
+        newRole.setType( newType );
+        try
+        {
+            daoManager.startTransaction( em );
+            em.persist( newRole );
+            em.flush();
+            daoManager.commitTransaction( em );
+        }
+        catch ( Exception e )
+        {
+            daoManager.rollBackTransaction( em );
+        }
+        finally
+        {
+            daoManager.closeEntityManager( em );
+        }
+    }
 }

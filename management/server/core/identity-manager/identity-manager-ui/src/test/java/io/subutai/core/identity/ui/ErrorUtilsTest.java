@@ -27,7 +27,6 @@ public class ErrorUtilsTest
     @Test
     public void testGetComponentError() throws Exception
     {
-        errorUtils.getComponentError( new ArrayList<Object>(  ) );
+        errorUtils.getComponentError( new ArrayList<Object>() );
     }
-
 }
