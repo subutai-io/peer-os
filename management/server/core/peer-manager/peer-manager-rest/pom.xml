@@ -36,17 +36,13 @@
     </dependency>
 
     <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>http-context-manager-api</artifactId>
+      <groupId>com.fasterxml.jackson.jaxrs</groupId>
+      <artifactId>jackson-jaxrs-json-provider</artifactId>
+      <version>${jackson.version}</version>
     </dependency>
     <dependency>
-    	<groupId>com.fasterxml.jackson.jaxrs</groupId>
-    	<artifactId>jackson-jaxrs-json-provider</artifactId>
-    	<version>${jackson.version}</version>
-    </dependency>
-    <dependency>
-    	<groupId>org.codehaus.jackson</groupId>
-    	<artifactId>jackson-jaxrs</artifactId>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-jaxrs</artifactId>
       <version>${jackson-jaxrs.version}</version>
     </dependency>
 

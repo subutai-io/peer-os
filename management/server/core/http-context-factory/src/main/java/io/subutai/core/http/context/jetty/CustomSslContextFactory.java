@@ -1,20 +1,11 @@
 package io.subutai.core.http.context.jetty;
 
 
-
-//import java.security.cert.CRL;
-//import java.util.Collection;
-//import javax.net.ssl.TrustManager;
-//import javax.net.ssl.X509TrustManager;
-//import java.security.cert.CertificateException;
-//import java.security.cert.X509Certificate;
-//import io.subutai.common.security.crypto.ssl.NaiveTrustManager;
-
 import java.security.KeyStore;
+
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 
 /**
@@ -28,6 +19,7 @@ public class CustomSslContextFactory extends SslContextFactory
 
     private boolean customStart = false;
 
+    //TODO take these parameters from config file
     private String _keyStorePassword = "subutai";
     private String _trustStorePassword = "subutai";
 
@@ -91,18 +83,4 @@ public class CustomSslContextFactory extends SslContextFactory
     {
         this.customStart = customStart;
     }
-
-    /*
-    @Override
-    protected TrustManager[] getTrustManagers( final KeyStore trustStore, final Collection<? extends CRL> crls )
-            throws Exception
-    {
-        //CertificateVerifier certVerifier = new CertificateVerifier( certificateVerificationUrl, new HttpClient() );
-
-        TrustManager[] certs = new TrustManager[] {
-                new NaiveTrustManager()
-        };
-
-        return certs;
-    }*/
 }

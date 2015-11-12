@@ -1,4 +1,4 @@
-package io.subutai.core.http.manager.api;
+package io.subutai.core.security.api.jetty;
 
 
 public interface HttpContextManager
