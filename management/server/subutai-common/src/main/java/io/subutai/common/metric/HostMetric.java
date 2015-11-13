@@ -19,10 +19,8 @@ import com.google.gson.annotations.SerializedName;
 @XmlAccessorType( XmlAccessType.FIELD )
 public class HostMetric
 {
-    @JsonIgnore
     private String peerId;
 
-    @JsonIgnore
     protected String hostId;
     @Expose
     @SerializedName( "host" )
@@ -131,13 +129,13 @@ public class HostMetric
         return cpu != null ? cpu.coreCount : 0;
     }
 
-
+    @JsonIgnore
     public Double getFreeRam()
     {
         return ram != null ? ram.free : 0;
     }
 
-
+    @JsonIgnore
     public Double getTotalSpace()
     {
         return disk != null ? disk.getTotal() : 0;

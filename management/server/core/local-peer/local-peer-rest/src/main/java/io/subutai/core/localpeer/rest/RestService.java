@@ -2,7 +2,6 @@ package io.subutai.core.localpeer.rest;
 
 
 import java.util.Collection;
-import java.util.List;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -17,15 +16,10 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInterfaces;
-import io.subutai.common.metric.HostMetric;
-import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
-import io.subutai.common.peer.ContainerGateway;
-import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.N2NConfig;
@@ -47,12 +41,6 @@ public interface RestService
     @Path( "/info" )
     @Produces( MediaType.APPLICATION_JSON )
     public PeerInfo getPeerInfo();
-
-//    @GET
-//    @Path( "registered_peers" )
-//    @Produces( MediaType.APPLICATION_JSON )
-//    public List<PeerInfo> getRegisteredPeers();
-
 
     @GET
     @Path( "peer_policy" )
@@ -123,92 +111,11 @@ public interface RestService
     @Path( "network/{environmentId}" )
     void cleanupNetwork( @PathParam( "environmentId" ) EnvironmentId environmentId );
 
-    //*************** Peer Registration Handshake REST - BEGIN ***************************
-
-    //TODO move all registration process operations to peerManager and remove duplicated code pieces from
-    // TODO !!! @Nurkaly do this please !!!
-    // PeerRegistrationUI and RestServiceImpl
-    //    @POST
-    //    @Path( "register" )
-    //    @Consumes(     MediaType.APPLICATION_JSON  )
-    //    @Produces(     MediaType.APPLICATION_JSON  )
-    //    public Response processRegistrationRequest( RegistrationRequest registrationRequest );
-
-    //
-    //    @POST
-    //    @Path( "register/{peerIp}" )
-    //    @Produces(     MediaType.APPLICATION_JSON  )
-    //    public Response doRegistrationRequest( @PathParam( "peerIp" ) String peerIp );
-
-
-    //    @DELETE
-    //    @Path( "unregister" )
-    //    @Produces(     MediaType.APPLICATION_JSON  )
-    //    public Response unregisterPeer( @QueryParam( "peerId" ) String peerId );
-    //
-    //
-    //    @PUT
-    //    @Path( "reject" )
-    //    @Produces(     MediaType.APPLICATION_JSON  )
-    //    public Response rejectForRegistrationRequest( @FormParam( "rejectedPeerId" ) String rejectedPeerId );
-    //
-    //
-    //    @DELETE
-    //    @Path( "remove" )
-    //    @Produces(     MediaType.APPLICATION_JSON  )
-    //    public Response removeRegistrationRequest( @QueryParam( "rejectedPeerId" ) String rejectedPeerId );
-    //
-    //
-    //    @PUT
-    //    @Path( "approve" )
-    //    @Produces(     MediaType.APPLICATION_JSON  )
-    //    public Response approveForRegistrationRequest( @FormParam( "approvedPeer" ) String approvedPeer,
-    //                                                   @FormParam( "cert" ) String certHEX );
-
-
     @PUT
     @Path( "update" )
     @Produces( MediaType.APPLICATION_JSON )
     public Response updatePeer( @FormParam( "peer" ) String peer );
 
-    //*************** Peer Registration Handshake REST - END ***************************
-
-
-    //*********** Environment Specific REST - BEGIN ***************
-
-
-//    @POST
-//    @Path( "container/destroy" )
-//    @Consumes( MediaType.APPLICATION_JSON )
-//    @Produces( MediaType.APPLICATION_JSON )
-//    public void destroyContainer( ContainerId containerId );
-//
-//    @POST
-//    @Path( "container/start" )
-//    @Consumes( MediaType.APPLICATION_JSON )
-//    @Produces( MediaType.APPLICATION_JSON )
-//    public void startContainer( ContainerId containerId );
-//
-//    @POST
-//    @Path( "container/stop" )
-//    @Consumes( MediaType.APPLICATION_JSON )
-//    @Produces( MediaType.APPLICATION_JSON )
-//    public void stopContainer( ContainerId containerId );
-//
-//    @POST
-//    @Path( "container/state" )
-//    @Consumes( MediaType.APPLICATION_JSON )
-//    @Produces( MediaType.APPLICATION_JSON )
-//    public ContainerHostState getContainerState( ContainerId containerId );
-//
-//
-//    @GET
-//    @Path( "container/{id}/usage/{pid}" )
-//    @Consumes( MediaType.APPLICATION_JSON )
-//    @Produces( MediaType.APPLICATION_JSON )
-//    ProcessResourceUsage getProcessResourceUsage( @PathParam( "id" ) ContainerId containerId,
-//                                                  @PathParam( "pid" ) int pid );
-//
     @GET
     @Path( "container/quota/ram/available" )
     @Produces( MediaType.APPLICATION_JSON )
@@ -290,14 +197,6 @@ public interface RestService
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
     ResourceHostMetrics getResources();
-
-//    @GET
-//    @Path( "metrics/{hostId}" )
-//    @Consumes( MediaType.APPLICATION_JSON )
-//    @Produces( MediaType.APPLICATION_JSON )
-//    HostMetric getHostMetric( @PathParam( "hostId" ) String hostId );
-
-    //*********** Environment Specific REST - END ***************
 
     @GET
     @Path( "interfaces" )

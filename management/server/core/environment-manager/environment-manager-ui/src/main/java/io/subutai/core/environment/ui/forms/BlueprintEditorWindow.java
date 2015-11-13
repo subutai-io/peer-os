@@ -157,7 +157,6 @@ public class BlueprintEditorWindow extends Window
         final Blueprint b = new Blueprint( nameTxt.getValue(), nodeGroups );
 
         b.setId( this.blueprint.getId() );
-        b.setContainerDistributionType( this.blueprint.getContainerDistributionType() );
         return b;
     }
 

@@ -266,6 +266,8 @@ public class PeerWebClient
         String path = "/resources";
 
         WebClient client = WebClientBuilder.buildPeerWebClient( host, path, provider );
+        client.type( MediaType.APPLICATION_JSON );
+        client.accept( MediaType.APPLICATION_JSON );
 
         return client.get( ResourceHostMetrics.class );
     }
