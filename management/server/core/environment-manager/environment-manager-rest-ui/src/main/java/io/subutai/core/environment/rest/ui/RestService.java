@@ -15,23 +15,14 @@ import java.util.UUID;
 
 public interface RestService
 {
-
-    @GET
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public Response listEnvironments();
-
+    /** Templates *****************************************************/
     @GET
     @Path( "templates" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response listTemplates();
 
-    @GET
-    @Path( "domain" )
-    @Produces( { MediaType.TEXT_PLAIN } )
-    public Response getDefaultDomainName();
 
-    // blueprint
-
+    /** Blueprints ****************************************************/
     @GET
     @Path( "blueprint" )
     @Produces( { MediaType.TEXT_PLAIN } )
@@ -45,6 +36,44 @@ public interface RestService
     @DELETE
     @Path( "blueprint/{blueprintId}" )
     public Response deleteBlueprint( @PathParam( "blueprintId" ) UUID blueprintId );
+
+
+    /** Domain *****************************************************/
+    @GET
+    @Path( "domain" )
+    @Produces( { MediaType.TEXT_PLAIN } )
+    public Response getDefaultDomainName();
+
+
+    /** Environments *****************************************************/
+    @GET
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response listEnvironments();
+
+
+    @POST
+    public Response createEnvironment( @FormParam( "name" ) String environmentName,
+                                       @FormParam( "topology" ) String topologyJsonString,
+                                       @FormParam( "subnet" ) String subnetCidr, @FormParam( "key" ) String sshKey );
+
+    @POST
+    @Path( "grow" )
+    public Response growEnvironment( @FormParam( "environmentId" ) String environmentId,
+                                     @FormParam( "topology" ) String topologyJsonString );
+
+    @POST
+    @Path( "key" )
+    public Response setSshKey( @FormParam( "environmentId" ) String environmentId, @FormParam( "key" ) String key );
+
+
+    @DELETE
+    @Path( "{environmentId}/keys" )
+    public Response removeSshKey( @PathParam( "environmentId" ) String environmentId );
+
+    @DELETE
+    @Path( "{environmentId}" )
+    public Response destroyEnvironment( @PathParam( "environmentId" ) String environmentId );
+
 
     // container
 
@@ -72,35 +101,6 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response stopContainer( @PathParam( "containerId" ) String containerId );
 
-    // environment
-
-    @GET
-    @Path( "{environmentId}" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public Response viewEnvironment( @PathParam( "environmentId" ) String environmentId );
-
-    @POST
-    public Response createEnvironment( @FormParam( "name" ) String environmentName,
-                                       @FormParam( "topology" ) String topologyJsonString,
-                                       @FormParam( "subnet" ) String subnetCidr, @FormParam( "key" ) String sshKey );
-
-    @POST
-    @Path( "grow" )
-    public Response growEnvironment( @FormParam( "environmentId" ) String environmentId,
-                                     @FormParam( "topology" ) String topologyJsonString );
-
-    @POST
-    @Path( "key" )
-    public Response setSshKey( @FormParam( "environmentId" ) String environmentId, @FormParam( "key" ) String key );
-
-
-    @DELETE
-    @Path( "{environmentId}/keys" )
-    public Response removeSshKey( @PathParam( "environmentId" ) String environmentId );
-
-    @DELETE
-    @Path( "{environmentId}" )
-    public Response destroyEnvironment( @PathParam( "environmentId" ) String environmentId );
 
 
     // Peers

@@ -14,15 +14,12 @@
     <reference id="peerManager" availability="mandatory"
                interface="io.subutai.core.peer.api.PeerManager" />
 
-    <reference id="httpContextManager" availability="mandatory"
-               interface="io.subutai.core.http.manager.api.HttpContextManager" />
 
     <reference id="securityManager" availability="mandatory"
                interface="io.subutai.core.security.api.SecurityManager" />
 
     <bean id="peerRestUIServiceImpl" class="io.subutai.core.peer.rest.ui.RestServiceImpl">
         <argument ref="peerManager" />
-        <argument ref="httpContextManager" />
         <argument ref="securityManager" />
     </bean>
 
