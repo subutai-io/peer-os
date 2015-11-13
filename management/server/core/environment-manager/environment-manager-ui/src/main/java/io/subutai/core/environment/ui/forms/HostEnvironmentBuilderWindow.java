@@ -72,7 +72,7 @@ public class HostEnvironmentBuilderWindow extends Window
         this.peerManager = peerManager;
         initMetrics();
 
-        setCaption( "Strategy based environment builder" );
+        setCaption( "Host based environment builder" );
         setWidth( "800px" );
         setHeight( "600px" );
         setModal( true );
