@@ -4,6 +4,8 @@ package io.subutai.common.security;
 import java.security.KeyStore;
 import java.util.Arrays;
 
+import javax.ws.rs.core.MediaType;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,11 +42,15 @@ public class WebClientBuilder
         if ( provider == null )
         {
             client = WebClient.create( effectiveUrl );
+
         }
         else
         {
             client = WebClient.create( effectiveUrl, Arrays.asList( provider ) );
         }
+        client.type( MediaType.APPLICATION_JSON );
+        client.accept( MediaType.APPLICATION_JSON );
+
         HTTPConduit httpConduit = ( HTTPConduit ) WebClient.getConfig( client ).getConduit();
 
         HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
