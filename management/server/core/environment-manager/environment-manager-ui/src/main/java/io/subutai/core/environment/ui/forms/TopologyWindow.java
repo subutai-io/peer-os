@@ -147,7 +147,20 @@ public class TopologyWindow extends Window
         }
         else
         {
-            Topology topology = new Topology();
+            Topology topology;
+            if ( grow )
+            {
+                Environment environment = ( Environment ) envCombo.getValue();
+                topology =
+                        new Topology( environment.getName(), environment.getId(), environment.getSubnetCidr(), null );
+            }
+            else
+            {
+                final String environmentId = UUID.randomUUID().toString();
+                final String subnet = subnetTxt.getValue().trim();
+                topology = new Topology( String.format( "%s-%s", blueprint.getName(), environmentId ), environmentId,
+                        subnet, null );
+            }
             constructTopology( topology, placements );
 
             try
@@ -155,13 +168,15 @@ public class TopologyWindow extends Window
                 if ( grow )
                 {
                     Environment environment = ( Environment ) envCombo.getValue();
-                    environmentManager.growEnvironment( environment.getId(), topology, true );
-                    Notification.show( "Environment growth started" );
+                    environmentManager.growEnvironment( topology, true );
+                    Notification.show( "Environment expanding started" );
                 }
                 else
                 {
-                    checkPickedSubnetValidity( topology, environmentManager );
+                    environmentManager.createEnvironment( topology, true );
+                    Notification.show( "Environment creation started" );
                 }
+
 
                 close();
             }
@@ -185,36 +200,36 @@ public class TopologyWindow extends Window
         }
     }
 
-
-    private void checkPickedSubnetValidity( final Topology topology, final EnvironmentManager environmentManager )
-            throws EnvironmentManagerException, PeerException, EnvironmentCreationException
-    {
-        //check availability of subnet
-        Map<Peer, Set<Gateway>> usedGateways = getUsedGateways( topology.getNodeGroupPlacement().keySet() );
-
-        SubnetUtils subnetUtils = new SubnetUtils( subnetTxt.getValue() );
-        String environmentGatewayIp = subnetUtils.getInfo().getLowAddress();
-
-        for ( Map.Entry<Peer, Set<Gateway>> peerGateways : usedGateways.entrySet() )
-        {
-            Peer peer = peerGateways.getKey();
-            Set<Gateway> gateways = peerGateways.getValue();
-            for ( Gateway gateway : gateways )
-            {
-                if ( gateway.getIp().equals( environmentGatewayIp ) )
-                {
-                    throw new EnvironmentManagerException(
-                            String.format( "Subnet %s is already used on peer %s", environmentGatewayIp,
-                                    peer.getName() ), null );
-                }
-            }
-        }
-
-        environmentManager
-                .createEnvironment( String.format( "%s-%s", blueprint.getName(), UUID.randomUUID() ), topology,
-                        subnetTxt.getValue(), null, true );
-        Notification.show( "Environment creation started" );
-    }
+    //
+    //    private void checkPickedSubnetValidity( final Topology topology, final EnvironmentManager environmentManager )
+    //            throws EnvironmentManagerException, PeerException, EnvironmentCreationException
+    //    {
+    //        //check availability of subnet
+    //        Map<Peer, Set<Gateway>> usedGateways = getUsedGateways( topology.getNodeGroupPlacement().keySet() );
+    //
+    //        SubnetUtils subnetUtils = new SubnetUtils( subnetTxt.getValue() );
+    //        String environmentGatewayIp = subnetUtils.getInfo().getLowAddress();
+    //
+    //        for ( Map.Entry<Peer, Set<Gateway>> peerGateways : usedGateways.entrySet() )
+    //        {
+    //            Peer peer = peerGateways.getKey();
+    //            Set<Gateway> gateways = peerGateways.getValue();
+    //            for ( Gateway gateway : gateways )
+    //            {
+    //                if ( gateway.getIp().equals( environmentGatewayIp ) )
+    //                {
+    //                    throw new EnvironmentManagerException(
+    //                            String.format( "Subnet %s is already used on peer %s", environmentGatewayIp,
+    //                                    peer.getName() ), null );
+    //                }
+    //            }
+    //        }
+    //
+    //        environmentManager
+    //                .createEnvironment( String.format( "%s-%s", blueprint.getName(), UUID.randomUUID() ), topology,
+    //                        subnetTxt.getValue(), null, true );
+    //        Notification.show( "Environment creation started" );
+    //    }
 
 
     private Map<Peer, Set<Gateway>> getUsedGateways( Set<Peer> peers ) throws PeerException

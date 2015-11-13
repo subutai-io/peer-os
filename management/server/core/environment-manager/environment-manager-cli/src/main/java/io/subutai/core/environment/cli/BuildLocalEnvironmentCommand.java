@@ -1,6 +1,8 @@
 package io.subutai.core.environment.cli;
 
 
+import java.util.UUID;
+
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 
@@ -70,14 +72,14 @@ public class BuildLocalEnvironmentCommand extends SubutaiShellCommandSupport
     protected Object doExecute() throws Exception
     {
 
-        Topology topology = new Topology();
+        final String environmentId = UUID.randomUUID().toString();
+        Topology topology = new Topology( "Dummy environment name", environmentId, subnetCidr, null );
         NodeGroup nodeGroup = new NodeGroup( "NodeGroup1", templateName, numberOfContainers, 1, 1,
                 new PlacementStrategy( "ROUND_ROBIN" ) );
 
         topology.addNodeGroupPlacement( peerManager.getLocalPeer(), nodeGroup );
 
-        Environment environment =
-                environmentManager.createEnvironment( "Dummy environment name", topology, subnetCidr, null, async );
+        Environment environment = environmentManager.createEnvironment( topology, async );
 
         System.out.println( String.format( "Environment created with id %s", environment.getId() ) );
 

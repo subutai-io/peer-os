@@ -3,6 +3,7 @@ package io.subutai.core.environment.rest;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.ws.rs.core.Response;
 
@@ -79,7 +80,8 @@ public class RestServiceImpl implements RestService
 
         try
         {
-            Topology topology = new Topology();
+            final String environmentId = UUID.randomUUID().toString();
+            Topology topology = new Topology( environmentName, environmentId, subnetCidr, null );
 
             for ( Map.Entry<String, Set<NodeGroup>> placementEntry : topologyJson.getNodeGroupPlacement().entrySet() )
             {
@@ -90,8 +92,7 @@ public class RestServiceImpl implements RestService
                 }
             }
 
-            Environment environment =
-                    environmentManager.createEnvironment( environmentName, topology, subnetCidr, sshKey, false );
+            Environment environment = environmentManager.createEnvironment( topology, false );
 
             return Response.ok( JsonUtil.toJson(
                     new EnvironmentJson( environment.getId(), environment.getName(), environment.getStatus(),
@@ -338,9 +339,9 @@ public class RestServiceImpl implements RestService
 
         try
         {
-            Topology topology = buildTopology( topologyJson );
+            Topology topology = buildTopology( environmentId, environmentId, topologyJson );
 
-            Set<EnvironmentContainerHost> newContainers = environmentManager.growEnvironment( environmentId, topology, false );
+            Set<EnvironmentContainerHost> newContainers = environmentManager.growEnvironment( topology, false );
 
             return Response.ok( JsonUtil.toJson( convertContainersToContainerJson( newContainers ) ) ).build();
         }
@@ -357,9 +358,10 @@ public class RestServiceImpl implements RestService
     }
 
 
-    private Topology buildTopology( final TopologyJson topologyJson )
+    private Topology buildTopology( final String environmentName, final String environmentId,
+                                    final TopologyJson topologyJson )
     {
-        Topology topology = new Topology();
+        Topology topology = new Topology( environmentName, environmentId, null, null );
         for ( Map.Entry<String, Set<NodeGroup>> placementEntry : topologyJson.getNodeGroupPlacement().entrySet() )
         {
             Peer peer = peerManager.getPeer( placementEntry.getKey() );

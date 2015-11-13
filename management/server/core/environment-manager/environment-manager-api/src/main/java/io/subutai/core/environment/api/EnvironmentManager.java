@@ -37,18 +37,15 @@ public interface EnvironmentManager
     /**
      * Creates environment based on a passed topology
      *
-     * @param name - environment name
      * @param topology - {@code Topology}
-     * @param subnetCidr - subnet in CIDR-notation string, e.g. "192.168.0.1/16"
-     * @param sshKey - optional ssh key content
      * @param async - indicates whether environment is created synchronously or asynchronously to the calling party
      *
      * @return - created environment
      *
      * @throws EnvironmentCreationException - thrown if error occurs during environment creation
      */
-    Environment createEnvironment( String name, Topology topology, String subnetCidr, String sshKey, boolean async )
-            throws EnvironmentCreationException;
+    Environment createEnvironment( Topology topology, boolean async ) throws EnvironmentCreationException;
+
 
     /**
      * Imports environment based on a passed topology
@@ -69,7 +66,6 @@ public interface EnvironmentManager
     /**
      * Grows environment based on a passed topology
      *
-     * @param environmentId - environment id
      * @param topology - {@code Topology}
      * @param async - indicates whether environment is grown synchronously or asynchronously to the calling party
      *
@@ -78,7 +74,7 @@ public interface EnvironmentManager
      * @throws EnvironmentModificationException - thrown if error occurs during environment modification
      * @throws EnvironmentNotFoundException - thrown if environment not found
      */
-    Set<EnvironmentContainerHost> growEnvironment( String environmentId, Topology topology, boolean async )
+    Set<EnvironmentContainerHost> growEnvironment( Topology topology, boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException;
 
     /**
@@ -166,10 +162,14 @@ public interface EnvironmentManager
 
     /**
      * Loads environment blueprint from DB
+     *
      * @param id blueprint primary key
+     *
      * @return environment blueprint
      */
-    Blueprint getBlueprint( UUID id ) throws EnvironmentManagerException;;
+    Blueprint getBlueprint( UUID id ) throws EnvironmentManagerException;
+
+    ;
 
 
     /**
@@ -241,5 +241,4 @@ public interface EnvironmentManager
     void notifyOnContainerDestroyed( Environment environment, String containerId );
 
     void notifyOnContainerStateChanged( Environment environment, ContainerHost containerHost );
-
 }

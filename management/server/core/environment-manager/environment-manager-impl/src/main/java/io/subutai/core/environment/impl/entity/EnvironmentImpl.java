@@ -312,7 +312,7 @@ public class EnvironmentImpl implements Environment, Serializable
     {
         try
         {
-            return environmentManager.growEnvironment( getId(), topology, async );
+            return environmentManager.growEnvironment( topology, async );
         }
         catch ( EnvironmentNotFoundException e )
         {

@@ -9,6 +9,7 @@ import org.apache.karaf.shell.commands.Command;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
+import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.EnvironmentContainerHost;
@@ -80,13 +81,14 @@ public class GrowLocalEnvironmentCommand extends SubutaiShellCommandSupport
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
 
-        Topology topology = new Topology();
+        Environment environment = environmentManager.loadEnvironment( environmentId );
+        Topology topology = new Topology( environment.getName(), environmentId, environment.getSubnetCidr(), null );
         NodeGroup nodeGroup = new NodeGroup( String.format( "NodeGroup%s", System.currentTimeMillis() ), templateName,
                 numberOfContainers, 1, 1, new PlacementStrategy( "ROUND_ROBIN" ) );
 
         topology.addNodeGroupPlacement( peerManager.getLocalPeer(), nodeGroup );
 
-        Set<EnvironmentContainerHost> newContainers = environmentManager.growEnvironment( environmentId, topology, async );
+        Set<EnvironmentContainerHost> newContainers = environmentManager.growEnvironment( topology, async );
 
         System.out.println( "New containers created:" );
 
