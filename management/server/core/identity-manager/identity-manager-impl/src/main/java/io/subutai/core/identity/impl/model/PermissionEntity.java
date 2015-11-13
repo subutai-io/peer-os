@@ -3,6 +3,7 @@ package io.subutai.core.identity.impl.model;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
@@ -33,7 +34,7 @@ public class PermissionEntity implements Permission
     private int object;
 
     @Column( name = "scope" )
-    private int scope  = 1;
+    private int scope = 1;
 
     @Column( name = "read" )
     private boolean read = false;
@@ -145,22 +146,25 @@ public class PermissionEntity implements Permission
         this.delete = delete;
     }
 
+
     @Override
     public String getObjectName()
     {
-        return PermissionObject.values()[object-1].getName();
+        return PermissionObject.values()[object - 1].getName();
     }
 
+
+    // TODO: delete this method
     @Override
     public List<String> asString()
     {
         List<String> perms = new ArrayList<>();
 
-        if(PermissionObject.values()[object-1] == PermissionObject.KarafServerAdministration)
+        if ( PermissionObject.values()[object - 1] == PermissionObject.KarafServerAdministration )
         {
             perms.add( "admin" );
         }
-        else if(PermissionObject.values()[object-1] == PermissionObject.KarafServerManagement)
+        else if ( PermissionObject.values()[object - 1] == PermissionObject.KarafServerManagement )
         {
             perms.add( "manager" );
         }
@@ -168,21 +172,28 @@ public class PermissionEntity implements Permission
         {
             String permString = "";
 
-            permString +=( PermissionObject.values())[object-1].getName()+"|A|";
+            permString += ( PermissionObject.values() )[object - 1].getName() + "|A|";
             //permString +="|"+(PermissionScope.values())[scope-1].getName()+"|";
 
-            if(read)
-                perms.add( permString+"Read" );
-            if(write)
-                perms.add( permString+"Write" );
-            if(update)
-                perms.add( permString+"Update" );
-            if(delete)
-                perms.add( permString+"Delete" );
+            if ( read )
+            {
+                perms.add( permString + "Read" );
+            }
+            if ( write )
+            {
+                perms.add( permString + "Write" );
+            }
+            if ( update )
+            {
+                perms.add( permString + "Update" );
+            }
+            if ( delete )
+            {
+                perms.add( permString + "Delete" );
+            }
         }
 
 
         return perms;
     }
-
 }

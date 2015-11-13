@@ -340,7 +340,7 @@ public class RegistrationForm extends CustomComponent
                         }
                         else
                         {
-                            sendRegistrationRequest( hostField.getValue(), keyPhraseField.getValue() );
+                            sendRegistrationRequest( hostField.getValue().trim(), keyPhraseField.getValue() );
                         }
                         updateRequestsTable();
                     }

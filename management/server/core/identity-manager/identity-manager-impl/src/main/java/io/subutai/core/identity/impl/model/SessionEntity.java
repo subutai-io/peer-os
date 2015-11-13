@@ -33,13 +33,13 @@ public class SessionEntity implements Session
     @Column( name = "id" )
     private long id;
 
-    @Column(name="active")
+    @Column( name = "active" )
     private boolean active = true;
 
-    @Column(name="start_date")
-    private Date startDate = new Date(System.currentTimeMillis());
+    @Column( name = "start_date" )
+    private Date startDate = new Date( System.currentTimeMillis() );
 
-    @Column(name="end_date")
+    @Column( name = "end_date" )
     private Date endDate;
 
     //************************************
@@ -53,6 +53,7 @@ public class SessionEntity implements Session
     @Transient
     private Subject subject;
     //************************************
+
 
     @Override
     public Long getId()

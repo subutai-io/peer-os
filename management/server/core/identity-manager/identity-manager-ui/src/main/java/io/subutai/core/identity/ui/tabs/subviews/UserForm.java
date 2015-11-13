@@ -7,12 +7,14 @@ import java.util.List;
 import java.util.Set;
 
 import com.vaadin.ui.*;
+
 import io.subutai.common.security.objects.UserStatus;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Role;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.ui.ErrorUtils;
 import io.subutai.core.identity.ui.tabs.TabCallback;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +25,7 @@ import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.validator.AbstractStringValidator;
 import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.ui.themes.Reindeer;
+
 
 public class UserForm extends Window
 {
@@ -44,15 +47,16 @@ public class UserForm extends Window
     private TextField email;
     private PasswordField password;
     private PasswordField confirmPassword;
-    private ComboBox status = new ComboBox ("Status");;
+    private ComboBox status = new ComboBox( "Status" );
+    ;
     private TwinColSelect rolesSelector;
     private final BeanContainer<String, Role> rolesContainer;
 
 
     public UserForm( TabCallback<BeanItem<User>> callback, IdentityManager identityManager )
     {
-        this.setClosable (false);
-        this.addStyleName ("default");
+        this.setClosable( false );
+        this.addStyleName( "default" );
         this.center();
         init();
         this.identityManager = identityManager;
@@ -93,7 +97,7 @@ public class UserForm extends Window
                         for ( final String roleName : selectedRoleNames )
                         {
                             BeanItem beanItem = ( BeanItem ) rolesSelector.getItem( roleName );
-                            userFieldGroup.getItemDataSource().getBean().getRoles().add(( Role )beanItem.getBean());
+                            userFieldGroup.getItemDataSource().getBean().getRoles().add( ( Role ) beanItem.getBean() );
                         }
 
                         callback.saveOperation( userFieldGroup.getItemDataSource(), newValue );
@@ -127,9 +131,9 @@ public class UserForm extends Window
         final Button cancelButton = new Button( "Close", cancelListener );
         saveButton.setStyleName( Reindeer.BUTTON_DEFAULT );
 
-        for (int i = 0; i < UserStatus.values().length; ++i)
+        for ( int i = 0; i < UserStatus.values().length; ++i )
         {
-            status.addItem (i+1);
+            status.addItem( i + 1 );
             status.setItemCaption( i + 1, UserStatus.values()[i].getName() );
         }
 
@@ -140,11 +144,11 @@ public class UserForm extends Window
         form.addComponents( userName, fullName, email, password, confirmPassword, status, rolesSelector );
 
         VerticalLayout content = new VerticalLayout();
-        content.setSpacing (true);
-        content.setMargin (true);
-        content.addComponents(buttons, form);
+        content.setSpacing( true );
+        content.setMargin( true );
+        content.addComponents( buttons, form );
 
-        this.setContent (content);
+        this.setContent( content );
     }
 
 
@@ -199,13 +203,13 @@ public class UserForm extends Window
         confirmPassword.setRequiredError( "Please enter password confirm." );
         confirmPassword.setInputPrompt( "Confirm password" );
 
-        status.setNullSelectionAllowed (false);
-        status.setTextInputAllowed (false);
+        status.setNullSelectionAllowed( false );
+        status.setTextInputAllowed( false );
 
         rolesSelector = new TwinColSelect( "User roles" );
-        rolesSelector.setWidth ("500px");
-        rolesSelector.setHeight ("200px");
-        rolesSelector.setItemCaptionMode(AbstractSelect.ItemCaptionMode.PROPERTY);
+        rolesSelector.setWidth( "500px" );
+        rolesSelector.setHeight( "200px" );
+        rolesSelector.setItemCaptionMode( AbstractSelect.ItemCaptionMode.PROPERTY );
         rolesSelector.setItemCaptionPropertyId( "name" );
         rolesSelector.setLeftColumnCaption( "All Roles" );
         rolesSelector.setRightColumnCaption( "Assigned Roles" );
@@ -226,12 +230,12 @@ public class UserForm extends Window
             userFieldGroup.bind( fullName, "fullName" );
             userFieldGroup.bind( email, "email" );
             userFieldGroup.bind( password, "password" );
-            userFieldGroup.bind( status , "status" );
+            userFieldGroup.bind( status, "status" );
 
 
             confirmPassword.setValue( user.getBean().getPassword() );
 
-            status.setValue (user.getBean().getStatus());
+            status.setValue( user.getBean().getStatus() );
             if ( newValue )
             {
                 status.setVisible( false );
@@ -255,7 +259,6 @@ public class UserForm extends Window
                 roleNames.add( role.getName() );
             }
             rolesSelector.setValue( roleNames );
-
         }
     }
 }

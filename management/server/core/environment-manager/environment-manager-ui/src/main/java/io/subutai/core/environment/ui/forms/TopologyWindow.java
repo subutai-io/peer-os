@@ -64,7 +64,7 @@ public class TopologyWindow extends Window
         this.peerManager = peerManager;
         this.strategyManager = strategyManager;
 
-        setCaption( "Topology" );
+        setCaption( "Strategy based environment builder" );
         setWidth( "800px" );
         setHeight( "600px" );
         setModal( true );

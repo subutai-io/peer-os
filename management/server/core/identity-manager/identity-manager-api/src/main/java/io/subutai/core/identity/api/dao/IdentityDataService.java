@@ -3,11 +3,7 @@ package io.subutai.core.identity.api.dao;
 
 import java.util.List;
 
-import io.subutai.core.identity.api.model.Permission;
-import io.subutai.core.identity.api.model.Role;
-import io.subutai.core.identity.api.model.Session;
-import io.subutai.core.identity.api.model.User;
-import io.subutai.core.identity.api.model.UserToken;
+import io.subutai.core.identity.api.model.*;
 
 
 /**
@@ -211,8 +207,32 @@ public interface IdentityDataService
     void removeUserToken( String token );
 
 
+    /* ******RolePermission *********************************
+        *
+        */
+    RolePermission persistRolePermission( Long roleId, Permission perm );
+
+
     /* *************************************************
-     *
-     */
-    void updateUserToken( UserToken item );
+             *
+             */
+    void updateRolePermission( RolePermission rp );
+
+
+    /* *************************************************
+             *
+             */
+    void removeRolePermission( RolePermission rp );
+
+
+    /* *************************************************
+             *
+             */
+    List<RolePermission> getAllRolePermissions( Long roleId );
+
+
+    /* *************************************************
+             *
+             */
+    void persistRoleByName( String newName, int newType );
 }

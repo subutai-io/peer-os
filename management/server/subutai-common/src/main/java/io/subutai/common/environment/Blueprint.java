@@ -20,7 +20,6 @@ import com.google.common.collect.Sets;
 public class Blueprint
 {
     private UUID id;
-    private ContainerDistributionType containerDistributionType = ContainerDistributionType.AUTO;
     private String name;
     private String cidr;
     private Set<NodeGroup> nodeGroups;
@@ -55,19 +54,6 @@ public class Blueprint
     {
         this.id = id;
     }
-
-
-    public ContainerDistributionType getContainerDistributionType()
-    {
-        return containerDistributionType;
-    }
-
-
-    public void setContainerDistributionType( final ContainerDistributionType containerDistributionType )
-    {
-        this.containerDistributionType = containerDistributionType;
-    }
-
 
     public String getName()
     {

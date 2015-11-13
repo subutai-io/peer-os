@@ -3,12 +3,11 @@
            default-activation="eager"
            xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
            xmlns:authz="http://aries.apache.org/xmlns/authorization/v1.0.0"
-    >
+>
 
   <!--**************Enable Authorization ******************************-->
-  <authz:enable/>
+  <authz:enable />
   <!--*****************************************************************-->
-
 
   <!--*****************************************************************-->
   <jaas:config name="karaf" rank="1">
@@ -18,14 +17,12 @@
   </jaas:config>
   <!--*****************************************************************-->
 
-
   <!--*****************************************************************-->
   <bean id="daoManagerIdenity" init-method="init" activation="eager" scope="singleton"
         class="io.subutai.common.dao.DaoManager">
     <jpa:unit unitname="identityManagerPUnit" property="entityManagerFactory" />
   </bean>
   <!--*****************************************************************-->
-
 
   <!--*****************************************************************-->
   <bean id="identityManager" scope="singleton" activation="eager" init-method="init"
@@ -38,6 +35,4 @@
            interface="io.subutai.core.identity.api.IdentityManager" />
   <!--*****************************************************************-->
 
-
-
-  </blueprint>
+</blueprint>

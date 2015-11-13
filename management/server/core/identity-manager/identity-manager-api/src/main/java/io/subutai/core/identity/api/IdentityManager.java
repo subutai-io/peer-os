@@ -102,7 +102,6 @@ public interface IdentityManager
     void removeUserAllRoles( long userId );
 
 
-
     /* *************************************************
      */
     boolean changeUserPassword( long userId, String oldPassword, String newPassword );
@@ -133,7 +132,7 @@ public interface IdentityManager
     /* *************************************************
      *
      */
-    User login( String userName, String password);
+    User login( String userName, String password );
 
 
     /* *************************************************
@@ -177,6 +176,16 @@ public interface IdentityManager
 
     /* *************************************************
      */
-    UserToken createUserToken( User user, String token, String secret, String issuer,int tokenType,Date validDate);
+    UserToken createUserToken( User user, String token, String secret, String issuer, int tokenType, Date validDate );
 
+
+    /* *************************************************
+     */
+    List<UserToken> getUserTokens();
+
+
+    /* *************************************************
+         */
+    public void updateUserToken( String oldName, User user, String token, String secret, String issuer, int tokenType,
+                                 Date validDate );
 }

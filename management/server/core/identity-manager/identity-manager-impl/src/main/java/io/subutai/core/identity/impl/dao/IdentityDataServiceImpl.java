@@ -3,16 +3,14 @@ package io.subutai.core.identity.impl.dao;
 
 import java.util.List;
 
+import io.subutai.core.identity.api.model.*;
+import io.subutai.core.identity.impl.model.RolePermissionEntity;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.core.identity.api.dao.IdentityDataService;
-import io.subutai.core.identity.api.model.Permission;
-import io.subutai.core.identity.api.model.Role;
-import io.subutai.core.identity.api.model.Session;
-import io.subutai.core.identity.api.model.User;
-import io.subutai.core.identity.api.model.UserToken;
 
 
 /**
@@ -28,7 +26,7 @@ public class IdentityDataServiceImpl implements IdentityDataService
     private SessionDAO sessionDAOService = null;
     private PermissionDAO permissionDAOService = null;
     private UserTokenDAO userTokenDAOService = null;
-
+    private RolePermissionDAO rolePermissionDAO = null;
 
 
     /* *************************************************
@@ -45,6 +43,7 @@ public class IdentityDataServiceImpl implements IdentityDataService
             sessionDAOService = new SessionDAO( daoManager );
             permissionDAOService = new PermissionDAO( daoManager );
             userTokenDAOService = new UserTokenDAO( daoManager );
+            rolePermissionDAO = new RolePermissionDAO( daoManager );
         }
         else
         {
@@ -62,6 +61,7 @@ public class IdentityDataServiceImpl implements IdentityDataService
         return userDAOService.findByUsername( userName );
     }
 
+
     /* *************************************************
      *
      */
@@ -71,11 +71,12 @@ public class IdentityDataServiceImpl implements IdentityDataService
         return userDAOService.find( userId );
     }
 
+
     /* *************************************************
      *
      */
     @Override
-    public void assignUserRole( long userId, Role role)
+    public void assignUserRole( long userId, Role role )
     {
         User user = userDAOService.find( userId );
         user.getRoles().add( role );
@@ -87,7 +88,7 @@ public class IdentityDataServiceImpl implements IdentityDataService
      *
      */
     @Override
-    public void removeUserRole( long userId, Role role)
+    public void removeUserRole( long userId, Role role )
     {
         User user = userDAOService.find( userId );
 
@@ -95,11 +96,12 @@ public class IdentityDataServiceImpl implements IdentityDataService
         userDAOService.update( user );
     }
 
+
     /* *************************************************
      *
      */
     @Override
-    public void removeUserAllRoles( long userId)
+    public void removeUserAllRoles( long userId )
     {
         User user = userDAOService.find( userId );
 
@@ -190,10 +192,19 @@ public class IdentityDataServiceImpl implements IdentityDataService
 
 
     /* *************************************************
+     */
+    @Override
+    public void persistRoleByName( String newName, int newType )
+    {
+        roleDAOService.persistByName( newName, newType );
+    }
+
+
+    /* *************************************************
      *
      */
     @Override
-    public void assignRolePermission( long roleId, Permission permission)
+    public void assignRolePermission( long roleId, Permission permission )
     {
         Role role = roleDAOService.find( roleId );
         role.getPermissions().add( permission );
@@ -216,9 +227,9 @@ public class IdentityDataServiceImpl implements IdentityDataService
      * ******Permission*********************************
      */
     @Override
-    public Permission getPermission(final  long permissionId )
+    public Permission getPermission( final long permissionId )
     {
-        return permissionDAOService.find( permissionId ) ;
+        return permissionDAOService.find( permissionId );
     }
 
 
@@ -272,9 +283,9 @@ public class IdentityDataServiceImpl implements IdentityDataService
      *
      */
     @Override
-    public Session getSession(final long sessionId)
+    public Session getSession( final long sessionId )
     {
-        return sessionDAOService.find ( sessionId );
+        return sessionDAOService.find( sessionId );
     }
 
 
@@ -282,7 +293,7 @@ public class IdentityDataServiceImpl implements IdentityDataService
      *
      */
     @Override
-    public Session getSessionByUserId(final long userId)
+    public Session getSessionByUserId( final long userId )
     {
         return sessionDAOService.getByUserId( userId );
     }
@@ -317,6 +328,7 @@ public class IdentityDataServiceImpl implements IdentityDataService
         sessionDAOService.update( item );
     }
 
+
     /* ******UserToken *********************************
     *
     */
@@ -333,8 +345,9 @@ public class IdentityDataServiceImpl implements IdentityDataService
     @Override
     public UserToken getUserToken( String token )
     {
-        return userTokenDAOService.find ( token );
+        return userTokenDAOService.find( token );
     }
+
 
     /* *************************************************
      *
@@ -342,7 +355,7 @@ public class IdentityDataServiceImpl implements IdentityDataService
     @Override
     public UserToken getValidUserToken( String token )
     {
-        return userTokenDAOService.findValid ( token );
+        return userTokenDAOService.findValid( token );
     }
 
 
@@ -352,7 +365,7 @@ public class IdentityDataServiceImpl implements IdentityDataService
     @Override
     public UserToken getUserToken( long userId )
     {
-        return userTokenDAOService.findByUserId ( userId );
+        return userTokenDAOService.findByUserId( userId );
     }
 
 
@@ -365,6 +378,7 @@ public class IdentityDataServiceImpl implements IdentityDataService
         return userTokenDAOService.findValidByUserId( userId );
     }
 
+
     /* *************************************************
      *
      */
@@ -372,7 +386,6 @@ public class IdentityDataServiceImpl implements IdentityDataService
     public void persistUserToken( final UserToken item )
     {
         userTokenDAOService.persist( item );
-
     }
 
 
@@ -386,14 +399,44 @@ public class IdentityDataServiceImpl implements IdentityDataService
     }
 
 
-    /* *************************************************
-     *
-     */
+	/* ******RolePermission *********************************
+    *
+	*/
+
+
     @Override
-    public void updateUserToken( final UserToken item )
+    public RolePermission persistRolePermission( final Long roleId, final Permission perm )
     {
-        userTokenDAOService.update( item );
+        return rolePermissionDAO.persist( roleId, perm );
     }
 
 
+    /* *************************************************
+        *
+        */
+    @Override
+    public void updateRolePermission( final RolePermission rp )
+    {
+        rolePermissionDAO.update( rp );
+    }
+
+
+    /* *************************************************
+        *
+        */
+    @Override
+    public void removeRolePermission( final RolePermission rp )
+    {
+        rolePermissionDAO.remove( rp );
+    }
+
+
+    /* *************************************************
+        *
+        */
+    @Override
+    public List<RolePermission> getAllRolePermissions( Long roleId )
+    {
+        return rolePermissionDAO.getAll( roleId );
+    }
 }

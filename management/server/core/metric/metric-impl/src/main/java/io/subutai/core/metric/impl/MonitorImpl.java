@@ -109,7 +109,7 @@ public class MonitorImpl implements Monitor
         }
 
         stateUpdateExecutorService = Executors.newScheduledThreadPool( 1 );
-        stateUpdateExecutorService.scheduleWithFixedDelay( new MetricsUpdater( this ), 10, 120, TimeUnit.SECONDS );
+        stateUpdateExecutorService.scheduleWithFixedDelay( new MetricsUpdater( this ), 10, 90, TimeUnit.SECONDS );
     }
 
 
