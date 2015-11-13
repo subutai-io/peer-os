@@ -55,10 +55,19 @@ public interface UserToken
     void setValidDate( Date validDate );
 
     //***********************************
-    User getUser();
+    /*User getUser ();
 
-    //***********************************
-    void setUser( User user );
+	/*/
+
+    /***********************************
+     * void setUser (User user);
+     */
 
     String getTypeName();
+
+
+    public long getUserId();
+
+
+    public void setUserId( long userId );
 }

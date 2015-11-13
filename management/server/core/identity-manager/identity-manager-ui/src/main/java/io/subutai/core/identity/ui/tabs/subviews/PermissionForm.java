@@ -5,6 +5,7 @@ import java.util.EnumSet;
 
 import io.subutai.core.identity.api.model.Permission;
 import io.subutai.core.identity.ui.tabs.TabCallback;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,7 +68,8 @@ public class PermissionForm extends VerticalLayout
     } );
 
     private ComboBox permissionGroup =
-            //new ComboBox( "", new BeanItemContainer<>( PermissionGroup.class, EnumSet.allOf( PermissionGroup.class ) ) )
+            //new ComboBox( "", new BeanItemContainer<>( PermissionGroup.class, EnumSet.allOf( PermissionGroup.class
+            // ) ) )
             new ComboBox( "" )
             {
                 {
@@ -79,9 +81,6 @@ public class PermissionForm extends VerticalLayout
                     setRequired( true );
                 }
             };
-
-
-
 
 
     public PermissionForm( TabCallback<BeanItem<Permission>> callback )

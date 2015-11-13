@@ -128,12 +128,6 @@
         <version>${project.version}</version>
       </dependency>
 
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>subutai-common-implementation</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
       <dependency>
@@ -247,19 +241,6 @@
       </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!-- file-tracker -->
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>file-tracker-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>file-tracker-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- git-manager -->
       <dependency>
         <groupId>${project.groupId}</groupId>
@@ -292,15 +273,6 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>lxc-quota-manager-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!-- script-manager -->
-
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>script-manager-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -549,24 +521,6 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>plugin-manager-ui</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!-- wol-manager -->
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>wol-manager-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>wol-manager-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>wol-manager-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
 

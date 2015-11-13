@@ -50,7 +50,6 @@
       <scope>provided</scope>
     </dependency>
 
-
     <!--******** WT Library ****************-->
     <dependency>
       <groupId>com.nimbusds</groupId>

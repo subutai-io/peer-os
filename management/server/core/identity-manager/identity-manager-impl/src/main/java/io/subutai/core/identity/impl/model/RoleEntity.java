@@ -3,6 +3,7 @@ package io.subutai.core.identity.impl.model;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
@@ -41,13 +42,15 @@ public class RoleEntity implements Role
     private int type = 1;
 
 
+    // TODO: delete this table
     //*********************************************
-    @ManyToMany(targetEntity=PermissionEntity.class,fetch = FetchType.EAGER)
+    @ManyToMany( targetEntity = PermissionEntity.class, fetch = FetchType.EAGER )
     @JoinTable( name = "role_permissions",
             joinColumns = { @JoinColumn( name = "role_id", referencedColumnName = "id" ) },
-            inverseJoinColumns = { @JoinColumn( name = "permission_id", referencedColumnName = "id" ) })
+            inverseJoinColumns = { @JoinColumn( name = "permission_id", referencedColumnName = "id" ) } )
     private List<Permission> permissions = new ArrayList<>();
     //*********************************************
+
 
     @Override
     public Long getId()
@@ -90,13 +93,15 @@ public class RoleEntity implements Role
         this.type = type;
     }
 
+
     @Override
     public String getTypeName()
     {
-        return UserType.values()[type-1].getName();
+        return UserType.values()[type - 1].getName();
     }
 
 
+    // TODO: delete these methods
     @Override
     public List<Permission> getPermissions()
     {
@@ -109,6 +114,4 @@ public class RoleEntity implements Role
     {
         this.permissions = permissions;
     }
-
-
 }

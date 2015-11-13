@@ -17,7 +17,7 @@ import io.subutai.core.identity.impl.model.PermissionEntity;
  */
 class PermissionDAO
 {
-    private DaoManager daoManager= null;
+    private DaoManager daoManager = null;
 
 
     /* *************************************************
