@@ -7,10 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.subutai.common.environment.Blueprint;
-import io.subutai.common.environment.ContainerDistributionType;
 import io.subutai.common.environment.ContainerType;
 import io.subutai.common.environment.NodeGroup;
-import io.subutai.common.protocol.PlacementStrategy;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
@@ -43,11 +41,15 @@ public class BlueprintForm
     private static final String BLUEPRINT_SAVED = "Blueprint saved";
     private static final String VIEW_BLUEPRINTS = "View blueprints";
     private static final String NAME = "Name";
-    private static final String BUILD = "Build";
+    private static final String BUILDERS = "Environment buiders";
+    private static final String BUILD_BY_STRATGEY = "Build by strategy";
+    private static final String BUILD_BY_HOST = "Build by host";
     private static final String EDIT = "Edit";
     private static final String VIEW = "View";
     private static final String DELETE = "Delete";
-    private static final String GROW = "Grow";
+    private static final String GROWERS = "Environment expanders";
+    private static final String GROW_BY_STRATEGY = "Expand by strategy";
+    private static final String GROW_BY_HOST = "Expand by host";
 
 
     private final VerticalLayout contentRoot;
@@ -62,7 +64,7 @@ public class BlueprintForm
 
 
     public BlueprintForm( EnvironmentManager environmentManager, PeerManager peerManager,
-                          TemplateRegistry templateRegistry, StrategyManager strategyManager)
+                          TemplateRegistry templateRegistry, StrategyManager strategyManager )
     {
         this.environmentManager = environmentManager;
         this.peerManager = peerManager;
@@ -131,7 +133,6 @@ public class BlueprintForm
             {
                 Blueprint b = new Blueprint( "Custom blueprint", "192.168.0.1/24", null );
                 b.setId( UUID.randomUUID() );
-                b.setContainerDistributionType( ContainerDistributionType.CUSTOM );
                 editBlueprint( b );
             }
         } );
@@ -182,7 +183,7 @@ public class BlueprintForm
                         }
                     }
                 } );
-                final Button build = new Button( BUILD );
+                final Button build = new Button( BUILD_BY_STRATGEY );
                 build.setId( blueprint.getName() + "-build" );
                 build.addClickListener( new Button.ClickListener()
                 {
@@ -190,6 +191,16 @@ public class BlueprintForm
                     public void buttonClick( final Button.ClickEvent clickEvent )
                     {
                         buildBlueprint( blueprint, false );
+                    }
+                } );
+                final Button buildByHost = new Button( BUILD_BY_HOST );
+                buildByHost.setId( blueprint.getName() + "-build-host" );
+                buildByHost.addClickListener( new Button.ClickListener()
+                {
+                    @Override
+                    public void buttonClick( final Button.ClickEvent clickEvent )
+                    {
+                        buildHostEnvironment( blueprint, false );
                     }
                 } );
 
@@ -212,7 +223,7 @@ public class BlueprintForm
                         }
                     }
                 } );
-                final Button grow = new Button( GROW );
+                final Button grow = new Button( GROW_BY_STRATEGY );
                 grow.setId( blueprint.getName() + "-grow" );
                 grow.addClickListener( new Button.ClickListener()
                 {
@@ -223,9 +234,28 @@ public class BlueprintForm
                     }
                 } );
 
+                final Button growByHost = new Button( GROW_BY_HOST );
+                growByHost.setId( blueprint.getName() + "-grow-host" );
+                growByHost.addClickListener( new Button.ClickListener()
+                {
+                    @Override
+                    public void buttonClick( final Button.ClickEvent event )
+                    {
+                        buildHostEnvironment( blueprint, true );
+                    }
+                } );
 
+
+                HorizontalLayout buildButtons = new HorizontalLayout();
+                buildButtons.setSpacing( true );
+                buildButtons.addComponent( build );
+                buildButtons.addComponent( buildByHost );
+                HorizontalLayout growButtons = new HorizontalLayout();
+                growButtons.setSpacing( true );
+                growButtons.addComponent( grow );
+                growButtons.addComponent( growByHost );
                 blueprintsTable.addItem( new Object[] {
-                        blueprint.getName(), view, edit, delete, build, grow
+                        blueprint.getName(), view, edit, delete, buildButtons, growButtons
                 }, null );
             }
         }
@@ -239,7 +269,15 @@ public class BlueprintForm
 
     private void buildBlueprint( Blueprint blueprint, boolean grow )
     {
-        contentRoot.getUI().addWindow( new TopologyWindow( blueprint, peerManager, environmentManager, strategyManager, grow ) );
+        contentRoot.getUI().addWindow(
+                new TopologyWindow( blueprint, peerManager, environmentManager, strategyManager, grow ) );
+    }
+
+
+    private void buildHostEnvironment( Blueprint blueprint, boolean grow )
+    {
+        contentRoot.getUI()
+                   .addWindow( new HostEnvironmentBuilderWindow( blueprint, peerManager, environmentManager, grow ) );
     }
 
 
@@ -256,8 +294,8 @@ public class BlueprintForm
         table.addContainerProperty( VIEW, Button.class, null );
         table.addContainerProperty( EDIT, Button.class, null );
         table.addContainerProperty( DELETE, Button.class, null );
-        table.addContainerProperty( BUILD, Button.class, null );
-        table.addContainerProperty( GROW, Button.class, null );
+        table.addContainerProperty( BUILDERS, HorizontalLayout.class, null );
+        table.addContainerProperty( GROWERS, HorizontalLayout.class, null );
         table.setPageLength( 10 );
         table.setSelectable( false );
         table.setEnabled( true );

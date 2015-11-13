@@ -23,6 +23,7 @@ public class NodeGroup
     private PlacementStrategy containerPlacementStrategy;
     private String peerId;
     private String hostId;
+    private ContainerDistributionType containerDistributionType = ContainerDistributionType.AUTO;
 
 
     public NodeGroup( final String name, final String templateName, final int numberOfContainers, final int sshGroupId,
@@ -40,11 +41,28 @@ public class NodeGroup
         this.sshGroupId = sshGroupId;
         this.hostsGroupId = hostsGroupId;
         this.containerPlacementStrategy = containerPlacementStrategy;
+        this.containerDistributionType = ContainerDistributionType.AUTO;
     }
 
 
     public NodeGroup( final String name, final String templateName, final ContainerType type,
-                      final int numberOfContainers, final int sshGroupId, final int hostsGroupId)
+                      final int numberOfContainers, final int sshGroupId, final int hostsGroupId, final String peerId,
+                      final String hostId )
+    {
+        this.name = name;
+        this.templateName = templateName;
+        this.type = type;
+        this.numberOfContainers = numberOfContainers;
+        this.sshGroupId = sshGroupId;
+        this.hostsGroupId = hostsGroupId;
+        this.peerId = peerId;
+        this.hostId = hostId;
+        this.containerDistributionType = ContainerDistributionType.CUSTOM;
+    }
+
+
+    public NodeGroup( final String name, final String templateName, final ContainerType type,
+                      final int numberOfContainers, final int sshGroupId, final int hostsGroupId )
     {
         this.name = name;
         this.templateName = templateName;
@@ -106,5 +124,17 @@ public class NodeGroup
     public String getHostId()
     {
         return hostId;
+    }
+
+
+    public ContainerDistributionType getContainerDistributionType()
+    {
+        return containerDistributionType;
+    }
+
+
+    public void setContainerDistributionType( final ContainerDistributionType containerDistributionType )
+    {
+        this.containerDistributionType = containerDistributionType;
     }
 }

@@ -38,6 +38,7 @@ public class ResourceHostMetric extends HostMetric
     @Override
     public String toString()
     {
-        return hostName != null ? hostName : hostId;
+        return String
+                .format( "%s:%s", getPeerId() != null ? getPeerId() : "UNKNOWN", hostName != null ? hostName : hostId );
     }
 }
