@@ -48,6 +48,7 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
+import io.subutai.common.environment.ContainerDistributionType;
 import io.subutai.common.environment.ContainersDestructionResultImpl;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.host.ContainerHostState;
@@ -409,6 +410,81 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         Preconditions.checkNotNull( request );
 
+        Set<HostInfoModel> result;
+        if ( request.getContainerDistributionType() == ContainerDistributionType.AUTO )
+        {
+            result = createByStrategy( request );
+        }
+        else
+        {
+            result = createByHost( request );
+        }
+
+        return result;
+    }
+
+
+    private Set<HostInfoModel> createByHost( final CreateEnvironmentContainerGroupRequest request ) throws PeerException
+    {
+        SubnetUtils cidr;
+        try
+        {
+            cidr = new SubnetUtils( request.getSubnetCidr() );
+        }
+        catch ( IllegalArgumentException e )
+        {
+            throw new PeerException( "Failed to parse subnet CIDR", e );
+        }
+
+        ResourceHost resourceHost = getResourceHostById( request.getHost() );
+        Set<String> containerDistribution =
+                generateCloneNames( request.getTemplateName(), request.getNumberOfContainers() );
+        String networkPrefix = cidr.getInfo().getCidrSignature().split( "/" )[1];
+        String[] allAddresses = cidr.getInfo().getAllAddresses();
+        String gateway = cidr.getInfo().getLowAddress();
+        int currentIpAddressOffset = 0;
+        Vni environmentVni = getManagementHost().findVniByEnvironmentId( request.getEnvironmentId() );
+
+        if ( environmentVni == null )
+        {
+            throw new PeerException(
+                    String.format( "No reserved vni found for environment %s", request.getEnvironmentId() ) );
+        }
+
+        Set<HostInfoModel> result = Sets.newHashSet();
+
+        for ( String cloneName : containerDistribution )
+        {
+            String ipAddress = allAddresses[request.getIpAddressOffset() + currentIpAddressOffset];
+
+            try
+            {
+                ContainerHost containerHost = resourceHost.createContainer( request.getTemplateName(), cloneName,
+                        String.format( "%s/%s", ipAddress, networkPrefix ), environmentVni.getVlan(), gateway,
+                        Common.WAIT_CONTAINER_CONNECTION_SEC );
+
+
+                ContainerHostEntity containerHostEntity = ( ContainerHostEntity ) containerHost;
+                containerHostEntity.setEnvironmentId( request.getEnvironmentId() );
+                containerHostEntity.setOwnerId( request.getOwnerId() );
+                containerHostEntity.setInitiatorPeerId( request.getInitiatorPeerId() );
+                result.add( new HostInfoModel( containerHost ) );
+            }
+            catch ( ResourceHostException e )
+            {
+                LOG.error( "Error creating container", e );
+            }
+
+            currentIpAddressOffset++;
+        }
+
+        return result;
+    }
+
+
+    private Set<HostInfoModel> createByStrategy( final CreateEnvironmentContainerGroupRequest request )
+            throws PeerException
+    {
         //check if strategy exists
         try
         {
@@ -554,6 +630,22 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             containerDistribution.put( resourceHost, hostCloneNames );
         }
         return containerDistribution;
+    }
+
+
+    protected Set<String> generateCloneNames( String templateName, int count ) throws PeerException
+    {
+        Set<String> result = new HashSet<>();
+
+        for ( int i = 0; i < count; i++ )
+        {
+            String newContainerName = StringUtil
+                    .trimToSize( String.format( "%s%s", templateName, UUID.randomUUID() ).replace( "-", "" ),
+                            Common.MAX_CONTAINER_NAME_LEN );
+            result.add( newContainerName );
+        }
+
+        return result;
     }
 
 

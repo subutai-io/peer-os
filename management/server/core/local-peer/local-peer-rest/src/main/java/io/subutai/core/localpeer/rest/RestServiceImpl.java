@@ -42,7 +42,7 @@ public class RestServiceImpl implements RestService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( RestServiceImpl.class );
     private LocalPeer peerManager;
-//    private Monitor monitor;
+    //    private Monitor monitor;
     protected JsonUtil jsonUtil = new JsonUtil();
     protected RestUtil restUtil = new RestUtil();
 
@@ -50,7 +50,7 @@ public class RestServiceImpl implements RestService
     public RestServiceImpl( final LocalPeer peerManager/*, Monitor monitor*/ )
     {
         this.peerManager = peerManager;
-//        this.monitor = monitor;
+        //        this.monitor = monitor;
     }
 
 
@@ -110,7 +110,7 @@ public class RestServiceImpl implements RestService
             PeerInfo p = jsonUtil.from( peer, PeerInfo.class );
             p.setIp( getRequestIp() );
             p.setName( String.format( "Peer %s", p.getId() ) );
-//            peerManager.update( p );
+            //            peerManager.update( p );
 
             return Response.ok( jsonUtil.to( p ) ).build();
         }
@@ -128,66 +128,6 @@ public class RestServiceImpl implements RestService
         HttpServletRequest request = ( HttpServletRequest ) message.get( AbstractHTTPDestination.HTTP_REQUEST );
         return request.getRemoteAddr();
     }
-
-
-    //*************************************************************************************
-    //    @Override
-    //    public void destroyContainer( final ContainerId containerId )
-    //    {
-    //        Preconditions.checkNotNull( containerId );
-    //        try
-    //        {
-    //            peerManager.destroyContainer( containerId );
-    //        }
-    //        catch ( Exception e )
-    //        {
-    //            LOGGER.error( "Error destroying container #destroyContainer", e );
-    //            Response response = Response.serverError().entity( e.toString() ).build();
-    //            throw new WebApplicationException( response );
-    //        }
-    //    }
-    //
-    //
-    //    @Override
-    //    public void startContainer( final ContainerId containerId )
-    //    {
-    //        Preconditions.checkNotNull( containerId );
-    //        try
-    //        {
-    //            peerManager.startContainer( containerId );
-    //        }
-    //        catch ( Exception e )
-    //        {
-    //            LOGGER.error( "Error starting container #startContainer", e );
-    //            Response response = Response.serverError().entity( e.toString() ).build();
-    //            throw new WebApplicationException( response );
-    //        }
-    //    }
-    //
-    //
-    //    @Override
-    //    public void stopContainer( final ContainerId containerId )
-    //    {
-    //        Preconditions.checkNotNull( containerId );
-    //        try
-    //        {
-    //            peerManager.stopContainer( containerId );
-    //        }
-    //        catch ( Exception e )
-    //        {
-    //            LOGGER.error( "Error stopping container #stopContainer", e );
-    //            Response response = Response.serverError().entity( e.toString() ).build();
-    //            throw new WebApplicationException( response );
-    //        }
-    //    }
-    //
-    //
-    //    @Override
-    //    public ContainerHostState getContainerState( final ContainerId containerId )
-    //    {
-    //        Preconditions.checkNotNull( containerId );
-    //        return peerManager.getContainerState( containerId );
-    //    }
 
 
     @Override
@@ -654,13 +594,6 @@ public class RestServiceImpl implements RestService
     }
 
 
-//    @Override
-//    public HostMetric getHostMetric( final String hostId )
-//    {
-//        return monitor.getHostMetric( hostId );
-//    }
-
-
     @Override
     public void setupN2NConnection( final N2NConfig config )
     {
@@ -729,67 +662,6 @@ public class RestServiceImpl implements RestService
     //        catch ( Exception ex )
     //        {
     //            return "";
-    //        }
-    //    }
-
-
-    //    @Override
-    //    public Response approveForRegistrationRequest( final String approvedPeer, final String certHEX )
-    //    {
-    //        try
-    //        {
-    //            // ******* Convert HexString to Byte Array ****** Decrypt data
-    //            EncryptionTool encTool = securityManager.getEncryptionTool();
-    //            KeyManager keyManager = securityManager.getKeyManager();
-    //
-    //            byte data[] = HexUtil.hexStringToByteArray( approvedPeer );
-    //            byte cert[] = HexUtil.hexStringToByteArray( certHEX );
-    //
-    //            data = encTool.decrypt( data );
-    //            cert = encTool.decrypt( cert );
-    //            //*************************************************************
-    //
-    //            PeerInfo p = jsonUtil.from( new String( data ), PeerInfo.class );
-    //
-    //            if ( p.getKeyPhrase().equals( ( peerManager.getPeerInfo( p.getId() ).getKeyPhrase() ) ) )
-    //            {
-    //                p.setStatus( PeerStatus.APPROVED );
-    //                peerManager.update( p );
-    //
-    //                //adding remote repository
-    //                ManagementHost managementHost = peerManager.getLocalPeer().getManagementHost();
-    //                managementHost.addRepository( p.getIp() );
-    //
-    //                //************ Save Trust SSL Cert **************************************
-    //                String rootCertPx2 = new String( cert );
-    //
-    //                securityManager.getKeyStoreManager()
-    //                               .importCertAsTrusted( ChannelSettings.SECURE_PORT_X2, p.getId(), rootCertPx2 );
-    //                //***********************************************************************
-    //
-    //                //************ Export Current Cert **************************************
-    //                String localPeerCert =
-    //                        securityManager.getKeyStoreManager().exportCertificate( ChannelSettings.SECURE_PORT_X2,
-    // "" );
-    //
-    //                httpContextManager.reloadTrustStore();
-    //                //***********************************************************************
-    //
-    //
-    //                PGPPublicKey pkey = keyManager.getPublicKey( p.getId() ); //Get PublicKey from KeyServer
-    //                byte certRes[] = encTool.encrypt( localPeerCert.getBytes(), pkey, false );
-    //
-    //                return Response.ok( HexUtil.byteArrayToHexString( certRes ) ).build();
-    //            }
-    //            else
-    //            {
-    //                return Response.status( Response.Status.FORBIDDEN ).build();
-    //            }
-    //        }
-    //        catch ( Exception e )
-    //        {
-    //            LOGGER.error( "Error approving registration request #approveForRegistrationRequest", e );
-    //            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
     //        }
     //    }
 }

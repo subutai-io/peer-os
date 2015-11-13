@@ -1,10 +1,15 @@
 package io.subutai.core.environment.ui.forms;
 
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.net.util.SubnetUtils;
@@ -29,42 +34,45 @@ import io.subutai.common.environment.Blueprint;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.environment.Topology;
+import io.subutai.common.metric.ResourceHostMetric;
+import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.PlacementStrategy;
 import io.subutai.common.util.CollectionUtil;
+import io.subutai.common.util.JsonUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.strategy.api.ContainerPlacementStrategy;
-import io.subutai.core.strategy.api.StrategyManager;
-import io.subutai.core.strategy.api.StrategyNotFoundException;
 
 
-public class TopologyWindow extends Window
+public class HostEnvironmentBuilderWindow extends Window
 {
+    private static final Logger LOG = LoggerFactory.getLogger( HostEnvironmentBuilderWindow.class );
+
     private static final String DEFAULT_SUBNET_CIDR = "192.168.1.2/24";
     private final Blueprint blueprint;
     private final PeerManager peerManager;
-    private final StrategyManager strategyManager;
     private Table placementTable;
     private Button buildBtn;
     private ComboBox envCombo;
     private TextField subnetTxt;
 
+    List<ResourceHostMetric> metrics = new ArrayList<>();
 
-    public TopologyWindow( final Blueprint blueprint, final PeerManager peerManager,
-                           final EnvironmentManager environmentManager, final StrategyManager strategyManager,
-                           final boolean grow )
+
+    public HostEnvironmentBuilderWindow( final Blueprint blueprint, final PeerManager peerManager,
+                                         final EnvironmentManager environmentManager, final boolean grow )
     {
 
         this.blueprint = blueprint;
         this.peerManager = peerManager;
-        this.strategyManager = strategyManager;
+        initMetrics();
 
-        setCaption( "Strategy based environment builder" );
+        setCaption( "Host based environment builder" );
         setWidth( "800px" );
         setHeight( "600px" );
         setModal( true );
@@ -87,7 +95,7 @@ public class TopologyWindow extends Window
 
         content.addComponent( placementTable );
 
-        buildBtn = new Button( grow ? "Grow" : "Build" );
+        buildBtn = new Button( grow ? "Expand" : "Build" );
         buildBtn.setId( "buildButton" );
         buildBtn.setEnabled( false );
         buildBtn.addClickListener( new Button.ClickListener()
@@ -131,7 +139,7 @@ public class TopologyWindow extends Window
 
     private void buildProcessTrigger( final EnvironmentManager environmentManager, final boolean grow )
     {
-        Map<Peer, Set<NodeGroup>> placements = getPlacements();
+        Set<NodeGroup> placements = getPlacements();
 
         if ( placements == null )
         {
@@ -149,6 +157,7 @@ public class TopologyWindow extends Window
         {
             Topology topology = new Topology();
             constructTopology( topology, placements );
+            LOG.debug( JsonUtil.toJson( topology ) );
 
             try
             {
@@ -156,6 +165,7 @@ public class TopologyWindow extends Window
                 {
                     Environment environment = ( Environment ) envCombo.getValue();
                     environmentManager.growEnvironment( environment.getId(), topology, true );
+
                     Notification.show( "Environment growth started" );
                 }
                 else
@@ -174,14 +184,11 @@ public class TopologyWindow extends Window
     }
 
 
-    private void constructTopology( final Topology topology, final Map<Peer, Set<NodeGroup>> placements )
+    private void constructTopology( final Topology topology, final Set<NodeGroup> placements )
     {
-        for ( Map.Entry<Peer, Set<NodeGroup>> placement : placements.entrySet() )
+        for ( NodeGroup placement : placements )
         {
-            for ( NodeGroup nodeGroup : placement.getValue() )
-            {
-                topology.addNodeGroupPlacement( placement.getKey(), nodeGroup );
-            }
+            topology.addNodeGroupPlacement( peerManager.getPeer( placement.getPeerId() ), placement );
         }
     }
 
@@ -230,56 +237,26 @@ public class TopologyWindow extends Window
     }
 
 
-    private Map<Peer, Set<NodeGroup>> getPlacements()
+    private Set<NodeGroup> getPlacements()
     {
-        Map<Peer, Set<NodeGroup>> placements = Maps.newHashMap();
+        Set<NodeGroup> placements = Sets.newHashSet();
 
         for ( Object itemId : placementTable.getItemIds() )
         {
             Item item = placementTable.getItem( itemId );
             String nodeGroupName = item.getItemProperty( "Name" ).getValue().toString();
-            String peerName = item.getItemProperty( "Peer" ).getValue().toString();
-            String strategyId = item.getItemProperty( "Strategy" ).getValue().toString();
+            ResourceHostMetric metric = ( ResourceHostMetric ) item.getItemProperty( "Host" ).getValue();
             int amount = Integer.parseInt( item.getItemProperty( "Amount" ).getValue().toString() );
 
-            NodeGroup nodeGroup = null;
             for ( NodeGroup ng : blueprint.getNodeGroups() )
             {
                 if ( ng.getName().equalsIgnoreCase( nodeGroupName ) )
                 {
-                    PlacementStrategy placementStrategy = new PlacementStrategy( strategyId );
-                    nodeGroup = new NodeGroup( nodeGroupName, ng.getTemplateName(), amount, ng.getSshGroupId(),
-                            ng.getHostsGroupId(), placementStrategy );
+                    NodeGroup nodeGroup = new NodeGroup( nodeGroupName, ng.getTemplateName(), ng.getType(), amount,
+                            ng.getSshGroupId(), ng.getHostsGroupId(), metric.getPeerId(), metric.getHostId() );
 
-                    break;
+                    placements.add( nodeGroup );
                 }
-            }
-
-            Peer peer = null;
-            for ( Peer p : peerManager.getPeers() )
-            {
-                if ( p.getName().equalsIgnoreCase( peerName ) )
-                {
-                    peer = p;
-                    break;
-                }
-            }
-
-            if ( peer != null && nodeGroup != null )
-            {
-                Set<NodeGroup> peerNodeGroups = placements.get( peer );
-
-                if ( peerNodeGroups == null )
-                {
-                    peerNodeGroups = Sets.newHashSet();
-                    placements.put( peer, peerNodeGroups );
-                }
-
-                peerNodeGroups.add( nodeGroup );
-            }
-            else
-            {
-                return null;
             }
         }
 
@@ -292,9 +269,8 @@ public class TopologyWindow extends Window
         Table table = new Table();
         table.addContainerProperty( "Name", String.class, null );
         table.addContainerProperty( "Amount", Integer.class, null );
-        table.addContainerProperty( "Peer", String.class, null );
-        table.addContainerProperty( "Strategy", String.class, null );
-        table.addContainerProperty( "Remove", Button.class, null );
+        table.addContainerProperty( "Host", ResourceHostMetric.class, null );
+        table.addContainerProperty( "Action", Button.class, null );
         table.setPageLength( 10 );
         table.setSelectable( false );
         table.setEnabled( true );
@@ -313,23 +289,19 @@ public class TopologyWindow extends Window
             slider.setOrientation( SliderOrientation.HORIZONTAL );
             slider.setValue( ( double ) nodeGroup.getNumberOfContainers() );
 
-            ComboBox peersCombo = createPeersComboBox();
-            peersCombo.setId( "peersCombo" );
+            ComboBox hostsComboBox = createHostsComboBox();
+            hostsComboBox.setId( nodeGroup.getName() + "-hostsComboBox" );
 
-            ComboBox strategiesCombo = createStrategiesComboBox();
-            peersCombo.setId( "strategiesCombo" );
-
-            Button placeBtn = createPlaceButton( nodeGroup, slider, peersCombo, strategiesCombo );
+            Button placeBtn = createPlaceButton( nodeGroup, slider, hostsComboBox );
 
             nodeGroupsTable.addItem( new Object[] {
-                    nodeGroup.getName(), slider, peersCombo, strategiesCombo, placeBtn
+                    nodeGroup.getName(), slider, hostsComboBox, placeBtn
             }, null );
         }
     }
 
 
-    private Button createPlaceButton( final NodeGroup nodeGroup, final Slider slider, final ComboBox peersCombo,
-                                      final ComboBox strategiesCombo )
+    private Button createPlaceButton( final NodeGroup nodeGroup, final Slider slider, final ComboBox hostsComboBox )
     {
         Button placeButton = new Button( "Place" );
         placeButton.setId( "placeButton" );
@@ -339,15 +311,10 @@ public class TopologyWindow extends Window
             @Override
             public void buttonClick( final Button.ClickEvent event )
             {
-                if ( peersCombo.getValue() == null )
+                if ( hostsComboBox.getValue() == null )
                 {
 
-                    Notification.show( "Please, select target peer", Notification.Type.WARNING_MESSAGE );
-                }
-                else if ( strategiesCombo.getValue() == null )
-                {
-
-                    Notification.show( "Please, select distribution strategy", Notification.Type.WARNING_MESSAGE );
+                    Notification.show( "Please, select target host", Notification.Type.WARNING_MESSAGE );
                 }
                 else if ( slider.getMax() == 0 )
                 {
@@ -359,8 +326,7 @@ public class TopologyWindow extends Window
                 }
                 else
                 {
-                    placeNodeGroup( nodeGroup, slider, ( Peer ) peersCombo.getValue(),
-                            ( ContainerPlacementStrategy ) strategiesCombo.getValue() );
+                    placeNodeGroup( nodeGroup, slider, ( ResourceHostMetric ) hostsComboBox.getValue() );
                 }
             }
         } );
@@ -369,10 +335,9 @@ public class TopologyWindow extends Window
     }
 
 
-    private void placeNodeGroup( NodeGroup nodeGroup, final Slider slider, Peer peer,
-                                 ContainerPlacementStrategy placementStrategy )
+    private void placeNodeGroup( NodeGroup nodeGroup, final Slider slider, ResourceHostMetric metric )
     {
-        final String rowId = String.format( "%s-%s", nodeGroup.getName(), peer.getId() );
+        final String rowId = String.format( "%s-%s", nodeGroup.getName(), metric.getHostId() );
         Button removeBtn = new Button( "Remove" );
         removeBtn.setId( "removeButton" );
 
@@ -398,7 +363,7 @@ public class TopologyWindow extends Window
         if ( row == null )
         {
             placementTable.addItem( new Object[] {
-                    nodeGroup.getName(), amount, peer.getName(), placementStrategy.getId(), removeBtn
+                    nodeGroup.getName(), amount, metric, removeBtn
             }, rowId );
         }
         else
@@ -423,63 +388,55 @@ public class TopologyWindow extends Window
     }
 
 
-    private ComboBox createPeersComboBox()
+    private void initMetrics()
     {
-        ComboBox peersCombo = new ComboBox();
-        peersCombo.setNullSelectionAllowed( false );
-        peersCombo.setTextInputAllowed( false );
-        peersCombo.setImmediate( true );
-        peersCombo.setRequired( true );
+
         List<Peer> peers = peerManager.getPeers();
 
         for ( Peer peer : peers )
         {
-            peersCombo.addItem( peer );
-
-            peersCombo.setItemCaption( peer, peer.getName() );
-        }
-
-        peersCombo.addValueChangeListener( new Property.ValueChangeListener()
-        {
-            @Override
-            public void valueChange( final Property.ValueChangeEvent event )
+            try
             {
-                Peer peer = ( Peer ) event.getProperty().getValue();
-                Notification.show( peer.getName() );
+                ResourceHostMetrics rm = peer.getResourceHostMetrics();
+                for ( ResourceHostMetric m : rm.getResources() )
+                {
+                    metrics.add( m );
+                }
             }
-        } );
-
-        return peersCombo;
+            catch ( Exception ignore )
+            {
+                // ignore
+            }
+        }
     }
 
 
-    private ComboBox createStrategiesComboBox()
+    private ComboBox createHostsComboBox()
     {
-        ComboBox strategiesCombo = new ComboBox();
-        strategiesCombo.setNullSelectionAllowed( false );
-        strategiesCombo.setTextInputAllowed( false );
-        strategiesCombo.setImmediate( true );
-        strategiesCombo.setRequired( true );
-        List<ContainerPlacementStrategy> placementStrategies = strategyManager.getPlacementStrategies();
+        ComboBox hostCombo = new ComboBox();
+        hostCombo.setNullSelectionAllowed( false );
+        hostCombo.setTextInputAllowed( false );
+        hostCombo.setImmediate( true );
+        hostCombo.setRequired( true );
 
-        for ( ContainerPlacementStrategy strategy : placementStrategies )
+        for ( ResourceHostMetric metric : metrics )
         {
-            strategiesCombo.addItem( strategy );
+            hostCombo.addItem( metric );
 
-            strategiesCombo.setItemCaption( strategy, strategy.getTitle() );
+            hostCombo.setItemCaption( metric, metric.getPeerId() + ":" + metric.getHostName() );
         }
 
-        strategiesCombo.addValueChangeListener( new Property.ValueChangeListener()
+        hostCombo.addValueChangeListener( new Property.ValueChangeListener()
         {
             @Override
             public void valueChange( final Property.ValueChangeEvent event )
             {
-                ContainerPlacementStrategy strategy = ( ContainerPlacementStrategy ) event.getProperty().getValue();
-                Notification.show( strategy.getTitle() );
+                ResourceHostMetric m = ( ResourceHostMetric ) event.getProperty().getValue();
+                Notification.show( m.getHostName() );
             }
         } );
 
-        return strategiesCombo;
+        return hostCombo;
     }
 
 
@@ -488,8 +445,7 @@ public class TopologyWindow extends Window
         Table table = new Table();
         table.addContainerProperty( "Name", String.class, null );
         table.addContainerProperty( "Amount", Slider.class, null );
-        table.addContainerProperty( "Peer", ComboBox.class, null );
-        table.addContainerProperty( "Strategy", ComboBox.class, null );
+        table.addContainerProperty( "Host", ComboBox.class, null );
         table.addContainerProperty( "Action", Button.class, null );
         table.setPageLength( 10 );
         table.setSelectable( false );
