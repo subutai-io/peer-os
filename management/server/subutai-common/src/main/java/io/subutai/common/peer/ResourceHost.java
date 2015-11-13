@@ -1,6 +1,7 @@
 package io.subutai.common.peer;
 
 
+import java.util.Collection;
 import java.util.Set;
 
 import io.subutai.common.host.ContainerHostState;
@@ -20,7 +21,7 @@ public interface ResourceHost extends Host, ResourceHostInfo
     /**
      * Returns resource usage metric of the resource host
      */
-    public ResourceHostMetric getHostMetric();
+    //    public ResourceHostMetric getHostMetric();
 
     /**
      * Returns hosts containers
@@ -83,4 +84,6 @@ public interface ResourceHost extends Host, ResourceHostInfo
     Set<ContainerHost> getContainerHostsByEnvironmentId( String environmentId );
 
     Set<ContainerHost> getContainerHostsByOwnerId( String ownerId );
+
+    Set<ContainerHost> getContainerHostsByPeerId( String peerId );
 }

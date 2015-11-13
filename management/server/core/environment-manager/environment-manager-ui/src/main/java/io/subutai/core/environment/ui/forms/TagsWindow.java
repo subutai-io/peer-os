@@ -5,7 +5,7 @@ import io.subutai.common.environment.Environment;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.common.peer.HostNotFoundException;
-import io.subutai.core.peer.api.LocalPeer;
+import io.subutai.common.peer.LocalPeer;
 
 import com.google.common.base.Strings;
 import com.vaadin.data.util.IndexedContainer;

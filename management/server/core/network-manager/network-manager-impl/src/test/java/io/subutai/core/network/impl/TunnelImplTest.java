@@ -3,7 +3,7 @@ package io.subutai.core.network.impl;
 
 import org.junit.Test;
 
-import io.subutai.core.peer.api.Tunnel;
+import io.subutai.common.protocol.Tunnel;
 
 import static org.junit.Assert.assertEquals;
 

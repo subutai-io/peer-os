@@ -78,7 +78,7 @@
     <com.google.guava.version>18.0</com.google.guava.version>
     <!-- REST -->
     <restlet-version>2.2.2</restlet-version>
-    <org.apache.cxf.version>2.7.16</org.apache.cxf.version>
+    <org.apache.cxf.version>2.7.18</org.apache.cxf.version>
     <!-- TEST -->
     <org.mockito.version>1.9.5</org.mockito.version>
     <com.jayway.awaitility.version>1.5.0</com.jayway.awaitility.version>
@@ -233,19 +233,6 @@
       </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!-- file-tracker -->
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>file-tracker-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>file-tracker-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- git-manager -->
       <dependency>
         <groupId>${project.groupId}</groupId>
@@ -278,15 +265,6 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>lxc-quota-manager-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!-- script-manager -->
-
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>script-manager-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -483,6 +461,28 @@
         <version>${project.version}</version>
       </dependency>
 
+      <!-- local-peer -->
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>local-peer-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>local-peer-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>local-peer-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>local-peer-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
       <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
       <!--plugin-master -->
       <dependency>
@@ -493,19 +493,6 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>plugin-manager-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!-- wol-manager -->
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>wol-manager-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>wol-manager-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -572,24 +559,6 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>http-context-factory</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!-- ssl-context-manager -->
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>http-context-manager-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>http-context-manager-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>http-context-manager-cli</artifactId>
         <version>${project.version}</version>
       </dependency>
 

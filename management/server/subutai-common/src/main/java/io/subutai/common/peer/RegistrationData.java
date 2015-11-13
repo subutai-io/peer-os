@@ -55,24 +55,6 @@ public class RegistrationData
     }
 
 
-//    public void setKeyPhrase( final String keyPhrase )
-//    {
-//        this.keyPhrase = keyPhrase;
-//    }
-
-
-//    public void setCert( final String cert )
-//    {
-//        this.cert = cert;
-//    }
-//
-//
-//    public String getCert()
-//    {
-//        return cert;
-//    }
-
-
     public RegistrationStatus getStatus()
     {
         return status;

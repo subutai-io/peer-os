@@ -418,9 +418,19 @@ public class IdentityManagerImpl implements IdentityManager
      */
     @PermitAll
     @Override
-    public User getUser(long userId) { return identityDataService.getUser(userId ); }
+    public User getUser( long userId )
+    {
+        return identityDataService.getUser( userId );
+    }
 
-
+    /* *************************************************
+     */
+    @PermitAll
+    @Override
+    public User getActiveUser()
+    {
+        return getLoggedUser();
+    }
 
     /* *************************************************
      */
@@ -465,6 +475,34 @@ public class IdentityManagerImpl implements IdentityManager
         {
             return null;
         }
+    }
+
+    /* *************************************************
+     */
+    @RolesAllowed( "Identity-Management|A|Write" )
+    @Override
+    public User createTempUser( String userName, String password, String fullName, String email, int type )
+    {
+        //***************Cannot use TOKEN keyword *******
+        if(userName.equalsIgnoreCase( "token" ))
+        {
+            throw new IllegalArgumentException("Cannot use TOKEN keyword.");
+        }
+        //***********************************************
+
+        if(Strings.isNullOrEmpty( password ))
+        {
+            password = Integer.toString( ( new Random() ).nextInt());
+        }
+
+        User user = new UserEntity();
+        user.setUserName( userName );
+        user.setPassword( password );
+        user.setEmail( email );
+        user.setFullName( fullName );
+        user.setType( type );
+
+        return user;
     }
 
 
@@ -655,11 +693,14 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-
     /* *************************************************
      */
+    @PermitAll
     @Override
-    public Role getRole(long roleId) { return identityDataService.getRole(roleId); }
+    public Role getRole(long roleId)
+    {
+        return identityDataService.getRole( roleId );
+    }
 
 
 

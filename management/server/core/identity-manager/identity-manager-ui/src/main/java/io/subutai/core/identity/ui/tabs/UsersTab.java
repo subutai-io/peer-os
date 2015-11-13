@@ -2,6 +2,8 @@ package io.subutai.core.identity.ui.tabs;
 
 
 import com.vaadin.ui.*;
+
+import io.subutai.common.security.objects.UserType;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.ui.tabs.subviews.UserForm;
@@ -95,17 +97,11 @@ public class UsersTab extends CustomComponent implements TabCallback<BeanItem<Us
         {
             public void buttonClick( Button.ClickEvent event )
             {
-
-                // Create a new item; this will create a new bean
-                //BeanItem<User> newUser = new BeanItem<>( identityManager.createMockUser( "", "", "", "" ) );
+                 //Create a new item; this will create a new bean
+                BeanItem<User> newUser = new BeanItem(identityManager.createTempUser( "","","","", UserType.Regular.getId() ));
 
                 // The form was opened for editing a new item
-                refreshControls( FormState.STATE_NEW_ENTITY, null );
-
-
-                // Make the form a bit nicer
-                //this is an example for future how to improve UI
-                //form.setUser( newUser, true );
+                refreshControls( FormState.STATE_NEW_ENTITY, newUser );
             }
         } );
 
@@ -135,14 +131,15 @@ public class UsersTab extends CustomComponent implements TabCallback<BeanItem<Us
         {
             case STATE_EXISTING_ENTITY_SELECTED:
                 form = new UserForm (this, identityManager);
-                form.setUser (userBean, false);
-                UI.getCurrent().addWindow (form);
+                form.setUser( userBean, false );
+                UI.getCurrent().addWindow( form );
                 newBean.setEnabled(false);
                 usersTable.setEnabled( false );
                 break;
             case STATE_SAVE_EXISTING_ENTITY:
             case STATE_SAVE_NEW_ENTITY:
                 newBean.setEnabled( true );
+                form.setUser (userBean, true);
                 usersTable.setEnabled( true );
                 form.close();
                 break;
@@ -153,8 +150,8 @@ public class UsersTab extends CustomComponent implements TabCallback<BeanItem<Us
                 break;
             case STATE_NEW_ENTITY:
                 form = new UserForm (this, identityManager);
-                form.setUser (userBean, false);
-                UI.getCurrent().addWindow(form);
+                form.setUser (userBean, true);
+                UI.getCurrent().addWindow( form );
                 newBean.setEnabled( false );
                 usersTable.setEnabled( false );
                 break;

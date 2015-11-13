@@ -11,7 +11,7 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.StringUtil;
 import io.subutai.common.peer.HostNotFoundException;
-import io.subutai.core.peer.api.ManagementHost;
+import io.subutai.common.peer.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.pluginmanager.api.PluginInfo;
 import io.subutai.core.pluginmanager.api.PluginManagerException;

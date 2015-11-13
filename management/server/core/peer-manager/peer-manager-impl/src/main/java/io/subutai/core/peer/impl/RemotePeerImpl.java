@@ -18,10 +18,16 @@ import com.google.common.reflect.TypeToken;
 
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
+import io.subutai.common.command.CommandRequest;
 import io.subutai.common.command.CommandResult;
+import io.subutai.common.command.CommandResultImpl;
 import io.subutai.common.command.CommandStatus;
 import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.environment.ContainersDestructionResultImpl;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
+import io.subutai.common.environment.CreateEnvironmentContainerGroupResponse;
+import io.subutai.common.environment.DestroyEnvironmentContainerGroupRequest;
+import io.subutai.common.environment.DestroyEnvironmentContainerGroupResponse;
 import io.subutai.common.exception.HTTPException;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
@@ -39,8 +45,15 @@ import io.subutai.common.peer.ContainersDestructionResult;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
+import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.peer.MessageRequest;
+import io.subutai.common.peer.MessageResponse;
+import io.subutai.common.peer.Payload;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
+import io.subutai.common.peer.RecipientType;
+import io.subutai.common.peer.RemotePeer;
+import io.subutai.common.peer.Timeouts;
 import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.quota.CpuQuotaInfo;
@@ -51,7 +64,6 @@ import io.subutai.common.quota.QuotaType;
 import io.subutai.common.quota.RamQuota;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.settings.ChannelSettings;
-import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SecuritySettings;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.JsonUtil;
@@ -59,19 +71,8 @@ import io.subutai.common.util.RestUtil;
 import io.subutai.core.messenger.api.Message;
 import io.subutai.core.messenger.api.MessageException;
 import io.subutai.core.messenger.api.Messenger;
-import io.subutai.core.peer.api.LocalPeer;
-import io.subutai.core.peer.api.Payload;
-import io.subutai.core.peer.api.RemotePeer;
 import io.subutai.core.peer.impl.command.BlockingCommandCallback;
-import io.subutai.core.peer.impl.command.CommandRequest;
 import io.subutai.core.peer.impl.command.CommandResponseListener;
-import io.subutai.core.peer.impl.command.CommandResultImpl;
-import io.subutai.core.peer.impl.container.ContainersDestructionResultImpl;
-import io.subutai.core.peer.impl.container.CreateEnvironmentContainerGroupResponse;
-import io.subutai.core.peer.impl.container.DestroyEnvironmentContainerGroupRequest;
-import io.subutai.core.peer.impl.container.DestroyEnvironmentContainerGroupResponse;
-import io.subutai.core.peer.impl.request.MessageRequest;
-import io.subutai.core.peer.impl.request.MessageResponse;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
 
 
@@ -324,12 +325,39 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
+    @Override
+    public void setDefaultGateway( final ContainerGateway containerGateway ) throws PeerException
+    {
+        Preconditions.checkNotNull( containerGateway, "Container host is null" );
+
+        String path = "peer/container/gateway";
+
+        Map<String, String> params = Maps.newHashMap();
+        params.put( "containerId", containerGateway.getContainerId().getId() );
+        params.put( "gatewayIp", containerGateway.getGateway() );
+
+        //*********construct Secure Header ****************************
+        Map<String, String> headers = Maps.newHashMap();
+        //*************************************************************
+
+        try
+        {
+            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
+            post( path, alias, params, headers );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Error setting container gateway ip", e );
+        }
+    }
+
 
     @Override
     public void removeEnvironmentKeyPair( final EnvironmentId environmentId ) throws PeerException
     {
         new PeerWebClient( peerInfo.getIp(), provider ).removeEnvironmentKeyPair( environmentId );
     }
+
 
     @RolesAllowed( "Environment-Management|A|Delete" )
     @Override
@@ -539,6 +567,7 @@ public class RemotePeerImpl implements RemotePeer
             throw new PeerException( "Error obtaining container cpu quota", e );
         }
     }
+
 
     @RolesAllowed( "Environment-Management|A|Update" )
     @Override
@@ -1154,10 +1183,10 @@ public class RemotePeerImpl implements RemotePeer
         {
             //*********construct Secure Header ****************************
             Map<String, String> headers = Maps.newHashMap();
-//
-//            headers.put( Common.HEADER_SPECIAL, "ENC" );
-//            headers.put( Common.HEADER_PEER_ID_SOURCE, localPeer.getId() );
-//            headers.put( Common.HEADER_PEER_ID_TARGET, peerInfo.getId() );
+            //
+            //            headers.put( Common.HEADER_SPECIAL, "ENC" );
+            //            headers.put( Common.HEADER_PEER_ID_SOURCE, localPeer.getId() );
+            //            headers.put( Common.HEADER_PEER_ID_TARGET, peerInfo.getId() );
             //*************************************************************
             Map<String, String> params = Maps.newHashMap();
             params.put( "peerIps", jsonUtil.to( peerIps ) );
@@ -1200,37 +1229,6 @@ public class RemotePeerImpl implements RemotePeer
         }
     }
 
-
-    @Override
-    public void setDefaultGateway( final ContainerHost containerHost, final String gatewayIp ) throws PeerException
-    {
-        Preconditions.checkNotNull( containerHost, "Container host is null" );
-        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
-
-        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( gatewayIp ) && gatewayIp.matches( Common.IP_REGEX ),
-                "Invalid gateway IP" );
-
-        String path = "peer/container/gateway";
-
-        Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId() );
-        params.put( "gatewayIp", gatewayIp );
-
-        //*********construct Secure Header ****************************
-        Map<String, String> headers = Maps.newHashMap();
-        //*************************************************************
-
-        try
-        {
-            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
-            post( path, alias, params, headers );
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException( "Error setting container gateway ip", e );
-        }
-    }
 
     @Override
     public Set<Vni> getReservedVnis() throws PeerException
@@ -1304,6 +1302,13 @@ public class RemotePeerImpl implements RemotePeer
     {
         return new PeerWebClient( peerInfo.getIp(), provider ).getResourceHostMetrics();
     }
+
+
+    //    @Override
+    //    public HostMetric getHostMetric( final String hostId )
+    //    {
+    //        return new PeerWebClient( peerInfo.getIp(), provider ).getHostMetric( hostId );
+    //    }
 
 
     @Override

@@ -18,10 +18,9 @@ import org.slf4j.Logger;
 
 import com.google.common.collect.Sets;
 
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerInfo;
-import io.subutai.common.util.RestUtil;
-import io.subutai.core.peer.api.LocalPeer;
 import io.subutai.core.peer.api.PeerManager;
 
 import static org.mockito.Matchers.anyString;
@@ -49,8 +48,6 @@ public class MessageSenderTest
     @Mock
     ExecutorService restExecutor;
     @Mock
-    RestUtil restUtil;
-    @Mock
     Envelope envelope;
     @Mock
     Peer peer;
@@ -74,7 +71,6 @@ public class MessageSenderTest
         messageSender = new MessageSender( messengerDao, messenger );
         messageSender.mainLoopExecutor = mainLoopExecutor;
         messageSender.restExecutor = restExecutor;
-        messageSender.restUtil = restUtil;
         messageSender.LOG = logger;
         messageSender.completer = completer;
     }

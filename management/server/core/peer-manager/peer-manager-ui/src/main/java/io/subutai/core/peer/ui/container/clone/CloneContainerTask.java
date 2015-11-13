@@ -3,7 +3,7 @@ package io.subutai.core.peer.ui.container.clone;
 
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.Template;
-import io.subutai.core.peer.api.LocalPeer;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.ResourceHost;
 
 

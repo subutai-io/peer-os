@@ -14,6 +14,7 @@ import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInfoModel;
 import io.subutai.common.host.HostInterfaces;
+import io.subutai.common.metric.HostMetric;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.Gateway;
@@ -87,7 +88,7 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
     /**
      * Sets default gateway for the container
      */
-    public void setDefaultGateway( ContainerHost host, String gatewayIp ) throws PeerException;
+    public void setDefaultGateway( ContainerGateway containerGateway) throws PeerException;
 
     /**
      * Cleans up environment networking settings. This method is called when an environment is being destroyed to clean
@@ -405,4 +406,5 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
     void removeEnvironmentKeyPair( EnvironmentId environmentId ) throws PeerException;
 
     ResourceHostMetrics getResourceHostMetrics();
+
 }

@@ -1,14 +1,10 @@
 package io.subutai.core.peer.ui.forms;
 
 
-import java.util.Iterator;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.FormLayout;
@@ -18,16 +14,10 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
-import io.subutai.common.environment.Environment;
-import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
-import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.RegistrationData;
 import io.subutai.common.peer.RegistrationStatus;
-import io.subutai.common.peer.ResourceHost;
 import io.subutai.core.peer.ui.PeerManagerPortalModule;
-import io.subutai.server.ui.component.ConfirmationDialog;
 
 
 /**
@@ -36,21 +26,12 @@ import io.subutai.server.ui.component.ConfirmationDialog;
  * connection. So first initial handshake will be one direction, to pass keys through encrypted channel and register
  * them in peers' trust stores. These newly saved keys will be used further for safe communication, with bidirectional
  * authentication.
- *
- *
- * TODO here still exists some issues concerned via registration/reject/approve requests. Some of them must pass through
- * secure channel such as unregister process. Which already must be in bidirectional auth completed stage.
  */
 
-//TODO: move rest calls to RemotePeer
 public class RegistrationForm extends CustomComponent
 {
 
-    private static final Logger LOG = LoggerFactory.getLogger( PeerRegisterForm.class.getName() );
-    private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-
-    //    private AbsoluteLayout mainLayout;
-    private Table peersTable;
+    private static final Logger LOG = LoggerFactory.getLogger( RegistrationForm.class );
     private Button showPeersButton;
     private Button doRequestButton;
     private TextField hostField;
@@ -72,7 +53,6 @@ public class RegistrationForm extends CustomComponent
 
         this.module = module;
         updateRequestsTable();
-        //        showPeersButton.click();
     }
 
 
@@ -99,9 +79,6 @@ public class RegistrationForm extends CustomComponent
         hostField.setMaxLength( 45 );
         fl.addComponent( hostField );
 
-        //        content.addComponent( fl );
-
-        //        fl = new FormLayout(  );
         fl.addComponent( new Label( "Secret keyphrase" ) );
         // secretKeyphrase
         keyPhraseField = new TextField();
@@ -121,12 +98,10 @@ public class RegistrationForm extends CustomComponent
         requestsTable.setCaption( "List of remote peers" );
 
         requestsTable.setImmediate( true );
-        //        requestsTable.setHeight( "283px" );
         requestsTable.setSizeFull();
         requestsTable.addContainerProperty( "ID", String.class, "UNKNOWN" );
         requestsTable.addContainerProperty( "Name", String.class, null );
         requestsTable.addContainerProperty( "Host", String.class, null );
-//        requestsTable.addContainerProperty( "Key phrase", String.class, null );
         requestsTable.addContainerProperty( "Status", RegistrationStatus.class, null );
         requestsTable.addContainerProperty( "Action", RequestActionsComponent.class, null );
 
@@ -184,11 +159,13 @@ public class RegistrationForm extends CustomComponent
             };
             RequestActionsComponent actionsComponent =
                     new RequestActionsComponent( module, registrationData, listener );
+
+            String rowId = registrationData.getPeerInfo().getId();
             requestsTable.addItem( new Object[] {
                     registrationData.getPeerInfo().getId(), registrationData.getPeerInfo().getName(),
-                    registrationData.getPeerInfo().getIp(),/* registrationData.getKeyPhrase(),*/
-                    registrationData.getStatus(), actionsComponent
-            }, registrationData.getPeerInfo().getId() );
+                    registrationData.getPeerInfo().getIp(), registrationData.getStatus(), actionsComponent
+            }, rowId );
+            LOG.debug( String.format( "Size: %d. %s", requestsTable.size(), rowId ) );
         }
     }
 
@@ -213,7 +190,6 @@ public class RegistrationForm extends CustomComponent
     private void negativeActionTrigger( final RegistrationData request,
                                         final RequestActionsComponent.RequestUpdateViewListener updateViewListener )
     {
-        PeerInfo selfPeer = module.getPeerManager().getLocalPeerInfo();
         switch ( request.getStatus() )
         {
             case REQUESTED:
@@ -228,9 +204,6 @@ public class RegistrationForm extends CustomComponent
     }
 
 
-    /* *************************************************************
-     *
-     */
     private void sendRegistrationRequest( final String destinationHost, final String keyPhrase )
     {
         try
@@ -241,107 +214,6 @@ public class RegistrationForm extends CustomComponent
         {
             Notification.show( e.getMessage(), Notification.Type.WARNING_MESSAGE );
         }
-    }
-
-
-    private void unregisterMeFromRemote( final RegistrationData request,
-                                         final RequestActionsComponent.RequestUpdateViewListener updateViewListener )
-    {
-        int relationExists = 0;
-        relationExists = checkEnvironmentExistence( request.getPeerInfo(), relationExists );
-
-        relationExists = isRemotePeerContainersHost( request.getPeerInfo(), relationExists );
-
-        if ( relationExists != 0 )
-        {
-            String msg;
-            switch ( relationExists )
-            {
-                case 1:
-                    msg = "Please destroy all cross peer environments, before you proceed!!!";
-                    break;
-                case 2:
-                    msg = "You cannot unregister Peer, because you are a carrier of Peer's resources!!!"
-                            + " Contact with Peer to migrate all his data.";
-                    break;
-                default:
-                    msg = "Cannot break peer relationship.";
-            }
-            ConfirmationDialog alert = new ConfirmationDialog( msg, "Ok", "" );
-            alert.getOk().addClickListener( new Button.ClickListener()
-            {
-                @Override
-                public void buttonClick( Button.ClickEvent clickEvent )
-                {
-                }
-            } );
-
-            getUI().addWindow( alert.getAlert() );
-        }
-        else
-        {
-            unregisterPeerRequestThread( request, updateViewListener );
-        }
-    }
-
-
-    private int checkEnvironmentExistence( final PeerInfo remotePeerInfo, final int relationExist )
-    {
-        int relationExists = relationExist;
-        for ( final Iterator<Environment> itEnv = module.getEnvironmentManager().getEnvironments().iterator();
-              itEnv.hasNext() && relationExists == 0; )
-        {
-            Environment environment = itEnv.next();
-            for ( final Iterator<Peer> itPeer = environment.getPeers().iterator();
-                  itPeer.hasNext() && relationExists == 0; )
-            {
-                Peer peer = itPeer.next();
-                if ( peer.getPeerInfo().equals( remotePeerInfo ) )
-                {
-                    relationExists = 1;
-                }
-            }
-        }
-        return relationExists;
-    }
-
-
-    private int isRemotePeerContainersHost( final PeerInfo remotePeerInfo, final int relationExist )
-    {
-        int relationExists = relationExist;
-        for ( final Iterator<ResourceHost> itResource =
-              module.getPeerManager().getLocalPeer().getResourceHosts().iterator();
-              itResource.hasNext() && relationExists == 0; )
-        {
-            ResourceHost resourceHost = itResource.next();
-            for ( final Iterator<ContainerHost> itContainer = resourceHost.getContainerHosts().iterator();
-                  itContainer.hasNext() && relationExists == 0; )
-            {
-                ContainerHost containerHost = itContainer.next();
-
-                if ( containerHost.getInitiatorPeerId().equals( remotePeerInfo.getId() ) )
-                {
-                    relationExists = 2;
-                }
-            }
-        }
-        return relationExists;
-    }
-
-
-    private void unregisterPeerRequestThread( final RegistrationData request,
-                                              final RequestActionsComponent.RequestUpdateViewListener
-                                                      updateViewListener )
-    {
-        new Thread( new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                unregister( request, updateViewListener );
-                updateRequestsTable();
-            }
-        } ).start();
     }
 
 

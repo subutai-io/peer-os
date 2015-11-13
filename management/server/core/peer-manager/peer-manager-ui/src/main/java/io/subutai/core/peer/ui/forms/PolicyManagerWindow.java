@@ -9,7 +9,7 @@ import java.util.List;
 
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.PeerPolicy;
-import io.subutai.core.peer.api.LocalPeer;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.core.peer.api.PeerManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

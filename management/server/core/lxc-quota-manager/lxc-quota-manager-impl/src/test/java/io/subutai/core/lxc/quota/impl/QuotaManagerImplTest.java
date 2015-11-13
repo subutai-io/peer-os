@@ -21,7 +21,7 @@ import io.subutai.common.quota.QuotaType;
 import io.subutai.common.quota.RamQuota;
 import io.subutai.common.quota.RamQuotaUnit;
 import io.subutai.common.peer.HostNotFoundException;
-import io.subutai.core.peer.api.LocalPeer;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.common.peer.ResourceHost;
 

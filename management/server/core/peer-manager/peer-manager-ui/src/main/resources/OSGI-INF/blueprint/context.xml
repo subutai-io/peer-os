@@ -10,8 +10,6 @@
              interface="io.subutai.core.hostregistry.api.HostRegistry" />
   <reference id="environmentManager" availability="optional"
              interface="io.subutai.core.environment.api.EnvironmentManager" />
-  <reference id="httpContextManager" availability="mandatory"
-             interface="io.subutai.core.http.manager.api.HttpContextManager" />
   <reference id="securityManager" availability="mandatory"
              interface="io.subutai.core.security.api.SecurityManager" />
 
@@ -21,9 +19,8 @@
     <argument ref="templateRegistry" />
     <argument ref="hostRegistry" />
 
-    <property name="httpContextManager" ref="httpContextManager" />
     <property name="environmentManager" ref="environmentManager" />
-    <property name="securityManager"    ref="securityManager" />
+    <property name="securityManager" ref="securityManager" />
 
   </bean>
 

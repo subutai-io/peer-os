@@ -11,8 +11,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.core.metric.api.MonitoringSettings;
 
-import io.subutai.core.peer.api.LocalPeer;
-import io.subutai.core.peer.api.Payload;
+import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.peer.Payload;
 import io.subutai.core.peer.api.PeerManager;
 
 import com.google.common.collect.Sets;

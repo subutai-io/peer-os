@@ -16,25 +16,29 @@ import io.subutai.core.environment.api.EnvironmentEventListener;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registry.api.TemplateRegistry;
+import io.subutai.core.strategy.api.StrategyManager;
 import io.subutai.server.ui.api.PortalModule;
 
 
 public class EnvironmentManagerPortalModule implements PortalModule, EnvironmentEventListener
 {
-    private static final Logger LOG = LoggerFactory.getLogger( EnvironmentManagerPortalModule.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( EnvironmentManagerPortalModule.class );
     private final static String MODULE_IMAGE = "environment.jpg";
     private final static String MODULE_NAME = "Environment";
     private final EnvironmentManager environmentManager;
     private final PeerManager peerManager;
     private final TemplateRegistry templateRegistry;
+    private final StrategyManager strategyManager;
 
 
     public EnvironmentManagerPortalModule( final EnvironmentManager environmentManager, final PeerManager peerManager,
-                                           final TemplateRegistry templateRegistry )
+                                           final TemplateRegistry templateRegistry,
+                                           final StrategyManager strategyManager )
     {
         this.environmentManager = environmentManager;
         this.peerManager = peerManager;
         this.templateRegistry = templateRegistry;
+        this.strategyManager = strategyManager;
     }
 
 
@@ -62,7 +66,7 @@ public class EnvironmentManagerPortalModule implements PortalModule, Environment
     @Override
     public Component createComponent()
     {
-        return new EnvironmentManagerComponent( environmentManager, peerManager, templateRegistry );
+        return new EnvironmentManagerComponent( environmentManager, peerManager, templateRegistry, strategyManager );
     }
 
 

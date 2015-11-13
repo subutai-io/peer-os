@@ -8,7 +8,7 @@
     >
 
   <!-- ***************************************************************** -->
-  <authz:enable/>
+  <authz:enable />
   <!-- ***************************************************************** -->
 
   <!-- Allow the use of system properties -->
@@ -31,8 +31,6 @@
 
   <reference id="commandExecutor" interface="io.subutai.core.executor.api.CommandExecutor" />
 
-  <reference id="templateRegistry" interface="io.subutai.core.registry.api.TemplateRegistry" />
-
   <reference id="hostRegistry" interface="io.subutai.core.hostregistry.api.HostRegistry" />
 
   <reference id="strategyManager" interface="io.subutai.core.strategy.api.StrategyManager" />
@@ -49,18 +47,8 @@
   <reference id="securityManager" availability="mandatory"
              interface="io.subutai.core.security.api.SecurityManager" />
 
-  <bean id="localPeer" class="io.subutai.core.peer.impl.LocalPeerImpl" init-method="init"
-        destroy-method="dispose" scope="singleton" activation="eager">
-    <argument ref="daoManagerPeer" />
-    <argument ref="templateRegistry" />
-    <argument ref="quotaManager" />
-    <argument ref="strategyManager" />
-    <argument ref="commandExecutor" />
-    <argument ref="hostRegistry" />
-    <argument ref="monitor" />
-    <argument ref="securityManager" />
-    <property name="externalIpInterface" value="${externalIpInterface}" />
-  </bean>
+  <reference id="localPeer" availability="mandatory"
+             interface="io.subutai.common.peer.LocalPeer" />
 
   <bean id="messageResponseListener" class="io.subutai.core.peer.impl.request.MessageResponseListener"
         destroy-method="dispose" scope="singleton" activation="eager">
@@ -79,25 +67,8 @@
     <argument ref="jsonProvider" />
   </bean>
 
-  <bean id="messageRequestListener" class="io.subutai.core.peer.impl.request.MessageRequestListener"
-        destroy-method="dispose" scope="singleton" activation="eager">
-    <argument ref="peerManager" />
-    <argument ref="messenger" />
-  </bean>
-
-  <reference-list id="peerMsgLstnr"
-                  interface="io.subutai.core.peer.api.RequestListener"
-                  availability="optional" ext:proxy-method="classes">
-    <reference-listener ref="peerManager"
-                        bind-method="addRequestListener" unbind-method="removeRequestListener" />
-  </reference-list>
-
-  <service ref="localPeer" interface="io.subutai.core.hostregistry.api.HostListener" />
-
   <service ref="messageResponseListener" interface="io.subutai.core.messenger.api.MessageListener" />
 
   <service ref="peerManager" interface="io.subutai.core.peer.api.PeerManager" />
-
-  <service ref="messageRequestListener" interface="io.subutai.core.messenger.api.MessageListener" />
 
 </blueprint>

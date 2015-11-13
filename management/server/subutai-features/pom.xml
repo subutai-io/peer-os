@@ -161,17 +161,6 @@
     </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-    <!-- file-tracker -->
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>file-tracker-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>file-tracker-impl</artifactId>
-    </dependency>
-
-    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- git-manager -->
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -199,14 +188,6 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>lxc-quota-manager-cli</artifactId>
-    </dependency>
-
-    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-    <!-- script-manager -->
-
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>script-manager-rest</artifactId>
     </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
@@ -338,6 +319,24 @@
       <artifactId>peer-manager-rest-ui</artifactId>
     </dependency>
 
+    <!-- local-peer -->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>local-peer-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>local-peer-impl</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>local-peer-cli</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>local-peer-rest</artifactId>
+    </dependency>
+
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- plugin-master -->
     <dependency>
@@ -347,17 +346,6 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>plugin-manager-impl</artifactId>
-    </dependency>
-
-    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-    <!-- wol-manager -->
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>wol-manager-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>wol-manager-impl</artifactId>
     </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
@@ -377,21 +365,6 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>http-context-factory</artifactId>
       <version>${project.version}</version>
-    </dependency>
-
-    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-    <!-- http-context-manager -->
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>http-context-manager-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>http-context-manager-impl</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>http-context-manager-cli</artifactId>
     </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->

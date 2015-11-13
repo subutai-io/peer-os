@@ -7,6 +7,8 @@ import java.util.Set;
 
 import javax.ws.rs.core.MediaType;
 
+import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,6 +18,7 @@ import com.google.common.base.Preconditions;
 
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInterfaces;
+import io.subutai.common.metric.HostMetric;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.Gateway;
@@ -336,5 +339,15 @@ public class PeerWebClient
         {
             throw new PeerException( "Error on reserving VNI", e );
         }
+    }
+
+
+    public HostMetric getHostMetric( final String hostId )
+    {
+        String path = String.format( "/metric/%s", hostId );
+
+        WebClient client = WebClientBuilder.buildPeerWebClient( host, path, provider );
+
+        return client.get( HostMetric.class );
     }
 }
