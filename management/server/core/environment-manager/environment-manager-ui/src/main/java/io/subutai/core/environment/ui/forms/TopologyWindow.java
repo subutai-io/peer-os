@@ -1,17 +1,16 @@
 package io.subutai.core.environment.ui.forms;
 
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.shared.ui.slider.SliderOrientation;
@@ -28,19 +27,15 @@ import com.vaadin.ui.Window;
 import io.subutai.common.environment.Blueprint;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.NodeGroup;
-import io.subutai.common.environment.Topology;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.PlacementStrategy;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
-import io.subutai.core.environment.api.exception.EnvironmentCreationException;
-import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.strategy.api.ContainerPlacementStrategy;
 import io.subutai.core.strategy.api.StrategyManager;
-import io.subutai.core.strategy.api.StrategyNotFoundException;
 
 
 public class TopologyWindow extends Window
@@ -131,7 +126,7 @@ public class TopologyWindow extends Window
 
     private void buildProcessTrigger( final EnvironmentManager environmentManager, final boolean grow )
     {
-        Map<Peer, Set<NodeGroup>> placements = getPlacements();
+        Set<NodeGroup> placements = getPlacements();
 
         if ( placements == null )
         {
@@ -147,33 +142,30 @@ public class TopologyWindow extends Window
         }
         else
         {
-            Topology topology;
-            if ( grow )
-            {
-                Environment environment = ( Environment ) envCombo.getValue();
-                topology =
-                        new Topology( environment.getName(), environment.getId(), environment.getSubnetCidr(), null );
-            }
-            else
-            {
-                final String environmentId = UUID.randomUUID().toString();
-                final String subnet = subnetTxt.getValue().trim();
-                topology = new Topology( String.format( "%s-%s", blueprint.getName(), environmentId ), environmentId,
-                        subnet, null );
-            }
-            constructTopology( topology, placements );
+
+
+            //            constructTopology( blueprint, placements );
 
             try
             {
                 if ( grow )
                 {
                     Environment environment = ( Environment ) envCombo.getValue();
-                    environmentManager.growEnvironment( topology, true );
+                    Blueprint blueprint =
+                            new Blueprint( environment.getId(), environment.getName(), environment.getSubnetCidr(),
+                                    null, placements );
+                    environmentManager.growEnvironment( blueprint, true );
                     Notification.show( "Environment expanding started" );
                 }
                 else
                 {
-                    environmentManager.createEnvironment( topology, true );
+                    final String environmentId = UUID.randomUUID().toString();
+                    final String subnet = subnetTxt.getValue().trim();
+                    Blueprint blueprint =
+                            new Blueprint( String.format( "%s-%s", this.blueprint.getName(), environmentId ),
+                                    environmentId, subnet, null, placements );
+
+                    environmentManager.createEnvironment( blueprint, true );
                     Notification.show( "Environment creation started" );
                 }
 
@@ -188,17 +180,17 @@ public class TopologyWindow extends Window
         }
     }
 
-
-    private void constructTopology( final Topology topology, final Map<Peer, Set<NodeGroup>> placements )
-    {
-        for ( Map.Entry<Peer, Set<NodeGroup>> placement : placements.entrySet() )
-        {
-            for ( NodeGroup nodeGroup : placement.getValue() )
-            {
-                topology.addNodeGroupPlacement( placement.getKey(), nodeGroup );
-            }
-        }
-    }
+    //
+    //    private void constructTopology( final Topology topology, final Map<Peer, Set<NodeGroup>> placements )
+    //    {
+    //        for ( Map.Entry<Peer, Set<NodeGroup>> placement : placements.entrySet() )
+    //        {
+    //            for ( NodeGroup nodeGroup : placement.getValue() )
+    //            {
+    //                topology.addNodeGroupPlacement( placement.getKey(), nodeGroup );
+    //            }
+    //        }
+    //    }
 
     //
     //    private void checkPickedSubnetValidity( final Topology topology, final EnvironmentManager environmentManager )
@@ -245,9 +237,9 @@ public class TopologyWindow extends Window
     }
 
 
-    private Map<Peer, Set<NodeGroup>> getPlacements()
+    private Set<NodeGroup> getPlacements()
     {
-        Map<Peer, Set<NodeGroup>> placements = Maps.newHashMap();
+        Set<NodeGroup> placements = new HashSet<>();
 
         for ( Object itemId : placementTable.getItemIds() )
         {
@@ -257,48 +249,42 @@ public class TopologyWindow extends Window
             String strategyId = item.getItemProperty( "Strategy" ).getValue().toString();
             int amount = Integer.parseInt( item.getItemProperty( "Amount" ).getValue().toString() );
 
-            NodeGroup nodeGroup = null;
             for ( NodeGroup ng : blueprint.getNodeGroups() )
             {
                 if ( ng.getName().equalsIgnoreCase( nodeGroupName ) )
                 {
+                    Peer peer = getPeerByName( peerName );
+                    if ( peer == null )
+                    {
+                        Notification.show( "Peer not found: " + peerName );
+                        continue;
+                    }
                     PlacementStrategy placementStrategy = new PlacementStrategy( strategyId );
-                    nodeGroup = new NodeGroup( nodeGroupName, ng.getTemplateName(), amount, ng.getSshGroupId(),
-                            ng.getHostsGroupId(), placementStrategy );
+                    NodeGroup nodeGroup =
+                            new NodeGroup( nodeGroupName, ng.getTemplateName(), amount, ng.getSshGroupId(),
+                                    ng.getHostsGroupId(), placementStrategy, peer.getId() );
 
-                    break;
+                    placements.add( nodeGroup );
                 }
-            }
-
-            Peer peer = null;
-            for ( Peer p : peerManager.getPeers() )
-            {
-                if ( p.getName().equalsIgnoreCase( peerName ) )
-                {
-                    peer = p;
-                    break;
-                }
-            }
-
-            if ( peer != null && nodeGroup != null )
-            {
-                Set<NodeGroup> peerNodeGroups = placements.get( peer );
-
-                if ( peerNodeGroups == null )
-                {
-                    peerNodeGroups = Sets.newHashSet();
-                    placements.put( peer, peerNodeGroups );
-                }
-
-                peerNodeGroups.add( nodeGroup );
-            }
-            else
-            {
-                return null;
             }
         }
 
         return placements;
+    }
+
+
+    private Peer getPeerByName( final String peerName )
+    {
+        Peer peer = null;
+        for ( Peer p : peerManager.getPeers() )
+        {
+            if ( p.getName().equalsIgnoreCase( peerName ) )
+            {
+                peer = p;
+                break;
+            }
+        }
+        return peer;
     }
 
 

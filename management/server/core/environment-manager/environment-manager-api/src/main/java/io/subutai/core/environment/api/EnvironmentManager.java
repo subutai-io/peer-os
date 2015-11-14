@@ -37,14 +37,14 @@ public interface EnvironmentManager
     /**
      * Creates environment based on a passed topology
      *
-     * @param topology - {@code Topology}
+     * @param blueprint - {@code Blueprint}
      * @param async - indicates whether environment is created synchronously or asynchronously to the calling party
      *
      * @return - created environment
      *
      * @throws EnvironmentCreationException - thrown if error occurs during environment creation
      */
-    Environment createEnvironment( Topology topology, boolean async ) throws EnvironmentCreationException;
+    Environment createEnvironment( Blueprint blueprint, boolean async ) throws EnvironmentCreationException;
 
 
     /**
@@ -66,7 +66,7 @@ public interface EnvironmentManager
     /**
      * Grows environment based on a passed topology
      *
-     * @param topology - {@code Topology}
+     * @param blueprint - {@code Blueprint}
      * @param async - indicates whether environment is grown synchronously or asynchronously to the calling party
      *
      * @return - set of newly created {@code ContainerHost} or empty set if operation is async
@@ -74,7 +74,7 @@ public interface EnvironmentManager
      * @throws EnvironmentModificationException - thrown if error occurs during environment modification
      * @throws EnvironmentNotFoundException - thrown if environment not found
      */
-    Set<EnvironmentContainerHost> growEnvironment( Topology topology, boolean async )
+    Set<EnvironmentContainerHost> growEnvironment( Blueprint blueprint, boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException;
 
     /**
@@ -241,4 +241,5 @@ public interface EnvironmentManager
     void notifyOnContainerDestroyed( Environment environment, String containerId );
 
     void notifyOnContainerStateChanged( Environment environment, ContainerHost containerHost );
+
 }

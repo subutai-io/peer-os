@@ -29,7 +29,6 @@ import com.vaadin.ui.Window;
 import io.subutai.common.environment.Blueprint;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.NodeGroup;
-import io.subutai.common.environment.Topology;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.peer.Peer;
@@ -144,35 +143,26 @@ public class HostEnvironmentBuilderWindow extends Window
         }
         else
         {
-            Topology topology;
-            if ( grow )
-            {
-                Environment environment = ( Environment ) envCombo.getValue();
-                topology = new Topology( environment.getName(), environment.getId(), environment.getSubnetCidr(), null );
-            }
-            else
-            {
-                final String environmentId = UUID.randomUUID().toString();
-                final String subnet = subnetTxt.getValue().trim();
-                topology = new Topology( String.format( "%s-%s", blueprint.getName(), environmentId ), environmentId,
-                        subnet, null );
-            }
-
-            constructTopology( topology, placements );
-
             try
             {
-
                 if ( grow )
                 {
                     Environment environment = ( Environment ) envCombo.getValue();
-                    environmentManager.growEnvironment( topology, true );
+                    Blueprint blueprint =
+                            new Blueprint( environment.getId(), environment.getName(), environment.getSubnetCidr(),
+                                    null, placements );
+                    environmentManager.growEnvironment( blueprint, true );
 
                     Notification.show( "Environment expanding started" );
                 }
                 else
                 {
-                    environmentManager.createEnvironment( topology, true );
+                    final String environmentId = UUID.randomUUID().toString();
+                    final String subnet = subnetTxt.getValue().trim();
+                    Blueprint blueprint = new Blueprint( environmentId,
+                            String.format( "%s-%s", this.blueprint.getName(), environmentId ), subnet, null,
+                            placements );
+                    environmentManager.createEnvironment( blueprint, true );
                     Notification.show( "Environment creation started" );
                 }
 
@@ -183,15 +173,6 @@ public class HostEnvironmentBuilderWindow extends Window
                 Notification.show( String.format( "Failed to %s environment: %s", grow ? "grow" : "create",
                         ExceptionUtils.getRootCauseMessage( e ) ), Notification.Type.ERROR_MESSAGE );
             }
-        }
-    }
-
-
-    private void constructTopology( final Topology topology, final Set<NodeGroup> placements )
-    {
-        for ( NodeGroup placement : placements )
-        {
-            topology.addNodeGroupPlacement( peerManager.getPeer( placement.getPeerId() ), placement );
         }
     }
 

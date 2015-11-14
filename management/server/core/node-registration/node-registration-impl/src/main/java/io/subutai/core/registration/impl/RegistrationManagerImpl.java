@@ -332,7 +332,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
                 String templateName = entry.getKey();
                 NodeGroup nodeGroup =
                         new NodeGroup( String.format( "%s_group", templateName ), templateName, entry.getValue().size(),
-                                1, 1, new PlacementStrategy( "ROUND_ROBIN" ) );
+                                1, 1, new PlacementStrategy( "ROUND_ROBIN" ), localPeer.getId() );
                 topology.addNodeGroupPlacement( localPeer, nodeGroup );
 
                 Set<HostInfo> converter = Sets.newHashSet();

@@ -8,10 +8,11 @@ import org.apache.karaf.shell.commands.Command;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
 
+import io.subutai.common.environment.Blueprint;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.NodeGroup;
-import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.protocol.PlacementStrategy;
 import io.subutai.common.settings.Common;
@@ -82,13 +83,13 @@ public class GrowLocalEnvironmentCommand extends SubutaiShellCommandSupport
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
 
         Environment environment = environmentManager.loadEnvironment( environmentId );
-        Topology topology = new Topology( environment.getName(), environmentId, environment.getSubnetCidr(), null );
         NodeGroup nodeGroup = new NodeGroup( String.format( "NodeGroup%s", System.currentTimeMillis() ), templateName,
-                numberOfContainers, 1, 1, new PlacementStrategy( "ROUND_ROBIN" ) );
+                numberOfContainers, 1, 1, new PlacementStrategy( "ROUND_ROBIN" ), peerManager.getLocalPeer().getId() );
 
-        topology.addNodeGroupPlacement( peerManager.getLocalPeer(), nodeGroup );
+        Blueprint blueprint = new Blueprint( environmentId, environment.getName(), environment.getSubnetCidr(), null,
+                Sets.newHashSet( nodeGroup ) );
 
-        Set<EnvironmentContainerHost> newContainers = environmentManager.growEnvironment( topology, async );
+        Set<EnvironmentContainerHost> newContainers = environmentManager.growEnvironment( blueprint, async );
 
         System.out.println( "New containers created:" );
 
