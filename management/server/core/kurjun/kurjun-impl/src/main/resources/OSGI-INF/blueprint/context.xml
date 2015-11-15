@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+  
+
+  <bean id="kurjun" scope="singleton" activation="eager" 
+        init-method="init" destroy-method="dispose"
+        class="io.subutai.core.kurjun.impl.TemplateManagerImpl">
+  </bean>
+
+  <service ref="kurjun"
+           interface="io.subutai.core.kurjun.api.TemplateManager" />
+
+</blueprint>

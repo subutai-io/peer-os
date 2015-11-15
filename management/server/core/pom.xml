@@ -43,6 +43,7 @@
     <module>node-registration</module>
     <module>http-context-factory</module>
     <module>environment-manager</module>
+    <module>kurjun</module>
   </modules>
 
 </project>
