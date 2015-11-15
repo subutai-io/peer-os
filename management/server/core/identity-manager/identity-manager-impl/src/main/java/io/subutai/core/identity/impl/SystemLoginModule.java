@@ -15,8 +15,6 @@ import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.LoginException;
 
-import io.subutai.core.identity.api.model.RolePermission;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -99,10 +97,8 @@ public class SystemLoginModule extends AbstractKarafLoginModule
                 List<Role> roles = loggedUser.getRoles();
                 for ( Role role : roles )
                 {
-                    //List<Permission> permissions = role.getPermissions();
-                    List<RolePermission> permissions =
-                            identityManager.getIdentityDataService().getAllRolePermissions( role.getId() );
-                    for ( RolePermission permission : permissions )
+                    List<Permission> permissions = role.getPermissions();
+                    for ( Permission permission : permissions )
                     {
                         List<String> perms = permission.asString();
 

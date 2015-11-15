@@ -17,7 +17,6 @@ import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
@@ -57,9 +56,10 @@ public class MessageContentUtil
     }
 
 
-    public static int checkUrlAccessibility( final int currentStatus, final URL url, final String basePath )
+    public static int checkUrlAccessibility( final int currentStatus, final URL url )
     {
         int status = currentStatus;
+        String  basePath = url.getPath();
 
         if ( url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X1 ) )
         {

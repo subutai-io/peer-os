@@ -4,7 +4,6 @@ package io.subutai.core.identity.impl.dao;
 import java.util.List;
 
 import io.subutai.core.identity.api.model.*;
-import io.subutai.core.identity.impl.model.RolePermissionEntity;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +25,6 @@ public class IdentityDataServiceImpl implements IdentityDataService
     private SessionDAO sessionDAOService = null;
     private PermissionDAO permissionDAOService = null;
     private UserTokenDAO userTokenDAOService = null;
-    private RolePermissionDAO rolePermissionDAO = null;
 
 
     /* *************************************************
@@ -43,7 +41,6 @@ public class IdentityDataServiceImpl implements IdentityDataService
             sessionDAOService = new SessionDAO( daoManager );
             permissionDAOService = new PermissionDAO( daoManager );
             userTokenDAOService = new UserTokenDAO( daoManager );
-            rolePermissionDAO = new RolePermissionDAO( daoManager );
         }
         else
         {
@@ -192,15 +189,6 @@ public class IdentityDataServiceImpl implements IdentityDataService
 
 
     /* *************************************************
-     */
-    @Override
-    public void persistRoleByName( String newName, int newType )
-    {
-        roleDAOService.persistByName( newName, newType );
-    }
-
-
-    /* *************************************************
      *
      */
     @Override
@@ -255,6 +243,17 @@ public class IdentityDataServiceImpl implements IdentityDataService
     public void updatePermission( final Permission item )
     {
         permissionDAOService.update( item );
+    }
+
+
+    /* *************************************************
+     */
+    @Override
+    public void removeRolePermission( final long roleId, Permission permission )
+    {
+        Role role = roleDAOService.find( roleId );
+        role.getPermissions().remove( permission );
+        roleDAOService.update( role );
     }
 
 
@@ -387,45 +386,4 @@ public class IdentityDataServiceImpl implements IdentityDataService
         userTokenDAOService.remove( token );
     }
 
-
-	/* ******RolePermission *********************************
-    *
-	*/
-
-
-    @Override
-    public RolePermission persistRolePermission( final Long roleId, final Permission perm )
-    {
-        return rolePermissionDAO.persist( roleId, perm );
-    }
-
-
-    /* *************************************************
-        *
-        */
-    @Override
-    public void updateRolePermission( final RolePermission rp )
-    {
-        rolePermissionDAO.update( rp );
-    }
-
-
-    /* *************************************************
-        *
-        */
-    @Override
-    public void removeRolePermission( final RolePermission rp )
-    {
-        rolePermissionDAO.remove( rp );
-    }
-
-
-    /* *************************************************
-        *
-        */
-    @Override
-    public List<RolePermission> getAllRolePermissions( Long roleId )
-    {
-        return rolePermissionDAO.getAll( roleId );
-    }
 }
