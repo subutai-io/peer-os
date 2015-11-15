@@ -17,6 +17,7 @@ public class ChannelSettings
 
         public static final String[] URL_ACCESS_PX1 = {
 
+                "/rest/identity/gettoken",
                 "/rest/peer/id",
                 "/rest/pks/{$}",
                 "/rest/security/keyman/getpublickeyring",
@@ -29,18 +30,18 @@ public class ChannelSettings
 
         public static short checkURLArray( String uri, String[] urlAccessArray )
         {
-                short status = 0;
+            short status = 0;
 
-                for ( final String aUrlAccess : urlAccessArray )
+            for ( final String aUrlAccess : urlAccessArray )
+            {
+                if ( checkURL( uri, aUrlAccess ) == 1 )
                 {
-                        if ( checkURL( uri, aUrlAccess ) == 1 )
-                        {
-                                status = 1;
-                                break;
-                        }
+                    status = 1;
+                    break;
                 }
+            }
 
-                return status;
+            return status;
         }
 
 

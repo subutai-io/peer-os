@@ -54,22 +54,20 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
             URL url = new URL( ( String ) message.get( Message.REQUEST_URL ) );
             User user = null;
 
-            if ( url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X1 ) )
+            if ( url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X2 ) )
             {
                 user = authenticateAccess( null );
             }
             else
             {
                 int status = 0;
-
                 status = MessageContentUtil.checkUrlAccessibility( status, url );
                 //----------------------------------------------------------------------------------------------
-                if ( status != 0 )
+                if ( status != 0 ) //require tokenauth
                     user = authenticateAccess( message );
-                else
+                else // auth with system user
                     user = authenticateAccess( null );
             }
-
 
             //******Authenticate************************************************
             if ( user != null )

@@ -21,6 +21,9 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,6 +34,7 @@ import com.google.common.collect.Sets;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.datatypes.TemplateVersion;
 import io.subutai.common.protocol.Template;
+import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.StringUtil;
 import io.subutai.core.git.api.GitChangedFile;
@@ -44,6 +48,7 @@ import io.subutai.core.registry.impl.dao.TemplateDataService;
 /**
  * This is an implementation of TemplateRegistryManager
  */
+@PermitAll
 public class TemplateRegistryImpl implements TemplateRegistry
 {
 
@@ -89,6 +94,7 @@ public class TemplateRegistryImpl implements TemplateRegistry
      * @param packagesFile - template packages manifest file contents
      * @param md5sum - template file's md5 hash
      */
+    @RolesAllowed( { "Template-Management|A|Write","Template-Management|A|Update" } )
     @Override
     public synchronized boolean registerTemplate( final String configFile, final String packagesFile,
                                                   final String md5sum ) throws RegistryException
@@ -256,6 +262,7 @@ public class TemplateRegistryImpl implements TemplateRegistry
      *
      * @param templateName - name of template to remove
      */
+    @RolesAllowed( { "Template-Management|A|Delete","Template-Management|A|Update" } )
     @Override
     public boolean unregisterTemplate( final String templateName ) throws RegistryException
     {
@@ -270,6 +277,7 @@ public class TemplateRegistryImpl implements TemplateRegistry
      * @param templateName - name of template to remove
      * @param lxcArch - lxc architecture
      */
+    @RolesAllowed( { "Template-Management|A|Write","Template-Management|A|Update" } )
     @Override
     public void unregisterTemplate( final String templateName, final String lxcArch ) throws RegistryException
     {
@@ -714,6 +722,7 @@ public class TemplateRegistryImpl implements TemplateRegistry
      * @param templateName - target template
      * @param inUse - true - template is in use, false - template is out of use
      */
+    @RolesAllowed( { "Template-Management|A|Write","Template-Management|A|Update" } )
     @Override
     public synchronized boolean updateTemplateUsage( final String faiHostname, final String templateName,
                                                      TemplateVersion templateVersion, final boolean inUse )
@@ -785,6 +794,7 @@ public class TemplateRegistryImpl implements TemplateRegistry
     }
 
 
+    @RolesAllowed( { "Template-Management|A|Write","Template-Management|A|Update" } )
     @Override
     public boolean registerTemplate( Template template ) throws RegistryException
     {
