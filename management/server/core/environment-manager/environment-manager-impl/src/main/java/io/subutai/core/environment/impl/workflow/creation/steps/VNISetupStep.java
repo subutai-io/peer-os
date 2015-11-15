@@ -9,7 +9,6 @@ import org.apache.commons.net.util.SubnetUtils;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
@@ -18,7 +17,7 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.settings.Common;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
-import io.subutai.core.peer.api.LocalPeer;
+import io.subutai.common.peer.LocalPeer;
 
 
 /**
@@ -79,9 +78,9 @@ public class VNISetupStep
 
         for ( final Peer peer : peers )
         {
-            int vlan = peer.reserveVni( newVni );
+            Vni reservedVni = peer.reserveVni( newVni );
 
-            peer.createGateway( environmentGatewayIp, vlan );
+            peer.createGateway( environmentGatewayIp, reservedVni.getVlan() );
         }
 
         //store vni in environment metadata

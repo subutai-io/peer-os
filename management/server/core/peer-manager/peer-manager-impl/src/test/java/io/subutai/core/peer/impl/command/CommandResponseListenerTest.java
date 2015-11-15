@@ -9,13 +9,15 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
 import io.subutai.common.cache.EntryExpiryCallback;
 import io.subutai.common.cache.ExpiringCache;
 import io.subutai.common.command.CommandCallback;
+import io.subutai.common.command.CommandResponse;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.Response;
-import io.subutai.core.peer.api.Payload;
-import io.subutai.core.peer.impl.Timeouts;
+import io.subutai.common.peer.Payload;
+import io.subutai.common.peer.Timeouts;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;

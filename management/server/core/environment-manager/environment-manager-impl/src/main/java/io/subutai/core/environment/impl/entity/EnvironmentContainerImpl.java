@@ -35,12 +35,17 @@ import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
-import io.subutai.common.host.Interface;
-import io.subutai.common.metric.ProcessResourceUsage;
-import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.host.HostInfoModel;
+import io.subutai.common.host.Interface;
+import io.subutai.common.host.NullInterface;
+import io.subutai.common.metric.ProcessResourceUsage;
+import io.subutai.common.peer.ContainerGateway;
+import io.subutai.common.peer.ContainerId;
+import io.subutai.common.peer.EnvironmentContainerHost;
+import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.PeerId;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.quota.CpuQuotaInfo;
 import io.subutai.common.quota.DiskPartition;
@@ -103,6 +108,9 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
     @Transient
     private EnvironmentManager environmentManager;
+
+    @Transient
+    private ContainerId containerId;
 
 
     protected EnvironmentContainerImpl()
@@ -185,7 +193,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @Override
     public void setDefaultGateway( final String gatewayIp ) throws PeerException
     {
-        getPeer().setDefaultGateway( this, gatewayIp );
+        getPeer().setDefaultGateway( new ContainerGateway( getContainerId(), gatewayIp ) );
     }
 
 
@@ -213,14 +221,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @Override
     public ContainerHostState getStatus()
     {
-        try
-        {
-            return getPeer().getContainerHostState( this );
-        }
-        catch ( PeerException e )
-        {
-            return ContainerHostState.UNKNOWN;
-        }
+        return getPeer().getContainerState( getContainerId() );
     }
 
 
@@ -247,21 +248,21 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
     public void destroy() throws PeerException
     {
-        getPeer().destroyContainer( this );
+        getPeer().destroyContainer( getContainerId() );
     }
 
 
     @Override
     public void start() throws PeerException
     {
-        getPeer().startContainer( this );
+        getPeer().startContainer( getContainerId() );
     }
 
 
     @Override
     public void stop() throws PeerException
     {
-        getPeer().stopContainer( this );
+        getPeer().stopContainer( getContainerId() );
     }
 
 
@@ -369,7 +370,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @Override
     public boolean isConnected()
     {
-        return getPeer().isConnected( this );
+        return ContainerHostState.RUNNING.equals( getStatus() );
     }
 
 
@@ -413,8 +414,8 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @Override
     public Interface getInterfaceByName( final String interfaceName )
     {
-        Interface result = null;
-        for ( Iterator<Interface> i = getInterfaces().iterator(); result == null && i.hasNext(); )
+        Interface result = NullInterface.getInstance();
+        for ( Iterator<Interface> i = getInterfaces().iterator(); result instanceof NullInterface && i.hasNext(); )
         {
             Interface n = i.next();
             if ( n.getName().equalsIgnoreCase( interfaceName ) )
@@ -437,7 +438,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @Override
     public ProcessResourceUsage getProcessResourceUsage( final int processPid ) throws PeerException
     {
-        return getPeer().getProcessResourceUsage( this, processPid );
+        return getPeer().getProcessResourceUsage( getContainerId(), processPid );
     }
 
 
@@ -598,6 +599,18 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
         }
 
         return true;
+    }
+
+
+    @Override
+    public ContainerId getContainerId()
+    {
+        if ( containerId == null )
+        {
+            containerId =
+                    new ContainerId( getId(), new PeerId( getPeerId() ), new EnvironmentId( getEnvironmentId() ) );
+        }
+        return containerId;
     }
 
 

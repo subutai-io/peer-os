@@ -40,6 +40,11 @@
       <artifactId>peer-manager-api</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>http-context-factory</artifactId>
+    </dependency>
+
     <!-- ********* KeyServer ************* -->
     <dependency>
       <groupId>${project.groupId}</groupId>

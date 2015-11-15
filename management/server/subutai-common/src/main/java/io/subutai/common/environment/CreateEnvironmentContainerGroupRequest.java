@@ -15,8 +15,10 @@ public class CreateEnvironmentContainerGroupRequest
     private final int numberOfContainers;
     private final String strategyId;
     private final List<Criteria> criteria;
+    private final String host;
     private final int ipAddressOffset;
     private final String templateName;
+    private final ContainerDistributionType containerDistributionType;
 
 
     public CreateEnvironmentContainerGroupRequest( final String environmentId, final String initiatorPeerId,
@@ -34,6 +36,27 @@ public class CreateEnvironmentContainerGroupRequest
         this.criteria = criteria;
         this.ipAddressOffset = ipAddressOffset;
         this.templateName = templateName;
+        this.containerDistributionType = ContainerDistributionType.AUTO;
+        this.host = null;
+    }
+
+
+    public CreateEnvironmentContainerGroupRequest( final String environmentId, final String initiatorPeerId,
+                                                   final String ownerId, final String subnetCidr,
+                                                   final int numberOfContainers, final int ipAddressOffset,
+                                                   final String templateName, String host )
+    {
+        this.environmentId = environmentId;
+        this.initiatorPeerId = initiatorPeerId;
+        this.ownerId = ownerId;
+        this.subnetCidr = subnetCidr;
+        this.numberOfContainers = numberOfContainers;
+        this.strategyId = null;
+        this.criteria = null;
+        this.ipAddressOffset = ipAddressOffset;
+        this.templateName = templateName;
+        this.host = host;
+        this.containerDistributionType = ContainerDistributionType.CUSTOM;
     }
 
 
@@ -88,5 +111,17 @@ public class CreateEnvironmentContainerGroupRequest
     public int getIpAddressOffset()
     {
         return ipAddressOffset;
+    }
+
+
+    public String getHost()
+    {
+        return host;
+    }
+
+
+    public ContainerDistributionType getContainerDistributionType()
+    {
+        return containerDistributionType;
     }
 }

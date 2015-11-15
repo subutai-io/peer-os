@@ -7,7 +7,8 @@ import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.network.Vni;
 import io.subutai.common.network.VniVlanMapping;
 import io.subutai.common.peer.ContainerHost;
-import io.subutai.core.peer.api.Tunnel;
+import io.subutai.common.peer.EnvironmentId;
+import io.subutai.common.protocol.Tunnel;
 
 
 public interface NetworkManager
@@ -76,7 +77,7 @@ public interface NetworkManager
      *
      * @param environmentId - environment id
      */
-    public void cleanupEnvironmentNetworkSettings( String environmentId ) throws NetworkManagerException;
+    public void cleanupEnvironmentNetworkSettings( EnvironmentId environmentId ) throws NetworkManagerException;
 
     /**
      * Removes gateway IP on a container

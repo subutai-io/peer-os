@@ -32,7 +32,7 @@ import io.subutai.common.protocol.Template;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.FileUtil;
 import io.subutai.common.util.JsonUtil;
-import io.subutai.core.peer.api.ManagementHost;
+import io.subutai.common.peer.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registry.api.RegistryException;
 import io.subutai.core.registry.api.TemplateRegistry;

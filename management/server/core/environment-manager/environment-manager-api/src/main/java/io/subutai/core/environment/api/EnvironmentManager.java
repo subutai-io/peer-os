@@ -164,6 +164,13 @@ public interface EnvironmentManager
      */
     void saveBlueprint( Blueprint blueprint ) throws EnvironmentManagerException;
 
+    /**
+     * Loads environment blueprint from DB
+     * @param id blueprint primary key
+     * @return environment blueprint
+     */
+    Blueprint getBlueprint( UUID id ) throws EnvironmentManagerException;;
+
 
     /**
      * Remove blueprint from database
@@ -234,4 +241,5 @@ public interface EnvironmentManager
     void notifyOnContainerDestroyed( Environment environment, String containerId );
 
     void notifyOnContainerStateChanged( Environment environment, ContainerHost containerHost );
+
 }

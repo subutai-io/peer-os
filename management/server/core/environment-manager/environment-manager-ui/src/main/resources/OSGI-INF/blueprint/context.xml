@@ -7,11 +7,14 @@
              interface="io.subutai.core.peer.api.PeerManager" />
   <reference id="templateRegistry" availability="mandatory"
              interface="io.subutai.core.registry.api.TemplateRegistry" />
+  <reference id="strategyManager" availability="mandatory"
+             interface="io.subutai.core.strategy.api.StrategyManager" />
 
   <bean id="module" scope="singleton" class="io.subutai.core.environment.ui.EnvironmentManagerPortalModule">
     <argument ref="environmentManager" />
     <argument ref="peerManager" />
     <argument ref="templateRegistry" />
+    <argument ref="strategyManager" />
   </bean>
 
   <service ref="module" interface="io.subutai.server.ui.api.PortalModule" />

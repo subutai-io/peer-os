@@ -10,9 +10,11 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInfoModel;
 import io.subutai.common.host.HostInterfaces;
+import io.subutai.common.metric.HostMetric;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.Gateway;
@@ -25,6 +27,7 @@ import io.subutai.common.quota.DiskQuota;
 import io.subutai.common.quota.QuotaInfo;
 import io.subutai.common.quota.QuotaType;
 import io.subutai.common.quota.RamQuota;
+import io.subutai.common.security.PublicKeyContainer;
 
 
 /**
@@ -70,34 +73,33 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
     /**
      * Start container on the peer
      */
-    public void startContainer( ContainerHost containerHost ) throws PeerException;
+    public void startContainer( ContainerId containerId ) throws PeerException;
 
     /**
      * Stops container on the peer
      */
-    public void stopContainer( ContainerHost containerHost ) throws PeerException;
+    public void stopContainer( ContainerId containerId ) throws PeerException;
 
     /**
      * Destroys container on the peer
      */
-    public void destroyContainer( ContainerHost containerHost ) throws PeerException;
+    public void destroyContainer( ContainerId containerId ) throws PeerException;
 
     /**
      * Sets default gateway for the container
      */
-    public void setDefaultGateway( ContainerHost host, String gatewayIp ) throws PeerException;
+    public void setDefaultGateway( ContainerGateway containerGateway) throws PeerException;
 
     /**
      * Cleans up environment networking settings. This method is called when an environment is being destroyed to clean
      * up its settings on the local peer.
      */
-    void cleanupEnvironmentNetworkSettings( final String environmentId ) throws PeerException;
+    void cleanupEnvironmentNetworkSettings( final EnvironmentId environmentId ) throws PeerException;
 
     /**
      * Returns true of the host is connected, false otherwise
      */
-    public boolean isConnected( Host host );
-
+    public boolean isConnected( HostId hostId );
 
     /**
      * Executes command on the container
@@ -197,17 +199,17 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
     /**
      * Returns state of container
      */
-    public ContainerHostState getContainerHostState( ContainerHost host ) throws PeerException;
+    public ContainerHostState getContainerState( ContainerId containerId );
 
     //******** Quota functions ***********
 
     /**
      * Returns resource usage of process on container by its PID
      *
-     * @param host - target container
-     * @param processPid - pid of process
+     * @param containerId - target container
+     * @param pid - pid of process
      */
-    public ProcessResourceUsage getProcessResourceUsage( ContainerHost host, int processPid ) throws PeerException;
+    public ProcessResourceUsage getProcessResourceUsage( final ContainerId containerId, int pid ) throws PeerException;
 
     /**
      * Returns available RAM quota on container in megabytes
@@ -367,7 +369,7 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
     /* ************************************************
      * Reserves VNI on the peer
      */
-    public int reserveVni( Vni vni ) throws PeerException;
+    public Vni reserveVni( Vni vni ) throws PeerException;
 
 
     /* ************************************************
@@ -386,7 +388,7 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
     /* **************************************************************
      *
      */
-    public String createEnvironmentKeyPair( String environmentId ) throws PeerException;
+    public PublicKeyContainer createEnvironmentKeyPair( EnvironmentId environmentId ) throws PeerException;
 
 
     /**
@@ -397,11 +399,12 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
 
     void setupN2NConnection( N2NConfig config ) throws PeerException;
 
-    void removeN2NConnection( N2NConfig config ) throws PeerException;
+    void removeN2NConnection( EnvironmentId environmentId ) throws PeerException;
 
     void createGateway( String environmentGatewayIp, int vlan ) throws PeerException;
 
-    void removeEnvironmentKeyPair( String environmentId ) throws PeerException;
+    void removeEnvironmentKeyPair( EnvironmentId environmentId ) throws PeerException;
 
     ResourceHostMetrics getResourceHostMetrics();
+
 }

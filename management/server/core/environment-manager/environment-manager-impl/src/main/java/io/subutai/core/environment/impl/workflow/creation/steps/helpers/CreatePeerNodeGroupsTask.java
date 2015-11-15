@@ -1,11 +1,14 @@
 package io.subutai.core.environment.impl.workflow.creation.steps.helpers;
 
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
 import com.google.common.collect.Sets;
 
+import io.subutai.common.environment.ContainerDistributionType;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.NodeGroup;
@@ -14,7 +17,7 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.exception.NodeGroupBuildException;
-import io.subutai.core.peer.api.LocalPeer;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.core.registry.api.TemplateRegistry;
 
 
@@ -56,12 +59,22 @@ public class CreatePeerNodeGroupsTask implements Callable<Set<NodeGroupBuildResu
             Set<EnvironmentContainerImpl> containers = Sets.newHashSet();
             try
             {
-                Set<HostInfoModel> newHosts = peer.createEnvironmentContainerGroup(
-                        new CreateEnvironmentContainerGroupRequest( environment.getId(), localPeer.getId(),
-                                localPeer.getOwnerId(), environment.getSubnetCidr(), nodeGroup.getNumberOfContainers(),
-                                nodeGroup.getContainerPlacementStrategy().getStrategyId(),
-                                nodeGroup.getContainerPlacementStrategy().getCriteriaAsList(),
-                                ipAddressOffset + currentIpAddressOffset, nodeGroup.getTemplateName() ) );
+                final CreateEnvironmentContainerGroupRequest request;
+
+                if ( ContainerDistributionType.AUTO == nodeGroup.getContainerDistributionType() )
+                {
+                    request = new CreateEnvironmentContainerGroupRequest( environment.getId(), localPeer.getId(),
+                            localPeer.getOwnerId(), environment.getSubnetCidr(), nodeGroup.getNumberOfContainers(),
+                            nodeGroup.getContainerPlacementStrategy().getStrategyId(),
+                            nodeGroup.getContainerPlacementStrategy().getCriteriaAsList(),
+                            ipAddressOffset + currentIpAddressOffset, nodeGroup.getTemplateName() );
+                }
+                else {
+                    request = new CreateEnvironmentContainerGroupRequest( environment.getId(), localPeer.getId(),
+                            localPeer.getOwnerId(), environment.getSubnetCidr(), nodeGroup.getNumberOfContainers(),
+                            ipAddressOffset + currentIpAddressOffset, nodeGroup.getTemplateName(), nodeGroup.getHostId() );
+                }
+                Set<HostInfoModel> newHosts = peer.createEnvironmentContainerGroup( request );
 
                 currentIpAddressOffset += nodeGroup.getNumberOfContainers();
 

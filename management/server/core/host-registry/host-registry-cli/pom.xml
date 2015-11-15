@@ -25,7 +25,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>subutai-cli-rbac</artifactId>
+      <artifactId>cli-controller</artifactId>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
@@ -50,11 +50,7 @@
       <artifactId>mockito-all</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.apache.shiro</groupId>
-      <artifactId>shiro-core</artifactId>
-      <scope>provided</scope>
-    </dependency>
+
   </dependencies>
 
   <build>

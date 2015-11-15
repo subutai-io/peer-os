@@ -6,11 +6,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.vaadin.ui.*;
+
+import io.subutai.common.security.objects.UserStatus;
 import io.subutai.core.identity.api.IdentityManager;
-import io.subutai.core.identity.api.Role;
-import io.subutai.core.identity.api.User;
+import io.subutai.core.identity.api.model.Role;
+import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.ui.ErrorUtils;
 import io.subutai.core.identity.ui.tabs.TabCallback;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,19 +24,10 @@ import com.vaadin.data.util.BeanContainer;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.validator.AbstractStringValidator;
 import com.vaadin.data.validator.EmailValidator;
-import com.vaadin.ui.AbstractSelect;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.FormLayout;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.PasswordField;
-import com.vaadin.ui.TextField;
-import com.vaadin.ui.TwinColSelect;
-import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Reindeer;
 
 
-public class UserForm extends VerticalLayout
+public class UserForm extends Window
 {
 
     private final IdentityManager identityManager;
@@ -47,23 +42,27 @@ public class UserForm extends VerticalLayout
     private boolean newValue;
 
     private Button removeButton;
-    private TextField username;
+    private TextField userName;
     private TextField fullName;
     private TextField email;
     private PasswordField password;
     private PasswordField confirmPassword;
+    private ComboBox status = new ComboBox( "Status" );
+    ;
     private TwinColSelect rolesSelector;
-    private final BeanContainer<String, Role> permissionsContainer;
+    private final BeanContainer<String, Role> rolesContainer;
 
 
     public UserForm( TabCallback<BeanItem<User>> callback, IdentityManager identityManager )
     {
+        this.setClosable( false );
+        this.addStyleName( "default" );
+        this.center();
         init();
         this.identityManager = identityManager;
-        permissionsContainer = new BeanContainer<>( Role.class );
-        permissionsContainer.setBeanIdProperty( "name" );
-        //        permissionsContainer.addAll( roles );
-        rolesSelector.setContainerDataSource( permissionsContainer );
+        rolesContainer = new BeanContainer<>( Role.class );
+        rolesContainer.setBeanIdProperty( "name" );
+        rolesSelector.setContainerDataSource( rolesContainer );
         rolesSelector.setItemCaptionPropertyId( "name" );
 
         this.callback = callback;
@@ -84,6 +83,7 @@ public class UserForm extends VerticalLayout
                 try
                 {
                     userFieldGroup.commit();
+
                     Collection<String> selectedRoleNames = ( Collection<String> ) rolesSelector.getValue();
                     if ( selectedRoleNames.isEmpty() )
                     {
@@ -93,13 +93,16 @@ public class UserForm extends VerticalLayout
                     if ( callback != null )
                     {
                         User user = userFieldGroup.getItemDataSource().getBean();
-                        user.removeAllRoles();
+                        userFieldGroup.getItemDataSource().getBean().getRoles().clear();
                         for ( final String roleName : selectedRoleNames )
                         {
                             BeanItem beanItem = ( BeanItem ) rolesSelector.getItem( roleName );
-                            user.addRole( ( Role ) beanItem.getBean() );
+                            userFieldGroup.getItemDataSource().getBean().getRoles().add( ( Role ) beanItem.getBean() );
                         }
+
                         callback.saveOperation( userFieldGroup.getItemDataSource(), newValue );
+
+
                         Notification.show( "Successfully saved." );
                     }
                 }
@@ -125,18 +128,27 @@ public class UserForm extends VerticalLayout
         };
 
         final Button saveButton = new Button( "Save user", saveListener );
-        final Button cancelButton = new Button( "Cancel", cancelListener );
+        final Button cancelButton = new Button( "Close", cancelListener );
         saveButton.setStyleName( Reindeer.BUTTON_DEFAULT );
+
+        for ( int i = 0; i < UserStatus.values().length; ++i )
+        {
+            status.addItem( i + 1 );
+            status.setItemCaption( i + 1, UserStatus.values()[i].getName() );
+        }
 
         HorizontalLayout buttons = new HorizontalLayout( saveButton, cancelButton, removeButton );
         buttons.setSpacing( true );
 
         form = new FormLayout();
-        form.addComponents( username, fullName, email, password, confirmPassword, rolesSelector );
+        form.addComponents( userName, fullName, email, password, confirmPassword, status, rolesSelector );
 
-        addComponents( form, buttons );
+        VerticalLayout content = new VerticalLayout();
+        content.setSpacing( true );
+        content.setMargin( true );
+        content.addComponents( buttons, form );
 
-        setSpacing( true );
+        this.setContent( content );
     }
 
 
@@ -154,12 +166,13 @@ public class UserForm extends VerticalLayout
                 }
             }
         } );
+        removeButton.setEnabled( false );
 
-        username = new TextField( "Username" );
-        username.setRequired( true );
-        username.setInputPrompt( "Username" );
-        username.setRequiredError( "Please enter username." );
-        username.setEnabled( false );
+        userName = new TextField( "Username" );
+        userName.setRequired( true );
+        userName.setInputPrompt( "Username" );
+        userName.setRequiredError( "Please enter username." );
+        userName.setEnabled( false );
 
         fullName = new TextField( "Full name" );
         fullName.setRequired( true );
@@ -185,21 +198,21 @@ public class UserForm extends VerticalLayout
             }
         } );
 
-
         confirmPassword = new PasswordField( "Confirm password" );
         confirmPassword.setRequired( true );
         confirmPassword.setRequiredError( "Please enter password confirm." );
         confirmPassword.setInputPrompt( "Confirm password" );
 
+        status.setNullSelectionAllowed( false );
+        status.setTextInputAllowed( false );
 
-        rolesSelector = new TwinColSelect( "User roles" )
-        {
-            {
-                setSpacing( true );
-            }
-        };
+        rolesSelector = new TwinColSelect( "User roles" );
+        rolesSelector.setWidth( "500px" );
+        rolesSelector.setHeight( "200px" );
         rolesSelector.setItemCaptionMode( AbstractSelect.ItemCaptionMode.PROPERTY );
         rolesSelector.setItemCaptionPropertyId( "name" );
+        rolesSelector.setLeftColumnCaption( "All Roles" );
+        rolesSelector.setRightColumnCaption( "Assigned Roles" );
     }
 
 
@@ -209,21 +222,35 @@ public class UserForm extends VerticalLayout
         if ( user != null )
         {
             List<Role> roles = identityManager.getAllRoles();
-            permissionsContainer.removeAllItems();
-            permissionsContainer.addAll( roles );
-            userFieldGroup.setItemDataSource( user );
+            rolesContainer.removeAllItems();
+            rolesContainer.addAll( roles );
+            userFieldGroup.setItemDataSource( user.getBean() );
 
-            userFieldGroup.bind( username, "username" );
-            userFieldGroup.bind( fullName, "fullname" );
+            userFieldGroup.bind( userName, "userName" );
+            userFieldGroup.bind( fullName, "fullName" );
             userFieldGroup.bind( email, "email" );
             userFieldGroup.bind( password, "password" );
+            userFieldGroup.bind( status, "status" );
+
+
             confirmPassword.setValue( user.getBean().getPassword() );
 
+            status.setValue( user.getBean().getStatus() );
             if ( newValue )
             {
+                status.setVisible( false );
                 password.setValue( "" );
                 confirmPassword.setValue( "" );
+                userName.setReadOnly( false );
+                removeButton.setVisible( false );
             }
+            else
+            {
+                status.setVisible( true );
+                userName.setReadOnly( true );
+                removeButton.setVisible( true );
+            }
+
             // Pre-select user roles
             User userBean = user.getBean();
             Set<String> roleNames = new HashSet<>();
@@ -232,17 +259,6 @@ public class UserForm extends VerticalLayout
                 roleNames.add( role.getName() );
             }
             rolesSelector.setValue( roleNames );
-
-            if ( !newValue )
-            {
-                username.setReadOnly( true );
-                removeButton.setVisible( true );
-            }
-            else
-            {
-                username.setReadOnly( false );
-                removeButton.setVisible( false );
-            }
         }
     }
 }

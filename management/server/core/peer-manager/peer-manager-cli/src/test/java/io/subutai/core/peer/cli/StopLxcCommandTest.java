@@ -7,7 +7,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import io.subutai.common.peer.ContainerHost;
-import io.subutai.core.peer.api.LocalPeer;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.core.peer.api.PeerManager;
 
 import static org.mockito.Matchers.anyString;
@@ -43,6 +43,6 @@ public class StopLxcCommandTest
     {
         command.doExecute();
 
-        verify( localPeer ).stopContainer( containerHost );
+        verify( localPeer ).stopContainer( containerHost.getContainerId() );
     }
 }

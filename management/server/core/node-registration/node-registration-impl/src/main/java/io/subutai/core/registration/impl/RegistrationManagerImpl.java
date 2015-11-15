@@ -42,8 +42,8 @@ import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
-import io.subutai.core.peer.api.LocalPeer;
-import io.subutai.core.peer.api.ManagementHost;
+import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.peer.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registration.api.RegistrationManager;
 import io.subutai.core.registration.api.RegistrationStatus;
@@ -241,7 +241,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
         Form form = new Form();
         try
         {
-            ClientCredentials clientCredentials = broker.createNewClientCredentials( requestId.toString() );
+            ClientCredentials clientCredentials = broker.createNewClientCredentials( requestId, "client" );
             form.set( "ca", clientCredentials.getCaCertificate() );
             form.set( "crt", clientCredentials.getClientCertificate() );
             form.set( "key", clientCredentials.getClientKey() );
@@ -255,7 +255,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
         //TODO move the rest of code to separate function where approval process done selectively
         for ( final ContainerInfo containerInfo : registrationRequest.getHostInfos() )
         {
-            importHostPublicKey( containerInfo.getId().toString(), containerInfo.getPublicKey() );
+            importHostPublicKey( containerInfo.getId(), containerInfo.getPublicKey() );
         }
 
         processEnvironmentImport( registrationRequest );
@@ -363,7 +363,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
                 {
                     for ( final HostInfo hostInfo : infos )
                     {
-                        ContainerInfoImpl containerInfo = containerInfoDataService.find( hostInfo.getId().toString() );
+                        ContainerInfoImpl containerInfo = containerInfoDataService.find( hostInfo.getId() );
                         containerInfo.setGateway( gateway );
                         containerInfo.setStatus( RegistrationStatus.APPROVED );
                         containerInfoDataService.update( containerInfo );
@@ -450,7 +450,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
     @Override
     public void deployResourceHost( List<String> args ) throws NodeRegistrationException
     {
-        ManagementHost managementHost = null;
+        ManagementHost managementHost;
         CommandResult result;
 
         try

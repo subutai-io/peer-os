@@ -19,41 +19,8 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>subutai-common</artifactId>
+      <version>4.0.0-RC3</version>
     </dependency>
-    <dependency>
-      <groupId>org.apache.shiro</groupId>
-      <artifactId>shiro-core</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.core</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.karaf.jaas</groupId>
-      <artifactId>org.apache.karaf.jaas.config</artifactId>
-      <version>${karaf.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.karaf.jaas</groupId>
-      <artifactId>org.apache.karaf.jaas.boot</artifactId>
-      <version>${karaf.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.karaf.jaas</groupId>
-      <artifactId>org.apache.karaf.jaas.modules</artifactId>
-      <version>${karaf.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpclient-osgi</artifactId>
-      <scope>provided</scope>
-      <version>${org.apache.httpcomonents.httpclient.version}</version>
-    </dependency>
-
   </dependencies>
 
   <build>

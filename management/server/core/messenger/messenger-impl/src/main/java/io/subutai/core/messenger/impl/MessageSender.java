@@ -5,7 +5,6 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.UUID;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
@@ -15,12 +14,12 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import io.subutai.common.peer.Peer;
-import io.subutai.common.util.RestUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Maps;
+
+import io.subutai.common.peer.Peer;
 
 
 /**
@@ -35,7 +34,6 @@ public class MessageSender
     protected static Logger LOG = LoggerFactory.getLogger( MessageSender.class.getName() );
     protected ScheduledExecutorService mainLoopExecutor = Executors.newSingleThreadScheduledExecutor();
     protected ExecutorService restExecutor = Executors.newCachedThreadPool();
-    protected RestUtil restUtil;
     protected CompletionService<Boolean> completer = new ExecutorCompletionService<>( restExecutor );
 
 
@@ -43,7 +41,6 @@ public class MessageSender
     {
         this.messengerDao = messengerDao;
         this.messenger = messenger;
-        this.restUtil = new RestUtil();
     }
 
 
@@ -126,9 +123,7 @@ public class MessageSender
             }
             else
             {
-                completer.submit(
-                        new RemotePeerMessageSender( restUtil, messengerDao, targetPeer, envelopsPerPeer.getValue(),
-                                messenger.getPeerManager().getLocalPeerInfo().getId() ) );
+                completer.submit( new RemotePeerMessageSender( messengerDao, targetPeer, envelopsPerPeer.getValue() ) );
             }
         }
 

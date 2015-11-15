@@ -1,320 +1,302 @@
 package io.subutai.core.identity.ui.tabs.subviews;
 
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
-import io.subutai.core.identity.api.CliCommand;
-import io.subutai.core.identity.api.Permission;
-import io.subutai.core.identity.api.PortalModuleScope;
-import io.subutai.core.identity.api.RestEndpointScope;
-import io.subutai.core.identity.api.Role;
-import io.subutai.core.identity.ui.tabs.TabCallback;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.vaadin.data.fieldgroup.BeanFieldGroup;
-import com.vaadin.data.fieldgroup.FieldGroup;
-import com.vaadin.data.util.BeanContainer;
+import com.vaadin.data.Item;
+import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItem;
-import com.vaadin.ui.AbstractSelect;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.FormLayout;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.TextField;
-import com.vaadin.ui.TwinColSelect;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.Reindeer;
+import com.vaadin.server.Page;
+import com.vaadin.ui.*;
+
+import io.subutai.core.identity.api.model.Permission;
+import io.subutai.core.identity.api.model.Role;
+import io.subutai.core.identity.api.model.RolePermission;
+
+import io.subutai.core.identity.ui.tabs.RolesTab;
 
 
-public class RoleForm extends VerticalLayout
+// TODO: use identity manager methods only (no data service)
+public class RoleForm extends Window
 {
-
-    private TabCallback<BeanItem<Role>> callback;
-    private static final Logger LOGGER = LoggerFactory.getLogger( RoleForm.class );
-    private BeanFieldGroup<Role> permissionFieldGroup = new BeanFieldGroup<>( Role.class );
-    private boolean newValue;
-
-    private static final String REST_ENDPOINT_KEY = "restEndpoint";
-    private static final String COMMAND_PROP_KEY = "command";
-
-    private TextField name;
-    private Button removeButton;
-    private TwinColSelect restEndpointsSelector;
-    private TwinColSelect permissionsSelector;
-    private TwinColSelect modulesSelector;
-    private TwinColSelect commandsSelector;
+    private Table permTable = new Table( "Assigned permissions" );
+    private Table allPerms = new Table( "All permissions" );
+    private List<RolePermission> perms = new ArrayList<>();
+    private BeanItem<Role> currentRole;
+    private RolesTab callback;
 
 
-    public RoleForm( TabCallback<BeanItem<Role>> callback, Set<Permission> permissions,
-                     final Set<PortalModuleScope> allPortalModules, final Set<RestEndpointScope> allRestEndpoints,
-                     final List<CliCommand> allCliCommands )
+    private void addRow( final RolePermission p )
     {
-        init();
-        BeanContainer<String, Permission> permissionsContainer = new BeanContainer<>( Permission.class );
-        permissionsContainer.setBeanIdProperty( "name" );
-        permissionsContainer.addAll( permissions );
-        permissionsSelector.setContainerDataSource( permissionsContainer );
-        permissionsSelector.setItemCaptionPropertyId( "name" );
+        Object newItemId = permTable.addItem();
+        Item row = permTable.getItem( newItemId );
+        row.getItemProperty( "Permission" ).setValue( p.getObjectName() );
 
-        BeanContainer<String, PortalModuleScope> modulesContainer = new BeanContainer<>( PortalModuleScope.class );
-        modulesContainer.setBeanIdProperty( "moduleKey" );
-        modulesContainer.addAll( allPortalModules );
-        modulesSelector.setContainerDataSource( modulesContainer );
-        modulesSelector.setItemCaptionPropertyId( "moduleName" );
-
-        BeanContainer<String, RestEndpointScope> restEndpointsContainer =
-                new BeanContainer<>( RestEndpointScope.class );
-        restEndpointsContainer.setBeanIdProperty( REST_ENDPOINT_KEY );
-        restEndpointsContainer.addAll( allRestEndpoints );
-        restEndpointsSelector.setContainerDataSource( restEndpointsContainer );
-        restEndpointsSelector.setItemCaptionPropertyId( REST_ENDPOINT_KEY );
-
-        BeanContainer<String, CliCommand> cliCommandBeanContainer = new BeanContainer<>( CliCommand.class );
-        cliCommandBeanContainer.setBeanIdProperty( COMMAND_PROP_KEY );
-        cliCommandBeanContainer.addAll( allCliCommands );
-        commandsSelector.setContainerDataSource( cliCommandBeanContainer );
-        commandsSelector.setItemCaptionPropertyId( COMMAND_PROP_KEY );
-
-        this.callback = callback;
-    }
-
-
-    private void init()
-    {
-        initControls();
-        // When OK button is clicked, commit the form to the bean
-        Button.ClickListener saveListener = new Button.ClickListener()
+        ComboBox scopes = new ComboBox();
+        scopes.setNullSelectionAllowed( false );
+        scopes.setTextInputAllowed( false );
+        for ( int i = 1; i < 4; ++i )
         {
-            @Override
-            public void buttonClick( final Button.ClickEvent event )
+            scopes.addItem( i );
+            switch ( i )
             {
-                saveRoleOperation();
-            }
-        };
-
-        Button.ClickListener cancelListener = new Button.ClickListener()
-        {
-            @Override
-            public void buttonClick( final Button.ClickEvent event )
-            {
-                permissionFieldGroup.discard();
-                RoleForm.this.setVisible( false );
-                if ( callback != null )
+                case ( 1 ):
                 {
-                    callback.cancelOperation();
+                    scopes.setItemCaption( 1, "All Objects" );
+                    break;
+                }
+                case ( 2 ):
+                {
+                    scopes.setItemCaption( 2, "Child Objects" );
+                    break;
+                }
+                case ( 3 ):
+                {
+                    scopes.setItemCaption( 3, "Owner Objects" );
+                    break;
                 }
             }
-        };
-
-        final Button saveButton = new Button( "Save role", saveListener );
-        final Button cancelButton = new Button( "Cancel", cancelListener );
-        saveButton.setStyleName( Reindeer.BUTTON_DEFAULT );
-
-        HorizontalLayout buttons = new HorizontalLayout( saveButton, cancelButton, removeButton );
-        buttons.setSpacing( true );
-
-        HorizontalLayout selectorsGroupA = new HorizontalLayout( permissionsSelector, modulesSelector );
-        selectorsGroupA.setSpacing( true );
-
-        HorizontalLayout selectorsGroupB = new HorizontalLayout( restEndpointsSelector, commandsSelector );
-        selectorsGroupB.setSpacing( true );
-
-        final FormLayout form = new FormLayout();
-        form.addComponents( name, selectorsGroupA, selectorsGroupB );
-
-        addComponents( form, buttons );
-
-        setSpacing( true );
-    }
-
-
-    private void initControls()
-    {
-        name = new TextField();
-        name.setInputPrompt( "Role name" );
-        name.setEnabled( false );
-        name.setRequired( true );
-
-        removeButton = new Button( "Remove role", new Button.ClickListener()
+        }
+        scopes.setValue( p.getScope() );
+        scopes.addValueChangeListener( new Property.ValueChangeListener()
         {
             @Override
-            public void buttonClick( final Button.ClickEvent event )
+            public void valueChange( Property.ValueChangeEvent event )
             {
-                permissionFieldGroup.discard();
-                if ( callback != null )
+                int scope = ( int ) event.getProperty().getValue();
+                p.setScope( scope );
+                for ( RolePermission perm : perms )
                 {
-                    callback.removeOperation( permissionFieldGroup.getItemDataSource(), newValue );
+                    if ( p.getPermissionId() == perm.getPermissionId() )
+                    {
+                        perm.setScope( scope );
+
+                        callback.getIdentityManager().getIdentityDataService().updateRolePermission( perm );
+                    }
                 }
             }
         } );
+        row.getItemProperty( "Scope" ).setValue( scopes );
 
-        restEndpointsSelector = new TwinColSelect( "Accessible rest endpoints" )
+        final CheckBox read = new CheckBox();
+        read.setValue( p.isRead() );
+        read.addValueChangeListener( new Property.ValueChangeListener()
         {
+            @Override
+            public void valueChange( Property.ValueChangeEvent event )
             {
-                setSpacing( true );
+                p.setRead( read.getValue() );
+                for ( RolePermission perm : perms )
+                {
+                    if ( p.getPermissionId() == perm.getPermissionId() )
+                    {
+                        perm.setRead( read.getValue() );
+                        callback.getIdentityManager().getIdentityDataService().updateRolePermission( perm );
+                    }
+                }
             }
-        };
-        restEndpointsSelector.setItemCaptionMode( AbstractSelect.ItemCaptionMode.PROPERTY );
-        restEndpointsSelector.setItemCaptionPropertyId( REST_ENDPOINT_KEY );
-        restEndpointsSelector.setWidth( 600, Unit.PIXELS );
-        restEndpointsSelector.setImmediate( true );
-        restEndpointsSelector.setRequired( true );
-        restEndpointsSelector.setNullSelectionAllowed( false );
+        } );
+        row.getItemProperty( "Read" ).setValue( read );
 
-        permissionsSelector = new TwinColSelect( "System Permissions" )
+        final CheckBox write = new CheckBox();
+        write.setValue( p.isWrite() );
+        write.addValueChangeListener( new Property.ValueChangeListener()
         {
+            @Override
+            public void valueChange( Property.ValueChangeEvent event )
             {
-                setSpacing( true );
+                p.setWrite( write.getValue() );
+                for ( RolePermission perm : perms )
+                {
+                    if ( p.getPermissionId() == perm.getPermissionId() )
+                    {
+                        perm.setWrite( write.getValue() );
+                        callback.getIdentityManager().getIdentityDataService().updateRolePermission( perm );
+                    }
+                }
             }
-        };
-        permissionsSelector.setItemCaptionMode( AbstractSelect.ItemCaptionMode.PROPERTY );
-        permissionsSelector.setItemCaptionPropertyId( "name" );
-        permissionsSelector.setWidth( 400, Unit.PIXELS );
-        permissionsSelector.setImmediate( true );
-        permissionsSelector.setRequired( true );
-        permissionsSelector.setVisible( false );
-        permissionsSelector.setNullSelectionAllowed( false );
+        } );
+        row.getItemProperty( "Write" ).setValue( write );
 
-        modulesSelector = new TwinColSelect( "Accessible modules" )
+        final CheckBox update = new CheckBox();
+        update.setValue( p.isUpdate() );
+        update.addValueChangeListener( new Property.ValueChangeListener()
         {
+            @Override
+            public void valueChange( Property.ValueChangeEvent event )
             {
-                setSpacing( true );
+                p.setUpdate( update.getValue() );
+                for ( RolePermission perm : perms )
+                {
+                    if ( p.getPermissionId() == perm.getPermissionId() )
+                    {
+                        perm.setUpdate( update.getValue() );
+                        callback.getIdentityManager().getIdentityDataService().updateRolePermission( perm );
+                    }
+                }
             }
-        };
-        modulesSelector.setItemCaptionMode( AbstractSelect.ItemCaptionMode.PROPERTY );
-        modulesSelector.setItemCaptionPropertyId( "moduleName" );
-        modulesSelector.setWidth( 400, Unit.PIXELS );
-        modulesSelector.setImmediate( true );
-        modulesSelector.setRequired( false );
-        modulesSelector.setNullSelectionAllowed( true );
+        } );
+        row.getItemProperty( "Update" ).setValue( update );
 
-        commandsSelector = new TwinColSelect( "Accessible cli commands" )
+        final CheckBox delete = new CheckBox();
+        delete.setValue( p.isDelete() );
+        delete.addValueChangeListener( new Property.ValueChangeListener()
         {
+            @Override
+            public void valueChange( Property.ValueChangeEvent event )
             {
-                setSpacing( true );
+                p.setDelete( delete.getValue() );
+                for ( RolePermission perm : perms )
+                {
+                    if ( p.getPermissionId() == perm.getPermissionId() )
+                    {
+                        perm.setDelete( delete.getValue() );
+                        callback.getIdentityManager().getIdentityDataService().updateRolePermission( perm );
+                    }
+                }
             }
-        };
-        commandsSelector.setItemCaptionMode( AbstractSelect.ItemCaptionMode.PROPERTY );
-        commandsSelector.setItemCaptionPropertyId( COMMAND_PROP_KEY );
-        commandsSelector.setWidth( 500, Unit.PIXELS );
-        commandsSelector.setImmediate( true );
-        commandsSelector.setRequired( false );
-        commandsSelector.setNullSelectionAllowed( true );
+        } );
+        row.getItemProperty( "Delete" ).setValue( delete );
+
+
+        final Button remove = new Button( "Remove" );
+        remove.setData( newItemId );
+        remove.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent event )
+            {
+                for ( int i = 0; i < perms.size(); ++i )
+                {
+                    if ( p.getPermissionId() == perms.get( i ).getPermissionId() )
+                    {
+                        callback.getIdentityManager().getIdentityDataService().removeRolePermission( perms.get( i ) );
+                        perms.remove( i );
+                        break;
+                    }
+                }
+                permTable.removeItem( remove.getData() );
+            }
+        } );
+        row.getItemProperty( "Remove" ).setValue( remove );
     }
 
 
-    public void setRole( final BeanItem<Role> role, boolean newValue )
+    private void addPerms()
     {
-        this.newValue = newValue;
-        if ( role != null )
+        for ( final Permission p : callback.getIdentityManager().getAllPermissions() )
         {
-            permissionFieldGroup.setItemDataSource( role );
-            permissionFieldGroup.bind( name, "name" );
+            final Object newItemId = allPerms.addItem();
+            final Item row = allPerms.getItem( newItemId );
 
-            // Pre-select role permissions
-            Role roleBean = role.getBean();
-            Set<String> permissionNames = new HashSet<>();
+            row.getItemProperty( "Permission" ).setValue( p.getObjectName() );
 
-            for ( final Permission permission : roleBean.getPermissions() )
+            Button add = new Button( "Add" );
+            add.addClickListener( new Button.ClickListener()
             {
-                permissionNames.add( permission.getName() );
-            }
-            permissionsSelector.setValue( permissionNames );
-
-            Set<String> modules = new HashSet<>();
-            for ( final PortalModuleScope portalModuleScope : roleBean.getAccessibleModules() )
-            {
-                modules.add( portalModuleScope.getModuleName() );
-            }
-            modulesSelector.setValue( modules );
-
-
-            List<String> endpoints = new ArrayList<>();
-            for ( final RestEndpointScope endpointScope : roleBean.getAccessibleRestEndpoints() )
-            {
-                endpoints.add( endpointScope.getRestEndpoint() );
-            }
-            restEndpointsSelector.setValue( endpoints );
-
-            Set<String> cliCommands = new HashSet<>();
-            for ( final CliCommand cliCommand : roleBean.getCliCommands() )
-            {
-                cliCommands.add( cliCommand.getCommand() );
-            }
-            commandsSelector.setValue( cliCommands );
-
-            if ( !newValue )
-            {
-                permissionFieldGroup.setReadOnly( true );
-                removeButton.setVisible( true );
-            }
-            else
-            {
-                permissionFieldGroup.setReadOnly( false );
-                removeButton.setVisible( false );
-            }
+                @Override
+                public void buttonClick( Button.ClickEvent event )
+                {
+                    boolean exists = false;
+                    for ( RolePermission perm : perms )
+                    {
+                        if ( p.getId() == perm.getPermissionId() )
+                        {
+                            exists = true;
+                            break;
+                        }
+                    }
+                    if ( !exists )
+                    {
+                        RolePermission newRP = callback.getIdentityManager().getIdentityDataService()
+                                                       .persistRolePermission( currentRole.getBean().getId(), p );
+                        //callback.getIdentityManager ().assignRolePermission (currentRole.getBean ().getId (), p);
+                        //TODO: perms.add(p);
+                        addRow( newRP );
+                    }
+                    else
+                    {
+                        Notification notif = new Notification( "Permission is already added" );
+                        notif.setDelayMsec( 2000 );
+                        notif.show( Page.getCurrent() );
+                    }
+                }
+            } );
+            row.getItemProperty( "Add" ).setValue( add );
         }
     }
 
 
-    private void saveRoleOperation()
+    public void setRole( BeanItem<Role> role )
     {
-        // New items have to be added to the container
-        // Commit the addition
-        try
+        this.currentRole = role;
+        this.perms.clear();
+        for ( RolePermission rp : callback.getIdentityManager().getIdentityDataService()
+                                          .getAllRolePermissions( currentRole.getBean().getId() ) )
         {
-            permissionFieldGroup.commit();
-            if ( callback != null )
-            {
-                // Set selected permissions for role
-                Collection<String> selectedPermissions = ( Collection<String> ) permissionsSelector.getValue();
-                Role role = permissionFieldGroup.getItemDataSource().getBean();
-                for ( final String permissionId : selectedPermissions )
-                {
-                    BeanItem beanItem = ( BeanItem ) permissionsSelector.getItem( permissionId );
-                    role.addPermission( ( Permission ) beanItem.getBean() );
-                }
-
-                role.clearPortalModules();
-                Collection<String> selectedModuleNames = ( Collection<String> ) modulesSelector.getValue();
-                for ( final String moduleName : selectedModuleNames )
-                {
-                    BeanItem beanItem = ( BeanItem ) modulesSelector.getItem( moduleName );
-                    role.addPortalModule( ( PortalModuleScope ) beanItem.getBean() );
-                }
-
-
-                role.clearRestEndpointScopes();
-                Collection<String> selectedRestEndpoints = ( Collection<String> ) restEndpointsSelector.getValue();
-                for ( final String moduleName : selectedRestEndpoints )
-                {
-                    BeanItem beanItem = ( BeanItem ) restEndpointsSelector.getItem( moduleName );
-                    role.addRestEndpointScope( ( RestEndpointScope ) beanItem.getBean() );
-                }
-
-                role.setCliCommands( Collections.<CliCommand>emptyList() );
-                Collection<String> selectedCommands = ( Collection<String> ) commandsSelector.getValue();
-                for ( final String command : selectedCommands )
-                {
-                    BeanItem beanItem = ( BeanItem ) commandsSelector.getItem( command );
-                    role.addCliCommand( ( CliCommand ) beanItem.getBean() );
-                }
-
-                callback.saveOperation( permissionFieldGroup.getItemDataSource(), newValue );
-                Notification.show( "Successfully saved." );
-            }
-        }
-        catch ( FieldGroup.CommitException e )
-        {
-            LOGGER.error( "Error commit role fieldGroup changes", e );
-            Notification.show( "Verify for fields correctness", Notification.Type.WARNING_MESSAGE );
+            this.perms.add( rp );
+            this.addRow( rp );
         }
     }
 
+
+    public RoleForm( final RolesTab callback )
+    {
+        this.callback = callback;
+        this.setClosable( false );
+        this.addStyleName( "default" );
+        this.center();
+        VerticalLayout content = new VerticalLayout();
+        content.setSpacing( true );
+        content.setMargin( true );
+        permTable.addContainerProperty( "Permission", String.class, null );
+        permTable.addContainerProperty( "Scope", ComboBox.class, null );
+        permTable.addContainerProperty( "Read", CheckBox.class, null );
+        permTable.addContainerProperty( "Write", CheckBox.class, null );
+        permTable.addContainerProperty( "Update", CheckBox.class, null );
+        permTable.addContainerProperty( "Delete", CheckBox.class, null );
+        permTable.addContainerProperty( "Remove", Button.class, null );
+
+        permTable.setColumnWidth( "Scope", 70 );
+        permTable.setColumnWidth( "Read", 35 );
+        permTable.setColumnWidth( "Write", 35 );
+        permTable.setColumnWidth( "Update", 35 );
+        permTable.setColumnWidth( "Delete", 35 );
+
+        allPerms.addContainerProperty( "Permission", String.class, null );
+        allPerms.addContainerProperty( "Add", Button.class, null );
+
+        addPerms();
+        Button close = new Button( "Close" );
+        close.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent event )
+            {
+                callback.cancelOperation();
+            }
+        } );
+        Button save = new Button( "Save" );
+        save.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent )
+            {
+
+                //TODO: currentRole.getBean().setPermissions (perms);
+                callback.saveOperation( currentRole, false );
+            }
+        } );
+        HorizontalLayout buttonGrid = new HorizontalLayout();
+        buttonGrid.setSpacing( true );
+        buttonGrid.addComponent( close );
+        buttonGrid.addComponent( save );
+        HorizontalLayout tableGrid = new HorizontalLayout();
+        tableGrid.setSpacing( true );
+        tableGrid.addComponent( permTable );
+        tableGrid.addComponent( allPerms );
+        content.addComponent( buttonGrid );
+        content.addComponent( tableGrid );
+        this.setContent( content );
+    }
 }

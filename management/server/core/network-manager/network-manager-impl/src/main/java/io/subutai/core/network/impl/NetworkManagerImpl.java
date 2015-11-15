@@ -20,6 +20,7 @@ import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.network.Vni;
 import io.subutai.common.network.VniVlanMapping;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
@@ -29,9 +30,9 @@ import io.subutai.core.network.api.ContainerInfo;
 import io.subutai.core.network.api.N2NConnection;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
-import io.subutai.core.peer.api.ManagementHost;
+import io.subutai.common.peer.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.core.peer.api.Tunnel;
+import io.subutai.common.protocol.Tunnel;
 
 
 /**
@@ -121,7 +122,7 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public void cleanupEnvironmentNetworkSettings( final String environmentId ) throws NetworkManagerException
+    public void cleanupEnvironmentNetworkSettings( final EnvironmentId environmentId ) throws NetworkManagerException
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
@@ -129,7 +130,7 @@ public class NetworkManagerImpl implements NetworkManager
 
         for ( Vni vni : reservedVnis )
         {
-            if ( vni.getEnvironmentId().equals( environmentId ) )
+            if ( vni.getEnvironmentId().equals( environmentId.getId() ) )
             {
                 execute( getManagementHost(), commands.getCleanupEnvironmentNetworkSettingsCommand( vni.getVlan() ) );
                 break;
@@ -163,7 +164,7 @@ public class NetworkManagerImpl implements NetworkManager
             if ( m.find() && m.groupCount() == 2 )
             {
                 LOG.debug( String.format( "Adding new tunnel: %s %s", m.group( 1 ), m.group( 2 ) ) );
-                tunnels.add( new TunnelImpl( m.group( 1 ), m.group( 2 ) ) );
+                tunnels.add( new Tunnel( m.group( 1 ), m.group( 2 ) ) );
             }
         }
 
@@ -311,7 +312,8 @@ public class NetworkManagerImpl implements NetworkManager
         Preconditions.checkArgument( domain.matches( Common.HOSTNAME_REGEX ), "Invalid domain" );
         Preconditions.checkNotNull( domainLoadBalanceStrategy );
 
-        execute( getManagementHost(), commands.getSetVlanDomainCommand( vLanId, domain, domainLoadBalanceStrategy, sslCertPath ) );
+        execute( getManagementHost(),
+                commands.getSetVlanDomainCommand( vLanId, domain, domainLoadBalanceStrategy, sslCertPath ) );
     }
 
 

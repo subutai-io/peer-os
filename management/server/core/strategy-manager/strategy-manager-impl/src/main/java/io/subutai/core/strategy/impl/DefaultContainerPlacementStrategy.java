@@ -106,12 +106,10 @@ public class DefaultContainerPlacementStrategy extends AbstractContainerPlacemen
         {
             for ( ResourceHostMetric metric : serverMetrics.getResources() )
             {
-                int numOfLxcByRam =
-                        ( int ) ( ( UnitUtil.getBytesInMb( metric.getAvailableRam() ) - MIN_RAM_IN_RESERVE_MB )
-                                / MIN_RAM_LXC_MB );
-                int numOfLxcByHdd =
-                        ( int ) ( ( UnitUtil.getBytesInMb( metric.getAvailableSpace() ) - MIN_HDD_IN_RESERVE_MB )
-                                / MIN_HDD_LXC_MB );
+//                final double bytesInMb = UnitUtil.getBytesInMb( metric.getAvailableRam() );
+                int numOfLxcByRam = ( int ) ( ( metric.getAvailableRam() - MIN_RAM_IN_RESERVE_MB ) / MIN_RAM_LXC_MB );
+//                final double bytesInMb1 = UnitUtil.getBytesInMb( metric.getAvailableSpace() );
+                int numOfLxcByHdd = ( int ) ( ( metric.getAvailableSpace() - MIN_HDD_IN_RESERVE_MB ) / MIN_HDD_LXC_MB );
 
                 if ( numOfLxcByHdd > 0 && numOfLxcByRam > 0 )
                 {

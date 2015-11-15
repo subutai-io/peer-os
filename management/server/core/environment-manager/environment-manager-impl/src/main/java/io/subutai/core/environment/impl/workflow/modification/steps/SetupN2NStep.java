@@ -55,10 +55,9 @@ public class SetupN2NStep
         {
             if ( !environment.isMember( peer ) )
             {
-                N2NConfig config =
-                        new N2NConfig( peer.getId(), environment.getSuperNode(), environment.getSuperNodePort(),
-                                environment.getTunnelInterfaceName(), environment.getTunnelCommunityName(),
-                                addresses[counter], sharedKey );
+                N2NConfig config = new N2NConfig( peer.getId(), environment.getId(), environment.getSuperNode(),
+                        environment.getSuperNodePort(), environment.getTunnelInterfaceName(),
+                        environment.getTunnelCommunityName(), addresses[counter], sharedKey );
                 try
                 {
                     peer.setupN2NConnection( config );

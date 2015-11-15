@@ -6,9 +6,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
 import io.subutai.core.identity.api.IdentityManager;
-import io.subutai.core.identity.api.Role;
-import io.subutai.core.identity.ui.tabs.RolesTab;
+import io.subutai.core.identity.api.model.Role;
 
 import com.vaadin.data.util.BeanItem;
 
@@ -17,11 +17,12 @@ import com.vaadin.data.util.BeanItem;
 public class RolesTabTest
 {
     private RolesTab rolesTab;
-    
+
     @Mock
     IdentityManager identityManager;
     @Mock
     BeanItem<Role> beanItem;
+
 
     @Before
     public void setUp() throws Exception
@@ -33,22 +34,17 @@ public class RolesTabTest
     @Test
     public void testSaveOperation() throws Exception
     {
-        rolesTab.saveOperation( beanItem, true );
-        rolesTab.saveOperation( beanItem, false );
     }
 
 
     @Test
     public void testRemoveOperation() throws Exception
     {
-        rolesTab.removeOperation( beanItem, true );
-        rolesTab.removeOperation( beanItem, false );
     }
 
 
     @Test
     public void testCancelOperation() throws Exception
     {
-        rolesTab.cancelOperation();
     }
 }

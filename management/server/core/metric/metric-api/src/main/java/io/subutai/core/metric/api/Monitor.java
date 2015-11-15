@@ -9,11 +9,14 @@ import java.util.Set;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.metric.ContainerHostMetric;
 import io.subutai.common.metric.HistoricalMetric;
+import io.subutai.common.metric.HostMetric;
 import io.subutai.common.metric.MetricType;
 import io.subutai.common.metric.OwnerResourceUsage;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetric;
+import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.ResourceHost;
 
@@ -99,14 +102,13 @@ public interface Monitor
     /**
      * Returns process resource usage on a given container host
      *
-     * @param containerHost - container
-     * @param processPid - pid of process
+     * @param containerId - container ID
+     * @param pid - process ID
      *
      * @return - {@code ProcessResourceUsage}
      */
-    public ProcessResourceUsage getProcessResourceUsage( ContainerHost containerHost, int processPid )
-            throws MonitorException;
 
+    ProcessResourceUsage getProcessResourceUsage( ContainerId containerId, int pid ) throws MonitorException;
 
     /**
      * Returns total owner resource usage on local peer
@@ -138,4 +140,10 @@ public interface Monitor
      * @param metricType to be retrieved for historical data
      */
     public Map<String, List<HistoricalMetric>> getHistoricalMetrics( Collection<Host> hosts, MetricType metricType );
+
+    void updateHostMetric( HostMetric metric );
+
+    HostMetric getHostMetric( String id );
+
+    ResourceHostMetrics getResourceHostMetrics( boolean isLocalOnly );
 }

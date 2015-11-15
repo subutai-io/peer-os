@@ -16,32 +16,29 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>file-tracker</module>
+    <module>blueprint-authz</module>
     <module>environment-terminal</module>
     <module>git-manager</module>
     <module>lxc-quota-manager</module>
     <module>network-manager</module>
+    <module>local-peer</module>
     <module>peer-manager</module>
     <module>strategy-manager</module>
     <module>template-registry</module>
     <module>tracker</module>
     <module>metric</module>
     <module>messenger</module>
-    <module>script-manager</module>
     <module>repository-manager</module>
     <module>broker</module>
     <module>host-registry</module>
     <module>command-executor</module>
-    <module>wol-manager</module>
     <module>plugin-manager</module>
     <module>identity-manager</module>
     <module>channel-manager</module>
-    <module>http-context-manager</module>
-    <module>subutai-cli-rbac</module>
+    <module>cli-controller</module>
     <module>key-server</module>
     <module>security-manager</module>
     <module>node-registration</module>
-    <module>http-context-factory</module>
     <module>environment-manager</module>
     <module>kurjun</module>
   </modules>

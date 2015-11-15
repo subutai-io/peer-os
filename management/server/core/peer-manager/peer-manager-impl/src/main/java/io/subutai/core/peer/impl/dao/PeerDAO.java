@@ -11,7 +11,7 @@ import javax.persistence.TypedQuery;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.util.GsonInterfaceAdapter;
-import io.subutai.core.peer.api.ManagementHost;
+import io.subutai.common.peer.ManagementHost;
 import io.subutai.core.peer.impl.entity.PeerData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +28,7 @@ import com.google.gson.GsonBuilder;
 public class PeerDAO
 {
 
-    private static final Logger LOG = LoggerFactory.getLogger( PeerDAO.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( PeerDAO.class );
     private DaoManager daoManager;
     protected Gson gson;
 

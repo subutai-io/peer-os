@@ -9,19 +9,18 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.N2NConfig;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
-import io.subutai.core.peer.api.LocalPeer;
 
 
 public class CleanupN2NStep
 {
     private final EnvironmentImpl environment;
-//    private final LocalPeer localPeer;
+    //    private final LocalPeer localPeer;
 
 
     public CleanupN2NStep( final EnvironmentImpl environment/*, final LocalPeer localPeer*/ )
     {
         this.environment = environment;
-//        this.localPeer = localPeer;
+        //        this.localPeer = localPeer;
     }
 
 
@@ -38,7 +37,7 @@ public class CleanupN2NStep
 
         for ( Peer peer : environment.getPeers() )
         {
-            peer.removeN2NConnection( n2nConfigs.get( peer.getId() ) );
+            peer.removeN2NConnection( environment.getEnvironmentId() );
         }
     }
 }

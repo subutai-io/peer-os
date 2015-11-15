@@ -55,7 +55,7 @@ public class PortalModuleServiceImpl implements PortalModuleService
 
                 if ( identityManager != null )
                 {
-                    identityManager.updateUserPortalModule( module.getId(), module.getName() );
+                    //identityManager.updateUserPortalModule( module.getId(), module.getName() );
                 }
             }
             catch ( NamingException e )

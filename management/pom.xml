@@ -78,7 +78,7 @@
     <com.google.guava.version>18.0</com.google.guava.version>
     <!-- REST -->
     <restlet-version>2.2.2</restlet-version>
-    <org.apache.cxf.version>2.7.16</org.apache.cxf.version>
+    <org.apache.cxf.version>2.7.18</org.apache.cxf.version>
     <!-- TEST -->
     <org.mockito.version>1.9.5</org.mockito.version>
     <com.jayway.awaitility.version>1.5.0</com.jayway.awaitility.version>
@@ -86,12 +86,11 @@
 
     <vaadin-version>7.3.3</vaadin-version>
 
-    <!-- apache shiro -->
-    <org.apache.shiro.version>1.2.3</org.apache.shiro.version>
+    <!-- bouncycastle -->
     <org.bouncycastle.version>1.52</org.bouncycastle.version>
 
     <!-- JWT lib -->
-    <nimbus.jwt.version>3.10</nimbus.jwt.version>
+    <nimbus.jwt.version>4.3.1</nimbus.jwt.version>
     <!-- Jackson JSON lib lib -->
     <jackson.version>2.6.1</jackson.version>
     <jackson-jaxrs.version>1.9.13</jackson-jaxrs.version>
@@ -110,6 +109,12 @@
   <dependencyManagement>
     <dependencies>
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <!-- blueprint-authz -->
+      <dependency>
+        <groupId>org.apache.aries.blueprint</groupId>
+        <artifactId>org.apache.aries.blueprint.authz</artifactId>
+        <version>1.0.1-CUSTOM</version>
+      </dependency>
       <!-- subutai-common -->
       <dependency>
         <groupId>${project.groupId}</groupId>
@@ -123,17 +128,11 @@
         <version>${project.version}</version>
       </dependency>
 
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>subutai-common-implementation</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>subutai-cli-rbac</artifactId>
+        <artifactId>cli-controller</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -242,19 +241,6 @@
       </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!-- file-tracker -->
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>file-tracker-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>file-tracker-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- git-manager -->
       <dependency>
         <groupId>${project.groupId}</groupId>
@@ -291,15 +277,6 @@
       </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!-- script-manager -->
-
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>script-manager-rest</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- repository manager -->
       <dependency>
         <groupId>${project.groupId}</groupId>
@@ -332,6 +309,11 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>broker-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>broker-cli</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -497,6 +479,33 @@
         <version>${project.version}</version>
       </dependency>
 
+      <!-- local-peer -->
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>local-peer-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>local-peer-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>local-peer-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>local-peer-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>local-peer-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
       <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
       <!--plugin-master -->
       <dependency>
@@ -512,24 +521,6 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>plugin-manager-ui</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!-- wol-manager -->
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>wol-manager-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>wol-manager-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>wol-manager-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -620,24 +611,6 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>http-context-factory</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!-- ssl-context-manager -->
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>http-context-manager-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>http-context-manager-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>http-context-manager-cli</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -794,10 +767,10 @@
       </dependency>
       <!-- Json Mapper -->
       <dependency>
-       	<groupId>org.codehaus.jackson</groupId>
-       	<artifactId>jackson-jaxrs</artifactId>
-       	<version>${jackson-jaxrs.version}</version>
-       </dependency>
+        <groupId>org.codehaus.jackson</groupId>
+        <artifactId>jackson-jaxrs</artifactId>
+        <version>${jackson-jaxrs.version}</version>
+      </dependency>
 
       <dependency>
         <groupId>com.fasterxml.jackson.jaxrs</groupId>
@@ -859,6 +832,14 @@
         <artifactId>javax.servlet-api</artifactId>
         <version>3.1.0</version>
       </dependency>
+
+      <!-- ~~~~~~~~Security Annotation ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <dependency>
+        <groupId>javax.annotation</groupId>
+        <artifactId>javax.annotation-api</artifactId>
+        <version>1.2</version>
+      </dependency>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- subutai-common -->
@@ -1039,16 +1020,6 @@
         <version>1.9.13</version>
       </dependency>
 
-      <dependency>
-        <groupId>org.apache.shiro</groupId>
-        <artifactId>shiro-core</artifactId>
-        <version>${org.apache.shiro.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.shiro</groupId>
-        <artifactId>shiro-web</artifactId>
-        <version>${org.apache.shiro.version}</version>
-      </dependency>
       <dependency>
         <groupId>com.nimbusds</groupId>
         <artifactId>nimbus-jose-jwt</artifactId>

@@ -53,7 +53,7 @@ import io.subutai.common.settings.Common;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.StringUtil;
 import io.subutai.common.util.UUIDUtil;
-import io.subutai.core.peer.api.LocalPeer;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.core.peer.ui.container.ContainerTree;
 import io.subutai.core.registry.api.TemplateRegistry;
 import io.subutai.core.strategy.api.ContainerPlacementStrategy;
@@ -443,16 +443,16 @@ public class Cloner extends VerticalLayout
     }
 
 
-    private List<ResourceHostMetric> fillInServerMetrics()
-    {
-        List<ResourceHostMetric> result = new ArrayList<>();
-
-        for ( ResourceHost host : localPeer.getResourceHosts() )
-        {
-            result.add( host.getHostMetric() );
-        }
-        return result;
-    }
+//    private List<ResourceHostMetric> fillInServerMetrics()
+//    {
+//        List<ResourceHostMetric> result = new ArrayList<>();
+//
+//        for ( ResourceHost host : localPeer.getResourceHosts() )
+//        {
+//            result.add( host.getHostMetric() );
+//        }
+//        return result;
+//    }
 
 
     private void show( String msg )

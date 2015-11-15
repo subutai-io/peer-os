@@ -6,8 +6,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
 import io.subutai.core.identity.api.IdentityManager;
-import io.subutai.core.identity.ui.IdentityManagerPortalModule;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -54,7 +54,7 @@ public class IdentityManagerPortalModuleTest
     @Test
     public void testGetId() throws Exception
     {
-        assertEquals("Identity Manager",identityManagerPortalModule.getId());
+        assertEquals( "Identity Manager", identityManagerPortalModule.getId() );
     }
 
 

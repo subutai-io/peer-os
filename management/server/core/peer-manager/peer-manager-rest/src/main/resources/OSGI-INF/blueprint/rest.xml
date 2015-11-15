@@ -11,28 +11,23 @@
     </cxf:features>
   </cxf:bus>
 
-  <jaxrs:server address="/peer" id="peerRestService">
+
+  <jaxrs:server address="/v1/registration" id="registrationService">
     <jaxrs:serviceBeans>
-      <ref component-id="peerRestServiceImpl" />
+      <ref component-id="registrationServiceImpl" />
     </jaxrs:serviceBeans>
     <jaxrs:providers>
-      <bean class="org.codehaus.jackson.jaxrs.JacksonJsonProvider"/>
+      <bean class="org.codehaus.jackson.jaxrs.JacksonJsonProvider" />
     </jaxrs:providers>
   </jaxrs:server>
 
-  <bean id="peerRestServiceImpl" class="io.subutai.core.peer.rest.RestServiceImpl">
+  <!--<bean id="jsonProvider" class="org.codehaus.jackson.jaxrs.JacksonJsonProvider" />-->
+
+  <bean id="registrationServiceImpl" class="io.subutai.core.peer.rest.RegistrationServiceImpl">
     <argument ref="peerManager" />
-    <argument ref="httpContextManager" />
-    <argument ref="securityManager" />
   </bean>
 
   <reference id="peerManager" availability="mandatory"
              interface="io.subutai.core.peer.api.PeerManager" />
-
-  <reference id="httpContextManager" availability="mandatory"
-             interface="io.subutai.core.http.manager.api.HttpContextManager" />
-
-  <reference id="securityManager" availability="mandatory"
-             interface="io.subutai.core.security.api.SecurityManager" />
 
 </blueprint>

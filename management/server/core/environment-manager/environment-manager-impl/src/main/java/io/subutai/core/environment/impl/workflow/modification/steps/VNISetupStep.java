@@ -17,7 +17,7 @@ import io.subutai.common.network.Vni;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
-import io.subutai.core.peer.api.LocalPeer;
+import io.subutai.common.peer.LocalPeer;
 
 
 public class VNISetupStep
@@ -91,9 +91,9 @@ public class VNISetupStep
 
         for ( final Peer peer : newPeers )
         {
-            int vlan = peer.reserveVni( environmentVni );
+            Vni reservedVni = peer.reserveVni( environmentVni );
 
-            peer.createGateway( environmentGatewayIp, vlan );
+            peer.createGateway( environmentGatewayIp, reservedVni.getVlan() );
         }
     }
 }

@@ -13,15 +13,24 @@ import com.google.common.collect.Sets;
 
 
 /**
- * Blueprint for environment creation
- * stores nodeGroups.
+ * Blueprint for environment creation stores nodeGroups.
+ *
  * @see NodeGroup
  */
 public class Blueprint
 {
     private UUID id;
     private String name;
+    private String cidr;
     private Set<NodeGroup> nodeGroups;
+
+
+    public Blueprint( final String name, final String cidr, final Set<NodeGroup> nodeGroups )
+    {
+        this.name = name;
+        this.cidr = cidr;
+        this.nodeGroups = nodeGroups;
+    }
 
 
     public Blueprint( final String name, final Set<NodeGroup> nodeGroups )
@@ -46,7 +55,6 @@ public class Blueprint
         this.id = id;
     }
 
-
     public String getName()
     {
         return name;
@@ -56,5 +64,11 @@ public class Blueprint
     public Set<NodeGroup> getNodeGroups()
     {
         return nodeGroups == null ? Sets.<NodeGroup>newHashSet() : Collections.unmodifiableSet( nodeGroups );
+    }
+
+
+    public String getCidr()
+    {
+        return cidr;
     }
 }

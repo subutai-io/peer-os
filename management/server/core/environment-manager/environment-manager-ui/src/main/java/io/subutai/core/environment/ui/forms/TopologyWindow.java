@@ -32,11 +32,15 @@ import io.subutai.common.environment.Topology;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.protocol.PlacementStrategy;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.peer.api.PeerManager;
+import io.subutai.core.strategy.api.ContainerPlacementStrategy;
+import io.subutai.core.strategy.api.StrategyManager;
+import io.subutai.core.strategy.api.StrategyNotFoundException;
 
 
 public class TopologyWindow extends Window
@@ -44,6 +48,7 @@ public class TopologyWindow extends Window
     private static final String DEFAULT_SUBNET_CIDR = "192.168.1.2/24";
     private final Blueprint blueprint;
     private final PeerManager peerManager;
+    private final StrategyManager strategyManager;
     private Table placementTable;
     private Button buildBtn;
     private ComboBox envCombo;
@@ -51,13 +56,15 @@ public class TopologyWindow extends Window
 
 
     public TopologyWindow( final Blueprint blueprint, final PeerManager peerManager,
-                           final EnvironmentManager environmentManager, final boolean grow )
+                           final EnvironmentManager environmentManager, final StrategyManager strategyManager,
+                           final boolean grow )
     {
 
         this.blueprint = blueprint;
         this.peerManager = peerManager;
+        this.strategyManager = strategyManager;
 
-        setCaption( "Topology" );
+        setCaption( "Strategy based environment builder" );
         setWidth( "800px" );
         setHeight( "600px" );
         setModal( true );
@@ -232,6 +239,7 @@ public class TopologyWindow extends Window
             Item item = placementTable.getItem( itemId );
             String nodeGroupName = item.getItemProperty( "Name" ).getValue().toString();
             String peerName = item.getItemProperty( "Peer" ).getValue().toString();
+            String strategyId = item.getItemProperty( "Strategy" ).getValue().toString();
             int amount = Integer.parseInt( item.getItemProperty( "Amount" ).getValue().toString() );
 
             NodeGroup nodeGroup = null;
@@ -239,8 +247,10 @@ public class TopologyWindow extends Window
             {
                 if ( ng.getName().equalsIgnoreCase( nodeGroupName ) )
                 {
+                    PlacementStrategy placementStrategy = new PlacementStrategy( strategyId );
                     nodeGroup = new NodeGroup( nodeGroupName, ng.getTemplateName(), amount, ng.getSshGroupId(),
-                            ng.getHostsGroupId(), ng.getContainerPlacementStrategy() );
+                            ng.getHostsGroupId(), placementStrategy );
+
                     break;
                 }
             }
@@ -283,6 +293,7 @@ public class TopologyWindow extends Window
         table.addContainerProperty( "Name", String.class, null );
         table.addContainerProperty( "Amount", Integer.class, null );
         table.addContainerProperty( "Peer", String.class, null );
+        table.addContainerProperty( "Strategy", String.class, null );
         table.addContainerProperty( "Remove", Button.class, null );
         table.setPageLength( 10 );
         table.setSelectable( false );
@@ -305,16 +316,20 @@ public class TopologyWindow extends Window
             ComboBox peersCombo = createPeersComboBox();
             peersCombo.setId( "peersCombo" );
 
-            Button placeBtn = createPlaceButton( nodeGroup, slider, peersCombo );
+            ComboBox strategiesCombo = createStrategiesComboBox();
+            peersCombo.setId( "strategiesCombo" );
+
+            Button placeBtn = createPlaceButton( nodeGroup, slider, peersCombo, strategiesCombo );
 
             nodeGroupsTable.addItem( new Object[] {
-                    nodeGroup.getName(), slider, peersCombo, placeBtn
+                    nodeGroup.getName(), slider, peersCombo, strategiesCombo, placeBtn
             }, null );
         }
     }
 
 
-    private Button createPlaceButton( final NodeGroup nodeGroup, final Slider slider, final ComboBox peersCombo )
+    private Button createPlaceButton( final NodeGroup nodeGroup, final Slider slider, final ComboBox peersCombo,
+                                      final ComboBox strategiesCombo )
     {
         Button placeButton = new Button( "Place" );
         placeButton.setId( "placeButton" );
@@ -329,6 +344,11 @@ public class TopologyWindow extends Window
 
                     Notification.show( "Please, select target peer", Notification.Type.WARNING_MESSAGE );
                 }
+                else if ( strategiesCombo.getValue() == null )
+                {
+
+                    Notification.show( "Please, select distribution strategy", Notification.Type.WARNING_MESSAGE );
+                }
                 else if ( slider.getMax() == 0 )
                 {
                     Notification.show( "All containers are distributed", Notification.Type.WARNING_MESSAGE );
@@ -339,7 +359,8 @@ public class TopologyWindow extends Window
                 }
                 else
                 {
-                    placeNodeGroup( nodeGroup, slider, ( Peer ) peersCombo.getValue() );
+                    placeNodeGroup( nodeGroup, slider, ( Peer ) peersCombo.getValue(),
+                            ( ContainerPlacementStrategy ) strategiesCombo.getValue() );
                 }
             }
         } );
@@ -348,7 +369,8 @@ public class TopologyWindow extends Window
     }
 
 
-    private void placeNodeGroup( NodeGroup nodeGroup, final Slider slider, Peer peer )
+    private void placeNodeGroup( NodeGroup nodeGroup, final Slider slider, Peer peer,
+                                 ContainerPlacementStrategy placementStrategy )
     {
         final String rowId = String.format( "%s-%s", nodeGroup.getName(), peer.getId() );
         Button removeBtn = new Button( "Remove" );
@@ -376,7 +398,7 @@ public class TopologyWindow extends Window
         if ( row == null )
         {
             placementTable.addItem( new Object[] {
-                    nodeGroup.getName(), amount, peer.getName(), removeBtn
+                    nodeGroup.getName(), amount, peer.getName(), placementStrategy.getId(), removeBtn
             }, rowId );
         }
         else
@@ -431,13 +453,44 @@ public class TopologyWindow extends Window
     }
 
 
+    private ComboBox createStrategiesComboBox()
+    {
+        ComboBox strategiesCombo = new ComboBox();
+        strategiesCombo.setNullSelectionAllowed( false );
+        strategiesCombo.setTextInputAllowed( false );
+        strategiesCombo.setImmediate( true );
+        strategiesCombo.setRequired( true );
+        List<ContainerPlacementStrategy> placementStrategies = strategyManager.getPlacementStrategies();
+
+        for ( ContainerPlacementStrategy strategy : placementStrategies )
+        {
+            strategiesCombo.addItem( strategy );
+
+            strategiesCombo.setItemCaption( strategy, strategy.getTitle() );
+        }
+
+        strategiesCombo.addValueChangeListener( new Property.ValueChangeListener()
+        {
+            @Override
+            public void valueChange( final Property.ValueChangeEvent event )
+            {
+                ContainerPlacementStrategy strategy = ( ContainerPlacementStrategy ) event.getProperty().getValue();
+                Notification.show( strategy.getTitle() );
+            }
+        } );
+
+        return strategiesCombo;
+    }
+
+
     private Table createNodeGroupsTable()
     {
         Table table = new Table();
         table.addContainerProperty( "Name", String.class, null );
         table.addContainerProperty( "Amount", Slider.class, null );
         table.addContainerProperty( "Peer", ComboBox.class, null );
-        table.addContainerProperty( "Place", Button.class, null );
+        table.addContainerProperty( "Strategy", ComboBox.class, null );
+        table.addContainerProperty( "Action", Button.class, null );
         table.setPageLength( 10 );
         table.setSelectable( false );
         table.setEnabled( true );

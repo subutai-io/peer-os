@@ -9,6 +9,9 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
+import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,13 +59,14 @@ import io.subutai.core.environment.impl.workflow.destruction.EnvironmentDestruct
 import io.subutai.core.environment.impl.workflow.modification.EnvironmentGrowingWorkflow;
 import io.subutai.core.environment.impl.workflow.modification.SshKeyModificationWorkflow;
 import io.subutai.core.identity.api.IdentityManager;
-import io.subutai.core.identity.api.User;
+import io.subutai.core.identity.api.model.User;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registry.api.TemplateRegistry;
 import io.subutai.core.tracker.api.Tracker;
 
 
+@PermitAll
 public class EnvironmentManagerImpl implements EnvironmentManager
 {
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentManagerImpl.class );
@@ -158,6 +162,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
+    @RolesAllowed( "Environment-Management|A|Write" )
     @Override
     public Environment createEnvironment( final String name, final Topology topology, final String subnetCidr,
                                           final String sshKey, final boolean async ) throws EnvironmentCreationException
@@ -217,6 +222,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
+    @RolesAllowed( "Environment-Management|A|Write" )
     @Override
     public Set<EnvironmentContainerHost> growEnvironment( final String environmentId, final Topology topology,
                                                           final boolean async )
@@ -233,6 +239,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
+    @RolesAllowed( "Environment-Management|A|Write" )
     public Set<EnvironmentContainerHost> growEnvironment( final String environmentId, final Topology topology,
                                                           final boolean async, final boolean checkAccess,
                                                           final TrackerOperation operationTracker )
@@ -311,6 +318,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
+    @RolesAllowed( "Environment-Management|A|Write" )
     @Override
     public void setSshKey( final String environmentId, final String sshKey, final boolean async )
             throws EnvironmentNotFoundException, EnvironmentModificationException
@@ -358,6 +366,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
+    @RolesAllowed( "Environment-Management|A|Delete" )
     @Override
     public void destroyEnvironment( final String environmentId, final boolean async,
                                     final boolean forceMetadataRemoval )
@@ -372,6 +381,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
+    @RolesAllowed( "Environment-Management|A|Delete" )
     public void destroyEnvironment( final String environmentId, boolean async, final boolean forceMetadataRemoval,
                                     final boolean checkAccess, final TrackerOperation operationTracker )
             throws EnvironmentDestructionException, EnvironmentNotFoundException
@@ -430,6 +440,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
+    @RolesAllowed( "Environment-Management|A|Delete" )
     @Override
     public void destroyContainer( final String environmentId, final String containerId, final boolean async,
                                   final boolean forceMetadataRemoval )
@@ -446,6 +457,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
+    @RolesAllowed( "Environment-Management|A|Delete" )
     public void destroyContainer( final String environmentId, final String containerId, final boolean async,
                                   final boolean forceMetadataRemoval, final boolean checkAccess,
                                   final TrackerOperation operationTracker )
@@ -504,6 +516,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
+    @PermitAll
     @Override
     public Environment loadEnvironment( final String environmentId ) throws EnvironmentNotFoundException
     {
@@ -518,6 +531,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
+    @RolesAllowed( "Environment-Management|A|Delete" )
     @Override
     public void removeEnvironment( final String environmentId ) throws EnvironmentNotFoundException
     {
@@ -527,6 +541,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
+    @RolesAllowed( "Environment-Management|A|Delete" )
     public void removeEnvironment( final String environmentId, final boolean checkAccess )
             throws EnvironmentNotFoundException
     {
@@ -540,6 +555,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
+    @PermitAll
     @Override
     public Set<Environment> getEnvironments()
     {
@@ -569,6 +585,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
+    @RolesAllowed( "Environment-Management|A|Write" )
     @Override
     public void saveBlueprint( final Blueprint blueprint ) throws EnvironmentManagerException
     {
@@ -577,7 +594,16 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         blueprintDataService.persist( blueprint );
     }
 
+    @RolesAllowed( "Environment-Management|A|Write" )
+    @Override
+    public Blueprint getBlueprint( final UUID id ) throws EnvironmentManagerException
+    {
+        Preconditions.checkNotNull( id, "Blueprint ID could not be null" );
+        return blueprintDataService.find( id );
+    }
 
+
+    @RolesAllowed( "Environment-Management|A|Delete" )
     @Override
     public void removeBlueprint( final UUID blueprintId ) throws EnvironmentManagerException
     {
@@ -587,6 +613,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
+    @PermitAll
     @Override
     public Set<Blueprint> getBlueprints() throws EnvironmentManagerException
     {
@@ -594,6 +621,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
+    @RolesAllowed( "Environment-Management|A|Update" )
     @Override
     public void updateEnvironmentContainersMetadata( final String environmentId ) throws EnvironmentManagerException
     {
@@ -629,6 +657,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
+    @RolesAllowed( "Environment-Management|A|Update" )
     @Override
     public void assignEnvironmentDomain( final String environmentId, final String newDomain,
                                          final DomainLoadBalanceStrategy domainLoadBalanceStrategy,
@@ -648,6 +677,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
+    @RolesAllowed( "Environment-Management|A|Update" )
     @Override
     public void removeEnvironmentDomain( final String environmentId )
             throws EnvironmentModificationException, EnvironmentNotFoundException
@@ -694,6 +724,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
+    @PermitAll
     @Override
     public String getEnvironmentDomain( final String environmentId )
             throws EnvironmentManagerException, EnvironmentNotFoundException
@@ -713,6 +744,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
+    @PermitAll
     @Override
     public boolean isContainerInEnvironmentDomain( final String containerHostId, final String environmentId )
             throws EnvironmentManagerException, EnvironmentNotFoundException
@@ -736,6 +768,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
+    @RolesAllowed( "Environment-Management|A|Update" )
     @Override
     public void addContainerToEnvironmentDomain( final String containerHostId, final String environmentId )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
@@ -747,6 +780,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
+    @RolesAllowed( "Environment-Management|A|Update" )
     @Override
     public void removeContainerFromEnvironmentDomain( final String containerHostId, final String environmentId )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
@@ -797,6 +831,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     //************ utility methods
 
 
+    @PermitAll
     protected EnvironmentCreationWorkflow getEnvironmentCreationWorkflow( final EnvironmentImpl environment,
                                                                           final Topology topology, final String sshKey,
                                                                           final TrackerOperation operationTracker )
@@ -856,6 +891,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
+    @PermitAll
     protected Environment loadEnvironment( final String environmentId, boolean checkAccess )
             throws EnvironmentNotFoundException
     {
@@ -896,7 +932,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
     protected boolean isUserAdmin()
     {
-        return getUser().isAdmin();
+        return true;//getUser().isAdmin();
     }
 
 
@@ -939,6 +975,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
+    @PermitAll
     public void notifyOnEnvironmentCreated( final Environment environment )
     {
         for ( final EnvironmentEventListener listener : listeners )
@@ -955,6 +992,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
+    @PermitAll
     public void notifyOnEnvironmentGrown( final Environment environment,
                                           final Set<EnvironmentContainerHost> containers )
     {
@@ -972,6 +1010,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
+    @PermitAll
     public void notifyOnContainerDestroyed( final Environment environment, final String containerId )
     {
         for ( final EnvironmentEventListener listener : listeners )
@@ -988,6 +1027,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
+    @PermitAll
     @Override
     public void notifyOnContainerStateChanged( final Environment environment, final ContainerHost containerHost )
     {
@@ -995,6 +1035,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
+    @PermitAll
     public void notifyOnEnvironmentDestroyed( final String environmentId )
     {
         for ( final EnvironmentEventListener listener : listeners )
@@ -1011,6 +1052,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
+    @RolesAllowed( "Environment-Management|A|Write" )
     protected EnvironmentImpl createEmptyEnvironment( final String name, final String subnetCidr, final String sshKey )
     {
 
@@ -1029,20 +1071,20 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
     protected User getUser()
     {
-        User user = identityManager.getUser();
+        //User user = identityManager.getUser();
 
-        if ( user == null )
+        //if ( user == null )
         {
             throw new EnvironmentSecurityException( "User not authenticated" );
         }
 
-        return user;
+        //return user;
     }
 
 
     protected Long getUserId()
     {
-        return getUser().getId();
+        return ( long ) 0;//getUser().getId();
     }
 
 

@@ -1,303 +1,186 @@
 package io.subutai.core.identity.api;
 
 
-import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
-import org.apache.shiro.mgt.SecurityManager;
-import org.apache.shiro.subject.Subject;
+import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
+
+import io.subutai.common.security.objects.PermissionObject;
+import io.subutai.common.security.objects.PermissionOperation;
+import io.subutai.common.security.objects.PermissionScope;
+import io.subutai.core.identity.api.dao.IdentityDataService;
+import io.subutai.core.identity.api.model.Permission;
+import io.subutai.core.identity.api.model.Role;
+import io.subutai.core.identity.api.model.Session;
+import io.subutai.core.identity.api.model.User;
+import io.subutai.core.identity.api.model.UserToken;
 
 
 /**
- * IdentityManager implements RBAC system control
+ *
  */
 public interface IdentityManager
 {
-
-
-    /**
-     * Returns shiro SecurityManager
-     *
-     * @return {@link org.apache.shiro.mgt.SecurityManager}
-     *
-     * @see org.apache.shiro.mgt.SecurityManager
+    /* *************************************************
      */
-    public SecurityManager getSecurityManager();
+    List<Permission> getAllPermissions();
 
-    /**
-     * Return user entity
-     *
-     * @return user entity
-     */
-    public User getUser();
-
-    public User getUser( String username );
-
-
-    /**
-     * Logs in user with token passed
-     *
-     * @param username - username
-     * @param password - password
-     *
-     * @return - {@code Subject} represents state and security operations for a <em>single</em> application user.
-     */
-    public Serializable login( String username, String password );
-
-    public Serializable loginWithToken( String username );
-
-
-    /**
-     * Check User Rest URL
-     *
-     *
-     *
-     *
+    /* *************************************************
      *
      */
-    public short checkRestPermissions(  User user , String restURL );
+    public IdentityDataService getIdentityDataService();
 
-    /**
-     * Get {@code Subject} for target session
-     *
-     * @param sessionId - session id
-     *
-     * @return - {@code Subject} represents state and security operations for a <em>single</em> application user.
+
+    /* *************************************************
      */
-    public Subject getSubject( Serializable sessionId );
+    Session startSession( User user );
 
 
-    public void touch( Serializable sessionId );
-
-    /**
-     * Logout user by sessions id
-     *
-     * @param sessionId - logout user by session id
+    /* *************************************************
      */
-    public void logout( Serializable sessionId );
+    void logout();
 
 
-    /**
-     * Get all registered users
-     *
-     * @return - {@code List} of {@code User}
+    /* *************************************************
      */
-    public List<User> getAllUsers();
+    String getUserToken( String userName, String password );
 
-
-    /**
-     * Save new user in system
-     *
-     * @param username - username
-     * @param fullname - surname/name
-     * @param password - password
-     * @param email - email
-     *
-     * @return - user registration operation result
+    /* *************************************************
      */
-    public boolean addUser( String username, String fullname, String password, String email );
+    User authenticateByToken( String token );
 
 
-    /**
-     * Returns user key by username
-     *
-     * @param username - username
-     *
-     * @return - user key
+    /* *************************************************
      */
-    public String getUserKey( String username );
+    User authenticateUser( String userName, String password );
 
 
-    /**
-     * Creates sample user entity. This generates salt from username and hashed password
-     *
-     * @param username - username
-     * @param fullName - fullName
-     * @param password - password
-     * @param email - email
-     *
-     * @return - {@code User}
+    /* *************************************************
      */
-    public User createMockUser( String username, String fullName, String password, String email );
+    List<User> getAllUsers();
 
 
-    /**
-     * Update user parameters
-     *
-     * @param user - target user to update some parameters
-     *
-     * @return - update result
+    /* *************************************************
      */
-    public boolean updateUser( User user );
+    void assignUserRole( long userId, Role role );
 
 
-    /**
-     * Get user by id
-     *
-     * @param id - user id
-     *
-     * @return - {@code User}
+    /* *************************************************
      */
-    public User getUser( Long id );
+    User getUser( long userId );
 
-
-    /**
-     * Remove user from system
-     *
-     * @param user - {@code User} entity
-     *
-     * @return - remove operation result
+    /* *************************************************
      */
-    public boolean deleteUser( User user );
+    @PermitAll
+    User getActiveUser();
 
-    //-------------------------- CliCommandScope ----------------------
+    /* *************************************************
+         */
+    User getLoggedUser();
 
-    /**
-     * Get all available cli commands registered in system
-     *
-     * @return - list of {@code CliCommand} interface objects
+
+    /* *************************************************
      */
-    public List<CliCommand> getAllCliCommands();
+    User createTempUser( String userName, String password, String fullName, String email, int type );
 
-    /**
-     * Create sample {@code CliCommand} instance of CliCommandEntity with intention of usability for further db CRUD
-     * operations
+
+    /* *************************************************
      *
-     * @param scope - scope of {@link CliCommand#getScope()}
-     * @param name - name of {@link CliCommand#getName()}
      */
-    public CliCommand createCliCommand( String scope, String name );
+    User createUser( String userName, String password, String fullName, String email, int type );
 
-    /**
-     * Update/persist passed {@code CliCommand} object to database
-     *
-     * @param cliCommand - cliCommand
-     *
-     * @return - operation result denoted as true or false
+
+    /* *************************************************
      */
-    public boolean updateCliCommand( CliCommand cliCommand );
+    void removeUserRole( long userId, Role role );
 
 
-    //-------------------------- RestEndpointScope --------------------
-
-    /**
-     * List all rest endpoints registered in system
-     *
-     * @return - set of {@code RestEndpointScope} objects
+    /* *************************************************
      */
-    public Set<RestEndpointScope> getAllRestEndpoints();
-
-    //-------------------------- PortalModuleScope --------------------
-
-    public Set<PortalModuleScope> getAllPortalModules();
-
-    public boolean updateUserPortalModule( String moduleKey, String moduleName );
+    void removeUserAllRoles( long userId );
 
 
-    //<-------------------------- Permissions -------------------------
-
-    /**
-     * Get all Permissions
-     *
-     * @return - {@code Collection} of {@code Permission}
+    /* *************************************************
      */
-    public List<Permission> getAllPermissions();
+    boolean changeUserPassword( long userId, String oldPassword, String newPassword );
 
 
-    /**
-     * Create sample {@code Permission} entity
-     *
-     * @param permissionName - permission name
-     * @param permissionGroup - permission group
-     * @param description - description
-     *
-     * @return - {@code Permission} entity
+    /* *************************************************
      */
-    public Permission createPermission( String permissionName, PermissionGroup permissionGroup, String description );
+    void updateUser( User user );
 
 
-    /**
-     * Update existing permission
-     *
-     * @param permission - {@code Permission} entity to update
-     *
-     * @return - update operation result
+    /* *************************************************
      */
-    public boolean updatePermission( Permission permission );
+    void removeUser( long userId );
 
 
-    /**
-     * Returns {@code Permission} for {@link Permission#getName()} and {@link Permission#getPermissionGroup()}
-     * parameters
-     *
-     * @param name - permission name
-     * @param permissionGroup - permission group
-     *
-     * @return - {@code Permission} entity
+    /* *************************************************
      */
-    public Permission getPermission( String name, PermissionGroup permissionGroup );
+    boolean isUserPermitted( User user, PermissionObject permObj, PermissionScope permScope,
+                             PermissionOperation permOp );
 
 
-    /**
-     * Erases {@code Permission} entity from database
+    /* *************************************************
      *
-     * @param permission - target {@code Permission} to erase
-     *
-     * @return - result for delete operation
      */
-    public boolean deletePermission( Permission permission );
+    Role createRole( String roleName, int roleType );
 
 
-    //-------------------------- Roles -------------------------
-
-    /**
-     * Get list of {@code Role} existing in database
+    /* *************************************************
      *
-     * @return - {@code Collection} of {@code Role} entities
      */
-    public List<Role> getAllRoles();
+    User login( String userName, String password );
 
 
-    /**
-     * Create sample {@code Role} for persisting purposes
-     *
-     * @param roleName - role name
-     *
-     * @return - {@code Role} entity
+    /* *************************************************
      */
-    public Role createRole( String roleName );
+    List<Role> getAllRoles();
 
 
-    /**
-     * Update existing role or save a new one
-     *
-     * @param role - {@code Role} entity
-     *
-     * @return - result for {@code Role} update operation
+    /* *************************************************
      */
-    public boolean updateRole( Role role );
+    Role getRole( long roleId );
+
+    /* *************************************************
+         */
+    void updateRole( Role role );
 
 
-    /**
-     * Return {@code Role} by name
-     *
-     * @param name - role name
-     *
-     * @return - {@code Role} entity
+    /* *************************************************
      */
-    public Role getRole( String name );
+    void removeRole( long roleId );
 
 
-    /**
-     * Erase existing {@code Role} from database
-     *
-     * @param role - {@code Role}
+    /* *************************************************
      */
-    public void deleteRole( Role role );
+    Permission createPermission( int objectId, int scope, boolean read, boolean write, boolean update, boolean delete );
 
-    public boolean isAuthenticated();
 
-    public Set<String> getRoles( Serializable shiroSessionId );
+    /* *************************************************
+     */
+    void assignRolePermission( long roleId, Permission permission );
+
+
+    /* *************************************************
+     */
+    void removePermission( long permissionId );
+
+
+    /* *************************************************
+     */
+    UserToken createUserToken( User user, String token, String secret, String issuer, int tokenType, Date validDate );
+
+
+    /* *************************************************
+     */
+    List<UserToken> getUserTokens();
+
+
+    /* *************************************************
+         */
+    public void updateUserToken( String oldName, User user, String token, String secret, String issuer, int tokenType,
+                                 Date validDate );
 }
-

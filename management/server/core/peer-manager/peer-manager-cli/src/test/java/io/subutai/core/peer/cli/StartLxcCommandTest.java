@@ -6,8 +6,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
 import io.subutai.common.peer.ContainerHost;
-import io.subutai.core.peer.api.LocalPeer;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.core.peer.api.PeerManager;
 
 import static org.mockito.Matchers.anyString;
@@ -43,6 +44,6 @@ public class StartLxcCommandTest
     {
         command.doExecute();
 
-        verify( localPeer ).startContainer( containerHost );
+        verify( localPeer ).startContainer( containerHost.getContainerId() );
     }
 }

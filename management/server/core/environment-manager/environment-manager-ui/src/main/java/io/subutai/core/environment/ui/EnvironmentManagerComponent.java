@@ -7,6 +7,7 @@ import io.subutai.core.environment.ui.forms.EnvironmentForm;
 import io.subutai.core.environment.ui.tabs.EnvironmentContainersQuotaTab;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registry.api.TemplateRegistry;
+import io.subutai.core.strategy.api.StrategyManager;
 
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.TabSheet;
@@ -16,17 +17,19 @@ import com.vaadin.ui.themes.Runo;
 
 public class EnvironmentManagerComponent extends CustomComponent
 {
+    private final StrategyManager strategyManager;
     private EnvironmentManager environmentManager;
     private PeerManager peerManager;
     private TemplateRegistry templateRegistry;
 
 
     public EnvironmentManagerComponent( final EnvironmentManager environmentManager, final PeerManager peerManager,
-                                        final TemplateRegistry templateRegistry )
+                                        final TemplateRegistry templateRegistry, final StrategyManager strategyManager )
     {
         this.environmentManager = environmentManager;
         this.peerManager = peerManager;
         this.templateRegistry = templateRegistry;
+        this.strategyManager = strategyManager;
         init();
     }
 
@@ -43,7 +46,7 @@ public class EnvironmentManagerComponent extends CustomComponent
         formSheet.setStyleName( Runo.TABSHEET_SMALL );
         formSheet.setSizeFull();
 
-        BlueprintForm blueprintForm = new BlueprintForm( environmentManager, peerManager, templateRegistry );
+        BlueprintForm blueprintForm = new BlueprintForm( environmentManager, peerManager, templateRegistry, strategyManager );
         formSheet.addTab( blueprintForm.getContentRoot(), "Blueprints" );
         formSheet.getTab( 0 ).setId( "Blueprints" );
 

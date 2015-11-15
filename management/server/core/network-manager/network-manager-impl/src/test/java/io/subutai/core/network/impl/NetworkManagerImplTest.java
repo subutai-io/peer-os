@@ -18,6 +18,7 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.network.Vni;
 import io.subutai.common.network.VniVlanMapping;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
@@ -25,10 +26,10 @@ import io.subutai.core.network.api.ContainerInfo;
 import io.subutai.core.network.api.N2NConnection;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
-import io.subutai.core.peer.api.LocalPeer;
-import io.subutai.core.peer.api.ManagementHost;
+import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.peer.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.core.peer.api.Tunnel;
+import io.subutai.common.protocol.Tunnel;
 import junit.framework.TestCase;
 
 import static junit.framework.Assert.assertFalse;
@@ -239,7 +240,7 @@ public class NetworkManagerImplTest
     {
         when( commandResult.getStdOut() ).thenReturn( RESERVED_VNIS_OUTPUT );
 
-        networkManager.cleanupEnvironmentNetworkSettings( ENVIRONMENT_ID );
+        networkManager.cleanupEnvironmentNetworkSettings( new EnvironmentId( ENVIRONMENT_ID ) );
 
         verify( commands ).getCleanupEnvironmentNetworkSettingsCommand( VLAN_ID );
         verify( managementHost, atLeastOnce() ).execute( any( RequestBuilder.class ) );
