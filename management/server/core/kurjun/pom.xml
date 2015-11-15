@@ -15,7 +15,7 @@
     <packaging>pom</packaging>
     
     <properties>
-        <ai.subut.kurjun.version>1.0-SNAPSHOT</ai.subut.kurjun.version>
+        <ai.subut.kurjun.version>1.0</ai.subut.kurjun.version>
     </properties>
       
       
