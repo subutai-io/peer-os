@@ -1,6 +1,7 @@
 package io.subutai.core.identity.rest;
 
 
+import com.google.common.base.Strings;
 import io.subutai.core.identity.api.IdentityManager;
 
 
@@ -16,23 +17,25 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public String createToken( final String userName, final String password )
+    public String createTokenPOST( final String userName, final String password )
     {
-        return identityManager.getUserToken( userName, password );
+        String token = identityManager.getUserToken( userName, password );
+
+        if( !Strings.isNullOrEmpty(token))
+        {
+            return token;
+        }
+        else
+        {
+            return "Access Denied to the resource!";
+        }
+
     }
 
 
     @Override
-    public String getToken( final String userName, final String password )
+    public String createTokenGET( final String userName, final String password )
     {
-        return createToken( userName, password );
-    }
-
-
-    @Override
-    public Token createToken( final UserCrdentials userCrdentials )
-    {
-        String token = identityManager.getUserToken( userCrdentials.getUsername(), userCrdentials.getPassword() );
-        return new Token( token );
+        return createTokenPOST( userName, password );
     }
 }
