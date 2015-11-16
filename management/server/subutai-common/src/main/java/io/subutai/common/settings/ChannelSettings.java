@@ -17,10 +17,10 @@ public class ChannelSettings
 
         public static final String[] URL_ACCESS_PX1 = {
 
-                "/rest/identity/gettoken",
-                "/rest/peer/id",
-                "/rest/pks/{$}",
-                "/rest/security/keyman/getpublickeyring",
+                "/rest/v1/identity/gettoken",
+                "/rest/v1/peer/id",
+                "/rest/v1/pks/{$}",
+                "/rest/v1/security/keyman/getpublickeyring",
                 "/rest/v1/registration/register",
                 "/rest/v1/registration/approve",
                 "/rest/v1/registration/cancel",

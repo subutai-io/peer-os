@@ -613,7 +613,7 @@ public class KeyManagerImpl implements KeyManager
 
             if ( pubRing == null ) // Get from HTTP
             {
-                String baseUrl = String.format( "https://%s:%s/rest", ip, ChannelSettings.SECURE_PORT_X1 );
+                String baseUrl = String.format( "https://%s:%s/rest/v1", ip, ChannelSettings.SECURE_PORT_X1 );
                 WebClient client = RestUtil.createTrustedWebClient( baseUrl, provider );
                 client.type( MediaType.MULTIPART_FORM_DATA ).accept( MediaType.APPLICATION_JSON );
 
