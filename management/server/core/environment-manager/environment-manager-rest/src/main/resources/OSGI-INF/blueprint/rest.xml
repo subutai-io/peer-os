@@ -24,7 +24,7 @@
     <argument ref="templateRegistry" />
   </bean>
 
-  <jaxrs:server address="/environments" id="environmentRestService">
+  <jaxrs:server address="/v1/environments" id="environmentRestService">
     <jaxrs:serviceBeans>
       <ref component-id="environmentRestServiceImpl" />
     </jaxrs:serviceBeans>

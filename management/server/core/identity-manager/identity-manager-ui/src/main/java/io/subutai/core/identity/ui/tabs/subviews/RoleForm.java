@@ -186,6 +186,7 @@ public class RoleForm extends Window
                     Permission newRP = callback.getIdentityManager().createPermission((int)newItemId,PermissionScope.ALL_SCOPE.getId(),true,true,true,true );
 
                     callback.getIdentityManager().assignRolePermission( currentRole.getBean().getId(), newRP  );
+                    perms.add( newRP );
                     addRow( newRP );
                 }
             });

@@ -11,7 +11,7 @@
     </cxf:features>
   </cxf:bus>
 
-  <jaxrs:server address="/registration" id="nodeRegistrationManager">
+  <jaxrs:server address="/v1/registration" id="nodeRegistrationManager">
     <jaxrs:serviceBeans>
       <ref component-id="nodeRegistrationRest" />
     </jaxrs:serviceBeans>
