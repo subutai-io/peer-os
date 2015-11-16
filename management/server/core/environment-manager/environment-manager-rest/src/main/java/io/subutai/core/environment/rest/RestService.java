@@ -1,16 +1,20 @@
 package io.subutai.core.environment.rest;
 
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import io.subutai.common.environment.Blueprint;
 
 
 public interface RestService
@@ -37,14 +41,13 @@ public interface RestService
     public Response viewEnvironment( @PathParam( "environmentId" ) String environmentId );
 
     @POST
-    public Response createEnvironment( @FormParam( "name" ) String environmentName,
-                                       @FormParam( "topology" ) String topologyJsonString,
-                                       @FormParam( "subnet" ) String subnetCidr, @FormParam( "key" ) String sshKey );
+    @Consumes( MediaType.APPLICATION_JSON )
+    public void createEnvironment( Blueprint blueprint );
 
-    @POST
-    @Path( "grow" )
-    public Response growEnvironment( @FormParam( "environmentId" ) String environmentId,
-                                     @FormParam( "topology" ) String topologyJsonString );
+    @PUT
+    @Path( "{environmentId}" )
+    @Consumes( MediaType.APPLICATION_JSON )
+    public void growEnvironment( @PathParam( "environmentId" ) String environmentId, final Blueprint blueprint );
 
     @POST
     @Path( "key" )

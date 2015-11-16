@@ -1,13 +1,18 @@
 package io.subutai.core.environment.impl;
 
 
+import java.util.HashSet;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import com.google.common.collect.Sets;
+
 import io.subutai.common.dao.DaoManager;
+import io.subutai.common.environment.Blueprint;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.environment.Topology;
@@ -25,15 +30,18 @@ import io.subutai.core.tracker.api.Tracker;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyCollection;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 
 @RunWith( MockitoJUnitRunner.class )
 public class EnvironmentManagerTest
 {
     private static final String ENV_ID = "123";
+    private static final java.lang.String PEER_ID = "peer_id";
     EnvironmentManagerImpl environmentManager;
 
 
@@ -64,17 +72,25 @@ public class EnvironmentManagerTest
     @Mock
     EnvironmentCreationWorkflow environmentCreationWorkflow;
 
-    Topology topology = new Topology();
+    @Mock
+    Topology topology;
+
+    Blueprint blueprint;
 
 
     @Before
     public void setUp() throws Exception
     {
-        topology.addNodeGroupPlacement( peer, nodeGroup );
+        when( nodeGroup.getPeerId() ).thenReturn( PEER_ID );
+
+        blueprint = new Blueprint( "env", ENV_ID, "192.168.1.0/24", null, Sets.newHashSet( nodeGroup ) );
+
         environmentManager = spy( new EnvironmentManagerImpl( templateRegistry, peerManager, networkManager, daoManager,
                 identityManager, tracker ) );
         doReturn( environment ).when( environmentManager )
                                .createEmptyEnvironment( anyString(), anyString(), anyString() );
+        doReturn( topology ).when( environmentManager ).buildTopology( blueprint );
+        doReturn( new HashSet<>() ).when( environmentManager ).getUsedGateways( ( Peer ) any() );
         doReturn( environmentCreationWorkflow ).when( environmentManager )
                                                .getEnvironmentCreationWorkflow( any( EnvironmentImpl.class ),
                                                        any( Topology.class ), anyString(),
@@ -89,8 +105,7 @@ public class EnvironmentManagerTest
     @Test
     public void testCreateEnvironment() throws Exception
     {
-        Environment environment1 =
-                environmentManager.createEnvironment( "env", topology, "192.168.1.0/24", null, true );
+        Environment environment1 = environmentManager.createEnvironment( blueprint, true );
 
         assertEquals( environment1, environment );
     }

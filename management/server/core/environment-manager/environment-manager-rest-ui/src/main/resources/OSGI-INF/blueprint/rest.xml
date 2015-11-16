@@ -36,7 +36,7 @@
   </jaxrs:server>
 
   <httpj:engine-factory id="ClientAuthHttpsSettings" bus="cxf">
-    <httpj:engine port="8081">
+    <httpj:engine port="30080">
     </httpj:engine>
   </httpj:engine-factory>
 
