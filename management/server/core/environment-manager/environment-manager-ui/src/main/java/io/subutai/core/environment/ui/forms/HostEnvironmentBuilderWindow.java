@@ -2,9 +2,7 @@ package io.subutai.core.environment.ui.forms;
 
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -12,10 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
@@ -33,20 +29,12 @@ import com.vaadin.ui.Window;
 import io.subutai.common.environment.Blueprint;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.NodeGroup;
-import io.subutai.common.environment.Topology;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.metric.ResourceHostMetrics;
-import io.subutai.common.network.Gateway;
 import io.subutai.common.peer.Peer;
-import io.subutai.common.peer.PeerException;
-import io.subutai.common.protocol.PlacementStrategy;
 import io.subutai.common.util.CollectionUtil;
-import io.subutai.common.util.JsonUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
-import io.subutai.core.environment.api.exception.EnvironmentCreationException;
-import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.core.strategy.api.ContainerPlacementStrategy;
 
 
 public class HostEnvironmentBuilderWindow extends Window
@@ -155,22 +143,27 @@ public class HostEnvironmentBuilderWindow extends Window
         }
         else
         {
-            Topology topology = new Topology();
-            constructTopology( topology, placements );
-            LOG.debug( JsonUtil.toJson( topology ) );
-
             try
             {
                 if ( grow )
                 {
                     Environment environment = ( Environment ) envCombo.getValue();
-                    environmentManager.growEnvironment( environment.getId(), topology, true );
+                    Blueprint blueprint =
+                            new Blueprint( environment.getId(), environment.getName(), environment.getSubnetCidr(),
+                                    null, placements );
+                    environmentManager.growEnvironment( blueprint, true );
 
-                    Notification.show( "Environment growth started" );
+                    Notification.show( "Environment expanding started" );
                 }
                 else
                 {
-                    checkPickedSubnetValidity( topology, environmentManager );
+                    final String environmentId = UUID.randomUUID().toString();
+                    final String subnet = subnetTxt.getValue().trim();
+                    Blueprint blueprint = new Blueprint( environmentId,
+                            String.format( "%s-%s", this.blueprint.getName(), environmentId ), subnet, null,
+                            placements );
+                    environmentManager.createEnvironment( blueprint, true );
+                    Notification.show( "Environment creation started" );
                 }
 
                 close();
@@ -181,59 +174,6 @@ public class HostEnvironmentBuilderWindow extends Window
                         ExceptionUtils.getRootCauseMessage( e ) ), Notification.Type.ERROR_MESSAGE );
             }
         }
-    }
-
-
-    private void constructTopology( final Topology topology, final Set<NodeGroup> placements )
-    {
-        for ( NodeGroup placement : placements )
-        {
-            topology.addNodeGroupPlacement( peerManager.getPeer( placement.getPeerId() ), placement );
-        }
-    }
-
-
-    private void checkPickedSubnetValidity( final Topology topology, final EnvironmentManager environmentManager )
-            throws EnvironmentManagerException, PeerException, EnvironmentCreationException
-    {
-        //check availability of subnet
-        Map<Peer, Set<Gateway>> usedGateways = getUsedGateways( topology.getNodeGroupPlacement().keySet() );
-
-        SubnetUtils subnetUtils = new SubnetUtils( subnetTxt.getValue() );
-        String environmentGatewayIp = subnetUtils.getInfo().getLowAddress();
-
-        for ( Map.Entry<Peer, Set<Gateway>> peerGateways : usedGateways.entrySet() )
-        {
-            Peer peer = peerGateways.getKey();
-            Set<Gateway> gateways = peerGateways.getValue();
-            for ( Gateway gateway : gateways )
-            {
-                if ( gateway.getIp().equals( environmentGatewayIp ) )
-                {
-                    throw new EnvironmentManagerException(
-                            String.format( "Subnet %s is already used on peer %s", environmentGatewayIp,
-                                    peer.getName() ), null );
-                }
-            }
-        }
-
-        environmentManager
-                .createEnvironment( String.format( "%s-%s", blueprint.getName(), UUID.randomUUID() ), topology,
-                        subnetTxt.getValue(), null, true );
-        Notification.show( "Environment creation started" );
-    }
-
-
-    private Map<Peer, Set<Gateway>> getUsedGateways( Set<Peer> peers ) throws PeerException
-    {
-        Map<Peer, Set<Gateway>> usedGateways = Maps.newHashMap();
-
-        for ( Peer peer : peers )
-        {
-            usedGateways.put( peer, peer.getGateways() );
-        }
-
-        return usedGateways;
     }
 
 

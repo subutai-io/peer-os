@@ -1,6 +1,7 @@
 package io.subutai.core.environment.ui.forms;
 
 
+import java.util.HashSet;
 import java.util.UUID;
 
 import org.slf4j.Logger;
@@ -131,8 +132,8 @@ public class BlueprintForm
             @Override
             public void buttonClick( final Button.ClickEvent event )
             {
-                Blueprint b = new Blueprint( "Custom blueprint", "192.168.0.1/24", null );
-                b.setId( UUID.randomUUID() );
+                Blueprint b = new Blueprint( UUID.randomUUID().toString(), "Custom blueprint", "192.168.0.1/24", null,
+                        new HashSet<NodeGroup>() );
                 editBlueprint( b );
             }
         } );
