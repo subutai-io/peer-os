@@ -93,7 +93,7 @@ public class VNISetupStep
         {
             Vni reservedVni = peer.reserveVni( environmentVni );
 
-            peer.createGateway( environmentGatewayIp, reservedVni.getVlan() );
+            peer.createGateway( new Gateway( reservedVni.getVlan(), environmentGatewayIp ) );
         }
     }
 }

@@ -1945,9 +1945,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     @RolesAllowed( "Environment-Management|A|Write" )
     @Override
-    public void createGateway( final String environmentGatewayIp, final int vlan ) throws PeerException
+    public void createGateway( final Gateway gateway) throws PeerException
     {
-        getManagementHost().createGateway( environmentGatewayIp, vlan );
+        getManagementHost().createGateway( gateway.getIp(), gateway.getVlan());
     }
 
 

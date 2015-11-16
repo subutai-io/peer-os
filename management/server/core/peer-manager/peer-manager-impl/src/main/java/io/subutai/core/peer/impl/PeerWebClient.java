@@ -7,8 +7,6 @@ import java.util.Set;
 
 import javax.ws.rs.core.MediaType;
 
-import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -351,5 +349,24 @@ public class PeerWebClient
         WebClient client = WebClientBuilder.buildPeerWebClient( host, path, provider );
 
         return client.get( HostMetric.class );
+    }
+
+
+    public void createGateway( final Gateway gateway ) throws PeerException
+    {
+        String path = "/gateways";
+
+        WebClient client = WebClientBuilder.buildPeerWebClient( host, path, provider );
+        client.type( MediaType.APPLICATION_JSON );
+        client.accept( MediaType.APPLICATION_JSON );
+
+        try
+        {
+            client.post( gateway );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Error on creating gateway", e );
+        }
     }
 }

@@ -401,7 +401,7 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
 
     void removeN2NConnection( EnvironmentId environmentId ) throws PeerException;
 
-    void createGateway( String environmentGatewayIp, int vlan ) throws PeerException;
+    void createGateway( Gateway gateway ) throws PeerException;
 
     void removeEnvironmentKeyPair( EnvironmentId environmentId ) throws PeerException;
 
