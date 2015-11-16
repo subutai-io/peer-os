@@ -25,6 +25,7 @@ public class ChannelSettings
                 "/rest/v1/handshake/approve",
                 "/rest/v1/handshake/cancel",
                 "/rest/v1/handshake/reject",
+                "/rest/v1/handshake/unregister",
 
 
                 "/rest/registry/templates",
