@@ -7,17 +7,6 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.subutai.common.environment.Blueprint;
-import io.subutai.common.environment.ContainerType;
-import io.subutai.common.environment.NodeGroup;
-import io.subutai.common.util.CollectionUtil;
-import io.subutai.common.util.JsonUtil;
-import io.subutai.core.environment.api.EnvironmentManager;
-import io.subutai.core.environment.api.exception.EnvironmentManagerException;
-import io.subutai.core.peer.api.PeerManager;
-import io.subutai.core.registry.api.TemplateRegistry;
-import io.subutai.core.strategy.api.StrategyManager;
-
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
@@ -29,6 +18,17 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.VerticalLayout;
+
+import io.subutai.common.environment.Blueprint;
+import io.subutai.common.environment.ContainerType;
+import io.subutai.common.environment.NodeGroup;
+import io.subutai.common.util.CollectionUtil;
+import io.subutai.common.util.JsonUtil;
+import io.subutai.core.environment.api.EnvironmentManager;
+import io.subutai.core.environment.api.exception.EnvironmentManagerException;
+import io.subutai.core.peer.api.PeerManager;
+import io.subutai.core.registry.api.TemplateRegistry;
+import io.subutai.core.strategy.api.StrategyManager;
 
 
 public class BlueprintForm
@@ -132,8 +132,7 @@ public class BlueprintForm
             @Override
             public void buttonClick( final Button.ClickEvent event )
             {
-                Blueprint b = new Blueprint( UUID.randomUUID().toString(), "Custom blueprint", "192.168.0.1/24", null,
-                        new HashSet<NodeGroup>() );
+                Blueprint b = new Blueprint( "Custom blueprint", null, new HashSet<NodeGroup>() );
                 editBlueprint( b );
             }
         } );

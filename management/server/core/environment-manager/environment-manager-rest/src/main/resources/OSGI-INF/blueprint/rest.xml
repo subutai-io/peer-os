@@ -28,6 +28,9 @@
     <jaxrs:serviceBeans>
       <ref component-id="environmentRestServiceImpl" />
     </jaxrs:serviceBeans>
+    <jaxrs:providers>
+      <bean class="org.codehaus.jackson.jaxrs.JacksonJsonProvider" />
+    </jaxrs:providers>
   </jaxrs:server>
 
 </blueprint>

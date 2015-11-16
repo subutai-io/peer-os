@@ -3,7 +3,6 @@ package io.subutai.core.environment.rest;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
@@ -22,14 +21,11 @@ import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.NodeGroup;
-import io.subutai.common.environment.Topology;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentContainerHost;
-import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.settings.Common;
-import io.subutai.common.util.JsonUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
@@ -41,7 +37,7 @@ public class RestServiceImpl implements RestService
 {
     private static final Logger LOG = LoggerFactory.getLogger( RestServiceImpl.class );
 
-    private static final String ERROR_KEY = "ERROR";
+
     private final EnvironmentManager environmentManager;
     private final PeerManager peerManager;
     private final TemplateRegistry templateRegistry;
@@ -61,7 +57,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public void createEnvironment( final Blueprint blueprint )
+    public Response createEnvironment( final Blueprint blueprint )
     {
         //validate params
         try
@@ -70,37 +66,31 @@ public class RestServiceImpl implements RestService
             Preconditions.checkNotNull( blueprint.getNodeGroups() );
             Preconditions.checkArgument( blueprint.getNodeGroups().size() > 0, "Nodegroup size must be great than 0" );
             Preconditions.checkArgument( !Strings.isNullOrEmpty( blueprint.getName() ), "Invalid blueprint name" );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( blueprint.getCidr() ), "Invalid subnet cidr" );
+            //            Preconditions.checkArgument( !Strings.isNullOrEmpty( blueprint.getCidr() ), "Invalid subnet
+            // cidr" );
             checkBlueprint( blueprint );
         }
         catch ( Exception e )
         {
             LOG.error( "Error validating parameters #createEnvironment", e );
-            Response response = Response.status( Response.Status.BAD_REQUEST )
-                                        .entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+            Response response =
+                    Response.status( Response.Status.BAD_REQUEST ).entity( new ErrorDto( e.getMessage() ) ).build();
 
-            throw new WebApplicationException( response );
+            return response;
         }
 
         try
         {
-            final String environmentId = UUID.randomUUID().toString();
-            Topology topology =
-                    new Topology( blueprint.getName(), environmentId, blueprint.getCidr(), blueprint.getSshKey() );
+            Environment environment = environmentManager.createEnvironment( blueprint, false );
 
-            for ( NodeGroup nodeGroup : blueprint.getNodeGroups() )
-            {
-                Peer peer = peerManager.getPeer( nodeGroup.getPeerId() );
-                topology.addNodeGroupPlacement( peer, nodeGroup );
-            }
+            Response response = Response.ok( environment.getEnvironmentId() ).build();
 
-            /*Environment environment = */
-            environmentManager.createEnvironment( blueprint, false );
+            return response;
         }
         catch ( EnvironmentCreationException e )
         {
             LOG.error( "Error creating environment #createEnvironment", e );
-            Response response = Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+            Response response = Response.serverError().entity( new ErrorDto( e.getMessage() ) ).build();
             throw new WebApplicationException( response );
         }
     }
@@ -197,8 +187,8 @@ public class RestServiceImpl implements RestService
     {
         if ( Strings.isNullOrEmpty( containerId ) )
         {
-            return Response.status( Response.Status.BAD_REQUEST )
-                           .entity( JsonUtil.toJson( ERROR_KEY, "Invalid container id" ) ).build();
+            return Response.status( Response.Status.BAD_REQUEST ).entity( new ErrorDto( "Invalid container id" ) )
+                           .build();
         }
 
 
@@ -226,16 +216,16 @@ public class RestServiceImpl implements RestService
 
         Set<Environment> environments = environmentManager.getEnvironments();
 
-        Set<EnvironmentJson> environmentJsons = Sets.newHashSet();
+        Set<EnvironmentDto> environmentDtos = Sets.newHashSet();
 
         for ( Environment environment : environments )
         {
-            environmentJsons
-                    .add( new EnvironmentJson( environment.getId(), environment.getName(), environment.getStatus(),
+            environmentDtos
+                    .add( new EnvironmentDto( environment.getId(), environment.getName(), environment.getStatus(),
                             convertContainersToContainerJson( environment.getContainerHosts() ) ) );
         }
 
-        return Response.ok( JsonUtil.toJson( environmentJsons ) ).build();
+        return Response.ok( environmentDtos ).build();
     }
 
 
@@ -244,8 +234,10 @@ public class RestServiceImpl implements RestService
     {
         if ( Strings.isNullOrEmpty( environmentId ) )
         {
-            return Response.status( Response.Status.BAD_REQUEST )
-                           .entity( JsonUtil.toJson( ERROR_KEY, "Invalid environment id" ) ).build();
+            Response response =
+                    Response.status( Response.Status.BAD_REQUEST ).entity( new ErrorDto( "Invalid environment id" ) )
+                            .build();
+            return response;
         }
 
 
@@ -253,14 +245,16 @@ public class RestServiceImpl implements RestService
         {
             Environment environment = environmentManager.loadEnvironment( environmentId );
 
-            return Response.ok( JsonUtil.toJson(
-                    new EnvironmentJson( environment.getId(), environment.getName(), environment.getStatus(),
-                            convertContainersToContainerJson( environment.getContainerHosts() ) ) ) ).build();
+            Response response = Response.ok(
+                    new EnvironmentDto( environment.getId(), environment.getName(), environment.getStatus(),
+                            convertContainersToContainerJson( environment.getContainerHosts() ) ) ).build();
+            return response;
         }
         catch ( EnvironmentNotFoundException e )
         {
             LOG.warn( "Error getting environment by id", environmentId );
-            return Response.status( Response.Status.NOT_FOUND ).build();
+            Response response = Response.status( Response.Status.NOT_FOUND ).build();
+            return response;
         }
     }
 
@@ -270,8 +264,8 @@ public class RestServiceImpl implements RestService
     {
         if ( Strings.isNullOrEmpty( environmentId ) )
         {
-            return Response.status( Response.Status.BAD_REQUEST )
-                           .entity( JsonUtil.toJson( ERROR_KEY, "Invalid environment id" ) ).build();
+            return Response.status( Response.Status.BAD_REQUEST ).entity( new ErrorDto( "Invalid environment id" ) )
+                           .build();
         }
 
 
@@ -289,7 +283,7 @@ public class RestServiceImpl implements RestService
         catch ( EnvironmentDestructionException e )
         {
             LOG.error( "Error destroying environment #destroyEnvironment", e );
-            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+            return Response.serverError().entity( new ErrorDto( e.getMessage() ) ).build();
         }
     }
 
@@ -299,8 +293,8 @@ public class RestServiceImpl implements RestService
     {
         if ( Strings.isNullOrEmpty( containerId ) )
         {
-            return Response.status( Response.Status.BAD_REQUEST )
-                           .entity( JsonUtil.toJson( ERROR_KEY, "Invalid container id" ) ).build();
+            return Response.status( Response.Status.BAD_REQUEST ).entity( new ErrorDto( "Invalid container id" ) )
+                           .build();
         }
 
         Environment environment = findEnvironmentByContainerId( containerId );
@@ -318,7 +312,7 @@ public class RestServiceImpl implements RestService
             catch ( ContainerHostNotFoundException | EnvironmentNotFoundException | EnvironmentModificationException e )
             {
                 LOG.error( "Error destroying container #destroyContainer", e );
-                return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+                return Response.serverError().entity( new ErrorDto( e.getMessage() ) ).build();
             }
         }
 
@@ -354,14 +348,15 @@ public class RestServiceImpl implements RestService
             Preconditions.checkNotNull( blueprint.getNodeGroups() );
             Preconditions.checkArgument( blueprint.getNodeGroups().size() > 0, "Nodegroup size must be great than 0" );
             Preconditions.checkArgument( !Strings.isNullOrEmpty( blueprint.getName() ), "Invalid blueprint name" );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( blueprint.getCidr() ), "Invalid subnet cidr" );
+            //            Preconditions.checkArgument( !Strings.isNullOrEmpty( blueprint.getCidr() ), "Invalid subnet
+            // cidr" );
             checkBlueprint( blueprint );
         }
         catch ( Exception e )
         {
             LOG.error( "Error validating parameters #growEnvironment", e );
-            Response response = Response.status( Response.Status.BAD_REQUEST )
-                                        .entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+            Response response =
+                    Response.status( Response.Status.BAD_REQUEST ).entity( new ErrorDto( e.getMessage() ) ).build();
 
             throw new WebApplicationException( response );
         }
@@ -369,7 +364,7 @@ public class RestServiceImpl implements RestService
         try
         {
             /*Set<EnvironmentContainerHost> newContainers = */
-            environmentManager.growEnvironment( blueprint, false );
+            environmentManager.growEnvironment( environmentId, blueprint, false );
 
             //            return Response.ok( JsonUtil.toJson( convertContainersToContainerJson( newContainers ) ) )
             // .build();
@@ -383,7 +378,7 @@ public class RestServiceImpl implements RestService
         catch ( EnvironmentModificationException e )
         {
             LOG.error( "Error modifying environment #growEnvironment", e );
-            Response response = Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+            Response response = Response.serverError().entity( new ErrorDto( e.getMessage() ) ).build();
             throw new WebApplicationException( response );
         }
     }
@@ -394,8 +389,8 @@ public class RestServiceImpl implements RestService
     {
         if ( Strings.isNullOrEmpty( containerId ) )
         {
-            return Response.status( Response.Status.BAD_REQUEST )
-                           .entity( JsonUtil.toJson( ERROR_KEY, "Invalid container id" ) ).build();
+            return Response.status( Response.Status.BAD_REQUEST ).entity( new ErrorDto( "Invalid container id" ) )
+                           .build();
         }
 
 
@@ -407,12 +402,12 @@ public class RestServiceImpl implements RestService
             {
                 ContainerHost containerHost = environment.getContainerHostById( containerId );
 
-                return Response.ok().entity( JsonUtil.toJson( "STATE", containerHost.getStatus() ) ).build();
+                return Response.ok( new ContainerStateDto( containerHost.getStatus() ) ).build();
             }
             catch ( ContainerHostNotFoundException e )
             {
                 LOG.error( "Error getting container state", e );
-                return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+                return Response.serverError().entity( new ErrorDto( e.getMessage() ) ).build();
             }
         }
 
@@ -425,8 +420,8 @@ public class RestServiceImpl implements RestService
     {
         if ( Strings.isNullOrEmpty( containerId ) )
         {
-            return Response.status( Response.Status.BAD_REQUEST )
-                           .entity( JsonUtil.toJson( ERROR_KEY, "Invalid container id" ) ).build();
+            return Response.status( Response.Status.BAD_REQUEST ).entity( new ErrorDto( "Invalid container id" ) )
+                           .build();
         }
 
 
@@ -445,7 +440,7 @@ public class RestServiceImpl implements RestService
             catch ( ContainerHostNotFoundException | PeerException e )
             {
                 LOG.error( "Exception starting container host", e );
-                return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+                return Response.serverError().entity( new ErrorDto( e.getMessage() ) ).build();
             }
         }
 
@@ -458,8 +453,8 @@ public class RestServiceImpl implements RestService
     {
         if ( Strings.isNullOrEmpty( containerId ) )
         {
-            return Response.status( Response.Status.BAD_REQUEST )
-                           .entity( JsonUtil.toJson( ERROR_KEY, "Invalid container id" ) ).build();
+            return Response.status( Response.Status.BAD_REQUEST ).entity( new ErrorDto( "Invalid container id" ) )
+                           .build();
         }
 
 
@@ -478,7 +473,7 @@ public class RestServiceImpl implements RestService
             catch ( ContainerHostNotFoundException | PeerException e )
             {
                 LOG.error( "Exception stopping container host", e );
-                return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+                return Response.serverError().entity( new ErrorDto( e.getMessage() ) ).build();
             }
         }
 
@@ -491,13 +486,12 @@ public class RestServiceImpl implements RestService
     {
         if ( Strings.isNullOrEmpty( environmentId ) )
         {
-            return Response.status( Response.Status.BAD_REQUEST )
-                           .entity( JsonUtil.toJson( ERROR_KEY, "Invalid environment id" ) ).build();
+            return Response.status( Response.Status.BAD_REQUEST ).entity( new ErrorDto( "Invalid environment id" ) )
+                           .build();
         }
         else if ( Strings.isNullOrEmpty( key ) )
         {
-            return Response.status( Response.Status.BAD_REQUEST )
-                           .entity( JsonUtil.toJson( ERROR_KEY, "Invalid ssh key" ) ).build();
+            return Response.status( Response.Status.BAD_REQUEST ).entity( new ErrorDto( "Invalid ssh key" ) ).build();
         }
 
 
@@ -515,7 +509,7 @@ public class RestServiceImpl implements RestService
         catch ( EnvironmentModificationException e )
         {
             LOG.error( "Environment modification failed", e );
-            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+            return Response.serverError().entity( new ErrorDto( e.getMessage() ) ).build();
         }
     }
 
@@ -525,8 +519,8 @@ public class RestServiceImpl implements RestService
     {
         if ( Strings.isNullOrEmpty( environmentId ) )
         {
-            return Response.status( Response.Status.BAD_REQUEST )
-                           .entity( JsonUtil.toJson( ERROR_KEY, "Invalid environment id" ) ).build();
+            return Response.status( Response.Status.BAD_REQUEST ).entity( new ErrorDto( "Invalid environment id" ) )
+                           .build();
         }
 
 
@@ -544,20 +538,20 @@ public class RestServiceImpl implements RestService
         catch ( EnvironmentModificationException e )
         {
             LOG.error( "Error modifying environment", e );
-            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+            return Response.serverError().entity( new ErrorDto( e.getMessage() ) ).build();
         }
     }
 
 
-    private Set<ContainerJson> convertContainersToContainerJson( Set<EnvironmentContainerHost> containerHosts )
+    private Set<ContainerDto> convertContainersToContainerJson( Set<EnvironmentContainerHost> containerHosts )
     {
-        Set<ContainerJson> jsonSet = Sets.newHashSet();
+        Set<ContainerDto> jsonSet = Sets.newHashSet();
         for ( EnvironmentContainerHost containerHost : containerHosts )
         {
             ContainerHostState state = containerHost.getStatus();
 
 
-            jsonSet.add( new ContainerJson( containerHost.getId(), containerHost.getEnvironmentId(),
+            jsonSet.add( new ContainerDto( containerHost.getId(), containerHost.getEnvironmentId(),
                     containerHost.getHostname(), state,
                     containerHost.getIpByInterfaceName( Common.DEFAULT_CONTAINER_INTERFACE ),
                     containerHost.getTemplateName() ) );
