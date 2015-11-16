@@ -574,7 +574,6 @@
         <version>${project.version}</version>
       </dependency>
 
-
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!--Internal karaf dependencies-->
       <dependency>
@@ -905,6 +904,13 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>webui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>webui</artifactId>
+        <classifier>classes</classifier>
         <version>${project.version}</version>
       </dependency>
 

@@ -423,6 +423,7 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>webui</artifactId>
+      <classifier>classes</classifier>
     </dependency>
 
     <!--JMX-HTTP manager-->
