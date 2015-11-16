@@ -386,4 +386,14 @@ public class IdentityDataServiceImpl implements IdentityDataService
         userTokenDAOService.remove( token );
     }
 
+
+    /* *************************************************
+     *
+     */
+    @Override
+    public void removeInvalidTokens()
+    {
+        userTokenDAOService.removeInvalid();
+    }
+
 }
