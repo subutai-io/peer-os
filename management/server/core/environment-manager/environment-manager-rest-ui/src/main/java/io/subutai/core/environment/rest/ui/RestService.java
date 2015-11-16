@@ -61,7 +61,7 @@ public interface RestService
 
     @POST
     @Path( "grow" )
-    Response growEnvironment( @FormParam( "blueprint_json" ) String blueprintJson );
+    Response growEnvironment( @FormParam( "enviroupmentId" ) String enviroupmentId, @FormParam( "blueprint_json" ) String blueprintJson );
 
     @DELETE
     @Path( "{environmentId}" )

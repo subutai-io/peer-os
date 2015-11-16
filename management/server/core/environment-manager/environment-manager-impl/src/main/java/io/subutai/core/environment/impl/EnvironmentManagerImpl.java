@@ -659,9 +659,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         User activeUser = identityManager.getActiveUser();
 
-        final boolean deleteAll = identityManager
-                .isUserPermitted( activeUser, PermissionObject.EnvironmentManagement, PermissionScope.ALL_SCOPE,
-                        PermissionOperation.Delete );
+//        final boolean deleteAll = identityManager
+//                .isUserPermitted( activeUser, PermissionObject.EnvironmentManagement, PermissionScope.ALL_SCOPE,
+//                        PermissionOperation.Delete ); @todo frontend
+        boolean deleteAll = true;
 
         if ( deleteAll || environment.getUserId().equals( activeUser.getId() ) )
         {
@@ -681,9 +682,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     {
         User activeUser = identityManager.getActiveUser();
 
-        final boolean viewAll = identityManager
-                .isUserPermitted( activeUser, PermissionObject.EnvironmentManagement, PermissionScope.ALL_SCOPE,
-                        PermissionOperation.Read );
+//        final boolean viewAll = identityManager
+//                .isUserPermitted( activeUser, PermissionObject.EnvironmentManagement, PermissionScope.ALL_SCOPE,
+//                        PermissionOperation.Read ); @todo frontend change
+        boolean viewAll = true;
 
 
         Set<Environment> environments = new HashSet<>();
@@ -1178,7 +1180,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         EnvironmentImpl environment =
                 new EnvironmentImpl( name, subnetCidr, sshKey, getUserId(), peerManager.getLocalPeerInfo().getId() );
 
-        environment.setUserId( identityManager.getActiveUser().getId() );
+        environment.setUserId( 1L ); // identityManager.getActiveUser().getId() @todo frontend
         environment = saveOrUpdate( environment );
 
         setEnvironmentTransientFields( environment );

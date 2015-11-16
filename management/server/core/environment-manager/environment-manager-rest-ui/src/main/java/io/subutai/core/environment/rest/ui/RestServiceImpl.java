@@ -2,6 +2,7 @@ package io.subutai.core.environment.rest.ui;
 
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
 
@@ -24,6 +25,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
 
 import io.subutai.common.host.ContainerHostState;
@@ -76,12 +78,10 @@ public class RestServiceImpl implements RestService
     @Override
     public Response listTemplates()
     {
-        List<String> templates = new ArrayList<>();
+        List<String> templates = templateRegistry.getAllTemplates().stream()
+                                                 .map( t -> t.getTemplateName() )
+                                                 .collect( Collectors.toList() );
 
-        for ( Template template : templateRegistry.getAllTemplates() )
-        {
-            templates.add( template.getTemplateName() );
-        }
         if ( !templates.isEmpty() )
         {
             return Response.ok().entity( JsonUtil.toJson( templates ) ).build();
@@ -99,7 +99,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            return Response.ok( JsonUtil.toJson( environmentManager.getBlueprints())).build();
+            return Response.ok( JsonUtil.toJson( environmentManager.getBlueprints()) ).build();
         }
         catch (EnvironmentManagerException e )
         {
@@ -132,25 +132,10 @@ public class RestServiceImpl implements RestService
 
             for ( NodeGroup nodeGroup : blueprint.getNodeGroups() )
             {
-                if ( Strings.isNullOrEmpty( nodeGroup.getName() ) )
+                if ( nodeGroup.getNumberOfContainers() <= 0 )
                 {
                     return Response.status( Response.Status.BAD_REQUEST )
-                                   .entity( JsonUtil.toJson( ERROR_KEY, "Invalid node group name" ) ).build();
-                }
-                else if ( nodeGroup.getNumberOfContainers() <= 0 )
-                {
-                    return Response.status( Response.Status.BAD_REQUEST )
-                                   .entity(JsonUtil.toJson(ERROR_KEY, "Invalid number of containers")).build();
-                }
-                else if ( Strings.isNullOrEmpty( nodeGroup.getTemplateName() ) )
-                {
-                    return Response.status( Response.Status.BAD_REQUEST )
-                                   .entity(JsonUtil.toJson(ERROR_KEY, "Invalid templateName")).build();
-                }
-                else if ( nodeGroup.getType() == null )
-                {
-                    return Response.status( Response.Status.BAD_REQUEST )
-                                   .entity(JsonUtil.toJson(ERROR_KEY, "Invalid container type")).build();
+                                   .entity(JsonUtil.toJson(ERROR_KEY, "You must specify at least 1 container")).build();
                 }
             }
 
@@ -166,7 +151,7 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOG.error( "Error validating blueprint", e );
-            return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) )
+            return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( ERROR_KEY, e.getMessage()))
                     .build();
         }
     }
@@ -232,7 +217,7 @@ public class RestServiceImpl implements RestService
             LOG.error( "Error creating environment #createEnvironment", e );
             return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
         }
-        catch ( Exception e )
+        catch ( JsonParseException e )
         {
             LOG.error( "Error validating parameters #createEnvironment", e );
             return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) )
@@ -242,17 +227,11 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response growEnvironment( final String blueprintJson )
+    public Response growEnvironment( final String enviroupmentId, final String blueprintJson )
     {
         try
         {
             Blueprint blueprint = gson.fromJson( blueprintJson, Blueprint.class );
-
-            if( blueprint.getEnvironmentId() == null )
-            {
-                LOG.error( "Error validating parameters #growEnvironment" );
-                return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, "Error validating parameters #growEnvironment" ) ).build();
-            }
 
             Environment environment =
                     environmentManager.createEnvironment( blueprint, false );
