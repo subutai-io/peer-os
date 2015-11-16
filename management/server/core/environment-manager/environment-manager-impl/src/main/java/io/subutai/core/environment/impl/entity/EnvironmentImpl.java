@@ -546,4 +546,10 @@ public class EnvironmentImpl implements Environment, Serializable
         }
         return envId;
     }
+
+
+    public void setUserId( final Long userId )
+    {
+        this.userId = userId;
+    }
 }

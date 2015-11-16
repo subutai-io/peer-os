@@ -41,6 +41,9 @@ import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.security.objects.PermissionObject;
+import io.subutai.common.security.objects.PermissionOperation;
+import io.subutai.common.security.objects.PermissionScope;
 import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.ExceptionUtil;
@@ -651,27 +654,25 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     @Override
     public Set<Environment> getEnvironments()
     {
-        Set<Environment> environments = Sets.newHashSet();
-        environments.addAll( environmentDataService.getAll() );
+        User activeUser = identityManager.getActiveUser();
 
-        for ( Environment environment : environments )
-        {
-            setEnvironmentTransientFields( environment );
-            setContainersTransientFields( environment );
-        }
+        final boolean viewAll = identityManager
+                .isUserPermitted( activeUser, PermissionObject.EnvironmentManagement, PermissionScope.ALL_SCOPE,
+                        PermissionOperation.Read );
 
-        if ( !isUserAdmin() )
+
+        Set<Environment> environments = new HashSet<>();
+        for ( Environment environment : environmentDataService.getAll() )
         {
-            Long userId = getUserId();
-            for ( Iterator<Environment> iterator = environments.iterator(); iterator.hasNext(); )
+            if ( viewAll || environment.getUserId().equals( activeUser.getId() ) )
             {
-                final Environment environment = iterator.next();
-                if ( !Objects.equals( environment.getUserId(), userId ) )
-                {
-                    iterator.remove();
-                }
+                environments.add( environment );
+
+                setEnvironmentTransientFields( environment );
+                setContainersTransientFields( environment );
             }
         }
+
 
         return environments;
     }
@@ -1152,6 +1153,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         EnvironmentImpl environment =
                 new EnvironmentImpl( name, subnetCidr, sshKey, getUserId(), peerManager.getLocalPeerInfo().getId() );
 
+        environment.setUserId( identityManager.getActiveUser().getId() );
         environment = saveOrUpdate( environment );
 
         setEnvironmentTransientFields( environment );

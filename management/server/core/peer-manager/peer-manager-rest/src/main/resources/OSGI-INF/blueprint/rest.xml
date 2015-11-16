@@ -12,7 +12,7 @@
   </cxf:bus>
 
 
-  <jaxrs:server address="/v1/registration" id="registrationService">
+  <jaxrs:server address="/v1/handshake" id="registrationService">
     <jaxrs:serviceBeans>
       <ref component-id="registrationServiceImpl" />
     </jaxrs:serviceBeans>
