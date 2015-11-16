@@ -11,7 +11,7 @@ import java.util.List;
 
 
 @Entity
-@Table( name = "role_permission" )
+@Table( name = "role_permissions" )
 @Access( AccessType.FIELD )
 public class RolePermissionEntity implements RolePermission
 {
