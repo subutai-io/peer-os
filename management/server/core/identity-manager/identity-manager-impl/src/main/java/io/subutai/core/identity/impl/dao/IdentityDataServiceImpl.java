@@ -98,19 +98,6 @@ public class IdentityDataServiceImpl implements IdentityDataService
 
 
     /* *************************************************
-     *
-     */
-    @Override
-    public void removeUserAllRoles( long userId )
-    {
-        User user = userDAOService.find( userId );
-
-        user.getRoles().clear();
-        userDAOService.update( user );
-    }
-
-
-    /* *************************************************
      */
     @Override
     public List<User> getAllUsers()

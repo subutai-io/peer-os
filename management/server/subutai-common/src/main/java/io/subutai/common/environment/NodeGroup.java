@@ -24,9 +24,12 @@ public class NodeGroup
     @GsonRequired
     private int numberOfContainers;
 
+    @GsonRequired
     private int sshGroupId;
+    @GsonRequired
     private int hostsGroupId;
     private PlacementStrategy containerPlacementStrategy;
+    @GsonRequired
     private String peerId;
     private String hostId;
     private ContainerDistributionType containerDistributionType = ContainerDistributionType.AUTO;

@@ -214,42 +214,14 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response createEnvironment( final String environmentName, final String topologyJsonString,
-                                       final String subnetCidr, final String sshKey )
+    public Response createEnvironment( final String blueprintJson )
     {
-        TopologyJson topologyJson = new TopologyJson();
-
-        //validate params
         try
         {
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentName ), "Invalid environment name" );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( subnetCidr ), "Invalid subnet cidr" );
-
-            topologyJson.setNodeGroupPlacement((Map<String, Set<NodeGroup>>) JsonUtil.fromJson( topologyJsonString, new TypeToken<Map<String, Set<NodeGroup>>>(){}.getType()));
-            checkTopology( topologyJson );
-        }
-        catch ( Exception e )
-        {
-            LOG.error( "Error validating parameters #createEnvironment", e );
-            return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) )
-                           .build();
-        }
-
-        try
-        {
-            Topology topology = new Topology();
-
-            for ( Map.Entry<String, Set<NodeGroup>> placementEntry : topologyJson.getNodeGroupPlacement().entrySet() )
-            {
-                Peer peer = peerManager.getPeer( placementEntry.getKey() );
-                for ( NodeGroup nodeGroup : placementEntry.getValue() )
-                {
-                    topology.addNodeGroupPlacement( peer, nodeGroup );
-                }
-            }
+            Blueprint blueprint = gson.fromJson( blueprintJson, Blueprint.class );
 
             Environment environment =
-                    environmentManager.createEnvironment( environmentName, topology, subnetCidr, sshKey, false );
+                    environmentManager.createEnvironment( blueprint, false );
 
             return Response.ok( JsonUtil.toJson(
                     new EnvironmentJson( environment.getId(), environment.getName(), environment.getStatus(),
@@ -260,49 +232,45 @@ public class RestServiceImpl implements RestService
             LOG.error( "Error creating environment #createEnvironment", e );
             return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
         }
+        catch ( Exception e )
+        {
+            LOG.error( "Error validating parameters #createEnvironment", e );
+            return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) )
+                           .build();
+        }
     }
 
 
     @Override
-    public Response growEnvironment( final String environmentId, final String topologyJsonString )
+    public Response growEnvironment( final String blueprintJson )
     {
-        if ( Strings.isNullOrEmpty( environmentId ) )
-        {
-            return Response.status( Response.Status.BAD_REQUEST )
-                           .entity( JsonUtil.toJson( ERROR_KEY, "Invalid environment id" ) ).build();
-        }
-
-        TopologyJson topologyJson = new TopologyJson();
-
         try
         {
-            topologyJson.setNodeGroupPlacement((Map<String, Set<NodeGroup>>) JsonUtil.fromJson( topologyJsonString, new TypeToken<Map<String, Set<NodeGroup>>>(){}.getType()));
-            checkTopology( topologyJson );
+            Blueprint blueprint = gson.fromJson( blueprintJson, Blueprint.class );
+
+            if( blueprint.getEnvironmentId() == null )
+            {
+                LOG.error( "Error validating parameters #growEnvironment" );
+                return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, "Error validating parameters #growEnvironment" ) ).build();
+            }
+
+            Environment environment =
+                    environmentManager.createEnvironment( blueprint, false );
+
+            return Response.ok( JsonUtil.toJson(
+                    new EnvironmentJson( environment.getId(), environment.getName(), environment.getStatus(),
+                            convertContainersToContainerJson( environment.getContainerHosts() ) ) ) ).build();
+        }
+        catch ( EnvironmentCreationException e )
+        {
+            LOG.error( "Error creating environment #growEnvironment", e );
+            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
         }
         catch ( Exception e )
         {
-            LOG.error( "Error validating topology #growEnvironment", e );
+            LOG.error( "Error validating parameters #growEnvironment", e );
             return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) )
                            .build();
-        }
-
-        try
-        {
-            Topology topology = buildTopology( topologyJson );
-
-            Set<EnvironmentContainerHost> newContainers = environmentManager.growEnvironment( environmentId, topology, false );
-
-            return Response.ok( JsonUtil.toJson( convertContainersToContainerJson( newContainers ) ) ).build();
-        }
-        catch ( EnvironmentNotFoundException e )
-        {
-            LOG.warn( "Error looking for environment by id {}", environmentId );
-            return Response.status( Response.Status.NOT_FOUND ).build();
-        }
-        catch ( EnvironmentModificationException e )
-        {
-            LOG.error( "Error modifying environment #growEnvironment", e );
-            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
         }
     }
 
@@ -810,76 +778,5 @@ public class RestServiceImpl implements RestService
     public Response listPlacementStrategies()
     {
         return Response.ok( JsonUtil.toJson( strategyManager.getPlacementStrategyTitles() ) ).build();
-    }
-
-
-    private Topology buildTopology( final TopologyJson topologyJson )
-    {
-        Topology topology = new Topology();
-        for ( Map.Entry<String, Set<NodeGroup>> placementEntry : topologyJson.getNodeGroupPlacement().entrySet() )
-        {
-            Peer peer = peerManager.getPeer( placementEntry.getKey() );
-            for ( NodeGroup nodeGroup : placementEntry.getValue() )
-            {
-                topology.addNodeGroupPlacement( peer, nodeGroup );
-            }
-        }
-        return topology;
-    }
-
-    private void checkTopology( TopologyJson topologyJson ) throws EnvironmentCreationException
-    {
-
-        if ( topologyJson.getNodeGroupPlacement() == null || topologyJson.getNodeGroupPlacement().isEmpty() )
-        {
-            throw new EnvironmentCreationException( "Invalid node group placement" );
-        }
-        else
-        {
-            for ( Map.Entry<String, Set<NodeGroup>> placementKey : topologyJson.getNodeGroupPlacement().entrySet() )
-            {
-                checkNodeGroup( placementKey );
-            }
-        }
-    }
-
-
-    private void checkNodeGroup( final Map.Entry<String, Set<NodeGroup>> placementKey )
-            throws EnvironmentCreationException
-    {
-        String peerId = placementKey.getKey();
-        Set<NodeGroup> nodeGroups = placementKey.getValue();
-        if ( peerId == null )
-        {
-            throw new EnvironmentCreationException( "Invalid peer id" );
-        }
-        else if ( peerManager.getPeer( peerId ) == null )
-        {
-            throw new EnvironmentCreationException( String.format( "Peer %s not found", peerId ) );
-        }
-        for ( NodeGroup nodeGroup : nodeGroups )
-        {
-            if ( Strings.isNullOrEmpty( nodeGroup.getName() ) )
-            {
-                throw new EnvironmentCreationException( "Invalid node group name" );
-            }
-            else if ( nodeGroup.getNumberOfContainers() <= 0 )
-            {
-                throw new EnvironmentCreationException( "Invalid number of containers" );
-            }
-            else if ( Strings.isNullOrEmpty( nodeGroup.getTemplateName() ) )
-            {
-                throw new EnvironmentCreationException( "Invalid templateName" );
-            }
-            else if ( templateRegistry.getTemplate( nodeGroup.getTemplateName() ) == null )
-            {
-                throw new EnvironmentCreationException(
-                        String.format( "Template %s does not exist", nodeGroup.getTemplateName() ) );
-            }
-            else if ( nodeGroup.getContainerPlacementStrategy() == null )
-            {
-                throw new EnvironmentCreationException( "Invalid node container placement strategy" );
-            }
-        }
     }
 }

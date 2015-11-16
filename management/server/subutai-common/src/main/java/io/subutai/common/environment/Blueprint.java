@@ -38,11 +38,13 @@ public class Blueprint
     @JsonProperty( "sshKey" )
     private String sshKey;
     @JsonProperty( "nodegroups" )
+    @GsonRequired
     private Set<NodeGroup> nodeGroups;
 
 
     public Blueprint( @JsonProperty( "environmentId" ) final String environmentId,
-                      @JsonProperty( "name" ) final String name, @JsonProperty( "cidr" ) final String cidr,
+                      @JsonProperty( "name" ) final String name,
+                      @JsonProperty( "cidr" ) final String cidr,
                       @JsonProperty( "sshKey" ) final String sshKey,
                       @JsonProperty( "nodegroups" ) final Set<NodeGroup> nodeGroups )
     {

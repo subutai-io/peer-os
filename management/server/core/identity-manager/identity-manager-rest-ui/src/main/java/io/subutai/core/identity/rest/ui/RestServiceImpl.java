@@ -3,6 +3,7 @@ package io.subutai.core.identity.rest.ui;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.gson.reflect.TypeToken;
 import io.subutai.common.security.objects.UserType;
 import io.subutai.core.identity.api.*;
@@ -17,6 +18,8 @@ import io.subutai.core.identity.rest.ui.PermissionJson;
 
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class RestServiceImpl implements RestService
@@ -111,15 +114,12 @@ public class RestServiceImpl implements RestService
             }
 
             if(!Strings.isNullOrEmpty(rolesJson)) {
-                ArrayList<Long> roles = jsonUtil.fromJson(
+                List<Long> roleIds = jsonUtil.fromJson(
                     rolesJson, new TypeToken<ArrayList<Long>>() {}.getType()
                 );
 
-                identityManager.removeUserAllRoles(newUser.getId());
-                for (Long roleId : roles) {
-                    Role role = identityManager.getRole(roleId);
-                    identityManager.assignUserRole(newUser.getId(), role);
-                }
+
+                newUser.setRoles( roleIds.stream().map( r -> identityManager.getRole(r) ).collect( Collectors.toList() ) );
             }
             identityManager.updateUser(newUser);
 
@@ -168,18 +168,15 @@ public class RestServiceImpl implements RestService
                     permissionJson, new TypeToken<ArrayList<PermissionJson>>() {}.getType()
                 );
 
-                identityManager.removeAllRolePermissions(role.getId());
-                for(PermissionJson permission : permissions) {
-                    Permission newPermission = identityManager.createPermission(
-                        permission.getObject(),
-                        permission.getScope(),
-                        permission.getRead(),
-                        permission.getWrite(),
-                        permission.getUpdate(),
-                        permission.getDelete()
-                    );
-                    identityManager.assignRolePermission(role.getId(), newPermission);
-                }
+
+                role.setPermissions( permissions.stream().map( p -> identityManager.createPermission(
+                        p.getObject(),
+                        p.getScope(),
+                        p.getRead(),
+                        p.getWrite(),
+                        p.getUpdate(),
+                        p.getDelete()
+                        ) ).collect( Collectors.toList() ) );
             }
 
             identityManager.updateRole(role);

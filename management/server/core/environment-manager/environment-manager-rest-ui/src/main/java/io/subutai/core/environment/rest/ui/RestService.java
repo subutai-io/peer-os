@@ -57,14 +57,11 @@ public interface RestService
 
 
     @POST
-    Response createEnvironment( @FormParam( "name" ) String environmentName,
-                                       @FormParam( "topology" ) String topologyJsonString,
-                                       @FormParam( "subnet" ) String subnetCidr, @FormParam( "key" ) String sshKey );
+    Response createEnvironment( @FormParam( "blueprint_json" ) String blueprintJson );
 
     @POST
     @Path( "grow" )
-    Response growEnvironment( @FormParam( "environmentId" ) String environmentId,
-                                     @FormParam( "topology" ) String topologyJsonString );
+    Response growEnvironment( @FormParam( "blueprint_json" ) String blueprintJson );
 
     @DELETE
     @Path( "{environmentId}" )

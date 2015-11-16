@@ -99,11 +99,6 @@ public interface IdentityManager
 
     /* *************************************************
      */
-    void removeUserAllRoles( long userId );
-
-
-    /* *************************************************
-     */
     boolean changeUserPassword( long userId, String oldPassword, String newPassword );
 
 
