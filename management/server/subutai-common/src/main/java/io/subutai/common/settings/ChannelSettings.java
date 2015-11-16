@@ -21,10 +21,10 @@ public class ChannelSettings
                 "/rest/v1/peer/id",
                 "/rest/v1/pks/{$}",
                 "/rest/v1/security/keyman/getpublickeyring",
-                "/rest/v1/registration/register",
-                "/rest/v1/registration/approve",
-                "/rest/v1/registration/cancel",
-                "/rest/v1/registration/reject"
+                "/rest/v1/handshake/register",
+                "/rest/v1/handshake/approve",
+                "/rest/v1/handshake/cancel",
+                "/rest/v1/handshake/reject"
 
         };
 
