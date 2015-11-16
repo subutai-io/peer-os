@@ -1,6 +1,7 @@
 package io.subutai.core.environment.impl;
 
 
+import java.security.AccessControlException;
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -563,6 +564,18 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId, checkAccess );
 
+        User activeUser = identityManager.getActiveUser();
+
+        final boolean deleteAll = identityManager
+                .isUserPermitted( activeUser, PermissionObject.EnvironmentManagement, PermissionScope.ALL_SCOPE,
+                        PermissionOperation.Delete );
+
+        if (!( deleteAll || environment.getUserId().equals( activeUser.getId() ) ))
+        {
+            throw new AccessControlException( "You have not enough permissions." );
+        }
+
+
         if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
         {
             operationTracker.addLogFailed( String.format( "Environment status is %s", environment.getStatus() ) );
@@ -644,9 +657,21 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         Environment environment = loadEnvironment( environmentId, checkAccess );
 
-        environmentDataService.remove( ( EnvironmentImpl ) environment );
+        User activeUser = identityManager.getActiveUser();
 
-        notifyOnEnvironmentDestroyed( environmentId );
+        final boolean deleteAll = identityManager
+                .isUserPermitted( activeUser, PermissionObject.EnvironmentManagement, PermissionScope.ALL_SCOPE,
+                        PermissionOperation.Delete );
+
+        if ( deleteAll || environment.getUserId().equals( activeUser.getId() ) )
+        {
+            environmentDataService.remove( ( EnvironmentImpl ) environment );
+            notifyOnEnvironmentDestroyed( environmentId );
+        }
+        else
+        {
+            throw new AccessControlException( "You have not enough permissions." );
+        }
     }
 
 
