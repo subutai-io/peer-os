@@ -86,7 +86,7 @@ public class CommandProcessor implements ByteMessageListener
 
             LOG.info( String.format( "Sending:%n%s", command ) );
 
-            broker.sendTextMessage( targetHost.getId().toString(), command );
+            broker.sendTextMessage( targetHost.getId(), command );
         }
         catch ( Exception e )
         {
