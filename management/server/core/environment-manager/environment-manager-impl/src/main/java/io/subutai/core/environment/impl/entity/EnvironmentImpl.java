@@ -308,12 +308,12 @@ public class EnvironmentImpl implements Environment, Serializable
 
 
     @Override
-    public Set<EnvironmentContainerHost> growEnvironment( final Blueprint blueprint, boolean async )
+    public Set<EnvironmentContainerHost> growEnvironment( final String environmentId, final Blueprint blueprint, boolean async )
             throws EnvironmentModificationException
     {
         try
         {
-            return environmentManager.growEnvironment( blueprint, async );
+            return environmentManager.growEnvironment( environmentId,blueprint, async );
         }
         catch ( EnvironmentNotFoundException e )
         {
@@ -545,5 +545,11 @@ public class EnvironmentImpl implements Environment, Serializable
             envId = new EnvironmentId( environmentId );
         }
         return envId;
+    }
+
+
+    public void setUserId( final Long userId )
+    {
+        this.userId = userId;
     }
 }

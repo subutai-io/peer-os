@@ -9,7 +9,6 @@ import java.util.UUID;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
@@ -20,7 +19,6 @@ import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Slider;
 import com.vaadin.ui.Table;
-import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
@@ -40,14 +38,14 @@ import io.subutai.core.strategy.api.StrategyManager;
 
 public class TopologyWindow extends Window
 {
-    private static final String DEFAULT_SUBNET_CIDR = "192.168.1.2/24";
+//    private static final String DEFAULT_SUBNET_CIDR = "192.168.1.2/24";
     private final Blueprint blueprint;
     private final PeerManager peerManager;
     private final StrategyManager strategyManager;
     private Table placementTable;
     private Button buildBtn;
     private ComboBox envCombo;
-    private TextField subnetTxt;
+//    private TextField subnetTxt;
 
 
     public TopologyWindow( final Blueprint blueprint, final PeerManager peerManager,
@@ -109,14 +107,14 @@ public class TopologyWindow extends Window
             }
             content.addComponent( envCombo );
         }
-        else
-        {
-            subnetTxt = new TextField( "Subnet CIDR" );
-            subnetTxt.setId( "subnetTxt" );
-            subnetTxt.setImmediate( true );
-            subnetTxt.setValue( DEFAULT_SUBNET_CIDR );
-            content.addComponent( subnetTxt );
-        }
+//        else
+//        {
+//            subnetTxt = new TextField( "Subnet CIDR" );
+//            subnetTxt.setId( "subnetTxt" );
+//            subnetTxt.setImmediate( true );
+//            subnetTxt.setValue( DEFAULT_SUBNET_CIDR );
+//            content.addComponent( subnetTxt );
+//        }
         content.addComponent( buildBtn );
         content.setComponentAlignment( buildBtn, Alignment.TOP_RIGHT );
 
@@ -136,10 +134,10 @@ public class TopologyWindow extends Window
         {
             Notification.show( "Please, select environment to grow" );
         }
-        else if ( !grow && Strings.isNullOrEmpty( subnetTxt.getValue() ) )
-        {
-            Notification.show( "Please, enter subnet CIDR" );
-        }
+//        else if ( !grow && Strings.isNullOrEmpty( subnetTxt.getValue() ) )
+//        {
+//            Notification.show( "Please, enter subnet CIDR" );
+//        }
         else
         {
 
@@ -151,19 +149,16 @@ public class TopologyWindow extends Window
                 if ( grow )
                 {
                     Environment environment = ( Environment ) envCombo.getValue();
-                    Blueprint blueprint =
-                            new Blueprint( environment.getId(), environment.getName(), environment.getSubnetCidr(),
-                                    null, placements );
-                    environmentManager.growEnvironment( blueprint, true );
+                    Blueprint blueprint = new Blueprint( environment.getName(), null, placements );
+                    environmentManager.growEnvironment( environment.getId(), blueprint, true );
                     Notification.show( "Environment expanding started" );
                 }
                 else
                 {
-                    final String environmentId = UUID.randomUUID().toString();
-                    final String subnet = subnetTxt.getValue().trim();
-                    Blueprint blueprint =
-                            new Blueprint( String.format( "%s-%s", this.blueprint.getName(), environmentId ),
-                                    environmentId, subnet, null, placements );
+//                    final String subnet = subnetTxt.getValue().trim();
+                    Blueprint blueprint = new Blueprint(
+                            String.format( "%s-%s", this.blueprint.getName(), UUID.randomUUID().toString() ), null,
+                            placements );
 
                     environmentManager.createEnvironment( blueprint, true );
                     Notification.show( "Environment creation started" );

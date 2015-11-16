@@ -28,13 +28,9 @@ public class Blueprint
 {
     @JsonIgnore
     private UUID id;
-    @JsonProperty( "environmentId" )
-    private String environmentId;
     @JsonProperty( "name" )
     @GsonRequired
     private String name;
-    @JsonProperty( "cidr" )
-    private String cidr;
     @JsonProperty( "sshKey" )
     private String sshKey;
     @JsonProperty( "nodegroups" )
@@ -42,15 +38,10 @@ public class Blueprint
     private Set<NodeGroup> nodeGroups;
 
 
-    public Blueprint( @JsonProperty( "environmentId" ) final String environmentId,
-                      @JsonProperty( "name" ) final String name,
-                      @JsonProperty( "cidr" ) final String cidr,
-                      @JsonProperty( "sshKey" ) final String sshKey,
+    public Blueprint( @JsonProperty( "name" ) final String name, @JsonProperty( "sshKey" ) final String sshKey,
                       @JsonProperty( "nodegroups" ) final Set<NodeGroup> nodeGroups )
     {
-        this.environmentId = environmentId;
         this.name = name;
-        this.cidr = cidr;
         this.nodeGroups = nodeGroups;
         this.sshKey = sshKey;
     }
@@ -111,20 +102,8 @@ public class Blueprint
     }
 
 
-    public String getCidr()
-    {
-        return cidr;
-    }
-
-
     public String getSshKey()
     {
         return sshKey;
-    }
-
-
-    public String getEnvironmentId()
-    {
-        return environmentId;
     }
 }

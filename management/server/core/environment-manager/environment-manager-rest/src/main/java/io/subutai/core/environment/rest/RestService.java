@@ -15,13 +15,14 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import io.subutai.common.environment.Blueprint;
+import io.subutai.common.peer.EnvironmentId;
 
 
 public interface RestService
 {
 
     @GET
-    @Produces( { MediaType.APPLICATION_JSON } )
+    @Produces(  MediaType.APPLICATION_JSON  )
     public Response listEnvironments();
 
     @GET
@@ -42,7 +43,8 @@ public interface RestService
 
     @POST
     @Consumes( MediaType.APPLICATION_JSON )
-    public void createEnvironment( Blueprint blueprint );
+    @Produces( MediaType.APPLICATION_JSON )
+    public Response createEnvironment( Blueprint blueprint );
 
     @PUT
     @Path( "{environmentId}" )
@@ -59,7 +61,8 @@ public interface RestService
     public Response removeSshKey( @QueryParam( "environmentId" ) String environmentId );
 
     @DELETE
-    public Response destroyEnvironment( @QueryParam( "environmentId" ) String environmentId );
+    @Path( "{environmentId}" )
+    public Response destroyEnvironment( @PathParam( "environmentId" ) String environmentId );
 
     @DELETE
     @Path( "container" )

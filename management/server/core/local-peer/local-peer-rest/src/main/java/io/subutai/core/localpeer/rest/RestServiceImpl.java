@@ -487,11 +487,11 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response createGateway( final String gatewayIp, final int vlan )
+    public Response createGateway( final Gateway gateway )
     {
         try
         {
-            peerManager.createGateway( gatewayIp, vlan );
+            peerManager.createGateway( gateway );
 
             return Response.ok().status( Response.Status.CREATED ).build();
         }

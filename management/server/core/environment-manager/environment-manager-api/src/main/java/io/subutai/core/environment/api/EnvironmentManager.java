@@ -74,7 +74,7 @@ public interface EnvironmentManager
      * @throws EnvironmentModificationException - thrown if error occurs during environment modification
      * @throws EnvironmentNotFoundException - thrown if environment not found
      */
-    Set<EnvironmentContainerHost> growEnvironment( Blueprint blueprint, boolean async )
+    Set<EnvironmentContainerHost> growEnvironment( String environmentId, Blueprint blueprint, boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException;
 
     /**

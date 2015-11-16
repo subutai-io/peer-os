@@ -153,10 +153,9 @@ public class RolesTab extends CustomComponent implements TabCallback<BeanItem<Ro
                     {
                         boolean exists = false;
                         List<Role> roles = identityManager.getIdentityDataService().getAllRoles();
-                        Long newId = new Long( 1 );
+
                         for ( Role r : roles )
                         {
-                            ++newId;
                             if ( r.getName().equals( newName.getValue() ) )
                             {
                                 exists = true;
@@ -165,9 +164,8 @@ public class RolesTab extends CustomComponent implements TabCallback<BeanItem<Ro
                         }
                         if ( !exists )
                         {
-                            identityManager.getIdentityDataService()
-                                           .persistRoleByName( newName.getValue(), ( int ) newType.getValue() );
-                            Role newRole = identityManager.getIdentityDataService().getRole( newId );
+                            Role newRole = identityManager.createRole( newName.getValue(),( int ) newType.getValue()  );
+
                             beans.addBean( newRole );
                             subWindow.close();
                             Notification notif = new Notification( "Role successfully added" );

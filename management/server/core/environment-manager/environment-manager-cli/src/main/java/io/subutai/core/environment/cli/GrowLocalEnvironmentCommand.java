@@ -86,10 +86,10 @@ public class GrowLocalEnvironmentCommand extends SubutaiShellCommandSupport
         NodeGroup nodeGroup = new NodeGroup( String.format( "NodeGroup%s", System.currentTimeMillis() ), templateName,
                 numberOfContainers, 1, 1, new PlacementStrategy( "ROUND_ROBIN" ), peerManager.getLocalPeer().getId() );
 
-        Blueprint blueprint = new Blueprint( environmentId, environment.getName(), environment.getSubnetCidr(), null,
-                Sets.newHashSet( nodeGroup ) );
+        Blueprint blueprint = new Blueprint( environment.getName(), null, Sets.newHashSet( nodeGroup ) );
 
-        Set<EnvironmentContainerHost> newContainers = environmentManager.growEnvironment( blueprint, async );
+        Set<EnvironmentContainerHost> newContainers =
+                environmentManager.growEnvironment( environmentId, blueprint, async );
 
         System.out.println( "New containers created:" );
 

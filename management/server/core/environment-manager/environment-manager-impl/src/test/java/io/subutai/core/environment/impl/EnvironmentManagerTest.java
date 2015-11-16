@@ -82,14 +82,15 @@ public class EnvironmentManagerTest
     public void setUp() throws Exception
     {
         when( nodeGroup.getPeerId() ).thenReturn( PEER_ID );
+        when( peerManager.getPeer(PEER_ID) ).thenReturn( peer );
 
-        blueprint = new Blueprint( "env", ENV_ID, "192.168.1.0/24", null, Sets.newHashSet( nodeGroup ) );
+        blueprint = new Blueprint( "env", null, Sets.newHashSet( nodeGroup ) );
 
         environmentManager = spy( new EnvironmentManagerImpl( templateRegistry, peerManager, networkManager, daoManager,
                 identityManager, tracker ) );
         doReturn( environment ).when( environmentManager )
                                .createEmptyEnvironment( anyString(), anyString(), anyString() );
-        doReturn( topology ).when( environmentManager ).buildTopology( blueprint );
+//        doReturn( topology ).when( environmentManager ).buildTopology( blueprint );
         doReturn( new HashSet<>() ).when( environmentManager ).getUsedGateways( ( Peer ) any() );
         doReturn( environmentCreationWorkflow ).when( environmentManager )
                                                .getEnvironmentCreationWorkflow( any( EnvironmentImpl.class ),

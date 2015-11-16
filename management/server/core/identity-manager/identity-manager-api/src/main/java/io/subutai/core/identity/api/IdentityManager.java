@@ -25,11 +25,19 @@ public interface IdentityManager
 {
     /* *************************************************
      */
+    void removeRolePermission( long roleId, Permission permission );
+
+    /* *************************************************
+         */
     List<Permission> getAllPermissions();
 
     /* *************************************************
-     *
      */
+    void updatePermission( Permission permission );
+
+    /* *************************************************
+         *
+         */
     public IdentityDataService getIdentityDataService();
 
 
@@ -73,11 +81,10 @@ public interface IdentityManager
 
     /* *************************************************
      */
-    @PermitAll
     User getActiveUser();
 
     /* *************************************************
-         */
+     */
     User getLoggedUser();
 
 
@@ -174,13 +181,17 @@ public interface IdentityManager
     UserToken createUserToken( User user, String token, String secret, String issuer, int tokenType, Date validDate );
 
 
+
     /* *************************************************
      */
-    List<UserToken> getUserTokens();
+    List<UserToken> getAllUserTokens();
 
+    /* *************************************************
+             */
+    public void updateUserToken( String oldName, User user, String token, String secret, String issuer, int tokenType,
+                                 Date validDate );
 
     /* *************************************************
          */
-    public void updateUserToken( String oldName, User user, String token, String secret, String issuer, int tokenType,
-                                 Date validDate );
+    void removeUserToken( String tokenId );
 }

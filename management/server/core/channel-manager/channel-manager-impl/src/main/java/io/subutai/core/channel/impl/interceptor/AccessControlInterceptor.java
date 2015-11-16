@@ -20,6 +20,7 @@ import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 import com.google.common.base.Strings;
 
+import io.subutai.common.settings.ChannelSettings;
 import io.subutai.core.channel.impl.ChannelManagerImpl;
 import io.subutai.core.channel.impl.util.MessageContentUtil;
 import io.subutai.core.identity.api.model.User;
@@ -51,61 +52,46 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
         try
         {
             URL url = new URL( ( String ) message.get( Message.REQUEST_URL ) );
+            User user = null;
 
-            String basePath = url.getPath();
-            int status = 0;
-
-            status = 0;//MessageContentUtil.checkUrlAccessibility( status, url, basePath );
-            //----------------------------------------------------------------------------------------------
-            //--------------- if error occurs --------------------------------------------------------------
-            if ( status != 0 )
+            if ( url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X2 ) )
             {
-                String error = "";
-                int errorStatus = 0;
-
-                if ( status == 1 )
-                {
-                    errorStatus = 403;
-                    error = "*********  Access to " + basePath + "  is blocked (403) **********************";
-                }
-                else if ( status == 2 )
-                {
-                    errorStatus = 404;
-                    error = "*********  Access to " + basePath + "  is blocked (404) **********************";
-                }
-
-                MessageContentUtil.abortChain(message,errorStatus,error);
-
+                user = authenticateAccess( null );
             }
             else
             {
-                //**********************************************
-                User user = authenticateAccess( message );
-                //**********************************************
+                int status = 0;
+                status = MessageContentUtil.checkUrlAccessibility( status, url );
+                //----------------------------------------------------------------------------------------------
+                if ( status != 0 ) //require tokenauth
+                    user = authenticateAccess( message );
+                else // auth with system user
+                    user = authenticateAccess( null );
+            }
 
-                if(user!=null)
+            //******Authenticate************************************************
+            if ( user != null )
+            {
+                Subject.doAs( user.getSubject(), new PrivilegedAction<Void>()
                 {
-                    Subject.doAs( user.getSubject(), new PrivilegedAction<Void>()
+                    @Override
+                    public Void run()
                     {
-                        @Override
-                        public Void run()
+                        try
                         {
-                            try
-                            {
-                                message.getInterceptorChain().doIntercept( message );
-                            }
-                            catch(Exception ex)
-                            {
-                                MessageContentUtil.abortChain(message,403,"Access Denied to the resource");
-                            }
-                            return null;
+                            message.getInterceptorChain().doIntercept( message );
                         }
-                    });
-                }
-                else
-                {
-                    MessageContentUtil.abortChain( message, 403, "Access Denied to the resource" );
-                }
+                        catch ( Exception ex )
+                        {
+                            MessageContentUtil.abortChain( message, 403, "Access Denied to the resource" );
+                        }
+                        return null;
+                    }
+                } );
+            }
+            else
+            {
+                MessageContentUtil.abortChain( message, 403, "Access Denied to the resource" );
             }
             //-----------------------------------------------------------------------------------------------
         }
@@ -115,32 +101,32 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
         }
     }
 
+
     //******************************************************************
-    private User authenticateAccess(Message message)
+    private User authenticateAccess( Message message )
     {
-        HttpServletRequest req = ( HttpServletRequest ) message.getExchange().getInMessage()
-                                                               .get( AbstractHTTPDestination
-                                                                       .HTTP_REQUEST );
-
-        String sptoken = req.getParameter( "sptoken" );
-
-        if( Strings.isNullOrEmpty(sptoken))
+        if ( message == null )
         {
-            HttpHeaders headers = new HttpHeadersImpl( message.getExchange().getInMessage() );
-            sptoken = headers.getHeaderString( "sptoken" );
-
-            if(Strings.isNullOrEmpty( sptoken ))
-            {
-                return channelManagerImpl.getIdentityManager().login( "internal","internal");
-            }
-            else
-            {
-                return channelManagerImpl.getIdentityManager().login( "token",sptoken);
-            }
+            //***********internal auth ********* for regisration and 8444 port
+            return channelManagerImpl.getIdentityManager().login( "internal", "internal" );
         }
         else
         {
-            return channelManagerImpl.getIdentityManager().login( "token",sptoken);
+            HttpServletRequest req = ( HttpServletRequest ) message.getExchange().getInMessage()
+                                                                   .get( AbstractHTTPDestination.HTTP_REQUEST );
+
+            String sptoken = req.getParameter( "sptoken" );
+
+            if ( Strings.isNullOrEmpty( sptoken ) )
+            {
+                HttpHeaders headers = new HttpHeadersImpl( message.getExchange().getInMessage() );
+                sptoken = headers.getHeaderString( "sptoken" );
+            }
+
+            if ( Strings.isNullOrEmpty( sptoken ) )
+                return null;
+            else
+                return channelManagerImpl.getIdentityManager().login( "token", sptoken );
         }
     }
     //******************************************************************

@@ -145,29 +145,5 @@ class RoleDAO
     }
 
 
-    /* *************************************************
-         *
-         */
-    public void persistByName( String newName, int newType )
-    {
-        EntityManager em = daoManager.getEntityManagerFromFactory();
-        Role newRole = new RoleEntity();
-        newRole.setName( newName );
-        newRole.setType( newType );
-        try
-        {
-            daoManager.startTransaction( em );
-            em.persist( newRole );
-            em.flush();
-            daoManager.commitTransaction( em );
-        }
-        catch ( Exception e )
-        {
-            daoManager.rollBackTransaction( em );
-        }
-        finally
-        {
-            daoManager.closeEntityManager( em );
-        }
-    }
+
 }

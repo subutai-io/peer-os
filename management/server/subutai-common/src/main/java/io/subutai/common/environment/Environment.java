@@ -71,10 +71,11 @@ public interface Environment
     /**
      * Grows environment according to the passed blueprint
      *
+     * @param environmentId = environment id to use when growing
      * @param blueprint = blueprint to use when growing
      * @param async - sync or async to the calling party
      */
-    Set<EnvironmentContainerHost> growEnvironment( Blueprint blueprint, boolean async )
+    Set<EnvironmentContainerHost> growEnvironment( String environmentId, Blueprint blueprint, boolean async )
             throws EnvironmentModificationException;
 
 

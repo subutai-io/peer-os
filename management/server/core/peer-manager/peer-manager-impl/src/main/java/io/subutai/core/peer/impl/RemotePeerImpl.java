@@ -1271,29 +1271,33 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void createGateway( final String environmentGatewayIp, final int vlan ) throws PeerException
+    public void createGateway( final Gateway gateway ) throws PeerException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentGatewayIp ) );
-        Preconditions.checkArgument( vlan > 0 );
+        Preconditions.checkNotNull( gateway );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( gateway.getIp() ) );
+        Preconditions.checkArgument( gateway.getVlan() > 0 );
 
-        String path = "/gateways";
 
-        try
-        {
-            //*********construct Secure Header ****************************
-            Map<String, String> headers = Maps.newHashMap();
-            //*************************************************************
+        new PeerWebClient( peerInfo.getIp(), provider ).createGateway( gateway );
 
-            Map<String, String> params = Maps.newHashMap();
-            params.put( "gatewayIp", environmentGatewayIp );
-            params.put( "vlan", String.valueOf( vlan ) );
-
-            post( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, params, headers );
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException( String.format( "Error creating gateway on peer %s", getName() ), e );
-        }
+        //        String path = "/gateways";
+        //
+        //        try
+        //        {
+        //            //*********construct Secure Header ****************************
+        //            Map<String, String> headers = Maps.newHashMap();
+        //            //*************************************************************
+        //
+        //            Map<String, String> params = Maps.newHashMap();
+        //            params.put( "gatewayIp", environmentGatewayIp );
+        //            params.put( "vlan", String.valueOf( vlan ) );
+        //
+        //            post( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, params, headers );
+        //        }
+        //        catch ( Exception e )
+        //        {
+        //            throw new PeerException( String.format( "Error creating gateway on peer %s", getName() ), e );
+        //        }
     }
 
 

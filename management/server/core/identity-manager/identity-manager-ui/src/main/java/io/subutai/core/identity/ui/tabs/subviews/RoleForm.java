@@ -6,12 +6,12 @@ import java.util.*;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItem;
-import com.vaadin.server.Page;
 import com.vaadin.ui.*;
 
+import io.subutai.common.security.objects.PermissionObject;
+import io.subutai.common.security.objects.PermissionScope;
 import io.subutai.core.identity.api.model.Permission;
 import io.subutai.core.identity.api.model.Role;
-import io.subutai.core.identity.api.model.RolePermission;
 
 import io.subutai.core.identity.ui.tabs.RolesTab;
 
@@ -21,12 +21,12 @@ public class RoleForm extends Window
 {
     private Table permTable = new Table( "Assigned permissions" );
     private Table allPerms = new Table( "All permissions" );
-    private List<RolePermission> perms = new ArrayList<>();
+    private List<Permission> perms = new ArrayList<>();
     private BeanItem<Role> currentRole;
     private RolesTab callback;
 
 
-    private void addRow( final RolePermission p )
+    private void addRow( final Permission p )
     {
         Object newItemId = permTable.addItem();
         Item row = permTable.getItem( newItemId );
@@ -34,28 +34,12 @@ public class RoleForm extends Window
 
         ComboBox scopes = new ComboBox();
         scopes.setNullSelectionAllowed( false );
-        scopes.setTextInputAllowed( false );
-        for ( int i = 1; i < 4; ++i )
+
+
+        for (int i = 0; i < PermissionScope.values().length; ++i)
         {
-            scopes.addItem( i );
-            switch ( i )
-            {
-                case ( 1 ):
-                {
-                    scopes.setItemCaption( 1, "All Objects" );
-                    break;
-                }
-                case ( 2 ):
-                {
-                    scopes.setItemCaption( 2, "Child Objects" );
-                    break;
-                }
-                case ( 3 ):
-                {
-                    scopes.setItemCaption( 3, "Owner Objects" );
-                    break;
-                }
-            }
+            scopes.addItem(i+1);
+            scopes.setItemCaption( i + 1, PermissionScope.values()[i].getName() );
         }
         scopes.setValue( p.getScope() );
         scopes.addValueChangeListener( new Property.ValueChangeListener()
@@ -65,13 +49,13 @@ public class RoleForm extends Window
             {
                 int scope = ( int ) event.getProperty().getValue();
                 p.setScope( scope );
-                for ( RolePermission perm : perms )
+                for ( Permission perm : perms )
                 {
-                    if ( p.getPermissionId() == perm.getPermissionId() )
+                    if ( p.getId() == perm.getId() )
                     {
                         perm.setScope( scope );
 
-                        callback.getIdentityManager().getIdentityDataService().updateRolePermission( perm );
+                        callback.getIdentityManager().updatePermission( perm );
                     }
                 }
             }
@@ -86,12 +70,13 @@ public class RoleForm extends Window
             public void valueChange( Property.ValueChangeEvent event )
             {
                 p.setRead( read.getValue() );
-                for ( RolePermission perm : perms )
+                for ( Permission perm : perms )
                 {
-                    if ( p.getPermissionId() == perm.getPermissionId() )
+                    if ( p.getId() == perm.getId() )
                     {
                         perm.setRead( read.getValue() );
-                        callback.getIdentityManager().getIdentityDataService().updateRolePermission( perm );
+
+                        callback.getIdentityManager().updatePermission( perm );
                     }
                 }
             }
@@ -106,12 +91,12 @@ public class RoleForm extends Window
             public void valueChange( Property.ValueChangeEvent event )
             {
                 p.setWrite( write.getValue() );
-                for ( RolePermission perm : perms )
+                for ( Permission perm : perms )
                 {
-                    if ( p.getPermissionId() == perm.getPermissionId() )
+                    if ( p.getId() == perm.getId() )
                     {
                         perm.setWrite( write.getValue() );
-                        callback.getIdentityManager().getIdentityDataService().updateRolePermission( perm );
+                        callback.getIdentityManager().updatePermission( perm );
                     }
                 }
             }
@@ -126,12 +111,12 @@ public class RoleForm extends Window
             public void valueChange( Property.ValueChangeEvent event )
             {
                 p.setUpdate( update.getValue() );
-                for ( RolePermission perm : perms )
+                for ( Permission perm : perms )
                 {
-                    if ( p.getPermissionId() == perm.getPermissionId() )
+                    if ( p.getId() == perm.getId() )
                     {
                         perm.setUpdate( update.getValue() );
-                        callback.getIdentityManager().getIdentityDataService().updateRolePermission( perm );
+                        callback.getIdentityManager().updatePermission( perm );
                     }
                 }
             }
@@ -146,12 +131,12 @@ public class RoleForm extends Window
             public void valueChange( Property.ValueChangeEvent event )
             {
                 p.setDelete( delete.getValue() );
-                for ( RolePermission perm : perms )
+                for ( Permission perm : perms )
                 {
-                    if ( p.getPermissionId() == perm.getPermissionId() )
+                    if ( p.getId() == perm.getId() )
                     {
                         perm.setDelete( delete.getValue() );
-                        callback.getIdentityManager().getIdentityDataService().updateRolePermission( perm );
+                        callback.getIdentityManager().updatePermission( perm );
                     }
                 }
             }
@@ -168,9 +153,9 @@ public class RoleForm extends Window
             {
                 for ( int i = 0; i < perms.size(); ++i )
                 {
-                    if ( p.getPermissionId() == perms.get( i ).getPermissionId() )
+                    if ( p.getId() == perms.get( i ).getId() )
                     {
-                        callback.getIdentityManager().getIdentityDataService().removeRolePermission( perms.get( i ) );
+                        callback.getIdentityManager().removePermission( perms.get( i ).getId() );
                         perms.remove( i );
                         break;
                     }
@@ -184,12 +169,12 @@ public class RoleForm extends Window
 
     private void addPerms()
     {
-        for ( final Permission p : callback.getIdentityManager().getAllPermissions() )
+        for (int a=0; a< PermissionObject.values().length;a++)
         {
             final Object newItemId = allPerms.addItem();
             final Item row = allPerms.getItem( newItemId );
 
-            row.getItemProperty( "Permission" ).setValue( p.getObjectName() );
+            row.getItemProperty ("Permission").setValue (PermissionObject.values()[a].getName());
 
             Button add = new Button( "Add" );
             add.addClickListener( new Button.ClickListener()
@@ -197,31 +182,14 @@ public class RoleForm extends Window
                 @Override
                 public void buttonClick( Button.ClickEvent event )
                 {
-                    boolean exists = false;
-                    for ( RolePermission perm : perms )
-                    {
-                        if ( p.getId() == perm.getPermissionId() )
-                        {
-                            exists = true;
-                            break;
-                        }
-                    }
-                    if ( !exists )
-                    {
-                        RolePermission newRP = callback.getIdentityManager().getIdentityDataService()
-                                                       .persistRolePermission( currentRole.getBean().getId(), p );
-                        //callback.getIdentityManager ().assignRolePermission (currentRole.getBean ().getId (), p);
-                        //TODO: perms.add(p);
-                        addRow( newRP );
-                    }
-                    else
-                    {
-                        Notification notif = new Notification( "Permission is already added" );
-                        notif.setDelayMsec( 2000 );
-                        notif.show( Page.getCurrent() );
-                    }
+
+                    Permission newRP = callback.getIdentityManager().createPermission((int)newItemId,PermissionScope.ALL_SCOPE.getId(),true,true,true,true );
+
+                    callback.getIdentityManager().assignRolePermission( currentRole.getBean().getId(), newRP  );
+                    perms.add( newRP );
+                    addRow( newRP );
                 }
-            } );
+            });
             row.getItemProperty( "Add" ).setValue( add );
         }
     }
@@ -231,8 +199,7 @@ public class RoleForm extends Window
     {
         this.currentRole = role;
         this.perms.clear();
-        for ( RolePermission rp : callback.getIdentityManager().getIdentityDataService()
-                                          .getAllRolePermissions( currentRole.getBean().getId() ) )
+        for ( Permission rp : callback.getIdentityManager().getRole( currentRole.getBean().getId() ).getPermissions() )
         {
             this.perms.add( rp );
             this.addRow( rp );
@@ -257,7 +224,7 @@ public class RoleForm extends Window
         permTable.addContainerProperty( "Delete", CheckBox.class, null );
         permTable.addContainerProperty( "Remove", Button.class, null );
 
-        permTable.setColumnWidth( "Scope", 70 );
+        permTable.setColumnWidth( "Scope", 85 );
         permTable.setColumnWidth( "Read", 35 );
         permTable.setColumnWidth( "Write", 35 );
         permTable.setColumnWidth( "Update", 35 );
@@ -265,6 +232,8 @@ public class RoleForm extends Window
 
         allPerms.addContainerProperty( "Permission", String.class, null );
         allPerms.addContainerProperty( "Add", Button.class, null );
+        allPerms.setHeight( "280px" );
+        permTable.setHeight( "280px" );
 
         addPerms();
         Button close = new Button( "Close" );
@@ -276,20 +245,30 @@ public class RoleForm extends Window
                 callback.cancelOperation();
             }
         } );
+
+        Button removeRole = new Button( "Remove Role" );
+        removeRole.addClickListener( new Button.ClickListener()
+        {
+            @Override
+            public void buttonClick( Button.ClickEvent event )
+            {
+                callback.removeOperation( currentRole, false );
+            }
+        } );
+
         Button save = new Button( "Save" );
         save.addClickListener( new Button.ClickListener()
         {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent )
             {
-
-                //TODO: currentRole.getBean().setPermissions (perms);
                 callback.saveOperation( currentRole, false );
             }
         } );
         HorizontalLayout buttonGrid = new HorizontalLayout();
         buttonGrid.setSpacing( true );
         buttonGrid.addComponent( close );
+        buttonGrid.addComponent( removeRole );
         buttonGrid.addComponent( save );
         HorizontalLayout tableGrid = new HorizontalLayout();
         tableGrid.setSpacing( true );
