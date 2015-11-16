@@ -1,20 +1,21 @@
 package io.subutai.common.environment;
 
 
+import java.util.UUID;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import io.subutai.common.environment.NodeGroup;
-import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.Peer;
 
 
 @RunWith( MockitoJUnitRunner.class )
 public class TopologyTest
 {
+    private static final String ENVIRONMENT_ID = UUID.randomUUID().toString();
     private Topology topology;
 
     @Mock
@@ -22,10 +23,11 @@ public class TopologyTest
     @Mock
     NodeGroup nodeGroup;
 
+
     @Before
     public void setUp() throws Exception
     {
-        topology = new Topology();
+        topology = new Topology( "Name-" + ENVIRONMENT_ID, ENVIRONMENT_ID, null, null );
     }
 
 

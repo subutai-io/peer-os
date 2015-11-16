@@ -31,6 +31,8 @@ import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.HostNotFoundException;
+import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.peer.ManagementHost;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.protocol.PlacementStrategy;
@@ -42,8 +44,6 @@ import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
-import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.peer.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registration.api.RegistrationManager;
 import io.subutai.core.registration.api.RegistrationStatus;
@@ -321,7 +321,8 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
 
         for ( final Map.Entry<Integer, Map<String, Set<ContainerInfo>>> mapEntry : groupedContainersByVlan.entrySet() )
         {
-            Topology topology = new Topology();
+            //TODO: check this run. Topology constructor changed
+            Topology topology = new Topology( "Imported-environment", null, null, null );
             Map<String, Set<ContainerInfo>> rawNodeGroup = mapEntry.getValue();
             Map<NodeGroup, Set<HostInfo>> classification = Maps.newHashMap();
 
@@ -331,7 +332,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
                 String templateName = entry.getKey();
                 NodeGroup nodeGroup =
                         new NodeGroup( String.format( "%s_group", templateName ), templateName, entry.getValue().size(),
-                                1, 1, new PlacementStrategy( "ROUND_ROBIN" ) );
+                                1, 1, new PlacementStrategy( "ROUND_ROBIN" ), localPeer.getId() );
                 topology.addNodeGroupPlacement( localPeer, nodeGroup );
 
                 Set<HostInfo> converter = Sets.newHashSet();

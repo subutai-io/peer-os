@@ -15,6 +15,38 @@ import io.subutai.common.peer.Peer;
 public class Topology
 {
     private final Map<Peer, Set<NodeGroup>> nodeGroupPlacement = Maps.newHashMap();
+    private String environmentName;
+    private String environmentId;
+    private String subnet;
+    private String sshKey;
+
+
+    public Topology( final String environmentName, final String environmentId, final String subnet,
+                     final String sshKey )
+    {
+        this.environmentName = environmentName;
+        this.environmentId = environmentId;
+        this.subnet = subnet;
+        this.sshKey = sshKey;
+    }
+
+
+    public String getEnvironmentName()
+    {
+        return environmentName;
+    }
+
+
+    public String getSubnet()
+    {
+        return subnet;
+    }
+
+
+    public String getEnvironmentId()
+    {
+        return environmentId;
+    }
 
 
     public Map<Peer, Set<NodeGroup>> getNodeGroupPlacement()
@@ -43,5 +75,11 @@ public class Topology
         }
 
         peerNodeGroups.add( nodeGroup );
+    }
+
+
+    public String getSshKey()
+    {
+        return sshKey;
     }
 }

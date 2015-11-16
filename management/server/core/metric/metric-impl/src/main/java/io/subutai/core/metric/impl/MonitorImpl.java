@@ -1152,11 +1152,11 @@ public class MonitorImpl implements Monitor
                     }
                 }
             }
-            catch ( Exception ignore ) {
-                // ignore
+            catch ( Exception e )
+            {
+                LOG.error( e.getMessage(), e );
             }
             LOG.debug( "Metrics updater finished." );
-
         }
     }
 }
