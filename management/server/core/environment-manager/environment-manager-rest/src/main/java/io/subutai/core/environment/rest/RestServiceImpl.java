@@ -3,7 +3,9 @@ package io.subutai.core.environment.rest;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
@@ -13,6 +15,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
+import io.subutai.common.environment.Blueprint;
+import io.subutai.common.environment.ContainerDistributionType;
 import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
@@ -57,71 +61,97 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response createEnvironment( final String environmentName, final String topologyJsonString,
-                                       final String subnetCidr, final String sshKey )
+    public void createEnvironment( final Blueprint blueprint )
     {
-        TopologyJson topologyJson;
-
         //validate params
         try
         {
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentName ), "Invalid environment name" );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( subnetCidr ), "Invalid subnet cidr" );
-            topologyJson = JsonUtil.fromJson( topologyJsonString, TopologyJson.class );
-            checkTopology( topologyJson );
+            Preconditions.checkNotNull( blueprint );
+            Preconditions.checkNotNull( blueprint.getNodeGroups() );
+            Preconditions.checkArgument( blueprint.getNodeGroups().size() > 0, "Nodegroup size must be great than 0" );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( blueprint.getName() ), "Invalid blueprint name" );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( blueprint.getCidr() ), "Invalid subnet cidr" );
+            checkBlueprint( blueprint );
         }
         catch ( Exception e )
         {
             LOG.error( "Error validating parameters #createEnvironment", e );
-            return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) )
-                           .build();
+            Response response = Response.status( Response.Status.BAD_REQUEST )
+                                        .entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+
+            throw new WebApplicationException( response );
         }
 
         try
         {
-            Topology topology = new Topology();
+            final String environmentId = UUID.randomUUID().toString();
+            Topology topology =
+                    new Topology( blueprint.getName(), environmentId, blueprint.getCidr(), blueprint.getSshKey() );
 
-            for ( Map.Entry<String, Set<NodeGroup>> placementEntry : topologyJson.getNodeGroupPlacement().entrySet() )
+            for ( NodeGroup nodeGroup : blueprint.getNodeGroups() )
             {
-                Peer peer = peerManager.getPeer( placementEntry.getKey() );
-                for ( NodeGroup nodeGroup : placementEntry.getValue() )
-                {
-                    topology.addNodeGroupPlacement( peer, nodeGroup );
-                }
+                Peer peer = peerManager.getPeer( nodeGroup.getPeerId() );
+                topology.addNodeGroupPlacement( peer, nodeGroup );
             }
 
-            Environment environment =
-                    environmentManager.createEnvironment( environmentName, topology, subnetCidr, sshKey, false );
-
-            return Response.ok( JsonUtil.toJson(
-                    new EnvironmentJson( environment.getId(), environment.getName(), environment.getStatus(),
-                            convertContainersToContainerJson( environment.getContainerHosts() ) ) ) ).build();
+            /*Environment environment = */
+            environmentManager.createEnvironment( blueprint, false );
         }
         catch ( EnvironmentCreationException e )
         {
             LOG.error( "Error creating environment #createEnvironment", e );
-            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+            Response response = Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+            throw new WebApplicationException( response );
         }
     }
 
 
-    private void checkTopology( TopologyJson topologyJson ) throws EnvironmentCreationException
+    private void checkBlueprint( Blueprint blueprint ) throws EnvironmentCreationException
     {
-
-        if ( topologyJson.getNodeGroupPlacement() == null || topologyJson.getNodeGroupPlacement().isEmpty() )
+        for ( NodeGroup nodegroup : blueprint.getNodeGroups() )
         {
-            throw new EnvironmentCreationException( "Invalid node group placement" );
-        }
-        else
-        {
-            for ( Map.Entry<String, Set<NodeGroup>> placementKey : topologyJson.getNodeGroupPlacement().entrySet() )
-            {
-                checkNodeGroup( placementKey );
-            }
+            checkNodeGroup( nodegroup );
         }
     }
 
 
+    private void checkNodeGroup( final NodeGroup nodeGroup ) throws EnvironmentCreationException
+    {
+        String peerId = nodeGroup.getPeerId();
+        if ( peerId == null )
+        {
+            throw new EnvironmentCreationException( "Invalid peer id" );
+        }
+        else if ( peerManager.getPeer( peerId ) == null )
+        {
+            throw new EnvironmentCreationException( String.format( "Peer %s not found", peerId ) );
+        }
+        if ( Strings.isNullOrEmpty( nodeGroup.getName() ) )
+        {
+            throw new EnvironmentCreationException( "Invalid node group name" );
+        }
+        else if ( nodeGroup.getNumberOfContainers() <= 0 )
+        {
+            throw new EnvironmentCreationException( "Invalid number of containers" );
+        }
+        else if ( Strings.isNullOrEmpty( nodeGroup.getTemplateName() ) )
+        {
+            throw new EnvironmentCreationException( "Invalid templateName" );
+        }
+        else if ( templateRegistry.getTemplate( nodeGroup.getTemplateName() ) == null )
+        {
+            throw new EnvironmentCreationException(
+                    String.format( "Template %s does not exist", nodeGroup.getTemplateName() ) );
+        }
+        else if ( nodeGroup.getContainerDistributionType() == ContainerDistributionType.AUTO
+                && nodeGroup.getContainerPlacementStrategy() == null )
+        {
+            throw new EnvironmentCreationException( "Invalid node container placement strategy" );
+        }
+    }
+
+
+    @Deprecated
     private void checkNodeGroup( final Map.Entry<String, Set<NodeGroup>> placementKey )
             throws EnvironmentCreationException
     {
@@ -314,61 +344,48 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response growEnvironment( final String environmentId, final String topologyJsonString )
+    public void growEnvironment( final String environmentId, final Blueprint blueprint )
     {
-        if ( Strings.isNullOrEmpty( environmentId ) )
-        {
-            return Response.status( Response.Status.BAD_REQUEST )
-                           .entity( JsonUtil.toJson( ERROR_KEY, "Invalid environment id" ) ).build();
-        }
-
-        TopologyJson topologyJson;
-
+        //validate params
         try
         {
-            topologyJson = JsonUtil.fromJson( topologyJsonString, TopologyJson.class );
-            checkTopology( topologyJson );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+            Preconditions.checkNotNull( blueprint );
+            Preconditions.checkNotNull( blueprint.getNodeGroups() );
+            Preconditions.checkArgument( blueprint.getNodeGroups().size() > 0, "Nodegroup size must be great than 0" );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( blueprint.getName() ), "Invalid blueprint name" );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( blueprint.getCidr() ), "Invalid subnet cidr" );
+            checkBlueprint( blueprint );
         }
         catch ( Exception e )
         {
-            LOG.error( "Error validating topology #growEnvironment", e );
-            return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) )
-                           .build();
+            LOG.error( "Error validating parameters #growEnvironment", e );
+            Response response = Response.status( Response.Status.BAD_REQUEST )
+                                        .entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+
+            throw new WebApplicationException( response );
         }
 
         try
         {
-            Topology topology = buildTopology( topologyJson );
+            /*Set<EnvironmentContainerHost> newContainers = */
+            environmentManager.growEnvironment( blueprint, false );
 
-            Set<EnvironmentContainerHost> newContainers = environmentManager.growEnvironment( environmentId, topology, false );
-
-            return Response.ok( JsonUtil.toJson( convertContainersToContainerJson( newContainers ) ) ).build();
+            //            return Response.ok( JsonUtil.toJson( convertContainersToContainerJson( newContainers ) ) )
+            // .build();
         }
         catch ( EnvironmentNotFoundException e )
         {
             LOG.warn( "Error looking for environment by id {}", environmentId );
-            return Response.status( Response.Status.NOT_FOUND ).build();
+            Response response = Response.status( Response.Status.NOT_FOUND ).build();
+            throw new WebApplicationException( response );
         }
         catch ( EnvironmentModificationException e )
         {
             LOG.error( "Error modifying environment #growEnvironment", e );
-            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+            Response response = Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+            throw new WebApplicationException( response );
         }
-    }
-
-
-    private Topology buildTopology( final TopologyJson topologyJson )
-    {
-        Topology topology = new Topology();
-        for ( Map.Entry<String, Set<NodeGroup>> placementEntry : topologyJson.getNodeGroupPlacement().entrySet() )
-        {
-            Peer peer = peerManager.getPeer( placementEntry.getKey() );
-            for ( NodeGroup nodeGroup : placementEntry.getValue() )
-            {
-                topology.addNodeGroupPlacement( peer, nodeGroup );
-            }
-        }
-        return topology;
     }
 
 

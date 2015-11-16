@@ -27,7 +27,7 @@ public class NodeGroup
 
 
     public NodeGroup( final String name, final String templateName, final int numberOfContainers, final int sshGroupId,
-                      final int hostsGroupId, final PlacementStrategy containerPlacementStrategy )
+                      final int hostsGroupId, final PlacementStrategy containerPlacementStrategy, final String peerId )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid node group name" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
@@ -40,6 +40,7 @@ public class NodeGroup
         this.numberOfContainers = numberOfContainers;
         this.sshGroupId = sshGroupId;
         this.hostsGroupId = hostsGroupId;
+        this.peerId = peerId;
         this.containerPlacementStrategy = containerPlacementStrategy;
         this.containerDistributionType = ContainerDistributionType.AUTO;
     }

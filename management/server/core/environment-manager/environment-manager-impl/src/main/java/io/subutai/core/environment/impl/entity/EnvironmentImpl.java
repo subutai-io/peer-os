@@ -30,6 +30,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
+import io.subutai.common.environment.Blueprint;
 import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
@@ -307,12 +308,12 @@ public class EnvironmentImpl implements Environment, Serializable
 
 
     @Override
-    public Set<EnvironmentContainerHost> growEnvironment( final Topology topology, boolean async )
+    public Set<EnvironmentContainerHost> growEnvironment( final Blueprint blueprint, boolean async )
             throws EnvironmentModificationException
     {
         try
         {
-            return environmentManager.growEnvironment( getId(), topology, async );
+            return environmentManager.growEnvironment( blueprint, async );
         }
         catch ( EnvironmentNotFoundException e )
         {

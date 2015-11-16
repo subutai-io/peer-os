@@ -2,6 +2,8 @@ package io.subutai.core.environment.impl;
 
 
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
@@ -14,6 +16,8 @@ import javax.annotation.security.RolesAllowed;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -33,6 +37,7 @@ import io.subutai.common.host.HostInfoModel;
 import io.subutai.common.host.Interface;
 import io.subutai.common.mdc.SubutaiExecutors;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
+import io.subutai.common.network.Gateway;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Peer;
@@ -162,19 +167,42 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
+    protected Topology buildTopology( final Blueprint blueprint )
+    {
+        Topology topology = new Topology( blueprint.getName(), blueprint.getEnvironmentId(), blueprint.getCidr(),
+                blueprint.getSshKey() );
+
+
+        for ( Map.Entry<String, Set<NodeGroup>> placementEntry : blueprint.getNodeGroupsMap().entrySet() )
+        {
+            Peer peer = peerManager.getPeer( placementEntry.getKey() );
+            for ( NodeGroup nodeGroup : placementEntry.getValue() )
+            {
+                topology.addNodeGroupPlacement( peer, nodeGroup );
+            }
+        }
+
+        return topology;
+    }
+
+
     @RolesAllowed( "Environment-Management|A|Write" )
     @Override
-    public Environment createEnvironment( final String name, final Topology topology, final String subnetCidr,
-                                          final String sshKey, final boolean async ) throws EnvironmentCreationException
+    public Environment createEnvironment( final Blueprint blueprint, final boolean async )
+            throws EnvironmentCreationException
     {
+        Preconditions.checkNotNull( blueprint, "Invalid blueprint" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( blueprint.getName() ), "Invalid name" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( blueprint.getCidr() ), "Invalid subnet CIDR" );
+        Preconditions.checkArgument( !blueprint.getNodeGroups().isEmpty(), "Placement is empty" );
 
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid name" );
-        Preconditions.checkNotNull( topology, "Invalid topology" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( subnetCidr ), "Invalid subnet CIDR" );
-        Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
+        validateBlueprint( blueprint );
+
+        Topology topology = buildTopology( blueprint );
 
         //create empty environment
-        final EnvironmentImpl environment = createEmptyEnvironment( name, subnetCidr, sshKey );
+        final EnvironmentImpl environment =
+                createEmptyEnvironment( blueprint.getName(), blueprint.getCidr(), blueprint.getSshKey() );
 
         //create operation tracker
         TrackerOperation operationTracker = tracker.createTrackerOperation( TRACKER_SOURCE,
@@ -182,7 +210,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         //launch environment creation workflow
         final EnvironmentCreationWorkflow environmentCreationWorkflow =
-                getEnvironmentCreationWorkflow( environment, topology, sshKey, operationTracker );
+                getEnvironmentCreationWorkflow( environment, topology, blueprint.getSshKey(), operationTracker );
 
         //start environment creation workflow
         executor.execute( new Runnable()
@@ -222,34 +250,84 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Write" )
-    @Override
-    public Set<EnvironmentContainerHost> growEnvironment( final String environmentId, final Topology topology,
-                                                          final boolean async )
-            throws EnvironmentModificationException, EnvironmentNotFoundException
+    private void validateBlueprint( final Blueprint blueprint ) throws EnvironmentCreationException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
-        Preconditions.checkNotNull( topology, "Invalid topology" );
-        Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
+        checkSubnetValidity( blueprint );
+    }
 
-        TrackerOperation op = tracker.createTrackerOperation( TRACKER_SOURCE,
-                String.format( "Growing environment %s", environmentId ) );
 
-        return growEnvironment( environmentId, topology, async, true, op );
+    private void checkSubnetValidity( final Blueprint blueprint ) throws EnvironmentCreationException
+    {
+        Preconditions.checkNotNull( blueprint );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( blueprint.getCidr() ) );
+
+        //check availability of subnet
+
+        SubnetUtils subnetUtils = new SubnetUtils( blueprint.getCidr() );
+        String environmentGatewayIp = subnetUtils.getInfo().getLowAddress();
+        try
+        {
+            for ( String peerId : blueprint.getNodeGroupsMap().keySet() )
+            {
+                Peer peer = peerManager.getPeer( peerId );
+                if ( getUsedGateways( peer ).contains( environmentGatewayIp ) )
+                {
+                    throw new EnvironmentCreationException(
+                            String.format( "Subnet %s is already used on peerId %s", environmentGatewayIp,
+                                    peer.getName() ) );
+                }
+            }
+        }
+        catch ( PeerException e )
+        {
+            throw new EnvironmentCreationException( String.format( "Error on validating subnet: %s", e.getMessage() ) );
+        }
+    }
+
+
+    protected Set<String> getUsedGateways( Peer peer ) throws PeerException
+    {
+
+        Set<String> usedGateways = Sets.newHashSet();
+
+        for ( Gateway gateway : peer.getGateways() )
+        {
+            usedGateways.add( gateway.getIp() );
+        }
+
+        return usedGateways;
     }
 
 
     @RolesAllowed( "Environment-Management|A|Write" )
-    public Set<EnvironmentContainerHost> growEnvironment( final String environmentId, final Topology topology,
-                                                          final boolean async, final boolean checkAccess,
-                                                          final TrackerOperation operationTracker )
+    @Override
+    public Set<EnvironmentContainerHost> growEnvironment( final Blueprint blueprint, final boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
-        Preconditions.checkNotNull( topology, "Invalid topology" );
-        Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
+        Preconditions.checkNotNull( blueprint, "Invalid blueprint" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( blueprint.getEnvironmentId() ), "Invalid environment id" );
+        Preconditions.checkArgument( !blueprint.getNodeGroups().isEmpty(), "Placement is empty" );
+        TrackerOperation operationTracker = tracker.createTrackerOperation( TRACKER_SOURCE,
+                String.format( "Growing environment %s", blueprint.getEnvironmentId() ) );
+        return growEnvironment( blueprint, async, true, operationTracker );
+    }
 
-        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId, checkAccess );
+
+    @RolesAllowed( "Environment-Management|A|Write" )
+    private Set<EnvironmentContainerHost> growEnvironment( final Blueprint blueprint, final boolean async,
+                                                           final boolean checkAccess,
+                                                           TrackerOperation operationTracker )
+            throws EnvironmentModificationException, EnvironmentNotFoundException
+    {
+
+        Preconditions.checkNotNull( blueprint, "Invalid blueprint" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( blueprint.getEnvironmentId() ), "Invalid environment id" );
+        Preconditions.checkArgument( !blueprint.getNodeGroups().isEmpty(), "Placement is empty" );
+
+        final Topology topology = buildTopology( blueprint );
+
+        final EnvironmentImpl environment =
+                ( EnvironmentImpl ) loadEnvironment( blueprint.getEnvironmentId(), checkAccess );
 
         if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
         {
@@ -263,6 +341,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
 
         //launch environment growing workflow
+
         final EnvironmentGrowingWorkflow environmentGrowingWorkflow =
                 getEnvironmentGrowingWorkflow( environment, topology, environment.getSshKey(), operationTracker );
 
@@ -593,6 +672,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         blueprintDataService.persist( blueprint );
     }
+
 
     @RolesAllowed( "Environment-Management|A|Write" )
     @Override

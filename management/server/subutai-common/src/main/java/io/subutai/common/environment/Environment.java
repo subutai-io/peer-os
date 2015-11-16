@@ -69,12 +69,12 @@ public interface Environment
 
 
     /**
-     * Grows environment according to the passed topology
+     * Grows environment according to the passed blueprint
      *
-     * @param topology = topology to use when growing
+     * @param blueprint = blueprint to use when growing
      * @param async - sync or async to the calling party
      */
-    Set<EnvironmentContainerHost> growEnvironment( Topology topology, boolean async )
+    Set<EnvironmentContainerHost> growEnvironment( Blueprint blueprint, boolean async )
             throws EnvironmentModificationException;
 
 
