@@ -4,6 +4,7 @@ package io.subutai.common.environment;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
+import io.subutai.common.gson.required.GsonRequired;
 import io.subutai.common.host.HostId;
 import io.subutai.common.peer.PeerId;
 import io.subutai.common.protocol.PlacementStrategy;
@@ -14,10 +15,15 @@ import io.subutai.common.protocol.PlacementStrategy;
  */
 public class NodeGroup
 {
+    @GsonRequired
     private String name;
+    @GsonRequired
     private String templateName;
+    @GsonRequired
     private ContainerType type;
+    @GsonRequired
     private int numberOfContainers;
+
     private int sshGroupId;
     private int hostsGroupId;
     private PlacementStrategy containerPlacementStrategy;

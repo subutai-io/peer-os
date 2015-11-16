@@ -19,104 +19,110 @@ public interface RestService
     @GET
     @Path( "templates" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response listTemplates();
+    Response listTemplates();
 
 
     /** Blueprints ****************************************************/
     @GET
-    @Path( "blueprint" )
-    @Produces( { MediaType.TEXT_PLAIN } )
-    public Response getBlueprints();
+    @Path( "blueprints" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response getBlueprints();
+
+    @GET
+    @Path( "blueprints/{blueprintId}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response getBlueprint( @PathParam( "blueprintId" ) UUID blueprintId );
 
     @POST
-    @Path( "blueprint" )
+    @Path( "blueprints" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response saveBlueprint( @FormParam( "blueprint_json" ) String content);
+    Response saveBlueprint( @FormParam( "blueprint_json" ) String content);
 
     @DELETE
-    @Path( "blueprint/{blueprintId}" )
-    public Response deleteBlueprint( @PathParam( "blueprintId" ) UUID blueprintId );
+    @Path( "blueprints/{blueprintId}" )
+    Response deleteBlueprint( @PathParam( "blueprintId" ) UUID blueprintId );
 
 
     /** Domain *****************************************************/
     @GET
-    @Path( "domain" )
+    @Path( "domains" )
     @Produces( { MediaType.TEXT_PLAIN } )
-    public Response getDefaultDomainName();
+    Response getDefaultDomainName();
 
 
     /** Environments *****************************************************/
     @GET
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response listEnvironments();
+    Response listEnvironments();
 
 
     @POST
-    public Response createEnvironment( @FormParam( "name" ) String environmentName,
+    Response createEnvironment( @FormParam( "name" ) String environmentName,
                                        @FormParam( "topology" ) String topologyJsonString,
                                        @FormParam( "subnet" ) String subnetCidr, @FormParam( "key" ) String sshKey );
 
     @POST
     @Path( "grow" )
-    public Response growEnvironment( @FormParam( "environmentId" ) String environmentId,
+    Response growEnvironment( @FormParam( "environmentId" ) String environmentId,
                                      @FormParam( "topology" ) String topologyJsonString );
 
+    @DELETE
+    @Path( "{environmentId}" )
+    Response destroyEnvironment( @PathParam( "environmentId" ) String environmentId );
+
+
+    /** Environments SSH keys *****************************************************/
     @POST
-    @Path( "key" )
-    public Response setSshKey( @FormParam( "environmentId" ) String environmentId, @FormParam( "key" ) String key );
+    @Path( "keys" )
+    Response setSshKey( @FormParam( "environmentId" ) String environmentId, @FormParam( "key" ) String key );
 
 
     @DELETE
     @Path( "{environmentId}/keys" )
-    public Response removeSshKey( @PathParam( "environmentId" ) String environmentId );
+    Response removeSshKey( @PathParam( "environmentId" ) String environmentId );
+
+
+    /** Containers keys *****************************************************/
+    @GET
+    @Path( "containers/{containerId}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response getContainerEnvironmentId( @PathParam( "containerId" ) String containerId );
 
     @DELETE
-    @Path( "{environmentId}" )
-    public Response destroyEnvironment( @PathParam( "environmentId" ) String environmentId );
-
-
-    // container
+    @Path( "containers/{containerId}" )
+    Response destroyContainer( @PathParam( "containerId" ) String containerId );
 
     @GET
-    @Path( "container/{containerId}" )
+    @Path( "containers/{containerId}/state" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getContainerEnvironmentId( @PathParam( "containerId" ) String containerId );
-
-    @DELETE
-    @Path( "container/{containerId}" )
-    public Response destroyContainer( @PathParam( "containerId" ) String containerId );
-
-    @GET
-    @Path( "container/{containerId}/state" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getContainerState( @PathParam( "containerId" ) String containerId );
+    Response getContainerState( @PathParam( "containerId" ) String containerId );
 
     @POST
-    @Path( "container/{containerId}/start" )
+    @Path( "containers/{containerId}/start" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response startContainer( @PathParam( "containerId" ) String containerId );
+    Response startContainer( @PathParam( "containerId" ) String containerId );
 
     @POST
-    @Path( "container/{containerId}/stop" )
+    @Path( "containers/{containerId}/stop" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response stopContainer( @PathParam( "containerId" ) String containerId );
+    Response stopContainer( @PathParam( "containerId" ) String containerId );
 
 
-
-    // Peers
+    /** Container types *****************************************************/
     @GET
-    @Path( "peers" )
-    public Response getPeers();
+    @Path( "containers/types" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response listContainerTypes();
 
 
-    //Quota
+    /** Container quota *****************************************************/
     @GET
-    @Path( "container/{containerId}/quota" )
+    @Path( "containers/{containerId}/quota" )
     @Produces( { MediaType.APPLICATION_JSON } )
     Response getContainerQuota( @PathParam( "containerId" ) String containerId );
 
     @POST
-    @Path( "container/{containerId}/quota" )
+    @Path( "containers/{containerId}/quota" )
     @Produces( { MediaType.APPLICATION_JSON } )
     Response setContainerQuota( @PathParam( "containerId" ) String containerId,
                                 @FormParam( "cpu" ) int cpu,
@@ -127,30 +133,42 @@ public interface RestService
                                 @FormParam( "disk_opt" ) Double diskOpt);
 
     @GET
-    @Path( "container/{containerId}/quota/ram" )
+    @Path( "containers/{containerId}/quota/ram" )
     @Produces( { MediaType.APPLICATION_JSON } )
     Response getRamQuota( @PathParam( "containerId" ) String containerId );
 
     @POST
-    @Path( "container/{containerId}/quota/ram" )
+    @Path( "containers/{containerId}/quota/ram" )
     Response setRamQuota( @PathParam( "containerId" ) String containerId, @FormParam( "ram" ) int ram );
 
     @GET
-    @Path( "container/{containerId}/quota/cpu" )
+    @Path( "containers/{containerId}/quota/cpu" )
     @Produces( { MediaType.APPLICATION_JSON } )
     Response getCpuQuota( @PathParam( "containerId" ) String containerId );
 
     @POST
-    @Path( "container/{containerId}/quota/cpu" )
+    @Path( "containers/{containerId}/quota/cpu" )
     Response setCpuQuota( @PathParam( "containerId" ) String containerId, @FormParam( "cpu" ) int cpu );
 
     @GET
-    @Path( "container/{containerId}/quota/disk/{diskPartition}" )
+    @Path( "containers/{containerId}/quota/disk/{diskPartition}" )
     @Produces( { MediaType.APPLICATION_JSON } )
     Response getDiskQuota( @PathParam( "containerId" ) String containerId,
                            @PathParam( "diskPartition" ) String diskPartition );
 
     @POST
-    @Path( "container/{containerId}/quota/disk" )
+    @Path( "containers/{containerId}/quota/disk" )
     Response setDiskQuota( @PathParam( "containerId" ) String containerId, @FormParam( "diskQuota" ) String diskQuota );
+
+    /** Peers strategy *****************************************************/
+
+    @GET
+    @Path( "strategies" )
+    Response listPlacementStrategies();
+
+    /** Peers *****************************************************/
+    @GET
+    @Path( "peers" )
+    Response getPeers();
+
 }

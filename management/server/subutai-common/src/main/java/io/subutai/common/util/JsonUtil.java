@@ -5,9 +5,6 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -17,8 +14,6 @@ import com.google.gson.GsonBuilder;
  */
 public class JsonUtil
 {
-    private static final Logger LOG = LoggerFactory.getLogger( JsonUtil.class );
-
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
 

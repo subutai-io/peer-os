@@ -6,12 +6,15 @@ import java.util.*;
 import javax.ws.rs.core.Response;
 
 import io.subutai.common.environment.*;
+import io.subutai.common.gson.required.RequiredDeserializer;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.quota.DiskPartition;
 import io.subutai.common.quota.DiskQuota;
 import io.subutai.common.quota.DiskQuotaUnit;
 import io.subutai.common.util.CollectionUtil;
+import io.subutai.common.environment.ContainerType;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +22,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import io.subutai.common.host.ContainerHostState;
@@ -33,21 +38,28 @@ import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registry.api.TemplateRegistry;
+import io.subutai.core.strategy.api.StrategyManager;
 
 
 public class RestServiceImpl implements RestService
 {
     private static final Logger LOG = LoggerFactory.getLogger( RestServiceImpl.class );
 
+    private Gson gson = new GsonBuilder()
+                    .registerTypeAdapter( NodeGroup.class, new RequiredDeserializer<NodeGroup>() )
+                    .registerTypeAdapter( Blueprint.class, new RequiredDeserializer<Blueprint>() )
+                    .setPrettyPrinting().create();
+
     private static final String ERROR_KEY = "ERROR";
 
     private final EnvironmentManager environmentManager;
     private final PeerManager peerManager;
     private final TemplateRegistry templateRegistry;
+    private final StrategyManager strategyManager;
 
 
     public RestServiceImpl( final EnvironmentManager environmentManager, final PeerManager peerManager,
-                            final TemplateRegistry templateRegistry )
+                            final TemplateRegistry templateRegistry, final StrategyManager strategyManager )
     {
         Preconditions.checkNotNull( environmentManager );
         Preconditions.checkNotNull( peerManager );
@@ -56,6 +68,7 @@ public class RestServiceImpl implements RestService
         this.environmentManager = environmentManager;
         this.peerManager = peerManager;
         this.templateRegistry = templateRegistry;
+        this.strategyManager = strategyManager;
     }
 
 
@@ -86,7 +99,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            return Response.ok( JsonUtil.toJson( environmentManager.getBlueprints() ) ).build();
+            return Response.ok( JsonUtil.toJson( environmentManager.getBlueprints())).build();
         }
         catch (EnvironmentManagerException e )
         {
@@ -96,25 +109,55 @@ public class RestServiceImpl implements RestService
     }
 
     @Override
-    public Response saveBlueprint(final String content)
+    public Response getBlueprint( UUID blueprintId )
     {
-        if ( content.length() <= 0 )
-        {
-            return Response.status( Response.Status.BAD_REQUEST )
-                           .entity(JsonUtil.toJson(ERROR_KEY, "Empty request")).build();
-        }
-
         try
         {
-            Blueprint blueprint = JsonUtil.fromJson( content, Blueprint.class );
+            return Response.ok( JsonUtil.toJson( environmentManager.getBlueprint( blueprintId ))).build();
+        }
+        catch (EnvironmentManagerException e )
+        {
+            return Response.status( Response.Status.BAD_REQUEST )
+                           .entity(JsonUtil.toJson(ERROR_KEY, "Error blueprint not found")).build();
+        }
+
+    }
+
+    @Override
+    public Response saveBlueprint(final String content)
+    {
+        try
+        {
+            Blueprint blueprint = gson.fromJson( content, Blueprint.class );
 
             for ( NodeGroup nodeGroup : blueprint.getNodeGroups() )
             {
-                return Response.status( Response.Status.BAD_REQUEST )
-                        .entity(JsonUtil.toJson(ERROR_KEY, "Invalid node container placement strategy")).build();
+                if ( Strings.isNullOrEmpty( nodeGroup.getName() ) )
+                {
+                    return Response.status( Response.Status.BAD_REQUEST )
+                                   .entity( JsonUtil.toJson( ERROR_KEY, "Invalid node group name" ) ).build();
+                }
+                else if ( nodeGroup.getNumberOfContainers() <= 0 )
+                {
+                    return Response.status( Response.Status.BAD_REQUEST )
+                                   .entity(JsonUtil.toJson(ERROR_KEY, "Invalid number of containers")).build();
+                }
+                else if ( Strings.isNullOrEmpty( nodeGroup.getTemplateName() ) )
+                {
+                    return Response.status( Response.Status.BAD_REQUEST )
+                                   .entity(JsonUtil.toJson(ERROR_KEY, "Invalid templateName")).build();
+                }
+                else if ( nodeGroup.getType() == null )
+                {
+                    return Response.status( Response.Status.BAD_REQUEST )
+                                   .entity(JsonUtil.toJson(ERROR_KEY, "Invalid container type")).build();
+                }
             }
 
-            blueprint.setId( UUID.randomUUID() );
+            if( blueprint.getId() == null )
+            {
+                blueprint.setId( UUID.randomUUID() );
+            }
 
             environmentManager.saveBlueprint( blueprint );
 
@@ -263,6 +306,40 @@ public class RestServiceImpl implements RestService
         }
     }
 
+    @Override
+    public Response destroyEnvironment( final String environmentId )
+    {
+        if ( Strings.isNullOrEmpty( environmentId ) )
+        {
+            return Response.status( Response.Status.BAD_REQUEST )
+                           .entity( JsonUtil.toJson( ERROR_KEY, "Invalid environment id" ) ).build();
+        }
+
+        try
+        {
+            environmentManager.destroyEnvironment( environmentId, false, false );
+
+            return Response.ok().build();
+        }
+        catch ( EnvironmentNotFoundException e )
+        {
+            LOG.warn( "Error getting environment by id {}", environmentId );
+            return Response.status( Response.Status.NOT_FOUND ).build();
+        }
+        catch ( EnvironmentDestructionException e )
+        {
+            LOG.error( "Error destroying environment #destroyEnvironment", e );
+            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+        }
+    }
+
+
+    @Override
+    public Response listContainerTypes()
+    {
+        return Response.ok().entity( JsonUtil.toJson( ContainerType.values() ) ).build();
+    }
+
 
     @Override
     public Response getContainerEnvironmentId( final String containerId )
@@ -282,36 +359,6 @@ public class RestServiceImpl implements RestService
         }
 
         return Response.status( Response.Status.NOT_FOUND ).build();
-    }
-
-
-
-    @Override
-    public Response destroyEnvironment( final String environmentId )
-    {
-        if ( Strings.isNullOrEmpty( environmentId ) )
-        {
-            return Response.status( Response.Status.BAD_REQUEST )
-                           .entity( JsonUtil.toJson( ERROR_KEY, "Invalid environment id" ) ).build();
-        }
-
-
-        try
-        {
-            environmentManager.destroyEnvironment( environmentId, false, false );
-
-            return Response.ok().build();
-        }
-        catch ( EnvironmentNotFoundException e )
-        {
-            LOG.warn( "Error getting environment by id {}", environmentId );
-            return Response.status( Response.Status.NOT_FOUND ).build();
-        }
-        catch ( EnvironmentDestructionException e )
-        {
-            LOG.error( "Error destroying environment #destroyEnvironment", e );
-            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
-        }
     }
 
 
@@ -757,6 +804,13 @@ public class RestServiceImpl implements RestService
         return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
     }
 
+
+    /** Peers strategy *****************************************************/
+    @Override
+    public Response listPlacementStrategies()
+    {
+        return Response.ok( JsonUtil.toJson( strategyManager.getPlacementStrategyTitles() ) ).build();
+    }
 
 
     private Topology buildTopology( final TopologyJson topologyJson )

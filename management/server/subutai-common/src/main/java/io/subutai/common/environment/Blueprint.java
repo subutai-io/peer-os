@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
 
+import io.subutai.common.gson.required.GsonRequired;
 import io.subutai.common.util.CollectionUtil;
 
 import com.google.common.base.Preconditions;
@@ -20,6 +21,7 @@ import com.google.common.collect.Sets;
 public class Blueprint
 {
     private UUID id;
+    @GsonRequired
     private String name;
     private String cidr;
     private Set<NodeGroup> nodeGroups;
