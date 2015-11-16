@@ -154,7 +154,6 @@ public class PermissionEntity implements Permission
     }
 
 
-    // TODO: delete this method
     @Override
     public List<String> asString()
     {

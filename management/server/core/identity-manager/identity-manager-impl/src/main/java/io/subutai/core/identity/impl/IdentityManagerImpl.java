@@ -118,11 +118,9 @@ public class IdentityManagerImpl implements IdentityManager
             assignUserRole( admin.getId(), role );
 
             per = createPermission( PermissionObject.KarafServerAdministration.getId(), 1, true, true, true, true );
-            //assignRolePermission( role.getId(), per );
-            identityDataService.persistRolePermission( role.getId(), per );
+            assignRolePermission( role.getId(), per );
             per = createPermission( PermissionObject.KarafServerManagement.getId(), 1, true, true, true, true );
-            //assignRolePermission( role.getId(), per );
-            identityDataService.persistRolePermission( role.getId(), per );
+            assignRolePermission( role.getId(), per );
             //*********************************************
 
             //*********************************************
@@ -132,8 +130,7 @@ public class IdentityManagerImpl implements IdentityManager
             for ( int a = 0; a < permsp.length; a++ )
             {
                 per = createPermission( permsp[a].getId(), 1, true, true, true, true );
-                // assignRolePermission( role.getId(), per );
-                identityDataService.persistRolePermission( role.getId(), per );
+                assignRolePermission( role.getId(), per );
             }
             //*********************************************
 
@@ -151,8 +148,7 @@ public class IdentityManagerImpl implements IdentityManager
                         permsp[a] != PermissionObject.ResourceManagement )
                 {
                     per = createPermission( permsp[a].getId(), 3, true, true, true, true );
-                    //assignRolePermission( role.getId(), per );
-                    identityDataService.persistRolePermission( role.getId(), per );
+                    assignRolePermission( role.getId(), per );
                 }
             }
             //*********************************************
@@ -169,8 +165,7 @@ public class IdentityManagerImpl implements IdentityManager
                         permsp[a] != PermissionObject.KarafServerManagement )
                 {
                     per = createPermission( permsp[a].getId(), 1, true, true, true, true );
-                    //assignRolePermission( role.getId(), per );
-                    identityDataService.persistRolePermission( role.getId(), per );
+                    assignRolePermission( role.getId(), per );
                 }
             }
             //*********************************************
@@ -663,7 +658,7 @@ public class IdentityManagerImpl implements IdentityManager
         {
             for ( Permission permission : role.getPermissions() )
             {
-                if ( permission.getId() == permObj.getId() && permission.getScope() == permScope.getId() )
+                if ( permission.getObject() == permObj.getId() && permission.getScope() == permScope.getId() )
                 {
                     switch ( permOp )
                     {
@@ -779,7 +774,6 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    // TODO: refactor this method for new table
     @RolesAllowed( "Identity-Management|A|Write" )
     @Override
     public void assignRolePermission( long roleId, Permission permission )
@@ -800,11 +794,31 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
+    @RolesAllowed( "Identity-Management|A|Delete" )
+    @Override
+    public void removeRolePermission( long roleId, Permission permission )
+    {
+        identityDataService.removeRolePermission( roleId, permission );
+    }
+
+
+    /* *************************************************
+     */
     @PermitAll
     @Override
     public List<Permission> getAllPermissions()
     {
         return identityDataService.getAllPermissions();
+    }
+
+
+    /* *************************************************
+     */
+    @RolesAllowed( "Identity-Management|A|Update" )
+    @Override
+    public void updatePermission( Permission permission )
+    {
+        identityDataService.updatePermission( permission );
     }
 
 
@@ -819,6 +833,40 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
+    @Override
+    public List<UserToken> getAllUserTokens()
+    {
+        return identityDataService.getAllUserTokens();
+    }
+
+
+
+    /* *************************************************
+     */
+    @RolesAllowed( {"Identity-Management|A|Write",
+                    "Identity-Management|A|Update"} )
+    @Override
+    public void updateUserToken( String oldName, User user, String token, String secret, String issuer, int tokenType,
+                                 Date validDate )
+    {
+        identityDataService.removeUserToken( oldName );
+        createUserToken( user, token, secret, issuer, tokenType, validDate );
+    }
+
+
+    /* *************************************************
+     */
+    @RolesAllowed( {"Identity-Management|A|Write",
+                    "Identity-Management|A|Delete"} )
+    @Override
+    public void removeUserToken( String tokenId)
+    {
+        identityDataService.removeUserToken( tokenId );
+    }
+
+
+    /* *************************************************
+    */
     public DaoManager getDaoManager()
     {
         return daoManager;
@@ -832,22 +880,4 @@ public class IdentityManagerImpl implements IdentityManager
         this.daoManager = daoManager;
     }
 
-
-    /* *************************************************
-         */
-    // TODO: change permission if needed
-    @Override
-    public List<UserToken> getUserTokens()
-    {
-        return identityDataService.getAllUserTokens();
-    }
-
-
-    @Override
-    public void updateUserToken( String oldName, User user, String token, String secret, String issuer, int tokenType,
-                                 Date validDate )
-    {
-        identityDataService.removeUserToken( oldName );
-        createUserToken( user, token, secret, issuer, tokenType, validDate );
-    }
 }

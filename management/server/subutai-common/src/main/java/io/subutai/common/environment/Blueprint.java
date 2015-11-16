@@ -11,11 +11,11 @@ import java.util.UUID;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 
-import io.subutai.common.util.CollectionUtil;
-
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
+
+import io.subutai.common.util.CollectionUtil;
 
 
 /**
@@ -27,26 +27,18 @@ public class Blueprint
 {
     @JsonIgnore
     private UUID id;
-    @JsonProperty( "environmentId" )
-    private String environmentId;
     @JsonProperty( "name" )
     private String name;
-    @JsonProperty( "cidr" )
-    private String cidr;
     @JsonProperty( "sshKey" )
     private String sshKey;
     @JsonProperty( "nodegroups" )
     private Set<NodeGroup> nodeGroups;
 
 
-    public Blueprint( @JsonProperty( "environmentId" ) final String environmentId,
-                      @JsonProperty( "name" ) final String name, @JsonProperty( "cidr" ) final String cidr,
-                      @JsonProperty( "sshKey" ) final String sshKey,
+    public Blueprint( @JsonProperty( "name" ) final String name, @JsonProperty( "sshKey" ) final String sshKey,
                       @JsonProperty( "nodegroups" ) final Set<NodeGroup> nodeGroups )
     {
-        this.environmentId = environmentId;
         this.name = name;
-        this.cidr = cidr;
         this.nodeGroups = nodeGroups;
         this.sshKey = sshKey;
     }
@@ -107,20 +99,8 @@ public class Blueprint
     }
 
 
-    public String getCidr()
-    {
-        return cidr;
-    }
-
-
     public String getSshKey()
     {
         return sshKey;
-    }
-
-
-    public String getEnvironmentId()
-    {
-        return environmentId;
     }
 }

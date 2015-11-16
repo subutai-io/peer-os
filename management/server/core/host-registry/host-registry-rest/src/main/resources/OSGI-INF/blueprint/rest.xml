@@ -18,7 +18,7 @@
     <argument ref="hostRegistry" />
   </bean>
 
-  <jaxrs:server address="/hosts" id="hostRegistryRestService">
+  <jaxrs:server address="/v1/hosts" id="hostRegistryRestService">
     <jaxrs:serviceBeans>
       <ref component-id="hostRegistryRest" />
     </jaxrs:serviceBeans>

@@ -21,7 +21,7 @@
     <argument ref="environmentManager" />
   </bean>
 
-  <jaxrs:server address="/monitor" id="registryRestService">
+  <jaxrs:server address="/v1/monitor" id="registryRestService">
     <jaxrs:serviceBeans>
       <ref component-id="monitorRestImpl" />
     </jaxrs:serviceBeans>

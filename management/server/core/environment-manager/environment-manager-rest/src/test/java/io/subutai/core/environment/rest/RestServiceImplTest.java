@@ -94,18 +94,11 @@ public class RestServiceImplTest
     }
 
 
-    @Test( expected = WebApplicationException.class )
-    public void testCreateEnvironment() throws Exception
+    @Test
+    public void testCreateEnvironment() throws EnvironmentCreationException
     {
         NodeGroup nodeGroup = JsonUtil.fromJson( TestUtil.NODE_GROUP_JSON, NodeGroup.class );
-        Blueprint blueprint = new Blueprint( "ID", TestUtil.ENV_NAME, TestUtil.SUBNET, TestUtil.SSH_KEY,
-                Sets.newHashSet( nodeGroup ) );
-        restService.createEnvironment( blueprint );
-
-        nodeGroup = JsonUtil.fromJson( TestUtil.NODE_GROUP_JSON.replace( TestUtil.PEER_ID, "" ), NodeGroup.class );
-        blueprint = new Blueprint( "ID", TestUtil.ENV_NAME, TestUtil.SUBNET, TestUtil.SSH_KEY,
-                Sets.newHashSet( nodeGroup ) );
-
+        Blueprint blueprint = new Blueprint( TestUtil.ENV_NAME, TestUtil.SSH_KEY, Sets.newHashSet( nodeGroup ) );
         restService.createEnvironment( blueprint );
     }
 
@@ -225,8 +218,7 @@ public class RestServiceImplTest
     public void testGrowEnvironment() throws Exception
     {
         NodeGroup nodeGroup = JsonUtil.fromJson( TestUtil.NODE_GROUP_JSON, NodeGroup.class );
-        Blueprint blueprint = new Blueprint( "ID", TestUtil.ENV_NAME, TestUtil.SUBNET, TestUtil.SSH_KEY,
-                Sets.newHashSet( nodeGroup ) );
+        Blueprint blueprint = new Blueprint( TestUtil.ENV_NAME, TestUtil.SSH_KEY, Sets.newHashSet( nodeGroup ) );
 
         restService.growEnvironment( "ENV_ID", blueprint );
 

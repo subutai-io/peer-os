@@ -18,7 +18,7 @@ import io.subutai.core.peer.api.RegistrationClient;
 public class RegistrationClientImpl implements RegistrationClient
 {
     protected RestUtil restUtil = new RestUtil();
-    private static final String urlTemplate = "https://%s:8443/rest/v1/registration/%s";
+    private static final String urlTemplate = "https://%s:8443/rest/v1/handshake/%s";
     private Object provider;
 
 

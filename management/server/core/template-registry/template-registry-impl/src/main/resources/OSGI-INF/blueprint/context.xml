@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:jpa="http://aries.apache.org/xmlns/jpa/v1.0.0">
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:authz="http://aries.apache.org/xmlns/authorization/v1.0.0"
+           xmlns:jpa="http://aries.apache.org/xmlns/jpa/v1.0.0">
+
+  <!-- ***************************************************************** -->
+  <authz:enable />
+  <!-- ***************************************************************** -->
 
   <!-- ***************************************************************** -->
   <bean id="daoManager" init-method="init" class="io.subutai.common.dao.DaoManager" scope="prototype">

@@ -7,7 +7,7 @@ import io.subutai.common.host.ContainerHostState;
 /**
  * Trimmed container for REST
  */
-public class ContainerJson
+public class ContainerDto
 {
     private String id;
     private String environmentId;
@@ -17,8 +17,8 @@ public class ContainerJson
     private String templateName;
 
 
-    public ContainerJson( final String id, final String environmentId, final String hostname,
-                          final ContainerHostState state, final String ip, final String templateName )
+    public ContainerDto( final String id, final String environmentId, final String hostname,
+                         final ContainerHostState state, final String ip, final String templateName )
     {
         this.id = id;
         this.environmentId = environmentId;
