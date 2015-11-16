@@ -85,6 +85,32 @@ public class UserTokenDAO
     /* *************************************************
      *
      */
+    public void removeInvalid()
+    {
+        EntityManager em = daoManager.getEntityManagerFromFactory();
+        try
+        {
+            daoManager.startTransaction( em );
+            Query query = null;
+            query = em.createQuery( "delete from UserTokenEntity ut where ut.type=1 and ut.validDate<:CurrentDate");
+            query.setParameter( "CurrentDate", new Date( System.currentTimeMillis() ) );
+            query.executeUpdate();
+            daoManager.commitTransaction( em );
+        }
+        catch ( Exception e )
+        {
+            daoManager.rollBackTransaction( em );
+        }
+        finally
+        {
+            daoManager.closeEntityManager( em );
+        }
+    }
+
+
+    /* *************************************************
+     *
+     */
     public List<UserToken> getAll()
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
