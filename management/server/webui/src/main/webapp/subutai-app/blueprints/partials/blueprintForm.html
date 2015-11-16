@@ -1,0 +1,99 @@
+<div class="b-popup">
+	<div class="b-popup__header">
+		Create blueprint
+		<a href ng-click="closeThisDialog()">
+			<img src="assets/elements/buttons/b-icon-close.svg" class="b-icon g-right"/>
+		</a>
+	</div>
+	<div class="b-popup__body">
+		<div class="b-popup-body">
+			<div class="b-popup-body__name">
+				<label class="b-popup-body-label">Enter blueprint name</label>
+				<input type="text" 
+					class="b-popup-body-input b-popup-body-input_name" 
+					ng-model="createBlueprintCtrl.blueprintFrom.name" required>
+				<div class="clear"></div>
+			</div>
+			<div class="b-popup-body__box b-popup-body__box_conf">
+				<div class="popup-body-box">
+					<label class="b-popup-body-label">Enter node name</label>
+					<input type="text" 
+						class="b-popup-body-input b-popup-body-input_box" 
+						ng-model="createBlueprintCtrl.blueprintFrom.currentNode.name" required>
+					<div class="clear"></div>
+				</div>
+				<div class="popup-body-box">
+					<label class="b-popup-body-label">Select template</label>
+					<select class="b-popup-body-input b-popup-body-input_box" 
+						ng-model="createBlueprintCtrl.blueprintFrom.currentNode.templateName"
+					>
+						<option ng-repeat="template in createBlueprintCtrl.templates" value="{{ template }}">
+							{{ template }}
+						</option>
+					</select>
+					<div class="clear"></div>
+				</div>
+				<div class="popup-body-box">
+					<label class="b-popup-body-label">Number of containers</label>
+					<input type="number" 
+						class="b-popup-body-input b-popup-body-input_box" 
+						ng-model="createBlueprintCtrl.blueprintFrom.currentNode.numberOfContainers" required>
+					<div class="clear"></div>
+				</div>				
+				<div class="popup-body-box">
+					<label class="b-popup-body-label">Enter SSH Group ID </label>
+					<input type="number" 
+						class="b-popup-body-input b-popup-body-input_box" 
+						ng-model="createBlueprintCtrl.blueprintFrom.currentNode.sshGroupId" required>
+					<div class="clear"></div>
+				</div>
+				<div class="popup-body-box">
+					<label class="b-popup-body-label">Enter host Group ID </label>
+					<input type="number" 
+						class="b-popup-body-input b-popup-body-input_box" 
+						ng-model="createBlueprintCtrl.blueprintFrom.currentNode.hostsGroupId" required>
+					<div class="clear"></div>
+				</div>
+				<div class="popup-body-box">
+					<label class="b-popup-body-label">Select quota size</label>
+					<select class="b-popup-body-input b-popup-body-input_box" 
+						ng-model="createBlueprintCtrl.blueprintFrom.currentNode.type"
+					>
+						<option ng-repeat="type in createBlueprintCtrl.containersType" value="{{ type }}">
+							{{ type }}
+						</option>
+					</select>
+					<div class="clear"></div>
+				</div>				
+				<div class="popup-body-box popup-body-box_btn">
+					<a href class="b-btn b-btn_blue g-right" ng-click="createBlueprintCtrl.addNewNode()">
+						{{ createBlueprintCtrl.nodeStatus }} node list <i class="fa fa-arrow-right"></i>
+					</a>
+					<div class="clear"></div>
+				</div>
+			</div>
+			<div class="b-popup-body__box b-popup-body__box_node">
+				<div class="popup-body-box">
+					<div class="b-popup-body-label">
+						Node list
+					</div>
+					<ul class="b-popup-box__node-list">
+						<li ng-repeat="(key, blueprintNode) in createBlueprintCtrl.nodeList" 
+							class="b-popup-box-node-list" 
+							ng-click="createBlueprintCtrl.setNodeData(key)">
+							<i class="fa fa-cube"></i> {{ blueprintNode.name }}
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="b-popup__footer">
+		<button type="button" 
+			class="b-btn b-btn_green g-right" 
+			ng-click="createBlueprintCtrl.addBlueprint()">
+			Create
+		</button>
+		<div class="clear"></div>
+	</div>
+</div>

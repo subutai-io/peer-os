@@ -7,32 +7,38 @@ angular.module('subutai.environment.service', [])
 environmentService.$inject = ['$http'];
 
 function environmentService($http) {
-	var BASE_URL = 'http://172.16.131.205:8181/rest/environments_ui/';
-	var blueprintURL = BASE_URL + 'blueprint/';
+	var BASE_URL = serverUrl + 'environments_ui/';
+	var blueprintURL = BASE_URL + 'blueprints/';
 	var growBlueprintURL = BASE_URL + 'grow/';
 	var templatesURL = BASE_URL + 'templates/';
-	var peersURL = BASE_URL + 'peers';
+	var peersURL = BASE_URL + 'peers/';
+	var strategiesURL = BASE_URL + 'strategies/';
 	var environmentsURL = BASE_URL;
 	var sshKeysURL = environmentsURL + 'key/';
-	var containersURL = environmentsURL + 'container/';
+	var containersURL = environmentsURL + 'containers/';
+	var containersTypeURL = containersURL + 'types/';
 
 	var environmentService = {
 		getBlueprints: getBlueprints,
+		getBlueprintById: getBlueprintById,
+		createBlueprint : createBlueprint,
 		getTemplates: getTemplates,
 		deleteBlueprint : deleteBlueprint,
 		getPeers : getPeers,
+		getStrategies : getStrategies,
 		buildBlueprint : buildBlueprint,
+		growBlueprint : growBlueprint,
+		getContainersType : getContainersType,
+
 		getEnvironments : getEnvironments,
 		destroyEnvironment: destroyEnvironment,
-		createBlueprint : createBlueprint,
-		growBlueprint : growBlueprint,
 		getContainerStatus : getContainerStatus,
 		switchContainer : switchContainer,
 		destroyContainer : destroyContainer,
 		addSshKey : addSshKey,
 		removeSshKey : removeSshKey,
+
 		getEnvQuota: getEnvQuota,
-		
 		updateQuota: updateQuota
 	};
 
@@ -44,8 +50,16 @@ function environmentService($http) {
 		return $http.get(blueprintURL, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
 	}
 
+	function getBlueprintById(blueprintId) {
+		return $http.get(blueprintURL + blueprintId, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
+	}
+
 	function getTemplates() {
 		return $http.get(templatesURL, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
+	}
+
+	function getContainersType() {
+		return $http.get(containersTypeURL, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
 	}
 
 	function createBlueprint(blueprint_json) {
@@ -63,9 +77,14 @@ function environmentService($http) {
 
 	function getPeers() {
 		return $http.get(peersURL, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
-	}	
+	}
 
-	function buildBlueprint(postData) {
+	function getStrategies() {
+		return $http.get(strategiesURL, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
+	}
+
+	function buildBlueprint(data) {
+		var postData = 'blueprint_json=' + data;
 		return $http.post(
 			environmentsURL, 
 			postData, 
@@ -73,7 +92,8 @@ function environmentService($http) {
 		);
 	}
 
-	function growBlueprint(postData) {
+	function growBlueprint(environmentId, data) {
+		var postData = 'environmentId=' + environmentId + '&blueprint_json=' + data;
 		return $http.post(
 			growBlueprintURL, 
 			postData, 

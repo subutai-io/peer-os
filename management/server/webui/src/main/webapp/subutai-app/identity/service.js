@@ -7,9 +7,9 @@ angular.module('subutai.identity.service', [])
 identitySrv.$inject = ['$http'];
 
 function identitySrv($http) {
-	var BASE_URL = 'http://172.16.131.205:8181/rest/';
-	var usersURL = BASE_URL + 'identity_ui/';
-	var rolesURL = BASE_URL + 'identity_ui/roles/';
+	var BASE_URL = serverUrl + 'identity_ui/';
+	var usersURL = BASE_URL;
+	var rolesURL = BASE_URL + 'roles/';
 
 	var identitySrv = {
 		getUsers: getUsers,

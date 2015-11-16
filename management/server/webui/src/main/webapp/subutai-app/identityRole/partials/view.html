@@ -1,0 +1,30 @@
+<div ng-controller="IdentityRoleCtrl as identityRoleCtrl">
+
+	<div class="b-workspace__header">
+		<a class="b-btn b-btn_blue b-btn_header-button">
+			<i class="fa fa-plus"></i> Add role
+		</a>
+		<h1 class="b-title">Roles management</h1>
+	</div>
+
+	<div class="b-workspace__content">
+		<div class="b-data-table">
+			<table datatable="" 
+				dt-options="identityRoleCtrl.dtOptions" 
+				dt-columns="identityRoleCtrl.dtColumns" 
+				dt-instance="identityRoleCtrl.dtInstance" 
+				class="table table-striped table-hover">
+			</table>
+		</div>
+
+		<div class="b-empty-list" ng-show="identityRoleCtrl.roles.length == 0">
+			<div class="b-empty-list__text">
+				You don’t have any roles
+			</div>
+			<a class="b-btn b-btn_blue" href ng-click="IdentityRoleCtrl.createRoleFrom()">
+				<i class="fa fa-plus"></i> Add role
+			</a>	
+		</div>		
+	</div>
+
+</div>
