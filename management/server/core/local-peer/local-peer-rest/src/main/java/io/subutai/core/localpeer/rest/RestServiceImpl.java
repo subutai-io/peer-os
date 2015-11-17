@@ -41,15 +41,15 @@ import io.subutai.common.peer.LocalPeer;
 public class RestServiceImpl implements RestService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( RestServiceImpl.class );
-    private LocalPeer peerManager;
+    private LocalPeer localPeer;
     //    private Monitor monitor;
     protected JsonUtil jsonUtil = new JsonUtil();
     protected RestUtil restUtil = new RestUtil();
 
 
-    public RestServiceImpl( final LocalPeer peerManager/*, Monitor monitor*/ )
+    public RestServiceImpl( final LocalPeer localPeer/*, Monitor monitor*/ )
     {
-        this.peerManager = peerManager;
+        this.localPeer = localPeer;
         //        this.monitor = monitor;
     }
 
@@ -59,7 +59,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            PeerInfo selfInfo = peerManager.getPeerInfo();
+            PeerInfo selfInfo = localPeer.getPeerInfo();
             return Response.ok( jsonUtil.to( selfInfo ) ).build();
         }
         catch ( Exception e )
@@ -73,7 +73,7 @@ public class RestServiceImpl implements RestService
     @Override
     public PeerInfo getPeerInfo()
     {
-        return peerManager.getPeerInfo();
+        return localPeer.getPeerInfo();
     }
 
 
@@ -84,7 +84,7 @@ public class RestServiceImpl implements RestService
         {
             Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
 
-            PeerPolicy peerPolicy = peerManager.getPeerInfo().getPeerPolicy( peerId );
+            PeerPolicy peerPolicy = localPeer.getPeerInfo().getPeerPolicy( peerId );
             if ( peerPolicy == null )
             {
                 return Response.ok().build();
@@ -110,7 +110,7 @@ public class RestServiceImpl implements RestService
             PeerInfo p = jsonUtil.from( peer, PeerInfo.class );
             p.setIp( getRequestIp() );
             p.setName( String.format( "Peer %s", p.getId() ) );
-            //            peerManager.update( p );
+            //            localPeer.update( p );
 
             return Response.ok( jsonUtil.to( p ) ).build();
         }
@@ -135,7 +135,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            Template result = peerManager.getTemplate( templateName );
+            Template result = localPeer.getTemplate( templateName );
             return Response.ok( jsonUtil.to( result ) ).build();
         }
         catch ( Exception e )
@@ -156,7 +156,7 @@ public class RestServiceImpl implements RestService
         {
             Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
 
-            return Response.ok( peerManager.getContainerHostById( containerId ).getAvailableRamQuota() ).build();
+            return Response.ok( localPeer.getContainerHostById( containerId ).getAvailableRamQuota() ).build();
         }
         catch ( Exception e )
         {
@@ -173,7 +173,7 @@ public class RestServiceImpl implements RestService
         {
             Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
 
-            return Response.ok( peerManager.getContainerHostById( containerId ).getAvailableCpuQuota() ).build();
+            return Response.ok( localPeer.getContainerHostById( containerId ).getAvailableCpuQuota() ).build();
         }
         catch ( Exception e )
         {
@@ -190,7 +190,7 @@ public class RestServiceImpl implements RestService
         {
             Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
 
-            return Response.ok( jsonUtil.to( peerManager.getContainerHostById( containerId ).getAvailableDiskQuota(
+            return Response.ok( jsonUtil.to( localPeer.getContainerHostById( containerId ).getAvailableDiskQuota(
                     jsonUtil.<DiskPartition>from( diskPartition, new TypeToken<DiskPartition>()
                     {}.getType() ) ) ) ).build();
         }
@@ -210,7 +210,7 @@ public class RestServiceImpl implements RestService
     //            Preconditions.checkNotNull( containerId );
     //            Preconditions.checkArgument( pid > 0 );
     //
-    //            return peerManager.getProcessResourceUsage( containerId, pid );
+    //            return localPeer.getProcessResourceUsage( containerId, pid );
     //        }
     //        catch ( Exception e )
     //        {
@@ -228,7 +228,7 @@ public class RestServiceImpl implements RestService
         {
             Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
 
-            return Response.ok( peerManager.getContainerHostById( containerId ).getRamQuota() ).build();
+            return Response.ok( localPeer.getContainerHostById( containerId ).getRamQuota() ).build();
         }
         catch ( Exception e )
         {
@@ -245,7 +245,7 @@ public class RestServiceImpl implements RestService
         {
             Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
 
-            return Response.ok( peerManager.getContainerHostById( containerId ).getRamQuotaInfo() ).build();
+            return Response.ok( localPeer.getContainerHostById( containerId ).getRamQuotaInfo() ).build();
         }
         catch ( Exception e )
         {
@@ -262,7 +262,7 @@ public class RestServiceImpl implements RestService
         {
             Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
 
-            peerManager.getContainerHostById( containerId ).setRamQuota( ram );
+            localPeer.getContainerHostById( containerId ).setRamQuota( ram );
             return Response.ok().build();
         }
         catch ( Exception e )
@@ -280,7 +280,7 @@ public class RestServiceImpl implements RestService
         {
             Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
 
-            peerManager.getContainerHostById( containerId )
+            localPeer.getContainerHostById( containerId )
                        .setRamQuota( jsonUtil.<RamQuota>from( ramQuota, new TypeToken<RamQuota>()
                        {}.getType() ) );
             return Response.ok().build();
@@ -300,7 +300,7 @@ public class RestServiceImpl implements RestService
         {
             Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
 
-            return Response.ok( peerManager.getContainerHostById( containerId ).getCpuQuota() ).build();
+            return Response.ok( localPeer.getContainerHostById( containerId ).getCpuQuota() ).build();
         }
         catch ( Exception e )
         {
@@ -317,7 +317,7 @@ public class RestServiceImpl implements RestService
         {
             Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
 
-            return Response.ok( peerManager.getContainerHostById( containerId ).getCpuQuotaInfo() ).build();
+            return Response.ok( localPeer.getContainerHostById( containerId ).getCpuQuotaInfo() ).build();
         }
         catch ( Exception e )
         {
@@ -334,7 +334,7 @@ public class RestServiceImpl implements RestService
         {
             Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
 
-            peerManager.getContainerHostById( containerId ).setCpuQuota( cpu );
+            localPeer.getContainerHostById( containerId ).setCpuQuota( cpu );
             return Response.ok().build();
         }
         catch ( Exception e )
@@ -352,7 +352,7 @@ public class RestServiceImpl implements RestService
         {
             Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
 
-            return Response.ok( jsonUtil.to( peerManager.getContainerHostById( containerId ).getCpuSet() ) ).build();
+            return Response.ok( jsonUtil.to( localPeer.getContainerHostById( containerId ).getCpuSet() ) ).build();
         }
         catch ( Exception e )
         {
@@ -369,7 +369,7 @@ public class RestServiceImpl implements RestService
         {
             Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
 
-            peerManager.getContainerHostById( containerId )
+            localPeer.getContainerHostById( containerId )
                        .setCpuSet( jsonUtil.<Set<Integer>>from( cpuSet, new TypeToken<Set<Integer>>()
                        {}.getType() ) );
             return Response.ok().build();
@@ -389,7 +389,7 @@ public class RestServiceImpl implements RestService
         {
             Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
 
-            return Response.ok( jsonUtil.to( peerManager.getContainerHostById( containerId ).getDiskQuota(
+            return Response.ok( jsonUtil.to( localPeer.getContainerHostById( containerId ).getDiskQuota(
                     JsonUtil.<DiskPartition>fromJson( diskPartition, new TypeToken<DiskPartition>()
                     {}.getType() ) ) ) ).build();
         }
@@ -408,7 +408,7 @@ public class RestServiceImpl implements RestService
         {
             Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
 
-            peerManager.getContainerHostById( containerId )
+            localPeer.getContainerHostById( containerId )
                        .setDiskQuota( jsonUtil.<DiskQuota>from( diskQuota, new TypeToken<DiskQuota>()
                        {}.getType() ) );
             return Response.ok().build();
@@ -428,7 +428,7 @@ public class RestServiceImpl implements RestService
         {
             Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
 
-            peerManager.getContainerHostById( containerId ).setDefaultGateway( gatewayIp );
+            localPeer.getContainerHostById( containerId ).setDefaultGateway( gatewayIp );
             return Response.ok().build();
         }
         catch ( Exception e )
@@ -446,7 +446,7 @@ public class RestServiceImpl implements RestService
         {
             Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
 
-            return Response.ok( jsonUtil.to( peerManager.getContainerHostInfoById( containerId ) ) ).build();
+            return Response.ok( jsonUtil.to( localPeer.getContainerHostInfoById( containerId ) ) ).build();
         }
         catch ( Exception e )
         {
@@ -461,7 +461,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            return peerManager.getReservedVnis();
+            return localPeer.getReservedVnis();
         }
         catch ( Exception e )
         {
@@ -476,7 +476,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            return peerManager.getGateways();
+            return localPeer.getGateways();
         }
         catch ( Exception e )
         {
@@ -491,7 +491,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            peerManager.createGateway( gateway );
+            localPeer.createGateway( gateway );
 
             return Response.ok().status( Response.Status.CREATED ).build();
         }
@@ -509,7 +509,7 @@ public class RestServiceImpl implements RestService
 
         try
         {
-            return peerManager.createEnvironmentKeyPair( environmentId );
+            return localPeer.createEnvironmentKeyPair( environmentId );
         }
         catch ( Exception ex )
         {
@@ -523,7 +523,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            peerManager.removeEnvironmentKeyPair( environmentId );
+            localPeer.removeEnvironmentKeyPair( environmentId );
         }
         catch ( Exception e )
         {
@@ -537,7 +537,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            return peerManager.reserveVni( vni );
+            return localPeer.reserveVni( vni );
         }
         catch ( Exception e )
         {
@@ -552,7 +552,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            int vlan = peerManager
+            int vlan = localPeer
                     .setupTunnels( jsonUtil.<Map<String, String>>from( peerIps, new TypeToken<Map<String, String>>()
                     {}.getType() ), environmentId );
 
@@ -571,7 +571,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            return peerManager.getInterfaces();
+            return localPeer.getInterfaces();
         }
         catch ( Exception e )
         {
@@ -585,7 +585,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            return peerManager.getResourceHostMetrics();
+            return localPeer.getResourceHostMetrics();
         }
         catch ( Exception e )
         {
@@ -599,7 +599,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            peerManager.setupN2NConnection( config );
+            localPeer.setupN2NConnection( config );
         }
         catch ( Exception e )
         {
@@ -613,7 +613,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            peerManager.removeN2NConnection( environmentId );
+            localPeer.removeN2NConnection( environmentId );
         }
         catch ( Exception e )
         {
@@ -627,7 +627,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            peerManager.cleanupEnvironmentNetworkSettings( environmentId );
+            localPeer.cleanupEnvironmentNetworkSettings( environmentId );
         }
         catch ( Exception e )
         {

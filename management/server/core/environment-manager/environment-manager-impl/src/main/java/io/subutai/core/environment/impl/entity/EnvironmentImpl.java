@@ -307,13 +307,14 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
+    //TODO: remove environmentId param
     @Override
-    public Set<EnvironmentContainerHost> growEnvironment( final String environmentId, final Blueprint blueprint, boolean async )
-            throws EnvironmentModificationException
+    public Set<EnvironmentContainerHost> growEnvironment( final String environmentId, final Blueprint blueprint,
+                                                          boolean async ) throws EnvironmentModificationException
     {
         try
         {
-            return environmentManager.growEnvironment( environmentId,blueprint, async );
+            return environmentManager.growEnvironment( environmentId, blueprint, async );
         }
         catch ( EnvironmentNotFoundException e )
         {

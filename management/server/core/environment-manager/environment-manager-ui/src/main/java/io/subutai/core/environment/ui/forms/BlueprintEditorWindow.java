@@ -3,6 +3,7 @@ package io.subutai.core.environment.ui.forms;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -144,7 +145,7 @@ public class BlueprintEditorWindow extends Window
 
         final Blueprint b = new Blueprint( nameTxt.getValue(), nodeGroups );
 
-        b.setId( this.blueprint.getId() );
+        b.setId( this.blueprint.getId() != null ? this.blueprint.getId() : UUID.randomUUID() );
         return b;
     }
 
