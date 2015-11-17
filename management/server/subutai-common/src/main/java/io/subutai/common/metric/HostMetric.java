@@ -72,7 +72,7 @@ public class HostMetric extends BaseMetric
     @JsonIgnore
     public Double getAvailableRam()
     {
-        return ram != null ? ram.getTotal() : 0;
+        return ram != null ? ram.getFree() : 0;
     }
 
 
