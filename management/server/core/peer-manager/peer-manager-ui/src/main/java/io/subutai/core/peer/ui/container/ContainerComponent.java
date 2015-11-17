@@ -50,28 +50,28 @@ public class ContainerComponent extends CustomComponent
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setSpacing( true );
         verticalLayout.setSizeFull();
-        TabSheet commandsSheet = new TabSheet();
-        commandsSheet.setStyleName( Runo.TABSHEET_SMALL );
-        commandsSheet.setSizeFull();
+//        TabSheet commandsSheet = new TabSheet();
+//        commandsSheet.setStyleName( Runo.TABSHEET_SMALL );
+//        commandsSheet.setSizeFull();
         final Manager manager = new Manager( peerManager );
-        commandsSheet.addTab(
-                new Cloner( peerManagerPortalModule.getRegistry(), peerManager.getLocalPeer(), strategyManager,
-                        containerTree ), "Clone" );
-        commandsSheet.addTab( manager, MANAGER_TAB_CAPTION );
-        commandsSheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener()
-        {
-            @Override
-            public void selectedTabChange( TabSheet.SelectedTabChangeEvent event )
-            {
-                TabSheet tabsheet = event.getTabSheet();
-                String caption = tabsheet.getTab( event.getTabSheet().getSelectedTab() ).getCaption();
-                if ( caption.equals( MANAGER_TAB_CAPTION ) )
-                {
-                    manager.getContainerInfo();
-                }
-            }
-        } );
-        verticalLayout.addComponent( commandsSheet );
+//        commandsSheet.addTab(
+//                new Cloner( peerManagerPortalModule.getRegistry(), peerManager.getLocalPeer(), strategyManager,
+//                        containerTree ), "Clone" );
+//        commandsSheet.addTab( manager, MANAGER_TAB_CAPTION );
+//        commandsSheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener()
+//        {
+//            @Override
+//            public void selectedTabChange( TabSheet.SelectedTabChangeEvent event )
+//            {
+//                TabSheet tabsheet = event.getTabSheet();
+//                String caption = tabsheet.getTab( event.getTabSheet().getSelectedTab() ).getCaption();
+//                if ( caption.equals( MANAGER_TAB_CAPTION ) )
+//                {
+//                    manager.getContainerInfo();
+//                }
+//            }
+//        } );
+        verticalLayout.addComponent( manager );
 
         horizontalSplit.setSecondComponent( verticalLayout );
         setCompositionRoot( horizontalSplit );

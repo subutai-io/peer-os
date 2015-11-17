@@ -24,7 +24,7 @@
     <argument ref="peerManager" />
   </bean>
 
-  <jaxrs:server address="/v1/registry" id="registryRestService">
+  <jaxrs:server address="/registry" id="registryRestService">
     <jaxrs:serviceBeans>
       <ref component-id="templateRegistryRestImpl" />
     </jaxrs:serviceBeans>

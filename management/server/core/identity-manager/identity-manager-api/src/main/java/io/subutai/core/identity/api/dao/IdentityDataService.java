@@ -204,5 +204,8 @@ public interface IdentityDataService
     void removeUserToken( String token );
 
 
-
+    /* *************************************************
+         *
+         */
+    void removeInvalidTokens();
 }

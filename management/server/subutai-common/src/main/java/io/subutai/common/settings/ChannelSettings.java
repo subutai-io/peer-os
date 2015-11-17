@@ -21,12 +21,36 @@ public class ChannelSettings
                 "/rest/v1/peer/id",
                 "/rest/v1/pks/{$}",
                 "/rest/v1/security/keyman/getpublickeyring",
-                "/rest/v1/registration/register",
-                "/rest/v1/registration/approve",
-                "/rest/v1/registration/cancel",
-                "/rest/v1/registration/reject"
+                "/rest/v1/handshake/register",
+                "/rest/v1/handshake/approve",
+                "/rest/v1/handshake/cancel",
+                "/rest/v1/handshake/reject",
+                "/rest/v1/handshake/unregister",
 
-        };
+
+                "/rest/registry/templates",
+                "/rest/registry/templates/import",
+                "/rest/registry/templates/arch/{$}",
+                "/rest/registry/templates/plain-list",
+                "/rest/registry/templates/arch/{$}/plain-list",
+                "/rest/registry/templates/{$}",
+                "/rest/registry/templates/{$}/{$}",
+                "/rest/registry/templates/{$}/{$}/remove",
+                "/rest/registry/templates/{$}/{$}/arch/{$}",
+                "/rest/registry/templates/{$}/parent",
+                "/rest/registry/templates/{$}/{$}/parent",
+                "/rest/registry/templates/{$}/{$}/arch/{$}/parent",
+                "/rest/registry/templates/{$}/parents",
+                "/rest/registry/templates/{$}/{$}/parents",
+                "/rest/registry/templates/{$}/{$}/arch/{$}/parents",
+                "/rest/registry/templates/{$}/children",
+                "/rest/registry/templates/{$}/{$}/children",
+                "/rest/registry/templates/{$}/{$}/arch/{$}/children",
+                "/rest/registry/templates/{$}/{$}/is-used-on-fai",
+                "/rest/registry/templates/{$}/{$}/fai/{$}/is-used/{$}"
+
+
+};
 
         public static short checkURLArray( String uri, String[] urlAccessArray )
         {

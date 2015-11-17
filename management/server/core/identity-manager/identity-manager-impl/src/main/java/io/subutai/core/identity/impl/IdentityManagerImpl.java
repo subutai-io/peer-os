@@ -10,6 +10,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.security.objects.PermissionOperation;
@@ -64,6 +67,7 @@ public class IdentityManagerImpl implements IdentityManager
 
     private IdentityDataService identityDataService = null;
     private DaoManager daoManager = null;
+    private ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
 
 
     /* *************************************************
@@ -77,12 +81,23 @@ public class IdentityManagerImpl implements IdentityManager
     public void init()
     {
         createDefaultUsers();
+
+        //*******Start Token Cleaner *****************
+        executorService.scheduleWithFixedDelay( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                removeInvalidTokens();
+            }
+        }, 1, 1, TimeUnit.HOURS );
+        //*****************************************
     }
 
 
     public void destroy()
     {
-
+        executorService.shutdownNow();
     }
     //*****************************************************
 
@@ -862,6 +877,14 @@ public class IdentityManagerImpl implements IdentityManager
     public void removeUserToken( String tokenId)
     {
         identityDataService.removeUserToken( tokenId );
+    }
+
+
+    /* *************************************************
+     */
+    private void removeInvalidTokens()
+    {
+        identityDataService.removeInvalidTokens();
     }
 
 
