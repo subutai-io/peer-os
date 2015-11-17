@@ -30,11 +30,6 @@
             <artifactId>cxf-rt-frontend-jaxrs</artifactId>
         </dependency>
 
-        <dependency>
-        	<groupId>commons-io</groupId>
-        	<artifactId>commons-io</artifactId>
-        </dependency>
-
     </dependencies> 
     
     
@@ -49,12 +44,12 @@
                         <Bundle-SymbolicName>${project.groupId}.core.kurjun.rest</Bundle-SymbolicName>
                         <Export-Package>{local-packages};version=${project.version};-noimport:=true</Export-Package>
                         <Embed-Dependency>
-                            commons-compress,model
+                            commons-compress,model,geronimo-javamail_1.4_spec
                         </Embed-Dependency>
                         <Embed-Transitive>true</Embed-Transitive>
                         
                         <Import-Package>
-                            org.apache.commons.io, io.subutai.core.kurjun.api, org.slf4j, org.apache.cxf.jaxrs*, javax.ws.rs*, !*
+                            io.subutai.core.kurjun.api, org.apache.commons.io, org.slf4j, org.apache.cxf.jaxrs*, javax.ws.rs*, !*
                         </Import-Package>
                         
                     </instructions>

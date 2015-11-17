@@ -22,7 +22,8 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>local-peer-api</artifactId>
-    </dependency>    <dependency>
+    </dependency>    
+    <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>kurjun-api</artifactId>
     </dependency>
