@@ -122,7 +122,6 @@ public class Manager extends VerticalLayout
             }
         } );
 
-        getContainerInfo();
     }
 
 
