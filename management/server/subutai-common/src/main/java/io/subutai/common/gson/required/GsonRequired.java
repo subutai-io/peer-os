@@ -11,4 +11,5 @@ import java.lang.annotation.Target;
 @Target( ElementType.FIELD )
 public @interface GsonRequired
 {
+    GsonValidation validation() default GsonValidation.NONE;
 }

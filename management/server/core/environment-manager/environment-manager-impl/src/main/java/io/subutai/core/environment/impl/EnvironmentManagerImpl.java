@@ -319,11 +319,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                                                           final boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
-        Preconditions.checkNotNull( blueprint, "Invalid blueprint" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
-        Preconditions.checkArgument( !blueprint.getNodeGroups().isEmpty(), "Placement is empty" );
         TrackerOperation operationTracker = tracker.createTrackerOperation( TRACKER_SOURCE,
                 String.format( "Growing environment %s", environmentId ) );
+
         return growEnvironment( environmentId, blueprint, async, true, operationTracker );
     }
 
@@ -419,8 +417,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     public void setSshKey( final String environmentId, final String sshKey, final boolean async )
             throws EnvironmentNotFoundException, EnvironmentModificationException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
-
         TrackerOperation op = tracker.createTrackerOperation( TRACKER_SOURCE,
                 String.format( "Setting environment %s ssh key", environmentId ) );
 
@@ -468,8 +464,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                                     final boolean forceMetadataRemoval )
             throws EnvironmentDestructionException, EnvironmentNotFoundException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
-
         TrackerOperation op = tracker.createTrackerOperation( TRACKER_SOURCE,
                 String.format( "Destroying environment %s", environmentId ) );
 
@@ -566,9 +560,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager
 
         User activeUser = identityManager.getActiveUser();
 
-        final boolean deleteAll = identityManager
-                .isUserPermitted( activeUser, PermissionObject.EnvironmentManagement, PermissionScope.ALL_SCOPE,
-                        PermissionOperation.Delete );
+//        final boolean deleteAll = identityManager
+//                .isUserPermitted( activeUser, PermissionObject.EnvironmentManagement, PermissionScope.ALL_SCOPE,
+//                        PermissionOperation.Delete ); @todo frontend
+
+        final boolean deleteAll = true;
 
         if (!( deleteAll || environment.getUserId().equals( activeUser.getId() ) ))
         {

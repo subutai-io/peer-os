@@ -169,6 +169,10 @@ public class RestServiceImpl implements RestService
                 );
 
 
+                if(!Strings.isNullOrEmpty(rolename)) {
+                    role.setName(rolename);
+                }
+
                 role.setPermissions( permissions.stream().map( p -> identityManager.createPermission(
                         p.getObject(),
                         p.getScope(),

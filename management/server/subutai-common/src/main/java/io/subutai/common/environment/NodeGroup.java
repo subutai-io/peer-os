@@ -5,6 +5,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 import io.subutai.common.gson.required.GsonRequired;
+import io.subutai.common.gson.required.GsonValidation;
 import io.subutai.common.host.HostId;
 import io.subutai.common.peer.PeerId;
 import io.subutai.common.protocol.PlacementStrategy;
@@ -21,7 +22,7 @@ public class NodeGroup
     private String templateName;
     @GsonRequired
     private ContainerType type;
-    @GsonRequired
+    @GsonRequired( validation = GsonValidation.GREATER_THAN_ZERO )
     private int numberOfContainers;
 
     @GsonRequired

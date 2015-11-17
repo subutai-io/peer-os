@@ -1,6 +1,8 @@
 package io.subutai.core.environment.rest.ui;
 
 
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -8,25 +10,21 @@ import javax.ws.rs.core.Response;
 
 import io.subutai.common.environment.*;
 import io.subutai.common.gson.required.RequiredDeserializer;
-import io.subutai.common.protocol.Template;
-import io.subutai.common.quota.DiskPartition;
-import io.subutai.common.quota.DiskQuota;
-import io.subutai.common.quota.DiskQuotaUnit;
-import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.environment.ContainerType;
+import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
-import com.google.gson.reflect.TypeToken;
 
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.peer.ContainerHost;
@@ -47,10 +45,7 @@ public class RestServiceImpl implements RestService
 {
     private static final Logger LOG = LoggerFactory.getLogger( RestServiceImpl.class );
 
-    private Gson gson = new GsonBuilder()
-                    .registerTypeAdapter( NodeGroup.class, new RequiredDeserializer<NodeGroup>() )
-                    .registerTypeAdapter( Blueprint.class, new RequiredDeserializer<Blueprint>() )
-                    .setPrettyPrinting().create();
+    private Gson gson = RequiredDeserializer.createValidatingGson();
 
     private static final String ERROR_KEY = "ERROR";
 
@@ -66,6 +61,7 @@ public class RestServiceImpl implements RestService
         Preconditions.checkNotNull( environmentManager );
         Preconditions.checkNotNull( peerManager );
         Preconditions.checkNotNull( templateRegistry );
+        Preconditions.checkNotNull( strategyManager );
 
         this.environmentManager = environmentManager;
         this.peerManager = peerManager;
@@ -74,7 +70,9 @@ public class RestServiceImpl implements RestService
     }
 
 
+
     /** Templates *****************************************************/
+
     @Override
     public Response listTemplates()
     {
@@ -84,7 +82,7 @@ public class RestServiceImpl implements RestService
 
         if ( !templates.isEmpty() )
         {
-            return Response.ok().entity( JsonUtil.toJson( templates ) ).build();
+            return Response.ok().entity( gson.toJson( templates ) ).build();
         }
         else
         {
@@ -93,18 +91,20 @@ public class RestServiceImpl implements RestService
     }
 
 
+
     /** Blueprints ****************************************************/
+
     @Override
     public Response getBlueprints()
     {
         try
         {
-            return Response.ok( JsonUtil.toJson( environmentManager.getBlueprints()) ).build();
+            return Response.ok( gson.toJson( environmentManager.getBlueprints()) ).build();
         }
         catch (EnvironmentManagerException e )
         {
             return Response.status( Response.Status.BAD_REQUEST )
-                    .entity(JsonUtil.toJson(ERROR_KEY, "Error loading blueprints")).build();
+                    .entity( JsonUtil.toJson(ERROR_KEY, "Error loading blueprints") ).build();
         }
     }
 
@@ -113,7 +113,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            return Response.ok( JsonUtil.toJson( environmentManager.getBlueprint( blueprintId ))).build();
+            return Response.ok( gson.toJson( environmentManager.getBlueprint( blueprintId ))).build();
         }
         catch (EnvironmentManagerException e )
         {
@@ -146,7 +146,7 @@ public class RestServiceImpl implements RestService
 
             environmentManager.saveBlueprint( blueprint );
 
-            return Response.ok(JsonUtil.toJson(blueprint)).build();
+            return Response.ok(gson.toJson(blueprint)).build();
         }
         catch ( Exception e )
         {
@@ -172,7 +172,9 @@ public class RestServiceImpl implements RestService
     }
 
 
+
     /** Domain *****************************************************/
+
     @Override
     public Response getDefaultDomainName()
     {
@@ -180,7 +182,9 @@ public class RestServiceImpl implements RestService
     }
 
 
+
     /** Environments *****************************************************/
+
     @Override
     public Response listEnvironments()
     {
@@ -207,10 +211,6 @@ public class RestServiceImpl implements RestService
 
             Environment environment =
                     environmentManager.createEnvironment( blueprint, false );
-
-            return Response.ok( JsonUtil.toJson(
-                    new EnvironmentJson( environment.getId(), environment.getName(), environment.getStatus(),
-                            convertContainersToContainerJson( environment.getContainerHosts() ) ) ) ).build();
         }
         catch ( EnvironmentCreationException e )
         {
@@ -223,27 +223,20 @@ public class RestServiceImpl implements RestService
             return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) )
                            .build();
         }
+
+        return Response.ok().build();
     }
 
 
     @Override
-    public Response growEnvironment( final String enviroupmentId, final String blueprintJson )
+    public Response growEnvironment( final String environmentId, final String blueprintJson )
     {
         try
         {
             Blueprint blueprint = gson.fromJson( blueprintJson, Blueprint.class );
 
-            Environment environment =
-                    environmentManager.createEnvironment( blueprint, false );
-
-            return Response.ok( JsonUtil.toJson(
-                    new EnvironmentJson( environment.getId(), environment.getName(), environment.getStatus(),
-                            convertContainersToContainerJson( environment.getContainerHosts() ) ) ) ).build();
-        }
-        catch ( EnvironmentCreationException e )
-        {
-            LOG.error( "Error creating environment #growEnvironment", e );
-            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+            Set<EnvironmentContainerHost> environment =
+                    environmentManager.growEnvironment( environmentId, blueprint, false );
         }
         catch ( Exception e )
         {
@@ -251,22 +244,16 @@ public class RestServiceImpl implements RestService
             return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) )
                            .build();
         }
+
+        return Response.ok().build();
     }
 
     @Override
     public Response destroyEnvironment( final String environmentId )
     {
-        if ( Strings.isNullOrEmpty( environmentId ) )
-        {
-            return Response.status( Response.Status.BAD_REQUEST )
-                           .entity( JsonUtil.toJson( ERROR_KEY, "Invalid environment id" ) ).build();
-        }
-
         try
         {
             environmentManager.destroyEnvironment( environmentId, false, false );
-
-            return Response.ok().build();
         }
         catch ( EnvironmentNotFoundException e )
         {
@@ -278,15 +265,136 @@ public class RestServiceImpl implements RestService
             LOG.error( "Error destroying environment #destroyEnvironment", e );
             return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
         }
+
+        return Response.ok().build();
+    }
+
+    @Override
+    public Response setSshKey( final String environmentId, final String key )
+    {
+        if ( Strings.isNullOrEmpty( key ) )
+        {
+            return Response.status( Response.Status.BAD_REQUEST )
+                           .entity( JsonUtil.toJson( ERROR_KEY, "Invalid ssh key" ) ).build();
+        }
+
+
+        try
+        {
+            environmentManager.setSshKey( environmentId, key, false );
+        }
+        catch ( EnvironmentNotFoundException e )
+        {
+            LOG.warn( "Environment not found by id {}", environmentId );
+            return Response.status( Response.Status.NOT_FOUND ).build();
+        }
+        catch ( EnvironmentModificationException e )
+        {
+            LOG.error( "Environment modification failed", e );
+            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+        }
+
+        return Response.ok().build();
+    }
+
+
+    /** Environments SSH keys *****************************************************/
+
+    @Override
+    public Response removeSshKey( final String environmentId )
+    {
+
+        try
+        {
+            environmentManager.setSshKey( environmentId, null, false );
+        }
+        catch ( EnvironmentNotFoundException e )
+        {
+            LOG.warn( "Exception getting environment by id {}", environmentId );
+            return Response.status( Response.Status.NOT_FOUND ).build();
+        }
+        catch ( EnvironmentModificationException e )
+        {
+            LOG.error( "Error modifying environment", e );
+            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+        }
+
+        return Response.ok().build();
+    }
+
+
+
+    /** Environment domains *****************************************************/
+
+    @Override
+    public Response listDomainLoadBalanceStrategies()
+    {
+        return Response.ok( JsonUtil.toJson( DomainLoadBalanceStrategy.values() ) ).build();
     }
 
 
     @Override
-    public Response listContainerTypes()
+    public Response addEnvironmentDomain( String environmentId, String hostName, DomainLoadBalanceStrategy strategy,
+                                          Attachment attr )
     {
-        return Response.ok().entity( JsonUtil.toJson( ContainerType.values() ) ).build();
+        if( attr == null )
+        {
+            return Response.status( Response.Status.BAD_REQUEST ).build();
+        }
+
+        try
+        {
+            File file = new File( System.getProperty( "java.io.tmpdir" ) + "/" + environmentId );
+            file.createNewFile();
+            attr.transferTo( file );
+        }
+        catch ( IOException e )
+        {
+            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+        }
+
+        try
+        {
+            environmentManager.assignEnvironmentDomain( environmentId, hostName, strategy,
+                    System.getProperty( "java.io.tmpdir" ) + "/" + environmentId );
+        }
+        catch ( EnvironmentModificationException e )
+        {
+            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+        }
+        catch ( EnvironmentNotFoundException e )
+        {
+            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+        }
+
+        return Response.ok().build();
     }
 
+
+    @Override
+    public Response removeEnvironmentDomain( String environmentId )
+    {
+        try
+        {
+            environmentManager.removeEnvironmentDomain( environmentId );
+        }
+        catch ( EnvironmentModificationException e )
+        {
+            LOG.error( "Error removing sshKey ", e );
+            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+        }
+        catch ( EnvironmentNotFoundException e )
+        {
+            LOG.error( "Cannot find environment ", e );
+            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+        }
+
+        return Response.ok().build();
+    }
+
+
+
+    /** Containers *****************************************************/
 
     @Override
     public Response getContainerEnvironmentId( final String containerId )
@@ -339,24 +447,6 @@ public class RestServiceImpl implements RestService
 
         return Response.status( Response.Status.NOT_FOUND ).build();
     }
-
-
-    private Environment findEnvironmentByContainerId( String containerId )
-    {
-        for ( Environment environment : environmentManager.getEnvironments() )
-        {
-            for ( ContainerHost containerHost : environment.getContainerHosts() )
-            {
-                if ( containerHost.getId().equals( containerId ) )
-                {
-                    return environment;
-                }
-            }
-        }
-
-        return null;
-    }
-
 
 
     @Override
@@ -456,100 +546,17 @@ public class RestServiceImpl implements RestService
     }
 
 
+
+    /** Container types *****************************************************/
     @Override
-    public Response setSshKey( final String environmentId, final String key )
+    public Response listContainerTypes()
     {
-        if ( Strings.isNullOrEmpty( environmentId ) )
-        {
-            return Response.status( Response.Status.BAD_REQUEST )
-                           .entity( JsonUtil.toJson( ERROR_KEY, "Invalid environment id" ) ).build();
-        }
-        else if ( Strings.isNullOrEmpty( key ) )
-        {
-            return Response.status( Response.Status.BAD_REQUEST )
-                           .entity( JsonUtil.toJson( ERROR_KEY, "Invalid ssh key" ) ).build();
-        }
-
-
-        try
-        {
-            environmentManager.setSshKey( environmentId, key, false );
-
-            return Response.ok().build();
-        }
-        catch ( EnvironmentNotFoundException e )
-        {
-            LOG.warn( "Environment not found by id {}", environmentId );
-            return Response.status( Response.Status.NOT_FOUND ).build();
-        }
-        catch ( EnvironmentModificationException e )
-        {
-            LOG.error( "Environment modification failed", e );
-            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
-        }
+        return Response.ok().entity( gson.toJson( ContainerType.values() ) ).build();
     }
 
 
-    @Override
-    public Response removeSshKey( final String environmentId )
-    {
-        if ( Strings.isNullOrEmpty( environmentId ) )
-        {
-            return Response.status( Response.Status.BAD_REQUEST )
-                           .entity( JsonUtil.toJson( ERROR_KEY, "Invalid environment id" ) ).build();
-        }
 
-
-        try
-        {
-            environmentManager.setSshKey( environmentId, null, false );
-
-            return Response.ok().build();
-        }
-        catch ( EnvironmentNotFoundException e )
-        {
-            LOG.warn( "Exception getting environment by id {}", environmentId );
-            return Response.status( Response.Status.NOT_FOUND ).build();
-        }
-        catch ( EnvironmentModificationException e )
-        {
-            LOG.error( "Error modifying environment", e );
-            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
-        }
-    }
-
-
-    private Set<ContainerJson> convertContainersToContainerJson( Set<EnvironmentContainerHost> containerHosts )
-    {
-        Set<ContainerJson> jsonSet = Sets.newHashSet();
-        for ( EnvironmentContainerHost containerHost : containerHosts )
-        {
-            ContainerHostState state = containerHost.getStatus();
-
-
-            jsonSet.add( new ContainerJson( containerHost.getId(), containerHost.getEnvironmentId(),
-                    containerHost.getHostname(), state,
-                    containerHost.getIpByInterfaceName( Common.DEFAULT_CONTAINER_INTERFACE ),
-                    containerHost.getTemplateName() ) );
-        }
-        return jsonSet;
-    }
-
-    @Override
-    public Response getPeers()
-    {
-        List<Peer> peers = peerManager.getPeers();
-        Map<String, String> peerNames = Maps.newHashMap();
-
-        for( Peer peer : peers )
-        {
-            peerNames.put( peer.getId(), peer.getName() );
-        }
-
-        return Response.ok().entity( JsonUtil.toJson( peerNames ) ).build();
-    }
-
-    //Quota
+    /** Container quota *****************************************************/
     @Override
     public Response getContainerQuota( final String containerId )
     {
@@ -757,5 +764,61 @@ public class RestServiceImpl implements RestService
     public Response listPlacementStrategies()
     {
         return Response.ok( JsonUtil.toJson( strategyManager.getPlacementStrategyTitles() ) ).build();
+    }
+
+
+
+    /** Peers *****************************************************/
+    @Override
+    public Response getPeers()
+    {
+        List<Peer> peers = peerManager.getPeers();
+        Map<String, String> peerNames = Maps.newHashMap();
+
+        for( Peer peer : peers )
+        {
+            peerNames.put( peer.getId(), peer.getName() );
+        }
+
+        return Response.ok().entity( JsonUtil.toJson( peerNames ) ).build();
+    }
+
+
+
+    /** AUX *****************************************************/
+
+    private Set<ContainerJson> convertContainersToContainerJson( Set<EnvironmentContainerHost> containerHosts )
+    {
+        Set<ContainerJson> jsonSet = Sets.newHashSet();
+        for ( EnvironmentContainerHost containerHost : containerHosts )
+        {
+            ContainerHostState state = containerHost.getStatus();
+
+
+            jsonSet.add( new ContainerJson( containerHost.getId(), containerHost.getEnvironmentId(),
+                    containerHost.getHostname(), state,
+                    containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp(),
+                    containerHost.getTemplateName() ) );
+        }
+        return jsonSet;
+    }
+
+
+
+
+    private Environment findEnvironmentByContainerId( String containerId )
+    {
+        for ( Environment environment : environmentManager.getEnvironments() )
+        {
+            for ( ContainerHost containerHost : environment.getContainerHosts() )
+            {
+                if ( containerHost.getId().equals( containerId ) )
+                {
+                    return environment;
+                }
+            }
+        }
+
+        return null;
     }
 }

@@ -14,22 +14,14 @@
     <reference id="peerManager" availability="mandatory"
                interface="io.subutai.core.peer.api.PeerManager" />
 
-
-    <reference id="securityManager" availability="mandatory"
-               interface="io.subutai.core.security.api.SecurityManager" />
-
     <bean id="peerRestUIServiceImpl" class="io.subutai.core.peer.rest.ui.RestServiceImpl">
         <argument ref="peerManager" />
-        <argument ref="securityManager" />
     </bean>
 
   <jaxrs:server address="/peer_ui" id="peerRestUIService">
     <jaxrs:serviceBeans>
       <ref component-id="peerRestUIServiceImpl" />
     </jaxrs:serviceBeans>
-    <jaxrs:providers>
-      <bean class="org.codehaus.jackson.jaxrs.JacksonJsonProvider"/>
-    </jaxrs:providers>
   </jaxrs:server>
 
 </blueprint>

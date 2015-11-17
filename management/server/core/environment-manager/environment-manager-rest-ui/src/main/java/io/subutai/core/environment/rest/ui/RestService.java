@@ -1,6 +1,7 @@
 package io.subutai.core.environment.rest.ui;
 
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -12,6 +13,11 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.UUID;
 
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.multipart.Multipart;
+
+import io.subutai.common.network.DomainLoadBalanceStrategy;
+
 
 public interface RestService
 {
@@ -22,7 +28,9 @@ public interface RestService
     Response listTemplates();
 
 
+
     /** Blueprints ****************************************************/
+
     @GET
     @Path( "blueprints" )
     @Produces( { MediaType.APPLICATION_JSON } )
@@ -43,32 +51,37 @@ public interface RestService
     Response deleteBlueprint( @PathParam( "blueprintId" ) UUID blueprintId );
 
 
+
     /** Domain *****************************************************/
+
     @GET
     @Path( "domains" )
     @Produces( { MediaType.TEXT_PLAIN } )
     Response getDefaultDomainName();
 
 
+
     /** Environments *****************************************************/
+
     @GET
     @Produces( { MediaType.APPLICATION_JSON } )
     Response listEnvironments();
-
 
     @POST
     Response createEnvironment( @FormParam( "blueprint_json" ) String blueprintJson );
 
     @POST
     @Path( "grow" )
-    Response growEnvironment( @FormParam( "enviroupmentId" ) String enviroupmentId, @FormParam( "blueprint_json" ) String blueprintJson );
+    Response growEnvironment( @FormParam( "environmentId" ) String environmentId, @FormParam( "blueprint_json" ) String blueprintJson );
 
     @DELETE
     @Path( "{environmentId}" )
     Response destroyEnvironment( @PathParam( "environmentId" ) String environmentId );
 
 
+
     /** Environments SSH keys *****************************************************/
+
     @POST
     @Path( "keys" )
     Response setSshKey( @FormParam( "environmentId" ) String environmentId, @FormParam( "key" ) String key );
@@ -79,7 +92,31 @@ public interface RestService
     Response removeSshKey( @PathParam( "environmentId" ) String environmentId );
 
 
-    /** Containers keys *****************************************************/
+
+    /** Environment domains *****************************************************/
+
+    @GET
+    @Path( "/domains/strategies" )
+    Response listDomainLoadBalanceStrategies();
+
+
+    @POST
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Path( "/domains" )
+    Response addEnvironmentDomain( @Multipart( "environmentId" ) String environmentId,
+                                   @Multipart( "hostName" ) String hostName,
+                                   @Multipart( "strategy" ) DomainLoadBalanceStrategy strategy,
+                                   @Multipart(value = "file") Attachment attr );
+
+
+    @DELETE
+    @Path( "{environmentId}/domains" )
+    Response removeEnvironmentDomain( @PathParam( "environmentId" ) String environmentId );
+
+
+
+    /** Containers *****************************************************/
+
     @GET
     @Path( "containers/{containerId}" )
     @Produces( { MediaType.APPLICATION_JSON } )
@@ -105,14 +142,18 @@ public interface RestService
     Response stopContainer( @PathParam( "containerId" ) String containerId );
 
 
+
     /** Container types *****************************************************/
+
     @GET
     @Path( "containers/types" )
     @Produces( { MediaType.APPLICATION_JSON } )
     Response listContainerTypes();
 
 
+
     /** Container quota *****************************************************/
+
     @GET
     @Path( "containers/{containerId}/quota" )
     @Produces( { MediaType.APPLICATION_JSON } )
@@ -157,15 +198,22 @@ public interface RestService
     @Path( "containers/{containerId}/quota/disk" )
     Response setDiskQuota( @PathParam( "containerId" ) String containerId, @FormParam( "diskQuota" ) String diskQuota );
 
+
+
     /** Peers strategy *****************************************************/
 
     @GET
     @Path( "strategies" )
+    @Produces( { MediaType.APPLICATION_JSON } )
     Response listPlacementStrategies();
 
+
+
     /** Peers *****************************************************/
+
     @GET
     @Path( "peers" )
+    @Produces( { MediaType.APPLICATION_JSON } )
     Response getPeers();
 
 }

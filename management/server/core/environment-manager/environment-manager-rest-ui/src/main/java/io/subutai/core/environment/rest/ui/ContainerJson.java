@@ -2,6 +2,7 @@ package io.subutai.core.environment.rest.ui;
 
 
 import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.host.Interface;
 
 
 /**
