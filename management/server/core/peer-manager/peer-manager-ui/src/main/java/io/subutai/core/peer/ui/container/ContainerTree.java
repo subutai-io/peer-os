@@ -22,6 +22,7 @@ import com.vaadin.ui.Tree;
 import io.subutai.common.host.Interface;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.HostMetric;
+import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
@@ -61,6 +62,18 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
         initView( hostRegistry );
     }
 
+
+    private String getText( final String format, final Object o )
+    {
+        if ( o != null )
+        {
+            return String.format( format, o );
+        }
+        else
+        {
+            return "";
+        }
+    }
 
     private void initView( final HostRegistry hostRegistry )
     {
@@ -103,25 +116,12 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
                             result.append( getText( "<br/>ID: %s", host.getId() ) );
                             result.append( getText( "<br/>IP: %s", ip ) );
                             result.append( getText( "<br/>MAC: %s", mac ) );
+                            result.append( getText( "<br>ARCH: %s", host.getArch() ) );
 
 
-                            if ( host instanceof ResourceHost )
-                            {
+                            String desc = monitor.getHostMetricsAsHtml(host.getId() );
 
-                                ResourceHost resourceHost = ( ResourceHost ) host;
-                                final HostMetric metric = monitor.getHostMetric( resourceHost.getId() );
-
-                                result.append( getText( "<br>ARCH: %s", resourceHost.getArch() ) );
-                                result.append( getText( "<br>CPU model: %s", metric.getCpuModel() ) );
-                                result.append( getText( "<br>CPU core(s): %d", metric.getCpuCore() ) );
-                                result.append( getText( "<br>CPU load: %.2f", metric.getUsedCpu() ) );
-                                result.append( getText( "<br>Total RAM: %.3f Gb",
-                                        metric.getTotalRam() / 1024 / 1024 / 1024 ) );
-                                result.append( getText( "<br>Available RAM: %.3f Gb",
-                                        metric.getAvailableRam() / 1024 / 1024 / 1024 ) );
-                                result.append( getText( "<br>Available space: %.3f Gb",
-                                        metric.getAvailableSpace() / 1024 / 1024 / 1024 ) );
-                            }
+                            result.append( desc );
                         }
                         catch ( Exception ignore )
                         {
@@ -214,20 +214,6 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
             tree.expandItem( rh.getId() );
         }
     }
-
-
-    private String getText( final String format, final Object o )
-    {
-        if ( o != null )
-        {
-            return String.format( format, o );
-        }
-        else
-        {
-            return "";
-        }
-    }
-
 
     public HierarchicalContainer getNodeContainer()
     {

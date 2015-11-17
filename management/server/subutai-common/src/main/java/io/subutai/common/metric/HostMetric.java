@@ -13,15 +13,13 @@ import com.google.gson.annotations.SerializedName;
 
 
 /**
- * Base class for host metrics
+ * Base host metrics
  */
 @XmlRootElement
 @XmlAccessorType( XmlAccessType.FIELD )
-public class HostMetric
+public class HostMetric extends BaseMetric
 {
-    private String peerId;
 
-    protected String hostId;
     @Expose
     @SerializedName( "host" )
     @JsonProperty( "host" )
@@ -42,36 +40,6 @@ public class HostMetric
 
     public HostMetric()
     {
-    }
-
-
-    public HostMetric( final Ram ram )
-    {
-        this.ram = ram;
-    }
-
-
-    public String getPeerId()
-    {
-        return peerId;
-    }
-
-
-    public void setPeerId( final String peerId )
-    {
-        this.peerId = peerId;
-    }
-
-
-    public String getHostId()
-    {
-        return hostId;
-    }
-
-
-    public void setHostId( final String hostId )
-    {
-        this.hostId = hostId;
     }
 
 
@@ -129,11 +97,13 @@ public class HostMetric
         return cpu != null ? cpu.coreCount : 0;
     }
 
+
     @JsonIgnore
     public Double getFreeRam()
     {
         return ram != null ? ram.free : 0;
     }
+
 
     @JsonIgnore
     public Double getTotalSpace()

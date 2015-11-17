@@ -18,6 +18,11 @@ public class Commands
         return new RequestBuilder( String.format( "subutai stats system %s", hostname ) );
     }
 
+    public RequestBuilder getContainerHostQuotaCommand( String hostname )
+    {
+        return new RequestBuilder( String.format( "subutai stats quota %s", hostname ) );
+    }
+
 
     public RequestBuilder getHistoricalMetricCommand( Host host, MetricType metricType )
     {

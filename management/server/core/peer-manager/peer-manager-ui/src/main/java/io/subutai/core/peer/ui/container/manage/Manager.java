@@ -121,6 +121,8 @@ public class Manager extends VerticalLayout
                 executorService.shutdown();
             }
         } );
+
+        getContainerInfo();
     }
 
 

@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 import io.subutai.common.environment.Environment;
+import io.subutai.common.metric.BaseMetric;
 import io.subutai.common.metric.ContainerHostMetric;
 import io.subutai.common.metric.HistoricalMetric;
 import io.subutai.common.metric.HostMetric;
@@ -141,9 +142,11 @@ public interface Monitor
      */
     public Map<String, List<HistoricalMetric>> getHistoricalMetrics( Collection<Host> hosts, MetricType metricType );
 
-    void updateHostMetric( HostMetric metric );
+//    void updateHostMetric( BaseMetric metric );
 
-    HostMetric getHostMetric( String id );
+    BaseMetric getHostMetric( String id );
 
     ResourceHostMetrics getResourceHostMetrics( boolean isLocalOnly );
+
+    String getHostMetricsAsHtml( String hostId );
 }
