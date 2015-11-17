@@ -1,17 +1,15 @@
 package io.subutai.core.environment.ui.forms;
 
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.commons.net.util.SubnetUtils;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.shared.ui.slider.SliderOrientation;
@@ -21,38 +19,33 @@ import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Slider;
 import com.vaadin.ui.Table;
-import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
 import io.subutai.common.environment.Blueprint;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.NodeGroup;
-import io.subutai.common.environment.Topology;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.PlacementStrategy;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
-import io.subutai.core.environment.api.exception.EnvironmentCreationException;
-import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.strategy.api.ContainerPlacementStrategy;
 import io.subutai.core.strategy.api.StrategyManager;
-import io.subutai.core.strategy.api.StrategyNotFoundException;
 
 
 public class TopologyWindow extends Window
 {
-    private static final String DEFAULT_SUBNET_CIDR = "192.168.1.2/24";
+//    private static final String DEFAULT_SUBNET_CIDR = "192.168.1.2/24";
     private final Blueprint blueprint;
     private final PeerManager peerManager;
     private final StrategyManager strategyManager;
     private Table placementTable;
     private Button buildBtn;
     private ComboBox envCombo;
-    private TextField subnetTxt;
+//    private TextField subnetTxt;
 
 
     public TopologyWindow( final Blueprint blueprint, final PeerManager peerManager,
@@ -114,14 +107,14 @@ public class TopologyWindow extends Window
             }
             content.addComponent( envCombo );
         }
-        else
-        {
-            subnetTxt = new TextField( "Subnet CIDR" );
-            subnetTxt.setId( "subnetTxt" );
-            subnetTxt.setImmediate( true );
-            subnetTxt.setValue( DEFAULT_SUBNET_CIDR );
-            content.addComponent( subnetTxt );
-        }
+//        else
+//        {
+//            subnetTxt = new TextField( "Subnet CIDR" );
+//            subnetTxt.setId( "subnetTxt" );
+//            subnetTxt.setImmediate( true );
+//            subnetTxt.setValue( DEFAULT_SUBNET_CIDR );
+//            content.addComponent( subnetTxt );
+//        }
         content.addComponent( buildBtn );
         content.setComponentAlignment( buildBtn, Alignment.TOP_RIGHT );
 
@@ -131,7 +124,7 @@ public class TopologyWindow extends Window
 
     private void buildProcessTrigger( final EnvironmentManager environmentManager, final boolean grow )
     {
-        Map<Peer, Set<NodeGroup>> placements = getPlacements();
+        Set<NodeGroup> placements = getPlacements();
 
         if ( placements == null )
         {
@@ -141,27 +134,36 @@ public class TopologyWindow extends Window
         {
             Notification.show( "Please, select environment to grow" );
         }
-        else if ( !grow && Strings.isNullOrEmpty( subnetTxt.getValue() ) )
-        {
-            Notification.show( "Please, enter subnet CIDR" );
-        }
+//        else if ( !grow && Strings.isNullOrEmpty( subnetTxt.getValue() ) )
+//        {
+//            Notification.show( "Please, enter subnet CIDR" );
+//        }
         else
         {
-            Topology topology = new Topology();
-            constructTopology( topology, placements );
+
+
+            //            constructTopology( blueprint, placements );
 
             try
             {
                 if ( grow )
                 {
                     Environment environment = ( Environment ) envCombo.getValue();
-                    environmentManager.growEnvironment( environment.getId(), topology, true );
-                    Notification.show( "Environment growth started" );
+                    Blueprint blueprint = new Blueprint( environment.getName(), null, placements );
+                    environmentManager.growEnvironment( environment.getId(), blueprint, true );
+                    Notification.show( "Environment expanding started" );
                 }
                 else
                 {
-                    checkPickedSubnetValidity( topology, environmentManager );
+//                    final String subnet = subnetTxt.getValue().trim();
+                    Blueprint blueprint = new Blueprint(
+                            String.format( "%s-%s", this.blueprint.getName(), UUID.randomUUID().toString() ), null,
+                            placements );
+
+                    environmentManager.createEnvironment( blueprint, true );
+                    Notification.show( "Environment creation started" );
                 }
+
 
                 close();
             }
@@ -173,48 +175,48 @@ public class TopologyWindow extends Window
         }
     }
 
+    //
+    //    private void constructTopology( final Topology topology, final Map<Peer, Set<NodeGroup>> placements )
+    //    {
+    //        for ( Map.Entry<Peer, Set<NodeGroup>> placement : placements.entrySet() )
+    //        {
+    //            for ( NodeGroup nodeGroup : placement.getValue() )
+    //            {
+    //                topology.addNodeGroupPlacement( placement.getKey(), nodeGroup );
+    //            }
+    //        }
+    //    }
 
-    private void constructTopology( final Topology topology, final Map<Peer, Set<NodeGroup>> placements )
-    {
-        for ( Map.Entry<Peer, Set<NodeGroup>> placement : placements.entrySet() )
-        {
-            for ( NodeGroup nodeGroup : placement.getValue() )
-            {
-                topology.addNodeGroupPlacement( placement.getKey(), nodeGroup );
-            }
-        }
-    }
-
-
-    private void checkPickedSubnetValidity( final Topology topology, final EnvironmentManager environmentManager )
-            throws EnvironmentManagerException, PeerException, EnvironmentCreationException
-    {
-        //check availability of subnet
-        Map<Peer, Set<Gateway>> usedGateways = getUsedGateways( topology.getNodeGroupPlacement().keySet() );
-
-        SubnetUtils subnetUtils = new SubnetUtils( subnetTxt.getValue() );
-        String environmentGatewayIp = subnetUtils.getInfo().getLowAddress();
-
-        for ( Map.Entry<Peer, Set<Gateway>> peerGateways : usedGateways.entrySet() )
-        {
-            Peer peer = peerGateways.getKey();
-            Set<Gateway> gateways = peerGateways.getValue();
-            for ( Gateway gateway : gateways )
-            {
-                if ( gateway.getIp().equals( environmentGatewayIp ) )
-                {
-                    throw new EnvironmentManagerException(
-                            String.format( "Subnet %s is already used on peer %s", environmentGatewayIp,
-                                    peer.getName() ), null );
-                }
-            }
-        }
-
-        environmentManager
-                .createEnvironment( String.format( "%s-%s", blueprint.getName(), UUID.randomUUID() ), topology,
-                        subnetTxt.getValue(), null, true );
-        Notification.show( "Environment creation started" );
-    }
+    //
+    //    private void checkPickedSubnetValidity( final Topology topology, final EnvironmentManager environmentManager )
+    //            throws EnvironmentManagerException, PeerException, EnvironmentCreationException
+    //    {
+    //        //check availability of subnet
+    //        Map<Peer, Set<Gateway>> usedGateways = getUsedGateways( topology.getNodeGroupPlacement().keySet() );
+    //
+    //        SubnetUtils subnetUtils = new SubnetUtils( subnetTxt.getValue() );
+    //        String environmentGatewayIp = subnetUtils.getInfo().getLowAddress();
+    //
+    //        for ( Map.Entry<Peer, Set<Gateway>> peerGateways : usedGateways.entrySet() )
+    //        {
+    //            Peer peer = peerGateways.getKey();
+    //            Set<Gateway> gateways = peerGateways.getValue();
+    //            for ( Gateway gateway : gateways )
+    //            {
+    //                if ( gateway.getIp().equals( environmentGatewayIp ) )
+    //                {
+    //                    throw new EnvironmentManagerException(
+    //                            String.format( "Subnet %s is already used on peer %s", environmentGatewayIp,
+    //                                    peer.getName() ), null );
+    //                }
+    //            }
+    //        }
+    //
+    //        environmentManager
+    //                .createEnvironment( String.format( "%s-%s", blueprint.getName(), UUID.randomUUID() ), topology,
+    //                        subnetTxt.getValue(), null, true );
+    //        Notification.show( "Environment creation started" );
+    //    }
 
 
     private Map<Peer, Set<Gateway>> getUsedGateways( Set<Peer> peers ) throws PeerException
@@ -230,9 +232,9 @@ public class TopologyWindow extends Window
     }
 
 
-    private Map<Peer, Set<NodeGroup>> getPlacements()
+    private Set<NodeGroup> getPlacements()
     {
-        Map<Peer, Set<NodeGroup>> placements = Maps.newHashMap();
+        Set<NodeGroup> placements = new HashSet<>();
 
         for ( Object itemId : placementTable.getItemIds() )
         {
@@ -242,48 +244,42 @@ public class TopologyWindow extends Window
             String strategyId = item.getItemProperty( "Strategy" ).getValue().toString();
             int amount = Integer.parseInt( item.getItemProperty( "Amount" ).getValue().toString() );
 
-            NodeGroup nodeGroup = null;
             for ( NodeGroup ng : blueprint.getNodeGroups() )
             {
                 if ( ng.getName().equalsIgnoreCase( nodeGroupName ) )
                 {
+                    Peer peer = getPeerByName( peerName );
+                    if ( peer == null )
+                    {
+                        Notification.show( "Peer not found: " + peerName );
+                        continue;
+                    }
                     PlacementStrategy placementStrategy = new PlacementStrategy( strategyId );
-                    nodeGroup = new NodeGroup( nodeGroupName, ng.getTemplateName(), amount, ng.getSshGroupId(),
-                            ng.getHostsGroupId(), placementStrategy );
+                    NodeGroup nodeGroup =
+                            new NodeGroup( nodeGroupName, ng.getTemplateName(), amount, ng.getSshGroupId(),
+                                    ng.getHostsGroupId(), placementStrategy, peer.getId() );
 
-                    break;
+                    placements.add( nodeGroup );
                 }
-            }
-
-            Peer peer = null;
-            for ( Peer p : peerManager.getPeers() )
-            {
-                if ( p.getName().equalsIgnoreCase( peerName ) )
-                {
-                    peer = p;
-                    break;
-                }
-            }
-
-            if ( peer != null && nodeGroup != null )
-            {
-                Set<NodeGroup> peerNodeGroups = placements.get( peer );
-
-                if ( peerNodeGroups == null )
-                {
-                    peerNodeGroups = Sets.newHashSet();
-                    placements.put( peer, peerNodeGroups );
-                }
-
-                peerNodeGroups.add( nodeGroup );
-            }
-            else
-            {
-                return null;
             }
         }
 
         return placements;
+    }
+
+
+    private Peer getPeerByName( final String peerName )
+    {
+        Peer peer = null;
+        for ( Peer p : peerManager.getPeers() )
+        {
+            if ( p.getName().equalsIgnoreCase( peerName ) )
+            {
+                peer = p;
+                break;
+            }
+        }
+        return peer;
     }
 
 

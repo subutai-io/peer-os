@@ -89,7 +89,7 @@ public interface RestService
 
     @POST
     @Path( "gateways" )
-    Response createGateway( @FormParam( "gatewayIp" ) String gatewayIp, @FormParam( "vlan" ) int vlan );
+    Response createGateway( Gateway gateway );
 
 
     @POST

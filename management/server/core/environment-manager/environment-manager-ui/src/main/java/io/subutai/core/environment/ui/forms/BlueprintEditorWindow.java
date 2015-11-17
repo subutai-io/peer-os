@@ -2,17 +2,12 @@ package io.subutai.core.environment.ui.forms;
 
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.commons.net.util.SubnetUtils;
-
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.vaadin.data.Item;
 import com.vaadin.shared.ui.slider.SliderOrientation;
 import com.vaadin.ui.Alignment;
@@ -29,14 +24,9 @@ import com.vaadin.ui.Window;
 import io.subutai.common.environment.Blueprint;
 import io.subutai.common.environment.ContainerType;
 import io.subutai.common.environment.NodeGroup;
-import io.subutai.common.environment.Topology;
-import io.subutai.common.network.Gateway;
-import io.subutai.common.peer.Peer;
-import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
-import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.peer.api.PeerManager;
 
@@ -49,7 +39,6 @@ public class BlueprintEditorWindow extends Window
     private final PeerManager peerManager;
     private final TextField nameTxt;
     private Table placementTable;
-    private Button saveBtn;
 
 
     public BlueprintEditorWindow( final Blueprint blueprint, final PeerManager peerManager,
@@ -82,7 +71,7 @@ public class BlueprintEditorWindow extends Window
 
         content.addComponent( placementTable );
 
-        saveBtn = new Button( "Save" );
+        Button saveBtn = new Button( "Save" );
         saveBtn.setId( "saveButton" );
         saveBtn.setEnabled( true );
         saveBtn.addClickListener( new Button.ClickListener()
@@ -156,7 +145,7 @@ public class BlueprintEditorWindow extends Window
 
         final Blueprint b = new Blueprint( nameTxt.getValue(), nodeGroups );
 
-        b.setId( this.blueprint.getId() );
+        b.setId( this.blueprint.getId() != null ? this.blueprint.getId() : UUID.randomUUID() );
         return b;
     }
 

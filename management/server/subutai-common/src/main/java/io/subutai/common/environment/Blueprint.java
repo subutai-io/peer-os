@@ -2,14 +2,20 @@ package io.subutai.common.environment;
 
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import io.subutai.common.util.CollectionUtil;
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonProperty;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
+
+import io.subutai.common.util.CollectionUtil;
 
 
 /**
@@ -19,17 +25,22 @@ import com.google.common.collect.Sets;
  */
 public class Blueprint
 {
+    @JsonIgnore
     private UUID id;
+    @JsonProperty( "name" )
     private String name;
-    private String cidr;
+    @JsonProperty( "sshKey" )
+    private String sshKey;
+    @JsonProperty( "nodegroups" )
     private Set<NodeGroup> nodeGroups;
 
 
-    public Blueprint( final String name, final String cidr, final Set<NodeGroup> nodeGroups )
+    public Blueprint( @JsonProperty( "name" ) final String name, @JsonProperty( "sshKey" ) final String sshKey,
+                      @JsonProperty( "nodegroups" ) final Set<NodeGroup> nodeGroups )
     {
         this.name = name;
-        this.cidr = cidr;
         this.nodeGroups = nodeGroups;
+        this.sshKey = sshKey;
     }
 
 
@@ -55,6 +66,7 @@ public class Blueprint
         this.id = id;
     }
 
+
     public String getName()
     {
         return name;
@@ -67,8 +79,28 @@ public class Blueprint
     }
 
 
-    public String getCidr()
+    @JsonIgnore
+    public Map<String, Set<NodeGroup>> getNodeGroupsMap()
     {
-        return cidr;
+        Map<String, Set<NodeGroup>> result = new HashMap<>();
+
+        for ( NodeGroup nodeGroup : nodeGroups )
+        {
+            String key = nodeGroup.getPeerId();
+            Set<NodeGroup> nodes = result.get( key );
+            if ( nodes == null )
+            {
+                nodes = new HashSet<>();
+                result.put( key, nodes );
+            }
+            nodes.add( nodeGroup );
+        }
+        return result;
+    }
+
+
+    public String getSshKey()
+    {
+        return sshKey;
     }
 }

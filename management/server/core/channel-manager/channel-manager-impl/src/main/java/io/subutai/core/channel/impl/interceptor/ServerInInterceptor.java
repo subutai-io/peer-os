@@ -17,6 +17,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
+
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.settings.ChannelSettings;
 import io.subutai.common.settings.Common;
@@ -63,84 +64,50 @@ public class ServerInInterceptor extends AbstractPhaseInterceptor<Message>
                 URL url = new URL( ( String ) message.get( Message.REQUEST_URL ) );
 
                 String basePath = url.getPath();
-                int status = 0;
 
-                //                status = MessageContentUtil.checkUrlAccessibility( status, url, basePath );
-                status = 0;
-                //----------------------------------------------------------------------------------------------
-                //--------------- if error occurs --------------------------------------------------------------
-                if ( status != 0 )
+                if ( url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X2 ) )
                 {
-                    String error = "";
-                    int errorStatus = 0;
-                    HttpServletResponse response = ( HttpServletResponse ) message.getExchange().getInMessage()
-                                                                                  .get( AbstractHTTPDestination
-                                                                                          .HTTP_RESPONSE );
-                    if ( status == 1 )
-                    {
-                        errorStatus = 403;
-                        error = "*********  Access to " + basePath + "  is blocked (403) **********************";
-                    }
-                    else if ( status == 2 )
-                    {
-                        errorStatus = 404;
-                        error = "*********  Access to " + basePath + "  is blocked (404) **********************";
-                    }
+                    HttpHeaders headers = new HttpHeadersImpl( message.getExchange().getInMessage() );
+                    //String spHeader = headers.getHeaderString( Common.HEADER_SPECIAL );
+                    LOG.info( " *** URL:" + url.getPath() );
+                    HttpServletRequest request = ( HttpServletRequest ) message.getExchange().getInMessage()
+                                                                               .get( AbstractHTTPDestination
+                                                                                       .HTTP_REQUEST );
+                    String remoteAddress = request.getRemoteAddr();
+                    LOG.debug( "Remote address: " + remoteAddress );
 
-                    try
-                    {
-                        response.setStatus( errorStatus );
-                        response.getOutputStream().write( error.getBytes( Charset.forName( "UTF-8" ) ) );
-                        response.getOutputStream().flush();
-                    }
-                    catch ( Exception e )
-                    {
-                        LOG.error( "Error writing to response: " + e.toString(), e );
-                    }
-                    LOG.warn( error );
-                    message.getInterceptorChain().abort();
-                }
-                else
-                {
-                    if ( url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X2 ) )
-                    {
-                        HttpHeaders headers = new HttpHeadersImpl( message.getExchange().getInMessage() );
-                        //String spHeader = headers.getHeaderString( Common.HEADER_SPECIAL );
-                        LOG.info( " *** URL:" + url.getPath() );
-                        HttpServletRequest request = ( HttpServletRequest ) message.getExchange().getInMessage()
-                                                                                   .get( AbstractHTTPDestination
-                                                                                           .HTTP_REQUEST );
-                        String remoteAddress = request.getRemoteAddr();
-                        LOG.debug( "Remote address: " + remoteAddress );
+                    String path = url.getPath();
 
-                        String path = url.getPath();
-
-                        if ( path.startsWith( "/rest/v1/peer" ) )
+                    if ( path.startsWith( "/rest/v1/peer" ) )
+                    {
+                        handlePeerMessage( remoteAddress, message );
+                        LOG.debug( "Path handled by peer crypto handler: " + path );
+                    }
+                    else
+                    {
+                        final String prefix = "/rest/v1/env";
+                        if ( path.startsWith( prefix ) )
                         {
-                            handlePeerMessage( remoteAddress, message );
-                            LOG.debug( "Path handled by peer crypto handler: " + path );
+                            String s = path.substring( prefix.length() + 1 );
+                            String environmentId = s.substring( 0, s.indexOf( "/" ) );
+                            handleEnvironmentMessage( remoteAddress, environmentId, message );
+                            LOG.debug( "Path handled by environment crypto handler: " + path );
                         }
                         else
                         {
-                            final String prefix = "/rest/v1/env";
-                            if ( path.startsWith( prefix ) )
-                            {
-                                String s = path.substring( prefix.length() + 1 );
-                                String environmentId = s.substring( 0, s.indexOf( "/" ) );
-                                handleEnvironmentMessage( remoteAddress, environmentId, message );
-                                LOG.debug( "Path handled by environment crypto handler: " + path );
-                            }
-                            else
-                            {
-                                LOG.warn( "Path is not handled by crypto handler: " + path );
-                            }
+                            LOG.warn( "Path is not handled by crypto handler: " + path );
                         }
                     }
                 }
             }
+
             //-----------------------------------------------------------------------------------------------
         }
+
+
         catch ( MalformedURLException ignore )
+
+
         {
             LOG.debug( "MalformedURLException", ignore.toString() );
         }

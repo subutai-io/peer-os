@@ -19,9 +19,9 @@ public class TestUtil
     public static final ContainerHostState CONTAINER_STATE = ContainerHostState.RUNNING;
     public static final String PEER_ID = UUID.randomUUID().toString();
 
-    public static final String TOPOLOGY_JSON = String.format(
-            "{ \"nodeGroupPlacement\": {\"%s\": [" + "{\"name\": \"Sample Node Group\"," + "\"templateName\": \"%s\","
-                    + "\"numberOfContainers\": 4,\"sshGroupId\": 1,"
+    public static final String NODE_GROUP_JSON = String.format(
+            "{\"name\": \"Sample Node Group\"," + "\"templateName\": \"%s\","
+                    + "\"numberOfContainers\": 4,\"sshGroupId\": 1," + "\"peerId\":\"%s\","
                     + "\"hostsGroupId\": 1,\"containerPlacementStrategy\": {"
-                    + "\"strategyId\": \"ROUND_ROBIN\",\"criteria\": []" + "}}]}}", PEER_ID, TEMPLATE_NAME );
+                    + "\"strategyId\": \"ROUND_ROBIN\",\"criteria\": []" + "}}", TEMPLATE_NAME, PEER_ID );
 }
