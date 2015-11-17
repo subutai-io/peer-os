@@ -30,6 +30,11 @@
             <artifactId>cxf-rt-frontend-jaxrs</artifactId>
         </dependency>
 
+        <dependency>
+        	<groupId>commons-io</groupId>
+        	<artifactId>commons-io</artifactId>
+        </dependency>
+
     </dependencies> 
     
     
@@ -49,7 +54,7 @@
                         <Embed-Transitive>true</Embed-Transitive>
                         
                         <Import-Package>
-                            io.subutai.core.kurjun.api, org.slf4j, org.apache.cxf.jaxrs*, javax.ws.rs*, !*
+                            org.apache.commons.io, io.subutai.core.kurjun.api, org.slf4j, org.apache.cxf.jaxrs*, javax.ws.rs*, !*
                         </Import-Package>
                         
                     </instructions>

@@ -161,7 +161,7 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
     public void setQuota( ContainerHost host, QuotaInfo quotaInfo ) throws PeerException;
 
     /**
-     * Returns tempalte by name
+     * Returns template by name
      */
     public Template getTemplate( String templateName ) throws PeerException;
 

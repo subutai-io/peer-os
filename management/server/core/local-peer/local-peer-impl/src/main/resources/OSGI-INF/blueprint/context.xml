@@ -49,6 +49,9 @@
   <reference id="securityManager" availability="mandatory"
              interface="io.subutai.core.security.api.SecurityManager" />
 
+  <reference id="templateManager" availability="mandatory"
+             interface="io.subutai.core.kurjun.api.TemplateManager" />
+
   <bean id="localPeer" class="io.subutai.core.localpeer.impl.LocalPeerImpl" init-method="init"
         destroy-method="dispose" scope="singleton" activation="eager">
     <argument ref="daoManagerPeer" />
@@ -59,6 +62,7 @@
     <argument ref="hostRegistry" />
     <argument ref="monitor" />
     <argument ref="securityManager" />
+    <argument ref="templateManager" />
     <property name="externalIpInterface" value="${externalIpInterface}" />
   </bean>
 

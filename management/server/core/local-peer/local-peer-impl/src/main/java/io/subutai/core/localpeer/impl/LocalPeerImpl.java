@@ -102,6 +102,7 @@ import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hostregistry.api.HostRegistry;
+import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.localpeer.impl.command.CommandRequestListener;
 import io.subutai.core.localpeer.impl.container.CreateContainerWrapperTask;
 import io.subutai.core.localpeer.impl.container.CreateEnvironmentContainerGroupRequestListener;
@@ -140,7 +141,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     private String externalIpInterface = "eth1";
     private DaoManager daoManager;
-    private TemplateRegistry templateRegistry;
+//    private TemplateRegistry templateRegistry;
     protected ManagementHostEntity managementHost;
     protected Set<ResourceHost> resourceHosts = Sets.newHashSet();
     private CommandExecutor commandExecutor;
@@ -156,6 +157,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     protected Set<RequestListener> requestListeners = Sets.newHashSet();
     protected PeerInfo peerInfo;
     private SecurityManager securityManager;
+    private TemplateManager templateManager;
+
 
 
     protected boolean initialized = false;
@@ -163,16 +166,17 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     public LocalPeerImpl( DaoManager daoManager, TemplateRegistry templateRegistry, QuotaManager quotaManager,
                           StrategyManager strategyManager, CommandExecutor commandExecutor, HostRegistry hostRegistry,
-                          Monitor monitor, SecurityManager securityManager )
+                          Monitor monitor, SecurityManager securityManager, TemplateManager templateManager )
     {
         this.strategyManager = strategyManager;
         this.daoManager = daoManager;
-        this.templateRegistry = templateRegistry;
+//        this.templateRegistry = templateRegistry;
         this.quotaManager = quotaManager;
         this.monitor = monitor;
         this.commandExecutor = commandExecutor;
         this.hostRegistry = hostRegistry;
         this.securityManager = securityManager;
+        this.templateManager = templateManager;
     }
 
 
@@ -319,7 +323,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             ( ( AbstractSubutaiHost ) resourceHost ).setPeer( this );
             final ResourceHostEntity resourceHostEntity = ( ResourceHostEntity ) resourceHost;
-            resourceHostEntity.setRegistry( templateRegistry );
+//            resourceHostEntity.setRegistry( templateRegistry );
+            resourceHostEntity.setTemplateManager( templateManager );
             //            resourceHostEntity.setMonitor( monitor );
             resourceHostEntity.setHostRegistry( hostRegistry );
         }
@@ -381,7 +386,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         getResourceHostByName( resourceHost.getHostname() );
 
-        if ( templateRegistry.getTemplate( template.getTemplateName() ) == null )
+        if ( getTemplate( template.getTemplateName() ) == null )
         {
             throw new PeerException( String.format( "Template %s not registered", template.getTemplateName() ) );
         }
@@ -1118,7 +1123,17 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
 
-        return templateRegistry.getTemplate( templateName );
+//        return templateRegistry.getTemplate( templateName );
+        try
+        {
+            String templateInfo = templateManager.getTemplateInfo( "public", templateName, null );
+            LOG.debug( templateInfo );
+        }
+        catch ( IOException e )
+        {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 
@@ -1969,14 +1984,16 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public List<Template> getTemplates()
     {
-        return templateRegistry.getAllTemplates();
+//        return templateRegistry.getAllTemplates();
+        return null;
     }
 
 
     @Override
     public Template getTemplateByName( final String name )
     {
-        return templateRegistry.getTemplate( name );
+//        return templateRegistry.getTemplate( name );
+        return null;
     }
 
 
