@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>io.subutai</groupId>
+        <artifactId>kurjun</artifactId>
+        <version>4.0.0-RC3</version>
+    </parent>
+    
+    <artifactId>install-repository</artifactId>
+    <name>Subutai Kurjun Install Repo</name>
+    <description>Module to install dependency artifact to local repository</description>
+    <packaging>pom</packaging>
+    
+    <properties>
+        <lib.dir>${project.parent.basedir}/lib</lib.dir>
+    </properties>
+    
+    
+    <build>
+        <plugins>
+            
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-install-plugin</artifactId>
+                <version>2.5.2</version>
+                <executions>
+                    
+                    <execution>
+                        <id>install_24</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <file>${lib.dir}/poms/kurjun-parent/${ai.subut.kurjun.version}/kurjun-parent-${ai.subut.kurjun.version}.pom</file>
+                            <pomFile>${lib.dir}/poms/kurjun-parent/${ai.subut.kurjun.version}/kurjun-parent-${ai.subut.kurjun.version}.pom</pomFile>
+                        </configuration>
+                    </execution>
+                    
+                    <execution>
+                        <id>install_20</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <file>${lib.dir}/poms/kurjun-parsers/${ai.subut.kurjun.version}/kurjun-parsers-${ai.subut.kurjun.version}.pom</file>
+                            <pomFile>${lib.dir}/poms/kurjun-parsers/${ai.subut.kurjun.version}/kurjun-parsers-${ai.subut.kurjun.version}.pom</pomFile>
+                        </configuration>
+                    </execution>
+                    
+                    <execution>
+                        <id>install_21</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <file>${lib.dir}/poms/kurjun-utils/${ai.subut.kurjun.version}/kurjun-utils-${ai.subut.kurjun.version}.pom</file>
+                            <pomFile>${lib.dir}/poms/kurjun-utils/${ai.subut.kurjun.version}/kurjun-utils-${ai.subut.kurjun.version}.pom</pomFile>
+                        </configuration>
+                    </execution>
+                    
+                    <execution>
+                        <id>install_22</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <file>${lib.dir}/poms/kurjun-file-stores/${ai.subut.kurjun.version}/kurjun-file-stores-${ai.subut.kurjun.version}.pom</file>
+                            <pomFile>${lib.dir}/poms/kurjun-file-stores/${ai.subut.kurjun.version}/kurjun-file-stores-${ai.subut.kurjun.version}.pom</pomFile>
+                        </configuration>
+                    </execution>
+                    
+                    <execution>
+                        <id>install_23</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <file>${lib.dir}/poms/kurjun-meta-stores/${ai.subut.kurjun.version}/kurjun-meta-stores-${ai.subut.kurjun.version}.pom</file>
+                            <pomFile>${lib.dir}/poms/kurjun-meta-stores/${ai.subut.kurjun.version}/kurjun-meta-stores-${ai.subut.kurjun.version}.pom</pomFile>
+                        </configuration>
+                    </execution>
+                    
+                    <execution>
+                        <id>install_1</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <file>${lib.dir}/ar-${ai.subut.kurjun.version}.jar</file>
+                            <pomFile>${lib.dir}/poms/ar/${ai.subut.kurjun.version}/ar-${ai.subut.kurjun.version}.pom</pomFile>
+                        </configuration>
+                    </execution>
+                    
+                    <execution>
+                        <id>install_2</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <file>${lib.dir}/model-${ai.subut.kurjun.version}.jar</file>
+                            <pomFile>${lib.dir}/poms/model/${ai.subut.kurjun.version}/model-${ai.subut.kurjun.version}.pom</pomFile>
+                        </configuration>
+                    </execution>
+                    
+                    <execution>
+                        <id>install_3</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <file>${lib.dir}/cfparser-${ai.subut.kurjun.version}.jar</file>
+                            <pomFile>${lib.dir}/poms/cfparser/${ai.subut.kurjun.version}/cfparser-${ai.subut.kurjun.version}.pom</pomFile>
+                        </configuration>
+                    </execution>
+                    
+                    <execution>
+                        <id>install_4</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <file>${lib.dir}/common-utils-${ai.subut.kurjun.version}.jar</file>
+                            <pomFile>${lib.dir}/poms/common-utils/${ai.subut.kurjun.version}/common-utils-${ai.subut.kurjun.version}.pom</pomFile>
+                        </configuration>
+                    </execution>
+                    
+                    <execution>
+                        <id>install_5</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <file>${lib.dir}/db-file-${ai.subut.kurjun.version}.jar</file>
+                            <pomFile>${lib.dir}/poms/db-file/${ai.subut.kurjun.version}/db-file-${ai.subut.kurjun.version}.pom</pomFile>
+                        </configuration>
+                    </execution>
+                    
+                    <execution>
+                        <id>install_6</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <file>${lib.dir}/db-meta-store-${ai.subut.kurjun.version}.jar</file>
+                            <pomFile>${lib.dir}/poms/db-meta-store/${ai.subut.kurjun.version}/db-meta-store-${ai.subut.kurjun.version}.pom</pomFile>
+                        </configuration>
+                    </execution>
+                    
+                    <execution>
+                        <id>install_7</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <file>${lib.dir}/file-store-factory-${ai.subut.kurjun.version}.jar</file>
+                            <pomFile>${lib.dir}/poms/file-store-factory/${ai.subut.kurjun.version}/file-store-factory-${ai.subut.kurjun.version}.pom</pomFile>
+                        </configuration>
+                    </execution>
+                    
+                    <execution>
+                        <id>install_8</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <file>${lib.dir}/fs-file-store-${ai.subut.kurjun.version}.jar</file>
+                            <pomFile>${lib.dir}/poms/fs-file-store/${ai.subut.kurjun.version}/fs-file-store-${ai.subut.kurjun.version}.pom</pomFile>
+                        </configuration>
+                    </execution>
+                    
+                    <execution>
+                        <id>install_9</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <file>${lib.dir}/kurjun-packages-parser-${ai.subut.kurjun.version}.jar</file>
+                            <pomFile>${lib.dir}/poms/kurjun-packages-parser/${ai.subut.kurjun.version}/kurjun-packages-parser-${ai.subut.kurjun.version}.pom</pomFile>
+                        </configuration>
+                    </execution>
+                    
+                    
+                    <execution>
+                        <id>install_10</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <file>${lib.dir}/kurjun-release-parser-${ai.subut.kurjun.version}.jar</file>
+                            <pomFile>${lib.dir}/poms/kurjun-release-parser/${ai.subut.kurjun.version}/kurjun-release-parser-${ai.subut.kurjun.version}.pom</pomFile>
+                        </configuration>
+                    </execution>
+                    
+                    <execution>
+                        <id>install_11</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <file>${lib.dir}/kurjun-template-parser-${ai.subut.kurjun.version}.jar</file>
+                            <pomFile>${lib.dir}/poms/kurjun-template-parser/${ai.subut.kurjun.version}/kurjun-template-parser-${ai.subut.kurjun.version}.pom</pomFile>
+                        </configuration>
+                    </execution>
+                    
+                    <execution>
+                        <id>install_12</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <file>${lib.dir}/metadata-common-${ai.subut.kurjun.version}.jar</file>
+                            <pomFile>${lib.dir}/poms/metadata-common/${ai.subut.kurjun.version}/metadata-common-${ai.subut.kurjun.version}.pom</pomFile>
+                        </configuration>
+                    </execution>
+                    
+                    <execution>
+                        <id>install_13</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <file>${lib.dir}/metadata-store-factory-${ai.subut.kurjun.version}.jar</file>
+                            <pomFile>${lib.dir}/poms/metadata-store-factory/${ai.subut.kurjun.version}/metadata-store-factory-${ai.subut.kurjun.version}.pom</pomFile>
+                        </configuration>
+                    </execution>
+                    
+                    <execution>
+                        <id>install_14</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <file>${lib.dir}/nosql-meta-store-${ai.subut.kurjun.version}.jar</file>
+                            <pomFile>${lib.dir}/poms/nosql-meta-store/${ai.subut.kurjun.version}/nosql-meta-store-${ai.subut.kurjun.version}.pom</pomFile>
+                        </configuration>
+                    </execution>
+                    
+                    <execution>
+                        <id>install_15</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <file>${lib.dir}/repository-${ai.subut.kurjun.version}.jar</file>
+                            <pomFile>${lib.dir}/poms/repository/${ai.subut.kurjun.version}/repository-${ai.subut.kurjun.version}.pom</pomFile>
+                        </configuration>
+                    </execution>
+                    
+                    <execution>
+                        <id>install_16</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <file>${lib.dir}/s3-file-store-${ai.subut.kurjun.version}.jar</file>
+                            <pomFile>${lib.dir}/poms/s3-file-store/${ai.subut.kurjun.version}/s3-file-store-${ai.subut.kurjun.version}.pom</pomFile>
+                        </configuration>
+                    </execution>
+                    
+                    <execution>
+                        <id>install_17</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <file>${lib.dir}/security-${ai.subut.kurjun.version}.jar</file>
+                            <pomFile>${lib.dir}/poms/security/${ai.subut.kurjun.version}/security-${ai.subut.kurjun.version}.pom</pomFile>
+                        </configuration>
+                    </execution>
+                    
+                    <execution>
+                        <id>install_18</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <file>${lib.dir}/snap-parser-${ai.subut.kurjun.version}.jar</file>
+                            <pomFile>${lib.dir}/poms/snap-parser/${ai.subut.kurjun.version}/snap-parser-${ai.subut.kurjun.version}.pom</pomFile>
+                        </configuration>
+                    </execution>
+                    
+                    <execution>
+                        <id>install_19</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <file>${lib.dir}/sql-meta-store-${ai.subut.kurjun.version}.jar</file>
+                            <pomFile>${lib.dir}/poms/sql-meta-store/${ai.subut.kurjun.version}/sql-meta-store-${ai.subut.kurjun.version}.pom</pomFile>
+                        </configuration>
+                    </execution>
+                    
+                </executions>
+            </plugin>
+            
+        </plugins>
+    </build>
+    
+    
+    
+</project>

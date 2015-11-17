@@ -24,8 +24,7 @@
             <artifactId>model</artifactId>
             <version>${ai.subut.kurjun.version}</version>
         </dependency>
- 
- 
+        
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxrs</artifactId>

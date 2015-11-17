@@ -11,8 +11,8 @@
     <name>Subutai Kurjun Impl</name>
     <description>Subutai Kurjun Impl</description>
     <packaging>bundle</packaging>
-     
-     
+    
+
     <dependencies>
           
           
@@ -74,7 +74,7 @@
             <artifactId>kurjun-template-parser</artifactId>
             <version>${ai.subut.kurjun.version}</version>
         </dependency>
-    
+        
     </dependencies>
     
     
@@ -101,72 +101,72 @@
                             com.google.gson*, org.slf4j, org.apache.cxf.jaxrs*, javax.ws.rs*, !*
                         </Import-Package>
                         
-                        
-                        
-                              
-<!--                        <Import-Package>
-                            javax.ws.rs*, org.apache.cxf*, !*
-                        </Import-Package>-->
-                        
-<!--                        <Import-Package>
-                            !org.apache.commons.beanutils, !org.apache.commons.digester*, 
-                            !org.apache.commons.jxpath*, !org.apache.commons.vfs2*,
-                            io.subutai.common*, org.apache.commons*, com.google.common*, com.google.gson*, org.slf4j, javax.ws*, org.apache.cxf*
-                        </Import-Package>-->
-                        
-<!--                        <Import-Package>
-                            !com.codahale.metrics*, !com.google.inject.internal.asm.util, !com.sun.org*, 
-                            !io.netty*, !javassist, !net.jpountz*, !org.HdrHistogram, !org.apache.commons.beanutils*,
-                            !org.apache.commons*, !net.sf.cglib.proxy, *
-                        </Import-Package>-->
-                        
-                        <!--<_exportcontents>*</_exportcontents>-->
-                        <!--                        <Private-Package>
-                            ai.subut.kurjun.common.service;version=${ai.subut.kurjun.version}, 
-                            ai.subut.kurjun.storage.factory;version=${ai.subut.kurjun.version}, 
-                            ai.subut.kurjun.metadata.factory;version=${ai.subut.kurjun.version}, 
-                            ai.subut.kurjun.subutai.service;version=${ai.subut.kurjun.version}
-                        </Private-Package>-->
-<!--                        <Import-Package>
-                            io.subutai.core.kurjun.api;version=${project.version},
-                            javax.ws.rs.core;version=!, 
-                            javax.ws.rs;version=!, 
-                            org.apache.cxf.jaxrs.ext.multipart;version=!
-                        </Import-Package>-->
-                        
-                        
-                        
-                        
-                        
-                        
-<!--                        <Bundle-SymbolicName>${project.groupId}.core.kurjun.rest</Bundle-SymbolicName>
-                        <Export-Package>
-                            {local-packages};version=${project.version};-noimport:=true,
-                            ai.subut.kurjun.common.service;version=${ai.subut.kurjun.version}, 
-                            ai.subut.kurjun.storage.factory;version=${ai.subut.kurjun.version}, 
-                            ai.subut.kurjun.metadata.factory;version=${ai.subut.kurjun.version}, 
-                            ai.subut.kurjun.subutai.service;version=${ai.subut.kurjun.version}
-                        </Export-Package>
-                        <Embed-Dependency>groupId=ai.subut.kurjun;artifactId=!s3-file-store|file-store-factory</Embed-Dependency>
-                        <Embed-Dependency>*</Embed-Dependency>
-                        <Embed-Transitive>true</Embed-Transitive>
-                        <_exportcontents>*</_exportcontents>
-                                                <Private-Package>
-                            ai.subut.kurjun.common.service;version=${ai.subut.kurjun.version}, 
-                            ai.subut.kurjun.storage.factory;version=${ai.subut.kurjun.version}, 
-                            ai.subut.kurjun.metadata.factory;version=${ai.subut.kurjun.version}, 
-                            ai.subut.kurjun.subutai.service;version=${ai.subut.kurjun.version}
-                        </Private-Package>
-                        <Import-Package>
-                            io.subutai.core.kurjun.api;version=${project.version},
-                            javax.ws.rs.core;version=!, 
-                            javax.ws.rs;version=!, 
-                            org.apache.cxf.jaxrs.ext.multipart;version=!
-                        </Import-Package>-->
-                        
                     </instructions>
                 </configuration>
             </plugin>
+            
+            
+            
+            <!--                        <Import-Package>
+                javax.ws.rs*, org.apache.cxf*, !*
+            </Import-Package>-->
+        
+            <!--                        <Import-Package>
+                !org.apache.commons.beanutils, !org.apache.commons.digester*, 
+                !org.apache.commons.jxpath*, !org.apache.commons.vfs2*,
+                io.subutai.common*, org.apache.commons*, com.google.common*, com.google.gson*, org.slf4j, javax.ws*, org.apache.cxf*
+            </Import-Package>-->
+        
+            <!--                        <Import-Package>
+                !com.codahale.metrics*, !com.google.inject.internal.asm.util, !com.sun.org*, 
+                !io.netty*, !javassist, !net.jpountz*, !org.HdrHistogram, !org.apache.commons.beanutils*,
+                !org.apache.commons*, !net.sf.cglib.proxy, *
+            </Import-Package>-->
+                        
+            <!--<_exportcontents>*</_exportcontents>-->
+            <!--                        <Private-Package>
+                ai.subut.kurjun.common.service;version=${ai.subut.kurjun.version}, 
+                ai.subut.kurjun.storage.factory;version=${ai.subut.kurjun.version}, 
+                ai.subut.kurjun.metadata.factory;version=${ai.subut.kurjun.version}, 
+                ai.subut.kurjun.subutai.service;version=${ai.subut.kurjun.version}
+            </Private-Package>-->
+            <!--                        <Import-Package>
+                io.subutai.core.kurjun.api;version=${project.version},
+                javax.ws.rs.core;version=!, 
+                javax.ws.rs;version=!, 
+                org.apache.cxf.jaxrs.ext.multipart;version=!
+            </Import-Package>-->
+                        
+                        
+                        
+                        
+                        
+                        
+            <!--                        <Bundle-SymbolicName>${project.groupId}.core.kurjun.rest</Bundle-SymbolicName>
+            <Export-Package>
+                {local-packages};version=${project.version};-noimport:=true,
+                ai.subut.kurjun.common.service;version=${ai.subut.kurjun.version}, 
+                ai.subut.kurjun.storage.factory;version=${ai.subut.kurjun.version}, 
+                ai.subut.kurjun.metadata.factory;version=${ai.subut.kurjun.version}, 
+                ai.subut.kurjun.subutai.service;version=${ai.subut.kurjun.version}
+            </Export-Package>
+            <Embed-Dependency>groupId=ai.subut.kurjun;artifactId=!s3-file-store|file-store-factory</Embed-Dependency>
+            <Embed-Dependency>*</Embed-Dependency>
+            <Embed-Transitive>true</Embed-Transitive>
+            <_exportcontents>*</_exportcontents>
+                                    <Private-Package>
+                ai.subut.kurjun.common.service;version=${ai.subut.kurjun.version}, 
+                ai.subut.kurjun.storage.factory;version=${ai.subut.kurjun.version}, 
+                ai.subut.kurjun.metadata.factory;version=${ai.subut.kurjun.version}, 
+                ai.subut.kurjun.subutai.service;version=${ai.subut.kurjun.version}
+            </Private-Package>
+            <Import-Package>
+                io.subutai.core.kurjun.api;version=${project.version},
+                javax.ws.rs.core;version=!, 
+                javax.ws.rs;version=!, 
+                org.apache.cxf.jaxrs.ext.multipart;version=!
+            </Import-Package>-->
+                        
         </plugins>
     </build>
   

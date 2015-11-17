@@ -20,7 +20,7 @@
         <argument ref="templateManager" />
     </bean>
     
-    <jaxrs:server address="/kurjun-test" id="restTemplateManager">  
+    <jaxrs:server address="/kurjun" id="restTemplateManager">  
         <jaxrs:serviceBeans>
             <ref component-id="restTemplateManagerImpl" />
         </jaxrs:serviceBeans>

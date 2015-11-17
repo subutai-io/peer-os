@@ -35,10 +35,6 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>broker-api</artifactId>
     </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>peer-manager-api</artifactId>
-    </dependency>
 
     <dependency>
       <groupId>${project.groupId}</groupId>

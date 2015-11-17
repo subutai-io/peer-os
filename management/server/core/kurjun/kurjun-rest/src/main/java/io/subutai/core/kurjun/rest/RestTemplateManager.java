@@ -21,7 +21,7 @@ import org.apache.cxf.jaxrs.ext.multipart.Multipart;
  * HTTP service for templates repository. Built using CXF to be compatible with Subutai.
  *
  */
-@Path( "kurjun-templates" )
+@Path( "templates" )
 public interface RestTemplateManager
 {
     // TODO: copied from TemplateServlet. Put to some common place 

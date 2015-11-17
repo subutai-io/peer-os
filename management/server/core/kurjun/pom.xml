@@ -14,8 +14,18 @@
     <description>Subutai Kurjun Parent</description>
     <packaging>pom</packaging>
     
+<!--    <repositories>
+        <repository>
+            <id>local-kurjun-repo</id>
+            <url>file://${basedir}/../local-repo</url>
+            <url>file://${project.basedir}/../local-repo</url>
+            <url>file://${lib.dir}/../local-repo</url>
+        </repository>
+    </repositories>-->
+    
     <properties>
         <ai.subut.kurjun.version>1.0</ai.subut.kurjun.version>
+        <!--<lib.dir>${project.basedir}/lib</lib.dir>-->
     </properties>
       
       
@@ -34,6 +44,7 @@
     </build>
     
     <modules>
+        <module>install-repository</module>
         <module>kurjun-api</module>
         <module>kurjun-impl</module>
         <module>kurjun-rest</module>
