@@ -120,9 +120,6 @@ public class BrokerImpl implements Broker
             String clientKey = sslUtil.encryptKey( keyPair.getPrivate(), password );
             String caCert = new String( Files.readAllBytes( Paths.get( caCertificate ) ) );
 
-            //disabled since client certs are signed by CA key now
-            //registerClientCertificateWithBroker( String.format( "client-%s", clientId ), certificate );
-
             return new ClientCredentials( clientCert, clientKey, caCert );
         }
         catch ( Exception e )
