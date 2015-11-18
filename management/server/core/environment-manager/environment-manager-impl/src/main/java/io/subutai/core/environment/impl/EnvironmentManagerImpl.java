@@ -43,6 +43,7 @@ import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.PeerId;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.objects.PermissionOperation;
 import io.subutai.common.security.objects.PermissionScope;
@@ -1259,7 +1260,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                 // it is ok
                 break;
             case UNREGISTER:
-                if ( isPeerInUse( peerAction.getData().toString() ) )
+                if ( isPeerInUse( ( ( String ) peerAction.getData() ) ) )
                 {
                     response = PeerActionResponse.Fail( "Peer in use." );
                 }
@@ -1276,6 +1277,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         for ( Iterator<EnvironmentImpl> i = environmentDataService.getAll().iterator(); !inUse && i.hasNext(); )
         {
             EnvironmentImpl e = i.next();
+            if ( e.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
+            {
+                inUse = true;
+                break;
+            }
 
             for ( PeerConf p : e.getPeerConfs() )
             {

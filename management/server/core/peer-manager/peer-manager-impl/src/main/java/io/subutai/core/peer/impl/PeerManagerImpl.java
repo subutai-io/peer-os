@@ -24,6 +24,7 @@ import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.ManagementHost;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.PeerId;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.peer.RegistrationData;
@@ -117,9 +118,8 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    private PeerActionResponses notifyPeerActionListeners( PeerActionType peerActionType, Object... data )
+    private PeerActionResponses notifyPeerActionListeners( PeerAction action )
     {
-        PeerAction action = new PeerAction( peerActionType, data );
         PeerActionResponses result = new PeerActionResponses();
         for ( PeerActionListener peerActionListener : peerActionListeners )
         {
@@ -135,7 +135,7 @@ public class PeerManagerImpl implements PeerManager
         Preconditions.checkNotNull( keyPhrase, "Key phrase could not be null." );
         Preconditions.checkArgument( !keyPhrase.isEmpty(), "Key phrase could not be empty" );
 
-        if ( !notifyPeerActionListeners( PeerActionType.REGISTER ).succeeded() )
+        if ( !notifyPeerActionListeners( new PeerAction( PeerActionType.REGISTER ) ).succeeded() )
         {
             throw new PeerException( "Could not register peer." );
         }
@@ -166,7 +166,8 @@ public class PeerManagerImpl implements PeerManager
     private boolean unregister( final RegistrationData registrationData ) throws PeerException
     {
 
-        if ( !notifyPeerActionListeners( PeerActionType.UNREGISTER ).succeeded() )
+        if ( !notifyPeerActionListeners(
+                new PeerAction( PeerActionType.UNREGISTER, registrationData.getPeerInfo().getId() ) ).succeeded() )
         {
             throw new PeerException( "Could not register peer." );
         }
@@ -324,10 +325,10 @@ public class PeerManagerImpl implements PeerManager
         //        {
         //            throw new PeerException( "Could not unregister peer. Peer still used." );
         //        }
-        if ( !notifyPeerActionListeners( PeerActionType.UNREGISTER, registrationData.getPeerInfo().getId() )
-                .succeeded() )
+        if ( !notifyPeerActionListeners(
+                new PeerAction( PeerActionType.UNREGISTER, registrationData.getPeerInfo().getId() ) ).succeeded() )
         {
-            throw new PeerException( "Could not unregister peer. Peer still used." );
+            throw new PeerException( "Could not unregister peer. Peer in used." );
         }
         PeerInfo p = getPeerInfo( registrationData.getPeerInfo().getId() );
 
@@ -479,9 +480,10 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public void doUnregisterRequest( final RegistrationData request ) throws PeerException
     {
-        if ( !notifyPeerActionListeners( PeerActionType.UNREGISTER, request.getPeerInfo().getId() ).succeeded() )
+        if ( !notifyPeerActionListeners( new PeerAction( PeerActionType.UNREGISTER, request.getPeerInfo().getId() ) )
+                .succeeded() )
         {
-            throw new PeerException( "Could not unregister peer. Peer still used." );
+            throw new PeerException( "Could not unregister peer. Peer in use." );
         }
 
         RegistrationClient registrationClient = new RegistrationClientImpl( provider );
@@ -549,7 +551,7 @@ public class PeerManagerImpl implements PeerManager
             for ( Iterator<PeerActionResponse> i = iterator(); i.hasNext() && result; )
             {
                 PeerActionResponse r = i.next();
-                if ( r.isOk() )
+                if ( !r.isOk() )
                 {
                     result = false;
                 }

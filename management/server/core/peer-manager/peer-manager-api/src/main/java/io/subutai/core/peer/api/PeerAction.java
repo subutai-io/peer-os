@@ -7,7 +7,13 @@ package io.subutai.core.peer.api;
 public class PeerAction
 {
     private PeerActionType type;
-    private final Object data;
+    private Object data;
+
+
+    public PeerAction( final PeerActionType type )
+    {
+        this.type = type;
+    }
 
 
     public PeerAction( final PeerActionType type, final Object data )
