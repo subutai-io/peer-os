@@ -181,5 +181,5 @@ public interface LocalPeer extends Peer
 
     Template getTemplateByName( String templateName );
 
-    boolean isPeerUsed( String peerId );
+//    boolean isPeerUsed( String peerId );
 }

@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -23,6 +24,7 @@ import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.ManagementHost;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.PeerId;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.peer.RegistrationData;
@@ -30,6 +32,10 @@ import io.subutai.common.peer.RegistrationStatus;
 import io.subutai.common.settings.ChannelSettings;
 import io.subutai.common.util.SecurityUtilities;
 import io.subutai.core.messenger.api.Messenger;
+import io.subutai.core.peer.api.PeerAction;
+import io.subutai.core.peer.api.PeerActionListener;
+import io.subutai.core.peer.api.PeerActionResponse;
+import io.subutai.core.peer.api.PeerActionType;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.peer.api.RegistrationClient;
 import io.subutai.core.peer.impl.command.CommandResponseListener;
@@ -56,6 +62,7 @@ public class PeerManagerImpl implements PeerManager
     private SecurityManager securityManager;
     private Object provider;
     private Map<String, RegistrationData> registrationRequests = new ConcurrentHashMap<>();
+    private List<PeerActionListener> peerActionListeners = new CopyOnWriteArrayList<>();
 
 
     public PeerManagerImpl( final Messenger messenger, LocalPeer localPeer, DaoManager daoManager,
@@ -93,18 +100,45 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    //    @RolesAllowed( "Peer-Management|A|Write" )
-    //    @Override
-    //    public boolean register( final PeerInfo peerInfo )
-    //    {
-    //        return peerDAO.saveInfo( SOURCE_REMOTE_PEER, peerInfo.getId(), peerInfo );
-    //    }
+    @Override
+    public void registerPeerActionListener( PeerActionListener peerActionListener )
+    {
+        Preconditions.checkNotNull( peerActionListener );
+
+        this.peerActionListeners.add( peerActionListener );
+    }
+
+
+    @Override
+    public void unregisterPeerActionListener( PeerActionListener peerActionListener )
+    {
+        Preconditions.checkNotNull( peerActionListener );
+
+        this.peerActionListeners.remove( peerActionListener );
+    }
+
+
+    private PeerActionResponses notifyPeerActionListeners( PeerAction action )
+    {
+        PeerActionResponses result = new PeerActionResponses();
+        for ( PeerActionListener peerActionListener : peerActionListeners )
+        {
+            PeerActionResponse response = peerActionListener.onPeerAction( action );
+            result.add( response );
+        }
+        return result;
+    }
+
 
     private void register( final String keyPhrase, final RegistrationData registrationData ) throws PeerException
     {
         Preconditions.checkNotNull( keyPhrase, "Key phrase could not be null." );
         Preconditions.checkArgument( !keyPhrase.isEmpty(), "Key phrase could not be empty" );
 
+        if ( !notifyPeerActionListeners( new PeerAction( PeerActionType.REGISTER ) ).succeeded() )
+        {
+            throw new PeerException( "Could not register peer." );
+        }
 
         Encrypted encryptedData = registrationData.getData();
         try
@@ -131,7 +165,13 @@ public class PeerManagerImpl implements PeerManager
     //TODO:Remove x509 cert from keystore
     private boolean unregister( final RegistrationData registrationData ) throws PeerException
     {
-        isPeerUsed( registrationData );
+
+        if ( !notifyPeerActionListeners(
+                new PeerAction( PeerActionType.UNREGISTER, registrationData.getPeerInfo().getId() ) ).succeeded() )
+        {
+            throw new PeerException( "Could not register peer." );
+        }
+        //        isPeerUsed( registrationData );
 
         ManagementHost mgmHost = getLocalPeer().getManagementHost();
         PeerInfo p = getPeerInfo( registrationData.getPeerInfo().getId() );
@@ -160,16 +200,16 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    private void isPeerUsed( final RegistrationData registrationData ) throws PeerException
-    {
-        if ( localPeer.isPeerUsed( registrationData.getPeerInfo().getId() ) )
-        {
-            throw new PeerException( "Could not unregister peer. Peer still used." );
-        }
-    }
+    //    private void isPeerUsed( final RegistrationData registrationData ) throws PeerException
+    //    {
+    //        if ( localPeer.isPeerUsed( registrationData.getPeerInfo().getId() ) )
+    //        {
+    //            throw new PeerException( "Could not unregister peer. Peer still used." );
+    //        }
+    //    }
 
 
-    @RolesAllowed( {"Peer-Management|A|Write","Peer-Management|A|Update"} )
+    @RolesAllowed( { "Peer-Management|A|Write", "Peer-Management|A|Update" } )
     @Override
     public boolean update( final PeerInfo peerInfo )
     {
@@ -268,7 +308,7 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    @RolesAllowed( {"Peer-Management|A|Write","Peer-Management|A|Update"} )
+    @RolesAllowed( { "Peer-Management|A|Write", "Peer-Management|A|Update" } )
     @Override
     public RegistrationData processRegistrationRequest( final RegistrationData registrationData ) throws PeerException
     {
@@ -277,15 +317,19 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    @RolesAllowed( {"Peer-Management|A|Delete","Peer-Management|A|Update"} )
+    @RolesAllowed( { "Peer-Management|A|Delete", "Peer-Management|A|Update" } )
     @Override
     public void processUnregisterRequest( final RegistrationData registrationData ) throws PeerException
     {
-        if ( localPeer.isPeerUsed( registrationData.getPeerInfo().getId() ) )
+        //        if ( localPeer.isPeerUsed( registrationData.getPeerInfo().getId() ) )
+        //        {
+        //            throw new PeerException( "Could not unregister peer. Peer still used." );
+        //        }
+        if ( !notifyPeerActionListeners(
+                new PeerAction( PeerActionType.UNREGISTER, registrationData.getPeerInfo().getId() ) ).succeeded() )
         {
-            throw new PeerException( "Could not unregister peer. Peer still used." );
+            throw new PeerException( "Could not unregister peer. Peer in used." );
         }
-
         PeerInfo p = getPeerInfo( registrationData.getPeerInfo().getId() );
 
         Encrypted encryptedData = registrationData.getData();
@@ -308,7 +352,7 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    @RolesAllowed( {"Peer-Management|A|Delete","Peer-Management|A|Update"} )
+    @RolesAllowed( { "Peer-Management|A|Delete", "Peer-Management|A|Update" } )
     @Override
     public void processRejectRequest( final RegistrationData registrationData ) throws PeerException
     {
@@ -316,7 +360,7 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    @RolesAllowed( {"Peer-Management|A|Delete","Peer-Management|A|Update"} )
+    @RolesAllowed( { "Peer-Management|A|Delete", "Peer-Management|A|Update" } )
     @Override
     public void processCancelRequest( final RegistrationData registrationData ) throws PeerException
     {
@@ -324,7 +368,7 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    @RolesAllowed( {"Peer-Management|A|Write","Peer-Management|A|Update"} )
+    @RolesAllowed( { "Peer-Management|A|Write", "Peer-Management|A|Update" } )
     @Override
     public void processApproveRequest( final RegistrationData registrationData ) throws PeerException
     {
@@ -374,10 +418,13 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    @RolesAllowed( {"Peer-Management|A|Write","Peer-Management|A|Update"} )
+    @RolesAllowed( { "Peer-Management|A|Write", "Peer-Management|A|Update" } )
     @Override
     public void doRegistrationRequest( final String destinationHost, final String keyPhrase ) throws PeerException
     {
+        Preconditions.checkNotNull( destinationHost );
+        Preconditions.checkNotNull( keyPhrase );
+
         RegistrationClient registrationClient = new RegistrationClientImpl( provider );
 
         RegistrationData result = registrationClient
@@ -388,7 +435,7 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    @RolesAllowed( {"Peer-Management|A|Delete","Peer-Management|A|Update"} )
+    @RolesAllowed( { "Peer-Management|A|Delete", "Peer-Management|A|Update" } )
     @Override
     public void doCancelRequest( final RegistrationData request ) throws PeerException
     {
@@ -401,7 +448,7 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    @RolesAllowed( {"Peer-Management|A|Write","Peer-Management|A|Update"} )
+    @RolesAllowed( { "Peer-Management|A|Write", "Peer-Management|A|Update" } )
     @Override
     public void doApproveRequest( final String keyPhrase, final RegistrationData request ) throws PeerException
     {
@@ -416,7 +463,7 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    @RolesAllowed( {"Peer-Management|A|Delete","Peer-Management|A|Update"} )
+    @RolesAllowed( { "Peer-Management|A|Delete", "Peer-Management|A|Update" } )
     @Override
     public void doRejectRequest( final RegistrationData request ) throws PeerException
     {
@@ -429,13 +476,14 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    @RolesAllowed( {"Peer-Management|A|Delete","Peer-Management|A|Update"} )
+    @RolesAllowed( { "Peer-Management|A|Delete", "Peer-Management|A|Update" } )
     @Override
     public void doUnregisterRequest( final RegistrationData request ) throws PeerException
     {
-        if ( localPeer.isPeerUsed( request.getPeerInfo().getId() ) )
+        if ( !notifyPeerActionListeners( new PeerAction( PeerActionType.UNREGISTER, request.getPeerInfo().getId() ) )
+                .succeeded() )
         {
-            throw new PeerException( "Could not unregister peer. Peer still used." );
+            throw new PeerException( "Could not unregister peer. Peer in use." );
         }
 
         RegistrationClient registrationClient = new RegistrationClientImpl( provider );
@@ -456,8 +504,7 @@ public class PeerManagerImpl implements PeerManager
         {
             if ( !peer.getId().equals( getLocalPeerInfo().getId() ) )
             {
-                r.add( new RegistrationData( peer.getPeerInfo(), /*peer.getPeerInfo().getKeyPhrase(),*/
-                        RegistrationStatus.APPROVED ) );
+                r.add( new RegistrationData( peer.getPeerInfo(), RegistrationStatus.APPROVED ) );
             }
         }
 
@@ -493,6 +540,24 @@ public class PeerManagerImpl implements PeerManager
             throw new PeerException( "Peer not found by IP: " + ip );
         }
         return result;
+    }
+
+
+    private class PeerActionResponses extends ArrayList<PeerActionResponse>
+    {
+        boolean succeeded()
+        {
+            boolean result = true;
+            for ( Iterator<PeerActionResponse> i = iterator(); i.hasNext() && result; )
+            {
+                PeerActionResponse r = i.next();
+                if ( !r.isOk() )
+                {
+                    result = false;
+                }
+            }
+            return result;
+        }
     }
 }
 
