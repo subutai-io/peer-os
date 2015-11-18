@@ -1245,6 +1245,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     public void dispose()
     {
         executor.shutdown();
+        peerManager.unregisterPeerActionListener( this );
     }
 
 
