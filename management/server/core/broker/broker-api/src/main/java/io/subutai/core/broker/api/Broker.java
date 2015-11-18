@@ -39,5 +39,14 @@ public interface Broker
      *
      * @return - client credentials {@code ClientCredentials}
      */
+    @Deprecated
     public ClientCredentials createNewClientCredentials( String clientId, String password ) throws BrokerException;
+
+    /**
+     * Adds certificate to broker trust-store
+     *
+     * @param clientId - unique client id
+     * @param clientX509CertInPem - client X509 certificate in PEM format
+     */
+    public void registerClientCertificate( String clientId, String clientX509CertInPem ) throws BrokerException;
 }

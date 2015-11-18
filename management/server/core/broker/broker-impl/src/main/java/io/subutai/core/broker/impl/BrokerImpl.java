@@ -134,6 +134,23 @@ public class BrokerImpl implements Broker
 
 
     @Override
+    public void registerClientCertificate( final String clientId, final String clientX509CertInPem )
+            throws BrokerException
+    {
+        try
+        {
+            ReloadableX509TrustManager tm = ( ReloadableX509TrustManager ) getSslContext().getTrustManagersAsArray()[0];
+            tm.addServerCertAndReload( clientId, sslUtil.convertX509PemToCert( clientX509CertInPem ) );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error in registerClientCertificate", e );
+            throw new BrokerException( e );
+        }
+    }
+
+
+    @Override
     public void sendTextMessage( final String topic, String message ) throws BrokerException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( topic ), "Invalid topic" );
@@ -261,22 +278,6 @@ public class BrokerImpl implements Broker
         if ( listener != null )
         {
             messageRouter.removeListener( listener );
-        }
-    }
-
-
-    public synchronized void registerClientCertificateWithBroker( String alias, X509Certificate certificate )
-            throws BrokerException
-    {
-        try
-        {
-            ReloadableX509TrustManager tm = ( ReloadableX509TrustManager ) getSslContext().getTrustManagersAsArray()[0];
-            tm.addServerCertAndReload( alias, certificate );
-        }
-        catch ( Exception e )
-        {
-            LOG.error( "Error in registerClientCertificateWithBroker", e );
-            throw new BrokerException( e );
         }
     }
 
