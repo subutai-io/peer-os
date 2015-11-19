@@ -11,15 +11,13 @@ import io.subutai.core.security.api.crypto.CertificateManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.security.api.crypto.KeyStoreManager;
-import io.subutai.core.security.api.dao.SecretKeyStoreDAO;
-import io.subutai.core.security.api.dao.SecurityManagerDAO;
+import io.subutai.core.security.api.dao.SecurityDataService;
 import io.subutai.core.security.api.jetty.HttpContextManager;
 import io.subutai.core.security.impl.crypto.CertificateManagerImpl;
 import io.subutai.core.security.impl.crypto.EncryptionToolImpl;
 import io.subutai.core.security.impl.crypto.KeyManagerImpl;
 import io.subutai.core.security.impl.crypto.KeyStoreManagerImpl;
-import io.subutai.core.security.impl.dao.SecretKeyStoreDAOImpl;
-import io.subutai.core.security.impl.dao.SecurityManagerDAOImpl;
+import io.subutai.core.security.impl.dao.SecurityDataServiceImpl;
 import io.subutai.core.security.impl.jetty.HttpContextManagerImpl;
 import io.subutai.core.security.impl.model.SecurityKeyData;
 
@@ -34,13 +32,11 @@ public class SecurityManagerImpl implements SecurityManager
     private KeyManager keyManager = null;
     private DaoManager daoManager = null;
     private EncryptionTool encryptionTool = null;
-    private SecurityManagerDAO securityManagerDAO = null;
+    private SecurityDataService securityDataService = null;
     private KeyServer keyServer = null;
     private SecurityKeyData keyData = null;
-    private SecretKeyStoreDAO secretKeyStoreDAO = null;
     private KeyStoreManager keyStoreManager = null;
     private CertificateManager certificateManager = null;
-    private Object provider;
     private HttpContextManager httpContextManager;
 
 
@@ -48,7 +44,7 @@ public class SecurityManagerImpl implements SecurityManager
      *
      */
     public SecurityManagerImpl( String ownerPublicKeyringFile, String secretKeyringFile, String publicKeyringFile,
-                                String secretKeyringPwd, Object provider )
+                                String secretKeyringPwd )
     {
         keyData = new SecurityKeyData();
 
@@ -66,9 +62,8 @@ public class SecurityManagerImpl implements SecurityManager
      */
     public void init()
     {
-        securityManagerDAO = new SecurityManagerDAOImpl( daoManager );
-        secretKeyStoreDAO = new SecretKeyStoreDAOImpl( daoManager );
-        keyManager = new KeyManagerImpl( securityManagerDAO, secretKeyStoreDAO, keyServer, keyData, provider );
+        securityDataService = new SecurityDataServiceImpl( daoManager );
+        keyManager = new KeyManagerImpl( securityDataService, keyServer, keyData );
         encryptionTool = new EncryptionToolImpl( ( KeyManagerImpl ) keyManager );
         keyStoreManager = new KeyStoreManagerImpl();
         certificateManager = new CertificateManagerImpl();
@@ -94,21 +89,11 @@ public class SecurityManagerImpl implements SecurityManager
     }
 
 
-    /**
-     * *****************************
+    /* *****************************
      */
     public void setKeyManager( KeyManager keyManager )
     {
         this.keyManager = keyManager;
-    }
-
-
-    /**
-     * *****************************
-     */
-    public DaoManager getDaoManager()
-    {
-        return daoManager;
     }
 
 
@@ -124,18 +109,18 @@ public class SecurityManagerImpl implements SecurityManager
     /* *****************************
      *
      */
-    public SecurityManagerDAO getSecurityManagerDAO()
+    public SecurityDataService getSecurityManagerDAO()
     {
-        return securityManagerDAO;
+        return securityDataService;
     }
 
 
     /* *****************************
      *
      */
-    public void setSecurityManagerDAO( final SecurityManagerDAO securityManagerDAO )
+    public void setSecurityManagerDAO( final SecurityDataService securityDataService )
     {
-        this.securityManagerDAO = securityManagerDAO;
+        this.securityDataService = securityDataService;
     }
 
 
@@ -222,9 +207,14 @@ public class SecurityManagerImpl implements SecurityManager
     }
 
 
+    /* *****************************
+     *
+     */
     @Override
     public HttpContextManager getHttpContextManager()
     {
         return httpContextManager;
     }
+
+
 }

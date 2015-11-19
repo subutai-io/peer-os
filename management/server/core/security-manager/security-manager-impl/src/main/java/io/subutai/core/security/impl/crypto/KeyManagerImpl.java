@@ -29,8 +29,7 @@ import io.subutai.common.settings.ChannelSettings;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.keyserver.api.KeyServer;
 import io.subutai.core.security.api.crypto.KeyManager;
-import io.subutai.core.security.api.dao.SecretKeyStoreDAO;
-import io.subutai.core.security.api.dao.SecurityManagerDAO;
+import io.subutai.core.security.api.dao.SecurityDataService;
 import io.subutai.core.security.impl.model.SecurityKeyData;
 
 
@@ -41,24 +40,19 @@ public class KeyManagerImpl implements KeyManager
 {
     private static final Logger LOG = LoggerFactory.getLogger( KeyManagerImpl.class );
 
-    private SecurityManagerDAO securityManagerDAO = null;
-    private SecretKeyStoreDAO secretKeyStoreDAO = null;
+    private SecurityDataService securityDataService = null;
     private KeyServer keyServer = null;
     private SecurityKeyData keyData = null;
-    Object provider;
 
 
     /* *****************************
      *
      */
-    public KeyManagerImpl( SecurityManagerDAO securityManagerDAO, SecretKeyStoreDAO secretKeyStoreDAO,
-                           KeyServer keyServer, SecurityKeyData securityKeyData, Object Provider )
+    public KeyManagerImpl( SecurityDataService securityDataService, KeyServer keyServer, SecurityKeyData securityKeyData)
     {
         this.keyData = securityKeyData;
-        this.securityManagerDAO = securityManagerDAO;
+        this.securityDataService = securityDataService;
         this.keyServer = keyServer;
-        this.secretKeyStoreDAO = secretKeyStoreDAO;
-        this.provider = provider;
         // Create Key Identity Record , save Public key in the KeyStore.
         init();
     }
@@ -74,8 +68,8 @@ public class KeyManagerImpl implements KeyManager
 
 
             InputStream ownerPubStream = PGPEncryptionUtil.getFileInputStream( keyData.getOwnerPublicKeyringFile() );
-            InputStream peerPubStream = PGPEncryptionUtil.getFileInputStream( keyData.getPublicKeyringFile() );
-            InputStream peerSecStream = PGPEncryptionUtil.getFileInputStream( keyData.getSecretKeyringFile() );
+            InputStream peerPubStream  = PGPEncryptionUtil.getFileInputStream( keyData.getPublicKeyringFile() );
+            InputStream peerSecStream  = PGPEncryptionUtil.getFileInputStream( keyData.getSecretKeyringFile() );
 
             if ( ownerPubStream == null || peerPubStream == null || peerSecStream == null )
             {
@@ -121,8 +115,8 @@ public class KeyManagerImpl implements KeyManager
 
 
     /* ***************************************************************
-         *
-         */
+     *
+     */
     @Override
     public void saveSecretKeyRing( String hostId, short type, PGPSecretKeyRing secretKeyRing )
     {
@@ -136,8 +130,10 @@ public class KeyManagerImpl implements KeyManager
                 String fingerprint = PGPKeyUtil.getFingerprint( publicKey.getFingerprint() );
                 String pwd = keyData.getSecretKeyringPwd();
 
-                secretKeyStoreDAO.saveSecretKeyRing( fingerprint, secretKeyRing.getEncoded(), pwd, type );
-                securityManagerDAO.saveKeyIdentityData( hostId, fingerprint, "", type );
+                //*******************
+                securityDataService.saveSecretKeyData( fingerprint, secretKeyRing.getEncoded(), pwd, type );
+                securityDataService.saveKeyIdentityData( hostId, fingerprint, "", type );
+                //*******************
             }
         }
         catch ( Exception ex )
@@ -190,7 +186,7 @@ public class KeyManagerImpl implements KeyManager
                 keyServer.addPublicKey( publicKeyRing );
 
                 String fingerprint = PGPKeyUtil.getFingerprint( publicKey.getFingerprint() );
-                securityManagerDAO.saveKeyIdentityData( hostId, "", fingerprint, type );
+                securityDataService.saveKeyIdentityData( hostId, "", fingerprint, type );
             }
         }
         catch ( Exception ex )
@@ -210,7 +206,7 @@ public class KeyManagerImpl implements KeyManager
         {
             if ( !Objects.equals( hostId, keyData.getManHostId() ) )
             {
-                securityManagerDAO.removeKeyIdentityData( hostId );
+                securityDataService.removeKeyIdentityData( hostId );
             }
 
             //Remove from KeyStore
@@ -233,8 +229,8 @@ public class KeyManagerImpl implements KeyManager
         {
             if ( !Objects.equals( hostId, keyData.getManHostId() ) )
             {
-                String fingerprint = securityManagerDAO.getSecretKeyFingerprint( hostId );
-                secretKeyStoreDAO.removeSecretKeyRing( fingerprint );
+                //String fingerprint = securityDataService.getKeyIdentityData( hostId ).getSecretKeyFingerprint();
+                //securityDataService.removeSecretKeyRing( fingerprint );
             }
         }
         catch ( Exception ex )
@@ -418,7 +414,7 @@ public class KeyManagerImpl implements KeyManager
 
         try
         {
-            String fingerprint = securityManagerDAO.getSecretKeyFingerprint( hostId );
+            String fingerprint = securityDataService.getSecretKeyFingerprint( hostId );
             return PGPKeyUtil
                     .readSecretKeyRingInputStream( secretKeyStoreDAO.getSecretKeyData( fingerprint ).getData() );
         }
