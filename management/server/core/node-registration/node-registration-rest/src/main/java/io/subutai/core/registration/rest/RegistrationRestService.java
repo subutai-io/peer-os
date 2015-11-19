@@ -4,6 +4,7 @@ package io.subutai.core.registration.rest;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -26,4 +27,12 @@ public interface RegistrationRestService
     public Response verifyContainerToken( String message );
 
 
+    @GET
+    @Path( "requests" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getRegistrationRequests();
+
+    @POST
+    @Path( "requests/{id}/approve" )
+    public Response approveRegistrationRequest( @PathParam( "id" ) String requestId );
 }

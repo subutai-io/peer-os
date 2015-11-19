@@ -14,7 +14,6 @@ import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 
 
-
 public class RegistrationRestServiceImpl implements RegistrationRestService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( RegistrationRestServiceImpl.class );
@@ -49,11 +48,10 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
             RequestedHost temp = JsonUtil.fromJson( decryptedMessage, RequestedHostJson.class );
 
             registrationManager.queueRequest( temp );
-
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error decrypting file.", e );
+            LOGGER.error( "Error registering public key", e );
             return Response.serverError().build();
         }
 
@@ -84,10 +82,33 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error decrypting file.", e );
+            LOGGER.error( "Error verifying container token", e );
             return Response.serverError().build();
         }
 
         return Response.ok( "Accepted" ).build();
+    }
+
+
+    @Override
+    public Response getRegistrationRequests()
+    {
+        return Response.ok( JsonUtil.toJson( registrationManager.getRequests() ) ).build();
+    }
+
+
+    @Override
+    public Response approveRegistrationRequest( final String requestId )
+    {
+        try
+        {
+            registrationManager.approveRequest( requestId );
+            return Response.ok().build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error approving registration request", e );
+            return Response.serverError().build();
+        }
     }
 }

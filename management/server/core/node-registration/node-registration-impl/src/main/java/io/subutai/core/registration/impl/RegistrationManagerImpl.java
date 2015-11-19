@@ -227,7 +227,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
     {
         RequestedHostImpl registrationRequest = requestDataService.find( requestId );
 
-        if ( !RegistrationStatus.REQUESTED.equals( registrationRequest.getStatus() ) )
+        if ( registrationRequest == null || !RegistrationStatus.REQUESTED.equals( registrationRequest.getStatus() ) )
         {
             return;
         }
