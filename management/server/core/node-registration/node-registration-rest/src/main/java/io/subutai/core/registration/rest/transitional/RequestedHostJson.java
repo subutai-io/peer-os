@@ -23,6 +23,7 @@ public class RequestedHostJson implements RequestedHost
     private String publicKey;
     private String restHook;
     private RegistrationStatus status;
+    private String cert;
 
     private Set<ContainerInfoJson> hostInfos = Sets.newHashSet();
 
@@ -58,6 +59,13 @@ public class RequestedHostJson implements RequestedHost
     public String getHostname()
     {
         return hostname;
+    }
+
+
+    @Override
+    public String getCert()
+    {
+        return cert;
     }
 
 

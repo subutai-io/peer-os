@@ -24,4 +24,6 @@ public interface RegistrationRestService
     @Path( "verify/container-token" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response verifyContainerToken( String message );
+
+
 }
