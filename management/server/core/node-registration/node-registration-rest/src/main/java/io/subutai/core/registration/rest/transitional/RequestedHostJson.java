@@ -185,6 +185,7 @@ public class RequestedHostJson implements RequestedHost
                 ", restHook='" + restHook + '\'' +
                 ", status=" + status +
                 ", hostInfos=" + hostInfos +
+                ", cert=" + cert +
                 '}';
     }
 }

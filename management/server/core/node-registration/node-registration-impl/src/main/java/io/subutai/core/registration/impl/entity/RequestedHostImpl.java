@@ -279,6 +279,7 @@ public class RequestedHostImpl implements RequestedHost, Serializable
                 ", restHook='" + restHook + '\'' +
                 ", netInterfaces=" + netInterfaces +
                 ", hostInfos=" + hostInfos +
+                ", cert=" + cert +
                 '}';
     }
 }
