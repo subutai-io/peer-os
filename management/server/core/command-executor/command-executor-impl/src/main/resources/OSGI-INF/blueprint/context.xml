@@ -6,11 +6,14 @@
              interface="io.subutai.core.broker.api.Broker" />
   <reference id="hostRegistry" availability="mandatory"
              interface="io.subutai.core.hostregistry.api.HostRegistry" />
+  <reference id="identityManager" availability="optional"
+             interface="io.subutai.core.identity.api.IdentityManager" />
 
   <bean id="commandProcessor" class="io.subutai.core.executor.impl.CommandProcessor"
         destroy-method="dispose">
     <argument ref="broker" />
     <argument ref="hostRegistry" />
+    <property name="identityManager" ref="identityManager" />
   </bean>
 
   <bean id="executor"

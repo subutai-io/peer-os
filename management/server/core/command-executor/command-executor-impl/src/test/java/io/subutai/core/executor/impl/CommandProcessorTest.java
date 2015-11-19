@@ -27,6 +27,7 @@ import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.common.host.ResourceHostInfo;
+import io.subutai.core.identity.api.model.User;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.TestCase.fail;
@@ -35,8 +36,10 @@ import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -68,6 +71,9 @@ public class CommandProcessorTest
     Request request;
     @Mock
     CommandCallback callback;
+    @Mock
+    User user;
+
 
     CommandProcessor commandProcessor;
 
@@ -75,13 +81,14 @@ public class CommandProcessorTest
     @Before
     public void setUp() throws Exception
     {
-        commandProcessor = new CommandProcessor( broker, hostRegistry );
+        commandProcessor = spy( new CommandProcessor( broker, hostRegistry ));
         commandProcessor.commands = commands;
         doThrow( new HostDisconnectedException( "" ) ).when( hostRegistry ).getResourceHostInfoById( HOST_ID );
         when( hostRegistry.getContainerHostInfoById( HOST_ID ) ).thenReturn( containerHostInfo );
         when( hostRegistry.getResourceHostByContainerHost( containerHostInfo ) ).thenReturn( resourceHostInfo );
         when( request.getId() ).thenReturn( HOST_ID );
         when( request.getCommandId() ).thenReturn( COMMAND_ID );
+        doReturn( user ).when( commandProcessor ).getUser();
     }
 
 

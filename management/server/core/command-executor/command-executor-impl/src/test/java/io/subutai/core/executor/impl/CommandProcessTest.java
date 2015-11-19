@@ -10,19 +10,19 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandStatus;
 import io.subutai.common.command.Response;
 import io.subutai.common.command.ResponseType;
+import io.subutai.core.identity.api.model.User;
 
-//import static junit.framework.Assert.assertEquals;
-
+import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertTrue;
-import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.isA;
@@ -32,6 +32,8 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+//import static junit.framework.Assert.assertEquals;
 
 
 @RunWith( MockitoJUnitRunner.class )
@@ -49,6 +51,8 @@ public class CommandProcessTest
     Semaphore semaphore;
     @Mock
     Response response;
+    @Mock
+    User user;
 
     CommandProcess commandProcess;
 
@@ -56,7 +60,7 @@ public class CommandProcessTest
     @Before
     public void setUp() throws Exception
     {
-        commandProcess = new CommandProcess( commandProcessor, callback );
+        commandProcess = new CommandProcess( commandProcessor, callback, user );
         commandProcess.executor = executor;
         commandProcess.semaphore = semaphore;
     }
@@ -69,7 +73,7 @@ public class CommandProcessTest
         try
         {
 
-            new CommandProcess( null, callback );
+            new CommandProcess( null, callback, user );
             fail( "Expected NullPointerException" );
         }
         catch ( NullPointerException e )
@@ -78,7 +82,7 @@ public class CommandProcessTest
         try
         {
 
-            new CommandProcess( commandProcessor, null );
+            new CommandProcess( commandProcessor, null, user );
             fail( "Expected NullPointerException" );
         }
         catch ( NullPointerException e )
@@ -220,6 +224,5 @@ public class CommandProcessTest
         verify( response, times( 2 ) ).getStdErr();
         verify( response ).getExitCode();
         assertEquals( CommandStatus.SUCCEEDED, commandProcess.status );
-
     }
 }
