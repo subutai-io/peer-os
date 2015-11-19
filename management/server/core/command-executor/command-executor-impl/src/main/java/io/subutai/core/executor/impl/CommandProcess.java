@@ -1,9 +1,18 @@
 package io.subutai.core.executor.impl;
 
 
+import java.security.PrivilegedAction;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
+
+import javax.security.auth.Subject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
@@ -11,11 +20,7 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandStatus;
 import io.subutai.common.command.Response;
 import io.subutai.common.command.ResponseType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
+import io.subutai.core.identity.api.model.User;
 
 
 /**
@@ -33,9 +38,10 @@ public class CommandProcess
     protected volatile CommandStatus status;
     protected Semaphore semaphore;
     protected ExecutorService executor;
+    private User user;
 
 
-    public CommandProcess( final CommandProcessor commandProcessor, final CommandCallback callback )
+    public CommandProcess( final CommandProcessor commandProcessor, final CommandCallback callback, final User user )
     {
         Preconditions.checkNotNull( commandProcessor );
         Preconditions.checkNotNull( callback );
@@ -47,6 +53,8 @@ public class CommandProcess
         stdErr = new StringBuilder();
         status = CommandStatus.NEW;
         semaphore = new Semaphore( 0 );
+
+        this.user = user;
     }
 
 
@@ -80,7 +88,23 @@ public class CommandProcess
 
     public void processResponse( final Response response )
     {
-        executor.execute( new ResponseProcessor( response, this, commandProcessor ) );
+        final CommandProcess THIS = this;
+        Subject.doAs( user.getSubject(), new PrivilegedAction<Void>()
+        {
+            @Override
+            public Void run()
+            {
+                try
+                {
+                    executor.execute( new ResponseProcessor( response, THIS, commandProcessor ) );
+                }
+                catch ( Exception e )
+                {
+                    LOG.error( "Error in processResponse", e );
+                }
+                return null;
+            }
+        } );
     }
 
 
