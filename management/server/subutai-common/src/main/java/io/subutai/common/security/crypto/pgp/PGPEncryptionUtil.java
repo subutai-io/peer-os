@@ -285,7 +285,7 @@ public class PGPEncryptionUtil
         }
         catch ( Exception e )
         {
-            throw new PGPException( "Error in decryptAndVerify", e );
+            throw new PGPException( "Error in decryptAndReturnSignatures", e );
         }
     }
 

@@ -33,11 +33,6 @@
     </dependency>
 
 
-    <!-- Security Manager  -->
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>security-manager-api</artifactId>
-    </dependency>
     <!-- Security Manager API -->
     <dependency>
       <groupId>${project.groupId}</groupId>

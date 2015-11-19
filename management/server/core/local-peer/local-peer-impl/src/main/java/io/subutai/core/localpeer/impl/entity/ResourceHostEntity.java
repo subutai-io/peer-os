@@ -44,6 +44,7 @@ import io.subutai.common.protocol.Disposable;
 import io.subutai.common.protocol.Template;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
+import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.localpeer.impl.container.CreateContainerTask;
 import io.subutai.core.localpeer.impl.container.DestroyContainerTask;
 import io.subutai.core.registry.api.TemplateRegistry;
@@ -80,6 +81,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
     @Transient
     protected HostRegistry hostRegistry;
+    private TemplateManager templateManager;
 
 
     protected ResourceHostEntity()
@@ -530,5 +532,11 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     public boolean isConnected()
     {
         return getPeer().isConnected( new HostId( getId() ) );
+    }
+
+
+    public void setTemplateManager( final TemplateManager templateManager )
+    {
+        this.templateManager = templateManager;
     }
 }

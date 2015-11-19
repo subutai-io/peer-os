@@ -11,7 +11,7 @@
     </cxf:features>
   </cxf:bus>
 
-  <jaxrs:server address="/pks" id="keyServerRest">
+  <jaxrs:server address="/v1/pks" id="keyServerRest">
     <jaxrs:serviceBeans>
       <ref component-id="keyServerRestImpl" />
     </jaxrs:serviceBeans>

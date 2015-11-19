@@ -89,7 +89,8 @@ public interface RestService
 
     @POST
     @Path( "gateways" )
-    Response createGateway( @FormParam( "gatewayIp" ) String gatewayIp, @FormParam( "vlan" ) int vlan );
+    @Consumes( MediaType.APPLICATION_JSON )
+    Response createGateway( Gateway gateway );
 
 
     @POST

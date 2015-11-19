@@ -11,7 +11,7 @@
     </cxf:features>
   </cxf:bus>
 
-  <jaxrs:server address="/security" id="securityManagerRest">
+  <jaxrs:server address="/v1/security" id="securityManagerRest">
     <jaxrs:serviceBeans>
       <ref component-id="securityManagerRestImpl" />
     </jaxrs:serviceBeans>

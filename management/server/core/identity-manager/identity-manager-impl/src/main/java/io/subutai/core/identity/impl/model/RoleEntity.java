@@ -42,7 +42,6 @@ public class RoleEntity implements Role
     private int type = 1;
 
 
-    // TODO: delete this table
     //*********************************************
     @ManyToMany( targetEntity = PermissionEntity.class, fetch = FetchType.EAGER )
     @JoinTable( name = "role_permissions",

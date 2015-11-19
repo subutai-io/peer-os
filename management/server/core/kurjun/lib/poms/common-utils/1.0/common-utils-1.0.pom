@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>ai.subut.kurjun</groupId>
+    <artifactId>kurjun-utils</artifactId>
+    <version>1.0</version>
+  </parent>
+
+    <name>Kurjun Common Utilities</name>
+    <artifactId>common-utils</artifactId>
+    <packaging>jar</packaging>
+
+    <properties>
+        <osgi.export-package>{local-packages};version=1.0;-noimport:=true</osgi.export-package>
+<!--        <osgi.import-package>!com.google.inject.internal.asm.util, !org.apache.commons.beanutils, 
+            !org.apache.commons.*, !org.apache.xml.*, !org.apache.log, *</osgi.import-package>-->
+        <!--<osgi.import-package>*</osgi.import-package>-->
+        <!--<osgi.embed-dependency>groupId=com.google.inject|commons-configuration|javax.inject|org.ow2.asm|aopalliance|commons-beanutils</osgi.embed-dependency>-->
+        <osgi.import-package>ai.subut.kurjun.*, org.slf4j.*, !*</osgi.import-package>
+        <osgi.embed-dependency>groupId=com.google.inject|aopalliance|javax.inject|commons-configuration|commons-lang|commons-logging</osgi.embed-dependency>
+        <!--<osgi.embed-dependency>groupId=!commons-beanutils,*</osgi.embed-dependency>-->
+        <!--<osgi.embed-dependency>*;scope=compile|runtime</osgi.embed-dependency>-->
+        <osgi.embed-transitive>true</osgi.embed-transitive>
+    </properties>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>ai.subut.kurjun</groupId>
+            <artifactId>model</artifactId>
+            <version>1.0</version>
+        </dependency>
+    
+        <dependency>
+            <groupId>commons-configuration</groupId>
+            <artifactId>commons-configuration</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+        </dependency>
+        
+    </dependencies>
+  
+</project>
