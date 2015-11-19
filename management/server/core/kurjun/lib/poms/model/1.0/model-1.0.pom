@@ -30,37 +30,4 @@
 
     </dependencies>
     
-    <build>
-        <plugins>
-            
-<!--            <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>2.7</version>
-                <executions>
-                    <execution>
-                        <id>copy-pom-files</id>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-
-                        <configuration>
-                            <outputDirectory>/home/kair/Desktop/dada/poms</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>/home/kair/.m2/repository/ai/subut/kurjun</directory>
-                                    <filtering>true</filtering>
-                                    <includes>
-                                        <include>**/*.pom</include>
-                                    </includes>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>-->
-            
-        </plugins>
-    </build>
-
 </project>

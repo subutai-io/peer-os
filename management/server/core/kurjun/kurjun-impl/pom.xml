@@ -56,10 +56,16 @@
             <artifactId>file-store-factory</artifactId>
             <version>${ai.subut.kurjun.version}</version>
         </dependency>
-
+        
         <dependency>
             <groupId>ai.subut.kurjun</groupId>
             <artifactId>metadata-store-factory</artifactId>
+            <version>${ai.subut.kurjun.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>ai.subut.kurjun</groupId>
+            <artifactId>metadata-common</artifactId>
             <version>${ai.subut.kurjun.version}</version>
         </dependency>
 
@@ -90,7 +96,7 @@
                         <Embed-Dependency>
                             commons-compress,
                             groupId=ai.subut.kurjun|com.amazonaws|com.datastax.cassandra|org.yaml
-                            |com.zaxxer|com.google.inject*|javax.inject|aopalliance|org.vafer
+                            |com.zaxxer|com.google.inject*|javax.inject|aopalliance|org.vafer|org.tukaani
                             |commons-configuration|org.mapdb|org.mybatis|org.bouncycastle
                         </Embed-Dependency>
                         <Embed-Transitive>true</Embed-Transitive>
