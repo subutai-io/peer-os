@@ -3,6 +3,7 @@ package io.subutai.core.kurjun.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -27,6 +28,7 @@ import ai.subut.kurjun.metadata.factory.PackageMetadataStoreModule;
 import ai.subut.kurjun.model.metadata.Metadata;
 import ai.subut.kurjun.model.metadata.SerializableMetadata;
 import ai.subut.kurjun.model.repository.LocalRepository;
+import ai.subut.kurjun.model.repository.UnifiedRepository;
 import ai.subut.kurjun.repo.RepositoryFactory;
 import ai.subut.kurjun.repo.RepositoryModule;
 import ai.subut.kurjun.riparser.ReleaseIndexParserModule;
@@ -45,6 +47,8 @@ public class TemplateManagerImpl implements TemplateManager
     private static final Set<KurjunContext> CONTEXTS = new HashSet<>();
 
     private Injector injector;
+
+    private Set<URL> remotes = new HashSet<>();
 
 
     public void init()
@@ -69,7 +73,7 @@ public class TemplateManagerImpl implements TemplateManager
         DefaultMetadata m = new DefaultMetadata();
         m.setMd5sum( md5 );
 
-        LocalRepository repo = getRepository( context );
+        UnifiedRepository repo = getRepository( context );
         SerializableMetadata meta = repo.getPackageInfo( m );
         if ( meta != null )
         {
@@ -86,7 +90,7 @@ public class TemplateManagerImpl implements TemplateManager
         m.setName( name );
         m.setVersion( version );
 
-        LocalRepository repo = getRepository( context );
+        UnifiedRepository repo = getRepository( context );
         SerializableMetadata meta = repo.getPackageInfo( m );
         if ( meta != null )
         {
@@ -102,7 +106,7 @@ public class TemplateManagerImpl implements TemplateManager
         DefaultMetadata m = new DefaultMetadata();
         m.setMd5sum( md5 );
 
-        LocalRepository repo = getRepository( context );
+        UnifiedRepository repo = getRepository( context );
         return repo.getPackageStream( m );
     }
 
@@ -110,7 +114,7 @@ public class TemplateManagerImpl implements TemplateManager
     @Override
     public List<String> list( String context ) throws IOException
     {
-        LocalRepository repo = getRepository( context );
+        UnifiedRepository repo = getRepository( context );
         List<SerializableMetadata> items = repo.listPackages();
 
         List<String> result = new LinkedList<>();
@@ -125,7 +129,7 @@ public class TemplateManagerImpl implements TemplateManager
     @Override
     public byte[] upload( String context, InputStream inputStream ) throws IOException
     {
-        LocalRepository repo = getRepository( context );
+        LocalRepository repo = getLocalRepository( context );
         try
         {
             Metadata m = repo.put( inputStream, CompressionType.GZIP );
@@ -142,7 +146,7 @@ public class TemplateManagerImpl implements TemplateManager
     @Override
     public boolean delete( String context, byte[] md5 ) throws IOException
     {
-        LocalRepository repo = getRepository( context );
+        LocalRepository repo = getLocalRepository( context );
         try
         {
             repo.delete( md5 );
@@ -153,6 +157,13 @@ public class TemplateManagerImpl implements TemplateManager
             LOGGER.error( "Failed to delete template", ex );
             return false;
         }
+    }
+
+
+    @Override
+    public void addRemoteRepository( URL url )
+    {
+        remotes.add( url );
     }
 
 
@@ -178,7 +189,7 @@ public class TemplateManagerImpl implements TemplateManager
     }
 
 
-    private LocalRepository getRepository( String context ) throws IOException
+    private LocalRepository getLocalRepository( String context ) throws IOException
     {
         KurjunContext c = getContext( context );
         if ( c != null )
@@ -187,6 +198,19 @@ public class TemplateManagerImpl implements TemplateManager
             return repositoryFactory.createLocalTemplate( c );
         }
         throw new IOException( "Invalid context" );
+    }
+
+
+    private UnifiedRepository getRepository( String context ) throws IOException
+    {
+        RepositoryFactory repositoryFactory = injector.getInstance( RepositoryFactory.class );
+        UnifiedRepository unifiedRepo = repositoryFactory.createUnifiedRepo();
+        unifiedRepo.getRepositories().add( getLocalRepository( context ) );
+        for ( URL url : remotes )
+        {
+            unifiedRepo.getRepositories().add( repositoryFactory.createNonLocalSnap( url.toString(), null ) );
+        }
+        return unifiedRepo;
     }
 
 

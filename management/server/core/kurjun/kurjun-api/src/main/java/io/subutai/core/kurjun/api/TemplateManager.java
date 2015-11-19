@@ -3,6 +3,7 @@ package io.subutai.core.kurjun.api;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.List;
 
 
@@ -80,6 +81,15 @@ public interface TemplateManager
      * @throws IOException
      */
     boolean delete( String context, byte[] md5 ) throws IOException;
+
+
+    /**
+     * Adds remote repository located at supplied URL. Repositories added with this method will be used to fulfill
+     * requests in case the local repository can not handle requests.
+     *
+     * @param url URL of the remote repository
+     */
+    void addRemoteRepository( URL url );
 
 
 }
