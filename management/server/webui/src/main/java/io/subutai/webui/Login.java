@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 
-public class AngularApp extends HttpServlet
+public class Login extends HttpServlet
 {
     protected void doGet( HttpServletRequest request, HttpServletResponse response ) throws ServletException,
             IOException

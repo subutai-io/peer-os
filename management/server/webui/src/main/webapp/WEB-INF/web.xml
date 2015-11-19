@@ -28,12 +28,22 @@
   </welcome-file-list>
 
   <servlet>
-    <servlet-name>AngularApp</servlet-name>
-    <servlet-class>io.subutai.webui.AngularApp</servlet-class>
+    <servlet-name>Login</servlet-name>
+    <servlet-class>io.subutai.webui.Login</servlet-class>
   </servlet>
 
   <servlet-mapping>
-    <servlet-name>AngularApp</servlet-name>
-    <url-pattern>/subutai-app.js</url-pattern>
+    <servlet-name>Login</servlet-name>
+    <url-pattern>/login</url-pattern>
   </servlet-mapping>
+  
+  <filter>
+    <filter-name>AngularApp</filter-name>
+    <filter-class>io.subutai.webui.AngularAppFilter</filter-class>
+  </filter>
+
+  <filter-mapping>
+    <filter-name>AngularApp</filter-name>
+    <url-pattern>/subutai-app.js</url-pattern>
+  </filter-mapping>
 </web-app>

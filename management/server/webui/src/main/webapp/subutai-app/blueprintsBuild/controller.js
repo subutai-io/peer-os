@@ -1,11 +1,9 @@
 'use strict';
 
 angular.module('subutai.blueprints-build.controller', [])
-	.controller('BlueprintsBuildCtrl', BlueprintsBuildCtrl)
-	.controller('BlueprintsBuildFormCtrl', BlueprintsBuildFormCtrl);
+	.controller('BlueprintsBuildCtrl', BlueprintsBuildCtrl);
 
 BlueprintsBuildCtrl.$inject = ['$scope', 'environmentService', 'SweetAlert', 'ngDialog', '$stateParams'];
-BlueprintsBuildFormCtrl.$inject = ['$scope', 'environmentService', 'SweetAlert', 'ngDialog', '$stateParams'];
 
 function BlueprintsBuildCtrl($scope, environmentService, SweetAlert, ngDialog, $stateParams) {
 
@@ -21,11 +19,47 @@ function BlueprintsBuildCtrl($scope, environmentService, SweetAlert, ngDialog, $
 	vm.environments = [];
 	vm.newEnvironmentName = '';
 	vm.environmentToGrow;
+	vm.totalContainers = 0;
+	vm.popupError = false;
+
+	vm.groupList = {};
+	vm.colors = quotaColors;	
 
 	// functions
 	vm.placeNode = placeNode;
-	vm.removeNode = removeNode;
 	vm.buildPopup = buildPopup;
+
+	//popup functions
+	vm.start = start;	
+	vm.removeNode = removeNode;
+	vm.removeGroup = removeGroup;	
+
+	environmentService.getBlueprintById($stateParams.blueprintId).success(function (data) {
+		vm.blueprint = data;
+
+		for(var i = 0; i < vm.blueprint.nodeGroups.length; i++) {
+			vm.transportNodes[i] = vm.blueprint.nodeGroups[i];
+			vm.transportNodes[i].show = true;
+			vm.transportNodes[i].disabled = true;
+			vm.transportNodes[i].options = {
+				start: vm.transportNodes[i].numberOfContainers, 
+				range: {
+					min: 1, 
+					max: vm.transportNodes[i].numberOfContainers
+				}, 
+				step: 1,
+				tooltips: true,
+				format: wNumb({
+					decimals: 0,
+				}),
+				pips: {
+					mode: "count", 
+					values: vm.transportNodes[i].numberOfContainers, 
+					density: 1
+				}
+			};
+		}
+	});
 
 	if(vm.blueprintAction == 'grow') {
 		environmentService.getEnvironments().success(function (data) {
@@ -42,171 +76,142 @@ function BlueprintsBuildCtrl($scope, environmentService, SweetAlert, ngDialog, $
 	});
 
 	function buildPopup() {
-		var dataToBuild = {};
+
+		if(vm.blueprintAction == 'grow') {
+			if(vm.environmentToGrow === undefined || vm.environmentToGrow.length < 1) {
+				vm.popupError = true;
+				return;
+			}
+		} else {
+			console.log(vm.newEnvironmentName);
+			if(vm.newEnvironmentName === undefined || vm.newEnvironmentName.length < 1) {
+				vm.popupError = true;
+				return;
+			}
+		}
 
 		if(vm.nodesToCreate.length < 1) return;
+		vm.popupError = false;
 
-		dataToBuild.nodesToCreate = vm.nodesToCreate;
-		if(vm.blueprintAction == 'build') {
-			dataToBuild.newEnvironmentName = vm.newEnvironmentName;
-		} else if(vm.blueprintAction == 'grow') {
-			dataToBuild.environmentToGrow = vm.environmentToGrow;
-		}		
+		for(var i = 0; i < vm.nodesToCreate.length; i++) {
+			var currentNode = vm.nodesToCreate[i];
+
+			if(currentNode !== null) {
+				if(vm.groupList[currentNode.peer] === undefined) {
+					vm.groupList[currentNode.peer] = {};
+				}
+				if(vm.groupList[currentNode.peer][currentNode.strategyId] === undefined) {
+					vm.groupList[currentNode.peer][currentNode.strategyId] = [];
+				}
+
+				currentNode.nodesToCreateKey = i;
+				vm.groupList[currentNode.peer][currentNode.strategyId].push(currentNode);
+			}
+		}
 
 		ngDialog.open({
 			template: 'subutai-app/blueprintsBuild/partials/buildPopup.html',
-			controller: 'BlueprintsBuildFormCtrl',
-			controllerAs: 'blueprintsBuildFormCtrl',
-			data: dataToBuild,
+			scope: $scope,
 			preCloseCallback: function(value) {
-				//callback
+				vm.groupList = {};
 			}
 		});
 	}
 
-	function getCurrentBlueprint() {
-		environmentService.getBlueprintById($stateParams.blueprintId).success(function (data) {
-			vm.blueprint = data;
-
-			for(var i = 0; i < vm.blueprint.nodeGroups.length; i++) {
-				vm.transportNodes[i] = {};
-				vm.transportNodes[i].name = vm.blueprint.nodeGroups[i].name;
-				vm.transportNodes[i].numberOfContainers = vm.blueprint.nodeGroups[i].numberOfContainers;
-				vm.transportNodes[i].disabled = false;
-				vm.transportNodes[i].options = {
-					start: vm.transportNodes[i].numberOfContainers, 
-					range: {
-						min: 1, 
-						max: vm.transportNodes[i].numberOfContainers
-					}, 
-					step: 1,
-					tooltips: true,
-					format: wNumb({
-						decimals: 0,
-					}),
-					pips: {
-						mode: "count", 
-						values: vm.transportNodes[i].numberOfContainers, 
-						density: 1
-					}
-				};
-			}
-		});
-	}
-	getCurrentBlueprint();
-
-	function placeNode(node, nodeGroup, key) {
+	function placeNode(node, parentKey) {
 		if(node.peer === undefined) return;
 		if(node.strategyId === undefined) return;
-		var foundedInArray = false;
-		for(var i = 0; i < vm.nodesToCreate.length; i++) {
-			if(vm.nodesToCreate[i].peer == node.peer && vm.nodesToCreate[i].name == node.name) {
-				vm.nodesToCreate[i].peer = node.peer;
-				vm.nodesToCreate[i].strategyId = node.strategyId;
-				vm.nodesToCreate[i].numberOfContainers = (
-					parseInt(vm.nodesToCreate[i].numberOfContainers) + parseInt(node.options.start)
-				);
-				foundedInArray = true;
-				break;
-			}
-		}
+		if(node.options.start < 1) return;
 
-		if(!foundedInArray) {
-			var copyNode = {};
-			copyNode.name = node.name;
-			copyNode.numberOfContainers = parseInt(node.options.start);
-			copyNode.peer = node.peer;
-			copyNode.strategyId = node.strategyId;
-			copyNode.parentNode = key;
-			vm.nodesToCreate.push(copyNode);
-		}
+		var key = findContainer(node);
 
-		nodeGroup.numberOfContainers = nodeGroup.numberOfContainers - node.options.start;
-		if(nodeGroup.numberOfContainers > 0) {
-			node.numberOfContainers = nodeGroup.numberOfContainers;
-			node.options.start = nodeGroup.numberOfContainers;
-			node.options.min = nodeGroup.numberOfContainers;
-			node.options.pips.values = nodeGroup.numberOfContainers;
-			node.options.range.max = nodeGroup.numberOfContainers;
-			node.disabled = false;
+		if(key !== false) {
+			vm.nodesToCreate[key].numberOfContainers = vm.nodesToCreate[key].numberOfContainers + node.options.start;			
 		} else {
-			node.options.start = 0;
-			node.numberOfContainers = 0;
-			node.disabled = true;
-			nodeGroup.numberOfContainers = 0;
+			var temp = angular.copy(node);
+			temp.parentNode = parentKey;
+			temp.numberOfContainers = node.options.start;			
+			vm.nodesToCreate.push(temp);
 		}
+
+		vm.totalContainers +=  node.options.start;
+		node.numberOfContainers = node.numberOfContainers - node.options.start;
+		node = setRangeSliderValues(node, node.numberOfContainers);
 	}
 
-	function removeNode(key) {
+	function setRangeSliderValues(node, value) {
+		if(value > 0) {
+			node.options.range.max = value;
+			node.options.pips.values = value;
+			node.show = true;
+		} else {
+			node.show = false;
+		}
+		node.numberOfContainers = value;
+		node.options.start = value;
+		node.options.min = value;
+	}
+
+	function findContainer(node) {
+		for(var i = 0; i < vm.nodesToCreate.length; i++) {
+			if(vm.nodesToCreate[i] !== null){
+				var currentNode = vm.nodesToCreate[i];
+				if(
+					currentNode.peer == node.peer && 
+					currentNode.name == node.name && 
+					currentNode.templateName == node.templateName
+				) {
+					return i;
+				}
+			}
+		}
+		return false;
+	}
+
+	function removeNodeFromCreateList(key) {
 		var parentKey = vm.nodesToCreate[key].parentNode;
+		var node = vm.transportNodes[parentKey];
 
 		var numberOfContainers = (
-			parseInt(vm.blueprint[parentKey].numberOfContainers) 
+			parseInt(node.numberOfContainers) 
 			+ 
 			parseInt(vm.nodesToCreate[key].numberOfContainers)
 		);
 
-		vm.blueprint[parentKey].numberOfContainers = numberOfContainers;
-		vm.nodesToCreate.splice(key, 1);
+		vm.totalContainers = vm.totalContainers - vm.nodesToCreate[key].numberOfContainers;
+		node.numberOfContainers = numberOfContainers;
+		node = setRangeSliderValues(node, numberOfContainers);
+
+		vm.nodesToCreate[key] = null;
 	}
 
-}
-
-function BlueprintsBuildFormCtrl($scope, environmentService, SweetAlert, ngDialog, $stateParams) {
-
-	var vm = this;
-	vm.blueprint = {};
-
-	vm.blueprintAction = $stateParams.action;
-	vm.nodesToCreate = [];
-	vm.environments = [];
-	vm.newEnvironmentName = '';
-	vm.environmentToGrow;	
-
-	vm.groupList = {};
-	vm.colors = quotaColors;
-
-	//functions
-	vm.start = start;	
-
-	if($scope.ngDialogData !== undefined) {
-		vm.nodesToCreate = $scope.ngDialogData.nodesToCreate;
-
-		for(var i = 0; i < vm.nodesToCreate.length; i++) {
-			var currentNode = angular.copy(vm.nodesToCreate[i]);
-			if(vm.groupList[currentNode.peer] === undefined) {
-				vm.groupList[currentNode.peer] = {};
-				if(vm.groupList[currentNode.peer][currentNode.strategyId] === undefined) {
-					vm.groupList[currentNode.peer][currentNode.strategyId] = [];
-				}
-			}
-			vm.groupList[currentNode.peer][currentNode.strategyId].push(currentNode);
-		}
-
-		if(vm.blueprintAction == 'build') {
-			vm.newEnvironmentName = $scope.ngDialogData.newEnvironmentName;
-		} else if(vm.blueprintAction == 'grow') {
-			vm.environmentToGrow = $scope.ngDialogData.environmentToGrow;
-		}
+	function removeNode(peer, strategies, itemKey, itemParentKey) {
+		removeNodeFromCreateList(itemParentKey);
+		vm.groupList[peer][strategies].splice(itemKey, 1);
 	}
 
-	environmentService.getBlueprintById($stateParams.blueprintId).success(function (data) {
-		vm.blueprint = data;
-	});
+	function removeGroup(peer, strategies) {
+		for(var i = 0; i < vm.groupList[peer][strategies].length; i++) {
+			removeNodeFromCreateList(vm.groupList[peer][strategies][i].nodesToCreateKey);
+		}
+		delete vm.groupList[peer][strategies];
+	}
 
 	function getNodesGroups() {
 		var nodeGroupsArray = [];
 		for(var i = 0; i < vm.nodesToCreate.length; i++) {
 
-			var currentNodeGroup = vm.blueprint.nodeGroups[vm.nodesToCreate[i].parentNode];
-			var containerPlacementStrategy = {"strategyId": vm.nodesToCreate[i].strategyId, "criteria": []};
+			if(vm.nodesToCreate[i] !== null) {
+				var currentNodeGroup = vm.blueprint.nodeGroups[vm.nodesToCreate[i].parentNode];
+				var containerPlacementStrategy = {"strategyId": vm.nodesToCreate[i].strategyId, "criteria": []};
 
-			currentNodeGroup.numberOfContainers = vm.nodesToCreate[i].numberOfContainers;
-			currentNodeGroup.containerPlacementStrategy = containerPlacementStrategy;
-			currentNodeGroup.peerId = vm.nodesToCreate[i].peer;
-			currentNodeGroup.containerDistributionType = 'AUTO';
+				currentNodeGroup.numberOfContainers = vm.nodesToCreate[i].numberOfContainers;
+				currentNodeGroup.containerPlacementStrategy = containerPlacementStrategy;
+				currentNodeGroup.peerId = vm.nodesToCreate[i].peer;
+				currentNodeGroup.containerDistributionType = 'AUTO';
 
-			nodeGroupsArray.push(currentNodeGroup);
+				nodeGroupsArray.push(currentNodeGroup);
+			}
 		}
 		return nodeGroupsArray;
 	}
@@ -251,6 +256,6 @@ function BlueprintsBuildFormCtrl($scope, environmentService, SweetAlert, ngDialo
 			SweetAlert.swal("ERROR!", 'Grow environment error: ' + error.ERROR, "error");
 		});
 	}
-	
+
 }
 

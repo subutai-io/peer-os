@@ -29,15 +29,21 @@ function EnvironmentViewCtrl($scope, environmentService, SweetAlert, DTOptionsBu
 
 	vm.dtInstance = {};
 	vm.users = {};
-	vm.dtOptions = DTOptionsBuilder.fromFnPromise(function() {
-		return $resource(serverUrl + 'environments_ui/').query().$promise;
-	}).withPaginationType('full_numbers').withOption('createdRow', createdRow);
+	vm.dtOptions = DTOptionsBuilder
+		.fromFnPromise(function() {
+			return $resource(serverUrl + 'environments_ui/').query().$promise;
+		}).withPaginationType('full_numbers')
+		.withOption('createdRow', createdRow)
+		.withOption('order', [[ 1, "asc" ]])
+		//.withDisplayLength(2)
+		.withOption('stateSave', true);
+
 	vm.dtColumns = [
 		//DTColumnBuilder.newColumn('id').withTitle('ID'),
-		DTColumnBuilder.newColumn(null).withTitle('').renderWith(statusHTML),
+		DTColumnBuilder.newColumn(null).withTitle('').notSortable().renderWith(statusHTML),
 		DTColumnBuilder.newColumn('name').withTitle('Environment name'),
 		DTColumnBuilder.newColumn(null).withTitle('Key SSH').renderWith(sshKeyLinks),
-		DTColumnBuilder.newColumn(null).withTitle('Domains'),
+		//DTColumnBuilder.newColumn(null).withTitle('Domains'),
 		DTColumnBuilder.newColumn(null).withTitle('').renderWith(containersTags),
 		DTColumnBuilder.newColumn(null).withTitle('').notSortable().renderWith(actionDelete)
 	];
@@ -78,23 +84,21 @@ function EnvironmentViewCtrl($scope, environmentService, SweetAlert, DTOptionsBu
 			text: "Your will not be able to recover this Container!",
 			type: "warning",
 			showCancelButton: true,
-			confirmButtonColor: "#DD6B55",
-			confirmButtonText: "Yes, destroy it!",
-			cancelButtonText: "No, cancel plx!",
+			confirmButtonColor: "#ff3f3c",
+			confirmButtonText: "Destroy",
+			cancelButtonText: "Cancel",
 			closeOnConfirm: false,
-			closeOnCancel: false,
+			closeOnCancel: true,
 			showLoaderOnConfirm: true
 		},
 		function (isConfirm) {
 			if (isConfirm) {
 				environmentService.destroyContainer(containerId).success(function (data) {
 					SweetAlert.swal("Destroyed!", "Your container has been destroyed.", "success");
-					vm.dtInstance.reloadData();
+					vm.dtInstance.reloadData(null, false);
 				}).error(function (data) {
 					SweetAlert.swal("ERROR!", "Your environment is safe :). Error: " + data.ERROR, "error");
 				});
-			} else {
-				SweetAlert.swal("Cancelled", "Your container is safe :)", "error");
 			}
 		});
 	}
@@ -105,23 +109,21 @@ function EnvironmentViewCtrl($scope, environmentService, SweetAlert, DTOptionsBu
 				text: "Your will not be able to recover this Environment!",
 				type: "warning",
 				showCancelButton: true,
-				confirmButtonColor: "#DD6B55",
-				confirmButtonText: "Yes, destroy it!",
-				cancelButtonText: "No, cancel plx!",
+				confirmButtonColor: "#ff3f3c",
+				confirmButtonText: "Delete",
+				cancelButtonText: "Cancel",
 				closeOnConfirm: false,
-				closeOnCancel: false,
+				closeOnCancel: true,
 				showLoaderOnConfirm: true
 			},
 			function (isConfirm) {
 				if (isConfirm) {
 					environmentService.destroyEnvironment(environmentId).success(function (data) {
 						SweetAlert.swal("Destroyed!", "Your environment has been destroyed.", "success");
-						vm.dtInstance.reloadData();
+						vm.dtInstance.reloadData(null, false);
 					}).error(function (data) {
 						SweetAlert.swal("ERROR!", "Your environment is safe :). Error: " + data.ERROR, "error");
 					});
-				} else {
-					SweetAlert.swal("Cancelled", "Your environment is safe :)", "error");
 				}
 			});
 	}
@@ -152,11 +154,11 @@ function EnvironmentViewCtrl($scope, environmentService, SweetAlert, DTOptionsBu
 			text: "Delete environment SSH keys!",
 			type: "warning",
 			showCancelButton: true,
-			confirmButtonColor: "#DD6B55",
-			confirmButtonText: "Yes, delete it!",
-			cancelButtonText: "No, cancel plx!",
+			confirmButtonColor: "#ff3f3c",
+			confirmButtonText: "Delete",
+			cancelButtonText: "Cancel",
 			closeOnConfirm: false,
-			closeOnCancel: false,
+			closeOnCancel: true,
 			showLoaderOnConfirm: true
 		},
 		function (isConfirm) {
@@ -166,8 +168,6 @@ function EnvironmentViewCtrl($scope, environmentService, SweetAlert, DTOptionsBu
 				}).error(function (data) {
 					SweetAlert.swal("ERROR!", "Your SSH keys is safe :). Error: " + data.ERROR, "error");
 				});
-			} else {
-				SweetAlert.swal("Cancelled", "Your SSH keys is safe :)", "error");
 			}
 		});
 	}	

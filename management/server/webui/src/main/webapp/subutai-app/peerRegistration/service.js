@@ -7,14 +7,15 @@ angular.module('subutai.peer-registration.service', [])
 peerRegistrationService.$inject = ['$http'];
 
 function peerRegistrationService($http) {
-	var BASE_URL = 'http://172.16.131.205:8181/rest/';
-	var peersURL = BASE_URL + 'peer_ui/';
+	var peersURL = serverUrl + 'peer_ui/';
 
 	var peerRegistrationService = {
 		getRequestedPeers: getRequestedPeers,
 		registerRequest: registerRequest,
 		rejectPeerRequest: rejectPeerRequest,
-		approvePeerRequest: approvePeerRequest
+		approvePeerRequest: approvePeerRequest,
+		cancelPeerRequest: cancelPeerRequest,
+		unregisterPeerRequest: unregisterPeerRequest
 	};
 
 	return peerRegistrationService;
@@ -34,7 +35,7 @@ function peerRegistrationService($http) {
 	}
 
 	function rejectPeerRequest(peerId) {
-		var postData = 'rejectedPeerId=' + peerId;
+		var postData = 'peerId=' + peerId;
 		return $http.put(
 			peersURL + 'reject/', 
 			postData, 
@@ -42,8 +43,26 @@ function peerRegistrationService($http) {
 		);		
 	}
 
-	function approvePeerRequest(peerId) {
-		var postData = 'approvePeerId=' + peerId;
+	function unregisterPeerRequest(peerId) {
+		var postData = 'peerId=' + peerId;
+		return $http.put(
+			peersURL + 'unregister/', 
+			postData, 
+			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+		);		
+	}
+
+	function cancelPeerRequest(peerId) {
+		var postData = 'peerId=' + peerId;
+		return $http.put(
+			peersURL + 'cancel/', 
+			postData, 
+			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+		);		
+	}
+
+	function approvePeerRequest(peerId, keyPhrase) {
+		var postData = 'peerId=' + peerId + '&key_phrase=' + keyPhrase;
 		return $http.put(
 			peersURL + 'approve/', 
 			postData, 

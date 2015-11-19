@@ -18,7 +18,7 @@ body.stop-scrolling {
 
 .sweet-alert {
   background-color: white;
-  font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-family: 'Ubuntu', 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   width: 478px;
   padding: 17px;
   border-radius: 5px;
@@ -39,7 +39,7 @@ body.stop-scrolling {
       left: 15px;
       right: 15px; } }
   .sweet-alert h2 {
-    color: #575757;
+    color: #19286e;
     font-size: 30px;
     text-align: center;
     font-weight: 600;
@@ -50,7 +50,7 @@ body.stop-scrolling {
     line-height: 40px;
     display: block; }
   .sweet-alert p {
-    color: #797979;
+    color: #19286e;
     font-size: 16px;
     text-align: center;
     font-weight: 300;
@@ -170,7 +170,7 @@ body.stop-scrolling {
     opacity: 0;
     visibility: hidden; }
   .sweet-alert button {
-    background-color: #8CD4F5;
+    background-color: #22b573;
     color: white;
     border: none;
     box-shadow: none;
@@ -178,22 +178,22 @@ body.stop-scrolling {
     font-weight: 500;
     -webkit-border-radius: 4px;
     border-radius: 5px;
-    padding: 10px 32px;
+    padding: 6px 20px;
     margin: 26px 5px 0 5px;
     cursor: pointer; }
     .sweet-alert button:focus {
       outline: none;
       box-shadow: 0 0 2px rgba(128, 179, 235, 0.5), inset 0 0 0 1px rgba(0, 0, 0, 0.05); }
     .sweet-alert button:hover {
-      background-color: #7ecff4; }
+      background-color: #22b547; }
     .sweet-alert button:active {
-      background-color: #5dc2f1; }
+      background-color: #22b590; }
     .sweet-alert button.cancel {
-      background-color: #C1C1C1; }
+      background-color: #255fb5; }
       .sweet-alert button.cancel:hover {
-        background-color: #b9b9b9; }
+        background-color: #255fff; }
       .sweet-alert button.cancel:active {
-        background-color: #a8a8a8; }
+        background-color: #255fff; }
       .sweet-alert button.cancel:focus {
         box-shadow: rgba(197, 205, 211, 0.8) 0px 0px 2px, rgba(0, 0, 0, 0.0470588) 0px 0px 0px 1px inset !important; }
     .sweet-alert button[disabled] {

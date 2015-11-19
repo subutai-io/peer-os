@@ -1,6 +1,7 @@
 package io.subutai.core.environment.rest.ui;
 
 
+import io.subutai.common.environment.ContainerType;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.Interface;
 
@@ -16,10 +17,12 @@ public class ContainerJson
     private ContainerHostState state;
     private String ip;
     private String templateName;
+    private ContainerType type;
+
 
 
     public ContainerJson( final String id, final String environmentId, final String hostname,
-                          final ContainerHostState state, final String ip, final String templateName )
+                          final ContainerHostState state, final String ip, final String templateName, final ContainerType type )
     {
         this.id = id;
         this.environmentId = environmentId;
@@ -27,6 +30,7 @@ public class ContainerJson
         this.state = state;
         this.ip = ip;
         this.templateName = templateName;
+        this.type = type;
     }
 
 
@@ -99,5 +103,17 @@ public class ContainerJson
     public void setTemplateName( final String templateName )
     {
         this.templateName = templateName;
+    }
+
+
+    public ContainerType getType()
+    {
+        return type;
+    }
+
+
+    public void setType( final ContainerType type )
+    {
+        this.type = type;
     }
 }

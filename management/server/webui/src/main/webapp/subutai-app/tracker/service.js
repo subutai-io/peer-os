@@ -9,9 +9,9 @@ angular.module('subutai.tracker.service', [])
 trackerSrv.$inject = ['$http'];
 
 function trackerSrv($http) {
-	var baseURL = 'http://172.16.131.205:8181/rest/';
-	var modulesURL = baseURL + 'tracker_ui/operations/sources';
-	var operationsURL = baseURL + 'tracker_ui/operations/';
+	var baseURL = serverUrl + 'tracker_ui/';
+	var operationsURL = baseURL + 'operations/';
+	var modulesURL = operationsURL + 'sources';
 
 	var trackerSrv = {
 		getModules: getModules,

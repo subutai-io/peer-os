@@ -372,25 +372,22 @@ table.dataTable thead .sorting_desc {
 				   *cursor: hand;
 				   color: #7f8ea4 !important;
 				   border-radius: 2px;
-			   }
-			   .dataTables_wrapper .dataTables_paginate .paginate_button.current {
 				   text-decoration: underline;
 			   }
-			   .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
-				   text-decoration: none;
-			   }
 			   .dataTables_wrapper .dataTables_paginate .paginate_button.current, .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
-				   color: #7f8ea4 !important;
-				   background-color: #fff;
+				   background-color: #f1f4f8;
+				   color: #19286e!important;
+				   text-decoration: none;
 			   }
 			   .dataTables_wrapper .dataTables_paginate .paginate_button.disabled, .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover, .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:active {
 				   cursor: default;
 				   color: #666 !important;
+				   text-decoration: none;
 				   background: #f2f2f2;
 			   }
 			   .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-				   color: white !important;
-				   background-color: #585858;
+				   color: #19286e !important;
+				   background-color: #f1f4f8;
 				   text-decoration: none;
 			   }
 			   .dataTables_wrapper .dataTables_paginate .paginate_button:active {

@@ -1,115 +1,49 @@
 'use strict';
 
 angular.module('subutai.identity-role.controller', [])
-	.controller('IdentityRoleCtrl', IdentityRoleCtrl);
+	.controller('IdentityRoleCtrl', IdentityRoleCtrl)
+	.controller('IdentityRoleFormCtrl', IdentityRoleFormCtrl);
 
-IdentityRoleCtrl.$inject = ['$scope', 'identitySrv', 'DTOptionsBuilder', 'DTColumnBuilder', '$resource', '$compile', 'SweetAlert'];
+IdentityRoleCtrl.$inject = ['$scope', 'identitySrv', 'DTOptionsBuilder', 'DTColumnBuilder', '$resource', '$compile', 'SweetAlert', 'ngDialog'];
+IdentityRoleFormCtrl.$inject = ['$scope', 'identitySrv', 'SweetAlert', 'ngDialog'];
 
-function IdentityRoleCtrl($scope, identitySrv, DTOptionsBuilder, DTColumnBuilder, $resource, $compile, SweetAlert) {
+function IdentityRoleCtrl($scope, identitySrv, DTOptionsBuilder, DTColumnBuilder, $resource, $compile, SweetAlert, ngDialog) {
 
 	var vm = this;
 
-	var permissionIdentityManagement = {
-		"object": 1,
-		"name": "Identity-Management",
-		"scope": 1,
-		"read": true,
-		"write": true,
-		"update": true,
-		"delete": true,
-		"selected": false
-	};
-
-	var permissionPeerManagement = {
-		"object": 2,
-		"name": "Peer-Management",
-		"scope": 1,
-		"read": true,
-		"write": true,
-		"update": true,
-		"delete": true,
-		"selected": false
-	};
-
-	var permissionEnvironmentManagement = {
-		"object": 3,
-		"name": "Environment-Management",
-		"scope": 1,
-		"read": true,
-		"write": true,
-		"update": true,
-		"delete": true,
-		"selected": false
-	};
-
-	var permissionResourceManagement = {
-		"object": 4,
-		"name": "Resource-Management",
-		"scope": 1,
-		"read": true,
-		"write": true,
-		"update": true,
-		"delete": true,
-		"selected": false
-	};
-
-	var permissionTemplateManagement = {
-		"object": 5,
-		"name": "Template-Management",
-		"scope": 1,
-		"read": true,
-		"write": true,
-		"update": true,
-		"delete": true,
-		"selected": false
-	};
-
-	var permissionKarafServerAdministration = {
-		"object": 6,
-		"name": "Karaf-Server-Administration",
-		"scope": 1,
-		"read": true,
-		"write": true,
-		"update": true,
-		"delete": true,
-		"selected": false
-	};
-
-	var permissionKarafServerManagement = {
-		"object": 7,
-		"name": "Karaf-Server-Management",
-		"scope": 1,
-		"read": true,
-		"write": true,
-		"update": true,
-		"delete": true,
-		"selected": false
-	};
-
-	vm.permissionsDefault = [];
-	vm.permissionsDefault[permissionIdentityManagement.object] = permissionIdentityManagement;
-	vm.permissionsDefault[permissionPeerManagement.object] = permissionPeerManagement;
-	vm.permissionsDefault[permissionEnvironmentManagement.object] = permissionEnvironmentManagement;
-	vm.permissionsDefault[permissionResourceManagement.object] = permissionResourceManagement;
-	vm.permissionsDefault[permissionTemplateManagement.object] = permissionTemplateManagement;
-	vm.permissionsDefault[permissionKarafServerAdministration.object] = permissionKarafServerAdministration;
-	vm.permissionsDefault[permissionKarafServerManagement.object] = permissionKarafServerManagement;
-
-	vm.permissions2Add = angular.copy(vm.permissionsDefault);
+	vm.permissions2Add = angular.copy(permissionsDefault);
 	vm.role2Add = {}
 
 	//functions
-	vm.addPermission2Stack = addPermission2Stack;
-	vm.editRole = editRole;
-	vm.addRole = addRole;
+	vm.roleForm = roleForm;
 	vm.deleteRole = deleteRole;
 	vm.removePermissionFromRole = removePermissionFromRole;
 
+	function roleForm(role) {
+		if(role === undefined || role === null) role = false;
+
+		ngDialog.open({
+			template: 'subutai-app/identityRole/partials/roleForm.html',
+			controller: 'IdentityRoleFormCtrl',
+			controllerAs: 'identityRoleFormCtrl',
+			data: role,
+			preCloseCallback: function(value) {
+				vm.dtInstance.reloadData(null, false);
+			}
+		});
+	}
+
 	vm.dtInstance = {};
 	vm.roles = {};
-	vm.dtOptions = DTOptionsBuilder.fromFnPromise(function() {
-		return $resource(serverUrl + 'identity_ui/roles/').query().$promise;
-	}).withPaginationType('full_numbers').withOption('createdRow', createdRow);
+	vm.dtOptions = DTOptionsBuilder
+		.fromFnPromise(function() {
+			return $resource(serverUrl + 'identity_ui/roles/').query().$promise;
+		})
+		.withPaginationType('full_numbers')
+		.withOption('stateSave', true)
+		.withOption('order', [[ 1, "asc" ]])
+		.withOption('createdRow', createdRow);
+
 	vm.dtColumns = [
 		DTColumnBuilder.newColumn(null).withTitle('').notSortable().renderWith(actionEdit),
 		DTColumnBuilder.newColumn('name').withTitle('Role'),
@@ -123,14 +57,17 @@ function IdentityRoleCtrl($scope, identitySrv, DTOptionsBuilder, DTColumnBuilder
 
 	function actionEdit(data, type, full, meta) {
 		vm.roles[data.id] = data;
-		return '<a href class="b-icon b-icon_edit" ng-click="identityRoleCtrl.editRole(identityRoleCtrl.roles[' + data.id + '])"></a>';
+		return '<a href class="b-icon b-icon_edit" ng-click="identityRoleCtrl.roleForm(identityRoleCtrl.roles[' + data.id + '])"></a>';
 	}	
 
 	function permissionsTags(data, type, full, meta) {
 		var permissionsHTML = '';
 		for(var i = 0; i < data.permissions.length; i++) {
+			var perrmission = $.grep(permissionsDefault, function(element, index) {
+				return (element.object === data.permissions[i].object);
+			})[0];
 			permissionsHTML += '<span class="b-tags b-tags_grey">' 
-				+ vm.permissionsDefault[data.permissions[i].object].name 
+				+ perrmission.name 
 				+ ' <a href ng-click="identityRoleCtrl.removePermissionFromRole(identityRoleCtrl.roles[' + data.id + '], ' + i + ')"><i class="fa fa-times"></i></a>' 
 			+ '</span>';
 		}
@@ -141,38 +78,20 @@ function IdentityRoleCtrl($scope, identitySrv, DTOptionsBuilder, DTColumnBuilder
 		return '<a href class="b-icon b-icon_remove" ng-click="identityRoleCtrl.deleteRole(' + data.id + ')"></a>';
 	}
 
-	function addPermission2Stack(permission) {
-		permission.selected = !permission.selected;
-	}
-
-	function editRole(role) {
-		vm.permissions2Add = angular.copy(vm.permissionsDefault);
-		for(var i = 0; i < role.permissions.length; i++) {
-			for(var j = 0; j < vm.permissions2Add.length; j++) {
-				if(vm.permissions2Add[j].object == role.permissions[i].object) {
-					vm.permissions2Add[j].selected = true;
-					vm.permissions2Add[j].read = role.permissions[i].read;
-					vm.permissions2Add[j].write = role.permissions[i].write;
-					vm.permissions2Add[j].update = role.permissions[i].update;
-					vm.permissions2Add[j].delete = role.permissions[i].delete;
-					break;
-				}
-			}
-		}
-		vm.role2Add = angular.copy(role);
-	}
-
 	function removePermissionFromRole(role, permissionKey) {
+		var perrmission = $.grep(permissionsDefault, function(element, index) {
+			return (element.object === role.permissions[permissionKey].object);
+		})[0];
 		SweetAlert.swal({
 			title: "Are you sure?",
-			text: 'Remove "' + vm.permissionsDefault[role.permissions[permissionKey].object].name + '" permission from role!',
+			text: 'Remove "' + perrmission.name + '" permission from role!',
 			type: "warning",
 			showCancelButton: true,
-			confirmButtonColor: "#DD6B55",
-			confirmButtonText: "Yes, remove it!",
-			cancelButtonText: "No, cancel!",
+			confirmButtonColor: "#ff3f3c",
+			confirmButtonText: "Remove",
+			cancelButtonText: "Cancel",
 			closeOnConfirm: false,
-			closeOnCancel: false,
+			closeOnCancel: true,
 			showLoaderOnConfirm: true
 		},
 		function (isConfirm) {
@@ -185,16 +104,13 @@ function IdentityRoleCtrl($scope, identitySrv, DTOptionsBuilder, DTColumnBuilder
 					postData += '&role_id=' + role.id;
 				}
 				postData += '&permission=' + JSON.stringify(role.permissions);
-				console.log(postData);
 
 				identitySrv.addRole(postData).success(function (data) {
 					SweetAlert.swal("Removed!", "Permission has been removed.", "success");
-					vm.dtInstance.reloadData();
+					vm.dtInstance.reloadData(null, false);
 				}).error(function (data) {
 					SweetAlert.swal("ERROR!", "Role permission is safe :). Error: " + data, "error");
 				});
-			} else {
-				SweetAlert.swal("Cancelled", "Role permission is safe :)", "error");
 			}
 		});
 	}
@@ -205,23 +121,59 @@ function IdentityRoleCtrl($scope, identitySrv, DTOptionsBuilder, DTColumnBuilder
 			text: "Your will not be able to recover this role!",
 			type: "warning",
 			showCancelButton: true,
-			confirmButtonColor: "#DD6B55",
-			confirmButtonText: "Yes, delete it!",
-			cancelButtonText: "No, cancel plx!",
+			confirmButtonColor: "#ff3f3c",
+			confirmButtonText: "Delete",
+			cancelButtonText: "Cancel",
 			closeOnConfirm: false,
-			closeOnCancel: false,
+			closeOnCancel: true,
 			showLoaderOnConfirm: true
 		},
 		function (isConfirm) {
 			if (isConfirm) {
 				identitySrv.deleteRole(roleId).success(function (data) {
 					SweetAlert.swal("Deleted!", "Role has been deleted.", "success");
-					vm.dtInstance.reloadData();
+					vm.dtInstance.reloadData(null, false);
 				});
-			} else {
-				SweetAlert.swal("Cancelled", "Role is safe :)", "error");
 			}
 		});		
+	}
+
+};
+
+function IdentityRoleFormCtrl($scope, identitySrv, SweetAlert, ngDialog) {
+
+	var vm = this;
+
+	vm.permissions2Add = angular.copy(permissionsDefault);
+	vm.role2Add = {}
+	vm.editRole = false;
+
+	if($scope.ngDialogData !== undefined) {
+		//vm.role2Add = $scope.ngDialogData;
+		vm.editRole = true;
+
+		var role = $scope.ngDialogData;
+		for(var i = 0; i < role.permissions.length; i++) {
+			for(var j = 0; j < vm.permissions2Add.length; j++) {
+				if(vm.permissions2Add[j].object == role.permissions[i].object) {
+					vm.permissions2Add[j].selected = true;
+					vm.permissions2Add[j].read = role.permissions[i].read;
+					vm.permissions2Add[j].write = role.permissions[i].write;
+					vm.permissions2Add[j].update = role.permissions[i].update;
+					vm.permissions2Add[j].delete = role.permissions[i].delete;
+					break;
+				}
+			}
+		}
+		vm.role2Add = role;
+	}
+
+	//functions
+	vm.addPermission2Stack = addPermission2Stack;
+	vm.addRole = addRole;
+
+	function addPermission2Stack(permission) {
+		permission.selected = !permission.selected;
 	}
 
 	function addRole() {
@@ -244,9 +196,9 @@ function IdentityRoleCtrl($scope, identitySrv, DTOptionsBuilder, DTColumnBuilder
 		}
 
 		identitySrv.addRole(postData).success(function (data) {
-			vm.dtInstance.reloadData();
+			ngDialog.closeAll();
 		});
-	}	
-
-};
+	}
+	
+}
 

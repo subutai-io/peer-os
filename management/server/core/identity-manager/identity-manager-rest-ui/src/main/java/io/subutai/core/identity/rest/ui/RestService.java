@@ -13,7 +13,7 @@ public interface RestService
 
     @POST
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response setUser( @FormParam( "username" ) String username,
+    public Response saveUser( @FormParam( "username" ) String username,
                              @FormParam( "full_name" ) String fullName,
                              @FormParam( "password" ) String password,
                              @FormParam( "email" ) String email,

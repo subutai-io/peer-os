@@ -9,16 +9,6 @@ var app = angular.module("subutai-app", [
 .config(routesConf)
 	.run(startup);
 
-//Global
-var serverUrl = 'http://172.16.131.205:8181/rest/';
-quotaColors = [];
-quotaColors['CUSTOM'] = 'blue';
-quotaColors['HUGE'] = 'bark-red';
-quotaColors['LARGE'] = 'red';
-quotaColors['MEDIUME'] = 'orange';
-quotaColors['SMALL'] = 'yellow';
-quotaColors['TINY'] = 'green';
-
 routesConf.$inject = ['$stateProvider', '$urlRouterProvider', '$ocLazyLoadProvider'];
 startup.$inject = ['$rootScope', '$state'];
 
@@ -97,6 +87,24 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 			}]
 		}
 	})
+	.state("containers", {
+		url: "/containers",
+		templateUrl: "subutai-app/containers/partials/view.html",
+		resolve: {
+			loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+				return $ocLazyLoad.load([
+						{
+							name: 'subutai.containers',
+							files: [
+								'subutai-app/containers/containers.js',
+								'subutai-app/containers/controller.js',
+								'subutai-app/environment/service.js'
+							]
+						}
+				]);
+			}]
+		}
+	})
 	.state("identity-user", {
 		url: "/identity-user",
 		templateUrl: "subutai-app/identityUser/partials/view.html",
@@ -127,6 +135,43 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 								'subutai-app/identityRole/identityRole.js',
 								'subutai-app/identityRole/controller.js',
 								'subutai-app/identity/service.js'
+							]
+						}
+				]);
+			}]
+		}
+	})
+	.state("tracker", {
+		url: "/tracker",
+		templateUrl: "subutai-app/tracker/partials/view.html",
+		resolve: {
+			loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+				return $ocLazyLoad.load([
+						{
+							name: 'subutai.tracker',
+							files: [
+								'subutai-app/tracker/tracker.js',
+								'subutai-app/tracker/controller.js',
+								'subutai-app/tracker/service.js',
+									'subutai-app/tracker/filter.js'
+							]
+						}
+				]);
+			}]
+		}
+	})
+	.state('peer-registration', {
+		url: '/peer-registration',
+		templateUrl: 'subutai-app/peerRegistration/partials/view.html',
+		resolve: {
+			loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+				return $ocLazyLoad.load([
+						{
+							name: 'subutai.peer-registration',
+							files: [
+								'subutai-app/peerRegistration/peerRegistration.js',
+								'subutai-app/peerRegistration/controller.js',
+								'subutai-app/peerRegistration/service.js'
 							]
 						}
 				]);
@@ -171,4 +216,87 @@ app.directive('dropdownMenu', function() {
 		}
 	}
 });
+
+//Global variables
+var serverUrl = 'http://172.16.131.205:8181/rest/';
+quotaColors = [];
+quotaColors['CUSTOM'] = 'blue';
+quotaColors['HUGE'] = 'bark-red';
+quotaColors['LARGE'] = 'red';
+quotaColors['MEDIUME'] = 'orange';
+quotaColors['SMALL'] = 'yellow';
+quotaColors['TINY'] = 'green';
+
+var permissionsDefault = [
+	{
+		"object": 1,
+		"name": "Identity-Management",
+		"scope": 1,
+		"read": true,
+		"write": true,
+		"update": true,
+		"delete": true,
+		"selected": false
+	},
+	{
+		"object": 2,
+		"name": "Peer-Management",
+		"scope": 1,
+		"read": true,
+		"write": true,
+		"update": true,
+		"delete": true,
+		"selected": false
+	},
+	{
+		"object": 3,
+		"name": "Environment-Management",
+		"scope": 1,
+		"read": true,
+		"write": true,
+		"update": true,
+		"delete": true,
+		"selected": false
+	},
+	{
+		"object": 4,
+		"name": "Resource-Management",
+		"scope": 1,
+		"read": true,
+		"write": true,
+		"update": true,
+		"delete": true,
+		"selected": false
+	},
+	{
+		"object": 5,
+		"name": "Template-Management",
+		"scope": 1,
+		"read": true,
+		"write": true,
+		"update": true,
+		"delete": true,
+		"selected": false
+	},
+	{
+		"object": 6,
+		"name": "Karaf-Server-Administration",
+		"scope": 1,
+		"read": true,
+		"write": true,
+		"update": true,
+		"delete": true,
+		"selected": false
+	},
+	{
+		"object": 7,
+		"name": "Karaf-Server-Management",
+		"scope": 1,
+		"read": true,
+		"write": true,
+		"update": true,
+		"delete": true,
+		"selected": false
+	}
+];
 

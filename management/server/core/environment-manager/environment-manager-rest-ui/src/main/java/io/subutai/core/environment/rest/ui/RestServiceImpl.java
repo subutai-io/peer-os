@@ -11,6 +11,7 @@ import javax.ws.rs.core.Response;
 import io.subutai.common.environment.*;
 import io.subutai.common.gson.required.RequiredDeserializer;
 import io.subutai.common.environment.ContainerType;
+import io.subutai.common.host.Interface;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 
@@ -789,16 +790,19 @@ public class RestServiceImpl implements RestService
 
     private Set<ContainerJson> convertContainersToContainerJson( Set<EnvironmentContainerHost> containerHosts )
     {
+        String types[] = {"TINY", "SMALL", "MEDIUM", "LARGE", "HUGE", "CUSTOM"};
+
         Set<ContainerJson> jsonSet = Sets.newHashSet();
         for ( EnvironmentContainerHost containerHost : containerHosts )
         {
             ContainerHostState state = containerHost.getStatus();
 
+            Interface iface = containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE );
 
             jsonSet.add( new ContainerJson( containerHost.getId(), containerHost.getEnvironmentId(),
                     containerHost.getHostname(), state,
-                    containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp(),
-                    containerHost.getTemplateName() ) );
+                    iface.getIp(),
+                    containerHost.getTemplateName(), ContainerType.valueOf( types[ (int)(Math.random() * types.length) ] ) ) );
         }
         return jsonSet;
     }

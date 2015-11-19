@@ -29,7 +29,6 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-//            return Response.ok( JsonUtil.toJson( peerManager.getPeerInfos() ) ).build();
             return Response.ok( JsonUtil.toJson( peerManager.getRegistrationRequests() ) ).build();
         }
         catch ( Exception e )

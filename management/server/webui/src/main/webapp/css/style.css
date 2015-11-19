@@ -8,6 +8,14 @@ html, body {
     margin: 0;
 }
 
+a {
+	text-decoration: underline;
+}
+
+a:hover {
+	text-decoration: none;
+}
+
 body {
     font-family: 'Ubuntu', sans-serif;
     background-color: #f0f0f0;
@@ -63,7 +71,7 @@ body {
 }
 
 .b-header-userbar-avatar {
-    border: 1px solid #e6eaf5;
+    border: 1px solid #dcdcdc;
     border-radius: 15px;
 }
 
@@ -91,8 +99,8 @@ body {
 }
 
 #nprogress .spinner-icon {
-    border-top-color: #0b55ff;;
-    border-left-color: #0b55ff;;
+    border-top-color: #0b55ff;
+    border-left-color: #0b55ff;
 }
 
 .b-content {
@@ -102,7 +110,7 @@ body {
 .b-workspace {
 	margin: 0 0 0 220px;
     background-color: #fff;
-    border: 1px solid #e6eaf5;
+    border: 1px solid #dcdcdc;
     border-radius: 5px;
 	padding: 16px 0 32px 0;
 	position: relative;
@@ -111,7 +119,7 @@ body {
 .b-workspace__header {
 	padding: 0 25px 14px 25px;
 	margin: 0 0 21px 0;
-	border-bottom: 1px solid #e6eaf5;
+	border-bottom: 1px solid #dcdcdc;
 }
 
 .b-workspace__content {
@@ -124,6 +132,12 @@ body {
 	margin: 0 0 0 0;
 	color: #19286e;
 	font-weight: 700;
+}
+
+.b-title_sub {
+	font-size: 16px;
+	font-weight: 400;
+	padding-bottom: 20px;
 }
 
 .b-title_breadcrumbs {
@@ -221,7 +235,8 @@ body {
     transition: all .4s ease-in-out;
 }
 .b-main-table-border {
-    border: 1px solid #e9edf6;
+    border: 1px solid #dcdcdc;
+	border-bottom: none;
     border-radius: 5px;
     overflow: hidden;
     position: relative;
@@ -292,7 +307,7 @@ body {
 }
 
 .b-main-table tr {
-	border-bottom: 1px solid #e9edf6;
+	border-bottom: 1px solid #dcdcdc;
 }
 .b-main-table_white-header tr {
     border: none;
@@ -306,10 +321,6 @@ body {
 	visibility: visible;
 }
 
-.b-main-table tr:last-child {
-	border: none;
-}
-
 .b-main-table td {
     font-size: 13px;
     color: #19286e;
@@ -319,7 +330,7 @@ body {
 
 .b-main-table_white-header td {
     padding: 8px 0 8px 7px;
-    font-size: 11px;
+    font-size: 12px;
 }
 .b-main-table_white-header td:first-child,
 .b-main-table_white-header td:last-child {
@@ -338,6 +349,10 @@ body {
 	border-radius: 5px;
 	margin: 0 5px 5px 0;
 	/*transition: all .4s ease-in-out;	*/
+}
+
+.b-tags a {
+	color: inherit;
 }
 
 .b-tags_bark-red {
@@ -380,17 +395,30 @@ body {
 	height: 10px;
 	border-radius: 50px;
 	overflow: hidden;
-}
-
-.b-status-icon_UNDER_MODIFICATION {
 	background-color: #efc94c;
 }
 
-.b-status-icon_UNHEALTHY {
+.b-status-icon_UNDER_MODIFICATION,
+.b-status-icon_WAIT ,
+.b-status-icon_STOPPING ,
+.b-status-icon_STARTING {
+	background-color: #efc94c;
+}
+
+.b-status-icon_UNHEALTHY,
+.b-status-icon_FAILED,
+.b-status-icon_REQUESTED,
+.b-status-icon_STOPPED,
+.b-status-icon_ABORTING,
+.b-status-icon_FREEZING,
+.b-status-icon_FROZEN {
 	background-color: #c1272d;
 }
 
-.b-status-icon_HEALTHY {
+.b-status-icon_HEALTHY,
+.b-status-icon_SUCCEEDED,
+.b-status-icon_APPROVED,
+.b-status-icon_RUNNING {
 	background-color: #22b573;
 }
 
@@ -398,7 +426,7 @@ body {
 .b-nav {
     width: 205px;
     background-color: #fff;
-    border: 1px solid #e6eaf5;
+    border: 1px solid #dcdcdc;
     border-radius: 5px;
     padding-top: 50px;
 }
@@ -420,8 +448,8 @@ body {
 
 .b-nav-menu_active {
     background-color: #f5f6fb;
-    border-top: 1px solid #e6eaf5;
-    border-bottom: 1px solid #e6eaf5;
+    border-top: 1px solid #dcdcdc;
+    border-bottom: 1px solid #dcdcdc;
     border-left: 3px solid #0b55ff;
 }
 
@@ -660,6 +688,14 @@ body {
     width: 690px;
 }
 
+.b-popup_log {
+	width: 500px;
+}
+
+.b-popup_min {
+	width: 305px;
+}
+
 .b-popup__header {
     box-sizing: border-box;
     width: 100%;
@@ -667,13 +703,30 @@ body {
     font-size: 16px;
     line-height: 12px;
     color: #19286e;
-    border-bottom: 1px solid #e6eaf5;
+    border-bottom: 1px solid #dcdcdc;
 	text-transform: capitalize;
+}
+
+.b-popup_min .b-popup__header {
+	padding: 20px 20px;
 }
 
 .b-popup__body {
     padding: 15px 30px;
 }
+
+.b-popup_min .b-popup__body {
+    padding: 15px 20px;
+}
+
+.b-popup__footer {
+    padding: 0 30px 15px 30px;
+}
+
+.b-popup_min .b-popup__footer {
+    padding: 0 20px 15px 20px;
+}
+
 .b-popup-body_role {
     width: 201px;
     display: inline-block;
@@ -705,6 +758,7 @@ body {
     width: 100%;
     border: 1px solid #e6e6e6;
     border-radius: 5px;
+	min-height: 102px;
     max-height: 129px;
     overflow: auto;
 }
@@ -750,19 +804,25 @@ body {
 .b-popup-body-input {
     box-sizing: border-box;
     height: 29px;
-    border: 1px solid #e6eaf5;
+    border: 1px solid #dcdcdc;
     border-radius: 5px;
     padding: 0 5px;
     font-family: 'Ubuntu', sans-serif;
     font-size: 13px;
     color: #cccccc;
 }
+
 .b-popup-body-input:focus {
     color: #19286e;
+	box-shadow: none;
 }
 
 .b-popup-body-input_full {
     width: 100%;
+}
+
+.b-popup-body-input__error {
+	box-shadow: 0px 0px 10px rgba(255, 0, 0, 0.6);
 }
 
 .b-popup-body-input_margin-bttm {
@@ -792,7 +852,7 @@ body {
 .b-popup-body__box {
     display: inline-block;
     padding: 10px;
-    border: 1px solid #e6eaf5;
+    border: 1px solid #dcdcdc;
     border-radius: 5px;
     vertical-align: top;
 }
@@ -840,10 +900,6 @@ body {
     float: right;
     width: 160px;
     color: #cccccc;
-}
-
-.b-popup__footer {
-    padding: 0 30px 15px 30px;
 }
 
 /*Empty List*/
@@ -960,4 +1016,50 @@ body {
 .b-form-hint_red {
 	color: #ff0000;
 }
+
+.b-main-table__status-col {
+	width: 95px;
+}
+
+.b-main-table__container-status {
+	width: 45px;
+	text-align: center!important;
+}
+
+.b-main-table__peer-status-col {
+	width: 65px;
+	text-align: center!important;
+}
+
+td.b-main-table__status-col {
+	text-align: center!important;
+}
+
+.b-logs-view {
+	background-color: #f1f4f8;
+	padding: 10px 14px;
+	overflow: auto;
+	height: 160px;
+	border-radius: 5px;
+	font-size: 13px;
+	color: #5a5a5a;
+}
+
+.b-main-table__buttons-group .b-btn {
+	margin-left: 10px;
+}
+
+.b-load-icon {
+	display: inline-block;
+    width: 25px;
+    height: 25px;
+    box-sizing: border-box;
+    border: solid 2px transparent;
+    border-top-color: #0b55ff;
+    border-left-color: #0b55ff;
+    border-radius: 50%;
+    -webkit-animation: nprogress-spinner 400ms linear infinite;
+    animation: nprogress-spinner 400ms linear infinite;
+}
+
 
