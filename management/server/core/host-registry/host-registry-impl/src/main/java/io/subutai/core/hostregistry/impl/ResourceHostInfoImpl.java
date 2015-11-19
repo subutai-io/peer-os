@@ -9,6 +9,7 @@ import com.google.common.collect.Sets;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.InstanceType;
 import io.subutai.common.host.Interface;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.util.CollectionUtil;
@@ -24,6 +25,7 @@ public class ResourceHostInfoImpl implements ResourceHostInfo
     private Set<InterfaceImpl> interfaces;
     private Set<ContainerHostInfoImpl> containers;
     private HostArchitecture arch;
+    private InstanceType instance;
 
 
     @Override
@@ -37,6 +39,13 @@ public class ResourceHostInfoImpl implements ResourceHostInfo
     public String getHostname()
     {
         return hostname;
+    }
+
+
+    @Override
+    public InstanceType getInstanceType()
+    {
+        return instance;
     }
 
 
@@ -77,7 +86,8 @@ public class ResourceHostInfoImpl implements ResourceHostInfo
     public String toString()
     {
         return MoreObjects.toStringHelper( this ).add( "id", id ).add( "hostname", hostname )
-                          .add( "interfaces", interfaces ).add( "containers", containers ).toString();
+                          .add( "instance", instance ).add( "interfaces", interfaces ).add( "containers", containers )
+                          .toString();
     }
 
 
