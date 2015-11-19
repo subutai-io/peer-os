@@ -366,13 +366,13 @@ public class BlueprintForm
                             Notification.show( "Invalid templateName", Notification.Type.ERROR_MESSAGE );
                             return;
                         }
-                        else if ( templateRegistry.getTemplate( nodeGroup.getTemplateName() ) == null )
-                        {
-                            Notification
-                                    .show( String.format( "Template %s does not exist", nodeGroup.getTemplateName() ),
-                                            Notification.Type.ERROR_MESSAGE );
-                            return;
-                        }
+//                        else if ( templateRegistry.getTemplate( nodeGroup.getTemplateName() ) == null )
+//                        {
+//                            Notification
+//                                    .show( String.format( "Template %s does not exist", nodeGroup.getTemplateName() ),
+//                                            Notification.Type.ERROR_MESSAGE );
+//                            return;
+//                        }
                     }
 
                     blueprint.setId( UUID.randomUUID() );

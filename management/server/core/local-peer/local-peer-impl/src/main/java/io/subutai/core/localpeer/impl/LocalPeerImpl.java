@@ -1945,9 +1945,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     @RolesAllowed( "Environment-Management|A|Write" )
     @Override
-    public void createGateway( final Gateway gateway) throws PeerException
+    public void createGateway( final Gateway gateway ) throws PeerException
     {
-        getManagementHost().createGateway( gateway.getIp(), gateway.getVlan());
+        getManagementHost().createGateway( gateway.getIp(), gateway.getVlan() );
     }
 
 
@@ -1980,25 +1980,25 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @Override
-    public boolean isPeerUsed( final String peerId )
-    {
-        return findContainersByPeerId( peerId ).size() > 0;
-    }
-
-
-    private Set<ContainerHost> findContainersByPeerId( final String peerId )
-    {
-        Preconditions.checkNotNull( peerId );
-
-        Set<ContainerHost> result = new HashSet<>();
-
-        for ( ResourceHost resourceHost : resourceHosts )
-        {
-            result.addAll( resourceHost.getContainerHostsByPeerId( peerId ) );
-        }
-        return result;
-    }
+    //    @Override
+    //    public boolean isPeerUsed( final String peerId )
+    //    {
+    //        return findContainersByPeerId( peerId ).size() > 0;
+    //    }
+    //
+    //
+    //    private Set<ContainerHost> findContainersByPeerId( final String peerId )
+    //    {
+    //        Preconditions.checkNotNull( peerId );
+    //
+    //        Set<ContainerHost> result = new HashSet<>();
+    //
+    //        for ( ResourceHost resourceHost : resourceHosts )
+    //        {
+    //            result.addAll( resourceHost.getContainerHostsByPeerId( peerId ) );
+    //        }
+    //        return result;
+    //    }
 
 
     private class SetupN2NConnectionTask implements Callable<N2NConfig>
