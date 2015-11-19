@@ -41,7 +41,6 @@ import io.subutai.core.broker.api.BrokerException;
 import io.subutai.core.broker.api.ByteMessageListener;
 import io.subutai.core.broker.api.ByteMessagePostProcessor;
 import io.subutai.core.broker.api.ByteMessagePreProcessor;
-import io.subutai.core.broker.api.ClientCredentials;
 import io.subutai.core.broker.api.MessageListener;
 import io.subutai.core.broker.api.TextMessageListener;
 import io.subutai.core.broker.api.TextMessagePostProcessor;
@@ -87,13 +86,6 @@ public class BrokerImpl implements Broker
         this.keystorePassword = keystorePassword;
         this.truststore = String.format( "%s/%s", Common.SUBUTAI_APP_CERTS_PATH, truststore );
         this.truststorePassword = truststorePassword;
-    }
-
-
-    @Override
-    public ClientCredentials createNewClientCredentials( String clientId, String password ) throws BrokerException
-    {
-        throw new UnsupportedOperationException();
     }
 
 

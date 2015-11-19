@@ -84,7 +84,6 @@ public class SslUtil
         try
         {
             PEMParser pemParser = new PEMParser( new StringReader( x509InPem ) );
-            JcaPEMKeyConverter jcaPEMKeyConverter = new JcaPEMKeyConverter();
             JcaX509CertificateConverter x509CertificateConverter = new JcaX509CertificateConverter();
 
             Object o = pemParser.readObject();
