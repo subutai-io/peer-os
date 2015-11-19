@@ -115,10 +115,10 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
                             result.append( getText( "<br/>ID: %s", host.getId() ) );
                             result.append( getText( "<br/>IP: %s", ip ) );
                             result.append( getText( "<br/>MAC: %s", mac ) );
-                            result.append( getText( "<br>ARCH: %s", host.getArch() ) );
+                            result.append( getText( "<br/>ARCH: %s", host.getArch() ) );
                             if ( host instanceof ResourceHost )
                             {
-                                result.append( getText( "Instance: %s", ( ( ResourceHost ) host ).getInstanceType() ) );
+                                result.append( getText( "<br/>Instance: %s", ( ( ResourceHost ) host ).getInstanceType() ) );
                             }
 
 
