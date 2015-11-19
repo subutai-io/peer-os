@@ -40,18 +40,15 @@ public class CommandProcessor implements ByteMessageListener
     protected ExpiringCache<UUID, CommandProcess> commands = new ExpiringCache<>();
 
 
-    public CommandProcessor( final Broker broker, final HostRegistry hostRegistry )
+    public CommandProcessor( final Broker broker, final HostRegistry hostRegistry,
+                             final IdentityManager identityManager )
     {
         Preconditions.checkNotNull( broker );
         Preconditions.checkNotNull( hostRegistry );
+        Preconditions.checkNotNull( identityManager );
 
         this.broker = broker;
         this.hostRegistry = hostRegistry;
-    }
-
-
-    public void setIdentityManager( final IdentityManager identityManager )
-    {
         this.identityManager = identityManager;
     }
 
