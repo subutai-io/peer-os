@@ -40,6 +40,7 @@
     <module>security-manager</module>
     <module>node-registration</module>
     <module>environment-manager</module>
+    <module>test</module>
   </modules>
 
 </project>
