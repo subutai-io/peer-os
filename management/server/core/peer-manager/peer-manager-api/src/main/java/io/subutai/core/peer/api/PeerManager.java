@@ -15,6 +15,10 @@ public interface PeerManager
     public static final String SOURCE_REMOTE_PEER = "PEER_REMOTE";
     public static final String SOURCE_LOCAL_PEER = "PEER_LOCAL";
 
+    void registerPeerActionListener( PeerActionListener peerActionListener );
+
+    void unregisterPeerActionListener( PeerActionListener peerActionListener );
+
     /**
      * Updates peer metadata
      */
