@@ -27,4 +27,11 @@ $(document).ready(function() {
 	}
 	colEqualHeight();
 });
-  
+
+$(".b-form-input_dropdown").click(function () {
+	$(this).toggleClass("is-active");
+});
+
+$(".b-form-input-dropdown-list").click(function(e) {
+	e.stopPropagation();
+});

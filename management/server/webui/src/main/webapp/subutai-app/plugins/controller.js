@@ -1,13 +1,13 @@
 'use strict';
 
 angular.module('subutai.plugins.controller', [])
-        .controller('PluginsCtrl', PluginsCtrl);
+	.controller('PluginsCtrl', PluginsCtrl);
 
 PluginsCtrl.$inject = ['PluginsSrv'];
 function PluginsCtrl(PluginsSrv) {
-    var vm = this;
+	var vm = this;
 
-    PluginsSrv.getPlugins().success(function(data) {
-        vm.plugins = data;
-    });
+	PluginsSrv.getPlugins().success(function(data) {
+		vm.plugins = data;
+	});
 }

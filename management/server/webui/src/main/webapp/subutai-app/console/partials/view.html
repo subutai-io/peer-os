@@ -5,36 +5,73 @@
 	</div>
 
 	<div class="b-workspace__content">
-		<div id="sidebar">
-			<h3>Console for</h3>
-			<div class="form-group">
-				<select class="form-control" ng-model="consoleViewCtrl.currentType" ng-change="consoleViewCtrl.getSubMenuTree()">
-					<option value="environments">Environments</option>
-					<option value="resourceHosts">Resource hosts</option>
-				</select>
-			</div>		
-			<div ui-tree>
-				<ol ui-tree-nodes="" ng-model="consoleViewCtrl.resourceHosts" id="tree-root" class="b-nodes-tree">
-					<li ng-repeat="node in consoleViewCtrl.resourceHosts" 
-						ui-tree-node 
-						data-nodrag 
-						collapsed="true" 
-						ng-include="'subutai-app/console/partials/nodes_renderer.html'">
-					</li>
-				</ol>
-			</div>
-		</div>		
-		<tabset>
-			<tab ng-repeat="console in consoleViewCtrl.activeConsole" heading="{{ console.title }}">
-				<div class="col-md-12">
-					<div id="term_demo">
-						<terminal terminal-class="modern-terminal" terminal-config="modern">
-						<!--<p class="click-me">Click me to start commanding !</p>-->
-						</terminal>
-					</div>
+
+		<div class="b-main-form">
+
+			<div class="b-console-selects">
+
+				<div class="b-console-selects__item b-main-form__wrapper" 
+				ng-show="consoleViewCtrl.containers.length > 0">
+					<select class="b-popup-body-input" 
+						ng-model="selectedContainer" 
+						ng-change="consoleViewCtrl.setConsole(selectedContainer)">
+						<option value="">Select container</option>
+						<option ng-repeat="container in consoleViewCtrl.containers" value="{{ container.id }}">
+							{{ container.hostname }}
+						</option>
+					</select>
+					<div class="clear"></div>
 				</div>
-			</tab>
-		</tabset>
+
+				<div class="b-console-selects__item b-main-form__wrapper" 
+				ng-show="consoleViewCtrl.currentType == 'environments'">
+					<select class="b-popup-body-input" 
+						ng-model="selectedEnvironment" 
+						ng-change="consoleViewCtrl.showContainers(selectedEnvironment)">
+						<option value="">Select environment</option>
+						<option ng-repeat="environment in consoleViewCtrl.environments" value="{{ environment.id }}">
+							{{ environment.name }}
+						</option>
+					</select>
+					<div class="clear"></div>
+				</div>
+
+				<div class="b-console-selects__item b-main-form__wrapper" 
+				ng-show="consoleViewCtrl.currentType == 'peer'">
+					<select class="b-popup-body-input" 
+						ng-model="selectedPeer" 
+						ng-change="consoleViewCtrl.setConsole(selectedPeer)">
+						<option value="">Select peer</option>
+						<option ng-repeat="host in consoleViewCtrl.hosts" value="{{ host.id }}">
+							{{ host.hostname }}
+						</option>
+					</select>
+					<div class="clear"></div>
+				</div>
+
+			</div>
+
+			<div class="b-toggle-buttons">
+				<ul>
+					<li class="b-toggle-buttons__item" 
+					ng-class="consoleViewCtrl.currentType == 'peer' ? 'b-toggle-buttons__item_active' : ''" 
+					ng-click="consoleViewCtrl.setCurrentType('peer')">
+						Peer
+					</li>
+					<li class="b-toggle-buttons__item"
+					ng-class="consoleViewCtrl.currentType == 'environments' ? 'b-toggle-buttons__item_active' : ''" 
+					ng-click="consoleViewCtrl.setCurrentType('environments')">
+						Environment
+					</li>
+				</ul>
+			</div>
+			
+		</div>
+
+		<div class="b-terminal">
+			<terminal terminal-class="modern-terminal" terminal-config="modern"></terminal>
+		</div>
+
 	</div>
 
 </div>

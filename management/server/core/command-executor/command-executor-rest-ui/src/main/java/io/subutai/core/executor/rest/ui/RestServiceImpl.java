@@ -5,6 +5,7 @@ import java.util.Set;
 
 import javax.ws.rs.core.Response;
 
+import io.subutai.common.command.CommandResult;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,14 +39,17 @@ public class RestServiceImpl implements RestService
     }
 
     @Override
-    public Response executeCommand( final String hostId, final String content )
+    public Response executeCommand( final String hostId, final String command, final String path )
     {
         try {
             Preconditions.checkNotNull( hostId, "Invalid host id" );
+            Preconditions.checkNotNull( command, "Invalid command" );
 
-            RequestBuilder command = new RequestBuilder( content );
-            commandExecutor.executeAsync( hostId, command );
-            return Response.ok().entity( JsonUtil.toJson( "ok" ) ).build();
+            RequestBuilder request = new RequestBuilder( command );
+            request.withCwd( path );
+            CommandResult result = commandExecutor.execute( hostId, request );
+
+            return Response.ok().entity( JsonUtil.toJson( result )).build();
         }
         catch ( Exception e )
         {

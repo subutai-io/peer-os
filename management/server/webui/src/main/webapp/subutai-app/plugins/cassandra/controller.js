@@ -7,6 +7,7 @@ cassandraCtrl.$inject = ['cassandraSrv'];
 function cassandraCtrl(cassandraSrv)
 {
     var vm = this;
+
     //cassandraSrv.getCassandra()(function (data) {
     //    vm.cassandra= data;
     //});

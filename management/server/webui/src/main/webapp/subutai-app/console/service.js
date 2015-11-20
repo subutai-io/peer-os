@@ -6,13 +6,14 @@ angular.module('subutai.console.service', [])
 consoleService.$inject = ['$http'];
 
 function consoleService($http) {
-	var baseURL = 'http://172.16.131.205:8181/rest/';
-	var resourceHostsURL = baseURL + 'command_ui/resource_hosts/';
-	var environmentsURL = baseURL + 'environments_ui/';	
+	var baseURL = serverUrl + 'command_ui/';
+	var resourceHostsURL = baseURL + 'resource_hosts/';
+	var environmentsURL = serverUrl + 'environments_ui/';	
 
 	var consoleService = {
 		getResourceHosts: getResourceHosts,
 		getEnvironments: getEnvironments,
+		sendCommand: sendCommand,
 	};
 
 	return consoleService;
@@ -25,5 +26,14 @@ function consoleService($http) {
 
 	function getEnvironments() {
 		return $http.get(environmentsURL, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
+	}
+
+	function sendCommand(cmd, peerId, path) {
+		var postData = 'command=' + cmd + '&hostId=' + peerId + '&path=' + path;
+		return $http.post(
+			baseURL, 
+			postData, 
+			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+		);
 	}
 }

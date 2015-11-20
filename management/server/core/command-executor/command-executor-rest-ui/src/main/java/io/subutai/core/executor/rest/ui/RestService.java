@@ -14,11 +14,12 @@ public interface RestService
 {
     @POST
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response executeCommand( @FormParam( "hostId" ) String hostId,
-                                   @FormParam( "command" ) String content );
+    Response executeCommand( @FormParam( "hostId" ) String hostId,
+                                    @FormParam( "command" ) String content,
+                                    @FormParam( "path" ) String path );
 
     @GET
     @Path( "resource_hosts" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getResourceHosts( );
+    Response getResourceHosts( );
 }

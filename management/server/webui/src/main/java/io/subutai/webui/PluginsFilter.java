@@ -18,7 +18,7 @@ import io.subutai.common.util.ServiceLocator;
 import io.subutai.webui.api.WebuiModuleService;
 
 
-public class AngularAppFilter implements Filter
+public class PluginsFilter implements Filter
 {
     private FilterConfig filterConfig;
     private WebuiModuleService webuiModuleService;
@@ -45,7 +45,7 @@ public class AngularAppFilter implements Filter
             LOG.error( "Service locator cannot find WebuiModuleService", e );
         }
 
-        servletResponse.getWriter().write( webuiModuleService.getModulesListLazyLoadConfig() );
+        servletResponse.getWriter().write( webuiModuleService.getModulesListJson() );
     }
 
 

@@ -44,6 +44,17 @@
 
   <filter-mapping>
     <filter-name>AngularApp</filter-name>
-    <url-pattern>/subutai-app.js</url-pattern>
+    <url-pattern>/js/subutai-app.js</url-pattern>
+  </filter-mapping>
+
+
+  <filter>
+    <filter-name>Plugins</filter-name>
+    <filter-class>io.subutai.webui.PluginsFilter</filter-class>
+  </filter>
+
+  <filter-mapping>
+    <filter-name>Plugins</filter-name>
+    <url-pattern>/js/plugins.json</url-pattern>
   </filter-mapping>
 </web-app>
