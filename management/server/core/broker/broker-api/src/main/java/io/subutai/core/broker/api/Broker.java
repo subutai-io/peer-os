@@ -29,15 +29,10 @@ public interface Broker
 
 
     /**
-     * Creates a new client keypair & adds public key certificate to broker's truststore.
+     * Adds certificate to broker trust-store
      *
-     * Client can immediately connect to broker using these credentials. The certificates and the client key are in PEM
-     * format. The client key is also password protected
-     *
-     * @param clientId unique client id
-     * @param password password for client private key
-     *
-     * @return - client credentials {@code ClientCredentials}
+     * @param clientId - unique client id
+     * @param clientX509CertInPem - client X509 certificate in PEM format
      */
-    public ClientCredentials createNewClientCredentials( String clientId, String password ) throws BrokerException;
+    public void registerClientCertificate( String clientId, String clientX509CertInPem ) throws BrokerException;
 }

@@ -14,7 +14,10 @@ import java.util.regex.Pattern;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -35,6 +38,7 @@ import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.InstanceType;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerQuota;
@@ -69,6 +73,10 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             targetEntity = ContainerHostEntity.class, orphanRemoval = true )
     private Set<ContainerHost> containersHosts = Sets.newHashSet();
 
+    @Column( name = "instance" )
+    @Enumerated( EnumType.STRING )
+    private InstanceType instanceType;
+
     @Transient
     protected ExecutorService singleThreadExecutorService;
 
@@ -101,10 +109,20 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
-    public ResourceHostEntity( final String peerId, final HostInfo resourceHostInfo )
+    public ResourceHostEntity( final String peerId, final ResourceHostInfo resourceHostInfo )
     {
         super( peerId, resourceHostInfo );
+
+        this.instanceType = resourceHostInfo.getInstanceType();
+
         init();
+    }
+
+
+    @Override
+    public InstanceType getInstanceType()
+    {
+        return instanceType;
     }
 
 

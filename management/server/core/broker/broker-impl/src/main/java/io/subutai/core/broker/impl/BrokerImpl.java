@@ -3,11 +3,7 @@ package io.subutai.core.broker.impl;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.security.KeyPair;
 import java.security.KeyStore;
-import java.security.cert.X509Certificate;
 import java.util.LinkedList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -39,14 +35,12 @@ import org.apache.activemq.usage.TempUsage;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
-import io.subutai.common.security.crypto.certificate.CertificateData;
 import io.subutai.common.settings.Common;
 import io.subutai.core.broker.api.Broker;
 import io.subutai.core.broker.api.BrokerException;
 import io.subutai.core.broker.api.ByteMessageListener;
 import io.subutai.core.broker.api.ByteMessagePostProcessor;
 import io.subutai.core.broker.api.ByteMessagePreProcessor;
-import io.subutai.core.broker.api.ClientCredentials;
 import io.subutai.core.broker.api.MessageListener;
 import io.subutai.core.broker.api.TextMessageListener;
 import io.subutai.core.broker.api.TextMessagePostProcessor;
@@ -69,9 +63,6 @@ public class BrokerImpl implements Broker
     private final String keystorePassword;
     private final String truststore;
     private final String truststorePassword;
-    private final String caCertificate;
-    private final String caPrivateKey;
-    private final String caPrivateKeyPassword;
     private ByteMessagePostProcessor byteMessagePostProcessor;
     private TextMessagePostProcessor textMessagePostProcessor;
     private SslContext customSslContext;
@@ -81,18 +72,13 @@ public class BrokerImpl implements Broker
 
 
     public BrokerImpl( final String brokerUrl, final String keystore, final String keystorePassword,
-                       final String truststore, final String truststorePassword, final String caCertificate,
-                       final String caPrivateKey, final String caPrivateKeyPassword )
+                       final String truststore, final String truststorePassword )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( brokerUrl ), "Invalid broker URL" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( keystore ), "Invalid keystore path" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( keystorePassword ), "Invalid keystore password" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( truststore ), "Invalid truststore path" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( truststorePassword ), "Invalid truststore password" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( caCertificate ), "Invalid CA certificate" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( caPrivateKey ), "Invalid CA private key" );
-        Preconditions
-                .checkArgument( !Strings.isNullOrEmpty( caPrivateKeyPassword ), "Invalid CA private key password" );
 
         this.brokerUrl = brokerUrl;
         this.messageRouter = new MessageRoutingListener();
@@ -100,34 +86,21 @@ public class BrokerImpl implements Broker
         this.keystorePassword = keystorePassword;
         this.truststore = String.format( "%s/%s", Common.SUBUTAI_APP_CERTS_PATH, truststore );
         this.truststorePassword = truststorePassword;
-        this.caCertificate = String.format( "%s/%s", Common.SUBUTAI_APP_CERTS_PATH, caCertificate );
-        this.caPrivateKey = String.format( "%s/%s", Common.SUBUTAI_APP_CERTS_PATH, caPrivateKey );
-        this.caPrivateKeyPassword = caPrivateKeyPassword;
     }
 
 
     @Override
-    public ClientCredentials createNewClientCredentials( String clientId, String password ) throws BrokerException
+    public void registerClientCertificate( final String clientId, final String clientX509CertInPem )
+            throws BrokerException
     {
         try
         {
-            KeyPair keyPair = sslUtil.generateKeyPair( "RSA", 2048 );
-            CertificateData certData = new CertificateData();
-            certData.setCommonName( String.format( "client-%s", clientId ) );
-            KeyPair caKey = sslUtil.loadEncryptedRsaPrivateKey( caPrivateKey, caPrivateKeyPassword );
-            X509Certificate certificate = sslUtil.generateCaKeySignedCertificate( keyPair, certData, caKey );
-            String clientCert = sslUtil.convertToPem( certificate );
-            String clientKey = sslUtil.encryptKey( keyPair.getPrivate(), password );
-            String caCert = new String( Files.readAllBytes( Paths.get( caCertificate ) ) );
-
-            //disabled since client certs are signed by CA key now
-            //registerClientCertificateWithBroker( String.format( "client-%s", clientId ), certificate );
-
-            return new ClientCredentials( clientCert, clientKey, caCert );
+            ReloadableX509TrustManager tm = ( ReloadableX509TrustManager ) getSslContext().getTrustManagersAsArray()[0];
+            tm.addServerCertAndReload( clientId, sslUtil.convertX509PemToCert( clientX509CertInPem ) );
         }
         catch ( Exception e )
         {
-            LOG.error( "Error in createNewClientCredentials", e );
+            LOG.error( "Error in registerClientCertificate", e );
             throw new BrokerException( e );
         }
     }
@@ -261,22 +234,6 @@ public class BrokerImpl implements Broker
         if ( listener != null )
         {
             messageRouter.removeListener( listener );
-        }
-    }
-
-
-    public synchronized void registerClientCertificateWithBroker( String alias, X509Certificate certificate )
-            throws BrokerException
-    {
-        try
-        {
-            ReloadableX509TrustManager tm = ( ReloadableX509TrustManager ) getSslContext().getTrustManagersAsArray()[0];
-            tm.addServerCertAndReload( alias, certificate );
-        }
-        catch ( Exception e )
-        {
-            LOG.error( "Error in registerClientCertificateWithBroker", e );
-            throw new BrokerException( e );
         }
     }
 
