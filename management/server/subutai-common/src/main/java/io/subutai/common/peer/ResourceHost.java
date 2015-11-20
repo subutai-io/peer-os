@@ -4,6 +4,7 @@ package io.subutai.common.peer;
 import java.util.Collection;
 import java.util.Set;
 
+import io.subutai.common.environment.ContainerType;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.ResourceHostMetric;
@@ -65,7 +66,7 @@ public interface ResourceHost extends Host, ResourceHostInfo
      * @param hostname - hostname for the new container
      * @param timeout - timeout to wait until container connects to server
      */
-    public ContainerHost createContainer( String templateName, String hostname, int timeout )
+    public ContainerHost createContainer( String templateName, String hostname, ContainerQuota containerQuota, int timeout )
             throws ResourceHostException;
 
     /**
@@ -78,12 +79,15 @@ public interface ResourceHost extends Host, ResourceHostInfo
      * @param gateway - default gateway for container
      * @param timeout - timeout to wait until container connects to server
      */
-    public ContainerHost createContainer( String templateName, String hostname, String ip, int vlan, String gateway,
-                                          int timeout ) throws ResourceHostException;
+    public ContainerHost createContainer( String templateName, String hostname, ContainerQuota containerQuota,
+                                          String ip, int vlan, String gateway, int timeout )
+            throws ResourceHostException;
 
     Set<ContainerHost> getContainerHostsByEnvironmentId( String environmentId );
 
     Set<ContainerHost> getContainerHostsByOwnerId( String ownerId );
 
     Set<ContainerHost> getContainerHostsByPeerId( String peerId );
+
+    void setQuota( String containerName, ContainerQuota quota ) throws ResourceHostException;
 }

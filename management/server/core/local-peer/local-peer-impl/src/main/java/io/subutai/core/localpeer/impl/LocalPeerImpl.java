@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -49,6 +50,7 @@ import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.ContainerDistributionType;
+import io.subutai.common.environment.ContainerType;
 import io.subutai.common.environment.ContainersDestructionResultImpl;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.host.ContainerHostState;
@@ -102,6 +104,7 @@ import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hostregistry.api.HostRegistry;
+import io.subutai.common.peer.ContainerQuota;
 import io.subutai.core.localpeer.impl.command.CommandRequestListener;
 import io.subutai.core.localpeer.impl.container.CreateContainerWrapperTask;
 import io.subutai.core.localpeer.impl.container.CreateEnvironmentContainerGroupRequestListener;
@@ -156,9 +159,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     protected Set<RequestListener> requestListeners = Sets.newHashSet();
     protected PeerInfo peerInfo;
     private SecurityManager securityManager;
+    private String defaultQuota;
 
 
     protected boolean initialized = false;
+    private HashMap<ContainerType, ContainerQuota> containerQuotas = new HashMap<>();
 
 
     public LocalPeerImpl( DaoManager daoManager, TemplateRegistry templateRegistry, QuotaManager quotaManager,
@@ -182,11 +187,62 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
+    public void setDefaultQuota( final String defaultQuota )
+    {
+        this.defaultQuota = defaultQuota;
+    }
+
+
+    private void parseDefaultQuotaSettings()
+    {
+        LOG.info( "Parsing default quota settings..." );
+        String[] settings = defaultQuota.split( ":" );
+        if ( settings.length != 5 )
+        {
+            throw new LocalPeerInitializationError( "Invalid default quota settings." );
+        }
+
+        int i = 0;
+        for ( ContainerType containerType : ContainerType.values() )
+        {
+            if ( i > ContainerType.values().length - 2 )
+            {
+                break;
+            }
+            LOG.debug( String.format( "Settings for %s: %s", containerType, settings[i] ) );
+            String[] quotas = settings[i++].split( "\\|" );
+
+            if ( quotas.length != 6 )
+            {
+                throw new LocalPeerInitializationError(
+                        String.format( "Invalid quota settings for %s.", containerType ) );
+            }
+
+            try
+            {
+                final ContainerQuota containerQuota =
+                        new ContainerQuota( Integer.valueOf( quotas[0] ), Integer.valueOf( quotas[1] ),
+                                Double.parseDouble( quotas[2] ), Double.parseDouble( quotas[3] ),
+                                Double.parseDouble( quotas[4] ), Double.parseDouble( quotas[5] ) );
+                containerQuotas.put( containerType, containerQuota );
+                LOG.debug( containerQuota.toString() );
+            }
+            catch ( Exception e )
+            {
+                throw new LocalPeerInitializationError(
+                        String.format( "Could not parse quota settings for %s.", containerType ) );
+            }
+        }
+        LOG.info( "Quota settings parsed." );
+    }
+
+
     public void init()
     {
         LOG.debug( "********************************************** Initializing peer "
                 + "******************************************" );
 
+        parseDefaultQuotaSettings();
         //add command request listener
         addRequestListener( new CommandRequestListener() );
         //add command response listener
@@ -372,7 +428,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @RolesAllowed( "Environment-Management|A|Write" )
     @Override
     public ContainerHost createContainer( final ResourceHost resourceHost, final Template template,
-                                          final String containerName ) throws PeerException
+                                          final String containerName, final ContainerQuota containerQuota )
+            throws PeerException
     {
         Preconditions.checkNotNull( resourceHost, "Resource host is null value" );
         Preconditions.checkNotNull( template, "Pass valid template object" );
@@ -388,7 +445,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         try
         {
-            return resourceHost.createContainer( template.getTemplateName(), containerName, 180 );
+            return resourceHost.createContainer( template.getTemplateName(), containerName, containerQuota, 180 );
         }
         catch ( ResourceHostException e )
         {
@@ -459,7 +516,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
             try
             {
-                ContainerHost containerHost = resourceHost.createContainer( request.getTemplateName(), cloneName,
+                ContainerQuota quota = containerQuotas.get( request.getContainerType() );
+                ContainerHost containerHost = resourceHost.createContainer( request.getTemplateName(), cloneName, quota,
                         String.format( "%s/%s", ipAddress, networkPrefix ), environmentVni.getVlan(), gateway,
                         Common.WAIT_CONTAINER_CONNECTION_SEC );
 
@@ -485,6 +543,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     private Set<HostInfoModel> createByStrategy( final CreateEnvironmentContainerGroupRequest request )
             throws PeerException
     {
+
         //check if strategy exists
         try
         {
@@ -533,10 +592,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             {
 
                 String ipAddress = allAddresses[request.getIpAddressOffset() + currentIpAddressOffset];
+                final ContainerQuota containerQuota = containerQuotas.get( request.getContainerType() );
                 taskFutures.add( executorService.submit(
                         new CreateContainerWrapperTask( resourceHostEntity, request.getTemplateName(), hostname,
-                                String.format( "%s/%s", ipAddress, networkPrefix ), environmentVni.getVlan(), gateway,
-                                Common.WAIT_CONTAINER_CONNECTION_SEC ) ) );
+                                containerQuota, String.format( "%s/%s", ipAddress, networkPrefix ),
+                                environmentVni.getVlan(), gateway, Common.WAIT_CONTAINER_CONNECTION_SEC ) ) );
 
                 currentIpAddressOffset++;
             }
@@ -1980,25 +2040,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    //    @Override
-    //    public boolean isPeerUsed( final String peerId )
-    //    {
-    //        return findContainersByPeerId( peerId ).size() > 0;
-    //    }
-    //
-    //
-    //    private Set<ContainerHost> findContainersByPeerId( final String peerId )
-    //    {
-    //        Preconditions.checkNotNull( peerId );
-    //
-    //        Set<ContainerHost> result = new HashSet<>();
-    //
-    //        for ( ResourceHost resourceHost : resourceHosts )
-    //        {
-    //            result.addAll( resourceHost.getContainerHostsByPeerId( peerId ) );
-    //        }
-    //        return result;
-    //    }
+    @Override
+    public ContainerQuota getDefaultQuota( final ContainerType containerType )
+    {
+        return containerQuotas.get( containerType );
+    }
 
 
     private class SetupN2NConnectionTask implements Callable<N2NConfig>

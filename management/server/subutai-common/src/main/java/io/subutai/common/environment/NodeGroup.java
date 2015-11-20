@@ -16,7 +16,7 @@ public class NodeGroup
 {
     private String name;
     private String templateName;
-    private ContainerType type;
+    private ContainerType type = ContainerType.SMALL;
     private int numberOfContainers;
     private int sshGroupId;
     private int hostsGroupId;
