@@ -19,13 +19,13 @@ import io.subutai.core.identity.api.model.User;
 
 public class Login extends HttpServlet
 {
-    protected void doPost( HttpServletRequest request, HttpServletResponse response ) throws ServletException,
-            IOException
+    protected void doPost( HttpServletRequest request, HttpServletResponse response )
+            throws ServletException, IOException
     {
         String username = request.getParameter( "username" );
         String password = request.getParameter( "password" );
 
-        if( !Strings.isNullOrEmpty( username ))
+        if ( !Strings.isNullOrEmpty( username ) )
         {
             try
             {
@@ -33,7 +33,7 @@ public class Login extends HttpServlet
 
                 String token = identityManager.getUserToken( username, password );
 
-                if( !Strings.isNullOrEmpty( token ) )
+                if ( !Strings.isNullOrEmpty( token ) )
                 {
                     request.getSession().setAttribute( "userSessionData", token );
                     Cookie cookie = new Cookie( "sptoken", "%22" + token + "%22" );
@@ -45,6 +45,7 @@ public class Login extends HttpServlet
                     request.setAttribute( "error", "Wrong Username or Password !!!" );
                     response.getWriter().write( "Error, Wrong Username or Password" );
                     response.setStatus( HttpServletResponse.SC_UNAUTHORIZED );
+                }
             }
             catch ( NamingException e )
             {
