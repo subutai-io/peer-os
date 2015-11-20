@@ -222,8 +222,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             {
                 final ContainerQuota containerQuota =
                         new ContainerQuota( Integer.valueOf( quotas[0] ), Integer.valueOf( quotas[1] ),
-                                Double.parseDouble( quotas[2] ), Double.parseDouble( quotas[3] ),
-                                Double.parseDouble( quotas[4] ), Double.parseDouble( quotas[5] ) );
+                                Integer.valueOf( quotas[2] ), Integer.valueOf( quotas[3] ),
+                                Integer.valueOf( quotas[4] ), Integer.valueOf( quotas[5] ) );
                 containerQuotas.put( containerType, containerQuota );
                 LOG.debug( containerQuota.toString() );
             }
@@ -445,7 +445,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         try
         {
-            return resourceHost.createContainer( template.getTemplateName(), containerName, containerQuota, 180 );
+            return resourceHost.createContainer( template.getTemplateName(), containerName, 180 );
         }
         catch ( ResourceHostException e )
         {
@@ -516,19 +516,20 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
             try
             {
-                ContainerQuota quota = containerQuotas.get( request.getContainerType() );
-                ContainerHost containerHost = resourceHost.createContainer( request.getTemplateName(), cloneName, quota,
+                ContainerHost containerHost = resourceHost.createContainer( request.getTemplateName(), cloneName,
                         String.format( "%s/%s", ipAddress, networkPrefix ), environmentVni.getVlan(), gateway,
                         Common.WAIT_CONTAINER_CONNECTION_SEC );
 
+                ContainerQuota quota = containerQuotas.get( request.getContainerType() );
 
                 ContainerHostEntity containerHostEntity = ( ContainerHostEntity ) containerHost;
                 containerHostEntity.setEnvironmentId( request.getEnvironmentId() );
                 containerHostEntity.setOwnerId( request.getOwnerId() );
                 containerHostEntity.setInitiatorPeerId( request.getInitiatorPeerId() );
+                quotaManager.setQuota( containerHostEntity.getContainerName(), quota );
                 result.add( new HostInfoModel( containerHost ) );
             }
-            catch ( ResourceHostException e )
+            catch ( ResourceHostException | QuotaException e )
             {
                 LOG.error( "Error creating container", e );
             }
@@ -592,11 +593,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             {
 
                 String ipAddress = allAddresses[request.getIpAddressOffset() + currentIpAddressOffset];
-                final ContainerQuota containerQuota = containerQuotas.get( request.getContainerType() );
                 taskFutures.add( executorService.submit(
                         new CreateContainerWrapperTask( resourceHostEntity, request.getTemplateName(), hostname,
-                                containerQuota, String.format( "%s/%s", ipAddress, networkPrefix ),
-                                environmentVni.getVlan(), gateway, Common.WAIT_CONTAINER_CONNECTION_SEC ) ) );
+                                String.format( "%s/%s", ipAddress, networkPrefix ), environmentVni.getVlan(), gateway,
+                                Common.WAIT_CONTAINER_CONNECTION_SEC ) ) );
 
                 currentIpAddressOffset++;
             }
@@ -606,6 +606,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         //wait for succeeded containers
         Set<ContainerHost> newContainers = Sets.newHashSet();
         Set<HostInfoModel> result = Sets.newHashSet();
+
+        final ContainerQuota containerQuota = containerQuotas.get( request.getContainerType() );
 
         for ( Future<ContainerHost> future : taskFutures )
         {
@@ -618,17 +620,18 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 containerHostEntity.setEnvironmentId( request.getEnvironmentId() );
                 containerHostEntity.setOwnerId( request.getOwnerId() );
                 containerHostEntity.setInitiatorPeerId( request.getInitiatorPeerId() );
+                containerHostEntity.setContainerType( request.getContainerType() );
                 newContainers.add( containerHost );
+                quotaManager.setQuota( containerHost.getContainerName(), containerQuota );
                 result.add( new HostInfoModel( containerHost ) );
             }
-            catch ( ExecutionException | InterruptedException e )
+            catch ( QuotaException | ExecutionException | InterruptedException e )
             {
                 LOG.error( "Error creating container", e );
             }
         }
 
         executorService.shutdown();
-
 
         return result;
     }
