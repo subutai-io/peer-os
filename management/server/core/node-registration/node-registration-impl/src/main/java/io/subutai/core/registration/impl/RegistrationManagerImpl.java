@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.commons.net.util.SubnetUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.cxf.jaxrs.ext.form.Form;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -38,7 +37,7 @@ import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.protocol.PlacementStrategy;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.broker.api.Broker;
-import io.subutai.core.broker.api.ClientCredentials;
+import io.subutai.core.broker.api.BrokerException;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.hostregistry.api.HostListener;
@@ -228,7 +227,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
     {
         RequestedHostImpl registrationRequest = requestDataService.find( requestId );
 
-        if ( !RegistrationStatus.REQUESTED.equals( registrationRequest.getStatus() ) )
+        if ( registrationRequest == null || !RegistrationStatus.REQUESTED.equals( registrationRequest.getStatus() ) )
         {
             return;
         }
@@ -237,20 +236,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
 
         importHostPublicKey( registrationRequest.getId(), registrationRequest.getPublicKey() );
 
-        WebClient client = RestUtil.createWebClient( registrationRequest.getRestHook() );
-        Form form = new Form();
-        try
-        {
-            ClientCredentials clientCredentials = broker.createNewClientCredentials( requestId, "client" );
-            form.set( "ca", clientCredentials.getCaCertificate() );
-            form.set( "crt", clientCredentials.getClientCertificate() );
-            form.set( "key", clientCredentials.getClientKey() );
-            client.form( form );
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( "Error approving new connections request", e );
-        }
+        importHostSslCert( registrationRequest.getId(), registrationRequest.getCert() );
 
         //TODO move the rest of code to separate function where approval process done selectively
         for ( final ContainerInfo containerInfo : registrationRequest.getHostInfos() )
@@ -259,6 +245,19 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
         }
 
         processEnvironmentImport( registrationRequest );
+    }
+
+
+    private void importHostSslCert( String hostId, String cert )
+    {
+        try
+        {
+            broker.registerClientCertificate( hostId, cert );
+        }
+        catch ( BrokerException e )
+        {
+            LOGGER.error( "Error importing host SSL certificate", e );
+        }
     }
 
 

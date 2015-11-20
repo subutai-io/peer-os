@@ -21,18 +21,16 @@ import com.vaadin.ui.Tree;
 
 import io.subutai.common.host.Interface;
 import io.subutai.common.host.ResourceHostInfo;
-import io.subutai.common.metric.HostMetric;
-import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
+import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.peer.ManagementHost;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.settings.Common;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.metric.api.Monitor;
-import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.peer.ManagementHost;
 import io.subutai.server.ui.component.ConcurrentComponent;
 
 
@@ -75,6 +73,7 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
         }
     }
 
+
     private void initView( final HostRegistry hostRegistry )
     {
         container = new HierarchicalContainer();
@@ -116,10 +115,14 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
                             result.append( getText( "<br/>ID: %s", host.getId() ) );
                             result.append( getText( "<br/>IP: %s", ip ) );
                             result.append( getText( "<br/>MAC: %s", mac ) );
-                            result.append( getText( "<br>ARCH: %s", host.getArch() ) );
+                            result.append( getText( "<br/>ARCH: %s", host.getArch() ) );
+                            if ( host instanceof ResourceHost )
+                            {
+                                result.append( getText( "<br/>Instance: %s", ( ( ResourceHost ) host ).getInstanceType() ) );
+                            }
 
 
-                            String desc = monitor.getHostMetricsAsHtml(host.getId() );
+                            String desc = monitor.getHostMetricsAsHtml( host.getId() );
 
                             result.append( desc );
                         }
@@ -214,6 +217,7 @@ public class ContainerTree extends ConcurrentComponent implements HostListener
             tree.expandItem( rh.getId() );
         }
     }
+
 
     public HierarchicalContainer getNodeContainer()
     {

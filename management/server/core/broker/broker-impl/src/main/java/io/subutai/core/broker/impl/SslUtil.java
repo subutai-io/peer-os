@@ -4,6 +4,7 @@ package io.subutai.core.broker.impl;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigInteger;
 import java.security.KeyFactory;
@@ -22,6 +23,7 @@ import java.util.Date;
 
 import org.bouncycastle.asn1.x500.X500NameBuilder;
 import org.bouncycastle.asn1.x500.style.BCStyle;
+import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
@@ -62,6 +64,30 @@ public class SslUtil
             pemWriter.close();
 
             return stringWriter.toString();
+        }
+        catch ( Exception e )
+        {
+            throw new RuntimeException( "Failed to convert object to PEM format", e );
+        }
+    }
+
+
+    /**
+     * Convert X509 certificate in PEM format to X509Certificate object
+     *
+     * @param x509InPem X509 certificate in PEM format
+     *
+     * @return {@code X509Certificate}
+     */
+    public X509Certificate convertX509PemToCert( String x509InPem )
+    {
+        try
+        {
+            PEMParser pemParser = new PEMParser( new StringReader( x509InPem ) );
+            JcaX509CertificateConverter x509CertificateConverter = new JcaX509CertificateConverter();
+
+            Object o = pemParser.readObject();
+            return x509CertificateConverter.getCertificate( ( X509CertificateHolder ) o );
         }
         catch ( Exception e )
         {
