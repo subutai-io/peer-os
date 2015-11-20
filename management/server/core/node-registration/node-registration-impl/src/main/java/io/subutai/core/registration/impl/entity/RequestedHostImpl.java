@@ -57,6 +57,10 @@ public class RequestedHostImpl implements RequestedHost, Serializable
     @Column( name = "public_key" )
     private String publicKey;
 
+    @Lob
+    @Column( name = "cert" )
+    private String cert;
+
     @Column( name = "rest_hook" )
     private String restHook;
 
@@ -86,6 +90,7 @@ public class RequestedHostImpl implements RequestedHost, Serializable
         this.publicKey = requestedHost.getPublicKey();
         this.restHook = requestedHost.getRestHook();
         this.status = requestedHost.getStatus();
+        this.cert = requestedHost.getCert();
 
         if ( this.arch == null )
         {
@@ -95,8 +100,8 @@ public class RequestedHostImpl implements RequestedHost, Serializable
         Set<Interface> netInterfaces = requestedHost.getNetInterfaces();
         for ( final Interface netInterface : netInterfaces )
         {
-            io.subutai.core.registration.impl.entity.HostInterface
-                    hostInterface = new io.subutai.core.registration.impl.entity.HostInterface( netInterface );
+            io.subutai.core.registration.impl.entity.HostInterface hostInterface =
+                    new io.subutai.core.registration.impl.entity.HostInterface( netInterface );
             this.netInterfaces.add( hostInterface );
         }
 
@@ -191,6 +196,13 @@ public class RequestedHostImpl implements RequestedHost, Serializable
 
 
     @Override
+    public String getCert()
+    {
+        return cert;
+    }
+
+
+    @Override
     public String getRestHook()
     {
         return restHook;
@@ -267,6 +279,7 @@ public class RequestedHostImpl implements RequestedHost, Serializable
                 ", restHook='" + restHook + '\'' +
                 ", netInterfaces=" + netInterfaces +
                 ", hostInfos=" + hostInfos +
+                ", cert=" + cert +
                 '}';
     }
 }
