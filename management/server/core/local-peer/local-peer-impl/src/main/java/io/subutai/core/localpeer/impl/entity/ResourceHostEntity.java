@@ -1,9 +1,7 @@
 package io.subutai.core.localpeer.impl.entity;
 
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -43,6 +41,7 @@ import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.InstanceType;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.ContainerQuota;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
@@ -50,7 +49,6 @@ import io.subutai.common.protocol.Disposable;
 import io.subutai.common.protocol.Template;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
-import io.subutai.common.peer.ContainerQuota;
 import io.subutai.core.localpeer.impl.container.CreateContainerTask;
 import io.subutai.core.localpeer.impl.container.DestroyContainerTask;
 import io.subutai.core.registry.api.TemplateRegistry;
@@ -426,9 +424,9 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public ContainerHost createContainer( final String templateName, final String hostname,
-                                          final ContainerQuota containerQuota, final String ip, final int vlan,
-                                          final String gateway, final int timeout ) throws ResourceHostException
+    public ContainerHost createContainer( final String templateName, final String hostname, final String ip,
+                                          final int vlan, final String gateway, final int timeout )
+            throws ResourceHostException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
@@ -457,7 +455,6 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         try
         {
             final ContainerHost result = containerHostFuture.get();
-            setQuota( hostname, containerQuota );
             return result;
         }
         catch ( ExecutionException | InterruptedException e )
@@ -468,10 +465,10 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public ContainerHost createContainer( final String templateName, final String hostname, final ContainerQuota quota,
-                                          final int timeout ) throws ResourceHostException
+    public ContainerHost createContainer( final String templateName, final String hostname, final int timeout )
+            throws ResourceHostException
     {
-        return createContainer( templateName, hostname, quota, null, 0, null, timeout );
+        return createContainer( templateName, hostname, null, 0, null, timeout );
     }
 
 
@@ -553,70 +550,5 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     public boolean isConnected()
     {
         return getPeer().isConnected( new HostId( getId() ) );
-    }
-
-
-    @Override
-    public void setQuota( final String containerName, final ContainerQuota quota ) throws ResourceHostException
-    {
-        Preconditions.checkNotNull( containerName );
-
-        QuotaCommandHelper quotaCommandHelper = new QuotaCommandHelper( containerName, quota );
-        for ( String command : quotaCommandHelper.getQuotaSetCommands() )
-        {
-            RequestBuilder requestBuilder = new RequestBuilder( command ).withTimeout( 15 );
-            try
-            {
-                commandUtil.execute( requestBuilder, this );
-            }
-            catch ( CommandException e )
-            {
-                throw new ResourceHostException( "Error on setting quota", e );
-            }
-        }
-    }
-
-
-    class QuotaCommandHelper
-    {
-        private String containerName;
-        private ContainerQuota containerQuota;
-
-
-        public QuotaCommandHelper( final String containerName, final ContainerQuota containerQuota )
-        {
-            this.containerName = containerName;
-            this.containerQuota = containerQuota;
-        }
-
-
-        List<String> getQuotaSetCommands()
-        {
-            final List<String> result = new ArrayList<>();
-            if ( containerQuota.getRam() != null )
-            {
-                result.add( setRamCommand() );
-            }
-            return result;
-        }
-
-
-        String getRamCommand()
-        {
-            return String.format( "subutai quota %s ram", containerName );
-        }
-
-
-        String setRamCommand()
-        {
-            if ( containerQuota.getRam() != null )
-            {
-                return String.format( "subutai quota %s ram -s %d", containerName, containerQuota.getRam() );
-            }
-            else
-            {
-                return null;
-            }
-        }
     }
 }

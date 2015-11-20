@@ -360,6 +360,12 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     }
 
 
+    public void setContainerType( final ContainerType containerType )
+    {
+        this.containerType = containerType;
+    }
+
+
     @Override
     public boolean isConnected()
     {

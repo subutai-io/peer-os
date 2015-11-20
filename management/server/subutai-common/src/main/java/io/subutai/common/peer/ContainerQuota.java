@@ -8,14 +8,14 @@ public class ContainerQuota
 {
     private Integer ram;
     private Integer cpu;
-    private double opt;
-    private double home;
-    private double var;
-    private double root;
+    private Integer opt;
+    private Integer home;
+    private Integer var;
+    private Integer root;
 
 
-    public ContainerQuota( final Integer ram, final Integer cpu, final double opt, final double home, final double var,
-                           final double root )
+    public ContainerQuota( final Integer ram, final Integer cpu, final Integer opt, final Integer home, final Integer var,
+                           final Integer root )
     {
         this.ram = ram;
         this.cpu = cpu;
@@ -38,25 +38,25 @@ public class ContainerQuota
     }
 
 
-    public double getOpt()
+    public Integer getOpt()
     {
         return opt;
     }
 
 
-    public double getHome()
+    public Integer getHome()
     {
         return home;
     }
 
 
-    public double getVar()
+    public Integer getVar()
     {
         return var;
     }
 
 
-    public double getRoot()
+    public Integer getRoot()
     {
         return root;
     }
