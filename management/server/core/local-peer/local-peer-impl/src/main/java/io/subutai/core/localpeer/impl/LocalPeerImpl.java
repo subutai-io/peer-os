@@ -193,7 +193,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    private void parseDefaultQuotaSettings()
+    protected void parseDefaultQuotaSettings()
     {
         LOG.info( "Parsing default quota settings..." );
         String[] settings = defaultQuota.split( ":" );
@@ -425,34 +425,37 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Write" )
-    @Override
-    public ContainerHost createContainer( final ResourceHost resourceHost, final Template template,
-                                          final String containerName, final ContainerQuota containerQuota )
-            throws PeerException
-    {
-        Preconditions.checkNotNull( resourceHost, "Resource host is null value" );
-        Preconditions.checkNotNull( template, "Pass valid template object" );
-        Preconditions
-                .checkArgument( !Strings.isNullOrEmpty( containerName ), "Cannot create container with null name" );
-
-        getResourceHostByName( resourceHost.getHostname() );
-
-        if ( templateRegistry.getTemplate( template.getTemplateName() ) == null )
-        {
-            throw new PeerException( String.format( "Template %s not registered", template.getTemplateName() ) );
-        }
-
-        try
-        {
-            return resourceHost.createContainer( template.getTemplateName(), containerName, 180 );
-        }
-        catch ( ResourceHostException e )
-        {
-            LOG.error( "Failed to create container", e );
-            throw new PeerException( e );
-        }
-    }
+    //    @RolesAllowed( "Environment-Management|A|Write" )
+    ////    @Override
+    //    private ContainerHost createContainer( final ResourceHost resourceHost, final Template template,
+    //                                          final String containerName )
+    //            throws PeerException
+    //    {
+    //        Preconditions.checkNotNull( resourceHost, "Resource host is null value" );
+    //        Preconditions.checkNotNull( template, "Pass valid template object" );
+    //        Preconditions
+    //                .checkArgument( !Strings.isNullOrEmpty( containerName ), "Cannot create container with null
+    // name" );
+    //
+    //        getResourceHostByName( resourceHost.getHostname() );
+    //
+    //        if ( templateRegistry.getTemplate( template.getTemplateName() ) == null )
+    //        {
+    //            throw new PeerException( String.format( "Template %s not registered", template.getTemplateName() ) );
+    //        }
+    //
+    //        try
+    //        {
+    //            final ContainerHost container =
+    //                    resourceHost.createContainer( template.getTemplateName(), containerName, 180 );
+    //            return container;
+    //        }
+    //        catch ( ResourceHostException e )
+    //        {
+    //            LOG.error( "Failed to create container", e );
+    //            throw new PeerException( e );
+    //        }
+    //    }
 
 
     protected ExecutorService getFixedPoolExecutor( int numOfThreads )
@@ -510,6 +513,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         Set<HostInfoModel> result = Sets.newHashSet();
 
+        ContainerQuota containerQuota = containerQuotas.get( request.getContainerType() );
+        if ( containerQuota == null )
+        {
+            containerQuota = containerQuotas.get( ContainerType.SMALL );
+        }
+
         for ( String cloneName : containerDistribution )
         {
             String ipAddress = allAddresses[request.getIpAddressOffset() + currentIpAddressOffset];
@@ -520,13 +529,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                         String.format( "%s/%s", ipAddress, networkPrefix ), environmentVni.getVlan(), gateway,
                         Common.WAIT_CONTAINER_CONNECTION_SEC );
 
-                ContainerQuota quota = containerQuotas.get( request.getContainerType() );
 
                 ContainerHostEntity containerHostEntity = ( ContainerHostEntity ) containerHost;
                 containerHostEntity.setEnvironmentId( request.getEnvironmentId() );
                 containerHostEntity.setOwnerId( request.getOwnerId() );
                 containerHostEntity.setInitiatorPeerId( request.getInitiatorPeerId() );
-                quotaManager.setQuota( containerHostEntity.getContainerName(), quota );
+                quotaManager.setQuota( containerHostEntity.getHostname(), containerQuota );
                 result.add( new HostInfoModel( containerHost ) );
             }
             catch ( ResourceHostException | QuotaException e )
@@ -607,7 +615,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         Set<ContainerHost> newContainers = Sets.newHashSet();
         Set<HostInfoModel> result = Sets.newHashSet();
 
-        final ContainerQuota containerQuota = containerQuotas.get( request.getContainerType() );
+        ContainerQuota containerQuota = containerQuotas.get( request.getContainerType() );
+        if ( containerQuota == null )
+        {
+            containerQuota = containerQuotas.get( ContainerType.SMALL );
+        }
 
         for ( Future<ContainerHost> future : taskFutures )
         {
@@ -622,10 +634,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 containerHostEntity.setInitiatorPeerId( request.getInitiatorPeerId() );
                 containerHostEntity.setContainerType( request.getContainerType() );
                 newContainers.add( containerHost );
-                quotaManager.setQuota( containerHost.getContainerName(), containerQuota );
+                quotaManager.setQuota( containerHost.getHostname(), containerQuota );
                 result.add( new HostInfoModel( containerHost ) );
             }
-            catch ( QuotaException | ExecutionException | InterruptedException e )
+            catch ( ExecutionException | InterruptedException | QuotaException e )
             {
                 LOG.error( "Error creating container", e );
             }
@@ -1245,7 +1257,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public void onHeartbeat( final ResourceHostInfo resourceHostInfo )
     {
-        LOG.debug( "On hearbeat: " + resourceHostInfo.getHostname() );
+        LOG.debug( "On heartbeat: " + resourceHostInfo.getHostname() );
         if ( initialized )
         {
             if ( resourceHostInfo.getHostname().equals( "management" ) )
