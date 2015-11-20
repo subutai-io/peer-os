@@ -1,6 +1,7 @@
 package io.subutai.common.environment;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
@@ -14,16 +15,58 @@ import io.subutai.common.protocol.PlacementStrategy;
  */
 public class NodeGroup
 {
+    @JsonProperty( "name" )
     private String name;
+    @JsonProperty( "templateName" )
     private String templateName;
+    @JsonProperty( "type" )
     private ContainerType type = ContainerType.SMALL;
+    @JsonProperty( "numberOfContainers" )
     private int numberOfContainers;
+    @JsonProperty( "sshGroupId" )
     private int sshGroupId;
+    @JsonProperty( "hostsGroupId" )
     private int hostsGroupId;
+    @JsonProperty( "containerPlacementStrategy" )
     private PlacementStrategy containerPlacementStrategy;
+    @JsonProperty( "peerId" )
     private String peerId;
+    @JsonProperty( "hostId" )
     private String hostId;
+    @JsonProperty( "containerDistributionType" )
     private ContainerDistributionType containerDistributionType = ContainerDistributionType.AUTO;
+
+
+    private NodeGroup()
+    {
+    }
+
+
+    public NodeGroup( @JsonProperty( "name" ) final String name,
+                      @JsonProperty( "templateName" ) final String templateName,
+                      @JsonProperty( "numberOfContainers" ) final int numberOfContainers,
+                      @JsonProperty( "type" ) ContainerType type, @JsonProperty( "sshGroupId" ) final int sshGroupId,
+                      @JsonProperty( "hostsGroupId" ) final int hostsGroupId,
+                      @JsonProperty( "containerDistributionType" ) ContainerDistributionType containerDistributionType,
+                      @JsonProperty( "containerPlacementStrategy" ) final PlacementStrategy containerPlacementStrategy,
+                      @JsonProperty( "peerId" ) final String peerId, @JsonProperty( "hostId" ) final String hostId )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid node group name" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
+        Preconditions.checkArgument( numberOfContainers > 0, "Number of containers must be greater than 0" );
+        Preconditions.checkNotNull( type );
+
+        this.name = name;
+        this.templateName = templateName;
+        this.numberOfContainers = numberOfContainers;
+        this.type = type;
+        this.sshGroupId = sshGroupId;
+        this.hostsGroupId = hostsGroupId;
+        this.peerId = peerId;
+        this.hostId = hostId;
+        this.containerPlacementStrategy = containerPlacementStrategy;
+        this.containerDistributionType = containerDistributionType;
+    }
 
 
     public NodeGroup( final String name, final String templateName, final int numberOfContainers, final int sshGroupId,
@@ -33,7 +76,8 @@ public class NodeGroup
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
         Preconditions.checkArgument( numberOfContainers > 0, "Number of containers must be greater than 0" );
         Preconditions.checkNotNull( containerPlacementStrategy, "Invalid container placement strategy" );
-
+        Preconditions.checkNotNull( type, "Container type could not be null" );
+        Preconditions.checkNotNull( peerId, "Peer could not be null" );
 
         this.name = name;
         this.templateName = templateName;
@@ -46,10 +90,16 @@ public class NodeGroup
     }
 
 
-    public NodeGroup( final String name, final String templateName, final ContainerType type,
-                      final int numberOfContainers, final int sshGroupId, final int hostsGroupId, final String peerId,
-                      final String hostId )
+    public NodeGroup( final String name, final String templateName, ContainerType type, final int numberOfContainers,
+                      final int sshGroupId, final int hostsGroupId, final String peerId, final String hostId )
     {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid node group name" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
+        Preconditions.checkArgument( numberOfContainers > 0, "Number of containers must be greater than 0" );
+        Preconditions.checkNotNull( type, "Container type could not be null" );
+        Preconditions.checkNotNull( peerId, "Peer could not be null" );
+        Preconditions.checkNotNull( hostId, "Host could not be null" );
+
         this.name = name;
         this.templateName = templateName;
         this.type = type;

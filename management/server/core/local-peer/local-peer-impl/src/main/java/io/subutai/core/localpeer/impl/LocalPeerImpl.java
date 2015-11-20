@@ -424,40 +424,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
     }
 
-
-    //    @RolesAllowed( "Environment-Management|A|Write" )
-    ////    @Override
-    //    private ContainerHost createContainer( final ResourceHost resourceHost, final Template template,
-    //                                          final String containerName )
-    //            throws PeerException
-    //    {
-    //        Preconditions.checkNotNull( resourceHost, "Resource host is null value" );
-    //        Preconditions.checkNotNull( template, "Pass valid template object" );
-    //        Preconditions
-    //                .checkArgument( !Strings.isNullOrEmpty( containerName ), "Cannot create container with null
-    // name" );
-    //
-    //        getResourceHostByName( resourceHost.getHostname() );
-    //
-    //        if ( templateRegistry.getTemplate( template.getTemplateName() ) == null )
-    //        {
-    //            throw new PeerException( String.format( "Template %s not registered", template.getTemplateName() ) );
-    //        }
-    //
-    //        try
-    //        {
-    //            final ContainerHost container =
-    //                    resourceHost.createContainer( template.getTemplateName(), containerName, 180 );
-    //            return container;
-    //        }
-    //        catch ( ResourceHostException e )
-    //        {
-    //            LOG.error( "Failed to create container", e );
-    //            throw new PeerException( e );
-    //        }
-    //    }
-
-
     protected ExecutorService getFixedPoolExecutor( int numOfThreads )
     {
         return Executors.newFixedThreadPool( numOfThreads );
