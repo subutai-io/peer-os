@@ -255,12 +255,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         return environment;
     }
 
-    //
-    //    private void validateBlueprint( final Blueprint blueprint ) throws EnvironmentCreationException
-    //    {
-    //        calculateCidr( blueprint );
-    //    }
-
 
     private String calculateCidr( final Blueprint blueprint ) throws EnvironmentCreationException
     {

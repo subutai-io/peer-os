@@ -88,9 +88,9 @@ public interface LocalPeer extends Peer
      * @param template - source template from which to clone container
      * @param containerName - container name
      */
-    public ContainerHost createContainer( final ResourceHost resourceHost, final Template template,
-                                          final String containerName, final ContainerQuota containerQuota )
-            throws PeerException;
+//    public ContainerHost createContainer( final ResourceHost resourceHost, final Template template,
+//                                          final String containerName, final ContainerQuota containerQuota )
+//            throws PeerException;
 
 
     /**

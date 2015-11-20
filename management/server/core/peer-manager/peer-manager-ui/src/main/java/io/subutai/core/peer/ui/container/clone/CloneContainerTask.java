@@ -31,17 +31,17 @@ public class CloneContainerTask implements Runnable
     @Override
     public void run()
     {
-        try
-        {
-            cloner.updateContainerStatus( containerName, CloneResultType.START );
-
-            localPeer.createContainer( resourceHost, template, containerName,
-                    localPeer.getDefaultQuota( ContainerType.SMALL ) ).getHostname();
-            cloner.updateContainerStatus( containerName, CloneResultType.SUCCESS );
-        }
-        catch ( PeerException e )
-        {
-            cloner.updateContainerStatus( containerName, CloneResultType.FAIL );
-        }
+//        try
+//        {
+//            cloner.updateContainerStatus( containerName, CloneResultType.START );
+//
+//            localPeer.createContainer( resourceHost, template, containerName,
+//                    localPeer.getDefaultQuota( ContainerType.SMALL ) ).getHostname();
+//            cloner.updateContainerStatus( containerName, CloneResultType.SUCCESS );
+//        }
+//        catch ( PeerException e )
+//        {
+//            cloner.updateContainerStatus( containerName, CloneResultType.FAIL );
+//        }
     }
 }
