@@ -27,9 +27,11 @@
 					</td>
 					<td>{{ blueprint.name }}</td>
 					<td>
-						<a class="b-tags b-tags_{{ blueprintsViewCtrl.colors[nodeGroup.type] }}" href ng-repeat="nodeGroup in blueprint.nodeGroups">
+						<span 
+							class="b-tags b-tags_{{ blueprintsViewCtrl.colors[nodeGroup.type] }}" 
+							ng-repeat="nodeGroup in blueprint.nodeGroups">
 							{{ nodeGroup.name }}: {{ nodeGroup.numberOfContainers }}
-						</a>
+						</span>
 					</td>
 					<td class="b-main-table__controls">
 						<a ui-sref="blueprintsActions({ blueprintId: blueprint.id, action: 'build' })" 

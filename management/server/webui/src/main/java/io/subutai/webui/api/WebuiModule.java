@@ -5,5 +5,7 @@ public interface WebuiModule
 {
     String getName();
 
+    String getModuleInfo();
+
     String getAngularDependecyList();
 }

@@ -3,32 +3,62 @@
 angular.module('subutai.containers.controller', [])
 	.controller('ContainerViewCtrl', ContainerViewCtrl);
 
-ContainerViewCtrl.$inject = ['$scope', 'environmentService', 'SweetAlert', 'DTOptionsBuilder', 'DTColumnDefBuilder'];
+ContainerViewCtrl.$inject = ['$scope', 'environmentService', 'SweetAlert', 'DTOptionsBuilder', 'DTColumnDefBuilder', '$stateParams'];
 
-function ContainerViewCtrl($scope, environmentService, SweetAlert, DTOptionsBuilder, DTColumnDefBuilder) {
+function ContainerViewCtrl($scope, environmentService, SweetAlert, DTOptionsBuilder, DTColumnDefBuilder, $stateParams) {
 
 	var vm = this;
 	vm.environments = [];
 	vm.containers = [];
+	vm.containersType = [];
+	vm.environmentId = $stateParams.environmentId;
 
 	// functions
 	vm.getContainers = getContainers;
 	vm.containerAction = containerAction;
 	vm.destroyContainer = destroyContainer;
 
-	function getContainers() {
+	environmentService.getContainersType().success(function (data) {
+		vm.containersType = data;
+	});
+
+	function getEnvironments() {
 		environmentService.getEnvironments().success(function (data) {
 			vm.environments = data;
-			vm.containers = [];
-			for(var i in vm.environments) {
-				for(var j in vm.environments[i].containers) {
-					vm.containers.push(vm.environments[i].containers[j]);
-				}
-			}
 		});
 	}
 
+	function getContainers() {
+		vm.containers = [];
+		if(vm.environments.length < 1){
+			environmentService.getEnvironments().success(function (data) {
+				vm.environments = data;
+				filterContainersList();
+			});
+		} else {
+			filterContainersList();
+		}
+	}
 	getContainers();
+
+	function filterContainersList() {
+		for(var i in vm.environments) {
+			if(
+				vm.environmentId == vm.environments[i].id || 
+				vm.environmentId === undefined || 
+				vm.environmentId.length == 0
+			) {
+				for(var j in vm.environments[i].containers) {
+					if(
+						vm.containersTypeId === undefined || 
+						vm.containersTypeId == vm.environments[i].containers[j].type
+					) {
+						vm.containers.push(vm.environments[i].containers[j]);
+					}
+				}
+			}
+		}
+	}
 
 	vm.dtOptions = DTOptionsBuilder
 		.newOptions()

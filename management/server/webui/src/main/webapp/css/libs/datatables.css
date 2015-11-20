@@ -19,7 +19,7 @@ table.dataTable {
 	clear: both;
 	border-collapse: separate;
 	border-spacing: 0;
-	border: 1px solid #e9edf6;	
+	border: 1px solid #dcdcdc;	
 	border-radius: 5px;
 	/*
 	 * Header and footer styles
@@ -34,11 +34,12 @@ table.dataTable tfoot th {
 }
 table.dataTable thead th,
 table.dataTable thead td {
-	padding: 10px 18px;
+	padding: 18px 18px;
 	background-color: #f1f4f8;
 	font-size: 13px;
 	color: #19286e;
-	text-align: left;  
+	text-align: left; 
+	border-bottom: 1px solid #dcdcdc;
 }
 table.dataTable thead th:active,
 table.dataTable thead td:active {
@@ -79,7 +80,10 @@ table.dataTable thead .sorting_desc {
 			background-image: url("DataTables-1.10.10/images/sort_desc_disabled.png");
 		}
 		table.dataTable tbody tr {
-			border-bottom: 1px solid #e9edf6;
+			border-bottom: 1px solid #dcdcdc;
+		}
+		table.dataTable thead tr {
+			border-bottom: 1px solid #dcdcdc;
 		}
 		table.dataTable tbody tr:hover {
 			background-color: #fbfbfb;
@@ -95,7 +99,7 @@ table.dataTable thead .sorting_desc {
 			font-size: 13px;
 			color: #19286e;
 			text-align: left;
-			padding: 10px 18px;
+			padding: 18px 18px;
 		}
 
 		table.dataTable tbody td .b-icon_edit {

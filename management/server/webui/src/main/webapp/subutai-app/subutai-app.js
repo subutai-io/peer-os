@@ -1,5 +1,6 @@
 var app = angular.module("subutai-app", [
 	'ui.router',
+	'ngCookies',
 	'ngResource',
 	'oc.lazyLoad',
 	'oitozero.ngSweetAlert',
@@ -10,7 +11,7 @@ var app = angular.module("subutai-app", [
 	.run(startup);
 
 routesConf.$inject = ['$stateProvider', '$urlRouterProvider', '$ocLazyLoadProvider'];
-startup.$inject = ['$rootScope', '$state'];
+startup.$inject = ['$rootScope', '$state', '$cookieStore', '$location', '$http'];
 
 function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 
@@ -21,6 +22,24 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 	});
 
 	$stateProvider
+	.state("login", {
+		url: "/login",
+		templateUrl: "subutai-app/login/partials/view.html",
+		resolve: {
+			loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+				return $ocLazyLoad.load([
+					{
+						name: 'subutai.login',
+						files: [
+							'subutai-app/login/login.js',
+							'subutai-app/login/controller.js',
+							'subutai-app/login/service.js'
+						]
+					}
+				])
+			}]
+		}
+	})
 	.state("home", {
 		url: "",
 		templateUrl: "subutai-app/home/partials/view.html"
@@ -88,7 +107,7 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 		}
 	})
 	.state("containers", {
-		url: "/containers",
+		url: "/containers/{environmentId}",
 		templateUrl: "subutai-app/containers/partials/view.html",
 		resolve: {
 			loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
@@ -178,10 +197,83 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 			}]
 		}
 	})
+	.state("tokens", {
+		url: "/tokens",
+		templateUrl: "subutai-app/tokens/partials/view.html",
+		resolve: {
+			loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+				return $ocLazyLoad.load([
+						{
+							name: 'subutai.tokens',
+							files: [
+								'subutai-app/tokens/tokens.js',
+								'subutai-app/tokens/controller.js',
+								'subutai-app/identity/service.js'
+							]
+						}
+				]);
+			}]
+		}
+	})
+	.state("console", {
+		url: "/console",
+		templateUrl: "subutai-app/console/partials/view.html",
+		resolve: {
+			loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+				return $ocLazyLoad.load([
+					{
+						name: 'vtortola.ng-terminal',
+						files: [
+							'assets/js/plugins/vtortola.ng-terminal.js'
+						]
+					},
+					{
+						name: 'subutai.console',
+						files: [
+							'subutai-app/console/console.js',
+							'subutai-app/console/controller.js',
+							'subutai-app/console/service.js'
+						]
+					}
+				]);
+			}]
+		}
+	})
+	.state("cassandra", {
+		url: "/plugins/cassandra",
+		templateUrl: "subutai-app/plugins/cassandra/partials/view.html",
+		resolve: {
+			loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+				return $ocLazyLoad.load([
+						{
+							name: 'subutai.plugins.cassandra',
+							files: [
+								'subutai-app/plugins/cassandra/cassandra.js',
+								'subutai-app/plugins/cassandra/controller.js',
+								'subutai-app/plugins/cassandra/service.js'
+							]
+						}
+				]);
+			}]
+		}
+	})
+	.state("404", {
+		url: "/404",
+		template: "Not found"
+	})
 }
 
-function startup($rootScope, $state) {
+function startup($rootScope, $state, $cookieStore, $location, $http) {
+
+	//$rootScope.sptoken = $cookieStore.get('sptoken') || false;
+	$rootScope.sptoken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkNjI1YzA4MS0yY2VmLTRmNGEtYjkwYi04ZjIxNDU5NmE5YmQiLCJpc3MiOiJpby5zdWJ1dGFpIn0.tTN-sKSJMsrIJi29o9IL_zLMJ5mMbXFdYBWRPhc5TsU';
+	var restrictedPage = $.inArray($location.path(), ['/login']) === -1;
+	if (restrictedPage && !$rootScope.sptoken) {
+		$location.path('login');
+	}
+
 	$rootScope.$state = $state;
+	$http.defaults.headers.common['sptoken']= $rootScope.sptoken;
 }
 
 app.directive('dropdownMenu', function() {

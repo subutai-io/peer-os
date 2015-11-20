@@ -67,7 +67,7 @@ function EnvironmentViewCtrl($scope, environmentService, SweetAlert, DTOptionsBu
 		var containersHTML = '';
 		for(var i = 0; i < data.containers.length; i++) {
 			containersHTML += '<span class="b-tags b-tags_' + quotaColors[data.containers[i].type] + '">' 
-				+ data.containers[i].templateName 
+				+ '<a ui-sref="containers({environmentId:\'' + data.id + '\'})">' + data.containers[i].templateName + '</a>' 
 				+ ' <a href ng-click="environmentViewCtrl.destroyContainer(\'' + data.containers[i].id + '\')"><i class="fa fa-times"></i></a>' 
 			+ '</span>';
 		}

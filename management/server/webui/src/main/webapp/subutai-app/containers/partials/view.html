@@ -5,6 +5,40 @@
 	</div>
 
 	<div class="b-workspace__content">
+
+		<div class="b-main-form">
+			<div class="b-main-form__wrapper b-main-form__wrapper_margin-r">
+				<label class="b-popup-body-label b-popup-body-label_inline">
+					Environment
+				</label>
+				<select class="b-popup-body-input b-popup-body-input_min" 
+					ng-change="containerViewCtrl.getContainers()" 
+					ng-model="containerViewCtrl.environmentId">
+					<option 
+						ng-repeat="environment in containerViewCtrl.environments" 
+						value="{{ environment.id }}"
+						ng-selected="containerViewCtrl.environmentId == environment.id">
+						{{ environment.name }}
+					</option>
+				</select>
+				<div class="clear"></div>
+			</div>
+
+			<div class="b-main-form__wrapper b-main-form__wrapper_margin-r">
+				<label class="b-popup-body-label b-popup-body-label_inline">
+					Containers Type 
+				</label>
+				<select class="b-popup-body-input b-popup-body-input_min" 
+					ng-change="containerViewCtrl.getContainers()" 
+					ng-model="containerViewCtrl.containersTypeId">
+					<option ng-repeat="type in containerViewCtrl.containersType" value="{{ type }}">
+						{{ type }}
+					</option>
+				</select>
+				<div class="clear"></div>
+			</div>
+		</div>
+
 		<div class="b-data-table">
 			<table datatable="ng" ng-show="containerViewCtrl.containers.length > 0" 
 				dt-options="containerViewCtrl.dtOptions" 

@@ -12,8 +12,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import io.subutai.common.util.JsonUtil;
 
+import javax.ws.rs.FormParam;
 import javax.ws.rs.core.Response;
+
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,6 +33,10 @@ public class RestServiceImpl implements RestService
     {
         this.identityManager = identityManager;
     }
+
+
+
+    /** Users ***********************************************/
 
     @Override
     public Response getUsers()
@@ -50,7 +58,6 @@ public class RestServiceImpl implements RestService
                              final String password, final String email,
                              final String rolesJson, final Long userId )
     {
-        // @todo need to define the mandatory fields
         Preconditions.checkArgument( !Strings.isNullOrEmpty( username ), "username is missing" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( fullName ), "fullname is missing" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( email ), "email must be set" );
@@ -104,6 +111,9 @@ public class RestServiceImpl implements RestService
         return Response.ok().build();
     }
 
+
+
+    /** Roles ***********************************************/
 
     @Override
     public Response getRoles()
@@ -184,18 +194,122 @@ public class RestServiceImpl implements RestService
 
 
 
+    /** Permissions ***********************************************/
+
     @Override
     public Response getPermissions()
     {
-
         try
         {
             return Response.ok( jsonUtil.to(identityManager.getAllPermissions()) ).build();
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error getting permissions #getPermissions", e );
+            LOGGER.error( "Error receiving permissions", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
+    }
+
+
+
+    /** Tokens ***********************************************/
+
+    @Override
+    public Response getAllUserTokens()
+    {
+        try
+        {
+            List<UserTokenJson> list = identityManager.getAllUserTokens().stream().map( p -> new UserTokenJson(
+                    p.getUserId(),
+                    identityManager.getUser( p.getUserId() ).getUserName(),
+                    p.getToken(),
+                    p.getFullToken(),
+                    p.getType(),
+                    p.getHashAlgorithm(),
+                    p.getIssuer(),
+                    p.getValidDate()
+            ) ).collect( Collectors.toList() );
+
+            return Response.ok( JsonUtil.toJson( list ) ).build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error receiving user tokens", e );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response createUserToken( final Long userId, final String token, final Integer period )
+    {
+        try
+        {
+            Preconditions.checkNotNull( userId, "Invalid userId" );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( token ), "Invalid token" );
+            Preconditions.checkNotNull( period, "Invalid period" );
+
+            Date newDate = new Date( );
+            java.util.Calendar cal = Calendar.getInstance();
+            cal.setTime( newDate );
+            cal.add( Calendar.HOUR_OF_DAY, period );
+
+            identityManager.createUserToken( identityManager.getUser( userId ), token, null, "subutai.io", 2, cal.getTime() );
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error creating new user token", e );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+
+        return Response.ok().build();
+    }
+
+
+
+    @Override
+    public Response updateUserToken( final Long userId, final String token, final String newToken, final Integer period )
+    {
+        try
+        {
+            Preconditions.checkNotNull( userId, "Invalid userId" );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( token ), "Invalid token id to be replaced" );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( newToken ), "Invalid newToken" );
+            Preconditions.checkNotNull( period, "Invalid period" );
+
+            Date newDate = new Date( );
+            java.util.Calendar cal = Calendar.getInstance();
+            cal.setTime( newDate );
+            cal.add( Calendar.HOUR_OF_DAY, period );
+
+            identityManager.updateUserToken( token, identityManager.getUser( userId ), newToken, null, "issuer", 1, cal.getTime() );
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error updating user token", e );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+
+        return Response.ok().build();
+    }
+
+
+    @Override
+    public Response removeUserToken( final String tokenId )
+    {
+        try
+        {
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( tokenId ), "Invalid tokenId" );
+
+            identityManager.removeUserToken( tokenId );
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error updating new user token", e );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+
+
+        return Response.ok().build();
     }
 }

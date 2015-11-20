@@ -4,9 +4,9 @@ angular.module('subutai.environment.service', [])
 	.factory('environmentService', environmentService);
 
 
-environmentService.$inject = ['$http'];
+environmentService.$inject = ['$http', '$rootScope'];
 
-function environmentService($http) {
+function environmentService($http, $rootScope) {
 	var BASE_URL = serverUrl + 'environments_ui/';
 	var blueprintURL = BASE_URL + 'blueprints/';
 	var growBlueprintURL = BASE_URL + 'grow/';

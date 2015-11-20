@@ -426,6 +426,12 @@
       <classifier>classes</classifier>
     </dependency>
 
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>webui-impl</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
     <!--JMX-HTTP manager-->
     <dependency>
       <groupId>org.jolokia</groupId>

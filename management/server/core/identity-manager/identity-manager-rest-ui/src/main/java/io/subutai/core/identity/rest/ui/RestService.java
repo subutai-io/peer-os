@@ -7,13 +7,15 @@ import javax.ws.rs.core.Response;
 
 public interface RestService
 {
+    /** Users ***********************************************/
+
     @GET
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getUsers();
+    Response getUsers();
 
     @POST
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response saveUser( @FormParam( "username" ) String username,
+    Response saveUser( @FormParam( "username" ) String username,
                              @FormParam( "full_name" ) String fullName,
                              @FormParam( "password" ) String password,
                              @FormParam( "email" ) String email,
@@ -22,26 +24,61 @@ public interface RestService
 
     @DELETE
     @Path( "/{userId}" )
-    public Response deleteUser( @PathParam( "userId" ) Long userId );
+    Response deleteUser( @PathParam( "userId" ) Long userId );
+
+
+
+    /** Roles ***********************************************/
 
     @GET
     @Path( "roles" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getRoles();
+    Response getRoles();
 
     @POST
     @Path( "roles" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response saveRole( @FormParam( "rolename" ) String rolename,
+    Response saveRole( @FormParam( "rolename" ) String rolename,
                               @FormParam( "permission" ) String permissionJson,
                               @FormParam( "role_id" ) Long roleId );
 
     @DELETE
     @Path( "roles/{roleId}" )
-    public Response deleteRole( @PathParam( "roleId" ) Long roleName );
+    Response deleteRole( @PathParam( "roleId" ) Long roleName );
+
+
+
+    /** Permissions ***********************************************/
 
     @GET
     @Path( "permissions" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getPermissions();
+    Response getPermissions();
+
+
+    /** Tokens ***********************************************/
+
+    @GET
+    @Path( "users/tokens" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response getAllUserTokens();
+
+    @POST
+    @Path( "users/tokens" )
+    Response createUserToken( @FormParam( "userId" ) Long userId,
+                              @FormParam( "token" ) String token,
+                              @FormParam( "period" ) Integer period );
+
+    @PUT
+    @Path( "users/tokens" )
+    Response updateUserToken( @FormParam( "userId" ) Long userId,
+                              @FormParam( "token" ) String token,
+                              @FormParam( "newToken" ) String newToken,
+                              @FormParam( "period" ) Integer period );
+
+
+    @DELETE
+    @Path( "users/tokens/{tokenId}" )
+    Response removeUserToken( @PathParam( "tokenId" ) String tokenId );
+
 }

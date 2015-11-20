@@ -106,6 +106,7 @@ function CreateBlueprintCtrl($scope, environmentService, ngDialog) {
 		if(vm.nodeStatus == 'Add to') {
 			var tempNode = vm.blueprintFrom.currentNode;
 
+			if(tempNode === undefined) return;
 			if(tempNode.name === undefined || tempNode.name.length < 1) return;
 			if(tempNode.numberOfContainers === undefined || tempNode.numberOfContainers < 1) return;
 			if(tempNode.sshGroupId === undefined) return;
@@ -115,7 +116,7 @@ function CreateBlueprintCtrl($scope, environmentService, ngDialog) {
 		} else {
 			vm.nodeStatus = 'Add to';
 		}
-		vm.blueprintFrom.currentNode = getDefaultValues;
+		vm.blueprintFrom.currentNode = getDefaultValues();
 	}
 
 	function setNodeData(key) {
