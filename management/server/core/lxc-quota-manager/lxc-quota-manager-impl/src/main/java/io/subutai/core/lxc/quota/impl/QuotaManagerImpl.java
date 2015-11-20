@@ -1,6 +1,8 @@
 package io.subutai.core.lxc.quota.impl;
 
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
@@ -17,6 +19,8 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.ContainerQuota;
+import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.quota.CpuQuotaInfo;
 import io.subutai.common.quota.DiskPartition;
 import io.subutai.common.quota.DiskQuota;
@@ -69,6 +73,30 @@ public class QuotaManagerImpl implements QuotaManager
         {
             LOGGER.error( "Error in setQuota", e );
             throw new QuotaException( "Error setting quota value for command: " + cmd, e );
+        }
+    }
+
+
+    @Override
+    public void setQuota( final String containerName, final ContainerQuota quota ) throws QuotaException
+    {
+        Preconditions.checkNotNull( containerName );
+
+        QuotaCommandHelper quotaCommandHelper = new QuotaCommandHelper( containerName, quota );
+        try
+        {
+            ResourceHost resourceHost = peerManager.getLocalPeer().getResourceHostByContainerName( containerName );
+
+            for ( String command : quotaCommandHelper.getQuotaSetCommands() )
+            {
+                RequestBuilder requestBuilder = new RequestBuilder( command ).withTimeout( 15 );
+
+                commandUtil.execute( requestBuilder, resourceHost );
+            }
+        }
+        catch ( CommandException | HostNotFoundException e )
+        {
+            throw new QuotaException( "Error on setting quota", e );
         }
     }
 
