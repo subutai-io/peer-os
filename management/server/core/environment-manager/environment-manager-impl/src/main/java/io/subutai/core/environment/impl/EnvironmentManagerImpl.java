@@ -2,7 +2,6 @@ package io.subutai.core.environment.impl;
 
 
 import java.security.AccessControlException;
-import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -43,7 +42,6 @@ import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
-import io.subutai.common.peer.PeerId;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.objects.PermissionOperation;
 import io.subutai.common.security.objects.PermissionScope;
@@ -204,13 +202,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         //        Preconditions.checkArgument( !Strings.isNullOrEmpty( blueprint.getCidr() ), "Invalid subnet CIDR" );
         Preconditions.checkArgument( !blueprint.getNodeGroups().isEmpty(), "Placement is empty" );
 
-        String cdir = calculateCdir( blueprint );
+        String cidr = calculateCidr( blueprint );
 
         String environmentId = UUID.randomUUID().toString();
-        Topology topology = buildTopology( environmentId, cdir, blueprint );
+        Topology topology = buildTopology( environmentId, cidr, blueprint );
 
         //create empty environment
-        final EnvironmentImpl environment = createEmptyEnvironment( blueprint.getName(), cdir, blueprint.getSshKey() );
+        final EnvironmentImpl environment = createEmptyEnvironment( blueprint.getName(), cidr, blueprint.getSshKey() );
 
         //create operation tracker
         TrackerOperation operationTracker = tracker.createTrackerOperation( TRACKER_SOURCE,
@@ -257,20 +255,21 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         return environment;
     }
 
+    //
+    //    private void validateBlueprint( final Blueprint blueprint ) throws EnvironmentCreationException
+    //    {
+    //        calculateCidr( blueprint );
+    //    }
 
-    private void validateBlueprint( final Blueprint blueprint ) throws EnvironmentCreationException
-    {
-        calculateCdir( blueprint );
-    }
 
-
-    private String calculateCdir( final Blueprint blueprint ) throws EnvironmentCreationException
+    private String calculateCidr( final Blueprint blueprint ) throws EnvironmentCreationException
     {
         Preconditions.checkNotNull( blueprint );
 
         try
         {
             Set<String> usedGateways = new HashSet<>();
+            usedGateways.addAll( getUsedGateways( peerManager.getLocalPeer() ) );
             for ( String peerId : blueprint.getNodeGroupsMap().keySet() )
             {
                 Peer peer = peerManager.getPeer( peerId );
@@ -288,6 +287,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                 if ( !usedGateways.contains( gw ) )
                 {
                     environmentGatewayIp = info.getCidrSignature();
+                    break;
                 }
             }
 
