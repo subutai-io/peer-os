@@ -4,6 +4,7 @@ package io.subutai.core.localpeer.impl.container;
 import java.util.concurrent.Callable;
 
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.ContainerQuota;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.NumUtil;
 import io.subutai.common.peer.ResourceHost;
@@ -21,11 +22,12 @@ public class CreateContainerWrapperTask implements Callable<ContainerHost>
     private final int vlan;
     private final String gateway;
     private final int timeoutSec;
+    private final ContainerQuota containerQuota;
 
 
     public CreateContainerWrapperTask( final ResourceHost resourceHost, final String templateName,
-                                       final String hostname, final String ip, final int vlan, final String gateway,
-                                       final int timeoutSec )
+                                       final String hostname, final ContainerQuota containerQuota, final String ip,
+                                       final int vlan, final String gateway, final int timeoutSec )
     {
         Preconditions.checkNotNull( resourceHost );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ) );
@@ -42,12 +44,13 @@ public class CreateContainerWrapperTask implements Callable<ContainerHost>
         this.vlan = vlan;
         this.gateway = gateway;
         this.timeoutSec = timeoutSec;
+        this.containerQuota = containerQuota;
     }
 
 
     @Override
     public ContainerHost call() throws Exception
     {
-        return resourceHost.createContainer( templateName, hostname, ip, vlan, gateway, timeoutSec );
+        return resourceHost.createContainer( templateName, hostname, containerQuota, ip, vlan, gateway, timeoutSec );
     }
 }
