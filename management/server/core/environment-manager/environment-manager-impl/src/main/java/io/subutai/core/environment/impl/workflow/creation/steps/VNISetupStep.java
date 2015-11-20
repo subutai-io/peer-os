@@ -72,6 +72,7 @@ public class VNISetupStep
         //calculate new vni
         long freeVni = findFreeVni( peers );
 
+        //TODO: add gateway to reserve vni
         Vni newVni = new Vni( freeVni, environment.getId() );
 
         //reserve new vni and create gateway
