@@ -36,7 +36,7 @@ public class Login extends HttpServlet
                 if( !Strings.isNullOrEmpty( token ) )
                 {
                     request.getSession().setAttribute( "userSessionData", token );
-                    Cookie cookie = new Cookie( "sptoken", token );
+                    Cookie cookie = new Cookie( "sptoken", "%22" + token + "%22" );
                     cookie.setMaxAge( 3600 * 3 );
                     response.addCookie( cookie );
                 }
@@ -45,7 +45,6 @@ public class Login extends HttpServlet
                     request.setAttribute( "error", "Wrong Username or Password !!!" );
                     response.getWriter().write( "Error, Wrong Username or Password" );
                     response.setStatus( HttpServletResponse.SC_UNAUTHORIZED );
-                }
             }
             catch ( NamingException e )
             {

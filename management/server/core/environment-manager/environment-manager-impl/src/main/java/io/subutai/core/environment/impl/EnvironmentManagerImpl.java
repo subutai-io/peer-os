@@ -2,7 +2,6 @@ package io.subutai.core.environment.impl;
 
 
 import java.security.AccessControlException;
-import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -31,6 +30,7 @@ import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.NodeGroup;
+import io.subutai.common.environment.PeerConf;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInfoModel;
@@ -69,13 +69,16 @@ import io.subutai.core.environment.impl.workflow.modification.SshKeyModification
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.network.api.NetworkManager;
+import io.subutai.core.peer.api.PeerAction;
+import io.subutai.core.peer.api.PeerActionListener;
+import io.subutai.core.peer.api.PeerActionResponse;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registry.api.TemplateRegistry;
 import io.subutai.core.tracker.api.Tracker;
 
 
 @PermitAll
-public class EnvironmentManagerImpl implements EnvironmentManager
+public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionListener
 {
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentManagerImpl.class );
 
@@ -199,13 +202,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager
         //        Preconditions.checkArgument( !Strings.isNullOrEmpty( blueprint.getCidr() ), "Invalid subnet CIDR" );
         Preconditions.checkArgument( !blueprint.getNodeGroups().isEmpty(), "Placement is empty" );
 
-        String cdir = calculateCdir( blueprint );
+        String cidr = calculateCidr( blueprint );
 
         String environmentId = UUID.randomUUID().toString();
-        Topology topology = buildTopology( environmentId, cdir, blueprint );
+        Topology topology = buildTopology( environmentId, cidr, blueprint );
 
         //create empty environment
-        final EnvironmentImpl environment = createEmptyEnvironment( blueprint.getName(), cdir, blueprint.getSshKey() );
+        final EnvironmentImpl environment = createEmptyEnvironment( blueprint.getName(), cidr, blueprint.getSshKey() );
 
         //create operation tracker
         TrackerOperation operationTracker = tracker.createTrackerOperation( TRACKER_SOURCE,
@@ -253,19 +256,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    private void validateBlueprint( final Blueprint blueprint ) throws EnvironmentCreationException
-    {
-        calculateCdir( blueprint );
-    }
-
-
-    private String calculateCdir( final Blueprint blueprint ) throws EnvironmentCreationException
+    private String calculateCidr( final Blueprint blueprint ) throws EnvironmentCreationException
     {
         Preconditions.checkNotNull( blueprint );
 
         try
         {
             Set<String> usedGateways = new HashSet<>();
+            usedGateways.addAll( getUsedGateways( peerManager.getLocalPeer() ) );
             for ( String peerId : blueprint.getNodeGroupsMap().keySet() )
             {
                 Peer peer = peerManager.getPeer( peerId );
@@ -283,6 +281,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                 if ( !usedGateways.contains( gw ) )
                 {
                     environmentGatewayIp = info.getCidrSignature();
+                    break;
                 }
             }
 
@@ -564,7 +563,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager
                 .isUserPermitted( activeUser, PermissionObject.EnvironmentManagement, PermissionScope.ALL_SCOPE,
                         PermissionOperation.Delete );
 
-        if (!( deleteAll || environment.getUserId().equals( activeUser.getId() ) ))
+        if ( !( deleteAll || environment.getUserId().equals( activeUser.getId() ) ) )
         {
             throw new AccessControlException( "You have not enough permissions." );
         }
@@ -1222,17 +1221,67 @@ public class EnvironmentManagerImpl implements EnvironmentManager
     }
 
 
-    public void init() throws SQLException
+    public void init()
     {
         this.blueprintDataService = new BlueprintDataService( daoManager );
         this.environmentDataService = new EnvironmentDataService( daoManager );
         this.environmentContainerDataService = new EnvironmentContainerDataService( daoManager );
+        peerManager.registerPeerActionListener( this );
     }
 
 
     public void dispose()
     {
         executor.shutdown();
+        peerManager.unregisterPeerActionListener( this );
+    }
+
+
+    @Override
+    public PeerActionResponse onPeerAction( final PeerAction peerAction )
+    {
+        Preconditions.checkNotNull( peerAction );
+
+        PeerActionResponse response = PeerActionResponse.Ok();
+        switch ( peerAction.getType() )
+        {
+            case REGISTER:
+                // it is ok
+                break;
+            case UNREGISTER:
+                if ( isPeerInUse( ( ( String ) peerAction.getData() ) ) )
+                {
+                    response = PeerActionResponse.Fail( "Peer in use." );
+                }
+
+                break;
+        }
+        return response;
+    }
+
+
+    private boolean isPeerInUse( String peerId )
+    {
+        boolean inUse = false;
+        for ( Iterator<EnvironmentImpl> i = environmentDataService.getAll().iterator(); !inUse && i.hasNext(); )
+        {
+            EnvironmentImpl e = i.next();
+            if ( e.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
+            {
+                inUse = true;
+                break;
+            }
+
+            for ( PeerConf p : e.getPeerConfs() )
+            {
+                if ( peerId.equals( p.getPeerId() ) )
+                {
+                    inUse = true;
+                    break;
+                }
+            }
+        }
+        return inUse;
     }
 
 

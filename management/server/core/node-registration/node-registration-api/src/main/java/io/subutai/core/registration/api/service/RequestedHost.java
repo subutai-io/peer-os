@@ -29,4 +29,6 @@ public interface RequestedHost
     public void setRestHook( String restHook );
 
     public String getSecret();
+
+    public String getCert();
 }

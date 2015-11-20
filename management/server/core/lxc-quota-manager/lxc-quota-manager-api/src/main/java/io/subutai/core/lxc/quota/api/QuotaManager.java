@@ -3,6 +3,7 @@ package io.subutai.core.lxc.quota.api;
 
 import java.util.Set;
 
+import io.subutai.common.peer.ContainerQuota;
 import io.subutai.common.quota.CpuQuotaInfo;
 import io.subutai.common.quota.DiskPartition;
 import io.subutai.common.quota.DiskQuota;
@@ -23,6 +24,12 @@ public interface QuotaManager
      * QuotaInfo - about quota information containing quota key and value in preformatted string values
      */
     public void setQuota( String containerName, QuotaInfo quota ) throws QuotaException;
+
+    /**
+     * Set Quota for container specified with parameters passed containerName - the target container to set quota on,
+     * ConatinerQuota - quota information
+     */
+    public void setQuota( String containerName, ContainerQuota quota ) throws QuotaException;
 
 
     /**

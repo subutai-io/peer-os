@@ -19,13 +19,14 @@ public class CreateEnvironmentContainerGroupRequest
     private final int ipAddressOffset;
     private final String templateName;
     private final ContainerDistributionType containerDistributionType;
+    private final ContainerType containerType;
 
 
     public CreateEnvironmentContainerGroupRequest( final String environmentId, final String initiatorPeerId,
                                                    final String ownerId, final String subnetCidr,
                                                    final int numberOfContainers, final String strategyId,
                                                    final List<Criteria> criteria, final int ipAddressOffset,
-                                                   final String templateName )
+                                                   final String templateName, final ContainerType containerType )
     {
         this.environmentId = environmentId;
         this.initiatorPeerId = initiatorPeerId;
@@ -38,13 +39,14 @@ public class CreateEnvironmentContainerGroupRequest
         this.templateName = templateName;
         this.containerDistributionType = ContainerDistributionType.AUTO;
         this.host = null;
+        this.containerType = containerType;
     }
 
 
     public CreateEnvironmentContainerGroupRequest( final String environmentId, final String initiatorPeerId,
                                                    final String ownerId, final String subnetCidr,
                                                    final int numberOfContainers, final int ipAddressOffset,
-                                                   final String templateName, String host )
+                                                   final String templateName, String host, ContainerType containerType )
     {
         this.environmentId = environmentId;
         this.initiatorPeerId = initiatorPeerId;
@@ -57,6 +59,7 @@ public class CreateEnvironmentContainerGroupRequest
         this.templateName = templateName;
         this.host = host;
         this.containerDistributionType = ContainerDistributionType.CUSTOM;
+        this.containerType = containerType;
     }
 
 
@@ -123,5 +126,11 @@ public class CreateEnvironmentContainerGroupRequest
     public ContainerDistributionType getContainerDistributionType()
     {
         return containerDistributionType;
+    }
+
+
+    public ContainerType getContainerType()
+    {
+        return containerType;
     }
 }

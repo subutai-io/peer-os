@@ -3,32 +3,21 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
-    <artifactId>broker</artifactId>
+    <artifactId>mgmt-server-core-parent</artifactId>
     <groupId>io.subutai</groupId>
     <version>4.0.0-RC3</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>broker-cli</artifactId>
-  <name>Broker CLI</name>
-  <description>Broker CLI</description>
+  <artifactId>test</artifactId>
+  <version>4.0.0-RC3</version>
   <packaging>bundle</packaging>
 
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>subutai-common</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>broker-api</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>${project.groupId}</groupId>
       <artifactId>cli-controller</artifactId>
     </dependency>
-
   </dependencies>
 
   <build>
@@ -38,7 +27,7 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.groupId}.core.broker.cli</Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.groupId}.core.test</Bundle-SymbolicName>
             <Export-Package>
               {local-packages};version=${project.version};-noimport:=true
             </Export-Package>

@@ -282,16 +282,26 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 }
 
 function startup($rootScope, $state, $cookieStore, $location, $http) {
-
-	//$rootScope.sptoken = $cookieStore.get('sptoken') || false;
-	$rootScope.sptoken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MjQ4ZGJhMi1iODc3LTQyYTAtOTBiMi0wMDA1YWUzNWZmMmIiLCJpc3MiOiJpby5zdWJ1dGFpIn0.nevrOmYGmLFGoPces9x1y9ZboCzfKZPssa0JiWjN6Kw';
+	$rootScope.sptoken = $cookieStore.get('sptoken') || false;
+	//$rootScope.sptoken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MjQ4ZGJhMi1iODc3LTQyYTAtOTBiMi0wMDA1YWUzNWZmMmIiLCJpc3MiOiJpby5zdWJ1dGFpIn0.nevrOmYGmLFGoPces9x1y9ZboCzfKZPssa0JiWjN6Kw';
 	var restrictedPage = $.inArray($location.path(), ['/login']) === -1;
 	if (restrictedPage && !$rootScope.sptoken) {
 		$location.path('login');
 	}
 
+	$rootScope.$on('$stateChangeStart',
+		function(event, toState, toParams, fromState, fromParams){
+			if( $cookieStore.get('sptoken') )
+			{
+				$http.defaults.headers.common['sptoken'] = $cookieStore.get('sptoken');
+			}
+			else
+			{
+				$location.path('login');
+			}
+		});
+
 	$rootScope.$state = $state;
-	$http.defaults.headers.common['sptoken']= $rootScope.sptoken;
 }
 
 app.directive('dropdownMenu', function() {
@@ -328,7 +338,7 @@ app.directive('dropdownMenu', function() {
 });
 
 //Global variables
-var serverUrl = 'http://172.16.131.205:8181/rest/';
+var serverUrl = '/rest/';
 quotaColors = [];
 quotaColors['CUSTOM'] = 'blue';
 quotaColors['HUGE'] = 'bark-red';
