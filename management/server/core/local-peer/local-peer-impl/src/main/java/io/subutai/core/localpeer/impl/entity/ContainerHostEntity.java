@@ -9,6 +9,8 @@ import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -18,6 +20,7 @@ import javax.persistence.Transient;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
+import io.subutai.common.environment.ContainerType;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInfo;
@@ -61,6 +64,10 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
 
     @Column( name = "owner_id", nullable = true )
     private String ownerId;
+
+    @Column( name = "container_type", nullable = true )
+    @Enumerated( EnumType.STRING )
+    private ContainerType containerType = ContainerType.SMALL;
 
     @ElementCollection( targetClass = String.class, fetch = FetchType.EAGER )
     private Set<String> tags = new HashSet<>();

@@ -89,22 +89,31 @@ public class CommandProcess
     public void processResponse( final Response response )
     {
         final CommandProcess THIS = this;
-        Subject.doAs( user.getSubject(), new PrivilegedAction<Void>()
+        if ( user != null )
         {
-            @Override
-            public Void run()
+
+            Subject.doAs( user.getSubject(), new PrivilegedAction<Void>()
             {
-                try
+                @Override
+                public Void run()
                 {
-                    executor.execute( new ResponseProcessor( response, THIS, commandProcessor ) );
+                    try
+                    {
+                        executor.execute( new ResponseProcessor( response, THIS, commandProcessor ) );
+                    }
+                    catch ( Exception e )
+                    {
+                        LOG.error( "Error in processResponse", e );
+                    }
+                    return null;
                 }
-                catch ( Exception e )
-                {
-                    LOG.error( "Error in processResponse", e );
-                }
-                return null;
-            }
-        } );
+            } );
+        }
+        else
+        {
+            //TODO: check user
+            executor.execute( new ResponseProcessor( response, THIS, commandProcessor ) );
+        }
     }
 
 

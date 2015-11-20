@@ -1,6 +1,7 @@
 package io.subutai.core.peer.ui.container.clone;
 
 
+import io.subutai.common.environment.ContainerType;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.peer.LocalPeer;
@@ -33,7 +34,9 @@ public class CloneContainerTask implements Runnable
         try
         {
             cloner.updateContainerStatus( containerName, CloneResultType.START );
-            localPeer.createContainer( resourceHost, template, containerName ).getHostname();
+
+            localPeer.createContainer( resourceHost, template, containerName,
+                    localPeer.getDefaultQuota( ContainerType.SMALL ) ).getHostname();
             cloner.updateContainerStatus( containerName, CloneResultType.SUCCESS );
         }
         catch ( PeerException e )
