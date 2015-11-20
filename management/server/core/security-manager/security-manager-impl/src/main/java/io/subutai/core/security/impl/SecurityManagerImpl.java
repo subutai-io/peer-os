@@ -38,13 +38,14 @@ public class SecurityManagerImpl implements SecurityManager
     private KeyStoreManager keyStoreManager = null;
     private CertificateManager certificateManager = null;
     private HttpContextManager httpContextManager;
+    private Object provider;
 
 
     /* *****************************
      *
      */
     public SecurityManagerImpl( String ownerPublicKeyringFile, String secretKeyringFile, String publicKeyringFile,
-                                String secretKeyringPwd )
+                                String secretKeyringPwd, Object provider )
     {
         keyData = new SecurityKeyData();
 

@@ -1,8 +1,11 @@
 package io.subutai.core.security.api.dao;
 
 
+import java.util.List;
+
 import io.subutai.core.security.api.model.SecretKeyStore;
 import io.subutai.core.security.api.model.SecurityKeyIdentity;
+import io.subutai.core.security.api.model.SecurityKeyTrust;
 
 
 /**
@@ -47,8 +50,13 @@ public interface SecurityDataService
     void removeSecretKeyData( String fingerprint );
 
 
-    /******************************************
-     *
-     */
-    String getSecretKeyFingerprint( String hostId );
+    void saveKeyTrustData( String sourceId, String targetId, int trustLevel );
+
+    void removeKeyTrustData( long id );
+
+    void removeKeyTrustData( String sourceId );
+
+    SecurityKeyTrust getKeyTrustData( long id );
+
+    List<SecurityKeyTrust> getKeyTrustData( String sourceId );
 }

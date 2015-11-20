@@ -3,6 +3,7 @@ package io.subutai.core.security.impl.crypto;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.security.AccessControlException;
 import java.util.Objects;
 
 import javax.ws.rs.core.MediaType;
@@ -30,6 +31,7 @@ import io.subutai.common.util.RestUtil;
 import io.subutai.core.keyserver.api.KeyServer;
 import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.security.api.dao.SecurityDataService;
+import io.subutai.core.security.api.model.SecurityKeyIdentity;
 import io.subutai.core.security.impl.model.SecurityKeyData;
 
 
@@ -48,7 +50,8 @@ public class KeyManagerImpl implements KeyManager
     /* *****************************
      *
      */
-    public KeyManagerImpl( SecurityDataService securityDataService, KeyServer keyServer, SecurityKeyData securityKeyData)
+    public KeyManagerImpl( SecurityDataService securityDataService, KeyServer keyServer,
+                           SecurityKeyData securityKeyData )
     {
         this.keyData = securityKeyData;
         this.securityDataService = securityDataService;
@@ -68,8 +71,8 @@ public class KeyManagerImpl implements KeyManager
 
 
             InputStream ownerPubStream = PGPEncryptionUtil.getFileInputStream( keyData.getOwnerPublicKeyringFile() );
-            InputStream peerPubStream  = PGPEncryptionUtil.getFileInputStream( keyData.getPublicKeyringFile() );
-            InputStream peerSecStream  = PGPEncryptionUtil.getFileInputStream( keyData.getSecretKeyringFile() );
+            InputStream peerPubStream = PGPEncryptionUtil.getFileInputStream( keyData.getPublicKeyringFile() );
+            InputStream peerSecStream = PGPEncryptionUtil.getFileInputStream( keyData.getSecretKeyringFile() );
 
             if ( ownerPubStream == null || peerPubStream == null || peerSecStream == null )
             {
@@ -185,8 +188,10 @@ public class KeyManagerImpl implements KeyManager
                 // Store public key in the KeyServer
                 keyServer.addPublicKey( publicKeyRing );
 
+                //*************************
                 String fingerprint = PGPKeyUtil.getFingerprint( publicKey.getFingerprint() );
                 securityDataService.saveKeyIdentityData( hostId, "", fingerprint, type );
+                //*************************
             }
         }
         catch ( Exception ex )
@@ -229,13 +234,21 @@ public class KeyManagerImpl implements KeyManager
         {
             if ( !Objects.equals( hostId, keyData.getManHostId() ) )
             {
-                //String fingerprint = securityDataService.getKeyIdentityData( hostId ).getSecretKeyFingerprint();
-                //securityDataService.removeSecretKeyRing( fingerprint );
+                SecurityKeyIdentity keyIden = securityDataService.getKeyIdentityData( hostId );
+
+                if ( keyIden != null )
+                {
+                    securityDataService.removeSecretKeyData( keyIden.getSecretKeyFingerprint() );
+                }
+            }
+            else
+            {
+                throw new AccessControlException( " ***** Error!Management Keys cannot be removed ****" );
             }
         }
         catch ( Exception ex )
         {
-            LOG.error( "Error removing Public key:" + ex.toString() );
+            LOG.error( "Error removing Secret key:" + ex.toString() );
         }
     }
 
@@ -282,16 +295,15 @@ public class KeyManagerImpl implements KeyManager
 
         try
         {
-            String fingerprint = securityManagerDAO.getPublicKeyFingerprint( hostId );
+            SecurityKeyIdentity keyIden = securityDataService.getKeyIdentityData( hostId );
 
-            if ( Strings.isNullOrEmpty( fingerprint ) )
+            if ( keyIden == null )
             {
                 LOG.error( "Error !Public key not found :" );
                 return "";
             }
-            else
             {
-                byte[] keyData = keyServer.getPublicKeyByFingerprint( fingerprint ).getKeyData();
+                byte[] keyData = keyServer.getPublicKeyByFingerprint( keyIden.getPublicKeyFingerprint() ).getKeyData();
 
                 return PGPEncryptionUtil.armorByteArrayToString( keyData );
             }
@@ -319,13 +331,21 @@ public class KeyManagerImpl implements KeyManager
 
         try
         {
-            String fingerprint = securityManagerDAO.getPublicKeyFingerprint( hostId );
+            SecurityKeyIdentity keyIden = securityDataService.getKeyIdentityData( hostId );
 
-            byte[] keyData = keyServer.getPublicKeyByFingerprint( fingerprint ).getKeyData();
+            if ( keyIden == null )
+            {
+                throw new NullPointerException( "***** Error! Key Identity not found." );
+            }
+            else
+            {
 
-            publicKeyRing = PGPKeyUtil.readPublicKeyRing( keyData );
+                byte[] keyData = keyServer.getPublicKeyByFingerprint( keyIden.getPublicKeyFingerprint() ).getKeyData();
 
-            return publicKeyRing;
+                publicKeyRing = PGPKeyUtil.readPublicKeyRing( keyData );
+
+                return publicKeyRing;
+            }
         }
         catch ( Exception ex )
         {
@@ -346,7 +366,8 @@ public class KeyManagerImpl implements KeyManager
 
         try
         {
-            return securityManagerDAO.getPublicKeyFingerprint( hostId );
+            SecurityKeyIdentity keyIden = securityDataService.getKeyIdentityData( hostId );
+            return keyIden.getPublicKeyFingerprint();
         }
         catch ( Exception ex )
         {
@@ -370,17 +391,18 @@ public class KeyManagerImpl implements KeyManager
         try
         {
             PGPSecretKeyRing secretKeyRing;
-            String fingerprint = securityManagerDAO.getSecretKeyFingerprint( hostId );
+            SecurityKeyIdentity keyIden = securityDataService.getKeyIdentityData( hostId );
 
-            if ( Strings.isNullOrEmpty( fingerprint ) )
+            if ( keyIden == null )
             {
-                LOG.error( "Object not found with fprint:" + fingerprint );
+                LOG.error( " **** Error! Identity Info not found for host:" + hostId );
                 return null;
             }
             else
             {
-                secretKeyRing =
-                        PGPKeyUtil.readSecretKeyRing( secretKeyStoreDAO.getSecretKeyData( fingerprint ).getData() );
+                String fingerprint = keyIden.getSecretKeyFingerprint();
+                secretKeyRing = PGPKeyUtil.readSecretKeyRing(
+                        securityDataService.getSecretKeyData( fingerprint ).getData() );
 
                 if ( secretKeyRing != null )
                 {
@@ -388,14 +410,14 @@ public class KeyManagerImpl implements KeyManager
                 }
                 else
                 {
-                    LOG.error( "Object not found with fprint:" + fingerprint );
+                    LOG.error( " **** Error! Object not found with fprint:" + fingerprint );
                     return null;
                 }
             }
         }
         catch ( Exception ex )
         {
-            LOG.error( "Error getting Secret key:" + ex.toString(), ex );
+            LOG.error( " **** Error getting Secret key:" + ex.toString(), ex );
             return null;
         }
     }
@@ -414,9 +436,17 @@ public class KeyManagerImpl implements KeyManager
 
         try
         {
-            String fingerprint = securityDataService.getSecretKeyFingerprint( hostId );
-            return PGPKeyUtil
-                    .readSecretKeyRingInputStream( secretKeyStoreDAO.getSecretKeyData( fingerprint ).getData() );
+            SecurityKeyIdentity keyIden = securityDataService.getKeyIdentityData( hostId );
+
+            if ( keyIden != null )
+            {
+                return PGPKeyUtil.readSecretKeyRingInputStream(
+                        securityDataService.getSecretKeyData( keyIden.getSecretKeyFingerprint() ).getData() );
+            }
+            else
+            {
+                return null;
+            }
         }
         catch ( Exception ex )
         {
@@ -505,7 +535,7 @@ public class KeyManagerImpl implements KeyManager
         try
         {
             ByteArrayInputStream barIn =
-                    new ByteArrayInputStream( secretKeyStoreDAO.getSecretKeyData( fingerprint ).getData() );
+                    new ByteArrayInputStream( securityDataService.getSecretKeyData( fingerprint ).getData() );
 
             secretKey = PGPEncryptionUtil.findSecretKeyByFingerprint( barIn, fingerprint );
         }
@@ -610,7 +640,7 @@ public class KeyManagerImpl implements KeyManager
             if ( pubRing == null ) // Get from HTTP
             {
                 String baseUrl = String.format( "https://%s:%s/rest/v1", ip, ChannelSettings.SECURE_PORT_X1 );
-                WebClient client = RestUtil.createTrustedWebClient( baseUrl, provider );
+                WebClient client = RestUtil.createTrustedWebClient( baseUrl, keyData.getJsonProvider() );
                 client.type( MediaType.MULTIPART_FORM_DATA ).accept( MediaType.APPLICATION_JSON );
 
                 Response response =
@@ -645,7 +675,7 @@ public class KeyManagerImpl implements KeyManager
         String peerId = "";
 
         String baseUrl = String.format( "https://%s:%s/rest/v1/peer", ip, ChannelSettings.SECURE_PORT_X1 );
-        WebClient clientPeerId = RestUtil.createTrustedWebClient( baseUrl, provider );
+        WebClient clientPeerId = RestUtil.createTrustedWebClient( baseUrl, keyData.getJsonProvider() );
         clientPeerId.type( MediaType.APPLICATION_JSON ).accept( MediaType.APPLICATION_JSON );
         PeerInfo peerInfo = clientPeerId.path( "/info" ).get( PeerInfo.class );
 

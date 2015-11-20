@@ -123,7 +123,7 @@ class SecurityKeyTrustDAO
     /******************************************
      *
      */
-    public void remove( String hostId )
+    public void remove( long id )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
 
@@ -131,8 +131,35 @@ class SecurityKeyTrustDAO
         {
             daoManager.startTransaction( em );
 
-            Query qr = em.createQuery( "delete from SecurityKeyTrustEntity AS ss where ss.hostId=:hostId" );
-            qr.setParameter( "hostId",hostId );
+            Query qr = em.createQuery( "delete from SecurityKeyTrustEntity AS ss where ss.id=:id" );
+            qr.setParameter( "id",id );
+            qr.executeUpdate();
+
+            daoManager.commitTransaction( em );
+        }
+        catch ( Exception ex )
+        {
+            daoManager.rollBackTransaction( em );
+        }
+        finally
+        {
+            daoManager.closeEntityManager( em );
+        }
+    }
+
+    /******************************************
+     *
+     */
+    public void removeBySourceId( String sourceId)
+    {
+        EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
+
+        try
+        {
+            daoManager.startTransaction( em );
+
+            Query qr = em.createQuery( "delete from SecurityKeyTrustEntity AS ss where ss.sourceId=:sourceId" );
+            qr.setParameter( "sourceId",sourceId );
             qr.executeUpdate();
 
             daoManager.commitTransaction( em );
