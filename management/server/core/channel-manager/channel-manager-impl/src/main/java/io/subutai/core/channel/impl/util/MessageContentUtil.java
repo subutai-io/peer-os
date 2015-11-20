@@ -110,7 +110,7 @@ public class MessageContentUtil
             }
             else
             {
-                LOG.warn( "Decrypted data is NULL!!!" );
+                LOG.debug( "Decrypted data is NULL!!!" );
             }
         }
         catch ( IOException e )
