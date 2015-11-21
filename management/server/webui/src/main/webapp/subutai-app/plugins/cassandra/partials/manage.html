@@ -72,7 +72,10 @@
 					</span>
 				</td>
 				<td class="b-main-table__container-status">
-					<div class="b-status-icon b-status-icon_RUNNING" title="RUNNING"></div>
+					<div 
+						class="b-status-icon b-status-icon_{{ cassandraCtrl.currentCluster.nodeStatuses[clusterNode] }}" 
+						title="RUNNING">
+					</div>
 				</td>
 				<td>
 					<a href ng-click="cassandraCtrl.deleteNode(clusterNode)" class="b-icon b-icon_remove"></a>

@@ -323,7 +323,7 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 
 function startup($rootScope, $state, $location, $http) {
 
-	//document.cookie="sptoken=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1YjhmMDk0NS03NTIxLTQ4NjEtODM4Yi00MzJkZmFjNzZkODkiLCJpc3MiOiJpby5zdWJ1dGFpIn0.UczlX6i2srUvARGGMs8Z12Yy9hMVi1t2YPtHexV5kB8";
+	//document.cookie="sptoken=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMWVkYzVmNy1iYTg0LTQ2ZjItOWUzNi1lYzYzODFlMjIzZDEiLCJpc3MiOiJpby5zdWJ1dGFpIn0.2W1VOowPf36mw-hI_ew-R-KUB3jUbQ4fNVk5M35S1JU";
 	$rootScope.$on('$stateChangeStart',	function(event, toState, toParams, fromState, fromParams){
 		var restrictedPage = $.inArray($location.path(), ['/login']) === -1;
 		if (restrictedPage && !getCookie('sptoken')) {
@@ -396,8 +396,8 @@ app.directive('checkbox-list-dropdown', function() {
 });
 
 //Global variables
-var serverUrl = '/rest/';
-//var serverUrl = 'http://172.16.131.205:8181/rest/';
+//var serverUrl = '/rest/';
+var serverUrl = 'http://172.16.131.205:8181/rest/';
 quotaColors = [];
 quotaColors['CUSTOM'] = 'blue';
 quotaColors['HUGE'] = 'bark-red';

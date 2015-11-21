@@ -9,7 +9,12 @@ function PluginsCtrl(PluginsSrv) {
 	var vm = this;
 	vm.plugins = [];
 
-	PluginsSrv.getPlugins().success(function(data) {
-		vm.plugins.push(data);
-	});
+	function getPlugins() {
+		try {
+			PluginsSrv.getPlugins().success(function(data) {
+				vm.plugins = data;
+			});
+		} catch(e) {}
+	}
+	getPlugins();
 }
