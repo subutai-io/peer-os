@@ -5,7 +5,7 @@
   <parent>
     <groupId>io.subutai</groupId>
     <artifactId>mgmt-server-parent</artifactId>
-    <version>4.0.0-RC3</version>
+    <version>4.0.0-RC4</version>
   </parent>
 
   <artifactId>subutai</artifactId>
@@ -159,7 +159,7 @@
                 <artifactItem>
                   <groupId>${project.groupId}</groupId>
                   <artifactId>webui</artifactId>
-                  <destFileName>webui-4.0.0-RC3.war</destFileName>
+                  <destFileName>webui-4.0.0-RC4.war</destFileName>
                   <outputDirectory>target/assembly/deploy</outputDirectory>
                   <type>war</type>
                 </artifactItem>
