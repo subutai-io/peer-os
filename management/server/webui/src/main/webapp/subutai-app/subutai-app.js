@@ -323,7 +323,7 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 
 function startup($rootScope, $state, $location, $http) {
 
-	//document.cookie="sptoken=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwZDI3NzM3NC0yODNmLTQyMDEtYmRiOS02ZjA0OThkODE3MWYiLCJpc3MiOiJpby5zdWJ1dGFpIn0.WYBwPBZ6yOVa9AhECiVNYijTYrXleARdF3ta06vNtSo";
+	//document.cookie="sptoken=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1YjhmMDk0NS03NTIxLTQ4NjEtODM4Yi00MzJkZmFjNzZkODkiLCJpc3MiOiJpby5zdWJ1dGFpIn0.UczlX6i2srUvARGGMs8Z12Yy9hMVi1t2YPtHexV5kB8";
 	$rootScope.$on('$stateChangeStart',	function(event, toState, toParams, fromState, fromParams){
 		var restrictedPage = $.inArray($location.path(), ['/login']) === -1;
 		if (restrictedPage && !getCookie('sptoken')) {

@@ -3,9 +3,9 @@
 angular.module('subutai.blueprints-build.controller', [])
 	.controller('BlueprintsBuildCtrl', BlueprintsBuildCtrl);
 
-BlueprintsBuildCtrl.$inject = ['$scope', 'environmentService', 'SweetAlert', 'ngDialog', '$stateParams'];
+BlueprintsBuildCtrl.$inject = ['$scope', 'environmentService', 'SweetAlert', 'ngDialog', '$stateParams', '$location'];
 
-function BlueprintsBuildCtrl($scope, environmentService, SweetAlert, ngDialog, $stateParams) {
+function BlueprintsBuildCtrl($scope, environmentService, SweetAlert, ngDialog, $stateParams, $location) {
 
 	var vm = this;
 	vm.blueprint = {};
@@ -234,6 +234,9 @@ function BlueprintsBuildCtrl($scope, environmentService, SweetAlert, ngDialog, $
 		var postData = JSON.stringify(postJson);
 
 		SweetAlert.swal("Success!", "Your environment start creation.", "success");
+		ngDialog.closeAll();
+		$location.path('/environments');
+
 		environmentService.buildBlueprint(encodeURI(postData)).success(function (data) {
 			SweetAlert.swal("Success!", "Your environment has been created.", "success");
 		}).error(function (error) {
@@ -250,6 +253,9 @@ function BlueprintsBuildCtrl($scope, environmentService, SweetAlert, ngDialog, $
 		var postData = JSON.stringify(postJson);		
 
 		SweetAlert.swal("Success!", "Your environment start growing.", "success");
+		ngDialog.closeAll();
+		$location.path('/environments');
+
 		environmentService.growBlueprint(vm.environmentToGrow, encodeURI(postData)).success(function (data) {
 			SweetAlert.swal("Success!", "You successfully grow environment.", "success");
 		}).error(function (error) {
