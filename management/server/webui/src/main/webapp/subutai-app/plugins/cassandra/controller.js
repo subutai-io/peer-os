@@ -54,8 +54,8 @@ function CassandraCtrl(cassandraSrv, SweetAlert) {
 
 	function startNodes() {
 		if(vm.nodes2Action.length == 0) return;
-		if(vm.currentCluster.clusterName === undefined) return;
-		cassandraSrv.startNodes(vm.currentCluster.clusterName, JSON.stringify(vm.nodes2Action)).success(function (data) {
+		if(vm.currentCluster.name === undefined) return;
+		cassandraSrv.startNodes(vm.currentCluster.name, JSON.stringify(vm.nodes2Action)).success(function (data) {
 			SweetAlert.swal("Success!", "Your cluster nodes started successfully.", "success");
 		}).error(function (error) {
 			SweetAlert.swal("ERROR!", 'Cluster start error: ' + error.ERROR, "error");
@@ -64,8 +64,8 @@ function CassandraCtrl(cassandraSrv, SweetAlert) {
 
 	function stopNodes() {
 		if(vm.nodes2Action.length == 0) return;
-		if(vm.currentCluster.clusterName === undefined) return;
-		cassandraSrv.stopNodes(vm.currentCluster.clusterName, JSON.stringify(vm.nodes2Action)).success(function (data) {
+		if(vm.currentCluster.name === undefined) return;
+		cassandraSrv.stopNodes(vm.currentCluster.name, JSON.stringify(vm.nodes2Action)).success(function (data) {
 			SweetAlert.swal("Success!", "Your cluster nodes stoped successfully.", "success");
 		}).error(function (error) {
 			SweetAlert.swal("ERROR!", 'Cluster stop error: ' + error.ERROR, "error");
@@ -81,20 +81,20 @@ function CassandraCtrl(cassandraSrv, SweetAlert) {
 	}
 
 	function addNode() {
-		if(vm.currentCluster.clusterName === undefined) return;
+		if(vm.currentCluster.name === undefined) return;
 		SweetAlert.swal("Success!", "Adding node action started.", "success");
-		cassandraSrv.addNode(vm.currentCluster.clusterName).success(function (data) {
+		cassandraSrv.addNode(vm.currentCluster.name).success(function (data) {
 			SweetAlert.swal(
 				"Success!",
-				"Node has been added on cluster " + vm.currentCluster.clusterName + ".",
+				"Node has been added on cluster " + vm.currentCluster.name + ".",
 				"success"
 			);
-			getClustersInfo(vm.currentCluster.clusterName);
+			getClustersInfo(vm.currentCluster.name);
 		});
 	}
 
 	function deleteNode(nodeId) {
-		if(vm.currentCluster.clusterName === undefined) return;
+		if(vm.currentCluster.name === undefined) return;
 		SweetAlert.swal({
 			title: "Are you sure?",
 			text: "Your will not be able to recover this node!",
@@ -109,7 +109,7 @@ function CassandraCtrl(cassandraSrv, SweetAlert) {
 		},
 		function (isConfirm) {
 			if (isConfirm) {
-				cassandraSrv.deleteNode(vm.currentCluster.clusterName, nodeId).success(function (data) {
+				cassandraSrv.deleteNode(vm.currentCluster.name, nodeId).success(function (data) {
 					SweetAlert.swal("Deleted!", "Node has been deleted.", "success");
 					vm.currentCluster = {};
 				});
@@ -118,7 +118,7 @@ function CassandraCtrl(cassandraSrv, SweetAlert) {
 	}
 
 	function deleteCluster() {
-		if(vm.currentCluster.clusterName === undefined) return;
+		if(vm.currentCluster.name === undefined) return;
 		SweetAlert.swal({
 			title: "Are you sure?",
 			text: "Your will not be able to recover this cluster!",
@@ -133,7 +133,7 @@ function CassandraCtrl(cassandraSrv, SweetAlert) {
 		},
 		function (isConfirm) {
 			if (isConfirm) {
-				cassandraSrv.deleteCluster(vm.currentCluster.clusterName).success(function (data) {
+				cassandraSrv.deleteCluster(vm.currentCluster.name).success(function (data) {
 					SweetAlert.swal("Deleted!", "Cluster has been deleted.", "success");
 					vm.currentCluster = {};
 				});
@@ -150,9 +150,9 @@ function CassandraCtrl(cassandraSrv, SweetAlert) {
 	}
 
 	function changeClusterScaling(scale) {
-		if(vm.currentCluster.clusterName === undefined) return;
+		if(vm.currentCluster.name === undefined) return;
 		try {
-			cassandraSrv.changeClusterScaling(vm.currentCluster.clusterName, scale);
+			cassandraSrv.changeClusterScaling(vm.currentCluster.name, scale);
 		} catch(e) {}
 	}
 

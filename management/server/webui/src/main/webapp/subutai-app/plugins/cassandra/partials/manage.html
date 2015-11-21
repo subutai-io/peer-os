@@ -28,8 +28,8 @@
 
 				<label class="b-form-label">
 					<input type="checkbox" 
-					ng-change="cassandraCtrl.changeClusterScaling(cassandraCtrl.currentCluster.autoScaling)" 
-					ng-model="cassandraCtrl.currentCluster.autoScaling">
+					ng-change="cassandraCtrl.changeClusterScaling(cassandraCtrl.currentCluster.scaling)" 
+					ng-model="cassandraCtrl.currentCluster.scaling">
 					Auto scale
 				</label>
 			</div>
@@ -57,24 +57,24 @@
 				<th>Status</th>
 				<th></th>
 			</tr>
-			<tr ng-repeat="clusterNode in cassandraCtrl.currentCluster.nodes">
+			<tr ng-repeat="clusterNode in cassandraCtrl.currentCluster.containers">
 				<td class="b-main-table__edit-icon">
 					<input type="checkbox" ng-click="cassandraCtrl.pushNode(clusterNode)">
 				</td>
 				<td>{{ clusterNode }}</td>
-				<td>123.123.123.123</td>
+				<td>{{ cassandraCtrl.currentCluster.containersStatuses[clusterNode].ip }}</td>
 				<td>
-					<span ng-if="cassandraCtrl.currentCluster.seedNodes.indexOf(clusterNode) >= 0">
+					<span ng-if="cassandraCtrl.currentCluster.seeds.indexOf(clusterNode) >= 0">
 						Seed+Data
 					</span>
-					<span ng-if="cassandraCtrl.currentCluster.seedNodes.indexOf(clusterNode) == -1">
+					<span ng-if="cassandraCtrl.currentCluster.seeds.indexOf(clusterNode) == -1">
 						Data
 					</span>
 				</td>
 				<td class="b-main-table__container-status">
 					<div 
-						class="b-status-icon b-status-icon_{{ cassandraCtrl.currentCluster.nodeStatuses[clusterNode] }}" 
-						title="RUNNING">
+						class="b-status-icon b-status-icon_{{ cassandraCtrl.currentCluster.containersStatuses[clusterNode].status }}" 
+						title="{{ cassandraCtrl.currentCluster.containersStatuses[clusterNode].status }}">
 					</div>
 				</td>
 				<td>
