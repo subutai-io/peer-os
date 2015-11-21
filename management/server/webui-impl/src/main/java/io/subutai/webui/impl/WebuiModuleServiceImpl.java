@@ -48,7 +48,7 @@ public class WebuiModuleServiceImpl implements WebuiModuleService
         }
         else
         {
-            return modules.stream().map( m -> m.getModuleInfo() ).reduce( (m1, m2) -> m1 + "," + m2 ).get();
+            return "[" + modules.stream().map( m -> m.getModuleInfo() ).reduce( (m1, m2) -> m1 + "," + m2 ).get() + ']';
         }
     }
 
