@@ -6,7 +6,7 @@
   <parent>
     <groupId>io.subutai</groupId>
     <artifactId>strategy-manager-parent</artifactId>
-    <version>4.0.0-RC3</version>
+    <version>4.0.0-RC4</version>
   </parent>
 
   <artifactId>strategy-manager-impl</artifactId>
@@ -50,6 +50,10 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.felix</groupId>

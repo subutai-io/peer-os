@@ -1,0 +1,63 @@
+<div class="b-popup b-popup_wide">
+	<div class="b-popup__header">
+		<span ng-show="identityUserFormCtrl.editUser">Edit</span> 
+		<span ng-show="!identityUserFormCtrl.editUser">Create</span> user
+		<a href ng-click="closeThisDialog()">
+			<img src="assets/elements/buttons/b-icon-close.svg" class="b-icon g-right"/>
+		</a>
+	</div>
+	<form ng-submit="identityUserFormCtrl.addUser()" name="addUserForm">	
+		<div class="b-popup__body">
+			<div class="b-popup-body b-popup-body_col-2">
+				<label class="b-popup-body-label b-popup-body-label_block">Username:</label>
+				<input type="text" 
+					placeholder="Username" 
+					class="b-popup-body-input b-popup-body-input_full b-popup-body-input_margin-bttm" 
+					ng-model="identityUserFormCtrl.user2Add.userName" 
+					required 
+					ng-readonly="identityUserFormCtrl.editUser">
+
+				<label class="b-popup-body-label b-popup-body-label_block">Full name:</label>
+				<input type="text" 
+					placeholder="Full name" 
+					class="b-popup-body-input b-popup-body-input_full b-popup-body-input_margin-bttm" 
+					ng-model="identityUserFormCtrl.user2Add.fullName" 
+					required>
+
+				<label class="b-popup-body-label b-popup-body-label_block">E-mail:</label>
+				<input type="email" 
+					placeholder="email@mail.com" 
+					class="b-popup-body-input b-popup-body-input_full b-popup-body-input_margin-bttm-b" 
+					ng-model="identityUserFormCtrl.user2Add.email" 
+					required>			
+
+				<label class="b-popup-body-label b-popup-body-label_block">Password:</label>
+				<input type="password" 
+					placeholder="***********" 
+					class="b-popup-body-input b-popup-body-input_full b-popup-body-input_margin-bttm" 
+					ng-model="identityUserFormCtrl.user2Add.password" 
+					id="js-password" 
+					required>
+
+				<label class="b-popup-body-label b-popup-body-label_block">Confirm password:</label>
+				<input type="password" 
+					placeholder="***********" 
+					class="b-popup-body-input b-popup-body-input_full" 
+					ng-model="identityUserFormCtrl.user2Add.confirm_password" 
+					pw-check="js-password" 
+					name="confirm_password" 
+					ng-attr-required="identityUserFormCtrl.user2Add.password.length > 0">
+				<span class="b-form-hint b-form-hint_red" ng-show="addUserForm.confirm_password.$error.pwmatch">Passwords don't match.</span>			
+			</div>
+			<div class="b-popup-body b-popup-body_col-2 g-right">
+				<col-select></col-select>
+			</div>
+			<div class="clear"></div>
+		</div>
+		<div class="b-popup__footer">
+			<button class="b-btn b-btn_green g-right" type="submit">Save user</button>
+			<div class="clear"></div>
+		</div>
+	</form>
+</div>
+

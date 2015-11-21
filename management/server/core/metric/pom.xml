@@ -7,7 +7,7 @@
   <parent>
     <groupId>io.subutai</groupId>
     <artifactId>mgmt-server-core-parent</artifactId>
-    <version>4.0.0-RC3</version>
+    <version>4.0.0-RC4</version>
   </parent>
 
   <artifactId>metric-parent</artifactId>
@@ -19,7 +19,6 @@
     <module>metric-impl</module>
     <module>metric-cli</module>
     <module>metric-rest</module>
-    <module>metric-ui</module>
   </modules>
 
 </project>

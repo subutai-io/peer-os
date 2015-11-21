@@ -1,0 +1,24 @@
+<div ui-tree-handle class="tree-node tree-node-content">
+	<div style="cursor: hand" ng-if="node.nodes.length > 0" ng-click="toggle(this)">
+		<a class="btn btn-info btn-xs" data-nodrag>
+			<span class="fa" ng-class="{'fa-folder': collapsed, 'fa-folder-open': !collapsed}"></span>
+		</a>
+		{{node.title}}
+	</div>
+
+	<div style="cursor: hand" 
+		ng-if="node.nodes === undefined || node.nodes.length === 0" 
+		ng-click="consoleViewCtrl.setConsole(node)">
+
+		<a class="btn btn-info btn-xs" data-nodrag>
+			<span class="fa fa-desktop"></span>
+		</a>
+		{{node.title}}
+
+	</div>	
+</div>
+<ol ui-tree-nodes="" ng-model="node.nodes" ng-class="{hidden: collapsed}">
+	<li ng-repeat="node in node.nodes" ui-tree-node ng-include="'subutai-app/console/partials/nodes_renderer.html'">
+	</li>
+</ol>
+

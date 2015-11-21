@@ -1,0 +1,14 @@
+{
+  "scaleShowGridLines" : true,
+  "scaleGridLineColor" : "rgba(0,0,0,.05)",
+  "scaleGridLineWidth" : 1,
+  "bezierCurve" : true,
+  "bezierCurveTension" : 0.4,
+  "pointDot" : true,
+  "pointDotRadius" : 4,
+  "pointDotStrokeWidth" : 1,
+  "pointHitDetectionRadius" : 20,
+  "datasetStroke" : true,
+  "datasetStrokeWidth" : 2,
+  "datasetFill" : true
+}

@@ -1,0 +1,103 @@
+<div ng-controller="ContainerViewCtrl as containerViewCtrl">
+
+	<div class="b-workspace__header">
+		<h1 class="b-title">Containers</h1>
+	</div>
+
+	<div class="b-workspace__content">
+
+		<div class="b-main-form">
+			<div class="b-main-form__wrapper b-main-form__wrapper_margin-r">
+				<label class="b-popup-body-label b-popup-body-label_inline">
+					Environment
+				</label>
+				<select class="b-popup-body-input b-popup-body-input_min" 
+					ng-change="containerViewCtrl.getContainers()" 
+					ng-model="containerViewCtrl.environmentId">
+					<option 
+						ng-repeat="environment in containerViewCtrl.environments" 
+						value="{{ environment.id }}"
+						ng-selected="containerViewCtrl.environmentId == environment.id">
+						{{ environment.name }}
+					</option>
+				</select>
+				<div class="clear"></div>
+			</div>
+
+			<div class="b-main-form__wrapper b-main-form__wrapper_margin-r">
+				<label class="b-popup-body-label b-popup-body-label_inline">
+					Containers Type 
+				</label>
+				<select class="b-popup-body-input b-popup-body-input_min" 
+					ng-change="containerViewCtrl.getContainers()" 
+					ng-model="containerViewCtrl.containersTypeId">
+					<option ng-repeat="type in containerViewCtrl.containersType" value="{{ type }}">
+						{{ type }}
+					</option>
+				</select>
+				<div class="clear"></div>
+			</div>
+		</div>
+
+		<div class="b-data-table">
+			<table datatable="ng" ng-show="containerViewCtrl.containers.length > 0" 
+				dt-options="containerViewCtrl.dtOptions" 
+				dt-column-defs="containerViewCtrl.dtColumnDefs" 
+				class="row-border hover">
+				<thead>
+					<tr>
+						<th>Status</th>
+						<th>Template</th>
+						<th>IP</th>
+						<th>Tags</th>
+						<th></th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="(key, container) in containerViewCtrl.containers">
+						<td class="b-main-table__container-status">
+							<div 
+								class="b-status-icon b-status-icon_{{ container.state }}" 
+								tooltips 
+								tooltip-title="{{ container.state }}">
+							</div>
+						</td>
+						<td>{{ container.templateName }}</td>
+						<td>{{ container.ip }}</td>
+						<td>{{ container.hostname }}</td>
+						<td>
+							<button ng-show="container.state == 'RUNNING'" class="b-btn b-btn_red" 
+							ng-click="containerViewCtrl.containerAction(key)">
+								Stop
+							</button>
+							<button ng-show="container.state == 'STOPPED'" class="b-btn b-btn_green" 
+							ng-click="containerViewCtrl.containerAction(key)">
+								Start
+							</button>
+							<span class="b-load-icon" title="{{ container.state }}" 
+								ng-show="container.state != 'STOPPED' && container.state != 'RUNNING'">
+							</span>
+						</td>
+						<td>
+							<a href 
+								class="b-icon b-icon_remove" 
+								ng-click="containerViewCtrl.destroyContainer(container.id, key)">
+							</a>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<!--<div class="b-empty-list" ng-show="environmentViewCtrl.environments.length == 0">
+			<div class="b-empty-list__text">
+				You don’t have any environments, chose blueprint and build it
+			</div>
+			<a class="b-btn b-btn_blue" ui-sref="blueprints">
+				<i class="fa fa-plus"></i> Blueprints
+			</a>	
+		</div>-->
+	</div>
+
+</div>

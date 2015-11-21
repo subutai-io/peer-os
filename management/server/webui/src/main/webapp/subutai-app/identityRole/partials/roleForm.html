@@ -1,0 +1,88 @@
+<div class="b-popup b-popup_wide">
+	<div class="b-popup__header">
+		<span ng-show="identityRoleFormCtrl.editRole">Edit</span> 
+		<span ng-show="!identityRoleFormCtrl.editRole">Create</span> role
+		<a href ng-click="closeThisDialog()">
+			<img src="assets/elements/buttons/b-icon-close.svg" class="b-icon g-right"/>
+		</a>
+	</div>
+	<form class="form-horizontal" ng-submit="identityRoleFormCtrl.addRole()">
+
+		<div class="b-popup__header">
+			<input type="text" 
+				placeholder="Enter role name" 
+				class="b-popup-body-input b-popup-body-input_role" 
+				ng-model="identityRoleFormCtrl.role2Add.name" 
+				required>		
+		</div>
+
+		<div class="b-popup__body">
+			<div class="b-popup-body b-popup-body_role b-nav_left">
+				<div class="b-popup-body-list-title ">All roles</div>
+				<div class="b-main-table-border">
+					<table class="b-main-table b-main-table_with-header b-main-table_white-header">
+						<tr>
+							<th>Name</th>
+							<th></th>
+						</tr>
+						<tr ng-repeat="permission in identityRoleFormCtrl.permissions2Add" 
+							ng-if="!permission.selected">
+							<td class="b-main-table__name">{{permission.name}}</td>
+							<td>
+								<a href 
+									class="b-btn-circle b-btn_green" 
+									ng-click="identityRoleFormCtrl.addPermission2Stack(permission)">
+									<i class="fa fa-plus"></i>
+								</a>
+							</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+			<div class="b-popup-body b-popup-body_role-100">
+				<div class="b-popup-body-list-title ">Role permissions</div>
+				<div class="b-main-table-border">
+					<table class="b-main-table b-main-table_with-header b-main-table_white-header">
+						<tr>
+							<th>Name</th>
+							<th>Read</th>
+							<th>Write</th>
+							<th>Update</th>
+							<th>Delete</th>
+							<th></th>
+						</tr>
+						<tr ng-repeat="permission in identityRoleFormCtrl.permissions2Add" 
+							ng-if="permission.selected">
+							<td class="b-main-table__name">{{permission.name}}</td>
+							<td class="b-main-table__checkbox">
+								<input type="checkbox" ng-model="permission.read">
+							</td>
+							<td class="b-main-table__checkbox">
+								<input type="checkbox" ng-model="permission.write">
+							</td>
+							<td class="b-main-table__checkbox">
+								<input type="checkbox" ng-model="permission.update">
+							</td>
+							<td class="b-main-table__checkbox">
+								<input type="checkbox" ng-model="permission.delete">
+							</td>
+							<td>
+								<a href 
+								class="b-btn-circle b-btn_red" 
+								ng-click="identityRoleFormCtrl.addPermission2Stack(permission)">
+									<i class="fa fa-times"></i>
+								</a>
+							</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+			<div class="clear"></div>
+		</div>
+		<div class="b-popup__footer">
+			<button class="b-btn b-btn_green g-right" type="submit">Save</button>
+			<div class="clear"></div>
+		</div>
+
+	</form>
+</div>

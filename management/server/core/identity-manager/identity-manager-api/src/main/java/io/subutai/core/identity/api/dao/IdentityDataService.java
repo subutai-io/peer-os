@@ -37,12 +37,6 @@ public interface IdentityDataService
     /* *************************************************
      *
      */
-    void removeUserAllRoles( long userId );
-
-
-    /* *************************************************
-     *
-     */
     List<User> getAllUsers();
 
 
@@ -96,6 +90,12 @@ public interface IdentityDataService
      *
      */
     void assignRolePermission( long roleId, Permission permission );
+
+
+    /* *************************************************
+     *
+     */
+    void removeAllRolePermissions( long roleId );
 
 
     /*

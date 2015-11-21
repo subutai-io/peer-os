@@ -106,11 +106,6 @@ public interface IdentityManager
 
     /* *************************************************
      */
-    void removeUserAllRoles( long userId );
-
-
-    /* *************************************************
-     */
     boolean changeUserPassword( long userId, String oldPassword, String newPassword );
 
 
@@ -152,7 +147,7 @@ public interface IdentityManager
     Role getRole( long roleId );
 
     /* *************************************************
-         */
+     */
     void updateRole( Role role );
 
 
@@ -169,6 +164,11 @@ public interface IdentityManager
     /* *************************************************
      */
     void assignRolePermission( long roleId, Permission permission );
+
+
+    /* *************************************************
+     */
+    void removeAllRolePermissions( long roleId );
 
 
     /* *************************************************

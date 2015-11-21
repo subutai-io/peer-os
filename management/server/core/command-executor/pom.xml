@@ -5,7 +5,7 @@
   <parent>
     <artifactId>mgmt-server-core-parent</artifactId>
     <groupId>io.subutai</groupId>
-    <version>4.0.0-RC3</version>
+    <version>4.0.0-RC4</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -18,7 +18,7 @@
     <module>command-executor-api</module>
     <module>command-executor-impl</module>
     <module>command-executor-cli</module>
-    <module>command-executor-ui</module>
+    <module>command-executor-rest-ui</module>
   </modules>
 
 </project>

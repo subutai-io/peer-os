@@ -1,0 +1,54 @@
+<div ng-controller="TokensCtrl as tokensCtrl">
+
+	<div class="b-workspace__header">
+		<h1 class="b-title">Token</h1>
+	</div>
+
+	<div class="b-workspace__content">
+
+		<div class="b-main-form b-main-form_token">
+
+			<div class="b-main-form__wrapper">
+				<label class="b-popup-body-label b-popup-body-label_inline">Token name</label>
+				<input type="text" 
+					ng-model="tokensCtrl.newToken.token" 
+					class="b-popup-body-input">
+			</div><!--
+
+			--><div class="b-main-form__wrapper">
+				<label class="b-popup-body-label b-popup-body-label_inline">Valid perion (hours)</label>
+				<input type="text" 
+					ng-model="tokensCtrl.newToken.period" 
+					class="b-popup-body-input">				
+			</div><!--
+
+			--><div class="b-main-form__wrapper">
+				<label class="b-popup-body-label b-popup-body-label_inline">User</label>
+				<select class="b-popup-body-input" 
+					ng-model="tokensCtrl.newToken.userId">
+					<option ng-repeat="user in tokensCtrl.users" value="{{ user.id }}">
+						{{ user.userName }}
+					</option>
+				</select>
+				<div class="clear"></div>
+			</div><!--
+
+			--><div class="b-main-form__wrapper">
+				<button class="b-btn b-btn_green" ng-click="tokensCtrl.addToken()">Add Token</button>
+				<div class="clear"></div>
+			</div>
+
+		</div>
+
+		<div class="b-data-table">
+			<table datatable="" 
+				dt-options="tokensCtrl.dtOptions" 
+				dt-columns="tokensCtrl.dtColumns" 
+				dt-instance="tokensCtrl.dtInstance" 
+				class="row-border hover">
+			</table>
+		</div>
+	</div>	
+
+</div>
+

@@ -318,11 +318,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                                                           final boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
-        Preconditions.checkNotNull( blueprint, "Invalid blueprint" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
-        Preconditions.checkArgument( !blueprint.getNodeGroups().isEmpty(), "Placement is empty" );
         TrackerOperation operationTracker = tracker.createTrackerOperation( TRACKER_SOURCE,
                 String.format( "Growing environment %s", environmentId ) );
+
         return growEnvironment( environmentId, blueprint, async, true, operationTracker );
     }
 
@@ -418,8 +416,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     public void setSshKey( final String environmentId, final String sshKey, final boolean async )
             throws EnvironmentNotFoundException, EnvironmentModificationException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
-
         TrackerOperation op = tracker.createTrackerOperation( TRACKER_SOURCE,
                 String.format( "Setting environment %s ssh key", environmentId ) );
 
@@ -467,8 +463,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                                     final boolean forceMetadataRemoval )
             throws EnvironmentDestructionException, EnvironmentNotFoundException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
-
         TrackerOperation op = tracker.createTrackerOperation( TRACKER_SOURCE,
                 String.format( "Destroying environment %s", environmentId ) );
 
