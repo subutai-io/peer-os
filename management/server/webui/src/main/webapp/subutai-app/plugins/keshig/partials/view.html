@@ -1,0 +1,43 @@
+<div ng-controller="KeshigCtrl as keshigCtrl">
+
+	<div class="b-workspace__header">
+		<h1 class="b-title">Plugins/<span class="b-title_breadcrumbs">Keshig</span></h1>
+	</div>
+
+	<div class="b-workspace__content">
+		<div class="b-tabs-menu">
+			<ul>
+				<li class="b-tabs-menu__item" 
+				ng-click="keshigCtrl.activeTab = 'build'" 
+				ng-class="keshigCtrl.activeTab == 'build' ? 'b-tabs-menu__item_active' : ''">
+					Build
+				</li>
+				<li class="b-tabs-menu__item" 
+				ng-click="keshigCtrl.activeTab = 'deploy'" 
+				ng-class="keshigCtrl.activeTab == 'deploy' ? 'b-tabs-menu__item_active' : ''">
+					Deploy
+				</li>
+				<li class="b-tabs-menu__item" 
+				ng-click="keshigCtrl.activeTab = 'test'" 
+				ng-class="keshigCtrl.activeTab == 'test' ? 'b-tabs-menu__item_active' : ''">
+					Test
+				</li>
+			</ul>
+		</div>
+
+		<div 
+			ng-if="keshigCtrl.activeTab == 'build'" 
+			ng-include="'subutai-app/plugins/keshig/partials/build.html'">
+		</div>
+		<div 
+			ng-if="keshigCtrl.activeTab == 'deploy'" 
+			ng-include="'subutai-app/plugins/keshig/partials/deploy.html'">
+		</div>
+		<div 
+			ng-if="keshigCtrl.activeTab == 'test'" 
+			ng-include="'subutai-app/plugins/keshig/partials/test.html'">
+		</div>		
+
+	</div>
+
+</div>

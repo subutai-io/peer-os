@@ -57,7 +57,11 @@
 				<tbody>
 					<tr ng-repeat="(key, container) in containerViewCtrl.containers">
 						<td class="b-main-table__container-status">
-							<div class="b-status-icon b-status-icon_{{ container.state }}" title="{{ container.state }}"></div>
+							<div 
+								class="b-status-icon b-status-icon_{{ container.state }}" 
+								tooltips 
+								tooltip-title="{{ container.state }}">
+							</div>
 						</td>
 						<td>{{ container.templateName }}</td>
 						<td>{{ container.ip }}</td>

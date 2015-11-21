@@ -5,9 +5,11 @@ angular.module('subutai.plugins.controller', [])
 
 PluginsCtrl.$inject = ['PluginsSrv'];
 function PluginsCtrl(PluginsSrv) {
+
 	var vm = this;
+	vm.plugins = [];
 
 	PluginsSrv.getPlugins().success(function(data) {
-		vm.plugins = data;
+		vm.plugins.push(data);
 	});
 }

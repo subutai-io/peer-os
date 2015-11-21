@@ -8,24 +8,26 @@
 
 		<div class="b-main-form b-main-form_token">
 
-			<div class="b-main-form__wrapper">
-				<label class="b-popup-body-label b-popup-body-label_inline">Login</label>
-				<input type="text" 
-					ng-model="loginCtrl.name" 
-					class="b-popup-body-input">
-			</div><!--
+			<form ng-submit="loginCtrl.login()">
+				<div class="b-main-form__wrapper">
+					<label class="b-popup-body-label b-popup-body-label_inline">Login</label>
+					<input type="text" 
+						ng-model="loginCtrl.name" 
+						class="b-popup-body-input">
+				</div><!--
 
-			--><div class="b-main-form__wrapper">
-				<label class="b-popup-body-label b-popup-body-label_inline">Password</label>
-				<input type="password" 
-					ng-model="loginCtrl.pass" 
-					class="b-popup-body-input">				
-			</div><!--
+				--><div class="b-main-form__wrapper">
+					<label class="b-popup-body-label b-popup-body-label_inline">Password</label>
+					<input type="password" 
+						ng-model="loginCtrl.pass" 
+						class="b-popup-body-input">				
+				</div><!--
 
-			--><div class="b-main-form__wrapper">
-				<button class="b-btn b-btn_green" ng-click="loginCtrl.login()">Login</button>
-				<div class="clear"></div>
-			</div>
+				--><div class="b-main-form__wrapper">
+					<button type="submit" class="b-btn b-btn_green">Login</button>
+					<div class="clear"></div>
+				</div>
+			</form>
 
 		</div>	
 	</div>

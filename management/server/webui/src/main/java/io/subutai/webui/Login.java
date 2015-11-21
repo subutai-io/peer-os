@@ -36,7 +36,7 @@ public class Login extends HttpServlet
                 if ( !Strings.isNullOrEmpty( token ) )
                 {
                     request.getSession().setAttribute( "userSessionData", token );
-                    Cookie cookie = new Cookie( "sptoken", "%22" + token + "%22" );
+                    Cookie cookie = new Cookie( "sptoken", token );
                     cookie.setMaxAge( 3600 * 3 );
                     response.addCookie( cookie );
                 }

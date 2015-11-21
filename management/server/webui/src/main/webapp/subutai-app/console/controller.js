@@ -28,7 +28,7 @@ function ConsoleViewCtrl($scope, consoleService) {
 
 	consoleService.getEnvironments().success(function (data) {
 		vm.environments = data;
-	});	
+	});
 
 	//Console UI
 	$scope.theme = 'modern';
@@ -36,7 +36,7 @@ function ConsoleViewCtrl($scope, consoleService) {
 		$scope.$broadcast('terminal-output', {
 			output: true,
 			text: [
-				'Wake up, Neo...',
+				'Subutai Social',
 			],
 			breakLine: true
 		});

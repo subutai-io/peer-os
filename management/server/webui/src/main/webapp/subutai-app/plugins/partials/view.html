@@ -6,7 +6,30 @@
 
 	<div class="b-workspace__content">
 		<div class="b-plugins-list">
-			
+
+			<div class="b-plugins-list__item" ng-repeat="plugin in pluginsCtrl.plugins">
+				{{ plugin }}
+				<div class="b-plugins-list-item">
+					<div class="b-plugins-list-item__img">
+						<table class="b-vertical-helper">
+							<tr>
+								<td>
+									<img src="{{ plugin.img }}" alt="{{ plugin.name }}">
+								</td>
+							</tr>
+						</table>
+					</div>
+					<div class="b-plugins-list-item__title">
+						{{ plugin.name }}
+					</div>
+					<div class="b-plugins-list-item__button">
+						<a href class="b-btn b-btn_blue" ui-sref="{{ plugin.name.toLowerCase() }}">
+							Open
+						</a>
+					</div>
+				</div>
+			</div>
+
 		</div>
 	</div>	
 

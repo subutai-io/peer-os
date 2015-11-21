@@ -7,7 +7,7 @@ loginSrv.$inject = ['$http'];
 
 function loginSrv($http)
 {
-	var loginURL = '/login';
+	var loginURL = 'http://172.16.131.205:8181/login';
 
 	var loginSrv = {
 		login: login

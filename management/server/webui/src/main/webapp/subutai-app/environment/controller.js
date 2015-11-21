@@ -118,12 +118,14 @@ function EnvironmentViewCtrl($scope, environmentService, SweetAlert, DTOptionsBu
 			},
 			function (isConfirm) {
 				if (isConfirm) {
+					SweetAlert.swal("Delete!", "Your environment start deleting!", "success");
 					environmentService.destroyEnvironment(environmentId).success(function (data) {
 						SweetAlert.swal("Destroyed!", "Your environment has been destroyed.", "success");
 						vm.dtInstance.reloadData(null, false);
 					}).error(function (data) {
 						SweetAlert.swal("ERROR!", "Your environment is safe :). Error: " + data.ERROR, "error");
 					});
+					vm.dtInstance.reloadData(null, false);
 				}
 			});
 	}

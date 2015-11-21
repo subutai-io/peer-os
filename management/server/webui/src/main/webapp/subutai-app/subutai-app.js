@@ -6,12 +6,19 @@ var app = angular.module("subutai-app", [
 	'oitozero.ngSweetAlert',
 	'ngDialog',
 	'datatables',
+	'720kb.tooltips'
 ])
 .config(routesConf)
+.config(function(tooltipsConfigProvider) {
+	tooltipsConfigProvider.options({
+		lazy: true,
+		side: 'bottom'
+	})
+})
 	.run(startup);
 
 routesConf.$inject = ['$stateProvider', '$urlRouterProvider', '$ocLazyLoadProvider'];
-startup.$inject = ['$rootScope', '$state', '$cookieStore', '$location', '$http'];
+startup.$inject = ['$rootScope', '$state', '$cookies', '$location', '$http'];
 
 function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 
@@ -275,33 +282,75 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 			}]
 		}
 	})
+	.state("keshig", {
+		url: "/plugins/keshig",
+		templateUrl: "subutai-app/plugins/keshig/partials/view.html",
+		resolve: {
+			loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+				return $ocLazyLoad.load([
+						{
+							name: 'subutai.plugins.keshig',
+							files: [
+								'subutai-app/plugins/keshig/keshig.js',
+								'subutai-app/plugins/keshig/controller.js',
+								'subutai-app/plugins/keshig/service.js'
+							]
+						}
+				]);
+			}]
+		}
+	})
+	.state("hadoop", {
+		url: "/plugins/hadoop",
+		templateUrl: "subutai-app/plugins/hadoop/partials/view.html",
+		resolve: {
+			loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+				return $ocLazyLoad.load([
+						{
+							name: 'subutai.plugins.hadoop',
+							files: [
+								'subutai-app/plugins/hadoop/hadoop.js',
+								'subutai-app/plugins/hadoop/controller.js',
+								'subutai-app/plugins/hadoop/service.js'
+							]
+						}
+				]);
+			}]
+		}
+	})
 	.state("404", {
 		url: "/404",
 		template: "Not found"
 	})
 }
 
-function startup($rootScope, $state, $cookieStore, $location, $http) {
-	$rootScope.sptoken = $cookieStore.get('sptoken') || false;
-	//$rootScope.sptoken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MjQ4ZGJhMi1iODc3LTQyYTAtOTBiMi0wMDA1YWUzNWZmMmIiLCJpc3MiOiJpby5zdWJ1dGFpIn0.nevrOmYGmLFGoPces9x1y9ZboCzfKZPssa0JiWjN6Kw';
-	var restrictedPage = $.inArray($location.path(), ['/login']) === -1;
-	if (restrictedPage && !$rootScope.sptoken) {
-		$location.path('login');
-	}
+function startup($rootScope, $state, $cookies, $location, $http) {
 
-	$rootScope.$on('$stateChangeStart',
-		function(event, toState, toParams, fromState, fromParams){
-			if( $cookieStore.get('sptoken') )
-			{
-				$http.defaults.headers.common['sptoken'] = $cookieStore.get('sptoken');
-			}
-			else
-			{
-				$location.path('login');
-			}
-		});
+	//document.cookie="sptoken=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzMjAzY2E4ZC01MzNkLTQ0MmEtYTI4My02OGRkMDFmMWYzZmUiLCJpc3MiOiJpby5zdWJ1dGFpIn0.I3UXOMiC9kq4Vt4letp2qmsfkfvIpP764uazehzJc5g";
+	if($rootScope.sptoken === undefined) {
+		$rootScope.sptoken = getCookie('sptoken');
+		//$rootScope.sptoken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzMjAzY2E4ZC01MzNkLTQ0MmEtYTI4My02OGRkMDFmMWYzZmUiLCJpc3MiOiJpby5zdWJ1dGFpIn0.I3UXOMiC9kq4Vt4letp2qmsfkfvIpP764uazehzJc5g';
+	}
+	$rootScope.$on('$stateChangeStart',	function(event, toState, toParams, fromState, fromParams){
+		var restrictedPage = $.inArray($location.path(), ['/login']) === -1;
+		if (restrictedPage && !$rootScope.sptoken) {
+			$location.path('/login');
+		}
+	});
 
 	$rootScope.$state = $state;
+	$http.defaults.headers.common['sptoken']= $rootScope.sptoken;
+}
+
+function getCookie(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i=0; i<ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0)==' ') c = c.substring(1);
+        if (c.indexOf(name) == 0) return c.substring(name.length,c.length);
+    }
+    return false;
 }
 
 app.directive('dropdownMenu', function() {
@@ -333,6 +382,22 @@ app.directive('dropdownMenu', function() {
 					return false;
 				}
 			});			
+		}
+	}
+});
+
+app.directive('checkbox-list-dropdown', function() {
+	return {
+		restrict: 'A',
+		link: function(scope, element, attr) {
+			console.log('lololo');
+			$(".b-form-input_dropdown").click(function () {
+				$(this).toggleClass("is-active");
+			});
+
+			$(".b-form-input-dropdown-list").click(function(e) {
+				e.stopPropagation();
+			});
 		}
 	}
 });

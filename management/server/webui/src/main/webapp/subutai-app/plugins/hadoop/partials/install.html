@@ -1,89 +1,111 @@
 
-<form ng-submit="cassandraCtrl.createCassandra()">
+<form ng-submit="hadoopCtrl.createHadoop()">
 	<div class="b-workspace-content b-workspace-content_border">
 		<div class="b-workspace-content__row">
 			<div class="b-workspace-content-row_col-2 b-workspace-content-row_col-2_padding-right">
 				<div class="b-form">
+
 					<div class="b-form__wrapper b-form__wrapper_margin-bottom">
 						<label class="b-form-label b-form-label_fix-size-1 g-left">Enter cluster name</label>
 
 						<div class="b-form-wrapper b-form-wrapper_margin-size-1">
 							<input class="b-form-input b-form-input_full" type="text"
 							placeholder="Enter cluster name" 
-							ng-model="cassandraCtrl.cassandraInstall.name" 
+							ng-model="hadoopCtrl.hadoopInstall.name" 
 							required>
 						</div>
 						<div class="clear"></div>
 					</div>
+
 					<div class="b-form__wrapper b-form__wrapper_margin-bottom">
 						<label class="b-form-label b-form-label_fix-size-1 g-left">Enter domain name</label>
 
 						<div class="b-form-wrapper b-form-wrapper_margin-size-1">
 							<input class="b-form-input b-form-input_full" type="text"
 							placeholder="Enter domain name" 
-							ng-model="cassandraCtrl.cassandraInstall.domainName" 
+							ng-model="hadoopCtrl.hadoopInstall.domainName" 
 							required>
 						</div>
 						<div class="clear"></div>
 					</div>
-					<div class="b-form__wrapper b-form__wrapper_margin-bottom">
-						<label class="b-form-label b-form-label_fix-size-1 g-left">Data directory</label>
 
-						<div class="b-form-wrapper b-form-wrapper_margin-size-1">
-							<input class="b-form-input b-form-input_full" type="text"
-							placeholder="Data directory" 
-							ng-model="cassandraCtrl.cassandraInstall.dataDir" 
-							required>
-						</div>
-
-						<div class="clear"></div>
-					</div>
-				</div>
-			</div>
-			<div class="b-workspace-content-row_col-2 b-workspace-content-row_col-2_padding-left g-right">
-				<div class="b-form">
-					<div class="b-form__wrapper b-form__wrapper_margin-bottom">
-						<label class="b-form-label b-form-label_fix-size-1 g-left">Commit log directory</label>
-
-						<div class="b-form-wrapper b-form-wrapper_margin-size-1">
-							<input class="b-form-input b-form-input_full" type="text"
-							placeholder="Commit log directory" 
-							ng-model="cassandraCtrl.cassandraInstall.commitDir" 
-							required>
-						</div>
-
-						<div class="clear"></div>
-					</div>
-					<div class="b-form__wrapper b-form__wrapper_margin-bottom">
-						<label class="b-form-label b-form-label_fix-size-1 g-left">
-							Saved caches directory
-						</label>
-
-						<div class="b-form-wrapper b-form-wrapper_margin-size-1">
-							<input class="b-form-input b-form-input_full" type="text"
-							placeholder="Saved caches directory" 
-							ng-model="cassandraCtrl.cassandraInstall.cacheDir" 
-							required>
-						</div>
-
-						<div class="clear"></div>
-					</div>
 					<div class="b-form__wrapper b-form__wrapper_margin-bottom">
 						<label class="b-form-label b-form-label_fix-size-1 g-left">Choose Environment</label>
 
 						<div class="b-form-wrapper b-form-wrapper_margin-size-1">
 							<select class="b-form-input b-form-input_full" 
 								ng-model="selectedEnvironment" 
-								ng-change="cassandraCtrl.showContainers(selectedEnvironment)">
+								ng-change="hadoopCtrl.showContainers(selectedEnvironment)">
 								<option value="">Select environment</option>
-								<option ng-repeat="environment in cassandraCtrl.environments" value="{{ environment.id }}">
+								<option ng-repeat="environment in hadoopCtrl.environments" value="{{ environment.id }}">
 									{{ environment.name }}
 								</option>
-							</select>						
+							</select>
 						</div>
 
 						<div class="clear"></div>
 					</div>
+
+					<div class="b-form__wrapper b-form__wrapper_margin-bottom">
+						<label class="b-form-label b-form-label_2-line b-form-label_fix-size-1 g-left">
+							Choose replication factor for slave nodes
+						</label>
+
+						<div class="b-form-wrapper b-form-wrapper_margin-size-1">
+							<select class="b-form-input b-form-input_full">
+								<option value="1"></option>
+							</select>
+						</div>
+
+						<div class="clear"></div>
+					</div>
+
+				</div>
+			</div>
+			<div class="b-workspace-content-row_col-2 b-workspace-content-row_col-2_padding-left g-right">
+
+				<div class="b-form">
+
+					<div class="b-form__wrapper b-form__wrapper_margin-bottom">
+						<label class="b-form-label b-form-label_fix-size-1 g-left">Choose Name Node</label>
+
+						<div class="b-form-wrapper b-form-wrapper_margin-size-1">
+							<select class="b-form-input b-form-input_full">
+								<option value="1"></option>
+							</select>
+						</div>
+
+						<div class="clear"></div>
+					</div>
+
+					<div class="b-form__wrapper b-form__wrapper_margin-bottom">
+						<label class="b-form-label b-form-label_fix-size-1 g-left">
+							Choose Job Tracker
+						</label>
+
+						<div class="b-form-wrapper b-form-wrapper_margin-size-1">
+							<select class="b-form-input b-form-input_full">
+								<option value="1"></option>
+							</select>
+						</div>
+
+						<div class="clear"></div>
+					</div>
+
+					<div class="b-form__wrapper b-form__wrapper_margin-bottom">
+						<label class="b-form-label b-form-label_2-line b-form-label_fix-size-1 g-left">
+							Choose Secondary Name Node
+						</label>
+
+						<div class="b-form-wrapper b-form-wrapper_margin-size-1">
+							<select class="b-form-input b-form-input_full">
+								<option value="1"></option>
+							</select>
+						</div>
+
+						<div class="clear"></div>
+					</div>
+
 				</div>
 
 			</div>
@@ -91,20 +113,10 @@
 
 		<div class="b-workspace-content__row">
 			<h2 class="b-workspace-content-row-h2">
-				Nodes to be configured
+				Slave Nodes
 			</h2>
 
 			<col-select-containers></col-select-containers>
-
-			<div class="clear"></div>
-		</div>
-
-		<div class="b-workspace-content__row">
-			<h2 class="b-workspace-content-row-h2">
-				Seeds
-			</h2>
-
-			<col-select-seeds></col-select-seeds>
 
 			<div class="clear"></div>
 		</div>
