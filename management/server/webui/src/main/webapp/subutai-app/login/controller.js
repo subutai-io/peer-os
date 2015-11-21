@@ -3,9 +3,9 @@
 angular.module('subutai.login.controller', [])
 	.controller('LoginCtrl', LoginCtrl);
 
-LoginCtrl.$inject = ['loginSrv'];
+LoginCtrl.$inject = ['loginSrv', '$http'];
 
-function LoginCtrl( loginSrv )
+function LoginCtrl( loginSrv, $http )
 {
 	var vm = this;
 

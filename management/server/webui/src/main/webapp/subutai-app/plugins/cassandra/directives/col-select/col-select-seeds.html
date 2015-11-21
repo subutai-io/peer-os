@@ -3,7 +3,7 @@
 	<ul class="b-form-list b-form-list_table">
 		<li class="b-form-list-table__link" 
 		ng-repeat="seed in cassandraCtrl.seeds" 
-		ng-if="cassandraCtrl.cassandraInstall.seedId.indexOf(seed) == -1" 
+		ng-if="cassandraCtrl.cassandraInstall.seeds.indexOf(seed) == -1" 
 		ng-click="cassandraCtrl.addSeed(seed)">
 			{{ seed }}
 		</li>
@@ -20,7 +20,7 @@
 	<ul class="b-form-list b-form-list_table">
 		<li class="b-form-list-table__link" 
 		ng-repeat="seed in cassandraCtrl.seeds" 
-		ng-if="cassandraCtrl.cassandraInstall.seedId.indexOf(seed) > -1" 
+		ng-if="cassandraCtrl.cassandraInstall.seeds.indexOf(seed) > -1" 
 		ng-click="cassandraCtrl.addSeed(seed)">
 			{{ seed }}
 		</li>		

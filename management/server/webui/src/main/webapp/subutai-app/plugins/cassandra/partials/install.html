@@ -73,8 +73,8 @@
 
 						<div class="b-form-wrapper b-form-wrapper_margin-size-1">
 							<select class="b-form-input b-form-input_full" 
-								ng-model="selectedEnvironment" 
-								ng-change="cassandraCtrl.showContainers(selectedEnvironment)">
+								ng-model="cassandraCtrl.cassandraInstall.environmentId" 
+								ng-change="cassandraCtrl.showContainers(cassandraCtrl.cassandraInstall.environmentId)">
 								<option value="">Select environment</option>
 								<option ng-repeat="environment in cassandraCtrl.environments" value="{{ environment.id }}">
 									{{ environment.name }}

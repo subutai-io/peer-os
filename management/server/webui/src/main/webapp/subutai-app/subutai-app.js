@@ -179,7 +179,7 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 								'subutai-app/tracker/tracker.js',
 								'subutai-app/tracker/controller.js',
 								'subutai-app/tracker/service.js',
-									'subutai-app/tracker/filter.js'
+								'subutai-app/tracker/filter.js'
 							]
 						}
 				]);
@@ -229,10 +229,7 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 			loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
 				return $ocLazyLoad.load([
 					{
-						name: 'vtortola.ng-terminal',
-						files: [
-							'assets/js/plugins/vtortola.ng-terminal.js'
-						]
+						name: 'vtortola.ng-terminal'
 					},
 					{
 						name: 'subutai.console',
@@ -326,7 +323,7 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 
 function startup($rootScope, $state, $location, $http) {
 
-	//document.cookie="sptoken=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzMjAzY2E4ZC01MzNkLTQ0MmEtYTI4My02OGRkMDFmMWYzZmUiLCJpc3MiOiJpby5zdWJ1dGFpIn0.I3UXOMiC9kq4Vt4letp2qmsfkfvIpP764uazehzJc5g";
+	//document.cookie="sptoken=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzMTBjNGE5MC05YWQ3LTQ4Y2UtYWRmNi1kODVkMTVmNDU2NGEiLCJpc3MiOiJpby5zdWJ1dGFpIn0.uipLKoywZk3mDOAu0uT7PdijzJp0Sexzt3TPyYMV5bE";
 	$rootScope.$on('$stateChangeStart',	function(event, toState, toParams, fromState, fromParams){
 		var restrictedPage = $.inArray($location.path(), ['/login']) === -1;
 		if (restrictedPage && !getCookie('sptoken')) {
@@ -399,8 +396,8 @@ app.directive('checkbox-list-dropdown', function() {
 });
 
 //Global variables
-//var serverUrl = '/rest/';
-var serverUrl = 'http://172.16.131.205:8181/rest/';
+var serverUrl = '/rest/';
+//var serverUrl = 'http://172.16.131.205:8181/rest/';
 quotaColors = [];
 quotaColors['CUSTOM'] = 'blue';
 quotaColors['HUGE'] = 'bark-red';
