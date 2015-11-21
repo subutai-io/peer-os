@@ -57,6 +57,7 @@ function CassandraCtrl(cassandraSrv, SweetAlert) {
 		if(vm.currentCluster.name === undefined) return;
 		cassandraSrv.startNodes(vm.currentCluster.name, JSON.stringify(vm.nodes2Action)).success(function (data) {
 			SweetAlert.swal("Success!", "Your cluster nodes started successfully.", "success");
+			getClustersInfo(vm.currentCluster.name);
 		}).error(function (error) {
 			SweetAlert.swal("ERROR!", 'Cluster start error: ' + error.ERROR, "error");
 		});
@@ -67,6 +68,7 @@ function CassandraCtrl(cassandraSrv, SweetAlert) {
 		if(vm.currentCluster.name === undefined) return;
 		cassandraSrv.stopNodes(vm.currentCluster.name, JSON.stringify(vm.nodes2Action)).success(function (data) {
 			SweetAlert.swal("Success!", "Your cluster nodes stoped successfully.", "success");
+			getClustersInfo(vm.currentCluster.name);
 		}).error(function (error) {
 			SweetAlert.swal("ERROR!", 'Cluster stop error: ' + error.ERROR, "error");
 		});
