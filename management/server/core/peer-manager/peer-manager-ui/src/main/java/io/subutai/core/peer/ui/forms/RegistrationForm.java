@@ -132,7 +132,6 @@ public class RegistrationForm extends CustomComponent
 
     private void updateRequestsTable()
     {
-
         requestsTable.removeAllItems();
         for ( RegistrationData registrationData : module.getPeerManager().getRegistrationRequests() )
         {
@@ -340,7 +339,16 @@ public class RegistrationForm extends CustomComponent
                         }
                         else
                         {
-                            sendRegistrationRequest( hostField.getValue().trim(), keyPhraseField.getValue() );
+                            String ip = module.getPeerManager().getLocalPeerInfo().getIp();
+
+                            if( ip.equals( hostField.getValue()))
+                            {
+                                Notification.show( "Invalid Host address, select valid IP", Notification.Type.WARNING_MESSAGE );
+                            }
+                            else
+                            {
+                                sendRegistrationRequest( hostField.getValue().trim(), keyPhraseField.getValue() );
+                            }
                         }
                         updateRequestsTable();
                     }
