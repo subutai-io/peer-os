@@ -281,9 +281,19 @@ public class IdentityDataServiceImpl implements IdentityDataService
      *
      */
     @Override
-    public Session getSessionByUserId( final long userId )
+    public List<Session> getSessionsByUserId( final long userId )
     {
         return sessionDAOService.getByUserId( userId );
+    }
+
+
+    /* *************************************************
+     *
+     */
+    @Override
+    public Session getValidSession( final long userId )
+    {
+        return sessionDAOService.getValid( userId );
     }
 
 
@@ -314,6 +324,16 @@ public class IdentityDataServiceImpl implements IdentityDataService
     public void updateSession( final Session item )
     {
         sessionDAOService.update( item );
+    }
+
+
+    /* *************************************************
+     *
+     */
+    @Override
+    public void invalidateSessions()
+    {
+        sessionDAOService.invalidate();
     }
 
 
@@ -376,6 +396,15 @@ public class IdentityDataServiceImpl implements IdentityDataService
         userTokenDAOService.persist( item );
     }
 
+
+    /* *************************************************
+     *
+     */
+    @Override
+    public void updateUserToken( final UserToken item )
+    {
+        userTokenDAOService.update( item );
+    }
 
     /* *************************************************
      *

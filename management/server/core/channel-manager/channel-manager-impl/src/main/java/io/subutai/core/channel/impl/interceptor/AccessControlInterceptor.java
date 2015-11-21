@@ -23,6 +23,7 @@ import com.google.common.base.Strings;
 import io.subutai.common.settings.ChannelSettings;
 import io.subutai.core.channel.impl.ChannelManagerImpl;
 import io.subutai.core.channel.impl.util.MessageContentUtil;
+import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.identity.api.model.User;
 
 
@@ -52,11 +53,11 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
         try
         {
             URL url = new URL( ( String ) message.get( Message.REQUEST_URL ) );
-            User user = null;
+            Session userSession = null;
 
             if ( url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X2 ) )
             {
-                user = authenticateAccess( null );
+                userSession = authenticateAccess( null );
             }
             else
             {
@@ -64,15 +65,15 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
                 status = MessageContentUtil.checkUrlAccessibility( status, url );
                 //----------------------------------------------------------------------------------------------
                 if ( status != 0 ) //require tokenauth
-                    user = authenticateAccess( message );
+                    userSession = authenticateAccess( message );
                 else // auth with system user
-                    user = authenticateAccess( null );
+                    userSession = authenticateAccess( null );
             }
 
             //******Authenticate************************************************
-            if ( user != null )
+            if ( userSession != null )
             {
-                Subject.doAs( user.getSubject(), new PrivilegedAction<Void>()
+                Subject.doAs( userSession.getSubject(), new PrivilegedAction<Void>()
                 {
                     @Override
                     public Void run()
@@ -83,6 +84,7 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
                         }
                         catch ( Exception ex )
                         {
+                            LOG.error( "****** Error !! Error in doIntercept," + ex.toString(),ex );
                             MessageContentUtil.abortChain( message, 403, "Access Denied to the resource" );
                         }
                         return null;
@@ -103,7 +105,7 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
 
 
     //******************************************************************
-    private User authenticateAccess( Message message )
+    private Session authenticateAccess( Message message )
     {
         if ( message == null )
         {

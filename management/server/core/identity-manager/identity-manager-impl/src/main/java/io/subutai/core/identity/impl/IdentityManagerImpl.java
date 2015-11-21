@@ -62,6 +62,10 @@ import io.subutai.core.identity.impl.model.UserTokenEntity;
 @PermitAll
 public class IdentityManagerImpl implements IdentityManager
 {
+    //Session Expiration time in mins
+    //****************************************
+    private static int SESSION_TIMEOUT = 30;
+    //****************************************
 
     private static final Logger LOGGER = LoggerFactory.getLogger( IdentityManagerImpl.class.getName() );
 
@@ -89,15 +93,21 @@ public class IdentityManagerImpl implements IdentityManager
             public void run()
             {
                 removeInvalidTokens();
+                invalidateSessions();
             }
-        }, 1, 1, TimeUnit.HOURS );
+        }, 15, 15, TimeUnit.MINUTES );
         //*****************************************
     }
 
 
     public void destroy()
     {
-        executorService.shutdownNow();
+        //*****************************************
+        if(executorService!=null)
+        {
+            executorService.shutdown();
+        }
+        //*****************************************
     }
     //*****************************************************
 
@@ -107,7 +117,6 @@ public class IdentityManagerImpl implements IdentityManager
     {
         identityDataService = new IdentityDataServiceImpl( daoManager );
 
-        // TODO: return to @code assignRolePermission
         if ( identityDataService.getAllUsers().size() < 1 )
         {
             PermissionObject permsp[] = PermissionObject.values();
@@ -222,11 +231,11 @@ public class IdentityManagerImpl implements IdentityManager
      */
     @PermitAll
     @Override
-    public User login( String userName, String password )
+    public Session login( String userName, String password )
     {
         try
         {
-            User user = null;
+            Session userSession = null;
 
             CallbackHandler ch = getCalbackHandler( userName, password );
             Subject subject = new Subject();
@@ -237,15 +246,15 @@ public class IdentityManagerImpl implements IdentityManager
             {
                 Object obj = subject.getPrivateCredentials().iterator().next();
 
-                if ( obj instanceof UserEntity )
+                if ( obj instanceof SessionEntity )
                 {
-                    user = ( User ) obj;
-                    user.setSubject( subject );
+                    userSession = ( Session ) obj;
+                    userSession.setSubject( subject );
                     break;
                 }
             }
 
-            return user;
+            return userSession;
         }
         catch ( Exception ex )
         {
@@ -254,25 +263,100 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
+
     /* *************************************************
      */
     @PermitAll
     @Override
     public Session startSession( User user )
     {
+        Session userSession = null;
+
         try
         {
-            Session userSession = new SessionEntity();
-            userSession.setUser( user );
+            userSession = identityDataService.getValidSession( user.getId() );
 
-            identityDataService.persistSession( userSession );
+            if(userSession==null)
+            {
+                userSession = new SessionEntity();
+                userSession.setStatus( 1 );
+                userSession.setUser( user );
+                userSession.setStartDate( new Date( System.currentTimeMillis() ) );
+                identityDataService.persistSession( userSession );
+            }
+        }
 
-            return userSession;
+        catch ( Exception ex )
+        {
+        }
+
+        return userSession;
+    }
+
+
+    /* *************************************************
+     */
+    @PermitAll
+    @Override
+    public void endSession( Session userSession )
+    {
+        try
+        {
+            userSession.setStatus( 0 ); //inactive
+            userSession.setEndDate( new Date( System.currentTimeMillis() ) );
+
+            identityDataService.updateSession( userSession );
         }
         catch ( Exception ex )
         {
-            return null;
         }
+    }
+
+    /* *************************************************
+     */
+    @PermitAll
+    @Override
+    public void extendSessionTime( Session userSession )
+    {
+        try
+        {
+            Date currentDate = new Date(System.currentTimeMillis() );
+            userSession.setStartDate( DateUtils.addMinutes( currentDate, SESSION_TIMEOUT ) );
+            identityDataService.updateSession( userSession );
+        }
+        catch ( Exception ex )
+        {
+        }
+    }
+
+
+    /* *************************************************
+     */
+    @RolesAllowed( "Identity-Management|A|Read" )
+    @Override
+    public List<Session> getSessions()
+    {
+        return identityDataService.getAllSessions();
+    }
+
+
+    /* *************************************************
+     */
+    @RolesAllowed( "Identity-Management|A|Read" )
+    @Override
+    public Session getSession( long sessionId )
+    {
+        return identityDataService.getSession( sessionId );
+    }
+
+
+    /* *************************************************
+     */
+    @PermitAll
+    @Override
+    public void invalidateSessions()
+    {
+        identityDataService.invalidateSessions();
     }
 
 
@@ -301,7 +385,7 @@ public class IdentityManagerImpl implements IdentityManager
             }
             if ( validDate == null )
             {
-                validDate = DateUtils.addHours( new Date( System.currentTimeMillis() ), 1 );
+                validDate = DateUtils.addMinutes( new Date( System.currentTimeMillis() ), SESSION_TIMEOUT );
             }
 
             userToken.setToken( token );
@@ -454,53 +538,80 @@ public class IdentityManagerImpl implements IdentityManager
     @Override
     public User getActiveUser()
     {
-        return getLoggedUser();
+        Session session = getLoggedUser();
+
+        if(session!=null)
+        {
+            return session.getUser();
+        }
+        else
+        {
+            return null;
+        }
     }
 
 
     /* *************************************************
      */
-    @PermitAll
-    @Override
-    public User getLoggedUser()
+    private Session getLoggedUser()
     {
-        User user = null;
+        Session session = null;
+        try
+        {
+            Subject subject = getActiveSubject();
+
+            if ( subject != null )
+            {
+                while ( subject.getPrivateCredentials().iterator().hasNext() )
+                {
+                    Object obj = subject.getPrivateCredentials().iterator().next();
+
+                    if ( obj instanceof SessionEntity )
+                    {
+                        session = (( Session ) obj);
+                        break;
+                    }
+                }
+            }
+        }
+        catch ( Exception ex )
+        {
+            LOGGER.error("*** Error! Cannot find active User. Session is not started");
+        }
+
+        return session;
+    }
+
+    /* *************************************************
+     */
+    private Subject getActiveSubject()
+    {
+
+        Subject subject = null;
+
         try
         {
             AccessControlContext acc = AccessController.getContext();
+
             if ( acc == null )
             {
                 throw new RuntimeException( "access control context is null" );
             }
 
-            Subject subject = Subject.getSubject( acc );
+            subject = Subject.getSubject( acc );
+
             if ( subject == null )
             {
                 throw new RuntimeException( "subject is null" );
             }
 
-            while ( subject.getPrivateCredentials().iterator().hasNext() )
-            {
-                Object obj = subject.getPrivateCredentials().iterator().next();
-
-                if ( obj instanceof UserEntity )
-                {
-                    user = ( User ) obj;
-                    user.setSubject( subject );
-                    break;
-                }
-            }
-
-            return user;
-        }
-        catch ( RuntimeException ex )
-        {
-            return null;
         }
         catch ( Exception ex )
         {
-            return null;
+            LOGGER.error("*** Error! Cannot get auth.subject.");
         }
+
+        return subject;
     }
 
 
@@ -848,12 +959,34 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
+    @PermitAll
     @Override
     public List<UserToken> getAllUserTokens()
     {
         return identityDataService.getAllUserTokens();
     }
 
+
+    /* *************************************************
+     */
+    @PermitAll
+    @Override
+    public void extendTokenTime( UserToken token, int minutes )
+    {
+        token.setValidDate( DateUtils.addMinutes( token.getValidDate(), minutes ));
+        identityDataService.updateUserToken( token );
+    }
+
+
+
+    /* *************************************************
+     */
+    @PermitAll
+    @Override
+    public void updateUserToken( UserToken token )
+    {
+        identityDataService.updateUserToken( token );
+    }
 
 
     /* *************************************************

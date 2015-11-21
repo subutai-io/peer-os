@@ -1,6 +1,8 @@
 package io.subutai.core.test;
 
 
+import javax.naming.NamingException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,12 +35,20 @@ public class TestCommand extends SubutaiShellCommandSupport
         try
         {
             LocalPeer localPeer = ServiceLocator.getServiceNoCache( LocalPeer.class );
-            final IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
             localPeer.getManagementHost().execute( new RequestBuilder( "pwd" ), new CommandCallback()
             {
                 @Override
                 public void onResponse( final Response response, final CommandResult commandResult )
                 {
+                    IdentityManager identityManager = null;
+                    try
+                    {
+                        identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
+                    }
+                    catch ( NamingException e )
+                    {
+                        e.printStackTrace();
+                    }
                     LOG.error( identityManager.getActiveUser().toString() );
                 }
             } );

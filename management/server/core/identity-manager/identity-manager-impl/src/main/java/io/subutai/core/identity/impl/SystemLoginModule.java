@@ -27,6 +27,7 @@ import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Permission;
 import io.subutai.core.identity.api.model.Role;
+import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.identity.api.model.User;
 
 
@@ -81,39 +82,49 @@ public class SystemLoginModule extends AbstractKarafLoginModule
             // **************************************
             IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
             User loggedUser = identityManager.authenticateUser( user, password );
-            //Session userSession = identityManager.startSession(loggedUser);
-            //userSession.setSubject( subject );
             // **************************************
 
 
             if ( loggedUser != null )
             {
-                //******************************************
-                principals = new HashSet<>();
-                principals.add( new UserPrincipal( user ) );
-                //******************************************
+                // Create or restore existing session *********************
+                Session userSession = identityManager.startSession( loggedUser );
+                //*********************************************************
 
-                //******************************************
-                List<Role> roles = loggedUser.getRoles();
-                for ( Role role : roles )
+                if ( userSession.getSubject() != null ) //restore
                 {
-                    List<Permission> permissions = role.getPermissions();
-                    for ( Permission permission : permissions )
-                    {
-                        List<String> perms = permission.asString();
+                    subject = userSession.getSubject();
+                    LOGGER.debug( "Session restored" );
+                }
+                else //create new subject
+                {
+                    //******************************************
+                    principals = new HashSet<>();
+                    principals.add( new UserPrincipal( user ) );
+                    //******************************************
 
-                        for ( String perm : perms )
+                    //******************************************
+                    List<Role> roles = loggedUser.getRoles();
+                    for ( Role role : roles )
+                    {
+                        List<Permission> permissions = role.getPermissions();
+                        for ( Permission permission : permissions )
                         {
-                            principals.add( new RolePrincipal( perm ) );
+                            List<String> perms = permission.asString();
+
+                            for ( String perm : perms )
+                            {
+                                principals.add( new RolePrincipal( perm ) );
+                            }
                         }
                     }
+                    principals.add( new RolePrincipal( "webconsole" ) );
+                    subject.getPrincipals().addAll( principals );
+                    subject.getPrivateCredentials().add( userSession );
+                    //******************************************
+                    LOGGER.debug( "Successful login." );
                 }
-                principals.add( new RolePrincipal( "webconsole" ) );
-                subject.getPrincipals().addAll( principals );
-                subject.getPrivateCredentials().add( loggedUser );
-                //******************************************
 
-                LOGGER.debug( "Successful login." );
             }
         }
         catch ( IOException ioException )

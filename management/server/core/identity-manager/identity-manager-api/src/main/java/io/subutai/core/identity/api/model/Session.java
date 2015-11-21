@@ -19,9 +19,9 @@ public interface Session
 
     void setUser( User user );
 
-    boolean isActive();
+    int getStatus();
 
-    void setActive( boolean active );
+    void setStatus( int status );
 
     Date getStartDate();
 

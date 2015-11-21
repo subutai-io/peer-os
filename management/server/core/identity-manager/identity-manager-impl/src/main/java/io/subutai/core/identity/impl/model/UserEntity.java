@@ -59,11 +59,9 @@ public class UserEntity implements User
     @Column( name = "status" )
     private int status = 1; // Active
 
+    @Column( name = "security_key_id" )
+    private int securityKeyId = 1; // PGP KeyID
 
-    //************************************
-    @Transient
-    private Subject subject;
-    //************************************
 
     //*********************************************
     @ManyToMany( targetEntity = RoleEntity.class, fetch = FetchType.EAGER )
@@ -173,20 +171,6 @@ public class UserEntity implements User
 
 
     @Override
-    public Subject getSubject()
-    {
-        return subject;
-    }
-
-
-    @Override
-    public void setSubject( final Subject subject )
-    {
-        this.subject = subject;
-    }
-
-
-    @Override
     public int getType()
     {
         return type;
@@ -217,6 +201,19 @@ public class UserEntity implements User
     public void setId( final long id )
     {
         this.id = id;
+    }
+
+
+    @Override
+    public int getSecurityKeyId()
+    {
+        return securityKeyId;
+    }
+
+    @Override
+    public void setSecurityKeyId( final int securityKeyId )
+    {
+        this.securityKeyId = securityKeyId;
     }
 
 

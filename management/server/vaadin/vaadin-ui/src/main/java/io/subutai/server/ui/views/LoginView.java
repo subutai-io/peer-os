@@ -3,6 +3,7 @@ package io.subutai.server.ui.views;
 
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.server.ui.MainUI;
 import io.subutai.server.ui.util.HelpManager;
@@ -116,12 +117,12 @@ public class LoginView extends VerticalLayout implements View
                 try
                 {
                     IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
-                    User user = identityManager.login(  username.getValue(), password.getValue() );
+                    Session userSession = identityManager.login(  username.getValue(), password.getValue() );
 
-                    if(user!=null)
+                    if(userSession!=null)
                     {
                         VaadinRequest request = VaadinService.getCurrentRequest();
-                        request.getWrappedSession().setAttribute( "userSessionData",user );
+                        request.getWrappedSession().setAttribute( "userSessionData",userSession );
                         mainUI.getUsername().setValue( username.getValue() );
                         getUI().getNavigator().navigateTo( "/core" );
                     }

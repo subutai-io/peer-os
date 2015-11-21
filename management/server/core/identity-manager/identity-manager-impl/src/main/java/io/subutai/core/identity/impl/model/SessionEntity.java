@@ -33,8 +33,8 @@ public class SessionEntity implements Session
     @Column( name = "id" )
     private long id;
 
-    @Column( name = "active" )
-    private boolean active = true;
+    @Column( name = "status" )
+    private int status = 1;
 
     @Column( name = "start_date" )
     private Date startDate = new Date( System.currentTimeMillis() );
@@ -84,16 +84,16 @@ public class SessionEntity implements Session
 
 
     @Override
-    public boolean isActive()
+    public int getStatus()
     {
-        return active;
+        return status;
     }
 
 
     @Override
-    public void setActive( final boolean active )
+    public void setStatus( final int status )
     {
-        this.active = active;
+        this.status = status;
     }
 
 

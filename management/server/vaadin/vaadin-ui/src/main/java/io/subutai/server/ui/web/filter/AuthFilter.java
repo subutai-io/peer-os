@@ -14,6 +14,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.identity.api.model.User;
 
 
@@ -57,7 +59,7 @@ public class AuthFilter implements Filter
         {
             if ( request.getSession().getAttribute( "userSessionData" ) != null )
             {
-                User userSession = ( User ) request.getSession().getAttribute( "userSessionData" );
+                Session userSession = ( Session ) request.getSession().getAttribute( "userSessionData" );
 
 
                 //*******************************************************************

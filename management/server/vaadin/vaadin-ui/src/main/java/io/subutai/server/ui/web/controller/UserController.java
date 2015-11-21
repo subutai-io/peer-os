@@ -14,6 +14,7 @@ import com.google.common.base.Strings;
 
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.identity.api.model.User;
 
 
@@ -52,12 +53,12 @@ public class UserController extends HttpServlet
             if( !Strings.isNullOrEmpty(username))
             {
                 IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
-                User user = identityManager.login( username, password  );
+                Session userSession = identityManager.login( username, password  );
 
-                if(user != null)
+                if(userSession != null)
                 {
                     Random r = new Random();
-                    request.getSession().setAttribute( "userSessionData", user);
+                    request.getSession().setAttribute( "userSessionData", userSession);
                     response.sendRedirect( "vui/?" + r.nextInt(100));
                 }
                 else

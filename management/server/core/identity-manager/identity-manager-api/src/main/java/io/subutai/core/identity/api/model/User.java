@@ -3,8 +3,6 @@ package io.subutai.core.identity.api.model;
 
 import java.util.List;
 
-import javax.security.auth.Subject;
-
 
 public interface User
 {
@@ -37,10 +35,6 @@ public interface User
 
     void setRoles( List<Role> roles );
 
-    Subject getSubject();
-
-    void setSubject( Subject subject );
-
     int getType();
 
     void setType( int type );
@@ -48,6 +42,10 @@ public interface User
     int getStatus();
 
     void setStatus( int status );
+
+    int getSecurityKeyId();
+
+    void setSecurityKeyId( int securityKeyId );
 
     String getStatusName();
 
