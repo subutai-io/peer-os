@@ -44,7 +44,7 @@ public class WebuiModuleServiceImpl implements WebuiModuleService
     {
         if( modules.size() == 0 )
         {
-            return "";
+            return "{}";
         }
         else
         {

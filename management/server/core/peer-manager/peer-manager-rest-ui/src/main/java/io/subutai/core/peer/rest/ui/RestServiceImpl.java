@@ -124,7 +124,7 @@ public class RestServiceImpl implements RestService
 
         try
         {
-            peerManager.doRejectRequest( data );
+            peerManager.doUnregisterRequest( data );
         }
         catch ( PeerException e )
         {
