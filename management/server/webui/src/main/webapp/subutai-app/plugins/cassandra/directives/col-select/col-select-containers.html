@@ -3,7 +3,7 @@
 	<ul class="b-form-list b-form-list_table">
 		<li class="b-form-list-table__link" 
 		ng-repeat="container in cassandraCtrl.containers" 
-		ng-if="cassandraCtrl.cassandraInstall.containerId.indexOf(container.id) == -1" 
+		ng-if="cassandraCtrl.cassandraInstall.containers.indexOf(container.id) == -1" 
 		ng-click="cassandraCtrl.addContainer(container.id)">
 			{{ container.id }}
 		</li>
@@ -20,7 +20,7 @@
 	<ul class="b-form-list b-form-list_table">
 		<li class="b-form-list-table__link" 
 		ng-repeat="container in cassandraCtrl.containers" 
-		ng-if="cassandraCtrl.cassandraInstall.containerId.indexOf(container.id) > -1" 
+		ng-if="cassandraCtrl.cassandraInstall.containers.indexOf(container.id) > -1" 
 		ng-click="cassandraCtrl.addContainer(container.id)">
 			{{ container.id }}
 		</li>		

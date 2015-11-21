@@ -18,7 +18,7 @@ var app = angular.module("subutai-app", [
 	.run(startup);
 
 routesConf.$inject = ['$stateProvider', '$urlRouterProvider', '$ocLazyLoadProvider'];
-startup.$inject = ['$rootScope', '$state', '$cookies', '$location', '$http'];
+startup.$inject = ['$rootScope', '$state', '$location', '$http'];
 
 function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 
@@ -179,7 +179,7 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 								'subutai-app/tracker/tracker.js',
 								'subutai-app/tracker/controller.js',
 								'subutai-app/tracker/service.js',
-									'subutai-app/tracker/filter.js'
+								'subutai-app/tracker/filter.js'
 							]
 						}
 				]);
@@ -229,10 +229,7 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 			loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
 				return $ocLazyLoad.load([
 					{
-						name: 'vtortola.ng-terminal',
-						files: [
-							'assets/js/plugins/vtortola.ng-terminal.js'
-						]
+						name: 'vtortola.ng-terminal'
 					},
 					{
 						name: 'subutai.console',
@@ -324,22 +321,18 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 	})
 }
 
-function startup($rootScope, $state, $cookies, $location, $http) {
+function startup($rootScope, $state, $location, $http) {
 
-	//document.cookie="sptoken=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzMjAzY2E4ZC01MzNkLTQ0MmEtYTI4My02OGRkMDFmMWYzZmUiLCJpc3MiOiJpby5zdWJ1dGFpIn0.I3UXOMiC9kq4Vt4letp2qmsfkfvIpP764uazehzJc5g";
-	if($rootScope.sptoken === undefined) {
-		$rootScope.sptoken = getCookie('sptoken');
-		//$rootScope.sptoken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzMjAzY2E4ZC01MzNkLTQ0MmEtYTI4My02OGRkMDFmMWYzZmUiLCJpc3MiOiJpby5zdWJ1dGFpIn0.I3UXOMiC9kq4Vt4letp2qmsfkfvIpP764uazehzJc5g';
-	}
+	//document.cookie="sptoken=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwZDI3NzM3NC0yODNmLTQyMDEtYmRiOS02ZjA0OThkODE3MWYiLCJpc3MiOiJpby5zdWJ1dGFpIn0.WYBwPBZ6yOVa9AhECiVNYijTYrXleARdF3ta06vNtSo";
 	$rootScope.$on('$stateChangeStart',	function(event, toState, toParams, fromState, fromParams){
 		var restrictedPage = $.inArray($location.path(), ['/login']) === -1;
-		if (restrictedPage && !$rootScope.sptoken) {
+		if (restrictedPage && !getCookie('sptoken')) {
 			$location.path('/login');
 		}
 	});
 
 	$rootScope.$state = $state;
-	$http.defaults.headers.common['sptoken']= $rootScope.sptoken;
+	$http.defaults.headers.common['sptoken']= getCookie('sptoken');
 }
 
 function getCookie(cname) {
@@ -404,6 +397,7 @@ app.directive('checkbox-list-dropdown', function() {
 
 //Global variables
 var serverUrl = '/rest/';
+//var serverUrl = 'http://172.16.131.205:8181/rest/';
 quotaColors = [];
 quotaColors['CUSTOM'] = 'blue';
 quotaColors['HUGE'] = 'bark-red';

@@ -135,7 +135,7 @@ function IdentityRoleCtrl($scope, identitySrv, DTOptionsBuilder, DTColumnBuilder
 					vm.dtInstance.reloadData(null, false);
 				});
 			}
-		});		
+		});
 	}
 
 };

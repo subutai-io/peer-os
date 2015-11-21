@@ -4,8 +4,8 @@ angular.module('subutai.console.controller', [])
 	.controller('ConsoleViewCtrl', ConsoleViewCtrl)
 	.config(['terminalConfigurationProvider', function (terminalConfigurationProvider) {
 
-		terminalConfigurationProvider.config('modern').outputDelay = 80;
 		terminalConfigurationProvider.config('modern').allowTypingWriteDisplaying = false;
+		terminalConfigurationProvider.config('modern').outputDelay = 80;
 		//terminalConfigurationProvider.config('vintage').typeSoundUrl ='example/content/type.wav';
 		//terminalConfigurationProvider.config('vintage').startSoundUrl ='example/content/start.wav';
 	}]);

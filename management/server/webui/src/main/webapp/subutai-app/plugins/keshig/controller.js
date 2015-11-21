@@ -6,7 +6,7 @@ angular.module('subutai.plugins.keshig.controller', [])
 KeshigCtrl.$inject = ['keshigSrv', 'SweetAlert'];
 function KeshigCtrl(keshigSrv, SweetAlert) {
     var vm = this;
-	vm.activeTab = 'build';
+	vm.activeTab = 'servers';
 	vm.keshigInstall = {};
 
 	//functions
