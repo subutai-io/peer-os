@@ -17,7 +17,7 @@ function LoginCtrl( loginSrv )
 
 	function login() {
 		loginSrv.login( vm.name, vm.pass ).success(function(data){
-			console.log(getCookie('sptoken'));
+			$http.defaults.headers.common['sptoken']= getCookie('sptoken');
 		});
 	}
 }

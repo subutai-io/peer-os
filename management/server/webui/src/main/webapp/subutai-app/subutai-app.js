@@ -18,7 +18,7 @@ var app = angular.module("subutai-app", [
 	.run(startup);
 
 routesConf.$inject = ['$stateProvider', '$urlRouterProvider', '$ocLazyLoadProvider'];
-startup.$inject = ['$rootScope', '$state', '$cookies', '$location', '$http'];
+startup.$inject = ['$rootScope', '$state', '$location', '$http'];
 
 function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 
@@ -324,22 +324,18 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 	})
 }
 
-function startup($rootScope, $state, $cookies, $location, $http) {
+function startup($rootScope, $state, $location, $http) {
 
 	//document.cookie="sptoken=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzMjAzY2E4ZC01MzNkLTQ0MmEtYTI4My02OGRkMDFmMWYzZmUiLCJpc3MiOiJpby5zdWJ1dGFpIn0.I3UXOMiC9kq4Vt4letp2qmsfkfvIpP764uazehzJc5g";
-	if($rootScope.sptoken === undefined) {
-		$rootScope.sptoken = getCookie('sptoken');
-		//$rootScope.sptoken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzMjAzY2E4ZC01MzNkLTQ0MmEtYTI4My02OGRkMDFmMWYzZmUiLCJpc3MiOiJpby5zdWJ1dGFpIn0.I3UXOMiC9kq4Vt4letp2qmsfkfvIpP764uazehzJc5g';
-	}
 	$rootScope.$on('$stateChangeStart',	function(event, toState, toParams, fromState, fromParams){
 		var restrictedPage = $.inArray($location.path(), ['/login']) === -1;
-		if (restrictedPage && !$rootScope.sptoken) {
+		if (restrictedPage && !getCookie('sptoken')) {
 			$location.path('/login');
 		}
 	});
 
 	$rootScope.$state = $state;
-	$http.defaults.headers.common['sptoken']= $rootScope.sptoken;
+	$http.defaults.headers.common['sptoken']= getCookie('sptoken');
 }
 
 function getCookie(cname) {
@@ -403,7 +399,8 @@ app.directive('checkbox-list-dropdown', function() {
 });
 
 //Global variables
-var serverUrl = '/rest/';
+//var serverUrl = '/rest/';
+var serverUrl = 'http://172.16.131.205:8181/rest/';
 quotaColors = [];
 quotaColors['CUSTOM'] = 'blue';
 quotaColors['HUGE'] = 'bark-red';

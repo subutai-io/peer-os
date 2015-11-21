@@ -52,12 +52,12 @@ function CassandraCtrl(cassandraSrv, SweetAlert) {
 	}
 
 	function addContainer(containerId) {
-		if(vm.cassandraInstall.containerId.indexOf(containerId) > -1) {
-			vm.cassandraInstall.containerId.splice(vm.cassandraInstall.containerId.indexOf(containerId), 1);
+		if(vm.cassandraInstall.containers.indexOf(containerId) > -1) {
+			vm.cassandraInstall.containers.splice(vm.cassandraInstall.containers.indexOf(containerId), 1);
 		} else {
-			vm.cassandraInstall.containerId.push(containerId);
+			vm.cassandraInstall.containers.push(containerId);
 		}
-		vm.seeds = angular.copy(vm.cassandraInstall.containerId);
+		vm.seeds = angular.copy(vm.cassandraInstall.containers);
 	}
 
 	function addSeed(seedId) {
@@ -72,7 +72,7 @@ function CassandraCtrl(cassandraSrv, SweetAlert) {
 		vm.cassandraInstall.dataDir = '/var/lib/cassandra/data';
 		vm.cassandraInstall.commitDir = '/var/lib/cassandra/commitlog';
 		vm.cassandraInstall.cacheDir = '/var/lib/cassandra/saved_caches';
-		vm.cassandraInstall.containerId = [];
+		vm.cassandraInstall.containers = [];
 		vm.cassandraInstall.seedId = [];
 	}
 }
