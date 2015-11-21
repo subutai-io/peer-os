@@ -7,7 +7,7 @@ PluginsSrv.$inject = ['$http'];
 
 function PluginsSrv($http) {
 
-	var pluginsUrl = 'http://172.16.131.205:8181/js/plugins.json';
+	var pluginsUrl = 'js/plugins.json';
 
 	var PluginsSrv = {
 		getPlugins: getPlugins
