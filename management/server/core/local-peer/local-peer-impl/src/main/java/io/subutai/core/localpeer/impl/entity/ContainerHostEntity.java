@@ -20,7 +20,7 @@ import javax.persistence.Transient;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
-import io.subutai.common.environment.ContainerType;
+import io.subutai.common.peer.ContainerType;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInfo;
@@ -34,7 +34,7 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerId;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.Template;
-import io.subutai.common.quota.CpuQuotaInfo;
+import io.subutai.common.quota.CpuQuota;
 import io.subutai.common.quota.DiskPartition;
 import io.subutai.common.quota.DiskQuota;
 import io.subutai.common.quota.RamQuota;
@@ -284,9 +284,9 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
 
 
     @Override
-    public void setRamQuota( final RamQuota ramQuota ) throws PeerException
+    public void setRamQuota( final RamQuota ramQuotaInfo ) throws PeerException
     {
-        getPeer().setRamQuota( this, ramQuota );
+        getPeer().setRamQuota( this, ramQuotaInfo );
     }
 
 
@@ -298,7 +298,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
 
 
     @Override
-    public CpuQuotaInfo getCpuQuotaInfo() throws PeerException
+    public CpuQuota getCpuQuotaInfo() throws PeerException
     {
         return getPeer().getCpuQuotaInfo( this );
     }

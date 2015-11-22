@@ -4,7 +4,6 @@ package io.subutai.core.localpeer.impl.container;
 import java.util.concurrent.Callable;
 
 import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.peer.ContainerQuota;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.NumUtil;
 import io.subutai.common.peer.ResourceHost;

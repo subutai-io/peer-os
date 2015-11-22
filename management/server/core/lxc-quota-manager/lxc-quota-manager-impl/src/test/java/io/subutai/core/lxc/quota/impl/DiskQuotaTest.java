@@ -1,4 +1,4 @@
-package io.subutai.common.quota;
+package io.subutai.core.lxc.quota.impl;
 
 
 import org.junit.Before;
@@ -9,6 +9,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import io.subutai.common.quota.DiskPartition;
 import io.subutai.common.quota.DiskQuota;
 import io.subutai.common.quota.DiskQuotaUnit;
+import io.subutai.core.lxc.quota.impl.parser.DiskQuotaParser;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -18,6 +19,7 @@ public class DiskQuotaTest
 {
     private DiskQuota diskQuota;
     private DiskQuota diskQuota2;
+
 
     @Before
     public void setUp() throws Exception
@@ -30,26 +32,26 @@ public class DiskQuotaTest
     @Test
     public void testProperties() throws Exception
     {
-        assertNotNull( diskQuota.getQuotaValue() );
+        assertNotNull( diskQuota.getValue() );
         assertNotNull( diskQuota.getDiskPartition() );
         assertNotNull( diskQuota.getDiskQuotaUnit() );
         assertNotNull( diskQuota.getDiskQuotaValue() );
-        assertNotNull( diskQuota.getQuotaKey() );
-        assertNotNull( diskQuota.getQuotaValue() );
-        assertNotNull( diskQuota2.getQuotaValue() );
-        assertNotNull( diskQuota.getQuotaType() );
-        DiskQuota.parse( DiskPartition.OPT, "none" );
+        assertNotNull( diskQuota.getKey() );
+        assertNotNull( diskQuota.getValue() );
+        assertNotNull( diskQuota2.getValue() );
+        assertNotNull( diskQuota.getType() );
+        DiskQuotaParser.getInstance( DiskPartition.OPT ).parse( "none" );
         diskQuota.hashCode();
         diskQuota.equals( "test" );
         diskQuota.equals( diskQuota );
-        DiskQuota.parse( DiskPartition.OPT, "10G" );
+        DiskQuotaParser.getInstance( DiskPartition.OPT ).parse( "10G" );
         DiskQuotaUnit.UNLIMITED.getName();
     }
 
 
-    @Test (expected = IllegalArgumentException.class)
+    @Test( expected = IllegalArgumentException.class )
     public void testParse()
     {
-        DiskQuota.parse( DiskPartition.OPT, String.valueOf( DiskQuotaUnit.UNLIMITED ) );
+        DiskQuotaParser.getInstance( DiskPartition.OPT ).parse( String.valueOf( DiskQuotaUnit.UNLIMITED ) );
     }
 }

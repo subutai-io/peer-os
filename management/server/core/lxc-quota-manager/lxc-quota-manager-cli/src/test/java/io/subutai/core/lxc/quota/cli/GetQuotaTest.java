@@ -57,7 +57,7 @@ public class GetQuotaTest
         when( diskQuota.toString() ).thenReturn( "disk partition" );
         when( quotaManager.getCpuQuota( uuid ) ).thenReturn( 100 );
 
-        getQuota = new GetQuota( quotaManager, peerManager );
+        getQuota = new GetQuota( quotaManager );
         getQuota.setContainerName( containerName );
     }
 

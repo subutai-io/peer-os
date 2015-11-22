@@ -61,4 +61,11 @@ public enum QuotaType
             return null;
         }
     }
+
+
+    @Override
+    public String toString()
+    {
+        return key;
+    }
 }

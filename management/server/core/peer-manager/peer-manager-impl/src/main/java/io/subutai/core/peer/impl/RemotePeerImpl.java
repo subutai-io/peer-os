@@ -56,10 +56,10 @@ import io.subutai.common.peer.RemotePeer;
 import io.subutai.common.peer.Timeouts;
 import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.protocol.Template;
-import io.subutai.common.quota.CpuQuotaInfo;
+import io.subutai.common.quota.CpuQuota;
 import io.subutai.common.quota.DiskPartition;
 import io.subutai.common.quota.DiskQuota;
-import io.subutai.common.quota.QuotaInfo;
+import io.subutai.common.quota.Quota;
 import io.subutai.common.quota.QuotaType;
 import io.subutai.common.quota.RamQuota;
 import io.subutai.common.security.PublicKeyContainer;
@@ -541,7 +541,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public CpuQuotaInfo getCpuQuotaInfo( final ContainerHost containerHost ) throws PeerException
+    public CpuQuota getCpuQuotaInfo( final ContainerHost containerHost ) throws PeerException
     {
         Preconditions.checkNotNull( containerHost, "Container host is null" );
         Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
@@ -560,7 +560,7 @@ public class RemotePeerImpl implements RemotePeer
             String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
             String response = get( path, alias, params, headers );
 
-            return jsonUtil.from( response, CpuQuotaInfo.class );
+            return jsonUtil.from( response, CpuQuota.class );
         }
         catch ( Exception e )
         {
@@ -734,19 +734,19 @@ public class RemotePeerImpl implements RemotePeer
 
     @RolesAllowed( "Environment-Management|A|Update" )
     @Override
-    public void setRamQuota( final ContainerHost containerHost, final RamQuota ramQuota ) throws PeerException
+    public void setRamQuota( final ContainerHost containerHost, final RamQuota ramQuotaInfo ) throws PeerException
     {
         Preconditions.checkNotNull( containerHost, "Container host is null" );
         Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
 
         EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
-        Preconditions.checkNotNull( ramQuota, "Invalid ram quota" );
+        Preconditions.checkNotNull( ramQuotaInfo, "Invalid ram quota" );
 
         String path = "/container/quota/ram2";
 
         Map<String, String> params = Maps.newHashMap();
         params.put( "containerId", host.getId() );
-        params.put( "ramQuota", jsonUtil.to( ramQuota ) );
+        params.put( "ramQuota", jsonUtil.to( ramQuotaInfo ) );
 
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
@@ -859,7 +859,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public QuotaInfo getQuotaInfo( final ContainerHost containerHost, final QuotaType quotaType ) throws PeerException
+    public Quota getQuotaInfo( final ContainerHost containerHost, final QuotaType quotaType ) throws PeerException
     {
         Preconditions.checkNotNull( containerHost, "Container host is null" );
         Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
@@ -882,7 +882,7 @@ public class RemotePeerImpl implements RemotePeer
             String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
             String response = get( path, alias, params, headers );
 
-            return jsonUtil.from( response, new TypeToken<QuotaInfo>()
+            return jsonUtil.from( response, new TypeToken<Quota>()
             {}.getType() );
         }
         catch ( Exception e )
@@ -894,7 +894,7 @@ public class RemotePeerImpl implements RemotePeer
 
     @RolesAllowed( "Environment-Management|A|Update" )
     @Override
-    public void setQuota( final ContainerHost containerHost, final QuotaInfo quotaInfo ) throws PeerException
+    public void setQuota( final ContainerHost containerHost, final Quota quotaInfo ) throws PeerException
     {
         Preconditions.checkNotNull( containerHost, "Container host is null" );
         Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
