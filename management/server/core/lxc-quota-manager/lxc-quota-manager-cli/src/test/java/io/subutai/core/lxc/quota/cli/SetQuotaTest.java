@@ -8,14 +8,19 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.quota.CpuQuota;
 import io.subutai.common.quota.DiskPartition;
 import io.subutai.common.quota.DiskQuota;
+import io.subutai.common.quota.QuotaType;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.core.peer.api.PeerManager;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 
@@ -58,7 +63,8 @@ public class SetQuotaTest
         when( quotaManager.getDiskQuota( uuid, DiskPartition.VAR ) ).thenReturn( diskQuota );
         when( diskQuota.toString() ).thenReturn( "disk partition" );
         when( quotaManager.getCpuQuota( uuid ) ).thenReturn( 100 );
-        setQuota = new SetQuota( quotaManager, peerManager );
+
+        setQuota = new SetQuota( quotaManager );
     }
 
 

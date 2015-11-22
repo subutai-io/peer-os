@@ -1,4 +1,4 @@
-package io.subutai.common.quota;
+package io.subutai.core.lxc.quota.impl;
 
 
 import org.junit.Before;
@@ -13,7 +13,7 @@ import static org.junit.Assert.assertNotNull;
 
 
 @RunWith( MockitoJUnitRunner.class )
-public class HddQuotaInfoTest
+public class HddQuotaTest
 {
     private HddQuotaInfo hddQuotaInfo;
     private HddQuotaInfo hddQuotaInfo2;

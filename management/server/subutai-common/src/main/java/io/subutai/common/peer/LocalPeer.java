@@ -4,7 +4,6 @@ package io.subutai.common.peer;
 import java.util.List;
 import java.util.Set;
 
-import io.subutai.common.environment.ContainerType;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.protocol.Template;
@@ -88,9 +87,9 @@ public interface LocalPeer extends Peer
      * @param template - source template from which to clone container
      * @param containerName - container name
      */
-//    public ContainerHost createContainer( final ResourceHost resourceHost, final Template template,
-//                                          final String containerName, final ContainerQuota containerQuota )
-//            throws PeerException;
+    //    public ContainerHost createContainer( final ResourceHost resourceHost, final Template template,
+    //                                          final String containerName, final ContainerQuota containerQuota )
+    //            throws PeerException;
 
 
     /**
@@ -182,8 +181,4 @@ public interface LocalPeer extends Peer
     List<Template> getTemplates();
 
     Template getTemplateByName( String templateName );
-
-    ContainerQuota getDefaultQuota( ContainerType containerType );
-
-    //    boolean isPeerUsed( String peerId );
 }

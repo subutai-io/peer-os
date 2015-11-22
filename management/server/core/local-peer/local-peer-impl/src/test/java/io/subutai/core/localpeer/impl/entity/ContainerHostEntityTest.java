@@ -247,11 +247,11 @@ public class ContainerHostEntityTest
         verify( peer ).setRamQuota( containerHostEntity, RAM_QUOTA );
 
 
-        RamQuota ramQuota = mock( RamQuota.class );
+        RamQuota ramQuotaInfo = mock( RamQuota.class );
 
-        containerHostEntity.setRamQuota( ramQuota );
+        containerHostEntity.setRamQuota( ramQuotaInfo );
 
-        verify( peer ).setRamQuota( containerHostEntity, ramQuota );
+        verify( peer ).setRamQuota( containerHostEntity, ramQuotaInfo );
     }
 
 

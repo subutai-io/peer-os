@@ -41,7 +41,6 @@ import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.InstanceType;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.peer.ContainerQuota;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;

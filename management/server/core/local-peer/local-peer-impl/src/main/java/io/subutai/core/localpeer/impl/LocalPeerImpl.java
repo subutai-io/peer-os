@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -50,7 +49,6 @@ import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.ContainerDistributionType;
-import io.subutai.common.environment.ContainerType;
 import io.subutai.common.environment.ContainersDestructionResultImpl;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.host.ContainerHostState;
@@ -69,6 +67,7 @@ import io.subutai.common.network.Vni;
 import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
+import io.subutai.common.peer.ContainerType;
 import io.subutai.common.peer.ContainersDestructionResult;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
@@ -85,11 +84,12 @@ import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.protocol.Disposable;
 import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.protocol.Template;
-import io.subutai.common.quota.CpuQuotaInfo;
+import io.subutai.common.quota.ContainerQuota;
+import io.subutai.common.quota.CpuQuota;
 import io.subutai.common.quota.DiskPartition;
 import io.subutai.common.quota.DiskQuota;
+import io.subutai.common.quota.Quota;
 import io.subutai.common.quota.QuotaException;
-import io.subutai.common.quota.QuotaInfo;
 import io.subutai.common.quota.QuotaType;
 import io.subutai.common.quota.RamQuota;
 import io.subutai.common.security.PublicKeyContainer;
@@ -166,7 +166,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     protected boolean initialized = false;
-    private HashMap<ContainerType, ContainerQuota> containerQuotas = new HashMap<>();
 
 
     public LocalPeerImpl( DaoManager daoManager, TemplateRegistry templateRegistry, QuotaManager quotaManager,
@@ -191,62 +190,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    public void setDefaultQuota( final String defaultQuota )
-    {
-        this.defaultQuota = defaultQuota;
-    }
-
-
-    protected void parseDefaultQuotaSettings()
-    {
-        LOG.info( "Parsing default quota settings..." );
-        String[] settings = defaultQuota.split( ":" );
-        if ( settings.length != 5 )
-        {
-            throw new LocalPeerInitializationError( "Invalid default quota settings." );
-        }
-
-        int i = 0;
-        for ( ContainerType containerType : ContainerType.values() )
-        {
-            if ( i > ContainerType.values().length - 2 )
-            {
-                break;
-            }
-            LOG.debug( String.format( "Settings for %s: %s", containerType, settings[i] ) );
-            String[] quotas = settings[i++].split( "\\|" );
-
-            if ( quotas.length != 6 )
-            {
-                throw new LocalPeerInitializationError(
-                        String.format( "Invalid quota settings for %s.", containerType ) );
-            }
-
-            try
-            {
-                final ContainerQuota containerQuota =
-                        new ContainerQuota( Integer.valueOf( quotas[0] ), Integer.valueOf( quotas[1] ),
-                                Integer.valueOf( quotas[2] ), Integer.valueOf( quotas[3] ),
-                                Integer.valueOf( quotas[4] ), Integer.valueOf( quotas[5] ) );
-                containerQuotas.put( containerType, containerQuota );
-                LOG.debug( containerQuota.toString() );
-            }
-            catch ( Exception e )
-            {
-                throw new LocalPeerInitializationError(
-                        String.format( "Could not parse quota settings for %s.", containerType ) );
-            }
-        }
-        LOG.info( "Quota settings parsed." );
-    }
-
-
     public void init()
     {
         LOG.debug( "********************************************** Initializing peer "
                 + "******************************************" );
 
-        parseDefaultQuotaSettings();
         //add command request listener
         addRequestListener( new CommandRequestListener() );
         //add command response listener
@@ -430,36 +378,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Write" )
-    @Override
-    public ContainerHost createContainer( final ResourceHost resourceHost, final Template template,
-                                          final String containerName ) throws PeerException
-    {
-        Preconditions.checkNotNull( resourceHost, "Resource host is null value" );
-        Preconditions.checkNotNull( template, "Pass valid template object" );
-        Preconditions
-                .checkArgument( !Strings.isNullOrEmpty( containerName ), "Cannot create container with null name" );
-
-        getResourceHostByName( resourceHost.getHostname() );
-
-        if ( getTemplate( template.getTemplateName() ) == null )
-        {
-            throw new PeerException( String.format( "Template %s not registered", template.getTemplateName() ) );
-        }
-
-        try
-        {
-            return resourceHost.createContainer( template.getTemplateName(), containerName, 180 );
-        }
-        catch ( ResourceHostException e )
-        {
-            LOG.error( "Failed to create container", e );
-            throw new PeerException( e );
-        }
-    }
-
-
-
     protected ExecutorService getFixedPoolExecutor( int numOfThreads )
     {
         return Executors.newFixedThreadPool( numOfThreads );
@@ -515,11 +433,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         Set<HostInfoModel> result = Sets.newHashSet();
 
-        ContainerQuota containerQuota = containerQuotas.get( request.getContainerType() );
+        ContainerQuota containerQuota = quotaManager.getDefaultContainerQuota( request.getContainerType() );
         if ( containerQuota == null )
         {
-            containerQuota = containerQuotas.get( ContainerType.SMALL );
+            LOG.warn( "Quota not found for container type: " + request.getContainerType() );
+            containerQuota = quotaManager.getDefaultContainerQuota( ContainerType.SMALL );
         }
+
 
         for ( String cloneName : containerDistribution )
         {
@@ -617,10 +537,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         Set<ContainerHost> newContainers = Sets.newHashSet();
         Set<HostInfoModel> result = Sets.newHashSet();
 
-        ContainerQuota containerQuota = containerQuotas.get( request.getContainerType() );
+        ContainerQuota containerQuota = quotaManager.getDefaultContainerQuota( request.getContainerType() );
         if ( containerQuota == null )
         {
-            containerQuota = containerQuotas.get( ContainerType.SMALL );
+            LOG.warn( "Quota not found for container type: " + request.getContainerType() );
+            containerQuota = quotaManager.getDefaultContainerQuota( ContainerType.SMALL );
         }
 
         for ( Future<ContainerHost> future : taskFutures )
@@ -1037,12 +958,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public QuotaInfo getQuotaInfo( ContainerHost host, final QuotaType quota ) throws PeerException
+    public Quota getQuotaInfo( ContainerHost host, final QuotaType quota ) throws PeerException
     {
         try
         {
-            Host c = bindHost( host.getId() );
-            return quotaManager.getQuotaInfo( c.getId(), quota );
+            ContainerHost c = ( ContainerHost ) bindHost( host.getId() );
+            return quotaManager.getQuota( c.getContainerId(), quota );
         }
         catch ( QuotaException e )
         {
@@ -1053,7 +974,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     @RolesAllowed( "Environment-Management|A|Update" )
     @Override
-    public void setQuota( ContainerHost host, final QuotaInfo quota ) throws PeerException
+    public void setQuota( ContainerHost host, final Quota quota ) throws PeerException
     {
         try
         {
@@ -1409,7 +1330,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public CpuQuotaInfo getCpuQuotaInfo( final ContainerHost host ) throws PeerException
+    public CpuQuota getCpuQuotaInfo( final ContainerHost host ) throws PeerException
     {
         Preconditions.checkNotNull( host, "Invalid container host" );
 
@@ -1513,14 +1434,14 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     @RolesAllowed( "Environment-Management|A|Update" )
     @Override
-    public void setRamQuota( final ContainerHost host, final RamQuota ramQuota ) throws PeerException
+    public void setRamQuota( final ContainerHost host, final RamQuota ramQuotaInfo ) throws PeerException
     {
         Preconditions.checkNotNull( host, "Invalid container host" );
-        Preconditions.checkNotNull( ramQuota, "Invalid ram quota" );
+        Preconditions.checkNotNull( ramQuotaInfo, "Invalid ram quota" );
 
         try
         {
-            quotaManager.setRamQuota( host.getId(), ramQuota );
+            quotaManager.setRamQuota( host.getId(), ramQuotaInfo );
         }
         catch ( QuotaException e )
         {
@@ -2066,13 +1987,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
 //        return templateRegistry.getTemplate( name );
         return null;
-    }
-
-
-    @Override
-    public ContainerQuota getDefaultQuota( final ContainerType containerType )
-    {
-        return containerQuotas.get( containerType );
     }
 
 
