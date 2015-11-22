@@ -261,36 +261,18 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 			}]
 		}
 	})
-	.state('cassandra', {
-		url: '/plugins/cassandra',
-		templateUrl: 'plugins/cassandra/partials/view.html',
-		resolve: {
-			loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
-				return $ocLazyLoad.load([
-						{
-							name: 'subutai.plugins.cassandra',
-							files: [
-								'plugins/cassandra/cassandra.js',
-								'plugins/cassandra/controller.js',
-								'plugins/cassandra/service.js'
-							]
-						}
-				]);
-			}]
-		}
-	})
 	.state('keshig', {
 		url: '/plugins/keshig',
-		templateUrl: 'plugins/keshig/partials/view.html',
+		templateUrl: 'subutai-app/plugins/keshig/partials/view.html',
 		resolve: {
 			loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
 				return $ocLazyLoad.load([
 						{
 							name: 'subutai.plugins.keshig',
 							files: [
-								'plugins/keshig/keshig.js',
-								'plugins/keshig/controller.js',
-								'plugins/keshig/service.js'
+								'subutai-app/plugins/keshig/keshig.js',
+								'subutai-app/plugins/keshig/controller.js',
+								'subutai-app/plugins/keshig/service.js'
 							]
 						}
 				]);
@@ -319,6 +301,7 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 		url: '/404',
 		template: 'Not found'
 	})
+	.state()
 }
 
 function startup($rootScope, $state, $location, $http) {

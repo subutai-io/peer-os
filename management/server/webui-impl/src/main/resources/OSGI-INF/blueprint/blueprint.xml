@@ -31,6 +31,7 @@
   <bean id="webuiModuleService"
         scope="singleton" activation="eager"
         class="io.subutai.webui.impl.WebuiModuleServiceImpl">
+    <property name="bcontext" ref="blueprintBundleContext"></property>
   </bean>
 
   <service ref="webuiModuleService"
