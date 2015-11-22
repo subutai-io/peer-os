@@ -38,10 +38,10 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.Template;
-import io.subutai.common.quota.CpuQuotaInfo;
+import io.subutai.common.quota.CpuQuota;
 import io.subutai.common.quota.DiskPartition;
 import io.subutai.common.quota.DiskQuota;
-import io.subutai.common.quota.QuotaInfo;
+import io.subutai.common.quota.Quota;
 import io.subutai.common.quota.QuotaType;
 import io.subutai.common.quota.RamQuota;
 import io.subutai.common.util.JsonUtil;
@@ -471,8 +471,8 @@ public class RemotePeerImplTest
     @Test( expected = PeerException.class )
     public void testGetCpuQuotaInfo() throws Exception
     {
-        CpuQuotaInfo cpuQuotaInfo = mock( CpuQuotaInfo.class );
-        when( jsonUtil.from( anyString(), eq( CpuQuotaInfo.class ) ) ).thenReturn( cpuQuotaInfo );
+        CpuQuota cpuQuota = mock( CpuQuota.class );
+        when( jsonUtil.from( anyString(), eq( CpuQuota.class ) ) ).thenReturn( cpuQuota );
 
         remotePeer.getCpuQuotaInfo( containerHost );
 
@@ -559,15 +559,15 @@ public class RemotePeerImplTest
     @Test( expected = PeerException.class )
     public void testSetRamQuota2() throws Exception
     {
-        RamQuota ramQuota = mock( RamQuota.class );
+        RamQuota ramQuotaInfo = mock( RamQuota.class );
 
-        remotePeer.setRamQuota( containerHost, ramQuota );
+        remotePeer.setRamQuota( containerHost, ramQuotaInfo );
 
         //verify( peerInfo ).getId();
 
         throwException();
 
-        remotePeer.setRamQuota( containerHost, ramQuota );
+        remotePeer.setRamQuota( containerHost, ramQuotaInfo );
     }
 
 
@@ -630,7 +630,7 @@ public class RemotePeerImplTest
     @Test( expected = PeerException.class )
     public void testSetQuota() throws Exception
     {
-        QuotaInfo quotaInfo = mock( QuotaInfo.class );
+        Quota quotaInfo = mock( Quota.class );
 
         remotePeer.setQuota( containerHost, quotaInfo );
 

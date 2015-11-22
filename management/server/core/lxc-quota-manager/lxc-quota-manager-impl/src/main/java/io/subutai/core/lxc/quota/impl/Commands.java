@@ -2,6 +2,7 @@ package io.subutai.core.lxc.quota.impl;
 
 
 import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.quota.QuotaType;
 
 import com.google.common.collect.Lists;
 
@@ -12,6 +13,13 @@ import com.google.common.collect.Lists;
 public class Commands
 {
     private static final String QUOTA_BINDING = "subutai quota";
+
+
+    public RequestBuilder getReadQuotaCommand( String containerHostname, QuotaType quotaType )
+    {
+        return new RequestBuilder( QUOTA_BINDING )
+                .withCmdArgs( Lists.newArrayList( containerHostname, quotaType.getKey() ) );
+    }
 
 
     public RequestBuilder getReadRamQuotaCommand( String containerHostname )

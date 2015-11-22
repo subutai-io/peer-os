@@ -14,17 +14,16 @@ import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInfoModel;
 import io.subutai.common.host.HostInterfaces;
-import io.subutai.common.metric.HostMetric;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
 import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.protocol.Template;
-import io.subutai.common.quota.CpuQuotaInfo;
+import io.subutai.common.quota.CpuQuota;
 import io.subutai.common.quota.DiskPartition;
 import io.subutai.common.quota.DiskQuota;
-import io.subutai.common.quota.QuotaInfo;
+import io.subutai.common.quota.Quota;
 import io.subutai.common.quota.QuotaType;
 import io.subutai.common.quota.RamQuota;
 import io.subutai.common.security.PublicKeyContainer;
@@ -150,7 +149,7 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
      *
      * @return - Abstract QuotaInfo class extended by quota classes
      */
-    public QuotaInfo getQuotaInfo( ContainerHost host, QuotaType quotaType ) throws PeerException;
+    public Quota getQuotaInfo( ContainerHost host, QuotaType quotaType ) throws PeerException;
 
     /**
      * Sets quota on the container
@@ -158,7 +157,7 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
      * @param host - target container
      * @param quotaInfo - quota to set
      */
-    public void setQuota( ContainerHost host, QuotaInfo quotaInfo ) throws PeerException;
+    public void setQuota( ContainerHost host, Quota quotaInfo ) throws PeerException;
 
     /**
      * Returns tempalte by name
@@ -285,7 +284,7 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
      *
      * @return - cpu quota object on container
      */
-    public CpuQuotaInfo getCpuQuotaInfo( ContainerHost host ) throws PeerException;
+    public CpuQuota getCpuQuotaInfo( ContainerHost host ) throws PeerException;
 
 
     /**
@@ -337,9 +336,9 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
      * Sets ram quota
      *
      * @param host - container
-     * @param ramQuota - quota to set
+     * @param ramQuotaInfo - quota to set
      */
-    public void setRamQuota( ContainerHost host, RamQuota ramQuota ) throws PeerException;
+    public void setRamQuota( ContainerHost host, RamQuota ramQuotaInfo ) throws PeerException;
 
 
     /**

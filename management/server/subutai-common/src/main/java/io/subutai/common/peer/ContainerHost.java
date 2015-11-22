@@ -6,7 +6,7 @@ import java.util.Set;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.protocol.Template;
-import io.subutai.common.quota.CpuQuotaInfo;
+import io.subutai.common.quota.CpuQuota;
 import io.subutai.common.quota.DiskPartition;
 import io.subutai.common.quota.DiskQuota;
 import io.subutai.common.quota.RamQuota;
@@ -95,7 +95,7 @@ public interface ContainerHost extends Host, ContainerHostInfo
      *
      * @return - cpu quota object on container
      */
-    public CpuQuotaInfo getCpuQuotaInfo() throws PeerException;
+    public CpuQuota getCpuQuotaInfo() throws PeerException;
 
     /**
      * Sets CPU quota on container in percent
@@ -160,7 +160,7 @@ public interface ContainerHost extends Host, ContainerHostInfo
     /**
      * Sets ram quota
      *
-     * @param ramQuota - quota to set
+     * @param ramQuotaInfo - quota to set
      */
-    public void setRamQuota( RamQuota ramQuota ) throws PeerException;
+    public void setRamQuota( RamQuota ramQuotaInfo ) throws PeerException;
 }

@@ -20,40 +20,6 @@
     </cm:default-properties>
   </cm:property-placeholder>
 
-  <cm:property-placeholder persistent-id="quota" update-strategy="none" placeholder-prefix="$(" placeholder-suffix=")">
-    <cm:default-properties>
-      <cm:property name="TINY.ram" value="256" />
-      <cm:property name="TINY.cpu" value="10" />
-      <cm:property name="TINY.space.opt" value="2" />
-      <cm:property name="TINY.space.home" value="1" />
-      <cm:property name="TINY.space.var" value="2" />
-      <cm:property name="TINY.space.root" value="2" />
-      <cm:property name="SMALL.ram" value="512" />
-      <cm:property name="SMALL.cpu" value="25" />
-      <cm:property name="SMALL.space.opt" value="5" />
-      <cm:property name="SMALL.space.home" value="1" />
-      <cm:property name="SMALL.space.var" value="5" />
-      <cm:property name="SMALL.space.root" value="2" />
-      <cm:property name="MEDIUM.ram" value="1024" />
-      <cm:property name="MEDIUM.cpu" value="50" />
-      <cm:property name="MEDIUM.space.opt" value="10" />
-      <cm:property name="MEDIUM.space.home" value="1" />
-      <cm:property name="MEDIUM.space.var" value="10" />
-      <cm:property name="MEDIUM.space.root" value="2" />
-      <cm:property name="LARGE.ram" value="2048" />
-      <cm:property name="LARGE.cpu" value="75" />
-      <cm:property name="LARGE.space.opt" value="20" />
-      <cm:property name="LARGE.space.home" value="1" />
-      <cm:property name="LARGE.space.var" value="20" />
-      <cm:property name="LARGE.space.root" value="2" />
-      <cm:property name="HUGE.ram" value="4096" />
-      <cm:property name="HUGE.cpu" value="100" />
-      <cm:property name="HUGE.space.opt" value="40" />
-      <cm:property name="HUGE.space.home" value="1" />
-      <cm:property name="HUGE.space.var" value="40" />
-      <cm:property name="HUGE.space.root" value="2" />
-    </cm:default-properties>
-  </cm:property-placeholder>
 
   <!-- ***************************************************************** -->
   <bean id="daoManagerPeer" init-method="init" class="io.subutai.common.dao.DaoManager" scope="prototype">
@@ -95,8 +61,6 @@
     <argument ref="monitor" />
     <argument ref="securityManager" />
     <property name="externalIpInterface" value="${externalIpInterface}" />
-    <property name="defaultQuota"
-              value="$(TINY.ram)|$(TINY.cpu)|$(TINY.space.opt)|$(TINY.space.home)|$(TINY.space.var)|$(TINY.space.root):$(SMALL.ram)|$(SMALL.cpu)|$(SMALL.space.opt)|$(SMALL.space.home)|$(SMALL.space.var)|$(SMALL.space.root):$(MEDIUM.ram)|$(MEDIUM.cpu)|$(MEDIUM.space.opt)|$(MEDIUM.space.home)|$(MEDIUM.space.var)|$(MEDIUM.space.root):$(LARGE.ram)|$(LARGE.cpu)|$(LARGE.space.opt)|$(LARGE.space.home)|$(LARGE.space.var)|$(LARGE.space.root):$(HUGE.ram)|$(HUGE.cpu)|$(HUGE.space.opt)|$(HUGE.space.home)|$(HUGE.space.var)|$(HUGE.space.root)" />
   </bean>
 
   <service ref="localPeer" interface="io.subutai.core.hostregistry.api.HostListener" />

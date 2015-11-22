@@ -1,9 +1,8 @@
 package io.subutai.core.environment.rest.ui;
 
 
-import io.subutai.common.environment.ContainerType;
+import io.subutai.common.peer.ContainerType;
 import io.subutai.common.host.ContainerHostState;
-import io.subutai.common.host.Interface;
 
 
 /**

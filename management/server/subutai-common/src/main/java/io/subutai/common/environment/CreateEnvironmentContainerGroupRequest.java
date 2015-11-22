@@ -3,6 +3,7 @@ package io.subutai.common.environment;
 
 import java.util.List;
 
+import io.subutai.common.peer.ContainerType;
 import io.subutai.common.protocol.Criteria;
 
 

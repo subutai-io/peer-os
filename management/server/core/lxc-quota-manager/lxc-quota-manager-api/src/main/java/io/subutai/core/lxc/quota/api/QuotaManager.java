@@ -1,14 +1,20 @@
 package io.subutai.core.lxc.quota.api;
 
 
+import java.util.List;
 import java.util.Set;
 
-import io.subutai.common.peer.ContainerQuota;
-import io.subutai.common.quota.CpuQuotaInfo;
+import com.google.common.collect.Lists;
+
+import io.subutai.common.peer.ContainerId;
+import io.subutai.common.peer.ContainerType;
+import io.subutai.common.quota.ContainerQuota;
+import io.subutai.common.quota.CpuQuota;
 import io.subutai.common.quota.DiskPartition;
 import io.subutai.common.quota.DiskQuota;
 import io.subutai.common.quota.QuotaException;
-import io.subutai.common.quota.QuotaInfo;
+import io.subutai.common.quota.Quota;
+import io.subutai.common.quota.QuotaParser;
 import io.subutai.common.quota.QuotaType;
 import io.subutai.common.quota.RamQuota;
 
@@ -19,11 +25,15 @@ import io.subutai.common.quota.RamQuota;
  */
 public interface QuotaManager
 {
+    public static List<QuotaType> DEFAULT_QUOTA_TYPES =
+            Lists.newArrayList( QuotaType.QUOTA_TYPE_RAM, QuotaType.QUOTA_TYPE_CPU, QuotaType.QUOTA_TYPE_DISK_OPT,
+                    QuotaType.QUOTA_TYPE_DISK_HOME, QuotaType.QUOTA_TYPE_DISK_VAR, QuotaType.QUOTA_TYPE_DISK_ROOTFS );
+
     /**
      * Set Quota for container specified with parameters passed containerName - the target container to set quota on,
      * QuotaInfo - about quota information containing quota key and value in preformatted string values
      */
-    public void setQuota( String containerName, QuotaInfo quota ) throws QuotaException;
+    public void setQuota( String containerName, Quota quota ) throws QuotaException;
 
     /**
      * Set Quota for container specified with parameters passed containerName - the target container to set quota on,
@@ -32,16 +42,28 @@ public interface QuotaManager
     public void setQuota( String containerName, ContainerQuota quota ) throws QuotaException;
 
 
+    ContainerQuota getQuota( String containerName ) throws QuotaException;
+
     /**
      * Return abstract QuotaInfo object
      *
-     * @param containerId - containerId
-     * @param quotaType - quotaType
+     * @param containerName - container name
+     * @param quotaType - quota type
      *
      * @return - brief description of quota requested
      */
-    public QuotaInfo getQuotaInfo( String containerId, QuotaType quotaType ) throws QuotaException;
+    public Quota getQuota( String containerName, QuotaType quotaType ) throws QuotaException;
 
+
+    /**
+     * Return abstract QuotaInfo object
+     *
+     * @param containerId - container ID
+     * @param quotaType - quota type
+     *
+     * @return - brief description of quota requested
+     */
+    Quota getQuota( ContainerId containerId, QuotaType quotaType ) throws QuotaException;
 
     /**
      * Returns RAM quota on container in megabytes
@@ -89,7 +111,7 @@ public interface QuotaManager
      *
      * @return - cpu quota object on container
      */
-    public CpuQuotaInfo getCpuQuotaInfo( String containerId ) throws QuotaException;
+    public CpuQuota getCpuQuotaInfo( String containerId ) throws QuotaException;
 
 
     /**
@@ -140,9 +162,9 @@ public interface QuotaManager
      * Sets ram quota on container
      *
      * @param containerId - id of container
-     * @param ramQuota - ram quota to set
+     * @param ramQuotaInfo - ram quota to set
      */
-    public void setRamQuota( final String containerId, final RamQuota ramQuota ) throws QuotaException;
+    public void setRamQuota( final String containerId, final RamQuota ramQuotaInfo ) throws QuotaException;
 
     /**
      * Returns max available RAM quota in MB on container
@@ -170,4 +192,10 @@ public interface QuotaManager
      * @return - max available ram disk quota {@code DiskQuota}
      */
     public DiskQuota getAvailableDiskQuota( String containerId, DiskPartition diskPartition ) throws QuotaException;
+
+    QuotaParser getQuotaParser( QuotaType quotaType ) throws QuotaException;
+
+    ContainerQuota getDefaultContainerQuota( ContainerType containerType );
+
+    void setQuota( String containerName, QuotaType quotaType, String quotaValue ) throws QuotaException;
 }
