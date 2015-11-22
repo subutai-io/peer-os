@@ -553,7 +553,28 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    private Session getLoggedUser()
+    @PermitAll
+    @Override
+    public User getActiveSession()
+    {
+        Session session = getActiveSession();
+
+        if(session!=null)
+        {
+            return session.getUser();
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+
+    /* *************************************************
+     */
+    @PermitAll
+    @Override
+    public Session getActiveSession()
     {
         Session session = null;
         try

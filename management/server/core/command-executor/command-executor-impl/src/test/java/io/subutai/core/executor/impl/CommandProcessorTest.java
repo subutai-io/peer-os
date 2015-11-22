@@ -91,7 +91,7 @@ public class CommandProcessorTest
         when( hostRegistry.getResourceHostByContainerHost( containerHostInfo ) ).thenReturn( resourceHostInfo );
         when( request.getId() ).thenReturn( HOST_ID );
         when( request.getCommandId() ).thenReturn( COMMAND_ID );
-        doReturn( user ).when( commandProcessor ).getUser();
+        doReturn( user ).when( commandProcessor ).getActiveSession();
     }
 
 

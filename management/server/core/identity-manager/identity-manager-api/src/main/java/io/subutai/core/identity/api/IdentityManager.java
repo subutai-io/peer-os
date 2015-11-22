@@ -85,6 +85,11 @@ public interface IdentityManager
 
     /* *************************************************
      */
+    @PermitAll
+    Session getActiveSession();
+
+    /* *************************************************
+         */
     User createTempUser( String userName, String password, String fullName, String email, int type );
 
 
