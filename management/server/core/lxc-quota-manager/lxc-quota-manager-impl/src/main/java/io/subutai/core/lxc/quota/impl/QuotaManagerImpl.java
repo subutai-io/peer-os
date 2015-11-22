@@ -1,8 +1,8 @@
 package io.subutai.core.lxc.quota.impl;
 
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
@@ -18,54 +18,149 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.peer.ContainerId;
+import io.subutai.common.peer.ContainerType;
 import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.peer.ContainerQuota;
-import io.subutai.common.peer.ResourceHostException;
-import io.subutai.common.quota.CpuQuotaInfo;
+import io.subutai.common.peer.HostNotFoundException;
+import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.quota.ContainerQuota;
+import io.subutai.common.quota.CpuQuota;
 import io.subutai.common.quota.DiskPartition;
 import io.subutai.common.quota.DiskQuota;
 import io.subutai.common.quota.DiskQuotaUnit;
+import io.subutai.common.quota.Quota;
 import io.subutai.common.quota.QuotaException;
-import io.subutai.common.quota.QuotaInfo;
 import io.subutai.common.quota.QuotaType;
 import io.subutai.common.quota.RamQuota;
 import io.subutai.common.quota.RamQuotaUnit;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.core.lxc.quota.api.QuotaManager;
-import io.subutai.common.peer.HostNotFoundException;
-import io.subutai.core.peer.api.PeerManager;
-import io.subutai.common.peer.ResourceHost;
+import io.subutai.core.lxc.quota.impl.parser.CpuQuotaParser;
+import io.subutai.core.lxc.quota.impl.parser.DiskQuotaParser;
+import io.subutai.common.quota.QuotaParser;
+import io.subutai.core.lxc.quota.impl.parser.RamQuotaParser;
 
 
 public class QuotaManagerImpl implements QuotaManager
 {
 
     private static Logger LOGGER = LoggerFactory.getLogger( QuotaManagerImpl.class );
-    private PeerManager peerManager;
+    private LocalPeer localPeer;
     private CommandUtil commandUtil;
     protected Commands commands = new Commands();
+    private Map<QuotaType, QuotaParser> registeredQuotaParsers = new HashMap<>();
+    private HashMap<ContainerType, ContainerQuota> containerQuotas = new HashMap<>();
+    private String defaultQuota;
 
 
-    public QuotaManagerImpl( PeerManager peerManager )
+    public QuotaManagerImpl( LocalPeer localPeer )
     {
-        Preconditions.checkNotNull( peerManager );
-        this.peerManager = peerManager;
+        Preconditions.checkNotNull( localPeer );
+        this.localPeer = localPeer;
         this.commandUtil = new CommandUtil();
     }
 
 
+    public void init() throws QuotaException
+    {
+        registerQuotaParsers();
+        initDefaultQuotas();
+    }
+
+
+    protected void registerQuotaParsers()
+    {
+        this.registeredQuotaParsers.put( QuotaType.QUOTA_TYPE_CPU, CpuQuotaParser.getInstance() );
+        this.registeredQuotaParsers.put( QuotaType.QUOTA_TYPE_RAM, RamQuotaParser.getInstance() );
+        this.registeredQuotaParsers
+                .put( QuotaType.QUOTA_TYPE_DISK_OPT, DiskQuotaParser.getInstance( DiskPartition.OPT ) );
+        this.registeredQuotaParsers
+                .put( QuotaType.QUOTA_TYPE_DISK_HOME, DiskQuotaParser.getInstance( DiskPartition.HOME ) );
+        this.registeredQuotaParsers
+                .put( QuotaType.QUOTA_TYPE_DISK_VAR, DiskQuotaParser.getInstance( DiskPartition.VAR ) );
+        this.registeredQuotaParsers
+                .put( QuotaType.QUOTA_TYPE_DISK_ROOTFS, DiskQuotaParser.getInstance( DiskPartition.ROOT_FS ) );
+    }
+
+
+    protected void initDefaultQuotas() throws QuotaException
+    {
+        LOGGER.info( "Parsing default quota settings..." );
+        String[] settings = defaultQuota.split( ":" );
+        if ( settings.length != 5 )
+        {
+            throw new QuotaException( "Invalid default quota settings." );
+        }
+
+        int i = 0;
+        for ( ContainerType containerType : ContainerType.values() )
+        {
+            if ( i > ContainerType.values().length - 2 )
+            {
+                break;
+            }
+            LOGGER.debug( String.format( "Settings for %s: %s", containerType, settings[i] ) );
+            String[] quotas = settings[i++].split( "\\|" );
+
+            if ( quotas.length != 6 )
+            {
+                throw new QuotaException( String.format( "Invalid quota settings for %s.", containerType ) );
+            }
+
+            try
+            {
+                final ContainerQuota containerQuota = new ContainerQuota();
+
+                QuotaParser quotaParser = getQuotaParser( QuotaType.QUOTA_TYPE_RAM );
+                containerQuota.addQuota( quotaParser.parse( quotas[0] ) );
+
+                quotaParser = getQuotaParser( QuotaType.QUOTA_TYPE_CPU );
+                containerQuota.addQuota( quotaParser.parse( quotas[1] ) );
+
+                quotaParser = getQuotaParser( QuotaType.QUOTA_TYPE_DISK_OPT );
+                containerQuota.addQuota( quotaParser.parse( quotas[2] ) );
+
+                quotaParser = getQuotaParser( QuotaType.QUOTA_TYPE_DISK_HOME );
+                containerQuota.addQuota( quotaParser.parse( quotas[3] ) );
+
+                quotaParser = getQuotaParser( QuotaType.QUOTA_TYPE_DISK_VAR );
+                containerQuota.addQuota( quotaParser.parse( quotas[4] ) );
+
+                quotaParser = getQuotaParser( QuotaType.QUOTA_TYPE_DISK_ROOTFS );
+                containerQuota.addQuota( quotaParser.parse( quotas[5] ) );
+
+                containerQuotas.put( containerType, containerQuota );
+
+                LOGGER.debug( containerQuota.toString() );
+            }
+            catch ( Exception e )
+            {
+                throw new QuotaException( String.format( "Could not parse quota settings for %s.", containerType ) );
+            }
+        }
+        LOGGER.info( "Quota settings parsed." );
+    }
+
+
+    public void setDefaultQuota( final String defaultQuota )
+    {
+        this.defaultQuota = defaultQuota;
+    }
+
+
     @Override
-    public void setQuota( String containerName, QuotaInfo quotaInfo ) throws QuotaException
+    public void setQuota( String containerName, Quota quotaInfo ) throws QuotaException
     {
         Preconditions.checkNotNull( containerName, "ContainerName cannot be null" );
         Preconditions.checkNotNull( quotaInfo, "QuotaInfo cannot be null." );
 
 
-        String cmd = String.format( "subutai quota %s %s %s", containerName, quotaInfo.getQuotaKey(),
-                quotaInfo.getQuotaValue() );
+        String cmd =
+                String.format( "subutai quota %s %s -s %s", containerName, quotaInfo.getKey(), quotaInfo.getValue() );
         try
         {
-            ResourceHost resourceHost = peerManager.getLocalPeer().getResourceHostByContainerName( containerName );
+            ResourceHost resourceHost = localPeer.getResourceHostByContainerName( containerName );
 
             commandUtil.execute( new RequestBuilder( cmd ), resourceHost );
         }
@@ -80,23 +175,82 @@ public class QuotaManagerImpl implements QuotaManager
     @Override
     public void setQuota( final String containerName, final ContainerQuota quota ) throws QuotaException
     {
-        Preconditions.checkNotNull( containerName );
+        for ( Quota quotaInfo : quota.getAllQuotaInfo() )
+        {
+            setQuota( containerName, quotaInfo );
+        }
+    }
 
-        QuotaCommandHelper quotaCommandHelper = new QuotaCommandHelper( containerName, quota );
+
+    @Override
+    public ContainerQuota getQuota( final String containerName ) throws QuotaException
+    {
+        ContainerQuota containerQuota = new ContainerQuota();
+        for ( QuotaType quotaType : registeredQuotaParsers.keySet() )
+        {
+            Quota quotaInfo = getQuota( containerName, quotaType );
+            containerQuota.addQuota( quotaInfo );
+        }
+        return containerQuota;
+    }
+
+
+    @Override
+    public Quota getQuota( final String containerName, QuotaType quotaType ) throws QuotaException
+    {
+        Preconditions.checkNotNull( containerName, "ContainerName cannot be null" );
+        Preconditions.checkNotNull( quotaType, "Quota type cannot be null." );
+
+        QuotaParser quotaParser = registeredQuotaParsers.get( quotaType );
+        if ( quotaParser == null )
+        {
+            throw new QuotaException( "Quota parser not registered for type: " + quotaType );
+        }
+
+        String cmd = String.format( "subutai quota %s %s", containerName, quotaType.getKey() );
         try
         {
-            ResourceHost resourceHost = peerManager.getLocalPeer().getResourceHostByContainerName( containerName );
+            ResourceHost resourceHost = localPeer.getResourceHostByContainerName( containerName );
 
-            for ( String command : quotaCommandHelper.getQuotaSetCommands() )
-            {
-                RequestBuilder requestBuilder = new RequestBuilder( command ).withTimeout( 15 );
+            CommandResult result =
+                    commandUtil.execute( commands.getReadQuotaCommand( containerName, quotaType ), resourceHost );
 
-                commandUtil.execute( requestBuilder, resourceHost );
-            }
+            return quotaParser.parse( result.getStdOut() );
         }
         catch ( CommandException | HostNotFoundException e )
         {
-            throw new QuotaException( "Error on setting quota", e );
+            LOGGER.error( "Error in setQuota", e );
+            throw new QuotaException( "Error getting quota value for command: " + cmd, e );
+        }
+    }
+
+
+    @Override
+    public Quota getQuota( final ContainerId containerId, QuotaType quotaType ) throws QuotaException
+    {
+        Preconditions.checkNotNull( containerId, "ContainerName cannot be null" );
+        Preconditions.checkNotNull( quotaType, "Quota type cannot be null." );
+
+        QuotaParser quotaParser = registeredQuotaParsers.get( quotaType );
+        if ( quotaParser == null )
+        {
+            throw new QuotaException( "Quota parser not registered for type: " + quotaType );
+        }
+
+        String cmd = String.format( "subutai quota %s %s", containerId, quotaType.getKey() );
+        try
+        {
+            ResourceHost resourceHost = localPeer.getResourceHostByContainerId( containerId.getId() );
+
+            CommandResult result =
+                    commandUtil.execute( commands.getReadQuotaCommand( containerId.getId(), quotaType ), resourceHost );
+
+            return quotaParser.parse( result.getStdOut() );
+        }
+        catch ( CommandException | HostNotFoundException e )
+        {
+            LOGGER.error( "Error in setQuota", e );
+            throw new QuotaException( "Error getting quota value for command: " + cmd, e );
         }
     }
 
@@ -157,7 +311,7 @@ public class QuotaManagerImpl implements QuotaManager
 
 
     @Override
-    public CpuQuotaInfo getCpuQuotaInfo( final String containerId ) throws QuotaException
+    public CpuQuota getCpuQuotaInfo( final String containerId ) throws QuotaException
     {
         Preconditions.checkNotNull( containerId );
 
@@ -166,7 +320,7 @@ public class QuotaManagerImpl implements QuotaManager
         CommandResult result = executeOnContainersResourceHost( containerId,
                 commands.getReadCpuQuotaCommand( containerHost.getHostname() ) );
 
-        return new CpuQuotaInfo( result.getStdOut().trim() );
+        return CpuQuotaParser.getInstance().parse( result.getStdOut().trim() );
     }
 
 
@@ -252,7 +406,7 @@ public class QuotaManagerImpl implements QuotaManager
         CommandResult result = executeOnContainersResourceHost( containerId,
                 commands.getReadDiskQuotaCommand( containerHost.getHostname(), diskPartition.getPartitionName() ) );
 
-        return DiskQuota.parse( diskPartition, result.getStdOut() );
+        return DiskQuotaParser.getInstance( diskPartition ).parse( result.getStdOut() );
     }
 
 
@@ -271,15 +425,16 @@ public class QuotaManagerImpl implements QuotaManager
     }
 
 
-    public void setRamQuota( final String containerId, final RamQuota ramQuota ) throws QuotaException
+    public void setRamQuota( final String containerId, final RamQuota ramQuotaInfo ) throws QuotaException
     {
         Preconditions.checkNotNull( containerId );
-        Preconditions.checkNotNull( ramQuota );
+        Preconditions.checkNotNull( ramQuotaInfo );
 
         ContainerHost containerHost = getContainerHostById( containerId );
 
         executeOnContainersResourceHost( containerId, commands.getWriteRamQuotaCommand2( containerHost.getHostname(),
-                String.format( "%s%s", ramQuota.getRamQuotaValue(), ramQuota.getRamQuotaUnit().getAcronym() ) ) );
+                String.format( "%s%s", ramQuotaInfo.getRamQuotaValue(),
+                        ramQuotaInfo.getRamQuotaUnit().getAcronym() ) ) );
     }
 
 
@@ -325,7 +480,7 @@ public class QuotaManagerImpl implements QuotaManager
                 commands.getReadAvailableDiskQuotaCommand( containerHost.getHostname(),
                         diskPartition.getPartitionName() ) );
 
-        return DiskQuota.parse( diskPartition, result.getStdOut() );
+        return DiskQuotaParser.getInstance( diskPartition ).parse( result.getStdOut() );
     }
 
 
@@ -349,7 +504,7 @@ public class QuotaManagerImpl implements QuotaManager
     {
         try
         {
-            return peerManager.getLocalPeer().getContainerHostById( containerId );
+            return localPeer.getContainerHostById( containerId );
         }
         catch ( HostNotFoundException e )
         {
@@ -362,7 +517,7 @@ public class QuotaManagerImpl implements QuotaManager
     {
         try
         {
-            return peerManager.getLocalPeer().getResourceHostByContainerId( containerId );
+            return localPeer.getResourceHostByContainerId( containerId );
         }
         catch ( HostNotFoundException e )
         {
@@ -370,32 +525,62 @@ public class QuotaManagerImpl implements QuotaManager
         }
     }
 
+    //
+    //    @Override
+    //    public Quota getQuotaInfo( String containerId, final QuotaType quotaType ) throws QuotaException
+    //    {
+    //        Quota quotaInfo = null;
+    //        switch ( quotaType )
+    //        {
+    //            case QUOTA_TYPE_CPU:
+    //                quotaInfo = getCpuQuotaInfo( containerId );
+    //                break;
+    //            case QUOTA_TYPE_DISK_ROOTFS:
+    //                quotaInfo = getDiskQuota( containerId, DiskPartition.ROOT_FS );
+    //                break;
+    //            case QUOTA_TYPE_DISK_VAR:
+    //                quotaInfo = getDiskQuota( containerId, DiskPartition.VAR );
+    //                break;
+    //            case QUOTA_TYPE_DISK_OPT:
+    //                quotaInfo = getDiskQuota( containerId, DiskPartition.OPT );
+    //                break;
+    //            case QUOTA_TYPE_DISK_HOME:
+    //                quotaInfo = getDiskQuota( containerId, DiskPartition.HOME );
+    //                break;
+    //            case QUOTA_TYPE_RAM:
+    //                quotaInfo = getRamQuotaInfo( containerId );
+    //                break;
+    //        }
+    //        return quotaInfo;
+    //    }
+
 
     @Override
-    public QuotaInfo getQuotaInfo( String containerId, final QuotaType quotaType ) throws QuotaException
+    public QuotaParser getQuotaParser( final QuotaType quotaType ) throws QuotaException
     {
-        QuotaInfo quotaInfo = null;
-        switch ( quotaType )
+        final QuotaParser parser = registeredQuotaParsers.get( quotaType );
+        if ( parser == null )
         {
-            case QUOTA_TYPE_CPU:
-                quotaInfo = getCpuQuotaInfo( containerId );
-                break;
-            case QUOTA_TYPE_DISK_ROOTFS:
-                quotaInfo = getDiskQuota( containerId, DiskPartition.ROOT_FS );
-                break;
-            case QUOTA_TYPE_DISK_VAR:
-                quotaInfo = getDiskQuota( containerId, DiskPartition.VAR );
-                break;
-            case QUOTA_TYPE_DISK_OPT:
-                quotaInfo = getDiskQuota( containerId, DiskPartition.OPT );
-                break;
-            case QUOTA_TYPE_DISK_HOME:
-                quotaInfo = getDiskQuota( containerId, DiskPartition.HOME );
-                break;
-            case QUOTA_TYPE_RAM:
-                quotaInfo = getRamQuotaInfo( containerId );
-                break;
+            throw new QuotaException( "Quota parser not registered for type: " + quotaType );
         }
-        return quotaInfo;
+
+        return parser;
+    }
+
+
+    @Override
+    public ContainerQuota getDefaultContainerQuota( final ContainerType containerType )
+    {
+        return containerQuotas.get( containerType );
+    }
+
+
+    @Override
+    public void setQuota( final String containerName, final QuotaType quotaType, final String quotaValue )
+            throws QuotaException
+    {
+        final QuotaParser parser = getQuotaParser( quotaType );
+
+        setQuota( containerName, parser.parse( quotaValue ) );
     }
 }
