@@ -718,16 +718,6 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    @RolesAllowed( "Identity-Management|A|Delete" )
-    @Override
-    public void removeUserAllRoles( long userId )
-    {
-        identityDataService.removeUserAllRoles( userId );
-    }
-
-
-    /* *************************************************
-     */
     @PermitAll
     @Override
     public boolean changeUserPassword( long userId, String oldPassword, String newPassword )
@@ -926,6 +916,16 @@ public class IdentityManagerImpl implements IdentityManager
     public void assignRolePermission( long roleId, Permission permission )
     {
         identityDataService.assignRolePermission( roleId, permission );
+    }
+
+
+    /* *************************************************
+     */
+    @RolesAllowed( "Identity-Management|A|Write" )
+    @Override
+    public void removeAllRolePermissions( long roleId )
+    {
+        identityDataService.removeAllRolePermissions( roleId );
     }
 
 

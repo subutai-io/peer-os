@@ -11,11 +11,12 @@ import java.util.UUID;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 
+import io.subutai.common.gson.required.GsonRequired;
+import io.subutai.common.util.CollectionUtil;
+
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
-
-import io.subutai.common.util.CollectionUtil;
 
 
 /**
@@ -28,10 +29,12 @@ public class Blueprint
     @JsonIgnore
     private UUID id;
     @JsonProperty( "name" )
+    @GsonRequired
     private String name;
     @JsonProperty( "sshKey" )
     private String sshKey;
     @JsonProperty( "nodegroups" )
+    @GsonRequired
     private Set<NodeGroup> nodeGroups;
 
 

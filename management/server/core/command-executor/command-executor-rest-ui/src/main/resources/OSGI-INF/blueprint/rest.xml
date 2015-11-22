@@ -1,0 +1,34 @@
+<blueprint xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:jaxrs="http://cxf.apache.org/blueprint/jaxrs"
+           xmlns:cxf="http://cxf.apache.org/blueprint/core" xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+
+  http://cxf.apache.org/blueprint/jaxrs http://cxf.apache.org/schemas/blueprint/jaxrs.xsd">
+
+  <cxf:bus id="cxfBusExecutorUI">
+    <cxf:features>
+      <cxf:logging />
+    </cxf:features>
+  </cxf:bus>
+
+  <reference id="commandExecutor" availability="mandatory"
+             interface="io.subutai.core.executor.api.CommandExecutor" />
+  <reference id="hostRegistry" availability="mandatory"
+             interface="io.subutai.core.hostregistry.api.HostRegistry" />
+  <reference id="environmentManager" availability="mandatory"
+             interface="io.subutai.core.environment.api.EnvironmentManager" />
+
+
+  <bean id="executorRestUIServiceImpl" class="io.subutai.core.executor.rest.ui.RestServiceImpl">
+    <argument ref="commandExecutor" />
+    <argument ref="hostRegistry" />
+    <argument ref="environmentManager" />
+  </bean>
+
+  <jaxrs:server address="/command_ui" id="executorRestUIService">
+    <jaxrs:serviceBeans>
+      <ref component-id="executorRestUIServiceImpl" />
+    </jaxrs:serviceBeans>
+  </jaxrs:server>
+
+</blueprint>

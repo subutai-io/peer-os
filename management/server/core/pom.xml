@@ -5,7 +5,7 @@
   <parent>
     <groupId>io.subutai</groupId>
     <artifactId>mgmt-server-parent</artifactId>
-    <version>4.0.0-RC3</version>
+    <version>4.0.0-RC4</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
@@ -17,7 +17,6 @@
 
   <modules>
     <module>blueprint-authz</module>
-    <module>environment-terminal</module>
     <module>git-manager</module>
     <module>lxc-quota-manager</module>
     <module>network-manager</module>

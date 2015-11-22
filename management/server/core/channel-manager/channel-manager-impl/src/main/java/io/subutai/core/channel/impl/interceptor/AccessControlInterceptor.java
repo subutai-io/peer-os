@@ -6,6 +6,7 @@ import java.net.URL;
 import java.security.PrivilegedAction;
 
 import javax.security.auth.Subject;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.HttpHeaders;
 

@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
+import io.subutai.common.gson.required.GsonRequired;
+import io.subutai.common.gson.required.GsonValidation;
 import io.subutai.common.host.HostId;
 import io.subutai.common.peer.PeerId;
 import io.subutai.common.protocol.PlacementStrategy;
@@ -15,20 +17,28 @@ import io.subutai.common.protocol.PlacementStrategy;
  */
 public class NodeGroup
 {
+    @GsonRequired
     @JsonProperty( "name" )
     private String name;
+    @GsonRequired
     @JsonProperty( "templateName" )
     private String templateName;
+    @GsonRequired
     @JsonProperty( "type" )
     private ContainerType type = ContainerType.SMALL;
+    @GsonRequired( validation = GsonValidation.GREATER_THAN_ZERO )
     @JsonProperty( "numberOfContainers" )
     private int numberOfContainers;
+
+    @GsonRequired
     @JsonProperty( "sshGroupId" )
     private int sshGroupId;
+    @GsonRequired
     @JsonProperty( "hostsGroupId" )
     private int hostsGroupId;
     @JsonProperty( "containerPlacementStrategy" )
     private PlacementStrategy containerPlacementStrategy;
+    @GsonRequired
     @JsonProperty( "peerId" )
     private String peerId;
     @JsonProperty( "hostId" )

@@ -1,0 +1,78 @@
+<div ng-controller="ConsoleViewCtrl as consoleViewCtrl">
+
+	<div class="b-workspace__header">
+		<h1 class="b-title">Console</h1>
+	</div>
+
+	<div class="b-workspace__content">
+
+		<div class="b-main-form">
+
+			<div class="b-console-selects">
+
+				<div class="b-console-selects__item b-main-form__wrapper" 
+				ng-show="consoleViewCtrl.containers.length > 0">
+					<select class="b-popup-body-input" 
+						ng-model="selectedContainer" 
+						ng-change="consoleViewCtrl.setConsole(selectedContainer)">
+						<option value="">Select container</option>
+						<option ng-repeat="container in consoleViewCtrl.containers" value="{{ container.id }}">
+							{{ container.hostname }}
+						</option>
+					</select>
+					<div class="clear"></div>
+				</div>
+
+				<div class="b-console-selects__item b-main-form__wrapper" 
+				ng-show="consoleViewCtrl.currentType == 'environments'">
+					<select class="b-popup-body-input" 
+						ng-model="selectedEnvironment" 
+						ng-change="consoleViewCtrl.showContainers(selectedEnvironment)">
+						<option value="">Select environment</option>
+						<option ng-repeat="environment in consoleViewCtrl.environments" value="{{ environment.id }}">
+							{{ environment.name }}
+						</option>
+					</select>
+					<div class="clear"></div>
+				</div>
+
+				<div class="b-console-selects__item b-main-form__wrapper" 
+				ng-show="consoleViewCtrl.currentType == 'peer'">
+					<select class="b-popup-body-input" 
+						ng-model="selectedPeer" 
+						ng-change="consoleViewCtrl.setConsole(selectedPeer)">
+						<option value="">Select peer</option>
+						<option ng-repeat="host in consoleViewCtrl.hosts" value="{{ host.id }}">
+							{{ host.hostname }}
+						</option>
+					</select>
+					<div class="clear"></div>
+				</div>
+
+			</div>
+
+			<div class="b-toggle-buttons">
+				<ul>
+					<li class="b-toggle-buttons__item" 
+					ng-class="consoleViewCtrl.currentType == 'peer' ? 'b-toggle-buttons__item_active' : ''" 
+					ng-click="consoleViewCtrl.setCurrentType('peer')">
+						Peer
+					</li>
+					<li class="b-toggle-buttons__item"
+					ng-class="consoleViewCtrl.currentType == 'environments' ? 'b-toggle-buttons__item_active' : ''" 
+					ng-click="consoleViewCtrl.setCurrentType('environments')">
+						Environment
+					</li>
+				</ul>
+			</div>
+			
+		</div>
+
+		<div class="b-terminal">
+			<terminal terminal-class="modern-terminal" terminal-config="modern"></terminal>
+		</div>
+
+	</div>
+
+</div>
+

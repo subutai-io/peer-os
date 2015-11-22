@@ -1,0 +1,53 @@
+[
+  {
+    "name": "environment 1",
+    "lxcs": [
+      {
+        "id": "env-lxc1",
+        "metrics": [
+          {
+            "time": 9.00,
+            "cpu": 123,
+            "ram": 98,
+            "dataset": 56
+          },
+          {
+            "time": 9.30,
+            "cpu": 48,
+            "ram": 37,
+            "dataset": 90
+          },
+          {
+            "time": 10.00,
+            "cpu": 46,
+            "ram": 48,
+            "dataset": 56
+          }
+        ]
+      },
+      {
+        "id": "env-lxc2",
+        "metrics": [
+          {
+            "time": 9.00,
+            "cpu": 34,
+            "ram": 53,
+            "dataset": 13
+          },
+          {
+            "time": 9.30,
+            "cpu": 76,
+            "ram": 38,
+            "dataset": 99
+          },
+          {
+            "time": 10.00,
+            "cpu": 12,
+            "ram": 47,
+            "dataset": 58
+          }
+        ]
+      }
+    ]
+  }
+]
