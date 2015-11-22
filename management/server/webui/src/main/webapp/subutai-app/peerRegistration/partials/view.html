@@ -1,0 +1,24 @@
+<div ng-controller="PeerRegistrationCtrl as peerRegistrationCtrl">
+
+	<div class="b-workspace__header">
+		<a class="b-btn b-btn_green b-btn_header-button" 
+			href 
+			ng-click="peerRegistrationCtrl.peerFrom()">
+			<i class="fa fa-plus"></i> Create peer
+		</a>
+		<h1 class="b-title">Peer registration</h1>
+	</div>
+
+	<div class="b-workspace__content">
+
+		<div class="b-data-table">
+			<table datatable="" 
+				dt-options="peerRegistrationCtrl.dtOptions" 
+				dt-columns="peerRegistrationCtrl.dtColumns" 
+				dt-instance="peerRegistrationCtrl.dtInstance" 
+				class="row-border hover">
+			</table>
+		</div>
+	</div>	
+
+</div>

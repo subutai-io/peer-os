@@ -43,7 +43,7 @@ public class NodeGroupBuildResult
 
         for ( EnvironmentContainerImpl c : containers )
         {
-            sb.append( String.format( "EnvironmentContainer: id=%s, name=%s\n", c.getId(), c.getContainerName() ) );
+            sb.append( String.format( "EnvironmentContainer: id=%s, name=%s\n", c.getId(), c.getHostname() ) );
         }
         if ( exception != null )
         {

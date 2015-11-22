@@ -1,0 +1,49 @@
+<div class="b-popup b-popup_min">
+	<div class="b-popup__header">
+		Edit token
+		<a href ng-click="closeThisDialog()">
+			<img src="assets/elements/buttons/b-icon-close.svg" class="b-icon g-right"/>
+		</a>
+	</div>
+	<form ng-submit="tokensCtrl.editToken()">								
+		<div class="b-popup__body">
+
+			<div class="popup-body-box">
+				<label class="b-popup-body-label">Token</label>
+				<input type="text" 
+					class="b-popup-body-input b-popup-body-input_box" 
+					ng-model="tokensCtrl.token2Edit.newToken" required>
+				<div class="clear"></div>
+			</div>
+
+			<div class="popup-body-box">
+				<label class="b-popup-body-label">Period (hours)</label>
+				<input type="text" 
+					class="b-popup-body-input b-popup-body-input_box" 
+					ng-model="tokensCtrl.token2Edit.period" required>
+				<div class="clear"></div>
+			</div>			
+
+			<div class="popup-body-box">
+				<label class="b-popup-body-label">User</label>
+				<select class="b-popup-body-input b-popup-body-input_box" 
+					ng-model="tokensCtrl.token2Edit.userId">
+					<option 
+						ng-repeat="user in tokensCtrl.users" 
+						value="{{ user.id }}" 
+						ng-selected="tokensCtrl.token2Edit.userId == user.id">
+						{{ user.userName }}
+					</option>
+				</select>
+				<div class="clear"></div>
+			</div>
+
+		</div>
+		<div class="b-popup__footer">
+			<button class="b-btn b-btn_green g-right" type="submit">
+				Update
+			</button>
+			<div class="clear"></div>
+		</div>
+	</form>
+</div>

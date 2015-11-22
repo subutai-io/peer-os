@@ -15,12 +15,14 @@ import io.subutai.common.protocol.Criteria;
  */
 public interface StrategyManager
 {
-    public List<ContainerPlacementStrategy> getPlacementStrategies();
+    List<ContainerPlacementStrategy> getPlacementStrategies();
 
-    public Map<ResourceHostMetric, Integer> getPlacementDistribution( ResourceHostMetrics serverMetrics,
+    Map<ResourceHostMetric, Integer> getPlacementDistribution( ResourceHostMetrics serverMetrics,
                                                                       int nodesCount, String strategyId,
                                                                       List<Criteria> criteria )
             throws StrategyException;
 
-    public ContainerPlacementStrategy findStrategyById( String strategyId ) throws StrategyNotFoundException;
+    ContainerPlacementStrategy findStrategyById( String strategyId ) throws StrategyNotFoundException;
+
+    List<String> getPlacementStrategyTitles();
 }

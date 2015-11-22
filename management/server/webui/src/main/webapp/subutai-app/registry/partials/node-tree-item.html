@@ -1,0 +1,30 @@
+<script type="text/ng-template" id="nodes_renderer.html">
+<div>
+		<div ui-tree-handle class="tree-node tree-node-content">
+			<div style="cursor: hand" ng-if="file.children.length > 0" ng-click="registryCtrl.toggle(this)">
+				<a class="btn btn-primary btn-xs" data-nodrag>
+					<span class="fa" ng-class="{'fa-folder': collapsed, 'fa-folder-open': !collapsed}">
+					</span>
+				</a>
+				{{ file.name }}
+			</div>
+
+			<div style="cursor: hand" ng-if="file.children.length === 0" ng-click="registryCtrl.getFileContent(file)">
+				<a class="btn btn-primary btn-xs" data-nodrag>
+					<span class="fa fa-file-o"></span>
+				</a>
+				{{ file.name }}
+			</div>
+
+		</div>
+		<ol ui-tree-nodes ng-model="file.children" ng-class="{hidden: collapsed}">
+			<li ng-repeat="file in file.children" ui-tree-node
+				ng-include="'nodes_renderer.html'">
+			</li>
+		</ol>
+	</div>
+</script>
+<ol ui-tree-nodes ng-model="registryCtrl.filesTree">
+	<li ng-repeat="file in registryCtrl.filesTree" ui-tree-node data-nodrag
+	ng-include="'nodes_renderer.html'"></li>
+</ol>

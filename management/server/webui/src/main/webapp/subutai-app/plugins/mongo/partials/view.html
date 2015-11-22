@@ -1,0 +1,90 @@
+<div ng-include="'subutai-app/plugins/partials/top.html'"></div>
+
+<div ng-controller="mongoCtrl as MongoCtrl"  class="ibox float-e-margins animated fadeInLeft">
+    <strong>Please, specify installation settings</strong>
+    </br>
+
+    <div class="myColumns">
+        <div class="subCol">
+            <div class="col-md-2">
+                Select environment
+                <select class="form-control m-b"
+                        ng-change="trackerCtrl.loadOperations()"
+                        ng-model="trackerCtrl.selectedModule">
+                    <option ng-repeat="module in trackerCtrl.modules" value="{{ module }}">
+                        {{ module }}
+                    </option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                Enter domain name
+                <input type="text" placeholder="intra.lan"  name="userName" ng-model="MongoCtrl.domain.name" class="form-control input-sm" required>
+            </div>
+            <div class="col-md-2">
+                Enter port for data nodes
+                <input type="text" name="userName" placeholder="27017" ng-model="MongoCtrl.data.directory" class="form-control input-sm" required>
+            </div>
+        </div>
+
+        <div class="subCol">
+            <div class="col-md-2">
+                Enter cluster name
+                <input type="text" name="userName" placeholder="cluster name" ng-model="MongoCtrl.cluster.name"  class="form-control input-sm" required>
+            </div>
+            <div class="col-md-2">
+                Enter port for configuration servers
+                <input type="text" name="userName" placeholder="27019" ng-model="MongoCtrl.config.servers" class="form-control input-sm" required>
+            </div>
+            <div class="col-md-2">
+                Enter replica set name
+                <input type="text" name="userName" placeholder="repl" ng-model="MongoCtrl.replica.set.name" class="form-control input-sm" required>
+            </div>
+        </div>
+
+        <div class="subCol">
+            <div class="col-md-2">
+                Enter port for routers
+                </br>
+                <input type="text" name="userName" placeholder="27018" ng-model="MongoCtrl.port" class="form-control input-sm" required>
+            </div>
+        </div>
+    </div>
+
+    <div class="myColumns" style="clear: both" >
+        <div class="myColumns">
+            <div class="subCol" style="float: left;">
+                <div >
+                    <select class="v-select-twincol-options" size="10" multiple="" tabindex="0" style="width: 145px;"></select>
+                    <div class="subCol">
+                        <button tabindex="0" role="button" class="btn btn-primary"><span class="v-button-wrap"><span class="v-button-caption">&lt;&lt;</span></span></button>
+                        <button class="btn btn-primary">&gt;&gt;</button>
+                    </div>
+                    <select class="v-select-twincol-options" size="10" multiple="" tabindex="0" style="width: 145px;"></select>
+
+                </div>
+            </div>
+            <div class="subCol">
+                <div class="myColunms">
+                    <select class="v-select-twincol-options" size="10" multiple="" tabindex="0" style="width: 145px;"></select>
+                    <div class="subCol">
+                        <button tabindex="0" role="button" class="btn btn-primary"><span class="v-button-wrap"><span class="v-button-caption">&lt;&lt;</span></span></button>
+                        <button class="btn btn-primary">&gt;&gt;</button>
+                    </div>
+                    <select class="v-select-twincol-options" size="10" multiple="" tabindex="0" style="width: 145px;"></select>
+
+                </div>
+            </div>
+            <div class="subCol">
+                <div style="float: left;">
+                    <select class="v-select-twincol-options" size="10" multiple="" tabindex="0" style="width: 145px;"></select>
+                    <div class="subCol">
+                        <button tabindex="0" role="button" class="btn btn-primary"><span class="v-button-wrap"><span class="v-button-caption">&lt;&lt;</span></span></button>
+                        <button class="btn btn-primary">&gt;&gt;</button>
+                    </div>
+                    <select class="v-select-twincol-options" size="10" multiple="" tabindex="0" style="width: 145px;"></select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

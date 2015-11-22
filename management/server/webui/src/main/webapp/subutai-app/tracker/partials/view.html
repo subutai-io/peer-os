@@ -1,0 +1,55 @@
+<div ng-controller="TrackerCtrl as trackerCtrl">
+
+	<div class="b-workspace__header">
+		<h1 class="b-title">Tracker</h1>
+	</div>
+
+	<div class="b-workspace__content">
+
+		<div class="b-main-form">
+
+			<h2 class="b-title b-title_sub">Choose module to see operations list</h2>
+			<div class="b-main-form__wrapper b-main-form__wrapper_margin-r">
+				<label class="b-popup-body-label b-popup-body-label_inline">Source</label>
+				<select class="b-popup-body-input b-popup-body-input_enviroment-name" 
+					ng-change="trackerCtrl.loadOperations()" 
+					ng-model="trackerCtrl.selectedModule">
+					<option ng-repeat="module in trackerCtrl.modules" value="{{ module }}">
+						{{ module }}
+					</option>
+				</select>
+				<div class="clear"></div>
+			</div>
+
+			<div class="b-main-form__wrapper b-main-form__wrapper_margin-r">
+				<label class="b-popup-body-label b-popup-body-label_inline">From</label>
+				<input type="date" 
+					ng-model="trackerCtrl.startDate" 
+					ng-change="trackerCtrl.loadOperations()" 
+					id="end" 
+					class="b-popup-body-input b-popup-body-input__enviroment-name">
+			</div>
+
+			<div class="b-main-form__wrapper b-main-form__wrapper_margin-r">
+				<label class="b-popup-body-label b-popup-body-label_inline">To</label>
+				<input type="date" 
+					ng-model="trackerCtrl.endDate" 
+					ng-change="trackerCtrl.loadOperations()" 
+					id="end" 
+					class="b-popup-body-input b-popup-body-input__enviroment-name">				
+			</div>
+		</div>
+
+		<div class="b-data-table">
+			<h2 class="b-title b-title_sub">Selected module operations list</h2>
+			<table datatable="" 
+				dt-options="trackerCtrl.dtOptions" 
+				dt-columns="trackerCtrl.dtColumns" 
+				dt-instance="trackerCtrl.dtInstance" 
+				class="row-border hover">
+			</table>
+		</div>
+	</div>	
+
+</div>
+

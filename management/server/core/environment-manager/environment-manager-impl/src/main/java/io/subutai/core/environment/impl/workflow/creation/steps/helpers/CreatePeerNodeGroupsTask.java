@@ -1,8 +1,6 @@
 package io.subutai.core.environment.impl.workflow.creation.steps.helpers;
 
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
@@ -67,12 +65,12 @@ public class CreatePeerNodeGroupsTask implements Callable<Set<NodeGroupBuildResu
                             localPeer.getOwnerId(), environment.getSubnetCidr(), nodeGroup.getNumberOfContainers(),
                             nodeGroup.getContainerPlacementStrategy().getStrategyId(),
                             nodeGroup.getContainerPlacementStrategy().getCriteriaAsList(),
-                            ipAddressOffset + currentIpAddressOffset, nodeGroup.getTemplateName() );
+                            ipAddressOffset + currentIpAddressOffset, nodeGroup.getTemplateName(), nodeGroup.getType() );
                 }
                 else {
                     request = new CreateEnvironmentContainerGroupRequest( environment.getId(), localPeer.getId(),
                             localPeer.getOwnerId(), environment.getSubnetCidr(), nodeGroup.getNumberOfContainers(),
-                            ipAddressOffset + currentIpAddressOffset, nodeGroup.getTemplateName(), nodeGroup.getHostId() );
+                            ipAddressOffset + currentIpAddressOffset, nodeGroup.getTemplateName(), nodeGroup.getHostId(), nodeGroup.getType() );
                 }
                 Set<HostInfoModel> newHosts = peer.createEnvironmentContainerGroup( request );
 

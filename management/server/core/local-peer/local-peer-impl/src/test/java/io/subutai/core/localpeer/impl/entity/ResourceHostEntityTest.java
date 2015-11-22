@@ -22,8 +22,8 @@ import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostArchitecture;
-import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.Interface;
+import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.Peer;
@@ -83,7 +83,7 @@ public class ResourceHostEntityTest
     @Mock
     Peer peer;
     @Mock
-    HostInfo hostInfo;
+    ResourceHostInfo hostInfo;
     @Mock
     Interface anInterface;
     @Mock
@@ -112,7 +112,7 @@ public class ResourceHostEntityTest
 
         resourceHostEntity = new ResourceHostEntity( PEER_ID, hostInfo );
         resourceHostEntity.setHostRegistry( hostRegistry );
-//        resourceHostEntity.setMonitor( monitor );
+        //        resourceHostEntity.setMonitor( monitor );
         resourceHostEntity.setRegistry( registry );
         resourceHostEntity.setPeer( peer );
         resourceHostEntity.singleThreadExecutorService = singleThreadExecutorService;
@@ -194,7 +194,8 @@ public class ResourceHostEntityTest
         }
     }
 
-   @Test
+
+    @Test
     public void testGetContainerHosts() throws Exception
     {
         resourceHostEntity.addContainerHost( containerHost );

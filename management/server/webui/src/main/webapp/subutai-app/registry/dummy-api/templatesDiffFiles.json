@@ -1,0 +1,42 @@
+[
+  {
+    "status": "M",
+    "pathToFile": "etc/group"
+  },
+  {
+    "status": "M",
+    "pathToFile": "etc/group-"
+  },
+  {
+    "status": "M",
+    "pathToFile": "abc/gshadow"
+  },
+  {
+    "status": "M",
+    "pathToFile": "opt/gshadow-"
+  },
+  {
+    "status": "M",
+    "pathToFile": "etc/var/hostname"
+  },
+  {
+    "status": "M",
+    "pathToFile": "etc/var/hosts"
+  },
+  {
+    "status": "M",
+    "pathToFile": "etc/var/passwd"
+  },
+  {
+    "status": "M",
+    "pathToFile": "etc/passwd-"
+  },
+  {
+    "status": "M",
+    "pathToFile": "etc/shadow"
+  },
+  {
+    "status": "M",
+    "pathToFile": "etc/shadow-"
+  }
+]

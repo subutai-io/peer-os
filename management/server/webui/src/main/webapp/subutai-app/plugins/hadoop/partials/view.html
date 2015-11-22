@@ -1,0 +1,35 @@
+<div ng-controller="HadoopCtrl as hadoopCtrl">
+
+	<div class="b-workspace__header">
+		<h1 class="b-title">Plugins/<span class="b-title_breadcrumbs">Hadoop</span></h1>
+	</div>
+
+	<div class="b-workspace__content">
+		<div class="b-tabs-menu">
+			<ul>
+				<li class="b-tabs-menu__item" 
+				ng-click="hadoopCtrl.activeTab = 'install'" 
+				ng-class="hadoopCtrl.activeTab == 'install' ? 'b-tabs-menu__item_active' : ''">
+					Install
+				</li>
+				<li class="b-tabs-menu__item" 
+				ng-click="hadoopCtrl.activeTab = 'manage'" 
+				ng-class="hadoopCtrl.activeTab == 'manage' ? 'b-tabs-menu__item_active' : ''">
+					Manage
+				</li>
+			</ul>
+		</div>
+
+		<div 
+			ng-if="hadoopCtrl.activeTab == 'install'" 
+			ng-include="'subutai-app/plugins/hadoop/partials/install.html'">
+		</div>
+
+		<div 
+			ng-if="hadoopCtrl.activeTab == 'manage'" 
+			ng-include="'subutai-app/plugins/hadoop/partials/manage.html'">
+		</div>
+
+	</div>
+
+</div>

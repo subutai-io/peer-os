@@ -58,13 +58,14 @@ public class AuthorizationInterceptor implements Interceptor {
 
     public Object preCall(ComponentMetadata cm, Method m, Object... parameters) throws Throwable {
         Annotation ann = new SecurityAnotationParser().getEffectiveAnnotation(beanClass, m);
+
         if (ann instanceof PermitAll) {
             return null;
         }
         String[] rolesAr = new String[] {}; // Also applies for @DenyAll
         if (ann instanceof RolesAllowed) {
             rolesAr = ((RolesAllowed) ann).value();
-        } 
+        }
         Set<String> roles = new HashSet<String>(Arrays.asList(rolesAr));
         AccessControlContext acc = AccessController.getContext();
         Subject subject = Subject.getSubject(acc);

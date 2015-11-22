@@ -13,16 +13,18 @@ import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.Request;
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.broker.api.Broker;
 import io.subutai.core.broker.api.ByteMessageListener;
 import io.subutai.core.broker.api.Topic;
-import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
-import io.subutai.common.host.ResourceHostInfo;
+import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.model.User;
 
 
 /**
@@ -33,17 +35,21 @@ public class CommandProcessor implements ByteMessageListener
     private static final Logger LOG = LoggerFactory.getLogger( CommandProcessor.class.getName() );
     private final Broker broker;
     private final HostRegistry hostRegistry;
+    private IdentityManager identityManager;
 
     protected ExpiringCache<UUID, CommandProcess> commands = new ExpiringCache<>();
 
 
-    public CommandProcessor( final Broker broker, final HostRegistry hostRegistry )
+    public CommandProcessor( final Broker broker, final HostRegistry hostRegistry,
+                             final IdentityManager identityManager )
     {
         Preconditions.checkNotNull( broker );
         Preconditions.checkNotNull( hostRegistry );
+        Preconditions.checkNotNull( identityManager );
 
         this.broker = broker;
         this.hostRegistry = hostRegistry;
+        this.identityManager = identityManager;
     }
 
 
@@ -68,7 +74,7 @@ public class CommandProcessor implements ByteMessageListener
         }
 
         //create command process
-        CommandProcess commandProcess = new CommandProcess( this, callback );
+        CommandProcess commandProcess = new CommandProcess( this, callback, getUser() );
         boolean queued =
                 commands.put( request.getCommandId(), commandProcess, Common.INACTIVE_COMMAND_DROP_TIMEOUT_SEC * 1000,
                         new CommandProcessExpiryCallback() );
@@ -86,7 +92,7 @@ public class CommandProcessor implements ByteMessageListener
 
             LOG.info( String.format( "Sending:%n%s", command ) );
 
-            broker.sendTextMessage( targetHost.getId().toString(), command );
+            broker.sendTextMessage( targetHost.getId(), command );
         }
         catch ( Exception e )
         {
@@ -96,6 +102,12 @@ public class CommandProcessor implements ByteMessageListener
 
             throw new CommandException( e );
         }
+    }
+
+
+    protected User getUser()
+    {
+        return identityManager.getActiveUser();
     }
 
 

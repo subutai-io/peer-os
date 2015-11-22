@@ -5,7 +5,7 @@
   <parent>
     <groupId>io.subutai</groupId>
     <artifactId>mgmt-server-core-parent</artifactId>
-    <version>4.0.0-RC3</version>
+    <version>4.0.0-RC4</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -19,6 +19,5 @@
     <module>template-registry-impl</module>
     <module>template-registry-cli</module>
     <module>template-registry-rest</module>
-    <module>template-registry-ui</module>
   </modules>
 </project>

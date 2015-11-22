@@ -1,0 +1,50 @@
+<div class="b-popup">
+	<div class="b-popup__header">
+		{{ blueprintsBuildFormCtrl.blueprintAction }} Environment
+		<a href ng-click="closeThisDialog(blueprintsBuildFormCtrl.deleteNode)">
+			<img src="assets/elements/buttons/b-icon-close.svg" class="b-icon g-right"/>
+		</a>
+	</div>
+	<div class="b-popup__body">
+		<div class="b-main-table-border">
+			<table class="b-main-table b-main-table_with-header">
+				<tr>
+					<th>Peer</th>
+					<th>Resource host</th>
+					<th>Node groups</th>
+					<th></th>
+				</tr>
+				<tbody ng-repeat="(peer, nodesInPeer) in blueprintsBuildFormCtrl.groupList">
+					<tr ng-repeat="(strategue, nodesInStrategue) in nodesInPeer">
+						<td>{{ peer }}</td>
+						<td>{{ strategue }}</td>
+						<td class="b-main-table__node-two">
+							<span ng-repeat="(key, item) in nodesInStrategue"
+							class="b-tags b-tags_{{ blueprintsBuildFormCtrl.colors[blueprintsBuildFormCtrl.blueprint.nodeGroups[item.parentNode].type] }}">
+								{{ item.name }}: {{ item.numberOfContainers }}
+								<a href 
+								ng-click="blueprintsBuildFormCtrl.removeNode(peer, strategue, key, item.originalKey)">
+									<i class="fa fa-times"></i>
+								</a>
+							</span>
+						</td>
+						<td class="b-main-table__controls b-main-table__controls_popup-remove">
+							<a href
+							class="b-icon b-icon_remove g-right" 
+							ng-click="blueprintsBuildFormCtrl.removeGroup(peer)">
+								
+							</a>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<div class="b-popup__footer">
+		<button class="b-btn b-btn_green g-right" ng-click="blueprintsBuildFormCtrl.start()">
+			{{ blueprintsBuildFormCtrl.blueprintAction }}
+		</button>
+
+		<div class="clear"></div>
+	</div>
+</div>

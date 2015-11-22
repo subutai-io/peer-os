@@ -1,7 +1,6 @@
 package io.subutai.core.environment.impl.dao;
 
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -33,7 +32,7 @@ public class BlueprintDataService
     private DaoManager daoManager;
 
 
-    public BlueprintDataService( DaoManager daoManager ) throws SQLException
+    public BlueprintDataService( DaoManager daoManager )
     {
         this.daoManager = daoManager;
     }

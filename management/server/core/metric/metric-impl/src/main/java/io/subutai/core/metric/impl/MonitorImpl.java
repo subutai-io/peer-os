@@ -30,7 +30,9 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.exception.DaoException;
+import io.subutai.common.metric.BaseMetric;
 import io.subutai.common.metric.ContainerHostMetric;
+import io.subutai.common.metric.ContainerHostQuotaState;
 import io.subutai.common.metric.HistoricalMetric;
 import io.subutai.common.metric.HostMetric;
 import io.subutai.common.metric.MetricType;
@@ -43,6 +45,8 @@ import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
+import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.peer.ManagementHost;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
@@ -55,7 +59,6 @@ import io.subutai.core.metric.api.AlertListener;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.metric.api.MonitoringSettings;
-import io.subutai.common.peer.LocalPeer;
 import io.subutai.core.peer.api.PeerManager;
 
 
@@ -80,7 +83,7 @@ public class MonitorImpl implements Monitor
     protected ExecutorService notificationExecutor = Executors.newCachedThreadPool();
     protected MonitorDao monitorDao;
     protected DaoManager daoManager;
-    private Map<String, HostMetric> metrics = new ConcurrentHashMap<>();
+    private Map<String, BaseMetric> metrics = new ConcurrentHashMap<>();
     protected ScheduledExecutorService stateUpdateExecutorService;
 
 
@@ -391,25 +394,56 @@ public class MonitorImpl implements Monitor
         }
     }
 
+    //
+    //    private BaseMetric fetchResourceHostMetric( Host host )
+    //    {
+    //        BaseMetric result = null;
+    //        if ( host instanceof ResourceHost )
+    //        {
+    //            result = fetchResourceHostMetric( ( ResourceHost ) host );
+    //        }
+    //        else if ( host instanceof ContainerHost )
+    //        {
+    //            try
+    //            {
+    //                ResourceHost resourceHost = peerManager.getLocalPeer().getResourceHostByContainerId( host.getId
+    // () );
+    //                result = fetchContainerHostQuotaState( resourceHost, ( ContainerHost ) host );
+    //            }
+    //            catch ( HostNotFoundException ignore )
+    //            {
+    //                //ignore
+    //            }
+    //        }
+    //
+    //        return result;
+    //    }
 
-    private HostMetric fetchHostMetric( Host host )
+
+    private HostMetric fetchManagementHostMetric( ManagementHost managementHost )
     {
         HostMetric result = null;
-        if ( host instanceof ResourceHost )
+        try
         {
-            result = fetchResourceHostMetric( ( ResourceHost ) host );
+
+            CommandResult commandResult =
+                    managementHost.execute( commands.getCurrentMetricCommand( managementHost.getHostname() ) );
+            if ( commandResult.hasSucceeded() )
+            {
+                result = JsonUtil.fromJson( commandResult.getStdOut(), HostMetric.class );
+                result.setPeerId( peerManager.getLocalPeer().getId() );
+                result.setHostId( managementHost.getId() );
+                result.setHostName( managementHost.getHostname() );
+                LOG.debug( String.format( "Host %s metrics fetched successfully.", managementHost.getHostname() ) );
+            }
+            else
+            {
+                LOG.warn( String.format( "Error getting %s metrics", managementHost.getHostname() ) );
+            }
         }
-        else if ( host instanceof ContainerHost )
+        catch ( CommandException | JsonSyntaxException e )
         {
-            try
-            {
-                ResourceHost resourceHost = peerManager.getLocalPeer().getResourceHostByContainerId( host.getId() );
-                result = fetchContainerHostMetric( resourceHost, ( ContainerHost ) host );
-            }
-            catch ( HostNotFoundException ignore )
-            {
-                //ignore
-            }
+            LOG.error( e.getMessage(), e );
         }
 
         return result;
@@ -429,52 +463,53 @@ public class MonitorImpl implements Monitor
                 result = JsonUtil.fromJson( commandResult.getStdOut(), ResourceHostMetric.class );
                 result.setPeerId( peerManager.getLocalPeer().getId() );
                 result.setHostId( resourceHost.getId() );
-                //TODO: please remove following 2 lines after implementation of host metric script: subutai stats
-                // system [hostname]
                 result.setHostName( resourceHost.getHostname() );
-                result.setHostId( resourceHost.getId() );
                 result.setContainersCount( resourceHost.getContainers().size() );
-                LOG.debug(
-                        String.format( "Resource host %s metrics fetched successfully.", resourceHost.getHostname() ) );
+                LOG.debug( String.format( "Host %s metrics fetched successfully.", resourceHost.getHostname() ) );
             }
             else
             {
-                LOG.warn( String.format( "Error getting metrics from resource host %s", resourceHost.getHostname() ) );
+                LOG.warn( String.format( "Error getting %s metrics", resourceHost.getHostname() ) );
             }
         }
         catch ( CommandException | JsonSyntaxException e )
         {
-            LOG.error( "Error in addResourceHostMetric", e );
+            LOG.error( e.getMessage(), e );
         }
 
         return result;
     }
 
 
-    private HostMetric fetchContainerHostMetric( ResourceHost resourceHost, ContainerHost containerHost )
+    private ContainerHostQuotaState fetchContainerHostQuotaState( ResourceHost resourceHost,
+                                                                  ContainerHost containerHost )
     {
-        HostMetric result = null;
+        ContainerHostQuotaState result = null;
         try
         {
 
             CommandResult commandResult =
-                    resourceHost.execute( commands.getCurrentMetricCommand( containerHost.getHostname() ) );
+                    resourceHost.execute( commands.getContainerHostQuotaCommand( containerHost.getHostname() ) );
             if ( commandResult.hasSucceeded() )
             {
-                result = JsonUtil.fromJson( commandResult.getStdOut(), HostMetric.class );
+                result = JsonUtil.fromJson( commandResult.getStdOut(), ContainerHostQuotaState.class );
                 result.setPeerId( peerManager.getLocalPeer().getId() );
-                result.setHostId( resourceHost.getId() );
+                result.setHostId( containerHost.getId() );
+                result.setHostName( containerHost.getHostname() );
+
                 LOG.debug( String.format( "Container host %s metrics fetched successfully.",
-                        resourceHost.getHostname() ) );
+                        containerHost.getHostname() ) );
             }
             else
             {
-                LOG.warn( String.format( "Error getting metrics from resource host %s", resourceHost.getHostname() ) );
+                LOG.warn(
+                        String.format( "Error getting metrics from resource host %s for %s", resourceHost.getHostname(),
+                                containerHost.getHostname() ) );
             }
         }
         catch ( CommandException | JsonSyntaxException e )
         {
-            LOG.error( "Error in addResourceHostMetric", e );
+            LOG.error( e.getMessage(), e );
         }
 
         return result;
@@ -550,12 +585,12 @@ public class MonitorImpl implements Monitor
         Preconditions.checkNotNull( environment, ENVIRONMENT_IS_NULL_MSG );
 
         //make sure subscriber id is truncated to 100 characters
-        String trimmmedSubscriberId = StringUtil.trimToSize( subscriberId, Constants.MAX_SUBSCRIBER_ID_LEN );
+        String trimmedSubscriberId = StringUtil.trimToSize( subscriberId, Constants.MAX_SUBSCRIBER_ID_LEN );
 
         //remove subscription from database
         try
         {
-            monitorDao.removeSubscription( environment.getId(), trimmmedSubscriberId );
+            monitorDao.removeSubscription( environment.getId(), trimmedSubscriberId );
         }
         catch ( DaoException e )
         {
@@ -1053,15 +1088,18 @@ public class MonitorImpl implements Monitor
     }
 
 
-    @Override
-    public void updateHostMetric( final HostMetric metric )
+    //    @Override
+    private void updateHostMetric( final BaseMetric metric )
     {
-        this.metrics.put( metric.getHostId(), metric );
+        if ( metric != null )
+        {
+            this.metrics.put( metric.getHostId(), metric );
+        }
     }
 
 
     @Override
-    public HostMetric getHostMetric( final String id )
+    public BaseMetric getHostMetric( final String id )
     {
         return this.metrics.get( id );
     }
@@ -1072,7 +1110,7 @@ public class MonitorImpl implements Monitor
     {
         ResourceHostMetrics result = new ResourceHostMetrics();
 
-        for ( HostMetric metric : metrics.values() )
+        for ( BaseMetric metric : metrics.values() )
         {
             if ( isLocalOnly && !metric.getPeerId().equals( peerManager.getLocalPeerInfo().getId() ) )
             {
@@ -1088,36 +1126,53 @@ public class MonitorImpl implements Monitor
     }
 
 
-    private class HostMetricUpdater implements Runnable
+    @Override
+    public String getHostMetricsAsHtml( final String hostId )
     {
-        private final Host host;
-        private final Monitor monitor;
+        StringBuilder result = new StringBuilder();
+        BaseMetric metrics = getHostMetric( hostId );
 
-
-        public HostMetricUpdater( final Host host, final Monitor monitor )
+        if ( metrics instanceof ContainerHostQuotaState )
         {
-            this.host = host;
-            this.monitor = monitor;
+            ContainerHostQuotaState state = ( ContainerHostQuotaState ) metrics;
+            result.append( getText( "<br>CPU : %d%%", state.getCpu() ) );
+            result.append( getText( "<br>RAM : %d%%", state.getRam() ) );
+            result.append( getText( "<br>/ : %d%%", state.getDisk().getRootfs() ) );
+            result.append( getText( "<br>/home : %d%%", state.getDisk().getHome() ) );
+            result.append( getText( "<br>/opt : %d%%", state.getDisk().getOpt() ) );
+            result.append( getText( "<br>/var : %d%%", state.getDisk().getVar() ) );
         }
-
-
-        @Override
-        public void run()
+        else
         {
+            HostMetric hostMetric = ( HostMetric ) metrics;
 
-            try
+            result.append( getText( "<br>CPU model: %s", hostMetric.getCpuModel() ) );
+            result.append( getText( "<br>CPU core(s): %d", hostMetric.getCpuCore() ) );
+            result.append( getText( "<br>CPU load: %.2f", hostMetric.getUsedCpu() ) );
+            result.append( getText( "<br>Total RAM: %.3f Gb", hostMetric.getTotalRam() / 1024 / 1024 / 1024 ) );
+            result.append( getText( "<br>Available RAM: %.3f Gb", hostMetric.getAvailableRam() / 1024 / 1024 / 1024 ) );
+            result.append(
+                    getText( "<br>Available space: %.3f Gb", hostMetric.getAvailableSpace() / 1024 / 1024 / 1024 ) );
+
+            if ( hostMetric instanceof ResourceHostMetric )
             {
-                HostMetric metric = fetchHostMetric( host );
-                if ( metric != null )
-                {
-                    monitor.updateHostMetric( metric );
-                    LOG.debug( "Metrics updated for: " + host.getId() );
-                }
+                result.append(
+                        getText( "<br>Container #: %d", ( ( ResourceHostMetric ) hostMetric ).getContainersCount() ) );
             }
-            catch ( Exception e )
-            {
-                LOG.warn( String.format( "Could not fetch host metric for %s: %s", host.getId(), e.getMessage() ) );
-            }
+        }
+        return result.toString();
+    }
+
+
+    private String getText( final String format, final Object o )
+    {
+        if ( o != null )
+        {
+            return String.format( format, o );
+        }
+        else
+        {
+            return "";
         }
     }
 
@@ -1139,15 +1194,21 @@ public class MonitorImpl implements Monitor
             LOG.debug( "Metrics updater started." );
             try
             {
+
+                HostMetric managementHostMetric =
+                        monitor.fetchManagementHostMetric( peerManager.getLocalPeer().getManagementHost() );
+
+                monitor.updateHostMetric( managementHostMetric );
+
                 for ( ResourceHost resourceHost : peerManager.getLocalPeer().getResourceHosts() )
                 {
                     ResourceHostMetric resourceHostMetric = monitor.fetchResourceHostMetric( resourceHost );
-                    resourceHostMetric.setHostId( resourceHost.getId() );
+
                     monitor.updateHostMetric( resourceHostMetric );
                     for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
                     {
-                        HostMetric hostMetric = monitor.fetchContainerHostMetric( resourceHost, containerHost );
-                        hostMetric.setHostId( containerHost.getId() );
+                        ContainerHostQuotaState hostMetric =
+                                monitor.fetchContainerHostQuotaState( resourceHost, containerHost );
                         monitor.updateHostMetric( hostMetric );
                     }
                 }
