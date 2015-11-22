@@ -157,7 +157,7 @@ class SessionDAO
         {
             daoManager.startTransaction( em );
             em.persist( item );
-            em.flush();
+            //em.flush();
             daoManager.commitTransaction( em );
         }
         catch ( Exception e )

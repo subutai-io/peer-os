@@ -34,6 +34,7 @@ import io.subutai.core.identity.api.model.User;
 public class SystemLoginModule extends AbstractKarafLoginModule
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( SystemLoginModule.class.getName() );
+    private Session userSession = null;
 
 
     @Override
@@ -87,21 +88,23 @@ public class SystemLoginModule extends AbstractKarafLoginModule
 
             if ( loggedUser != null )
             {
+                //******************************************
+                principals = new HashSet<>();
+                principals.add( new UserPrincipal( user ) );
+                principals.add( new RolePrincipal( "webconsole" ) );
+                //******************************************
+
                 // Create or restore existing session *********************
                 Session userSession = identityManager.startSession( loggedUser );
                 //*********************************************************
 
                 if ( userSession.getSubject() != null ) //restore
                 {
-                    subject = userSession.getSubject();
+                    principals.addAll( userSession.getSubject().getPrincipals() );
                     LOGGER.debug( "Session restored" );
                 }
                 else //create new subject
                 {
-                    //******************************************
-                    principals = new HashSet<>();
-                    principals.add( new UserPrincipal( user ) );
-                    //******************************************
 
                     //******************************************
                     List<Role> roles = loggedUser.getRoles();
@@ -118,13 +121,19 @@ public class SystemLoginModule extends AbstractKarafLoginModule
                             }
                         }
                     }
-                    principals.add( new RolePrincipal( "webconsole" ) );
-                    subject.getPrincipals().addAll( principals );
-                    subject.getPrivateCredentials().add( userSession );
                     //******************************************
                     LOGGER.debug( "Successful login." );
                 }
 
+                //******************************************
+                subject.getPrincipals().clear();
+                subject.getPrincipals().addAll( principals );
+                subject.getPrivateCredentials().add( userSession );
+                //******************************************
+            }
+            else
+            {
+                throw new LoginException( "Invalid Login" );
             }
         }
         catch ( IOException ioException )
@@ -191,4 +200,6 @@ public class SystemLoginModule extends AbstractKarafLoginModule
         LOGGER.debug( "Invoking checkPassword." );
         return super.checkPassword( plain, encrypted );
     }
+
+
 }

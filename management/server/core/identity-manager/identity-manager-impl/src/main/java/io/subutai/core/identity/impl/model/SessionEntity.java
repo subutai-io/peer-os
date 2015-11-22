@@ -40,10 +40,10 @@ public class SessionEntity implements Session
     private Date startDate = new Date( System.currentTimeMillis() );
 
     @Column( name = "end_date" )
-    private Date endDate;
+    private Date endDate = new Date( System.currentTimeMillis() );
 
     //************************************
-    @ManyToOne
+    @ManyToOne(targetEntity = UserEntity.class)
     @JoinColumn( name = "user_id" )
     private User user;
     //************************************

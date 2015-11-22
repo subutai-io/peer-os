@@ -178,7 +178,7 @@ public interface IdentityManager
 
     /* *************************************************
      */
-    void endSession( Session userSession );
+    void endSession( User user );
 
 
     /* *************************************************
@@ -198,11 +198,10 @@ public interface IdentityManager
 
     /* *************************************************
      */
-    @PermitAll
     void invalidateSessions();
 
     /* *************************************************
-         */
+     */
     UserToken createUserToken( User user, String token, String secret, String issuer, int tokenType, Date validDate );
 
 

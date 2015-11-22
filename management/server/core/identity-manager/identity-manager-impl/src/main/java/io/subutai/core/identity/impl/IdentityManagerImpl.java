@@ -7,7 +7,9 @@ import java.security.AccessControlException;
 import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.Executors;
@@ -64,7 +66,7 @@ public class IdentityManagerImpl implements IdentityManager
 {
     //Session Expiration time in mins
     //****************************************
-    private static int SESSION_TIMEOUT = 30;
+    private static int SESSION_TIMEOUT = 3;
     //****************************************
 
     private static final Logger LOGGER = LoggerFactory.getLogger( IdentityManagerImpl.class.getName() );
@@ -72,6 +74,7 @@ public class IdentityManagerImpl implements IdentityManager
     private IdentityDataService identityDataService = null;
     private DaoManager daoManager = null;
     private ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+    private Map<Long, Session> sessionContext = new HashMap<Long, Session>();
 
 
     /* *************************************************
@@ -95,7 +98,7 @@ public class IdentityManagerImpl implements IdentityManager
                 removeInvalidTokens();
                 invalidateSessions();
             }
-        }, 15, 15, TimeUnit.MINUTES );
+        }, 3, 3, TimeUnit.MINUTES );
         //*****************************************
     }
 
@@ -103,13 +106,12 @@ public class IdentityManagerImpl implements IdentityManager
     public void destroy()
     {
         //*****************************************
-        if(executorService!=null)
+        if ( executorService != null )
         {
             executorService.shutdown();
         }
         //*****************************************
     }
-    //*****************************************************
 
 
     //*****************************************************
@@ -263,7 +265,6 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-
     /* *************************************************
      */
     @PermitAll
@@ -274,15 +275,19 @@ public class IdentityManagerImpl implements IdentityManager
 
         try
         {
-            userSession = identityDataService.getValidSession( user.getId() );
+            userSession = getValidSession( user );
 
-            if(userSession==null)
+            if ( userSession == null )
             {
                 userSession = new SessionEntity();
-                userSession.setStatus( 1 );
                 userSession.setUser( user );
+                userSession.setStatus( 1 );
                 userSession.setStartDate( new Date( System.currentTimeMillis() ) );
-                identityDataService.persistSession( userSession );
+                sessionContext.put( user.getId(), userSession );
+            }
+            else
+            {
+                extendSessionTime( userSession );
             }
         }
 
@@ -296,33 +301,40 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    @PermitAll
-    @Override
-    public void endSession( Session userSession )
+    private Session getValidSession( User user )
     {
-        try
-        {
-            userSession.setStatus( 0 ); //inactive
-            userSession.setEndDate( new Date( System.currentTimeMillis() ) );
+        Session sc = sessionContext.get( user.getId() );
 
-            identityDataService.updateSession( userSession );
-        }
-        catch ( Exception ex )
+        if ( sc != null )
         {
+            return sc;
+        }
+        else
+        {
+            return null;
         }
     }
+
+
+    /* *************************************************
+     */
+    @Override
+    public void extendSessionTime( Session userSession )
+    {
+        Date currentDate = new Date( System.currentTimeMillis() );
+        userSession.setStartDate( DateUtils.addMinutes( currentDate, SESSION_TIMEOUT ) );
+    }
+
 
     /* *************************************************
      */
     @PermitAll
     @Override
-    public void extendSessionTime( Session userSession )
+    public void endSession( User user )
     {
         try
         {
-            Date currentDate = new Date(System.currentTimeMillis() );
-            userSession.setStartDate( DateUtils.addMinutes( currentDate, SESSION_TIMEOUT ) );
-            identityDataService.updateSession( userSession );
+            sessionContext.remove( user.getId() );
         }
         catch ( Exception ex )
         {
@@ -356,7 +368,16 @@ public class IdentityManagerImpl implements IdentityManager
     @Override
     public void invalidateSessions()
     {
-        identityDataService.invalidateSessions();
+        Date currentDate = DateUtils.addMinutes( new Date( System.currentTimeMillis() ), -SESSION_TIMEOUT );
+
+        for ( Session session : sessionContext.values() )
+        {
+            if ( session.getStartDate().before( currentDate ) )
+            {
+                sessionContext.remove( session.getUser().getId() );
+            }
+        }
+        //identityDataService.invalidateSessions();
     }
 
 
@@ -467,6 +488,10 @@ public class IdentityManagerImpl implements IdentityManager
             }
             else
             {
+                //**************************************
+                extendTokenTime( userToken,SESSION_TIMEOUT );
+                //**************************************
+
                 return getUser( userToken.getUserId() );
             }
         }
@@ -538,29 +563,11 @@ public class IdentityManagerImpl implements IdentityManager
     @Override
     public User getActiveUser()
     {
-        Session session = getLoggedUser();
-
-        if(session!=null)
-        {
-            return session.getUser();
-        }
-        else
-        {
-            return null;
-        }
-    }
-
-
-    /* *************************************************
-     */
-    @PermitAll
-    @Override
-    public User getActiveSession()
-    {
         Session session = getActiveSession();
 
-        if(session!=null)
+        if ( session != null )
         {
+            session.getUser().setSubject( session.getSubject() );
             return session.getUser();
         }
         else
@@ -589,7 +596,7 @@ public class IdentityManagerImpl implements IdentityManager
 
                     if ( obj instanceof SessionEntity )
                     {
-                        session = (( Session ) obj);
+                        session = ( ( Session ) obj );
                         break;
                     }
                 }
@@ -597,11 +604,12 @@ public class IdentityManagerImpl implements IdentityManager
         }
         catch ( Exception ex )
         {
-            LOGGER.error("*** Error! Cannot find active User. Session is not started");
+            LOGGER.error( "*** Error! Cannot find active User. Session is not started" );
         }
 
         return session;
     }
+
 
     /* *************************************************
      */
@@ -625,11 +633,10 @@ public class IdentityManagerImpl implements IdentityManager
             {
                 throw new RuntimeException( "subject is null" );
             }
-
         }
         catch ( Exception ex )
         {
-            LOGGER.error("*** Error! Cannot get auth.subject.");
+            LOGGER.error( "*** Error! Cannot get auth.subject." );
         }
 
         return subject;
@@ -994,10 +1001,9 @@ public class IdentityManagerImpl implements IdentityManager
     @Override
     public void extendTokenTime( UserToken token, int minutes )
     {
-        token.setValidDate( DateUtils.addMinutes( token.getValidDate(), minutes ));
+        token.setValidDate( DateUtils.addMinutes( token.getValidDate(), minutes ) );
         identityDataService.updateUserToken( token );
     }
-
 
 
     /* *************************************************
@@ -1012,8 +1018,9 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    @RolesAllowed( {"Identity-Management|A|Write",
-                    "Identity-Management|A|Update"} )
+    @RolesAllowed( {
+            "Identity-Management|A|Write", "Identity-Management|A|Update"
+    } )
     @Override
     public void updateUserToken( String oldName, User user, String token, String secret, String issuer, int tokenType,
                                  Date validDate )
@@ -1025,10 +1032,11 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    @RolesAllowed( {"Identity-Management|A|Write",
-                    "Identity-Management|A|Delete"} )
+    @RolesAllowed( {
+            "Identity-Management|A|Write", "Identity-Management|A|Delete"
+    } )
     @Override
-    public void removeUserToken( String tokenId)
+    public void removeUserToken( String tokenId )
     {
         identityDataService.removeUserToken( tokenId );
     }
@@ -1056,5 +1064,4 @@ public class IdentityManagerImpl implements IdentityManager
     {
         this.daoManager = daoManager;
     }
-
 }
