@@ -30,7 +30,7 @@ public class DefSubutaiStepsGiven {
     }
 
     @Given("the user enter login and password: '$login', '$password'")
-    public void input_login_and_password(String login, String password){
+    public void enter_login_and_password(String login, String password){
         subutaiSteps.inputLogin(login);
         subutaiSteps.inputPassword(password);
     }

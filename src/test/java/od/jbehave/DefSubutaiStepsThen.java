@@ -18,4 +18,20 @@ public class DefSubutaiStepsThen {
         subutaiSteps.seeEnvironmentMenuItemEnvironments();
         subutaiSteps.seeEnvironmentMenuItemContainers();
     }
+
+    @Then("the user observe button: Create Blueprint")
+    public void see_button_create_blueprint(){
+        subutaiSteps.seeButtonCreateEnvironment();
+    }
+
+    @Then("the user observe field: Enter blueprint name")
+    public void see_field_enter_blueprint_name(){
+        subutaiSteps.seeFieldEnterBlueprintName();
+    }
+
+    @Then("the user observe node list item")
+    public void see_node_list_item()
+    {
+        subutaiSteps.seeNodeListItem();
+    }
 }

@@ -6,7 +6,6 @@ import od.pages.ReaderFromFile;
 import od.pages.SubutaiPage;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -81,4 +80,63 @@ public class SubutaiSteps extends ScenarioSteps {
         assertThat(subutaiPage.linkContainers.isVisible(), is(true));
     }
 
+    @Step
+    public void seeButtonCreateEnvironment() {
+        assertThat(subutaiPage.buttonCreateBlueprintSecond.isVisible(), is(true));
+    }
+
+    @Step
+    public void clickOnButtonCreateBlueprint() {
+        subutaiPage.buttonCreateBlueprintSecond.click();
+    }
+
+    @Step
+    public void seeFieldEnterBlueprintName() {
+        assertThat(subutaiPage.inputBlueprintName.isVisible(), is(true));
+    }
+
+    @Step
+    public void enterBlueprintName(String blueprintName){
+        subutaiPage.inputBlueprintName.type(blueprintName);
+    }
+
+    @Step
+    public void enterNodeName(String nodeName) {
+        subutaiPage.inputBlueprintNodeName.type(nodeName);
+    }
+
+    @Step
+    public void selectTemplate(String template) {
+        subutaiPage.selectBlueprintTemplate.selectByValue(template);
+    }
+
+    @Step
+    public void enterNumberOfContainers(String count) {
+        subutaiPage.inputBlueprintNumberOfContainers.type(count);
+    }
+
+    @Step
+    public void enterSSHGroupID(String id) {
+        subutaiPage.inputBlueprintSSHGroupID.type(id);
+    }
+
+    @Step
+    public void enterHostGroupID(String id) {
+        subutaiPage.inputBlueprintHostGroupID.type(id);
+    }
+
+    @Step
+    public void selectQuotaSize(String quotaSize) {
+        subutaiPage.selectBlueprintQuotaSize.selectByValue(quotaSize);
+    }
+
+    @Step
+    public void clickOnButtonAddToNodeList() {
+        subutaiPage.buttonBlueprintAddToNodeList.click();
+    }
+
+    @Step
+    public void seeNodeListItem(){
+        assertThat(subutaiPage.nodeListItem.isVisible(), is(true));
+    }
 }

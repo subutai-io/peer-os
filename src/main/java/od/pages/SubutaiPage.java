@@ -53,7 +53,7 @@ public class SubutaiPage extends PageObject {
     public WebElementFacade selectBlueprintQuotaSize;
 
     @FindBy(id = "subt_button__blueprint-create")
-    public WebElementFacade buttonBlueprintCreate;
+    public WebElementFacade buttonCreateBlueprint;
 
     @FindBy(id = "subt_input__environment-name")
     public WebElementFacade inputEnvironmentName;
@@ -72,6 +72,12 @@ public class SubutaiPage extends PageObject {
 
     @FindBy(id = "subt-link__containers")
     public WebElementFacade linkContainers;
+
+    @FindBy(id = "subt_button__blueprint-add-to-node-list")
+    public WebElementFacade buttonBlueprintAddToNodeList;
+
+    @FindBy(className = "b-popup-box-node-list subt_button__blueprint-node-list-item ng-binding ng-scope")
+    public WebElementFacade nodeListItem;
 
     //---------------------------------------------------------------------
 }
