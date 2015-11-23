@@ -258,9 +258,9 @@ public class ContainerHostEntityTest
     @Test
     public void testGetRamQuotaInfo() throws Exception
     {
-        containerHostEntity.getRamQuotaInfo();
+        containerHostEntity.getRamQuota();
 
-        verify( peer ).getRamQuotaInfo( containerHostEntity );
+        verify( peer ).getRamQuota( containerHostEntity );
     }
 
 
@@ -276,9 +276,9 @@ public class ContainerHostEntityTest
     @Test
     public void testGetCpuQuotaInfo() throws Exception
     {
-        containerHostEntity.getCpuQuotaInfo();
+        containerHostEntity.getCpuQuota();
 
-        verify( peer ).getCpuQuotaInfo( containerHostEntity );
+        verify( peer ).getCpuQuota( containerHostEntity );
     }
 
 

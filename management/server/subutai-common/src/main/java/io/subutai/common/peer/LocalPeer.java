@@ -7,6 +7,8 @@ import java.util.Set;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.protocol.Template;
+import io.subutai.common.quota.Quota;
+import io.subutai.common.quota.QuotaType;
 
 
 /**
@@ -129,6 +131,7 @@ public interface LocalPeer extends Peer
     public void removeRequestListener( RequestListener listener );
 
     public Set<RequestListener> getRequestListeners();
+
 
     /**
      * Returns domain assigned to vni if any

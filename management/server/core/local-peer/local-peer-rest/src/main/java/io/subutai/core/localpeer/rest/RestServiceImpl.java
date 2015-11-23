@@ -245,11 +245,11 @@ public class RestServiceImpl implements RestService
         {
             Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
 
-            return Response.ok( localPeer.getContainerHostById( containerId ).getRamQuotaInfo() ).build();
+            return Response.ok( localPeer.getContainerHostById( containerId ).getRamQuota() ).build();
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error getting ram quota info #getRamQuotaInfo", e );
+            LOGGER.error( "Error getting ram quota info #getRamQuota", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
@@ -317,7 +317,7 @@ public class RestServiceImpl implements RestService
         {
             Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
 
-            return Response.ok( localPeer.getContainerHostById( containerId ).getCpuQuotaInfo() ).build();
+            return Response.ok( localPeer.getContainerHostById( containerId ).getCpuQuota() ).build();
         }
         catch ( Exception e )
         {
