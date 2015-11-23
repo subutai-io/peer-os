@@ -12,14 +12,17 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 public class SubutaiSteps extends ScenarioSteps {
+    SubutaiPage subutaiPage;
 
     @Step
-    public String getMngHost1() throws FileNotFoundException {
-        return ReaderFromFile.readDataFromFile("src/test/resources/parameters/mng_h1");
+    public void open_mng_h1() throws FileNotFoundException {
+        subutaiPage.setDefaultBaseUrl(String.format("http://%s:8181/", ReaderFromFile.readDataFromFile("src/test/resources/parameters/mng_h1")));
+        subutaiPage.open();
     }
 
     @Step
-    public String getMngHost2() throws FileNotFoundException {
-        return ReaderFromFile.readDataFromFile("src/test/resources/parameters/mng_h2");
+    public void open_mng_h2() throws FileNotFoundException {
+        subutaiPage.setDefaultBaseUrl(String.format("http://%s:8181/", ReaderFromFile.readDataFromFile("src/test/resources/parameters/mng_h2")));
+        subutaiPage.open();
     }
 }
