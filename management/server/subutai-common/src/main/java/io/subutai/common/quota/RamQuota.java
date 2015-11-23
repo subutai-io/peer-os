@@ -7,14 +7,15 @@ package io.subutai.common.quota;
 public class RamQuota extends Quota
 {
     private RamQuotaUnit ramQuotaUnit;
-    private int ramQuotaValue;
+    private long ramQuotaValue;
 
 
-    public RamQuota( final RamQuotaUnit ramQuotaUnit, final int ramQuotaValue )
+    public RamQuota( final RamQuotaUnit ramQuotaUnit, final long ramQuotaValue )
     {
         this.ramQuotaUnit = ramQuotaUnit;
         this.ramQuotaValue = ramQuotaValue;
     }
+
 
     public RamQuotaUnit getRamQuotaUnit()
     {
@@ -22,9 +23,10 @@ public class RamQuota extends Quota
     }
 
 
-    public int getRamQuotaValue()
+    public double getRamQuotaValue( RamQuotaUnit unit )
     {
-        return ramQuotaValue;
+        double inBytes = ramQuotaUnit.getMultiplicator() * ramQuotaValue;
+        return inBytes / unit.getMultiplicator();
     }
 
 
@@ -67,16 +69,6 @@ public class RamQuota extends Quota
 
         return true;
     }
-
-
-    @Override
-    public int hashCode()
-    {
-        int result = ramQuotaUnit != null ? ramQuotaUnit.hashCode() : 0;
-        result = 31 * result + ramQuotaValue;
-        return result;
-    }
-
 
     public String getValue()
     {

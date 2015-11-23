@@ -11,6 +11,7 @@ import io.subutai.common.quota.RamQuota;
 import io.subutai.common.quota.RamQuotaUnit;
 import io.subutai.core.lxc.quota.impl.parser.RamQuotaParser;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
@@ -24,7 +25,8 @@ public class RamQuotaTest
     @Before
     public void setUp() throws Exception
     {
-        ramQuotaInfo = new RamQuota( RamQuotaUnit.BYTE, 55 );
+        //        ramQuotaInfo = new RamQuota( RamQuotaUnit.BYTE, 1073741824 );
+        ramQuotaInfo = new RamQuota( RamQuotaUnit.GB, 1 );
     }
 
 
@@ -33,9 +35,13 @@ public class RamQuotaTest
     {
         assertNotNull( ramQuotaInfo.getKey() );
         assertNotNull( ramQuotaInfo.getRamQuotaUnit() );
-        assertNotNull( ramQuotaInfo.getRamQuotaValue() );
+        assertNotNull( ramQuotaInfo.getRamQuotaValue( RamQuotaUnit.BYTE ) );
         assertNotNull( ramQuotaInfo.getType() );
         assertNotNull( ramQuotaInfo.getValue() );
+        assertEquals( 1073741824.0, ramQuotaInfo.getRamQuotaValue( RamQuotaUnit.BYTE ), 0.0 );
+        assertEquals( 1048576.0, ramQuotaInfo.getRamQuotaValue( RamQuotaUnit.KB ), 0.0 );
+        assertEquals( 1024.0, ramQuotaInfo.getRamQuotaValue( RamQuotaUnit.MB ), 0.00001 );
+        assertEquals( 1.0, ramQuotaInfo.getRamQuotaValue( RamQuotaUnit.GB ), 0.00001 );
         assertNotNull( ramQuotaInfo.hashCode() );
         assertNotNull( ramQuotaInfo.equals( "test" ) );
         assertNotNull( ramQuotaInfo.equals( ramQuotaInfo ) );

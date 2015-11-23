@@ -1,6 +1,9 @@
 package io.subutai.common.quota;
 
 
+import java.math.BigDecimal;
+
+
 /**
  * Disk quota
  */
@@ -61,10 +64,18 @@ public class DiskQuota extends Quota
     }
 
 
+    public BigDecimal getValue( DiskQuotaUnit unit )
+    {
+        BigDecimal inBytes = diskQuotaUnit.getMultiplicator().multiply( new BigDecimal( diskQuotaValue ) );
+        return inBytes.divide( unit.getMultiplicator() );
+    }
+
+
     public QuotaType getType()
     {
         return QuotaType.getQuotaType( diskPartition.getPartitionName() );
     }
+
 
     @Override
     public boolean equals( final Object o )
