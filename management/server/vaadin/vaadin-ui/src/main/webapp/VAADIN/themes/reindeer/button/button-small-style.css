@@ -1,0 +1,96 @@
+/**
+ * NovaForge(TM) is a web-based forge offering a Collaborative Development and 
+ * Project Management Environment.
+ *
+ * Copyright (C) 2007-2012  BULL SAS
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see http://www.gnu.org/licenses/.
+ */
+.v-button-small:focus
+{
+    background-image: url(img/small-left-focus.png); /** sprite-ref: buttons */
+}
+
+.v-button-small:focus .v-button-wrap
+{
+    background-image: url(img/small-right-focus.png); /** sprite-ref: buttons; sprite-alignment: right */
+}
+
+.v-button-small:active,
+.v-button-small.v-pressed
+{
+    background-image: url(img/small-left-pressed.png); /** sprite-ref: buttons */
+}
+
+.v-button-small:active .v-button-wrap,
+.v-button-small.v-pressed .v-button-wrap
+{
+    background-image: url(img/small-right-pressed.png); /** sprite-ref: buttons; sprite-alignment: right */
+}
+
+.v-button-small,
+.v-disabled.v-button-small
+{
+    background-image: url(img/small-left.png); /** sprite-ref: buttons */
+    height: 20px;
+}
+
+.v-button-small .v-button-wrap,
+.v-disabled.v-button-small .v-button-wrap
+{
+    background-image: url(img/small-right.png); /** sprite-ref: buttons; sprite-alignment: right */
+    height: 19px;
+    padding: 1px 14px 0 8px;
+}
+
+.v-button-small .v-button-caption
+{
+    font-weight: normal;
+}
+
+/* Black style */
+
+.black .v-button-small:focus
+{
+    background-image: url(img/black/small-left-focus.png); /** sprite-ref: black-buttons */
+}
+
+.black .v-button-small:focus .v-button-wrap
+{
+    background-image: url(img/black/small-right-focus.png); /** sprite-ref: black-buttons; sprite-alignment: right */
+}
+
+.black .v-button-small:active,
+.black .v-button-small.v-pressed
+{
+    background-image: url(img/black/small-left-pressed.png); /** sprite-ref: black-buttons */
+}
+
+.black .v-button-small:active .v-button-wrap,
+.black .v-button-small.v-pressed .v-button-wrap
+{
+    background-image: url(img/black/small-right-pressed.png); /** sprite-ref: black-buttons; sprite-alignment: right */
+}
+
+.black .v-button-small,
+.black .v-disabled.v-button-small
+{
+    background-image: url(img/black/small-left.png); /** sprite-ref: black-buttons */
+}
+
+.black .v-button-small .v-button-wrap,
+.black .v-disabled.v-button-small .v-button-wrap
+{
+    background-image: url(img/black/small-right.png); /** sprite-ref: black-buttons; sprite-alignment: right */
+}

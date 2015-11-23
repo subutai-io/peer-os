@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>io.subutai</groupId>
+    <artifactId>vaadin-osgi-parent</artifactId>
+    <version>4.0.0-RC3</version>
+  </parent>
+  <artifactId>vaadin-ui</artifactId>
+  <packaging>war</packaging>
+  <name>Subutai Vaadin OSGi UI</name>
+  <description>Subutai Vaadin OSGi UI</description>
+
+  <profiles>
+    <profile>
+      <!-- Updates Vaadin widgetset definitions based on project dependencies Remove widgetset directory to trigger recompile: rm -Rf src/main/webapp/VAADIN/widgetsets/ -->
+      <id>update-widgetset</id>
+      <activation>
+        <file>
+          <missing>${basedir}/src/main/webapp/VAADIN/widgetsets/</missing>
+        </file>
+        <property>
+          <name>vaadin.production</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.vaadin</groupId>
+            <artifactId>vaadin-maven-plugin</artifactId>
+            <configuration>
+              <webappDirectory>${basedir}/src/main/webapp/VAADIN/widgetsets/</webappDirectory>
+              <extraJvmArgs>-Xmx512M -Xss1024k</extraJvmArgs>
+            </configuration>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>resources</goal>
+                  <goal>update-widgetset</goal>
+                  <goal>compile</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+  <dependencies>
+
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>subutai-common</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>identity-manager-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- Vaadin dependencies -->
+    <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>vaadin-server</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>vaadin-client-compiled</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>vaadin-client</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>vaadin-shared</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>vaadin-shared-deps</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>vaadin-themes</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>jsp-api</artifactId>
+      <version>2.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <version>2.5</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <finalName>vaadin-ui</finalName>
+    <plugins>
+
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <supportedProjectTypes>
+            <supportedProjectType>war</supportedProjectType>
+          </supportedProjectTypes>
+          <instructions>
+            <Bundle-SymbolicName>${project.groupId}.server.ui</Bundle-SymbolicName>
+            <Bundle-ClassPath>.,WEB-INF/classes</Bundle-ClassPath>
+
+            <!-- Add Embed lib -->
+            <Embed-Directory>WEB-INF/lib</Embed-Directory>
+            <Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
+            <Import-Package>io.subutai.core.identity.api;*;resolution:=optional</Import-Package>
+            <Export-Package>
+              com.vaadin.shared.*;
+              com.vaadin.ui.*;
+              com.vaadin.data.*;
+              com.vaadin.server.*;
+              com.vaadin.event.*;
+              com.vaadin.client.*;
+              com.google.gwt.*;
+              org.json.*;
+              {local-packages};version=${project.version};-noimport:=true
+            </Export-Package>
+
+            <!-- Package format version - do not change -->
+            <Vaadin-Package-Version>${project.version}</Vaadin-Package-Version>
+
+            <!-- Comma-separated list of widgetsets in the package -->
+            <Vaadin-Widgetsets>${project.groupId}.server.ui.widgetset.PortalWidgetset</Vaadin-Widgetsets>
+
+            <!-- OSGi war spec config -->
+            <Web-ContextPath>subutai</Web-ContextPath>
+          </instructions>
+        </configuration>
+        <executions>
+          <execution>
+            <id>bundle-manifest</id>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>manifest</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <configuration>
+          <attachClasses>true</attachClasses>
+          <webResources>
+            <resource>
+              <filtering>true</filtering>
+              <directory>src/main/webapp</directory>
+              <includes>
+                <include>**/web.xml</include>
+              </includes>
+            </resource>
+          </webResources>
+          <archive>
+            <manifestFile>META-INF/MANIFEST.MF</manifestFile>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
