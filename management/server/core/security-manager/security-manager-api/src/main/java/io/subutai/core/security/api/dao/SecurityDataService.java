@@ -1,13 +1,17 @@
 package io.subutai.core.security.api.dao;
 
 
+import java.util.List;
+
+import io.subutai.core.security.api.model.SecretKeyStore;
 import io.subutai.core.security.api.model.SecurityKeyIdentity;
+import io.subutai.core.security.api.model.SecurityKeyTrust;
 
 
 /**
  * DAO Manager for SecurityManager Entity
  */
-public interface SecurityManagerDAO
+public interface SecurityDataService
 {
 
     /******************************************
@@ -29,14 +33,30 @@ public interface SecurityManagerDAO
 
 
     /******************************************
-     * Get Security KeyId from DB
+     *
      */
-    public String getPublicKeyFingerprint( String hostId );
+    SecretKeyStore getSecretKeyData( String fingerprint );
 
 
     /******************************************
-     * Get SecretKey from DB
+     *
      */
-    public String getSecretKeyFingerprint( String hostId );
+    void saveSecretKeyData( String fingerprint, byte[] data, String pwd, short type );
 
+
+    /******************************************
+     *
+     */
+    void removeSecretKeyData( String fingerprint );
+
+
+    void saveKeyTrustData( String sourceId, String targetId, int trustLevel );
+
+    void removeKeyTrustData( long id );
+
+    void removeKeyTrustData( String sourceId );
+
+    SecurityKeyTrust getKeyTrustData( long id );
+
+    List<SecurityKeyTrust> getKeyTrustData( String sourceId );
 }

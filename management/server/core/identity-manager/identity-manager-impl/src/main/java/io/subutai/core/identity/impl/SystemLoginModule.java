@@ -27,12 +27,14 @@ import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Permission;
 import io.subutai.core.identity.api.model.Role;
+import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.identity.api.model.User;
 
 
 public class SystemLoginModule extends AbstractKarafLoginModule
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( SystemLoginModule.class.getName() );
+    private Session userSession = null;
 
 
     @Override
@@ -81,8 +83,6 @@ public class SystemLoginModule extends AbstractKarafLoginModule
             // **************************************
             IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
             User loggedUser = identityManager.authenticateUser( user, password );
-            //Session userSession = identityManager.startSession(loggedUser);
-            //userSession.setSubject( subject );
             // **************************************
 
 
@@ -91,29 +91,49 @@ public class SystemLoginModule extends AbstractKarafLoginModule
                 //******************************************
                 principals = new HashSet<>();
                 principals.add( new UserPrincipal( user ) );
+                principals.add( new RolePrincipal( "webconsole" ) );
                 //******************************************
 
-                //******************************************
-                List<Role> roles = loggedUser.getRoles();
-                for ( Role role : roles )
+                // Create or restore existing session *********************
+                Session userSession = identityManager.startSession( loggedUser );
+                //*********************************************************
+
+                if ( userSession.getSubject() != null ) //restore
                 {
-                    List<Permission> permissions = role.getPermissions();
-                    for ( Permission permission : permissions )
-                    {
-                        List<String> perms = permission.asString();
+                    principals.addAll( userSession.getSubject().getPrincipals() );
+                    LOGGER.debug( "Session restored" );
+                }
+                else //create new subject
+                {
 
-                        for ( String perm : perms )
+                    //******************************************
+                    List<Role> roles = loggedUser.getRoles();
+                    for ( Role role : roles )
+                    {
+                        List<Permission> permissions = role.getPermissions();
+                        for ( Permission permission : permissions )
                         {
-                            principals.add( new RolePrincipal( perm ) );
+                            List<String> perms = permission.asString();
+
+                            for ( String perm : perms )
+                            {
+                                principals.add( new RolePrincipal( perm ) );
+                            }
                         }
                     }
+                    //******************************************
+                    LOGGER.debug( "Successful login." );
                 }
-                principals.add( new RolePrincipal( "webconsole" ) );
-                subject.getPrincipals().addAll( principals );
-                subject.getPrivateCredentials().add( loggedUser );
-                //******************************************
 
-                LOGGER.debug( "Successful login." );
+                //******************************************
+                subject.getPrincipals().clear();
+                subject.getPrincipals().addAll( principals );
+                subject.getPrivateCredentials().add( userSession );
+                //******************************************
+            }
+            else
+            {
+                throw new LoginException( "Invalid Login" );
             }
         }
         catch ( IOException ioException )
@@ -180,4 +200,6 @@ public class SystemLoginModule extends AbstractKarafLoginModule
         LOGGER.debug( "Invoking checkPassword." );
         return super.checkPassword( plain, encrypted );
     }
+
+
 }

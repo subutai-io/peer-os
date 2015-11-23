@@ -25,7 +25,7 @@
   <!--*****************************************************************-->
 
   <!--*****************************************************************-->
-  <bean id="identityManager" scope="singleton" activation="eager" init-method="init"
+  <bean id="identityManager" scope="singleton" activation="eager" init-method="init" destroy-method="destroy"
         class="io.subutai.core.identity.impl.IdentityManagerImpl">
     <property name="daoManager" ref="daoManagerIdenity" />
   </bean>

@@ -36,8 +36,8 @@ public interface IdentityManager
     void updatePermission( Permission permission );
 
     /* *************************************************
-         *
-         */
+     *
+     */
     public IdentityDataService getIdentityDataService();
 
 
@@ -85,11 +85,11 @@ public interface IdentityManager
 
     /* *************************************************
      */
-    User getLoggedUser();
-
+    @PermitAll
+    Session getActiveSession();
 
     /* *************************************************
-     */
+         */
     User createTempUser( String userName, String password, String fullName, String email, int type );
 
 
@@ -134,7 +134,7 @@ public interface IdentityManager
     /* *************************************************
      *
      */
-    User login( String userName, String password );
+    Session login( String userName, String password );
 
 
     /* *************************************************
@@ -178,20 +178,55 @@ public interface IdentityManager
 
     /* *************************************************
      */
-    UserToken createUserToken( User user, String token, String secret, String issuer, int tokenType, Date validDate );
+    void endSession( User user );
 
+
+    /* *************************************************
+     */
+    void extendSessionTime( Session userSession );
+
+
+    /* *************************************************
+     */
+    List<Session> getSessions();
+
+
+    /* *************************************************
+     */
+    Session getSession( long sessionId );
+
+
+    /* *************************************************
+     */
+    void invalidateSessions();
+
+    /* *************************************************
+     */
+    UserToken createUserToken( User user, String token, String secret, String issuer, int tokenType, Date validDate );
 
 
     /* *************************************************
      */
     List<UserToken> getAllUserTokens();
 
+
     /* *************************************************
-             */
+     */
+    void extendTokenTime( UserToken token, int minutes );
+
+
+    /* *************************************************
+     */
+    void updateUserToken( UserToken token );
+
+
+    /* *************************************************
+     */
     public void updateUserToken( String oldName, User user, String token, String secret, String issuer, int tokenType,
                                  Date validDate );
 
+
     /* *************************************************
-         */
+     */
     void removeUserToken( String tokenId );
 }

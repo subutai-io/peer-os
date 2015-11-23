@@ -20,6 +20,7 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandStatus;
 import io.subutai.common.command.Response;
 import io.subutai.common.command.ResponseType;
+import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.identity.api.model.User;
 
 
@@ -38,10 +39,10 @@ public class CommandProcess
     protected volatile CommandStatus status;
     protected Semaphore semaphore;
     protected ExecutorService executor;
-    private User user;
+    private Session userSession;
 
 
-    public CommandProcess( final CommandProcessor commandProcessor, final CommandCallback callback, final User user )
+    public CommandProcess( final CommandProcessor commandProcessor, final CommandCallback callback, final Session userSession )
     {
         Preconditions.checkNotNull( commandProcessor );
         Preconditions.checkNotNull( callback );
@@ -54,7 +55,7 @@ public class CommandProcess
         status = CommandStatus.NEW;
         semaphore = new Semaphore( 0 );
 
-        this.user = user;
+        this.userSession = userSession;
     }
 
 
@@ -89,10 +90,10 @@ public class CommandProcess
     public void processResponse( final Response response )
     {
         final CommandProcess THIS = this;
-        if ( user != null )
+        if ( userSession != null )
         {
 
-            Subject.doAs( user.getSubject(), new PrivilegedAction<Void>()
+            Subject.doAs( userSession.getSubject(), new PrivilegedAction<Void>()
             {
                 @Override
                 public Void run()

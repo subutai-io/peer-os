@@ -59,11 +59,9 @@ public class UserEntity implements User
     @Column( name = "status" )
     private int status = 1; // Active
 
+    @Column( name = "security_key_id" )
+    private int securityKeyId = 1; // PGP KeyID
 
-    //************************************
-    @Transient
-    private Subject subject;
-    //************************************
 
     //*********************************************
     @ManyToMany( targetEntity = RoleEntity.class, fetch = FetchType.EAGER )
@@ -72,6 +70,11 @@ public class UserEntity implements User
             inverseJoinColumns = { @JoinColumn( name = "role_id", referencedColumnName = "id" ) } )
     private List<Role> roles = new ArrayList<>();
     //*********************************************
+
+    //************************************
+    @Transient
+    private Subject subject;
+    //************************************
 
 
     @Override
@@ -173,20 +176,6 @@ public class UserEntity implements User
 
 
     @Override
-    public Subject getSubject()
-    {
-        return subject;
-    }
-
-
-    @Override
-    public void setSubject( final Subject subject )
-    {
-        this.subject = subject;
-    }
-
-
-    @Override
     public int getType()
     {
         return type;
@@ -221,6 +210,19 @@ public class UserEntity implements User
 
 
     @Override
+    public int getSecurityKeyId()
+    {
+        return securityKeyId;
+    }
+
+    @Override
+    public void setSecurityKeyId( final int securityKeyId )
+    {
+        this.securityKeyId = securityKeyId;
+    }
+
+
+    @Override
     public String getStatusName()
     {
         return UserStatus.values()[status - 1].getName();
@@ -231,5 +233,19 @@ public class UserEntity implements User
     public String getTypeName()
     {
         return UserType.values()[type - 1].getName();
+    }
+
+
+    @Override
+    public Subject getSubject()
+    {
+        return subject;
+    }
+
+
+    @Override
+    public void setSubject( final Subject subject )
+    {
+        this.subject = subject;
     }
 }
