@@ -35,20 +35,14 @@ public class TestCommand extends SubutaiShellCommandSupport
         try
         {
             LocalPeer localPeer = ServiceLocator.getServiceNoCache( LocalPeer.class );
+
             localPeer.getManagementHost().execute( new RequestBuilder( "pwd" ), new CommandCallback()
             {
                 @Override
                 public void onResponse( final Response response, final CommandResult commandResult )
                 {
                     IdentityManager identityManager = null;
-                    try
-                    {
-                        identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
-                    }
-                    catch ( NamingException e )
-                    {
-                        e.printStackTrace();
-                    }
+                    //identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
                     LOG.error( identityManager.getActiveUser().toString() );
                 }
             } );
