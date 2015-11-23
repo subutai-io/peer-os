@@ -1,0 +1,16 @@
+{
+  "name": "Sample blueprint",
+  "nodeGroups": [
+    {
+      "name": "Sample node group",
+      "templateName": "master",
+      "numberOfContainers": 1,
+      "sshGroupId": 0,
+      "hostsGroupId": 0,
+      "containerPlacementStrategy": {
+        "strategyId": "ROUND_ROBIN",
+        "criteria": []
+      }
+    }
+  ]
+}
