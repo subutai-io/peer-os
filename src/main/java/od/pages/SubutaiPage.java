@@ -17,4 +17,49 @@ import static ch.lambdaj.Lambda.convert;
 
 public class SubutaiPage extends PageObject {
 
+    //----- GENERAL PLAYBOOKS
+
+    @FindBy(id = "subt-input__login")
+    public WebElementFacade inputLogin;
+
+    @FindBy(id = "subt-input__password")
+    public WebElementFacade inputPassword;
+
+    @FindBy(id = "subt-button__login")
+    public WebElementFacade buttonLogin;
+
+    @FindBy(id = "subt-button__create-blueprint-second")
+    public WebElementFacade buttonCreateBlueprintSecond;
+
+    @FindBy(id = "subt-input__blueprint-name")
+    public WebElementFacade inputBlueprintName;
+
+    @FindBy(id = "subt-input__blueprint-node-name")
+    public WebElementFacade inputBlueprintNodeName;
+
+    @FindBy(id = "subt-select__blueprint-template")
+    public WebElementFacade selectBlueprintTemplate;
+
+    @FindBy(id = "subt-input__blueprint-number-of-containers")
+    public WebElementFacade inputBlueprintNumberOfContainers;
+
+    @FindBy(id = "subt-input__blueprint-ssh-group-id")
+    public WebElementFacade inputBlueprintSSHGroupID;
+
+    @FindBy(id = "subt-input__blueprint-host-group-id")
+    public WebElementFacade inputBlueprintHostGroupID;
+
+    @FindBy(id = "subt-select__blueprint-quota-size")
+    public WebElementFacade selectBlueprintQuotaSize;
+
+    @FindBy(id = "subt_button__blueprint-create")
+    public WebElementFacade buttonBlueprintCreate;
+
+    @FindBy(id = "subt_input__environment-name")
+    public WebElementFacade inputEnvironmentName;
+
+    @FindBy(className = "b-btn b-btn_green subt_button__environment-place")
+    public WebElementFacade buttonPlace;
+
+    //---------------------------------------------------------------------
 }
