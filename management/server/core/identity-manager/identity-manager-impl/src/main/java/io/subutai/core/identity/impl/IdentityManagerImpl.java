@@ -66,7 +66,7 @@ public class IdentityManagerImpl implements IdentityManager
 {
     //Session Expiration time in mins
     //****************************************
-    private static int SESSION_TIMEOUT = 3;
+    private static int SESSION_TIMEOUT = 30;
     //****************************************
 
     private static final Logger LOGGER = LoggerFactory.getLogger( IdentityManagerImpl.class.getName() );
@@ -98,7 +98,7 @@ public class IdentityManagerImpl implements IdentityManager
                 removeInvalidTokens();
                 invalidateSessions();
             }
-        }, 3, 3, TimeUnit.MINUTES );
+        }, 10, 10, TimeUnit.MINUTES );
         //*****************************************
     }
 

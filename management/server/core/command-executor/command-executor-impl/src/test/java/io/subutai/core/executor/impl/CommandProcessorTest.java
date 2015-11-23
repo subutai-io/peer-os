@@ -28,6 +28,7 @@ import io.subutai.core.broker.api.Topic;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.identity.api.model.User;
 
 import static junit.framework.Assert.assertEquals;
@@ -75,6 +76,8 @@ public class CommandProcessorTest
     @Mock
     User user;
     @Mock
+    Session session;
+    @Mock
     IdentityManager identityManager;
 
 
@@ -91,7 +94,7 @@ public class CommandProcessorTest
         when( hostRegistry.getResourceHostByContainerHost( containerHostInfo ) ).thenReturn( resourceHostInfo );
         when( request.getId() ).thenReturn( HOST_ID );
         when( request.getCommandId() ).thenReturn( COMMAND_ID );
-        doReturn( user ).when( commandProcessor ).getActiveSession();
+        doReturn( session ).when( commandProcessor ).getActiveSession();
     }
 
 
