@@ -260,19 +260,19 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
         Peer peer = getPeer();
         return peer.getProcessResourceUsage( getContainerId(), processPid );
     }
+//
+//
+//    @Override
+//    public int getRamQuota() throws PeerException
+//    {
+//        return getPeer().getRamQuota( this );
+//    }
 
 
     @Override
-    public int getRamQuota() throws PeerException
+    public RamQuota getRamQuota() throws PeerException
     {
         return getPeer().getRamQuota( this );
-    }
-
-
-    @Override
-    public RamQuota getRamQuotaInfo() throws PeerException
-    {
-        return getPeer().getRamQuotaInfo( this );
     }
 
 
@@ -289,18 +289,18 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
         getPeer().setRamQuota( this, ramQuotaInfo );
     }
 
+//
+//    @Override
+//    public int getCpuQuota() throws PeerException
+//    {
+//        return getPeer().getCpuQuota( this );
+//    }
+
 
     @Override
-    public int getCpuQuota() throws PeerException
+    public CpuQuota getCpuQuota() throws PeerException
     {
         return getPeer().getCpuQuota( this );
-    }
-
-
-    @Override
-    public CpuQuota getCpuQuotaInfo() throws PeerException
-    {
-        return getPeer().getCpuQuotaInfo( this );
     }
 
 
@@ -340,14 +340,14 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
 
 
     @Override
-    public int getAvailableRamQuota() throws PeerException
+    public RamQuota getAvailableRamQuota() throws PeerException
     {
         return getPeer().getAvailableRamQuota( this );
     }
 
 
     @Override
-    public int getAvailableCpuQuota() throws PeerException
+    public CpuQuota getAvailableCpuQuota() throws PeerException
     {
         return getPeer().getAvailableCpuQuota( this );
     }
@@ -378,7 +378,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
         if ( containerId == null )
         {
             containerId =
-                    new ContainerId( getId(), new PeerId( getPeerId() ), new EnvironmentId( getEnvironmentId() ) );
+                    new ContainerId( getId(), getHostname(), new PeerId( getPeerId() ), new EnvironmentId( getEnvironmentId() ) );
         }
         return containerId;
     }

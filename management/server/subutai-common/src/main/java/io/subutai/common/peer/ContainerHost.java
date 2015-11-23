@@ -63,7 +63,7 @@ public interface ContainerHost extends Host, ContainerHostInfo
      *
      * @return - quota in mb
      */
-    public int getRamQuota() throws PeerException;
+//    public int getRamQuota() throws PeerException;
 
 
     /**
@@ -71,7 +71,7 @@ public interface ContainerHost extends Host, ContainerHostInfo
      *
      * @return - MemoryQuotaInfo carries ram quota specific info
      */
-    public RamQuota getRamQuotaInfo() throws PeerException;
+    public RamQuota getRamQuota() throws PeerException;
 
 
     /**
@@ -87,7 +87,7 @@ public interface ContainerHost extends Host, ContainerHostInfo
      *
      * @return - cpu quota on container in percent
      */
-    public int getCpuQuota() throws PeerException;
+//    public int getCpuQuota() throws PeerException;
 
 
     /**
@@ -95,7 +95,7 @@ public interface ContainerHost extends Host, ContainerHostInfo
      *
      * @return - cpu quota object on container
      */
-    public CpuQuota getCpuQuotaInfo() throws PeerException;
+    public CpuQuota getCpuQuota() throws PeerException;
 
     /**
      * Sets CPU quota on container in percent
@@ -139,14 +139,14 @@ public interface ContainerHost extends Host, ContainerHostInfo
      *
      * @return - quota in mb
      */
-    public int getAvailableRamQuota() throws PeerException;
+    public RamQuota getAvailableRamQuota() throws PeerException;
 
     /**
      * Returns available CPU quota on container in percent
      *
      * @return - cpu quota on container in percent
      */
-    public int getAvailableCpuQuota() throws PeerException;
+    public CpuQuota getAvailableCpuQuota() throws PeerException;
 
     /**
      * Returns available disk quota

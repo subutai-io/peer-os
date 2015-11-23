@@ -401,7 +401,7 @@ public class RestServiceImplTest
     {
         restService.getRamQuotaInfo( CONTAINER_ID.toString() );
 
-        verify( containerHost ).getRamQuotaInfo();
+        verify( containerHost ).getRamQuota();
 
         doThrow( exception ).when( localPeer ).getContainerHostById( CONTAINER_ID );
 
@@ -461,7 +461,7 @@ public class RestServiceImplTest
     {
         restService.getCpuQuotaInfo( CONTAINER_ID.toString() );
 
-        verify( containerHost ).getCpuQuotaInfo();
+        verify( containerHost ).getCpuQuota();
 
         doThrow( exception ).when( localPeer ).getContainerHostById( CONTAINER_ID );
 

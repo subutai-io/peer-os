@@ -430,13 +430,13 @@ public class RemotePeerImplTest
     @Test( expected = PeerException.class )
     public void testGetRamQuotaInfo() throws Exception
     {
-        remotePeer.getRamQuotaInfo( containerHost );
+        remotePeer.getRamQuota( containerHost );
 
         //verify( localPeer ).getId();
 
         throwException();
 
-        remotePeer.getRamQuotaInfo( containerHost );
+        remotePeer.getRamQuota( containerHost );
     }
 
 
@@ -474,13 +474,13 @@ public class RemotePeerImplTest
         CpuQuota cpuQuota = mock( CpuQuota.class );
         when( jsonUtil.from( anyString(), eq( CpuQuota.class ) ) ).thenReturn( cpuQuota );
 
-        remotePeer.getCpuQuotaInfo( containerHost );
+        remotePeer.getCpuQuota( containerHost );
 
         //verify( localPeer ).getId();
 
         throwException();
 
-        remotePeer.getCpuQuotaInfo( containerHost );
+        remotePeer.getCpuQuota( containerHost );
     }
 
 

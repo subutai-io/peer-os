@@ -422,7 +422,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public int getRamQuota( final ContainerHost containerHost ) throws PeerException
+    public RamQuota getRamQuota( final ContainerHost containerHost ) throws PeerException
     {
         Preconditions.checkNotNull( containerHost, "Container host is null" );
         Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
@@ -436,36 +436,6 @@ public class RemotePeerImpl implements RemotePeer
         //*********construct Secure Header ****************************
         Map<String, String> headers = Maps.newHashMap();
         //*************************************************************
-        try
-        {
-            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
-            String response = get( path, alias, params, headers );
-
-            return jsonUtil.from( response, Integer.class );
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException( "Error obtaining container ram quota", e );
-        }
-    }
-
-
-    @Override
-    public RamQuota getRamQuotaInfo( final ContainerHost containerHost ) throws PeerException
-    {
-        Preconditions.checkNotNull( containerHost, "Container host is null" );
-        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
-
-        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
-        String path = "/container/quota/ram/info";
-
-        Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId() );
-
-        //*********construct Secure Header ****************************
-        Map<String, String> headers = Maps.newHashMap();
-        //*************************************************************
-
         try
         {
             String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
@@ -511,37 +481,37 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
+    //    @Override
+    //    public int getCpuQuota( final ContainerHost containerHost ) throws PeerException
+    //    {
+    //        Preconditions.checkNotNull( containerHost, "Container host is null" );
+    //        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
+    //
+    //        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
+    //        String path = "/container/quota/cpu";
+    //
+    //        Map<String, String> params = Maps.newHashMap();
+    //        params.put( "containerId", host.getId() );
+    //
+    //        //*********construct Secure Header ****************************
+    //        Map<String, String> headers = Maps.newHashMap();
+    //        //*************************************************************
+    //        try
+    //        {
+    //            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
+    //            String response = get( path, alias, params, headers );
+    //
+    //            return jsonUtil.from( response, Integer.class );
+    //        }
+    //        catch ( Exception e )
+    //        {
+    //            throw new PeerException( "Error obtaining container cpu quota", e );
+    //        }
+    //    }
+
+
     @Override
-    public int getCpuQuota( final ContainerHost containerHost ) throws PeerException
-    {
-        Preconditions.checkNotNull( containerHost, "Container host is null" );
-        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
-
-        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
-        String path = "/container/quota/cpu";
-
-        Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", host.getId() );
-
-        //*********construct Secure Header ****************************
-        Map<String, String> headers = Maps.newHashMap();
-        //*************************************************************
-        try
-        {
-            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
-            String response = get( path, alias, params, headers );
-
-            return jsonUtil.from( response, Integer.class );
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException( "Error obtaining container cpu quota", e );
-        }
-    }
-
-
-    @Override
-    public CpuQuota getCpuQuotaInfo( final ContainerHost containerHost ) throws PeerException
+    public CpuQuota getCpuQuota( final ContainerHost containerHost ) throws PeerException
     {
         Preconditions.checkNotNull( containerHost, "Container host is null" );
         Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
@@ -765,7 +735,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public int getAvailableRamQuota( final ContainerHost containerHost ) throws PeerException
+    public RamQuota getAvailableRamQuota( final ContainerHost containerHost ) throws PeerException
     {
         Preconditions.checkNotNull( containerHost, "Container host is null" );
         Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
@@ -784,7 +754,7 @@ public class RemotePeerImpl implements RemotePeer
             String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
             String response = get( path, alias, params, headers );
 
-            return jsonUtil.from( response, Integer.class );
+            return jsonUtil.from( response, RamQuota.class );
         }
         catch ( Exception e )
         {
@@ -794,7 +764,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public int getAvailableCpuQuota( final ContainerHost containerHost ) throws PeerException
+    public CpuQuota getAvailableCpuQuota( final ContainerHost containerHost ) throws PeerException
     {
         Preconditions.checkNotNull( containerHost, "Container host is null" );
         Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
@@ -814,7 +784,7 @@ public class RemotePeerImpl implements RemotePeer
             String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
             String response = get( path, alias, params, headers );
 
-            return jsonUtil.from( response, Integer.class );
+            return jsonUtil.from( response, CpuQuota.class );
         }
         catch ( Exception e )
         {

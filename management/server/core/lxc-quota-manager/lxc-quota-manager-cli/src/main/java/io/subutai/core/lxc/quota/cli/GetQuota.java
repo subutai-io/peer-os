@@ -31,11 +31,13 @@ public class GetQuota extends SubutaiShellCommandSupport
     private String quotaType;
 
     private QuotaManager quotaManager;
+    private LocalPeer localPeer;
 
 
-    public GetQuota( QuotaManager quotaManager )
+    public GetQuota( QuotaManager quotaManager, LocalPeer localPeer )
     {
         this.quotaManager = quotaManager;
+        this.localPeer = localPeer;
     }
 
 
@@ -58,9 +60,10 @@ public class GetQuota extends SubutaiShellCommandSupport
         {
             QuotaType quotaType = QuotaType.getQuotaType( this.quotaType );
 
-            System.out.println( quotaManager.getQuota( containerName, quotaType ) );
+            ContainerHost containerHost = localPeer.getContainerHostByName( containerName );
+            System.out.println( quotaManager.getQuota( containerHost.getContainerId(), quotaType ) );
         }
-        catch ( QuotaException e )
+        catch ( HostNotFoundException | QuotaException e )
         {
             System.out.println( "Error getting quota for container" );
             LOGGER.error( "Error getting quota for container", e );

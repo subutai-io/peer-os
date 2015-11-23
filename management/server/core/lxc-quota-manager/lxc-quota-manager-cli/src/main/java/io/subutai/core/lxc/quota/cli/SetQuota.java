@@ -24,6 +24,7 @@ import org.apache.karaf.shell.commands.Command;
 public class SetQuota extends SubutaiShellCommandSupport
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( SetQuota.class );
+    private final LocalPeer localPeer;
     private QuotaManager quotaManager;
 
     @Argument( index = 0, name = "container name", required = true, multiValued = false, description = "specify "
@@ -38,9 +39,10 @@ public class SetQuota extends SubutaiShellCommandSupport
     private String quotaValue;
 
 
-    public SetQuota( QuotaManager quotaManager )
+    public SetQuota( QuotaManager quotaManager, LocalPeer localPeer )
     {
         this.quotaManager = quotaManager;
+        this.localPeer = localPeer;
     }
 
 
@@ -66,7 +68,9 @@ public class SetQuota extends SubutaiShellCommandSupport
     protected Object doExecute() throws Exception
     {
         QuotaType qt = QuotaType.getQuotaType( quotaType );
-        quotaManager.setQuota( containerName, qt, quotaType );
+        ContainerHost containerHost = localPeer.getContainerHostByName( containerName );
+
+        quotaManager.setQuota( containerHost.getContainerId(), qt, quotaValue );
         return null;
     }
 }
