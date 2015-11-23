@@ -3,19 +3,15 @@ package io.subutai.webui.impl;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.naming.NamingException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.subutai.common.util.JsonUtil;
-import io.subutai.common.util.ServiceLocator;
 import io.subutai.webui.api.WebuiModule;
 import io.subutai.webui.api.WebuiModuleService;
 

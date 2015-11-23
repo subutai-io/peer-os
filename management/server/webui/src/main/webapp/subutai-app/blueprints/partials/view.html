@@ -3,6 +3,7 @@
 	<div class="b-workspace__header">
 		<a class="b-btn b-btn_green b-btn_header-button" 
 			href 
+			id="subt-button__create-blueprint-first" 
 			ng-show="blueprintsViewCtrl.blueprints.length > 0" 
 			ng-click="blueprintsViewCtrl.createBlueprintFrom()">
 			<i class="fa fa-plus"></i> Create blueprint
@@ -52,7 +53,10 @@
 			<div class="b-empty-list__text">
 				You don’t have any blueprints
 			</div>
-			<a class="b-btn b-btn_green" href ng-click="blueprintsViewCtrl.createBlueprintFrom()">
+			<a class="b-btn b-btn_green" 
+			href 
+			ng-click="blueprintsViewCtrl.createBlueprintFrom()" 
+			id="subt-button__create-blueprint-second">
 				<i class="fa fa-plus"></i> Create blueprint
 			</a>	
 		</div>		

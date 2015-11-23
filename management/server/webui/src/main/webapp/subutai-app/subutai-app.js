@@ -297,24 +297,6 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 			}]
 		}
 	})
-	.state('hadoop', {
-		url: '/plugins/hadoop',
-		templateUrl: 'subutai-app/plugins/hadoop/partials/view.html',
-		resolve: {
-			loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
-				return $ocLazyLoad.load([
-						{
-							name: 'subutai.plugins.hadoop',
-							files: [
-								'subutai-app/plugins/hadoop/hadoop.js',
-								'subutai-app/plugins/hadoop/controller.js',
-								'subutai-app/plugins/hadoop/service.js'
-							]
-						}
-				]);
-			}]
-		}
-	})
 	.state('404', {
 		url: '/404',
 		template: 'Not found'

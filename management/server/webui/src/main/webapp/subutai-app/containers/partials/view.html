@@ -13,6 +13,7 @@
 				</label>
 				<select class="b-popup-body-input b-popup-body-input_min" 
 					ng-change="containerViewCtrl.getContainers()" 
+					id="subt_select__containers-environment" 
 					ng-model="containerViewCtrl.environmentId">
 					<option 
 						ng-repeat="environment in containerViewCtrl.environments" 
@@ -30,6 +31,7 @@
 				</label>
 				<select class="b-popup-body-input b-popup-body-input_min" 
 					ng-change="containerViewCtrl.getContainers()" 
+					id="subt_select__containers-type" 
 					ng-model="containerViewCtrl.containersTypeId">
 					<option ng-repeat="type in containerViewCtrl.containersType" value="{{ type }}">
 						{{ type }}
@@ -64,14 +66,14 @@
 							</div>
 						</td>
 						<td>{{ container.templateName }}</td>
-						<td>{{ container.ip }}</td>
+						<td class="subt_text__container-ip">{{ container.ip }}</td>
 						<td>{{ container.hostname }}</td>
 						<td>
-							<button ng-show="container.state == 'RUNNING'" class="b-btn b-btn_red" 
+							<button ng-show="container.state == 'RUNNING'" class="b-btn b-btn_red subt_button__container-stop" 
 							ng-click="containerViewCtrl.containerAction(key)">
 								Stop
 							</button>
-							<button ng-show="container.state == 'STOPPED'" class="b-btn b-btn_green" 
+							<button ng-show="container.state == 'STOPPED'" class="b-btn b-btn_green subt_button__container-start" 
 							ng-click="containerViewCtrl.containerAction(key)">
 								Start
 							</button>

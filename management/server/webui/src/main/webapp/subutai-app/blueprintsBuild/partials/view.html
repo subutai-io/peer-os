@@ -28,13 +28,17 @@
 			class="b-main-form__wrapper b-main-form__wrapper_margin-r">
 				<label class="b-popup-body-label b-popup-body-label_inline">Environment name</label>
 				<input type="text" 
+				id="subt_input__environment-name" 
 				class="b-popup-body-input b-popup-body-input__enviroment-name" 
 				ng-class="blueprintsBuildCtrl.popupError ? 'b-popup-body-input__error' : ''" 
 				ng-model="blueprintsBuildCtrl.newEnvironmentName">
 			</div>
 
 			<div class="b-main-form__wrapper g-right">
-				<a href ng-click="blueprintsBuildCtrl.buildPopup()" class="b-icon b-icon_box b-icon_notification">
+				<a href 
+				ng-click="blueprintsBuildCtrl.buildPopup()" 
+				class="b-icon b-icon_box b-icon_notification" 
+				id="subt_link__environment-build-list">
 					<span class="b-icon__inner-num">
 						{{ blueprintsBuildCtrl.totalContainers }}
 					</span>
@@ -65,9 +69,14 @@
 							ng-if='nodeGroup.show'
 						>
 						</div>
+						<input 
+						type="hidden" 
+						class="subt_input__environment-amount-containers" 
+						value="{{ nodeGroup.options.start }}"
+						ng-model="nodeGroup.options.start">
 					</td>
 					<td>
-						<select class="b-popup-body-input b-popup-body-input_table" 
+						<select class="b-popup-body-input b-popup-body-input_table subt_select__environment-peer" 
 						ng-model="nodeGroup.peer">
 							<option 
 							ng-repeat="(peerId, peer) in blueprintsBuildCtrl.peers" 
@@ -77,7 +86,7 @@
 						</select>
 					</td>
 					<td>
-						<select class="b-popup-body-input b-popup-body-input_table" 
+						<select class="b-popup-body-input b-popup-body-input_table subt_select__environment-strategie" 
 						ng-model="nodeGroup.strategyId">
 							<option 
 							ng-repeat="strategie in blueprintsBuildCtrl.strategies" 
@@ -87,7 +96,7 @@
 						</select>
 					</td>
 					<td>
-						<a href class="b-btn b-btn_green" 
+						<a href class="b-btn b-btn_green subt_button__environment-place" 
 						ng-click="blueprintsBuildCtrl.placeNode(nodeGroup, key)">
 							<i class="b-icon b-icon_box-white b-icon_box-white_place"></i> Place
 						</a>
