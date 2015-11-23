@@ -40,4 +40,45 @@ public class SubutaiSteps extends ScenarioSteps {
         subutaiPage.setDefaultBaseUrl(String.format("http://%s:8181/", ReaderFromFile.readDataFromFile("src/test/resources/parameters/mng_h2")));
         subutaiPage.open();
     }
+
+    @Step
+    public void clickOnMenuItemEnvironment(){
+        subutaiPage.linkEnvironment.click();
+    }
+
+    @Step
+    public void clickOnMenuItemBlueprint(){
+        subutaiPage.linkBlueprint.click();
+    }
+
+    @Step
+    public void clickOnMenuItemEnvironments(){
+        subutaiPage.linkEnvironments.click();
+    }
+
+    @Step
+    public void clickOnMenuItemContainers(){
+        subutaiPage.linkContainers.click();
+    }
+
+    @Step
+    public void seeEnvironmentMenuItemEnvironment(){
+        assertThat(subutaiPage.linkEnvironment.isVisible(), is(true));
+    }
+
+    @Step
+    public void seeEnvironmentMenuItemBlueprint(){
+        assertThat(subutaiPage.linkBlueprint.isVisible(), is(true));
+    }
+
+    @Step
+    public void seeEnvironmentMenuItemEnvironments(){
+        assertThat(subutaiPage.linkEnvironments.isVisible(), is(true));
+    }
+
+    @Step
+    public void seeEnvironmentMenuItemContainers(){
+        assertThat(subutaiPage.linkContainers.isVisible(), is(true));
+    }
+
 }

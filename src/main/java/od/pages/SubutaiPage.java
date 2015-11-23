@@ -61,5 +61,17 @@ public class SubutaiPage extends PageObject {
     @FindBy(className = "b-btn b-btn_green subt_button__environment-place")
     public WebElementFacade buttonPlace;
 
+    @FindBy(id = "subt-link__environment")
+    public WebElementFacade linkEnvironment;
+
+    @FindBy(id = "subt-link__blueprint")
+    public WebElementFacade linkBlueprint;
+
+    @FindBy(id = "subt-link__environments")
+    public WebElementFacade linkEnvironments;
+
+    @FindBy(id = "subt-link__containers")
+    public WebElementFacade linkContainers;
+
     //---------------------------------------------------------------------
 }
