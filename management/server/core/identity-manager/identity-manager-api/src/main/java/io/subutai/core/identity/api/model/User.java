@@ -45,9 +45,9 @@ public interface User
 
     void setStatus( int status );
 
-    int getSecurityKeyId();
+    String getSecurityKeyId();
 
-    void setSecurityKeyId( int securityKeyId );
+    void setSecurityKeyId( String securityKeyId );
 
     String getStatusName();
 

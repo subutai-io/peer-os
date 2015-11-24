@@ -34,13 +34,13 @@ public interface SecurityKeyIdentity
     /********************************
      *
      */
-    public short getType();
+    public int getType();
 
 
     /********************************
      *
      */
-    public void setType( final short type );
+    public void setType( final int type );
 
 
     /********************************
