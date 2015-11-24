@@ -305,9 +305,9 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
 
 
     @Override
-    public void setCpuQuota( final int cpuPercent ) throws PeerException
+    public void setCpuQuota( final CpuQuota cpuQuota ) throws PeerException
     {
-        getPeer().setCpuQuota( this, cpuPercent );
+        getPeer().setCpuQuota( this, cpuQuota );
     }
 
 

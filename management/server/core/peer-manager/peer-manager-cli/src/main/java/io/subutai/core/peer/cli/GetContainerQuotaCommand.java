@@ -57,7 +57,8 @@ public class GetContainerQuotaCommand extends SubutaiShellCommandSupport
         }
         else
         {
-            System.out.println( peer.getQuotaInfo( targetContainer, QuotaType.getQuotaType( quotaType ) ) );
+            //TODO: check or implement this
+//            System.out.println( peer.getQuotaInfo( targetContainer, QuotaType.getQuotaType( quotaType ) ) );
         }
         return null;
     }
