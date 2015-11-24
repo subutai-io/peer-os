@@ -41,8 +41,15 @@ public interface KeyManager
     public PGPPublicKey getPublicKey( String hostId );
 
 
+    /* *****************************
+     *
+     */
     public String getPeerId();
 
+
+    /* *****************************
+     *
+     */
     public String getOwnerId();
 
 
@@ -75,6 +82,22 @@ public interface KeyManager
      */
     public void savePublicKeyRing( String hostId, short type, PGPPublicKeyRing publicKeyRing );
 
+
+
+    /* ***************************************************************
+     *
+     */
+    void setKeyTrust( String sourceId, String targetId, int trustLevel );
+
+    /* ***************************************************************
+     *
+     */
+    void removeKeyTrust( String sourceId );
+
+    /* ***************************************************************
+     *
+     */
+    void removeKeyTrust( String sourceId, String targetId );
 
     /* *****************************
      *
@@ -123,5 +146,9 @@ public interface KeyManager
      */
     public PGPPublicKey getRemoteHostPublicKey( String hostId, String ip );
 
+
+    /* *****************************
+     *
+     */
     public String getFingerprint( String hostId );
 }

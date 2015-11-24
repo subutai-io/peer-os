@@ -174,4 +174,33 @@ class SecurityKeyTrustDAO
         }
     }
 
+    /******************************************
+     *
+     */
+    public void removeBySourceId( String sourceId, String targetId)
+    {
+        EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
+
+        try
+        {
+            daoManager.startTransaction( em );
+
+            Query qr = em.createQuery( "delete from SecurityKeyTrustEntity AS ss where ss.sourceId=:sourceId and "
+                    + " ss.targetId=:targetId " );
+            qr.setParameter( "sourceId",sourceId );
+            qr.setParameter( "targetId",targetId );
+            qr.executeUpdate();
+
+            daoManager.commitTransaction( em );
+        }
+        catch ( Exception ex )
+        {
+            daoManager.rollBackTransaction( em );
+        }
+        finally
+        {
+            daoManager.closeEntityManager( em );
+        }
+    }
+
 }

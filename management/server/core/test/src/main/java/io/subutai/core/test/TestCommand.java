@@ -42,7 +42,13 @@ public class TestCommand extends SubutaiShellCommandSupport
                 public void onResponse( final Response response, final CommandResult commandResult )
                 {
                     IdentityManager identityManager = null;
-                    //identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
+                    try
+                    {
+                        identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
+                    }
+                    catch ( NamingException e )
+                    {
+                    }
                     LOG.error( identityManager.getActiveUser().toString() );
                 }
             } );

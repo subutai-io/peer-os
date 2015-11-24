@@ -103,6 +103,9 @@ public class KeyManagerImpl implements KeyManager
     }
 
 
+    /* ***************************************************************
+     *
+     */
     @Override
     public String getPeerId()
     {
@@ -110,10 +113,64 @@ public class KeyManagerImpl implements KeyManager
     }
 
 
+    /* ***************************************************************
+     *
+     */
     @Override
     public String getOwnerId()
     {
         return PGPKeyUtil.getFingerprint( getPublicKey( getOwnerKeyIdx() ).getFingerprint() );
+    }
+
+
+    /* ***************************************************************
+     *
+     */
+    @Override
+    public void setKeyTrust( String sourceId, String targetId, int trustLevel )
+    {
+        try
+        {
+            securityDataService.saveKeyTrustData(sourceId, targetId, trustLevel  );
+        }
+        catch(Exception ex)
+        {
+            LOG.error( " **** Error!!! Error creating key trust:" + ex.toString(),ex);
+        }
+    }
+
+
+    /* ***************************************************************
+     *
+     */
+    @Override
+    public void removeKeyTrust(String sourceId)
+    {
+        try
+        {
+            securityDataService.removeKeyTrustData( sourceId );
+        }
+        catch(Exception ex)
+        {
+            LOG.error( " **** Error!!! Error removing key trust:" + ex.toString(),ex);
+        }
+    }
+
+
+    /* ***************************************************************
+     *
+     */
+    @Override
+    public void removeKeyTrust( String sourceId, String targetId )
+    {
+        try
+        {
+            securityDataService.removeKeyTrustData( sourceId ,targetId );
+        }
+        catch(Exception ex)
+        {
+            LOG.error( " **** Error!!! Error removing key trust:" + ex.toString(),ex);
+        }
     }
 
 
