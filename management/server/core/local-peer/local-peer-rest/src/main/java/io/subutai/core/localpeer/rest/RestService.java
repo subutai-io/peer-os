@@ -102,8 +102,9 @@ public interface RestService
 
     @PUT
     @Path( "update" )
+    @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
-    public Response updatePeer( @FormParam( "peer" ) String peer );
+    public Response updatePeer( PeerInfo peerInfo );
 
     @GET
     @Path( "container/info" )
