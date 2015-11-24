@@ -1,9 +1,9 @@
 Meta:
 
 Narrative:
-As a user
-I want to perform an action
-So that I can achieve a business goal
+As a QA
+I want to verify a functional: Cross Peer Environment
+So that I wrote acceptance test for it
 
 Scenario: The First User Sends Request
 Given the first user is on the home page of Subutai
