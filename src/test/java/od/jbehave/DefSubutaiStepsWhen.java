@@ -4,6 +4,8 @@ import net.thucydides.core.annotations.Steps;
 import od.steps.SubutaiSteps;
 import org.jbehave.core.annotations.When;
 
+import java.io.FileNotFoundException;
+
 public class DefSubutaiStepsWhen {
 
     @Steps
@@ -84,9 +86,14 @@ public class DefSubutaiStepsWhen {
         subutaiSteps.clickOnIconBuild();
     }
 
-    @When("the user select peer")
-    public void select_peer(){
+    @When("the user select peer: One")
+    public void select_peer_one(){
         subutaiSteps.selectPeer(1);
+    }
+
+    @When("the user select peer: Two")
+    public void select_peer_two(){
+        subutaiSteps.selectPeer(2);
     }
 
     @When("the user select Strategie: '$strategie'")
@@ -142,5 +149,56 @@ public class DefSubutaiStepsWhen {
     @When("the user click on the icon: Destroy")
     public void click_on_icon_destroy(){
         subutaiSteps.clickOnIconDestroy();
+    }
+
+    @When("the user click on the menu item: Peer Registration")
+    public void click_menu_item_peer_registration() {
+        subutaiSteps.waitABit(5000);
+        subutaiSteps.clickOnMenuPeerRegistration();
+    }
+
+    @When("the user click on the link: Create Peer")
+    public void click_on_link_create_peer(){
+        subutaiSteps.clickOnLinkCreatePeer();
+    }
+
+    @When("the user enter peer ip: Second user")
+    public void enter_peer_ip_second_user() throws FileNotFoundException {
+        subutaiSteps.enterPeerIP();
+    }
+
+    @When("the user enter peer key phrase: '$phrase'")
+    public void enter_peer_key_phrase(String phrase){
+        subutaiSteps.enterPeerKeyPhrase(phrase);
+    }
+
+    @When("the user click on the button: Create for peer")
+    public void click_on_button_create_for_peer(){
+        subutaiSteps.clickOnButtonCreatePeer();
+    }
+
+    @When("the user click on the button: Approve")
+    public void click_on_button_approve(){
+        subutaiSteps.clickOnButtonApprove();
+    }
+
+    @When("the user enter approve key phrase: '$phrase'")
+    public void enter_peer_approve_key_phrase(String phrase){
+        subutaiSteps.enterPeerApproveKeyPhrase(phrase);
+    }
+
+    @When("the user click on the button popup: Approve")
+    public void click_on_button_popup_approve(){
+        subutaiSteps.clickOnButtonPopupApprove();
+    }
+
+    @When("the user click on the button: Unregister")
+    public void click_on_button_unregister(){
+        subutaiSteps.clickOnButtonUnregister();
+    }
+
+    @When("the user click on the button: Confirm Unregister")
+    public void click_on_button_confirm_unregister(){
+        subutaiSteps.clickOnButtonConfirmUnregister();
     }
 }

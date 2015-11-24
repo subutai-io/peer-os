@@ -201,9 +201,9 @@ public class SubutaiSteps extends ScenarioSteps {
     }
 
     @Step
-    public void seeHeader2Success(){
-        subutaiPage.waitHeader2Success();
-        assertThat(subutaiPage.header2Success.isVisible(), is(true));
+    public void seeHeaderSuccess(){
+        subutaiPage.waitHeaderSuccess();
+        assertThat(subutaiPage.headerSuccess.isVisible(), is(true));
     }
 
     @Step
@@ -294,5 +294,130 @@ public class SubutaiSteps extends ScenarioSteps {
     @Step
     public void clickOnIconDestroy(){
         subutaiPage.iconDestroy.click();
+    }
+
+    @Step
+    public void clickOnMenuPeerRegistration() {
+        subutaiPage.linkPeerRegistration.click();
+    }
+
+    @Step
+    public void waitButtonCreatePeer(){
+        subutaiPage.waitButtonCreatePeer();
+    }
+
+    @Step
+    public void seeButtonCreatePeer() {
+        assertThat(subutaiPage.linkCreatePeer.isVisible(), is(true));
+    }
+
+    @Step
+    public void clickOnLinkCreatePeer(){
+        subutaiPage.linkCreatePeer.click();
+    }
+
+    @Step
+    public void seeInputPeerIP(){
+        assertThat(subutaiPage.inputPeerIP.isVisible(), is(true));
+    }
+
+    @Step
+    public void seeInputPeerKeyPhrase(){
+        assertThat(subutaiPage.inputPeerKeyPhrase.isVisible(), is(true));
+    }
+
+    @Step
+    public void enterPeerIP() throws FileNotFoundException {
+        subutaiPage.inputPeerIP.type(ReaderFromFile.readDataFromFile("src/test/resources/parameters/mng_h2"));
+    }
+
+    @Step
+    public void enterPeerKeyPhrase(String phrase){
+        subutaiPage.inputPeerKeyPhrase.type(phrase);
+    }
+
+    @Step
+    public void clickOnButtonCreatePeer(){
+        subutaiPage.buttonCreatePeer.click();
+    }
+
+    @Step
+    public void seeCrossPeer2Ip() throws FileNotFoundException {
+        subutaiPage.textPeer2Ip.containsText(String.format("%s", ReaderFromFile.readDataFromFile("src/test/resources/parameters/mng_h2")));
+    }
+
+    @Step
+    public void seeCrossPeer1Ip() throws FileNotFoundException {
+        subutaiPage.textPeer1Ip.containsText(String.format("%s", ReaderFromFile.readDataFromFile("src/test/resources/parameters/mng_h1")));
+    }
+
+    @Step
+    public void seeButtonCancel(){
+        assertThat(subutaiPage.buttonCancel.isVisible(), is(true));
+    }
+
+    @Step
+    public void seeButtonApprove(){
+        assertThat(subutaiPage.buttonApprove.isVisible(), is(true));
+    }
+
+    @Step
+    public void seeButtonReject(){
+        assertThat(subutaiPage.buttonReject.isVisible(), is(true));
+    }
+
+    @Step
+    public void clickOnButtonApprove(){
+        subutaiPage.buttonApprove.click();
+    }
+
+    @Step
+    public void enterPeerApproveKeyPhrase(String phrase){
+        subutaiPage.inputPeerApproveKeyPhrase.type(phrase);
+    }
+
+    @Step
+    public void seePeerApproveKeyPhrase(){
+        assertThat(subutaiPage.inputPeerApproveKeyPhrase.isVisible(), is(true));
+    }
+
+    @Step
+    public void clickOnButtonPopupApprove(){
+        subutaiPage.buttonPopupApprove.click();
+    }
+
+    @Step
+    public void waitButtonUnregister(){
+        subutaiPage.waitButtonUnregister();
+    }
+
+    @Step
+    public void seeButtonUnregister(){
+        assertThat(subutaiPage.buttonUnregister.isVisible(), is(true));
+    }
+
+    @Step
+    public void clickOnButtonUnregister(){
+        subutaiPage.buttonUnregister.click();
+    }
+
+    @Step
+    public void clickOnButtonConfirmUnregister(){
+        subutaiPage.buttonConfirmUnregister.click();
+    }
+
+    @Step
+    public void waitTextUnregistered(){
+        subutaiPage.waitTextUnregistered();
+    }
+
+    @Step
+    public void seeTexUnregistered() {
+        assertThat(subutaiPage.textUnregistered.isVisible(), is(true));
+    }
+
+    @Step
+    public void seeTextNoDataAvailableInTable(){
+        assertThat(subutaiPage.textNoDataAvailableInTable.isVisible(), is(true));
     }
 }

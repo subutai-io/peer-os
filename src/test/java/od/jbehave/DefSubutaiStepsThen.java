@@ -4,6 +4,8 @@ import net.thucydides.core.annotations.Steps;
 import od.steps.SubutaiSteps;
 import org.jbehave.core.annotations.Then;
 
+import java.io.FileNotFoundException;
+
 public class DefSubutaiStepsThen {
 
     @Steps
@@ -54,7 +56,7 @@ public class DefSubutaiStepsThen {
 
     @Then("the user observe header: Success!")
     public void see_header_success(){
-        subutaiSteps.seeHeader2Success();
+        subutaiSteps.seeHeaderSuccess();
     }
 
     @Then("the user observe text: Your environment start creation.")
@@ -103,5 +105,68 @@ public class DefSubutaiStepsThen {
     public void see_text_your_environment_has_been_destroyed(){
         subutaiSteps.waitTextYourEnvironmentHasBeenDestroyed();
         subutaiSteps.seeTextYourEnvironmentHasBeenDestroyed();
+    }
+
+    @Then("the user observe button: Create Peer")
+    public void see_button_create_peer(){
+        subutaiSteps.waitButtonCreatePeer();
+        subutaiSteps.seeButtonCreatePeer();
+    }
+
+    @Then("the user observe field: Enter IP")
+    public void see_input_peer_ip(){
+        subutaiSteps.seeInputPeerIP();
+    }
+
+    @Then("the user observe field: Key phrase")
+    public void see_input_peer_key_phrase(){
+        subutaiSteps.seeInputPeerKeyPhrase();
+    }
+
+    @Then("the user observe: First user's IP")
+    public void see_text_cross_peer_1_ip() throws FileNotFoundException {
+        subutaiSteps.seeCrossPeer1Ip();
+    }
+
+    @Then("the user observe: Second user's IP")
+    public void see_text_cross_peer_2_ip() throws FileNotFoundException {
+        subutaiSteps.seeCrossPeer2Ip();
+    }
+
+    @Then("the user observe button: Cancel")
+    public void see_button_cancel(){
+        subutaiSteps.seeButtonCancel();
+    }
+
+    @Then("the user observe button: Approve")
+    public void see_button_approve(){
+        subutaiSteps.seeButtonApprove();
+    }
+
+    @Then("the user observe button: Reject")
+    public void see_button_reject(){
+        subutaiSteps.seeButtonReject();
+    }
+
+    @Then("the user observe field: Approve Key phrase")
+    public void see_input_peer_approve_key_phrase(){
+        subutaiSteps.seePeerApproveKeyPhrase();
+    }
+
+    @Then("the user observe button: Unregister")
+    public void see_button_unregister(){
+        subutaiSteps.waitButtonUnregister();
+        subutaiSteps.seeButtonUnregister();
+    }
+
+    @Then("the user observe header: Unregistered!")
+    public void see_text_unregistered(){
+        subutaiSteps.waitTextUnregistered();
+        subutaiSteps.seeTexUnregistered();
+    }
+
+    @Then("the user observe text: No data available in table")
+    public void see_text_no_data_available_in_table(){
+        subutaiSteps.seeTextNoDataAvailableInTable();
     }
 }

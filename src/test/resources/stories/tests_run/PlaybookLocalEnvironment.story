@@ -28,7 +28,7 @@ Then the user observe created blueprint
 When the user click on the icon: Build
 Then the user observe build environment
 When the user enter environment name: 'Local Environment'
-And the user select peer
+And the user select peer: One
 And the user select Strategie: 'DEFAULT-STRATEGY'
 And the user click on the button: Place
 Then the user observe icon: two containers
@@ -48,7 +48,7 @@ And the user click on the menu item: Blueprint
 And the user click on the icon: Grow
 Then the user observe selector: Environment
 When the user select environment: Local Environment
-And the user select peer
+And the user select peer: One
 And the user select Strategie: 'DEFAULT-STRATEGY'
 And the user click on the button: Place
 Then the user observe icon: two containers
@@ -77,6 +77,7 @@ When the user click on the button: Delete
 Then the user observe text: Your environment start deleting!
 When the user click on the button: OK
 Then the user observe text: Your environment has been destroyed.
+And the user observe text: No data available in table
 
 
 

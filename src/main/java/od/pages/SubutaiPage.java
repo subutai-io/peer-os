@@ -1,19 +1,8 @@
 package od.pages;
 
-import ch.lambdaj.function.convert.Converter;
 import net.serenitybdd.core.annotations.findby.FindBy;
 import net.serenitybdd.core.pages.WebElementFacade;
 import net.thucydides.core.pages.PageObject;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebElement;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.List;
-
-import static ch.lambdaj.Lambda.convert;
 
 public class SubutaiPage extends PageObject {
 
@@ -104,7 +93,7 @@ public class SubutaiPage extends PageObject {
     public WebElementFacade buttonEnvironmentBuild;
 
     @FindBy(xpath = "*//h2[contains(text(), \"Success!\")]")
-    public WebElementFacade header2Success;
+    public WebElementFacade headerSuccess;
 
     @FindBy(xpath = "*//div[@class=\"sweet-alert showSweetAlert visible\"]//button[contains(text(), \"OK\")]")
     public WebElementFacade buttonOK;
@@ -148,10 +137,58 @@ public class SubutaiPage extends PageObject {
     @FindBy(xpath = "*//a[@class=\"b-icon b-icon_remove\"]")
     public WebElementFacade iconDestroy;
 
+    @FindBy(id = "subt-link__peer-registration")
+    public WebElementFacade linkPeerRegistration;
+
+    @FindBy(id = "subt_link__create-peer")
+    public WebElementFacade linkCreatePeer;
+
+    @FindBy(id = "subt_input__peer-ip")
+    public WebElementFacade inputPeerIP;
+
+    @FindBy(id = "subt_input__peer-key-phrase")
+    public WebElementFacade inputPeerKeyPhrase;
+
+    @FindBy(id = "subt_button__create-peer")
+    public WebElementFacade buttonCreatePeer;
+
+    @FindBy(xpath = "*//td[@class=\"ng-scope\"]")
+    public WebElementFacade textPeer1Ip;
+
+    @FindBy(xpath = "*//td[@class=\"ng-scope\"]")
+    public WebElementFacade textPeer2Ip;
+
+    @FindBy(xpath = "*//a[@class=\"b-btn b-btn_blue subt_button__peer-cancel\" and contains(text(), \"Cancel\")]")
+    public WebElementFacade buttonCancel;
+
+    @FindBy(xpath = "*//a[@class=\"b-btn b-btn_green subt_button__peer-approve\" and contains(text(), \"Approve\")]")
+    public WebElementFacade buttonApprove;
+
+    @FindBy(xpath = "*//a[@class=\"b-btn b-btn_red subt_button__peer-reject\" and contains(text(), \"Reject\")]")
+    public WebElementFacade buttonReject;
+
+    @FindBy(id = "subt_input__peer-approve-keyphrase")
+    public WebElementFacade inputPeerApproveKeyPhrase;
+
+    @FindBy(id = "subt_button__peer-approve-popup")
+    public WebElementFacade buttonPopupApprove;
+
+    @FindBy(xpath = "*//a[@class=\"b-btn b-btn_red subt_button__peer-unregister\" and contains(text(), \"Unregister\")]")
+    public WebElementFacade buttonUnregister;
+
+    @FindBy(xpath = "*//button[@class=\"confirm\" and contains(text(), \"Unregister\")]")
+    public WebElementFacade buttonConfirmUnregister;
+
+    @FindBy(xpath = "*//div[@class=\"sweet-alert showSweetAlert visible\"]//h2[contains(text(), \"Unregistered!\")]")
+    public WebElementFacade textUnregistered;
+
+    @FindBy(xpath = "*//td[@class=\"dataTables_empty\" and contains(text(), \"No data available in table\")]")
+    public WebElementFacade textNoDataAvailableInTable;
+
     //---------------------------------------------------------------------
 
-    public void waitHeader2Success(){
-        waitFor(header2Success);
+    public void waitHeaderSuccess(){
+        waitFor(headerSuccess);
     }
 
     public void waitTextYourEnvironmentHasBeenCreated() {
@@ -164,5 +201,17 @@ public class SubutaiPage extends PageObject {
 
     public void waitTextYourEnvironmentHasBeenDestroyed(){
         waitFor(textYourEnvironmentHasBeenDestroyed);
+    }
+
+    public void waitButtonCreatePeer(){
+        waitFor(linkCreatePeer);
+    }
+
+    public void waitButtonUnregister(){
+        waitFor(buttonUnregister);
+    }
+
+    public void waitTextUnregistered(){
+        waitFor(textUnregistered);
     }
 }
