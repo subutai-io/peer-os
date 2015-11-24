@@ -100,9 +100,9 @@ public interface ContainerHost extends Host, ContainerHostInfo
     /**
      * Sets CPU quota on container in percent
      *
-     * @param cpuPercent - cpu quota in percent
+     * @param cpuQuota - cpu quota
      */
-    public void setCpuQuota( int cpuPercent ) throws PeerException;
+    public void setCpuQuota( CpuQuota cpuQuota ) throws PeerException;
 
     /**
      * Returns allowed cpus/cores ids on container

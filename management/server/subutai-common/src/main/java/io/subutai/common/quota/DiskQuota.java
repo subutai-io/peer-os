@@ -3,20 +3,26 @@ package io.subutai.common.quota;
 
 import java.math.BigDecimal;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonProperty;
+
 
 /**
  * Disk quota
  */
 public class DiskQuota extends Quota
 {
-
+    @JsonProperty( "diskPartition" )
     private DiskPartition diskPartition;
+    @JsonProperty( "diskQuotaUnit" )
     private DiskQuotaUnit diskQuotaUnit;
+    @JsonProperty( "diskQuotaValue" )
     private double diskQuotaValue;
 
 
-    public DiskQuota( final DiskPartition diskPartition, final DiskQuotaUnit diskQuotaUnit,
-                      final double diskQuotaValue )
+    public DiskQuota( @JsonProperty( "diskPartition" ) final DiskPartition diskPartition,
+                      @JsonProperty( "diskQuotaUnit" ) final DiskQuotaUnit diskQuotaUnit,
+                      @JsonProperty( "diskQuotaValue" ) final double diskQuotaValue )
     {
         this.diskPartition = diskPartition;
         this.diskQuotaUnit = diskQuotaUnit;
@@ -48,12 +54,14 @@ public class DiskQuota extends Quota
     }
 
 
+    @JsonIgnore
     public String getKey()
     {
         return diskPartition.getPartitionName();
     }
 
 
+    @JsonIgnore
     public String getValue()
     {
         if ( diskQuotaUnit == DiskQuotaUnit.UNLIMITED )
@@ -64,6 +72,8 @@ public class DiskQuota extends Quota
     }
 
 
+    @JsonIgnore
+
     public BigDecimal getValue( DiskQuotaUnit unit )
     {
         BigDecimal inBytes = diskQuotaUnit.getMultiplicator().multiply( new BigDecimal( diskQuotaValue ) );
@@ -71,6 +81,7 @@ public class DiskQuota extends Quota
     }
 
 
+    @JsonIgnore
     public QuotaType getType()
     {
         return QuotaType.getQuotaType( diskPartition.getPartitionName() );

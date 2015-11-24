@@ -4,6 +4,8 @@ package io.subutai.common.quota;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+import org.codehaus.jackson.annotate.JsonProperty;
+
 
 /**
  * Unit types for disk quotas
@@ -18,9 +20,19 @@ public enum DiskQuotaUnit
     PB( "P", "Petabytes", new BigDecimal( "1125899906842624.00" ) ),
     EB( "E", "Exabytes", new BigDecimal( "1152921504606846976.00" ) ),
     UNLIMITED( "none", "Unlimited", null );
+    @JsonProperty( "acronym" )
     private String acronym;
     private String name;
     private BigDecimal multiplicator;
+
+
+    DiskQuotaUnit( @JsonProperty( "acronym" ) final String acronym )
+    {
+        DiskQuotaUnit instance = parseFromAcronym( acronym );
+        this.acronym = instance.getAcronym();
+        this.name = instance.getName();
+        this.multiplicator = instance.getMultiplicator();
+    }
 
 
     private DiskQuotaUnit( final String acronym, final String name, final BigDecimal multiplicator )

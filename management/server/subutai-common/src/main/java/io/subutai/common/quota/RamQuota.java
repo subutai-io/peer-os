@@ -1,16 +1,22 @@
 package io.subutai.common.quota;
 
 
+import org.codehaus.jackson.annotate.JsonProperty;
+
+
 /**
  * RAM quota
  */
 public class RamQuota extends Quota
 {
+    @JsonProperty( "ramQuotaUnit" )
     private RamQuotaUnit ramQuotaUnit;
+    @JsonProperty( "ramQuotaValue" )
     private long ramQuotaValue;
 
 
-    public RamQuota( final RamQuotaUnit ramQuotaUnit, final long ramQuotaValue )
+    public RamQuota( @JsonProperty( "ramQuotaUnit" ) final RamQuotaUnit ramQuotaUnit,
+                     @JsonProperty( "ramQuotaValue" ) final long ramQuotaValue )
     {
         this.ramQuotaUnit = ramQuotaUnit;
         this.ramQuotaValue = ramQuotaValue;
@@ -69,6 +75,7 @@ public class RamQuota extends Quota
 
         return true;
     }
+
 
     public String getValue()
     {

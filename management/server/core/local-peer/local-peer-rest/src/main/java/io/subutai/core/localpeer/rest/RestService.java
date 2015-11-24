@@ -47,17 +47,6 @@ public interface RestService
     @Produces( MediaType.APPLICATION_JSON )
     public Response getPeerPolicy( @QueryParam( "peerId" ) String peerId );
 
-
-    //todo check why is this endpoint used
-    //    @Path( "/" )
-    //    @Produces(     MediaType.APPLICATION_JSON  )
-    //    @Deprecated
-    //    public Response getRegisteredPeerInfo( @QueryParam( "peerId" ) String peerId );
-    //
-    //    @GET
-    //    @Path( "ping" )
-    //    public Response ping();
-
     @GET
     @Path( "template/get" )
     @Produces( MediaType.APPLICATION_JSON )
@@ -115,77 +104,6 @@ public interface RestService
     @Path( "update" )
     @Produces( MediaType.APPLICATION_JSON )
     public Response updatePeer( @FormParam( "peer" ) String peer );
-
-    @GET
-    @Path( "container/quota/ram/available" )
-    @Produces( MediaType.APPLICATION_JSON )
-    Response getAvailableRamQuota( @QueryParam( "containerId" ) String containerId );
-
-    @GET
-    @Path( "container/quota/cpu/available" )
-    @Produces( MediaType.APPLICATION_JSON )
-    Response getAvailableCpuQuota( @QueryParam( "containerId" ) String containerId );
-
-    @GET
-    @Path( "container/quota/disk/available" )
-    @Produces( MediaType.APPLICATION_JSON )
-    Response getAvailableDiskQuota( @QueryParam( "containerId" ) String containerId,
-                                    @QueryParam( "diskPartition" ) String diskPartition );
-
-
-    @GET
-    @Path( "container/quota/ram" )
-    @Produces( MediaType.APPLICATION_JSON )
-    Response getRamQuota( @QueryParam( "containerId" ) String containerId );
-
-
-    @GET
-    @Path( "container/quota/ram/info" )
-    @Produces( MediaType.APPLICATION_JSON )
-    Response getRamQuotaInfo( @QueryParam( "containerId" ) String containerId );
-
-    @POST
-    @Path( "container/quota/ram" )
-    Response setRamQuota( @FormParam( "containerId" ) String containerId, @FormParam( "ram" ) int ram );
-
-    @POST
-    @Path( "container/quota/ram2" )
-    Response setRamQuota( @FormParam( "containerId" ) String containerId, @FormParam( "ramQuota" ) String ramQuota );
-
-    @GET
-    @Path( "container/quota/cpu" )
-    @Produces( MediaType.APPLICATION_JSON )
-    Response getCpuQuota( @QueryParam( "containerId" ) String containerId );
-
-
-    @GET
-    @Path( "container/quota/cpu/info" )
-    @Produces( MediaType.APPLICATION_JSON )
-    Response getCpuQuotaInfo( @QueryParam( "containerId" ) String containerId );
-
-
-    @POST
-    @Path( "container/quota/cpu" )
-    Response setCpuQuota( @FormParam( "containerId" ) String containerId, @FormParam( "cpu" ) int cpu );
-
-    @GET
-    @Path( "container/quota/cpuset" )
-    @Produces( MediaType.APPLICATION_JSON )
-    Response getCpuSet( @QueryParam( "containerId" ) String containerId );
-
-    @POST
-    @Path( "container/quota/cpuset" )
-    Response setCpuSet( @FormParam( "containerId" ) String containerId, @FormParam( "cpuset" ) String cpuSet );
-
-    @GET
-    @Path( "container/quota/disk" )
-    @Produces( MediaType.APPLICATION_JSON )
-    Response getDiskQuota( @QueryParam( "containerId" ) String containerId,
-                           @QueryParam( "diskPartition" ) String diskPartition );
-
-    @POST
-    @Path( "container/quota/disk" )
-    Response setDiskQuota( @FormParam( "containerId" ) String containerId, @FormParam( "diskQuota" ) String diskQuota );
 
     @GET
     @Path( "container/info" )
