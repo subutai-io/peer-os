@@ -139,4 +139,90 @@ public class SubutaiSteps extends ScenarioSteps {
     public void seeNodeListItem(){
         assertThat(subutaiPage.nodeListItem.isVisible(), is(true));
     }
+
+    @Step
+    public void clickOnButtonCreate(){
+        subutaiPage.buttonCreateBlueprint.click();
+    }
+
+    @Step
+    public void seeCreatedBlueprint() {
+        assertThat(subutaiPage.createdBlueprint.isDisplayed(), is(true));
+    }
+
+    @Step
+    public void clickOnIconBuild(){
+        subutaiPage.iconBuild.click();
+    }
+
+    @Step
+    public void seeBuildEnvironment() {
+        assertThat(subutaiPage.linkEnvironmentBuildList.isVisible(), is(true));
+    }
+
+    @Step
+    public void clickOnButtonPlace(){
+        subutaiPage.buttonPlace.click();
+    }
+
+    @Step
+    public void selectPeer(int index){
+        subutaiPage.selectPeer.selectByIndex(index);
+    }
+
+    @Step
+    public void selectStrategie(String value){
+        subutaiPage.selectStrategie.selectByValue(value);
+    }
+
+    @Step
+    public void inputEnvironmentName(String name){
+        subutaiPage.inputEnvironmentName.type(name);
+    }
+
+    @Step
+    public void clickLinkBuildEnvironmentList(){
+        subutaiPage.linkEnvironmentBuildList.click();
+    }
+
+    @Step
+    public void seeIconTwoContainers(){
+        assertThat(subutaiPage.iconTwoContainers.isVisible(), is(true));
+    }
+
+    @Step
+    public void seePopup(){
+        assertThat(subutaiPage.popup.isVisible(), is(true));
+    }
+
+    @Step
+    public void clickOnButtonEnvironmentBuild(){
+        subutaiPage.buttonEnvironmentBuild.click();
+    }
+
+    @Step
+    public void seeHeader2Success(){
+        subutaiPage.waitHeader2Success();
+        assertThat(subutaiPage.header2Success.isVisible(), is(true));
+    }
+
+    @Step
+    public void clickOnButtonOK(){
+        subutaiPage.buttonOK.click();
+    }
+
+    @Step
+    public void seeTextYourEnvironmentStartCreation(){
+        assertThat(subutaiPage.textYourEnvironmentStartCreation.isVisible(), is(true));
+    }
+
+    @Step
+    public void seeTextYourEnvironmentHasBeenCreated(){
+        assertThat(subutaiPage.textYourEnvironmentHasBeenCreated.isVisible(), is(true));
+    }
+
+    @Step
+    public void waitTextYourEnvironmentHasBeenCreated() {
+        subutaiPage.waitTextYourEnvironmentHasBeenCreated();
+    }
 }

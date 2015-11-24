@@ -23,3 +23,20 @@ And the user enter SSH group ID: '0'
 And the user enter host Group ID: '0'
 And the user select quota size: 'TINY'
 And the user click on the button: Add to node list
+And the user click on the button: Create
+Then the user observe created blueprint
+When the user click on the icon: Build
+Then the user observe build environment
+When the user enter environment name: 'Local Environment'
+And the user select peer
+And the user select Strategie: 'DEFAULT-STRATEGY'
+And the user click on the button: Place
+Then the user observe icon: two containers
+When the user click on the link: Environment Build List
+Then the user observe popup: Build Environment
+When the user click on the button: Build
+Then the user observe header: Success!
+And the user observe text: Your environment start creation.
+When the user click on the button: OK
+Then the user observe header: Success!
+And the user observe text: Your environment has been created.

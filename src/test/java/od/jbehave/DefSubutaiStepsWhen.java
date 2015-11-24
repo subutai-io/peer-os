@@ -73,4 +73,49 @@ public class DefSubutaiStepsWhen {
     public void click_button_add_to_node_list(){
         subutaiSteps.clickOnButtonAddToNodeList();
     }
+
+    @When("the user click on the button: Create")
+    public void click_button_create(){
+        subutaiSteps.clickOnButtonCreate();
+    }
+
+    @When("the user click on the icon: Build")
+    public void click_on_icon_build(){
+        subutaiSteps.clickOnIconBuild();
+    }
+
+    @When("the user select peer")
+    public void select_peer(){
+        subutaiSteps.selectPeer(1);
+    }
+
+    @When("the user select Strategie: '$strategie'")
+    public void select_strategie(String strategie){
+        subutaiSteps.selectStrategie(strategie);
+    }
+
+    @When("the user click on the button: Place")
+    public void click_on_button_place(){
+        subutaiSteps.clickOnButtonPlace();
+    }
+
+    @When("the user enter environment name: '$name'")
+    public void enter_environment_name(String name){
+        subutaiSteps.inputEnvironmentName(name);
+    }
+
+    @When("the user click on the link: Environment Build List")
+    public void click_on_link_environment_build_list(){
+        subutaiSteps.clickLinkBuildEnvironmentList();
+    }
+
+    @When("the user click on the button: Build")
+    public void click_on_button_build(){
+        subutaiSteps.clickOnButtonEnvironmentBuild();
+    }
+
+    @When("the user click on the button: OK")
+    public void click_on_button_ok(){
+        subutaiSteps.clickOnButtonOK();
+    }
 }

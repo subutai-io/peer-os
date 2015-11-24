@@ -2,10 +2,7 @@ package od.jbehave;
 
 import net.thucydides.core.annotations.Steps;
 import od.steps.SubutaiSteps;
-import org.jbehave.core.annotations.Given;
 import org.jbehave.core.annotations.Then;
-
-import java.io.FileNotFoundException;
 
 public class DefSubutaiStepsThen {
 
@@ -33,5 +30,41 @@ public class DefSubutaiStepsThen {
     public void see_node_list_item()
     {
         subutaiSteps.seeNodeListItem();
+    }
+
+    @Then("the user observe created blueprint")
+    public void see_created_blueprint(){
+        subutaiSteps.seeCreatedBlueprint();
+    }
+
+    @Then("the user observe build environment")
+    public void see_build_environment(){
+        subutaiSteps.seeBuildEnvironment();
+    }
+
+    @Then("the user observe icon: two containers")
+    public void see_icon_two_containers(){
+        subutaiSteps.seeIconTwoContainers();
+    }
+
+    @Then("the user observe popup: Build Environment")
+    public void see_popup_build_environment(){
+        subutaiSteps.seePopup();
+    }
+
+    @Then("the user observe header: Success!")
+    public void see_header_success(){
+        subutaiSteps.seeHeader2Success();
+    }
+
+    @Then("the user observe text: Your environment start creation.")
+    public void see_text_your_environment_start_creation(){
+        subutaiSteps.seeTextYourEnvironmentStartCreation();
+    }
+
+    @Then("the user observe text: Your environment has been created.")
+    public void see_text_your_environment_has_been_created(){
+        subutaiSteps.waitTextYourEnvironmentHasBeenCreated();
+        subutaiSteps.seeTextYourEnvironmentHasBeenCreated();
     }
 }

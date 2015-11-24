@@ -58,7 +58,7 @@ public class SubutaiPage extends PageObject {
     @FindBy(id = "subt_input__environment-name")
     public WebElementFacade inputEnvironmentName;
 
-    @FindBy(className = "b-btn b-btn_green subt_button__environment-place")
+    @FindBy(xpath = "*//i[@class=\"b-icon b-icon_box-white b-icon_box-white_place\"]/..")
     public WebElementFacade buttonPlace;
 
     @FindBy(id = "subt-link__environment")
@@ -79,5 +79,49 @@ public class SubutaiPage extends PageObject {
     @FindBy(className = "b-popup-box-node-list subt_button__blueprint-node-list-item ng-binding ng-scope")
     public WebElementFacade nodeListItem;
 
+    @FindBy(xpath = "*//td[@class=\"b-main-table__controls\"]//a[@class=\"b-icon b-icon_build\"]")
+    public WebElementFacade iconBuild;
+
+    @FindBy(xpath = "*//td[@class=\"ng-binding\"]")
+    public WebElementFacade createdBlueprint;
+
+    @FindBy(id = "subt_link__environment-build-list")
+    public WebElementFacade linkEnvironmentBuildList;
+
+    @FindBy(xpath = "*//select[@ng-model=\"nodeGroup.peer\"]")
+    public WebElementFacade selectPeer;
+
+    @FindBy(xpath = "*//select[@ng-model=\"nodeGroup.strategyId\"]")
+    public WebElementFacade selectStrategie;
+
+    @FindBy(xpath = "*//span[@class=\"b-icon__inner-num ng-binding\" and contains(text(), \"2\")]")
+    public WebElementFacade iconTwoContainers;
+
+    @FindBy(xpath = "*//div[@class=\"b-popup\"]")
+    public WebElementFacade popup;
+
+    @FindBy(id = "subt_button__environment-build")
+    public WebElementFacade buttonEnvironmentBuild;
+
+    @FindBy(xpath = "*//h2[contains(text(), \"Success!\")]")
+    public WebElementFacade header2Success;
+
+    @FindBy(xpath = "*//div[@class=\"sweet-alert showSweetAlert visible\"]//button[contains(text(), \"OK\")]")
+    public WebElementFacade buttonOK;
+
+    @FindBy(xpath = "*//div[@class=\"sweet-alert showSweetAlert visible\"]//p[contains(text(), \"Your environment start creation.\")]")
+    public WebElementFacade textYourEnvironmentStartCreation;
+
+    @FindBy(xpath = "*//div[@class=\"sweet-alert showSweetAlert visible\"]//p[contains(text(), \"Your environment has been created.\")]")
+    public WebElementFacade textYourEnvironmentHasBeenCreated;
+
     //---------------------------------------------------------------------
+
+    public void waitHeader2Success(){
+        waitFor(header2Success);
+    }
+
+    public void waitTextYourEnvironmentHasBeenCreated() {
+        waitFor(textYourEnvironmentHasBeenCreated);
+    }
 }
