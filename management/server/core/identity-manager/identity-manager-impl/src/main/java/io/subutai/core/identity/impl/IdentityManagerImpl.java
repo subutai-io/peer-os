@@ -1001,7 +1001,7 @@ public class IdentityManagerImpl implements IdentityManager
     @Override
     public void extendTokenTime( UserToken token, int minutes )
     {
-        token.setValidDate( DateUtils.addMinutes( token.getValidDate(), minutes ) );
+        token.setValidDate( DateUtils.addMinutes( new Date(System.currentTimeMillis()), minutes ) );
         identityDataService.updateUserToken( token );
     }
 

@@ -56,6 +56,8 @@ public interface SecurityDataService
 
     void removeKeyTrustData( String sourceId );
 
+    void removeKeyTrustData( String sourceId, String targetId );
+
     SecurityKeyTrust getKeyTrustData( long id );
 
     List<SecurityKeyTrust> getKeyTrustData( String sourceId );

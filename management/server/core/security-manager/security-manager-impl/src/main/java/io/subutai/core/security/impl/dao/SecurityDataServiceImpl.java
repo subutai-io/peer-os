@@ -207,6 +207,16 @@ public class SecurityDataServiceImpl implements SecurityDataService
      *
      */
     @Override
+    public void removeKeyTrustData( String sourceId, String targetId )
+    {
+        securityKeyTrustDAO.removeBySourceId( sourceId, targetId);
+    }
+
+
+    /******************************************
+     *
+     */
+    @Override
     public SecurityKeyTrust getKeyTrustData( long id )
     {
         return securityKeyTrustDAO.find( id );

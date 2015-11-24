@@ -13,7 +13,7 @@ public enum TokenType
     private int id;
 
 
-    private TokenType(  int id, String name)
+    TokenType(  int id, String name)
     {
         this.id = id;
         this.name = name;
