@@ -17,7 +17,7 @@ public interface SecurityDataService
     /******************************************
      * Store Public key in the DB
      */
-    public void saveKeyIdentityData( String hostId ,String sKeyId,String pKeyId, short type );
+    public void saveKeyIdentityData( String hostId ,String sKeyId,String pKeyId, int type );
 
 
     /******************************************
@@ -41,7 +41,7 @@ public interface SecurityDataService
     /******************************************
      *
      */
-    void saveSecretKeyData( String fingerprint, byte[] data, String pwd, short type );
+    void saveSecretKeyData( String fingerprint, byte[] data, String pwd, int type );
 
 
     /******************************************
@@ -50,15 +50,36 @@ public interface SecurityDataService
     void removeSecretKeyData( String fingerprint );
 
 
+    /******************************************
+     *
+     */
     void saveKeyTrustData( String sourceId, String targetId, int trustLevel );
 
+    /******************************************
+     *
+     */
     void removeKeyTrustData( long id );
 
+    /******************************************
+     *
+     */
     void removeKeyTrustData( String sourceId );
 
+
+    /******************************************
+     *
+     */
     void removeKeyTrustData( String sourceId, String targetId );
 
+
+    /******************************************
+     *
+     */
     SecurityKeyTrust getKeyTrustData( long id );
 
+
+    /******************************************
+     *
+     */
     List<SecurityKeyTrust> getKeyTrustData( String sourceId );
 }

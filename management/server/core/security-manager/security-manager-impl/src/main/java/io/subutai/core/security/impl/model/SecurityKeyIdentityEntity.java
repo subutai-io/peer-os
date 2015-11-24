@@ -45,7 +45,7 @@ public class SecurityKeyIdentityEntity implements SecurityKeyIdentity
     private short status;
 
     @Column( name = TYPE )
-    private short type;
+    private int type;
 
     @Override
     public String getHostId()
@@ -76,14 +76,14 @@ public class SecurityKeyIdentityEntity implements SecurityKeyIdentity
 
 
     @Override
-    public short getType()
+    public int getType()
     {
         return type;
     }
 
 
     @Override
-    public void setType( final short type )
+    public void setType( final int type )
     {
         this.type = type;
     }

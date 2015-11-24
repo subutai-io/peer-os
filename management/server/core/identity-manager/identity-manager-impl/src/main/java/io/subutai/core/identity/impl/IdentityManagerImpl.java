@@ -17,12 +17,15 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import io.subutai.common.dao.DaoManager;
+import io.subutai.common.security.crypto.pgp.KeyPair;
 import io.subutai.common.security.objects.PermissionOperation;
 import io.subutai.common.security.objects.PermissionScope;
+import io.subutai.common.security.objects.SecurityKeyType;
 import io.subutai.common.security.objects.TokenType;
 import io.subutai.common.security.objects.UserStatus;
 import io.subutai.common.security.objects.UserType;
 import io.subutai.common.security.token.TokenUtil;
+import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.identity.api.model.UserToken;
 import io.subutai.core.identity.impl.dao.IdentityDataServiceImpl;
@@ -55,6 +58,7 @@ import io.subutai.core.identity.api.model.Role;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.core.identity.impl.model.UserTokenEntity;
+import io.subutai.core.security.api.SecurityManager;
 
 
 /**
@@ -75,6 +79,7 @@ public class IdentityManagerImpl implements IdentityManager
     private DaoManager daoManager = null;
     private ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
     private Map<Long, Session> sessionContext = new HashMap<Long, Session>();
+    private SecurityManager securityManager = null;
 
 
     /* *************************************************
@@ -678,26 +683,42 @@ public class IdentityManagerImpl implements IdentityManager
     @Override
     public User createUser( String userName, String password, String fullName, String email, int type )
     {
-        //***************Cannot use TOKEN keyword *******
-        if ( userName.equalsIgnoreCase( "token" ) )
-        {
-            throw new IllegalArgumentException( "Cannot use TOKEN keyword." );
-        }
-        //***********************************************
-
-        if ( Strings.isNullOrEmpty( password ) )
-        {
-            password = Integer.toString( ( new Random() ).nextInt() );
-        }
-
         User user = new UserEntity();
-        user.setUserName( userName );
-        user.setPassword( password );
-        user.setEmail( email );
-        user.setFullName( fullName );
-        user.setType( type );
 
-        identityDataService.persistUser( user );
+        try
+        {
+            //***************Cannot use TOKEN keyword *******
+            if ( userName.equalsIgnoreCase( "token" ) )
+            {
+                throw new IllegalArgumentException( "Cannot use TOKEN keyword." );
+            }
+            //***********************************************
+
+            if ( Strings.isNullOrEmpty( password ) )
+            {
+                password = Integer.toString( ( new Random() ).nextInt() );
+            }
+
+            user.setUserName( userName );
+            user.setPassword( password );
+            user.setEmail( email );
+            user.setFullName( fullName );
+            user.setType( type );
+
+            //** Create Key*****************************
+            String keyId = UUID.randomUUID().toString();
+            KeyPair kPair = securityManager.getKeyManager().generateKeyPair( keyId, false );
+            securityManager.getKeyManager().saveKeyPair( keyId, SecurityKeyType.UserKey.getId(), kPair );
+            //******************************************
+
+            //user.setSecurityKeyId( keyId );
+
+            identityDataService.persistUser( user );
+        }
+        catch(Exception ex)
+        {
+            LOGGER.error("***** Error! Error creating user:"+ex.toString(),ex);
+        }
 
         return user;
     }
@@ -1063,5 +1084,21 @@ public class IdentityManagerImpl implements IdentityManager
     public void setDaoManager( DaoManager daoManager )
     {
         this.daoManager = daoManager;
+    }
+
+
+    /* *************************************************
+     */
+    public SecurityManager getSecurityManager()
+    {
+        return securityManager;
+    }
+
+
+    /* *************************************************
+     */
+    public void setSecurityManager( final SecurityManager securityManager )
+    {
+        this.securityManager = securityManager;
     }
 }

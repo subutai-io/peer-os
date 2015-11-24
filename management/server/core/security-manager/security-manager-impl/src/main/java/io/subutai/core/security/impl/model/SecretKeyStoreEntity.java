@@ -41,7 +41,7 @@ public class SecretKeyStoreEntity implements SecretKeyStore
     private short status = 1;
 
     @Column( name = TYPE )
-    private short type = 1;
+    private int type = 1;
 
     @Column( name = PWD)
     private String pwd;
@@ -75,13 +75,13 @@ public class SecretKeyStoreEntity implements SecretKeyStore
     }
 
 
-    public short getType()
+    public int getType()
     {
         return type;
     }
 
 
-    public void setType( final short type )
+    public void setType( final int type )
     {
         this.type = type;
     }

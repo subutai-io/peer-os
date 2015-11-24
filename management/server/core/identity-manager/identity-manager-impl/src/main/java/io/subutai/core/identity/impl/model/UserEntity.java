@@ -60,7 +60,7 @@ public class UserEntity implements User
     private int status = 1; // Active
 
     @Column( name = "security_key_id" )
-    private int securityKeyId = 1; // PGP KeyID
+    private String securityKeyId = ""; // PGP KeyID
 
 
     //*********************************************
@@ -210,13 +210,13 @@ public class UserEntity implements User
 
 
     @Override
-    public int getSecurityKeyId()
+    public String getSecurityKeyId()
     {
         return securityKeyId;
     }
 
     @Override
-    public void setSecurityKeyId( final int securityKeyId )
+    public void setSecurityKeyId( final String securityKeyId )
     {
         this.securityKeyId = securityKeyId;
     }
