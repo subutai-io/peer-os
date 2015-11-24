@@ -1,14 +1,19 @@
 package io.subutai.common.quota;
 
 
-public class CpuQuotaInfo extends QuotaInfo
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonProperty;
+
+
+public class CpuQuota extends Quota
 {
+    @JsonProperty( "percentage" )
     private int percentage;
 
 
-    public CpuQuotaInfo( String cpuAmount )
+    public CpuQuota( @JsonProperty( "percentage" ) int cpuAmount )
     {
-        this.percentage = Integer.parseInt( cpuAmount );
+        this.percentage = cpuAmount;
     }
 
 
@@ -24,21 +29,24 @@ public class CpuQuotaInfo extends QuotaInfo
     }
 
 
+    @JsonIgnore
     @Override
-    public String getQuotaValue()
+    public String getValue()
     {
         return String.format( "%d", percentage );
     }
 
 
+    @JsonIgnore
     @Override
-    public String getQuotaKey()
+    public String getKey()
     {
         return QuotaType.QUOTA_TYPE_CPU.getKey();
     }
 
 
-    public QuotaType getQuotaType()
+    @JsonIgnore
+    public QuotaType getType()
     {
         return QuotaType.QUOTA_TYPE_CPU;
     }
@@ -51,12 +59,12 @@ public class CpuQuotaInfo extends QuotaInfo
         {
             return true;
         }
-        if ( !( o instanceof CpuQuotaInfo ) )
+        if ( !( o instanceof CpuQuota ) )
         {
             return false;
         }
 
-        final CpuQuotaInfo that = ( CpuQuotaInfo ) o;
+        final CpuQuota that = ( CpuQuota ) o;
 
         if ( percentage != that.percentage )
         {

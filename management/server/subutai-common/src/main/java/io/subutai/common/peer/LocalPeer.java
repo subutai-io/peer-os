@@ -4,10 +4,13 @@ package io.subutai.common.peer;
 import java.util.List;
 import java.util.Set;
 
-import io.subutai.common.environment.ContainerType;
+import javax.annotation.security.RolesAllowed;
+
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.protocol.Template;
+import io.subutai.common.quota.Quota;
+import io.subutai.common.quota.QuotaType;
 
 
 /**
@@ -70,6 +73,11 @@ public interface LocalPeer extends Peer
      */
     public ContainerHost getContainerHostById( String hostId ) throws HostNotFoundException;
 
+    Quota getQuota( ContainerHost host, QuotaType quota ) throws PeerException;
+
+    @RolesAllowed( "Environment-Management|A|Update" )
+    void setQuota( ContainerHost host, Quota quota ) throws PeerException;
+
     /**
      * Returns instance of management host
      */
@@ -88,9 +96,9 @@ public interface LocalPeer extends Peer
      * @param template - source template from which to clone container
      * @param containerName - container name
      */
-//    public ContainerHost createContainer( final ResourceHost resourceHost, final Template template,
-//                                          final String containerName, final ContainerQuota containerQuota )
-//            throws PeerException;
+    //    public ContainerHost createContainer( final ResourceHost resourceHost, final Template template,
+    //                                          final String containerName, final ContainerQuota containerQuota )
+    //            throws PeerException;
 
 
     /**
@@ -130,6 +138,7 @@ public interface LocalPeer extends Peer
     public void removeRequestListener( RequestListener listener );
 
     public Set<RequestListener> getRequestListeners();
+
 
     /**
      * Returns domain assigned to vni if any
@@ -182,8 +191,4 @@ public interface LocalPeer extends Peer
     List<Template> getTemplates();
 
     Template getTemplateByName( String templateName );
-
-    ContainerQuota getDefaultQuota( ContainerType containerType );
-
-    //    boolean isPeerUsed( String peerId );
 }

@@ -12,7 +12,6 @@ public class RegistrationData
     private PeerInfo peerInfo;
     @JsonIgnore
     private String keyPhrase;
-//    private String cert;
     private RegistrationStatus status;
     private Encrypted data;
 

@@ -26,9 +26,6 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.protocol.Template;
-import io.subutai.common.quota.DiskPartition;
-import io.subutai.common.quota.DiskQuota;
-import io.subutai.common.quota.RamQuota;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.peer.api.PeerManager;
@@ -38,7 +35,6 @@ import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyObject;
-import static org.mockito.Matchers.anySet;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -327,251 +323,221 @@ public class RestServiceImplTest
     }
 
 
-    @Test
-    public void testGetAvailableRamQuota() throws Exception
-    {
-        restService.getAvailableRamQuota( CONTAINER_ID.toString() );
-
-        verify( containerHost ).getAvailableRamQuota();
-
-        doThrow( exception ).when( localPeer ).getContainerHostById( CONTAINER_ID );
-
-        Response response1 = restService.getAvailableRamQuota( CONTAINER_ID.toString() );
-
-        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
-    }
-
-
-    @Test
-    public void testGetAvailableCpuQuota() throws Exception
-    {
-        restService.getAvailableCpuQuota( CONTAINER_ID.toString() );
-
-        verify( containerHost ).getAvailableCpuQuota();
-
-        doThrow( exception ).when( localPeer ).getContainerHostById( CONTAINER_ID );
-
-        Response response1 = restService.getAvailableCpuQuota( CONTAINER_ID.toString() );
-
-        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
-    }
-
-
-    @Test
-    public void testGetAvailableDiskQuota() throws Exception
-    {
-        restService.getAvailableDiskQuota( CONTAINER_ID.toString(), JSON );
-
-        verify( containerHost ).getAvailableDiskQuota( any( DiskPartition.class ) );
-
-        doThrow( exception ).when( localPeer ).getContainerHostById( CONTAINER_ID );
-
-        Response response1 = restService.getAvailableDiskQuota( CONTAINER_ID.toString(), JSON );
-
-        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
-    }
-
-
     //    @Test
-    //    public void testGetProcessResourceUsage() throws Exception
+    //    public void testGetAvailableRamQuota() throws Exception
     //    {
-    //        restService.getProcessResourceUsage( containerId, PID );
+    //        restService.getAvailableRamQuota( CONTAINER_ID.toString() );
     //
-    //        verify( peerManager ).getProcessResourceUsage( containerId, PID );
+    //        verify( containerHost ).getAvailableRamQuota();
+    //
+    //        doThrow( exception ).when( localPeer ).getContainerHostById( CONTAINER_ID );
+    //
+    //        Response response1 = restService.getAvailableRamQuota( CONTAINER_ID.toString() );
+    //
+    //        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
     //    }
-
-
-    @Test
-    public void testGetRamQuota() throws Exception
-    {
-        restService.getRamQuota( CONTAINER_ID.toString() );
-
-        verify( containerHost ).getRamQuota();
-
-        doThrow( exception ).when( localPeer ).getContainerHostById( CONTAINER_ID );
-
-        Response response1 = restService.getRamQuota( CONTAINER_ID.toString() );
-
-        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
-    }
-
-
-    @Test
-    public void testGetRamQuotaInfo() throws Exception
-    {
-        restService.getRamQuotaInfo( CONTAINER_ID.toString() );
-
-        verify( containerHost ).getRamQuotaInfo();
-
-        doThrow( exception ).when( localPeer ).getContainerHostById( CONTAINER_ID );
-
-        Response response1 = restService.getRamQuotaInfo( CONTAINER_ID.toString() );
-
-        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
-    }
-
-
-    @Test
-    public void testSetRamQuota() throws Exception
-    {
-        restService.setRamQuota( CONTAINER_ID.toString(), QUOTA );
-
-        verify( containerHost ).setRamQuota( QUOTA );
-
-        doThrow( exception ).when( localPeer ).getContainerHostById( CONTAINER_ID );
-
-        Response response1 = restService.setRamQuota( CONTAINER_ID.toString(), QUOTA );
-
-        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
-    }
-
-
-    @Test
-    public void testSetRamQuota2() throws Exception
-    {
-        restService.setRamQuota( CONTAINER_ID.toString(), JSON );
-
-        verify( containerHost ).setRamQuota( any( RamQuota.class ) );
-
-        doThrow( exception ).when( localPeer ).getContainerHostById( CONTAINER_ID );
-
-        Response response1 = restService.setRamQuota( CONTAINER_ID.toString(), JSON );
-
-        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
-    }
-
-
-    @Test
-    public void testGetCpuQuota() throws Exception
-    {
-        restService.getCpuQuota( CONTAINER_ID.toString() );
-
-        verify( containerHost ).getCpuQuota();
-
-        doThrow( exception ).when( localPeer ).getContainerHostById( CONTAINER_ID );
-
-        Response response1 = restService.getCpuQuota( CONTAINER_ID.toString() );
-
-        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
-    }
-
-
-    @Test
-    public void testGetCpuQuotaInfo() throws Exception
-    {
-        restService.getCpuQuotaInfo( CONTAINER_ID.toString() );
-
-        verify( containerHost ).getCpuQuotaInfo();
-
-        doThrow( exception ).when( localPeer ).getContainerHostById( CONTAINER_ID );
-
-        Response response1 = restService.getCpuQuotaInfo( CONTAINER_ID.toString() );
-
-        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
-    }
-
-
-    @Test
-    public void testSetCpuQuota() throws Exception
-    {
-        restService.setCpuQuota( CONTAINER_ID.toString(), QUOTA );
-
-        verify( containerHost ).setCpuQuota( QUOTA );
-
-        doThrow( exception ).when( localPeer ).getContainerHostById( CONTAINER_ID );
-
-        Response response1 = restService.setCpuQuota( CONTAINER_ID.toString(), QUOTA );
-
-        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
-    }
-
-
-    @Test
-    public void testGetCpuSet() throws Exception
-    {
-        restService.getCpuSet( CONTAINER_ID.toString() );
-
-        verify( containerHost ).getCpuSet();
-
-        doThrow( exception ).when( localPeer ).getContainerHostById( CONTAINER_ID );
-
-        Response response1 = restService.getCpuSet( CONTAINER_ID.toString() );
-
-        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
-    }
-
-
-    @Test
-    public void testSetCpuSet() throws Exception
-    {
-        restService.setCpuSet( CONTAINER_ID.toString(), JSON );
-
-        verify( containerHost ).setCpuSet( anySet() );
-
-        doThrow( exception ).when( localPeer ).getContainerHostById( CONTAINER_ID );
-
-        Response response1 = restService.setCpuSet( CONTAINER_ID.toString(), JSON );
-
-        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
-    }
-
-
-    @Test
-    public void testGetDiskQuota() throws Exception
-    {
-        restService.getDiskQuota( CONTAINER_ID.toString(), JSON );
-
-        verify( containerHost ).getDiskQuota( any( DiskPartition.class ) );
-
-        doThrow( exception ).when( localPeer ).getContainerHostById( CONTAINER_ID );
-
-        Response response1 = restService.getDiskQuota( CONTAINER_ID.toString(), JSON );
-
-        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
-    }
-
-
-    @Test
-    public void testSetDiskQuota() throws Exception
-    {
-        restService.setDiskQuota( CONTAINER_ID.toString(), JSON );
-
-        verify( containerHost ).setDiskQuota( any( DiskQuota.class ) );
-
-        doThrow( exception ).when( localPeer ).getContainerHostById( CONTAINER_ID );
-
-        Response response1 = restService.setDiskQuota( CONTAINER_ID.toString(), JSON );
-
-        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
-    }
-
-
-    @Test
-    public void testSetDefaultGateway() throws Exception
-    {
-        //restService.setDefaultGateway( containerGateway );
-
-        //verify( peerManager ).setDefaultGateway( containerGateway );
-
-        doThrow( exception ).when( localPeer ).getContainerHostById( CONTAINER_ID );
-
-        //restService.setDefaultGateway( containerGateway );
-    }
-
-
-    @Test
-    public void testGetContainerHostInfoById() throws Exception
-    {
-        restService.getContainerHostInfoById( CONTAINER_ID.toString() );
-
-        verify( localPeer ).getContainerHostInfoById( CONTAINER_ID );
-
-        doThrow( exception ).when( peerManager ).getLocalPeer();
-
-        Response response1 = restService.getContainerHostInfoById( CONTAINER_ID.toString() );
-
-        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
-    }
+    //
+    //
+    //    @Test
+    //    public void testGetAvailableCpuQuota() throws Exception
+    //    {
+    //        restService.getAvailableCpuQuota( CONTAINER_ID.toString() );
+    //
+    //        verify( containerHost ).getAvailableCpuQuota();
+    //
+    //        doThrow( exception ).when( localPeer ).getContainerHostById( CONTAINER_ID );
+    //
+    //        Response response1 = restService.getAvailableCpuQuota( CONTAINER_ID.toString() );
+    //
+    //        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+    //    }
+    //
+    //
+    //    @Test
+    //    public void testGetAvailableDiskQuota() throws Exception
+    //    {
+    //        restService.getAvailableDiskQuota( CONTAINER_ID.toString(), JSON );
+    //
+    //        verify( containerHost ).getAvailableDiskQuota( any( DiskPartition.class ) );
+    //
+    //        doThrow( exception ).when( localPeer ).getContainerHostById( CONTAINER_ID );
+    //
+    //        Response response1 = restService.getAvailableDiskQuota( CONTAINER_ID.toString(), JSON );
+    //
+    //        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+    //    }
+    //
+    //
+    //    //    @Test
+    //    //    public void testGetProcessResourceUsage() throws Exception
+    //    //    {
+    //    //        restService.getProcessResourceUsage( containerId, PID );
+    //    //
+    //    //        verify( peerManager ).getProcessResourceUsage( containerId, PID );
+    //    //    }
+    //
+    //
+    //    @Test
+    //    public void testGetRamQuota() throws Exception
+    //    {
+    //        restService.getRamQuota( CONTAINER_ID.toString() );
+    //
+    //        verify( containerHost ).getRamQuota();
+    //
+    //        doThrow( exception ).when( localPeer ).getContainerHostById( CONTAINER_ID );
+    //
+    //        Response response1 = restService.getRamQuota( CONTAINER_ID.toString() );
+    //
+    //        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+    //    }
+    //
+    //
+    //    @Test
+    //    public void testGetRamQuotaInfo() throws Exception
+    //    {
+    //        restService.getRamQuotaInfo( CONTAINER_ID.toString() );
+    //
+    //        verify( containerHost ).getRamQuota();
+    //
+    //        doThrow( exception ).when( localPeer ).getContainerHostById( CONTAINER_ID );
+    //
+    //        Response response1 = restService.getRamQuotaInfo( CONTAINER_ID.toString() );
+    //
+    //        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+    //    }
+    //
+    //
+    //    @Test
+    //    public void testSetRamQuota() throws Exception
+    //    {
+    //        restService.setRamQuota( CONTAINER_ID.toString(), QUOTA );
+    //
+    //        verify( containerHost ).setRamQuota( QUOTA );
+    //
+    //        doThrow( exception ).when( localPeer ).getContainerHostById( CONTAINER_ID );
+    //
+    //        Response response1 = restService.setRamQuota( CONTAINER_ID.toString(), QUOTA );
+    //
+    //        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+    //    }
+    //
+    //
+    //    @Test
+    //    public void testGetCpuQuota() throws Exception
+    //    {
+    //        restService.getCpuQuota( CONTAINER_ID.toString() );
+    //
+    //        verify( containerHost ).getCpuQuota();
+    //
+    //        doThrow( exception ).when( localPeer ).getContainerHostById( CONTAINER_ID );
+    //
+    //        Response response1 = restService.getCpuQuota( CONTAINER_ID.toString() );
+    //
+    //        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+    //    }
+    //
+    //
+    //    @Test
+    //    public void testSetCpuQuota() throws Exception
+    //    {
+    //        restService.setCpuQuota( CONTAINER_ID.toString(), QUOTA );
+    //
+    //        verify( containerHost ).setCpuQuota( QUOTA );
+    //
+    //        doThrow( exception ).when( localPeer ).getContainerHostById( CONTAINER_ID );
+    //
+    //        Response response1 = restService.setCpuQuota( CONTAINER_ID.toString(), QUOTA );
+    //
+    //        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+    //    }
+    //
+    //
+    //    @Test
+    //    public void testGetCpuSet() throws Exception
+    //    {
+    //        restService.getCpuSet( CONTAINER_ID.toString() );
+    //
+    //        verify( containerHost ).getCpuSet();
+    //
+    //        doThrow( exception ).when( localPeer ).getContainerHostById( CONTAINER_ID );
+    //
+    //        Response response1 = restService.getCpuSet( CONTAINER_ID.toString() );
+    //
+    //        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+    //    }
+    //
+    //
+    //    @Test
+    //    public void testSetCpuSet() throws Exception
+    //    {
+    //        restService.setCpuSet( CONTAINER_ID.toString(), JSON );
+    //
+    //        verify( containerHost ).setCpuSet( anySet() );
+    //
+    //        doThrow( exception ).when( localPeer ).getContainerHostById( CONTAINER_ID );
+    //
+    //        Response response1 = restService.setCpuSet( CONTAINER_ID.toString(), JSON );
+    //
+    //        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+    //    }
+    //
+    //
+    //    @Test
+    //    public void testGetDiskQuota() throws Exception
+    //    {
+    //        restService.getDiskQuota( CONTAINER_ID.toString(), JSON );
+    //
+    //        verify( containerHost ).getDiskQuota( any( DiskPartition.class ) );
+    //
+    //        doThrow( exception ).when( localPeer ).getContainerHostById( CONTAINER_ID );
+    //
+    //        Response response1 = restService.getDiskQuota( CONTAINER_ID.toString(), JSON );
+    //
+    //        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+    //    }
+    //
+    //
+    //    @Test
+    //    public void testSetDiskQuota() throws Exception
+    //    {
+    //        restService.setDiskQuota( CONTAINER_ID.toString(), JSON );
+    //
+    //        verify( containerHost ).setDiskQuota( any( DiskQuota.class ) );
+    //
+    //        doThrow( exception ).when( localPeer ).getContainerHostById( CONTAINER_ID );
+    //
+    //        Response response1 = restService.setDiskQuota( CONTAINER_ID.toString(), JSON );
+    //
+    //        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+    //    }
+    //
+    //
+    //    @Test
+    //    public void testSetDefaultGateway() throws Exception
+    //    {
+    //        //restService.setDefaultGateway( containerGateway );
+    //
+    //        //verify( peerManager ).setDefaultGateway( containerGateway );
+    //
+    //        doThrow( exception ).when( localPeer ).getContainerHostById( CONTAINER_ID );
+    //
+    //        //restService.setDefaultGateway( containerGateway );
+    //    }
+    //
+    //
+    //    @Test
+    //    public void testGetContainerHostInfoById() throws Exception
+    //    {
+    //        restService.getContainerHostInfoById( CONTAINER_ID.toString() );
+    //
+    //        verify( localPeer ).getContainerHostInfoById( CONTAINER_ID );
+    //
+    //        doThrow( exception ).when( peerManager ).getLocalPeer();
+    //
+    //        Response response1 = restService.getContainerHostInfoById( CONTAINER_ID.toString() );
+    //
+    //        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+    //    }
 
 
     //    @Test

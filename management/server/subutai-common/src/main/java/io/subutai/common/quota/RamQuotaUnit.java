@@ -6,20 +6,31 @@ package io.subutai.common.quota;
  */
 public enum RamQuotaUnit
 {
-    BYTE( "", "Bytes" ),
-    KB( "K", "Kilobytes" ),
-    MB( "M", "Megabytes" ),
-    GB( "G", "Gigabytes" );
+    BYTE( "", "Bytes", 1 ),
+    KB( "K", "Kilobytes", 1024 ),
+    MB( "M", "Megabytes", 1024 * 1024 ),
+    GB( "G", "Gigabytes", 1024 * 1024 * 1024 );
 
 
     private String acronym;
     private String name;
+    private int multiplicator;
 
 
-    RamQuotaUnit( final String acronym, final String name )
+    RamQuotaUnit( final String acronym )
+    {
+        RamQuotaUnit instance = parseFromAcronym( acronym );
+        this.acronym = instance.getAcronym();
+        this.multiplicator = instance.getMultiplicator();
+        this.name = instance.getName();
+    }
+
+
+    RamQuotaUnit( final String acronym, final String name, final int multiplicator )
     {
         this.acronym = acronym;
         this.name = name;
+        this.multiplicator = multiplicator;
     }
 
 
@@ -32,6 +43,12 @@ public enum RamQuotaUnit
     public String getName()
     {
         return name;
+    }
+
+
+    public int getMultiplicator()
+    {
+        return multiplicator;
     }
 
 

@@ -3,30 +3,30 @@
   <reference id="quotaManager" availability="mandatory"
              interface="io.subutai.core.lxc.quota.api.QuotaManager" />
 
-  <reference id="peerManager" availability="mandatory"
-             interface="io.subutai.core.peer.api.PeerManager" />
+  <reference id="localPeer" availability="mandatory"
+             interface="io.subutai.common.peer.LocalPeer" />
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="quota/list-quota">
+    <command name="quota/list">
       <action class="io.subutai.core.lxc.quota.cli.ListQuotaTypes">
       </action>
     </command>
   </command-bundle>
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="quota/get-quota">
+    <command name="quota/get">
       <action class="io.subutai.core.lxc.quota.cli.GetQuota">
         <argument ref="quotaManager" />
-        <argument ref="peerManager" />
+        <argument ref="localPeer" />
       </action>
     </command>
   </command-bundle>
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="quota/set-quota">
+    <command name="quota/set">
       <action class="io.subutai.core.lxc.quota.cli.SetQuota">
         <argument ref="quotaManager" />
-        <argument ref="peerManager" />
+        <argument ref="localPeer" />
       </action>
     </command>
   </command-bundle>

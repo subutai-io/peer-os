@@ -8,6 +8,7 @@ import com.google.common.base.Preconditions;
 
 import io.subutai.common.environment.Environment;
 import io.subutai.common.peer.EnvironmentContainerHost;
+import io.subutai.common.quota.DiskPartition;
 import io.subutai.common.settings.Common;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
@@ -51,14 +52,31 @@ public class ViewEnvironmentCommand extends SubutaiShellCommandSupport
         {
             System.out.println( "-----------------------------------------------------------------" );
 
-            System.out.println( String.format( "Container id %s", containerHost.getId() ) );
-            System.out.println( String.format( "Container hostname %s", containerHost.getHostname() ) );
-            System.out.println( String.format( "Environment id %s", containerHost.getEnvironmentId() ) );
-            System.out.println( String.format( "NodeGroup name %s", containerHost.getNodeGroupName() ) );
-            System.out.println( String.format( "Template name %s", containerHost.getTemplateName() ) );
-            System.out.println( String.format( "IP %s",
-                    containerHost.getIpByInterfaceName( Common.DEFAULT_CONTAINER_INTERFACE ) ) );
+            System.out.println( String.format( "Container id: %s", containerHost.getId() ) );
+            System.out.println( String.format( "Container hostname: %s", containerHost.getHostname() ) );
+            System.out.println( String.format( "Environment id: %s", containerHost.getEnvironmentId() ) );
+            System.out.println( String.format( "Peer id: %s", containerHost.getPeerId() ) );
+            System.out.println( String.format( "NodeGroup name: %s", containerHost.getNodeGroupName() ) );
+            System.out.println( String.format( "Template name: %s", containerHost.getTemplateName() ) );
+            System.out.println( String.format( "IP: %s",
+                    containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp() ) );
             System.out.println( String.format( "Is connected %s", containerHost.isConnected() ) );
+            System.out.println( String.format( "RAM quota: %s/%s", containerHost.getRamQuota().getValue(),
+                    containerHost.getAvailableRamQuota().getValue() ) );
+            System.out.println( String.format( "CPU quota: %s/%s", containerHost.getCpuQuota().getValue(),
+                    containerHost.getAvailableCpuQuota().getValue() ) );
+            System.out.println(
+                    String.format( "/ quota: %s/%s", containerHost.getDiskQuota( DiskPartition.ROOT_FS ).getValue(),
+                            containerHost.getAvailableDiskQuota( DiskPartition.ROOT_FS ).getValue() ) );
+            System.out.println(
+                    String.format( "/opt quota: %s/%s", containerHost.getDiskQuota( DiskPartition.OPT ).getValue(),
+                            containerHost.getAvailableDiskQuota( DiskPartition.OPT ).getValue() ) );
+            System.out.println(
+                    String.format( "/home quota: %s/%s", containerHost.getDiskQuota( DiskPartition.HOME ).getValue(),
+                            containerHost.getAvailableDiskQuota( DiskPartition.HOME ).getValue() ) );
+            System.out.println(
+                    String.format( "/var quota: %s/%s", containerHost.getDiskQuota( DiskPartition.VAR ).getValue(),
+                            containerHost.getAvailableDiskQuota( DiskPartition.VAR ).getValue() ) );
         }
 
         return null;
