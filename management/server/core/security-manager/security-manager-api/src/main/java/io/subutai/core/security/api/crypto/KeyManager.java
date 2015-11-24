@@ -74,13 +74,13 @@ public interface KeyManager
     /* *****************************
      *
      */
-    public void savePublicKeyRing( String hostId, short type, String keyringAsASCII );
+    public void savePublicKeyRing( String hostId, int type, String keyringAsASCII );
 
 
     /* *****************************
      *
      */
-    public void savePublicKeyRing( String hostId, short type, PGPPublicKeyRing publicKeyRing );
+    public void savePublicKeyRing( String hostId, int type, PGPPublicKeyRing publicKeyRing );
 
 
 
@@ -102,7 +102,7 @@ public interface KeyManager
     /* *****************************
      *
      */
-    public void saveSecretKeyRing( String hostId, short type, PGPSecretKeyRing publicKeyRing );
+    public void saveSecretKeyRing( String hostId, int type, PGPSecretKeyRing publicKeyRing );
 
 
     /* *****************************
@@ -126,7 +126,7 @@ public interface KeyManager
     /* *****************************************
      *
      */
-    public void saveKeyPair( String hostId, short type, KeyPair keyPair );
+    public void saveKeyPair( String hostId, int type, KeyPair keyPair );
 
 
     /* *****************************************

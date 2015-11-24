@@ -26,6 +26,8 @@ import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.security.crypto.pgp.KeyPair;
 import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
+import io.subutai.common.security.objects.KeyTrustLevel;
+import io.subutai.common.security.objects.SecurityKeyType;
 import io.subutai.common.settings.ChannelSettings;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.keyserver.api.KeyServer;
@@ -71,8 +73,8 @@ public class KeyManagerImpl implements KeyManager
 
 
             InputStream ownerPubStream = PGPEncryptionUtil.getFileInputStream( keyData.getOwnerPublicKeyringFile() );
-            InputStream peerPubStream = PGPEncryptionUtil.getFileInputStream( keyData.getPublicKeyringFile() );
-            InputStream peerSecStream = PGPEncryptionUtil.getFileInputStream( keyData.getSecretKeyringFile() );
+            InputStream peerPubStream  = PGPEncryptionUtil.getFileInputStream( keyData.getPublicKeyringFile() );
+            InputStream peerSecStream  = PGPEncryptionUtil.getFileInputStream( keyData.getSecretKeyringFile() );
 
             if ( ownerPubStream == null || peerPubStream == null || peerSecStream == null )
             {
@@ -81,12 +83,20 @@ public class KeyManagerImpl implements KeyManager
             }
             else
             {
-                PGPPublicKeyRing peerPubRing = PGPKeyUtil.readPublicKeyRing( peerPubStream );
+                PGPPublicKeyRing peerPubRing      = PGPKeyUtil.readPublicKeyRing( peerPubStream );
+                PGPPublicKeyRing ownerPeerPubRing = PGPKeyUtil.readPublicKeyRing( ownerPubStream );
+
                 String peerId = PGPKeyUtil.getFingerprint( peerPubRing.getPublicKey().getFingerprint() );
+                String ownerPeerFPrint = PGPKeyUtil.getFingerprint( ownerPeerPubRing.getPublicKey().getFingerprint() );
+
                 keyData.setManHostId( peerId );
-                saveSecretKeyRing( keyData.getManHostId(), ( short ) 1, PGPKeyUtil.readSecretKeyRing( peerSecStream ) );
-                savePublicKeyRing( keyData.getManHostId(), ( short ) 1, peerPubRing );
-                savePublicKeyRing( getOwnerKeyIdx(), ( short ) 1, PGPKeyUtil.readPublicKeyRing( ownerPubStream ) );
+                saveSecretKeyRing( keyData.getManHostId(), SecurityKeyType.PeerKey.getId(),      PGPKeyUtil.readSecretKeyRing( peerSecStream ) );
+                savePublicKeyRing( keyData.getManHostId(), SecurityKeyType.PeerKey.getId(),      peerPubRing );
+                savePublicKeyRing( getOwnerKeyIdx(),       SecurityKeyType.PeerOwnerKey.getId(), ownerPeerPubRing);
+
+                //************************************************************
+                setKeyTrust( ownerPeerFPrint, peerId, KeyTrustLevel.Full.getId() );
+                //************************************************************
             }
         }
         catch ( Exception ex )
@@ -144,7 +154,7 @@ public class KeyManagerImpl implements KeyManager
      *
      */
     @Override
-    public void removeKeyTrust(String sourceId)
+    public void removeKeyTrust( String sourceId )
     {
         try
         {
@@ -178,7 +188,7 @@ public class KeyManagerImpl implements KeyManager
      *
      */
     @Override
-    public void saveSecretKeyRing( String hostId, short type, PGPSecretKeyRing secretKeyRing )
+    public void saveSecretKeyRing( String hostId, int type, PGPSecretKeyRing secretKeyRing )
     {
         try
         {
@@ -207,7 +217,7 @@ public class KeyManagerImpl implements KeyManager
      *
      */
     @Override
-    public void savePublicKeyRing( String hostId, short type, String keyringAsASCII )
+    public void savePublicKeyRing( String hostId, int type, String keyringAsASCII )
     {
         try
         {
@@ -229,7 +239,7 @@ public class KeyManagerImpl implements KeyManager
      *
      */
     @Override
-    public void savePublicKeyRing( String hostId, short type, PGPPublicKeyRing publicKeyRing )
+    public void savePublicKeyRing( String hostId, int type, PGPPublicKeyRing publicKeyRing )
     {
         try
         {
@@ -638,7 +648,7 @@ public class KeyManagerImpl implements KeyManager
      *
      */
     @Override
-    public void saveKeyPair( String hostId, short type, KeyPair keyPair )
+    public void saveKeyPair( String hostId, int type, KeyPair keyPair )
     {
         try
         {

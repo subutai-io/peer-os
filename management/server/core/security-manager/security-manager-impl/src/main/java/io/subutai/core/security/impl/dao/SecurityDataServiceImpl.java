@@ -47,7 +47,7 @@ public class SecurityDataServiceImpl implements SecurityDataService
      *
      */
     @Override
-    public void saveKeyIdentityData( final String hostId, final String sKeyId, final String pKeyId, final short type )
+    public void saveKeyIdentityData( final String hostId, final String sKeyId, final String pKeyId, final int type )
     {
         try
         {
@@ -126,7 +126,7 @@ public class SecurityDataServiceImpl implements SecurityDataService
      *
      */
     @Override
-    public void saveSecretKeyData( String fingerprint, byte[] data, String pwd, short type )
+    public void saveSecretKeyData( String fingerprint, byte[] data, String pwd, int type )
     {
         try
         {

@@ -95,6 +95,8 @@ import io.subutai.common.quota.RamQuota;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.crypto.pgp.KeyPair;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
+import io.subutai.common.security.objects.KeyTrustLevel;
+import io.subutai.common.security.objects.SecurityKeyType;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.ExceptionUtil;
@@ -1741,19 +1743,23 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             KeyPair keyPair = keyManager.generateKeyPair( pairId, false );
 
 
-            //**********************************************************************************
+            //******Create PEK *****************************************************************
             PGPSecretKeyRing secRing = PGPKeyUtil.readSecretKeyRing( keyPair.getSecKeyring() );
             PGPPublicKeyRing pubRing = PGPKeyUtil.readPublicKeyRing( keyPair.getPubKeyring() );
             PGPSecretKeyRing peerSecRing = keyManager.getSecretKeyRing( null );
 
-            //************Sign Key **************************************************************
+            String PEKfingerprint  = PGPKeyUtil.getFingerprint( pubRing.getPublicKey().getFingerprint());
+            String peerfingerprint = PGPKeyUtil.getFingerprint( peerSecRing.getPublicKey().getFingerprint());
+
+            //************Sign Key/Create Trust*************************************************
             pubRing = encTool.signPublicKey( pubRing, getId(), peerSecRing.getSecretKey(), "" );
+            keyManager.setKeyTrust(peerfingerprint ,PEKfingerprint, KeyTrustLevel.Full.getId() );
 
             //***************Save Keys *********************************************************
-            keyManager.saveSecretKeyRing( pairId, ( short ) 2, secRing );
-            keyManager.savePublicKeyRing( pairId, ( short ) 2, pubRing );
+            keyManager.saveSecretKeyRing( pairId, SecurityKeyType.PeerEnvironmentKey.getId(), secRing );
+            keyManager.savePublicKeyRing( pairId, SecurityKeyType.PeerEnvironmentKey.getId(), pubRing );
 
-            return new PublicKeyContainer( getId(), pubRing.getPublicKey().getFingerprint(),
+            return new PublicKeyContainer( getId(),pubRing.getPublicKey().getFingerprint(),
                     encTool.armorByteArrayToString( pubRing.getEncoded() ) );
         }
         catch ( IOException | PGPException ex )
