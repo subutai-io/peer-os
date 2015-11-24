@@ -61,6 +61,22 @@ When the user click on the button: OK
 Then the user observe header: Success!
 And the user observe text: You successfully grow environment.
 
+Scenario: Destroy Environment and Blueprint
+Given the first user is on the home page of Subutai
+When the user click on the menu item: Environment
+And the user click on the menu item: Blueprint
+And the user click on the icon: Remove
+Then the user observe popup: Are you sure?
+When the user click on the button: Delete
+Then the user observe header: Deleted!
+When the user click on the button: OK
+And the user click on the menu item: Environments
+And the user click on the icon: Destroy
+Then the user observe popup: Are you sure?
+When the user click on the button: Delete
+Then the user observe text: Your environment start deleting!
+When the user click on the button: OK
+Then the user observe text: Your environment has been destroyed.
 
 
 

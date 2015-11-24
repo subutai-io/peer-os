@@ -118,6 +118,9 @@ public class SubutaiPage extends PageObject {
     @FindBy(xpath = "*//td[@class=\"b-main-table__controls\"]//a[@class=\"b-icon b-icon_grow\"]")
     public WebElementFacade iconGrow;
 
+    @FindBy(xpath = "*//td[@class=\"b-main-table__controls\"]//a[@class=\"b-icon b-icon_remove\"]")
+    public WebElementFacade iconRemove;
+
     @FindBy(ngModel = "blueprintsBuildCtrl.environmentToGrow")
     public WebElementFacade selectEnvironment;
 
@@ -126,6 +129,24 @@ public class SubutaiPage extends PageObject {
 
     @FindBy(xpath = "*//div[@class=\"sweet-alert showSweetAlert visible\"]//p[contains(text(), \"You successfully grow environment.\")]")
     public WebElementFacade textYouSuccessfullyGrowEnvironment;
+
+    @FindBy(xpath = "*//div[@class=\"sweet-alert showSweetAlert visible\"]//h2[contains(text(), \"Are you sure?\")]")
+    public WebElementFacade popupAreYouSure;
+
+    @FindBy(xpath = "*//div[@class=\"sweet-alert showSweetAlert visible\"]//button[@class=\"confirm\"]")
+    public WebElementFacade buttonDeleteConfirm;
+
+    @FindBy(xpath = "*//div[@class=\"sweet-alert showSweetAlert visible\"]//h2[contains(text(), \"Deleted!\")]")
+    public WebElementFacade headerBlueprintDeleted;
+
+    @FindBy(xpath = "*//div[@class=\"sweet-alert showSweetAlert visible\"]//p[contains(text(), \"Your environment start deleting!\")]")
+    public WebElementFacade textYourEnvironmentStartDeleting;
+
+    @FindBy(xpath = "*//div[@class=\"sweet-alert showSweetAlert visible\"]//p[contains(text(), \"Your environment has been destroyed.\")]")
+    public WebElementFacade textYourEnvironmentHasBeenDestroyed;
+
+    @FindBy(xpath = "*//a[@class=\"b-icon b-icon_remove\"]")
+    public WebElementFacade iconDestroy;
 
     //---------------------------------------------------------------------
 
@@ -139,5 +160,9 @@ public class SubutaiPage extends PageObject {
 
     public void waitTextYouSuccessfullyGrowEnvironment() {
         waitFor(textYouSuccessfullyGrowEnvironment);
+    }
+
+    public void waitTextYourEnvironmentHasBeenDestroyed(){
+        waitFor(textYourEnvironmentHasBeenDestroyed);
     }
 }

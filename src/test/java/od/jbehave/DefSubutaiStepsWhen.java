@@ -128,4 +128,19 @@ public class DefSubutaiStepsWhen {
     public void select_environment(){
         subutaiSteps.selectEnvironment(1);
     }
+
+    @When("the user click on the icon: Remove")
+    public void click_on_icon_remove(){
+        subutaiSteps.clickOnIconRemove();
+    }
+
+    @When("the user click on the button: Delete")
+    public void click_on_button_delete(){
+        subutaiSteps.clickOnButtonDeleteConfirm();
+    }
+
+    @When("the user click on the icon: Destroy")
+    public void click_on_icon_destroy(){
+        subutaiSteps.clickOnIconDestroy();
+    }
 }

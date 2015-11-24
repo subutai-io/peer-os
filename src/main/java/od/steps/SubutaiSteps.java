@@ -255,4 +255,44 @@ public class SubutaiSteps extends ScenarioSteps {
     public void waitTextYouSuccessfullyGrowEnvironment() {
         subutaiPage.waitTextYouSuccessfullyGrowEnvironment();
     }
+
+    @Step
+    public void clickOnIconRemove(){
+        subutaiPage.iconRemove.click();
+    }
+
+    @Step
+    public void clickOnButtonDeleteConfirm(){
+        subutaiPage.buttonDeleteConfirm.click();
+    }
+
+    @Step
+    public void seePopupAreYouSure(){
+        assertThat(subutaiPage.popupAreYouSure.isVisible(), is(true));
+    }
+
+    @Step
+    public void seeHeaderBlueprintDeleted(){
+        assertThat(subutaiPage.headerBlueprintDeleted.isVisible(), is(true));
+    }
+
+    @Step
+    public void seeTextYourEnvironmentStartDeleting(){
+        assertThat(subutaiPage.textYourEnvironmentStartDeleting.isVisible(), is(true));
+    }
+
+    @Step
+    public void seeTextYourEnvironmentHasBeenDestroyed(){
+        assertThat(subutaiPage.textYourEnvironmentHasBeenDestroyed.isVisible(), is(true));
+    }
+
+    @Step
+    public void waitTextYourEnvironmentHasBeenDestroyed(){
+        subutaiPage.waitTextYourEnvironmentHasBeenDestroyed();
+    }
+
+    @Step
+    public void clickOnIconDestroy(){
+        subutaiPage.iconDestroy.click();
+    }
 }

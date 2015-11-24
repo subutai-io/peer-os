@@ -83,4 +83,25 @@ public class DefSubutaiStepsThen {
         subutaiSteps.waitTextYouSuccessfullyGrowEnvironment();
         subutaiSteps.seeTextYouSuccessfullyGrowEnvironment();
     }
+
+    @Then("the user observe popup: Are you sure?")
+    public void see_popup_are_sure_yes(){
+        subutaiSteps.seePopupAreYouSure();
+    }
+
+    @Then("the user observe header: Deleted!")
+    public void see_header_blueprint_deleted(){
+        subutaiSteps.seeHeaderBlueprintDeleted();
+    }
+
+    @Then("the user observe text: Your environment start deleting!")
+    public void see_text_your_environment_start_deleting(){
+        subutaiSteps.seeTextYourEnvironmentStartDeleting();
+    }
+
+    @Then("the user observe text: Your environment has been destroyed.")
+    public void see_text_your_environment_has_been_destroyed(){
+        subutaiSteps.waitTextYourEnvironmentHasBeenDestroyed();
+        subutaiSteps.seeTextYourEnvironmentHasBeenDestroyed();
+    }
 }
