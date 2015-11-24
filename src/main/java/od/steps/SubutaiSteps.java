@@ -225,4 +225,34 @@ public class SubutaiSteps extends ScenarioSteps {
     public void waitTextYourEnvironmentHasBeenCreated() {
         subutaiPage.waitTextYourEnvironmentHasBeenCreated();
     }
+
+    @Step
+    public void clickOnIconGrow(){
+        subutaiPage.iconGrow.click();
+    }
+
+    @Step
+    public void seeSelectorEnvironment() {
+        assertThat(subutaiPage.selectEnvironment.isVisible(), is(true));
+    }
+
+    @Step
+    public void selectEnvironment(int index){
+        subutaiPage.selectEnvironment.selectByIndex(index);
+    }
+
+    @Step
+    public void seeTextYourEnvironmentStartGrowing(){
+        assertThat(subutaiPage.textYourEnvironmentStartGrowing.isVisible(), is(true));
+    }
+
+    @Step
+    public void seeTextYouSuccessfullyGrowEnvironment(){
+        assertThat(subutaiPage.textYouSuccessfullyGrowEnvironment.isVisible(), is(true));
+    }
+
+    @Step
+    public void waitTextYouSuccessfullyGrowEnvironment() {
+        subutaiPage.waitTextYouSuccessfullyGrowEnvironment();
+    }
 }

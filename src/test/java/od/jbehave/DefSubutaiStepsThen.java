@@ -67,4 +67,20 @@ public class DefSubutaiStepsThen {
         subutaiSteps.waitTextYourEnvironmentHasBeenCreated();
         subutaiSteps.seeTextYourEnvironmentHasBeenCreated();
     }
+
+    @Then("the user observe selector: Environment")
+    public void see_selector_environment(){
+        subutaiSteps.seeSelectorEnvironment();
+    }
+
+    @Then("the user observe text: Your environment start growing.")
+    public void see_text_your_environment_start_growing(){
+        subutaiSteps.seeTextYourEnvironmentStartGrowing();
+    }
+
+    @Then("the user observe text: You successfully grow environment.")
+    public void see_you_successfully_grow_environment(){
+        subutaiSteps.waitTextYouSuccessfullyGrowEnvironment();
+        subutaiSteps.seeTextYouSuccessfullyGrowEnvironment();
+    }
 }

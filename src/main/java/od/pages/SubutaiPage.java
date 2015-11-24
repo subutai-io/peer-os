@@ -88,10 +88,10 @@ public class SubutaiPage extends PageObject {
     @FindBy(id = "subt_link__environment-build-list")
     public WebElementFacade linkEnvironmentBuildList;
 
-    @FindBy(xpath = "*//select[@ng-model=\"nodeGroup.peer\"]")
+    @FindBy(ngModel = "nodeGroup.peer")
     public WebElementFacade selectPeer;
 
-    @FindBy(xpath = "*//select[@ng-model=\"nodeGroup.strategyId\"]")
+    @FindBy(ngModel = "nodeGroup.strategyId")
     public WebElementFacade selectStrategie;
 
     @FindBy(xpath = "*//span[@class=\"b-icon__inner-num ng-binding\" and contains(text(), \"2\")]")
@@ -115,6 +115,18 @@ public class SubutaiPage extends PageObject {
     @FindBy(xpath = "*//div[@class=\"sweet-alert showSweetAlert visible\"]//p[contains(text(), \"Your environment has been created.\")]")
     public WebElementFacade textYourEnvironmentHasBeenCreated;
 
+    @FindBy(xpath = "*//td[@class=\"b-main-table__controls\"]//a[@class=\"b-icon b-icon_grow\"]")
+    public WebElementFacade iconGrow;
+
+    @FindBy(ngModel = "blueprintsBuildCtrl.environmentToGrow")
+    public WebElementFacade selectEnvironment;
+
+    @FindBy(xpath = "*//div[@class=\"sweet-alert showSweetAlert visible\"]//p[contains(text(), \"Your environment start growing.\")]")
+    public WebElementFacade textYourEnvironmentStartGrowing;
+
+    @FindBy(xpath = "*//div[@class=\"sweet-alert showSweetAlert visible\"]//p[contains(text(), \"You successfully grow environment.\")]")
+    public WebElementFacade textYouSuccessfullyGrowEnvironment;
+
     //---------------------------------------------------------------------
 
     public void waitHeader2Success(){
@@ -123,5 +135,9 @@ public class SubutaiPage extends PageObject {
 
     public void waitTextYourEnvironmentHasBeenCreated() {
         waitFor(textYourEnvironmentHasBeenCreated);
+    }
+
+    public void waitTextYouSuccessfullyGrowEnvironment() {
+        waitFor(textYouSuccessfullyGrowEnvironment);
     }
 }

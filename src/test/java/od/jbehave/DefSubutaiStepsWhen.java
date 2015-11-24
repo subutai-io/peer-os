@@ -118,4 +118,14 @@ public class DefSubutaiStepsWhen {
     public void click_on_button_ok(){
         subutaiSteps.clickOnButtonOK();
     }
+
+    @When("the user click on the icon: Grow")
+    public void click_on_icon_grow(){
+        subutaiSteps.clickOnIconGrow();
+    }
+
+    @When("the user select environment: Local Environment")
+    public void select_environment(){
+        subutaiSteps.selectEnvironment(1);
+    }
 }
