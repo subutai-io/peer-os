@@ -1,18 +1,18 @@
-<div ng-controller="BlueprintsViewCtrl as blueprintsViewCtrl">
+<div ng-controller="BlueprintsViewCtrl as bvc">
 
 	<div class="b-workspace__header">
 		<a class="b-btn b-btn_green b-btn_header-button" 
 			href 
 			id="subt-button__create-blueprint-first" 
-			ng-show="blueprintsViewCtrl.blueprints.length > 0" 
-			ng-click="blueprintsViewCtrl.createBlueprintFrom()">
+			ng-show="bvc.blueprints.length > 0"
+			ng-click="bvc.createBlueprintFrom()">
 			<i class="fa fa-plus"></i> Create blueprint
 		</a>
 		<h1 class="b-title">Blueprint</h1>
 	</div>
 
 	<div class="b-workspace__content">
-		<div class="b-main-table-border" ng-show="blueprintsViewCtrl.blueprints.length > 0">
+		<div class="b-main-table-border" ng-show="bvc.blueprints.length > 0">
 			<table class="b-main-table b-main-table_with-header">
 				<tr>
 					<th></th>
@@ -20,42 +20,51 @@
 					<th>Node group</th>
 					<th></th>
 				</tr>
-				<tr ng-repeat = "(key, blueprint) in blueprintsViewCtrl.blueprints">
+				<tr ng-repeat = "(key, blueprint) in bvc.blueprints">
 					<td class="b-main-table__edit-icon">
 						<a href class="b-icon b-icon_edit" 
-							ng-click="blueprintsViewCtrl.createBlueprintFrom(key)">
+							ng-click="bvc.createBlueprintFrom(key)">
 						</a>
 					</td>
 					<td>{{ blueprint.name }}</td>
 					<td>
 						<span 
-							class="b-tags b-tags_{{ blueprintsViewCtrl.colors[nodeGroup.type] }}" 
-							ng-repeat="nodeGroup in blueprint.nodeGroups">
+							class="b-tags b-tags_{{ bvc.colors[nodeGroup.type] }}"
+							ng-repeat="nodeGroup in blueprint.nodeGroups" 
+							tooltips 
+							tooltip-content='Template: <b>{{ nodeGroup.templateName }}</b><br>Quota: <div class="b-quota-type-round b-quota-type-round_{{ bvc.colors[nodeGroup.type] }}"></div> <b>{{ nodeGroup.type }}</b>'>
 							{{ nodeGroup.name }}: {{ nodeGroup.numberOfContainers }}
+							<i class="fa fa-times" ng-click="bvc.removeNodeGroup( blueprint.id, nodeGroup.name )"></i>
 						</span>
 					</td>
 					<td class="b-main-table__controls">
 						<a ui-sref="blueprintsActions({ blueprintId: blueprint.id, action: 'build' })" 
-							class="b-icon b-icon_build">
+							class="b-icon b-icon_build" tooltips tooltip-title="Build">
 						</a>
-						<a ui-sref="blueprintsActions({ blueprintId: blueprint.id, action: 'grow' })" 
-							class="b-icon b-icon_grow">
+
+						<a ng-if="bvc.hasEnvironments" ui-sref="blueprintsActions({ blueprintId: blueprint.id, action: 'grow' })"
+							class="b-icon b-icon_grow" tooltips tooltip-title="Grow">
 						</a>
-						<a href class="b-icon b-icon_remove" 
-							ng-click="blueprintsViewCtrl.deleteBlueprint(blueprint.id, key)">
+
+						<a ng-if="!bvc.hasEnvironments" tooltips tooltip-title="Grow Disabled"
+							 class="b-icon b-icon_grow_disabled">
+						</a>
+
+						<a href class="b-icon b-icon_remove"
+							ng-click="bvc.deleteBlueprint(blueprint.id, key)">
 						</a>
 					</td>
 				</tr>
 			</table>
 		</div>
 
-		<div class="b-empty-list" ng-show="blueprintsViewCtrl.blueprints.length == 0">
+		<div class="b-empty-list" ng-show="bvc.blueprints.length == 0">
 			<div class="b-empty-list__text">
 				You don’t have any blueprints
 			</div>
 			<a class="b-btn b-btn_green" 
 			href 
-			ng-click="blueprintsViewCtrl.createBlueprintFrom()" 
+			ng-click="bvc.createBlueprintFrom()"
 			id="subt-button__create-blueprint-second">
 				<i class="fa fa-plus"></i> Create blueprint
 			</a>	

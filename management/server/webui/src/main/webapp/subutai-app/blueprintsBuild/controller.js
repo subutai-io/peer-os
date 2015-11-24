@@ -237,7 +237,7 @@ function BlueprintsBuildCtrl($scope, environmentService, SweetAlert, ngDialog, $
 		ngDialog.closeAll();
 		$location.path('/environments');
 
-		environmentService.buildBlueprint(encodeURI(postData)).success(function (data) {
+		environmentService.createEnvironment(encodeURI(postData)).success(function (data) {
 			SweetAlert.swal("Success!", "Your environment has been created.", "success");
 		}).error(function (error) {
 			SweetAlert.swal("ERROR!", 'Create environment error: ' + error.ERROR, "error");
@@ -256,7 +256,7 @@ function BlueprintsBuildCtrl($scope, environmentService, SweetAlert, ngDialog, $
 		ngDialog.closeAll();
 		$location.path('/environments');
 
-		environmentService.growBlueprint(vm.environmentToGrow, encodeURI(postData)).success(function (data) {
+		environmentService.growEnvironment(vm.environmentToGrow, encodeURI(postData)).success(function (data) {
 			SweetAlert.swal("Success!", "You successfully grow environment.", "success");
 		}).error(function (error) {
 			SweetAlert.swal("ERROR!", 'Grow environment error: ' + error.ERROR, "error");

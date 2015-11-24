@@ -10,9 +10,9 @@ angular.module('subutai.console.controller', [])
 		//terminalConfigurationProvider.config('vintage').startSoundUrl ='example/content/start.wav';
 	}]);
 
-ConsoleViewCtrl.$inject = ['$scope', 'consoleService'];
+ConsoleViewCtrl.$inject = ['$scope', 'consoleService', 'peerRegistrationService'];
 
-function ConsoleViewCtrl($scope, consoleService) {
+function ConsoleViewCtrl($scope, consoleService, peerRegistrationService) {
 
 	var vm = this;	
 	vm.currentType = 'peer';
@@ -22,7 +22,7 @@ function ConsoleViewCtrl($scope, consoleService) {
 	vm.containers = [];
 	vm.currentTab = '';
 
-	consoleService.getResourceHosts().success(function (data) {
+	peerRegistrationService.getResourceHosts().success(function (data) {
 		vm.hosts = data;
 	});
 

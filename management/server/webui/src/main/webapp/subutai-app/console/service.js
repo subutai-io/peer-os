@@ -3,35 +3,28 @@
 angular.module('subutai.console.service', [])
 	.factory('consoleService', consoleService);
 
-consoleService.$inject = ['$http'];
+consoleService.$inject = ['$http', 'environmentService'];
 
-function consoleService($http) {
-	var baseURL = serverUrl + 'command_ui/';
-	var resourceHostsURL = baseURL + 'resource_hosts/';
-	var environmentsURL = serverUrl + 'environments_ui/';	
+function consoleService($http, environmentService) {
+	var BASE_URL = SERVER_URL + 'rest/ui/commands/';
 
 	var consoleService = {
-		getResourceHosts: getResourceHosts,
 		getEnvironments: getEnvironments,
-		sendCommand: sendCommand,
+		sendCommand: sendCommand
 	};
 
 	return consoleService;
 
 	// Implementation
 
-	function getResourceHosts() {
-		return $http.get(resourceHostsURL, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
-	}
-
 	function getEnvironments() {
-		return $http.get(environmentsURL, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
+		return environmentService.getEnvironments();
 	}
 
 	function sendCommand(cmd, peerId, path) {
 		var postData = 'command=' + cmd + '&hostId=' + peerId + '&path=' + path;
 		return $http.post(
-			baseURL, 
+			BASE_URL,
 			postData, 
 			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
 		);

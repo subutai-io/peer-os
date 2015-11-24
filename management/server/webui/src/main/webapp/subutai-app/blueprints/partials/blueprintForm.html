@@ -1,6 +1,6 @@
 <div class="b-popup">
 	<div class="b-popup__header">
-		Create blueprint
+		{{ cbl.actionName }} blueprint
 		<a href ng-click="closeThisDialog()">
 			<img src="assets/elements/buttons/b-icon-close.svg" class="b-icon g-right"/>
 		</a>
@@ -12,7 +12,7 @@
 				<input type="text" 
 					id="subt-input__blueprint-name" 
 					class="b-popup-body-input b-popup-body-input_name" 
-					ng-model="createBlueprintCtrl.blueprintFrom.name" required>
+					ng-model="cbl.blueprintFrom.name" required>
 				<div class="clear"></div>
 			</div>
 			<div class="b-popup-body__box b-popup-body__box_conf">
@@ -21,16 +21,16 @@
 					<input type="text" 
 						id="subt-input__blueprint-node-name" 
 						class="b-popup-body-input b-popup-body-input_box" 
-						ng-model="createBlueprintCtrl.blueprintFrom.currentNode.name" required>
+						ng-model="cbl.blueprintFrom.currentNode.name" required>
 					<div class="clear"></div>
 				</div>
 				<div class="popup-body-box">
 					<label class="b-popup-body-label">Select template</label>
 					<select class="b-popup-body-input b-popup-body-input_box" 
 						id="subt-select__blueprint-template" 
-						ng-model="createBlueprintCtrl.blueprintFrom.currentNode.templateName"
+						ng-model="cbl.blueprintFrom.currentNode.templateName"
 					>
-						<option ng-repeat="template in createBlueprintCtrl.templates" value="{{ template }}">
+						<option ng-repeat="template in cbl.templates" value="{{ template }}">
 							{{ template }}
 						</option>
 					</select>
@@ -41,7 +41,7 @@
 					<input type="number" 
 						id="subt-input__blueprint-number-of-containers" 
 						class="b-popup-body-input b-popup-body-input_box" 
-						ng-model="createBlueprintCtrl.blueprintFrom.currentNode.numberOfContainers" required>
+						ng-model="cbl.blueprintFrom.currentNode.numberOfContainers" required>
 					<div class="clear"></div>
 				</div>
 				<div class="popup-body-box">
@@ -49,7 +49,7 @@
 					<input type="number" 
 						id="subt-input__blueprint-ssh-group-id" 
 						class="b-popup-body-input b-popup-body-input_box" 
-						ng-model="createBlueprintCtrl.blueprintFrom.currentNode.sshGroupId" required>
+						ng-model="cbl.blueprintFrom.currentNode.sshGroupId" required>
 					<div class="clear"></div>
 				</div>
 				<div class="popup-body-box">
@@ -57,16 +57,16 @@
 					<input type="number" 
 						id="subt-input__blueprint-host-group-id" 
 						class="b-popup-body-input b-popup-body-input_box" 
-						ng-model="createBlueprintCtrl.blueprintFrom.currentNode.hostsGroupId" required>
+						ng-model="cbl.blueprintFrom.currentNode.hostsGroupId" required>
 					<div class="clear"></div>
 				</div>
 				<div class="popup-body-box">
 					<label class="b-popup-body-label">Select quota size</label>
 					<select class="b-popup-body-input b-popup-body-input_box" 
 						id="subt-select__blueprint-quota-size" 
-						ng-model="createBlueprintCtrl.blueprintFrom.currentNode.type"
+						ng-model="cbl.blueprintFrom.currentNode.type"
 					>
-						<option ng-repeat="type in createBlueprintCtrl.containersType" value="{{ type }}">
+						<option ng-repeat="type in cbl.containersType" value="{{ type }}">
 							{{ type }}
 						</option>
 					</select>
@@ -76,9 +76,9 @@
 					<a href 
 					id="subt_button__blueprint-add-to-node-list" 
 					class="b-btn b-btn_blue g-right" 
-					ng-click="createBlueprintCtrl.addNewNode()" 
+					ng-click="cbl.addNewNode()"
 					id="subt-button__blueprint-add-node">
-						{{ createBlueprintCtrl.nodeStatus }} node list &rarr;
+						{{ cbl.nodeStatus }} node list &rarr;
 					</a>
 					<div class="clear"></div>
 				</div>
@@ -89,10 +89,12 @@
 						Node list
 					</div>
 					<ul class="b-popup-box__node-list">
-						<li ng-repeat="(key, blueprintNode) in createBlueprintCtrl.nodeList" 
-							class="b-popup-box-node-list subt_button__blueprint-node-list-item" 
-							ng-click="createBlueprintCtrl.setNodeData(key)">
-							<i class="fa fa-cube"></i> {{ blueprintNode.name }}
+						<li ng-repeat="(key, blueprintNode) in cbl.nodeList"
+							class="subt_button__blueprint-node-list-item
+							b-tags b-tags_{{ cbl.colors[blueprintNode.type] }}"
+							ng-click="cbl.setNodeData(key)">
+							<i class="fa fa-cube"></i> {{ blueprintNode.name }}: {{ blueprintNode.numberOfContainers }}
+							<i class="fa fa-times" ng-click="cbl.removeNodeGroup( blueprintNode.name )"></i>
 						</li>
 					</ul>
 				</div>
@@ -103,8 +105,8 @@
 		<button type="button" 
 			class="b-btn b-btn_green g-right" 
 			id="subt_button__blueprint-create" 
-			ng-click="createBlueprintCtrl.addBlueprint()">
-			Create
+			ng-click="cbl.addBlueprint()">
+			{{ cbl.actionName }}
 		</button>
 		<div class="clear"></div>
 	</div>
