@@ -217,7 +217,7 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
      *
      * @return - quota in mb
      */
-    public int getAvailableRamQuota( ContainerHost host ) throws PeerException;
+    public RamQuota getAvailableRamQuota( ContainerHost host ) throws PeerException;
 
     /**
      * Returns available CPU quota on container in percent
@@ -226,7 +226,7 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
      *
      * @return - cpu quota on container in percent
      */
-    public int getAvailableCpuQuota( ContainerHost host ) throws PeerException;
+    public CpuQuota getAvailableCpuQuota( ContainerHost host ) throws PeerException;
 
     /**
      * Returns available disk quota
@@ -245,7 +245,7 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
      *
      * @return - quota in mb
      */
-    public int getRamQuota( ContainerHost host ) throws PeerException;
+//    public Quota getRamQuota( ContainerHost host ) throws PeerException;
 
 
     /**
@@ -255,7 +255,7 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
      *
      * @return - MemoryQuotaInfo with quota details
      */
-    public RamQuota getRamQuotaInfo( ContainerHost host ) throws PeerException;
+    public RamQuota getRamQuota( ContainerHost host ) throws PeerException;
 
 
     /**
@@ -274,7 +274,7 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
      *
      * @return - cpu quota on container in percent
      */
-    public int getCpuQuota( ContainerHost host ) throws PeerException;
+//    public int getCpuQuota( ContainerHost host ) throws PeerException;
 
 
     /**
@@ -284,7 +284,7 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
      *
      * @return - cpu quota object on container
      */
-    public CpuQuota getCpuQuotaInfo( ContainerHost host ) throws PeerException;
+    public CpuQuota getCpuQuota( ContainerHost host ) throws PeerException;
 
 
     /**
@@ -405,5 +405,6 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
     void removeEnvironmentKeyPair( EnvironmentId environmentId ) throws PeerException;
 
     ResourceHostMetrics getResourceHostMetrics();
+
 
 }

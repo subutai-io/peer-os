@@ -12,6 +12,8 @@ import io.subutai.common.host.HostId;
  */
 public class ContainerId extends HostId
 {
+    @JsonProperty( "hostName" )
+    private String hostName;
     @JsonProperty( "peerId" )
     private PeerId peerId;
     @JsonProperty( "environmentId" )
@@ -25,12 +27,20 @@ public class ContainerId extends HostId
 
 
     @JsonCreator()
-    public ContainerId( @JsonProperty( "id" ) final String id, @JsonProperty( "peerId" ) final PeerId peerId,
+    public ContainerId( @JsonProperty( "id" ) final String id, @JsonProperty( "hostName" ) final String hostName,
+                        @JsonProperty( "peerId" ) final PeerId peerId,
                         @JsonProperty( "environmentId" ) final EnvironmentId environmentId )
     {
         super( id );
+        this.hostName = hostName;
         this.peerId = peerId;
         this.environmentId = environmentId;
+    }
+
+
+    public String getHostName()
+    {
+        return hostName;
     }
 
 
