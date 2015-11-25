@@ -138,7 +138,7 @@ public class KeyServerImpl implements KeyServer
     {
         PublicKeyStore securityKey = SecurityKeyUtil.convert( publicRing );
 
-        keyServerDAO.save( securityKey );
+        keyServerDAO.update ( securityKey );
     }
 
 

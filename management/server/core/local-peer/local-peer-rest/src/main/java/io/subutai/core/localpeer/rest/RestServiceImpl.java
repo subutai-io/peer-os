@@ -509,7 +509,7 @@ public class RestServiceImpl implements RestService
 
         try
         {
-            return localPeer.createEnvironmentKeyPair( environmentId );
+            return localPeer.createPeerEnvironmentKeyPair( environmentId );
         }
         catch ( Exception ex )
         {
@@ -523,7 +523,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            localPeer.removeEnvironmentKeyPair( environmentId );
+            localPeer.removePeerEnvironmentKeyPair( environmentId );
         }
         catch ( Exception e )
         {

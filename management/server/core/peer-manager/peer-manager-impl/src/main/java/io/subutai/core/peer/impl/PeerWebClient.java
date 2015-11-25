@@ -194,7 +194,7 @@ public class PeerWebClient
     }
 
 
-    public void removeEnvironmentKeyPair( final EnvironmentId environmentId ) throws PeerException
+    public void removePeerEnvironmentKeyPair( final EnvironmentId environmentId ) throws PeerException
     {
         Preconditions.checkNotNull( environmentId );
 

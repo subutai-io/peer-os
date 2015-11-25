@@ -31,6 +31,7 @@ import io.subutai.common.security.objects.SecurityKeyType;
 import io.subutai.common.settings.ChannelSettings;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.keyserver.api.KeyServer;
+import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.security.api.dao.SecurityDataService;
 import io.subutai.core.security.api.model.SecurityKeyIdentity;
@@ -47,6 +48,7 @@ public class KeyManagerImpl implements KeyManager
     private SecurityDataService securityDataService = null;
     private KeyServer keyServer = null;
     private SecurityKeyData keyData = null;
+    private EncryptionTool encryptionTool = null;
 
 
     /* *****************************
@@ -58,7 +60,8 @@ public class KeyManagerImpl implements KeyManager
         this.keyData = securityKeyData;
         this.securityDataService = securityDataService;
         this.keyServer = keyServer;
-        // Create Key Identity Record , save Public key in the KeyStore.
+        encryptionTool = this.keyData.getEncryptionTool();
+
         init();
     }
 
@@ -130,6 +133,18 @@ public class KeyManagerImpl implements KeyManager
     public String getOwnerId()
     {
         return PGPKeyUtil.getFingerprint( getPublicKey( getOwnerKeyIdx() ).getFingerprint() );
+    }
+
+
+    /* ***************************************************************
+     *
+     */
+    @Override
+    public void signKey( PGPSecretKeyRing sourceSecRing, PGPPublicKeyRing targetPubRing, int trustLevel )
+    {
+        targetPubRing = encryptionTool.signPublicKey( targetPubRing, "", sourceSecRing.getSecretKey(),
+            "" );
+        savePublicKeyRing( pairId, SecurityKeyType.PeerEnvironmentKey.getId(), targetPubRing );
     }
 
 
