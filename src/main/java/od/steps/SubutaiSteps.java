@@ -4,6 +4,7 @@ import net.thucydides.core.annotations.Step;
 import net.thucydides.core.steps.ScenarioSteps;
 import od.pages.ReaderFromFile;
 import od.pages.SubutaiPage;
+import org.openqa.selenium.Keys;
 
 import java.io.FileNotFoundException;
 
@@ -26,17 +27,18 @@ public class SubutaiSteps extends ScenarioSteps {
     @Step
     public void clickOnButtonLogin(){
         subutaiPage.buttonLogin.click();
+        waitABit(5000);
     }
 
     @Step
     public void open_mng_h1() throws FileNotFoundException {
-        subutaiPage.setDefaultBaseUrl(String.format("http://%s:8181/", ReaderFromFile.readDataFromFile("src/test/resources/parameters/mng_h1")));
+        subutaiPage.setDefaultBaseUrl(String.format("https://%s:8443/", ReaderFromFile.readDataFromFile("src/test/resources/parameters/mng_h1")));
         subutaiPage.open();
     }
 
     @Step
     public void open_mng_h2() throws FileNotFoundException {
-        subutaiPage.setDefaultBaseUrl(String.format("http://%s:8181/", ReaderFromFile.readDataFromFile("src/test/resources/parameters/mng_h2")));
+        subutaiPage.setDefaultBaseUrl(String.format("https://%s:8443/", ReaderFromFile.readDataFromFile("src/test/resources/parameters/mng_h2")));
         subutaiPage.open();
     }
 
@@ -419,5 +421,26 @@ public class SubutaiSteps extends ScenarioSteps {
     @Step
     public void seeTextNoDataAvailableInTable(){
         assertThat(subutaiPage.textNoDataAvailableInTable.isVisible(), is(true));
+    }
+
+    @Step
+    public void clickLinkConsole(){
+        subutaiPage.linkConsole.click();
+        waitABit(3000);
+    }
+
+    @Step
+    public void enterCommand(String command){
+        waitABit(5000);
+        subutaiPage.inputCommandLine.click();
+        subutaiPage.inputCommandLine.type(command);
+        subutaiPage.inputCommandLine.sendKeys(Keys.ENTER);
+        waitABit(5000);
+    }
+
+    @Step
+    public void selectPeerConsole(int index){
+        subutaiPage.selectPeerConsole.selectByIndex(index);
+        waitABit(3000);
     }
 }

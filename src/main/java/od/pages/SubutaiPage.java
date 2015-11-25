@@ -185,6 +185,15 @@ public class SubutaiPage extends PageObject {
     @FindBy(xpath = "*//td[@class=\"dataTables_empty\" and contains(text(), \"No data available in table\")]")
     public WebElementFacade textNoDataAvailableInTable;
 
+    @FindBy(xpath = "*//input[@class=\"terminal-target ng-pristine ng-valid ng-touched\"]")
+    public WebElementFacade inputCommandLine;
+
+    @FindBy(id = "subt-link__console")
+    public WebElementFacade linkConsole;
+
+    @FindBy(xpath = "*//select[@class=\"b-popup-body-input ng-pristine ng-valid ng-touched\"]")
+    public WebElementFacade selectPeerConsole;
+
     //---------------------------------------------------------------------
 
     public void waitHeaderSuccess(){

@@ -201,4 +201,21 @@ public class DefSubutaiStepsWhen {
     public void click_on_button_confirm_unregister(){
         subutaiSteps.clickOnButtonConfirmUnregister();
     }
+
+
+
+    @When("the user click on the menu item: Console")
+    public void click_menu_item(){
+        subutaiSteps.clickLinkConsole();
+    }
+
+    @When("the user enter command: '$command'")
+    public void enter_command(String command){
+        subutaiSteps.enterCommand(command);
+    }
+
+    @When("the user select peer console: Two")
+    public void select_peer_console(){
+        subutaiSteps.selectPeerConsole(2);
+    }
 }
