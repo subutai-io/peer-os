@@ -41,6 +41,11 @@ public interface RestTemplateManager
                           @QueryParam( VERSION_PARAM ) String version,
                           @QueryParam( TYPE_PARAM ) String type
     );
+    
+    @GET
+    @Path( "{repository}" )
+    @Produces( MediaType.TEXT_PLAIN )
+    Response getTemplateList( @PathParam( "repository" ) String repository );
 
 
     @POST

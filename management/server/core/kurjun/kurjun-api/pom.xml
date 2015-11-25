@@ -11,6 +11,20 @@
     <description>Subutai Kurjun Api</description>
     <packaging>bundle</packaging>
     
+    <dependencies>
+        
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>subutai-common</artifactId>
+        </dependency>
+        
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+        </dependency>
+
+    </dependencies> 
+    
     <build>
         <plugins>
             <plugin>
@@ -26,6 +40,10 @@
                         <Export-Package>
                             {local-packages};version=${project.version};-noimport:=true
                         </Export-Package>
+                        
+                        <Import-Package>
+                            io.subutai.*, com.google.gson*, !*
+                        </Import-Package>
                     </instructions>
                 </configuration>
             </plugin>

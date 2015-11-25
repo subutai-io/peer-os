@@ -16,10 +16,10 @@
     <dependencies>
           
           
-        <!--          <dependency>
+        <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>subutai-common</artifactId>
-        </dependency>-->
+            <artifactId>peer-manager-api</artifactId>
+        </dependency>
         
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -102,7 +102,7 @@
                         <Embed-Transitive>true</Embed-Transitive>
                         
                         <Import-Package>
-                            io.subutai.core.kurjun.api, org.apache.commons.codec*, org.apache.commons.logging*, org.apache.commons.io,
+                            io.subutai.*, org.apache.commons.codec*, org.apache.commons.logging*, org.apache.commons.io,
                             org.apache.commons.lang*, org.apache.commons.lang3*, com.google.commons*, com.google.common*, 
                             com.google.gson*, org.slf4j, org.apache.cxf.jaxrs*, javax.ws.rs*, !*
                         </Import-Package>

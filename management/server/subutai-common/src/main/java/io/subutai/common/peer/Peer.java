@@ -27,6 +27,7 @@ import io.subutai.common.quota.Quota;
 import io.subutai.common.quota.QuotaType;
 import io.subutai.common.quota.RamQuota;
 import io.subutai.common.security.PublicKeyContainer;
+import io.subutai.common.protocol.TemplateKurjun;
 
 
 /**
@@ -162,7 +163,7 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
     /**
      * Returns template by name
      */
-    public Template getTemplate( String templateName ) throws PeerException;
+    public TemplateKurjun getTemplate( String templateName ) throws PeerException;
 
     /**
      * Returns true of the peer is reachable online, false otherwise

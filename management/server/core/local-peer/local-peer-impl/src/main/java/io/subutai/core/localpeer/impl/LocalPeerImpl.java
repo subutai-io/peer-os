@@ -105,6 +105,7 @@ import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.kurjun.api.TemplateManager;
+import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.core.localpeer.impl.command.CommandRequestListener;
 import io.subutai.core.localpeer.impl.container.CreateContainerWrapperTask;
 import io.subutai.core.localpeer.impl.container.CreateEnvironmentContainerGroupRequestListener;
@@ -127,6 +128,8 @@ import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.strategy.api.StrategyManager;
 import io.subutai.core.strategy.api.StrategyNotFoundException;
+
+import static io.subutai.core.kurjun.api.TemplateManager.PUBLIC_REPO;
 
 
 /**
@@ -1108,19 +1111,16 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public Template getTemplate( final String templateName )
+    public TemplateKurjun getTemplate( final String templateName )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
-
-//        return templateRegistry.getTemplate( templateName );
         try
         {
-            String templateInfo = templateManager.getTemplateInfo( "public", templateName, null );
-            LOG.debug( templateInfo );
+            return templateManager.getTemplate( PUBLIC_REPO, templateName, null );
         }
         catch ( IOException e )
         {
-            e.printStackTrace();
+            LOG.error( "Failed to get template '{}' from '{}' repository", templateName, PUBLIC_REPO, e);
         }
         return null;
     }
@@ -1981,7 +1981,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public Template getTemplateByName( final String name )
     {
-//        return templateRegistry.getTemplate( name );
+//        return templateRegistry.getTemplateData( name );
         return null;
     }
 

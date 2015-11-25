@@ -23,6 +23,7 @@ import ai.subut.kurjun.common.service.KurjunContext;
 import ai.subut.kurjun.common.service.KurjunProperties;
 import ai.subut.kurjun.index.PackagesIndexParserModule;
 import ai.subut.kurjun.metadata.common.DefaultMetadata;
+import ai.subut.kurjun.metadata.common.subutai.DefaultTemplate;
 import ai.subut.kurjun.metadata.factory.PackageMetadataStoreFactory;
 import ai.subut.kurjun.metadata.factory.PackageMetadataStoreModule;
 import ai.subut.kurjun.model.metadata.Metadata;
@@ -37,6 +38,8 @@ import ai.subut.kurjun.storage.factory.FileStoreFactory;
 import ai.subut.kurjun.storage.factory.FileStoreModule;
 import ai.subut.kurjun.subutai.SubutaiTemplateParserModule;
 import io.subutai.core.kurjun.api.TemplateManager;
+import io.subutai.common.protocol.TemplateKurjun;
+import org.apache.commons.codec.binary.Hex;
 
 
 public class TemplateManagerImpl implements TemplateManager
@@ -48,8 +51,8 @@ public class TemplateManagerImpl implements TemplateManager
 
     private Injector injector;
 
-    private Set<URL> remotes = new HashSet<>();
-
+    private final Set<URL> remoteRepoUrls = new HashSet<>();
+    
 
     public void init()
     {
@@ -59,6 +62,7 @@ public class TemplateManagerImpl implements TemplateManager
         KurjunProperties properties = injector.getInstance( KurjunProperties.class );
         setContexts( properties );
 
+        LOGGER.warn( "remoteRepoUrls = " + remoteRepoUrls );
     }
 
 
@@ -68,40 +72,43 @@ public class TemplateManagerImpl implements TemplateManager
 
 
     @Override
-    public String getTemplateInfo( String context, byte[] md5 ) throws IOException
+    public TemplateKurjun getTemplate( String context, byte[] md5 ) throws IOException
     {
         DefaultMetadata m = new DefaultMetadata();
         m.setMd5sum( md5 );
 
         UnifiedRepository repo = getRepository( context );
-        SerializableMetadata meta = repo.getPackageInfo( m );
+        DefaultTemplate meta = ( DefaultTemplate ) repo.getPackageInfo( m );
         if ( meta != null )
         {
-            return meta.serialize();
+            return new TemplateKurjun( Hex.encodeHexString( meta.getMd5Sum() ), meta.getName(), meta.getVersion(),
+                    meta.getArchitecture().name(), meta.getParent(), meta.getPackage() );
         }
         return null;
     }
 
 
     @Override
-    public String getTemplateInfo( String context, String name, String version ) throws IOException
+    public TemplateKurjun getTemplate( String context, String name, String version ) throws IOException
     {
         DefaultMetadata m = new DefaultMetadata();
         m.setName( name );
         m.setVersion( version );
-
+        
         UnifiedRepository repo = getRepository( context );
-        SerializableMetadata meta = repo.getPackageInfo( m );
+
+        DefaultTemplate meta = ( DefaultTemplate ) repo.getPackageInfo( m );
         if ( meta != null )
         {
-            return meta.serialize();
+            return new TemplateKurjun( Hex.encodeHexString( meta.getMd5Sum() ), meta.getName(), meta.getVersion(),
+                    meta.getArchitecture().name(), meta.getParent(), meta.getPackage() );
         }
         return null;
     }
 
 
     @Override
-    public InputStream getTemplate( String context, byte[] md5 ) throws IOException
+    public InputStream getTemplateData( String context, byte[] md5 ) throws IOException
     {
         DefaultMetadata m = new DefaultMetadata();
         m.setMd5sum( md5 );
@@ -112,15 +119,17 @@ public class TemplateManagerImpl implements TemplateManager
 
 
     @Override
-    public List<String> list( String context ) throws IOException
+    public List<TemplateKurjun> list( String context ) throws IOException
     {
         UnifiedRepository repo = getRepository( context );
         List<SerializableMetadata> items = repo.listPackages();
 
-        List<String> result = new LinkedList<>();
+        List<TemplateKurjun> result = new LinkedList<>();
         for ( SerializableMetadata item : items )
         {
-            result.add( item.serialize() );
+            DefaultTemplate meta = ( DefaultTemplate ) item;
+            result.add( new TemplateKurjun( Hex.encodeHexString( meta.getMd5Sum() ), meta.getName(), meta.getVersion(),
+                    meta.getArchitecture().name(), meta.getParent(), meta.getPackage() ) );
         }
         return result;
     }
@@ -163,7 +172,8 @@ public class TemplateManagerImpl implements TemplateManager
     @Override
     public void addRemoteRepository( URL url )
     {
-        remotes.add( url );
+        remoteRepoUrls.add( url );
+        LOGGER.info( "Remote host url is added: {}", url );
     }
 
 
@@ -206,9 +216,9 @@ public class TemplateManagerImpl implements TemplateManager
         RepositoryFactory repositoryFactory = injector.getInstance( RepositoryFactory.class );
         UnifiedRepository unifiedRepo = repositoryFactory.createUnifiedRepo();
         unifiedRepo.getRepositories().add( getLocalRepository( context ) );
-        for ( URL url : remotes )
+        for ( URL url : remoteRepoUrls )
         {
-            unifiedRepo.getRepositories().add( repositoryFactory.createNonLocalSnap( url.toString(), null ) );
+            unifiedRepo.getRepositories().add( repositoryFactory.createNonLocalTemplate( url.toString(), null ) );
         }
         return unifiedRepo;
     }
@@ -251,6 +261,4 @@ public class TemplateManagerImpl implements TemplateManager
         return null;
     }
 
-
 }
-

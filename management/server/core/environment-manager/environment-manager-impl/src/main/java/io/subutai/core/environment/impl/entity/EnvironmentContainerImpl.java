@@ -276,7 +276,9 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @Override
     public Template getTemplate() throws PeerException
     {
-        return getPeer().getTemplate( this.templateName );
+        // TODO : Kairat
+        // return getPeer().getTemplate( this.templateName );
+        return null;
     }
 
 

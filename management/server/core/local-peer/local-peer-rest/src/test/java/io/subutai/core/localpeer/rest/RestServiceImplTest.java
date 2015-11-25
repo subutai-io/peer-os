@@ -31,6 +31,7 @@ import io.subutai.common.quota.DiskQuota;
 import io.subutai.common.quota.RamQuota;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
+import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 
@@ -311,7 +312,7 @@ public class RestServiceImplTest
     @Test
     public void testGetTemplate() throws Exception
     {
-        Template template = mock( Template.class );
+        TemplateKurjun template = mock( TemplateKurjun.class );
 
         when( localPeer.getTemplate( TEMPLATE_NAME ) ).thenReturn( template );
 

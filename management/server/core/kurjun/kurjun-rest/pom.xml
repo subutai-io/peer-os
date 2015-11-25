@@ -20,14 +20,30 @@
         </dependency>
         
         <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>subutai-common</artifactId>
+        </dependency>
+        
+        <dependency>
             <groupId>ai.subut.kurjun</groupId>
             <artifactId>model</artifactId>
             <version>${ai.subut.kurjun.version}</version>
         </dependency>
         
         <dependency>
+            <groupId>ai.subut.kurjun</groupId>
+            <artifactId>metadata-common</artifactId>
+            <version>${ai.subut.kurjun.version}</version>
+        </dependency>
+        
+        <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxrs</artifactId>
+        </dependency>
+        
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
         </dependency>
 
     </dependencies> 
@@ -44,12 +60,13 @@
                         <Bundle-SymbolicName>${project.groupId}.core.kurjun.rest</Bundle-SymbolicName>
                         <Export-Package>{local-packages};version=${project.version};-noimport:=true</Export-Package>
                         <Embed-Dependency>
-                            commons-compress,model,geronimo-javamail_1.4_spec
+                            commons-compress, model, metadata-common, geronimo-javamail_1.4_spec
                         </Embed-Dependency>
                         <Embed-Transitive>true</Embed-Transitive>
                         
                         <Import-Package>
-                            io.subutai.core.kurjun.api, org.apache.commons.io, org.slf4j, org.apache.cxf.jaxrs*, javax.ws.rs*, !*
+                            io.subutai*, org.apache.commons.io, org.slf4j, org.apache.cxf.jaxrs*, 
+                            com.google.gson*, javax.ws.rs*, !*
                         </Import-Package>
                         
                     </instructions>

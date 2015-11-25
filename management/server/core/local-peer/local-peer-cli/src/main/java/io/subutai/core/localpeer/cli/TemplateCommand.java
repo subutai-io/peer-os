@@ -5,9 +5,8 @@ import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 
 import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.protocol.Template;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
-import io.subutai.core.peer.api.PeerManager;
+import io.subutai.common.protocol.TemplateKurjun;
 
 
 @Command( scope = "lp", name = "template" )
@@ -28,8 +27,8 @@ public class TemplateCommand extends SubutaiShellCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        Template templateInfo = localPeer.getTemplate( templateName );
-        System.out.println( "Template Info: " + templateInfo );
+        TemplateKurjun template = localPeer.getTemplate( templateName );
+        System.out.println( "Template: " + template.getName() + ", " + template.getVersion() + ", " + template.getArchitecture() );
         return null;
     }
 }

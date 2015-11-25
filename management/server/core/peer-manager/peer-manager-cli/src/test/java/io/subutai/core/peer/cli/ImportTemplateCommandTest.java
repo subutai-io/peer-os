@@ -47,7 +47,8 @@ public class ImportTemplateCommandTest extends SystemOutRedirectTest
         command.peerId = PEER_ID.toString();
         when( templateRegistry.getTemplate( anyString() ) ).thenReturn( template );
         when( peerManager.getPeer( PEER_ID ) ).thenReturn( peer );
-        when( peer.getTemplate( anyString() ) ).thenReturn( template );
+        //TODO: Kairat
+        //when( peer.getTemplate( anyString() ) ).thenReturn( template );
     }
 
 

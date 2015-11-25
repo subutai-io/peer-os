@@ -28,7 +28,6 @@ import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.protocol.N2NConfig;
-import io.subutai.common.protocol.Template;
 import io.subutai.common.quota.DiskPartition;
 import io.subutai.common.quota.DiskQuota;
 import io.subutai.common.quota.RamQuota;
@@ -36,12 +35,13 @@ import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.protocol.TemplateKurjun;
 
 
 public class RestServiceImpl implements RestService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( RestServiceImpl.class );
-    private LocalPeer localPeer;
+    private final LocalPeer localPeer;
     //    private Monitor monitor;
     protected JsonUtil jsonUtil = new JsonUtil();
     protected RestUtil restUtil = new RestUtil();
@@ -135,7 +135,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            Template result = localPeer.getTemplate( templateName );
+            TemplateKurjun result = localPeer.getTemplate( templateName );
             return Response.ok( jsonUtil.to( result ) ).build();
         }
         catch ( Exception e )

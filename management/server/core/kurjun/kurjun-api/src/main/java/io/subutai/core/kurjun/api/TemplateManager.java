@@ -1,6 +1,7 @@
 package io.subutai.core.kurjun.api;
 
 
+import io.subutai.common.protocol.TemplateKurjun;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -8,7 +9,7 @@ import java.util.List;
 
 
 /**
- * Template manager interface that wraps Kurjun repositories.
+ * TemplateKurjun manager interface that wraps Kurjun repositories.
  * <p>
  * This is the first version and further changes will be applied.
  *
@@ -16,6 +17,10 @@ import java.util.List;
 public interface TemplateManager
 {
 
+    /**
+     * Name of public repository (context)
+     */
+    public static final String PUBLIC_REPO = "public";
 
     /**
      * Gets template info.
@@ -25,7 +30,7 @@ public interface TemplateManager
      * @return JSON encoded meta data
      * @throws IOException
      */
-    String getTemplateInfo( String context, byte[] md5 ) throws IOException;
+    TemplateKurjun getTemplate( String context, byte[] md5 ) throws IOException;
 
 
     /**
@@ -37,8 +42,8 @@ public interface TemplateManager
      * @return JSON encoded meta data
      * @throws IOException
      */
-    String getTemplateInfo( String context, String name, String version ) throws IOException;
-
+    TemplateKurjun getTemplate( String context, String name, String version ) throws IOException;
+    
 
     /**
      * Gets template stream.
@@ -48,7 +53,7 @@ public interface TemplateManager
      * @return input stream to read package data
      * @throws IOException
      */
-    InputStream getTemplate( String context, byte[] md5 ) throws IOException;
+    InputStream getTemplateData( String context, byte[] md5 ) throws IOException;
 
 
     /**
@@ -58,7 +63,7 @@ public interface TemplateManager
      * @return list of JSON encoded meta data
      * @throws IOException
      */
-    List<String> list( String context ) throws IOException;
+    List<TemplateKurjun> list( String context ) throws IOException;
 
 
     /**
