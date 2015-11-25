@@ -178,5 +178,5 @@ public interface KeyManager
 
     SecurityKeyIdentity getKeyTrustTree( String hostId );
 
-    KeyTrustLevel getTrustLevel( String aHost, String bHost );
+    KeyTrustLevel getTrustLevel( String aHostId, String bHostId );
 }

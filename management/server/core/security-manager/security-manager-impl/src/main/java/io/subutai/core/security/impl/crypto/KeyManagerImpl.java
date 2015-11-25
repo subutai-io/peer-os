@@ -821,9 +821,52 @@ public class KeyManagerImpl implements KeyManager
 
 
     @Override
-    public KeyTrustLevel getTrustLevel( final String aHost, final String bHost )
+    public KeyTrustLevel getTrustLevel( final String aHostId, final String bHostId )
     {
-        return null;
+        String aFingerprint = getFingerprint( aHostId );
+        String bFingerprint = getFingerprint( bHostId );
+
+        if ( aFingerprint.equals( bFingerprint ) )
+        {
+            // ultimate trust exists if asked trust level for myself
+            return KeyTrustLevel.Ultimate;
+        }
+
+        Set<String> aTrustChain = Sets.newHashSet();
+        Set<String> bTrustChain = Sets.newHashSet();
+
+        constructTrustChain( aFingerprint, aTrustChain );
+        constructTrustChain( bFingerprint, bTrustChain );
+
+        if ( bTrustChain.contains( aFingerprint ) || aTrustChain.contains( aFingerprint ) )
+        {
+            return KeyTrustLevel.Full;
+        }
+        else
+        {
+            for ( final String fingerprint : aTrustChain )
+            {
+                if ( bTrustChain.contains( fingerprint ) )
+                {
+                    return KeyTrustLevel.Marginal;
+                }
+            }
+        }
+        return KeyTrustLevel.NO_TRUST;
+    }
+
+
+    private void constructTrustChain( String fingerprint, Set<String> chain )
+    {
+        chain.add( fingerprint );
+        List<SecurityKeyTrust> keyTrusts = securityDataService.getKeyTrustData( fingerprint );
+        for ( final SecurityKeyTrust keyTrust : keyTrusts )
+        {
+            if ( !chain.contains( keyTrust.getTargetId() ) )
+            {
+                constructTrustChain( keyTrust.getTargetId(), chain );
+            }
+        }
     }
 
 
