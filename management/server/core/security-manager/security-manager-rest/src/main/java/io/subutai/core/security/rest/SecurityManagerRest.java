@@ -79,6 +79,7 @@ public interface SecurityManagerRest
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response getKeyTrustTree( @QueryParam( "hostId" ) String hostId );
 
+
     /* *******************************
      *
      */
@@ -86,4 +87,15 @@ public interface SecurityManagerRest
     @Path( "keyman/revoke" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response revokeKey( String hostId );
+
+
+    /* *******************************
+     *
+     */
+    @POST
+    @Path( "keyman/signkey" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response signKey( @FormParam( "sourcehostid" ) final String sourceHostId,
+                             @FormParam( "keyText" ) final String keyText,
+                             @FormParam( "trustlevel" ) final int trustLevel );
 }

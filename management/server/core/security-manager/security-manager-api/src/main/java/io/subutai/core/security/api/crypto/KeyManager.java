@@ -60,37 +60,51 @@ public interface KeyManager
     /* *****************************
      *
      */
-    public PGPSecretKey getSecretKey( String hostId );
+    PGPSecretKey getSecretKey( String hostId );
 
 
     /* *****************************
      *
      */
-    public PGPPrivateKey getPrivateKey( String hostId );
+    PGPPrivateKey getPrivateKey( String hostId );
 
 
     /* *****************************
      *
      */
-    public PGPSecretKey getSecretKeyByFingerprint( String fingerprint );
+    PGPSecretKey getSecretKeyByFingerprint( String fingerprint );
 
 
     /* *****************************
      *
      */
-    public void savePublicKeyRing( String hostId, int type, String keyringAsASCII );
+    void savePublicKeyRing( String hostId, int type, String keyringAsASCII );
 
 
     /* *****************************
      *
      */
-    public void savePublicKeyRing( String hostId, int type, PGPPublicKeyRing publicKeyRing );
-
+    void savePublicKeyRing( String hostId, int type, PGPPublicKeyRing publicKeyRing );
 
 
     /* ***************************************************************
      *
      */
+    PGPPublicKeyRing signKey( PGPSecretKeyRing sourceSecRing, PGPPublicKeyRing targetPubRing, int trustLevel );
+
+    /* ***************************************************************
+     *
+     */
+    PGPPublicKeyRing signKey( String sourceHostId, String targetHostId, int trustLevel );
+
+    /* ***************************************************************
+     *
+     */
+    String signPublicKey( String sourceHostId, String keyText, int trustLevel );
+
+    /* ***************************************************************
+         *
+         */
     void setKeyTrust( String sourceId, String targetId, int trustLevel );
 
 
@@ -119,31 +133,31 @@ public interface KeyManager
     /* *****************************
      *
      */
-    public void saveSecretKeyRing( String hostId, int type, PGPSecretKeyRing publicKeyRing );
+     void saveSecretKeyRing( String hostId, int type, PGPSecretKeyRing publicKeyRing );
 
 
     /* *****************************
      *
      */
-    public void removePublicKeyRing( String hostId );
+    void removePublicKeyRing( String hostId );
 
 
     /* *****************************************
      * Removes SecretKeyRing from the Store
      */
-    public void removeSecretKeyRing( String hostId );
+    void removeSecretKeyRing( String hostId );
 
 
     /* *****************************************
      * Retrieves host key identity data
      */
-    public SecurityKeyIdentity getKeyIdentityData( String hostId );
+    SecurityKeyIdentity getKeyIdentityData( String hostId );
 
 
     /* *****************************************
      *
      */
-    public KeyPair generateKeyPair( String userId, boolean armored );
+    KeyPair generateKeyPair( String userId, boolean armored );
 
 
     /* *****************************************
@@ -176,7 +190,14 @@ public interface KeyManager
     public String getFingerprint( String hostId );
 
 
+    /* *****************************
+     *
+     */
     SecurityKeyIdentity getKeyTrustTree( String hostId );
 
-    KeyTrustLevel getTrustLevel( String aHostId, String bHostId );
+
+    /* *****************************
+     *
+     */
+    int getTrustLevel( String aHost, String bHost );
 }

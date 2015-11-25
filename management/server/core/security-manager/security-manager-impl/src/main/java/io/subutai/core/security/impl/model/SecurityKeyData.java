@@ -1,6 +1,9 @@
 package io.subutai.core.security.impl.model;
 
 
+import io.subutai.core.security.api.crypto.EncryptionTool;
+
+
 /**
  * KeyRing Data for ManagementHost
  */
@@ -13,6 +16,7 @@ public class SecurityKeyData
     private String manHostKeyFingerprint;
     private String ownerPublicKeyringFile;
     private Object jsonProvider;
+    private EncryptionTool encryptionTool;
 
 
     public String getPublicKeyringFile()
@@ -95,5 +99,17 @@ public class SecurityKeyData
     public void setJsonProvider( final Object jsonProvider )
     {
         this.jsonProvider = jsonProvider;
+    }
+
+
+    public EncryptionTool getEncryptionTool()
+    {
+        return encryptionTool;
+    }
+
+
+    public void setEncryptionTool( final EncryptionTool encryptionTool )
+    {
+        this.encryptionTool = encryptionTool;
     }
 }
