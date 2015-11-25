@@ -24,17 +24,10 @@ import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.EnvironmentId;
-import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.protocol.Template;
-import io.subutai.common.security.PublicKeyContainer;
-import io.subutai.common.util.JsonUtil;
-import io.subutai.common.util.RestUtil;
-import io.subutai.common.quota.DiskPartition;
-import io.subutai.common.quota.DiskQuota;
-import io.subutai.common.quota.RamQuota;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
@@ -140,8 +133,6 @@ public class RestServiceImpl implements RestService
         try
         {
             TemplateKurjun result = localPeer.getTemplate( templateName );
-            return Response.ok( jsonUtil.to( result ) ).build();
-            Template result = localPeer.getTemplate( templateName );
             return Response.ok( result ).build();
         }
         catch ( Exception e )
