@@ -1,6 +1,9 @@
 package io.subutai.core.security.api.model;
 
 
+import java.util.List;
+
+
 /**
  * Interface for SecurityData
  */
@@ -65,4 +68,10 @@ public interface SecurityKeyIdentity
      *
      */
     void setSecretKeyFingerprint( String secretKeyFingerprint );
+
+
+    List<SecurityKeyIdentity> getTrustedKeys();
+
+
+    void setTrustedKeys( final List<SecurityKeyIdentity> trustedKeys );
 }

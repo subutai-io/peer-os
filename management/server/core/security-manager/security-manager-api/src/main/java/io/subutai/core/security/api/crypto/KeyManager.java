@@ -2,6 +2,7 @@ package io.subutai.core.security.api.crypto;
 
 
 import java.io.InputStream;
+import java.util.List;
 
 import org.bouncycastle.openpgp.PGPPrivateKey;
 import org.bouncycastle.openpgp.PGPPublicKey;
@@ -10,6 +11,9 @@ import org.bouncycastle.openpgp.PGPSecretKey;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
 
 import io.subutai.common.security.crypto.pgp.KeyPair;
+import io.subutai.common.security.objects.KeyTrustLevel;
+import io.subutai.core.security.api.model.SecurityKeyIdentity;
+import io.subutai.core.security.api.model.SecurityKeyTrust;
 
 
 /**
@@ -89,6 +93,19 @@ public interface KeyManager
      */
     void setKeyTrust( String sourceId, String targetId, int trustLevel );
 
+
+    /* ***************************************************************
+     *
+     */
+    SecurityKeyTrust getKeyTrust( String sourceId, String targetId );
+
+
+    /* ***************************************************************
+     *
+     */
+    List<SecurityKeyTrust> getKeyTrust( String sourceId );
+
+
     /* ***************************************************************
      *
      */
@@ -115,6 +132,12 @@ public interface KeyManager
      * Removes SecretKeyRing from the Store
      */
     public void removeSecretKeyRing( String hostId );
+
+
+    /* *****************************************
+     * Retrieves host key identity data
+     */
+    public SecurityKeyIdentity getKeyIdentityData( String hostId );
 
 
     /* *****************************************
@@ -151,4 +174,9 @@ public interface KeyManager
      *
      */
     public String getFingerprint( String hostId );
+
+
+    SecurityKeyIdentity getKeyTrustTree( String hostId );
+
+    KeyTrustLevel getTrustLevel( String aHost, String bHost );
 }

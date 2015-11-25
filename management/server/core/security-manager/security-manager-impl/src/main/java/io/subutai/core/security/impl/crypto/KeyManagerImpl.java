@@ -4,7 +4,9 @@ package io.subutai.core.security.impl.crypto;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.security.AccessControlException;
+import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -21,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
 
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.security.crypto.pgp.KeyPair;
@@ -34,6 +37,7 @@ import io.subutai.core.keyserver.api.KeyServer;
 import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.security.api.dao.SecurityDataService;
 import io.subutai.core.security.api.model.SecurityKeyIdentity;
+import io.subutai.core.security.api.model.SecurityKeyTrust;
 import io.subutai.core.security.impl.model.SecurityKeyData;
 
 
@@ -73,8 +77,8 @@ public class KeyManagerImpl implements KeyManager
 
 
             InputStream ownerPubStream = PGPEncryptionUtil.getFileInputStream( keyData.getOwnerPublicKeyringFile() );
-            InputStream peerPubStream  = PGPEncryptionUtil.getFileInputStream( keyData.getPublicKeyringFile() );
-            InputStream peerSecStream  = PGPEncryptionUtil.getFileInputStream( keyData.getSecretKeyringFile() );
+            InputStream peerPubStream = PGPEncryptionUtil.getFileInputStream( keyData.getPublicKeyringFile() );
+            InputStream peerSecStream = PGPEncryptionUtil.getFileInputStream( keyData.getSecretKeyringFile() );
 
             if ( ownerPubStream == null || peerPubStream == null || peerSecStream == null )
             {
@@ -83,16 +87,17 @@ public class KeyManagerImpl implements KeyManager
             }
             else
             {
-                PGPPublicKeyRing peerPubRing      = PGPKeyUtil.readPublicKeyRing( peerPubStream );
+                PGPPublicKeyRing peerPubRing = PGPKeyUtil.readPublicKeyRing( peerPubStream );
                 PGPPublicKeyRing ownerPeerPubRing = PGPKeyUtil.readPublicKeyRing( ownerPubStream );
 
                 String peerId = PGPKeyUtil.getFingerprint( peerPubRing.getPublicKey().getFingerprint() );
                 String ownerPeerFPrint = PGPKeyUtil.getFingerprint( ownerPeerPubRing.getPublicKey().getFingerprint() );
 
                 keyData.setManHostId( peerId );
-                saveSecretKeyRing( keyData.getManHostId(), SecurityKeyType.PeerKey.getId(),      PGPKeyUtil.readSecretKeyRing( peerSecStream ) );
-                savePublicKeyRing( keyData.getManHostId(), SecurityKeyType.PeerKey.getId(),      peerPubRing );
-                savePublicKeyRing( getOwnerKeyIdx(),       SecurityKeyType.PeerOwnerKey.getId(), ownerPeerPubRing);
+                saveSecretKeyRing( keyData.getManHostId(), SecurityKeyType.PeerKey.getId(),
+                        PGPKeyUtil.readSecretKeyRing( peerSecStream ) );
+                savePublicKeyRing( keyData.getManHostId(), SecurityKeyType.PeerKey.getId(), peerPubRing );
+                savePublicKeyRing( getOwnerKeyIdx(), SecurityKeyType.PeerOwnerKey.getId(), ownerPeerPubRing );
 
                 //************************************************************
                 setKeyTrust( ownerPeerFPrint, peerId, KeyTrustLevel.Full.getId() );
@@ -141,12 +146,32 @@ public class KeyManagerImpl implements KeyManager
     {
         try
         {
-            securityDataService.saveKeyTrustData(sourceId, targetId, trustLevel  );
+            securityDataService.saveKeyTrustData( sourceId, targetId, trustLevel );
         }
-        catch(Exception ex)
+        catch ( Exception ex )
         {
-            LOG.error( " **** Error!!! Error creating key trust:" + ex.toString(),ex);
+            LOG.error( " **** Error!!! Error creating key trust:" + ex.toString(), ex );
         }
+    }
+
+
+    /* ***************************************************************
+     *
+     */
+    @Override
+    public SecurityKeyTrust getKeyTrust( final String sourceId, final String targetId )
+    {
+        return securityDataService.getKeyTrustData( sourceId, targetId );
+    }
+
+
+    /* ***************************************************************
+     *
+     */
+    @Override
+    public List<SecurityKeyTrust> getKeyTrust( final String sourceId )
+    {
+        return securityDataService.getKeyTrustData( sourceId );
     }
 
 
@@ -160,9 +185,9 @@ public class KeyManagerImpl implements KeyManager
         {
             securityDataService.removeKeyTrustData( sourceId );
         }
-        catch(Exception ex)
+        catch ( Exception ex )
         {
-            LOG.error( " **** Error!!! Error removing key trust:" + ex.toString(),ex);
+            LOG.error( " **** Error!!! Error removing key trust:" + ex.toString(), ex );
         }
     }
 
@@ -175,11 +200,11 @@ public class KeyManagerImpl implements KeyManager
     {
         try
         {
-            securityDataService.removeKeyTrustData( sourceId ,targetId );
+            securityDataService.removeKeyTrustData( sourceId, targetId );
         }
-        catch(Exception ex)
+        catch ( Exception ex )
         {
-            LOG.error( " **** Error!!! Error removing key trust:" + ex.toString(),ex);
+            LOG.error( " **** Error!!! Error removing key trust:" + ex.toString(), ex );
         }
     }
 
@@ -320,9 +345,29 @@ public class KeyManagerImpl implements KeyManager
     }
 
 
+    @Override
+    public SecurityKeyIdentity getKeyIdentityData( String hostId )
+    {
+        SecurityKeyIdentity keyIden = null;
+        try
+        {
+            if ( Strings.isNullOrEmpty( hostId ) )
+            {
+                hostId = keyData.getManHostId();
+            }
+            keyIden = securityDataService.getKeyIdentityData( hostId );
+        }
+        catch ( Exception ex )
+        {
+            LOG.error( "Error removing Secret key:" + ex.toString() );
+        }
+        return keyIden;
+    }
+
+
     /* *****************************
-     *
-     */
+         *
+         */
     @Override
     public PGPPublicKey getPublicKey( String hostId )
     {
@@ -468,8 +513,8 @@ public class KeyManagerImpl implements KeyManager
             else
             {
                 String fingerprint = keyIden.getSecretKeyFingerprint();
-                secretKeyRing = PGPKeyUtil.readSecretKeyRing(
-                        securityDataService.getSecretKeyData( fingerprint ).getData() );
+                secretKeyRing =
+                        PGPKeyUtil.readSecretKeyRing( securityDataService.getSecretKeyData( fingerprint ).getData() );
 
                 if ( secretKeyRing != null )
                 {
@@ -752,5 +797,52 @@ public class KeyManagerImpl implements KeyManager
         }
 
         return peerId;
+    }
+
+
+    @Override
+    public SecurityKeyIdentity getKeyTrustTree( final String hostId )
+    {
+        String fingerprint = getFingerprint( hostId );
+        SecurityKeyIdentity securityKeyIdentity = getKeyIdentityData( hostId );
+        Set<String> trustChain = Sets.newHashSet();
+
+        List<SecurityKeyTrust> keyTrustList = securityDataService.getKeyTrustData( fingerprint );
+
+        LOG.debug( fingerprint );
+        LOG.debug( "***key trust size: " + keyTrustList.size() );
+        for ( final SecurityKeyTrust keyTrust : keyTrustList )
+        {
+            getKeyTrustList( securityKeyIdentity, keyTrust, trustChain );
+        }
+
+        return securityKeyIdentity;
+    }
+
+
+    @Override
+    public KeyTrustLevel getTrustLevel( final String aHost, final String bHost )
+    {
+        return null;
+    }
+
+
+    private void getKeyTrustList( final SecurityKeyIdentity securityKeyIdentity, SecurityKeyTrust securityKeyTrust,
+                                  Set<String> trustIdSet )
+    {
+        List<SecurityKeyTrust> trustedKeys = securityDataService.getKeyTrustData( securityKeyTrust.getTargetId() );
+
+        SecurityKeyIdentity trustedIdentity = securityDataService.getKeyIdentityData( securityKeyTrust.getTargetId() );
+        securityKeyIdentity.getTrustedKeys().add( trustedIdentity );
+
+        trustIdSet.add( securityKeyIdentity.getHostId() );
+
+        for ( final SecurityKeyTrust trustedKey : trustedKeys )
+        {
+            if ( !trustIdSet.contains( trustedIdentity.getHostId() ) )
+            {
+                getKeyTrustList( trustedIdentity, trustedKey, trustIdSet );
+            }
+        }
     }
 }

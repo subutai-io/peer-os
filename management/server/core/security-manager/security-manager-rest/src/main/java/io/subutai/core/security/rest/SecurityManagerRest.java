@@ -5,6 +5,7 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -61,4 +62,28 @@ public interface SecurityManagerRest
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response getPublicKeyFingerprint( @QueryParam ( "hostid" ) String   hostId);
 
+    /* *******************************
+     *
+     */
+    @GET
+    @Path( "keyman/trust/tree/user" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getUserKeyTrustTree();
+
+
+    /* *******************************
+     *
+     */
+    @GET
+    @Path( "keyman/trust/tree" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getKeyTrustTree( @QueryParam( "hostId" ) String hostId );
+
+    /* *******************************
+     *
+     */
+    @PUT
+    @Path( "keyman/revoke" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response revokeKey( String hostId );
 }
