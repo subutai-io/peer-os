@@ -47,10 +47,8 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerId;
 import io.subutai.common.protocol.Template;
-import io.subutai.common.quota.CpuQuota;
-import io.subutai.common.quota.DiskPartition;
-import io.subutai.common.quota.DiskQuota;
-import io.subutai.common.quota.RamQuota;
+import io.subutai.common.resource.ResourceType;
+import io.subutai.common.resource.ResourceValue;
 import io.subutai.core.environment.api.EnvironmentManager;
 
 
@@ -445,48 +443,6 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
 
     @Override
-    public int getRamQuota() throws PeerException
-    {
-        return getPeer().getRamQuota( this );
-    }
-
-
-    @Override
-    public RamQuota getRamQuotaInfo() throws PeerException
-    {
-        return getPeer().getRamQuotaInfo( this );
-    }
-
-
-    @Override
-    public void setRamQuota( final int ramInMb ) throws PeerException
-    {
-        getPeer().setRamQuota( this, ramInMb );
-    }
-
-
-    @Override
-    public int getCpuQuota() throws PeerException
-    {
-        return getPeer().getCpuQuota( this );
-    }
-
-
-    @Override
-    public CpuQuota getCpuQuotaInfo() throws PeerException
-    {
-        return getPeer().getCpuQuotaInfo( this );
-    }
-
-
-    @Override
-    public void setCpuQuota( final int cpuPercent ) throws PeerException
-    {
-        getPeer().setCpuQuota( this, cpuPercent );
-    }
-
-
-    @Override
     public Set<Integer> getCpuSet() throws PeerException
     {
         return getPeer().getCpuSet( this );
@@ -501,44 +457,23 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
 
     @Override
-    public DiskQuota getDiskQuota( final DiskPartition diskPartition ) throws PeerException
+    public ResourceValue getAvailableQuota( final ResourceType resourceType ) throws PeerException
     {
-        return getPeer().getDiskQuota( this, diskPartition );
+        return getPeer().getAvailableQuota( this.getContainerId(), resourceType );
     }
 
 
     @Override
-    public void setDiskQuota( final DiskQuota diskQuota ) throws PeerException
+    public ResourceValue getQuota( final ResourceType resourceType ) throws PeerException
     {
-        getPeer().setDiskQuota( this, diskQuota );
+        return getPeer().getQuota( this.getContainerId(), resourceType );
     }
 
 
     @Override
-    public void setRamQuota( final RamQuota ramQuotaInfo ) throws PeerException
+    public void setQuota( final ResourceType resourceType, final ResourceValue resourceValue ) throws PeerException
     {
-        getPeer().setRamQuota( this, ramQuotaInfo );
-    }
-
-
-    @Override
-    public int getAvailableRamQuota() throws PeerException
-    {
-        return getPeer().getAvailableRamQuota( this );
-    }
-
-
-    @Override
-    public int getAvailableCpuQuota() throws PeerException
-    {
-        return getPeer().getAvailableCpuQuota( this );
-    }
-
-
-    @Override
-    public DiskQuota getAvailableDiskQuota( final DiskPartition diskPartition ) throws PeerException
-    {
-        return getPeer().getAvailableDiskQuota( this, diskPartition );
+        getPeer().setQuota( this.getContainerId(), resourceType, resourceValue );
     }
 
 
@@ -609,8 +544,8 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     {
         if ( containerId == null )
         {
-            containerId =
-                    new ContainerId( getId(), new PeerId( getPeerId() ), new EnvironmentId( getEnvironmentId() ) );
+            containerId = new ContainerId( getId(), getHostname(), new PeerId( getPeerId() ),
+                    new EnvironmentId( getEnvironmentId() ) );
         }
         return containerId;
     }

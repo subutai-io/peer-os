@@ -16,6 +16,8 @@
     </jaas:module>
   </jaas:config>
   <!--*****************************************************************-->
+  <reference id="securityManager" availability="mandatory"
+             interface="io.subutai.core.security.api.SecurityManager" />
 
   <!--*****************************************************************-->
   <bean id="daoManagerIdenity" init-method="init" activation="eager" scope="singleton"
@@ -25,9 +27,10 @@
   <!--*****************************************************************-->
 
   <!--*****************************************************************-->
-  <bean id="identityManager" scope="singleton" activation="eager" init-method="init"
+  <bean id="identityManager" scope="singleton" activation="eager" init-method="init" destroy-method="destroy"
         class="io.subutai.core.identity.impl.IdentityManagerImpl">
     <property name="daoManager" ref="daoManagerIdenity" />
+    <property name="securityManager" ref="securityManager" />
   </bean>
 
   <!--*****************************************************************-->

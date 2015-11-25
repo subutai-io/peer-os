@@ -184,10 +184,23 @@ public class UserTokenDAO
     /* *************************************************
      *
      */
-    public void update( final UserToken item, final String oldName )
+    public void update( final UserToken item)
     {
-        remove( oldName );
-        persist( item );
+        EntityManager em = daoManager.getEntityManagerFromFactory();
+        try
+        {
+            daoManager.startTransaction( em );
+            em.merge( item );
+            daoManager.commitTransaction( em );
+        }
+        catch ( Exception e )
+        {
+            daoManager.rollBackTransaction( em );
+        }
+        finally
+        {
+            daoManager.closeEntityManager( em );
+        }
     }
 
 

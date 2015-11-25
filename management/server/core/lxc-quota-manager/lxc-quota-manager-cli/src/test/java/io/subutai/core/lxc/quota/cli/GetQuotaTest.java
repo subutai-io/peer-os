@@ -8,13 +8,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.quota.DiskPartition;
-import io.subutai.common.quota.DiskQuota;
-import io.subutai.common.quota.QuotaException;
-import io.subutai.core.lxc.quota.api.QuotaManager;
 
+import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.quota.QuotaException;
+import io.subutai.common.resource.ResourceType;
+import io.subutai.common.resource.ResourceValue;
+import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.peer.api.PeerManager;
 
 import static org.mockito.Mockito.when;
@@ -23,9 +24,9 @@ import static org.mockito.Mockito.when;
 @RunWith( MockitoJUnitRunner.class )
 public class GetQuotaTest
 {
-    private String containerName = "containerName";
+    private static final String CONTAINER_HOST_ID = UUID.randomUUID().toString();
+    private static final String CONTAINER_HOST_NAME = "containerName";
     private GetQuota getQuota;
-    private String uuid = UUID.randomUUID().toString();
 
     @Mock
     QuotaManager quotaManager;
@@ -40,52 +41,62 @@ public class GetQuotaTest
     ContainerHost containerHost;
 
     @Mock
-    DiskQuota diskQuota;
+    ResourceValue diskQuotaValue;
+    @Mock
+    ResourceValue cpuQuotaValue;
+    @Mock
+    ResourceValue ramQuotaValue;
+
+
+    @Mock
+    ContainerId containerId;
 
 
     @Before
     public void setUp() throws Exception
     {
+        when( containerId.getHostName() ).thenReturn( CONTAINER_HOST_NAME );
+        when( containerId.getId() ).thenReturn( CONTAINER_HOST_ID );
         when( peerManager.getLocalPeer() ).thenReturn( localPeer );
-        when( localPeer.getContainerHostByName( containerName ) ).thenReturn( containerHost );
-        when( containerHost.getId() ).thenReturn( uuid );
-        when( quotaManager.getRamQuota( uuid ) ).thenReturn( 100 );
-        when( quotaManager.getDiskQuota( uuid, DiskPartition.HOME ) ).thenReturn( diskQuota );
-        when( quotaManager.getDiskQuota( uuid, DiskPartition.OPT ) ).thenReturn( diskQuota );
-        when( quotaManager.getDiskQuota( uuid, DiskPartition.ROOT_FS ) ).thenReturn( diskQuota );
-        when( quotaManager.getDiskQuota( uuid, DiskPartition.VAR ) ).thenReturn( diskQuota );
-        when( diskQuota.toString() ).thenReturn( "disk partition" );
-        when( quotaManager.getCpuQuota( uuid ) ).thenReturn( 100 );
+        when( localPeer.getContainerHostByName( CONTAINER_HOST_NAME ) ).thenReturn( containerHost );
+        when( containerHost.getId() ).thenReturn( CONTAINER_HOST_ID );
+        when( quotaManager.getQuota( containerId, ResourceType.RAM ) ).thenReturn( ramQuotaValue );
+        when( quotaManager.getQuota( containerId, ResourceType.HOME ) ).thenReturn( diskQuotaValue );
+        when( quotaManager.getQuota( containerId, ResourceType.OPT ) ).thenReturn( diskQuotaValue );
+        when( quotaManager.getQuota( containerId, ResourceType.ROOTFS ) ).thenReturn( diskQuotaValue );
+        when( quotaManager.getQuota( containerId, ResourceType.VAR ) ).thenReturn( diskQuotaValue );
+        when( quotaManager.getQuota( containerId, ResourceType.CPU ) ).thenReturn( cpuQuotaValue );
 
-        getQuota = new GetQuota( quotaManager );
-        getQuota.setContainerName( containerName );
+        getQuota = new GetQuota( quotaManager, localPeer );
+        getQuota.setContainerName( CONTAINER_HOST_NAME );
     }
 
 
     @Test
     public void testDoExecute() throws Exception
     {
-        getQuota.setQuotaType( "ram" );
+        getQuota.setResourceType( ResourceType.RAM.name() );
         getQuota.doExecute();
 
-        getQuota.setQuotaType( "cpu" );
+        getQuota.setResourceType( ResourceType.CPU.name() );
         getQuota.doExecute();
 
-        getQuota.setQuotaType( "diskHome" );
+        getQuota.setResourceType( ResourceType.HOME.name() );
         getQuota.doExecute();
 
-        getQuota.setQuotaType( "diskRootfs" );
+        getQuota.setResourceType( ResourceType.ROOTFS.name() );
         getQuota.doExecute();
 
-        getQuota.setQuotaType( "diskOpt" );
+        getQuota.setResourceType( ResourceType.OPT.name() );
         getQuota.doExecute();
 
-        getQuota.setQuotaType( "diskVar" );
+        getQuota.setResourceType( ResourceType.VAR.name() );
         getQuota.doExecute();
 
         //For exception handling purposes
-        when( quotaManager.getCpuQuota( uuid ) ).thenThrow( new QuotaException( "Some quota exception" ) );
-        getQuota.setQuotaType( "cpu" );
+        when( quotaManager.getQuota( containerId, ResourceType.CPU ) )
+                .thenThrow( new QuotaException( "Some quota exception" ) );
+        getQuota.setResourceType( ResourceType.CPU.name() );
         getQuota.doExecute();
     }
 }

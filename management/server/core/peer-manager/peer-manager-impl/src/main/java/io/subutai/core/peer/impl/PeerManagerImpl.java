@@ -321,16 +321,17 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public void processUnregisterRequest( final RegistrationData registrationData ) throws PeerException
     {
-        //        if ( localPeer.isPeerUsed( registrationData.getPeerInfo().getId() ) )
-        //        {
-        //            throw new PeerException( "Could not unregister peer. Peer still used." );
-        //        }
         if ( !notifyPeerActionListeners(
                 new PeerAction( PeerActionType.UNREGISTER, registrationData.getPeerInfo().getId() ) ).succeeded() )
         {
             throw new PeerException( "Could not unregister peer. Peer in used." );
         }
         PeerInfo p = getPeerInfo( registrationData.getPeerInfo().getId() );
+        if ( p == null )
+        {
+            LOG.warn( "Registration info not found for peer: " + registrationData.getPeerInfo().getId() );
+            return;
+        }
 
         Encrypted encryptedData = registrationData.getData();
         try

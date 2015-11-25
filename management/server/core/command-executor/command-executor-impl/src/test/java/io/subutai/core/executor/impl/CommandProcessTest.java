@@ -17,6 +17,7 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandStatus;
 import io.subutai.common.command.Response;
 import io.subutai.common.command.ResponseType;
+import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.identity.api.model.User;
 
 import static junit.framework.TestCase.assertEquals;
@@ -52,7 +53,7 @@ public class CommandProcessTest
     @Mock
     Response response;
     @Mock
-    User user;
+    Session session;
 
     CommandProcess commandProcess;
 
@@ -60,7 +61,7 @@ public class CommandProcessTest
     @Before
     public void setUp() throws Exception
     {
-        commandProcess = new CommandProcess( commandProcessor, callback, user );
+        commandProcess = new CommandProcess( commandProcessor, callback, session );
         commandProcess.executor = executor;
         commandProcess.semaphore = semaphore;
     }
@@ -73,7 +74,7 @@ public class CommandProcessTest
         try
         {
 
-            new CommandProcess( null, callback, user );
+            new CommandProcess( null, callback, session );
             fail( "Expected NullPointerException" );
         }
         catch ( NullPointerException e )
@@ -82,7 +83,7 @@ public class CommandProcessTest
         try
         {
 
-            new CommandProcess( commandProcessor, null, user );
+            new CommandProcess( commandProcessor, null, session );
             fail( "Expected NullPointerException" );
         }
         catch ( NullPointerException e )

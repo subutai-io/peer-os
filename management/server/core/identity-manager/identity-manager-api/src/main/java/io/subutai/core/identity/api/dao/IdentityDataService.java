@@ -133,8 +133,8 @@ public interface IdentityDataService
     void removeRolePermission( long roleId, Permission permission );
 
     /* ******Session************************
-         *
-         */
+     *
+     */
     List<Session> getAllSessions();
 
 
@@ -143,10 +143,16 @@ public interface IdentityDataService
     Session getSession( long sessionId );
 
 
-    /* *************************************************
-     */
-    Session getSessionByUserId( long userId );
 
+    /* *************************************************
+     *
+     */
+    List<Session> getSessionsByUserId( long userId );
+
+    /* *************************************************
+     *
+     */
+    Session getValidSession( long userId );
 
     /* *************************************************
      *
@@ -183,8 +189,8 @@ public interface IdentityDataService
     UserToken getValidUserToken( String token );
 
     /* *************************************************
-         *
-         */
+     *
+     */
     UserToken getUserToken( long userId );
 
     /* *************************************************
@@ -193,10 +199,15 @@ public interface IdentityDataService
     UserToken getValidUserToken( long userId );
 
     /* *************************************************
-         *
-         */
+     *
+     */
     void persistUserToken( UserToken item );
 
+
+    /* *************************************************
+     *
+     */
+    void updateUserToken( UserToken item );
 
     /* *************************************************
      *
@@ -205,7 +216,13 @@ public interface IdentityDataService
 
 
     /* *************************************************
-         *
-         */
+     *
+     */
     void removeInvalidTokens();
+
+
+    /* *************************************************
+     *
+     */
+    void invalidateSessions();
 }

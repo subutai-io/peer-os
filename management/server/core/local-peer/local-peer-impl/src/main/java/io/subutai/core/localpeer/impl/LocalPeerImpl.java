@@ -84,17 +84,15 @@ import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.protocol.Disposable;
 import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.protocol.Template;
-import io.subutai.common.quota.ContainerQuota;
-import io.subutai.common.quota.CpuQuota;
-import io.subutai.common.quota.DiskPartition;
-import io.subutai.common.quota.DiskQuota;
-import io.subutai.common.quota.Quota;
+import io.subutai.common.quota.ContainerQuotaHolder;
 import io.subutai.common.quota.QuotaException;
-import io.subutai.common.quota.QuotaType;
-import io.subutai.common.quota.RamQuota;
+import io.subutai.common.resource.ResourceType;
+import io.subutai.common.resource.ResourceValue;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.crypto.pgp.KeyPair;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
+import io.subutai.common.security.objects.KeyTrustLevel;
+import io.subutai.common.security.objects.SecurityKeyType;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.ExceptionUtil;
@@ -432,7 +430,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         Set<HostInfoModel> result = Sets.newHashSet();
 
-        ContainerQuota containerQuota = quotaManager.getDefaultContainerQuota( request.getContainerType() );
+        ContainerQuotaHolder containerQuota = quotaManager.getDefaultContainerQuota( request.getContainerType() );
         if ( containerQuota == null )
         {
             LOG.warn( "Quota not found for container type: " + request.getContainerType() );
@@ -455,7 +453,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 containerHostEntity.setEnvironmentId( request.getEnvironmentId() );
                 containerHostEntity.setOwnerId( request.getOwnerId() );
                 containerHostEntity.setInitiatorPeerId( request.getInitiatorPeerId() );
-                quotaManager.setQuota( containerHostEntity.getHostname(), containerQuota );
+                quotaManager.setQuota( containerHostEntity.getContainerId(), containerQuota );
                 result.add( new HostInfoModel( containerHost ) );
             }
             catch ( ResourceHostException | QuotaException e )
@@ -536,7 +534,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         Set<ContainerHost> newContainers = Sets.newHashSet();
         Set<HostInfoModel> result = Sets.newHashSet();
 
-        ContainerQuota containerQuota = quotaManager.getDefaultContainerQuota( request.getContainerType() );
+        ContainerQuotaHolder containerQuota = quotaManager.getDefaultContainerQuota( request.getContainerType() );
         if ( containerQuota == null )
         {
             LOG.warn( "Quota not found for container type: " + request.getContainerType() );
@@ -556,7 +554,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 containerHostEntity.setInitiatorPeerId( request.getInitiatorPeerId() );
                 containerHostEntity.setContainerType( request.getContainerType() );
                 newContainers.add( containerHost );
-                quotaManager.setQuota( containerHost.getHostname(), containerQuota );
+                quotaManager.setQuota( containerHost.getContainerId(), containerQuota );
                 result.add( new HostInfoModel( containerHost ) );
             }
             catch ( ExecutionException | InterruptedException | QuotaException e )
@@ -957,37 +955,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public Quota getQuotaInfo( ContainerHost host, final QuotaType quota ) throws PeerException
-    {
-        try
-        {
-            ContainerHost c = ( ContainerHost ) bindHost( host.getId() );
-            return quotaManager.getQuota( c.getContainerId(), quota );
-        }
-        catch ( QuotaException e )
-        {
-            throw new PeerException( e );
-        }
-    }
-
-
-    @RolesAllowed( "Environment-Management|A|Update" )
-    @Override
-    public void setQuota( ContainerHost host, final Quota quota ) throws PeerException
-    {
-        try
-        {
-            Host c = bindHost( host.getId() );
-            quotaManager.setQuota( c.getHostname(), quota );
-        }
-        catch ( QuotaException e )
-        {
-            throw new PeerException( e );
-        }
-    }
-
-
-    @Override
     public ManagementHost getManagementHost() throws HostNotFoundException
     {
         if ( managementHost == null )
@@ -1260,113 +1227,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public int getRamQuota( final ContainerHost host ) throws PeerException
-    {
-        Preconditions.checkNotNull( host, "Invalid container host" );
-
-        try
-        {
-            return quotaManager.getRamQuota( host.getId() );
-        }
-        catch ( QuotaException e )
-        {
-            throw new PeerException( e );
-        }
-    }
-
-
-    @Override
-    public RamQuota getRamQuotaInfo( final ContainerHost host ) throws PeerException
-    {
-        Preconditions.checkNotNull( host, "Invalid container host" );
-
-        try
-        {
-            return quotaManager.getRamQuotaInfo( host.getId() );
-        }
-        catch ( QuotaException e )
-        {
-            throw new PeerException( e );
-        }
-    }
-
-
-    @RolesAllowed( "Environment-Management|A|Update" )
-    @Override
-    public void setRamQuota( final ContainerHost host, final int ramInMb ) throws PeerException
-    {
-        Preconditions.checkNotNull( host, "Invalid container host" );
-        Preconditions.checkArgument( ramInMb > 0, "Ram quota value must be greater than 0" );
-
-        try
-        {
-            quotaManager.setRamQuota( host.getId(), ramInMb );
-        }
-        catch ( QuotaException e )
-        {
-            throw new PeerException( e );
-        }
-    }
-
-
-    @Override
-    public int getCpuQuota( final ContainerHost host ) throws PeerException
-    {
-        Preconditions.checkNotNull( host, "Invalid container host" );
-
-        try
-        {
-            return quotaManager.getCpuQuota( host.getId() );
-        }
-        catch ( QuotaException e )
-        {
-            throw new PeerException( e );
-        }
-    }
-
-
-    @Override
-    public CpuQuota getCpuQuotaInfo( final ContainerHost host ) throws PeerException
-    {
-        Preconditions.checkNotNull( host, "Invalid container host" );
-
-        try
-        {
-            return quotaManager.getCpuQuotaInfo( host.getId() );
-        }
-        catch ( QuotaException e )
-        {
-            throw new PeerException( e );
-        }
-    }
-
-
-    @RolesAllowed( "Environment-Management|A|Update" )
-    @Override
-    public void setCpuQuota( final ContainerHost host, final int cpuPercent ) throws PeerException
-    {
-        Preconditions.checkNotNull( host, "Invalid container host" );
-        Preconditions.checkArgument( cpuPercent > 0, "Cpu quota value must be greater than 0" );
-
-        try
-        {
-            quotaManager.setCpuQuota( host.getId(), cpuPercent );
-        }
-        catch ( QuotaException e )
-        {
-            throw new PeerException( e );
-        }
-    }
-
-
-    @Override
     public Set<Integer> getCpuSet( final ContainerHost host ) throws PeerException
     {
         Preconditions.checkNotNull( host, "Invalid container host" );
 
         try
         {
-            return quotaManager.getCpuSet( host.getId() );
+            return quotaManager.getCpuSet( host.getContainerId() );
         }
         catch ( QuotaException e )
         {
@@ -1384,110 +1251,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         try
         {
-            quotaManager.setCpuSet( host.getId(), cpuSet );
-        }
-        catch ( QuotaException e )
-        {
-            throw new PeerException( e );
-        }
-    }
-
-
-    @Override
-    public DiskQuota getDiskQuota( final ContainerHost host, final DiskPartition diskPartition ) throws PeerException
-    {
-        Preconditions.checkNotNull( host, "Invalid container host" );
-        Preconditions.checkNotNull( diskPartition, "Invalid disk partition" );
-
-        try
-        {
-            return quotaManager.getDiskQuota( host.getId(), diskPartition );
-        }
-        catch ( QuotaException e )
-        {
-            throw new PeerException( e );
-        }
-    }
-
-
-    @RolesAllowed( "Environment-Management|A|Update" )
-    @Override
-    public void setDiskQuota( final ContainerHost host, final DiskQuota diskQuota ) throws PeerException
-    {
-        Preconditions.checkNotNull( host, "Invalid container host" );
-        Preconditions.checkNotNull( diskQuota, "Invalid disk quota" );
-
-        try
-        {
-            quotaManager.setDiskQuota( host.getId(), diskQuota );
-        }
-        catch ( QuotaException e )
-        {
-            throw new PeerException( e );
-        }
-    }
-
-
-    @RolesAllowed( "Environment-Management|A|Update" )
-    @Override
-    public void setRamQuota( final ContainerHost host, final RamQuota ramQuotaInfo ) throws PeerException
-    {
-        Preconditions.checkNotNull( host, "Invalid container host" );
-        Preconditions.checkNotNull( ramQuotaInfo, "Invalid ram quota" );
-
-        try
-        {
-            quotaManager.setRamQuota( host.getId(), ramQuotaInfo );
-        }
-        catch ( QuotaException e )
-        {
-            throw new PeerException( e );
-        }
-    }
-
-
-    @Override
-    public int getAvailableRamQuota( final ContainerHost host ) throws PeerException
-    {
-        Preconditions.checkNotNull( host, "Invalid container host" );
-
-        try
-        {
-            return quotaManager.getAvailableRamQuota( host.getId() );
-        }
-        catch ( QuotaException e )
-        {
-            throw new PeerException( e );
-        }
-    }
-
-
-    @Override
-    public int getAvailableCpuQuota( final ContainerHost host ) throws PeerException
-    {
-        Preconditions.checkNotNull( host, "Invalid container host" );
-
-        try
-        {
-            return quotaManager.getAvailableCpuQuota( host.getId() );
-        }
-        catch ( QuotaException e )
-        {
-            throw new PeerException( e );
-        }
-    }
-
-
-    @Override
-    public DiskQuota getAvailableDiskQuota( final ContainerHost host, final DiskPartition diskPartition )
-            throws PeerException
-    {
-        Preconditions.checkNotNull( host, "Invalid container host" );
-        Preconditions.checkNotNull( diskPartition, "Invalid disk partition" );
-
-        try
-        {
-            return quotaManager.getAvailableDiskQuota( host.getId(), diskPartition );
+            quotaManager.setCpuSet( host.getContainerId(), cpuSet );
         }
         catch ( QuotaException e )
         {
@@ -1769,17 +1533,21 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             KeyPair keyPair = keyManager.generateKeyPair( pairId, false );
 
 
-            //**********************************************************************************
+            //******Create PEK *****************************************************************
             PGPSecretKeyRing secRing = PGPKeyUtil.readSecretKeyRing( keyPair.getSecKeyring() );
             PGPPublicKeyRing pubRing = PGPKeyUtil.readPublicKeyRing( keyPair.getPubKeyring() );
             PGPSecretKeyRing peerSecRing = keyManager.getSecretKeyRing( null );
 
-            //************Sign Key **************************************************************
+            String PEKfingerprint = PGPKeyUtil.getFingerprint( pubRing.getPublicKey().getFingerprint() );
+            String peerfingerprint = PGPKeyUtil.getFingerprint( peerSecRing.getPublicKey().getFingerprint() );
+
+            //************Sign Key/Create Trust*************************************************
             pubRing = encTool.signPublicKey( pubRing, getId(), peerSecRing.getSecretKey(), "" );
+            keyManager.setKeyTrust( peerfingerprint, PEKfingerprint, KeyTrustLevel.Full.getId() );
 
             //***************Save Keys *********************************************************
-            keyManager.saveSecretKeyRing( pairId, ( short ) 2, secRing );
-            keyManager.savePublicKeyRing( pairId, ( short ) 2, pubRing );
+            keyManager.saveSecretKeyRing( pairId, SecurityKeyType.PeerEnvironmentKey.getId(), secRing );
+            keyManager.savePublicKeyRing( pairId, SecurityKeyType.PeerEnvironmentKey.getId(), pubRing );
 
             return new PublicKeyContainer( getId(), pubRing.getPublicKey().getFingerprint(),
                     encTool.armorByteArrayToString( pubRing.getEncoded() ) );
@@ -1983,6 +1751,115 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
 //        return templateRegistry.getTemplateData( name );
         return null;
+    }
+
+
+    @Override
+    public ResourceValue getQuota( final ContainerHost containerHost, final ResourceType resourceType )
+            throws PeerException
+    {
+        Preconditions.checkNotNull( containerHost );
+        Preconditions.checkNotNull( resourceType );
+        try
+        {
+            return quotaManager.getQuota( containerHost.getContainerId(), resourceType );
+        }
+        catch ( QuotaException e )
+        {
+            throw new PeerException(
+                    String.format( "Could not obtain quota for: %s %s", containerHost.getId(), resourceType ) );
+        }
+    }
+
+
+    @Override
+    public void setQuota( final ContainerHost containerHost, final ResourceType resourceType,
+                          final ResourceValue resourceValue ) throws PeerException
+    {
+        Preconditions.checkNotNull( containerHost );
+        Preconditions.checkNotNull( resourceType );
+        try
+        {
+            quotaManager.setQuota( containerHost.getContainerId(), resourceType, resourceValue );
+        }
+        catch ( QuotaException e )
+        {
+            throw new PeerException(
+                    String.format( "Could not set quota for: %s %s", containerHost.getId(), resourceType ) );
+        }
+    }
+
+
+    @Override
+    public ResourceValue getAvailableQuota( final ContainerId containerId, final ResourceType resourceType )
+            throws PeerException
+    {
+        Preconditions.checkNotNull( containerId );
+        Preconditions.checkNotNull( resourceType );
+        try
+        {
+            ContainerHost containerHost = getContainerHostById( containerId.getId() );
+            return quotaManager.getAvailableQuota( containerHost.getContainerId(), resourceType );
+        }
+        catch ( QuotaException e )
+        {
+            throw new PeerException( String.format( "Could not obtain quota for: %s %s", containerId, resourceType ) );
+        }
+    }
+
+
+    @Override
+    public ResourceValue getQuota( final ContainerId containerId, final ResourceType resourceType ) throws PeerException
+    {
+        Preconditions.checkNotNull( containerId );
+        Preconditions.checkNotNull( resourceType );
+        try
+        {
+            ContainerHost containerHost = getContainerHostById( containerId.getId() );
+            return quotaManager.getQuota( containerHost.getContainerId(), resourceType );
+        }
+        catch ( QuotaException e )
+        {
+            throw new PeerException(
+                    String.format( "Could not obtain quota for: %s %s", containerId.getId(), resourceType ) );
+        }
+    }
+
+
+    @Override
+    public void setQuota( final ContainerId containerId, final ResourceType resourceType,
+                          final ResourceValue resourceValue ) throws PeerException
+    {
+        Preconditions.checkNotNull( containerId );
+        Preconditions.checkNotNull( resourceType );
+        try
+        {
+            ContainerHost containerHost = getContainerHostById( containerId.getId() );
+            quotaManager.setQuota( containerHost.getContainerId(), resourceType, resourceValue );
+        }
+        catch ( QuotaException e )
+        {
+            throw new PeerException(
+                    String.format( "Could not set quota for: %s %s", containerId.getId(), resourceType ) );
+        }
+    }
+
+
+    @Override
+    public ResourceValue getAvailableQuota( final ContainerHost containerHost, final ResourceType resourceType )
+            throws PeerException
+    {
+        Preconditions.checkNotNull( containerHost );
+        Preconditions.checkNotNull( resourceType );
+        try
+        {
+            return quotaManager.getAvailableQuota( containerHost.getContainerId(), resourceType );
+        }
+        catch ( QuotaException e )
+        {
+            throw new PeerException(
+                    String.format( "Could not obtain quota for: %s %s", containerHost.getId(), resourceType ) );
+        }
     }
 
 

@@ -6,11 +6,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import io.subutai.common.quota.QuotaType;
-import io.subutai.common.quota.RamQuota;
-import io.subutai.common.quota.RamQuotaUnit;
-import io.subutai.core.lxc.quota.impl.parser.RamQuotaParser;
 
+import io.subutai.common.resource.MeasureUnit;
+import io.subutai.common.resource.ResourceValue;
+import io.subutai.core.lxc.quota.impl.parser.CommonResourceValueParser;
+
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
@@ -18,41 +19,36 @@ import static org.junit.Assert.assertNull;
 @RunWith( MockitoJUnitRunner.class )
 public class RamQuotaTest
 {
-    private RamQuota ramQuotaInfo;
+    private ResourceValue ramQuotaInfo;
 
 
     @Before
     public void setUp() throws Exception
     {
-        ramQuotaInfo = new RamQuota( RamQuotaUnit.BYTE, 55 );
+        //        ramQuotaInfo = new RamQuota( RamQuotaUnit.BYTE, 1073741824 );
+        ramQuotaInfo = new ResourceValue("1.0", MeasureUnit.GB);
     }
 
 
     @Test
     public void testGetRamQuotaUnit() throws Exception
     {
-        assertNotNull( ramQuotaInfo.getKey() );
-        assertNotNull( ramQuotaInfo.getRamQuotaUnit() );
-        assertNotNull( ramQuotaInfo.getRamQuotaValue() );
-        assertNotNull( ramQuotaInfo.getType() );
-        assertNotNull( ramQuotaInfo.getValue() );
+
+        assertNotNull( ramQuotaInfo.getValue(MeasureUnit.BYTE) );
+        assertEquals( 1073741824.0, ramQuotaInfo.getValue( MeasureUnit.BYTE).doubleValue(), 0.0 );
+        assertEquals( 1048576.0, ramQuotaInfo.getValue( MeasureUnit.KB ).doubleValue(), 0.0 );
+        assertEquals( 1024.0, ramQuotaInfo.getValue( MeasureUnit.MB).doubleValue(), 0.00001 );
+        assertEquals( 1.0, ramQuotaInfo.getValue( MeasureUnit.GB ).doubleValue(), 0.00001 );
         assertNotNull( ramQuotaInfo.hashCode() );
         assertNotNull( ramQuotaInfo.equals( "test" ) );
         assertNotNull( ramQuotaInfo.equals( ramQuotaInfo ) );
-        assertNotNull( RamQuotaParser.getInstance().parse( "10G" ) );
-        assertNotNull( QuotaType.getQuotaType( "cpu" ) );
-        assertNotNull( QuotaType.getQuotaType( "diskhome" ) );
-        assertNotNull( QuotaType.getQuotaType( "diskvar" ) );
-        assertNotNull( QuotaType.getQuotaType( "diskRootfs" ) );
-        assertNotNull( QuotaType.getQuotaType( "ram" ) );
-        assertNotNull( QuotaType.getQuotaType( "json" ) );
-        assertNull( QuotaType.getQuotaType( "test" ) );
+        assertNotNull( CommonResourceValueParser.getInstance().parse( "10G" ) );
     }
 
 
     @Test( expected = IllegalArgumentException.class )
     public void testParse()
     {
-        RamQuotaParser.getInstance().parse( "test" );
+        CommonResourceValueParser.getInstance().parse( "test" );
     }
 }

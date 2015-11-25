@@ -69,6 +69,11 @@ public interface LocalPeer extends Peer
      */
     public ContainerHost getContainerHostById( String hostId ) throws HostNotFoundException;
 
+//    Quota getQuota( ContainerHost host, QuotaType quota ) throws PeerException;
+
+//    @RolesAllowed( "Environment-Management|A|Update" )
+//    void setQuota( ContainerHost host, Quota quota ) throws PeerException;
+
     /**
      * Returns instance of management host
      */
@@ -129,6 +134,7 @@ public interface LocalPeer extends Peer
     public void removeRequestListener( RequestListener listener );
 
     public Set<RequestListener> getRequestListeners();
+
 
     /**
      * Returns domain assigned to vni if any

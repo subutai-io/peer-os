@@ -27,14 +27,4 @@ public class QuotaException extends Exception
     }
 
 
-    public QuotaException( String message, QuotaType parameter )
-    {
-        super( parameter.getKey() + message );
-    }
-
-
-    public QuotaException( String message, Throwable cause, QuotaType parameter )
-    {
-        super( parameter.getKey() + message, cause );
-    }
 }

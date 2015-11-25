@@ -37,10 +37,6 @@ public interface User
 
     void setRoles( List<Role> roles );
 
-    Subject getSubject();
-
-    void setSubject( Subject subject );
-
     int getType();
 
     void setType( int type );
@@ -49,7 +45,15 @@ public interface User
 
     void setStatus( int status );
 
+    String getSecurityKeyId();
+
+    void setSecurityKeyId( String securityKeyId );
+
     String getStatusName();
 
     String getTypeName();
+
+    Subject getSubject();
+
+    void setSubject( Subject subject );
 }

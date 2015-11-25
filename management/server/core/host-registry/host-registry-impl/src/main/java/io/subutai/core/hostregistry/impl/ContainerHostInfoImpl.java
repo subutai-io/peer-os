@@ -6,6 +6,7 @@ import java.util.Set;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Sets;
 
+import io.subutai.common.host.Alert;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostArchitecture;
@@ -25,6 +26,7 @@ public class ContainerHostInfoImpl implements ContainerHostInfo
     private Set<InterfaceImpl> interfaces;
     private ContainerHostState status;
     private HostArchitecture arch;
+    private Alert alert;
 
 
     @Override

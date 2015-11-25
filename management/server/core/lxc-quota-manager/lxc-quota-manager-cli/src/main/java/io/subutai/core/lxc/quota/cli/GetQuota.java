@@ -3,13 +3,11 @@ package io.subutai.core.lxc.quota.cli;
 
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.quota.DiskPartition;
 import io.subutai.common.quota.QuotaException;
-import io.subutai.common.quota.QuotaType;
+import io.subutai.common.resource.ResourceType;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.common.peer.HostNotFoundException;
-import io.subutai.core.peer.api.PeerManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,16 +24,18 @@ public class GetQuota extends SubutaiShellCommandSupport
             description = "container name" )
     private String containerName;
 
-    @Argument( index = 1, name = "quota type", required = true, multiValued = false,
-            description = "quota type to get specific quota" )
-    private String quotaType;
+    @Argument( index = 1, name = "resource type", required = true, multiValued = false,
+            description = "resource type to get specific quota" )
+    private String resourceType;
 
     private QuotaManager quotaManager;
+    private LocalPeer localPeer;
 
 
-    public GetQuota( QuotaManager quotaManager )
+    public GetQuota( QuotaManager quotaManager, LocalPeer localPeer )
     {
         this.quotaManager = quotaManager;
+        this.localPeer = localPeer;
     }
 
 
@@ -45,9 +45,9 @@ public class GetQuota extends SubutaiShellCommandSupport
     }
 
 
-    public void setQuotaType( final String quotaType )
+    public void setResourceType( final String resourceType )
     {
-        this.quotaType = quotaType;
+        this.resourceType = resourceType;
     }
 
 
@@ -56,11 +56,12 @@ public class GetQuota extends SubutaiShellCommandSupport
     {
         try
         {
-            QuotaType quotaType = QuotaType.getQuotaType( this.quotaType );
+            ResourceType quotaType = ResourceType.valueOf( this.resourceType );
 
-            System.out.println( quotaManager.getQuota( containerName, quotaType ) );
+            ContainerHost containerHost = localPeer.getContainerHostByName( containerName );
+            System.out.println( quotaManager.getQuota( containerHost.getContainerId(), quotaType ) );
         }
-        catch ( QuotaException e )
+        catch ( HostNotFoundException | QuotaException e )
         {
             System.out.println( "Error getting quota for container" );
             LOGGER.error( "Error getting quota for container", e );
