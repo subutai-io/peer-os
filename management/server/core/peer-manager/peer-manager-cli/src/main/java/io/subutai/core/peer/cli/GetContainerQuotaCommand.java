@@ -7,7 +7,6 @@ import org.apache.karaf.shell.commands.Command;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Peer;
-import io.subutai.common.quota.QuotaType;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.peer.api.PeerManager;
