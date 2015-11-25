@@ -96,6 +96,6 @@ public interface SecurityManagerRest
     @Path( "keyman/signkey" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response signKey( @FormParam( "sourcehostid" ) final String sourceHostId,
-                             @FormParam( "keyText" ) final String keyText,
+                             @FormParam( "keytext" ) final String keyText,
                              @FormParam( "trustlevel" ) final int trustLevel );
 }

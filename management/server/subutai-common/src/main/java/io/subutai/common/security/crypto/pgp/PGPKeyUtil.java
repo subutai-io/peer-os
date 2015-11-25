@@ -359,6 +359,10 @@ public class PGPKeyUtil
         {
             instr = org.bouncycastle.openpgp.PGPUtil.getDecoderStream( instr );
             pgpPub = new PGPPublicKeyRing( instr, new JcaKeyFingerprintCalculator() );
+
+            //**********************
+            instr.close();
+            //**********************
         }
         catch ( IOException ex )
         {
@@ -406,6 +410,10 @@ public class PGPKeyUtil
         {
             instr = org.bouncycastle.openpgp.PGPUtil.getDecoderStream( instr );
             pgpSecRing = new PGPSecretKeyRing( instr, new JcaKeyFingerprintCalculator() );
+
+            //**********************
+            instr.close();
+            //**********************
         }
         catch ( IOException ex )
         {

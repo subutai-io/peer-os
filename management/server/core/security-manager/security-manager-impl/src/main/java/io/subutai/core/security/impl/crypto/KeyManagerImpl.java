@@ -81,8 +81,8 @@ public class KeyManagerImpl implements KeyManager
 
 
             InputStream ownerPubStream = PGPEncryptionUtil.getFileInputStream( keyData.getOwnerPublicKeyringFile() );
-            InputStream peerPubStream = PGPEncryptionUtil.getFileInputStream( keyData.getPublicKeyringFile() );
-            InputStream peerSecStream = PGPEncryptionUtil.getFileInputStream( keyData.getSecretKeyringFile() );
+            InputStream peerPubStream  = PGPEncryptionUtil.getFileInputStream( keyData.getPublicKeyringFile() );
+            InputStream peerSecStream  = PGPEncryptionUtil.getFileInputStream( keyData.getSecretKeyringFile() );
 
             if ( ownerPubStream == null || peerPubStream == null || peerSecStream == null )
             {
@@ -106,6 +106,13 @@ public class KeyManagerImpl implements KeyManager
                 //************************************************************
                 setKeyTrust( ownerPeerFPrint, peerId, KeyTrustLevel.Full.getId() );
                 //************************************************************
+
+                //************************************************************
+                ownerPubStream.close();
+                peerPubStream.close();
+                peerSecStream.close();
+                //************************************************************
+
             }
         }
         catch ( Exception ex )
