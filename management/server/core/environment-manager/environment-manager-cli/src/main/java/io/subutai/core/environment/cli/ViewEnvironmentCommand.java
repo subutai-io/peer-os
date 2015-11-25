@@ -61,16 +61,22 @@ public class ViewEnvironmentCommand extends SubutaiShellCommandSupport
             System.out.println( String.format( "IP: %s",
                     containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp() ) );
             System.out.println( String.format( "Is connected %s", containerHost.isConnected() ) );
-            System.out.println( String.format( "RAM quota: %s", containerHost.getRamQuota().getValue() ) );
-            System.out.println( String.format( "CPU quota: %s", containerHost.getCpuQuota().getValue() ) );
+            System.out.println( String.format( "RAM quota: %s/%s", containerHost.getRamQuota().getValue(),
+                    containerHost.getAvailableRamQuota().getValue() ) );
+            System.out.println( String.format( "CPU quota: %s/%s", containerHost.getCpuQuota().getValue(),
+                    containerHost.getAvailableCpuQuota().getValue() ) );
             System.out.println(
-                    String.format( "/ quota: %s", containerHost.getDiskQuota( DiskPartition.ROOT_FS ).getValue() ) );
+                    String.format( "/ quota: %s/%s", containerHost.getDiskQuota( DiskPartition.ROOT_FS ).getValue(),
+                            containerHost.getAvailableDiskQuota( DiskPartition.ROOT_FS ).getValue() ) );
             System.out.println(
-                    String.format( "/opt quota: %s", containerHost.getDiskQuota( DiskPartition.OPT ).getValue() ) );
+                    String.format( "/opt quota: %s/%s", containerHost.getDiskQuota( DiskPartition.OPT ).getValue(),
+                            containerHost.getAvailableDiskQuota( DiskPartition.OPT ).getValue() ) );
             System.out.println(
-                    String.format( "/home quota: %s", containerHost.getDiskQuota( DiskPartition.HOME ).getValue() ) );
+                    String.format( "/home quota: %s/%s", containerHost.getDiskQuota( DiskPartition.HOME ).getValue(),
+                            containerHost.getAvailableDiskQuota( DiskPartition.HOME ).getValue() ) );
             System.out.println(
-                    String.format( "/var quota: %s", containerHost.getDiskQuota( DiskPartition.VAR ).getValue() ) );
+                    String.format( "/var quota: %s/%s", containerHost.getDiskQuota( DiskPartition.VAR ).getValue(),
+                            containerHost.getAvailableDiskQuota( DiskPartition.VAR ).getValue() ) );
         }
 
         return null;

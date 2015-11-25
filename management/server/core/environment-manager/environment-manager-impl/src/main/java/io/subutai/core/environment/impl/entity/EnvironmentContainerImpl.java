@@ -442,11 +442,11 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     }
 
 
-//    @Override
-//    public int getRamQuota() throws PeerException
-//    {
-//        return getPeer().getRamQuota( this );
-//    }
+    //    @Override
+    //    public int getRamQuota() throws PeerException
+    //    {
+    //        return getPeer().getRamQuota( this );
+    //    }
 
 
     @Override
@@ -463,13 +463,6 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     }
 
 
-//    @Override
-//    public int getCpuQuota() throws PeerException
-//    {
-//        return getPeer().getCpuQuota( this );
-//    }
-
-
     @Override
     public CpuQuota getCpuQuota() throws PeerException
     {
@@ -478,9 +471,9 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
 
     @Override
-    public void setCpuQuota( final int cpuPercent ) throws PeerException
+    public void setCpuQuota( final CpuQuota cpuQuota ) throws PeerException
     {
-        getPeer().setCpuQuota( this, cpuPercent );
+        getPeer().setCpuQuota( this, cpuQuota );
     }
 
 
@@ -607,8 +600,8 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     {
         if ( containerId == null )
         {
-            containerId =
-                    new ContainerId( getId(), getHostname(), new PeerId( getPeerId() ), new EnvironmentId( getEnvironmentId() ) );
+            containerId = new ContainerId( getId(), getHostname(), new PeerId( getPeerId() ),
+                    new EnvironmentId( getEnvironmentId() ) );
         }
         return containerId;
     }

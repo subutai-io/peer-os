@@ -20,6 +20,7 @@ import io.subutai.common.host.Interface;
 import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.quota.CpuQuota;
 import io.subutai.common.quota.DiskPartition;
 import io.subutai.common.quota.DiskQuota;
 import io.subutai.common.quota.RamQuota;
@@ -51,12 +52,12 @@ public class ContainerHostEntityTest
     private static final int CPU_QUOTA = 100;
     private static final Set<Integer> CPU_SET = Sets.newHashSet( 1, 3, 5 );
 
-//    @Mock
-//    DataService dataService;
+    //    @Mock
+    //    DataService dataService;
     @Mock
     LocalPeer localPeer;
-//    @Mock
-//    ContainerGroup containerGroup;
+    //    @Mock
+    //    ContainerGroup containerGroup;
     @Mock
     ContainerHostInfo containerHostInfo;
     @Mock
@@ -70,10 +71,14 @@ public class ContainerHostEntityTest
     @Mock
     private ContainerGateway containerGateway;
 
+    @Mock
+    private CpuQuota cpuQuota;
+
 
     @Before
     public void setUp() throws Exception
     {
+        when( cpuQuota.getPercentage() ).thenReturn( CPU_QUOTA );
         when( containerHostInfo.getId() ).thenReturn( HOST_ID );
         when( containerHostInfo.getHostname() ).thenReturn( HOSTNAME );
         when( containerHostInfo.getArch() ).thenReturn( ARCH );
@@ -87,8 +92,8 @@ public class ContainerHostEntityTest
         //        containerHostEntity.setLocalPeer( localPeer );
         //        containerHostEntity.setDataService( dataService );
         containerHostEntity.setParent( resourceHost );
-//        when( localPeer.findContainerGroupByContainerId( HOST_ID ) ).thenReturn( containerGroup );
-//        when( containerGroup.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID );
+        //        when( localPeer.findContainerGroupByContainerId( HOST_ID ) ).thenReturn( containerGroup );
+        //        when( containerGroup.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID );
         when( resourceHost.getPeer() ).thenReturn( peer );
     }
 
@@ -121,22 +126,22 @@ public class ContainerHostEntityTest
     //    }
 
 
-//    @Test
-//    public void testAddTag() throws Exception
-//    {
-//        containerHostEntity.addTag( TAG );
-//
-//        verify( dataService ).update( containerHostEntity );
-//    }
-//
-//
-//    @Test
-//    public void testRemoveTag() throws Exception
-//    {
-//        containerHostEntity.removeTag( TAG );
-//
-//        verify( dataService ).update( containerHostEntity );
-//    }
+    //    @Test
+    //    public void testAddTag() throws Exception
+    //    {
+    //        containerHostEntity.addTag( TAG );
+    //
+    //        verify( dataService ).update( containerHostEntity );
+    //    }
+    //
+    //
+    //    @Test
+    //    public void testRemoveTag() throws Exception
+    //    {
+    //        containerHostEntity.removeTag( TAG );
+    //
+    //        verify( dataService ).update( containerHostEntity );
+    //    }
 
 
     @Test
@@ -152,7 +157,7 @@ public class ContainerHostEntityTest
     @Ignore
     public void testSetDefaultGateway() throws Exception
     {
-        when(containerHostEntity.getPeer()).thenReturn( localPeer );
+        when( containerHostEntity.getPeer() ).thenReturn( localPeer );
         containerHostEntity.setDefaultGateway( GATEWAY_IP );
 
 
@@ -285,9 +290,9 @@ public class ContainerHostEntityTest
     @Test
     public void testSetCpuQuota() throws Exception
     {
-        containerHostEntity.setCpuQuota( CPU_QUOTA );
+        containerHostEntity.setCpuQuota( cpuQuota );
 
-        verify( peer ).setCpuQuota( containerHostEntity, CPU_QUOTA );
+        verify( peer ).setCpuQuota( containerHostEntity, cpuQuota );
     }
 
 

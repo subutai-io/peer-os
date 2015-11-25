@@ -41,8 +41,6 @@ import io.subutai.common.protocol.Template;
 import io.subutai.common.quota.CpuQuota;
 import io.subutai.common.quota.DiskPartition;
 import io.subutai.common.quota.DiskQuota;
-import io.subutai.common.quota.Quota;
-import io.subutai.common.quota.QuotaType;
 import io.subutai.common.quota.RamQuota;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
@@ -143,6 +141,9 @@ public class RemotePeerImplTest
     @Mock
     private ContainerGateway containerGateway;
 
+    @Mock
+    private CpuQuota cpuQuota;
+
 
     @Before
     public void setUp() throws Exception
@@ -159,6 +160,7 @@ public class RemotePeerImplTest
         remotePeer.restUtil = restUtil;
         remotePeer.jsonUtil = jsonUtil;
 
+        when( cpuQuota.getPercentage() ).thenReturn( PERCENT );
         when( restUtil.createTrustedWebClientWithAuthAndProviders( anyString(), anyString(), any() ) )
                 .thenReturn( webClient );
         when( containerHost.getId() ).thenReturn( CONTAINER_ID );
@@ -487,13 +489,13 @@ public class RemotePeerImplTest
     @Test( expected = PeerException.class )
     public void testSetCpuQuota() throws Exception
     {
-        remotePeer.setCpuQuota( containerHost, PERCENT );
+        remotePeer.setCpuQuota( containerHost, cpuQuota );
 
         //verify( localPeer ).getId();
 
         throwException();
 
-        remotePeer.setCpuQuota( containerHost, PERCENT );
+        remotePeer.setCpuQuota( containerHost, cpuQuota );
     }
 
 
@@ -614,32 +616,32 @@ public class RemotePeerImplTest
     }
 
 
-    @Test( expected = PeerException.class )
-    public void testGetQuotaInfo() throws Exception
-    {
-        remotePeer.getQuotaInfo( containerHost, QuotaType.QUOTA_TYPE_CPU );
-
-        //verify( localPeer ).getId();
-
-        throwException();
-
-        remotePeer.getQuotaInfo( containerHost, QuotaType.QUOTA_TYPE_CPU );
-    }
-
-
-    @Test( expected = PeerException.class )
-    public void testSetQuota() throws Exception
-    {
-        Quota quotaInfo = mock( Quota.class );
-
-        remotePeer.setQuota( containerHost, quotaInfo );
-
-        //verify( localPeer ).getId();
-
-        throwException();
-
-        remotePeer.setQuota( containerHost, quotaInfo );
-    }
+    //    @Test( expected = PeerException.class )
+    //    public void testGetQuotaInfo() throws Exception
+    //    {
+    //        remotePeer.getQuotaInfo( containerHost, QuotaType.QUOTA_TYPE_CPU );
+    //
+    //        //verify( localPeer ).getId();
+    //
+    //        throwException();
+    //
+    //        remotePeer.getQuotaInfo( containerHost, QuotaType.QUOTA_TYPE_CPU );
+    //    }
+    //
+    //
+    //    @Test( expected = PeerException.class )
+    //    public void testSetQuota() throws Exception
+    //    {
+    //        Quota quotaInfo = mock( Quota.class );
+    //
+    //        remotePeer.setQuota( containerHost, quotaInfo );
+    //
+    //        //verify( localPeer ).getId();
+    //
+    //        throwException();
+    //
+    //        remotePeer.setQuota( containerHost, quotaInfo );
+    //    }
 
 
     @Test
