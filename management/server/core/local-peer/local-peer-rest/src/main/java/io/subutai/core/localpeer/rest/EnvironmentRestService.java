@@ -15,10 +15,8 @@ import javax.ws.rs.core.Response;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerId;
-import io.subutai.common.quota.CpuQuota;
-import io.subutai.common.quota.DiskPartition;
-import io.subutai.common.quota.DiskQuota;
-import io.subutai.common.quota.RamQuota;
+import io.subutai.common.resource.ResourceType;
+import io.subutai.common.resource.ResourceValue;
 
 
 public interface EnvironmentRestService
@@ -56,42 +54,6 @@ public interface EnvironmentRestService
                                                   @PathParam( "pid" ) int pid );
 
     @GET
-    @Path( "{environmentId}/container/{containerId}/quota/ram/available" )
-    @Produces( MediaType.APPLICATION_JSON )
-    Response getAvailableRamQuota( @PathParam( "containerId" ) ContainerId containerId );
-
-    @GET
-    @Path( "{environmentId}/container/{containerId}/quota/cpu/available" )
-    @Produces( MediaType.APPLICATION_JSON )
-    Response getAvailableCpuQuota( @PathParam( "containerId" ) ContainerId containerId );
-
-    @GET
-    @Path( "{environmentId}/container/{containerId}/quota/disk/{partition}/available" )
-    @Consumes( MediaType.APPLICATION_JSON )
-    @Produces( MediaType.APPLICATION_JSON )
-    Response getAvailableDiskQuota( @PathParam( "containerId" ) ContainerId containerId,
-                                    @PathParam( "partition" ) DiskPartition diskPartition );
-
-    @GET
-    @Path( "{environmentId}/container/{containerId}/quota/ram" )
-    @Produces( MediaType.APPLICATION_JSON )
-    Response getRamQuota( @PathParam( "containerId" ) ContainerId containerId );
-
-    @POST
-    @Path( "{environmentId}/container/{containerId}/quota/ram" )
-    Response setRamQuota( @PathParam( "containerId" ) ContainerId containerId, RamQuota ramQuota );
-
-
-    @GET
-    @Path( "{environmentId}/container/{containerId}/quota/cpu" )
-    @Produces( MediaType.APPLICATION_JSON )
-    Response getCpuQuota( @PathParam( "containerId" ) ContainerId containerId );
-
-    @POST
-    @Path( "{environmentId}/container/{containerId}/quota/cpu" )
-    Response setCpuQuota( @PathParam( "containerId" ) ContainerId containerId, CpuQuota cpuQuota );
-
-    @GET
     @Path( "{environmentId}/container/{containerId}/quota/cpuset" )
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
@@ -104,15 +66,23 @@ public interface EnvironmentRestService
     Response setCpuSet( @PathParam( "containerId" ) ContainerId containerId, Set<Integer> cpuSet );
 
     @GET
-    @Path( "{environmentId}/container/{containerId}/quota/disk/{partition}" )
+    @Path( "{environmentId}/container/{containerId}/quota/{resourceType}" )
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
-    Response getDiskQuota( @PathParam( "containerId" ) ContainerId containerId,
-                           @PathParam( "partition" ) DiskPartition diskPartition );
+    Response getQuota( @PathParam( "containerId" ) ContainerId containerId,
+                       @PathParam( "resourceType" ) ResourceType resourceType );
 
     @POST
-    @Path( "{environmentId}/container/{containerId}/quota/disk" )
+    @Path( "{environmentId}/container/{containerId}/quota/{resourceType}" )
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
-    Response setDiskQuota( @PathParam( "containerId" ) ContainerId containerId, DiskQuota diskQuota );
+    Response setQuota( @PathParam( "containerId" ) ContainerId containerId,
+                           @PathParam( "resourceType" ) ResourceType resourceType, ResourceValue resourceValue );
+
+    @GET
+    @Path( "{environmentId}/container/{containerId}/quota/{resourceType}/available" )
+    @Consumes( MediaType.APPLICATION_JSON )
+    @Produces( MediaType.APPLICATION_JSON )
+    Response getAvailableQuota( @PathParam( "containerId" ) ContainerId containerId,
+                                @PathParam( "resourceType" ) ResourceType resourceType );
 }
