@@ -2,6 +2,7 @@ package io.subutai.core.security.rest;
 
 
 import javax.naming.NamingException;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.core.Response;
 
 import org.bouncycastle.openpgp.PGPPublicKey;
@@ -103,6 +104,9 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
     }
 
 
+    /* ***********************************************************
+     *
+     */
     @Override
     public Response getUserKeyTrustTree()
     {
@@ -125,8 +129,8 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
 
 
     /* ******************************
-         *
-         */
+     *
+     */
     @Override
     public Response getPublicKeyFingerprint( final String hostId )
     {
@@ -143,6 +147,9 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
     }
 
 
+    /* ***********************************************************
+     *
+     */
     @Override
     public Response getKeyTrustTree( String hostId )
     {
@@ -153,9 +160,31 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
     }
 
 
+    /* ***********************************************************
+     *
+     */
     @Override
     public Response revokeKey( String hostId )
     {
         return null;
+    }
+
+
+    /* ***********************************************************
+     *
+     */
+    @Override
+    public Response signKey( final String sourceHostId, final String keyText, final int trustLevel )
+    {
+        String key = securityManager.getKeyManager().signPublicKey( sourceHostId, keyText, trustLevel );
+
+        if ( Strings.isNullOrEmpty( key ) )
+        {
+            return Response.status( Response.Status.NOT_FOUND ).entity( "Object Not found" ).build();
+        }
+        else
+        {
+            return Response.ok( key ).build();
+        }
     }
 }
