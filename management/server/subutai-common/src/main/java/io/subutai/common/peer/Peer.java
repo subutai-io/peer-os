@@ -87,7 +87,7 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
     /**
      * Sets default gateway for the container
      */
-    public void setDefaultGateway( ContainerGateway containerGateway) throws PeerException;
+    public void setDefaultGateway( ContainerGateway containerGateway ) throws PeerException;
 
     /**
      * Cleans up environment networking settings. This method is called when an environment is being destroyed to clean
@@ -141,23 +141,6 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
      */
     public boolean isLocal();
 
-    /**
-     * Get quota for enum specified
-     *
-     * @param host - Target container host whose quota details been requested
-     * @param quotaType - QuotaType needed
-     *
-     * @return - Abstract QuotaInfo class extended by quota classes
-     */
-    public Quota getQuotaInfo( ContainerHost host, QuotaType quotaType ) throws PeerException;
-
-    /**
-     * Sets quota on the container
-     *
-     * @param host - target container
-     * @param quotaInfo - quota to set
-     */
-    public void setQuota( ContainerHost host, Quota quotaInfo ) throws PeerException;
 
     /**
      * Returns tempalte by name
@@ -245,7 +228,7 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
      *
      * @return - quota in mb
      */
-//    public Quota getRamQuota( ContainerHost host ) throws PeerException;
+    //    public Quota getRamQuota( ContainerHost host ) throws PeerException;
 
 
     /**
@@ -274,7 +257,7 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
      *
      * @return - cpu quota on container in percent
      */
-//    public int getCpuQuota( ContainerHost host ) throws PeerException;
+    //    public int getCpuQuota( ContainerHost host ) throws PeerException;
 
 
     /**
@@ -291,9 +274,9 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
      * Sets CPU quota on container in percent
      *
      * @param host - container
-     * @param cpuPercent - cpu quota in percent
+     * @param cpuQuota - cpu quota
      */
-    public void setCpuQuota( ContainerHost host, int cpuPercent ) throws PeerException;
+    public void setCpuQuota( ContainerHost host, CpuQuota cpuQuota ) throws PeerException;
 
     /**
      * Returns allowed cpus/cores ids on container
@@ -405,6 +388,4 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
     void removePeerEnvironmentKeyPair( EnvironmentId environmentId ) throws PeerException;
 
     ResourceHostMetrics getResourceHostMetrics();
-
-
 }

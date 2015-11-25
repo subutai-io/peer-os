@@ -17,6 +17,15 @@ public enum RamQuotaUnit
     private int multiplicator;
 
 
+    RamQuotaUnit( final String acronym )
+    {
+        RamQuotaUnit instance = parseFromAcronym( acronym );
+        this.acronym = instance.getAcronym();
+        this.multiplicator = instance.getMultiplicator();
+        this.name = instance.getName();
+    }
+
+
     RamQuotaUnit( final String acronym, final String name, final int multiplicator )
     {
         this.acronym = acronym;
@@ -41,6 +50,7 @@ public enum RamQuotaUnit
     {
         return multiplicator;
     }
+
 
     public static RamQuotaUnit parseFromAcronym( String acronym )
     {
