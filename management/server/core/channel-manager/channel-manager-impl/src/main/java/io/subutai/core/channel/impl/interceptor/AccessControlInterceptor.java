@@ -25,7 +25,6 @@ import io.subutai.common.settings.ChannelSettings;
 import io.subutai.core.channel.impl.ChannelManagerImpl;
 import io.subutai.core.channel.impl.util.MessageContentUtil;
 import io.subutai.core.identity.api.model.Session;
-import io.subutai.core.identity.api.model.User;
 
 
 /**
@@ -124,6 +123,18 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
             {
                 HttpHeaders headers = new HttpHeadersImpl( message.getExchange().getInMessage() );
                 sptoken = headers.getHeaderString( "sptoken" );
+            }
+
+            if ( Strings.isNullOrEmpty( sptoken ) )
+            {
+                Cookie[] cookies = req.getCookies();
+                for ( final Cookie cookie : cookies )
+                {
+                    if ( "sptoken".equals( cookie.getName() ) )
+                    {
+                        sptoken = cookie.getValue();
+                    }
+                }
             }
 
             if ( Strings.isNullOrEmpty( sptoken ) )
