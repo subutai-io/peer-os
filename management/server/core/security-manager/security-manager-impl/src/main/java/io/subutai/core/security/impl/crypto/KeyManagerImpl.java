@@ -911,6 +911,29 @@ public class KeyManagerImpl implements KeyManager
     }
 
 
+    private void getKeyTrustList( final SecurityKeyIdentity securityKeyIdentity, SecurityKeyTrust securityKeyTrust,
+                                  Set<String> trustIdSet )
+    {
+        List<SecurityKeyTrust> trustedKeys = securityDataService.getKeyTrustData( securityKeyTrust.getTargetId() );
+        SecurityKeyIdentity trustedIdentity =
+                securityDataService.getKeyIdentityDataByFingerprint( securityKeyTrust.getTargetId() );
+        trustIdSet.add( securityKeyIdentity.getHostId() );
+
+        if ( trustedIdentity != null )
+        {
+            securityKeyIdentity.getTrustedKeys().add( trustedIdentity );
+        }
+
+        for ( final SecurityKeyTrust trustedKey : trustedKeys )
+        {
+            if ( trustedIdentity != null && !trustIdSet.contains( trustedIdentity.getHostId() ) )
+            {
+                getKeyTrustList( trustedIdentity, trustedKey, trustIdSet );
+            }
+        }
+    }
+
+
     /* *****************************
      *
      */
@@ -963,53 +986,9 @@ public class KeyManagerImpl implements KeyManager
         }
     }
 
-
     /* *****************************
      *
      */
-    private void getKeyTrustList( final SecurityKeyIdentity securityKeyIdentity, SecurityKeyTrust securityKeyTrust,
-                                  Set<String> trustIdSet )
-    {
-        List<SecurityKeyTrust> trustedKeys = securityDataService.getKeyTrustData( securityKeyTrust.getTargetId() );
-        SecurityKeyIdentity trustedIdentity =
-                securityDataService.getKeyIdentityDataByFingerprint( securityKeyTrust.getTargetId() );
-        trustIdSet.add( securityKeyIdentity.getHostId() );
-
-        if ( trustedIdentity != null )
-        {
-            securityKeyIdentity.getTrustedKeys().add( trustedIdentity );
-        }
-
-        for ( final SecurityKeyTrust trustedKey : trustedKeys )
-        {
-            if ( trustedIdentity != null && !trustIdSet.contains( trustedIdentity.getHostId() ) )
-            {
-                getKeyTrustList( trustedIdentity, trustedKey, trustIdSet );
-            }
-        }
-    }
-
-
-    /* *****************************
-     *
-     */
-    //    @Override
-    //    public int getTrustLevel( final String aHost, final String bHost )
-    //    {
-    //
-    //        SecurityKeyTrust trust = getKeyTrust( aHost, bHost );
-    //
-    //        if ( trust != null )
-    //        {
-    //            return trust.getLevel();
-    //        }
-    //        else
-    //        {
-    //            return KeyTrustLevel.Never.getId();
-    //        }
-    //    }
-
-
     @Override
     public void updatePublicKeyRing( final PGPPublicKeyRing publicKeyRing )
     {
