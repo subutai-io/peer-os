@@ -105,7 +105,7 @@ public interface RestService
     @Path( "/domains" )
     Response addEnvironmentDomain( @Multipart( "environmentId" ) String environmentId,
                                    @Multipart( "hostName" ) String hostName,
-                                   @Multipart( "strategy" ) DomainLoadBalanceStrategy strategy,
+                                   @Multipart( "strategy" ) String strategyJson,
                                    @Multipart(value = "file") Attachment attr );
 
 

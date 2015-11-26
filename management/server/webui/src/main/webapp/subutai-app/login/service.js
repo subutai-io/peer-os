@@ -7,7 +7,7 @@ loginSrv.$inject = ['$http'];
 
 function loginSrv($http)
 {
-	var loginURL = '/login';
+	var LOGIN_URL = SERVER_URL + 'login';
 
 	var loginSrv = {
 		login: login
@@ -21,6 +21,6 @@ function loginSrv($http)
 		var postData =
 			'username=' + user +
 			'&password=' + pass;
-		return $http.post(loginURL, postData, {withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}});
+		return $http.post(LOGIN_URL, postData, {withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}});
 	}
 }

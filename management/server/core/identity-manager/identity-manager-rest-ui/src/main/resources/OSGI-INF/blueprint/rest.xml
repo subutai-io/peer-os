@@ -11,7 +11,7 @@
     </cxf:features>
   </cxf:bus>
 
-  <jaxrs:server address="/identity_ui" id="identityRestUIService">
+  <jaxrs:server address="/ui/identity" id="identityRestUIService">
     <jaxrs:serviceBeans>
       <ref component-id="identityRestUIServiceImpl" />
     </jaxrs:serviceBeans>
