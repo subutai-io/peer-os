@@ -15,7 +15,7 @@ function TrackerCtrl(trackerSrv, $scope, DTOptionsBuilder, DTColumnBuilder, $res
 	vm.loadOperations = loadOperations;
 	vm.viewLogs = viewLogs;
 
-	//vm.selectedModule = 'ENVIRONMENT MANAGER';
+	vm.selectedModule = 'ENVIRONMENT_MANAGER';
 	vm.startDate = new Date("2015-01-01");
 	vm.endDate = new Date("2015-12-31");
 
@@ -28,11 +28,12 @@ function TrackerCtrl(trackerSrv, $scope, DTOptionsBuilder, DTColumnBuilder, $res
 	vm.dtOptions = DTOptionsBuilder
 		.fromFnPromise(function() {
 			var logsDates = getDateInStringFormat();
-			var url  = serverUrl + 'tracker_ui/operations/' + vm.selectedModule + '/' + logsDates.startDateString + '/' + logsDates.endDateString + '/' + 10;
+			var url  = trackerSrv.getBaseUrl() + 'operations/' + vm.selectedModule + '/' + logsDates.startDateString + '/' + logsDates.endDateString + '/' + 100;
 			return $resource( url ).query().$promise;
 		})
 		.withPaginationType('full_numbers')
 		.withOption('createdRow', createdRow)
+		.withOption('order', [[ 0, "desc" ]])
 		.withOption('columnDefs', [ {className: "b-main-table__status-col", "targets": [2, 3]} ])
 		.withOption('stateSave', true);
 

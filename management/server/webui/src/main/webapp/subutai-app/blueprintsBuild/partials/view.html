@@ -2,12 +2,26 @@
 
 	<div class="b-workspace__header">
 		<h1 class="b-title">
-			Blueprint/ 
+			<a ui_sref="blueprints">Blueprint/</a>
 			<span class="b-title_breadcrumbs">{{ blueprintsBuildCtrl.blueprintAction }} environment</span>
 		</h1>
 	</div>
 
 	<div class="b-workspace__content">
+
+		<div class="b-fixed-button" ng-class="blueprintsBuildCtrl.totalContainers == 0 ? 'b-fixed-button_disabled' : ''">
+			<a href 
+			ng-click="blueprintsBuildCtrl.buildPopup()" 
+			class="b-icon b-icon_box-white b-icon_notification" 
+			id="subt_link__environment-build-list">
+				<span class="b-icon__inner-num">
+					{{ blueprintsBuildCtrl.totalContainers }}
+				</span>
+			</a>
+
+			<div class="clear"></div>
+		</div>
+
 		<div class="b-main-form">
 			<div class="b-main-form__wrapper b-main-form__wrapper_margin-r" 
 				ng-show="blueprintsBuildCtrl.blueprintAction == 'grow'">
@@ -28,20 +42,22 @@
 			class="b-main-form__wrapper b-main-form__wrapper_margin-r">
 				<label class="b-popup-body-label b-popup-body-label_inline">Environment name</label>
 				<input type="text" 
+				id="subt_input__environment-name" 
 				class="b-popup-body-input b-popup-body-input__enviroment-name" 
 				ng-class="blueprintsBuildCtrl.popupError ? 'b-popup-body-input__error' : ''" 
 				ng-model="blueprintsBuildCtrl.newEnvironmentName">
 			</div>
 
-			<div class="b-main-form__wrapper g-right">
-				<a href ng-click="blueprintsBuildCtrl.buildPopup()" class="b-icon b-icon_box b-icon_notification">
-					<span class="b-icon__inner-num">
-						{{ blueprintsBuildCtrl.totalContainers }}
-					</span>
-				</a>
-
+			<div class="b-main-form__wrapper b-main-form__wrapper_margin-r">
+				<label class="b-popup-body-label b-popup-body-label_inline">Build Type</label>
+				<select class="b-popup-body-input b-popup-body-input_enviroment-name" 
+					ng-model="blueprintsBuildCtrl.buildWith">
+					<option value="strategie">Strategie</option>
+					<option value="resources">Resource Host</option>
+				</select>
 				<div class="clear"></div>
 			</div>
+
 		</div>
 		<div class="b-main-table-border">
 			<table class="b-main-table b-main-table_with-header">
@@ -49,12 +65,20 @@
 					<th>Node group</th>
 					<th>Amount containers</th>
 					<th>Peer</th>
-					<th>Strategie</th>
+					<th class="b-main-table__capitalize">{{ blueprintsBuildCtrl.buildWith }}</th>
 					<th></th>
 				</tr>
 				<tr ng-repeat="(key, nodeGroup) in blueprintsBuildCtrl.transportNodes">
 					<td>
-						<span class="b-tags b-tags_{{ blueprintsBuildCtrl.colors[nodeGroup.type] }}">
+						<span 
+							class="b-tags b-tags_{{ blueprintsBuildCtrl.colors[nodeGroup.type] }}" 
+							tooltips 
+							tooltip-content='
+								Template: <b>{{ nodeGroup.templateName }}</b><br>
+								Quota: <div class="b-quota-type-round b-quota-type-round_{{ blueprintsBuildCtrl.colors[nodeGroup.type] }}"></div> <b>{{ nodeGroup.type }}</b><br>
+								SSH Group ID: <b>{{ nodeGroup.sshGroupId }}</b><br>
+								Host Group ID: <b>{{ nodeGroup.hostsGroupId }}</b>
+							'>
 							{{ nodeGroup.name }}: {{ nodeGroup.numberOfContainers }}
 						</span>
 					</td>
@@ -65,29 +89,34 @@
 							ng-if='nodeGroup.show'
 						>
 						</div>
+						<input 
+						type="hidden" 
+						class="subt_input__environment-amount-containers" 
+						value="{{ nodeGroup.options.start }}"
+						ng-model="nodeGroup.options.start">
 					</td>
 					<td>
-						<select class="b-popup-body-input b-popup-body-input_table" 
+						<select class="b-popup-body-input b-popup-body-input_table subt_select__environment-peer" 
 						ng-model="nodeGroup.peer">
 							<option 
 							ng-repeat="(peerId, peer) in blueprintsBuildCtrl.peers" 
 							value="{{ peerId }}">
-								{{ peer }}
+								{{ peerId }}
 							</option>
 						</select>
 					</td>
 					<td>
-						<select class="b-popup-body-input b-popup-body-input_table" 
-						ng-model="nodeGroup.strategyId">
+						<select class="b-popup-body-input b-popup-body-input_table subt_select__environment-strategie" 
+						ng-model="nodeGroup.createOption">
 							<option 
-							ng-repeat="strategie in blueprintsBuildCtrl.strategies" 
-							value="{{ strategie }}">
-								{{ strategie }}
+							ng-repeat="buildType in blueprintsBuildCtrl.peers[nodeGroup.peer][blueprintsBuildCtrl.buildWith]" 
+							value="{{ buildType }}">
+								{{ buildType }}
 							</option>
 						</select>
 					</td>
 					<td>
-						<a href class="b-btn b-btn_green" 
+						<a href class="b-btn b-btn_green subt_button__environment-place" 
 						ng-click="blueprintsBuildCtrl.placeNode(nodeGroup, key)">
 							<i class="b-icon b-icon_box-white b-icon_box-white_place"></i> Place
 						</a>
