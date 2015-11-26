@@ -200,4 +200,6 @@ public interface KeyManager
      *
      */
     int getTrustLevel( String aHost, String bHost );
+
+    void updatePublicKeyRing( PGPPublicKeyRing publicKeyRing );
 }

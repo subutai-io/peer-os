@@ -16,7 +16,6 @@ public class SecurityKeyData
     private String manHostKeyFingerprint;
     private String ownerPublicKeyringFile;
     private Object jsonProvider;
-    private EncryptionTool encryptionTool;
 
 
     public String getPublicKeyringFile()
@@ -101,15 +100,4 @@ public class SecurityKeyData
         this.jsonProvider = jsonProvider;
     }
 
-
-    public EncryptionTool getEncryptionTool()
-    {
-        return encryptionTool;
-    }
-
-
-    public void setEncryptionTool( final EncryptionTool encryptionTool )
-    {
-        this.encryptionTool = encryptionTool;
-    }
 }

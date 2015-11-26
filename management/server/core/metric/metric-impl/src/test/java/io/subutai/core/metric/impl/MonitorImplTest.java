@@ -38,20 +38,19 @@ import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.RemotePeer;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
-import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.metric.api.AlertListener;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.metric.api.MonitoringSettings;
-import io.subutai.common.peer.LocalPeer;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.common.peer.RemotePeer;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
@@ -104,8 +103,6 @@ public class MonitorImplTest
     @Mock
     PeerManager peerManager;
     @Mock
-    IdentityManager identityManager;
-    @Mock
     EnvironmentManager environmentManager;
     @Mock
     MonitorDao monitorDao;
@@ -146,10 +143,10 @@ public class MonitorImplTest
 
     static class MonitorImplExt extends MonitorImpl
     {
-        public MonitorImplExt( PeerManager peerManager, DaoManager daoManager, IdentityManager identityManager,
-                               EnvironmentManager environmentManager ) throws MonitorException
+        public MonitorImplExt( PeerManager peerManager, DaoManager daoManager, EnvironmentManager environmentManager )
+                throws MonitorException
         {
-            super( peerManager, daoManager, identityManager, environmentManager );
+            super( peerManager, daoManager, environmentManager );
         }
 
 
@@ -179,7 +176,7 @@ public class MonitorImplTest
         when( daoManager.getEntityManagerFactory() ).thenReturn( entityManagerFactory );
 
 
-        monitor = new MonitorImplExt( peerManager, daoManager, identityManager, environmentManager );
+        monitor = new MonitorImplExt( peerManager, daoManager, environmentManager );
         monitor.setMonitorDao( monitorDao );
 
 
@@ -745,7 +742,7 @@ public class MonitorImplTest
         Monitor monitor1 = null;
         try
         {
-            monitor1 = new MonitorImpl( peerManager, daoManager, identityManager, environmentManager );
+            monitor1 = new MonitorImpl( peerManager, daoManager, environmentManager );
         }
         catch ( MonitorException e )
         {

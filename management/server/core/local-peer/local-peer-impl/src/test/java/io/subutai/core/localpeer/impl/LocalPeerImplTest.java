@@ -41,13 +41,10 @@ import io.subutai.common.peer.RequestListener;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.protocol.Template;
-import io.subutai.common.quota.CpuQuota;
-import io.subutai.common.quota.DiskPartition;
-import io.subutai.common.quota.DiskQuota;
-import io.subutai.common.quota.Quota;
 import io.subutai.common.quota.QuotaException;
-import io.subutai.common.quota.QuotaType;
-import io.subutai.common.quota.RamQuota;
+import io.subutai.common.resource.MeasureUnit;
+import io.subutai.common.resource.ResourceType;
+import io.subutai.common.resource.ResourceValue;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.core.executor.api.CommandExecutor;
@@ -194,7 +191,7 @@ public class LocalPeerImplTest
     private ContainerGateway containerGateway;
 
     @Mock
-    private CpuQuota cpuQuota;
+    private ResourceValue cpuQuota;
 
 
     @Before
@@ -216,7 +213,7 @@ public class LocalPeerImplTest
         localPeer.managementHost = managementHost;
         localPeer.requestListeners = Sets.newHashSet( requestListener );
 
-        when( cpuQuota.getPercentage() ).thenReturn( Integer.parseInt( CPUQUOTA ) );
+//        when( cpuQuota.getValue( MeasureUnit.PERCENT ).intValue() ).thenReturn( Integer.parseInt( CPUQUOTA ) );
         when( containerGateway.getContainerId() ).thenReturn( containerId );
         //        when(containerGateway.getGateway()).thenReturn(  );
 
@@ -583,28 +580,28 @@ public class LocalPeerImplTest
     @Ignore
     public void testGetQuotaInfo() throws Exception
     {
-        localPeer.getQuota( containerHost, QuotaType.QUOTA_TYPE_CPU );
+        localPeer.getQuota( containerHost, ResourceType.CPU );
 
-        verify( quotaManager ).getQuota( containerId, QuotaType.QUOTA_TYPE_CPU );
+        verify( quotaManager ).getQuota( containerId, ResourceType.CPU );
 
-        doThrow( new QuotaException( "" ) ).when( quotaManager ).getQuota( containerId, QuotaType.QUOTA_TYPE_CPU );
+        doThrow( new QuotaException( "" ) ).when( quotaManager ).getQuota( containerId, ResourceType.CPU );
 
-        localPeer.getQuota( containerHost, QuotaType.QUOTA_TYPE_CPU );
+        localPeer.getQuota( containerHost, ResourceType.CPU );
     }
 
 
     @Test( expected = PeerException.class )
     public void testSetQuota() throws Exception
     {
-        Quota quotaInfo = mock( Quota.class );
+        ResourceValue quotaInfo = mock( ResourceValue.class );
 
-        localPeer.setQuota( containerHost, quotaInfo );
+        localPeer.setQuota( containerHost, ResourceType.RAM, quotaInfo );
 
-        verify( quotaManager ).setQuota( containerId, quotaInfo );
+        verify( quotaManager ).setQuota( containerId, ResourceType.RAM, quotaInfo );
 
-        doThrow( new QuotaException( "" ) ).when( quotaManager ).setQuota( containerId, quotaInfo );
+        doThrow( new QuotaException( "" ) ).when( quotaManager ).setQuota( containerId, ResourceType.RAM, quotaInfo );
 
-        localPeer.setQuota( containerHost, quotaInfo );
+        localPeer.setQuota( containerHost, ResourceType.RAM, quotaInfo );
     }
 
 
@@ -819,80 +816,13 @@ public class LocalPeerImplTest
     @Test( expected = PeerException.class )
     public void testGetRamQuota() throws Exception
     {
-        localPeer.getRamQuota( containerHost );
+        localPeer.getQuota( containerHost, ResourceType.RAM );
 
-        verify( quotaManager ).getQuota( containerId, QuotaType.QUOTA_TYPE_RAM );
+        verify( quotaManager ).getQuota( containerId, ResourceType.RAM );
 
-        doThrow( new QuotaException( "" ) ).when( quotaManager ).getQuota( containerId, QuotaType.QUOTA_TYPE_RAM );
+        doThrow( new QuotaException( "" ) ).when( quotaManager ).getQuota( containerId, ResourceType.RAM );
 
-        localPeer.getRamQuota( containerHost );
-    }
-
-
-    @Test( expected = PeerException.class )
-    public void testGetRamQuotaInfo() throws Exception
-    {
-        localPeer.getRamQuota( containerHost );
-
-        verify( quotaManager ).getQuota( containerId, QuotaType.QUOTA_TYPE_RAM );
-
-        doThrow( new QuotaException( "" ) ).when( quotaManager ).getQuota( containerId, QuotaType.QUOTA_TYPE_RAM );
-
-        localPeer.getRamQuota( containerHost );
-    }
-
-
-    @Test( expected = PeerException.class )
-    public void testSetRamQuota() throws Exception
-    {
-        localPeer.setRamQuota( containerHost, QUOTA );
-
-        verify( quotaManager ).setQuota( containerId, QuotaType.QUOTA_TYPE_RAM, RAMQUOTA );
-
-        doThrow( new QuotaException( "" ) ).when( quotaManager )
-                                           .setQuota( containerId, QuotaType.QUOTA_TYPE_RAM, RAMQUOTA );
-
-        localPeer.setRamQuota( containerHost, QUOTA );
-    }
-
-
-    @Test( expected = PeerException.class )
-    public void testGetCpuQuota() throws Exception
-    {
-        localPeer.getCpuQuota( containerHost );
-
-        verify( quotaManager ).getQuota( containerId, QuotaType.QUOTA_TYPE_CPU );
-
-        doThrow( new QuotaException() ).when( quotaManager ).getQuota( containerId, QuotaType.QUOTA_TYPE_CPU );
-
-        localPeer.getCpuQuota( containerHost );
-    }
-
-
-    @Test( expected = PeerException.class )
-    public void testGetCpuQuotaInfo() throws Exception
-    {
-        localPeer.getCpuQuota( containerHost );
-
-        verify( quotaManager ).getQuota( containerId, QuotaType.QUOTA_TYPE_CPU );
-
-        doThrow( new QuotaException() ).when( quotaManager ).getQuota( containerId, QuotaType.QUOTA_TYPE_CPU );
-
-        localPeer.getCpuQuota( containerHost );
-    }
-
-
-    @Test( expected = PeerException.class )
-    public void testSetCpuQuota() throws Exception
-    {
-        localPeer.setCpuQuota( containerHost, cpuQuota );
-
-        verify( quotaManager ).setQuota( containerId, QuotaType.QUOTA_TYPE_CPU, CPUQUOTA );
-
-        doThrow( new QuotaException() ).when( quotaManager )
-                                       .setQuota( containerId, QuotaType.QUOTA_TYPE_CPU, CPUQUOTA );
-
-        localPeer.setCpuQuota( containerHost, cpuQuota );
+        localPeer.getQuota( containerHost, ResourceType.RAM );
     }
 
 
@@ -919,88 +849,6 @@ public class LocalPeerImplTest
         doThrow( new QuotaException() ).when( quotaManager ).setCpuSet( eq( containerId ), anySet() );
 
         localPeer.setCpuSet( containerHost, Sets.newHashSet( QUOTA ) );
-    }
-
-
-    @Test( expected = PeerException.class )
-    public void testGetDiskQuota() throws Exception
-    {
-        localPeer.getDiskQuota( containerHost, DiskPartition.VAR );
-
-        verify( quotaManager ).getDiskQuota( containerId, DiskPartition.VAR );
-
-        doThrow( new QuotaException() ).when( quotaManager ).getDiskQuota( containerId, DiskPartition.VAR );
-
-        localPeer.getDiskQuota( containerHost, DiskPartition.VAR );
-    }
-
-
-    @Test( expected = PeerException.class )
-    public void testSetDiskQuota() throws Exception
-    {
-        DiskQuota diskQuota = mock( DiskQuota.class );
-
-        localPeer.setDiskQuota( containerHost, diskQuota );
-
-        verify( quotaManager ).setQuota( containerId, diskQuota );
-
-        doThrow( new QuotaException() ).when( quotaManager ).setQuota( containerId, diskQuota );
-
-        localPeer.setDiskQuota( containerHost, diskQuota );
-    }
-
-
-    @Test( expected = PeerException.class )
-    public void testSetRamQuota2() throws Exception
-    {
-        RamQuota ramQuotaInfo = mock( RamQuota.class );
-
-        localPeer.setRamQuota( containerHost, ramQuotaInfo );
-
-        verify( quotaManager ).setQuota( containerId, ramQuotaInfo );
-
-        doThrow( new QuotaException() ).when( quotaManager ).setQuota( containerId, ramQuotaInfo );
-
-        localPeer.setRamQuota( containerHost, ramQuotaInfo );
-    }
-
-
-    @Test( expected = PeerException.class )
-    public void testGetAvailableRamQuota() throws Exception
-    {
-        localPeer.getAvailableRamQuota( containerHost );
-
-        verify( quotaManager ).getAvailableQuota( containerId, QuotaType.QUOTA_TYPE_RAM );
-
-        doThrow( new QuotaException() ).when( quotaManager ).getAvailableQuota( containerId, QuotaType.QUOTA_TYPE_RAM );
-
-        localPeer.getAvailableRamQuota( containerHost );
-    }
-
-
-    @Test( expected = PeerException.class )
-    public void testGetAvailableCpuQuota() throws Exception
-    {
-        localPeer.getAvailableCpuQuota( containerHost );
-
-        verify( quotaManager ).getAvailableQuota( containerId, QuotaType.QUOTA_TYPE_CPU );
-
-        doThrow( new QuotaException() ).when( quotaManager ).getAvailableQuota( containerId, QuotaType.QUOTA_TYPE_CPU );
-
-        localPeer.getAvailableCpuQuota( containerHost );
-    }
-
-
-    @Test( expected = PeerException.class )
-    public void testGetAvailableDiskQuota() throws Exception
-    {
-        localPeer.getAvailableDiskQuota( containerHost, DiskPartition.VAR );
-
-        verify( quotaManager ).getAvailableDiskQuota( containerId, DiskPartition.VAR );
-
-        doThrow( new QuotaException() ).when( quotaManager ).getAvailableDiskQuota( containerId, DiskPartition.VAR );
-
-        localPeer.getAvailableDiskQuota( containerHost, DiskPartition.VAR );
     }
 
 

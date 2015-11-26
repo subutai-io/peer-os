@@ -53,7 +53,6 @@ public class SecurityManagerImpl implements SecurityManager
         keyData.setSecretKeyringFile( secretKeyringFile );
         keyData.setPublicKeyringFile( publicKeyringFile );
         keyData.setSecretKeyringPwd( secretKeyringPwd );
-        keyData.setEncryptionTool(encryptionTool);
 
         httpContextManager = new HttpContextManagerImpl();
     }

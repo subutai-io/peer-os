@@ -75,6 +75,7 @@ import io.subutai.core.peer.api.PeerActionResponse;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registry.api.TemplateRegistry;
 import io.subutai.core.tracker.api.Tracker;
+import io.subutai.core.security.api.SecurityManager;
 
 
 @PermitAll
@@ -87,6 +88,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     private final IdentityManager identityManager;
     private final PeerManager peerManager;
+    private SecurityManager securityManager;
     private final NetworkManager networkManager;
     private final Tracker tracker;
     private final TemplateRegistry templateRegistry;
@@ -101,6 +103,93 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     protected BlueprintDataService blueprintDataService;
 
     protected ExceptionUtil exceptionUtil = new ExceptionUtil();
+
+
+    public EnvironmentManagerImpl( final TemplateRegistry templateRegistry, final PeerManager peerManager,
+                                   SecurityManager securityManager, final NetworkManager networkManager,
+                                   final DaoManager daoManager, final IdentityManager identityManager,
+                                   final Tracker tracker )
+    {
+        Preconditions.checkNotNull( templateRegistry );
+        Preconditions.checkNotNull( peerManager );
+        Preconditions.checkNotNull( networkManager );
+        Preconditions.checkNotNull( daoManager );
+        Preconditions.checkNotNull( identityManager );
+        Preconditions.checkNotNull( securityManager );
+        Preconditions.checkNotNull( tracker );
+
+        this.templateRegistry = templateRegistry;
+        this.peerManager = peerManager;
+        this.securityManager = securityManager;
+        this.networkManager = networkManager;
+        this.daoManager = daoManager;
+        this.identityManager = identityManager;
+        this.tracker = tracker;
+    }
+
+
+    public void init()
+    {
+        this.blueprintDataService = new BlueprintDataService( daoManager );
+        this.environmentDataService = new EnvironmentDataService( daoManager );
+        this.environmentContainerDataService = new EnvironmentContainerDataService( daoManager );
+        peerManager.registerPeerActionListener( this );
+    }
+
+
+    public void dispose()
+    {
+        executor.shutdown();
+        peerManager.unregisterPeerActionListener( this );
+    }
+
+
+    @Override
+    public PeerActionResponse onPeerAction( final PeerAction peerAction )
+    {
+        Preconditions.checkNotNull( peerAction );
+
+        PeerActionResponse response = PeerActionResponse.Ok();
+        switch ( peerAction.getType() )
+        {
+            case REGISTER:
+                // it is ok
+                break;
+            case UNREGISTER:
+                if ( isPeerInUse( ( ( String ) peerAction.getData() ) ) )
+                {
+                    response = PeerActionResponse.Fail( "Peer in use." );
+                }
+
+                break;
+        }
+        return response;
+    }
+
+
+    private boolean isPeerInUse( String peerId )
+    {
+        boolean inUse = false;
+        for ( Iterator<EnvironmentImpl> i = environmentDataService.getAll().iterator(); !inUse && i.hasNext(); )
+        {
+            EnvironmentImpl e = i.next();
+            if ( e.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
+            {
+                inUse = true;
+                break;
+            }
+
+            for ( PeerConf p : e.getPeerConfs() )
+            {
+                if ( peerId.equals( p.getPeerId() ) )
+                {
+                    inUse = true;
+                    break;
+                }
+            }
+        }
+        return inUse;
+    }
 
 
     @Override
@@ -949,7 +1038,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                                                                           final TrackerOperation operationTracker )
     {
         return new EnvironmentCreationWorkflow( Common.DEFAULT_DOMAIN_NAME, templateRegistry, this, networkManager,
-                peerManager, environment, topology, sshKey, operationTracker );
+                peerManager, securityManager, identityManager, environment, topology, sshKey, operationTracker );
     }
 
 
@@ -958,7 +1047,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                                                                       final TrackerOperation tracker )
     {
         return new EnvironmentImportWorkflow( Common.DEFAULT_DOMAIN_NAME, templateRegistry, this, networkManager,
-                peerManager, environment, topology, sshKey, tracker );
+                peerManager, securityManager, identityManager, environment, topology, sshKey, tracker );
     }
 
 
@@ -1198,90 +1287,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     protected Long getUserId()
     {
         return ( long ) 0;//getUser().getId();
-    }
-
-
-    public EnvironmentManagerImpl( final TemplateRegistry templateRegistry, final PeerManager peerManager,
-                                   final NetworkManager networkManager, final DaoManager daoManager,
-                                   final IdentityManager identityManager, final Tracker tracker )
-    {
-        Preconditions.checkNotNull( templateRegistry );
-        Preconditions.checkNotNull( peerManager );
-        Preconditions.checkNotNull( networkManager );
-        Preconditions.checkNotNull( daoManager );
-        Preconditions.checkNotNull( identityManager );
-        Preconditions.checkNotNull( tracker );
-
-        this.templateRegistry = templateRegistry;
-        this.peerManager = peerManager;
-        this.networkManager = networkManager;
-        this.daoManager = daoManager;
-        this.identityManager = identityManager;
-        this.tracker = tracker;
-    }
-
-
-    public void init()
-    {
-        this.blueprintDataService = new BlueprintDataService( daoManager );
-        this.environmentDataService = new EnvironmentDataService( daoManager );
-        this.environmentContainerDataService = new EnvironmentContainerDataService( daoManager );
-        peerManager.registerPeerActionListener( this );
-    }
-
-
-    public void dispose()
-    {
-        executor.shutdown();
-        peerManager.unregisterPeerActionListener( this );
-    }
-
-
-    @Override
-    public PeerActionResponse onPeerAction( final PeerAction peerAction )
-    {
-        Preconditions.checkNotNull( peerAction );
-
-        PeerActionResponse response = PeerActionResponse.Ok();
-        switch ( peerAction.getType() )
-        {
-            case REGISTER:
-                // it is ok
-                break;
-            case UNREGISTER:
-                if ( isPeerInUse( ( ( String ) peerAction.getData() ) ) )
-                {
-                    response = PeerActionResponse.Fail( "Peer in use." );
-                }
-
-                break;
-        }
-        return response;
-    }
-
-
-    private boolean isPeerInUse( String peerId )
-    {
-        boolean inUse = false;
-        for ( Iterator<EnvironmentImpl> i = environmentDataService.getAll().iterator(); !inUse && i.hasNext(); )
-        {
-            EnvironmentImpl e = i.next();
-            if ( e.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
-            {
-                inUse = true;
-                break;
-            }
-
-            for ( PeerConf p : e.getPeerConfs() )
-            {
-                if ( peerId.equals( p.getPeerId() ) )
-                {
-                    inUse = true;
-                    break;
-                }
-            }
-        }
-        return inUse;
     }
 
 

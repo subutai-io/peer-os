@@ -15,10 +15,8 @@ import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.PeerException;
-import io.subutai.common.quota.CpuQuota;
-import io.subutai.common.quota.DiskPartition;
-import io.subutai.common.quota.DiskQuota;
-import io.subutai.common.quota.RamQuota;
+import io.subutai.common.resource.ResourceType;
+import io.subutai.common.resource.ResourceValue;
 import io.subutai.common.security.WebClientBuilder;
 
 
@@ -132,88 +130,6 @@ public class EnvironmentWebClient
     }
 
 
-    public RamQuota getRamQuota( final String host, final ContainerId containerId ) throws PeerException
-    {
-        String path = String.format( "/%s/container/%s/quota/ram", containerId.getEnvironmentId().getId(),
-                containerId.getId() );
-
-        WebClient client = WebClientBuilder.buildEnvironmentWebClient( host, path, provider );
-
-        client.type( MediaType.APPLICATION_JSON );
-        client.accept( MediaType.APPLICATION_JSON );
-        try
-        {
-            return client.get( RamQuota.class );
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException( "Error on obtaining ram quota", e );
-        }
-    }
-
-
-    public void setRamQuota( final String host, final ContainerId containerId, final RamQuota ramQuota )
-            throws PeerException
-    {
-        String path = String.format( "/%s/container/%s/quota/ram", containerId.getEnvironmentId().getId(),
-                containerId.getId() );
-
-        WebClient client = WebClientBuilder.buildEnvironmentWebClient( host, path, provider );
-
-        client.type( MediaType.APPLICATION_JSON );
-        client.accept( MediaType.APPLICATION_JSON );
-        try
-        {
-            client.post( ramQuota );
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException( "Error on setting ram quota", e );
-        }
-    }
-
-
-    public CpuQuota getCpuQuota( final String host, final ContainerId containerId ) throws PeerException
-    {
-        String path = String.format( "/%s/container/%s/quota/cpu", containerId.getEnvironmentId().getId(),
-                containerId.getId() );
-
-        WebClient client = WebClientBuilder.buildEnvironmentWebClient( host, path, provider );
-
-        client.type( MediaType.APPLICATION_JSON );
-        client.accept( MediaType.APPLICATION_JSON );
-        try
-        {
-            return client.get( CpuQuota.class );
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException( "Error on obtaining cpu quota", e );
-        }
-    }
-
-
-    public void setCpuQuota( final String host, final ContainerId containerId, final CpuQuota cpuQuota )
-            throws PeerException
-    {
-        String path = String.format( "/%s/container/%s/quota/cpu", containerId.getEnvironmentId().getId(),
-                containerId.getId() );
-
-        WebClient client = WebClientBuilder.buildEnvironmentWebClient( host, path, provider );
-
-        client.type( MediaType.APPLICATION_JSON );
-        client.accept( MediaType.APPLICATION_JSON );
-        try
-        {
-            client.post( cpuQuota );
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException( "Error on setting cpu quota", e );
-        }
-    }
-
-
     public Set<Integer> getCpuSet( final String host, final ContainerId containerId ) throws PeerException
     {
         String path = String.format( "/%s/container/%s/quota/cpuset", containerId.getEnvironmentId().getId(),
@@ -255,11 +171,33 @@ public class EnvironmentWebClient
     }
 
 
-    public DiskQuota getDiskQuota( final String host, final ContainerId containerId, final DiskPartition diskPartition )
+    public ResourceValue getAvailableQuota( final String host, final ContainerId containerId,
+                                            final ResourceType resourceType ) throws PeerException
+    {
+        String path = String.format( "/%s/container/%s/quota/%s/available", containerId.getEnvironmentId().getId(),
+                containerId.getId(), resourceType );
+
+        WebClient client = WebClientBuilder.buildEnvironmentWebClient( host, path, provider );
+
+        client.type( MediaType.APPLICATION_JSON );
+        client.accept( MediaType.APPLICATION_JSON );
+        try
+        {
+            return client.get( ResourceValue.class );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Error on obtaining available quota", e );
+        }
+    }
+
+
+    public ResourceValue getQuota( final String host, final ContainerId containerId, final ResourceType resourceType )
             throws PeerException
     {
-        String path = String.format( "/%s/container/%s/quota/disk/%s", containerId.getEnvironmentId().getId(),
-                containerId.getId(), diskPartition );
+        String path =
+                String.format( "/%s/container/%s/quota/%s", containerId.getEnvironmentId().getId(), containerId.getId(),
+                        resourceType );
 
         WebClient client = WebClientBuilder.buildEnvironmentWebClient( host, path, provider );
 
@@ -267,20 +205,23 @@ public class EnvironmentWebClient
         client.accept( MediaType.APPLICATION_JSON );
         try
         {
-            return client.get( DiskQuota.class );
+            return client.get( ResourceValue.class );
         }
         catch ( Exception e )
         {
-            throw new PeerException( "Error on obtaining cpu set", e );
+            throw new PeerException( "Error on obtaining available quota", e );
         }
     }
 
 
-    public void setDiskQuota( final String host, final ContainerId containerId, final DiskQuota diskQuota )
+    public void setQuota( final String host, final ContainerId containerId, final ResourceType resourceType,
+                          ResourceValue resourceValue )
+
             throws PeerException
     {
-        String path = String.format( "/%s/container/%s/quota/disk", containerId.getEnvironmentId().getId(),
-                containerId.getId() );
+        String path =
+                String.format( "/%s/container/%s/quota/%s", containerId.getEnvironmentId().getId(), containerId.getId(),
+                        resourceType );
 
         WebClient client = WebClientBuilder.buildEnvironmentWebClient( host, path, provider );
 
@@ -288,72 +229,11 @@ public class EnvironmentWebClient
         client.accept( MediaType.APPLICATION_JSON );
         try
         {
-            client.post( diskQuota );
+            client.post( resourceValue );
         }
         catch ( Exception e )
         {
-            throw new PeerException( "Error on setting disk quota", e );
-        }
-    }
-
-
-    public RamQuota getAvailableRamQuota( final String host, final ContainerId containerId ) throws PeerException
-    {
-        String path = String.format( "/%s/container/%s/quota/ram/available", containerId.getEnvironmentId().getId(),
-                containerId.getId() );
-
-        WebClient client = WebClientBuilder.buildEnvironmentWebClient( host, path, provider );
-
-        client.type( MediaType.APPLICATION_JSON );
-        client.accept( MediaType.APPLICATION_JSON );
-        try
-        {
-            return client.get( RamQuota.class );
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException( "Error on obtaining available ram quota", e );
-        }
-    }
-
-
-    public CpuQuota getAvailableCpuQuota( final String host, final ContainerId containerId ) throws PeerException
-    {
-        String path = String.format( "/%s/container/%s/quota/cpu/available", containerId.getEnvironmentId().getId(),
-                containerId.getId() );
-
-        WebClient client = WebClientBuilder.buildEnvironmentWebClient( host, path, provider );
-
-        client.type( MediaType.APPLICATION_JSON );
-        client.accept( MediaType.APPLICATION_JSON );
-        try
-        {
-            return client.get( CpuQuota.class );
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException( "Error on obtaining available cpu quota", e );
-        }
-    }
-
-
-    public DiskQuota getAvailableDiskQuota( final String host, final ContainerId containerId,
-                                            final DiskPartition diskPartition ) throws PeerException
-    {
-        String path = String.format( "/%s/container/%s/quota/disk/%s/available", containerId.getEnvironmentId().getId(),
-                containerId.getId(), diskPartition );
-
-        WebClient client = WebClientBuilder.buildEnvironmentWebClient( host, path, provider );
-
-        client.type( MediaType.APPLICATION_JSON );
-        client.accept( MediaType.APPLICATION_JSON );
-        try
-        {
-            return client.get( DiskQuota.class );
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException( "Error on obtaining available disk quota", e );
+            throw new PeerException( "Error on setting quota", e );
         }
     }
 }

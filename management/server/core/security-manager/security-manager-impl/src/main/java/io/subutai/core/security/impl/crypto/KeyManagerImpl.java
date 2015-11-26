@@ -2,6 +2,7 @@ package io.subutai.core.security.impl.crypto;
 
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.security.AccessControlException;
 import java.util.List;
@@ -64,9 +65,17 @@ public class KeyManagerImpl implements KeyManager
         this.keyData = securityKeyData;
         this.securityDataService = securityDataService;
         this.keyServer = keyServer;
-        encryptionTool = this.keyData.getEncryptionTool();
 
         init();
+    }
+
+
+    /* *****************************
+     *
+     */
+    public void setEncryptionTool( final EncryptionTool encryptionTool )
+    {
+        this.encryptionTool = encryptionTool;
     }
 
 
@@ -105,6 +114,13 @@ public class KeyManagerImpl implements KeyManager
                 //************************************************************
                 setKeyTrust( ownerPeerFPrint, peerId, KeyTrustLevel.Full.getId() );
                 //************************************************************
+
+                //************************************************************
+                //ownerPubStream.close();
+                //peerPubStream.close();
+                //peerSecStream.close();
+                //************************************************************
+
             }
         }
         catch ( Exception ex )
@@ -932,6 +948,20 @@ public class KeyManagerImpl implements KeyManager
         else
         {
             return KeyTrustLevel.Never.getId();
+        }
+    }
+
+
+    @Override
+    public void updatePublicKeyRing( final PGPPublicKeyRing publicKeyRing )
+    {
+        try
+        {
+            keyServer.updatePublicKey( publicKeyRing );
+        }
+        catch ( IOException | PGPException e )
+        {
+            LOG.warn( e.getMessage() );
         }
     }
 }

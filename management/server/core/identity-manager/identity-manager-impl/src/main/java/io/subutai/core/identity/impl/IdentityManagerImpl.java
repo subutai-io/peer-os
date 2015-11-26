@@ -137,7 +137,8 @@ public class IdentityManagerImpl implements IdentityManager
             //***********************************************************
 
             //***Create Token *******************************************
-            createUserToken( internal, "", "", "", TokenType.Permanent.getId(), null );
+            Date tokenDate = DateUtils.addMonths( new Date( System.currentTimeMillis()), 1);
+            createUserToken( internal, "", "", "", TokenType.Permanent.getId(),tokenDate);
             //***********************************************************
 
 

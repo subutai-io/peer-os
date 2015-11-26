@@ -19,6 +19,7 @@ import io.subutai.core.identity.api.model.User;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.security.api.model.SecurityKeyIdentity;
+import io.subutai.core.security.rest.model.SecurityKeyData;
 
 
 /**
@@ -202,9 +203,11 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
      *
      */
     @Override
-    public Response signKey( final String sourceHostId, final String keyText, final int trustLevel )
+    public Response signKey(  SecurityKeyData keyData )
     {
-        String key = securityManager.getKeyManager().signPublicKey( sourceHostId, keyText, trustLevel );
+        String key = securityManager.getKeyManager().signPublicKey( keyData.getSourceKeyIdentityId(),
+                                                                    keyData.getKeyText(),
+                                                                    keyData.getTrustlevel() );
 
         if ( Strings.isNullOrEmpty( key ) )
         {

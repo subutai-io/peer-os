@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
+import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +31,7 @@ import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.security.PublicKeyContainer;
+import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
 
@@ -231,6 +233,26 @@ public class RestServiceImpl implements RestService
         try
         {
             return localPeer.createPeerEnvironmentKeyPair( environmentId );
+        }
+        catch ( Exception ex )
+        {
+            throw new WebApplicationException( ex );
+        }
+    }
+
+
+    @Override
+    public void updateEnvironmentKey( final PublicKeyContainer publicKeyContainer )
+    {
+        Preconditions.checkNotNull( publicKeyContainer );
+        Preconditions.checkNotNull( publicKeyContainer.getKey() );
+        Preconditions.checkNotNull( publicKeyContainer.getHostId() );
+        Preconditions.checkNotNull( publicKeyContainer.getFingerprint() );
+
+        try
+        {
+            final PGPPublicKeyRing pubKeyRing = PGPKeyUtil.readPublicKeyRing( publicKeyContainer.getKey() );
+            localPeer.updatePeerEnvironmentPubKey( new EnvironmentId( publicKeyContainer.getHostId() ), pubKeyRing );
         }
         catch ( Exception ex )
         {
