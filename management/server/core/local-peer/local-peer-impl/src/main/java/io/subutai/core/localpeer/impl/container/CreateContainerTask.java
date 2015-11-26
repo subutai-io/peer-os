@@ -14,17 +14,19 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.peer.HostNotFoundException;
+import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.Interface;
+import io.subutai.common.peer.ContainerCreationException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.NumUtil;
-import io.subutai.common.peer.ContainerCreationException;
+import io.subutai.core.hostregistry.api.HostDisconnectedException;
+import io.subutai.core.hostregistry.api.HostRegistry;
 
 
-public class CreateContainerTask implements Callable<ContainerHost>
+public class CreateContainerTask implements Callable<HostInfo>
 {
     protected static final Logger LOG = LoggerFactory.getLogger( CreateContainerTask.class );
     private static final int TEMPLATE_IMPORT_TIMEOUT_SEC = 10 * 60 * 60;
@@ -35,16 +37,18 @@ public class CreateContainerTask implements Callable<ContainerHost>
     private final int vlan;
     private final int timeoutSec;
     protected CommandUtil commandUtil = new CommandUtil();
+    private HostRegistry hostRegistry;
 
 
-    public CreateContainerTask( final ResourceHost resourceHost, final Template template, final String hostname,
-                                final String ip, final int vlan, final int timeoutSec )
+    public CreateContainerTask( HostRegistry hostRegistry, final ResourceHost resourceHost, final Template template,
+                                final String hostname, final String ip, final int vlan, final int timeoutSec )
     {
         Preconditions.checkNotNull( resourceHost );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ) );
         Preconditions.checkNotNull( template );
         Preconditions.checkArgument( timeoutSec > 0 );
 
+        this.hostRegistry = hostRegistry;
         this.resourceHost = resourceHost;
         this.template = template;
         this.hostname = hostname;
@@ -55,7 +59,7 @@ public class CreateContainerTask implements Callable<ContainerHost>
 
 
     @Override
-    public ContainerHost call() throws Exception
+    public HostInfo call() throws Exception
     {
 
         prepareTemplate( template );
@@ -74,28 +78,37 @@ public class CreateContainerTask implements Callable<ContainerHost>
         }
         long start = System.currentTimeMillis();
 
-        ContainerHost containerHost = null;
-        while ( System.currentTimeMillis() - start < timeoutSec * 1000 && ( containerHost == null || Strings
-                .isNullOrEmpty( containerHost.getIpByInterfaceName( Common.DEFAULT_CONTAINER_INTERFACE ) ) ) )
+        HostInfo hostInfo = null;
+        String ip = null;
+        while ( System.currentTimeMillis() - start < timeoutSec * 1000 && ( hostInfo == null || Strings
+                .isNullOrEmpty( ip ) ) )
         {
             Thread.sleep( 100 );
             try
             {
-                containerHost = resourceHost.getContainerHostByName( hostname );
+                hostInfo = hostRegistry.getContainerHostInfoByHostname( hostname );
+                for ( Interface intf : hostInfo.getInterfaces() )
+                {
+                    if ( Common.DEFAULT_CONTAINER_INTERFACE.equals( intf.getName() ) )
+                    {
+                        ip = intf.getIp();
+                        break;
+                    }
+                }
             }
-            catch ( HostNotFoundException e )
+            catch ( HostDisconnectedException e )
             {
                 //ignore
             }
         }
 
-        if ( containerHost == null )
+        if ( hostInfo == null )
         {
             throw new ContainerCreationException(
                     String.format( "Container %s did not connect within timeout with proper IP", hostname ) );
         }
 
-        return containerHost;
+        return hostInfo;
     }
 
 

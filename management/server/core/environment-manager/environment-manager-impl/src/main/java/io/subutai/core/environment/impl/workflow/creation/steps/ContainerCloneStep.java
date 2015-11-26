@@ -98,7 +98,8 @@ public class ContainerCloneStep
         for ( Map.Entry<Peer, Set<NodeGroup>> peerPlacement : placement.entrySet() )
         {
             Peer peer = peerPlacement.getKey();
-              LOG.debug( "Scheduling node group task on peer %s", peer.getId() );
+            LOG.debug( String.format( "Scheduling node group task on peer %s", peer.getId() ) );
+
             taskCompletionService.submit(
                     new CreatePeerNodeGroupsTask( peer, peerPlacement.getValue(), localPeer, environment,
                             currentLastUsedIpIndex + 1, templateRegistry, defaultDomain ) );
@@ -123,7 +124,7 @@ public class ContainerCloneStep
                 Set<NodeGroupBuildResult> results = futures.get();
                 for ( NodeGroupBuildResult result : results )
                 {
-                    LOG.debug( String.format( "Node group build result: %s", result) );
+                    LOG.debug( String.format( "Node group build result: %s", result ) );
                     if ( !CollectionUtil.isCollectionEmpty( result.getContainers() ) )
                     {
                         environment.addContainers( result.getContainers() );
