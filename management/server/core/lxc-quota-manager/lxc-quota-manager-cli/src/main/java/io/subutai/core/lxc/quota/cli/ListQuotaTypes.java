@@ -7,7 +7,7 @@ import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import org.apache.karaf.shell.commands.Command;
 
 
-@Command( scope = "quota", name = "list-quota", description = "list all available quotas" )
+@Command( scope = "quota", name = "list", description = "list all available quotas" )
 public class ListQuotaTypes extends SubutaiShellCommandSupport
 {
     @Override

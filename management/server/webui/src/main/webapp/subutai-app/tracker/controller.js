@@ -28,7 +28,11 @@ function TrackerCtrl(trackerSrv, $scope, DTOptionsBuilder, DTColumnBuilder, $res
 	vm.dtOptions = DTOptionsBuilder
 		.fromFnPromise(function() {
 			var logsDates = getDateInStringFormat();
+<<<<<<< HEAD
 			var url  = trackerSrv.getBaseUrl() + 'operations/' + vm.selectedModule + '/' + logsDates.startDateString + '/' + logsDates.endDateString + '/' + 100;
+=======
+			var url  = trackerSrv.getBaseUrl() + 'operations/' + vm.selectedModule + '/' + logsDates.startDateString + '/' + logsDates.endDateString + '/' + 10;
+>>>>>>> 6c94c4eed1ee34277b4d4b46b49ac4e1775baa6b
 			return $resource( url ).query().$promise;
 		})
 		.withPaginationType('full_numbers')

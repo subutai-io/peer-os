@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 
 import com.vaadin.server.ErrorEvent;
 import com.vaadin.server.ErrorHandler;
-import com.vaadin.shared.ui.label.ContentMode;
 
 import io.subutai.server.ui.MainUI;
 import io.subutai.server.ui.views.ErrorView;
@@ -41,6 +40,16 @@ public class SystemErrorHandler implements ErrorHandler
                     if(t.getClass()  ==  AccessControlException.class)
                     {
                         message = "Access Denied! You don't have permission to access resource";
+                        errorMessage = t.toString();
+                    }
+                    else if(t.getClass()  ==  java.net.NoRouteToHostException.class)
+                    {
+                        message = "Invalid IP address or Requested host is not available !!!";
+                        errorMessage = t.toString();
+                    }
+                    else if(t.getClass()  ==  java.lang.IllegalArgumentException.class)
+                    {
+                        message = "Invalid parameters specified for the request !!!";
                         errorMessage = t.toString();
                     }
                     else

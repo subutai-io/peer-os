@@ -1,31 +1,38 @@
 package io.subutai.common.quota;
 
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.math.BigDecimal;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonProperty;
 
 
 /**
  * Disk quota
  */
-public class DiskQuota extends QuotaInfo
+public class DiskQuota extends Quota
 {
-    private static final String QUOTA_REGEX = "(\\d+(?:[\\.,]\\d+)?)(K|M|G|T|P|E)?";
-    private static final Pattern QUOTA_PATTERN = Pattern.compile( QUOTA_REGEX );
+    @JsonProperty( "diskPartition" )
     private DiskPartition diskPartition;
+    @JsonProperty( "diskQuotaUnit" )
     private DiskQuotaUnit diskQuotaUnit;
+    @JsonProperty( "diskQuotaValue" )
     private double diskQuotaValue;
 
 
-    public DiskQuota( final DiskPartition diskPartition, final DiskQuotaUnit diskQuotaUnit,
-                      final double diskQuotaValue )
+    public DiskQuota( @JsonProperty( "diskPartition" ) final DiskPartition diskPartition,
+                      @JsonProperty( "diskQuotaUnit" ) final DiskQuotaUnit diskQuotaUnit,
+                      @JsonProperty( "diskQuotaValue" ) final double diskQuotaValue )
     {
         this.diskPartition = diskPartition;
         this.diskQuotaUnit = diskQuotaUnit;
         this.diskQuotaValue = diskQuotaValue;
+    }
+
+
+    public DiskQuota( final DiskPartition partition )
+    {
+        this.diskPartition = partition;
     }
 
 
@@ -47,13 +54,15 @@ public class DiskQuota extends QuotaInfo
     }
 
 
-    public String getQuotaKey()
+    @JsonIgnore
+    public String getKey()
     {
         return diskPartition.getPartitionName();
     }
 
 
-    public String getQuotaValue()
+    @JsonIgnore
+    public String getValue()
     {
         if ( diskQuotaUnit == DiskQuotaUnit.UNLIMITED )
         {
@@ -63,35 +72,19 @@ public class DiskQuota extends QuotaInfo
     }
 
 
-    public QuotaType getQuotaType()
+    @JsonIgnore
+
+    public BigDecimal getValue( DiskQuotaUnit unit )
     {
-        return QuotaType.getQuotaType( diskPartition.getPartitionName() );
+        BigDecimal inBytes = diskQuotaUnit.getMultiplicator().multiply( new BigDecimal( diskQuotaValue ) );
+        return inBytes.divide( unit.getMultiplicator() );
     }
 
 
-    public static DiskQuota parse( DiskPartition diskPartition, String quotaString )
+    @JsonIgnore
+    public QuotaType getType()
     {
-        Preconditions.checkNotNull( diskPartition, "Invalid disk partition" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( quotaString ), "Invalid quota string" );
-
-        if ( quotaString.trim().equalsIgnoreCase( DiskQuotaUnit.UNLIMITED.getAcronym() ) )
-        {
-            return new DiskQuota( diskPartition, DiskQuotaUnit.UNLIMITED, -1 );
-        }
-
-        Matcher quotaMatcher = QUOTA_PATTERN.matcher( quotaString.trim() );
-        if ( quotaMatcher.matches() )
-        {
-            String quotaValue = quotaMatcher.group( 1 );
-            double value = Double.parseDouble( quotaValue.replace( ",", "." ) );
-            String acronym = quotaMatcher.group( 2 );
-            DiskQuotaUnit diskQuotaUnit = DiskQuotaUnit.parseFromAcronym( acronym );
-            return new DiskQuota( diskPartition, diskQuotaUnit == null ? DiskQuotaUnit.BYTE : diskQuotaUnit, value );
-        }
-        else
-        {
-            throw new IllegalArgumentException( String.format( "Unparseable result: %s", quotaString ) );
-        }
+        return QuotaType.getQuotaType( diskPartition.getPartitionName() );
     }
 
 

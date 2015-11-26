@@ -24,6 +24,7 @@ import io.subutai.core.broker.api.Topic;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.identity.api.model.User;
 
 
@@ -74,7 +75,7 @@ public class CommandProcessor implements ByteMessageListener
         }
 
         //create command process
-        CommandProcess commandProcess = new CommandProcess( this, callback, getUser() );
+        CommandProcess commandProcess = new CommandProcess( this, callback, getActiveSession() );
         boolean queued =
                 commands.put( request.getCommandId(), commandProcess, Common.INACTIVE_COMMAND_DROP_TIMEOUT_SEC * 1000,
                         new CommandProcessExpiryCallback() );
@@ -105,9 +106,9 @@ public class CommandProcessor implements ByteMessageListener
     }
 
 
-    protected User getUser()
+    protected Session getActiveSession()
     {
-        return identityManager.getActiveUser();
+        return identityManager.getActiveSession();
     }
 
 

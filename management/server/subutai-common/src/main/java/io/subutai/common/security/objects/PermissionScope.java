@@ -13,7 +13,7 @@ public enum PermissionScope
     private String name;
     private int id;
 
-    private PermissionScope(  int id, String name)
+    PermissionScope(  int id, String name)
     {
         this.id = id;
         this.name = name;

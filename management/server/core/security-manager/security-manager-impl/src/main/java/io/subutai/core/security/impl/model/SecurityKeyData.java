@@ -12,6 +12,7 @@ public class SecurityKeyData
     private String manHostId;
     private String manHostKeyFingerprint;
     private String ownerPublicKeyringFile;
+    private Object jsonProvider;
 
 
     public String getPublicKeyringFile()
@@ -82,5 +83,17 @@ public class SecurityKeyData
     public void setOwnerPublicKeyringFile( final String ownerPublicKeyringFile )
     {
         this.ownerPublicKeyringFile = ownerPublicKeyringFile;
+    }
+
+
+    public Object getJsonProvider()
+    {
+        return jsonProvider;
+    }
+
+
+    public void setJsonProvider( final Object jsonProvider )
+    {
+        this.jsonProvider = jsonProvider;
     }
 }

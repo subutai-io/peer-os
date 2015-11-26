@@ -268,8 +268,12 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 								'plugins/cassandra/cassandra.js',
 								'plugins/cassandra/controller.js',
 								'plugins/cassandra/service.js',
+<<<<<<< HEAD
 								'subutai-app/environment/service.js',
 								'subutai-app/peerRegistration/service.js'
+=======
+								'subutai-app/environment/service.js'
+>>>>>>> 6c94c4eed1ee34277b4d4b46b49ac4e1775baa6b
 							]
 						}
 					]);
@@ -297,7 +301,11 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 		})
 		.state('hadoop', {
 			url: '/plugins/hadoop',
+<<<<<<< HEAD
 			templateUrl: 'plugins/hadoop/partials/view.html',
+=======
+			templateUrl: 'subutai-app/plugins/hadoop/partials/view.html',
+>>>>>>> 6c94c4eed1ee34277b4d4b46b49ac4e1775baa6b
 			resolve: {
 				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
 					return $ocLazyLoad.load([
@@ -306,14 +314,19 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 							files: [
 								'plugins/hadoop/hadoop.js',
 								'plugins/hadoop/controller.js',
+<<<<<<< HEAD
 								'plugins/hadoop/service.js',
 								'subutai-app/environment/service.js',
+=======
+								'plugins/hadoop/service.js'
+>>>>>>> 6c94c4eed1ee34277b4d4b46b49ac4e1775baa6b
 							]
 						}
 					]);
 				}]
 			}
 		})
+<<<<<<< HEAD
 		.state('solr', {
 			url: '/plugins/solr',
 			templateUrl: 'plugins/solr/partials/view.html',
@@ -333,6 +346,8 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 				}]
 			}
 		})
+=======
+>>>>>>> 6c94c4eed1ee34277b4d4b46b49ac4e1775baa6b
 		.state('404', {
 			url: '/404',
 			template: 'Not found'
@@ -341,6 +356,7 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 
 function startup($rootScope, $state, $location, $http) {
 
+<<<<<<< HEAD
 	$http.defaults.headers.common['sptoken'] = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0YjE5MzU5ZS00OGFkLTQxMTgtOGUxOS1iOTJlNjI5OWU0YTEiLCJpc3MiOiJpby5zdWJ1dGFpIn0.iRh7cBa1PBox73ticQ9Mxn0juEQN00t-lUff9-lUoXM';
 
 	//$rootScope.$on('$stateChangeStart',	function(event, toState, toParams, fromState, fromParams){
@@ -350,6 +366,17 @@ function startup($rootScope, $state, $location, $http) {
 	//	}
 	//});
 	//$http.defaults.headers.common['sptoken'] = getCookie('sptoken');
+=======
+	//$http.defaults.headers.common['sptoken'] = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlODE1M2ZiNS05MWVmLTQzNjctOWNhYS0yZDhiMTU1ZDgxMzYiLCJpc3MiOiJpby5zdWJ1dGFpIn0.JBlD497K76GA4QFjarFcxflD-byAAF7Lxf1FmRJLzBE';
+
+	$rootScope.$on('$stateChangeStart',	function(event, toState, toParams, fromState, fromParams){
+		var restrictedPage = $.inArray($location.path(), ['/login']) === -1;
+		if (restrictedPage && !getCookie('sptoken')) {
+			$location.path('/login');
+		}
+	});
+	$http.defaults.headers.common['sptoken'] = getCookie('sptoken');
+>>>>>>> 6c94c4eed1ee34277b4d4b46b49ac4e1775baa6b
 
 	$rootScope.$state = $state;
 }
@@ -415,18 +442,25 @@ app.directive('checkbox-list-dropdown', function() {
 });
 
 //Global variables
+<<<<<<< HEAD
 //var SERVER_URL = '/';
 var SERVER_URL = 'http://172.16.131.205:8080/';
+=======
+var SERVER_URL = '/';
+>>>>>>> 6c94c4eed1ee34277b4d4b46b49ac4e1775baa6b
 
 var STATUS_UNDER_MODIFICATION = 'UNDER_MODIFICATION';
 var VARS_TOOLTIP_TIMEOUT = 900;
 
+<<<<<<< HEAD
 function LOAD_SCREEN(displayStatus) {
 	if(displayStatus === undefined || displayStatus === null) displayStatus = 'block';
 	var loadScreen = document.getElementsByClassName('js-loading-screen')[0];
 	loadScreen.style.display = displayStatus;
 }
 
+=======
+>>>>>>> 6c94c4eed1ee34277b4d4b46b49ac4e1775baa6b
 function VARS_MODAL_CONFIRMATION( object, title, text, func )
 {
 	object.swal({

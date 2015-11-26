@@ -2,25 +2,36 @@ package io.subutai.core.peer.rest.ui;
 
 
 import java.util.List;
+import java.util.Set;
 
+import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.peer.*;
 import io.subutai.common.util.JsonUtil;
+import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.peer.api.PeerManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.Response;
 
+import com.google.common.base.Preconditions;
+
+
 public class RestServiceImpl implements RestService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( RestServiceImpl.class );
 
     private PeerManager peerManager;
+    private HostRegistry hostRegistry;
 
 
-    public RestServiceImpl( final PeerManager peerManager )
+    public RestServiceImpl( final PeerManager peerManager, final HostRegistry hostRegistry )
     {
+        Preconditions.checkNotNull( peerManager );
+        Preconditions.checkNotNull( hostRegistry );
+
         this.peerManager = peerManager;
+        this.hostRegistry = hostRegistry;
     }
 
 
@@ -132,5 +143,14 @@ public class RestServiceImpl implements RestService
         }
 
         return Response.ok().build();
+    }
+
+
+
+    @Override
+    public Response getResourceHosts()
+    {
+        Set<ResourceHostInfo> reply = hostRegistry.getResourceHostsInfo();
+        return Response.ok().entity( JsonUtil.toJson( hostRegistry.getResourceHostsInfo() ) ).build();
     }
 }

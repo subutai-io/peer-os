@@ -48,6 +48,7 @@
 				ng-model="blueprintsBuildCtrl.newEnvironmentName">
 			</div>
 
+<<<<<<< HEAD
 			<div class="b-main-form__wrapper b-main-form__wrapper_margin-r">
 				<label class="b-popup-body-label b-popup-body-label_inline">Build Type</label>
 				<select class="b-popup-body-input b-popup-body-input_enviroment-name" 
@@ -55,6 +56,18 @@
 					<option value="strategie">Strategie</option>
 					<option value="resources">Resource Host</option>
 				</select>
+=======
+			<div class="b-main-form__wrapper g-right">
+				<a href 
+				ng-click="blueprintsBuildCtrl.buildPopup()" 
+				class="b-icon b-icon_box b-icon_notification" 
+				id="subt_link__environment-build-list">
+					<span class="b-icon__inner-num">
+						{{ blueprintsBuildCtrl.totalContainers }}
+					</span>
+				</a>
+
+>>>>>>> 6c94c4eed1ee34277b4d4b46b49ac4e1775baa6b
 				<div class="clear"></div>
 			</div>
 
@@ -107,7 +120,11 @@
 					</td>
 					<td>
 						<select class="b-popup-body-input b-popup-body-input_table subt_select__environment-strategie" 
+<<<<<<< HEAD
 						ng-model="nodeGroup.createOption">
+=======
+						ng-model="nodeGroup.strategyId">
+>>>>>>> 6c94c4eed1ee34277b4d4b46b49ac4e1775baa6b
 							<option 
 							ng-repeat="buildType in blueprintsBuildCtrl.peers[nodeGroup.peer][blueprintsBuildCtrl.buildWith]" 
 							value="{{ buildType }}">

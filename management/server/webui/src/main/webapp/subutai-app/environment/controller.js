@@ -74,7 +74,11 @@ function EnvironmentViewCtrl($scope, environmentService, SweetAlert, DTOptionsBu
 	}
 
 	function sshKeyLinks(data, type, full, meta) {
+<<<<<<< HEAD
 		var addSshKeyLink = '<a href ng-click="environmentViewCtrl.showSSHKeyForm(\'' + data.id + '\')">Add</a>';
+=======
+		var addSshKeyLink = '<a href ng-click="environmentViewCtrl.setSshKey(\'' + data.id + '\')">Add</a>';
+>>>>>>> 6c94c4eed1ee34277b4d4b46b49ac4e1775baa6b
 		var removeSshKeyLink = '<a href ng-click="environmentViewCtrl.removeSshKey(\'' + data.id + '\')">Remove</a>';
 		return addSshKeyLink + '/' + removeSshKeyLink;
 	}

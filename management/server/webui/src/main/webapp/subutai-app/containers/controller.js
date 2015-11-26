@@ -62,7 +62,11 @@ function ContainerViewCtrl($scope, environmentService, SweetAlert, DTOptionsBuil
 
 	vm.dtOptions = DTOptionsBuilder
 		.newOptions()
+<<<<<<< HEAD
 		.withOption('order', [[ 2, "asc" ]])
+=======
+		.withOption('order', [[ 1, "asc" ]])
+>>>>>>> 6c94c4eed1ee34277b4d4b46b49ac4e1775baa6b
 		.withOption('stateSave', true)
 		.withPaginationType('full_numbers');
 	vm.dtColumnDefs = [

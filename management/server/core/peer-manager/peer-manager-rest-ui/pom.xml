@@ -5,7 +5,7 @@
     <parent>
         <artifactId>peer-manager-parent</artifactId>
         <groupId>io.subutai</groupId>
-        <version>4.0.0-RC3</version>
+        <version>4.0.0-RC4</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -28,18 +28,7 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>security-manager-api</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.fasterxml.jackson.jaxrs</groupId>
-            <artifactId>jackson-jaxrs-json-provider</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-jaxrs</artifactId>
-            <version>${jackson-jaxrs.version}</version>
+            <artifactId>host-registry-api</artifactId>
         </dependency>
 
         <dependency>
@@ -56,11 +45,6 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest-all</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

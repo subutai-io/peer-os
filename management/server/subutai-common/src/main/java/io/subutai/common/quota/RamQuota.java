@@ -1,25 +1,22 @@
 package io.subutai.common.quota;
 
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
+import org.codehaus.jackson.annotate.JsonProperty;
 
 
 /**
  * RAM quota
  */
-public class RamQuota extends QuotaInfo
+public class RamQuota extends Quota
 {
-    private static final String QUOTA_REGEX = "(\\d+)(K|M|G)?";
-    private static final Pattern QUOTA_PATTERN = Pattern.compile( QUOTA_REGEX );
+    @JsonProperty( "ramQuotaUnit" )
     private RamQuotaUnit ramQuotaUnit;
-    private int ramQuotaValue;
+    @JsonProperty( "ramQuotaValue" )
+    private long ramQuotaValue;
 
 
-    public RamQuota( final RamQuotaUnit ramQuotaUnit, final int ramQuotaValue )
+    public RamQuota( @JsonProperty( "ramQuotaUnit" ) final RamQuotaUnit ramQuotaUnit,
+                     @JsonProperty( "ramQuotaValue" ) final long ramQuotaValue )
     {
         this.ramQuotaUnit = ramQuotaUnit;
         this.ramQuotaValue = ramQuotaValue;
@@ -32,42 +29,22 @@ public class RamQuota extends QuotaInfo
     }
 
 
-    public int getRamQuotaValue()
+    public double getRamQuotaValue( RamQuotaUnit unit )
     {
-        return ramQuotaValue;
-    }
-
-
-    public static RamQuota parse( String quotaString )
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( quotaString ), "Invalid quota string" );
-
-
-        Matcher quotaMatcher = QUOTA_PATTERN.matcher( quotaString.trim() );
-        if ( quotaMatcher.matches() )
-        {
-            String quotaValue = quotaMatcher.group( 1 );
-            int value = Integer.parseInt( quotaValue );
-            String acronym = quotaMatcher.group( 2 );
-            RamQuotaUnit ramQuotaUnit = RamQuotaUnit.parseFromAcronym( acronym );
-            return new RamQuota( ramQuotaUnit == null ? RamQuotaUnit.BYTE : ramQuotaUnit, value );
-        }
-        else
-        {
-            throw new IllegalArgumentException( String.format( "Unparseable result: %s", quotaString ) );
-        }
+        double inBytes = ramQuotaUnit.getMultiplicator() * ramQuotaValue;
+        return inBytes / unit.getMultiplicator();
     }
 
 
     @Override
-    public String getQuotaKey()
+    public String getKey()
     {
         return QuotaType.QUOTA_TYPE_RAM.getKey();
     }
 
 
     @Override
-    public QuotaType getQuotaType()
+    public QuotaType getType()
     {
         return QuotaType.QUOTA_TYPE_RAM;
     }
@@ -85,13 +62,13 @@ public class RamQuota extends QuotaInfo
             return false;
         }
 
-        final RamQuota ramQuota = ( RamQuota ) o;
+        final RamQuota ramQuotaInfo = ( RamQuota ) o;
 
-        if ( ramQuotaValue != ramQuota.ramQuotaValue )
+        if ( ramQuotaValue != ramQuotaInfo.ramQuotaValue )
         {
             return false;
         }
-        if ( ramQuotaUnit != ramQuota.ramQuotaUnit )
+        if ( ramQuotaUnit != ramQuotaInfo.ramQuotaUnit )
         {
             return false;
         }
@@ -100,16 +77,7 @@ public class RamQuota extends QuotaInfo
     }
 
 
-    @Override
-    public int hashCode()
-    {
-        int result = ramQuotaUnit != null ? ramQuotaUnit.hashCode() : 0;
-        result = 31 * result + ramQuotaValue;
-        return result;
-    }
-
-
-    public String getQuotaValue()
+    public String getValue()
     {
         return String.format( "%d%s", ramQuotaValue, ramQuotaUnit.getAcronym() );
     }

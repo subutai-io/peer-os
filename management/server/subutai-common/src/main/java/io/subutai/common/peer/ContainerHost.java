@@ -6,7 +6,7 @@ import java.util.Set;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.protocol.Template;
-import io.subutai.common.quota.CpuQuotaInfo;
+import io.subutai.common.quota.CpuQuota;
 import io.subutai.common.quota.DiskPartition;
 import io.subutai.common.quota.DiskQuota;
 import io.subutai.common.quota.RamQuota;
@@ -63,7 +63,7 @@ public interface ContainerHost extends Host, ContainerHostInfo
      *
      * @return - quota in mb
      */
-    public int getRamQuota() throws PeerException;
+//    public int getRamQuota() throws PeerException;
 
 
     /**
@@ -71,7 +71,7 @@ public interface ContainerHost extends Host, ContainerHostInfo
      *
      * @return - MemoryQuotaInfo carries ram quota specific info
      */
-    public RamQuota getRamQuotaInfo() throws PeerException;
+    public RamQuota getRamQuota() throws PeerException;
 
 
     /**
@@ -87,7 +87,7 @@ public interface ContainerHost extends Host, ContainerHostInfo
      *
      * @return - cpu quota on container in percent
      */
-    public int getCpuQuota() throws PeerException;
+//    public int getCpuQuota() throws PeerException;
 
 
     /**
@@ -95,14 +95,14 @@ public interface ContainerHost extends Host, ContainerHostInfo
      *
      * @return - cpu quota object on container
      */
-    public CpuQuotaInfo getCpuQuotaInfo() throws PeerException;
+    public CpuQuota getCpuQuota() throws PeerException;
 
     /**
      * Sets CPU quota on container in percent
      *
-     * @param cpuPercent - cpu quota in percent
+     * @param cpuQuota - cpu quota
      */
-    public void setCpuQuota( int cpuPercent ) throws PeerException;
+    public void setCpuQuota( CpuQuota cpuQuota ) throws PeerException;
 
     /**
      * Returns allowed cpus/cores ids on container
@@ -139,14 +139,14 @@ public interface ContainerHost extends Host, ContainerHostInfo
      *
      * @return - quota in mb
      */
-    public int getAvailableRamQuota() throws PeerException;
+    public RamQuota getAvailableRamQuota() throws PeerException;
 
     /**
      * Returns available CPU quota on container in percent
      *
      * @return - cpu quota on container in percent
      */
-    public int getAvailableCpuQuota() throws PeerException;
+    public CpuQuota getAvailableCpuQuota() throws PeerException;
 
     /**
      * Returns available disk quota
@@ -160,7 +160,7 @@ public interface ContainerHost extends Host, ContainerHostInfo
     /**
      * Sets ram quota
      *
-     * @param ramQuota - quota to set
+     * @param ramQuotaInfo - quota to set
      */
-    public void setRamQuota( RamQuota ramQuota ) throws PeerException;
+    public void setRamQuota( RamQuota ramQuotaInfo ) throws PeerException;
 }

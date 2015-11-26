@@ -20,11 +20,11 @@ public interface SecretKeyStore
     public void setStatus( final short status );
 
 
-    public short getType();
+    public int getType();
 
 
 
-    public void setType( final short type );
+    public void setType( final int type );
 
 
 

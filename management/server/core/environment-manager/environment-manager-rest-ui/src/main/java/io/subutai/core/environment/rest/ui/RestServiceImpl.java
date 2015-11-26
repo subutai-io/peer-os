@@ -10,7 +10,7 @@ import javax.ws.rs.core.Response;
 
 import io.subutai.common.environment.*;
 import io.subutai.common.gson.required.RequiredDeserializer;
-import io.subutai.common.environment.ContainerType;
+import io.subutai.common.peer.ContainerType;
 import io.subutai.common.host.Interface;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
