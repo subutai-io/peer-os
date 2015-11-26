@@ -18,7 +18,7 @@ import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.KeyManager;
-import io.subutai.core.security.api.model.SecurityKeyIdentity;
+import io.subutai.core.security.rest.model.KeyIdentityDTO;
 import io.subutai.core.security.rest.model.SecurityKeyData;
 
 
@@ -156,8 +156,27 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
     {
         logger.debug( "Received hostId: " + hostId );
         KeyManager keyManager = securityManager.getKeyManager();
-        SecurityKeyIdentity keyIdentity = keyManager.getKeyTrustTree( hostId );
-        return Response.ok( JsonUtil.toJson( keyIdentity ) ).build();
+
+        KeyIdentityDTO keyIdentityDTO = new KeyIdentityDTO( keyManager.getKeyTrustTree( hostId ) );
+        keyIdentityDTO.setChild( false );
+        keyIdentityDTO.setTrustLevel( KeyTrustLevel.Ultimate.getId() );
+
+        resetTrustLevels( keyIdentityDTO, keyManager );
+
+
+        return Response.ok( JsonUtil.toJson( keyIdentityDTO ) ).build();
+    }
+
+
+    private void resetTrustLevels( KeyIdentityDTO keyIdentityDTO, KeyManager keyManager )
+    {
+        for ( final KeyIdentityDTO identityDTO : keyIdentityDTO.getTrusts() )
+        {
+            identityDTO.setChild( true );
+            identityDTO
+                    .setTrustLevel( keyManager.getTrustLevel( keyIdentityDTO.getHostId(), identityDTO.getHostId() ) );
+            resetTrustLevels( identityDTO, keyManager );
+        }
     }
 
 
@@ -203,11 +222,11 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
      *
      */
     @Override
-    public Response signKey(  SecurityKeyData keyData )
+    public Response signKey( SecurityKeyData keyData )
     {
-        String key = securityManager.getKeyManager().signPublicKey( keyData.getSourceKeyIdentityId(),
-                                                                    keyData.getKeyText(),
-                                                                    keyData.getTrustlevel() );
+        String key = securityManager.getKeyManager()
+                                    .signPublicKey( keyData.getSourceKeyIdentityId(), keyData.getKeyText(),
+                                            keyData.getTrustlevel() );
 
         if ( Strings.isNullOrEmpty( key ) )
         {
