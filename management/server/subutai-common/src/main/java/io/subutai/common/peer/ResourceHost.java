@@ -4,7 +4,9 @@ package io.subutai.common.peer;
 import java.util.Set;
 
 import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.ResourceHostInfo;
+import io.subutai.common.metric.ResourceHostMetric;
 
 
 /**
@@ -54,12 +56,11 @@ public interface ResourceHost extends Host, ResourceHostInfo
 
     /**
      * Creates container on the resource host
-     *
-     * @param templateName - name of template from which to clone container
+     *  @param templateName - name of template from which to clone container
      * @param hostname - hostname for the new container
      * @param timeout - timeout to wait until container connects to server
      */
-    public ContainerHost createContainer( String templateName, String hostname, int timeout )
+    public HostInfo createContainer( String templateName, String hostname, int timeout )
             throws ResourceHostException;
 
     /**
@@ -72,7 +73,7 @@ public interface ResourceHost extends Host, ResourceHostInfo
      * @param gateway - default gateway for container
      * @param timeout - timeout to wait until container connects to server
      */
-    public ContainerHost createContainer( String templateName, String hostname, String ip, int vlan, String gateway,
+    public HostInfo createContainer( String templateName, String hostname, String ip, int vlan, String gateway,
                                           int timeout ) throws ResourceHostException;
 
     Set<ContainerHost> getContainerHostsByEnvironmentId( String environmentId );
@@ -80,4 +81,8 @@ public interface ResourceHost extends Host, ResourceHostInfo
     Set<ContainerHost> getContainerHostsByOwnerId( String ownerId );
 
     Set<ContainerHost> getContainerHostsByPeerId( String peerId );
+
+    void addContainerHost( ContainerHost host );
+
+    ResourceHostMetric getMetric();
 }

@@ -7,6 +7,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import io.subutai.common.peer.ResourceHost;
+import io.subutai.core.hostregistry.api.HostRegistry;
 
 import static org.mockito.Mockito.verify;
 
@@ -22,6 +23,9 @@ public class CreateContainerWrapperTaskTest
     private static final String GATEWAY = "192.168.1.1";
     private static final String TEMPLATE_NAME = "master";
     private static final int TIMEOUT = 30;
+
+    @Mock
+    private HostRegistry hostRegistry;
 
     CreateContainerWrapperTask task;
 
