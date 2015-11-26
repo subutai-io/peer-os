@@ -304,11 +304,6 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
         this.containerType = containerType;
     }
 
-    public ContainerType getContainerType( )
-    {
-        return containerType;
-    }
-
 
     @Override
     public boolean isConnected()

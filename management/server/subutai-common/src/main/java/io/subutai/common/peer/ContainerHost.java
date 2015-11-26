@@ -97,7 +97,4 @@ public interface ContainerHost extends Host, ContainerHostInfo
      * @param newValue new quota value
      */
     void setQuota( ResourceType resourceType, ResourceValue newValue ) throws PeerException;
-
-
-    ContainerType getContainerType();
 }
