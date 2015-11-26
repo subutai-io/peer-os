@@ -46,6 +46,7 @@ import io.subutai.core.messenger.api.Messenger;
 import io.subutai.core.peer.impl.command.BlockingCommandCallback;
 import io.subutai.core.peer.impl.command.CommandResponseListener;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
+import io.subutai.core.security.api.SecurityManager;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
@@ -137,6 +138,9 @@ public class RemotePeerImplTest
     @Mock
     private ContainerGateway containerGateway;
 
+    @Mock
+    private SecurityManager securityManager;
+
 
     @Before
     public void setUp() throws Exception
@@ -148,7 +152,7 @@ public class RemotePeerImplTest
         params.put( PARAM_NAME, PARAM_VALUE );
         headers = Maps.newHashMap();
         headers.put( HEADER_NAME, HEADER_VALUE );
-        remotePeer = spy( new RemotePeerImpl( localPeer, peerInfo, messenger, commandResponseListener,
+        remotePeer = spy( new RemotePeerImpl( localPeer, securityManager, peerInfo, messenger, commandResponseListener,
                 messageResponseListener, null ) );
         remotePeer.restUtil = restUtil;
         remotePeer.jsonUtil = jsonUtil;

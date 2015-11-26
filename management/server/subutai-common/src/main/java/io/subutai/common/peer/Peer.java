@@ -4,6 +4,8 @@ package io.subutai.common.peer;
 import java.util.Map;
 import java.util.Set;
 
+import org.bouncycastle.openpgp.PGPPublicKeyRing;
+
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
@@ -251,6 +253,9 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
      *
      */
     public PublicKeyContainer createPeerEnvironmentKeyPair( EnvironmentId environmentId ) throws PeerException;
+
+    void updatePeerEnvironmentPubKey( EnvironmentId environmentId, PGPPublicKeyRing publicKeyRing )
+            throws PeerException;
 
 
     /**

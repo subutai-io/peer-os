@@ -89,8 +89,8 @@ public class KeyManagerImpl implements KeyManager
 
 
             InputStream ownerPubStream = PGPEncryptionUtil.getFileInputStream( keyData.getOwnerPublicKeyringFile() );
-            InputStream peerPubStream  = PGPEncryptionUtil.getFileInputStream( keyData.getPublicKeyringFile() );
-            InputStream peerSecStream  = PGPEncryptionUtil.getFileInputStream( keyData.getSecretKeyringFile() );
+            InputStream peerPubStream = PGPEncryptionUtil.getFileInputStream( keyData.getPublicKeyringFile() );
+            InputStream peerSecStream = PGPEncryptionUtil.getFileInputStream( keyData.getSecretKeyringFile() );
 
             if ( ownerPubStream == null || peerPubStream == null || peerSecStream == null )
             {
@@ -157,7 +157,6 @@ public class KeyManagerImpl implements KeyManager
     }
 
 
-
     /* ***************************************************************
      *
      */
@@ -166,12 +165,12 @@ public class KeyManagerImpl implements KeyManager
     {
         try
         {
-            String secretFPrint = PGPKeyUtil.getFingerprint( sourceSecRing.getPublicKey().getFingerprint());
-            String publicFPrint = PGPKeyUtil.getFingerprint( targetPubRing.getPublicKey().getFingerprint());
+            String secretFPrint = PGPKeyUtil.getFingerprint( sourceSecRing.getPublicKey().getFingerprint() );
+            String publicFPrint = PGPKeyUtil.getFingerprint( targetPubRing.getPublicKey().getFingerprint() );
 
-            targetPubRing = encryptionTool.signPublicKey( targetPubRing, "", sourceSecRing.getSecretKey(),"" );
+            targetPubRing = encryptionTool.signPublicKey( targetPubRing, "", sourceSecRing.getSecretKey(), "" );
             keyServer.updatePublicKey( targetPubRing );
-            setKeyTrust( secretFPrint , publicFPrint ,trustLevel);
+            setKeyTrust( secretFPrint, publicFPrint, trustLevel );
         }
         catch ( Exception ex )
         {
@@ -209,10 +208,9 @@ public class KeyManagerImpl implements KeyManager
 
             targetPubRing = signKey( sourceSecRing, targetPubRing, trustLevel );
 
-            keyStr = encryptionTool.armorByteArrayToString(targetPubRing.getEncoded() );
-
+            keyStr = encryptionTool.armorByteArrayToString( targetPubRing.getEncoded() );
         }
-        catch(Exception ex)
+        catch ( Exception ex )
         {
 
         }
@@ -943,9 +941,27 @@ public class KeyManagerImpl implements KeyManager
 
         SecurityKeyTrust trust = getKeyTrust( aHost, bHost );
 
-        if(trust!=null)
+        if ( trust != null )
+        {
             return trust.getLevel();
+        }
         else
+        {
             return KeyTrustLevel.Never.getId();
+        }
+    }
+
+
+    @Override
+    public void updatePublicKeyRing( final PGPPublicKeyRing publicKeyRing )
+    {
+        try
+        {
+            keyServer.updatePublicKey( publicKeyRing );
+        }
+        catch ( IOException | PGPException e )
+        {
+            LOG.warn( e.getMessage() );
+        }
     }
 }

@@ -1,6 +1,7 @@
 package io.subutai.core.peer.impl;
 
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
@@ -8,6 +9,8 @@ import java.util.concurrent.Semaphore;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 
+import org.bouncycastle.openpgp.PGPException;
+import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,6 +61,7 @@ import io.subutai.common.protocol.Template;
 import io.subutai.common.resource.ResourceType;
 import io.subutai.common.resource.ResourceValue;
 import io.subutai.common.security.PublicKeyContainer;
+import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.settings.ChannelSettings;
 import io.subutai.common.settings.SecuritySettings;
 import io.subutai.common.util.CollectionUtil;
@@ -69,6 +73,7 @@ import io.subutai.core.messenger.api.Messenger;
 import io.subutai.core.peer.impl.command.BlockingCommandCallback;
 import io.subutai.core.peer.impl.command.CommandResponseListener;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
+import io.subutai.core.security.api.SecurityManager;
 
 
 /**
@@ -80,6 +85,7 @@ public class RemotePeerImpl implements RemotePeer
     private static final Logger LOG = LoggerFactory.getLogger( RemotePeerImpl.class );
 
     private final LocalPeer localPeer;
+    private SecurityManager securityManager;
     protected final PeerInfo peerInfo;
     protected final Messenger messenger;
     private final CommandResponseListener commandResponseListener;
@@ -90,11 +96,12 @@ public class RemotePeerImpl implements RemotePeer
     Object provider;
 
 
-    public RemotePeerImpl( LocalPeer localPeer, final PeerInfo peerInfo, final Messenger messenger,
-                           CommandResponseListener commandResponseListener,
+    public RemotePeerImpl( LocalPeer localPeer, SecurityManager securityManager, final PeerInfo peerInfo,
+                           final Messenger messenger, CommandResponseListener commandResponseListener,
                            MessageResponseListener messageResponseListener, Object provider )
     {
         this.localPeer = localPeer;
+        this.securityManager = securityManager;
         this.peerInfo = peerInfo;
         this.messenger = messenger;
         this.commandResponseListener = commandResponseListener;
@@ -400,7 +407,6 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
-
     @Override
     public Set<Integer> getCpuSet( final ContainerHost containerHost ) throws PeerException
     {
@@ -422,7 +428,6 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( cpuSet ), "Empty cpu set" );
 
         new EnvironmentWebClient( provider ).setCpuSet( peerInfo.getIp(), containerHost.getContainerId(), cpuSet );
-
     }
 
 
@@ -811,6 +816,31 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
+    public void updatePeerEnvironmentPubKey( final EnvironmentId environmentId, final PGPPublicKeyRing publicKeyRing )
+            throws PeerException
+    {
+        Preconditions.checkNotNull( environmentId, "Invalid environmentId" );
+        Preconditions.checkNotNull( publicKeyRing, "Public key ring is null" );
+
+
+        try
+        {
+            String exportedPubKeyRing =
+                    securityManager.getEncryptionTool().armorByteArrayToString( publicKeyRing.getEncoded() );
+            final PublicKeyContainer publicKeyContainer =
+                    new PublicKeyContainer( environmentId.getId(), publicKeyRing.getPublicKey().getFingerprint(),
+                            exportedPubKeyRing );
+            new PeerWebClient( peerInfo.getIp(), provider ).updateEnvironmentPubKey( publicKeyContainer );
+        }
+        catch ( IOException | PGPException e )
+        {
+
+
+        }
+    }
+
+
+    @Override
     public HostInterfaces getInterfaces()
     {
         return new PeerWebClient( peerInfo.getIp(), provider ).getInterfaces();
@@ -851,6 +881,7 @@ public class RemotePeerImpl implements RemotePeer
     {
         return new PeerWebClient( peerInfo.getIp(), provider ).getResourceHostMetrics();
     }
+
 
     @Override
     public boolean equals( final Object o )
