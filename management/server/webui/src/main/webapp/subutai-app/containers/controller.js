@@ -50,11 +50,16 @@ function ContainerViewCtrl($scope, environmentService, SweetAlert, DTOptionsBuil
 			) {
 				for(var j in vm.environments[i].containers) {
 					if(
-						vm.containersTypeId === undefined || 
-						vm.containersTypeId == vm.environments[i].containers[j].type
-					) {
-						vm.containers.push(vm.environments[i].containers[j]);
-					}
+						vm.containersTypeId !== undefined && 
+						vm.containersTypeId != vm.environments[i].containers[j].type && 
+						vm.containersTypeId.length > 0
+					) {continue;}
+					if(
+						vm.containerState !== undefined && 
+						vm.containerState != vm.environments[i].containers[j].state && 
+						vm.containerState.length > 0
+					) {continue;}
+					vm.containers.push(vm.environments[i].containers[j]);
 				}
 			}
 		}

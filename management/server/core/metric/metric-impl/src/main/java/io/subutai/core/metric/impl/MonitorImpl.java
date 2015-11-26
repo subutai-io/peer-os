@@ -11,8 +11,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +52,6 @@ import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.StringUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
-import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.metric.api.AlertListener;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
@@ -84,7 +81,7 @@ public class MonitorImpl implements Monitor
     protected MonitorDao monitorDao;
     protected DaoManager daoManager;
     private Map<String, BaseMetric> metrics = new ConcurrentHashMap<>();
-    protected ScheduledExecutorService stateUpdateExecutorService;
+//    protected ScheduledExecutorService stateUpdateExecutorService;
 
 
     public MonitorImpl( PeerManager peerManager, DaoManager daoManager, EnvironmentManager environmentManager )
@@ -109,8 +106,8 @@ public class MonitorImpl implements Monitor
             throw new MonitorException( e );
         }
 
-        stateUpdateExecutorService = Executors.newScheduledThreadPool( 1 );
-        stateUpdateExecutorService.scheduleWithFixedDelay( new MetricsUpdater( this ), 10, 90, TimeUnit.SECONDS );
+//        stateUpdateExecutorService = Executors.newScheduledThreadPool( 1 );
+//        stateUpdateExecutorService.scheduleWithFixedDelay( new MetricsUpdater( this ), 10, 90, TimeUnit.SECONDS );
     }
 
 
@@ -1069,127 +1066,127 @@ public class MonitorImpl implements Monitor
         }
     }
 
-
-    @Override
-    public BaseMetric getHostMetric( final String id )
-    {
-        return this.metrics.get( id );
-    }
-
-
-    @Override
-    public ResourceHostMetrics getResourceHostMetrics( final boolean isLocalOnly )
-    {
-        ResourceHostMetrics result = new ResourceHostMetrics();
-
-        for ( BaseMetric metric : metrics.values() )
-        {
-            if ( isLocalOnly && !metric.getPeerId().equals( peerManager.getLocalPeerInfo().getId() ) )
-            {
-                continue;
-            }
-            if ( metric instanceof ResourceHostMetric )
-            {
-                result.addMetric( ( ResourceHostMetric ) metric );
-            }
-        }
-
-        return result;
-    }
+//
+//    @Override
+//    public BaseMetric getHostMetric( final String id )
+//    {
+//        return this.metrics.get( id );
+//    }
 
 
-    @Override
-    public String getHostMetricsAsHtml( final String hostId )
-    {
-        StringBuilder result = new StringBuilder();
-        BaseMetric metrics = getHostMetric( hostId );
-
-        if ( metrics instanceof ContainerHostQuotaState )
-        {
-            ContainerHostQuotaState state = ( ContainerHostQuotaState ) metrics;
-            result.append( getText( "<br>CPU : %d%%", state.getCpu() ) );
-            result.append( getText( "<br>RAM : %d%%", state.getRam() ) );
-            result.append( getText( "<br>/ : %d%%", state.getDisk().getRootfs() ) );
-            result.append( getText( "<br>/home : %d%%", state.getDisk().getHome() ) );
-            result.append( getText( "<br>/opt : %d%%", state.getDisk().getOpt() ) );
-            result.append( getText( "<br>/var : %d%%", state.getDisk().getVar() ) );
-        }
-        else
-        {
-            HostMetric hostMetric = ( HostMetric ) metrics;
-
-            result.append( getText( "<br>CPU model: %s", hostMetric.getCpuModel() ) );
-            result.append( getText( "<br>CPU core(s): %d", hostMetric.getCpuCore() ) );
-            result.append( getText( "<br>CPU load: %.2f", hostMetric.getUsedCpu() ) );
-            result.append( getText( "<br>Total RAM: %.3f Gb", hostMetric.getTotalRam() / 1024 / 1024 / 1024 ) );
-            result.append( getText( "<br>Available RAM: %.3f Gb", hostMetric.getAvailableRam() / 1024 / 1024 / 1024 ) );
-            result.append(
-                    getText( "<br>Available space: %.3f Gb", hostMetric.getAvailableSpace() / 1024 / 1024 / 1024 ) );
-
-            if ( hostMetric instanceof ResourceHostMetric )
-            {
-                result.append(
-                        getText( "<br>Container #: %d", ( ( ResourceHostMetric ) hostMetric ).getContainersCount() ) );
-            }
-        }
-        return result.toString();
-    }
-
-
-    private String getText( final String format, final Object o )
-    {
-        if ( o != null )
-        {
-            return String.format( format, o );
-        }
-        else
-        {
-            return "";
-        }
-    }
-
-
-    private class MetricsUpdater implements Runnable
-    {
-        private final MonitorImpl monitor;
-
-
-        public MetricsUpdater( final MonitorImpl monitor )
-        {
-            this.monitor = monitor;
-        }
+//    @Override
+//    public ResourceHostMetrics getResourceHostMetrics( final boolean isLocalOnly )
+//    {
+//        ResourceHostMetrics result = new ResourceHostMetrics();
+//
+//        for ( BaseMetric metric : metrics.values() )
+//        {
+//            if ( isLocalOnly && !metric.getPeerId().equals( peerManager.getLocalPeerInfo().getId() ) )
+//            {
+//                continue;
+//            }
+//            if ( metric instanceof ResourceHostMetric )
+//            {
+//                result.addMetric( ( ResourceHostMetric ) metric );
+//            }
+//        }
+//
+//        return result;
+//    }
+//
+//
+//    @Override
+//    public String getHostMetricsAsHtml( final String hostId )
+//    {
+//        StringBuilder result = new StringBuilder();
+//        BaseMetric metrics = getHostMetric( hostId );
+//
+//        if ( metrics instanceof ContainerHostQuotaState )
+//        {
+//            ContainerHostQuotaState state = ( ContainerHostQuotaState ) metrics;
+//            result.append( getText( "<br>CPU : %d%%", state.getCpu() ) );
+//            result.append( getText( "<br>RAM : %d%%", state.getRam() ) );
+//            result.append( getText( "<br>/ : %d%%", state.getDisk().getRootfs() ) );
+//            result.append( getText( "<br>/home : %d%%", state.getDisk().getHome() ) );
+//            result.append( getText( "<br>/opt : %d%%", state.getDisk().getOpt() ) );
+//            result.append( getText( "<br>/var : %d%%", state.getDisk().getVar() ) );
+//        }
+//        else
+//        {
+//            HostMetric hostMetric = ( HostMetric ) metrics;
+//
+//            result.append( getText( "<br>CPU model: %s", hostMetric.getCpuModel() ) );
+//            result.append( getText( "<br>CPU core(s): %d", hostMetric.getCpuCore() ) );
+//            result.append( getText( "<br>CPU load: %.2f", hostMetric.getUsedCpu() ) );
+//            result.append( getText( "<br>Total RAM: %.3f Gb", hostMetric.getTotalRam() / 1024 / 1024 / 1024 ) );
+//            result.append( getText( "<br>Available RAM: %.3f Gb", hostMetric.getAvailableRam() / 1024 / 1024 / 1024 ) );
+//            result.append(
+//                    getText( "<br>Available space: %.3f Gb", hostMetric.getAvailableSpace() / 1024 / 1024 / 1024 ) );
+//
+//            if ( hostMetric instanceof ResourceHostMetric )
+//            {
+//                result.append(
+//                        getText( "<br>Container #: %d", ( ( ResourceHostMetric ) hostMetric ).getContainersCount() ) );
+//            }
+//        }
+//        return result.toString();
+//    }
 
 
-        @Override
-        public void run()
-        {
-            LOG.debug( "Metrics updater started." );
-            try
-            {
+//    private String getText( final String format, final Object o )
+//    {
+//        if ( o != null )
+//        {
+//            return String.format( format, o );
+//        }
+//        else
+//        {
+//            return "";
+//        }
+//    }
 
-                HostMetric managementHostMetric =
-                        monitor.fetchManagementHostMetric( peerManager.getLocalPeer().getManagementHost() );
 
-                monitor.updateHostMetric( managementHostMetric );
-
-                for ( ResourceHost resourceHost : peerManager.getLocalPeer().getResourceHosts() )
-                {
-                    ResourceHostMetric resourceHostMetric = monitor.fetchResourceHostMetric( resourceHost );
-
-                    monitor.updateHostMetric( resourceHostMetric );
-                    for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
-                    {
-                        ContainerHostQuotaState hostMetric =
-                                monitor.fetchContainerHostQuotaState( resourceHost, containerHost );
-                        monitor.updateHostMetric( hostMetric );
-                    }
-                }
-            }
-            catch ( Exception e )
-            {
-                LOG.error( e.getMessage(), e );
-            }
-            LOG.debug( "Metrics updater finished." );
-        }
-    }
+//    private class MetricsUpdater implements Runnable
+//    {
+//        private final MonitorImpl monitor;
+//
+//
+//        public MetricsUpdater( final MonitorImpl monitor )
+//        {
+//            this.monitor = monitor;
+//        }
+//
+//
+//        @Override
+//        public void run()
+//        {
+//            LOG.debug( "Metrics updater started." );
+//            try
+//            {
+//
+//                HostMetric managementHostMetric =
+//                        monitor.fetchManagementHostMetric( peerManager.getLocalPeer().getManagementHost() );
+//
+//                monitor.updateHostMetric( managementHostMetric );
+//
+//                for ( ResourceHost resourceHost : peerManager.getLocalPeer().getResourceHosts() )
+//                {
+//                    ResourceHostMetric resourceHostMetric = monitor.fetchResourceHostMetric( resourceHost );
+//
+//                    monitor.updateHostMetric( resourceHostMetric );
+//                    for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
+//                    {
+//                        ContainerHostQuotaState hostMetric =
+//                                monitor.fetchContainerHostQuotaState( resourceHost, containerHost );
+//                        monitor.updateHostMetric( hostMetric );
+//                    }
+//                }
+//            }
+//            catch ( Exception e )
+//            {
+//                LOG.error( e.getMessage(), e );
+//            }
+//            LOG.debug( "Metrics updater finished." );
+//        }
+//    }
 }

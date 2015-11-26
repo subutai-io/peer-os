@@ -10,9 +10,9 @@ angular.module('subutai.console.controller', [])
 		//terminalConfigurationProvider.config('vintage').startSoundUrl ='example/content/start.wav';
 	}]);
 
-ConsoleViewCtrl.$inject = ['$scope', 'consoleService', 'peerRegistrationService'];
+ConsoleViewCtrl.$inject = ['$scope', 'consoleService', 'peerRegistrationService', '$stateParams'];
 
-function ConsoleViewCtrl($scope, consoleService, peerRegistrationService) {
+function ConsoleViewCtrl($scope, consoleService, peerRegistrationService, $stateParams) {
 
 	var vm = this;	
 	vm.currentType = 'peer';
@@ -23,6 +23,10 @@ function ConsoleViewCtrl($scope, consoleService, peerRegistrationService) {
 	vm.currentTab = '';
 	vm.daemon = false;
 	vm.timeOut = 0;
+
+	if($stateParams.containerId !== undefined && $stateParams.containerId.length > 0) {
+		vm.activeConsole = $stateParams.containerId;
+	}
 
 	peerRegistrationService.getResourceHosts().success(function (data) {
 		vm.hosts = data;
@@ -42,7 +46,12 @@ function ConsoleViewCtrl($scope, consoleService, peerRegistrationService) {
 			],
 			breakLine: true
 		});
-		$scope.prompt.path('/');		
+		$scope.prompt.path('/');
+
+		if(vm.activeConsole) {
+			$scope.prompt.user(vm.activeConsole);
+		}
+
 		$scope.$apply();
 	}, 100);
 

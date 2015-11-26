@@ -19,6 +19,7 @@ import io.subutai.common.protocol.Template;
 import io.subutai.common.settings.Common;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
+import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.localpeer.impl.container.CreateContainerTask;
 
 import static junit.framework.TestCase.assertFalse;
@@ -54,12 +55,14 @@ public class CreateContainerTaskTest
     ContainerHost containerHost;
 
     CreateContainerTask task;
+    @Mock
+    private HostRegistry hostRegistry;
 
 
     @Before
     public void setUp() throws Exception
     {
-        task = new CreateContainerTask( resourceHost, template, HOSTNAME, IP, VLAN, /*GATEWAY, */TIMEOUT );
+        task = new CreateContainerTask( hostRegistry, resourceHost, template, HOSTNAME, IP, VLAN, /*GATEWAY, */TIMEOUT );
         task.commandUtil = commandUtil;
         when( resourceHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
         when( commandResult.hasSucceeded() ).thenReturn( true );
@@ -118,7 +121,7 @@ public class CreateContainerTaskTest
 //        verify( containerHost ).setDefaultGateway( GATEWAY );
 
         CreateContainerTask task =
-                new CreateContainerTask( resourceHost, template, HOSTNAME, CIDR, VLAN, /*GATEWAY,*/ TIMEOUT );
+                new CreateContainerTask( hostRegistry, resourceHost, template, HOSTNAME, CIDR, VLAN, /*GATEWAY,*/ TIMEOUT );
         task.commandUtil = commandUtil;
 
         task.call();

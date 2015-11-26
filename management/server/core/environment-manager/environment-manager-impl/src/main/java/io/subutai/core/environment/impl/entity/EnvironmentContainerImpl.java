@@ -102,8 +102,8 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @Column( name = "domain_name" )
     private String domainName;
 
-    @Column( name = "container_type", nullable = true )
-    @Enumerated( EnumType.STRING )
+    @Column(name="type")
+    @Enumerated( EnumType.STRING)
     private ContainerType containerType;
 
 
@@ -137,6 +137,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
         Preconditions.checkArgument( !Strings.isNullOrEmpty( domainName ) );
         Preconditions.checkNotNull( hostInfo );
         Preconditions.checkNotNull( template );
+        Preconditions.checkNotNull( containerType );
 
 
         this.peer = peer;
@@ -557,6 +558,13 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
 
     @Override
+    public ContainerType getContainerType()
+    {
+        return containerType;
+    }
+
+
+    @Override
     public int hashCode()
     {
         return hostId != null ? hostId.hashCode() : 0;
@@ -585,11 +593,5 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
             return hostname.compareTo( o.getHostname() );
         }
         return -1;
-    }
-
-    @Override
-    public ContainerType getContainerType()
-    {
-        return containerType;
     }
 }

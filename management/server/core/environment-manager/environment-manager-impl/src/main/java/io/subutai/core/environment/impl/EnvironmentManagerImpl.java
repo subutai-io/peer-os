@@ -24,6 +24,7 @@ import com.google.common.collect.Sets;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.Blueprint;
+import io.subutai.common.environment.ContainerDistributionType;
 import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
@@ -204,7 +205,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         Map.Entry<NodeGroup, Set<HostInfo>> containersEntry = containers.entrySet().iterator().next();
         Iterator<HostInfo> hostIterator = containersEntry.getValue().iterator();
-        ContainerType type = containersEntry.getKey().getType();
 
         String ip = "";
 
@@ -235,12 +235,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             for ( HostInfo newHost : entry.getValue() )
             {
+                ContainerType containerType = entry.getKey().getType();
+
                 environment.addContainers( Sets.newHashSet(
                         new EnvironmentContainerImpl( peerManager.getLocalPeer().getId(), peerManager.getLocalPeer(),
                                 entry.getKey().getName(), new HostInfoModel( newHost ),
                                 templateRegistry.getTemplate( entry.getKey().getTemplateName() ),
                                 entry.getKey().getSshGroupId(), entry.getKey().getHostsGroupId(),
-                                Common.DEFAULT_DOMAIN_NAME, type ) ) );
+                                Common.DEFAULT_DOMAIN_NAME, containerType ) ) );
             }
         }
         TrackerOperation operationTracker = tracker.createTrackerOperation( TRACKER_SOURCE,
@@ -275,6 +277,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             Peer peer = peerManager.getPeer( placementEntry.getKey() );
             for ( NodeGroup nodeGroup : placementEntry.getValue() )
             {
+                LOG.debug( String.format( "%s %s %s %s %s %s %d", nodeGroup.getName(), nodeGroup.getPeerId(),
+                        nodeGroup.getHostId(), nodeGroup.getType(),
+                        nodeGroup.getContainerDistributionType() == ContainerDistributionType.AUTO ?
+                        nodeGroup.getContainerPlacementStrategy().getStrategyId() : "",
+                        nodeGroup.getContainerDistributionType(), nodeGroup.getNumberOfContainers() ) );
                 topology.addNodeGroupPlacement( peer, nodeGroup );
             }
         }

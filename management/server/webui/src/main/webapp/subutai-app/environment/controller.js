@@ -4,12 +4,12 @@ angular.module('subutai.environment.controller', [])
 	.controller('EnvironmentViewCtrl', EnvironmentViewCtrl)
 	.directive('fileModel', fileModel);
 
-EnvironmentViewCtrl.$inject = ['$scope', 'environmentService', 'SweetAlert', 'DTOptionsBuilder', 'DTColumnBuilder', '$resource', '$compile', 'ngDialog'];
+EnvironmentViewCtrl.$inject = ['$scope', 'environmentService', 'SweetAlert', 'DTOptionsBuilder', 'DTColumnBuilder', '$resource', '$compile', 'ngDialog', '$timeout'];
 fileModel.$inject = ['$parse'];
 
 var fileUploder = {};
 
-function EnvironmentViewCtrl($scope, environmentService, SweetAlert, DTOptionsBuilder, DTColumnBuilder, $resource, $compile, ngDialog) {
+function EnvironmentViewCtrl($scope, environmentService, SweetAlert, DTOptionsBuilder, DTColumnBuilder, $resource, $compile, ngDialog, $timeout) {
 
 	var vm = this;
 	vm.environments = [];
@@ -63,6 +63,14 @@ function EnvironmentViewCtrl($scope, environmentService, SweetAlert, DTOptionsBu
 		DTColumnBuilder.newColumn(null).withTitle('').renderWith(containersTags),
 		DTColumnBuilder.newColumn(null).withTitle('').notSortable().renderWith(actionDelete)
 	];
+
+	/*function reloadTableData() {
+		vm.refreshTable = $timeout(function myFunction() {
+			vm.dtInstance.reloadData(null, false);
+			vm.refreshTable = $timeout(reloadTableData, 10000);
+		}, 10000);
+	};
+	reloadTableData();*/
 
 	function createdRow(row, data, dataIndex) {
 		$compile(angular.element(row).contents())($scope);

@@ -15,6 +15,8 @@ import io.subutai.common.resource.ResourceValue;
  */
 public interface ContainerHost extends Host, ContainerHostInfo
 {
+    ContainerType getContainerType();
+
     ContainerId getContainerId();
 
     String getInitiatorPeerId();

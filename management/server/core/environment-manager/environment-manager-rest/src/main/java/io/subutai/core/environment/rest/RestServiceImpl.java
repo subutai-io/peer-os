@@ -552,8 +552,8 @@ public class RestServiceImpl implements RestService
 
 
             jsonSet.add( new ContainerDto( containerHost.getId(), containerHost.getEnvironmentId(),
-                    containerHost.getHostname(), state,
-                    containerHost.getIpByInterfaceName( Common.DEFAULT_CONTAINER_INTERFACE ),
+                    containerHost.getHostname(), containerHost.getContainerType(), state,
+                    containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp(),
                     containerHost.getTemplateName() ) );
         }
         return jsonSet;

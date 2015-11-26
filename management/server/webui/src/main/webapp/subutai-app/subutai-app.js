@@ -216,7 +216,7 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 			}
 		})
 		.state('console', {
-			url: '/console',
+			url: '/console/{containerId}',
 			templateUrl: 'subutai-app/console/partials/view.html',
 			resolve: {
 				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
@@ -341,13 +341,15 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 
 function startup($rootScope, $state, $location, $http) {
 
-	$rootScope.$on('$stateChangeStart',	function(event, toState, toParams, fromState, fromParams){
-		var restrictedPage = $.inArray($location.path(), ['/login']) === -1;
-		if (restrictedPage && !getCookie('sptoken')) {
-			$location.path('/login');
-		}
-	});
-	$http.defaults.headers.common['sptoken'] = getCookie('sptoken');
+	$http.defaults.headers.common['sptoken'] = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyZDg4YjY0Zi1hNzllLTRlZDItYTY2Zi1iMmY3NmYwMDE5OGUiLCJpc3MiOiJpby5zdWJ1dGFpIn0._H7W3VcYfpxlG6gcXRkXHf4gctjNUII3JJ1X9_F3BFc';
+
+	//$rootScope.$on('$stateChangeStart',	function(event, toState, toParams, fromState, fromParams){
+	//	var restrictedPage = $.inArray($location.path(), ['/login']) === -1;
+	//	if (restrictedPage && !getCookie('sptoken')) {
+	//		$location.path('/login');
+	//	}
+	//});
+	//$http.defaults.headers.common['sptoken'] = getCookie('sptoken');
 
 	$rootScope.$state = $state;
 }
@@ -413,12 +415,13 @@ app.directive('checkbox-list-dropdown', function() {
 });
 
 //Global variables
-var SERVER_URL = '/';
+//var SERVER_URL = '/';
+var SERVER_URL = 'http://172.16.131.205:8080/';
 
 var STATUS_UNDER_MODIFICATION = 'UNDER_MODIFICATION';
 var VARS_TOOLTIP_TIMEOUT = 900;
 
-function LOAD_SCREEN(displayStatus) {
+function LOADING_SCREEN(displayStatus) {
 	if(displayStatus === undefined || displayStatus === null) displayStatus = 'block';
 	var loadScreen = document.getElementsByClassName('js-loading-screen')[0];
 	loadScreen.style.display = displayStatus;

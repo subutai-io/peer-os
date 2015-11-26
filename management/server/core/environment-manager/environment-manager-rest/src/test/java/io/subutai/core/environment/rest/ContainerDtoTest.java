@@ -5,7 +5,9 @@ import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
+
 import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.peer.ContainerType;
 
 import static junit.framework.TestCase.assertEquals;
 
@@ -22,9 +24,8 @@ public class ContainerDtoTest
     @Before
     public void setUp() throws Exception
     {
-        containerDto =
-                new ContainerDto( TestUtil.CONTAINER_ID, TestUtil.ENV_ID, TestUtil.HOSTNAME, TestUtil.CONTAINER_STATE,
-                        TestUtil.IP, TestUtil.TEMPLATE_NAME );
+        containerDto = new ContainerDto( TestUtil.CONTAINER_ID, TestUtil.ENV_ID, TestUtil.HOSTNAME, ContainerType.TINY,
+                TestUtil.CONTAINER_STATE, TestUtil.IP, TestUtil.TEMPLATE_NAME );
     }
 
 

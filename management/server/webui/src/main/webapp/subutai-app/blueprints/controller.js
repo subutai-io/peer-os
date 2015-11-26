@@ -124,8 +124,8 @@ function BlueprintsViewCtrl($scope, environmentService, SweetAlert, ngDialog) {
 	}
 
 	function deleteBlueprint(blueprintId, key) {
-		VARS_MODAL_CONFIRMATION( SweetAlert, 'Are you sure?', 'To remove ' + blueprintName + ' blueprint!',
-
+		var currentBlueprint = vm.blueprints[key];
+		VARS_MODAL_CONFIRMATION( SweetAlert, 'Are you sure?', 'To remove ' + currentBlueprint.name + ' blueprint!',
 			function (isConfirm) {
 				if (isConfirm) {
 					environmentService.deleteBlueprint(blueprintId)

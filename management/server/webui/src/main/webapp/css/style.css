@@ -339,6 +339,10 @@ body {
 	text-transform: capitalize;
 }
 
+.b-main-table__empty-item {
+	text-align: center!important;
+}
+
 .b-main-table__controls {
     width: 82px;
 }
@@ -413,7 +417,7 @@ body {
 .b-main-table td {
     font-size: 13px;
     color: #19286e;
-    padding: 10px 0 10px 18px;
+    padding: 15px 0 15px 18px;
     text-align: left;
 }
 
@@ -1206,6 +1210,7 @@ td.b-main-table__status-col {
 .b-workspace-content__row {
     position: relative;
 	overflow: hidden;
+	margin-bottom: 20px;
 }
 
 .b-workspace-content__row_margin-b {
@@ -1236,6 +1241,7 @@ td.b-main-table__status-col {
     font-weight: 600;
     font-size: 14px;
     color: #19286e;
+	margin: 0 0 10px 0;
 }
 
 .b-workspace-content-row-h2_inline {
