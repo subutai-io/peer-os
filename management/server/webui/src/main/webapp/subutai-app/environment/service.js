@@ -10,9 +10,16 @@ function environmentService($http) {
 
 	var ENVIRONMENTS_URL = SERVER_URL + 'rest/ui/environments/';
 
+<<<<<<< HEAD
+	var SSH_KEY_URL = ENVIRONMENTS_URL + 'keys/';
+	var CONTAINERS_URL = ENVIRONMENTS_URL + 'containers/';
+	var CONTAINER_TYPES_URL = CONTAINERS_URL + 'types/';
+	var DOMAINS_URL = ENVIRONMENTS_URL + 'domains/';
+=======
 	var SSH_KEY_URL = ENVIRONMENTS_URL + 'key/';
 	var CONTAINERS_URL = ENVIRONMENTS_URL + 'containers/';
 	var CONTAINER_TYPES_URL = CONTAINERS_URL + 'types/';
+>>>>>>> 6c94c4eed1ee34277b4d4b46b49ac4e1775baa6b
 
 	var BLUEPRINT_URL = ENVIRONMENTS_URL + 'blueprints/';
 
@@ -33,6 +40,10 @@ function environmentService($http) {
 		getBlueprintById: getBlueprintById,
 		saveBlueprint : saveBlueprint,
 		deleteBlueprint : deleteBlueprint,
+<<<<<<< HEAD
+		getStrategies : getStrategies,
+=======
+>>>>>>> 6c94c4eed1ee34277b4d4b46b49ac4e1775baa6b
 
 
 		getEnvironments : getEnvironments,
@@ -45,6 +56,10 @@ function environmentService($http) {
 		removeSshKey : removeSshKey,
 
 
+<<<<<<< HEAD
+		getDomainStrategies : getDomainStrategies,
+=======
+>>>>>>> 6c94c4eed1ee34277b4d4b46b49ac4e1775baa6b
 		setDomain : setDomain,
 		removeDomain : removeDomain,
 
@@ -61,8 +76,11 @@ function environmentService($http) {
 		updateQuota: updateQuota,
 
 
+<<<<<<< HEAD
+=======
 		getStrategies : getStrategies,
 
+>>>>>>> 6c94c4eed1ee34277b4d4b46b49ac4e1775baa6b
 
 		getPeers : getPeers,
 
@@ -154,7 +172,6 @@ function environmentService($http) {
 
 	function setSshKey(sshKey, environmentId) {
 		var postData = 'environmentId=' + environmentId + '&key=' + sshKey;
-		console.log(postData);
 		return $http.post(
 			SSH_KEY_URL,
 			postData, 
@@ -167,10 +184,26 @@ function environmentService($http) {
 	}
 
 
+<<<<<<< HEAD
+	function getDomainStrategies() {
+		return $http.get(
+			DOMAINS_URL + 'strategies/',
+			{withCredentials: true, headers: {'Content-Type': 'application/json'}}
+		);
+	}
+
+
+	function setDomain(domain, envId, file) {
+		var fd = new FormData();
+		fd.append('environmentId', envId);
+		fd.append('hostName', domain.name);
+		fd.append('strategy', domain.strategy);
+=======
 	function setDomain(envId, domainName, file) {
 		var fd = new FormData();
 		fd.append('environmentId', envId);
 		fd.append('hostName', domainName);
+>>>>>>> 6c94c4eed1ee34277b4d4b46b49ac4e1775baa6b
 		fd.append('file', file);
 
 		return $http.post(

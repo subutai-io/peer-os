@@ -10,9 +10,11 @@ function BlueprintsBuildCtrl($scope, environmentService, SweetAlert, ngDialog, $
 	var vm = this;
 	vm.blueprint = {};
 	vm.peers = [];
-	vm.strategies = [];
+	vm.buildTypes = [];
 	vm.blueprintAction = $stateParams.action;
 	vm.colors = quotaColors;
+
+	vm.buildWith = 'strategie';
 
 	vm.nodesToCreate = [];
 	vm.transportNodes = [];
@@ -69,10 +71,12 @@ function BlueprintsBuildCtrl($scope, environmentService, SweetAlert, ngDialog, $
 
 	environmentService.getPeers().success(function (data) {
 		vm.peers = data;
-	});
-
-	environmentService.getStrategies().success(function (data) {
-		vm.strategies = data;
+		environmentService.getStrategies().success(function (strategie) {
+			for(var i in vm.peers) {
+				var resources = vm.peers[i];
+				vm.peers[i] = {"strategie": strategie, "resources": resources};
+			}
+		});
 	});
 
 	function buildPopup() {
@@ -83,7 +87,6 @@ function BlueprintsBuildCtrl($scope, environmentService, SweetAlert, ngDialog, $
 				return;
 			}
 		} else {
-			console.log(vm.newEnvironmentName);
 			if(vm.newEnvironmentName === undefined || vm.newEnvironmentName.length < 1) {
 				vm.popupError = true;
 				return;
@@ -100,12 +103,12 @@ function BlueprintsBuildCtrl($scope, environmentService, SweetAlert, ngDialog, $
 				if(vm.groupList[currentNode.peer] === undefined) {
 					vm.groupList[currentNode.peer] = {};
 				}
-				if(vm.groupList[currentNode.peer][currentNode.strategyId] === undefined) {
-					vm.groupList[currentNode.peer][currentNode.strategyId] = [];
+				if(vm.groupList[currentNode.peer][currentNode.createOption] === undefined) {
+					vm.groupList[currentNode.peer][currentNode.createOption] = [];
 				}
 
 				currentNode.nodesToCreateKey = i;
-				vm.groupList[currentNode.peer][currentNode.strategyId].push(currentNode);
+				vm.groupList[currentNode.peer][currentNode.createOption].push(currentNode);
 			}
 		}
 
@@ -120,7 +123,7 @@ function BlueprintsBuildCtrl($scope, environmentService, SweetAlert, ngDialog, $
 
 	function placeNode(node, parentKey) {
 		if(node.peer === undefined) return;
-		if(node.strategyId === undefined) return;
+		if(node.createOption === undefined) return;
 		if(node.options.start < 1) return;
 
 		var key = findContainer(node);
@@ -191,10 +194,12 @@ function BlueprintsBuildCtrl($scope, environmentService, SweetAlert, ngDialog, $
 	}
 
 	function removeGroup(peer, strategies) {
+		console.log(vm.groupList.length);
 		for(var i = 0; i < vm.groupList[peer][strategies].length; i++) {
 			removeNodeFromCreateList(vm.groupList[peer][strategies][i].nodesToCreateKey);
 		}
 		delete vm.groupList[peer][strategies];
+		console.log(vm.groupList.length);
 	}
 
 	function getNodesGroups() {
@@ -203,10 +208,15 @@ function BlueprintsBuildCtrl($scope, environmentService, SweetAlert, ngDialog, $
 
 			if(vm.nodesToCreate[i] !== null) {
 				var currentNodeGroup = vm.blueprint.nodeGroups[vm.nodesToCreate[i].parentNode];
-				var containerPlacementStrategy = {"strategyId": vm.nodesToCreate[i].strategyId, "criteria": []};
+
+				if(vm.buildWith == 'strategie') {
+					var containerPlacementStrategy = {"strategyId": vm.nodesToCreate[i].createOption, "criteria": []};
+					currentNodeGroup.containerPlacementStrategy = containerPlacementStrategy;
+				} else {
+					currentNodeGroup.hostId = vm.nodesToCreate[i].createOption;
+				}
 
 				currentNodeGroup.numberOfContainers = vm.nodesToCreate[i].numberOfContainers;
-				currentNodeGroup.containerPlacementStrategy = containerPlacementStrategy;
 				currentNodeGroup.peerId = vm.nodesToCreate[i].peer;
 				currentNodeGroup.containerDistributionType = 'AUTO';
 
