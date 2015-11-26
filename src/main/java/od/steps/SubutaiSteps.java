@@ -433,7 +433,6 @@ public class SubutaiSteps extends ScenarioSteps {
     public void enterCommand(String command){
         waitABit(5000);
         subutaiPage.inputCommandLine.click();
-        subutaiPage.inputCommandLine.type(command);
         subutaiPage.inputCommandLine.sendKeys(Keys.ENTER);
         waitABit(5000);
     }
@@ -443,4 +442,22 @@ public class SubutaiSteps extends ScenarioSteps {
         subutaiPage.selectPeerConsole.selectByIndex(index);
         waitABit(3000);
     }
+
+    @Step
+    public void executeConsoleCommand(String command){
+        subutaiPage.executeConsoleCommand(command);
+    }
+
+    @Step
+    public void selectMenuResourceHost(){
+        subutaiPage.selectMenuResourceHost.click();
+        subutaiPage.selectMenuResourceHost.selectByIndex(1);
+        subutaiPage.selectMenuResourceHost.sendKeys(Keys.ENTER);
+    }
+
+    @Step
+    public void verifyOutputConsoleCommand(String expectedPhrase){
+        assertThat(subutaiPage.getPreData().contains(expectedPhrase), is(true));
+    }
+
 }

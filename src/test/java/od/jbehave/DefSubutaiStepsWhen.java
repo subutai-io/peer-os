@@ -214,8 +214,18 @@ public class DefSubutaiStepsWhen {
         subutaiSteps.enterCommand(command);
     }
 
-    @When("the user select peer console: Two")
+    @When("the user select peer executeConsoleCommand: Two")
     public void select_peer_console(){
         subutaiSteps.selectPeerConsole(2);
+    }
+
+    @When("the user select any available resource host from select menu")
+    public void select_resource_host_from_select_menu(){
+        subutaiSteps.selectMenuResourceHost();
+    }
+
+    @When("the user enter console command: '$command'")
+    public void execute_console_command(String command){
+        subutaiSteps.executeConsoleCommand(command);
     }
 }

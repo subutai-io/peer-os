@@ -1,9 +1,9 @@
 Meta:
 
 Narrative:
-As a QA and Developer
-I want to verify cross peer, create Environment and ping containers
-So for that I created this scenarios
+As a QA
+I want to verify an Unprivileged containers PLAYBOOK SS-3292
+So that I will create test scenarios
 
 Scenario: the First user sends request
 Given TO DO

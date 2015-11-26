@@ -1,9 +1,9 @@
 Meta:
 
 Narrative:
-As a user
-I want to perform an action
-So that I can achieve a business goal
+As a QA
+I want to verify an Unprivileged containers PLAYBOOK SS-3025
+So that I will create test scenarios
 
 Scenario: the First user sends request
 Given TO DO

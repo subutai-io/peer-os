@@ -169,4 +169,9 @@ public class DefSubutaiStepsThen {
     public void see_text_no_data_available_in_table(){
         subutaiSteps.seeTextNoDataAvailableInTable();
     }
+
+    @Then("the user verify output console command: '$expectedPhrase'")
+    public void verify_output_console_command(String expectedPhrase){
+        subutaiSteps.verifyOutputConsoleCommand(expectedPhrase);
+    }
 }

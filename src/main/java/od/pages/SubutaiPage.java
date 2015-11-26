@@ -1,8 +1,19 @@
 package od.pages;
 
+import ch.lambdaj.function.convert.Converter;
+import com.opera.core.systems.scope.protos.SystemInputProtos;
+import javafx.scene.input.KeyCode;
+import net.serenitybdd.core.annotations.findby.By;
 import net.serenitybdd.core.annotations.findby.FindBy;
 import net.serenitybdd.core.pages.WebElementFacade;
 import net.thucydides.core.pages.PageObject;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebElement;
+
+import java.awt.event.KeyAdapter;
+import java.util.List;
+
+import static ch.lambdaj.Lambda.convert;
 
 public class SubutaiPage extends PageObject {
 
@@ -185,7 +196,7 @@ public class SubutaiPage extends PageObject {
     @FindBy(xpath = "*//td[@class=\"dataTables_empty\" and contains(text(), \"No data available in table\")]")
     public WebElementFacade textNoDataAvailableInTable;
 
-    @FindBy(xpath = "*//input[@class=\"terminal-target ng-pristine ng-valid ng-touched\"]")
+    @FindBy(ngModel = "*//span[@class=\"terminal-cursor terminal-cursor-hidden\"]")
     public WebElementFacade inputCommandLine;
 
     @FindBy(id = "subt-link__console")
@@ -193,6 +204,10 @@ public class SubutaiPage extends PageObject {
 
     @FindBy(xpath = "*//select[@class=\"b-popup-body-input ng-pristine ng-valid ng-touched\"]")
     public WebElementFacade selectPeerConsole;
+
+    @FindBy(ngModel = "selectedPeer")
+    public WebElementFacade selectMenuResourceHost;
+
 
     //---------------------------------------------------------------------
 
@@ -223,4 +238,32 @@ public class SubutaiPage extends PageObject {
     public void waitTextUnregistered(){
         waitFor(textUnregistered);
     }
+
+    public void executeConsoleCommand(String command){
+        evaluateJavascript("function setCommand(value) {\n" +
+                "var appElement = document.getElementsByClassName('b-terminal')[0];" +
+                "var $scope = angular.element(appElement).scope();" +
+                "$scope.$apply(function() {" +
+                "$scope.commandLine = value;" +
+                "$scope.execute();" +
+                "});" +
+                "} " +
+                "setCommand('"+ command +"')");
+        waitABit(10000);
+    }
+
+    private Converter<WebElement, String> toStrings() {
+        return new Converter<WebElement, String>() {
+            public String convert(WebElement from) {
+                return from.getText();
+            }
+        };
+    }
+
+    public List<String> getPreData() {
+        WebElementFacade LinksList = find(By.tagName("pre"));
+        List<WebElement> results = LinksList.findElements(By.className("terminal-line"));
+        return convert(results, toStrings());
+    }
+
 }
