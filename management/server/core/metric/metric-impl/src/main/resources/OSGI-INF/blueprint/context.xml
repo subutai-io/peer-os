@@ -7,8 +7,6 @@
 
   <reference id="peerManager" availability="mandatory"
              interface="io.subutai.core.peer.api.PeerManager" />
-  <reference id="identityManager" availability="mandatory"
-             interface="io.subutai.core.identity.api.IdentityManager" />
   <reference id="environmentManager" availability="mandatory"
              interface="io.subutai.core.environment.api.EnvironmentManager" />
 
@@ -22,7 +20,6 @@
         scope="singleton" destroy-method="destroy">
     <argument ref="peerManager" />
     <argument ref="daoManagerMetric" />
-    <argument ref="identityManager" />
     <argument ref="environmentManager" />
   </bean>
 

@@ -30,11 +30,12 @@ import io.subutai.core.tracker.api.Tracker;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyCollection;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+
+import io.subutai.core.security.api.SecurityManager;
 
 
 @RunWith( MockitoJUnitRunner.class )
@@ -50,6 +51,8 @@ public class EnvironmentManagerTest
     @Mock
     PeerManager peerManager;
     @Mock
+    SecurityManager securityManager;
+    @Mock
     NetworkManager networkManager;
     @Mock
     DaoManager daoManager;
@@ -57,8 +60,6 @@ public class EnvironmentManagerTest
     IdentityManager identityManager;
     @Mock
     Tracker tracker;
-    @Mock
-    io.subutai.core.security.api.SecurityManager securityManager;
     @Mock
     Peer peer;
     @Mock
@@ -82,15 +83,16 @@ public class EnvironmentManagerTest
     public void setUp() throws Exception
     {
         when( nodeGroup.getPeerId() ).thenReturn( PEER_ID );
-        when( peerManager.getPeer(PEER_ID) ).thenReturn( peer );
+        when( peerManager.getPeer( PEER_ID ) ).thenReturn( peer );
 
         blueprint = new Blueprint( "env", null, Sets.newHashSet( nodeGroup ) );
 
-        environmentManager = spy( new EnvironmentManagerImpl( templateRegistry, peerManager, networkManager, daoManager,
-                identityManager, tracker ) );
+        environmentManager =
+                spy( new EnvironmentManagerImpl( templateRegistry, peerManager, securityManager, networkManager,
+                        daoManager, identityManager, tracker ) );
         doReturn( environment ).when( environmentManager )
                                .createEmptyEnvironment( anyString(), anyString(), anyString() );
-//        doReturn( topology ).when( environmentManager ).buildTopology( blueprint );
+        //        doReturn( topology ).when( environmentManager ).buildTopology( blueprint );
         doReturn( new HashSet<>() ).when( environmentManager ).getUsedGateways( ( Peer ) any() );
         doReturn( environmentCreationWorkflow ).when( environmentManager )
                                                .getEnvironmentCreationWorkflow( any( EnvironmentImpl.class ),

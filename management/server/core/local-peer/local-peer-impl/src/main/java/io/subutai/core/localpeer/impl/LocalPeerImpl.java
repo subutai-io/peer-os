@@ -319,7 +319,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             ( ( AbstractSubutaiHost ) resourceHost ).setPeer( this );
             final ResourceHostEntity resourceHostEntity = ( ResourceHostEntity ) resourceHost;
             resourceHostEntity.setRegistry( templateRegistry );
-            //            resourceHostEntity.setMonitor( monitor );
             resourceHostEntity.setHostRegistry( hostRegistry );
         }
     }
@@ -1505,6 +1504,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     //todo Create PEK
     //todo Sign PEK with EK and PEER Key
 
+
     /* ***********************************************
      *  Create PEK
      */
@@ -1515,6 +1515,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         KeyManager keyManager = securityManager.getKeyManager();
         EncryptionTool encTool = securityManager.getEncryptionTool();
         String pairId = String.format( "%s-%s", getId(), envId.getId() );
+        final PGPSecretKeyRing peerSecKeyRing = securityManager.getKeyManager().getSecretKeyRing( null );
         try
         {
             KeyPair keyPair = keyManager.generateKeyPair( pairId, false );
@@ -1527,6 +1528,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             keyManager.saveSecretKeyRing( pairId, SecurityKeyType.PeerEnvironmentKey.getId(), secRing );
             keyManager.savePublicKeyRing( pairId, SecurityKeyType.PeerEnvironmentKey.getId(), pubRing );
 
+            securityManager.getKeyManager().signKey( peerSecKeyRing, pubRing, KeyTrustLevel.Full.getId() );
+
             return new PublicKeyContainer( getId(), pubRing.getPublicKey().getFingerprint(),
                     encTool.armorByteArrayToString( pubRing.getEncoded() ) );
         }
@@ -1537,6 +1540,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
+    @Override
+    public void updatePeerEnvironmentPubKey( final EnvironmentId environmentId, final PGPPublicKeyRing pubKeyRing )
+            throws PeerException
+    {
+        securityManager.getKeyManager().updatePublicKeyRing( pubKeyRing );
+    }
 
 
     @Override

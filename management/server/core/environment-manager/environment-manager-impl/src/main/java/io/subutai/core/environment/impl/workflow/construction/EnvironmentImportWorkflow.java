@@ -1,5 +1,6 @@
 package io.subutai.core.environment.impl.workflow.construction;
 
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,9 +13,12 @@ import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.creation.steps.*;
+import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.model.User;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registry.api.TemplateRegistry;
+import io.subutai.core.security.api.SecurityManager;
 
 
 public class EnvironmentImportWorkflow extends Workflow<EnvironmentImportWorkflow.Phase>
@@ -25,7 +29,8 @@ public class EnvironmentImportWorkflow extends Workflow<EnvironmentImportWorkflo
     private final TemplateRegistry templateRegistry;
     private final NetworkManager networkManager;
     private final PeerManager peerManager;
-    private  EnvironmentImpl environment;
+    private final SecurityManager securityManager;
+    private EnvironmentImpl environment;
     private final Topology topology;
     private final String sshKey;
     private final String defaultDomain;
@@ -33,16 +38,21 @@ public class EnvironmentImportWorkflow extends Workflow<EnvironmentImportWorkflo
     private final EnvironmentManagerImpl environmentManager;
 
     private Throwable error;
+    private IdentityManager identityManager;
+
 
     public EnvironmentImportWorkflow( String defaultDomain, TemplateRegistry templateRegistry,
                                       EnvironmentManagerImpl environmentManager, NetworkManager networkManager,
-                                      PeerManager peerManager, EnvironmentImpl environment, Topology topology,
+                                      PeerManager peerManager, SecurityManager securityManager,
+                                      IdentityManager identityManager, EnvironmentImpl environment, Topology topology,
                                       String sshKey, TrackerOperation operationTracker )
     {
         super( Phase.INIT );
+        this.identityManager = identityManager;
         this.environmentManager = environmentManager;
         this.templateRegistry = templateRegistry;
         this.peerManager = peerManager;
+        this.securityManager = securityManager;
         this.networkManager = networkManager;
         this.environment = environment;
         this.topology = topology;
@@ -64,6 +74,7 @@ public class EnvironmentImportWorkflow extends Workflow<EnvironmentImportWorkflo
         FINALIZE
     }
 
+
     public Phase INIT()
     {
 
@@ -76,13 +87,15 @@ public class EnvironmentImportWorkflow extends Workflow<EnvironmentImportWorkflo
         return Phase.GENERATE_KEYS;
     }
 
+
     public Phase GENERATE_KEYS()
     {
         operationTracker.addLog( "Generating PEKs" );
 
         try
         {
-            new io.subutai.core.environment.impl.workflow.creation.steps.PEKGenerationStep( topology, environment, peerManager.getLocalPeer() ).execute();
+            new PEKGenerationStep( topology, environment, peerManager.getLocalPeer(), securityManager,
+                    identityManager.getActiveUser() ).execute();
 
             environment = environmentManager.saveOrUpdate( environment );
 
@@ -95,6 +108,7 @@ public class EnvironmentImportWorkflow extends Workflow<EnvironmentImportWorkflo
             return null;
         }
     }
+
 
     public Phase SETUP_VNI()
     {
@@ -115,6 +129,7 @@ public class EnvironmentImportWorkflow extends Workflow<EnvironmentImportWorkflo
             return null;
         }
     }
+
 
     public Phase SETUP_N2N()
     {
@@ -179,6 +194,7 @@ public class EnvironmentImportWorkflow extends Workflow<EnvironmentImportWorkflo
         }
     }
 
+
     public Phase SET_ENVIRONMENT_SSH_KEY()
     {
         operationTracker.addLog( "Setting environment ssh key to containers" );
@@ -198,6 +214,7 @@ public class EnvironmentImportWorkflow extends Workflow<EnvironmentImportWorkflo
             return null;
         }
     }
+
 
     public void FINALIZE()
     {

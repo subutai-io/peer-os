@@ -16,6 +16,8 @@
              interface="io.subutai.core.registry.api.TemplateRegistry" />
   <reference id="peerManager"
              interface="io.subutai.core.peer.api.PeerManager" />
+  <reference id="securityManager"
+             interface="io.subutai.core.security.api.SecurityManager" />
   <reference id="networkManager"
              interface="io.subutai.core.network.api.NetworkManager" />
   <reference id="identityManager"
@@ -40,6 +42,7 @@
         class="io.subutai.core.environment.impl.EnvironmentManagerImpl">
     <argument ref="templateRegistry" />
     <argument ref="peerManager" />
+    <argument ref="securityManager" />
     <argument ref="networkManager" />
     <argument ref="daoManagerEnv" />
     <argument ref="identityManager" />
