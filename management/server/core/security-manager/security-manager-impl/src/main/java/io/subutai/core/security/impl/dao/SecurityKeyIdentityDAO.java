@@ -1,6 +1,8 @@
 package io.subutai.core.security.impl.dao;
 
 
+import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
@@ -46,6 +48,38 @@ class SecurityKeyIdentityDAO
         {
             daoManager.closeEntityManager( em );
         }
+    }
+
+
+    /******************************************
+     *
+     */
+    public SecurityKeyIdentity findByFingerprint( String fingerprint )
+    {
+        EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
+        SecurityKeyIdentity key = null;
+        try
+        {
+            Query qr = em.createQuery(
+                    "select ss from SecurityKeyIdentityEntity AS ss where ss"
+                            + ".publicKeyFingerprint=:publicKeyFingerprint" );
+            qr.setParameter( "publicKeyFingerprint", fingerprint );
+            List<SecurityKeyIdentityEntity> result = qr.getResultList();
+
+            if ( result.size() > 0 )
+            {
+                key = result.get( 0 );
+            }
+        }
+        catch ( Exception ex )
+        {
+            //ignore
+        }
+        finally
+        {
+            daoManager.closeEntityManager( em );
+        }
+        return key;
     }
 
 

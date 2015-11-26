@@ -226,7 +226,9 @@ public class KeyManagerImpl implements KeyManager
     {
         try
         {
-            securityDataService.saveKeyTrustData( sourceId, targetId, trustLevel );
+            SecurityKeyTrust securityKeyTrust = securityDataService.getKeyTrustData( sourceId, targetId );
+            securityKeyTrust.setLevel( KeyTrustLevel.Never.getId() );
+            securityDataService.updateKeyTrustData( securityKeyTrust );
         }
         catch ( Exception ex )
         {
@@ -912,19 +914,75 @@ public class KeyManagerImpl implements KeyManager
     /* *****************************
      *
      */
+    @Override
+    public int getTrustLevel( final String aHostId, final String bHostId )
+    {
+        String aFingerprint = getFingerprint( aHostId );
+        String bFingerprint = getFingerprint( bHostId );
+
+        if ( aFingerprint.equals( bFingerprint ) )
+        {
+            // ultimate trust exists if asked trust level for myself
+            return KeyTrustLevel.Ultimate.getId();
+        }
+
+        Set<String> aTrustChain = Sets.newHashSet();
+        Set<String> bTrustChain = Sets.newHashSet();
+
+        constructTrustChain( aFingerprint, aTrustChain );
+        constructTrustChain( bFingerprint, bTrustChain );
+
+        if ( bTrustChain.contains( aFingerprint ) || aTrustChain.contains( aFingerprint ) )
+        {
+            return KeyTrustLevel.Full.getId();
+        }
+        else
+        {
+            for ( final String fingerprint : aTrustChain )
+            {
+                if ( bTrustChain.contains( fingerprint ) )
+                {
+                    return KeyTrustLevel.Marginal.getId();
+                }
+            }
+        }
+        return KeyTrustLevel.NO_TRUST.getId();
+    }
+
+
+    private void constructTrustChain( String fingerprint, Set<String> chain )
+    {
+        chain.add( fingerprint );
+        List<SecurityKeyTrust> keyTrusts = securityDataService.getKeyTrustData( fingerprint );
+        for ( final SecurityKeyTrust keyTrust : keyTrusts )
+        {
+            if ( !chain.contains( keyTrust.getTargetId() ) )
+            {
+                constructTrustChain( keyTrust.getTargetId(), chain );
+            }
+        }
+    }
+
+
+    /* *****************************
+     *
+     */
     private void getKeyTrustList( final SecurityKeyIdentity securityKeyIdentity, SecurityKeyTrust securityKeyTrust,
                                   Set<String> trustIdSet )
     {
         List<SecurityKeyTrust> trustedKeys = securityDataService.getKeyTrustData( securityKeyTrust.getTargetId() );
-
-        SecurityKeyIdentity trustedIdentity = securityDataService.getKeyIdentityData( securityKeyTrust.getTargetId() );
-        securityKeyIdentity.getTrustedKeys().add( trustedIdentity );
-
+        SecurityKeyIdentity trustedIdentity =
+                securityDataService.getKeyIdentityDataByFingerprint( securityKeyTrust.getTargetId() );
         trustIdSet.add( securityKeyIdentity.getHostId() );
+
+        if ( trustedIdentity != null )
+        {
+            securityKeyIdentity.getTrustedKeys().add( trustedIdentity );
+        }
 
         for ( final SecurityKeyTrust trustedKey : trustedKeys )
         {
-            if ( !trustIdSet.contains( trustedIdentity.getHostId() ) )
+            if ( trustedIdentity != null && !trustIdSet.contains( trustedIdentity.getHostId() ) )
             {
                 getKeyTrustList( trustedIdentity, trustedKey, trustIdSet );
             }
@@ -935,21 +993,21 @@ public class KeyManagerImpl implements KeyManager
     /* *****************************
      *
      */
-    @Override
-    public int getTrustLevel( final String aHost, final String bHost )
-    {
-
-        SecurityKeyTrust trust = getKeyTrust( aHost, bHost );
-
-        if ( trust != null )
-        {
-            return trust.getLevel();
-        }
-        else
-        {
-            return KeyTrustLevel.Never.getId();
-        }
-    }
+    //    @Override
+    //    public int getTrustLevel( final String aHost, final String bHost )
+    //    {
+    //
+    //        SecurityKeyTrust trust = getKeyTrust( aHost, bHost );
+    //
+    //        if ( trust != null )
+    //        {
+    //            return trust.getLevel();
+    //        }
+    //        else
+    //        {
+    //            return KeyTrustLevel.Never.getId();
+    //        }
+    //    }
 
 
     @Override

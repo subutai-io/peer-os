@@ -104,6 +104,13 @@ public class SecurityDataServiceImpl implements SecurityDataService
     }
 
 
+    @Override
+    public SecurityKeyIdentity getKeyIdentityDataByFingerprint( final String fingerprint )
+    {
+        return securityKeyIdentityDAO.findByFingerprint( fingerprint );
+    }
+
+
     // ********** Secret Key Store ***************
 
 
@@ -183,6 +190,12 @@ public class SecurityDataServiceImpl implements SecurityDataService
         catch ( Exception ex )
         {
         }
+    }
+
+
+    public void updateKeyTrustData( SecurityKeyTrust securityKeyTrust )
+    {
+        securityKeyTrustDAO.update( securityKeyTrust );
     }
 
 

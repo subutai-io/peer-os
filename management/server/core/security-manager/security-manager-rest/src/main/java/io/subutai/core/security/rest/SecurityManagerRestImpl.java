@@ -170,7 +170,7 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
         try
         {
             KeyManager keyManager = securityManager.getKeyManager();
-            keyManager.setKeyTrust( source, target, KeyTrustLevel.NO_TRUST.getId() );
+            keyManager.setKeyTrust( source, target, KeyTrustLevel.Never.getId() );
         }
         catch ( Exception e )
         {

@@ -33,6 +33,12 @@ public interface SecurityDataService
 
 
     /******************************************
+     * Get SecurityKeyIdentity entity from DB
+     */
+    public SecurityKeyIdentity getKeyIdentityDataByFingerprint( String fingerprint );
+
+
+    /******************************************
      *
      */
     SecretKeyStore getSecretKeyData( String fingerprint );
@@ -54,6 +60,9 @@ public interface SecurityDataService
      *
      */
     void saveKeyTrustData( String sourceId, String targetId, int trustLevel );
+
+
+    public void updateKeyTrustData( SecurityKeyTrust securityKeyTrust );
 
     /******************************************
      *
