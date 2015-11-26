@@ -66,18 +66,18 @@ function choice_stories(){
     if [[ $ns_path == "all" ]]; then
       cp -r src/test/resources/stories/general_playbooks src/test/resources/stories/tests_run
       cp -r src/test/resources/stories/playbooks src/test/resources/stories/tests_run
-    #########################################################################################
-          echo "$ns_path" > src/test/resources/parameters/ns_path
-    cat src/test/java/od/jbehave/AcceptanceTestSuite.java | while read i;
-    do echo ${i//directory_stories=*/directory_stories=\"stories/tests_run/*/*\"\;};
-    done > newfile;
-    mv newfile src/test/java/od/jbehave/AcceptanceTestSuite.java;
-    cd src/test/resources/stories/tests_run
-    echo
-    echo "PLAYBOOKS FOR RUN: "
-    find * -type f
-    echo
-    ##########################################################################################
+
+      echo "$ns_path" > src/test/resources/parameters/ns_path
+      cat src/test/java/od/jbehave/AcceptanceTestSuite.java | while read i;
+      do echo ${i//directory_stories=*/directory_stories=\"stories/tests_run/*/*\"\;};
+      done > newfile;
+      mv newfile src/test/java/od/jbehave/AcceptanceTestSuite.java;
+      cd src/test/resources/stories/tests_run
+      echo
+      echo "PLAYBOOKS FOR RUN: "
+      find * -type f
+      echo
+
     else
       for ((i=0;i<"${#arr[@]}";i++))
      do
@@ -86,16 +86,17 @@ function choice_stories(){
         echo "$s"
         mv src/test/resources/stories/tests_run/${arr[i]} src/test/resources/stories/tests_run/"Playbook${arr[i]}"
      done
-     echo "$ns_path" > src/test/resources/parameters/ns_path
-     cat src/test/java/od/jbehave/AcceptanceTestSuite.java | while read i;
-     do echo ${i//directory_stories=*/directory_stories=\"stories/tests_run/*\"\;};
-     done > newfile;
-     mv newfile src/test/java/od/jbehave/AcceptanceTestSuite.java;
-     cd src/test/resources/stories/tests_run
-     echo
-     echo "PLAYBOOKS FOR RUN: "
-     find * -type f
-     echo
+
+      echo "$ns_path" > src/test/resources/parameters/ns_path
+      cat src/test/java/od/jbehave/AcceptanceTestSuite.java | while read i;
+      do echo ${i//directory_stories=*/directory_stories=\"stories/tests_run/*\"\;};
+      done > newfile;
+      mv newfile src/test/java/od/jbehave/AcceptanceTestSuite.java;
+      cd src/test/resources/stories/tests_run
+      echo
+      echo "PLAYBOOKS FOR RUN: "
+      find * -type f
+      echo
     fi
 }
 

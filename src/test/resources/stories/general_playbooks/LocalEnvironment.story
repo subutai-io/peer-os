@@ -12,8 +12,7 @@ And the user click on the button: Login
 When the user click on the menu item: Environment
 Then the user observe items of Environment menu
 When the user click on the menu item: Blueprint
-Then the user observe button: Create Blueprint
-When the user click on the button: Create Blueprint
+And the user click on the button: Create Blueprint
 Then the user observe field: Enter blueprint name
 When the user enter blueprint name: 'Sample blueprint'
 And the user enter node name: 'Node'
