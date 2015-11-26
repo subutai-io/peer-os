@@ -13,6 +13,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import io.subutai.core.security.rest.model.SecurityKeyData;
+
 
 /**
  * Interface for Key Server REST
@@ -95,9 +97,7 @@ public interface SecurityManagerRest
      */
     @POST
     @Path( "keyman/signkey" )
-    @Produces(  MediaType.APPLICATION_JSON  )
-    @Consumes({"application/x-www-form-urlencoded"})
-    public Response signKey( @FormParam( "sourcehostid" ) final String sourceHostId,
-                             @FormParam( "keytext" ) final String keyText,
-                             @FormParam( "trustlevel" ) final int trustLevel );
+    @Produces( MediaType.APPLICATION_JSON )
+    @Consumes( MediaType.APPLICATION_JSON )
+    public Response signKey( SecurityKeyData keyData );
 }
