@@ -797,13 +797,18 @@ public class RestServiceImpl implements RestService
     }
 
 
+    public Response setTags()
+    {
+
+
+        return Response.ok().build();
+    }
+
 
     /** AUX *****************************************************/
 
     private Set<ContainerJson> convertContainersToContainerJson( Set<EnvironmentContainerHost> containerHosts )
     {
-        String types[] = {"TINY", "SMALL", "MEDIUM", "LARGE", "HUGE", "CUSTOM"};
-
         Set<ContainerJson> jsonSet = Sets.newHashSet();
         for ( EnvironmentContainerHost containerHost : containerHosts )
         {
@@ -811,10 +816,14 @@ public class RestServiceImpl implements RestService
 
             Interface iface = containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE );
 
+
+
+
             jsonSet.add( new ContainerJson( containerHost.getId(), containerHost.getEnvironmentId(),
                     containerHost.getHostname(), state,
                     iface.getIp(),
-                    containerHost.getTemplateName(), ContainerType.valueOf( types[ (int)(Math.random() * types.length) ] ), null ) );
+                    iface.getMac(),
+                    containerHost.getTemplateName(), containerHost.getContainerType(), containerHost.getTags() ) );
 
         }
         return jsonSet;

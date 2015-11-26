@@ -80,7 +80,7 @@ public class CreatePeerNodeGroupsTask implements Callable<Set<NodeGroupBuildResu
                 {
                     containers.add( new EnvironmentContainerImpl( localPeer.getId(), peer, nodeGroup.getName(), newHost,
                             templateRegistry.getTemplate( nodeGroup.getTemplateName() ), nodeGroup.getSshGroupId(),
-                            nodeGroup.getHostsGroupId(), defaultDomain ) );
+                            nodeGroup.getHostsGroupId(), defaultDomain, nodeGroup.getType() ) );
                 }
 
                 if ( containers.size() < nodeGroup.getNumberOfContainers() )

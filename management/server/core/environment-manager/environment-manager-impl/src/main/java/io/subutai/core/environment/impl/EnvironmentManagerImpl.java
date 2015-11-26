@@ -39,6 +39,7 @@ import io.subutai.common.mdc.SubutaiExecutors;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.ContainerType;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
@@ -203,6 +204,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         Map.Entry<NodeGroup, Set<HostInfo>> containersEntry = containers.entrySet().iterator().next();
         Iterator<HostInfo> hostIterator = containersEntry.getValue().iterator();
+        ContainerType type = containersEntry.getKey().getType();
 
         String ip = "";
 
@@ -238,7 +240,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                                 entry.getKey().getName(), new HostInfoModel( newHost ),
                                 templateRegistry.getTemplate( entry.getKey().getTemplateName() ),
                                 entry.getKey().getSshGroupId(), entry.getKey().getHostsGroupId(),
-                                Common.DEFAULT_DOMAIN_NAME ) ) );
+                                Common.DEFAULT_DOMAIN_NAME, type ) ) );
             }
         }
         TrackerOperation operationTracker = tracker.createTrackerOperation( TRACKER_SOURCE,

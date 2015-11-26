@@ -12,6 +12,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
@@ -41,6 +42,7 @@ import io.subutai.common.host.NullInterface;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerId;
+import io.subutai.common.peer.ContainerType;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Peer;
@@ -100,6 +102,10 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @Column( name = "domain_name" )
     private String domainName;
 
+    @Column( name = "container_type", nullable = true )
+    @Enumerated( EnumType.STRING )
+    private ContainerType containerType;
+
 
     @Transient
     private Peer peer;
@@ -124,7 +130,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
     public EnvironmentContainerImpl( final String localPeerId, final Peer peer, final String nodeGroupName,
                                      final HostInfoModel hostInfo, final Template template, int sshGroupId,
-                                     int hostsGroupId, String domainName )
+                                     int hostsGroupId, String domainName, ContainerType containerType )
     {
         Preconditions.checkNotNull( peer );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( nodeGroupName ) );
@@ -146,6 +152,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
         this.sshGroupId = sshGroupId;
         this.hostsGroupId = hostsGroupId;
         this.domainName = domainName;
+        this.containerType = containerType;
         setNetInterfaces( hostInfo.getInterfaces() );
     }
 
@@ -578,5 +585,11 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
             return hostname.compareTo( o.getHostname() );
         }
         return -1;
+    }
+
+    @Override
+    public ContainerType getContainerType()
+    {
+        return containerType;
     }
 }
