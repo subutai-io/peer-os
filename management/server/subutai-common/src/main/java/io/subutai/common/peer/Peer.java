@@ -250,7 +250,7 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
     /* **************************************************************
      *
      */
-    public PublicKeyContainer createEnvironmentKeyPair( EnvironmentId environmentId ) throws PeerException;
+    public PublicKeyContainer createPeerEnvironmentKeyPair( EnvironmentId environmentId ) throws PeerException;
 
 
     /**
@@ -265,7 +265,7 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
 
     void createGateway( Gateway gateway ) throws PeerException;
 
-    void removeEnvironmentKeyPair( EnvironmentId environmentId ) throws PeerException;
+    void removePeerEnvironmentKeyPair( EnvironmentId environmentId ) throws PeerException;
 
     ResourceHostMetrics getResourceHostMetrics();
 

@@ -64,6 +64,8 @@ public interface KeyServerDAO
     public void save( PublicKeyStore securityKey );
 
 
+    void update( PublicKeyStore keyStore );
+
     /********************************
      * Deletes the given public key.
      *

@@ -18,10 +18,12 @@ class SecurityKeyTrustDAO
 {
     private DaoManager daoManager = null;
 
-    public SecurityKeyTrustDAO(DaoManager daoManager)
+
+    public SecurityKeyTrustDAO( DaoManager daoManager )
     {
         this.daoManager = daoManager;
     }
+
 
     public SecurityKeyTrust find( long id )
     {
@@ -47,14 +49,14 @@ class SecurityKeyTrustDAO
     /******************************************
      *
      */
-    public List<SecurityKeyTrust> findBySourceId( String fingerprint)
+    public List<SecurityKeyTrust> findBySourceId( String fingerprint )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
 
         try
         {
             Query qr = em.createQuery( "select st from SecurityKeyTrustEntity AS st where st.sourceId=:sourceId" );
-            qr.setParameter( "sourceId",fingerprint );
+            qr.setParameter( "sourceId", fingerprint );
             List<SecurityKeyTrust> trusts = qr.getResultList();
 
             return trusts;
@@ -73,7 +75,35 @@ class SecurityKeyTrustDAO
     /******************************************
      *
      */
-    public void persist(SecurityKeyTrust SecurityKeyTrust )
+    public SecurityKeyTrust findBySourceId( String sourceId, String targetId )
+    {
+        EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
+
+        try
+        {
+            Query qr = em.createQuery( "select st from SecurityKeyTrustEntity AS st where "
+                    + "st.sourceId=:sourceId and st.targetId=:targetId" );
+            qr.setParameter( "sourceId", sourceId );
+            qr.setParameter( "targetId", targetId );
+            List<SecurityKeyTrust> trusts = qr.getResultList();
+
+            return trusts.get( 0 );
+        }
+        catch ( Exception ex )
+        {
+            return null;
+        }
+        finally
+        {
+            daoManager.closeEntityManager( em );
+        }
+    }
+
+
+    /******************************************
+     *
+     */
+    public void persist( SecurityKeyTrust SecurityKeyTrust )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
 
@@ -82,7 +112,6 @@ class SecurityKeyTrustDAO
             daoManager.startTransaction( em );
             em.persist( SecurityKeyTrust );
             daoManager.commitTransaction( em );
-
         }
         catch ( Exception ex )
         {
@@ -98,7 +127,7 @@ class SecurityKeyTrustDAO
     /******************************************
      *
      */
-    public void update(SecurityKeyTrust SecurityKeyTrust )
+    public void update( SecurityKeyTrust SecurityKeyTrust )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
 
@@ -107,7 +136,6 @@ class SecurityKeyTrustDAO
             daoManager.startTransaction( em );
             em.merge( SecurityKeyTrust );
             daoManager.commitTransaction( em );
-
         }
         catch ( Exception ex )
         {
@@ -132,7 +160,7 @@ class SecurityKeyTrustDAO
             daoManager.startTransaction( em );
 
             Query qr = em.createQuery( "delete from SecurityKeyTrustEntity AS ss where ss.id=:id" );
-            qr.setParameter( "id",id );
+            qr.setParameter( "id", id );
             qr.executeUpdate();
 
             daoManager.commitTransaction( em );
@@ -147,10 +175,11 @@ class SecurityKeyTrustDAO
         }
     }
 
+
     /******************************************
      *
      */
-    public void removeBySourceId( String sourceId)
+    public void removeBySourceId( String sourceId )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
 
@@ -159,7 +188,7 @@ class SecurityKeyTrustDAO
             daoManager.startTransaction( em );
 
             Query qr = em.createQuery( "delete from SecurityKeyTrustEntity AS ss where ss.sourceId=:sourceId" );
-            qr.setParameter( "sourceId",sourceId );
+            qr.setParameter( "sourceId", sourceId );
             qr.executeUpdate();
 
             daoManager.commitTransaction( em );
@@ -174,10 +203,11 @@ class SecurityKeyTrustDAO
         }
     }
 
+
     /******************************************
      *
      */
-    public void removeBySourceId( String sourceId, String targetId)
+    public void removeBySourceId( String sourceId, String targetId )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
 
@@ -187,8 +217,8 @@ class SecurityKeyTrustDAO
 
             Query qr = em.createQuery( "delete from SecurityKeyTrustEntity AS ss where ss.sourceId=:sourceId and "
                     + " ss.targetId=:targetId " );
-            qr.setParameter( "sourceId",sourceId );
-            qr.setParameter( "targetId",targetId );
+            qr.setParameter( "sourceId", sourceId );
+            qr.setParameter( "targetId", targetId );
             qr.executeUpdate();
 
             daoManager.commitTransaction( em );
@@ -202,5 +232,4 @@ class SecurityKeyTrustDAO
             daoManager.closeEntityManager( em );
         }
     }
-
 }

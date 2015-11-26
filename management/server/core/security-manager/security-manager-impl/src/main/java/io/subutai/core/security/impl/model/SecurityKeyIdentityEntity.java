@@ -1,12 +1,18 @@
 package io.subutai.core.security.impl.model;
 
 
+import java.util.List;
+
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import com.google.common.collect.Lists;
+
 import io.subutai.core.security.api.model.SecurityKeyIdentity;
 
 
@@ -46,6 +52,24 @@ public class SecurityKeyIdentityEntity implements SecurityKeyIdentity
 
     @Column( name = TYPE )
     private int type;
+
+    @Transient
+    private List<SecurityKeyIdentity> trustedKeys = Lists.newArrayList();
+
+
+    @Override
+    public List<SecurityKeyIdentity> getTrustedKeys()
+    {
+        return trustedKeys;
+    }
+
+
+    @Override
+    public void setTrustedKeys( final List<SecurityKeyIdentity> trustedKeys )
+    {
+        this.trustedKeys = trustedKeys;
+    }
+
 
     @Override
     public String getHostId()

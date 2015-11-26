@@ -332,9 +332,9 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void removeEnvironmentKeyPair( final EnvironmentId environmentId ) throws PeerException
+    public void removePeerEnvironmentKeyPair( final EnvironmentId environmentId ) throws PeerException
     {
-        new PeerWebClient( peerInfo.getIp(), provider ).removeEnvironmentKeyPair( environmentId );
+        new PeerWebClient( peerInfo.getIp(), provider ).removePeerEnvironmentKeyPair( environmentId );
     }
 
 
@@ -802,7 +802,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public PublicKeyContainer createEnvironmentKeyPair( EnvironmentId environmentId ) throws PeerException
+    public PublicKeyContainer createPeerEnvironmentKeyPair( EnvironmentId environmentId ) throws PeerException
     {
         Preconditions.checkNotNull( environmentId, "Invalid environmentId" );
 
