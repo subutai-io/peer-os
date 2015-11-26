@@ -787,8 +787,14 @@ public class RestServiceImpl implements RestService
             Collection<ResourceHostMetric> collection = peer.getResourceHostMetrics().getResources();
             for( ResourceHostMetric metric : collection.toArray(new ResourceHostMetric[ collection.size() ]) )
             {
-
-                peerHostMap.get( peer.getId() ).add( metric.getHostId() );
+                try
+                {
+                    peerHostMap.get( peer.getId() ).add( metric.getHostId() );
+                }
+                catch ( Exception e )
+                {
+                    LOG.error( "Resource hosts are empty", e );
+                }
             }
         }
 
