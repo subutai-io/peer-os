@@ -1,6 +1,8 @@
 package io.subutai.core.environment.rest.ui;
 
 
+import java.util.List;
+
 import io.subutai.common.peer.ContainerType;
 import io.subutai.common.host.ContainerHostState;
 
@@ -17,11 +19,13 @@ public class ContainerJson
     private String ip;
     private String templateName;
     private ContainerType type;
+    private List<String> tags;
 
 
 
     public ContainerJson( final String id, final String environmentId, final String hostname,
-                          final ContainerHostState state, final String ip, final String templateName, final ContainerType type )
+                          final ContainerHostState state, final String ip, final String templateName,
+                          final ContainerType type, final List<String> tags )
     {
         this.id = id;
         this.environmentId = environmentId;
@@ -30,6 +34,7 @@ public class ContainerJson
         this.ip = ip;
         this.templateName = templateName;
         this.type = type;
+        this.tags = tags;
     }
 
 
@@ -114,5 +119,17 @@ public class ContainerJson
     public void setType( final ContainerType type )
     {
         this.type = type;
+    }
+
+
+    public List<String> getTags()
+    {
+        return tags;
+    }
+
+
+    public void setTags( final List<String> tags )
+    {
+        this.tags = tags;
     }
 }

@@ -28,7 +28,8 @@ public class RestServiceImpl implements RestService
     }
 
     @Override
-    public Response executeCommand( final String hostId, final String command, final String path )
+    public Response executeCommand( final String hostId, final String command, final String path,
+                                    final Boolean daemon, final Integer timeOut )
     {
         try {
             Preconditions.checkNotNull( hostId, "Invalid host id" );
@@ -36,6 +37,17 @@ public class RestServiceImpl implements RestService
 
             RequestBuilder request = new RequestBuilder( command );
             request.withCwd( path );
+
+            if( daemon != null && daemon )
+            {
+                request.daemon();
+            }
+
+            if( timeOut != null && timeOut > 0 )
+            {
+                request.withTimeout( timeOut );
+            }
+
             CommandResult result = commandExecutor.execute( hostId, request );
 
             return Response.ok().entity( JsonUtil.toJson( result )).build();
