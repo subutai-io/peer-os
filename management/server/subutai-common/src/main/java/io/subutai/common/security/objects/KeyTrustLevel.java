@@ -6,7 +6,6 @@ package io.subutai.common.security.objects;
  */
 public enum KeyTrustLevel
 {
-    NO_TRUST( 0, "No Trust" ),
     Never( 1, "Never Trust" ),
     Marginal( 2, "Marginal" ),
     Full( 3, "Full" ),
