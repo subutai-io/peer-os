@@ -42,8 +42,18 @@ public interface RestTemplateManager
                           @QueryParam( TYPE_PARAM ) String type
     );
     
+    
     @GET
-    @Path( "{repository}" )
+    @Path( "{repository}/info" )
+    @Produces( MediaType.TEXT_PLAIN )
+    Response getTemplateInfo( @PathParam( "repository" ) String repository,
+                          @QueryParam( MD5_PARAM ) String md5,
+                          @QueryParam( NAME_PARAM ) String name,
+                          @QueryParam( VERSION_PARAM ) String version
+    );
+    
+    @GET
+    @Path( "{repository}/list" )
     @Produces( MediaType.TEXT_PLAIN )
     Response getTemplateList( @PathParam( "repository" ) String repository );
 

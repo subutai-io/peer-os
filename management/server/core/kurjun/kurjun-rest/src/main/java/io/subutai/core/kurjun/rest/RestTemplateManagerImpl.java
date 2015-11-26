@@ -59,9 +59,39 @@ public class RestTemplateManagerImpl implements RestTemplateManager
                             .header( "Content-Type", "application/octet-stream" )
                             .build();
                 }
-                else
+            }
+            else
+            {
+                TemplateKurjun template = templateManager.getTemplate( repository, name, version );
+
+                if ( template != null && RestTemplateManager.RESPONSE_TYPE_MD5.equals( type ) )
                 {
-                    return packageNotFoundResponse();
+                    return Response.ok( template.getMd5Sum() ).build();
+                }
+            }
+        }
+        catch ( IOException ex )
+        {
+            String msg = "Failed to get template info";
+            LOGGER.error( msg, ex );
+            return Response.serverError().entity( msg ).build();
+        }
+        return packageNotFoundResponse();
+    }
+
+
+    @Override
+    public Response getTemplateInfo( String repository, String md5, String name, String version )
+    {
+        try
+        {
+            byte[] md5bytes = decodeMd5( md5 );
+            if ( md5bytes != null )
+            {
+                TemplateKurjun template = templateManager.getTemplate( repository, md5bytes );
+                if ( template != null )
+                {
+                    return Response.ok( GSON.toJson( convertToDefaultTemplate( template ) ) ).build();
                 }
             }
 
@@ -69,14 +99,7 @@ public class RestTemplateManagerImpl implements RestTemplateManager
 
             if ( template != null )
             {
-                if ( RestTemplateManager.RESPONSE_TYPE_MD5.equals( type ) )
-                {
-                    return Response.ok( template.getMd5Sum() ).build();
-                }
-                else
-                {
-                    return Response.ok( GSON.toJson( convertToDefaultTemplate( template ) ) ).build();
-                }
+                return Response.ok( GSON.toJson( convertToDefaultTemplate( template ) ) ).build();
             }
         }
         catch ( IOException ex )
