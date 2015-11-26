@@ -1,16 +1,15 @@
-package io.subutai.common.quota;
+package io.subutai.common.resource;
 
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 
 
 /**
- * Unit types for disk quotas
+ * Measure unit types
  */
-public enum DiskQuotaUnit
+public enum MeasureUnit
 {
     BYTE( "", "Bytes", new BigDecimal( "1.00" ) ),
     KB( "K", "Kilobytes", new BigDecimal( "1024.00" ) ),
@@ -19,23 +18,15 @@ public enum DiskQuotaUnit
     TB( "T", "Terabytes", new BigDecimal( "1099511627776.00" ) ),
     PB( "P", "Petabytes", new BigDecimal( "1125899906842624.00" ) ),
     EB( "E", "Exabytes", new BigDecimal( "1152921504606846976.00" ) ),
-    UNLIMITED( "none", "Unlimited", null );
+    UNLIMITED( "none", "Unlimited", null ),
+    PERCENT( "%", "Percent", null );
     @JsonProperty( "acronym" )
     private String acronym;
     private String name;
     private BigDecimal multiplicator;
 
 
-    DiskQuotaUnit( @JsonProperty( "acronym" ) final String acronym )
-    {
-        DiskQuotaUnit instance = parseFromAcronym( acronym );
-        this.acronym = instance.getAcronym();
-        this.name = instance.getName();
-        this.multiplicator = instance.getMultiplicator();
-    }
-
-
-    private DiskQuotaUnit( final String acronym, final String name, final BigDecimal multiplicator )
+    MeasureUnit( final String acronym, final String name, final BigDecimal multiplicator )
     {
         this.acronym = acronym;
         this.name = name;
@@ -61,13 +52,13 @@ public enum DiskQuotaUnit
     }
 
 
-    public static DiskQuotaUnit parseFromAcronym( String acronym )
+    public static MeasureUnit parseFromAcronym( String acronym )
     {
-        for ( DiskQuotaUnit diskQuotaUnit : DiskQuotaUnit.values() )
+        for ( MeasureUnit measureUnit : MeasureUnit.values() )
         {
-            if ( diskQuotaUnit.getAcronym().equalsIgnoreCase( acronym ) )
+            if ( measureUnit.getAcronym().equalsIgnoreCase( acronym ) )
             {
-                return diskQuotaUnit;
+                return measureUnit;
             }
         }
         return null;

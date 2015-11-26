@@ -3,15 +3,11 @@ package io.subutai.core.lxc.quota.cli;
 
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.quota.DiskPartition;
-import io.subutai.common.quota.DiskQuota;
-import io.subutai.common.quota.DiskQuotaUnit;
-import io.subutai.common.quota.Quota;
-import io.subutai.common.quota.QuotaParser;
-import io.subutai.common.quota.QuotaType;
+import io.subutai.common.resource.ResourceType;
+import io.subutai.common.resource.ResourceValue;
+import io.subutai.common.resource.ResourceValueParser;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.lxc.quota.api.QuotaManager;
-import io.subutai.core.peer.api.PeerManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,9 +27,9 @@ public class SetQuota extends SubutaiShellCommandSupport
             + "container name" )
     private String containerName;
 
-    @Argument( index = 1, name = "quota type", required = true, multiValued = false, description = "specify quota "
+    @Argument( index = 1, name = "resource type", required = true, multiValued = false, description = "specify resource "
             + "type" )
-    private String quotaType;
+    private String resourceType;
 
     @Argument( index = 2, name = "quota value", required = true, multiValued = false, description = "set quota value" )
     private String quotaValue;
@@ -52,9 +48,9 @@ public class SetQuota extends SubutaiShellCommandSupport
     }
 
 
-    public void setQuotaType( final String quotaType )
+    public void setResourceType( final String resourceType )
     {
-        this.quotaType = quotaType;
+        this.resourceType = resourceType;
     }
 
 
@@ -67,10 +63,12 @@ public class SetQuota extends SubutaiShellCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        QuotaType qt = QuotaType.getQuotaType( quotaType );
+        ResourceType type = ResourceType.valueOf( resourceType );
         ContainerHost containerHost = localPeer.getContainerHostByName( containerName );
 
-        quotaManager.setQuota( containerHost.getContainerId(), qt, quotaValue );
+        ResourceValueParser parser = quotaManager.getResourceValueParser( type );
+        ResourceValue resourceValue = parser.parse( quotaValue );
+        quotaManager.setQuota( containerHost.getContainerId(), type, resourceValue );
         return null;
     }
 }

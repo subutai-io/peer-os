@@ -4,13 +4,9 @@ package io.subutai.common.peer;
 import java.util.List;
 import java.util.Set;
 
-import javax.annotation.security.RolesAllowed;
-
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.protocol.Template;
-import io.subutai.common.quota.Quota;
-import io.subutai.common.quota.QuotaType;
 
 
 /**
@@ -73,10 +69,10 @@ public interface LocalPeer extends Peer
      */
     public ContainerHost getContainerHostById( String hostId ) throws HostNotFoundException;
 
-    Quota getQuota( ContainerHost host, QuotaType quota ) throws PeerException;
+//    Quota getQuota( ContainerHost host, QuotaType quota ) throws PeerException;
 
-    @RolesAllowed( "Environment-Management|A|Update" )
-    void setQuota( ContainerHost host, Quota quota ) throws PeerException;
+//    @RolesAllowed( "Environment-Management|A|Update" )
+//    void setQuota( ContainerHost host, Quota quota ) throws PeerException;
 
     /**
      * Returns instance of management host

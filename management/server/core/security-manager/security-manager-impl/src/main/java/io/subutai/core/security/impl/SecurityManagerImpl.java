@@ -64,8 +64,8 @@ public class SecurityManagerImpl implements SecurityManager
     public void init()
     {
         securityDataService = new SecurityDataServiceImpl( daoManager );
-        encryptionTool = new EncryptionToolImpl( ( KeyManagerImpl ) keyManager );
         keyManager = new KeyManagerImpl( securityDataService, keyServer, keyData );
+        encryptionTool = new EncryptionToolImpl( ( KeyManagerImpl ) keyManager );
         keyStoreManager = new KeyStoreManagerImpl();
         certificateManager = new CertificateManagerImpl();
     }

@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
-import com.google.common.reflect.TypeToken;
 
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
@@ -56,13 +55,8 @@ import io.subutai.common.peer.RemotePeer;
 import io.subutai.common.peer.Timeouts;
 import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.protocol.Template;
-import io.subutai.common.quota.CpuQuota;
-import io.subutai.common.quota.DiskPartition;
-import io.subutai.common.quota.DiskQuota;
-import io.subutai.common.quota.Quota;
-import io.subutai.common.quota.QuotaType;
-import io.subutai.common.quota.RamQuota;
-import io.subutai.common.quota.RamQuotaUnit;
+import io.subutai.common.resource.ResourceType;
+import io.subutai.common.resource.ResourceValue;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.settings.ChannelSettings;
 import io.subutai.common.settings.SecuritySettings;
@@ -406,136 +400,136 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
-    @Override
-    public RamQuota getRamQuota( final ContainerHost containerHost ) throws PeerException
-    {
-        Preconditions.checkNotNull( containerHost, "Container host is null" );
-        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
-
-        return new EnvironmentWebClient( provider ).getRamQuota( peerInfo.getIp(), containerHost.getContainerId() );
-
-        //        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
-        //        String path = "/container/quota/ram";
-        //
-        //        Map<String, String> params = Maps.newHashMap();
-        //        params.put( "containerId", host.getId() );
-        //
-        //        //*********construct Secure Header ****************************
-        //        Map<String, String> headers = Maps.newHashMap();
-        //        //*************************************************************
-        //        try
-        //        {
-        //            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
-        //            String response = get( path, alias, params, headers );
-        //
-        //            return jsonUtil.from( response, RamQuota.class );
-        //        }
-        //        catch ( Exception e )
-        //        {
-        //            throw new PeerException( "Error obtaining container ram quota", e );
-        //        }
-    }
-
-
-    @RolesAllowed( "Environment-Management|A|Update" )
-    @Override
-    public void setRamQuota( final ContainerHost containerHost, final int ramInMb ) throws PeerException
-    {
-        Preconditions.checkNotNull( containerHost, "Container host is null" );
-        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
-
-        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
-        Preconditions.checkArgument( ramInMb > 0, "Ram quota value must be greater than 0" );
-
-        new EnvironmentWebClient( provider ).setRamQuota( peerInfo.getIp(), containerHost.getContainerId(),
-                new RamQuota( RamQuotaUnit.MB, ramInMb ) );
-
-        //        String path = "/container/quota/ram";
-        //
-        //        Map<String, String> params = Maps.newHashMap();
-        //        params.put( "containerId", host.getId() );
-        //        params.put( "ram", String.valueOf( ramInMb ) );
-        //
-        //        //*********construct Secure Header ****************************
-        //        Map<String, String> headers = Maps.newHashMap();
-        //        //*************************************************************
-        //        try
-        //        {
-        //            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
-        //            post( path, alias, params, headers );
-        //        }
-        //        catch ( Exception e )
-        //        {
-        //            throw new PeerException( "Error setting container ram quota", e );
-        //        }
-    }
+//    @Override
+//    public RamQuota getRamQuota( final ContainerHost containerHost ) throws PeerException
+//    {
+//        Preconditions.checkNotNull( containerHost, "Container host is null" );
+//        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
+//
+//        return new EnvironmentWebClient( provider ).getRamQuota( peerInfo.getIp(), containerHost.getContainerId() );
+//
+//        //        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
+//        //        String path = "/container/quota/ram";
+//        //
+//        //        Map<String, String> params = Maps.newHashMap();
+//        //        params.put( "containerId", host.getId() );
+//        //
+//        //        //*********construct Secure Header ****************************
+//        //        Map<String, String> headers = Maps.newHashMap();
+//        //        //*************************************************************
+//        //        try
+//        //        {
+//        //            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
+//        //            String response = get( path, alias, params, headers );
+//        //
+//        //            return jsonUtil.from( response, RamQuota.class );
+//        //        }
+//        //        catch ( Exception e )
+//        //        {
+//        //            throw new PeerException( "Error obtaining container ram quota", e );
+//        //        }
+//    }
 
 
-    @Override
-    public CpuQuota getCpuQuota( final ContainerHost containerHost ) throws PeerException
-    {
-        Preconditions.checkNotNull( containerHost, "Container host is null" );
-        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
+//    @RolesAllowed( "Environment-Management|A|Update" )
+//    @Override
+//    public void setRamQuota( final ContainerHost containerHost, final int ramInMb ) throws PeerException
+//    {
+//        Preconditions.checkNotNull( containerHost, "Container host is null" );
+//        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
+//
+//        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
+//        Preconditions.checkArgument( ramInMb > 0, "Ram quota value must be greater than 0" );
+//
+//        new EnvironmentWebClient( provider ).setRamQuota( peerInfo.getIp(), containerHost.getContainerId(),
+//                new RamQuota( RamQuotaUnit.MB, ramInMb ) );
+//
+//        //        String path = "/container/quota/ram";
+//        //
+//        //        Map<String, String> params = Maps.newHashMap();
+//        //        params.put( "containerId", host.getId() );
+//        //        params.put( "ram", String.valueOf( ramInMb ) );
+//        //
+//        //        //*********construct Secure Header ****************************
+//        //        Map<String, String> headers = Maps.newHashMap();
+//        //        //*************************************************************
+//        //        try
+//        //        {
+//        //            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
+//        //            post( path, alias, params, headers );
+//        //        }
+//        //        catch ( Exception e )
+//        //        {
+//        //            throw new PeerException( "Error setting container ram quota", e );
+//        //        }
+//    }
 
-        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
 
-        return new EnvironmentWebClient( provider ).getCpuQuota( peerInfo.getIp(), containerHost.getContainerId() );
+//    @Override
+//    public CpuQuota getCpuQuota( final ContainerHost containerHost ) throws PeerException
+//    {
+//        Preconditions.checkNotNull( containerHost, "Container host is null" );
+//        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
+//
+//        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
+//
+//        return new EnvironmentWebClient( provider ).getCpuQuota( peerInfo.getIp(), containerHost.getContainerId() );
+//
+//        //        String path = "/container/quota/cpu/info";
+//        //
+//        //        Map<String, String> params = Maps.newHashMap();
+//        //        params.put( "containerId", host.getId() );
+//        //
+//        //        //*********construct Secure Header ****************************
+//        //        Map<String, String> headers = Maps.newHashMap();
+//        //        //*************************************************************
+//        //        try
+//        //        {
+//        //            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
+//        //            String response = get( path, alias, params, headers );
+//        //
+//        //            return jsonUtil.from( response, CpuQuota.class );
+//        //        }
+//        //        catch ( Exception e )
+//        //        {
+//        //            throw new PeerException( "Error obtaining container cpu quota", e );
+//        //        }
+//    }
 
-        //        String path = "/container/quota/cpu/info";
-        //
-        //        Map<String, String> params = Maps.newHashMap();
-        //        params.put( "containerId", host.getId() );
-        //
-        //        //*********construct Secure Header ****************************
-        //        Map<String, String> headers = Maps.newHashMap();
-        //        //*************************************************************
-        //        try
-        //        {
-        //            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
-        //            String response = get( path, alias, params, headers );
-        //
-        //            return jsonUtil.from( response, CpuQuota.class );
-        //        }
-        //        catch ( Exception e )
-        //        {
-        //            throw new PeerException( "Error obtaining container cpu quota", e );
-        //        }
-    }
 
-
-    @RolesAllowed( "Environment-Management|A|Update" )
-    @Override
-    public void setCpuQuota( final ContainerHost containerHost, final CpuQuota cpuQuota ) throws PeerException
-    {
-        Preconditions.checkNotNull( containerHost, "Container host is null" );
-        Preconditions.checkNotNull( cpuQuota, "CPU quota is null" );
-        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
-
-        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
-        Preconditions.checkArgument( cpuQuota.getPercentage() > 0, "Cpu quota value must be greater than 0" );
-
-        new EnvironmentWebClient( provider ).setCpuQuota( peerInfo.getIp(), containerHost.getContainerId(), cpuQuota );
-
-        //        String path = "/container/quota/cpu";
-        //
-        //        Map<String, String> params = Maps.newHashMap();
-        //        params.put( "containerId", host.getId() );
-        //        params.put( "cpu", String.valueOf( cpuQuota ) );
-        //
-        //        //*********construct Secure Header ****************************
-        //        Map<String, String> headers = Maps.newHashMap();
-        //        //**************************************************************
-        //
-        //        try
-        //        {
-        //            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
-        //            post( path, alias, params, headers );
-        //        }
-        //        catch ( Exception e )
-        //        {
-        //            throw new PeerException( "Error setting container cpu quota", e );
-        //        }
-    }
+//    @RolesAllowed( "Environment-Management|A|Update" )
+//    @Override
+//    public void setCpuQuota( final ContainerHost containerHost, final CpuQuota cpuQuota ) throws PeerException
+//    {
+//        Preconditions.checkNotNull( containerHost, "Container host is null" );
+//        Preconditions.checkNotNull( cpuQuota, "CPU quota is null" );
+//        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
+//
+//        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
+//        Preconditions.checkArgument( cpuQuota.getPercentage() > 0, "Cpu quota value must be greater than 0" );
+//
+//        new EnvironmentWebClient( provider ).setCpuQuota( peerInfo.getIp(), containerHost.getContainerId(), cpuQuota );
+//
+//        //        String path = "/container/quota/cpu";
+//        //
+//        //        Map<String, String> params = Maps.newHashMap();
+//        //        params.put( "containerId", host.getId() );
+//        //        params.put( "cpu", String.valueOf( cpuQuota ) );
+//        //
+//        //        //*********construct Secure Header ****************************
+//        //        Map<String, String> headers = Maps.newHashMap();
+//        //        //**************************************************************
+//        //
+//        //        try
+//        //        {
+//        //            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
+//        //            post( path, alias, params, headers );
+//        //        }
+//        //        catch ( Exception e )
+//        //        {
+//        //            throw new PeerException( "Error setting container cpu quota", e );
+//        //        }
+//    }
 
 
     @Override
@@ -605,212 +599,281 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
+//    @RolesAllowed( "Environment-Management|A|Update" )
+//    @Override
+//    public void setDiskQuota( final ContainerHost containerHost, final DiskQuota diskQuota ) throws PeerException
+//    {
+//        Preconditions.checkNotNull( containerHost, "Container host is null" );
+//        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
+//
+//        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
+//        Preconditions.checkNotNull( diskQuota, "Invalid disk quota" );
+//
+//        new EnvironmentWebClient( provider )
+//                .setDiskQuota( peerInfo.getIp(), containerHost.getContainerId(), diskQuota );
+//
+//        //        String path = "/container/quota/disk";
+//        //
+//        //        Map<String, String> params = Maps.newHashMap();
+//        //        params.put( "containerId", host.getId() );
+//        //        params.put( "diskQuota", jsonUtil.to( diskQuota ) );
+//        //
+//        //        //*********construct Secure Header ****************************
+//        //        Map<String, String> headers = Maps.newHashMap();
+//        //        //*************************************************************
+//        //
+//        //        try
+//        //        {
+//        //            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
+//        //            post( path, alias, params, headers );
+//        //        }
+//        //        catch ( Exception e )
+//        //        {
+//        //            throw new PeerException( "Error setting container disk quota", e );
+//        //        }
+//    }
+//
+//
+//    @Override
+//    public DiskQuota getDiskQuota( final ContainerHost containerHost, final DiskPartition diskPartition )
+//            throws PeerException
+//    {
+//        Preconditions.checkNotNull( containerHost, "Container host is null" );
+//        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
+//
+//        //        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
+//        Preconditions.checkNotNull( diskPartition, "Invalid disk partition" );
+//
+//
+//        return new EnvironmentWebClient( provider )
+//                .getDiskQuota( peerInfo.getIp(), containerHost.getContainerId(), diskPartition );
+//
+//        //        String path = "/container/quota/disk";
+//        //
+//        //        Map<String, String> params = Maps.newHashMap();
+//        //
+//        //        params.put( "containerId", host.getId() );
+//        //        params.put( "diskPartition", jsonUtil.to( diskPartition ) );
+//        //
+//        //        //*********construct Secure Header ****************************
+//        //        Map<String, String> headers = Maps.newHashMap();
+//        //        //*************************************************************
+//        //
+//        //        try
+//        //        {
+//        //            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
+//        //            String response = get( path, alias, params, headers );
+//        //
+//        //            return jsonUtil.from( response, new TypeToken<DiskQuota>()
+//        //            {}.getType() );
+//        //        }
+//        //        catch ( Exception e )
+//        //        {
+//        //            throw new PeerException( "Error obtaining container disk quota", e );
+//        //        }
+//    }
+//
+//
+//    @RolesAllowed( "Environment-Management|A|Update" )
+//    @Override
+//    public void setRamQuota( final ContainerHost containerHost, final RamQuota ramQuota ) throws PeerException
+//    {
+//        Preconditions.checkNotNull( containerHost, "Container host is null" );
+//        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
+//
+//        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
+//        Preconditions.checkNotNull( ramQuota, "Invalid ram quota" );
+//        new EnvironmentWebClient( provider ).setRamQuota( peerInfo.getIp(), containerHost.getContainerId(), ramQuota );
+//
+//        //
+//        //        String path = "/container/quota/ram2";
+//        //
+//        //        Map<String, String> params = Maps.newHashMap();
+//        //        params.put( "containerId", host.getId() );
+//        //        params.put( "ramQuota", jsonUtil.to( ramQuota ) );
+//        //
+//        //        //*********construct Secure Header ****************************
+//        //        Map<String, String> headers = Maps.newHashMap();
+//        //        //*************************************************************
+//        //
+//        //        try
+//        //        {
+//        //            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
+//        //            post( path, alias, params, headers );
+//        //        }
+//        //        catch ( Exception e )
+//        //        {
+//        //            throw new PeerException( "Error setting ram quota", e );
+//        //        }
+//    }
+//
+//
+//    @Override
+//    public RamQuota getAvailableRamQuota( final ContainerHost containerHost ) throws PeerException
+//    {
+//        Preconditions.checkNotNull( containerHost, "Container host is null" );
+//        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
+//
+//        return new EnvironmentWebClient( provider )
+//                .getAvailableRamQuota( peerInfo.getIp(), containerHost.getContainerId() );
+//        //        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
+//        //        String path = "/container/quota/ram/available";
+//        //
+//        //        Map<String, String> params = Maps.newHashMap();
+//        //        params.put( "containerId", host.getId() );
+//        //
+//        //        //*********construct Secure Header ****************************
+//        //        Map<String, String> headers = Maps.newHashMap();
+//        //        //*************************************************************
+//        //        try
+//        //        {
+//        //            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
+//        //            String response = get( path, alias, params, headers );
+//        //
+//        //            return jsonUtil.from( response, RamQuota.class );
+//        //        }
+//        //        catch ( Exception e )
+//        //        {
+//        //            throw new PeerException( "Error obtaining container available ram quota", e );
+//        //        }
+//    }
+//
+//
+//    @Override
+//    public CpuQuota getAvailableCpuQuota( final ContainerHost containerHost ) throws PeerException
+//    {
+//        Preconditions.checkNotNull( containerHost, "Container host is null" );
+//        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
+//
+//        return new EnvironmentWebClient( provider )
+//                .getAvailableCpuQuota( peerInfo.getIp(), containerHost.getContainerId() );
+//
+//        //        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
+//        //        String path = "/container/quota/cpu/available";
+//        //
+//        //        Map<String, String> params = Maps.newHashMap();
+//        //        params.put( "containerId", host.getId() );
+//        //
+//        //        //*********construct Secure Header ****************************
+//        //        Map<String, String> headers = Maps.newHashMap();
+//        //        //*************************************************************
+//        //
+//        //        try
+//        //        {
+//        //            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
+//        //            String response = get( path, alias, params, headers );
+//        //
+//        //            return jsonUtil.from( response, CpuQuota.class );
+//        //        }
+//        //        catch ( Exception e )
+//        //        {
+//        //            throw new PeerException( "Error obtaining container available cpu quota", e );
+//        //        }
+//    }
+//
+//
+//    @Override
+//    public DiskQuota getAvailableDiskQuota( final ContainerHost containerHost, final DiskPartition diskPartition )
+//            throws PeerException
+//    {
+//        Preconditions.checkNotNull( containerHost, "Container host is null" );
+//        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
+//        Preconditions.checkNotNull( diskPartition, "Invalid disk partition" );
+//
+//        return new EnvironmentWebClient( provider )
+//                .getAvailableDiskQuota( peerInfo.getIp(), containerHost.getContainerId(), diskPartition );
+//        //
+//        //        String path = "/container/quota/disk/available";
+//        //
+//        //        Map<String, String> params = Maps.newHashMap();
+//        //        params.put( "containerId", host.getId() );
+//        //        params.put( "diskPartition", jsonUtil.to( diskPartition ) );
+//        //
+//        //        //*********construct Secure Header ****************************
+//        //        Map<String, String> headers = Maps.newHashMap();
+//        //        //*************************************************************
+//        //
+//        //        try
+//        //        {
+//        //            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
+//        //            String response = get( path, alias, params, headers );
+//        //
+//        //            return jsonUtil.from( response, new TypeToken<DiskQuota>()
+//        //            {}.getType() );
+//        //        }
+//        //        catch ( Exception e )
+//        //        {
+//        //            throw new PeerException( "Error obtaining container available disk quota", e );
+//        //        }
+//    }
+
+
     @Override
-    public DiskQuota getDiskQuota( final ContainerHost containerHost, final DiskPartition diskPartition )
+    public ResourceValue getQuota( final ContainerHost containerHost, final ResourceType resourceType )
             throws PeerException
     {
         Preconditions.checkNotNull( containerHost, "Container host is null" );
-        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
-
-        //        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
-        Preconditions.checkNotNull( diskPartition, "Invalid disk partition" );
-
+        Preconditions.checkNotNull( resourceType, "Resource type is null" );
 
         return new EnvironmentWebClient( provider )
-                .getDiskQuota( peerInfo.getIp(), containerHost.getContainerId(), diskPartition );
-
-        //        String path = "/container/quota/disk";
-        //
-        //        Map<String, String> params = Maps.newHashMap();
-        //
-        //        params.put( "containerId", host.getId() );
-        //        params.put( "diskPartition", jsonUtil.to( diskPartition ) );
-        //
-        //        //*********construct Secure Header ****************************
-        //        Map<String, String> headers = Maps.newHashMap();
-        //        //*************************************************************
-        //
-        //        try
-        //        {
-        //            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
-        //            String response = get( path, alias, params, headers );
-        //
-        //            return jsonUtil.from( response, new TypeToken<DiskQuota>()
-        //            {}.getType() );
-        //        }
-        //        catch ( Exception e )
-        //        {
-        //            throw new PeerException( "Error obtaining container disk quota", e );
-        //        }
+                .getQuota( peerInfo.getIp(), containerHost.getContainerId(), resourceType );
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Update" )
     @Override
-    public void setDiskQuota( final ContainerHost containerHost, final DiskQuota diskQuota ) throws PeerException
+    public void setQuota( final ContainerHost containerHost, final ResourceType resourceType,
+                          final ResourceValue resourceValue ) throws PeerException
     {
         Preconditions.checkNotNull( containerHost, "Container host is null" );
-        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
-
-        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
-        Preconditions.checkNotNull( diskQuota, "Invalid disk quota" );
+        Preconditions.checkNotNull( resourceType, "Resource type is null" );
 
         new EnvironmentWebClient( provider )
-                .setDiskQuota( peerInfo.getIp(), containerHost.getContainerId(), diskQuota );
-
-        //        String path = "/container/quota/disk";
-        //
-        //        Map<String, String> params = Maps.newHashMap();
-        //        params.put( "containerId", host.getId() );
-        //        params.put( "diskQuota", jsonUtil.to( diskQuota ) );
-        //
-        //        //*********construct Secure Header ****************************
-        //        Map<String, String> headers = Maps.newHashMap();
-        //        //*************************************************************
-        //
-        //        try
-        //        {
-        //            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
-        //            post( path, alias, params, headers );
-        //        }
-        //        catch ( Exception e )
-        //        {
-        //            throw new PeerException( "Error setting container disk quota", e );
-        //        }
-    }
-
-
-    @RolesAllowed( "Environment-Management|A|Update" )
-    @Override
-    public void setRamQuota( final ContainerHost containerHost, final RamQuota ramQuota ) throws PeerException
-    {
-        Preconditions.checkNotNull( containerHost, "Container host is null" );
-        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
-
-        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
-        Preconditions.checkNotNull( ramQuota, "Invalid ram quota" );
-        new EnvironmentWebClient( provider ).setRamQuota( peerInfo.getIp(), containerHost.getContainerId(), ramQuota );
-
-        //
-        //        String path = "/container/quota/ram2";
-        //
-        //        Map<String, String> params = Maps.newHashMap();
-        //        params.put( "containerId", host.getId() );
-        //        params.put( "ramQuota", jsonUtil.to( ramQuota ) );
-        //
-        //        //*********construct Secure Header ****************************
-        //        Map<String, String> headers = Maps.newHashMap();
-        //        //*************************************************************
-        //
-        //        try
-        //        {
-        //            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
-        //            post( path, alias, params, headers );
-        //        }
-        //        catch ( Exception e )
-        //        {
-        //            throw new PeerException( "Error setting ram quota", e );
-        //        }
+                .setQuota( peerInfo.getIp(), containerHost.getContainerId(), resourceType, resourceValue );
     }
 
 
     @Override
-    public RamQuota getAvailableRamQuota( final ContainerHost containerHost ) throws PeerException
-    {
-        Preconditions.checkNotNull( containerHost, "Container host is null" );
-        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
-
-        return new EnvironmentWebClient( provider )
-                .getAvailableRamQuota( peerInfo.getIp(), containerHost.getContainerId() );
-        //        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
-        //        String path = "/container/quota/ram/available";
-        //
-        //        Map<String, String> params = Maps.newHashMap();
-        //        params.put( "containerId", host.getId() );
-        //
-        //        //*********construct Secure Header ****************************
-        //        Map<String, String> headers = Maps.newHashMap();
-        //        //*************************************************************
-        //        try
-        //        {
-        //            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
-        //            String response = get( path, alias, params, headers );
-        //
-        //            return jsonUtil.from( response, RamQuota.class );
-        //        }
-        //        catch ( Exception e )
-        //        {
-        //            throw new PeerException( "Error obtaining container available ram quota", e );
-        //        }
-    }
-
-
-    @Override
-    public CpuQuota getAvailableCpuQuota( final ContainerHost containerHost ) throws PeerException
-    {
-        Preconditions.checkNotNull( containerHost, "Container host is null" );
-        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
-
-        return new EnvironmentWebClient( provider )
-                .getAvailableCpuQuota( peerInfo.getIp(), containerHost.getContainerId() );
-
-        //        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
-        //        String path = "/container/quota/cpu/available";
-        //
-        //        Map<String, String> params = Maps.newHashMap();
-        //        params.put( "containerId", host.getId() );
-        //
-        //        //*********construct Secure Header ****************************
-        //        Map<String, String> headers = Maps.newHashMap();
-        //        //*************************************************************
-        //
-        //        try
-        //        {
-        //            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
-        //            String response = get( path, alias, params, headers );
-        //
-        //            return jsonUtil.from( response, CpuQuota.class );
-        //        }
-        //        catch ( Exception e )
-        //        {
-        //            throw new PeerException( "Error obtaining container available cpu quota", e );
-        //        }
-    }
-
-
-    @Override
-    public DiskQuota getAvailableDiskQuota( final ContainerHost containerHost, final DiskPartition diskPartition )
+    public ResourceValue getAvailableQuota( final ContainerHost containerHost, final ResourceType resourceType )
             throws PeerException
     {
         Preconditions.checkNotNull( containerHost, "Container host is null" );
-        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
-        Preconditions.checkNotNull( diskPartition, "Invalid disk partition" );
+        Preconditions.checkNotNull( resourceType, "Resource type is null" );
 
         return new EnvironmentWebClient( provider )
-                .getAvailableDiskQuota( peerInfo.getIp(), containerHost.getContainerId(), diskPartition );
-        //
-        //        String path = "/container/quota/disk/available";
-        //
-        //        Map<String, String> params = Maps.newHashMap();
-        //        params.put( "containerId", host.getId() );
-        //        params.put( "diskPartition", jsonUtil.to( diskPartition ) );
-        //
-        //        //*********construct Secure Header ****************************
-        //        Map<String, String> headers = Maps.newHashMap();
-        //        //*************************************************************
-        //
-        //        try
-        //        {
-        //            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
-        //            String response = get( path, alias, params, headers );
-        //
-        //            return jsonUtil.from( response, new TypeToken<DiskQuota>()
-        //            {}.getType() );
-        //        }
-        //        catch ( Exception e )
-        //        {
-        //            throw new PeerException( "Error obtaining container available disk quota", e );
-        //        }
+                .getAvailableQuota( peerInfo.getIp(), containerHost.getContainerId(), resourceType );
+    }
+
+
+    @Override
+    public ResourceValue getQuota( final ContainerId containerId, final ResourceType resourceType ) throws PeerException
+    {
+        Preconditions.checkNotNull( containerId, "Container id is null" );
+        Preconditions.checkNotNull( resourceType, "Resource type is null" );
+
+        return new EnvironmentWebClient( provider ).getQuota( peerInfo.getIp(), containerId, resourceType );
+    }
+
+
+    @Override
+    public void setQuota( final ContainerId containerId, final ResourceType resourceType,
+                          final ResourceValue resourceValue ) throws PeerException
+    {
+        Preconditions.checkNotNull( containerId, "Container id is null" );
+        Preconditions.checkNotNull( resourceType, "Resource type is null" );
+        Preconditions.checkNotNull( resourceValue, "Resource value is null" );
+
+        new EnvironmentWebClient( provider ).setQuota( peerInfo.getIp(), containerId, resourceType, resourceValue );
+    }
+
+
+    @Override
+    public ResourceValue getAvailableQuota( final ContainerId containerId, final ResourceType resourceType )
+            throws PeerException
+    {
+        Preconditions.checkNotNull( containerId, "Container id is null" );
+        Preconditions.checkNotNull( resourceType, "Resource type is null" );
+
+        return new EnvironmentWebClient( provider ).getAvailableQuota( peerInfo.getIp(), containerId, resourceType );
     }
 
 

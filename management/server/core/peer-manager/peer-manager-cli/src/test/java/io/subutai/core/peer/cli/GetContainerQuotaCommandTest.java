@@ -13,7 +13,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Peer;
-import io.subutai.common.quota.QuotaType;
+import io.subutai.common.resource.ResourceType;
 import io.subutai.common.test.SystemOutRedirectTest;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.peer.api.PeerManager;
@@ -21,7 +21,6 @@ import io.subutai.core.peer.api.PeerManager;
 import static junit.framework.TestCase.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
@@ -51,7 +50,7 @@ public class GetContainerQuotaCommandTest extends SystemOutRedirectTest
         when( environmentManager.loadEnvironment( any( String.class ) ) ).thenReturn( environment );
         when( environment.getContainerHostByHostname( anyString() ) ).thenReturn( containerHost );
         command.environmentId = UUID.randomUUID().toString();
-        command.quotaType = QuotaType.QUOTA_TYPE_CPU.getKey();
+        command.quotaType = ResourceType.CPU.getKey();
         command.containerName = CONTAINER_NAME;
     }
 
@@ -62,7 +61,7 @@ public class GetContainerQuotaCommandTest extends SystemOutRedirectTest
     {
         command.doExecute();
 
-//        verify( peer ).getQuotaInfo( containerHost, QuotaType.QUOTA_TYPE_CPU );
+        //        verify( peer ).getQuotaInfo( containerHost, QuotaType.QUOTA_TYPE_CPU );
 
         when( environment.getContainerHostByHostname( anyString() ) ).thenReturn( null );
 
