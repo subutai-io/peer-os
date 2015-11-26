@@ -2,7 +2,6 @@ package io.subutai.core.security.rest;
 
 
 import javax.naming.NamingException;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.core.Response;
 
 import org.bouncycastle.openpgp.PGPPublicKey;
@@ -12,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Strings;
 
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
+import io.subutai.common.security.objects.KeyTrustLevel;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.identity.api.IdentityManager;
@@ -164,9 +164,37 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
      *
      */
     @Override
-    public Response revokeKey( String hostId )
+    public Response revokeKey( String source, String target )
     {
-        return null;
+        try
+        {
+            KeyManager keyManager = securityManager.getKeyManager();
+            keyManager.setKeyTrust( source, target, KeyTrustLevel.NO_TRUST.getId() );
+        }
+        catch ( Exception e )
+        {
+            return Response.serverError().build();
+        }
+        return Response.ok().build();
+    }
+
+
+    /* ***********************************************************
+     *
+     */
+    @Override
+    public Response allowKey( String source, String target )
+    {
+        try
+        {
+            KeyManager keyManager = securityManager.getKeyManager();
+            keyManager.setKeyTrust( source, target, KeyTrustLevel.Full.getId() );
+        }
+        catch ( Exception e )
+        {
+            return Response.serverError().build();
+        }
+        return Response.ok().build();
     }
 
 

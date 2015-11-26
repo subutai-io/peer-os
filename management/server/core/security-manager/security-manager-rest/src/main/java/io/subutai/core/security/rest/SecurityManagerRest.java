@@ -84,9 +84,18 @@ public interface SecurityManagerRest
      *
      */
     @PUT
-    @Path( "keyman/revoke" )
+    @Path( "keyman/trust/revoke" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response revokeKey( String hostId );
+    public Response revokeKey( @QueryParam( "source" ) String source, @QueryParam( "target" ) String target );
+
+
+    /* *******************************
+     *
+     */
+    @PUT
+    @Path( "keyman/trust/allow" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response allowKey( @QueryParam( "source" ) String source, @QueryParam( "target" ) String target );
 
 
     /* *******************************
