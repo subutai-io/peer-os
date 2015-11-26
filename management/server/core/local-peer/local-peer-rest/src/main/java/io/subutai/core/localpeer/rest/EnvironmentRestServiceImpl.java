@@ -11,17 +11,13 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.gson.reflect.TypeToken;
 
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.quota.CpuQuota;
-import io.subutai.common.quota.DiskPartition;
-import io.subutai.common.quota.DiskQuota;
-import io.subutai.common.quota.RamQuota;
-import io.subutai.common.util.JsonUtil;
+import io.subutai.common.resource.ResourceType;
+import io.subutai.common.resource.ResourceValue;
 
 
 /**
@@ -121,137 +117,6 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
 
 
     @Override
-    public Response getAvailableRamQuota( final ContainerId containerId )
-    {
-        try
-        {
-            Preconditions.checkNotNull( containerId );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId.getId() ) );
-
-            return Response.ok( localPeer.getContainerHostById( containerId.getId() ).getAvailableRamQuota() ).build();
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( "Error getting available ram quota #getAvailableRamQuota", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
-        }
-    }
-
-
-    @Override
-    public Response getAvailableCpuQuota( final ContainerId containerId )
-    {
-        try
-        {
-            Preconditions.checkNotNull( containerId );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId.getId() ) );
-
-            return Response.ok( localPeer.getContainerHostById( containerId.getId() ).getAvailableCpuQuota() ).build();
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( "Error getting available cpu quota #getAvailableCpuQuota", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
-        }
-    }
-
-
-    @Override
-    public Response getAvailableDiskQuota( final ContainerId containerId, final DiskPartition diskPartition )
-    {
-        try
-        {
-            Preconditions.checkNotNull( containerId );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId.getId() ) );
-            Preconditions.checkNotNull( diskPartition );
-
-            return Response
-                    .ok( localPeer.getContainerHostById( containerId.getId() ).getAvailableDiskQuota( diskPartition ) )
-                    .build();
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( "Error getting available disk quota #getAvailableDiskQuota", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
-        }
-    }
-
-
-    @Override
-    public Response getRamQuota( final ContainerId containerId )
-    {
-        try
-        {
-            Preconditions.checkNotNull( containerId );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId.getId() ) );
-
-            return Response.ok( localPeer.getContainerHostById( containerId.getId() ).getRamQuota() ).build();
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( "Error getting ram quota #getRamQuota", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
-        }
-    }
-
-
-    @Override
-    public Response setRamQuota( final ContainerId containerId, final RamQuota ramQuota )
-    {
-        try
-        {
-            Preconditions.checkNotNull( containerId );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId.getId() ) );
-
-            localPeer.getContainerHostById( containerId.getId() ).setRamQuota( ramQuota );
-            return Response.ok().build();
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( "Error setting ram quota #setRamQuota", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
-        }
-    }
-
-
-    @Override
-    public Response getCpuQuota( final ContainerId containerId )
-    {
-        try
-        {
-            Preconditions.checkNotNull( containerId );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId.getId() ) );
-
-            return Response.ok( localPeer.getContainerHostById( containerId.getId() ).getCpuQuota() ).build();
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( "Error getting cpu quota #getCpuQuota", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
-        }
-    }
-
-
-    @Override
-    public Response setCpuQuota( final ContainerId containerId, final CpuQuota cpuQuota )
-    {
-        try
-        {
-            Preconditions.checkNotNull( containerId );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId.getId() ) );
-
-            localPeer.getContainerHostById( containerId.getId() ).setCpuQuota( cpuQuota );
-            return Response.ok().build();
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( "Error setting cpu quota #setCpuQuota", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
-        }
-    }
-
-
-    @Override
     public Response getCpuSet( final ContainerId containerId )
     {
         try
@@ -289,34 +154,57 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
 
 
     @Override
-    public Response getDiskQuota( final ContainerId containerId, final DiskPartition diskPartition )
+    public Response getQuota( final ContainerId containerId, final ResourceType resourceType )
     {
+        Preconditions.checkNotNull( containerId );
+        Preconditions.checkNotNull( resourceType );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId.getId() ) );
         try
         {
-            Preconditions.checkNotNull( containerId );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId.getId() ) );
-
-            return Response.ok( localPeer.getContainerHostById( containerId.getId() ).getDiskQuota( diskPartition ) )
-                           .build();
+            ResourceValue resourceValue = localPeer.getQuota( containerId, resourceType );
+            return Response.ok( resourceValue ).build();
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error getting disk quota #getDiskQuota", e );
+            LOGGER.error( "Error setting disk quota #setDiskQuota", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
 
 
     @Override
-    public Response setDiskQuota( final ContainerId containerId, final DiskQuota diskQuota )
+    public Response setQuota( final ContainerId containerId, final ResourceType resourceType,
+                              final ResourceValue resourceValue )
     {
+        Preconditions.checkNotNull( containerId );
+        Preconditions.checkNotNull( resourceType );
+        Preconditions.checkNotNull( resourceValue );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId.getId() ) );
+
         try
         {
-            Preconditions.checkNotNull( containerId );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId.getId() ) );
-
-            localPeer.getContainerHostById( containerId.getId() ).setDiskQuota( diskQuota );
+            localPeer.setQuota( containerId, resourceType, resourceValue );
             return Response.ok().build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error setting disk quota #setDiskQuota", e );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response getAvailableQuota( final ContainerId containerId, final ResourceType resourceType )
+    {
+        Preconditions.checkNotNull( containerId );
+        Preconditions.checkNotNull( resourceType );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId.getId() ) );
+        try
+        {
+
+            ResourceValue resourceValue = localPeer.getAvailableQuota( containerId, resourceType );
+            return Response.ok( resourceValue ).build();
         }
         catch ( Exception e )
         {

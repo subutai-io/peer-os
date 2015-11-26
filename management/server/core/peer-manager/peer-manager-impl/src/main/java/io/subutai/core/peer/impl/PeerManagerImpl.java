@@ -276,7 +276,7 @@ public class PeerManagerImpl implements PeerManager
 
         if ( pi != null )
         {
-            return new RemotePeerImpl( localPeer, pi, messenger, commandResponseListener, messageResponseListener,
+            return new RemotePeerImpl( localPeer,securityManager, pi, messenger, commandResponseListener, messageResponseListener,
                     provider );
         }
         return null;

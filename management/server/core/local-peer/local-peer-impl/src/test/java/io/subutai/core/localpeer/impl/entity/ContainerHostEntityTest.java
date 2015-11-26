@@ -18,13 +18,11 @@ import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.Interface;
 import io.subutai.common.peer.ContainerGateway;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.ResourceHost;
-import io.subutai.common.quota.CpuQuota;
-import io.subutai.common.quota.DiskPartition;
-import io.subutai.common.quota.DiskQuota;
-import io.subutai.common.quota.RamQuota;
-import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.resource.ResourceType;
+import io.subutai.common.resource.ResourceValue;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
@@ -71,14 +69,10 @@ public class ContainerHostEntityTest
     @Mock
     private ContainerGateway containerGateway;
 
-    @Mock
-    private CpuQuota cpuQuota;
-
 
     @Before
     public void setUp() throws Exception
     {
-        when( cpuQuota.getPercentage() ).thenReturn( CPU_QUOTA );
         when( containerHostInfo.getId() ).thenReturn( HOST_ID );
         when( containerHostInfo.getHostname() ).thenReturn( HOSTNAME );
         when( containerHostInfo.getArch() ).thenReturn( ARCH );
@@ -236,63 +230,21 @@ public class ContainerHostEntityTest
 
 
     @Test
-    public void testGetRamQuota() throws Exception
+    public void testGetQuota() throws Exception
     {
-        containerHostEntity.getRamQuota();
+        containerHostEntity.getQuota( ResourceType.RAM );
 
-        verify( peer ).getRamQuota( containerHostEntity );
+        verify( peer ).getQuota( containerHostEntity.getContainerId(), ResourceType.RAM );
     }
 
 
     @Test
-    public void testSetRamQuota() throws Exception
+    public void testSetQuota() throws Exception
     {
-        containerHostEntity.setRamQuota( RAM_QUOTA );
+        ResourceValue ramQuota = mock( ResourceValue.class );
+        containerHostEntity.setQuota( ResourceType.RAM, ramQuota );
 
-        verify( peer ).setRamQuota( containerHostEntity, RAM_QUOTA );
-
-
-        RamQuota ramQuotaInfo = mock( RamQuota.class );
-
-        containerHostEntity.setRamQuota( ramQuotaInfo );
-
-        verify( peer ).setRamQuota( containerHostEntity, ramQuotaInfo );
-    }
-
-
-    @Test
-    public void testGetRamQuotaInfo() throws Exception
-    {
-        containerHostEntity.getRamQuota();
-
-        verify( peer ).getRamQuota( containerHostEntity );
-    }
-
-
-    @Test
-    public void testGetCpuQuota() throws Exception
-    {
-        containerHostEntity.getCpuQuota();
-
-        verify( peer ).getCpuQuota( containerHostEntity );
-    }
-
-
-    @Test
-    public void testGetCpuQuotaInfo() throws Exception
-    {
-        containerHostEntity.getCpuQuota();
-
-        verify( peer ).getCpuQuota( containerHostEntity );
-    }
-
-
-    @Test
-    public void testSetCpuQuota() throws Exception
-    {
-        containerHostEntity.setCpuQuota( cpuQuota );
-
-        verify( peer ).setCpuQuota( containerHostEntity, cpuQuota );
+        verify( peer ).setQuota( containerHostEntity.getContainerId(), ResourceType.RAM, ramQuota );
     }
 
 
@@ -312,56 +264,5 @@ public class ContainerHostEntityTest
         containerHostEntity.setCpuSet( CPU_SET );
 
         verify( peer ).setCpuSet( containerHostEntity, CPU_SET );
-    }
-
-
-    @Test
-    public void testGetDiskQuota() throws Exception
-    {
-        DiskPartition diskPartition = DiskPartition.VAR;
-
-        containerHostEntity.getDiskQuota( diskPartition );
-
-        verify( peer ).getDiskQuota( containerHostEntity, diskPartition );
-    }
-
-
-    @Test
-    public void testSetDiskQuota() throws Exception
-    {
-        DiskQuota diskQuota = mock( DiskQuota.class );
-
-        containerHostEntity.setDiskQuota( diskQuota );
-
-        verify( peer ).setDiskQuota( containerHostEntity, diskQuota );
-    }
-
-
-    @Test
-    public void testGetAvailableRamQuota() throws Exception
-    {
-        containerHostEntity.getAvailableRamQuota();
-
-        verify( peer ).getAvailableRamQuota( containerHostEntity );
-    }
-
-
-    @Test
-    public void testGetAvailableCpuQuota() throws Exception
-    {
-        containerHostEntity.getAvailableCpuQuota();
-
-        verify( peer ).getAvailableCpuQuota( containerHostEntity );
-    }
-
-
-    @Test
-    public void testGetAvailableDiskQuota() throws Exception
-    {
-        DiskPartition diskPartition = DiskPartition.VAR;
-
-        containerHostEntity.getAvailableDiskQuota( diskPartition );
-
-        verify( peer ).getAvailableDiskQuota( containerHostEntity, diskPartition );
     }
 }

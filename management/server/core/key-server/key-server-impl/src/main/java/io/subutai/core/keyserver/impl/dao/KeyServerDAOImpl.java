@@ -189,6 +189,33 @@ public class KeyServerDAOImpl implements KeyServerDAO
      *
      */
     @Override
+    public void update( final PublicKeyStore keyStore )
+    {
+        EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
+
+        try
+        {
+            daoManager.startTransaction( em );
+            em.merge( keyStore );
+            daoManager.commitTransaction( em );
+
+        }
+        catch(Exception ex)
+        {
+            LOG.error( "KeyManagerDAOImpl save:"+ex.toString() );
+            daoManager.rollBackTransaction( em );
+        }
+        finally
+        {
+            daoManager.closeEntityManager( em );
+        }
+    }
+
+
+    /********************************
+     *
+     */
+    @Override
     public void delete( final PublicKeyStore keyStore )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();

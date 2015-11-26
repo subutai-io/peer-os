@@ -6,10 +6,8 @@ import java.util.Set;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.protocol.Template;
-import io.subutai.common.quota.CpuQuota;
-import io.subutai.common.quota.DiskPartition;
-import io.subutai.common.quota.DiskQuota;
-import io.subutai.common.quota.RamQuota;
+import io.subutai.common.resource.ResourceType;
+import io.subutai.common.resource.ResourceValue;
 
 
 /**
@@ -25,29 +23,29 @@ public interface ContainerHost extends Host, ContainerHostInfo
 
     String getEnvironmentId();
 
-    public String getNodeGroupName();
+    String getNodeGroupName();
 
-    public void dispose() throws PeerException;
+    void dispose() throws PeerException;
 
-    public void start() throws PeerException;
+    void start() throws PeerException;
 
-    public void stop() throws PeerException;
+    void stop() throws PeerException;
 
-    public Peer getPeer();
+    Peer getPeer();
 
-    public Template getTemplate() throws PeerException;
+    Template getTemplate() throws PeerException;
 
-    public String getTemplateName();
+    String getTemplateName();
 
-    public void addTag( String tag );
+    void addTag( String tag );
 
-    public void removeTag( String tag );
+    void removeTag( String tag );
 
-    public Set<String> getTags();
+    Set<String> getTags();
 
-    public void setDefaultGateway( String gatewayIp ) throws PeerException;
+    void setDefaultGateway( String gatewayIp ) throws PeerException;
 
-    public boolean isLocal();
+    boolean isLocal();
 
     /**
      * Returns process's resource usage by pid
@@ -57,52 +55,6 @@ public interface ContainerHost extends Host, ContainerHostInfo
      * @return - resource usage
      */
     public ProcessResourceUsage getProcessResourceUsage( int processPid ) throws PeerException;
-
-    /**
-     * Returns RAM quota on container in megabytes
-     *
-     * @return - quota in mb
-     */
-//    public int getRamQuota() throws PeerException;
-
-
-    /**
-     * Get RAM quota object in details
-     *
-     * @return - MemoryQuotaInfo carries ram quota specific info
-     */
-    public RamQuota getRamQuota() throws PeerException;
-
-
-    /**
-     * Sets RAM quota on container in megabytes
-     *
-     * @param ramInMb - quota in mb
-     */
-    public void setRamQuota( int ramInMb ) throws PeerException;
-
-
-    /**
-     * Returns CPU quota on container in percent
-     *
-     * @return - cpu quota on container in percent
-     */
-//    public int getCpuQuota() throws PeerException;
-
-
-    /**
-     * Returns CPU quota object on container
-     *
-     * @return - cpu quota object on container
-     */
-    public CpuQuota getCpuQuota() throws PeerException;
-
-    /**
-     * Sets CPU quota on container in percent
-     *
-     * @param cpuQuota - cpu quota
-     */
-    public void setCpuQuota( CpuQuota cpuQuota ) throws PeerException;
 
     /**
      * Returns allowed cpus/cores ids on container
@@ -119,48 +71,28 @@ public interface ContainerHost extends Host, ContainerHostInfo
     public void setCpuSet( Set<Integer> cpuSet ) throws PeerException;
 
     /**
-     * Returns disk quota
+     * Returns available quota value by resource type
      *
-     * @param diskPartition - disk partition which quota to return
+     * @param resourceType resource type
      *
-     * @return - disk partition quota
+     * @return quota value
      */
-    public DiskQuota getDiskQuota( DiskPartition diskPartition ) throws PeerException;
+    ResourceValue getAvailableQuota( ResourceType resourceType ) throws PeerException;
 
     /**
-     * Sets disk partition quota
+     * Returns current quota value by resource type
      *
-     * @param diskQuota - quota to set
+     * @param resourceType resource type
+     *
+     * @return quota value
      */
-    public void setDiskQuota( DiskQuota diskQuota ) throws PeerException;
+    ResourceValue getQuota( ResourceType resourceType ) throws PeerException;
 
     /**
-     * Returns available RAM quota on container in megabytes
+     * Sets quota value by resource type to new value
      *
-     * @return - quota in mb
+     * @param resourceType resource type
+     * @param newValue new quota value
      */
-    public RamQuota getAvailableRamQuota() throws PeerException;
-
-    /**
-     * Returns available CPU quota on container in percent
-     *
-     * @return - cpu quota on container in percent
-     */
-    public CpuQuota getAvailableCpuQuota() throws PeerException;
-
-    /**
-     * Returns available disk quota
-     *
-     * @param diskPartition - disk partition which quota to return
-     *
-     * @return - disk partition quota
-     */
-    public DiskQuota getAvailableDiskQuota( DiskPartition diskPartition ) throws PeerException;
-
-    /**
-     * Sets ram quota
-     *
-     * @param ramQuotaInfo - quota to set
-     */
-    public void setRamQuota( RamQuota ramQuotaInfo ) throws PeerException;
+    void setQuota( ResourceType resourceType, ResourceValue newValue ) throws PeerException;
 }

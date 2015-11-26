@@ -16,24 +16,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import io.subutai.common.dao.DaoManager;
-import io.subutai.common.security.crypto.pgp.KeyPair;
-import io.subutai.common.security.objects.PermissionOperation;
-import io.subutai.common.security.objects.PermissionScope;
-import io.subutai.common.security.objects.SecurityKeyType;
-import io.subutai.common.security.objects.TokenType;
-import io.subutai.common.security.objects.UserStatus;
-import io.subutai.common.security.objects.UserType;
-import io.subutai.common.security.token.TokenUtil;
-import io.subutai.common.util.ServiceLocator;
-import io.subutai.core.identity.api.model.Session;
-import io.subutai.core.identity.api.model.UserToken;
-import io.subutai.core.identity.impl.dao.IdentityDataServiceImpl;
-import io.subutai.core.identity.impl.model.PermissionEntity;
-import io.subutai.core.identity.impl.model.RoleEntity;
-import io.subutai.core.identity.impl.model.SessionEntity;
-import io.subutai.core.identity.impl.model.UserEntity;
-
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.security.auth.Subject;
@@ -51,12 +33,28 @@ import org.apache.commons.lang.time.DateUtils;
 
 import com.google.common.base.Strings;
 
+import io.subutai.common.dao.DaoManager;
+import io.subutai.common.security.crypto.pgp.KeyPair;
+import io.subutai.common.security.objects.PermissionObject;
+import io.subutai.common.security.objects.PermissionOperation;
+import io.subutai.common.security.objects.PermissionScope;
+import io.subutai.common.security.objects.SecurityKeyType;
+import io.subutai.common.security.objects.TokenType;
+import io.subutai.common.security.objects.UserStatus;
+import io.subutai.common.security.objects.UserType;
+import io.subutai.common.security.token.TokenUtil;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.dao.IdentityDataService;
 import io.subutai.core.identity.api.model.Permission;
 import io.subutai.core.identity.api.model.Role;
+import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.identity.api.model.User;
-import io.subutai.common.security.objects.PermissionObject;
+import io.subutai.core.identity.api.model.UserToken;
+import io.subutai.core.identity.impl.dao.IdentityDataServiceImpl;
+import io.subutai.core.identity.impl.model.PermissionEntity;
+import io.subutai.core.identity.impl.model.RoleEntity;
+import io.subutai.core.identity.impl.model.SessionEntity;
+import io.subutai.core.identity.impl.model.UserEntity;
 import io.subutai.core.identity.impl.model.UserTokenEntity;
 import io.subutai.core.security.api.SecurityManager;
 
@@ -139,7 +137,8 @@ public class IdentityManagerImpl implements IdentityManager
             //***********************************************************
 
             //***Create Token *******************************************
-            createUserToken( internal, "", "", "", TokenType.Permanent.getId(), null );
+            Date tokenDate = DateUtils.addMonths( new Date( System.currentTimeMillis()), 1);
+            createUserToken( internal, "", "", "", TokenType.Permanent.getId(),tokenDate);
             //***********************************************************
 
 
@@ -711,7 +710,7 @@ public class IdentityManagerImpl implements IdentityManager
             securityManager.getKeyManager().saveKeyPair( keyId, SecurityKeyType.UserKey.getId(), kPair );
             //******************************************
 
-            //user.setSecurityKeyId( keyId );
+            user.setSecurityKeyId( keyId );
 
             identityDataService.persistUser( user );
         }

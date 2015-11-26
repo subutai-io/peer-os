@@ -1,10 +1,12 @@
 package io.subutai.core.security.rest;
 
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -61,4 +63,41 @@ public interface SecurityManagerRest
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response getPublicKeyFingerprint( @QueryParam ( "hostid" ) String   hostId);
 
+    /* *******************************
+     *
+     */
+    @GET
+    @Path( "keyman/trust/tree/user" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getUserKeyTrustTree();
+
+
+    /* *******************************
+     *
+     */
+    @GET
+    @Path( "keyman/trust/tree" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getKeyTrustTree( @QueryParam( "hostId" ) String hostId );
+
+
+    /* *******************************
+     *
+     */
+    @PUT
+    @Path( "keyman/revoke" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response revokeKey( String hostId );
+
+
+    /* *******************************
+     *
+     */
+    @POST
+    @Path( "keyman/signkey" )
+    @Produces(  MediaType.APPLICATION_JSON  )
+    @Consumes({"application/x-www-form-urlencoded"})
+    public Response signKey( @FormParam( "sourcehostid" ) final String sourceHostId,
+                             @FormParam( "keytext" ) final String keyText,
+                             @FormParam( "trustlevel" ) final int trustLevel );
 }

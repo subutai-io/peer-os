@@ -6,9 +6,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import io.subutai.common.quota.QuotaException;
-import io.subutai.common.quota.QuotaType;
-
 
 @RunWith( MockitoJUnitRunner.class )
 public class QuotaExceptionTest
@@ -19,11 +16,9 @@ public class QuotaExceptionTest
     public void setUp() throws Exception
     {
         quotaException = new QuotaException( "test" );
-        quotaException = new QuotaException( "test", QuotaType.QUOTA_TYPE_CPU );
         quotaException = new QuotaException(  );
         quotaException = new QuotaException( new Throwable(  ) );
         quotaException = new QuotaException( "test" , new Throwable(  ) );
-        quotaException = new QuotaException( "test" , new Throwable(  ), QuotaType.QUOTA_TYPE_ALL_JSON );
 
     }
 

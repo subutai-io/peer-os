@@ -71,14 +71,14 @@ public class MonitorImpl implements Monitor
     private static final String CONTAINER_IS_NULL_MSG = "Container is null";
     private static final String INVALID_SUBSCRIBER_ID_MSG = "Invalid subscriber id";
     private static final String SETTINGS_IS_NULL_MSG = "Settings is null";
-    private static final Logger LOG = LoggerFactory.getLogger( MonitorImpl.class.getName() );
+
+    private static final Logger LOG = LoggerFactory.getLogger( MonitorImpl.class );
 
     //set of metric subscribers
     protected Set<AlertListener> alertListeners =
             Collections.newSetFromMap( new ConcurrentHashMap<AlertListener, Boolean>() );
     private final Commands commands = new Commands();
     private final PeerManager peerManager;
-    private final IdentityManager identityManager;
     private final EnvironmentManager environmentManager;
     protected ExecutorService notificationExecutor = Executors.newCachedThreadPool();
     protected MonitorDao monitorDao;
@@ -87,12 +87,11 @@ public class MonitorImpl implements Monitor
     protected ScheduledExecutorService stateUpdateExecutorService;
 
 
-    public MonitorImpl( PeerManager peerManager, DaoManager daoManager, IdentityManager identityManager,
-                        EnvironmentManager environmentManager ) throws MonitorException
+    public MonitorImpl( PeerManager peerManager, DaoManager daoManager, EnvironmentManager environmentManager )
+            throws MonitorException
     {
         Preconditions.checkNotNull( peerManager );
         Preconditions.checkNotNull( daoManager );
-        Preconditions.checkNotNull( identityManager );
         Preconditions.checkNotNull( environmentManager );
 
         try
@@ -100,7 +99,6 @@ public class MonitorImpl implements Monitor
             this.daoManager = daoManager;
             this.monitorDao = new MonitorDao( daoManager.getEntityManagerFactory() );
             this.peerManager = peerManager;
-            this.identityManager = identityManager;
             this.environmentManager = environmentManager;
             //            peerManager.addRequestListener( new RemoteAlertListener( this ) );
             //            peerManager.addRequestListener( new RemoteMetricRequestListener( this ) );
@@ -393,32 +391,6 @@ public class MonitorImpl implements Monitor
             LOG.error( "Error in addResourceHostMetric", e );
         }
     }
-
-    //
-    //    private BaseMetric fetchResourceHostMetric( Host host )
-    //    {
-    //        BaseMetric result = null;
-    //        if ( host instanceof ResourceHost )
-    //        {
-    //            result = fetchResourceHostMetric( ( ResourceHost ) host );
-    //        }
-    //        else if ( host instanceof ContainerHost )
-    //        {
-    //            try
-    //            {
-    //                ResourceHost resourceHost = peerManager.getLocalPeer().getResourceHostByContainerId( host.getId
-    // () );
-    //                result = fetchContainerHostQuotaState( resourceHost, ( ContainerHost ) host );
-    //            }
-    //            catch ( HostNotFoundException ignore )
-    //            {
-    //                //ignore
-    //            }
-    //        }
-    //
-    //        return result;
-    //    }
-
 
     private HostMetric fetchManagementHostMetric( ManagementHost managementHost )
     {

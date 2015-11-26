@@ -4,6 +4,8 @@ package io.subutai.common.peer;
 import java.util.Map;
 import java.util.Set;
 
+import org.bouncycastle.openpgp.PGPPublicKeyRing;
+
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
@@ -20,20 +22,13 @@ import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
 import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.protocol.Template;
-import io.subutai.common.quota.CpuQuota;
-import io.subutai.common.quota.DiskPartition;
-import io.subutai.common.quota.DiskQuota;
-import io.subutai.common.quota.Quota;
-import io.subutai.common.quota.QuotaType;
-import io.subutai.common.quota.RamQuota;
+import io.subutai.common.resource.ResourceType;
+import io.subutai.common.resource.ResourceValue;
 import io.subutai.common.security.PublicKeyContainer;
 
 
 /**
  * Peer interface
- *
- * TODO separate methods into PeerSpecific and EnvironmentSpecific interfaces this interface should be a marker
- * interface @Nurkaly do this
  */
 public interface Peer extends PeerSpecific, EnvironmentSpecific
 {
@@ -194,91 +189,6 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
     public ProcessResourceUsage getProcessResourceUsage( final ContainerId containerId, int pid ) throws PeerException;
 
     /**
-     * Returns available RAM quota on container in megabytes
-     *
-     * @param host - container
-     *
-     * @return - quota in mb
-     */
-    public RamQuota getAvailableRamQuota( ContainerHost host ) throws PeerException;
-
-    /**
-     * Returns available CPU quota on container in percent
-     *
-     * @param host - container
-     *
-     * @return - cpu quota on container in percent
-     */
-    public CpuQuota getAvailableCpuQuota( ContainerHost host ) throws PeerException;
-
-    /**
-     * Returns available disk quota
-     *
-     * @param host - container
-     * @param diskPartition - disk partition which quota to return
-     *
-     * @return - disk partition quota
-     */
-    public DiskQuota getAvailableDiskQuota( ContainerHost host, DiskPartition diskPartition ) throws PeerException;
-
-    /**
-     * Returns RAM quota on container in megabytes
-     *
-     * @param host -  container
-     *
-     * @return - quota in mb
-     */
-    //    public Quota getRamQuota( ContainerHost host ) throws PeerException;
-
-
-    /**
-     * Returns RAM quota on container with details
-     *
-     * @param host -  container
-     *
-     * @return - MemoryQuotaInfo with quota details
-     */
-    public RamQuota getRamQuota( ContainerHost host ) throws PeerException;
-
-
-    /**
-     * Sets RAM quota on container in megabytes
-     *
-     * @param host - container
-     * @param ramInMb - quota in mb
-     */
-    public void setRamQuota( ContainerHost host, int ramInMb ) throws PeerException;
-
-
-    /**
-     * Returns CPU quota on container in percent
-     *
-     * @param host - container
-     *
-     * @return - cpu quota on container in percent
-     */
-    //    public int getCpuQuota( ContainerHost host ) throws PeerException;
-
-
-    /**
-     * Returns CPU quota on container in brief description
-     *
-     * @param host - container
-     *
-     * @return - cpu quota object on container
-     */
-    public CpuQuota getCpuQuota( ContainerHost host ) throws PeerException;
-
-
-    /**
-     * Sets CPU quota on container in percent
-     *
-     * @param host - container
-     * @param cpuQuota - cpu quota
-     */
-    public void setCpuQuota( ContainerHost host, CpuQuota cpuQuota ) throws PeerException;
-
-    /**
      * Returns allowed cpus/cores ids on container
      *
      * @param host - container
@@ -294,34 +204,6 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
      * @param cpuSet - allowed cpu set
      */
     public void setCpuSet( ContainerHost host, Set<Integer> cpuSet ) throws PeerException;
-
-    /**
-     * Returns disk quota
-     *
-     * @param host - container
-     * @param diskPartition - disk partition which quota to return
-     *
-     * @return - disk partition quota
-     */
-    public DiskQuota getDiskQuota( ContainerHost host, DiskPartition diskPartition ) throws PeerException;
-
-
-    /**
-     * Sets disk partition quota
-     *
-     * @param host - container
-     * @param diskQuota - quota to set
-     */
-    public void setDiskQuota( ContainerHost host, DiskQuota diskQuota ) throws PeerException;
-
-
-    /**
-     * Sets ram quota
-     *
-     * @param host - container
-     * @param ramQuotaInfo - quota to set
-     */
-    public void setRamQuota( ContainerHost host, RamQuota ramQuotaInfo ) throws PeerException;
 
 
     /**
@@ -370,7 +252,10 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
     /* **************************************************************
      *
      */
-    public PublicKeyContainer createEnvironmentKeyPair( EnvironmentId environmentId ) throws PeerException;
+    public PublicKeyContainer createPeerEnvironmentKeyPair( EnvironmentId environmentId ) throws PeerException;
+
+    void updatePeerEnvironmentPubKey( EnvironmentId environmentId, PGPPublicKeyRing publicKeyRing )
+            throws PeerException;
 
 
     /**
@@ -385,7 +270,22 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
 
     void createGateway( Gateway gateway ) throws PeerException;
 
-    void removeEnvironmentKeyPair( EnvironmentId environmentId ) throws PeerException;
+    void removePeerEnvironmentKeyPair( EnvironmentId environmentId ) throws PeerException;
 
     ResourceHostMetrics getResourceHostMetrics();
+
+    ResourceValue getAvailableQuota( ContainerHost containerHost, ResourceType resourceType ) throws PeerException;
+
+    ResourceValue getQuota( ContainerHost containerHost, ResourceType resourceType ) throws PeerException;
+
+    void setQuota( ContainerHost containerHost, ResourceType resourceType, ResourceValue resourceValue )
+            throws PeerException;
+
+
+    ResourceValue getAvailableQuota( ContainerId containerId, ResourceType resourceType ) throws PeerException;
+
+    ResourceValue getQuota( ContainerId containerId, ResourceType resourceType ) throws PeerException;
+
+    void setQuota( ContainerId containerId, ResourceType resourceType, ResourceValue resourceValue )
+            throws PeerException;
 }
