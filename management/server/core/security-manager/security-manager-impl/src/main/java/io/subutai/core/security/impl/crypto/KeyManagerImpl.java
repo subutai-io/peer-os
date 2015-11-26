@@ -2,7 +2,6 @@ package io.subutai.core.security.impl.crypto;
 
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.security.AccessControlException;
 import java.util.List;
@@ -892,59 +891,6 @@ public class KeyManagerImpl implements KeyManager
 
         return securityKeyIdentity;
     }
-
-
-    /* *****************************
-     *
-     */
-    //    @Override
-    //    public KeyTrustLevel getTrustLevel( final String aHostId, final String bHostId )
-    //    {
-    //        String aFingerprint = getFingerprint( aHostId );
-    //        String bFingerprint = getFingerprint( bHostId );
-    //
-    //        if ( aFingerprint.equals( bFingerprint ) )
-    //        {
-    //            // ultimate trust exists if asked trust level for myself
-    //            return KeyTrustLevel.Ultimate;
-    //        }
-    //
-    //        Set<String> aTrustChain = Sets.newHashSet();
-    //        Set<String> bTrustChain = Sets.newHashSet();
-    //
-    //        constructTrustChain( aFingerprint, aTrustChain );
-    //        constructTrustChain( bFingerprint, bTrustChain );
-    //
-    //        if ( bTrustChain.contains( aFingerprint ) || aTrustChain.contains( aFingerprint ) )
-    //        {
-    //            return KeyTrustLevel.Full;
-    //        }
-    //        else
-    //        {
-    //            for ( final String fingerprint : aTrustChain )
-    //            {
-    //                if ( bTrustChain.contains( fingerprint ) )
-    //                {
-    //                    return KeyTrustLevel.Marginal;
-    //                }
-    //            }
-    //        }
-    //        return KeyTrustLevel.NO_TRUST;
-    //    }
-    //
-    //
-    //    private void constructTrustChain( String fingerprint, Set<String> chain )
-    //    {
-    //        chain.add( fingerprint );
-    //        List<SecurityKeyTrust> keyTrusts = securityDataService.getKeyTrustData( fingerprint );
-    //        for ( final SecurityKeyTrust keyTrust : keyTrusts )
-    //        {
-    //            if ( !chain.contains( keyTrust.getTargetId() ) )
-    //            {
-    //                constructTrustChain( keyTrust.getTargetId(), chain );
-    //            }
-    //        }
-    //    }
 
 
     /* *****************************
