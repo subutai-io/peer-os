@@ -369,6 +369,7 @@ public class PGPKeyUtil
             throw new PGPException( "Failed to init public key ring", ex );
         }
 
+
         return pgpPub;
     }
 

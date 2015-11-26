@@ -174,8 +174,10 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
      *
      */
     @Override
-    public Response signKey( final String sourceHostId, final String keyText, final int trustLevel )
+    public Response signKey(  String sourceHostId,  String keyText,  int trustLevel )
     {
+        //keyText =  securityManager.getKeyManager().getPublicKeyRingAsASCII( null );
+
         String key = securityManager.getKeyManager().signPublicKey( sourceHostId, keyText, trustLevel );
 
         if ( Strings.isNullOrEmpty( key ) )

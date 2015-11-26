@@ -65,9 +65,17 @@ public class KeyManagerImpl implements KeyManager
         this.keyData = securityKeyData;
         this.securityDataService = securityDataService;
         this.keyServer = keyServer;
-        encryptionTool = this.keyData.getEncryptionTool();
 
         init();
+    }
+
+
+    /* *****************************
+     *
+     */
+    public void setEncryptionTool( final EncryptionTool encryptionTool )
+    {
+        this.encryptionTool = encryptionTool;
     }
 
 
@@ -108,9 +116,9 @@ public class KeyManagerImpl implements KeyManager
                 //************************************************************
 
                 //************************************************************
-                ownerPubStream.close();
-                peerPubStream.close();
-                peerSecStream.close();
+                //ownerPubStream.close();
+                //peerPubStream.close();
+                //peerSecStream.close();
                 //************************************************************
 
             }
@@ -933,7 +941,7 @@ public class KeyManagerImpl implements KeyManager
     public int getTrustLevel( final String aHost, final String bHost )
     {
 
-        SecurityKeyTrust trust = getKeyTrust( aHost,bHost );
+        SecurityKeyTrust trust = getKeyTrust( aHost, bHost );
 
         if(trust!=null)
             return trust.getLevel();

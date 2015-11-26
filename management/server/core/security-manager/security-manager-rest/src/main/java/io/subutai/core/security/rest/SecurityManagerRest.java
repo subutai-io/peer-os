@@ -1,6 +1,7 @@
 package io.subutai.core.security.rest;
 
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -94,7 +95,8 @@ public interface SecurityManagerRest
      */
     @POST
     @Path( "keyman/signkey" )
-    @Produces( { MediaType.APPLICATION_JSON } )
+    @Produces(  MediaType.APPLICATION_JSON  )
+    @Consumes({"application/x-www-form-urlencoded"})
     public Response signKey( @FormParam( "sourcehostid" ) final String sourceHostId,
                              @FormParam( "keytext" ) final String keyText,
                              @FormParam( "trustlevel" ) final int trustLevel );

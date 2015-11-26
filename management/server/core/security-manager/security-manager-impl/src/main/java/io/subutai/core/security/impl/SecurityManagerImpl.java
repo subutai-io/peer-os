@@ -53,7 +53,6 @@ public class SecurityManagerImpl implements SecurityManager
         keyData.setSecretKeyringFile( secretKeyringFile );
         keyData.setPublicKeyringFile( publicKeyringFile );
         keyData.setSecretKeyringPwd( secretKeyringPwd );
-        keyData.setEncryptionTool(encryptionTool);
 
         httpContextManager = new HttpContextManagerImpl();
     }
@@ -65,8 +64,8 @@ public class SecurityManagerImpl implements SecurityManager
     public void init()
     {
         securityDataService = new SecurityDataServiceImpl( daoManager );
-        keyManager = new KeyManagerImpl( securityDataService, keyServer, keyData );
         encryptionTool = new EncryptionToolImpl( ( KeyManagerImpl ) keyManager );
+        keyManager = new KeyManagerImpl( securityDataService, keyServer, keyData );
         keyStoreManager = new KeyStoreManagerImpl();
         certificateManager = new CertificateManagerImpl();
     }
