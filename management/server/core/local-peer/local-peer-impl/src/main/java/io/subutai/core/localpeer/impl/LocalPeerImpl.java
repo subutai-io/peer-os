@@ -902,7 +902,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     @RolesAllowed( "Environment-Management|A|Delete" )
     @Override
-    public void removeEnvironmentKeyPair( final EnvironmentId environmentId ) throws PeerException
+    public void removePeerEnvironmentKeyPair( final EnvironmentId environmentId ) throws PeerException
     {
         Preconditions.checkNotNull( environmentId );
 
@@ -1500,36 +1500,28 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         return Collections.unmodifiableSet( requestListeners );
     }
 
+    //todo Create Environment Key (EK )  with Environment ID
+    //todo Sign EK with UserKey (getActiveSession.getUser.getSecurityKeyID)
+    //todo Create PEK
+    //todo Sign PEK with EK and PEER Key
 
     /* ***********************************************
      *  Create PEK
      */
-
-
     @RolesAllowed( "Environment-Management|A|Write" )
     @Override
-    public PublicKeyContainer createEnvironmentKeyPair( EnvironmentId envId ) throws PeerException
+    public PublicKeyContainer createPeerEnvironmentKeyPair( EnvironmentId envId ) throws PeerException
     {
         KeyManager keyManager = securityManager.getKeyManager();
         EncryptionTool encTool = securityManager.getEncryptionTool();
         String pairId = String.format( "%s-%s", getId(), envId.getId() );
         try
         {
-
             KeyPair keyPair = keyManager.generateKeyPair( pairId, false );
-
 
             //******Create PEK *****************************************************************
             PGPSecretKeyRing secRing = PGPKeyUtil.readSecretKeyRing( keyPair.getSecKeyring() );
             PGPPublicKeyRing pubRing = PGPKeyUtil.readPublicKeyRing( keyPair.getPubKeyring() );
-            PGPSecretKeyRing peerSecRing = keyManager.getSecretKeyRing( null );
-
-            String PEKfingerprint = PGPKeyUtil.getFingerprint( pubRing.getPublicKey().getFingerprint() );
-            String peerfingerprint = PGPKeyUtil.getFingerprint( peerSecRing.getPublicKey().getFingerprint() );
-
-            //************Sign Key/Create Trust*************************************************
-            pubRing = encTool.signPublicKey( pubRing, getId(), peerSecRing.getSecretKey(), "" );
-            keyManager.setKeyTrust( peerfingerprint, PEKfingerprint, KeyTrustLevel.Full.getId() );
 
             //***************Save Keys *********************************************************
             keyManager.saveSecretKeyRing( pairId, SecurityKeyType.PeerEnvironmentKey.getId(), secRing );
@@ -1543,6 +1535,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             throw new PeerException( ex );
         }
     }
+
+
 
 
     @Override

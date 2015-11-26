@@ -41,7 +41,7 @@ public class PEKGenerationStep
 
         for ( final Peer peer : peers )
         {
-            peerPekPubKeys.put( peer, peer.createEnvironmentKeyPair( environment.getEnvironmentId() ).getKey() );
+            peerPekPubKeys.put( peer, peer.createPeerEnvironmentKeyPair( environment.getEnvironmentId() ).getKey() );
         }
 
         return peerPekPubKeys;

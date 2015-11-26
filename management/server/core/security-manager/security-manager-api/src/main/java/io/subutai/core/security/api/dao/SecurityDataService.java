@@ -81,5 +81,11 @@ public interface SecurityDataService
     /******************************************
      *
      */
+    SecurityKeyTrust getKeyTrustData( String sourceId, String targetId );
+
+
+    /******************************************
+     *
+     */
     List<SecurityKeyTrust> getKeyTrustData( String sourceId );
 }

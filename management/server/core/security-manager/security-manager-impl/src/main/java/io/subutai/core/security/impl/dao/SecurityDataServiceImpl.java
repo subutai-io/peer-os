@@ -77,9 +77,9 @@ public class SecurityDataServiceImpl implements SecurityDataService
                 securityKeyIdentityDAO.update( securityKeyIdentity );
             }
         }
-        catch(Exception ex)
+        catch ( Exception ex )
         {
-            LOG.error( "Error Saving Identity data",ex );
+            LOG.error( "Error Saving Identity data", ex );
         }
     }
 
@@ -105,6 +105,8 @@ public class SecurityDataServiceImpl implements SecurityDataService
 
 
     // ********** Secret Key Store ***************
+
+
     /******************************************
      *
      */
@@ -141,7 +143,7 @@ public class SecurityDataServiceImpl implements SecurityDataService
         }
         catch ( Exception ex )
         {
-            LOG.error( " ****** Error Saving Secret key **********",ex);
+            LOG.error( " ****** Error Saving Secret key **********", ex );
         }
     }
 
@@ -158,16 +160,16 @@ public class SecurityDataServiceImpl implements SecurityDataService
         }
         catch ( Exception ex )
         {
-            LOG.error( " ****** Error Removing Secret key **********",ex);
+            LOG.error( " ****** Error Removing Secret key **********", ex );
         }
     }
 
 
-    /************Trust Data ******************************
-     *
+    /************
+     * Trust Data ******************************
      */
     @Override
-    public void saveKeyTrustData( String sourceId,String targetId, int trustLevel )
+    public void saveKeyTrustData( String sourceId, String targetId, int trustLevel )
     {
         try
         {
@@ -183,6 +185,7 @@ public class SecurityDataServiceImpl implements SecurityDataService
         }
     }
 
+
     /******************************************
      *
      */
@@ -192,7 +195,7 @@ public class SecurityDataServiceImpl implements SecurityDataService
         securityKeyTrustDAO.remove( id );
     }
 
-    
+
     /******************************************
      *
      */
@@ -209,7 +212,7 @@ public class SecurityDataServiceImpl implements SecurityDataService
     @Override
     public void removeKeyTrustData( String sourceId, String targetId )
     {
-        securityKeyTrustDAO.removeBySourceId( sourceId, targetId);
+        securityKeyTrustDAO.removeBySourceId( sourceId, targetId );
     }
 
 
@@ -222,6 +225,17 @@ public class SecurityDataServiceImpl implements SecurityDataService
         return securityKeyTrustDAO.find( id );
     }
 
+
+    /******************************************
+     *
+     */
+    @Override
+    public SecurityKeyTrust getKeyTrustData( String sourceId, String targetId )
+    {
+        return securityKeyTrustDAO.findBySourceId( sourceId, targetId );
+    }
+
+
     /******************************************
      *
      */
@@ -230,5 +244,4 @@ public class SecurityDataServiceImpl implements SecurityDataService
     {
         return securityKeyTrustDAO.findBySourceId( sourceId );
     }
-
 }
