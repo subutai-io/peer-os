@@ -170,6 +170,7 @@ public class SubutaiSteps extends ScenarioSteps {
 
     @Step
     public void selectPeer(int index){
+        waitABit(5000);
         subutaiPage.selectPeer.selectByIndex(index);
     }
 
@@ -241,6 +242,7 @@ public class SubutaiSteps extends ScenarioSteps {
 
     @Step
     public void selectEnvironment(int index){
+        waitABit(5000);
         subutaiPage.selectEnvironment.selectByIndex(index);
     }
 

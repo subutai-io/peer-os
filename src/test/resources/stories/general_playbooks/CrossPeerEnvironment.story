@@ -33,11 +33,11 @@ Then the user observe field: Approve Key phrase
 When the user enter approve key phrase: 'secret'
 And the user click on the button popup: Approve
 Then the user observe button: Unregister
+
 When the user click on the menu item: Environment
 Then the user observe items of Environment menu
 When the user click on the menu item: Blueprint
-Then the user observe button: Create Blueprint
-When the user click on the button: Create Blueprint
+And the user click on the button: Create Blueprint
 Then the user observe field: Enter blueprint name
 When the user enter blueprint name: 'Sample blueprint'
 And the user enter node name: 'Node'
@@ -92,9 +92,8 @@ And the user click on the menu item: Blueprint
 And the user click on the icon: Remove
 Then the user observe popup: Are you sure?
 When the user click on the button: Delete
-Then the user observe header: Deleted!
-When the user click on the button: OK
-And the user click on the menu item: Environments
+Then the user observe header: Deleted
+When the user click on the menu item: Environments
 And the user click on the icon: Destroy
 Then the user observe popup: Are you sure?
 When the user click on the button: Delete

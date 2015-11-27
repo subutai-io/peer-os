@@ -80,7 +80,7 @@ And the user click on the menu item: Blueprint
 And the user click on the icon: Remove
 Then the user observe popup: Are you sure?
 When the user click on the button: Delete
-Then the user observe header: Deleted!
+Then the user observe header: Deleted
 When the user click on the menu item: Environments
 And the user click on the icon: Destroy
 Then the user observe popup: Are you sure?
