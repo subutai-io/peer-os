@@ -452,7 +452,7 @@ public class SubutaiSteps extends ScenarioSteps {
     @Step
     public void selectMenuResourceHost(){
         subutaiPage.selectMenuResourceHost.click();
-        subutaiPage.selectMenuResourceHost.selectByIndex(2);
+        subutaiPage.selectMenuResourceHost.selectByIndex(1);
         subutaiPage.selectMenuResourceHost.sendKeys(Keys.ENTER);
     }
 

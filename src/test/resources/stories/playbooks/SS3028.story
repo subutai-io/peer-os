@@ -1,11 +1,11 @@
 Meta:
 
 Narrative:
-As a user
-I want to perform an action
-So that I can achieve a business goal
+As a QA
+I want to verify an Unprivileged containers PLAYBOOK SS-3028
+So that I will create test scenarios
 
-Scenario: Create Local Environment
+Scenario: Create Environment with 2 containers
 Given the first user is on the home page of Subutai
 And the user enter login and password: 'admin', 'secret'
 And the user click on the button: Login
@@ -40,7 +40,7 @@ When the user click on the button: OK
 Then the user observe header: Success!
 And the user observe text: Your environment has been created.
 
-Scenario: scenario description
+Scenario: Verify unprivileged containers
 Given the first user is on the home page of Subutai
 When the user click on the menu item: Console
 And the user select any available resource host from select menu
@@ -72,4 +72,21 @@ When the user enter console command: 'clear'
 And the user enter console command: 'sudo subutai list -c'
 And the user enter console command: ls -l /var/lib/apps/subutai/current/var/lib/lxc/ContainerName/rootfs
 Then the user verify output console command and observe expected phrase: 'total 0'
+
+Scenario: Destroy Environment and Blueprint
+Given the first user is on the home page of Subutai
+When the user click on the menu item: Environment
+And the user click on the menu item: Blueprint
+And the user click on the icon: Remove
+Then the user observe popup: Are you sure?
+When the user click on the button: Delete
+Then the user observe header: Deleted!
+When the user click on the menu item: Environments
+And the user click on the icon: Destroy
+Then the user observe popup: Are you sure?
+When the user click on the button: Delete
+Then the user observe text: Your environment start deleting!
+When the user click on the button: OK
+Then the user observe text: Your environment has been destroyed.
+And the user observe text: No data available in table
 
