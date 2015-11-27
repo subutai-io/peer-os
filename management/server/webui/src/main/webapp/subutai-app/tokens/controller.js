@@ -129,17 +129,28 @@ function TokensCtrl(identitySrv, $scope, DTOptionsBuilder, DTColumnBuilder, $res
 			confirmButtonColor: "#ff3f3c",
 			confirmButtonText: "Delete",
 			cancelButtonText: "Cancel",
-			closeOnConfirm: true,
+			closeOnConfirm: false,
 			closeOnCancel: true,
 			showLoaderOnConfirm: true
 		},
 		function (isConfirm) {
 			if (isConfirm) {
-				identitySrv.deleteToken(token).success(function (data) {
-					vm.dtInstance.reloadData(null, false);
-				}).error(function (data) {
-					SweetAlert.swal("ERROR!", "User token is safe :). Error: " + data, "error");
-				});
+				try {
+					identitySrv.deleteToken(token).success(function (data) {
+						//SweetAlert.swal("Success!", "Your token has been deleted.", "success");
+						SweetAlert.swal({
+							title : 'Deleted',
+							text : 'User token has been deleted!',
+							timer: VARS_TOOLTIP_TIMEOUT,
+							showConfirmButton: false
+						});
+						vm.dtInstance.reloadData(null, false);
+					}).error(function (data) {
+						SweetAlert.swal("ERROR!", "User token is safe :). Error: " + data, "error");
+					});
+				} catch(e) {
+					SweetAlert.swal("ERROR!", "User token is safe. Error: " + e, "error");
+				}
 			}
 		});		
 	}

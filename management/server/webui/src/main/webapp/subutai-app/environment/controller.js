@@ -64,13 +64,14 @@ function EnvironmentViewCtrl($scope, environmentService, SweetAlert, DTOptionsBu
 		DTColumnBuilder.newColumn(null).withTitle('').notSortable().renderWith(actionDelete)
 	];
 
-	/*function reloadTableData() {
+	/*vm.reloadTableData = function() {
 		vm.refreshTable = $timeout(function myFunction() {
 			vm.dtInstance.reloadData(null, false);
-			vm.refreshTable = $timeout(reloadTableData, 10000);
-		}, 10000);
+			console.log('lololo');
+			vm.refreshTable = $timeout(vm.reloadTableData, 3000);
+		}, 3000);
 	};
-	reloadTableData();*/
+	vm.reloadTableData();*/
 
 	function createdRow(row, data, dataIndex) {
 		$compile(angular.element(row).contents())($scope);
