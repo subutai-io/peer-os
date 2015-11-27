@@ -52,13 +52,13 @@ public class ResourceHostEntityTest
     private static final String CONTAINER_HOST_ID = UUID.randomUUID().toString();
     private static final String CONTAINER_HOST_NAME = "hostname";
     private static final String TEMPLATE_NAME = "master";
-    private static final String GATEWAY = "192.168.1.1";
+    private static final String ENV_ID = "123";
     private static final int VLAN = 100;
     private static final int TIMEOUT = 120;
     private static final String HOSTNAME = "hostname";
     private static final HostArchitecture ARCH = HostArchitecture.AMD64;
     private static final String INTERFACE_NAME = "eth0";
-    private static final String IP = "127.0.0.1";
+    private static final String IP = "127.0.0.1/24";
     private static final String MAC = "mac";
     private static final String CONTAINER_STATUS_STARTED =
             "NAME                               STATE    HWADDR             IP" + "            Interface\n" +
@@ -360,7 +360,7 @@ public class ResourceHostEntityTest
 
         try
         {
-            resourceHostEntity.createContainer( TEMPLATE_NAME, HOSTNAME, IP, VLAN, GATEWAY, TIMEOUT );
+            resourceHostEntity.createContainer( TEMPLATE_NAME, HOSTNAME, IP, VLAN, TIMEOUT, ENV_ID );
             fail( "Expected HostNotFoundException" );
         }
         catch ( ResourceHostException e )
@@ -374,7 +374,7 @@ public class ResourceHostEntityTest
 
         try
         {
-            resourceHostEntity.createContainer( TEMPLATE_NAME, HOSTNAME, IP, VLAN, GATEWAY, TIMEOUT );
+            resourceHostEntity.createContainer( TEMPLATE_NAME, HOSTNAME, IP, VLAN, TIMEOUT, ENV_ID );
             fail( "Expected HostNotFoundException" );
         }
         catch ( ResourceHostException e )
@@ -384,25 +384,14 @@ public class ResourceHostEntityTest
         resourceHostEntity.removeContainerHost( containerHost );
 
 
-        resourceHostEntity.createContainer( TEMPLATE_NAME, HOSTNAME, IP, VLAN, GATEWAY, TIMEOUT );
+        resourceHostEntity.createContainer( TEMPLATE_NAME, HOSTNAME, IP, VLAN, TIMEOUT, ENV_ID );
 
         verify( future ).get();
 
         doThrow( new ExecutionException( null ) ).when( future ).get();
 
 
-        resourceHostEntity.createContainer( TEMPLATE_NAME, HOSTNAME, IP, VLAN, GATEWAY, TIMEOUT );
-    }
-
-
-    @Test
-    public void testCreateContainer2() throws Exception
-    {
-        when( registry.getTemplate( TEMPLATE_NAME ) ).thenReturn( template );
-
-        resourceHostEntity.createContainer( TEMPLATE_NAME, HOSTNAME, TIMEOUT );
-
-        verify( future ).get();
+        resourceHostEntity.createContainer( TEMPLATE_NAME, HOSTNAME, IP, VLAN, TIMEOUT, ENV_ID );
     }
 }
 
