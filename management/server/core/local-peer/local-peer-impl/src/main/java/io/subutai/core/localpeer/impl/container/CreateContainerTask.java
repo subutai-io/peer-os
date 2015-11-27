@@ -36,17 +36,22 @@ public class CreateContainerTask implements Callable<HostInfo>
     private final String ip;
     private final int vlan;
     private final int timeoutSec;
+    private final String environmentId;
     protected CommandUtil commandUtil = new CommandUtil();
     private HostRegistry hostRegistry;
 
 
     public CreateContainerTask( HostRegistry hostRegistry, final ResourceHost resourceHost, final Template template,
-                                final String hostname, final String ip, final int vlan, final int timeoutSec )
+                                final String hostname, final String ip, final int vlan, final int timeoutSec,
+                                final String environmentId )
     {
         Preconditions.checkNotNull( resourceHost );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ) );
         Preconditions.checkNotNull( template );
         Preconditions.checkArgument( timeoutSec > 0 );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( ip ) && ip.matches( Common.CIDR_REGEX ) );
+        Preconditions.checkArgument( NumUtil.isIntBetween( vlan, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ) );
 
         this.hostRegistry = hostRegistry;
         this.resourceHost = resourceHost;
@@ -55,6 +60,7 @@ public class CreateContainerTask implements Callable<HostInfo>
         this.ip = ip;
         this.vlan = vlan;
         this.timeoutSec = timeoutSec;
+        this.environmentId = environmentId;
     }
 
 
@@ -63,19 +69,11 @@ public class CreateContainerTask implements Callable<HostInfo>
     {
 
         prepareTemplate( template );
-        if ( !Strings.isNullOrEmpty( ip ) && ip.matches( Common.CIDR_REGEX ) && NumUtil
-                .isIntBetween( vlan, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) )
-        {
-            commandUtil.execute( new RequestBuilder( "subutai clone" ).withCmdArgs(
-                    Lists.newArrayList( template.getTemplateName(), hostname, "-i",
-                            String.format( "\"%s %s\"", ip, vlan ) ) ).withTimeout( 1 ).daemon(), resourceHost );
-        }
-        else
-        {
-            commandUtil.execute( new RequestBuilder( "subutai clone" )
-                    .withCmdArgs( Lists.newArrayList( template.getTemplateName(), hostname ) ).withTimeout( 1 )
-                    .daemon(), resourceHost );
-        }
+
+        commandUtil.execute( new RequestBuilder( "subutai clone" ).withCmdArgs(
+                Lists.newArrayList( template.getTemplateName(), hostname, "-i",
+                        String.format( "\"%s %s\"", ip, vlan ) ) ).withTimeout( 1 ).daemon(), resourceHost );
+
         long start = System.currentTimeMillis();
 
         HostInfo hostInfo = null;
@@ -106,6 +104,11 @@ public class CreateContainerTask implements Callable<HostInfo>
         {
             throw new ContainerCreationException(
                     String.format( "Container %s did not connect within timeout with proper IP", hostname ) );
+        }
+        else
+        {
+            //TODO sign CH key with PEK identified by LocalPeerId+environmentId
+            //at this point the CH key is already in the KeyStore and might be just updated.
         }
 
         return hostInfo;

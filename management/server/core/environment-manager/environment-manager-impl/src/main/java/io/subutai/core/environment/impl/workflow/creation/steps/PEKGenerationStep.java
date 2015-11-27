@@ -54,6 +54,7 @@ public class PEKGenerationStep
     }
 
 
+    //TODO this EK should be uploaded by user when creating environment via UI. @Nurkaly!
     private PGPSecretKeyRing createEnvironmentKeyPair( EnvironmentId envId, String userSecKeyId ) throws PeerException
     {
         KeyManager keyManager = securityManager.getKeyManager();
