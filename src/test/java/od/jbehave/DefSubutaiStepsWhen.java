@@ -226,7 +226,7 @@ public class DefSubutaiStepsWhen {
 
     @When("the user select management host from select menu")
     public void select_menagement_host_from_select_menu(){
-        subutaiSteps.selectMenuResourceHost();
+        subutaiSteps.selectMenuManagementHost();
     }
 
     @When("the user enter console command: '$command'")

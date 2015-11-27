@@ -44,6 +44,12 @@ public class SubutaiSteps extends ScenarioSteps {
     }
 
     @Step
+    public void open_mng_h_arm() {
+        subutaiPage.setDefaultBaseUrl("https://172.16.194.234:8443/");
+        subutaiPage.open();
+    }
+
+    @Step
     public void clickOnMenuItemEnvironment(){
         subutaiPage.linkEnvironment.click();
     }

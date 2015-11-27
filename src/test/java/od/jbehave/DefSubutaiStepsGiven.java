@@ -29,6 +29,11 @@ public class DefSubutaiStepsGiven {
         subutaiSteps.open_mng_h2();
     }
 
+    @Given("the ARM user is on the home page of Subutai")
+    public void arm_user_open_home_page(){
+        subutaiSteps.open_mng_h_arm();
+    }
+
     @Given("the user enter login and password: '$login', '$password'")
     public void enter_login_and_password(String login, String password){
         subutaiSteps.inputLogin(login);
