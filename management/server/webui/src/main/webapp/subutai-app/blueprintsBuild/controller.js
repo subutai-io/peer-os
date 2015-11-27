@@ -40,7 +40,7 @@ function BlueprintsBuildCtrl($scope, environmentService, SweetAlert, ngDialog, $
 		vm.blueprint = data;
 
 		for(var i = 0; i < vm.blueprint.nodeGroups.length; i++) {
-			vm.transportNodes[i] = vm.blueprint.nodeGroups[i];
+			vm.transportNodes[i] = angular.copy(vm.blueprint.nodeGroups[i]);
 			vm.transportNodes[i].show = true;
 			vm.transportNodes[i].disabled = true;
 			vm.transportNodes[i].options = {
@@ -207,7 +207,7 @@ function BlueprintsBuildCtrl($scope, environmentService, SweetAlert, ngDialog, $
 		for(var i = 0; i < vm.nodesToCreate.length; i++) {
 
 			if(vm.nodesToCreate[i] !== null) {
-				var currentNodeGroup = vm.blueprint.nodeGroups[vm.nodesToCreate[i].parentNode];
+				var currentNodeGroup = angular.copy(vm.blueprint.nodeGroups[vm.nodesToCreate[i].parentNode]);
 
 				if(vm.buildWith == 'strategie') {
 					var containerPlacementStrategy = {"strategyId": vm.nodesToCreate[i].createOption, "criteria": []};
@@ -221,6 +221,7 @@ function BlueprintsBuildCtrl($scope, environmentService, SweetAlert, ngDialog, $
 				currentNodeGroup.containerDistributionType = 'AUTO';
 
 				nodeGroupsArray.push(currentNodeGroup);
+				currentNodeGroup = {};
 			}
 		}
 		return nodeGroupsArray;

@@ -1053,9 +1053,17 @@ body {
     display: inline-block;
     line-height: 29px;
 }
-
+.b-main-form__wrapper_full {
+    width: 100%;
+}
+.b-main-form__wrapper_block {
+    display: block;
+}
 .b-main-form__wrapper_margin-r {
     margin-right: 35px;
+}
+.b-main-form__wrapper_margin-b {
+    margin-bottom: 10px;
 }
 
 .b-main-form__wrapper_min {
@@ -1260,6 +1268,10 @@ td.b-main-table__status-col {
     border-radius: 5px;
 	overflow: hidden;
 }
+.b-form_border_tabs,
+.b-workspace-content_border_tabs {
+    border-top-left-radius: 0;
+}
 
 .b-form_dirty-hack {
 	overflow: visible;
@@ -1370,6 +1382,9 @@ td.b-main-table__status-col {
 }
 .b-form-wrapper_margin-size-2 {
     margin-left: 80px;
+}
+.b-form-wrapper_margin-size-3 {
+    margin-right: 80px;
 }
 .b-form-input_dropdown {
     position: relative;

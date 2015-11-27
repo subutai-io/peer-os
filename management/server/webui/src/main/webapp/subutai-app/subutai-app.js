@@ -333,6 +333,86 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 				}]
 			}
 		})
+		.state('mahout', {
+			url: '/plugins/mahout',
+			templateUrl: 'plugins/mahout/partials/view.html',
+			resolve: {
+				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+					return $ocLazyLoad.load([
+						{
+							name: 'subutai.plugins.mahout',
+							files: [
+								'plugins/mahout/mahout.js',
+								'plugins/mahout/controller.js',
+								'plugins/mahout/service.js',
+								'plugins/hadoop/service.js',
+								'subutai-app/environment/service.js'
+							]
+						}
+					]);
+				}]
+			}
+		})
+		.state('pig', {
+			url: '/plugins/pig',
+			templateUrl: 'plugins/pig/partials/view.html',
+			resolve: {
+				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+					return $ocLazyLoad.load([
+						{
+							name: 'subutai.plugins.pig',
+							files: [
+								'plugins/pig/mahout.js',
+								'plugins/pig/controller.js',
+								'plugins/pig/service.js',
+								'plugins/pig/service.js',
+								'subutai-app/environment/service.js'
+							]
+						}
+					]);
+				}]
+			}
+		})
+		.state('hipi', {
+			url: '/plugins/hipi',
+			templateUrl: 'plugins/hipi/partials/view.html',
+			resolve: {
+				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+					return $ocLazyLoad.load([
+						{
+							name: 'subutai.plugins.hipi',
+							files: [
+								'plugins/hipi/hipi.js',
+								'plugins/hipi/controller.js',
+								'plugins/hipi/service.js',
+								'plugins/hadoop/service.js',
+								'subutai-app/environment/service.js'
+							]
+						}
+					]);
+				}]
+			}
+		})
+		.state('lucene', {
+			url: '/plugins/lucene',
+			templateUrl: 'plugins/lucene/partials/view.html',
+			resolve: {
+				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+					return $ocLazyLoad.load([
+						{
+							name: 'subutai.plugins.lucene',
+							files: [
+								'plugins/lucene/lucene.js',
+								'plugins/lucene/controller.js',
+								'plugins/lucene/service.js',
+								'plugins/hadoop/service.js',
+								'subutai-app/environment/service.js'
+							]
+						}
+					]);
+				}]
+			}
+		})
 		.state('404', {
 			url: '/404',
 			template: 'Not found'
@@ -414,6 +494,7 @@ app.directive('checkbox-list-dropdown', function() {
 
 //Global variables
 var SERVER_URL = '/';
+//var SERVER_URL = 'http://172.16.131.205:8080/';
 
 var STATUS_UNDER_MODIFICATION = 'UNDER_MODIFICATION';
 var VARS_TOOLTIP_TIMEOUT = 900;
