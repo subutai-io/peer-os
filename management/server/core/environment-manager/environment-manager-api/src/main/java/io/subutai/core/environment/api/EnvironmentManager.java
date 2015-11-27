@@ -210,7 +210,7 @@ public interface EnvironmentManager
      * @param environmentId - id of the environment to assign the passed domain to
      * @param newDomain - domain url
      * @param domainLoadBalanceStrategy - strategy to load balance requests to the domain
-     * @param sslCertPath - path to SSL certificate to enable HTTPS access to domai only, null if not needed
+     * @param sslCertPath - path to SSL certificate to enable HTTPS access to domain only, null if not needed
      */
     void assignEnvironmentDomain( String environmentId, String newDomain,
                                   DomainLoadBalanceStrategy domainLoadBalanceStrategy, String sslCertPath )

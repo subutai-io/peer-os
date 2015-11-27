@@ -271,20 +271,21 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     {
         Topology topology = new Topology( blueprint.getName(), environmentId, cdir, blueprint.getSshKey() );
 
-
+        LOG.debug( "Building topology..." );
         for ( Map.Entry<String, Set<NodeGroup>> placementEntry : blueprint.getNodeGroupsMap().entrySet() )
         {
             Peer peer = peerManager.getPeer( placementEntry.getKey() );
             for ( NodeGroup nodeGroup : placementEntry.getValue() )
             {
-                LOG.debug( String.format( "%s %s %s %s %s %s %d", nodeGroup.getName(), nodeGroup.getPeerId(),
-                        nodeGroup.getHostId(), nodeGroup.getType(),
+                LOG.debug( String.format( "%s %s %s %s %s %s", nodeGroup.getName(), nodeGroup.getType(),
+                        nodeGroup.getNumberOfContainers(), nodeGroup.getPeerId(),
                         nodeGroup.getContainerDistributionType() == ContainerDistributionType.AUTO ?
-                        nodeGroup.getContainerPlacementStrategy().getStrategyId() : "",
-                        nodeGroup.getContainerDistributionType(), nodeGroup.getNumberOfContainers() ) );
+                        nodeGroup.getContainerPlacementStrategy().getStrategyId() : nodeGroup.getHostId(),
+                        nodeGroup.getContainerDistributionType() ) );
                 topology.addNodeGroupPlacement( peer, nodeGroup );
             }
         }
+        LOG.debug( "Topology built." );
 
         return topology;
     }

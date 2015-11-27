@@ -33,11 +33,11 @@ public class ResourceHostMetricsCommand extends SubutaiShellCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        Set<ResourceHostMetric> metrics = monitor.getResourceHostsMetrics();
-        for ( ResourceHostMetric metric : metrics )
-        {
-            System.out.println( metric );
-        }
+//        Set<ResourceHostMetric> metrics = monitor.getResourceHostsMetrics();
+//        for ( ResourceHostMetric metric : metrics )
+//        {
+//            System.out.println( metric );
+//        }
 
         return null;
     }

@@ -1,9 +1,11 @@
 package io.subutai.core.metric.impl;
 
 
+import io.subutai.common.metric.Alert;
 import io.subutai.core.metric.api.MonitorException;
 import io.subutai.common.peer.Payload;
 import io.subutai.common.peer.RequestListener;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +30,7 @@ public class RemoteAlertListener extends RequestListener
     @Override
     public Object onRequest( final Payload payload )
     {
-        ContainerHostMetricImpl containerHostMetric = payload.getMessage( ContainerHostMetricImpl.class );
+        Alert containerHostMetric = payload.getMessage( Alert.class );
 
         try
         {

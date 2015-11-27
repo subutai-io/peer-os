@@ -6,6 +6,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 
+import io.subutai.common.host.HostInfo;
+
 
 /**
  * Resource host metric
@@ -19,6 +21,13 @@ public class ResourceHostMetric extends HostMetric
 
     public ResourceHostMetric()
     {
+    }
+
+
+    public ResourceHostMetric( final String peerId, final HostInfo hostInfo, final Integer containersCount )
+    {
+        super( peerId, hostInfo );
+        this.containersCount = containersCount;
     }
 
 
@@ -39,6 +48,6 @@ public class ResourceHostMetric extends HostMetric
     public String toString()
     {
         return String
-                .format( "%s:%s", getPeerId() != null ? getPeerId() : "UNKNOWN", hostName != null ? hostName : hostId );
+                .format( "%s:%s", getPeerId() != null ? getPeerId() : "UNKNOWN", hostName != null ? hostName : getHostInfo().getHostname() );
     }
 }

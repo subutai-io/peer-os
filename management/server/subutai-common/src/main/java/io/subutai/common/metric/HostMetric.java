@@ -11,6 +11,8 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import io.subutai.common.host.HostInfo;
+
 
 /**
  * Base host metrics
@@ -19,7 +21,6 @@ import com.google.gson.annotations.SerializedName;
 @XmlAccessorType( XmlAccessType.FIELD )
 public class HostMetric extends BaseMetric
 {
-
     @Expose
     @SerializedName( "host" )
     @JsonProperty( "host" )
@@ -39,7 +40,12 @@ public class HostMetric extends BaseMetric
 
 
     public HostMetric()
+    {}
+
+
+    public HostMetric( String peerId, HostInfo hostInfo )
     {
+        super( peerId, hostInfo );
     }
 
 

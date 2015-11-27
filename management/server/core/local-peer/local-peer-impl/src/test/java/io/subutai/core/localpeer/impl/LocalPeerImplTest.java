@@ -27,10 +27,12 @@ import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInfoModel;
 import io.subutai.common.host.ResourceHostInfo;
+import io.subutai.common.metric.ResourceAlert;
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
+import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.Payload;
@@ -192,6 +194,11 @@ public class LocalPeerImplTest
 
     @Mock
     private ResourceValue cpuQuota;
+    @Mock
+    private EnvironmentId environmentId;
+
+    @Mock
+    private ResourceAlert resourceAlert;
 
 
     @Before
@@ -213,7 +220,8 @@ public class LocalPeerImplTest
         localPeer.managementHost = managementHost;
         localPeer.requestListeners = Sets.newHashSet( requestListener );
 
-//        when( cpuQuota.getValue( MeasureUnit.PERCENT ).intValue() ).thenReturn( Integer.parseInt( CPUQUOTA ) );
+        //        when( cpuQuota.getValue( MeasureUnit.PERCENT ).intValue() ).thenReturn( Integer.parseInt( CPUQUOTA
+        // ) );
         when( containerGateway.getContainerId() ).thenReturn( containerId );
         //        when(containerGateway.getGateway()).thenReturn(  );
 
@@ -243,7 +251,8 @@ public class LocalPeerImplTest
         when( hostRegistry.getHostInfoById( CONTAINER_HOST_ID ) ).thenReturn( containerHostInfo );
         when( containerHostInfo.getId() ).thenReturn( CONTAINER_HOST_ID );
         when( containerHost.getHostname() ).thenReturn( CONTAINER_HOST_NAME );
-        when( containerHost.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID );
+        when( environmentId.getId() ).thenReturn( ENVIRONMENT_ID );
+        when( containerHost.getEnvironmentId() ).thenReturn( environmentId );
         //        when( containerGroup.getContainerIds() ).thenReturn( Sets.newHashSet( CONTAINER_HOST_ID ) );
         //        when( containerGroup.getOwnerId() ).thenReturn( OWNER_ID );
         //        when( containerGroup.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID );
@@ -751,20 +760,20 @@ public class LocalPeerImplTest
         when( resourceHostInfo.getId() ).thenReturn( MANAGEMENT_HOST_ID );
 
         localPeer.initialized = true;
-        localPeer.onHeartbeat( resourceHostInfo );
+        localPeer.onHeartbeat( resourceHostInfo, Sets.newHashSet( resourceAlert ) );
 
         verify( managementHost ).updateHostInfo( resourceHostInfo );
 
         localPeer.managementHost = null;
 
-        localPeer.onHeartbeat( resourceHostInfo );
+        localPeer.onHeartbeat( resourceHostInfo, Sets.newHashSet( resourceAlert ) );
 
         verify( managementHostDataService ).persist( any( ManagementHostEntity.class ) );
 
         when( resourceHostInfo.getHostname() ).thenReturn( RESOURCE_HOST_NAME );
         when( resourceHostInfo.getId() ).thenReturn( RESOURCE_HOST_ID );
 
-        localPeer.onHeartbeat( resourceHostInfo );
+        localPeer.onHeartbeat( resourceHostInfo, Sets.newHashSet( resourceAlert ) );
 
         verify( resourceHost ).updateHostInfo( resourceHostInfo );
 

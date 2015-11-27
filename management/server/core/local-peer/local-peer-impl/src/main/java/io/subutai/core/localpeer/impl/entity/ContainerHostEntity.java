@@ -105,9 +105,9 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     }
 
 
-    public String getEnvironmentId()
+    public EnvironmentId getEnvironmentId()
     {
-        return environmentId;
+        return new EnvironmentId( environmentId );
     }
 
 
@@ -259,6 +259,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
         return peer.getProcessResourceUsage( getContainerId(), processPid );
     }
 
+
     @Override
     public ResourceValue getAvailableQuota( final ResourceType resourceType ) throws PeerException
     {
@@ -279,6 +280,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
         getPeer().setQuota( this.getContainerId(), resourceType, resourceValue );
     }
 
+
     @Override
     public Set<Integer> getCpuSet() throws PeerException
     {
@@ -291,6 +293,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     {
         getPeer().setCpuSet( this, cpuSet );
     }
+
 
     @Override
     public ContainerType getContainerType()
@@ -316,8 +319,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     {
         if ( containerId == null )
         {
-            containerId = new ContainerId( getId(), getHostname(), new PeerId( getPeerId() ),
-                    new EnvironmentId( getEnvironmentId() ) );
+            containerId = new ContainerId( getId(), getHostname(), new PeerId( getPeerId() ), getEnvironmentId() );
         }
         return containerId;
     }

@@ -42,7 +42,7 @@ public class HeartBeatListener implements ByteMessageListener
 
             //            LOG.info( String.format( "%n<<<HEARTBEAT>>>%n%s%n", heartBeat.getHostInfo().toString() ) );
 
-            registry.registerHost( heartBeat.getHostInfo() );
+            registry.registerHost( heartBeat.getHostInfo(), heartBeat.getAlerts() );
         }
         catch ( Exception e )
         {

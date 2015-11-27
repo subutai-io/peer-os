@@ -102,8 +102,8 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @Column( name = "domain_name" )
     private String domainName;
 
-    @Column(name="type")
-    @Enumerated( EnumType.STRING)
+    @Column( name = "type" )
+    @Enumerated( EnumType.STRING )
     private ContainerType containerType;
 
 
@@ -211,9 +211,9 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
 
     @Override
-    public String getEnvironmentId()
+    public EnvironmentId getEnvironmentId()
     {
-        return environment.getId();
+        return environment.getEnvironmentId();
     }
 
 
@@ -550,8 +550,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     {
         if ( containerId == null )
         {
-            containerId = new ContainerId( getId(), getHostname(), new PeerId( getPeerId() ),
-                    new EnvironmentId( getEnvironmentId() ) );
+            containerId = new ContainerId( getId(), getHostname(), new PeerId( getPeerId() ), getEnvironmentId() );
         }
         return containerId;
     }

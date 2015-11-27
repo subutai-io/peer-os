@@ -28,6 +28,7 @@ import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.ResourceHostInfo;
+import io.subutai.common.metric.ResourceAlert;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
@@ -379,7 +380,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
 
 
     @Override
-    public void onHeartbeat( final ResourceHostInfo resourceHostInfo )
+    public void onHeartbeat( final ResourceHostInfo resourceHostInfo, Set<ResourceAlert> alerts )
     {
         RequestedHostImpl requestedHost = requestDataService.find( resourceHostInfo.getId() );
         if ( requestedHost != null && requestedHost.getStatus() == RegistrationStatus.APPROVED )

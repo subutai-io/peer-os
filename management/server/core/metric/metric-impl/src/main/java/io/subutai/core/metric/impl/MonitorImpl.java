@@ -11,6 +11,10 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import javax.naming.NamingException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,30 +32,42 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.exception.DaoException;
+import io.subutai.common.host.ContainerHostInfo;
+import io.subutai.common.host.HostId;
+import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.ResourceHostInfo;
+import io.subutai.common.metric.Alert;
+import io.subutai.common.metric.BaseAlert;
 import io.subutai.common.metric.BaseMetric;
+import io.subutai.common.metric.CommonAlert;
 import io.subutai.common.metric.ContainerHostMetric;
 import io.subutai.common.metric.ContainerHostQuotaState;
+import io.subutai.common.metric.EnvironmentContainerResourceAlert;
 import io.subutai.common.metric.HistoricalMetric;
-import io.subutai.common.metric.HostMetric;
 import io.subutai.common.metric.MetricType;
 import io.subutai.common.metric.OwnerResourceUsage;
 import io.subutai.common.metric.ProcessResourceUsage;
+import io.subutai.common.metric.ResourceAlert;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentContainerHost;
+import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.peer.ManagementHost;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.JsonUtil;
+import io.subutai.common.util.ServiceLocator;
 import io.subutai.common.util.StringUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
+import io.subutai.core.hostregistry.api.HostDisconnectedException;
+import io.subutai.core.hostregistry.api.HostListener;
+import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.metric.api.AlertListener;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
@@ -62,7 +78,7 @@ import io.subutai.core.peer.api.PeerManager;
 /**
  * Implementation of Monitor
  */
-public class MonitorImpl implements Monitor
+public class MonitorImpl implements Monitor, HostListener
 {
     private static final String ENVIRONMENT_IS_NULL_MSG = "Environment is null";
     private static final String CONTAINER_IS_NULL_MSG = "Container is null";
@@ -75,13 +91,15 @@ public class MonitorImpl implements Monitor
     protected Set<AlertListener> alertListeners =
             Collections.newSetFromMap( new ConcurrentHashMap<AlertListener, Boolean>() );
     private final Commands commands = new Commands();
-    private final PeerManager peerManager;
     private final EnvironmentManager environmentManager;
     protected ExecutorService notificationExecutor = Executors.newCachedThreadPool();
     protected MonitorDao monitorDao;
     protected DaoManager daoManager;
     private Map<String, BaseMetric> metrics = new ConcurrentHashMap<>();
-//    protected ScheduledExecutorService stateUpdateExecutorService;
+    protected ScheduledExecutorService stateUpdateExecutorService;
+
+    private static Map<HostId, BaseAlert> alerts = new ConcurrentHashMap<>();
+    private PeerManager peerManager;
 
 
     public MonitorImpl( PeerManager peerManager, DaoManager daoManager, EnvironmentManager environmentManager )
@@ -106,8 +124,8 @@ public class MonitorImpl implements Monitor
             throw new MonitorException( e );
         }
 
-//        stateUpdateExecutorService = Executors.newScheduledThreadPool( 1 );
-//        stateUpdateExecutorService.scheduleWithFixedDelay( new MetricsUpdater( this ), 10, 90, TimeUnit.SECONDS );
+        stateUpdateExecutorService = Executors.newScheduledThreadPool( 1 );
+        stateUpdateExecutorService.scheduleWithFixedDelay( new MetricsUpdater( this ), 10, 90, TimeUnit.SECONDS );
     }
 
 
@@ -143,7 +161,7 @@ public class MonitorImpl implements Monitor
             if ( peer.isLocal() )
             {
                 //dispatch locally
-                metrics.addAll( getLocalContainerHostsMetrics( environment.getId() ) );
+                metrics.addAll( getLocalContainerHostsMetrics( environment.getEnvironmentId() ) );
             }
             else
             {
@@ -245,7 +263,7 @@ public class MonitorImpl implements Monitor
     }
 
 
-    protected Set<ContainerHostMetricImpl> getLocalContainerHostsMetrics( String environmentId )
+    protected Set<ContainerHostMetricImpl> getLocalContainerHostsMetrics( EnvironmentId environmentId )
     {
 
         Set<ContainerHostMetricImpl> metrics = Sets.newHashSet();
@@ -257,7 +275,7 @@ public class MonitorImpl implements Monitor
 
         //obtain environment containers
 
-        Set<ContainerHost> containerHosts = localPeer.findContainersByEnvironmentId( environmentId );
+        Set<ContainerHost> containerHosts = localPeer.findContainersByEnvironmentId( environmentId.getId() );
         //            Set<String> containerIds = containerGroup.getContainerIds();
         retrieveContainerHostMetrics( containerHosts, localPeer, environmentId, metrics );
         //        }
@@ -270,7 +288,7 @@ public class MonitorImpl implements Monitor
 
 
     private void retrieveContainerHostMetrics( final Set<ContainerHost> containerIds, final LocalPeer localPeer,
-                                               final String environmentId, Set<ContainerHostMetricImpl> metrics )
+                                               final EnvironmentId environmentId, Set<ContainerHostMetricImpl> metrics )
     {
         for ( ContainerHost containerHost : containerIds )
         {
@@ -292,7 +310,7 @@ public class MonitorImpl implements Monitor
     }
 
 
-    protected void addLocalContainerHostMetric( final String environmentId, final ResourceHost resourceHost,
+    protected void addLocalContainerHostMetric( final EnvironmentId environmentId, final ResourceHost resourceHost,
                                                 final ContainerHost localContainer,
                                                 Set<ContainerHostMetricImpl> metrics )
     {
@@ -307,7 +325,7 @@ public class MonitorImpl implements Monitor
                 {
                     ContainerHostMetricImpl metric =
                             JsonUtil.fromJson( result.getStdOut(), ContainerHostMetricImpl.class );
-                    metric.setEnvironmentId( environmentId );
+                    metric.setEnvironmentId( environmentId.getId() );
                     metric.setHostId( localContainer.getId() );
                     metrics.add( metric );
                 }
@@ -329,94 +347,97 @@ public class MonitorImpl implements Monitor
     }
 
 
-    @Override
-    public Set<ResourceHostMetric> getResourceHostsMetrics()
-    {
-        Set<ResourceHostMetric> metrics = new HashSet<>();
-        //obtain resource hosts
-        Set<ResourceHost> resourceHosts = peerManager.getLocalPeer().getResourceHosts();
-        //iterate resource hosts and get their metrics
-        for ( ResourceHost resourceHost : resourceHosts )
-        {
-            addResourceHostMetric( resourceHost, metrics );
-        }
+    //    @Override
+    //    public Set<ResourceHostMetric> getResourceHostsMetrics()
+    //    {
+    //        Set<ResourceHostMetric> metrics = new HashSet<>();
+    //        //obtain resource hosts
+    //        Set<ResourceHost> resourceHosts = peerManager.getLocalPeer().getResourceHosts();
+    //        //iterate resource hosts and get their metrics
+    //        for ( ResourceHost resourceHost : resourceHosts )
+    //        {
+    //            addResourceHostMetric( resourceHost, metrics );
+    //        }
+    //
+    //
+    //        return metrics;
+    //    }
 
 
-        return metrics;
-    }
+    //    @Override
+    //    public ResourceHostMetric getResourceHostMetric( ResourceHost resourceHost ) throws MonitorException
+    //    {
+    //        Preconditions.checkNotNull( resourceHost, "Invalid resource host" );
+    //
+    //        Set<ResourceHostMetric> metrics = Sets.newHashSet();
+    //        addResourceHostMetric( resourceHost, metrics );
+    //
+    //        if ( metrics.isEmpty() )
+    //        {
+    //            throw new MonitorException( "Failed to obtain resource host metric" );
+    //        }
+    //
+    //        return metrics.iterator().next();
+    //    }
 
 
-    @Override
-    public ResourceHostMetric getResourceHostMetric( ResourceHost resourceHost ) throws MonitorException
-    {
-        Preconditions.checkNotNull( resourceHost, "Invalid resource host" );
+    //    protected void addResourceHostMetric( ResourceHost resourceHost, Set<ResourceHostMetric> metrics )
+    //    {
+    //        try
+    //        {
+    //            CommandResult result =
+    //                    resourceHost.execute( commands.getCurrentMetricCommand( resourceHost.getHostname() ) );
+    //            if ( result.hasSucceeded() )
+    //            {
+    //                ResourceHostMetric metric = JsonUtil.fromJson( result.getStdOut(), ResourceHostMetric.class );
+    //                //set peer id for future reference
+    //                metric.setPeerId( peerManager.getLocalPeer().getId() );
+    //                metric.setHostId( resourceHost.getId() );
+    //                metrics.add( metric );
+    //            }
+    //            else
+    //            {
+    //                LOG.error( String.format( "Error getting metrics from resource host %s: %s", resourceHost
+    // .getHostname(),
+    //                        result.getStdErr() ) );
+    //            }
+    //        }
+    //        catch ( CommandException | JsonSyntaxException e )
+    //        {
+    //            LOG.error( "Error in addResourceHostMetric", e );
+    //        }
+    //    }
 
-        Set<ResourceHostMetric> metrics = Sets.newHashSet();
-        addResourceHostMetric( resourceHost, metrics );
 
-        if ( metrics.isEmpty() )
-        {
-            throw new MonitorException( "Failed to obtain resource host metric" );
-        }
-
-        return metrics.iterator().next();
-    }
-
-
-    protected void addResourceHostMetric( ResourceHost resourceHost, Set<ResourceHostMetric> metrics )
-    {
-        try
-        {
-            CommandResult result =
-                    resourceHost.execute( commands.getCurrentMetricCommand( resourceHost.getHostname() ) );
-            if ( result.hasSucceeded() )
-            {
-                ResourceHostMetric metric = JsonUtil.fromJson( result.getStdOut(), ResourceHostMetric.class );
-                //set peer id for future reference
-                metric.setPeerId( peerManager.getLocalPeer().getId() );
-                metric.setHostId( resourceHost.getId() );
-                metrics.add( metric );
-            }
-            else
-            {
-                LOG.error( String.format( "Error getting metrics from resource host %s: %s", resourceHost.getHostname(),
-                        result.getStdErr() ) );
-            }
-        }
-        catch ( CommandException | JsonSyntaxException e )
-        {
-            LOG.error( "Error in addResourceHostMetric", e );
-        }
-    }
-
-    private HostMetric fetchManagementHostMetric( ManagementHost managementHost )
-    {
-        HostMetric result = null;
-        try
-        {
-
-            CommandResult commandResult =
-                    managementHost.execute( commands.getCurrentMetricCommand( managementHost.getHostname() ) );
-            if ( commandResult.hasSucceeded() )
-            {
-                result = JsonUtil.fromJson( commandResult.getStdOut(), HostMetric.class );
-                result.setPeerId( peerManager.getLocalPeer().getId() );
-                result.setHostId( managementHost.getId() );
-                result.setHostName( managementHost.getHostname() );
-                LOG.debug( String.format( "Host %s metrics fetched successfully.", managementHost.getHostname() ) );
-            }
-            else
-            {
-                LOG.warn( String.format( "Error getting %s metrics", managementHost.getHostname() ) );
-            }
-        }
-        catch ( CommandException | JsonSyntaxException e )
-        {
-            LOG.error( e.getMessage(), e );
-        }
-
-        return result;
-    }
+    //    private HostMetric fetchManagementHostMetric( ManagementHost managementHost )
+    //    {
+    //        HostMetric result = null;
+    //        try
+    //        {
+    //
+    //            CommandResult commandResult =
+    //                    managementHost.execute( commands.getCurrentMetricCommand( managementHost.getHostname() ) );
+    //            if ( commandResult.hasSucceeded() )
+    //            {
+    //                result = JsonUtil.fromJson( commandResult.getStdOut(), HostMetric.class );
+    //                result.setPeerId( peerManager.getLocalPeer().getId() );
+    //                result.setHostId( managementHost.getId() );
+    //                result.setHostName( managementHost.getHostname() );
+    //                LOG.debug( String.format( "Host %s metrics fetched successfully.", managementHost.getHostname()
+    // ) );
+    //            }
+    //            else
+    //            {
+    //                LOG.warn( String.format( "Error getting %s metrics", managementHost.getHostname() ) );
+    //            }
+    //        }
+    //        catch ( CommandException | JsonSyntaxException e )
+    //        {
+    //            LOG.error( e.getMessage(), e );
+    //        }
+    //
+    //        return result;
+    //    }
 
 
     private ResourceHostMetric fetchResourceHostMetric( ResourceHost resourceHost )
@@ -430,10 +451,10 @@ public class MonitorImpl implements Monitor
             if ( commandResult.hasSucceeded() )
             {
                 result = JsonUtil.fromJson( commandResult.getStdOut(), ResourceHostMetric.class );
-                result.setPeerId( peerManager.getLocalPeer().getId() );
-                result.setHostId( resourceHost.getId() );
-                result.setHostName( resourceHost.getHostname() );
-                result.setContainersCount( resourceHost.getContainers().size() );
+                HostRegistry hostRegistry = ServiceLocator.getServiceNoCache( HostRegistry.class );
+                final HostInfo hostInfo = hostRegistry.getResourceHostInfoById( resourceHost.getId() );
+                result = new ResourceHostMetric( peerManager.getLocalPeer().getId(), hostInfo,
+                        resourceHost.getContainers().size() );
                 LOG.debug( String.format( "Host %s metrics fetched successfully.", resourceHost.getHostname() ) );
             }
             else
@@ -441,7 +462,7 @@ public class MonitorImpl implements Monitor
                 LOG.warn( String.format( "Error getting %s metrics", resourceHost.getHostname() ) );
             }
         }
-        catch ( CommandException | JsonSyntaxException e )
+        catch ( HostDisconnectedException | NamingException | CommandException | JsonSyntaxException e )
         {
             LOG.error( e.getMessage(), e );
         }
@@ -450,39 +471,40 @@ public class MonitorImpl implements Monitor
     }
 
 
-    private ContainerHostQuotaState fetchContainerHostQuotaState( ResourceHost resourceHost,
-                                                                  ContainerHost containerHost )
-    {
-        ContainerHostQuotaState result = null;
-        try
-        {
-
-            CommandResult commandResult =
-                    resourceHost.execute( commands.getContainerHostQuotaCommand( containerHost.getHostname() ) );
-            if ( commandResult.hasSucceeded() )
-            {
-                result = JsonUtil.fromJson( commandResult.getStdOut(), ContainerHostQuotaState.class );
-                result.setPeerId( peerManager.getLocalPeer().getId() );
-                result.setHostId( containerHost.getId() );
-                result.setHostName( containerHost.getHostname() );
-
-                LOG.debug( String.format( "Container host %s metrics fetched successfully.",
-                        containerHost.getHostname() ) );
-            }
-            else
-            {
-                LOG.warn(
-                        String.format( "Error getting metrics from resource host %s for %s", resourceHost.getHostname(),
-                                containerHost.getHostname() ) );
-            }
-        }
-        catch ( CommandException | JsonSyntaxException e )
-        {
-            LOG.error( e.getMessage(), e );
-        }
-
-        return result;
-    }
+    //    private ContainerHostQuotaState fetchContainerHostQuotaState( ResourceHost resourceHost,
+    //                                                                  ContainerHost containerHost )
+    //    {
+    //        ContainerHostQuotaState result = null;
+    //        try
+    //        {
+    //
+    //            CommandResult commandResult =
+    //                    resourceHost.execute( commands.getContainerHostQuotaCommand( containerHost.getHostname() ) );
+    //            if ( commandResult.hasSucceeded() )
+    //            {
+    //                result = JsonUtil.fromJson( commandResult.getStdOut(), ContainerHostQuotaState.class );
+    //                result.setPeerId( peerManager.getLocalPeer().getId() );
+    //                result.setHostId( containerHost.getId() );
+    //                result.setHostName( containerHost.getHostname() );
+    //
+    //                LOG.debug( String.format( "Container host %s metrics fetched successfully.",
+    //                        containerHost.getHostname() ) );
+    //            }
+    //            else
+    //            {
+    //                LOG.warn(
+    //                        String.format( "Error getting metrics from resource host %s for %s", resourceHost
+    // .getHostname(),
+    //                                containerHost.getHostname() ) );
+    //            }
+    //        }
+    //        catch ( CommandException | JsonSyntaxException e )
+    //        {
+    //            LOG.error( e.getMessage(), e );
+    //        }
+    //
+    //        return result;
+    //    }
 
 
     @Override
@@ -500,7 +522,7 @@ public class MonitorImpl implements Monitor
         //save subscription to database
         try
         {
-            monitorDao.addSubscription( environment.getId(), trimmedSubscriberId );
+            monitorDao.addSubscription( environment.getEnvironmentId(), trimmedSubscriberId );
         }
         catch ( DaoException e )
         {
@@ -511,7 +533,7 @@ public class MonitorImpl implements Monitor
         //activate monitoring
         Set<ContainerHost> a = new HashSet<>();
         a.addAll( environment.getContainerHosts() );
-        activateMonitoring( a, monitoringSettings, environment.getId() );
+        activateMonitoring( a, monitoringSettings, environment.getEnvironmentId() );
     }
 
 
@@ -530,7 +552,7 @@ public class MonitorImpl implements Monitor
         //save subscription to database
         try
         {
-            String environmentId =
+            EnvironmentId environmentId =
                     containerHost instanceof EnvironmentContainerHost ? containerHost.getEnvironmentId() : null;
             monitorDao.addSubscription( environmentId, trimmedSubscriberId );
         }
@@ -541,7 +563,7 @@ public class MonitorImpl implements Monitor
         }
 
         //activate monitoring
-        String environmentId =
+        EnvironmentId environmentId =
                 containerHost instanceof EnvironmentContainerHost ? containerHost.getEnvironmentId() : null;
         activateMonitoring( Sets.newHashSet( containerHost ), monitoringSettings, environmentId );
     }
@@ -577,14 +599,14 @@ public class MonitorImpl implements Monitor
         Preconditions.checkNotNull( containerHost, CONTAINER_IS_NULL_MSG );
         Preconditions.checkNotNull( monitoringSettings, SETTINGS_IS_NULL_MSG );
 
-        String environmentId =
+        EnvironmentId environmentId =
                 containerHost instanceof EnvironmentContainerHost ? containerHost.getEnvironmentId() : null;
         activateMonitoring( Sets.newHashSet( containerHost ), monitoringSettings, environmentId );
     }
 
 
     protected void activateMonitoring( Set<ContainerHost> containerHosts, MonitoringSettings monitoringSettings,
-                                       String environmentId ) throws MonitorException
+                                       EnvironmentId environmentId ) throws MonitorException
     {
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( containerHosts ) );
         Map<Peer, Set<ContainerHost>> peersContainers = Maps.newHashMap();
@@ -631,7 +653,8 @@ public class MonitorImpl implements Monitor
 
 
     protected void activateMonitoringAtRemoteContainers( Peer peer, Set<ContainerHost> containerHosts,
-                                                         MonitoringSettings monitoringSettings, String environmentId )
+                                                         MonitoringSettings monitoringSettings,
+                                                         EnvironmentId environmentId )
     {
         Preconditions.checkNotNull( peer );
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( containerHosts ) );
@@ -778,78 +801,79 @@ public class MonitorImpl implements Monitor
     }
 
 
-    /**
-     * This method is called by REST endpoint from local peer indicating that some container hosted locally is under
-     * stress.
-     *
-     * @param alertMetric - body of notifyOnAlert in JSON
-     */
-    @Override
-    public void alert( final String alertMetric ) throws MonitorException
-    {
-        try
-        {
-            //deserialize container metric
-            ContainerHostMetricImpl containerHostMetric =
-                    JsonUtil.fromJson( alertMetric, ContainerHostMetricImpl.class );
-
-            LocalPeer localPeer = peerManager.getLocalPeer();
-
-            //find source container host
-            ContainerHost containerHost = localPeer.getContainerHostByName( containerHostMetric.getHost() );
-
-            //set host id for future reference
-            containerHostMetric.setHostId( containerHost.getId() );
-
-            //find container's initiator peer
-            //            ContainerGroup containerGroup = localPeer.findContainerGroupByContainerId( containerHost
-            // .getId() );
-
-
-            //set environment id
-            containerHostMetric.setEnvironmentId( containerHost.getEnvironmentId() );
-
-
-            Peer creatorPeer = peerManager.getPeer( containerHost.getInitiatorPeerId() );
-
-            //if container is "created" by local peer, notifyOnAlert local peer
-            if ( creatorPeer.isLocal() )
-            {
-                notifyOnAlert( containerHostMetric );
-            }
-            //send metric to remote creator peer
-            else
-            {
-
-                //*********construct Secure Header ****************************
-                Map<String, String> headers = Maps.newHashMap();
-                //*************************************************************
-
-
-                creatorPeer.sendRequest( containerHostMetric, RecipientType.ALERT_RECIPIENT.name(),
-                        Constants.ALERT_TIMEOUT, headers );
-            }
-        }
-        catch ( Exception e )
-        {
-            LOG.error( "Error in onAlert", e );
-            throw new MonitorException( e );
-        }
-    }
+    //    /**
+    //     * This method is called by REST endpoint from local peer indicating that some container hosted locally is
+    // under
+    //     * stress.
+    //     *
+    //     * @param alertMetric - body of notifyOnAlert in JSON
+    //     */
+    //    @Override
+    //    public void alert( final String alertMetric ) throws MonitorException
+    //    {
+    //        try
+    //        {
+    //            //deserialize container metric
+    //            Alert containerHostMetric =
+    //                    JsonUtil.fromJson( alertMetric, ContainerHostMetricImpl.class );
+    //
+    //            LocalPeer localPeer = peerManager.getLocalPeer();
+    //
+    //            //find source container host
+    //            ContainerHost containerHost = localPeer.getContainerHostByName( containerHostMetric.getHost() );
+    //
+    //            //set host id for future reference
+    //            containerHostMetric.setHostId( containerHost.getId() );
+    //
+    //            //find container's initiator peer
+    //            //            ContainerGroup containerGroup = localPeer.findContainerGroupByContainerId( containerHost
+    //            // .getId() );
+    //
+    //
+    //            //set environment id
+    //            containerHostMetric.setEnvironmentId( containerHost.getEnvironmentId().getId() );
+    //
+    //
+    //            Peer creatorPeer = peerManager.getPeer( containerHost.getInitiatorPeerId() );
+    //
+    //            //if container is "created" by local peer, notifyOnAlert local peer
+    //            if ( creatorPeer.isLocal() )
+    //            {
+    //                notifyOnAlert( containerHostMetric );
+    //            }
+    //            //send metric to remote creator peer
+    //            else
+    //            {
+    //
+    //                //*********construct Secure Header ****************************
+    //                Map<String, String> headers = Maps.newHashMap();
+    //                //*************************************************************
+    //
+    //
+    //                creatorPeer.sendRequest( containerHostMetric, RecipientType.ALERT_RECIPIENT.name(),
+    //                        Constants.ALERT_TIMEOUT, headers );
+    //            }
+    //        }
+    //        catch ( Exception e )
+    //        {
+    //            LOG.error( "Error in onAlert", e );
+    //            throw new MonitorException( e );
+    //        }
+    //    }
 
 
     /**
      * This methods is called by REST endpoint when a remote peer sends a notifyOnAlert from one of its hosted
      * containers belonging to this peer or when local "own" container is under stress
      *
-     * @param metric - {@code ContainerHostMetric} metric of the host where thresholds are being exceeded
+     * @param alert - {@code Alert} alert of the host where thresholds are being exceeded
      */
-    public void notifyOnAlert( final ContainerHostMetricImpl metric ) throws MonitorException
+    public void notifyOnAlert( final Alert alert ) throws MonitorException
     {
         try
         {
             //obtain user from environment
-            Environment environment = environmentManager.loadEnvironment( metric.getEnvironmentId() );
+            Environment environment = environmentManager.loadEnvironment( alert.getHostId().getId() );
             //User user = identityManager.getUser( environment.getUserId() );
 
             //if ( user == null )
@@ -861,11 +885,11 @@ public class MonitorImpl implements Monitor
             //identityManager.loginWithToken( user.getUsername() );
 
             //search for subscriber if not found then no-op
-            //Set<String> subscribersIds = monitorDao.getEnvironmentSubscribersIds( metric.getEnvironmentId() );
+            //Set<String> subscribersIds = monitorDao.getEnvironmentSubscribersIds( alert.getEnvironmentId() );
             //for ( String subscriberId : subscribersIds )
             //{
             //notify subscriber on alert
-            //notifyListener( metric, subscriberId );
+            //notifyListener( alert, subscriberId );
             //}
         }
         catch ( MonitorException e )
@@ -880,13 +904,13 @@ public class MonitorImpl implements Monitor
     }
 
 
-    protected void notifyListener( final ContainerHostMetric metric, String subscriberId )
+    protected void notifyListener( final Alert alert, String subscriberId )
     {
         for ( final AlertListener listener : alertListeners )
         {
             if ( listener.getSubscriberId().startsWith( subscriberId ) )
             {
-                notificationExecutor.execute( new AlertNotifier( metric, listener ) );
+                notificationExecutor.execute( new AlertNotifier( alert, listener ) );
             }
         }
     }
@@ -1057,136 +1081,257 @@ public class MonitorImpl implements Monitor
     }
 
 
-    //    @Override
+    @Override
+    public void putAlert( BaseAlert alert )
+    {
+
+        if ( !isValidBaseAlert( alert ) )
+        {
+            return;
+        }
+        if ( alerts.get( alert.getHostId() ) != null )
+        {
+            // skipping, alert already exists
+            LOG.debug( String.format( "Alert already exists: ", alert.getHostId() ) );
+        }
+
+        if ( alert instanceof CommonAlert )
+        {
+            processCommonAlert( ( CommonAlert ) alert );
+        }
+        else if ( alert instanceof ResourceAlert )
+        {
+            processResourceAlert( ( ResourceAlert ) alert );
+        }
+    }
+
+
+    private void processCommonAlert( CommonAlert commonAlert )
+    {
+        Host host;
+        try
+        {
+            host = peerManager.getLocalPeer().bindHost( commonAlert.getHostId().getId() );
+        }
+        catch ( HostNotFoundException e )
+        {
+            LOG.warn( "Invalid common alert. Host not found: " + commonAlert.getHostId() );
+            return;
+        }
+        alerts.put( commonAlert.getHostId(), commonAlert );
+    }
+
+
+    private void processResourceAlert( final ResourceAlert alert )
+    {
+        Host host;
+        try
+        {
+            host = peerManager.getLocalPeer().bindHost( alert.getHostId().getId() );
+        }
+        catch ( HostNotFoundException e )
+        {
+            LOG.warn( "Invalid resource alert. Host not found: " + alert.getHostId() );
+            return;
+        }
+
+        if ( host instanceof ContainerHost )
+        {
+            final ContainerHost containerHost = ( ContainerHost ) host;
+
+            EnvironmentContainerResourceAlert environmentContainerResourceAlert =
+                    new EnvironmentContainerResourceAlert( alert, containerHost.getEnvironmentId() );
+            alerts.put( alert.getHostId(), alert );
+        }
+        else
+        {
+            alerts.put( alert.getHostId(), alert );
+        }
+    }
+
+
+    private boolean isValidBaseAlert( final BaseAlert alertValue )
+    {
+        try
+        {
+            Preconditions.checkNotNull( alertValue, "Alert value is null" );
+            Preconditions.checkNotNull( alertValue.getHostId(), "Host id is null" );
+            Preconditions.checkNotNull( alertValue.getHostId().getId(), "Host id is null" );
+            return true;
+        }
+        catch ( Exception e )
+        {
+            LOG.warn( "Invalid alert value: " + e.getMessage() );
+            return false;
+        }
+    }
+
+
+    private boolean isValidResourceAlert( final ResourceAlert alertValue )
+    {
+        try
+        {
+            Preconditions.checkNotNull( alertValue, "Alert value is null" );
+            Preconditions.checkNotNull( alertValue.getHostId(), "Host id is null" );
+            Preconditions.checkNotNull( alertValue.getHostId().getId(), "Host id is null" );
+            Preconditions.checkNotNull( alertValue.getResourceType(), "Resource type is null" );
+            Preconditions.checkNotNull( alertValue.getCurrentValue(), "Current value is null" );
+            Preconditions.checkNotNull( alertValue.getQuotaValue(), "Quota value is null" );
+            return true;
+        }
+        catch ( Exception e )
+        {
+            LOG.warn( "Invalid alert value: " + e.getMessage() );
+            return false;
+        }
+    }
+
+
     private void updateHostMetric( final BaseMetric metric )
     {
         if ( metric != null )
         {
-            this.metrics.put( metric.getHostId(), metric );
+            this.metrics.put( metric.getHostInfo().getId(), metric );
         }
     }
 
-//
-//    @Override
-//    public BaseMetric getHostMetric( final String id )
-//    {
-//        return this.metrics.get( id );
-//    }
+    //
+    //    @Override
+    //    public BaseMetric getHostMetric( final String id )
+    //    {
+    //        return this.metrics.get( id );
+    //    }
 
 
-//    @Override
-//    public ResourceHostMetrics getResourceHostMetrics( final boolean isLocalOnly )
-//    {
-//        ResourceHostMetrics result = new ResourceHostMetrics();
-//
-//        for ( BaseMetric metric : metrics.values() )
-//        {
-//            if ( isLocalOnly && !metric.getPeerId().equals( peerManager.getLocalPeerInfo().getId() ) )
-//            {
-//                continue;
-//            }
-//            if ( metric instanceof ResourceHostMetric )
-//            {
-//                result.addMetric( ( ResourceHostMetric ) metric );
-//            }
-//        }
-//
-//        return result;
-//    }
-//
-//
-//    @Override
-//    public String getHostMetricsAsHtml( final String hostId )
-//    {
-//        StringBuilder result = new StringBuilder();
-//        BaseMetric metrics = getHostMetric( hostId );
-//
-//        if ( metrics instanceof ContainerHostQuotaState )
-//        {
-//            ContainerHostQuotaState state = ( ContainerHostQuotaState ) metrics;
-//            result.append( getText( "<br>CPU : %d%%", state.getCpu() ) );
-//            result.append( getText( "<br>RAM : %d%%", state.getRam() ) );
-//            result.append( getText( "<br>/ : %d%%", state.getDisk().getRootfs() ) );
-//            result.append( getText( "<br>/home : %d%%", state.getDisk().getHome() ) );
-//            result.append( getText( "<br>/opt : %d%%", state.getDisk().getOpt() ) );
-//            result.append( getText( "<br>/var : %d%%", state.getDisk().getVar() ) );
-//        }
-//        else
-//        {
-//            HostMetric hostMetric = ( HostMetric ) metrics;
-//
-//            result.append( getText( "<br>CPU model: %s", hostMetric.getCpuModel() ) );
-//            result.append( getText( "<br>CPU core(s): %d", hostMetric.getCpuCore() ) );
-//            result.append( getText( "<br>CPU load: %.2f", hostMetric.getUsedCpu() ) );
-//            result.append( getText( "<br>Total RAM: %.3f Gb", hostMetric.getTotalRam() / 1024 / 1024 / 1024 ) );
-//            result.append( getText( "<br>Available RAM: %.3f Gb", hostMetric.getAvailableRam() / 1024 / 1024 / 1024 ) );
-//            result.append(
-//                    getText( "<br>Available space: %.3f Gb", hostMetric.getAvailableSpace() / 1024 / 1024 / 1024 ) );
-//
-//            if ( hostMetric instanceof ResourceHostMetric )
-//            {
-//                result.append(
-//                        getText( "<br>Container #: %d", ( ( ResourceHostMetric ) hostMetric ).getContainersCount() ) );
-//            }
-//        }
-//        return result.toString();
-//    }
+    @Override
+    public ResourceHostMetrics getResourceHostMetrics()
+    {
+        ResourceHostMetrics result = new ResourceHostMetrics();
+
+        //TODO: implement me
+
+        return result;
+    }
+    //
+    //
+    //    @Override
+    //    public String getHostMetricsAsHtml( final String hostId )
+    //    {
+    //        StringBuilder result = new StringBuilder();
+    //        BaseMetric metrics = getHostMetric( hostId );
+    //
+    //        if ( metrics instanceof ContainerHostQuotaState )
+    //        {
+    //            ContainerHostQuotaState state = ( ContainerHostQuotaState ) metrics;
+    //            result.append( getText( "<br>CPU : %d%%", state.getCpu() ) );
+    //            result.append( getText( "<br>RAM : %d%%", state.getRam() ) );
+    //            result.append( getText( "<br>/ : %d%%", state.getDisk().getRootfs() ) );
+    //            result.append( getText( "<br>/home : %d%%", state.getDisk().getHome() ) );
+    //            result.append( getText( "<br>/opt : %d%%", state.getDisk().getOpt() ) );
+    //            result.append( getText( "<br>/var : %d%%", state.getDisk().getVar() ) );
+    //        }
+    //        else
+    //        {
+    //            HostMetric hostMetric = ( HostMetric ) metrics;
+    //
+    //            result.append( getText( "<br>CPU model: %s", hostMetric.getCpuModel() ) );
+    //            result.append( getText( "<br>CPU core(s): %d", hostMetric.getCpuCore() ) );
+    //            result.append( getText( "<br>CPU load: %.2f", hostMetric.getUsedCpu() ) );
+    //            result.append( getText( "<br>Total RAM: %.3f Gb", hostMetric.getTotalRam() / 1024 / 1024 / 1024 ) );
+    //            result.append( getText( "<br>Available RAM: %.3f Gb", hostMetric.getAvailableRam() / 1024 / 1024 /
+    // 1024 ) );
+    //            result.append(
+    //                    getText( "<br>Available space: %.3f Gb", hostMetric.getAvailableSpace() / 1024 / 1024 /
+    // 1024 ) );
+    //
+    //            if ( hostMetric instanceof ResourceHostMetric )
+    //            {
+    //                result.append(
+    //                        getText( "<br>Container #: %d", ( ( ResourceHostMetric ) hostMetric )
+    // .getContainersCount() ) );
+    //            }
+    //        }
+    //        return result.toString();
+    //    }
 
 
-//    private String getText( final String format, final Object o )
-//    {
-//        if ( o != null )
-//        {
-//            return String.format( format, o );
-//        }
-//        else
-//        {
-//            return "";
-//        }
-//    }
+    //    private String getText( final String format, final Object o )
+    //    {
+    //        if ( o != null )
+    //        {
+    //            return String.format( format, o );
+    //        }
+    //        else
+    //        {
+    //            return "";
+    //        }
+    //    }
 
 
-//    private class MetricsUpdater implements Runnable
-//    {
-//        private final MonitorImpl monitor;
-//
-//
-//        public MetricsUpdater( final MonitorImpl monitor )
-//        {
-//            this.monitor = monitor;
-//        }
-//
-//
-//        @Override
-//        public void run()
-//        {
-//            LOG.debug( "Metrics updater started." );
-//            try
-//            {
-//
-//                HostMetric managementHostMetric =
-//                        monitor.fetchManagementHostMetric( peerManager.getLocalPeer().getManagementHost() );
-//
-//                monitor.updateHostMetric( managementHostMetric );
-//
-//                for ( ResourceHost resourceHost : peerManager.getLocalPeer().getResourceHosts() )
-//                {
-//                    ResourceHostMetric resourceHostMetric = monitor.fetchResourceHostMetric( resourceHost );
-//
-//                    monitor.updateHostMetric( resourceHostMetric );
-//                    for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
-//                    {
-//                        ContainerHostQuotaState hostMetric =
-//                                monitor.fetchContainerHostQuotaState( resourceHost, containerHost );
-//                        monitor.updateHostMetric( hostMetric );
-//                    }
-//                }
-//            }
-//            catch ( Exception e )
-//            {
-//                LOG.error( e.getMessage(), e );
-//            }
-//            LOG.debug( "Metrics updater finished." );
-//        }
-//    }
+    private class MetricsUpdater implements Runnable
+    {
+        private final MonitorImpl monitor;
+
+
+        public MetricsUpdater( final MonitorImpl monitor )
+        {
+            this.monitor = monitor;
+        }
+
+
+        @Override
+        public void run()
+        {
+            LOG.debug( "Metrics updater started." );
+            try
+            {
+                for ( ResourceHost resourceHost : peerManager.getLocalPeer().getResourceHosts() )
+                {
+                    ResourceHostMetric resourceHostMetric = monitor.fetchResourceHostMetric( resourceHost );
+
+                    monitor.updateHostMetric( resourceHostMetric );
+                }
+            }
+            catch ( Exception e )
+            {
+                LOG.error( e.getMessage(), e );
+            }
+            LOG.debug( "Metrics updater finished." );
+        }
+    }
+
+
+    @Override
+    public void onHeartbeat( final ResourceHostInfo resourceHostInfo, final Set<ResourceAlert> alerts )
+    {
+        if ( !"management".equals( resourceHostInfo.getHostname() ) )
+        {
+            ResourceHost host;
+            try
+            {
+                host = peerManager.getLocalPeer().getResourceHostByName( resourceHostInfo.getHostname() );
+            }
+            catch ( HostNotFoundException e )
+            {
+                final String description =
+                        String.format( "Resource host '%s' hot found. Id: %s", resourceHostInfo.getHostname(),
+                                resourceHostInfo.getId() );
+                CommonAlert commonAlert = new CommonAlert( new HostId( resourceHostInfo.getId() ), description );
+                putAlert( commonAlert );
+                //TODO: sign RH key with peer key including management host
+            }
+
+            for ( ResourceAlert resourceAlert : alerts )
+            {
+                putAlert( resourceAlert );
+            }
+
+
+            for ( ContainerHostInfo containerHostInfo : resourceHostInfo.getContainers() )
+            {
+                BaseMetric metric = new BaseMetric( peerManager.getLocalPeer().getId(), containerHostInfo );
+                metrics.put( containerHostInfo.getId(), metric );
+            }
+        }
+    }
 }

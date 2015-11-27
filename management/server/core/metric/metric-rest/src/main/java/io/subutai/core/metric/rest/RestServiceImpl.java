@@ -13,7 +13,9 @@ import com.google.common.base.Strings;
 
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentNotFoundException;
-import io.subutai.common.metric.ResourceHostMetric;
+import io.subutai.common.metric.ResourceAlert;
+import io.subutai.common.metric.ResourceHostMetrics;
+import io.subutai.common.metric.ResourceAlertValue;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.common.metric.ContainerHostMetric;
@@ -47,8 +49,8 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            Set<ResourceHostMetric> metrics = monitor.getResourceHostsMetrics();
-            return Response.ok( JsonUtil.toJson( metrics ) ).build();
+            ResourceHostMetrics metrics = monitor.getResourceHostMetrics();
+            return Response.ok( metrics ).build();
         }
         catch ( Exception e )
         {
@@ -94,17 +96,9 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response alert( final String alertMetric )
+    public Response alert( final ResourceAlert alert )
     {
-        try
-        {
-            monitor.alert( alertMetric );
-            return Response.accepted().build();
-        }
-        catch ( MonitorException e )
-        {
-            LOG.error( "Error in alert", e );
-            return Response.serverError().entity( e ).build();
-        }
+        monitor.putAlert( alert );
+        return Response.accepted().build();
     }
 }

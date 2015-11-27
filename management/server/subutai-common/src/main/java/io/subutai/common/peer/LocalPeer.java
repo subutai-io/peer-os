@@ -187,4 +187,6 @@ public interface LocalPeer extends Peer
     List<Template> getTemplates();
 
     Template getTemplateByName( String templateName );
+
+    ContainerHost findContainerById( ContainerId containerId );
 }

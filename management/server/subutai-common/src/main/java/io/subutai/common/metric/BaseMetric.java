@@ -1,19 +1,28 @@
 package io.subutai.common.metric;
 
 
+import io.subutai.common.host.HostInfo;
+
+
 /**
  * Base metrics
  */
-public abstract class BaseMetric
+public class BaseMetric
 {
     protected String peerId;
+    protected HostInfo hostInfo;
 
-    protected String hostId;
+
+    public BaseMetric()
+    {
+    }
 
 
-    abstract public void setHostName( String hostName );
-
-    abstract public String getHostName();
+    public BaseMetric( final String peerId, final HostInfo hostInfo )
+    {
+        this.peerId = peerId;
+        this.hostInfo = hostInfo;
+    }
 
 
     public String getPeerId()
@@ -22,20 +31,8 @@ public abstract class BaseMetric
     }
 
 
-    public void setPeerId( final String peerId )
+    public HostInfo getHostInfo()
     {
-        this.peerId = peerId;
-    }
-
-
-    public String getHostId()
-    {
-        return hostId;
-    }
-
-
-    public void setHostId( final String hostId )
-    {
-        this.hostId = hostId;
+        return hostInfo;
     }
 }

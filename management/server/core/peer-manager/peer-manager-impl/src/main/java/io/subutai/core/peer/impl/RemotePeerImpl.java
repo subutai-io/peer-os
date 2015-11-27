@@ -51,6 +51,7 @@ import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.MessageRequest;
 import io.subutai.common.peer.MessageResponse;
 import io.subutai.common.peer.Payload;
+import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.RecipientType;
@@ -589,8 +590,8 @@ public class RemotePeerImpl implements RemotePeer
             throw new CommandException( "Operation not allowed" );
         }
 
-        String environmentId = ( ( EnvironmentContainerHost ) host ).getEnvironmentId();
-        CommandRequest request = new CommandRequest( requestBuilder, host.getId(), environmentId );
+        EnvironmentId environmentId = ( ( EnvironmentContainerHost ) host ).getEnvironmentId();
+        CommandRequest request = new CommandRequest( requestBuilder, host.getId(), environmentId.getId() );
         //cache callback
         commandResponseListener.addCallback( request.getRequestId(), callback, requestBuilder.getTimeout(), semaphore );
 

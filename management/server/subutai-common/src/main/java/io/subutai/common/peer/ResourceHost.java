@@ -84,5 +84,5 @@ public interface ResourceHost extends Host, ResourceHostInfo
 
     void addContainerHost( ContainerHost host );
 
-    ResourceHostMetric getMetric();
+//    ResourceHostMetric getMetric();
 }

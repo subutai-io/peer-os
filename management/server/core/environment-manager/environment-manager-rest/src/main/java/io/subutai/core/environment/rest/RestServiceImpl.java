@@ -1,6 +1,8 @@
 package io.subutai.core.environment.rest;
 
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
@@ -9,6 +11,8 @@ import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -22,10 +26,12 @@ import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.settings.Common;
+import io.subutai.common.util.JsonUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
@@ -36,7 +42,7 @@ import io.subutai.core.registry.api.TemplateRegistry;
 public class RestServiceImpl implements RestService
 {
     private static final Logger LOG = LoggerFactory.getLogger( RestServiceImpl.class );
-
+    private static final String ERROR_KEY = "ERROR";
 
     private final EnvironmentManager environmentManager;
     private final PeerManager peerManager;
@@ -207,6 +213,44 @@ public class RestServiceImpl implements RestService
     public Response getDefaultDomainName()
     {
         return Response.ok( environmentManager.getDefaultDomainName() ).build();
+    }
+
+
+    @Override
+    public Response addEnvironmentDomain( String environmentId, String hostName, DomainLoadBalanceStrategy strategy,
+                                          Attachment attr )
+    {
+        if ( attr == null )
+        {
+            return Response.status( Response.Status.BAD_REQUEST ).build();
+        }
+
+        try
+        {
+            File file = new File( System.getProperty( "java.io.tmpdir" ) + "/" + environmentId );
+            file.createNewFile();
+            attr.transferTo( file );
+        }
+        catch ( IOException e )
+        {
+            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+        }
+
+        try
+        {
+            environmentManager.assignEnvironmentDomain( environmentId, hostName, strategy,
+                    System.getProperty( "java.io.tmpdir" ) + "/" + environmentId );
+        }
+        catch ( EnvironmentModificationException e )
+        {
+            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+        }
+        catch ( EnvironmentNotFoundException e )
+        {
+            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+        }
+
+        return Response.ok().build();
     }
 
 
@@ -551,7 +595,7 @@ public class RestServiceImpl implements RestService
             ContainerHostState state = containerHost.getStatus();
 
 
-            jsonSet.add( new ContainerDto( containerHost.getId(), containerHost.getEnvironmentId(),
+            jsonSet.add( new ContainerDto( containerHost.getId(), containerHost.getEnvironmentId().getId(),
                     containerHost.getHostname(), containerHost.getContainerType(), state,
                     containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp(),
                     containerHost.getTemplateName() ) );

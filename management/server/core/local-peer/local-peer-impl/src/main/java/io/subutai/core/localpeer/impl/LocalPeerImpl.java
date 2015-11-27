@@ -60,6 +60,7 @@ import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.Interface;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.ProcessResourceUsage;
+import io.subutai.common.metric.ResourceAlert;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.network.Gateway;
@@ -441,11 +442,20 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                         Common.WAIT_CONTAINER_CONNECTION_SEC );
 
 
-                //                ContainerHostEntity containerHostEntity = ( ContainerHostEntity ) hostInfo;
-                //                containerHostEntity.setEnvironmentId( request.getEnvironmentId() );
-                //                containerHostEntity.setOwnerId( request.getOwnerId() );
-                //                containerHostEntity.setInitiatorPeerId( request.getInitiatorPeerId() );
                 quotaManager.setQuota( new ContainerId( hostInfo.getId() ), containerQuota );
+
+                ContainerHostEntity containerHostEntity = new ContainerHostEntity( getId(), hostInfo );
+                containerHostEntity.setEnvironmentId( request.getEnvironmentId() );
+                containerHostEntity.setOwnerId( request.getOwnerId() );
+                containerHostEntity.setInitiatorPeerId( request.getInitiatorPeerId() );
+                containerHostEntity.setContainerType( request.getContainerType() );
+
+                //TODO: sign container host key with PEK
+                resourceHost.addContainerHost( containerHostEntity );
+
+                resourceHostDataService.saveOrUpdate( resourceHost );
+
+                quotaManager.setQuota( containerHostEntity.getContainerId(), containerQuota );
                 result.add( new HostInfoModel( hostInfo ) );
             }
             catch ( ResourceHostException | QuotaException e )
@@ -547,6 +557,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 containerHostEntity.setInitiatorPeerId( request.getInitiatorPeerId() );
                 containerHostEntity.setContainerType( request.getContainerType() );
 
+                //TODO: sign container host key with PEK
                 resourceHost.addContainerHost( containerHostEntity );
 
                 resourceHostDataService.saveOrUpdate( resourceHost );
@@ -652,6 +663,29 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         for ( ResourceHost resourceHost : resourceHosts )
         {
             result.addAll( resourceHost.getContainerHostsByEnvironmentId( environmentId ) );
+        }
+        return result;
+    }
+
+
+    @Override
+    public ContainerHost findContainerById( final ContainerId containerId )
+    {
+        Preconditions.checkNotNull( containerId, "Invalid container id" );
+        Preconditions.checkNotNull( containerId.getId(), "Invalid container id" );
+
+        ContainerHost result = null;
+        for ( ResourceHost resourceHost : resourceHosts )
+        {
+            try
+            {
+                result = resourceHost.getContainerHostById( containerId.getId() );
+                break;
+            }
+            catch ( HostNotFoundException ignore )
+            {
+                // ignore
+            }
         }
         return result;
     }
@@ -1141,7 +1175,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public void onHeartbeat( final ResourceHostInfo resourceHostInfo )
+    public void onHeartbeat( final ResourceHostInfo resourceHostInfo, Set<ResourceAlert> alerts )
     {
         LOG.debug( "On heartbeat: " + resourceHostInfo.getHostname() );
         if ( initialized )
@@ -1720,20 +1754,22 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public ResourceHostMetrics getResourceHostMetrics()
     {
-        ResourceHostMetrics result = new ResourceHostMetrics();
+        //        ResourceHostMetrics result = new ResourceHostMetrics();
+        //
+        //        for ( ResourceHost resourceHost : getResourceHosts() )
+        //        {
+        //            try
+        //            {
+        //                result.addMetric( resourceHost.getMetric() );
+        //            }
+        //            catch ( Exception e )
+        //            {
+        //                LOG.warn( e.getMessage() );
+        //            }
+        //        }
 
-        for ( ResourceHost resourceHost : getResourceHosts() )
-        {
-            try
-            {
-                result.addMetric( resourceHost.getMetric() );
-            }
-            catch ( Exception e )
-            {
-                LOG.warn( e.getMessage() );
-            }
-        }
-        return result;
+        return monitor.getResourceHostMetrics();
+        //        return result;
     }
 
 

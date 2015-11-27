@@ -15,4 +15,6 @@ public interface ResourceHostInfo extends HostInfo
     public Set<ContainerHostInfo> getContainers();
 
     public InstanceType getInstanceType();
+
+
 }

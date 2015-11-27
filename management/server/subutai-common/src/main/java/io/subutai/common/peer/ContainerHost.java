@@ -23,7 +23,7 @@ public interface ContainerHost extends Host, ContainerHostInfo
 
     String getOwnerId();
 
-    String getEnvironmentId();
+    EnvironmentId getEnvironmentId();
 
     String getNodeGroupName();
 

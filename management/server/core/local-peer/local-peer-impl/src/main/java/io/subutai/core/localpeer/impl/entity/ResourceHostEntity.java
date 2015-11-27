@@ -559,32 +559,32 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
-    @Override
-    public ResourceHostMetric getMetric()
-    {
-        ResourceHostMetric result = null;
-        try
-        {
-            RequestBuilder requestBuilder = new RequestBuilder( String.format( "subutai stats system %s", hostname ) );
-            CommandResult commandResult = execute( requestBuilder );
-            if ( commandResult.hasSucceeded() )
-            {
-                result = JsonUtil.fromJson( commandResult.getStdOut(), ResourceHostMetric.class );
-                result.setPeerId( peerId );
-                result.setHostId( hostId );
-                result.setHostName( hostname );
-                result.setContainersCount( getContainers().size() );
-            }
-            else
-            {
-                LOG.warn( String.format( "Error getting %s metrics", hostname ) );
-            }
-        }
-        catch ( CommandException | JsonSyntaxException e )
-        {
-            LOG.error( e.getMessage(), e );
-        }
-
-        return result;
-    }
+//    @Override
+//    public ResourceHostMetric getMetric()
+//    {
+//        ResourceHostMetric result = null;
+//        try
+//        {
+//            RequestBuilder requestBuilder = new RequestBuilder( String.format( "subutai stats system %s", hostname ) );
+//            CommandResult commandResult = execute( requestBuilder );
+//            if ( commandResult.hasSucceeded() )
+//            {
+//                result = JsonUtil.fromJson( commandResult.getStdOut(), ResourceHostMetric.class );
+//                result.setPeerId( peerId );
+//                result.setHostId( hostId );
+//                result.setHostName( hostname );
+//                result.setContainersCount( getContainers().size() );
+//            }
+//            else
+//            {
+//                LOG.warn( String.format( "Error getting %s metrics", hostname ) );
+//            }
+//        }
+//        catch ( CommandException | JsonSyntaxException e )
+//        {
+//            LOG.error( e.getMessage(), e );
+//        }
+//
+//        return result;
+//    }
 }

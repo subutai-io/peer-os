@@ -8,6 +8,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import io.subutai.common.metric.Alert;
 import io.subutai.core.metric.api.MonitorException;
 
 import io.subutai.common.peer.Payload;
@@ -28,7 +30,7 @@ public class RemoteAlertListenerTest
     @Mock
     Payload payload;
     @Mock
-    ContainerHostMetricImpl metric;
+    Alert alert;
 
 
     RemoteAlertListener remoteAlertListener;
@@ -44,15 +46,15 @@ public class RemoteAlertListenerTest
     @Test
     public void testOnMessage() throws Exception
     {
-        when( payload.getMessage( ContainerHostMetricImpl.class ) ).thenReturn( metric );
+        when( payload.getMessage( Alert.class ) ).thenReturn( alert );
 
         remoteAlertListener.onRequest( payload );
 
-        verify( monitor ).notifyOnAlert( metric );
+        verify( monitor ).notifyOnAlert( alert );
 
         MonitorException exception = mock( MonitorException.class );
 
-        doThrow( exception ).when( monitor ).notifyOnAlert( metric );
+        doThrow( exception ).when( monitor ).notifyOnAlert( alert );
 
         remoteAlertListener.onRequest( payload );
 

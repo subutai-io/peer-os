@@ -799,7 +799,7 @@ public class RestServiceImpl implements RestService
 
             Interface iface = containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE );
 
-            jsonSet.add( new ContainerJson( containerHost.getId(), containerHost.getEnvironmentId(),
+            jsonSet.add( new ContainerJson( containerHost.getId(), containerHost.getEnvironmentId().getId(),
                     containerHost.getHostname(), state,
                     iface.getIp(),
                     containerHost.getTemplateName(), ContainerType.valueOf( types[ (int)(Math.random() * types.length) ] ) ) );
