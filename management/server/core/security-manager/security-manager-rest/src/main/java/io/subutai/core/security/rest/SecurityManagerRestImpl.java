@@ -160,6 +160,7 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
         KeyIdentityDTO keyIdentityDTO = new KeyIdentityDTO( keyManager.getKeyTrustTree( hostId ) );
         keyIdentityDTO.setChild( false );
         keyIdentityDTO.setTrustLevel( KeyTrustLevel.Ultimate.getId() );
+        keyIdentityDTO.setParentId( keyIdentityDTO.getHostId() );
 
         resetTrustLevels( keyIdentityDTO, keyManager );
 
@@ -172,6 +173,7 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
     {
         for ( final KeyIdentityDTO identityDTO : keyIdentityDTO.getTrusts() )
         {
+            identityDTO.setParentId( keyIdentityDTO.getHostId() );
             identityDTO.setChild( true );
             identityDTO
                     .setTrustLevel( keyManager.getTrustLevel( keyIdentityDTO.getHostId(), identityDTO.getHostId() ) );

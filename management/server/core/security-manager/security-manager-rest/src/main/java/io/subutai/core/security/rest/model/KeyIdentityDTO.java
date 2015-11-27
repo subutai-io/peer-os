@@ -22,6 +22,7 @@ public class KeyIdentityDTO implements SecurityKeyIdentity
     private boolean child;
     private int trustLevel;
     private List<KeyIdentityDTO> trustedKeys = Lists.newArrayList();
+    private String parentId;
 
 
     public KeyIdentityDTO( SecurityKeyIdentity securityKeyIdentity )
@@ -35,6 +36,18 @@ public class KeyIdentityDTO implements SecurityKeyIdentity
         {
             this.trustedKeys.add( new KeyIdentityDTO( keyIdentity ) );
         }
+    }
+
+
+    public String getParentId()
+    {
+        return parentId;
+    }
+
+
+    public void setParentId( final String parentId )
+    {
+        this.parentId = parentId;
     }
 
 

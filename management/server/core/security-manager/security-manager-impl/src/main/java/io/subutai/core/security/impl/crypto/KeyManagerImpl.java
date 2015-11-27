@@ -969,7 +969,7 @@ public class KeyManagerImpl implements KeyManager
                 }
             }
         }
-        return KeyTrustLevel.NO_TRUST.getId();
+        return KeyTrustLevel.Never.getId();
     }
 
 
