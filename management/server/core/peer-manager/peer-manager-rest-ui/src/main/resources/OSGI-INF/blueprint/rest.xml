@@ -11,14 +11,18 @@
     </cxf:features>
   </cxf:bus>
 
-    <reference id="peerManager" availability="mandatory"
-               interface="io.subutai.core.peer.api.PeerManager" />
+  <reference id="peerManager" availability="mandatory"
+             interface="io.subutai.core.peer.api.PeerManager" />
 
-    <bean id="peerRestUIServiceImpl" class="io.subutai.core.peer.rest.ui.RestServiceImpl">
-        <argument ref="peerManager" />
-    </bean>
+  <reference id="hostRegistry" availability="mandatory"
+             interface="io.subutai.core.hostregistry.api.HostRegistry" />
 
-  <jaxrs:server address="/peer_ui" id="peerRestUIService">
+  <bean id="peerRestUIServiceImpl" class="io.subutai.core.peer.rest.ui.RestServiceImpl">
+    <argument ref="peerManager" />
+    <argument ref="hostRegistry" />
+  </bean>
+
+  <jaxrs:server address="/ui/peers" id="peerRestUIService">
     <jaxrs:serviceBeans>
       <ref component-id="peerRestUIServiceImpl" />
     </jaxrs:serviceBeans>

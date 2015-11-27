@@ -3,16 +3,18 @@ package io.subutai.core.localpeer.impl.container;
 
 import java.util.concurrent.Callable;
 
+import io.subutai.common.host.HostInfo;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.NumUtil;
 import io.subutai.common.peer.ResourceHost;
+import io.subutai.core.hostregistry.api.HostRegistry;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 
-public class CreateContainerWrapperTask implements Callable<ContainerHost>
+public class CreateContainerWrapperTask implements Callable<CreateContainerWrapperTask>
 {
     private final ResourceHost resourceHost;
     private final String templateName;
@@ -21,11 +23,12 @@ public class CreateContainerWrapperTask implements Callable<ContainerHost>
     private final int vlan;
     private final String gateway;
     private final int timeoutSec;
+    private HostInfo hostInfo;
 
 
     public CreateContainerWrapperTask( final ResourceHost resourceHost, final String templateName,
-                                       final String hostname, final String ip,
-                                       final int vlan, final String gateway, final int timeoutSec )
+                                       final String hostname, final String ip, final int vlan, final String gateway,
+                                       final int timeoutSec )
     {
         Preconditions.checkNotNull( resourceHost );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ) );
@@ -46,8 +49,21 @@ public class CreateContainerWrapperTask implements Callable<ContainerHost>
 
 
     @Override
-    public ContainerHost call() throws Exception
+    public CreateContainerWrapperTask call() throws Exception
     {
-        return resourceHost.createContainer( templateName, hostname, ip, vlan, gateway, timeoutSec );
+        this.hostInfo = resourceHost.createContainer( templateName, hostname, ip, vlan, gateway, timeoutSec );
+        return this;
+    }
+
+
+    public ResourceHost getResourceHost()
+    {
+        return resourceHost;
+    }
+
+
+    public HostInfo getHostInfo()
+    {
+        return hostInfo;
     }
 }

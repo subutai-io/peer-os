@@ -267,6 +267,8 @@ public class BrokerImpl implements Broker
             amqFactory = new ActiveMQConnectionFactory( VM_BROKER_URL );
             //tune connection factory
             amqFactory.setWatchTopicAdvisories( false );
+            amqFactory.setOptimizeAcknowledge( true );
+            amqFactory.setAlwaysSessionAsync( true );
             amqFactory.setCheckForDuplicates( true );
             amqFactory.setUseAsyncSend( true );
         }
@@ -326,7 +328,7 @@ public class BrokerImpl implements Broker
          * timestamps. Besides, it overides the zero-TTL specified by the producers
          */
         TimeStampingBrokerPlugin tsbp = getTimeStampingBrokerPlugin();
-        tsbp.setZeroExpirationOverride( 200000 );
+        tsbp.setZeroExpirationOverride( 300000 );
 
         tsbp.installPlugin( getBroker().getBroker() );
         tsbp.start();
@@ -367,8 +369,8 @@ public class BrokerImpl implements Broker
         std_entry.setOptimizedDispatch( true );
         stream_entry.setOptimizedDispatch( true );
 
-        final long EXPIRE_MSG_PERIOD = 200000; //200 seconds
-        final long STREAM_EXPIRE_MSG_PERIOD = 3000; //3 seconds
+        final long EXPIRE_MSG_PERIOD = 300000; //200 seconds
+        final long STREAM_EXPIRE_MSG_PERIOD = 10000; //3 seconds
 
             /* Sets the strategy to calculate the maximum number of messages that are allowed
              * to be pending on consumers (in addition to their prefetch sizes).
@@ -435,7 +437,7 @@ public class BrokerImpl implements Broker
                 tempLimit = 1024L * 1024L,
                 storeLimit = 1024L * 1024L;
 
-        memLimit *= 64;
+        memLimit *= 512;
         tempLimit *= 10000;
         storeLimit *= 50000;
 
@@ -479,7 +481,7 @@ public class BrokerImpl implements Broker
                 Connection connection = getConnectionFactory().createConnection();
                 connection.setClientID( String.format( "%s-subutai-client", topic.name() ) );
                 connection.start();
-                Session session = connection.createSession( false, Session.CLIENT_ACKNOWLEDGE );
+                Session session = connection.createSession( false, Session.AUTO_ACKNOWLEDGE );
                 javax.jms.Topic topicDestination = session.createTopic( topic.name() );
                 TopicSubscriber topicSubscriber = session.createDurableSubscriber( topicDestination,
                         String.format( "%s-subutai-subscriber", topic.name() ) );

@@ -1,6 +1,3 @@
-/**
- * Created by ubuntu on 5/14/15.
- */
 'use strict';
 
 angular.module('subutai.tracker.service', [])
@@ -9,29 +6,31 @@ angular.module('subutai.tracker.service', [])
 trackerSrv.$inject = ['$http'];
 
 function trackerSrv($http) {
-	var baseURL = serverUrl + 'tracker_ui/';
-	var operationsURL = baseURL + 'operations/';
-	var modulesURL = operationsURL + 'sources';
+	var BASE_URL = SERVER_URL + 'rest/ui/tracker/';
+	var OPERATIONS_URL = BASE_URL + 'operations/';
+	var SOURCES_URL = OPERATIONS_URL + 'sources';
 
 	var trackerSrv = {
 		getModules: getModules,
 		getOperations: getOperations,
-		getOperation: getOperation
+		getOperation: getOperation,
+
+		getBaseUrl : function() { return BASE_URL; }
 	};
 
 	return trackerSrv;
 
 	function getModules() {
-		return $http.get(modulesURL, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
+		return $http.get(SOURCES_URL, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
 	}
 
 	function getOperations(module, dateFrom, dateTo, limit) {
-		var $url = operationsURL + module + '/' + dateFrom + '/' + dateTo + '/' + limit;
+		var $url = OPERATIONS_URL + module + '/' + dateFrom + '/' + dateTo + '/' + limit;
 		return $http.get($url, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
 	}
 
 	function getOperation(module, id) {
-		var $url = operationsURL + module + '/' + id;
+		var $url = OPERATIONS_URL + module + '/' + id;
 		return $http.get($url, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
 	}	
 

@@ -10,7 +10,7 @@
 			<table class="b-main-table b-main-table_with-header">
 				<tr>
 					<th>Peer</th>
-					<th>Resource host</th>
+					<th class="b-main-table__capitalize">{{ blueprintsBuildCtrl.buildWith }}</th>
 					<th>Node groups</th>
 					<th></th>
 				</tr>
@@ -41,7 +41,10 @@
 		</div>
 	</div>
 	<div class="b-popup__footer">
-		<button class="b-btn b-btn_green g-right" ng-click="blueprintsBuildCtrl.start()">
+		<button 
+		class="b-btn b-btn_green g-right" 
+		ng-click="blueprintsBuildCtrl.start()" 
+		id="subt_button__environment-build">
 			{{ blueprintsBuildCtrl.blueprintAction }}
 		</button>
 

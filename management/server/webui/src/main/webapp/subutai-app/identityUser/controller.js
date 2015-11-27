@@ -54,7 +54,7 @@ function IdentityUserCtrl($scope, identitySrv, DTOptionsBuilder, DTColumnBuilder
 	vm.users = {};
 	vm.dtOptions = DTOptionsBuilder
 		.fromFnPromise(function() {
-			return $resource( serverUrl + 'identity_ui/').query().$promise;
+			return $resource( identitySrv.getUsersUrl() ).query().$promise;
 		})
 		.withPaginationType('full_numbers')
 		.withOption('createdRow', createdRow)
