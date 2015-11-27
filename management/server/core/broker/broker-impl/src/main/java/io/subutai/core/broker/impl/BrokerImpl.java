@@ -268,7 +268,7 @@ public class BrokerImpl implements Broker
             //tune connection factory
             amqFactory.setWatchTopicAdvisories( false );
             amqFactory.setOptimizeAcknowledge( true );
-            amqFactory.setAlwaysSessionAsync( true );
+            amqFactory.setAlwaysSessionAsync( false );
             amqFactory.setCheckForDuplicates( true );
             amqFactory.setUseAsyncSend( true );
         }
@@ -369,8 +369,8 @@ public class BrokerImpl implements Broker
         std_entry.setOptimizedDispatch( true );
         stream_entry.setOptimizedDispatch( true );
 
-        final long EXPIRE_MSG_PERIOD = 300000; //200 seconds
-        final long STREAM_EXPIRE_MSG_PERIOD = 10000; //3 seconds
+        final long EXPIRE_MSG_PERIOD = 200000; //200 seconds
+        final long STREAM_EXPIRE_MSG_PERIOD = 5000; //5 seconds
 
             /* Sets the strategy to calculate the maximum number of messages that are allowed
              * to be pending on consumers (in addition to their prefetch sizes).
@@ -437,7 +437,7 @@ public class BrokerImpl implements Broker
                 tempLimit = 1024L * 1024L,
                 storeLimit = 1024L * 1024L;
 
-        memLimit *= 512;
+        memLimit *= 1024;
         tempLimit *= 10000;
         storeLimit *= 50000;
 

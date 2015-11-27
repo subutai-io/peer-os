@@ -33,7 +33,6 @@ import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.ManagementHost;
 import io.subutai.common.peer.ResourceHost;
-import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.protocol.PlacementStrategy;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.broker.api.Broker;
@@ -234,11 +233,11 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
         registrationRequest.setStatus( RegistrationStatus.APPROVED );
         requestDataService.update( registrationRequest );
 
+        //todo sign RH key with Peer Key
         importHostPublicKey( registrationRequest.getId(), registrationRequest.getPublicKey() );
 
         importHostSslCert( registrationRequest.getId(), registrationRequest.getCert() );
 
-        //TODO move the rest of code to separate function where approval process done selectively
         for ( final ContainerInfo containerInfo : registrationRequest.getHostInfos() )
         {
             importHostPublicKey( containerInfo.getId(), containerInfo.getPublicKey() );
@@ -361,6 +360,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
                 String gateway = cidr.getInfo().getLowAddress();
                 for ( final Set<HostInfo> infos : classification.values() )
                 {
+                    //TODO: sign CH key with PEK (identified by LocalPeerId+environment.getId())
                     for ( final HostInfo hostInfo : infos )
                     {
                         ContainerInfoImpl containerInfo = containerInfoDataService.find( hostInfo.getId() );
@@ -513,37 +513,5 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
             throw new NodeRegistrationException( "Failed to store container pubkey", ex );
         }
         return containerToken;
-    }
-
-
-    //TODO in future user could import his containers selectively
-    @Override
-    public void importEnvironment( final Environment environment, final List<ContainerHost> containerHosts )
-            throws NodeRegistrationException
-    {
-        /**
-         * steps to perform for fully functional environment and compliance work with the rest of the system
-         * 1. setupN2n
-         * 2. add environment peers
-         * 3. create key pair
-         * 4. find free vni
-         * 5. reserve vni
-         * 6. set vni
-         */
-
-        //        networkManager.setupN2NConnection( peerManager.getLocalPeer(). );
-        //step 1
-        List<N2NConfig> tunnels =
-                Lists.newArrayList();//setupN2NConnection( Sets.newHashSet((Peer)peerManager.getLocalPeer()) );
-
-        for ( N2NConfig config : tunnels )
-        {
-            //            final PeerConf p = new PeerConfImpl();
-            //            p.setN2NConfig( config );
-            //            environment.addEnvironmentPeer( p );
-        }
-
-        //step 2
-
     }
 }
