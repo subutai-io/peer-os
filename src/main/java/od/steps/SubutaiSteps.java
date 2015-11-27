@@ -452,7 +452,7 @@ public class SubutaiSteps extends ScenarioSteps {
     @Step
     public void selectMenuResourceHost(){
         subutaiPage.selectMenuResourceHost.click();
-        subutaiPage.selectMenuResourceHost.selectByIndex(1);
+        subutaiPage.selectMenuResourceHost.selectByIndex(2);
         subutaiPage.selectMenuResourceHost.sendKeys(Keys.ENTER);
     }
 
@@ -532,4 +532,8 @@ public class SubutaiSteps extends ScenarioSteps {
         subutaiPage.selectEnvironmentConsole.sendKeys(Keys.ENTER);
     }
 
+    @Step
+    public void waitHeaderBlueprintDeleted() {
+        subutaiPage.waitHeaderBlueprintDeleted();
+    }
 }

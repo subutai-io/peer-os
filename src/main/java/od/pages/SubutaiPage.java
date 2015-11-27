@@ -70,7 +70,7 @@ public class SubutaiPage extends PageObject {
     @FindBy(className = "b-popup-box-node-list subt_button__blueprint-node-list-item ng-binding ng-scope")
     public WebElementFacade nodeListItem;
 
-    @FindBy(xpath = "*//td[@class=\"b-main-table__controls\"]//a[@class=\"b-icon b-icon_build\"]")
+    @FindBy(xpath = "*//td[@class=\"b-main-table__controls\"]//a[@tooltip-title=\"Build\"]")
     public WebElementFacade iconBuild;
 
     @FindBy(xpath = "*//td[@class=\"ng-binding\"]")
@@ -82,7 +82,7 @@ public class SubutaiPage extends PageObject {
     @FindBy(ngModel = "nodeGroup.peer")
     public WebElementFacade selectPeer;
 
-    @FindBy(ngModel = "nodeGroup.strategyId")
+    @FindBy(ngModel = "nodeGroup.createOption")
     public WebElementFacade selectStrategie;
 
     @FindBy(xpath = "*//span[@class=\"b-icon__inner-num ng-binding\" and contains(text(), \"2\")]")
@@ -106,7 +106,7 @@ public class SubutaiPage extends PageObject {
     @FindBy(xpath = "*//div[@class=\"sweet-alert showSweetAlert visible\"]//p[contains(text(), \"Your environment has been created.\")]")
     public WebElementFacade textYourEnvironmentHasBeenCreated;
 
-    @FindBy(xpath = "*//td[@class=\"b-main-table__controls\"]//a[@class=\"b-icon b-icon_grow\"]")
+    @FindBy(xpath = "*//td[@class=\"b-main-table__controls\"]//a[@tooltip-title=\"Grow\"]")
     public WebElementFacade iconGrow;
 
     @FindBy(xpath = "*//td[@class=\"b-main-table__controls\"]//a[@class=\"b-icon b-icon_remove\"]")
@@ -127,7 +127,7 @@ public class SubutaiPage extends PageObject {
     @FindBy(xpath = "*//div[@class=\"sweet-alert showSweetAlert visible\"]//button[@class=\"confirm\"]")
     public WebElementFacade buttonDeleteConfirm;
 
-    @FindBy(xpath = "*//div[@class=\"sweet-alert showSweetAlert visible\"]//h2[contains(text(), \"Deleted!\")]")
+    @FindBy(xpath = "*//div[@class=\"sweet-alert showSweetAlert visible\"]//h2[contains(text(), \"Deleted\")]")
     public WebElementFacade headerBlueprintDeleted;
 
     @FindBy(xpath = "*//div[@class=\"sweet-alert showSweetAlert visible\"]//p[contains(text(), \"Your environment start deleting!\")]")
@@ -240,6 +240,10 @@ public class SubutaiPage extends PageObject {
 
     public void waitTextUnregistered(){
         waitFor(textUnregistered);
+    }
+
+    public void waitHeaderBlueprintDeleted(){
+        waitFor(headerBlueprintDeleted);
     }
 
     public void executeConsoleCommand(String command){
