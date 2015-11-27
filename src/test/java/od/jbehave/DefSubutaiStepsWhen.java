@@ -248,4 +248,43 @@ public class DefSubutaiStepsWhen {
     public void execute_console_command_pid(){
         subutaiSteps.executeConsoleCommand("ps -ef | grep " + subutaiSteps.getPIDContainer());
     }
+
+    //------------ 3023
+
+    @When("the user click on console link")
+    public void click_on_console_link(){
+        subutaiSteps.clickOnLinkConsole();
+    }
+
+    @When("the user enter a command '$caommand' to Command field and press enter")
+    public void enter_command_into_console(String command){
+        subutaiSteps.seeRHCommandLine();
+        subutaiSteps.clickOnConsole();
+        subutaiSteps.inputCommandIntoConsole(command);
+    }
+
+    @When("the user click on link: environment on the console page")
+    public void klick_on_environment_link_on_console_page(){
+        subutaiSteps.pageConsoleClickOnEnvironmentLink();
+    }
+
+    @When("the user select '$environment' environment in select menu")
+    public void select_environment_in_select_menu(String environment){
+        subutaiSteps.selectEnvironmentInSelectMenu(environment);
+    }
+
+    @When("the user select container in select menu")
+    public void user_select_container_in_select_menu(){
+        subutaiSteps.selectContainerInSelectMenu();
+    }
+
+    @When("the user get resource host ID and go pgp key url")
+    public void user_get_rh_id_and_go_to_pgp_url() throws FileNotFoundException {
+        subutaiSteps.resourceHostPGPKey();
+    }
+
+    @When("the user get container ID and go pgp key url")
+    public void user_get_container_id_and_go_to_pgp_url() throws FileNotFoundException {
+        subutaiSteps.resourceHostPGPKey();
+    }
 }

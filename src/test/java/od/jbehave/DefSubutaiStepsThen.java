@@ -179,4 +179,28 @@ public class DefSubutaiStepsThen {
     public void get_all_data(){
         subutaiSteps.getAllData();
     }
+
+    //------3023
+
+
+    @Then("the user observe console module UI with select menu of available resource hosts")
+    public void see_console_and_select_menu_resource_hosts(){
+        subutaiSteps.seeConsole();
+        subutaiSteps.seeSelectMenuResourceHosts();
+    }
+
+    @Then("the user should observe output of the command")
+    public void see_output_of_the_test_command(){
+        subutaiSteps.seeOutputOfTestCommand();
+    }
+
+    @Then("the user should observe public Key of the resource host in GPG Armored text")
+    public void see_resource_host_pgp_header(){
+        subutaiSteps.seePGP();
+    }
+
+    @Then("the user should observe public Key of the container in GPG Armored text")
+    public void see_container_pgp_header(){
+        subutaiSteps.seePGP();
+    }
 }

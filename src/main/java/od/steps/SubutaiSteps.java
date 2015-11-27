@@ -296,6 +296,7 @@ public class SubutaiSteps extends ScenarioSteps {
 
     @Step
     public void clickOnIconDestroy(){
+        waitABit(2000);
         subutaiPage.iconDestroy.click();
     }
 
@@ -489,6 +490,100 @@ public class SubutaiSteps extends ScenarioSteps {
     @Step
     public void getAllData(){
         subutaiPage.getAllData("upstart-udev-bridge --daemon");
+    }
+
+    //--------------3023
+
+    @Step
+    public void clickOnLinkConsole(){
+        subutaiPage.subutaiLinkConsole.click();
+    }
+
+    @Step
+    public void seeConsole(){
+        assertThat(subutaiPage.subuaiConsole.isVisible(), is(true));
+    }
+
+    @Step
+    public void seeSelectMenuResourceHosts(){
+        assertThat(subutaiPage.selectMenuResourceHost.isVisible(), is(true));
+    }
+
+    @Step
+    public void clickOnSelectMenuResourceHosts(){
+        subutaiPage.selectMenuResourceHost.click();
+    }
+
+    @Step
+    public void clickOnOptionOfSelectMenuResourceHosts(){
+        assertThat(subutaiPage.selectMenuResourceHostsOptionRH.isVisible(), is(true));
+        subutaiPage.selectMenuResourceHost.selectByIndex(1);
+        subutaiPage.selectMenuResourceHost.sendKeys(Keys.ENTER);
+    }
+
+    @Step
+    public void inputCommandIntoConsole(String command){
+        waitABit(5000);
+        subutaiPage.executeConsoleCommand(command);
+    }
+
+    @Step
+    public void seeOutputOfTestCommand(){
+        assertThat(subutaiPage.outputOfTestCommand.isVisible(), is(true));
+    }
+
+    @Step
+    public void seeHeaderBlueprint(){
+        assertThat(subutaiPage.subutaiBlueprintHeader.isVisible(), is(true));
+    }
+
+    @Step
+    public void clickOnConsole(){
+        subutaiPage.endOfConsoleLine.click();
+    }
+
+    @Step
+    public void seeRHCommandLine(){
+        assertThat(subutaiPage.endOfConsoleLine.isVisible(), is(true));
+    }
+
+    @Step
+    public void pageConsoleClickOnEnvironmentLink(){
+        subutaiPage.pageConsoleLinkEnvironment.click();
+    }
+
+    @Step
+    public void selectEnvironmentInSelectMenu(String environment){
+        assertThat(subutaiPage.environmentSelectMenu.isVisible(), is(true));
+        subutaiPage.environmentSelectMenu.click();
+        subutaiPage.environmentSelectMenu.selectByVisibleText(environment);
+        subutaiPage.environmentSelectMenu.sendKeys(Keys.ENTER);
+    }
+
+    @Step
+    public void selectContainerInSelectMenu(){
+        assertThat(subutaiPage.selectMenuContainer.isVisible(), is(true));
+        subutaiPage.selectMenuContainer.selectByIndex(1);
+        subutaiPage.selectMenuContainer.sendKeys(Keys.ENTER);
+    }
+
+    @Step
+    public void resourceHostPGPKey() throws FileNotFoundException {
+        waitABit(5000);
+        String s = subutaiPage.terminalPromptBinding.getText();
+        int rStart = 0;
+        int rEnd = s.length() - 4 ;
+        String result = s.substring(rStart, rEnd);
+
+
+        subutaiPage.setDefaultBaseUrl("https://" + ReaderFromFile.readDataFromFile("src/test/resources/parameters/mng_h1") + ":8443/rest/v1/security/keyman/getpublickeyring?hostId=" + result );
+        subutaiPage.open();
+        waitABit(10000);
+    }
+
+    @Step
+    public void seePGP(){
+        assertThat(subutaiPage.pgpHeader.isVisible(), is(true));
     }
 
 

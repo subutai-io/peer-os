@@ -39,4 +39,11 @@ public class DefSubutaiStepsGiven {
     public void click_button_login(){
         subutaiSteps.clickOnButtonLogin();
     }
+
+    //-------3023
+
+    @Given("the user should observe blueprint header")
+    public void see_blueprint_header(){
+        subutaiSteps.seeHeaderBlueprint();
+    }
 }

@@ -70,7 +70,7 @@ public class SubutaiPage extends PageObject {
     @FindBy(className = "b-popup-box-node-list subt_button__blueprint-node-list-item ng-binding ng-scope")
     public WebElementFacade nodeListItem;
 
-    @FindBy(xpath = "*//td[@class=\"b-main-table__controls\"]//a[@class=\"b-icon b-icon_build\"]")
+    @FindBy(xpath = "*//td[@class=\"b-main-table__controls\"]//a[@class=\"b-icon b-icon_build ng-isolate-scope\"]")
     public WebElementFacade iconBuild;
 
     @FindBy(xpath = "*//td[@class=\"ng-binding\"]")
@@ -82,7 +82,7 @@ public class SubutaiPage extends PageObject {
     @FindBy(ngModel = "nodeGroup.peer")
     public WebElementFacade selectPeer;
 
-    @FindBy(ngModel = "nodeGroup.strategyId")
+    @FindBy(ngModel = "nodeGroup.createOption")
     public WebElementFacade selectStrategie;
 
     @FindBy(xpath = "*//span[@class=\"b-icon__inner-num ng-binding\" and contains(text(), \"2\")]")
@@ -276,5 +276,50 @@ public class SubutaiPage extends PageObject {
         String text = element("*//div[@class=\"terminal-results\"]//pre[@class=\"terminal-line\" and contains(text(), \"" + phrase + "\")]").getText();
         System.out.println(text);
     }
+
+    //------3023
+
+    @FindBy(id = "subt-link__console")
+    public WebElementFacade subutaiLinkConsole;
+
+    @FindBy(xpath = "*//section[@class=\"terminal modern-terminal\"]")
+    public WebElementFacade subuaiConsole;
+
+    @FindBy(ngModel = "commandLine")
+    public WebElementFacade inputConsole;
+
+    @FindBy(xpath = "*//option[contains(text(),\"rh\")]")
+    public WebElementFacade selectMenuResourceHostsOptionRH;
+
+    @FindBy(className = "terminal-input ng-binding")
+    public WebElementFacade consoleInput;
+
+    @FindBy(xpath = "*//pre[contains(text(),\"test\")]")
+    public WebElementFacade outputOfTestCommand;
+
+    @FindBy(xpath = "*//h1[contains(text(),\"Blueprint\")]")
+    public WebElementFacade subutaiBlueprintHeader;
+
+    @FindBy(xpath = "*//span[contains(text(),\":>\")]")
+    public WebElementFacade endOfConsoleLine;
+
+    @FindBy(xpath = "*//li[contains(text(),\"Environment\")]")
+    public WebElementFacade pageConsoleLinkEnvironment;
+
+    @FindBy(ngModel = "selectedEnvironment")
+    public WebElementFacade environmentSelectMenu;
+
+    @FindBy(ngModel = "selectedContainer")
+    public WebElementFacade selectMenuContainer;
+
+    @FindBy(xpath = "*//span[@class=\"terminal-prompt ng-binding\"]")
+    public WebElementFacade terminalPromptBinding;
+
+    @FindBy(xpath = "xhtml:html/xhtml:body/xhtml:pre[contains(text(),\"-----BEGIN PGP PUBLIC KEY BLOCK-----\")]")
+    public WebElementFacade pgpHeader;
+
+
+
+
 
 }
