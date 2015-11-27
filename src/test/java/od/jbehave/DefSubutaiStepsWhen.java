@@ -248,4 +248,36 @@ public class DefSubutaiStepsWhen {
     public void execute_console_command_pid(){
         subutaiSteps.executeConsoleCommand("ps -ef | grep " + subutaiSteps.getPIDContainer());
     }
+
+    @When("the user click on the button: Environment")
+    public void click_on_button_environment(){
+        subutaiSteps.clickOnButtonEnvironmentOnConsole();
+    }
+
+    @When("the user select current environment")
+    public void select_current_environment(){
+        subutaiSteps.selectEnvironmentConsole();
+    }
+
+    @When("the user select first container")
+    public void select_container(){
+        subutaiSteps.selectContainer();
+    }
+
+    @When("the user click on the button: Peer")
+    public void click_button_Peer(){
+        subutaiSteps.clickButtonPeerConsole();
+    }
+
+    @When("the user select again one resource host")
+    public void select_one_resource_host(){
+        subutaiSteps.selectMenuResourceHostAgain();
+    }
+
+
+    @When("the user enter console command: ls -l /var/lib/apps/subutai/current/var/lib/lxc/ContainerName/rootfs")
+    public void execute_console_command_container2_ls(){
+        subutaiSteps.executeConsoleCommand("ls -l /var/lib/apps/subutai/current/var/lib/lxc/" + subutaiSteps.getContainerNameTwo() + "/rootfs/");
+    }
+
 }

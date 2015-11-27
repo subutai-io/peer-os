@@ -199,8 +199,17 @@ public class SubutaiPage extends PageObject {
     @FindBy(ngModel = "selectedPeer")
     public WebElementFacade selectMenuResourceHost;
 
-    @FindBy(xpath = "/html/body/div/div[2]/div/div/div[2]/div[2]/section/div[1]/div/pre[2]")
-    public WebElementFacade outputConsoleCommand;
+    @FindBy(xpath = "*//li[contains(text(), \"Environment\")]")
+    public WebElementFacade buttonEnvironmentOnConsole;
+
+    @FindBy(xpath = "*//li[contains(text(), \"Peer\")]")
+    public WebElementFacade buttonPeerOnConsole;
+
+    @FindBy(ngModel = "selectedContainer")
+    public WebElementFacade selectContainer;
+
+    @FindBy(ngModel = "selectedEnvironment")
+    public WebElementFacade selectEnvironmentConsole;
 
 
     //---------------------------------------------------------------------
@@ -243,7 +252,7 @@ public class SubutaiPage extends PageObject {
                 "});" +
                 "} " +
                 "setCommand('"+ command +"')");
-        waitABit(15000);
+        waitABit(10000);
     }
 
     public boolean getPreData(String expectedPhrase){

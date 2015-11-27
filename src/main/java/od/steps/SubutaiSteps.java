@@ -457,6 +457,20 @@ public class SubutaiSteps extends ScenarioSteps {
     }
 
     @Step
+    public void selectMenuEnvironment(){
+        subutaiPage.selectMenuResourceHost.click();
+        subutaiPage.selectMenuResourceHost.selectByIndex(1);
+        subutaiPage.selectMenuResourceHost.sendKeys(Keys.ENTER);
+    }
+
+    @Step
+    public void selectContainer(){
+        subutaiPage.selectContainer.click();
+        subutaiPage.selectContainer.selectByIndex(1);
+        subutaiPage.selectContainer.sendKeys(Keys.ENTER);
+    }
+
+    @Step
     public void selectMenuManagementHost(){
         subutaiPage.selectMenuResourceHost.click();
         subutaiPage.selectMenuResourceHost.selectByIndex(2);
@@ -491,5 +505,31 @@ public class SubutaiSteps extends ScenarioSteps {
         subutaiPage.getAllData("upstart-udev-bridge --daemon");
     }
 
+    @Step
+    public void clickOnButtonEnvironmentOnConsole(){
+        subutaiPage.buttonEnvironmentOnConsole.click();
+    }
+
+    @Step
+    public void clickButtonPeerConsole(){
+        subutaiPage.buttonPeerOnConsole.click();
+    }
+
+    @Step
+    public void selectMenuResourceHostAgain(){
+        subutaiPage.selectMenuResourceHost.click();
+        subutaiPage.selectMenuResourceHost.selectByIndex(0);
+        subutaiPage.selectMenuResourceHost.sendKeys(Keys.ENTER);
+        subutaiPage.selectMenuResourceHost.click();
+        subutaiPage.selectMenuResourceHost.selectByIndex(1);
+        subutaiPage.selectMenuResourceHost.sendKeys(Keys.ENTER);
+    }
+
+    @Step
+    public void selectEnvironmentConsole(){
+        subutaiPage.selectEnvironmentConsole.click();
+        subutaiPage.selectEnvironmentConsole.selectByIndex(1);
+        subutaiPage.selectEnvironmentConsole.sendKeys(Keys.ENTER);
+    }
 
 }
