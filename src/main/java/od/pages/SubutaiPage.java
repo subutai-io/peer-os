@@ -1,19 +1,10 @@
 package od.pages;
 
-import ch.lambdaj.function.convert.Converter;
-import com.opera.core.systems.scope.protos.SystemInputProtos;
-import javafx.scene.input.KeyCode;
-import net.serenitybdd.core.annotations.findby.By;
 import net.serenitybdd.core.annotations.findby.FindBy;
 import net.serenitybdd.core.pages.WebElementFacade;
 import net.thucydides.core.pages.PageObject;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebElement;
 
-import java.awt.event.KeyAdapter;
-import java.util.List;
-
-import static ch.lambdaj.Lambda.convert;
+import java.util.Arrays;
 
 public class SubutaiPage extends PageObject {
 
@@ -208,6 +199,9 @@ public class SubutaiPage extends PageObject {
     @FindBy(ngModel = "selectedPeer")
     public WebElementFacade selectMenuResourceHost;
 
+    @FindBy(xpath = "/html/body/div/div[2]/div/div/div[2]/div[2]/section/div[1]/div/pre[2]")
+    public WebElementFacade outputConsoleCommand;
+
 
     //---------------------------------------------------------------------
 
@@ -249,21 +243,38 @@ public class SubutaiPage extends PageObject {
                 "});" +
                 "} " +
                 "setCommand('"+ command +"')");
-        waitABit(10000);
+        waitABit(15000);
     }
 
-    private Converter<WebElement, String> toStrings() {
-        return new Converter<WebElement, String>() {
-            public String convert(WebElement from) {
-                return from.getText();
+    public boolean getPreData(String expectedPhrase){
+        try {
+            return element("*//div[@class=\"terminal-results\"]//pre[@class=\"terminal-line\" and contains(text(), \""+ expectedPhrase +"\")]").isVisible();
+        }
+        catch (Exception e){
+            return false;
+        }
+    }
+
+    public String getOutputRow(String expectedPhrase, int rStart, int rEnd, int numberRow){
+      String text = element("*//div[@class=\"terminal-results\"]//pre[@class=\"terminal-line\" and contains(text(), \""+ expectedPhrase +"\")]").getText().trim();
+        String sb[] = text.split("\n");
+        for(int i=0; i < sb.length; i++)
+            if (sb[i].contains(expectedPhrase)) {
+                text += sb[i] + "\n";
             }
-        };
+        sb = text.split("\n");
+        return sb[numberRow].substring(rStart, rEnd);
     }
 
-    public List<String> getPreData() {
-        WebElementFacade LinksList = find(By.tagName("pre"));
-        List<WebElement> results = LinksList.findElements(By.className("terminal-line"));
-        return convert(results, toStrings());
+    public String getPIDContainer(String phrase){
+        String text [] = element("*//div[@class=\"terminal-results\"]//pre[@class=\"terminal-line\" and contains(text(), \"" + phrase + "\")]").getText().split("\n");
+        System.out.println(text[1].substring(text[1].length() - 6, text[1].length()).trim());
+        return text[1].substring(text[1].length() - 6, text[1].length()).trim();
+    }
+
+    public void getAllData(String phrase){
+        String text = element("*//div[@class=\"terminal-results\"]//pre[@class=\"terminal-line\" and contains(text(), \"" + phrase + "\")]").getText();
+        System.out.println(text);
     }
 
 }

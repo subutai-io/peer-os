@@ -40,7 +40,7 @@ When the user click on the button: OK
 Then the user observe header: Success!
 And the user observe text: Your environment has been created.
 
-Scenario: Grow Local Envirement
+Scenario: Grow Local Environment
 Given the first user is on the home page of Subutai
 When the user click on the menu item: Environment
 And the user click on the menu item: Blueprint

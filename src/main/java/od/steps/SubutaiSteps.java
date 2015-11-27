@@ -5,6 +5,7 @@ import net.thucydides.core.steps.ScenarioSteps;
 import od.pages.ReaderFromFile;
 import od.pages.SubutaiPage;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebElement;
 
 import java.io.FileNotFoundException;
 
@@ -456,8 +457,39 @@ public class SubutaiSteps extends ScenarioSteps {
     }
 
     @Step
-    public void verifyOutputConsoleCommand(String expectedPhrase){
-        assertThat(subutaiPage.getPreData().contains(expectedPhrase), is(true));
+    public void selectMenuManagementHost(){
+        subutaiPage.selectMenuResourceHost.click();
+        subutaiPage.selectMenuResourceHost.selectByIndex(2);
+        subutaiPage.selectMenuResourceHost.sendKeys(Keys.ENTER);
     }
+
+    @Step
+    public void verifyOutputConsoleCommand(String expectedPhrase){
+        assertThat(subutaiPage.getPreData(expectedPhrase), is(true));
+    }
+
+    @Step
+    public String getContainerNameOne(){
+        String s =  subutaiPage.getOutputRow("master", 0, 38, 2);
+        return s;
+    }
+
+    @Step
+    public String getContainerNameTwo(){
+        String s = subutaiPage.getOutputRow("master",0, 38, 3);
+        return s;
+    }
+
+    @Step
+    public String getPIDContainer(){
+        String s = subutaiPage.getPIDContainer("PID:");
+        return s;
+    }
+
+    @Step
+    public void getAllData(){
+        subutaiPage.getAllData("upstart-udev-bridge --daemon");
+    }
+
 
 }

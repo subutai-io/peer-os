@@ -224,8 +224,28 @@ public class DefSubutaiStepsWhen {
         subutaiSteps.selectMenuResourceHost();
     }
 
+    @When("the user select management host from select menu")
+    public void select_menagement_host_from_select_menu(){
+        subutaiSteps.selectMenuResourceHost();
+    }
+
     @When("the user enter console command: '$command'")
     public void execute_console_command(String command){
         subutaiSteps.executeConsoleCommand(command);
+    }
+
+    @When("the user enter console command: sudo lxc-info -Ssip -n for Container One")
+    public void execute_console_command_container1(){
+        subutaiSteps.executeConsoleCommand("sudo lxc-info -Ssip -n " + subutaiSteps.getContainerNameOne());
+    }
+
+    @When("the user enter console command: sudo lxc-info -Ssip -n for Container Two")
+    public void execute_console_command_container2(){
+        subutaiSteps.executeConsoleCommand("sudo lxc-info -Ssip -n " + subutaiSteps.getContainerNameTwo());
+    }
+
+    @When("the user enter console command: ps -ef and grep PID")
+    public void execute_console_command_pid(){
+        subutaiSteps.executeConsoleCommand("ps -ef | grep " + subutaiSteps.getPIDContainer());
     }
 }
