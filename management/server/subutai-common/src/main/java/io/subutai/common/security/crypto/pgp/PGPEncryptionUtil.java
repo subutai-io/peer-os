@@ -1349,4 +1349,37 @@ public class PGPEncryptionUtil
             throw new PGPException( "Error verifying public key", e );
         }
     }
+
+
+    /**
+     * Verifies that a public key is signed with another public key
+     *
+     * @param keyToVerify the public key to verify
+     * @param keyToVerifyWith the key to verify with
+     *
+     * @return true if verified, false otherwise
+     */
+    public static boolean verifyPublicKey( PGPPublicKey keyToVerify, PGPPublicKey keyToVerifyWith )
+            throws PGPException
+    {
+        try
+        {
+            Iterator<PGPSignature> signIterator = keyToVerify.getSignatures();
+            while ( signIterator.hasNext() )
+            {
+                PGPSignature signature = signIterator.next();
+                signature.init( new JcaPGPContentVerifierBuilderProvider().setProvider( provider ), keyToVerifyWith );
+                if ( signature.verifyCertification( keyToVerify ) )
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        catch ( Exception e )
+        {
+            //throw custom  exception
+            throw new PGPException( "Error verifying public key", e );
+        }
+    }
 }

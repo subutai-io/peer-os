@@ -19,7 +19,7 @@ import io.subutai.core.security.api.model.SecurityKeyTrust;
  */
 @Entity
 @Table( name = "security_key_trust",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"source_id", "target_id"} ))
+        uniqueConstraints = @UniqueConstraint(columnNames = {"source_fprint", "target_fprint"} ))
 @Access( AccessType.FIELD )
 public class SecurityKeyTrustEntity implements SecurityKeyTrust
 {
@@ -28,11 +28,11 @@ public class SecurityKeyTrustEntity implements SecurityKeyTrust
     @Column( name = "id" )
     private long id;
 
-    @Column( name = "source_id" )
-    private String sourceId;
+    @Column( name = "source_fprint" )
+    private String sourceFingerprint;
 
-    @Column( name = "target_id" )
-    private String targetId;
+    @Column( name = "target_fprint" )
+    private String targetFingerprint;
 
     @Column( name = "level" )
     private int level = 1;
@@ -53,30 +53,30 @@ public class SecurityKeyTrustEntity implements SecurityKeyTrust
 
 
     @Override
-    public String getSourceId()
+    public String getSourceFingerprint()
     {
-        return sourceId;
+        return sourceFingerprint;
     }
 
 
     @Override
-    public void setSourceId( final String sourceId )
+    public void setSourceFingerprint( final String sourceFingerprint )
     {
-        this.sourceId = sourceId;
+        this.sourceFingerprint = sourceFingerprint;
     }
 
 
     @Override
-    public String getTargetId()
+    public String getTargetFingerprint()
     {
-        return targetId;
+        return targetFingerprint;
     }
 
 
     @Override
-    public void setTargetId( final String targetId )
+    public void setTargetFingerprint( final String targetFingerprint )
     {
-        this.targetId = targetId;
+        this.targetFingerprint = targetFingerprint;
     }
 
 

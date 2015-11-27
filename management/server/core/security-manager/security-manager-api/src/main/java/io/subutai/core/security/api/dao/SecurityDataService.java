@@ -17,19 +17,19 @@ public interface SecurityDataService
     /******************************************
      * Store Public key in the DB
      */
-    public void saveKeyIdentityData( String hostId ,String sKeyId,String pKeyId, int type );
+    public void saveKeyIdentityData( String identityId ,String sKeyId,String pKeyId, int type );
 
 
     /******************************************
      * Remove Public key from the DB
      */
-    public void removeKeyIdentityData( String hostId);
+    public void removeKeyIdentityData( String identityId);
 
 
     /******************************************
      * Get SecurityKeyIdentity entity from DB
      */
-    public SecurityKeyIdentity getKeyIdentityData( String hostId );
+    public SecurityKeyIdentity getKeyIdentityData( String identityId );
 
 
     /******************************************

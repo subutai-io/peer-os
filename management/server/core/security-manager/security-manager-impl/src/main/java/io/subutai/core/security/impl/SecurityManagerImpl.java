@@ -38,7 +38,6 @@ public class SecurityManagerImpl implements SecurityManager
     private KeyStoreManager keyStoreManager = null;
     private CertificateManager certificateManager = null;
     private HttpContextManager httpContextManager;
-    private Object provider;
 
 
     /* *****************************
@@ -53,6 +52,7 @@ public class SecurityManagerImpl implements SecurityManager
         keyData.setSecretKeyringFile( secretKeyringFile );
         keyData.setPublicKeyringFile( publicKeyringFile );
         keyData.setSecretKeyringPwd( secretKeyringPwd );
+        keyData.setJsonProvider( provider );
 
         httpContextManager = new HttpContextManagerImpl();
     }

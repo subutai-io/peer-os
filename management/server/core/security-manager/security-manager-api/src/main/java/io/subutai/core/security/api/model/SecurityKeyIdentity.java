@@ -13,14 +13,13 @@ public interface SecurityKeyIdentity
     /********************************
      *
      */
-    public String getHostId();
+    public String getIdentityId();
 
 
     /********************************
      *
      */
-    public void setHostId( final String hostId );
-
+    public void setIdentityId( final String identityId );
 
     /********************************
      *
@@ -70,8 +69,14 @@ public interface SecurityKeyIdentity
     void setSecretKeyFingerprint( String secretKeyFingerprint );
 
 
+    /********************************
+     *
+     */
     List<SecurityKeyIdentity> getTrustedKeys();
 
 
+    /********************************
+     *
+     */
     void setTrustedKeys( final List<SecurityKeyIdentity> trustedKeys );
 }
