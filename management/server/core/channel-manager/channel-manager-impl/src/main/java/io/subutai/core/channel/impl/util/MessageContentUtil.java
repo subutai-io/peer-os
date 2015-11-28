@@ -8,7 +8,9 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.security.AccessControlException;
 
+import javax.security.auth.login.LoginException;
 import javax.servlet.http.HttpServletResponse;
 
 import org.bouncycastle.openpgp.PGPException;
@@ -36,19 +38,41 @@ public class MessageContentUtil
     private static final Logger LOG = LoggerFactory.getLogger( MessageContentUtil.class );
 
 
-    public static void abortChain( Message message, int errorStatus, String error )
+    //***************************************************************************
+    public static void abortChain( Message message, Exception ex )
+    {
+        if(ex.getClass() == AccessControlException.class)
+        {
+            abortChain( message, 403, "Access Denied to the resource");
+        }
+        else if(ex.getClass() == LoginException.class)
+        {
+            abortChain( message, 401, "User is not authorized");
+        }
+        else
+        {
+            abortChain( message, 500, "Internal system Error 500");
+        }
+
+        LOG.error( "****** Error !! Error in doIntercept:" + ex.toString(),ex );
+    }
+
+    //***************************************************************************
+    public static void abortChain( Message message, int errorStatus, String errorMessage)
     {
         HttpServletResponse response = ( HttpServletResponse ) message.getExchange().getInMessage()
                                                                       .get( AbstractHTTPDestination.HTTP_RESPONSE );
         try
         {
             response.setStatus( errorStatus );
-            response.getOutputStream().write( error.getBytes( Charset.forName( "UTF-8" ) ) );
+            response.getOutputStream().write( errorMessage.getBytes( Charset.forName( "UTF-8" ) ) );
             response.getOutputStream().flush();
-            LOG.warn( error );
+            LOG.error( "****** Error !! Error in doIntercept:" + message );
+
         }
         catch ( Exception e )
         {
+            //gnore
             LOG.error( "Error writing to response: " + e.toString(), e );
         }
 
@@ -56,6 +80,7 @@ public class MessageContentUtil
     }
 
 
+    //***************************************************************************
     public static int checkUrlAccessibility( final int currentStatus, final URL url )
     {
         int status = currentStatus;

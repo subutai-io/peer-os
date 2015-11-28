@@ -1382,4 +1382,32 @@ public class PGPEncryptionUtil
             throw new PGPException( "Error verifying public key", e );
         }
     }
+
+
+    /**
+     * Verifies that a public key is signed with another public key
+     *
+     * @param keyToRemoveFrom the public key to verify
+     * @param id id of the sugnature
+     *
+     * @return true if verified, false otherwise
+     */
+    public static PGPPublicKeyRing removeSignature( PGPPublicKeyRing keyToRemoveFrom, String id )
+            throws PGPException
+    {
+        try
+        {
+            PGPPublicKey oldKey = keyToRemoveFrom.getPublicKey();
+            PGPPublicKey newKey = PGPPublicKey.removeCertification( oldKey, id );
+
+            PGPPublicKeyRing newPublicKeyRing = PGPPublicKeyRing.removePublicKey( keyToRemoveFrom, oldKey );
+            return PGPPublicKeyRing.insertPublicKey( newPublicKeyRing, newKey );
+        }
+        catch ( Exception e )
+        {
+            //throw custom  exception
+            throw new PGPException( "Error removing signature", e );
+        }
+    }
+
 }

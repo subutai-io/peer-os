@@ -23,6 +23,11 @@ public interface KeyManager
     /* *****************************
      *
      */
+    PGPPublicKeyRing getPublicKeyRingByFingerprint( String fingerprint );
+
+    /* *****************************
+     *
+     */
     public String getPublicKeyRingAsASCII( String identityId );
 
 
@@ -37,6 +42,16 @@ public interface KeyManager
      */
     public PGPSecretKeyRing getSecretKeyRing( String identityId );
 
+
+    /* *****************************
+     *
+     */
+    SecurityKeyIdentity getKeyIdentityDataByFingerprint( String fingerprint );
+
+    /* *****************************
+     *
+     */
+    void removeKeyIdentityData( String identityId );
 
     /* *****************************
      * Gets KeyRing from the store and returns Publickey object
@@ -91,10 +106,12 @@ public interface KeyManager
      */
     PGPPublicKeyRing signKey( PGPSecretKeyRing sourceSecRing, PGPPublicKeyRing targetPubRing, int trustLevel );
 
+
     /* ***************************************************************
      *
      */
     PGPPublicKeyRing signKey( String sourceIdentityId, String targetIdentityId, int trustLevel );
+
 
     /* ***************************************************************
      *
@@ -103,22 +120,32 @@ public interface KeyManager
 
 
     /* ***************************************************************
-         *
-         */
+     *
+     */
     void setKeyTrust( String sourceFingerprint, String targetFingerprint, int trustLevel );
 
 
     /* ***************************************************************
      *
      */
-    SecurityKeyTrust getKeyTrust(String sourceFingerprint, String targetFingerprint);
+    PGPPublicKeyRing removeSignature( String sourceFingerprint, String targetFingerprint );
+
+    /* ***************************************************************
+         *
+         */
+    PGPPublicKeyRing removeSignature( String sourceIdentityId, PGPPublicKeyRing targetPubRing );
 
 
     /* ***************************************************************
      *
      */
-    List<SecurityKeyTrust> getKeyTrust( String sourceFingerprint );
+    SecurityKeyTrust getKeyTrustData(String sourceFingerprint, String targetFingerprint);
 
+
+    /* ***************************************************************
+     *
+     */
+    List<SecurityKeyTrust> getKeyTrustData( String sourceFingerprint );
 
 
     /* ***************************************************************
@@ -161,7 +188,7 @@ public interface KeyManager
     /* *****************************************
      *
      */
-    KeyPair generateKeyPair( String userId, boolean armored );
+    KeyPair generateKeyPair( String identityId, boolean armored );
 
 
     /* *****************************************

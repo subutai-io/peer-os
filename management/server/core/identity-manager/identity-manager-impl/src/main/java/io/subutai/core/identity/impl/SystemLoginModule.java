@@ -34,7 +34,7 @@ import io.subutai.core.identity.api.model.User;
 public class SystemLoginModule extends AbstractKarafLoginModule
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( SystemLoginModule.class.getName() );
-    private Session userSession = null;
+    private IdentityManager identityManager = null;
 
 
     @Override
@@ -47,6 +47,7 @@ public class SystemLoginModule extends AbstractKarafLoginModule
         {
             LOGGER.info( "Initializing Karaf login module." );
             Class.forName( "org.apache.karaf.jaas.config.JaasRealm", true, JaasRealm.class.getClassLoader() );
+            identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
         }
         catch ( Exception e )
         {
@@ -80,23 +81,17 @@ public class SystemLoginModule extends AbstractKarafLoginModule
             String password = new String( tmpPassword );
             // **************************************
 
-            // **************************************
-            IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
-            User loggedUser = identityManager.authenticateUser( user, password );
-            // **************************************
+            Session userSession = identityManager.authenticateSession( user, password );
 
-
-            if ( loggedUser != null )
+            if(userSession != null)
             {
+
+                User loggedUser = userSession.getUser();
                 //******************************************
                 principals = new HashSet<>();
                 principals.add( new UserPrincipal( user ) );
                 principals.add( new RolePrincipal( "webconsole" ) );
                 //******************************************
-
-                // Create or restore existing session *********************
-                Session userSession = identityManager.startSession( loggedUser );
-                //*********************************************************
 
                 if ( userSession.getSubject() != null ) //restore
                 {
@@ -175,10 +170,9 @@ public class SystemLoginModule extends AbstractKarafLoginModule
         LOGGER.debug( "Invoking logout." );
         try
         {
-            IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
             identityManager.logout();
         }
-        catch ( NamingException e )
+        catch ( Exception e )
         {
             LOGGER.error( e.toString(), e );
         }

@@ -86,8 +86,6 @@ public class KeyManagerImpl implements KeyManager
     {
         try
         {
-
-
             InputStream ownerPubStream = PGPEncryptionUtil.getFileInputStream( keyData.getOwnerPublicKeyringFile() );
             InputStream peerPubStream = PGPEncryptionUtil.getFileInputStream( keyData.getPublicKeyringFile() );
             InputStream peerSecStream = PGPEncryptionUtil.getFileInputStream( keyData.getSecretKeyringFile() );
@@ -169,10 +167,10 @@ public class KeyManagerImpl implements KeyManager
             String publicFPrint = PGPKeyUtil.getFingerprint( targetPubRing.getPublicKey().getFingerprint() );
 
             //****************************************
-            String keyIdentityId = secretFPrint;
+            String keyIdentityId = getKeyIdentityDataByFingerprint( secretFPrint ).getIdentityId();
             //****************************************
 
-            targetPubRing = encryptionTool.signPublicKey( targetPubRing,secretFPrint, sourceSecRing.getSecretKey(), "" );
+            targetPubRing = encryptionTool.signPublicKey( targetPubRing, keyIdentityId, sourceSecRing.getSecretKey(), "" );
             keyServer.updatePublicKey( targetPubRing );
             setKeyTrust( secretFPrint, publicFPrint, trustLevel );
         }
@@ -188,10 +186,10 @@ public class KeyManagerImpl implements KeyManager
      *
      */
     @Override
-    public PGPPublicKeyRing signKey( String sourceHostId, String targetHostId, int trustLevel )
+    public PGPPublicKeyRing signKey( String sourceFingerprint, String targetFingerprint, int trustLevel )
     {
-        PGPPublicKeyRing targetPubRing = getPublicKeyRing( targetHostId );
-        PGPSecretKeyRing sourceSecRing = getSecretKeyRing( sourceHostId );
+        PGPPublicKeyRing targetPubRing = getPublicKeyRing( sourceFingerprint );
+        PGPSecretKeyRing sourceSecRing = getSecretKeyRing( targetFingerprint );
 
         return signKey( sourceSecRing, targetPubRing, trustLevel );
     }
@@ -201,14 +199,14 @@ public class KeyManagerImpl implements KeyManager
      *
      */
     @Override
-    public String signPublicKey( String sourceHostId, String keyText, int trustLevel )
+    public String signPublicKey( String sourceIdentityId, String keyText, int trustLevel )
     {
         String keyStr = "";
 
         try
         {
             PGPPublicKeyRing targetPubRing = PGPKeyUtil.readPublicKeyRing( keyText );
-            PGPSecretKeyRing sourceSecRing = getSecretKeyRing( sourceHostId );
+            PGPSecretKeyRing sourceSecRing = getSecretKeyRing( sourceIdentityId );
 
             targetPubRing = signKey( sourceSecRing, targetPubRing, trustLevel );
 
@@ -216,7 +214,7 @@ public class KeyManagerImpl implements KeyManager
         }
         catch ( Exception ex )
         {
-
+            LOG.error( "**** Error !!! Error signing key, IdentityId: "+sourceIdentityId,ex );
         }
         return keyStr;
     }
@@ -230,7 +228,29 @@ public class KeyManagerImpl implements KeyManager
     {
         try
         {
-            securityDataService.saveKeyTrustData( sourceFingerprint, targetFingerprint, trustLevel );
+            SecurityKeyTrust securityKeyTrust =
+                    securityDataService.getKeyTrustData( sourceFingerprint, targetFingerprint );
+
+            if ( trustLevel == KeyTrustLevel.Never.getId() )
+            {
+                //******************************************
+                removeSignature( sourceFingerprint, targetFingerprint );
+                //******************************************
+            }
+            else
+            {
+                if ( securityKeyTrust == null )
+                {
+                    securityDataService.saveKeyTrustData( sourceFingerprint, targetFingerprint, trustLevel );
+
+                    //******************************************
+                    signKey( sourceFingerprint, targetFingerprint ,trustLevel );
+                    //******************************************
+                }
+            }
+
+            securityKeyTrust.setLevel( trustLevel );
+            securityDataService.updateKeyTrustData( securityKeyTrust );
         }
         catch ( Exception ex )
         {
@@ -243,7 +263,41 @@ public class KeyManagerImpl implements KeyManager
      *
      */
     @Override
-    public SecurityKeyTrust getKeyTrust( String sourceFingerprint, String targetFingerprint )
+    public PGPPublicKeyRing removeSignature( String sourceFingerprint, String targetFingerprint )
+    {
+        PGPPublicKeyRing targetPubRing = getPublicKeyRingByFingerprint( targetFingerprint );
+        String sourceIdentityId = getKeyIdentityDataByFingerprint( sourceFingerprint ).getIdentityId();
+
+        return encryptionTool.removeSignature(sourceIdentityId, targetPubRing);
+    }
+
+
+    /* ***************************************************************
+     *
+     */
+    @Override
+    public PGPPublicKeyRing removeSignature( String sourceIdentityId, PGPPublicKeyRing targetPubRing )
+    {
+        PGPPublicKeyRing newRing = null;
+        try
+        {
+            encryptionTool.removeSignature(sourceIdentityId,targetPubRing);
+            keyServer.updatePublicKey( newRing );
+        }
+        catch ( IOException | PGPException e )
+        {
+            LOG.error( "**** Error !!! Error removing key signature IdentityId: "+sourceIdentityId,e );
+        }
+
+        return newRing;
+    }
+
+
+    /* ***************************************************************
+     *
+     */
+    @Override
+    public SecurityKeyTrust getKeyTrustData( String sourceFingerprint, String targetFingerprint )
     {
         return securityDataService.getKeyTrustData( sourceFingerprint, targetFingerprint );
     }
@@ -253,7 +307,7 @@ public class KeyManagerImpl implements KeyManager
      *
      */
     @Override
-    public List<SecurityKeyTrust> getKeyTrust( final String sourceFingerprint )
+    public List<SecurityKeyTrust> getKeyTrustData( final String sourceFingerprint )
     {
         return securityDataService.getKeyTrustData( sourceFingerprint );
     }
@@ -263,11 +317,11 @@ public class KeyManagerImpl implements KeyManager
      *
      */
     @Override
-    public void removeKeyTrust( String sourceId )
+    public void removeKeyTrust( String sourceFingerprint )
     {
         try
         {
-            securityDataService.removeKeyTrustData( sourceId );
+            securityDataService.removeKeyTrustData( sourceFingerprint );
         }
         catch ( Exception ex )
         {
@@ -280,11 +334,11 @@ public class KeyManagerImpl implements KeyManager
      *
      */
     @Override
-    public void removeKeyTrust( String sourceId, String targetId )
+    public void removeKeyTrust( String sourceFingerprint, String targetFingerprint )
     {
         try
         {
-            securityDataService.removeKeyTrustData( sourceId, targetId );
+            securityDataService.removeKeyTrustData( sourceFingerprint, targetFingerprint );
         }
         catch ( Exception ex )
         {
@@ -297,7 +351,7 @@ public class KeyManagerImpl implements KeyManager
      *
      */
     @Override
-    public void saveSecretKeyRing( String hostId, int type, PGPSecretKeyRing secretKeyRing )
+    public void saveSecretKeyRing( String identityId, int type, PGPSecretKeyRing secretKeyRing )
     {
         try
         {
@@ -311,7 +365,7 @@ public class KeyManagerImpl implements KeyManager
 
                 //*******************
                 securityDataService.saveSecretKeyData( fingerprint, secretKeyRing.getEncoded(), pwd, type );
-                securityDataService.saveKeyIdentityData( hostId, fingerprint, "", type );
+                securityDataService.saveKeyIdentityData( identityId, fingerprint, "", type );
                 //*******************
             }
         }
@@ -326,7 +380,7 @@ public class KeyManagerImpl implements KeyManager
      *
      */
     @Override
-    public void savePublicKeyRing( String hostId, int type, String keyringAsASCII )
+    public void savePublicKeyRing( String identityId, int type, String keyringAsASCII )
     {
         try
         {
@@ -334,7 +388,7 @@ public class KeyManagerImpl implements KeyManager
 
             if ( pgpPublicKeyRing != null )
             {
-                savePublicKeyRing( hostId, type, pgpPublicKeyRing );
+                savePublicKeyRing( identityId, type, pgpPublicKeyRing );
             }
         }
         catch ( Exception ex )
@@ -348,15 +402,15 @@ public class KeyManagerImpl implements KeyManager
      *
      */
     @Override
-    public void savePublicKeyRing( String hostId, int type, PGPPublicKeyRing publicKeyRing )
+    public void savePublicKeyRing( String identityId, int type, PGPPublicKeyRing publicKeyRing )
     {
         try
         {
             PGPPublicKey publicKey = PGPKeyUtil.readPublicKey( publicKeyRing );
 
-            if ( Strings.isNullOrEmpty( hostId ) )
+            if ( Strings.isNullOrEmpty( identityId ) )
             {
-                hostId = keyData.getManHostId();
+                identityId = keyData.getManHostId();
             }
 
             if ( publicKey != null )
@@ -366,7 +420,7 @@ public class KeyManagerImpl implements KeyManager
 
                 //*************************
                 String fingerprint = PGPKeyUtil.getFingerprint( publicKey.getFingerprint() );
-                securityDataService.saveKeyIdentityData( hostId, "", fingerprint, type );
+                securityDataService.saveKeyIdentityData( identityId, "", fingerprint, type );
                 //*************************
             }
         }
@@ -381,13 +435,13 @@ public class KeyManagerImpl implements KeyManager
      *
      */
     @Override
-    public void removePublicKeyRing( String hostId )
+    public void removePublicKeyRing( String identityId )
     {
         try
         {
-            if ( !Objects.equals( hostId, keyData.getManHostId() ) )
+            if ( !Objects.equals( identityId, keyData.getManHostId() ) )
             {
-                securityDataService.removeKeyIdentityData( hostId );
+                securityDataService.removeKeyIdentityData( identityId );
             }
 
             //Remove from KeyStore
@@ -404,13 +458,13 @@ public class KeyManagerImpl implements KeyManager
      *
      */
     @Override
-    public void removeSecretKeyRing( String hostId )
+    public void removeSecretKeyRing( String identityId )
     {
         try
         {
-            if ( !Objects.equals( hostId, keyData.getManHostId() ) )
+            if ( !Objects.equals( identityId, keyData.getManHostId() ) )
             {
-                SecurityKeyIdentity keyIden = securityDataService.getKeyIdentityData( hostId );
+                SecurityKeyIdentity keyIden = securityDataService.getKeyIdentityData( identityId );
 
                 if ( keyIden != null )
                 {
@@ -433,16 +487,36 @@ public class KeyManagerImpl implements KeyManager
      *
      */
     @Override
-    public SecurityKeyIdentity getKeyIdentityData( String hostId )
+    public SecurityKeyIdentity getKeyIdentityData( String identityId )
     {
         SecurityKeyIdentity keyIden = null;
         try
         {
-            if ( Strings.isNullOrEmpty( hostId ) )
+            if ( Strings.isNullOrEmpty( identityId ) )
             {
-                hostId = keyData.getManHostId();
+                identityId = keyData.getManHostId();
             }
-            keyIden = securityDataService.getKeyIdentityData( hostId );
+            keyIden = securityDataService.getKeyIdentityData( identityId );
+        }
+        catch ( Exception ex )
+        {
+            LOG.error( "Error removing Secret key:" + ex.toString() );
+        }
+        return keyIden;
+    }
+
+
+
+    /* *****************************
+     *
+     */
+    @Override
+    public SecurityKeyIdentity getKeyIdentityDataByFingerprint( String fingerprint )
+    {
+        SecurityKeyIdentity keyIden = null;
+        try
+        {
+           keyIden = securityDataService.getKeyIdentityDataByFingerprint( fingerprint );
         }
         catch ( Exception ex )
         {
@@ -456,13 +530,34 @@ public class KeyManagerImpl implements KeyManager
      *
      */
     @Override
-    public PGPPublicKey getPublicKey( String hostId )
+    public void removeKeyIdentityData( String identityId )
+    {
+        try
+        {
+            if ( !Objects.equals( identityId, keyData.getManHostId() ) )
+            {
+                securityDataService.removeKeyIdentityData( identityId );
+                removeKeyRings( identityId );
+            }
+        }
+        catch ( Exception ex )
+        {
+            LOG.error( "Error removing Secret key:" + ex.toString() );
+        }
+    }
+
+
+    /* *****************************
+     *
+     */
+    @Override
+    public PGPPublicKey getPublicKey( String identityId )
     {
         PGPPublicKeyRing publicKeyRing;
 
         try
         {
-            publicKeyRing = getPublicKeyRing( hostId );
+            publicKeyRing = getPublicKeyRing( identityId );
 
             if ( publicKeyRing != null )
             {
@@ -480,21 +575,43 @@ public class KeyManagerImpl implements KeyManager
         }
     }
 
+    /* *****************************
+     *
+     */
+    @Override
+    public PGPPublicKeyRing getPublicKeyRingByFingerprint( String fingerprint )
+    {
+        PGPPublicKeyRing pubKeyRing = null;
+        try
+        {
+            byte[] keyData = keyServer.getPublicKeyByFingerprint( fingerprint ).getKeyData();
+
+            if(keyData!=null)
+            {
+                return PGPKeyUtil.readPublicKeyRing( keyData );
+            }
+        }
+        catch ( PGPException e )
+        {
+        }
+
+        return pubKeyRing;
+    }
 
     /* *****************************
      *
      */
     @Override
-    public String getPublicKeyRingAsASCII( String hostId )
+    public String getPublicKeyRingAsASCII( String identityId )
     {
-        if ( Strings.isNullOrEmpty( hostId ) )
+        if ( Strings.isNullOrEmpty( identityId ) )
         {
-            hostId = keyData.getManHostId();
+            identityId = keyData.getManHostId();
         }
 
         try
         {
-            SecurityKeyIdentity keyIden = securityDataService.getKeyIdentityData( hostId );
+            SecurityKeyIdentity keyIden = securityDataService.getKeyIdentityData( identityId );
 
             if ( keyIden == null )
             {
@@ -519,18 +636,18 @@ public class KeyManagerImpl implements KeyManager
      *
      */
     @Override
-    public PGPPublicKeyRing getPublicKeyRing( String hostId )
+    public PGPPublicKeyRing getPublicKeyRing( String identityId )
     {
         PGPPublicKeyRing publicKeyRing;
 
-        if ( Strings.isNullOrEmpty( hostId ) )
+        if ( Strings.isNullOrEmpty( identityId ) )
         {
-            hostId = keyData.getManHostId();
+            identityId = keyData.getManHostId();
         }
 
         try
         {
-            SecurityKeyIdentity keyIden = securityDataService.getKeyIdentityData( hostId );
+            SecurityKeyIdentity keyIden = securityDataService.getKeyIdentityData( identityId );
 
             if ( keyIden == null )
             {
@@ -558,17 +675,17 @@ public class KeyManagerImpl implements KeyManager
      *
      */
     @Override
-    public String getFingerprint( String hostId )
+    public String getFingerprint( String identityId )
     {
 
-        if ( Strings.isNullOrEmpty( hostId ) )
+        if ( Strings.isNullOrEmpty( identityId ) )
         {
-            hostId = keyData.getManHostId();
+            identityId = keyData.getManHostId();
         }
 
         try
         {
-            SecurityKeyIdentity keyIden = securityDataService.getKeyIdentityData( hostId );
+            SecurityKeyIdentity keyIden = securityDataService.getKeyIdentityData( identityId );
             return keyIden.getPublicKeyFingerprint();
         }
         catch ( Exception ex )
@@ -583,21 +700,21 @@ public class KeyManagerImpl implements KeyManager
      *
      */
     @Override
-    public PGPSecretKeyRing getSecretKeyRing( String hostId )
+    public PGPSecretKeyRing getSecretKeyRing( String identityId )
     {
-        if ( Strings.isNullOrEmpty( hostId ) )
+        if ( Strings.isNullOrEmpty( identityId ) )
         {
-            hostId = keyData.getManHostId();
+            identityId = keyData.getManHostId();
         }
 
         try
         {
             PGPSecretKeyRing secretKeyRing;
-            SecurityKeyIdentity keyIden = securityDataService.getKeyIdentityData( hostId );
+            SecurityKeyIdentity keyIden = securityDataService.getKeyIdentityData( identityId );
 
             if ( keyIden == null )
             {
-                LOG.error( " **** Error! Identity Info not found for host:" + hostId );
+                LOG.error( " **** Error! Identity Info not found for host:" + identityId );
                 return null;
             }
             else
@@ -629,16 +746,16 @@ public class KeyManagerImpl implements KeyManager
      *
      */
     @Override
-    public InputStream getSecretKeyRingInputStream( String hostId )
+    public InputStream getSecretKeyRingInputStream( String identityId )
     {
-        if ( Strings.isNullOrEmpty( hostId ) )
+        if ( Strings.isNullOrEmpty( identityId ) )
         {
-            hostId = keyData.getManHostId();
+            identityId = keyData.getManHostId();
         }
 
         try
         {
-            SecurityKeyIdentity keyIden = securityDataService.getKeyIdentityData( hostId );
+            SecurityKeyIdentity keyIden = securityDataService.getKeyIdentityData( identityId );
 
             if ( keyIden != null )
             {
@@ -662,16 +779,16 @@ public class KeyManagerImpl implements KeyManager
      *
      */
     @Override
-    public PGPSecretKey getSecretKey( String hostId )
+    public PGPSecretKey getSecretKey( String identityId )
     {
-        if ( Strings.isNullOrEmpty( hostId ) )
+        if ( Strings.isNullOrEmpty( identityId ) )
         {
-            hostId = keyData.getManHostId();
+            identityId = keyData.getManHostId();
         }
 
         try
         {
-            PGPSecretKeyRing secretKeyRing = getSecretKeyRing( hostId );
+            PGPSecretKeyRing secretKeyRing = getSecretKeyRing( identityId );
 
             if ( secretKeyRing != null )
             {
@@ -694,18 +811,18 @@ public class KeyManagerImpl implements KeyManager
      *
      */
     @Override
-    public PGPPrivateKey getPrivateKey( String hostId )
+    public PGPPrivateKey getPrivateKey( String identityId )
     {
         PGPPrivateKey privateKey;
 
-        if ( Strings.isNullOrEmpty( hostId ) )
+        if ( Strings.isNullOrEmpty( identityId ) )
         {
-            hostId = keyData.getManHostId();
+            identityId = keyData.getManHostId();
         }
 
         try
         {
-            PGPSecretKey secretKey = getSecretKey( hostId );
+            PGPSecretKey secretKey = getSecretKey( identityId );
 
             if ( secretKey != null )
             {
@@ -726,7 +843,6 @@ public class KeyManagerImpl implements KeyManager
     }
 
 
-
     /* *****************************
      *
      */
@@ -742,7 +858,6 @@ public class KeyManagerImpl implements KeyManager
             LOG.warn( e.getMessage() );
         }
     }
-
 
 
     /* ******************************************************************
@@ -769,7 +884,7 @@ public class KeyManagerImpl implements KeyManager
     }
 
 
-    /* *****************************
+       /* *****************************
      *
      */
     public SecurityKeyData getSecurityKeyData()
@@ -782,13 +897,13 @@ public class KeyManagerImpl implements KeyManager
      *
      */
     @Override
-    public KeyPair generateKeyPair( String userId, boolean armored )
+    public KeyPair generateKeyPair( String identityId, boolean armored )
     {
         KeyPair keyPair;
 
         try
         {
-            keyPair = PGPEncryptionUtil.generateKeyPair( userId, keyData.getSecretKeyringPwd(), armored );
+            keyPair = PGPEncryptionUtil.generateKeyPair( identityId, keyData.getSecretKeyringPwd(), armored );
             return keyPair;
         }
         catch ( Exception ex )
@@ -802,12 +917,12 @@ public class KeyManagerImpl implements KeyManager
      *
      */
     @Override
-    public void saveKeyPair( String hostId, int type, KeyPair keyPair )
+    public void saveKeyPair( String identityId, int type, KeyPair keyPair )
     {
         try
         {
-            saveSecretKeyRing( hostId, type, PGPKeyUtil.readSecretKeyRing( keyPair.getSecKeyring() ) );
-            savePublicKeyRing( hostId, type, PGPKeyUtil.readPublicKeyRing( keyPair.getPubKeyring() ) );
+            saveSecretKeyRing( identityId, type, PGPKeyUtil.readSecretKeyRing( keyPair.getSecKeyring() ) );
+            savePublicKeyRing( identityId, type, PGPKeyUtil.readPublicKeyRing( keyPair.getPubKeyring() ) );
         }
         catch ( Exception ignored )
         {
@@ -820,18 +935,18 @@ public class KeyManagerImpl implements KeyManager
      *
      */
     @Override
-    public void removeKeyRings( String hostId )
+    public void removeKeyRings( String identityId )
     {
         try
         {
-            if ( !Objects.equals( hostId, keyData.getManHostId() ) )
+            if ( !Objects.equals( identityId, keyData.getManHostId() ) )
             {
-                removeSecretKeyRing( hostId );
-                removePublicKeyRing( hostId );
+                removeSecretKeyRing( identityId );
+                removePublicKeyRing( identityId );
             }
             else
             {
-                LOG.error( hostId + " Cannot be removed (possibly ManagementHost):" );
+                LOG.error( identityId + " Cannot be removed (possibly ManagementHost):" );
             }
         }
         catch ( Exception ignored )
@@ -923,6 +1038,7 @@ public class KeyManagerImpl implements KeyManager
 
         LOG.debug( fingerprint );
         LOG.debug( "***key trust size: " + keyTrustList.size() );
+
         for ( final SecurityKeyTrust keyTrust : keyTrustList )
         {
             getKeyTrustList( securityKeyIdentity, keyTrust, trustChain );
@@ -938,19 +1054,21 @@ public class KeyManagerImpl implements KeyManager
     private void getKeyTrustList( final SecurityKeyIdentity securityKeyIdentity, SecurityKeyTrust securityKeyTrust,
                                   Set<String> trustIdSet )
     {
-        List<SecurityKeyTrust> trustedKeys = securityDataService.getKeyTrustData( securityKeyTrust.getSourceFingerprint() );
-
-        SecurityKeyIdentity trustedIdentity = securityDataService.getKeyIdentityData( securityKeyTrust.getTargetFingerprint() );
-        securityKeyIdentity.getTrustedKeys().add( trustedIdentity );
-
+        List<SecurityKeyTrust> trustedKeys =
+                securityDataService.getKeyTrustData( securityKeyTrust.getTargetFingerprint() );
+        SecurityKeyIdentity trustedIdentity =
+                securityDataService.getKeyIdentityDataByFingerprint( securityKeyTrust.getTargetFingerprint() );
         trustIdSet.add( securityKeyIdentity.getIdentityId() );
+
+        if ( trustedIdentity != null )
+        {
+            securityKeyIdentity.getTrustedKeys().add( trustedIdentity );
+        }
 
         for ( final SecurityKeyTrust trustedKey : trustedKeys )
         {
-            if ( !trustIdSet.contains( trustedIdentity.getIdentityId() ) )
-            {
-                getKeyTrustList( trustedIdentity, trustedKey, trustIdSet );
-            }
+            if ( trustedIdentity != null && !trustIdSet.contains( trustedIdentity.getIdentityId() ) )
+            getKeyTrustList( trustedIdentity, trustedKey, trustIdSet );
         }
     }
 
@@ -961,18 +1079,52 @@ public class KeyManagerImpl implements KeyManager
     @Override
     public int getTrustLevel( final String sourceIdentityId, final String targetIdentityId )
     {
+        String sFingerprint = getFingerprint( sourceIdentityId );
+        String tFingerprint = getFingerprint( targetIdentityId );
 
-        SecurityKeyTrust trust = getKeyTrust( sourceIdentityId, targetIdentityId );
-
-        if ( trust != null )
+        if ( sFingerprint.equals( tFingerprint ) )
         {
-            return trust.getLevel();
+            // ultimate trust exists if asked trust level for myself
+            return KeyTrustLevel.Ultimate.getId();
+        }
+
+        Set<String> sTrustChain = Sets.newHashSet();
+        Set<String> tTrustChain = Sets.newHashSet();
+
+        constructTrustChain( sFingerprint, sTrustChain );
+        constructTrustChain( tFingerprint, tTrustChain );
+
+        if ( tTrustChain.contains( sFingerprint ) || sTrustChain.contains( tFingerprint ) )
+        {
+            return KeyTrustLevel.Full.getId();
         }
         else
         {
-            return KeyTrustLevel.Never.getId();
+            for ( final String fingerprint : sTrustChain )
+            {
+                if ( tTrustChain.contains( fingerprint ) )
+                {
+                    return KeyTrustLevel.Marginal.getId();
+                }
+            }
         }
+        return KeyTrustLevel.Never.getId();
     }
 
 
+    /* *****************************
+     *
+     */
+    private void constructTrustChain( String fingerprint, Set<String> chain )
+    {
+        chain.add( fingerprint );
+        List<SecurityKeyTrust> keyTrusts = securityDataService.getKeyTrustData( fingerprint );
+        for ( final SecurityKeyTrust keyTrust : keyTrusts )
+        {
+            if ( !chain.contains( keyTrust.getTargetFingerprint() ) )
+            {
+                constructTrustChain( keyTrust.getTargetFingerprint(), chain );
+            }
+        }
+    }
 }

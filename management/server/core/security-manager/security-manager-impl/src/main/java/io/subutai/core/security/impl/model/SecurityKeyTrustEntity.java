@@ -37,7 +37,6 @@ public class SecurityKeyTrustEntity implements SecurityKeyTrust
     @Column( name = "level" )
     private int level = 1;
 
-
     @Override
     public long getId()
     {
