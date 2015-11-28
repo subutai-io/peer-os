@@ -10,7 +10,7 @@ Given the ARM user is on the home page of Subutai
 And the user enter login and password: 'admin', 'secret'
 And the user click on the button: Login
 When the user click on the menu item: Console
-And the user select any available resource host from select menu
+And the user select management host from select menu
 And the user enter console command: 'cat /proc/cpuinfo'
 Then the user verify output console command and observe expected phrase: 'ARM'
 When the user click on the menu item: Environment
@@ -43,14 +43,15 @@ And the user observe text: Your environment start creation.
 When the user click on the button: OK
 Then the user observe header: Success!
 And the user observe text: Your environment has been created.
-When the user click on the menu item: Console
-And the user select any available resource host from select menu
+When the user click on the button: OK
+And the user click on the menu item: Console
+And the user select management host from select menu
 And the user enter console command: 'sudo subutai list -i'
 Then the user verify output console command and observe expected phrase: 'master'
 And the user verify output console command and observe expected phrase: 'RUNNING'
-When the user select management host from select menu
+When the user select any available resource host from select menu
 And the user enter console command: 'cat /proc/cpuinfo'
-Then the user verify output console command and observe expected phrase: 'ARM'
+Then the user verify output console command and observe expected phrase: 'Intel'
 
 Scenario: Destroy Environment and Blueprint from ARM
 Given the ARM user is on the home page of Subutai
