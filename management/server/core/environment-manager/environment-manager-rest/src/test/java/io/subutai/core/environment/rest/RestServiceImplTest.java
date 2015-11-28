@@ -21,6 +21,8 @@ import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.NodeGroup;
+import io.subutai.common.host.Interface;
+import io.subutai.common.peer.ContainerType;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.protocol.Template;
@@ -58,11 +60,14 @@ public class RestServiceImplTest
     EnvironmentContainerHost containerHost;
 
     RestServiceImpl restService;
+    @Mock
+    private Interface netIntf;
 
 
     @Before
     public void setUp() throws Exception
     {
+        when(netIntf.getIp()).thenReturn( TestUtil.IP );
         when( peerManager.getPeer( TestUtil.PEER_ID ) ).thenReturn( peer );
         when( templateRegistry.getTemplate( TestUtil.TEMPLATE_NAME ) ).thenReturn( template );
         when( environmentManager.createEnvironment( any( Blueprint.class ), anyBoolean() ) ).thenReturn( environment );
@@ -73,9 +78,10 @@ public class RestServiceImplTest
         when( containerHost.getId() ).thenReturn( TestUtil.CONTAINER_ID );
         when( containerHost.getEnvironmentId() ).thenReturn( TestUtil.ENV_ID );
         when( containerHost.getHostname() ).thenReturn( TestUtil.HOSTNAME );
-        when( containerHost.getIpByInterfaceName( anyString() ) ).thenReturn( TestUtil.IP );
+        when( containerHost.getInterfaceByName( anyString() ) ).thenReturn( netIntf );
         when( containerHost.getTemplateName() ).thenReturn( TestUtil.TEMPLATE_NAME );
         when( containerHost.getStatus() ).thenReturn( TestUtil.CONTAINER_STATE );
+        when( containerHost.getContainerType() ).thenReturn( ContainerType.LARGE );
         when( environmentManager.getEnvironments() ).thenReturn( Sets.newHashSet( environment ) );
         when( environmentManager.loadEnvironment( TestUtil.ENV_ID ) ).thenReturn( environment );
         when( environment.getContainerHostById( TestUtil.CONTAINER_ID ) ).thenReturn( containerHost );

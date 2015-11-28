@@ -14,17 +14,19 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.peer.HostNotFoundException;
+import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.Interface;
+import io.subutai.common.peer.ContainerCreationException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.NumUtil;
-import io.subutai.common.peer.ContainerCreationException;
+import io.subutai.core.hostregistry.api.HostDisconnectedException;
+import io.subutai.core.hostregistry.api.HostRegistry;
 
 
-public class CreateContainerTask implements Callable<ContainerHost>
+public class CreateContainerTask implements Callable<HostInfo>
 {
     protected static final Logger LOG = LoggerFactory.getLogger( CreateContainerTask.class );
     private static final int TEMPLATE_IMPORT_TIMEOUT_SEC = 10 * 60 * 60;
@@ -34,68 +36,82 @@ public class CreateContainerTask implements Callable<ContainerHost>
     private final String ip;
     private final int vlan;
     private final int timeoutSec;
+    private final String environmentId;
     protected CommandUtil commandUtil = new CommandUtil();
+    private HostRegistry hostRegistry;
 
 
-    public CreateContainerTask( final ResourceHost resourceHost, final Template template, final String hostname,
-                                final String ip, final int vlan, final int timeoutSec )
+    public CreateContainerTask( HostRegistry hostRegistry, final ResourceHost resourceHost, final Template template,
+                                final String hostname, final String ip, final int vlan, final int timeoutSec,
+                                final String environmentId )
     {
         Preconditions.checkNotNull( resourceHost );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ) );
         Preconditions.checkNotNull( template );
         Preconditions.checkArgument( timeoutSec > 0 );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( ip ) && ip.matches( Common.CIDR_REGEX ) );
+        Preconditions.checkArgument( NumUtil.isIntBetween( vlan, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ) );
 
+        this.hostRegistry = hostRegistry;
         this.resourceHost = resourceHost;
         this.template = template;
         this.hostname = hostname;
         this.ip = ip;
         this.vlan = vlan;
         this.timeoutSec = timeoutSec;
+        this.environmentId = environmentId;
     }
 
 
     @Override
-    public ContainerHost call() throws Exception
+    public HostInfo call() throws Exception
     {
 
         prepareTemplate( template );
-        if ( !Strings.isNullOrEmpty( ip ) && ip.matches( Common.CIDR_REGEX ) && NumUtil
-                .isIntBetween( vlan, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) )
-        {
-            commandUtil.execute( new RequestBuilder( "subutai clone" ).withCmdArgs(
-                    Lists.newArrayList( template.getTemplateName(), hostname, "-i",
-                            String.format( "\"%s %s\"", ip, vlan ) ) ).withTimeout( 1 ).daemon(), resourceHost );
-        }
-        else
-        {
-            commandUtil.execute( new RequestBuilder( "subutai clone" )
-                    .withCmdArgs( Lists.newArrayList( template.getTemplateName(), hostname ) ).withTimeout( 1 )
-                    .daemon(), resourceHost );
-        }
+
+        commandUtil.execute( new RequestBuilder( "subutai clone" ).withCmdArgs(
+                Lists.newArrayList( template.getTemplateName(), hostname, "-i",
+                        String.format( "\"%s %s\"", ip, vlan ) ) ).withTimeout( 1 ).daemon(), resourceHost );
+
         long start = System.currentTimeMillis();
 
-        ContainerHost containerHost = null;
-        while ( System.currentTimeMillis() - start < timeoutSec * 1000 && ( containerHost == null || Strings
-                .isNullOrEmpty( containerHost.getIpByInterfaceName( Common.DEFAULT_CONTAINER_INTERFACE ) ) ) )
+        HostInfo hostInfo = null;
+        String ip = null;
+        while ( System.currentTimeMillis() - start < timeoutSec * 1000 && ( hostInfo == null || Strings
+                .isNullOrEmpty( ip ) ) )
         {
             Thread.sleep( 100 );
             try
             {
-                containerHost = resourceHost.getContainerHostByName( hostname );
+                hostInfo = hostRegistry.getContainerHostInfoByHostname( hostname );
+                for ( Interface intf : hostInfo.getInterfaces() )
+                {
+                    if ( Common.DEFAULT_CONTAINER_INTERFACE.equals( intf.getName() ) )
+                    {
+                        ip = intf.getIp();
+                        break;
+                    }
+                }
             }
-            catch ( HostNotFoundException e )
+            catch ( HostDisconnectedException e )
             {
                 //ignore
             }
         }
 
-        if ( containerHost == null )
+        if ( hostInfo == null )
         {
             throw new ContainerCreationException(
                     String.format( "Container %s did not connect within timeout with proper IP", hostname ) );
         }
+        else
+        {
+            //TODO sign CH key with PEK identified by LocalPeerId+environmentId
+            //at this point the CH key is already in the KeyStore and might be just updated.
+        }
 
-        return containerHost;
+        return hostInfo;
     }
 
 

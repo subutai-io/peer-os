@@ -18,7 +18,7 @@
     <argument ref="tracker" />
   </bean>
 
-  <jaxrs:server address="/tracker_ui" id="trackerRestUIService">
+  <jaxrs:server address="/ui/tracker" id="trackerRestUIService">
     <jaxrs:serviceBeans>
       <ref component-id="trackerRestUIImpl" />
     </jaxrs:serviceBeans>

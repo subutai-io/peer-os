@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
+import com.google.gson.JsonSyntaxException;
 
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
@@ -40,12 +41,16 @@ import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.InstanceType;
 import io.subutai.common.host.ResourceHostInfo;
+import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.protocol.Disposable;
 import io.subutai.common.protocol.Template;
+import io.subutai.common.settings.Common;
+import io.subutai.common.util.JsonUtil;
+import io.subutai.common.util.NumUtil;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.localpeer.impl.container.CreateContainerTask;
@@ -423,12 +428,15 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public ContainerHost createContainer( final String templateName, final String hostname, final String ip,
-                                          final int vlan, final String gateway, final int timeout )
-            throws ResourceHostException
+    public HostInfo createContainer( final String templateName, final String hostname, final String ip, final int vlan,
+                                     final int timeout, final String environmentId ) throws ResourceHostException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( ip ), "Invalid ip" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+        Preconditions
+                .checkArgument( NumUtil.isIntBetween( vlan, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ), "Invalid vlan id" );
         Preconditions.checkArgument( timeout > 0, "Invalid timeout" );
 
         Template template = registry.getTemplate( templateName );
@@ -448,26 +456,18 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             LOG.info( String.format( "Container host '%s' does not exists, creating new one.", hostname ) );
         }
 
-        Future<ContainerHost> containerHostFuture = queueSequentialTask(
-                new CreateContainerTask( this, template, hostname, ip, vlan, /*gateway, */timeout ) );
+        Future<HostInfo> containerHostFuture = queueSequentialTask(
+                new CreateContainerTask( hostRegistry, this, template, hostname, ip, vlan, timeout, environmentId ) );
 
         try
         {
-            final ContainerHost result = containerHostFuture.get();
+            final HostInfo result = containerHostFuture.get();
             return result;
         }
         catch ( ExecutionException | InterruptedException e )
         {
             throw new ResourceHostException( "Error creating container", e );
         }
-    }
-
-
-    @Override
-    public ContainerHost createContainer( final String templateName, final String hostname, final int timeout )
-            throws ResourceHostException
-    {
-        return createContainer( templateName, hostname, null, 0, null, timeout );
     }
 
 
@@ -483,11 +483,13 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
-    public void addContainerHost( ContainerHostEntity host )
+    @Override
+    public void addContainerHost( ContainerHost host )
     {
         Preconditions.checkNotNull( host, "Invalid container host" );
 
-        host.setParent( this );
+        ContainerHostEntity containerHostEntity = ( ContainerHostEntity ) host;
+        containerHostEntity.setParent( this );
 
         synchronized ( containersHosts )
         {
@@ -512,13 +514,15 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             }
             catch ( HostNotFoundException e )
             {
-                if ( !Strings.isNullOrEmpty( info.getId() ) )
-                {
-                    containerHost = new ContainerHostEntity( peerId, info );
-                    addContainerHost( containerHost );
-                    containerHost.updateHostInfo( info );
-                    result = true;
-                }
+                LOG.warn( String.format( "Found not registered container host: %s %s", info.getId(),
+                        info.getHostname() ) );
+                //                if ( !Strings.isNullOrEmpty( info.getId() ) )
+                //                {
+                //                    containerHost = new ContainerHostEntity( peerId, info );
+                //                    addContainerHost( containerHost );
+                //                    containerHost.updateHostInfo( info );
+                //                    result = true;
+                //                }
             }
         }
 
@@ -549,5 +553,35 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     public boolean isConnected()
     {
         return getPeer().isConnected( new HostId( getId() ) );
+    }
+
+
+    @Override
+    public ResourceHostMetric getMetric()
+    {
+        ResourceHostMetric result = null;
+        try
+        {
+            RequestBuilder requestBuilder = new RequestBuilder( String.format( "subutai stats system %s", hostname ) );
+            CommandResult commandResult = execute( requestBuilder );
+            if ( commandResult.hasSucceeded() )
+            {
+                result = JsonUtil.fromJson( commandResult.getStdOut(), ResourceHostMetric.class );
+                result.setPeerId( peerId );
+                result.setHostId( hostId );
+                result.setHostName( hostname );
+                result.setContainersCount( getContainers().size() );
+            }
+            else
+            {
+                LOG.warn( String.format( "Error getting %s metrics", hostname ) );
+            }
+        }
+        catch ( CommandException | JsonSyntaxException e )
+        {
+            LOG.error( e.getMessage(), e );
+        }
+
+        return result;
     }
 }

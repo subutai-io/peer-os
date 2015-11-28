@@ -10,9 +10,9 @@ angular.module('subutai.console.controller', [])
 		//terminalConfigurationProvider.config('vintage').startSoundUrl ='example/content/start.wav';
 	}]);
 
-ConsoleViewCtrl.$inject = ['$scope', 'consoleService'];
+ConsoleViewCtrl.$inject = ['$scope', 'consoleService', 'peerRegistrationService', '$stateParams'];
 
-function ConsoleViewCtrl($scope, consoleService) {
+function ConsoleViewCtrl($scope, consoleService, peerRegistrationService, $stateParams) {
 
 	var vm = this;	
 	vm.currentType = 'peer';
@@ -21,8 +21,14 @@ function ConsoleViewCtrl($scope, consoleService) {
 	vm.environments = [];
 	vm.containers = [];
 	vm.currentTab = '';
+	vm.daemon = false;
+	vm.timeOut = 0;
 
-	consoleService.getResourceHosts().success(function (data) {
+	if($stateParams.containerId !== undefined && $stateParams.containerId.length > 0) {
+		vm.activeConsole = $stateParams.containerId;
+	}
+
+	peerRegistrationService.getResourceHosts().success(function (data) {
 		vm.hosts = data;
 	});
 
@@ -40,7 +46,12 @@ function ConsoleViewCtrl($scope, consoleService) {
 			],
 			breakLine: true
 		});
-		$scope.prompt.path('/');		
+		$scope.prompt.path('/');
+
+		if(vm.activeConsole) {
+			$scope.prompt.user(vm.activeConsole);
+		}
+
 		$scope.$apply();
 	}, 100);
 
@@ -71,7 +82,6 @@ function ConsoleViewCtrl($scope, consoleService) {
 		$scope.outputDelay = 0;
 
 		$scope.showPrompt = false;
-		console.log($scope);
 
 		if(!vm.activeConsole) {
 			output.push('Select peer or environment container');
@@ -84,15 +94,13 @@ function ConsoleViewCtrl($scope, consoleService) {
 		var cmd = consoleInput[0];
 
 		try {
-			console.log(cmd);
 			if (cmd.command =='clear') {
 				$scope.results.splice(0, $scope.results.length);
 				$scope.$$phase || $scope.$apply();
 				return;
 			}
 
-			consoleService.sendCommand(cmd.command, vm.activeConsole, $scope.prompt.path()).success(function(data){
-				console.log(data);
+			consoleService.sendCommand(cmd.command, vm.activeConsole, $scope.prompt.path(), vm.daemon, vm.timeOut).success(function(data){
 				if(data.stdErr.length > 0) {
 					output = data.stdErr.split('\r');
 				} else {
@@ -103,7 +111,6 @@ function ConsoleViewCtrl($scope, consoleService) {
 				if (checkCommand[0] == 'cd' && data.status == 'SUCCEEDED') {
 					var pathArray = ($scope.prompt.path() + checkCommand[1]).split('/');
 					var totalPath = [];
-					console.log(pathArray);
 					for(var i = 0; i < pathArray.length; i++) {
 						if(pathArray[i].length > 0 && pathArray[i] != '&&') {
 							if(pathArray[i] == '..') {
@@ -124,7 +131,7 @@ function ConsoleViewCtrl($scope, consoleService) {
 
 				$scope.session.output.push(
 					{ output: true, text: output, breakLine: true }
-				);				
+				);
 			}).error(function (data) {
 				$scope.session.output.push({ output: true, breakLine: true, text: [data] });
 			});
@@ -160,10 +167,10 @@ function ConsoleViewCtrl($scope, consoleService) {
 		for(var i in vm.environments) {
 			if(environmentId == vm.environments[i].id) {
 				vm.containers = vm.environments[i].containers;
-				console.log(vm.containers);
 				break;
 			}
 		}
 	}
 
 }
+

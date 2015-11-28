@@ -35,3 +35,7 @@ $(".b-form-input_dropdown").click(function () {
 $(".b-form-input-dropdown-list").click(function(e) {
 	e.stopPropagation();
 });
+
+//document.getElementById("uploadBtn").onchange = function () {
+//	document.getElementById("uploadFile").value = this.value;
+//};
