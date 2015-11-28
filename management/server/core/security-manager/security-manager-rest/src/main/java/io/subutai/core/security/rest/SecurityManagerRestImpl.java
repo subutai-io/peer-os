@@ -161,6 +161,7 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
         keyIdentityDTO.setChild( false );
         keyIdentityDTO.setTrustLevel( KeyTrustLevel.Ultimate.getId() );
         keyIdentityDTO.setParentId( keyIdentityDTO.getHostId() );
+        keyIdentityDTO.setParentPublicKeyFingerprint( keyIdentityDTO.getParentPublicKeyFingerprint() );
 
         resetTrustLevels( keyIdentityDTO, keyManager );
 
@@ -174,6 +175,7 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
         for ( final KeyIdentityDTO identityDTO : keyIdentityDTO.getTrusts() )
         {
             identityDTO.setParentId( keyIdentityDTO.getHostId() );
+            identityDTO.setParentPublicKeyFingerprint( keyIdentityDTO.getPublicKeyFingerprint() );
             identityDTO.setChild( true );
             identityDTO
                     .setTrustLevel( keyManager.getTrustLevel( keyIdentityDTO.getHostId(), identityDTO.getHostId() ) );

@@ -23,6 +23,7 @@ public class KeyIdentityDTO implements SecurityKeyIdentity
     private int trustLevel;
     private List<KeyIdentityDTO> trustedKeys = Lists.newArrayList();
     private String parentId;
+    private String parentPublicKeyFingerprint;
 
 
     public KeyIdentityDTO( SecurityKeyIdentity securityKeyIdentity )
@@ -36,6 +37,18 @@ public class KeyIdentityDTO implements SecurityKeyIdentity
         {
             this.trustedKeys.add( new KeyIdentityDTO( keyIdentity ) );
         }
+    }
+
+
+    public String getParentPublicKeyFingerprint()
+    {
+        return parentPublicKeyFingerprint;
+    }
+
+
+    public void setParentPublicKeyFingerprint( final String parentPublicKeyFingerprint )
+    {
+        this.parentPublicKeyFingerprint = parentPublicKeyFingerprint;
     }
 
 
