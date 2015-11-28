@@ -290,4 +290,49 @@ public class SubutaiPage extends PageObject {
         System.out.println(text);
     }
 
+    //------3023
+
+    @FindBy(id = "subt-link__console")
+    public WebElementFacade subutaiLinkConsole;
+
+    @FindBy(xpath = "*//section[@class=\"terminal modern-terminal\"]")
+    public WebElementFacade subuaiConsole;
+
+    @FindBy(ngModel = "commandLine")
+    public WebElementFacade inputConsole;
+
+    @FindBy(xpath = "*//option[contains(text(),\"rh\")]")
+    public WebElementFacade selectMenuResourceHostsOptionRH;
+
+    @FindBy(className = "terminal-input ng-binding")
+    public WebElementFacade consoleInput;
+
+    @FindBy(xpath = "*//pre[contains(text(),\"test\")]")
+    public WebElementFacade outputOfTestCommand;
+
+    @FindBy(xpath = "*//h1[contains(text(),\"Blueprint\")]")
+    public WebElementFacade subutaiBlueprintHeader;
+
+    @FindBy(xpath = "*//span[contains(text(),\":>\")]")
+    public WebElementFacade endOfConsoleLine;
+
+    @FindBy(xpath = "*//li[contains(text(),\"Environment\")]")
+    public WebElementFacade pageConsoleLinkEnvironment;
+
+    @FindBy(ngModel = "selectedEnvironment")
+    public WebElementFacade environmentSelectMenu;
+
+    @FindBy(ngModel = "selectedContainer")
+    public WebElementFacade selectMenuContainer;
+
+    @FindBy(xpath = "*//span[@class=\"terminal-prompt ng-binding\"]")
+    public WebElementFacade terminalPromptBinding;
+
+    @FindBy(xpath = "xhtml:html/xhtml:body/xhtml:pre[contains(text(),\"-----BEGIN PGP PUBLIC KEY BLOCK-----\")]")
+    public WebElementFacade pgpHeader;
+
+
+
+
+
 }
