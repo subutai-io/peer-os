@@ -3,6 +3,7 @@ package io.subutai.core.channel.impl.interceptor;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.AccessControlException;
 import java.security.PrivilegedAction;
 
 import javax.security.auth.Subject;
@@ -84,8 +85,7 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
                         }
                         catch ( Exception ex )
                         {
-                            LOG.error( "****** Error !! Error in doIntercept," + ex.toString(),ex );
-                            MessageContentUtil.abortChain( message, 403, "Access Denied to the resource" );
+                            MessageContentUtil.abortChain( message, ex );
                         }
                         return null;
                     }
@@ -93,7 +93,7 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
             }
             else
             {
-                MessageContentUtil.abortChain( message, 403, "Access Denied to the resource" );
+                MessageContentUtil.abortChain( message, 401, "User is not authorized" );
             }
             //-----------------------------------------------------------------------------------------------
         }
@@ -125,6 +125,8 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
                 sptoken = headers.getHeaderString( "sptoken" );
             }
 
+            //******************Get sptoken from cookies *****************
+            /*
             if ( Strings.isNullOrEmpty( sptoken ) )
             {
                 Cookie[] cookies = req.getCookies();
@@ -135,7 +137,7 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
                         sptoken = cookie.getValue();
                     }
                 }
-            }
+            }*/
 
             if ( Strings.isNullOrEmpty( sptoken ) )
                 return null;

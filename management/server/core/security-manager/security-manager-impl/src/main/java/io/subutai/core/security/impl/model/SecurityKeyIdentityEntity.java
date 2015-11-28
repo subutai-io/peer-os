@@ -30,7 +30,7 @@ public class SecurityKeyIdentityEntity implements SecurityKeyIdentity
 
     /********* column names *******/
 
-    public static final String HOST_ID = "peer_id";
+    public static final String IDENTITY_ID = "identity_id";
     public static final String PUBLIC_KEY_FINGERPRINT  = "pkfingerprint";
     public static final String SECRET_KEY_FINGERPRINT  = "skfingerprint";
     public static final String STATUS  = "status";
@@ -38,8 +38,8 @@ public class SecurityKeyIdentityEntity implements SecurityKeyIdentity
 
 
     @Id
-    @Column( name = HOST_ID )
-    private String hostId;
+    @Column( name = IDENTITY_ID )
+    private String identityId;
 
     @Column( name = PUBLIC_KEY_FINGERPRINT )
     private String publicKeyFingerprint;
@@ -72,16 +72,16 @@ public class SecurityKeyIdentityEntity implements SecurityKeyIdentity
 
 
     @Override
-    public String getHostId()
+    public String getIdentityId()
     {
-        return hostId;
+        return identityId;
     }
 
 
     @Override
-    public void setHostId( final String hostId )
+    public void setIdentityId( final String identityId )
     {
-        this.hostId = hostId;
+        this.identityId = identityId;
     }
 
 

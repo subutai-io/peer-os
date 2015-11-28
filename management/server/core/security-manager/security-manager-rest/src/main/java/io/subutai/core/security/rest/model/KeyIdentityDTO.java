@@ -14,7 +14,7 @@ import io.subutai.core.security.api.model.SecurityKeyIdentity;
  */
 public class KeyIdentityDTO implements SecurityKeyIdentity
 {
-    private String hostId;
+    private String identityId;
     private String publicKeyFingerprint;
     private String secretKeyFingerprint;
     private short status;
@@ -28,7 +28,7 @@ public class KeyIdentityDTO implements SecurityKeyIdentity
 
     public KeyIdentityDTO( SecurityKeyIdentity securityKeyIdentity )
     {
-        this.hostId = securityKeyIdentity.getHostId();
+        this.identityId = securityKeyIdentity.getIdentityId();
         this.publicKeyFingerprint = securityKeyIdentity.getPublicKeyFingerprint();
         this.secretKeyFingerprint = securityKeyIdentity.getSecretKeyFingerprint();
         this.status = securityKeyIdentity.getStatus();
@@ -89,16 +89,16 @@ public class KeyIdentityDTO implements SecurityKeyIdentity
 
 
     @Override
-    public String getHostId()
+    public String getIdentityId()
     {
-        return hostId;
+        return identityId;
     }
 
 
     @Override
-    public void setHostId( final String hostId )
+    public void setIdentityId( final String identityId )
     {
-        this.hostId = hostId;
+        this.identityId = identityId;
     }
 
 

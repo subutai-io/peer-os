@@ -30,13 +30,13 @@ class SecurityKeyIdentityDAO
     /******************************************
      * Get Security KeyId from DB
      */
-    public SecurityKeyIdentity find( String hostId )
+    public SecurityKeyIdentity find( String identityId )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
 
         try
         {
-            SecurityKeyIdentity securityKeyIdentity = em.find( SecurityKeyIdentityEntity.class, hostId );
+            SecurityKeyIdentity securityKeyIdentity = em.find( SecurityKeyIdentityEntity.class, identityId );
 
             return securityKeyIdentity;
         }
@@ -96,7 +96,6 @@ class SecurityKeyIdentityDAO
             daoManager.startTransaction( em );
             em.persist( securityKeyIdentity );
             daoManager.commitTransaction( em );
-
         }
         catch ( Exception ex )
         {
@@ -121,7 +120,6 @@ class SecurityKeyIdentityDAO
             daoManager.startTransaction( em );
             em.merge( securityKeyIdentity );
             daoManager.commitTransaction( em );
-
         }
         catch ( Exception ex )
         {
@@ -137,7 +135,7 @@ class SecurityKeyIdentityDAO
     /******************************************
      *
      */
-    public void remove( String hostId )
+    public void remove( String identityId )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
 
@@ -145,8 +143,8 @@ class SecurityKeyIdentityDAO
         {
             daoManager.startTransaction( em );
 
-            Query qr = em.createQuery( "delete from SecurityKeyIdentityEntity AS ss where ss.hostId=:hostId" );
-            qr.setParameter( "hostId",hostId );
+            Query qr = em.createQuery( "delete from SecurityKeyIdentityEntity AS ss where ss.identityId=:identityId" );
+            qr.setParameter( "identityId",identityId );
             qr.executeUpdate();
 
             daoManager.commitTransaction( em );

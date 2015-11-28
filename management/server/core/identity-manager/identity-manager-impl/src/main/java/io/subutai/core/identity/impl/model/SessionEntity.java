@@ -7,8 +7,6 @@ import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -29,9 +27,8 @@ import io.subutai.core.identity.api.model.User;
 public class SessionEntity implements Session
 {
     @Id
-    @GeneratedValue( strategy = GenerationType.IDENTITY )
     @Column( name = "id" )
-    private long id;
+    private String id;
 
     @Column( name = "status" )
     private int status = 1;
@@ -56,14 +53,14 @@ public class SessionEntity implements Session
 
 
     @Override
-    public Long getId()
+    public String getId()
     {
         return id;
     }
 
 
     @Override
-    public void setId( final Long id )
+    public void setId( final String id )
     {
         this.id = id;
     }

@@ -11,7 +11,6 @@ import org.bouncycastle.openpgp.PGPSecretKey;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
 
 import io.subutai.common.security.crypto.pgp.KeyPair;
-import io.subutai.common.security.objects.KeyTrustLevel;
 import io.subutai.core.security.api.model.SecurityKeyIdentity;
 import io.subutai.core.security.api.model.SecurityKeyTrust;
 
@@ -24,25 +23,40 @@ public interface KeyManager
     /* *****************************
      *
      */
-    public String getPublicKeyRingAsASCII( String hostId );
+    PGPPublicKeyRing getPublicKeyRingByFingerprint( String fingerprint );
+
+    /* *****************************
+     *
+     */
+    public String getPublicKeyRingAsASCII( String identityId );
 
 
     /* *****************************
      * Gets KeyRing from the store
      */
-    public PGPPublicKeyRing getPublicKeyRing( String hostId );
+    public PGPPublicKeyRing getPublicKeyRing( String identityId );
 
 
     /* *****************************
      * Gets SecretKeyRing from the store
      */
-    public PGPSecretKeyRing getSecretKeyRing( String hostId );
+    public PGPSecretKeyRing getSecretKeyRing( String identityId );
 
+
+    /* *****************************
+     *
+     */
+    SecurityKeyIdentity getKeyIdentityDataByFingerprint( String fingerprint );
+
+    /* *****************************
+     *
+     */
+    void removeKeyIdentityData( String identityId );
 
     /* *****************************
      * Gets KeyRing from the store and returns Publickey object
      */
-    public PGPPublicKey getPublicKey( String hostId );
+    public PGPPublicKey getPublicKey( String identityId );
 
 
     /* *****************************
@@ -60,13 +74,13 @@ public interface KeyManager
     /* *****************************
      *
      */
-    PGPSecretKey getSecretKey( String hostId );
+    PGPSecretKey getSecretKey( String identityId );
 
 
     /* *****************************
      *
      */
-    PGPPrivateKey getPrivateKey( String hostId );
+    PGPPrivateKey getPrivateKey( String identityId );
 
 
     /* *****************************
@@ -78,13 +92,13 @@ public interface KeyManager
     /* *****************************
      *
      */
-    void savePublicKeyRing( String hostId, int type, String keyringAsASCII );
+    void savePublicKeyRing( String identityId, int type, String keyringAsASCII );
 
 
     /* *****************************
      *
      */
-    void savePublicKeyRing( String hostId, int type, PGPPublicKeyRing publicKeyRing );
+    void savePublicKeyRing( String identityId, int type, PGPPublicKeyRing publicKeyRing );
 
 
     /* ***************************************************************
@@ -92,43 +106,59 @@ public interface KeyManager
      */
     PGPPublicKeyRing signKey( PGPSecretKeyRing sourceSecRing, PGPPublicKeyRing targetPubRing, int trustLevel );
 
-    /* ***************************************************************
-     *
-     */
-    PGPPublicKeyRing signKey( String sourceHostId, String targetHostId, int trustLevel );
 
     /* ***************************************************************
      *
      */
-    String signPublicKey( String sourceHostId, String keyText, int trustLevel );
+    PGPPublicKeyRing signKey( String sourceIdentityId, String targetIdentityId, int trustLevel );
+
+
+    /* ***************************************************************
+     *
+     */
+    String signPublicKey( String sourceIdentityId, String keyText, int trustLevel );
+
+
+    /* ***************************************************************
+     *
+     */
+    void setKeyTrust( String sourceFingerprint, String targetFingerprint, int trustLevel );
+
+
+    /* ***************************************************************
+     *
+     */
+    PGPPublicKeyRing removeSignature( String sourceFingerprint, String targetFingerprint );
 
     /* ***************************************************************
          *
          */
-    void setKeyTrust( String sourceId, String targetId, int trustLevel );
+    PGPPublicKeyRing removeSignature( String sourceIdentityId, PGPPublicKeyRing targetPubRing );
 
 
     /* ***************************************************************
      *
      */
-    SecurityKeyTrust getKeyTrust( String sourceId, String targetId );
+    SecurityKeyTrust getKeyTrustData(String sourceFingerprint, String targetFingerprint);
 
 
     /* ***************************************************************
      *
      */
-    List<SecurityKeyTrust> getKeyTrust( String sourceId );
+    List<SecurityKeyTrust> getKeyTrustData( String sourceFingerprint );
 
 
     /* ***************************************************************
      *
      */
-    void removeKeyTrust( String sourceId );
+    void removeKeyTrust( String sourceFingerprint );
+
 
     /* ***************************************************************
      *
      */
-    void removeKeyTrust( String sourceId, String targetId );
+    void removeKeyTrust( String sourceFingerprint, String targetFingerprint);
+
 
     /* *****************************
      *
@@ -139,67 +169,74 @@ public interface KeyManager
     /* *****************************
      *
      */
-    void removePublicKeyRing( String hostId );
+    void removePublicKeyRing( String identityId );
 
 
     /* *****************************************
      * Removes SecretKeyRing from the Store
      */
-    void removeSecretKeyRing( String hostId );
+    void removeSecretKeyRing( String identityId );
+
 
 
     /* *****************************************
      * Retrieves host key identity data
      */
-    SecurityKeyIdentity getKeyIdentityData( String hostId );
+    SecurityKeyIdentity getKeyIdentityData( String identityId );
 
 
     /* *****************************************
      *
      */
-    KeyPair generateKeyPair( String userId, boolean armored );
+    KeyPair generateKeyPair( String identityId, boolean armored );
 
 
     /* *****************************************
      *
      */
-    public void saveKeyPair( String hostId, int type, KeyPair keyPair );
+    public void saveKeyPair( String identityId, int type, KeyPair keyPair );
 
 
     /* *****************************************
      * Removes Secret and PublicKeyrings from the Store
      */
-    public void removeKeyRings( String hostId );
+    public void removeKeyRings( String identityId );
 
 
     /* *****************************
      *
      */
-    public InputStream getSecretKeyRingInputStream( String hostId );
+    public InputStream getSecretKeyRingInputStream( String identityId );
 
-
-    /* *****************************
-     *
-     */
-    public PGPPublicKey getRemoteHostPublicKey( String hostId, String ip );
 
 
     /* *****************************
      *
      */
-    public String getFingerprint( String hostId );
+    public PGPPublicKey getRemoteHostPublicKey( String identityId, String ip );
 
-
-    /* *****************************
-     *
-     */
-    SecurityKeyIdentity getKeyTrustTree( String hostId );
 
 
     /* *****************************
      *
      */
-    int getTrustLevel( String aHost, String bHost );
+    public String getFingerprint( String identityId );
 
+
+    /* *****************************
+     *
+     */
+    SecurityKeyIdentity getKeyTrustTree( String identityId );
+
+
+    /* *****************************
+     *
+     */
+    int getTrustLevel(final String sourceIdentityId, final String targetIdentityId );
+
+
+    /* *****************************
+     *
+     */
     void updatePublicKeyRing( PGPPublicKeyRing publicKeyRing );
 }

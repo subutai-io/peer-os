@@ -185,7 +185,7 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
             identityDTO.setParentPublicKeyFingerprint( keyIdentityDTO.getPublicKeyFingerprint() );
             identityDTO.setChild( true );
             identityDTO
-                    .setTrustLevel( keyManager.getTrustLevel( keyIdentityDTO.getHostId(), identityDTO.getHostId() ) );
+                    .setTrustLevel( keyManager.getTrustLevel( keyIdentityDTO.getIdentityId(), identityDTO.getIdentityId() ) );
             resetTrustLevels( identityDTO, keyManager );
         }
     }

@@ -257,6 +257,52 @@ public class EncryptionToolImpl implements EncryptionTool
     }
 
 
+    /**
+     * Verifies that a public key is signed with another public key
+     *
+     * @param keyToVerify the public key to verify
+     * @param keyToVerifyWith the key to verify with
+     *
+     * @return true if verified, false otherwise
+     */
+    @Override
+    public boolean verifyPublicKey( PGPPublicKey keyToVerify, PGPPublicKey keyToVerifyWith )
+    {
+        try
+        {
+            return PGPEncryptionUtil.verifyPublicKey( keyToVerify, keyToVerifyWith );
+        }
+        catch ( Exception e )
+        {
+            //throw custom  exception
+            throw new RuntimeException( e );
+        }
+    }
+
+
+    /**
+     * Removes signature
+     *
+     * @param keyToRemoveFrom the key to verify with
+     * @param id the id we are verifying against the public key
+     *
+     * @return true if verified, false otherwise
+     */
+    @Override
+    public PGPPublicKeyRing removeSignature( String id ,PGPPublicKeyRing keyToRemoveFrom)
+    {
+        try
+        {
+            return PGPEncryptionUtil.removeSignature(keyToRemoveFrom , id );
+        }
+        catch ( Exception e )
+        {
+            //throw custom  exception
+            throw new RuntimeException( e );
+        }
+    }
+
+
     @Override
     public byte[] decryptAndVerify( final byte[] message, final String secretKeyHostId, final String pwd,
                                     final String publicKeyHostId ) throws PGPException

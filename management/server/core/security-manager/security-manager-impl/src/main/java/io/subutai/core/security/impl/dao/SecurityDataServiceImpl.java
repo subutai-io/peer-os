@@ -47,17 +47,17 @@ public class SecurityDataServiceImpl implements SecurityDataService
      *
      */
     @Override
-    public void saveKeyIdentityData( final String hostId, final String sKeyId, final String pKeyId, final int type )
+    public void saveKeyIdentityData( final String identityId, final String sKeyId, final String pKeyId, final int type )
     {
         try
         {
 
-            SecurityKeyIdentity securityKeyIdentity = getKeyIdentityData( hostId );
+            SecurityKeyIdentity securityKeyIdentity = getKeyIdentityData( identityId );
 
             if ( securityKeyIdentity == null )
             {
                 securityKeyIdentity = new SecurityKeyIdentityEntity();
-                securityKeyIdentity.setHostId( hostId );
+                securityKeyIdentity.setIdentityId( identityId );
                 securityKeyIdentity.setType( type );
                 securityKeyIdentity.setPublicKeyFingerprint( pKeyId );
                 securityKeyIdentity.setSecretKeyFingerprint( sKeyId );
@@ -88,9 +88,9 @@ public class SecurityDataServiceImpl implements SecurityDataService
      *
      */
     @Override
-    public void removeKeyIdentityData( String hostId )
+    public void removeKeyIdentityData( String identityId )
     {
-        securityKeyIdentityDAO.remove( hostId );
+        securityKeyIdentityDAO.remove( identityId );
     }
 
 
@@ -98,12 +98,15 @@ public class SecurityDataServiceImpl implements SecurityDataService
      *
      */
     @Override
-    public SecurityKeyIdentity getKeyIdentityData( final String hostId )
+    public SecurityKeyIdentity getKeyIdentityData( final String identityId )
     {
-        return securityKeyIdentityDAO.find( hostId );
+        return securityKeyIdentityDAO.find( identityId );
     }
 
 
+    /******************************************
+     *
+     */
     @Override
     public SecurityKeyIdentity getKeyIdentityDataByFingerprint( final String fingerprint )
     {
@@ -112,8 +115,6 @@ public class SecurityDataServiceImpl implements SecurityDataService
 
 
     // ********** Secret Key Store ***************
-
-
     /******************************************
      *
      */
@@ -172,17 +173,17 @@ public class SecurityDataServiceImpl implements SecurityDataService
     }
 
 
-    /************
-     * Trust Data ******************************
+    /*******************************************
+     * Trust Data
      */
     @Override
-    public void saveKeyTrustData( String sourceId, String targetId, int trustLevel )
+    public void saveKeyTrustData( String sourceFingerprint, String targetFingerprint, int trustLevel )
     {
         try
         {
             SecurityKeyTrust secTrust = new SecurityKeyTrustEntity();
-            secTrust.setSourceId( sourceId );
-            secTrust.setTargetId( targetId );
+            secTrust.setSourceFingerprint( sourceFingerprint );
+            secTrust.setTargetFingerprint( targetFingerprint );
             secTrust.setLevel( trustLevel );
 
             securityKeyTrustDAO.persist( secTrust );
@@ -193,6 +194,10 @@ public class SecurityDataServiceImpl implements SecurityDataService
     }
 
 
+    /******************************************
+     *
+     */
+    @Override
     public void updateKeyTrustData( SecurityKeyTrust securityKeyTrust )
     {
         securityKeyTrustDAO.update( securityKeyTrust );
@@ -203,9 +208,9 @@ public class SecurityDataServiceImpl implements SecurityDataService
      *
      */
     @Override
-    public void removeKeyTrustData( long id )
+    public void removeKeyTrustData( long trustDataid )
     {
-        securityKeyTrustDAO.remove( id );
+        securityKeyTrustDAO.remove( trustDataid );
     }
 
 
@@ -213,9 +218,9 @@ public class SecurityDataServiceImpl implements SecurityDataService
      *
      */
     @Override
-    public void removeKeyTrustData( String sourceId )
+    public void removeKeyTrustData( String sourceFingerprint )
     {
-        securityKeyTrustDAO.removeBySourceId( sourceId );
+        securityKeyTrustDAO.removeBySourceId( sourceFingerprint );
     }
 
 
@@ -223,9 +228,9 @@ public class SecurityDataServiceImpl implements SecurityDataService
      *
      */
     @Override
-    public void removeKeyTrustData( String sourceId, String targetId )
+    public void removeKeyTrustData( String sourceFingerprint, String targetFingerprint )
     {
-        securityKeyTrustDAO.removeBySourceId( sourceId, targetId );
+        securityKeyTrustDAO.removeBySourceId( sourceFingerprint, targetFingerprint );
     }
 
 
@@ -243,9 +248,9 @@ public class SecurityDataServiceImpl implements SecurityDataService
      *
      */
     @Override
-    public SecurityKeyTrust getKeyTrustData( String sourceId, String targetId )
+    public SecurityKeyTrust getKeyTrustData( String sourceFingerprint, String targetFingerprint)
     {
-        return securityKeyTrustDAO.findBySourceId( sourceId, targetId );
+        return securityKeyTrustDAO.findBySourceId( sourceFingerprint, targetFingerprint );
     }
 
 
@@ -253,8 +258,8 @@ public class SecurityDataServiceImpl implements SecurityDataService
      *
      */
     @Override
-    public List<SecurityKeyTrust> getKeyTrustData( String sourceId )
+    public List<SecurityKeyTrust> getKeyTrustData( String sourceFingerprint)
     {
-        return securityKeyTrustDAO.findBySourceId( sourceId );
+        return securityKeyTrustDAO.findBySourceId( sourceFingerprint );
     }
 }
