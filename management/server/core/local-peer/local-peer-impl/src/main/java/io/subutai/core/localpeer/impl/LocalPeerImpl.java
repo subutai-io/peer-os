@@ -438,8 +438,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             try
             {
                 HostInfo hostInfo = resourceHost.createContainer( request.getTemplateName(), cloneName,
-                        String.format( "%s/%s", ipAddress, networkPrefix ), environmentVni.getVlan(), gateway,
-                        Common.WAIT_CONTAINER_CONNECTION_SEC );
+                        String.format( "%s/%s", ipAddress, networkPrefix ), environmentVni.getVlan(),
+                        Common.WAIT_CONTAINER_CONNECTION_SEC, request.getEnvironmentId() );
 
 
                 quotaManager.setQuota( new ContainerId( hostInfo.getId() ), containerQuota );
@@ -524,8 +524,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 String ipAddress = allAddresses[request.getIpAddressOffset() + currentIpAddressOffset];
                 taskFutures.add( executorService.submit(
                         new CreateContainerWrapperTask( resourceHostEntity, request.getTemplateName(), hostname,
-                                String.format( "%s/%s", ipAddress, networkPrefix ), environmentVni.getVlan(), gateway,
-                                Common.WAIT_CONTAINER_CONNECTION_SEC ) ) );
+                                String.format( "%s/%s", ipAddress, networkPrefix ), environmentVni.getVlan(),
+                                Common.WAIT_CONTAINER_CONNECTION_SEC, request.getEnvironmentId() ) ) );
 
                 currentIpAddressOffset++;
             }

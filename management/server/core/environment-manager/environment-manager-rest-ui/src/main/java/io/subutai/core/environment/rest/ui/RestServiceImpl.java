@@ -10,6 +10,7 @@ import javax.ws.rs.core.Response;
 
 import io.subutai.common.environment.*;
 import io.subutai.common.gson.required.RequiredDeserializer;
+import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.peer.ContainerType;
 import io.subutai.common.host.Interface;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
@@ -22,6 +23,7 @@ import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
@@ -210,6 +212,8 @@ public class RestServiceImpl implements RestService
         {
             Blueprint blueprint = gson.fromJson( blueprintJson, Blueprint.class );
 
+            updateContainerPlacementStrategy( blueprint );
+
             Environment environment =
                     environmentManager.createEnvironment( blueprint, false );
         }
@@ -335,9 +339,10 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response addEnvironmentDomain( String environmentId, String hostName, DomainLoadBalanceStrategy strategy,
+    public Response addEnvironmentDomain( String environmentId, String hostName, String strategyJson,
                                           Attachment attr )
     {
+        DomainLoadBalanceStrategy strategy = JsonUtil.fromJson( strategyJson, DomainLoadBalanceStrategy.class );
         if( attr == null )
         {
             return Response.status( Response.Status.BAD_REQUEST ).build();
@@ -773,25 +778,43 @@ public class RestServiceImpl implements RestService
     @Override
     public Response getPeers()
     {
-        List<Peer> peers = peerManager.getPeers();
-        Map<String, String> peerNames = Maps.newHashMap();
+        Map<String, List<String>> peerHostMap = Maps.newHashMap();
 
-        for( Peer peer : peers )
+        for( Peer peer : peerManager.getPeers() )
         {
-            peerNames.put( peer.getId(), peer.getName() );
+            peerHostMap.put( peer.getId(), Lists.newArrayList() );
+
+            Collection<ResourceHostMetric> collection = peer.getResourceHostMetrics().getResources();
+            for( ResourceHostMetric metric : collection.toArray(new ResourceHostMetric[ collection.size() ]) )
+            {
+                try
+                {
+                    peerHostMap.get( peer.getId() ).add( metric.getHostId() );
+                }
+                catch ( Exception e )
+                {
+                    LOG.error( "Resource hosts are empty", e );
+                }
+            }
         }
 
-        return Response.ok().entity( JsonUtil.toJson( peerNames ) ).build();
+
+        return Response.ok().entity( JsonUtil.toJson( peerHostMap ) ).build();
     }
 
+
+    public Response setTags()
+    {
+
+
+        return Response.ok().build();
+    }
 
 
     /** AUX *****************************************************/
 
     private Set<ContainerJson> convertContainersToContainerJson( Set<EnvironmentContainerHost> containerHosts )
     {
-        String types[] = {"TINY", "SMALL", "MEDIUM", "LARGE", "HUGE", "CUSTOM"};
-
         Set<ContainerJson> jsonSet = Sets.newHashSet();
         for ( EnvironmentContainerHost containerHost : containerHosts )
         {
@@ -799,10 +822,15 @@ public class RestServiceImpl implements RestService
 
             Interface iface = containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE );
 
-            jsonSet.add( new ContainerJson( containerHost.getId(), containerHost.getEnvironmentId().getId(),
+
+
+
+            jsonSet.add( new ContainerJson( containerHost.getId(), containerHost.getEnvironmentId(),
                     containerHost.getHostname(), state,
                     iface.getIp(),
-                    containerHost.getTemplateName(), ContainerType.valueOf( types[ (int)(Math.random() * types.length) ] ) ) );
+                    iface.getMac(),
+                    containerHost.getTemplateName(), containerHost.getContainerType(), containerHost.getTags() ) );
+
         }
         return jsonSet;
     }
@@ -824,5 +852,20 @@ public class RestServiceImpl implements RestService
         }
 
         return null;
+    }
+
+    private void updateContainerPlacementStrategy( Blueprint blueprint )
+    {
+        for( NodeGroup nodeGroup : blueprint.getNodeGroups() )
+        {
+            if( nodeGroup.getHostId() == null )
+            {
+                nodeGroup.setContainerDistributionType( ContainerDistributionType.AUTO );
+            }
+            else
+            {
+                nodeGroup.setContainerDistributionType( ContainerDistributionType.CUSTOM );
+            }
+        }
     }
 }

@@ -50,11 +50,16 @@ function ContainerViewCtrl($scope, environmentService, SweetAlert, DTOptionsBuil
 			) {
 				for(var j in vm.environments[i].containers) {
 					if(
-						vm.containersTypeId === undefined || 
-						vm.containersTypeId == vm.environments[i].containers[j].type
-					) {
-						vm.containers.push(vm.environments[i].containers[j]);
-					}
+						vm.containersTypeId !== undefined && 
+						vm.containersTypeId != vm.environments[i].containers[j].type && 
+						vm.containersTypeId.length > 0
+					) {continue;}
+					if(
+						vm.containerState !== undefined && 
+						vm.containerState != vm.environments[i].containers[j].state && 
+						vm.containerState.length > 0
+					) {continue;}
+					vm.containers.push(vm.environments[i].containers[j]);
 				}
 			}
 		}
@@ -62,7 +67,7 @@ function ContainerViewCtrl($scope, environmentService, SweetAlert, DTOptionsBuil
 
 	vm.dtOptions = DTOptionsBuilder
 		.newOptions()
-		//.withOption('order', [[ 1, "asc" ]])
+		.withOption('order', [[ 2, "asc" ]])
 		.withOption('stateSave', true)
 		.withPaginationType('full_numbers');
 	vm.dtColumnDefs = [
@@ -72,7 +77,7 @@ function ContainerViewCtrl($scope, environmentService, SweetAlert, DTOptionsBuil
 		DTColumnDefBuilder.newColumnDef(3),
 		DTColumnDefBuilder.newColumnDef(4).notSortable(),
 		DTColumnDefBuilder.newColumnDef(5).notSortable()
-	];	
+	];
 
 	function destroyContainer(containerId, key) {
 		SweetAlert.swal({

@@ -48,7 +48,9 @@ import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.protocol.Disposable;
 import io.subutai.common.protocol.Template;
+import io.subutai.common.settings.Common;
 import io.subutai.common.util.JsonUtil;
+import io.subutai.common.util.NumUtil;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.localpeer.impl.container.CreateContainerTask;
@@ -426,12 +428,15 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public HostInfo createContainer( final String templateName, final String hostname, final String ip,
-                                          final int vlan, final String gateway, final int timeout )
-            throws ResourceHostException
+    public HostInfo createContainer( final String templateName, final String hostname, final String ip, final int vlan,
+                                     final int timeout, final String environmentId ) throws ResourceHostException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( ip ), "Invalid ip" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+        Preconditions
+                .checkArgument( NumUtil.isIntBetween( vlan, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ), "Invalid vlan id" );
         Preconditions.checkArgument( timeout > 0, "Invalid timeout" );
 
         Template template = registry.getTemplate( templateName );
@@ -452,7 +457,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         }
 
         Future<HostInfo> containerHostFuture = queueSequentialTask(
-                new CreateContainerTask( hostRegistry, this, template, hostname, ip, vlan, /*gateway, */timeout ) );
+                new CreateContainerTask( hostRegistry, this, template, hostname, ip, vlan, timeout, environmentId ) );
 
         try
         {
@@ -463,14 +468,6 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         {
             throw new ResourceHostException( "Error creating container", e );
         }
-    }
-
-
-    @Override
-    public HostInfo createContainer( final String templateName, final String hostname, final int timeout )
-            throws ResourceHostException
-    {
-        return createContainer( templateName, hostname, null, 0, null, timeout );
     }
 
 
@@ -492,7 +489,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         Preconditions.checkNotNull( host, "Invalid container host" );
 
         ContainerHostEntity containerHostEntity = ( ContainerHostEntity ) host;
-        containerHostEntity .setParent( this );
+        containerHostEntity.setParent( this );
 
         synchronized ( containersHosts )
         {
