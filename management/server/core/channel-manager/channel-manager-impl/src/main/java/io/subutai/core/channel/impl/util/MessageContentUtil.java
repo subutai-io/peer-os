@@ -67,7 +67,7 @@ public class MessageContentUtil
             response.setStatus( errorStatus );
             response.getOutputStream().write( errorMessage.getBytes( Charset.forName( "UTF-8" ) ) );
             response.getOutputStream().flush();
-            LOG.error( "****** Error !! Error in doIntercept:" + message );
+            LOG.error( "****** Error !! Error in doIntercept:" + errorMessage );
 
         }
         catch ( Exception e )

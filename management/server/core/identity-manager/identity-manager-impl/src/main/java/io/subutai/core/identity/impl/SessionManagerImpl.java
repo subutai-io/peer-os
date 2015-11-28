@@ -28,7 +28,7 @@ public class SessionManagerImpl implements SessionManager
 {
     //Session Expiration time in mins
     //****************************************
-    private static int SESSION_TIMEOUT = 2;
+    private static int SESSION_TIMEOUT = 30;
 
     //****************************************
     private ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
@@ -62,7 +62,7 @@ public class SessionManagerImpl implements SessionManager
                 {
                 }
             }
-        }, 2, 2, TimeUnit.MINUTES );
+        }, 10, 10, TimeUnit.MINUTES );
     }
 
 
