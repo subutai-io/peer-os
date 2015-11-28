@@ -80,7 +80,7 @@ public interface SecurityManagerRest
     @GET
     @Path( "keyman/trust/tree" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getKeyTrustTree( @QueryParam( "hostId" ) String hostId );
+    public Response getKeyTrustTree( @QueryParam( "identityId" ) String identityId );
 
 
     /* *******************************

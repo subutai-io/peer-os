@@ -47,9 +47,9 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
      *
      */
     @Override
-    public Response addPublicKeyRing( final String hostId, final String keyText )
+    public Response addPublicKeyRing( final String identityId, final String keyText )
     {
-        securityManager.getKeyManager().savePublicKeyRing( hostId, ( short ) 3, keyText );
+        securityManager.getKeyManager().savePublicKeyRing( identityId, ( short ) 3, keyText );
 
         return Response.ok().build();
     }
@@ -59,9 +59,9 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
      *
      */
     @Override
-    public Response removePublicKeyRing( final String hostId )
+    public Response removePublicKeyRing( final String identityId )
     {
-        securityManager.getKeyManager().removePublicKeyRing( hostId );
+        securityManager.getKeyManager().removePublicKeyRing( identityId );
 
         return Response.ok().build();
     }
@@ -71,9 +71,9 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
      *
      */
     @Override
-    public Response getPublicKeyRing( final String hostId )
+    public Response getPublicKeyRing( final String identityId )
     {
-        String key = securityManager.getKeyManager().getPublicKeyRingAsASCII( hostId );
+        String key = securityManager.getKeyManager().getPublicKeyRingAsASCII( identityId );
 
         if ( Strings.isNullOrEmpty( key ) )
         {
@@ -90,9 +90,9 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
      *
      */
     @Override
-    public Response getPublicKeyId( final String hostId )
+    public Response getPublicKeyId( final String identityId )
     {
-        PGPPublicKey key = securityManager.getKeyManager().getPublicKeyRing( hostId ).getPublicKey();
+        PGPPublicKey key = securityManager.getKeyManager().getPublicKeyRing( identityId ).getPublicKey();
 
         if ( key == null )
         {
@@ -133,9 +133,9 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
      *
      */
     @Override
-    public Response getPublicKeyFingerprint( final String hostId )
+    public Response getPublicKeyFingerprint( final String identityId )
     {
-        String fingerprint = securityManager.getKeyManager().getFingerprint( hostId );
+        String fingerprint = securityManager.getKeyManager().getFingerprint( identityId );
 
         if ( fingerprint == null )
         {
@@ -152,18 +152,18 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
      *
      */
     @Override
-    public Response getKeyTrustTree( String hostId )
+    public Response getKeyTrustTree( String identityId )
     {
         try
         {
-            logger.debug( "Received hostId: " + hostId );
+            logger.debug( "Received identityId: " + identityId );
             KeyManager keyManager = securityManager.getKeyManager();
 
-            KeyIdentityDTO keyIdentityDTO = new KeyIdentityDTO( keyManager.getKeyTrustTree( hostId ) );
+            KeyIdentityDTO keyIdentityDTO = new KeyIdentityDTO( keyManager.getKeyTrustTree( identityId ) );
             keyIdentityDTO.setChild( false );
             keyIdentityDTO.setTrustLevel( KeyTrustLevel.Ultimate.getId() );
-            keyIdentityDTO.setParentId( keyIdentityDTO.getHostId() );
-            keyIdentityDTO.setParentPublicKeyFingerprint( keyIdentityDTO.getParentPublicKeyFingerprint() );
+            keyIdentityDTO.setParentId( keyIdentityDTO.getIdentityId() );
+            keyIdentityDTO.setParentPublicKeyFingerprint( keyIdentityDTO.getPublicKeyFingerprint() );
 
             resetTrustLevels( keyIdentityDTO, keyManager );
 
@@ -181,7 +181,7 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
     {
         for ( final KeyIdentityDTO identityDTO : keyIdentityDTO.getTrusts() )
         {
-            identityDTO.setParentId( keyIdentityDTO.getHostId() );
+            identityDTO.setParentId( keyIdentityDTO.getIdentityId() );
             identityDTO.setParentPublicKeyFingerprint( keyIdentityDTO.getPublicKeyFingerprint() );
             identityDTO.setChild( true );
             identityDTO

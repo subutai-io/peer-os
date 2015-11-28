@@ -3,7 +3,6 @@ package io.subutai.core.channel.impl.interceptor;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.AccessControlException;
 import java.security.PrivilegedAction;
 
 import javax.security.auth.Subject;
@@ -126,7 +125,7 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
             }
 
             //******************Get sptoken from cookies *****************
-            /*
+
             if ( Strings.isNullOrEmpty( sptoken ) )
             {
                 Cookie[] cookies = req.getCookies();
@@ -137,7 +136,7 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
                         sptoken = cookie.getValue();
                     }
                 }
-            }*/
+            }
 
             if ( Strings.isNullOrEmpty( sptoken ) )
                 return null;

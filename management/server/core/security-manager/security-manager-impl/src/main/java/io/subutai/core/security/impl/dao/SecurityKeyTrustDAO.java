@@ -55,7 +55,8 @@ class SecurityKeyTrustDAO
 
         try
         {
-            Query qr = em.createQuery( "select st from SecurityKeyTrustEntity AS st where st.sourceId=:sourceId" );
+            Query qr = em.createQuery(
+                    "select st from SecurityKeyTrustEntity AS st where st.sourceFingerprint=:sourceId" );
             qr.setParameter( "sourceId", fingerprint );
             List<SecurityKeyTrust> trusts = qr.getResultList();
 
@@ -82,7 +83,7 @@ class SecurityKeyTrustDAO
         try
         {
             Query qr = em.createQuery( "select st from SecurityKeyTrustEntity AS st where "
-                    + "st.sourceId=:sourceId and st.targetId=:targetId" );
+                    + "st.sourceFingerprint=:sourceId and st.targetFingerprint=:targetId" );
             qr.setParameter( "sourceId", sourceId );
             qr.setParameter( "targetId", targetId );
             List<SecurityKeyTrust> trusts = qr.getResultList();
@@ -187,7 +188,8 @@ class SecurityKeyTrustDAO
         {
             daoManager.startTransaction( em );
 
-            Query qr = em.createQuery( "delete from SecurityKeyTrustEntity AS ss where ss.sourceId=:sourceId" );
+            Query qr =
+                    em.createQuery( "delete from SecurityKeyTrustEntity AS ss where ss.sourceFingerprint=:sourceId" );
             qr.setParameter( "sourceId", sourceId );
             qr.executeUpdate();
 
@@ -215,8 +217,9 @@ class SecurityKeyTrustDAO
         {
             daoManager.startTransaction( em );
 
-            Query qr = em.createQuery( "delete from SecurityKeyTrustEntity AS ss where ss.sourceId=:sourceId and "
-                    + " ss.targetId=:targetId " );
+            Query qr = em.createQuery(
+                    "delete from SecurityKeyTrustEntity AS ss where ss.sourceFingerprint=:sourceId and "
+                            + " ss.targetFingerprint=:targetId" );
             qr.setParameter( "sourceId", sourceId );
             qr.setParameter( "targetId", targetId );
             qr.executeUpdate();

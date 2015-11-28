@@ -60,9 +60,8 @@ class SecurityKeyIdentityDAO
         SecurityKeyIdentity key = null;
         try
         {
-            Query qr = em.createQuery(
-                    "select ss from SecurityKeyIdentityEntity AS ss where ss"
-                            + ".publicKeyFingerprint=:publicKeyFingerprint" );
+            Query qr = em.createQuery( "select ss from SecurityKeyIdentityEntity AS ss"
+                            + " where ss.publicKeyFingerprint=:publicKeyFingerprint" );
             qr.setParameter( "publicKeyFingerprint", fingerprint );
             List<SecurityKeyIdentityEntity> result = qr.getResultList();
 
