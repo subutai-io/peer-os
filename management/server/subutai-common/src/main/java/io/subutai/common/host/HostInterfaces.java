@@ -43,7 +43,8 @@ public class HostInterfaces
         Preconditions.checkNotNull( ip );
         HostInterfaceModel result = NullHostInterface.getInstance();
 
-        for ( Iterator<HostInterfaceModel> i = interfaces.iterator(); i.hasNext() && result instanceof NullHostInterface; )
+        for ( Iterator<HostInterfaceModel> i = interfaces.iterator();
+              i.hasNext() && result instanceof NullHostInterface; )
         {
             HostInterfaceModel c = i.next();
             if ( ip.equals( c.getIp() ) )
@@ -60,7 +61,8 @@ public class HostInterfaces
         Preconditions.checkNotNull( name );
         HostInterfaceModel result = NullHostInterface.getInstance();
 
-        for ( Iterator<HostInterfaceModel> i = interfaces.iterator(); i.hasNext() && result instanceof NullHostInterface; )
+        for ( Iterator<HostInterfaceModel> i = interfaces.iterator();
+              i.hasNext() && result instanceof NullHostInterface; )
         {
             HostInterfaceModel c = i.next();
             if ( name.equals( c.getName() ) )
@@ -122,7 +124,14 @@ public class HostInterfaces
     @JsonIgnore
     public Set<HostInterfaceModel> getAll()
     {
-        return Collections.unmodifiableSet( this.interfaces );
+        if ( this.interfaces != null )
+        {
+            return Collections.unmodifiableSet( this.interfaces );
+        }
+        else
+        {
+            return new HashSet<>();
+        }
     }
 
 

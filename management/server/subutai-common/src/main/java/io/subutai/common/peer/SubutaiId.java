@@ -25,4 +25,11 @@ public abstract class SubutaiId
     {
         return id;
     }
+
+
+    @Override
+    public String toString()
+    {
+        return id;
+    }
 }

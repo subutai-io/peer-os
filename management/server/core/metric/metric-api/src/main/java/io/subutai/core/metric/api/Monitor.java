@@ -153,5 +153,7 @@ public interface Monitor
 
     Collection<BaseMetric> getMetrics();
 
+    Collection<BaseAlert> getAlerts();
+
     //    String getHostMetricsAsHtml( String hostId );
 }

@@ -32,6 +32,7 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.exception.DaoException;
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInfo;
@@ -1234,6 +1235,12 @@ public class MonitorImpl implements Monitor, HostListener
         return result;
     }
 
+    @Override
+    public Collection<BaseAlert> getAlerts()
+    {
+        return Collections.unmodifiableCollection( alerts.values() );
+    }
+
 
     private class MetricsUpdater implements Runnable
     {
@@ -1332,8 +1339,22 @@ public class MonitorImpl implements Monitor, HostListener
             CommonAlert commonAlert = new CommonAlert( new HostId( resourceHostInfo.getId() ), description );
             putAlert( commonAlert );
             //TODO: sign RH key with peer key including management host
+            return;
         }
 
+//        for ( ContainerHostInfo containerHostInfo : resourceHostInfo.getContainers() )
+//        {
+//            ContainerHost containerHost =
+//                    peerManager.getLocalPeer().findContainerById( new ContainerId( containerHostInfo.getId() ) );
+//            if ( containerHost == null )
+//            {
+//                final String description =
+//                        String.format( "Container host '%s' hot found. Id: %s", containerHostInfo.getHostname(),
+//                                containerHostInfo.getId() );
+//                CommonAlert commonAlert = new CommonAlert( new HostId( containerHostInfo.getId() ), description );
+//                putAlert( commonAlert );
+//            }
+//        }
         if ( alerts != null )
         {
             for ( ResourceAlert resourceAlert : alerts )

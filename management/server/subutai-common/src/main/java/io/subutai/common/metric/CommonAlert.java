@@ -32,4 +32,11 @@ public class CommonAlert extends BaseAlert implements CommonAlertValue
     {
         return hostId;
     }
+
+
+    @Override
+    public String toString()
+    {
+        return String.format( "%s %s", super.toString(), description );
+    }
 }

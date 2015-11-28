@@ -19,4 +19,11 @@ public abstract class BaseAlert implements AlertValue
     {
         return hostId;
     }
+
+
+    @Override
+    public String toString()
+    {
+        return String.format( "%s", hostId );
+    }
 }
