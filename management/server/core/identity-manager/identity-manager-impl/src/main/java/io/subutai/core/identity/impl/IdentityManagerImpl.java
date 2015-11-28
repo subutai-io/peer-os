@@ -8,6 +8,7 @@ import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -98,8 +99,15 @@ public class IdentityManagerImpl implements IdentityManager
             @Override
             public void run()
             {
-                removeInvalidTokens();
-                invalidateSessions();
+                try
+                {
+                    removeInvalidTokens();
+                    invalidateSessions();
+                }
+                catch ( Exception e )
+                {
+                    LOGGER.error( "Error in cleanup task", e );
+                }
             }
         }, 10, 10, TimeUnit.MINUTES );
         //*****************************************
@@ -137,8 +145,8 @@ public class IdentityManagerImpl implements IdentityManager
             //***********************************************************
 
             //***Create Token *******************************************
-            Date tokenDate = DateUtils.addMonths( new Date( System.currentTimeMillis()), 1);
-            createUserToken( internal, "", "", "", TokenType.Permanent.getId(),tokenDate);
+            Date tokenDate = DateUtils.addMonths( new Date( System.currentTimeMillis() ), 1 );
+            createUserToken( internal, "", "", "", TokenType.Permanent.getId(), tokenDate );
             //***********************************************************
 
 
@@ -374,14 +382,14 @@ public class IdentityManagerImpl implements IdentityManager
     {
         Date currentDate = DateUtils.addMinutes( new Date( System.currentTimeMillis() ), -SESSION_TIMEOUT );
 
-        for ( Session session : sessionContext.values() )
+        for ( Iterator<Session> iterator = sessionContext.values().iterator(); iterator.hasNext(); )
         {
+            final Session session = iterator.next();
             if ( session.getStartDate().before( currentDate ) )
             {
-                sessionContext.remove( session.getUser().getId() );
+                iterator.remove();
             }
         }
-        //identityDataService.invalidateSessions();
     }
 
 
@@ -493,7 +501,7 @@ public class IdentityManagerImpl implements IdentityManager
             else
             {
                 //**************************************
-                extendTokenTime( userToken,SESSION_TIMEOUT );
+                extendTokenTime( userToken, SESSION_TIMEOUT );
                 //**************************************
 
                 return getUser( userToken.getUserId() );
@@ -714,9 +722,9 @@ public class IdentityManagerImpl implements IdentityManager
 
             identityDataService.persistUser( user );
         }
-        catch(Exception ex)
+        catch ( Exception ex )
         {
-            LOGGER.error("***** Error! Error creating user:"+ex.toString(),ex);
+            LOGGER.error( "***** Error! Error creating user:" + ex.toString(), ex );
         }
 
         return user;
@@ -1021,7 +1029,7 @@ public class IdentityManagerImpl implements IdentityManager
     @Override
     public void extendTokenTime( UserToken token, int minutes )
     {
-        token.setValidDate( DateUtils.addMinutes( new Date(System.currentTimeMillis()), minutes ) );
+        token.setValidDate( DateUtils.addMinutes( new Date( System.currentTimeMillis() ), minutes ) );
         identityDataService.updateUserToken( token );
     }
 
