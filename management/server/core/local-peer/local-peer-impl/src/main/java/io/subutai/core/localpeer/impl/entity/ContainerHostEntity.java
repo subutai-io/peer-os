@@ -1,6 +1,7 @@
 package io.subutai.core.localpeer.impl.entity;
 
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,6 +16,8 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 import com.google.common.base.Preconditions;
@@ -66,6 +69,10 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     @Column( name = "container_type", nullable = true )
     @Enumerated( EnumType.STRING )
     private ContainerType containerType = ContainerType.SMALL;
+
+    @Column( name = "created", nullable = false )
+    @Temporal( TemporalType.TIMESTAMP )
+    private Date created = new Date();
 
     @ElementCollection( targetClass = String.class, fetch = FetchType.EAGER )
     private Set<String> tags = new HashSet<>();
@@ -196,6 +203,12 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     public void setParent( final ResourceHost parent )
     {
         this.parent = parent;
+    }
+
+
+    public Date getCreated()
+    {
+        return created;
     }
 
 

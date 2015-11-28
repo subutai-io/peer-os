@@ -136,6 +136,6 @@ public class ResourceHostMetric extends BaseMetric
     @Override
     public String toString()
     {
-        return String.format( "%s %s", getPeerId() != null ? getPeerId() : "UNKNOWN", super.toString() );
+        return String.format( "%s %s %s %s", super.toString(), this.cpu, this.ram, this.disk );
     }
 }

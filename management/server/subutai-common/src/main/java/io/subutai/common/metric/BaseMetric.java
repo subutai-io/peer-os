@@ -16,6 +16,8 @@ public class BaseMetric
     protected String peerId;
     @JsonProperty( "hostInfo" )
     protected HostInfoModel hostInfo;
+    @JsonProperty( "connected" )
+    private boolean connected;
 
 
     public BaseMetric()
@@ -54,11 +56,25 @@ public class BaseMetric
     {
         if ( hostInfo != null )
         {
-            return String.format( "%s %s %s", hostInfo.getHostname(), hostInfo.getId(), hostInfo.getArch() );
+            return String
+                    .format( "%s\t%s\t%s\t%s\t%s", peerId, hostInfo.getHostname(), hostInfo.getId(), hostInfo.getArch(),
+                            connected );
         }
         else
         {
             return "NULL";
         }
+    }
+
+
+    public boolean isConnected()
+    {
+        return connected;
+    }
+
+
+    public void setConnected( final boolean connected )
+    {
+        this.connected = connected;
     }
 }

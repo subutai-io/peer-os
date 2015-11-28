@@ -441,9 +441,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                         String.format( "%s/%s", ipAddress, networkPrefix ), environmentVni.getVlan(),
                         Common.WAIT_CONTAINER_CONNECTION_SEC, request.getEnvironmentId() );
 
-
-                quotaManager.setQuota( new ContainerId( hostInfo.getId() ), containerQuota );
-
                 ContainerHostEntity containerHostEntity = new ContainerHostEntity( getId(), hostInfo );
                 containerHostEntity.setEnvironmentId( request.getEnvironmentId() );
                 containerHostEntity.setOwnerId( request.getOwnerId() );
@@ -1299,7 +1296,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
             {
-                if ( environmentId.equals( containerHost.getEnvironmentId() ) )
+                if ( environmentId.equals( containerHost.getEnvironmentId().getId() ) )
                 {
                     containerHosts.add( containerHost );
                 }

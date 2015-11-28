@@ -24,6 +24,7 @@
     <argument ref="peerManager" />
     <argument ref="daoManagerMetric" />
     <argument ref="environmentManager" />
+    <argument ref="hostRegistry" />
   </bean>
 
 

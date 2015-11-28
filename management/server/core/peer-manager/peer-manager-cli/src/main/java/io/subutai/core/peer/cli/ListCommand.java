@@ -1,14 +1,12 @@
 package io.subutai.core.peer.cli;
 
 
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.karaf.shell.commands.Command;
 
-import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.HostInterface;
-import io.subutai.common.metric.ResourceHostMetric;
+import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
@@ -57,7 +55,7 @@ public class ListCommand extends SubutaiShellCommandSupport
                 HostInterfaces ints = peer.getInterfaces();
                 System.out.println( String.format( "Interfaces count: %d", ints != null ? ints.size() : -1 ) );
 
-                for ( HostInterface i : ints.filterByName( ".*" ) )
+                for ( HostInterface i : ints.getAll() )
                 {
                     System.out.println( String.format( "\t%-15s %-15s %-15s", i.getName(), i.getIp(), i.getMac() ) );
                 }
@@ -68,15 +66,17 @@ public class ListCommand extends SubutaiShellCommandSupport
             }
 
 
-            final Collection<ResourceHostMetric> resourceHostMetrics = peer.getResourceHostMetrics().getResources();
-            System.out.println( String.format( "Resource hosts: %d",
-                    resourceHostMetrics != null ? resourceHostMetrics.size() : -1 ) );
-            for ( ResourceHostMetric m : resourceHostMetrics )
-            {
-                System.out.println(
-                        String.format( "%s %s %d %s", m.getHostName(), m.getHostInfo().getId(), m.getContainersCount(),
-                                m.getCpuModel() ) );
-            }
+            //            final Collection<ResourceHostMetric> resourceHostMetrics = peer.getResourceHostMetrics()
+            // .getResources();
+            //            System.out.println( String.format( "Resource hosts: %d",
+            //                    resourceHostMetrics != null ? resourceHostMetrics.size() : -1 ) );
+            //            for ( ResourceHostMetric m : resourceHostMetrics )
+            //            {
+            //                System.out.println(
+            //                        String.format( "%s %s %d %s", m.getHostName(), m.getHostInfo().getId(), m
+            // .getContainersCount(),
+            //                                m.getCpuModel() ) );
+            //            }
         }
         return null;
     }

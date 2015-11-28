@@ -194,7 +194,7 @@ public abstract class AbstractSubutaiHost implements Host
     @Override
     public String getIpByInterfaceName( String interfaceName )
     {
-        return getHostInterfaces().findByName( interfaceName ).getName();
+        return getHostInterfaces().findByName( interfaceName ).getIp();
         //        for ( HostInterface iface : getHostInterfaces(). )
         //        {
         //            if ( interfaceName.equalsIgnoreCase( iface.getName() ) )

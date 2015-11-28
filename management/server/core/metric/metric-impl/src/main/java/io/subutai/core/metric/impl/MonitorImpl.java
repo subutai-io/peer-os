@@ -19,6 +19,8 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -30,10 +32,11 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.exception.DaoException;
-import io.subutai.common.host.ContainerHostInfo;
-import io.subutai.common.host.ContainerHostInfoModel;
+import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostId;
+import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInfoModel;
+import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.host.ResourceHostInfoModel;
 import io.subutai.common.metric.Alert;
@@ -63,7 +66,9 @@ import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.StringUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
+import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostListener;
+import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.metric.api.AlertListener;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
@@ -80,8 +85,10 @@ public class MonitorImpl implements Monitor, HostListener
     private static final String CONTAINER_IS_NULL_MSG = "Container is null";
     private static final String INVALID_SUBSCRIBER_ID_MSG = "Invalid subscriber id";
     private static final String SETTINGS_IS_NULL_MSG = "Settings is null";
+    private static final int METRICS_UPDATE_DELAY = 60;
 
     private static final Logger LOG = LoggerFactory.getLogger( MonitorImpl.class );
+    private final HostRegistry hostRegistry;
 
     //set of metric subscribers
     protected Set<AlertListener> alertListeners =
@@ -91,19 +98,22 @@ public class MonitorImpl implements Monitor, HostListener
     protected ExecutorService notificationExecutor = Executors.newCachedThreadPool();
     protected MonitorDao monitorDao;
     protected DaoManager daoManager;
-    private Map<String, BaseMetric> metrics = new ConcurrentHashMap<>();
+    private Cache<String, BaseMetric> metrics = CacheBuilder.newBuilder().
+            expireAfterWrite( METRICS_UPDATE_DELAY * 2, TimeUnit.SECONDS ).
+                                                                    build();
     protected ScheduledExecutorService stateUpdateExecutorService;
 
     private static Map<HostId, BaseAlert> alerts = new ConcurrentHashMap<>();
     private PeerManager peerManager;
 
 
-    public MonitorImpl( PeerManager peerManager, DaoManager daoManager, EnvironmentManager environmentManager )
-            throws MonitorException
+    public MonitorImpl( PeerManager peerManager, DaoManager daoManager, EnvironmentManager environmentManager,
+                        HostRegistry hostRegistry ) throws MonitorException
     {
         Preconditions.checkNotNull( peerManager );
         Preconditions.checkNotNull( daoManager );
         Preconditions.checkNotNull( environmentManager );
+        Preconditions.checkNotNull( hostRegistry );
 
         try
         {
@@ -111,6 +121,7 @@ public class MonitorImpl implements Monitor, HostListener
             this.monitorDao = new MonitorDao( daoManager.getEntityManagerFactory() );
             this.peerManager = peerManager;
             this.environmentManager = environmentManager;
+            this.hostRegistry = hostRegistry;
             //            peerManager.addRequestListener( new RemoteAlertListener( this ) );
             //            peerManager.addRequestListener( new RemoteMetricRequestListener( this ) );
             //            peerManager.addRequestListener( new MonitoringActivationListener( this, peerManager ) );
@@ -121,7 +132,8 @@ public class MonitorImpl implements Monitor, HostListener
         }
 
         stateUpdateExecutorService = Executors.newScheduledThreadPool( 1 );
-        stateUpdateExecutorService.scheduleWithFixedDelay( new MetricsUpdater( this ), 10, 90, TimeUnit.SECONDS );
+        stateUpdateExecutorService
+                .scheduleWithFixedDelay( new MetricsUpdater( this ), 10, METRICS_UPDATE_DELAY, TimeUnit.SECONDS );
     }
 
 
@@ -459,6 +471,7 @@ public class MonitorImpl implements Monitor, HostListener
         catch ( CommandException | JsonSyntaxException e )
         {
             LOG.error( e.getMessage(), e );
+            result = new ResourceHostMetric( resourceHost.getPeerId() );
         }
 
         return result;
@@ -1189,18 +1202,18 @@ public class MonitorImpl implements Monitor, HostListener
         }
     }
 
-    //
-    //    @Override
-    //    public BaseMetric getHostMetric( final String id )
-    //    {
-    //        return this.metrics.get( id );
-    //    }
+
+    @Override
+    public BaseMetric getHostMetric( final String id )
+    {
+        return this.metrics.getIfPresent( id );
+    }
 
 
     @Override
     public Collection<BaseMetric> getMetrics()
     {
-        return Collections.unmodifiableCollection( metrics.values() );
+        return Collections.unmodifiableCollection( metrics.asMap().values() );
     }
 
 
@@ -1220,60 +1233,6 @@ public class MonitorImpl implements Monitor, HostListener
 
         return result;
     }
-    //
-    //
-    //    @Override
-    //    public String getHostMetricsAsHtml( final String hostId )
-    //    {
-    //        StringBuilder result = new StringBuilder();
-    //        BaseMetric metrics = getHostMetric( hostId );
-    //
-    //        if ( metrics instanceof ContainerHostQuotaState )
-    //        {
-    //            ContainerHostQuotaState state = ( ContainerHostQuotaState ) metrics;
-    //            result.append( getText( "<br>CPU : %d%%", state.getCpu() ) );
-    //            result.append( getText( "<br>RAM : %d%%", state.getRam() ) );
-    //            result.append( getText( "<br>/ : %d%%", state.getDisk().getRootfs() ) );
-    //            result.append( getText( "<br>/home : %d%%", state.getDisk().getHome() ) );
-    //            result.append( getText( "<br>/opt : %d%%", state.getDisk().getOpt() ) );
-    //            result.append( getText( "<br>/var : %d%%", state.getDisk().getVar() ) );
-    //        }
-    //        else
-    //        {
-    //            HostMetric hostMetric = ( HostMetric ) metrics;
-    //
-    //            result.append( getText( "<br>CPU model: %s", hostMetric.getCpuModel() ) );
-    //            result.append( getText( "<br>CPU core(s): %d", hostMetric.getCpuCore() ) );
-    //            result.append( getText( "<br>CPU load: %.2f", hostMetric.getUsedCpu() ) );
-    //            result.append( getText( "<br>Total RAM: %.3f Gb", hostMetric.getTotalRam() / 1024 / 1024 / 1024 ) );
-    //            result.append( getText( "<br>Available RAM: %.3f Gb", hostMetric.getAvailableRam() / 1024 / 1024 /
-    // 1024 ) );
-    //            result.append(
-    //                    getText( "<br>Available space: %.3f Gb", hostMetric.getAvailableSpace() / 1024 / 1024 /
-    // 1024 ) );
-    //
-    //            if ( hostMetric instanceof ResourceHostMetric )
-    //            {
-    //                result.append(
-    //                        getText( "<br>Container #: %d", ( ( ResourceHostMetric ) hostMetric )
-    // .getContainersCount() ) );
-    //            }
-    //        }
-    //        return result.toString();
-    //    }
-
-
-    //    private String getText( final String format, final Object o )
-    //    {
-    //        if ( o != null )
-    //        {
-    //            return String.format( format, o );
-    //        }
-    //        else
-    //        {
-    //            return "";
-    //        }
-    //    }
 
 
     private class MetricsUpdater implements Runnable
@@ -1295,9 +1254,50 @@ public class MonitorImpl implements Monitor, HostListener
             {
                 for ( ResourceHost resourceHost : peerManager.getLocalPeer().getResourceHosts() )
                 {
-                    ResourceHostMetric resourceHostMetric = monitor.fetchResourceHostMetric( resourceHost );
 
-                    updateResourceHostMetrics( resourceHost.getId(), resourceHostMetric );
+                    ResourceHostMetric resourceHostMetric =
+                            new ResourceHostMetric( peerManager.getLocalPeer().getId() );
+                    try
+                    {
+                        HostInfo hostInfo = hostRegistry.getHostInfoById( resourceHost.getId() );
+                        resourceHostMetric.setHostInfo( new ResourceHostInfoModel( hostInfo ) );
+                        ResourceHostMetric m = monitor.fetchResourceHostMetric( resourceHost );
+                        resourceHostMetric.updateMetrics( m );
+                        resourceHostMetric.setConnected( true );
+                    }
+                    catch ( HostDisconnectedException hde )
+                    {
+                        HostInfoModel defaultHostInfo =
+                                new HostInfoModel( resourceHost.getId(), resourceHost.getHostname(),
+                                        new HostInterfaces(), HostArchitecture.UNKNOWN );
+                        resourceHostMetric.setHostInfo( defaultHostInfo );
+                        resourceHostMetric.setConnected( false );
+                    }
+
+                    updateHostMetric( resourceHost.getId(), resourceHostMetric );
+
+                    for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
+                    {
+                        BaseMetric containerHostMetric;
+                        try
+                        {
+                            HostInfo hostInfo = hostRegistry.getHostInfoById( containerHost.getId() );
+                            containerHostMetric =
+                                    new BaseMetric( peerManager.getLocalPeer().getId(), new HostInfoModel( hostInfo ) );
+                            containerHostMetric.setConnected( true );
+                        }
+                        catch ( HostDisconnectedException hde )
+                        {
+                            HostInfoModel disconnectedHostInfo =
+                                    new HostInfoModel( containerHost.getId(), containerHost.getHostname(),
+                                            new HostInterfaces(), HostArchitecture.UNKNOWN );
+                            containerHostMetric =
+                                    new BaseMetric( peerManager.getLocalPeer().getId(), disconnectedHostInfo );
+                            containerHostMetric.setConnected( false );
+                        }
+
+                        updateHostMetric( containerHost.getId(), containerHostMetric );
+                    }
                 }
             }
             catch ( Exception e )
@@ -1323,7 +1323,6 @@ public class MonitorImpl implements Monitor, HostListener
             {
                 host = peerManager.getLocalPeer().getResourceHostByName( resourceHostInfo.getHostname() );
             }
-            updateHostInfo( ( ResourceHostInfoModel ) resourceHostInfo );
         }
         catch ( HostNotFoundException e )
         {
@@ -1344,55 +1343,61 @@ public class MonitorImpl implements Monitor, HostListener
         }
     }
 
+    //
+    //    private void updateHostInfo( final HostInfoModel hostInfo )
+    //    {
+    //        BaseMetric metric = this.metrics.get( hostInfo.getId() );
+    //        if ( metric == null )
+    //        {
+    //            if ( hostInfo instanceof ResourceHostInfo )
+    //            {
+    //                metric = new ResourceHostMetric( peerManager.getLocalPeer().getId(),
+    //                        ( ResourceHostInfoModel ) hostInfo );
+    //            }
+    //            else if ( hostInfo instanceof ContainerHostInfo )
+    //            {
+    //                metric = new BaseMetric( peerManager.getLocalPeer().getId(), hostInfo );
+    //            }
+    //            else
+    //            {
+    //                return;       //unknown
+    //            }
+    //            this.metrics.put( hostInfo.getId(), metric );
+    //        }
+    //
+    //        metric.setHostInfo( ( HostInfoModel ) hostInfo );
+    //
+    //        if ( hostInfo instanceof ResourceHostInfoModel )
+    //        {
+    //            ResourceHostInfoModel resourceHostInfo = ( ResourceHostInfoModel ) hostInfo;
+    //            for ( ContainerHostInfo containerHostInfo : resourceHostInfo.getContainers() )
+    //            {
+    //                updateHostInfo( ( ContainerHostInfoModel ) containerHostInfo );
+    //            }
+    //        }
+    //    }
 
-    private void updateHostInfo( final HostInfoModel hostInfo )
+
+    private void updateHostMetric( String id, final BaseMetric baseMetric )
     {
-        BaseMetric metric = this.metrics.get( hostInfo.getId() );
-        if ( metric == null )
-        {
-            if ( hostInfo instanceof ResourceHostInfo )
-            {
-                metric = new ResourceHostMetric( peerManager.getLocalPeer().getId(),
-                        ( ResourceHostInfoModel ) hostInfo );
-            }
-            else if ( hostInfo instanceof ContainerHostInfo )
-            {
-                metric = new BaseMetric( peerManager.getLocalPeer().getId(), hostInfo );
-            }
-            else
-            {
-                return;       //unknown
-            }
-            this.metrics.put( hostInfo.getId(), metric );
-        }
-
-        metric.setHostInfo( ( HostInfoModel ) hostInfo );
-
-        if ( hostInfo instanceof ResourceHostInfoModel )
-        {
-            ResourceHostInfoModel resourceHostInfo = ( ResourceHostInfoModel ) hostInfo;
-            for ( ContainerHostInfo containerHostInfo : resourceHostInfo.getContainers() )
-            {
-                updateHostInfo( ( ContainerHostInfoModel ) containerHostInfo );
-            }
-        }
+        this.metrics.put( id, baseMetric );
     }
 
-
-    private void updateResourceHostMetrics( final String id, final ResourceHostMetric resourceHostMetric )
-    {
-        if ( resourceHostMetric == null )
-        {
-            return;
-        }
-        BaseMetric metric = this.metrics.get( id );
-        if ( metric == null )
-        {
-            metric = new ResourceHostMetric( peerManager.getLocalPeer().getId() );
-            this.metrics.put( id, metric );
-        }
-
-        ResourceHostMetric m = ( ResourceHostMetric ) metric;
-        m.updateMetrics( resourceHostMetric );
-    }
+    //
+    //    private void updateResourceHostMetrics( final String id, final ResourceHostMetric resourceHostMetric )
+    //    {
+    //        if ( resourceHostMetric == null )
+    //        {
+    //            return;
+    //        }
+    //        BaseMetric metric = this.metrics.get( id );
+    //        if ( metric == null )
+    //        {
+    //            metric = new ResourceHostMetric( peerManager.getLocalPeer().getId() );
+    //            this.metrics.put( id, metric );
+    //        }
+    //
+    //        ResourceHostMetric m = ( ResourceHostMetric ) metric;
+    //        m.updateMetrics( resourceHostMetric );
+    //    }
 }

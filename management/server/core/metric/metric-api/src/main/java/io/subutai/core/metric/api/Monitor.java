@@ -149,6 +149,8 @@ public interface Monitor
 
     ResourceHostMetrics getResourceHostMetrics();
 
+    BaseMetric getHostMetric( String id );
+
     Collection<BaseMetric> getMetrics();
 
     //    String getHostMetricsAsHtml( String hostId );

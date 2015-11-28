@@ -41,9 +41,9 @@ public class HostInterfaces
     public HostInterfaceModel findByIp( final String ip )
     {
         Preconditions.checkNotNull( ip );
-        HostInterfaceModel result = null;
+        HostInterfaceModel result = NullHostInterface.getInstance();
 
-        for ( Iterator<HostInterfaceModel> i = interfaces.iterator(); i.hasNext() && result == null; )
+        for ( Iterator<HostInterfaceModel> i = interfaces.iterator(); i.hasNext() && result instanceof NullHostInterface; )
         {
             HostInterfaceModel c = i.next();
             if ( ip.equals( c.getIp() ) )
@@ -60,7 +60,7 @@ public class HostInterfaces
         Preconditions.checkNotNull( name );
         HostInterfaceModel result = NullHostInterface.getInstance();
 
-        for ( Iterator<HostInterfaceModel> i = interfaces.iterator(); i.hasNext() && result == null; )
+        for ( Iterator<HostInterfaceModel> i = interfaces.iterator(); i.hasNext() && result instanceof NullHostInterface; )
         {
             HostInterfaceModel c = i.next();
             if ( name.equals( c.getName() ) )
@@ -123,5 +123,15 @@ public class HostInterfaces
     public Set<HostInterfaceModel> getAll()
     {
         return Collections.unmodifiableSet( this.interfaces );
+    }
+
+
+    @Override
+    public String toString()
+    {
+        final StringBuffer sb = new StringBuffer( "HostInterfaces{" );
+        sb.append( "interfaces=" ).append( interfaces );
+        sb.append( '}' );
+        return sb.toString();
     }
 }

@@ -147,10 +147,10 @@ public class MonitorImplTest
 
     static class MonitorImplExt extends MonitorImpl
     {
-        public MonitorImplExt( PeerManager peerManager, DaoManager daoManager, EnvironmentManager environmentManager
-                                ) throws MonitorException
+        public MonitorImplExt( PeerManager peerManager, DaoManager daoManager, EnvironmentManager environmentManager,
+                               HostRegistry hostRegistry ) throws MonitorException
         {
-            super( peerManager, daoManager, environmentManager );
+            super( peerManager, daoManager, environmentManager, hostRegistry );
         }
 
 
@@ -180,14 +180,14 @@ public class MonitorImplTest
         when( daoManager.getEntityManagerFactory() ).thenReturn( entityManagerFactory );
 
 
-        monitor = new MonitorImplExt( peerManager, daoManager, environmentManager );
+        monitor = new MonitorImplExt( peerManager, daoManager, environmentManager, hostRegistry );
         monitor.setMonitorDao( monitorDao );
 
 
         alert = mock( Alert.class );
         when( environmentId.getId() ).thenReturn( ENVIRONMENT_ID );
-//        when( alert.getEnvironmentId() ).thenReturn( environmentId );
-//        when( alert.getContainerId() ).thenReturn( containerId );
+        //        when( alert.getEnvironmentId() ).thenReturn( environmentId );
+        //        when( alert.getContainerId() ).thenReturn( containerId );
         when( alertListener.getSubscriberId() ).thenReturn( SUBSCRIBER_ID );
         alertListeners = Sets.newHashSet( alertListener );
         monitor.setMetricListeners( alertListeners );
@@ -749,7 +749,7 @@ public class MonitorImplTest
         Monitor monitor1 = null;
         try
         {
-            monitor1 = new MonitorImpl( peerManager, daoManager, environmentManager);
+            monitor1 = new MonitorImpl( peerManager, daoManager, environmentManager, hostRegistry );
         }
         catch ( MonitorException e )
         {
