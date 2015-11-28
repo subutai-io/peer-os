@@ -88,7 +88,6 @@ public class IdentityManagerImpl implements IdentityManager
         sessionManager = new SessionManagerImpl(identityDataService);
         sessionManager.startSessionController();
 
-
         createDefaultUsers();
     }
 
@@ -118,8 +117,8 @@ public class IdentityManagerImpl implements IdentityManager
             //***********************************************************
 
             //***Create Token *******************************************
-            Date tokenDate = DateUtils.addMonths( new Date( System.currentTimeMillis()), 1);
-            createUserToken( internal, "", "", "", TokenType.Permanent.getId(),tokenDate);
+            Date tokenDate = DateUtils.addMonths( new Date( System.currentTimeMillis() ), 1 );
+            createUserToken( internal, "", "", "", TokenType.Permanent.getId(), tokenDate );
             //***********************************************************
 
 
@@ -288,7 +287,6 @@ public class IdentityManagerImpl implements IdentityManager
         }
 
         session = sessionManager.startSession(sessionId ,session,  user);
-
 
         return session;
     }
@@ -647,9 +645,9 @@ public class IdentityManagerImpl implements IdentityManager
 
             identityDataService.persistUser( user );
         }
-        catch(Exception ex)
+        catch ( Exception ex )
         {
-            LOGGER.error("***** Error! Error creating user:"+ex.toString(),ex);
+            LOGGER.error( "***** Error! Error creating user:" + ex.toString(), ex );
         }
 
         return user;
@@ -955,7 +953,7 @@ public class IdentityManagerImpl implements IdentityManager
     @Override
     public void extendTokenTime( UserToken token, int minutes )
     {
-        token.setValidDate( DateUtils.addMinutes( new Date(System.currentTimeMillis()), minutes ) );
+        token.setValidDate( DateUtils.addMinutes( new Date( System.currentTimeMillis() ), minutes ) );
         identityDataService.updateUserToken( token );
     }
 

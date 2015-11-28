@@ -2,6 +2,7 @@ package io.subutai.core.identity.impl;
 
 
 import java.util.Date;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -170,11 +171,12 @@ public class SessionManagerImpl implements SessionManager
     {
         Date currentDate = DateUtils.addMinutes( new Date( System.currentTimeMillis() ), -SESSION_TIMEOUT );
 
-        for ( Session session : sessionContext.values() )
+        for ( Iterator<Session> iterator = sessionContext.values().iterator(); iterator.hasNext(); )
         {
+            final Session session = iterator.next();
             if ( session.getStartDate().before( currentDate ) )
             {
-                sessionContext.remove( session.getUser().getId() );
+                iterator.remove();
             }
         }
     }

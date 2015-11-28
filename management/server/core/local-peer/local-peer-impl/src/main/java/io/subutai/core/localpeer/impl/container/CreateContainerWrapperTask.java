@@ -3,15 +3,13 @@ package io.subutai.core.localpeer.impl.container;
 
 import java.util.concurrent.Callable;
 
-import io.subutai.common.host.HostInfo;
-import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.settings.Common;
-import io.subutai.common.util.NumUtil;
-import io.subutai.common.peer.ResourceHost;
-import io.subutai.core.hostregistry.api.HostRegistry;
-
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+
+import io.subutai.common.host.HostInfo;
+import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.settings.Common;
+import io.subutai.common.util.NumUtil;
 
 
 public class CreateContainerWrapperTask implements Callable<CreateContainerWrapperTask>
@@ -21,21 +19,21 @@ public class CreateContainerWrapperTask implements Callable<CreateContainerWrapp
     private final String hostname;
     private final String ip;
     private final int vlan;
-    private final String gateway;
+    private final String environmentId;
     private final int timeoutSec;
     private HostInfo hostInfo;
 
 
     public CreateContainerWrapperTask( final ResourceHost resourceHost, final String templateName,
-                                       final String hostname, final String ip, final int vlan, final String gateway,
-                                       final int timeoutSec )
+                                       final String hostname, final String ip, final int vlan, final int timeoutSec,
+                                       final String environmentId )
     {
         Preconditions.checkNotNull( resourceHost );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ) );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ) );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( ip ) && ip.matches( Common.CIDR_REGEX ) );
         Preconditions.checkArgument( NumUtil.isIntBetween( vlan, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( gateway ) && gateway.matches( Common.IP_REGEX ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ) );
         Preconditions.checkArgument( timeoutSec > 0 );
 
         this.resourceHost = resourceHost;
@@ -43,7 +41,7 @@ public class CreateContainerWrapperTask implements Callable<CreateContainerWrapp
         this.hostname = hostname;
         this.ip = ip;
         this.vlan = vlan;
-        this.gateway = gateway;
+        this.environmentId = environmentId;
         this.timeoutSec = timeoutSec;
     }
 
@@ -51,7 +49,7 @@ public class CreateContainerWrapperTask implements Callable<CreateContainerWrapp
     @Override
     public CreateContainerWrapperTask call() throws Exception
     {
-        this.hostInfo = resourceHost.createContainer( templateName, hostname, ip, vlan, gateway, timeoutSec );
+        this.hostInfo = resourceHost.createContainer( templateName, hostname, ip, vlan, timeoutSec, environmentId );
         return this;
     }
 
