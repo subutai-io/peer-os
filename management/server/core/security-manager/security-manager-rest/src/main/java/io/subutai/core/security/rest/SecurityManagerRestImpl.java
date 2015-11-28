@@ -154,19 +154,26 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
     @Override
     public Response getKeyTrustTree( String hostId )
     {
-        logger.debug( "Received hostId: " + hostId );
-        KeyManager keyManager = securityManager.getKeyManager();
+        try
+        {
+            logger.debug( "Received hostId: " + hostId );
+            KeyManager keyManager = securityManager.getKeyManager();
 
-        KeyIdentityDTO keyIdentityDTO = new KeyIdentityDTO( keyManager.getKeyTrustTree( hostId ) );
-        keyIdentityDTO.setChild( false );
-        keyIdentityDTO.setTrustLevel( KeyTrustLevel.Ultimate.getId() );
-        keyIdentityDTO.setParentId( keyIdentityDTO.getHostId() );
-        keyIdentityDTO.setParentPublicKeyFingerprint( keyIdentityDTO.getParentPublicKeyFingerprint() );
+            KeyIdentityDTO keyIdentityDTO = new KeyIdentityDTO( keyManager.getKeyTrustTree( hostId ) );
+            keyIdentityDTO.setChild( false );
+            keyIdentityDTO.setTrustLevel( KeyTrustLevel.Ultimate.getId() );
+            keyIdentityDTO.setParentId( keyIdentityDTO.getHostId() );
+            keyIdentityDTO.setParentPublicKeyFingerprint( keyIdentityDTO.getParentPublicKeyFingerprint() );
 
-        resetTrustLevels( keyIdentityDTO, keyManager );
+            resetTrustLevels( keyIdentityDTO, keyManager );
 
 
-        return Response.ok( JsonUtil.toJson( keyIdentityDTO ) ).build();
+            return Response.ok( JsonUtil.toJson( keyIdentityDTO ) ).build();
+        }
+        catch ( Exception ex )
+        {
+            return Response.serverError().build();
+        }
     }
 
 
