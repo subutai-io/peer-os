@@ -11,9 +11,11 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostInfoModel;
-import io.subutai.common.host.Interface;
+import io.subutai.common.host.HostInterface;
+import io.subutai.common.host.HostInterfaceModel;
+import io.subutai.common.host.HostInterfaces;
 
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
@@ -25,28 +27,31 @@ public class ContainerHostInfoModelTest
     private ContainerHostInfoModel containerHostInfoModel;
 
     @Mock
-    HostInfo hostInfo;
+    ContainerHostInfo hostInfo;
     @Mock
     ContainerHost containerHost;
     @Mock
-    Interface anInterface;
+    HostInterfaceModel anHostInterface;
+    @Mock
+    HostInterfaces hostInterfaces;
 
 
     @Before
     public void setUp() throws Exception
     {
-        Set<Interface> mySet = new HashSet<>();
-        mySet.add( anInterface );
+        Set<HostInterfaceModel> mySet = new HashSet<>();
+        mySet.add( anHostInterface );
 
         when( containerHost.getId() ).thenReturn( UUID.randomUUID().toString() );
         when( containerHost.getHostname() ).thenReturn( "testHostName" );
         when( containerHost.getArch() ).thenReturn( null );
-        when( containerHost.getInterfaces() ).thenReturn( mySet );
-        when( anInterface.getName() ).thenReturn( "testInterFace" );
-        when( anInterface.getIp() ).thenReturn( "testIp" );
-        when( anInterface.getMac() ).thenReturn( "testMac" );
+        when( hostInterfaces.getAll() ).thenReturn( mySet );
+        when( containerHost.getHostInterfaces() ).thenReturn( hostInterfaces );
+        when( anHostInterface.getName() ).thenReturn( "testInterFace" );
+        when( anHostInterface.getIp() ).thenReturn( "testIp" );
+        when( anHostInterface.getMac() ).thenReturn( "testMac" );
         when( hostInfo.getHostname() ).thenReturn( "testHostName" );
-        when( hostInfo.getInterfaces() ).thenReturn( mySet );
+        when( hostInfo.getHostInterfaces() ).thenReturn( hostInterfaces );
 
         containerHostInfoModel = new ContainerHostInfoModel( hostInfo );
         containerHostInfoModel = new ContainerHostInfoModel( containerHost );
@@ -59,7 +64,7 @@ public class ContainerHostInfoModelTest
         assertNotNull( containerHostInfoModel.getArch() );
         assertNotNull( containerHostInfoModel.getHostname() );
         assertNotNull( containerHostInfoModel.getId() );
-        assertNotNull( containerHostInfoModel.getInterfaces() );
+        assertNotNull( containerHostInfoModel.getHostInterfaces() );
         containerHostInfoModel.compareTo( hostInfo );
         containerHostInfoModel.hashCode();
         containerHostInfoModel.equals( "test" );

@@ -51,13 +51,14 @@ import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.ContainerDistributionType;
 import io.subutai.common.environment.ContainersDestructionResultImpl;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInfo;
-import io.subutai.common.host.HostInfoModel;
-import io.subutai.common.host.HostInterface;
+import io.subutai.common.host.ContainerHostInfoModel;
+import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
-import io.subutai.common.host.Interface;
+import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceAlert;
@@ -239,8 +240,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             throw new LocalPeerInitializationError( "Failed to init Local Peer", e );
         }
-        hostRegistry.addHostListener( this );
-
 
         addRequestListener( new CreateEnvironmentContainerGroupRequestListener( this ) );
         //add destroy environment containers requests listener
@@ -359,7 +358,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         try
         {
             ContainerHost containerHost = bindHost( containerId );
-            return containerHost.getStatus();
+            return containerHost.getState();
         }
         catch ( Exception e )
         {
@@ -375,12 +374,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @RolesAllowed( "Environment-Management|A|Write" )
-    public Set<HostInfoModel> createEnvironmentContainerGroup( final CreateEnvironmentContainerGroupRequest request )
-            throws PeerException
+    public Set<ContainerHostInfoModel> createEnvironmentContainerGroup(
+            final CreateEnvironmentContainerGroupRequest request ) throws PeerException
     {
         Preconditions.checkNotNull( request );
 
-        Set<HostInfoModel> result;
+        Set<ContainerHostInfoModel> result;
         if ( request.getContainerDistributionType() == ContainerDistributionType.AUTO )
         {
             result = createByStrategy( request );
@@ -394,7 +393,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    private Set<HostInfoModel> createByHost( final CreateEnvironmentContainerGroupRequest request ) throws PeerException
+    private Set<ContainerHostInfoModel> createByHost( final CreateEnvironmentContainerGroupRequest request )
+            throws PeerException
     {
         SubnetUtils cidr;
         try
@@ -421,7 +421,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                     String.format( "No reserved vni found for environment %s", request.getEnvironmentId() ) );
         }
 
-        Set<HostInfoModel> result = Sets.newHashSet();
+        Set<ContainerHostInfoModel> result = Sets.newHashSet();
 
         ContainerQuotaHolder containerQuota = quotaManager.getDefaultContainerQuota( request.getContainerType() );
         if ( containerQuota == null )
@@ -437,7 +437,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
             try
             {
-                HostInfo hostInfo = resourceHost.createContainer( request.getTemplateName(), cloneName,
+                ContainerHostInfo hostInfo = resourceHost.createContainer( request.getTemplateName(), cloneName,
                         String.format( "%s/%s", ipAddress, networkPrefix ), environmentVni.getVlan(),
                         Common.WAIT_CONTAINER_CONNECTION_SEC, request.getEnvironmentId() );
 
@@ -456,7 +456,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 resourceHostDataService.saveOrUpdate( resourceHost );
 
                 quotaManager.setQuota( containerHostEntity.getContainerId(), containerQuota );
-                result.add( new HostInfoModel( hostInfo ) );
+                result.add( new ContainerHostInfoModel( hostInfo ) );
             }
             catch ( ResourceHostException | QuotaException e )
             {
@@ -470,7 +470,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    private Set<HostInfoModel> createByStrategy( final CreateEnvironmentContainerGroupRequest request )
+    private Set<ContainerHostInfoModel> createByStrategy( final CreateEnvironmentContainerGroupRequest request )
             throws PeerException
     {
 
@@ -533,7 +533,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
         //wait for succeeded containers
-        Set<HostInfoModel> result = Sets.newHashSet();
+        Set<ContainerHostInfoModel> result = Sets.newHashSet();
 
         ContainerQuotaHolder containerQuota = quotaManager.getDefaultContainerQuota( request.getContainerType() );
         if ( containerQuota == null )
@@ -547,7 +547,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             try
             {
                 CreateContainerWrapperTask task = future.get();
-                HostInfo hostInfo = task.getHostInfo();
+                ContainerHostInfo hostInfo = task.getHostInfo();
                 ResourceHost resourceHost = task.getResourceHost();
 
 
@@ -563,7 +563,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 resourceHostDataService.saveOrUpdate( resourceHost );
 
                 quotaManager.setQuota( containerHostEntity.getContainerId(), containerQuota );
-                result.add( new HostInfoModel( hostInfo ) );
+                result.add( new ContainerHostInfoModel( hostInfo ) );
             }
             catch ( ExecutionException | InterruptedException | QuotaException e )
             {
@@ -753,11 +753,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     @PermitAll
     @Override
-    public HostInfo getContainerHostInfoById( final String containerHostId ) throws PeerException
+    public ContainerHostInfo getContainerHostInfoById( final String containerHostId ) throws PeerException
     {
         ContainerHost containerHost = getContainerHostById( containerHostId );
 
-        return new HostInfoModel( containerHost );
+        return new ContainerHostInfoModel( containerHost );
     }
 
 
@@ -1590,12 +1590,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public HostInterfaces getInterfaces()
     {
-        HostInterfaces result = new HostInterfaces();
-        for ( Interface intf : managementHost.getInterfaces() )
-        {
-            result.addInterface( new HostInterface( intf.getName(), intf.getIp(), intf.getMac() ) );
-        }
-        return result;
+        return managementHost.getHostInterfaces();
+//        HostInterfaces result = new HostInterfaces();
+//        for ( HostInterface intf : managementHost.getHostInterfaces() )
+//        {
+//            result.addInterface( new HostInterfaceModel( intf ) );
+//        }
+//        return result;
     }
 
 
@@ -1633,14 +1634,14 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             HostInterfaces intfs = peer.getInterfaces();
 
-            Set<HostInterface> r = intfs.filterByIp( N2NUtil.N2N_INTERFACE_IP_PATTERN );
+            Set<HostInterfaceModel> r = intfs.filterByIp( N2NUtil.N2N_INTERFACE_IP_PATTERN );
 
             Collection peerSubnets = CollectionUtils.<String>collect( r, new Transformer()
             {
                 @Override
                 public Object transform( final Object o )
                 {
-                    Interface i = ( Interface ) o;
+                    HostInterface i = ( HostInterface ) o;
                     SubnetUtils u = new SubnetUtils( i.getIp(), PEER_SUBNET_MASK );
                     return u.getInfo().getNetworkAddress();
                 }

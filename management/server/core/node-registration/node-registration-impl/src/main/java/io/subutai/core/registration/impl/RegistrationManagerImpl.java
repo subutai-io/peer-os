@@ -26,7 +26,7 @@ import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.environment.Topology;
-import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.ResourceAlert;
 import io.subutai.common.peer.ContainerHost;
@@ -323,7 +323,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
             //TODO: check this run. Topology constructor changed
             Topology topology = new Topology( "Imported-environment", null, null, null );
             Map<String, Set<ContainerInfo>> rawNodeGroup = mapEntry.getValue();
-            Map<NodeGroup, Set<HostInfo>> classification = Maps.newHashMap();
+            Map<NodeGroup, Set<ContainerHostInfo>> classification = Maps.newHashMap();
 
             for ( final Map.Entry<String, Set<ContainerInfo>> entry : rawNodeGroup.entrySet() )
             {
@@ -334,7 +334,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
                                 1, 1, new PlacementStrategy( "ROUND_ROBIN" ), localPeer.getId() );
                 topology.addNodeGroupPlacement( localPeer, nodeGroup );
 
-                Set<HostInfo> converter = Sets.newHashSet();
+                Set<ContainerHostInfo> converter = Sets.newHashSet();
                 converter.addAll( entry.getValue() );
                 classification.put( nodeGroup, converter );
             }
@@ -359,10 +359,10 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
                 }
 
                 String gateway = cidr.getInfo().getLowAddress();
-                for ( final Set<HostInfo> infos : classification.values() )
+                for ( final Set<ContainerHostInfo> infos : classification.values() )
                 {
                     //TODO: sign CH key with PEK (identified by LocalPeerId+environment.getId())
-                    for ( final HostInfo hostInfo : infos )
+                    for ( final ContainerHostInfo hostInfo : infos )
                     {
                         ContainerInfoImpl containerInfo = containerInfoDataService.find( hostInfo.getId() );
                         containerInfo.setGateway( gateway );
@@ -392,7 +392,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
                 Map<Integer, Set<ContainerHost>> containerHostList = Maps.newHashMap();
                 for ( final ContainerInfo containerInfo : requestedHost.getHostInfos() )
                 {
-                    if ( containerInfo.getStatus().equals( RegistrationStatus.APPROVED )
+                    if ( containerInfo.getState().equals( RegistrationStatus.APPROVED )
                             && containerInfo.getVlan() != 0 )
                     {
 

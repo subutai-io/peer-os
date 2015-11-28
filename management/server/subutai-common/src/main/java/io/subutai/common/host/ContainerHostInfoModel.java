@@ -1,59 +1,41 @@
 package io.subutai.common.host;
 
 
-import java.util.Set;
+import org.codehaus.jackson.annotate.JsonProperty;
 
 import com.google.common.base.MoreObjects;
-import com.google.common.collect.Sets;
+import com.google.gson.annotations.SerializedName;
 
 import io.subutai.common.metric.Alert;
-import io.subutai.common.util.CollectionUtil;
 
 
 /**
  * Implementation of ContainerHostInfo
  */
-public class ContainerHostInfoModel implements ContainerHostInfo
+
+public class ContainerHostInfoModel extends HostInfoModel implements ContainerHostInfo
 {
-    private String id;
-    private String hostname;
-    private String containerName;
-    private Set<InterfaceImpl> interfaces;
-    private ContainerHostState status;
-    private HostArchitecture arch;
-    private Alert alert;
+    @SerializedName( "containerName" )
+    @JsonProperty( "containerName" )
+    protected String containerName;
+    @SerializedName( "status" )
+    @JsonProperty( "status" )
+    protected ContainerHostState state;
+    @SerializedName( "alert" )
+    @JsonProperty( "alert" )
+    protected Alert alert;
 
 
-    @Override
-    public String getId()
+    public ContainerHostInfoModel( final ContainerHostInfo containerHost )
     {
-        return id;
+        super( containerHost );
     }
 
 
     @Override
-    public String getHostname()
+    public ContainerHostState getState()
     {
-        return hostname;
-    }
-
-
-    @Override
-    public Set<Interface> getInterfaces()
-    {
-        Set<Interface> result = Sets.newHashSet();
-        if ( !CollectionUtil.isCollectionEmpty( interfaces ) )
-        {
-            result.addAll( interfaces );
-        }
-        return result;
-    }
-
-
-    @Override
-    public ContainerHostState getStatus()
-    {
-        return status;
+        return state;
     }
 
 
@@ -65,18 +47,11 @@ public class ContainerHostInfoModel implements ContainerHostInfo
 
 
     @Override
-    public HostArchitecture getArch()
-    {
-        return arch;
-    }
-
-
-    @Override
     public String toString()
     {
         return MoreObjects.toStringHelper( this ).add( "id", id ).add( "hostname", hostname )
-                          .add( "containerName", containerName ).add( "interfaces", interfaces ).add( "status", status )
-                          .add( "arch", arch ).toString();
+                          .add( "containerName", containerName ).add( "interfaces", hostInterfaces )
+                          .add( "status", state ).add( "arch", hostArchitecture ).toString();
     }
 
 

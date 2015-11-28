@@ -63,7 +63,6 @@
     <property name="externalIpInterface" value="${externalIpInterface}" />
   </bean>
 
-  <service ref="localPeer" interface="io.subutai.core.hostregistry.api.HostListener" />
 
   <bean id="messageRequestListener" class="io.subutai.core.localpeer.impl.request.MessageRequestListener"
         destroy-method="dispose" scope="singleton" activation="eager">
@@ -78,6 +77,7 @@
                         bind-method="addRequestListener" unbind-method="removeRequestListener" />
   </reference-list>
 
+  <service ref="localPeer" interface="io.subutai.core.hostregistry.api.HostListener" />
   <service ref="localPeer" interface="io.subutai.common.peer.LocalPeer" />
 
   <service ref="messageRequestListener" interface="io.subutai.core.messenger.api.MessageListener" />

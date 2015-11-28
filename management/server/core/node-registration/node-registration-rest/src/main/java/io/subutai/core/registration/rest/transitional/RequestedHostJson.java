@@ -6,7 +6,7 @@ import java.util.Set;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.host.HostArchitecture;
-import io.subutai.common.host.Interface;
+import io.subutai.common.host.HostInterface;
 import io.subutai.core.registration.api.RegistrationStatus;
 import io.subutai.core.registration.api.service.ContainerInfo;
 import io.subutai.core.registration.api.service.RequestedHost;
@@ -16,7 +16,7 @@ public class RequestedHostJson implements RequestedHost
 {
     private String id;
     private String hostname;
-    private Set<HostInterfaceJson> interfaces = Sets.newHashSet();
+    private Set<HostHostInterfaceJson> interfaces = Sets.newHashSet();
     private HostArchitecture arch;
     private String secret;
 
@@ -69,16 +69,16 @@ public class RequestedHostJson implements RequestedHost
     }
 
 
-    public Set<Interface> getNetInterfaces()
+    public Set<HostInterface> getNetHostInterfaces()
     {
-        Set<Interface> temp = Sets.newHashSet();
+        Set<HostInterface> temp = Sets.newHashSet();
         temp.addAll( interfaces );
         return temp;
         //        return Sets.newHashSet();
     }
 
 
-    public void setInterfaces( final Set<HostInterfaceJson> interfaces )
+    public void setInterfaces( final Set<HostHostInterfaceJson> interfaces )
     {
         this.interfaces = interfaces;
     }

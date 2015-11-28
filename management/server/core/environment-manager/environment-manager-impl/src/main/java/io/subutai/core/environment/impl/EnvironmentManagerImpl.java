@@ -33,9 +33,10 @@ import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.environment.PeerConf;
 import io.subutai.common.environment.Topology;
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.HostInfo;
-import io.subutai.common.host.HostInfoModel;
-import io.subutai.common.host.Interface;
+import io.subutai.common.host.ContainerHostInfoModel;
+import io.subutai.common.host.HostInterface;
 import io.subutai.common.mdc.SubutaiExecutors;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.network.Gateway;
@@ -196,15 +197,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     @Override
     public Environment importEnvironment( final String name, final Topology topology,
-                                          final Map<NodeGroup, Set<HostInfo>> containers, final String ssh,
+                                          final Map<NodeGroup, Set<ContainerHostInfo>> containers, final String ssh,
                                           final Integer vlan ) throws EnvironmentCreationException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid name" );
         Preconditions.checkNotNull( topology, "Invalid topology" );
         Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
 
-        Map.Entry<NodeGroup, Set<HostInfo>> containersEntry = containers.entrySet().iterator().next();
-        Iterator<HostInfo> hostIterator = containersEntry.getValue().iterator();
+        Map.Entry<NodeGroup, Set<ContainerHostInfo>> containersEntry = containers.entrySet().iterator().next();
+        Iterator<ContainerHostInfo> hostIterator = containersEntry.getValue().iterator();
 
         String ip = "";
 
@@ -213,7 +214,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             HostInfo sampleHostInfo = hostIterator.next();
 
             //TODO ip is chosen from first standing container host info
-            for ( final Interface iface : sampleHostInfo.getInterfaces() )
+            for ( final HostInterface iface : sampleHostInfo.getHostInterfaces().getAll() )
             {
                 if ( StringUtil.isStringNullOrEmpty( iface.getIp() ) )
                 {
@@ -231,15 +232,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         //create empty environment
         final EnvironmentImpl environment = createEmptyEnvironment( name, ip, ssh );
-        for ( Map.Entry<NodeGroup, Set<HostInfo>> entry : containers.entrySet() )
+        for ( Map.Entry<NodeGroup, Set<ContainerHostInfo>> entry : containers.entrySet() )
         {
-            for ( HostInfo newHost : entry.getValue() )
+            for ( ContainerHostInfo newHost : entry.getValue() )
             {
                 ContainerType containerType = entry.getKey().getType();
 
                 environment.addContainers( Sets.newHashSet(
                         new EnvironmentContainerImpl( peerManager.getLocalPeer().getId(), peerManager.getLocalPeer(),
-                                entry.getKey().getName(), new HostInfoModel( newHost ),
+                                entry.getKey().getName(), new ContainerHostInfoModel( newHost ),
                                 templateRegistry.getTemplate( entry.getKey().getTemplateName() ),
                                 entry.getKey().getSshGroupId(), entry.getKey().getHostsGroupId(),
                                 Common.DEFAULT_DOMAIN_NAME, containerType ) ) );
@@ -850,7 +851,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                     EnvironmentContainerImpl environmentContainer =
                             environmentContainerDataService.find( containerHost.getId() );
                     environmentContainer.setHostname( hostInfo.getHostname() );
-                    environmentContainer.setNetInterfaces( hostInfo.getInterfaces() );
+                    environmentContainer.setHostInterfaces( hostInfo.getHostInterfaces() );
 
                     environmentContainerDataService.update( environmentContainer );
                 }

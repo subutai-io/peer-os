@@ -2,6 +2,7 @@ package io.subutai.core.security.broker;
 
 
 import io.subutai.common.host.ResourceHostInfo;
+import io.subutai.common.host.ResourceHostInfoModel;
 
 
 /**
@@ -9,7 +10,7 @@ import io.subutai.common.host.ResourceHostInfo;
  */
 public class HeartBeat
 {
-    ResourceHostInfoImpl response;
+    ResourceHostInfoModel response;
 
 
     public ResourceHostInfo getHostInfo()

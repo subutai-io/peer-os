@@ -446,7 +446,7 @@ public class RestServiceImpl implements RestService
             {
                 ContainerHost containerHost = environment.getContainerHostById( containerId );
 
-                return Response.ok( new ContainerStateDto( containerHost.getStatus() ) ).build();
+                return Response.ok( new ContainerStateDto( containerHost.getState() ) ).build();
             }
             catch ( ContainerHostNotFoundException e )
             {
@@ -592,7 +592,7 @@ public class RestServiceImpl implements RestService
         Set<ContainerDto> jsonSet = Sets.newHashSet();
         for ( EnvironmentContainerHost containerHost : containerHosts )
         {
-            ContainerHostState state = containerHost.getStatus();
+            ContainerHostState state = containerHost.getState();
 
 
             jsonSet.add( new ContainerDto( containerHost.getId(), containerHost.getEnvironmentId().getId(),

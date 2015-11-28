@@ -8,6 +8,7 @@ import java.util.Set;
 
 import io.subutai.common.environment.Environment;
 import io.subutai.common.metric.BaseAlert;
+import io.subutai.common.metric.BaseMetric;
 import io.subutai.common.metric.ContainerHostMetric;
 import io.subutai.common.metric.HistoricalMetric;
 import io.subutai.common.metric.MetricType;
@@ -147,6 +148,8 @@ public interface Monitor
     void putAlert( BaseAlert alert );
 
     ResourceHostMetrics getResourceHostMetrics();
+
+    Collection<BaseMetric> getMetrics();
 
     //    String getHostMetricsAsHtml( String hostId );
 }

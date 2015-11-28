@@ -23,7 +23,7 @@ import com.google.gson.annotations.Expose;
 public class ResourceHostMetrics
 {
     @Expose
-    @JsonProperty
+    @JsonProperty("resources")
     Collection<ResourceHostMetric> resources = new HashSet();
 
 

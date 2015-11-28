@@ -6,17 +6,9 @@
              interface="io.subutai.core.environment.api.EnvironmentManager" />
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="metric/resource-host-metrics">
-      <action class="io.subutai.core.metric.cli.ResourceHostMetricsCommand">
+    <command name="metric/list">
+      <action class="io.subutai.core.metric.cli.MetricListCommand">
         <argument ref="monitor" />
-      </action>
-    </command>
-  </command-bundle>
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="metric/container-host-metrics">
-      <action class="io.subutai.core.metric.cli.ContainerHostMetricsCommand">
-        <argument ref="monitor" />
-        <argument ref="environmentManager" />
       </action>
     </command>
   </command-bundle>

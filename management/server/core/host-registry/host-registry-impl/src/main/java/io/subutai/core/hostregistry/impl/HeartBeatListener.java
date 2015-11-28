@@ -14,7 +14,7 @@ import io.subutai.core.broker.api.Topic;
  */
 public class HeartBeatListener implements ByteMessageListener
 {
-    private static final Logger LOG = LoggerFactory.getLogger( HeartBeatListener.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( HeartBeatListener.class);
     private final HostRegistryImpl registry;
     protected JsonUtil jsonUtil = new JsonUtil();
 

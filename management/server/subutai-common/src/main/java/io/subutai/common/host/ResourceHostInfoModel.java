@@ -5,6 +5,9 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonProperty;
+
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Sets;
 
@@ -15,15 +18,19 @@ import io.subutai.common.util.JsonUtil;
 /**
  * Implementation of ResourceHostInfo
  */
-public class ResourceHostInfoModel implements ResourceHostInfo
+public class ResourceHostInfoModel extends HostInfoModel implements ResourceHostInfo
 {
-    private String id;
-    private String hostname;
-    private Set<InterfaceImpl> interfaces;
     private Set<ContainerHostInfoModel> containers;
-    private HostArchitecture arch;
+    @JsonIgnore
     private InstanceType instance;
+    @JsonIgnore
     private Set<Alert> alert;
+
+
+    public ResourceHostInfoModel( final HostInfo hostInfo )
+    {
+        super( hostInfo );
+    }
 
 
     @Override
@@ -41,30 +48,20 @@ public class ResourceHostInfoModel implements ResourceHostInfo
 
 
     @Override
+    @JsonIgnore
     public InstanceType getInstanceType()
     {
         return instance;
     }
 
 
+    @JsonIgnore
     public Set<Alert> getAlerts()
     {
         return alert;
     }
 
-
-    @Override
-    public Set<Interface> getInterfaces()
-    {
-        Set<Interface> result = Sets.newHashSet();
-        if ( !CollectionUtil.isCollectionEmpty( interfaces ) )
-        {
-            result.addAll( interfaces );
-        }
-        return result;
-    }
-
-
+    @JsonIgnore
     @Override
     public Set<ContainerHostInfo> getContainers()
     {
@@ -80,17 +77,10 @@ public class ResourceHostInfoModel implements ResourceHostInfo
 
 
     @Override
-    public HostArchitecture getArch()
-    {
-        return arch;
-    }
-
-
-    @Override
     public String toString()
     {
         return MoreObjects.toStringHelper( this ).add( "id", id ).add( "hostname", hostname )
-                          .add( "instance", instance ).add( "interfaces", interfaces ).add( "containers", containers )
+                          .add( "instance", instance ).add( "interfaces", getHostInterfaces() ).add( "containers", containers )
                           .toString();
     }
 
@@ -171,6 +161,30 @@ public class ResourceHostInfoModel implements ResourceHostInfo
         Cpu cpu;
         Ram ram;
         Set<Hdd> hdd;
+
+
+        public String getId()
+        {
+            return id;
+        }
+
+
+        public Cpu getCpu()
+        {
+            return cpu;
+        }
+
+
+        public Ram getRam()
+        {
+            return ram;
+        }
+
+
+        public Set<Hdd> getHdd()
+        {
+            return hdd;
+        }
     }
 
 
@@ -185,6 +199,18 @@ public class ResourceHostInfoModel implements ResourceHostInfo
             this.current = current;
             this.quota = quota;
         }
+
+
+        public String getCurrent()
+        {
+            return current;
+        }
+
+
+        public String getQuota()
+        {
+            return quota;
+        }
     }
 
 
@@ -198,6 +224,18 @@ public class ResourceHostInfoModel implements ResourceHostInfo
         {
             this.current = current;
             this.quota = quota;
+        }
+
+
+        public String getCurrent()
+        {
+            return current;
+        }
+
+
+        public String getQuota()
+        {
+            return quota;
         }
     }
 
@@ -215,14 +253,32 @@ public class ResourceHostInfoModel implements ResourceHostInfo
             this.current = current;
             this.quota = quota;
         }
-    }
 
 
-    public static void main( String[] args )
-    {
-        ResourceHostInfoModel info = new ResourceHostInfoModel();
-        info.test();
+        public String getPartition()
+        {
+            return partition;
+        }
+
+
+        public String getCurrent()
+        {
+            return current;
+        }
+
+
+        public String getQuota()
+        {
+            return quota;
+        }
     }
+
+//
+//    public static void main( String[] args )
+//    {
+//        ResourceHostInfoModel info = new ResourceHostInfoModel();
+//        info.test();
+//    }
 
 
     private void test()

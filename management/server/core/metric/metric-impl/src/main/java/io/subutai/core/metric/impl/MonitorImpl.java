@@ -14,8 +14,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import javax.naming.NamingException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,15 +31,16 @@ import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.exception.DaoException;
 import io.subutai.common.host.ContainerHostInfo;
+import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.HostId;
-import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.HostInfoModel;
 import io.subutai.common.host.ResourceHostInfo;
+import io.subutai.common.host.ResourceHostInfoModel;
 import io.subutai.common.metric.Alert;
 import io.subutai.common.metric.BaseAlert;
 import io.subutai.common.metric.BaseMetric;
 import io.subutai.common.metric.CommonAlert;
 import io.subutai.common.metric.ContainerHostMetric;
-import io.subutai.common.metric.ContainerHostQuotaState;
 import io.subutai.common.metric.EnvironmentContainerResourceAlert;
 import io.subutai.common.metric.HistoricalMetric;
 import io.subutai.common.metric.MetricType;
@@ -62,12 +61,9 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.JsonUtil;
-import io.subutai.common.util.ServiceLocator;
 import io.subutai.common.util.StringUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
-import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostListener;
-import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.metric.api.AlertListener;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
@@ -451,10 +447,8 @@ public class MonitorImpl implements Monitor, HostListener
             if ( commandResult.hasSucceeded() )
             {
                 result = JsonUtil.fromJson( commandResult.getStdOut(), ResourceHostMetric.class );
-                HostRegistry hostRegistry = ServiceLocator.getServiceNoCache( HostRegistry.class );
-                final HostInfo hostInfo = hostRegistry.getResourceHostInfoById( resourceHost.getId() );
-                result = new ResourceHostMetric( peerManager.getLocalPeer().getId(), hostInfo,
-                        resourceHost.getContainers().size() );
+
+                //                result = new ResourceHostMetric( peerManager.getLocalPeer().getId(), null );
                 LOG.debug( String.format( "Host %s metrics fetched successfully.", resourceHost.getHostname() ) );
             }
             else
@@ -462,7 +456,7 @@ public class MonitorImpl implements Monitor, HostListener
                 LOG.warn( String.format( "Error getting %s metrics", resourceHost.getHostname() ) );
             }
         }
-        catch ( HostDisconnectedException | NamingException | CommandException | JsonSyntaxException e )
+        catch ( CommandException | JsonSyntaxException e )
         {
             LOG.error( e.getMessage(), e );
         }
@@ -1204,11 +1198,25 @@ public class MonitorImpl implements Monitor, HostListener
 
 
     @Override
+    public Collection<BaseMetric> getMetrics()
+    {
+        return Collections.unmodifiableCollection( metrics.values() );
+    }
+
+
+    @Override
     public ResourceHostMetrics getResourceHostMetrics()
     {
         ResourceHostMetrics result = new ResourceHostMetrics();
 
-        //TODO: implement me
+        for ( BaseMetric baseMetric : getMetrics() )
+        {
+            if ( baseMetric instanceof ResourceHostMetric && !"management"
+                    .equals( ( ( ResourceHostMetric ) baseMetric ).getHostName() ) )
+            {
+                result.addMetric( ( ResourceHostMetric ) baseMetric );
+            }
+        }
 
         return result;
     }
@@ -1289,7 +1297,7 @@ public class MonitorImpl implements Monitor, HostListener
                 {
                     ResourceHostMetric resourceHostMetric = monitor.fetchResourceHostMetric( resourceHost );
 
-                    monitor.updateHostMetric( resourceHostMetric );
+                    updateResourceHostMetrics( resourceHost.getId(), resourceHostMetric );
                 }
             }
             catch ( Exception e )
@@ -1304,34 +1312,87 @@ public class MonitorImpl implements Monitor, HostListener
     @Override
     public void onHeartbeat( final ResourceHostInfo resourceHostInfo, final Set<ResourceAlert> alerts )
     {
-        if ( !"management".equals( resourceHostInfo.getHostname() ) )
+        Host host;
+        try
         {
-            ResourceHost host;
-            try
+            if ( "management".equals( resourceHostInfo.getHostname() ) )
+            {
+                host = peerManager.getLocalPeer().getManagementHost();
+            }
+            else
             {
                 host = peerManager.getLocalPeer().getResourceHostByName( resourceHostInfo.getHostname() );
             }
-            catch ( HostNotFoundException e )
-            {
-                final String description =
-                        String.format( "Resource host '%s' hot found. Id: %s", resourceHostInfo.getHostname(),
-                                resourceHostInfo.getId() );
-                CommonAlert commonAlert = new CommonAlert( new HostId( resourceHostInfo.getId() ), description );
-                putAlert( commonAlert );
-                //TODO: sign RH key with peer key including management host
-            }
+            updateHostInfo( ( ResourceHostInfoModel ) resourceHostInfo );
+        }
+        catch ( HostNotFoundException e )
+        {
+            final String description =
+                    String.format( "Resource host '%s' hot found. Id: %s", resourceHostInfo.getHostname(),
+                            resourceHostInfo.getId() );
+            CommonAlert commonAlert = new CommonAlert( new HostId( resourceHostInfo.getId() ), description );
+            putAlert( commonAlert );
+            //TODO: sign RH key with peer key including management host
+        }
 
+        if ( alerts != null )
+        {
             for ( ResourceAlert resourceAlert : alerts )
             {
                 putAlert( resourceAlert );
             }
+        }
+    }
 
 
+    private void updateHostInfo( final HostInfoModel hostInfo )
+    {
+        BaseMetric metric = this.metrics.get( hostInfo.getId() );
+        if ( metric == null )
+        {
+            if ( hostInfo instanceof ResourceHostInfo )
+            {
+                metric = new ResourceHostMetric( peerManager.getLocalPeer().getId(),
+                        ( ResourceHostInfoModel ) hostInfo );
+            }
+            else if ( hostInfo instanceof ContainerHostInfo )
+            {
+                metric = new BaseMetric( peerManager.getLocalPeer().getId(), hostInfo );
+            }
+            else
+            {
+                return;       //unknown
+            }
+            this.metrics.put( hostInfo.getId(), metric );
+        }
+
+        metric.setHostInfo( ( HostInfoModel ) hostInfo );
+
+        if ( hostInfo instanceof ResourceHostInfoModel )
+        {
+            ResourceHostInfoModel resourceHostInfo = ( ResourceHostInfoModel ) hostInfo;
             for ( ContainerHostInfo containerHostInfo : resourceHostInfo.getContainers() )
             {
-                BaseMetric metric = new BaseMetric( peerManager.getLocalPeer().getId(), containerHostInfo );
-                metrics.put( containerHostInfo.getId(), metric );
+                updateHostInfo( ( ContainerHostInfoModel ) containerHostInfo );
             }
         }
+    }
+
+
+    private void updateResourceHostMetrics( final String id, final ResourceHostMetric resourceHostMetric )
+    {
+        if ( resourceHostMetric == null )
+        {
+            return;
+        }
+        BaseMetric metric = this.metrics.get( id );
+        if ( metric == null )
+        {
+            metric = new ResourceHostMetric( peerManager.getLocalPeer().getId() );
+            this.metrics.put( id, metric );
+        }
+
+        ResourceHostMetric m = ( ResourceHostMetric ) metric;
+        m.updateMetrics( resourceHostMetric );
     }
 }

@@ -1,7 +1,10 @@
 package io.subutai.common.metric;
 
 
+import org.codehaus.jackson.annotate.JsonProperty;
+
 import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.HostInfoModel;
 
 
 /**
@@ -9,8 +12,10 @@ import io.subutai.common.host.HostInfo;
  */
 public class BaseMetric
 {
+    @JsonProperty( "peerId" )
     protected String peerId;
-    protected HostInfo hostInfo;
+    @JsonProperty( "hostInfo" )
+    protected HostInfoModel hostInfo;
 
 
     public BaseMetric()
@@ -18,7 +23,8 @@ public class BaseMetric
     }
 
 
-    public BaseMetric( final String peerId, final HostInfo hostInfo )
+    public BaseMetric( @JsonProperty( "peerId" ) final String peerId,
+                       @JsonProperty( "hostInfo" ) final HostInfoModel hostInfo )
     {
         this.peerId = peerId;
         this.hostInfo = hostInfo;
@@ -34,5 +40,25 @@ public class BaseMetric
     public HostInfo getHostInfo()
     {
         return hostInfo;
+    }
+
+
+    public void setHostInfo( final HostInfoModel hostInfo )
+    {
+        this.hostInfo = hostInfo;
+    }
+
+
+    @Override
+    public String toString()
+    {
+        if ( hostInfo != null )
+        {
+            return String.format( "%s %s %s", hostInfo.getHostname(), hostInfo.getId(), hostInfo.getArch() );
+        }
+        else
+        {
+            return "NULL";
+        }
     }
 }

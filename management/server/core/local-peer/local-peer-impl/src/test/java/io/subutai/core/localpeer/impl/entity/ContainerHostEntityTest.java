@@ -16,7 +16,9 @@ import com.google.common.collect.Sets;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostArchitecture;
-import io.subutai.common.host.Interface;
+import io.subutai.common.host.HostInterface;
+import io.subutai.common.host.HostInterfaceModel;
+import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
@@ -61,13 +63,15 @@ public class ContainerHostEntityTest
     @Mock
     Peer peer;
     @Mock
-    Interface anInterface;
+    HostInterfaceModel anHostInterface;
     @Mock
     ResourceHost resourceHost;
 
     ContainerHostEntity containerHostEntity;
     @Mock
     private ContainerGateway containerGateway;
+    @Mock
+    private HostInterfaces hostInterfaces;
 
 
     @Before
@@ -76,11 +80,12 @@ public class ContainerHostEntityTest
         when( containerHostInfo.getId() ).thenReturn( HOST_ID );
         when( containerHostInfo.getHostname() ).thenReturn( HOSTNAME );
         when( containerHostInfo.getArch() ).thenReturn( ARCH );
-        when( containerHostInfo.getInterfaces() ).thenReturn( Sets.newHashSet( anInterface ) );
-        when( containerHostInfo.getStatus() ).thenReturn( CONTAINER_HOST_STATE );
-        when( anInterface.getName() ).thenReturn( INTERFACE_NAME );
-        when( anInterface.getIp() ).thenReturn( IP );
-        when( anInterface.getMac() ).thenReturn( MAC );
+        when( hostInterfaces.getAll() ).thenReturn( Sets.newHashSet( anHostInterface ) );
+        when( containerHostInfo.getHostInterfaces() ).thenReturn( hostInterfaces );
+        when( containerHostInfo.getState() ).thenReturn( CONTAINER_HOST_STATE );
+        when( anHostInterface.getName() ).thenReturn( INTERFACE_NAME );
+        when( anHostInterface.getIp() ).thenReturn( IP );
+        when( anHostInterface.getMac() ).thenReturn( MAC );
 
         containerHostEntity = new ContainerHostEntity( PEER_ID.toString(), containerHostInfo );
         //        containerHostEntity.setLocalPeer( localPeer );
@@ -171,7 +176,7 @@ public class ContainerHostEntityTest
     {
         containerHostEntity.updateHostInfo( containerHostInfo );
 
-        assertEquals( CONTAINER_HOST_STATE, containerHostEntity.getStatus() );
+        assertEquals( CONTAINER_HOST_STATE, containerHostEntity.getState() );
     }
 
 
@@ -216,7 +221,7 @@ public class ContainerHostEntityTest
     {
         containerHostEntity.updateHostInfo( containerHostInfo );
 
-        assertEquals( CONTAINER_HOST_STATE, containerHostEntity.getStatus() );
+        assertEquals( CONTAINER_HOST_STATE, containerHostEntity.getState() );
     }
 
 

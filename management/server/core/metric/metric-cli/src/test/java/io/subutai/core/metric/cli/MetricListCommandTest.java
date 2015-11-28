@@ -47,25 +47,15 @@ public class MetricListCommandTest extends SystemOutRedirectTest
         ContainerHostMetric metric = mock( ContainerHostMetric.class );
         when( metric.toString() ).thenReturn( METRIC_TO_STRING );
         when( monitor.getContainerHostsMetrics( environment ) ).thenReturn( Sets.newHashSet( metric ) );
-        when( environmentManager.loadEnvironment( ENVIRONMENT_ID ) ).thenReturn( environment );
-        metricListCommand = new MetricListCommand( monitor, environmentManager );
-        metricListCommand.environmentIdString = ENVIRONMENT_ID.toString();
+        metricListCommand = new MetricListCommand( monitor);
     }
 
 
     @Test( expected = NullPointerException.class )
     public void testConstructorShouldFailOnNullMonitor() throws Exception
     {
-        new MetricListCommand( null, environmentManager );
+        new MetricListCommand( null );
     }
-
-
-    @Test( expected = NullPointerException.class )
-    public void testConstructorShouldFailOnNullEnvironmentManager() throws Exception
-    {
-        new MetricListCommand( monitor, null );
-    }
-
 
     @Test
     public void testDoExecute() throws Exception
@@ -75,15 +65,15 @@ public class MetricListCommandTest extends SystemOutRedirectTest
         assertThat( getSysOut(), containsString( METRIC_TO_STRING ) );
     }
 
-
-    @Test
-    public void testDoExecuteWithMissingEnvironment() throws Exception
-    {
-        doThrow( new EnvironmentNotFoundException( null ) ).when( environmentManager )
-                                                           .loadEnvironment( ENVIRONMENT_ID );
-
-        metricListCommand.doExecute();
-
-        assertThat( getSysOut(), containsString( ENVIRONMENT_NOT_FOUND_MSG ) );
-    }
+//
+//    @Test
+//    public void testDoExecuteWithMissingEnvironment() throws Exception
+//    {
+//        doThrow( new EnvironmentNotFoundException( null ) ).when( environmentManager )
+//                                                           .loadEnvironment( ENVIRONMENT_ID );
+//
+//        metricListCommand.doExecute();
+//
+//        assertThat( getSysOut(), containsString( ENVIRONMENT_NOT_FOUND_MSG ) );
+//    }
 }

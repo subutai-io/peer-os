@@ -181,7 +181,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     }
 
 
-    public ContainerHostState getStatus()
+    public ContainerHostState getState()
     {
         return state;
     }
@@ -247,7 +247,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
         super.updateHostInfo( hostInfo );
 
         ContainerHostInfo containerHostInfo = ( ContainerHostInfo ) hostInfo;
-        this.state = containerHostInfo.getStatus();
+        this.state = containerHostInfo.getState();
         return false;
     }
 
@@ -311,7 +311,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     @Override
     public boolean isConnected()
     {
-        return ContainerHostState.RUNNING.equals( getStatus() );
+        return ContainerHostState.RUNNING.equals( getState() );
     }
 
 

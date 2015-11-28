@@ -4,9 +4,9 @@ package io.subutai.common.host;
 /**
  * Null object for interface Interface
  */
-public class NullHostInterface implements HostInterface
+public class NullHostInterface extends HostInterfaceModel
 {
-    private static HostInterface instance = new NullHostInterface();
+    private static HostInterfaceModel instance = new NullHostInterface();
 
 
     private NullHostInterface()
@@ -14,7 +14,7 @@ public class NullHostInterface implements HostInterface
     }
 
 
-    public static HostInterface getInstance()
+    public static HostInterfaceModel getInstance()
     {
         return instance;
     }

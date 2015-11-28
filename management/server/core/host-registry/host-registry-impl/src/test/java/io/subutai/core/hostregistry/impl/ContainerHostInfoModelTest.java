@@ -58,12 +58,12 @@ public class ContainerHostInfoModelTest
     {
         assertEquals( HOSTNAME, containerHostInfo.getHostname() );
         assertEquals( ID, containerHostInfo.getId() );
-        assertEquals( CONTAINER_STATUS, containerHostInfo.getStatus() );
+        assertEquals( CONTAINER_STATUS, containerHostInfo.getState() );
         assertEquals( ARCH, containerHostInfo.getArch() );
         assertEquals( Common.DEFAULT_CONTAINER_INTERFACE,
-                containerHostInfo.getInterfaces().iterator().next().getName() );
-        assertEquals( MAC, containerHostInfo.getInterfaces().iterator().next().getMac() );
-        assertEquals( IP, containerHostInfo.getInterfaces().iterator().next().getIp() );
+                containerHostInfo.getHostInterfaces().getAll().iterator().next().getName() );
+        assertEquals( MAC, containerHostInfo.getHostInterfaces().getAll().iterator().next().getMac() );
+        assertEquals( IP, containerHostInfo.getHostInterfaces().getAll().iterator().next().getIp() );
     }
 
 

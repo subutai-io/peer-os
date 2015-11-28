@@ -6,6 +6,7 @@ import java.util.Set;
 
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.ResourceHostInfo;
+import io.subutai.common.host.ResourceHostInfoModel;
 import io.subutai.common.metric.ResourceAlert;
 import io.subutai.common.resource.MeasureUnit;
 import io.subutai.common.resource.ResourceType;
@@ -17,7 +18,7 @@ import io.subutai.common.resource.ResourceValue;
  */
 public class HeartBeat
 {
-    ResourceHostInfoImpl response;
+    ResourceHostInfoModel response;
     Set<ResourceAlert> alerts;
 
 
@@ -32,7 +33,7 @@ public class HeartBeat
         if ( alerts == null && response.getAlerts() != null )
         {
             alerts = new HashSet<>();
-            for ( ResourceHostInfoImpl.Alert a : response.getAlerts() )
+            for ( ResourceHostInfoModel.Alert a : response.getAlerts() )
             {
                 processCpuAlert( a );
                 processRamAlert( a );
@@ -44,37 +45,37 @@ public class HeartBeat
     }
 
 
-    private void processCpuAlert( final ResourceHostInfoImpl.Alert a )
+    private void processCpuAlert( final ResourceHostInfoModel.Alert a )
     {
-        if ( a.cpu != null )
+        if ( a.getCpu() != null )
         {
-            ResourceAlert cpuAlert = new ResourceAlert( new HostId( a.id ), ResourceType.CPU,
-                    new ResourceValue( a.cpu.current, MeasureUnit.PERCENT ),
-                    new ResourceValue( a.cpu.quota, MeasureUnit.PERCENT ) );
+            ResourceAlert cpuAlert = new ResourceAlert( new HostId( a.getId() ), ResourceType.CPU,
+                    new ResourceValue( a.getCpu().getCurrent(), MeasureUnit.PERCENT ),
+                    new ResourceValue( a.getCpu().getQuota(), MeasureUnit.PERCENT ) );
             alerts.add( cpuAlert );
         }
     }
 
 
-    private void processRamAlert( final ResourceHostInfoImpl.Alert a )
+    private void processRamAlert( final ResourceHostInfoModel.Alert a )
     {
-        if ( a.ram != null )
+        if ( a.getRam() != null )
         {
-            ResourceAlert cpuAlert = new ResourceAlert( new HostId( a.id ), ResourceType.RAM,
-                    new ResourceValue( a.ram.current, MeasureUnit.MB ),
-                    new ResourceValue( a.ram.quota, MeasureUnit.MB ) );
+            ResourceAlert cpuAlert = new ResourceAlert( new HostId( a.getId() ), ResourceType.RAM,
+                    new ResourceValue( a.getRam().getCurrent(), MeasureUnit.MB ),
+                    new ResourceValue( a.getRam().getQuota(), MeasureUnit.MB ) );
             alerts.add( cpuAlert );
         }
     }
 
 
-    private void processHddAlert( final ResourceHostInfoImpl.Alert a )
+    private void processHddAlert( final ResourceHostInfoModel.Alert a )
     {
-        if ( a.ram != null )
+        if ( a.getRam() != null )
         {
-            ResourceAlert cpuAlert = new ResourceAlert( new HostId( a.id ), ResourceType.RAM,
-                    new ResourceValue( a.ram.current, MeasureUnit.MB ),
-                    new ResourceValue( a.ram.quota, MeasureUnit.MB ) );
+            ResourceAlert cpuAlert = new ResourceAlert( new HostId( a.getId()), ResourceType.RAM,
+                    new ResourceValue( a.getRam().getCurrent(), MeasureUnit.MB ),
+                    new ResourceValue( a.getRam().getQuota(), MeasureUnit.MB ) );
             alerts.add( cpuAlert );
         }
     }

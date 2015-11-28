@@ -1,9 +1,15 @@
 package io.subutai.common.host;
 
 
+import org.codehaus.jackson.map.annotate.JsonDeserialize;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+
+
 /**
- * Represent a host network interface
+ * Host network interface
  */
+@JsonSerialize( as = HostInterfaceModel.class )
+@JsonDeserialize( as = HostInterfaceModel.class )
 public interface HostInterface
 {
     /**

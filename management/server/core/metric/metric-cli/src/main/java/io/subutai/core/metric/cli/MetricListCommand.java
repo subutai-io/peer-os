@@ -13,7 +13,7 @@ import io.subutai.core.metric.api.Monitor;
 
 
 /**
- * ResourceHostMetricsCommand
+ * List of metrics command
  */
 @Command( scope = "metric", name = "list", description = "Lists host metrics" )
 public class MetricListCommand extends SubutaiShellCommandSupport
@@ -33,6 +33,7 @@ public class MetricListCommand extends SubutaiShellCommandSupport
     protected Object doExecute() throws Exception
     {
         Collection<BaseMetric> metrics = monitor.getMetrics();
+        System.out.println( "List of metrics:" );
         for ( BaseMetric metric : metrics )
         {
             System.out.println( metric );

@@ -122,7 +122,7 @@ public class RestServiceImplTest
     //
     //        verify( monitor ).alert( alertValue );
     //
-    //        assertEquals( Response.Status.ACCEPTED.getStatusCode(), response.getStatus() );
+    //        assertEquals( Response.Status.ACCEPTED.getStatusCode(), response.getState() );
     //    }
     //
     //
@@ -134,7 +134,7 @@ public class RestServiceImplTest
     //
     //        Response response = restService.alert( alertMetric );
     //
-    //        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus() );
+    //        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getState() );
     //    }
 
 
@@ -150,7 +150,7 @@ public class RestServiceImplTest
     //        Set<ContainerHostMetric> metrics = JsonUtil.fromJson( response.getEntity().toString(),
     //                new TypeToken<Set<ContainerHostMetricImpl>>() {}.getType() );
     //
-    //        assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
+    //        assertEquals( Response.Status.OK.getStatusCode(), response.getState() );
     //        assertFalse( metrics.isEmpty() );
     //    }
 

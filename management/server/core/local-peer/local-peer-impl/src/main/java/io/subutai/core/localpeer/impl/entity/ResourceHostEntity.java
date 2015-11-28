@@ -428,7 +428,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public HostInfo createContainer( final String templateName, final String hostname, final String ip, final int vlan,
+    public ContainerHostInfo createContainer( final String templateName, final String hostname, final String ip, final int vlan,
                                      final int timeout, final String environmentId ) throws ResourceHostException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
@@ -456,12 +456,12 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             LOG.info( String.format( "Container host '%s' does not exists, creating new one.", hostname ) );
         }
 
-        Future<HostInfo> containerHostFuture = queueSequentialTask(
-                new CreateContainerTask( hostRegistry, this, template, hostname, ip, vlan, timeout, environmentId ) );
+        Future<ContainerHostInfo> containerHostFuture = queueSequentialTask(
+                new CreateContainerTask( hostRegistry, this, template, hostname, ip, vlan, timeout/*, environmentId*/ ) );
 
         try
         {
-            final HostInfo result = containerHostFuture.get();
+            final ContainerHostInfo result = containerHostFuture.get();
             return result;
         }
         catch ( ExecutionException | InterruptedException e )
@@ -520,7 +520,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
                 //                {
                 //                    containerHost = new ContainerHostEntity( peerId, info );
                 //                    addContainerHost( containerHost );
-                //                    containerHost.updateHostInfo( info );
+                //                    containerHost.setHostInfo( info );
                 //                    result = true;
                 //                }
             }

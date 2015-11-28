@@ -34,7 +34,7 @@ import io.subutai.common.exception.HTTPException;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInfo;
-import io.subutai.common.host.HostInfoModel;
+import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
@@ -51,7 +51,6 @@ import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.MessageRequest;
 import io.subutai.common.peer.MessageResponse;
 import io.subutai.common.peer.Payload;
-import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.RecipientType;
@@ -62,7 +61,6 @@ import io.subutai.common.protocol.Template;
 import io.subutai.common.resource.ResourceType;
 import io.subutai.common.resource.ResourceValue;
 import io.subutai.common.security.PublicKeyContainer;
-import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.settings.ChannelSettings;
 import io.subutai.common.settings.SecuritySettings;
 import io.subutai.common.util.CollectionUtil;
@@ -515,7 +513,7 @@ public class RemotePeerImpl implements RemotePeer
             Map<String, String> params = Maps.newHashMap();
             params.put( "containerId", jsonUtil.to( containerHostId ) );
             String response = get( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, params, headers );
-            return jsonUtil.from( response, HostInfoModel.class );
+            return jsonUtil.from( response, ContainerHostInfoModel.class );
         }
         catch ( Exception e )
         {
@@ -685,7 +683,7 @@ public class RemotePeerImpl implements RemotePeer
 
     @RolesAllowed( "Environment-Management|A|Write" )
     @Override
-    public Set<HostInfoModel> createEnvironmentContainerGroup( final CreateEnvironmentContainerGroupRequest request )
+    public Set<ContainerHostInfoModel> createEnvironmentContainerGroup( final CreateEnvironmentContainerGroupRequest request )
             throws PeerException
     {
         Preconditions.checkNotNull( request, "Invalid request" );

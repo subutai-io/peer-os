@@ -12,6 +12,7 @@ import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.environment.Topology;
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.peer.ContainerHost;
@@ -59,7 +60,7 @@ public interface EnvironmentManager
      *
      * @throws EnvironmentCreationException - thrown if error occurs during environment creation
      */
-    Environment importEnvironment( String name, Topology topology, Map<NodeGroup, Set<HostInfo>> containers, String ssh,
+    Environment importEnvironment( String name, Topology topology, Map<NodeGroup, Set<ContainerHostInfo>> containers, String ssh,
                                    Integer vlan ) throws EnvironmentCreationException;
 
 
