@@ -70,7 +70,7 @@ public class SubutaiPage extends PageObject {
     @FindBy(className = "b-popup-box-node-list subt_button__blueprint-node-list-item ng-binding ng-scope")
     public WebElementFacade nodeListItem;
 
-    @FindBy(xpath = "*//td[@class=\"b-main-table__controls\"]//a[@class=\"b-icon b-icon_build ng-isolate-scope\"]")
+    @FindBy(xpath = "*//td[@class=\"b-main-table__controls\"]//a[@tooltip-title=\"Build\"]")
     public WebElementFacade iconBuild;
 
     @FindBy(xpath = "*//td[@class=\"ng-binding\"]")
@@ -106,7 +106,7 @@ public class SubutaiPage extends PageObject {
     @FindBy(xpath = "*//div[@class=\"sweet-alert showSweetAlert visible\"]//p[contains(text(), \"Your environment has been created.\")]")
     public WebElementFacade textYourEnvironmentHasBeenCreated;
 
-    @FindBy(xpath = "*//td[@class=\"b-main-table__controls\"]//a[@class=\"b-icon b-icon_grow\"]")
+    @FindBy(xpath = "*//td[@class=\"b-main-table__controls\"]//a[@tooltip-title=\"Grow\"]")
     public WebElementFacade iconGrow;
 
     @FindBy(xpath = "*//td[@class=\"b-main-table__controls\"]//a[@class=\"b-icon b-icon_remove\"]")
@@ -127,7 +127,7 @@ public class SubutaiPage extends PageObject {
     @FindBy(xpath = "*//div[@class=\"sweet-alert showSweetAlert visible\"]//button[@class=\"confirm\"]")
     public WebElementFacade buttonDeleteConfirm;
 
-    @FindBy(xpath = "*//div[@class=\"sweet-alert showSweetAlert visible\"]//h2[contains(text(), \"Deleted!\")]")
+    @FindBy(xpath = "*//div[@class=\"sweet-alert showSweetAlert visible\"]//h2[contains(text(), \"Deleted\")]")
     public WebElementFacade headerBlueprintDeleted;
 
     @FindBy(xpath = "*//div[@class=\"sweet-alert showSweetAlert visible\"]//p[contains(text(), \"Your environment start deleting!\")]")
@@ -199,8 +199,17 @@ public class SubutaiPage extends PageObject {
     @FindBy(ngModel = "selectedPeer")
     public WebElementFacade selectMenuResourceHost;
 
-    @FindBy(xpath = "/html/body/div/div[2]/div/div/div[2]/div[2]/section/div[1]/div/pre[2]")
-    public WebElementFacade outputConsoleCommand;
+    @FindBy(xpath = "*//li[contains(text(), \"Environment\")]")
+    public WebElementFacade buttonEnvironmentOnConsole;
+
+    @FindBy(xpath = "*//li[contains(text(), \"Peer\")]")
+    public WebElementFacade buttonPeerOnConsole;
+
+    @FindBy(ngModel = "selectedContainer")
+    public WebElementFacade selectContainer;
+
+    @FindBy(ngModel = "selectedEnvironment")
+    public WebElementFacade selectEnvironmentConsole;
 
 
     //---------------------------------------------------------------------
@@ -233,6 +242,10 @@ public class SubutaiPage extends PageObject {
         waitFor(textUnregistered);
     }
 
+    public void waitHeaderBlueprintDeleted(){
+        waitFor(headerBlueprintDeleted);
+    }
+
     public void executeConsoleCommand(String command){
         evaluateJavascript("function setCommand(value) {\n" +
                 "var appElement = document.getElementsByClassName('b-terminal')[0];" +
@@ -243,7 +256,7 @@ public class SubutaiPage extends PageObject {
                 "});" +
                 "} " +
                 "setCommand('"+ command +"')");
-        waitABit(15000);
+        waitABit(10000);
     }
 
     public boolean getPreData(String expectedPhrase){

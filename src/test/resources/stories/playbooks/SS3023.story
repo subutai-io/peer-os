@@ -1,9 +1,9 @@
 Meta:
 
 Narrative:
-As a user
-I want to perform an action
-So that I can achieve a business goal
+As a QA
+I want to verify the PLAYBOOK SS-3023
+So that I will create test scenarios
 
 
 Scenario: Create Local Environment

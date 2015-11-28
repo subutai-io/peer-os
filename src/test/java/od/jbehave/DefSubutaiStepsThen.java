@@ -91,8 +91,9 @@ public class DefSubutaiStepsThen {
         subutaiSteps.seePopupAreYouSure();
     }
 
-    @Then("the user observe header: Deleted!")
+    @Then("the user observe header: Deleted")
     public void see_header_blueprint_deleted(){
+        subutaiSteps.waitHeaderBlueprintDeleted();
         subutaiSteps.seeHeaderBlueprintDeleted();
     }
 

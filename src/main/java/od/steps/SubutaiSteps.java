@@ -44,6 +44,12 @@ public class SubutaiSteps extends ScenarioSteps {
     }
 
     @Step
+    public void open_mng_h_arm() {
+        subutaiPage.setDefaultBaseUrl("https://172.16.194.234:8443/");
+        subutaiPage.open();
+    }
+
+    @Step
     public void clickOnMenuItemEnvironment(){
         subutaiPage.linkEnvironment.click();
     }
@@ -170,6 +176,7 @@ public class SubutaiSteps extends ScenarioSteps {
 
     @Step
     public void selectPeer(int index){
+        waitABit(5000);
         subutaiPage.selectPeer.selectByIndex(index);
     }
 
@@ -241,6 +248,7 @@ public class SubutaiSteps extends ScenarioSteps {
 
     @Step
     public void selectEnvironment(int index){
+        waitABit(5000);
         subutaiPage.selectEnvironment.selectByIndex(index);
     }
 
@@ -458,6 +466,20 @@ public class SubutaiSteps extends ScenarioSteps {
     }
 
     @Step
+    public void selectMenuEnvironment(){
+        subutaiPage.selectMenuResourceHost.click();
+        subutaiPage.selectMenuResourceHost.selectByIndex(1);
+        subutaiPage.selectMenuResourceHost.sendKeys(Keys.ENTER);
+    }
+
+    @Step
+    public void selectContainer(){
+        subutaiPage.selectContainer.click();
+        subutaiPage.selectContainer.selectByIndex(1);
+        subutaiPage.selectContainer.sendKeys(Keys.ENTER);
+    }
+
+    @Step
     public void selectMenuManagementHost(){
         subutaiPage.selectMenuResourceHost.click();
         subutaiPage.selectMenuResourceHost.selectByIndex(2);
@@ -586,5 +608,35 @@ public class SubutaiSteps extends ScenarioSteps {
         assertThat(subutaiPage.pgpHeader.isVisible(), is(true));
     }
 
+    @Step
+    public void clickOnButtonEnvironmentOnConsole(){
+        subutaiPage.buttonEnvironmentOnConsole.click();
+    }
 
+    @Step
+    public void clickButtonPeerConsole(){
+        subutaiPage.buttonPeerOnConsole.click();
+    }
+
+    @Step
+    public void selectMenuResourceHostAgain(){
+        subutaiPage.selectMenuResourceHost.click();
+        subutaiPage.selectMenuResourceHost.selectByIndex(0);
+        subutaiPage.selectMenuResourceHost.sendKeys(Keys.ENTER);
+        subutaiPage.selectMenuResourceHost.click();
+        subutaiPage.selectMenuResourceHost.selectByIndex(1);
+        subutaiPage.selectMenuResourceHost.sendKeys(Keys.ENTER);
+    }
+
+    @Step
+    public void selectEnvironmentConsole(){
+        subutaiPage.selectEnvironmentConsole.click();
+        subutaiPage.selectEnvironmentConsole.selectByIndex(1);
+        subutaiPage.selectEnvironmentConsole.sendKeys(Keys.ENTER);
+    }
+
+    @Step
+    public void waitHeaderBlueprintDeleted() {
+        subutaiPage.waitHeaderBlueprintDeleted();
+    }
 }

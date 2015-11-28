@@ -2,13 +2,17 @@ Meta:
 
 Narrative:
 As a QA
-I want to verify a functional: Local Environment
-So that I wrote acceptance test for it
+I want to verify the PLAYBOOK SS-3038
+So that I will create test scenarios
 
-Scenario: Create Local Environment
-Given the first user is on the home page of Subutai
+Scenario: Create Environment on the ARM
+Given the ARM user is on the home page of Subutai
 And the user enter login and password: 'admin', 'secret'
 And the user click on the button: Login
+When the user click on the menu item: Console
+And the user select any available resource host from select menu
+And the user enter console command: 'cat /proc/cpuinfo'
+Then the user verify output console command and observe expected phrase: 'ARM'
 When the user click on the menu item: Environment
 Then the user observe items of Environment menu
 When the user click on the menu item: Blueprint
@@ -39,29 +43,17 @@ And the user observe text: Your environment start creation.
 When the user click on the button: OK
 Then the user observe header: Success!
 And the user observe text: Your environment has been created.
+When the user click on the menu item: Console
+And the user select any available resource host from select menu
+And the user enter console command: 'sudo subutai list -i'
+Then the user verify output console command and observe expected phrase: 'master'
+And the user verify output console command and observe expected phrase: 'RUNNING'
+When the user select management host from select menu
+And the user enter console command: 'cat /proc/cpuinfo'
+Then the user verify output console command and observe expected phrase: 'ARM'
 
-Scenario: Grow Local Environment
-Given the first user is on the home page of Subutai
-When the user click on the menu item: Environment
-And the user click on the menu item: Blueprint
-And the user click on the icon: Grow
-Then the user observe selector: Environment
-When the user select environment: Local Environment
-And the user select peer: One
-And the user select Strategie: 'DEFAULT-STRATEGY'
-And the user click on the button: Place
-Then the user observe icon: two containers
-When the user click on the link: Environment Build List
-Then the user observe popup: Build Environment
-When the user click on the button: Build
-Then the user observe header: Success!
-And the user observe text: Your environment start growing.
-When the user click on the button: OK
-Then the user observe header: Success!
-And the user observe text: You successfully grow environment.
-
-Scenario: Destroy Environment and Blueprint
-Given the first user is on the home page of Subutai
+Scenario: Destroy Environment and Blueprint from ARM
+Given the ARM user is on the home page of Subutai
 When the user click on the menu item: Environment
 And the user click on the menu item: Blueprint
 And the user click on the icon: Remove
@@ -76,8 +68,3 @@ Then the user observe text: Your environment start deleting!
 When the user click on the button: OK
 Then the user observe text: Your environment has been destroyed.
 And the user observe text: No data available in table
-
-
-
-
-
