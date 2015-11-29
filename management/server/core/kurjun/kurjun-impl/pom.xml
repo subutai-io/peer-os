@@ -15,12 +15,6 @@
 
     <dependencies>
           
-          
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>peer-manager-api</artifactId>
-        </dependency>
-        
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>kurjun-api</artifactId>
@@ -100,10 +94,10 @@
                             |commons-configuration|org.mapdb|org.mybatis|org.bouncycastle
                         </Embed-Dependency>
                         <Embed-Transitive>true</Embed-Transitive>
-                        
+            
                         <Import-Package>
-                            io.subutai.*, org.apache.commons.codec*, org.apache.commons.logging*, org.apache.commons.io,
-                            org.apache.commons.lang*, org.apache.commons.lang3*, com.google.commons*, com.google.common*, 
+                            io.subutai.*, org.apache.commons.codec*, org.apache.commons.logging*, 
+                            org.apache.commons.io, org.apache.commons.lang*, com.google.common*, 
                             com.google.gson*, org.slf4j, org.apache.cxf.jaxrs*, javax.ws.rs*, !*
                         </Import-Package>
                         

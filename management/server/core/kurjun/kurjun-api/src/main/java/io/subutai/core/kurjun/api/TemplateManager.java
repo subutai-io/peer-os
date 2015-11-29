@@ -95,7 +95,13 @@ public interface TemplateManager
      * @param url URL of the remote repository
      */
     void addRemoteRepository( URL url );
-
+    
+    /**
+     * Removes remote repository located at supplied URL.
+     *
+     * @param url URL of the remote repository
+     */
+    void removeRemoteRepository( URL url );
 
 }
 

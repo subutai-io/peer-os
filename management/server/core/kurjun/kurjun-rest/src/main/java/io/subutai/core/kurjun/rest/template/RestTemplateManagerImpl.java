@@ -1,4 +1,4 @@
-package io.subutai.core.kurjun.rest;
+package io.subutai.core.kurjun.rest.template;
 
 
 import ai.subut.kurjun.metadata.common.subutai.DefaultTemplate;
@@ -22,11 +22,12 @@ import org.apache.geronimo.mail.util.Hex;
 
 import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.common.protocol.TemplateKurjun;
+import io.subutai.core.kurjun.rest.RestManagerBase;
 import java.util.List;
 import java.util.stream.Collectors;
 
 
-public class RestTemplateManagerImpl implements RestTemplateManager
+public class RestTemplateManagerImpl extends RestManagerBase implements RestTemplateManager
 {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( RestTemplateManagerImpl.class );
@@ -188,23 +189,6 @@ public class RestTemplateManagerImpl implements RestTemplateManager
     }
 
 
-    private byte[] decodeMd5( String md5 )
-    {
-        if ( md5 != null )
-        {
-            try
-            {
-                return Hex.decode( md5 );
-            }
-            catch ( RuntimeException ex )
-            {
-                LOGGER.error( "Invalid md5 checksum", ex );
-            }
-        }
-        return null;
-    }
-
-
     private DefaultTemplate convertToDefaultTemplate( TemplateKurjun template )
     {
         DefaultTemplate defaultTemplate = new DefaultTemplate();
@@ -224,32 +208,10 @@ public class RestTemplateManagerImpl implements RestTemplateManager
     }
 
 
-    protected Response badRequest( String msg )
+    @Override
+    protected Logger getLogger()
     {
-        return Response.status( Response.Status.BAD_REQUEST ).entity( msg ).build();
+        return LOGGER;
     }
 
-
-    protected Response notFoundResponse( String msg )
-    {
-        return Response.status( Response.Status.NOT_FOUND ).entity( msg ).build();
-    }
-
-
-    protected Response packageNotFoundResponse()
-    {
-        return notFoundResponse( "Package not found." );
-    }
-
-
-    protected Response forbiddenResponse( String msg )
-    {
-        return Response.status( Response.Status.FORBIDDEN ).entity( msg ).build();
-    }
-
-
-    protected Response forbiddenResponse()
-    {
-        return forbiddenResponse( "No permission." );
-    }
 }

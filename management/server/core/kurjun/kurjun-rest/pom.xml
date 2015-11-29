@@ -65,7 +65,7 @@
                         <Embed-Transitive>true</Embed-Transitive>
                         
                         <Import-Package>
-                            io.subutai*, org.apache.commons.io, org.slf4j, org.apache.cxf.jaxrs*, 
+                            io.subutai*, org.apache.commons.codec*, org.apache.commons.io, org.slf4j, org.apache.cxf.jaxrs*, 
                             com.google.gson*, javax.ws.rs*, !*
                         </Import-Package>
                         

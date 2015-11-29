@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
@@ -37,6 +36,8 @@ import ai.subut.kurjun.snap.SnapMetadataParserModule;
 import ai.subut.kurjun.storage.factory.FileStoreFactory;
 import ai.subut.kurjun.storage.factory.FileStoreModule;
 import ai.subut.kurjun.subutai.SubutaiTemplateParserModule;
+import io.subutai.common.peer.HostNotFoundException;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.common.protocol.TemplateKurjun;
 import org.apache.commons.codec.binary.Hex;
@@ -51,18 +52,35 @@ public class TemplateManagerImpl implements TemplateManager
 
     private Injector injector;
 
-    private final Set<URL> remoteRepoUrls = new HashSet<>();
-    
+    private Set<URL> remoteRepoUrls = new HashSet<>();
+
+    private final LocalPeer localPeer;
+
+    private final RepoUrlStore repoUrlStore = new RepoUrlStore();
+
+
+    public TemplateManagerImpl( LocalPeer localPeer )
+    {
+        this.localPeer = localPeer;
+    }
+
 
     public void init()
     {
-
         injector = bootstrapDI();
+
+        try
+        {
+            remoteRepoUrls = repoUrlStore.getRemoteTemplateUrls();
+            LOGGER.info( "Loaded remote template host urls: {}", remoteRepoUrls );
+        }
+        catch ( IOException e )
+        {
+            LOGGER.error( "Failed to get remote repo urls", e );
+        }
 
         KurjunProperties properties = injector.getInstance( KurjunProperties.class );
         setContexts( properties );
-
-        LOGGER.warn( "remoteRepoUrls = " + remoteRepoUrls );
     }
 
 
@@ -94,7 +112,7 @@ public class TemplateManagerImpl implements TemplateManager
         DefaultMetadata m = new DefaultMetadata();
         m.setName( name );
         m.setVersion( version );
-        
+
         UnifiedRepository repo = getRepository( context );
 
         DefaultTemplate meta = ( DefaultTemplate ) repo.getPackageInfo( m );
@@ -172,14 +190,47 @@ public class TemplateManagerImpl implements TemplateManager
     @Override
     public void addRemoteRepository( URL url )
     {
-        remoteRepoUrls.add( url );
-        LOGGER.info( "Remote host url is added: {}", url );
+        try
+        {
+            if ( url != null && !url.getHost().equals( localPeer.getManagementHost().getExternalIp() ) )
+            {
+                repoUrlStore.addRemoteTemplateUrl( url );
+                remoteRepoUrls = repoUrlStore.getRemoteTemplateUrls();
+                LOGGER.info( "Remote template host url is added: {}", url );
+            }
+            else
+            {
+                LOGGER.error( "Failed to add remote host url: {}", url );
+            }
+        }
+        catch ( IOException | HostNotFoundException ex )
+        {
+            LOGGER.error( "Failed to add remote host url: {}", url, ex );
+        }
+    }
+
+
+    @Override
+    public void removeRemoteRepository( URL url )
+    {
+        if ( url != null )
+        {
+            try
+            {
+                repoUrlStore.removeRemoteTemplateUrl( url );
+                remoteRepoUrls = repoUrlStore.getRemoteTemplateUrls();
+                LOGGER.info( "Remote template host url is removed: {}", url );
+            }
+            catch ( IOException e )
+            {
+                LOGGER.error( "Failed to remove remote host url: {}", url, e );
+            }
+        }
     }
 
 
     private Injector bootstrapDI()
     {
-
         KurjunBootstrap bootstrap = new KurjunBootstrap();
         bootstrap.addModule( new ControlFileParserModule() );
         bootstrap.addModule( new ReleaseIndexParserModule() );
@@ -242,7 +293,6 @@ public class TemplateManagerImpl implements TemplateManager
 
     /**
      * Gets Kurjun context for templates repository type.
-     * <p>
      *
      * @param context
      * @return
@@ -250,9 +300,8 @@ public class TemplateManagerImpl implements TemplateManager
     private KurjunContext getContext( String context )
     {
         Set<KurjunContext> set = CONTEXTS;
-        for ( Iterator<KurjunContext> it = set.iterator(); it.hasNext(); )
+        for ( KurjunContext c : set )
         {
-            KurjunContext c = it.next();
             if ( c.getName().equals( context ) )
             {
                 return c;

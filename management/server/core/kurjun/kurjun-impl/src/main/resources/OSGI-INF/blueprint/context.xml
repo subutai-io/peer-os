@@ -1,14 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:jpa="http://aries.apache.org/xmlns/jpa/v1.0.0">
 
-  
+    <reference id="locaPeer" availability="optional"
+                 interface="io.subutai.common.peer.LocalPeer" />
 
-  <bean id="kurjun" scope="singleton" activation="eager" 
-        init-method="init" destroy-method="dispose"
-        class="io.subutai.core.kurjun.impl.TemplateManagerImpl">
-  </bean>
+    <bean id="templateManager" scope="singleton" activation="eager" 
+          init-method="init" destroy-method="dispose"
+          class="io.subutai.core.kurjun.impl.TemplateManagerImpl">
+        <argument ref="locaPeer" />
+    </bean>
+    
+    <bean id="aptManager" scope="singleton" activation="eager" 
+          init-method="init" destroy-method="dispose"
+          class="io.subutai.core.kurjun.impl.vapt.AptManagerImpl">
+    </bean>
 
-  <service ref="kurjun"
-           interface="io.subutai.core.kurjun.api.TemplateManager" />
+    <service ref="templateManager"
+             interface="io.subutai.core.kurjun.api.TemplateManager" />
+    
+    <service ref="aptManager"
+             interface="io.subutai.core.kurjun.api.vapt.AptManager" />
 
 </blueprint>

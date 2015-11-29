@@ -1,5 +1,5 @@
  
-package io.subutai.core.kurjun.rest;
+package io.subutai.core.kurjun.rest.template;
 
  
 import javax.ws.rs.Consumes;
@@ -21,7 +21,6 @@ import org.apache.cxf.jaxrs.ext.multipart.Multipart;
  * HTTP service for templates repository. Built using CXF to be compatible with Subutai.
  *
  */
-@Path( "templates" )
 public interface RestTemplateManager
 {
     // TODO: copied from TemplateServlet. Put to some common place 
@@ -45,7 +44,7 @@ public interface RestTemplateManager
     
     @GET
     @Path( "{repository}/info" )
-    @Produces( MediaType.TEXT_PLAIN )
+    @Produces( MediaType.APPLICATION_JSON )
     Response getTemplateInfo( @PathParam( "repository" ) String repository,
                           @QueryParam( MD5_PARAM ) String md5,
                           @QueryParam( NAME_PARAM ) String name,
@@ -54,7 +53,7 @@ public interface RestTemplateManager
     
     @GET
     @Path( "{repository}/list" )
-    @Produces( MediaType.TEXT_PLAIN )
+    @Produces( MediaType.APPLICATION_JSON )
     Response getTemplateList( @PathParam( "repository" ) String repository );
 
 
