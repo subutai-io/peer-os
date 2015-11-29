@@ -7,23 +7,24 @@ import org.slf4j.LoggerFactory;
 import org.apache.cxf.Bus;
 import org.apache.cxf.feature.AbstractFeature;
 
+import io.subutai.common.settings.ChannelSettings;
 import io.subutai.core.channel.impl.ChannelManagerImpl;
 import io.subutai.core.peer.api.PeerManager;
 
 
 /**
- * Bus listener class
- */
+* Bus listener class
+*/
 public class ServerBusListener extends AbstractFeature
 {
-    private final static Logger LOG = LoggerFactory.getLogger( ServerBusListener.class );
-    private ChannelManagerImpl channelManagerImpl = null;
-    private PeerManager peerManager;
+private final static Logger LOG = LoggerFactory.getLogger( ServerBusListener.class );
+private ChannelManagerImpl channelManagerImpl = null;
+private PeerManager peerManager;
 
 
-    public void busRegistered( Bus bus )
-    {
-        LOG.info( "Adding LoggingFeature interceptor on bus: " + bus );
+public void busRegistered( Bus bus )
+{
+        LOG.info( "Adding LoggingFeature interceptor on bus: " + bus.getId() );
 
         //********Set BUS Message Size to 500 KB ************************
         bus.setProperty( "bus.io.CachedOutputStream.Threshold", "500000" );
@@ -31,24 +32,31 @@ public class ServerBusListener extends AbstractFeature
         LOG.info( "Setting CXF CachedOutputStream.Threshold size to: 500Kb ");
         //***************************************************************
 
-        // initialise the feature on the bus, which will add the interceptors
+        if ( !ChannelSettings.SPECIAL_REST_BUS.contains(bus.getId()) ) {
 
-        //***** RECEIVE    **********************************
-        bus.getInInterceptors().add( new AccessControlInterceptor(channelManagerImpl) );
+            // initialise the feature on the bus, which will add the interceptors
 
-        //***** PRE_STREAM **********************************
-        bus.getOutInterceptors().add( new ClientOutInterceptor(channelManagerImpl, peerManager) );
+            //***** RECEIVE    **********************************
+            bus.getInInterceptors().add( new AccessControlInterceptor(channelManagerImpl) );
 
-        //***** RECEIVE    **********************************
-        bus.getInInterceptors().add( new ServerInInterceptor(channelManagerImpl, peerManager) );
+            //***** PRE_STREAM **********************************
+            bus.getOutInterceptors().add( new ClientOutInterceptor(channelManagerImpl, peerManager) );
 
-        //***** PRE_STREAM **********************************
-        bus.getOutInterceptors().add( new ServerOutInterceptor(channelManagerImpl, peerManager) );
+            //***** RECEIVE    **********************************
+            bus.getInInterceptors().add( new ServerInInterceptor(channelManagerImpl, peerManager) );
 
-        //***** RECEIVE    **********************************
-        bus.getInInterceptors().add( new ClientInInterceptor(channelManagerImpl, peerManager) );
+            //***** PRE_STREAM **********************************
+            bus.getOutInterceptors().add( new ServerOutInterceptor(channelManagerImpl, peerManager) );
 
-        LOG.info( "Successfully added LoggingFeature interceptor on bus: " + bus );
+            //***** RECEIVE    **********************************
+            bus.getInInterceptors().add( new ClientInInterceptor(channelManagerImpl, peerManager) );
+        }
+        else
+        {
+            LOG.warn( "Channel Manager specific interceptors are skipped for the bus: " + bus.getId() );
+        }
+        
+        LOG.info( "Successfully added LoggingFeature interceptor on bus: " + bus.getId() );
     }
 
 
