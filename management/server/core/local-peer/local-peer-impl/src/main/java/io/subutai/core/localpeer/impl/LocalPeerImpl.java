@@ -1085,7 +1085,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     @PermitAll
     @Override
-    public boolean isOnline() throws PeerException
+    public boolean isOnline()
     {
         return true;
     }
