@@ -770,22 +770,23 @@ public class RestServiceImpl implements RestService
     {
         Map<String, List<String>> peerHostMap = Maps.newHashMap();
 
-        for( Peer peer : peerManager.getPeers() )
+        try
         {
-            peerHostMap.put( peer.getId(), Lists.newArrayList() );
-
-            Collection<ResourceHostMetric> collection = peer.getResourceHostMetrics().getResources();
-            for( ResourceHostMetric metric : collection.toArray(new ResourceHostMetric[ collection.size() ]) )
+            for( Peer peer : peerManager.getPeers() )
             {
-                try
+                peerHostMap.put( peer.getId(), Lists.newArrayList() );
+
+                Collection<ResourceHostMetric> collection = peer.getResourceHostMetrics().getResources();
+                for( ResourceHostMetric metric : collection.toArray(new ResourceHostMetric[ collection.size() ]) )
                 {
-                    peerHostMap.get( peer.getId() ).add( metric.getHostId() );
-                }
-                catch ( Exception e )
-                {
-                    LOG.error( "Resource hosts are empty", e );
+                        peerHostMap.get( peer.getId() ).add( metric.getHostId() );
+
                 }
             }
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Resource hosts are empty", e );
         }
 
 
