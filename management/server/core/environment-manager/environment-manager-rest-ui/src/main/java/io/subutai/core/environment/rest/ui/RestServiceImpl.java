@@ -796,18 +796,17 @@ public class RestServiceImpl implements RestService
             if ( peer.isOnline() )
             {
                 peerHostMap.put( peer.getId(), Lists.newArrayList() );
-
-                Collection<ResourceHostMetric> collection = peer.getResourceHostMetrics().getResources();
-                for ( ResourceHostMetric metric : collection.toArray( new ResourceHostMetric[collection.size()] ) )
+                try
                 {
-                    try
+                    Collection<ResourceHostMetric> collection = peer.getResourceHostMetrics().getResources();
+                    for ( ResourceHostMetric metric : collection.toArray( new ResourceHostMetric[collection.size()] ) )
                     {
                         peerHostMap.get( peer.getId() ).add( metric.getHostId() );
                     }
-                    catch ( Exception e )
-                    {
-                        LOG.error( "Resource hosts are empty", e );
-                    }
+                }
+                catch ( PeerException e )
+                {
+                    LOG.error( String.format( "Error obtaining rh metrics from peer %s", peer.getName() ), e );
                 }
             }
         }
