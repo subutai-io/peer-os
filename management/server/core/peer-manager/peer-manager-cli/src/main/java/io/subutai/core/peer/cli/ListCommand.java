@@ -32,30 +32,29 @@ public class ListCommand extends SubutaiShellCommandSupport
         System.out.println( "Found " + list.size() + " registered peers" );
         for ( Peer peer : list )
         {
-            String peerStatus = "OFFLINE";
+            boolean online = peer.isOnline();
 
+            System.out.println(
+                    peer.getId() + " " + peer.getPeerInfo().getIp() + " " + peer.getName() + " " + ( online ? "ONLINE" :
+                                                                                                     "OFFLINE" ) );
 
-            if ( peer.isOnline() )
+            if ( online )
             {
-                peerStatus = "ONLINE";
-            }
-
-            try
-            {
-                System.out.println(
-                        peer.getId() + " " + peer.getPeerInfo().getIp() + " " + peer.getName() + " " + peerStatus );
-
-                HostInterfaces ints = peer.getInterfaces();
-                System.out.println( String.format( "Interfaces count: %d", ints != null ? ints.size() : -1 ) );
-
-                for ( Interface i : ints.filterByName( ".*" ) )
+                try
                 {
-                    System.out.println( String.format( "\t%-15s %-15s %-15s", i.getName(), i.getIp(), i.getMac() ) );
+                    HostInterfaces ints = peer.getInterfaces();
+                    System.out.println( String.format( "Interfaces count: %d", ints != null ? ints.size() : -1 ) );
+
+                    for ( Interface i : ints.filterByName( ".*" ) )
+                    {
+                        System.out
+                                .println( String.format( "\t%-15s %-15s %-15s", i.getName(), i.getIp(), i.getMac() ) );
+                    }
                 }
-            }
-            catch ( Exception e )
-            {
-                log.error( e.getMessage(), e );
+                catch ( Exception e )
+                {
+                    log.error( e.getMessage(), e );
+                }
             }
         }
         return null;
