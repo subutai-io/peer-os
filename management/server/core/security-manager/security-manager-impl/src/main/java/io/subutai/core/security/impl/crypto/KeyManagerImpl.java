@@ -249,8 +249,11 @@ public class KeyManagerImpl implements KeyManager
                 }
             }
 
-            securityKeyTrust.setLevel( trustLevel );
-            securityDataService.updateKeyTrustData( securityKeyTrust );
+            if ( securityKeyTrust != null )
+            {
+                securityKeyTrust.setLevel( trustLevel );
+                securityDataService.updateKeyTrustData( securityKeyTrust );
+            }
         }
         catch ( Exception ex )
         {
