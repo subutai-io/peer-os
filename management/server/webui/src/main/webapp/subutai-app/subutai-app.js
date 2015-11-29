@@ -6,7 +6,8 @@ var app = angular.module('subutai-app', [
 		'oitozero.ngSweetAlert',
 		'ngDialog',
 		'datatables',
-		'720kb.tooltips'
+		'720kb.tooltips',
+		'ngTagsInput'
 	])
 	.config(routesConf)
 	.run(startup);
@@ -113,13 +114,6 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 			resolve: {
 				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
 					return $ocLazyLoad.load([
-						{
-							name: 'ngTagsInput',
-							files: [
-								'css/libs/ng-tags-input.min.css',
-								'assets/js/plugins/ng-tags-input.min.js'
-							]
-						},
 						{
 							name: 'subutai.containers',
 							files: [
@@ -560,25 +554,64 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 			}
 		})
 		.state('storm', {
-        			url: '/plugins/storm',
-        			templateUrl: 'plugins/storm/partials/view.html',
-        			resolve: {
-        				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
-        					return $ocLazyLoad.load([
-        						{
-        							name: 'subutai.plugins.storm',
-        							files: [
-        								'plugins/storm/storm.js',
-        								'plugins/storm/controller.js',
-        								'plugins/storm/service.js',
-        								'plugins/hadoop/service.js',
-        								'subutai-app/environment/service.js'
-        							]
-        						}
-        					]);
-        				}]
-        			}
-        		})
+			url: '/plugins/storm',
+			templateUrl: 'plugins/storm/partials/view.html',
+			resolve: {
+				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+					return $ocLazyLoad.load([
+						{
+							name: 'subutai.plugins.storm',
+							files: [
+								'plugins/storm/storm.js',
+								'plugins/storm/controller.js',
+								'plugins/storm/service.js',
+								'subutai-app/environment/service.js'
+							]
+						}
+					]);
+				}]
+			}
+		})
+		.state('zookeeper', {
+			url: '/plugins/zookeeper',
+			templateUrl: 'plugins/zookeeper/partials/view.html',
+			resolve: {
+				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+					return $ocLazyLoad.load([
+						{
+							name: 'subutai.plugins.zookeeper',
+							files: [
+								'plugins/zookeeper/zookeeper.js',
+								'plugins/zookeeper/controller.js',
+								'plugins/zookeeper/service.js',
+								'plugins/hadoop/service.js',
+								'subutai-app/environment/service.js'
+							]
+						}
+					]);
+				}]
+			}
+		})
+		.state('flume', {
+			url: '/plugins/flume',
+			templateUrl: 'plugins/flume/partials/view.html',
+			resolve: {
+				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+					return $ocLazyLoad.load([
+						{
+							name: 'subutai.plugins.flume',
+							files: [
+								'plugins/flume/flume.js',
+								'plugins/flume/controller.js',
+								'plugins/flume/service.js',
+								'plugins/hadoop/service.js',
+								'subutai-app/environment/service.js'
+							]
+						}
+					]);
+				}]
+			}
+		})
 		.state('404', {
 			url: '/404',
 			template: 'Not found'
@@ -646,7 +679,6 @@ app.directive('checkbox-list-dropdown', function() {
 	return {
 		restrict: 'A',
 		link: function(scope, element, attr) {
-			console.log('lololo');
 			$('.b-form-input_dropdown').click(function () {
 				$(this).toggleClass('is-active');
 			});

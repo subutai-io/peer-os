@@ -1784,3 +1784,13 @@ td.b-main-table__status-col {
 	margin: -12px 0 0 -12px;
 }
 
+.b-popup-checkbox {
+	line-height: 20px;
+	vertical-align: middle;
+}
+
+.b-popup-checkbox__input {
+	margin: 0 0 0 10px;
+	vertical-align: middle;
+}
+

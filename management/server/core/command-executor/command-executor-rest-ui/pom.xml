@@ -25,7 +25,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>security-manager-api</artifactId>
+      <artifactId>environment-manager-api</artifactId>
     </dependency>
     <!--CXF-->
     <dependency>

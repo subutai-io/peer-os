@@ -16,6 +16,7 @@ function EnvironmentViewCtrl($scope, environmentService, SweetAlert, DTOptionsBu
 	vm.domainStrategies = [];
 	vm.sshKeyForEnvironment = '';
 	vm.environmentForDomain = '';
+	vm.currentDomain = {};
 
 	// functions
 	vm.destroyEnvironment = destroyEnvironment;
@@ -85,7 +86,7 @@ function EnvironmentViewCtrl($scope, environmentService, SweetAlert, DTOptionsBu
 	}
 
 	function domainsTag(data, type, full, meta) {
-		return '<span class="b-tags b-tags_grey" ng-click="environmentViewCtrl.showDomainForm(\'' + data.id + '\')">Add <i class="fa fa-plus"></i></span>';
+		return '<button class="b-btn b-btn_grey" ng-click="environmentViewCtrl.showDomainForm(\'' + data.id + '\')">Configure</button>';
 		//return '<span class="b-tags b-tags_grey" ng-click="environmentViewCtrl.removeDomain(\'' + data.id + '\')">Add <i class="fa fa-plus"></i></span>';
 	}
 
@@ -257,6 +258,10 @@ function EnvironmentViewCtrl($scope, environmentService, SweetAlert, DTOptionsBu
 
 	function showDomainForm(environmentId) {
 		vm.environmentForDomain = environmentId;
+		vm.currentDomain = {};
+		environmentService.getDomain(environmentId).success(function (data) {
+			vm.currentDomain = data;
+		});
 		ngDialog.open({
 			template: 'subutai-app/environment/partials/domainForm.html',
 			scope: $scope
@@ -276,6 +281,7 @@ function EnvironmentViewCtrl($scope, environmentService, SweetAlert, DTOptionsBu
 	}
 
 	function removeDomain(environmentId) {
+		ngDialog.closeAll();
 		SweetAlert.swal({
 			title: "Are you sure?",
 			text: "Delete environment domain!",

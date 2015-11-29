@@ -13,10 +13,13 @@
 
   <reference id="commandExecutor" availability="mandatory"
              interface="io.subutai.core.executor.api.CommandExecutor" />
+  <reference id="environmentManager" availability="mandatory"
+             interface="io.subutai.core.environment.api.EnvironmentManager" />
 
 
   <bean id="executorRestUIServiceImpl" class="io.subutai.core.executor.rest.ui.RestServiceImpl">
     <argument ref="commandExecutor" />
+    <argument ref="environmentManager" />
   </bean>
 
   <jaxrs:server address="/ui/commands" id="executorRestUIService">
