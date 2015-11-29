@@ -331,8 +331,4 @@ public class SubutaiPage extends PageObject {
     @FindBy(xpath = "xhtml:html/xhtml:body/xhtml:pre[contains(text(),\"-----BEGIN PGP PUBLIC KEY BLOCK-----\")]")
     public WebElementFacade pgpHeader;
 
-
-
-
-
 }

@@ -639,4 +639,9 @@ public class SubutaiSteps extends ScenarioSteps {
     public void waitHeaderBlueprintDeleted() {
         subutaiPage.waitHeaderBlueprintDeleted();
     }
+
+    @Step
+    public void waitFunctionForSlowOperations(int time){
+        waitABit(time);
+    }
 }

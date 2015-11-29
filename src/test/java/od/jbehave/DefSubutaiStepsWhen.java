@@ -234,6 +234,12 @@ public class DefSubutaiStepsWhen {
         subutaiSteps.executeConsoleCommand(command);
     }
 
+    @When("the user enter console command: subutai import hadoop")
+    public void execute_console_command_subutai_import_hadoop(){
+        subutaiSteps.executeConsoleCommand("subutai import hadoop");
+        subutaiSteps.waitFunctionForSlowOperations(60000);
+    }
+
     @When("the user enter console command: sudo lxc-info -Ssip -n for Container One")
     public void execute_console_command_container1(){
         subutaiSteps.executeConsoleCommand("sudo lxc-info -Ssip -n " + subutaiSteps.getContainerNameOne());
