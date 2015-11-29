@@ -77,14 +77,14 @@ public class AptManagerImpl implements AptManager
         KurjunProperties properties = injector.getInstance( KurjunProperties.class );
         setContexts( properties );
         
-        try
-        {
-            addRemoteRepository( new URL( "https://172.16.131.84:8443/rest/kurjun/vapt" ) );
-        }
-        catch ( MalformedURLException ex )
-        {
-            LOGGER.error( "", ex );
-        }
+//        try
+//        {
+//            addRemoteRepository( new URL( "https://172.16.131.84:8443/rest/kurjun/vapt" ) );
+//        }
+//        catch ( MalformedURLException ex )
+//        {
+//            LOGGER.error( "", ex );
+//        }
     }
 
 
@@ -117,7 +117,7 @@ public class AptManagerImpl implements AptManager
     @Override
     public String getRelease( String release, String component, String arch )
     {
-        UnifiedRepository repo = getRepository();
+        LocalRepository repo = getLocalRepository();
         Optional<ReleaseFile> rel = repo.getDistributions().stream()
                 .filter( r -> r.getCodename().equals( release ) ).findFirst();
 
@@ -134,7 +134,7 @@ public class AptManagerImpl implements AptManager
     @Override
     public InputStream getPackagesIndex( String release, String component, String arch, String packagesIndex ) throws IllegalArgumentException
     {
-        Optional<ReleaseFile> distr = getRepository().getDistributions().stream()
+        Optional<ReleaseFile> distr = getLocalRepository().getDistributions().stream()
                 .filter( r -> r.getCodename().equals( release ) ).findFirst();
         if ( !distr.isPresent() )
         {
@@ -186,7 +186,7 @@ public class AptManagerImpl implements AptManager
 //        }
 
         SerializableMetadata meta = getPackageInfoByFilename( filename );
-        return ( meta != null ) ? getRepository().getPackageStream( meta ) : null;
+        return ( meta != null ) ? getLocalRepository().getPackageStream( meta ) : null;
     }
 
 
@@ -208,7 +208,7 @@ public class AptManagerImpl implements AptManager
     {
         DefaultMetadata m = new DefaultMetadata();
         m.setMd5sum( md5 );
-        SerializableMetadata meta = getRepository().getPackageInfo( m );
+        SerializableMetadata meta = getLocalRepository().getPackageInfo( m );
         return ( meta != null ) ? meta.serialize() : null;
     }
 
@@ -228,7 +228,7 @@ public class AptManagerImpl implements AptManager
         m.setName( packageName );
         m.setVersion( version );
 
-        return getRepository().getPackageInfo( m );
+        return getLocalRepository().getPackageInfo( m );
     }
 
 
@@ -272,7 +272,7 @@ public class AptManagerImpl implements AptManager
         m.setName( name );
         m.setVersion( version );
 
-        SerializableMetadata meta = getRepository().getPackageInfo( m );
+        SerializableMetadata meta = getLocalRepository().getPackageInfo( m );
         if ( meta != null )
         {
             return meta.serialize();
@@ -297,7 +297,7 @@ public class AptManagerImpl implements AptManager
         DefaultMetadata m = new DefaultMetadata();
         m.setMd5sum( md5 );
 
-        UnifiedRepository repo = getRepository();
+        LocalRepository repo = getLocalRepository();
         SerializableMetadata meta = repo.getPackageInfo( m );
         if ( meta != null )
         {
@@ -307,54 +307,54 @@ public class AptManagerImpl implements AptManager
     }
 
 
-    @Override
-    public void addRemoteRepository( URL url )
-    {
-        String hostAddr = null;
-        try
-        {
-            NetworkInterface ni = NetworkInterface.getByName( "eth0" );
-            Enumeration<InetAddress> inetAddress = ni.getInetAddresses();
+//    @Override
+//    public void addRemoteRepository( URL url )
+//    {
+//        String hostAddr = null;
+//        try
+//        {
+//            NetworkInterface ni = NetworkInterface.getByName( "eth0" );
+//            Enumeration<InetAddress> inetAddress = ni.getInetAddresses();
+//
+//            for ( ; inetAddress.hasMoreElements(); )
+//            {
+//                InetAddress addr = inetAddress.nextElement();
+//                if ( addr instanceof Inet4Address )
+//                {
+//                    hostAddr = addr.getHostAddress();
+//                }
+//            }
+//        }
+//        catch ( SocketException ex )
+//        {
+//            LOGGER.error( "", ex );
+//        }
+//
+//        if ( url != null && !url.getHost().equals( hostAddr ) )
+//        {
+//            remoteRepoUrls.add( url );
+//            LOGGER.error( "remoteRepoUrls = " + remoteRepoUrls );
+//            LOGGER.info( "Remote host url is added: {}", url );
+//        }
+//        else
+//        {
+//            LOGGER.error( "Failed to add remote host url: {}", url );
+//        }
+//
+//    }
 
-            for ( ; inetAddress.hasMoreElements(); )
-            {
-                InetAddress addr = inetAddress.nextElement();
-                if ( addr instanceof Inet4Address )
-                {
-                    hostAddr = addr.getHostAddress();
-                }
-            }
-        }
-        catch ( SocketException ex )
-        {
-            LOGGER.error( "", ex );
-        }
 
-        if ( url != null && !url.getHost().equals( hostAddr ) )
-        {
-            remoteRepoUrls.add( url );
-            LOGGER.error( "remoteRepoUrls = " + remoteRepoUrls );
-            LOGGER.info( "Remote host url is added: {}", url );
-        }
-        else
-        {
-            LOGGER.error( "Failed to add remote host url: {}", url );
-        }
-
-    }
-
-
-    private UnifiedRepository getRepository()
-    {
-        RepositoryFactory repositoryFactory = injector.getInstance( RepositoryFactory.class );
-        UnifiedRepository unifiedRepo = repositoryFactory.createUnifiedRepo();
-        unifiedRepo.getRepositories().add( getLocalRepository() );
-        for ( URL url : remoteRepoUrls )
-        {
-            unifiedRepo.getRepositories().add( repositoryFactory.createNonLocalApt( url ) );
-        }
-        return unifiedRepo;
-    }
+//    private UnifiedRepository getRepository()
+//    {
+//        RepositoryFactory repositoryFactory = injector.getInstance( RepositoryFactory.class );
+//        UnifiedRepository unifiedRepo = repositoryFactory.createUnifiedRepo();
+//        unifiedRepo.getRepositories().add( getLocalRepository() );
+//        for ( URL url : remoteRepoUrls )
+//        {
+//            unifiedRepo.getRepositories().add( repositoryFactory.createNonLocalApt( url ) );
+//        }
+//        return unifiedRepo;
+//    }
 
 
     private LocalRepository getLocalRepository()

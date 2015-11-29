@@ -30,7 +30,7 @@ public interface AptManager
     boolean isCompressionTypeSupported( String packagesIndex );
 
 
-    void addRemoteRepository( URL url );
+    // TODO void addRemoteRepository( URL url );
 
 
     String getSerializedPackageInfo( String filename ) throws IllegalArgumentException;
