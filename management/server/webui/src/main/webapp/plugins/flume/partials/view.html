@@ -1,0 +1,61 @@
+<div ng-include="'subutai-app/plugins/partials/top.html'"></div>
+
+<div ng-controller="flumeCtrl as flumeCtrl"  class="ibox float-e-margins animated fadeInLeft">
+    <div style="min-height: 40px">
+        <strong> <p10>Please, specify installation settings </p10> </strong>
+    </div>
+    <div class="subCol">
+        <div>
+            Flume initialization name <font color=red size=1><b>*</b></font>
+            </br>
+            <input type="text" style="width: 200px" name="userName" ng-model="flumeCtrl.instalation.name" required>
+        </div>
+        <br>
+        <div class="subCol" style="width: 200px">
+            Hadoop cluster <font color=red size=1><b>*</b></font>
+            <select class="form-control m-b"
+                    ng-change="flumeCtrl.loadOperations()"
+                    ng-model="flumeCtrl.selectedModule">
+                <option ng-repeat="module in flumeCtrl.modules" value="{{ module }}">
+                    {{ module }}
+                </option>
+            </select>
+        </div>
+        <br/>Nodes <font color=red size=1><b>*</b></font>
+        </br>
+        <div class="myColumns">
+            <div class="subCol" style="float: left; width: 500px;">
+                <div>
+                    Available nodes
+                    <select class="v-select-twincol-options" size="4" multiple="" tabindex="0" style="width: 521px;"></select>
+                </div>
+            </div>
+            <div class="subCol" style="width: 20px;">
+                <br>
+                <button tabindex="0" role="button" class="btn btn-primary"><span class="v-button-wrap"><span class="v-button-caption">&lt;&lt;</span></span></button>
+                <button class="btn btn-primary">&gt;&gt;</button>
+            </div>
+            <div class="subCol" style="float: left;">
+                Selected nodes
+                <div>
+                    <select class="v-select-twincol-options" size="4" multiple="" tabindex="0" style="width: 521px;"></select>
+                </div>
+            </div>
+        </div>
+        <div>
+            <button  ng-click="flumeCtrl.do()" class="btn btn-primary" >
+                next
+            </button>
+            <button  ng-click="flumeCtrl.do()" class="btn btn-primary" >
+                back
+            </button>
+            <div>
+                <div ng-repeat="row in flumeCtrl.rows">
+                    <input type="text" placeholder="{{row.fnPlaceholder}}" ng-model="row.question">
+                    <input ng-class="{'blockInput': !row.pick}" placeholder="{{row.lnPlaceholder}}" type="text" ng-model="  row.text">
+                    <button class="btn btn-primary" ng-click="flumeCtrl.removeRow($index)">Remove</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

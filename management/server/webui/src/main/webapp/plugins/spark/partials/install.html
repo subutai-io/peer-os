@@ -1,0 +1,66 @@
+<form ng-submit="sparkCtrl.createSpark()">
+	<div class="b-workspace-content b-workspace-content_border">
+		<div class="b-workspace-content__row">
+			<div class="b-workspace-content-row_col-2 b-workspace-content-row_col-2_padding-right">
+				<div class="b-form">
+					<div class="b-form__wrapper b-form__wrapper_margin-bottom">
+						<label class="b-form-label b-form-label_fix-size-1 g-left">Enter cluster name</label>
+
+						<div class="b-form-wrapper b-form-wrapper_margin-size-1">
+							<input class="b-form-input b-form-input_full" type="text"
+							placeholder="Enter cluster name" 
+							ng-model="sparkCtrl.sparkInstall.clusterName" 
+							required>
+						</div>
+						<div class="clear"></div>
+					</div>
+					<div class="b-form__wrapper b-form__wrapper_margin-bottom">
+						<label class="b-form-label b-form-label_fix-size-1 g-left">Hadoop cluster</label>
+
+						<div class="b-form-wrapper b-form-wrapper_margin-size-1">
+							<select class="b-form-input b-form-input_full" 
+								ng-model="sparkCtrl.sparkInstall.hadoopClusterName" 
+								ng-change="sparkCtrl.getHadoopClusterNodes(sparkCtrl.sparkInstall.hadoopClusterName)">
+								<option value="">Select hadoop cluster</option>
+								<option ng-repeat="hadoopCluster in sparkCtrl.hadoopClusters" value="{{ hadoopCluster }}">
+									{{ hadoopCluster }}
+								</option>
+							</select>						
+						</div>
+						<div class="clear"></div>
+					</div>
+					<div class="b-form__wrapper b-form__wrapper_margin-bottom">
+						<label class="b-form-label b-form-label_fix-size-1 g-left">Master</label>
+
+						<div class="b-form-wrapper b-form-wrapper_margin-size-1">
+							<select class="b-form-input b-form-input_full"
+								ng-model="sparkCtrl.sparkInstall.server"
+								ng-change="sparkCtrl.changeDirective(sparkCtrl.sparkInstall.server)">
+								<option ng-repeat="node in sparkCtrl.currentClusterNodes" value="{{ node.uuid }}">
+									{{ node.hostname }}
+								</option>
+							</select>
+						</div>
+						<div class="clear"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="b-workspace-content__row">
+			<h2 class="b-workspace-content-row-h2">
+				Nodes to be configured
+			</h2>
+
+			<col-select-spark-nodes></col-select-spark-nodes>
+
+			<div class="clear"></div>
+		</div>
+
+	</div>
+
+	<div class="b-workspace__button-group b-workspace__button-group_right">
+		<button type="submit" class="b-btn b-btn_green g-right">Create</button>
+	</div>
+</form>
+

@@ -1,0 +1,34 @@
+<div ng-controller="MahoutCtrl as mahoutCtrl">
+
+	<div class="b-workspace__header">
+		<h1 class="b-title">Plugins/<span class="b-title_breadcrumbs">Mahout</span></h1>
+	</div>
+
+	<div class="b-workspace__content">
+		<div class="b-tabs-menu">
+			<ul>
+				<li class="b-tabs-menu__item" 
+				ng-click="mahoutCtrl.activeTab = 'install'" 
+				ng-class="mahoutCtrl.activeTab == 'install' ? 'b-tabs-menu__item_active' : ''">
+					Install
+				</li>
+				<li class="b-tabs-menu__item" 
+				ng-click="mahoutCtrl.activeTab = 'manage'" 
+				ng-class="mahoutCtrl.activeTab == 'manage' ? 'b-tabs-menu__item_active' : ''">
+					Manage
+				</li>
+			</ul>
+		</div>
+		<div 
+			ng-if="mahoutCtrl.activeTab == 'install'" 
+			ng-include="'plugins/mahout/partials/install.html'">
+		</div>
+
+		<div 
+			ng-if="mahoutCtrl.activeTab == 'manage'" 
+			ng-include="'plugins/mahout/partials/manage.html'">
+		</div>
+
+	</div>
+
+</div>

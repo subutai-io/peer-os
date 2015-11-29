@@ -1,0 +1,32 @@
+<div class="b-popup b-popup_min">
+	<div class="b-popup__header">
+		Available Nodes
+		<a href ng-click="closeThisDialog()">
+			<img src="assets/elements/buttons/b-icon-close.svg" class="b-icon g-right"/>
+		</a>
+	</div>
+	<form ng-submit="luceneCtrl.addNode(chosenNode)">
+		<div class="b-popup__body">
+
+			<div class="popup-body-box">
+				<label class="b-popup-body-label">Available Nodes</label>
+				<select class="b-popup-body-input b-popup-body-input_box" 
+					ng-model="chosenNode">
+					<option 
+						ng-repeat="availableNode in luceneCtrl.availableNodes" 
+						value="{{ availableNode }}">
+						{{ availableNode }}
+					</option>
+				</select>
+				<div class="clear"></div>
+			</div>
+
+		</div>
+		<div class="b-popup__footer">
+			<button class="b-btn b-btn_green g-right" type="submit">
+				Run
+			</button>
+			<div class="clear"></div>
+		</div>
+	</form>
+</div>

@@ -1,0 +1,94 @@
+<div class="b-workspace-content b-workspace-content_border">
+	<div class="b-main-form">
+
+		<div class="b-main-form__wrapper b-main-form__wrapper_margin-r">
+			<div class="b-form__wrapper b-form__wrapper_margin-bottom">
+				<label class="b-form-label b-form-label_margin_r">Select the cluster</label>
+				<select class="b-form-input b-form-input_fix-size-1 b-form-label_margin_r" 
+					ng-model="selectedCluster" 
+					ng-change="cassandraCtrl.getClustersInfo(selectedCluster)" 
+					ng-options="cluster for cluster in cassandraCtrl.clusters">
+				</select>
+				<a href 
+					class="b-btn b-btn_light-grey b-btn_margin-r" 
+					ng-click="cassandraCtrl.addNode()">
+					Add 
+					<span class="b-btn-light-grey-icon b-btn-light-grey-icon_green">
+						<i class="fa fa-plus"></i>
+					</span>
+				</a>
+				<a href 
+					class="b-btn b-btn_light-grey b-btn_margin-r" 
+					ng-click="cassandraCtrl.deleteCluster()">
+					Remove 
+					<span class="b-btn-light-grey-icon b-btn-light-grey-icon_red">
+						<i class="fa fa-times"></i>
+					</span>
+				</a>
+
+				<label class="b-form-label">
+					<input type="checkbox" 
+					ng-change="cassandraCtrl.changeClusterScaling(cassandraCtrl.currentCluster.scaling)" 
+					ng-model="cassandraCtrl.currentCluster.scaling">
+					Auto scale
+				</label>
+			</div>
+		</div>
+	</div>
+	<div class="b-data-table">
+
+		<div class="b-workspace-content__row">
+			<h2 class="b-workspace-content-row-h2 b-workspace-content-row-h2_inline">
+				Cluster nodes
+			</h2>
+
+			<div class="b-workspace-content-row-bttns g-right">
+				<!--<a href class="b-btn b-btn_blue">Refresh</a>-->
+				<a href ng-click="cassandraCtrl.startNodes()" class="b-btn b-btn_green">Start</a>
+				<a href ng-click="cassandraCtrl.stopNodes()" class="b-btn b-btn_red">Stop</a>
+			</div>
+		</div>		
+
+		<table datatable="ng" 
+			dt-options="hadoopCtrl.dtOptions" 
+			dt-column-defs="hadoopCtrl.dtColumnDefs" 
+			class="row-border hover">
+			<thead>
+				<tr>
+					<th><input type="checkbox" onClick="toggle(this, 'cassandraChk')" ng-click = "cassandraCtrl.pushAll()"></th>
+					<th>Host</th>
+					<th>IP List</th>
+					<th>Node role</th>
+					<th>Status</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="clusterNode in cassandraCtrl.currentCluster.containers">
+					<td class="b-main-table__edit-icon">
+						<input name = "cassandraChk" type="checkbox" ng-click="cassandraCtrl.pushNode(clusterNode)">
+					</td>
+					<td>{{ clusterNode }}</td>
+					<td>{{ cassandraCtrl.currentCluster.containersStatuses[clusterNode].ip }}</td>
+					<td>
+						<span ng-if="cassandraCtrl.currentCluster.seeds.indexOf(clusterNode) >= 0">
+							Seed+Data
+						</span>
+						<span ng-if="cassandraCtrl.currentCluster.seeds.indexOf(clusterNode) == -1">
+							Data
+						</span>
+					</td>
+					<td class="b-main-table__container-status">
+						<div 
+							class="b-status-icon b-status-icon_{{ cassandraCtrl.currentCluster.containersStatuses[clusterNode].status }}" 
+							title="{{ cassandraCtrl.currentCluster.containersStatuses[clusterNode].status }}">
+						</div>
+					</td>
+					<td>
+						<a href ng-click="cassandraCtrl.deleteNode(clusterNode)" class="b-icon b-icon_remove"></a>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>

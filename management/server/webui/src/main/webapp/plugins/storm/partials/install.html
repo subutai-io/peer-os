@@ -1,0 +1,78 @@
+<form ng-submit="stormCtrl.createStorm()">
+	<div class="b-workspace-content b-workspace-content_border">
+		<div class="b-workspace-content__row">
+			<div class="b-workspace-content-row_col-2 b-workspace-content-row_col-2_padding-right">
+				<div class="b-form">
+					<div class="b-form__wrapper b-form__wrapper_margin-bottom">
+						<label class="b-form-label b-form-label_fix-size-1 g-left">Cluster name</label>
+
+						<div class="b-form-wrapper b-form-wrapper_margin-size-1">
+							<input class="b-form-input b-form-input_full" type="text"
+							placeholder="Enter cluster name" 
+							ng-model="stormCtrl.stormInstall.clusterName" 
+							required>
+						</div>
+						<div class="clear"></div>
+					</div>
+					<div class="b-form__wrapper b-form__wrapper_margin-bottom">
+						<label class="b-form-label b-form-label_fix-size-1 g-left">Domain name</label>
+
+						<div class="b-form-wrapper b-form-wrapper_margin-size-1">
+							<input class="b-form-input b-form-input_full" type="text"
+								   placeholder="Enter domain name"
+								   ng-model="stormCtrl.stormInstall.domainName"
+								   required>
+						</div>
+						<div class="clear"></div>
+					</div>
+					<div class="b-form__wrapper b-form__wrapper_margin-bottom">
+						<label class="b-form-label b-form-label_fix-size-1 g-left">Environment</label>
+
+						<div class="b-form-wrapper b-form-wrapper_margin-size-1">
+							<select class="b-form-input b-form-input_full" 
+								ng-model="stormCtrl.stormInstall.environmentId"
+								ng-change="stormCtrl.getEnvironmentNodes(stormCtrl.stormInstall.environmentId)">
+								<option value="">Select environment</option>
+								<option ng-repeat="hadoopCluster in stormCtrl.environments" value="{{ hadoopCluster.id }}">
+									{{ hadoopCluster.name }}
+								</option>
+							</select>						
+						</div>
+						<div class="clear"></div>
+					</div>
+					<div class="b-form__wrapper b-form__wrapper_margin-bottom">
+						<label class="b-form-label b-form-label_fix-size-1 g-left">Nimbus node</label>
+
+						<div class="b-form-wrapper b-form-wrapper_margin-size-1">
+							<select class="b-form-input b-form-input_full"
+								ng-model="stormCtrl.stormInstall.server"
+								ng-change="stormCtrl.changeDirective(stormCtrl.stormInstall.server)">
+								<option value="">Select nimbus node</option>
+								<option ng-repeat="node in stormCtrl.currentClusterNodes" value="{{ node.id }}">
+									{{ node.hostname }}
+								</option>
+							</select>
+						</div>
+						<div class="clear"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="b-workspace-content__row">
+			<h2 class="b-workspace-content-row-h2">
+				Nodes to be configured as supervisors
+			</h2>
+
+			<col-select-storm-nodes></col-select-storm-nodes>
+
+			<div class="clear"></div>
+		</div>
+
+	</div>
+
+	<div class="b-workspace__button-group b-workspace__button-group_right">
+		<button type="submit" class="b-btn b-btn_green g-right">Create</button>
+	</div>
+</form>
+

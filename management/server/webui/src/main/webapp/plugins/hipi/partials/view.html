@@ -1,0 +1,34 @@
+<div ng-controller="HipiCtrl as hipiCtrl">
+
+	<div class="b-workspace__header">
+		<h1 class="b-title">Plugins/<span class="b-title_breadcrumbs">Hipi</span></h1>
+	</div>
+
+	<div class="b-workspace__content">
+		<div class="b-tabs-menu">
+			<ul>
+				<li class="b-tabs-menu__item" 
+				ng-click="hipiCtrl.activeTab = 'install'" 
+				ng-class="hipiCtrl.activeTab == 'install' ? 'b-tabs-menu__item_active' : ''">
+					Install
+				</li>
+				<li class="b-tabs-menu__item" 
+				ng-click="hipiCtrl.activeTab = 'manage'" 
+				ng-class="hipiCtrl.activeTab == 'manage' ? 'b-tabs-menu__item_active' : ''">
+					Manage
+				</li>
+			</ul>
+		</div>
+		<div 
+			ng-if="hipiCtrl.activeTab == 'install'" 
+			ng-include="'plugins/hipi/partials/install.html'">
+		</div>
+
+		<div 
+			ng-if="hipiCtrl.activeTab == 'manage'" 
+			ng-include="'plugins/hipi/partials/manage.html'">
+		</div>
+
+	</div>
+
+</div>
