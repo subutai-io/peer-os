@@ -8,7 +8,6 @@ import java.util.concurrent.Semaphore;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
-import javax.ws.rs.client.ClientException;
 
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
@@ -190,7 +189,7 @@ public class RemotePeerImpl implements RemotePeer
             check();
             return true;
         }
-        catch ( PeerException | ClientException e )
+        catch ( PeerException e )
         {
             LOG.error( e.getMessage(), e );
             return false;
@@ -841,14 +840,14 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public HostInterfaces getInterfaces()
+    public HostInterfaces getInterfaces() throws PeerException
     {
         return new PeerWebClient( peerInfo.getIp(), provider ).getInterfaces();
     }
 
 
     @Override
-    public void setupN2NConnection( final N2NConfig config )
+    public void setupN2NConnection( final N2NConfig config ) throws PeerException
     {
         Preconditions.checkNotNull( config, "Invalid n2n config" );
 
@@ -877,7 +876,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public ResourceHostMetrics getResourceHostMetrics()
+    public ResourceHostMetrics getResourceHostMetrics() throws PeerException
     {
         return new PeerWebClient( peerInfo.getIp(), provider ).getResourceHostMetrics();
     }

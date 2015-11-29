@@ -262,7 +262,7 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
      * Gets network interfaces
      */
 
-    HostInterfaces getInterfaces();
+    HostInterfaces getInterfaces() throws PeerException;
 
     void setupN2NConnection( N2NConfig config ) throws PeerException;
 
@@ -272,7 +272,7 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
 
     void removePeerEnvironmentKeyPair( EnvironmentId environmentId ) throws PeerException;
 
-    ResourceHostMetrics getResourceHostMetrics();
+    ResourceHostMetrics getResourceHostMetrics() throws PeerException;
 
     ResourceValue getAvailableQuota( ContainerHost containerHost, ResourceType resourceType ) throws PeerException;
 
