@@ -9,7 +9,10 @@ import java.net.URL;
 import java.util.Map;
 import java.util.Set;
 
-
+/**
+ * Handles persisting and accessing remote repository urls. Leverages FileDb. 
+ * 
+ */
 public class RepoUrlStore
 {
     private static final String MAP_NAME_TEMPLATE = "template_repo_urls";
