@@ -29,7 +29,7 @@ function TokensCtrl(identitySrv, $scope, DTOptionsBuilder, DTColumnBuilder, $res
 	vm.dtInstance = {};
 	vm.dtOptions = DTOptionsBuilder
 		.fromFnPromise(function() {
-			return $resource( serverUrl + 'identity_ui/users/tokens/' ).query().$promise;
+			return $resource( identitySrv.getTokensUrl() ).query().$promise;
 		})
 		.withPaginationType('full_numbers')
 		.withOption('createdRow', createdRow)
@@ -94,9 +94,13 @@ function TokensCtrl(identitySrv, $scope, DTOptionsBuilder, DTColumnBuilder, $res
 		if(vm.newToken.token === undefined || vm.newToken.token.length < 1) return;
 		if(vm.newToken.period === undefined || vm.newToken.period.length < 1) return;
 		if(vm.newToken.userId === undefined) return;
-		identitySrv.addToken(vm.newToken).success(function (data) {
-			vm.dtInstance.reloadData(null, false);
-		});
+		try {
+			identitySrv.addToken(vm.newToken).success(function (data) {
+				vm.dtInstance.reloadData(null, false);
+			});
+		} catch(e) {
+			SweetAlert.swal("ERROR!", "Token creation error. Error: " + e, "error");
+		}
 	}
 
 	function editTokenForm(token) {

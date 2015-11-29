@@ -144,9 +144,9 @@ public interface Monitor
 
 //    void updateHostMetric( BaseMetric metric );
 
-    BaseMetric getHostMetric( String id );
+//    BaseMetric getHostMetric( String id );
 
-    ResourceHostMetrics getResourceHostMetrics( boolean isLocalOnly );
+//    ResourceHostMetrics getResourceHostMetrics( boolean isLocalOnly );
 
-    String getHostMetricsAsHtml( String hostId );
+//    String getHostMetricsAsHtml( String hostId );
 }

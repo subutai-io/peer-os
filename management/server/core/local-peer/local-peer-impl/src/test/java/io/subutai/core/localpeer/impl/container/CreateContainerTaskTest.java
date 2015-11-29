@@ -15,11 +15,11 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.protocol.Template;
-import io.subutai.common.settings.Common;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
-import io.subutai.core.localpeer.impl.container.CreateContainerTask;
+import io.subutai.common.protocol.Template;
+import io.subutai.common.settings.Common;
+import io.subutai.core.hostregistry.api.HostRegistry;
 
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
@@ -37,7 +37,7 @@ public class CreateContainerTaskTest
     private static final String IP = "127.0.0.1";
     private static final String CIDR = "192.168.1.0/24";
     private static final int VLAN = 100;
-//    private static final String GATEWAY = "192.168.1.1";
+    private static final String ENV_ID = "123";
     private static final String TEMPLATE_NAME = "master";
     private static final int TIMEOUT = 30;
     private static final String OUT = "TEMPLATE\n" + "--------\n" + "master";
@@ -54,12 +54,14 @@ public class CreateContainerTaskTest
     ContainerHost containerHost;
 
     CreateContainerTask task;
+    @Mock
+    private HostRegistry hostRegistry;
 
 
     @Before
     public void setUp() throws Exception
     {
-        task = new CreateContainerTask( resourceHost, template, HOSTNAME, IP, VLAN, /*GATEWAY, */TIMEOUT );
+        task = new CreateContainerTask( hostRegistry, resourceHost, template, HOSTNAME, CIDR, VLAN, TIMEOUT, ENV_ID );
         task.commandUtil = commandUtil;
         when( resourceHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
         when( commandResult.hasSucceeded() ).thenReturn( true );
@@ -115,14 +117,14 @@ public class CreateContainerTaskTest
     {
         task.call();
 
-//        verify( containerHost ).setDefaultGateway( GATEWAY );
+        //        verify( containerHost ).setDefaultGateway( GATEWAY );
 
         CreateContainerTask task =
-                new CreateContainerTask( resourceHost, template, HOSTNAME, CIDR, VLAN, /*GATEWAY,*/ TIMEOUT );
+                new CreateContainerTask( hostRegistry, resourceHost, template, HOSTNAME, CIDR, VLAN, TIMEOUT, ENV_ID );
         task.commandUtil = commandUtil;
 
         task.call();
 
-//        verify( containerHost, times( 2 ) ).setDefaultGateway( GATEWAY );
+        //        verify( containerHost, times( 2 ) ).setDefaultGateway( GATEWAY );
     }
 }

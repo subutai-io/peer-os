@@ -7,6 +7,7 @@ import java.util.Set;
 
 import javax.ws.rs.core.MediaType;
 
+import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -194,7 +195,27 @@ public class PeerWebClient
     }
 
 
-    public void removeEnvironmentKeyPair( final EnvironmentId environmentId ) throws PeerException
+    public void updateEnvironmentPubKey( PublicKeyContainer publicKeyContainer ) throws PeerException
+    {
+        String path = "/pek";
+
+
+        WebClient client = WebClientBuilder.buildPeerWebClient( host, path, provider );
+
+        client.type( MediaType.APPLICATION_JSON );
+        client.accept( MediaType.APPLICATION_JSON );
+        try
+        {
+            client.put( publicKeyContainer );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Error on updating  peer environment key", e );
+        }
+    }
+
+
+    public void removePeerEnvironmentKeyPair( final EnvironmentId environmentId ) throws PeerException
     {
         Preconditions.checkNotNull( environmentId );
 

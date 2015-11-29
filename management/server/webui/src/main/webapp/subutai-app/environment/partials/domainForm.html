@@ -1,0 +1,49 @@
+<div class="b-popup b-popup_middle">
+	<div class="b-popup__header">
+		Set Domain
+		<a href ng-click="closeThisDialog()">
+			<img src="assets/elements/buttons/b-icon-close.svg" class="b-icon g-right"/>
+		</a>
+	</div>
+	<form ng-submit="environmentViewCtrl.setDomain(domain)">								
+		<div class="b-popup__body">
+
+			<div class="popup-body-box">
+				<label class="b-popup-body-label">Domain</label>
+				<input type="text" 
+					class="b-popup-body-input b-popup-body-input_box" 
+					ng-model="domain.name" required>
+				<div class="clear"></div>
+			</div>
+
+			<div class="popup-body-box">
+				<label class="b-popup-body-label">Domain Strategy</label>
+				<select 
+					class="b-popup-body-input b-popup-body-input_box" 
+					ng-model="domain.strategy" 
+					ng-options="strategy for strategy in environmentViewCtrl.domainStrategies">
+				</select>
+				<div class="clear"></div>
+			</div>			
+
+			<div class="popup-body-box">
+				<label class="b-popup-body-label">SSL cert</label>
+				<div class="b-file-uploader">
+					<div class="fileUpload b-btn b-btn_light-grey">
+						<span>Upload SSL cert</span>
+						<input id="js-uploadBtn" type="file" class="upload" file-model="sshCertFile"/>
+					</div>
+					<input id="js-uploadFile" class="b-form-input b-form-input_fix-size-1" placeholder="Choose File" disabled="disabled" />
+				</div>
+				<div class="clear"></div>
+			</div>
+
+		</div>
+		<div class="b-popup__footer">
+			<button class="b-btn b-btn_green g-right" type="submit" id="subt_button__create-peer">
+				Save
+			</button>
+			<div class="clear"></div>
+		</div>
+	</form>
+</div>

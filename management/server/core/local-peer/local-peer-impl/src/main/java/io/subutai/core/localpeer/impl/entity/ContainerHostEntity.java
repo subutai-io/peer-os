@@ -292,6 +292,13 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
         getPeer().setCpuSet( this, cpuSet );
     }
 
+    @Override
+    public ContainerType getContainerType()
+    {
+        return containerType;
+    }
+
+
     public void setContainerType( final ContainerType containerType )
     {
         this.containerType = containerType;

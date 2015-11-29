@@ -37,7 +37,7 @@ function IdentityRoleCtrl($scope, identitySrv, DTOptionsBuilder, DTColumnBuilder
 	vm.roles = {};
 	vm.dtOptions = DTOptionsBuilder
 		.fromFnPromise(function() {
-			return $resource(serverUrl + 'identity_ui/roles/').query().$promise;
+			return $resource( identitySrv.getRolesUrl() ).query().$promise;
 		})
 		.withPaginationType('full_numbers')
 		.withOption('stateSave', true)

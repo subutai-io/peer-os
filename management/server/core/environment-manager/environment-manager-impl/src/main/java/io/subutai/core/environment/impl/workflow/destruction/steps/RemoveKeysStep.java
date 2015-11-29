@@ -32,7 +32,7 @@ public class RemoveKeysStep
 
         for ( final Peer peer : peers )
         {
-            peer.removeEnvironmentKeyPair( environment.getEnvironmentId() );
+            peer.removePeerEnvironmentKeyPair( environment.getEnvironmentId() );
         }
     }
 }

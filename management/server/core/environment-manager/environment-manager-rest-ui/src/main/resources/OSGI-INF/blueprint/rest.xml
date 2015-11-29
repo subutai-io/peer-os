@@ -27,7 +27,7 @@
     <argument ref="strategyManager" />
   </bean>
 
-  <jaxrs:server address="/environments_ui" id="environmentRestUIService">
+  <jaxrs:server address="/ui/environments" id="environmentRestUIService">
     <jaxrs:serviceBeans>
       <ref component-id="environmentRestUIServiceImpl" />
     </jaxrs:serviceBeans>

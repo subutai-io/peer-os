@@ -33,6 +33,7 @@ public class EncryptionToolImpl implements EncryptionTool
     public EncryptionToolImpl( KeyManagerImpl keyManager )
     {
         this.keyManager = keyManager;
+        this.keyManager.setEncryptionTool( this );
     }
 
 

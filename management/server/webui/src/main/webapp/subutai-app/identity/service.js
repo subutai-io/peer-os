@@ -7,10 +7,10 @@ angular.module('subutai.identity.service', [])
 identitySrv.$inject = ['$http'];
 
 function identitySrv($http) {
-	var BASE_URL = serverUrl + 'identity_ui/';
-	var usersURL = BASE_URL;
-	var rolesURL = BASE_URL + 'roles/';
-	var tokenURL = BASE_URL + 'users/tokens/';
+	var BASE_URL = SERVER_URL + 'rest/ui/identity/';
+	var USERS_URL = BASE_URL;
+	var ROLES_URL = BASE_URL + 'roles/';
+	var TOKENS_URL = BASE_URL + 'users/tokens/';
 
 	var identitySrv = {
 		getTokens: getTokens,
@@ -22,21 +22,26 @@ function identitySrv($http) {
 		deleteUser: deleteUser,
 		getRoles: getRoles,
 		addRole: addRole,
-		deleteRole: deleteRole
+		deleteRole: deleteRole,
+
+		getUsersUrl : function(){ return USERS_URL },
+		getRolesUrl : function(){ return ROLES_URL },
+		getTokensUrl : function(){ return TOKENS_URL }
 	};
 
 	return identitySrv;
 
 	//// Implementation
+
 	
 	function getTokens() {
-		return $http.get(tokenURL, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
+		return $http.get(TOKENS_URL, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
 	}
 
 	function addToken(token) {
 		var postData = 'token=' + token.token + '&period=' + token.period + '&userId=' + token.userId;
 		return $http.post(
-			tokenURL, 
+			TOKENS_URL,
 			postData, 
 			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
 		);
@@ -48,46 +53,46 @@ function identitySrv($http) {
 			+ '&userId=' + token.userId 
 			+ '&newToken=' + token.newToken;
 		return $http.put(
-			tokenURL, 
+			TOKENS_URL,
 			postData, 
 			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
 		);
 	}	
 
 	function deleteToken(token) {
-		return $http.delete(tokenURL + token);
+		return $http.delete(TOKENS_URL + token);
 	}
 
 	function getUsers() {
-		return $http.get(usersURL, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
+		return $http.get(USERS_URL, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
 	}
 
 	function addUser(postData) {
 		return $http.post(
-			usersURL, 
+			USERS_URL,
 			postData, 
 			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
 		);
 	}
 
 	function deleteUser(userId) {
-		return $http.delete(usersURL + userId);
+		return $http.delete(USERS_URL + userId);
 	}
 
 	function getRoles() {
-		return $http.get(rolesURL, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
+		return $http.get(ROLES_URL, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
 	}
 
 	function addRole(postData) {
 		return $http.post(
-			rolesURL, 
+			ROLES_URL,
 			postData, 
 			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
 		);
 	}
 
 	function deleteRole(roleId) {
-		return $http.delete(rolesURL + roleId);
+		return $http.delete(ROLES_URL + roleId);
 	}
 
 }

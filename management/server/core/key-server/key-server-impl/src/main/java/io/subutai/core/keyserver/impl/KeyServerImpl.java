@@ -136,9 +136,21 @@ public class KeyServerImpl implements KeyServer
     @Override
     public void addPublicKey( PGPPublicKeyRing publicRing ) throws PGPException, IOException
     {
-        PublicKeyStore securityKey = SecurityKeyUtil.convert( publicRing );
+        PublicKeyStore pubKeyStore = SecurityKeyUtil.convert( publicRing );
 
-        keyServerDAO.save( securityKey );
+        keyServerDAO.save( pubKeyStore );
+    }
+
+
+    /********************************
+     *
+     */
+    @Override
+    public void updatePublicKey( PGPPublicKeyRing publicRing ) throws PGPException, IOException
+    {
+        PublicKeyStore pubKeyStore = SecurityKeyUtil.convert( publicRing );
+
+        keyServerDAO.update( pubKeyStore );
     }
 
 

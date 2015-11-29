@@ -84,6 +84,8 @@ public interface KeyServer
     public void addPublicKey( PGPPublicKeyRing publicKeyRing ) throws PGPException, IOException;
 
 
+    void updatePublicKey( PGPPublicKeyRing publicRing ) throws PGPException, IOException;
+
     /********************************
      * Saves the given public keyring.
      *

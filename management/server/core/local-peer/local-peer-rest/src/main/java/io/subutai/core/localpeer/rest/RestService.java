@@ -93,6 +93,12 @@ public interface RestService
     @Consumes( MediaType.APPLICATION_JSON )
     PublicKeyContainer createEnvironmentKeyPair( EnvironmentId environmentId );
 
+    @PUT
+    @Path( "pek" )
+    @Produces( MediaType.APPLICATION_JSON )
+    @Consumes( MediaType.APPLICATION_JSON )
+    void updateEnvironmentKey( PublicKeyContainer publicKeyContainer);
+
     @DELETE
     @Path( "pek/{environmentId}" )
     void removeEnvironmentKeyPair( @PathParam( "environmentId" ) EnvironmentId environmentId );

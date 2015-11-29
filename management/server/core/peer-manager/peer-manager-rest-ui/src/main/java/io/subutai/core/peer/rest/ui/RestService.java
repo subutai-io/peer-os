@@ -40,4 +40,10 @@ public interface RestService
     @Path( "unregister" )
     @Produces( { MediaType.TEXT_PLAIN } )
     Response unregisterForRegistrationRequest( @FormParam( "peerId" ) String peerId );
+
+
+    @GET
+    @Path( "resource_hosts" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response getResourceHosts( );
 }
