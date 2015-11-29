@@ -8,6 +8,7 @@ import java.util.concurrent.Semaphore;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
+import javax.ws.rs.client.ClientException;
 
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
@@ -61,7 +62,6 @@ import io.subutai.common.protocol.Template;
 import io.subutai.common.resource.ResourceType;
 import io.subutai.common.resource.ResourceValue;
 import io.subutai.common.security.PublicKeyContainer;
-import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.settings.ChannelSettings;
 import io.subutai.common.settings.SecuritySettings;
 import io.subutai.common.util.CollectionUtil;
@@ -184,14 +184,14 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public boolean isOnline() throws PeerException
+    public boolean isOnline()
     {
         try
         {
             check();
             return true;
         }
-        catch ( PeerException e )
+        catch ( PeerException | ClientException e )
         {
             LOG.error( e.getMessage(), e );
             return false;

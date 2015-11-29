@@ -8,16 +8,17 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import com.google.common.collect.Lists;
+
+import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.peer.Peer;
-import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.test.SystemOutRedirectTest;
 import io.subutai.core.peer.api.PeerManager;
 
-import com.google.common.collect.Lists;
-
 import static junit.framework.TestCase.assertTrue;
-import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 
@@ -32,6 +33,8 @@ public class ListCommandTest extends SystemOutRedirectTest
     Peer peer;
     @Mock
     PeerInfo peerInfo;
+    @Mock
+    HostInterfaces anInterface;
 
     ListCommand command;
 
@@ -45,6 +48,7 @@ public class ListCommandTest extends SystemOutRedirectTest
         when( peer.isOnline() ).thenReturn( true );
         when( peer.getId() ).thenReturn( PEER_ID );
         when( peer.getPeerInfo() ).thenReturn( peerInfo );
+        doReturn( anInterface ).when( peer ).getInterfaces();
     }
 
 
@@ -53,12 +57,6 @@ public class ListCommandTest extends SystemOutRedirectTest
     {
         command.doExecute();
 
-        assertTrue( getSysOut().contains( PEER_ID.toString() ) );
-
-        doThrow( new PeerException( ERR_MSG ) ).when( peer ).isOnline();
-
-        command.doExecute();
-
-        assertTrue( getSysOut().contains( ERR_MSG ) );
+        assertTrue( getSysOut().contains( PEER_ID ) );
     }
 }
