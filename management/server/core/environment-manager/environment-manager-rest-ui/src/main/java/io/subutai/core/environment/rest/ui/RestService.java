@@ -216,4 +216,12 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     Response getPeers();
 
+
+    @POST
+    @Path( "{environmentId}/containers/{containerId}/tags" )
+    Response addTags( @PathParam( "environmentId" ) String environmentId, @PathParam( "containerId" ) String containerId, @FormParam( "tags" ) String tags );
+
+    @DELETE
+    @Path( "{environmentId}/containers/{containerId}/tags/{tag}" )
+    Response removeTag( @PathParam( "environmentId" ) String environmentId, @PathParam( "containerId" ) String containerId, @PathParam( "tag" ) String tag );
 }

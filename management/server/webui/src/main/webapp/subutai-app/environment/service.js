@@ -58,6 +58,8 @@ function environmentService($http) {
 
 
 		getContainersType : getContainersType,
+		setTags : setTags,
+		removeTag : removeTag,
 
 
 		getEnvQuota: getEnvQuota,
@@ -221,5 +223,18 @@ function environmentService($http) {
 
 	function getPeers() {
 		return $http.get(PEERS_URL, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
+	}
+
+	function setTags(environmentId, containerId, tags) {
+		var postData = 'tags=' + JSON.stringify(tags);
+		return $http.post(
+			ENVIRONMENTS_URL + environmentId + '/containers/' + containerId + '/tags',
+			postData, 
+			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+		);
+	}
+
+	function removeTag(environmentId, containerId, tag) {
+		return $http.delete(ENVIRONMENTS_URL + environmentId + '/containers/' + containerId + '/tags/' + tag);		
 	}
 }

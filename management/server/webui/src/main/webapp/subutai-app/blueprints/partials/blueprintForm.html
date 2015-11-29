@@ -91,7 +91,7 @@
 					<ul class="b-popup-box__node-list">
 						<li ng-repeat="(key, blueprintNode) in cbl.nodeList"
 							class="subt_button__blueprint-node-list-item
-							b-tags b-tags_{{ cbl.colors[blueprintNode.type] }}"
+							b-tags b-tags_{{ cbl.colors[blueprintNode.type] }}" 
 							ng-click="cbl.setNodeData(key)">
 							<i class="fa fa-cube"></i> {{ blueprintNode.name }}: {{ blueprintNode.numberOfContainers }}
 							<i class="fa fa-times" ng-click="cbl.removeNodeGroup( blueprintNode.name )"></i>

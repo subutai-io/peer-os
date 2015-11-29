@@ -10,7 +10,7 @@ import io.subutai.common.host.ContainerHostState;
 /**
  * Trimmed container for REST
  */
-public class ContainerJson
+public class ContainerDto
 {
     private String id;
     private String environmentId;
@@ -20,13 +20,14 @@ public class ContainerJson
     private String mac;
     private String templateName;
     private ContainerType type;
+    private String arch;
     private Set<String> tags;
 
 
 
-    public ContainerJson( final String id, final String environmentId, final String hostname,
-                          final ContainerHostState state, final String ip, final String mac, final String templateName,
-                          final ContainerType type, final Set<String> tags )
+    public ContainerDto( final String id, final String environmentId, final String hostname,
+                         final ContainerHostState state, final String ip, final String mac, final String templateName,
+                         final ContainerType type, final String arch, final Set<String> tags )
     {
         this.id = id;
         this.environmentId = environmentId;
@@ -36,6 +37,7 @@ public class ContainerJson
         this.mac = mac;
         this.templateName = templateName;
         this.type = type;
+        this.arch = arch;
         this.tags = tags;
     }
 
@@ -145,5 +147,17 @@ public class ContainerJson
     public void setMac( final String mac )
     {
         this.mac = mac;
+    }
+
+
+    public String getArch()
+    {
+        return arch;
+    }
+
+
+    public void setArch( final String arch )
+    {
+        this.arch = arch;
     }
 }

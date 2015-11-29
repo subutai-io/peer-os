@@ -30,6 +30,13 @@ function ConsoleViewCtrl($scope, consoleService, peerRegistrationService, $state
 
 	peerRegistrationService.getResourceHosts().success(function (data) {
 		vm.hosts = data;
+		for(var i = 0; i < vm.hosts.length; i++) {
+			if(vm.hosts[i].hostname == 'management') {
+				var temp = angular.copy(vm.hosts[0]);
+				vm.hosts[0] = angular.copy(vm.hosts[i]);
+				vm.hosts[i] = temp;
+			}
+		}
 	});
 
 	consoleService.getEnvironments().success(function (data) {
@@ -109,7 +116,11 @@ function ConsoleViewCtrl($scope, consoleService, peerRegistrationService, $state
 
 				var checkCommand = cmd.command.split(' ');
 				if (checkCommand[0] == 'cd' && data.status == 'SUCCEEDED') {
-					var pathArray = ($scope.prompt.path() + checkCommand[1]).split('/');
+					var currentPath = $scope.prompt.path();
+					if(checkCommand[1].substring(0, 1) == '/') {
+						currentPath = '';
+					}
+					var pathArray = (currentPath + checkCommand[1]).split('/');
 					var totalPath = [];
 					for(var i = 0; i < pathArray.length; i++) {
 						if(pathArray[i].length > 0 && pathArray[i] != '&&') {

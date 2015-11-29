@@ -1,0 +1,26 @@
+<div class="b-popup b-popup_min">
+	<div class="b-popup__header">
+		Tags
+		<a href ng-click="closeThisDialog()">
+			<img src="assets/elements/buttons/b-icon-close.svg" class="b-icon g-right"/>
+		</a>
+	</div>
+	<form ng-submit="containerViewCtrl.addTags()">								
+		<div class="b-popup__body">
+
+			<div class="popup-body-box">
+				<tags-input ng-model="containerViewCtrl.currentTags">
+					<auto-complete source="containerViewCtrl.allTags"></auto-complete>
+				</tags-input>
+			</div>
+
+		</div>
+		<div class="b-popup__footer">
+			<button class="b-btn b-btn_green g-right" type="submit" id="subt_button__peer-approve-popup">
+				Save
+			</button>
+			<div class="clear"></div>
+		</div>
+	</form>
+</div>
+
