@@ -61,7 +61,6 @@ import io.subutai.common.protocol.Template;
 import io.subutai.common.resource.ResourceType;
 import io.subutai.common.resource.ResourceValue;
 import io.subutai.common.security.PublicKeyContainer;
-import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.settings.ChannelSettings;
 import io.subutai.common.settings.SecuritySettings;
 import io.subutai.common.util.CollectionUtil;
@@ -183,7 +182,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public boolean isOnline() throws PeerException
+    public boolean isOnline()
     {
         try
         {
@@ -841,14 +840,14 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public HostInterfaces getInterfaces()
+    public HostInterfaces getInterfaces() throws PeerException
     {
         return new PeerWebClient( peerInfo.getIp(), provider ).getInterfaces();
     }
 
 
     @Override
-    public void setupN2NConnection( final N2NConfig config )
+    public void setupN2NConnection( final N2NConfig config ) throws PeerException
     {
         Preconditions.checkNotNull( config, "Invalid n2n config" );
 
@@ -877,7 +876,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public ResourceHostMetrics getResourceHostMetrics()
+    public ResourceHostMetrics getResourceHostMetrics() throws PeerException
     {
         return new PeerWebClient( peerInfo.getIp(), provider ).getResourceHostMetrics();
     }

@@ -3,14 +3,11 @@ package io.subutai.core.peer.cli;
 
 import java.util.List;
 
-import javax.annotation.security.RolesAllowed;
-
 import org.apache.karaf.shell.commands.Command;
 
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.Interface;
 import io.subutai.common.peer.Peer;
-import io.subutai.common.peer.PeerException;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.peer.api.PeerManager;
 
@@ -35,36 +32,29 @@ public class ListCommand extends SubutaiShellCommandSupport
         System.out.println( "Found " + list.size() + " registered peers" );
         for ( Peer peer : list )
         {
-            String peerStatus = "OFFLINE";
-            try
-            {
+            boolean online = peer.isOnline();
 
-                if ( peer.isOnline() )
+            System.out.println(
+                    peer.getId() + " " + peer.getPeerInfo().getIp() + " " + peer.getName() + " " + ( online ? "ONLINE" :
+                                                                                                     "OFFLINE" ) );
+
+            if ( online )
+            {
+                try
                 {
-                    peerStatus = "ONLINE";
+                    HostInterfaces ints = peer.getInterfaces();
+                    System.out.println( String.format( "Interfaces count: %d", ints != null ? ints.size() : -1 ) );
+
+                    for ( Interface i : ints.filterByName( ".*" ) )
+                    {
+                        System.out
+                                .println( String.format( "\t%-15s %-15s %-15s", i.getName(), i.getIp(), i.getMac() ) );
+                    }
                 }
-            }
-            catch ( PeerException pe )
-            {
-                peerStatus += " " + pe.getMessage();
-            }
-
-            try
-            {
-                System.out.println(
-                        peer.getId() + " " + peer.getPeerInfo().getIp() + " " + peer.getName() + " " + peerStatus );
-
-                HostInterfaces ints = peer.getInterfaces();
-                System.out.println( String.format( "Interfaces count: %d", ints != null ? ints.size() : -1 ) );
-
-                for ( Interface i : ints.filterByName( ".*" ) )
+                catch ( Exception e )
                 {
-                    System.out.println( String.format( "\t%-15s %-15s %-15s", i.getName(), i.getIp(), i.getMac() ) );
+                    log.error( e.getMessage(), e );
                 }
-            }
-            catch ( Exception e )
-            {
-                log.error( e.getMessage(), e );
             }
         }
         return null;
