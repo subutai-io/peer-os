@@ -11,7 +11,7 @@ import org.bouncycastle.openpgp.PGPSecretKey;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
 
 import io.subutai.common.security.crypto.pgp.KeyPair;
-import io.subutai.core.security.api.model.SecurityKeyIdentity;
+import io.subutai.core.security.api.model.SecurityKey;
 import io.subutai.core.security.api.model.SecurityKeyTrust;
 
 
@@ -46,16 +46,21 @@ public interface KeyManager
     /* *****************************
      *
      */
-    SecurityKeyIdentity getKeyIdentityDataByFingerprint( String fingerprint );
+    SecurityKey getKeyData( String identityId );
 
     /* *****************************
      *
      */
-    void removeKeyIdentityData( String identityId );
+    SecurityKey getKeyDataByFingerprint( String fingerprint );
 
     /* *****************************
-     * Gets KeyRing from the store and returns Publickey object
+     *
      */
+    void removeKeyData( String identityId );
+
+    /* *****************************
+                 * Gets KeyRing from the store and returns Publickey object
+                 */
     public PGPPublicKey getPublicKey( String identityId );
 
 
@@ -128,6 +133,16 @@ public interface KeyManager
     /* ***************************************************************
      *
      */
+    boolean verifySignature( String sourceFingerprint, String targetFingerprint );
+
+    /* ***************************************************************
+         *
+         */
+    boolean verifySignature( PGPPublicKeyRing sourcePubRing, PGPPublicKeyRing targetPubRing );
+
+    /* ***************************************************************
+         *
+         */
     PGPPublicKeyRing removeSignature( String sourceFingerprint, String targetFingerprint );
 
     /* ***************************************************************
@@ -157,6 +172,12 @@ public interface KeyManager
     /* ***************************************************************
      *
      */
+    void removeKeyAllTrustData( String sourceFingerprint );
+
+
+    /* ***************************************************************
+     *
+     */
     void removeKeyTrust( String sourceFingerprint, String targetFingerprint);
 
 
@@ -176,13 +197,6 @@ public interface KeyManager
      * Removes SecretKeyRing from the Store
      */
     void removeSecretKeyRing( String identityId );
-
-
-
-    /* *****************************************
-     * Retrieves host key identity data
-     */
-    SecurityKeyIdentity getKeyIdentityData( String identityId );
 
 
     /* *****************************************
@@ -223,10 +237,15 @@ public interface KeyManager
     public String getFingerprint( String identityId );
 
 
-    /* *****************************
+    /* *************************************************************
      *
      */
-    SecurityKeyIdentity getKeyTrustTree( String identityId );
+    SecurityKey getKeyDetails( String identityId );
+
+    /* *****************************
+         *
+         */
+    SecurityKey getKeyTrustTree( String identityId );
 
 
     /* *****************************

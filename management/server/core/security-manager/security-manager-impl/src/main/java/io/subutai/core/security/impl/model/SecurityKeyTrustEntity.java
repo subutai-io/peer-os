@@ -9,8 +9,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
+import io.subutai.core.security.api.model.SecurityKey;
 import io.subutai.core.security.api.model.SecurityKeyTrust;
 
 
@@ -37,6 +39,13 @@ public class SecurityKeyTrustEntity implements SecurityKeyTrust
     @Column( name = "level" )
     private int level = 1;
 
+
+    //**********************************
+    @Transient
+    private SecurityKey targetKey = null;
+    //**********************************
+
+
     @Override
     public long getId()
     {
@@ -48,6 +57,19 @@ public class SecurityKeyTrustEntity implements SecurityKeyTrust
     public void setId( final long id )
     {
         this.id = id;
+    }
+
+    @Override
+    public int getLevel()
+    {
+        return level;
+    }
+
+
+    @Override
+    public void setLevel( final int level )
+    {
+        this.level = level;
     }
 
 
@@ -78,17 +100,17 @@ public class SecurityKeyTrustEntity implements SecurityKeyTrust
         this.targetFingerprint = targetFingerprint;
     }
 
-
     @Override
-    public int getLevel()
+    public SecurityKey getTargetKey()
     {
-        return level;
+        return targetKey;
     }
 
 
     @Override
-    public void setLevel( final int level )
+    public void setTargetKey( final SecurityKey targetKey )
     {
-        this.level = level;
+        this.targetKey = targetKey;
     }
+
 }

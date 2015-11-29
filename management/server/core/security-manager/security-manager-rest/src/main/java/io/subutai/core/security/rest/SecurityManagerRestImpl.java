@@ -18,7 +18,7 @@ import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.KeyManager;
-import io.subutai.core.security.rest.model.KeyIdentityDTO;
+import io.subutai.core.security.api.model.SecurityKey;
 import io.subutai.core.security.rest.model.SecurityKeyData;
 
 
@@ -157,18 +157,11 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
         try
         {
             logger.debug( "Received identityId: " + identityId );
+
             KeyManager keyManager = securityManager.getKeyManager();
+            SecurityKey securityKey = keyManager.getKeyTrustTree( identityId );
 
-            KeyIdentityDTO keyIdentityDTO = new KeyIdentityDTO( keyManager.getKeyTrustTree( identityId ) );
-            keyIdentityDTO.setChild( false );
-            keyIdentityDTO.setTrustLevel( KeyTrustLevel.Ultimate.getId() );
-            keyIdentityDTO.setParentId( keyIdentityDTO.getIdentityId() );
-            keyIdentityDTO.setParentPublicKeyFingerprint( keyIdentityDTO.getPublicKeyFingerprint() );
-
-            resetTrustLevels( keyIdentityDTO, keyManager );
-
-
-            return Response.ok( JsonUtil.toJson( keyIdentityDTO ) ).build();
+            return Response.ok( JsonUtil.toJson( securityKey ) ).build();
         }
         catch ( Exception ex )
         {
@@ -177,30 +170,36 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
     }
 
 
-    private void resetTrustLevels( KeyIdentityDTO keyIdentityDTO, KeyManager keyManager )
+    /* ***********************************************************
+     *
+     */
+    @Override
+    public Response revokeKey( String sourceFingerprint, String targetFingerprint )
     {
-        for ( final KeyIdentityDTO identityDTO : keyIdentityDTO.getTrusts() )
+        try
         {
-            identityDTO.setParentId( keyIdentityDTO.getIdentityId() );
-            identityDTO.setParentPublicKeyFingerprint( keyIdentityDTO.getPublicKeyFingerprint() );
-            identityDTO.setChild( true );
-            identityDTO
-                    .setTrustLevel( keyManager.getTrustLevel( keyIdentityDTO.getIdentityId(), identityDTO.getIdentityId() ) );
-            resetTrustLevels( identityDTO, keyManager );
+            KeyManager keyManager = securityManager.getKeyManager();
+            keyManager.setKeyTrust( sourceFingerprint, targetFingerprint, KeyTrustLevel.Never.getId() );
         }
+        catch ( Exception e )
+        {
+            return Response.serverError().build();
+        }
+        return Response.ok().build();
     }
+
 
 
     /* ***********************************************************
      *
      */
     @Override
-    public Response revokeKey( String source, String target )
+    public Response setTrust( String source, String target, int level )
     {
         try
         {
             KeyManager keyManager = securityManager.getKeyManager();
-            keyManager.setKeyTrust( source, target, KeyTrustLevel.Never.getId() );
+            keyManager.setKeyTrust( source, target, level );
         }
         catch ( Exception e )
         {
@@ -248,4 +247,29 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
             return Response.ok( key ).build();
         }
     }
+
+
+    /* ***********************************************************
+     *
+     */
+    @Override
+    public Response verifySignature( String sourceFingerprint, String targetFingerprint )
+    {
+        KeyManager keyManager = securityManager.getKeyManager();
+
+        boolean certfied = keyManager.verifySignature( sourceFingerprint, targetFingerprint  );
+
+        return Response.ok( certfied ).build();
+    }
+
+
+    /* ***********************************************************
+     *
+     */
+    @Override
+    public Response verifyTrust( String sourceFingerprint, String targetFingerprint )
+    {
+        return null;
+    }
+
 }

@@ -11,10 +11,10 @@ import com.google.common.base.Strings;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.core.security.api.dao.SecurityDataService;
 import io.subutai.core.security.api.model.SecretKeyStore;
-import io.subutai.core.security.api.model.SecurityKeyIdentity;
+import io.subutai.core.security.api.model.SecurityKey;
 import io.subutai.core.security.api.model.SecurityKeyTrust;
 import io.subutai.core.security.impl.model.SecretKeyStoreEntity;
-import io.subutai.core.security.impl.model.SecurityKeyIdentityEntity;
+import io.subutai.core.security.impl.model.SecurityKeyEntity;
 import io.subutai.core.security.impl.model.SecurityKeyTrustEntity;
 
 
@@ -28,7 +28,7 @@ public class SecurityDataServiceImpl implements SecurityDataService
     private DaoManager daoManager = null;
     private SecretKeyStoreDAO secretKeyStoreDAO = null;
     private SecurityKeyTrustDAO securityKeyTrustDAO = null;
-    private SecurityKeyIdentityDAO securityKeyIdentityDAO = null;
+    private SecurityKeyDAO securityKeyDAO = null;
 
 
     /******************************************
@@ -39,7 +39,7 @@ public class SecurityDataServiceImpl implements SecurityDataService
         this.daoManager = daoManager;
         this.secretKeyStoreDAO = new SecretKeyStoreDAO( daoManager );
         this.securityKeyTrustDAO = new SecurityKeyTrustDAO( daoManager );
-        this.securityKeyIdentityDAO = new SecurityKeyIdentityDAO( daoManager );
+        this.securityKeyDAO = new SecurityKeyDAO( daoManager );
     }
 
 
@@ -47,34 +47,34 @@ public class SecurityDataServiceImpl implements SecurityDataService
      *
      */
     @Override
-    public void saveKeyIdentityData( final String identityId, final String sKeyId, final String pKeyId, final int type )
+    public void saveKeyData( final String identityId, final String sKeyId, final String pKeyId, final int type )
     {
         try
         {
 
-            SecurityKeyIdentity securityKeyIdentity = getKeyIdentityData( identityId );
+            SecurityKey SecurityKey = getKeyData( identityId );
 
-            if ( securityKeyIdentity == null )
+            if ( SecurityKey == null )
             {
-                securityKeyIdentity = new SecurityKeyIdentityEntity();
-                securityKeyIdentity.setIdentityId( identityId );
-                securityKeyIdentity.setType( type );
-                securityKeyIdentity.setPublicKeyFingerprint( pKeyId );
-                securityKeyIdentity.setSecretKeyFingerprint( sKeyId );
-                securityKeyIdentityDAO.persist( securityKeyIdentity );
+                SecurityKey = new SecurityKeyEntity();
+                SecurityKey.setIdentityId( identityId );
+                SecurityKey.setType( type );
+                SecurityKey.setPublicKeyFingerprint( pKeyId );
+                SecurityKey.setSecretKeyFingerprint( sKeyId );
+                securityKeyDAO.persist( SecurityKey );
             }
             else
             {
                 if ( Strings.isNullOrEmpty( pKeyId ) )
                 {
-                    securityKeyIdentity.setSecretKeyFingerprint( sKeyId );
+                    SecurityKey.setSecretKeyFingerprint( sKeyId );
                 }
 
                 if ( Strings.isNullOrEmpty( sKeyId ) )
                 {
-                    securityKeyIdentity.setPublicKeyFingerprint( pKeyId );
+                    SecurityKey.setPublicKeyFingerprint( pKeyId );
                 }
-                securityKeyIdentityDAO.update( securityKeyIdentity );
+                securityKeyDAO.update( SecurityKey );
             }
         }
         catch ( Exception ex )
@@ -88,9 +88,9 @@ public class SecurityDataServiceImpl implements SecurityDataService
      *
      */
     @Override
-    public void removeKeyIdentityData( String identityId )
+    public void removeKeyData( String identityId )
     {
-        securityKeyIdentityDAO.remove( identityId );
+        securityKeyDAO.remove( identityId );
     }
 
 
@@ -98,9 +98,9 @@ public class SecurityDataServiceImpl implements SecurityDataService
      *
      */
     @Override
-    public SecurityKeyIdentity getKeyIdentityData( final String identityId )
+    public SecurityKey getKeyData( final String identityId )
     {
-        return securityKeyIdentityDAO.find( identityId );
+        return securityKeyDAO.find( identityId );
     }
 
 
@@ -108,9 +108,9 @@ public class SecurityDataServiceImpl implements SecurityDataService
      *
      */
     @Override
-    public SecurityKeyIdentity getKeyIdentityDataByFingerprint( final String fingerprint )
+    public SecurityKey getKeyDataByFingerprint( final String fingerprint )
     {
-        return securityKeyIdentityDAO.findByFingerprint( fingerprint );
+        return securityKeyDAO.findByFingerprint( fingerprint );
     }
 
 
@@ -223,7 +223,6 @@ public class SecurityDataServiceImpl implements SecurityDataService
         securityKeyTrustDAO.removeBySourceId( sourceFingerprint );
     }
 
-
     /******************************************
      *
      */
@@ -231,6 +230,16 @@ public class SecurityDataServiceImpl implements SecurityDataService
     public void removeKeyTrustData( String sourceFingerprint, String targetFingerprint )
     {
         securityKeyTrustDAO.removeBySourceId( sourceFingerprint, targetFingerprint );
+    }
+
+
+    /******************************************
+     *
+     */
+    @Override
+    public void removeKeyAllTrustData( String fingerprint )
+    {
+        securityKeyTrustDAO.removeAll( fingerprint );
     }
 
 

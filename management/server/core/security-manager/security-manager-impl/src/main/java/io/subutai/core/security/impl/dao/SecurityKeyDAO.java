@@ -7,21 +7,21 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import io.subutai.common.dao.DaoManager;
-import io.subutai.core.security.api.model.SecurityKeyIdentity;
-import io.subutai.core.security.impl.model.SecurityKeyIdentityEntity;
+import io.subutai.core.security.api.model.SecurityKey;
+import io.subutai.core.security.impl.model.SecurityKeyEntity;
 
 
 /**
  *
  */
-class SecurityKeyIdentityDAO
+class SecurityKeyDAO
 {
     private DaoManager daoManager = null;
 
     /******************************************
      *
      */
-    public SecurityKeyIdentityDAO( DaoManager daoManager )
+    public SecurityKeyDAO( DaoManager daoManager )
     {
         this.daoManager = daoManager;
     }
@@ -30,15 +30,15 @@ class SecurityKeyIdentityDAO
     /******************************************
      * Get Security KeyId from DB
      */
-    public SecurityKeyIdentity find( String identityId )
+    public SecurityKey find( String identityId )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
 
         try
         {
-            SecurityKeyIdentity securityKeyIdentity = em.find( SecurityKeyIdentityEntity.class, identityId );
+            SecurityKey SecurityKey = em.find( SecurityKeyEntity.class, identityId );
 
-            return securityKeyIdentity;
+            return SecurityKey;
         }
         catch ( Exception ex )
         {
@@ -54,16 +54,16 @@ class SecurityKeyIdentityDAO
     /******************************************
      *
      */
-    public SecurityKeyIdentity findByFingerprint( String fingerprint )
+    public SecurityKey findByFingerprint( String fingerprint )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
-        SecurityKeyIdentity key = null;
+        SecurityKey key = null;
         try
         {
-            Query qr = em.createQuery( "select ss from SecurityKeyIdentityEntity AS ss"
+            Query qr = em.createQuery( "select ss from SecurityKeyEntity AS ss"
                             + " where ss.publicKeyFingerprint=:publicKeyFingerprint" );
             qr.setParameter( "publicKeyFingerprint", fingerprint );
-            List<SecurityKeyIdentityEntity> result = qr.getResultList();
+            List<SecurityKeyEntity> result = qr.getResultList();
 
             if ( result.size() > 0 )
             {
@@ -86,14 +86,14 @@ class SecurityKeyIdentityDAO
     /******************************************
      *
      */
-    public void persist(SecurityKeyIdentity securityKeyIdentity )
+    public void persist(SecurityKey SecurityKey )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
 
         try
         {
             daoManager.startTransaction( em );
-            em.persist( securityKeyIdentity );
+            em.persist( SecurityKey );
             daoManager.commitTransaction( em );
         }
         catch ( Exception ex )
@@ -110,14 +110,14 @@ class SecurityKeyIdentityDAO
     /******************************************
      *
      */
-    public void update(SecurityKeyIdentity securityKeyIdentity )
+    public void update(SecurityKey SecurityKey )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
 
         try
         {
             daoManager.startTransaction( em );
-            em.merge( securityKeyIdentity );
+            em.merge( SecurityKey );
             daoManager.commitTransaction( em );
         }
         catch ( Exception ex )
@@ -142,7 +142,7 @@ class SecurityKeyIdentityDAO
         {
             daoManager.startTransaction( em );
 
-            Query qr = em.createQuery( "delete from SecurityKeyIdentityEntity AS ss where ss.identityId=:identityId" );
+            Query qr = em.createQuery( "delete from SecurityKeyEntity AS ss where ss.identityId=:identityId" );
             qr.setParameter( "identityId",identityId );
             qr.executeUpdate();
 
