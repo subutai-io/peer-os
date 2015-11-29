@@ -61,7 +61,7 @@ public class MessageContentUtil
         int status = currentStatus;
         String  basePath = url.getPath();
 
-        if ( url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X1 ) )
+        if ( url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X1 ) ||  url.getPort() == 8080 )
         {
             if ( ChannelSettings.checkURLArray( basePath, ChannelSettings.URL_ACCESS_PX1 ) == 0 )
             {

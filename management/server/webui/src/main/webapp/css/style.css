@@ -319,7 +319,7 @@ body {
 }
 .b-data-table {
     overflow: hidden;
-    padding-top: 20px;
+    padding-top: 10px;
 }
 
 .dt-loading {
@@ -337,6 +337,10 @@ body {
 
 .b-main-table__capitalize {
 	text-transform: capitalize;
+}
+
+.b-main-table__tags {
+	width: 250px;
 }
 
 .b-main-table__empty-item {
@@ -368,7 +372,7 @@ body {
 }
 
 .b-main-table th {
-    padding: 18px 0 17px 18px;
+    padding: 15px 0 15px 18px;
     background-color: #f1f4f8;
     font-size: 13px;
     color: #19286e;
@@ -773,7 +777,7 @@ body {
 }
 
 .b-popup_log {
-    width: 500px;
+    width: 520px;
 }
 
 .b-popup_min {
@@ -1177,7 +1181,7 @@ td.b-main-table__status-col {
     background-color: #f1f4f8;
     padding: 10px 14px;
     overflow: auto;
-    height: 160px;
+    height: 340px;
     border-radius: 5px;
     font-size: 13px;
     color: #5a5a5a;
@@ -1336,6 +1340,10 @@ td.b-main-table__status-col {
 
 .b-form-input_full {
     width: 100%;
+}
+
+.b-form-input_textarea {
+    height: 100px;
 }
 
 .b-form-input_half {

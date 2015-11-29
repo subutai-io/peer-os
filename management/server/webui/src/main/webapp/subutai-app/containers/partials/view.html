@@ -70,6 +70,7 @@
 						<th>Template</th>
 						<th>IP</th>
 						<th>Tags</th>
+						<th class="b-main-table__empty-item">Domain</th>
 						<th></th>
 						<th></th>
 					</tr>
@@ -101,7 +102,23 @@
 								{{ container.ip }}
 							</span>
 						</td>
-						<td>{{ container.hostname }}</td>
+						<td class="b-main-table__tags">
+							<span class="b-tags b-tags_grey" ng-repeat="(key, tag) in container.tags">
+								{{ tag }} 
+								<a href ng-click="containerViewCtrl.removeTag(container, tag, key)">
+									<i class="fa fa-times"></i>
+								</a>
+							</span>
+							<span class="b-tags b-tags_grey" ng-click="containerViewCtrl.addTagForm(container)">
+								Add 
+								<i class="fa fa-plus"></i>
+							</span>
+						</td>
+						<td class="b-main-table__empty-item">
+							<input type="checkbox" 
+								ng-click="containerViewCtrl.addToDomain(container)" 
+								ng-model="container.onDomain">
+						</td>
 						<td>
 							<button ng-show="container.state == 'RUNNING'" class="b-btn b-btn_red subt_button__container-stop" 
 							ng-click="containerViewCtrl.containerAction(key)">

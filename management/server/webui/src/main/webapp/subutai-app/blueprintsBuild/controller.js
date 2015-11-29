@@ -43,10 +43,16 @@ function BlueprintsBuildCtrl($scope, environmentService, SweetAlert, ngDialog, $
 			vm.transportNodes[i] = angular.copy(vm.blueprint.nodeGroups[i]);
 			vm.transportNodes[i].show = true;
 			vm.transportNodes[i].disabled = true;
+
+			var minSlider = 1;
+			if(vm.transportNodes[i].numberOfContainers == 1) {
+				minSlider = 0;
+			}
+
 			vm.transportNodes[i].options = {
 				start: vm.transportNodes[i].numberOfContainers, 
 				range: {
-					min: 1, 
+					min: minSlider, 
 					max: vm.transportNodes[i].numberOfContainers
 				}, 
 				step: 1,
@@ -69,15 +75,20 @@ function BlueprintsBuildCtrl($scope, environmentService, SweetAlert, ngDialog, $
 		});
 	}
 
-	environmentService.getPeers().success(function (data) {
-		vm.peers = data;
-		environmentService.getStrategies().success(function (strategie) {
-			for(var i in vm.peers) {
-				var resources = vm.peers[i];
-				vm.peers[i] = {"strategie": strategie, "resources": resources};
-			}
+	function getPeers() {
+		LOADING_SCREEN();
+		environmentService.getPeers().success(function (data) {
+			vm.peers = data;
+			LOADING_SCREEN('none');
+			environmentService.getStrategies().success(function (strategie) {
+				for(var i in vm.peers) {
+					var resources = vm.peers[i];
+					vm.peers[i] = {"strategie": strategie, "resources": resources};
+				}
+			});
 		});
-	});
+	}
+	getPeers();
 
 	function buildPopup() {
 
@@ -194,12 +205,10 @@ function BlueprintsBuildCtrl($scope, environmentService, SweetAlert, ngDialog, $
 	}
 
 	function removeGroup(peer, strategies) {
-		console.log(vm.groupList.length);
 		for(var i = 0; i < vm.groupList[peer][strategies].length; i++) {
 			removeNodeFromCreateList(vm.groupList[peer][strategies][i].nodesToCreateKey);
 		}
 		delete vm.groupList[peer][strategies];
-		console.log(vm.groupList.length);
 	}
 
 	function getNodesGroups() {

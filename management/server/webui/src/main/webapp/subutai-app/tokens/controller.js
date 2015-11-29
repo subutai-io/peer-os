@@ -75,9 +75,9 @@ function TokensCtrl(identitySrv, $scope, DTOptionsBuilder, DTColumnBuilder, $res
 	function getTokenType(data, type, full, meta) {
 		var type = '';
 		if(data.type == 1) {
-			type = 'Permanent';
-		} else {
 			type = 'Session';
+		} else {
+			type = 'Permanent';
 		}
 		return type;
 	}
