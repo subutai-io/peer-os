@@ -7,7 +7,6 @@ import java.util.Set;
 
 import javax.ws.rs.core.MediaType;
 
-import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +53,7 @@ public class PeerWebClient
     {
         String path = "/info";
 
-        WebClient client = WebClientBuilder.buildPeerWebClient( host, path, provider );
+        WebClient client = WebClientBuilder.buildPeerWebClient( host, path, provider, 500, 3000, 1 );
 
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );

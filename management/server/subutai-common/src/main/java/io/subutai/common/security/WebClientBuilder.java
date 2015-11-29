@@ -27,14 +27,15 @@ import io.subutai.common.settings.SecuritySettings;
 public class WebClientBuilder
 {
     private static final Logger LOG = LoggerFactory.getLogger( WebClientBuilder.class );
-    public static final long DEFAULT_RECIVE_TIMEOUT = 1000 * 60 * 5;
+    public static final long DEFAULT_RECEIVE_TIMEOUT = 1000 * 60 * 5;
     public static final long DEFAULT_CONNECTION_TIMEOUT = 1000 * 60;
     public static final int DEFAULT_MAX_RETRANSMITS = 3;
     private static final String PEER_URL_TEMPLATE = "https://%s:%s/rest/v1/peer%s";
     private static final String ENVIRONMENT_URL_TEMPLATE = "https://%s:%s/rest/v1/env%s";
 
 
-    public static WebClient buildPeerWebClient( final String host, final String path, final Object provider )
+    public static WebClient buildPeerWebClient( final String host, final String path, final Object provider,
+                                                long connectTimeoutMs, long readTimeoutMs, int maxAttempts )
     {
         String effectiveUrl = String.format( PEER_URL_TEMPLATE, host, ChannelSettings.SECURE_PORT_X2,
                 ( path.startsWith( "/" ) ? path : "/" + path ) );
@@ -42,7 +43,6 @@ public class WebClientBuilder
         if ( provider == null )
         {
             client = WebClient.create( effectiveUrl );
-
         }
         else
         {
@@ -54,9 +54,9 @@ public class WebClientBuilder
         HTTPConduit httpConduit = ( HTTPConduit ) WebClient.getConfig( client ).getConduit();
 
         HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
-        httpClientPolicy.setConnectionTimeout( DEFAULT_CONNECTION_TIMEOUT );
-        httpClientPolicy.setReceiveTimeout( DEFAULT_RECIVE_TIMEOUT );
-        httpClientPolicy.setMaxRetransmits( DEFAULT_MAX_RETRANSMITS );
+        httpClientPolicy.setConnectionTimeout( connectTimeoutMs );
+        httpClientPolicy.setReceiveTimeout( readTimeoutMs );
+        httpClientPolicy.setMaxRetransmits( maxAttempts );
 
         httpConduit.setClient( httpClientPolicy );
 
@@ -85,6 +85,13 @@ public class WebClientBuilder
     }
 
 
+    public static WebClient buildPeerWebClient( final String host, final String path, final Object provider )
+    {
+        return buildPeerWebClient( host, path, provider, DEFAULT_CONNECTION_TIMEOUT, DEFAULT_RECEIVE_TIMEOUT,
+                DEFAULT_MAX_RETRANSMITS );
+    }
+
+
     public static WebClient buildEnvironmentWebClient( final String host, final String path, final Object provider )
     {
         String effectiveUrl = String.format( ENVIRONMENT_URL_TEMPLATE, host, ChannelSettings.SECURE_PORT_X2,
@@ -94,7 +101,7 @@ public class WebClientBuilder
 
         HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
         httpClientPolicy.setConnectionTimeout( DEFAULT_CONNECTION_TIMEOUT );
-        httpClientPolicy.setReceiveTimeout( DEFAULT_RECIVE_TIMEOUT );
+        httpClientPolicy.setReceiveTimeout( DEFAULT_RECEIVE_TIMEOUT );
         httpClientPolicy.setMaxRetransmits( DEFAULT_MAX_RETRANSMITS );
 
         httpConduit.setClient( httpClientPolicy );
