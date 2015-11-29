@@ -561,6 +561,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     public void setTemplateManager( final TemplateManager templateManager )
     {
         this.templateManager = templateManager;
+    }
+    
     @Override
     public ResourceHostMetric getMetric()
     {
