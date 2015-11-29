@@ -180,6 +180,35 @@ class SecurityKeyTrustDAO
     /******************************************
      *
      */
+    public void removeAll( String fingerprint )
+    {
+        EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
+
+        try
+        {
+            daoManager.startTransaction( em );
+
+            Query qr = em.createQuery( "delete from SecurityKeyTrustEntity AS ss where "
+                    + " ss.sourceFingerprint=:Fingerprint or ss.targetFingerprint=:Fingerprint " );
+            qr.setParameter( "Fingerprint", fingerprint );
+            qr.executeUpdate();
+
+            daoManager.commitTransaction( em );
+        }
+        catch ( Exception ex )
+        {
+            daoManager.rollBackTransaction( em );
+        }
+        finally
+        {
+            daoManager.closeEntityManager( em );
+        }
+    }
+
+
+    /******************************************
+     *
+     */
     public void removeBySourceId( String sourceId )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();

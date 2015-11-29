@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Interface for SecurityData
  */
-public interface SecurityKeyIdentity
+public interface SecurityKey
 {
 
     /********************************
@@ -72,11 +72,15 @@ public interface SecurityKeyIdentity
     /********************************
      *
      */
-    List<SecurityKeyIdentity> getTrustedKeys();
+    List<SecurityKeyTrust> getTrustedKeys();
 
 
     /********************************
      *
      */
-    void setTrustedKeys( final List<SecurityKeyIdentity> trustedKeys );
+    void setTrustedKeys( final List<SecurityKeyTrust> trustedKeys );
+
+    String getHostIP();
+
+    void setHostIP( String hostIP );
 }

@@ -28,7 +28,7 @@ public interface SecurityManagerRest
     @POST
     @Path( "keyman/addpublickeyring" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response addPublicKeyRing( @FormParam( "hostid" ) String hostId, @FormParam( "keytext" ) String keyText );
+    public Response addPublicKeyRing( @FormParam( "hostid" ) String identityId, @FormParam( "keytext" ) String keyText );
 
 
     /* *******************************
@@ -37,7 +37,7 @@ public interface SecurityManagerRest
     @DELETE
     @Path( "keyman/removepublickeyring" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response removePublicKeyRing( @QueryParam( "hostid" ) String hostId );
+    public Response removePublicKeyRing( @QueryParam( "hostid" ) String identityId );
 
 
     /* *******************************
@@ -46,7 +46,7 @@ public interface SecurityManagerRest
     @GET
     @Path( "keyman/getpublickeyring" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getPublicKeyRing( @QueryParam( "hostid" ) String hostId );
+    public Response getPublicKeyRing( @QueryParam( "hostid" ) String identityId );
 
 
     /* *******************************
@@ -55,7 +55,8 @@ public interface SecurityManagerRest
     @GET
     @Path( "keyman/getpublickeyid" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getPublicKeyId( @QueryParam ( "hostid" ) String   hostId);
+    public Response getPublicKeyId( @QueryParam( "hostid" ) String identityId );
+
 
     /* *******************************
      *
@@ -63,7 +64,8 @@ public interface SecurityManagerRest
     @GET
     @Path( "keyman/getpublickeyfingerprint" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getPublicKeyFingerprint( @QueryParam ( "hostid" ) String   hostId);
+    public Response getPublicKeyFingerprint( @QueryParam( "hostid" ) String identityId );
+
 
     /* *******************************
      *
@@ -80,7 +82,8 @@ public interface SecurityManagerRest
     @GET
     @Path( "keyman/trust/tree" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getKeyTrustTree( @QueryParam( "identityId" ) String identityId );
+    public Response getKeyTrustTree( @QueryParam( "identityid" ) String identityId );
+
 
 
     /* *******************************
@@ -90,6 +93,37 @@ public interface SecurityManagerRest
     @Path( "keyman/trust/revoke" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response revokeKey( @QueryParam( "source" ) String source, @QueryParam( "target" ) String target );
+
+
+
+    /* *******************************
+     *
+     */
+    @PUT
+    @Path( "keyman/trust" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response setTrust( @QueryParam( "source" ) String source, @QueryParam( "target" ) String target,
+                              @QueryParam( "level" ) int trustLevel );
+
+
+
+    /* *******************************
+     *
+     */
+    @GET
+    @Path( "keyman/trust/verify" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response verifyTrust( @QueryParam( "source" ) String source, @QueryParam( "target" ) String target);
+
+
+
+    /* *******************************
+     *
+     */
+    @GET
+    @Path( "keyman/signature/verify" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response verifySignature( @QueryParam( "source" ) String source, @QueryParam( "target" ) String target);
 
 
     /* *******************************
@@ -104,8 +138,8 @@ public interface SecurityManagerRest
     /* *******************************
      *
      */
-    @POST
-    @Path( "keyman/signkey" )
+    @PUT
+    @Path( "keyman/signature" )
     @Produces( MediaType.APPLICATION_JSON )
     @Consumes( MediaType.APPLICATION_JSON )
     public Response signKey( SecurityKeyData keyData );

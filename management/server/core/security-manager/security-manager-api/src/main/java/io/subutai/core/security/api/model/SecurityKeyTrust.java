@@ -10,6 +10,10 @@ public interface SecurityKeyTrust
 
     void setId( long id );
 
+    int getLevel();
+
+    void setLevel( int level );
+
     String getSourceFingerprint();
 
     void setSourceFingerprint( String sourceFingerprint );
@@ -18,7 +22,7 @@ public interface SecurityKeyTrust
 
     void setTargetFingerprint( String targetFingerprint );
 
-    int getLevel();
+    SecurityKey getTargetKey();
 
-    void setLevel( int level );
+    void setTargetKey( SecurityKey targetKey );
 }

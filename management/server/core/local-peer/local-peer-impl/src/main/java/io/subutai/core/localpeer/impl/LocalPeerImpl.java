@@ -912,7 +912,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         KeyManager keyManager = securityManager.getKeyManager();
 
-        keyManager.removeKeyRings( environmentId.getId() );
+        keyManager.removeKeyData( environmentId.getId() );
+        keyManager.removeKeyData( getId()+"-"+ environmentId.getId() );
     }
 
 
