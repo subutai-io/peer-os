@@ -2,9 +2,8 @@ Meta:
 
 Narrative:
 As a QA
-I want to verify an Unprivileged containers PLAYBOOK SS-3285
+I want to verify an Ubuntu on Snappy PLAYBOOK SS-3285
 So that I will create test scenarios
-
 
 Scenario: The user verify work Subutai: Ubuntu on Snappy
 Given the first user is on the home page of Subutai
