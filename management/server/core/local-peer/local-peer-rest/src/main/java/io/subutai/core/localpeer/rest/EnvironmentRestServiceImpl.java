@@ -91,6 +91,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
     public ContainerHostState getContainerState( final ContainerId containerId )
     {
         Preconditions.checkNotNull( containerId );
+        Preconditions.checkNotNull( containerId.getId() );
         return localPeer.getContainerState( containerId );
     }
 

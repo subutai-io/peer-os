@@ -9,6 +9,7 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -89,6 +90,7 @@ import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.quota.ContainerQuotaHolder;
 import io.subutai.common.quota.QuotaException;
+import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.resource.ResourceType;
 import io.subutai.common.resource.ResourceValue;
 import io.subutai.common.security.PublicKeyContainer;
@@ -359,11 +361,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         try
         {
-            ContainerHost containerHost = bindHost( containerId );
-            return containerHost.getState();
+            ContainerHostInfo containerHostInfo =
+                    ( ContainerHostInfo ) hostRegistry.getHostInfoById( containerId.getId() );
+            return containerHostInfo.getState();
         }
         catch ( Exception e )
         {
+            LOG.error( e.getMessage(), e );
             return ContainerHostState.UNKNOWN;
         }
     }
@@ -951,7 +955,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         KeyManager keyManager = securityManager.getKeyManager();
 
         keyManager.removeKeyData( environmentId.getId() );
-        keyManager.removeKeyData( getId()+"-"+ environmentId.getId() );
+        keyManager.removeKeyData( getId() + "-" + environmentId.getId() );
     }
 
 
@@ -1572,7 +1576,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             keyManager.saveSecretKeyRing( pairId, SecurityKeyType.PeerEnvironmentKey.getId(), secRing );
             keyManager.savePublicKeyRing( pairId, SecurityKeyType.PeerEnvironmentKey.getId(), pubRing );
 
-            pubRing = securityManager.getKeyManager().setKeyTrust( peerSecKeyRing, pubRing, KeyTrustLevel.Full.getId() );
+            pubRing =
+                    securityManager.getKeyManager().setKeyTrust( peerSecKeyRing, pubRing, KeyTrustLevel.Full.getId() );
 
             return new PublicKeyContainer( getId(), pubRing.getPublicKey().getFingerprint(),
                     encTool.armorByteArrayToString( pubRing.getEncoded() ) );
@@ -1892,6 +1897,49 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public void alert( AlertPack alert )
     {
         monitor.addAlert( alert );
+    }
+
+
+    @Override
+    public HistoricalMetrics getHistoricalMetrics( final String hostname, final Date startTime, final Date endTime )
+            throws PeerException
+    {
+        try
+        {
+            Host host = findHostByName( hostname );
+            return monitor.getHistoricalMetrics( host, startTime, endTime );
+        }
+        catch ( HostNotFoundException e )
+        {
+            throw new PeerException( e.getMessage(), e );
+        }
+    }
+
+
+    private Host findHostByName( final String hostname ) throws HostNotFoundException
+    {
+        if ( managementHost.getHostname().equals( hostname ) )
+        {
+            return managementHost;
+        }
+        Host result = null;
+
+        for ( ResourceHost resourceHost : resourceHosts )
+        {
+            if ( resourceHost.getHostname().equals( hostname ) )
+            {
+                return resourceHost;
+            }
+            for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
+            {
+                if ( containerHost.getHostname().equals( hostname ) )
+                {
+                    return containerHost;
+                }
+            }
+        }
+
+        throw new HostNotFoundException( "Host by name '" + hostname + "' not found." );
     }
 
 

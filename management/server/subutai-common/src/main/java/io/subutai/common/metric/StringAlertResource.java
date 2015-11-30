@@ -8,7 +8,7 @@ import io.subutai.common.peer.HostType;
 /**
  * String alert value
  */
-public class StringAlertValue implements AlertValue
+public class StringAlertResource implements AlertResource
 {
     private final HostId hostId;
     private final HostType hostType;
@@ -16,8 +16,8 @@ public class StringAlertValue implements AlertValue
     private String value;
 
 
-    public StringAlertValue( final HostId hostId, final HostType hostType, final AlertType alertType,
-                             final String description )
+    public StringAlertResource( final HostId hostId, final HostType hostType, final AlertType alertType,
+                                final String description )
     {
         this.hostId = hostId;
         this.hostType = hostType;

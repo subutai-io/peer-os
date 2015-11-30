@@ -11,7 +11,7 @@ import io.subutai.common.metric.ResourceHostMetric;
 /**
  * Test for ResourceHostMetric
  */
-public class ResourceHostMetricTest
+public class ResourceHostHistoricalMetricsTest
 {
 
     @Test
