@@ -19,7 +19,6 @@ import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 
 import io.subutai.common.environment.Blueprint;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
-import io.subutai.common.peer.EnvironmentId;
 
 
 public interface RestService
