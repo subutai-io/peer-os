@@ -19,8 +19,7 @@ public class ContainerId extends HostId
     @JsonProperty( "environmentId" )
     private EnvironmentId environmentId;
 
-
-    public ContainerId( final String id )
+    public ContainerId( @JsonProperty( "id" ) final String id )
     {
         super( id );
     }
