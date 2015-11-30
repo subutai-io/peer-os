@@ -11,9 +11,9 @@ import javax.security.auth.Subject;
  */
 public interface Session
 {
-    Long getId();
+    String getId();
 
-    void setId( Long id );
+    void setId( String id );
 
     User getUser();
 

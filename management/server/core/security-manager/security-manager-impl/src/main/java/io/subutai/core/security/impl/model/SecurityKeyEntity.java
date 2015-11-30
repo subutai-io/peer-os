@@ -1,19 +1,24 @@
 package io.subutai.core.security.impl.model;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import com.google.common.collect.Lists;
-
-import io.subutai.core.security.api.model.SecurityKeyIdentity;
+import io.subutai.core.security.api.model.SecurityKey;
+import io.subutai.core.security.api.model.SecurityKeyTrust;
 
 
 /**
@@ -21,16 +26,17 @@ import io.subutai.core.security.api.model.SecurityKeyIdentity;
  */
 
 @Entity
-@Table( name = SecurityKeyIdentityEntity.TABLE_NAME )
+@Table( name = SecurityKeyEntity.TABLE_NAME )
 @Access( AccessType.FIELD )
-public class SecurityKeyIdentityEntity implements SecurityKeyIdentity
+public class SecurityKeyEntity implements SecurityKey
 {
     /********* Table name *********/
-    public static final String TABLE_NAME = "security_key_identity";
+    public static final String TABLE_NAME = "security_key";
 
     /********* column names *******/
 
-    public static final String HOST_ID = "peer_id";
+    public static final String IDENTITY_ID = "identity_id";
+    public static final String HOST_IP = "host_ip";
     public static final String PUBLIC_KEY_FINGERPRINT  = "pkfingerprint";
     public static final String SECRET_KEY_FINGERPRINT  = "skfingerprint";
     public static final String STATUS  = "status";
@@ -38,8 +44,11 @@ public class SecurityKeyIdentityEntity implements SecurityKeyIdentity
 
 
     @Id
-    @Column( name = HOST_ID )
-    private String hostId;
+    @Column( name = IDENTITY_ID )
+    private String identityId;
+
+    @Column( name = HOST_IP )
+    private String hostIP;
 
     @Column( name = PUBLIC_KEY_FINGERPRINT )
     private String publicKeyFingerprint;
@@ -53,35 +62,23 @@ public class SecurityKeyIdentityEntity implements SecurityKeyIdentity
     @Column( name = TYPE )
     private int type;
 
+
+    //*********************************************
     @Transient
-    private List<SecurityKeyIdentity> trustedKeys = Lists.newArrayList();
-
+    private List<SecurityKeyTrust> trustedKeys = new ArrayList<>();
+    //*********************************************
 
     @Override
-    public List<SecurityKeyIdentity> getTrustedKeys()
+    public String getIdentityId()
     {
-        return trustedKeys;
+        return identityId;
     }
 
 
     @Override
-    public void setTrustedKeys( final List<SecurityKeyIdentity> trustedKeys )
+    public void setIdentityId( final String identityId )
     {
-        this.trustedKeys = trustedKeys;
-    }
-
-
-    @Override
-    public String getHostId()
-    {
-        return hostId;
-    }
-
-
-    @Override
-    public void setHostId( final String hostId )
-    {
-        this.hostId = hostId;
+        this.identityId = identityId;
     }
 
 
@@ -139,4 +136,32 @@ public class SecurityKeyIdentityEntity implements SecurityKeyIdentity
     {
         this.secretKeyFingerprint = secretKeyFingerprint;
     }
+
+
+    @Override
+    public String getHostIP()
+    {
+        return hostIP;
+    }
+
+
+    @Override
+    public void setHostIP( final String hostIP )
+    {
+        this.hostIP = hostIP;
+    }
+
+    @Override
+    public List<SecurityKeyTrust> getTrustedKeys()
+    {
+        return trustedKeys;
+    }
+
+
+    @Override
+    public void setTrustedKeys( final List<SecurityKeyTrust> trustedKeys )
+    {
+        this.trustedKeys = trustedKeys;
+    }
+
 }

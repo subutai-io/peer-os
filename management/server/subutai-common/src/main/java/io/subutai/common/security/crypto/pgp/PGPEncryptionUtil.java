@@ -1349,4 +1349,97 @@ public class PGPEncryptionUtil
             throw new PGPException( "Error verifying public key", e );
         }
     }
+
+
+    /**
+     * Verifies that a public key is signed with another public key
+     *
+     * @param keyToVerify the public key to verify
+     * @param keyToVerifyWith the key to verify with
+     *
+     * @return true if verified, false otherwise
+     */
+    public static boolean verifyPublicKey( PGPPublicKey keyToVerify, PGPPublicKey keyToVerifyWith )
+            throws PGPException
+    {
+        try
+        {
+            Iterator<PGPSignature> signIterator = keyToVerify.getSignatures();
+            while ( signIterator.hasNext() )
+            {
+                PGPSignature signature = signIterator.next();
+                signature.init( new JcaPGPContentVerifierBuilderProvider().setProvider( provider ), keyToVerifyWith );
+                if ( signature.verifyCertification( keyToVerify ) )
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        catch ( Exception e )
+        {
+            //throw custom  exception
+            throw new PGPException( "Error verifying public key", e );
+        }
+    }
+
+
+    /**
+     * Verifies that a public key is signed with another public key
+     *
+     * @param keyToRemoveFrom the public key to verify
+     * @param id id of the sugnature
+     *
+     * @return true if verified, false otherwise
+     */
+    public static PGPPublicKeyRing removeSignature( PGPPublicKeyRing keyToRemoveFrom, String id )
+            throws PGPException
+    {
+        try
+        {
+            PGPPublicKey oldKey = keyToRemoveFrom.getPublicKey();
+            PGPPublicKey newKey = PGPPublicKey.removeCertification( oldKey, id );
+
+            PGPPublicKeyRing newPublicKeyRing = PGPPublicKeyRing.removePublicKey( keyToRemoveFrom, oldKey );
+            return PGPPublicKeyRing.insertPublicKey( newPublicKeyRing, newKey );
+        }
+        catch ( Exception e )
+        {
+            //throw custom  exception
+            throw new PGPException( "Error removing signature", e );
+        }
+    }
+
+
+    public static PGPPublicKeyRing removeSignature( PGPPublicKeyRing keyToRemoveFrom,
+                                                    PGPPublicKey keySignatureToRemove )
+            throws PGPException
+    {
+        try
+        {
+            PGPPublicKey oldKey = keyToRemoveFrom.getPublicKey();
+
+            PGPPublicKeyRing newPublicKeyRing = PGPPublicKeyRing.removePublicKey( keyToRemoveFrom, oldKey );
+
+            Iterator<PGPSignature> signIterator = oldKey.getSignatures();
+            while ( signIterator.hasNext() )
+            {
+                PGPSignature signature = signIterator.next();
+                signature.init( new JcaPGPContentVerifierBuilderProvider().setProvider( provider ),
+                        keySignatureToRemove );
+                if ( signature.verifyCertification( Long.toHexString( oldKey.getKeyID() ), oldKey ) )
+                {
+                    PGPPublicKey updatedKey = PGPPublicKey.removeCertification( oldKey, signature );
+                    keyToRemoveFrom = PGPPublicKeyRing.insertPublicKey( newPublicKeyRing, updatedKey );
+                }
+            }
+
+            return keyToRemoveFrom;
+        }
+        catch ( Exception e )
+        {
+            //throw custom  exception
+            throw new PGPException( "Error removing signature", e );
+        }
+    }
 }
