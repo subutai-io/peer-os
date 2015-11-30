@@ -1,11 +1,8 @@
-package io.subutai.core.hostregistry.impl;
+package io.subutai.core.test.cli;
 
 
 import java.util.HashSet;
 import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.ResourceHostInfo;
@@ -21,9 +18,15 @@ import io.subutai.common.resource.ResourceValue;
  */
 public class HeartBeat
 {
-    private static final Logger LOG = LoggerFactory.getLogger( HeartBeat.class );
     ResourceHostInfoModel response;
     Set<ResourceAlert> alerts;
+
+
+    public HeartBeat( final ResourceHostInfoModel response, final Set<ResourceAlert> alerts )
+    {
+        this.response = response;
+        this.alerts = alerts;
+    }
 
 
     public ResourceHostInfo getHostInfo()
@@ -34,7 +37,7 @@ public class HeartBeat
 
     public Set<ResourceAlert> getAlerts()
     {
-        if ( alerts == null && response != null && response.getAlerts() != null )
+        if ( alerts == null && response.getAlerts() != null )
         {
             alerts = new HashSet<>();
             for ( ResourceHostInfoModel.Alert a : response.getAlerts() )
@@ -65,12 +68,10 @@ public class HeartBeat
     {
         if ( a.getRam() != null )
         {
-            ResourceAlert ramAlert = new ResourceAlert( new HostId( a.getId() ), ResourceType.RAM,
+            ResourceAlert cpuAlert = new ResourceAlert( new HostId( a.getId() ), ResourceType.RAM,
                     new ResourceValue( a.getRam().getCurrent(), MeasureUnit.MB ),
                     new ResourceValue( a.getRam().getQuota(), MeasureUnit.MB ) );
-            LOG.debug( String.format( "**********Adding RAM alert: %s", ramAlert) );
-
-            alerts.add( ramAlert );
+            alerts.add( cpuAlert );
         }
     }
 
@@ -79,7 +80,7 @@ public class HeartBeat
     {
         if ( a.getRam() != null )
         {
-            ResourceAlert cpuAlert = new ResourceAlert( new HostId( a.getId() ), ResourceType.RAM,
+            ResourceAlert cpuAlert = new ResourceAlert( new HostId( a.getId()), ResourceType.RAM,
                     new ResourceValue( a.getRam().getCurrent(), MeasureUnit.MB ),
                     new ResourceValue( a.getRam().getQuota(), MeasureUnit.MB ) );
             alerts.add( cpuAlert );

@@ -32,15 +32,15 @@ public class RemoteAlertListener extends RequestListener
     {
         Alert containerHostMetric = payload.getMessage( Alert.class );
 
-        try
-        {
-            monitor.notifyOnAlert( containerHostMetric );
-        }
-        catch ( MonitorException e )
-        {
-            LOG.error( "Error in RemoteAlertListener.onMessage", e );
-        }
-
+//        try
+//        {
+////            monitor.notifyOnAlert( containerHostMetric );
+//        }
+//        catch ( MonitorException e )
+//        {
+//            LOG.error( "Error in RemoteAlertListener.onMessage", e );
+//        }
+//
         return null;
     }
 }

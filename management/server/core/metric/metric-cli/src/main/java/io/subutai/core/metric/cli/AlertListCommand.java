@@ -7,8 +7,7 @@ import org.apache.karaf.shell.commands.Command;
 
 import com.google.common.base.Preconditions;
 
-import io.subutai.common.metric.BaseAlert;
-import io.subutai.common.metric.BaseMetric;
+import io.subutai.common.peer.AlertPack;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.metric.api.Monitor;
 
@@ -33,9 +32,9 @@ public class AlertListCommand extends SubutaiShellCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        Collection<BaseAlert> alerts = monitor.getAlerts();
+        Collection<AlertPack> alerts = monitor.getAlerts();
         System.out.println( "List of alerts:" );
-        for ( BaseAlert alert : alerts )
+        for ( AlertPack alert : alerts )
         {
             System.out.println( alert );
         }

@@ -15,7 +15,6 @@ import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.metric.ResourceAlert;
 import io.subutai.common.metric.ResourceHostMetrics;
-import io.subutai.common.metric.ResourceAlertValue;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.common.metric.ContainerHostMetric;
@@ -98,7 +97,8 @@ public class RestServiceImpl implements RestService
     @Override
     public Response alert( final ResourceAlert alert )
     {
-        monitor.putAlert( alert );
+//        monitor.putAlert( alert );
+        //TODO: implement me
         return Response.accepted().build();
     }
 }

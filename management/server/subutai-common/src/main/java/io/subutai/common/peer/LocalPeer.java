@@ -1,6 +1,7 @@
 package io.subutai.common.peer;
 
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -189,4 +190,14 @@ public interface LocalPeer extends Peer
     Template getTemplateByName( String templateName );
 
     ContainerHost findContainerById( ContainerId containerId );
+
+    void addAlertListener( AlertListener alertListener );
+
+    void removeAlertListener( AlertListener alertListener );
+
+    Collection<AlertListener> getAlertListeners();
+
+    Set<AlertPack> getAlertPackages();
+
+    void notifyAlertListeners();
 }

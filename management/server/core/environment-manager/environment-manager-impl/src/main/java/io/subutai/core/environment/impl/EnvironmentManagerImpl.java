@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ExecutorService;
 
 import javax.annotation.security.PermitAll;
@@ -38,6 +39,8 @@ import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.mdc.SubutaiExecutors;
+import io.subutai.common.metric.Alert;
+import io.subutai.common.metric.EnvironmentAlert;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.peer.ContainerHost;
@@ -52,6 +55,7 @@ import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.common.util.StringUtil;
+import io.subutai.core.environment.api.EnvironmentAlertListener;
 import io.subutai.core.environment.api.EnvironmentEventListener;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
@@ -106,6 +110,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     protected BlueprintDataService blueprintDataService;
 
     protected ExceptionUtil exceptionUtil = new ExceptionUtil();
+    private Set<EnvironmentAlertListener> alertListeners = new CopyOnWriteArraySet<>();
 
 
     public EnvironmentManagerImpl( final TemplateRegistry templateRegistry, final PeerManager peerManager,
@@ -1260,6 +1265,36 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                     listener.onEnvironmentDestroyed( environmentId );
                 }
             } );
+        }
+    }
+
+
+    @Override
+    public void addAlertListener( final EnvironmentAlertListener alertListener )
+    {
+        this.alertListeners.add( alertListener );
+    }
+
+
+    @Override
+    public void removeAlertListener( final EnvironmentAlertListener alertListener )
+    {
+        this.alertListeners.remove( alertListener );
+    }
+
+
+    void onAlert( EnvironmentAlert alert )
+    {
+        // notify new alerts
+        if ( alert.getState() == EnvironmentAlert.State.NEW )
+        {
+            for ( EnvironmentAlertListener alertListener : alertListeners )
+            {
+                if ( alertListener.getEnvironmentId().equals( alert.getEnvironmentId() ) )
+                {
+                    alertListener.onAlert( alert );
+                }
+            }
         }
     }
 

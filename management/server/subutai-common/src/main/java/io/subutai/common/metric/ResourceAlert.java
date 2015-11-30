@@ -11,8 +11,10 @@ import io.subutai.common.resource.ResourceValue;
 /**
  * Resource alert class
  */
-public class ResourceAlert extends BaseAlert implements ResourceAlertValue
+public class ResourceAlert
 {
+    @JsonProperty( "hostId" )
+    protected HostId hostId;
     @JsonProperty( "resourceType" )
     protected ResourceType resourceType;
     @JsonProperty( "currentValue" )
@@ -33,37 +35,45 @@ public class ResourceAlert extends BaseAlert implements ResourceAlertValue
     }
 
 
-    @Override
     public HostId getHostId()
     {
         return hostId;
     }
 
 
-    @Override
     public ResourceType getResourceType()
     {
         return resourceType;
     }
 
 
-    @Override
     public ResourceValue getCurrentValue()
     {
         return currentValue;
     }
 
 
-    @Override
     public ResourceValue getQuotaValue()
     {
         return quotaValue;
     }
 
 
-    @Override
     public String getDescription()
     {
         return String.format( "%s/%s", currentValue.getPrintValue(), quotaValue.getPrintValue() );
+    }
+
+
+    @Override
+    public String toString()
+    {
+        final StringBuffer sb = new StringBuffer( "ResourceAlert{" );
+        sb.append( "hostId=" ).append( hostId );
+        sb.append( ", resourceType=" ).append( resourceType );
+        sb.append( ", currentValue=" ).append( currentValue );
+        sb.append( ", quotaValue=" ).append( quotaValue );
+        sb.append( '}' );
+        return sb.toString();
     }
 }

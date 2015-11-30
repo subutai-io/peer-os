@@ -1,7 +1,6 @@
 package io.subutai.core.metric.rest;
 
 
-import java.util.Set;
 import java.util.UUID;
 
 import javax.ws.rs.core.Response;
@@ -14,16 +13,13 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.google.common.collect.Sets;
-import com.google.common.reflect.TypeToken;
 
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.peer.ContainerId;
-import io.subutai.common.metric.ResourceAlertValue;
 import io.subutai.common.metric.ResourceAlert;
-import io.subutai.common.resource.MeasureUnit;
 import io.subutai.common.resource.ResourceType;
 import io.subutai.common.resource.ResourceValue;
 import io.subutai.common.util.JsonUtil;
@@ -50,7 +46,7 @@ public class RestServiceImplTest
     EnvironmentManager environmentManager;
     RestServiceImpl restService;
     ResourceHostMetric resourceHostMetric;
-    ResourceAlertValue alertValue;
+    ResourceAlert alertValue;
     @Mock
     ResourceHostMetrics resourceHostMetrics;
     @Mock

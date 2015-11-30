@@ -1,24 +1,18 @@
 package io.subutai.common.metric;
 
 
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import com.google.common.base.Preconditions;
 
-import io.subutai.common.environment.Environment;
-import io.subutai.common.host.HostId;
 import io.subutai.common.peer.EnvironmentId;
 
 
 /**
  * Alert class
  */
-public class Alert
+public class EnvironmentAlert
 {
     public enum State
     {
@@ -28,14 +22,21 @@ public class Alert
 
     private Map<String, State> subscribers = new HashMap<>();
 
+    private EnvironmentId environmentId;
     private AlertValue alert;
-    //    private State state = State.NEW;
 
 
-    public Alert( final AlertValue alert )
+    public EnvironmentAlert( final EnvironmentId environmentId , final AlertValue alert )
     {
         Preconditions.checkNotNull( alert );
         this.alert = alert;
+        this.environmentId = environmentId;
+    }
+
+
+    public EnvironmentId getEnvironmentId()
+    {
+        return environmentId;
     }
 
 

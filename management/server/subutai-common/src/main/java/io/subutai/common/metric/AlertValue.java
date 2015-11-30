@@ -10,6 +10,7 @@ import io.subutai.common.host.HostId;
 public interface AlertValue
 {
     HostId getHostId();
-
-    String getDescription();
+    Object getValue();
+    String getId();
+    AlertType getType();
 }

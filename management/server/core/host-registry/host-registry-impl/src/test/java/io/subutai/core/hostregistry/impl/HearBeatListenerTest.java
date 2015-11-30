@@ -8,12 +8,10 @@ import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import io.subutai.common.host.ContainerHostState;
-import io.subutai.common.metric.ResourceAlert;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.host.ResourceHostInfo;
 
@@ -21,7 +19,6 @@ import io.subutai.core.broker.api.Topic;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;

@@ -40,6 +40,7 @@ import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
+import io.subutai.common.peer.AlertPack;
 import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
@@ -683,8 +684,8 @@ public class RemotePeerImpl implements RemotePeer
 
     @RolesAllowed( "Environment-Management|A|Write" )
     @Override
-    public Set<ContainerHostInfoModel> createEnvironmentContainerGroup( final CreateEnvironmentContainerGroupRequest request )
-            throws PeerException
+    public Set<ContainerHostInfoModel> createEnvironmentContainerGroup(
+            final CreateEnvironmentContainerGroupRequest request ) throws PeerException
     {
         Preconditions.checkNotNull( request, "Invalid request" );
 
@@ -879,6 +880,13 @@ public class RemotePeerImpl implements RemotePeer
     public ResourceHostMetrics getResourceHostMetrics()
     {
         return new PeerWebClient( peerInfo.getIp(), provider ).getResourceHostMetrics();
+    }
+
+
+    @Override
+    public void putAlert( final AlertPack alert ) throws PeerException
+    {
+        new PeerWebClient( peerInfo.getIp(), provider ).putAlert(alert);
     }
 
 

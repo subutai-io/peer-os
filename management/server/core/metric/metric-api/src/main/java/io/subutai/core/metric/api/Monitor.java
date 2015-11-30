@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Set;
 
 import io.subutai.common.environment.Environment;
-import io.subutai.common.metric.BaseAlert;
 import io.subutai.common.metric.BaseMetric;
 import io.subutai.common.metric.ContainerHostMetric;
 import io.subutai.common.metric.HistoricalMetric;
@@ -15,10 +14,10 @@ import io.subutai.common.metric.MetricType;
 import io.subutai.common.metric.OwnerResourceUsage;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
+import io.subutai.common.peer.AlertPack;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.Host;
-import io.subutai.common.metric.ResourceAlertValue;
 
 
 /**
@@ -141,11 +140,9 @@ public interface Monitor
      */
     public Map<String, List<HistoricalMetric>> getHistoricalMetrics( Collection<Host> hosts, MetricType metricType );
 
-    //    void updateHostMetric( BaseMetric metric );
-
     //    BaseMetric getHostMetric( String id );
 
-    void putAlert( BaseAlert alert );
+//    void putAlert( Alert alert );
 
     ResourceHostMetrics getResourceHostMetrics();
 
@@ -153,7 +150,5 @@ public interface Monitor
 
     Collection<BaseMetric> getMetrics();
 
-    Collection<BaseAlert> getAlerts();
-
-    //    String getHostMetricsAsHtml( String hostId );
+    Collection<AlertPack> getAlerts();
 }

@@ -1,4 +1,4 @@
-package io.subutai.core.test;
+package io.subutai.core.test.cli;
 
 
 import javax.naming.NamingException;

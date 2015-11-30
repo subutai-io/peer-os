@@ -21,6 +21,7 @@ import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
+import io.subutai.common.peer.AlertPack;
 import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
@@ -362,14 +363,14 @@ public class PeerWebClient
     }
 
 
-//    public BaseMetric getHostMetric( final String hostId )
-//    {
-//        String path = String.format( "/metric/%s", hostId );
-//
-//        WebClient client = WebClientBuilder.buildPeerWebClient( host, path, provider );
-//
-//        return client.get( BaseMetric.class );
-//    }
+    //    public BaseMetric getHostMetric( final String hostId )
+    //    {
+    //        String path = String.format( "/metric/%s", hostId );
+    //
+    //        WebClient client = WebClientBuilder.buildPeerWebClient( host, path, provider );
+    //
+    //        return client.get( BaseMetric.class );
+    //    }
 
 
     public void createGateway( final Gateway gateway ) throws PeerException
@@ -387,6 +388,25 @@ public class PeerWebClient
         catch ( Exception e )
         {
             throw new PeerException( "Error on creating gateway", e );
+        }
+    }
+
+
+    public void putAlert( final AlertPack alert ) throws PeerException
+    {
+        String path = "/alert";
+
+        WebClient client = WebClientBuilder.buildPeerWebClient( host, path, provider );
+        client.type( MediaType.APPLICATION_JSON );
+        client.accept( MediaType.APPLICATION_JSON );
+
+        try
+        {
+            client.post( alert );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Error on sending alert package to remote peer", e );
         }
     }
 }

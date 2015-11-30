@@ -83,6 +83,12 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     @Transient
     private ContainerId containerId;
 
+    @Column( name = "template_name", nullable = false )
+    private String templateName;
+
+    @Column( name = "template_arch", nullable = true )
+    private String templateArch;
+
 
     protected ContainerHostEntity()
     {
@@ -96,13 +102,15 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     }
 
 
-    public ContainerHostEntity( String peerId, HostInfo hostInfo )
+    public ContainerHostEntity( String peerId, HostInfo hostInfo, String templateName, String templateArch )
     {
         super( peerId, hostInfo );
 
         updateHostInfo( hostInfo );
 
         this.containerName = ( ( ContainerHostInfo ) hostInfo ).getContainerName();
+        this.templateName = templateName;
+        this.templateArch = templateArch;
     }
 
 
@@ -221,7 +229,13 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
 
     public String getTemplateName()
     {
-        throw new UnsupportedOperationException();
+        return this.templateName;
+    }
+
+
+    public String getTemplateArch()
+    {
+        return templateArch;
     }
 
 

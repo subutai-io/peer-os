@@ -17,6 +17,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
@@ -66,6 +68,8 @@ import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
+import io.subutai.common.peer.AlertListener;
+import io.subutai.common.peer.AlertPack;
 import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
@@ -159,7 +163,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     protected PeerInfo peerInfo;
     private SecurityManager securityManager;
 
+    private Set<AlertPack> alerts = new CopyOnWriteArraySet<>();
+
     protected boolean initialized = false;
+    private Map<String, AlertListener> alertListeners = new ConcurrentHashMap<>();
 
 
     public LocalPeerImpl( DaoManager daoManager, TemplateRegistry templateRegistry, QuotaManager quotaManager,
@@ -441,7 +448,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                         String.format( "%s/%s", ipAddress, networkPrefix ), environmentVni.getVlan(),
                         Common.WAIT_CONTAINER_CONNECTION_SEC, request.getEnvironmentId() );
 
-                ContainerHostEntity containerHostEntity = new ContainerHostEntity( getId(), hostInfo );
+                Template template = getTemplateByName( request.getTemplateName() );
+
+                ContainerHostEntity containerHostEntity =
+                        new ContainerHostEntity( getId(), hostInfo, template.getTemplateName(), template.getLxcArch() );
                 containerHostEntity.setEnvironmentId( request.getEnvironmentId() );
                 containerHostEntity.setOwnerId( request.getOwnerId() );
                 containerHostEntity.setInitiatorPeerId( request.getInitiatorPeerId() );
@@ -547,8 +557,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 ContainerHostInfo hostInfo = task.getHostInfo();
                 ResourceHost resourceHost = task.getResourceHost();
 
+                Template template = getTemplateByName( request.getTemplateName() );
 
-                ContainerHostEntity containerHostEntity = new ContainerHostEntity( getId(), hostInfo );
+                ContainerHostEntity containerHostEntity =
+                        new ContainerHostEntity( getId(), hostInfo, template.getTemplateName(), template.getLxcArch() );
                 containerHostEntity.setEnvironmentId( request.getEnvironmentId() );
                 containerHostEntity.setOwnerId( request.getOwnerId() );
                 containerHostEntity.setInitiatorPeerId( request.getInitiatorPeerId() );
@@ -1588,12 +1600,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public HostInterfaces getInterfaces()
     {
         return managementHost.getHostInterfaces();
-//        HostInterfaces result = new HostInterfaces();
-//        for ( HostInterface intf : managementHost.getHostInterfaces() )
-//        {
-//            result.addInterface( new HostInterfaceModel( intf ) );
-//        }
-//        return result;
+        //        HostInterfaces result = new HostInterfaces();
+        //        for ( HostInterface intf : managementHost.getHostInterfaces() )
+        //        {
+        //            result.addInterface( new HostInterfaceModel( intf ) );
+        //        }
+        //        return result;
     }
 
 
@@ -1879,6 +1891,64 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             throw new PeerException(
                     String.format( "Could not set quota for: %s %s", containerId.getId(), resourceType ) );
+        }
+    }
+
+
+    @Override
+    public void putAlert( AlertPack alert )
+    {
+        alerts.add( alert );
+    }
+
+
+    @Override
+    public void addAlertListener( final AlertListener alertListener )
+    {
+        this.alertListeners.put( alertListener.getTemplateName(), alertListener );
+    }
+
+
+    @Override
+    public void removeAlertListener( final AlertListener alertListener )
+    {
+        this.alertListeners.remove( alertListener.getTemplateName() );
+    }
+
+
+    @Override
+    public Collection<AlertListener> getAlertListeners()
+    {
+        return alertListeners.values();
+    }
+
+
+    @Override
+    public Set<AlertPack> getAlertPackages()
+    {
+        return alerts;
+    }
+
+
+    @Override
+    public void notifyAlertListeners()
+    {
+        for ( AlertPack alertPack : alerts )
+        {
+            if ( !alertPack.isDelivered() )
+            {
+                AlertListener alertListener = alertListeners.get( alertPack.getTemplateName() );
+
+                if ( alertListener != null )
+                {
+                    alertListener.onAlert( alertPack );
+                    alertPack.setDelivered( true );
+                }
+                else
+                {
+                    LOG.warn( "Alert listener for template '%s' not registered.", alertPack.getTemplateName() );
+                }
+            }
         }
     }
 

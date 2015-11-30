@@ -33,6 +33,31 @@ public class ResourceHostInfoModel extends HostInfoModel implements ResourceHost
     }
 
 
+    public void setContainers( final Set<ContainerHostInfoModel> containers )
+    {
+        this.containers = containers;
+    }
+
+
+    public void setInstance( final InstanceType instance )
+    {
+        this.instance = instance;
+    }
+
+
+    public void addRamAlert( final String hostId, String current, String quota )
+    {
+        final Alert a = new Alert();
+        a.id = hostId;
+        a.ram = new Ram( current, quota );
+        if ( alert == null )
+        {
+            alert = new HashSet<>();
+        }
+        this.alert.add( a );
+    }
+
+
     @Override
     public String getId()
     {
@@ -61,6 +86,7 @@ public class ResourceHostInfoModel extends HostInfoModel implements ResourceHost
         return alert;
     }
 
+
     @JsonIgnore
     @Override
     public Set<ContainerHostInfo> getContainers()
@@ -80,8 +106,8 @@ public class ResourceHostInfoModel extends HostInfoModel implements ResourceHost
     public String toString()
     {
         return MoreObjects.toStringHelper( this ).add( "id", id ).add( "hostname", hostname )
-                          .add( "instance", instance ).add( "interfaces", getHostInterfaces() ).add( "containers", containers )
-                          .toString();
+                          .add( "instance", instance ).add( "interfaces", getHostInterfaces() )
+                          .add( "containers", containers ).toString();
     }
 
 
@@ -273,12 +299,12 @@ public class ResourceHostInfoModel extends HostInfoModel implements ResourceHost
         }
     }
 
-//
-//    public static void main( String[] args )
-//    {
-//        ResourceHostInfoModel info = new ResourceHostInfoModel();
-//        info.test();
-//    }
+    //
+    //    public static void main( String[] args )
+    //    {
+    //        ResourceHostInfoModel info = new ResourceHostInfoModel();
+    //        info.test();
+    //    }
 
 
     private void test()
