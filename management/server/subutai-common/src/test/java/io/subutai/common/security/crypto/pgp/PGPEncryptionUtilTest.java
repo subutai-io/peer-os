@@ -150,28 +150,38 @@ public class PGPEncryptionUtilTest
         signKeyAndPrintIds( first, second, "second" );
 
         InputStream firstPublicStream = new ByteArrayInputStream( first.getPubKeyring() );
+        InputStream secondPublicStream = new ByteArrayInputStream( second.getPubKeyring() );
         InputStream thirdPublicStream = new ByteArrayInputStream( third.getPubKeyring() );
 
-        PGPPublicKeyRingCollection keyrings =
+        PGPPublicKeyRingCollection firstPublicKeyRingCollection =
                 new PGPPublicKeyRingCollection( PGPUtil.getDecoderStream( firstPublicStream ),
                         new JcaKeyFingerprintCalculator() );
 
-        PGPPublicKeyRing firstPublicKeyRing = null;
-        if ( keyrings.getKeyRings().hasNext() )
+        PGPPublicKeyRingCollection secondPublicKeyRingCollection =
+                new PGPPublicKeyRingCollection( PGPUtil.getDecoderStream( secondPublicStream ),
+                        new JcaKeyFingerprintCalculator() );
+
+        if ( firstPublicKeyRingCollection.getKeyRings().hasNext() )
         {
-            firstPublicKeyRing = keyrings.getKeyRings().next();
+            PGPPublicKeyRing firstPublicKeyRing = null;
+            PGPPublicKeyRing secondPublicKeyRing = null;
+            firstPublicKeyRing = firstPublicKeyRingCollection.getKeyRings().next();
+            secondPublicKeyRing = secondPublicKeyRingCollection.getKeyRings().next();
 
             PGPPublicKey thirdPublicKey =
                     PGPEncryptionUtil.findPublicKeyById( thirdPublicStream, third.getPrimaryKeyId() );
 
             printPublicKeySignatures( firstPublicKeyRing.getPublicKey(), thirdPublicKey );
 
-            InputStream secondPublicStream = new ByteArrayInputStream( second.getPubKeyring() );
-            PGPPublicKey secondPublicKey =
-                    PGPEncryptionUtil.findPublicKeyById( secondPublicStream, second.getPrimaryKeyId() );
+            //            PGPPublicKey secondPublicKey =
+            //                    PGPEncryptionUtil.findPublicKeyById( secondPublicStream, second.getPrimaryKeyId() );
 
-            firstPublicKeyRing = PGPEncryptionUtil.removeSignature( firstPublicKeyRing, secondPublicKey );
-            printPublicKeySignatures( firstPublicKeyRing.getPublicKey(), secondPublicKey );
+            if ( secondPublicKeyRing != null )
+            {
+                firstPublicKeyRing =
+                        PGPEncryptionUtil.removeSignature( firstPublicKeyRing, secondPublicKeyRing.getPublicKey() );
+                printPublicKeySignatures( firstPublicKeyRing.getPublicKey(), secondPublicKeyRing.getPublicKey() );
+            }
         }
     }
 

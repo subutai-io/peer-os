@@ -1411,7 +1411,8 @@ public class PGPEncryptionUtil
     }
 
 
-    public static PGPPublicKeyRing removeSignature( PGPPublicKeyRing keyToRemoveFrom, PGPPublicKey keyToRemove )
+    public static PGPPublicKeyRing removeSignature( PGPPublicKeyRing keyToRemoveFrom,
+                                                    PGPPublicKey keySignatureToRemove )
             throws PGPException
     {
         try
@@ -1424,7 +1425,8 @@ public class PGPEncryptionUtil
             while ( signIterator.hasNext() )
             {
                 PGPSignature signature = signIterator.next();
-                signature.init( new JcaPGPContentVerifierBuilderProvider().setProvider( provider ), keyToRemove );
+                signature.init( new JcaPGPContentVerifierBuilderProvider().setProvider( provider ),
+                        keySignatureToRemove );
                 if ( signature.verifyCertification( Long.toHexString( oldKey.getKeyID() ), oldKey ) )
                 {
                     PGPPublicKey updatedKey = PGPPublicKey.removeCertification( oldKey, signature );

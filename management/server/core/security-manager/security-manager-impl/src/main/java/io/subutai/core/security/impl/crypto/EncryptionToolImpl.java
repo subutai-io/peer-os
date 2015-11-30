@@ -304,6 +304,22 @@ public class EncryptionToolImpl implements EncryptionTool
 
 
     @Override
+    public PGPPublicKeyRing removeSignature( final PGPPublicKey keySignToRemove,
+                                             final PGPPublicKeyRing keyToRemoveFrom )
+    {
+        try
+        {
+            return PGPEncryptionUtil.removeSignature( keyToRemoveFrom, keySignToRemove );
+        }
+        catch ( Exception e )
+        {
+            //throw custom  exception
+            throw new RuntimeException( e );
+        }
+    }
+
+
+    @Override
     public byte[] decryptAndVerify( final byte[] message, final String secretKeyHostId, final String pwd,
                                     final String publicKeyHostId ) throws PGPException
     {

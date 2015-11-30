@@ -168,7 +168,8 @@ public class KeyManagerImpl implements KeyManager
             String keyIdentityId = getKeyDataByFingerprint( secretFPrint ).getIdentityId();
             //****************************************
 
-            targetPubRing = encryptionTool.signPublicKey( targetPubRing, keyIdentityId, sourceSecRing.getSecretKey(), "" );
+            targetPubRing =
+                    encryptionTool.signPublicKey( targetPubRing, keyIdentityId, sourceSecRing.getSecretKey(), "" );
             keyServer.updatePublicKey( targetPubRing );
             setKeyTrust( secretFPrint, publicFPrint, trustLevel );
         }
@@ -212,7 +213,7 @@ public class KeyManagerImpl implements KeyManager
         }
         catch ( Exception ex )
         {
-            LOG.error( "**** Error !!! Error signing key, IdentityId: "+sourceIdentityId,ex );
+            LOG.error( "**** Error !!! Error signing key, IdentityId: " + sourceIdentityId, ex );
         }
         return keyStr;
     }
@@ -229,6 +230,14 @@ public class KeyManagerImpl implements KeyManager
             SecurityKeyTrust securityKeyTrust =
                     securityDataService.getKeyTrustData( sourceFingerprint, targetFingerprint );
 
+            SecurityKey sourceSecurityKey = getKeyDataByFingerprint( sourceFingerprint );
+            SecurityKey targetSecurityKey = getKeyDataByFingerprint( targetFingerprint );
+
+            if ( !verifyTrustRelationValidity( SecurityKeyType. ) )
+            {
+                throw new RuntimeException( "Trust is not allow for this relation" );
+            }
+
             if ( trustLevel == KeyTrustLevel.Never.getId() )
             {
                 //******************************************
@@ -242,7 +251,7 @@ public class KeyManagerImpl implements KeyManager
                     securityDataService.saveKeyTrustData( sourceFingerprint, targetFingerprint, trustLevel );
 
                     //******************************************
-                    signKey( sourceFingerprint, targetFingerprint ,trustLevel );
+                    signKey( sourceFingerprint, targetFingerprint, trustLevel );
                     //******************************************
                 }
             }
@@ -260,6 +269,59 @@ public class KeyManagerImpl implements KeyManager
     }
 
 
+    //TODO need to finish
+    private SecurityKeyType getSecurityTypeById( int securityType )
+    {
+        if ( SecurityKeyType.ContainerHostKey.getId() == securityType )
+        {
+            return SecurityKeyType.ContainerHostKey;
+        }
+        return false;
+        case EnvironmentKey:
+        return targetKeyType == SecurityKeyType.PeerEnvironmentKey;
+        case ManagementHostKey:
+        return targetKeyType == SecurityKeyType.ResourceHostKey;
+        case PeerEnvironmentKey:
+        return targetKeyType == SecurityKeyType.ContainerHostKey;
+        case PeerKey:
+        return targetKeyType == SecurityKeyType.ManagementHostKey;
+        case PeerOwnerKey:
+        return targetKeyType == SecurityKeyType.PeerKey;
+        case ResourceHostKey:
+        return targetKeyType == SecurityKeyType.ContainerHostKey;
+        case UserKey:
+        return targetKeyType == SecurityKeyType.EnvironmentKey;
+    }
+
+
+}
+
+
+    private boolean verifyTrustRelationValidity( SecurityKeyType sourceKeyType, SecurityKeyType targetKeyType )
+    {
+        switch ( sourceKeyType )
+        {
+            case ContainerHostKey:
+                return false;
+            case EnvironmentKey:
+                return targetKeyType == SecurityKeyType.PeerEnvironmentKey;
+            case ManagementHostKey:
+                return targetKeyType == SecurityKeyType.ResourceHostKey;
+            case PeerEnvironmentKey:
+                return targetKeyType == SecurityKeyType.ContainerHostKey;
+            case PeerKey:
+                return targetKeyType == SecurityKeyType.ManagementHostKey;
+            case PeerOwnerKey:
+                return targetKeyType == SecurityKeyType.PeerKey;
+            case ResourceHostKey:
+                return targetKeyType == SecurityKeyType.ContainerHostKey;
+            case UserKey:
+                return targetKeyType == SecurityKeyType.EnvironmentKey;
+        }
+        return false;
+    }
+
+
     /* ***************************************************************
      *
      */
@@ -267,7 +329,7 @@ public class KeyManagerImpl implements KeyManager
     public boolean verifySignature( String sourceFingerprint, String targetFingerprint )
     {
         PGPPublicKeyRing sourcePubRing = getPublicKeyRingByFingerprint( targetFingerprint );
-        PGPPublicKeyRing targetPubRing = getPublicKeyRingByFingerprint(sourceFingerprint  );
+        PGPPublicKeyRing targetPubRing = getPublicKeyRingByFingerprint( sourceFingerprint );
 
         return verifySignature( sourcePubRing, targetPubRing );
     }
@@ -279,7 +341,9 @@ public class KeyManagerImpl implements KeyManager
     @Override
     public boolean verifySignature( PGPPublicKeyRing sourcePubRing, PGPPublicKeyRing targetPubRing )
     {
-        return encryptionTool.verifyPublicKey(targetPubRing.getPublicKey() ,sourcePubRing.getPublicKey() );
+        PGPPublicKey targetPublicKey = targetPubRing.getPublicKey();
+        return encryptionTool.verifyPublicKey( targetPublicKey, Long.toHexString( targetPublicKey.getKeyID() ),
+                sourcePubRing.getPublicKey() );
     }
 
 
@@ -290,9 +354,11 @@ public class KeyManagerImpl implements KeyManager
     public PGPPublicKeyRing removeSignature( String sourceFingerprint, String targetFingerprint )
     {
         PGPPublicKeyRing targetPubRing = getPublicKeyRingByFingerprint( targetFingerprint );
-        String sourceIdentityId = getKeyDataByFingerprint( sourceFingerprint ).getIdentityId();
+        PGPPublicKeyRing sourcePubRing = getPublicKeyRingByFingerprint( sourceFingerprint );
+        PGPPublicKey sourcePublicKey = sourcePubRing.getPublicKey();
+        //        String sourceIdentityId = getKeyDataByFingerprint( sourceFingerprint ).getIdentityId();
 
-        return encryptionTool.removeSignature(sourceIdentityId, targetPubRing);
+        return encryptionTool.removeSignature( sourcePublicKey, targetPubRing );
     }
 
 
@@ -305,12 +371,13 @@ public class KeyManagerImpl implements KeyManager
         PGPPublicKeyRing newRing = null;
         try
         {
-            encryptionTool.removeSignature(sourceIdentityId,targetPubRing);
+            PGPPublicKey sourcePublicKey = getPublicKey( sourceIdentityId );
+            newRing = encryptionTool.removeSignature( sourcePublicKey, targetPubRing );
             keyServer.updatePublicKey( newRing );
         }
         catch ( IOException | PGPException e )
         {
-            LOG.error( "**** Error !!! Error removing key signature IdentityId: "+sourceIdentityId,e );
+            LOG.error( "**** Error !!! Error removing key signature IdentityId: " + sourceIdentityId, e );
         }
 
         return newRing;
@@ -369,6 +436,7 @@ public class KeyManagerImpl implements KeyManager
             LOG.error( " **** Error!!! Error removing key trust:" + ex.toString(), ex );
         }
     }
+
 
     /* ***************************************************************
      *
@@ -512,7 +580,7 @@ public class KeyManagerImpl implements KeyManager
                 {
                     securityDataService.removeSecretKeyData( keyIden.getSecretKeyFingerprint() );
                     securityDataService.removeKeyData( identityId );
-                    securityDataService.removeKeyAllTrustData( keyIden.getSecretKeyFingerprint()  );
+                    securityDataService.removeKeyAllTrustData( keyIden.getSecretKeyFingerprint() );
                 }
             }
             else
@@ -550,7 +618,6 @@ public class KeyManagerImpl implements KeyManager
     }
 
 
-
     /* *****************************
      *
      */
@@ -560,7 +627,7 @@ public class KeyManagerImpl implements KeyManager
         SecurityKey keyIden = null;
         try
         {
-           keyIden = securityDataService.getKeyDataByFingerprint( fingerprint );
+            keyIden = securityDataService.getKeyDataByFingerprint( fingerprint );
         }
         catch ( Exception ex )
         {
@@ -622,6 +689,7 @@ public class KeyManagerImpl implements KeyManager
         }
     }
 
+
     /* *****************************
      *
      */
@@ -633,7 +701,7 @@ public class KeyManagerImpl implements KeyManager
         {
             byte[] keyData = keyServer.getPublicKeyByFingerprint( fingerprint ).getKeyData();
 
-            if(keyData!=null)
+            if ( keyData != null )
             {
                 return PGPKeyUtil.readPublicKeyRing( keyData );
             }
@@ -644,6 +712,7 @@ public class KeyManagerImpl implements KeyManager
 
         return pubKeyRing;
     }
+
 
     /* *****************************
      *
@@ -931,9 +1000,9 @@ public class KeyManagerImpl implements KeyManager
     }
 
 
-       /* *****************************
-     *
-     */
+    /* *****************************
+  *
+  */
     public SecurityKeyData getSecurityKeyData()
     {
         return keyData;
@@ -1071,7 +1140,6 @@ public class KeyManagerImpl implements KeyManager
     }
 
 
-
     /* *************************************************************
      *
      */
@@ -1080,7 +1148,7 @@ public class KeyManagerImpl implements KeyManager
     {
         SecurityKey securityKey = getKeyDataByFingerprint( fingerprint );
 
-        if(securityKey!=null)
+        if ( securityKey != null )
         {
             List<SecurityKeyTrust> keyTrustList = securityDataService.getKeyTrustData( fingerprint );
             securityKey.getTrustedKeys().clear();
@@ -1099,13 +1167,13 @@ public class KeyManagerImpl implements KeyManager
     {
         SecurityKey securityKey = getKeyData( identityId );
 
-        if(securityKey!=null)
+        if ( securityKey != null )
         {
             securityKey = getKeyDetails( securityKey.getPublicKeyFingerprint() );
 
             for ( SecurityKeyTrust keyTrust : securityKey.getTrustedKeys() )
             {
-                SecurityKey targetKey =  getKeyTrustSubTree( keyTrust.getTargetFingerprint());
+                SecurityKey targetKey = getKeyTrustSubTree( keyTrust.getTargetFingerprint() );
 
                 keyTrust.setTargetKey( targetKey );
             }
@@ -1122,11 +1190,11 @@ public class KeyManagerImpl implements KeyManager
     {
         SecurityKey securityKey = getKeyDetails( fingerprint );
 
-        if(securityKey!=null)
+        if ( securityKey != null )
         {
             for ( SecurityKeyTrust keyTrust : securityKey.getTrustedKeys() )
             {
-                SecurityKey targetKey =  getKeyTrustSubTree( keyTrust.getTargetFingerprint());
+                SecurityKey targetKey = getKeyTrustSubTree( keyTrust.getTargetFingerprint() );
 
                 keyTrust.setTargetKey( targetKey );
             }
@@ -1134,7 +1202,6 @@ public class KeyManagerImpl implements KeyManager
 
         return securityKey;
     }
-
 
 
     /* *****************************
@@ -1145,5 +1212,4 @@ public class KeyManagerImpl implements KeyManager
     {
         return 0;
     }
-
 }
