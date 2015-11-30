@@ -9,9 +9,6 @@ if [ -z "$1" ]
 fi
 
 sptoken=`curl -s --data "username=admin&password=secret" --insecure https://$1:8443/rest/v1/identity/gettoken`
-
-#response=`curl -s -k https://10.10.12.20:8443/rest/v1/registration/requests?sptoken=$sptoken` #| sed -e 's/[{}]/''/g' | awk -v RS=',' -F: '/id/ {print $2}' | awk '{print $1}'`
-
 rsp=`curl -s -k https://$1:8443/rest/v1/registration/requests?sptoken=$sptoken | awk -F"," -v k="\"id\": \"" '{
     gsub(/{|}/,"")
     for(i=1;i<=NF;i++){
