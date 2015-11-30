@@ -620,13 +620,15 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 
 function startup($rootScope, $state, $location, $http) {
 
-	$rootScope.$on('$stateChangeStart',	function(event, toState, toParams, fromState, fromParams){
-		var restrictedPage = $.inArray($location.path(), ['/login']) === -1;
-		if (restrictedPage && !getCookie('sptoken')) {
-			$location.path('/login');
-		}
-	});
-	$http.defaults.headers.common['sptoken'] = getCookie('sptoken');
+	$http.defaults.headers.common['sptoken'] = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJiNDQwMDhhMi01NjA4LTRkMzItOGU3Yi05MzUyNDBhNjdhOGMiLCJpc3MiOiJpby5zdWJ1dGFpIn0.xDkWXuh287I75QTQiHZ4PP6dfLQ6f_ULukHmBDZ3Sto';
+
+	//$rootScope.$on('$stateChangeStart',	function(event, toState, toParams, fromState, fromParams){
+	//	var restrictedPage = $.inArray($location.path(), ['/login']) === -1;
+	//	if (restrictedPage && !getCookie('sptoken')) {
+	//		$location.path('/login');
+	//	}
+	//});
+	//$http.defaults.headers.common['sptoken'] = getCookie('sptoken');
 
 	$rootScope.$state = $state;
 }
@@ -679,6 +681,7 @@ app.directive('checkbox-list-dropdown', function() {
 	return {
 		restrict: 'A',
 		link: function(scope, element, attr) {
+			console.log('lololo');
 			$('.b-form-input_dropdown').click(function () {
 				$(this).toggleClass('is-active');
 			});
@@ -691,7 +694,8 @@ app.directive('checkbox-list-dropdown', function() {
 });
 
 //Global variables
-var SERVER_URL = '/';
+//var SERVER_URL = '/';
+var SERVER_URL = 'http://172.16.131.205:8080/';
 
 var STATUS_UNDER_MODIFICATION = 'UNDER_MODIFICATION';
 var VARS_TOOLTIP_TIMEOUT = 900;
