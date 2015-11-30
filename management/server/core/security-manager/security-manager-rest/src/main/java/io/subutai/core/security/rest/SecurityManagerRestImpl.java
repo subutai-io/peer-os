@@ -2,7 +2,6 @@ package io.subutai.core.security.rest;
 
 
 import javax.naming.NamingException;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.core.Response;
 
 import org.bouncycastle.openpgp.PGPPublicKey;
@@ -12,13 +11,14 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Strings;
 
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
+import io.subutai.common.security.objects.KeyTrustLevel;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.KeyManager;
-import io.subutai.core.security.api.model.SecurityKeyIdentity;
+import io.subutai.core.security.api.model.SecurityKey;
 import io.subutai.core.security.rest.model.SecurityKeyData;
 
 
@@ -47,9 +47,9 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
      *
      */
     @Override
-    public Response addPublicKeyRing( final String hostId, final String keyText )
+    public Response addPublicKeyRing( final String identityId, final String keyText )
     {
-        securityManager.getKeyManager().savePublicKeyRing( hostId, ( short ) 3, keyText );
+        securityManager.getKeyManager().savePublicKeyRing( identityId, ( short ) 3, keyText );
 
         return Response.ok().build();
     }
@@ -59,9 +59,9 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
      *
      */
     @Override
-    public Response removePublicKeyRing( final String hostId )
+    public Response removePublicKeyRing( final String identityId )
     {
-        securityManager.getKeyManager().removePublicKeyRing( hostId );
+        securityManager.getKeyManager().removePublicKeyRing( identityId );
 
         return Response.ok().build();
     }
@@ -71,9 +71,9 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
      *
      */
     @Override
-    public Response getPublicKeyRing( final String hostId )
+    public Response getPublicKeyRing( final String identityId )
     {
-        String key = securityManager.getKeyManager().getPublicKeyRingAsASCII( hostId );
+        String key = securityManager.getKeyManager().getPublicKeyRingAsASCII( identityId );
 
         if ( Strings.isNullOrEmpty( key ) )
         {
@@ -90,9 +90,9 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
      *
      */
     @Override
-    public Response getPublicKeyId( final String hostId )
+    public Response getPublicKeyId( final String identityId )
     {
-        PGPPublicKey key = securityManager.getKeyManager().getPublicKeyRing( hostId ).getPublicKey();
+        PGPPublicKey key = securityManager.getKeyManager().getPublicKeyRing( identityId ).getPublicKey();
 
         if ( key == null )
         {
@@ -133,9 +133,9 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
      *
      */
     @Override
-    public Response getPublicKeyFingerprint( final String hostId )
+    public Response getPublicKeyFingerprint( final String identityId )
     {
-        String fingerprint = securityManager.getKeyManager().getFingerprint( hostId );
+        String fingerprint = securityManager.getKeyManager().getFingerprint( identityId );
 
         if ( fingerprint == null )
         {
@@ -152,12 +152,21 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
      *
      */
     @Override
-    public Response getKeyTrustTree( String hostId )
+    public Response getKeyTrustTree( String identityId )
     {
-        logger.debug( "Received hostId: " + hostId );
-        KeyManager keyManager = securityManager.getKeyManager();
-        SecurityKeyIdentity keyIdentity = keyManager.getKeyTrustTree( hostId );
-        return Response.ok( JsonUtil.toJson( keyIdentity ) ).build();
+        try
+        {
+            logger.debug( "Received identityId: " + identityId );
+
+            KeyManager keyManager = securityManager.getKeyManager();
+            SecurityKey securityKey = keyManager.getKeyTrustTree( identityId );
+
+            return Response.ok( JsonUtil.toJson( securityKey ) ).build();
+        }
+        catch ( Exception ex )
+        {
+            return Response.serverError().build();
+        }
     }
 
 
@@ -165,9 +174,38 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
      *
      */
     @Override
-    public Response revokeKey( String hostId )
+    public Response revokeKey( String sourceFingerprint, String targetFingerprint )
     {
-        return null;
+        try
+        {
+            KeyManager keyManager = securityManager.getKeyManager();
+            keyManager.setKeyTrust( sourceFingerprint, targetFingerprint, KeyTrustLevel.Never.getId() );
+        }
+        catch ( Exception e )
+        {
+            return Response.serverError().build();
+        }
+        return Response.ok().build();
+    }
+
+
+
+    /* ***********************************************************
+     *
+     */
+    @Override
+    public Response setTrust( String source, String target, int level )
+    {
+        try
+        {
+            KeyManager keyManager = securityManager.getKeyManager();
+            keyManager.setKeyTrust( source, target, level );
+        }
+        catch ( Exception e )
+        {
+            return Response.serverError().build();
+        }
+        return Response.ok().build();
     }
 
 
@@ -175,11 +213,30 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
      *
      */
     @Override
-    public Response signKey(  SecurityKeyData keyData )
+    public Response allowKey( String source, String target )
     {
-        String key = securityManager.getKeyManager().signPublicKey( keyData.getSourceKeyIdentityId(),
-                                                                    keyData.getKeyText(),
-                                                                    keyData.getTrustlevel() );
+        try
+        {
+            KeyManager keyManager = securityManager.getKeyManager();
+            keyManager.setKeyTrust( source, target, KeyTrustLevel.Full.getId() );
+        }
+        catch ( Exception e )
+        {
+            return Response.serverError().build();
+        }
+        return Response.ok().build();
+    }
+
+
+    /* ***********************************************************
+     *
+     */
+    @Override
+    public Response signKey( SecurityKeyData keyData )
+    {
+        String key = securityManager.getKeyManager()
+                                    .signPublicKey( keyData.getSourceKeyIdentityId(), keyData.getKeyText(),
+                                            keyData.getTrustlevel() );
 
         if ( Strings.isNullOrEmpty( key ) )
         {
@@ -190,4 +247,29 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
             return Response.ok( key ).build();
         }
     }
+
+
+    /* ***********************************************************
+     *
+     */
+    @Override
+    public Response verifySignature( String sourceFingerprint, String targetFingerprint )
+    {
+        KeyManager keyManager = securityManager.getKeyManager();
+
+        boolean certfied = keyManager.verifySignature( sourceFingerprint, targetFingerprint  );
+
+        return Response.ok( certfied ).build();
+    }
+
+
+    /* ***********************************************************
+     *
+     */
+    @Override
+    public Response verifyTrust( String sourceFingerprint, String targetFingerprint )
+    {
+        return null;
+    }
+
 }

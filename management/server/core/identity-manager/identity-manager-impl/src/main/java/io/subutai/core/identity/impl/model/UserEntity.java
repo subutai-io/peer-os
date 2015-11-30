@@ -71,10 +71,6 @@ public class UserEntity implements User
     private List<Role> roles = new ArrayList<>();
     //*********************************************
 
-    //************************************
-    @Transient
-    private Subject subject;
-    //************************************
 
 
     @Override
@@ -235,17 +231,4 @@ public class UserEntity implements User
         return UserType.values()[type - 1].getName();
     }
 
-
-    @Override
-    public Subject getSubject()
-    {
-        return subject;
-    }
-
-
-    @Override
-    public void setSubject( final Subject subject )
-    {
-        this.subject = subject;
-    }
 }
