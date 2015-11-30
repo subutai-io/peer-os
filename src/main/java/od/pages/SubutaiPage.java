@@ -319,7 +319,7 @@ public class SubutaiPage extends PageObject {
     @FindBy(xpath = "*//li[contains(text(),\"Environment\")]")
     public WebElementFacade pageConsoleLinkEnvironment;
 
-    @FindBy(ngModel = "selectedEnvironment")
+    @FindBy(ngModel = "consoleViewCtrl.selectedEnvironment")
     public WebElementFacade environmentSelectMenu;
 
     @FindBy(ngModel = "selectedContainer")
@@ -366,4 +366,7 @@ public class SubutaiPage extends PageObject {
 
     @FindBy(xpath = "*//*[contains(text(),\"BEGIN PGP PUBLIC KEY BLOCK\")]")
     public WebElementFacade environmentPGPKey;
+
+    @FindBy(xpath = "*//tr[@class=\"ng-scope odd\"]//td[@class=\"subt_text__container-ip sorting_1\"]")
+    public WebElementFacade containerIp;
 }

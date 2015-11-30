@@ -329,7 +329,7 @@ public class DefSubutaiStepsWhen {
     public void click_button_stop(){
         subutaiSteps.clickOnButtonStop();
         subutaiSteps.waitABit(5000);
-//        subutaiSteps.clickOnButtonStop();
+        subutaiSteps.clickOnButtonStop();
     }
 
     @When("the user click on the button: Start")
@@ -367,4 +367,8 @@ public class DefSubutaiStepsWhen {
         subutaiSteps.getEnvironmentData();
     }
 
+    @When("the user get master IP")
+    public void user_get_master_ip(){
+        subutaiSteps.getContainerIp();
+    }
 }
