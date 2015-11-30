@@ -1,23 +1,27 @@
 package io.subutai.core.kurjun.rest.vapt;
 
 
-import ai.subut.kurjun.metadata.common.apt.DefaultPackageMetadata;
-import ai.subut.kurjun.metadata.common.utils.MetadataUtils;
-import ai.subut.kurjun.model.metadata.apt.PackageMetadata;
-import io.subutai.core.kurjun.api.vapt.AptManager;
-import io.subutai.core.kurjun.rest.RestManagerBase;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.Files;
+
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import org.apache.commons.io.FileUtils;
-import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+
+import ai.subut.kurjun.metadata.common.apt.DefaultPackageMetadata;
+import ai.subut.kurjun.metadata.common.utils.MetadataUtils;
+import ai.subut.kurjun.model.metadata.apt.PackageMetadata;
+import io.subutai.core.kurjun.api.vapt.AptManager;
+import io.subutai.core.kurjun.rest.RestManagerBase;
 
 
 public class RestAptManagerImpl extends RestManagerBase implements RestAptManager
@@ -38,7 +42,8 @@ public class RestAptManagerImpl extends RestManagerBase implements RestAptManage
     public Response getRelease( String release )
     {
         String releaseIndex = aptManager.getRelease( release, null, null );
-        return ( releaseIndex != null ) ? Response.ok( releaseIndex ).build() : notFoundResponse( "Release not found." );
+        return ( releaseIndex != null ) ? Response.ok( releaseIndex ).build() :
+               notFoundResponse( "Release not found." );
     }
 
 
@@ -51,13 +56,13 @@ public class RestAptManagerImpl extends RestManagerBase implements RestAptManage
 
             Response.ResponseBuilder rb = Response.ok();
 
-            rb.header( "Content-Type", "application/octet-stream" );
-
             if ( aptManager.isCompressionTypeSupported( packagesIndex ) )
             {
                 // make archived package indices downloadable by specifying content disposition header
                 rb.header( "Content-Disposition", " attachment; filename=" + packagesIndex );
+                rb.header( "Content-Type", "application/octet-stream" );
             }
+
             return rb.entity( is ).build();
         }
         catch ( IllegalArgumentException e )
@@ -81,9 +86,8 @@ public class RestAptManagerImpl extends RestManagerBase implements RestAptManage
                 {
                     DefaultPackageMetadata pm = MetadataUtils.JSON.fromJson( serialized, DefaultPackageMetadata.class );
                     return Response.ok( is )
-                            .header( "Content-Disposition", "attachment; filename=" + makePackageFilename( pm ) )
-                            .header( "Content-Type", "application/octet-stream" )
-                            .build();
+                                   .header( "Content-Disposition", "attachment; filename=" + makePackageFilename( pm ) )
+                                   .header( "Content-Type", "application/octet-stream" ).build();
                 }
             }
         }
@@ -98,10 +102,10 @@ public class RestAptManagerImpl extends RestManagerBase implements RestAptManage
     @Override
     public Response upload( Attachment attachment )
     {
-//        if ( checkAuthentication( Permission.ADD_PACKAGE ) )
-//        {
-//            return forbiddenResponse();
-//        }
+        //        if ( checkAuthentication( Permission.ADD_PACKAGE ) )
+        //        {
+        //            return forbiddenResponse();
+        //        }
 
         File temp = null;
         try
@@ -132,10 +136,10 @@ public class RestAptManagerImpl extends RestManagerBase implements RestAptManage
     @Override
     public Response getPackageInfo( String md5, String name, String version )
     {
-//        if ( checkAuthentication( Permission.GET_PACKAGE ) )
-//        {
-//            return forbiddenResponse();
-//        }
+        //        if ( checkAuthentication( Permission.GET_PACKAGE ) )
+        //        {
+        //            return forbiddenResponse();
+        //        }
 
         String str = aptManager.getPackageInfo( decodeMd5( md5 ), name, version );
 
@@ -150,10 +154,10 @@ public class RestAptManagerImpl extends RestManagerBase implements RestAptManage
     @Override
     public Response getPackage( String md5 )
     {
-//        if ( checkAuthentication( Permission.GET_PACKAGE ) )
-//        {
-//            return forbiddenResponse();
-//        }
+        //        if ( checkAuthentication( Permission.GET_PACKAGE ) )
+        //        {
+        //            return forbiddenResponse();
+        //        }
 
         String serialized = aptManager.getSerializedPackageInfo( decodeMd5( md5 ) );
 
@@ -165,9 +169,8 @@ public class RestAptManagerImpl extends RestManagerBase implements RestAptManage
             {
                 DefaultPackageMetadata pm = MetadataUtils.JSON.fromJson( serialized, DefaultPackageMetadata.class );
                 return Response.ok( is )
-                        .header( "Content-Disposition", "attachment; filename=" + makePackageFilename( pm ) )
-                        .header( "Content-Type", "application/octet-stream" )
-                        .build();
+                               .header( "Content-Disposition", "attachment; filename=" + makePackageFilename( pm ) )
+                               .header( "Content-Type", "application/octet-stream" ).build();
             }
         }
         return packageNotFoundResponse();
@@ -185,15 +188,14 @@ public class RestAptManagerImpl extends RestManagerBase implements RestAptManage
     }
 
 
-//    @Override
-//    protected AuthManager getAuthManager()
-//    {
-//        return authManager;
-//    }
+    //    @Override
+    //    protected AuthManager getAuthManager()
+    //    {
+    //        return authManager;
+    //    }
     @Override
     protected Logger getLogger()
     {
         return LOGGER;
     }
-
 }
