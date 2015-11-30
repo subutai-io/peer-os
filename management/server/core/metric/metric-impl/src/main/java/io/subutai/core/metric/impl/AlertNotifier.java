@@ -1,14 +1,13 @@
 package io.subutai.core.metric.impl;
 
 
-import io.subutai.common.metric.Alert;
-import io.subutai.common.metric.ContainerHostMetric;
-import io.subutai.core.metric.api.AlertListener;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
+
+import io.subutai.common.peer.AlertListener;
+import io.subutai.common.peer.AlertPack;
 
 
 /**
@@ -18,11 +17,11 @@ public class AlertNotifier implements Runnable
 {
     protected Logger LOG = LoggerFactory.getLogger( AlertNotifier.class );
 
-    protected Alert alert;
+    protected AlertPack alert;
     protected AlertListener listener;
 
 
-    public AlertNotifier( final Alert alert, final AlertListener listener )
+    public AlertNotifier( final AlertPack alert, final AlertListener listener )
     {
         Preconditions.checkNotNull( alert, "Alert is null" );
         Preconditions.checkNotNull( listener, "Listener is null" );
@@ -41,7 +40,7 @@ public class AlertNotifier implements Runnable
         }
         catch ( Exception e )
         {
-            LOG.error( String.format( "Error notifying %s on %s", listener.getSubscriberId(), alert ), e );
+            LOG.error( String.format( "Error notifying %s on %s", listener.getTemplateName(), alert ), e );
         }
     }
 }
