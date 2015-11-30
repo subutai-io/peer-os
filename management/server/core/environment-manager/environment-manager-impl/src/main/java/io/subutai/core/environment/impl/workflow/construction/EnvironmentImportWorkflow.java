@@ -12,12 +12,16 @@ import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
-import io.subutai.core.environment.impl.workflow.creation.steps.*;
+import io.subutai.core.environment.impl.workflow.creation.steps.PEKGenerationStep;
+import io.subutai.core.environment.impl.workflow.creation.steps.RegisterHostsStep;
+import io.subutai.core.environment.impl.workflow.creation.steps.RegisterSshStep;
+import io.subutai.core.environment.impl.workflow.creation.steps.SetSshKeyStep;
+import io.subutai.core.environment.impl.workflow.creation.steps.SetupN2NStep;
+import io.subutai.core.environment.impl.workflow.creation.steps.VNISetupStep;
 import io.subutai.core.identity.api.IdentityManager;
-import io.subutai.core.identity.api.model.User;
+import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.core.registry.api.TemplateRegistry;
 import io.subutai.core.security.api.SecurityManager;
 
 
@@ -26,7 +30,7 @@ public class EnvironmentImportWorkflow extends Workflow<EnvironmentImportWorkflo
 
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentImportWorkflow.class );
 
-    private final TemplateRegistry templateRegistry;
+    private final TemplateManager templateRegistry;
     private final NetworkManager networkManager;
     private final PeerManager peerManager;
     private final SecurityManager securityManager;
@@ -41,7 +45,7 @@ public class EnvironmentImportWorkflow extends Workflow<EnvironmentImportWorkflo
     private IdentityManager identityManager;
 
 
-    public EnvironmentImportWorkflow( String defaultDomain, TemplateRegistry templateRegistry,
+    public EnvironmentImportWorkflow( String defaultDomain, TemplateManager templateRegistry,
                                       EnvironmentManagerImpl environmentManager, NetworkManager networkManager,
                                       PeerManager peerManager, SecurityManager securityManager,
                                       IdentityManager identityManager, EnvironmentImpl environment, Topology topology,

@@ -31,14 +31,13 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.protocol.N2NConfig;
-import io.subutai.common.protocol.Template;
+import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.util.DateTimeParam;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
-import io.subutai.common.peer.LocalPeer;
 
 
 public class RestServiceImpl implements RestService
@@ -138,7 +137,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            Template result = localPeer.getTemplate( templateName );
+            TemplateKurjun result = localPeer.getTemplate( templateName );
             return Response.ok( result ).build();
         }
         catch ( Exception e )

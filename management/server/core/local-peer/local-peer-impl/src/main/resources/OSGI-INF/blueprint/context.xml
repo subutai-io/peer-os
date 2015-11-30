@@ -31,7 +31,7 @@
 
   <reference id="commandExecutor" interface="io.subutai.core.executor.api.CommandExecutor" />
 
-  <reference id="templateRegistry" interface="io.subutai.core.registry.api.TemplateRegistry" />
+  <reference id="templateRegistry" interface="io.subutai.core.kurjun.api.TemplateManager" />
 
   <reference id="hostRegistry" interface="io.subutai.core.hostregistry.api.HostRegistry" />
 

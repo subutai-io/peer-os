@@ -1,8 +1,6 @@
 package io.subutai.core.localpeer.impl.container;
 
 
-import java.util.UUID;
-
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -17,7 +15,7 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
-import io.subutai.common.protocol.Template;
+import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.settings.Common;
 import io.subutai.core.hostregistry.api.HostRegistry;
 
@@ -45,7 +43,7 @@ public class CreateContainerTaskTest
     @Mock
     ResourceHost resourceHost;
     @Mock
-    Template template;
+    TemplateKurjun template;
     @Mock
     CommandUtil commandUtil;
     @Mock
@@ -61,14 +59,13 @@ public class CreateContainerTaskTest
     @Before
     public void setUp() throws Exception
     {
-        task = new CreateContainerTask( hostRegistry, resourceHost, template, HOSTNAME, CIDR, VLAN, TIMEOUT/*, ENV_ID*/ );
+        task = new CreateContainerTask( hostRegistry, resourceHost, template, HOSTNAME, CIDR, VLAN,
+                TIMEOUT/*, ENV_ID*/ );
         task.commandUtil = commandUtil;
         when( resourceHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
         when( commandResult.hasSucceeded() ).thenReturn( true );
         when( commandResult.getStdOut() ).thenReturn( OUT );
-        when( template.getTemplateName() ).thenReturn( TEMPLATE_NAME );
-        when( template.isRemote() ).thenReturn( true );
-        when( template.getPeerId() ).thenReturn( UUID.randomUUID().toString() );
+        when( template.getName() ).thenReturn( TEMPLATE_NAME );
         when( resourceHost.getContainerHostByName( HOSTNAME ) ).thenReturn( containerHost );
         when( containerHost.getIpByInterfaceName( Common.DEFAULT_CONTAINER_INTERFACE ) ).thenReturn( IP );
     }
@@ -119,8 +116,8 @@ public class CreateContainerTaskTest
 
         //        verify( containerHost ).setDefaultGateway( GATEWAY );
 
-        CreateContainerTask task =
-                new CreateContainerTask( hostRegistry, resourceHost, template, HOSTNAME, CIDR, VLAN, TIMEOUT/*, ENV_ID*/ );
+        CreateContainerTask task = new CreateContainerTask( hostRegistry, resourceHost, template, HOSTNAME, CIDR, VLAN,
+                TIMEOUT/*, ENV_ID*/ );
         task.commandUtil = commandUtil;
 
         task.call();

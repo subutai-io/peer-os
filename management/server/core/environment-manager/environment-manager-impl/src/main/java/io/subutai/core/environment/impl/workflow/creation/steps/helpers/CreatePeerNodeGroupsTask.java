@@ -15,12 +15,12 @@ import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.peer.ContainerType;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.exception.NodeGroupBuildException;
-import io.subutai.common.peer.LocalPeer;
-import io.subutai.core.registry.api.TemplateRegistry;
+import io.subutai.core.kurjun.api.TemplateManager;
 
 
 public class CreatePeerNodeGroupsTask implements Callable<Set<NodeGroupBuildResult>>
@@ -32,14 +32,14 @@ public class CreatePeerNodeGroupsTask implements Callable<Set<NodeGroupBuildResu
     private final LocalPeer localPeer;
     private final Environment environment;
     private final int ipAddressOffset;
-    private final TemplateRegistry templateRegistry;
+    private final TemplateManager templateRegistry;
     private final String defaultDomain;
     protected ExceptionUtil exceptionUtil = new ExceptionUtil();
 
 
     public CreatePeerNodeGroupsTask( final Peer peer, final Set<NodeGroup> nodeGroups, final LocalPeer localPeer,
                                      final Environment environment, final int ipAddressOffset,
-                                     final TemplateRegistry templateRegistry, final String defaultDomain )
+                                     final TemplateManager templateRegistry, final String defaultDomain )
     {
         this.peer = peer;
         this.nodeGroups = nodeGroups;

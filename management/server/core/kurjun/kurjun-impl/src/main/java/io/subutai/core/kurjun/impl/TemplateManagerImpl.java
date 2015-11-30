@@ -13,6 +13,9 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.codec.binary.Hex;
+
+import com.google.common.collect.Lists;
 import com.google.inject.Injector;
 
 import ai.subut.kurjun.ar.CompressionType;
@@ -38,9 +41,8 @@ import ai.subut.kurjun.storage.factory.FileStoreModule;
 import ai.subut.kurjun.subutai.SubutaiTemplateParserModule;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
-import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.common.protocol.TemplateKurjun;
-import org.apache.commons.codec.binary.Hex;
+import io.subutai.core.kurjun.api.TemplateManager;
 
 
 public class TemplateManagerImpl implements TemplateManager
@@ -126,6 +128,22 @@ public class TemplateManagerImpl implements TemplateManager
 
 
     @Override
+    public TemplateKurjun getTemplate( final String name )
+    {
+        try
+        {
+            return getTemplate( PUBLIC_REPO, name, null );
+        }
+        catch ( IOException e )
+        {
+            LOGGER.error( "Error in getTemplate(name)", e );
+
+            return null;
+        }
+    }
+
+
+    @Override
     public InputStream getTemplateData( String context, byte[] md5 ) throws IOException
     {
         DefaultMetadata m = new DefaultMetadata();
@@ -150,6 +168,21 @@ public class TemplateManagerImpl implements TemplateManager
                     meta.getArchitecture().name(), meta.getParent(), meta.getPackage() ) );
         }
         return result;
+    }
+
+
+    @Override
+    public List<TemplateKurjun> list()
+    {
+        try
+        {
+            return list( PUBLIC_REPO );
+        }
+        catch ( IOException e )
+        {
+            LOGGER.error( "Error in list", e );
+            return Lists.newArrayList();
+        }
     }
 
 
@@ -242,7 +275,7 @@ public class TemplateManagerImpl implements TemplateManager
         bootstrap.addModule( new SnapMetadataParserModule() );
 
         bootstrap.addModule( new RepositoryModule() );
-//        bootstrap.addModule( new SecurityModule() );
+        //        bootstrap.addModule( new SecurityModule() );
 
         bootstrap.boot();
 
@@ -285,17 +318,14 @@ public class TemplateManagerImpl implements TemplateManager
         {
             Properties kcp = properties.getContextProperties( kc );
             kcp.setProperty( FileStoreFactory.TYPE, FileStoreFactory.FILE_SYSTEM );
-            kcp.setProperty( PackageMetadataStoreModule.PACKAGE_METADATA_STORE_TYPE, PackageMetadataStoreFactory.FILE_DB );
+            kcp.setProperty( PackageMetadataStoreModule.PACKAGE_METADATA_STORE_TYPE,
+                    PackageMetadataStoreFactory.FILE_DB );
         }
-
     }
 
 
     /**
      * Gets Kurjun context for templates repository type.
-     *
-     * @param context
-     * @return
      */
     private KurjunContext getContext( String context )
     {
@@ -309,5 +339,4 @@ public class TemplateManagerImpl implements TemplateManager
         }
         return null;
     }
-
 }

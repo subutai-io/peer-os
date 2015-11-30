@@ -23,9 +23,9 @@ import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.host.ContainerHostInfo;
+import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInfo;
-import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.ResourceAlert;
 import io.subutai.common.network.Vni;
@@ -42,7 +42,7 @@ import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.RequestListener;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
-import io.subutai.common.protocol.Template;
+import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.quota.QuotaException;
 import io.subutai.common.resource.ResourceType;
 import io.subutai.common.resource.ResourceValue;
@@ -52,6 +52,7 @@ import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.localpeer.impl.dao.ManagementHostDataService;
 import io.subutai.core.localpeer.impl.dao.ResourceHostDataService;
 import io.subutai.core.localpeer.impl.entity.ContainerHostEntity;
@@ -61,7 +62,6 @@ import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.core.registry.api.TemplateRegistry;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.strategy.api.StrategyManager;
@@ -116,7 +116,7 @@ public class LocalPeerImplTest
     @Mock
     PeerManager peerManager;
     @Mock
-    TemplateRegistry templateRegistry;
+    TemplateManager templateRegistry;
     @Mock
     ManagementHostEntity managementHost;
     @Mock
@@ -159,7 +159,7 @@ public class LocalPeerImplTest
     @Mock
     ContainerHostInfo containerHostInfo;
     @Mock
-    Template template;
+    TemplateKurjun template;
     @Mock
     ContainerHostInfoModel containerHostInfoModel;
     //    @Mock
@@ -207,7 +207,7 @@ public class LocalPeerImplTest
         peerMap.put( IP, N2N_IP );
         localPeer =
                 spy( new LocalPeerImpl( daoManager, templateRegistry, quotaManager, strategyManager, commandExecutor,
-                        hostRegistry, monitor, securityManager) );
+                        hostRegistry, monitor, securityManager ) );
 
         //        localPeer.containerHostDataService = containerHostDataService;
         //        localPeer.containerGroupDataService = containerGroupDataService;
@@ -244,7 +244,7 @@ public class LocalPeerImplTest
         when( resourceHostDataService.getAll() ).thenReturn( Sets.newHashSet( resourceHost ) );
         when( managementHostDataService.getAll() ).thenReturn( Sets.newHashSet( managementHost ) );
         when( templateRegistry.getTemplate( TEMPLATE_NAME ) ).thenReturn( template );
-        when( template.getTemplateName() ).thenReturn( TEMPLATE_NAME );
+        when( template.getName() ).thenReturn( TEMPLATE_NAME );
         when( resourceHost.isConnected() ).thenReturn( true );
         when( hostRegistry.getContainerHostInfoById( CONTAINER_HOST_ID ) ).thenReturn( containerHostInfo );
         when( hostRegistry.getHostInfoById( CONTAINER_HOST_ID ) ).thenReturn( containerHostInfo );

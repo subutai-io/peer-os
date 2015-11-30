@@ -36,7 +36,7 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerId;
 import io.subutai.common.peer.ResourceHost;
-import io.subutai.common.protocol.Template;
+import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.resource.ResourceType;
 import io.subutai.common.resource.ResourceValue;
 
@@ -239,7 +239,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     }
 
 
-    public Template getTemplate() throws PeerException
+    public TemplateKurjun getTemplate() throws PeerException
     {
         throw new UnsupportedOperationException();
     }

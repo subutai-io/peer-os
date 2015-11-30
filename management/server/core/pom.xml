@@ -23,7 +23,6 @@
     <module>local-peer</module>
     <module>peer-manager</module>
     <module>strategy-manager</module>
-    <module>template-registry</module>
     <module>tracker</module>
     <module>metric</module>
     <module>messenger</module>

@@ -34,15 +34,6 @@
   </command-bundle>
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="peer/import-template">
-      <action class="io.subutai.core.peer.cli.ImportTemplateCommand">
-        <property name="peerManager" ref="peerManager" />
-        <property name="templateRegistry" ref="templateRegistry" />
-      </action>
-    </command>
-  </command-bundle>
-
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="peer/hosts">
       <action class="io.subutai.core.peer.cli.HostsCommand">
         <property name="peerManager" ref="peerManager" />
@@ -87,8 +78,6 @@
   <reference id="identityManager" availability="mandatory"
              interface="io.subutai.core.identity.api.IdentityManager" />
 
-  <reference id="templateRegistry" availability="mandatory"
-             interface="io.subutai.core.registry.api.TemplateRegistry" />
   <reference id="environmentManager" availability="mandatory"
              interface="io.subutai.core.environment.api.EnvironmentManager" />
 

@@ -32,10 +32,10 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
+import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
-import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
@@ -48,7 +48,7 @@ import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerId;
-import io.subutai.common.protocol.Template;
+import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.resource.ResourceType;
 import io.subutai.common.resource.ResourceValue;
 import io.subutai.core.environment.api.EnvironmentManager;
@@ -129,8 +129,8 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
 
     public EnvironmentContainerImpl( final String localPeerId, final Peer peer, final String nodeGroupName,
-                                     final ContainerHostInfoModel hostInfo, final Template template, int sshGroupId,
-                                     int hostsGroupId, String domainName, ContainerType containerType )
+                                     final ContainerHostInfoModel hostInfo, final TemplateKurjun template,
+                                     int sshGroupId, int hostsGroupId, String domainName, ContainerType containerType )
     {
         Preconditions.checkNotNull( peer );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( nodeGroupName ) );
@@ -148,15 +148,14 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
         this.containerName = hostInfo.getContainerName();
         this.hostArchitecture = hostInfo.getArch();
         this.nodeGroupName = nodeGroupName;
-        this.templateName = template.getTemplateName();
-        this.templateArch = template.getLxcArch();
+        this.templateName = template.getName();
+        this.templateArch = template.getArchitecture();
         this.sshGroupId = sshGroupId;
         this.hostsGroupId = hostsGroupId;
         this.domainName = domainName;
         this.containerType = containerType;
         setHostInterfaces( hostInfo.getHostInterfaces() );
     }
-
 
 
     public void setPeer( final Peer peer )
@@ -267,9 +266,9 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
 
     @Override
-    public Template getTemplate() throws PeerException
+    public TemplateKurjun getTemplate() throws PeerException
     {
-         return getPeer().getTemplate( this.templateName );
+        return getPeer().getTemplate( this.templateName );
     }
 
 
@@ -392,6 +391,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
             this.hostInterfaces.add( hostInterface );
         }
     }
+
 
     @Override
     public String getIpByInterfaceName( String interfaceName )

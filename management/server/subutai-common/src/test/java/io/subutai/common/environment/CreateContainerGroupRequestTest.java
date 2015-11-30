@@ -3,10 +3,8 @@ package io.subutai.common.environment;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import org.junit.Before;
@@ -16,7 +14,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import io.subutai.common.protocol.Criteria;
-import io.subutai.common.protocol.Template;
+import io.subutai.common.protocol.TemplateKurjun;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -26,11 +24,11 @@ public class CreateContainerGroupRequestTest
 {
     private CreateContainerGroupRequest containerGroupRequest;
     private Map<String, String> myMap;
-    private List<Template> myList;
+    private List<TemplateKurjun> myList;
     private List<Criteria> myListCriteria;
 
     @Mock
-    Template template;
+    TemplateKurjun template;
     @Mock
     Criteria criteria;
 
@@ -48,8 +46,8 @@ public class CreateContainerGroupRequestTest
         myListCriteria.add( criteria );
 
         containerGroupRequest =
-                new CreateContainerGroupRequest( myMap, UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString(), "555",
-                        myList, 5, "Round Robin", myListCriteria, 555 );
+                new CreateContainerGroupRequest( myMap, UUID.randomUUID().toString(), UUID.randomUUID().toString(),
+                        UUID.randomUUID().toString(), "555", myList, 5, "Round Robin", myListCriteria, 555 );
     }
 
 

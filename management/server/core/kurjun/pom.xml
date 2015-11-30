@@ -1,53 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
-        <groupId>io.subutai</groupId>
-        <artifactId>mgmt-server-core-parent</artifactId>
-        <version>4.0.0-RC4</version>
-    </parent>
-    <modelVersion>4.0.0</modelVersion>
-    
-    <artifactId>kurjun</artifactId>
-    <name>Subutai Kurjun Parent</name>
-    <description>Subutai Kurjun Parent</description>
-    <packaging>pom</packaging>
-    
-<!--    <repositories>
-        <repository>
-            <id>local-kurjun-repo</id>
-            <url>file://${basedir}/../local-repo</url>
-            <url>file://${project.basedir}/../local-repo</url>
-            <url>file://${lib.dir}/../local-repo</url>
-        </repository>
-    </repositories>-->
-    
-    <properties>
-        <ai.subut.kurjun.version>1.0</ai.subut.kurjun.version>
-        <!--<lib.dir>${project.basedir}/lib</lib.dir>-->
-    </properties>
-      
-      
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-    
-    <modules>
-        <module>install-repository</module>
-        <module>kurjun-api</module>
-        <module>kurjun-impl</module>
-        <module>kurjun-rest</module>
-        <module>kurjun-cli</module>
-    </modules>
+  <parent>
+    <groupId>io.subutai</groupId>
+    <artifactId>mgmt-server-core-parent</artifactId>
+    <version>4.0.0-RC4</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>kurjun</artifactId>
+  <name>Subutai Kurjun Parent</name>
+  <description>Subutai Kurjun Parent</description>
+  <packaging>pom</packaging>
+
+  <!--    <repositories>
+          <repository>
+              <id>local-kurjun-repo</id>
+              <url>file://${basedir}/../local-repo</url>
+              <url>file://${project.basedir}/../local-repo</url>
+              <url>file://${lib.dir}/../local-repo</url>
+          </repository>
+      </repositories>-->
+
+  <properties>
+    <ai.subut.kurjun.version>1.0</ai.subut.kurjun.version>
+    <!--<lib.dir>${project.basedir}/lib</lib.dir>-->
+  </properties>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.3.2</version>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <modules>
+    <module>install-repository</module>
+    <module>kurjun-api</module>
+    <module>kurjun-impl</module>
+    <module>kurjun-rest</module>
+    <module>kurjun-cli</module>
+  </modules>
 </project>

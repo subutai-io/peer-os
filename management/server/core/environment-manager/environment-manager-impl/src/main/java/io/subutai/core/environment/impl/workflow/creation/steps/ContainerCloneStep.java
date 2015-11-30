@@ -20,6 +20,7 @@ import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.environment.Topology;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.ExceptionUtil;
@@ -27,8 +28,7 @@ import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.creation.steps.helpers.CreatePeerNodeGroupsTask;
 import io.subutai.core.environment.impl.workflow.creation.steps.helpers.NodeGroupBuildResult;
-import io.subutai.common.peer.LocalPeer;
-import io.subutai.core.registry.api.TemplateRegistry;
+import io.subutai.core.kurjun.api.TemplateManager;
 
 
 /**
@@ -37,7 +37,7 @@ import io.subutai.core.registry.api.TemplateRegistry;
 public class ContainerCloneStep
 {
     private static final Logger LOG = LoggerFactory.getLogger( ContainerCloneStep.class );
-    private final TemplateRegistry templateRegistry;
+    private final TemplateManager templateRegistry;
     private final String defaultDomain;
     private final Topology topology;
     private final EnvironmentImpl environment;
@@ -45,7 +45,7 @@ public class ContainerCloneStep
     protected ExceptionUtil exceptionUtil = new ExceptionUtil();
 
 
-    public ContainerCloneStep( final TemplateRegistry templateRegistry, final String defaultDomain,
+    public ContainerCloneStep( final TemplateManager templateRegistry, final String defaultDomain,
                                final Topology topology, final EnvironmentImpl environment, final LocalPeer localPeer )
     {
         this.templateRegistry = templateRegistry;

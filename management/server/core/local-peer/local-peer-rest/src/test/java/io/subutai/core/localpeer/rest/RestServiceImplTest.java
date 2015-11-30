@@ -25,7 +25,7 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.PeerPolicy;
-import io.subutai.common.protocol.Template;
+import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.peer.api.PeerManager;
@@ -307,7 +307,7 @@ public class RestServiceImplTest
     @Test
     public void testGetTemplate() throws Exception
     {
-        Template template = mock( Template.class );
+        TemplateKurjun template = mock( TemplateKurjun.class );
 
         when( localPeer.getTemplate( TEMPLATE_NAME ) ).thenReturn( template );
 

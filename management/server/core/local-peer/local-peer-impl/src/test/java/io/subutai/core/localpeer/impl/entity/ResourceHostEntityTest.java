@@ -22,7 +22,6 @@ import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostArchitecture;
-import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.ResourceHostInfo;
@@ -30,10 +29,10 @@ import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.ResourceHostException;
-import io.subutai.common.protocol.Template;
+import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.core.hostregistry.api.HostRegistry;
+import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.metric.api.Monitor;
-import io.subutai.core.registry.api.TemplateRegistry;
 
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.TestCase.assertEquals;
@@ -79,7 +78,7 @@ public class ResourceHostEntityTest
     @Mock
     CommandUtil commandUtil;
     @Mock
-    TemplateRegistry registry;
+    TemplateManager registry;
     @Mock
     HostRegistry hostRegistry;
     @Mock
@@ -95,7 +94,7 @@ public class ResourceHostEntityTest
     @Mock
     Future future;
     @Mock
-    Template template;
+    TemplateKurjun template;
 
 
     ResourceHostEntity resourceHostEntity;

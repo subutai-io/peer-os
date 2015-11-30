@@ -26,13 +26,13 @@ import io.subutai.common.peer.ContainerType;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Peer;
-import io.subutai.common.protocol.Template;
+import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
+import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.core.registry.api.TemplateRegistry;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.mockito.Matchers.any;
@@ -48,13 +48,13 @@ public class RestServiceImplTest
     @Mock
     EnvironmentManager environmentManager;
     @Mock
-    TemplateRegistry templateRegistry;
+    TemplateManager templateRegistry;
     @Mock
     PeerManager peerManager;
     @Mock
     Peer peer;
     @Mock
-    Template template;
+    TemplateKurjun template;
     @Mock
     Environment environment;
     @Mock

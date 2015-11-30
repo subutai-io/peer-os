@@ -32,10 +32,10 @@ import io.subutai.common.environment.CreateEnvironmentContainerGroupResponse;
 import io.subutai.common.environment.DestroyEnvironmentContainerGroupRequest;
 import io.subutai.common.environment.DestroyEnvironmentContainerGroupResponse;
 import io.subutai.common.exception.HTTPException;
+import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInfo;
-import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
@@ -59,7 +59,7 @@ import io.subutai.common.peer.RecipientType;
 import io.subutai.common.peer.RemotePeer;
 import io.subutai.common.peer.Timeouts;
 import io.subutai.common.protocol.N2NConfig;
-import io.subutai.common.protocol.Template;
+import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.resource.ResourceType;
 import io.subutai.common.resource.ResourceValue;
@@ -229,7 +229,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public Template getTemplate( final String templateName ) throws PeerException
+    public TemplateKurjun getTemplate( final String templateName ) throws PeerException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
 
@@ -249,7 +249,7 @@ public class RemotePeerImpl implements RemotePeer
         {
             String response = get( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, params, headers );
 
-             return jsonUtil.from( response, Template.class );
+            return jsonUtil.from( response, TemplateKurjun.class );
         }
         catch ( Exception e )
         {
@@ -896,8 +896,7 @@ public class RemotePeerImpl implements RemotePeer
     public HistoricalMetrics getHistoricalMetrics( final String hostname, final Date startTime, final Date endTime )
             throws PeerException
     {
-        return new PeerWebClient( peerInfo.getIp(), provider )
-                .getHistoricalMetrics( hostname, startTime, endTime );
+        return new PeerWebClient( peerInfo.getIp(), provider ).getHistoricalMetrics( hostname, startTime, endTime );
     }
 
 
