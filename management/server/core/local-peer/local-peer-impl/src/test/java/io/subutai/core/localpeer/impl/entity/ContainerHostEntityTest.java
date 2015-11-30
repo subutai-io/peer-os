@@ -25,6 +25,7 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.resource.ResourceType;
 import io.subutai.common.resource.ResourceValue;
+import junit.framework.Assert;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
@@ -51,6 +52,8 @@ public class ContainerHostEntityTest
     private static final int RAM_QUOTA = 2048;
     private static final int CPU_QUOTA = 100;
     private static final Set<Integer> CPU_SET = Sets.newHashSet( 1, 3, 5 );
+    private static final String TEMPLATE_NAME = "master";
+    private static final String TEMP_ARCH = "amd64";
 
     //    @Mock
     //    DataService dataService;
@@ -87,7 +90,7 @@ public class ContainerHostEntityTest
         when( anHostInterface.getIp() ).thenReturn( IP );
         when( anHostInterface.getMac() ).thenReturn( MAC );
 
-        containerHostEntity = new ContainerHostEntity( PEER_ID.toString(), containerHostInfo );
+        containerHostEntity = new ContainerHostEntity( PEER_ID.toString(), containerHostInfo,TEMPLATE_NAME, TEMP_ARCH );
         //        containerHostEntity.setLocalPeer( localPeer );
         //        containerHostEntity.setDataService( dataService );
         containerHostEntity.setParent( resourceHost );
@@ -104,10 +107,15 @@ public class ContainerHostEntityTest
     }
 
 
-    @Test( expected = UnsupportedOperationException.class )
+    @Test()
     public void testGetTemplateName() throws Exception
     {
-        containerHostEntity.getTemplateName();
+        assertEquals( TEMPLATE_NAME, containerHostEntity.getTemplateName() );
+    }
+    @Test()
+    public void testGetTemplateArch() throws Exception
+    {
+        assertEquals( TEMP_ARCH, containerHostEntity.getTemplateArch() );
     }
 
 

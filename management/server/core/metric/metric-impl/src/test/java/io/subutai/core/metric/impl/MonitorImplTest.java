@@ -256,23 +256,23 @@ public class MonitorImplTest
     }
 
 
-    @Test
-    public void testAlertThresholdExcess() throws Exception
-    {
-
-        monitor.notifyOnAlert( alert );
-
-        //verify( identityManager ).loginWithToken( anyString() );
-    }
-
-
-    @Test( expected = MonitorException.class )
-    public void testAlertThresholdExcessException() throws Exception
-    {
-        doThrow( new DaoException( "" ) ).when( monitorDao ).getEnvironmentSubscribersIds( ENVIRONMENT_ID );
-
-        monitor.notifyOnAlert( alert );
-    }
+//    @Test
+//    public void testAlertThresholdExcess() throws Exception
+//    {
+//
+//        monitor.notifyOnAlert( alert );
+//
+//        //verify( identityManager ).loginWithToken( anyString() );
+//    }
+//
+//
+//    @Test( expected = MonitorException.class )
+//    public void testAlertThresholdExcessException() throws Exception
+//    {
+//        doThrow( new DaoException( "" ) ).when( monitorDao ).getEnvironmentSubscribersIds( ENVIRONMENT_ID );
+//
+//        monitor.notifyOnAlert( alert );
+//    }
 
 
     @Test
