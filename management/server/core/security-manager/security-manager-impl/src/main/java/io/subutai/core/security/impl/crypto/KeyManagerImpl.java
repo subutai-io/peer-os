@@ -162,14 +162,10 @@ public class KeyManagerImpl implements KeyManager
     {
         try
         {
-            String secretFPrint = PGPKeyUtil.getFingerprint( sourceSecRing.getPublicKey().getFingerprint() );
-
-            //****************************************
-            String keyIdentityId = getKeyDataByFingerprint( secretFPrint ).getIdentityId();
-            //****************************************
+            String sigId = PGPKeyUtil.encodeNumericKeyId( targetPubRing.getPublicKey().getKeyID() );
 
             targetPubRing =
-                    encryptionTool.signPublicKey( targetPubRing, keyIdentityId, sourceSecRing.getSecretKey(), "" );
+                    encryptionTool.signPublicKey( targetPubRing, sigId, sourceSecRing.getSecretKey(), "" );
         }
         catch ( Exception ex )
         {
@@ -234,7 +230,6 @@ public class KeyManagerImpl implements KeyManager
                 keyTrust = saveKeyTrustData( sFingerprint, tFingerprint, KeyTrustLevel.Never.getId() );
             }
 
-
             if ( trustLevel == KeyTrustLevel.Never.getId() )
             {
                 //******************************************
@@ -251,6 +246,7 @@ public class KeyManagerImpl implements KeyManager
                 }
             }
 
+            keyTrust.setLevel( trustLevel );
             securityDataService.updateKeyTrustData( keyTrust );
 
         }
@@ -311,8 +307,8 @@ public class KeyManagerImpl implements KeyManager
     @Override
     public boolean verifySignature( String sourceFingerprint, String targetFingerprint )
     {
-        PGPPublicKeyRing sourcePubRing = getPublicKeyRingByFingerprint( targetFingerprint );
-        PGPPublicKeyRing targetPubRing = getPublicKeyRingByFingerprint( sourceFingerprint );
+        PGPPublicKeyRing sourcePubRing = getPublicKeyRingByFingerprint( sourceFingerprint );
+        PGPPublicKeyRing targetPubRing = getPublicKeyRingByFingerprint( targetFingerprint );
 
         return verifySignature( sourcePubRing, targetPubRing );
     }
@@ -324,9 +320,11 @@ public class KeyManagerImpl implements KeyManager
     @Override
     public boolean verifySignature( PGPPublicKeyRing sourcePubRing, PGPPublicKeyRing targetPubRing )
     {
-        PGPPublicKey targetPublicKey = targetPubRing.getPublicKey();
-        return encryptionTool.verifyPublicKey( targetPublicKey, Long.toHexString( targetPublicKey.getKeyID() ),
-                sourcePubRing.getPublicKey() );
+        PGPPublicKey keyToVerifyWith = sourcePubRing.getPublicKey();
+        PGPPublicKey keyToVerify     = targetPubRing.getPublicKey();
+        String sigId = PGPKeyUtil.encodeNumericKeyId( keyToVerify.getKeyID());
+
+        return encryptionTool.verifyPublicKey( keyToVerify, sigId , keyToVerifyWith );
     }
 
 
