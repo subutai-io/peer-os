@@ -14,7 +14,7 @@ import static org.mockito.Mockito.when;
 
 
 @RunWith( MockitoJUnitRunner.class )
-public class MetricComparatorTest
+public class HistoricalMetricsComparatorTest
 {
     private final static double DELTA = 1e-15;
     @Mock

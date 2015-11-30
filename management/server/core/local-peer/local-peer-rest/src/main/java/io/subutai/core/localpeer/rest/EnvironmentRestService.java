@@ -40,11 +40,11 @@ public interface EnvironmentRestService
     void destroyContainer( ContainerId containerId );
 
 
-    @POST
-    @Path( "{environmentId}/container/state" )
+    @GET
+    @Path( "{environmentId}/container/{containerId}/state" )
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( { MediaType.APPLICATION_JSON } )
-    ContainerHostState getContainerState( ContainerId containerId );
+    ContainerHostState getContainerState( @PathParam( "containerId" ) ContainerId containerId );
 
     @GET
     @Path( "{environmentId}/container/{containerId}/usage/{pid}" )
@@ -77,7 +77,7 @@ public interface EnvironmentRestService
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
     Response setQuota( @PathParam( "containerId" ) ContainerId containerId,
-                           @PathParam( "resourceType" ) ResourceType resourceType, ResourceValue resourceValue );
+                       @PathParam( "resourceType" ) ResourceType resourceType, ResourceValue resourceValue );
 
     @GET
     @Path( "{environmentId}/container/{containerId}/quota/{resourceType}/available" )

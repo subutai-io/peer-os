@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 
+import com.google.common.base.Preconditions;
+
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerId;
@@ -92,14 +94,18 @@ public class EnvironmentWebClient
 
     public ContainerHostState getState( final String host, final ContainerId containerId )
     {
-        String path = String.format( "/%s/container/state", containerId.getEnvironmentId().getId() );
+        Preconditions.checkNotNull( containerId );
+        Preconditions.checkNotNull( containerId.getId() );
+
+        String path =
+                String.format( "/%s/container/%s/state", containerId.getEnvironmentId().getId(), containerId.getId() );
         WebClient client = WebClientBuilder.buildEnvironmentWebClient( host, path, provider );
 
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
         try
         {
-            return client.post( containerId, ContainerHostState.class );
+            return client.get( ContainerHostState.class );
         }
         catch ( Exception e )
         {

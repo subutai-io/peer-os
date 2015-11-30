@@ -9,6 +9,7 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -89,6 +90,7 @@ import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.quota.ContainerQuotaHolder;
 import io.subutai.common.quota.QuotaException;
+import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.resource.ResourceType;
 import io.subutai.common.resource.ResourceValue;
 import io.subutai.common.security.PublicKeyContainer;
@@ -359,11 +361,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         try
         {
-            ContainerHost containerHost = bindHost( containerId );
-            return containerHost.getState();
+            ContainerHostInfo containerHostInfo =
+                    ( ContainerHostInfo ) hostRegistry.getHostInfoById( containerId.getId() );
+            return containerHostInfo.getState();
         }
         catch ( Exception e )
         {
+            LOG.error( e.getMessage(), e );
             return ContainerHostState.UNKNOWN;
         }
     }
@@ -1891,6 +1895,22 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public void alert( AlertPack alert )
     {
         monitor.addAlert( alert );
+    }
+
+
+    @Override
+    public HistoricalMetrics getHistoricalMetrics( final String hostname, final Date startTime, final Date endTime )
+            throws PeerException
+    {
+        try
+        {
+            Host host = bindHost( hostname );
+            return monitor.getHistoricalMetrics( host, startTime, endTime );
+        }
+        catch ( HostNotFoundException e )
+        {
+            throw new PeerException( e.getMessage(), e );
+        }
     }
 
 
