@@ -48,6 +48,13 @@ public interface RestService
 
 
 
+    @GET
+    @Path( "roles/types" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response getRoleTypes();
+
+
+
     /** Permissions ***********************************************/
 
     @GET

@@ -9,7 +9,9 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 
+import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.util.JsonUtil;
+import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.common.command.RequestBuilder;
 
@@ -18,18 +20,20 @@ public class RestServiceImpl implements RestService
 {
     private static final Logger LOG = LoggerFactory.getLogger( RestServiceImpl.class );
     private CommandExecutor commandExecutor;
+    private EnvironmentManager environmentManager;
 
 
-    public RestServiceImpl( final CommandExecutor commandExecutor )
+    public RestServiceImpl( final CommandExecutor commandExecutor, final EnvironmentManager environmentManager )
     {
         Preconditions.checkNotNull( commandExecutor );
 
         this.commandExecutor = commandExecutor;
+        this.environmentManager = environmentManager;
     }
 
     @Override
-    public Response executeCommand( final String hostId, final String command, final String path,
-                                    final Boolean daemon, final Integer timeOut )
+    public Response executeCommand( final String hostId, final String command, final String environmentId,
+                                    final String path, final Boolean daemon, final Integer timeOut )
     {
         try {
             Preconditions.checkNotNull( hostId, "Invalid host id" );
@@ -48,7 +52,24 @@ public class RestServiceImpl implements RestService
                 request.withTimeout( timeOut );
             }
 
-            CommandResult result = commandExecutor.execute( hostId, request );
+            CommandResult result;
+            if( environmentId != null )
+            {
+                try
+                {
+                    ContainerHost containerHost = environmentManager.loadEnvironment( environmentId ).getContainerHostById( hostId );
+                    result = containerHost.execute( request );
+                }
+                catch ( Exception e )
+                {
+                    return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( e.getMessage() ) ).build();
+                }
+            }
+            else
+            {
+                result = commandExecutor.execute( hostId, request );
+            }
+
 
             return Response.ok().entity( JsonUtil.toJson( result )).build();
         }

@@ -59,15 +59,15 @@ function TokensCtrl(identitySrv, $scope, DTOptionsBuilder, DTColumnBuilder, $res
 	}
 
 	function dateFormat(data, type, full, meta) {
-		var dateFormat = new Date(data.validDate);
+		var currentDate = new Date(data.validDate);
 
-		var day = dateFormat.getDate();
-		var month = dateFormat.getMonth();
-		var year = dateFormat.getFullYear();
+		var day = currentDate.getDate();
+		var month = currentDate.getMonth() + 1;
+		var year = currentDate.getFullYear();
 
-		var houre = dateFormat.getHours();
-		var minutes = dateFormat.getMinutes();
-		var seconds = dateFormat.getSeconds();
+		var houre = currentDate.getHours();
+		var minutes = currentDate.getMinutes();
+		var seconds = currentDate.getSeconds();
 
 		return day + '/' + month + '/' + year + ' ' + houre + ':' + minutes + ':' + seconds;
 	}

@@ -195,6 +195,7 @@ function CreateBlueprintCtrl($scope, environmentService, ngDialog) {
 	vm.addNewNode = addNewNode;
 	vm.setNodeData = setNodeData;
 	vm.removeNodeGroup = removeNodeGroup;
+	vm.changeTemplate = changeTemplate;
 
 	function addNewNode() {
 		if(vm.nodeStatus == 'Add to') {
@@ -259,6 +260,16 @@ function CreateBlueprintCtrl($scope, environmentService, ngDialog) {
 				vm.nodeList.splice( i, 1 );
 				break;
 			}
+		}
+	}
+
+	function changeTemplate(template) {
+		if(template == 'hadoop') {
+			vm.blueprintFrom.currentNode.sshGroupId = 1;
+			vm.blueprintFrom.currentNode.hostsGroupId = 1;
+		} else {
+			vm.blueprintFrom.currentNode.sshGroupId = 0;
+			vm.blueprintFrom.currentNode.hostsGroupId = 0;
 		}
 	}
 

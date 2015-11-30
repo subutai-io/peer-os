@@ -23,6 +23,7 @@ function ConsoleViewCtrl($scope, consoleService, peerRegistrationService, $state
 	vm.currentTab = '';
 	vm.daemon = false;
 	vm.timeOut = 0;
+	vm.selectedEnvironment = '';
 
 	if($stateParams.containerId !== undefined && $stateParams.containerId.length > 0) {
 		vm.activeConsole = $stateParams.containerId;
@@ -107,7 +108,7 @@ function ConsoleViewCtrl($scope, consoleService, peerRegistrationService, $state
 				return;
 			}
 
-			consoleService.sendCommand(cmd.command, vm.activeConsole, $scope.prompt.path(), vm.daemon, vm.timeOut).success(function(data){
+			consoleService.sendCommand(cmd.command, vm.activeConsole, $scope.prompt.path(), vm.daemon, vm.timeOut, vm.selectedEnvironment).success(function(data){
 				if(data.stdErr.length > 0) {
 					output = data.stdErr.split('\r');
 				} else {
@@ -170,6 +171,7 @@ function ConsoleViewCtrl($scope, consoleService, peerRegistrationService, $state
 
 	function setCurrentType(type) {
 		vm.containers = [];
+		vm.selectedEnvironment = '';
 		vm.currentType = type;
 	}
 
