@@ -233,7 +233,8 @@ public class KeyManagerImpl implements KeyManager
             SecurityKey sourceSecurityKey = getKeyDataByFingerprint( sourceFingerprint );
             SecurityKey targetSecurityKey = getKeyDataByFingerprint( targetFingerprint );
 
-            if ( !verifyTrustRelationValidity( SecurityKeyType. ) )
+            if ( !verifyTrustRelationValidity( SecurityKeyType.getById( sourceSecurityKey.getType() ),
+                    SecurityKeyType.getById( targetSecurityKey.getType() ) ) )
             {
                 throw new RuntimeException( "Trust is not allow for this relation" );
             }
@@ -267,34 +268,6 @@ public class KeyManagerImpl implements KeyManager
             LOG.error( " **** Error!!! Error creating key trust:" + ex.toString(), ex );
         }
     }
-
-
-    //TODO need to finish
-    private SecurityKeyType getSecurityTypeById( int securityType )
-    {
-        if ( SecurityKeyType.ContainerHostKey.getId() == securityType )
-        {
-            return SecurityKeyType.ContainerHostKey;
-        }
-        return false;
-        case EnvironmentKey:
-        return targetKeyType == SecurityKeyType.PeerEnvironmentKey;
-        case ManagementHostKey:
-        return targetKeyType == SecurityKeyType.ResourceHostKey;
-        case PeerEnvironmentKey:
-        return targetKeyType == SecurityKeyType.ContainerHostKey;
-        case PeerKey:
-        return targetKeyType == SecurityKeyType.ManagementHostKey;
-        case PeerOwnerKey:
-        return targetKeyType == SecurityKeyType.PeerKey;
-        case ResourceHostKey:
-        return targetKeyType == SecurityKeyType.ContainerHostKey;
-        case UserKey:
-        return targetKeyType == SecurityKeyType.EnvironmentKey;
-    }
-
-
-}
 
 
     private boolean verifyTrustRelationValidity( SecurityKeyType sourceKeyType, SecurityKeyType targetKeyType )
