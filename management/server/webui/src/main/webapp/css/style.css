@@ -1759,7 +1759,8 @@ td.b-main-table__status-col {
 }
 
 .b-file-uploader {
-	
+	font-size: 0px;
+	line-height: 0;
 }
 
 .b-file-uploader .fileUpload {
@@ -1782,5 +1783,15 @@ td.b-main-table__status-col {
 	top: 50%;
 	left: 50%;
 	margin: -12px 0 0 -12px;
+}
+
+.b-popup-checkbox {
+	line-height: 20px;
+	vertical-align: middle;
+}
+
+.b-popup-checkbox__input {
+	margin: 0 0 0 10px;
+	vertical-align: middle;
 }
 

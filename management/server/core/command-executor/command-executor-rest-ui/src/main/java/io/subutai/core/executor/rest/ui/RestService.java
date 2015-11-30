@@ -14,6 +14,7 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     Response executeCommand( @FormParam( "hostId" ) String hostId,
                                     @FormParam( "command" ) String content,
+                                    @FormParam( "environmentId" ) String environmentId,
                                     @FormParam( "path" ) String path,
                                     @FormParam( "daemon" ) Boolean daemon,
                                     @FormParam( "timeOut" ) Integer timeOut );

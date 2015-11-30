@@ -348,6 +348,21 @@ public class RestServiceImpl implements RestService
 
 
     @Override
+    public Response getEnvironmentDomain( final String environmentId )
+    {
+        try
+        {
+            return Response.ok( JsonUtil.toJson( environmentManager.getEnvironmentDomain( environmentId ) ) ).build();
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "getEnvironmentDomain error", e );
+            return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( e.getMessage() ) ).build();
+        }
+    }
+
+
+    @Override
     public Response addEnvironmentDomain( String environmentId, String hostName, String strategyJson,
                                           Attachment attr )
     {
@@ -397,6 +412,44 @@ public class RestServiceImpl implements RestService
         return Response.ok().build();
     }
 
+
+    @Override
+    public Response isContainerDomain( final String environmentId, final String containerId )
+    {
+        try
+        {
+            return Response.ok( environmentManager.isContainerInEnvironmentDomain( containerId, environmentId ) )
+                               .build();
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Cannot check domain status of container", e );
+            return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( e.getMessage() ) ).build();
+        }
+    }
+
+
+    @Override
+    public Response setContainerDomain( final String environmentId, final String containerId )
+    {
+        try
+        {
+            if( environmentManager.isContainerInEnvironmentDomain( containerId, environmentId ) )
+            {
+                environmentManager.addContainerToEnvironmentDomain( containerId, environmentId );
+            }
+            else
+            {
+                environmentManager.removeContainerFromEnvironmentDomain( containerId, environmentId  );
+            }
+        }
+        catch ( Exception e )
+        {
+            return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( e.getMessage() ) ).build();
+        }
+
+        return Response.ok().build();
+    }
 
 
     /** Containers *****************************************************/
@@ -803,6 +856,9 @@ public class RestServiceImpl implements RestService
     }
 
 
+
+    /** Tags *****************************************************/
+
     @Override
     public Response addTags( final String environmentId, final String containerId, final String tagsJson )
     {
@@ -815,6 +871,8 @@ public class RestServiceImpl implements RestService
             Set<String> tags = JsonUtil.fromJson( tagsJson, new TypeToken<Set<String>>(){}.getType() );
 
             tags.stream().forEach( tag -> containerHost.addTag( tag ) );
+
+            environmentManager.notifyOnContainerStateChanged( environment, null );
         }
         catch ( Exception e )
         {
@@ -832,6 +890,8 @@ public class RestServiceImpl implements RestService
         {
             Environment environment = environmentManager.loadEnvironment( environmentId );
             environment.getContainerHostById( containerId ).removeTag( tag );
+
+            environmentManager.notifyOnContainerStateChanged( environment, null );
         }
         catch ( Exception e )
         {
