@@ -85,7 +85,7 @@
         <xz.version>1.5</xz.version>
         <jdeb.version>1.4</jdeb.version>
         <bcpg-jdk15on.version>1.52</bcpg-jdk15on.version>
-        <subutai.version>4.0.0-RC3</subutai.version>
+        <subutai.version>4.0.0-RC4</subutai.version>
         <org.osgi.core.version>6.0.0</org.osgi.core.version>
         <org.osgi.compendium.version>5.0.0</org.osgi.compendium.version>
         <!-- CXF JAX-RS version is old, using that version to be compatible with Subutai utility classes -->
@@ -445,7 +445,7 @@
             <dependency>
                 <groupId>io.subutai</groupId>
                 <artifactId>subutai-common</artifactId>
-                <version>4.0.0-RC3</version>
+                <version>4.0.0-RC4</version>
             </dependency>
       
             <dependency>
