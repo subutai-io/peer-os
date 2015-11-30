@@ -18,16 +18,19 @@ function print_help() {
 }
 
 function choice_mngh1(){
+    cd /home/ubuntu/playbooks-newui
     mh1=$OPTARG;
     echo "$mh1" > src/test/resources/parameters/mng_h1
 }
 
 function choice_mngh2(){
+    cd /home/ubuntu/playbooks-newui
     mh2=$OPTARG;
     echo "$mh2" > src/test/resources/parameters/mng_h2
 }
 
 function list_stories(){
+    cd /home/ubuntu/playbooks-newui
     echo "======================================================================"
     echo "LIST of the ALL PLAYBOOKS: "
     echo
@@ -43,6 +46,7 @@ function list_playbooks(){
     echo "======================================================================"
     echo "LIST of the RUN PLAYBOOKS: "
     echo
+    cd /home/ubuntu/playbooks-newui
     DIR="src/test/resources/stories/tests_run/"
      if [[ -d "$DIR" && "$(ls -A $DIR)" ]]; then
         cd "$DIR"
@@ -56,6 +60,7 @@ function list_playbooks(){
 }
 
 function choice_stories(){
+    cd /home/ubuntu/playbooks-newui
     mvn clean;
     ns_path=$OPTARG;
     arr=($ns_path);
@@ -72,10 +77,10 @@ function choice_stories(){
       do echo ${i//directory_stories=*/directory_stories=\"stories/tests_run/*/*\"\;};
       done > newfile;
       mv newfile src/test/java/od/jbehave/AcceptanceTestSuite.java;
-      cd src/test/resources/stories/tests_run
-      echo
-      echo "PLAYBOOKS FOR RUN: "
-      find * -type f
+      #cd src/test/resources/stories/tests_run
+      #echo
+      #echo "PLAYBOOKS FOR RUN: "
+      #find * -type f
       echo
 
     else
@@ -101,14 +106,24 @@ function choice_stories(){
 }
 
 function run_tests(){
-    mvn clean; mvn integration-test; mvn serenity:aggregate;
+    cd /home/ubuntu/playbooks-newui
+    Xvfb :10 -ac &
+    export DISPLAY=:10
+    firefox &
+    rmdir -r mvn clean; mvn integration-test; mvn serenity:aggregate;
+}
+
+function copy_results(){
+    buildName=$OPTARG;
+    echo DEBUG Entered Copy files, build name is $buildName
+    scp -r /home/ubuntu/playbooks-newui/target/site/serenity/ ubuntu@10.10.12.1:$buildName 2>&1>/dev/null
 }
 
 if [ $# = 0 ]; then
     print_help
 fi
 
-while getopts "m:M:s:rLlh" opt;
+while getopts "m:M:s:ro:Llh" opt;
 do
     case $opt in
         m) choice_mngh1;
@@ -123,10 +138,10 @@ do
             ;;
         r) run_tests;
             ;;
+        o) copy_results;
+            ;;
         h) echo "Print Help Page"
            print_help;
             ;;
         esac
 done
-shift $(($OPTIND - 1))
-
