@@ -42,7 +42,7 @@ public interface RestAptManager
 
 
     @GET
-    @Path( "dists/{release}/{component}/{arch: binary-\\w+}/{packages: Packages(\\.\\w+)?}" )
+    @Path( "dists/{release}/{component}/{arch: \\w+(-\\w+)?}/{packages: Packages(\\.\\w+)?}" )
     @Produces( MediaType.TEXT_PLAIN )
     Response getPackagesIndex(
             @PathParam( "release" ) String release,
