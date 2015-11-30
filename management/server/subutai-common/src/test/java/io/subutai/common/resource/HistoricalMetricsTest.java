@@ -31,16 +31,18 @@ public class HistoricalMetricsTest
     @Test
     public void testReadSeries() throws IOException
     {
-        historicalMetrics = objectMapper.readValue( HistoricalMetricsTest.class.getClassLoader().getResourceAsStream( "lxc.txt" ),
-                HistoricalMetrics.class );
+        historicalMetrics = objectMapper
+                .readValue( HistoricalMetricsTest.class.getClassLoader().getResourceAsStream( "lxc.txt" ),
+                        HistoricalMetrics.class );
     }
 
 
     @Test
     public void testNotNullSeries() throws IOException
     {
-        historicalMetrics = objectMapper.readValue( HistoricalMetricsTest.class.getClassLoader().getResourceAsStream( "lxc.txt" ),
-                HistoricalMetrics.class );
+        historicalMetrics = objectMapper
+                .readValue( HistoricalMetricsTest.class.getClassLoader().getResourceAsStream( "lxc.txt" ),
+                        HistoricalMetrics.class );
         assertNotNull( historicalMetrics.getMetrics() );
     }
 
@@ -48,18 +50,20 @@ public class HistoricalMetricsTest
     @Test
     public void testSeriesCount() throws IOException
     {
-        historicalMetrics = objectMapper.readValue( HistoricalMetricsTest.class.getClassLoader().getResourceAsStream( "lxc.txt" ),
-                HistoricalMetrics.class );
-        assertEquals( 4, historicalMetrics.getMetrics().length );
+        historicalMetrics = objectMapper
+                .readValue( HistoricalMetricsTest.class.getClassLoader().getResourceAsStream( "lxc.txt" ),
+                        HistoricalMetrics.class );
+        assertEquals( 4, historicalMetrics.getMetrics().size() );
     }
 
 
     @Test
     public void testSeriesLxcCpu() throws IOException
     {
-        historicalMetrics = objectMapper.readValue( HistoricalMetricsTest.class.getClassLoader().getResourceAsStream( "lxc.txt" ),
-                HistoricalMetrics.class );
-        SeriesBatch batch = historicalMetrics.getMetrics()[0];
+        historicalMetrics = objectMapper
+                .readValue( HistoricalMetricsTest.class.getClassLoader().getResourceAsStream( "lxc.txt" ),
+                        HistoricalMetrics.class );
+        SeriesBatch batch = historicalMetrics.getMetrics().get( 0 );
         Series lxcCpuSeries = batch.getSeries()[0];
         assertEquals( "lxc_cpu", lxcCpuSeries.name );
         assertEquals( 1, lxcCpuSeries.tags.size() );
@@ -67,7 +71,7 @@ public class HistoricalMetricsTest
         assertNotNull( lxcCpuSeries.getValues() );
         assertTrue( lxcCpuSeries.getValues().size() > 0 );
         assertEquals( 2, lxcCpuSeries.getValues().get( 0 ).size() );
-        assertEquals( "2015-11-30T03:02:00Z", lxcCpuSeries.getValues().get( 0 ).get(0) );
-        assertEquals( "0", lxcCpuSeries.getValues().get( 0 ).get(1) );
+        assertEquals( "2015-11-30T03:02:00Z", lxcCpuSeries.getValues().get( 0 ).get( 0 ) );
+        assertEquals( "0", lxcCpuSeries.getValues().get( 0 ).get( 1 ) );
     }
 }

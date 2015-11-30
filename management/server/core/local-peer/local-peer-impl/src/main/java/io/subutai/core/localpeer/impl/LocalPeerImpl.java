@@ -955,7 +955,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         KeyManager keyManager = securityManager.getKeyManager();
 
         keyManager.removeKeyData( environmentId.getId() );
-        keyManager.removeKeyData( getId()+"-"+ environmentId.getId() );
+        keyManager.removeKeyData( getId() + "-" + environmentId.getId() );
     }
 
 
@@ -1576,7 +1576,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             keyManager.saveSecretKeyRing( pairId, SecurityKeyType.PeerEnvironmentKey.getId(), secRing );
             keyManager.savePublicKeyRing( pairId, SecurityKeyType.PeerEnvironmentKey.getId(), pubRing );
 
-            pubRing = securityManager.getKeyManager().setKeyTrust( peerSecKeyRing, pubRing, KeyTrustLevel.Full.getId() );
+            pubRing =
+                    securityManager.getKeyManager().setKeyTrust( peerSecKeyRing, pubRing, KeyTrustLevel.Full.getId() );
 
             return new PublicKeyContainer( getId(), pubRing.getPublicKey().getFingerprint(),
                     encTool.armorByteArrayToString( pubRing.getEncoded() ) );
@@ -1905,13 +1906,40 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         try
         {
-            Host host = bindHost( hostname );
+            Host host = findHostByName( hostname );
             return monitor.getHistoricalMetrics( host, startTime, endTime );
         }
         catch ( HostNotFoundException e )
         {
             throw new PeerException( e.getMessage(), e );
         }
+    }
+
+
+    private Host findHostByName( final String hostname ) throws HostNotFoundException
+    {
+        if ( managementHost.getHostname().equals( hostname ) )
+        {
+            return managementHost;
+        }
+        Host result = null;
+
+        for ( ResourceHost resourceHost : resourceHosts )
+        {
+            if ( resourceHost.getHostname().equals( hostname ) )
+            {
+                return resourceHost;
+            }
+            for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
+            {
+                if ( containerHost.getHostname().equals( hostname ) )
+                {
+                    return containerHost;
+                }
+            }
+        }
+
+        throw new HostNotFoundException( "Host by name '" + hostname + "' not found." );
     }
 
 
