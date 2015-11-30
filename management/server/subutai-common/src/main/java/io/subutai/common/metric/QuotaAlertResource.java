@@ -13,39 +13,39 @@ import io.subutai.common.host.HostId;
  * Resource alert value
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ResourceAlertValue implements AlertValue
+public class QuotaAlertResource implements AlertResource
 {
     @JsonProperty( "value" )
-    private ResourceAlert value;
+    private ResourceAlert resource;
 
 
-    public ResourceAlertValue( @JsonProperty( "value" ) final ResourceAlert value )
+    public QuotaAlertResource( @JsonProperty( "resource" ) final ResourceAlert resource )
     {
-        Preconditions.checkNotNull( value );
-        Preconditions.checkNotNull( value.getHostId() );
-        Preconditions.checkNotNull( value.getResourceType() );
-        this.value = value;
+        Preconditions.checkNotNull( resource );
+        Preconditions.checkNotNull( resource.getHostId() );
+        Preconditions.checkNotNull( resource.getResourceType() );
+        this.resource = resource;
     }
 
 
     @Override
     public String getId()
     {
-        return value.getHostId() + ":" + value.getResourceType();
+        return resource.getHostId() + ":" + resource.getResourceType();
     }
 
 
     @Override
     public ResourceAlert getValue()
     {
-        return value;
+        return resource;
     }
 
 
     @Override
     public HostId getHostId()
     {
-        return value.getHostId();
+        return resource.getHostId();
     }
 
 
@@ -60,7 +60,7 @@ public class ResourceAlertValue implements AlertValue
     public String toString()
     {
         final StringBuffer sb = new StringBuffer( "ResourceAlertValue{" );
-        sb.append( "value=" ).append( value );
+        sb.append( "resource=" ).append( resource );
         sb.append( '}' );
         return sb.toString();
     }
