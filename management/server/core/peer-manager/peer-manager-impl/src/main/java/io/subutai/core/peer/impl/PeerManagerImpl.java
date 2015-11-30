@@ -1,6 +1,7 @@
 package io.subutai.core.peer.impl;
 
 
+import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -30,6 +31,7 @@ import io.subutai.common.peer.RegistrationData;
 import io.subutai.common.peer.RegistrationStatus;
 import io.subutai.common.settings.ChannelSettings;
 import io.subutai.common.util.SecurityUtilities;
+import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.messenger.api.Messenger;
 import io.subutai.core.peer.api.PeerAction;
 import io.subutai.core.peer.api.PeerActionListener;
@@ -50,6 +52,7 @@ import io.subutai.core.security.api.SecurityManager;
 public class PeerManagerImpl implements PeerManager
 {
     private static final Logger LOG = LoggerFactory.getLogger( PeerManagerImpl.class );
+    private static final String KURJUN_URL_PATTERN = "https://%s:%s/rest/kurjun/templates/public";
 
 
     protected PeerDAO peerDAO;
@@ -62,17 +65,19 @@ public class PeerManagerImpl implements PeerManager
     private Object provider;
     private Map<String, RegistrationData> registrationRequests = new ConcurrentHashMap<>();
     private List<PeerActionListener> peerActionListeners = new CopyOnWriteArrayList<>();
+    private TemplateManager templateManager;
 
 
     public PeerManagerImpl( final Messenger messenger, LocalPeer localPeer, DaoManager daoManager,
                             MessageResponseListener messageResponseListener, SecurityManager securityManager,
-                            Object provider )
+                            TemplateManager templateManager, Object provider )
     {
         this.messenger = messenger;
         this.localPeer = localPeer;
         this.daoManager = daoManager;
         this.messageResponseListener = messageResponseListener;
         this.securityManager = securityManager;
+        this.templateManager = templateManager;
         this.provider = provider;
         //todo expose CommandResponseListener as service "RequestListener" and inject here
         commandResponseListener = new CommandResponseListener();
@@ -156,7 +161,10 @@ public class PeerManagerImpl implements PeerManager
             ManagementHost mgmHost = getLocalPeer().getManagementHost();
             try
             {
-                mgmHost.addRepository( registrationData.getPeerInfo().getIp() );
+                //                mgmHost.addRepository( registrationData.getPeerInfo().getIp() );
+                templateManager.addRemoteRepository( new URL(
+                        String.format( KURJUN_URL_PATTERN, registrationData.getPeerInfo().getIp(),
+                                ChannelSettings.SECURE_PORT_X1 ) ) );
             }
             catch ( Exception ignore )
             {
@@ -199,7 +207,10 @@ public class PeerManagerImpl implements PeerManager
 
         try
         {
-            mgmHost.removeRepository( p.getId(), p.getIp() );
+            //            mgmHost.removeRepository( p.getId(), p.getIp() );
+            templateManager.removeRemoteRepository( new URL(
+                    String.format( KURJUN_URL_PATTERN, registrationData.getPeerInfo().getIp(),
+                            ChannelSettings.SECURE_PORT_X1 ) ) );
         }
         catch ( Exception ignore )
         {
