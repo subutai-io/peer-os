@@ -1,0 +1,31 @@
+#!/bin/bash
+if [ -z "$1" ]
+  then
+    echo "No argument provided"
+    echo "First argument should be ip address of management host"	
+    echo "Example: "
+    echo "         node-approve 10.10.10.1"
+    exit 1
+fi
+
+sptoken=`curl -s --data "username=admin&password=secret" --insecure https://$1:8443/rest/v1/identity/gettoken`
+
+#response=`curl -s -k https://10.10.12.20:8443/rest/v1/registration/requests?sptoken=$sptoken` #| sed -e 's/[{}]/''/g' | awk -v RS=',' -F: '/id/ {print $2}' | awk '{print $1}'`
+
+rsp=`curl -s -k https://$1:8443/rest/v1/registration/requests?sptoken=$sptoken | awk -F"," -v k="\"id\": \"" '{
+    gsub(/{|}/,"")
+    for(i=1;i<=NF;i++){
+        if ( $i ~ k ){
+            print $i
+        }
+    }
+}' | awk '{print $2 $4}' | tr -d ' ' | tr -d \"` 
+
+
+arr=( $rsp )
+for i in "${arr[@]}"; 
+do 
+curl -X POST -k https://$1:8443/rest/v1/registration/requests/$i/approve?sptoken=$sptoken;
+echo Approved $i;
+done
+
