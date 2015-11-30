@@ -235,6 +235,11 @@ public class DefSubutaiStepsThen {
         subutaiSteps.observeLocalPeerID();
     }
 
+    @Then("the user observe Remote Peer ID")
+    public void user_observe_remote_peer_id() throws FileNotFoundException {
+        subutaiSteps.observeRemotePeerID();
+    }
+
     @Then("the user observe Own PGP key")
     public void user_observe_own_pgp_key() throws FileNotFoundException {
         subutaiSteps.ownPGPKey();
@@ -255,7 +260,7 @@ public class DefSubutaiStepsThen {
     @Then("the user observe Environment PGP key")
     public void user_observe_environment_pgp_key() throws FileNotFoundException {
         subutaiSteps.environmentPGPKey();
-        subutaiSteps.waitABit(10000);
+//        subutaiSteps.waitABit(10000);
         subutaiSteps.observeEnvironmentPGPKey();
     }
 }

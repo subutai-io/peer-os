@@ -90,6 +90,16 @@ Then the user get Token
 And the user observe Local Peer ID
 When the user get Peer ID
 Then the user observe Own PGP key
+
+Scenario: the Second user should Test Peer KeyServers
+Given the second user is on the home page of Subutai
+When the user click on the menu item: User Identity
+And the user click on the menu item: Tokens
+When the user click on the button: Show Token
+Then the user observe text: Token
+Then the user get Token
+And the user observe Remote Peer ID
+When the user get Peer ID
 Then the user observe Remote PGP key
 
 Scenario: the Second user execute a command on a local environment and remote Container

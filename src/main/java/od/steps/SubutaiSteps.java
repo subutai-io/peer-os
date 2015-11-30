@@ -5,7 +5,6 @@ import net.thucydides.core.steps.ScenarioSteps;
 import od.pages.ReaderFromFile;
 import od.pages.SubutaiPage;
 import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebElement;
 
 import java.io.FileNotFoundException;
 
@@ -17,6 +16,7 @@ public class SubutaiSteps extends ScenarioSteps {
     private Object token;
     private Object peerID;
     private Object environmentData;
+    private Object containerIp;
 
     @Step
     public void inputLogin(String login){
@@ -711,6 +711,13 @@ public class SubutaiSteps extends ScenarioSteps {
     }
 
     @Step
+    public void observeRemotePeerID() throws FileNotFoundException {
+        subutaiPage.setDefaultBaseUrl(String.format("https://%s:8443/rest/v1/security/keyman/getpublickeyfingerprint?sptoken=" + token, ReaderFromFile.readDataFromFile("src/test/resources/parameters/mng_h2")));
+        subutaiPage.open();
+    }
+
+
+    @Step
     public Object getPeerID() {
         peerID = subutaiPage.peerID.getText();
         return peerID;
@@ -754,5 +761,11 @@ public class SubutaiSteps extends ScenarioSteps {
     @Step
     public void observeEnvironmentPGPKey() {
         assertThat(subutaiPage.environmentPGPKey.isVisible(),is(true));
+    }
+
+    @Step
+    public Object getContainerIp() {
+        containerIp = subutaiPage.containerIp.getText();
+        return containerIp;
     }
 }
