@@ -15,27 +15,30 @@ public class DeployRequest extends SubutaiShellCommandSupport
 {
     private final RegistrationManager registrationManager;
 
-    @Argument( index = 0, name = "edgeIp", multiValued = false, required = true, description = "edge ip address" )
-    private String edgeIp;
-
-    @Argument( index = 1, name = "secret", multiValued = false, required = true, description = "passphrase" )
-    private String secret;
-
-    @Argument( index = 2, name = "port", multiValued = false, required = true, description = "SN port",
-            valueToShowInHelp = "5000" )
-    private String port;
-
-    @Argument( index = 3, name = "name", multiValued = false, required = true, description = "community name" )
-    private String name;
-
-    @Argument( index = 4, name = "key", multiValued = false, required = true, description = "name of the key file" )
+    //-O RSA access key
+    @Argument( index = 0, name = "key", multiValued = false, required = true, description = "RSA access key" )
     private String key;
 
-    @Argument( index = 5, name = "ami", multiValued = false, required = true, description = "AMI name" )
+    //-W RSA security key
+    @Argument( index = 1, name = "secret", multiValued = false, required = true, description = "RSA Security key " )
+    private String secret;
+
+    //-k RSA key name
+    @Argument( index = 2, name = "name", multiValued = false, required = true, description = "RSA key name Id" )
+    private String name;
+
+    //-a AMI name
+    @Argument( index = 3, name = "ami", multiValued = false, required = true, description = "AMI image name" )
     private String ami;
 
-    @Argument( index = 6, name = "region", multiValued = false, required = true, description = "region" )
+    //-r Region
+    @Argument( index = 4, name = "region", multiValued = false, required = true, description = "AWS region" )
     private String region;
+
+    //-s N2N password
+    @Argument( index = 5, name = "password", multiValued = false, required = true, description = "N2N password" )
+    private String pass;
+
 
 
     public DeployRequest( final RegistrationManager registrationManager )
@@ -47,9 +50,8 @@ public class DeployRequest extends SubutaiShellCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        registrationManager.deployResourceHost(
-                Lists.newArrayList( "-i", edgeIp, "-s", secret, "-p", port, "-n", name, "-k", key, "-a", ami, "-r",
-                        region ) );
+        registrationManager.deployResourceHost(Lists.newArrayList("-O",key,"-W",secret,"-k",name,"-a",ami,"-r",region,"-s",pass) );
+
         return null;
     }
 }
