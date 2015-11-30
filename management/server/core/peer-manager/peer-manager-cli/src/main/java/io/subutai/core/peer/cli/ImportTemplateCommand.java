@@ -52,7 +52,7 @@ public class ImportTemplateCommand extends SubutaiShellCommandSupport
         }
 
 
-        // template = peerManager.getPeer( peerId ).getTemplate( templateName );
+         template = peerManager.getPeer( peerId ).getTemplate( templateName );
         if ( template != null )
         {
             System.out.println( "Template successfully obtained: " + template );
