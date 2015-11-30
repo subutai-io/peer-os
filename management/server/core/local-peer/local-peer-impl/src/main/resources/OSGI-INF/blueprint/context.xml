@@ -17,6 +17,7 @@
   <cm:property-placeholder persistent-id="peer" update-strategy="none">
     <cm:default-properties>
       <cm:property name="externalIpInterface" value="eth1" />
+      <cm:property name="validateTrust" value="false" />
     </cm:default-properties>
   </cm:property-placeholder>
 
@@ -60,6 +61,7 @@
     <argument ref="monitor" />
     <argument ref="securityManager" />
     <property name="externalIpInterface" value="${externalIpInterface}" />
+    <property name="validateTrust" value="${validateTrust}" />
   </bean>
 
   <bean id="messageRequestListener" class="io.subutai.core.localpeer.impl.request.MessageRequestListener"

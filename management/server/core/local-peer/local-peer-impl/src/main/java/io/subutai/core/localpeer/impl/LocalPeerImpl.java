@@ -147,6 +147,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     private static final int N2N_PORT = 5000;
 
     private String externalIpInterface = "eth1";
+    private boolean validateTrust = false;
     private DaoManager daoManager;
     private TemplateRegistry templateRegistry;
     protected ManagementHostEntity managementHost;
@@ -191,6 +192,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public void setExternalIpInterface( final String externalIpInterface )
     {
         this.externalIpInterface = externalIpInterface;
+    }
+
+
+    public void setValidateTrust( final boolean validateTrust )
+    {
+        this.validateTrust = validateTrust;
     }
 
 
@@ -1045,16 +1052,19 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         Preconditions.checkNotNull( requestBuilder, "Invalid request" );
         Preconditions.checkNotNull( aHost, "Invalid host" );
 
-        User activeUser = identityManager.getActiveUser();
-        if ( activeUser != null )
+        if ( validateTrust )
         {
-            KeyManager keyManager = securityManager.getKeyManager();
-            String hostFingerprint = keyManager.getFingerprint( aHost.getId() );
-            String userFingerprint = keyManager.getFingerprint( activeUser.getSecurityKeyId() );
-
-            if ( keyManager.getTrustLevel( userFingerprint, hostFingerprint ) == KeyTrustLevel.Never.getId() )
+            User activeUser = identityManager.getActiveUser();
+            if ( activeUser != null )
             {
-                throw new CommandException( "Host was revoked to execute commands" );
+                KeyManager keyManager = securityManager.getKeyManager();
+                String hostFingerprint = keyManager.getFingerprint( aHost.getId() );
+                String userFingerprint = keyManager.getFingerprint( activeUser.getSecurityKeyId() );
+
+                if ( keyManager.getTrustLevel( userFingerprint, hostFingerprint ) == KeyTrustLevel.Never.getId() )
+                {
+                    throw new CommandException( "Host was revoked to execute commands" );
+                }
             }
         }
         Host host;
@@ -1093,6 +1103,22 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         Preconditions.checkNotNull( requestBuilder, "Invalid request" );
         Preconditions.checkNotNull( aHost, "Invalid host" );
+
+        if ( validateTrust )
+        {
+            User activeUser = identityManager.getActiveUser();
+            if ( activeUser != null )
+            {
+                KeyManager keyManager = securityManager.getKeyManager();
+                String hostFingerprint = keyManager.getFingerprint( aHost.getId() );
+                String userFingerprint = keyManager.getFingerprint( activeUser.getSecurityKeyId() );
+
+                if ( keyManager.getTrustLevel( userFingerprint, hostFingerprint ) == KeyTrustLevel.Never.getId() )
+                {
+                    throw new CommandException( "Host was revoked to execute commands" );
+                }
+            }
+        }
 
         Host host;
         try
