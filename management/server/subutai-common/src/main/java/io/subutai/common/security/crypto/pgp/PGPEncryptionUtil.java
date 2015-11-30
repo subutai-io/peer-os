@@ -1410,4 +1410,36 @@ public class PGPEncryptionUtil
         }
     }
 
+
+    public static PGPPublicKeyRing removeSignature( PGPPublicKeyRing keyToRemoveFrom,
+                                                    PGPPublicKey keySignatureToRemove )
+            throws PGPException
+    {
+        try
+        {
+            PGPPublicKey oldKey = keyToRemoveFrom.getPublicKey();
+
+            PGPPublicKeyRing newPublicKeyRing = PGPPublicKeyRing.removePublicKey( keyToRemoveFrom, oldKey );
+
+            Iterator<PGPSignature> signIterator = oldKey.getSignatures();
+            while ( signIterator.hasNext() )
+            {
+                PGPSignature signature = signIterator.next();
+                signature.init( new JcaPGPContentVerifierBuilderProvider().setProvider( provider ),
+                        keySignatureToRemove );
+                if ( signature.verifyCertification( Long.toHexString( oldKey.getKeyID() ), oldKey ) )
+                {
+                    PGPPublicKey updatedKey = PGPPublicKey.removeCertification( oldKey, signature );
+                    keyToRemoveFrom = PGPPublicKeyRing.insertPublicKey( newPublicKeyRing, updatedKey );
+                }
+            }
+
+            return keyToRemoveFrom;
+        }
+        catch ( Exception e )
+        {
+            //throw custom  exception
+            throw new PGPException( "Error removing signature", e );
+        }
+    }
 }

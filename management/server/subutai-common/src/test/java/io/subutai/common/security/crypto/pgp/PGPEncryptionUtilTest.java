@@ -2,18 +2,28 @@ package io.subutai.common.security.crypto.pgp;
 
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Iterator;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKey;
+import org.bouncycastle.openpgp.PGPPublicKeyRing;
+import org.bouncycastle.openpgp.PGPPublicKeyRingCollection;
 import org.bouncycastle.openpgp.PGPSecretKey;
+import org.bouncycastle.openpgp.PGPSignature;
+import org.bouncycastle.openpgp.PGPUtil;
+import org.bouncycastle.openpgp.operator.jcajce.JcaKeyFingerprintCalculator;
 import org.bouncycastle.openpgp.operator.jcajce.JcaPGPKeyConverter;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
@@ -21,6 +31,8 @@ import static junit.framework.Assert.assertTrue;
 
 public class PGPEncryptionUtilTest
 {
+    private static final Logger logger = LoggerFactory.getLogger( PGPEncryptionUtilTest.class );
+
     private static final String MESSAGE = "hello";
     private static final String PUBLIC_KEYRING = "dummy.pkr";
     private static final String SECRET_KEYRING = "dummy.skr";
@@ -126,5 +138,121 @@ public class PGPEncryptionUtilTest
         JcaPGPKeyConverter c = new JcaPGPKeyConverter();
         PublicKey publicKey = c.getPublicKey( pgpSecretKey.getPublicKey() );
         x509Certificate.verify( publicKey, new BouncyCastleProvider() );
+    }
+
+
+    @Test
+    public void testKeySigning() throws PGPException, IOException
+    {
+        KeyPair first = PGPEncryptionUtil.generateKeyPair( "first@key.com", "first", false );
+        KeyPair second = PGPEncryptionUtil.generateKeyPair( "second@key.com", "second", false );
+        KeyPair third = PGPEncryptionUtil.generateKeyPair( "third@key.com", "third", false );
+        signKeyAndPrintIds( first, second, "second" );
+
+        InputStream firstPublicStream = new ByteArrayInputStream( first.getPubKeyring() );
+        InputStream secondPublicStream = new ByteArrayInputStream( second.getPubKeyring() );
+        InputStream thirdPublicStream = new ByteArrayInputStream( third.getPubKeyring() );
+
+        PGPPublicKeyRingCollection firstPublicKeyRingCollection =
+                new PGPPublicKeyRingCollection( PGPUtil.getDecoderStream( firstPublicStream ),
+                        new JcaKeyFingerprintCalculator() );
+
+        PGPPublicKeyRingCollection secondPublicKeyRingCollection =
+                new PGPPublicKeyRingCollection( PGPUtil.getDecoderStream( secondPublicStream ),
+                        new JcaKeyFingerprintCalculator() );
+
+        if ( firstPublicKeyRingCollection.getKeyRings().hasNext() )
+        {
+            PGPPublicKeyRing firstPublicKeyRing = null;
+            PGPPublicKeyRing secondPublicKeyRing = null;
+            firstPublicKeyRing = firstPublicKeyRingCollection.getKeyRings().next();
+            secondPublicKeyRing = secondPublicKeyRingCollection.getKeyRings().next();
+
+            PGPPublicKey thirdPublicKey =
+                    PGPEncryptionUtil.findPublicKeyById( thirdPublicStream, third.getPrimaryKeyId() );
+
+            printPublicKeySignatures( firstPublicKeyRing.getPublicKey(), thirdPublicKey );
+
+            //            PGPPublicKey secondPublicKey =
+            //                    PGPEncryptionUtil.findPublicKeyById( secondPublicStream, second.getPrimaryKeyId() );
+
+            if ( secondPublicKeyRing != null )
+            {
+                firstPublicKeyRing =
+                        PGPEncryptionUtil.removeSignature( firstPublicKeyRing, secondPublicKeyRing.getPublicKey() );
+                printPublicKeySignatures( firstPublicKeyRing.getPublicKey(), secondPublicKeyRing.getPublicKey() );
+            }
+        }
+    }
+
+
+    private void printKeyInArmoredFormat( KeyPair keyPair ) throws PGPException
+    {
+        //        logger.info( "*********************" );
+        //        logger.info( keyPair.getSubKeyFingerprint() );
+        String firstPublicArmored = PGPEncryptionUtil.armorByteArrayToString( keyPair.getPubKeyring() );
+        String firstPrivateArmored = PGPEncryptionUtil.armorByteArrayToString( keyPair.getSecKeyring() );
+        //        logger.info( String.format( "\n%s\n\n%s", firstPublicArmored, firstPrivateArmored ) );
+    }
+
+
+    private void printPublicKeySignatures( PGPPublicKey publicKey, final PGPPublicKey secondPublicKey )
+    {
+        //        logger.info( "@@@@@@@@@@@@@@@@@@@@@" );
+        boolean verification = false;
+        try
+        {
+            verification = PGPEncryptionUtil
+                    .verifyPublicKey( publicKey, Long.toHexString( publicKey.getKeyID() ), secondPublicKey );
+        }
+        catch ( PGPException e )
+        {
+            e.printStackTrace();
+        }
+        logger.info( "%%%%%%%%%%%%% Signature verification: " + verification );
+        Iterator keySignatures = publicKey.getSignatures();
+        while ( keySignatures.hasNext() )
+        {
+            PGPSignature signature = ( PGPSignature ) keySignatures.next();
+            signature.getSignatureType();
+            logger.info( Long.toHexString( signature.getKeyID() ) );
+        }
+    }
+
+
+    private void signKeyAndPrintIds( KeyPair first, KeyPair second, String password ) throws IOException, PGPException
+    {
+        InputStream firstPublicStream = new ByteArrayInputStream( first.getPubKeyring() );
+        InputStream secondPublicStream = new ByteArrayInputStream( second.getPubKeyring() );
+        InputStream secondSecretStream = new ByteArrayInputStream( second.getSecKeyring() );
+
+        PGPPublicKeyRingCollection keyrings =
+                new PGPPublicKeyRingCollection( PGPUtil.getDecoderStream( firstPublicStream ),
+                        new JcaKeyFingerprintCalculator() );
+
+        PGPPublicKeyRing firstPublicKeyRing = null;
+        if ( keyrings.getKeyRings().hasNext() )
+        {
+            firstPublicKeyRing = keyrings.getKeyRings().next();
+
+
+            PGPSecretKey secondSecretKey =
+                    PGPEncryptionUtil.findSecretKeyById( secondSecretStream, second.getPrimaryKeyId() );
+            PGPPublicKey secondPublicKey =
+                    PGPEncryptionUtil.findPublicKeyById( secondPublicStream, second.getPrimaryKeyId() );
+
+            if ( secondSecretKey != null )
+            {
+                String keyId = Long.toHexString( firstPublicKeyRing.getPublicKey().getKeyID() );
+
+                PGPPublicKeyRing firstSignedPublicKeyRing =
+                        PGPEncryptionUtil.signPublicKey( firstPublicKeyRing, keyId, secondSecretKey, password );
+
+                //                printPublicKeySignatures( firstPublicKeyRing.getPublicKey(), secondPublicKey );
+                printPublicKeySignatures( firstSignedPublicKeyRing.getPublicKey(), secondPublicKey );
+
+                first.setPubKeyring( firstSignedPublicKeyRing.getEncoded() );
+            }
+        }
     }
 }

@@ -46,6 +46,13 @@ public interface EncryptionTool
      */
     PGPPublicKeyRing removeSignature( String id, PGPPublicKeyRing keyToRemoveFrom);
 
+
+    /* *****************************************
+     *
+     */
+    PGPPublicKeyRing removeSignature( PGPPublicKey keySignToRemove, PGPPublicKeyRing keyToRemoveFrom );
+
+
     /* *****************************************
      *
      */
