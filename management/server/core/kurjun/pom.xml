@@ -48,5 +48,6 @@
         <module>kurjun-api</module>
         <module>kurjun-impl</module>
         <module>kurjun-rest</module>
+        <module>kurjun-cli</module>
     </modules>
 </project>
