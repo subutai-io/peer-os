@@ -198,7 +198,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
 
     public ContainerHostState getState()
     {
-        return state;
+        return getPeer().getContainerState( getContainerId() );
     }
 
 

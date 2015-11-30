@@ -18,7 +18,7 @@ import static junit.framework.TestCase.assertEquals;
 public class HistoricalMetricsTest
 {
     ObjectMapper objectMapper;
-    Metric metric;
+    HistoricalMetrics historicalMetrics;
 
 
     @Before
@@ -31,35 +31,35 @@ public class HistoricalMetricsTest
     @Test
     public void testReadSeries() throws IOException
     {
-        metric = objectMapper.readValue( HistoricalMetricsTest.class.getClassLoader().getResourceAsStream( "lxc.txt" ),
-                Metric.class );
+        historicalMetrics = objectMapper.readValue( HistoricalMetricsTest.class.getClassLoader().getResourceAsStream( "lxc.txt" ),
+                HistoricalMetrics.class );
     }
 
 
     @Test
     public void testNotNullSeries() throws IOException
     {
-        metric = objectMapper.readValue( HistoricalMetricsTest.class.getClassLoader().getResourceAsStream( "lxc.txt" ),
-                Metric.class );
-        assertNotNull( metric.getMetrics() );
+        historicalMetrics = objectMapper.readValue( HistoricalMetricsTest.class.getClassLoader().getResourceAsStream( "lxc.txt" ),
+                HistoricalMetrics.class );
+        assertNotNull( historicalMetrics.getMetrics() );
     }
 
 
     @Test
     public void testSeriesCount() throws IOException
     {
-        metric = objectMapper.readValue( HistoricalMetricsTest.class.getClassLoader().getResourceAsStream( "lxc.txt" ),
-                Metric.class );
-        assertEquals( 4, metric.getMetrics().length );
+        historicalMetrics = objectMapper.readValue( HistoricalMetricsTest.class.getClassLoader().getResourceAsStream( "lxc.txt" ),
+                HistoricalMetrics.class );
+        assertEquals( 4, historicalMetrics.getMetrics().length );
     }
 
 
     @Test
     public void testSeriesLxcCpu() throws IOException
     {
-        metric = objectMapper.readValue( HistoricalMetricsTest.class.getClassLoader().getResourceAsStream( "lxc.txt" ),
-                Metric.class );
-        SeriesBatch batch = metric.getMetrics()[0];
+        historicalMetrics = objectMapper.readValue( HistoricalMetricsTest.class.getClassLoader().getResourceAsStream( "lxc.txt" ),
+                HistoricalMetrics.class );
+        SeriesBatch batch = historicalMetrics.getMetrics()[0];
         Series lxcCpuSeries = batch.getSeries()[0];
         assertEquals( "lxc_cpu", lxcCpuSeries.name );
         assertEquals( 1, lxcCpuSeries.tags.size() );

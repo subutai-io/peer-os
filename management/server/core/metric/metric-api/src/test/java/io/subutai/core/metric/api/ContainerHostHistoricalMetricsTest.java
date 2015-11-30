@@ -21,7 +21,7 @@ import static org.mockito.Mockito.spy;
 
 
 @RunWith( MockitoJUnitRunner.class )
-public class ContainerHostMetricTest
+public class ContainerHostHistoricalMetricsTest
 {
     private static class ContainerHostMetricImpl extends ContainerHostMetric
     {

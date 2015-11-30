@@ -2,19 +2,17 @@ package io.subutai.core.metric.api;
 
 
 import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.Date;
 import java.util.Set;
 
 import io.subutai.common.metric.BaseMetric;
-import io.subutai.common.metric.HistoricalMetric;
-import io.subutai.common.metric.MetricType;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.peer.AlertListener;
 import io.subutai.common.peer.AlertPack;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.Host;
+import io.subutai.common.resource.HistoricalMetrics;
 
 
 /**
@@ -44,16 +42,16 @@ public interface Monitor
 
     /**
      * @param host physical or container host to be monitored
-     * @param metricType to be retrieved for historical data
      */
-    public List<HistoricalMetric> getHistoricalMetric( Host host, MetricType metricType );
+    public HistoricalMetrics getHistoricalMetrics( Host host, Date startTime, Date endTime );
 
 
     /**
      * @param hosts physical or container hosts to be monitored
-     * @param metricType to be retrieved for historical data
+     * @param resourceType to be retrieved for historical data
      */
-    public Map<String, List<HistoricalMetric>> getHistoricalMetrics( Collection<Host> hosts, MetricType metricType );
+//    public Map<String, List<HistoricalMetric>> getHistoricalMetrics( Collection<Host> hosts,
+//                                                                     ResourceType resourceType );
 
     ResourceHostMetrics getResourceHostMetrics();
 
