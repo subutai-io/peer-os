@@ -289,5 +289,5 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
     void setQuota( ContainerId containerId, ResourceType resourceType, ResourceValue resourceValue )
             throws PeerException;
 
-    void putAlert( AlertPack alert ) throws PeerException;
+    void alert( AlertPack alert ) throws PeerException;
 }

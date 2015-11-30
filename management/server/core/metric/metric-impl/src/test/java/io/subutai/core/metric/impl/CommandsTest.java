@@ -2,13 +2,10 @@ package io.subutai.core.metric.impl;
 
 
 import org.junit.Test;
+
 import io.subutai.common.command.RequestBuilder;
-import io.subutai.core.metric.api.MonitoringSettings;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 
 
 public class CommandsTest
@@ -23,16 +20,4 @@ public class CommandsTest
         assertEquals( new RequestBuilder( String.format( "subutai stats system %s", HOSTNAME ) ),
                 commands.getCurrentMetricCommand( HOSTNAME ) );
     }
-
-
-    @Test
-    public void testGetActivateMonitoringCommand() throws Exception
-    {
-        MonitoringSettings settings = mock( MonitoringSettings.class );
-        RequestBuilder requestBuilder = commands.getActivateMonitoringCommand( HOSTNAME, settings );
-
-        verify( settings ).getCpuAlertThreshold();
-        assertNotNull( requestBuilder );
-    }
-
 }
