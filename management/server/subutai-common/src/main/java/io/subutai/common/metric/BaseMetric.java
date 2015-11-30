@@ -1,19 +1,36 @@
 package io.subutai.common.metric;
 
 
+import org.codehaus.jackson.annotate.JsonProperty;
+
+import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.HostInfoModel;
+
+
 /**
  * Base metrics
  */
-public abstract class BaseMetric
+public class BaseMetric
 {
+    @JsonProperty( "peerId" )
     protected String peerId;
+    @JsonProperty( "hostInfo" )
+    protected HostInfoModel hostInfo;
+    @JsonProperty( "connected" )
+    private boolean connected;
 
-    protected String hostId;
+
+    public BaseMetric()
+    {
+    }
 
 
-    abstract public void setHostName( String hostName );
-
-    abstract public String getHostName();
+    public BaseMetric( @JsonProperty( "peerId" ) final String peerId,
+                       @JsonProperty( "hostInfo" ) final HostInfoModel hostInfo )
+    {
+        this.peerId = peerId;
+        this.hostInfo = hostInfo;
+    }
 
 
     public String getPeerId()
@@ -22,20 +39,42 @@ public abstract class BaseMetric
     }
 
 
-    public void setPeerId( final String peerId )
+    public HostInfo getHostInfo()
     {
-        this.peerId = peerId;
+        return hostInfo;
     }
 
 
-    public String getHostId()
+    public void setHostInfo( final HostInfoModel hostInfo )
     {
-        return hostId;
+        this.hostInfo = hostInfo;
     }
 
 
-    public void setHostId( final String hostId )
+    @Override
+    public String toString()
     {
-        this.hostId = hostId;
+        if ( hostInfo != null )
+        {
+            return String
+                    .format( "%s\t%s\t%s\t%s\t%s", peerId, hostInfo.getHostname(), hostInfo.getId(), hostInfo.getArch(),
+                            connected );
+        }
+        else
+        {
+            return "NULL";
+        }
+    }
+
+
+    public boolean isConnected()
+    {
+        return connected;
+    }
+
+
+    public void setConnected( final boolean connected )
+    {
+        this.connected = connected;
     }
 }

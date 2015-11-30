@@ -152,7 +152,7 @@ public class CommandProcessorTest
     @Test
     public void testGetTargetHost() throws Exception
     {
-        when( containerHostInfo.getStatus() ).thenReturn( ContainerHostState.RUNNING );
+        when( containerHostInfo.getState() ).thenReturn( ContainerHostState.RUNNING );
 
         ResourceHostInfo targetHost = commandProcessor.getTargetHost( HOST_ID );
 
@@ -317,7 +317,7 @@ public class CommandProcessorTest
         };
 
         when( resourceHostInfo.getId() ).thenReturn( HOST_ID );
-        when( containerHostInfo.getStatus() ).thenReturn( ContainerHostState.RUNNING );
+        when( containerHostInfo.getState() ).thenReturn( ContainerHostState.RUNNING );
         try
         {
             commandProcessor.execute( request, callback );

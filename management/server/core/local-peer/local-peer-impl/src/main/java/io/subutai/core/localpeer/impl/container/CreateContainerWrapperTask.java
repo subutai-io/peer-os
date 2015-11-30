@@ -6,6 +6,7 @@ import java.util.concurrent.Callable;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.settings.Common;
@@ -21,7 +22,7 @@ public class CreateContainerWrapperTask implements Callable<CreateContainerWrapp
     private final int vlan;
     private final String environmentId;
     private final int timeoutSec;
-    private HostInfo hostInfo;
+    private ContainerHostInfo hostInfo;
 
 
     public CreateContainerWrapperTask( final ResourceHost resourceHost, final String templateName,
@@ -60,7 +61,7 @@ public class CreateContainerWrapperTask implements Callable<CreateContainerWrapp
     }
 
 
-    public HostInfo getHostInfo()
+    public ContainerHostInfo getHostInfo()
     {
         return hostInfo;
     }

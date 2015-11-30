@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupResponse;
-import io.subutai.common.host.HostInfoModel;
+import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.RecipientType;
 import io.subutai.common.peer.Payload;
@@ -39,7 +39,7 @@ public class CreateEnvironmentContainerGroupRequestListener extends RequestListe
         if ( request != null )
         {
 
-            Set<HostInfoModel> containerHosts = localPeer.createEnvironmentContainerGroup( request );
+            Set<ContainerHostInfoModel> containerHosts = localPeer.createEnvironmentContainerGroup( request );
 
             return new CreateEnvironmentContainerGroupResponse( containerHosts );
         }

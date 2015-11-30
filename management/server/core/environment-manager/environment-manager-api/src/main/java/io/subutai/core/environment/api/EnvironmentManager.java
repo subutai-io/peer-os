@@ -12,10 +12,13 @@ import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.environment.Topology;
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.HostInfo;
+import io.subutai.common.metric.Alert;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentContainerHost;
+import io.subutai.common.peer.EnvironmentId;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
@@ -59,8 +62,8 @@ public interface EnvironmentManager
      *
      * @throws EnvironmentCreationException - thrown if error occurs during environment creation
      */
-    Environment importEnvironment( String name, Topology topology, Map<NodeGroup, Set<HostInfo>> containers, String ssh,
-                                   Integer vlan ) throws EnvironmentCreationException;
+    Environment importEnvironment( String name, Topology topology, Map<NodeGroup, Set<ContainerHostInfo>> containers,
+                                   String ssh, Integer vlan ) throws EnvironmentCreationException;
 
 
     /**
@@ -210,7 +213,7 @@ public interface EnvironmentManager
      * @param environmentId - id of the environment to assign the passed domain to
      * @param newDomain - domain url
      * @param domainLoadBalanceStrategy - strategy to load balance requests to the domain
-     * @param sslCertPath - path to SSL certificate to enable HTTPS access to domai only, null if not needed
+     * @param sslCertPath - path to SSL certificate to enable HTTPS access to domain only, null if not needed
      */
     void assignEnvironmentDomain( String environmentId, String newDomain,
                                   DomainLoadBalanceStrategy domainLoadBalanceStrategy, String sslCertPath )
@@ -242,4 +245,8 @@ public interface EnvironmentManager
 
     void notifyOnContainerStateChanged( Environment environment, ContainerHost containerHost );
 
+    void addAlertListener( EnvironmentAlertListener alertListener );
+
+
+    void removeAlertListener( EnvironmentAlertListener alertListener );
 }

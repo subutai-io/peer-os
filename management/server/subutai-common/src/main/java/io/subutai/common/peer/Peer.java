@@ -11,10 +11,10 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
+import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInfo;
-import io.subutai.common.host.HostInfoModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
@@ -60,8 +60,8 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
      *
      * @return - set of metadaobjects of created containers
      */
-    public Set<HostInfoModel> createEnvironmentContainerGroup( final CreateEnvironmentContainerGroupRequest request )
-            throws PeerException;
+    public Set<ContainerHostInfoModel> createEnvironmentContainerGroup(
+            final CreateEnvironmentContainerGroupRequest request ) throws PeerException;
 
 
     /**
@@ -145,7 +145,7 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
     /**
      * Returns true of the peer is reachable online, false otherwise
      */
-    public boolean isOnline();
+    public boolean isOnline() throws PeerException;
 
     /**
      * Sends message to the peer
@@ -288,4 +288,6 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
 
     void setQuota( ContainerId containerId, ResourceType resourceType, ResourceValue resourceValue )
             throws PeerException;
+
+    void putAlert( AlertPack alert ) throws PeerException;
 }

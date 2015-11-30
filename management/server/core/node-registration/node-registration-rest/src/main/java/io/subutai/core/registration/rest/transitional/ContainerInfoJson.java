@@ -6,9 +6,12 @@ import java.util.Set;
 
 import com.google.common.collect.Sets;
 
+import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
-import io.subutai.common.host.Interface;
+import io.subutai.common.host.HostInterface;
+import io.subutai.common.host.HostInterfaceModel;
+import io.subutai.common.host.HostInterfaces;
 import io.subutai.core.registration.api.RegistrationStatus;
 import io.subutai.core.registration.api.service.ContainerInfo;
 
@@ -22,11 +25,12 @@ public class ContainerInfoJson implements ContainerInfo
     private String hostname;
     private Integer vlan;
     private String templateName;
-    private Set<HostInterfaceJson> interfaces = new HashSet<>();
+    private Set<HostHostInterfaceJson> interfaces = new HashSet<>();
     private HostArchitecture arch;
     private String publicKey;
     private String gateway;
     private RegistrationStatus status = RegistrationStatus.REQUESTED;
+    private ContainerHostState state;
 
 
     public ContainerInfoJson()
@@ -45,13 +49,14 @@ public class ContainerInfoJson implements ContainerInfo
         this.publicKey = hostInfo.getPublicKey();
         this.status = hostInfo.getStatus();
         this.gateway = hostInfo.getGateway();
+        this.state = hostInfo.getState();
         if ( arch == null )
         {
             arch = HostArchitecture.AMD64;
         }
-        for ( Interface anInterface : hostInfo.getInterfaces() )
+        for ( HostInterface anHostInterface : hostInfo.getHostInterfaces().getAll() )
         {
-            this.interfaces.add( new HostInterfaceJson( anInterface ) );
+            this.interfaces.add( new HostHostInterfaceJson( anHostInterface ) );
         }
     }
 
@@ -84,10 +89,28 @@ public class ContainerInfoJson implements ContainerInfo
 
 
     @Override
-    public Set<Interface> getInterfaces()
+    public ContainerHostState getState()
     {
-        Set<Interface> result = Sets.newHashSet();
-        result.addAll( this.interfaces );
+        return state;
+    }
+
+
+    @Override
+    public String getContainerName()
+    {
+        return null;
+    }
+
+
+    @Override
+    public HostInterfaces getHostInterfaces()
+    {
+        HostInterfaces result = new HostInterfaces();
+        for ( HostInterface hostInterface : this.interfaces )
+        {
+            HostInterfaceModel model = new HostInterfaceModel( hostInterface );
+            result.addHostInterface( model );
+        }
         return result;
     }
 

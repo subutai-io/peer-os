@@ -13,7 +13,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import io.subutai.common.host.Interface;
+import io.subutai.common.host.HostInterface;
 
 
 /**
@@ -21,13 +21,13 @@ import io.subutai.common.host.Interface;
  * <p> {@link #ip} - ip address</p> <p> {@link #mac} - mac address</p> <p> {@link #host} - target host whose metadata
  * being saved</p>
  *
- * @see Interface
+ * @see HostInterface
  * @see EnvironmentContainerImpl
  */
 @Entity
 @Table( name = "env_con_intf" )
 @Access( AccessType.FIELD )
-public class HostInterfaceImpl implements Interface, Serializable
+public class HostInterfaceImpl implements HostInterface, Serializable
 {
     @Id
     @GeneratedValue
@@ -50,7 +50,7 @@ public class HostInterfaceImpl implements Interface, Serializable
     }
 
 
-    public HostInterfaceImpl( final Interface s )
+    public HostInterfaceImpl( final HostInterface s )
     {
         this.interfaceName = s.getName();
         this.ip = s.getIp().replace( "addr:", "" );
