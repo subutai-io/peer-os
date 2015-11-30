@@ -145,7 +145,7 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
     /**
      * Returns true of the peer is reachable online, false otherwise
      */
-    public boolean isOnline();
+    public boolean isOnline() throws PeerException;
 
     /**
      * Sends message to the peer
