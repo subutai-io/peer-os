@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -35,13 +34,11 @@ import io.subutai.common.host.HostInfoModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.host.ResourceHostInfoModel;
-import io.subutai.common.metric.AlertValue;
+import io.subutai.common.metric.AlertResource;
 import io.subutai.common.metric.BaseMetric;
-import io.subutai.common.metric.HistoricalMetric;
-import io.subutai.common.metric.MetricType;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceAlert;
-import io.subutai.common.metric.ResourceAlertValue;
+import io.subutai.common.metric.QuotaAlertResource;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.peer.AlertListener;
@@ -205,11 +202,11 @@ public class MonitorImpl implements Monitor, HostListener
                     Peer peer = peerManager.getPeer( alertPack.getPeerId() );
                     peer.alert( alertPack );
                     alertPack.setDelivered( true );
-                    LOG.debug( "Alert package delivered: " + alertPack.getValue().getId() );
+                    LOG.debug( "Alert package delivered: " + alertPack.getResource().getId() );
                 }
                 catch ( Exception e )
                 {
-                    LOG.warn( "Error on delivering alert package: " + alertPack.getValue().getId() );
+                    LOG.warn( "Error on delivering alert package: " + alertPack.getResource().getId() );
                 }
             }
         }
@@ -263,7 +260,7 @@ public class MonitorImpl implements Monitor, HostListener
     public void addAlert( final AlertPack alert )
     {
         AlertPack a = new AlertPack( alert.getPeerId(), alert.getEnvironmentId(), alert.getContainerId(),
-                alert.getTemplateName(), alert.getValue() );
+                alert.getTemplateName(), alert.getResource() );
         alerts.add( a );
     }
 
@@ -326,7 +323,7 @@ public class MonitorImpl implements Monitor, HostListener
 
 */
 
-    protected void putAlert( AlertValue alert )
+    protected void putAlert( AlertResource alert )
     {
 
         //        if ( !isValidAlert( alert ) )
@@ -643,7 +640,7 @@ public class MonitorImpl implements Monitor, HostListener
             {
                 //                final Alert alert = new Alert( new ResourceAlertValue( resourceAlert ) );
 
-                putAlert( new ResourceAlertValue( resourceAlert ) );
+                putAlert( new QuotaAlertResource( resourceAlert ) );
 
                 //                alertProcessor.process( alert );
             }
