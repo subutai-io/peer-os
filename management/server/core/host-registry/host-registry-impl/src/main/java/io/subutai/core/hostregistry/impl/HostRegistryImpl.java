@@ -17,6 +17,7 @@ import com.google.common.collect.Sets;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.ResourceHostInfo;
+import io.subutai.common.metric.ResourceAlert;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hostregistry.api.HostRegistry;
@@ -188,7 +189,7 @@ public class HostRegistryImpl implements HostRegistry
     }
 
 
-    protected void registerHost( ResourceHostInfo info )
+    protected void registerHost( ResourceHostInfo info, Set<ResourceAlert> alerts )
     {
         Preconditions.checkNotNull( info, "Info is null" );
 
@@ -197,7 +198,7 @@ public class HostRegistryImpl implements HostRegistry
         //notify listeners
         for ( HostListener listener : hostListeners )
         {
-            notifier.execute( new HostNotifier( listener, info ) );
+            notifier.execute( new HostNotifier( listener, info, alerts ) );
         }
     }
 

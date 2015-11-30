@@ -21,9 +21,10 @@ import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.NodeGroup;
-import io.subutai.common.host.Interface;
+import io.subutai.common.host.HostInterface;
 import io.subutai.common.peer.ContainerType;
 import io.subutai.common.peer.EnvironmentContainerHost;
+import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.util.JsonUtil;
@@ -61,13 +62,16 @@ public class RestServiceImplTest
 
     RestServiceImpl restService;
     @Mock
-    private Interface netIntf;
+    private HostInterface netIntf;
+    @Mock
+    private EnvironmentId envId;
 
 
     @Before
     public void setUp() throws Exception
     {
-        when(netIntf.getIp()).thenReturn( TestUtil.IP );
+        when( envId.getId() ).thenReturn( TestUtil.ENV_ID );
+        when( netIntf.getIp() ).thenReturn( TestUtil.IP );
         when( peerManager.getPeer( TestUtil.PEER_ID ) ).thenReturn( peer );
         when( templateRegistry.getTemplate( TestUtil.TEMPLATE_NAME ) ).thenReturn( template );
         when( environmentManager.createEnvironment( any( Blueprint.class ), anyBoolean() ) ).thenReturn( environment );
@@ -76,11 +80,11 @@ public class RestServiceImplTest
         when( environment.getStatus() ).thenReturn( EnvironmentStatus.HEALTHY );
         when( environment.getContainerHosts() ).thenReturn( Sets.newHashSet( containerHost ) );
         when( containerHost.getId() ).thenReturn( TestUtil.CONTAINER_ID );
-        when( containerHost.getEnvironmentId() ).thenReturn( TestUtil.ENV_ID );
+        when( containerHost.getEnvironmentId() ).thenReturn( envId );
         when( containerHost.getHostname() ).thenReturn( TestUtil.HOSTNAME );
         when( containerHost.getInterfaceByName( anyString() ) ).thenReturn( netIntf );
         when( containerHost.getTemplateName() ).thenReturn( TestUtil.TEMPLATE_NAME );
-        when( containerHost.getStatus() ).thenReturn( TestUtil.CONTAINER_STATE );
+        when( containerHost.getState() ).thenReturn( TestUtil.CONTAINER_STATE );
         when( containerHost.getContainerType() ).thenReturn( ContainerType.LARGE );
         when( environmentManager.getEnvironments() ).thenReturn( Sets.newHashSet( environment ) );
         when( environmentManager.loadEnvironment( TestUtil.ENV_ID ) ).thenReturn( environment );
@@ -230,13 +234,13 @@ public class RestServiceImplTest
 
         restService.growEnvironment( "", blueprint );
 
-        //        assertEquals( Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus() );
+        //        assertEquals( Response.Status.BAD_REQUEST.getStatusCode(), response.getState() );
         //
         //        response =
         //                restService.growEnvironment( TestUtil.ENV_ID, TestUtil.NODE_GROUP_JSON.replace( TestUtil
         // .PEER_ID, "" ) );
         //
-        //        assertEquals( Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus() );
+        //        assertEquals( Response.Status.BAD_REQUEST.getStatusCode(), response.getState() );
         //
         //        doThrow( new EnvironmentNotFoundException( "" ) ).when( environmentManager )
         //                                                         .growEnvironment( any( Topology.class ),
@@ -244,7 +248,7 @@ public class RestServiceImplTest
         //
         //        response = restService.growEnvironment( TestUtil.ENV_ID, TestUtil.NODE_GROUP_JSON );
         //
-        //        assertEquals( Response.Status.NOT_FOUND.getStatusCode(), response.getStatus() );
+        //        assertEquals( Response.Status.NOT_FOUND.getStatusCode(), response.getState() );
         //
         //        doThrow( new EnvironmentModificationException( "" ) ).when( environmentManager )
         //                                                             .growEnvironment( any( Topology.class ),
@@ -252,7 +256,7 @@ public class RestServiceImplTest
         //
         //        response = restService.growEnvironment( TestUtil.ENV_ID, TestUtil.NODE_GROUP_JSON );
         //
-        //        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus() );
+        //        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getState() );
     }
 
 

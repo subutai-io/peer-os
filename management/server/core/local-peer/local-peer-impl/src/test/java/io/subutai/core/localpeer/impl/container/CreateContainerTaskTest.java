@@ -61,7 +61,7 @@ public class CreateContainerTaskTest
     @Before
     public void setUp() throws Exception
     {
-        task = new CreateContainerTask( hostRegistry, resourceHost, template, HOSTNAME, CIDR, VLAN, TIMEOUT, ENV_ID );
+        task = new CreateContainerTask( hostRegistry, resourceHost, template, HOSTNAME, CIDR, VLAN, TIMEOUT/*, ENV_ID*/ );
         task.commandUtil = commandUtil;
         when( resourceHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
         when( commandResult.hasSucceeded() ).thenReturn( true );
@@ -120,7 +120,7 @@ public class CreateContainerTaskTest
         //        verify( containerHost ).setDefaultGateway( GATEWAY );
 
         CreateContainerTask task =
-                new CreateContainerTask( hostRegistry, resourceHost, template, HOSTNAME, CIDR, VLAN, TIMEOUT, ENV_ID );
+                new CreateContainerTask( hostRegistry, resourceHost, template, HOSTNAME, CIDR, VLAN, TIMEOUT/*, ENV_ID*/ );
         task.commandUtil = commandUtil;
 
         task.call();

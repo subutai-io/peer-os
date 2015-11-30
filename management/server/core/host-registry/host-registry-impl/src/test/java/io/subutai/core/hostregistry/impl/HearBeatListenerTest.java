@@ -2,6 +2,7 @@ package io.subutai.core.hostregistry.impl;
 
 
 import java.io.PrintStream;
+import java.util.Set;
 import java.util.UUID;
 
 import org.junit.Before;
@@ -9,6 +10,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.host.ResourceHostInfo;
@@ -72,7 +74,8 @@ public class HearBeatListenerTest
     {
         heartBeatListener.onMessage( message );
 
-        verify( containerRegistry ).registerHost( isA( ResourceHostInfo.class ) );
+        verify( containerRegistry ).registerHost( isA( ResourceHostInfo.class ),
+                any(Set.class) );
 
 
         heartBeatListener.jsonUtil = jsonUtil;

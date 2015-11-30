@@ -140,6 +140,8 @@ public class RemotePeerImplTest
 
     @Mock
     private SecurityManager securityManager;
+    @Mock
+    private EnvironmentId envId;
 
 
     @Before
@@ -169,7 +171,8 @@ public class RemotePeerImplTest
         when( remotePeer.getId() ).thenReturn( PEER_ID );
         //        when( remotePeer.getPeerInfo() ).thenReturn( new PeerInfo() );
         when( containerHost.isConnected() ).thenReturn( true );
-        when( containerHost.getEnvironmentId() ).thenReturn( ENV_ID );
+        when( envId.getId() ).thenReturn( ENV_ID );
+        when( containerHost.getEnvironmentId() ).thenReturn( envId );
         when( messenger.createMessage( anyObject() ) ).thenReturn( message );
         when( message.getId() ).thenReturn( MESSAGE_ID );
     }

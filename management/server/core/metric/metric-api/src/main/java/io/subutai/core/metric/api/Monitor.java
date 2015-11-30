@@ -10,16 +10,14 @@ import io.subutai.common.environment.Environment;
 import io.subutai.common.metric.BaseMetric;
 import io.subutai.common.metric.ContainerHostMetric;
 import io.subutai.common.metric.HistoricalMetric;
-import io.subutai.common.metric.HostMetric;
 import io.subutai.common.metric.MetricType;
 import io.subutai.common.metric.OwnerResourceUsage;
 import io.subutai.common.metric.ProcessResourceUsage;
-import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.metric.ResourceHostMetrics;
+import io.subutai.common.peer.AlertPack;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.Host;
-import io.subutai.common.peer.ResourceHost;
 
 
 /**
@@ -50,10 +48,10 @@ public interface Monitor
      *
      * @return set of metrics, one per each resource host within the local peer
      */
-    public Set<ResourceHostMetric> getResourceHostsMetrics();
+    //    public Set<ResourceHostMetric> getResourceHostsMetrics();
 
 
-    public ResourceHostMetric getResourceHostMetric( ResourceHost resourceHost ) throws MonitorException;
+    //    public ResourceHostMetric getResourceHostMetric( ResourceHost resourceHost ) throws MonitorException;
 
 
     /**
@@ -126,7 +124,7 @@ public interface Monitor
      *
      * @param alertMetric - body of alert in JSON
      */
-    public void alert( String alertMetric ) throws MonitorException;
+    //    public void alert( String alertMetric ) throws MonitorException;
 
 
     /**
@@ -142,11 +140,15 @@ public interface Monitor
      */
     public Map<String, List<HistoricalMetric>> getHistoricalMetrics( Collection<Host> hosts, MetricType metricType );
 
-//    void updateHostMetric( BaseMetric metric );
+    //    BaseMetric getHostMetric( String id );
 
-//    BaseMetric getHostMetric( String id );
+//    void putAlert( Alert alert );
 
-//    ResourceHostMetrics getResourceHostMetrics( boolean isLocalOnly );
+    ResourceHostMetrics getResourceHostMetrics();
 
-//    String getHostMetricsAsHtml( String hostId );
+    BaseMetric getHostMetric( String id );
+
+    Collection<BaseMetric> getMetrics();
+
+    Collection<AlertPack> getAlerts();
 }

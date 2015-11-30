@@ -3,10 +3,15 @@ package io.subutai.common.host;
 
 import java.util.Set;
 
+import org.codehaus.jackson.map.annotate.JsonDeserialize;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+
 
 /**
  * Parent interface for host info
  */
+@JsonSerialize( as = HostInfoModel.class )
+@JsonDeserialize( as = HostInfoModel.class )
 public interface HostInfo extends Comparable<HostInfo>
 {
     /**
@@ -24,7 +29,7 @@ public interface HostInfo extends Comparable<HostInfo>
     /**
      * Returns network interfaces of host
      */
-    public Set<Interface> getInterfaces();
+    public HostInterfaces getHostInterfaces();
 
 
     /**
