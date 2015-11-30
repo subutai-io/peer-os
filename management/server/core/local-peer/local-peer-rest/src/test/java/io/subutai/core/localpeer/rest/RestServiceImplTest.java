@@ -194,7 +194,7 @@ public class RestServiceImplTest
     //    {
     //        Response response = restService.ping();
     //
-    //        assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
+    //        assertEquals( Response.Status.OK.getStatusCode(), response.getState() );
     //    }
     //
 
@@ -210,7 +210,7 @@ public class RestServiceImplTest
 
         //Response response1 = restService.approveForRegistrationRequest( JSON, CERT );
 
-        //assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+        //assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getState() );
     }
 
 
@@ -227,7 +227,7 @@ public class RestServiceImplTest
 
         //Response response1 = restService.updatePeer( JSON, CERT );
 
-        //assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+        //assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getState() );
     }
 
     //
@@ -284,14 +284,14 @@ public class RestServiceImplTest
     //
     //        response1 = restService.getContainerState( containerId ) isContainerConnected( CONTAINER_ID.toString() );
     //
-    //        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+    //        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getState() );
     //    }
 
 
     //    @Test
     //    public void testGetContainerState() throws Exception
     //    {
-    //        when( containerHost.getStatus() ).thenReturn( ContainerHostState.RUNNING );
+    //        when( containerHost.getState() ).thenReturn( ContainerHostState.RUNNING );
     //
     //        restService.getContainerState( containerId );
     //
@@ -301,7 +301,7 @@ public class RestServiceImplTest
     //
     //        restService.getContainerState( containerId );
     //
-    //        //assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+    //        //assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getState() );
     //    }
 
 
@@ -335,7 +335,7 @@ public class RestServiceImplTest
     //
     //        Response response1 = restService.getAvailableRamQuota( CONTAINER_ID.toString() );
     //
-    //        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+    //        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getState() );
     //    }
     //
     //
@@ -350,7 +350,7 @@ public class RestServiceImplTest
     //
     //        Response response1 = restService.getAvailableCpuQuota( CONTAINER_ID.toString() );
     //
-    //        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+    //        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getState() );
     //    }
     //
     //
@@ -365,7 +365,7 @@ public class RestServiceImplTest
     //
     //        Response response1 = restService.getAvailableDiskQuota( CONTAINER_ID.toString(), JSON );
     //
-    //        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+    //        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getState() );
     //    }
     //
     //
@@ -389,7 +389,7 @@ public class RestServiceImplTest
     //
     //        Response response1 = restService.getRamQuota( CONTAINER_ID.toString() );
     //
-    //        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+    //        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getState() );
     //    }
     //
     //
@@ -404,7 +404,7 @@ public class RestServiceImplTest
     //
     //        Response response1 = restService.getRamQuotaInfo( CONTAINER_ID.toString() );
     //
-    //        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+    //        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getState() );
     //    }
     //
     //
@@ -419,7 +419,7 @@ public class RestServiceImplTest
     //
     //        Response response1 = restService.setRamQuota( CONTAINER_ID.toString(), QUOTA );
     //
-    //        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+    //        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getState() );
     //    }
     //
     //
@@ -434,7 +434,7 @@ public class RestServiceImplTest
     //
     //        Response response1 = restService.getCpuQuota( CONTAINER_ID.toString() );
     //
-    //        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+    //        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getState() );
     //    }
     //
     //
@@ -449,7 +449,7 @@ public class RestServiceImplTest
     //
     //        Response response1 = restService.setCpuQuota( CONTAINER_ID.toString(), QUOTA );
     //
-    //        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+    //        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getState() );
     //    }
     //
     //
@@ -464,7 +464,7 @@ public class RestServiceImplTest
     //
     //        Response response1 = restService.getCpuSet( CONTAINER_ID.toString() );
     //
-    //        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+    //        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getState() );
     //    }
     //
     //
@@ -479,7 +479,7 @@ public class RestServiceImplTest
     //
     //        Response response1 = restService.setCpuSet( CONTAINER_ID.toString(), JSON );
     //
-    //        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+    //        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getState() );
     //    }
     //
     //
@@ -494,7 +494,7 @@ public class RestServiceImplTest
     //
     //        Response response1 = restService.getDiskQuota( CONTAINER_ID.toString(), JSON );
     //
-    //        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+    //        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getState() );
     //    }
     //
     //
@@ -509,7 +509,7 @@ public class RestServiceImplTest
     //
     //        Response response1 = restService.setDiskQuota( CONTAINER_ID.toString(), JSON );
     //
-    //        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+    //        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getState() );
     //    }
     //
     //
@@ -537,7 +537,7 @@ public class RestServiceImplTest
     //
     //        Response response1 = restService.getContainerHostInfoById( CONTAINER_ID.toString() );
     //
-    //        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+    //        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getState() );
     //    }
 
 

@@ -1,12 +1,29 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="lp/template">
-      <action class="io.subutai.core.localpeer.cli.TemplateCommand">
+    <command name="localpeer/alert-listeners">
+      <action class="io.subutai.core.localpeer.cli.AlertListenersCommand">
         <argument ref="localPeer" />
       </action>
     </command>
   </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="localpeer/notify-listeners">
+      <action class="io.subutai.core.localpeer.cli.NotifyListenersCommand">
+        <argument ref="localPeer" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="localpeer/put-alert">
+      <action class="io.subutai.core.localpeer.cli.PutAlertCommand">
+        <argument ref="localPeer" />
+      </action>
+    </command>
+  </command-bundle>
+
 
   <reference id="localPeer" availability="mandatory" interface="io.subutai.common.peer.LocalPeer" />
 

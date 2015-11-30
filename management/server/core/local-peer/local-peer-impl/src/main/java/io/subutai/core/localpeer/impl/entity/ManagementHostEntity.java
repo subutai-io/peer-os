@@ -34,7 +34,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.host.HostId;
-import io.subutai.common.host.Interface;
+import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.mdc.SubutaiExecutors;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
@@ -370,7 +370,8 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     {
         Set<Gateway> gateways = Sets.newHashSet();
 
-        for ( Interface iface : getInterfaces() )
+        //TODO: use findByName method
+        for ( HostInterface iface : getHostInterfaces().getAll() )
         {
             Matcher matcher = GATEWAY_INTERFACE_NAME_PATTERN.matcher( iface.getName().trim() );
             if ( matcher.find() )

@@ -5,7 +5,7 @@ angular.module('subutai.peer-registration.controller', [])
 	.controller('PeerRegistrationPopupCtrl', PeerRegistrationPopupCtrl);
 
 PeerRegistrationCtrl.$inject = ['$scope', 'peerRegistrationService', 'DTOptionsBuilder', 'DTColumnBuilder', '$resource', '$compile', 'SweetAlert', 'ngDialog'];
-PeerRegistrationPopupCtrl.$inject = ['$scope', 'peerRegistrationService', 'ngDialog'];
+PeerRegistrationPopupCtrl.$inject = ['$scope', 'peerRegistrationService', 'ngDialog', 'SweetAlert'];
 
 function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder, DTColumnBuilder, $resource, $compile, SweetAlert, ngDialog) {
 
@@ -143,7 +143,7 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder,
 
 }
 
-function PeerRegistrationPopupCtrl($scope, peerRegistrationService, ngDialog) {
+function PeerRegistrationPopupCtrl($scope, peerRegistrationService, ngDialog, SweetAlert) {
 
 	var vm = this;
 	vm.peerId = null;
@@ -157,15 +157,18 @@ function PeerRegistrationPopupCtrl($scope, peerRegistrationService, ngDialog) {
 
 	function addPeer(newPeer) {
 		var postData = 'ip=' + newPeer.ip + '&key_phrase=' + newPeer.keyphrase;
-		console.log('lololo');
 		peerRegistrationService.registerRequest(postData).success(function (data) {
 			ngDialog.closeAll();
+		}).error(function(error){
+			SweetAlert.swal("ERROR!", "Peer request error: " + error, "error");
 		});
 	}
 
 	function approvePeerRequest(keyPhrase) {
 		peerRegistrationService.approvePeerRequest(vm.peerId, keyPhrase).success(function (data) {
 			ngDialog.closeAll();
+		}).error(function(error){
+			SweetAlert.swal("ERROR!", "Peer approve error: " + error, "error");
 		});
 	}
 

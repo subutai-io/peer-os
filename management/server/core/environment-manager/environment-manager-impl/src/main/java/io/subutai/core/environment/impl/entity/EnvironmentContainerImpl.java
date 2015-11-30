@@ -3,7 +3,6 @@ package io.subutai.core.environment.impl.entity;
 
 import java.io.Serializable;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import javax.persistence.Access;
@@ -36,9 +35,10 @@ import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
-import io.subutai.common.host.HostInfoModel;
-import io.subutai.common.host.Interface;
-import io.subutai.common.host.NullInterface;
+import io.subutai.common.host.ContainerHostInfoModel;
+import io.subutai.common.host.HostInterface;
+import io.subutai.common.host.HostInterfaceModel;
+import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerId;
@@ -93,7 +93,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
     @OneToMany( mappedBy = "host", fetch = FetchType.EAGER, cascade = CascadeType.ALL, targetEntity =
             HostInterfaceImpl.class, orphanRemoval = true )
-    protected Set<Interface> interfaces = new HashSet<>();
+    protected Set<HostInterface> hostInterfaces = new HashSet<>();
 
     @Column( name = "ssh_group_id" )
     private int sshGroupId;
@@ -102,8 +102,8 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @Column( name = "domain_name" )
     private String domainName;
 
-    @Column(name="type")
-    @Enumerated( EnumType.STRING)
+    @Column( name = "type" )
+    @Enumerated( EnumType.STRING )
     private ContainerType containerType;
 
 
@@ -129,7 +129,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
 
     public EnvironmentContainerImpl( final String localPeerId, final Peer peer, final String nodeGroupName,
-                                     final HostInfoModel hostInfo, final Template template, int sshGroupId,
+                                     final ContainerHostInfoModel hostInfo, final Template template, int sshGroupId,
                                      int hostsGroupId, String domainName, ContainerType containerType )
     {
         Preconditions.checkNotNull( peer );
@@ -154,22 +154,9 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
         this.hostsGroupId = hostsGroupId;
         this.domainName = domainName;
         this.containerType = containerType;
-        setNetInterfaces( hostInfo.getInterfaces() );
+        setHostInterfaces( hostInfo.getHostInterfaces() );
     }
 
-
-    public void setNetInterfaces( Set<Interface> interfaces )
-    {
-        Preconditions.checkNotNull( interfaces );
-
-        this.interfaces.clear();
-        for ( Interface iface : interfaces )
-        {
-            HostInterfaceImpl hostInterface = new HostInterfaceImpl( iface );
-            hostInterface.setHost( this );
-            this.interfaces.add( hostInterface );
-        }
-    }
 
 
     public void setPeer( final Peer peer )
@@ -211,9 +198,9 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
 
     @Override
-    public String getEnvironmentId()
+    public EnvironmentId getEnvironmentId()
     {
-        return environment.getId();
+        return environment.getEnvironmentId();
     }
 
 
@@ -225,7 +212,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
 
     @Override
-    public ContainerHostState getStatus()
+    public ContainerHostState getState()
     {
         return getPeer().getContainerState( getContainerId() );
     }
@@ -378,21 +365,40 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @Override
     public boolean isConnected()
     {
-        return ContainerHostState.RUNNING.equals( getStatus() );
+        return ContainerHostState.RUNNING.equals( getState() );
     }
 
 
     @Override
-    public Set<Interface> getInterfaces()
+    public HostInterfaces getHostInterfaces()
     {
-        return interfaces;
+        HostInterfaces result = new HostInterfaces();
+        for ( HostInterface hostInterface : this.hostInterfaces )
+        {
+            HostInterfaceModel model = new HostInterfaceModel( hostInterface );
+            result.addHostInterface( model );
+        }
+        return result;
     }
 
+
+    public void setHostInterfaces( HostInterfaces hostInterfaces )
+    {
+        Preconditions.checkNotNull( hostInterfaces );
+
+        this.hostInterfaces.clear();
+        for ( HostInterface iface : hostInterfaces.getAll() )
+        {
+            HostInterfaceImpl hostInterface = new HostInterfaceImpl( iface );
+            hostInterface.setHost( this );
+            this.hostInterfaces.add( hostInterface );
+        }
+    }
 
     @Override
     public String getIpByInterfaceName( String interfaceName )
     {
-        for ( Interface iface : interfaces )
+        for ( HostInterface iface : hostInterfaces )
         {
             if ( iface.getName().equalsIgnoreCase( interfaceName ) )
             {
@@ -407,32 +413,36 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @Override
     public String getMacByInterfaceName( final String interfaceName )
     {
-        for ( Interface iface : interfaces )
-        {
-            if ( iface.getName().equalsIgnoreCase( interfaceName ) )
-            {
-                return iface.getMac();
-            }
-        }
+        return getHostInterfaces().findByName( interfaceName ).getMac();
 
-        return null;
+        //        for ( HostInterface iface : hostInterfaces )
+        //        {
+        //            if ( iface.getName().equalsIgnoreCase( interfaceName ) )
+        //            {
+        //                return iface.getMac();
+        //            }
+        //        }
+        //
+        //        return null;
     }
 
 
     @Override
-    public Interface getInterfaceByName( final String interfaceName )
+    public HostInterface getInterfaceByName( final String interfaceName )
     {
-        Interface result = NullInterface.getInstance();
-        for ( Iterator<Interface> i = getInterfaces().iterator(); result instanceof NullInterface && i.hasNext(); )
-        {
-            Interface n = i.next();
-            if ( n.getName().equalsIgnoreCase( interfaceName ) )
-            {
-                result = n;
-            }
-        }
-
-        return result;
+        return getHostInterfaces().findByName( interfaceName );
+        //        HostInterface result = NullHostInterface.getInstance();
+        //        for ( Iterator<HostInterface> i = getHostInterfaces().iterator(); result instanceof
+        // NullHostInterface && i.hasNext(); )
+        //        {
+        //            HostInterface n = i.next();
+        //            if ( n.getName().equalsIgnoreCase( interfaceName ) )
+        //            {
+        //                result = n;
+        //            }
+        //        }
+        //
+        //        return result;
     }
 
 
@@ -552,8 +562,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     {
         if ( containerId == null )
         {
-            containerId = new ContainerId( getId(), getHostname(), new PeerId( getPeerId() ),
-                    new EnvironmentId( getEnvironmentId() ) );
+            containerId = new ContainerId( getId(), getHostname(), new PeerId( getPeerId() ), getEnvironmentId() );
         }
         return containerId;
     }
@@ -576,7 +585,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @Override
     public String toString()
     {
-        ContainerHostState state = getStatus();
+        ContainerHostState state = getState();
 
         return MoreObjects.toStringHelper( this ).add( "hostId", hostId ).add( "hostname", hostname )
                           .add( "nodeGroupName", nodeGroupName ).add( "creatorPeerId", creatorPeerId )

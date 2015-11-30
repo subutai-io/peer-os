@@ -54,9 +54,9 @@ public class ContainerHostQuotaState extends BaseMetric
     }
 
 
-    @Override
-    public void setHostName( final String hostName )
-    {
-        this.hostName = hostName;
-    }
+//    @Override
+//    public void setHostName( final String hostName )
+//    {
+//        this.hostName = hostName;
+//    }
 }

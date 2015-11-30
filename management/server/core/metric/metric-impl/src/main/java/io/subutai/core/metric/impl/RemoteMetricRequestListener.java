@@ -3,8 +3,10 @@ package io.subutai.core.metric.impl;
 
 import java.util.Set;
 
+import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Payload;
 import io.subutai.common.peer.RequestListener;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +33,8 @@ public class RemoteMetricRequestListener extends RequestListener
 
         if ( request != null )
         {
-            Set<ContainerHostMetricImpl> metrics = monitor.getLocalContainerHostsMetrics( request.getEnvironmentId() );
+            Set<ContainerHostMetricImpl> metrics =
+                    monitor.getLocalContainerHostsMetrics( new EnvironmentId( request.getEnvironmentId() ) );
 
             if ( !metrics.isEmpty() )
             {
