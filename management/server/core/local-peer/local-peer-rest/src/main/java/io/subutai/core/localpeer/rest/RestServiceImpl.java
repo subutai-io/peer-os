@@ -387,7 +387,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            localPeer.putAlert( alertPack );
+            localPeer.alert( alertPack );
         }
         catch ( PeerException e )
         {

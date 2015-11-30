@@ -1,6 +1,9 @@
 package io.subutai.common.peer;
 
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonProperty;
+
 import io.subutai.common.metric.AlertValue;
 
 
@@ -9,16 +12,25 @@ import io.subutai.common.metric.AlertValue;
  */
 public class AlertPack
 {
+    @JsonProperty( "peerId" )
     String peerId;
+    @JsonProperty( "environmentId" )
     String environmentId;
+    @JsonProperty( "containerId" )
     String containerId;
+    @JsonProperty( "templateName" )
     String templateName;
+    @JsonProperty( "value" )
     AlertValue value;
+    @JsonIgnore
     boolean delivered = false;
 
 
-    public AlertPack( final String peerId, final String environmentId, final String containerId,
-                      final String templateName, final AlertValue value )
+    public AlertPack( @JsonProperty( "peerId" ) final String peerId,
+                      @JsonProperty( "environmentId" ) final String environmentId,
+                      @JsonProperty( "containerId" ) final String containerId,
+                      @JsonProperty( "templateName" ) final String templateName,
+                      @JsonProperty( "value" ) final AlertValue value )
     {
         this.peerId = peerId;
         this.environmentId = environmentId;

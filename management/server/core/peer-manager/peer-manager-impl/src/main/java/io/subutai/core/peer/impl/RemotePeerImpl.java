@@ -884,9 +884,9 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void putAlert( final AlertPack alert ) throws PeerException
+    public void alert( final AlertPack alert ) throws PeerException
     {
-        new PeerWebClient( peerInfo.getIp(), provider ).putAlert(alert);
+        new PeerWebClient( peerInfo.getIp(), provider ).alert( alert );
     }
 
 

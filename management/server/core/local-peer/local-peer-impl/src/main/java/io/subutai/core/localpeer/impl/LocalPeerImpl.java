@@ -17,8 +17,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
@@ -54,13 +52,13 @@ import io.subutai.common.environment.ContainerDistributionType;
 import io.subutai.common.environment.ContainersDestructionResultImpl;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.host.ContainerHostInfo;
+import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInfo;
-import io.subutai.common.host.ContainerHostInfoModel;
+import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
-import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceAlert;
@@ -68,7 +66,6 @@ import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
-import io.subutai.common.peer.AlertListener;
 import io.subutai.common.peer.AlertPack;
 import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerHost;
@@ -163,10 +160,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     protected PeerInfo peerInfo;
     private SecurityManager securityManager;
 
-    private Set<AlertPack> alerts = new CopyOnWriteArraySet<>();
 
     protected boolean initialized = false;
-    private Map<String, AlertListener> alertListeners = new ConcurrentHashMap<>();
 
 
     public LocalPeerImpl( DaoManager daoManager, TemplateRegistry templateRegistry, QuotaManager quotaManager,
@@ -1600,12 +1595,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public HostInterfaces getInterfaces()
     {
         return managementHost.getHostInterfaces();
-        //        HostInterfaces result = new HostInterfaces();
-        //        for ( HostInterface intf : managementHost.getHostInterfaces() )
-        //        {
-        //            result.addInterface( new HostInterfaceModel( intf ) );
-        //        }
-        //        return result;
     }
 
 
@@ -1764,22 +1753,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public ResourceHostMetrics getResourceHostMetrics()
     {
-        //        ResourceHostMetrics result = new ResourceHostMetrics();
-        //
-        //        for ( ResourceHost resourceHost : getResourceHosts() )
-        //        {
-        //            try
-        //            {
-        //                result.addMetric( resourceHost.getMetric() );
-        //            }
-        //            catch ( Exception e )
-        //            {
-        //                LOG.warn( e.getMessage() );
-        //            }
-        //        }
-
         return monitor.getResourceHostMetrics();
-        //        return result;
     }
 
 
@@ -1896,64 +1870,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public void putAlert( AlertPack alert )
-    {
-        alerts.add( alert );
-    }
-
-
-    @Override
-    public void addAlertListener( final AlertListener alertListener )
-    {
-        this.alertListeners.put( alertListener.getTemplateName(), alertListener );
-    }
-
-
-    @Override
-    public void removeAlertListener( final AlertListener alertListener )
-    {
-        this.alertListeners.remove( alertListener.getTemplateName() );
-    }
-
-
-    @Override
-    public Collection<AlertListener> getAlertListeners()
-    {
-        return alertListeners.values();
-    }
-
-
-    @Override
-    public Set<AlertPack> getAlertPackages()
-    {
-        return alerts;
-    }
-
-
-    @Override
-    public void notifyAlertListeners()
-    {
-        for ( AlertPack alertPack : alerts )
-        {
-            if ( !alertPack.isDelivered() )
-            {
-                AlertListener alertListener = alertListeners.get( alertPack.getTemplateName() );
-
-                if ( alertListener != null )
-                {
-                    alertListener.onAlert( alertPack );
-                    alertPack.setDelivered( true );
-                }
-                else
-                {
-                    LOG.warn( "Alert listener for template '%s' not registered.", alertPack.getTemplateName() );
-                }
-            }
-        }
-    }
-
-
-    @Override
     public ResourceValue getAvailableQuota( final ContainerHost containerHost, final ResourceType resourceType )
             throws PeerException
     {
@@ -1968,6 +1884,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             throw new PeerException(
                     String.format( "Could not obtain quota for: %s %s", containerHost.getId(), resourceType ) );
         }
+    }
+
+
+    @Override
+    public void alert( AlertPack alert )
+    {
+        monitor.addAlert( alert );
     }
 
 

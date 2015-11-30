@@ -405,7 +405,7 @@ public class PeerWebClient
         }
     }
 
-    public void putAlert( final AlertPack alert ) throws PeerException
+    public void alert( final AlertPack alert ) throws PeerException
     {
         String path = "/alert";
 
