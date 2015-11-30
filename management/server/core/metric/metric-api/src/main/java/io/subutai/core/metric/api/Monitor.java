@@ -3,6 +3,7 @@ package io.subutai.core.metric.api;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 import io.subutai.common.metric.BaseMetric;
@@ -67,9 +68,11 @@ public interface Monitor
 
     Collection<AlertListener> getAlertListeners();
 
-    Set<AlertPack> getAlertPackages();
+    List<AlertPack> getAlertPackages();
 
     void notifyAlertListeners();
 
     void addAlert( AlertPack alert );
+
+    void deliverAlerts();
 }

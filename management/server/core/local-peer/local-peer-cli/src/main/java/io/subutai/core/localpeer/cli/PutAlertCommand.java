@@ -34,7 +34,7 @@ public class PutAlertCommand extends SubutaiShellCommandSupport
                 new ResourceAlert( new HostId( "hostId" ), ResourceType.RAM, new ResourceValue( "1.1", MeasureUnit.MB ),
                         new ResourceValue( "2.2", MeasureUnit.MB ) );
         QuotaAlertResource value = new QuotaAlertResource( alertValue );
-        AlertPack alertPack = new AlertPack( localPeer.getId(), "enironmentId", "containerId", "master", value );
+        AlertPack alertPack = new AlertPack( localPeer.getId(), "enironmentId", "containerId", "master", value, System.currentTimeMillis() );
         localPeer.alert( alertPack );
         return null;
     }

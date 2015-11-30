@@ -5,11 +5,12 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -37,8 +38,8 @@ import io.subutai.common.host.ResourceHostInfoModel;
 import io.subutai.common.metric.AlertResource;
 import io.subutai.common.metric.BaseMetric;
 import io.subutai.common.metric.ProcessResourceUsage;
-import io.subutai.common.metric.ResourceAlert;
 import io.subutai.common.metric.QuotaAlertResource;
+import io.subutai.common.metric.ResourceAlert;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.peer.AlertListener;
@@ -80,17 +81,17 @@ public class MonitorImpl implements Monitor, HostListener
 
     private final Commands commands = new Commands();
     private final EnvironmentManager environmentManager;
-    protected ExecutorService notificationExecutor = Executors.newCachedThreadPool();
+    //    protected ExecutorService notificationExecutor = Executors.newCachedThreadPool();
     protected MonitorDao monitorDao;
     protected DaoManager daoManager;
     private Cache<String, BaseMetric> metrics = CacheBuilder.newBuilder().
             expireAfterWrite( METRICS_UPDATE_DELAY * 2, TimeUnit.SECONDS ).
                                                                     build();
     protected ScheduledExecutorService stateUpdateExecutorService;
-    protected ScheduledExecutorService alertDeliverExecutorService;
+    protected ScheduledExecutorService alertTaskExecutorService;
 
     private Map<String, AlertPack> localAlerts = new ConcurrentHashMap<>();
-    private Set<AlertPack> alerts = new CopyOnWriteArraySet<>();
+    private List<AlertPack> alerts = new CopyOnWriteArrayList<>();
 
     private PeerManager peerManager;
     //    private AlertProcessor alertProcessor = new AlertProcessor();
@@ -121,8 +122,8 @@ public class MonitorImpl implements Monitor, HostListener
         stateUpdateExecutorService = Executors.newScheduledThreadPool( 1 );
         stateUpdateExecutorService
                 .scheduleWithFixedDelay( new MetricsUpdater( this ), 10, METRICS_UPDATE_DELAY, TimeUnit.SECONDS );
-        alertDeliverExecutorService = Executors.newScheduledThreadPool( 1 );
-        alertDeliverExecutorService.scheduleWithFixedDelay( new AlertDeliver(), 10, 30, TimeUnit.SECONDS );
+        alertTaskExecutorService = Executors.newScheduledThreadPool( 1 );
+        alertTaskExecutorService.scheduleWithFixedDelay( new BackgroundTasksRunner(), 10, 30, TimeUnit.SECONDS );
     }
 
 
@@ -191,31 +192,10 @@ public class MonitorImpl implements Monitor, HostListener
     }
 
 
-    protected void deliverAlertPackets()
-    {
-        for ( AlertPack alertPack : localAlerts.values() )
-        {
-            if ( !alertPack.isDelivered() )
-            {
-                try
-                {
-                    Peer peer = peerManager.getPeer( alertPack.getPeerId() );
-                    peer.alert( alertPack );
-                    alertPack.setDelivered( true );
-                    LOG.debug( "Alert package delivered: " + alertPack.getResource().getId() );
-                }
-                catch ( Exception e )
-                {
-                    LOG.warn( "Error on delivering alert package: " + alertPack.getResource().getId() );
-                }
-            }
-        }
-    }
-
-
     public void destroy()
     {
-        notificationExecutor.shutdown();
+        alertTaskExecutorService.shutdown();
+        stateUpdateExecutorService.shutdown();
     }
 
 
@@ -224,7 +204,7 @@ public class MonitorImpl implements Monitor, HostListener
     {
         Preconditions.checkNotNull( host );
 
-        HistoricalMetrics result = new HistoricalMetrics(  );
+        HistoricalMetrics result = new HistoricalMetrics();
 
         try
         {
@@ -256,11 +236,12 @@ public class MonitorImpl implements Monitor, HostListener
         return result;
     }
 
+
     @Override
     public void addAlert( final AlertPack alert )
     {
         AlertPack a = new AlertPack( alert.getPeerId(), alert.getEnvironmentId(), alert.getContainerId(),
-                alert.getTemplateName(), alert.getResource() );
+                alert.getTemplateName(), alert.getResource(), alert.geTimestamp() );
         alerts.add( a );
     }
 
@@ -323,6 +304,7 @@ public class MonitorImpl implements Monitor, HostListener
 
 */
 
+
     protected void putAlert( AlertResource alert )
     {
 
@@ -334,7 +316,8 @@ public class MonitorImpl implements Monitor, HostListener
         if ( localAlerts.get( alert.getId() ) != null )
         {
             // skipping, alert already exists
-            LOG.debug( String.format( "Alert already exists: ", alert.getId() ) );
+            LOG.debug( String.format( "Local alert '%s' already exists. Please remove this alert.", alert.getId() ) );
+            return;
         }
 
         String containerId = alert.getHostId().getId();
@@ -343,7 +326,7 @@ public class MonitorImpl implements Monitor, HostListener
         {
             ContainerHost host = peerManager.getLocalPeer().getContainerHostById( containerId );
             AlertPack packet = new AlertPack( host.getInitiatorPeerId(), host.getEnvironmentId().getId(), containerId,
-                    host.getTemplateName(), alert );
+                    host.getTemplateName(), alert, System.currentTimeMillis() );
             LOG.debug( String.format( "Put alert: %s", alert.getId() ) );
             localAlerts.put( alert.getId(), packet );
         }
@@ -440,18 +423,6 @@ public class MonitorImpl implements Monitor, HostListener
     }
 
 
-    protected void notifyListener( final AlertPack alertPack )
-    {
-        AlertListener alertListener = alertListeners.get( alertPack.getTemplateName() );
-
-        if ( alertListener != null )
-        {
-            AlertNotifier alertNotifier = new AlertNotifier( alertPack, alertListener );
-            alertNotifier.run();
-        }
-    }
-
-
     @Override
     public void addAlertListener( final AlertListener alertListener )
     {
@@ -480,7 +451,7 @@ public class MonitorImpl implements Monitor, HostListener
 
 
     @Override
-    public Set<AlertPack> getAlertPackages()
+    public List<AlertPack> getAlertPackages()
     {
         return alerts;
     }
@@ -500,12 +471,62 @@ public class MonitorImpl implements Monitor, HostListener
     }
 
 
-    private class AlertDeliver implements Runnable
+    protected void notifyListener( final AlertPack alertPack )
+    {
+        AlertListener alertListener = alertListeners.get( alertPack.getTemplateName() );
+
+        if ( alertListener != null )
+        {
+            AlertNotifier alertNotifier = new AlertNotifier( alertPack, alertListener );
+            alertNotifier.run();
+        }
+    }
+
+
+    @Override
+    public void deliverAlerts()
+    {
+        for ( AlertPack alertPack : localAlerts.values() )
+        {
+            if ( !alertPack.isDelivered() )
+            {
+                deliverAlert( alertPack );
+            }
+        }
+    }
+
+
+    private void deliverAlert( final AlertPack alertPack )
+    {
+        Peer peer = peerManager.getPeer( alertPack.getPeerId() );
+        if ( peer != null )
+        {
+            new AlertDeliver( peer, alertPack ).run();
+        }
+        else
+        {
+            LOG.warn( String.format( "Destination peer '%s' for alert '%s' not found.", alertPack.getPeerId(),
+                    alertPack.getResource().getId() ) );
+        }
+    }
+
+
+    private class BackgroundTasksRunner implements Runnable
     {
         @Override
         public void run()
         {
-            deliverAlertPackets();
+            LOG.debug( "Background task runner started..." );
+            try
+            {
+                deliverAlerts();
+                notifyAlertListeners();
+            }
+            catch ( Exception e )
+            {
+                LOG.warn( "Background task execution faild: " + e.getMessage() );
+            }
+            LOG.debug( "Background task runner finished." );
         }
     }
 

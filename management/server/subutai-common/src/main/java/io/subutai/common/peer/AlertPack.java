@@ -1,6 +1,8 @@
 package io.subutai.common.peer;
 
 
+import java.util.Date;
+
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 
@@ -24,19 +26,23 @@ public class AlertPack
     AlertResource resource;
     @JsonIgnore
     boolean delivered = false;
+    @JsonProperty( "ts" )
+    long timestamp;
 
 
     public AlertPack( @JsonProperty( "peerId" ) final String peerId,
                       @JsonProperty( "environmentId" ) final String environmentId,
                       @JsonProperty( "containerId" ) final String containerId,
                       @JsonProperty( "templateName" ) final String templateName,
-                      @JsonProperty( "resource" ) final AlertResource resource )
+                      @JsonProperty( "resource" ) final AlertResource resource,
+                      @JsonProperty( "ts" ) final long timestamp )
     {
         this.peerId = peerId;
         this.environmentId = environmentId;
         this.containerId = containerId;
         this.resource = resource;
         this.templateName = templateName;
+        this.timestamp = timestamp;
     }
 
 
@@ -79,6 +85,19 @@ public class AlertPack
     public void setDelivered( final boolean delivered )
     {
         this.delivered = delivered;
+    }
+
+
+    @JsonIgnore
+    public Date getCreationDate()
+    {
+        return new Date( timestamp );
+    }
+
+
+    public long geTimestamp()
+    {
+        return this.timestamp;
     }
 
 
