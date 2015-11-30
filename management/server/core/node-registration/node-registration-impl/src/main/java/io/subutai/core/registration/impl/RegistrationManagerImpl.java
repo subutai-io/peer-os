@@ -195,7 +195,12 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
         Set<String> result = new HashSet<>();
 
         for (Peer peer : peers) {
-            Set<HostInterface> r = peer.getInterfaces().filterByIp(N2NUtil.N2N_INTERFACE_IP_PATTERN);
+            Set<HostInterface> r = null;
+            try {
+                r = peer.getInterfaces().filterByIp(N2NUtil.N2N_INTERFACE_IP_PATTERN);
+            } catch (PeerException e) {
+                e.printStackTrace();
+            }
 
             Collection tunnels = CollectionUtils.collect(r, new Transformer() {
                 @Override
@@ -410,10 +415,12 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
 
             String freeTunnelNetwork = N2NUtil.findFreeTunnelNetwork(existingNetworks);
             args.add("-I");
+            freeTunnelNetwork = freeTunnelNetwork.substring(0, freeTunnelNetwork.length() - 1)+
+            (Integer.valueOf(freeTunnelNetwork.substring(freeTunnelNetwork.length()-1))+1);
             args.add(freeTunnelNetwork);
 
-            int ipOctet = Integer.valueOf(freeTunnelNetwork.substring(freeTunnelNetwork.length() - 1));
-            String ipRh = freeTunnelNetwork.substring(0, freeTunnelNetwork.length() - 1) + ++ipOctet;
+            int ipOctet = (Integer.valueOf(freeTunnelNetwork.substring(freeTunnelNetwork.length()-1))+1);
+            String ipRh = freeTunnelNetwork.substring(0, freeTunnelNetwork.length() - 1) + ipOctet;
             args.add("-i");
             args.add(ipRh);
 
@@ -424,11 +431,12 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
             String deviceName = N2NUtil.generateInterfaceName(freeTunnelNetwork);
             args.add("-d");
             args.add(deviceName);
-
+            String runUser = "root";
             result = managementHost
-                    .execute(new RequestBuilder("/home/ubuntu/awsdeploy/awsdeploy").withCmdArgs(args)
-                            .withTimeout(1800)
-                            .withRunAs("ubuntu"));
+                    .execute(new RequestBuilder("/home/ubuntu/awsdeploy/awsdeploy")
+                            .withCmdArgs(args)
+                            .withRunAs(runUser)
+                            .withTimeout(600));
 
             if (result.getExitCode() != 0) {
                 throw new NodeRegistrationException(result.getStdErr());
