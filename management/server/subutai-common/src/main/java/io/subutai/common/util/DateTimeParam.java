@@ -1,12 +1,18 @@
 package io.subutai.common.util;
 
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.codehaus.jackson.annotate.JsonCreator;
+
 import com.google.common.base.Preconditions;
+
+import sun.misc.CharacterEncoder;
 
 
 /**
@@ -23,12 +29,14 @@ public class DateTimeParam
     private static final DateFormat dateTimeFormat = new SimpleDateFormat( DATE_TIME_FORMAT );
 
 
-    public DateTimeParam( String str ) throws ParseException
+    @JsonCreator
+    public DateTimeParam( String str ) throws ParseException, UnsupportedEncodingException
     {
         Preconditions.checkNotNull( str );
-        Preconditions.checkArgument( str.length() == 10 );
+        Preconditions.checkArgument( str.length() >= 10 );
 
-        this.date = dateTimeFormat.parse( str );
+        String decoded = URLDecoder.decode( str, "UTF-8" );
+        this.date = dateTimeFormat.parse( decoded );
     }
 
 

@@ -10,4 +10,7 @@ public class HostNotFoundException extends PeerException
     {
         super( msg );
     }
+
+
+
 }

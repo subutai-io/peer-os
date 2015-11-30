@@ -1,7 +1,8 @@
 package io.subutai.common.resource;
 
 
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 
@@ -12,7 +13,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 public class HistoricalMetrics
 {
     @JsonProperty( "Metrics" )
-    SeriesBatch[] metrics;
+    List<SeriesBatch> metrics = new ArrayList<>();
 
 
     public HistoricalMetrics()
@@ -20,13 +21,13 @@ public class HistoricalMetrics
     }
 
 
-    public HistoricalMetrics( @JsonProperty( "Metrics" ) final SeriesBatch[] metrics )
+    public HistoricalMetrics( @JsonProperty( "Metrics" ) final List<SeriesBatch> metrics )
     {
         this.metrics = metrics;
     }
 
 
-    public SeriesBatch[] getMetrics()
+    public List<SeriesBatch> getMetrics()
     {
         return metrics;
     }
