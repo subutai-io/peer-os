@@ -2,7 +2,7 @@ Meta:
 
 Narrative:
 As a QA
-I want to verify an Unprivileged containers PLAYBOOK SS-3025
+I want to verify a PLAYBOOK SS-3025
 So that I will create test scenarios
 
 Scenario: The First User Sends Request
