@@ -25,6 +25,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
 
@@ -171,16 +172,15 @@ public class PGPEncryptionUtilTest
             PGPPublicKey thirdPublicKey =
                     PGPEncryptionUtil.findPublicKeyById( thirdPublicStream, third.getPrimaryKeyId() );
 
-            printPublicKeySignatures( firstPublicKeyRing.getPublicKey(), thirdPublicKey );
 
-            //            PGPPublicKey secondPublicKey =
-            //                    PGPEncryptionUtil.findPublicKeyById( secondPublicStream, second.getPrimaryKeyId() );
+            assertEquals( false, printPublicKeySignatures( firstPublicKeyRing.getPublicKey(), thirdPublicKey ) );
 
             if ( secondPublicKeyRing != null )
             {
                 firstPublicKeyRing =
                         PGPEncryptionUtil.removeSignature( firstPublicKeyRing, secondPublicKeyRing.getPublicKey() );
-                printPublicKeySignatures( firstPublicKeyRing.getPublicKey(), secondPublicKeyRing.getPublicKey() );
+                assertEquals( false, printPublicKeySignatures( firstPublicKeyRing.getPublicKey(),
+                        secondPublicKeyRing.getPublicKey() ) );
             }
         }
     }
@@ -188,17 +188,13 @@ public class PGPEncryptionUtilTest
 
     private void printKeyInArmoredFormat( KeyPair keyPair ) throws PGPException
     {
-        //        logger.info( "*********************" );
-        //        logger.info( keyPair.getSubKeyFingerprint() );
         String firstPublicArmored = PGPEncryptionUtil.armorByteArrayToString( keyPair.getPubKeyring() );
         String firstPrivateArmored = PGPEncryptionUtil.armorByteArrayToString( keyPair.getSecKeyring() );
-        //        logger.info( String.format( "\n%s\n\n%s", firstPublicArmored, firstPrivateArmored ) );
     }
 
 
-    private void printPublicKeySignatures( PGPPublicKey publicKey, final PGPPublicKey secondPublicKey )
+    private boolean printPublicKeySignatures( PGPPublicKey publicKey, final PGPPublicKey secondPublicKey )
     {
-        //        logger.info( "@@@@@@@@@@@@@@@@@@@@@" );
         boolean verification = false;
         try
         {
@@ -217,6 +213,7 @@ public class PGPEncryptionUtilTest
             signature.getSignatureType();
             logger.info( Long.toHexString( signature.getKeyID() ) );
         }
+        return verification;
     }
 
 
@@ -248,7 +245,6 @@ public class PGPEncryptionUtilTest
                 PGPPublicKeyRing firstSignedPublicKeyRing =
                         PGPEncryptionUtil.signPublicKey( firstPublicKeyRing, keyId, secondSecretKey, password );
 
-                //                printPublicKeySignatures( firstPublicKeyRing.getPublicKey(), secondPublicKey );
                 printPublicKeySignatures( firstSignedPublicKeyRing.getPublicKey(), secondPublicKey );
 
                 first.setPubKeyring( firstSignedPublicKeyRing.getEncoded() );
