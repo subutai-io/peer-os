@@ -46,7 +46,7 @@ public class MetricListCommandTest extends SystemOutRedirectTest
         Environment environment = mock( Environment.class );
         ContainerHostMetric metric = mock( ContainerHostMetric.class );
         when( metric.toString() ).thenReturn( METRIC_TO_STRING );
-        when( monitor.getContainerHostsMetrics( environment ) ).thenReturn( Sets.newHashSet( metric ) );
+//        when( monitor.getContainerHostsMetrics( environment ) ).thenReturn( Sets.newHashSet( metric ) );
         metricListCommand = new MetricListCommand( monitor);
     }
 

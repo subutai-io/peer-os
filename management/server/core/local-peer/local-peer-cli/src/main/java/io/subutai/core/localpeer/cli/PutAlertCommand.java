@@ -35,7 +35,7 @@ public class PutAlertCommand extends SubutaiShellCommandSupport
                         new ResourceValue( "2.2", MeasureUnit.MB ) );
         ResourceAlertValue value = new ResourceAlertValue( alertValue );
         AlertPack alertPack = new AlertPack( localPeer.getId(), "enironmentId", "containerId", "master", value );
-        localPeer.putAlert( alertPack );
+        localPeer.alert( alertPack );
         return null;
     }
 }

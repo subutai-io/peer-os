@@ -1,6 +1,7 @@
 package io.subutai.common.metric;
 
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import io.subutai.common.host.HostId;
@@ -59,6 +60,7 @@ public class ResourceAlert
     }
 
 
+    @JsonIgnore
     public String getDescription()
     {
         return String.format( "%s/%s", currentValue.getPrintValue(), quotaValue.getPrintValue() );

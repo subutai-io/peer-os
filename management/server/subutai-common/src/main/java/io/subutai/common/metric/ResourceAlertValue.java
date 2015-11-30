@@ -1,6 +1,9 @@
 package io.subutai.common.metric;
 
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import org.codehaus.jackson.annotate.JsonProperty;
+
 import com.google.common.base.Preconditions;
 
 import io.subutai.common.host.HostId;
@@ -9,12 +12,14 @@ import io.subutai.common.host.HostId;
 /**
  * Resource alert value
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ResourceAlertValue implements AlertValue
 {
+    @JsonProperty( "value" )
     private ResourceAlert value;
 
 
-    public ResourceAlertValue( final ResourceAlert value )
+    public ResourceAlertValue( @JsonProperty( "value" ) final ResourceAlert value )
     {
         Preconditions.checkNotNull( value );
         Preconditions.checkNotNull( value.getHostId() );
