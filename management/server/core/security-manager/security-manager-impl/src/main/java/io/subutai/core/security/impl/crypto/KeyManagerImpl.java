@@ -162,7 +162,6 @@ public class KeyManagerImpl implements KeyManager
         try
         {
             String secretFPrint = PGPKeyUtil.getFingerprint( sourceSecRing.getPublicKey().getFingerprint() );
-            String publicFPrint = PGPKeyUtil.getFingerprint( targetPubRing.getPublicKey().getFingerprint() );
 
             //****************************************
             String keyIdentityId = getKeyDataByFingerprint( secretFPrint ).getIdentityId();
@@ -170,8 +169,6 @@ public class KeyManagerImpl implements KeyManager
 
             targetPubRing =
                     encryptionTool.signPublicKey( targetPubRing, keyIdentityId, sourceSecRing.getSecretKey(), "" );
-            keyServer.updatePublicKey( targetPubRing );
-            setKeyTrust( secretFPrint, publicFPrint, trustLevel );
         }
         catch ( Exception ex )
         {
@@ -208,7 +205,6 @@ public class KeyManagerImpl implements KeyManager
             PGPSecretKeyRing sourceSecRing = getSecretKeyRing( sourceIdentityId );
 
             targetPubRing = signKey( sourceSecRing, targetPubRing, trustLevel );
-
             keyStr = encryptionTool.armorByteArrayToString( targetPubRing.getEncoded() );
         }
         catch ( Exception ex )
@@ -223,12 +219,50 @@ public class KeyManagerImpl implements KeyManager
      *
      */
     @Override
-    public void setKeyTrust( String sourceFingerprint, String targetFingerprint, int trustLevel )
+    public PGPPublicKeyRing setKeyTrust( PGPSecretKeyRing sourceSecRing, PGPPublicKeyRing targetPubRing, int trustLevel )
+    {
+        PGPPublicKeyRing newPubRing = null;
+        String sFingerprint = PGPKeyUtil.getFingerprint( sourceSecRing. );
+
+        SecurityKeyTrust keyTrust = securityDataService.getKeyTrustData( sourceFingerprint, targetFingerprint );
+
+        try
+        {
+            if ( trustLevel == KeyTrustLevel.Never.getId() )
+            {
+                //******************************************
+                newPubRing = removeSignature( sourceSecRing.getPublicKey() , targetPubRing );
+                //******************************************
+            }
+            else
+            {
+                newPubRing = signKey( sourceSecRing, targetPubRing, trustLevel);
+            }
+
+
+
+            updatePublicKeyRing( newPubRing );
+            securityDataService.updateKeyTrustData( keyTrustData );
+        }
+        catch ( Exception ex )
+        {
+            LOG.error( " **** Error!!! Error creating key trust:" + ex.toString(), ex );
+        }
+
+        return newPubRing;
+    }
+
+
+    /* ***************************************************************
+     *
+     */
+    @Override
+    public PGPPublicKeyRing setKeyTrust( String sourceFingerprint, String targetFingerprint, int trustLevel )
     {
         try
         {
-            SecurityKeyTrust securityKeyTrust =
-                    securityDataService.getKeyTrustData( sourceFingerprint, targetFingerprint );
+            //SecurityKeyTrust securityKeyTrust =
+                    //securityDataService.getKeyTrustData( sourceFingerprint, targetFingerprint );
 
             SecurityKey sourceSecurityKey = getKeyDataByFingerprint( sourceFingerprint );
             SecurityKey targetSecurityKey = getKeyDataByFingerprint( targetFingerprint );
@@ -236,7 +270,7 @@ public class KeyManagerImpl implements KeyManager
             if ( !verifyTrustRelationValidity( SecurityKeyType.getById( sourceSecurityKey.getType() ),
                     SecurityKeyType.getById( targetSecurityKey.getType() ) ) )
             {
-                throw new RuntimeException( "Trust is not allow for this relation" );
+                throw new RuntimeException( "Trust is not allowed for this relation" );
             }
 
             if ( trustLevel == KeyTrustLevel.Never.getId() )
@@ -270,6 +304,9 @@ public class KeyManagerImpl implements KeyManager
     }
 
 
+    /* ***************************************************************
+     *
+     */
     private boolean verifyTrustRelationValidity( SecurityKeyType sourceKeyType, SecurityKeyType targetKeyType )
     {
         switch ( sourceKeyType )
@@ -329,9 +366,8 @@ public class KeyManagerImpl implements KeyManager
         PGPPublicKeyRing targetPubRing = getPublicKeyRingByFingerprint( targetFingerprint );
         PGPPublicKeyRing sourcePubRing = getPublicKeyRingByFingerprint( sourceFingerprint );
         PGPPublicKey sourcePublicKey = sourcePubRing.getPublicKey();
-        //        String sourceIdentityId = getKeyDataByFingerprint( sourceFingerprint ).getIdentityId();
 
-        return encryptionTool.removeSignature( sourcePublicKey, targetPubRing );
+        return removeSignature( sourcePublicKey, targetPubRing );
     }
 
 
@@ -339,21 +375,9 @@ public class KeyManagerImpl implements KeyManager
      *
      */
     @Override
-    public PGPPublicKeyRing removeSignature( String sourceIdentityId, PGPPublicKeyRing targetPubRing )
+    public PGPPublicKeyRing removeSignature( PGPPublicKey sourcePublicKey, PGPPublicKeyRing targetPubRing )
     {
-        PGPPublicKeyRing newRing = null;
-        try
-        {
-            PGPPublicKey sourcePublicKey = getPublicKey( sourceIdentityId );
-            newRing = encryptionTool.removeSignature( sourcePublicKey, targetPubRing );
-            keyServer.updatePublicKey( newRing );
-        }
-        catch ( IOException | PGPException e )
-        {
-            LOG.error( "**** Error !!! Error removing key signature IdentityId: " + sourceIdentityId, e );
-        }
-
-        return newRing;
+        return encryptionTool.removeSignature( sourcePublicKey, targetPubRing );
     }
 
 

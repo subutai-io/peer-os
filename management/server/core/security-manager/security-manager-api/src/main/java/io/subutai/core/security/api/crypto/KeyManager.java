@@ -127,7 +127,12 @@ public interface KeyManager
     /* ***************************************************************
      *
      */
-    void setKeyTrust( String sourceFingerprint, String targetFingerprint, int trustLevel );
+    PGPPublicKeyRing setKeyTrust( PGPSecretKeyRing sourceSecRing, PGPPublicKeyRing targetPubRing, int trustLevel );
+
+    /* ***************************************************************
+         *
+         */
+    PGPPublicKeyRing setKeyTrust( String sourceFingerprint, String targetFingerprint, int trustLevel );
 
 
     /* ***************************************************************
@@ -154,6 +159,11 @@ public interface KeyManager
     /* ***************************************************************
      *
      */
+    PGPPublicKeyRing removeSignature( PGPPublicKey sourcePublicKey, PGPPublicKeyRing targetPubRing );
+
+    /* ***************************************************************
+         *
+         */
     SecurityKeyTrust getKeyTrustData(String sourceFingerprint, String targetFingerprint);
 
 
