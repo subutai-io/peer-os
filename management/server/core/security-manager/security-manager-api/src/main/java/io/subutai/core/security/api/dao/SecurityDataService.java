@@ -4,7 +4,7 @@ package io.subutai.core.security.api.dao;
 import java.util.List;
 
 import io.subutai.core.security.api.model.SecretKeyStore;
-import io.subutai.core.security.api.model.SecurityKeyIdentity;
+import io.subutai.core.security.api.model.SecurityKey;
 import io.subutai.core.security.api.model.SecurityKeyTrust;
 
 
@@ -17,19 +17,25 @@ public interface SecurityDataService
     /******************************************
      * Store Public key in the DB
      */
-    public void saveKeyIdentityData( String hostId ,String sKeyId,String pKeyId, int type );
+    public void saveKeyData( String identityId ,String sKeyId,String pKeyId, int type );
 
 
     /******************************************
      * Remove Public key from the DB
      */
-    public void removeKeyIdentityData( String hostId);
+    public void removeKeyData( String identityId);
 
 
     /******************************************
-     * Get SecurityKeyIdentity entity from DB
+     * Get SecurityKey entity from DB
      */
-    public SecurityKeyIdentity getKeyIdentityData( String hostId );
+    public SecurityKey getKeyData( String identityId );
+
+
+    /******************************************
+     * Get SecurityKey entity from DB
+     */
+    public SecurityKey getKeyDataByFingerprint( String fingerprint );
 
 
     /******************************************
@@ -53,12 +59,20 @@ public interface SecurityDataService
     /******************************************
      *
      */
-    void saveKeyTrustData( String sourceId, String targetId, int trustLevel );
+    SecurityKeyTrust saveKeyTrustData( String sourceId, String targetId, int trustLevel );
+
+
+    /******************************************
+     *
+     */
+    public void updateKeyTrustData( SecurityKeyTrust securityKeyTrust );
+
 
     /******************************************
      *
      */
     void removeKeyTrustData( long id );
+
 
     /******************************************
      *
@@ -70,6 +84,12 @@ public interface SecurityDataService
      *
      */
     void removeKeyTrustData( String sourceId, String targetId );
+
+
+    /******************************************
+     *
+     */
+    void removeKeyAllTrustData( String fingerprint );
 
 
     /******************************************

@@ -39,7 +39,7 @@ public class ServerBusListenerTest
     @Ignore
     public void testBusRegistered() throws Exception
     {
-        cxfBusListener.busRegistered( bus );
+        //cxfBusListener.busRegistered( bus );
     }
 
 

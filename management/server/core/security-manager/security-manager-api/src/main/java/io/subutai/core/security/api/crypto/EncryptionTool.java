@@ -34,6 +34,25 @@ public interface EncryptionTool
     public byte[] decryptAndVerify( final byte[] message,PGPSecretKey secretKey, String pwd ,PGPPublicKey pubKey) throws PGPException;
 
 
+
+    /* *****************************************
+     *
+     */
+    boolean verifyPublicKey( PGPPublicKey keyToVerify, PGPPublicKey keyToVerifyWith );
+
+
+    /* *****************************************
+     *
+     */
+    PGPPublicKeyRing removeSignature( String id, PGPPublicKeyRing keyToRemoveFrom);
+
+
+    /* *****************************************
+     *
+     */
+    PGPPublicKeyRing removeSignature( PGPPublicKey keySignToRemove, PGPPublicKeyRing keyToRemoveFrom );
+
+
     /* *****************************************
      *
      */
