@@ -207,7 +207,7 @@ public class LocalPeerImplTest
         peerMap.put( IP, N2N_IP );
         localPeer =
                 spy( new LocalPeerImpl( daoManager, templateRegistry, quotaManager, strategyManager, commandExecutor,
-                        hostRegistry, monitor, securityManager , null) );
+                        hostRegistry, monitor, securityManager) );
 
         //        localPeer.containerHostDataService = containerHostDataService;
         //        localPeer.containerGroupDataService = containerGroupDataService;

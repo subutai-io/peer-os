@@ -25,7 +25,6 @@ import io.subutai.common.protocol.Template;
 import io.subutai.common.resource.ResourceType;
 import io.subutai.common.resource.ResourceValue;
 import io.subutai.common.security.PublicKeyContainer;
-import io.subutai.common.protocol.TemplateKurjun;
 
 
 /**
@@ -141,7 +140,7 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
     /**
      * Returns template by name
      */
-    public TemplateKurjun getTemplate( String templateName ) throws PeerException;
+    public Template getTemplate( String templateName ) throws PeerException;
 
     /**
      * Returns true of the peer is reachable online, false otherwise

@@ -67,7 +67,6 @@ import io.subutai.common.settings.SecuritySettings;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
-import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.core.messenger.api.Message;
 import io.subutai.core.messenger.api.MessageException;
 import io.subutai.core.messenger.api.Messenger;
@@ -228,7 +227,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public TemplateKurjun getTemplate( final String templateName ) throws PeerException
+    public Template getTemplate( final String templateName ) throws PeerException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
 
@@ -248,9 +247,7 @@ public class RemotePeerImpl implements RemotePeer
         {
             String response = get( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, params, headers );
 
-            // TODO: Kairat
-            // return jsonUtil.from( response, TemplateKurjun.class );
-            return null;
+             return jsonUtil.from( response, Template.class );
         }
         catch ( Exception e )
         {

@@ -108,8 +108,6 @@ import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hostregistry.api.HostRegistry;
-import io.subutai.core.kurjun.api.TemplateManager;
-import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.core.localpeer.impl.command.CommandRequestListener;
 import io.subutai.core.localpeer.impl.container.CreateContainerWrapperTask;
 import io.subutai.core.localpeer.impl.container.CreateEnvironmentContainerGroupRequestListener;
@@ -133,8 +131,6 @@ import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.strategy.api.StrategyManager;
 import io.subutai.core.strategy.api.StrategyNotFoundException;
 
-import static io.subutai.core.kurjun.api.TemplateManager.PUBLIC_REPO;
-
 
 /**
  * Local peer implementation
@@ -150,7 +146,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     private String externalIpInterface = "eth1";
     private DaoManager daoManager;
-//    private TemplateRegistry templateRegistry;
+    private TemplateRegistry templateRegistry;
     protected ManagementHostEntity managementHost;
     protected Set<ResourceHost> resourceHosts = Sets.newHashSet();
     private CommandExecutor commandExecutor;
@@ -166,7 +162,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     protected Set<RequestListener> requestListeners = Sets.newHashSet();
     protected PeerInfo peerInfo;
     private SecurityManager securityManager;
-    private TemplateManager templateManager;
 
     private Set<AlertPack> alerts = new CopyOnWriteArraySet<>();
 
@@ -176,17 +171,16 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     public LocalPeerImpl( DaoManager daoManager, TemplateRegistry templateRegistry, QuotaManager quotaManager,
                           StrategyManager strategyManager, CommandExecutor commandExecutor, HostRegistry hostRegistry,
-                          Monitor monitor, SecurityManager securityManager, TemplateManager templateManager )
+                          Monitor monitor, SecurityManager securityManager )
     {
         this.strategyManager = strategyManager;
         this.daoManager = daoManager;
-//        this.templateRegistry = templateRegistry;
+        this.templateRegistry = templateRegistry;
         this.quotaManager = quotaManager;
         this.monitor = monitor;
         this.commandExecutor = commandExecutor;
         this.hostRegistry = hostRegistry;
         this.securityManager = securityManager;
-        this.templateManager = templateManager;
     }
 
 
@@ -331,9 +325,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             ( ( AbstractSubutaiHost ) resourceHost ).setPeer( this );
             final ResourceHostEntity resourceHostEntity = ( ResourceHostEntity ) resourceHost;
-//            resourceHostEntity.setRegistry( templateRegistry );
-            resourceHostEntity.setTemplateManager( templateManager );
-            //            resourceHostEntity.setMonitor( monitor );
+            resourceHostEntity.setRegistry( templateRegistry );
             resourceHostEntity.setHostRegistry( hostRegistry );
         }
     }
@@ -1126,18 +1118,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public TemplateKurjun getTemplate( final String templateName )
+    public Template getTemplate( final String templateName )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
-        try
-        {
-            return templateManager.getTemplate( PUBLIC_REPO, templateName, null );
-        }
-        catch ( IOException e )
-        {
-            LOG.error( "Failed to get template '{}' from '{}' repository", templateName, PUBLIC_REPO, e);
-        }
-        return null;
+        
+        return templateRegistry.getTemplate( templateName );
     }
 
 
@@ -1808,16 +1793,14 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public List<Template> getTemplates()
     {
-//        return templateRegistry.getAllTemplates();
-        return null;
+        return templateRegistry.getAllTemplates();
     }
 
 
     @Override
     public Template getTemplateByName( final String name )
     {
-//        return templateRegistry.getTemplateData( name );
-        return null;
+        return templateRegistry.getTemplate( name );
     }
 
 

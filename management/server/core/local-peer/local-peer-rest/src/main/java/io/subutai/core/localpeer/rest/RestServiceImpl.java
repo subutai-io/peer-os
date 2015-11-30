@@ -37,7 +37,6 @@ import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.protocol.TemplateKurjun;
 
 
 public class RestServiceImpl implements RestService
@@ -137,7 +136,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            TemplateKurjun result = localPeer.getTemplate( templateName );
+            Template result = localPeer.getTemplate( templateName );
             return Response.ok( result ).build();
         }
         catch ( Exception e )

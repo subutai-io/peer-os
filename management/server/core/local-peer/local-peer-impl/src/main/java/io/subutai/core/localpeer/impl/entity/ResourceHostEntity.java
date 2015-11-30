@@ -53,7 +53,6 @@ import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.NumUtil;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
-import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.localpeer.impl.container.CreateContainerTask;
 import io.subutai.core.localpeer.impl.container.DestroyContainerTask;
 import io.subutai.core.registry.api.TemplateRegistry;
@@ -94,7 +93,6 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
     @Transient
     protected HostRegistry hostRegistry;
-    private TemplateManager templateManager;
 
 
     protected ResourceHostEntity()
