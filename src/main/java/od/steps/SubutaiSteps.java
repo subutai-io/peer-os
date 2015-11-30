@@ -16,7 +16,7 @@ public class SubutaiSteps extends ScenarioSteps {
     private Object token;
     private Object peerID;
     private Object environmentData;
-    private Object containerIp;
+    public Object containerIp;
 
     @Step
     public void inputLogin(String login){
@@ -765,7 +765,21 @@ public class SubutaiSteps extends ScenarioSteps {
 
     @Step
     public Object getContainerIp() {
-        containerIp = subutaiPage.containerIp.getText();
+        containerIp =  subutaiPage.containerIp.getText();
         return containerIp;
+    }
+
+    @Step
+    public void executeConsoleCommandPingContainer(String command){
+        subutaiPage.executeConsoleCommand(command);
+    }
+
+    @Step
+    public void seeOutputOfPingCommand() {
+        assertThat(subutaiPage.outputOfPingCommand.isVisible(), is(true));
+    }
+
+    public void seeOutputOfWrongPingCommand() {
+        assertThat(subutaiPage.outputOfWrongPingCommand.isVisible(), is(true));
     }
 }

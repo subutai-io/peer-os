@@ -340,6 +340,12 @@ public class SubutaiPage extends PageObject {
     @FindBy(xpath = "*//pre[contains(text(),\"/\")]")
     public WebElementFacade outputOfPwdCommand;
 
+    @FindBy(xpath = "*//pre[contains(text(),\"3 received\")]")
+    public WebElementFacade outputOfPingCommand;
+
+    @FindBy(xpath = "*//pre[contains(text(),\"0 received\")]")
+    public WebElementFacade outputOfWrongPingCommand;
+
     @FindBy(id = "subt-link__user-identity")
     public WebElementFacade linkUserIdentity;
 
@@ -367,6 +373,6 @@ public class SubutaiPage extends PageObject {
     @FindBy(xpath = "*//*[contains(text(),\"BEGIN PGP PUBLIC KEY BLOCK\")]")
     public WebElementFacade environmentPGPKey;
 
-    @FindBy(xpath = "*//tr[@class=\"ng-scope odd\"]//td[@class=\"subt_text__container-ip sorting_1\"]")
+    @FindBy(xpath = "*//tr[@class=\"ng-scope odd\"]//td[@class=\"subt_text__container-ip sorting_1\"]//span[@class=\"ng-binding ng-isolate-scope\"]")
     public WebElementFacade containerIp;
 }
