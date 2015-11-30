@@ -1468,7 +1468,7 @@ td.b-main-table__status-col {
 }
 
 .b-form-input-dropdown-list-li {
-    border-bottom: 1px solid #E6EAF5;
+    border-bottom: 1px solid #dcdcdc;
 }
 
 .b-form-input-dropdown-list-li-label {
@@ -1554,7 +1554,7 @@ td.b-main-table__status-col {
     display: inline-block;
     margin: 0 0 0 0;
     background-color: #FFF;
-    border: 1px solid #e6eaf5;
+    border: 1px solid #dcdcdc;
     border-left: none;
     height: 26px;
     line-height: 26px;
@@ -1572,7 +1572,7 @@ td.b-main-table__status-col {
 }
 
 .b-toggle-buttons__item:first-child {
-    border-left: 1px solid #e6eaf5;
+    border-left: 1px solid #dcdcdc;
     border-radius: 5px 0 0 5px;
 }
 
@@ -1655,7 +1655,7 @@ td.b-main-table__status-col {
 
 .b-tabs-menu__item {
 	text-decoration: underline;
-	font-size: 11px;
+	font-size: 13px;
 	color: #19286e;
 	line-height: 23px;
 	border: 1px solid #dcdcdc;

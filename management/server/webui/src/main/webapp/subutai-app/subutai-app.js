@@ -612,6 +612,48 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 				}]
 			}
 		})
+		.state('accumulo', {
+			url: '/plugins/accumulo',
+			templateUrl: 'plugins/accumulo/partials/view.html',
+			resolve: {
+				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+					return $ocLazyLoad.load([
+						{
+							name: 'subutai.plugins.accumulo',
+							files: [
+								'plugins/accumulo/accumulo.js',
+								'plugins/accumulo/controller.js',
+								'plugins/accumulo/service.js',
+								'plugins/hadoop/service.js',
+								'plugins/zookeeper/service.js',
+								'subutai-app/environment/service.js'
+							]
+						}
+					]);
+				}]
+			}
+		})
+		.state('shark', {
+			url: '/plugins/shark',
+			templateUrl: 'plugins/shark/partials/view.html',
+			resolve: {
+				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+					return $ocLazyLoad.load([
+						{
+							name: 'subutai.plugins.shark',
+							files: [
+								'plugins/shark/shark.js',
+								'plugins/shark/controller.js',
+								'plugins/shark/service.js',
+								'plugins/hadoop/service.js',
+								'plugins/spark/service.js',
+								'subutai-app/environment/service.js'
+							]
+						}
+					]);
+				}]
+			}
+		})
 		.state('404', {
 			url: '/404',
 			template: 'Not found'
@@ -724,11 +766,11 @@ function VARS_MODAL_CONFIRMATION( object, title, text, func )
 function VARS_MODAL_ERROR( object, text )
 {
 	object.swal({
-			title: "ERROR!",
-			text: text,
-			type: "error",
-			confirmButtonColor: "#ff3f3c"
-		});
+		title: "ERROR!",
+		text: text,
+		type: "error",
+		confirmButtonColor: "#ff3f3c"
+	});
 }
 
 quotaColors = [];
@@ -816,7 +858,7 @@ var permissionsDefault = [
 
 function toggle (source, name) {
 	checkboxes = document.getElementsByName (name);
-    for (var i = 0; i < checkboxes.length; i++) {
-    	checkboxes[i].checked = source.checked;
-    }
+	for (var i = 0; i < checkboxes.length; i++) {
+		checkboxes[i].checked = source.checked;
+	}
 }

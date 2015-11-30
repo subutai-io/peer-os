@@ -334,7 +334,7 @@ table.dataTable thead .sorting_desc {
 		   padding: 0 23px 0 10px;
 		   font-size: 13px;
 		   height: 27px;
-		   border: 1px solid #e6eaf5;
+		   border: 1px solid #dcdcdc;
 		   border-radius: 5px;
 		   background-image: url(../../assets/elements/search-icon.png);
 		   background-position: 96% 50%;
@@ -342,7 +342,7 @@ table.dataTable thead .sorting_desc {
 	   }
 	   .dataTables_wrapper .dataTables_filter input:focus {
 		   box-shadow: 0px 0px 10px rgba(230, 234, 245, 0.7);
-		   border: 1px solid #e6eaf5;
+		   border: 1px solid #dcdcdc;
 		   border-radius: 5px;
 		   outline: 0;
 		   outline: none;
