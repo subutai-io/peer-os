@@ -14,6 +14,9 @@ import static org.hamcrest.Matchers.*;
 
 public class SubutaiSteps extends ScenarioSteps {
     SubutaiPage subutaiPage;
+    private Object token;
+    private Object peerID;
+    private Object environmentData;
 
     @Step
     public void inputLogin(String login){
@@ -643,5 +646,113 @@ public class SubutaiSteps extends ScenarioSteps {
     @Step
     public void waitFunctionForSlowOperations(int time){
         waitABit(time);
+    }
+
+    @Step
+    public void clickOnButtonStop() {
+        subutaiPage.buttonContainerStop.click();
+    }
+
+    @Step
+    public void seeButtonStart() {
+        assertThat(subutaiPage.buttonContainerStart.isVisible(), is(true));
+    }
+
+    @Step
+    public void seeButtonStop() {
+        assertThat(subutaiPage.buttonContainerStop.isVisible(), is(true));
+    }
+
+    @Step
+    public void seeOutputOfPwdCommand() {
+        assertThat(subutaiPage.outputOfPwdCommand.isVisible(), is(true));
+    }
+
+    @Step
+    public void clickOnButtonStart() {
+        subutaiPage.buttonContainerStart.click();
+    }
+
+    @Step
+    public void selectEnvironmentOnConsole() {
+        subutaiPage.buttonEnvironmentOnConsole.click();
+    }
+
+    @Step
+    public void clickOnMenuItemUserIdentity() {
+        subutaiPage.linkUserIdentity.click();
+    }
+
+    @Step
+    public void clickOnMenuItemsTokens() {
+        subutaiPage.linkTokens.click();
+    }
+
+    @Step
+    public void clickOnButtonShowToken() {
+        subutaiPage.buttonShowToken.click();
+    }
+
+    @Step
+    public void seeTextToken() {
+        assertThat(subutaiPage.popupMenuTokenTextHeader.isVisible(), is(true));
+    }
+
+    @Step
+    public Object getToken() {
+        token = subutaiPage.token.getText();
+        return token;
+    }
+
+    @Step
+    public void observeLocalPeerID() throws FileNotFoundException {
+        subutaiPage.setDefaultBaseUrl(String.format("https://%s:8443/rest/v1/security/keyman/getpublickeyfingerprint?sptoken=" + token, ReaderFromFile.readDataFromFile("src/test/resources/parameters/mng_h1")));
+        subutaiPage.open();
+    }
+
+    @Step
+    public Object getPeerID() {
+        peerID = subutaiPage.peerID.getText();
+        return peerID;
+    }
+
+    @Step
+    public void ownPGPKey() throws FileNotFoundException {
+        subutaiPage.setDefaultBaseUrl(String.format("https://%s:8443/rest/v1/security/keyman/getpublickeyring?hostid=" + peerID, ReaderFromFile.readDataFromFile("src/test/resources/parameters/mng_h1")));
+        subutaiPage.open();
+    }
+
+    @Step
+    public void observeOwnPGPKey() {
+        assertThat(subutaiPage.remotePGPKey.isVisible(), is(true));
+    }
+
+    @Step
+    public void remotePGPKey() throws FileNotFoundException {
+        subutaiPage.setDefaultBaseUrl(String.format("https://%s:8443/rest/v1/security/keyman/getpublickeyring?hostid=" + peerID, ReaderFromFile.readDataFromFile("src/test/resources/parameters/mng_h2")));
+        subutaiPage.open();
+    }
+
+    @Step
+    public void observeEnvironmentData() throws FileNotFoundException {
+        subutaiPage.setDefaultBaseUrl(String.format("https://%s:8443/rest/v1/environments?sptoken=" + token, ReaderFromFile.readDataFromFile("src/test/resources/parameters/mng_h2")));
+        subutaiPage.open();
+    }
+
+    @Step
+    public Object getEnvironmentData() {
+        environmentData = subutaiPage.environmentData.getText().substring(8, 44);
+        return environmentData;
+    }
+
+    @Step
+    public void environmentPGPKey() throws FileNotFoundException {
+        subutaiPage.setDefaultBaseUrl(String.format("https://%s:8443/rest/v1/security/keyman/getpublickeyring?hostid=" + peerID +"-"+environmentData, ReaderFromFile.readDataFromFile("src/test/resources/parameters/mng_h2")));
+        subutaiPage.open();
+    }
+
+    @Step
+    public void observeEnvironmentPGPKey() {
+        assertThat(subutaiPage.environmentPGPKey.isVisible(),is(true));
     }
 }

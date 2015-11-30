@@ -325,4 +325,46 @@ public class DefSubutaiStepsWhen {
         subutaiSteps.executeConsoleCommand("ls -l /var/lib/apps/subutai/current/var/lib/lxc/" + subutaiSteps.getContainerNameTwo() + "/rootfs/");
     }
 
+    @When("the user click on the button: Stop")
+    public void click_button_stop(){
+        subutaiSteps.clickOnButtonStop();
+        subutaiSteps.waitABit(5000);
+//        subutaiSteps.clickOnButtonStop();
+    }
+
+    @When("the user click on the button: Start")
+    public void click_button_start(){
+        subutaiSteps.clickOnButtonStart();
+    }
+
+    @When("the user select environment button on console")
+    public void user_select_console_environment(){
+        subutaiSteps.selectEnvironmentOnConsole();
+    }
+
+    @When("the user click on the menu item: User Identity")
+    public void click_on_user_identity(){
+        subutaiSteps.clickOnMenuItemUserIdentity();
+    }
+
+    @When("the user click on the menu item: Tokens")
+    public void click_on_menu_items_tokens(){
+        subutaiSteps.clickOnMenuItemsTokens();
+    }
+
+    @When("the user click on the button: Show Token")
+    public void click_buton_show_token(){
+        subutaiSteps.clickOnButtonShowToken();
+    }
+
+    @When("the user get Peer ID")
+    public void user_get_peer_id(){
+        subutaiSteps.getPeerID();
+    }
+
+    @When("the user get Environment ID")
+    public void user_get_environment_data(){
+        subutaiSteps.getEnvironmentData();
+    }
+
 }

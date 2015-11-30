@@ -204,4 +204,58 @@ public class DefSubutaiStepsThen {
     public void see_container_pgp_header(){
         subutaiSteps.seePGP();
     }
+
+    @Then("the user observe button: Start")
+    public void user_observe_button_start(){
+        subutaiSteps.seeButtonStart();
+    }
+
+    @Then("the user observe button: Stop")
+    public void user_observe_button_stop(){
+        subutaiSteps.seeButtonStop();
+    }
+
+    @Then("the user should observe output of the pwd command")
+    public void user_observe_output_of_pwd_command(){
+        subutaiSteps.seeOutputOfPwdCommand();
+    }
+
+    @Then("the user observe text: Token")
+    public void user_observe_text_token(){
+        subutaiSteps.seeTextToken();
+    }
+
+    @Then("the user get Token")
+    public void user_get_token(){
+        subutaiSteps.getToken();
+    }
+
+    @Then("the user observe Local Peer ID")
+    public void user_observe_local_peer_id() throws FileNotFoundException {
+        subutaiSteps.observeLocalPeerID();
+    }
+
+    @Then("the user observe Own PGP key")
+    public void user_observe_own_pgp_key() throws FileNotFoundException {
+        subutaiSteps.ownPGPKey();
+        subutaiSteps.observeOwnPGPKey();
+    }
+
+    @Then("the user observe Remote PGP key")
+    public void user_observe_remote_pgp_key() throws FileNotFoundException {
+        subutaiSteps.remotePGPKey();
+        subutaiSteps.observeOwnPGPKey();
+    }
+
+    @Then("the user observe Environment data")
+    public void user_observe_environment_id() throws FileNotFoundException {
+        subutaiSteps.observeEnvironmentData();
+    }
+
+    @Then("the user observe Environment PGP key")
+    public void user_observe_environment_pgp_key() throws FileNotFoundException {
+        subutaiSteps.environmentPGPKey();
+        subutaiSteps.waitABit(10000);
+        subutaiSteps.observeEnvironmentPGPKey();
+    }
 }
