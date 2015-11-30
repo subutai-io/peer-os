@@ -150,11 +150,6 @@ public interface KeyManager
          */
     PGPPublicKeyRing removeSignature( String sourceFingerprint, String targetFingerprint );
 
-    /* ***************************************************************
-         *
-         */
-    PGPPublicKeyRing removeSignature( String sourceIdentityId, PGPPublicKeyRing targetPubRing );
-
 
     /* ***************************************************************
      *
@@ -185,10 +180,17 @@ public interface KeyManager
     void removeKeyAllTrustData( String sourceFingerprint );
 
 
+
     /* ***************************************************************
      *
      */
-    void removeKeyTrust( String sourceFingerprint, String targetFingerprint);
+    void removeKeyTrustData( String sourceFingerprint, String targetFingerprint );
+
+
+    /* ***************************************************************
+     *
+     */
+    SecurityKeyTrust saveKeyTrustData( String sourceFingerprint, String targetFingerprint, int trustLevel );
 
 
     /* *****************************
@@ -209,9 +211,14 @@ public interface KeyManager
     void removeSecretKeyRing( String identityId );
 
 
-    /* *****************************************
+    /* ******************************************************************
      *
      */
+    PGPSecretKeyRing getSecretKeyRingByFingerprint( String fingerprint );
+
+    /* *****************************************
+         *
+         */
     KeyPair generateKeyPair( String identityId, boolean armored );
 
 

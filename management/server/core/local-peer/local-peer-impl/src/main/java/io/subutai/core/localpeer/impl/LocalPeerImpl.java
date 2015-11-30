@@ -1577,7 +1577,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             keyManager.saveSecretKeyRing( pairId, SecurityKeyType.PeerEnvironmentKey.getId(), secRing );
             keyManager.savePublicKeyRing( pairId, SecurityKeyType.PeerEnvironmentKey.getId(), pubRing );
 
-            pubRing = securityManager.getKeyManager().signKey( peerSecKeyRing, pubRing, KeyTrustLevel.Full.getId() );
+            pubRing = securityManager.getKeyManager().setKeyTrust( peerSecKeyRing, pubRing, KeyTrustLevel.Full.getId() );
 
             return new PublicKeyContainer( getId(), pubRing.getPublicKey().getFingerprint(),
                     encTool.armorByteArrayToString( pubRing.getEncoded() ) );
