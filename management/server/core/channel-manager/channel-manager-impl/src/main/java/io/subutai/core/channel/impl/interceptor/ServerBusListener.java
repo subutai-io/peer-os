@@ -17,13 +17,13 @@ import io.subutai.core.peer.api.PeerManager;
 */
 public class ServerBusListener extends AbstractFeature
 {
-private final static Logger LOG = LoggerFactory.getLogger( ServerBusListener.class );
-private ChannelManagerImpl channelManagerImpl = null;
-private PeerManager peerManager;
+    private final static Logger LOG = LoggerFactory.getLogger( ServerBusListener.class );
+    private ChannelManagerImpl channelManagerImpl = null;
+    private PeerManager peerManager;
 
 
-public void busRegistered( Bus bus )
-{
+    public void busRegistered( Bus bus )
+    {
         LOG.info( "Adding LoggingFeature interceptor on bus: " + bus.getId() );
 
         //********Set BUS Message Size to 500 KB ************************
