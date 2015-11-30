@@ -331,4 +331,39 @@ public class SubutaiPage extends PageObject {
     @FindBy(xpath = "xhtml:html/xhtml:body/xhtml:pre[contains(text(),\"-----BEGIN PGP PUBLIC KEY BLOCK-----\")]")
     public WebElementFacade pgpHeader;
 
+    @FindBy(xpath = "*//tr[@class=\"ng-scope odd\"]//button[@class=\"b-btn b-btn_red subt_button__container-stop\"]")
+    public WebElementFacade buttonContainerStop;
+
+    @FindBy(xpath = "*//tr[@class=\"ng-scope odd\"]//button[@class=\"b-btn b-btn_green subt_button__container-start\"]")
+    public WebElementFacade buttonContainerStart;
+
+    @FindBy(xpath = "*//pre[contains(text(),\"/\")]")
+    public WebElementFacade outputOfPwdCommand;
+
+    @FindBy(id = "subt-link__user-identity")
+    public WebElementFacade linkUserIdentity;
+
+    @FindBy(id = "subt-link__tokens")
+    public WebElementFacade linkTokens;
+
+    @FindBy(xpath = "*//tr[2]/td[8]/a")
+    public WebElementFacade buttonShowToken;
+
+    @FindBy(xpath = "*//div[contains(text(),\"Token\")]")
+    public WebElementFacade popupMenuTokenTextHeader;
+
+    @FindBy(xpath = "*//div[@class=\"b-logs-view b-logs-view_token ng-binding\"]")
+    public WebElementFacade token;
+
+    @FindBy(xpath = "xhtml:html/xhtml:body/xhtml:pre")
+    public WebElementFacade peerID;
+
+    @FindBy(xpath = "*//*[contains(text(),\"BEGIN PGP PUBLIC KEY BLOCK\")]")
+    public WebElementFacade remotePGPKey;
+
+    @FindBy(xpath = "xhtml:html/xhtml:body/xhtml:pre")
+    public WebElementFacade environmentData;
+
+    @FindBy(xpath = "*//*[contains(text(),\"BEGIN PGP PUBLIC KEY BLOCK\")]")
+    public WebElementFacade environmentPGPKey;
 }
