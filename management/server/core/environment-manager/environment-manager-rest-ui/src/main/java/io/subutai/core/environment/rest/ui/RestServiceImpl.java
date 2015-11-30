@@ -427,11 +427,11 @@ public class RestServiceImpl implements RestService
         {
             if( environmentManager.isContainerInEnvironmentDomain( containerId, environmentId ) )
             {
-                environmentManager.addContainerToEnvironmentDomain( containerId, environmentId );
+                environmentManager.removeContainerFromEnvironmentDomain( containerId, environmentId  );
             }
             else
             {
-                environmentManager.removeContainerFromEnvironmentDomain( containerId, environmentId  );
+                environmentManager.addContainerToEnvironmentDomain( containerId, environmentId );
             }
         }
         catch ( Exception e )
