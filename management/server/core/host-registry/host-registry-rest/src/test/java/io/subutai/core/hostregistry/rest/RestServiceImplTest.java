@@ -17,7 +17,7 @@ import io.subutai.common.settings.Common;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.common.host.ResourceHostInfo;
-import io.subutai.core.hostregistry.impl.ResourceHostInfoImpl;
+import io.subutai.common.host.ResourceHostInfoModel;
 
 import com.google.common.collect.Sets;
 import com.google.gson.reflect.TypeToken;
@@ -61,7 +61,7 @@ public class RestServiceImplTest
     public void setUp() throws Exception
     {
         Set<ResourceHostInfo> hosts = Sets.newHashSet();
-        hosts.add( JsonUtil.fromJson( INFO_JSON, ResourceHostInfoImpl.class ) );
+        hosts.add( JsonUtil.fromJson( INFO_JSON, ResourceHostInfoModel.class ) );
         restService = new RestServiceImpl( hostRegistry );
         when( hostRegistry.getResourceHostsInfo() ).thenReturn( hosts );
     }
@@ -73,9 +73,9 @@ public class RestServiceImplTest
         Response response = restService.getHosts();
 
         Set<ResourceHostInfo> hosts =
-                JsonUtil.fromJson( response.getEntity().toString(), new TypeToken<Set<ResourceHostInfoImpl>>()
+                JsonUtil.fromJson( response.getEntity().toString(), new TypeToken<Set<ResourceHostInfoModel>>()
                 {}.getType() );
 
-        assertTrue( hosts.contains( JsonUtil.fromJson( INFO_JSON, ResourceHostInfoImpl.class ) ) );
+        assertTrue( hosts.contains( JsonUtil.fromJson( INFO_JSON, ResourceHostInfoModel.class ) ) );
     }
 }

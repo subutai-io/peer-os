@@ -15,6 +15,8 @@ function ContainerViewCtrl($scope, environmentService, SweetAlert, DTOptionsBuil
 	vm.currentTags = [];
 	vm.allTags = [];
 	vm.tags2Container = {};
+	vm.currentDomainStatus = {};
+	vm.domainContainer = {};
 
 	// functions
 	vm.getContainers = getContainers;
@@ -24,10 +26,32 @@ function ContainerViewCtrl($scope, environmentService, SweetAlert, DTOptionsBuil
 	vm.addTagForm = addTagForm;
 	vm.addTags = addTags;
 	vm.removeTag = removeTag;
+	vm.showDomainForm = showDomainForm;
+	vm.checkDomain = checkDomain;
 
 	environmentService.getContainersType().success(function (data) {
 		vm.containersType = data;
 	});
+
+	function showDomainForm(container) {
+		vm.currentDomainStatus = {};
+		vm.domainContainer = container;
+		environmentService.getContainerDomain(container).success(function (data) {
+			vm.currentDomainStatus = data;
+			console.log(vm.currentDomainStatus);
+		});
+		ngDialog.open({
+			template: 'subutai-app/containers/partials/addToDomain.html',
+			scope: $scope
+		});
+	}
+
+	function checkDomain() {
+		environmentService.checkDomain(vm.domainContainer).success(function (data) {
+			vm.currentDomainStatus = data;
+		});
+		ngDialog.closeAll();
+	}
 
 	function getEnvironments() {
 		environmentService.getEnvironments().success(function (data) {

@@ -4,17 +4,36 @@ package io.subutai.common.host;
 import java.util.HashSet;
 import java.util.Set;
 
-import io.subutai.common.peer.ContainerHost;
+import org.codehaus.jackson.annotate.JsonProperty;
+
+import com.google.gson.annotations.SerializedName;
 
 
-public class HostInfoModel implements ContainerHostInfo
+public class HostInfoModel implements HostInfo
 {
-    private ContainerHostState status;
-    private String id;
-    private String hostname;
-    private String containerName;
-    private Set<HostInterface> netInterfaces = new HashSet<>();
-    private HostArchitecture hostArchitecture;
+    @SerializedName( "id" )
+    @JsonProperty( "id" )
+    protected String id;
+    @SerializedName( "hostname" )
+    @JsonProperty( "hostname" )
+    protected String hostname;
+    @SerializedName( "interfaces" )
+    @JsonProperty( "interfaces" )
+    protected Set<HostInterfaceModel> hostInterfaces = new HashSet<>();
+    @SerializedName( "arch" )
+    @JsonProperty( "arch" )
+    protected HostArchitecture hostArchitecture;
+
+
+    public HostInfoModel( @JsonProperty( "id" ) final String id, @JsonProperty( "hostname" ) final String hostname,
+                          @JsonProperty( "interfaces" ) final HostInterfaces hostInterfaces,
+                          @JsonProperty( "arch" ) final HostArchitecture hostArchitecture )
+    {
+        this.id = id;
+        this.hostname = hostname;
+        this.hostArchitecture = hostArchitecture;
+        setHostInterfaces( hostInterfaces );
+    }
 
 
     public HostInfoModel( HostInfo hostInfo )
@@ -26,42 +45,13 @@ public class HostInfoModel implements ContainerHostInfo
         {
             hostArchitecture = HostArchitecture.AMD64;
         }
-        for ( Interface anInterface : hostInfo.getInterfaces() )
-        {
-            this.netInterfaces.add( new HostInterface( anInterface ) );
-        }
-    }
+        this.hostInterfaces = hostInfo.getHostInterfaces().getAll();
 
-
-    public HostInfoModel( final ContainerHost containerHost )
-    {
-        this.id = containerHost.getId();
-        this.hostname = containerHost.getHostname();
-        this.hostArchitecture = containerHost.getArch();
-        this.containerName = containerHost.getContainerName();
-        this.status = containerHost.getStatus();
-        if ( hostArchitecture == null )
-        {
-            hostArchitecture = HostArchitecture.AMD64;
-        }
-        for ( Interface anInterface : containerHost.getInterfaces() )
-        {
-            this.netInterfaces.add( new HostInterface( anInterface ) );
-        }
-    }
-
-
-    @Override
-    public ContainerHostState getStatus()
-    {
-        return status;
-    }
-
-
-    @Override
-    public String getContainerName()
-    {
-        return containerName;
+        //        this.hostInterfaces = hostInfo.getHostInterfaces();
+        //        for ( HostInterface anHostInterface : hostInfo.getHostInterfaces() )
+        //        {
+        //            this.hostInterfaces.addHostInterface( new HostInterfaceModel( anHostInterface ) );
+        //        }
     }
 
 
@@ -80,11 +70,9 @@ public class HostInfoModel implements ContainerHostInfo
 
 
     @Override
-    public Set<Interface> getInterfaces()
+    public HostInterfaces getHostInterfaces()
     {
-        Set<Interface> result = new HashSet<>();
-        result.addAll( netInterfaces );
-        return result;
+        return new HostInterfaces( this.hostInterfaces );
     }
 
 
@@ -117,7 +105,7 @@ public class HostInfoModel implements ContainerHostInfo
         final HostInfoModel that = ( HostInfoModel ) o;
 
         return hostArchitecture == that.hostArchitecture && hostname.equals( that.hostname ) && id.equals( that.id )
-                && netInterfaces.equals( that.netInterfaces );
+                && hostInterfaces.equals( that.hostInterfaces );
     }
 
 
@@ -126,8 +114,14 @@ public class HostInfoModel implements ContainerHostInfo
     {
         int result = id.hashCode();
         result = 31 * result + hostname.hashCode();
-        result = 31 * result + netInterfaces.hashCode();
+        result = 31 * result + hostInterfaces.hashCode();
         result = 31 * result + hostArchitecture.hashCode();
         return result;
+    }
+
+
+    public void setHostInterfaces( final HostInterfaces hostInterfaces )
+    {
+        this.hostInterfaces.addAll( hostInterfaces.getAll() );
     }
 }

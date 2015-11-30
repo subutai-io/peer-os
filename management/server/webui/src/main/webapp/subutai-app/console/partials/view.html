@@ -26,8 +26,8 @@
 				<div class="b-console-selects__item b-main-form__wrapper" 
 				ng-show="consoleViewCtrl.currentType == 'environments'">
 					<select class="b-popup-body-input" 
-						ng-model="selectedEnvironment" 
-						ng-change="consoleViewCtrl.showContainers(selectedEnvironment)">
+						ng-model="consoleViewCtrl.selectedEnvironment" 
+						ng-change="consoleViewCtrl.showContainers(consoleViewCtrl.selectedEnvironment)">
 						<option value="">Select environment</option>
 						<option ng-repeat="environment in consoleViewCtrl.environments" value="{{ environment.id }}">
 							{{ environment.name }}

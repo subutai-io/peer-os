@@ -2,12 +2,17 @@ package io.subutai.core.hostregistry.impl;
 
 
 import java.io.PrintStream;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import com.google.common.collect.Sets;
+
+import io.subutai.common.metric.ResourceAlert;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.common.host.ResourceHostInfo;
 
@@ -26,13 +31,19 @@ public class HostNotifierTest
     @Mock
     ResourceHostInfo resourceHostInfo;
 
+    @Mock
+    ResourceAlert resourceAlert;
+
     HostNotifier notifier;
+
+    Set<ResourceAlert> alerts;
 
 
     @Before
     public void setUp() throws Exception
     {
-        notifier = new HostNotifier( listener, resourceHostInfo );
+        alerts = Sets.newHashSet( resourceAlert );
+        notifier = new HostNotifier( listener, resourceHostInfo, alerts );
     }
 
 
@@ -41,10 +52,10 @@ public class HostNotifierTest
     {
         notifier.run();
 
-        verify( listener ).onHeartbeat( resourceHostInfo );
+        verify( listener ).onHeartbeat( resourceHostInfo, alerts );
 
         RuntimeException exception = mock( RuntimeException.class );
-        doThrow( exception ).when( listener ).onHeartbeat( resourceHostInfo );
+        doThrow( exception ).when( listener ).onHeartbeat( resourceHostInfo, alerts );
 
         notifier.run();
 

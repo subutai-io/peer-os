@@ -8,7 +8,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import io.subutai.common.environment.CreateEnvironmentContainerGroupResponse;
-import io.subutai.common.host.HostInfoModel;
+import io.subutai.common.host.ContainerHostInfoModel;
 
 import com.google.common.collect.Sets;
 
@@ -19,7 +19,7 @@ import static junit.framework.TestCase.assertEquals;
 public class CreateEnvironmentContainerGroupResponseTest
 {
     @Mock
-    HostInfoModel hostInfoModel;
+    ContainerHostInfoModel containerHostInfoModel;
 
     CreateEnvironmentContainerGroupResponse response;
 
@@ -27,13 +27,13 @@ public class CreateEnvironmentContainerGroupResponseTest
     @Before
     public void setUp() throws Exception
     {
-        response = new CreateEnvironmentContainerGroupResponse( Sets.newHashSet( hostInfoModel ) );
+        response = new CreateEnvironmentContainerGroupResponse( Sets.newHashSet( containerHostInfoModel ) );
     }
 
 
     @Test
     public void testGetHosts() throws Exception
     {
-        assertEquals( Sets.newHashSet( hostInfoModel ), response.getHosts() );
+        assertEquals( Sets.newHashSet( containerHostInfoModel ), response.getHosts() );
     }
 }

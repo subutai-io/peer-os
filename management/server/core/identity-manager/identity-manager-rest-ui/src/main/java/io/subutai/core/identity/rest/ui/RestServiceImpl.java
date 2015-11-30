@@ -193,6 +193,13 @@ public class RestServiceImpl implements RestService
     }
 
 
+    @Override
+    public Response getRoleTypes()
+    {
+        return Response.ok( io.subutai.common.security.objects.TokenType.values() ).build();
+    }
+
+
 
     /** Permissions ***********************************************/
 

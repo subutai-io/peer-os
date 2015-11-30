@@ -24,14 +24,18 @@ import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
+import io.subutai.common.peer.AlertPack;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.protocol.Template;
+import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
+import io.subutai.common.util.DateTimeParam;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
 
@@ -373,6 +377,35 @@ public class RestServiceImpl implements RestService
             localPeer.cleanupEnvironmentNetworkSettings( environmentId );
         }
         catch ( Exception e )
+        {
+            throw new WebApplicationException( e );
+        }
+    }
+
+
+    @Override
+    public void putAlert( final AlertPack alertPack )
+    {
+        try
+        {
+            localPeer.alert( alertPack );
+        }
+        catch ( PeerException e )
+        {
+            throw new WebApplicationException( e );
+        }
+    }
+
+
+    @Override
+    public HistoricalMetrics getHistoricalMetrics( final String hostName, final DateTimeParam startTime,
+                                                   final DateTimeParam endTime )
+    {
+        try
+        {
+            return localPeer.getHistoricalMetrics( hostName, startTime.getDate(), endTime.getDate() );
+        }
+        catch ( PeerException e )
         {
             throw new WebApplicationException( e );
         }

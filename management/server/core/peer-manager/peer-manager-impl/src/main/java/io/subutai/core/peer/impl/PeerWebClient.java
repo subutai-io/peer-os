@@ -1,7 +1,9 @@
 package io.subutai.core.peer.impl;
 
 
+import java.text.ParseException;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -20,13 +22,17 @@ import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
+import io.subutai.common.peer.AlertPack;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.N2NConfig;
+import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.WebClientBuilder;
+import io.subutai.common.util.DateParam;
+import io.subutai.common.util.DateTimeParam;
 
 
 /**
@@ -398,6 +404,47 @@ public class PeerWebClient
         catch ( Exception e )
         {
             throw new PeerException( "Error on creating gateway", e );
+        }
+    }
+
+
+    public void alert( final AlertPack alert ) throws PeerException
+    {
+        String path = "/alert";
+
+        WebClient client = WebClientBuilder.buildPeerWebClient( host, path, provider );
+        client.type( MediaType.APPLICATION_JSON );
+        client.accept( MediaType.APPLICATION_JSON );
+
+        try
+        {
+            client.post( alert );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Error on sending alert package to remote peer", e );
+        }
+    }
+
+
+    public HistoricalMetrics getHistoricalMetrics( final String hostName, final Date startTime, final Date endTime )
+            throws PeerException
+    {
+        try
+        {
+            final DateTimeParam startParam = new DateTimeParam( startTime );
+            final DateTimeParam endParam = new DateTimeParam( endTime );
+            String path = String.format( "/hmetrics/%s/%s/%s/%s/%s", hostName, startParam.getDateString(),
+                    startParam.getTimeString(), endParam.getDateString(), endParam.getTimeString() );
+
+            WebClient client = WebClientBuilder.buildPeerWebClient( host, path, provider );
+            client.type( MediaType.APPLICATION_JSON );
+            client.accept( MediaType.APPLICATION_JSON );
+            return client.get( HistoricalMetrics.class );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Error on retrieving historical metrics from remote peer", e );
         }
     }
 }

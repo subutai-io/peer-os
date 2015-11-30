@@ -20,10 +20,13 @@ import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
+import io.subutai.common.peer.AlertPack;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.N2NConfig;
+import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.security.PublicKeyContainer;
+import io.subutai.common.util.DateTimeParam;
 
 //todo please check all endpoints for returned media type, do we return correct type if we just return response code
 // then no need to indicate it at all!!!
@@ -96,7 +99,7 @@ public interface RestService
     @Path( "pek" )
     @Produces( MediaType.APPLICATION_JSON )
     @Consumes( MediaType.APPLICATION_JSON )
-    void updateEnvironmentKey( PublicKeyContainer publicKeyContainer);
+    void updateEnvironmentKey( PublicKeyContainer publicKeyContainer );
 
     @DELETE
     @Path( "pek/{environmentId}" )
@@ -140,4 +143,18 @@ public interface RestService
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
     void removeN2NConnection( @PathParam( "environmentId" ) EnvironmentId environmentId );
+
+    @POST
+    @Path( "alert" )
+    @Consumes( MediaType.APPLICATION_JSON )
+    @Produces( MediaType.APPLICATION_JSON )
+    void putAlert( AlertPack alertPack );
+
+    @GET
+    @Path( "hmetrics/{hostname}/{startTime}/{endTime}" )
+    @Consumes( MediaType.APPLICATION_JSON )
+    @Produces( MediaType.APPLICATION_JSON )
+    HistoricalMetrics getHistoricalMetrics( @PathParam( "hostname" ) final String hostName,
+                                            @PathParam( "startTime" ) final DateTimeParam startTime,
+                                            @PathParam( "endTime" ) final DateTimeParam endTime );
 }

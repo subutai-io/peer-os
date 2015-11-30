@@ -2,6 +2,7 @@ package io.subutai.core.peer.impl;
 
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
@@ -34,12 +35,13 @@ import io.subutai.common.exception.HTTPException;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInfo;
-import io.subutai.common.host.HostInfoModel;
+import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
+import io.subutai.common.peer.AlertPack;
 import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
@@ -58,6 +60,7 @@ import io.subutai.common.peer.RemotePeer;
 import io.subutai.common.peer.Timeouts;
 import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.protocol.Template;
+import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.resource.ResourceType;
 import io.subutai.common.resource.ResourceValue;
 import io.subutai.common.security.PublicKeyContainer;
@@ -513,7 +516,7 @@ public class RemotePeerImpl implements RemotePeer
             Map<String, String> params = Maps.newHashMap();
             params.put( "containerId", jsonUtil.to( containerHostId ) );
             String response = get( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, params, headers );
-            return jsonUtil.from( response, HostInfoModel.class );
+            return jsonUtil.from( response, ContainerHostInfoModel.class );
         }
         catch ( Exception e )
         {
@@ -588,8 +591,8 @@ public class RemotePeerImpl implements RemotePeer
             throw new CommandException( "Operation not allowed" );
         }
 
-        String environmentId = ( ( EnvironmentContainerHost ) host ).getEnvironmentId();
-        CommandRequest request = new CommandRequest( requestBuilder, host.getId(), environmentId );
+        EnvironmentId environmentId = ( ( EnvironmentContainerHost ) host ).getEnvironmentId();
+        CommandRequest request = new CommandRequest( requestBuilder, host.getId(), environmentId.getId() );
         //cache callback
         commandResponseListener.addCallback( request.getRequestId(), callback, requestBuilder.getTimeout(), semaphore );
 
@@ -683,8 +686,8 @@ public class RemotePeerImpl implements RemotePeer
 
     @RolesAllowed( "Environment-Management|A|Write" )
     @Override
-    public Set<HostInfoModel> createEnvironmentContainerGroup( final CreateEnvironmentContainerGroupRequest request )
-            throws PeerException
+    public Set<ContainerHostInfoModel> createEnvironmentContainerGroup(
+            final CreateEnvironmentContainerGroupRequest request ) throws PeerException
     {
         Preconditions.checkNotNull( request, "Invalid request" );
 
@@ -879,6 +882,22 @@ public class RemotePeerImpl implements RemotePeer
     public ResourceHostMetrics getResourceHostMetrics() throws PeerException
     {
         return new PeerWebClient( peerInfo.getIp(), provider ).getResourceHostMetrics();
+    }
+
+
+    @Override
+    public void alert( final AlertPack alert ) throws PeerException
+    {
+        new PeerWebClient( peerInfo.getIp(), provider ).alert( alert );
+    }
+
+
+    @Override
+    public HistoricalMetrics getHistoricalMetrics( final String hostname, final Date startTime, final Date endTime )
+            throws PeerException
+    {
+        return new PeerWebClient( peerInfo.getIp(), provider )
+                .getHistoricalMetrics( hostname, startTime, endTime );
     }
 
 

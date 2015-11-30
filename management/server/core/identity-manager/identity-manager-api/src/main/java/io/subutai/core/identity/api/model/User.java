@@ -3,8 +3,6 @@ package io.subutai.core.identity.api.model;
 
 import java.util.List;
 
-import javax.security.auth.Subject;
-
 
 public interface User
 {
@@ -53,7 +51,4 @@ public interface User
 
     String getTypeName();
 
-    Subject getSubject();
-
-    void setSubject( Subject subject );
 }

@@ -14,8 +14,11 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.multipart.Multipart;
+
 import io.subutai.common.environment.Blueprint;
-import io.subutai.common.peer.EnvironmentId;
+import io.subutai.common.network.DomainLoadBalanceStrategy;
 
 
 public interface RestService
@@ -29,6 +32,14 @@ public interface RestService
     @Path( "domain" )
     @Produces( { MediaType.TEXT_PLAIN } )
     public Response getDefaultDomainName();
+
+    @POST
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Path( "domain" )
+    Response addEnvironmentDomain( @Multipart( "environmentId" ) String environmentId,
+                                   @Multipart( "hostName" ) String hostName,
+                                   @Multipart( "strategy" ) DomainLoadBalanceStrategy strategy,
+                                   @Multipart(value = "file") Attachment attr );
 
     @GET
     @Path( "container/environmentId" )

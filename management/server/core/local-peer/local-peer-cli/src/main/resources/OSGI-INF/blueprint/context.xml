@@ -1,3 +1,13 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="localpeer/put-alert">
+      <action class="io.subutai.core.localpeer.cli.PutAlertCommand">
+        <argument ref="localPeer" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <reference id="localPeer" availability="mandatory" interface="io.subutai.common.peer.LocalPeer" />
+
 </blueprint>

@@ -22,6 +22,11 @@
     </dependency>
 
     <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>webui</artifactId>
       <classifier>classes</classifier>

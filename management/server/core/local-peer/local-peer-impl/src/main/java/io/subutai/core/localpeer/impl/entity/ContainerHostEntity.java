@@ -1,6 +1,7 @@
 package io.subutai.core.localpeer.impl.entity;
 
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,6 +16,8 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 import com.google.common.base.Preconditions;
@@ -67,6 +70,10 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     @Enumerated( EnumType.STRING )
     private ContainerType containerType = ContainerType.SMALL;
 
+    @Column( name = "created", nullable = false )
+    @Temporal( TemporalType.TIMESTAMP )
+    private Date created = new Date();
+
     @ElementCollection( targetClass = String.class, fetch = FetchType.EAGER )
     private Set<String> tags = new HashSet<>();
 
@@ -75,6 +82,12 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
 
     @Transient
     private ContainerId containerId;
+
+    @Column( name = "template_name", nullable = false )
+    private String templateName;
+
+    @Column( name = "template_arch", nullable = true )
+    private String templateArch;
 
 
     protected ContainerHostEntity()
@@ -89,13 +102,15 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     }
 
 
-    public ContainerHostEntity( String peerId, HostInfo hostInfo )
+    public ContainerHostEntity( String peerId, HostInfo hostInfo, String templateName, String templateArch )
     {
         super( peerId, hostInfo );
 
         updateHostInfo( hostInfo );
 
         this.containerName = ( ( ContainerHostInfo ) hostInfo ).getContainerName();
+        this.templateName = templateName;
+        this.templateArch = templateArch;
     }
 
 
@@ -105,9 +120,9 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     }
 
 
-    public String getEnvironmentId()
+    public EnvironmentId getEnvironmentId()
     {
-        return environmentId;
+        return new EnvironmentId( environmentId );
     }
 
 
@@ -181,9 +196,9 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     }
 
 
-    public ContainerHostState getStatus()
+    public ContainerHostState getState()
     {
-        return state;
+        return getPeer().getContainerState( getContainerId() );
     }
 
 
@@ -199,6 +214,12 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     }
 
 
+    public Date getCreated()
+    {
+        return created;
+    }
+
+
     //unsupported START
     public String getNodeGroupName()
     {
@@ -208,7 +229,13 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
 
     public String getTemplateName()
     {
-        throw new UnsupportedOperationException();
+        return this.templateName;
+    }
+
+
+    public String getTemplateArch()
+    {
+        return templateArch;
     }
 
 
@@ -247,7 +274,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
         super.updateHostInfo( hostInfo );
 
         ContainerHostInfo containerHostInfo = ( ContainerHostInfo ) hostInfo;
-        this.state = containerHostInfo.getStatus();
+        this.state = containerHostInfo.getState();
         return false;
     }
 
@@ -258,6 +285,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
         Peer peer = getPeer();
         return peer.getProcessResourceUsage( getContainerId(), processPid );
     }
+
 
     @Override
     public ResourceValue getAvailableQuota( final ResourceType resourceType ) throws PeerException
@@ -279,6 +307,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
         getPeer().setQuota( this.getContainerId(), resourceType, resourceValue );
     }
 
+
     @Override
     public Set<Integer> getCpuSet() throws PeerException
     {
@@ -291,6 +320,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     {
         getPeer().setCpuSet( this, cpuSet );
     }
+
 
     @Override
     public ContainerType getContainerType()
@@ -308,7 +338,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     @Override
     public boolean isConnected()
     {
-        return ContainerHostState.RUNNING.equals( getStatus() );
+        return ContainerHostState.RUNNING.equals( getState() );
     }
 
 
@@ -316,8 +346,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     {
         if ( containerId == null )
         {
-            containerId = new ContainerId( getId(), getHostname(), new PeerId( getPeerId() ),
-                    new EnvironmentId( getEnvironmentId() ) );
+            containerId = new ContainerId( getId(), getHostname(), new PeerId( getPeerId() ), getEnvironmentId() );
         }
         return containerId;
     }

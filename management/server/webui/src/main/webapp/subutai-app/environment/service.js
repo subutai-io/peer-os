@@ -48,6 +48,7 @@ function environmentService($http) {
 
 
 		getDomainStrategies : getDomainStrategies,
+		getDomain : getDomain,
 		setDomain : setDomain,
 		removeDomain : removeDomain,
 
@@ -55,6 +56,8 @@ function environmentService($http) {
 		getContainerStatus : getContainerStatus,
 		destroyContainer : destroyContainer,
 		switchContainer : switchContainer,
+		getContainerDomain : getContainerDomain,
+		checkDomain : checkDomain,
 
 
 		getContainersType : getContainersType,
@@ -166,6 +169,25 @@ function environmentService($http) {
 
 	function removeSshKey(environmentId) {
 		return $http.delete(ENVIRONMENTS_URL + environmentId + '/keys');
+	}
+
+
+	function getDomain(environmentId) {
+		return $http.get(
+			ENVIRONMENTS_URL + environmentId + '/domain',
+			{withCredentials: true, headers: {'Content-Type': 'application/json'}}
+		);
+	}
+
+	function getContainerDomain(container) {
+		return $http.get(
+			ENVIRONMENTS_URL + container.environmentId + '/containers/' + container.id + '/domain',
+			{withCredentials: true, headers: {'Content-Type': 'application/json'}}
+		);
+	}
+
+	function checkDomain(container) {
+		return $http.put(ENVIRONMENTS_URL + container.environmentId + '/containers/' + container.id + '/domain');
 	}
 
 

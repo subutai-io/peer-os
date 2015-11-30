@@ -1,6 +1,7 @@
 package io.subutai.common.peer;
 
 
+import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
@@ -11,10 +12,10 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
+import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInfo;
-import io.subutai.common.host.HostInfoModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
@@ -22,6 +23,7 @@ import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
 import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.protocol.Template;
+import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.resource.ResourceType;
 import io.subutai.common.resource.ResourceValue;
 import io.subutai.common.security.PublicKeyContainer;
@@ -60,8 +62,8 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
      *
      * @return - set of metadaobjects of created containers
      */
-    public Set<HostInfoModel> createEnvironmentContainerGroup( final CreateEnvironmentContainerGroupRequest request )
-            throws PeerException;
+    public Set<ContainerHostInfoModel> createEnvironmentContainerGroup(
+            final CreateEnvironmentContainerGroupRequest request ) throws PeerException;
 
 
     /**
@@ -145,7 +147,7 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
     /**
      * Returns true of the peer is reachable online, false otherwise
      */
-    public boolean isOnline();
+    public boolean isOnline() throws PeerException;
 
     /**
      * Sends message to the peer
@@ -288,4 +290,8 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
 
     void setQuota( ContainerId containerId, ResourceType resourceType, ResourceValue resourceValue )
             throws PeerException;
+
+    void alert( AlertPack alert ) throws PeerException;
+
+    HistoricalMetrics getHistoricalMetrics( String hostName, Date startTime, Date endTime ) throws PeerException;
 }

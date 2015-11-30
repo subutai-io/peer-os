@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.core.keyserver.api.dao.KeyServerDAO;
 import io.subutai.core.keyserver.api.model.PublicKeyStore;
+import io.subutai.core.keyserver.impl.model.PublicKeyStoreEntity;
+
 
 /**
  * Manages Data Storage
@@ -115,7 +117,7 @@ public class KeyServerDAOImpl implements KeyServerDAO
 
         try
         {
-            PublicKeyStore securityKey  = em.find(PublicKeyStore.class,keyId);
+            PublicKeyStore securityKey = em.find( PublicKeyStoreEntity.class, keyId );
 
             return securityKey;
         }

@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import java.util.*;
 
 import io.subutai.common.host.HostInterface;
+import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.peer.*;
 import io.subutai.common.util.N2NUtil;
 import org.apache.commons.collections.CollectionUtils;
@@ -28,8 +29,14 @@ import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.environment.Topology;
-import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ResourceHostInfo;
+import io.subutai.common.metric.ResourceAlert;
+import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.HostNotFoundException;
+import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.peer.ManagementHost;
+import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.PlacementStrategy;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.broker.api.Broker;
@@ -57,8 +64,9 @@ import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
 
 
-public class RegistrationManagerImpl implements RegistrationManager, HostListener {
-    private static final Logger LOGGER = LoggerFactory.getLogger(RegistrationManagerImpl.class);
+public class RegistrationManagerImpl implements RegistrationManager, HostListener
+{
+    private static final Logger LOGGER = LoggerFactory.getLogger( RegistrationManagerImpl.class );
     private SecurityManager securityManager;
     private RequestDataService requestDataService;
     private ContainerInfoDataService containerInfoDataService;
@@ -71,131 +79,156 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
     private NetworkManager networkManager;
 
 
-    public RegistrationManagerImpl(final SecurityManager securityManager, final DaoManager daoManager,
-                                   String domainName) {
+    public RegistrationManagerImpl( final SecurityManager securityManager, final DaoManager daoManager,
+                                    String domainName )
+    {
         this.securityManager = securityManager;
         this.daoManager = daoManager;
         this.domainName = domainName;
     }
 
 
-    public void init() {
-        containerTokenDataService = new ContainerTokenDataService(daoManager);
-        requestDataService = new RequestDataService(daoManager);
-        containerInfoDataService = new ContainerInfoDataService(daoManager);
+    public void init()
+    {
+        containerTokenDataService = new ContainerTokenDataService( daoManager );
+        requestDataService = new RequestDataService( daoManager );
+        containerInfoDataService = new ContainerInfoDataService( daoManager );
     }
 
 
-    public NetworkManager getNetworkManager() {
+    public NetworkManager getNetworkManager()
+    {
         return networkManager;
     }
 
 
-    public void setNetworkManager(final NetworkManager networkManager) {
+    public void setNetworkManager( final NetworkManager networkManager )
+    {
         this.networkManager = networkManager;
     }
 
 
-    public EnvironmentManager getEnvironmentManager() {
+    public EnvironmentManager getEnvironmentManager()
+    {
         return environmentManager;
     }
 
 
-    public void setEnvironmentManager(final EnvironmentManager environmentManager) {
+    public void setEnvironmentManager( final EnvironmentManager environmentManager )
+    {
         this.environmentManager = environmentManager;
     }
 
 
-    public PeerManager getPeerManager() {
+    public PeerManager getPeerManager()
+    {
         return peerManager;
     }
 
 
-    public void setPeerManager(final PeerManager peerManager) {
+    public void setPeerManager( final PeerManager peerManager )
+    {
         this.peerManager = peerManager;
     }
 
 
-    public Broker getBroker() {
+    public Broker getBroker()
+    {
         return broker;
     }
 
 
-    public void setBroker(final Broker broker) {
+    public void setBroker( final Broker broker )
+    {
         this.broker = broker;
     }
 
 
-    public RequestDataService getRequestDataService() {
+    public RequestDataService getRequestDataService()
+    {
         return requestDataService;
     }
 
 
-    public void setRequestDataService(final RequestDataService requestDataService) {
-        Preconditions.checkNotNull(requestDataService, "RequestDataService shouldn't be null.");
+    public void setRequestDataService( final RequestDataService requestDataService )
+    {
+        Preconditions.checkNotNull( requestDataService, "RequestDataService shouldn't be null." );
 
         this.requestDataService = requestDataService;
     }
 
 
     @Override
-    public List<RequestedHost> getRequests() {
+    public List<RequestedHost> getRequests()
+    {
         List<RequestedHost> temp = Lists.newArrayList();
-        temp.addAll(requestDataService.getAll());
+        temp.addAll( requestDataService.getAll() );
         return temp;
     }
 
 
     @Override
-    public RequestedHost getRequest(final String requestId) {
-        return requestDataService.find(requestId);
+    public RequestedHost getRequest( final String requestId )
+    {
+        return requestDataService.find( requestId );
     }
 
 
     @Override
-    public void queueRequest(final RequestedHost requestedHost) throws NodeRegistrationException {
-        if (requestDataService.find(requestedHost.getId()) != null) {
-            LOGGER.info("Already requested registration");
-        } else {
-            RequestedHostImpl registrationRequest = new RequestedHostImpl(requestedHost);
-            registrationRequest.setStatus(RegistrationStatus.REQUESTED);
-            try {
-                requestDataService.persist(registrationRequest);
-            } catch (Exception ex) {
-                throw new NodeRegistrationException("Failed adding resource host registration request to queue", ex);
+    public void queueRequest( final RequestedHost requestedHost ) throws NodeRegistrationException
+    {
+        if ( requestDataService.find( requestedHost.getId() ) != null )
+        {
+            LOGGER.info( "Already requested registration" );
+        }
+        else
+        {
+            RequestedHostImpl registrationRequest = new RequestedHostImpl( requestedHost );
+            registrationRequest.setStatus( RegistrationStatus.REQUESTED );
+            try
+            {
+                requestDataService.persist( registrationRequest );
+            }
+            catch ( Exception ex )
+            {
+                throw new NodeRegistrationException( "Failed adding resource host registration request to queue", ex );
             }
         }
     }
 
 
     @Override
-    public void rejectRequest(final String requestId) {
-        RequestedHostImpl registrationRequest = requestDataService.find(requestId);
-        registrationRequest.setStatus(RegistrationStatus.REJECTED);
-        requestDataService.update(registrationRequest);
+    public void rejectRequest( final String requestId )
+    {
+        RequestedHostImpl registrationRequest = requestDataService.find( requestId );
+        registrationRequest.setStatus( RegistrationStatus.REJECTED );
+        requestDataService.update( registrationRequest );
 
-        WebClient client = RestUtil.createWebClient(registrationRequest.getRestHook());
+        WebClient client = RestUtil.createWebClient( registrationRequest.getRestHook() );
 
         EncryptionTool encryptionTool = securityManager.getEncryptionTool();
         KeyManager keyManager = securityManager.getKeyManager();
 
         String message = RegistrationStatus.REJECTED.name();
-        PGPPublicKey publicKey = keyManager.getPublicKey(registrationRequest.getId());
-        byte[] encodedArray = encryptionTool.encrypt(message.getBytes(), publicKey, true);
+        PGPPublicKey publicKey = keyManager.getPublicKey( registrationRequest.getId() );
+        byte[] encodedArray = encryptionTool.encrypt( message.getBytes(), publicKey, true );
         String encoded = message;
-        try {
-            encoded = new String(encodedArray, "UTF-8");
-        } catch (Exception e) {
-            LOGGER.error("Error approving new connections request", e);
+        try
+        {
+            encoded = new String( encodedArray, "UTF-8" );
         }
-        client.query("Message", encoded).delete();
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error approving new connections request", e );
+        }
+        client.query( "Message", encoded ).delete();
     }
 
     private Set<String> getTunnelNetworks(final Set<Peer> peers) {
         Set<String> result = new HashSet<>();
 
         for (Peer peer : peers) {
-            Set<HostInterface> r = null;
+            Set<HostInterfaceModel> r = null;
             try {
                 r = peer.getInterfaces().filterByIp(N2NUtil.N2N_INTERFACE_IP_PATTERN);
             } catch (PeerException e) {
@@ -218,186 +251,228 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
     }
 
     @Override
-    public void approveRequest(final String requestId) {
-        RequestedHostImpl registrationRequest = requestDataService.find(requestId);
+    public void approveRequest( final String requestId )
+    {
+        RequestedHostImpl registrationRequest = requestDataService.find( requestId );
 
-        if (registrationRequest == null || !RegistrationStatus.REQUESTED.equals(registrationRequest.getStatus())) {
+        if ( registrationRequest == null || !RegistrationStatus.REQUESTED.equals( registrationRequest.getStatus() ) )
+        {
             return;
         }
-        registrationRequest.setStatus(RegistrationStatus.APPROVED);
-        requestDataService.update(registrationRequest);
+        registrationRequest.setStatus( RegistrationStatus.APPROVED );
+        requestDataService.update( registrationRequest );
 
         //todo sign RH key with Peer Key
-        importHostPublicKey(registrationRequest.getId(), registrationRequest.getPublicKey());
+        importHostPublicKey( registrationRequest.getId(), registrationRequest.getPublicKey() );
 
-        importHostSslCert(registrationRequest.getId(), registrationRequest.getCert());
+        importHostSslCert( registrationRequest.getId(), registrationRequest.getCert() );
 
-        for (final ContainerInfo containerInfo : registrationRequest.getHostInfos()) {
-            importHostPublicKey(containerInfo.getId(), containerInfo.getPublicKey());
+        for ( final ContainerInfo containerInfo : registrationRequest.getHostInfos() )
+        {
+            importHostPublicKey( containerInfo.getId(), containerInfo.getPublicKey() );
         }
 
-        processEnvironmentImport(registrationRequest);
+        processEnvironmentImport( registrationRequest );
     }
 
 
-    private void importHostSslCert(String hostId, String cert) {
-        try {
-            broker.registerClientCertificate(hostId, cert);
-        } catch (BrokerException e) {
-            LOGGER.error("Error importing host SSL certificate", e);
+    private void importHostSslCert( String hostId, String cert )
+    {
+        try
+        {
+            broker.registerClientCertificate( hostId, cert );
+        }
+        catch ( BrokerException e )
+        {
+            LOGGER.error( "Error importing host SSL certificate", e );
         }
     }
 
 
-    private void importHostPublicKey(String hostId, String publicKey) {
-        try {
+    private void importHostPublicKey( String hostId, String publicKey )
+    {
+        try
+        {
             KeyManager keyManager = securityManager.getKeyManager();
-            keyManager.savePublicKeyRing(hostId, (short) 2, publicKey);
-        } catch (Exception ex) {
-            LOGGER.error("Error importing host public key", ex);
+            keyManager.savePublicKeyRing( hostId, ( short ) 2, publicKey );
+        }
+        catch ( Exception ex )
+        {
+            LOGGER.error( "Error importing host public key", ex );
         }
     }
 
 
-    private Map<Integer, Map<String, Set<ContainerInfo>>> groupContainersByVlan(Set<ContainerInfo> containerInfoSet) {
+    private Map<Integer, Map<String, Set<ContainerInfo>>> groupContainersByVlan( Set<ContainerInfo> containerInfoSet )
+    {
         Map<Integer, Map<String, Set<ContainerInfo>>> groupedContainersByVlan = Maps.newHashMap();
 
-        for (final ContainerInfo containerInfo : containerInfoSet) {
+        for ( final ContainerInfo containerInfo : containerInfoSet )
+        {
             //Group containers by environment relation
             // and group into node groups.
-            Map<String, Set<ContainerInfo>> groupedContainers = groupedContainersByVlan.get(containerInfo.getVlan());
-            if (groupedContainers == null) {
+            Map<String, Set<ContainerInfo>> groupedContainers = groupedContainersByVlan.get( containerInfo.getVlan() );
+            if ( groupedContainers == null )
+            {
                 groupedContainers = Maps.newHashMap();
             }
 
             //Group by container infos by container name
-            Set<ContainerInfo> group = groupedContainers.get(containerInfo.getTemplateName());
-            if (group != null) {
-                group.add(containerInfo);
-            } else {
-                group = Sets.newHashSet(containerInfo);
+            Set<ContainerInfo> group = groupedContainers.get( containerInfo.getTemplateName() );
+            if ( group != null )
+            {
+                group.add( containerInfo );
+            }
+            else
+            {
+                group = Sets.newHashSet( containerInfo );
             }
 
 
-            if (containerInfo.getVlan() != 0) {
-                groupedContainers.put(containerInfo.getTemplateName(), group);
-                groupedContainersByVlan.put(containerInfo.getVlan(), groupedContainers);
+            if ( containerInfo.getVlan() != 0 )
+            {
+                groupedContainers.put( containerInfo.getTemplateName(), group );
+                groupedContainersByVlan.put( containerInfo.getVlan(), groupedContainers );
             }
         }
         return groupedContainersByVlan;
     }
 
 
-    private void processEnvironmentImport(RequestedHostImpl registrationRequest) {
+    private void processEnvironmentImport( RequestedHostImpl registrationRequest )
+    {
         Map<Integer, Map<String, Set<ContainerInfo>>> groupedContainersByVlan =
-                groupContainersByVlan(registrationRequest.getHostInfos());
+                groupContainersByVlan( registrationRequest.getHostInfos() );
 
         LocalPeer localPeer = peerManager.getLocalPeer();
 
-        for (final Map.Entry<Integer, Map<String, Set<ContainerInfo>>> mapEntry : groupedContainersByVlan.entrySet()) {
+        for ( final Map.Entry<Integer, Map<String, Set<ContainerInfo>>> mapEntry : groupedContainersByVlan.entrySet() )
+        {
             //TODO: check this run. Topology constructor changed
-            Topology topology = new Topology("Imported-environment", null, null, null);
+            Topology topology = new Topology( "Imported-environment", null, null, null );
             Map<String, Set<ContainerInfo>> rawNodeGroup = mapEntry.getValue();
-            Map<NodeGroup, Set<HostInfo>> classification = Maps.newHashMap();
+            Map<NodeGroup, Set<ContainerHostInfo>> classification = Maps.newHashMap();
 
-            for (final Map.Entry<String, Set<ContainerInfo>> entry : rawNodeGroup.entrySet()) {
+            for ( final Map.Entry<String, Set<ContainerInfo>> entry : rawNodeGroup.entrySet() )
+            {
                 //place where to create node groups
                 String templateName = entry.getKey();
                 NodeGroup nodeGroup =
-                        new NodeGroup(String.format("%s_group", templateName), templateName, entry.getValue().size(),
-                                1, 1, new PlacementStrategy("ROUND_ROBIN"), localPeer.getId());
-                topology.addNodeGroupPlacement(localPeer, nodeGroup);
+                        new NodeGroup( String.format( "%s_group", templateName ), templateName, entry.getValue().size(),
+                                1, 1, new PlacementStrategy( "ROUND_ROBIN" ), localPeer.getId() );
+                topology.addNodeGroupPlacement( localPeer, nodeGroup );
 
-                Set<HostInfo> converter = Sets.newHashSet();
-                converter.addAll(entry.getValue());
-                classification.put(nodeGroup, converter);
+                Set<ContainerHostInfo> converter = Sets.newHashSet();
+                converter.addAll( entry.getValue() );
+                classification.put( nodeGroup, converter );
             }
             //trigger environment import task
-            try {
+            try
+            {
                 Environment environment = environmentManager
-                        .importEnvironment(String.format("environment_%d", mapEntry.getKey()), topology,
-                                classification, "", mapEntry.getKey());
+                        .importEnvironment( String.format( "environment_%d", mapEntry.getKey() ), topology,
+                                classification, "", mapEntry.getKey() );
 
                 //Save container gateway from environment configuration to update container network configuration
                 // later when it will be available
                 SubnetUtils cidr;
 
-                try {
-                    cidr = new SubnetUtils(environment.getSubnetCidr());
-                } catch (IllegalArgumentException e) {
-                    throw new RuntimeException("Failed to parse subnet CIDR", e);
+                try
+                {
+                    cidr = new SubnetUtils( environment.getSubnetCidr() );
+                }
+                catch ( IllegalArgumentException e )
+                {
+                    throw new RuntimeException( "Failed to parse subnet CIDR", e );
                 }
 
                 String gateway = cidr.getInfo().getLowAddress();
-                for (final Set<HostInfo> infos : classification.values()) {
+                for ( final Set<ContainerHostInfo> infos : classification.values() )
+                {
                     //TODO: sign CH key with PEK (identified by LocalPeerId+environment.getId())
-                    for (final HostInfo hostInfo : infos) {
-                        ContainerInfoImpl containerInfo = containerInfoDataService.find(hostInfo.getId());
-                        containerInfo.setGateway(gateway);
-                        containerInfo.setStatus(RegistrationStatus.APPROVED);
-                        containerInfoDataService.update(containerInfo);
+                    for ( final ContainerHostInfo hostInfo : infos )
+                    {
+                        ContainerInfoImpl containerInfo = containerInfoDataService.find( hostInfo.getId() );
+                        containerInfo.setGateway( gateway );
+                        containerInfo.setStatus( RegistrationStatus.APPROVED );
+                        containerInfoDataService.update( containerInfo );
                     }
                 }
-            } catch (EnvironmentCreationException e) {
-                LOGGER.error("Error importing environment", e);
+            }
+            catch ( EnvironmentCreationException e )
+            {
+                LOGGER.error( "Error importing environment", e );
             }
         }
     }
 
 
     @Override
-    public void onHeartbeat(final ResourceHostInfo resourceHostInfo) {
-        RequestedHostImpl requestedHost = requestDataService.find(resourceHostInfo.getId());
-        if (requestedHost != null && requestedHost.getStatus() == RegistrationStatus.APPROVED) {
+    public void onHeartbeat( final ResourceHostInfo resourceHostInfo, Set<ResourceAlert> alerts )
+    {
+        RequestedHostImpl requestedHost = requestDataService.find( resourceHostInfo.getId() );
+        if ( requestedHost != null && requestedHost.getStatus() == RegistrationStatus.APPROVED )
+        {
             LocalPeer localPeer = peerManager.getLocalPeer();
-            try {
-                ResourceHost resourceHost = localPeer.getResourceHostById(resourceHostInfo.getId());
+            try
+            {
+                ResourceHost resourceHost = localPeer.getResourceHostById( resourceHostInfo.getId() );
                 Map<Integer, Set<ContainerHost>> containerHostList = Maps.newHashMap();
-                for (final ContainerInfo containerInfo : requestedHost.getHostInfos()) {
-                    if (containerInfo.getStatus().equals(RegistrationStatus.APPROVED)
-                            && containerInfo.getVlan() != 0) {
+                for ( final ContainerInfo containerInfo : requestedHost.getHostInfos() )
+                {
+                    if ( containerInfo.getState().equals( RegistrationStatus.APPROVED )
+                            && containerInfo.getVlan() != 0 )
+                    {
 
-                        ContainerInfoImpl containerInfoImpl = containerInfoDataService.find(containerInfo.getId());
+                        ContainerInfoImpl containerInfoImpl = containerInfoDataService.find( containerInfo.getId() );
 
-                        ContainerHost containerHost = resourceHost.getContainerHostById(containerInfo.getId());
+                        ContainerHost containerHost = resourceHost.getContainerHostById( containerInfo.getId() );
 
-                        containerInfoImpl.setStatus(RegistrationStatus.REGISTERED);
-                        containerInfoDataService.update(containerInfoImpl);
+                        containerInfoImpl.setStatus( RegistrationStatus.REGISTERED );
+                        containerInfoDataService.update( containerInfoImpl );
 
                         //we assume that newly imported environment has always default sshGroupId=1, hostsGroupId=1
 
                         //configure hosts on each group | group containers by ssh group
-                        Set<ContainerHost> containers = containerHostList.get(containerInfoImpl.getVlan());
-                        if (containers == null) {
+                        Set<ContainerHost> containers = containerHostList.get( containerInfoImpl.getVlan() );
+                        if ( containers == null )
+                        {
                             containers = Sets.newHashSet();
                         }
-                        containers.add(containerHost);
+                        containers.add( containerHost );
                     }
                 }
-                for (final Map.Entry<Integer, Set<ContainerHost>> entry : containerHostList.entrySet()) {
-                    configureHosts(entry.getValue());
+                for ( final Map.Entry<Integer, Set<ContainerHost>> entry : containerHostList.entrySet() )
+                {
+                    configureHosts( entry.getValue() );
                 }
-            } catch (HostNotFoundException e) {
+            }
+            catch ( HostNotFoundException e )
+            {
                 //ignore
-            } catch (NetworkManagerException e) {
-                LOGGER.error("Error configuring container hosts", e);
+            }
+            catch ( NetworkManagerException e )
+            {
+                LOGGER.error( "Error configuring container hosts", e );
             }
         }
     }
 
 
-    private void configureHosts(final Set<ContainerHost> containerHosts) throws NetworkManagerException {
+    private void configureHosts( final Set<ContainerHost> containerHosts ) throws NetworkManagerException
+    {
         //assume that inside one host group the domain name must be the same for all containers
         //so pick one container's domain name as the group domain name
-        networkManager.registerHosts(containerHosts, domainName);
+        networkManager.registerHosts( containerHosts, domainName );
 
-        networkManager.exchangeSshKeys(containerHosts);
+        networkManager.exchangeSshKeys( containerHosts );
     }
 
 
     @Override
-    public void removeRequest(final String requestId) {
-        requestDataService.remove(requestId);
+    public void removeRequest( final String requestId )
+    {
+        requestDataService.remove( requestId );
     }
 
 
@@ -448,14 +523,18 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
 
 
     @Override
-    public ContainerToken generateContainerTTLToken(final Long ttl) {
+    public ContainerToken generateContainerTTLToken( final Long ttl )
+    {
         ContainerTokenImpl token =
-                new ContainerTokenImpl(UUID.randomUUID().toString(), new Timestamp(System.currentTimeMillis()),
-                        ttl);
-        try {
-            containerTokenDataService.persist(token);
-        } catch (Exception ex) {
-            LOGGER.error("Error persisting container token", ex);
+                new ContainerTokenImpl( UUID.randomUUID().toString(), new Timestamp( System.currentTimeMillis() ),
+                        ttl );
+        try
+        {
+            containerTokenDataService.persist( token );
+        }
+        catch ( Exception ex )
+        {
+            LOGGER.error( "Error persisting container token", ex );
         }
 
         return token;
@@ -463,21 +542,27 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
 
 
     @Override
-    public ContainerToken verifyToken(final String token, String containerHostId, String publicKey)
-            throws NodeRegistrationException {
+    public ContainerToken verifyToken( final String token, String containerHostId, String publicKey )
+            throws NodeRegistrationException
+    {
 
-        ContainerTokenImpl containerToken = containerTokenDataService.find(token);
-        if (containerToken == null) {
-            throw new NodeRegistrationException("Couldn't verify container token");
+        ContainerTokenImpl containerToken = containerTokenDataService.find( token );
+        if ( containerToken == null )
+        {
+            throw new NodeRegistrationException( "Couldn't verify container token" );
         }
 
-        if (containerToken.getDateCreated().getTime() + containerToken.getTtl() < System.currentTimeMillis()) {
-            throw new NodeRegistrationException("Container token expired");
+        if ( containerToken.getDateCreated().getTime() + containerToken.getTtl() < System.currentTimeMillis() )
+        {
+            throw new NodeRegistrationException( "Container token expired" );
         }
-        try {
-            securityManager.getKeyManager().savePublicKeyRing(containerHostId, (short) 2, publicKey);
-        } catch (Exception ex) {
-            throw new NodeRegistrationException("Failed to store container pubkey", ex);
+        try
+        {
+            securityManager.getKeyManager().savePublicKeyRing( containerHostId, ( short ) 2, publicKey );
+        }
+        catch ( Exception ex )
+        {
+            throw new NodeRegistrationException( "Failed to store container pubkey", ex );
         }
         return containerToken;
     }

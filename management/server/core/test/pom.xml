@@ -1,39 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
-    <artifactId>mgmt-server-core-parent</artifactId>
     <groupId>io.subutai</groupId>
+    <artifactId>mgmt-server-core-parent</artifactId>
     <version>4.0.0-RC4</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>test</artifactId>
-  <version>4.0.0-RC4</version>
-  <packaging>bundle</packaging>
+  <artifactId>test-parent</artifactId>
+  <name>Subutai Test Parent</name>
+  <description>Subutai Test Parent</description>
+  <packaging>pom</packaging>
 
-  <dependencies>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>cli-controller</artifactId>
-    </dependency>
-  </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <configuration>
-          <instructions>
-            <Bundle-SymbolicName>${project.groupId}.core.test</Bundle-SymbolicName>
-            <Export-Package>
-              {local-packages};version=${project.version};-noimport:=true
-            </Export-Package>
-          </instructions>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+  <modules>
+    <module>test-cli</module>
+  </modules>
 </project>

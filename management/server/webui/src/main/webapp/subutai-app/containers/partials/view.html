@@ -70,7 +70,7 @@
 						<th>Template</th>
 						<th>IP</th>
 						<th>Tags</th>
-						<th class="b-main-table__empty-item">Domain</th>
+						<th>Domain</th>
 						<th></th>
 						<th></th>
 					</tr>
@@ -114,10 +114,11 @@
 								<i class="fa fa-plus"></i>
 							</span>
 						</td>
-						<td class="b-main-table__empty-item">
-							<input type="checkbox" 
-								ng-click="containerViewCtrl.addToDomain(container)" 
-								ng-model="container.onDomain">
+						<td>
+							<button class="b-btn b-btn_grey" 
+							ng-click="containerViewCtrl.showDomainForm(container)">
+								Configure
+							</button>
 						</td>
 						<td>
 							<button ng-show="container.state == 'RUNNING'" class="b-btn b-btn_red subt_button__container-stop" 

@@ -24,6 +24,7 @@ import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.Topology;
 import io.subutai.common.host.HostInterface;
+import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
@@ -142,7 +143,7 @@ public class SetupN2NStep
 
         for ( Peer peer : peers )
         {
-            Set<HostInterface> r = peer.getInterfaces().filterByIp( N2NUtil.N2N_INTERFACE_IP_PATTERN );
+            Set<HostInterfaceModel> r = peer.getInterfaces().filterByIp( N2NUtil.N2N_INTERFACE_IP_PATTERN );
 
             Collection tunnels = CollectionUtils.collect( r, new Transformer()
             {

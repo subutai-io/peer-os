@@ -69,10 +69,10 @@ public interface LocalPeer extends Peer
      */
     public ContainerHost getContainerHostById( String hostId ) throws HostNotFoundException;
 
-//    Quota getQuota( ContainerHost host, QuotaType quota ) throws PeerException;
+    //    Quota getQuota( ContainerHost host, QuotaType quota ) throws PeerException;
 
-//    @RolesAllowed( "Environment-Management|A|Update" )
-//    void setQuota( ContainerHost host, Quota quota ) throws PeerException;
+    //    @RolesAllowed( "Environment-Management|A|Update" )
+    //    void setQuota( ContainerHost host, Quota quota ) throws PeerException;
 
     /**
      * Returns instance of management host
@@ -187,4 +187,6 @@ public interface LocalPeer extends Peer
     List<Template> getTemplates();
 
     Template getTemplateByName( String templateName );
+
+    ContainerHost findContainerById( ContainerId containerId );
 }

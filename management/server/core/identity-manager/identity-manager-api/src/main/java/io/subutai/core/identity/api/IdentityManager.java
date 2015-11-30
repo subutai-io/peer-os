@@ -1,8 +1,10 @@
 package io.subutai.core.identity.api;
 
 
+import java.security.PrivilegedAction;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -43,7 +45,7 @@ public interface IdentityManager
 
     /* *************************************************
      */
-    Session startSession( User user );
+    SessionManager getSessionManager();
 
 
     /* *************************************************
@@ -79,14 +81,21 @@ public interface IdentityManager
      */
     User getUser( long userId );
 
+
     /* *************************************************
      */
     User getActiveUser();
 
+
     /* *************************************************
      */
-    @PermitAll
     Session getActiveSession();
+
+
+    /* *************************************************
+     */
+    void runAs( Session userSession, Callable action );
+
 
     /* *************************************************
          */
@@ -178,30 +187,11 @@ public interface IdentityManager
 
     /* *************************************************
      */
-    void endSession( User user );
-
-
-    /* *************************************************
-     */
-    void extendSessionTime( Session userSession );
-
+    @PermitAll
+    Session authenticateSession( String login, String password );
 
     /* *************************************************
-     */
-    List<Session> getSessions();
-
-
-    /* *************************************************
-     */
-    Session getSession( long sessionId );
-
-
-    /* *************************************************
-     */
-    void invalidateSessions();
-
-    /* *************************************************
-     */
+         */
     UserToken createUserToken( User user, String token, String secret, String issuer, int tokenType, Date validDate );
 
 

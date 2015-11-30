@@ -20,9 +20,12 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
-import io.subutai.common.host.Interface;
+import io.subutai.common.host.HostInterface;
+import io.subutai.common.host.HostInterfaceModel;
+import io.subutai.common.host.HostInterfaces;
 import io.subutai.core.registration.api.RegistrationStatus;
 import io.subutai.core.registration.api.service.ContainerInfo;
 
@@ -30,7 +33,7 @@ import io.subutai.core.registration.api.service.ContainerInfo;
 @Entity
 @Access( AccessType.FIELD )
 @Table( name = "node_container_host_model" )
-public class ContainerInfoImpl implements ContainerInfo, Serializable, HostInfo
+public class ContainerInfoImpl implements ContainerInfo, Serializable
 {
     @Id
     @Column( name = "id" )
@@ -40,8 +43,11 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable, HostInfo
     @Column
     private String publicKey;
 
-    @Column( name = "hostname" )
+    @Column( name = "host_name" )
     private String hostname;
+
+    @Column( name = "container_name" )
+    private String containerName;
 
     @Column( name = "vlan" )
     private Integer vlan;
@@ -49,16 +55,16 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable, HostInfo
     @Column( name = "gateway" )
     private String gateway = "";
 
-    @Column( name = "templateName" )
+    @Column( name = "template_name" )
     private String templateName;
 
 
     @JoinColumn( name = "net_interfaces" )
     @OneToMany( orphanRemoval = true,
-            targetEntity = io.subutai.core.registration.impl.entity.HostInterface.class,
+            targetEntity = HostHostInterface.class,
             cascade = CascadeType.ALL,
             fetch = FetchType.EAGER )
-    private Set<Interface> netInterfaces = new HashSet<>();
+    private Set<HostInterface> netHostInterfaces = new HashSet<>();
 
     @Column( name = "arch" )
     @Enumerated( EnumType.STRING )
@@ -68,9 +74,13 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable, HostInfo
     @JoinColumn( name = "requested_host" )
     private RequestedHostImpl requestedHost;
 
-    @Column( name = "status" )
+    @Column( name = "reg_status" )
     @Enumerated( EnumType.STRING )
     private RegistrationStatus status = RegistrationStatus.REQUESTED;
+
+    @Column( name = "state" )
+    @Enumerated( EnumType.STRING )
+    private ContainerHostState state;
 
 
     public ContainerInfoImpl()
@@ -83,6 +93,7 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable, HostInfo
         this.id = hostInfo.getId().toString();
         this.hostname = hostInfo.getHostname();
         this.templateName = hostInfo.getTemplateName();
+        this.state = hostInfo.getState();
         this.vlan = hostInfo.getVlan();
         this.arch = hostInfo.getArch();
         this.status = hostInfo.getStatus();
@@ -92,10 +103,24 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable, HostInfo
         {
             arch = HostArchitecture.AMD64;
         }
-        for ( Interface anInterface : hostInfo.getInterfaces() )
+        for ( HostInterface anHostInterface : hostInfo.getHostInterfaces().getAll() )
         {
-            this.netInterfaces.add( new io.subutai.core.registration.impl.entity.HostInterface( anInterface ) );
+            this.netHostInterfaces.add( new HostHostInterface( anHostInterface ) );
         }
+    }
+
+
+    @Override
+    public String getContainerName()
+    {
+        return containerName;
+    }
+
+
+    @Override
+    public ContainerHostState getState()
+    {
+        return state;
     }
 
 
@@ -139,9 +164,15 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable, HostInfo
 
 
     @Override
-    public Set<Interface> getInterfaces()
+    public HostInterfaces getHostInterfaces()
     {
-        return netInterfaces;
+        HostInterfaces result = new HostInterfaces();
+        for ( HostInterface hostInterface : this.netHostInterfaces)
+        {
+            HostInterfaceModel model = new HostInterfaceModel( hostInterface );
+            result.addHostInterface( model );
+        }
+        return result;
     }
 
 
@@ -226,7 +257,7 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable, HostInfo
         final ContainerInfoImpl that = ( ContainerInfoImpl ) o;
 
         return arch == that.arch && hostname.equals( that.hostname ) && id.equals( that.id )
-                && netInterfaces.equals( that.netInterfaces );
+                && netHostInterfaces.equals( that.netHostInterfaces );
     }
 
 
@@ -246,7 +277,7 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable, HostInfo
                 ", hostname='" + hostname + '\'' +
                 ", vlan=" + vlan +
                 ", templateName='" + templateName + '\'' +
-                ", netInterfaces=" + netInterfaces +
+                ", hostInterfaces=" + netHostInterfaces +
                 ", arch=" + arch +
                 '}';
     }

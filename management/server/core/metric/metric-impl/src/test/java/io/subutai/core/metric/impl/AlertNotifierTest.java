@@ -2,10 +2,10 @@ package io.subutai.core.metric.impl;
 
 
 import org.junit.Test;
-import io.subutai.common.metric.ContainerHostMetric;
-import io.subutai.core.metric.api.AlertListener;
-
 import org.slf4j.Logger;
+
+import io.subutai.common.peer.AlertListener;
+import io.subutai.common.peer.AlertPack;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -31,7 +31,7 @@ public class AlertNotifierTest
     public void testConstructorShouldFailOnNullListener() throws Exception
     {
 
-        new AlertNotifier( mock( ContainerHostMetric.class ), null );
+        new AlertNotifier( mock( AlertPack.class ), null );
     }
 
 
@@ -39,24 +39,24 @@ public class AlertNotifierTest
     public void testListenerShouldBeNotified() throws Exception
     {
 
-        ContainerHostMetric metric = mock( ContainerHostMetric.class );
+        AlertPack alert = mock( AlertPack.class );
         AlertListener listener = mock( AlertListener.class );
-        AlertNotifier alertNotifier = new AlertNotifier( metric, listener );
+        AlertNotifier alertNotifier = new AlertNotifier( alert, listener );
 
         alertNotifier.run();
 
-        verify( listener ).onAlert( metric );
+        verify( listener ).onAlert( alert );
     }
 
 
     @Test
     public void testLogError() throws Exception
     {
-        ContainerHostMetric metric = mock( ContainerHostMetric.class );
+        AlertPack alert = mock( AlertPack.class );
         AlertListener listener = mock( AlertListener.class );
         Logger logger = mock( Logger.class );
-        doThrow( new RuntimeException( "" ) ).when( listener ).onAlert( metric );
-        AlertNotifier alertNotifier = new AlertNotifier( metric, listener );
+        doThrow( new RuntimeException( "" ) ).when( listener ).onAlert( alert );
+        AlertNotifier alertNotifier = new AlertNotifier( alert, listener );
         alertNotifier.LOG = logger;
 
         alertNotifier.run();
