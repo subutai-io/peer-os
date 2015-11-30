@@ -2,6 +2,7 @@ package io.subutai.core.peer.impl;
 
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
@@ -59,6 +60,7 @@ import io.subutai.common.peer.RemotePeer;
 import io.subutai.common.peer.Timeouts;
 import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.protocol.Template;
+import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.resource.ResourceType;
 import io.subutai.common.resource.ResourceValue;
 import io.subutai.common.security.PublicKeyContainer;
@@ -887,6 +889,15 @@ public class RemotePeerImpl implements RemotePeer
     public void alert( final AlertPack alert ) throws PeerException
     {
         new PeerWebClient( peerInfo.getIp(), provider ).alert( alert );
+    }
+
+
+    @Override
+    public HistoricalMetrics getHistoricalMetrics( final String hostname, final Date startTime, final Date endTime )
+            throws PeerException
+    {
+        return new PeerWebClient( peerInfo.getIp(), provider )
+                .getHistoricalMetrics( hostname, startTime, endTime );
     }
 
 

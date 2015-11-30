@@ -13,7 +13,7 @@ import static org.junit.Assert.assertNotNull;
 
 
 @RunWith( MockitoJUnitRunner.class )
-public class HistoricalMetricTest
+public class HistoricalHistoricalMetricsTest
 {
     private HistoricalMetric historicalMetric;
 
