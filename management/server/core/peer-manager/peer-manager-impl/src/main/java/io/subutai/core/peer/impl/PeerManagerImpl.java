@@ -24,7 +24,6 @@ import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.ManagementHost;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
-import io.subutai.common.peer.PeerId;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.peer.RegistrationData;
@@ -153,6 +152,16 @@ public class PeerManagerImpl implements PeerManager
             registrationData.getPeerInfo().setKeyPhrase( keyPhrase );
             peerDAO.saveInfo( SOURCE_REMOTE_PEER, registrationData.getPeerInfo().getId(),
                     registrationData.getPeerInfo() );
+
+            ManagementHost mgmHost = getLocalPeer().getManagementHost();
+            try
+            {
+                mgmHost.addRepository( registrationData.getPeerInfo().getIp() );
+            }
+            catch ( Exception ignore )
+            {
+                // ignore
+            }
         }
         catch ( Exception e )
         {
@@ -176,14 +185,6 @@ public class PeerManagerImpl implements PeerManager
         ManagementHost mgmHost = getLocalPeer().getManagementHost();
         PeerInfo p = getPeerInfo( registrationData.getPeerInfo().getId() );
 
-        try
-        {
-            mgmHost.removeRepository( p.getId(), p.getIp() );
-        }
-        catch ( Exception ignore )
-        {
-            // ignore
-        }
         PeerPolicy peerPolicy = localPeer.getPeerInfo().getPeerPolicy( p.getId() );
         // Remove peer policy of the target remote peer from the local peer
         if ( peerPolicy != null )
@@ -196,6 +197,14 @@ public class PeerManagerImpl implements PeerManager
         securityManager.getKeyManager().removePublicKeyRing( p.getId() );
         //*******************************************************************
 
+        try
+        {
+            mgmHost.removeRepository( p.getId(), p.getIp() );
+        }
+        catch ( Exception ignore )
+        {
+            // ignore
+        }
         return peerDAO.deleteInfo( SOURCE_REMOTE_PEER, p.getId() );
     }
 
@@ -276,8 +285,8 @@ public class PeerManagerImpl implements PeerManager
 
         if ( pi != null )
         {
-            return new RemotePeerImpl( localPeer,securityManager, pi, messenger, commandResponseListener, messageResponseListener,
-                    provider );
+            return new RemotePeerImpl( localPeer, securityManager, pi, messenger, commandResponseListener,
+                    messageResponseListener, provider );
         }
         return null;
     }
