@@ -22,7 +22,7 @@ function EnvironmentViewCtrl($scope, environmentService, SweetAlert, DTOptionsBu
 	vm.sshKey = sshKey;
 	vm.addSshKey = addSshKey;
 	vm.removeSshKey = removeSshKey;
-	vm.getEnvironments = getEnvironments;
+	//vm.getEnvironments = getEnvironments;
 	vm.showContainersList = showContainersList;
 	vm.destroyContainer = destroyContainer;
 	vm.setSSHKey = setSSHKey;
@@ -31,17 +31,9 @@ function EnvironmentViewCtrl($scope, environmentService, SweetAlert, DTOptionsBu
 	vm.setDomain = setDomain;
 	vm.removeDomain = removeDomain;
 
-	function getEnvironments() {
-		environmentService.getEnvironments().success(function (data) {
-			vm.environments = data;
-		});
-	}
-
 	environmentService.getDomainStrategies().success(function (data) {
 		vm.domainStrategies = data;
 	});
-
-	getEnvironments();
 
 	vm.dtInstance = {};
 	vm.users = {};
@@ -56,29 +48,34 @@ function EnvironmentViewCtrl($scope, environmentService, SweetAlert, DTOptionsBu
 
 	vm.dtColumns = [
 		//DTColumnBuilder.newColumn('id').withTitle('ID'),
-		DTColumnBuilder.newColumn(null).withTitle('').notSortable().renderWith(statusHTML),
-		DTColumnBuilder.newColumn('name').withTitle('Environment name'),
+		DTColumnBuilder.newColumn('status').withTitle('').notSortable().renderWith(statusHTML),
+		DTColumnBuilder.newColumn(null).withTitle('Environment name').renderWith(environmentNameTooltip),
 		DTColumnBuilder.newColumn(null).withTitle('Key SSH').renderWith(sshKeyLinks),
 		DTColumnBuilder.newColumn(null).withTitle('Domains').renderWith(domainsTag),
 		DTColumnBuilder.newColumn(null).withTitle('').renderWith(containersTags),
 		DTColumnBuilder.newColumn(null).withTitle('').notSortable().renderWith(actionDelete)
 	];
 
-	/*function reloadTableData() {
+	/*vm.reloadTableData = function() {
 		vm.refreshTable = $timeout(function myFunction() {
 			vm.dtInstance.reloadData(null, false);
-			vm.refreshTable = $timeout(reloadTableData, 10000);
-		}, 10000);
+			console.log('lololo');
+			vm.refreshTable = $timeout(vm.reloadTableData, 3000);
+		}, 3000);
 	};
-	reloadTableData();*/
+	vm.reloadTableData();*/
 
 	function createdRow(row, data, dataIndex) {
 		$compile(angular.element(row).contents())($scope);
 	}
 
-	function statusHTML(data, type, full, meta) {
+	function statusHTML(environmentStatus, type, full, meta) {
+		return '<div class="b-status-icon b-status-icon_' + environmentStatus + '" tooltips tooltip-title="' + environmentStatus + '"></div>';
+	}
+
+	function environmentNameTooltip(data, type, full, meta) {
 		vm.users[data.id] = data;
-		return '<div class="b-status-icon b-status-icon_' + data.status + '" tooltips tooltip-title="' + data.status + '"></div>';
+		return '<span tooltips tooltip-content="ID: <b>' + data.id + '</b>">' + data.name + '</span>';
 	}
 
 	function sshKeyLinks(data, type, full, meta) {
@@ -270,11 +267,11 @@ function EnvironmentViewCtrl($scope, environmentService, SweetAlert, DTOptionsBu
 		var file = fileUploder;
 		environmentService.setDomain(domain, vm.environmentForDomain, file).success(function (data) {
 			SweetAlert.swal("Success!", "You successfully add domain for " + vm.environmentForDomain + " environment!", "success");
-			//ngDialog.closeAll();
+			ngDialog.closeAll();
 			console.log(data);
 		}).error(function (data) {
 			SweetAlert.swal("Cancelled", "Error: " + data.ERROR, "error");
-			//ngDialog.closeAll();
+			ngDialog.closeAll();
 		});
 	}
 

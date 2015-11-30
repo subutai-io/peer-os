@@ -33,7 +33,7 @@ function TokensCtrl(identitySrv, $scope, DTOptionsBuilder, DTColumnBuilder, $res
 		})
 		.withPaginationType('full_numbers')
 		.withOption('createdRow', createdRow)
-		.withOption('order', [[ 3, "asc" ]])
+		.withOption('order', [[ 3, "desc" ]])
 		.withOption('columnDefs', [ {"width": "105px", "targets": [7]} ])
 		.withOption('stateSave', true);
 
@@ -75,9 +75,9 @@ function TokensCtrl(identitySrv, $scope, DTOptionsBuilder, DTColumnBuilder, $res
 	function getTokenType(data, type, full, meta) {
 		var type = '';
 		if(data.type == 1) {
-			type = 'Permanent';
-		} else {
 			type = 'Session';
+		} else {
+			type = 'Permanent';
 		}
 		return type;
 	}
@@ -135,11 +135,22 @@ function TokensCtrl(identitySrv, $scope, DTOptionsBuilder, DTColumnBuilder, $res
 		},
 		function (isConfirm) {
 			if (isConfirm) {
-				identitySrv.deleteToken(token).success(function (data) {
-					vm.dtInstance.reloadData(null, false);
-				}).error(function (data) {
-					SweetAlert.swal("ERROR!", "User token is safe :). Error: " + data, "error");
-				});
+				try {
+					identitySrv.deleteToken(token).success(function (data) {
+						//SweetAlert.swal("Success!", "Your token has been deleted.", "success");
+						SweetAlert.swal({
+							title : 'Deleted',
+							text : 'User token has been deleted!',
+							timer: VARS_TOOLTIP_TIMEOUT,
+							showConfirmButton: false
+						});
+						vm.dtInstance.reloadData(null, false);
+					}).error(function (data) {
+						SweetAlert.swal("ERROR!", "User token is safe :). Error: " + data, "error");
+					});
+				} catch(e) {
+					SweetAlert.swal("ERROR!", "User token is safe. Error: " + e, "error");
+				}
 			}
 		});		
 	}

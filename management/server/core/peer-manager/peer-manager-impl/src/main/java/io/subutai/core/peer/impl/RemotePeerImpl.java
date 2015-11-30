@@ -183,7 +183,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public boolean isOnline() throws PeerException
+    public boolean isOnline()
     {
         try
         {
@@ -841,14 +841,14 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public HostInterfaces getInterfaces()
+    public HostInterfaces getInterfaces() throws PeerException
     {
         return new PeerWebClient( peerInfo.getIp(), provider ).getInterfaces();
     }
 
 
     @Override
-    public void setupN2NConnection( final N2NConfig config )
+    public void setupN2NConnection( final N2NConfig config ) throws PeerException
     {
         Preconditions.checkNotNull( config, "Invalid n2n config" );
 
@@ -877,7 +877,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public ResourceHostMetrics getResourceHostMetrics()
+    public ResourceHostMetrics getResourceHostMetrics() throws PeerException
     {
         return new PeerWebClient( peerInfo.getIp(), provider ).getResourceHostMetrics();
     }

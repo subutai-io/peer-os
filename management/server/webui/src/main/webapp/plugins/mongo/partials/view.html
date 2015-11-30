@@ -1,0 +1,34 @@
+<div ng-controller="MongoCtrl as mongoCtrl">
+
+	<div class="b-workspace__header">
+		<h1 class="b-title">Plugins/<span class="b-title_breadcrumbs">Mongo</span></h1>
+	</div>
+
+	<div class="b-workspace__content">
+		<div class="b-tabs-menu">
+			<ul>
+				<li class="b-tabs-menu__item" 
+				ng-click="mongoCtrl.activeTab = 'install'"
+				ng-class="mongoCtrl.activeTab == 'install' ? 'b-tabs-menu__item_active' : ''">
+					Install
+				</li>
+				<li class="b-tabs-menu__item" 
+				ng-click="mongoCtrl.activeTab = 'manage'"
+				ng-class="mongoCtrl.activeTab == 'manage' ? 'b-tabs-menu__item_active' : ''">
+					Manage
+				</li>
+			</ul>
+		</div>
+		<div 
+			ng-if="mongoCtrl.activeTab == 'install'"
+			ng-include="'plugins/mongo/partials/install.html'">
+		</div>
+
+		<div 
+			ng-if="mongoCtrl.activeTab == 'manage'"
+			ng-include="'plugins/mongo/partials/manage.html'">
+		</div>
+
+	</div>
+
+</div>

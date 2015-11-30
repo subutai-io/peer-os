@@ -7,6 +7,7 @@ import java.util.Set;
 
 import javax.ws.rs.core.MediaType;
 
+import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,12 +55,19 @@ public class PeerWebClient
     {
         String path = "/info";
 
-        WebClient client = WebClientBuilder.buildPeerWebClient( host, path, provider );
+        WebClient client = WebClientBuilder.buildPeerWebClient( host, path, provider, 500, 3000, 1 );
 
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
 
-        return client.get( PeerInfo.class );
+        try
+        {
+            return client.get( PeerInfo.class );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Error getting peer info", e );
+        }
     }
 
 
@@ -237,7 +245,7 @@ public class PeerWebClient
     }
 
 
-    public HostInterfaces getInterfaces()
+    public HostInterfaces getInterfaces() throws PeerException
     {
         String path = "/interfaces";
 
@@ -245,11 +253,18 @@ public class PeerWebClient
 
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
-        return client.get( HostInterfaces.class );
+        try
+        {
+            return client.get( HostInterfaces.class );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Error getting interfaces", e );
+        }
     }
 
 
-    public void setupN2NConnection( final N2NConfig config )
+    public void setupN2NConnection( final N2NConfig config ) throws PeerException
     {
         LOG.debug( String.format( "Adding remote peer to n2n community: %s:%d %s %s %s", config.getSuperNodeIp(),
                 config.getN2NPort(), config.getInterfaceName(), config.getCommunityName(), config.getAddress() ) );
@@ -261,7 +276,14 @@ public class PeerWebClient
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
 
-        client.post( config );
+        try
+        {
+            client.post( config );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Error setting up n2n connection", e );
+        }
     }
 
 
@@ -276,11 +298,18 @@ public class PeerWebClient
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
 
-        client.delete();
+        try
+        {
+            client.delete();
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Error removing n2n connection", e );
+        }
     }
 
 
-    public ResourceHostMetrics getResourceHostMetrics()
+    public ResourceHostMetrics getResourceHostMetrics() throws PeerException
     {
         String path = "/resources";
 
@@ -288,7 +317,14 @@ public class PeerWebClient
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
 
-        return client.get( ResourceHostMetrics.class );
+        try
+        {
+            return client.get( ResourceHostMetrics.class );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Error getting rh metrics", e );
+        }
     }
 
 
@@ -299,27 +335,15 @@ public class PeerWebClient
         WebClient client = WebClientBuilder.buildPeerWebClient( host, path, provider );
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
-        Collection response = client.getCollection( Gateway.class );
-
-        return new HashSet<Gateway>( response );
-    }
-
-
-    public void setDefaultGateway( final ContainerGateway gateway ) throws PeerException
-    {
-        String path = "/container/gateway";
-
-        WebClient client = WebClientBuilder.buildPeerWebClient( host, path, provider );
-        client.type( MediaType.APPLICATION_JSON );
-        client.accept( MediaType.APPLICATION_JSON );
 
         try
         {
-            client.post( gateway );
+            Collection response = client.getCollection( Gateway.class );
+            return new HashSet<>( response );
         }
         catch ( Exception e )
         {
-            throw new PeerException( "Error setting container gateway ip", e );
+            throw new PeerException( "Error getting gateways", e );
         }
     }
 
@@ -363,16 +387,6 @@ public class PeerWebClient
     }
 
 
-    //    public BaseMetric getHostMetric( final String hostId )
-    //    {
-    //        String path = String.format( "/metric/%s", hostId );
-    //
-    //        WebClient client = WebClientBuilder.buildPeerWebClient( host, path, provider );
-    //
-    //        return client.get( BaseMetric.class );
-    //    }
-
-
     public void createGateway( final Gateway gateway ) throws PeerException
     {
         String path = "/gateways";
@@ -388,25 +402,6 @@ public class PeerWebClient
         catch ( Exception e )
         {
             throw new PeerException( "Error on creating gateway", e );
-        }
-    }
-
-
-    public void putAlert( final AlertPack alert ) throws PeerException
-    {
-        String path = "/alert";
-
-        WebClient client = WebClientBuilder.buildPeerWebClient( host, path, provider );
-        client.type( MediaType.APPLICATION_JSON );
-        client.accept( MediaType.APPLICATION_JSON );
-
-        try
-        {
-            client.post( alert );
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException( "Error on sending alert package to remote peer", e );
         }
     }
 }

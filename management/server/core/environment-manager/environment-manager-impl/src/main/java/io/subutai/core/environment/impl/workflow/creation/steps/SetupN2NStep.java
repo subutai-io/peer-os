@@ -23,14 +23,15 @@ import org.apache.commons.net.util.SubnetUtils;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.Topology;
-import io.subutai.common.host.HostInterfaceModel;
+import io.subutai.common.host.HostInterface;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
+import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.util.N2NUtil;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.entity.PeerConfImpl;
-import io.subutai.common.peer.LocalPeer;
 
 
 /**
@@ -55,19 +56,17 @@ public class SetupN2NStep
 
     public void execute() throws EnvironmentManagerException
     {
-
-        //obtain already participating peers
-        Set<Peer> peers = Sets.newHashSet( topology.getAllPeers() );
-
-        peers.add( localPeer );
-        // creating new n2n tunnels
-        Set<String> existingNetworks = getTunnelNetworks( peers );
-
-        String freeTunnelNetwork = N2NUtil.findFreeTunnelNetwork( existingNetworks );
-
-        LOGGER.debug( String.format( "Free tunnel network: %s", freeTunnelNetwork ) );
         try
         {
+            //obtain already participating peers
+            Set<Peer> peers = Sets.newHashSet( topology.getAllPeers() );
+
+            peers.add( localPeer );
+            // creating new n2n tunnels
+            Set<String> existingNetworks = getTunnelNetworks( peers );
+
+            String freeTunnelNetwork = N2NUtil.findFreeTunnelNetwork( existingNetworks );
+            LOGGER.debug( String.format( "Free tunnel network: %s", freeTunnelNetwork ) );
             if ( freeTunnelNetwork == null )
             {
                 throw new IllegalStateException( "Could not calculate tunnel network." );
@@ -137,20 +136,20 @@ public class SetupN2NStep
     }
 
 
-    private Set<String> getTunnelNetworks( final Set<Peer> peers )
+    private Set<String> getTunnelNetworks( final Set<Peer> peers ) throws PeerException
     {
         Set<String> result = new HashSet<>();
 
         for ( Peer peer : peers )
         {
-            Set<HostInterfaceModel> r = peer.getInterfaces().filterByIp( N2NUtil.N2N_INTERFACE_IP_PATTERN );
+            Set<HostInterface> r = peer.getInterfaces().filterByIp( N2NUtil.N2N_INTERFACE_IP_PATTERN );
 
             Collection tunnels = CollectionUtils.collect( r, new Transformer()
             {
                 @Override
                 public Object transform( final Object o )
                 {
-                    HostInterfaceModel i = ( HostInterfaceModel ) o;
+                    HostInterface i = ( HostInterface ) o;
                     SubnetUtils u = new SubnetUtils( i.getIp(), N2NUtil.N2N_SUBNET_MASK );
                     return u.getInfo().getNetworkAddress();
                 }
