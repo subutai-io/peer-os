@@ -73,7 +73,7 @@ public class PEKGenerationStep
             keyManager.savePublicKeyRing( pairId, SecurityKeyType.EnvironmentKey.getId(), pubRing );
 
             //***************Sign Keys *********************************************************
-            securityManager.getKeyManager().signKey( userSecKeyRing, pubRing, KeyTrustLevel.Full.getId() );
+            securityManager.getKeyManager().setKeyTrust( userSecKeyRing, pubRing, KeyTrustLevel.Full.getId() );
 
             return secRing;
         }
@@ -104,7 +104,7 @@ public class PEKGenerationStep
                 PGPPublicKeyRing pubRing = PGPKeyUtil.readPublicKeyRing( publicKeyContainer.getKey() );
 
                 PGPPublicKeyRing signedPEK =
-                        securityManager.getKeyManager().signKey( envSecKeyRing, pubRing, KeyTrustLevel.Full.getId() );
+                        securityManager.getKeyManager().setKeyTrust( envSecKeyRing, pubRing, KeyTrustLevel.Full.getId() );
 
                 peer.updatePeerEnvironmentPubKey( environment.getEnvironmentId(), signedPEK );
             }

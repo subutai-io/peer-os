@@ -25,7 +25,6 @@ import io.subutai.common.settings.ChannelSettings;
 import io.subutai.core.channel.impl.ChannelManagerImpl;
 import io.subutai.core.channel.impl.util.MessageContentUtil;
 import io.subutai.core.identity.api.model.Session;
-import io.subutai.core.identity.api.model.User;
 
 
 /**
@@ -85,8 +84,7 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
                         }
                         catch ( Exception ex )
                         {
-                            LOG.error( "****** Error !! Error in doIntercept," + ex.toString(),ex );
-                            MessageContentUtil.abortChain( message, 403, "Access Denied to the resource" );
+                            MessageContentUtil.abortChain( message, ex );
                         }
                         return null;
                     }
@@ -94,7 +92,7 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
             }
             else
             {
-                MessageContentUtil.abortChain( message, 403, "Access Denied to the resource" );
+                MessageContentUtil.abortChain( message, 401, "User is not authorized" );
             }
             //-----------------------------------------------------------------------------------------------
         }
@@ -124,6 +122,20 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
             {
                 HttpHeaders headers = new HttpHeadersImpl( message.getExchange().getInMessage() );
                 sptoken = headers.getHeaderString( "sptoken" );
+            }
+
+            //******************Get sptoken from cookies *****************
+
+            if ( Strings.isNullOrEmpty( sptoken ) )
+            {
+                Cookie[] cookies = req.getCookies();
+                for ( final Cookie cookie : cookies )
+                {
+                    if ( "sptoken".equals( cookie.getName() ) )
+                    {
+                        sptoken = cookie.getValue();
+                    }
+                }
             }
 
             if ( Strings.isNullOrEmpty( sptoken ) )

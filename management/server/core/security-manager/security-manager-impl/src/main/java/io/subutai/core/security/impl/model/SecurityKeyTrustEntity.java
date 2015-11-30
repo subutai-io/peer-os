@@ -9,8 +9,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
+import io.subutai.core.security.api.model.SecurityKey;
 import io.subutai.core.security.api.model.SecurityKeyTrust;
 
 
@@ -19,7 +21,7 @@ import io.subutai.core.security.api.model.SecurityKeyTrust;
  */
 @Entity
 @Table( name = "security_key_trust",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"source_id", "target_id"} ))
+        uniqueConstraints = @UniqueConstraint(columnNames = {"source_fprint", "target_fprint"} ))
 @Access( AccessType.FIELD )
 public class SecurityKeyTrustEntity implements SecurityKeyTrust
 {
@@ -28,14 +30,20 @@ public class SecurityKeyTrustEntity implements SecurityKeyTrust
     @Column( name = "id" )
     private long id;
 
-    @Column( name = "source_id" )
-    private String sourceId;
+    @Column( name = "source_fprint" )
+    private String sourceFingerprint;
 
-    @Column( name = "target_id" )
-    private String targetId;
+    @Column( name = "target_fprint" )
+    private String targetFingerprint;
 
     @Column( name = "level" )
     private int level = 1;
+
+
+    //**********************************
+    @Transient
+    private SecurityKey targetKey = null;
+    //**********************************
 
 
     @Override
@@ -51,35 +59,6 @@ public class SecurityKeyTrustEntity implements SecurityKeyTrust
         this.id = id;
     }
 
-
-    @Override
-    public String getSourceId()
-    {
-        return sourceId;
-    }
-
-
-    @Override
-    public void setSourceId( final String sourceId )
-    {
-        this.sourceId = sourceId;
-    }
-
-
-    @Override
-    public String getTargetId()
-    {
-        return targetId;
-    }
-
-
-    @Override
-    public void setTargetId( final String targetId )
-    {
-        this.targetId = targetId;
-    }
-
-
     @Override
     public int getLevel()
     {
@@ -92,4 +71,46 @@ public class SecurityKeyTrustEntity implements SecurityKeyTrust
     {
         this.level = level;
     }
+
+
+    @Override
+    public String getSourceFingerprint()
+    {
+        return sourceFingerprint;
+    }
+
+
+    @Override
+    public void setSourceFingerprint( final String sourceFingerprint )
+    {
+        this.sourceFingerprint = sourceFingerprint;
+    }
+
+
+    @Override
+    public String getTargetFingerprint()
+    {
+        return targetFingerprint;
+    }
+
+
+    @Override
+    public void setTargetFingerprint( final String targetFingerprint )
+    {
+        this.targetFingerprint = targetFingerprint;
+    }
+
+    @Override
+    public SecurityKey getTargetKey()
+    {
+        return targetKey;
+    }
+
+
+    @Override
+    public void setTargetKey( final SecurityKey targetKey )
+    {
+        this.targetKey = targetKey;
+    }
+
 }
