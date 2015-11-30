@@ -1086,7 +1086,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     @PermitAll
     @Override
-    public boolean isOnline() throws PeerException
+    public boolean isOnline()
     {
         return true;
     }
@@ -1592,7 +1592,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
      *
      * @return set of currently used n2n subnets.
      */
-    private Set<String> getN2NSubnets( final Set<Peer> peers )
+    private Set<String> getN2NSubnets( final Set<Peer> peers ) throws PeerException
     {
         Set<String> result = new HashSet<>();
 

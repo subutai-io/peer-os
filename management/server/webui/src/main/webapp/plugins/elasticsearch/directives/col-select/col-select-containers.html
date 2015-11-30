@@ -1,0 +1,28 @@
+<div class="b-workspace-content-row_col-2 b-workspace-content-row_col-2_padding-right g-left">
+	<span class="b-form-label b-form-label_block">Available nodes</span>
+	<ul class="b-form-list b-form-list_table">
+		<li class="b-form-list-table__link" 
+		ng-repeat="container in elasticSearchCtrl.containers" 
+		ng-if="elasticSearchCtrl.elasticSearchInstall.nodes.indexOf(container.id) == -1" 
+		ng-click="elasticSearchCtrl.addContainer(container.id)">
+			{{ container.hostname }}
+		</li>
+	</ul>
+</div>
+<div class="b-form-list-buttons b-form-list-buttons_absolute">
+	<a href class="b-btn-grey b-btn-grey_horizontal b-btn-block"><i
+			class="fa fa-angle-double-left"></i></a>
+	<a href class="b-btn-grey b-btn-grey_horizontal"><i
+			class="fa fa-angle-double-right"></i></a>
+</div>
+<div class="b-workspace-content-row_col-2 b-workspace-content-row_col-2_padding-left g-right">
+	<span class="b-form-label b-form-label_block">Selected nodes</span>
+	<ul class="b-form-list b-form-list_table">
+		<li class="b-form-list-table__link" 
+		ng-repeat="container in elasticSearchCtrl.containers" 
+		ng-if="elasticSearchCtrl.elasticSearchInstall.nodes.indexOf(container.id) > -1" 
+		ng-click="elasticSearchCtrl.addContainer(container.id)">
+			{{ container.hostname }}
+		</li>		
+	</ul>
+</div>

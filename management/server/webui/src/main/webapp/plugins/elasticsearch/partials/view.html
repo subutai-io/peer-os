@@ -1,0 +1,35 @@
+<div ng-controller="ElasticSearchCtrl as elasticSearchCtrl">
+
+	<div class="b-workspace__header">
+		<h1 class="b-title">Plugins/<span class="b-title_breadcrumbs">Elastic Search</span></h1>
+	</div>
+
+	<div class="b-workspace__content">
+		<div class="b-tabs-menu">
+			<ul>
+				<li class="b-tabs-menu__item" 
+				ng-click="elasticSearchCtrl.activeTab = 'install'" 
+				ng-class="elasticSearchCtrl.activeTab == 'install' ? 'b-tabs-menu__item_active' : ''">
+					Install
+				</li>
+				<li class="b-tabs-menu__item" 
+				ng-click="elasticSearchCtrl.activeTab = 'manage'" 
+				ng-class="elasticSearchCtrl.activeTab == 'manage' ? 'b-tabs-menu__item_active' : ''">
+					Manage
+				</li>
+			</ul>
+		</div>
+
+		<div 
+			ng-if="elasticSearchCtrl.activeTab == 'install'" 
+			ng-include="'plugins/elasticsearch/partials/install.html'">
+		</div>
+
+		<div 
+			ng-if="elasticSearchCtrl.activeTab == 'manage'" 
+			ng-include="'plugins/elasticsearch/partials/manage.html'">
+		</div>
+
+	</div>
+
+</div>

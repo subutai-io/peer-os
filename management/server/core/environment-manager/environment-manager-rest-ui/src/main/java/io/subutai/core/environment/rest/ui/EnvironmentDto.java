@@ -9,16 +9,16 @@ import io.subutai.common.environment.EnvironmentStatus;
 /**
  * Trimmed environment for REST
  */
-public class EnvironmentJson
+public class EnvironmentDto
 {
     private String id;
     private String name;
     private EnvironmentStatus status;
-    private Set<ContainerJson> containers;
+    private Set<ContainerDto> containers;
 
 
-    public EnvironmentJson( final String id, final String name, final EnvironmentStatus status,
-                            final Set<ContainerJson> containers )
+    public EnvironmentDto( final String id, final String name, final EnvironmentStatus status,
+                           final Set<ContainerDto> containers )
     {
         this.id = id;
         this.name = name;
@@ -63,13 +63,13 @@ public class EnvironmentJson
     }
 
 
-    public Set<ContainerJson> getContainers()
+    public Set<ContainerDto> getContainers()
     {
         return containers;
     }
 
 
-    public void setContainers( final Set<ContainerJson> containers )
+    public void setContainers( final Set<ContainerDto> containers )
     {
         this.containers = containers;
     }

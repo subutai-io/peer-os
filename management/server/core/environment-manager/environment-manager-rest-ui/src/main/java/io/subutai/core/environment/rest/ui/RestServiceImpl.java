@@ -2,7 +2,6 @@ package io.subutai.core.environment.rest.ui;
 
 
 import java.io.File;
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -28,6 +27,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
+import com.google.gson.reflect.TypeToken;
 
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.peer.ContainerHost;
@@ -192,16 +192,16 @@ public class RestServiceImpl implements RestService
     public Response listEnvironments()
     {
         Set<Environment> environments = environmentManager.getEnvironments();
-        Set<EnvironmentJson> environmentJsons = Sets.newHashSet();
+        Set<EnvironmentDto> environmentDtos = Sets.newHashSet();
 
         for ( Environment environment : environments )
         {
-            environmentJsons
-                    .add( new EnvironmentJson( environment.getId(), environment.getName(), environment.getStatus(),
+            environmentDtos
+                    .add( new EnvironmentDto( environment.getId(), environment.getName(), environment.getStatus(),
                             convertContainersToContainerJson( environment.getContainerHosts() ) ) );
         }
 
-        return Response.ok( JsonUtil.toJson( environmentJsons ) ).build();
+        return Response.ok( JsonUtil.toJson( environmentDtos ) ).build();
     }
 
 
@@ -342,33 +342,23 @@ public class RestServiceImpl implements RestService
     public Response addEnvironmentDomain( String environmentId, String hostName, String strategyJson,
                                           Attachment attr )
     {
-        DomainLoadBalanceStrategy strategy = JsonUtil.fromJson( strategyJson, DomainLoadBalanceStrategy.class );
-        if( attr == null )
-        {
-            return Response.status( Response.Status.BAD_REQUEST ).build();
-        }
-
         try
         {
+            DomainLoadBalanceStrategy strategy = JsonUtil.fromJson( strategyJson, DomainLoadBalanceStrategy.class );
+            if( attr == null )
+            {
+                throw new Exception( "Error, cannot read an attachment", null );
+            }
+
             File file = new File( System.getProperty( "java.io.tmpdir" ) + "/" + environmentId );
             file.createNewFile();
             attr.transferTo( file );
-        }
-        catch ( IOException e )
-        {
-            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
-        }
 
-        try
-        {
+
             environmentManager.assignEnvironmentDomain( environmentId, hostName, strategy,
                     System.getProperty( "java.io.tmpdir" ) + "/" + environmentId );
         }
-        catch ( EnvironmentModificationException e )
-        {
-            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
-        }
-        catch ( EnvironmentNotFoundException e )
+        catch ( Exception e )
         {
             return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
         }
@@ -780,22 +770,23 @@ public class RestServiceImpl implements RestService
     {
         Map<String, List<String>> peerHostMap = Maps.newHashMap();
 
-        for( Peer peer : peerManager.getPeers() )
+        try
         {
-            peerHostMap.put( peer.getId(), Lists.newArrayList() );
-
-            Collection<ResourceHostMetric> collection = peer.getResourceHostMetrics().getResources();
-            for( ResourceHostMetric metric : collection.toArray(new ResourceHostMetric[ collection.size() ]) )
+            for( Peer peer : peerManager.getPeers() )
             {
-                try
+                peerHostMap.put( peer.getId(), Lists.newArrayList() );
+
+                Collection<ResourceHostMetric> collection = peer.getResourceHostMetrics().getResources();
+                for( ResourceHostMetric metric : collection.toArray(new ResourceHostMetric[ collection.size() ]) )
                 {
-                    peerHostMap.get( peer.getId() ).add( metric.getHostId() );
-                }
-                catch ( Exception e )
-                {
-                    LOG.error( "Resource hosts are empty", e );
+                        peerHostMap.get( peer.getId() ).add( metric.getHostId() );
+
                 }
             }
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Resource hosts are empty", e );
         }
 
 
@@ -803,9 +794,40 @@ public class RestServiceImpl implements RestService
     }
 
 
-    public Response setTags()
+    @Override
+    public Response addTags( final String environmentId, final String containerId, final String tagsJson )
     {
+        try
+        {
+            Environment environment = environmentManager.loadEnvironment( environmentId );
 
+            ContainerHost containerHost = environment.getContainerHostById( containerId );
+
+            Set<String> tags = JsonUtil.fromJson( tagsJson, new TypeToken<Set<String>>(){}.getType() );
+
+            tags.stream().forEach( tag -> containerHost.addTag( tag ) );
+        }
+        catch ( Exception e )
+        {
+            return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( e ) ).build();
+        }
+
+        return Response.ok().build();
+    }
+
+
+    @Override
+    public Response removeTag( final String environmentId, final String containerId, final String tag )
+    {
+        try
+        {
+            Environment environment = environmentManager.loadEnvironment( environmentId );
+            environment.getContainerHostById( containerId ).removeTag( tag );
+        }
+        catch ( Exception e )
+        {
+            return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( e ) ).build();
+        }
 
         return Response.ok().build();
     }
@@ -813,9 +835,9 @@ public class RestServiceImpl implements RestService
 
     /** AUX *****************************************************/
 
-    private Set<ContainerJson> convertContainersToContainerJson( Set<EnvironmentContainerHost> containerHosts )
+    private Set<ContainerDto> convertContainersToContainerJson( Set<EnvironmentContainerHost> containerHosts )
     {
-        Set<ContainerJson> jsonSet = Sets.newHashSet();
+        Set<ContainerDto> containerDtos = Sets.newHashSet();
         for ( EnvironmentContainerHost containerHost : containerHosts )
         {
             ContainerHostState state = containerHost.getStatus();
@@ -825,14 +847,20 @@ public class RestServiceImpl implements RestService
 
 
 
-            jsonSet.add( new ContainerJson( containerHost.getId(), containerHost.getEnvironmentId(),
-                    containerHost.getHostname(), state,
+            containerDtos.add( new ContainerDto(
+                    containerHost.getId(),
+                    containerHost.getEnvironmentId(),
+                    containerHost.getHostname(),
+                    state,
                     iface.getIp(),
                     iface.getMac(),
-                    containerHost.getTemplateName(), containerHost.getContainerType(), containerHost.getTags() ) );
+                    containerHost.getTemplateName(),
+                    containerHost.getContainerType(),
+                    containerHost.getArch().toString(),
+                    containerHost.getTags() ) );
 
         }
-        return jsonSet;
+        return containerDtos;
     }
 
 

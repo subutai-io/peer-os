@@ -1,0 +1,131 @@
+<div class="b-workspace-content b-workspace-content_border">
+
+	<div class="b-workspace-content__row b-workspace-content__row_margin-b">
+		<div class="b-form b-form_border">
+		<form ng-submit="keshigCtrl.updateProfile()">
+
+			<div class="b-form-col-2">
+				<div class="b-form__wrapper b-form__wrapper_margin-bottom">
+					<label class="b-form-label b-form-label_fix-size-2 g-left">Name</label>
+
+					<div class="b-form-wrapper b-form-wrapper_margin-size-2">
+						<input 
+						class="b-form-input b-form-input_full" 
+						type="text" 
+						ng-model="keshigCtrl.profiles2Add.name" 
+						required>
+					</div>
+					<div class="clear"></div>
+				</div>
+			</div>
+
+			<div class="b-form-col-2 g-right">&nbsp;</div>
+
+			<div class="b-form-col-2">
+				<h2 class="b-workspace-content-row-h2">
+					Server
+				</h2>
+
+				<div class="b-form__wrapper b-form__wrapper_between">
+					<select class="b-form-input b-form-input_full" ng-model="keshigCtrl.profiles2Add.cbServer" required>
+						<option ng-repeat="server in keshigCtrl.serversByType['BUILD_SERVER']" value="{{ server.serverName }}">
+							{{ server.serverName }}
+						</option>
+					</select>
+				</div>
+
+				<div class="b-form__wrapper b-form__wrapper_margin-bottom">
+					<select class="b-form-input b-form-input_full" ng-model="keshigCtrl.profiles2Add.testServer" required>
+						<option ng-repeat="server in keshigCtrl.serversByType['TEST_SERVER']" value="{{ server.serverName }}">
+							{{ server.serverName }}
+						</option>
+					</select>
+				</div>
+
+				<div class="b-form__wrapper b-form__wrapper_margin-bottom">
+					<select class="b-form-input b-form-input_full" ng-model="keshigCtrl.profiles2Add.deployServer" required>
+						<option ng-repeat="server in keshigCtrl.serversByType['DEPLOY_SERVER']" value="{{ server.serverName }}">
+							{{ server.serverName }}
+						</option>
+					</select>
+				</div>
+
+			</div>
+
+			<div class="b-form-col-2 g-right">
+
+				<h2 class="b-workspace-content-row-h2" style="padding-left: 80px;">
+					Options
+				</h2>
+
+				<div class="b-form__wrapper b-form__wrapper_margin-bottom">
+					<label class="b-form-label b-form-label_fix-size-2 g-left">Clone</label>
+
+					<div class="b-form__wrapper b-form-wrapper_margin-size-2">
+						<select class="b-form-input b-form-input_full" ng-model="keshigCtrl.profiles2Add.cloneOption" required>
+							<option ng-repeat="option in keshigCtrl.optionsByType.CLONE" value="{{ option.name }}">
+								{{ option.name }}
+							</option>
+						</select>
+					</div>
+					<div class="clear"></div>
+				</div>				
+
+				<div class="b-form__wrapper b-form__wrapper_margin-bottom">
+					<label class="b-form-label b-form-label_fix-size-2 g-left">Build</label>
+
+					<div class="b-form__wrapper b-form-wrapper_margin-size-2">
+						<select class="b-form-input b-form-input_full" ng-model="keshigCtrl.profiles2Add.buildOption" required>
+							<option ng-repeat="option in keshigCtrl.optionsByType.BUILD" value="{{ option.name }}">
+								{{ option.name }}
+							</option>
+						</select>
+					</div>
+					<div class="clear"></div>
+				</div>
+
+				<div class="b-form__wrapper b-form__wrapper_margin-bottom">
+					<label class="b-form-label b-form-label_fix-size-2 g-left">Test</label>
+
+					<div class="b-form__wrapper b-form-wrapper_margin-size-2">
+						<select class="b-form-input b-form-input_full" ng-model="keshigCtrl.profiles2Add.testOption" required>
+							<option ng-repeat="option in keshigCtrl.optionsByType.TEST" value="{{ option.name }}">
+								{{ option.name }}
+							</option>
+						</select>
+					</div>
+					<div class="clear"></div>
+				</div>
+
+				<div class="b-form__wrapper b-form__wrapper_margin-bottom">
+					<label class="b-form-label b-form-label_fix-size-2 g-left">Deploy</label>
+
+					<div class="b-form__wrapper b-form-wrapper_margin-size-2">
+						<select class="b-form-input b-form-input_full" ng-model="keshigCtrl.profiles2Add.deployOption" required>
+							<option ng-repeat="option in keshigCtrl.optionsByType.DEPLOY" value="{{ option.name }}">
+								{{ option.name }}
+							</option>
+						</select>
+					</div>
+					<div class="clear"></div>
+				</div>
+
+				<button type="submit" class="b-btn b-btn_green g-right">Save</button>
+				<div class="clear"></div>
+			</div>
+
+			<div class="clear"></div>
+		</form>
+		</div>
+	</div>
+
+	<div class="b-data-table">
+		<table datatable="" 
+			dt-options="keshigCtrl.dtOptions" 
+			dt-columns="keshigCtrl.dtColumns" 
+			dt-instance="keshigCtrl.dtInstance" 
+			class="row-border hover">
+		</table>
+	</div>
+
+</div>
