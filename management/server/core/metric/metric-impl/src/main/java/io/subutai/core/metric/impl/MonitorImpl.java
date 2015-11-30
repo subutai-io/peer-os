@@ -1,9 +1,10 @@
 package io.subutai.core.metric.impl;
 
 
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -14,13 +15,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.google.common.collect.Lists;
 import com.google.gson.JsonSyntaxException;
 
 import io.subutai.common.command.CommandException;
@@ -51,6 +52,7 @@ import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
@@ -95,6 +97,7 @@ public class MonitorImpl implements Monitor, HostListener
 
     private PeerManager peerManager;
     //    private AlertProcessor alertProcessor = new AlertProcessor();
+    protected ObjectMapper mapper = new ObjectMapper();
 
 
     public MonitorImpl( PeerManager peerManager, DaoManager daoManager, EnvironmentManager environmentManager,
@@ -220,89 +223,55 @@ public class MonitorImpl implements Monitor, HostListener
 
 
     @Override
-    public List<HistoricalMetric> getHistoricalMetric( final Host host, final MetricType metricType )
+    public HistoricalMetrics getHistoricalMetrics( final Host host, Date startTime, Date endTime )
     {
         Preconditions.checkNotNull( host );
-        Preconditions.checkNotNull( metricType );
 
-        List<HistoricalMetric> metrics = new ArrayList<>();
+        HistoricalMetrics result = new HistoricalMetrics(  );
 
-        //execute metrics command
-        CommandResult result;
-        ResourceHost resourceHost;
         try
         {
-            RequestBuilder historicalMetricCommand = commands.getHistoricalMetricCommand( host, metricType );
-            if ( !( host instanceof ResourceHost ) )
+            RequestBuilder historicalMetricCommand = commands.getHistoricalMetricCommand( host, startTime, endTime );
+
+            CommandResult commandResult =
+                    peerManager.getLocalPeer().getManagementHost().execute( historicalMetricCommand );
+
+            if ( commandResult.hasSucceeded() )
             {
-                resourceHost = peerManager.getLocalPeer().getResourceHostByContainerId( host.getId() );
+                result = mapper.readValue( commandResult.getStdOut(), HistoricalMetrics.class );
             }
             else
             {
-                resourceHost = ( ResourceHost ) host;
+                LOG.error( String.format( "Error getting historical metrics from %s: %s", host.getHostname(),
+                        commandResult.getStdErr() ) );
             }
-            result = resourceHost.execute( historicalMetricCommand );
         }
-        catch ( CommandException e )
+        catch ( IOException | CommandException e )
         {
             LOG.error( "Could not run command successfully! Error: {}", e );
-            return Lists.newArrayList();
         }
         catch ( HostNotFoundException e )
         {
             LOG.error( "Could not find resource host of host {}!", host.getHostname() );
-            return Lists.newArrayList();
-        }
-        if ( result.hasSucceeded() )
-        {
-            processHistoricalMetricOutput( result.getStdOut(), metricType, metrics, host );
-        }
-        else
-        {
-            LOG.error( String.format( "Error getting historical metrics from %s: %s", host.getHostname(),
-                    result.getStdErr() ) );
         }
 
-        return metrics;
+
+        return result;
     }
-
-
-    private void processHistoricalMetricOutput( final String stdOut, final MetricType metricType,
-                                                final List<HistoricalMetric> metrics, final Host host )
-    {
-        String[] lines = stdOut.split( "\\r?\\n" );
-        int timestamp;
-        double value;
-        for ( String line : lines )
-        {
-            int seperatorIndex = line.indexOf( ":" );
-            timestamp = Integer.parseInt( line.substring( 0, seperatorIndex ) );
-            value = Double.parseDouble( line.substring( seperatorIndex + 1 ).trim() );
-            switch ( metricType )
-            {
-                case RAM:
-                case DISK_HOME:
-                case DISK_OPT:
-                case DISK_ROOTFS:
-                case DISK_VAR:
-                    // Convert it from byte to megabyte
-                    value = value / ( 1024 * 1024 );
-                    break;
-                case CPU:
-                    // Convert it from nanoseconds to seconds
-                    value = value / ( 1000000000 );
-                    break;
-                default:
-                    break;
-            }
-            metrics.add( new HistoricalMetric( host, metricType, timestamp, value ) );
-        }
-    }
-
 
     @Override
+    public void addAlert( final AlertPack alert )
+    {
+        AlertPack a = new AlertPack( alert.getPeerId(), alert.getEnvironmentId(), alert.getContainerId(),
+                alert.getTemplateName(), alert.getValue() );
+        alerts.add( a );
+    }
+
+
+/*
+    @Override
     public Map<String, List<HistoricalMetric>> getHistoricalMetrics( final Collection<Host> hosts,
-                                                                     final MetricType metricType )
+                                                                     final ResourceType resourceType )
     {
         final Map<String, List<HistoricalMetric>> historicalMetrics = new ConcurrentHashMap<>();
 
@@ -329,7 +298,7 @@ public class MonitorImpl implements Monitor, HostListener
         //                @Override
         //                public void run() {
         //                    try {
-        //                        List<HistoricalMetric> historicalMetric = getHistoricalMetric( host, metricType );
+        //                        List<HistoricalMetric> historicalMetric = getHistoricalMetrics( host, metricType );
         //                        historicalMetrics.put( historicalMetric.get( 0 ).getHost().getId(),
         // historicalMetric );
         //                    } catch ( Exception e ) {
@@ -355,15 +324,7 @@ public class MonitorImpl implements Monitor, HostListener
         return historicalMetrics;
     }
 
-
-    @Override
-    public void addAlert( final AlertPack alert )
-    {
-        AlertPack a = new AlertPack( alert.getPeerId(), alert.getEnvironmentId(), alert.getContainerId(),
-                alert.getTemplateName(), alert.getValue() );
-        alerts.add( a );
-    }
-
+*/
 
     protected void putAlert( AlertValue alert )
     {

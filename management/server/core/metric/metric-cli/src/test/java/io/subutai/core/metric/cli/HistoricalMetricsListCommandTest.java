@@ -28,7 +28,7 @@ import static org.mockito.Mockito.when;
  * Test for ContainerHostMetricsCommand
  */
 @RunWith( MockitoJUnitRunner.class )
-public class MetricListCommandTest extends SystemOutRedirectTest
+public class HistoricalMetricsListCommandTest extends SystemOutRedirectTest
 {
     @Mock
     Monitor monitor;

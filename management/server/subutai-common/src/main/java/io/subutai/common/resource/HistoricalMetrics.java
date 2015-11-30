@@ -9,13 +9,18 @@ import org.codehaus.jackson.annotate.JsonProperty;
 /**
  * Historical metrics
  */
-public class Metric
+public class HistoricalMetrics
 {
-    @JsonProperty("Metrics")
+    @JsonProperty( "Metrics" )
     SeriesBatch[] metrics;
 
 
-    public Metric(@JsonProperty("Metrics") final SeriesBatch[] metrics )
+    public HistoricalMetrics()
+    {
+    }
+
+
+    public HistoricalMetrics( @JsonProperty( "Metrics" ) final SeriesBatch[] metrics )
     {
         this.metrics = metrics;
     }

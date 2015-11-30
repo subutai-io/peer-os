@@ -1,6 +1,7 @@
 package io.subutai.core.metric.impl;
 
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -39,6 +40,7 @@ import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.RemotePeer;
 import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.identity.api.model.User;
@@ -151,13 +153,6 @@ public class MonitorImplTest
         public void setAlertListeners( Map<String, AlertListener> alertListeners )
         {
             this.alertListeners = alertListeners;
-        }
-
-
-        @Override
-        public List<HistoricalMetric> getHistoricalMetric( final Host host, final MetricType metricType )
-        {
-            return null;
         }
     }
 
@@ -484,9 +479,8 @@ public class MonitorImplTest
             e.printStackTrace();
         }
         assert monitor1 != null;
-        List<HistoricalMetric> historicalMetric = monitor1.getHistoricalMetric( containerHost, MetricType.CPU );
+        HistoricalMetrics historicalMetric = monitor1.getHistoricalMetrics( containerHost, new Date(), new Date() );
         assertNotNull( historicalMetric );
-        assertTrue( historicalMetric.size() == 2 );
     }
 
 

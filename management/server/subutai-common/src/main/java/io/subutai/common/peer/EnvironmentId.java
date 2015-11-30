@@ -1,7 +1,6 @@
 package io.subutai.common.peer;
 
 
-import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 
@@ -10,7 +9,6 @@ import org.codehaus.jackson.annotate.JsonProperty;
  */
 public class EnvironmentId extends SubutaiId
 {
-    @JsonCreator
     public EnvironmentId( @JsonProperty( "id" ) final String id )
     {
         super( id );
