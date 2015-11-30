@@ -14,7 +14,7 @@ import io.subutai.core.broker.api.Topic;
  */
 public class HeartBeatListener implements ByteMessageListener
 {
-    private static final Logger LOG = LoggerFactory.getLogger( HeartBeatListener.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( HeartBeatListener.class);
     private final HostRegistryImpl registry;
     protected JsonUtil jsonUtil = new JsonUtil();
 
@@ -42,7 +42,7 @@ public class HeartBeatListener implements ByteMessageListener
 
             //            LOG.info( String.format( "%n<<<HEARTBEAT>>>%n%s%n", heartBeat.getHostInfo().toString() ) );
 
-            registry.registerHost( heartBeat.getHostInfo() );
+            registry.registerHost( heartBeat.getHostInfo(), heartBeat.getAlerts() );
         }
         catch ( Exception e )
         {

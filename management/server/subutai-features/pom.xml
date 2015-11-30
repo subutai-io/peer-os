@@ -40,9 +40,10 @@
     </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>test</artifactId>
+      <artifactId>test-cli</artifactId>
       <version>4.0.0-RC4</version>
     </dependency>
 

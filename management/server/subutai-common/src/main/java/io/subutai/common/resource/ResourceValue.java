@@ -39,7 +39,7 @@ public class ResourceValue
     }
 
 
-    protected ResourceValue convert( final MeasureUnit unit )
+    public ResourceValue convert( final MeasureUnit unit )
     {
         if ( unit.equals( measureUnit ) )
         {

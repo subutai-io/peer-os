@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ExecutorService;
 
 import javax.annotation.security.PermitAll;
@@ -33,10 +34,13 @@ import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.environment.PeerConf;
 import io.subutai.common.environment.Topology;
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.HostInfo;
-import io.subutai.common.host.HostInfoModel;
-import io.subutai.common.host.Interface;
+import io.subutai.common.host.ContainerHostInfoModel;
+import io.subutai.common.host.HostInterface;
 import io.subutai.common.mdc.SubutaiExecutors;
+import io.subutai.common.metric.Alert;
+import io.subutai.common.metric.EnvironmentAlert;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.peer.ContainerHost;
@@ -51,6 +55,7 @@ import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.common.util.StringUtil;
+import io.subutai.core.environment.api.EnvironmentAlertListener;
 import io.subutai.core.environment.api.EnvironmentEventListener;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
@@ -105,6 +110,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     protected BlueprintDataService blueprintDataService;
 
     protected ExceptionUtil exceptionUtil = new ExceptionUtil();
+    private Set<EnvironmentAlertListener> alertListeners = new CopyOnWriteArraySet<>();
 
 
     public EnvironmentManagerImpl( final TemplateRegistry templateRegistry, final PeerManager peerManager,
@@ -196,15 +202,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     @Override
     public Environment importEnvironment( final String name, final Topology topology,
-                                          final Map<NodeGroup, Set<HostInfo>> containers, final String ssh,
+                                          final Map<NodeGroup, Set<ContainerHostInfo>> containers, final String ssh,
                                           final Integer vlan ) throws EnvironmentCreationException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid name" );
         Preconditions.checkNotNull( topology, "Invalid topology" );
         Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
 
-        Map.Entry<NodeGroup, Set<HostInfo>> containersEntry = containers.entrySet().iterator().next();
-        Iterator<HostInfo> hostIterator = containersEntry.getValue().iterator();
+        Map.Entry<NodeGroup, Set<ContainerHostInfo>> containersEntry = containers.entrySet().iterator().next();
+        Iterator<ContainerHostInfo> hostIterator = containersEntry.getValue().iterator();
 
         String ip = "";
 
@@ -213,7 +219,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             HostInfo sampleHostInfo = hostIterator.next();
 
             //TODO ip is chosen from first standing container host info
-            for ( final Interface iface : sampleHostInfo.getInterfaces() )
+            for ( final HostInterface iface : sampleHostInfo.getHostInterfaces().getAll() )
             {
                 if ( StringUtil.isStringNullOrEmpty( iface.getIp() ) )
                 {
@@ -231,15 +237,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         //create empty environment
         final EnvironmentImpl environment = createEmptyEnvironment( name, ip, ssh );
-        for ( Map.Entry<NodeGroup, Set<HostInfo>> entry : containers.entrySet() )
+        for ( Map.Entry<NodeGroup, Set<ContainerHostInfo>> entry : containers.entrySet() )
         {
-            for ( HostInfo newHost : entry.getValue() )
+            for ( ContainerHostInfo newHost : entry.getValue() )
             {
                 ContainerType containerType = entry.getKey().getType();
 
                 environment.addContainers( Sets.newHashSet(
                         new EnvironmentContainerImpl( peerManager.getLocalPeer().getId(), peerManager.getLocalPeer(),
-                                entry.getKey().getName(), new HostInfoModel( newHost ),
+                                entry.getKey().getName(), new ContainerHostInfoModel( newHost ),
                                 templateRegistry.getTemplate( entry.getKey().getTemplateName() ),
                                 entry.getKey().getSshGroupId(), entry.getKey().getHostsGroupId(),
                                 Common.DEFAULT_DOMAIN_NAME, containerType ) ) );
@@ -271,20 +277,21 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     {
         Topology topology = new Topology( blueprint.getName(), environmentId, cdir, blueprint.getSshKey() );
 
-
+        LOG.debug( "Building topology..." );
         for ( Map.Entry<String, Set<NodeGroup>> placementEntry : blueprint.getNodeGroupsMap().entrySet() )
         {
             Peer peer = peerManager.getPeer( placementEntry.getKey() );
             for ( NodeGroup nodeGroup : placementEntry.getValue() )
             {
-                LOG.debug( String.format( "%s %s %s %s %s %s %d", nodeGroup.getName(), nodeGroup.getPeerId(),
-                        nodeGroup.getHostId(), nodeGroup.getType(),
+                LOG.debug( String.format( "%s %s %s %s %s %s", nodeGroup.getName(), nodeGroup.getType(),
+                        nodeGroup.getNumberOfContainers(), nodeGroup.getPeerId(),
                         nodeGroup.getContainerDistributionType() == ContainerDistributionType.AUTO ?
-                        nodeGroup.getContainerPlacementStrategy().getStrategyId() : "",
-                        nodeGroup.getContainerDistributionType(), nodeGroup.getNumberOfContainers() ) );
+                        nodeGroup.getContainerPlacementStrategy().getStrategyId() : nodeGroup.getHostId(),
+                        nodeGroup.getContainerDistributionType() ) );
                 topology.addNodeGroupPlacement( peer, nodeGroup );
             }
         }
+        LOG.debug( "Topology built." );
 
         return topology;
     }
@@ -849,7 +856,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                     EnvironmentContainerImpl environmentContainer =
                             environmentContainerDataService.find( containerHost.getId() );
                     environmentContainer.setHostname( hostInfo.getHostname() );
-                    environmentContainer.setNetInterfaces( hostInfo.getInterfaces() );
+                    environmentContainer.setHostInterfaces( hostInfo.getHostInterfaces() );
 
                     environmentContainerDataService.update( environmentContainer );
                 }
@@ -1258,6 +1265,36 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                     listener.onEnvironmentDestroyed( environmentId );
                 }
             } );
+        }
+    }
+
+
+    @Override
+    public void addAlertListener( final EnvironmentAlertListener alertListener )
+    {
+        this.alertListeners.add( alertListener );
+    }
+
+
+    @Override
+    public void removeAlertListener( final EnvironmentAlertListener alertListener )
+    {
+        this.alertListeners.remove( alertListener );
+    }
+
+
+    void onAlert( EnvironmentAlert alert )
+    {
+        // notify new alerts
+        if ( alert.getState() == EnvironmentAlert.State.NEW )
+        {
+            for ( EnvironmentAlertListener alertListener : alertListeners )
+            {
+                if ( alertListener.getEnvironmentId().equals( alert.getEnvironmentId() ) )
+                {
+                    alertListener.onAlert( alert );
+                }
+            }
         }
     }
 

@@ -23,6 +23,7 @@ function ConsoleViewCtrl($scope, consoleService, peerRegistrationService, $state
 	vm.currentTab = '';
 	vm.daemon = false;
 	vm.timeOut = 0;
+	vm.selectedEnvironment = '';
 
 	if($stateParams.containerId !== undefined && $stateParams.containerId.length > 0) {
 		vm.activeConsole = $stateParams.containerId;
@@ -30,6 +31,13 @@ function ConsoleViewCtrl($scope, consoleService, peerRegistrationService, $state
 
 	peerRegistrationService.getResourceHosts().success(function (data) {
 		vm.hosts = data;
+		for(var i = 0; i < vm.hosts.length; i++) {
+			if(vm.hosts[i].hostname == 'management') {
+				var temp = angular.copy(vm.hosts[0]);
+				vm.hosts[0] = angular.copy(vm.hosts[i]);
+				vm.hosts[i] = temp;
+			}
+		}
 	});
 
 	consoleService.getEnvironments().success(function (data) {
@@ -100,7 +108,7 @@ function ConsoleViewCtrl($scope, consoleService, peerRegistrationService, $state
 				return;
 			}
 
-			consoleService.sendCommand(cmd.command, vm.activeConsole, $scope.prompt.path(), vm.daemon, vm.timeOut).success(function(data){
+			consoleService.sendCommand(cmd.command, vm.activeConsole, $scope.prompt.path(), vm.daemon, vm.timeOut, vm.selectedEnvironment).success(function(data){
 				if(data.stdErr.length > 0) {
 					output = data.stdErr.split('\r');
 				} else {
@@ -109,7 +117,11 @@ function ConsoleViewCtrl($scope, consoleService, peerRegistrationService, $state
 
 				var checkCommand = cmd.command.split(' ');
 				if (checkCommand[0] == 'cd' && data.status == 'SUCCEEDED') {
-					var pathArray = ($scope.prompt.path() + checkCommand[1]).split('/');
+					var currentPath = $scope.prompt.path();
+					if(checkCommand[1].substring(0, 1) == '/') {
+						currentPath = '';
+					}
+					var pathArray = (currentPath + checkCommand[1]).split('/');
 					var totalPath = [];
 					for(var i = 0; i < pathArray.length; i++) {
 						if(pathArray[i].length > 0 && pathArray[i] != '&&') {
@@ -159,6 +171,7 @@ function ConsoleViewCtrl($scope, consoleService, peerRegistrationService, $state
 
 	function setCurrentType(type) {
 		vm.containers = [];
+		vm.selectedEnvironment = '';
 		vm.currentType = type;
 	}
 

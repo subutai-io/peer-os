@@ -34,12 +34,13 @@ import io.subutai.common.exception.HTTPException;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInfo;
-import io.subutai.common.host.HostInfoModel;
+import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
+import io.subutai.common.peer.AlertPack;
 import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
@@ -61,7 +62,6 @@ import io.subutai.common.protocol.Template;
 import io.subutai.common.resource.ResourceType;
 import io.subutai.common.resource.ResourceValue;
 import io.subutai.common.security.PublicKeyContainer;
-import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.settings.ChannelSettings;
 import io.subutai.common.settings.SecuritySettings;
 import io.subutai.common.util.CollectionUtil;
@@ -183,7 +183,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public boolean isOnline() throws PeerException
+    public boolean isOnline()
     {
         try
         {
@@ -514,7 +514,7 @@ public class RemotePeerImpl implements RemotePeer
             Map<String, String> params = Maps.newHashMap();
             params.put( "containerId", jsonUtil.to( containerHostId ) );
             String response = get( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, params, headers );
-            return jsonUtil.from( response, HostInfoModel.class );
+            return jsonUtil.from( response, ContainerHostInfoModel.class );
         }
         catch ( Exception e )
         {
@@ -589,8 +589,8 @@ public class RemotePeerImpl implements RemotePeer
             throw new CommandException( "Operation not allowed" );
         }
 
-        String environmentId = ( ( EnvironmentContainerHost ) host ).getEnvironmentId();
-        CommandRequest request = new CommandRequest( requestBuilder, host.getId(), environmentId );
+        EnvironmentId environmentId = ( ( EnvironmentContainerHost ) host ).getEnvironmentId();
+        CommandRequest request = new CommandRequest( requestBuilder, host.getId(), environmentId.getId() );
         //cache callback
         commandResponseListener.addCallback( request.getRequestId(), callback, requestBuilder.getTimeout(), semaphore );
 
@@ -684,8 +684,8 @@ public class RemotePeerImpl implements RemotePeer
 
     @RolesAllowed( "Environment-Management|A|Write" )
     @Override
-    public Set<HostInfoModel> createEnvironmentContainerGroup( final CreateEnvironmentContainerGroupRequest request )
-            throws PeerException
+    public Set<ContainerHostInfoModel> createEnvironmentContainerGroup(
+            final CreateEnvironmentContainerGroupRequest request ) throws PeerException
     {
         Preconditions.checkNotNull( request, "Invalid request" );
 
@@ -841,14 +841,14 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public HostInterfaces getInterfaces()
+    public HostInterfaces getInterfaces() throws PeerException
     {
         return new PeerWebClient( peerInfo.getIp(), provider ).getInterfaces();
     }
 
 
     @Override
-    public void setupN2NConnection( final N2NConfig config )
+    public void setupN2NConnection( final N2NConfig config ) throws PeerException
     {
         Preconditions.checkNotNull( config, "Invalid n2n config" );
 
@@ -877,9 +877,16 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public ResourceHostMetrics getResourceHostMetrics()
+    public ResourceHostMetrics getResourceHostMetrics() throws PeerException
     {
         return new PeerWebClient( peerInfo.getIp(), provider ).getResourceHostMetrics();
+    }
+
+
+    @Override
+    public void putAlert( final AlertPack alert ) throws PeerException
+    {
+        new PeerWebClient( peerInfo.getIp(), provider ).putAlert(alert);
     }
 
 

@@ -17,6 +17,7 @@ import com.google.common.cache.Cache;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.host.ContainerHostInfo;
+import io.subutai.common.metric.ResourceAlert;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.common.host.ResourceHostInfo;
@@ -69,6 +70,11 @@ public class HostRegistryImplTest
     HostRegistryImpl registry;
 
 
+    @Mock
+    ResourceAlert resourceAlert;
+
+    Set<ResourceAlert> alerts;
+
     @Before
     public void setUp() throws Exception
     {
@@ -87,6 +93,7 @@ public class HostRegistryImplTest
         when( hostListeners.iterator() ).thenReturn( hostListenerIterator );
         when( hostListenerIterator.hasNext() ).thenReturn( true ).thenReturn( false );
         when( hostListenerIterator.next() ).thenReturn( hostListener );
+        alerts = Sets.newHashSet( resourceAlert );
     }
 
 
@@ -244,7 +251,7 @@ public class HostRegistryImplTest
     public void testRegisterHost() throws Exception
     {
 
-        registry.registerHost( resourceHostInfo );
+        registry.registerHost( resourceHostInfo, alerts );
 
         verify( hosts ).put( resourceHostInfo.getId(), resourceHostInfo );
         verify( notifier ).execute( isA( HostNotifier.class ) );

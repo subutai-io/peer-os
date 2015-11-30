@@ -1,6 +1,9 @@
 <div class="b-popup b-popup_middle">
 	<div class="b-popup__header">
-		Set Domain
+		<span ng-if="environmentViewCtrl.currentDomain == null">Set Domain</span>
+		<span ng-if="environmentViewCtrl.currentDomain != null">
+			Current domain: <b>{{ environmentViewCtrl.currentDomain }}</b>
+		</span>
 		<a href ng-click="closeThisDialog()">
 			<img src="assets/elements/buttons/b-icon-close.svg" class="b-icon g-right"/>
 		</a>
@@ -40,8 +43,14 @@
 
 		</div>
 		<div class="b-popup__footer">
-			<button class="b-btn b-btn_green g-right" type="submit" id="subt_button__create-peer">
+			<button class="b-btn b-btn_green g-right" type="submit" id="subt_button__environment-add-domain">
 				Save
+			</button>
+			<button class="b-btn b-btn_green g-right b-btn_margin-r" 
+			ng-click="environmentViewCtrl.removeDomain(environmentViewCtrl.environmentForDomain)" 
+			id="subt_button__environment-remove-domain" 
+			ng-if="environmentViewCtrl.currentDomain != null">
+				Remove Domain
 			</button>
 			<div class="clear"></div>
 		</div>

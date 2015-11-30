@@ -21,7 +21,7 @@ function consoleService($http, environmentService) {
 		return environmentService.getEnvironments();
 	}
 
-	function sendCommand(cmd, peerId, path, daemon, timeOut) {
+	function sendCommand(cmd, peerId, path, daemon, timeOut, environmentId) {
 		var postData = 'command=' + cmd + '&hostId=' + peerId + '&path=' + path;
 
 		if(daemon) {
@@ -29,6 +29,9 @@ function consoleService($http, environmentService) {
 		}
 		if(timeOut !== undefined && timeOut > 0) {
 			postData += '&timeOut=' + parseInt(timeOut);
+		}
+		if(environmentId && environmentId.length > 0) {
+			postData += '&environmentId=' + environmentId;
 		}
 
 		return $http.post(

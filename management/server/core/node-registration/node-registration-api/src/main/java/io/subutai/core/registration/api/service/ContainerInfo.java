@@ -1,39 +1,35 @@
 package io.subutai.core.registration.api.service;
 
 
-import java.util.Set;
-
-import io.subutai.common.host.HostArchitecture;
-import io.subutai.common.host.HostInfo;
-import io.subutai.common.host.Interface;
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.core.registration.api.RegistrationStatus;
 
 
-public interface ContainerInfo extends HostInfo
+public interface ContainerInfo extends ContainerHostInfo
 {
     /**
      * Returns id of host
      */
-    public String getId();
+//    public String getId();
 
 
     /**
      * Returns hostname of host
      */
-    public String getHostname();
-
-
-    /**
-     * Returns network interfaces of host
-     */
-    public Set<Interface> getInterfaces();
-
-
-    /**
-     * Returns architecture of host
-     */
-    public HostArchitecture getArch();
-
+//    public String getHostname();
+//
+//
+//    /**
+//     * Returns network interfaces of host
+//     */
+//    public Set<Interface> getInterfaces();
+//
+//
+//    /**
+//     * Returns architecture of host
+//     */
+//    public HostArchitecture getArch();
+//
     /**
      * Return container template name
      */

@@ -6,6 +6,7 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -15,8 +16,6 @@ import java.util.UUID;
 
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
-
-import io.subutai.common.network.DomainLoadBalanceStrategy;
 
 
 public interface RestService
@@ -96,6 +95,11 @@ public interface RestService
     /** Environment domains *****************************************************/
 
     @GET
+    @Path( "{environmentId}/domain" )
+    public Response getEnvironmentDomain( @PathParam( "environmentId" ) String environmentId );
+
+
+    @GET
     @Path( "/domains/strategies" )
     Response listDomainLoadBalanceStrategies();
 
@@ -112,6 +116,17 @@ public interface RestService
     @DELETE
     @Path( "{environmentId}/domains" )
     Response removeEnvironmentDomain( @PathParam( "environmentId" ) String environmentId );
+
+
+    @GET
+    @Path( "{environmentId}/containers/{containerId}/domain" )
+    Response isContainerDomain( @PathParam( "environmentId" ) String environmentId, @PathParam( "containerId" ) String containerId );
+
+
+
+    @PUT
+    @Path( "{environmentId}/containers/{containerId}/domain" )
+    Response setContainerDomain( @PathParam( "environmentId" ) String environmentId, @PathParam( "containerId" ) String containerId );
 
 
 
@@ -216,4 +231,15 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     Response getPeers();
 
+
+
+    /** Tags *****************************************************/
+
+    @POST
+    @Path( "{environmentId}/containers/{containerId}/tags" )
+    Response addTags( @PathParam( "environmentId" ) String environmentId, @PathParam( "containerId" ) String containerId, @FormParam( "tags" ) String tags );
+
+    @DELETE
+    @Path( "{environmentId}/containers/{containerId}/tags/{tag}" )
+    Response removeTag( @PathParam( "environmentId" ) String environmentId, @PathParam( "containerId" ) String containerId, @PathParam( "tag" ) String tag );
 }

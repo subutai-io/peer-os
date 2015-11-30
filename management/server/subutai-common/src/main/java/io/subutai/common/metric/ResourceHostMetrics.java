@@ -23,7 +23,7 @@ import com.google.gson.annotations.Expose;
 public class ResourceHostMetrics
 {
     @Expose
-    @JsonProperty
+    @JsonProperty("resources")
     Collection<ResourceHostMetric> resources = new HashSet();
 
 
@@ -46,7 +46,7 @@ public class ResourceHostMetrics
         for ( Iterator<ResourceHostMetric> i = resources.iterator(); result == null && i.hasNext(); )
         {
             ResourceHostMetric r = i.next();
-            if ( r.getHostId().equals( hostId ) )
+            if ( r.getHostInfo().getId().equals( hostId ) )
             {
                 result = r;
             }

@@ -1,7 +1,7 @@
 package io.subutai.core.metric.api;
 
 
-import io.subutai.common.metric.ContainerHostMetric;
+import io.subutai.common.metric.Alert;
 
 
 /**
@@ -12,9 +12,9 @@ public interface AlertListener
     /**
      * Notifies listeners about threshold excess on the container
      *
-     * @param metric - {@code ContainerHostMetric} metric of the host where thresholds are being exceeded
+     * @param alert - {@code Alert} metric of the host where thresholds are being exceeded
      */
-    public void onAlert( ContainerHostMetric metric ) throws Exception;
+    public void onAlert( Alert alert ) throws Exception;
 
     /**
      * Returns unique id of subscriber module for routing notifications

@@ -11,7 +11,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 public class EnvironmentId extends SubutaiId
 {
     @JsonCreator
-    public EnvironmentId( @JsonProperty("id")final String id )
+    public EnvironmentId( @JsonProperty( "id" ) final String id )
     {
         super( id );
     }

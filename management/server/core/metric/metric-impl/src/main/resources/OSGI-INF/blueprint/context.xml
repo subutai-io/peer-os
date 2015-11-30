@@ -10,6 +10,9 @@
   <reference id="environmentManager" availability="mandatory"
              interface="io.subutai.core.environment.api.EnvironmentManager" />
 
+  <reference id="hostRegistry" availability="mandatory"
+             interface="io.subutai.core.hostregistry.api.HostRegistry" />
+
   <!-- Data Access object to get EntityManager -->
 
   <bean id="daoManagerMetric" init-method="init" class="io.subutai.common.dao.DaoManager" scope="prototype">
@@ -21,7 +24,10 @@
     <argument ref="peerManager" />
     <argument ref="daoManagerMetric" />
     <argument ref="environmentManager" />
+    <argument ref="hostRegistry" />
   </bean>
+
+
 
   <reference-list id="alertLstnr"
                   interface="io.subutai.core.metric.api.AlertListener"
@@ -31,6 +37,7 @@
   </reference-list>
 
   <service ref="monitor" interface="io.subutai.core.metric.api.Monitor" />
+  <service ref="monitor" interface="io.subutai.core.hostregistry.api.HostListener" />
 
   <bean id="remoteAlertLstnr" scope="singleton" class="io.subutai.core.metric.impl.RemoteAlertListener">
     <argument ref="monitor" />

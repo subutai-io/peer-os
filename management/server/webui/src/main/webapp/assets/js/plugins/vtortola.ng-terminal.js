@@ -203,11 +203,12 @@
     });
        
     $scope.keypress= function (keyCode) {
-        if ($scope.commandLine.length < 80) {
-            commandIndex = -1;
-            $scope.commandLine += String.fromCharCode(keyCode);
-            $scope.$$phase || $scope.$apply();
-        }
+		//@todo check why limit here
+		//if ($scope.commandLine.length < 80) {
+			commandIndex = -1;
+			$scope.commandLine += String.fromCharCode(keyCode);
+			$scope.$$phase || $scope.$apply();
+		//}
     };
 
     $scope.previousCommand = function () {

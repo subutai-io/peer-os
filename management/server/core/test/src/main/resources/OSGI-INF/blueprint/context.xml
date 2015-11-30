@@ -1,9 +1,0 @@
-<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
-
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="test/do">
-      <action class="io.subutai.core.test.TestCommand" />
-    </command>
-  </command-bundle>
-
-</blueprint>

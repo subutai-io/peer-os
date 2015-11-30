@@ -25,7 +25,6 @@ import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Session;
-import io.subutai.core.identity.api.model.User;
 
 
 /**
@@ -173,10 +172,10 @@ public class CommandProcessor implements ByteMessageListener
         catch ( HostDisconnectedException e )
         {
             ContainerHostInfo containerHostInfo = hostRegistry.getContainerHostInfoById( hostId );
-            if ( containerHostInfo.getStatus() != ContainerHostState.RUNNING )
+            if ( containerHostInfo.getState() != ContainerHostState.RUNNING )
             {
                 throw new HostDisconnectedException(
-                        String.format( "Container state is %s", containerHostInfo.getStatus() ) );
+                        String.format( "Container state is %s", containerHostInfo.getState() ) );
             }
             targetHost = hostRegistry.getResourceHostByContainerHost( containerHostInfo );
         }

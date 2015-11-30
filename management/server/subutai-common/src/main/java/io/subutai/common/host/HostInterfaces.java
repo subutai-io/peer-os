@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,23 +24,29 @@ public class HostInterfaces
     private static final Logger LOG = LoggerFactory.getLogger( HostInterfaces.class );
 
     @JsonProperty
-    private Set<HostInterface> interfaces = new HashSet<>();
+    private Set<HostInterfaceModel> interfaces = new HashSet<>();
 
 
-    public void addInterface( HostInterface hostInterfaceModel )
+    public HostInterfaces()
     {
-        this.interfaces.add( hostInterfaceModel );
     }
 
 
-    public HostInterface findByIp( final String ip )
+    public HostInterfaces( final Set<HostInterfaceModel> interfaces )
+    {
+        this.interfaces = interfaces;
+    }
+
+
+    public HostInterfaceModel findByIp( final String ip )
     {
         Preconditions.checkNotNull( ip );
-        HostInterface result = null;
+        HostInterfaceModel result = NullHostInterface.getInstance();
 
-        for ( Iterator<HostInterface> i = interfaces.iterator(); i.hasNext() && result == null; )
+        for ( Iterator<HostInterfaceModel> i = interfaces.iterator();
+              i.hasNext() && result instanceof NullHostInterface; )
         {
-            HostInterface c = i.next();
+            HostInterfaceModel c = i.next();
             if ( ip.equals( c.getIp() ) )
             {
                 result = c;
@@ -49,14 +56,15 @@ public class HostInterfaces
     }
 
 
-    public HostInterface findByName( final String name )
+    public HostInterfaceModel findByName( final String name )
     {
         Preconditions.checkNotNull( name );
-        HostInterface result = null;
+        HostInterfaceModel result = NullHostInterface.getInstance();
 
-        for ( Iterator<HostInterface> i = interfaces.iterator(); i.hasNext() && result == null; )
+        for ( Iterator<HostInterfaceModel> i = interfaces.iterator();
+              i.hasNext() && result instanceof NullHostInterface; )
         {
-            HostInterface c = i.next();
+            HostInterfaceModel c = i.next();
             if ( name.equals( c.getName() ) )
             {
                 result = c;
@@ -66,15 +74,15 @@ public class HostInterfaces
     }
 
 
-    public Set<HostInterface> filterByIp( final String pattern )
+    public Set<HostInterfaceModel> filterByIp( final String pattern )
     {
         Preconditions.checkNotNull( pattern );
-        Set<HostInterface> result = new HashSet<>();
+        Set<HostInterfaceModel> result = new HashSet<>();
 
-        result = Sets.filter( interfaces, new Predicate<Interface>()
+        result = Sets.filter( interfaces, new Predicate<HostInterface>()
         {
             @Override
-            public boolean apply( final Interface intf )
+            public boolean apply( final HostInterface intf )
             {
                 return intf.getIp().matches( pattern );
             }
@@ -84,14 +92,14 @@ public class HostInterfaces
     }
 
 
-    public Set<HostInterface> filterByName( final String pattern )
+    public Set<HostInterfaceModel> filterByName( final String pattern )
     {
         Preconditions.checkNotNull( pattern );
-        Set<HostInterface> result = new HashSet<>();
-        result = Sets.filter( interfaces, new Predicate<HostInterface>()
+        Set<HostInterfaceModel> result = new HashSet<>();
+        result = Sets.filter( interfaces, new Predicate<HostInterfaceModel>()
         {
             @Override
-            public boolean apply( final HostInterface intf )
+            public boolean apply( final HostInterfaceModel intf )
             {
                 return intf.getName().matches( pattern );
             }
@@ -104,5 +112,35 @@ public class HostInterfaces
     public int size()
     {
         return interfaces.size();
+    }
+
+
+    public void addHostInterface( final HostInterfaceModel hostInterfaceModel )
+    {
+        this.interfaces.add( hostInterfaceModel );
+    }
+
+
+    @JsonIgnore
+    public Set<HostInterfaceModel> getAll()
+    {
+        if ( this.interfaces != null )
+        {
+            return Collections.unmodifiableSet( this.interfaces );
+        }
+        else
+        {
+            return new HashSet<>();
+        }
+    }
+
+
+    @Override
+    public String toString()
+    {
+        final StringBuffer sb = new StringBuffer( "HostInterfaces{" );
+        sb.append( "interfaces=" ).append( interfaces );
+        sb.append( '}' );
+        return sb.toString();
     }
 }
