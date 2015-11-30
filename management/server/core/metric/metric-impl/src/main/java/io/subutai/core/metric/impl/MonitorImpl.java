@@ -579,7 +579,10 @@ public class MonitorImpl implements Monitor, HostListener
                         HostInfo hostInfo = hostRegistry.getHostInfoById( resourceHost.getId() );
                         resourceHostMetric.setHostInfo( new ResourceHostInfoModel( hostInfo ) );
                         ResourceHostMetric m = monitor.fetchResourceHostMetric( resourceHost );
-                        resourceHostMetric.updateMetrics( m );
+                        if ( m != null )
+                        {
+                            resourceHostMetric.updateMetrics( m );
+                        }
                         resourceHostMetric.setConnected( true );
                     }
                     catch ( HostDisconnectedException hde )
