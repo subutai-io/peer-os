@@ -1,4 +1,4 @@
-package io.subutai.core.localpeer.impl;
+package io.subutai.core.metric.impl;
 
 
 import org.slf4j.Logger;
@@ -9,7 +9,7 @@ import io.subutai.common.peer.AlertPack;
 
 
 /**
- * Created by tzhamakeev on 11/29/15.
+ * Alert listener example implementation for template master
  */
 public class MasterAlertListener implements AlertListener
 {

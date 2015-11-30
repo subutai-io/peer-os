@@ -11,6 +11,7 @@
     </cxf:features>
   </cxf:bus>
 
+<!--
   <reference id="monitor" availability="mandatory"
              interface="io.subutai.core.metric.api.Monitor" />
   <reference id="environmentManager" availability="mandatory"
@@ -26,5 +27,6 @@
       <ref component-id="monitorRestImpl" />
     </jaxrs:serviceBeans>
   </jaxrs:server>
+-->
 
 </blueprint>

@@ -2,11 +2,22 @@ package io.subutai.common.peer;
 
 
 /**
- * Created by tzhamakeev on 11/29/15.
+ * Alert Listener
  */
 public interface AlertListener
 {
-    void onAlert( AlertPack alert );
+    /**
+     * Notifies listeners about quota excess on the container
+     *
+     * @param alert - {@code AlertPack} alert value of the host where thresholds are being exceeded
+     */
+    public void onAlert( AlertPack alert ) throws Exception;
+
+    /**
+     * Returns the template name of container host which alerts listen this listener
+     *
+     * @return - template name
+     */
 
     String getTemplateName();
 }

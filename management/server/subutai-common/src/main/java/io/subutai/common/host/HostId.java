@@ -1,6 +1,8 @@
 package io.subutai.common.host;
 
 
+import org.codehaus.jackson.annotate.JsonProperty;
+
 import io.subutai.common.peer.SubutaiId;
 
 
@@ -9,7 +11,7 @@ import io.subutai.common.peer.SubutaiId;
  */
 public class HostId extends SubutaiId
 {
-    public HostId( final String id )
+    public HostId( @JsonProperty( "id" ) final String id )
     {
         super( id );
     }
