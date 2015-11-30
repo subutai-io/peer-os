@@ -9,6 +9,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 import io.subutai.common.exception.DaoException;
+import io.subutai.common.peer.EnvironmentId;
 import io.subutai.core.metric.impl.dao.SubscriberDataService;
 
 
@@ -27,14 +28,15 @@ public class MonitorDao
     }
 
 
-    public void addSubscription( String environmentId, String subscriberId ) throws DaoException
+    public void addSubscription( EnvironmentId environmentId, String subscriberId ) throws DaoException
     {
 
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), INVALID_ENV_ID );
+        Preconditions.checkNotNull( environmentId , INVALID_ENV_ID );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId.getId() ), INVALID_ENV_ID );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( subscriberId ), "Invalid subscriber id" );
 
 
-        dataService.update( environmentId, subscriberId );
+        dataService.update( environmentId.getId(), subscriberId );
     }
 
 

@@ -13,7 +13,7 @@ import io.subutai.common.environment.ContainerDistributionType;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.NodeGroup;
-import io.subutai.common.host.HostInfoModel;
+import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.peer.ContainerType;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.util.ExceptionUtil;
@@ -84,11 +84,11 @@ public class CreatePeerNodeGroupsTask implements Callable<Set<NodeGroupBuildResu
                             ipAddressOffset + currentIpAddressOffset, nodeGroup.getTemplateName(),
                             nodeGroup.getHostId(), nodeGroup.getType() );
                 }
-                Set<HostInfoModel> newHosts = peer.createEnvironmentContainerGroup( request );
+                Set<ContainerHostInfoModel> newHosts = peer.createEnvironmentContainerGroup( request );
 
                 currentIpAddressOffset += nodeGroup.getNumberOfContainers();
 
-                for ( HostInfoModel newHost : newHosts )
+                for ( ContainerHostInfoModel newHost : newHosts )
                 {
 
                     containers.add( new EnvironmentContainerImpl( localPeer.getId(), peer, nodeGroup.getName(), newHost,

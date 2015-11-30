@@ -2,18 +2,14 @@ package io.subutai.core.environment.rest.ui;
 
 
 import java.io.File;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
-
-import io.subutai.common.environment.*;
-import io.subutai.common.gson.required.RequiredDeserializer;
-import io.subutai.common.metric.ResourceHostMetric;
-import io.subutai.common.peer.ContainerType;
-import io.subutai.common.host.Interface;
-import io.subutai.common.network.DomainLoadBalanceStrategy;
-import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,8 +25,20 @@ import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
 
+import io.subutai.common.environment.Blueprint;
+import io.subutai.common.environment.ContainerDistributionType;
+import io.subutai.common.environment.ContainerHostNotFoundException;
+import io.subutai.common.environment.Environment;
+import io.subutai.common.environment.EnvironmentModificationException;
+import io.subutai.common.environment.EnvironmentNotFoundException;
+import io.subutai.common.environment.NodeGroup;
+import io.subutai.common.gson.required.RequiredDeserializer;
 import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.host.HostInterface;
+import io.subutai.common.metric.ResourceHostMetric;
+import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.ContainerType;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
@@ -39,6 +47,7 @@ import io.subutai.common.util.JsonUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
+import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registry.api.TemplateRegistry;
 import io.subutai.core.strategy.api.StrategyManager;
@@ -107,7 +116,7 @@ public class RestServiceImpl implements RestService
         catch (EnvironmentManagerException e )
         {
             return Response.status( Response.Status.BAD_REQUEST )
-                    .entity( JsonUtil.toJson(ERROR_KEY, "Error loading blueprints") ).build();
+                    .entity( JsonUtil.toJson( ERROR_KEY, "Error loading blueprints" ) ).build();
         }
     }
 
@@ -339,6 +348,21 @@ public class RestServiceImpl implements RestService
 
 
     @Override
+    public Response getEnvironmentDomain( final String environmentId )
+    {
+        try
+        {
+            return Response.ok( JsonUtil.toJson( environmentManager.getEnvironmentDomain( environmentId ) ) ).build();
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "getEnvironmentDomain error", e );
+            return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( e.getMessage() ) ).build();
+        }
+    }
+
+
+    @Override
     public Response addEnvironmentDomain( String environmentId, String hostName, String strategyJson,
                                           Attachment attr )
     {
@@ -388,6 +412,44 @@ public class RestServiceImpl implements RestService
         return Response.ok().build();
     }
 
+
+    @Override
+    public Response isContainerDomain( final String environmentId, final String containerId )
+    {
+        try
+        {
+            return Response.ok( environmentManager.isContainerInEnvironmentDomain( containerId, environmentId ) )
+                               .build();
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Cannot check domain status of container", e );
+            return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( e.getMessage() ) ).build();
+        }
+    }
+
+
+    @Override
+    public Response setContainerDomain( final String environmentId, final String containerId )
+    {
+        try
+        {
+            if( environmentManager.isContainerInEnvironmentDomain( containerId, environmentId ) )
+            {
+                environmentManager.addContainerToEnvironmentDomain( containerId, environmentId );
+            }
+            else
+            {
+                environmentManager.removeContainerFromEnvironmentDomain( containerId, environmentId  );
+            }
+        }
+        catch ( Exception e )
+        {
+            return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( e.getMessage() ) ).build();
+        }
+
+        return Response.ok().build();
+    }
 
 
     /** Containers *****************************************************/
@@ -463,7 +525,7 @@ public class RestServiceImpl implements RestService
             {
                 ContainerHost containerHost = environment.getContainerHostById( containerId );
 
-                return Response.ok().entity( JsonUtil.toJson( "STATE", containerHost.getStatus() ) ).build();
+                return Response.ok().entity( JsonUtil.toJson( "STATE", containerHost.getState() ) ).build();
             }
             catch ( ContainerHostNotFoundException e )
             {
@@ -779,7 +841,7 @@ public class RestServiceImpl implements RestService
                 Collection<ResourceHostMetric> collection = peer.getResourceHostMetrics().getResources();
                 for( ResourceHostMetric metric : collection.toArray(new ResourceHostMetric[ collection.size() ]) )
                 {
-                        peerHostMap.get( peer.getId() ).add( metric.getHostId() );
+                        peerHostMap.get( peer.getId() ).add( metric.getHostInfo().getId() );
 
                 }
             }
@@ -794,6 +856,9 @@ public class RestServiceImpl implements RestService
     }
 
 
+
+    /** Tags *****************************************************/
+
     @Override
     public Response addTags( final String environmentId, final String containerId, final String tagsJson )
     {
@@ -806,6 +871,8 @@ public class RestServiceImpl implements RestService
             Set<String> tags = JsonUtil.fromJson( tagsJson, new TypeToken<Set<String>>(){}.getType() );
 
             tags.stream().forEach( tag -> containerHost.addTag( tag ) );
+
+            environmentManager.notifyOnContainerStateChanged( environment, null );
         }
         catch ( Exception e )
         {
@@ -823,6 +890,8 @@ public class RestServiceImpl implements RestService
         {
             Environment environment = environmentManager.loadEnvironment( environmentId );
             environment.getContainerHostById( containerId ).removeTag( tag );
+
+            environmentManager.notifyOnContainerStateChanged( environment, null );
         }
         catch ( Exception e )
         {
@@ -840,16 +909,16 @@ public class RestServiceImpl implements RestService
         Set<ContainerDto> containerDtos = Sets.newHashSet();
         for ( EnvironmentContainerHost containerHost : containerHosts )
         {
-            ContainerHostState state = containerHost.getStatus();
+            ContainerHostState state = containerHost.getState();
 
-            Interface iface = containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE );
+            HostInterface iface = containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE );
 
 
 
 
             containerDtos.add( new ContainerDto(
                     containerHost.getId(),
-                    containerHost.getEnvironmentId(),
+                    containerHost.getEnvironmentId().getId(),
                     containerHost.getHostname(),
                     state,
                     iface.getIp(),

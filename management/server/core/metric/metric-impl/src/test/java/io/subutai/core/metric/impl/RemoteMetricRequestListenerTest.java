@@ -8,6 +8,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Payload;
 
 import static org.junit.Assert.assertEquals;
@@ -45,7 +47,7 @@ public class RemoteMetricRequestListenerTest
     {
         when( payload.getMessage( ContainerHostMetricRequest.class ) ).thenReturn( request );
 
-        when( monitor.getLocalContainerHostsMetrics( any( String.class ) ) ).thenReturn( metrics );
+        when( monitor.getLocalContainerHostsMetrics( any( EnvironmentId.class ) ) ).thenReturn( metrics );
 
         when( metrics.isEmpty() ).thenReturn( false );
 

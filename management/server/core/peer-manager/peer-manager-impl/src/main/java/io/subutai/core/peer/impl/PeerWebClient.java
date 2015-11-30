@@ -7,6 +7,7 @@ import java.util.Set;
 
 import javax.ws.rs.core.MediaType;
 
+import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,10 +17,13 @@ import com.google.common.base.Preconditions;
 
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInterfaces;
+import io.subutai.common.metric.BaseMetric;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
+import io.subutai.common.peer.AlertPack;
+import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerException;
@@ -398,6 +402,24 @@ public class PeerWebClient
         catch ( Exception e )
         {
             throw new PeerException( "Error on creating gateway", e );
+        }
+    }
+
+    public void putAlert( final AlertPack alert ) throws PeerException
+    {
+        String path = "/alert";
+
+        WebClient client = WebClientBuilder.buildPeerWebClient( host, path, provider );
+        client.type( MediaType.APPLICATION_JSON );
+        client.accept( MediaType.APPLICATION_JSON );
+
+        try
+        {
+            client.post( alert );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Error on sending alert package to remote peer", e );
         }
     }
 }

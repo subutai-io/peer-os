@@ -14,9 +14,11 @@ import javax.persistence.PersistenceException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import io.subutai.common.exception.DaoException;
+import io.subutai.common.peer.EnvironmentId;
 import io.subutai.core.metric.impl.model.Subscriber;
 import io.subutai.core.metric.impl.model.SubscriberPK;
 
@@ -40,6 +42,8 @@ public class MonitorDaoTest
     MonitorDaoExt monitorDao;
 
     private EntityManagerFactory emf;
+    @Mock
+    private EnvironmentId environmentId;
 
 
     static class MonitorDaoExt extends MonitorDao
@@ -76,6 +80,7 @@ public class MonitorDaoTest
     @Before
     public void setUp() throws Exception
     {
+        when( environmentId.getId() ).thenReturn( ENVIRONMENT_ID );
         emf = Persistence.createEntityManagerFactory( "default" );
 
         monitorDao = new MonitorDaoExt( emf );
@@ -85,7 +90,7 @@ public class MonitorDaoTest
     @Test
     public void testAddSubscription() throws Exception
     {
-        monitorDao.addSubscription( ENVIRONMENT_ID, SUBSCRIBER_ID );
+        monitorDao.addSubscription( environmentId, SUBSCRIBER_ID );
 
         assertTrue( monitorDao.getEnvironmentSubscribersIds( ENVIRONMENT_ID ).contains( SUBSCRIBER_ID ) );
     }
@@ -96,7 +101,7 @@ public class MonitorDaoTest
     {
         throwDbException();
 
-        monitorDao.addSubscription( ENVIRONMENT_ID, SUBSCRIBER_ID );
+        monitorDao.addSubscription( environmentId, SUBSCRIBER_ID );
     }
 
 

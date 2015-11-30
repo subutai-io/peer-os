@@ -2,16 +2,15 @@ package io.subutai.webui.impl;
 
 
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.subutai.common.util.JsonUtil;
 import io.subutai.webui.api.WebuiModule;
 import io.subutai.webui.api.WebuiModuleService;
 
@@ -21,6 +20,26 @@ public class WebuiModuleServiceImpl implements WebuiModuleService
     private static final Logger LOG = LoggerFactory.getLogger( WebuiModuleServiceImpl.class.getName() );
     private Set<WebuiModule> modules =  new HashSet<WebuiModule>(  );
 
+    private BundleContext bcontext;
+    private String subutaiAppJs;
+
+    public void setBcontext(BundleContext bcontext ) {
+        this.bcontext = bcontext;
+    }
+
+    public void init()
+    {
+        try
+        {
+            Bundle bundle = bcontext.getBundle();
+            InputStream is = bundle.getEntry( "/subutai-app.js" ).openStream();
+            subutaiAppJs = readFile( is );
+        }
+        catch ( IOException e )
+        {
+            LOG.error( "The file subutai-app.js not found", e );
+        }
+    }
 
     public synchronized void registerModule( WebuiModule module )
     {
@@ -59,33 +78,18 @@ public class WebuiModuleServiceImpl implements WebuiModuleService
     @Override
     public String getModulesListLazyLoadConfig()
     {
-        if( modules.size() == 0 )
+        StringBuilder builder = new StringBuilder(  );
+        for( WebuiModule module : modules )
         {
-            return "";
+            builder.append( module.getAngularDependecyList() + "\n" );
         }
 
-        String buffer;
-        StringBuilder states = new StringBuilder( );
-        try
-        {
-            buffer = Files.readAllLines( Paths.get( this.getClass().getResource( "/subutai-app.js" ).toURI() ) ).toString();
+        return subutaiAppJs.replace( ".state()", builder.toString() );
+    }
 
-            for( WebuiModule module : modules )
-            {
-                WebuiModuleResourse webuiModuleResourse = JsonUtil.fromJson( module.getModuleInfo(), WebuiModuleResourse.class);
-
-                states.append(
-                        String.format( ".state( '%s', %s )",
-                                webuiModuleResourse.getName().toLowerCase(),
-                                module.getAngularDependecyList()));
-            }
-
-            return buffer.replace( ".state()", states.toString() );
-        }
-        catch ( IOException | NullPointerException | URISyntaxException e )
-        {
-            LOG.error( "Error reading file subutai-app", e );
-            return "";
-        }
+    private String readFile( InputStream is ) throws IOException
+    {
+        java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
+        return s.hasNext() ? s.next() : "";
     }
 }

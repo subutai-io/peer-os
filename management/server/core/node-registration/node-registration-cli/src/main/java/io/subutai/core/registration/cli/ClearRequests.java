@@ -36,7 +36,7 @@ public class ClearRequests extends SubutaiShellCommandSupport
         {
             System.out.println( requestedHost.toString() );
             System.out.println( "==========" );
-            //            if ( status.equalsIgnoreCase( requestedHost.getStatus().name() ) || )
+            //            if ( status.equalsIgnoreCase( requestedHost.getState().name() ) || )
             //            {
             registrationManager.removeRequest(requestedHost.getId());
             //            }

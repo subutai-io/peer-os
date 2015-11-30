@@ -20,7 +20,6 @@
     </cm:default-properties>
   </cm:property-placeholder>
 
-
   <!-- ***************************************************************** -->
   <bean id="daoManagerPeer" init-method="init" class="io.subutai.common.dao.DaoManager" scope="prototype">
     <jpa:unit unitname="localPeerPUnit" property="entityManagerFactory" />
@@ -63,8 +62,6 @@
     <property name="externalIpInterface" value="${externalIpInterface}" />
   </bean>
 
-  <service ref="localPeer" interface="io.subutai.core.hostregistry.api.HostListener" />
-
   <bean id="messageRequestListener" class="io.subutai.core.localpeer.impl.request.MessageRequestListener"
         destroy-method="dispose" scope="singleton" activation="eager">
     <argument ref="localPeer" />
@@ -78,6 +75,19 @@
                         bind-method="addRequestListener" unbind-method="removeRequestListener" />
   </reference-list>
 
+  <reference-list id="alertListener"
+                  interface="io.subutai.common.peer.AlertListener"
+                  availability="optional" ext:proxy-method="classes">
+    <reference-listener ref="localPeer"
+                        bind-method="addAlertListener" unbind-method="removeAlertListener" />
+  </reference-list>
+  <bean id="masterAlertListener" class="io.subutai.core.localpeer.impl.MasterAlertListener" scope="singleton"
+        activation="eager">
+
+  </bean>
+  <service ref="masterAlertListener" interface="io.subutai.common.peer.AlertListener" />
+
+  <service ref="localPeer" interface="io.subutai.core.hostregistry.api.HostListener" />
   <service ref="localPeer" interface="io.subutai.common.peer.LocalPeer" />
 
   <service ref="messageRequestListener" interface="io.subutai.core.messenger.api.MessageListener" />

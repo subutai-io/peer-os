@@ -22,7 +22,9 @@ import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostArchitecture;
-import io.subutai.common.host.Interface;
+import io.subutai.common.host.HostInterface;
+import io.subutai.common.host.HostInterfaceModel;
+import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.HostNotFoundException;
@@ -85,7 +87,7 @@ public class ResourceHostEntityTest
     @Mock
     ResourceHostInfo hostInfo;
     @Mock
-    Interface anInterface;
+    HostInterfaceModel anHostInterface;
     @Mock
     Callable callable;
     @Mock
@@ -97,18 +99,21 @@ public class ResourceHostEntityTest
 
 
     ResourceHostEntity resourceHostEntity;
+    @Mock
+    private HostInterfaces hostInterfaces;
 
 
     @Before
     public void setUp() throws Exception
     {
+        when( hostInterfaces.getAll() ).thenReturn( Sets.newHashSet( anHostInterface ) );
         when( hostInfo.getId() ).thenReturn( HOST_ID );
         when( hostInfo.getHostname() ).thenReturn( HOSTNAME );
         when( hostInfo.getArch() ).thenReturn( ARCH );
-        when( hostInfo.getInterfaces() ).thenReturn( Sets.newHashSet( anInterface ) );
-        when( anInterface.getName() ).thenReturn( INTERFACE_NAME );
-        when( anInterface.getIp() ).thenReturn( IP );
-        when( anInterface.getMac() ).thenReturn( MAC );
+        when( hostInfo.getHostInterfaces() ).thenReturn( hostInterfaces );
+        when( anHostInterface.getName() ).thenReturn( INTERFACE_NAME );
+        when( anHostInterface.getIp() ).thenReturn( IP );
+        when( anHostInterface.getMac() ).thenReturn( MAC );
 
         resourceHostEntity = new ResourceHostEntity( PEER_ID, hostInfo );
         resourceHostEntity.setHostRegistry( hostRegistry );
