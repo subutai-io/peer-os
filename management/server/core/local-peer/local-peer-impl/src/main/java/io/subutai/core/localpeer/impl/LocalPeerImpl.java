@@ -75,6 +75,7 @@ import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.ContainerType;
 import io.subutai.common.peer.ContainersDestructionResult;
+import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
@@ -967,7 +968,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         KeyManager keyManager = securityManager.getKeyManager();
 
         keyManager.removeKeyData( environmentId.getId() );
-        keyManager.removeKeyData( getId()+"-"+ environmentId.getId() );
+        keyManager.removeKeyData( getId() + "-" + environmentId.getId() );
     }
 
 
@@ -1054,19 +1055,28 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         if ( validateTrust )
         {
+            LOG.warn( "Trust chain validation is on..." );
             User activeUser = identityManager.getActiveUser();
             if ( activeUser != null )
             {
                 KeyManager keyManager = securityManager.getKeyManager();
-                String hostFingerprint = keyManager.getFingerprint( aHost.getId() );
-                String userFingerprint = keyManager.getFingerprint( activeUser.getSecurityKeyId() );
 
-                if ( keyManager.getTrustLevel( userFingerprint, hostFingerprint ) == KeyTrustLevel.Never.getId() )
+                if ( aHost instanceof EnvironmentContainerHost )
                 {
-                    throw new CommandException( "Host was revoked to execute commands" );
+                    EnvironmentId environmentId = ( ( EnvironmentContainerHost ) aHost ).getEnvironmentId();
+
+                    String environmentFingerprint = keyManager.getFingerprint( environmentId.getId() );
+                    String userFingerprint = keyManager.getFingerprint( activeUser.getSecurityKeyId() );
+
+                    if ( keyManager.getTrustLevel( userFingerprint, environmentFingerprint ) == KeyTrustLevel.Never
+                            .getId() )
+                    {
+                        throw new CommandException( "Host was revoked to execute commands" );
+                    }
                 }
             }
         }
+
         Host host;
         try
         {
@@ -1106,16 +1116,24 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         if ( validateTrust )
         {
+            LOG.warn( "Trust chain validation is on..." );
             User activeUser = identityManager.getActiveUser();
             if ( activeUser != null )
             {
                 KeyManager keyManager = securityManager.getKeyManager();
-                String hostFingerprint = keyManager.getFingerprint( aHost.getId() );
-                String userFingerprint = keyManager.getFingerprint( activeUser.getSecurityKeyId() );
 
-                if ( keyManager.getTrustLevel( userFingerprint, hostFingerprint ) == KeyTrustLevel.Never.getId() )
+                if ( aHost instanceof EnvironmentContainerHost )
                 {
-                    throw new CommandException( "Host was revoked to execute commands" );
+                    EnvironmentId environmentId = ( ( EnvironmentContainerHost ) aHost ).getEnvironmentId();
+
+                    String environmentFingerprint = keyManager.getFingerprint( environmentId.getId() );
+                    String userFingerprint = keyManager.getFingerprint( activeUser.getSecurityKeyId() );
+
+                    if ( keyManager.getTrustLevel( userFingerprint, environmentFingerprint ) == KeyTrustLevel.Never
+                            .getId() )
+                    {
+                        throw new CommandException( "Host was revoked to execute commands" );
+                    }
                 }
             }
         }

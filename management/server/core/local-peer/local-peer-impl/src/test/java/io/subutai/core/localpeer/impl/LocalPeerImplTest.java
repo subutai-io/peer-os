@@ -23,9 +23,9 @@ import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.host.ContainerHostInfo;
+import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInfo;
-import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.ResourceAlert;
 import io.subutai.common.network.Vni;
@@ -207,7 +207,7 @@ public class LocalPeerImplTest
         peerMap.put( IP, N2N_IP );
         localPeer =
                 spy( new LocalPeerImpl( daoManager, templateRegistry, quotaManager, strategyManager, commandExecutor,
-                        hostRegistry, monitor, securityManager ) );
+                        hostRegistry, monitor, securityManager, identityManager ) );
 
         //        localPeer.containerHostDataService = containerHostDataService;
         //        localPeer.containerGroupDataService = containerGroupDataService;

@@ -177,8 +177,8 @@ public class PGPEncryptionUtilTest
 
             if ( secondPublicKeyRing != null )
             {
-                firstPublicKeyRing =
-                        PGPEncryptionUtil.removeSignature( firstPublicKeyRing, secondPublicKeyRing.getPublicKey() );
+                String keyId = Long.toHexString( secondPublicKeyRing.getPublicKey().getKeyID() );
+                firstPublicKeyRing = PGPEncryptionUtil.removeSignature( firstPublicKeyRing, keyId );
                 assertEquals( false, printPublicKeySignatures( firstPublicKeyRing.getPublicKey(),
                         secondPublicKeyRing.getPublicKey() ) );
             }
@@ -198,8 +198,12 @@ public class PGPEncryptionUtilTest
         boolean verification = false;
         try
         {
+            //            verification = PGPEncryptionUtil
+            //                    .verifyPublicKey( publicKey, Long.toHexString( publicKey.getKeyID() ),
+            // secondPublicKey );
+
             verification = PGPEncryptionUtil
-                    .verifyPublicKey( publicKey, Long.toHexString( publicKey.getKeyID() ), secondPublicKey );
+                    .verifyPublicKey( publicKey, Long.toHexString( secondPublicKey.getKeyID() ), secondPublicKey );
         }
         catch ( PGPException e )
         {
@@ -240,7 +244,8 @@ public class PGPEncryptionUtilTest
 
             if ( secondSecretKey != null )
             {
-                String keyId = Long.toHexString( firstPublicKeyRing.getPublicKey().getKeyID() );
+                String keyId = Long.toHexString( secondSecretKey.getKeyID() );
+                //                String keyId = Long.toHexString( firstPublicKeyRing.getPublicKey().getKeyID() );
 
                 PGPPublicKeyRing firstSignedPublicKeyRing =
                         PGPEncryptionUtil.signPublicKey( firstPublicKeyRing, keyId, secondSecretKey, password );

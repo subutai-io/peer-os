@@ -238,7 +238,7 @@ public class KeyManagerImpl implements KeyManager
             if ( !verifyTrustRelationValidity( SecurityKeyType.getById( sourceSecurityKey.getType() ),
                     SecurityKeyType.getById( targetSecurityKey.getType() ) ) )
             {
-                throw new RuntimeException( "Trust is not allow for this relation" );
+                throw new RuntimeException( "Trust is not allowed for this relation" );
             }
 
             if ( trustLevel == KeyTrustLevel.Never.getId() )
