@@ -21,7 +21,7 @@ import sun.misc.CharacterEncoder;
 public class DateTimeParam
 {
     public static final String DATE_FORMAT = "yyyy-MM-dd";
-    public static final String TIME_FORMAT = "HH:MM:SS";
+    public static final String TIME_FORMAT = "HH:mm:ss";
     public static final String DATE_TIME_FORMAT = DATE_FORMAT + " " + TIME_FORMAT;
     private final Date date;
     private static final DateFormat dateFormat = new SimpleDateFormat( DATE_FORMAT );
@@ -54,7 +54,7 @@ public class DateTimeParam
 
     public String getDateString()
     {
-        return timeFormat.format( date );
+        return dateFormat.format( date );
     }
 
 
