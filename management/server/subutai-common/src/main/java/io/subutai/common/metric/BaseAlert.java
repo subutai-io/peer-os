@@ -17,7 +17,7 @@ public class BaseAlert
     @JsonProperty( "hostType" )
     private HostType hostType;
     @JsonProperty( "value" )
-    private AlertValue value;
+    private AlertResource value;
 
 
     public BaseAlert()
@@ -25,7 +25,7 @@ public class BaseAlert
     }
 
 
-    public BaseAlert( final HostId hostId, final HostType hostType, final AlertValue value )
+    public BaseAlert( final HostId hostId, final HostType hostType, final AlertResource value )
     {
         this.hostId = hostId;
         this.hostType = hostType;
@@ -45,7 +45,7 @@ public class BaseAlert
     }
 
 
-    public AlertValue getValue()
+    public AlertResource getValue()
     {
         return value;
     }
