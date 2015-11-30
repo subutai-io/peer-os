@@ -585,7 +585,7 @@ public class KeyManagerImpl implements KeyManager
         }
         catch ( Exception ex )
         {
-            LOG.error( "Error removing Secret key:" + ex.toString() );
+            LOG.error( " ***** Error getting security key data:" + ex.toString(),ex );
         }
         return keyIden;
     }
@@ -604,7 +604,7 @@ public class KeyManagerImpl implements KeyManager
         }
         catch ( Exception ex )
         {
-            LOG.error( "Error removing Secret key:" + ex.toString() );
+            LOG.error( " ***** Error getting security key data:" + ex.toString(),ex );
         }
         return keyIden;
     }
@@ -629,7 +629,7 @@ public class KeyManagerImpl implements KeyManager
         }
         catch ( Exception ex )
         {
-            LOG.error( "Error removing Secret key:" + ex.toString() );
+            LOG.error( "Error removing security key:" + ex.toString(),ex );
         }
     }
 
