@@ -47,10 +47,10 @@ public interface Monitor
     public HistoricalMetrics getHistoricalMetrics( Host host, Date startTime, Date endTime );
 
 
-    /**
-     * @param hosts physical or container hosts to be monitored
-     * @param resourceType to be retrieved for historical data
-     */
+//    /**
+//     * @param hosts physical or container hosts to be monitored
+//     * @param resourceType to be retrieved for historical data
+//     */
 //    public Map<String, List<HistoricalMetric>> getHistoricalMetrics( Collection<Host> hosts,
 //                                                                     ResourceType resourceType );
 
@@ -75,4 +75,6 @@ public interface Monitor
     void addAlert( AlertPack alert );
 
     void deliverAlerts();
+
+    List<AlertPack> getAlertsQueue();
 }

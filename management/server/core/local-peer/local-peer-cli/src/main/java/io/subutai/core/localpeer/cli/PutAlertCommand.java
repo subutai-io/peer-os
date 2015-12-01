@@ -1,6 +1,11 @@
 package io.subutai.core.localpeer.cli;
 
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+
+import org.apache.commons.lang.time.DateUtils;
 import org.apache.karaf.shell.commands.Command;
 
 import io.subutai.common.host.HostId;
@@ -33,8 +38,9 @@ public class PutAlertCommand extends SubutaiShellCommandSupport
         ResourceAlert alertValue =
                 new ResourceAlert( new HostId( "hostId" ), ResourceType.RAM, new ResourceValue( "1.1", MeasureUnit.MB ),
                         new ResourceValue( "2.2", MeasureUnit.MB ) );
-        QuotaAlertResource value = new QuotaAlertResource( alertValue );
-        AlertPack alertPack = new AlertPack( localPeer.getId(), "enironmentId", "containerId", "master", value, System.currentTimeMillis() );
+        QuotaAlertResource value = new QuotaAlertResource( alertValue, System.currentTimeMillis() );
+        AlertPack alertPack = new AlertPack( localPeer.getId(), "enironmentId", "containerId", "master", value,
+                DateUtils.addMinutes( new Date(), 1 ).getTime() );
         localPeer.alert( alertPack );
         return null;
     }

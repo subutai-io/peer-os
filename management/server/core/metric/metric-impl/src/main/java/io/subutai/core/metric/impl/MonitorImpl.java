@@ -2,15 +2,18 @@ package io.subutai.core.metric.impl;
 
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -18,6 +21,8 @@ import java.util.concurrent.TimeUnit;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.apache.commons.lang.time.DateUtils;
 
 import com.google.common.base.Preconditions;
 import com.google.common.cache.Cache;
@@ -66,13 +71,10 @@ import io.subutai.core.peer.api.PeerManager;
  */
 public class MonitorImpl implements Monitor, HostListener
 {
-    private static final String ENVIRONMENT_IS_NULL_MSG = "Environment is null";
-    private static final String CONTAINER_IS_NULL_MSG = "Container is null";
-    private static final String INVALID_SUBSCRIBER_ID_MSG = "Invalid subscriber id";
-    private static final String SETTINGS_IS_NULL_MSG = "Settings is null";
-    private static final int METRICS_UPDATE_DELAY = 60;
-
     private static final Logger LOG = LoggerFactory.getLogger( MonitorImpl.class );
+
+    private static final int METRICS_UPDATE_DELAY = 60;
+    private static final int ALERT_LIVE_TIME = 2;// alert live time in min
     private final HostRegistry hostRegistry;
 
     //    protected Set<AlertListener> alertListeners =
@@ -88,9 +90,9 @@ public class MonitorImpl implements Monitor, HostListener
             expireAfterWrite( METRICS_UPDATE_DELAY * 2, TimeUnit.SECONDS ).
                                                                     build();
     protected ScheduledExecutorService stateUpdateExecutorService;
-    protected ScheduledExecutorService alertTaskExecutorService;
+    protected ScheduledExecutorService backgroundTasksExecutorService;
 
-    private Map<String, AlertPack> localAlerts = new ConcurrentHashMap<>();
+    private Map<String, AlertPack> localALerts = new HashMap<>();
     private List<AlertPack> alerts = new CopyOnWriteArrayList<>();
 
     private PeerManager peerManager;
@@ -122,8 +124,8 @@ public class MonitorImpl implements Monitor, HostListener
         stateUpdateExecutorService = Executors.newScheduledThreadPool( 1 );
         stateUpdateExecutorService
                 .scheduleWithFixedDelay( new MetricsUpdater( this ), 10, METRICS_UPDATE_DELAY, TimeUnit.SECONDS );
-        alertTaskExecutorService = Executors.newScheduledThreadPool( 1 );
-        alertTaskExecutorService.scheduleWithFixedDelay( new BackgroundTasksRunner(), 10, 30, TimeUnit.SECONDS );
+        backgroundTasksExecutorService = Executors.newScheduledThreadPool( 1 );
+        backgroundTasksExecutorService.scheduleWithFixedDelay( new BackgroundTasksRunner(), 10, 30, TimeUnit.SECONDS );
     }
 
 
@@ -194,7 +196,7 @@ public class MonitorImpl implements Monitor, HostListener
 
     public void destroy()
     {
-        alertTaskExecutorService.shutdown();
+        backgroundTasksExecutorService.shutdown();
         stateUpdateExecutorService.shutdown();
     }
 
@@ -241,71 +243,13 @@ public class MonitorImpl implements Monitor, HostListener
     public void addAlert( final AlertPack alert )
     {
         AlertPack a = new AlertPack( alert.getPeerId(), alert.getEnvironmentId(), alert.getContainerId(),
-                alert.getTemplateName(), alert.getResource(), alert.geTimestamp() );
+                alert.getTemplateName(), alert.getResource(), alert.getExpiredTime() );
+        LOG.debug( "Accepted new alert: " + a );
         alerts.add( a );
     }
 
 
-/*
-    @Override
-    public Map<String, List<HistoricalMetric>> getHistoricalMetrics( final Collection<Host> hosts,
-                                                                     final ResourceType resourceType )
-    {
-        final Map<String, List<HistoricalMetric>> historicalMetrics = new ConcurrentHashMap<>();
-
-        for ( Host host : hosts )
-        {
-            try
-            {
-                List<HistoricalMetric> historicalMetric = getHistoricalMetric( host, metricType );
-                historicalMetrics.put( historicalMetric.get( 0 ).getHost().getId(), historicalMetric );
-            }
-            catch ( Exception e )
-            {
-                //ignore
-            }
-        }
-
-        // TODO enable this block as it executes the commands asynchronously
-        // when agent can read them without problem and returns a response
-
-        //        ExecutorService executor = Executors.newFixedThreadPool( hosts.size() );
-        //        final Map<UUID, List<HistoricalMetric>> historicalMetrics = new ConcurrentHashMap<>();
-        //        for ( final Host host : hosts ) {
-        //            executor.execute( new Runnable() {
-        //                @Override
-        //                public void run() {
-        //                    try {
-        //                        List<HistoricalMetric> historicalMetric = getHistoricalMetrics( host, metricType );
-        //                        historicalMetrics.put( historicalMetric.get( 0 ).getHost().getId(),
-        // historicalMetric );
-        //                    } catch ( Exception e ) {
-        //                    }
-        //                }
-        //            }
-        //                            );
-        //        }
-        //        executor.shutdown();
-        //        int timeout = 5;
-        //        LOG.info( "Waiting for all threads to retrieve historical data for {} to finish {} seconds maximum."
-        //                , metricType, timeout );
-        //        // Wait until all threads are finished
-        //        try {
-        //            executor.awaitTermination( timeout, TimeUnit.SECONDS );
-        //        } catch (InterruptedException e) {
-        //            LOG.error( e.getMessage() );
-        //        }
-        //
-        //        LOG.info( "All threads finished/timed out for retrieving {} metric. Size: {}", metricType,
-        // historicalMetrics.size() );
-
-        return historicalMetrics;
-    }
-
-*/
-
-
-    protected void putAlert( AlertResource alert )
+    protected void queueAlertResource( AlertResource alert )
     {
 
         //        if ( !isValidAlert( alert ) )
@@ -313,27 +257,45 @@ public class MonitorImpl implements Monitor, HostListener
         //            return;
         //        }
 
-        if ( localAlerts.get( alert.getId() ) != null )
+
+        AlertPack alertPack = localALerts.get( alert.getId() );
+        if ( alertPack != null )
         {
-            // skipping, alert already exists
-            LOG.debug( String.format( "Local alert '%s' already exists. Please remove this alert.", alert.getId() ) );
-            return;
+            if ( !alertPack.isExpired() )
+            {
+                // skipping, alert already exists
+                LOG.debug( String.format( "Alert already in queue. %s", alert ) );
+                return;
+            }
         }
 
-        String containerId = alert.getHostId().getId();
+        alertPack = buildAlertPack( alert );
+        localALerts.put( alert.getId(), alertPack );
+    }
 
+
+    private AlertPack buildAlertPack( final AlertResource alert )
+    {
+        String containerId = alert.getHostId().getId();
+        AlertPack packet = null;
         try
         {
             ContainerHost host = peerManager.getLocalPeer().getContainerHostById( containerId );
-            AlertPack packet = new AlertPack( host.getInitiatorPeerId(), host.getEnvironmentId().getId(), containerId,
-                    host.getTemplateName(), alert, System.currentTimeMillis() );
-            LOG.debug( String.format( "Put alert: %s", alert.getId() ) );
-            localAlerts.put( alert.getId(), packet );
+            packet = new AlertPack( host.getInitiatorPeerId(), host.getEnvironmentId().getId(), containerId,
+                    host.getTemplateName(), alert, buildExpireTime().getTime() );
         }
         catch ( HostNotFoundException e )
         {
             LOG.warn( e.getMessage() );
         }
+
+        return packet;
+    }
+
+
+    protected Date buildExpireTime()
+    {
+        return DateUtils.addMinutes( new Date(), ALERT_LIVE_TIME );
     }
 
 
@@ -419,7 +381,7 @@ public class MonitorImpl implements Monitor, HostListener
     @Override
     public Collection<AlertPack> getAlerts()
     {
-        return Collections.unmodifiableCollection( localAlerts.values() );
+        return Collections.unmodifiableCollection( localALerts.values() );
     }
 
 
@@ -458,11 +420,21 @@ public class MonitorImpl implements Monitor, HostListener
 
 
     @Override
+    public List<AlertPack> getAlertsQueue()
+    {
+        List<AlertPack> result = new ArrayList<>();
+        result.addAll( localALerts.values() );
+        return result;
+    }
+
+
+    @Override
     public void notifyAlertListeners()
     {
         for ( AlertPack alertPack : alerts )
         {
-            if ( !alertPack.isDelivered() )
+            LOG.debug( "Notifying: " + alertPack );
+            if ( !alertPack.isDelivered() && !alertPack.isExpired() )
             {
                 notifyListener( alertPack );
                 alertPack.setDelivered( true );
@@ -486,11 +458,25 @@ public class MonitorImpl implements Monitor, HostListener
     @Override
     public void deliverAlerts()
     {
-        for ( AlertPack alertPack : localAlerts.values() )
+        for ( AlertPack alertPack : localALerts.values() )
         {
             if ( !alertPack.isDelivered() )
             {
                 deliverAlert( alertPack );
+            }
+        }
+    }
+
+
+    private void clearObsoleteAlerts()
+    {
+        for ( AlertPack alertPack : localALerts.values() )
+        {
+            if ( alertPack.isExpired() )
+            {
+                LOG.debug( String.format( "Alert package '%s' expired. ", alertPack.getResource().getId() ) );
+                // removing obsolete alert
+                localALerts.remove( alertPack.getResource().getId() );
             }
         }
     }
@@ -521,6 +507,7 @@ public class MonitorImpl implements Monitor, HostListener
             {
                 deliverAlerts();
                 notifyAlertListeners();
+                clearObsoleteAlerts();
             }
             catch ( Exception e )
             {
@@ -659,11 +646,7 @@ public class MonitorImpl implements Monitor, HostListener
         {
             for ( ResourceAlert resourceAlert : alerts )
             {
-                //                final Alert alert = new Alert( new ResourceAlertValue( resourceAlert ) );
-
-                putAlert( new QuotaAlertResource( resourceAlert ) );
-
-                //                alertProcessor.process( alert );
+                queueAlertResource( new QuotaAlertResource( resourceAlert, System.currentTimeMillis() ) );
             }
         }
     }
