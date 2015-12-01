@@ -64,10 +64,14 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
                 int status = 0;
                 status = MessageContentUtil.checkUrlAccessibility( status, url );
                 //----------------------------------------------------------------------------------------------
-                if ( status != 0 ) //require tokenauth
+                if ( status == 1 ) //require tokenauth
                     userSession = authenticateAccess( message );
-                else // auth with system user
+                else if ( status == 0 ) // auth with system user
                     userSession = authenticateAccess( null );
+                else if ( status == 2 )
+                {
+                    MessageContentUtil.abortChain( message, 403, "Permission denied" );
+                }
             }
 
             //******Authenticate************************************************
