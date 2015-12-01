@@ -51,7 +51,13 @@ import io.subutai.common.peer.PeerId;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.resource.ResourceType;
 import io.subutai.common.resource.ResourceValue;
+import io.subutai.common.security.objects.KeyTrustLevel;
 import io.subutai.core.environment.api.EnvironmentManager;
+import io.subutai.core.environment.impl.EnvironmentManagerImpl;
+import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.model.User;
+import io.subutai.core.security.api.*;
+import io.subutai.core.security.api.crypto.KeyManager;
 
 
 /**
@@ -329,10 +335,38 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
         this.hostname = hostname;
     }
 
+    private void validateTrustChain() throws CommandException
+    {
+        if(environmentManager instanceof EnvironmentManagerImpl)
+        {
+            EnvironmentManagerImpl envImpl = (EnvironmentManagerImpl) environmentManager;
+            if ( envImpl.isKeyTrustCheckEnabled() )
+            {
+                IdentityManager identityManager = envImpl.getIdentityManager();
+                io.subutai.core.security.api.SecurityManager securityManager = envImpl.getSecurityManager();
+                User activeUser = identityManager.getActiveUser();
+                if ( activeUser != null )
+                {
+                    KeyManager keyManager = securityManager.getKeyManager();
+                    EnvironmentId environmentId = this.getEnvironmentId();
+
+                    String environmentFingerprint = keyManager.getFingerprint( environmentId.getId() );
+                    String userFingerprint = keyManager.getFingerprint( activeUser.getSecurityKeyId() );
+
+                    if ( keyManager.getTrustLevel( userFingerprint, environmentFingerprint ) == KeyTrustLevel.Never
+                            .getId() )
+                    {
+                        throw new CommandException( "Host was revoked to execute commands" );
+                    }
+                }
+            }
+        }
+    }
 
     @Override
     public CommandResult execute( final RequestBuilder requestBuilder ) throws CommandException
     {
+        validateTrustChain();
         return getPeer().execute( requestBuilder, this );
     }
 
@@ -341,6 +375,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     public CommandResult execute( final RequestBuilder requestBuilder, final CommandCallback callback )
             throws CommandException
     {
+        validateTrustChain();
         return getPeer().execute( requestBuilder, this, callback );
     }
 
@@ -349,6 +384,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     public void executeAsync( final RequestBuilder requestBuilder, final CommandCallback callback )
             throws CommandException
     {
+        validateTrustChain();
         getPeer().executeAsync( requestBuilder, this, callback );
     }
 
@@ -356,6 +392,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @Override
     public void executeAsync( final RequestBuilder requestBuilder ) throws CommandException
     {
+        validateTrustChain();
         getPeer().executeAsync( requestBuilder, this );
     }
 

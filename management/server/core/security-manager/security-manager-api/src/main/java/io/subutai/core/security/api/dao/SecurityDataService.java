@@ -59,9 +59,12 @@ public interface SecurityDataService
     /******************************************
      *
      */
-    void saveKeyTrustData( String sourceId, String targetId, int trustLevel );
+    SecurityKeyTrust saveKeyTrustData( String sourceId, String targetId, int trustLevel );
 
 
+    /******************************************
+     *
+     */
     public void updateKeyTrustData( SecurityKeyTrust securityKeyTrust );
 
 

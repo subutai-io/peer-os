@@ -213,7 +213,7 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
      *
      */
     @Override
-    public Response allowKey( String source, String target )
+    public Response approveKey( String source, String target )
     {
         try
         {

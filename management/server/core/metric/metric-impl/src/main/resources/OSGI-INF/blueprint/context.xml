@@ -2,16 +2,21 @@
 <blueprint default-activation="eager"
            xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xmlns:jpa="http://aries.apache.org/xmlns/jpa/v1.1.0"
+           xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0"
            xsi:schemaLocation="http://aries.apache.org/xmlns/jpa/v1.1.0 http://aries.apache.org/xmlns/jpa/v1.0.0"
     >
 
   <reference id="peerManager" availability="mandatory"
              interface="io.subutai.core.peer.api.PeerManager" />
+
   <reference id="environmentManager" availability="mandatory"
              interface="io.subutai.core.environment.api.EnvironmentManager" />
 
   <reference id="hostRegistry" availability="mandatory"
              interface="io.subutai.core.hostregistry.api.HostRegistry" />
+
+  <reference id="localPeer" availability="mandatory"
+             interface="io.subutai.common.peer.LocalPeer" />
 
   <!-- Data Access object to get EntityManager -->
 
@@ -27,37 +32,18 @@
     <argument ref="hostRegistry" />
   </bean>
 
-
-
-  <reference-list id="alertLstnr"
-                  interface="io.subutai.core.metric.api.AlertListener"
-                  availability="optional">
-    <reference-listener ref="monitor"
-                        bind-method="addAlertListener" unbind-method="removeAlertListener" />
-  </reference-list>
-
   <service ref="monitor" interface="io.subutai.core.metric.api.Monitor" />
   <service ref="monitor" interface="io.subutai.core.hostregistry.api.HostListener" />
 
-  <bean id="remoteAlertLstnr" scope="singleton" class="io.subutai.core.metric.impl.RemoteAlertListener">
-    <argument ref="monitor" />
+  <reference-list id="alertListener"
+                  interface="io.subutai.common.peer.AlertListener"
+                  availability="optional" ext:proxy-method="classes">
+    <reference-listener ref="monitor"
+                        bind-method="addAlertListener" unbind-method="removeAlertListener" />
+  </reference-list>
+  <bean id="masterAlertListener" class="io.subutai.core.metric.impl.MasterAlertListener" scope="singleton"
+        activation="eager">
+
   </bean>
-
-  <service ref="remoteAlertLstnr" interface="io.subutai.common.peer.RequestListener" />
-
-  <bean id="remoteMetricLstnr" scope="singleton"
-        class="io.subutai.core.metric.impl.RemoteMetricRequestListener">
-    <argument ref="monitor" />
-  </bean>
-
-  <service ref="remoteMetricLstnr" interface="io.subutai.common.peer.RequestListener" />
-
-  <bean id="activationLstnr" scope="singleton"
-        class="io.subutai.core.metric.impl.MonitoringActivationListener">
-    <argument ref="monitor" />
-    <argument ref="peerManager" />
-  </bean>
-
-  <service ref="activationLstnr" interface="io.subutai.common.peer.RequestListener" />
-
+  <service ref="masterAlertListener" interface="io.subutai.common.peer.AlertListener" />
 </blueprint>

@@ -177,11 +177,13 @@ public class SecurityDataServiceImpl implements SecurityDataService
      * Trust Data
      */
     @Override
-    public void saveKeyTrustData( String sourceFingerprint, String targetFingerprint, int trustLevel )
+    public SecurityKeyTrust saveKeyTrustData( String sourceFingerprint, String targetFingerprint, int trustLevel )
     {
+        SecurityKeyTrust secTrust = null;
+
         try
         {
-            SecurityKeyTrust secTrust = new SecurityKeyTrustEntity();
+            secTrust = new SecurityKeyTrustEntity();
             secTrust.setSourceFingerprint( sourceFingerprint );
             secTrust.setTargetFingerprint( targetFingerprint );
             secTrust.setLevel( trustLevel );
@@ -190,7 +192,10 @@ public class SecurityDataServiceImpl implements SecurityDataService
         }
         catch ( Exception ex )
         {
+            return null;
         }
+
+        return secTrust;
     }
 
 

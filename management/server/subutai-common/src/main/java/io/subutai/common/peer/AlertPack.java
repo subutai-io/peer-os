@@ -1,7 +1,10 @@
 package io.subutai.common.peer;
 
 
-import io.subutai.common.metric.AlertValue;
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonProperty;
+
+import io.subutai.common.metric.AlertResource;
 
 
 /**
@@ -9,21 +12,30 @@ import io.subutai.common.metric.AlertValue;
  */
 public class AlertPack
 {
+    @JsonProperty( "peerId" )
     String peerId;
+    @JsonProperty( "environmentId" )
     String environmentId;
+    @JsonProperty( "containerId" )
     String containerId;
+    @JsonProperty( "templateName" )
     String templateName;
-    AlertValue value;
+    @JsonProperty( "resource" )
+    AlertResource resource;
+    @JsonIgnore
     boolean delivered = false;
 
 
-    public AlertPack( final String peerId, final String environmentId, final String containerId,
-                      final String templateName, final AlertValue value )
+    public AlertPack( @JsonProperty( "peerId" ) final String peerId,
+                      @JsonProperty( "environmentId" ) final String environmentId,
+                      @JsonProperty( "containerId" ) final String containerId,
+                      @JsonProperty( "templateName" ) final String templateName,
+                      @JsonProperty( "resource" ) final AlertResource resource )
     {
         this.peerId = peerId;
         this.environmentId = environmentId;
         this.containerId = containerId;
-        this.value = value;
+        this.resource = resource;
         this.templateName = templateName;
     }
 
@@ -46,9 +58,9 @@ public class AlertPack
     }
 
 
-    public AlertValue getValue()
+    public AlertResource getResource()
     {
-        return value;
+        return resource;
     }
 
 
@@ -78,7 +90,7 @@ public class AlertPack
         sb.append( ", environmentId='" ).append( environmentId ).append( '\'' );
         sb.append( ", containerId='" ).append( containerId ).append( '\'' );
         sb.append( ", templateName='" ).append( templateName ).append( '\'' );
-        sb.append( ", value=" ).append( value );
+        sb.append( ", value=" ).append( resource );
         sb.append( ", delivered=" ).append( delivered );
         sb.append( '}' );
         return sb.toString();

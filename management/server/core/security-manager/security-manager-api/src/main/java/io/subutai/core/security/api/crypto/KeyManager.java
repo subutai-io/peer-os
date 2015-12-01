@@ -127,7 +127,12 @@ public interface KeyManager
     /* ***************************************************************
      *
      */
-    void setKeyTrust( String sourceFingerprint, String targetFingerprint, int trustLevel );
+    PGPPublicKeyRing setKeyTrust( PGPSecretKeyRing sourceSecRing, PGPPublicKeyRing targetPubRing, int trustLevel );
+
+    /* ***************************************************************
+         *
+         */
+    PGPPublicKeyRing setKeyTrust( String sourceFingerprint, String targetFingerprint, int trustLevel );
 
 
     /* ***************************************************************
@@ -145,15 +150,15 @@ public interface KeyManager
          */
     PGPPublicKeyRing removeSignature( String sourceFingerprint, String targetFingerprint );
 
-    /* ***************************************************************
-         *
-         */
-    PGPPublicKeyRing removeSignature( String sourceIdentityId, PGPPublicKeyRing targetPubRing );
-
 
     /* ***************************************************************
      *
      */
+    PGPPublicKeyRing removeSignature( PGPPublicKey sourcePublicKey, PGPPublicKeyRing targetPubRing );
+
+    /* ***************************************************************
+         *
+         */
     SecurityKeyTrust getKeyTrustData(String sourceFingerprint, String targetFingerprint);
 
 
@@ -175,10 +180,17 @@ public interface KeyManager
     void removeKeyAllTrustData( String sourceFingerprint );
 
 
+
     /* ***************************************************************
      *
      */
-    void removeKeyTrust( String sourceFingerprint, String targetFingerprint);
+    void removeKeyTrustData( String sourceFingerprint, String targetFingerprint );
+
+
+    /* ***************************************************************
+     *
+     */
+    SecurityKeyTrust saveKeyTrustData( String sourceFingerprint, String targetFingerprint, int trustLevel );
 
 
     /* *****************************
@@ -199,9 +211,14 @@ public interface KeyManager
     void removeSecretKeyRing( String identityId );
 
 
-    /* *****************************************
+    /* ******************************************************************
      *
      */
+    PGPSecretKeyRing getSecretKeyRingByFingerprint( String fingerprint );
+
+    /* *****************************************
+         *
+         */
     KeyPair generateKeyPair( String identityId, boolean armored );
 
 

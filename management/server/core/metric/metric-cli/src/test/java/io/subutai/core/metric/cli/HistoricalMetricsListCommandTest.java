@@ -28,7 +28,7 @@ import static org.mockito.Mockito.when;
  * Test for ContainerHostMetricsCommand
  */
 @RunWith( MockitoJUnitRunner.class )
-public class MetricListCommandTest extends SystemOutRedirectTest
+public class HistoricalMetricsListCommandTest extends SystemOutRedirectTest
 {
     @Mock
     Monitor monitor;
@@ -46,7 +46,7 @@ public class MetricListCommandTest extends SystemOutRedirectTest
         Environment environment = mock( Environment.class );
         ContainerHostMetric metric = mock( ContainerHostMetric.class );
         when( metric.toString() ).thenReturn( METRIC_TO_STRING );
-        when( monitor.getContainerHostsMetrics( environment ) ).thenReturn( Sets.newHashSet( metric ) );
+//        when( monitor.getContainerHostsMetrics( environment ) ).thenReturn( Sets.newHashSet( metric ) );
         metricListCommand = new MetricListCommand( monitor);
     }
 

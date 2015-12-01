@@ -23,7 +23,6 @@ import com.google.common.collect.Sets;
 
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInterfaceModel;
-import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.network.Gateway;
@@ -32,10 +31,10 @@ import io.subutai.common.network.VniVlanMapping;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
-import io.subutai.common.protocol.Tunnel;
 import io.subutai.core.repository.api.RepositoryException;
 import io.subutai.core.repository.api.RepositoryManager;
 
@@ -328,7 +327,8 @@ public class ManagementHostEntityTest
 
         verify( networkManager ).cleanupEnvironmentNetworkSettings( environmentId );
 
-        doThrow( new NetworkManagerException( "" ) ).when( networkManager ).cleanupEnvironmentNetworkSettings( environmentId );
+        doThrow( new NetworkManagerException( "" ) ).when( networkManager )
+                                                    .cleanupEnvironmentNetworkSettings( environmentId );
 
         managementHostEntity.cleanupEnvironmentNetworkSettings( environmentId );
     }
@@ -356,7 +356,6 @@ public class ManagementHostEntityTest
         managementHostEntity.removeTunnel( IP );
 
         verify( networkManager ).removeTunnel( anyInt() );
-
     }
 
 

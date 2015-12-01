@@ -332,6 +332,7 @@ public class LocalPeerImplTest
 
 
     @Test
+    @Ignore
     public void testGetContainerHostState() throws Exception
     {
         localPeer.getContainerState( containerHost.getContainerId() );

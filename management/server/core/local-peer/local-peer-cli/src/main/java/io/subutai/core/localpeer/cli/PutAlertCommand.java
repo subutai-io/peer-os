@@ -5,7 +5,7 @@ import org.apache.karaf.shell.commands.Command;
 
 import io.subutai.common.host.HostId;
 import io.subutai.common.metric.ResourceAlert;
-import io.subutai.common.metric.ResourceAlertValue;
+import io.subutai.common.metric.QuotaAlertResource;
 import io.subutai.common.peer.AlertPack;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.resource.MeasureUnit;
@@ -33,9 +33,9 @@ public class PutAlertCommand extends SubutaiShellCommandSupport
         ResourceAlert alertValue =
                 new ResourceAlert( new HostId( "hostId" ), ResourceType.RAM, new ResourceValue( "1.1", MeasureUnit.MB ),
                         new ResourceValue( "2.2", MeasureUnit.MB ) );
-        ResourceAlertValue value = new ResourceAlertValue( alertValue );
+        QuotaAlertResource value = new QuotaAlertResource( alertValue );
         AlertPack alertPack = new AlertPack( localPeer.getId(), "enironmentId", "containerId", "master", value );
-        localPeer.putAlert( alertPack );
+        localPeer.alert( alertPack );
         return null;
     }
 }

@@ -17,7 +17,7 @@
   <cm:property-placeholder persistent-id="peer" update-strategy="none">
     <cm:default-properties>
       <cm:property name="externalIpInterface" value="eth1" />
-      <cm:property name="validateTrust" value="false" />
+      <cm:property name="keyTrustCheckEnabled" value="false" />
     </cm:default-properties>
   </cm:property-placeholder>
 
@@ -62,7 +62,7 @@
     <argument ref="securityManager" />
     <argument ref="identityManager" />
     <property name="externalIpInterface" value="${externalIpInterface}" />
-    <property name="validateTrust" value="${validateTrust}" />
+    <property name="validateTrust" value="${keyTrustCheckEnabled}" />
   </bean>
 
   <bean id="messageRequestListener" class="io.subutai.core.localpeer.impl.request.MessageRequestListener"
@@ -77,18 +77,6 @@
     <reference-listener ref="localPeer"
                         bind-method="addRequestListener" unbind-method="removeRequestListener" />
   </reference-list>
-
-  <reference-list id="alertListener"
-                  interface="io.subutai.common.peer.AlertListener"
-                  availability="optional" ext:proxy-method="classes">
-    <reference-listener ref="localPeer"
-                        bind-method="addAlertListener" unbind-method="removeAlertListener" />
-  </reference-list>
-  <bean id="masterAlertListener" class="io.subutai.core.localpeer.impl.MasterAlertListener" scope="singleton"
-        activation="eager">
-
-  </bean>
-  <service ref="masterAlertListener" interface="io.subutai.common.peer.AlertListener" />
 
   <service ref="localPeer" interface="io.subutai.core.hostregistry.api.HostListener" />
   <service ref="localPeer" interface="io.subutai.common.peer.LocalPeer" />
