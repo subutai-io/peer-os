@@ -21,6 +21,9 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -32,10 +35,10 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
+import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
-import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
@@ -56,7 +59,6 @@ import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
-import io.subutai.core.security.api.*;
 import io.subutai.core.security.api.crypto.KeyManager;
 
 
@@ -68,6 +70,8 @@ import io.subutai.core.security.api.crypto.KeyManager;
 @Access( AccessType.FIELD )
 public class EnvironmentContainerImpl implements EnvironmentContainerHost, Serializable
 {
+    private static final Logger logger = LoggerFactory.getLogger( EnvironmentContainerImpl.class );
+
     @Column( name = "peer_id", nullable = false )
     private String peerId;
     @Id
@@ -339,6 +343,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     {
         if(environmentManager instanceof EnvironmentManagerImpl)
         {
+            logger.warn( "Trust chain validation is on..." );
             EnvironmentManagerImpl envImpl = (EnvironmentManagerImpl) environmentManager;
             if ( envImpl.isKeyTrustCheckEnabled() )
             {
