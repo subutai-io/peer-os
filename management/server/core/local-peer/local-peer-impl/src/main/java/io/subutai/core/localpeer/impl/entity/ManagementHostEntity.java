@@ -42,10 +42,12 @@ import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
 import io.subutai.common.network.VniVlanMapping;
 import io.subutai.common.peer.EnvironmentId;
+import io.subutai.common.peer.ManagementHost;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.Disposable;
 import io.subutai.common.protocol.N2NConfig;
+import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.NumUtil;
@@ -55,8 +57,6 @@ import io.subutai.core.localpeer.impl.tasks.ReserveVniTask;
 import io.subutai.core.localpeer.impl.tasks.SetupTunnelsTask;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
-import io.subutai.common.peer.ManagementHost;
-import io.subutai.common.protocol.Tunnel;
 import io.subutai.core.repository.api.RepositoryException;
 import io.subutai.core.repository.api.RepositoryManager;
 
@@ -197,6 +197,20 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
         catch ( NetworkManagerException e )
         {
             throw new PeerException( String.format( "Error removing ip %s from domain by vlan %d", hostIp, vlan ), e );
+        }
+    }
+
+
+    @Override
+    public int setupContainerSsh( final String containerIp, final int sshIdleTimeout ) throws PeerException
+    {
+        try
+        {
+            return getNetworkManager().setupContainerSsh( containerIp, sshIdleTimeout );
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new PeerException( String.format( "Error setting up ssh for container ip %s", containerIp ), e );
         }
     }
 

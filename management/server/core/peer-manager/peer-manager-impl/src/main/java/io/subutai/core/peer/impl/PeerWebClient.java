@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -416,13 +417,11 @@ public class PeerWebClient
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
 
-        try
+        Response response = client.post( alert );
+
+        if ( Response.Status.ACCEPTED.getStatusCode() != response.getStatus() )
         {
-            client.post( alert );
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException( "Error on sending alert package to remote peer", e );
+            throw new PeerException( "Alert not accepted." );
         }
     }
 

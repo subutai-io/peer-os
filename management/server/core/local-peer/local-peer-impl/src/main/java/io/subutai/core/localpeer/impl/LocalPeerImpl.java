@@ -60,6 +60,7 @@ import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
+import io.subutai.common.host.NullHostInterface;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceAlert;
@@ -1502,6 +1503,23 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
             throw new PeerException( String.format( "Vlan for vni %d not found", vni ) );
         }
+    }
+
+
+    @RolesAllowed( "Environment-Management|A|Update" )
+    @Override
+    public int setupContainerSsh( final String containerHostId, final int sshIdleTimeout ) throws PeerException
+    {
+        ContainerHost containerHost = getContainerHostById( containerHostId );
+
+        HostInterface hostInterface = containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE );
+
+        if ( hostInterface instanceof NullHostInterface )
+        {
+            throw new PeerException( "Container IP not found" );
+        }
+
+        return getManagementHost().setupContainerSsh( hostInterface.getIp(), sshIdleTimeout );
     }
 
 
