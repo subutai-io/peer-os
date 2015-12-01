@@ -21,7 +21,7 @@
 
 			<div class="popup-body-box">
 				<label class="b-popup-body-label">Domain Strategy</label>
-				<select 
+				<select ng-init="domain.strategy = environmentViewCtrl.domainStrategies[0]" 
 					class="b-popup-body-input b-popup-body-input_box" 
 					ng-model="domain.strategy" 
 					ng-options="strategy for strategy in environmentViewCtrl.domainStrategies">

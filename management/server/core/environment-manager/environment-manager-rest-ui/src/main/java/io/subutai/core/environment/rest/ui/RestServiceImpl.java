@@ -378,6 +378,8 @@ public class RestServiceImpl implements RestService
             file.createNewFile();
             attr.transferTo( file );
 
+            attr.getDataHandler().getInputStream()
+
 
             environmentManager.assignEnvironmentDomain( environmentId, hostName, strategy,
                     System.getProperty( "java.io.tmpdir" ) + "/" + environmentId );

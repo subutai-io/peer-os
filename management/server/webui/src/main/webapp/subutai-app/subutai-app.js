@@ -654,6 +654,26 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 				}]
 			}
 		})
+		.state('hbase', {
+			url: '/plugins/hbase',
+			templateUrl: 'plugins/hbase/partials/view.html',
+			resolve: {
+				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+					return $ocLazyLoad.load([
+						{
+							name: 'subutai.plugins.hbase',
+							files: [
+								'plugins/hbase/hbase.js',
+								'plugins/hbase/controller.js',
+								'plugins/hbase/service.js',
+								'plugins/hadoop/service.js',
+								'subutai-app/environment/service.js'
+							]
+						}
+					]);
+				}]
+			}
+		})
 		.state('404', {
 			url: '/404',
 			template: 'Not found'
