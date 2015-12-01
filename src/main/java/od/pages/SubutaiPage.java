@@ -4,9 +4,11 @@ import net.serenitybdd.core.annotations.findby.FindBy;
 import net.serenitybdd.core.pages.WebElementFacade;
 import net.thucydides.core.pages.PageObject;
 
+import java.io.File;
 import java.util.Arrays;
 
 public class SubutaiPage extends PageObject {
+public String cip;
 
     //----- GENERAL PLAYBOOKS
 
@@ -310,6 +312,9 @@ public class SubutaiPage extends PageObject {
     @FindBy(xpath = "*//pre[contains(text(),\"test\")]")
     public WebElementFacade outputOfTestCommand;
 
+    @FindBy(xpath = "*//pre[contains(text(),\"3 received\")]")
+    public WebElementFacade outputOfTestCommandThreeReceived;
+
     @FindBy(xpath = "*//h1[contains(text(),\"Blueprint\")]")
     public WebElementFacade subutaiBlueprintHeader;
 
@@ -375,4 +380,145 @@ public class SubutaiPage extends PageObject {
 
     @FindBy(xpath = "*//tr[@class=\"ng-scope odd\"]//td[@class=\"subt_text__container-ip sorting_1\"]//span[@class=\"ng-binding ng-isolate-scope\"]")
     public WebElementFacade containerIp;
+
+    //--------3117
+
+    @FindBy(xpath = "*//span[@class=\"b-icon__inner-num ng-binding\" and contains(text(), \"3\")]")
+    public WebElementFacade iconThreeContainers;
+
+    @FindBy(xpath = "*//button[@class=\"b-btn b-btn_grey\"]")
+    public WebElementFacade buttonConfigure;
+
+    @FindBy(ngModel = "domain.name")
+    public WebElementFacade inputDomain;
+
+    public String getDomain(){
+        String domain;
+        domain = evaluateJavascript("return document.getElementsByTagName('input')[1].value").toString();
+        String sb[] = domain.split("\n");
+        domain = sb[0];
+        return domain;
+    }
+
+    @FindBy(ngModel = "domain.strategy")
+    public WebElementFacade selectMenuDomainStrategy;
+
+    @FindBy(xpath= "*//input[@id=\"js-uploadBtn\"]/..")
+    public WebElementFacade inputUploadSSL;
+
+    public void uploadFromFile(){
+        File file = new File("src/test/resources/files/lighttpd.pem");
+        String filePath = file.getAbsolutePath();
+        evaluateJavascript("document.getElementById('js-uploadFile').value = '" + filePath + "'");
+    }
+
+    @FindBy(id = "subt_button__environment-add-domain")
+    public WebElementFacade domainButtonSave;
+
+    @FindBy(xpath = "*//b[@class=\"ng-binding\"]")
+    public WebElementFacade domainBindingText;
+
+    @FindBy(xpath = "*//option[contains(text(),\"ROUND_ROBIN\")]")
+    public WebElementFacade domainOptonRoundRobi;
+
+    @FindBy(xpath = ".//*[@id='DataTables_Table_1']/tbody/tr[1]/td[5]/button")
+    public WebElementFacade firstContainerButtonConfigure;
+
+    @FindBy(xpath = ".//*[@id='DataTables_Table_1']/tbody/tr[2]/td[5]/button")
+    public WebElementFacade secondContainerButtonConfigure;
+
+    @FindBy(xpath = ".//*[@id='DataTables_Table_1']/tbody/tr[3]/td[5]/button")
+    public WebElementFacade thirdContainerButtonConfigure;
+
+    @FindBy(id = "subt_checkbox__container-domain-add")
+    public WebElementFacade containerDomainCheckbox;
+
+    @FindBy(id = "subt_button__peer-approve-popup")
+    public WebElementFacade checkboxSaveButton;
+
+    @FindBy(xpath = "*//body")
+    public WebElementFacade domainContainerIP;
+
+
+    public boolean compareIP() {
+        String gip;
+        gip = evaluateJavascript("return document.body.innerHTML").toString();
+
+        getDriver().navigate().refresh();
+        getDriver().navigate().refresh();
+
+        String sGip;
+        sGip = evaluateJavascript("return document.body.innerHTML").toString();
+
+        boolean result = gip.equals(sGip);
+        return result;
+    }
+
+    @FindBy(xpath = "*//button[@class=\"b-btn b-btn_red subt_button__container-stop\"]")
+    public WebElementFacade containerButtonStop;
+
+    @FindBy(xpath = ".//*[@class='row-border hover subt_table-containers-table ng-isolate-scope no-footer dataTable']/tbody/tr[1]/td[3]/span")
+    public WebElementFacade ipStoppedContainer;
+
+    public String getIPContainerStopped(){
+        cip = ("Container IP:" + ipStoppedContainer.getText());
+
+        return cip;
+    }
+
+    @FindBy(xpath = "*//button[@class=\"b-btn b-btn_green subt_button__container-start\"]")
+    public WebElementFacade containerButtonStart;
+
+    public void pageReload(){
+        getDriver().navigate().refresh();
+        getDriver().navigate().refresh();
+    }
+
+    public boolean checkForOutOfIP() {
+        String checkForOutput;
+        checkForOutput = evaluateJavascript("return document.body.innerHTML").toString();
+        for (int i=0; i < 5; i++)
+        {
+            if (!cip.equals(checkForOutput)){
+                getDriver().navigate().refresh();
+                getDriver().navigate().refresh();
+            }
+            else return false;
+        }
+        return true;
+    }
+
+    @FindBy(xpath = ".//*[@class='row-border hover subt_table-containers-table ng-isolate-scope no-footer dataTable']/tbody/tr[2]/td[3]/span")
+    public WebElementFacade ipDesabledContainer;
+
+    public String getIPContainerDisabled(){
+        cip = ("Container IP:" + ipDesabledContainer.getText());
+
+        return cip;
+    }
+
+    @FindBy(id = "subt_button__environment-remove-domain")
+    public WebElementFacade enviromentButtonRemoveDomain;
+
+    @FindBy(xpath = "*//h1[contains(text(),\"404\")]")
+    public WebElementFacade desabledBindToEnvironment;
+
+    @FindBy(xpath = ".//*[@id='errorTitleText']")
+    public WebElementFacade unabledToConnect;
+
+
+    //-----------------3298
+
+    @FindBy(id="displayKeysButton")
+    public WebElementFacade dyspleyKeysButton;
+
+    @FindBy(id = "setupProviderButton")
+    public WebElementFacade stepButton;
+
+    @FindBy(id = "mhDecrypt")
+    public WebElementFacade dekryptButton;
+
+    public void pgpStart(){
+        open(new String[]{"resource://jid1-aqqsmbyb0a8adg-at-jetpack/mailvelope/data/common/ui/options.html#displayKeys"});
+    }
 }

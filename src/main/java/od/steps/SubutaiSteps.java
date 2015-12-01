@@ -6,6 +6,8 @@ import od.pages.ExecuteShellCommand;
 import od.pages.ReaderFromFile;
 import od.pages.SubutaiPage;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebElement;
+
 import java.io.FileNotFoundException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -554,8 +556,9 @@ public class SubutaiSteps extends ScenarioSteps {
     }
 
     @Step
-    public void seeOutputOfTestCommand(){
-        assertThat(subutaiPage.outputOfTestCommand.isVisible(), is(true));
+    public void seeOutputOfTestCommandThreeReceived(){
+        waitABit(5000);
+        assertThat(subutaiPage.outputOfTestCommandThreeReceived.isVisible(), is(true));
     }
 
     @Step
@@ -802,4 +805,190 @@ public class SubutaiSteps extends ScenarioSteps {
         subutaiPage.setDefaultBaseUrl(String.format("https://%s:8443/", ReaderFromFile.readDataFromFile("src/test/resources/parameters/vagrantMH_IP")));
         subutaiPage.open();
     }
+
+    //-------3117
+
+    @Step
+    public void seeIconThreeContainers(){
+        assertThat(subutaiPage.iconThreeContainers.isVisible(), is(true));
+    }
+
+    @Step
+    public void clickOnButtonConfigure(){
+        subutaiPage.buttonConfigure.click();
+    }
+
+    @Step
+    public void seeEmptyInputDomain(){
+        assertThat(subutaiPage.getDomain().isEmpty(), is(true));
+    }
+
+    @Step
+    public void inputDomainInTheField(String domain){
+        subutaiPage.inputDomain.type(domain);
+    }
+
+    @Step
+    public void clickOnSelectMenuDomainStrtegy(){
+        subutaiPage.selectMenuDomainStrategy.click();
+    }
+
+    @Step
+    public void selectDomainStrtegyRoundRobin(String strategy){
+        subutaiPage.selectMenuDomainStrategy.selectByVisibleText("ROUND_ROBIN");
+    }
+
+    @Step
+    public void pressEnterOnDomainStrategy(){
+        subutaiPage.selectMenuDomainStrategy.sendKeys(Keys.ENTER);
+    }
+
+    @Step
+    public void selectFileToUpload(){
+        subutaiPage.uploadFromFile();
+    }
+
+    @Step
+    public void domainClickOnTheButtonSave(){
+        subutaiPage.domainButtonSave.click();
+    }
+
+    @Step
+    public void seeDomainBindingText(String text){
+        waitABit(2000);
+        subutaiPage.domainBindingText.containsText(text);
+    }
+
+    @Step
+    public void roundRobinSelected(){
+        assertThat(subutaiPage.domainOptonRoundRobi.isSelected(), is(true));
+    }
+
+    @Step
+    public void clickOnFirstContainerButtonConfigure(){
+        waitABit(5000);
+        subutaiPage.firstContainerButtonConfigure.click();
+    }
+
+    @Step
+    public void  clickOnSecondContainerButtonConfigure(){
+        waitABit(5000);
+        subutaiPage.secondContainerButtonConfigure.click();
+    }
+
+    @Step
+    public void clickOnThirdContainerButtonConfigure(){
+        waitABit(5000);
+        subutaiPage.thirdContainerButtonConfigure.click();
+    }
+
+    @Step
+    public void clickOnContainerDomainCheckbox(){
+        subutaiPage.containerDomainCheckbox.click();
+    }
+
+    @Step
+    public void clickOnContainerDomainButtonSave(){
+        subutaiPage.checkboxSaveButton.click();
+    }
+
+    @Step
+    public void seeCheckboxCheced(){
+        waitABit(10000);
+        assertThat(subutaiPage.containerDomainCheckbox.isSelected(), is(true));
+    }
+
+    @Step
+    public void open_local_subutai_page() {
+        subutaiPage.setDefaultBaseUrl(String.format("http://subut.ai/"));
+        subutaiPage.open();
+        waitABit(10000);
+    }
+
+    @Step
+    public void seeDomainContainerIP(){
+        assertThat(subutaiPage.domainContainerIP.isVisible(), is(true));
+    }
+
+    @Step
+    public void compareContainerIP(){
+        assertThat(subutaiPage.compareIP(), is(false));
+    }
+
+    @Step
+    public void clickOnContainerButtonStop(){
+        subutaiPage.containerButtonStop.click();
+        waitABit(3000);
+    }
+
+    @Step
+    public void getIPStoppedContainer(){
+        subutaiPage.getIPContainerStopped();
+    }
+
+    @Step
+    public void seeContainerButtonStart(){
+        waitABit(30000);
+        assertThat(subutaiPage.containerButtonStart.isVisible(), is(true));
+    }
+
+    @Step
+    public void reloadPage(){
+        subutaiPage.pageReload();
+    }
+
+    @Step
+    public void checkForOutOfIP(){
+        assertThat(subutaiPage.checkForOutOfIP(), is(true));
+    }
+
+    @Step
+    public void shouldGetIPDisabledContainer(){
+        subutaiPage.getIPContainerDisabled();
+    }
+
+    @Step
+    public void seeCheckboxUncheck(){
+        waitABit(5000);
+        assertThat(subutaiPage.containerDomainCheckbox.isSelected(), is(false));
+    }
+
+    @Step
+    public void clickOnButtonRemoveDomain(){
+        subutaiPage.enviromentButtonRemoveDomain.click();
+    }
+
+    @Step
+    public void notSeeDomainName(){
+        waitABit(5000);
+        assertThat(subutaiPage.domainBindingText.isVisible(), is(false));
+    }
+
+    @Step
+    public void pageNotFoundMessage(){
+        assertThat(subutaiPage.desabledBindToEnvironment.isVisible() || subutaiPage.unabledToConnect.isVisible(), is(true))  ;
+    }
+
+
+    @Step
+    public void clickOnSomeTubs(){
+        subutaiPage.dyspleyKeysButton.click();
+        waitABit(6000);
+        subutaiPage.stepButton.click();
+        waitABit(6000);
+        subutaiPage.dekryptButton.click();
+        waitABit(6000);
+    }
+
+    @Step
+    public void seeOutputOfTestCommand(){
+        assertThat(subutaiPage.outputOfTestCommand.isVisible(), is(true));
+    }
+
+//    @Step
+//    public void run_bash_script(String file) throws FileNotFoundException {
+//        ExecuteShellCommand executeShellCommand = new ExecuteShellCommand();
+//        executeShellCommand.executeCommand(file);
+//        subutaiPage.pgpStart();
+//    }
 }

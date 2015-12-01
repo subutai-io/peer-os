@@ -195,6 +195,11 @@ public class DefSubutaiStepsThen {
         subutaiSteps.seeOutputOfTestCommand();
     }
 
+    @Then("the user should observe output of the command three received")
+    public void see_output_of_the_test_command_thre_receved(){
+        subutaiSteps.seeOutputOfTestCommandThreeReceived();
+    }
+
     @Then("the user should observe public Key of the resource host in GPG Armored text")
     public void see_resource_host_pgp_header(){
         subutaiSteps.seePGP();
@@ -277,5 +282,78 @@ public class DefSubutaiStepsThen {
     @Then("the user run bash script: reset virtual box and delete vagrant directory")
     public void user_reset_virual_box_and_remove_vagrant_directory() throws FileNotFoundException {
         subutaiSteps.run_bash_script("src/test/resources/files/resetVirtualBox.sh");
+    }
+
+    //-------3117
+
+    @Then("the user observe icon: three containers")
+    public void see_icon_three_containers(){
+        subutaiSteps.seeIconThreeContainers();
+    }
+
+    @Then("the user observe empty Environment domain")
+    public void see_empty_environment_domain(){
+        subutaiSteps.seeEmptyInputDomain();
+    }
+
+    @Then("the user should observe success message")
+    public void see_success_message(){
+        subutaiSteps.seeHeaderSuccess();
+    }
+
+    @Then("the user observe domain name '$domain' assigned to environment")
+    public void see_binding_text(String text){
+        subutaiSteps.clickOnButtonConfigure();
+        subutaiSteps.seeDomainBindingText(text);
+    }
+
+    @Then("the user observe domain strtegy set to round-robin")
+    public void see_domain_strategy_round_robin(){
+        subutaiSteps.roundRobinSelected();
+    }
+
+    @Then("the user check Is container in domain check-box")
+    public void see_cecked_checkbox_container(){
+        subutaiSteps.seeCheckboxCheced();
+    }
+
+    @Then("the user observe page with IP that received request appear")
+    public void see_container_ip_in_domain_page(){
+        subutaiSteps.seeDomainContainerIP();
+    }
+
+    @Then("the user should see diferents IP")
+    public void should_see_diferent_ip(){
+        subutaiSteps.compareContainerIP();
+    }
+
+    @Then("the user should see that container stopped")
+    public void see_that_container_stopped(){
+        subutaiSteps.seeContainerButtonStart();
+    }
+
+    @Then("the user should not observe stopped container IP")
+    public void should_not_observe_stopped_ip(){
+        subutaiSteps.checkForOutOfIP();
+    }
+
+    @Then("the user observe container removed from subut.ai domain")
+    public void see_container_removed(){
+        subutaiSteps.seeCheckboxUncheck();
+    }
+
+    @Then("the user should not observe disabled container IP")
+    public void should_not_observe_disabled_ip(){
+        subutaiSteps.checkForOutOfIP();
+    }
+
+    @Then("the user observe domain name empty to environment")
+    public void not_see_domain_name(){
+        subutaiSteps.notSeeDomainName();
+    }
+
+    @Then("the user should observe web page with container IP won't be available")
+    public void should_observe_page_not_found_message() {
+        subutaiSteps.pageNotFoundMessage();
     }
 }

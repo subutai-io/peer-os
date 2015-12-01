@@ -56,4 +56,19 @@ public class DefSubutaiStepsGiven {
     public void open_vagrant_mghost() throws FileNotFoundException {
         subutaiSteps.open_vagrant_mgh();
     }
+
+    //------3298
+
+    @Given("the user open pgp plugin")
+    public void open_pgp_plugin() throws FileNotFoundException {
+        subutaiSteps.open_mng_h1();
+        subutaiSteps.run_bash_script("src/test/resources/files/pgpStart.sh");
+    }
+
+    //-------3117
+
+    @Given("the user is on subut.ai page")
+    public void open_subutai_local_page(){
+        subutaiSteps.open_local_subutai_page();
+    }
 }

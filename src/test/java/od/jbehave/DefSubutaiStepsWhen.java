@@ -391,4 +391,95 @@ public class DefSubutaiStepsWhen {
     public void user_get_master_ip(){
         subutaiSteps.getContainerIp();
     }
+
+    //---------3117
+
+    @When("the user click on the button: configure")
+    public void click_on_button_configure(){
+        subutaiSteps.clickOnButtonConfigure();
+    }
+
+    @When("the user insert domain '$domain' in input field")
+    public void input_domain(String domain){
+        subutaiSteps.inputDomainInTheField(domain);
+    }
+
+    @When("the user select domain strategy '$strategy'")
+    public void select_domain_strategy(String strategy){
+        subutaiSteps.clickOnSelectMenuDomainStrtegy();
+        subutaiSteps.selectDomainStrtegyRoundRobin(strategy);
+        subutaiSteps.pressEnterOnDomainStrategy();
+    }
+
+    @When("the user add PEM certificate from file")
+    public void add_PEM_certificate(){
+        subutaiSteps.selectFileToUpload();
+    }
+
+    @When("the user press on the button: save")
+    public void press_on_the_button_save(){
+        subutaiSteps.domainClickOnTheButtonSave();
+    }
+
+    @When("the user click on the first container button: configure")
+    public void click_on_the_first_container_button_configure(){
+        subutaiSteps.clickOnFirstContainerButtonConfigure();
+    }
+
+    @When("the user click on the second container button: configure")
+    public void click_on_the_second_container_button_configure(){
+        subutaiSteps.clickOnSecondContainerButtonConfigure();
+    }
+
+    @When("the user click on the third container button: configure")
+    public void click_on_the_third_container_button_configure(){
+        subutaiSteps.clickOnThirdContainerButtonConfigure();
+    }
+
+    @When("the user click on ceckbox")
+    public void click_on_checkbox(){
+        subutaiSteps.clickOnContainerDomainCheckbox();
+    }
+
+    @When("the user click on the button: save")
+    public void click_on_container_checkbow_button_save(){
+        subutaiSteps.clickOnContainerDomainButtonSave();
+    }
+
+    @When("the user compare IP")
+    public void compare_ip_container(){
+        subutaiSteps.compareContainerIP();
+    }
+
+    @When("the user stop some container by pressing Stop button")
+    public void stop_some_container(){
+        subutaiSteps.clickOnContainerButtonStop();
+    }
+
+    @When("the user get ip of stopped container")
+    public void get_ip_of_stopped_container(){
+        subutaiSteps.getIPStoppedContainer();
+    }
+
+    @When("the user press F5 several times")
+    public void reload_page(){
+        subutaiSteps.reloadPage();
+    }
+
+    @When("the user get ip of disabled container")
+    public void get_ip_of_disabled_container(){
+        subutaiSteps.shouldGetIPDisabledContainer();
+    }
+
+    @When("the user click on the button: remove domain")
+    public void click_on_button_remove_domain(){
+        subutaiSteps.clickOnButtonRemoveDomain();
+    }
+
+    //-----3298
+    @When("I do something")
+    public void i_do_something(){
+        subutaiSteps.clickOnSomeTubs();
+    }
+
 }
