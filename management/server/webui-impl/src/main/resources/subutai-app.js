@@ -284,8 +284,6 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 			url: '/404',
 			template: 'Not found'
 		})
-		.state()
-	;
 }
 
 function startup($rootScope, $state, $location, $http) {
