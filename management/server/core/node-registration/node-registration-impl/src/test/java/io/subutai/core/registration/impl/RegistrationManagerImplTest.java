@@ -144,4 +144,6 @@ public class RegistrationManagerImplTest
     {
         registrationManager.removeRequest( uuid.toString() );
     }
+
+
 }
