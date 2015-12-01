@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.security.AccessControlException;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -23,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
 
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.security.crypto.pgp.KeyPair;
@@ -600,7 +602,7 @@ public class KeyManagerImpl implements KeyManager
         }
         catch ( Exception ex )
         {
-            LOG.error( " ***** Error getting security key data:" + ex.toString(),ex );
+            LOG.error( " ***** Error getting security key data:" + ex.toString(), ex );
         }
         return keyIden;
     }
@@ -619,7 +621,7 @@ public class KeyManagerImpl implements KeyManager
         }
         catch ( Exception ex )
         {
-            LOG.error( " ***** Error getting security key data:" + ex.toString(),ex );
+            LOG.error( " ***** Error getting security key data:" + ex.toString(), ex );
         }
         return keyIden;
     }
@@ -644,7 +646,7 @@ public class KeyManagerImpl implements KeyManager
         }
         catch ( Exception ex )
         {
-            LOG.error( "Error removing security key:" + ex.toString(),ex );
+            LOG.error( "Error removing security key:" + ex.toString(), ex );
         }
     }
 
@@ -1217,12 +1219,65 @@ public class KeyManagerImpl implements KeyManager
     }
 
 
-    /* *****************************
-     *
-     */
     @Override
-    public int getTrustLevel( final String sourceIdentityId, final String targetIdentityId )
+    public int getTrustLevel( String sourceFingerprint, String targetFingerprint )
     {
-        return 0;
+        List<SecurityKeyTrust> sourceTrusts = getKeyTrustData( sourceFingerprint );
+        Set<String> sourceChainTrust = Sets.newHashSet();
+        sourceChainTrust.add( sourceFingerprint );
+        int trustLevel = buildTrustChainTrustLevel( sourceFingerprint, sourceChainTrust, targetFingerprint, false );
+
+        if ( trustLevel != -1 )
+        {
+            return trustLevel;
+        }
+
+        Set<String> targetChainTrust = Sets.newHashSet();
+        sourceChainTrust.add( targetFingerprint );
+        trustLevel = buildTrustChainTrustLevel( targetFingerprint, sourceChainTrust, sourceFingerprint, true );
+
+        if ( trustLevel != -1 )
+        {
+            return trustLevel;
+        }
+        return KeyTrustLevel.Never.getId();
+    }
+
+
+    private int buildTrustChainTrustLevel( String source, Set<String> chainFingerprints, String target,
+                                           boolean repeated )
+    {
+        List<SecurityKeyTrust> sourceTrusts = getKeyTrustData( source );
+        for ( final SecurityKeyTrust sourceTrust : sourceTrusts )
+        {
+            if ( sourceTrust.getTargetFingerprint().equals( target ) )
+            {
+                return sourceTrust.getLevel();
+            }
+            // Before getting deeper into trust chain, check that next trust step is valid, otherwise stop looking
+            // for any further connections. Another condition to eliminate infinite recursion by each next step
+            // register id into simple fingerprints registry chainFingerprints
+            if ( sourceTrust.getLevel() != KeyTrustLevel.Never.getId() )
+            {
+                // When looking for second iteration for chained trusts, concurrently pay attention to marginal trust
+                if ( chainFingerprints.contains( sourceTrust.getTargetFingerprint() ) )
+                {
+                    if ( repeated )
+                    {
+                        return KeyTrustLevel.Marginal.getId();
+                    }
+                    continue;
+                }
+                chainFingerprints.add( sourceTrust.getTargetFingerprint() );
+                int trustLevel =
+                        buildTrustChainTrustLevel( sourceTrust.getTargetFingerprint(), chainFingerprints, target,
+                                repeated );
+                if ( trustLevel != -1 )
+                {
+                    return trustLevel;
+                }
+            }
+        }
+        return -1;
     }
 }

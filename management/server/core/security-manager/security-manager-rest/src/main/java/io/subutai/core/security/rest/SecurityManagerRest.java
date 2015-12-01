@@ -130,9 +130,9 @@ public interface SecurityManagerRest
      *
      */
     @PUT
-    @Path( "keyman/trust/allow" )
+    @Path( "keyman/trust/approve" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response allowKey( @QueryParam( "source" ) String source, @QueryParam( "target" ) String target );
+    public Response approveKey( @QueryParam( "source" ) String source, @QueryParam( "target" ) String target );
 
 
     /* *******************************
