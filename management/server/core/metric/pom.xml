@@ -18,7 +18,7 @@
     <module>metric-api</module>
     <module>metric-impl</module>
     <module>metric-cli</module>
-    <module>metric-rest</module>
+    <module>metric-rest-ui</module>
   </modules>
 
 </project>
