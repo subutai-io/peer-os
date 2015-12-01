@@ -342,8 +342,9 @@ public class DefSubutaiStepsWhen {
 
     @When("the user run bash script vagrant")
     public void run_shell_script() throws FileNotFoundException {
-        subutaiSteps.run_bash_script("src/test/resources/files/plugin.sh");
+        subutaiSteps.run_bash_script("src/test/resources/files/vagrant.sh");
     }
+
     @When("the user click on the button: Stop")
     public void click_button_stop(){
         subutaiSteps.clickOnButtonStop();

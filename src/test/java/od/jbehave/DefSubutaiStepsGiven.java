@@ -51,4 +51,9 @@ public class DefSubutaiStepsGiven {
     public void see_blueprint_header(){
         subutaiSteps.seeHeaderBlueprint();
     }
+
+    @Given("the vagrant user is on the home page of Subutai")
+    public void open_vagrant_mghost() throws FileNotFoundException {
+        subutaiSteps.open_vagrant_mgh();
+    }
 }

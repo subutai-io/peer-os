@@ -24,7 +24,7 @@ public class ExecuteShellCommand {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
+        System.out.println(output.toString());
         return output.toString();
 
     }

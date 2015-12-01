@@ -5,12 +5,7 @@ import net.thucydides.core.steps.ScenarioSteps;
 import od.pages.ExecuteShellCommand;
 import od.pages.ReaderFromFile;
 import od.pages.SubutaiPage;
-import od.pages.WriterFile;
 import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.remote.server.handler.ExecuteScript;
-
-import java.io.File;
 import java.io.FileNotFoundException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -69,6 +64,7 @@ public class SubutaiSteps extends ScenarioSteps {
 
     @Step
     public void clickOnMenuItemEnvironments(){
+        waitABit(5000);
         subutaiPage.linkEnvironments.click();
     }
 
@@ -799,5 +795,11 @@ public class SubutaiSteps extends ScenarioSteps {
 
     public void seeOutputOfWrongPingCommand() {
         assertThat(subutaiPage.outputOfWrongPingCommand.isVisible(), is(true));
+    }
+
+    @Step
+    public void open_vagrant_mgh() throws FileNotFoundException {
+        subutaiPage.setDefaultBaseUrl(String.format("https://%s:8443/", ReaderFromFile.readDataFromFile("src/test/resources/parameters/vagrantMH_IP")));
+        subutaiPage.open();
     }
 }

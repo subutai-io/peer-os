@@ -130,7 +130,7 @@ public class SubutaiPage extends PageObject {
     @FindBy(xpath = "*//div[@class=\"sweet-alert showSweetAlert visible\"]//h2[contains(text(), \"Deleted\")]")
     public WebElementFacade headerBlueprintDeleted;
 
-    @FindBy(xpath = "*//div[@class=\"sweet-alert showSweetAlert visible\"]//p[contains(text(), \"Your environment start deleting!\")]")
+    @FindBy(xpath = "*//div[@class=\"sweet-alert showSweetAlert visible\"]//p[contains(text(), \"Your environment is being deleted!\")]")
     public WebElementFacade textYourEnvironmentStartDeleting;
 
     @FindBy(xpath = "*//div[@class=\"sweet-alert showSweetAlert visible\"]//p[contains(text(), \"Your environment has been destroyed.\")]")

@@ -5,8 +5,12 @@ As a QA
 I want to verify the PLAYBOOK SS-3297
 So that I will create test scenarios
 
-Scenario: Create Environment
+Scenario: The user run  vagrant console commands using script
 Given the first user is on the home page of Subutai
+When the user run bash script vagrant
+
+Scenario: Create Environment
+Given the vagrant user is on the home page of Subutai
 And the user enter login and password: 'admin', 'secret'
 And the user click on the button: Login
 When the user click on the menu item: Environment
@@ -49,7 +53,7 @@ And the user enter console command: 'ping management -c 3'
 Then the user verify output console command and observe expected phrase: '3 packets transmitted, 3 received, 0% packet loss'
 
 Scenario: Destroy Environment and Blueprint
-Given the first user is on the home page of Subutai
+Given the vagrant user is on the home page of Subutai
 When the user click on the menu item: Environment
 And the user click on the menu item: Blueprint
 And the user click on the icon: Remove
@@ -64,3 +68,4 @@ Then the user observe text: Your environment start deleting!
 When the user click on the button: OK
 Then the user observe text: Your environment has been destroyed.
 And the user observe text: No data available in table
+And the user run bash script: reset virtual box and delete vagrant directory

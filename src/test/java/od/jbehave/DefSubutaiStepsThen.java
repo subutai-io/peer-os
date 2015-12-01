@@ -93,7 +93,7 @@ public class DefSubutaiStepsThen {
 
     @Then("the user observe header: Deleted")
     public void see_header_blueprint_deleted(){
-        subutaiSteps.waitHeaderBlueprintDeleted();
+//        subutaiSteps.waitHeaderBlueprintDeleted();
         subutaiSteps.seeHeaderBlueprintDeleted();
     }
 
@@ -272,5 +272,10 @@ public class DefSubutaiStepsThen {
         subutaiSteps.environmentPGPKey();
 //        subutaiSteps.waitABit(10000);
         subutaiSteps.observeEnvironmentPGPKey();
+    }
+
+    @Then("the user run bash script: reset virtual box and delete vagrant directory")
+    public void user_reset_virual_box_and_remove_vagrant_directory() throws FileNotFoundException {
+        subutaiSteps.run_bash_script("src/test/resources/files/resetVirtualBox.sh");
     }
 }
