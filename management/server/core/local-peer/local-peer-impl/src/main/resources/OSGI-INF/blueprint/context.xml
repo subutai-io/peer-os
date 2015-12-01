@@ -17,7 +17,6 @@
   <cm:property-placeholder persistent-id="peer" update-strategy="none">
     <cm:default-properties>
       <cm:property name="externalIpInterface" value="eth1" />
-      <cm:property name="keyTrustCheckEnabled" value="false" />
     </cm:default-properties>
   </cm:property-placeholder>
 
