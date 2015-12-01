@@ -20,14 +20,14 @@ function print_help() {
 function choice_mngh1(){
     cd /home/ubuntu/playbooks-newui
     mh1=$OPTARG;
-    ./node-approve $mg1
+    ./node-approve $mh1
     echo "$mh1" > src/test/resources/parameters/mng_h1
 }
 
 function choice_mngh2(){
     cd /home/ubuntu/playbooks-newui
     mh2=$OPTARG;
-    ./node-approve $mg2
+    ./node-approve $mh2
     echo "$mh2" > src/test/resources/parameters/mng_h2
 }
 
