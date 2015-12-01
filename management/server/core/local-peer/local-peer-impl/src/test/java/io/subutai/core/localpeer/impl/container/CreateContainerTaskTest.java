@@ -8,23 +8,16 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ResourceHost;
-import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.settings.Common;
 import io.subutai.core.hostregistry.api.HostRegistry;
 
-import static junit.framework.TestCase.assertFalse;
-import static junit.framework.TestCase.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
@@ -59,8 +52,7 @@ public class CreateContainerTaskTest
     @Before
     public void setUp() throws Exception
     {
-        task = new CreateContainerTask( hostRegistry, resourceHost, template, HOSTNAME, CIDR, VLAN,
-                TIMEOUT/*, ENV_ID*/ );
+        task = new CreateContainerTask( hostRegistry, resourceHost, template, HOSTNAME, CIDR, VLAN, TIMEOUT, ENV_ID );
         task.commandUtil = commandUtil;
         when( resourceHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
         when( commandResult.hasSucceeded() ).thenReturn( true );
@@ -71,57 +63,16 @@ public class CreateContainerTaskTest
     }
 
 
-    @Test( expected = ResourceHostException.class )
-    public void testPrepareTemplate() throws Exception
-    {
-        when( commandResult.getStdOut() ).thenReturn( "" );
-        task.prepareTemplate( template );
-    }
-
-
-    @Test( expected = ResourceHostException.class )
-    public void testIsTemplateExists() throws Exception
-    {
-        assertTrue( task.templateExists( template ) );
-
-        when( commandResult.getStdOut() ).thenReturn( "" );
-
-        assertFalse( task.templateExists( template ) );
-
-        doThrow( new CommandException( "" ) ).when( resourceHost ).execute( any( RequestBuilder.class ) );
-
-        task.templateExists( template );
-    }
-
-
-    @Test( expected = ResourceHostException.class )
-    public void testImportTemplate() throws Exception
-    {
-        task.importTemplate( template );
-
-        verify( commandUtil ).execute( any( RequestBuilder.class ), eq( resourceHost ) );
-
-        doThrow( new CommandException( "" ) ).when( commandUtil )
-                                             .execute( any( RequestBuilder.class ), eq( resourceHost ) );
-
-        task.importTemplate( template );
-    }
-
-
     @Test
     @Ignore
     public void testCall() throws Exception
     {
         task.call();
 
-        //        verify( containerHost ).setDefaultGateway( GATEWAY );
-
-        CreateContainerTask task = new CreateContainerTask( hostRegistry, resourceHost, template, HOSTNAME, CIDR, VLAN,
-                TIMEOUT/*, ENV_ID*/ );
+        CreateContainerTask task =
+                new CreateContainerTask( hostRegistry, resourceHost, template, HOSTNAME, CIDR, VLAN, TIMEOUT, ENV_ID );
         task.commandUtil = commandUtil;
 
         task.call();
-
-        //        verify( containerHost, times( 2 ) ).setDefaultGateway( GATEWAY );
     }
 }
