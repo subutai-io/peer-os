@@ -234,6 +234,16 @@ public class DefSubutaiStepsWhen {
         subutaiSteps.executeConsoleCommand(command);
     }
 
+    @When("the user enter console command ping")
+    public void ping_container(){
+        subutaiSteps.executeConsoleCommand("ping " + subutaiSteps.containerIp + " -c 3");
+    }
+
+    @When("the user should wait")
+    public void user_wait(){
+        subutaiSteps.waitABit(20000);
+    }
+
     @When("the user enter console command: subutai import hadoop")
     public void execute_console_command_subutai_import_hadoop(){
         subutaiSteps.executeConsoleCommand("subutai import hadoop");

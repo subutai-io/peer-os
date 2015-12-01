@@ -220,6 +220,16 @@ public class DefSubutaiStepsThen {
         subutaiSteps.seeOutputOfPwdCommand();
     }
 
+    @Then("the user should observe output of the ping command")
+    public void user_observe_output_of_ping_command(){
+        subutaiSteps.seeOutputOfPingCommand();
+    }
+
+    @Then("the user should observe output of the wrong ping command")
+    public void user_observe_output_of_wrong_ping_command(){
+        subutaiSteps.seeOutputOfWrongPingCommand();
+    }
+
     @Then("the user observe text: Token")
     public void user_observe_text_token(){
         subutaiSteps.seeTextToken();
