@@ -28,6 +28,10 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>environment-manager-api</artifactId>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>local-peer-api</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>com.google.guava</groupId>

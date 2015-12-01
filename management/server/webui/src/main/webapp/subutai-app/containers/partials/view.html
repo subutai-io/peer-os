@@ -12,7 +12,7 @@
 					Environment
 				</label>
 				<select class="b-popup-body-input b-popup-body-input_min" 
-					ng-change="containerViewCtrl.getContainers()" 
+					ng-change="containerViewCtrl.filterContainersList()" 
 					id="subt_select__containers-environment" 
 					ng-model="containerViewCtrl.environmentId">
 					<option value="">All</option>
@@ -31,7 +31,7 @@
 					Container Type
 				</label>
 				<select class="b-popup-body-input b-popup-body-input_min" 
-					ng-change="containerViewCtrl.getContainers()" 
+					ng-change="containerViewCtrl.filterContainersList()" 
 					id="subt_select__containers-type" 
 					ng-model="containerViewCtrl.containersTypeId">
 					<option value="">All</option>
@@ -47,7 +47,7 @@
 					Container Status
 				</label>
 				<select class="b-popup-body-input b-popup-body-input_min" 
-					ng-change="containerViewCtrl.getContainers()" 
+					ng-change="containerViewCtrl.filterContainersList()" 
 					id="subt_select__containers-status" 
 					ng-model="containerViewCtrl.containerState">
 					<option value="">All</option>

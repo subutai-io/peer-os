@@ -43,8 +43,29 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 			}
 		})
 		.state('home', {
-			url: '',
-			templateUrl: 'subutai-app/home/partials/view.html'
+			url: '/',
+			templateUrl: 'subutai-app/monitoring/partials/view.html',
+			resolve: {
+				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+					return $ocLazyLoad.load([
+						{
+							name: 'chart.js',
+							files: [
+								'css/libs/angular-chart.min.css',
+								'assets/js/plugins/angular-chart.min.js'
+							]
+						},
+						{
+							name: 'subutai.monitoring',
+							files: [
+								'subutai-app/monitoring/monitoring.js',
+								'subutai-app/monitoring/controller.js',
+								'subutai-app/monitoring/service.js'
+							]
+						}
+					]);
+				}]
+			}
 		})
 		.state('blueprints', {
 			url: '/blueprints',
@@ -674,25 +695,46 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 				}]
 			}
 		})
+		.state('nodeReg', {
+			url: '/nodeReg',
+			templateUrl: 'subutai-app/nodeReg/partials/view.html',
+			resolve: {
+				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+					return $ocLazyLoad.load(
+						{
+							name: 'subutai.nodeReg',
+							files: [
+								'subutai-app/nodeReg/nodeReg.js',
+								'subutai-app/nodeReg/controller.js',
+								'subutai-app/nodeReg/service.js',
+								'subutai-app/environment/service.js'
+							]
+						});
+				}]
+			}
+		})
 		.state('generic', {
-        			url: '/plugins/generic',
-        			templateUrl: 'plugins/generic/partials/view.html',
-        			resolve: {
-        				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
-        					return $ocLazyLoad.load([
-        						{
-        							name: 'subutai.plugins.generic',
-        							files: [
-        								'plugins/generic/generic.js',
-        								'plugins/generic/controller.js',
-        								'plugins/generic/service.js',
-        								'subutai-app/environment/service.js'
-        							]
-        						}
-        					]);
-        				}]
-        			}
-        		})
+			url: '/plugins/generic',
+			templateUrl: 'plugins/generic/partials/view.html',
+			resolve: {
+				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+					return $ocLazyLoad.load([
+						{
+							name: 'vtortola.ng-terminal'
+						},
+						{
+							name: 'subutai.plugins.generic',
+							files: [
+								'plugins/generic/generic.js',
+								'plugins/generic/controller.js',
+								'plugins/generic/service.js',
+								'subutai-app/environment/service.js'
+							]
+						}
+					]);
+				}]
+			}
+		})
 		.state('404', {
 			url: '/404',
 			template: 'Not found'
@@ -707,7 +749,6 @@ function startup($rootScope, $state, $location, $http) {
 			$location.path('/login');
 		}
 	});
-	$http.defaults.headers.common['sptoken'] = getCookie('sptoken');
 
 	$rootScope.$state = $state;
 }
@@ -737,6 +778,8 @@ app.directive('dropdownMenu', function() {
 			//colEqualHeight();
 
 			$('.b-nav-menu-link').on('click', function(){
+				$('.b-nav-menu_active').removeClass('b-nav-menu_active')
+				$('.b-nav-menu__sub').slideUp(200);
 				if($(this).next('.b-nav-menu__sub').length > 0) {
 					if($(this).parent().hasClass('b-nav-menu_active')) {
 						$(this).parent().removeClass('b-nav-menu_active');
@@ -772,6 +815,7 @@ app.directive('checkbox-list-dropdown', function() {
 });
 
 //Global variables
+
 var SERVER_URL = '/';
 
 var STATUS_UNDER_MODIFICATION = 'UNDER_MODIFICATION';

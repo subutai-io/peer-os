@@ -903,6 +903,21 @@ public class RestServiceImpl implements RestService
     }
 
 
+    @Override
+    public Response setupContainerSsh( final String environmentId, final String containerId )
+    {
+        try
+        {
+            return Response.ok( environmentManager.setupContainerSsh( containerId, environmentId ) ).build();
+        }
+        catch( Exception e )
+        {
+            return Response.status( Response.Status.BAD_REQUEST ).entity( e ).build();
+        }
+    }
+
+
+
     /** AUX *****************************************************/
 
     private Set<ContainerDto> convertContainersToContainerJson( Set<EnvironmentContainerHost> containerHosts )

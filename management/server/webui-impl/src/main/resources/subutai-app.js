@@ -6,7 +6,8 @@ var app = angular.module('subutai-app', [
 		'oitozero.ngSweetAlert',
 		'ngDialog',
 		'datatables',
-		'720kb.tooltips'
+		'720kb.tooltips',
+		'ngTagsInput'
 	])
 	.config(routesConf)
 	.run(startup);
@@ -42,8 +43,29 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 			}
 		})
 		.state('home', {
-			url: '',
-			templateUrl: 'subutai-app/home/partials/view.html'
+			url: '/',
+			templateUrl: 'subutai-app/monitoring/partials/view.html',
+			resolve: {
+				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+					return $ocLazyLoad.load([
+						{
+							name: 'chart.js',
+							files: [
+								'css/libs/angular-chart.min.css',
+								'assets/js/plugins/angular-chart.min.js'
+							]
+						},
+						{
+							name: 'subutai.monitoring',
+							files: [
+								'subutai-app/monitoring/monitoring.js',
+								'subutai-app/monitoring/controller.js',
+								'subutai-app/monitoring/service.js'
+							]
+						}
+					]);
+				}]
+			}
 		})
 		.state('blueprints', {
 			url: '/blueprints',
@@ -113,13 +135,6 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 			resolve: {
 				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
 					return $ocLazyLoad.load([
-						{
-							name: 'ngTagsInput',
-							files: [
-								'css/libs/ng-tags-input.min.css',
-								'assets/js/plugins/ng-tags-input.min.js'
-							]
-						},
 						{
 							name: 'subutai.containers',
 							files: [
@@ -267,7 +282,8 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 			url: '/404',
 			template: 'Not found'
 		})
-		.state();
+		.state()
+	;
 }
 
 function startup($rootScope, $state, $location, $http) {
@@ -278,7 +294,6 @@ function startup($rootScope, $state, $location, $http) {
 			$location.path('/login');
 		}
 	});
-	$http.defaults.headers.common['sptoken'] = getCookie('sptoken');
 
 	$rootScope.$state = $state;
 }
@@ -308,6 +323,8 @@ app.directive('dropdownMenu', function() {
 			//colEqualHeight();
 
 			$('.b-nav-menu-link').on('click', function(){
+				$('.b-nav-menu_active').removeClass('b-nav-menu_active')
+				$('.b-nav-menu__sub').slideUp(200);
 				if($(this).next('.b-nav-menu__sub').length > 0) {
 					if($(this).parent().hasClass('b-nav-menu_active')) {
 						$(this).parent().removeClass('b-nav-menu_active');
@@ -331,7 +348,6 @@ app.directive('checkbox-list-dropdown', function() {
 	return {
 		restrict: 'A',
 		link: function(scope, element, attr) {
-			console.log('lololo');
 			$('.b-form-input_dropdown').click(function () {
 				$(this).toggleClass('is-active');
 			});
@@ -344,6 +360,7 @@ app.directive('checkbox-list-dropdown', function() {
 });
 
 //Global variables
+
 var SERVER_URL = '/';
 
 var STATUS_UNDER_MODIFICATION = 'UNDER_MODIFICATION';

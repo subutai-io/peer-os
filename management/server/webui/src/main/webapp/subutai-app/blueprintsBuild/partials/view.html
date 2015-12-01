@@ -52,7 +52,7 @@
 				<label class="b-popup-body-label b-popup-body-label_inline">Build Type</label>
 				<select class="b-popup-body-input b-popup-body-input_enviroment-name" 
 					ng-model="blueprintsBuildCtrl.buildWith">
-					<option value="strategie">Strategy</option>
+					<option value="strategy">Strategy</option>
 					<option value="resources">Resource Host</option>
 				</select>
 				<div class="clear"></div>
@@ -65,7 +65,7 @@
 					<th>Node group</th>
 					<th>Amount of containers</th>
 					<th>Peer</th>
-					<th class="b-main-table__capitalize">{{ blueprintsBuildCtrl.buildWith }}</th>
+					<th class="b-main-table__capitalize">Placement</th>
 					<th></th>
 				</tr>
 				<tr ng-repeat="(key, nodeGroup) in blueprintsBuildCtrl.transportNodes">
@@ -117,6 +117,7 @@
 					</td>
 					<td>
 						<a href class="b-btn b-btn_green subt_button__environment-place" 
+						style="width: 52px;" 
 						ng-click="blueprintsBuildCtrl.placeNode(nodeGroup, key)">
 							<i class="b-icon b-icon_box-white b-icon_box-white_place"></i> Place
 						</a>

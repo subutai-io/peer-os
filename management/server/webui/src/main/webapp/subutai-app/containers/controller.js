@@ -19,7 +19,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 	vm.domainContainer = {};
 
 	// functions
-	vm.getContainers = getContainers;
+	vm.filterContainersList = filterContainersList;
 	vm.containerAction = containerAction;
 	vm.destroyContainer = destroyContainer;
 	vm.addTagForm = addTagForm;
@@ -112,8 +112,8 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 
 			if(currentArrayString != serverArrayString) {
 				vm.environments = data;
-				filterContainersList();
 			}
+			filterContainersList();
 		});
 	}
 	getContainers();

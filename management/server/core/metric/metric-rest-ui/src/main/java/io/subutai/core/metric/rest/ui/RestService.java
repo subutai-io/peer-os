@@ -15,4 +15,14 @@ public interface RestService
     @Path( "{environment_id}/{host_id}/{interval}" )
     @Produces( { MediaType.APPLICATION_JSON } )
     Response getMetrics( @PathParam( "environment_id" ) String environmentId, @PathParam( "host_id" ) String hostId, @PathParam( "interval" ) int interval );
+
+    @GET
+    @Path( "{host_id}/{interval}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response getMetrics( @PathParam( "host_id" ) String hostId, @PathParam( "interval" ) int interval );
+
+    @GET
+    @Path( "{interval}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response getMetrics( @PathParam( "interval" ) int interval );
 }

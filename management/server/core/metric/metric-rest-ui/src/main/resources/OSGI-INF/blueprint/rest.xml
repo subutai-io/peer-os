@@ -17,9 +17,13 @@
   <reference id="environmentManager" availability="mandatory"
              interface="io.subutai.core.environment.api.EnvironmentManager" />
 
+  <reference id="localPeer" availability="mandatory"
+             interface="io.subutai.common.peer.LocalPeer" />
+
   <bean id="metricsRestUIServiceImpl" class="io.subutai.core.metric.rest.ui.RestServiceImpl">
     <argument ref="monitor" />
     <argument ref="environmentManager" />
+    <argument ref="localPeer" />
   </bean>
 
   <jaxrs:server address="/ui/metrics" id="metricsRestUIService">

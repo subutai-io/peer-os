@@ -37,7 +37,7 @@ public class Login extends HttpServlet
                 {
                     request.getSession().setAttribute( "userSessionData", token );
                     Cookie cookie = new Cookie( "sptoken", token );
-                    cookie.setMaxAge( 3600 * 3 );
+                    cookie.setMaxAge( 1800 );
                     response.addCookie( cookie );
                 }
                 else

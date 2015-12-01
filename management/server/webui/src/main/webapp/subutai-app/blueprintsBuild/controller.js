@@ -144,6 +144,7 @@ function BlueprintsBuildCtrl($scope, environmentService, SweetAlert, ngDialog, $
 		} else {
 			var temp = angular.copy(node);
 			temp.parentNode = parentKey;
+			temp.placement = angular.copy(vm.buildWith);
 			temp.numberOfContainers = node.options.start;			
 			vm.nodesToCreate.push(temp);
 		}
@@ -173,6 +174,7 @@ function BlueprintsBuildCtrl($scope, environmentService, SweetAlert, ngDialog, $
 				if(
 					currentNode.peer == node.peer && 
 					currentNode.name == node.name && 
+					currentNode.createOption == node.createOption && 
 					currentNode.templateName == node.templateName
 				) {
 					return i;
@@ -218,7 +220,7 @@ function BlueprintsBuildCtrl($scope, environmentService, SweetAlert, ngDialog, $
 			if(vm.nodesToCreate[i] !== null) {
 				var currentNodeGroup = angular.copy(vm.blueprint.nodeGroups[vm.nodesToCreate[i].parentNode]);
 
-				if(vm.buildWith == 'strategy') {
+				if(vm.nodesToCreate[i].placement == 'strategy') {
 					var containerPlacementStrategy = {"strategyId": vm.nodesToCreate[i].createOption, "criteria": []};
 					currentNodeGroup.containerPlacementStrategy = containerPlacementStrategy;
 				} else {
