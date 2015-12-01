@@ -249,6 +249,8 @@ public class RestServiceImpl implements RestService
         {
             Blueprint blueprint = gson.fromJson( blueprintJson, Blueprint.class );
 
+            updateContainerPlacementStrategy( blueprint );
+
             Set<EnvironmentContainerHost> environment =
                     environmentManager.growEnvironment( environmentId, blueprint, false );
         }
