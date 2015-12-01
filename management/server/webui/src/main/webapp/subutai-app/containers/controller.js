@@ -3,9 +3,9 @@
 angular.module('subutai.containers.controller', ['ngTagsInput'])
 	.controller('ContainerViewCtrl', ContainerViewCtrl);
 
-ContainerViewCtrl.$inject = ['$scope', 'environmentService', 'SweetAlert', 'DTOptionsBuilder', 'DTColumnDefBuilder', '$stateParams', 'ngDialog'];
+ContainerViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'SweetAlert', 'DTOptionsBuilder', 'DTColumnDefBuilder', '$stateParams', 'ngDialog', '$timeout'];
 
-function ContainerViewCtrl($scope, environmentService, SweetAlert, DTOptionsBuilder, DTColumnDefBuilder, $stateParams, ngDialog) {
+function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, DTOptionsBuilder, DTColumnDefBuilder, $stateParams, ngDialog, $timeout) {
 
 	var vm = this;
 	vm.environments = [];
@@ -19,10 +19,9 @@ function ContainerViewCtrl($scope, environmentService, SweetAlert, DTOptionsBuil
 	vm.domainContainer = {};
 
 	// functions
-	vm.getContainers = getContainers;
+	vm.filterContainersList = filterContainersList;
 	vm.containerAction = containerAction;
 	vm.destroyContainer = destroyContainer;
-	vm.addToDomain = addToDomain;
 	vm.addTagForm = addTagForm;
 	vm.addTags = addTags;
 	vm.removeTag = removeTag;
@@ -34,11 +33,16 @@ function ContainerViewCtrl($scope, environmentService, SweetAlert, DTOptionsBuil
 	});
 
 	function showDomainForm(container) {
+		LOADING_SCREEN();
 		vm.currentDomainStatus = {};
 		vm.domainContainer = container;
 		environmentService.getContainerDomain(container).success(function (data) {
 			vm.currentDomainStatus = data;
+			LOADING_SCREEN('none');
 			console.log(vm.currentDomainStatus);
+		}).error(function(error){
+			LOADING_SCREEN('none');
+			ngDialog.closeAll();
 		});
 		ngDialog.open({
 			template: 'subutai-app/containers/partials/addToDomain.html',
@@ -51,16 +55,6 @@ function ContainerViewCtrl($scope, environmentService, SweetAlert, DTOptionsBuil
 			vm.currentDomainStatus = data;
 		});
 		ngDialog.closeAll();
-	}
-
-	function getEnvironments() {
-		environmentService.getEnvironments().success(function (data) {
-			vm.environments = data;
-		});
-	}
-
-	function addToDomain(container) {
-		console.log(container);
 	}
 
 	function addTagForm(container) {
@@ -96,20 +90,43 @@ function ContainerViewCtrl($scope, environmentService, SweetAlert, DTOptionsBuil
 	}
 
 	function getContainers() {
-		vm.containers = [];
-		if(vm.environments.length < 1){
-			environmentService.getEnvironments().success(function (data) {
-				vm.environments = data;
-				filterContainersList();
+		environmentService.getEnvironments().success(function (data) {
+
+			for(var i = 0; i < data.length; i++) {
+				data[i].containers.sort(compare);
+			}
+			data.sort(compare);
+
+			var currentArrayString = JSON.stringify(vm.environments, function( key, value ) {
+				if( key === "$$hashKey" ) {
+					return undefined;
+				}
+				return value;
 			});
-		} else {
+			var serverArrayString = JSON.stringify(data, function( key, value ) {
+				if( key === "$$hashKey" ) {
+					return undefined;
+				}
+				return value;
+			});
+
+			if(currentArrayString != serverArrayString) {
+				vm.environments = data;
+			}
 			filterContainersList();
-		}
+		});
 	}
 	getContainers();
 
+	function compare(a,b) {
+		if (a.id < b.id) return -1;
+		if (a.id > b.id) return 1;
+		return 0;
+	}
+
 	function filterContainersList() {
 		vm.allTags = [];
+		vm.containers = [];
 		for(var i in vm.environments) {
 			if(
 				vm.environmentId == vm.environments[i].id || 
@@ -149,6 +166,20 @@ function ContainerViewCtrl($scope, environmentService, SweetAlert, DTOptionsBuil
 		DTColumnDefBuilder.newColumnDef(6).notSortable()
 	];
 
+	var refreshTable;
+	var reloadTableData = function() {
+		refreshTable = $timeout(function myFunction() {
+			getContainers();
+			refreshTable = $timeout(reloadTableData, 30000);
+		}, 30000);
+	};
+	reloadTableData();
+
+	$rootScope.$on('$stateChangeStart',	function(event, toState, toParams, fromState, fromParams){
+		console.log('cancel');
+		$timeout.cancel(refreshTable);
+	});
+
 	function destroyContainer(containerId, key) {
 		SweetAlert.swal({
 			title: "Are you sure?",
@@ -184,9 +215,9 @@ function ContainerViewCtrl($scope, environmentService, SweetAlert, DTOptionsBuil
 		}
 
 		environmentService.switchContainer(vm.containers[key].id, action).success(function (data) {
-			environmentService.getContainerStatus(vm.containers[key].id).success(function (data) {
+			/*environmentService.getContainerStatus(vm.containers[key].id).success(function (data) {
 				vm.containers[key].state = data.STATE;
-			});				
+			});*/
 		});		
 	}
 

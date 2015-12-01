@@ -243,7 +243,7 @@ public interface EnvironmentManager
      *
      * @return port for ssh connection
      */
-    public int setupContainerSsh( final String containerHostId, final String environmentId )
+    int setupContainerSsh( final String containerHostId, final String environmentId )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException;
 
     void removeContainerFromEnvironmentDomain( String containerHostId, String environmentId )

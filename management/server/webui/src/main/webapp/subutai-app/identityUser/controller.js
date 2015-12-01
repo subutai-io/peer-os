@@ -132,7 +132,7 @@ function IdentityUserCtrl($scope, identitySrv, DTOptionsBuilder, DTColumnBuilder
 	function deleteUser(user) {
 		SweetAlert.swal({
 			title: "Are you sure?",
-			text: "Your will not be able to recover this user!",
+			text: "You will not be able to recover this user!",
 			type: "warning",
 			showCancelButton: true,
 			confirmButtonColor: "#ff3f3c",

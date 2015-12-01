@@ -4,12 +4,12 @@ angular.module('subutai.environment.controller', [])
 	.controller('EnvironmentViewCtrl', EnvironmentViewCtrl)
 	.directive('fileModel', fileModel);
 
-EnvironmentViewCtrl.$inject = ['$scope', 'environmentService', 'SweetAlert', 'DTOptionsBuilder', 'DTColumnBuilder', '$resource', '$compile', 'ngDialog', '$timeout'];
+EnvironmentViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'SweetAlert', 'DTOptionsBuilder', 'DTColumnBuilder', '$resource', '$compile', 'ngDialog', '$timeout'];
 fileModel.$inject = ['$parse'];
 
 var fileUploder = {};
 
-function EnvironmentViewCtrl($scope, environmentService, SweetAlert, DTOptionsBuilder, DTColumnBuilder, $resource, $compile, ngDialog, $timeout) {
+function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert, DTOptionsBuilder, DTColumnBuilder, $resource, $compile, ngDialog, $timeout) {
 
 	var vm = this;
 	vm.environments = [];
@@ -51,20 +51,25 @@ function EnvironmentViewCtrl($scope, environmentService, SweetAlert, DTOptionsBu
 		//DTColumnBuilder.newColumn('id').withTitle('ID'),
 		DTColumnBuilder.newColumn('status').withTitle('').notSortable().renderWith(statusHTML),
 		DTColumnBuilder.newColumn(null).withTitle('Environment name').renderWith(environmentNameTooltip),
-		DTColumnBuilder.newColumn(null).withTitle('Key SSH').renderWith(sshKeyLinks),
+		DTColumnBuilder.newColumn(null).withTitle('SSH Key').renderWith(sshKeyLinks),
 		DTColumnBuilder.newColumn(null).withTitle('Domains').renderWith(domainsTag),
 		DTColumnBuilder.newColumn(null).withTitle('').renderWith(containersTags),
 		DTColumnBuilder.newColumn(null).withTitle('').notSortable().renderWith(actionDelete)
 	];
 
-	/*vm.reloadTableData = function() {
-		vm.refreshTable = $timeout(function myFunction() {
+	var refreshTable;
+	var reloadTableData = function() {
+		refreshTable = $timeout(function myFunction() {
 			vm.dtInstance.reloadData(null, false);
-			console.log('lololo');
-			vm.refreshTable = $timeout(vm.reloadTableData, 3000);
-		}, 3000);
+			refreshTable = $timeout(reloadTableData, 30000);
+		}, 30000);
 	};
-	vm.reloadTableData();*/
+	reloadTableData();
+
+	$rootScope.$on('$stateChangeStart',	function(event, toState, toParams, fromState, fromParams){
+		console.log('cancel');
+		$timeout.cancel(refreshTable);
+	});
 
 	function createdRow(row, data, dataIndex) {
 		$compile(angular.element(row).contents())($scope);
@@ -152,7 +157,7 @@ function EnvironmentViewCtrl($scope, environmentService, SweetAlert, DTOptionsBu
 	function destroyContainer(containerId) {
 		SweetAlert.swal({
 			title: "Are you sure?",
-			text: "Your will not be able to recover this Container!",
+			text: "You will not be able to recover this Container!",
 			type: "warning",
 			showCancelButton: true,
 			confirmButtonColor: "#ff3f3c",
@@ -177,7 +182,7 @@ function EnvironmentViewCtrl($scope, environmentService, SweetAlert, DTOptionsBu
 	function destroyEnvironment(environmentId) {
 		SweetAlert.swal({
 				title: "Are you sure?",
-				text: "Your will not be able to recover this Environment!",
+				text: "You will not be able to recover this Environment!",
 				type: "warning",
 				showCancelButton: true,
 				confirmButtonColor: "#ff3f3c",
@@ -189,7 +194,7 @@ function EnvironmentViewCtrl($scope, environmentService, SweetAlert, DTOptionsBu
 			},
 			function (isConfirm) {
 				if (isConfirm) {
-					SweetAlert.swal("Delete!", "Your environment start deleting!", "success");
+					SweetAlert.swal("Delete!", "Your environment is being deleted!", "success");
 					environmentService.destroyEnvironment(environmentId).success(function (data) {
 						SweetAlert.swal("Destroyed!", "Your environment has been destroyed.", "success");
 						vm.dtInstance.reloadData(null, false);
@@ -214,8 +219,8 @@ function EnvironmentViewCtrl($scope, environmentService, SweetAlert, DTOptionsBu
 		var enviroment = vm.environments[vm.enviromentSSHKey.environmentKey];
 		environmentService.setSshKey(vm.enviromentSSHKey.key, enviroment.id).success(function (data) {
 			SweetAlert.swal("Success!", "You successfully add SSH key for " + enviroment.id + " environment!", "success");
-		}).error(function (data) {
-			SweetAlert.swal("Cancelled", "Error: " + data.ERROR, "error");
+		}).error(function (error) {
+			SweetAlert.swal("Cancelled", "Error: " + error.ERROR, "error");
 		});
 	}
 
@@ -270,13 +275,15 @@ function EnvironmentViewCtrl($scope, environmentService, SweetAlert, DTOptionsBu
 
 	function setDomain(domain) {
 		var file = fileUploder;
+		LOADING_SCREEN();
 		environmentService.setDomain(domain, vm.environmentForDomain, file).success(function (data) {
 			SweetAlert.swal("Success!", "You successfully add domain for " + vm.environmentForDomain + " environment!", "success");
 			ngDialog.closeAll();
-			console.log(data);
+			LOADING_SCREEN('none');
 		}).error(function (data) {
 			SweetAlert.swal("Cancelled", "Error: " + data.ERROR, "error");
 			ngDialog.closeAll();
+			LOADING_SCREEN('none');
 		});
 	}
 
