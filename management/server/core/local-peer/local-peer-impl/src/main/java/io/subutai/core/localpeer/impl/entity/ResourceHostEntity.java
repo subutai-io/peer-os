@@ -455,8 +455,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         }
 
         Future<ContainerHostInfo> containerHostFuture = queueSequentialTask(
-                new CreateContainerTask( hostRegistry, this, template, hostname, ip, vlan,
-                        timeout/*, environmentId*/ ) );
+                new CreateContainerTask( hostRegistry, this, template, hostname, ip, vlan, timeout, environmentId ) );
 
         try
         {

@@ -9,9 +9,8 @@ public class Common
     public static final String SUBUTAI_APP_KEYSTORES_PATH = System.getProperty( "subutaiKeystorePath" );
     public static final String SUBUTAI_APP_CERTS_PATH = System.getProperty( "subutaiCertsPath" );
     public static final String DEFAULT_CONTAINER_INTERFACE = "eth0";
-    public static final String MANAGEMENT_HOST_EXTERNAL_IP_INTERFACE = "eth1";
-    public static final int WAIT_CONTAINER_CONNECTION_SEC = 300;
-    public static final int REFRESH_UI_SEC = 3;
+    //10 hours including possible template download
+    public static final int WAIT_CONTAINER_CONNECTION_SEC = 10 * 60 * 60;
     public static final int BROKER_MESSAGE_TIMEOUT_SEC = 30;
     public static final int MIN_COMMAND_TIMEOUT_SEC = 1;
     public static final int MAX_COMMAND_TIMEOUT_SEC = 100 * 60 * 60; // 100 hours
@@ -27,12 +26,6 @@ public class Common
                     + "61}[a-zA-Z0-9]))*$";
     public static final int MAX_CONTAINER_NAME_LEN = 64;
 
-    public static final String HEADER_ENV_ID_TARGET = "ENV_ID_OUT";
-    public static final String HEADER_ENV_ID_SOURCE = "ENV_ID_IN";
-    public static final String HEADER_PEER_ID_TARGET = "PEER_ID_OUT";
-    public static final String HEADER_PEER_ID_SOURCE = "PEER_ID_IN";
-    public static final String HEADER_SPECIAL = "SECURED";
-
     public static final long MIN_VNI_ID = 0;
     public static final long MAX_VNI_ID = 16777216;//2^24
     public static final int MIN_VLAN_ID = 100;
@@ -42,11 +35,6 @@ public class Common
     public static final String MASTER_TEMPLATE_NAME = "master";
     public static final String MANAGEMENT_HOSTNAME = "management";
     public static final String GIT_REPO_URL = "git@gw.intra.lan:/opt/git/project.git";
-    public static final String APT_REPO = "trusty";
-    public static final String APT_REPO_PATH = "/repo/ksks/";
-    public static final String APT_REPO_AMD64_PACKAGES_SUBPATH = "amd64/trusty/";
-    public static final String DEFAULT_LXC_ARCH = "amd64";
-    public static final String DEFAULT_NET_INTERFACE = "eth0";
     public static final int SUPER_NODE_PORT = 5000;
     public static String DEFAULT_TEMPLATE_VERSION = "2.1.0";
     public static final String PACKAGE_PREFIX = "subutai-";
