@@ -99,6 +99,6 @@ VBoxManage startvm SubutaiRH --type  headless
 
 echo "14. Login in karaf and approve requests: "
 cd ~/playbooks-newui/
-./node-approve 127.0.0.1 8889
+./node-approve 127.0.0.1 8888
 
 echo "Continue run test on the Web UI of Management Host ... "
