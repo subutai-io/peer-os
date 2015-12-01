@@ -101,6 +101,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     private final DaoManager daoManager;
 
+    private boolean keyTrustCheckEnabled;
+
     protected Set<EnvironmentEventListener> listeners = Sets.newConcurrentHashSet();
     protected ExecutorService executor = SubutaiExecutors.newCachedThreadPool();
 
@@ -148,6 +150,30 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     {
         executor.shutdown();
         peerManager.unregisterPeerActionListener( this );
+    }
+
+
+    public void setKeyTrustCheckEnabled( final boolean keyTrustCheckEnabled )
+    {
+        this.keyTrustCheckEnabled = keyTrustCheckEnabled;
+    }
+
+
+    public boolean isKeyTrustCheckEnabled()
+    {
+        return keyTrustCheckEnabled;
+    }
+
+
+    public SecurityManager getSecurityManager()
+    {
+        return securityManager;
+    }
+
+
+    public IdentityManager getIdentityManager()
+    {
+        return identityManager;
     }
 
 
