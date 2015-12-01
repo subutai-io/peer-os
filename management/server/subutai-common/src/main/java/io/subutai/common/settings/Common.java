@@ -48,6 +48,7 @@ public class Common
     public static final String DEFAULT_LXC_ARCH = "amd64";
     public static final String DEFAULT_NET_INTERFACE = "eth0";
     public static final int SUPER_NODE_PORT = 5000;
+    public static final int CONTAINER_SSH_TIMEOUT_SEC = 1800;
     public static String DEFAULT_TEMPLATE_VERSION = "2.1.0";
     public static final String PACKAGE_PREFIX = "subutai-";
     public static final String PACKAGE_PREFIX_WITHOUT_DASH = "subutai";

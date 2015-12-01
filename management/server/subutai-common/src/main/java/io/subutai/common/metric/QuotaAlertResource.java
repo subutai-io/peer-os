@@ -1,9 +1,15 @@
 package io.subutai.common.metric;
 
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonProperty;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.google.common.base.Preconditions;
 
 import io.subutai.common.host.HostId;
@@ -12,22 +18,28 @@ import io.subutai.common.host.HostId;
 /**
  * Resource alert value
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonIgnoreProperties( ignoreUnknown = true )
 public class QuotaAlertResource implements AlertResource
 {
-    @JsonProperty( "value" )
+    @JsonProperty( "resource" )
     private ResourceAlert resource;
+    @JsonProperty( "createdTime" )
+    private Long createdTime;
 
 
-    public QuotaAlertResource( @JsonProperty( "resource" ) final ResourceAlert resource )
+    public QuotaAlertResource( @JsonProperty( "resource" ) final ResourceAlert resource,
+                               @JsonProperty( "createdTime" ) Long createdTime )
     {
+        Preconditions.checkNotNull( createdTime );
         Preconditions.checkNotNull( resource );
         Preconditions.checkNotNull( resource.getHostId() );
         Preconditions.checkNotNull( resource.getResourceType() );
         this.resource = resource;
+        this.createdTime = createdTime;
     }
 
 
+    @JsonIgnore
     @Override
     public String getId()
     {
@@ -35,6 +47,7 @@ public class QuotaAlertResource implements AlertResource
     }
 
 
+    @JsonIgnore
     @Override
     public ResourceAlert getValue()
     {
@@ -42,6 +55,7 @@ public class QuotaAlertResource implements AlertResource
     }
 
 
+    @JsonIgnore
     @Override
     public HostId getHostId()
     {
@@ -49,10 +63,19 @@ public class QuotaAlertResource implements AlertResource
     }
 
 
+    @JsonIgnore
     @Override
     public AlertType getType()
     {
         return AlertType.ENVIRONMENT_ALERT;
+    }
+
+
+    @JsonIgnore
+    @Override
+    public long getLiveTime()
+    {
+        return System.currentTimeMillis() - createdTime;
     }
 
 

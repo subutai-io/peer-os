@@ -100,10 +100,22 @@ public class MessageContentUtil
                 status = 1;
             }
         }
+        else if ( url.getPort() == Integer.parseInt( ChannelSettings.SPECIAL_PORT_X1 ) ) //file server
+        {
+            if ( basePath.startsWith( "/rest/kurjun" ))
+            {
+                status = 1;
+            }
+            else
+            {
+                status = 2;
+            }
+        }
         else
         {
             status = 0;
         }
+
         return status;
     }
 
