@@ -217,5 +217,15 @@ public interface NetworkManager
      * @param vLanId - vlan id
      */
     public void removeIpFromVlanDomain( String hostIp, int vLanId ) throws NetworkManagerException;
+
+    /**
+     * Sets up SSH connectivity for container identified by @param containerIp
+     *
+     * @param containerIp - ip fo container
+     * @param sshIdleTimeout - timeout during which the ssh connectivity is active in seconds
+     *
+     * @return - port to which clients should connect to access the contaier via ssh
+     */
+    int setupContainerSsh( String containerIp, int sshIdleTimeout ) throws NetworkManagerException;
 }
 

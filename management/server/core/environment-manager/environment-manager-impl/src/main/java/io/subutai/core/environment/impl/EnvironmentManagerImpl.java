@@ -35,10 +35,11 @@ import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.environment.PeerConf;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.host.ContainerHostInfo;
-import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.mdc.SubutaiExecutors;
+import io.subutai.common.metric.Alert;
 import io.subutai.common.metric.EnvironmentAlert;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.network.Gateway;
@@ -1019,6 +1020,39 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                 String.format( "Adding container %s to environment domain", containerHostId ) );
 
         toggleContainerDomain( containerHostId, environmentId, true, operationTracker, true );
+    }
+
+
+    @RolesAllowed( "Environment-Management|A|Update" )
+    @Override
+    public int setupContainerSsh( final String containerHostId, final String environmentId )
+            throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
+    {
+        TrackerOperation operationTracker = tracker.createTrackerOperation( TRACKER_SOURCE,
+                String.format( "Setting up ssh for container %s ", containerHostId ) );
+
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerHostId ), "Invalid container id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+
+        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId, true );
+
+        environment.getContainerHostById( containerHostId );
+        try
+        {
+            int sshPort =
+                    peerManager.getLocalPeer().setupContainerSsh( containerHostId, Common.CONTAINER_SSH_TIMEOUT_SEC );
+
+            operationTracker.addLogDone(
+                    String.format( "Ssh for container %s is ready on port %d", containerHostId, sshPort ) );
+
+            return sshPort;
+        }
+        catch ( Exception e )
+        {
+            operationTracker.addLogFailed(
+                    String.format( "Error setting up ssh for container %s: %s", containerHostId, e.getMessage() ) );
+            throw new EnvironmentModificationException( e );
+        }
     }
 
 

@@ -144,4 +144,14 @@ public interface ManagementHost extends Host, HostInfo
     int calculateNextTunnelId( Set<Tunnel> tunnels );
 
     void setupVniVlanMapping( int tunnelId, long vni, int vlan, String environmentId ) throws PeerException;
+
+    /**
+     * Opens ssh for container identified by its IP
+     *
+     * @param containerIp - IP of container
+     * @param sshIdleTimeout - timeout during which the ssh port is active in seconds
+     *
+     * @return - ssh port to which to connect to access the container
+     */
+    int setupContainerSsh( String containerIp, int sshIdleTimeout ) throws PeerException;
 }

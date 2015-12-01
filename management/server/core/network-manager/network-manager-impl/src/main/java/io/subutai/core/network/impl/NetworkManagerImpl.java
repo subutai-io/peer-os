@@ -22,17 +22,17 @@ import io.subutai.common.network.VniVlanMapping;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
+import io.subutai.common.peer.ManagementHost;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.NumUtil;
 import io.subutai.core.network.api.ContainerInfo;
 import io.subutai.core.network.api.N2NConnection;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
-import io.subutai.common.peer.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.common.protocol.Tunnel;
 
 
 /**
@@ -361,6 +361,32 @@ public class NetworkManagerImpl implements NetworkManager
         Preconditions.checkArgument( hostIp.matches( Common.HOSTNAME_REGEX ), "Invalid host IP" );
 
         execute( getManagementHost(), commands.getRemoveIpFromVlanDomainCommand( hostIp, vLanId ) );
+    }
+
+
+    @Override
+    public int setupContainerSsh( final String containerIp, final int sshIdleTimeout ) throws NetworkManagerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerIp ), "Invalid container IP" );
+        Preconditions.checkArgument( sshIdleTimeout > 0, "Timeout must be greater than 0" );
+        Preconditions.checkArgument( containerIp.matches( Common.HOSTNAME_REGEX ), "Invalid container IP" );
+
+
+        CommandResult result =
+                execute( getManagementHost(), commands.getSetupContainerSshCommand( containerIp, sshIdleTimeout ) );
+
+        Pattern p = Pattern.compile( "\\s+(\\d+)\\s+" );
+        Matcher m = p.matcher( result.getStdOut() );
+
+        if ( m.find() )
+        {
+            return Integer.parseInt( m.group( 1 ) );
+        }
+        else
+        {
+            throw new NetworkManagerException(
+                    String.format( "Could not parse port out of response %s", result.getStdOut() ) );
+        }
     }
 
 

@@ -13,12 +13,9 @@ import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.host.ContainerHostInfo;
-import io.subutai.common.host.HostInfo;
-import io.subutai.common.metric.Alert;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentContainerHost;
-import io.subutai.common.peer.EnvironmentId;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
@@ -237,6 +234,17 @@ public interface EnvironmentManager
     void addContainerToEnvironmentDomain( String containerHostId, String environmentId )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException;
 
+    /**
+     * Sets up ssh connectivity for container. Clients can connect to the container via ssh during 30 seconds after this
+     * call. Connection will remain active unless client is idle for 30 seconds.
+     *
+     * @param containerHostId container id
+     * @param environmentId env id
+     *
+     * @return port for ssh connection
+     */
+    public int setupContainerSsh( final String containerHostId, final String environmentId )
+            throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException;
 
     void removeContainerFromEnvironmentDomain( String containerHostId, String environmentId )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException;

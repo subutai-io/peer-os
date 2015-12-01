@@ -298,4 +298,12 @@ public class Commands
                 "sed -i \"\\,%s,d\" /root/.ssh/authorized_keys && " +
                 "chmod 644 /root/.ssh/authorized_keys", key ) );
     }
+
+
+    public RequestBuilder getSetupContainerSshCommand( final String containerIp, final int sshIdleTimeout )
+    {
+        return new RequestBuilder(
+                String.format( "ssh -f -R 0:%s:22 -o StrictHostKeyChecking=no ubuntu@localhost sleep %d", containerIp,
+                        sshIdleTimeout ) );
+    }
 }
