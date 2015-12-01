@@ -40,6 +40,18 @@ public class DefSubutaiStepsGiven {
         subutaiSteps.inputPassword(password);
     }
 
+    //-------3578
+
+    @Given("the first AWS user is on the home page of Subutai")
+    public void first_aws_user_open_home_page() throws FileNotFoundException {
+        subutaiSteps.open_aws_mng_h1();
+    }
+
+    @Given("the second AWS user is on the home page of Subutai")
+    public void second_aws_user_open_home_page() throws FileNotFoundException {
+        subutaiSteps.open_aws_mng_h2();
+    }
+
     @Given("the user click on the button: Login")
     public void click_button_login(){
         subutaiSteps.clickOnButtonLogin();

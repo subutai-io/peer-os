@@ -34,7 +34,7 @@ When the user enter approve key phrase: 'secret'
 And the user click on the button popup: Approve
 Then the user observe button: Unregister
 
-Scenario: The Second User Approve Request
+Scenario: The Second User create Environment
 Given the second user is on the home page of Subutai
 When the user click on the menu item: Environment
 Then the user observe items of Environment menu

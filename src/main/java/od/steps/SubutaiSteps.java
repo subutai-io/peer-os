@@ -57,6 +57,18 @@ public class SubutaiSteps extends ScenarioSteps {
     }
 
     @Step
+    public void open_aws_mng_h1() throws FileNotFoundException {
+        subutaiPage.setDefaultBaseUrl(String.format("https://%s:8443/", ReaderFromFile.readDataFromFile("src/test/resources/parameters/awsmh1_IP")));
+        subutaiPage.open();
+    }
+
+    @Step
+    public void open_aws_mng_h2() throws FileNotFoundException {
+        subutaiPage.setDefaultBaseUrl(String.format("https://%s:8443/", ReaderFromFile.readDataFromFile("src/test/resources/parameters/awsmh2_IP")));
+        subutaiPage.open();
+    }
+
+    @Step
     public void clickOnMenuItemEnvironment(){
         subutaiPage.linkEnvironment.click();
     }

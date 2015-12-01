@@ -6,10 +6,11 @@ I want to perform an action
 So that I can achieve a business goal
 
 Scenario: Create Local Environment
-Given the first user is on the home page of Subutai
+Given the first AWS user is on the home page of Subutai
 And the user enter login and password: 'admin', 'secret'
 And the user click on the button: Login
-When the user click on the menu item: Environment
+When the user run bash script aws
+And the user click on the menu item: Environment
 Then the user observe items of Environment menu
 When the user click on the menu item: Blueprint
 And the user click on the button: Create Blueprint
@@ -41,7 +42,7 @@ Then the user observe header: Success!
 And the user observe text: Your environment has been created.
 
 Scenario: Read output of the command from Peer in terminal
-Given the first user is on the home page of Subutai
+Given the first AWS user is on the home page of Subutai
 When the user click on console link
 And the user click on link: environment on the console page
 And the user select 'hadoop' environment in select menu
@@ -49,9 +50,8 @@ And the user select container one in select menu
 And the user enter a command 'ping management -c 3' to Command field and press enter
 Then the user should observe output of the command three received
 
-
 Scenario: Destroy Environment and Blueprint
-Given the first user is on the home page of Subutai
+Given the first AWS user is on the home page of Subutai
 When the user click on the menu item: Environment
 And the user click on the menu item: Blueprint
 And the user click on the icon: Remove

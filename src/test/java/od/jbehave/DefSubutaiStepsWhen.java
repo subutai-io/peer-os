@@ -345,6 +345,11 @@ public class DefSubutaiStepsWhen {
         subutaiSteps.run_bash_script("src/test/resources/files/vagrant.sh");
     }
 
+    @When("the user run bash script aws")
+    public void run_shell_script_aws() throws FileNotFoundException {
+        subutaiSteps.run_bash_script("src/test/resources/files/aws_run.sh");
+    }
+
     @When("the user click on the button: Stop")
     public void click_button_stop(){
         subutaiSteps.clickOnButtonStop();
