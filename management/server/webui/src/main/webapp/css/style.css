@@ -518,11 +518,14 @@ body {
 }
 
 .b-status-icon_HEALTHY,
-.b-status-icon_SUCCEEDED,
 .b-status-icon_APPROVED,
 .b-status-icon_RUNNING,
 .b-status-icon_true {
     background-color: #22b573;
+}
+
+.b-status-icon_SUCCEEDED {
+    background-color: rgb(11, 85, 255);
 }
 
 /*Navigation*/

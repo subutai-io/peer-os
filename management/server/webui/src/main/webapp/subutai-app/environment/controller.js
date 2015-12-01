@@ -219,8 +219,8 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 		var enviroment = vm.environments[vm.enviromentSSHKey.environmentKey];
 		environmentService.setSshKey(vm.enviromentSSHKey.key, enviroment.id).success(function (data) {
 			SweetAlert.swal("Success!", "You successfully add SSH key for " + enviroment.id + " environment!", "success");
-		}).error(function (data) {
-			SweetAlert.swal("Cancelled", "Error: " + data.ERROR, "error");
+		}).error(function (error) {
+			SweetAlert.swal("Cancelled", "Error: " + error.ERROR, "error");
 		});
 	}
 
