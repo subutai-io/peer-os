@@ -189,4 +189,6 @@ public interface LocalPeer extends Peer
     Template getTemplateByName( String templateName );
 
     ContainerHost findContainerById( ContainerId containerId );
+
+    int setupContainerSsh( String containerHostId, int sshIdleTimeout) throws PeerException;
 }
