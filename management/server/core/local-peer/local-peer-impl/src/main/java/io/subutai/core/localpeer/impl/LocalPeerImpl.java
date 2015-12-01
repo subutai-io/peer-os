@@ -73,7 +73,6 @@ import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.ContainerType;
 import io.subutai.common.peer.ContainersDestructionResult;
-import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
@@ -108,8 +107,6 @@ import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hostregistry.api.HostRegistry;
-import io.subutai.core.identity.api.IdentityManager;
-import io.subutai.core.identity.api.model.User;
 import io.subutai.core.localpeer.impl.command.CommandRequestListener;
 import io.subutai.core.localpeer.impl.container.CreateContainerWrapperTask;
 import io.subutai.core.localpeer.impl.container.CreateEnvironmentContainerGroupRequestListener;
@@ -147,7 +144,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     private static final int N2N_PORT = 5000;
 
     private String externalIpInterface = "eth1";
-    private boolean validateTrust = false;
     private DaoManager daoManager;
     private TemplateRegistry templateRegistry;
     protected ManagementHostEntity managementHost;
@@ -165,7 +161,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     protected Set<RequestListener> requestListeners = Sets.newHashSet();
     protected PeerInfo peerInfo;
     private SecurityManager securityManager;
-    private IdentityManager identityManager;
 
 
     protected boolean initialized = false;
@@ -173,7 +168,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     public LocalPeerImpl( DaoManager daoManager, TemplateRegistry templateRegistry, QuotaManager quotaManager,
                           StrategyManager strategyManager, CommandExecutor commandExecutor, HostRegistry hostRegistry,
-                          Monitor monitor, SecurityManager securityManager, IdentityManager identityManager )
+                          Monitor monitor, SecurityManager securityManager )
     {
         this.strategyManager = strategyManager;
         this.daoManager = daoManager;
@@ -183,19 +178,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         this.commandExecutor = commandExecutor;
         this.hostRegistry = hostRegistry;
         this.securityManager = securityManager;
-        this.identityManager = identityManager;
     }
 
 
     public void setExternalIpInterface( final String externalIpInterface )
     {
         this.externalIpInterface = externalIpInterface;
-    }
-
-
-    public void setValidateTrust( final boolean validateTrust )
-    {
-        this.validateTrust = validateTrust;
     }
 
 
@@ -1052,30 +1040,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         Preconditions.checkNotNull( requestBuilder, "Invalid request" );
         Preconditions.checkNotNull( aHost, "Invalid host" );
 
-        if ( validateTrust )
-        {
-            LOG.warn( "Trust chain validation is on..." );
-            User activeUser = identityManager.getActiveUser();
-            if ( activeUser != null )
-            {
-                KeyManager keyManager = securityManager.getKeyManager();
-
-                if ( aHost instanceof EnvironmentContainerHost )
-                {
-                    EnvironmentId environmentId = ( ( EnvironmentContainerHost ) aHost ).getEnvironmentId();
-
-                    String environmentFingerprint = keyManager.getFingerprint( environmentId.getId() );
-                    String userFingerprint = keyManager.getFingerprint( activeUser.getSecurityKeyId() );
-
-                    if ( keyManager.getTrustLevel( userFingerprint, environmentFingerprint ) == KeyTrustLevel.Never
-                            .getId() )
-                    {
-                        throw new CommandException( "Host was revoked to execute commands" );
-                    }
-                }
-            }
-        }
-
         Host host;
         try
         {
@@ -1112,30 +1076,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         Preconditions.checkNotNull( requestBuilder, "Invalid request" );
         Preconditions.checkNotNull( aHost, "Invalid host" );
-
-        if ( validateTrust )
-        {
-            LOG.warn( "Trust chain validation is on..." );
-            User activeUser = identityManager.getActiveUser();
-            if ( activeUser != null )
-            {
-                KeyManager keyManager = securityManager.getKeyManager();
-
-                if ( aHost instanceof EnvironmentContainerHost )
-                {
-                    EnvironmentId environmentId = ( ( EnvironmentContainerHost ) aHost ).getEnvironmentId();
-
-                    String environmentFingerprint = keyManager.getFingerprint( environmentId.getId() );
-                    String userFingerprint = keyManager.getFingerprint( activeUser.getSecurityKeyId() );
-
-                    if ( keyManager.getTrustLevel( userFingerprint, environmentFingerprint ) == KeyTrustLevel.Never
-                            .getId() )
-                    {
-                        throw new CommandException( "Host was revoked to execute commands" );
-                    }
-                }
-            }
-        }
 
         Host host;
         try

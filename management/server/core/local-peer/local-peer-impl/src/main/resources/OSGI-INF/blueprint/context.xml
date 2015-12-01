@@ -60,9 +60,7 @@
     <argument ref="hostRegistry" />
     <argument ref="monitor" />
     <argument ref="securityManager" />
-    <argument ref="identityManager" />
     <property name="externalIpInterface" value="${externalIpInterface}" />
-    <property name="validateTrust" value="${keyTrustCheckEnabled}" />
   </bean>
 
   <bean id="messageRequestListener" class="io.subutai.core.localpeer.impl.request.MessageRequestListener"
