@@ -27,4 +27,6 @@ public interface AlertResource
     String getId();
 
     AlertType getType();
+
+    long getLiveTime();
 }

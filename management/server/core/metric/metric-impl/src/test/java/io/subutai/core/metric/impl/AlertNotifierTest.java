@@ -1,9 +1,14 @@
 package io.subutai.core.metric.impl;
 
 
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.slf4j.Logger;
 
+import io.subutai.common.metric.AlertResource;
 import io.subutai.common.peer.AlertListener;
 import io.subutai.common.peer.AlertPack;
 
@@ -12,13 +17,34 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 
 /**
  * Test for AlertNotifier
  */
+@RunWith( MockitoJUnitRunner.class )
 public class AlertNotifierTest
 {
+    private static final String TEMPLATE_NAME = "master";
+    private static final String RESOURCE_ID = "resource_id";
+
+    @Mock
+    AlertPack alert;
+
+    @Mock
+    AlertResource resource;
+
+    @Mock
+    AlertListener listener;
+
+    @Before
+    public void setUp() {
+        when( resource.getId() ).thenReturn( RESOURCE_ID );
+        when( alert.getTemplateName() ).thenReturn( TEMPLATE_NAME );
+        when( alert.getResource() ).thenReturn( resource );
+    }
+
     @Test( expected = NullPointerException.class )
     public void testConstructorShouldFailOnNullMetric() throws Exception
     {
@@ -30,8 +56,7 @@ public class AlertNotifierTest
     @Test( expected = NullPointerException.class )
     public void testConstructorShouldFailOnNullListener() throws Exception
     {
-
-        new AlertNotifier( mock( AlertPack.class ), null );
+        new AlertNotifier( alert, null );
     }
 
 
@@ -39,8 +64,6 @@ public class AlertNotifierTest
     public void testListenerShouldBeNotified() throws Exception
     {
 
-        AlertPack alert = mock( AlertPack.class );
-        AlertListener listener = mock( AlertListener.class );
         AlertNotifier alertNotifier = new AlertNotifier( alert, listener );
 
         alertNotifier.run();
@@ -52,8 +75,6 @@ public class AlertNotifierTest
     @Test
     public void testLogError() throws Exception
     {
-        AlertPack alert = mock( AlertPack.class );
-        AlertListener listener = mock( AlertListener.class );
         Logger logger = mock( Logger.class );
         doThrow( new RuntimeException( "" ) ).when( listener ).onAlert( alert );
         AlertNotifier alertNotifier = new AlertNotifier( alert, listener );
