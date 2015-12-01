@@ -384,30 +384,35 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public void putAlert( final AlertPack alertPack )
+    public Response putAlert( final AlertPack alertPack )
     {
         try
         {
             localPeer.alert( alertPack );
+
+            return Response.accepted().build();
         }
         catch ( PeerException e )
         {
-            throw new WebApplicationException( e );
+            LOGGER.error( e.getMessage(), e );
+            return Response.serverError().build();
         }
     }
 
 
     @Override
-    public HistoricalMetrics getHistoricalMetrics( final String hostName, final DateTimeParam startTime,
-                                                   final DateTimeParam endTime )
+    public Response getHistoricalMetrics( final String hostName, final DateTimeParam startTime,
+                                          final DateTimeParam endTime )
     {
         try
         {
-            return localPeer.getHistoricalMetrics( hostName, startTime.getDate(), endTime.getDate() );
+            return Response.ok( localPeer.getHistoricalMetrics( hostName, startTime.getDate(), endTime.getDate() ) )
+                           .build();
         }
         catch ( PeerException e )
         {
-            throw new WebApplicationException( e );
+            LOGGER.error( e.getMessage(), e );
+            return Response.serverError().build();
         }
     }
 }

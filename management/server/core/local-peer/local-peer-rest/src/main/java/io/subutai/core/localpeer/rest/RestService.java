@@ -149,13 +149,13 @@ public interface RestService
     @Path( "alert" )
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
-    void putAlert( AlertPack alertPack );
+    Response putAlert( AlertPack alertPack );
 
     @GET
     @Path( "hmetrics/{hostname}/{startTime}/{endTime}" )
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
-    HistoricalMetrics getHistoricalMetrics( @PathParam( "hostname" ) final String hostName,
+    Response getHistoricalMetrics( @PathParam( "hostname" ) final String hostName,
                                             @PathParam( "startTime" ) final DateTimeParam startTime,
                                             @PathParam( "endTime" ) final DateTimeParam endTime );
 }

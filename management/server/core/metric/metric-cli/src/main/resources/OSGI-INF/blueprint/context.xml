@@ -14,7 +14,15 @@
   </command-bundle>
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="metric/alerts">
+    <command name="alert/queue">
+      <action class="io.subutai.core.metric.cli.QueueListCommand">
+        <argument ref="monitor" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="alert/list">
       <action class="io.subutai.core.metric.cli.AlertListCommand">
         <argument ref="monitor" />
       </action>
@@ -22,7 +30,7 @@
   </command-bundle>
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="metric/alert-listeners">
+    <command name="alert/handlers">
       <action class="io.subutai.core.metric.cli.AlertListenersCommand">
         <argument ref="monitor" />
       </action>
@@ -30,7 +38,7 @@
   </command-bundle>
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="metric/notify-listeners">
+    <command name="alert/notify-handlers">
       <action class="io.subutai.core.metric.cli.NotifyListenersCommand">
         <argument ref="monitor" />
       </action>
