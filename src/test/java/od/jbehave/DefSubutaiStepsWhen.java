@@ -496,4 +496,5 @@ public class DefSubutaiStepsWhen {
     public void user_click_menu_item_tracker(){
         subutaiSteps.clickOnMenuItemTracker();
     }
+
 }

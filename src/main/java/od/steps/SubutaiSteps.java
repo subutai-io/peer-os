@@ -1125,6 +1125,4 @@ public class SubutaiSteps extends ScenarioSteps {
             is(true);
         }
     }
-
-
 }
