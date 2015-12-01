@@ -112,7 +112,7 @@ function run_tests(){
     Xvfb :10 -ac &
     export DISPLAY=:10
     firefox &
-    rmdir -r mvn clean; mvn integration-test; mvn serenity:aggregate;
+    mvn clean; mvn integration-test; mvn serenity:aggregate;
 }
 
 function copy_results(){
@@ -124,6 +124,12 @@ function copy_results(){
 if [ $# = 0 ]; then
     print_help
 fi
+
+
+cd /home/ubuntu/playbooks-newui
+git clean -fd >/dev/null
+git reset --hard HEAD >/dev/null
+git pull origin master >/dev/null
 
 while getopts "m:M:s:ro:Llh" opt;
 do
