@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.registration.api.RegistrationManager;
 import io.subutai.core.registration.api.service.RequestedHost;
-import io.subutai.core.registration.rest.transitional.RequestedHostJson;
+import io.subutai. core.registration.rest.transitional.RequestedHostJson;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 

@@ -4,7 +4,7 @@ package io.subutai.common.peer;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 
-import io.subutai.common.metric.AlertValue;
+import io.subutai.common.metric.AlertResource;
 
 
 /**
@@ -20,8 +20,8 @@ public class AlertPack
     String containerId;
     @JsonProperty( "templateName" )
     String templateName;
-    @JsonProperty( "value" )
-    AlertValue value;
+    @JsonProperty( "resource" )
+    AlertResource resource;
     @JsonIgnore
     boolean delivered = false;
 
@@ -30,12 +30,12 @@ public class AlertPack
                       @JsonProperty( "environmentId" ) final String environmentId,
                       @JsonProperty( "containerId" ) final String containerId,
                       @JsonProperty( "templateName" ) final String templateName,
-                      @JsonProperty( "value" ) final AlertValue value )
+                      @JsonProperty( "resource" ) final AlertResource resource )
     {
         this.peerId = peerId;
         this.environmentId = environmentId;
         this.containerId = containerId;
-        this.value = value;
+        this.resource = resource;
         this.templateName = templateName;
     }
 
@@ -58,9 +58,9 @@ public class AlertPack
     }
 
 
-    public AlertValue getValue()
+    public AlertResource getResource()
     {
-        return value;
+        return resource;
     }
 
 
@@ -90,7 +90,7 @@ public class AlertPack
         sb.append( ", environmentId='" ).append( environmentId ).append( '\'' );
         sb.append( ", containerId='" ).append( containerId ).append( '\'' );
         sb.append( ", templateName='" ).append( templateName ).append( '\'' );
-        sb.append( ", value=" ).append( value );
+        sb.append( ", value=" ).append( resource );
         sb.append( ", delivered=" ).append( delivered );
         sb.append( '}' );
         return sb.toString();

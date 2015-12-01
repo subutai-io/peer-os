@@ -2,11 +2,14 @@ package io.subutai.core.registration.impl;
 
 
 import java.sql.Timestamp;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
+import io.subutai.common.host.HostInterface;
+import io.subutai.common.host.HostInterfaceModel;
+import io.subutai.common.peer.*;
+import io.subutai.common.util.N2NUtil;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Transformer;
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -221,6 +224,31 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
         client.query( "Message", encoded ).delete();
     }
 
+    private Set<String> getTunnelNetworks(final Set<Peer> peers) {
+        Set<String> result = new HashSet<>();
+
+        for (Peer peer : peers) {
+            Set<HostInterfaceModel> r = null;
+            try {
+                r = peer.getInterfaces().filterByIp(N2NUtil.N2N_INTERFACE_IP_PATTERN);
+            } catch (PeerException e) {
+                e.printStackTrace();
+            }
+
+            Collection tunnels = CollectionUtils.collect(r, new Transformer() {
+                @Override
+                public Object transform(final Object o) {
+                    HostInterface i = (HostInterface) o;
+                    SubnetUtils u = new SubnetUtils(i.getIp(), N2NUtil.N2N_SUBNET_MASK);
+                    return u.getInfo().getNetworkAddress();
+                }
+            });
+
+            result.addAll(tunnels);
+        }
+
+        return result;
+    }
 
     @Override
     public void approveRequest( final String requestId )
@@ -449,23 +477,46 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
 
 
     @Override
-    public void deployResourceHost( List<String> args ) throws NodeRegistrationException
-    {
-        ManagementHost managementHost;
+    public void deployResourceHost(List<String> args) throws NodeRegistrationException {
+        ManagementHost managementHost = null;
         CommandResult result;
 
-        try
-        {
+        try {
             managementHost = peerManager.getLocalPeer().getManagementHost();
+
+            Set<Peer> peers = Sets.newHashSet(managementHost.getPeer());
+
+            Set<String> existingNetworks = getTunnelNetworks(peers);
+
+            String freeTunnelNetwork = N2NUtil.findFreeTunnelNetwork(existingNetworks);
+            args.add("-I");
+            freeTunnelNetwork = freeTunnelNetwork.substring(0, freeTunnelNetwork.length() - 1)+
+            (Integer.valueOf(freeTunnelNetwork.substring(freeTunnelNetwork.length()-1))+1);
+            args.add(freeTunnelNetwork);
+
+            int ipOctet = (Integer.valueOf(freeTunnelNetwork.substring(freeTunnelNetwork.length()-1))+1);
+            String ipRh = freeTunnelNetwork.substring(0, freeTunnelNetwork.length() - 1) + ipOctet;
+            args.add("-i");
+            args.add(ipRh);
+
+            String communityName = N2NUtil.generateCommunityName(freeTunnelNetwork);
+            args.add("-n");
+            args.add(communityName);
+
+            String deviceName = N2NUtil.generateInterfaceName(freeTunnelNetwork);
+            args.add("-d");
+            args.add(deviceName);
+            String runUser = "root";
             result = managementHost
-                    .execute( new RequestBuilder( "/home/ubuntu/awsdeploy" ).withCmdArgs( args ).withTimeout( 1800 ) );
-            if ( result.getExitCode() != 0 )
-            {
-                throw new NodeRegistrationException( result.getStdErr() );
+                    .execute(new RequestBuilder("/apps/subutai-mng/current/bin/awsdeploy/awsdeploy")
+                            .withCmdArgs(args)
+                            .withRunAs(runUser)
+                            .withTimeout(600));
+
+            if (result.getExitCode() != 0) {
+                throw new NodeRegistrationException(result.getStdErr());
             }
-        }
-        catch ( HostNotFoundException | CommandException e )
-        {
+        } catch (HostNotFoundException | CommandException e) {
             e.printStackTrace();
         }
     }

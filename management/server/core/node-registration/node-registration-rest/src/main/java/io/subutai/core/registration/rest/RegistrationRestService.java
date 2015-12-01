@@ -26,7 +26,6 @@ public interface RegistrationRestService
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response verifyContainerToken( String message );
 
-
     @GET
     @Path( "requests" )
     @Produces( { MediaType.APPLICATION_JSON } )
@@ -35,4 +34,5 @@ public interface RegistrationRestService
     @POST
     @Path( "requests/{id}/approve" )
     public Response approveRegistrationRequest( @PathParam( "id" ) String requestId );
+
 }
