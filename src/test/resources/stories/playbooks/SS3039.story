@@ -1,7 +1,8 @@
 Meta:
+
 Narrative:
 As a user
-I want to verify if subutai AngularJS
+I want to verify if Subutai AngularJS
 So that I can achieve a business goal
 
 Scenario: The user observe AngularJS elements

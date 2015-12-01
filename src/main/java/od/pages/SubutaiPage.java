@@ -530,7 +530,6 @@ public class SubutaiPage extends PageObject {
     @FindBy(xpath = ".//*[@id='errorTitleText']")
     public WebElementFacade unabledToConnect;
 
-
     //-----------------3298
 
     @FindBy(id="displayKeysButton")
