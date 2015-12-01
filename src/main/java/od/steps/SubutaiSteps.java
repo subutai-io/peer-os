@@ -2,10 +2,15 @@ package od.steps;
 
 import net.thucydides.core.annotations.Step;
 import net.thucydides.core.steps.ScenarioSteps;
+import od.pages.ExecuteShellCommand;
 import od.pages.ReaderFromFile;
 import od.pages.SubutaiPage;
+import od.pages.WriterFile;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.remote.server.handler.ExecuteScript;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -464,7 +469,7 @@ public class SubutaiSteps extends ScenarioSteps {
     @Step
     public void selectMenuResourceHost(){
         subutaiPage.selectMenuResourceHost.click();
-        subutaiPage.selectMenuResourceHost.selectByIndex(1);
+        subutaiPage.selectMenuResourceHost.selectByIndex(2);
         subutaiPage.selectMenuResourceHost.sendKeys(Keys.ENTER);
     }
 
@@ -485,7 +490,7 @@ public class SubutaiSteps extends ScenarioSteps {
     @Step
     public void selectMenuManagementHost(){
         subutaiPage.selectMenuResourceHost.click();
-        subutaiPage.selectMenuResourceHost.selectByIndex(2);
+        subutaiPage.selectMenuResourceHost.selectByIndex(1);
         subutaiPage.selectMenuResourceHost.sendKeys(Keys.ENTER);
     }
 
@@ -586,9 +591,16 @@ public class SubutaiSteps extends ScenarioSteps {
     }
 
     @Step
-    public void selectContainerInSelectMenu(){
+    public void selectContainerOneInSelectMenu(){
         assertThat(subutaiPage.selectMenuContainer.isVisible(), is(true));
         subutaiPage.selectMenuContainer.selectByIndex(1);
+        subutaiPage.selectMenuContainer.sendKeys(Keys.ENTER);
+    }
+
+    @Step
+    public void selectContainerTwoInSelectMenu(){
+        assertThat(subutaiPage.selectMenuContainer.isVisible(), is(true));
+        subutaiPage.selectMenuContainer.selectByIndex(2);
         subutaiPage.selectMenuContainer.sendKeys(Keys.ENTER);
     }
 
@@ -627,7 +639,7 @@ public class SubutaiSteps extends ScenarioSteps {
         subutaiPage.selectMenuResourceHost.selectByIndex(0);
         subutaiPage.selectMenuResourceHost.sendKeys(Keys.ENTER);
         subutaiPage.selectMenuResourceHost.click();
-        subutaiPage.selectMenuResourceHost.selectByIndex(1);
+        subutaiPage.selectMenuResourceHost.selectByIndex(2);
         subutaiPage.selectMenuResourceHost.sendKeys(Keys.ENTER);
     }
 
@@ -646,6 +658,12 @@ public class SubutaiSteps extends ScenarioSteps {
     @Step
     public void waitFunctionForSlowOperations(int time){
         waitABit(time);
+    }
+
+    @Step
+    public void run_bash_script(String file) throws FileNotFoundException {
+        ExecuteShellCommand executeShellCommand = new ExecuteShellCommand();
+        executeShellCommand.executeCommand(file);
     }
 
     @Step

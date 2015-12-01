@@ -208,7 +208,7 @@ public class SubutaiPage extends PageObject {
     @FindBy(ngModel = "selectedContainer")
     public WebElementFacade selectContainer;
 
-    @FindBy(ngModel = "selectedEnvironment")
+    @FindBy(ngModel = "consoleViewCtrl.selectedEnvironment")
     public WebElementFacade selectEnvironmentConsole;
 
 

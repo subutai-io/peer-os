@@ -5,7 +5,6 @@ As a QA
 I want to verify the PLAYBOOK SS-3023
 So that I will create test scenarios
 
-
 Scenario: Create Local Environment
 Given the first user is on the home page of Subutai
 And the user enter login and password: 'admin', 'secret'
@@ -54,7 +53,7 @@ Given the first user is on the home page of Subutai
 When the user click on console link
 And the user click on link: environment on the console page
 And the user select 'Local Environment' environment in select menu
-And the user select container in select menu
+And the user select container one in select menu
 And the user enter a command 'echo test' to Command field and press enter
 Then the user should observe output of the command
 
@@ -70,7 +69,7 @@ Given the first user is on the home page of Subutai
 When the user click on console link
 And the user click on link: environment on the console page
 And the user select 'Local Environment' environment in select menu
-And the user select container in select menu
+And the user select container one in select menu
 And the user get container ID and go pgp key url
 Then the user should observe public Key of the container in GPG Armored text
 

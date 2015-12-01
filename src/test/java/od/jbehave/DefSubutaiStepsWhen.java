@@ -279,9 +279,14 @@ public class DefSubutaiStepsWhen {
         subutaiSteps.selectEnvironmentInSelectMenu(environment);
     }
 
-    @When("the user select container in select menu")
-    public void user_select_container_in_select_menu(){
-        subutaiSteps.selectContainerInSelectMenu();
+    @When("the user select container one in select menu")
+    public void user_select_container_one_in_select_menu(){
+        subutaiSteps.selectContainerOneInSelectMenu();
+    }
+
+    @When("the user select container two in select menu")
+    public void user_select_container_two_in_select_menu(){
+        subutaiSteps.selectContainerTwoInSelectMenu();
     }
 
     @When("the user get resource host ID and go pgp key url")
@@ -325,6 +330,10 @@ public class DefSubutaiStepsWhen {
         subutaiSteps.executeConsoleCommand("ls -l /var/lib/apps/subutai/current/var/lib/lxc/" + subutaiSteps.getContainerNameTwo() + "/rootfs/");
     }
 
+    @When("the user run bash script vagrant")
+    public void run_shell_script() throws FileNotFoundException {
+        subutaiSteps.run_bash_script("src/test/resources/files/plugin.sh");
+    }
     @When("the user click on the button: Stop")
     public void click_button_stop(){
         subutaiSteps.clickOnButtonStop();

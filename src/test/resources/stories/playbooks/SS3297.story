@@ -2,25 +2,20 @@ Meta:
 
 Narrative:
 As a QA
-I want to verify the PLAYBOOK SS-3038
+I want to verify the PLAYBOOK SS-3297
 So that I will create test scenarios
 
-Scenario: Create Environment on the ARM
-Given the ARM user is on the home page of Subutai
+Scenario: Create Environment
+Given the first user is on the home page of Subutai
 And the user enter login and password: 'admin', 'secret'
 And the user click on the button: Login
-When the user click on the menu item: Console
-And the user select any available resource host from select menu
-And the user enter console command: 'cat /proc/cpuinfo'
-Then the user verify output console command and observe expected phrase: 'ARM'
 When the user click on the menu item: Environment
-Then the user observe items of Environment menu
 When the user click on the menu item: Blueprint
 And the user click on the button: Create Blueprint
 Then the user observe field: Enter blueprint name
-When the user enter blueprint name: 'Sample blueprint'
-And the user enter node name: 'Node'
-And the user select template: 'master'
+When the user enter blueprint name: 'example'
+And the user enter node name: 'keshig'
+And the user select template: 'hadoop'
 And the user enter number of containers: '2'
 And the user enter SSH group ID: '0'
 And the user enter host Group ID: '0'
@@ -30,9 +25,9 @@ And the user click on the button: Create
 Then the user observe created blueprint
 When the user click on the icon: Build
 Then the user observe build environment
-When the user enter environment name: 'Local Environment'
+When the user enter environment name: 'hadoop'
 And the user select peer: One
-And the user select Strategie: 'DEFAULT-STRATEGY'
+And the user select Strategie: 'ROUND_ROBIN'
 And the user click on the button: Place
 Then the user observe icon: two containers
 When the user click on the link: Environment Build List
@@ -43,18 +38,18 @@ And the user observe text: Your environment start creation.
 When the user click on the button: OK
 Then the user observe header: Success!
 And the user observe text: Your environment has been created.
-When the user click on the button: OK
-And the user click on the menu item: Console
-And the user select any available resource host from select menu
-And the user enter console command: 'sudo subutai list -i'
-Then the user verify output console command and observe expected phrase: 'master'
-And the user verify output console command and observe expected phrase: 'RUNNING'
-When the user select management host from select menu
-And the user enter console command: 'cat /proc/cpuinfo'
-Then the user verify output console command and observe expected phrase: 'Intel'
+When the user click on the menu item: Console
+And the user click on the button: Environment
+And the user select current environment
+And the user select container one in select menu
+And the user enter console command: 'ping management -c 3'
+Then the user verify output console command and observe expected phrase: '3 packets transmitted, 3 received, 0% packet loss'
+When the user select container two in select menu
+And the user enter console command: 'ping management -c 3'
+Then the user verify output console command and observe expected phrase: '3 packets transmitted, 3 received, 0% packet loss'
 
-Scenario: Destroy Environment and Blueprint from ARM
-Given the ARM user is on the home page of Subutai
+Scenario: Destroy Environment and Blueprint
+Given the first user is on the home page of Subutai
 When the user click on the menu item: Environment
 And the user click on the menu item: Blueprint
 And the user click on the icon: Remove

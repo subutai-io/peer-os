@@ -1,0 +1,12 @@
+Vagrant.configure(2) do |config|
+config.ssh.username="ubuntu"
+config.ssh.password="ubuntu"
+config.vm.synced_folder ".", "/vagrant", disabled: true
+config.exec.commands '*', directory: '/'
+config.vm.box="subutai/resource-host"
+        config.vm.define :SubutaiRH do |conf|
+                conf.vm.provider "virtualbox" do |v|
+                        v.name="SubutaiRH"
+                end
+        end
+end
