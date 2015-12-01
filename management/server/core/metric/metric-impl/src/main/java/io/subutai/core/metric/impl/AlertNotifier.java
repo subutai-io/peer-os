@@ -37,10 +37,13 @@ public class AlertNotifier implements Runnable
         try
         {
             listener.onAlert( alert );
+            LOG.debug( String.format( "Alert package '%s' handled by '%s'.", alert.getResource().getId(),
+                    listener.getTemplateName() ) );
         }
         catch ( Exception e )
         {
-            LOG.error( String.format( "Error notifying %s on %s", listener.getTemplateName(), alert ), e );
+            LOG.error( String.format( "Alert package '%s' handling by '%s' failed.",
+                    alert.getResource().getId(), listener.getTemplateName() ),e );
         }
     }
 }

@@ -53,10 +53,17 @@ public class HeartBeat
     {
         if ( a.getCpu() != null )
         {
-            ResourceAlert cpuAlert = new ResourceAlert( new HostId( a.getId() ), ResourceType.CPU,
-                    new ResourceValue( a.getCpu().getCurrent(), MeasureUnit.PERCENT ),
-                    new ResourceValue( a.getCpu().getQuota(), MeasureUnit.PERCENT ) );
-            alerts.add( cpuAlert );
+            try
+            {
+                ResourceAlert cpuAlert = new ResourceAlert( new HostId( a.getId() ), ResourceType.CPU,
+                        new ResourceValue( a.getCpu().getCurrent(), MeasureUnit.PERCENT ),
+                        new ResourceValue( a.getCpu().getQuota(), MeasureUnit.PERCENT ) );
+                alerts.add( cpuAlert );
+            }
+            catch ( Exception e )
+            {
+                LOG.warn( "CPU alert parse error: " + e.getMessage() );
+            }
         }
     }
 
@@ -65,12 +72,18 @@ public class HeartBeat
     {
         if ( a.getRam() != null )
         {
-            ResourceAlert ramAlert = new ResourceAlert( new HostId( a.getId() ), ResourceType.RAM,
-                    new ResourceValue( a.getRam().getCurrent(), MeasureUnit.MB ),
-                    new ResourceValue( a.getRam().getQuota(), MeasureUnit.MB ) );
-            LOG.debug( String.format( "**********Adding RAM alert: %s", ramAlert) );
+            try
+            {
+                ResourceAlert ramAlert = new ResourceAlert( new HostId( a.getId() ), ResourceType.RAM,
+                        new ResourceValue( a.getRam().getCurrent(), MeasureUnit.MB ),
+                        new ResourceValue( a.getRam().getQuota(), MeasureUnit.MB ) );
 
-            alerts.add( ramAlert );
+                alerts.add( ramAlert );
+            }
+            catch ( Exception e )
+            {
+                LOG.warn( "RAM alert parse error: " + e.getMessage() );
+            }
         }
     }
 
@@ -79,10 +92,17 @@ public class HeartBeat
     {
         if ( a.getRam() != null )
         {
-            ResourceAlert cpuAlert = new ResourceAlert( new HostId( a.getId() ), ResourceType.RAM,
-                    new ResourceValue( a.getRam().getCurrent(), MeasureUnit.MB ),
-                    new ResourceValue( a.getRam().getQuota(), MeasureUnit.MB ) );
-            alerts.add( cpuAlert );
+            try
+            {
+                ResourceAlert cpuAlert = new ResourceAlert( new HostId( a.getId() ), ResourceType.RAM,
+                        new ResourceValue( a.getRam().getCurrent(), MeasureUnit.MB ),
+                        new ResourceValue( a.getRam().getQuota(), MeasureUnit.MB ) );
+                alerts.add( cpuAlert );
+            }
+            catch ( Exception e )
+            {
+                LOG.warn( "HDD alert parse error: " + e.getMessage() );
+            }
         }
     }
 }

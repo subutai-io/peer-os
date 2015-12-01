@@ -147,7 +147,7 @@ public class MonitorImplTest
         public void setMonitorDao( MonitorDao monitorDao ) {this.monitorDao = monitorDao;}
 
 
-        public void setNotificationExecutor( ExecutorService executor ) {this.notificationExecutor = executor;}
+//        public void setNotificationExecutor( ExecutorService executor ) {this.notificationExecutor = executor;}
 
 
         public void setAlertListeners( Map<String, AlertListener> alertListeners )
@@ -178,7 +178,7 @@ public class MonitorImplTest
         alertListeners = Maps.newHashMap();
         alertListeners.put( TEMPLATE_NAME, alertListener );
         monitor.setAlertListeners( alertListeners );
-        monitor.setNotificationExecutor( notificationService );
+//        monitor.setNotificationExecutor( notificationService );
         when( monitorDao.getEnvironmentSubscribersIds( ENVIRONMENT_ID ) )
                 .thenReturn( Sets.newHashSet( TEMPLATE_NAME ) );
         when( environment.getId() ).thenReturn( ENVIRONMENT_ID );

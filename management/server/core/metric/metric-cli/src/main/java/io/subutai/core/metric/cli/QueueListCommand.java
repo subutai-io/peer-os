@@ -13,15 +13,15 @@ import io.subutai.core.metric.api.Monitor;
 
 
 /**
- * List of alerts command
+ * Queue of alerts command
  */
-@Command( scope = "alert", name = "list", description = "Returns list of alerts" )
-public class AlertListCommand extends SubutaiShellCommandSupport
+@Command( scope = "alert", name = "queue", description = "Returns local alerts in queue" )
+public class QueueListCommand extends SubutaiShellCommandSupport
 {
     private final Monitor monitor;
 
 
-    public AlertListCommand( final Monitor monitor )
+    public QueueListCommand( final Monitor monitor )
     {
         Preconditions.checkNotNull( monitor, "Monitor is null" );
 
@@ -33,8 +33,8 @@ public class AlertListCommand extends SubutaiShellCommandSupport
     protected Object doExecute() throws Exception
     {
         Collection<AlertPack> alerts = monitor.getAlerts();
-        System.out.println( "List of alerts:" );
-        for ( AlertPack alert : alerts )
+        System.out.println( "List of alerts in queue:" );
+        for ( AlertPack alert : monitor.getAlertsQueue() )
         {
             System.out.println( alert );
         }

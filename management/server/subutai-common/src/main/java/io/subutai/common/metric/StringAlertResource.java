@@ -14,6 +14,7 @@ public class StringAlertResource implements AlertResource
     private final HostType hostType;
     private final AlertType alertType;
     private String value;
+    private Long created;
 
 
     public StringAlertResource( final HostId hostId, final HostType hostType, final AlertType alertType,
@@ -23,6 +24,7 @@ public class StringAlertResource implements AlertResource
         this.hostType = hostType;
         this.alertType = alertType;
         this.value = description;
+        this.created = System.currentTimeMillis();
     }
 
 
@@ -51,5 +53,12 @@ public class StringAlertResource implements AlertResource
     public AlertType getType()
     {
         return alertType;
+    }
+
+
+    @Override
+    public long getLiveTime()
+    {
+        return System.currentTimeMillis() - created;
     }
 }

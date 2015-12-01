@@ -7,7 +7,7 @@ import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.metric.api.Monitor;
 
 
-@Command( scope = "metric", name = "notify-listeners" )
+@Command( scope = "alert", name = "notify-handlers" )
 public class NotifyListenersCommand extends SubutaiShellCommandSupport
 {
 

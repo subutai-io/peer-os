@@ -9,7 +9,7 @@ import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.metric.api.Monitor;
 
 
-@Command( scope = "metric", name = "alert-listeners" )
+@Command( scope = "alert", name = "handlers" )
 public class AlertListenersCommand extends SubutaiShellCommandSupport
 {
 
@@ -25,15 +25,12 @@ public class AlertListenersCommand extends SubutaiShellCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
+        System.out.println( "List of alert handlers:" );
         for ( AlertListener listener : monitor.getAlertListeners() )
         {
-            System.out.println( listener );
+            System.out.println( listener.getTemplateName() );
         }
 
-        for ( AlertPack p : monitor.getAlertPackages() )
-        {
-            System.out.println( p );
-        }
         return null;
     }
 }
