@@ -482,4 +482,18 @@ public class DefSubutaiStepsWhen {
         subutaiSteps.clickOnSomeTubs();
     }
 
+    @When("the user click on the menu item: User management")
+    public void user_click_menu_item_user_management(){
+        subutaiSteps.clickOnMenuItemUserManagement();
+    }
+
+    @When("the user click on the menu item: Roles management")
+    public void user_click_menu_item_roles_management(){
+        subutaiSteps.clickOnMenuItemRolesManagement();
+    }
+
+    @When("the user click on the menu item: Tracker")
+    public void user_click_menu_item_tracker(){
+        subutaiSteps.clickOnMenuItemTracker();
+    }
 }

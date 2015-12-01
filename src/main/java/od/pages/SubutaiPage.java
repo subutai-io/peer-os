@@ -8,7 +8,10 @@ import java.io.File;
 import java.util.Arrays;
 
 public class SubutaiPage extends PageObject {
-public String cip;
+    public String cip;
+    public String webUi1;
+    public String webUi2;
+    public String webUi3;
 
     //----- GENERAL PLAYBOOKS
 
@@ -287,6 +290,27 @@ public String cip;
         return text[1].substring(text[1].length() - 6, text[1].length()).trim();
     }
 
+    public String getWebUiContainer1(String phrase){
+        String text [] = element("*//div[@class=\"terminal-results\"]//pre[@class=\"terminal-line\" and contains(text(), \"" + phrase + "\")]").getText().split("\n");
+        webUi1 = text[0].substring(2, 4).trim();
+        System.out.println(webUi1);
+        return  webUi1;
+    }
+
+    public String getWebUiContainer2(String phrase){
+        String text [] = element("*//div[@class=\"terminal-results\"]//pre[@class=\"terminal-line\" and contains(text(), \"" + phrase + "\")]").getText().split("\n");
+        webUi2 = text[1].substring(0, 2).trim();
+        System.out.println(webUi2);
+        return  webUi2;
+    }
+
+    public String getWebUiContainer3(String phrase){
+        String text [] = element("*//div[@class=\"terminal-results\"]//pre[@class=\"terminal-line\" and contains(text(), \"" + phrase + "\")]").getText().split("\n");
+        webUi3 = text[0].substring(2, 5).trim();
+        System.out.println(webUi3);
+        return  webUi3;
+    }
+
     public void getAllData(String phrase){
         String text = element("*//div[@class=\"terminal-results\"]//pre[@class=\"terminal-line\" and contains(text(), \"" + phrase + "\")]").getText();
         System.out.println(text);
@@ -521,4 +545,58 @@ public String cip;
     public void pgpStart(){
         open(new String[]{"resource://jid1-aqqsmbyb0a8adg-at-jetpack/mailvelope/data/common/ui/options.html#displayKeys"});
     }
+
+    @FindBy(xpath = "*//input[@ng-model=\"loginCtrl.name\"]")
+    public WebElementFacade ngLogin;
+
+    @FindBy(xpath = "*//input[@ng-model=\"loginCtrl.pass\"]")
+    public WebElementFacade ngPassword;
+
+    @FindBy(xpath = "*//div[@class=\"b-empty-list\"]//a[@ng-click=\"bvc.createBlueprintFrom()\"]")
+    public WebElementFacade ngCreateBlueprint;
+
+    @FindBy(xpath = "*//a[contains(text(),\"Add\")]")
+    public WebElementFacade ngAdd;
+
+    @FindBy(xpath = "*//a[contains(text(),\"Remove\")]")
+    public WebElementFacade ngRemove;
+
+    @FindBy(xpath = "*//select[@ng-model=\"containerViewCtrl.environmentId\"]")
+    public WebElementFacade ngEnvironmentSelector;
+
+    @FindBy(xpath = "*//select[@ng-model=\"containerViewCtrl.containersTypeId\"]")
+    public WebElementFacade ngContainersSelector;
+
+    @FindBy(xpath = "*//li[@ng-click=\"consoleViewCtrl.setCurrentType('peer')\"]")
+    public WebElementFacade ngPeer;
+
+    @FindBy(xpath = "*//select[@ng-change=\"consoleViewCtrl.setConsole(selectedPeer)\"]")
+    public WebElementFacade ngSelectedPeer;
+
+    @FindBy(id = "subt-link__user-management")
+    public WebElementFacade linkUserManagement;
+
+    @FindBy(xpath = "*//div[@class=\"b-workspace__header\"]//a[@ng-click=\"identityUserCtrl.userForm()\"]")
+    public WebElementFacade ngAddUser;
+
+    @FindBy(id = "subt-link__role-management")
+    public WebElementFacade ngRolesManagment;
+
+    @FindBy(xpath = "*//a[@ng-click=\"identityRoleCtrl.roleForm()\"]")
+    public WebElementFacade ngAddRole;
+
+    @FindBy(xpath = "*//button[@ng-click=\"tokensCtrl.addToken()\"]")
+    public WebElementFacade ngAddToken;
+
+    @FindBy(xpath = "*//input[@ng-model=\"tokensCtrl.newToken.token\"]")
+    public WebElementFacade ngTokenName;
+
+    @FindBy(xpath = "*//a[@ng-click=\"peerRegistrationCtrl.peerFrom()\"]")
+    public WebElementFacade ngCreatePeer;
+
+    @FindBy(id = "subt-link__treaker")
+    public WebElementFacade linkTracker;
+
+    @FindBy(xpath = "*//select[@ng-model=\"trackerCtrl.selectedModule\"]")
+    public WebElementFacade ngSourceSelector;
 }

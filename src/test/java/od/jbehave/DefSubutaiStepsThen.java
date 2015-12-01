@@ -356,4 +356,82 @@ public class DefSubutaiStepsThen {
     public void should_observe_page_not_found_message() {
         subutaiSteps.pageNotFoundMessage();
     }
+
+    @Then("the user should observe 'ng-login', 'ng-password'")
+    public void user_observe_ng_login_ng_password(){
+        subutaiSteps.observeLogin();
+        subutaiSteps.observePassword();
+    }
+
+    @Then("the user should observe 'ng-create blueprint'")
+    public void user_observe_ng_create_blueprint(){
+        subutaiSteps.observeNgCreateBlueprint();
+    }
+
+    @Then("the user observe button 'ng-add', 'ng-remove'")
+    public void user_observe_ng_add_ng_remove(){
+        subutaiSteps.observeNgAdd();
+        subutaiSteps.observeNgRevove();
+    }
+
+    @Then("the user observe 'ng-Environment selector', 'ng-Containers type selector'")
+    public void user_observe_ng_envi_ng_containers(){
+        subutaiSteps.observeNgEnvironmentSelector();
+        subutaiSteps.observeNgContainersSelector();
+    }
+
+    @Then("the user observe 'ng-Peer', 'ng-Select peer'")
+    public void user_observe_ng_peer_ng_select_peer(){
+        subutaiSteps.observeNgPeer();
+        subutaiSteps.observeNgSelectPeer();
+    }
+
+    @Then("the user observe button: 'ng-Add User'")
+    public void user_observe_button_add_user(){
+        subutaiSteps.observeNgAddUser();
+    }
+
+    @Then("the user observe button: 'ng-Add Role'")
+    public void user_observe_button_ng_add_role(){
+        subutaiSteps.observeNgAddRole();
+    }
+
+    @Then("the user observe button: 'ng-Add Token', name: 'ng-Token name'")
+    public void user_observe_button_ng_add_token_ng_token_name(){
+        subutaiSteps.observeNgAddToken();
+        subutaiSteps.observeNgTokenName();
+    }
+
+    @Then("the user observe button: 'ng-Create Peer'")
+    public void user_observe_button_ng_create_peer(){
+        subutaiSteps.observeNgCreatePeer();
+    }
+
+    @Then("the user observe 'ng-Source selector'")
+    public void user_observe_ng_source_selector(){
+        subutaiSteps.observeNgSourceSelector();
+    }
+
+    @Then("the user get weight of Web UI")
+    public void user_get_weight_of_webui(){
+        subutaiSteps.getWebUiWeght1();
+        subutaiSteps.getWebUiWeght2();
+        subutaiSteps.getWeightOfWeight1Weight2();
+    }
+
+    @Then("the user get weight of Web UI .war")
+    public void user_get_weight_of_webui_war(){
+        subutaiSteps.getWebUiWeight3();
+        subutaiSteps.waitABit(2000);
+    }
+
+    @Then("the user get weight of all files")
+    public void get_weight_of_all_files(){
+        subutaiSteps.getWeightOfWeight1Weight2Weight3();
+    }
+
+    @Then("the user should observe that Web UI is less than 10Mb")
+    public void user_observe_that_web_ui_less_than_10mb(){
+        subutaiSteps.observeWebUiLessThan10Mb();
+    }
 }

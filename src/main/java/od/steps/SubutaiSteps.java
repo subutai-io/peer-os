@@ -19,6 +19,8 @@ public class SubutaiSteps extends ScenarioSteps {
     private Object peerID;
     private Object environmentData;
     public Object containerIp;
+    int sumFirst;
+    int sumCommon;
 
     @Step
     public void inputLogin(String login){
@@ -991,4 +993,138 @@ public class SubutaiSteps extends ScenarioSteps {
 //        executeShellCommand.executeCommand(file);
 //        subutaiPage.pgpStart();
 //    }
+
+    @Step
+    public void observeLogin() {
+        assertThat(subutaiPage.ngLogin.isVisible(), is(true));
+    }
+
+    @Step
+    public void observePassword() {
+        assertThat(subutaiPage.ngPassword.isVisible(), is(true));
+    }
+
+    @Step
+    public void observeNgCreateBlueprint() {
+        assertThat(subutaiPage.ngCreateBlueprint.isVisible(), is(true));
+    }
+
+    @Step
+    public void observeNgAdd() {
+        assertThat(subutaiPage.ngAdd.isVisible(), is(true));
+    }
+
+    @Step
+    public void observeNgRevove() {
+        assertThat(subutaiPage.ngRemove.isVisible(), is(true));
+    }
+
+    @Step
+    public void observeNgEnvironmentSelector() {
+        assertThat(subutaiPage.ngEnvironmentSelector.isVisible(), is(true));
+    }
+
+    @Step
+    public void observeNgContainersSelector() {
+        assertThat(subutaiPage.ngContainersSelector.isVisible(), is(true));
+    }
+
+    @Step
+    public void observeNgPeer() {
+        assertThat(subutaiPage.ngPeer.isVisible(), is(true));
+    }
+
+    @Step
+    public void observeNgSelectPeer() {
+        assertThat(subutaiPage.ngSelectedPeer.isVisible(), is(true));
+    }
+
+    @Step
+    public void clickOnMenuItemUserManagement() {
+        subutaiPage.linkUserManagement.click();
+    }
+
+    @Step
+    public void observeNgAddUser() {
+        assertThat(subutaiPage.ngAddUser.isVisible(), is(true));
+    }
+
+    @Step
+    public void observeNgAddRole() {
+        assertThat(subutaiPage.ngAddRole.isVisible(), is(true));
+    }
+
+    @Step
+    public void clickOnMenuItemRolesManagement() {
+        subutaiPage.ngRolesManagment.click();
+    }
+
+    @Step
+    public void observeNgAddToken() {
+        assertThat(subutaiPage.ngAddToken.isVisible(), is(true));
+    }
+
+    @Step
+    public void observeNgTokenName() {
+        assertThat(subutaiPage.ngTokenName.isVisible(), is(true));
+    }
+
+    @Step
+    public void observeNgCreatePeer() {
+        assertThat(subutaiPage.ngCreatePeer.isVisible(), is(true));
+    }
+
+    @Step
+    public void clickOnMenuItemTracker() {
+        subutaiPage.linkTracker.click();
+    }
+
+    @Step
+    public void observeNgSourceSelector() {
+        assertThat(subutaiPage.ngSourceSelector.isVisible(), is(true));
+    }
+
+    @Step
+    public String getWebUiWeght1() {
+        String webUi1 = subutaiPage.getWebUiContainer1("K");
+        return webUi1;
+    }
+
+    @Step
+    public String getWebUiWeght2() {
+        String webUi2 = subutaiPage.getWebUiContainer2("impl");
+        return webUi2;
+    }
+
+    @Step
+    public String getWebUiWeight3() {
+        String webUi3 = subutaiPage.getWebUiContainer3("M");
+        return webUi3;
+    }
+
+    @Step
+    public int getWeightOfWeight1Weight2() {
+        int sum1 = Integer.parseInt(subutaiPage.webUi1);
+        int sum2 = Integer.parseInt(subutaiPage.webUi2);
+        sumFirst = sum1 + sum2;
+        System.out.println(sumFirst);
+        return sumFirst;
+    }
+
+    @Step
+    public int getWeightOfWeight1Weight2Weight3() {
+        float sum3 = Float.parseFloat(subutaiPage.webUi3) * 1000;
+        sumCommon = (int) (sum3 + sumFirst);
+        System.out.println(sumCommon);
+        return sumCommon;
+    }
+
+    @Step
+    public void observeWebUiLessThan10Mb() {
+        if ((sumCommon) < 10000) {
+            is(true);
+        }
+    }
+
+
 }
