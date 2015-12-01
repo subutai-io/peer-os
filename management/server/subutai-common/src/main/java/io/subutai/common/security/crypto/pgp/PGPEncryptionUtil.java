@@ -1427,7 +1427,10 @@ public class PGPEncryptionUtil
                 PGPSignature signature = signIterator.next();
                 signature.init( new JcaPGPContentVerifierBuilderProvider().setProvider( provider ),
                         keySignatureToRemove );
-                if ( signature.verifyCertification( Long.toHexString( oldKey.getKeyID() ), oldKey ) )
+
+                String sigId = PGPKeyUtil.encodeNumericKeyId( oldKey.getKeyID() );
+
+                if ( signature.verifyCertification( sigId, oldKey ) )
                 {
                     PGPPublicKey updatedKey = PGPPublicKey.removeCertification( oldKey, signature );
                     keyToRemoveFrom = PGPPublicKeyRing.insertPublicKey( newPublicKeyRing, updatedKey );
