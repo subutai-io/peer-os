@@ -1,22 +1,22 @@
 <div ng-controller="MonitoringCtrl as monitoringCtrl">
 
-    <div class="b-workspace__header">
-        <h1 class="b-title">Monitoring</h1>
-    </div>
+	<div class="b-workspace__header">
+		<h1 class="b-title">Monitoring</h1>
+	</div>
 
-    <div class="b-workspace__content">
+	<div class="b-workspace__content">
 
 		<div class="b-main-form b-main-form_overflow-hidden">
 
 			<div class="b-console-selects">
 
 				<div class="b-console-selects__item b-main-form__wrapper" 
-				ng-show="consoleViewCtrl.containers.length > 0">
+					ng-show="monitoringCtrl.containers.length > 0">
 					<select class="b-popup-body-input" 
-						ng-model="selectedContainer" 
-						ng-change="consoleViewCtrl.setConsole(selectedContainer)">
+						ng-model="monitoringCtrl.currentHost" 
+						ng-change="monitoringCtrl.getServerData()">
 						<option value="">Select container</option>
-						<option ng-repeat="container in consoleViewCtrl.containers" value="{{ container.id }}">
+						<option ng-repeat="container in monitoringCtrl.containers" value="{{ container.id }}">
 							{{ container.hostname }}
 						</option>
 					</select>
@@ -24,12 +24,12 @@
 				</div>
 
 				<div class="b-console-selects__item b-main-form__wrapper" 
-				ng-show="consoleViewCtrl.currentType == 'environments'">
+					ng-show="monitoringCtrl.currentType == 'environments'">
 					<select class="b-popup-body-input" 
-						ng-model="consoleViewCtrl.selectedEnvironment" 
-						ng-change="consoleViewCtrl.showContainers(consoleViewCtrl.selectedEnvironment)">
+						ng-model="monitoringCtrl.selectedEnvironment" 
+						ng-change="monitoringCtrl.showContainers(monitoringCtrl.selectedEnvironment)">
 						<option value="">Select environment</option>
-						<option ng-repeat="environment in consoleViewCtrl.environments" value="{{ environment.id }}">
+						<option ng-repeat="environment in monitoringCtrl.environments" value="{{ environment.id }}">
 							{{ environment.name }}
 						</option>
 					</select>
@@ -37,12 +37,12 @@
 				</div>
 
 				<div class="b-console-selects__item b-main-form__wrapper" 
-				ng-show="consoleViewCtrl.currentType == 'peer'">
+					ng-show="monitoringCtrl.currentType == 'peer'">
 					<select class="b-popup-body-input" 
-						ng-model="selectedPeer" 
-						ng-change="consoleViewCtrl.setConsole(selectedPeer)">
+						ng-model="monitoringCtrl.currentHost" 
+						ng-change="monitoringCtrl.getServerData()">
 						<option value="">Select peer</option>
-						<option ng-repeat="host in consoleViewCtrl.hosts" value="{{ host.id }}">
+						<option ng-repeat="host in monitoringCtrl.hosts" value="{{ host.id }}">
 							{{ host.hostname }}
 						</option>
 					</select>
@@ -54,54 +54,52 @@
 			<div class="b-toggle-buttons">
 				<ul>
 					<li class="b-toggle-buttons__item" 
-					ng-class="consoleViewCtrl.currentType == 'peer' ? 'b-toggle-buttons__item_active' : ''" 
-					ng-click="consoleViewCtrl.setCurrentType('peer')">
+					ng-class="monitoringCtrl.currentType == 'peer' ? 'b-toggle-buttons__item_active' : ''" 
+					ng-click="monitoringCtrl.setCurrentType('peer')">
 						Peer
 					</li>
 					<li class="b-toggle-buttons__item"
-					ng-class="consoleViewCtrl.currentType == 'environments' ? 'b-toggle-buttons__item_active' : ''" 
-					ng-click="consoleViewCtrl.setCurrentType('environments')">
+					ng-class="monitoringCtrl.currentType == 'environments' ? 'b-toggle-buttons__item_active' : ''" 
+					ng-click="monitoringCtrl.setCurrentType('environments')">
 						Environment
-					</li>
-					<li class="b-toggle-buttons__item"
-					ng-class="consoleViewCtrl.currentType == 'Containers' ? 'b-toggle-buttons__item_active' : ''" 
-					ng-click="consoleViewCtrl.setCurrentType('Containers')">
-						Containers
 					</li>
 				</ul>
 
+				<div class="b-console-selects__item b-main-form__wrapper">
+					<select class="b-popup-body-input" 
+						ng-model="monitoringCtrl.period" 
+						ng-change="monitoringCtrl.getServerData()">
+						<option value="">Choose period</option>
+						<option value="1">1</option>
+						<option value="6">6</option>
+						<option value="12">12</option>
+						<option value="24">24</option>
+						<option value="24">48</option>
+					</select>
+					<div class="clear"></div>
+				</div>
+
 			</div>
-			
+
 			<div class="clear"></div>
 		</div>
 
 		<div class="b-chart-block-list">
-			<div class="b-chart-block-list__item">
+			<div class="b-chart-block-list__item" ng-repeat="chart in monitoringCtrl.charts">
 				<div class="b-chart-block">
-					<div class="b-chart-block__title">RX</div>
+					<div class="b-chart-block__title">{{ chart.name }}</div>
 					<div class="b-chart-block__body">
-						<canvas id="line2" class="chart chart-line" chart-data="monitoringCtrl.cpu.data.values" 
-								chart-options="monitoringCtrl.options" 
-								chart-labels="monitoringCtrl.cpu.data.values" 
-								chart-legend="true" 
-								chart-series="monitoringCtrl.series" 
-								chart-click="monitoringCtrl.onClick">
+						<canvas id="line2" class="chart chart-line" chart-data="chart.values" 
+							chart-options="chart.options" 
+							chart-labels="chart.labels" 
+							chart-legend="true" 
+							chart-series="chart.series" 
+							chart-click="monitoringCtrl.onClick">
 						</canvas>
 					</div>
 				</div>
 			</div>
-			<div class="b-chart-block-list__item">
-				<div class="b-chart-block">
-					<div class="b-chart-block__title">RX</div>
-					<div class="b-chart-block__body">
-						<!--<canvas id="line2" class="chart chart-line" chart-data="monitoringCtrl.data"
-								chart-labels="monitoringCtrl.labels" chart-legend="true" chart-series="monitoringCtrl.series"
-								chart-click="monitoringCtrl.onClick">
-						</canvas>-->
-					</div>
-				</div>
-			</div>
 		</div>
-    </div>
+	</div>
 
 </div>

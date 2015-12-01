@@ -60,7 +60,9 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 							files: [
 								'subutai-app/monitoring/monitoring.js',
 								'subutai-app/monitoring/controller.js',
-								'subutai-app/monitoring/service.js'
+								'subutai-app/monitoring/service.js',
+								'subutai-app/environment/service.js',
+								'subutai-app/peerRegistration/service.js'
 							]
 						}
 					]);
@@ -743,12 +745,15 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 
 function startup($rootScope, $state, $location, $http) {
 
-	$rootScope.$on('$stateChangeStart',	function(event, toState, toParams, fromState, fromParams){
-		var restrictedPage = $.inArray($location.path(), ['/login']) === -1;
-		if (restrictedPage && !getCookie('sptoken')) {
-			$location.path('/login');
-		}
-	});
+	$http.defaults.headers.common['sptoken'] = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI3ZGRiYmMzOC03YmM0LTQwZmQtOWI2OC1jZWY3MmYwNmQ5MDYiLCJpc3MiOiJpby5zdWJ1dGFpIn0.XmxA5uxkRFr5zWau-acOBLzTGmKud-pqxnrIVPrmMqI';
+
+	//$rootScope.$on('$stateChangeStart',	function(event, toState, toParams, fromState, fromParams){
+	//	var restrictedPage = $.inArray($location.path(), ['/login']) === -1;
+	//	if (restrictedPage && !getCookie('sptoken')) {
+	//		$location.path('/login');
+	//	}
+	//});
+	//$http.defaults.headers.common['sptoken'] = getCookie('sptoken');
 
 	$rootScope.$state = $state;
 }
@@ -816,7 +821,8 @@ app.directive('checkbox-list-dropdown', function() {
 
 //Global variables
 
-var SERVER_URL = '/';
+var SERVER_URL = 'http://10.10.12.104:8080/';
+//var SERVER_URL = 'http://172.16.131.205:8080/';
 
 var STATUS_UNDER_MODIFICATION = 'UNDER_MODIFICATION';
 var VARS_TOOLTIP_TIMEOUT = 900;

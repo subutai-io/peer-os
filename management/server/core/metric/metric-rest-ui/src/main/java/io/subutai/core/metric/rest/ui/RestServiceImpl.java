@@ -56,11 +56,11 @@ public class RestServiceImpl implements RestService
             Host host;
             if( environmentId != null && hostId != null )
             {
-                host = localPeer.getResourceHostById( hostId );
+                host = environmentManager.loadEnvironment( environmentId ).getContainerHostById( hostId );
             }
             else if( hostId != null )
             {
-                host = environmentManager.loadEnvironment( environmentId ).getContainerHostById( hostId );
+                host = localPeer.getResourceHostById( hostId );
             }
             else
             {

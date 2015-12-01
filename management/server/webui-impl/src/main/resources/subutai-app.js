@@ -60,7 +60,9 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 							files: [
 								'subutai-app/monitoring/monitoring.js',
 								'subutai-app/monitoring/controller.js',
-								'subutai-app/monitoring/service.js'
+								'subutai-app/monitoring/service.js',
+								'subutai-app/environment/service.js',
+								'subutai-app/peerRegistration/service.js'
 							]
 						}
 					]);
