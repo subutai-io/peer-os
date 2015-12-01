@@ -264,7 +264,7 @@ public class MonitorImpl implements Monitor, HostListener
             if ( !alertPack.isExpired() )
             {
                 // skipping, alert already exists
-                LOG.debug( String.format( "Alert already in queue. %s", alert ) );
+                LOG.debug( String.format( "Alert already in queue. %s", alertPack ) );
                 return;
             }
         }
@@ -381,7 +381,7 @@ public class MonitorImpl implements Monitor, HostListener
     @Override
     public Collection<AlertPack> getAlerts()
     {
-        return Collections.unmodifiableCollection( localALerts.values() );
+        return Collections.unmodifiableCollection( alerts );
     }
 
 
@@ -449,8 +449,13 @@ public class MonitorImpl implements Monitor, HostListener
 
         if ( alertListener != null )
         {
+            alertPack.setDelivered( true );
             AlertNotifier alertNotifier = new AlertNotifier( alertPack, alertListener );
             alertNotifier.run();
+        }
+        else
+        {
+            LOG.warn( String.format( "Alert handler not found for: %s", alertPack ) );
         }
     }
 

@@ -419,7 +419,7 @@ public class PeerWebClient
 
         Response response = client.post( alert );
 
-        if ( Response.Status.ACCEPTED.getStatusCode() == response.getStatus() )
+        if ( Response.Status.ACCEPTED.getStatusCode() != response.getStatus() )
         {
             throw new PeerException( "Alert not accepted." );
         }

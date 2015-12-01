@@ -112,7 +112,7 @@ public class AlertPack
     public long getLiveTime()
     {
         final long liveTime = expiredTime - System.currentTimeMillis();
-        return liveTime < 0 ? liveTime : 0;
+        return liveTime > 0 ? liveTime : 0;
     }
 
 
