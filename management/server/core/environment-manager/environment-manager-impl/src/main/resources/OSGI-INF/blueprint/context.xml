@@ -2,6 +2,7 @@
 <blueprint default-activation="eager"
            xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xmlns:jpa="http://aries.apache.org/xmlns/jpa/v1.0.0"
+           xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
            xmlns:authz="http://aries.apache.org/xmlns/authorization/v1.0.0"
            xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0
             http://www.w3.org/2001/XMLSchema-instance http://www.w3.org/2001/XMLSchema-instance
@@ -11,6 +12,13 @@
   <!-- ***************************************************************** -->
   <authz:enable/>
   <!-- ***************************************************************** -->
+
+  <cm:property-placeholder persistent-id="peer" update-strategy="none">
+    <cm:default-properties>
+      <cm:property name="keyTrustCheckEnabled" value="false" />
+    </cm:default-properties>
+  </cm:property-placeholder>
+
 
   <reference id="templateRegistry" availability="mandatory"
              interface="io.subutai.core.registry.api.TemplateRegistry" />
@@ -47,6 +55,7 @@
     <argument ref="daoManagerEnv" />
     <argument ref="identityManager" />
     <argument ref="tracker" />
+    <property name="keyTrustCheckEnabled" value="${keyTrustCheckEnabled}"/>
   </bean>
 
   <service ref="environmentManager" interface="io.subutai.core.environment.api.EnvironmentManager" />
