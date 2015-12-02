@@ -44,7 +44,7 @@ function TokensCtrl(identitySrv, $scope, DTOptionsBuilder, DTColumnBuilder, $res
 		DTColumnBuilder.newColumn(null).withTitle('TTL/Date').renderWith(dateFormat),
 		DTColumnBuilder.newColumn(null).withTitle('Type').renderWith(getTokenType),
 		DTColumnBuilder.newColumn('hashAlgorithm').withTitle('Hash Algorithm'),
-		DTColumnBuilder.newColumn('issuer').withTitle('Issuer'),
+		DTColumnBuilder.newColumn('issuer').withTitle('Issued by'),
 		DTColumnBuilder.newColumn(null).withTitle('').notSortable().renderWith(viewTokenButton),
 		DTColumnBuilder.newColumn(null).withTitle('').notSortable().renderWith(actionDelete)
 	];

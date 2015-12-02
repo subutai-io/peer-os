@@ -249,6 +249,8 @@ public class RestServiceImpl implements RestService
         {
             Blueprint blueprint = gson.fromJson( blueprintJson, Blueprint.class );
 
+            updateContainerPlacementStrategy( blueprint );
+
             Set<EnvironmentContainerHost> environment =
                     environmentManager.growEnvironment( environmentId, blueprint, false );
         }
@@ -378,7 +380,6 @@ public class RestServiceImpl implements RestService
             file.createNewFile();
             attr.transferTo( file );
 
-
             environmentManager.assignEnvironmentDomain( environmentId, hostName, strategy,
                     System.getProperty( "java.io.tmpdir" ) + "/" + environmentId );
         }
@@ -436,11 +437,11 @@ public class RestServiceImpl implements RestService
         {
             if( environmentManager.isContainerInEnvironmentDomain( containerId, environmentId ) )
             {
-                environmentManager.addContainerToEnvironmentDomain( containerId, environmentId );
+                environmentManager.removeContainerFromEnvironmentDomain( containerId, environmentId  );
             }
             else
             {
-                environmentManager.removeContainerFromEnvironmentDomain( containerId, environmentId  );
+                environmentManager.addContainerToEnvironmentDomain( containerId, environmentId );
             }
         }
         catch ( Exception e )
@@ -900,6 +901,21 @@ public class RestServiceImpl implements RestService
 
         return Response.ok().build();
     }
+
+
+    @Override
+    public Response setupContainerSsh( final String environmentId, final String containerId )
+    {
+        try
+        {
+            return Response.ok( environmentManager.setupContainerSsh( containerId, environmentId ) ).build();
+        }
+        catch( Exception e )
+        {
+            return Response.status( Response.Status.BAD_REQUEST ).entity( e ).build();
+        }
+    }
+
 
 
     /** AUX *****************************************************/

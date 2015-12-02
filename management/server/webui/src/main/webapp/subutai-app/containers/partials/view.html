@@ -12,7 +12,7 @@
 					Environment
 				</label>
 				<select class="b-popup-body-input b-popup-body-input_min" 
-					ng-change="containerViewCtrl.getContainers()" 
+					ng-change="containerViewCtrl.filterContainersList()" 
 					id="subt_select__containers-environment" 
 					ng-model="containerViewCtrl.environmentId">
 					<option value="">All</option>
@@ -28,10 +28,10 @@
 
 			<div class="b-main-form__wrapper b-main-form__wrapper_margin-r">
 				<label class="b-popup-body-label b-popup-body-label_inline">
-					Containers Type 
+					Container Type
 				</label>
 				<select class="b-popup-body-input b-popup-body-input_min" 
-					ng-change="containerViewCtrl.getContainers()" 
+					ng-change="containerViewCtrl.filterContainersList()" 
 					id="subt_select__containers-type" 
 					ng-model="containerViewCtrl.containersTypeId">
 					<option value="">All</option>
@@ -44,10 +44,10 @@
 
 			<div class="b-main-form__wrapper b-main-form__wrapper_margin-r">
 				<label class="b-popup-body-label b-popup-body-label_inline">
-					Containers Status 
+					Container Status
 				</label>
 				<select class="b-popup-body-input b-popup-body-input_min" 
-					ng-change="containerViewCtrl.getContainers()" 
+					ng-change="containerViewCtrl.filterContainersList()" 
 					id="subt_select__containers-status" 
 					ng-model="containerViewCtrl.containerState">
 					<option value="">All</option>
@@ -63,7 +63,7 @@
 			<table datatable="ng" ng-show="containerViewCtrl.containers.length > 0" 
 				dt-options="containerViewCtrl.dtOptions" 
 				dt-column-defs="containerViewCtrl.dtColumnDefs" 
-				class="row-border hover">
+				class="row-border hover subt_table-containers-table">
 				<thead>
 					<tr>
 						<th>Status</th>

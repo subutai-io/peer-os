@@ -10,9 +10,9 @@ angular.module('subutai.console.controller', [])
 		//terminalConfigurationProvider.config('vintage').startSoundUrl ='example/content/start.wav';
 	}]);
 
-ConsoleViewCtrl.$inject = ['$scope', 'consoleService', 'peerRegistrationService', '$stateParams'];
+ConsoleViewCtrl.$inject = ['$scope', 'consoleService', 'peerRegistrationService', '$stateParams', 'ngDialog'];
 
-function ConsoleViewCtrl($scope, consoleService, peerRegistrationService, $stateParams) {
+function ConsoleViewCtrl($scope, consoleService, peerRegistrationService, $stateParams, ngDialog) {
 
 	var vm = this;	
 	vm.currentType = 'peer';
@@ -158,6 +158,7 @@ function ConsoleViewCtrl($scope, consoleService, peerRegistrationService, $state
 	vm.setCurrentType = setCurrentType;
 	vm.setConsole = setConsole;
 	vm.showContainers = showContainers;
+	vm.showSSH = showSSH;
 
 	function setConsole(node) {
 		vm.activeConsole = node;
@@ -172,7 +173,25 @@ function ConsoleViewCtrl($scope, consoleService, peerRegistrationService, $state
 	function setCurrentType(type) {
 		vm.containers = [];
 		vm.selectedEnvironment = '';
+		vm.showSSHCommand = '';
 		vm.currentType = type;
+	}
+
+	function showSSH() {
+		if(vm.activeConsole.length > 0) {
+			LOADING_SCREEN();
+			consoleService.getSSH(vm.selectedEnvironment, vm.activeConsole).success(function (data) {
+				vm.showSSHCommand = data;
+				ngDialog.open({
+					template: 'subutai-app/console/partials/sshPopup.html',
+					scope: $scope
+				});
+				LOADING_SCREEN('none');
+			}).error(function(error){
+				console.log(error);
+				LOADING_SCREEN('none');
+			});
+		}
 	}
 
 	function showContainers(environmentId) {

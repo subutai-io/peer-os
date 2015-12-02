@@ -43,7 +43,7 @@
 						ng-change="consoleViewCtrl.setConsole(selectedPeer)">
 						<option value="">Select peer</option>
 						<option ng-repeat="host in consoleViewCtrl.hosts" value="{{ host.id }}">
-							{{ host.hostname }}
+							{{ host.hostname }} ({{ host.instance }}, {{ host.arch }})
 						</option>
 					</select>
 					<div class="clear"></div>
@@ -80,6 +80,10 @@
 						class="b-popup-body-checkbox">
 					<div class="clear"></div>
 				</div>
+
+				<div class="b-main-form__wrapper" ng-show="consoleViewCtrl.currentType == 'environments'">
+					<button class="b-btn b-btn_green" ng-click="consoleViewCtrl.showSSH()">SSH</button>
+				</div>				
 			</div>
 			
 			<div class="clear"></div>

@@ -43,8 +43,31 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 			}
 		})
 		.state('home', {
-			url: '',
-			templateUrl: 'subutai-app/home/partials/view.html'
+			url: '/',
+			templateUrl: 'subutai-app/monitoring/partials/view.html',
+			resolve: {
+				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+					return $ocLazyLoad.load([
+						{
+							name: 'chart.js',
+							files: [
+								'css/libs/angular-chart.min.css',
+								'assets/js/plugins/angular-chart.min.js'
+							]
+						},
+						{
+							name: 'subutai.monitoring',
+							files: [
+								'subutai-app/monitoring/monitoring.js',
+								'subutai-app/monitoring/controller.js',
+								'subutai-app/monitoring/service.js',
+								'subutai-app/environment/service.js',
+								'subutai-app/peerRegistration/service.js'
+							]
+						}
+					]);
+				}]
+			}
 		})
 		.state('blueprints', {
 			url: '/blueprints',
@@ -612,6 +635,108 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 				}]
 			}
 		})
+		.state('accumulo', {
+			url: '/plugins/accumulo',
+			templateUrl: 'plugins/accumulo/partials/view.html',
+			resolve: {
+				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+					return $ocLazyLoad.load([
+						{
+							name: 'subutai.plugins.accumulo',
+							files: [
+								'plugins/accumulo/accumulo.js',
+								'plugins/accumulo/controller.js',
+								'plugins/accumulo/service.js',
+								'plugins/hadoop/service.js',
+								'plugins/zookeeper/service.js',
+								'subutai-app/environment/service.js'
+							]
+						}
+					]);
+				}]
+			}
+		})
+		.state('shark', {
+			url: '/plugins/shark',
+			templateUrl: 'plugins/shark/partials/view.html',
+			resolve: {
+				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+					return $ocLazyLoad.load([
+						{
+							name: 'subutai.plugins.shark',
+							files: [
+								'plugins/shark/shark.js',
+								'plugins/shark/controller.js',
+								'plugins/shark/service.js',
+								'plugins/hadoop/service.js',
+								'plugins/spark/service.js',
+								'subutai-app/environment/service.js'
+							]
+						}
+					]);
+				}]
+			}
+		})
+		.state('hbase', {
+			url: '/plugins/hbase',
+			templateUrl: 'plugins/hbase/partials/view.html',
+			resolve: {
+				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+					return $ocLazyLoad.load([
+						{
+							name: 'subutai.plugins.hbase',
+							files: [
+								'plugins/hbase/hbase.js',
+								'plugins/hbase/controller.js',
+								'plugins/hbase/service.js',
+								'plugins/hadoop/service.js',
+								'subutai-app/environment/service.js'
+							]
+						}
+					]);
+				}]
+			}
+		})
+		.state('nodeReg', {
+			url: '/nodeReg',
+			templateUrl: 'subutai-app/nodeReg/partials/view.html',
+			resolve: {
+				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+					return $ocLazyLoad.load(
+						{
+							name: 'subutai.nodeReg',
+							files: [
+								'subutai-app/nodeReg/nodeReg.js',
+								'subutai-app/nodeReg/controller.js',
+								'subutai-app/nodeReg/service.js',
+								'subutai-app/environment/service.js'
+							]
+						});
+				}]
+			}
+		})
+		.state('generic', {
+			url: '/plugins/generic',
+			templateUrl: 'plugins/generic/partials/view.html',
+			resolve: {
+				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+					return $ocLazyLoad.load([
+						{
+							name: 'vtortola.ng-terminal'
+						},
+						{
+							name: 'subutai.plugins.generic',
+							files: [
+								'plugins/generic/generic.js',
+								'plugins/generic/controller.js',
+								'plugins/generic/service.js',
+								'subutai-app/environment/service.js'
+							]
+						}
+					]);
+				}]
+			}
+		})
 		.state('404', {
 			url: '/404',
 			template: 'Not found'
@@ -626,7 +751,6 @@ function startup($rootScope, $state, $location, $http) {
 			$location.path('/login');
 		}
 	});
-	$http.defaults.headers.common['sptoken'] = getCookie('sptoken');
 
 	$rootScope.$state = $state;
 }
@@ -656,6 +780,8 @@ app.directive('dropdownMenu', function() {
 			//colEqualHeight();
 
 			$('.b-nav-menu-link').on('click', function(){
+				$('.b-nav-menu_active').removeClass('b-nav-menu_active')
+				$('.b-nav-menu__sub').slideUp(200);
 				if($(this).next('.b-nav-menu__sub').length > 0) {
 					if($(this).parent().hasClass('b-nav-menu_active')) {
 						$(this).parent().removeClass('b-nav-menu_active');
@@ -679,7 +805,6 @@ app.directive('checkbox-list-dropdown', function() {
 	return {
 		restrict: 'A',
 		link: function(scope, element, attr) {
-			console.log('lololo');
 			$('.b-form-input_dropdown').click(function () {
 				$(this).toggleClass('is-active');
 			});
@@ -692,6 +817,7 @@ app.directive('checkbox-list-dropdown', function() {
 });
 
 //Global variables
+
 var SERVER_URL = '/';
 
 var STATUS_UNDER_MODIFICATION = 'UNDER_MODIFICATION';
@@ -724,11 +850,11 @@ function VARS_MODAL_CONFIRMATION( object, title, text, func )
 function VARS_MODAL_ERROR( object, text )
 {
 	object.swal({
-			title: "ERROR!",
-			text: text,
-			type: "error",
-			confirmButtonColor: "#ff3f3c"
-		});
+		title: "ERROR!",
+		text: text,
+		type: "error",
+		confirmButtonColor: "#ff3f3c"
+	});
 }
 
 quotaColors = [];
@@ -816,7 +942,7 @@ var permissionsDefault = [
 
 function toggle (source, name) {
 	checkboxes = document.getElementsByName (name);
-    for (var i = 0; i < checkboxes.length; i++) {
-    	checkboxes[i].checked = source.checked;
-    }
+	for (var i = 0; i < checkboxes.length; i++) {
+		checkboxes[i].checked = source.checked;
+	}
 }

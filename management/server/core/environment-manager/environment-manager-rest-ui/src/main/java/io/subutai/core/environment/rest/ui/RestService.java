@@ -242,4 +242,9 @@ public interface RestService
     @DELETE
     @Path( "{environmentId}/containers/{containerId}/tags/{tag}" )
     Response removeTag( @PathParam( "environmentId" ) String environmentId, @PathParam( "containerId" ) String containerId, @PathParam( "tag" ) String tag );
+
+    @GET
+    @Path( "{environmentId}/containers/{containerId}/ssh" )
+    @Produces( { MediaType.TEXT_PLAIN } )
+    Response setupContainerSsh( @PathParam( "environmentId" ) String environmentId, @PathParam( "containerId" ) String containerId );
 }

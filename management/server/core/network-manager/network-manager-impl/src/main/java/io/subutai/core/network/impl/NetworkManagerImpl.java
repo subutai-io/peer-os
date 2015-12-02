@@ -373,7 +373,8 @@ public class NetworkManagerImpl implements NetworkManager
 
 
         CommandResult result =
-                execute( getManagementHost(), commands.getSetupContainerSshCommand( containerIp, sshIdleTimeout ) );
+                execute( getManagementHost(), commands.getSetupContainerSshCommand( containerIp, sshIdleTimeout )
+                                                      .daemon() );
 
         Pattern p = Pattern.compile( "\\s+(\\d+)\\s+" );
         Matcher m = p.matcher( result.getStdOut() );
