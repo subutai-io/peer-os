@@ -401,7 +401,7 @@ public class TemplateManagerImpl implements TemplateManager
         {
             // TODO: Kairat. Handle following workaround.
             
-            if ( repoUrl.isUseToken() ) // Workaround to avoid direct and indirect cyclic lookups
+            if ( ! repoUrl.isUseToken() ) // Workaround to avoid direct and indirect cyclic lookups
             {
                 unifiedRepo.getRepositories().add( repositoryFactory.createNonLocalTemplate( repoUrl.getUrl().toString(), null, repoUrl.isUseToken() ) );
             }
