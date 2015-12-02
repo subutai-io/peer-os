@@ -72,7 +72,7 @@ public class TemplateManagerImpl implements TemplateManager
     public TemplateManagerImpl( LocalPeer localPeer, String globalKurjunUrl )
     {
         this.localPeer = localPeer;
-        
+
         if ( !Strings.isNullOrEmpty( globalKurjunUrl ) )
         {
             String urls[] = globalKurjunUrl.split( "," );
@@ -189,6 +189,25 @@ public class TemplateManagerImpl implements TemplateManager
 
             return null;
         }
+    }
+
+
+    @Override
+    public Set<URL> getRemoteRepoUrls()
+    {
+        Set<URL> urls = new HashSet<>();
+        try
+        {
+            for ( RepoUrl r : repoUrlStore.getRemoteTemplateUrls() )
+            {
+                urls.add( r.getUrl() );
+            }
+        }
+        catch ( IOException e )
+        {
+            LOGGER.error( "", e );
+        }
+        return urls;
     }
 
 

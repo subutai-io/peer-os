@@ -14,6 +14,7 @@ public class GetTemplateCommand extends SubutaiShellCommandSupport
 {
 
     private final TemplateManager templateManager;
+
     @Argument( index = 0, name = "repository", multiValued = false, description = "Repository name" )
     private String repository;
 
