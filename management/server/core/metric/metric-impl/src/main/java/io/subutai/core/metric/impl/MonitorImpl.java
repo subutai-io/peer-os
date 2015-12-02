@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -43,14 +44,12 @@ import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.host.ResourceHostInfoModel;
 import io.subutai.common.metric.Alert;
 import io.subutai.common.metric.BaseMetric;
-import io.subutai.common.metric.ExceededQuota;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.QuotaAlert;
 import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.metric.ResourceHostMetrics;
-import io.subutai.common.metric.StringAlertValue;
-import io.subutai.common.peer.AlertListener;
+import io.subutai.common.peer.AlertHandler;
 import io.subutai.common.peer.AlertPack;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
@@ -87,8 +86,9 @@ public class MonitorImpl implements Monitor, HostListener
     private static final int ALERT_LIVE_TIME = 2;// alert live time in min
     private final HostRegistry hostRegistry;
 
-    protected Set<AlertListener> alertListeners =
-            Collections.newSetFromMap( new ConcurrentHashMap<AlertListener, Boolean>() );
+    //    protected Set<AlertHandler> alertHandlers =
+    //            Collections.newSetFromMap( new ConcurrentHashMap<AlertHandler, Boolean>() );
+    protected Map<String, AlertHandler> alertHandlers = new ConcurrentHashMap<String, AlertHandler>();
 
     private final Commands commands = new Commands();
     private final EnvironmentManager environmentManager;
@@ -499,10 +499,10 @@ public class MonitorImpl implements Monitor, HostListener
             LOG.warn( e.getMessage() );
         }
         //          Example of usage:
-        //        QuotaAlertValue quotaAlertValue = alert.getAlertValue( QuotaAlertValue.class );
-        //        StringAlertValue stringAlertValue = alert.getAlertValue( StringAlertValue.class );
-        //        ExceededQuota v1 = quotaAlertValue.getValue();
-        //        String v2 = stringAlertValue.getValue();
+        //                QuotaAlertValue quotaAlertValue = alert.getAlertValue( QuotaAlertValue.class );
+        //                StringAlertValue stringAlertValue = alert.getAlertValue( StringAlertValue.class );
+        //                ExceededQuota v1 = quotaAlertValue.getValue();
+        //                String v2 = stringAlertValue.getValue();
 
         return packet;
     }
@@ -563,29 +563,36 @@ public class MonitorImpl implements Monitor, HostListener
 
 
     @Override
-    public void addAlertListener( final AlertListener alertListener )
+    public void addAlertHandler( final AlertHandler alertHandler )
     {
-        if ( alertListener != null && alertListener.getSubscriberId() != null )
+        if ( alertHandler != null && alertHandler.getHandlerId() != null
+                && alertHandler.getAlertHandlerPriority() != null )
         {
-            this.alertListeners.add( alertListener );
+            this.alertHandlers.put( alertHandler.getHandlerId(), alertHandler );
+        }
+        else
+        {
+            LOG.warn( "Alert handler rejected: " + alertHandler );
         }
     }
 
 
     @Override
-    public void removeAlertListener( final AlertListener alertListener )
+    public void removeAlertHandler( final AlertHandler alertHandler )
     {
-        if ( alertListener != null )
+        if ( alertHandler != null )
         {
-            this.alertListeners.remove( alertListener );
+            this.alertHandlers.remove( alertHandler.getHandlerId() );
         }
     }
 
 
     @Override
-    public Collection<AlertListener> getAlertListeners()
+    public Collection<AlertHandler> getAlertHandlers()
     {
-        return alertListeners;
+        List<AlertHandler> result = new ArrayList<>( alertHandlers.values() );
+        Collections.sort( result, new AlertHandlerComparator() );
+        return result;
     }
 
 
@@ -610,9 +617,9 @@ public class MonitorImpl implements Monitor, HostListener
     {
         for ( AlertPack alertPack : alerts )
         {
-            LOG.debug( "Notifying: " + alertPack );
             if ( !alertPack.isDelivered() && !alertPack.isExpired() )
             {
+                LOG.debug( "Notifying: " + alertPack );
                 notifyOnAlert( alertPack );
                 alertPack.setDelivered( true );
             }
@@ -624,31 +631,54 @@ public class MonitorImpl implements Monitor, HostListener
     {
         try
         {
-            //obtain user from environment
             Environment environment = environmentManager.loadEnvironment( alertPack.getEnvironmentId() );
 
-            //search for subscriber if not found then no-op
-            Set<String> subscribersIds = monitorDao.getEnvironmentSubscribersIds( alertPack.getEnvironmentId() );
-            for ( String subscriberId : subscribersIds )
+            Set<String> handlerList = monitorDao.getEnvironmentSubscribersIds( alertPack.getEnvironmentId() );
+
+            List<AlertHandler> handlers = new ArrayList<>();
+
+            for ( String handlerId : handlerList )
             {
-                // notify subscriber on alert
-                notifyListener( alertPack, subscriberId );
+                AlertHandler alertHandler = alertHandlers.get( handlerId );
+                if ( alertHandler == null )
+                {
+                    alertPack.addLog(
+                            String.format( "Environment '%s' subscribed to handler '%s', but handler not found.",
+                                    alertPack.getEnvironmentId(), handlerId ) );
+                }
             }
+
+            Collections.sort( handlers, new AlertHandlerComparator() );
+
+            handleAlertPack( alertPack, handlers );
         }
         catch ( Exception e )
         {
-            LOG.error( "Error in notifyOnAlert", e );
+            LOG.error( "Error in handling alert package.", e );
         }
     }
 
 
-    protected void notifyListener( final AlertPack metric, String subscriberId )
+    protected void handleAlertPack( final AlertPack alertPack, List<AlertHandler> alertHandlers )
     {
-        for ( final AlertListener listener : alertListeners )
+
+        for ( final AlertHandler handler : alertHandlers )
         {
-            if ( listener.getSubscriberId().startsWith( subscriberId ) )
+            try
             {
-                notificationExecutor.execute( new AlertNotifier( metric, listener ) );
+                alertPack.addLog( String.format( "Invoking pre-processor of '%s'.", handler.getHandlerId() ) );
+                handler.preProcess( alertPack );
+                alertPack.addLog( String.format( "Pre-processor of '%s' finished.", handler.getHandlerId() ) );
+                alertPack.addLog( String.format( "Invoking main processor of '%s'.", handler.getHandlerId() ) );
+                handler.process( alertPack );
+                alertPack.addLog( String.format( "Main processor of '%s' finished.", handler.getHandlerId() ) );
+                alertPack.addLog( String.format( "Invoking post-processor of '%s'.", handler.getHandlerId() ) );
+                handler.postProcess( alertPack );
+                alertPack.addLog( String.format( "Pre-processor of '%s' finished.", handler.getHandlerId() ) );
+            }
+            catch ( Exception e )
+            {
+                alertPack.addLog( e.getMessage() );
             }
         }
     }

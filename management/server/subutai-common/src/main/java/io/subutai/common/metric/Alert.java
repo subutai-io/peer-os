@@ -15,18 +15,18 @@ import io.subutai.common.host.HostId;
         include = JsonTypeInfo.As.PROPERTY,
         property = "type" )
 @JsonSubTypes( {
-        @JsonSubTypes.Type( value = QuotaAlert.class, name = "ResourceAlertValue" ),
-        @JsonSubTypes.Type( value = StringAlert.class, name = "StringAlertValue" ),
+        @JsonSubTypes.Type( value = QuotaAlert.class, name = "QuotaAlert" ),
+        @JsonSubTypes.Type( value = StringAlert.class, name = "StringAlert" ),
 } )
 public interface Alert
 {
     HostId getHostId();
 
-    <T extends AlertValue> T getAlertValue(Class<T> format);
+    <T extends AlertValue> T getAlertValue( Class<T> format );
 
     String getId();
 
-//    AlertType getType();
+    //    AlertType getType();
 
     long getCreatedTime();
 

@@ -1,6 +1,8 @@
 package io.subutai.common.metric;
 
 
+import org.codehaus.jackson.annotate.JsonProperty;
+
 import com.google.common.base.Preconditions;
 
 
@@ -13,7 +15,7 @@ public class QuotaAlertValue implements AlertValue<ExceededQuota>
     private ExceededQuota value;
 
 
-    public QuotaAlertValue( final ExceededQuota value )
+    public QuotaAlertValue( @JsonProperty( "value" ) final ExceededQuota value )
     {
         this.value = value;
     }

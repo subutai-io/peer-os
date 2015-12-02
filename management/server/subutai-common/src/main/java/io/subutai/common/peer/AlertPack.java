@@ -1,34 +1,48 @@
 package io.subutai.common.peer;
 
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 
-import io.subutai.common.metric.AbstractAlert;
 import io.subutai.common.metric.Alert;
 
 
 /**
- * Alert packet for transferring between peers
+ * Alert package
  */
 public class AlertPack
 {
+    private static DateFormat fmt = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss.SS Z" );
     @JsonProperty( "peerId" )
     String peerId;
+
     @JsonProperty( "environmentId" )
     String environmentId;
+
     @JsonProperty( "containerId" )
     String containerId;
+
     @JsonProperty( "templateName" )
     String templateName;
+
     @JsonProperty( "resource" )
     Alert resource;
+
     @JsonIgnore
     boolean delivered = false;
+
     @JsonProperty( "expiredTime" )
     Long expiredTime;
+
+    @JsonIgnore
+    List<String> logs = new ArrayList<>();
 
 
     public AlertPack( @JsonProperty( "peerId" ) final String peerId,
@@ -110,11 +124,22 @@ public class AlertPack
     }
 
 
+    public void addLog( String log )
+    {
+        if ( log != null )
+        {
+            logs.add( fmt.format( new Date() ) + " " + log );
+        }
+    }
+
+
     @Override
     public String toString()
     {
-        return String.format( "%s %s Route:(%s,%s,%s) ttl:%d %s", resource.getId(), isExpired() ? "EXPIRED" : "NOT EXPIRED", peerId,
-                environmentId, containerId, TimeUnit.SECONDS.convert( getLiveTime(), TimeUnit.MILLISECONDS ),
-                delivered ? "DELIVERED" : "NOT DELIVERED" );
+        return String
+                .format( "%s %s Route:(%s,%s,%s) ttl:%d %s", resource.getId(), isExpired() ? "EXPIRED" : "NOT EXPIRED",
+                        peerId, environmentId, containerId,
+                        TimeUnit.SECONDS.convert( getLiveTime(), TimeUnit.MILLISECONDS ),
+                        delivered ? "DELIVERED" : "NOT DELIVERED" );
     }
 }

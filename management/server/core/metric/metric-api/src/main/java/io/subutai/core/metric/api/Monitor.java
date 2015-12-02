@@ -4,13 +4,12 @@ package io.subutai.core.metric.api;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 import io.subutai.common.environment.Environment;
 import io.subutai.common.metric.BaseMetric;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
-import io.subutai.common.peer.AlertListener;
+import io.subutai.common.peer.AlertHandler;
 import io.subutai.common.peer.AlertPack;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.Host;
@@ -68,11 +67,11 @@ public interface Monitor
 
     Collection<AlertPack> getAlerts();
 
-    void addAlertListener( AlertListener alertListener );
+    void addAlertHandler( AlertHandler alertHandler );
 
-    void removeAlertListener( AlertListener alertListener );
+    void removeAlertHandler( AlertHandler alertHandler );
 
-    Collection<AlertListener> getAlertListeners();
+    Collection<AlertHandler> getAlertHandlers();
 
     List<AlertPack> getAlertPackages();
 

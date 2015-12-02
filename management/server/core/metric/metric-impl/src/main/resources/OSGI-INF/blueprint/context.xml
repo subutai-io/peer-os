@@ -36,14 +36,14 @@
   <service ref="monitor" interface="io.subutai.core.hostregistry.api.HostListener" />
 
   <reference-list id="alertListener"
-                  interface="io.subutai.common.peer.AlertListener"
+                  interface="io.subutai.common.peer.AlertHandler"
                   availability="optional" ext:proxy-method="classes">
     <reference-listener ref="monitor"
                         bind-method="addAlertListener" unbind-method="removeAlertListener" />
   </reference-list>
-  <bean id="masterAlertListener" class="io.subutai.core.metric.impl.MasterAlertListener" scope="singleton"
+  <bean id="masterAlertListener" class="io.subutai.common.peer.AbstractAlertHandler" scope="singleton"
         activation="eager">
 
   </bean>
-  <service ref="masterAlertListener" interface="io.subutai.common.peer.AlertListener" />
+  <service ref="masterAlertListener" interface="io.subutai.common.peer.AlertHandler" />
 </blueprint>

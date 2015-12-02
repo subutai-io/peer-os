@@ -24,6 +24,7 @@ public class QuotaAlert extends AbstractAlert<QuotaAlertValue> implements Alert
         Preconditions.checkNotNull( alertValue.getValue().getResourceType() );
         Preconditions.checkNotNull( alertValue.getValue().getCurrentValue() );
         Preconditions.checkNotNull( alertValue.getValue().getQuotaValue() );
+        this.hostId = alertValue.getValue().getHostId();
         this.alert = alertValue;
         this.createdTime = createdTime;
     }

@@ -3,7 +3,6 @@ package io.subutai.core.metric.impl;
 
 import java.util.Date;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
@@ -26,7 +25,7 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.Environment;
-import io.subutai.common.peer.AlertListener;
+import io.subutai.common.peer.AlertHandler;
 import io.subutai.common.peer.AlertPack;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
@@ -96,8 +95,8 @@ public class MonitorImplTest
     @Mock
     AlertPack alert;
     @Mock
-    AlertListener alertListener;
-    Set<AlertListener> alertListeners;
+    AlertHandler alertHandler;
+    Map<String, AlertHandler> alertHandlers;
     MonitorImplExt monitor;
 
     @Mock
@@ -148,9 +147,9 @@ public class MonitorImplTest
         // executor;}
 
 
-        public void setAlertListeners( Set<AlertListener> alertListeners )
+        public void setAlertListeners( Map<String, AlertHandler> alertHandlers )
         {
-            this.alertListeners = alertListeners;
+            this.alertHandlers = alertHandlers;
         }
     }
 
@@ -172,10 +171,10 @@ public class MonitorImplTest
         when( environmentId.getId() ).thenReturn( ENVIRONMENT_ID );
         //        when( alert.getEnvironmentId() ).thenReturn( environmentId );
         //        when( alert.getContainerId() ).thenReturn( containerId );
-        when( alertListener.getSubscriberId() ).thenReturn( SUBSCRIBER_ID );
-        alertListeners = Sets.newHashSet();
-        alertListeners.add( alertListener );
-        monitor.setAlertListeners( alertListeners );
+        when( alertHandler.getHandlerId() ).thenReturn( SUBSCRIBER_ID );
+        alertHandlers = Maps.newHashMap();
+        alertHandlers.put( "test", alertHandler );
+        monitor.setAlertListeners( alertHandlers );
         //        monitor.setNotificationExecutor( notificationService );
         when( monitorDao.getEnvironmentSubscribersIds( ENVIRONMENT_ID ) )
                 .thenReturn( Sets.newHashSet( SUBSCRIBER_ID ) );
@@ -209,21 +208,21 @@ public class MonitorImplTest
     @Test
     public void testAddAlertListener() throws Exception
     {
-        Set<AlertListener> alertListeners = Sets.newHashSet();
-        monitor.setAlertListeners( alertListeners );
+        Map<String, AlertHandler> alertHandlers = Maps.newHashMap();
+        monitor.setAlertListeners( alertHandlers );
 
-        monitor.addAlertListener( alertListener );
+        monitor.addAlertHandler( alertHandler );
 
-        assertTrue( alertListeners.contains( alertListener ) );
+        assertTrue( alertHandlers.values().contains( alertHandler ) );
     }
 
 
     @Test
     public void testRemoveAlertListener() throws Exception
     {
-        monitor.removeAlertListener( alertListener );
+        monitor.removeAlertHandler( alertHandler );
 
-        assertFalse( alertListeners.contains( alertListener ) );
+        assertFalse( alertHandlers.values().contains( alertHandler ) );
     }
 
 
@@ -236,7 +235,7 @@ public class MonitorImplTest
         monitor.notifyOnAlert( alert );
 
         verify( notificationService ).execute( alertNotifierArgumentCaptor.capture() );
-        assertEquals( alertListener, alertNotifierArgumentCaptor.getValue().listener );
+        assertEquals( alertHandler, alertNotifierArgumentCaptor.getValue().listener );
         assertEquals( alert, alertNotifierArgumentCaptor.getValue().alert );
     }
 
