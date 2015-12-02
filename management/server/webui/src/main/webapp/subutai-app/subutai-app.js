@@ -780,8 +780,6 @@ app.directive('dropdownMenu', function() {
 			//colEqualHeight();
 
 			$('.b-nav-menu-link').on('click', function(){
-				$('.b-nav-menu_active').removeClass('b-nav-menu_active')
-				$('.b-nav-menu__sub').slideUp(200);
 				if($(this).next('.b-nav-menu__sub').length > 0) {
 					if($(this).parent().hasClass('b-nav-menu_active')) {
 						$(this).parent().removeClass('b-nav-menu_active');
@@ -789,6 +787,8 @@ app.directive('dropdownMenu', function() {
 							//colEqualHeight();
 						});
 					} else {
+						$('.b-nav-menu_active').removeClass('b-nav-menu_active')
+						$('.b-nav-menu__sub').slideUp(200);
 						$(this).parent().addClass('b-nav-menu_active');
 						$(this).next('.b-nav-menu__sub').slideDown(300, function(){
 							//colEqualHeight();
@@ -821,7 +821,7 @@ app.directive('checkbox-list-dropdown', function() {
 var SERVER_URL = '/';
 
 var STATUS_UNDER_MODIFICATION = 'UNDER_MODIFICATION';
-var VARS_TOOLTIP_TIMEOUT = 900;
+var VARS_TOOLTIP_TIMEOUT = 1600;
 
 function LOADING_SCREEN(displayStatus) {
 	if(displayStatus === undefined || displayStatus === null) displayStatus = 'block';
@@ -875,7 +875,6 @@ var permissionsDefault = [
 		'write': true,
 		'update': true,
 		'delete': true,
-		'selected': false
 	},
 	{
 		'object': 2,
@@ -885,7 +884,6 @@ var permissionsDefault = [
 		'write': true,
 		'update': true,
 		'delete': true,
-		'selected': false
 	},
 	{
 		'object': 3,
@@ -895,7 +893,6 @@ var permissionsDefault = [
 		'write': true,
 		'update': true,
 		'delete': true,
-		'selected': false
 	},
 	{
 		'object': 4,
@@ -905,7 +902,6 @@ var permissionsDefault = [
 		'write': true,
 		'update': true,
 		'delete': true,
-		'selected': false
 	},
 	{
 		'object': 5,
@@ -915,7 +911,6 @@ var permissionsDefault = [
 		'write': true,
 		'update': true,
 		'delete': true,
-		'selected': false
 	},
 	{
 		'object': 6,
@@ -925,7 +920,6 @@ var permissionsDefault = [
 		'write': true,
 		'update': true,
 		'delete': true,
-		'selected': false
 	},
 	{
 		'object': 7,
@@ -935,7 +929,6 @@ var permissionsDefault = [
 		'write': true,
 		'update': true,
 		'delete': true,
-		'selected': false
 	}
 ];
 

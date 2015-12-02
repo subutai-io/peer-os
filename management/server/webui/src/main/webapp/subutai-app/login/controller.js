@@ -18,7 +18,7 @@ function LoginCtrl( loginSrv, $http, $location )
 	function login() {
 		loginSrv.login( vm.name, vm.pass ).success(function(data){
 			$http.defaults.headers.common['sptoken']= getCookie('sptoken');
-			$location.path('/blueprints');
+			$location.path('/');
 		});
 	}
 }

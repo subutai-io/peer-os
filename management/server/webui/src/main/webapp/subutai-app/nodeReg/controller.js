@@ -26,7 +26,6 @@ function NodeRegCtrl(nodeRegSrv, SweetAlert, DTOptionsBuilder, DTColumnDefBuilde
 
 
 	nodeRegSrv.getData().success(function(data){
-		console.log(data,"<<<<<<<<<<<<<<<<<look here");
 		vm.nodes = data;
 	});
 
@@ -37,14 +36,18 @@ function NodeRegCtrl(nodeRegSrv, SweetAlert, DTOptionsBuilder, DTColumnDefBuilde
 
 		SweetAlert.swal("Success!", "Node is being approved.", "success");
 
+		LOADING_SCREEN();
 		nodeRegSrv.approveNode( nodeId ).success(function (data) {
 			SweetAlert.swal(
 				"Success!",
 				"Node has been added to cluster.",
 				"success"
 			);
-
-			// @todo add refresh table
+			LOADING_SCREEN('none');
+			vm.dtInstance.reloadData(null, false);
+		}).error(function(error){
+			SweetAlert.swal("ERROR!", error, "error");
+			LOADING_SCREEN('none');
 		});
 	}
 };
