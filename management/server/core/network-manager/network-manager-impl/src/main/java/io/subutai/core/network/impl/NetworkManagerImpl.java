@@ -371,14 +371,14 @@ public class NetworkManagerImpl implements NetworkManager
         Preconditions.checkArgument( sshIdleTimeout > 0, "Timeout must be greater than 0" );
         Preconditions.checkArgument( containerIp.matches( Common.HOSTNAME_REGEX ), "Invalid container IP" );
 
-        CommandResult result = execute( getManagementHost(),
-                commands.getSetupContainerSshCommand( containerIp, sshIdleTimeout ).daemon() );
+        CommandResult result =
+                execute( getManagementHost(), commands.getSetupContainerSshCommand( containerIp, sshIdleTimeout ) );
 
         try
         {
-            return Integer.parseInt( result.getStdOut() );
+            return Integer.parseInt( result.getStdOut().trim() );
         }
-        catch ( NumberFormatException e )
+        catch ( Exception e )
         {
             throw new NetworkManagerException(
                     String.format( "Could not parse port out of response %s", result.getStdOut() ) );
