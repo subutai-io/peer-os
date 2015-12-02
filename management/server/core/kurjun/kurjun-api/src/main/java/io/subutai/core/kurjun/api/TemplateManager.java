@@ -7,6 +7,7 @@ import java.net.URL;
 import java.util.List;
 
 import io.subutai.common.protocol.TemplateKurjun;
+import java.util.Set;
 
 
 /**
@@ -51,6 +52,13 @@ public interface TemplateManager
      * @return JSON encoded meta data
      */
     TemplateKurjun getTemplate( String name );
+    
+    /**
+     * Gets the set of remote repo urls
+     *
+     * @return Set of urls
+     */
+    Set<URL> getRemoteRepoUrls();
 
 
     /**
