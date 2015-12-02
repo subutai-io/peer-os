@@ -78,7 +78,11 @@ public class TemplateManagerImpl implements TemplateManager
         try
         {
             remoteRepoUrls = repoUrlStore.getRemoteTemplateUrls();
-            LOGGER.info( "Loaded remote template host urls: {}", remoteRepoUrls );
+            LOGGER.info( "Loaded {} remote template host urls:", remoteRepoUrls.size() );
+            for ( RepoUrl r : remoteRepoUrls )
+            {
+                LOGGER.info( r.toString() );
+            }
         }
         catch ( IOException e )
         {
