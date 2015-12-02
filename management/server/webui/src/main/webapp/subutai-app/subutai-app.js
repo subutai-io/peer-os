@@ -185,6 +185,24 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 				}]
 			}
 		})
+		.state('nodeReg', {
+			url: '/nodeReg',
+			templateUrl: 'subutai-app/nodeReg/partials/view.html',
+			resolve: {
+				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+					return $ocLazyLoad.load(
+						{
+							name: 'subutai.nodeReg',
+							files: [
+								'subutai-app/nodeReg/nodeReg.js',
+								'subutai-app/nodeReg/controller.js',
+								'subutai-app/nodeReg/service.js',
+								'subutai-app/environment/service.js'
+							]
+						});
+				}]
+			}
+		})
 		.state('tracker', {
 			url: '/tracker',
 			templateUrl: 'subutai-app/tracker/partials/view.html',
