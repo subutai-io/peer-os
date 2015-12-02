@@ -363,7 +363,7 @@
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>metric-rest</artifactId>
+        <artifactId>metric-rest-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
 

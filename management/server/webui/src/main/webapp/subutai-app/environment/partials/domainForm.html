@@ -21,7 +21,7 @@
 
 			<div class="popup-body-box">
 				<label class="b-popup-body-label">Domain Strategy</label>
-				<select 
+				<select ng-init="domain.strategy = environmentViewCtrl.domainStrategies[0]" 
 					class="b-popup-body-input b-popup-body-input_box" 
 					ng-model="domain.strategy" 
 					ng-options="strategy for strategy in environmentViewCtrl.domainStrategies">
@@ -30,11 +30,11 @@
 			</div>			
 
 			<div class="popup-body-box">
-				<label class="b-popup-body-label">SSL cert</label>
+				<label class="b-popup-body-label">SSL certificate</label>
 				<div class="b-file-uploader">
 					<div class="fileUpload b-btn b-btn_light-grey">
 						<span>Upload SSL cert</span>
-						<input id="js-uploadBtn" type="file" class="upload" file-model="sshCertFile"/>
+						<input id="js-uploadBtn" type="file" class="upload" file-model="test"/>
 					</div>
 					<input id="js-uploadFile" class="b-form-input b-form-input_fix-size-1" placeholder="Choose File" disabled="disabled" />
 				</div>

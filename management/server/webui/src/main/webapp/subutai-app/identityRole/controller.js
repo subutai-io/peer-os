@@ -46,7 +46,7 @@ function IdentityRoleCtrl($scope, identitySrv, DTOptionsBuilder, DTColumnBuilder
 
 	vm.dtColumns = [
 		DTColumnBuilder.newColumn(null).withTitle('').notSortable().renderWith(actionEdit),
-		DTColumnBuilder.newColumn('name').withTitle('Role'),
+		DTColumnBuilder.newColumn('name').withTitle('Roles'),
 		DTColumnBuilder.newColumn(null).withTitle('Role permissions').renderWith(permissionsTags),
 		DTColumnBuilder.newColumn(null).withTitle('').notSortable().renderWith(actionDelete)
 	];
@@ -118,7 +118,7 @@ function IdentityRoleCtrl($scope, identitySrv, DTOptionsBuilder, DTColumnBuilder
 	function deleteRole(roleId) {
 		SweetAlert.swal({
 			title: "Are you sure?",
-			text: "Your will not be able to recover this role!",
+			text: "You will not be able to recover this Role!",
 			type: "warning",
 			showCancelButton: true,
 			confirmButtonColor: "#ff3f3c",

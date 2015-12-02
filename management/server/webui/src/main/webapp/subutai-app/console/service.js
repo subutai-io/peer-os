@@ -10,7 +10,8 @@ function consoleService($http, environmentService) {
 
 	var consoleService = {
 		getEnvironments: getEnvironments,
-		sendCommand: sendCommand
+		sendCommand: sendCommand,
+		getSSH: getSSH,
 	};
 
 	return consoleService;
@@ -19,6 +20,16 @@ function consoleService($http, environmentService) {
 
 	function getEnvironments() {
 		return environmentService.getEnvironments();
+	}
+
+	function getSSH(environmentId, hostId, period) {
+		if(environmentId === undefined || environmentId.length == 0) {
+			environmentId = null;
+		}
+		return $http.get(
+			SERVER_URL + 'rest/ui/environments/' + environmentId + '/containers/' + hostId + '/ssh', 
+			{withCredentials: true, headers: {'Content-Type': 'application/json'}}
+		);		
 	}
 
 	function sendCommand(cmd, peerId, path, daemon, timeOut, environmentId) {

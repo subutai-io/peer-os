@@ -5,11 +5,11 @@ angular.module('subutai.tracker.controller', [])
 	.controller('TrackerPopupCtrl', TrackerPopupCtrl);
 
 
-TrackerCtrl.$inject = ['trackerSrv', '$scope', 'DTOptionsBuilder', 'DTColumnBuilder', '$resource', '$compile', 'ngDialog'];
+TrackerCtrl.$inject = ['trackerSrv', '$scope', '$rootScope', 'DTOptionsBuilder', 'DTColumnBuilder', '$resource', '$compile', 'ngDialog', '$timeout'];
 TrackerPopupCtrl.$inject = ['trackerSrv', '$scope', '$sce'];
 
 
-function TrackerCtrl(trackerSrv, $scope, DTOptionsBuilder, DTColumnBuilder, $resource, $compile, ngDialog) {
+function TrackerCtrl(trackerSrv, $scope, $rootScope, DTOptionsBuilder, DTColumnBuilder, $resource, $compile, ngDialog, $timeout) {
 
 	var vm = this;
 	vm.loadOperations = loadOperations;
@@ -43,6 +43,20 @@ function TrackerCtrl(trackerSrv, $scope, DTOptionsBuilder, DTColumnBuilder, $res
 		DTColumnBuilder.newColumn(null).withTitle('Status').renderWith(statusHTML),
 		DTColumnBuilder.newColumn(null).withTitle('Logs').notSortable().renderWith(viewLogsButton),
 	];
+
+	var refreshTable;
+	var reloadTableData = function() {
+		refreshTable = $timeout(function myFunction() {
+			vm.dtInstance.reloadData(null, false);
+			refreshTable = $timeout(reloadTableData, 30000);
+		}, 30000);
+	};
+	reloadTableData();
+
+	$rootScope.$on('$stateChangeStart',	function(event, toState, toParams, fromState, fromParams){
+		console.log('cancel');
+		$timeout.cancel(refreshTable);
+	});
 
 	function createdRow(row, data, dataIndex) {
 		$compile(angular.element(row).contents())($scope);
