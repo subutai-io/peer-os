@@ -239,6 +239,14 @@ public class SubutaiPage extends PageObject {
         waitFor(linkCreatePeer);
     }
 
+    public void waitButtonStartContainer(){
+        waitFor(containerButtonStart);
+    }
+
+    public void waitButtonStopContainer(){
+        waitFor(containerButtonStop);
+    }
+
     public void waitButtonUnregister(){
         waitFor(buttonUnregister);
     }
@@ -360,12 +368,6 @@ public class SubutaiPage extends PageObject {
     @FindBy(xpath = "xhtml:html/xhtml:body/xhtml:pre[contains(text(),\"-----BEGIN PGP PUBLIC KEY BLOCK-----\")]")
     public WebElementFacade pgpHeader;
 
-    @FindBy(xpath = "*//tr[@class=\"ng-scope odd\"]//button[@class=\"b-btn b-btn_red subt_button__container-stop\"]")
-    public WebElementFacade buttonContainerStop;
-
-    @FindBy(xpath = "*//tr[@class=\"ng-scope odd\"]//button[@class=\"b-btn b-btn_green subt_button__container-start\"]")
-    public WebElementFacade buttonContainerStart;
-
     @FindBy(xpath = "*//pre[contains(text(),\"/\")]")
     public WebElementFacade outputOfPwdCommand;
 
@@ -478,7 +480,7 @@ public class SubutaiPage extends PageObject {
         return result;
     }
 
-    @FindBy(xpath = "*//button[@class=\"b-btn b-btn_red subt_button__container-stop\"]")
+    @FindBy(xpath = "*//tr[@class=\"ng-scope odd\"]//button[@class=\"b-btn b-btn_red subt_button__container-stop\"]")
     public WebElementFacade containerButtonStop;
 
     @FindBy(xpath = ".//*[@class='row-border hover subt_table-containers-table ng-isolate-scope no-footer dataTable']/tbody/tr[1]/td[3]/span")
@@ -490,7 +492,7 @@ public class SubutaiPage extends PageObject {
         return cip;
     }
 
-    @FindBy(xpath = "*//button[@class=\"b-btn b-btn_green subt_button__container-start\"]")
+    @FindBy(xpath = "*//tr[@class=\"ng-scope odd\"]//button[@class=\"b-btn b-btn_green subt_button__container-start\"]")
     public WebElementFacade containerButtonStart;
 
     public void pageReload(){

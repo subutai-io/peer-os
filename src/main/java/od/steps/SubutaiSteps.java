@@ -339,6 +339,16 @@ public class SubutaiSteps extends ScenarioSteps {
     }
 
     @Step
+    public void waitButtonStartContainer(){
+        subutaiPage.waitButtonStartContainer();
+    }
+
+    @Step
+    public void waitButtonStopContainer(){
+        subutaiPage.waitButtonStopContainer();
+    }
+
+    @Step
     public void seeButtonCreatePeer() {
         assertThat(subutaiPage.linkCreatePeer.isVisible(), is(true));
     }
@@ -681,17 +691,17 @@ public class SubutaiSteps extends ScenarioSteps {
 
     @Step
     public void clickOnButtonStop() {
-        subutaiPage.buttonContainerStop.click();
+        subutaiPage.containerButtonStop.click();
     }
 
     @Step
     public void seeButtonStart() {
-        assertThat(subutaiPage.buttonContainerStart.isVisible(), is(true));
+        assertThat(subutaiPage.containerButtonStart.isVisible(), is(true));
     }
 
     @Step
     public void seeButtonStop() {
-        assertThat(subutaiPage.buttonContainerStop.isVisible(), is(true));
+        assertThat(subutaiPage.containerButtonStop.isVisible(), is(true));
     }
 
     @Step
@@ -701,7 +711,7 @@ public class SubutaiSteps extends ScenarioSteps {
 
     @Step
     public void clickOnButtonStart() {
-        subutaiPage.buttonContainerStart.click();
+        subutaiPage.containerButtonStart.click();
     }
 
     @Step
