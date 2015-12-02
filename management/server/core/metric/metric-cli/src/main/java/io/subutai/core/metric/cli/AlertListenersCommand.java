@@ -28,7 +28,7 @@ public class AlertListenersCommand extends SubutaiShellCommandSupport
         System.out.println( "List of alert handlers:" );
         for ( AlertListener listener : monitor.getAlertListeners() )
         {
-            System.out.println( listener.getTemplateName() );
+            System.out.println( listener.getSubscriberId() );
         }
 
         return null;

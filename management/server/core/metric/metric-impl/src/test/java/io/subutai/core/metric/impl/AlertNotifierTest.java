@@ -8,7 +8,8 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.slf4j.Logger;
 
-import io.subutai.common.metric.AlertResource;
+import io.subutai.common.metric.AbstractAlert;
+import io.subutai.common.metric.Alert;
 import io.subutai.common.peer.AlertListener;
 import io.subutai.common.peer.AlertPack;
 
@@ -33,7 +34,7 @@ public class AlertNotifierTest
     AlertPack alert;
 
     @Mock
-    AlertResource resource;
+    AbstractAlert resource;
 
     @Mock
     AlertListener listener;

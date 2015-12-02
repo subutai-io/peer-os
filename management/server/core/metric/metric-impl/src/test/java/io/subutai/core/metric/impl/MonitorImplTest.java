@@ -2,8 +2,8 @@ package io.subutai.core.metric.impl;
 
 
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
@@ -26,15 +26,12 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.Environment;
-import io.subutai.common.metric.HistoricalMetric;
-import io.subutai.common.metric.MetricType;
 import io.subutai.common.peer.AlertListener;
 import io.subutai.common.peer.AlertPack;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
-import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
@@ -66,7 +63,7 @@ import static org.mockito.Mockito.when;
 @RunWith( MockitoJUnitRunner.class )
 public class MonitorImplTest
 {
-    private static final String TEMPLATE_NAME = "master";
+    private static final String SUBSCRIBER_ID = "master";
     private static final String ENVIRONMENT_ID = UUID.randomUUID().toString();
     private static final String LOCAL_PEER_ID = UUID.randomUUID().toString();
     private static final String REMOTE_PEER_ID = UUID.randomUUID().toString();
@@ -100,7 +97,7 @@ public class MonitorImplTest
     AlertPack alert;
     @Mock
     AlertListener alertListener;
-    Map<String, AlertListener> alertListeners;
+    Set<AlertListener> alertListeners;
     MonitorImplExt monitor;
 
     @Mock
@@ -147,10 +144,11 @@ public class MonitorImplTest
         public void setMonitorDao( MonitorDao monitorDao ) {this.monitorDao = monitorDao;}
 
 
-//        public void setNotificationExecutor( ExecutorService executor ) {this.notificationExecutor = executor;}
+        //        public void setNotificationExecutor( ExecutorService executor ) {this.notificationExecutor =
+        // executor;}
 
 
-        public void setAlertListeners( Map<String, AlertListener> alertListeners )
+        public void setAlertListeners( Set<AlertListener> alertListeners )
         {
             this.alertListeners = alertListeners;
         }
@@ -174,13 +172,13 @@ public class MonitorImplTest
         when( environmentId.getId() ).thenReturn( ENVIRONMENT_ID );
         //        when( alert.getEnvironmentId() ).thenReturn( environmentId );
         //        when( alert.getContainerId() ).thenReturn( containerId );
-        when( alertListener.getTemplateName() ).thenReturn( TEMPLATE_NAME );
-        alertListeners = Maps.newHashMap();
-        alertListeners.put( TEMPLATE_NAME, alertListener );
+        when( alertListener.getSubscriberId() ).thenReturn( SUBSCRIBER_ID );
+        alertListeners = Sets.newHashSet();
+        alertListeners.add( alertListener );
         monitor.setAlertListeners( alertListeners );
-//        monitor.setNotificationExecutor( notificationService );
+        //        monitor.setNotificationExecutor( notificationService );
         when( monitorDao.getEnvironmentSubscribersIds( ENVIRONMENT_ID ) )
-                .thenReturn( Sets.newHashSet( TEMPLATE_NAME ) );
+                .thenReturn( Sets.newHashSet( SUBSCRIBER_ID ) );
         when( environment.getId() ).thenReturn( ENVIRONMENT_ID );
         when( environment.getUserId() ).thenReturn( USER_ID );
         //when( identityManager.getUser( USER_ID ) ).thenReturn( user );
@@ -211,12 +209,12 @@ public class MonitorImplTest
     @Test
     public void testAddAlertListener() throws Exception
     {
-        Map<String, AlertListener> alertListeners = Maps.newHashMap();
+        Set<AlertListener> alertListeners = Sets.newHashSet();
         monitor.setAlertListeners( alertListeners );
 
         monitor.addAlertListener( alertListener );
 
-        assertTrue( alertListeners.values().contains( alertListener ) );
+        assertTrue( alertListeners.contains( alertListener ) );
     }
 
 
@@ -225,7 +223,7 @@ public class MonitorImplTest
     {
         monitor.removeAlertListener( alertListener );
 
-        assertFalse( alertListeners.values().contains( alertListener ) );
+        assertFalse( alertListeners.contains( alertListener ) );
     }
 
 
@@ -235,7 +233,7 @@ public class MonitorImplTest
 
         ArgumentCaptor<AlertNotifier> alertNotifierArgumentCaptor = ArgumentCaptor.forClass( AlertNotifier.class );
 
-        monitor.notifyListener( alert );
+        monitor.notifyOnAlert( alert );
 
         verify( notificationService ).execute( alertNotifierArgumentCaptor.capture() );
         assertEquals( alertListener, alertNotifierArgumentCaptor.getValue().listener );

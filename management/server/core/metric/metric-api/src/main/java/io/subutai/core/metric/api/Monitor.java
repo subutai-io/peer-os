@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import io.subutai.common.environment.Environment;
 import io.subutai.common.metric.BaseMetric;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
@@ -21,6 +22,11 @@ import io.subutai.common.resource.HistoricalMetrics;
  */
 public interface Monitor
 {
+    void startMonitoring( String subscriberId, Environment environment, MonitoringSettings monitoringSettings )
+            throws MonitorException;
+
+    void stopMonitoring( String subscriberId, Environment environment ) throws MonitorException;
+
     /**
      * Returns process resource usage on a given container host
      *

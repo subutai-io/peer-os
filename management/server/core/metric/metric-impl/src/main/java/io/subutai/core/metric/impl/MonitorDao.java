@@ -28,15 +28,14 @@ public class MonitorDao
     }
 
 
-    public void addSubscription( EnvironmentId environmentId, String subscriberId ) throws DaoException
+    public void addSubscription( String environmentId, String subscriberId ) throws DaoException
     {
 
         Preconditions.checkNotNull( environmentId , INVALID_ENV_ID );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId.getId() ), INVALID_ENV_ID );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( subscriberId ), "Invalid subscriber id" );
 
 
-        dataService.update( environmentId.getId(), subscriberId );
+        dataService.update( environmentId, subscriberId );
     }
 
 

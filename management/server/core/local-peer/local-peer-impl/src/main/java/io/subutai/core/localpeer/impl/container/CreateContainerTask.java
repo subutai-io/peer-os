@@ -16,6 +16,7 @@ import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.HostInterface;
+import io.subutai.common.host.NullHostInterface;
 import io.subutai.common.peer.ContainerCreationException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
@@ -36,14 +37,12 @@ public class CreateContainerTask implements Callable<ContainerHostInfo>
     private final String ip;
     private final int vlan;
     private final int timeoutSec;
-//    private final String environmentId;
     protected CommandUtil commandUtil = new CommandUtil();
     private HostRegistry hostRegistry;
 
 
     public CreateContainerTask( HostRegistry hostRegistry, final ResourceHost resourceHost, final Template template,
-                                final String hostname, final String ip, final int vlan, final int timeoutSec/*,
-                                final String environmentId*/ )
+                                final String hostname, final String ip, final int vlan, final int timeoutSec )
     {
         Preconditions.checkNotNull( resourceHost );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ) );
@@ -51,7 +50,6 @@ public class CreateContainerTask implements Callable<ContainerHostInfo>
         Preconditions.checkArgument( timeoutSec > 0 );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( ip ) && ip.matches( Common.CIDR_REGEX ) );
         Preconditions.checkArgument( NumUtil.isIntBetween( vlan, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
-//        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ) );
 
         this.hostRegistry = hostRegistry;
         this.resourceHost = resourceHost;
@@ -60,7 +58,6 @@ public class CreateContainerTask implements Callable<ContainerHostInfo>
         this.ip = ip;
         this.vlan = vlan;
         this.timeoutSec = timeoutSec;
-//        this.environmentId = environmentId;
     }
 
 
@@ -77,23 +74,14 @@ public class CreateContainerTask implements Callable<ContainerHostInfo>
         long start = System.currentTimeMillis();
 
         ContainerHostInfo hostInfo = null;
-        String ip = null;
-        while ( System.currentTimeMillis() - start < timeoutSec * 1000 && ( hostInfo == null || Strings
-                .isNullOrEmpty( ip ) ) )
+        HostInterface hostInterface = NullHostInterface.getInstance();
+        while ( System.currentTimeMillis() < start + timeoutSec * 1000 && !ip.contains( hostInterface.getIp() ) )
         {
-            Thread.sleep( 100 );
+            Thread.sleep( 1000 );
             try
             {
                 hostInfo = hostRegistry.getContainerHostInfoByHostname( hostname );
-                //TODO: use findByName() method
-                for ( HostInterface intf : hostInfo.getHostInterfaces().getAll() )
-                {
-                    if ( Common.DEFAULT_CONTAINER_INTERFACE.equals( intf.getName() ) )
-                    {
-                        ip = intf.getIp();
-                        break;
-                    }
-                }
+                hostInterface = hostInfo.getHostInterfaces().findByName( Common.DEFAULT_CONTAINER_INTERFACE );
             }
             catch ( HostDisconnectedException e )
             {

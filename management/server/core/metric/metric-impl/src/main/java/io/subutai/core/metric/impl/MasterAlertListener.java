@@ -28,8 +28,8 @@ public class MasterAlertListener implements AlertListener
 
 
     @Override
-    public String getTemplateName()
+    public String getSubscriberId()
     {
-        return "master";
+        return "MASTER_ALERT_LISTENER_ID";
     }
 }

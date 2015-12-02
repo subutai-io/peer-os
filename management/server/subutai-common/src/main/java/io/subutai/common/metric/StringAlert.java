@@ -8,23 +8,19 @@ import io.subutai.common.peer.HostType;
 /**
  * String alert value
  */
-public class StringAlertResource implements AlertResource
+public class StringAlert extends AbstractAlert<StringAlertValue> implements Alert
 {
-    private final HostId hostId;
     private final HostType hostType;
     private final AlertType alertType;
-    private String value;
-    private Long created;
 
 
-    public StringAlertResource( final HostId hostId, final HostType hostType, final AlertType alertType,
-                                final String description )
+    public StringAlert( final HostId hostId, final HostType hostType, final AlertType alertType,
+                        final StringAlertValue description )
     {
         this.hostId = hostId;
         this.hostType = hostType;
         this.alertType = alertType;
-        this.value = description;
-        this.created = System.currentTimeMillis();
+        this.alert = description;
     }
 
 
@@ -36,20 +32,13 @@ public class StringAlertResource implements AlertResource
 
 
     @Override
-    public String getValue()
-    {
-        return value;
-    }
-
-
-    @Override
     public HostId getHostId()
     {
         return hostId;
     }
 
 
-    @Override
+//    @Override
     public AlertType getType()
     {
         return alertType;
@@ -59,6 +48,6 @@ public class StringAlertResource implements AlertResource
     @Override
     public long getLiveTime()
     {
-        return System.currentTimeMillis() - created;
+        return System.currentTimeMillis() - createdTime;
     }
 }

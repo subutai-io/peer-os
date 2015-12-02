@@ -1,19 +1,13 @@
 package io.subutai.common.peer;
 
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.concurrent.TimeUnit;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 
-import org.apache.commons.lang.time.DateUtils;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
-
-import io.subutai.common.metric.AlertResource;
+import io.subutai.common.metric.AbstractAlert;
+import io.subutai.common.metric.Alert;
 
 
 /**
@@ -30,7 +24,7 @@ public class AlertPack
     @JsonProperty( "templateName" )
     String templateName;
     @JsonProperty( "resource" )
-    AlertResource resource;
+    Alert resource;
     @JsonIgnore
     boolean delivered = false;
     @JsonProperty( "expiredTime" )
@@ -41,7 +35,7 @@ public class AlertPack
                       @JsonProperty( "environmentId" ) final String environmentId,
                       @JsonProperty( "containerId" ) final String containerId,
                       @JsonProperty( "templateName" ) final String templateName,
-                      @JsonProperty( "resource" ) final AlertResource resource,
+                      @JsonProperty( "resource" ) final Alert resource,
                       @JsonProperty( "expiredTime" ) final Long expiredTime )
     {
         this.peerId = peerId;
@@ -71,7 +65,7 @@ public class AlertPack
     }
 
 
-    public AlertResource getResource()
+    public Alert getResource()
     {
         return resource;
     }

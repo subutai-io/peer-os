@@ -6,13 +6,12 @@ import java.util.Map;
 
 import com.google.common.base.Preconditions;
 
-import io.subutai.common.peer.EnvironmentId;
-
 
 /**
  * Alert class
  */
-public class EnvironmentAlert
+//TODO: remove it
+public class Alert1
 {
     public enum State
     {
@@ -22,21 +21,14 @@ public class EnvironmentAlert
 
     private Map<String, State> subscribers = new HashMap<>();
 
-    private EnvironmentId environmentId;
     private Alert alert;
+    //    private State state = State.NEW;
 
 
-    public EnvironmentAlert( final EnvironmentId environmentId , final Alert alert )
+    public Alert1( final Alert alert )
     {
         Preconditions.checkNotNull( alert );
         this.alert = alert;
-        this.environmentId = environmentId;
-    }
-
-
-    public EnvironmentId getEnvironmentId()
-    {
-        return environmentId;
     }
 
 

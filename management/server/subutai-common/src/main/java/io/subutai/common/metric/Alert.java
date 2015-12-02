@@ -1,74 +1,36 @@
 package io.subutai.common.metric;
 
 
-import java.util.HashMap;
-import java.util.Map;
+import org.codehaus.jackson.annotate.JsonSubTypes;
+import org.codehaus.jackson.annotate.JsonTypeInfo;
 
-import com.google.common.base.Preconditions;
+import io.subutai.common.host.HostId;
 
 
 /**
- * Alert class
+ * Alert value interface
  */
-public class Alert
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "type" )
+@JsonSubTypes( {
+        @JsonSubTypes.Type( value = QuotaAlert.class, name = "ResourceAlertValue" ),
+        @JsonSubTypes.Type( value = StringAlert.class, name = "StringAlertValue" ),
+} )
+public interface Alert
 {
-    public enum State
-    {
-        NEW, PROCESSING, DONE;
-    }
+    HostId getHostId();
 
+    <T extends AlertValue> T getAlertValue(Class<T> format);
 
-    private Map<String, State> subscribers = new HashMap<>();
+    String getId();
 
-    private AlertResource alert;
-    //    private State state = State.NEW;
+//    AlertType getType();
 
+    long getCreatedTime();
 
-    public Alert( final AlertResource alert )
-    {
-        Preconditions.checkNotNull( alert );
-        this.alert = alert;
-    }
+    long getLiveTime();
 
-
-    public AlertResource getAlert()
-    {
-        return alert;
-    }
-
-
-    public String getId()
-    {
-        return alert.getId();
-    }
-
-
-    public void take( String subscriberId )
-    {
-        subscribers.put( subscriberId, State.PROCESSING );
-    }
-
-
-    public void done( String subscriberId )
-    {
-        subscribers.put( subscriberId, State.DONE );
-    }
-
-
-    public State getState()
-    {
-        if ( subscribers.size() == 0 )
-        {
-            return State.NEW;
-        }
-        for ( State state : subscribers.values() )
-        {
-            if ( state == State.PROCESSING )
-            {
-                return State.PROCESSING;
-            }
-        }
-
-        return State.DONE;
-    }
+    boolean validate();
 }

@@ -10,9 +10,9 @@ import io.subutai.common.resource.ResourceValue;
 
 
 /**
- * Resource alert class
+ * Exceeded quota class
  */
-public class ResourceAlert
+public class ExceededQuota
 {
     @JsonProperty( "hostId" )
     protected HostId hostId;
@@ -24,7 +24,8 @@ public class ResourceAlert
     protected ResourceValue quotaValue;
 
 
-    public ResourceAlert( @JsonProperty( "hostId" ) final HostId hostId,
+
+    public ExceededQuota( @JsonProperty( "hostId" ) final HostId hostId,
                           @JsonProperty( "resourceType" ) final ResourceType resourceType,
                           @JsonProperty( "currentValue" ) final ResourceValue currentValue,
                           @JsonProperty( "quotaValue" ) final ResourceValue quotaValue )

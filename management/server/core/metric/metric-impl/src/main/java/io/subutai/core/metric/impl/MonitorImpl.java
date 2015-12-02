@@ -3,17 +3,16 @@ package io.subutai.core.metric.impl;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -25,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.apache.commons.lang.time.DateUtils;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.gson.JsonSyntaxException;
@@ -33,6 +33,7 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
+import io.subutai.common.environment.Environment;
 import io.subutai.common.exception.DaoException;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
@@ -40,13 +41,15 @@ import io.subutai.common.host.HostInfoModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.host.ResourceHostInfoModel;
-import io.subutai.common.metric.AlertResource;
+import io.subutai.common.metric.Alert;
 import io.subutai.common.metric.BaseMetric;
+import io.subutai.common.metric.ExceededQuota;
 import io.subutai.common.metric.ProcessResourceUsage;
-import io.subutai.common.metric.QuotaAlertResource;
-import io.subutai.common.metric.ResourceAlert;
+import io.subutai.common.metric.QuotaAlert;
+import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.metric.ResourceHostMetrics;
+import io.subutai.common.metric.StringAlertValue;
 import io.subutai.common.peer.AlertListener;
 import io.subutai.common.peer.AlertPack;
 import io.subutai.common.peer.ContainerHost;
@@ -57,12 +60,14 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.util.JsonUtil;
+import io.subutai.common.util.StringUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
+import io.subutai.core.metric.api.MonitoringSettings;
 import io.subutai.core.peer.api.PeerManager;
 
 
@@ -73,17 +78,21 @@ public class MonitorImpl implements Monitor, HostListener
 {
     private static final Logger LOG = LoggerFactory.getLogger( MonitorImpl.class );
 
+    private static final String ENVIRONMENT_IS_NULL_MSG = "Environment is null";
+    private static final String CONTAINER_IS_NULL_MSG = "Container is null";
+    private static final String INVALID_SUBSCRIBER_ID_MSG = "Invalid subscriber id";
+    private static final String SETTINGS_IS_NULL_MSG = "Settings is null";
+
     private static final int METRICS_UPDATE_DELAY = 60;
     private static final int ALERT_LIVE_TIME = 2;// alert live time in min
     private final HostRegistry hostRegistry;
 
-    //    protected Set<AlertListener> alertListeners =
-    //            Collections.newSetFromMap( new ConcurrentHashMap<AlertListener, Boolean>() );
-    protected Map<String, AlertListener> alertListeners = new ConcurrentHashMap<>();
+    protected Set<AlertListener> alertListeners =
+            Collections.newSetFromMap( new ConcurrentHashMap<AlertListener, Boolean>() );
 
     private final Commands commands = new Commands();
     private final EnvironmentManager environmentManager;
-    //    protected ExecutorService notificationExecutor = Executors.newCachedThreadPool();
+    protected ExecutorService notificationExecutor = Executors.newCachedThreadPool();
     protected MonitorDao monitorDao;
     protected DaoManager daoManager;
     private Cache<String, BaseMetric> metrics = CacheBuilder.newBuilder().
@@ -127,6 +136,208 @@ public class MonitorImpl implements Monitor, HostListener
         backgroundTasksExecutorService = Executors.newScheduledThreadPool( 1 );
         backgroundTasksExecutorService.scheduleWithFixedDelay( new BackgroundTasksRunner(), 10, 30, TimeUnit.SECONDS );
     }
+
+
+    @Override
+    public void startMonitoring( final String subscriberId, final Environment environment,
+                                 final MonitoringSettings monitoringSettings ) throws MonitorException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( subscriberId ), INVALID_SUBSCRIBER_ID_MSG );
+        Preconditions.checkNotNull( environment, ENVIRONMENT_IS_NULL_MSG );
+        Preconditions.checkNotNull( monitoringSettings, SETTINGS_IS_NULL_MSG );
+
+
+        //make sure subscriber id is truncated to 100 characters
+        String trimmedSubscriberId = StringUtil.trimToSize( subscriberId, Constants.MAX_SUBSCRIBER_ID_LEN );
+
+        //save subscription to database
+        try
+        {
+            monitorDao.addSubscription( environment.getId(), trimmedSubscriberId );
+        }
+        catch ( DaoException e )
+        {
+            LOG.error( "Error in startMonitoring", e );
+            throw new MonitorException( e );
+        }
+
+        //activate monitoring
+        //        Set<ContainerHost> a = new HashSet<>();
+        //        a.addAll( environment.getContainerHosts() );
+        //        activateMonitoring( a, monitoringSettings, environment.getId() );
+    }
+
+
+    //    @Override
+    //    public void startMonitoring( final String subscriberId, final ContainerHost containerHost,
+    //                                 final MonitoringSettings monitoringSettings ) throws MonitorException
+    //    {
+    //        Preconditions.checkArgument( !Strings.isNullOrEmpty( subscriberId ), INVALID_SUBSCRIBER_ID_MSG );
+    //        Preconditions.checkNotNull( containerHost, CONTAINER_IS_NULL_MSG );
+    //        Preconditions.checkNotNull( monitoringSettings, SETTINGS_IS_NULL_MSG );
+    //
+    //        //make sure subscriber id is truncated to 100 characters
+    //        String trimmedSubscriberId = StringUtil.trimToSize( subscriberId, Constants.MAX_SUBSCRIBER_ID_LEN );
+    //
+    //
+    //        //save subscription to database
+    //        try
+    //        {
+    //            String environmentId =
+    //                    containerHost instanceof EnvironmentContainerHost ? containerHost.getEnvironmentId() : null;
+    //            monitorDao.addSubscription( environmentId, trimmedSubscriberId );
+    //        }
+    //        catch ( DaoException e )
+    //        {
+    //            LOG.error( "Error in startMonitoring", e );
+    //            throw new MonitorException( e );
+    //        }
+    //
+    ////        //activate monitoring
+    ////        String environmentId =
+    ////                containerHost instanceof EnvironmentContainerHost ? containerHost.getEnvironmentId() : null;
+    ////        activateMonitoring( Sets.newHashSet( containerHost ), monitoringSettings, environmentId );
+    //    }
+
+
+    @Override
+    public void stopMonitoring( final String subscriberId, final Environment environment ) throws MonitorException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( subscriberId ), INVALID_SUBSCRIBER_ID_MSG );
+        Preconditions.checkNotNull( environment, ENVIRONMENT_IS_NULL_MSG );
+
+        //make sure subscriber id is truncated to 100 characters
+        String trimmedSubscriberId = StringUtil.trimToSize( subscriberId, Constants.MAX_SUBSCRIBER_ID_LEN );
+
+        //remove subscription from database
+        try
+        {
+            monitorDao.removeSubscription( environment.getId(), trimmedSubscriberId );
+        }
+        catch ( DaoException e )
+        {
+            LOG.error( "Error in stopMonitoring", e );
+            throw new MonitorException( e );
+        }
+    }
+
+
+    //    @Override
+    //    public void activateMonitoring( final ContainerHost containerHost, final MonitoringSettings
+    // monitoringSettings/*,
+    //         final String environmentId*/ ) throws MonitorException
+    //
+    //    {
+    //        Preconditions.checkNotNull( containerHost, CONTAINER_IS_NULL_MSG );
+    //        Preconditions.checkNotNull( monitoringSettings, SETTINGS_IS_NULL_MSG );
+    //
+    //        String environmentId =
+    //                containerHost instanceof EnvironmentContainerHost ? containerHost.getEnvironmentId().getId() :
+    // null;
+    //        activateMonitoring( Sets.newHashSet( containerHost ), monitoringSettings, environmentId );
+    //    }
+    //
+    //
+    //    protected void activateMonitoring( Set<ContainerHost> containerHosts, MonitoringSettings monitoringSettings,
+    //                                       String environmentId ) throws MonitorException
+    //    {
+    //        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( containerHosts ) );
+    //        Map<Peer, Set<ContainerHost>> peersContainers = Maps.newHashMap();
+    //
+    //        for ( ContainerHost containerHost : containerHosts )
+    //        {
+    //            try
+    //            {
+    //                Peer peer = containerHost.getPeer();
+    //
+    //                Set<ContainerHost> containers = peersContainers.get( peer );
+    //
+    //                if ( containers == null )
+    //                {
+    //                    containers = Sets.newHashSet();
+    //                    peersContainers.put( peer, containers );
+    //                }
+    //
+    //                containers.add( containerHost );
+    //            }
+    //            catch ( Exception e )
+    //            {
+    //                LOG.error( String.format( "Could not obtain peer for container %s", containerHost.getHostname()
+    // ), e );
+    //                throw new MonitorException( e );
+    //            }
+    //        }
+    //
+    //
+    //        for ( Map.Entry<Peer, Set<ContainerHost>> peerContainers : peersContainers.entrySet() )
+    //        {
+    //            Peer peer = peerContainers.getKey();
+    //            Set<ContainerHost> containers = peerContainers.getValue();
+    //
+    //            if ( peer.isLocal() )
+    //            {
+    //                activateMonitoringAtLocalContainers( containers, monitoringSettings );
+    //            }
+    //            else
+    //            {
+    //                activateMonitoringAtRemoteContainers( peer, containers, monitoringSettings, environmentId );
+    //            }
+    //        }
+    //    }
+    //
+    //
+    //    protected void activateMonitoringAtRemoteContainers( Peer peer, Set<ContainerHost> containerHosts,
+    //                                                         MonitoringSettings monitoringSettings, String
+    // environmentId )
+    //    {
+    //        Preconditions.checkNotNull( peer );
+    //        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( containerHosts ) );
+    //
+    //        try
+    //        {
+    //            //*********construct Secure Header ****************************
+    //            Map<String, String> headers = Maps.newHashMap();
+    //            //*************************************************************
+    //
+    //            peer.sendRequest( new MonitoringActivationRequest( containerHosts, monitoringSettings ),
+    //                    RecipientType.MONITORING_ACTIVATION_RECIPIENT.name(), Constants.MONITORING_ACTIVATION_TIMEOUT,
+    //                    headers );
+    //        }
+    //        catch ( PeerException e )
+    //        {
+    //            LOG.error( "Error in activateMonitoringAtRemoteContainers", e );
+    //        }
+    //    }
+    //
+    //
+    //    protected void activateMonitoringAtLocalContainers( Set<ContainerHost> containerHosts,
+    //                                                        MonitoringSettings monitoringSettings )
+    //    {
+    //        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( containerHosts ) );
+    //        Preconditions.checkNotNull( monitoringSettings );
+    //
+    //        for ( ContainerHost containerHost : containerHosts )
+    //        {
+    //            try
+    //            {
+    //                ResourceHost resourceHost =
+    //                        peerManager.getLocalPeer().getResourceHostByContainerId( containerHost.getId() );
+    //                CommandResult commandResult = resourceHost.execute(
+    //                        commands.getActivateMonitoringCommand( containerHost.getHostname(), monitoringSettings
+    // ) );
+    //                if ( !commandResult.hasSucceeded() )
+    //                {
+    //                    LOG.error( String.format( "Error activating metrics on %s: %s %s", containerHost
+    // .getHostname(),
+    //                            commandResult.getStatus(), commandResult.getStdErr() ) );
+    //                }
+    //            }
+    //            catch ( Exception e )
+    //            {
+    //                LOG.error( "Error in activateMonitoringAtLocalContainers", e );
+    //            }
+    //        }
+    //    }
 
 
     private ResourceHostMetric fetchResourceHostMetric( ResourceHost resourceHost )
@@ -249,14 +460,13 @@ public class MonitorImpl implements Monitor, HostListener
     }
 
 
-    protected void queueAlertResource( AlertResource alert )
+    protected void queueAlertResource( Alert alert )
     {
-
-        //        if ( !isValidAlert( alert ) )
-        //        {
-        //            return;
-        //        }
-
+        if ( alert == null || !alert.validate() )
+        {
+            // skipping invalid alert
+            return;
+        }
 
         AlertPack alertPack = localALerts.get( alert.getId() );
         if ( alertPack != null )
@@ -274,7 +484,7 @@ public class MonitorImpl implements Monitor, HostListener
     }
 
 
-    private AlertPack buildAlertPack( final AlertResource alert )
+    private AlertPack buildAlertPack( Alert alert )
     {
         String containerId = alert.getHostId().getId();
         AlertPack packet = null;
@@ -288,6 +498,11 @@ public class MonitorImpl implements Monitor, HostListener
         {
             LOG.warn( e.getMessage() );
         }
+        //          Example of usage:
+        //        QuotaAlertValue quotaAlertValue = alert.getAlertValue( QuotaAlertValue.class );
+        //        StringAlertValue stringAlertValue = alert.getAlertValue( StringAlertValue.class );
+        //        ExceededQuota v1 = quotaAlertValue.getValue();
+        //        String v2 = stringAlertValue.getValue();
 
         return packet;
     }
@@ -296,44 +511,6 @@ public class MonitorImpl implements Monitor, HostListener
     protected Date buildExpireTime()
     {
         return DateUtils.addMinutes( new Date(), ALERT_LIVE_TIME );
-    }
-
-
-    //
-    //    private boolean isValidAlert( final Alert alertValue )
-    //    {
-    //        try
-    //        {
-    //            Preconditions.checkNotNull( alertValue, "Alert value is null" );
-    //            Preconditions.checkNotNull( alertValue.getHostId(), "Host id is null" );
-    //            Preconditions.checkNotNull( alertValue.getHostId().getId(), "Host id is null" );
-    //            return true;
-    //        }
-    //        catch ( Exception e )
-    //        {
-    //            LOG.warn( "Invalid alert value: " + e.getMessage() );
-    //            return false;
-    //        }
-    //    }
-
-
-    private boolean isValidResourceAlert( final ResourceAlert alertValue )
-    {
-        try
-        {
-            Preconditions.checkNotNull( alertValue, "Alert value is null" );
-            Preconditions.checkNotNull( alertValue.getHostId(), "Host id is null" );
-            Preconditions.checkNotNull( alertValue.getHostId().getId(), "Host id is null" );
-            Preconditions.checkNotNull( alertValue.getResourceType(), "Resource type is null" );
-            Preconditions.checkNotNull( alertValue.getCurrentValue(), "Current value is null" );
-            Preconditions.checkNotNull( alertValue.getQuotaValue(), "Quota value is null" );
-            return true;
-        }
-        catch ( Exception e )
-        {
-            LOG.warn( "Invalid alert value: " + e.getMessage() );
-            return false;
-        }
     }
 
 
@@ -388,9 +565,9 @@ public class MonitorImpl implements Monitor, HostListener
     @Override
     public void addAlertListener( final AlertListener alertListener )
     {
-        if ( alertListener != null && alertListener.getTemplateName() != null )
+        if ( alertListener != null && alertListener.getSubscriberId() != null )
         {
-            this.alertListeners.put( alertListener.getTemplateName(), alertListener );
+            this.alertListeners.add( alertListener );
         }
     }
 
@@ -400,7 +577,7 @@ public class MonitorImpl implements Monitor, HostListener
     {
         if ( alertListener != null )
         {
-            this.alertListeners.remove( alertListener.getTemplateName() );
+            this.alertListeners.remove( alertListener );
         }
     }
 
@@ -408,7 +585,7 @@ public class MonitorImpl implements Monitor, HostListener
     @Override
     public Collection<AlertListener> getAlertListeners()
     {
-        return alertListeners.values();
+        return alertListeners;
     }
 
 
@@ -436,26 +613,43 @@ public class MonitorImpl implements Monitor, HostListener
             LOG.debug( "Notifying: " + alertPack );
             if ( !alertPack.isDelivered() && !alertPack.isExpired() )
             {
-                notifyListener( alertPack );
+                notifyOnAlert( alertPack );
                 alertPack.setDelivered( true );
             }
         }
     }
 
 
-    protected void notifyListener( final AlertPack alertPack )
+    protected void notifyOnAlert( final AlertPack alertPack )
     {
-        AlertListener alertListener = alertListeners.get( alertPack.getTemplateName() );
+        try
+        {
+            //obtain user from environment
+            Environment environment = environmentManager.loadEnvironment( alertPack.getEnvironmentId() );
 
-        if ( alertListener != null )
-        {
-            alertPack.setDelivered( true );
-            AlertNotifier alertNotifier = new AlertNotifier( alertPack, alertListener );
-            alertNotifier.run();
+            //search for subscriber if not found then no-op
+            Set<String> subscribersIds = monitorDao.getEnvironmentSubscribersIds( alertPack.getEnvironmentId() );
+            for ( String subscriberId : subscribersIds )
+            {
+                // notify subscriber on alert
+                notifyListener( alertPack, subscriberId );
+            }
         }
-        else
+        catch ( Exception e )
         {
-            LOG.warn( String.format( "Alert handler not found for: %s", alertPack ) );
+            LOG.error( "Error in notifyOnAlert", e );
+        }
+    }
+
+
+    protected void notifyListener( final AlertPack metric, String subscriberId )
+    {
+        for ( final AlertListener listener : alertListeners )
+        {
+            if ( listener.getSubscriberId().startsWith( subscriberId ) )
+            {
+                notificationExecutor.execute( new AlertNotifier( metric, listener ) );
+            }
         }
     }
 
@@ -467,7 +661,7 @@ public class MonitorImpl implements Monitor, HostListener
         {
             if ( !alertPack.isDelivered() )
             {
-                deliverAlert( alertPack );
+                deliverAlertPackToPeer( alertPack );
             }
         }
     }
@@ -487,7 +681,7 @@ public class MonitorImpl implements Monitor, HostListener
     }
 
 
-    private void deliverAlert( final AlertPack alertPack )
+    private void deliverAlertPackToPeer( final AlertPack alertPack )
     {
         Peer peer = peerManager.getPeer( alertPack.getPeerId() );
         if ( peer != null )
@@ -601,7 +795,7 @@ public class MonitorImpl implements Monitor, HostListener
 
 
     @Override
-    public void onHeartbeat( final ResourceHostInfo resourceHostInfo, final Set<ResourceAlert> alerts )
+    public void onHeartbeat( final ResourceHostInfo resourceHostInfo, final Set<QuotaAlertValue> alerts )
     {
         //        Host host;
         //        try
@@ -649,9 +843,9 @@ public class MonitorImpl implements Monitor, HostListener
         //        }
         if ( alerts != null )
         {
-            for ( ResourceAlert resourceAlert : alerts )
+            for ( QuotaAlertValue quotaAlertValue : alerts )
             {
-                queueAlertResource( new QuotaAlertResource( resourceAlert, System.currentTimeMillis() ) );
+                queueAlertResource( new QuotaAlert( quotaAlertValue, System.currentTimeMillis() ) );
             }
         }
     }

@@ -38,12 +38,12 @@ public class AlertNotifier implements Runnable
         {
             listener.onAlert( alert );
             LOG.debug( String.format( "Alert package '%s' handled by '%s'.", alert.getResource().getId(),
-                    listener.getTemplateName() ) );
+                    listener.getSubscriberId() ) );
         }
         catch ( Exception e )
         {
-            LOG.error( String.format( "Alert package '%s' handling by '%s' failed.",
-                    alert.getResource().getId(), listener.getTemplateName() ),e );
+            LOG.error( String.format( "Alert package '%s' handling by '%s' failed.", alert.getResource().getId(),
+                    listener.getSubscriberId() ), e );
         }
     }
 }

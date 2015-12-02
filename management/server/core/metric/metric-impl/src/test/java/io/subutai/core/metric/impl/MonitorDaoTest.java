@@ -90,7 +90,7 @@ public class MonitorDaoTest
     @Test
     public void testAddSubscription() throws Exception
     {
-        monitorDao.addSubscription( environmentId, SUBSCRIBER_ID );
+        monitorDao.addSubscription( ENVIRONMENT_ID, SUBSCRIBER_ID );
 
         assertTrue( monitorDao.getEnvironmentSubscribersIds( ENVIRONMENT_ID ).contains( SUBSCRIBER_ID ) );
     }
@@ -101,7 +101,7 @@ public class MonitorDaoTest
     {
         throwDbException();
 
-        monitorDao.addSubscription( environmentId, SUBSCRIBER_ID );
+        monitorDao.addSubscription( ENVIRONMENT_ID, SUBSCRIBER_ID );
     }
 
 
