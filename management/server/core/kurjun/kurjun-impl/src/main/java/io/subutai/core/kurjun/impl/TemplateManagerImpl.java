@@ -23,6 +23,7 @@ import ai.subut.kurjun.cfparser.ControlFileParserModule;
 import ai.subut.kurjun.common.KurjunBootstrap;
 import ai.subut.kurjun.common.service.KurjunContext;
 import ai.subut.kurjun.common.service.KurjunProperties;
+import ai.subut.kurjun.common.utils.InetUtils;
 import ai.subut.kurjun.index.PackagesIndexParserModule;
 import ai.subut.kurjun.metadata.common.DefaultMetadata;
 import ai.subut.kurjun.metadata.common.subutai.DefaultTemplate;
@@ -42,7 +43,10 @@ import ai.subut.kurjun.subutai.SubutaiTemplateParserModule;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.protocol.TemplateKurjun;
+import io.subutai.common.settings.Common;
 import io.subutai.core.kurjun.api.TemplateManager;
+import java.net.InetAddress;
+import java.net.SocketException;
 
 
 public class TemplateManagerImpl implements TemplateManager
@@ -54,11 +58,11 @@ public class TemplateManagerImpl implements TemplateManager
 
     private Injector injector;
 
-    private Set<URL> remoteRepoUrls = new HashSet<>();
+    private Set<RepoUrl> remoteRepoUrls = new HashSet<>();
 
     private final LocalPeer localPeer;
 
-    private final RepoUrlStore repoUrlStore = new RepoUrlStore();
+    private final RepoUrlStore repoUrlStore = new RepoUrlStore( Common.SUBUTAI_APP_DATA_PATH );
 
 
     public TemplateManagerImpl( LocalPeer localPeer )
@@ -223,11 +227,18 @@ public class TemplateManagerImpl implements TemplateManager
     @Override
     public void addRemoteRepository( URL url )
     {
+        addRemoteRepository( url, false );
+    }
+
+
+    @Override
+    public void addRemoteRepository( URL url, boolean useToken )
+    {
         try
         {
-            if ( url != null && !url.getHost().equals( localPeer.getManagementHost().getExternalIp() ) )
+            if ( url != null && !url.getHost().equals( getExternalIp() ) )
             {
-                repoUrlStore.addRemoteTemplateUrl( url );
+                repoUrlStore.addRemoteTemplateUrl( new RepoUrl( url, useToken ) );
                 remoteRepoUrls = repoUrlStore.getRemoteTemplateUrls();
                 LOGGER.info( "Remote template host url is added: {}", url );
             }
@@ -236,7 +247,7 @@ public class TemplateManagerImpl implements TemplateManager
                 LOGGER.error( "Failed to add remote host url: {}", url );
             }
         }
-        catch ( IOException | HostNotFoundException ex )
+        catch ( IOException ex )
         {
             LOGGER.error( "Failed to add remote host url: {}", url, ex );
         }
@@ -258,6 +269,28 @@ public class TemplateManagerImpl implements TemplateManager
             {
                 LOGGER.error( "Failed to remove remote host url: {}", url, e );
             }
+        }
+    }
+
+
+    private String getExternalIp()
+    {
+        try
+        {
+            if ( localPeer != null )
+            {
+                return localPeer.getManagementHost().getExternalIp();
+            }
+            else
+            {
+                List<InetAddress> ips = InetUtils.getLocalIPAddresses();
+                return ips.get( 0 ).getHostAddress();
+            }
+        }
+        catch ( SocketException | IndexOutOfBoundsException | HostNotFoundException ex )
+        {
+            LOGGER.error( "Cannot get external ip. Returning null.", ex );
+            return null;
         }
     }
 
@@ -300,9 +333,9 @@ public class TemplateManagerImpl implements TemplateManager
         RepositoryFactory repositoryFactory = injector.getInstance( RepositoryFactory.class );
         UnifiedRepository unifiedRepo = repositoryFactory.createUnifiedRepo();
         unifiedRepo.getRepositories().add( getLocalRepository( context ) );
-        for ( URL url : remoteRepoUrls )
+        for ( RepoUrl repoUrl : remoteRepoUrls )
         {
-            unifiedRepo.getRepositories().add( repositoryFactory.createNonLocalTemplate( url.toString(), null ) );
+            unifiedRepo.getRepositories().add( repositoryFactory.createNonLocalTemplate( repoUrl.getUrl().toString(), null, repoUrl.isUseToken() ) );
         }
         return unifiedRepo;
     }

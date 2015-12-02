@@ -147,7 +147,14 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
             try ( InputStream is = new FileInputStream( temp ) )
             {
                 byte[] md5 = templateManager.upload( repository, is );
-                return Response.ok( Hex.encode( md5 ) ).build();
+                if ( md5 != null )
+                {
+                    return Response.ok( Hex.encode( md5 ) ).build();
+                }
+                else
+                {
+                    return Response.serverError().entity( "Failed to put template" ).build();
+                }
             }
         }
         catch ( IOException ex )

@@ -3,15 +3,15 @@ package io.subutai.core.kurjun.impl;
 
 import ai.subut.kurjun.db.file.FileDb;
 import com.google.common.collect.Sets;
-import io.subutai.common.settings.Common;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
 import java.util.Set;
 
+
 /**
- * Handles persisting and accessing remote repository urls. Leverages FileDb. 
- * 
+ * Handles persisting and accessing remote repository urls. Leverages FileDb.
+ *
  */
 public class RepoUrlStore
 {
@@ -21,17 +21,18 @@ public class RepoUrlStore
     private final String remoteRepoFile;
 
 
-    public RepoUrlStore()
+    public RepoUrlStore( String appDataBaseUrl )
     {
-        remoteRepoFile = Common.SUBUTAI_APP_DATA_PATH + "/kurjun/misc/remote_repo_url";
+        String path = appDataBaseUrl == null ? "kurjun" : appDataBaseUrl;
+        remoteRepoFile = path + "/misc/remote_repo_url";
     }
 
 
-    public void addRemoteTemplateUrl( URL url ) throws IOException
+    public void addRemoteTemplateUrl( RepoUrl repoUrl ) throws IOException
     {
         try ( FileDb fileDb = new FileDb( remoteRepoFile ) )
         {
-            fileDb.put( MAP_NAME_TEMPLATE, url.toString(), url );
+            fileDb.put( MAP_NAME_TEMPLATE, repoUrl.getUrl().toString(), repoUrl );
         }
     }
 
@@ -45,11 +46,11 @@ public class RepoUrlStore
     }
 
 
-    public Set<URL> getRemoteTemplateUrls() throws IOException
+    public Set<RepoUrl> getRemoteTemplateUrls() throws IOException
     {
         try ( FileDb fileDb = new FileDb( remoteRepoFile ) )
         {
-            Map<String, URL> map = fileDb.get( MAP_NAME_TEMPLATE );
+            Map<String, RepoUrl> map = fileDb.get( MAP_NAME_TEMPLATE );
 
             return Sets.newConcurrentHashSet( map.values() );
         }

@@ -110,6 +110,16 @@ public interface TemplateManager
      * @param url URL of the remote repository
      */
     void addRemoteRepository( URL url );
+    
+    /**
+     * Adds remote repository located at supplied URL. Repositories added with this method will be used to fulfill
+     * requests in case the local repository can not handle requests.
+     *
+     * @param url URL of the remote repository
+     * @param useToken flag to indicate where to request access token from remote url and add this token
+     * to query parameters
+     */
+    void addRemoteRepository( URL url, boolean useToken );
 
     /**
      * Removes remote repository located at supplied URL.
