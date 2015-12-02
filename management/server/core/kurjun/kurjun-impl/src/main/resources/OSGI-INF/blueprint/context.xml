@@ -14,7 +14,7 @@
   </cm:property-placeholder>
   
 
-  <reference id="locaPeer" availability="optional"
+  <reference id="locaPeer" availability="mandatory"
              interface="io.subutai.common.peer.LocalPeer" />
 
   <bean id="templateManager" scope="singleton" activation="eager" 
