@@ -40,6 +40,7 @@ import ai.subut.kurjun.snap.SnapMetadataParserModule;
 import ai.subut.kurjun.storage.factory.FileStoreFactory;
 import ai.subut.kurjun.storage.factory.FileStoreModule;
 import ai.subut.kurjun.subutai.SubutaiTemplateParserModule;
+import com.google.common.base.Strings;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.protocol.TemplateKurjun;
@@ -47,6 +48,7 @@ import io.subutai.common.settings.Common;
 import io.subutai.core.kurjun.api.TemplateManager;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.util.ArrayList;
 
 
 public class TemplateManagerImpl implements TemplateManager
@@ -55,6 +57,8 @@ public class TemplateManagerImpl implements TemplateManager
     private static final Logger LOGGER = LoggerFactory.getLogger( TemplateManagerImpl.class );
 
     private static final Set<KurjunContext> CONTEXTS = new HashSet<>();
+
+    private List<String> globalKurjunUrls = new ArrayList<>();
 
     private Injector injector;
 
@@ -65,9 +69,20 @@ public class TemplateManagerImpl implements TemplateManager
     private final RepoUrlStore repoUrlStore = new RepoUrlStore( Common.SUBUTAI_APP_DATA_PATH );
 
 
-    public TemplateManagerImpl( LocalPeer localPeer )
+    public TemplateManagerImpl( LocalPeer localPeer, String globalKurjunUrl )
     {
         this.localPeer = localPeer;
+        
+        if ( !Strings.isNullOrEmpty( globalKurjunUrl ) )
+        {
+            String urls[] = globalKurjunUrl.split( "," );
+
+            for ( int x = 0; x < urls.length; x++ )
+            {
+                urls[x] = urls[x].trim();
+                globalKurjunUrls.add( urls[x] );
+            }
+        }
     }
 
 
@@ -78,7 +93,33 @@ public class TemplateManagerImpl implements TemplateManager
         try
         {
             remoteRepoUrls = repoUrlStore.getRemoteTemplateUrls();
-            LOGGER.info( "Loaded {} remote template host urls:", remoteRepoUrls.size() );
+
+            if ( !globalKurjunUrls.isEmpty() )
+            {
+                // Remove all not secure (not using token) repo urls
+                Set<RepoUrl> remove = new HashSet<>();
+                for ( RepoUrl r : remoteRepoUrls )
+                {
+                    if ( !r.isUseToken() )
+                    {
+                        remove.add( r );
+                    }
+                }
+                for ( RepoUrl r : remove )
+                {
+                    removeRemoteRepository( r.getUrl() );
+                }
+
+                // Load new urls
+                LOGGER.info( "Loading {} global kurjun urls:", globalKurjunUrls.size() );
+                for ( String url : globalKurjunUrls )
+                {
+                    addRemoteRepository( new URL( url ) );
+                }
+            }
+
+            remoteRepoUrls = repoUrlStore.getRemoteTemplateUrls();
+            LOGGER.info( "{} remote template host urls:", remoteRepoUrls.size() );
             for ( RepoUrl r : remoteRepoUrls )
             {
                 LOGGER.info( r.toString() );

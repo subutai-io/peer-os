@@ -1,25 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
-           xmlns:jpa="http://aries.apache.org/xmlns/jpa/v1.0.0">
+           xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
+           xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0">
 
-    <reference id="locaPeer" availability="optional"
-                 interface="io.subutai.common.peer.LocalPeer" />
+    
+  <!-- Allow the use of system properties -->
+  <ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]" />
 
-    <bean id="templateManager" scope="singleton" activation="eager" 
+  <cm:property-placeholder persistent-id="kurjun" update-strategy="none">
+    <cm:default-properties>
+      <cm:property name="globalKurjunUrls" value="" />
+    </cm:default-properties>
+  </cm:property-placeholder>
+  
+
+  <reference id="locaPeer" availability="optional"
+             interface="io.subutai.common.peer.LocalPeer" />
+
+  <bean id="templateManager" scope="singleton" activation="eager" 
           init-method="init" destroy-method="dispose"
           class="io.subutai.core.kurjun.impl.TemplateManagerImpl">
-        <argument ref="locaPeer" />
-    </bean>
+    <argument ref="locaPeer" />
+    <argument value="${globalKurjunUrls}" />
+  </bean>
     
-    <bean id="aptManager" scope="singleton" activation="eager" 
+  <bean id="aptManager" scope="singleton" activation="eager" 
           init-method="init" destroy-method="dispose"
           class="io.subutai.core.kurjun.impl.vapt.AptManagerImpl">
-    </bean>
+  </bean>
 
-    <service ref="templateManager"
+  <service ref="templateManager"
              interface="io.subutai.core.kurjun.api.TemplateManager" />
     
-    <service ref="aptManager"
+  <service ref="aptManager"
              interface="io.subutai.core.kurjun.api.vapt.AptManager" />
 
 </blueprint>
