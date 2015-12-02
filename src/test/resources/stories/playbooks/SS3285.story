@@ -20,6 +20,8 @@ Then the user verify output console command and observe expected phrase: 'framew
 When the user enter console command: 'ls /var/lib/apps/subutai/current/var/lib/lxc/lxc-data/tmpdir/'
 Then the user verify output console command and observe expected phrase: 'master-subutai-template_2.1.1_amd64.tar.gz'
 When the user enter console command: subutai import hadoop
+And the user enter console command: 'clear'
+And the user enter console command: 'ls /var/lib/apps/subutai/current/var/lib/lxc/lxc-data/tmpdir/'
 Then the user verify output console command and observe expected phrase: 'hadoop-subutai-template_2.1.2_amd64.tar.gz'
 And the user verify output console command and observe expected phrase: 'openjre7-subutai-template_2.1.1_amd64.tar.gz'
 When the user click on the menu item: Peer Registration
