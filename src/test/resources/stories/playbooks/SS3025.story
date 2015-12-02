@@ -3,7 +3,7 @@ Meta:
 Narrative:
 As a QA
 I want to verify a PLAYBOOK SS-3025
-So that I will create test scenarios
+So that I created test scenarios
 
 Scenario: The First User Sends Request
 Given the first user is on the home page of Subutai
@@ -86,7 +86,7 @@ When the user click on the menu item: User Identity
 And the user click on the menu item: Tokens
 When the user click on the button: Show Token
 Then the user observe text: Token
-Then the user get Token
+And the user get Token
 And the user observe Local Peer ID
 When the user get Peer ID
 Then the user observe Own PGP key
@@ -97,7 +97,7 @@ When the user click on the menu item: User Identity
 And the user click on the menu item: Tokens
 When the user click on the button: Show Token
 Then the user observe text: Token
-Then the user get Token
+And the user get Token
 And the user observe Remote Peer ID
 When the user get Peer ID
 Then the user observe Remote PGP key

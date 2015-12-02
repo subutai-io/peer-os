@@ -212,11 +212,13 @@ public class DefSubutaiStepsThen {
 
     @Then("the user observe button: Start")
     public void user_observe_button_start(){
+        subutaiSteps.waitButtonStartContainer();
         subutaiSteps.seeButtonStart();
     }
 
     @Then("the user observe button: Stop")
     public void user_observe_button_stop(){
+        subutaiSteps.waitButtonStopContainer();
         subutaiSteps.seeButtonStop();
     }
 

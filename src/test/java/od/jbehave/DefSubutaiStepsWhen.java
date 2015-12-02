@@ -353,8 +353,7 @@ public class DefSubutaiStepsWhen {
     @When("the user click on the button: Stop")
     public void click_button_stop(){
         subutaiSteps.clickOnButtonStop();
-        subutaiSteps.waitABit(5000);
-        subutaiSteps.clickOnButtonStop();
+        //subutaiSteps.clickOnButtonStop();
     }
 
     @When("the user click on the button: Start")
