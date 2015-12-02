@@ -302,8 +302,6 @@ public class Commands
 
     public RequestBuilder getSetupContainerSshCommand( final String containerIp, final int sshIdleTimeout )
     {
-        return new RequestBuilder(
-                String.format( "ssh -f -R 0:%s:22 -o StrictHostKeyChecking=no ubuntu@localhost sleep %d", containerIp,
-                        sshIdleTimeout ) );
+        return new RequestBuilder( String.format( "subutai tunnel %s %d", containerIp, sshIdleTimeout ) );
     }
 }
