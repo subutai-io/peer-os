@@ -826,7 +826,7 @@ public class SubutaiSteps extends ScenarioSteps {
 
     @Step
     public void open_vagrant_mgh() throws FileNotFoundException {
-        subutaiPage.setDefaultBaseUrl(String.format("https://%s:8443/", ReaderFromFile.readDataFromFile("src/test/resources/parameters/vagrantMH_IP")));
+        subutaiPage.setDefaultBaseUrl(String.format("https://%s:8888/", ReaderFromFile.readDataFromFile("src/test/resources/parameters/vagrantMH_IP")));
         subutaiPage.open();
     }
 
@@ -1146,5 +1146,10 @@ public class SubutaiSteps extends ScenarioSteps {
         if ((sumCommon) < 10000) {
             is(true);
         }
+    }
+
+    @Step
+    public void waitSleep(int i) {
+        waitABit(i);
     }
 }

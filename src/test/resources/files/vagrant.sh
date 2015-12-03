@@ -83,7 +83,7 @@ echo
 VBoxManage controlvm SubutaiMGMT poweroff
 VBoxManage modifyvm SubutaiMGMT --nic2 intnet --intnet2 intnetSnappy1  --nicpromisc2 allow-all --macaddress2 auto
 VBoxManage modifyvm SubutaiMGMT --natpf1 subutai,tcp,127.0.0.1,8888,,8443
-VBoxManage modifyvm SubutaiMGMT --natpf1 karaf,tcp,127.0.0.1,8888,,8101
+VBoxManage modifyvm SubutaiMGMT --natpf1 karaf,tcp,127.0.0.1,8889,,8101
 VBoxManage startvm SubutaiMGMT --type headless
 
 echo

@@ -66,6 +66,7 @@ public class DefSubutaiStepsGiven {
 
     @Given("the vagrant user is on the home page of Subutai")
     public void open_vagrant_mghost() throws FileNotFoundException {
+        subutaiSteps.waitSleep(120000);
         subutaiSteps.open_vagrant_mgh();
     }
 
