@@ -23,6 +23,8 @@ function identitySrv($http) {
 		getRoles: getRoles,
 		addRole: addRole,
 		deleteRole: deleteRole,
+		getTokenTypes: getTokenTypes,
+		getPermissionsScops: getPermissionsScops,
 
 		getUsersUrl : function(){ return USERS_URL },
 		getRolesUrl : function(){ return ROLES_URL },
@@ -93,6 +95,14 @@ function identitySrv($http) {
 
 	function deleteRole(roleId) {
 		return $http.delete(ROLES_URL + roleId);
+	}
+
+	function getTokenTypes() {
+		return $http.get(USERS_URL + 'tokens/types', {withCredentials: true, headers: {'Content-Type': 'application/json'}});
+	}
+
+	function getPermissionsScops() {
+		return $http.get(USERS_URL + 'permissions/scopes', {withCredentials: true, headers: {'Content-Type': 'application/json'}});
 	}
 
 }

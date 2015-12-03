@@ -13,6 +13,7 @@ function TokensCtrl(identitySrv, $scope, DTOptionsBuilder, DTColumnBuilder, $res
 	vm.tokens = {};
 	vm.users = [];
 	vm.newToken = {};
+	vm.tokensType = [];
 	vm.token2Edit = {};
 
 	//functions
@@ -24,6 +25,10 @@ function TokensCtrl(identitySrv, $scope, DTOptionsBuilder, DTColumnBuilder, $res
 
 	identitySrv.getUsers().success(function (data) {
 		vm.users = data;
+	});
+
+	identitySrv.getTokenTypes().success(function (data) {
+		vm.tokensType = data;
 	});
 
 	vm.dtInstance = {};
@@ -73,12 +78,7 @@ function TokensCtrl(identitySrv, $scope, DTOptionsBuilder, DTColumnBuilder, $res
 	}
 
 	function getTokenType(data, type, full, meta) {
-		var type = '';
-		if(data.type == 1) {
-			type = 'Session';
-		} else {
-			type = 'Permanent';
-		}
+		var type = vm.tokensType[data.type];
 		return type;
 	}
 
