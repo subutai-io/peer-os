@@ -298,7 +298,7 @@ public class RestServiceImpl implements RestService
 
         try
         {
-            byte[] bytesEncoded = Base64.encodeBase64( key.getBytes() );
+            byte[] bytesEncoded = Base64.decodeBase64( key.getBytes() );
             environmentManager.setSshKey( environmentId, new String( bytesEncoded ), false );
         }
         catch ( EnvironmentNotFoundException e )
