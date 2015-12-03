@@ -159,6 +159,7 @@ function ConsoleViewCtrl($scope, consoleService, peerRegistrationService, $state
 	vm.setConsole = setConsole;
 	vm.showContainers = showContainers;
 	vm.showSSH = showSSH;
+	vm.getBaseUrl = getBaseUrl;
 
 	function setConsole(node) {
 		vm.activeConsole = node;
@@ -202,6 +203,16 @@ function ConsoleViewCtrl($scope, consoleService, peerRegistrationService, $state
 				break;
 			}
 		}
+	}
+
+	function getBaseUrl() {
+		var pathArray = location.href.split( '/' );
+		var protocol = pathArray[0];
+		var hostWithPort = pathArray[2].split(':');
+		var host = hostWithPort[0];
+		//var url = protocol + '//' + host;
+		var url = host;
+		return url;
 	}
 
 }
