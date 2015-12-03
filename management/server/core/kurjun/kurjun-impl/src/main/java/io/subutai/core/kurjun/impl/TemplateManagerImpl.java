@@ -64,6 +64,8 @@ public class TemplateManagerImpl implements TemplateManager
 
     private Set<RepoUrl> remoteRepoUrls = new HashSet<>();
 
+    private Set<RepoUrl> globalRepoUrls = new HashSet<>();
+
     private final LocalPeer localPeer;
 
     private final RepoUrlStore repoUrlStore = new RepoUrlStore( Common.SUBUTAI_APP_DATA_PATH );
@@ -72,17 +74,8 @@ public class TemplateManagerImpl implements TemplateManager
     public TemplateManagerImpl( LocalPeer localPeer, String globalKurjunUrl )
     {
         this.localPeer = localPeer;
+        parseGlobalKurjunUrls( globalKurjunUrl );
 
-        if ( !Strings.isNullOrEmpty( globalKurjunUrl ) )
-        {
-            String urls[] = globalKurjunUrl.split( "," );
-
-            for ( int x = 0; x < urls.length; x++ )
-            {
-                urls[x] = urls[x].trim();
-                globalKurjunUrls.add( urls[x] );
-            }
-        }
     }
 
 
@@ -92,43 +85,28 @@ public class TemplateManagerImpl implements TemplateManager
 
         try
         {
+            // Load remote repo urls from store
             remoteRepoUrls = repoUrlStore.getRemoteTemplateUrls();
 
+            // Refresh global urls
             if ( !globalKurjunUrls.isEmpty() )
             {
-                // Remove all not secure (not using token) repo urls
-                Set<RepoUrl> remove = new HashSet<>();
-                for ( RepoUrl r : remoteRepoUrls )
-                {
-                    if ( !r.isUseToken() )
-                    {
-                        remove.add( r );
-                    }
-                }
-                for ( RepoUrl r : remove )
-                {
-                    removeRemoteRepository( r.getUrl() );
-                }
-
-                // Load new urls
-                LOGGER.info( "Loading {} global kurjun urls:", globalKurjunUrls.size() );
+                repoUrlStore.removeAllGlobalTemplateUrl();
                 for ( String url : globalKurjunUrls )
                 {
-                    addRemoteRepository( new URL( url ), false );
+                    repoUrlStore.addGlobalTemplateUrl( new RepoUrl( new URL( url ), false ) );
                 }
             }
 
-            remoteRepoUrls = repoUrlStore.getRemoteTemplateUrls();
-            LOGGER.info( "{} remote template host urls:", remoteRepoUrls.size() );
-            for ( RepoUrl r : remoteRepoUrls )
-            {
-                LOGGER.info( r.toString() );
-            }
+            // Load global repo urls from store
+            globalRepoUrls = repoUrlStore.getGlobalTemplateUrls();
         }
         catch ( IOException e )
         {
             LOGGER.error( "Failed to get remote repo urls", e );
         }
+        
+        logAllUrlsInUse();
 
         KurjunProperties properties = injector.getInstance( KurjunProperties.class );
         setContexts( properties );
@@ -141,12 +119,12 @@ public class TemplateManagerImpl implements TemplateManager
 
 
     @Override
-    public TemplateKurjun getTemplate( String context, byte[] md5 ) throws IOException
+    public TemplateKurjun getTemplate( String context, byte[] md5, boolean isKurjunClient ) throws IOException
     {
         DefaultMetadata m = new DefaultMetadata();
         m.setMd5sum( md5 );
 
-        UnifiedRepository repo = getRepository( context );
+        UnifiedRepository repo = getRepository( context, isKurjunClient );
         DefaultTemplate meta = ( DefaultTemplate ) repo.getPackageInfo( m );
         if ( meta != null )
         {
@@ -158,13 +136,13 @@ public class TemplateManagerImpl implements TemplateManager
 
 
     @Override
-    public TemplateKurjun getTemplate( String context, String name, String version ) throws IOException
+    public TemplateKurjun getTemplate( String context, String name, String version, boolean isKurjunClient ) throws IOException
     {
         DefaultMetadata m = new DefaultMetadata();
         m.setName( name );
         m.setVersion( version );
 
-        UnifiedRepository repo = getRepository( context );
+        UnifiedRepository repo = getRepository( context, isKurjunClient );
 
         DefaultTemplate meta = ( DefaultTemplate ) repo.getPackageInfo( m );
         if ( meta != null )
@@ -181,7 +159,7 @@ public class TemplateManagerImpl implements TemplateManager
     {
         try
         {
-            return getTemplate( PUBLIC_REPO, name, null );
+            return getTemplate( PUBLIC_REPO, name, null, false );
         }
         catch ( IOException e )
         {
@@ -212,20 +190,20 @@ public class TemplateManagerImpl implements TemplateManager
 
 
     @Override
-    public InputStream getTemplateData( String context, byte[] md5 ) throws IOException
+    public InputStream getTemplateData( String context, byte[] md5, boolean isKurjunClient ) throws IOException
     {
         DefaultMetadata m = new DefaultMetadata();
         m.setMd5sum( md5 );
 
-        UnifiedRepository repo = getRepository( context );
+        UnifiedRepository repo = getRepository( context, isKurjunClient );
         return repo.getPackageStream( m );
     }
 
 
     @Override
-    public List<TemplateKurjun> list( String context ) throws IOException
+    public List<TemplateKurjun> list( String context, boolean isKurjunClient ) throws IOException
     {
-        UnifiedRepository repo = getRepository( context );
+        UnifiedRepository repo = getRepository( context, isKurjunClient );
         List<SerializableMetadata> items = repo.listPackages();
 
         List<TemplateKurjun> result = new LinkedList<>();
@@ -244,7 +222,7 @@ public class TemplateManagerImpl implements TemplateManager
     {
         try
         {
-            return list( PUBLIC_REPO );
+            return list( PUBLIC_REPO, false );
         }
         catch ( IOException e )
         {
@@ -392,18 +370,22 @@ public class TemplateManagerImpl implements TemplateManager
     }
 
 
-    private UnifiedRepository getRepository( String context ) throws IOException
+    private UnifiedRepository getRepository( String context, boolean isKurjunClient ) throws IOException
     {
         RepositoryFactory repositoryFactory = injector.getInstance( RepositoryFactory.class );
         UnifiedRepository unifiedRepo = repositoryFactory.createUnifiedRepo();
         unifiedRepo.getRepositories().add( getLocalRepository( context ) );
-        for ( RepoUrl repoUrl : remoteRepoUrls )
+
+        if ( ! isKurjunClient )
         {
-            // TODO: Kairat. Handle following workaround.
-            
-            if ( ! repoUrl.isUseToken() ) // Workaround to avoid direct and indirect cyclic lookups
+            for ( RepoUrl repoUrl : remoteRepoUrls )
             {
                 unifiedRepo.getRepositories().add( repositoryFactory.createNonLocalTemplate( repoUrl.getUrl().toString(), null, repoUrl.isUseToken() ) );
+            }
+
+            for ( RepoUrl repoUrl : globalRepoUrls )
+            {
+                unifiedRepo.getSecondaryRepositories().add( repositoryFactory.createNonLocalTemplate( repoUrl.getUrl().toString(), null, repoUrl.isUseToken() ) );
             }
         }
         return unifiedRepo;
@@ -440,5 +422,35 @@ public class TemplateManagerImpl implements TemplateManager
             }
         }
         return null;
+    }
+
+
+    private void parseGlobalKurjunUrls( String globalKurjunUrl )
+    {
+        if ( !Strings.isNullOrEmpty( globalKurjunUrl ) )
+        {
+            String urls[] = globalKurjunUrl.split( "," );
+
+            for ( int x = 0; x < urls.length; x++ )
+            {
+                urls[x] = urls[x].trim();
+                globalKurjunUrls.add( urls[x] );
+            }
+        }
+    }
+
+
+    private void logAllUrlsInUse()
+    {
+        LOGGER.info( "Remote template urls:" );
+        for ( RepoUrl r : remoteRepoUrls )
+        {
+            LOGGER.info( r.toString() );
+        }
+
+        for ( RepoUrl r : globalRepoUrls )
+        {
+            LOGGER.info( r.toString() );
+        }
     }
 }

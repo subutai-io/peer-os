@@ -303,6 +303,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
+    @Override
     public void dispose()
     {
         if ( managementHost != null )
@@ -381,6 +382,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @RolesAllowed( "Environment-Management|A|Write" )
+    @Override
     public Set<ContainerHostInfoModel> createEnvironmentContainerGroup(
             final CreateEnvironmentContainerGroupRequest request ) throws PeerException
     {
@@ -863,6 +865,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
+    @Override
     public ContainerHostEntity bindHost( final ContainerId containerId ) throws HostNotFoundException
     {
         return ( ContainerHostEntity ) bindHost( containerId.getId() );
@@ -1295,6 +1298,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @RolesAllowed( "Environment-Management|A|Delete" )
+    @Override
     public ContainersDestructionResult destroyContainersByEnvironment( final String environmentId ) throws PeerException
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
@@ -1363,6 +1367,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     //networking
 
 
+    @Override
     public Set<Gateway> getGateways() throws PeerException
     {
         return getManagementHost().getGateways();
@@ -1791,14 +1796,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public List<TemplateKurjun> getTemplates()
     {
-        try
-        {
-            return templateRegistry.list( TemplateManager.PUBLIC_REPO );
-        }
-        catch ( IOException e )
-        {
-            return Lists.newArrayList();
-        }
+        return templateRegistry.list();
     }
 
 

@@ -44,15 +44,15 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
 
 
     @Override
-    public Response getTemplate( String repository, String md5, String name, String version, String type )
+    public Response getTemplate( String repository, String md5, String name, String version, String type, boolean isKurjunClient )
     {
         try
         {
             byte[] md5bytes = decodeMd5( md5 );
             if ( md5bytes != null )
             {
-                TemplateKurjun template = templateManager.getTemplate( repository, md5bytes );
-                InputStream is = templateManager.getTemplateData( repository, md5bytes );
+                TemplateKurjun template = templateManager.getTemplate( repository, md5bytes, isKurjunClient );
+                InputStream is = templateManager.getTemplateData( repository, md5bytes, isKurjunClient );
                 if ( template != null && is != null )
                 {
                     return Response.ok( is )
@@ -63,7 +63,7 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
             }
             else
             {
-                TemplateKurjun template = templateManager.getTemplate( repository, name, version );
+                TemplateKurjun template = templateManager.getTemplate( repository, name, version, isKurjunClient );
 
                 if ( template != null && RestTemplateManager.RESPONSE_TYPE_MD5.equals( type ) )
                 {
@@ -82,21 +82,21 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
 
 
     @Override
-    public Response getTemplateInfo( String repository, String md5, String name, String version )
+    public Response getTemplateInfo( String repository, String md5, String name, String version, boolean isKurjunClient )
     {
         try
         {
             byte[] md5bytes = decodeMd5( md5 );
             if ( md5bytes != null )
             {
-                TemplateKurjun template = templateManager.getTemplate( repository, md5bytes );
+                TemplateKurjun template = templateManager.getTemplate( repository, md5bytes, isKurjunClient );
                 if ( template != null )
                 {
                     return Response.ok( GSON.toJson( convertToDefaultTemplate( template ) ) ).build();
                 }
             }
 
-            TemplateKurjun template = templateManager.getTemplate( repository, name, version );
+            TemplateKurjun template = templateManager.getTemplate( repository, name, version, isKurjunClient );
 
             if ( template != null )
             {
@@ -114,11 +114,11 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
 
 
     @Override
-    public Response getTemplateList( String repository )
+    public Response getTemplateList( String repository, boolean isKurjunClient )
     {
         try
         {
-            List<TemplateKurjun> list = templateManager.list( repository );
+            List<TemplateKurjun> list = templateManager.list( repository, isKurjunClient );
             if ( list != null )
             {
                 List<DefaultTemplate> deflist = list.stream().map( t -> convertToDefaultTemplate( t ) ).collect( Collectors.toList() );

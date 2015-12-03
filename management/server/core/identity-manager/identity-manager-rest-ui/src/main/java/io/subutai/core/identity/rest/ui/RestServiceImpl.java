@@ -3,7 +3,11 @@ package io.subutai.core.identity.rest.ui;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.Maps;
 import com.google.gson.reflect.TypeToken;
+
+import io.subutai.common.security.objects.PermissionScope;
+import io.subutai.common.security.objects.TokenType;
 import io.subutai.common.security.objects.UserType;
 import io.subutai.core.identity.api.*;
 import io.subutai.core.identity.api.model.Role;
@@ -19,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -193,13 +198,6 @@ public class RestServiceImpl implements RestService
     }
 
 
-    @Override
-    public Response getRoleTypes()
-    {
-        return Response.ok( io.subutai.common.security.objects.TokenType.values() ).build();
-    }
-
-
 
     /** Permissions ***********************************************/
 
@@ -215,6 +213,18 @@ public class RestServiceImpl implements RestService
             LOGGER.error( "Error receiving permissions", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
+    }
+
+
+    @Override
+    public Response getPermissionScopes()
+    {
+        Map<Integer, String> map = Maps.newHashMap();
+        for( PermissionScope permissionScope : PermissionScope.values() )
+        {
+            map.put( permissionScope.getId(), permissionScope.getName() );
+        }
+        return Response.ok( JsonUtil.toJson( map ) ).build();
     }
 
 
@@ -318,5 +328,17 @@ public class RestServiceImpl implements RestService
 
 
         return Response.ok().build();
+    }
+
+
+    @Override
+    public Response getTokenTypes()
+    {
+        Map<Integer, String> map = Maps.newHashMap();
+        for( TokenType tokenType : TokenType.values() )
+        {
+            map.put( tokenType.getId(), tokenType.getName() );
+        }
+        return Response.ok( JsonUtil.toJson( map ) ).build();
     }
 }

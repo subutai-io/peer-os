@@ -1723,11 +1723,25 @@
 							label = '';
 						}
 					}
-
-					if(this.showXLabelseByEveryMinutes){
-						var currentLabelDate = label.split(':');
-						if(parseInt(currentLabelDate[1]) % 10 != 0) {
-							label = '';
+					var timeInterval = this.showXLabelseByEveryMinutes;
+					if(timeInterval){
+                        var timeFormat = timeInterval.indexOf('m') > -1 ? "m" : "h";
+                        var currentLabelDate = label.split(':');
+                        if(timeFormat == "h") {
+                            timeInterval = timeInterval.substring(0, timeInterval.indexOf('h'));
+                            if(parseInt(currentLabelDate[0]) % timeInterval != 0) {
+                                label = '';
+                            } else {
+                                if(parseInt(currentLabelDate[1]) != 0) {
+                                    label = '';
+                                }
+                            }
+                        }
+						if(timeFormat == "m") {
+							timeInterval = timeInterval.substring(0, timeInterval.indexOf('m'));
+                            if(parseInt(currentLabelDate[1]) % timeInterval != 0) {
+                                label = '';
+                            }
 						}
 					}
 					ctx.fillText(label, 0, 0);
@@ -3098,7 +3112,7 @@
 			helpers.each(this.segments,function(segment){
 				segment.save();
 			});
-			
+
 			this.reflow();
 			this.render();
 		},

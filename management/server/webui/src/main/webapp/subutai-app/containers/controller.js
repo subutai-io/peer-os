@@ -38,15 +38,14 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 		vm.domainContainer = container;
 		environmentService.getContainerDomain(container).success(function (data) {
 			vm.currentDomainStatus = data;
+			ngDialog.open({
+				template: 'subutai-app/containers/partials/addToDomain.html',
+				scope: $scope
+			});			
 			LOADING_SCREEN('none');
-			console.log(vm.currentDomainStatus);
 		}).error(function(error){
 			LOADING_SCREEN('none');
 			ngDialog.closeAll();
-		});
-		ngDialog.open({
-			template: 'subutai-app/containers/partials/addToDomain.html',
-			scope: $scope
 		});
 	}
 
