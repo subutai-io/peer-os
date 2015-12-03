@@ -50,7 +50,7 @@ public abstract class AbstractSubutaiHost implements Host
     private HostArchitecture hostArchitecture;
 
     @Transient
-    protected HostInterfaces hostInterfaces /*= new CopyOnWriteArraySet<>()*/;
+    protected HostInterfaces hostInterfaces = new HostInterfaces();
 
     @Transient
     protected volatile long lastHeartbeat = 0;

@@ -92,7 +92,7 @@ public class MonitorDaoTest
     {
         monitorDao.addSubscription( ENVIRONMENT_ID, SUBSCRIBER_ID );
 
-        assertTrue( monitorDao.getEnvironmentSubscribersIds( ENVIRONMENT_ID ).contains( SUBSCRIBER_ID ) );
+        assertTrue( monitorDao.findHandlersByEnvironment( ENVIRONMENT_ID ).contains( SUBSCRIBER_ID ) );
     }
 
 
@@ -111,7 +111,7 @@ public class MonitorDaoTest
 
         monitorDao.removeSubscription( ENVIRONMENT_ID, SUBSCRIBER_ID );
 
-        assertFalse( monitorDao.getEnvironmentSubscribersIds( ENVIRONMENT_ID ).contains( SUBSCRIBER_ID ) );
+        assertFalse( monitorDao.findHandlersByEnvironment( ENVIRONMENT_ID ).contains( SUBSCRIBER_ID ) );
     }
 
 
@@ -127,7 +127,7 @@ public class MonitorDaoTest
     @Test
     public void testGetEnvironmentSubscribersIds() throws Exception
     {
-        Set<String> subscribersIds = monitorDao.getEnvironmentSubscribersIds( ENVIRONMENT_ID );
+        Set<String> subscribersIds = monitorDao.findHandlersByEnvironment( ENVIRONMENT_ID );
 
         assertTrue( subscribersIds.contains( SUBSCRIBER_ID ) );
     }
@@ -138,7 +138,7 @@ public class MonitorDaoTest
     {
         throwDbException();
 
-        monitorDao.getEnvironmentSubscribersIds( ENVIRONMENT_ID );
+        monitorDao.findHandlersByEnvironment( ENVIRONMENT_ID );
     }
 
 

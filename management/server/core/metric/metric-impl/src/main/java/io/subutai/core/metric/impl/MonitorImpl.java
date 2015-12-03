@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -25,7 +24,6 @@ import org.slf4j.LoggerFactory;
 import org.apache.commons.lang.time.DateUtils;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.gson.JsonSyntaxException;
@@ -34,7 +32,6 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
-import io.subutai.common.environment.Environment;
 import io.subutai.common.exception.DaoException;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
@@ -49,7 +46,7 @@ import io.subutai.common.metric.QuotaAlert;
 import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.metric.ResourceHostMetrics;
-import io.subutai.common.peer.AlertHandler;
+import io.subutai.common.peer.AlertListener;
 import io.subutai.common.peer.AlertPack;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
@@ -59,14 +56,12 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.util.JsonUtil;
-import io.subutai.common.util.StringUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
-import io.subutai.core.metric.api.MonitoringSettings;
 import io.subutai.core.peer.api.PeerManager;
 
 
@@ -86,12 +81,11 @@ public class MonitorImpl implements Monitor, HostListener
     private static final int ALERT_LIVE_TIME = 2;// alert live time in min
     private final HostRegistry hostRegistry;
 
-    //    protected Set<AlertHandler> alertHandlers =
-    //            Collections.newSetFromMap( new ConcurrentHashMap<AlertHandler, Boolean>() );
-    protected Map<String, AlertHandler> alertHandlers = new ConcurrentHashMap<String, AlertHandler>();
+    protected Set<AlertListener> alertListeners =
+            Collections.newSetFromMap( new ConcurrentHashMap<AlertListener, Boolean>() );
 
     private final Commands commands = new Commands();
-    private final EnvironmentManager environmentManager;
+    //    private final EnvironmentManager environmentManager;
     protected ExecutorService notificationExecutor = Executors.newCachedThreadPool();
     protected MonitorDao monitorDao;
     protected DaoManager daoManager;
@@ -114,7 +108,7 @@ public class MonitorImpl implements Monitor, HostListener
     {
         Preconditions.checkNotNull( peerManager );
         Preconditions.checkNotNull( daoManager );
-        Preconditions.checkNotNull( environmentManager );
+        //        Preconditions.checkNotNull( environmentManager );
         Preconditions.checkNotNull( hostRegistry );
 
         try
@@ -122,7 +116,7 @@ public class MonitorImpl implements Monitor, HostListener
             this.daoManager = daoManager;
             this.monitorDao = new MonitorDao( daoManager.getEntityManagerFactory() );
             this.peerManager = peerManager;
-            this.environmentManager = environmentManager;
+            //            this.environmentManager = environmentManager;
             this.hostRegistry = hostRegistry;
         }
         catch ( DaoException e )
@@ -138,89 +132,48 @@ public class MonitorImpl implements Monitor, HostListener
     }
 
 
-    @Override
-    public void startMonitoring( final String subscriberId, final Environment environment,
-                                 final MonitoringSettings monitoringSettings ) throws MonitorException
+    public void addAlertListener( AlertListener alertListener )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( subscriberId ), INVALID_SUBSCRIBER_ID_MSG );
-        Preconditions.checkNotNull( environment, ENVIRONMENT_IS_NULL_MSG );
-        Preconditions.checkNotNull( monitoringSettings, SETTINGS_IS_NULL_MSG );
-
-
-        //make sure subscriber id is truncated to 100 characters
-        String trimmedSubscriberId = StringUtil.trimToSize( subscriberId, Constants.MAX_SUBSCRIBER_ID_LEN );
-
-        //save subscription to database
-        try
+        if ( alertListener != null && alertListener.getId() != null && !"".equals( alertListener.getId().trim() ) )
         {
-            monitorDao.addSubscription( environment.getId(), trimmedSubscriberId );
+            alertListeners.add( alertListener );
         }
-        catch ( DaoException e )
-        {
-            LOG.error( "Error in startMonitoring", e );
-            throw new MonitorException( e );
-        }
-
-        //activate monitoring
-        //        Set<ContainerHost> a = new HashSet<>();
-        //        a.addAll( environment.getContainerHosts() );
-        //        activateMonitoring( a, monitoringSettings, environment.getId() );
     }
 
 
+    public void removeAlertListener( AlertListener alertListener )
+    {
+        alertListeners.remove( alertListener );
+    }
+
+
+    @Override
+    public Set<AlertListener> getAlertListeners()
+    {
+        return alertListeners;
+    }
+
+
+    //
     //    @Override
-    //    public void startMonitoring( final String subscriberId, final ContainerHost containerHost,
-    //                                 final MonitoringSettings monitoringSettings ) throws MonitorException
+    //    public EnvironmentAlertHandlers getEnvironmentAlertHandlersByEnvironment( final String environmentId )
     //    {
-    //        Preconditions.checkArgument( !Strings.isNullOrEmpty( subscriberId ), INVALID_SUBSCRIBER_ID_MSG );
-    //        Preconditions.checkNotNull( containerHost, CONTAINER_IS_NULL_MSG );
-    //        Preconditions.checkNotNull( monitoringSettings, SETTINGS_IS_NULL_MSG );
-    //
-    //        //make sure subscriber id is truncated to 100 characters
-    //        String trimmedSubscriberId = StringUtil.trimToSize( subscriberId, Constants.MAX_SUBSCRIBER_ID_LEN );
-    //
-    //
-    //        //save subscription to database
+    //        List<AlertHandler> collector = new ArrayList<>();
     //        try
     //        {
-    //            String environmentId =
-    //                    containerHost instanceof EnvironmentContainerHost ? containerHost.getEnvironmentId() : null;
-    //            monitorDao.addSubscription( environmentId, trimmedSubscriberId );
+    //            Set<String> handlers = monitorDao.findHandlersByEnvironment( environmentId );
+    //            for ( String handler : handlers )
+    //            {
+    //                collector.add( alertListeners.get( handler ) );
+    //            }
     //        }
     //        catch ( DaoException e )
     //        {
-    //            LOG.error( "Error in startMonitoring", e );
-    //            throw new MonitorException( e );
+    //            LOG.error( e.getMessage(), e );
     //        }
     //
-    ////        //activate monitoring
-    ////        String environmentId =
-    ////                containerHost instanceof EnvironmentContainerHost ? containerHost.getEnvironmentId() : null;
-    ////        activateMonitoring( Sets.newHashSet( containerHost ), monitoringSettings, environmentId );
+    //        return new EnvironmentAlertHandlers( new EnvironmentId( environmentId ));
     //    }
-
-
-    @Override
-    public void stopMonitoring( final String subscriberId, final Environment environment ) throws MonitorException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( subscriberId ), INVALID_SUBSCRIBER_ID_MSG );
-        Preconditions.checkNotNull( environment, ENVIRONMENT_IS_NULL_MSG );
-
-        //make sure subscriber id is truncated to 100 characters
-        String trimmedSubscriberId = StringUtil.trimToSize( subscriberId, Constants.MAX_SUBSCRIBER_ID_LEN );
-
-        //remove subscription from database
-        try
-        {
-            monitorDao.removeSubscription( environment.getId(), trimmedSubscriberId );
-        }
-        catch ( DaoException e )
-        {
-            LOG.error( "Error in stopMonitoring", e );
-            throw new MonitorException( e );
-        }
-    }
-
 
     //    @Override
     //    public void activateMonitoring( final ContainerHost containerHost, final MonitoringSettings
@@ -563,40 +516,6 @@ public class MonitorImpl implements Monitor, HostListener
 
 
     @Override
-    public void addAlertHandler( final AlertHandler alertHandler )
-    {
-        if ( alertHandler != null && alertHandler.getHandlerId() != null
-                && alertHandler.getAlertHandlerPriority() != null )
-        {
-            this.alertHandlers.put( alertHandler.getHandlerId(), alertHandler );
-        }
-        else
-        {
-            LOG.warn( "Alert handler rejected: " + alertHandler );
-        }
-    }
-
-
-    @Override
-    public void removeAlertHandler( final AlertHandler alertHandler )
-    {
-        if ( alertHandler != null )
-        {
-            this.alertHandlers.remove( alertHandler.getHandlerId() );
-        }
-    }
-
-
-    @Override
-    public Collection<AlertHandler> getAlertHandlers()
-    {
-        List<AlertHandler> result = new ArrayList<>( alertHandlers.values() );
-        Collections.sort( result, new AlertHandlerComparator() );
-        return result;
-    }
-
-
-    @Override
     public List<AlertPack> getAlertPackages()
     {
         return alerts;
@@ -612,80 +531,25 @@ public class MonitorImpl implements Monitor, HostListener
     }
 
 
-    @Override
-    public void notifyAlertListeners()
+    protected void notifyAlertListeners()
     {
         for ( AlertPack alertPack : alerts )
         {
             if ( !alertPack.isDelivered() && !alertPack.isExpired() )
             {
-                LOG.debug( "Notifying: " + alertPack );
-                notifyOnAlert( alertPack );
+                for ( AlertListener alertListener : alertListeners )
+                {
+                    AlertNotifier alertNotifier = new AlertNotifier( alertPack, alertListener );
+                    notificationExecutor.submit( alertNotifier );
+                }
                 alertPack.setDelivered( true );
             }
         }
     }
 
 
-    protected void notifyOnAlert( final AlertPack alertPack )
-    {
-        try
-        {
-            Environment environment = environmentManager.loadEnvironment( alertPack.getEnvironmentId() );
-
-            Set<String> handlerList = monitorDao.getEnvironmentSubscribersIds( alertPack.getEnvironmentId() );
-
-            List<AlertHandler> handlers = new ArrayList<>();
-
-            for ( String handlerId : handlerList )
-            {
-                AlertHandler alertHandler = alertHandlers.get( handlerId );
-                if ( alertHandler == null )
-                {
-                    alertPack.addLog(
-                            String.format( "Environment '%s' subscribed to handler '%s', but handler not found.",
-                                    alertPack.getEnvironmentId(), handlerId ) );
-                }
-            }
-
-            Collections.sort( handlers, new AlertHandlerComparator() );
-
-            handleAlertPack( alertPack, handlers );
-        }
-        catch ( Exception e )
-        {
-            LOG.error( "Error in handling alert package.", e );
-        }
-    }
-
-
-    protected void handleAlertPack( final AlertPack alertPack, List<AlertHandler> alertHandlers )
-    {
-
-        for ( final AlertHandler handler : alertHandlers )
-        {
-            try
-            {
-                alertPack.addLog( String.format( "Invoking pre-processor of '%s'.", handler.getHandlerId() ) );
-                handler.preProcess( alertPack );
-                alertPack.addLog( String.format( "Pre-processor of '%s' finished.", handler.getHandlerId() ) );
-                alertPack.addLog( String.format( "Invoking main processor of '%s'.", handler.getHandlerId() ) );
-                handler.process( alertPack );
-                alertPack.addLog( String.format( "Main processor of '%s' finished.", handler.getHandlerId() ) );
-                alertPack.addLog( String.format( "Invoking post-processor of '%s'.", handler.getHandlerId() ) );
-                handler.postProcess( alertPack );
-                alertPack.addLog( String.format( "Pre-processor of '%s' finished.", handler.getHandlerId() ) );
-            }
-            catch ( Exception e )
-            {
-                alertPack.addLog( e.getMessage() );
-            }
-        }
-    }
-
-
-    @Override
-    public void deliverAlerts()
+    //    @Override
+    protected void deliverAlerts()
     {
         for ( AlertPack alertPack : localALerts.values() )
         {

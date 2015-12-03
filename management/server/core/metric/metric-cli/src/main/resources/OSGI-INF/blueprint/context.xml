@@ -30,7 +30,7 @@
   </command-bundle>
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="alert/handlers">
+    <command name="alert/listeners">
       <action class="io.subutai.core.metric.cli.AlertListenersCommand">
         <argument ref="monitor" />
       </action>
@@ -45,22 +45,5 @@
     </command>
   </command-bundle>
 
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="monitoring/start">
-      <action class="io.subutai.core.metric.cli.StartMonitoringCommand">
-        <argument ref="monitor" />
-        <argument ref="environmentManager" />
-      </action>
-    </command>
-  </command-bundle>
-
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="monitoring/stop">
-      <action class="io.subutai.core.metric.cli.StopMonitoringCommand">
-        <argument ref="monitor" />
-        <argument ref="environmentManager" />
-      </action>
-    </command>
-  </command-bundle>
 
 </blueprint>

@@ -142,4 +142,10 @@ public class AlertPack
                         TimeUnit.SECONDS.convert( getLiveTime(), TimeUnit.MILLISECONDS ),
                         delivered ? "DELIVERED" : "NOT DELIVERED" );
     }
+
+
+    public List<String> getLogs()
+    {
+        return logs;
+    }
 }

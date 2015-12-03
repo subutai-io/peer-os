@@ -7,13 +7,23 @@ package io.subutai.common.peer;
 public interface AlertHandler
 {
     /**
-     * Returns the alert handler's unique identifier
+     * Returns the alert handler's identifier
      *
      * @return - handler identifier
      */
-    String getHandlerId();
+    String getId();
 
-    AlertHandlerPriority getAlertHandlerPriority();
+ /*   *//**
+     * Returns default alert handler priority
+     *
+     * @return alert handler priority
+     *//*
+    AlertHandlerPriority getPriority();
+*/
+    /**
+     * Returns the description of alert handler
+     */
+    String getDescription();
 
     /**
      * Pre processor implementation. Should be implemented preparation actions before alert processing

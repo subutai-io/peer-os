@@ -33,10 +33,14 @@ public class AlertListCommand extends SubutaiShellCommandSupport
     protected Object doExecute() throws Exception
     {
         Collection<AlertPack> alerts = monitor.getAlerts();
-        System.out.println( "List of alerts:" );
+        System.out.println( String.format( "List of alerts. Found %d alert(s)", alerts.size() ) );
         for ( AlertPack alert : alerts )
         {
             System.out.println( alert );
+            for ( String log : alert.getLogs() )
+            {
+                System.out.println( log );
+            }
         }
 
         return null;

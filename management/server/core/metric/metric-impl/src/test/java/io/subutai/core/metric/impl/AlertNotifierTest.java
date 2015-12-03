@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 
 import io.subutai.common.metric.AbstractAlert;
 import io.subutai.common.peer.AlertHandler;
+import io.subutai.common.peer.AlertListener;
 import io.subutai.common.peer.AlertPack;
 
 import static org.mockito.Matchers.any;
@@ -36,7 +37,7 @@ public class AlertNotifierTest
     AbstractAlert resource;
 
     @Mock
-    AlertHandler listener;
+    AlertListener listener;
 
     @Before
     public void setUp() {
@@ -49,7 +50,7 @@ public class AlertNotifierTest
     public void testConstructorShouldFailOnNullMetric() throws Exception
     {
 
-        new AlertNotifier( null, mock( AlertHandler.class ) );
+        new AlertNotifier( null, mock( AlertListener.class ) );
     }
 
 
@@ -68,7 +69,7 @@ public class AlertNotifierTest
 
         alertNotifier.run();
 
-        verify( listener ).process( alert );
+        verify( listener ).onAlert( alert );
     }
 
 
@@ -76,7 +77,7 @@ public class AlertNotifierTest
     public void testLogError() throws Exception
     {
         Logger logger = mock( Logger.class );
-        doThrow( new RuntimeException( "" ) ).when( listener ).process( alert );
+        doThrow( new RuntimeException( "" ) ).when( listener ).onAlert( alert );
         AlertNotifier alertNotifier = new AlertNotifier( alert, listener );
         alertNotifier.LOG = logger;
 

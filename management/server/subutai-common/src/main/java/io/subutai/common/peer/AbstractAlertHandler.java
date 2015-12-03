@@ -14,22 +14,17 @@ public abstract class AbstractAlertHandler implements AlertHandler
 
 
     @Override
-    abstract public String getHandlerId();
+    abstract public String getDescription();
 
 
     @Override
-    public AlertHandlerPriority getAlertHandlerPriority()
-    {
-        return AlertHandlerPriority.NORMAL;
-    }
+    public void preProcess( final AlertPack alert ) throws AlertHandlerException {}
 
 
     @Override
-    abstract public void preProcess( final AlertPack alert ) throws AlertHandlerException;
+    abstract public void process( final AlertPack alert ) throws AlertHandlerException ;
+
 
     @Override
-    abstract public void process( final AlertPack alert );
-
-    @Override
-    abstract public void postProcess( final AlertPack alert ) throws AlertHandlerException;
+    public void postProcess( final AlertPack alert ) throws AlertHandlerException {}
 }

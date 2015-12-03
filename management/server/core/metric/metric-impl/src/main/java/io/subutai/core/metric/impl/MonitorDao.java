@@ -9,7 +9,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 import io.subutai.common.exception.DaoException;
-import io.subutai.common.peer.EnvironmentId;
 import io.subutai.core.metric.impl.dao.SubscriberDataService;
 
 
@@ -50,12 +49,9 @@ public class MonitorDao
     }
 
 
-    public Set<String> getEnvironmentSubscribersIds( String environmentId ) throws DaoException
+    public Set<String> findHandlersByEnvironment( String environmentId ) throws DaoException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), INVALID_ENV_ID );
-        Set<String> subscribersIds;
-        subscribersIds = dataService.getEnvironmentSubscriberIds( environmentId );
-
-        return subscribersIds;
+        return dataService.findHandlersByEnvironment( environmentId );
     }
 }

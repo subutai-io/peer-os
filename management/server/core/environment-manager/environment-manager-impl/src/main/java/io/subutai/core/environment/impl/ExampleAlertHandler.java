@@ -1,4 +1,4 @@
-package io.subutai.core.metric.impl;
+package io.subutai.core.environment.impl;
 
 
 import io.subutai.common.peer.AbstractAlertHandler;
@@ -12,11 +12,29 @@ import io.subutai.common.peer.AlertPack;
  */
 public class ExampleAlertHandler extends AbstractAlertHandler
 {
+
     @Override
-    public String getHandlerId()
+    public String getId()
     {
         return "EXAMPLE_ALERT_HANDLER_ID";
     }
+
+
+/*
+    @Override
+    public AlertHandlerPriority getPriority()
+    {
+        return AlertHandlerPriority.NORMAL;
+    }
+*/
+
+
+    @Override
+    public String getDescription()
+    {
+        return "Example implementation of alert handler.";
+    }
+
 
     @Override
     public void preProcess( final AlertPack alert ) throws AlertHandlerException
