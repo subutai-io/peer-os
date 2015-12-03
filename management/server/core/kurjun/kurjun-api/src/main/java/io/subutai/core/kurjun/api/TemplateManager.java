@@ -113,7 +113,9 @@ public interface TemplateManager
 
     /**
      * Adds remote repository located at supplied URL. Repositories added with this method will be used to fulfill
-     * requests in case the local repository can not handle requests.
+     * requests in case the local repository can not handle requests. <code>useToken</code> is true for this method.
+     * To set <code>useToken</code> explicitly 
+     * use {@link #addRemoteRepository(URL, boolean) addRemoteRepository( URL url, boolean useToken )} method.
      *
      * @param url URL of the remote repository
      */

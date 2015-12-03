@@ -114,7 +114,7 @@ public class TemplateManagerImpl implements TemplateManager
                 LOGGER.info( "Loading {} global kurjun urls:", globalKurjunUrls.size() );
                 for ( String url : globalKurjunUrls )
                 {
-                    addRemoteRepository( new URL( url ) );
+                    addRemoteRepository( new URL( url ), false );
                 }
             }
 
@@ -291,7 +291,7 @@ public class TemplateManagerImpl implements TemplateManager
     @Override
     public void addRemoteRepository( URL url )
     {
-        addRemoteRepository( url, false );
+        addRemoteRepository( url, true );
     }
 
 
@@ -399,7 +399,12 @@ public class TemplateManagerImpl implements TemplateManager
         unifiedRepo.getRepositories().add( getLocalRepository( context ) );
         for ( RepoUrl repoUrl : remoteRepoUrls )
         {
-            unifiedRepo.getRepositories().add( repositoryFactory.createNonLocalTemplate( repoUrl.getUrl().toString(), null, repoUrl.isUseToken() ) );
+            // TODO: Kairat. Handle following workaround.
+            
+            if ( ! repoUrl.isUseToken() ) // Workaround to avoid direct and indirect cyclic lookups
+            {
+                unifiedRepo.getRepositories().add( repositoryFactory.createNonLocalTemplate( repoUrl.getUrl().toString(), null, repoUrl.isUseToken() ) );
+            }
         }
         return unifiedRepo;
     }
