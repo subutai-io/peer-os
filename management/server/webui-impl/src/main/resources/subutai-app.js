@@ -10,10 +10,34 @@ var app = angular.module('subutai-app', [
 		'ngTagsInput'
 	])
 	.config(routesConf)
+	.controller('CurrentUserCtrl', CurrentUserCtrl)
 	.run(startup);
 
+CurrentUserCtrl.$inject = ['$location', '$rootScope'];
 routesConf.$inject = ['$stateProvider', '$urlRouterProvider', '$ocLazyLoadProvider'];
 startup.$inject = ['$rootScope', '$state', '$location', '$http'];
+
+function CurrentUserCtrl($location, $rootScope) {
+	var vm = this;
+	vm.currentUser = $rootScope.currentUser;
+
+	//function
+	vm.logout = logout;
+
+	function logout() {
+		removeCookie('sptoken');
+		sessionStorage.removeItem('currentUser');
+		$location.path('login');
+	}
+
+	$rootScope.$on('$stateChangeStart',	function(event, toState, toParams, fromState, fromParams){
+		if(localStorage.getItem('currentUser') !== undefined) {
+			vm.currentUser = sessionStorage.getItem('currentUser');
+		} else if($rootScope.currentUser !== undefined) {
+			vm.currentUser = $rootScope.currentUser;
+		}
+	});
+}
 
 function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 
@@ -185,6 +209,24 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 				}]
 			}
 		})
+		.state('nodeReg', {
+			url: '/nodeReg',
+			templateUrl: 'subutai-app/nodeReg/partials/view.html',
+			resolve: {
+				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+					return $ocLazyLoad.load(
+						{
+							name: 'subutai.nodeReg',
+							files: [
+								'subutai-app/nodeReg/nodeReg.js',
+								'subutai-app/nodeReg/controller.js',
+								'subutai-app/nodeReg/service.js',
+								'subutai-app/environment/service.js'
+							]
+						});
+				}]
+			}
+		})
 		.state('tracker', {
 			url: '/tracker',
 			templateUrl: 'subutai-app/tracker/partials/view.html',
@@ -284,6 +326,7 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 			url: '/404',
 			template: 'Not found'
 		})
+		.state()
 }
 
 function startup($rootScope, $state, $location, $http) {
@@ -291,6 +334,7 @@ function startup($rootScope, $state, $location, $http) {
 	$rootScope.$on('$stateChangeStart',	function(event, toState, toParams, fromState, fromParams){
 		var restrictedPage = $.inArray($location.path(), ['/login']) === -1;
 		if (restrictedPage && !getCookie('sptoken')) {
+			sessionStorage.removeItem('currentUser');
 			$location.path('/login');
 		}
 	});
@@ -309,6 +353,10 @@ function getCookie(cname) {
 	return false;
 }
 
+function removeCookie( name ) {
+	document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+}
+
 app.directive('dropdownMenu', function() {
 	return {
 		restrict: 'A',
@@ -323,8 +371,6 @@ app.directive('dropdownMenu', function() {
 			//colEqualHeight();
 
 			$('.b-nav-menu-link').on('click', function(){
-				$('.b-nav-menu_active').removeClass('b-nav-menu_active')
-				$('.b-nav-menu__sub').slideUp(200);
 				if($(this).next('.b-nav-menu__sub').length > 0) {
 					if($(this).parent().hasClass('b-nav-menu_active')) {
 						$(this).parent().removeClass('b-nav-menu_active');
@@ -332,6 +378,8 @@ app.directive('dropdownMenu', function() {
 							//colEqualHeight();
 						});
 					} else {
+						$('.b-nav-menu_active').removeClass('b-nav-menu_active')
+						$('.b-nav-menu__sub').slideUp(200);
 						$(this).parent().addClass('b-nav-menu_active');
 						$(this).next('.b-nav-menu__sub').slideDown(300, function(){
 							//colEqualHeight();
@@ -364,7 +412,7 @@ app.directive('checkbox-list-dropdown', function() {
 var SERVER_URL = '/';
 
 var STATUS_UNDER_MODIFICATION = 'UNDER_MODIFICATION';
-var VARS_TOOLTIP_TIMEOUT = 900;
+var VARS_TOOLTIP_TIMEOUT = 1600;
 
 function LOADING_SCREEN(displayStatus) {
 	if(displayStatus === undefined || displayStatus === null) displayStatus = 'block';
@@ -418,7 +466,6 @@ var permissionsDefault = [
 		'write': true,
 		'update': true,
 		'delete': true,
-		'selected': false
 	},
 	{
 		'object': 2,
@@ -428,7 +475,6 @@ var permissionsDefault = [
 		'write': true,
 		'update': true,
 		'delete': true,
-		'selected': false
 	},
 	{
 		'object': 3,
@@ -438,7 +484,6 @@ var permissionsDefault = [
 		'write': true,
 		'update': true,
 		'delete': true,
-		'selected': false
 	},
 	{
 		'object': 4,
@@ -448,7 +493,6 @@ var permissionsDefault = [
 		'write': true,
 		'update': true,
 		'delete': true,
-		'selected': false
 	},
 	{
 		'object': 5,
@@ -458,7 +502,6 @@ var permissionsDefault = [
 		'write': true,
 		'update': true,
 		'delete': true,
-		'selected': false
 	},
 	{
 		'object': 6,
@@ -468,7 +511,6 @@ var permissionsDefault = [
 		'write': true,
 		'update': true,
 		'delete': true,
-		'selected': false
 	},
 	{
 		'object': 7,
@@ -478,7 +520,6 @@ var permissionsDefault = [
 		'write': true,
 		'update': true,
 		'delete': true,
-		'selected': false
 	}
 ];
 

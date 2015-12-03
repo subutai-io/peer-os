@@ -81,7 +81,7 @@
 					<div class="clear"></div>
 				</div>
 
-				<div class="b-main-form__wrapper" ng-show="consoleViewCtrl.currentType == 'environments'">
+				<div class="b-main-form__wrapper" ng-show="consoleViewCtrl.currentType == 'environments' && consoleViewCtrl.activeConsole !== undefinded && consoleViewCtrl.activeConsole.length > 0">
 					<button class="b-btn b-btn_green" ng-click="consoleViewCtrl.showSSH()">SSH</button>
 				</div>				
 			</div>

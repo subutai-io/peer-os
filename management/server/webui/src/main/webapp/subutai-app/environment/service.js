@@ -157,9 +157,8 @@ function environmentService($http) {
 	}
 
 
-
 	function setSshKey(sshKey, environmentId) {
-		var postData = 'environmentId=' + environmentId + '&key=' + sshKey;
+		var postData = 'environmentId=' + environmentId + '&key=' + window.btoa(sshKey);
 		return $http.post(
 			SSH_KEY_URL,
 			postData, 

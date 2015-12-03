@@ -3,42 +3,39 @@
 		<h1 class="b-title">Nodes/<span class="b-title_breadcrumbs">Adding</span></h1>
 	</div>
 	<div class="b-workspace__content">
-		<div class="b-workspace-content__row">
-			<h2 class="b-workspace-content-row-h2 b-workspace-content-row-h2_inline">
-				Master nodes
-			</h2>
-			<div class="clear"></div>
-		</div>
-		<div class="b-main-table-border">
-			<div class="b-data-table">
-				<table datatable="ng"
-					   dt-options="nodeRegCtrl.dtOptions"
-					   dt-column-defs="nodeRegCtrl.dtColumnDefs"
-					   class="row-border hover">
-					<thead>
+
+		<h2 class="b-workspace-content-row-h2 b-workspace-content-row-h2_inline">
+			Master nodes
+		</h2>
+
+		<div class="b-data-table">
+			<table datatable="ng"
+				dt-options="nodeRegCtrl.dtOptions"
+				dt-column-defs="nodeRegCtrl.dtColumnDefs"
+				class="row-border hover">
+				<thead>
 					<tr>
 						<th>Status</th>
 						<th>Name</th>
 						<th>Action</th>
 					</tr>
-					</thead>
-					<tbody>
-					<tr ng-repeat="clusterNode in nodeRegCtrl.nodes">
-						<td class="b-main-table__container-status">
-							<div
-									tooltips
-									tooltip-title="{{ clusterNode.status }}"
-									class="b-status-icon b-status-icon_{{ clusterNode.status }}">
-							</div>
-						</td>
-						<td>{{ clusterNode.hostname }}</td>
-						<td>
-							<button ng-if="clusterNode.status != 'APPROVED'" class="b-btn b-btn_green" ng-click="nodeRegCtrl.approveNode( clusterNode.id )">Approve</button>
-						</td>
-					</tr>
-					</tbody>
-				</table>
-			</div>
+				</thead>
+				<tbody>
+				<tr ng-repeat="clusterNode in nodeRegCtrl.nodes">
+					<td class="b-main-table__container-status">
+						<div
+							tooltips
+							tooltip-title="{{ clusterNode.status }}"
+							class="b-status-icon b-status-icon_{{ clusterNode.status }}">
+						</div>
+					</td>
+					<td>{{ clusterNode.hostname }}</td>
+					<td>
+						<button ng-if="clusterNode.status != 'APPROVED'" class="b-btn b-btn_green" ng-click="nodeRegCtrl.approveNode( clusterNode.id )">Approve</button>
+					</td>
+				</tr>
+				</tbody>
+			</table>
 		</div>
 	</div>
 </div>
