@@ -194,15 +194,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 			},
 			function (isConfirm) {
 				if (isConfirm) {
-					SweetAlert.swal(
-							{
-								title : 'Delete!',
-								text : 'Your environment is being deleted!!',
-								timer: VARS_TOOLTIP_TIMEOUT,
-								showConfirmButton: false
-							}
-					);
-
+					SweetAlert.swal("Delete!", "Your environment is being deleted!", "success");
 					environmentService.destroyEnvironment(environmentId).success(function (data) {
 						SweetAlert.swal("Destroyed!", "Your environment has been destroyed.", "success");
 						vm.dtInstance.reloadData(null, false);
