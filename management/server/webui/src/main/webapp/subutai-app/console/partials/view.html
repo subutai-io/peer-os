@@ -14,7 +14,7 @@
 				ng-show="consoleViewCtrl.containers.length > 0">
 					<select class="b-popup-body-input" 
 						ng-model="selectedContainer" 
-						ng-change="consoleViewCtrl.setConsole(selectedContainer)">
+						ng-change="consoleViewCtrl.setConsole(selectedContainer, 'container')">
 						<option value="">Select container</option>
 						<option ng-repeat="container in consoleViewCtrl.containers" value="{{ container.id }}">
 							{{ container.hostname }}
@@ -81,7 +81,8 @@
 					<div class="clear"></div>
 				</div>
 
-				<div class="b-main-form__wrapper" ng-show="consoleViewCtrl.currentType == 'environments' && consoleViewCtrl.activeConsole !== undefinded && consoleViewCtrl.activeConsole.length > 0">
+				<div class="b-main-form__wrapper" 
+					ng-show="consoleViewCtrl.selectedEnvironment.length > 0 && consoleViewCtrl.activeConsole !== undefinded && consoleViewCtrl.activeConsole.length > 0 && consoleViewCtrl.selectedNodeType == 'container'">
 					<button class="b-btn b-btn_green" ng-click="consoleViewCtrl.showSSH()">SSH</button>
 				</div>				
 			</div>
