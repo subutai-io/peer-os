@@ -31,7 +31,7 @@ public class GetTemplateCommand extends SubutaiShellCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        TemplateKurjun template = templateManager.getTemplate( repository, templateName, null );
+        TemplateKurjun template = templateManager.getTemplate( repository, templateName, null, false );
         if ( template != null )
         {
             System.out.println( "Template: " + template.getName() + ", " + template.getVersion() + ", " + template.getArchitecture() );
