@@ -5,7 +5,7 @@ import java.util.Set;
 
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.metric.ProcessResourceUsage;
-import io.subutai.common.protocol.Template;
+import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.resource.ResourceType;
 import io.subutai.common.resource.ResourceValue;
 
@@ -35,7 +35,7 @@ public interface ContainerHost extends Host, ContainerHostInfo
 
     Peer getPeer();
 
-    Template getTemplate() throws PeerException;
+    TemplateKurjun getTemplate() throws PeerException;
 
     String getTemplateName();
 

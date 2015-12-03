@@ -11,6 +11,7 @@ import io.subutai.core.channel.impl.ChannelManagerImpl;
 import org.slf4j.Logger;
 
 import org.apache.cxf.Bus;
+import org.junit.Ignore;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -35,6 +36,7 @@ public class ServerBusListenerTest
 
 
     @Test
+    @Ignore
     public void testBusRegistered() throws Exception
     {
         //cxfBusListener.busRegistered( bus );

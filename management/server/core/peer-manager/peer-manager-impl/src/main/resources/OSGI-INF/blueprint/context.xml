@@ -50,6 +50,8 @@
   <reference id="localPeer" availability="mandatory"
              interface="io.subutai.common.peer.LocalPeer" />
 
+  <reference id="templateRegistry" interface="io.subutai.core.kurjun.api.TemplateManager" />
+
   <bean id="messageResponseListener" class="io.subutai.core.peer.impl.request.MessageResponseListener"
         destroy-method="dispose" scope="singleton" activation="eager">
     <argument ref="messenger" />
@@ -64,6 +66,7 @@
     <argument ref="daoManagerPeer" />
     <argument ref="messageResponseListener" />
     <argument ref="securityManager" />
+    <argument ref="templateRegistry" />
     <argument ref="jsonProvider" />
   </bean>
 

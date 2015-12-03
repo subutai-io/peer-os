@@ -74,12 +74,12 @@ import io.subutai.core.environment.impl.workflow.modification.EnvironmentGrowing
 import io.subutai.core.environment.impl.workflow.modification.SshKeyModificationWorkflow;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
+import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerAction;
 import io.subutai.core.peer.api.PeerActionListener;
 import io.subutai.core.peer.api.PeerActionResponse;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.core.registry.api.TemplateRegistry;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.tracker.api.Tracker;
 
@@ -97,7 +97,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     private SecurityManager securityManager;
     private final NetworkManager networkManager;
     private final Tracker tracker;
-    private final TemplateRegistry templateRegistry;
+    private final TemplateManager templateRegistry;
 
     private final DaoManager daoManager;
 
@@ -114,7 +114,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     private Set<EnvironmentAlertListener> alertListeners = new CopyOnWriteArraySet<>();
 
 
-    public EnvironmentManagerImpl( final TemplateRegistry templateRegistry, final PeerManager peerManager,
+    public EnvironmentManagerImpl( final TemplateManager templateRegistry, final PeerManager peerManager,
                                    SecurityManager securityManager, final NetworkManager networkManager,
                                    final DaoManager daoManager, final IdentityManager identityManager,
                                    final Tracker tracker )

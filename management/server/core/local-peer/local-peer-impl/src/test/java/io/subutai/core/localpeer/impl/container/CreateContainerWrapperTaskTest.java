@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.core.hostregistry.api.HostRegistry;
 
@@ -33,7 +34,7 @@ public class CreateContainerWrapperTaskTest
     @Before
     public void setUp() throws Exception
     {
-        task = new CreateContainerWrapperTask( resourceHost, TEMPLATE_NAME, HOSTNAME, IP, VLAN,  TIMEOUT, ENV_ID  );
+        task = new CreateContainerWrapperTask( resourceHost, TEMPLATE_NAME, HOSTNAME, IP, VLAN, TIMEOUT, ENV_ID );
     }
 
 
@@ -42,6 +43,6 @@ public class CreateContainerWrapperTaskTest
     {
         task.call();
 
-        verify( resourceHost ).createContainer( TEMPLATE_NAME, HOSTNAME, IP, VLAN, TIMEOUT, ENV_ID  );
+        verify( resourceHost ).createContainer( TEMPLATE_NAME, HOSTNAME, IP, VLAN, TIMEOUT, ENV_ID );
     }
 }

@@ -23,9 +23,9 @@ import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.creation.EnvironmentCreationWorkflow;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
+import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.core.registry.api.TemplateRegistry;
 import io.subutai.core.tracker.api.Tracker;
 
 import static junit.framework.TestCase.assertEquals;
@@ -47,7 +47,7 @@ public class EnvironmentManagerTest
 
 
     @Mock
-    TemplateRegistry templateRegistry;
+    TemplateManager templateRegistry;
     @Mock
     PeerManager peerManager;
     @Mock

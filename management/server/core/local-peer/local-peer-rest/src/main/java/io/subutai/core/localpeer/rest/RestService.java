@@ -81,6 +81,7 @@ public interface RestService
 
     @POST
     @Path( "gateways" )
+    @Consumes( MediaType.APPLICATION_JSON )
     Response createGateway( Gateway gateway );
 
 

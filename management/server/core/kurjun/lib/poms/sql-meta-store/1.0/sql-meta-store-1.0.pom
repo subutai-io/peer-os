@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <artifactId>kurjun-meta-stores</artifactId>
+    <groupId>ai.subut.kurjun</groupId>
+    <version>1.0</version>
+  </parent>
+
+    <artifactId>sql-meta-store</artifactId>
+    <packaging>jar</packaging>
+    <name>Kurjun SQL DB Store</name>
+
+    <properties>
+      
+        <osgi.export-package>{local-packages};version=1.0;-noimport:=true</osgi.export-package>
+        <osgi.import-package>ai.subut.kurjun.*, !*</osgi.import-package>
+        <osgi.embed-dependency>groupId=com.zaxxer|org.mybatis|org.mariadb.jdbc</osgi.embed-dependency>
+        <osgi.embed-transitive>true</osgi.embed-transitive>
+
+        <test.db.className>org.mariadb.jdbc.MySQLDataSource</test.db.className>
+        <test.db.server>localhost</test.db.server>
+        <test.db.dbName>kurjun_metadata</test.db.dbName>
+        <test.db.user>kurjun-metadata</test.db.user>
+        <test.db.pass>kurjun-metadata</test.db.pass>
+    
+    </properties>
+
+    <build>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/*.properties</include>
+                </includes>
+            </testResource>
+        </testResources>
+    </build>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>ai.subut.kurjun</groupId>
+            <artifactId>metadata-common</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+        </dependency>
+
+    </dependencies>
+</project>

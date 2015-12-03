@@ -22,7 +22,7 @@ import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
 import io.subutai.common.protocol.N2NConfig;
-import io.subutai.common.protocol.Template;
+import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.resource.ResourceType;
 import io.subutai.common.resource.ResourceValue;
@@ -140,9 +140,9 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
 
 
     /**
-     * Returns tempalte by name
+     * Returns template by name
      */
-    public Template getTemplate( String templateName ) throws PeerException;
+    public TemplateKurjun getTemplate( String templateName ) throws PeerException;
 
     /**
      * Returns true of the peer is reachable online, false otherwise

@@ -1,0 +1,28 @@
+<blueprint xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:jaxrs="http://cxf.apache.org/blueprint/jaxrs"
+           xmlns:cxf="http://cxf.apache.org/blueprint/core" 
+           xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd http://cxf.apache.org/blueprint/jaxrs http://cxf.apache.org/schemas/blueprint/jaxrs.xsd">
+
+    <!--<cxf:bus id="cxfBusTemplateManager">-->
+    <cxf:bus id="cxfBusAptManager">
+        <cxf:features>
+            <cxf:logging />
+        </cxf:features>
+    </cxf:bus>
+    
+    <reference id="templateManager"
+               interface="io.subutai.core.kurjun.api.TemplateManager"
+               availability="mandatory" />
+    
+    <bean id="restTemplateManagerImpl" class="io.subutai.core.kurjun.rest.template.RestTemplateManagerImpl">
+        <argument ref="templateManager" />
+    </bean>
+    
+    <jaxrs:server address="/kurjun/templates" id="restTemplateManager">
+        <jaxrs:serviceBeans>
+            <ref component-id="restTemplateManagerImpl" />
+        </jaxrs:serviceBeans>
+    </jaxrs:server>
+    
+</blueprint>

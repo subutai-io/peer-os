@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <artifactId>kurjun-meta-stores</artifactId>
+        <groupId>ai.subut.kurjun</groupId>
+        <version>1.0</version>
+    </parent>
+
+    <artifactId>nosql-meta-store</artifactId>
+    <name>Kurjun NoSQL Store</name>
+    <packaging>jar</packaging>
+
+    <properties>
+        <osgi.export-package>{local-packages};version=1.0;-noimport:=true</osgi.export-package>
+        <osgi.import-package>ai.subut.kurjun.*, org.slf4j, !*</osgi.import-package>
+        <osgi.embed-dependency>groupId=com.datastax.cassandra</osgi.embed-dependency>
+        <osgi.embed-transitive>true</osgi.embed-transitive>
+
+        <test.cassandra.node>localhost</test.cassandra.node>
+        <test.cassandra.port>0</test.cassandra.port>
+
+    </properties>
+
+    <build>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/*.properties</include>
+                </includes>
+            </testResource>
+        </testResources>
+    </build>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>ai.subut.kurjun</groupId>
+            <artifactId>metadata-common</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <!-- TODO: remove this dependency, added to use snap metadata pojo classes -->
+        <!-- default snap pojo classes should be moved to common module            -->
+        <dependency>
+            <groupId>ai.subut.kurjun</groupId>
+            <artifactId>snap-parser</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.datastax.cassandra</groupId>
+            <artifactId>cassandra-driver-core</artifactId>
+        </dependency>
+
+    </dependencies>
+</project>
