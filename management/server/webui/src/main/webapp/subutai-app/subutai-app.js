@@ -10,10 +10,34 @@ var app = angular.module('subutai-app', [
 		'ngTagsInput'
 	])
 	.config(routesConf)
+	.controller('CurrentUserCtrl', CurrentUserCtrl)
 	.run(startup);
 
+CurrentUserCtrl.$inject = ['$location', '$rootScope'];
 routesConf.$inject = ['$stateProvider', '$urlRouterProvider', '$ocLazyLoadProvider'];
 startup.$inject = ['$rootScope', '$state', '$location', '$http'];
+
+function CurrentUserCtrl($location, $rootScope) {
+	var vm = this;
+	vm.currentUser = $rootScope.currentUser;
+
+	//function
+	vm.logout = logout;
+
+	function logout() {
+		removeCookie('sptoken');
+		sessionStorage.removeItem('currentUser');
+		$location.path('login');
+	}
+
+	$rootScope.$on('$stateChangeStart',	function(event, toState, toParams, fromState, fromParams){
+		if(localStorage.getItem('currentUser') !== undefined) {
+			vm.currentUser = sessionStorage.getItem('currentUser');
+		} else if($rootScope.currentUser !== undefined) {
+			vm.currentUser = $rootScope.currentUser;
+		}
+	});	
+}
 
 function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 
@@ -715,24 +739,6 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 				}]
 			}
 		})
-		.state('nodeReg', {
-			url: '/nodeReg',
-			templateUrl: 'subutai-app/nodeReg/partials/view.html',
-			resolve: {
-				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
-					return $ocLazyLoad.load(
-						{
-							name: 'subutai.nodeReg',
-							files: [
-								'subutai-app/nodeReg/nodeReg.js',
-								'subutai-app/nodeReg/controller.js',
-								'subutai-app/nodeReg/service.js',
-								'subutai-app/environment/service.js'
-							]
-						});
-				}]
-			}
-		})
 		.state('generic', {
 			url: '/plugins/generic',
 			templateUrl: 'plugins/generic/partials/view.html',
@@ -766,6 +772,7 @@ function startup($rootScope, $state, $location, $http) {
 	$rootScope.$on('$stateChangeStart',	function(event, toState, toParams, fromState, fromParams){
 		var restrictedPage = $.inArray($location.path(), ['/login']) === -1;
 		if (restrictedPage && !getCookie('sptoken')) {
+			sessionStorage.removeItem('currentUser');
 			$location.path('/login');
 		}
 	});
@@ -782,6 +789,10 @@ function getCookie(cname) {
 		if (c.indexOf(name) == 0) return c.substring(name.length,c.length);
 	}
 	return false;
+}
+
+function removeCookie( name ) {
+	document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
 }
 
 app.directive('dropdownMenu', function() {
