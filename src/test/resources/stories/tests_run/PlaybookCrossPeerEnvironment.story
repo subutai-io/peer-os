@@ -2,27 +2,13 @@ Meta:
 
 Narrative:
 As a QA
-I want to verify an Ubuntu on Snappy PLAYBOOK SS-3285
-So that I will create test scenarios
+I want to verify a functional: Cross Peer Environment
+So that I wrote acceptance test for it
 
-Scenario: The user verify work Subutai: Ubuntu on Snappy
+Scenario: The First User Sends Request
 Given the first user is on the home page of Subutai
 And the user enter login and password: 'admin', 'secret'
 And the user click on the button: Login
-When the user click on the menu item: Console
-And the user select management host from select menu
-And the user enter console command: 'snappy info'
-Then the user verify output console command and observe expected phrase: 'frameworks: subutai-mng.sideload'
-When the user enter console command: 'clear'
-And the user select any available resource host from select menu
-And the user enter console command: 'snappy info'
-Then the user verify output console command and observe expected phrase: 'frameworks: subutai.sideload'
-When the user enter console command: 'ls /var/lib/apps/subutai/current/var/lib/lxc/lxc-data/tmpdir/'
-And the user enter console command: subutai import hadoop
-And the user enter console command: 'clear'
-And the user enter console command: 'ls /var/lib/apps/subutai/current/var/lib/lxc/lxc-data/tmpdir/'
-Then the user verify output console command and observe expected phrase: 'hadoop-subutai-template_'
-And the user verify output console command and observe expected phrase: 'openjre7-subutai-template_'
 When the user click on the menu item: Peer Registration
 Then the user observe button: Create Peer
 When the user click on the link: Create Peer
@@ -47,6 +33,7 @@ Then the user observe field: Approve Key phrase
 When the user enter approve key phrase: 'secret'
 And the user click on the button popup: Approve
 Then the user observe button: Unregister
+
 When the user click on the menu item: Environment
 Then the user observe items of Environment menu
 When the user click on the menu item: Blueprint
@@ -54,7 +41,7 @@ And the user click on the button: Create Blueprint
 Then the user observe field: Enter blueprint name
 When the user enter blueprint name: 'Sample blueprint'
 And the user enter node name: 'Node'
-And the user select template: 'hadoop'
+And the user select template: 'master'
 And the user enter number of containers: '2'
 And the user enter SSH group ID: '0'
 And the user enter host Group ID: '0'
@@ -77,6 +64,26 @@ And the user observe text: Your environment start creation.
 When the user click on the button: OK
 Then the user observe header: Success!
 And the user observe text: Your environment has been created.
+
+Scenario: Grow Cross Peer Environment
+Given the second user is on the home page of Subutai
+When the user click on the menu item: Environment
+And the user click on the menu item: Blueprint
+And the user click on the icon: Grow
+Then the user observe selector: Environment
+When the user select environment: Local Environment
+And the user select peer: Two
+And the user select Strategie: 'DEFAULT-STRATEGY'
+And the user click on the button: Place
+Then the user observe icon: two containers
+When the user click on the link: Environment Build List
+Then the user observe popup: Build Environment
+When the user click on the button: Build
+Then the user observe header: Success!
+And the user observe text: Your environment start growing.
+When the user click on the button: OK
+Then the user observe header: Success!
+And the user observe text: You successfully grow environment.
 
 Scenario: Destroy Cross Peer Environment and Blueprint
 Given the second user is on the home page of Subutai
