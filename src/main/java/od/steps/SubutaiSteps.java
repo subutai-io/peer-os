@@ -844,6 +844,7 @@ public class SubutaiSteps extends ScenarioSteps {
 
     @Step
     public void seeEmptyInputDomain(){
+        subutaiPage.waitDomainPopUpMenu();
         assertThat(subutaiPage.getDomain().isEmpty(), is(true));
     }
 
