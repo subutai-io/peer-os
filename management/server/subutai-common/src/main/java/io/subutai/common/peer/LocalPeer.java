@@ -6,7 +6,7 @@ import java.util.Set;
 
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.protocol.N2NConfig;
-import io.subutai.common.protocol.Template;
+import io.subutai.common.protocol.TemplateKurjun;
 
 
 /**
@@ -184,9 +184,9 @@ public interface LocalPeer extends Peer
 
     void addToTunnel( N2NConfig config ) throws PeerException;
 
-    List<Template> getTemplates();
+    List<TemplateKurjun> getTemplates();
 
-    Template getTemplateByName( String templateName );
+    TemplateKurjun getTemplateByName( String templateName );
 
     ContainerHost findContainerById( ContainerId containerId );
 

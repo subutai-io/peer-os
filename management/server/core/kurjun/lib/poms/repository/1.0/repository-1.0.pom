@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>ai.subut.kurjun</groupId>
+    <artifactId>kurjun-parent</artifactId>
+    <version>1.0</version>
+  </parent>
+    
+    <artifactId>repository</artifactId>
+    <name>Kurjun Repositories</name>
+    <description></description>
+
+    <packaging>jar</packaging>
+
+    <properties>
+        <osgi.export-package>{local-packages};version=1.0;-noimport:=true</osgi.export-package>
+        <osgi.import-package>ai.subut.kurjun*, org.slf4j, !*</osgi.import-package>
+        <osgi.embed-dependency>groupId=com.google.inject|aopalliance|javax.inject</osgi.embed-dependency>
+        <osgi.embed-transitive>true</osgi.embed-transitive>
+        
+        <test.pkg.filename.1>
+            apt-transport-https_1.0.1ubuntu2_amd64.deb
+        </test.pkg.filename.1>
+        <test.pkg.url.1>
+            http://archive.ubuntu.com/ubuntu/pool/main/a/apt/apt-transport-https_1.0.1ubuntu2_amd64.deb
+        </test.pkg.url.1>
+
+        <test.pkg.filename.2>
+            bc_1.06.95-8ubuntu1_amd64.deb
+        </test.pkg.filename.2>
+        <test.pkg.url.2>
+            http://archive.ubuntu.com/ubuntu/pool/main/b/bc/bc_1.06.95-8ubuntu1_amd64.deb
+        </test.pkg.url.2>
+
+    </properties>
+  
+    <dependencies>
+
+        <dependency>
+            <groupId>ai.subut.kurjun</groupId>
+            <artifactId>model</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>ai.subut.kurjun</groupId>
+            <artifactId>common-utils</artifactId>
+            <version>1.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>ai.subut.kurjun</groupId>
+            <artifactId>ar</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>ai.subut.kurjun</groupId>
+            <artifactId>kurjun-release-parser</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>ai.subut.kurjun</groupId>
+            <artifactId>kurjun-template-parser</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>ai.subut.kurjun</groupId>
+            <artifactId>kurjun-packages-parser</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>ai.subut.kurjun</groupId>
+            <artifactId>file-store-factory</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>ai.subut.kurjun</groupId>
+            <artifactId>metadata-store-factory</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>ai.subut.kurjun</groupId>
+            <artifactId>metadata-common</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.subutai</groupId>
+            <artifactId>subutai-common</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.inject.extensions</groupId>
+            <artifactId>guice-assistedinject</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.hamcrest</groupId>
+                    <artifactId>hamcrest-core</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+    </dependencies>
+</project>

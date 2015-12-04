@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>ai.subut.kurjun</groupId>
+    <artifactId>kurjun-file-stores</artifactId>
+    <version>1.0</version>
+  </parent>
+
+    <name>Kurjun File Store Factory</name>
+    <artifactId>file-store-factory</artifactId>
+    <packaging>jar</packaging>
+  
+    <properties>
+        <osgi.export-package>{local-packages};version=1.0;-noimport:=true</osgi.export-package>
+        <osgi.import-package>ai.subut.kurjun*, !*</osgi.import-package>
+        <osgi.embed-dependency>groupId=com.google.inject|aopalliance|javax.inject</osgi.embed-dependency>
+        <osgi.embed-transitive>true</osgi.embed-transitive>
+    </properties>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>ai.subut.kurjun</groupId>
+            <artifactId>s3-file-store</artifactId>
+            <version>1.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>ai.subut.kurjun</groupId>
+            <artifactId>fs-file-store</artifactId>
+            <version>1.0</version>
+        </dependency>
+    
+    </dependencies>
+
+</project>

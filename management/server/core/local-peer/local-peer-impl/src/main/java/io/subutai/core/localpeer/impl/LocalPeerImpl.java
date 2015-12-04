@@ -88,7 +88,7 @@ import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.protocol.Disposable;
 import io.subutai.common.protocol.N2NConfig;
-import io.subutai.common.protocol.Template;
+import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.quota.ContainerQuotaHolder;
 import io.subutai.common.quota.QuotaException;
 import io.subutai.common.resource.HistoricalMetrics;
@@ -108,6 +108,7 @@ import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hostregistry.api.HostRegistry;
+import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.localpeer.impl.command.CommandRequestListener;
 import io.subutai.core.localpeer.impl.container.CreateContainerWrapperTask;
 import io.subutai.core.localpeer.impl.container.CreateEnvironmentContainerGroupRequestListener;
@@ -124,7 +125,6 @@ import io.subutai.core.localpeer.impl.entity.TunnelEntity;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
-import io.subutai.core.registry.api.TemplateRegistry;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
@@ -146,7 +146,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     private String externalIpInterface = "eth1";
     private DaoManager daoManager;
-    private TemplateRegistry templateRegistry;
+    private TemplateManager templateRegistry;
     protected ManagementHostEntity managementHost;
     protected Set<ResourceHost> resourceHosts = Sets.newHashSet();
     private CommandExecutor commandExecutor;
@@ -167,7 +167,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     protected boolean initialized = false;
 
 
-    public LocalPeerImpl( DaoManager daoManager, TemplateRegistry templateRegistry, QuotaManager quotaManager,
+    public LocalPeerImpl( DaoManager daoManager, TemplateManager templateRegistry, QuotaManager quotaManager,
                           StrategyManager strategyManager, CommandExecutor commandExecutor, HostRegistry hostRegistry,
                           Monitor monitor, SecurityManager securityManager )
     {
@@ -303,6 +303,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
+    @Override
     public void dispose()
     {
         if ( managementHost != null )
@@ -381,6 +382,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @RolesAllowed( "Environment-Management|A|Write" )
+    @Override
     public Set<ContainerHostInfoModel> createEnvironmentContainerGroup(
             final CreateEnvironmentContainerGroupRequest request ) throws PeerException
     {
@@ -448,10 +450,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                         String.format( "%s/%s", ipAddress, networkPrefix ), environmentVni.getVlan(),
                         Common.WAIT_CONTAINER_CONNECTION_SEC, request.getEnvironmentId() );
 
-                Template template = getTemplateByName( request.getTemplateName() );
+                TemplateKurjun template = getTemplateByName( request.getTemplateName() );
 
                 ContainerHostEntity containerHostEntity =
-                        new ContainerHostEntity( getId(), hostInfo, template.getTemplateName(), template.getLxcArch() );
+                        new ContainerHostEntity( getId(), hostInfo, template.getName(), template.getArchitecture() );
                 containerHostEntity.setEnvironmentId( request.getEnvironmentId() );
                 containerHostEntity.setOwnerId( request.getOwnerId() );
                 containerHostEntity.setInitiatorPeerId( request.getInitiatorPeerId() );
@@ -557,10 +559,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 ContainerHostInfo hostInfo = task.getHostInfo();
                 ResourceHost resourceHost = task.getResourceHost();
 
-                Template template = getTemplateByName( request.getTemplateName() );
+                TemplateKurjun template = getTemplateByName( request.getTemplateName() );
 
                 ContainerHostEntity containerHostEntity =
-                        new ContainerHostEntity( getId(), hostInfo, template.getTemplateName(), template.getLxcArch() );
+                        new ContainerHostEntity( getId(), hostInfo, template.getName(), template.getArchitecture() );
                 containerHostEntity.setEnvironmentId( request.getEnvironmentId() );
                 containerHostEntity.setOwnerId( request.getOwnerId() );
                 containerHostEntity.setInitiatorPeerId( request.getInitiatorPeerId() );
@@ -863,6 +865,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
+    @Override
     public ContainerHostEntity bindHost( final ContainerId containerId ) throws HostNotFoundException
     {
         return ( ContainerHostEntity ) bindHost( containerId.getId() );
@@ -1119,7 +1122,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public Template getTemplate( final String templateName )
+    public TemplateKurjun getTemplate( final String templateName )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
 
@@ -1295,6 +1298,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @RolesAllowed( "Environment-Management|A|Delete" )
+    @Override
     public ContainersDestructionResult destroyContainersByEnvironment( final String environmentId ) throws PeerException
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
@@ -1363,6 +1367,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     //networking
 
 
+    @Override
     public Set<Gateway> getGateways() throws PeerException
     {
         return getManagementHost().getGateways();
@@ -1789,14 +1794,14 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public List<Template> getTemplates()
+    public List<TemplateKurjun> getTemplates()
     {
-        return templateRegistry.getAllTemplates();
+        return templateRegistry.list();
     }
 
 
     @Override
-    public Template getTemplateByName( final String name )
+    public TemplateKurjun getTemplateByName( final String name )
     {
         return templateRegistry.getTemplate( name );
     }

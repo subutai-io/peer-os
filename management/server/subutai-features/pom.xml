@@ -364,22 +364,46 @@
     </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-    <!-- template-registry -->
+    <!-- Kurjun -->
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>template-registry-api</artifactId>
+      <artifactId>kurjun-api</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>template-registry-impl</artifactId>
+      <artifactId>kurjun-impl</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>template-registry-cli</artifactId>
+      <artifactId>kurjun-rest</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>template-registry-rest</artifactId>
+      <artifactId>kurjun-cli</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->

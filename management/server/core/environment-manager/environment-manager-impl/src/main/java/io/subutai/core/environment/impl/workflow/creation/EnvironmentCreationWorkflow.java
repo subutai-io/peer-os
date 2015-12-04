@@ -20,9 +20,9 @@ import io.subutai.core.environment.impl.workflow.creation.steps.SetSshKeyStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.SetupN2NStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.VNISetupStep;
 import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.core.registry.api.TemplateRegistry;
 import io.subutai.core.security.api.SecurityManager;
 
 
@@ -30,7 +30,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 {
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentCreationWorkflow.class );
 
-    private final TemplateRegistry templateRegistry;
+    private final TemplateManager templateRegistry;
     private final NetworkManager networkManager;
     private final PeerManager peerManager;
     private final SecurityManager securityManager;
@@ -61,7 +61,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
     }
 
 
-    public EnvironmentCreationWorkflow( String defaultDomain, TemplateRegistry templateRegistry,
+    public EnvironmentCreationWorkflow( String defaultDomain, TemplateManager templateRegistry,
                                         EnvironmentManagerImpl environmentManager, NetworkManager networkManager,
                                         PeerManager peerManager, SecurityManager securityManager,
                                         IdentityManager identityManager, EnvironmentImpl environment, Topology topology,

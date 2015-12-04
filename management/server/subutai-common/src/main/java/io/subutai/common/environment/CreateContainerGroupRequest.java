@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import io.subutai.common.protocol.Criteria;
-import io.subutai.common.protocol.Template;
+import io.subutai.common.protocol.TemplateKurjun;
 
 
 public class CreateContainerGroupRequest
@@ -15,7 +15,7 @@ public class CreateContainerGroupRequest
     private final String initiatorPeerId;
     private final String ownerId;
     private final String subnetCidr;
-    private final List<Template> templates;
+    private final List<TemplateKurjun> templates;
     private final int numberOfContainers;
     private final String strategyId;
     private final List<Criteria> criteria;
@@ -24,7 +24,7 @@ public class CreateContainerGroupRequest
 
     public CreateContainerGroupRequest( final Map<String, String> peerIps, final String environmentId,
                                         final String initiatorPeerId, final String ownerId, final String subnetCidr,
-                                        final List<Template> templates, final int numberOfContainers,
+                                        final List<TemplateKurjun> templates, final int numberOfContainers,
                                         final String strategyId, final List<Criteria> criteria,
                                         final int ipAddressOffset )
     {
@@ -71,7 +71,7 @@ public class CreateContainerGroupRequest
     }
 
 
-    public List<Template> getTemplates()
+    public List<TemplateKurjun> getTemplates()
     {
         return templates;
     }

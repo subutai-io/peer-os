@@ -5,9 +5,9 @@
 			<img src="assets/elements/buttons/b-icon-close.svg" class="b-icon g-right"/>
 		</a>
 	</div>
-	<div class="b-popup__body" style="height: 120px;">
-		<div class="b-logs-view">
-			{{ consoleViewCtrl.showSSHCommand }}
+	<div class="b-popup__body">
+		<div class="b-logs-view b-logs-view_ssh">
+			{{ consoleViewCtrl.getBaseUrl() }}:{{ consoleViewCtrl.showSSHCommand }}
 		</div>
 	</div>
 	<div class="b-popup__footer">

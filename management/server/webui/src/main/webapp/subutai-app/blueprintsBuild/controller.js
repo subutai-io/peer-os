@@ -269,10 +269,9 @@ function BlueprintsBuildCtrl($scope, environmentService, SweetAlert, ngDialog, $
 	function growBlueprint() {
 		if(vm.environmentToGrow === undefined) return;
 		var postJson = {};
-		//postJson.environmentId = vm.environmentToGrow;
 		postJson.name = '';
 		postJson.nodeGroups = getNodesGroups();
-		var postData = JSON.stringify(postJson);		
+		var postData = JSON.stringify(postJson);
 
 		SweetAlert.swal("Success!", "Your environment start growing.", "success");
 		ngDialog.closeAll();

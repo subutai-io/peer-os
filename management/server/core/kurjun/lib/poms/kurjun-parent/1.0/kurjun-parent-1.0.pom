@@ -1,0 +1,523 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
+
+    <artifactId>kurjun-parent</artifactId>
+    <groupId>ai.subut.kurjun</groupId>
+    <version>1.0</version>
+    <modelVersion>4.0.0</modelVersion>
+    <name>Kurjun Parent</name>
+
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>utils</module>
+        <module>model</module>
+        <module>parsers</module>
+        <module>file-stores</module>
+        <module>meta-stores</module>
+        <module>security</module>
+        <module>repository</module>
+        <module>http</module>
+        <module>jetty</module>
+        <module>karaf</module>
+    </modules>
+
+    <description>
+        Kurjun is a configurable Apt Repository that can proxy, mirror or just hold 
+        its own packages. It can merge together several repositories either as a proxy
+        or a mirror. It can dynamically publish verified changes to the repository with
+        the ability to version control, access control, encrypt, verify and audit 
+        package changes.
+    </description>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>tonuquq</id>
+            <name>Tonuquq</name>
+        </developer>
+    </developers>
+
+    <scm>
+        <url>http://stash.safehaus.org/projects/KURJUN/repos/main/browse</url>
+        <connection>
+            scm:git:ssh://git@stash.safehaus.org:7999/kurjun/main.git
+        </connection>
+        <developerConnection>
+            scm:git:ssh://git@stash.safehaus.org:7999/kurjun/main.git
+        </developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.7</maven.compiler.source>
+        <maven.compiler.target>1.7</maven.compiler.target>
+        <encoding>UTF-8</encoding>
+
+        <!-- dependency versions -->
+        <slf4j.version>1.7.12</slf4j.version>
+        <junit.version>4.12</junit.version>
+        <guava.version>18.0</guava.version>
+        <gson.version>2.3.1</gson.version>
+        <guice.version>4.0</guice.version>
+        <peaberry.version>1.3</peaberry.version>
+        <mockito.version>1.10.19</mockito.version>
+        <commons-codec.version>1.9</commons-codec.version>
+        <commons-compress.version>1.10</commons-compress.version>
+        <commons-io.version>2.4</commons-io.version>
+        <commons-configuration.version>1.10</commons-configuration.version>
+        <commons-validator.version>1.4.0</commons-validator.version>
+        <snakeyaml.version>1.16</snakeyaml.version>
+        <xz.version>1.5</xz.version>
+        <jdeb.version>1.4</jdeb.version>
+        <bcpg-jdk15on.version>1.52</bcpg-jdk15on.version>
+        <subutai.version>4.0.0-RC4</subutai.version>
+        <org.osgi.core.version>6.0.0</org.osgi.core.version>
+        <org.osgi.compendium.version>5.0.0</org.osgi.compendium.version>
+        <!-- CXF JAX-RS version is old, using that version to be compatible with Subutai utility classes -->
+        <cxf-rt-frontend-jaxrs.version>2.7.16</cxf-rt-frontend-jaxrs.version>
+        <aws-java-sdk-s3.version>1.10.19</aws-java-sdk-s3.version>
+        <mapdb.version>1.0.8</mapdb.version>
+        <hikariCp.version>2.4.1</hikariCp.version>
+        <mybatis.version>3.3.0</mybatis.version>
+        <mariadb-java-client.version>1.2.2</mariadb-java-client.version>
+        <cassandra-driver-core.version>2.1.6</cassandra-driver-core.version>
+        <jetty.version>9.3.2.v20150730</jetty.version>
+
+        <!-- default OSGi properties - set values in child pom files -->
+        <osgi.classpath></osgi.classpath>
+        <osgi.export-package></osgi.export-package>
+        <osgi.import-package>*</osgi.import-package>
+        <osgi.embed-dependency></osgi.embed-dependency>
+        <osgi.embed-transitive>false</osgi.embed-transitive>
+        <osgi.bundle-directives></osgi.bundle-directives>
+        <osgi.bundle-activator></osgi.bundle-activator>
+        <osgi.bundle-activationpolicy></osgi.bundle-activationpolicy>
+        <osgi.require-bundle></osgi.require-bundle>
+        <osgi.service-component></osgi.service-component>
+
+    </properties>
+
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/*.xml</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
+
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/*.properties</include>
+                </includes>
+            </testResource>
+            <testResource>
+                <directory>src/test/resources</directory>
+            </testResource>
+        </testResources>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.1</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <optimize>true</optimize>
+                    <showDeprecation>true</showDeprecation>
+                    <debug>true</debug>
+                    <encoding>UTF-8</encoding>
+                    <showWarnings>true</showWarnings>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.16</version>
+                <configuration>
+                    <systemPropertyVariables>
+                        <property>
+                            <name>foobar</name>
+                            <value>1000</value>
+                        </property>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.7</version>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.5</version>
+                <!--        <configuration>
+                            <archive>
+                                <manifestFile>/home/kair/DEV/kurjun/main/model/target/classes/META-INF/MANIFEST.MF</manifestFile>
+                            </archive>
+                </configuration>-->
+            </plugin>
+ 
+            
+<!--            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <version>2.4.0</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                    <archive>
+                        <forced>true</forced>
+                    </archive>
+                    <instructions>
+                        use default generated values for Bundle-SymbolicName, Bundle-Name 
+                        <Class-Path></Class-Path>
+                        <Export-Package>{local-packages};version=1.0;-noimport:=true</Export-Package>
+                        <Bundle-Activator></Bundle-Activator>
+                        <Bundle-ActivationPolicy></Bundle-ActivationPolicy>
+                        <Require-Bundle></Require-Bundle>
+                        <Service-Component></Service-Component>
+                        <Embed-Dependency></Embed-Dependency>
+                        <Embed-Transitive>false</Embed-Transitive>
+                        <Import-Package>ai.subut.kurjun.*, !*</Import-Package>
+                    </instructions>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>bundle-manifest</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>manifest</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>-->
+            
+        </plugins>
+
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-release-plugin</artifactId>
+                    <version>2.4.2</version>
+                    <configuration>
+                        <suppressCommitBeforeTag>false</suppressCommitBeforeTag>
+                        <remoteTagging>false</remoteTagging>
+                        <pushChanges>true</pushChanges>
+                        <mavenExecutorId>forked-path</mavenExecutorId>
+                        <useReleaseProfile>false</useReleaseProfile>
+                        <arguments>-Psafehaus.release -Psonatype-oss-release</arguments>
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.apache.maven.scm</groupId>
+                            <artifactId>maven-scm-api</artifactId>
+                            <version>1.8.1</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.apache.maven.scm</groupId>
+                            <artifactId>maven-scm-provider-gitexe</artifactId>
+                            <version>1.8.1</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-assembly-plugin</artifactId>
+                    <version>2.6</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <version>2.10</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>release-sign-artifacts</id>
+            <activation>
+                <property>
+                    <name>safehausRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.4</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+
+    <dependencyManagement>
+        <dependencies>
+
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-compress</artifactId>
+                <version>1.10</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-codec</groupId>
+                <artifactId>commons-codec</artifactId>
+                <version>1.9</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>2.4</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-configuration</groupId>
+                <artifactId>commons-configuration</artifactId>
+                <version>1.10</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-validator</groupId>
+                <artifactId>commons-validator</artifactId>
+                <version>1.4.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.tukaani</groupId>
+                <artifactId>xz</artifactId>
+                <version>1.5</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.vafer</groupId>
+                <artifactId>jdeb</artifactId>
+                <version>1.4</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.sonatype.sisu</groupId>
+                        <artifactId>sisu-guice</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcpg-jdk15on</artifactId>
+                <version>1.52</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.yaml</groupId>
+                <artifactId>snakeyaml</artifactId>
+                <version>1.16</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.code.gson</groupId>
+                <artifactId>gson</artifactId>
+                <version>2.3.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>18.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.inject</groupId>
+                <artifactId>guice</artifactId>
+                <version>4.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.inject.extensions</groupId>
+                <artifactId>guice-servlet</artifactId>
+                <version>4.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.inject.extensions</groupId>
+                <artifactId>guice-assistedinject</artifactId>
+                <version>4.0</version>
+            </dependency>
+      
+            <dependency>
+                <groupId>org.ops4j</groupId>
+                <artifactId>peaberry</artifactId>
+                <version>1.3</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-simple</artifactId>
+                <version>1.7.12</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-log4j12</artifactId>
+                <version>1.7.12</version>
+            </dependency>
+      
+            <dependency>
+                <groupId>com.amazonaws</groupId>
+                <artifactId>aws-java-sdk-s3</artifactId>
+                <version>1.10.19</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.mapdb</groupId>
+                <artifactId>mapdb</artifactId>
+                <version>1.0.8</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.zaxxer</groupId>
+                <artifactId>HikariCP</artifactId>
+                <version>2.4.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.mybatis</groupId>
+                <artifactId>mybatis</artifactId>
+                <version>3.3.0</version>
+            </dependency>
+      
+            <dependency>
+                <groupId>org.mariadb.jdbc</groupId>
+                <artifactId>mariadb-java-client</artifactId>
+                <version>1.2.2</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.datastax.cassandra</groupId>
+                <artifactId>cassandra-driver-core</artifactId>
+                <version>2.1.6</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.subutai</groupId>
+                <artifactId>subutai-common</artifactId>
+                <version>4.0.0-RC4</version>
+            </dependency>
+      
+            <dependency>
+                <groupId>org.osgi</groupId>
+                <artifactId>org.osgi.core</artifactId>
+                <version>6.0.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.osgi</groupId>
+                <artifactId>org.osgi.compendium</artifactId>
+                <version>5.0.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-rt-frontend-jaxrs</artifactId>
+                <version>2.7.16</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-server</artifactId>
+                <version>9.3.2.v20150730</version>
+            </dependency>
+      
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-servlet</artifactId>
+                <version>9.3.2.v20150730</version>
+            </dependency>
+
+            <!-- ===== begin Test scope dependencies ===== -->
+
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>1.10.19</version>
+                <scope>test</scope>
+            </dependency>
+
+            <!-- ===== end Test scope dependencies ===== -->
+
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.12</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <scope>test</scope>
+            <!--
+                Kurjun is a Slf4j-enabled project which means any preferred logging
+                framework can deployed. This Log4j binding is included in test scope
+                to be used in projects tests.
+            -->
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+</project>

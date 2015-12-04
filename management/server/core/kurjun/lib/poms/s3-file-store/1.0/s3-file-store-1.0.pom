@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <artifactId>kurjun-file-stores</artifactId>
+    <groupId>ai.subut.kurjun</groupId>
+    <version>1.0</version>
+  </parent>
+
+    <artifactId>s3-file-store</artifactId>
+    <packaging>jar</packaging>
+    <name>Kurjun S3 File Store</name>
+
+    <properties>
+        <osgi.export-package>{local-packages};version=1.0;-noimport:=true</osgi.export-package>
+        <osgi.import-package>ai.subut.kurjun.*, org.slf4j, !*</osgi.import-package>
+        <osgi.embed-dependency>groupId=com.amazonaws|com.google.inject|aopalliance|javax.inject</osgi.embed-dependency>
+        <osgi.embed-transitive>true</osgi.embed-transitive>
+
+        <test.aws.accessKey></test.aws.accessKey>
+        <test.aws.secretKey></test.aws.secretKey>
+    </properties>
+
+    <build>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/*.properties</include>
+                </includes>
+            </testResource>
+        </testResources>
+    </build>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>ai.subut.kurjun</groupId>
+            <artifactId>model</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>ai.subut.kurjun</groupId>
+            <artifactId>common-utils</artifactId>
+            <version>1.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+    
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-s3</artifactId>
+        </dependency>
+    
+        <dependency>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.inject.extensions</groupId>
+            <artifactId>guice-assistedinject</artifactId>
+        </dependency>
+    
+    </dependencies>
+</project>

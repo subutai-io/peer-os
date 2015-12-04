@@ -779,7 +779,7 @@ body {
 }
 
 .b-popup_wide {
-    width: 690px;
+    width: 790px;
 }
 
 .b-popup_log {
@@ -1901,3 +1901,11 @@ td.b-main-table__status-col {
 .b-login-form-btn {
     text-align: center;
 }
+
+.b-logs-view_ssh {
+	height: auto;
+	text-align: center;
+	font-size: 16px;
+	font-weight: bold;
+}
+

@@ -376,10 +376,20 @@ public class MonitorImpl implements Monitor, HostListener
         {
             RequestBuilder historicalMetricCommand = commands.getHistoricalMetricCommand( host, startTime, endTime );
 
-            CommandResult commandResult =
-                    peerManager.getLocalPeer().getManagementHost().execute( historicalMetricCommand );
+            CommandResult commandResult;
+            if( host instanceof ResourceHost )
+            {
+                commandResult =
+                        peerManager.getLocalPeer().getResourceHostById( host.getId() ).execute( historicalMetricCommand );
+            }
+            else
+            {
+                commandResult =
+                        peerManager.getLocalPeer().getManagementHost().execute( historicalMetricCommand );
+            }
 
-            if ( commandResult.hasSucceeded() )
+
+            if ( null != commandResult && commandResult.hasSucceeded() )
             {
                 result = mapper.readValue( commandResult.getStdOut(), HistoricalMetrics.class );
             }

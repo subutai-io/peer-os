@@ -23,7 +23,6 @@
     <module>local-peer</module>
     <module>peer-manager</module>
     <module>strategy-manager</module>
-    <module>template-registry</module>
     <module>tracker</module>
     <module>metric</module>
     <module>messenger</module>
@@ -40,6 +39,7 @@
     <module>node-registration</module>
     <module>environment-manager</module>
     <module>test</module>
+    <module>kurjun</module>
   </modules>
 
 </project>

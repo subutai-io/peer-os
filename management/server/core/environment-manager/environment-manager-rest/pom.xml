@@ -33,7 +33,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>template-registry-api</artifactId>
+      <artifactId>kurjun-api</artifactId>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>

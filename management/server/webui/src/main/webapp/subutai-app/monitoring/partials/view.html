@@ -41,9 +41,8 @@
 					<select class="b-popup-body-input" 
 						ng-model="monitoringCtrl.currentHost" 
 						ng-change="monitoringCtrl.getServerData()">
-						<option value="">Select peer</option>
 						<option ng-repeat="host in monitoringCtrl.hosts" value="{{ host.id }}">
-							{{ host.hostname }}
+							{{ host.hostname }} ({{ host.instance }}, {{ host.arch }})
 						</option>
 					</select>
 					<div class="clear"></div>
@@ -65,11 +64,11 @@
 					</li>
 				</ul>
 
-				<div class="b-console-selects__item b-main-form__wrapper">
+				<div class="b-main-form__wrapper b-main-form__wrapper_min">
+					<label class="b-popup-body-label b-popup-body-label_inline">Period (h)</label>
 					<select class="b-popup-body-input" 
 						ng-model="monitoringCtrl.period" 
 						ng-change="monitoringCtrl.getServerData()">
-						<option value="">Choose period</option>
 						<option value="1">1</option>
 						<option value="6">6</option>
 						<option value="12">12</option>
@@ -87,13 +86,13 @@
 		<div class="b-chart-block-list">
 			<div class="b-chart-block-list__item" ng-repeat="chart in monitoringCtrl.charts">
 				<div class="b-chart-block">
-					<div class="b-chart-block__title">{{ chart.name }}</div>
+					<div class="b-chart-block__title">{{ chart.name }}({{chart.unit}})</div>
 					<div class="b-chart-block__body">
-						<canvas id="line2" class="chart chart-line" chart-data="chart.values" 
+						<canvas id="line{{$index}}" class="chart chart-line" chart-data="chart.values"
 							chart-options="chart.options" 
 							chart-labels="chart.labels" 
-							chart-legend="true" 
-							chart-series="chart.series" 
+							chart-legend="false"
+							chart-series="chart.series"
 							chart-click="monitoringCtrl.onClick">
 						</canvas>
 					</div>

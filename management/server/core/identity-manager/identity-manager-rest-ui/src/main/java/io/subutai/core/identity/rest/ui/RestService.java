@@ -48,19 +48,19 @@ public interface RestService
 
 
 
-    @GET
-    @Path( "roles/types" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    Response getRoleTypes();
-
-
-
     /** Permissions ***********************************************/
 
     @GET
     @Path( "permissions" )
     @Produces( { MediaType.APPLICATION_JSON } )
     Response getPermissions();
+
+
+    @GET
+    @Path( "permissions/scopes" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response getPermissionScopes();
+
 
 
     /** Tokens ***********************************************/
@@ -88,4 +88,9 @@ public interface RestService
     @Path( "users/tokens/{tokenId}" )
     Response removeUserToken( @PathParam( "tokenId" ) String tokenId );
 
+
+    @GET
+    @Path( "tokens/types" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response getTokenTypes();
 }

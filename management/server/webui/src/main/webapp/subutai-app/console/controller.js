@@ -24,6 +24,7 @@ function ConsoleViewCtrl($scope, consoleService, peerRegistrationService, $state
 	vm.daemon = false;
 	vm.timeOut = 0;
 	vm.selectedEnvironment = '';
+	vm.selectedNodeType = '';
 
 	if($stateParams.containerId !== undefined && $stateParams.containerId.length > 0) {
 		vm.activeConsole = $stateParams.containerId;
@@ -159,8 +160,12 @@ function ConsoleViewCtrl($scope, consoleService, peerRegistrationService, $state
 	vm.setConsole = setConsole;
 	vm.showContainers = showContainers;
 	vm.showSSH = showSSH;
+	vm.getBaseUrl = getBaseUrl;
 
-	function setConsole(node) {
+	function setConsole(node, nodeType) {
+		if(nodeType === undefined || nodeType === null) nodeType = 'host';
+		console.log(nodeType);
+		vm.selectedNodeType = nodeType;
 		vm.activeConsole = node;
 		$scope.results.splice(0, $scope.results.length);
 		$scope.$$phase || $scope.$apply();
@@ -173,6 +178,7 @@ function ConsoleViewCtrl($scope, consoleService, peerRegistrationService, $state
 	function setCurrentType(type) {
 		vm.containers = [];
 		vm.selectedEnvironment = '';
+		vm.selectedNodeType = '';
 		vm.showSSHCommand = '';
 		vm.currentType = type;
 	}
@@ -202,6 +208,16 @@ function ConsoleViewCtrl($scope, consoleService, peerRegistrationService, $state
 				break;
 			}
 		}
+	}
+
+	function getBaseUrl() {
+		var pathArray = location.href.split( '/' );
+		var protocol = pathArray[0];
+		var hostWithPort = pathArray[2].split(':');
+		var host = hostWithPort[0];
+		//var url = protocol + '//' + host;
+		var url = host;
+		return url;
 	}
 
 }

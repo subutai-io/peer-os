@@ -35,8 +35,8 @@ import io.subutai.common.util.JsonUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
+import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.core.registry.api.TemplateRegistry;
 
 
 public class RestServiceImpl implements RestService
@@ -46,11 +46,11 @@ public class RestServiceImpl implements RestService
 
     private final EnvironmentManager environmentManager;
     private final PeerManager peerManager;
-    private final TemplateRegistry templateRegistry;
+    private final TemplateManager templateRegistry;
 
 
     public RestServiceImpl( final EnvironmentManager environmentManager, final PeerManager peerManager,
-                            final TemplateRegistry templateRegistry )
+                            final TemplateManager templateRegistry )
     {
         Preconditions.checkNotNull( environmentManager );
         Preconditions.checkNotNull( peerManager );

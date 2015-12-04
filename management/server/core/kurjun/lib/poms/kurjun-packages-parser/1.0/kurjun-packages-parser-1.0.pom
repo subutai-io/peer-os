@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <artifactId>kurjun-parsers</artifactId>
+        <groupId>ai.subut.kurjun</groupId>
+        <version>1.0</version>
+    </parent>
+
+    <artifactId>kurjun-packages-parser</artifactId>
+    <packaging>jar</packaging>
+    <name>Kurjun Packages Index Parser</name>
+
+    <properties>
+
+        <osgi.export-package>{local-packages};version=1.0;-noimport:=true</osgi.export-package>
+        <osgi.import-package>ai.subut.kurjun.*, !*</osgi.import-package>
+        <osgi.embed-dependency>
+            groupId=com.google.inject|aopalliance|javax.inject|commons-codec|org.vafer,
+            artifactId=cfparser|commons-compress
+        </osgi.embed-dependency>
+        <osgi.embed-transitive>true</osgi.embed-transitive>
+
+        <test.pkg.index.url.gz>
+            http://archive.ubuntu.com/ubuntu/dists/trusty/main/binary-amd64/Packages.gz
+        </test.pkg.index.url.gz>
+        <test.pkg.index.url.bz2>
+            http://archive.ubuntu.com/ubuntu/dists/trusty/main/binary-amd64/Packages.bz2
+        </test.pkg.index.url.bz2>
+    
+    </properties>
+
+    <build>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/*.properties</include>
+                </includes>
+            </testResource>
+        </testResources>
+    </build>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>ai.subut.kurjun</groupId>
+            <artifactId>model</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>ai.subut.kurjun</groupId>
+            <artifactId>cfparser</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>ai.subut.kurjun</groupId>
+            <artifactId>ar</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.vafer</groupId>
+            <artifactId>jdeb</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.maven</groupId>
+                    <artifactId>maven-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.maven</groupId>
+                    <artifactId>maven-plugin-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.ant</groupId>
+                    <artifactId>ant</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>bcpg-jdk15on</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+        </dependency>
+    
+        <!-- Test Scope Dependencies -->
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.hamcrest</groupId>
+                    <artifactId>hamcrest-core</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+    </dependencies>
+</project>

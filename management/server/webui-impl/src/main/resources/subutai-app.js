@@ -10,10 +10,34 @@ var app = angular.module('subutai-app', [
 		'ngTagsInput'
 	])
 	.config(routesConf)
+	.controller('CurrentUserCtrl', CurrentUserCtrl)
 	.run(startup);
 
+CurrentUserCtrl.$inject = ['$location', '$rootScope'];
 routesConf.$inject = ['$stateProvider', '$urlRouterProvider', '$ocLazyLoadProvider'];
 startup.$inject = ['$rootScope', '$state', '$location', '$http'];
+
+function CurrentUserCtrl($location, $rootScope) {
+	var vm = this;
+	vm.currentUser = $rootScope.currentUser;
+
+	//function
+	vm.logout = logout;
+
+	function logout() {
+		removeCookie('sptoken');
+		sessionStorage.removeItem('currentUser');
+		$location.path('login');
+	}
+
+	$rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
+		if (localStorage.getItem('currentUser') !== undefined) {
+			vm.currentUser = sessionStorage.getItem('currentUser');
+		} else if ($rootScope.currentUser !== undefined) {
+			vm.currentUser = $rootScope.currentUser;
+		}
+	});
+}
 
 function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 
@@ -185,6 +209,24 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 				}]
 			}
 		})
+		.state('nodeReg', {
+			url: '/nodeReg',
+			templateUrl: 'subutai-app/nodeReg/partials/view.html',
+			resolve: {
+				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+					return $ocLazyLoad.load(
+						{
+							name: 'subutai.nodeReg',
+							files: [
+								'subutai-app/nodeReg/nodeReg.js',
+								'subutai-app/nodeReg/controller.js',
+								'subutai-app/nodeReg/service.js',
+								'subutai-app/environment/service.js'
+							]
+						});
+				}]
+			}
+		})
 		.state('tracker', {
 			url: '/tracker',
 			templateUrl: 'subutai-app/tracker/partials/view.html',
@@ -284,13 +326,15 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 			url: '/404',
 			template: 'Not found'
 		})
+		.state()
 }
 
 function startup($rootScope, $state, $location, $http) {
 
-	$rootScope.$on('$stateChangeStart',	function(event, toState, toParams, fromState, fromParams){
+	$rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
 		var restrictedPage = $.inArray($location.path(), ['/login']) === -1;
 		if (restrictedPage && !getCookie('sptoken')) {
+			sessionStorage.removeItem('currentUser');
 			$location.path('/login');
 		}
 	});
@@ -301,39 +345,44 @@ function startup($rootScope, $state, $location, $http) {
 function getCookie(cname) {
 	var name = cname + '=';
 	var ca = document.cookie.split(';');
-	for(var i=0; i<ca.length; i++) {
+	for (var i = 0; i < ca.length; i++) {
 		var c = ca[i];
-		while (c.charAt(0)==' ') c = c.substring(1);
-		if (c.indexOf(name) == 0) return c.substring(name.length,c.length);
+		while (c.charAt(0) == ' ') c = c.substring(1);
+		if (c.indexOf(name) == 0) return c.substring(name.length, c.length);
 	}
 	return false;
 }
 
-app.directive('dropdownMenu', function() {
+function removeCookie(name) {
+	document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+}
+
+app.directive('dropdownMenu', function () {
 	return {
 		restrict: 'A',
-		link: function(scope, element, attr) {
+		link: function (scope, element, attr) {
 			function colEqualHeight() {
-				if( $('.b-nav').height() > $('.b-workspace').height() ) {
-					$('.b-workspace').height( $('.b-nav').height() );
-				}else if( $('.b-nav').height() < $('.b-workspace').height() ) {
-					$('.b-nav').height( $('.b-workspace').height() );
+				if ($('.b-nav').height() > $('.b-workspace').height()) {
+					$('.b-workspace').height($('.b-nav').height());
+				} else if ($('.b-nav').height() < $('.b-workspace').height()) {
+					$('.b-nav').height($('.b-workspace').height());
 				}
 			}
+
 			//colEqualHeight();
 
-			$('.b-nav-menu-link').on('click', function(){
-				$('.b-nav-menu_active').removeClass('b-nav-menu_active')
-				$('.b-nav-menu__sub').slideUp(200);
-				if($(this).next('.b-nav-menu__sub').length > 0) {
-					if($(this).parent().hasClass('b-nav-menu_active')) {
+			$('.b-nav-menu-link').on('click', function () {
+				if ($(this).next('.b-nav-menu__sub').length > 0) {
+					if ($(this).parent().hasClass('b-nav-menu_active')) {
 						$(this).parent().removeClass('b-nav-menu_active');
-						$(this).next('.b-nav-menu__sub').slideUp(300, function(){
+						$(this).next('.b-nav-menu__sub').slideUp(300, function () {
 							//colEqualHeight();
 						});
 					} else {
+						$('.b-nav-menu_active').removeClass('b-nav-menu_active')
+						$('.b-nav-menu__sub').slideUp(200);
 						$(this).parent().addClass('b-nav-menu_active');
-						$(this).next('.b-nav-menu__sub').slideDown(300, function(){
+						$(this).next('.b-nav-menu__sub').slideDown(300, function () {
 							//colEqualHeight();
 						});
 					}
@@ -344,15 +393,15 @@ app.directive('dropdownMenu', function() {
 	}
 });
 
-app.directive('checkbox-list-dropdown', function() {
+app.directive('checkbox-list-dropdown', function () {
 	return {
 		restrict: 'A',
-		link: function(scope, element, attr) {
+		link: function (scope, element, attr) {
 			$('.b-form-input_dropdown').click(function () {
 				$(this).toggleClass('is-active');
 			});
 
-			$('.b-form-input-dropdown-list').click(function(e) {
+			$('.b-form-input-dropdown-list').click(function (e) {
 				e.stopPropagation();
 			});
 		}
@@ -364,16 +413,15 @@ app.directive('checkbox-list-dropdown', function() {
 var SERVER_URL = '/';
 
 var STATUS_UNDER_MODIFICATION = 'UNDER_MODIFICATION';
-var VARS_TOOLTIP_TIMEOUT = 900;
+var VARS_TOOLTIP_TIMEOUT = 1600;
 
 function LOADING_SCREEN(displayStatus) {
-	if(displayStatus === undefined || displayStatus === null) displayStatus = 'block';
+	if (displayStatus === undefined || displayStatus === null) displayStatus = 'block';
 	var loadScreen = document.getElementsByClassName('js-loading-screen')[0];
 	loadScreen.style.display = displayStatus;
 }
 
-function VARS_MODAL_CONFIRMATION( object, title, text, func )
-{
+function VARS_MODAL_CONFIRMATION(object, title, text, func) {
 	object.swal({
 			title: title,
 			text: text,
@@ -390,8 +438,7 @@ function VARS_MODAL_CONFIRMATION( object, title, text, func )
 	);
 }
 
-function VARS_MODAL_ERROR( object, text )
-{
+function VARS_MODAL_ERROR(object, text) {
 	object.swal({
 		title: "ERROR!",
 		text: text,
@@ -418,7 +465,6 @@ var permissionsDefault = [
 		'write': true,
 		'update': true,
 		'delete': true,
-		'selected': false
 	},
 	{
 		'object': 2,
@@ -428,7 +474,6 @@ var permissionsDefault = [
 		'write': true,
 		'update': true,
 		'delete': true,
-		'selected': false
 	},
 	{
 		'object': 3,
@@ -438,7 +483,6 @@ var permissionsDefault = [
 		'write': true,
 		'update': true,
 		'delete': true,
-		'selected': false
 	},
 	{
 		'object': 4,
@@ -448,7 +492,6 @@ var permissionsDefault = [
 		'write': true,
 		'update': true,
 		'delete': true,
-		'selected': false
 	},
 	{
 		'object': 5,
@@ -458,7 +501,6 @@ var permissionsDefault = [
 		'write': true,
 		'update': true,
 		'delete': true,
-		'selected': false
 	},
 	{
 		'object': 6,
@@ -468,7 +510,6 @@ var permissionsDefault = [
 		'write': true,
 		'update': true,
 		'delete': true,
-		'selected': false
 	},
 	{
 		'object': 7,
@@ -478,13 +519,12 @@ var permissionsDefault = [
 		'write': true,
 		'update': true,
 		'delete': true,
-		'selected': false
 	}
 ];
 
 
-function toggle (source, name) {
-	checkboxes = document.getElementsByName (name);
+function toggle(source, name) {
+	checkboxes = document.getElementsByName(name);
 	for (var i = 0; i < checkboxes.length; i++) {
 		checkboxes[i].checked = source.checked;
 	}

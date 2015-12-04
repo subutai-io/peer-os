@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <artifactId>kurjun-meta-stores</artifactId>
+        <groupId>ai.subut.kurjun</groupId>
+        <version>1.0</version>
+    </parent>
+
+    <artifactId>db-meta-store</artifactId>
+    <name>Kurjun DB File Store</name>
+    <packaging>jar</packaging>
+
+  
+    <properties>
+        <osgi.export-package>{local-packages};version=1.0;-noimport:=true</osgi.export-package>
+        <osgi.import-package>ai.subut.kurjun.*, !*</osgi.import-package>
+        <osgi.embed-dependency></osgi.embed-dependency>
+        <osgi.embed-transitive>false</osgi.embed-transitive>
+    </properties>
+
+    <build>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/*.properties</include>
+                </includes>
+            </testResource>
+        </testResources>
+    </build>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>ai.subut.kurjun</groupId>
+            <artifactId>metadata-common</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>ai.subut.kurjun</groupId>
+            <artifactId>db-file</artifactId>
+            <version>1.0</version>
+        </dependency>
+    
+    </dependencies>
+</project>

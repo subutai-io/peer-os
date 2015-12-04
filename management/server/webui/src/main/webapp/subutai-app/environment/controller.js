@@ -173,7 +173,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 					SweetAlert.swal("Destroyed!", "Your container has been destroyed.", "success");
 					vm.dtInstance.reloadData(null, false);
 				}).error(function (data) {
-					SweetAlert.swal("ERROR!", "Your environment is safe :). Error: " + data.ERROR, "error");
+					SweetAlert.swal("ERROR!", "Your container is safe :). Error: " + data.ERROR, "error");
 				});
 			}
 		});
@@ -218,7 +218,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 	function addSshKey(key){
 		var enviroment = vm.environments[vm.enviromentSSHKey.environmentKey];
 		environmentService.setSshKey(vm.enviromentSSHKey.key, enviroment.id).success(function (data) {
-			SweetAlert.swal("Success!", "You successfully add SSH key for " + enviroment.id + " environment!", "success");
+			SweetAlert.swal("Success!", "You have successfully added SSH key for " + enviroment.id + " environment!", "success");
 		}).error(function (error) {
 			SweetAlert.swal("Cancelled", "Error: " + error.ERROR, "error");
 		});
@@ -240,7 +240,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 		function (isConfirm) {
 			if (isConfirm) {
 				environmentService.removeSshKey(environmentId).success(function () {
-					SweetAlert.swal("Destroyed!", "Your enviroment SSH keys has been deleted.", "success");
+					SweetAlert.swal("Destroyed!", "Your SSH keys has been deleted.", "success");
 				}).error(function (data) {
 					SweetAlert.swal("ERROR!", "Your SSH keys is safe :). Error: " + data.ERROR, "error");
 				});
@@ -264,12 +264,14 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 	function showDomainForm(environmentId) {
 		vm.environmentForDomain = environmentId;
 		vm.currentDomain = {};
+		LOADING_SCREEN();
 		environmentService.getDomain(environmentId).success(function (data) {
 			vm.currentDomain = data;
-		});
-		ngDialog.open({
-			template: 'subutai-app/environment/partials/domainForm.html',
-			scope: $scope
+			ngDialog.open({
+				template: 'subutai-app/environment/partials/domainForm.html',
+				scope: $scope
+			});
+			LOADING_SCREEN('none');
 		});
 	}
 
@@ -277,7 +279,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 		var file = fileUploder;
 		LOADING_SCREEN();
 		environmentService.setDomain(domain, vm.environmentForDomain, file).success(function (data) {
-			SweetAlert.swal("Success!", "You successfully add domain for " + vm.environmentForDomain + " environment!", "success");
+			SweetAlert.swal("Success!", "You have successfully added domain for " + vm.environmentForDomain + " environment!", "success");
 			ngDialog.closeAll();
 			LOADING_SCREEN('none');
 		}).error(function (data) {
@@ -304,7 +306,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 		function (isConfirm) {
 			if (isConfirm) {
 				environmentService.removeDomain(environmentId).success(function (data) {
-					SweetAlert.swal("Deleted!", "Your enviroment domain has been deleted.", "success");
+					SweetAlert.swal("Deleted!", "Your domain has been deleted.", "success");
 				}).error(function (data) {
 					SweetAlert.swal("ERROR!", "Your domain is safe. Error: " + data.ERROR, "error");
 				});
@@ -316,7 +318,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 		console.log(sshKey);
 		if(sshKey === undefined || sshKey.length <= 0 || sshKey === null) return;
 		environmentService.setSshKey(sshKey, vm.sshKeyForEnvironment).success(function (data) {
-			SweetAlert.swal("Success!", "You successfully add SSH key for " + vm.sshKeyForEnvironment + " environment!", "success");
+			SweetAlert.swal("Success!", "You have successfully added SSH key for " + vm.sshKeyForEnvironment + " environment!", "success");
 			ngDialog.closeAll();
 		}).error(function (data) {
 			SweetAlert.swal("Cancelled", "Error: " + data.ERROR, "error");

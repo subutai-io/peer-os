@@ -25,8 +25,7 @@
 							<th>Name</th>
 							<th></th>
 						</tr>
-						<tr ng-repeat="permission in identityRoleFormCtrl.permissions2Add" 
-							ng-if="!permission.selected">
+						<tr ng-repeat="permission in identityRoleFormCtrl.permissions">
 							<td class="b-main-table__name">{{permission.name}}</td>
 							<td>
 								<a href 
@@ -45,15 +44,24 @@
 					<table class="b-main-table b-main-table_with-header b-main-table_white-header">
 						<tr>
 							<th>Name</th>
+							<th>Scope</th>
 							<th>Read</th>
 							<th>Write</th>
 							<th>Update</th>
 							<th>Delete</th>
 							<th></th>
 						</tr>
-						<tr ng-repeat="permission in identityRoleFormCtrl.permissions2Add" 
-							ng-if="permission.selected">
+						<tr ng-repeat="(key, permission) in identityRoleFormCtrl.permissions2Add">
 							<td class="b-main-table__name">{{permission.name}}</td>
+							<td>
+								<select ng-model="permission.scope">
+									<option ng-repeat="(scopeId, scope) in identityRoleFormCtrl.scopes" 
+									value="{{ scopeId }}" 
+									ng-selected="permission.scope == scopeId">
+										{{ scope }}
+									</option>
+								</select>
+							</td>
 							<td class="b-main-table__checkbox">
 								<input type="checkbox" ng-model="permission.read">
 							</td>
@@ -66,10 +74,10 @@
 							<td class="b-main-table__checkbox">
 								<input type="checkbox" ng-model="permission.delete">
 							</td>
-							<td>
+							<td class="b-main-table__checkbox">
 								<a href 
 								class="b-btn-circle b-btn_red" 
-								ng-click="identityRoleFormCtrl.addPermission2Stack(permission)">
+								ng-click="identityRoleFormCtrl.removePermissionFromStack(key)">
 									<i class="fa fa-times"></i>
 								</a>
 							</td>

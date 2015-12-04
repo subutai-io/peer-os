@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Subutai</title>
+    <title>{{ Page.title() }}</title>
 
 	<!--CSS Libs-->
 	<link rel="stylesheet" href="css/libs/font-awesome.min.css"/>
@@ -36,10 +36,19 @@
 			</a>
 		</div>
 	</div>
-	<div class="b-header__userbar b-header__userbar_right">
+	<div class="b-header__userbar b-header__userbar_right" ng-controller="CurrentUserCtrl as currentUserCtrl">
 		<div class="b-header-userbar">
 			<div class="b-header-userbar__name">
-				<a href="#" class="b-header-userbar-name">Name Username</a>
+				<a href ng-click="currentUserCtrl.logout()" 
+					class="b-header-userbar-name" 
+					ng-if="currentUserCtrl.currentUser">
+					{{ currentUserCtrl.currentUser }} / Logout
+				</a>
+				<a href ui-sref="login" 
+					class="b-header-userbar-name" 
+					ng-if="!currentUserCtrl.currentUser">
+					Login
+				</a>
 			</div>
 			<div class="b-header-userbar__avatar">
 				<img src="" alt="" class="b-header-userbar-avatar"

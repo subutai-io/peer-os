@@ -494,27 +494,28 @@
       </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!-- template-registry -->
+      <!-- kurjun -->
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>template-registry-api</artifactId>
+        <artifactId>kurjun-api</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>template-registry-impl</artifactId>
+        <artifactId>kurjun-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>template-registry-cli</artifactId>
+        <artifactId>kurjun-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>template-registry-rest</artifactId>
+        <artifactId>kurjun-cli</artifactId>
         <version>${project.version}</version>
       </dependency>
+
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- tracker -->
       <dependency>
