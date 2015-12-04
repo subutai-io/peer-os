@@ -5,7 +5,7 @@
   <parent>
     <groupId>io.subutai</groupId>
     <artifactId>kurjun</artifactId>
-    <version>4.0.0-RC4</version>
+    <version>4.0.0-RC5</version>
   </parent>
   <artifactId>kurjun-cli</artifactId>
   <name>Subutai Kurjun CLI</name>

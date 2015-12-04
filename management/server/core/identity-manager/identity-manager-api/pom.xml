@@ -6,7 +6,7 @@
   <parent>
     <artifactId>identity-manager-parent</artifactId>
     <groupId>io.subutai</groupId>
-    <version>4.0.0-RC4</version>
+    <version>4.0.0-RC5</version>
   </parent>
 
   <artifactId>identity-manager-api</artifactId>
@@ -19,7 +19,7 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>subutai-common</artifactId>
-      <version>4.0.0-RC4</version>
+      <version>4.0.0-RC5</version>
     </dependency>
   </dependencies>
 
