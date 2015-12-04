@@ -1,6 +1,7 @@
 *.class
 
 # IDE and Maven files and directories #
+.idea
 *.iml
 *.ipr
 *.MF
