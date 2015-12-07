@@ -25,7 +25,7 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.peer.AlertListener;
-import io.subutai.common.peer.AlertPack;
+import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentContainerHost;
@@ -92,7 +92,7 @@ public class MonitorImplTest
     @Mock
     DaoManager daoManager;
     @Mock
-    AlertPack alert;
+    AlertEvent alert;
     @Mock
     Set<AlertListener> alertListeners;
     @Mock
@@ -167,7 +167,7 @@ public class MonitorImplTest
         monitor.setMonitorDao( monitorDao );
 
 
-        alert = mock( AlertPack.class );
+        alert = mock( AlertEvent.class );
         when( environmentId.getId() ).thenReturn( ENVIRONMENT_ID );
         //        when( alert.getEnvironmentId() ).thenReturn( environmentId );
         //        when( alert.getContainerId() ).thenReturn( containerId );

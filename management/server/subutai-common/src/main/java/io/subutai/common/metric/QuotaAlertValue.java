@@ -12,7 +12,7 @@ import com.google.common.base.Preconditions;
 public class QuotaAlertValue implements AlertValue<ExceededQuota>
 {
 
-    private ExceededQuota value;
+    private final ExceededQuota value;
 
 
     public QuotaAlertValue( @JsonProperty( "value" ) final ExceededQuota value )
@@ -22,6 +22,7 @@ public class QuotaAlertValue implements AlertValue<ExceededQuota>
 
 
     @Override
+    @SuppressWarnings( "unchecked" )
     public ExceededQuota getValue()
     {
         return value;

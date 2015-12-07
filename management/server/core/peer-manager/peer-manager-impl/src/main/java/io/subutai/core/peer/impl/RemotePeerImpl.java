@@ -41,7 +41,7 @@ import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
-import io.subutai.common.peer.AlertPack;
+import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
@@ -886,7 +886,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void alert( final AlertPack alert ) throws PeerException
+    public void alert( final AlertEvent alert ) throws PeerException
     {
         new PeerWebClient( peerInfo.getIp(), provider ).alert( alert );
     }

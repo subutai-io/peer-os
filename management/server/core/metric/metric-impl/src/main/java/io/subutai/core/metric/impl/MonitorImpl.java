@@ -47,7 +47,7 @@ import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.peer.AlertListener;
-import io.subutai.common.peer.AlertPack;
+import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.Host;
@@ -95,8 +95,8 @@ public class MonitorImpl implements Monitor, HostListener
     protected ScheduledExecutorService stateUpdateExecutorService;
     protected ScheduledExecutorService backgroundTasksExecutorService;
 
-    private Map<String, AlertPack> localALerts = new HashMap<>();
-    private List<AlertPack> alerts = new CopyOnWriteArrayList<>();
+    private Map<String, AlertEvent> localALerts = new HashMap<>();
+    private List<AlertEvent> alerts = new CopyOnWriteArrayList<>();
 
     private PeerManager peerManager;
     //    private AlertProcessor alertProcessor = new AlertProcessor();
@@ -414,9 +414,9 @@ public class MonitorImpl implements Monitor, HostListener
 
 
     @Override
-    public void addAlert( final AlertPack alert )
+    public void addAlert( final AlertEvent alert )
     {
-        AlertPack a = new AlertPack( alert.getPeerId(), alert.getEnvironmentId(), alert.getContainerId(),
+        AlertEvent a = new AlertEvent( alert.getPeerId(), alert.getEnvironmentId(), alert.getContainerId(),
                 alert.getTemplateName(), alert.getResource(), alert.getExpiredTime() );
         LOG.debug( "Accepted new alert: " + a );
         alerts.add( a );
@@ -431,30 +431,30 @@ public class MonitorImpl implements Monitor, HostListener
             return;
         }
 
-        AlertPack alertPack = localALerts.get( alert.getId() );
-        if ( alertPack != null )
+        AlertEvent alertEvent = localALerts.get( alert.getId() );
+        if ( alertEvent != null )
         {
-            if ( !alertPack.isExpired() )
+            if ( !alertEvent.isExpired() )
             {
                 // skipping, alert already exists
-                LOG.debug( String.format( "Alert already in queue. %s", alertPack ) );
+                LOG.debug( String.format( "Alert already in queue. %s", alertEvent ) );
                 return;
             }
         }
 
-        alertPack = buildAlertPack( alert );
-        localALerts.put( alert.getId(), alertPack );
+        alertEvent = buildAlertPack( alert );
+        localALerts.put( alert.getId(), alertEvent );
     }
 
 
-    private AlertPack buildAlertPack( Alert alert )
+    private AlertEvent buildAlertPack( Alert alert )
     {
         String containerId = alert.getHostId().getId();
-        AlertPack packet = null;
+        AlertEvent packet = null;
         try
         {
             ContainerHost host = peerManager.getLocalPeer().getContainerHostById( containerId );
-            packet = new AlertPack( host.getInitiatorPeerId(), host.getEnvironmentId().getId(), containerId,
+            packet = new AlertEvent( host.getInitiatorPeerId(), host.getEnvironmentId().getId(), containerId,
                     host.getTemplateName(), alert, buildExpireTime().getTime() );
         }
         catch ( HostNotFoundException e )
@@ -519,23 +519,23 @@ public class MonitorImpl implements Monitor, HostListener
 
 
     @Override
-    public Collection<AlertPack> getAlerts()
+    public Collection<AlertEvent> getAlerts()
     {
         return Collections.unmodifiableCollection( alerts );
     }
 
 
     @Override
-    public List<AlertPack> getAlertPackages()
+    public List<AlertEvent> getAlertPackages()
     {
         return alerts;
     }
 
 
     @Override
-    public List<AlertPack> getAlertsQueue()
+    public List<AlertEvent> getAlertsQueue()
     {
-        List<AlertPack> result = new ArrayList<>();
+        List<AlertEvent> result = new ArrayList<>();
         result.addAll( localALerts.values() );
         return result;
     }
@@ -543,16 +543,16 @@ public class MonitorImpl implements Monitor, HostListener
 
     protected void notifyAlertListeners()
     {
-        for ( AlertPack alertPack : alerts )
+        for ( AlertEvent alertEvent : alerts )
         {
-            if ( !alertPack.isDelivered() && !alertPack.isExpired() )
+            if ( !alertEvent.isDelivered() && !alertEvent.isExpired() )
             {
                 for ( AlertListener alertListener : alertListeners )
                 {
-                    AlertNotifier alertNotifier = new AlertNotifier( alertPack, alertListener );
+                    AlertNotifier alertNotifier = new AlertNotifier( alertEvent, alertListener );
                     notificationExecutor.submit( alertNotifier );
                 }
-                alertPack.setDelivered( true );
+                alertEvent.setDelivered( true );
             }
         }
     }
@@ -561,11 +561,11 @@ public class MonitorImpl implements Monitor, HostListener
     //    @Override
     protected void deliverAlerts()
     {
-        for ( AlertPack alertPack : localALerts.values() )
+        for ( AlertEvent alertEvent : localALerts.values() )
         {
-            if ( !alertPack.isDelivered() )
+            if ( !alertEvent.isDelivered() )
             {
-                deliverAlertPackToPeer( alertPack );
+                deliverAlertPackToPeer( alertEvent );
             }
         }
     }
@@ -573,29 +573,29 @@ public class MonitorImpl implements Monitor, HostListener
 
     private void clearObsoleteAlerts()
     {
-        for ( AlertPack alertPack : localALerts.values() )
+        for ( AlertEvent alertEvent : localALerts.values() )
         {
-            if ( alertPack.isExpired() )
+            if ( alertEvent.isExpired() )
             {
-                LOG.debug( String.format( "Alert package '%s' expired. ", alertPack.getResource().getId() ) );
+                LOG.debug( String.format( "Alert package '%s' expired. ", alertEvent.getResource().getId() ) );
                 // removing obsolete alert
-                localALerts.remove( alertPack.getResource().getId() );
+                localALerts.remove( alertEvent.getResource().getId() );
             }
         }
     }
 
 
-    private void deliverAlertPackToPeer( final AlertPack alertPack )
+    private void deliverAlertPackToPeer( final AlertEvent alertEvent )
     {
-        Peer peer = peerManager.getPeer( alertPack.getPeerId() );
+        Peer peer = peerManager.getPeer( alertEvent.getPeerId() );
         if ( peer != null )
         {
-            new AlertDeliver( peer, alertPack ).run();
+            new AlertDeliver( peer, alertEvent ).run();
         }
         else
         {
-            LOG.warn( String.format( "Destination peer '%s' for alert '%s' not found.", alertPack.getPeerId(),
-                    alertPack.getResource().getId() ) );
+            LOG.warn( String.format( "Destination peer '%s' for alert '%s' not found.", alertEvent.getPeerId(),
+                    alertEvent.getResource().getId() ) );
         }
     }
 

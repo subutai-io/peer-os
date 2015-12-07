@@ -9,9 +9,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.slf4j.Logger;
 
 import io.subutai.common.metric.AbstractAlert;
-import io.subutai.common.peer.AlertHandler;
 import io.subutai.common.peer.AlertListener;
-import io.subutai.common.peer.AlertPack;
+import io.subutai.common.peer.AlertEvent;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -31,7 +30,7 @@ public class AlertNotifierTest
     private static final String RESOURCE_ID = "resource_id";
 
     @Mock
-    AlertPack alert;
+    AlertEvent alert;
 
     @Mock
     AbstractAlert resource;

@@ -15,9 +15,9 @@ import io.subutai.common.metric.Alert;
 
 
 /**
- * Alert package
+ * Alert event class
  */
-public class AlertPack
+public class AlertEvent
 {
     private static DateFormat fmt = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss.SS Z" );
     @JsonProperty( "peerId" )
@@ -45,12 +45,12 @@ public class AlertPack
     List<String> logs = new ArrayList<>();
 
 
-    public AlertPack( @JsonProperty( "peerId" ) final String peerId,
-                      @JsonProperty( "environmentId" ) final String environmentId,
-                      @JsonProperty( "containerId" ) final String containerId,
-                      @JsonProperty( "templateName" ) final String templateName,
-                      @JsonProperty( "resource" ) final Alert resource,
-                      @JsonProperty( "expiredTime" ) final Long expiredTime )
+    public AlertEvent( @JsonProperty( "peerId" ) final String peerId,
+                       @JsonProperty( "environmentId" ) final String environmentId,
+                       @JsonProperty( "containerId" ) final String containerId,
+                       @JsonProperty( "templateName" ) final String templateName,
+                       @JsonProperty( "resource" ) final Alert resource,
+                       @JsonProperty( "expiredTime" ) final Long expiredTime )
     {
         this.peerId = peerId;
         this.environmentId = environmentId;

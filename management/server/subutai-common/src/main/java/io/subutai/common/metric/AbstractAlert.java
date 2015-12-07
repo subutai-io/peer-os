@@ -12,13 +12,20 @@ import io.subutai.common.host.HostId;
 public abstract class AbstractAlert<T extends AlertValue> implements Alert
 {
     @JsonProperty( "hostId" )
-    protected HostId hostId;
+    protected final HostId hostId;
 
     @JsonProperty( "alert" )
-    protected T alert;
+    protected final T alert;
 
     @JsonProperty( "createdTime" )
     protected Long createdTime = System.currentTimeMillis();
+
+
+    public AbstractAlert( final HostId hostId, final T alert )
+    {
+        this.hostId = hostId;
+        this.alert = alert;
+    }
 
 
     abstract public String getId();

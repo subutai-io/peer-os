@@ -10,7 +10,7 @@ import io.subutai.common.metric.BaseMetric;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.peer.AlertListener;
-import io.subutai.common.peer.AlertPack;
+import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.Host;
 import io.subutai.common.resource.HistoricalMetrics;
@@ -65,17 +65,17 @@ public interface Monitor
 
     Collection<BaseMetric> getMetrics();
 
-    Collection<AlertPack> getAlerts();
+    Collection<AlertEvent> getAlerts();
 
-    List<AlertPack> getAlertPackages();
+    List<AlertEvent> getAlertPackages();
 
 //    void routeAlerts();
 
-    void addAlert( AlertPack alert );
+    void addAlert( AlertEvent alert );
 
 //    void deliverAlerts();
 
-    List<AlertPack> getAlertsQueue();
+    List<AlertEvent> getAlertsQueue();
 
     Set<AlertListener> getAlertListeners();
 

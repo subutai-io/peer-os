@@ -10,7 +10,7 @@ import io.subutai.common.host.HostId;
 import io.subutai.common.metric.ExceededQuota;
 import io.subutai.common.metric.QuotaAlert;
 import io.subutai.common.metric.QuotaAlertValue;
-import io.subutai.common.peer.AlertPack;
+import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.resource.MeasureUnit;
 import io.subutai.common.resource.ResourceType;
@@ -38,9 +38,9 @@ public class PutAlertCommand extends SubutaiShellCommandSupport
                 new ExceededQuota( new HostId( "hostId" ), ResourceType.RAM, new ResourceValue( "1.1", MeasureUnit.MB ),
                         new ResourceValue( "2.2", MeasureUnit.MB ) ) );
         QuotaAlert value = new QuotaAlert( alertValue, System.currentTimeMillis() );
-        AlertPack alertPack = new AlertPack( localPeer.getId(), "enironmentId", "containerId", "master", value,
+        AlertEvent alertEvent = new AlertEvent( localPeer.getId(), "enironmentId", "containerId", "master", value,
                 DateUtils.addMinutes( new Date(), 1 ).getTime() );
-        localPeer.alert( alertPack );
+        localPeer.alert( alertEvent );
         return null;
     }
 }

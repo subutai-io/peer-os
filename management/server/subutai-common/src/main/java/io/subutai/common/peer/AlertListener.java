@@ -8,5 +8,5 @@ public interface AlertListener
 {
     String getId();
 
-    void onAlert( AlertPack alertPack );
+    void onAlert( AlertEvent alertEvent );
 }

@@ -1,16 +1,15 @@
 package io.subutai.core.environment.impl;
 
 
-import io.subutai.common.peer.AbstractAlertHandler;
+import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.peer.AlertHandlerException;
-import io.subutai.common.peer.AlertHandlerPriority;
-import io.subutai.common.peer.AlertPack;
+import io.subutai.common.peer.ExceededQuotaAlertHandler;
 
 
 /**
- * Default implementation of AlertHandler interface
+ * Example implementation of exceeded quota alert handler
  */
-public class ExampleAlertHandler extends AbstractAlertHandler
+public class ExampleAlertHandler extends ExceededQuotaAlertHandler
 {
 
     @Override
@@ -18,15 +17,6 @@ public class ExampleAlertHandler extends AbstractAlertHandler
     {
         return "EXAMPLE_ALERT_HANDLER_ID";
     }
-
-
-/*
-    @Override
-    public AlertHandlerPriority getPriority()
-    {
-        return AlertHandlerPriority.NORMAL;
-    }
-*/
 
 
     @Override
@@ -37,7 +27,7 @@ public class ExampleAlertHandler extends AbstractAlertHandler
 
 
     @Override
-    public void preProcess( final AlertPack alert ) throws AlertHandlerException
+    public void preProcess( final QuotaAlertValue alert ) throws AlertHandlerException
     {
         LOGGER.debug( "Example alert handler pre-processor started" );
 
@@ -48,7 +38,7 @@ public class ExampleAlertHandler extends AbstractAlertHandler
 
 
     @Override
-    public void process( final AlertPack alert )
+    public void process( final QuotaAlertValue alert )
     {
         LOGGER.debug( "Example alert handler main processor started" );
 
@@ -59,7 +49,7 @@ public class ExampleAlertHandler extends AbstractAlertHandler
 
 
     @Override
-    public void postProcess( final AlertPack alert ) throws AlertHandlerException
+    public void postProcess( final QuotaAlertValue alert ) throws AlertHandlerException
     {
         LOGGER.debug( "Example alert handler post-processor started" );
 

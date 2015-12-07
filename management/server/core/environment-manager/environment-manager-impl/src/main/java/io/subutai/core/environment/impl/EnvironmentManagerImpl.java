@@ -42,13 +42,14 @@ import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.mdc.SubutaiExecutors;
+import io.subutai.common.metric.AlertValue;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.peer.AlertHandler;
 import io.subutai.common.peer.EnvironmentAlertHandler;
 import io.subutai.common.peer.AlertHandlerPriority;
 import io.subutai.common.peer.AlertListener;
-import io.subutai.common.peer.AlertPack;
+import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerType;
 import io.subutai.common.peer.EnvironmentAlertHandlers;
@@ -1435,13 +1436,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
 
     @Override
-    public void onAlert( final AlertPack alertPack )
+    public void onAlert( final AlertEvent alertEvent )
     {
         try
         {
             EnvironmentAlertHandlers handlers =
-                    getEnvironmentAlertHandlers( new EnvironmentId( alertPack.getEnvironmentId() ) );
-            handleAlertPack( alertPack, handlers );
+                    getEnvironmentAlertHandlers( new EnvironmentId( alertEvent.getEnvironmentId() ) );
+            handleAlertPack( alertEvent, handlers );
         }
         catch ( Exception e )
         {
@@ -1467,45 +1468,47 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    protected void handleAlertPack( final AlertPack alertPack, EnvironmentAlertHandlers handlers )
+    protected void handleAlertPack( final AlertEvent alertEvent, EnvironmentAlertHandlers handlers )
     {
         for ( final EnvironmentAlertHandler handlerId : handlers.getAllHandlers().keySet() )
         {
             try
             {
                 AlertHandler handler = handlers.getHandler( handlerId );
-                if ( handler != null )
+                if ( handler == null )
                 {
-                    alertPack.addLog(
+                    alertEvent.addLog( String.format( "Alert Handler not found: %s. Skipped.", handlerId ) );
+                    continue;
+                }
+                AlertValue alertValue = alertEvent.getResource().getAlertValue( handler.getSupportedAlertValue() );
+                if ( alertValue != null )
+                {
+                    alertEvent.addLog(
                             String.format( "Invoking pre-processor of '%s:%s'.", handlerId.getAlertHandlerId(),
                                     handlerId.getAlertHandlerPriority() ) );
-                    handler.preProcess( alertPack );
-                    alertPack.addLog(
+                    handler.preProcess( alertValue );
+                    alertEvent.addLog(
                             String.format( "Pre-processor of '%s:%s' finished.", handlerId.getAlertHandlerId(),
                                     handlerId.getAlertHandlerPriority() ) );
-                    alertPack.addLog(
+                    alertEvent.addLog(
                             String.format( "Invoking main processor of '%s:%s'.", handlerId.getAlertHandlerId(),
                                     handlerId.getAlertHandlerPriority() ) );
-                    handler.process( alertPack );
-                    alertPack.addLog(
+                    handler.process( alertValue );
+                    alertEvent.addLog(
                             String.format( "Main processor of '%s:%s' finished.", handlerId.getAlertHandlerId(),
                                     handlerId.getAlertHandlerPriority() ) );
-                    alertPack.addLog(
+                    alertEvent.addLog(
                             String.format( "Invoking post-processor of '%s:%s'.", handlerId.getAlertHandlerId(),
                                     handlerId.getAlertHandlerPriority() ) );
-                    handler.postProcess( alertPack );
-                    alertPack.addLog(
+                    handler.postProcess( alertValue );
+                    alertEvent.addLog(
                             String.format( "Pre-processor of '%s:%s' finished.", handlerId.getAlertHandlerId(),
                                     handlerId.getAlertHandlerPriority() ) );
-                }
-                else
-                {
-                    alertPack.addLog( String.format( "Alert Handler not found: %s. Skipped.", handlerId ) );
                 }
             }
             catch ( Exception e )
             {
-                alertPack.addLog( e.getMessage() );
+                alertEvent.addLog( e.getMessage() );
             }
         }
     }
@@ -1522,8 +1525,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             //make sure subscriber id is truncated to 100 characters
             String trimmedSubscriberId = StringUtil.trimToSize( handlerId, Constants.MAX_SUBSCRIBER_ID_LEN );
 */
-        AlertHandler alertHandler =
-                alertHandlers.get( handlerId );
+        AlertHandler alertHandler = alertHandlers.get( handlerId );
         if ( alertHandler == null )
         {
             throw new EnvironmentManagerException( "Alert handler not found." );

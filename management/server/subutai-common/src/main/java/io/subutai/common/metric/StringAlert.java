@@ -17,10 +17,9 @@ public class StringAlert extends AbstractAlert<StringAlertValue> implements Aler
     public StringAlert( final HostId hostId, final HostType hostType, final AlertType alertType,
                         final StringAlertValue description )
     {
-        this.hostId = hostId;
+        super( hostId, description );
         this.hostType = hostType;
         this.alertType = alertType;
-        this.alert = description;
     }
 
 
@@ -38,7 +37,7 @@ public class StringAlert extends AbstractAlert<StringAlertValue> implements Aler
     }
 
 
-//    @Override
+    //    @Override
     public AlertType getType()
     {
         return alertType;
