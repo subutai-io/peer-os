@@ -95,6 +95,11 @@
       <artifactId>junit</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>io.subutai</groupId>
+      <artifactId>subutai-common</artifactId>
+      <version>4.0.0-RC5</version>
+    </dependency>
 
   </dependencies>
 

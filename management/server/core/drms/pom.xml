@@ -9,15 +9,14 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>plugin-manager</artifactId>
-  <name>Subutai Plugin Manager Parent</name>
-  <description>Subutai Plugin Manager Parent</description>
+  <artifactId>drms</artifactId>
+  <name>Subutai Distributed Relationship Management System Parent</name>
+  <description>Subutai Distributed Relationship Management System Parent</description>
 
   <packaging>pom</packaging>
   <modules>
-    <module>plugin-manager-api</module>
-    <module>plugin-manager-impl</module>
-    <module>plugin-manager-cli</module>
+    <module>drms-api</module>
+    <module>drms-impl</module>
   </modules>
 
 </project>
