@@ -508,7 +508,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
             args.add(deviceName);
             String runUser = "root";
             result = managementHost
-                    .execute(new RequestBuilder("/apps/subutai-mng/current/bin/awsdeploy/awsdeploy")
+                    .execute(new RequestBuilder("/apps/subutai-mng/current/awsdeploy/awsdeploy")
                             .withCmdArgs(args)
                             .withRunAs(runUser)
                             .withTimeout(600));
