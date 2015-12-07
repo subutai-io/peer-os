@@ -84,7 +84,7 @@ public class RestServiceImpl implements RestService
     }
 
 
-    /** Templates **************************************************** */
+    /** Templates *************************************************** */
 
     @Override
     public Response listTemplates()
