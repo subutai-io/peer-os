@@ -58,14 +58,19 @@ public class SubutaiSteps extends ScenarioSteps {
 
     @Step
     public void open_aws_mng_h1() throws FileNotFoundException {
-        subutaiPage.setDefaultBaseUrl(String.format("https://%s:8443/", ReaderFromFile.readDataFromFile("src/test/resources/parameters/awsmh1_IP")));
+        subutaiPage.setDefaultBaseUrl(String.format("https://%s:8443/", ReaderFromFile.readDataFromFile("src/test/resources/parameters/mng_h1")));
         subutaiPage.open();
     }
 
     @Step
     public void open_aws_mng_h2() throws FileNotFoundException {
-        subutaiPage.setDefaultBaseUrl(String.format("https://%s:8443/", ReaderFromFile.readDataFromFile("src/test/resources/parameters/awsmh2_IP")));
+        subutaiPage.setDefaultBaseUrl(String.format("https://%s:8443/", ReaderFromFile.readDataFromFile("src/test/resources/parameters/mng_h2")));
         subutaiPage.open();
+    }
+
+    @Step
+    public void clickOnMenuItemMonitoring() {
+        subutaiPage.linkMonitoring.click();
     }
 
     @Step
@@ -1098,6 +1103,16 @@ public class SubutaiSteps extends ScenarioSteps {
     }
 
     @Step
+    public void observeNgPeerMonitoring() {
+        assertThat(subutaiPage.ngPeerMonitoring.isVisible(), is(true));
+    }
+
+    @Step
+    public void observeNgEnvironmentMonitoring() {
+        assertThat(subutaiPage.ngEnvironmentMonitoring.isVisible(), is(true));
+    }
+
+    @Step
     public void clickOnMenuItemTracker() {
         subutaiPage.linkTracker.click();
     }
@@ -1153,4 +1168,5 @@ public class SubutaiSteps extends ScenarioSteps {
     public void waitSleep(int i) {
         waitABit(i);
     }
+
 }
