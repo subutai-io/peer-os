@@ -27,7 +27,7 @@ import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.ResourceHostInfo;
-import io.subutai.common.metric.ResourceAlert;
+import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerHost;
@@ -197,7 +197,7 @@ public class LocalPeerImplTest
     private EnvironmentId environmentId;
 
     @Mock
-    private ResourceAlert resourceAlert;
+    private QuotaAlertValue quotaAlertValue;
 
 
     @Before
@@ -761,20 +761,20 @@ public class LocalPeerImplTest
         when( resourceHostInfo.getId() ).thenReturn( MANAGEMENT_HOST_ID );
 
         localPeer.initialized = true;
-        localPeer.onHeartbeat( resourceHostInfo, Sets.newHashSet( resourceAlert ) );
+        localPeer.onHeartbeat( resourceHostInfo, Sets.newHashSet( quotaAlertValue ) );
 
         verify( managementHost ).updateHostInfo( resourceHostInfo );
 
         localPeer.managementHost = null;
 
-        localPeer.onHeartbeat( resourceHostInfo, Sets.newHashSet( resourceAlert ) );
+        localPeer.onHeartbeat( resourceHostInfo, Sets.newHashSet( quotaAlertValue ) );
 
         verify( managementHostDataService ).persist( any( ManagementHostEntity.class ) );
 
         when( resourceHostInfo.getHostname() ).thenReturn( RESOURCE_HOST_NAME );
         when( resourceHostInfo.getId() ).thenReturn( RESOURCE_HOST_ID );
 
-        localPeer.onHeartbeat( resourceHostInfo, Sets.newHashSet( resourceAlert ) );
+        localPeer.onHeartbeat( resourceHostInfo, Sets.newHashSet( quotaAlertValue ) );
 
         verify( resourceHost ).updateHostInfo( resourceHostInfo );
 

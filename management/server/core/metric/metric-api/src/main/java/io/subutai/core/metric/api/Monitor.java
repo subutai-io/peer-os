@@ -10,7 +10,7 @@ import io.subutai.common.metric.BaseMetric;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.peer.AlertListener;
-import io.subutai.common.peer.AlertPack;
+import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.Host;
 import io.subutai.common.resource.HistoricalMetrics;
@@ -21,6 +21,11 @@ import io.subutai.common.resource.HistoricalMetrics;
  */
 public interface Monitor
 {
+//    void startMonitoring( String subscriberId, Environment environment, MonitoringSettings monitoringSettings )
+//            throws MonitorException;
+//
+//    void stopMonitoring( String subscriberId, Environment environment ) throws MonitorException;
+
     /**
      * Returns process resource usage on a given container host
      *
@@ -47,12 +52,12 @@ public interface Monitor
     public HistoricalMetrics getHistoricalMetrics( Host host, Date startTime, Date endTime );
 
 
-//    /**
-//     * @param hosts physical or container hosts to be monitored
-//     * @param resourceType to be retrieved for historical data
-//     */
-//    public Map<String, List<HistoricalMetric>> getHistoricalMetrics( Collection<Host> hosts,
-//                                                                     ResourceType resourceType );
+    //    /**
+    //     * @param hosts physical or container hosts to be monitored
+    //     * @param resourceType to be retrieved for historical data
+    //     */
+    //    public Map<String, List<HistoricalMetric>> getHistoricalMetrics( Collection<Host> hosts,
+    //                                                                     ResourceType resourceType );
 
     ResourceHostMetrics getResourceHostMetrics();
 
@@ -60,21 +65,19 @@ public interface Monitor
 
     Collection<BaseMetric> getMetrics();
 
-    Collection<AlertPack> getAlerts();
+    Collection<AlertEvent> getAlerts();
 
-    void addAlertListener( AlertListener alertListener );
+    List<AlertEvent> getAlertPackages();
 
-    void removeAlertListener( AlertListener alertListener );
+//    void routeAlerts();
 
-    Collection<AlertListener> getAlertListeners();
+    void addAlert( AlertEvent alert );
 
-    List<AlertPack> getAlertPackages();
+//    void deliverAlerts();
 
-    void notifyAlertListeners();
+    List<AlertEvent> getAlertsQueue();
 
-    void addAlert( AlertPack alert );
+    Set<AlertListener> getAlertListeners();
 
-    void deliverAlerts();
-
-    List<AlertPack> getAlertsQueue();
+    //    EnvironmentAlertHandlers getEnvironmentAlertHandlersByEnvironment( String environmentId );
 }

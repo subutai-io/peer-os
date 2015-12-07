@@ -2,13 +2,16 @@ package io.subutai.core.environment.impl;
 
 
 import java.security.AccessControlException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 
 import javax.annotation.security.PermitAll;
@@ -39,12 +42,19 @@ import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.mdc.SubutaiExecutors;
-import io.subutai.common.metric.EnvironmentAlert;
+import io.subutai.common.metric.AlertValue;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.network.Gateway;
+import io.subutai.common.peer.AlertHandler;
+import io.subutai.common.peer.EnvironmentAlertHandler;
+import io.subutai.common.peer.AlertHandlerPriority;
+import io.subutai.common.peer.AlertListener;
+import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerType;
+import io.subutai.common.peer.EnvironmentAlertHandlers;
 import io.subutai.common.peer.EnvironmentContainerHost;
+import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.security.objects.PermissionObject;
@@ -54,7 +64,6 @@ import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.common.util.StringUtil;
-import io.subutai.core.environment.api.EnvironmentAlertListener;
 import io.subutai.core.environment.api.EnvironmentEventListener;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
@@ -64,6 +73,7 @@ import io.subutai.core.environment.api.exception.EnvironmentSecurityException;
 import io.subutai.core.environment.impl.dao.BlueprintDataService;
 import io.subutai.core.environment.impl.dao.EnvironmentContainerDataService;
 import io.subutai.core.environment.impl.dao.EnvironmentDataService;
+import io.subutai.core.environment.impl.entity.EnvironmentAlertHandlerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.construction.EnvironmentImportWorkflow;
@@ -85,7 +95,7 @@ import io.subutai.core.tracker.api.Tracker;
 
 
 @PermitAll
-public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionListener
+public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionListener, AlertListener
 {
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentManagerImpl.class );
 
@@ -111,7 +121,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     protected BlueprintDataService blueprintDataService;
 
     protected ExceptionUtil exceptionUtil = new ExceptionUtil();
-    private Set<EnvironmentAlertListener> alertListeners = new CopyOnWriteArraySet<>();
+    //    private Set<EnvironmentAlertListener> alertListeners = new CopyOnWriteArraySet<>();
+    protected Map<String, AlertHandler> alertHandlers = new ConcurrentHashMap<String, AlertHandler>();
 
 
     public EnvironmentManagerImpl( final TemplateManager templateRegistry, final PeerManager peerManager,
@@ -1327,36 +1338,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    @Override
-    public void addAlertListener( final EnvironmentAlertListener alertListener )
-    {
-        this.alertListeners.add( alertListener );
-    }
-
-
-    @Override
-    public void removeAlertListener( final EnvironmentAlertListener alertListener )
-    {
-        this.alertListeners.remove( alertListener );
-    }
-
-
-    void onAlert( EnvironmentAlert alert )
-    {
-        // notify new alerts
-        if ( alert.getState() == EnvironmentAlert.State.NEW )
-        {
-            for ( EnvironmentAlertListener alertListener : alertListeners )
-            {
-                if ( alertListener.getEnvironmentId().equals( alert.getEnvironmentId() ) )
-                {
-                    alertListener.onAlert( alert );
-                }
-            }
-        }
-    }
-
-
     @RolesAllowed( "Environment-Management|A|Write" )
     protected EnvironmentImpl createEmptyEnvironment( final String name, final String subnetCidr, final String sshKey )
     {
@@ -1412,5 +1393,181 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     public void remove( final EnvironmentImpl environment )
     {
         environmentDataService.remove( environment );
+    }
+
+
+    @Override
+    public void addAlertHandler( final AlertHandler alertHandler )
+    {
+        if ( alertHandler != null && alertHandler.getId() != null )
+        {
+            this.alertHandlers.put( alertHandler.getId(), alertHandler );
+        }
+        else
+        {
+            LOG.warn( "Alert handler rejected: " + alertHandler );
+        }
+    }
+
+
+    @Override
+    public void removeAlertHandler( final AlertHandler alertHandler )
+    {
+        if ( alertHandler != null )
+        {
+            this.alertHandlers.remove( alertHandler.getId() );
+        }
+    }
+
+
+    @Override
+    public Collection<AlertHandler> getRegisteredAlertHandlers()
+    {
+        List<AlertHandler> result = new ArrayList<>( alertHandlers.values() );
+        return result;
+    }
+
+
+    @Override
+    public String getId()
+    {
+        return "ENVIRONMENT_MANAGER";
+    }
+
+
+    @Override
+    public void onAlert( final AlertEvent alertEvent )
+    {
+        try
+        {
+            EnvironmentAlertHandlers handlers =
+                    getEnvironmentAlertHandlers( new EnvironmentId( alertEvent.getEnvironmentId() ) );
+            handleAlertPack( alertEvent, handlers );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error in handling alert package.", e );
+        }
+    }
+
+
+    @Override
+    public EnvironmentAlertHandlers getEnvironmentAlertHandlers( final EnvironmentId environmentId )
+            throws EnvironmentNotFoundException
+    {
+        Environment environment = loadEnvironment( environmentId.getId() );
+
+        Set<EnvironmentAlertHandler> handlerList = environment.getAlertHandlers();
+
+        EnvironmentAlertHandlers handlers = new EnvironmentAlertHandlersImpl( environment.getEnvironmentId() );
+        for ( EnvironmentAlertHandler environmentAlertHandler : handlerList )
+        {
+            handlers.add( environmentAlertHandler, alertHandlers.get( environmentAlertHandler.getAlertHandlerId() ) );
+        }
+        return handlers;
+    }
+
+
+    protected void handleAlertPack( final AlertEvent alertEvent, EnvironmentAlertHandlers handlers )
+    {
+        for ( final EnvironmentAlertHandler handlerId : handlers.getAllHandlers().keySet() )
+        {
+            try
+            {
+                AlertHandler handler = handlers.getHandler( handlerId );
+                if ( handler == null )
+                {
+                    alertEvent.addLog( String.format( "Alert Handler not found: %s. Skipped.", handlerId ) );
+                    continue;
+                }
+                AlertValue alertValue = alertEvent.getResource().getAlertValue( handler.getSupportedAlertValue() );
+                if ( alertValue != null )
+                {
+                    alertEvent.addLog(
+                            String.format( "Invoking pre-processor of '%s:%s'.", handlerId.getAlertHandlerId(),
+                                    handlerId.getAlertHandlerPriority() ) );
+                    handler.preProcess( alertValue );
+                    alertEvent.addLog(
+                            String.format( "Pre-processor of '%s:%s' finished.", handlerId.getAlertHandlerId(),
+                                    handlerId.getAlertHandlerPriority() ) );
+                    alertEvent.addLog(
+                            String.format( "Invoking main processor of '%s:%s'.", handlerId.getAlertHandlerId(),
+                                    handlerId.getAlertHandlerPriority() ) );
+                    handler.process( alertValue );
+                    alertEvent.addLog(
+                            String.format( "Main processor of '%s:%s' finished.", handlerId.getAlertHandlerId(),
+                                    handlerId.getAlertHandlerPriority() ) );
+                    alertEvent.addLog(
+                            String.format( "Invoking post-processor of '%s:%s'.", handlerId.getAlertHandlerId(),
+                                    handlerId.getAlertHandlerPriority() ) );
+                    handler.postProcess( alertValue );
+                    alertEvent.addLog(
+                            String.format( "Pre-processor of '%s:%s' finished.", handlerId.getAlertHandlerId(),
+                                    handlerId.getAlertHandlerPriority() ) );
+                }
+            }
+            catch ( Exception e )
+            {
+                alertEvent.addLog( e.getMessage() );
+            }
+        }
+    }
+
+
+    @Override
+    public void startMonitoring( final String handlerId, final AlertHandlerPriority handlerPriority,
+                                 final String environmentId ) throws EnvironmentManagerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( handlerId ), "Invalid alert handler id." );
+        Preconditions.checkNotNull( handlerPriority, "Invalid alert priority." );
+
+/*
+            //make sure subscriber id is truncated to 100 characters
+            String trimmedSubscriberId = StringUtil.trimToSize( handlerId, Constants.MAX_SUBSCRIBER_ID_LEN );
+*/
+        AlertHandler alertHandler = alertHandlers.get( handlerId );
+        if ( alertHandler == null )
+        {
+            throw new EnvironmentManagerException( "Alert handler not found." );
+        }
+        try
+        {
+            Environment environment = loadEnvironment( environmentId );
+
+            environment.addAlertHandler( new EnvironmentAlertHandlerImpl( handlerId, handlerPriority ) );
+
+            saveOrUpdate( environment );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error on start monitoring", e );
+            throw new EnvironmentManagerException( e.getMessage(), e );
+        }
+    }
+
+
+    @Override
+    public void stopMonitoring( final String handlerId, final AlertHandlerPriority handlerPriority,
+                                final String environmentId ) throws EnvironmentManagerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( handlerId ), "Invalid alert handler id." );
+        Preconditions.checkNotNull( handlerPriority, "Invalid alert priority." );
+
+/*
+            //make sure subscriber id is truncated to 100 characters
+            String trimmedSubscriberId = StringUtil.trimToSize( handlerId, Constants.MAX_SUBSCRIBER_ID_LEN );
+*/
+        //remove subscription from database
+        try
+        {
+            Environment environment = environmentDataService.find( environmentId );
+            environment.removeAlertHandler( new EnvironmentAlertHandlerImpl( handlerId, handlerPriority ) );
+            environmentDataService.saveOrUpdate( environment );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error on stop monitoring", e );
+            throw new EnvironmentManagerException( e.getMessage(), e );
+        }
     }
 }
