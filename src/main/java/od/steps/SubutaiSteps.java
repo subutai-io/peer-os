@@ -1102,7 +1102,6 @@ public class SubutaiSteps extends ScenarioSteps {
         assertThat(subutaiPage.ngCreatePeer.isVisible(), is(true));
     }
 
-
     @Step
     public void observeNgPeerMonitoring() {
         assertThat(subutaiPage.ngPeerMonitoring.isVisible(), is(true));

@@ -1,5 +1,4 @@
 Meta:
-
 Narrative:
 As a user
 I want to verify if Subutai AngularJS

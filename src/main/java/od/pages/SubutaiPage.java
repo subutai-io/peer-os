@@ -219,7 +219,6 @@ public class SubutaiPage extends PageObject {
     @FindBy(ngModel = "consoleViewCtrl.selectedEnvironment")
     public WebElementFacade selectEnvironmentConsole;
 
-
     //---------------------------------------------------------------------
 
     public void waitHeaderSuccess(){
