@@ -57,6 +57,9 @@ public class SubutaiPage extends PageObject {
     @FindBy(xpath = "*//i[@class=\"b-icon b-icon_box-white b-icon_box-white_place\"]/..")
     public WebElementFacade buttonPlace;
 
+    @FindBy(id = "subt-link__monitoring")
+    public WebElementFacade linkMonitoring;
+
     @FindBy(id = "subt-link__environment")
     public WebElementFacade linkEnvironment;
 
@@ -550,6 +553,12 @@ public class SubutaiPage extends PageObject {
     public void pgpStart(){
         open(new String[]{"resource://jid1-aqqsmbyb0a8adg-at-jetpack/mailvelope/data/common/ui/options.html#displayKeys"});
     }
+
+    @FindBy(xpath = "*//li[@ng-click=\"monitoringCtrl.setCurrentType('peer')\"]")
+    public WebElementFacade ngPeerMonitoring;
+
+    @FindBy(xpath = "*//li[@ng-click=\"monitoringCtrl.setCurrentType('environments')\"]")
+    public WebElementFacade ngEnvironmentMonitoring;
 
     @FindBy(xpath = "*//input[@ng-model=\"loginCtrl.name\"]")
     public WebElementFacade ngLogin;

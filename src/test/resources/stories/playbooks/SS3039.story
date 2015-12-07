@@ -10,6 +10,8 @@ Given the first user is on the home page of Subutai
 Then the user should observe 'ng-login', 'ng-password'
 Given the user enter login and password: 'admin', 'secret'
 And the user click on the button: Login
+When the user click on the menu item: Monitoring
+Then the user should observe 'ng-click peer', 'ng-click environment'
 When the user click on the menu item: Environment
 And the user click on the menu item: Blueprint
 Then the user should observe 'ng-create blueprint'

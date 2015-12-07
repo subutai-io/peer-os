@@ -11,6 +11,11 @@ public class DefSubutaiStepsWhen {
     @Steps
     SubutaiSteps subutaiSteps;
 
+    @When("the user click on the menu item: Monitoring")
+    public void click_on_menu_item_monitoring(){
+        subutaiSteps.clickOnMenuItemMonitoring();
+    }
+
     @When("the user click on the menu item: Environment")
     public void click_on_link_environment(){
         subutaiSteps.clickOnMenuItemEnvironment();

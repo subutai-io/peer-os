@@ -409,6 +409,12 @@ public class DefSubutaiStepsThen {
         subutaiSteps.observeNgCreatePeer();
     }
 
+    @Then("the user should observe 'ng-click peer', 'ng-click environment'")
+    public void user_observe_ng_peer_ng_environment(){
+        subutaiSteps.observeNgPeerMonitoring();
+        subutaiSteps.observeNgEnvironmentMonitoring();
+    }
+
     @Then("the user observe 'ng-Source selector'")
     public void user_observe_ng_source_selector(){
         subutaiSteps.observeNgSourceSelector();
