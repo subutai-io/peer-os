@@ -21,11 +21,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.apache.cxf</groupId>
-      <artifactId>cxf-rt-transports-http</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>ai.subut.kurjun</groupId>
       <artifactId>model</artifactId>
       <version>${ai.subut.kurjun.version}</version>
