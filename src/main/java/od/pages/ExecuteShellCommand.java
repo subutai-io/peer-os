@@ -2,12 +2,13 @@ package od.pages;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 
 public class ExecuteShellCommand {
 
     public String executeCommand(String command) {
 
-        StringBuffer output = new StringBuffer();
+        StringBuilder output = new StringBuilder();
 
         Process p;
         try {
@@ -15,7 +16,6 @@ public class ExecuteShellCommand {
             p.waitFor();
             BufferedReader reader =
                     new BufferedReader(new InputStreamReader(p.getInputStream()));
-
             String line;
             while ((line = reader.readLine())!= null) {
                 output.append(line + "\n");
@@ -24,8 +24,6 @@ public class ExecuteShellCommand {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println(output.toString());
         return output.toString();
-
     }
 }
