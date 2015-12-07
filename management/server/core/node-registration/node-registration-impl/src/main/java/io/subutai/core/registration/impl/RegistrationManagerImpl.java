@@ -2,18 +2,19 @@ package io.subutai.core.registration.impl;
 
 
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
-import io.subutai.common.host.HostInterface;
-import io.subutai.common.host.HostInterfaceModel;
-import io.subutai.common.peer.*;
-import io.subutai.common.util.N2NUtil;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Transformer;
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Transformer;
 import org.apache.commons.net.util.SubnetUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 
@@ -30,14 +31,19 @@ import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.host.ContainerHostInfo;
+import io.subutai.common.host.HostInterface;
+import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.ResourceAlert;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.ManagementHost;
+import io.subutai.common.peer.Peer;
+import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.PlacementStrategy;
+import io.subutai.common.util.N2NUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.broker.api.Broker;
 import io.subutai.core.broker.api.BrokerException;
@@ -224,31 +230,40 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
         client.query( "Message", encoded ).delete();
     }
 
-    private Set<String> getTunnelNetworks(final Set<Peer> peers) {
+
+    private Set<String> getTunnelNetworks( final Set<Peer> peers )
+    {
         Set<String> result = new HashSet<>();
 
-        for (Peer peer : peers) {
+        for ( Peer peer : peers )
+        {
             Set<HostInterfaceModel> r = null;
-            try {
-                r = peer.getInterfaces().filterByIp(N2NUtil.N2N_INTERFACE_IP_PATTERN);
-            } catch (PeerException e) {
+            try
+            {
+                r = peer.getInterfaces().filterByIp( N2NUtil.N2N_INTERFACE_IP_PATTERN );
+            }
+            catch ( PeerException e )
+            {
                 e.printStackTrace();
             }
 
-            Collection tunnels = CollectionUtils.collect(r, new Transformer() {
+            Collection tunnels = CollectionUtils.collect( r, new Transformer()
+            {
                 @Override
-                public Object transform(final Object o) {
-                    HostInterface i = (HostInterface) o;
-                    SubnetUtils u = new SubnetUtils(i.getIp(), N2NUtil.N2N_SUBNET_MASK);
+                public Object transform( final Object o )
+                {
+                    HostInterface i = ( HostInterface ) o;
+                    SubnetUtils u = new SubnetUtils( i.getIp(), N2NUtil.N2N_SUBNET_MASK );
                     return u.getInfo().getNetworkAddress();
                 }
-            });
+            } );
 
-            result.addAll(tunnels);
+            result.addAll( tunnels );
         }
 
         return result;
     }
+
 
     @Override
     public void approveRequest( final String requestId )
@@ -420,7 +435,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
                 Map<Integer, Set<ContainerHost>> containerHostList = Maps.newHashMap();
                 for ( final ContainerInfo containerInfo : requestedHost.getHostInfos() )
                 {
-                    if ( containerInfo.getState().equals( RegistrationStatus.APPROVED )
+                    if ( RegistrationStatus.APPROVED.equals( containerInfo.getState() )
                             && containerInfo.getVlan() != 0 )
                     {
 
@@ -477,46 +492,50 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
 
 
     @Override
-    public void deployResourceHost(List<String> args) throws NodeRegistrationException {
+    public void deployResourceHost( List<String> args ) throws NodeRegistrationException
+    {
         ManagementHost managementHost = null;
         CommandResult result;
 
-        try {
+        try
+        {
             managementHost = peerManager.getLocalPeer().getManagementHost();
 
-            Set<Peer> peers = Sets.newHashSet(managementHost.getPeer());
+            Set<Peer> peers = Sets.newHashSet( managementHost.getPeer() );
 
-            Set<String> existingNetworks = getTunnelNetworks(peers);
+            Set<String> existingNetworks = getTunnelNetworks( peers );
 
-            String freeTunnelNetwork = N2NUtil.findFreeTunnelNetwork(existingNetworks);
-            args.add("-I");
-            freeTunnelNetwork = freeTunnelNetwork.substring(0, freeTunnelNetwork.length() - 1)+
-            (Integer.valueOf(freeTunnelNetwork.substring(freeTunnelNetwork.length()-1))+1);
-            args.add(freeTunnelNetwork);
+            String freeTunnelNetwork = N2NUtil.findFreeTunnelNetwork( existingNetworks );
+            args.add( "-I" );
+            freeTunnelNetwork = freeTunnelNetwork.substring( 0, freeTunnelNetwork.length() - 1 ) + (
+                    Integer.valueOf( freeTunnelNetwork.substring( freeTunnelNetwork.length() - 1 ) ) + 1 );
+            args.add( freeTunnelNetwork );
 
-            int ipOctet = (Integer.valueOf(freeTunnelNetwork.substring(freeTunnelNetwork.length()-1))+1);
-            String ipRh = freeTunnelNetwork.substring(0, freeTunnelNetwork.length() - 1) + ipOctet;
-            args.add("-i");
-            args.add(ipRh);
+            int ipOctet = ( Integer.valueOf( freeTunnelNetwork.substring( freeTunnelNetwork.length() - 1 ) ) + 1 );
+            String ipRh = freeTunnelNetwork.substring( 0, freeTunnelNetwork.length() - 1 ) + ipOctet;
+            args.add( "-i" );
+            args.add( ipRh );
 
-            String communityName = N2NUtil.generateCommunityName(freeTunnelNetwork);
-            args.add("-n");
-            args.add(communityName);
+            String communityName = N2NUtil.generateCommunityName( freeTunnelNetwork );
+            args.add( "-n" );
+            args.add( communityName );
 
-            String deviceName = N2NUtil.generateInterfaceName(freeTunnelNetwork);
-            args.add("-d");
-            args.add(deviceName);
+            String deviceName = N2NUtil.generateInterfaceName( freeTunnelNetwork );
+            args.add( "-d" );
+            args.add( deviceName );
             String runUser = "root";
-            result = managementHost
-                    .execute(new RequestBuilder("/apps/subutai-mng/current/awsdeploy/awsdeploy")
-                            .withCmdArgs(args)
-                            .withRunAs(runUser)
-                            .withTimeout(600));
+            result = managementHost.execute(
+                    new RequestBuilder( "/apps/subutai-mng/current/awsdeploy/awsdeploy" ).withCmdArgs( args )
+                                                                                         .withRunAs( runUser )
+                                                                                         .withTimeout( 600 ) );
 
-            if (result.getExitCode() != 0) {
-                throw new NodeRegistrationException(result.getStdErr());
+            if ( result.getExitCode() != 0 )
+            {
+                throw new NodeRegistrationException( result.getStdErr() );
             }
-        } catch (HostNotFoundException | CommandException e) {
+        }
+        catch ( HostNotFoundException | CommandException e )
+        {
             e.printStackTrace();
         }
     }
