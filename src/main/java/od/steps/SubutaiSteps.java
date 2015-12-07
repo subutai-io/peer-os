@@ -686,7 +686,7 @@ public class SubutaiSteps extends ScenarioSteps {
     @Step
     public void run_bash_script(String file) throws FileNotFoundException {
         ExecuteShellCommand executeShellCommand = new ExecuteShellCommand();
-        executeShellCommand.executeCommand(file);
+        System.out.println(executeShellCommand.executeCommand(file));
     }
 
     @Step
