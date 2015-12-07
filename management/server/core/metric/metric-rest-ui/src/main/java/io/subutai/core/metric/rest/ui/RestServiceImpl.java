@@ -50,7 +50,7 @@ public class RestServiceImpl implements RestService
         {
             Calendar calendar = Calendar.getInstance();
             Date current = new Date( calendar.getTime().getTime() );
-            calendar.add( Calendar.HOUR, -1 );
+            calendar.add( Calendar.HOUR, (-interval) );
             Date start = calendar.getTime();
 
             Host host;
