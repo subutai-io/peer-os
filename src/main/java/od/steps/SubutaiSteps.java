@@ -69,6 +69,11 @@ public class SubutaiSteps extends ScenarioSteps {
     }
 
     @Step
+    public void clickOnMenuItemMonitoring() {
+        subutaiPage.linkMonitoring.click();
+    }
+
+    @Step
     public void clickOnMenuItemEnvironment(){
         subutaiPage.linkEnvironment.click();
     }
@@ -1098,6 +1103,16 @@ public class SubutaiSteps extends ScenarioSteps {
     }
 
     @Step
+    public void observeNgPeerMonitoring() {
+        assertThat(subutaiPage.ngPeerMonitoring.isVisible(), is(true));
+    }
+
+    @Step
+    public void observeNgEnvironmentMonitoring() {
+        assertThat(subutaiPage.ngEnvironmentMonitoring.isVisible(), is(true));
+    }
+
+    @Step
     public void clickOnMenuItemTracker() {
         subutaiPage.linkTracker.click();
     }
@@ -1153,4 +1168,5 @@ public class SubutaiSteps extends ScenarioSteps {
     public void waitSleep(int i) {
         waitABit(i);
     }
+
 }
