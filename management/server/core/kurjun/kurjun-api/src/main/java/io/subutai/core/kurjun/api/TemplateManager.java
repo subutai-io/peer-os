@@ -57,11 +57,11 @@ public interface TemplateManager
     TemplateKurjun getTemplate( String name );
     
     /**
-     * Gets the set of remote repo urls
+     * Gets the list of remote repo urls
      *
      * @return Set of urls
      */
-    Set<URL> getRemoteRepoUrls();
+    List<URL> getRemoteRepoUrls();
 
 
     /**
