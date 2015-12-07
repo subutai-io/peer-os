@@ -259,6 +259,10 @@ public class SubutaiPage extends PageObject {
         waitFor(headerBlueprintDeleted);
     }
 
+    public void waitDomainPopUpMenu(){
+        waitFor(inputDomain);
+    }
+
     public void executeConsoleCommand(String command){
         evaluateJavascript("function setCommand(value) {\n" +
                 "var appElement = document.getElementsByClassName('b-terminal')[0];" +
