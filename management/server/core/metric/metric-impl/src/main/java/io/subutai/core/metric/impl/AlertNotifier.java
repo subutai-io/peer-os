@@ -42,8 +42,8 @@ public class AlertNotifier implements Runnable
         }
         catch ( Exception e )
         {
-            LOG.debug( String.format( "Error on notifying '%s' notified about alert '%s'.", listener.getId(),
-                    alert.getResource().getId() ) );
+            LOG.error( String.format( "Error on notifying '%s' notified about alert '%s'.", listener.getId(),
+                    alert.getResource().getId() ), e );
         }
     }
 }
