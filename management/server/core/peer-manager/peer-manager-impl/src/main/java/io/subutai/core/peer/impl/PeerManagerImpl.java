@@ -473,10 +473,6 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public void doApproveRequest( final String keyPhrase, final RegistrationData request ) throws PeerException
     {
-        if ( !getPeer( request.getPeerInfo().getId() ).isOnline() )
-        {
-            throw new PeerException( "Remote peer is offline at current moment. Please try it again later." );
-        }
         RegistrationClient registrationClient = new RegistrationClientImpl( provider );
 
         registrationClient.sendApproveRequest( request.getPeerInfo().getIp(),
@@ -492,11 +488,6 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public void doRejectRequest( final RegistrationData request ) throws PeerException
     {
-        if ( !getPeer( request.getPeerInfo().getId() ).isOnline() )
-        {
-            throw new PeerException( "Remote peer is offline at current moment. Please try it again later." );
-        }
-
         RegistrationClient registrationClient = new RegistrationClientImpl( provider );
 
         registrationClient.sendRejectRequest( request.getPeerInfo().getIp(),
