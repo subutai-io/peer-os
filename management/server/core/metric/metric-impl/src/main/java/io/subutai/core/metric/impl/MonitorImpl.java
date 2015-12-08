@@ -24,8 +24,6 @@ import org.slf4j.LoggerFactory;
 import org.apache.commons.lang.time.DateUtils;
 
 import com.google.common.base.Preconditions;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 import com.google.gson.JsonSyntaxException;
 
 import io.subutai.common.command.CommandException;
@@ -40,14 +38,13 @@ import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.host.ResourceHostInfoModel;
 import io.subutai.common.metric.Alert;
-import io.subutai.common.metric.BaseMetric;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.QuotaAlert;
 import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.metric.ResourceHostMetrics;
-import io.subutai.common.peer.AlertListener;
 import io.subutai.common.peer.AlertEvent;
+import io.subutai.common.peer.AlertListener;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.Host;
@@ -85,17 +82,14 @@ public class MonitorImpl implements Monitor, HostListener
             Collections.newSetFromMap( new ConcurrentHashMap<AlertListener, Boolean>() );
 
     private final Commands commands = new Commands();
-    //    private final EnvironmentManager environmentManager;
-    protected ExecutorService notificationExecutor = Executors.newCachedThreadPool();
     protected MonitorDao monitorDao;
     protected DaoManager daoManager;
-    private Cache<String, BaseMetric> metrics = CacheBuilder.newBuilder().
-            expireAfterWrite( METRICS_UPDATE_DELAY * 2, TimeUnit.SECONDS ).
-                                                                    build();
-    protected ScheduledExecutorService stateUpdateExecutorService;
-    protected ScheduledExecutorService backgroundTasksExecutorService;
 
-    private Map<String, AlertEvent> localALerts = new HashMap<>();
+    protected ScheduledExecutorService backgroundTasksExecutorService;
+    protected ExecutorService notificationExecutor = Executors.newCachedThreadPool();
+
+    private Map<String, AlertEvent> alertQueue = new HashMap<>();
+
     private List<AlertEvent> alerts = new CopyOnWriteArrayList<>();
 
     private PeerManager peerManager;
@@ -124,9 +118,6 @@ public class MonitorImpl implements Monitor, HostListener
             throw new MonitorException( e );
         }
 
-        stateUpdateExecutorService = Executors.newScheduledThreadPool( 1 );
-        stateUpdateExecutorService
-                .scheduleWithFixedDelay( new MetricsUpdater( this ), 10, METRICS_UPDATE_DELAY, TimeUnit.SECONDS );
         backgroundTasksExecutorService = Executors.newScheduledThreadPool( 1 );
         backgroundTasksExecutorService.scheduleWithFixedDelay( new BackgroundTasksRunner(), 10, 30, TimeUnit.SECONDS );
     }
@@ -361,7 +352,6 @@ public class MonitorImpl implements Monitor, HostListener
     public void destroy()
     {
         backgroundTasksExecutorService.shutdown();
-        stateUpdateExecutorService.shutdown();
     }
 
 
@@ -377,15 +367,14 @@ public class MonitorImpl implements Monitor, HostListener
             RequestBuilder historicalMetricCommand = commands.getHistoricalMetricCommand( host, startTime, endTime );
 
             CommandResult commandResult;
-            if( host instanceof ResourceHost )
+            if ( host instanceof ResourceHost )
             {
-                commandResult =
-                        peerManager.getLocalPeer().getResourceHostById( host.getId() ).execute( historicalMetricCommand );
+                commandResult = peerManager.getLocalPeer().getResourceHostById( host.getId() )
+                                           .execute( historicalMetricCommand );
             }
             else
             {
-                commandResult =
-                        peerManager.getLocalPeer().getManagementHost().execute( historicalMetricCommand );
+                commandResult = peerManager.getLocalPeer().getManagementHost().execute( historicalMetricCommand );
             }
 
 
@@ -431,7 +420,7 @@ public class MonitorImpl implements Monitor, HostListener
             return;
         }
 
-        AlertEvent alertEvent = localALerts.get( alert.getId() );
+        AlertEvent alertEvent = alertQueue.get( alert.getId() );
         if ( alertEvent != null )
         {
             if ( !alertEvent.isExpired() )
@@ -443,7 +432,7 @@ public class MonitorImpl implements Monitor, HostListener
         }
 
         alertEvent = buildAlertPack( alert );
-        localALerts.put( alert.getId(), alertEvent );
+        alertQueue.put( alert.getId(), alertEvent );
     }
 
 
@@ -477,41 +466,36 @@ public class MonitorImpl implements Monitor, HostListener
     }
 
 
-    private void updateHostMetric( final BaseMetric metric )
-    {
-        if ( metric != null )
-        {
-            this.metrics.put( metric.getHostInfo().getId(), metric );
-        }
-    }
-
-
-    @Override
-    public BaseMetric getHostMetric( final String id )
-    {
-        return this.metrics.getIfPresent( id );
-    }
-
-
-    @Override
-    public Collection<BaseMetric> getMetrics()
-    {
-        return Collections.unmodifiableCollection( metrics.asMap().values() );
-    }
-
-
     @Override
     public ResourceHostMetrics getResourceHostMetrics()
     {
         ResourceHostMetrics result = new ResourceHostMetrics();
 
-        for ( BaseMetric baseMetric : getMetrics() )
+        for ( ResourceHost resourceHost : peerManager.getLocalPeer().getResourceHosts() )
         {
-            if ( baseMetric instanceof ResourceHostMetric && !"management"
-                    .equals( ( ( ResourceHostMetric ) baseMetric ).getHostName() ) )
+
+            ResourceHostMetric resourceHostMetric = new ResourceHostMetric( peerManager.getLocalPeer().getId() );
+            try
             {
-                result.addMetric( ( ResourceHostMetric ) baseMetric );
+                HostInfo hostInfo = hostRegistry.getHostInfoById( resourceHost.getId() );
+                resourceHostMetric.setHostInfo( new ResourceHostInfoModel( hostInfo ) );
+                ResourceHostMetric m = fetchResourceHostMetric( resourceHost );
+                if ( m != null )
+                {
+                    resourceHostMetric.updateMetrics( m );
+                }
+                resourceHostMetric.setConnected( true );
             }
+            catch ( HostDisconnectedException hde )
+            {
+                HostInfoModel defaultHostInfo =
+                        new HostInfoModel( resourceHost.getId(), resourceHost.getHostname(), new HostInterfaces(),
+                                HostArchitecture.UNKNOWN );
+                resourceHostMetric.setHostInfo( defaultHostInfo );
+                resourceHostMetric.setConnected( false );
+            }
+
+            result.addMetric( resourceHostMetric );
         }
 
         return result;
@@ -519,16 +503,9 @@ public class MonitorImpl implements Monitor, HostListener
 
 
     @Override
-    public Collection<AlertEvent> getAlerts()
+    public Collection<AlertEvent> getAlertEvents()
     {
         return Collections.unmodifiableCollection( alerts );
-    }
-
-
-    @Override
-    public List<AlertEvent> getAlertPackages()
-    {
-        return alerts;
     }
 
 
@@ -536,7 +513,7 @@ public class MonitorImpl implements Monitor, HostListener
     public List<AlertEvent> getAlertsQueue()
     {
         List<AlertEvent> result = new ArrayList<>();
-        result.addAll( localALerts.values() );
+        result.addAll( alertQueue.values() );
         return result;
     }
 
@@ -561,7 +538,7 @@ public class MonitorImpl implements Monitor, HostListener
     //    @Override
     protected void deliverAlerts()
     {
-        for ( AlertEvent alertEvent : localALerts.values() )
+        for ( AlertEvent alertEvent : alertQueue.values() )
         {
             if ( !alertEvent.isDelivered() )
             {
@@ -573,13 +550,13 @@ public class MonitorImpl implements Monitor, HostListener
 
     private void clearObsoleteAlerts()
     {
-        for ( AlertEvent alertEvent : localALerts.values() )
+        for ( AlertEvent alertEvent : alertQueue.values() )
         {
             if ( alertEvent.isExpired() )
             {
                 LOG.debug( String.format( "Alert package '%s' expired. ", alertEvent.getResource().getId() ) );
                 // removing obsolete alert
-                localALerts.remove( alertEvent.getResource().getId() );
+                alertQueue.remove( alertEvent.getResource().getId() );
             }
         }
     }
@@ -617,83 +594,6 @@ public class MonitorImpl implements Monitor, HostListener
                 LOG.warn( "Background task execution faild: " + e.getMessage() );
             }
             LOG.debug( "Background task runner finished." );
-        }
-    }
-
-
-    private class MetricsUpdater implements Runnable
-    {
-        private final MonitorImpl monitor;
-
-
-        public MetricsUpdater( final MonitorImpl monitor )
-        {
-            this.monitor = monitor;
-        }
-
-
-        @Override
-        public void run()
-        {
-            LOG.debug( "Metrics updater started." );
-            try
-            {
-                for ( ResourceHost resourceHost : peerManager.getLocalPeer().getResourceHosts() )
-                {
-
-                    ResourceHostMetric resourceHostMetric =
-                            new ResourceHostMetric( peerManager.getLocalPeer().getId() );
-                    try
-                    {
-                        HostInfo hostInfo = hostRegistry.getHostInfoById( resourceHost.getId() );
-                        resourceHostMetric.setHostInfo( new ResourceHostInfoModel( hostInfo ) );
-                        ResourceHostMetric m = monitor.fetchResourceHostMetric( resourceHost );
-                        if ( m != null )
-                        {
-                            resourceHostMetric.updateMetrics( m );
-                        }
-                        resourceHostMetric.setConnected( true );
-                    }
-                    catch ( HostDisconnectedException hde )
-                    {
-                        HostInfoModel defaultHostInfo =
-                                new HostInfoModel( resourceHost.getId(), resourceHost.getHostname(),
-                                        new HostInterfaces(), HostArchitecture.UNKNOWN );
-                        resourceHostMetric.setHostInfo( defaultHostInfo );
-                        resourceHostMetric.setConnected( false );
-                    }
-
-                    updateHostMetric( resourceHost.getId(), resourceHostMetric );
-
-                    for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
-                    {
-                        BaseMetric containerHostMetric;
-                        try
-                        {
-                            HostInfo hostInfo = hostRegistry.getHostInfoById( containerHost.getId() );
-                            containerHostMetric =
-                                    new BaseMetric( peerManager.getLocalPeer().getId(), new HostInfoModel( hostInfo ) );
-                            containerHostMetric.setConnected( true );
-                        }
-                        catch ( HostDisconnectedException hde )
-                        {
-                            HostInfoModel disconnectedHostInfo =
-                                    new HostInfoModel( containerHost.getId(), containerHost.getHostname(),
-                                            new HostInterfaces(), HostArchitecture.UNKNOWN );
-                            containerHostMetric =
-                                    new BaseMetric( peerManager.getLocalPeer().getId(), disconnectedHostInfo );
-                            containerHostMetric.setConnected( false );
-                        }
-
-                        updateHostMetric( containerHost.getId(), containerHostMetric );
-                    }
-                }
-            }
-            catch ( Exception e )
-            {
-                LOG.error( e.getMessage(), e );
-            }
-            LOG.debug( "Metrics updater finished." );
         }
     }
 
@@ -753,60 +653,4 @@ public class MonitorImpl implements Monitor, HostListener
             }
         }
     }
-
-
-    private void updateHostMetric( String id, final BaseMetric baseMetric )
-    {
-        this.metrics.put( id, baseMetric );
-    }
-
-
-    //    private class AlertProcessor
-    //    {
-    //        Map<String, AlertCounter> counters = new HashMap<>();
-    //
-    //
-    //        void process( Alert alert )
-    //        {
-    //            AlertCounter counter = counters.get( alert.getId() );
-    //            if ( counter == null )
-    //            {
-    //                counter = new AlertCounter();
-    //                counters.put( alert.getId(), counter );
-    //            }
-    //            counter.inc();
-    //            int c = counter.getValue();
-    //            LOG.debug( String.format( "Alert value: %s %d", alert.getId(), c ) );
-    //
-    //            if ( c % 10 == 0 )
-    //            {
-    //                alert( alert );
-    //                counter.reset();
-    //            }
-    //        }
-    //    }
-    //
-    //
-    //    private class AlertCounter
-    //    {
-    //        int value = 0;
-    //
-    //
-    //        void inc()
-    //        {
-    //            value += 1;
-    //        }
-    //
-    //
-    //        public int getValue()
-    //        {
-    //            return value;
-    //        }
-    //
-    //
-    //        public void reset()
-    //        {
-    //            value = 0;
-    //        }
-    //    }
 }

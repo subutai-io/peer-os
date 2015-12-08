@@ -32,7 +32,7 @@ public class AlertListCommand extends SubutaiShellCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        Collection<AlertEvent> alerts = monitor.getAlerts();
+        Collection<AlertEvent> alerts = monitor.getAlertEvents();
         System.out.println( String.format( "List of alerts. Found %d alert(s)", alerts.size() ) );
         for ( AlertEvent alert : alerts )
         {

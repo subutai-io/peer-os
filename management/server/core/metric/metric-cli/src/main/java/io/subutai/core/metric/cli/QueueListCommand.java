@@ -32,7 +32,7 @@ public class QueueListCommand extends SubutaiShellCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        Collection<AlertEvent> alerts = monitor.getAlerts();
+        Collection<AlertEvent> alerts = monitor.getAlertEvents();
         System.out.println( "List of alerts in queue:" );
         for ( AlertEvent alert : monitor.getAlertsQueue() )
         {
