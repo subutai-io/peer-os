@@ -40,7 +40,7 @@ echo
 vagrant exec sudo subutai clone master container2
 
 echo
-echo "7. Run list command to see containers information: vaghow to use wait in bashrant exec sudo subutai list -i"
+echo "7. Run list command to see containers information: vagrant exec sudo subutai list -i"
 echo
 vagrant exec sudo subutai list -i
 
