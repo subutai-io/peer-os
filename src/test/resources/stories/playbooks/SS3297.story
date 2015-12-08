@@ -42,7 +42,8 @@ And the user observe text: Your environment start creation.
 When the user click on the button: OK
 Then the user observe header: Success!
 And the user observe text: Your environment has been created.
-When the user click on the menu item: Console
+When the user click on the button: OK
+And the user click on the menu item: Console
 And the user click on the button: Environment
 And the user select current environment
 And the user select container one in select menu
