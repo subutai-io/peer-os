@@ -15,7 +15,7 @@ import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 
 
 /**
- * Start monitoring command
+ * List alert handlers of the specified environment
  */
 @Command( scope = "environment", name = "alert-handlers", description = "List alert handlers" )
 public class MonitoringListCommand extends SubutaiShellCommandSupport
