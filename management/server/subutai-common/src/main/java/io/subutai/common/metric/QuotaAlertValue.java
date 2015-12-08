@@ -47,4 +47,14 @@ public class QuotaAlertValue implements AlertValue<ExceededQuota>
         }
         return true;
     }
+
+
+    @Override
+    public String toString()
+    {
+        final StringBuffer sb = new StringBuffer( "QuotaAlertValue{" );
+        sb.append( "value=" ).append( value );
+        sb.append( '}' );
+        return sb.toString();
+    }
 }

@@ -24,8 +24,8 @@ public class RepoUrlStore
 
     public RepoUrlStore( String appDataBaseUrl )
     {
-        String path = appDataBaseUrl == null ? "kurjun" : appDataBaseUrl;
-        repoFile = path + "/misc/remote_repo_url";
+        String path = appDataBaseUrl == null ? "" : appDataBaseUrl + "/";
+        repoFile = path + "kurjun/misc/remote_repo_url";
     }
 
 
