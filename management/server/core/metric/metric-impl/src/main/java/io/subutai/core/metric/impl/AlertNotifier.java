@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Preconditions;
 
 import io.subutai.common.peer.AlertListener;
-import io.subutai.common.peer.AlertPack;
+import io.subutai.common.peer.AlertEvent;
 
 
 /**
@@ -17,11 +17,11 @@ public class AlertNotifier implements Runnable
 {
     protected Logger LOG = LoggerFactory.getLogger( AlertNotifier.class );
 
-    protected AlertPack alert;
+    protected AlertEvent alert;
     protected AlertListener listener;
 
 
-    public AlertNotifier( final AlertPack alert, final AlertListener listener )
+    public AlertNotifier( final AlertEvent alert, final AlertListener listener )
     {
         Preconditions.checkNotNull( alert, "Alert is null" );
         Preconditions.checkNotNull( listener, "Listener is null" );
@@ -36,14 +36,14 @@ public class AlertNotifier implements Runnable
     {
         try
         {
+            LOG.debug( String.format( "Alert listener '%s' notified about alert '%s'.", listener.getId(),
+                    alert.getResource().getId() ) );
             listener.onAlert( alert );
-            LOG.debug( String.format( "Alert package '%s' handled by '%s'.", alert.getResource().getId(),
-                    listener.getTemplateName() ) );
         }
         catch ( Exception e )
         {
-            LOG.error( String.format( "Alert package '%s' handling by '%s' failed.",
-                    alert.getResource().getId(), listener.getTemplateName() ),e );
+            LOG.error( String.format( "Error on notifying '%s' notified about alert '%s'.", listener.getId(),
+                    alert.getResource().getId() ), e );
         }
     }
 }

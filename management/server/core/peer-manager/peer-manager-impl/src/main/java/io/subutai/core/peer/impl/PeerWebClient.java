@@ -1,7 +1,6 @@
 package io.subutai.core.peer.impl;
 
 
-import java.text.ParseException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
@@ -23,7 +22,7 @@ import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
-import io.subutai.common.peer.AlertPack;
+import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerException;
@@ -32,7 +31,6 @@ import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.WebClientBuilder;
-import io.subutai.common.util.DateParam;
 import io.subutai.common.util.DateTimeParam;
 
 
@@ -409,7 +407,7 @@ public class PeerWebClient
     }
 
 
-    public void alert( final AlertPack alert ) throws PeerException
+    public void alert( final AlertEvent alert ) throws PeerException
     {
         String path = "/alert";
 

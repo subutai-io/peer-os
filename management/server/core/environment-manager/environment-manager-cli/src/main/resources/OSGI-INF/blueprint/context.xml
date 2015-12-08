@@ -13,6 +13,7 @@
       </action>
     </command>
   </command-bundle>
+
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="environment/grow-local">
       <action class="io.subutai.core.environment.cli.GrowLocalEnvironmentCommand">
@@ -21,6 +22,7 @@
       </action>
     </command>
   </command-bundle>
+
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="environment/destroy">
       <action class="io.subutai.core.environment.cli.DestroyEnvironmentCommand">
@@ -28,6 +30,7 @@
       </action>
     </command>
   </command-bundle>
+
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="environment/list">
       <action class="io.subutai.core.environment.cli.ListEnvironmentsCommand">
@@ -35,6 +38,7 @@
       </action>
     </command>
   </command-bundle>
+
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="environment/view">
       <action class="io.subutai.core.environment.cli.ViewEnvironmentCommand">
@@ -42,9 +46,42 @@
       </action>
     </command>
   </command-bundle>
+
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="environment/destroy-container">
       <action class="io.subutai.core.environment.cli.DestroyContainerCommand">
+        <argument ref="environmentManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="environment/add-alert-handler">
+      <action class="io.subutai.core.environment.cli.MonitoringStartCommand">
+        <argument ref="environmentManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="environment/remove-alert-handler">
+      <action class="io.subutai.core.environment.cli.MonitoringStopCommand">
+        <argument ref="environmentManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="environment/alert-handlers">
+      <action class="io.subutai.core.environment.cli.MonitoringListCommand">
+        <argument ref="environmentManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="environment/registered-alert-handlers">
+      <action class="io.subutai.core.environment.cli.ListRegisteredAlertHandlersCommand">
         <argument ref="environmentManager" />
       </action>
     </command>

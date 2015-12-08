@@ -103,7 +103,7 @@ public class SubscriberDataService
     }
 
 
-    public Set<String> getEnvironmentSubscriberIds( final String environmentId ) throws DaoException
+    public Set<String> findHandlersByEnvironment( final String environmentId ) throws DaoException
     {
         Set<String> result = new HashSet<>();
         EntityManager em = emf.createEntityManager();

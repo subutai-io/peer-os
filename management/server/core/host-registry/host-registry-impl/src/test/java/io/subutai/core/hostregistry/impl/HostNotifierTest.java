@@ -12,7 +12,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import com.google.common.collect.Sets;
 
-import io.subutai.common.metric.ResourceAlert;
+import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.common.host.ResourceHostInfo;
 
@@ -32,17 +32,17 @@ public class HostNotifierTest
     ResourceHostInfo resourceHostInfo;
 
     @Mock
-    ResourceAlert resourceAlert;
+    QuotaAlertValue quotaAlertValue;
 
     HostNotifier notifier;
 
-    Set<ResourceAlert> alerts;
+    Set<QuotaAlertValue> alerts;
 
 
     @Before
     public void setUp() throws Exception
     {
-        alerts = Sets.newHashSet( resourceAlert );
+        alerts = Sets.newHashSet( quotaAlertValue );
         notifier = new HostNotifier( listener, resourceHostInfo, alerts );
     }
 

@@ -4,7 +4,7 @@ package io.subutai.core.hostregistry.api;
 import java.util.Set;
 
 import io.subutai.common.host.ResourceHostInfo;
-import io.subutai.common.metric.ResourceAlert;
+import io.subutai.common.metric.QuotaAlertValue;
 
 
 /**
@@ -17,5 +17,5 @@ public interface HostListener
      *
      * @param resourceHostInfo - resource host info of host from which this heartbeat came
      */
-    public void onHeartbeat( ResourceHostInfo resourceHostInfo, Set<ResourceAlert> alerts );
+    public void onHeartbeat( ResourceHostInfo resourceHostInfo, Set<QuotaAlertValue> alerts );
 }

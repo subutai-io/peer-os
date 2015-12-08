@@ -1,48 +1,56 @@
 package io.subutai.common.peer;
 
 
-import java.util.Calendar;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 
-import org.apache.commons.lang.time.DateUtils;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
-
-import io.subutai.common.metric.AlertResource;
+import io.subutai.common.metric.Alert;
 
 
 /**
- * Alert packet for transferring between peers
+ * Alert event class
  */
-public class AlertPack
+public class AlertEvent
 {
+    private static DateFormat fmt = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss.SS Z" );
     @JsonProperty( "peerId" )
     String peerId;
+
     @JsonProperty( "environmentId" )
     String environmentId;
+
     @JsonProperty( "containerId" )
     String containerId;
+
     @JsonProperty( "templateName" )
     String templateName;
+
     @JsonProperty( "resource" )
-    AlertResource resource;
+    Alert resource;
+
     @JsonIgnore
     boolean delivered = false;
+
     @JsonProperty( "expiredTime" )
     Long expiredTime;
 
+    @JsonIgnore
+    List<String> logs = new ArrayList<>();
 
-    public AlertPack( @JsonProperty( "peerId" ) final String peerId,
-                      @JsonProperty( "environmentId" ) final String environmentId,
-                      @JsonProperty( "containerId" ) final String containerId,
-                      @JsonProperty( "templateName" ) final String templateName,
-                      @JsonProperty( "resource" ) final AlertResource resource,
-                      @JsonProperty( "expiredTime" ) final Long expiredTime )
+
+    public AlertEvent( @JsonProperty( "peerId" ) final String peerId,
+                       @JsonProperty( "environmentId" ) final String environmentId,
+                       @JsonProperty( "containerId" ) final String containerId,
+                       @JsonProperty( "templateName" ) final String templateName,
+                       @JsonProperty( "resource" ) final Alert resource,
+                       @JsonProperty( "expiredTime" ) final Long expiredTime )
     {
         this.peerId = peerId;
         this.environmentId = environmentId;
@@ -71,7 +79,7 @@ public class AlertPack
     }
 
 
-    public AlertResource getResource()
+    public Alert getResource()
     {
         return resource;
     }
@@ -116,11 +124,28 @@ public class AlertPack
     }
 
 
+    public void addLog( String log )
+    {
+        if ( log != null )
+        {
+            logs.add( fmt.format( new Date() ) + " " + log );
+        }
+    }
+
+
     @Override
     public String toString()
     {
-        return String.format( "%s %s Route:(%s,%s,%s) ttl:%d %s", resource.getId(), isExpired() ? "EXPIRED" : "NOT EXPIRED", peerId,
-                environmentId, containerId, TimeUnit.SECONDS.convert( getLiveTime(), TimeUnit.MILLISECONDS ),
-                delivered ? "DELIVERED" : "NOT DELIVERED" );
+        return String
+                .format( "%s %s Route:(%s,%s,%s) ttl:%d %s", resource.getId(), isExpired() ? "EXPIRED" : "NOT EXPIRED",
+                        peerId, environmentId, containerId,
+                        TimeUnit.SECONDS.convert( getLiveTime(), TimeUnit.MILLISECONDS ),
+                        delivered ? "DELIVERED" : "NOT DELIVERED" );
+    }
+
+
+    public List<String> getLogs()
+    {
+        return logs;
     }
 }
