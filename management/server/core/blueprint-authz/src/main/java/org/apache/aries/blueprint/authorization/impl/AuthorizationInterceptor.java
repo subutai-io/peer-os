@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.aries.blueprint.Interceptor;
 
-import io.subutai.common.datatypes.Relation;
+import io.subutai.common.datatypes.RelationDeclaration;
 
 
 public class AuthorizationInterceptor implements Interceptor
@@ -97,9 +97,9 @@ public class AuthorizationInterceptor implements Interceptor
 
             for ( Annotation annotation : annotations )
             {
-                if ( annotation instanceof Relation )
+                if ( annotation instanceof RelationDeclaration )
                 {
-                    Relation myAnnotation = ( Relation ) annotation;
+                    RelationDeclaration myAnnotation = ( RelationDeclaration ) annotation;
                     LOGGER.debug( parameterType.getName() );
                     LOGGER.debug( parameter.toString() );
                     LOGGER.debug( myAnnotation.context() );

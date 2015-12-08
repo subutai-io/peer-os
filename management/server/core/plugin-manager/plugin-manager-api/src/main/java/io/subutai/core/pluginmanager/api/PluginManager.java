@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import io.subutai.common.datatypes.Relation;
+import io.subutai.common.datatypes.RelationDeclaration;
 
 
 public interface PluginManager
@@ -20,7 +20,7 @@ public interface PluginManager
 
     Set<PluginInfo> getAvailablePlugins();
 
-    PluginInfo getPluginInfo( String pluginName, @Relation( context = "plugin" ) String version );
+    PluginInfo getPluginInfo( String pluginName, @RelationDeclaration( context = "plugin" ) String version );
 
     Set<String> getAvailablePluginNames();
 

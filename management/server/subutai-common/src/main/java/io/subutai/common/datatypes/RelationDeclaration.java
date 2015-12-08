@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
  */
 @Retention( RetentionPolicy.RUNTIME )
 @Target( ElementType.PARAMETER )
-public @interface Relation
+public @interface RelationDeclaration
 {
     public enum RelationWeight
     {
@@ -20,4 +20,9 @@ public @interface Relation
     }
 
     String context() default "";
+
+    /**
+     * Relationship query, that queries permissions exists between entities
+     */
+    String rql() default "";
 }

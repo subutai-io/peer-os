@@ -4,6 +4,8 @@ package io.subutai.common.drms;
 /**
  * Created by talas on 12/7/15.
  */
+//TODO this class should be abstract type, and all descendant child classes will override parent methods so that they
+// could be identified in right way
 public class TrustedObject
 {
     private String classPath;

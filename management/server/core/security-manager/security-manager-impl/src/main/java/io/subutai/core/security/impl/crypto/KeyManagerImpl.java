@@ -4,6 +4,7 @@ package io.subutai.core.security.impl.crypto;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.security.AccessControlException;
 import java.util.List;
 import java.util.Objects;
@@ -26,6 +27,7 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
+import io.subutai.common.drms.TrustMessage;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.security.crypto.pgp.KeyPair;
 import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
@@ -33,6 +35,7 @@ import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.KeyTrustLevel;
 import io.subutai.common.security.objects.SecurityKeyType;
 import io.subutai.common.settings.ChannelSettings;
+import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.keyserver.api.KeyServer;
 import io.subutai.core.security.api.crypto.EncryptionTool;
@@ -111,7 +114,7 @@ public class KeyManagerImpl implements KeyManager
                 savePublicKeyRing( getOwnerKeyIdx(), SecurityKeyType.PeerOwnerKey.getId(), ownerPeerPubRing );
 
                 //************************************************************
-                saveKeyTrustData(ownerPeerFPrint,peerId,KeyTrustLevel.Full.getId() );
+                saveKeyTrustData( ownerPeerFPrint, peerId, KeyTrustLevel.Full.getId() );
                 //************************************************************
 
                 //************************************************************
@@ -166,8 +169,7 @@ public class KeyManagerImpl implements KeyManager
         {
             String sigId = PGPKeyUtil.encodeNumericKeyId( targetPubRing.getPublicKey().getKeyID() );
 
-            targetPubRing =
-                    encryptionTool.signPublicKey( targetPubRing, sigId, sourceSecRing.getSecretKey(), "" );
+            targetPubRing = encryptionTool.signPublicKey( targetPubRing, sigId, sourceSecRing.getSecretKey(), "" );
         }
         catch ( Exception ex )
         {
@@ -218,16 +220,17 @@ public class KeyManagerImpl implements KeyManager
      *
      */
     @Override
-    public PGPPublicKeyRing setKeyTrust( PGPSecretKeyRing sourceSecRing, PGPPublicKeyRing targetPubRing, int trustLevel )
+    public PGPPublicKeyRing setKeyTrust( PGPSecretKeyRing sourceSecRing, PGPPublicKeyRing targetPubRing,
+                                         int trustLevel )
     {
-        String sFingerprint = PGPKeyUtil.getFingerprint( sourceSecRing.getPublicKey().getFingerprint());
-        String tFingerprint = PGPKeyUtil.getFingerprint( targetPubRing.getPublicKey().getFingerprint());
+        String sFingerprint = PGPKeyUtil.getFingerprint( sourceSecRing.getPublicKey().getFingerprint() );
+        String tFingerprint = PGPKeyUtil.getFingerprint( targetPubRing.getPublicKey().getFingerprint() );
 
         SecurityKeyTrust keyTrust = securityDataService.getKeyTrustData( sFingerprint, tFingerprint );
 
         try
         {
-            if(keyTrust == null)
+            if ( keyTrust == null )
             {
                 keyTrust = saveKeyTrustData( sFingerprint, tFingerprint, KeyTrustLevel.Never.getId() );
             }
@@ -235,22 +238,21 @@ public class KeyManagerImpl implements KeyManager
             if ( trustLevel == KeyTrustLevel.Never.getId() )
             {
                 //******************************************
-                targetPubRing = removeSignature( sourceSecRing.getPublicKey() , targetPubRing );
+                targetPubRing = removeSignature( sourceSecRing.getPublicKey(), targetPubRing );
                 updatePublicKeyRing( targetPubRing );
                 //******************************************
             }
             else
             {
-                if(keyTrust.getLevel() == KeyTrustLevel.Never.getId())
+                if ( keyTrust.getLevel() == KeyTrustLevel.Never.getId() )
                 {
-                    targetPubRing = signKey( sourceSecRing, targetPubRing, trustLevel);
+                    targetPubRing = signKey( sourceSecRing, targetPubRing, trustLevel );
                     updatePublicKeyRing( targetPubRing );
                 }
             }
 
             keyTrust.setLevel( trustLevel );
             securityDataService.updateKeyTrustData( keyTrust );
-
         }
         catch ( Exception ex )
         {
@@ -271,7 +273,38 @@ public class KeyManagerImpl implements KeyManager
         PGPPublicKeyRing targetPubRing = getPublicKeyRingByFingerprint( targetFingerprint );
 
         return setKeyTrust( sourceSecRing, targetPubRing, trustLevel );
+    }
 
+
+    @Override
+    public PGPPublicKeyRing setKeyTrust( final String sourceFingerprint, final String targetFingerprint,
+                                         final String encryptedMessage ) throws PGPException
+    {
+        //        byte[] decrypted = encryptionTool
+        //                .decryptAndVerify( encryptedMessage.getBytes(), targetFingerprint, "12345678",
+        // sourceFingerprint );
+
+        byte[] decrypted = encryptionTool.decrypt( encryptedMessage.getBytes() );
+
+        try
+        {
+            String decryptedMessage = new String( decrypted, "UTF-8" );
+
+            // TODO trust message signature verification should be verified on message separately from signature
+            // since on client side primarily Object properties are set then serialized to JSON and signature is
+            // generated from this string and set as additional Object property. Finally Object serialized
+            // again to JSON with signature and encoded with recipient's (management's), and sent as trust message.
+            //
+            // trustMessage:
+            // { [ ( "I Fully trust myself to manage this Environment") signed by User] encrypted by Peer PubKey}
+
+            TrustMessage trustMessage = JsonUtil.fromJson( decryptedMessage, TrustMessage.class );
+        }
+        catch ( UnsupportedEncodingException e )
+        {
+            LOG.error( "Error converting byte array to string with UTF-8 format.", e );
+        }
+        return null;
     }
 
 
@@ -323,10 +356,10 @@ public class KeyManagerImpl implements KeyManager
     public boolean verifySignature( PGPPublicKeyRing sourcePubRing, PGPPublicKeyRing targetPubRing )
     {
         PGPPublicKey keyToVerifyWith = sourcePubRing.getPublicKey();
-        PGPPublicKey keyToVerify     = targetPubRing.getPublicKey();
-        String sigId = PGPKeyUtil.encodeNumericKeyId( keyToVerify.getKeyID());
+        PGPPublicKey keyToVerify = targetPubRing.getPublicKey();
+        String sigId = PGPKeyUtil.encodeNumericKeyId( keyToVerify.getKeyID() );
 
-        return encryptionTool.verifyPublicKey( keyToVerify, sigId , keyToVerifyWith );
+        return encryptionTool.verifyPublicKey( keyToVerify, sigId, keyToVerifyWith );
     }
 
 
@@ -989,6 +1022,7 @@ public class KeyManagerImpl implements KeyManager
         return secretKey;
     }
 
+
     /* ******************************************************************
      *
      */
@@ -997,9 +1031,9 @@ public class KeyManagerImpl implements KeyManager
     {
         try
         {
-            SecretKeyStore secData = securityDataService.getSecretKeyData( fingerprint  );
+            SecretKeyStore secData = securityDataService.getSecretKeyData( fingerprint );
 
-            if(secData !=null)
+            if ( secData != null )
             {
                 return PGPKeyUtil.readSecretKeyRing( secData.getData() );
             }

@@ -29,6 +29,7 @@ public class SecurityDataServiceImpl implements SecurityDataService
     private SecretKeyStoreDAO secretKeyStoreDAO = null;
     private SecurityKeyTrustDAO securityKeyTrustDAO = null;
     private SecurityKeyDAO securityKeyDAO = null;
+    private TrustRelationDAO trustRelationDAO = null;
 
 
     /******************************************
@@ -40,6 +41,7 @@ public class SecurityDataServiceImpl implements SecurityDataService
         this.secretKeyStoreDAO = new SecretKeyStoreDAO( daoManager );
         this.securityKeyTrustDAO = new SecurityKeyTrustDAO( daoManager );
         this.securityKeyDAO = new SecurityKeyDAO( daoManager );
+        this.trustRelationDAO = new TrustRelationDAO( daoManager );
     }
 
 
@@ -115,6 +117,8 @@ public class SecurityDataServiceImpl implements SecurityDataService
 
 
     // ********** Secret Key Store ***************
+
+
     /******************************************
      *
      */
@@ -228,6 +232,7 @@ public class SecurityDataServiceImpl implements SecurityDataService
         securityKeyTrustDAO.removeBySourceId( sourceFingerprint );
     }
 
+
     /******************************************
      *
      */
@@ -262,7 +267,7 @@ public class SecurityDataServiceImpl implements SecurityDataService
      *
      */
     @Override
-    public SecurityKeyTrust getKeyTrustData( String sourceFingerprint, String targetFingerprint)
+    public SecurityKeyTrust getKeyTrustData( String sourceFingerprint, String targetFingerprint )
     {
         return securityKeyTrustDAO.findBySourceId( sourceFingerprint, targetFingerprint );
     }
@@ -272,7 +277,7 @@ public class SecurityDataServiceImpl implements SecurityDataService
      *
      */
     @Override
-    public List<SecurityKeyTrust> getKeyTrustData( String sourceFingerprint)
+    public List<SecurityKeyTrust> getKeyTrustData( String sourceFingerprint )
     {
         return securityKeyTrustDAO.findBySourceId( sourceFingerprint );
     }
