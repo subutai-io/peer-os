@@ -190,22 +190,22 @@ public class DefSubutaiStepsThen {
         subutaiSteps.seeSelectMenuResourceHosts();
     }
 
-    @Then("the user should observes output of the command")
+    @Then("the user should observe output of the command")
     public void see_output_of_the_test_command(){
         subutaiSteps.seeOutputOfTestCommand();
     }
 
-    @Then("the user should observes output of the command three received")
+    @Then("the user should observe output of the command three received")
     public void see_output_of_the_test_command_thre_receved(){
         subutaiSteps.seeOutputOfTestCommandThreeReceived();
     }
 
-    @Then("the user should observes public Key of the resource host in GPG Armored text")
+    @Then("the user should observe public Key of the resource host in GPG Armored text")
     public void see_resource_host_pgp_header(){
         subutaiSteps.seePGP();
     }
 
-    @Then("the user should observes public Key of the container in GPG Armored text")
+    @Then("the user should observe public Key of the container in GPG Armored text")
     public void see_container_pgp_header(){
         subutaiSteps.seePGP();
     }
@@ -222,17 +222,17 @@ public class DefSubutaiStepsThen {
         subutaiSteps.seeButtonStop();
     }
 
-    @Then("the user should observes output of the pwd command")
+    @Then("the user should observe output of the pwd command")
     public void user_observes_output_of_pwd_command(){
         subutaiSteps.seeOutputOfPwdCommand();
     }
 
-    @Then("the user should observes output of the ping command")
+    @Then("the user should observe output of the ping command")
     public void user_observes_output_of_ping_command(){
         subutaiSteps.seeOutputOfPingCommand();
     }
 
-    @Then("the user should observes output of the wrong ping command")
+    @Then("the user should observe output of the wrong ping command")
     public void user_observes_output_of_wrong_ping_command(){
         subutaiSteps.seeOutputOfWrongPingCommand();
     }
@@ -297,7 +297,7 @@ public class DefSubutaiStepsThen {
         subutaiSteps.seeEmptyInputDomain();
     }
 
-    @Then("the user should observes success message")
+    @Then("the user should observe success message")
     public void see_success_message(){
         subutaiSteps.seeHeaderSuccess();
     }
@@ -333,7 +333,7 @@ public class DefSubutaiStepsThen {
         subutaiSteps.seeContainerButtonStart();
     }
 
-    @Then("the user should not observes stopped container IP")
+    @Then("the user should not observe stopped container IP")
     public void should_not_observes_stopped_ip(){
         subutaiSteps.checkForOutOfIP();
     }
@@ -343,7 +343,7 @@ public class DefSubutaiStepsThen {
         subutaiSteps.seeCheckboxUncheck();
     }
 
-    @Then("the user should not observes disabled container IP")
+    @Then("the user should not observe disabled container IP")
     public void should_not_observes_disabled_ip(){
         subutaiSteps.checkForOutOfIP();
     }
@@ -353,24 +353,24 @@ public class DefSubutaiStepsThen {
         subutaiSteps.notSeeDomainName();
     }
 
-    @Then("the user should observes web page with container IP won't be available")
-    public void should_observes_page_not_found_message() {
+    @Then("the user should observe web page with container IP won't be available")
+    public void should_observe_page_not_found_message() {
         subutaiSteps.pageNotFoundMessage();
     }
 
-    @Then("the user should observes 'ng-login', 'ng-password'")
-    public void user_observes_ng_login_ng_password(){
+    @Then("the user should observe 'ng-login', 'ng-password'")
+    public void user_observe_ng_login_ng_password(){
         subutaiSteps.observeLogin();
         subutaiSteps.observePassword();
     }
 
-    @Then("the user should observes 'ng-create blueprint'")
+    @Then("the user should observe 'ng-create blueprint'")
     public void user_observes_ng_create_blueprint(){
         subutaiSteps.observeNgCreateBlueprint();
     }
 
     @Then("the user observes button 'ng-add', 'ng-remove'")
-    public void user_observes_ng_add_ng_remove(){
+    public void user_observe_ng_add_ng_remove(){
         subutaiSteps.observeNgAdd();
         subutaiSteps.observeNgRevove();
     }
@@ -408,7 +408,7 @@ public class DefSubutaiStepsThen {
         subutaiSteps.observeNgCreatePeer();
     }
 
-    @Then("the user should observes 'ng-click peer', 'ng-click environment'")
+    @Then("the user should observe 'ng-click peer', 'ng-click environment'")
     public void user_observes_ng_peer_ng_environment(){
         subutaiSteps.observeNgPeerMonitoring();
         subutaiSteps.observeNgEnvironmentMonitoring();
@@ -437,8 +437,8 @@ public class DefSubutaiStepsThen {
         subutaiSteps.getWeightOfWeight1Weight2Weight3();
     }
 
-    @Then("the user should observes that Web UI is less than 10Mb")
-    public void user_observes_that_web_ui_less_than_10mb(){
+    @Then("the user should observe that Web UI is less than 10Mb")
+    public void user_observe_that_web_ui_less_than_10mb(){
         subutaiSteps.observeWebUiLessThan10Mb();
     }
 }
