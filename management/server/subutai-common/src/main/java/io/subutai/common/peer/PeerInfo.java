@@ -172,7 +172,7 @@ public class PeerInfo implements Serializable
 
     public void setPeerPolicy( final PeerPolicy peerPolicy )
     {
-        PeerPolicy oldPeerPolicy = getPeerPolicy( peerPolicy.getRemotePeerId() );
+        PeerPolicy oldPeerPolicy = getPeerPolicy( peerPolicy.getPeerId() );
         if ( oldPeerPolicy != null )
         {
             peerPolicies.remove( oldPeerPolicy );
@@ -210,7 +210,7 @@ public class PeerInfo implements Serializable
         }
         for ( PeerPolicy peerPolicy : peerPolicies )
         {
-            if ( peerPolicy.getRemotePeerId().compareTo( remotePeerId ) == 0 )
+            if ( peerPolicy.getPeerId().compareTo( remotePeerId ) == 0 )
             {
                 return peerPolicy;
             }

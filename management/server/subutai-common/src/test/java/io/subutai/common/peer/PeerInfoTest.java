@@ -11,10 +11,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import io.subutai.common.peer.PeerInfo;
-import io.subutai.common.peer.PeerPolicy;
-import io.subutai.common.peer.PeerStatus;
-
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
 
@@ -34,8 +30,8 @@ public class PeerInfoTest
     @Before
     public void setUp() throws Exception
     {
-        when( peerPolicy.getRemotePeerId() ).thenReturn( new UUID( 50, 50 ).toString() );
-        when( peerPolicy2.getRemotePeerId() ).thenReturn( UUID.randomUUID().toString() );
+        when( peerPolicy.getPeerId() ).thenReturn( new UUID( 50, 50 ).toString() );
+        when( peerPolicy2.getPeerId() ).thenReturn( UUID.randomUUID().toString() );
 
         Set<PeerPolicy> mySet = new HashSet<>();
         mySet.add( peerPolicy );
