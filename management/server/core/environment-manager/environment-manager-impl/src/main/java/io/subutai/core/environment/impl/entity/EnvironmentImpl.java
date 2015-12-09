@@ -37,7 +37,8 @@ import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.PeerConf;
-import io.subutai.common.environment.Topology;
+import io.subutai.common.peer.AlertHandlerPriority;
+import io.subutai.common.peer.EnvironmentAlertHandler;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
@@ -115,6 +116,10 @@ public class EnvironmentImpl implements Environment, Serializable
 
     @Column( name = "user_id" )
     private Long userId;
+
+    @OneToMany( mappedBy = "environment", fetch = FetchType.EAGER, targetEntity = EnvironmentAlertHandlerImpl.class,
+            cascade = CascadeType.ALL, orphanRemoval = true )
+    private Set<EnvironmentAlertHandler> alertHandlers = Sets.newHashSet();
 
     @Transient
     private EnvironmentId envId;
@@ -528,17 +533,6 @@ public class EnvironmentImpl implements Environment, Serializable
 
 
     @Override
-    public String toString()
-    {
-        return "EnvironmentImpl{" + "userId=" + userId + ", publicKey='" + publicKey + '\'' + ", status=" + status
-                + ", peerConfs=" + peerConfs + ", containers=" + containers + ", superNodePort=" + superNodePort
-                + ", superNode='" + superNode + '\'' + ", vni=" + vni + ", lastUsedIpIndex=" + lastUsedIpIndex
-                + ", subnetCidr='" + subnetCidr + '\'' + ", creationTimestamp=" + creationTimestamp + ", name='" + name
-                + '\'' + ", peerId='" + peerId + '\'' + ", environmentId='" + environmentId + '\'' + '}';
-    }
-
-
-    @Override
     public EnvironmentId getEnvironmentId()
     {
         if ( envId == null )
@@ -552,5 +546,61 @@ public class EnvironmentImpl implements Environment, Serializable
     public void setUserId( final Long userId )
     {
         this.userId = userId;
+    }
+
+
+    @Override
+    public Set<EnvironmentAlertHandler> getAlertHandlers()
+    {
+        return alertHandlers;
+    }
+
+
+    @Override
+    public void addAlertHandler( EnvironmentAlertHandler environmentAlertHandler )
+    {
+        if ( environmentAlertHandler == null )
+        {
+            throw new IllegalArgumentException( "Invalid alert handler id." );
+        }
+        EnvironmentAlertHandlerImpl handlerId =
+                new EnvironmentAlertHandlerImpl( environmentAlertHandler.getAlertHandlerId(),
+                        environmentAlertHandler.getAlertHandlerPriority() );
+        handlerId.setEnvironment( this );
+        alertHandlers.add( handlerId );
+    }
+
+
+    @Override
+    public void removeAlertHandler( EnvironmentAlertHandler environmentAlertHandler )
+    {
+        boolean result = alertHandlers.remove( environmentAlertHandler );
+    }
+
+
+    @Override
+    public String toString()
+    {
+        final StringBuffer sb = new StringBuffer( "EnvironmentImpl{" );
+        sb.append( "environmentId='" ).append( environmentId ).append( '\'' );
+        sb.append( ", version=" ).append( version );
+        sb.append( ", peerId='" ).append( peerId ).append( '\'' );
+        sb.append( ", name='" ).append( name ).append( '\'' );
+        sb.append( ", creationTimestamp=" ).append( creationTimestamp );
+        sb.append( ", subnetCidr='" ).append( subnetCidr ).append( '\'' );
+        sb.append( ", lastUsedIpIndex=" ).append( lastUsedIpIndex );
+        sb.append( ", vni=" ).append( vni );
+        sb.append( ", superNode='" ).append( superNode ).append( '\'' );
+        sb.append( ", superNodePort=" ).append( superNodePort );
+        sb.append( ", tunnelNetwork='" ).append( tunnelNetwork ).append( '\'' );
+        sb.append( ", containers=" ).append( containers );
+        sb.append( ", peerConfs=" ).append( peerConfs );
+        sb.append( ", status=" ).append( status );
+        sb.append( ", publicKey='" ).append( publicKey ).append( '\'' );
+        sb.append( ", userId=" ).append( userId );
+        sb.append( ", alertHandlers=" ).append( alertHandlers );
+        sb.append( ", envId=" ).append( envId );
+        sb.append( '}' );
+        return sb.toString();
     }
 }

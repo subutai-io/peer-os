@@ -8,8 +8,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentNotFoundException;
+import io.subutai.common.metric.ResourceHostMetric;
+import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.test.SystemOutRedirectTest;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.common.metric.ContainerHostMetric;
@@ -25,29 +28,28 @@ import static org.mockito.Mockito.when;
 
 
 /**
- * Test for ContainerHostMetricsCommand
+ * Test for MetricListCommand
  */
 @RunWith( MockitoJUnitRunner.class )
-public class HistoricalMetricsListCommandTest extends SystemOutRedirectTest
+public class MetricsListCommandTest extends SystemOutRedirectTest
 {
     @Mock
     Monitor monitor;
     @Mock
-    EnvironmentManager environmentManager;
-    private static final String ENVIRONMENT_ID = UUID.randomUUID().toString();
-    private static final String METRIC_TO_STRING = "metric";
-    private static final String ENVIRONMENT_NOT_FOUND_MSG = "Environment not found";
+    ResourceHostMetrics resourceHostMetrics;
+
+    private static final String METRIC_TO_STRING = "metrics";
     private MetricListCommand metricListCommand;
 
 
     @Before
     public void setUp() throws Exception
     {
-        Environment environment = mock( Environment.class );
-        ContainerHostMetric metric = mock( ContainerHostMetric.class );
+        ResourceHostMetric metric = mock( ResourceHostMetric.class );
         when( metric.toString() ).thenReturn( METRIC_TO_STRING );
-//        when( monitor.getContainerHostsMetrics( environment ) ).thenReturn( Sets.newHashSet( metric ) );
-        metricListCommand = new MetricListCommand( monitor);
+        when( resourceHostMetrics.getResources() ).thenReturn( Sets.newHashSet( metric ) );
+        when( monitor.getResourceHostMetrics() ).thenReturn( resourceHostMetrics );
+        metricListCommand = new MetricListCommand( monitor );
     }
 
 
@@ -57,6 +59,7 @@ public class HistoricalMetricsListCommandTest extends SystemOutRedirectTest
         new MetricListCommand( null );
     }
 
+
     @Test
     public void testDoExecute() throws Exception
     {
@@ -65,15 +68,4 @@ public class HistoricalMetricsListCommandTest extends SystemOutRedirectTest
         assertThat( getSysOut(), containsString( METRIC_TO_STRING ) );
     }
 
-//
-//    @Test
-//    public void testDoExecuteWithMissingEnvironment() throws Exception
-//    {
-//        doThrow( new EnvironmentNotFoundException( null ) ).when( environmentManager )
-//                                                           .loadEnvironment( ENVIRONMENT_ID );
-//
-//        metricListCommand.doExecute();
-//
-//        assertThat( getSysOut(), containsString( ENVIRONMENT_NOT_FOUND_MSG ) );
-//    }
 }
