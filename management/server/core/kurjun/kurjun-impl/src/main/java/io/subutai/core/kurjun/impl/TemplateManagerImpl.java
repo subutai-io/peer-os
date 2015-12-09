@@ -3,7 +3,10 @@ package io.subutai.core.kurjun.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetAddress;
+import java.net.SocketException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,6 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.commons.codec.binary.Hex;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.inject.Injector;
 
@@ -40,15 +44,11 @@ import ai.subut.kurjun.snap.SnapMetadataParserModule;
 import ai.subut.kurjun.storage.factory.FileStoreFactory;
 import ai.subut.kurjun.storage.factory.FileStoreModule;
 import ai.subut.kurjun.subutai.SubutaiTemplateParserModule;
-import com.google.common.base.Strings;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.settings.Common;
 import io.subutai.core.kurjun.api.TemplateManager;
-import java.net.InetAddress;
-import java.net.SocketException;
-import java.util.ArrayList;
 
 
 public class TemplateManagerImpl implements TemplateManager
@@ -128,8 +128,12 @@ public class TemplateManagerImpl implements TemplateManager
         DefaultTemplate meta = ( DefaultTemplate ) repo.getPackageInfo( m );
         if ( meta != null )
         {
-            return new TemplateKurjun( Hex.encodeHexString( meta.getMd5Sum() ), meta.getName(), meta.getVersion(),
-                    meta.getArchitecture().name(), meta.getParent(), meta.getPackage() );
+            TemplateKurjun template = new TemplateKurjun( Hex.encodeHexString( meta.getMd5Sum() ), meta.getName(),
+                                                          meta.getVersion(), meta.getArchitecture().name(),
+                                                          meta.getParent(), meta.getPackage() );
+            template.setConfigContents( meta.getConfigContents() );
+            template.setPackagesContents( meta.getPackagesContents() );
+            return template;
         }
         return null;
     }
@@ -147,8 +151,12 @@ public class TemplateManagerImpl implements TemplateManager
         DefaultTemplate meta = ( DefaultTemplate ) repo.getPackageInfo( m );
         if ( meta != null )
         {
-            return new TemplateKurjun( Hex.encodeHexString( meta.getMd5Sum() ), meta.getName(), meta.getVersion(),
-                    meta.getArchitecture().name(), meta.getParent(), meta.getPackage() );
+            TemplateKurjun template = new TemplateKurjun( Hex.encodeHexString( meta.getMd5Sum() ), meta.getName(),
+                                                          meta.getVersion(), meta.getArchitecture().name(),
+                                                          meta.getParent(), meta.getPackage() );
+            template.setConfigContents( meta.getConfigContents() );
+            template.setPackagesContents( meta.getPackagesContents() );
+            return template;
         }
         return null;
     }
@@ -215,8 +223,12 @@ public class TemplateManagerImpl implements TemplateManager
         for ( SerializableMetadata item : items )
         {
             DefaultTemplate meta = ( DefaultTemplate ) item;
-            result.add( new TemplateKurjun( Hex.encodeHexString( meta.getMd5Sum() ), meta.getName(), meta.getVersion(),
-                    meta.getArchitecture().name(), meta.getParent(), meta.getPackage() ) );
+            TemplateKurjun t = new TemplateKurjun( Hex.encodeHexString( meta.getMd5Sum() ), meta.getName(),
+                                                   meta.getVersion(), meta.getArchitecture().name(), meta.getParent(),
+                                                   meta.getPackage() );
+            t.setConfigContents( meta.getConfigContents() );
+            t.setPackagesContents( meta.getPackagesContents() );
+            result.add( t );
         }
         return result;
     }

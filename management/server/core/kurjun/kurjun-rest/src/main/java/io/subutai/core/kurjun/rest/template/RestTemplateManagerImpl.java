@@ -1,15 +1,13 @@
 package io.subutai.core.kurjun.rest.template;
 
 
-import ai.subut.kurjun.metadata.common.subutai.DefaultTemplate;
-import ai.subut.kurjun.model.metadata.Architecture;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
 
@@ -20,11 +18,14 @@ import org.apache.commons.io.FileUtils;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.geronimo.mail.util.Hex;
 
-import io.subutai.core.kurjun.api.TemplateManager;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import ai.subut.kurjun.metadata.common.subutai.DefaultTemplate;
+import ai.subut.kurjun.model.metadata.Architecture;
 import io.subutai.common.protocol.TemplateKurjun;
+import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.kurjun.rest.RestManagerBase;
-import java.util.List;
-import java.util.stream.Collectors;
 
 
 public class RestTemplateManagerImpl extends RestManagerBase implements RestTemplateManager
@@ -205,6 +206,8 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
         defaultTemplate.setArchitecture( Architecture.getByValue( template.getArchitecture() ) );
         defaultTemplate.setParent( template.getParent() );
         defaultTemplate.setPackage( template.getPackageName() );
+        defaultTemplate.setConfigContents( template.getConfigContents() );
+        defaultTemplate.setPackagesContents( template.getPackagesContents() );
         return defaultTemplate;
     }
 
