@@ -122,7 +122,8 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
             List<TemplateKurjun> list = templateManager.list( repository, isKurjunClient );
             if ( list != null )
             {
-                List<DefaultTemplate> deflist = list.stream().map( t -> convertToDefaultTemplate( t ) ).collect( Collectors.toList() );
+                List<DefaultTemplate> deflist = list.stream().map( t -> convertToDefaultTemplate( t, false ) ).collect(
+                        Collectors.toList() );
                 return Response.ok( GSON.toJson( deflist ) ).build();
             }
         }
@@ -199,6 +200,12 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
 
     private DefaultTemplate convertToDefaultTemplate( TemplateKurjun template )
     {
+        return convertToDefaultTemplate( template, true );
+    }
+
+
+    private DefaultTemplate convertToDefaultTemplate( TemplateKurjun template, boolean includeFileContents )
+    {
         DefaultTemplate defaultTemplate = new DefaultTemplate();
         defaultTemplate.setName( template.getName() );
         defaultTemplate.setVersion( template.getVersion() );
@@ -206,8 +213,11 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
         defaultTemplate.setArchitecture( Architecture.getByValue( template.getArchitecture() ) );
         defaultTemplate.setParent( template.getParent() );
         defaultTemplate.setPackage( template.getPackageName() );
-        defaultTemplate.setConfigContents( template.getConfigContents() );
-        defaultTemplate.setPackagesContents( template.getPackagesContents() );
+        if ( includeFileContents )
+        {
+            defaultTemplate.setConfigContents( template.getConfigContents() );
+            defaultTemplate.setPackagesContents( template.getPackagesContents() );
+        }
         return defaultTemplate;
     }
 
