@@ -291,7 +291,7 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
     void setQuota( ContainerId containerId, ResourceType resourceType, ResourceValue resourceValue )
             throws PeerException;
 
-    void alert( AlertPack alert ) throws PeerException;
+    void alert( AlertEvent alert ) throws PeerException;
 
     HistoricalMetrics getHistoricalMetrics( String hostName, Date startTime, Date endTime ) throws PeerException;
 }
