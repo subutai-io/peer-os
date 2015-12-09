@@ -42,11 +42,11 @@ When the user clicks on the button: OK
 Then the user observes header: Success!
 And the user observes text: Your environment has been created.
 When the user clicks on the button: OK
-Then the user observe button 'ng-add', 'ng-remove'
+Then the user observes button 'ng-add', 'ng-remove'
 When the user clicks on the menu item: Containers
-Then the user observe 'ng-Environment selector', 'ng-Containers type selector'
+Then the user observes 'ng-Environment selector', 'ng-Containers type selector'
 When the user clicks on the menu item: Console
-Then the user observe 'ng-Peer', 'ng-Select peer'
+Then the user observes 'ng-Peer', 'ng-Select peer'
 When the user clicks on the menu item: User Identity
 When the user clicks on the menu item: User management
 Then the user observes button: 'ng-Add User'

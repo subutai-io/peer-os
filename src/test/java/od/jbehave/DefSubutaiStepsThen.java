@@ -184,7 +184,7 @@ public class DefSubutaiStepsThen {
     //------3023
 
 
-    @Then("the user observe console module UI with select menu of available resource hosts")
+    @Then("the user observes console module UI with select menu of available resource hosts")
     public void see_console_and_select_menu_resource_hosts(){
         subutaiSteps.seeConsole();
         subutaiSteps.seeSelectMenuResourceHosts();
@@ -292,7 +292,7 @@ public class DefSubutaiStepsThen {
         subutaiSteps.seeIconThreeContainers();
     }
 
-    @Then("the user observe empty Environment domain")
+    @Then("the user observes empty Environment domain")
     public void see_empty_environment_domain(){
         subutaiSteps.seeEmptyInputDomain();
     }
@@ -318,7 +318,7 @@ public class DefSubutaiStepsThen {
         subutaiSteps.seeCheckboxCheced();
     }
 
-    @Then("the user observe page with IP that received request appear")
+    @Then("the user observes page with IP that received request appear")
     public void see_container_ip_in_domain_page(){
         subutaiSteps.seeDomainContainerIP();
     }
@@ -369,20 +369,20 @@ public class DefSubutaiStepsThen {
         subutaiSteps.observeNgCreateBlueprint();
     }
 
-    @Then("the user observe button 'ng-add', 'ng-remove'")
+    @Then("the user observes button 'ng-add', 'ng-remove'")
     public void user_observe_ng_add_ng_remove(){
         subutaiSteps.observeNgAdd();
         subutaiSteps.observeNgRevove();
     }
 
-    @Then("the user observe 'ng-Environment selector', 'ng-Containers type selector'")
-    public void user_observe_ng_envi_ng_containers(){
+    @Then("the user observes 'ng-Environment selector', 'ng-Containers type selector'")
+    public void user_observes_ng_envi_ng_containers(){
         subutaiSteps.observeNgEnvironmentSelector();
         subutaiSteps.observeNgContainersSelector();
     }
 
-    @Then("the user observe 'ng-Peer', 'ng-Select peer'")
-    public void user_observe_ng_peer_ng_select_peer(){
+    @Then("the user observes 'ng-Peer', 'ng-Select peer'")
+    public void user_observes_ng_peer_ng_select_peer(){
         subutaiSteps.observeNgPeer();
         subutaiSteps.observeNgSelectPeer();
     }

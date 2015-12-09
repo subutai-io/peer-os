@@ -43,7 +43,7 @@ And the user observes text: Your environment has been created.
 Scenario: Read output of the command from RH in terminal
 Given the first user is on the home page of Subutai
 When the user clicks on console link
-Then the user observe console module UI with select menu of available resource hosts
+Then the user observes console module UI with select menu of available resource hosts
 When the user selects any available resource host from select menu
 And the user enters a command 'echo test' to Command field and press enter
 Then the user should observe output of the command
