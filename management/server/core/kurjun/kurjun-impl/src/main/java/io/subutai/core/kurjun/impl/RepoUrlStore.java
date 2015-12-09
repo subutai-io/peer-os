@@ -36,9 +36,9 @@ public class RepoUrlStore
     }
 
 
-    public void removeRemoteTemplateUrl( URL url ) throws IOException
+    public RepoUrl removeRemoteTemplateUrl( URL url ) throws IOException
     {
-        removeUrl( url, MAP_NAME_TEMPLATE );
+        return removeUrl( url, MAP_NAME_TEMPLATE );
     }
 
 
@@ -77,11 +77,11 @@ public class RepoUrlStore
     }
 
 
-    private void removeUrl( URL url, String mapName ) throws IOException
+    private RepoUrl removeUrl( URL url, String mapName ) throws IOException
     {
         try ( FileDb fileDb = new FileDb( repoFile ) )
         {
-            fileDb.remove( mapName, url.toString() );
+            return fileDb.remove( mapName, url.toString() );
         }
     }
 

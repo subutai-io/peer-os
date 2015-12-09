@@ -308,9 +308,16 @@ public class TemplateManagerImpl implements TemplateManager
         {
             try
             {
-                repoUrlStore.removeRemoteTemplateUrl( url );
+                RepoUrl r = repoUrlStore.removeRemoteTemplateUrl( url );
+                if ( r != null )
+                {
+                    LOGGER.info( "Remote template host url is removed: {}", url );
+                }
+                else
+                {
+                    LOGGER.warn( "Failed to remove remote host url: {}. Either it does not exist or it is a global url", url );
+                }
                 remoteRepoUrls = repoUrlStore.getRemoteTemplateUrls();
-                LOGGER.info( "Remote template host url is removed: {}", url );
             }
             catch ( IOException e )
             {
