@@ -1,6 +1,8 @@
 package io.subutai.core.security.api;
 
 
+import java.util.Map;
+
 import io.subutai.core.security.api.crypto.CertificateManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
@@ -38,4 +40,6 @@ public interface SecurityManager
     public CertificateManager getCertificateManager();
 
     public HttpContextManager getHttpContextManager();
+
+    void createTrustRelationship( Map<String, String> relationshipProp );
 }

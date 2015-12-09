@@ -21,6 +21,7 @@ import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.dao.DaoManager;
@@ -1364,7 +1365,29 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         EnvironmentImpl environment =
                 new EnvironmentImpl( name, subnetCidr, sshKey, getUserId(), peerManager.getLocalPeerInfo().getId() );
 
+        User activeUser = identityManager.getActiveUser();
+        //TODO set trust instead of setting explicit user
         environment.setUserId( identityManager.getActiveUser().getId() );
+
+        Map<String, String> trustRelationship = Maps.newHashMap();
+        trustRelationship.put( "sourceId", String.valueOf( activeUser.getId() ) );
+        trustRelationship.put( "sourceClass", activeUser.getClass().getSimpleName() );
+
+        trustRelationship.put( "targetId", String.valueOf( activeUser.getId() ) );
+        trustRelationship.put( "targetClass", activeUser.getClass().getSimpleName() );
+
+        trustRelationship.put( "objectId", environment.getId() );
+        trustRelationship.put( "objectClass", environment.getClass().getSimpleName() );
+
+        trustRelationship.put( "trustLevel", "Full" );
+        trustRelationship.put( "scope", "Read" );
+        trustRelationship.put( "action", "Allowed" );
+        trustRelationship.put( "ttl", "" );
+        trustRelationship.put( "type", "Environment" );
+
+        securityManager.createTrustRelationship( trustRelationship );
+
+
         environment = saveOrUpdate( environment );
 
         setEnvironmentTransientFields( environment );

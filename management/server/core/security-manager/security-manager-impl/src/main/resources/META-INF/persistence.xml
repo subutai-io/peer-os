@@ -10,6 +10,9 @@
     <class>io.subutai.core.security.impl.model.SecurityKeyTrustEntity</class>
     <class>io.subutai.core.security.impl.model.SecurityKeyEntity</class>
     <class>io.subutai.core.security.impl.model.SecretKeyStoreEntity</class>
+    <class>io.subutai.core.security.impl.model.TrustItem</class>
+    <class>io.subutai.core.security.impl.model.TrustRelationship</class>
+    <class>io.subutai.core.security.impl.model.TrustRelation</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
       <property name="openjpa.Log" value="DefaultLevel=WARN, Tool=INFO" />

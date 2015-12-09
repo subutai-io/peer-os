@@ -1,6 +1,8 @@
 package io.subutai.core.security.impl;
 
 
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -218,4 +220,9 @@ public class SecurityManagerImpl implements SecurityManager
     }
 
 
+    @Override
+    public void createTrustRelationship( final Map<String, String> relationshipProp )
+    {
+        securityDataService.createTrustRelationship( relationshipProp );
+    }
 }

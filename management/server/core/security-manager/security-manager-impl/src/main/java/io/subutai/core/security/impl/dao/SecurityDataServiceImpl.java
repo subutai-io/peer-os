@@ -2,6 +2,7 @@ package io.subutai.core.security.impl.dao;
 
 
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +17,9 @@ import io.subutai.core.security.api.model.SecurityKeyTrust;
 import io.subutai.core.security.impl.model.SecretKeyStoreEntity;
 import io.subutai.core.security.impl.model.SecurityKeyEntity;
 import io.subutai.core.security.impl.model.SecurityKeyTrustEntity;
+import io.subutai.core.security.impl.model.TrustItem;
+import io.subutai.core.security.impl.model.TrustRelation;
+import io.subutai.core.security.impl.model.TrustRelationship;
 
 
 /**
@@ -280,5 +284,23 @@ public class SecurityDataServiceImpl implements SecurityDataService
     public List<SecurityKeyTrust> getKeyTrustData( String sourceFingerprint )
     {
         return securityKeyTrustDAO.findBySourceId( sourceFingerprint );
+    }
+
+
+    @Override
+    public void createTrustRelationship( final Map<String, String> relationshipProp )
+    {
+        TrustItem source = new TrustItem( relationshipProp.get( "sourceId" ), relationshipProp.get( "sourceClass" ) );
+        TrustItem target = new TrustItem( relationshipProp.get( "targetId" ), relationshipProp.get( "targetClass" ) );
+        TrustItem object = new TrustItem( relationshipProp.get( "objectId" ), relationshipProp.get( "objectClass" ) );
+
+        TrustRelationship trustRelationship =
+                new TrustRelationship( relationshipProp.get( "trustLevel" ), relationshipProp.get( "scope" ),
+                        relationshipProp.get( "action" ), relationshipProp.get( "ttl" ),
+                        relationshipProp.get( "type" ) );
+
+        TrustRelation trustRelation = new TrustRelation( source, target, object, trustRelationship );
+
+        trustRelationDAO.update( trustRelation );
     }
 }

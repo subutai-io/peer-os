@@ -2,6 +2,7 @@ package io.subutai.core.security.api.dao;
 
 
 import java.util.List;
+import java.util.Map;
 
 import io.subutai.core.security.api.model.SecretKeyStore;
 import io.subutai.core.security.api.model.SecurityKey;
@@ -108,4 +109,7 @@ public interface SecurityDataService
      *
      */
     List<SecurityKeyTrust> getKeyTrustData( String sourceId );
+
+
+    void createTrustRelationship( Map<String, String> relationshipProp );
 }
