@@ -43,10 +43,10 @@ And the user observes text: Your environment has been created.
 Scenario: Read output of the command from RH in terminal
 Given the first user is on the home page of Subutai
 When the user clicks on console link
-Then the user observes console module UI with select menu of available resource hosts
+Then the user observe console module UI with select menu of available resource hosts
 When the user selects any available resource host from select menu
 And the user enters a command 'echo test' to Command field and press enter
-Then the user should observes output of the command
+Then the user should observe output of the command
 
 Scenario: Read output of the command from Peer in terminal
 Given the first user is on the home page of Subutai
@@ -55,14 +55,14 @@ And the user clicks on link: environment on the console page
 And the user selects 'Local Environment' environment in select menu
 And the user selects container one in select menu
 And the user enters a command 'echo test' to Command field and press enter
-Then the user should observes output of the command
+Then the user should observe output of the command
 
 Scenario: Navigate to resource host pgp
 Given the first user is on the home page of Subutai
 When the user clicks on console link
 And the user selects any available resource host from select menu
 And the user gets resource host ID and go pgp key url
-Then the user should observes public Key of the resource host in GPG Armored text
+Then the user should observe public Key of the resource host in GPG Armored text
 
 Scenario: Navigate to resource host container
 Given the first user is on the home page of Subutai
@@ -71,7 +71,7 @@ And the user clicks on link: environment on the console page
 And the user selects 'Local Environment' environment in select menu
 And the user selects container one in select menu
 And the user gets container ID and go pgp key url
-Then the user should observes public Key of the container in GPG Armored text
+Then the user should observe public Key of the container in GPG Armored text
 
 Scenario: Destroy Environment and Blueprint
 Given the first user is on the home page of Subutai

@@ -78,7 +78,7 @@ And the user selects environment button on console
 And the user selects 'Cross peer Environment' environment in select menu
 And the user selects first container
 And the user enters console command: 'pwd'
-Then the user should observes output of the pwd command
+Then the user should observe output of the pwd command
 
 Scenario: the First user should Test Peer KeyServers
 Given the first user is on the home page of Subutai

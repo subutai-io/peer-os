@@ -79,10 +79,10 @@ And the user selects environment button on console
 And the user selects 'Cross peer Environment' environment in select menu
 And the user selects first container
 And the user enters console command ping
-Then the user should observes output of the ping command
+Then the user should observe output of the ping command
 When the user enters console command: 'ping 192.168.0.111 -c 3'
 And the user should waits
-Then the user should observes output of the ping command
+Then the user should observe output of the ping command
 
 Scenario: Destroy Cross Peer Environment and Blueprint
 Given the second user is on the home page of Subutai

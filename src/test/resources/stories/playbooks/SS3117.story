@@ -144,7 +144,7 @@ Then the user observes domain name empty to environment
 Scenario: 404 - page not found message appear
 Given the user is on subut.ai page
 When the user presses F5 several times
-Then the user should observes web page with container IP won't be available
+Then the user should observe web page with container IP won't be available
 
 Scenario: Destroy Environment and Blueprint
 Given the first user is on the home page of Subutai

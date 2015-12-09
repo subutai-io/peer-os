@@ -6,14 +6,14 @@ So that I can achieve a business goal
 
 Scenario: The user observe AngularJS elements
 Given the first user is on the home page of Subutai
-Then the user should observes 'ng-login', 'ng-password'
+Then the user should observe 'ng-login', 'ng-password'
 Given the user enters login and password: 'admin', 'secret'
 And the user clicks on the button: Login
 When the user clicks on the menu item: Monitoring
-Then the user should observes 'ng-click peer', 'ng-click environment'
+Then the user should observe 'ng-click peer', 'ng-click environment'
 When the user clicks on the menu item: Environment
 And the user clicks on the menu item: Blueprint
-Then the user should observes 'ng-create blueprint'
+Then the user should observe 'ng-create blueprint'
 When the user clicks on the button: Create Blueprint
 Then the user observes field: Enter blueprint name
 When the user enters blueprint name: 'Sample blueprint'
@@ -42,11 +42,11 @@ When the user clicks on the button: OK
 Then the user observes header: Success!
 And the user observes text: Your environment has been created.
 When the user clicks on the button: OK
-Then the user observes button 'ng-add', 'ng-remove'
+Then the user observe button 'ng-add', 'ng-remove'
 When the user clicks on the menu item: Containers
-Then the user observes 'ng-Environment selector', 'ng-Containers type selector'
+Then the user observe 'ng-Environment selector', 'ng-Containers type selector'
 When the user clicks on the menu item: Console
-Then the user observes 'ng-Peer', 'ng-Select peer'
+Then the user observe 'ng-Peer', 'ng-Select peer'
 When the user clicks on the menu item: User Identity
 When the user clicks on the menu item: User management
 Then the user observes button: 'ng-Add User'
@@ -69,7 +69,7 @@ When the user enters console command: 'clear'
 When the user enters console command: 'du -sh /apps/subutai-mng/current/deploy/webui-4.0.0-RC4.war'
 Then the user gets weight of Web UI .war
 And the user gets weight of all files
-And the user should observes that Web UI is less than 10Mb
+And the user should observe that Web UI is less than 10Mb
 
 Scenario: Destroy Environment and Blueprint
 Given the first user is on the home page of Subutai
