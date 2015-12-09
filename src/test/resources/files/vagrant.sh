@@ -5,7 +5,7 @@ echo "1. Create folder with command: "
 echo
 mkdir -p ~/vagrant/resource-host/
 echo
-echo "and go to this directory"
+echo "and go to this directory: "
 cd ~/vagrant/resource-host/
 
 echo
@@ -19,6 +19,10 @@ echo
 echo "3. Start your Resource Host box: vagrant up"
 echo
 vagrant up
+VBoxManage controlvm SubutaiRH poweroff
+VBoxManage modifyvm SubutaiRH --natdnshostresolver1 on
+VBoxManage startvm SubutaiRH --type headless
+sleep 20
 
 echo
 echo "4. Now import master template to offline resource host with command: vagrant exec sudo subutai import master"
@@ -81,10 +85,12 @@ VBoxManage startvm SubutaiMGMT --type headless"
 echo
 
 VBoxManage controlvm SubutaiMGMT poweroff
+VBoxManage modifyvm SubutaiMGMT --natdnshostresolver1 on
 VBoxManage modifyvm SubutaiMGMT --nic2 intnet --intnet2 intnetSnappy1  --nicpromisc2 allow-all --macaddress2 auto
 VBoxManage modifyvm SubutaiMGMT --natpf1 subutai,tcp,127.0.0.1,8888,,8443
 VBoxManage modifyvm SubutaiMGMT --natpf1 karaf,tcp,127.0.0.1,8889,,8101
 VBoxManage startvm SubutaiMGMT --type headless
+sleep 20
 
 echo
 echo "13. Edit management VM network settings:
@@ -97,8 +103,10 @@ VBoxManage controlvm SubutaiRH poweroff
 VBoxManage modifyvm SubutaiRH --nic1 intnet --intnet1 intnetSnappy1  --nicpromisc1 allow-all --macaddress1 auto
 VBoxManage startvm SubutaiRH --type  headless
 
+sleep 120
+
 echo "14. Login in karaf and approve requests: "
-cd ~/playbooks-newui/
-./node-approve 127.0.0.1 8888
+
+~/playbooks-newui/node-approve 127.0.0.1 8888
 
 echo "Continue run test on the Web UI of Management Host ... "
