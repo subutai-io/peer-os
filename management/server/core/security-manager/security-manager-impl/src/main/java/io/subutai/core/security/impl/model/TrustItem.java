@@ -11,16 +11,13 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 
 
 /**
  * Created by talas on 12/8/15.
  */
 @Entity
-@Table( name = "trust_item",
-        uniqueConstraints = @UniqueConstraint(
-                columnNames = { "unique_identifier", "class_path" } ) )
+@Table( name = "trust_item" )
 @Access( AccessType.FIELD )
 public class TrustItem implements Serializable
 {

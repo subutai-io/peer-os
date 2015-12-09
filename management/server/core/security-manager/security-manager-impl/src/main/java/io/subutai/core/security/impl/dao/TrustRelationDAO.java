@@ -4,7 +4,11 @@ package io.subutai.core.security.impl.dao;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.subutai.common.dao.DaoManager;
+import io.subutai.core.security.impl.model.TrustItem;
 import io.subutai.core.security.impl.model.TrustRelation;
 
 
@@ -13,6 +17,7 @@ import io.subutai.core.security.impl.model.TrustRelation;
  */
 public class TrustRelationDAO
 {
+    private static final Logger logger = LoggerFactory.getLogger( TrustRelationDAO.class );
     private DaoManager daoManager = null;
 
     //CRUD
@@ -57,6 +62,29 @@ public class TrustRelationDAO
         }
         catch ( Exception ex )
         {
+            logger.error( "Error persisting object", ex );
+            daoManager.rollBackTransaction( em );
+        }
+        finally
+        {
+            daoManager.closeEntityManager( em );
+        }
+    }
+
+
+    public void update( TrustItem trustItem )
+    {
+        EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
+
+        try
+        {
+            daoManager.startTransaction( em );
+            em.merge( trustItem );
+            daoManager.commitTransaction( em );
+        }
+        catch ( Exception ex )
+        {
+            logger.error( "Error persisting object", ex );
             daoManager.rollBackTransaction( em );
         }
         finally

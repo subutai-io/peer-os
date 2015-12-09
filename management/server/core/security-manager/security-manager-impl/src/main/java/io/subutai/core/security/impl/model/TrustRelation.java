@@ -12,7 +12,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 
@@ -30,19 +30,19 @@ public class TrustRelation implements Serializable
     private long id;
 
     @Column( name = "source_item" )
-    @OneToMany( cascade = CascadeType.ALL, fetch = FetchType.EAGER )
+    @OneToOne( cascade = CascadeType.ALL, fetch = FetchType.EAGER )
     private TrustItem source;
 
     @Column( name = "target_item" )
-    @OneToMany( cascade = CascadeType.ALL, fetch = FetchType.EAGER )
+    @OneToOne( cascade = CascadeType.ALL, fetch = FetchType.EAGER )
     private TrustItem target;
 
     @Column( name = "trust_object" )
-    @OneToMany( cascade = CascadeType.ALL, fetch = FetchType.EAGER )
+    @OneToOne( cascade = CascadeType.ALL, fetch = FetchType.EAGER )
     private TrustItem trustedObject;
 
     @Column( name = "relationship" )
-    @OneToMany( cascade = CascadeType.ALL, fetch = FetchType.EAGER )
+    @OneToOne( cascade = CascadeType.ALL, fetch = FetchType.EAGER )
     private TrustRelationship relationship;
 
 

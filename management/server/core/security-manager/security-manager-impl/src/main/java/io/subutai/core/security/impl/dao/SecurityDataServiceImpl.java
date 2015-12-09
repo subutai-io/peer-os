@@ -294,6 +294,10 @@ public class SecurityDataServiceImpl implements SecurityDataService
         TrustItem target = new TrustItem( relationshipProp.get( "targetId" ), relationshipProp.get( "targetClass" ) );
         TrustItem object = new TrustItem( relationshipProp.get( "objectId" ), relationshipProp.get( "objectClass" ) );
 
+        trustRelationDAO.update( source );
+        trustRelationDAO.update( target );
+        trustRelationDAO.update( object );
+
         TrustRelationship trustRelationship =
                 new TrustRelationship( relationshipProp.get( "trustLevel" ), relationshipProp.get( "scope" ),
                         relationshipProp.get( "action" ), relationshipProp.get( "ttl" ),
