@@ -34,7 +34,7 @@ public class DefSubutaiStepsGiven {
         subutaiSteps.open_mng_h_arm();
     }
 
-    @Given("the user enter login and password: '$login', '$password'")
+    @Given("the user enters login and password: '$login', '$password'")
     public void enter_login_and_password(String login, String password){
         subutaiSteps.inputLogin(login);
         subutaiSteps.inputPassword(password);
@@ -52,28 +52,28 @@ public class DefSubutaiStepsGiven {
         subutaiSteps.open_aws_mng_h2();
     }
 
-    @Given("the user click on the button: Login")
-    public void click_button_login(){
+    @Given("the user clicks on the button: Login")
+    public void clicks_button_login(){
         subutaiSteps.clickOnButtonLogin();
     }
 
     //-------3023
 
-    @Given("the user should observe blueprint header")
+    @Given("the user should observes blueprint header")
     public void see_blueprint_header(){
         subutaiSteps.seeHeaderBlueprint();
     }
 
     @Given("the vagrant user is on the home page of Subutai")
-    public void open_vagrant_mghost() throws FileNotFoundException {
+    public void opens_vagrant_mghost() throws FileNotFoundException {
         subutaiSteps.waitSleep(120000);
         subutaiSteps.open_vagrant_mgh();
     }
 
     //------3298
 
-    @Given("the user open pgp plugin")
-    public void open_pgp_plugin() throws FileNotFoundException {
+    @Given("the user opens pgp plugin")
+    public void opens_pgp_plugin() throws FileNotFoundException {
         subutaiSteps.open_mng_h1();
         subutaiSteps.run_bash_script("src/test/resources/files/pgpStart.sh");
     }
@@ -81,7 +81,7 @@ public class DefSubutaiStepsGiven {
     //-------3117
 
     @Given("the user is on subut.ai page")
-    public void open_subutai_local_page(){
+    public void opens_subutai_local_page(){
         subutaiSteps.open_local_subutai_page();
     }
 }
