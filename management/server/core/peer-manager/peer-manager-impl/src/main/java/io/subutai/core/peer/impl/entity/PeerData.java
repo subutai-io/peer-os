@@ -22,15 +22,24 @@ public class PeerData implements Serializable
     @Column( name = "id" )
     private String id;
 
+    @Column( name = "key_phrase" )
+    private String keyPhrase;
+
     @Lob
     @Column( name = "info" )
     private String info;
 
+    @Lob
+    @Column( name = "policy" )
+    private String policy;
 
-    public PeerData( final String id, final String info )
+
+    public PeerData( final String id, final String info, final String keyPhrase, final String policy )
     {
         this.id = id;
         this.info = info;
+        this.keyPhrase = keyPhrase;
+        this.policy = policy;
     }
 
 
@@ -55,5 +64,29 @@ public class PeerData implements Serializable
     public void setInfo( final String info )
     {
         this.info = info;
+    }
+
+
+    public String getKeyPhrase()
+    {
+        return keyPhrase;
+    }
+
+
+    public void setKeyPhrase( final String keyPhrase )
+    {
+        this.keyPhrase = keyPhrase;
+    }
+
+
+    public String getPolicy()
+    {
+        return policy;
+    }
+
+
+    public void setPolicy( final String policy )
+    {
+        this.policy = policy;
     }
 }

@@ -218,6 +218,7 @@ public class LocalPeerImplTest
         localPeer.exceptionUtil = exceptionUtil;
         localPeer.managementHost = managementHost;
         localPeer.requestListeners = Sets.newHashSet( requestListener );
+        localPeer.setPeerInfo( peerInfo );
 
         //        when( cpuQuota.getValue( MeasureUnit.PERCENT ).intValue() ).thenReturn( Integer.parseInt( CPUQUOTA
         // ) );

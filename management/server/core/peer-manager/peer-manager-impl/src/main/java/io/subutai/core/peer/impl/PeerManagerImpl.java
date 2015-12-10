@@ -8,6 +8,7 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
@@ -76,9 +77,11 @@ public class PeerManagerImpl implements PeerManager
     private List<PeerActionListener> peerActionListeners = new CopyOnWriteArrayList<>();
     private TemplateManager templateManager;
     private Map<String, Peer> peers = new ConcurrentHashMap<>();
+    private Map<String, PeerPolicy> policies = new ConcurrentHashMap<>();
     private ObjectMapper mapper = new ObjectMapper();
     private String externalIpInterface = DEFAULT_EXTERNAL_INTERFACE_NAME;
     private String localPeerId;
+    private RegistrationClient registrationClient;
 
 
     public PeerManagerImpl( final Messenger messenger, LocalPeer localPeer, DaoManager daoManager,
@@ -95,6 +98,7 @@ public class PeerManagerImpl implements PeerManager
         //todo expose CommandResponseListener as service "RequestListener" and inject here
         commandResponseListener = new CommandResponseListener();
         localPeer.addRequestListener( commandResponseListener );
+        registrationClient = new RegistrationClientImpl( provider );
     }
 
 
@@ -122,16 +126,18 @@ public class PeerManagerImpl implements PeerManager
                 localPeerInfo.setOwnerId( securityManager.getKeyManager().getOwnerId() );
                 localPeerInfo.setIp( getLocalPeerIp() );
                 localPeerInfo.setName( String.format( "Peer %s %s", localPeerId, getLocalPeerIp() ) );
-                PeerPolicy peerPolicy = getDefaultPeerPolicy( localPeerId );
-                localPeerInfo.setGrantedPolicy( peerPolicy );
+                PeerPolicy policy = getDefaultPeerPolicy( localPeerId );
 
-                updatePeerInfo( localPeerInfo );
+                PeerData peerData =
+                        new PeerData( localPeerInfo.getId(), toJson( localPeerInfo ), "", toJson( policy ) );
+
+                updatePeerData( peerData );
             }
 
             for ( PeerData peerData : this.peerDataService.getAll() )
             {
-                PeerInfo peerInfo = mapper.readValue( peerData.getInfo(), PeerInfo.class );
-                Peer peer = createPeer( peerInfo );
+                //                PeerInfo peerInfo = mapper.readValue( peerData.getInfo(), PeerInfo.class );
+                Peer peer = createPeer( peerData );
                 addPeer( peer );
             }
         }
@@ -233,20 +239,19 @@ public class PeerManagerImpl implements PeerManager
                                    decryptedCert );
             securityManager.getHttpContextManager().reloadKeyStore();
 
-            registrationData.getPeerInfo().setKeyPhrase( keyPhrase );
-            Peer newPeer = createPeer( registrationData.getPeerInfo() );
+            PeerPolicy policy = getDefaultPeerPolicy( registrationData.getPeerInfo().getId() );
 
-            updatePeerInfo( newPeer.getPeerInfo() );
-            //            peerDAO.saveInfo( SOURCE_REMOTE_PEER, registrationData.getPeerInfo().getId(),
-            //                    registrationData.getPeerInfo() );
+            PeerData peerData =
+                    new PeerData( registrationData.getPeerInfo().getId(), toJson( registrationData.getPeerInfo() ),
+                            keyPhrase, toJson( policy ) );
+            updatePeerData( peerData );
+
+            Peer newPeer = createPeer( peerData );
 
             addPeer( newPeer );
 
-
-            //            ManagementHost mgmHost = getLocalPeer().getManagementHost();
             try
             {
-                //                mgmHost.addRepository( registrationData.getPeerInfo().getIp() );
                 templateManager.addRemoteRepository( new URL(
                         String.format( KURJUN_URL_PATTERN, registrationData.getPeerInfo().getIp(),
                                 ChannelSettings.SECURE_PORT_X1 ) ) );
@@ -264,9 +269,15 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    private PeerData createPeerData( final String id, final PeerInfo info ) throws IOException
+    private <T> T fromJson( String value, Class<T> type ) throws IOException
     {
-        return new PeerData( id, mapper.writerWithDefaultPrettyPrinter().writeValueAsString( info ) );
+        return mapper.readValue( value, type );
+    }
+
+
+    private String toJson( Object value ) throws IOException
+    {
+        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString( value );
     }
 
 
@@ -282,56 +293,61 @@ public class PeerManagerImpl implements PeerManager
 
     private void removePeer( String id )
     {
-        this.peerDataService.remove( id );
+        this.peers.remove( id );
     }
 
 
-    private void updatePeerInfo( final PeerInfo peerInfo ) throws PeerException
+    private PeerData loadPeerData( final String id )
     {
-        if ( peerInfo == null )
-        {
-            throw new IllegalArgumentException( "Peer info could not be null." );
-        }
-        try
-        {
-            PeerData peerData = createPeerData( peerInfo.getId(), peerInfo );
-            this.peerDataService.saveOrUpdate( peerData );
-        }
-        catch ( IOException e )
-        {
-            LOG.error( e.getMessage(), e );
-            throw new PeerException( "Could not add peer." );
-        }
+        return peerDataService.find( id );
     }
 
 
-    private void removePeerInfo( String id )
+    private void updatePeerData( final PeerData peerData ) throws PeerException
+    {
+        if ( peerData == null )
+        {
+            throw new IllegalArgumentException( "Peer data could not be null." );
+        }
+        this.peerDataService.saveOrUpdate( peerData );
+    }
+
+
+    private void removePeerData( String id )
     {
         this.peerDataService.remove( id );
     }
 
 
     /**
-     * Creates the peer instance by provided peer info
+     * Creates the peer instance by provided peer data
      *
-     * @param peerInfo peer info
+     * @param peerData peer data
      *
      * @return peer instance
      */
-    private Peer createPeer( final PeerInfo peerInfo )
+    private Peer createPeer( final PeerData peerData ) throws PeerException
     {
-        if ( peerInfo == null )
+        if ( peerData == null )
         {
             throw new IllegalArgumentException( "Peer info could not be null." );
         }
-        if ( localPeerId.equals( peerInfo.getId() ) )
+        try
         {
-            localPeer.setPeerInfo( peerInfo );
-            return localPeer;
-        }
+            PeerInfo peerInfo = fromJson( peerData.getInfo(), PeerInfo.class );
+            if ( localPeerId.equals( peerData.getId() ) )
+            {
+                localPeer.setPeerInfo( peerInfo );
+                return localPeer;
+            }
 
-        return new RemotePeerImpl( localPeerId, securityManager, peerInfo, messenger, commandResponseListener,
-                messageResponseListener, provider );
+            return new RemotePeerImpl( localPeerId, securityManager, peerInfo, messenger, commandResponseListener,
+                    messageResponseListener, provider );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Could not create peer instance.", e );
+        }
     }
 
 
@@ -373,7 +389,7 @@ public class PeerManagerImpl implements PeerManager
             // ignore
         }
         //        return peerDAO.deleteInfo( SOURCE_REMOTE_PEER, p.getId() );
-        removePeerInfo( registrationData.getPeerInfo().getId() );
+        removePeerData( registrationData.getPeerInfo().getId() );
         removePeer( registrationData.getPeerInfo().getId() );
     }
 
@@ -424,6 +440,26 @@ public class PeerManagerImpl implements PeerManager
 
         return new ArrayList<>( this.peers.values() );
     }
+
+
+    private List<PeerPolicy> getPolicies()
+    {
+        List<PeerPolicy> result = new ArrayList<>();
+        for ( PeerData peerData : peerDataService.getAll() )
+        {
+            try
+            {
+                PeerPolicy peerPolicy = fromJson( peerData.getPolicy(), PeerPolicy.class );
+                result.add( peerPolicy );
+            }
+            catch ( IOException e )
+            {
+                //ignore
+            }
+        }
+        return result;
+    }
+
 
     //
     //    @Override
@@ -488,30 +524,31 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public void processUnregisterRequest( final RegistrationData registrationData ) throws PeerException
     {
+        // Check peer consumers. This remote peer is used?
         if ( !notifyPeerActionListeners(
                 new PeerAction( PeerActionType.UNREGISTER, registrationData.getPeerInfo().getId() ) ).succeeded() )
         {
             throw new PeerException( "Could not unregister peer. Peer in used." );
         }
-        PeerInfo p = getPeer( registrationData.getPeerInfo().getId() ).getPeerInfo();
+        Peer p = getPeer( registrationData.getPeerInfo().getId() );
         if ( p == null )
         {
-            LOG.warn( "Registration info not found for peer: " + registrationData.getPeerInfo().getId() );
+            LOG.warn( "Peer not found to unregister: " + registrationData.getPeerInfo().getId() );
             return;
         }
 
         Encrypted encryptedData = registrationData.getData();
         try
         {
-            final String keyPhrase = p.getKeyPhrase();
+            final String keyPhrase = loadPeerData( registrationData.getPeerInfo().getId() ).getKeyPhrase();
             byte[] decrypted = encryptedData.decrypt( SecurityUtilities.generateKey( keyPhrase.getBytes( "UTF-8" ) ) );
             if ( !keyPhrase.equals( new String( decrypted, "UTF-8" ) ) )
             {
                 throw new PeerException( "Could not unregister peer." );
             }
 
-            removeRequest( registrationData.getPeerInfo().getId() );
             unregister( registrationData );
+            removeRequest( registrationData.getPeerInfo().getId() );
         }
         catch ( Exception e )
         {
@@ -541,6 +578,10 @@ public class PeerManagerImpl implements PeerManager
     public void processApproveRequest( final RegistrationData registrationData ) throws PeerException
     {
         RegistrationData initRequest = getRequest( registrationData.getPeerInfo().getId() );
+        if ( initRequest == null )
+        {
+            throw new PeerException( "Registration request not found." );
+        }
         register( initRequest.getKeyPhrase(), registrationData );
         removeRequest( registrationData.getPeerInfo().getId() );
     }
@@ -586,6 +627,12 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
+    protected PeerInfo getRemotePeerInfo( String destinationHost ) throws PeerException
+    {
+        return registrationClient.getPeerInfo( destinationHost );
+    }
+
+
     @RolesAllowed( { "Peer-Management|A|Write", "Peer-Management|A|Update" } )
     @Override
     public void doRegistrationRequest( final String destinationHost, final String keyPhrase ) throws PeerException
@@ -593,10 +640,17 @@ public class PeerManagerImpl implements PeerManager
         Preconditions.checkNotNull( destinationHost );
         Preconditions.checkNotNull( keyPhrase );
 
-        RegistrationClient registrationClient = new RegistrationClientImpl( provider );
+        PeerInfo peerInfo = getRemotePeerInfo( destinationHost );
 
-        RegistrationData result = registrationClient
-                .sendInitRequest( destinationHost, buildRegistrationData( keyPhrase, RegistrationStatus.REQUESTED ) );
+        if ( getRequest( peerInfo.getId() ) != null )
+        {
+            throw new PeerException( "Registration record already exists." );
+        }
+
+        final RegistrationData registrationData = buildRegistrationData( keyPhrase, RegistrationStatus.REQUESTED );
+
+
+        RegistrationData result = registrationClient.sendInitRequest( destinationHost, registrationData );
 
         result.setKeyPhrase( keyPhrase );
         addRequest( result );
@@ -607,7 +661,7 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public void doCancelRequest( final RegistrationData request ) throws PeerException
     {
-        RegistrationClient registrationClient = new RegistrationClientImpl( provider );
+        getRemotePeerInfo( request.getPeerInfo().getIp() );
 
         registrationClient.sendCancelRequest( request.getPeerInfo().getIp(),
                 buildRegistrationData( request.getKeyPhrase(), RegistrationStatus.CANCELLED ) );
@@ -620,7 +674,7 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public void doApproveRequest( final String keyPhrase, final RegistrationData request ) throws PeerException
     {
-        RegistrationClient registrationClient = new RegistrationClientImpl( provider );
+        getRemotePeerInfo( request.getPeerInfo().getIp() );
 
         registrationClient.sendApproveRequest( request.getPeerInfo().getIp(),
                 buildRegistrationData( keyPhrase, RegistrationStatus.APPROVED ) );
@@ -635,7 +689,7 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public void doRejectRequest( final RegistrationData request ) throws PeerException
     {
-        RegistrationClient registrationClient = new RegistrationClientImpl( provider );
+        getRemotePeerInfo( request.getPeerInfo().getIp() );
 
         registrationClient.sendRejectRequest( request.getPeerInfo().getIp(),
                 buildRegistrationData( request.getKeyPhrase(), RegistrationStatus.REJECTED ) );
@@ -648,10 +702,7 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public void doUnregisterRequest( final RegistrationData request ) throws PeerException
     {
-        if ( !getPeer( request.getPeerInfo().getId() ).isOnline() )
-        {
-            throw new PeerException( "Remote peer is offline at current moment. Please try it again later." );
-        }
+        getRemotePeerInfo( request.getPeerInfo().getIp() );
 
         if ( !notifyPeerActionListeners( new PeerAction( PeerActionType.UNREGISTER, request.getPeerInfo().getId() ) )
                 .succeeded() )
@@ -660,8 +711,9 @@ public class PeerManagerImpl implements PeerManager
         }
 
         RegistrationClient registrationClient = new RegistrationClientImpl( provider );
+        PeerData peerData = loadPeerData( request.getPeerInfo().getId() );
         registrationClient.sendUnregisterRequest( request.getPeerInfo().getIp(),
-                buildRegistrationData( request.getPeerInfo().getKeyPhrase(), RegistrationStatus.UNREGISTERED ) );
+                buildRegistrationData( peerData.getKeyPhrase(), RegistrationStatus.UNREGISTERED ) );
 
         unregister( request );
 
@@ -726,10 +778,8 @@ public class PeerManagerImpl implements PeerManager
         int networkUsageLimit = 100;
         int containerLimit = MAX_CONTAINER_LIMIT;
         int environmentLimit = MAX_ENVIRONMENT_LIMIT;
-        for ( Peer peer : getPeers() )
+        for ( PeerPolicy peerPolicy : getPolicies() )
         {
-            PeerInfo peerInfo = peer.getPeerInfo();
-            PeerPolicy peerPolicy = peerInfo.getGrantedPolicy();
             if ( peerPolicy != null )
             {
                 diskUsageLimit -= peerPolicy.getDiskUsageLimit();
@@ -755,6 +805,22 @@ public class PeerManagerImpl implements PeerManager
             // ignore
         }
         return result;
+    }
+
+
+    @Override
+    public PeerPolicy getPolicy( final String peerId )
+    {
+        try
+        {
+            PeerPolicy peerPolicy = fromJson( peerDataService.find( peerId ).getPolicy(), PeerPolicy.class );
+            return peerPolicy;
+        }
+        catch ( IOException e )
+        {
+            // ignore
+        }
+        return null;
     }
 
 
@@ -786,11 +852,21 @@ public class PeerManagerImpl implements PeerManager
             throw new PeerException( "Invalid policy: " + e.getMessage(), e );
         }
 
-        PeerInfo peerInfo = peer.getPeerInfo();
 
-        peerInfo.setGrantedPolicy( peerPolicy );
+        PeerData peerData = loadPeerData( peerId );
 
-        updatePeerInfo( peerInfo );
+        if ( peerData != null )
+        {
+            try
+            {
+                peerData.setPolicy( toJson( peerPolicy ) );
+                updatePeerData( peerData );
+            }
+            catch ( IOException e )
+            {
+                LOG.error( e.getMessage(), e );
+            }
+        }
     }
 
 

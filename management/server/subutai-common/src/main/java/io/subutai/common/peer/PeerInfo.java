@@ -2,11 +2,8 @@ package io.subutai.common.peer;
 
 
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import io.subutai.common.settings.ChannelSettings;
@@ -29,14 +26,14 @@ public class PeerInfo implements Serializable
 //    @JsonProperty
 //    private String gatewayIp;
 //
-    @JsonProperty
-    private String keyPhrase = "";
+//    @JsonProperty
+//    private String keyPhrase = "";
 
-    @JsonProperty
-    private PeerStatus status;
+//    @JsonProperty
+    //    private PeerStatus status;
 
-    @JsonProperty
-    private PeerPolicy grantedPolicy;
+//    @JsonProperty
+//    private PeerPolicy grantedPolicy;
 
     @JsonProperty
     private String name;
@@ -117,16 +114,16 @@ public class PeerInfo implements Serializable
 //    }
 
 
-    public PeerStatus getStatus()
-    {
-        return status;
-    }
+//    public PeerStatus getStatus()
+//    {
+//        return status;
+//    }
+//
 
-
-    public void setStatus( final PeerStatus status )
-    {
-        this.status = status;
-    }
+//    public void setStatus( final PeerStatus status )
+//    {
+//        this.status = status;
+//    }
 
 
     public int getPort()
@@ -158,29 +155,29 @@ public class PeerInfo implements Serializable
 //        this.keyId = keyId;
 //    }
 //
+//
+//    public String getKeyPhrase()
+//    {
+//        return keyPhrase;
+//    }
+//
+//
+//    public void setKeyPhrase( final String keyPhrase )
+//    {
+//        this.keyPhrase = keyPhrase;
+//    }
 
-    public String getKeyPhrase()
-    {
-        return keyPhrase;
-    }
-
-
-    public void setKeyPhrase( final String keyPhrase )
-    {
-        this.keyPhrase = keyPhrase;
-    }
-
-
-    public PeerPolicy getGrantedPolicy()
-    {
-        return grantedPolicy;
-    }
-
-
-    public void setGrantedPolicy( final PeerPolicy grantedPolicy )
-    {
-        this.grantedPolicy = grantedPolicy;
-    }
+//
+//    public PeerPolicy getGrantedPolicy()
+//    {
+//        return grantedPolicy;
+//    }
+//
+//
+//    public void setGrantedPolicy( final PeerPolicy grantedPolicy )
+//    {
+//        this.grantedPolicy = grantedPolicy;
+//    }
 
 
     @Override
@@ -227,7 +224,7 @@ public class PeerInfo implements Serializable
         final StringBuffer sb = new StringBuffer( "PeerInfo{" );
         sb.append( "ip='" ).append( ip ).append( '\'' );
 //        sb.append( ", gatewayIp='" ).append( gatewayIp ).append( '\'' );
-        sb.append( ", status=" ).append( status );
+//        sb.append( ", status=" ).append( status );
         //        sb.append( ", peerPolicies=" ).append( peerPolicies );
         sb.append( ", name='" ).append( name ).append( '\'' );
         sb.append( ", id=" ).append( id );

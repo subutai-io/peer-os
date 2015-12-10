@@ -2,6 +2,7 @@ package io.subutai.core.peer.api;
 
 
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.RegistrationData;
 
 
@@ -10,6 +11,7 @@ import io.subutai.common.peer.RegistrationData;
  */
 public interface RegistrationClient
 {
+    PeerInfo getPeerInfo( String destinationHost ) throws PeerException;
 
     RegistrationData sendInitRequest( String destinationHost, RegistrationData registrationData ) throws PeerException;
 

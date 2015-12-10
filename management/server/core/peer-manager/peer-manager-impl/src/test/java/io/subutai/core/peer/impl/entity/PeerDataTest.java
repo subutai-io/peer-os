@@ -14,7 +14,7 @@ public class PeerDataTest
     private static final String SOURCE = "source";
     private static final String INFO = "info";
 
-    PeerData peerData = new PeerData(ID, INFO);
+    PeerData peerData = new PeerData(ID, INFO,"","{}");
 
 
     @Test

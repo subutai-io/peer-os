@@ -7,6 +7,7 @@ import javax.ws.rs.core.Response;
 import org.apache.cxf.jaxrs.client.WebClient;
 
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.RegistrationData;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.peer.api.RegistrationClient;
@@ -29,6 +30,29 @@ public class RegistrationClientImpl implements RegistrationClient
 
 
     @Override
+    public PeerInfo getPeerInfo( final String destinationHost ) throws PeerException
+    {
+        WebClient client = restUtil.getTrustedWebClient( buildUrl( destinationHost, "/info" ), provider );
+
+        client.type( MediaType.APPLICATION_JSON );
+        client.accept( MediaType.APPLICATION_JSON );
+
+        Response response = client.get();
+
+        if ( response.getStatus() != Response.Status.OK.getStatusCode() )
+        {
+            throw new PeerException(
+                    String.format( "Remote peer '%s' unavailable at this moment. Please try again later.",
+                            destinationHost ) );
+        }
+        else
+        {
+            return response.readEntity( PeerInfo.class );
+        }
+    }
+
+
+    @Override
     public RegistrationData sendInitRequest( final String destinationHost, final RegistrationData registrationData )
             throws PeerException
     {
@@ -37,7 +61,12 @@ public class RegistrationClientImpl implements RegistrationClient
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
 
-        return client.post( registrationData, RegistrationData.class );
+        Response response = client.post( registrationData );
+        if ( response.getStatus() != Response.Status.OK.getStatusCode() )
+        {
+            throw new PeerException( "Remote error: " + response.readEntity( String.class ) );
+        }
+        return response.readEntity( RegistrationData.class );
     }
 
 
@@ -51,10 +80,10 @@ public class RegistrationClientImpl implements RegistrationClient
         client.accept( MediaType.APPLICATION_JSON );
 
         Response response = client.post( registrationData );
-        if ( response.getStatus() != Response.Status.NO_CONTENT.getStatusCode() )
+        if ( response.getStatus() != Response.Status.OK.getStatusCode() )
         {
             throw new PeerException(
-                    "Error on sending cancel registration request: " + response.getEntity().toString() );
+                    "Error on sending cancel registration request: " + response.readEntity( String.class ) );
         }
     }
 
@@ -69,10 +98,9 @@ public class RegistrationClientImpl implements RegistrationClient
         client.accept( MediaType.APPLICATION_JSON );
 
         Response response = client.post( registrationData );
-        if ( response.getStatus() != Response.Status.NO_CONTENT.getStatusCode() )
+        if ( response.getStatus() != Response.Status.OK.getStatusCode() )
         {
-            throw new PeerException(
-                    "Error on sending reject registration request: " + response.getEntity().toString() );
+            throw new PeerException( "Remote exception: " + response.readEntity( String.class ) );
         }
     }
 
@@ -87,9 +115,9 @@ public class RegistrationClientImpl implements RegistrationClient
         client.accept( MediaType.APPLICATION_JSON );
 
         Response response = client.post( registrationData );
-        if ( response.getStatus() != Response.Status.NO_CONTENT.getStatusCode() )
+        if ( response.getStatus() != Response.Status.OK.getStatusCode() )
         {
-            throw new PeerException( "Error on sending un-register request: " + response.readEntity( String.class ) );
+            throw new PeerException( "Remote exception: " + response.readEntity( String.class ) );
         }
     }
 
@@ -103,7 +131,11 @@ public class RegistrationClientImpl implements RegistrationClient
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
 
-        client.post( registrationData );
+        Response response = client.post( registrationData );
+        if ( response.getStatus() != Response.Status.OK.getStatusCode() )
+        {
+            throw new PeerException( "Remote exception: " + response.readEntity( String.class ) );
+        }
     }
 
 

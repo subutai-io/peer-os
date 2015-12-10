@@ -48,7 +48,7 @@ public class PeerInfoTest
 //        peerInfo.setPeerPolicy( peerPolicy );
 //        peerInfo.setPeerPolicies( mySet );
         peerInfo.setPort( 8252 );
-        peerInfo.setStatus( PeerStatus.APPROVED );
+//        peerInfo.setStatus( PeerStatus.APPROVED );
     }
 
 
@@ -60,7 +60,7 @@ public class PeerInfoTest
         assertNotNull( peerInfo.getOwnerId() );
         assertNotNull( peerInfo.getIp() );
 //        assertNotNull( peerInfo.getGatewayIp() );
-        assertNotNull( peerInfo.getStatus() );
+//        assertNotNull( peerInfo.getStatus() );
         assertNotNull( peerInfo.getPort() );
 //        assertNotNull( peerInfo.getLastUsedVlanId() );
 //        assertNotNull( peerInfo.getKeyId() );

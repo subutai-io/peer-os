@@ -38,7 +38,7 @@ public class PeerPolicyCommand extends SubutaiShellCommandSupport
 
         for ( Peer peer : peerManager.getPeers() )
         {
-            final PeerPolicy grantedPolicy = peer.getPeerInfo().getGrantedPolicy();
+            final PeerPolicy grantedPolicy = peerManager.getPolicy( peer.getId() );
             if ( grantedPolicy != null )
             {
                 objectMapper.writerWithDefaultPrettyPrinter().writeValue( w, grantedPolicy );
