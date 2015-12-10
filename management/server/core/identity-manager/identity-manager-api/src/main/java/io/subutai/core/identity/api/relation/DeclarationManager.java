@@ -1,4 +1,4 @@
-package io.subutai.core.drms.api;
+package io.subutai.core.identity.api.relation;
 
 
 /**
