@@ -46,13 +46,13 @@ import io.subutai.common.mdc.SubutaiExecutors;
 import io.subutai.common.metric.AlertValue;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.network.Gateway;
+import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.AlertHandler;
-import io.subutai.common.peer.EnvironmentAlertHandler;
 import io.subutai.common.peer.AlertHandlerPriority;
 import io.subutai.common.peer.AlertListener;
-import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerType;
+import io.subutai.common.peer.EnvironmentAlertHandler;
 import io.subutai.common.peer.EnvironmentAlertHandlers;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
@@ -824,7 +824,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         Set<Environment> environments = new HashSet<>();
         for ( Environment environment : environmentDataService.getAll() )
         {
-            if ( viewAll || environment.getUserId().equals( activeUser.getId() ) )
+            //TODO check for trust relation via security manager
+            boolean trustRelation = securityManager
+                    .isRelationValid( String.valueOf( activeUser.getId() ), activeUser.getClass().getSimpleName(),
+                            environment.getId(), environment.getClass().getSimpleName(),
+                            "action=Allowed\nscope=Read\ntype=Environment\ntrustLevel=Full" );
+
+            if ( viewAll || environment.getUserId().equals( activeUser.getId() ) || trustRelation )
             {
                 environments.add( environment );
 

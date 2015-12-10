@@ -7,6 +7,8 @@ import java.util.Map;
 import io.subutai.core.security.api.model.SecretKeyStore;
 import io.subutai.core.security.api.model.SecurityKey;
 import io.subutai.core.security.api.model.SecurityKeyTrust;
+import io.subutai.core.security.api.model.TrustItem;
+import io.subutai.core.security.api.model.TrustRelation;
 
 
 /**
@@ -18,13 +20,13 @@ public interface SecurityDataService
     /******************************************
      * Store Public key in the DB
      */
-    public void saveKeyData( String identityId ,String sKeyId,String pKeyId, int type );
+    public void saveKeyData( String identityId, String sKeyId, String pKeyId, int type );
 
 
     /******************************************
      * Remove Public key from the DB
      */
-    public void removeKeyData( String identityId);
+    public void removeKeyData( String identityId );
 
 
     /******************************************
@@ -112,4 +114,9 @@ public interface SecurityDataService
 
 
     void createTrustRelationship( Map<String, String> relationshipProp );
+
+
+    TrustItem getTrustItem( String uniqueIdentifier, String classPath );
+
+    TrustRelation getTrustRelationBySourceObject( TrustItem source, TrustItem object );
 }

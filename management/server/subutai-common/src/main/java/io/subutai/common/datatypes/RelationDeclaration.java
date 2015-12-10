@@ -14,15 +14,10 @@ import java.lang.annotation.Target;
 @Target( ElementType.PARAMETER )
 public @interface RelationDeclaration
 {
-    public enum RelationWeight
-    {
-        FAKE, INDIFFERENT, TRUTH
-    }
-
-    String context() default "";
-
     /**
      * Relationship query, that queries permissions exists between entities
      */
     String rql() default "";
+
+    RelationCondition[] conditions();
 }

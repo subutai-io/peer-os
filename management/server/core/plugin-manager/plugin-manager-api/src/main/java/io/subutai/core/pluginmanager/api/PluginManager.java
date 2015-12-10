@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import io.subutai.common.datatypes.RelationCondition;
 import io.subutai.common.datatypes.RelationDeclaration;
 
 
@@ -20,7 +21,11 @@ public interface PluginManager
 
     Set<PluginInfo> getAvailablePlugins();
 
-    PluginInfo getPluginInfo( String pluginName, @RelationDeclaration( context = "plugin" ) String version );
+    PluginInfo getPluginInfo( String pluginName, @RelationDeclaration( conditions = {
+            @RelationCondition( propertyKey = "scope", propertyValue = "admin", condition = "is" ),
+            @RelationCondition( propertyKey = "permission", propertyValue = "read", condition = "has" ),
+            @RelationCondition( propertyKey = "permission", propertyValue = "write", condition = "has" )
+    } ) String version );
 
     Set<String> getAvailablePluginNames();
 

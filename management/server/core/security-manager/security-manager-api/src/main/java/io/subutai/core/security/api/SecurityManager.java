@@ -42,4 +42,6 @@ public interface SecurityManager
     public HttpContextManager getHttpContextManager();
 
     void createTrustRelationship( Map<String, String> relationshipProp );
+
+    boolean isRelationValid( String sourceId, String sourcePath, String objectId, String objectPath, String statement );
 }

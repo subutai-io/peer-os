@@ -15,6 +15,9 @@ import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.security.api.crypto.KeyStoreManager;
 import io.subutai.core.security.api.dao.SecurityDataService;
 import io.subutai.core.security.api.jetty.HttpContextManager;
+import io.subutai.core.security.api.model.TrustItem;
+import io.subutai.core.security.api.model.TrustRelation;
+import io.subutai.core.security.api.model.TrustRelationship;
 import io.subutai.core.security.impl.crypto.CertificateManagerImpl;
 import io.subutai.core.security.impl.crypto.EncryptionToolImpl;
 import io.subutai.core.security.impl.crypto.KeyManagerImpl;
@@ -22,6 +25,7 @@ import io.subutai.core.security.impl.crypto.KeyStoreManagerImpl;
 import io.subutai.core.security.impl.dao.SecurityDataServiceImpl;
 import io.subutai.core.security.impl.jetty.HttpContextManagerImpl;
 import io.subutai.core.security.impl.model.SecurityKeyData;
+import io.subutai.core.security.impl.model.TrustRelationshipImpl;
 
 
 /**
@@ -224,5 +228,66 @@ public class SecurityManagerImpl implements SecurityManager
     public void createTrustRelationship( final Map<String, String> relationshipProp )
     {
         securityDataService.createTrustRelationship( relationshipProp );
+    }
+
+
+    @Override
+    public boolean isRelationValid( final String sourceId, final String sourcePath, final String objectId,
+                                    final String objectPath, String statement )
+    {
+        TrustItem source = securityDataService.getTrustItem( sourceId, sourcePath );
+        TrustItem object = securityDataService.getTrustItem( objectId, objectPath );
+
+        TrustRelation trustRelation = securityDataService.getTrustRelationBySourceObject( source, object );
+
+        TrustRelationship parsedRelationship = buildTrustRelationFromCondition( statement );
+        if ( trustRelation != null )
+        {
+            return trustRelation.getRelationship().equals( parsedRelationship );
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+
+    /**
+     * Relation condition is simple string presentation of propertyKey=propertyValue=condition with each line new
+     * condition is declared. Property values should be comparative objects so that with conditions it would be possible
+     * to identify which condition has greater scope
+     */
+    private TrustRelationship buildTrustRelationFromCondition( String relationCondition )
+    {
+        TrustRelationshipImpl relationship = new TrustRelationshipImpl();
+        String[] conditions = relationCondition.split( "\n" );
+
+        for ( final String condition : conditions )
+        {
+            String[] parsed = condition.split( "=" );
+            String key = parsed[0];
+            String value = parsed[1];
+
+            switch ( key )
+            {
+                case "trustLevel":
+                    relationship.setTrustLevel( value );
+                    break;
+                case "scope":
+                    relationship.setScope( value );
+                    break;
+                case "action":
+                    relationship.setAction( value );
+                    break;
+                case "ttl":
+                    relationship.setTtl( value );
+                    break;
+                case "type":
+                    relationship.setType( value );
+                    break;
+            }
+        }
+
+        return relationship;
     }
 }

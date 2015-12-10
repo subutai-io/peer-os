@@ -102,7 +102,7 @@ public class AuthorizationInterceptor implements Interceptor
                     RelationDeclaration myAnnotation = ( RelationDeclaration ) annotation;
                     LOGGER.debug( parameterType.getName() );
                     LOGGER.debug( parameter.toString() );
-                    LOGGER.debug( myAnnotation.context() );
+                    //                    LOGGER.debug( myAnnotation.context() );
                 }
             }
         }
