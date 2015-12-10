@@ -16,21 +16,22 @@ import javax.persistence.Table;
 @Entity
 @Table( name = "peer_data" )
 @Access( AccessType.FIELD )
-@IdClass(PeerDataPk.class)
-
 public class PeerData implements Serializable
 {
     @Id
     @Column( name = "id" )
     private String id;
 
-    @Id
-    @Column( name = "source" )
-    private String source;
-
     @Lob
     @Column( name = "info" )
     private String info;
+
+
+    public PeerData( final String id, final String info )
+    {
+        this.id = id;
+        this.info = info;
+    }
 
 
     public String getId()
@@ -42,18 +43,6 @@ public class PeerData implements Serializable
     public void setId( final String id )
     {
         this.id = id;
-    }
-
-
-    public String getSource()
-    {
-        return source;
-    }
-
-
-    public void setSource( final String source )
-    {
-        this.source = source;
     }
 
 

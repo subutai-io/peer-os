@@ -237,7 +237,7 @@ public class LocalPeerImplTest
         when( resourceHost.getHostname() ).thenReturn( RESOURCE_HOST_NAME );
         when( localPeer.getPeerInfo() ).thenReturn( peerInfo );
         when( securityManager.getKeyManager() ).thenReturn( keyManager );
-        localPeer.peerInfo = peerInfo;
+        when( localPeer.getPeerInfo() ).thenReturn( peerInfo );
         when( peerInfo.getId() ).thenReturn( LOCAL_PEER_ID );
         when( peerInfo.getName() ).thenReturn( LOCAL_PEER_NAME );
         when( peerInfo.getOwnerId() ).thenReturn( OWNER_ID );

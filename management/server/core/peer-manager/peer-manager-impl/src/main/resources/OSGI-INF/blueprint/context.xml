@@ -68,6 +68,7 @@
     <argument ref="securityManager" />
     <argument ref="templateRegistry" />
     <argument ref="jsonProvider" />
+    <property name="externalIpInterface" value="${externalIpInterface}" />
   </bean>
 
   <service ref="messageResponseListener" interface="io.subutai.core.messenger.api.MessageListener" />

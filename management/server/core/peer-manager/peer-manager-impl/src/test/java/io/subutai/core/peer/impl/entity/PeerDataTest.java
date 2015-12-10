@@ -14,7 +14,7 @@ public class PeerDataTest
     private static final String SOURCE = "source";
     private static final String INFO = "info";
 
-    PeerData peerData = new PeerData();
+    PeerData peerData = new PeerData(ID, INFO);
 
 
     @Test
@@ -26,13 +26,13 @@ public class PeerDataTest
     }
 
 
-    @Test
-    public void testSetNGetSource() throws Exception
-    {
-        peerData.setSource( SOURCE );
-
-        assertEquals( SOURCE, peerData.getSource() );
-    }
+//    @Test
+//    public void testSetNGetSource() throws Exception
+//    {
+//        peerData.setSource( SOURCE );
+//
+//        assertEquals( SOURCE, peerData.getSource() );
+//    }
 
 
     @Test

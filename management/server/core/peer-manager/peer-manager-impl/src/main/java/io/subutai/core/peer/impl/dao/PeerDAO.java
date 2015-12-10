@@ -44,39 +44,39 @@ public class PeerDAO
     }
 
 
-    public boolean saveInfo( String source, String key, Object info )
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), "Source is null or empty" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( key ), "Key is null or empty" );
-        Preconditions.checkNotNull( info, "Info is null" );
-
-        EntityManager entityManager = daoManager.getEntityManagerFromFactory();
-
-        try
-        {
-            String json = gson.toJson( info );
-            PeerData peerData = new PeerData();
-            peerData.setId( key );
-            peerData.setSource( source );
-            peerData.setInfo( json );
-
-            daoManager.startTransaction( entityManager );
-            entityManager.merge( peerData );
-            daoManager.commitTransaction( entityManager );
-        }
-        catch ( Exception e )
-        {
-            LOG.error( e.getMessage() );
-
-            daoManager.rollBackTransaction( entityManager );
-            return false;
-        }
-        finally
-        {
-            daoManager.closeEntityManager( entityManager );
-        }
-        return true;
-    }
+//    public boolean saveInfo( String source, String key, Object info )
+//    {
+//        Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), "Source is null or empty" );
+//        Preconditions.checkArgument( !Strings.isNullOrEmpty( key ), "Key is null or empty" );
+//        Preconditions.checkNotNull( info, "Info is null" );
+//
+//        EntityManager entityManager = daoManager.getEntityManagerFromFactory();
+//
+//        try
+//        {
+//            String json = gson.toJson( info );
+//            PeerData peerData = new PeerData();
+//            peerData.setId( key );
+//            peerData.setSource( source );
+//            peerData.setInfo( json );
+//
+//            daoManager.startTransaction( entityManager );
+//            entityManager.merge( peerData );
+//            daoManager.commitTransaction( entityManager );
+//        }
+//        catch ( Exception e )
+//        {
+//            LOG.error( e.getMessage() );
+//
+//            daoManager.rollBackTransaction( entityManager );
+//            return false;
+//        }
+//        finally
+//        {
+//            daoManager.closeEntityManager( entityManager );
+//        }
+//        return true;
+//    }
 
 
     /**

@@ -5,6 +5,8 @@ import java.util.Objects;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 
+import com.google.common.base.Preconditions;
+
 
 @SuppressWarnings( "unused" )
 public class PeerPolicy
@@ -39,6 +41,12 @@ public class PeerPolicy
                        @JsonProperty( "environmentLimit" ) final int environmentLimit,
                        @JsonProperty( "containerLimit" ) final int containerLimit )
     {
+        Preconditions.checkArgument( diskUsageLimit >= 0 );
+        Preconditions.checkArgument( cpuUsageLimit >= 0 );
+        Preconditions.checkArgument( memoryUsageLimit >= 0 );
+        Preconditions.checkArgument( networkUsageLimit >= 0 );
+        Preconditions.checkArgument( environmentLimit >= 0 );
+        Preconditions.checkArgument( containerLimit >= 0 );
         this.peerId = peerId;
         this.diskUsageLimit = diskUsageLimit;
         this.cpuUsageLimit = cpuUsageLimit;

@@ -95,19 +95,19 @@ public class PeerDAOTest
     }
 
 
-    @Test
-    public void testSaveInfo() throws Exception
-    {
-        peerDAO.saveInfo( SOURCE, KEY, info );
-
-        verifyCommitNClose();
-
-        throwException();
-
-        peerDAO.saveInfo( SOURCE, KEY, info );
-
-        verifyRollbackNClose();
-    }
+//    @Test
+//    public void testSaveInfo() throws Exception
+//    {
+//        peerDAO.saveInfo( SOURCE, KEY, info );
+//
+//        verifyCommitNClose();
+//
+//        throwException();
+//
+//        peerDAO.saveInfo( SOURCE, KEY, info );
+//
+//        verifyRollbackNClose();
+//    }
 
 
     @Test
