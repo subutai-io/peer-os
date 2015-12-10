@@ -154,13 +154,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     protected CommandUtil commandUtil = new CommandUtil();
     protected ExceptionUtil exceptionUtil = new ExceptionUtil();
     protected Set<RequestListener> requestListeners = Sets.newHashSet();
-    //    protected PeerInfo peerInfo;
+    protected PeerInfo peerInfo;
     private SecurityManager securityManager;
 
 
-
     protected boolean initialized = false;
-    private PeerInfo peerInfo;
 
 
     public LocalPeerImpl( DaoManager daoManager, TemplateManager templateRegistry, QuotaManager quotaManager,
@@ -176,6 +174,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         this.hostRegistry = hostRegistry;
         this.securityManager = securityManager;
     }
+
 
     public void init() throws PeerException
     {
@@ -227,6 +226,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         initialized = true;
     }
 
+
     @Override
     public void setPeerInfo( final PeerInfo peerInfo )
     {
@@ -250,9 +250,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         return new TunnelDataService( daoManager.getEntityManagerFactory() );
     }
-
-
-
 
 
     @Override
@@ -285,21 +282,21 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public String getId()
     {
-        return getPeerInfo().getId();
+        return peerInfo.getId();
     }
 
 
     @Override
     public String getName()
     {
-        return getPeerInfo().getName();
+        return peerInfo.getName();
     }
 
 
     @Override
     public String getOwnerId()
     {
-        return getPeerInfo().getOwnerId();
+        return peerInfo.getOwnerId();
     }
 
 
@@ -1918,7 +1915,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         throw new HostNotFoundException( "Host by name '" + hostname + "' not found." );
     }
-
 
 
     private class SetupN2NConnectionTask implements Callable<N2NConfig>

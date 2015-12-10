@@ -27,7 +27,6 @@ import com.google.common.base.Preconditions;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.peer.Encrypted;
 import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.peer.ManagementHost;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
@@ -79,6 +78,7 @@ public class PeerManagerImpl implements PeerManager
     private Map<String, Peer> peers = new ConcurrentHashMap<>();
     private ObjectMapper mapper = new ObjectMapper();
     private String externalIpInterface = DEFAULT_EXTERNAL_INTERFACE_NAME;
+    private String localPeerId;
 
 
     public PeerManagerImpl( final Messenger messenger, LocalPeer localPeer, DaoManager daoManager,
@@ -110,7 +110,7 @@ public class PeerManagerImpl implements PeerManager
         {
             this.peerDataService = new PeerDataService( daoManager.getEntityManagerFactory() );
 
-            String localPeerId = securityManager.getKeyManager().getPeerId();
+            localPeerId = securityManager.getKeyManager().getPeerId();
 
             // check local peer instance
             PeerData localPeerData = peerDataService.find( localPeerId );
@@ -121,21 +121,17 @@ public class PeerManagerImpl implements PeerManager
                 localPeerInfo.setId( localPeerId );
                 localPeerInfo.setOwnerId( securityManager.getKeyManager().getOwnerId() );
                 localPeerInfo.setIp( getLocalPeerIp() );
-                localPeerInfo.setName( String.format( "Peer %s %s", getLocalPeerIp(), localPeerData ) );
+                localPeerInfo.setName( String.format( "Peer %s %s", localPeerId, getLocalPeerIp() ) );
                 PeerPolicy peerPolicy = getDefaultPeerPolicy( localPeerId );
                 localPeerInfo.setGrantedPolicy( peerPolicy );
-                localPeerData = createPeerData( localPeerId, localPeerInfo );
-                saveOrUpdate( localPeerData );
-            }
 
-            localPeerInfo = mapper.readValue( localPeerData.getInfo(), PeerInfo.class );
-            localPeer.setPeerInfo( localPeerInfo );
-            addPeer( localPeer );
+                updatePeerInfo( localPeerInfo );
+            }
 
             for ( PeerData peerData : this.peerDataService.getAll() )
             {
                 PeerInfo peerInfo = mapper.readValue( peerData.getInfo(), PeerInfo.class );
-                Peer peer = createRemotePeer( peerInfo );
+                Peer peer = createPeer( peerInfo );
                 addPeer( peer );
             }
         }
@@ -238,17 +234,16 @@ public class PeerManagerImpl implements PeerManager
             securityManager.getHttpContextManager().reloadKeyStore();
 
             registrationData.getPeerInfo().setKeyPhrase( keyPhrase );
-            Peer newPeer = createRemotePeer( registrationData.getPeerInfo() );
+            Peer newPeer = createPeer( registrationData.getPeerInfo() );
+
+            updatePeerInfo( newPeer.getPeerInfo() );
             //            peerDAO.saveInfo( SOURCE_REMOTE_PEER, registrationData.getPeerInfo().getId(),
             //                    registrationData.getPeerInfo() );
 
-            PeerData peerData =
-                    createPeerData( registrationData.getPeerInfo().getId(), registrationData.getPeerInfo() );
-            saveOrUpdate( peerData );
             addPeer( newPeer );
 
 
-            ManagementHost mgmHost = getLocalPeer().getManagementHost();
+            //            ManagementHost mgmHost = getLocalPeer().getManagementHost();
             try
             {
                 //                mgmHost.addRepository( registrationData.getPeerInfo().getIp() );
@@ -275,25 +270,44 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    private void saveOrUpdate( PeerData peerData )
-    {
-        this.peerDataService.saveOrUpdate( peerData );
-    }
-
-
-    private void remove( String id )
-    {
-        this.peerDataService.remove( id );
-    }
-
-
-    private void addPeer( final Peer peer ) throws PeerException
+    protected void addPeer( final Peer peer ) throws PeerException
     {
         if ( peer == null )
         {
             throw new IllegalArgumentException( "Peer could not be null." );
         }
         this.peers.put( peer.getId(), peer );
+    }
+
+
+    private void removePeer( String id )
+    {
+        this.peerDataService.remove( id );
+    }
+
+
+    private void updatePeerInfo( final PeerInfo peerInfo ) throws PeerException
+    {
+        if ( peerInfo == null )
+        {
+            throw new IllegalArgumentException( "Peer info could not be null." );
+        }
+        try
+        {
+            PeerData peerData = createPeerData( peerInfo.getId(), peerInfo );
+            this.peerDataService.saveOrUpdate( peerData );
+        }
+        catch ( IOException e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( "Could not add peer." );
+        }
+    }
+
+
+    private void removePeerInfo( String id )
+    {
+        this.peerDataService.remove( id );
     }
 
 
@@ -304,14 +318,19 @@ public class PeerManagerImpl implements PeerManager
      *
      * @return peer instance
      */
-    private Peer createRemotePeer( final PeerInfo peerInfo )
+    private Peer createPeer( final PeerInfo peerInfo )
     {
         if ( peerInfo == null )
         {
             throw new IllegalArgumentException( "Peer info could not be null." );
         }
+        if ( localPeerId.equals( peerInfo.getId() ) )
+        {
+            localPeer.setPeerInfo( peerInfo );
+            return localPeer;
+        }
 
-        return new RemotePeerImpl( localPeer, securityManager, peerInfo, messenger, commandResponseListener,
+        return new RemotePeerImpl( localPeerId, securityManager, peerInfo, messenger, commandResponseListener,
                 messageResponseListener, provider );
     }
 
@@ -327,7 +346,7 @@ public class PeerManagerImpl implements PeerManager
         }
         //        isPeerUsed( registrationData );
 
-        ManagementHost mgmHost = getLocalPeer().getManagementHost();
+        //        ManagementHost mgmHost = getLocalPeer().getManagementHost();
         //        PeerInfo p = getPeerInfo( registrationData.getPeerInfo().getId() );
         //
         //        PeerPolicy peerPolicy = localPeer.getPeerInfo().getPeerPolicy( p.getId() );
@@ -354,7 +373,8 @@ public class PeerManagerImpl implements PeerManager
             // ignore
         }
         //        return peerDAO.deleteInfo( SOURCE_REMOTE_PEER, p.getId() );
-        remove( registrationData.getPeerInfo().getId() );
+        removePeerInfo( registrationData.getPeerInfo().getId() );
+        removePeer( registrationData.getPeerInfo().getId() );
     }
 
 
@@ -770,16 +790,7 @@ public class PeerManagerImpl implements PeerManager
 
         peerInfo.setGrantedPolicy( peerPolicy );
 
-        try
-        {
-            PeerData peerData = createPeerData( peerInfo.getId(), peerInfo );
-            saveOrUpdate( peerData );
-        }
-        catch ( IOException e )
-        {
-            LOG.error( e.getMessage(), e );
-            throw new PeerException( "Could not save peer info." );
-        }
+        updatePeerInfo( peerInfo );
     }
 
 
