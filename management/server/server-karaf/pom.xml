@@ -102,6 +102,23 @@
             </configuration>
           </execution>
           <execution>
+            <id>copy-lib</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.basedir}/target/assembly/lib</outputDirectory>
+              <overwrite>true</overwrite>
+              <resources>
+                <resource>
+                  <directory>${project.basedir}/src/main/assembly/lib</directory>
+                  <filtering>false</filtering>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+          <execution>
             <id>copy-etc</id>
             <phase>prepare-package</phase>
             <goals>

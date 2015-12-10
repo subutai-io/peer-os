@@ -70,7 +70,7 @@
     <sonar.jacoco.reportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPath>
     <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
     <!-- Runtime -->
-    <karaf.version>3.0.2</karaf.version>
+    <karaf.version>3.0.4</karaf.version>
     <osgi.framework.version>5.0.0</osgi.framework.version>
     <aries.blueprint.version>1.1.0</aries.blueprint.version>
     <aries.proxy.version>1.0.1</aries.proxy.version>
