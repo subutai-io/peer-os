@@ -7,18 +7,20 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Sets;
+
 import io.subutai.common.dao.DaoManager;
 import io.subutai.core.identity.api.dao.IdentityDataService;
 import io.subutai.core.identity.api.model.Permission;
+import io.subutai.core.identity.api.model.Relation;
+import io.subutai.core.identity.api.model.RelationLink;
 import io.subutai.core.identity.api.model.Role;
 import io.subutai.core.identity.api.model.Session;
-import io.subutai.core.identity.api.model.TrustItem;
-import io.subutai.core.identity.api.model.TrustRelation;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserToken;
-import io.subutai.core.identity.impl.model.TrustItemImpl;
-import io.subutai.core.identity.impl.model.TrustRelationImpl;
-import io.subutai.core.identity.impl.model.TrustRelationshipImpl;
+import io.subutai.core.identity.impl.model.RelationImpl;
+import io.subutai.core.identity.impl.model.RelationInfoImpl;
+import io.subutai.core.identity.impl.model.RelationLinkImpl;
 
 
 /**
@@ -440,49 +442,50 @@ public class IdentityDataServiceImpl implements IdentityDataService
     @Override
     public void createTrustRelationship( final Map<String, String> relationshipProp )
     {
-        TrustItemImpl source =
-                new TrustItemImpl( relationshipProp.get( "sourceId" ), relationshipProp.get( "sourceClass" ) );
-        TrustItemImpl target =
-                new TrustItemImpl( relationshipProp.get( "targetId" ), relationshipProp.get( "targetClass" ) );
-        TrustItemImpl object =
-                new TrustItemImpl( relationshipProp.get( "objectId" ), relationshipProp.get( "objectClass" ) );
+        RelationLinkImpl source =
+                new RelationLinkImpl( relationshipProp.get( "sourceId" ), relationshipProp.get( "sourceClass" ) );
+        RelationLinkImpl target =
+                new RelationLinkImpl( relationshipProp.get( "targetId" ), relationshipProp.get( "targetClass" ) );
+        RelationLinkImpl object =
+                new RelationLinkImpl( relationshipProp.get( "objectId" ), relationshipProp.get( "objectClass" ) );
 
         trustRelationDAO.update( source );
         trustRelationDAO.update( target );
         trustRelationDAO.update( object );
 
-        TrustRelationshipImpl trustRelationship =
-                new TrustRelationshipImpl( relationshipProp.get( "trustLevel" ), relationshipProp.get( "scope" ),
-                        relationshipProp.get( "action" ), relationshipProp.get( "ttl" ),
-                        relationshipProp.get( "type" ) );
+        RelationInfoImpl trustRelationship = new RelationInfoImpl( relationshipProp.get( "context" ),
+                Sets.newHashSet( relationshipProp.get( "operation" ) ), relationshipProp.get( "type" ) );
 
-        TrustRelationImpl trustRelation = new TrustRelationImpl( source, target, object, trustRelationship );
+        RelationImpl trustRelation = new RelationImpl( source, target, object, trustRelationship );
 
         trustRelationDAO.update( trustRelation );
     }
 
 
     @Override
-    public TrustItem getTrustItem( final String uniqueIdentifier, final String classPath )
+    public RelationLink getTrustItem( final String uniqueIdentifier, final String classPath )
     {
         return trustRelationDAO.findTrustItem( uniqueIdentifier, classPath );
     }
 
 
     @Override
-    public TrustRelation getRelationBySourceObject( final TrustItem source, final TrustItem object )
+    public Relation getRelationBySourceObject( final RelationLink source, final RelationLink object )
     {
-        if ( ( source instanceof TrustItemImpl ) && ( object instanceof TrustItemImpl ) )
+        if ( ( source instanceof RelationLinkImpl ) && ( object instanceof RelationLinkImpl ) )
         {
-            return trustRelationDAO.findBySourceAndObject( ( TrustItemImpl ) source, ( TrustItemImpl ) object );
+            return trustRelationDAO.findBySourceAndObject( ( RelationLinkImpl ) source, ( RelationLinkImpl ) object );
         }
         return null;
     }
 
 
     @Override
-    public void persistTrustRelation( final TrustRelation trustRelation )
+    public void persistRelation( final Relation relation )
     {
-        trustRelationDAO.update( trustRelation );
+        trustRelationDAO.update( relation.getSource() );
+        trustRelationDAO.update( relation.getTarget() );
+        trustRelationDAO.update( relation.getTrustedObject() );
+        trustRelationDAO.update( relation );
     }
 }

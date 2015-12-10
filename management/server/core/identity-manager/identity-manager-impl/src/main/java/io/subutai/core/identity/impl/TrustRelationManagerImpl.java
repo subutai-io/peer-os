@@ -1,20 +1,23 @@
 package io.subutai.core.identity.impl;
 
 
-import java.io.UnsupportedEncodingException;
 import java.util.Map;
+import java.util.Set;
 
-import org.bouncycastle.openpgp.PGPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.core.identity.api.dao.IdentityDataService;
-import io.subutai.core.identity.api.model.TrustItem;
-import io.subutai.core.identity.api.model.TrustRelation;
-import io.subutai.core.identity.api.model.TrustRelationship;
+import io.subutai.core.identity.api.model.Relation;
+import io.subutai.core.identity.api.model.RelationInfo;
+import io.subutai.core.identity.api.model.RelationLink;
+import io.subutai.core.identity.api.model.RelationMeta;
 import io.subutai.core.identity.api.relation.TrustRelationManager;
 import io.subutai.core.identity.impl.dao.IdentityDataServiceImpl;
+import io.subutai.core.identity.impl.model.RelationImpl;
+import io.subutai.core.identity.impl.model.RelationInfoImpl;
+import io.subutai.core.identity.impl.model.RelationLinkImpl;
 
 
 /**
@@ -55,14 +58,14 @@ public class TrustRelationManagerImpl implements TrustRelationManager
         try
         {
             //TODO get verification step
-            TrustRelation trustRelation = trustMessageManager.decryptAndVerifyMessage( encrypted );
+            Relation relation = trustMessageManager.decryptAndVerifyMessage( encrypted );
 
             // TODO check if source can declare this relation
-            identityDataService.persistTrustRelation( trustRelation );
+            identityDataService.persistRelation( relation );
         }
-        catch ( PGPException | UnsupportedEncodingException e )
+        catch ( Exception e )
         {
-            logger.warn( "Error decrypting trust message." );
+            logger.warn( "Error decrypting trust message.", e );
         }
     }
 
@@ -80,13 +83,57 @@ public class TrustRelationManagerImpl implements TrustRelationManager
     public boolean isRelationValid( final String sourceId, final String sourcePath, final String objectId,
                                     final String objectPath, String statement )
     {
-        TrustItem source = identityDataService.getTrustItem( sourceId, sourcePath );
-        TrustItem object = identityDataService.getTrustItem( objectId, objectPath );
+        RelationLink source = identityDataService.getTrustItem( sourceId, sourcePath );
+        RelationLink object = identityDataService.getTrustItem( objectId, objectPath );
 
-        TrustRelation trustRelation = identityDataService.getRelationBySourceObject( source, object );
+        Relation relation = identityDataService.getRelationBySourceObject( source, object );
 
-        TrustRelationship parsedRelationship = trustMessageManager.serializeMessage( statement );
+        if ( relation == null )
+        {
+            return false;
+        }
 
-        return trustRelation != null && trustRelation.getRelationship().equals( parsedRelationship );
+        RelationInfo relationInfo = relation.getRelationInfo();
+        RelationInfo parsedRelationship = trustMessageManager.serializeMessage( statement );
+
+        if ( !relationInfo.getContext().equalsIgnoreCase( parsedRelationship.getContext() ) )
+        {
+            return false;
+        }
+
+        if ( !relationInfo.getType().equalsIgnoreCase( parsedRelationship.getType() ) )
+        {
+            return false;
+        }
+
+        return relationInfo.getOperation().containsAll( parsedRelationship.getOperation() );
+    }
+
+
+    @Override
+    public RelationInfo generateTrustRelationship( final String pObject, final Set<String> operation,
+                                                   final String type )
+    {
+        return new RelationInfoImpl( pObject, operation, type );
+    }
+
+
+    @Override
+    public Relation buildTrustRelation( final RelationInfo relationInfo, final RelationMeta relationMeta )
+    {
+        RelationLinkImpl source = new RelationLinkImpl( relationMeta.getSourceId(), relationMeta.getSourcePath() );
+        RelationLinkImpl target = new RelationLinkImpl( relationMeta.getTargetId(), relationMeta.getTargetPath() );
+        RelationLinkImpl object = new RelationLinkImpl( relationMeta.getObjectId(), relationMeta.getObjectPath() );
+
+        //TODO try to pass interface as is
+        return new RelationImpl( source, target, object, new RelationInfoImpl( relationInfo ) );
+    }
+
+
+    @Override
+    public void executeRelationBuild( final Relation relation )
+    {
+        //TODO check if relation valid otherwise break relation build
+        identityDataService.persistRelation( relation );
     }
 }

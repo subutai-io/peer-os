@@ -10,10 +10,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.subutai.common.dao.DaoManager;
-import io.subutai.core.identity.api.model.TrustItem;
-import io.subutai.core.identity.api.model.TrustRelation;
-import io.subutai.core.identity.impl.model.TrustItemImpl;
-import io.subutai.core.identity.impl.model.TrustRelationImpl;
+import io.subutai.core.identity.api.model.Relation;
+import io.subutai.core.identity.api.model.RelationLink;
+import io.subutai.core.identity.impl.model.RelationImpl;
+import io.subutai.core.identity.impl.model.RelationLinkImpl;
 
 
 /**
@@ -33,7 +33,7 @@ public class TrustRelationDAO
     }
 
 
-    public void persist( TrustRelationImpl trustRelation )
+    public void persist( RelationImpl trustRelation )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
 
@@ -54,14 +54,14 @@ public class TrustRelationDAO
     }
 
 
-    public void update( TrustRelation trustRelation )
+    public void update( Relation relation )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
 
         try
         {
             daoManager.startTransaction( em );
-            em.merge( trustRelation );
+            em.merge( relation );
             daoManager.commitTransaction( em );
         }
         catch ( Exception ex )
@@ -76,14 +76,14 @@ public class TrustRelationDAO
     }
 
 
-    public void update( TrustItemImpl trustItem )
+    public void update( RelationLink relationLink )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
 
         try
         {
             daoManager.startTransaction( em );
-            em.merge( trustItem );
+            em.merge( relationLink );
             daoManager.commitTransaction( em );
         }
         catch ( Exception ex )
@@ -123,13 +123,13 @@ public class TrustRelationDAO
     }
 
 
-    public TrustRelationImpl find( long trustRelationId )
+    public RelationImpl find( long trustRelationId )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
 
         try
         {
-            return em.find( TrustRelationImpl.class, trustRelationId );
+            return em.find( RelationImpl.class, trustRelationId );
         }
         catch ( Exception ex )
         {
@@ -162,17 +162,17 @@ public class TrustRelationDAO
     }
 
 
-    public TrustRelation findBySourceAndObject( final TrustItemImpl source, final TrustItemImpl object )
+    public Relation findBySourceAndObject( final RelationLinkImpl source, final RelationLinkImpl object )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
-        TrustRelation result = null;
+        Relation result = null;
         try
         {
             Query qr = em.createQuery( "select ss from TrustRelationImpl AS ss"
                     + " where ss.source=:source AND ss.trustedObject=:trustedObject" );
             qr.setParameter( "source", source );
             qr.setParameter( "trustedObject", object );
-            List<TrustRelation> list = qr.getResultList();
+            List<Relation> list = qr.getResultList();
 
             if ( list.size() > 0 )
             {
@@ -196,17 +196,17 @@ public class TrustRelationDAO
     }
 
 
-    public TrustItem findTrustItem( final String uniqueIdentifier, final String classPath )
+    public RelationLink findTrustItem( final String uniqueIdentifier, final String classPath )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
-        TrustItem result = null;
+        RelationLink result = null;
         try
         {
             Query qr = em.createQuery( "select ss from TrustItemImpl AS ss"
                     + " where ss.uniqueIdentifier=:uniqueIdentifier AND ss.classPath=:classPath" );
             qr.setParameter( "uniqueIdentifier", uniqueIdentifier );
             qr.setParameter( "classPath", classPath );
-            List<TrustItem> list = qr.getResultList();
+            List<RelationLink> list = qr.getResultList();
 
             if ( list.size() > 0 )
             {

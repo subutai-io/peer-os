@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.Map;
 
 import io.subutai.core.identity.api.model.Permission;
+import io.subutai.core.identity.api.model.Relation;
+import io.subutai.core.identity.api.model.RelationLink;
 import io.subutai.core.identity.api.model.Role;
 import io.subutai.core.identity.api.model.Session;
-import io.subutai.core.identity.api.model.TrustItem;
-import io.subutai.core.identity.api.model.TrustRelation;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserToken;
 
@@ -238,10 +238,10 @@ public interface IdentityDataService
     void createTrustRelationship( Map<String, String> relationshipProp );
 
 
-    TrustItem getTrustItem( String uniqueIdentifier, String classPath );
+    RelationLink getTrustItem( String uniqueIdentifier, String classPath );
 
 
-    TrustRelation getRelationBySourceObject( TrustItem source, TrustItem object );
+    Relation getRelationBySourceObject( RelationLink source, RelationLink object );
 
-    void persistTrustRelation( TrustRelation trustRelation );
+    void persistRelation( Relation relation );
 }

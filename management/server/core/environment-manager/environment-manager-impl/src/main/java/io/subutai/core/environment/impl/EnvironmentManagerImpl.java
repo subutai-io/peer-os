@@ -1,6 +1,7 @@
 package io.subutai.core.environment.impl;
 
 
+import java.io.UnsupportedEncodingException;
 import java.security.AccessControlException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -17,6 +18,7 @@ import java.util.concurrent.ExecutorService;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 
+import org.bouncycastle.openpgp.PGPPublicKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,6 +65,7 @@ import io.subutai.common.security.objects.PermissionScope;
 import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.ExceptionUtil;
+import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.StringUtil;
 import io.subutai.core.environment.api.EnvironmentEventListener;
 import io.subutai.core.environment.api.EnvironmentManager;
@@ -83,7 +86,11 @@ import io.subutai.core.environment.impl.workflow.destruction.EnvironmentDestruct
 import io.subutai.core.environment.impl.workflow.modification.EnvironmentGrowingWorkflow;
 import io.subutai.core.environment.impl.workflow.modification.SshKeyModificationWorkflow;
 import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.model.Relation;
+import io.subutai.core.identity.api.model.RelationInfo;
+import io.subutai.core.identity.api.model.RelationMeta;
 import io.subutai.core.identity.api.model.User;
+import io.subutai.core.identity.api.relation.TrustRelationManager;
 import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerAction;
@@ -103,6 +110,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     private static final String DEFAULT_GATEWAY_TEMPLATE = "192.168.%s.1/24";
 
     private final IdentityManager identityManager;
+    private final TrustRelationManager relationManager;
     private final PeerManager peerManager;
     private SecurityManager securityManager;
     private final NetworkManager networkManager;
@@ -128,13 +136,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     public EnvironmentManagerImpl( final TemplateManager templateRegistry, final PeerManager peerManager,
                                    SecurityManager securityManager, final NetworkManager networkManager,
                                    final DaoManager daoManager, final IdentityManager identityManager,
-                                   final Tracker tracker )
+                                   final Tracker tracker, final TrustRelationManager relationManager )
     {
         Preconditions.checkNotNull( templateRegistry );
         Preconditions.checkNotNull( peerManager );
         Preconditions.checkNotNull( networkManager );
         Preconditions.checkNotNull( daoManager );
         Preconditions.checkNotNull( identityManager );
+        Preconditions.checkNotNull( relationManager );
         Preconditions.checkNotNull( securityManager );
         Preconditions.checkNotNull( tracker );
 
@@ -144,6 +153,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         this.networkManager = networkManager;
         this.daoManager = daoManager;
         this.identityManager = identityManager;
+        this.relationManager = relationManager;
         this.tracker = tracker;
     }
 
@@ -185,6 +195,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     public IdentityManager getIdentityManager()
     {
         return identityManager;
+    }
+
+
+    public TrustRelationManager getRelationManager()
+    {
+        return relationManager;
     }
 
 
@@ -352,7 +368,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         final EnvironmentImpl environment = createEmptyEnvironment( blueprint.getName(), cidr, blueprint.getSshKey() );
 
         // TODO add additional step for receiving trust message
-
 
 
         //create operation tracker
@@ -1359,8 +1374,35 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         environment.setUserId( identityManager.getActiveUser().getId() );
 
+        try
+        {
+            User activeUser = identityManager.getActiveUser();
+
+            RelationInfo relationInfo = relationManager
+                    .generateTrustRelationship( PermissionObject.EnvironmentManagement.getName(),
+                            Sets.newHashSet( PermissionOperation.Delete.getName(), PermissionOperation.Read.getName(),
+                                    PermissionOperation.Update.getName(), PermissionOperation.Write.getName() ),
+                            PermissionScope.OWNER_SCOPE.getName() );
+
+            RelationMeta relationMeta = new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), environment,
+                    environment.getId() );
+
+            Relation relation = relationManager.buildTrustRelation( relationInfo, relationMeta );
+
+            String relationJson = JsonUtil.toJson( relation );
+
+            PGPPublicKey publicKey = securityManager.getKeyManager().getPublicKey( null );
+            byte[] relationEncrypted =
+                    securityManager.getEncryptionTool().encrypt( relationJson.getBytes(), publicKey, true );
+            String encryptedRelation = new String( relationEncrypted, "UTF-8" );
+            relationManager.processTrustMessage( encryptedRelation );
+        }
+        catch ( UnsupportedEncodingException e )
+        {
+            LOG.warn( "Error message.", e );
+        }
+
         //        //TODO set trust instead of setting explicit user
-        //        User activeUser = identityManager.getActiveUser();
         //        Map<String, String> trustRelationship = Maps.newHashMap();
         //        trustRelationship.put( "sourceId", String.valueOf( activeUser.getId() ) );
         //        trustRelationship.put( "sourceClass", activeUser.getClass().getSimpleName() );

@@ -14,46 +14,46 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import io.subutai.core.identity.api.model.TrustRelation;
+import io.subutai.core.identity.api.model.Relation;
 
 
 /**
  * Created by talas on 12/8/15.
  */
 @Entity
-@Table( name = "trust_relation" )
+@Table( name = "relation" )
 @Access( AccessType.FIELD )
-public class TrustRelationImpl implements TrustRelation
+public class RelationImpl implements Relation
 {
     @Id
     @GeneratedValue( strategy = GenerationType.IDENTITY )
     @Column( name = "relation_id" )
     private long id;
 
-    @Column( name = "source_item" )
+    @Column( name = "source_link" )
     @ManyToOne( cascade = CascadeType.ALL, fetch = FetchType.EAGER )
-    private TrustItemImpl source;
+    private RelationLinkImpl source;
 
-    @Column( name = "target_item" )
+    @Column( name = "target_link" )
     @ManyToOne( cascade = CascadeType.ALL, fetch = FetchType.EAGER )
-    private TrustItemImpl target;
+    private RelationLinkImpl target;
 
-    @Column( name = "trust_object" )
+    @Column( name = "trusted_object_link" )
     @ManyToOne( cascade = CascadeType.ALL, fetch = FetchType.EAGER )
-    private TrustItemImpl trustedObject;
+    private RelationLinkImpl trustedObject;
 
-    @Column( name = "relationship" )
+    @Column( name = "relation_info" )
     @OneToOne( cascade = CascadeType.ALL, fetch = FetchType.EAGER )
-    private TrustRelationshipImpl relationship;
+    private RelationInfoImpl relationship;
 
 
-    public TrustRelationImpl()
+    public RelationImpl()
     {
     }
 
 
-    public TrustRelationImpl( final TrustItemImpl source, final TrustItemImpl target, final TrustItemImpl trustedObject,
-                              final TrustRelationshipImpl relationship )
+    public RelationImpl( final RelationLinkImpl source, final RelationLinkImpl target,
+                         final RelationLinkImpl trustedObject, final RelationInfoImpl relationship )
     {
         this.source = source;
         this.target = target;
@@ -70,28 +70,28 @@ public class TrustRelationImpl implements TrustRelation
 
 
     @Override
-    public TrustItemImpl getSource()
+    public RelationLinkImpl getSource()
     {
         return source;
     }
 
 
     @Override
-    public TrustItemImpl getTarget()
+    public RelationLinkImpl getTarget()
     {
         return target;
     }
 
 
     @Override
-    public TrustItemImpl getTrustedObject()
+    public RelationLinkImpl getTrustedObject()
     {
         return trustedObject;
     }
 
 
     @Override
-    public TrustRelationshipImpl getRelationship()
+    public RelationInfoImpl getRelationInfo()
     {
         return relationship;
     }
@@ -104,12 +104,12 @@ public class TrustRelationImpl implements TrustRelation
         {
             return true;
         }
-        if ( !( o instanceof TrustRelationImpl ) )
+        if ( !( o instanceof RelationImpl ) )
         {
             return false;
         }
 
-        final TrustRelationImpl that = ( TrustRelationImpl ) o;
+        final RelationImpl that = ( RelationImpl ) o;
 
         if ( source != null ? !source.equals( that.source ) : that.source != null )
         {

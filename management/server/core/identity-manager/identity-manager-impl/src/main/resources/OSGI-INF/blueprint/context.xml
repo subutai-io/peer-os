@@ -33,7 +33,7 @@
     <property name="securityManager" ref="securityManager" />
   </bean>
 
-  <bean id="trustRelationManager" scope="singleton" activation="eager" init-method="init"
+  <bean id="relationManager" scope="singleton" activation="eager" init-method="init"
         class="io.subutai.core.identity.impl.TrustRelationManagerImpl">
     <property name="daoManager" ref="daoManagerIdenity" />
     <property name="identityManager" ref="identityManager" />
@@ -43,7 +43,7 @@
   <service ref="identityManager" activation="eager"
            interface="io.subutai.core.identity.api.IdentityManager" />
 
-  <service ref="trustRelationManager" activation="eager"
+  <service ref="relationManager" activation="eager"
            interface="io.subutai.core.identity.api.relation.TrustRelationManager" />
   <!--*****************************************************************-->
 

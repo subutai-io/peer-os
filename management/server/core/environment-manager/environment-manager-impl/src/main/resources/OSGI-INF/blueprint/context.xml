@@ -31,6 +31,8 @@
              interface="io.subutai.core.network.api.NetworkManager" />
   <reference id="identityManager"
              interface="io.subutai.core.identity.api.IdentityManager" />
+  <reference id="relationManager"
+             interface="io.subutai.core.identity.api.relation.TrustRelationManager" />
   <reference id="tracker"
              interface="io.subutai.core.tracker.api.Tracker" />
 
@@ -56,6 +58,7 @@
     <argument ref="daoManagerEnv" />
     <argument ref="identityManager" />
     <argument ref="tracker" />
+    <argument ref="relationManager" />
     <property name="keyTrustCheckEnabled" value="${keyTrustCheckEnabled}"/>
   </bean>
 

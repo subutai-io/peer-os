@@ -27,7 +27,6 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
-import io.subutai.common.drms.TrustMessage;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.security.crypto.pgp.KeyPair;
 import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
@@ -35,7 +34,6 @@ import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.KeyTrustLevel;
 import io.subutai.common.security.objects.SecurityKeyType;
 import io.subutai.common.settings.ChannelSettings;
-import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.keyserver.api.KeyServer;
 import io.subutai.core.security.api.crypto.EncryptionTool;
@@ -298,7 +296,7 @@ public class KeyManagerImpl implements KeyManager
             // trustMessage:
             // { [ ( "I Fully trust myself to manage this Environment") signed by User] encrypted by Peer PubKey}
 
-            TrustMessage trustMessage = JsonUtil.fromJson( decryptedMessage, TrustMessage.class );
+            //            TrustMessage trustMessage = JsonUtil.fromJson( decryptedMessage, TrustMessage.class );
         }
         catch ( UnsupportedEncodingException e )
         {

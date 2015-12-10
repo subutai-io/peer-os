@@ -5,8 +5,8 @@ import java.io.UnsupportedEncodingException;
 
 import org.bouncycastle.openpgp.PGPException;
 
-import io.subutai.core.identity.api.model.TrustRelation;
-import io.subutai.core.identity.api.model.TrustRelationship;
+import io.subutai.core.identity.api.model.Relation;
+import io.subutai.core.identity.api.model.RelationInfo;
 
 
 /**
@@ -24,14 +24,14 @@ public interface TrustMessageManager
      *
      * @param encryptedMessage - Encrypted message where trust relationship is declared
      */
-    TrustRelation decryptAndVerifyMessage( String encryptedMessage ) throws PGPException, UnsupportedEncodingException;
+    Relation decryptAndVerifyMessage( String encryptedMessage ) throws PGPException, UnsupportedEncodingException;
 
     /**
      * Get message sender's key fingerprint
      *
      * @param trustMessage - signed trust relationship message
      */
-    String authenticateSource( TrustRelation trustMessage );
+    String authenticateSource( Relation trustMessage );
 
     /**
      * Verify that decrypted message is signed by trusted source, message verification should be done by comparing
@@ -41,8 +41,8 @@ public interface TrustMessageManager
      * @param signature - message signature
      * @param sourceFingerprint - sender's fingerprint
      */
-    boolean verifyMessageSource( TrustRelation trustMessage, String signature, String sourceFingerprint );
+    boolean verifyMessageSource( Relation trustMessage, String signature, String sourceFingerprint );
 
 
-    TrustRelationship serializeMessage( String rawRelationship );
+    RelationInfo serializeMessage( String rawRelationship );
 }

@@ -7,7 +7,7 @@ import java.io.Serializable;
 /**
  * Created by talas on 12/10/15.
  */
-public interface TrustItem extends Serializable
+public interface RelationLink extends Serializable
 {
     String getId();
 

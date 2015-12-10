@@ -5,12 +5,14 @@ import java.io.UnsupportedEncodingException;
 
 import org.bouncycastle.openpgp.PGPException;
 
+import com.google.common.collect.Sets;
+
 import io.subutai.common.util.JsonUtil;
-import io.subutai.core.identity.api.model.TrustRelation;
-import io.subutai.core.identity.api.model.TrustRelationship;
+import io.subutai.core.identity.api.model.Relation;
+import io.subutai.core.identity.api.model.RelationInfo;
 import io.subutai.core.identity.api.relation.TrustMessageManager;
-import io.subutai.core.identity.impl.model.TrustRelationImpl;
-import io.subutai.core.identity.impl.model.TrustRelationshipImpl;
+import io.subutai.core.identity.impl.model.RelationImpl;
+import io.subutai.core.identity.impl.model.RelationInfoImpl;
 import io.subutai.core.security.api.SecurityManager;
 
 
@@ -29,7 +31,7 @@ public class TrustMessageManagerImpl implements TrustMessageManager
 
 
     @Override
-    public TrustRelation decryptAndVerifyMessage( final String encryptedMessage )
+    public Relation decryptAndVerifyMessage( final String encryptedMessage )
             throws PGPException, UnsupportedEncodingException
     {
         byte[] decrypted = securityManager.getEncryptionTool().decrypt( encryptedMessage.getBytes() );
@@ -38,22 +40,21 @@ public class TrustMessageManagerImpl implements TrustMessageManager
 
         //TODO Check signature
 
-        TrustRelationImpl trustRelation = JsonUtil.fromJson( decryptedMessage, TrustRelationImpl.class );
+        RelationImpl trustRelation = JsonUtil.fromJson( decryptedMessage, RelationImpl.class );
 
         return trustRelation;
     }
 
 
     @Override
-    public String authenticateSource( final TrustRelation trustMessage )
+    public String authenticateSource( final Relation trustMessage )
     {
         return "";
     }
 
 
     @Override
-    public boolean verifyMessageSource( final TrustRelation trustMessage, final String signature,
-                                        String sourceFingerprint )
+    public boolean verifyMessageSource( final Relation trustMessage, final String signature, String sourceFingerprint )
     {
         return false;
     }
@@ -65,10 +66,10 @@ public class TrustMessageManagerImpl implements TrustMessageManager
      * to identify which condition has greater scope
      */
     @Override
-    public TrustRelationship serializeMessage( final String rawRelationship )
+    public RelationInfo serializeMessage( final String rawRelationship )
     {
         //TODO parse raw relationship
-        TrustRelationshipImpl relationship = new TrustRelationshipImpl();
+        RelationInfoImpl relationship = new RelationInfoImpl();
         String[] conditions = rawRelationship.split( "\n" );
 
         for ( final String condition : conditions )
@@ -79,14 +80,11 @@ public class TrustMessageManagerImpl implements TrustMessageManager
 
             switch ( key )
             {
-                case "trustLevel":
-                    relationship.setTrustLevel( value );
-                    break;
                 case "context":
                     relationship.setContext( value );
                     break;
                 case "operation":
-                    relationship.setOperation( value );
+                    relationship.setOperation( Sets.newHashSet( value.split( "," ) ) );
                     break;
                 case "type":
                     relationship.setType( value );

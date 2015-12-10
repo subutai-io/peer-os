@@ -8,16 +8,16 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import io.subutai.core.identity.api.model.TrustItem;
+import io.subutai.core.identity.api.model.RelationLink;
 
 
 /**
  * Created by talas on 12/8/15.
  */
 @Entity
-@Table( name = "trust_item" )
+@Table( name = "relation_link" )
 @Access( AccessType.FIELD )
-public class TrustItemImpl implements TrustItem
+public class RelationLinkImpl implements RelationLink
 {
     @Id
     @Column( name = "item_id" )
@@ -30,12 +30,12 @@ public class TrustItemImpl implements TrustItem
     private String classPath;
 
 
-    public TrustItemImpl()
+    public RelationLinkImpl()
     {
     }
 
 
-    public TrustItemImpl( final String uniqueIdentifier, final String classPath )
+    public RelationLinkImpl( final String uniqueIdentifier, final String classPath )
     {
         this.uniqueIdentifier = uniqueIdentifier;
         this.classPath = classPath;
@@ -71,12 +71,12 @@ public class TrustItemImpl implements TrustItem
         {
             return true;
         }
-        if ( !( o instanceof TrustItemImpl ) )
+        if ( !( o instanceof RelationLinkImpl ) )
         {
             return false;
         }
 
-        final TrustItemImpl trustItem = ( TrustItemImpl ) o;
+        final RelationLinkImpl trustItem = ( RelationLinkImpl ) o;
 
         if ( uniqueIdentifier != null ? !uniqueIdentifier.equals( trustItem.uniqueIdentifier ) :
              trustItem.uniqueIdentifier != null )
@@ -99,7 +99,7 @@ public class TrustItemImpl implements TrustItem
     @Override
     public String toString()
     {
-        return "TrustItemImpl{" +
+        return "RelationLinkImpl{" +
                 "id=" + id +
                 ", uniqueIdentifier='" + uniqueIdentifier + '\'' +
                 ", classPath='" + classPath + '\'' +

@@ -1,18 +1,19 @@
 package io.subutai.core.identity.api.model;
 
 
+import java.util.Set;
+
+
 /**
  * Created by talas on 12/10/15.
  */
-public interface TrustRelationship
+public interface RelationInfo
 {
     long getId();
 
-    String getTrustLevel();
-
     String getContext();
 
-    String getOperation();
+    Set<String> getOperation();
 
     String getType();
 }

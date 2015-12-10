@@ -1,33 +1,36 @@
 package io.subutai.core.identity.impl.model;
 
 
+import java.util.Set;
+
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import io.subutai.core.identity.api.model.TrustRelationship;
+import com.google.common.collect.Sets;
+
+import io.subutai.core.identity.api.model.RelationInfo;
 
 
 /**
  * Created by talas on 12/8/15.
  */
 @Entity
-@Table( name = "trust_relationship" )
+@Table( name = "relation_info" )
 @Access( AccessType.FIELD )
-public class TrustRelationshipImpl implements TrustRelationship
+public class RelationInfoImpl implements RelationInfo
 {
     @Id
     @GeneratedValue( strategy = GenerationType.IDENTITY )
-    @Column( name = "relationship_id" )
+    @Column( name = "relation_info_id" )
     private long id;
-
-    @Column( name = "trust_level" )
-    private String trustLevel = "";
 
     // condition
     @Column( name = "context" )
@@ -35,22 +38,29 @@ public class TrustRelationshipImpl implements TrustRelationship
 
     //read, write, delete, update
     @Column( name = "operation" )
-    private String operation = "";
+    @ElementCollection( targetClass = String.class, fetch = FetchType.EAGER )
+    private Set<String> operation = Sets.newHashSet();
 
     //Permission, role
     @Column( name = "type" )
     private String type = "";
 
 
-    public TrustRelationshipImpl()
+    public RelationInfoImpl()
     {
     }
 
 
-    public TrustRelationshipImpl( final String trustLevel, final String context, final String operation,
-                                  final String ttl, final String type )
+    public RelationInfoImpl( final RelationInfo relationInfo )
     {
-        this.trustLevel = trustLevel;
+        this.context = relationInfo.getContext();
+        this.operation = relationInfo.getOperation();
+        this.type = relationInfo.getType();
+    }
+
+
+    public RelationInfoImpl( final String context, final Set<String> operation, final String type )
+    {
         this.context = context;
         this.operation = operation;
         this.type = type;
@@ -65,13 +75,6 @@ public class TrustRelationshipImpl implements TrustRelationship
 
 
     @Override
-    public String getTrustLevel()
-    {
-        return trustLevel;
-    }
-
-
-    @Override
     public String getContext()
     {
         return context;
@@ -79,7 +82,7 @@ public class TrustRelationshipImpl implements TrustRelationship
 
 
     @Override
-    public String getOperation()
+    public Set<String> getOperation()
     {
         return operation;
     }
@@ -92,19 +95,13 @@ public class TrustRelationshipImpl implements TrustRelationship
     }
 
 
-    public void setTrustLevel( final String trustLevel )
-    {
-        this.trustLevel = trustLevel;
-    }
-
-
     public void setContext( final String context )
     {
         this.context = context;
     }
 
 
-    public void setOperation( final String operation )
+    public void setOperation( final Set<String> operation )
     {
         this.operation = operation;
     }
@@ -123,17 +120,13 @@ public class TrustRelationshipImpl implements TrustRelationship
         {
             return true;
         }
-        if ( !( o instanceof TrustRelationshipImpl ) )
+        if ( !( o instanceof RelationInfoImpl ) )
         {
             return false;
         }
 
-        final TrustRelationshipImpl that = ( TrustRelationshipImpl ) o;
+        final RelationInfoImpl that = ( RelationInfoImpl ) o;
 
-        if ( trustLevel != null ? !trustLevel.equals( that.trustLevel ) : that.trustLevel != null )
-        {
-            return false;
-        }
         if ( context != null ? !context.equals( that.context ) : that.context != null )
         {
             return false;
@@ -149,8 +142,7 @@ public class TrustRelationshipImpl implements TrustRelationship
     @Override
     public int hashCode()
     {
-        int result = trustLevel != null ? trustLevel.hashCode() : 0;
-        result = 31 * result + ( context != null ? context.hashCode() : 0 );
+        int result = context != null ? context.hashCode() : 0;
         result = 31 * result + ( operation != null ? operation.hashCode() : 0 );
         result = 31 * result + ( type != null ? type.hashCode() : 0 );
         return result;
