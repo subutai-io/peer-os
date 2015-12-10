@@ -71,7 +71,6 @@ public interface LocalPeer extends Peer
 
     //    Quota getQuota( ContainerHost host, QuotaType quota ) throws PeerException;
 
-    //    @RolesAllowed( "Environment-Management|A|Update" )
     //    void setQuota( ContainerHost host, Quota quota ) throws PeerException;
 
     /**

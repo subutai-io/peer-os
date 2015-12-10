@@ -7,8 +7,7 @@ package io.subutai.common.security.objects;
 public enum PermissionScope
 {
     ALL_SCOPE( 1,"All-Objects" ),
-    CHILD_SCOPE( 2, "Child-Objects" ),
-    OWNER_SCOPE( 3, "Owner-Objects" );
+    OWNER_SCOPE( 2, "Owner/Trusted-Objects" );
 
     private String name;
     private int id;

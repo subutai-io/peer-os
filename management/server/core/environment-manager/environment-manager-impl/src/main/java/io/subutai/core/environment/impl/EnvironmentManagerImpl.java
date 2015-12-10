@@ -333,7 +333,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Write" )
+    @RolesAllowed( "Environment-Management|Write" )
     @Override
     public Environment createEnvironment( final Blueprint blueprint, final boolean async )
             throws EnvironmentCreationException
@@ -453,7 +453,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Write" )
+    @RolesAllowed( "Environment-Management|Write" )
     @Override
     public Set<EnvironmentContainerHost> growEnvironment( final String environmentId, final Blueprint blueprint,
                                                           final boolean async )
@@ -466,7 +466,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Write" )
+    @RolesAllowed( "Environment-Management|Write" )
     private Set<EnvironmentContainerHost> growEnvironment( final String environmentId, final Blueprint blueprint,
                                                            final boolean async, final boolean checkAccess,
                                                            TrackerOperation operationTracker )
@@ -552,7 +552,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Write" )
+    @RolesAllowed( "Environment-Management|Write" )
     @Override
     public void setSshKey( final String environmentId, final String sshKey, final boolean async )
             throws EnvironmentNotFoundException, EnvironmentModificationException
@@ -598,7 +598,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Delete" )
+    @RolesAllowed( "Environment-Management|Delete" )
     @Override
     public void destroyEnvironment( final String environmentId, final boolean async,
                                     final boolean forceMetadataRemoval )
@@ -611,7 +611,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Delete" )
+    @RolesAllowed( "Environment-Management|Delete" )
     public void destroyEnvironment( final String environmentId, boolean async, final boolean forceMetadataRemoval,
                                     final boolean checkAccess, final TrackerOperation operationTracker )
             throws EnvironmentDestructionException, EnvironmentNotFoundException
@@ -670,7 +670,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Delete" )
+    @RolesAllowed( "Environment-Management|Delete" )
     @Override
     public void destroyContainer( final String environmentId, final String containerId, final boolean async,
                                   final boolean forceMetadataRemoval )
@@ -687,7 +687,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Delete" )
+    @RolesAllowed( "Environment-Management|Delete" )
     public void destroyContainer( final String environmentId, final String containerId, final boolean async,
                                   final boolean forceMetadataRemoval, final boolean checkAccess,
                                   final TrackerOperation operationTracker )
@@ -773,7 +773,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Delete" )
+    @RolesAllowed( "Environment-Management|Delete" )
     @Override
     public void removeEnvironment( final String environmentId ) throws EnvironmentNotFoundException
     {
@@ -783,7 +783,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Delete" )
+    @RolesAllowed( "Environment-Management|Delete" )
     public void removeEnvironment( final String environmentId, final boolean checkAccess )
             throws EnvironmentNotFoundException
     {
@@ -837,7 +837,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Write" )
+    @RolesAllowed( "Environment-Management|Write" )
     @Override
     public void saveBlueprint( final Blueprint blueprint ) throws EnvironmentManagerException
     {
@@ -847,7 +847,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Write" )
+    @RolesAllowed( "Environment-Management|Write" )
     @Override
     public Blueprint getBlueprint( final UUID id ) throws EnvironmentManagerException
     {
@@ -856,7 +856,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Delete" )
+    @RolesAllowed( "Environment-Management|Delete" )
     @Override
     public void removeBlueprint( final UUID blueprintId ) throws EnvironmentManagerException
     {
@@ -874,7 +874,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Update" )
+    @RolesAllowed( "Environment-Management|Update" )
     @Override
     public void updateEnvironmentContainersMetadata( final String environmentId ) throws EnvironmentManagerException
     {
@@ -910,7 +910,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Update" )
+    @RolesAllowed( "Environment-Management|Update" )
     @Override
     public void assignEnvironmentDomain( final String environmentId, final String newDomain,
                                          final DomainLoadBalanceStrategy domainLoadBalanceStrategy,
@@ -930,7 +930,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Update" )
+    @RolesAllowed( "Environment-Management|Update" )
     @Override
     public void removeEnvironmentDomain( final String environmentId )
             throws EnvironmentModificationException, EnvironmentNotFoundException
@@ -1021,7 +1021,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Update" )
+    @RolesAllowed( "Environment-Management|Update" )
     @Override
     public void addContainerToEnvironmentDomain( final String containerHostId, final String environmentId )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
@@ -1033,7 +1033,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Update" )
+    @RolesAllowed( "Environment-Management|Update" )
     @Override
     public int setupContainerSsh( final String containerHostId, final String environmentId )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
@@ -1066,7 +1066,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Update" )
+    @RolesAllowed( "Environment-Management|Update" )
     @Override
     public void removeContainerFromEnvironmentDomain( final String containerHostId, final String environmentId )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
@@ -1338,7 +1338,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Write" )
+    @RolesAllowed( "Environment-Management|Write" )
     protected EnvironmentImpl createEmptyEnvironment( final String name, final String subnetCidr, final String sshKey )
     {
 
