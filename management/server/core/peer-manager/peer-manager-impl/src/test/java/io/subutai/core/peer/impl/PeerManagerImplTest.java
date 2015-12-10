@@ -12,9 +12,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerInfo;
@@ -31,23 +28,16 @@ import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.messenger.api.Messenger;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.peer.impl.command.CommandResponseListener;
-import io.subutai.core.peer.impl.dao.PeerDAO;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.strategy.api.StrategyManager;
 
 import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyObject;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -57,8 +47,7 @@ public class PeerManagerImplTest
 {
     private static final String PEER_ID_FILE = "./id";
     private static final String PEER_ID = UUID.randomUUID().toString();
-    @Mock
-    PeerDAO peerDAO;
+
     @Mock
     QuotaManager quotaManager;
     @Mock
