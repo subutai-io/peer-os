@@ -66,7 +66,7 @@ And the user selects management host from select menu
 And the user enters console command: 'du -sh /apps/subutai-mng/current/system/io/subutai/webui*'
 Then the user gets weight of Web UI
 When the user enters console command: 'clear'
-When the user enters console command: 'du -sh /apps/subutai-mng/current/deploy/webui-4.0.0-RC4.war'
+When the user enters console command: 'du -sh /apps/subutai-mng/current/deploy/webui-4.0.0-RC5.war'
 Then the user gets weight of Web UI .war
 And the user gets weight of all files
 And the user should observe that Web UI is less than 10Mb

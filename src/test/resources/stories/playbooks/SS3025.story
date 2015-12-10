@@ -7,7 +7,7 @@ So that I created test scenarios
 
 Scenario: The First User Sends Request
 Given the first user is on the home page of Subutai
-And the user enters login and password: '$login', '$password'
+And the user enters login and password: 'admin', 'secret'
 And the user clicks on the button: Login
 When the user clicks on the menu item: Peer Registration
 Then the user observes button: Create Peer
