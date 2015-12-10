@@ -141,9 +141,20 @@ public class BlueprintDataService
     public Blueprint find( final UUID id )
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
-        EnvironmentBlueprintEntity r = em.find( EnvironmentBlueprintEntity.class, id.toString() );
-        Blueprint blueprint = JsonUtil.fromJson( r.getInfo(), Blueprint.class );
-        return blueprint;
+        try
+        {
+            EnvironmentBlueprintEntity r = em.find( EnvironmentBlueprintEntity.class, id.toString() );
+            return JsonUtil.fromJson( r.getInfo(), Blueprint.class );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Failed to find blueprint by id {}", id, e );
+            return null;
+        }
+        finally
+        {
+            daoManager.closeEntityManager( em );
+        }
     }
 }
 
