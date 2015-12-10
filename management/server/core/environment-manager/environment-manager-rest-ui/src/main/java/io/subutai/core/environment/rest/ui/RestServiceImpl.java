@@ -125,7 +125,15 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            return Response.ok( gson.toJson( environmentManager.getBlueprint( blueprintId ) ) ).build();
+            Blueprint blueprint = environmentManager.getBlueprint( blueprintId );
+            if ( blueprint != null )
+            {
+                return Response.ok( gson.toJson( blueprint ) ).build();
+            }
+            else
+            {
+                return Response.status( Response.Status.NOT_FOUND ).build();
+            }
         }
         catch ( EnvironmentManagerException e )
         {
