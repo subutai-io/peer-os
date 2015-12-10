@@ -1,7 +1,12 @@
 package io.subutai.core.identity.api.relation;
 
 
-import io.subutai.common.drms.TrustMessage;
+import java.io.UnsupportedEncodingException;
+
+import org.bouncycastle.openpgp.PGPException;
+
+import io.subutai.core.identity.api.model.TrustRelation;
+import io.subutai.core.identity.api.model.TrustRelationship;
 
 
 /**
@@ -19,21 +24,25 @@ public interface TrustMessageManager
      *
      * @param encryptedMessage - Encrypted message where trust relationship is declared
      */
-    void decryptMessage( String encryptedMessage );
+    TrustRelation decryptAndVerifyMessage( String encryptedMessage ) throws PGPException, UnsupportedEncodingException;
 
     /**
-     * Verify that trust relationship is from trusted source
+     * Get message sender's key fingerprint
+     *
      * @param trustMessage - signed trust relationship message
      */
-    void authenticateSource( TrustMessage trustMessage );
+    String authenticateSource( TrustRelation trustMessage );
 
     /**
-     * Verify that decrypted message is signed by trusted source
+     * Verify that decrypted message is signed by trusted source, message verification should be done by comparing
+     * trustMessage properties appended into one string with sourceFingerprint public key
+     *
      * @param trustMessage - signed message
-     * @param source - source
+     * @param signature - message signature
+     * @param sourceFingerprint - sender's fingerprint
      */
-    void verifyMessageSource( TrustMessage trustMessage, Object source );
+    boolean verifyMessageSource( TrustRelation trustMessage, String signature, String sourceFingerprint );
 
 
-    void serializeMessage( TrustMessage message, Class clazz );
+    TrustRelationship serializeMessage( String rawRelationship );
 }

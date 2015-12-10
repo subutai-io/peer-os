@@ -3,7 +3,6 @@ package io.subutai.core.identity.api;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Callable;
 
 import javax.annotation.security.PermitAll;
@@ -219,7 +218,4 @@ public interface IdentityManager
      */
     void removeUserToken( String tokenId );
 
-    void createTrustRelationship( Map<String, String> relationshipProp );
-
-    boolean isRelationValid( String sourceId, String sourcePath, String objectId, String objectPath, String statement );
 }

@@ -24,7 +24,6 @@ import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.dao.DaoManager;
@@ -351,6 +350,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         //create empty environment
         final EnvironmentImpl environment = createEmptyEnvironment( blueprint.getName(), cidr, blueprint.getSshKey() );
+
+        // TODO add additional step for receiving trust message
+
+
 
         //create operation tracker
         TrackerOperation operationTracker = tracker.createTrackerOperation( TRACKER_SOURCE,
@@ -825,12 +828,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         for ( Environment environment : environmentDataService.getAll() )
         {
             //TODO check for trust relation via security manager
-            boolean trustRelation = identityManager
-                    .isRelationValid( String.valueOf( activeUser.getId() ), activeUser.getClass().getSimpleName(),
-                            environment.getId(), environment.getClass().getSimpleName(),
-                            "action=Allowed\nscope=Read\ntype=Environment\ntrustLevel=Full" );
+            //            boolean trustRelation = identityManager
+            //                    .isRelationValid( String.valueOf( activeUser.getId() ), activeUser.getClass()
+            // .getSimpleName(),
+            //                            environment.getId(), environment.getClass().getSimpleName(),
+            //                            "action=Allowed\nscope=Read\ntype=Environment\ntrustLevel=Full" );
 
-            if ( viewAll || environment.getUserId().equals( activeUser.getId() ) || trustRelation )
+            //            if ( viewAll || environment.getUserId().equals( activeUser.getId() ) || trustRelation )
+            if ( viewAll || environment.getUserId().equals( activeUser.getId() ) )
             {
                 environments.add( environment );
 
@@ -1352,27 +1357,27 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         EnvironmentImpl environment =
                 new EnvironmentImpl( name, subnetCidr, sshKey, getUserId(), peerManager.getLocalPeerInfo().getId() );
 
-        User activeUser = identityManager.getActiveUser();
-        //TODO set trust instead of setting explicit user
         environment.setUserId( identityManager.getActiveUser().getId() );
 
-        Map<String, String> trustRelationship = Maps.newHashMap();
-        trustRelationship.put( "sourceId", String.valueOf( activeUser.getId() ) );
-        trustRelationship.put( "sourceClass", activeUser.getClass().getSimpleName() );
-
-        trustRelationship.put( "targetId", String.valueOf( activeUser.getId() ) );
-        trustRelationship.put( "targetClass", activeUser.getClass().getSimpleName() );
-
-        trustRelationship.put( "objectId", environment.getId() );
-        trustRelationship.put( "objectClass", environment.getClass().getSimpleName() );
-
-        trustRelationship.put( "trustLevel", "Full" );
-        trustRelationship.put( "scope", "Read" );
-        trustRelationship.put( "action", "Allowed" );
-        trustRelationship.put( "ttl", "" );
-        trustRelationship.put( "type", "Environment" );
-
-        identityManager.createTrustRelationship( trustRelationship );
+        //        //TODO set trust instead of setting explicit user
+        //        User activeUser = identityManager.getActiveUser();
+        //        Map<String, String> trustRelationship = Maps.newHashMap();
+        //        trustRelationship.put( "sourceId", String.valueOf( activeUser.getId() ) );
+        //        trustRelationship.put( "sourceClass", activeUser.getClass().getSimpleName() );
+        //
+        //        trustRelationship.put( "targetId", String.valueOf( activeUser.getId() ) );
+        //        trustRelationship.put( "targetClass", activeUser.getClass().getSimpleName() );
+        //
+        //        trustRelationship.put( "objectId", environment.getId() );
+        //        trustRelationship.put( "objectClass", environment.getClass().getSimpleName() );
+        //
+        //        trustRelationship.put( "trustLevel", "Full" );
+        //        trustRelationship.put( "scope", "Read" );
+        //        trustRelationship.put( "action", "Allowed" );
+        //        trustRelationship.put( "ttl", "" );
+        //        trustRelationship.put( "type", "Environment" );
+        //
+        //        identityManager.createTrustRelationship( trustRelationship );
 
 
         environment = saveOrUpdate( environment );

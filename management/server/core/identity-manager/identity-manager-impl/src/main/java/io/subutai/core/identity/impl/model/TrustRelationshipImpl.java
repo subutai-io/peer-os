@@ -30,15 +30,12 @@ public class TrustRelationshipImpl implements TrustRelationship
     private String trustLevel = "";
 
     // condition
-    @Column( name = "scope" )
-    private String scope = "";
+    @Column( name = "context" )
+    private String context = "";
 
     //read, write, delete, update
-    @Column( name = "action" )
-    private String action = "";
-
-    @Column( name = "ttl" )
-    private String ttl = "";
+    @Column( name = "operation" )
+    private String operation = "";
 
     //Permission, role
     @Column( name = "type" )
@@ -50,13 +47,12 @@ public class TrustRelationshipImpl implements TrustRelationship
     }
 
 
-    public TrustRelationshipImpl( final String trustLevel, final String scope, final String action, final String ttl,
-                                  final String type )
+    public TrustRelationshipImpl( final String trustLevel, final String context, final String operation,
+                                  final String ttl, final String type )
     {
         this.trustLevel = trustLevel;
-        this.scope = scope;
-        this.action = action;
-        this.ttl = ttl;
+        this.context = context;
+        this.operation = operation;
         this.type = type;
     }
 
@@ -76,23 +72,16 @@ public class TrustRelationshipImpl implements TrustRelationship
 
 
     @Override
-    public String getScope()
+    public String getContext()
     {
-        return scope;
+        return context;
     }
 
 
     @Override
-    public String getAction()
+    public String getOperation()
     {
-        return action;
-    }
-
-
-    @Override
-    public String getTtl()
-    {
-        return ttl;
+        return operation;
     }
 
 
@@ -109,21 +98,15 @@ public class TrustRelationshipImpl implements TrustRelationship
     }
 
 
-    public void setScope( final String scope )
+    public void setContext( final String context )
     {
-        this.scope = scope;
+        this.context = context;
     }
 
 
-    public void setAction( final String action )
+    public void setOperation( final String operation )
     {
-        this.action = action;
-    }
-
-
-    public void setTtl( final String ttl )
-    {
-        this.ttl = ttl;
+        this.operation = operation;
     }
 
 
@@ -151,15 +134,11 @@ public class TrustRelationshipImpl implements TrustRelationship
         {
             return false;
         }
-        if ( scope != null ? !scope.equals( that.scope ) : that.scope != null )
+        if ( context != null ? !context.equals( that.context ) : that.context != null )
         {
             return false;
         }
-        if ( action != null ? !action.equals( that.action ) : that.action != null )
-        {
-            return false;
-        }
-        if ( ttl != null ? !ttl.equals( that.ttl ) : that.ttl != null )
+        if ( operation != null ? !operation.equals( that.operation ) : that.operation != null )
         {
             return false;
         }
@@ -171,9 +150,8 @@ public class TrustRelationshipImpl implements TrustRelationship
     public int hashCode()
     {
         int result = trustLevel != null ? trustLevel.hashCode() : 0;
-        result = 31 * result + ( scope != null ? scope.hashCode() : 0 );
-        result = 31 * result + ( action != null ? action.hashCode() : 0 );
-        result = 31 * result + ( ttl != null ? ttl.hashCode() : 0 );
+        result = 31 * result + ( context != null ? context.hashCode() : 0 );
+        result = 31 * result + ( operation != null ? operation.hashCode() : 0 );
         result = 31 * result + ( type != null ? type.hashCode() : 0 );
         return result;
     }

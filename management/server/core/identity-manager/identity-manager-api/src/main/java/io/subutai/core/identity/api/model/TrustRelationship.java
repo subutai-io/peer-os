@@ -10,11 +10,9 @@ public interface TrustRelationship
 
     String getTrustLevel();
 
-    String getScope();
+    String getContext();
 
-    String getAction();
-
-    String getTtl();
+    String getOperation();
 
     String getType();
 }

@@ -14,9 +14,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import io.subutai.core.identity.api.model.TrustItem;
 import io.subutai.core.identity.api.model.TrustRelation;
-import io.subutai.core.identity.api.model.TrustRelationship;
 
 
 /**
@@ -64,31 +62,36 @@ public class TrustRelationImpl implements TrustRelation
     }
 
 
+    @Override
     public long getId()
     {
         return id;
     }
 
 
-    public TrustItem getSource()
+    @Override
+    public TrustItemImpl getSource()
     {
         return source;
     }
 
 
-    public TrustItem getTarget()
+    @Override
+    public TrustItemImpl getTarget()
     {
         return target;
     }
 
 
-    public TrustItem getTrustedObject()
+    @Override
+    public TrustItemImpl getTrustedObject()
     {
         return trustedObject;
     }
 
 
-    public TrustRelationship getRelationship()
+    @Override
+    public TrustRelationshipImpl getRelationship()
     {
         return relationship;
     }

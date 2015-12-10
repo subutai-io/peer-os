@@ -54,7 +54,7 @@ public class TrustRelationDAO
     }
 
 
-    public void update( TrustRelationImpl trustRelation )
+    public void update( TrustRelation trustRelation )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
 

@@ -241,5 +241,7 @@ public interface IdentityDataService
     TrustItem getTrustItem( String uniqueIdentifier, String classPath );
 
 
-    TrustRelation getTrustRelationBySourceObject( TrustItem source, TrustItem object );
+    TrustRelation getRelationBySourceObject( TrustItem source, TrustItem object );
+
+    void persistTrustRelation( TrustRelation trustRelation );
 }

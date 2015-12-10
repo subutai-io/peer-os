@@ -9,6 +9,8 @@ import java.io.Serializable;
  */
 public interface TrustItem extends Serializable
 {
+    String getId();
+
     String getUniqueIdentifier();
 
     String getClassPath();

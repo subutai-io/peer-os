@@ -470,12 +470,19 @@ public class IdentityDataServiceImpl implements IdentityDataService
 
 
     @Override
-    public TrustRelation getTrustRelationBySourceObject( final TrustItem source, final TrustItem object )
+    public TrustRelation getRelationBySourceObject( final TrustItem source, final TrustItem object )
     {
         if ( ( source instanceof TrustItemImpl ) && ( object instanceof TrustItemImpl ) )
         {
             return trustRelationDAO.findBySourceAndObject( ( TrustItemImpl ) source, ( TrustItemImpl ) object );
         }
         return null;
+    }
+
+
+    @Override
+    public void persistTrustRelation( final TrustRelation trustRelation )
+    {
+        trustRelationDAO.update( trustRelation );
     }
 }

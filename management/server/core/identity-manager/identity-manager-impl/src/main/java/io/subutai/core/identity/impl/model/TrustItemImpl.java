@@ -43,18 +43,21 @@ public class TrustItemImpl implements TrustItem
     }
 
 
+    @Override
     public String getId()
     {
         return id;
     }
 
 
+    @Override
     public String getUniqueIdentifier()
     {
         return uniqueIdentifier;
     }
 
 
+    @Override
     public String getClassPath()
     {
         return classPath;
