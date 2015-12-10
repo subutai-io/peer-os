@@ -97,7 +97,7 @@ public class ClientInInterceptor extends AbstractPhaseInterceptor<Message>
         try
         {
             String targetId = peerManager.getPeerIdByIp( ip );
-            String sourceId = peerManager.getLocalPeerInfo().getId();
+            String sourceId = peerManager.getLocalPeer().getId();
             MessageContentUtil.decryptContent( channelManagerImpl.getSecurityManager(), message, sourceId, targetId );
         }
         catch ( PeerException e )
@@ -112,7 +112,7 @@ public class ClientInInterceptor extends AbstractPhaseInterceptor<Message>
         try
         {
             String targetId = peerManager.getPeerIdByIp( ip ) + "-" + environmentId;
-            String sourceId = peerManager.getLocalPeerInfo().getId() + "-" + environmentId;
+            String sourceId = peerManager.getLocalPeer().getId() + "-" + environmentId;
 
             MessageContentUtil.decryptContent( channelManagerImpl.getSecurityManager(), message, sourceId, targetId );
         }

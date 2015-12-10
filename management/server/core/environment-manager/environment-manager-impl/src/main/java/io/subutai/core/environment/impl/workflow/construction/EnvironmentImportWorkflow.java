@@ -83,7 +83,7 @@ public class EnvironmentImportWorkflow extends Workflow<EnvironmentImportWorkflo
     {
 
         environment.setStatus( EnvironmentStatus.IMPORTING );
-        environment.setSuperNode( peerManager.getLocalPeerInfo().getIp() );
+        environment.setSuperNode( peerManager.getLocalPeer().getPeerInfo().getIp() );
         environment.setSuperNodePort( Common.SUPER_NODE_PORT );
 
         environment = environmentManager.saveOrUpdate( environment );

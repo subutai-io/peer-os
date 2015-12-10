@@ -78,29 +78,29 @@ public class RestServiceImpl implements RestService
     }
 
 
-    @Override
-    public Response getPeerPolicy( final String peerId )
-    {
-        try
-        {
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
-
-            PeerPolicy peerPolicy = localPeer.getPeerInfo().getPeerPolicy( peerId );
-            if ( peerPolicy == null )
-            {
-                return Response.ok().build();
-            }
-            else
-            {
-                return Response.ok( peerPolicy ).build();
-            }
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( "Error getting peer policy #getPeerPolicy", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
-        }
-    }
+//    @Override
+//    public Response getPeerPolicy( )
+//    {
+//        try
+//        {
+////            Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
+//
+//            PeerPolicy peerPolicy = localPeer.getPeerInfo().getPeerPolicy();
+//            if ( peerPolicy == null )
+//            {
+//                return Response.ok().build();
+//            }
+//            else
+//            {
+//                return Response.ok( peerPolicy ).build();
+//            }
+//        }
+//        catch ( Exception e )
+//        {
+//            LOGGER.error( "Error getting peer policy #getPeerPolicy", e );
+//            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+//        }
+//    }
 
 
     @Override

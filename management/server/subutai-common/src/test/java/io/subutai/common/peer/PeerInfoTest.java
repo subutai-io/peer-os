@@ -11,10 +11,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import io.subutai.common.peer.PeerInfo;
-import io.subutai.common.peer.PeerPolicy;
-import io.subutai.common.peer.PeerStatus;
-
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
 
@@ -34,8 +30,8 @@ public class PeerInfoTest
     @Before
     public void setUp() throws Exception
     {
-        when( peerPolicy.getRemotePeerId() ).thenReturn( new UUID( 50, 50 ).toString() );
-        when( peerPolicy2.getRemotePeerId() ).thenReturn( UUID.randomUUID().toString() );
+        when( peerPolicy.getPeerId() ).thenReturn( new UUID( 50, 50 ).toString() );
+        when( peerPolicy2.getPeerId() ).thenReturn( UUID.randomUUID().toString() );
 
         Set<PeerPolicy> mySet = new HashSet<>();
         mySet.add( peerPolicy );
@@ -43,16 +39,16 @@ public class PeerInfoTest
 
         peerInfo = new PeerInfo();
         peerInfo.setId( UUID.randomUUID().toString() );
-        peerInfo.setGatewayIp( "testGateWayIp" );
+//        peerInfo.setGatewayIp( "testGateWayIp" );
         peerInfo.setIp( "testIp" );
-        peerInfo.setKeyId( "testKeyId" );
-        peerInfo.setLastUsedVlanId( 555 );
+//        peerInfo.setKeyId( "testKeyId" );
+//        peerInfo.setLastUsedVlanId( 555 );
         peerInfo.setName( "testName" );
         peerInfo.setOwnerId( UUID.randomUUID().toString() );
-        peerInfo.setPeerPolicy( peerPolicy );
-        peerInfo.setPeerPolicies( mySet );
+//        peerInfo.setPeerPolicy( peerPolicy );
+//        peerInfo.setPeerPolicies( mySet );
         peerInfo.setPort( 8252 );
-        peerInfo.setStatus( PeerStatus.APPROVED );
+//        peerInfo.setStatus( PeerStatus.APPROVED );
     }
 
 
@@ -63,13 +59,13 @@ public class PeerInfoTest
         assertNotNull( peerInfo.getName() );
         assertNotNull( peerInfo.getOwnerId() );
         assertNotNull( peerInfo.getIp() );
-        assertNotNull( peerInfo.getGatewayIp() );
-        assertNotNull( peerInfo.getStatus() );
+//        assertNotNull( peerInfo.getGatewayIp() );
+//        assertNotNull( peerInfo.getStatus() );
         assertNotNull( peerInfo.getPort() );
-        assertNotNull( peerInfo.getLastUsedVlanId() );
-        assertNotNull( peerInfo.getKeyId() );
-        assertNotNull( peerInfo.getPeerPolicies() );
-        assertNotNull( peerInfo.getPeerPolicy( new UUID( 50, 50 ).toString() ) );
+//        assertNotNull( peerInfo.getLastUsedVlanId() );
+//        assertNotNull( peerInfo.getKeyId() );
+//        assertNotNull( peerInfo.getPeerPolicy() );
+//        assertNotNull( peerInfo.getPeerPolicy( new UUID( 50, 50 ).toString() ) );
         peerInfo.hashCode();
         peerInfo.equals( "test" );
         peerInfo.equals( peerInfo );

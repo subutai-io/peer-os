@@ -154,7 +154,7 @@ public class RemotePeerImplTest
         params.put( PARAM_NAME, PARAM_VALUE );
         headers = Maps.newHashMap();
         headers.put( HEADER_NAME, HEADER_VALUE );
-        remotePeer = spy( new RemotePeerImpl( localPeer, securityManager, peerInfo, messenger, commandResponseListener,
+        remotePeer = spy( new RemotePeerImpl( localPeer.getId(), securityManager, peerInfo, messenger, commandResponseListener,
                 messageResponseListener, null ) );
         remotePeer.restUtil = restUtil;
         remotePeer.jsonUtil = jsonUtil;

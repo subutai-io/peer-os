@@ -218,6 +218,7 @@ public class LocalPeerImplTest
         localPeer.exceptionUtil = exceptionUtil;
         localPeer.managementHost = managementHost;
         localPeer.requestListeners = Sets.newHashSet( requestListener );
+        localPeer.setPeerInfo( peerInfo );
 
         //        when( cpuQuota.getValue( MeasureUnit.PERCENT ).intValue() ).thenReturn( Integer.parseInt( CPUQUOTA
         // ) );
@@ -237,7 +238,7 @@ public class LocalPeerImplTest
         when( resourceHost.getHostname() ).thenReturn( RESOURCE_HOST_NAME );
         when( localPeer.getPeerInfo() ).thenReturn( peerInfo );
         when( securityManager.getKeyManager() ).thenReturn( keyManager );
-        localPeer.peerInfo = peerInfo;
+        when( localPeer.getPeerInfo() ).thenReturn( peerInfo );
         when( peerInfo.getId() ).thenReturn( LOCAL_PEER_ID );
         when( peerInfo.getName() ).thenReturn( LOCAL_PEER_NAME );
         when( peerInfo.getOwnerId() ).thenReturn( OWNER_ID );

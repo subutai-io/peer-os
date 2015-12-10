@@ -1343,7 +1343,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     {
 
         EnvironmentImpl environment =
-                new EnvironmentImpl( name, subnetCidr, sshKey, getUserId(), peerManager.getLocalPeerInfo().getId() );
+                new EnvironmentImpl( name, subnetCidr, sshKey, getUserId(), peerManager.getLocalPeer().getId() );
 
         environment.setUserId( identityManager.getActiveUser().getId() );
         environment = saveOrUpdate( environment );
