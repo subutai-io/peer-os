@@ -14,7 +14,8 @@ public enum SecurityKeyType
     PeerEnvironmentKey( 5, "Peer-Environment-Key" ),
     ManagementHostKey( 6, "Management-Host-Key" ),
     ResourceHostKey( 8, "Resource-Host-Key" ),
-    ContainerHostKey( 7, "Container-Host-Key" );
+    ContainerHostKey( 7, "Container-Host-Key" ),
+    TemplateKey( 7, "Template-Key" );
 
     private String name;
     private int id;

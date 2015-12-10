@@ -20,7 +20,7 @@ public enum PermissionObject
     private int id;
 
 
-    private PermissionObject(  int id, String name)
+    PermissionObject(  int id, String name)
     {
         this.id = id;
         this.name = name;

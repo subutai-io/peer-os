@@ -229,7 +229,7 @@ public class PeerManagerImpl implements PeerManager
     //    }
 
 
-    @RolesAllowed( { "Peer-Management|A|Write", "Peer-Management|A|Update" } )
+    @RolesAllowed( { "Peer-Management|Write", "Peer-Management|Update" } )
     @Override
     public boolean update( final PeerInfo peerInfo )
     {
@@ -328,7 +328,7 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    @RolesAllowed( { "Peer-Management|A|Write", "Peer-Management|A|Update" } )
+    @RolesAllowed( { "Peer-Management|Write", "Peer-Management|Update" } )
     @Override
     public RegistrationData processRegistrationRequest( final RegistrationData registrationData ) throws PeerException
     {
@@ -337,7 +337,7 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    @RolesAllowed( { "Peer-Management|A|Delete", "Peer-Management|A|Update" } )
+    @RolesAllowed( { "Peer-Management|Delete", "Peer-Management|Update" } )
     @Override
     public void processUnregisterRequest( final RegistrationData registrationData ) throws PeerException
     {
@@ -373,7 +373,7 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    @RolesAllowed( { "Peer-Management|A|Delete", "Peer-Management|A|Update" } )
+    @RolesAllowed( { "Peer-Management|Delete", "Peer-Management|Update" } )
     @Override
     public void processRejectRequest( final RegistrationData registrationData ) throws PeerException
     {
@@ -381,7 +381,7 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    @RolesAllowed( { "Peer-Management|A|Delete", "Peer-Management|A|Update" } )
+    @RolesAllowed( { "Peer-Management|Delete", "Peer-Management|Update" } )
     @Override
     public void processCancelRequest( final RegistrationData registrationData ) throws PeerException
     {
@@ -389,7 +389,7 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    @RolesAllowed( { "Peer-Management|A|Write", "Peer-Management|A|Update" } )
+    @RolesAllowed( { "Peer-Management|Write", "Peer-Management|Update" } )
     @Override
     public void processApproveRequest( final RegistrationData registrationData ) throws PeerException
     {
@@ -439,7 +439,7 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    @RolesAllowed( { "Peer-Management|A|Write", "Peer-Management|A|Update" } )
+    @RolesAllowed( { "Peer-Management|Write", "Peer-Management|Update" } )
     @Override
     public void doRegistrationRequest( final String destinationHost, final String keyPhrase ) throws PeerException
     {
@@ -456,7 +456,7 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    @RolesAllowed( { "Peer-Management|A|Delete", "Peer-Management|A|Update" } )
+    @RolesAllowed( { "Peer-Management|Delete", "Peer-Management|Update" } )
     @Override
     public void doCancelRequest( final RegistrationData request ) throws PeerException
     {
@@ -469,7 +469,7 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    @RolesAllowed( { "Peer-Management|A|Write", "Peer-Management|A|Update" } )
+    @RolesAllowed( { "Peer-Management|Write", "Peer-Management|Update" } )
     @Override
     public void doApproveRequest( final String keyPhrase, final RegistrationData request ) throws PeerException
     {
@@ -484,7 +484,7 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    @RolesAllowed( { "Peer-Management|A|Delete", "Peer-Management|A|Update" } )
+    @RolesAllowed( { "Peer-Management|Delete", "Peer-Management|Update" } )
     @Override
     public void doRejectRequest( final RegistrationData request ) throws PeerException
     {
@@ -497,7 +497,7 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    @RolesAllowed( { "Peer-Management|A|Delete", "Peer-Management|A|Update" } )
+    @RolesAllowed( { "Peer-Management|Delete", "Peer-Management|Update" } )
     @Override
     public void doUnregisterRequest( final RegistrationData request ) throws PeerException
     {

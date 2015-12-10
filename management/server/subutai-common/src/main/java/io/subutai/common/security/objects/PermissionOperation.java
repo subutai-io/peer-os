@@ -14,7 +14,7 @@ public enum PermissionOperation
     private String name;
     private int id;
 
-    private PermissionOperation(  int id, String name)
+    PermissionOperation(  int id, String name)
     {
         this.id = id;
         this.name = name;
