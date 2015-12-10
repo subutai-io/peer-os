@@ -825,7 +825,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         for ( Environment environment : environmentDataService.getAll() )
         {
             //TODO check for trust relation via security manager
-            boolean trustRelation = securityManager
+            boolean trustRelation = identityManager
                     .isRelationValid( String.valueOf( activeUser.getId() ), activeUser.getClass().getSimpleName(),
                             environment.getId(), environment.getClass().getSimpleName(),
                             "action=Allowed\nscope=Read\ntype=Environment\ntrustLevel=Full" );
@@ -1372,7 +1372,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         trustRelationship.put( "ttl", "" );
         trustRelationship.put( "type", "Environment" );
 
-        securityManager.createTrustRelationship( trustRelationship );
+        identityManager.createTrustRelationship( trustRelationship );
 
 
         environment = saveOrUpdate( environment );

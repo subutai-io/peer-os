@@ -1,4 +1,4 @@
-package io.subutai.core.security.impl.dao;
+package io.subutai.core.identity.impl.dao;
 
 
 import java.util.List;
@@ -10,10 +10,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.subutai.common.dao.DaoManager;
-import io.subutai.core.security.api.model.TrustItem;
-import io.subutai.core.security.api.model.TrustRelation;
-import io.subutai.core.security.impl.model.TrustItemImpl;
-import io.subutai.core.security.impl.model.TrustRelationImpl;
+import io.subutai.core.identity.api.model.TrustItem;
+import io.subutai.core.identity.api.model.TrustRelation;
+import io.subutai.core.identity.impl.model.TrustItemImpl;
+import io.subutai.core.identity.impl.model.TrustRelationImpl;
 
 
 /**
@@ -106,7 +106,7 @@ public class TrustRelationDAO
         {
             daoManager.startTransaction( em );
 
-            Query qr = em.createQuery( "DELETE FROM TrustRelation AS ss where ss.id=:id" );
+            Query qr = em.createQuery( "DELETE FROM TrustRelationImpl AS ss where ss.id=:id" );
             qr.setParameter( "id", trustRelationId );
             qr.executeUpdate();
 

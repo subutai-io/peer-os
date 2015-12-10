@@ -1,4 +1,4 @@
-package io.subutai.core.security.impl.model;
+package io.subutai.core.identity.impl.model;
 
 
 import javax.persistence.Access;
@@ -14,9 +14,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import io.subutai.core.security.api.model.TrustItem;
-import io.subutai.core.security.api.model.TrustRelation;
-import io.subutai.core.security.api.model.TrustRelationship;
+import io.subutai.core.identity.api.model.TrustItem;
+import io.subutai.core.identity.api.model.TrustRelation;
+import io.subutai.core.identity.api.model.TrustRelationship;
 
 
 /**

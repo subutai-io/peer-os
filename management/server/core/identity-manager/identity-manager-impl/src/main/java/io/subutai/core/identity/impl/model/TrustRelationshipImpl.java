@@ -1,4 +1,4 @@
-package io.subutai.core.security.impl.model;
+package io.subutai.core.identity.impl.model;
 
 
 import javax.persistence.Access;
@@ -10,7 +10,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import io.subutai.core.security.api.model.TrustRelationship;
+import io.subutai.core.identity.api.model.TrustRelationship;
 
 
 /**

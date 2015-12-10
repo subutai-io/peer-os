@@ -9,6 +9,7 @@ import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.Callable;
@@ -46,12 +47,16 @@ import io.subutai.core.identity.api.dao.IdentityDataService;
 import io.subutai.core.identity.api.model.Permission;
 import io.subutai.core.identity.api.model.Role;
 import io.subutai.core.identity.api.model.Session;
+import io.subutai.core.identity.api.model.TrustItem;
+import io.subutai.core.identity.api.model.TrustRelation;
+import io.subutai.core.identity.api.model.TrustRelationship;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserToken;
 import io.subutai.core.identity.impl.dao.IdentityDataServiceImpl;
 import io.subutai.core.identity.impl.model.PermissionEntity;
 import io.subutai.core.identity.impl.model.RoleEntity;
 import io.subutai.core.identity.impl.model.SessionEntity;
+import io.subutai.core.identity.impl.model.TrustRelationshipImpl;
 import io.subutai.core.identity.impl.model.UserEntity;
 import io.subutai.core.identity.impl.model.UserTokenEntity;
 import io.subutai.core.security.api.SecurityManager;
@@ -988,6 +993,74 @@ public class IdentityManagerImpl implements IdentityManager
     public void removeUserToken( String tokenId )
     {
         identityDataService.removeUserToken( tokenId );
+    }
+
+
+    @Override
+    public void createTrustRelationship( final Map<String, String> relationshipProp )
+    {
+        identityDataService.createTrustRelationship( relationshipProp );
+    }
+
+
+    @Override
+    public boolean isRelationValid( final String sourceId, final String sourcePath, final String objectId,
+                                    final String objectPath, String statement )
+    {
+        TrustItem source = identityDataService.getTrustItem( sourceId, sourcePath );
+        TrustItem object = identityDataService.getTrustItem( objectId, objectPath );
+
+        TrustRelation trustRelation = identityDataService.getTrustRelationBySourceObject( source, object );
+
+        TrustRelationship parsedRelationship = buildTrustRelationFromCondition( statement );
+        if ( trustRelation != null )
+        {
+            return trustRelation.getRelationship().equals( parsedRelationship );
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+
+    /**
+     * Relation condition is simple string presentation of propertyKey=propertyValue=condition with each line new
+     * condition is declared. Property values should be comparative objects so that with conditions it would be possible
+     * to identify which condition has greater scope
+     */
+    private TrustRelationship buildTrustRelationFromCondition( String relationCondition )
+    {
+        TrustRelationshipImpl relationship = new TrustRelationshipImpl();
+        String[] conditions = relationCondition.split( "\n" );
+
+        for ( final String condition : conditions )
+        {
+            String[] parsed = condition.split( "=" );
+            String key = parsed[0];
+            String value = parsed[1];
+
+            switch ( key )
+            {
+                case "trustLevel":
+                    relationship.setTrustLevel( value );
+                    break;
+                case "scope":
+                    relationship.setScope( value );
+                    break;
+                case "action":
+                    relationship.setAction( value );
+                    break;
+                case "ttl":
+                    relationship.setTtl( value );
+                    break;
+                case "type":
+                    relationship.setType( value );
+                    break;
+            }
+        }
+
+        return relationship;
     }
 
 

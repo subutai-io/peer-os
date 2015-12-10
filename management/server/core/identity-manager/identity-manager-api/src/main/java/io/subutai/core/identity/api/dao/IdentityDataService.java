@@ -2,7 +2,15 @@ package io.subutai.core.identity.api.dao;
 
 
 import java.util.List;
-import io.subutai.core.identity.api.model.*;
+import java.util.Map;
+
+import io.subutai.core.identity.api.model.Permission;
+import io.subutai.core.identity.api.model.Role;
+import io.subutai.core.identity.api.model.Session;
+import io.subutai.core.identity.api.model.TrustItem;
+import io.subutai.core.identity.api.model.TrustRelation;
+import io.subutai.core.identity.api.model.User;
+import io.subutai.core.identity.api.model.UserToken;
 
 
 /**
@@ -225,4 +233,13 @@ public interface IdentityDataService
      *
      */
     void invalidateSessions();
+
+
+    void createTrustRelationship( Map<String, String> relationshipProp );
+
+
+    TrustItem getTrustItem( String uniqueIdentifier, String classPath );
+
+
+    TrustRelation getTrustRelationBySourceObject( TrustItem source, TrustItem object );
 }

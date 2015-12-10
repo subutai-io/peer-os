@@ -2,14 +2,23 @@ package io.subutai.core.identity.impl.dao;
 
 
 import java.util.List;
-
-import io.subutai.core.identity.api.model.*;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.core.identity.api.dao.IdentityDataService;
+import io.subutai.core.identity.api.model.Permission;
+import io.subutai.core.identity.api.model.Role;
+import io.subutai.core.identity.api.model.Session;
+import io.subutai.core.identity.api.model.TrustItem;
+import io.subutai.core.identity.api.model.TrustRelation;
+import io.subutai.core.identity.api.model.User;
+import io.subutai.core.identity.api.model.UserToken;
+import io.subutai.core.identity.impl.model.TrustItemImpl;
+import io.subutai.core.identity.impl.model.TrustRelationImpl;
+import io.subutai.core.identity.impl.model.TrustRelationshipImpl;
 
 
 /**
@@ -25,6 +34,7 @@ public class IdentityDataServiceImpl implements IdentityDataService
     private SessionDAO sessionDAOService = null;
     private PermissionDAO permissionDAOService = null;
     private UserTokenDAO userTokenDAOService = null;
+    private TrustRelationDAO trustRelationDAO = null;
 
 
     /* *************************************************
@@ -41,6 +51,7 @@ public class IdentityDataServiceImpl implements IdentityDataService
             sessionDAOService = new SessionDAO( daoManager );
             permissionDAOService = new PermissionDAO( daoManager );
             userTokenDAOService = new UserTokenDAO( daoManager );
+            trustRelationDAO = new TrustRelationDAO( daoManager );
         }
         else
         {
@@ -185,6 +196,7 @@ public class IdentityDataServiceImpl implements IdentityDataService
         role.getPermissions().add( permission );
         roleDAOService.update( role );
     }
+
 
     /* *************************************************
      *
@@ -424,4 +436,46 @@ public class IdentityDataServiceImpl implements IdentityDataService
         userTokenDAOService.removeInvalid();
     }
 
+
+    @Override
+    public void createTrustRelationship( final Map<String, String> relationshipProp )
+    {
+        TrustItemImpl source =
+                new TrustItemImpl( relationshipProp.get( "sourceId" ), relationshipProp.get( "sourceClass" ) );
+        TrustItemImpl target =
+                new TrustItemImpl( relationshipProp.get( "targetId" ), relationshipProp.get( "targetClass" ) );
+        TrustItemImpl object =
+                new TrustItemImpl( relationshipProp.get( "objectId" ), relationshipProp.get( "objectClass" ) );
+
+        trustRelationDAO.update( source );
+        trustRelationDAO.update( target );
+        trustRelationDAO.update( object );
+
+        TrustRelationshipImpl trustRelationship =
+                new TrustRelationshipImpl( relationshipProp.get( "trustLevel" ), relationshipProp.get( "scope" ),
+                        relationshipProp.get( "action" ), relationshipProp.get( "ttl" ),
+                        relationshipProp.get( "type" ) );
+
+        TrustRelationImpl trustRelation = new TrustRelationImpl( source, target, object, trustRelationship );
+
+        trustRelationDAO.update( trustRelation );
+    }
+
+
+    @Override
+    public TrustItem getTrustItem( final String uniqueIdentifier, final String classPath )
+    {
+        return trustRelationDAO.findTrustItem( uniqueIdentifier, classPath );
+    }
+
+
+    @Override
+    public TrustRelation getTrustRelationBySourceObject( final TrustItem source, final TrustItem object )
+    {
+        if ( ( source instanceof TrustItemImpl ) && ( object instanceof TrustItemImpl ) )
+        {
+            return trustRelationDAO.findBySourceAndObject( ( TrustItemImpl ) source, ( TrustItemImpl ) object );
+        }
+        return null;
+    }
 }
