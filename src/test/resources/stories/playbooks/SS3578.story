@@ -48,7 +48,7 @@ And the user clicks on link: environment on the console page
 And the user selects 'hadoop' environment in select menu
 And the user selects container one in select menu
 And the user enters a command 'ping management -c 3' to Command field and press enter
-Then the user should observes output of the command three received
+Then the user should observe output of the command three received
 
 Scenario: Destroy Environment and Blueprint
 Given the first AWS user is on the home page of Subutai

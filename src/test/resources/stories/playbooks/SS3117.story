@@ -50,7 +50,7 @@ When the user inserts domain 'subut.ai' in input field
 And the user selects domain strategy 'ROUND_ROBIN'
 And the user adds PEM certificate from file
 And the user presses on the button: save
-Then the user should observes success message
+Then the user should observe success message
 When the user clicks on the button: OK
 Then the user observes domain name 'subut.ai' assigned to environment
 And the user observes domain strtegy set to round-robin
@@ -105,7 +105,7 @@ Then the user should see that container stopped
 Scenario: should not observe stopped container
 Given the user is on subut.ai page
 When the user presses F5 several times
-Then the user should not observes stopped container IP
+Then the user should not observe stopped container IP
 
 Scenario: check checkbox is container in domain
 Given the first user is on the home page of Subutai
@@ -128,7 +128,7 @@ Then the user observes container removed from subut.ai domain
 Scenario: disabled container IP address won't appear
 Given the user is on subut.ai page
 When the user presses F5 several times
-Then the user should not observes disabled container IP
+Then the user should not observe disabled container IP
 
 Scenario: domain unassigned from environment
 Given the first user is on the home page of Subutai
@@ -144,7 +144,7 @@ Then the user observes domain name empty to environment
 Scenario: 404 - page not found message appear
 Given the user is on subut.ai page
 When the user presses F5 several times
-Then the user should observes web page with container IP won't be available
+Then the user should observe web page with container IP won't be available
 
 Scenario: Destroy Environment and Blueprint
 Given the first user is on the home page of Subutai
