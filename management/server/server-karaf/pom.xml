@@ -197,13 +197,13 @@
             <feature>war</feature>
             <feature>ssh</feature>
             <feature>subutai-application</feature>
+            <feature>jpa/2.0.0</feature>
             <feature>openjpa</feature>
-            <feature>aries-annotation</feature>fea
+            <feature>aries-annotation</feature>
             <feature>http</feature>
             <feature>jndi</feature>
             <feature>transaction</feature>
             <feature>jdbc</feature>
-
           </bootFeatures>
         </configuration>
         <executions>
