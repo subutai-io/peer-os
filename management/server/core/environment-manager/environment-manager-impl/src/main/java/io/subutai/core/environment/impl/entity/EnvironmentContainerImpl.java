@@ -93,7 +93,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @ElementCollection( targetClass = String.class, fetch = FetchType.EAGER )
     private Set<String> tags = new HashSet<>();
 
-    @ManyToOne( targetEntity = EnvironmentImpl.class )
+    @ManyToOne( targetEntity = EnvironmentImpl.class, fetch = FetchType.EAGER )
     @JoinColumn( name = "environment_id" )
     private Environment environment;
 
@@ -338,12 +338,13 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
         this.hostname = hostname;
     }
 
+
     private void validateTrustChain() throws CommandException
     {
-        if(environmentManager instanceof EnvironmentManagerImpl)
+        if ( environmentManager instanceof EnvironmentManagerImpl )
         {
             logger.warn( "Trust chain validation is on..." );
-            EnvironmentManagerImpl envImpl = (EnvironmentManagerImpl) environmentManager;
+            EnvironmentManagerImpl envImpl = ( EnvironmentManagerImpl ) environmentManager;
             if ( envImpl.isKeyTrustCheckEnabled() )
             {
                 IdentityManager identityManager = envImpl.getIdentityManager();
@@ -366,6 +367,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
             }
         }
     }
+
 
     @Override
     public CommandResult execute( final RequestBuilder requestBuilder ) throws CommandException
