@@ -26,4 +26,14 @@ public class StringAlertValue implements AlertValue
     {
         return value != null && value.trim().length() > 0;
     }
+
+
+    @Override
+    public String toString()
+    {
+        final StringBuffer sb = new StringBuffer( "StringAlertValue{" );
+        sb.append( "value='" ).append( value ).append( '\'' );
+        sb.append( '}' );
+        return sb.toString();
+    }
 }

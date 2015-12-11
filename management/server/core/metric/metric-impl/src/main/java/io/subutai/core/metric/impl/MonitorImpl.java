@@ -68,13 +68,6 @@ import io.subutai.core.peer.api.PeerManager;
 public class MonitorImpl implements Monitor, HostListener
 {
     private static final Logger LOG = LoggerFactory.getLogger( MonitorImpl.class );
-
-    private static final String ENVIRONMENT_IS_NULL_MSG = "Environment is null";
-    private static final String CONTAINER_IS_NULL_MSG = "Container is null";
-    private static final String INVALID_SUBSCRIBER_ID_MSG = "Invalid subscriber id";
-    private static final String SETTINGS_IS_NULL_MSG = "Settings is null";
-
-    private static final int METRICS_UPDATE_DELAY = 60;
     private static final int ALERT_LIVE_TIME = 2;// alert live time in min
     private final HostRegistry hostRegistry;
 
@@ -93,7 +86,6 @@ public class MonitorImpl implements Monitor, HostListener
     private List<AlertEvent> alerts = new CopyOnWriteArrayList<>();
 
     private PeerManager peerManager;
-    //    private AlertProcessor alertProcessor = new AlertProcessor();
     protected ObjectMapper mapper = new ObjectMapper();
 
 
@@ -102,7 +94,6 @@ public class MonitorImpl implements Monitor, HostListener
     {
         Preconditions.checkNotNull( peerManager );
         Preconditions.checkNotNull( daoManager );
-        //        Preconditions.checkNotNull( environmentManager );
         Preconditions.checkNotNull( hostRegistry );
 
         try
@@ -110,7 +101,6 @@ public class MonitorImpl implements Monitor, HostListener
             this.daoManager = daoManager;
             this.monitorDao = new MonitorDao( daoManager.getEntityManagerFactory() );
             this.peerManager = peerManager;
-            //            this.environmentManager = environmentManager;
             this.hostRegistry = hostRegistry;
         }
         catch ( DaoException e )
@@ -145,145 +135,6 @@ public class MonitorImpl implements Monitor, HostListener
     }
 
 
-    //
-    //    @Override
-    //    public EnvironmentAlertHandlers getEnvironmentAlertHandlersByEnvironment( final String environmentId )
-    //    {
-    //        List<AlertHandler> collector = new ArrayList<>();
-    //        try
-    //        {
-    //            Set<String> handlers = monitorDao.findHandlersByEnvironment( environmentId );
-    //            for ( String handler : handlers )
-    //            {
-    //                collector.add( alertListeners.get( handler ) );
-    //            }
-    //        }
-    //        catch ( DaoException e )
-    //        {
-    //            LOG.error( e.getMessage(), e );
-    //        }
-    //
-    //        return new EnvironmentAlertHandlers( new EnvironmentId( environmentId ));
-    //    }
-
-    //    @Override
-    //    public void activateMonitoring( final ContainerHost containerHost, final MonitoringSettings
-    // monitoringSettings/*,
-    //         final String environmentId*/ ) throws MonitorException
-    //
-    //    {
-    //        Preconditions.checkNotNull( containerHost, CONTAINER_IS_NULL_MSG );
-    //        Preconditions.checkNotNull( monitoringSettings, SETTINGS_IS_NULL_MSG );
-    //
-    //        String environmentId =
-    //                containerHost instanceof EnvironmentContainerHost ? containerHost.getEnvironmentId().getId() :
-    // null;
-    //        activateMonitoring( Sets.newHashSet( containerHost ), monitoringSettings, environmentId );
-    //    }
-    //
-    //
-    //    protected void activateMonitoring( Set<ContainerHost> containerHosts, MonitoringSettings monitoringSettings,
-    //                                       String environmentId ) throws MonitorException
-    //    {
-    //        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( containerHosts ) );
-    //        Map<Peer, Set<ContainerHost>> peersContainers = Maps.newHashMap();
-    //
-    //        for ( ContainerHost containerHost : containerHosts )
-    //        {
-    //            try
-    //            {
-    //                Peer peer = containerHost.getPeer();
-    //
-    //                Set<ContainerHost> containers = peersContainers.get( peer );
-    //
-    //                if ( containers == null )
-    //                {
-    //                    containers = Sets.newHashSet();
-    //                    peersContainers.put( peer, containers );
-    //                }
-    //
-    //                containers.add( containerHost );
-    //            }
-    //            catch ( Exception e )
-    //            {
-    //                LOG.error( String.format( "Could not obtain peer for container %s", containerHost.getHostname()
-    // ), e );
-    //                throw new MonitorException( e );
-    //            }
-    //        }
-    //
-    //
-    //        for ( Map.Entry<Peer, Set<ContainerHost>> peerContainers : peersContainers.entrySet() )
-    //        {
-    //            Peer peer = peerContainers.getKey();
-    //            Set<ContainerHost> containers = peerContainers.getValue();
-    //
-    //            if ( peer.isLocal() )
-    //            {
-    //                activateMonitoringAtLocalContainers( containers, monitoringSettings );
-    //            }
-    //            else
-    //            {
-    //                activateMonitoringAtRemoteContainers( peer, containers, monitoringSettings, environmentId );
-    //            }
-    //        }
-    //    }
-    //
-    //
-    //    protected void activateMonitoringAtRemoteContainers( Peer peer, Set<ContainerHost> containerHosts,
-    //                                                         MonitoringSettings monitoringSettings, String
-    // environmentId )
-    //    {
-    //        Preconditions.checkNotNull( peer );
-    //        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( containerHosts ) );
-    //
-    //        try
-    //        {
-    //            //*********construct Secure Header ****************************
-    //            Map<String, String> headers = Maps.newHashMap();
-    //            //*************************************************************
-    //
-    //            peer.sendRequest( new MonitoringActivationRequest( containerHosts, monitoringSettings ),
-    //                    RecipientType.MONITORING_ACTIVATION_RECIPIENT.name(), Constants.MONITORING_ACTIVATION_TIMEOUT,
-    //                    headers );
-    //        }
-    //        catch ( PeerException e )
-    //        {
-    //            LOG.error( "Error in activateMonitoringAtRemoteContainers", e );
-    //        }
-    //    }
-    //
-    //
-    //    protected void activateMonitoringAtLocalContainers( Set<ContainerHost> containerHosts,
-    //                                                        MonitoringSettings monitoringSettings )
-    //    {
-    //        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( containerHosts ) );
-    //        Preconditions.checkNotNull( monitoringSettings );
-    //
-    //        for ( ContainerHost containerHost : containerHosts )
-    //        {
-    //            try
-    //            {
-    //                ResourceHost resourceHost =
-    //                        peerManager.getLocalPeer().getResourceHostByContainerId( containerHost.getId() );
-    //                CommandResult commandResult = resourceHost.execute(
-    //                        commands.getActivateMonitoringCommand( containerHost.getHostname(), monitoringSettings
-    // ) );
-    //                if ( !commandResult.hasSucceeded() )
-    //                {
-    //                    LOG.error( String.format( "Error activating metrics on %s: %s %s", containerHost
-    // .getHostname(),
-    //                            commandResult.getStatus(), commandResult.getStdErr() ) );
-    //                }
-    //            }
-    //            catch ( Exception e )
-    //            {
-    //                LOG.error( "Error in activateMonitoringAtLocalContainers", e );
-    //            }
-    //        }
-    //    }
-
-
     private ResourceHostMetric fetchResourceHostMetric( ResourceHost resourceHost )
     {
         ResourceHostMetric result = null;
@@ -296,7 +147,6 @@ public class MonitorImpl implements Monitor, HostListener
             {
                 result = JsonUtil.fromJson( commandResult.getStdOut(), ResourceHostMetric.class );
 
-                //                result = new ResourceHostMetric( peerManager.getLocalPeer().getId(), null );
                 LOG.debug( String.format( "Host %s metrics fetched successfully.", resourceHost.getHostname() ) );
             }
             else
@@ -352,6 +202,7 @@ public class MonitorImpl implements Monitor, HostListener
     public void destroy()
     {
         backgroundTasksExecutorService.shutdown();
+        notificationExecutor.shutdown();
     }
 
 
@@ -601,50 +452,6 @@ public class MonitorImpl implements Monitor, HostListener
     @Override
     public void onHeartbeat( final ResourceHostInfo resourceHostInfo, final Set<QuotaAlertValue> alerts )
     {
-        //        Host host;
-        //        try
-        //        {
-        //            if ( "management".equals( resourceHostInfo.getHostname() ) )
-        //            {
-        //                host = peerManager.getLocalPeer().getManagementHost();
-        //            }
-        //            else
-        //            {
-        //                host = peerManager.getLocalPeer().getResourceHostByName( resourceHostInfo.getHostname() );
-        //            }
-        //        }
-        //        catch ( HostNotFoundException e )
-        //        {
-        //            final String description =
-        //                    String.format( "Resource host '%s' hot found. Id: %s", resourceHostInfo.getHostname(),
-        //                            resourceHostInfo.getId() );
-        //            Alert alert = new Alert(
-        //                    new StringAlertValue( new HostId( resourceHostInfo.getId() ), HostType.RESOURCE_HOST,
-        //                            AlertType.HOST_NOT_REGISTERED_ALERT, description ) );
-        //            alertProcessor.process( alert );
-        //            //TODO: sign RH key with peer key including management host
-        //            return;
-        //        }
-
-        //        for ( ContainerHostInfo containerHostInfo : resourceHostInfo.getContainers() )
-        //        {
-        //            ContainerHost containerHost =
-        //                    peerManager.getLocalPeer().findContainerById( new ContainerId( containerHostInfo.getId
-        // () ) );
-        //            if ( containerHost == null )
-        //            {
-        //                final String description =
-        //                        String.format( "Container host '%s' hot found. Id: %s", containerHostInfo
-        // .getHostname(),
-        //                                containerHostInfo.getId() );
-        //                Alert alert = new Alert(
-        //                        new StringAlertValue( new HostId( containerHostInfo.getId() ), HostType
-        // .CONTAINER_HOST,
-        //                                AlertType.HOST_NOT_REGISTERED_ALERT, description ) );
-        //
-        //                alertProcessor.process( alert );
-        //            }
-        //        }
         if ( alerts != null )
         {
             for ( QuotaAlertValue quotaAlertValue : alerts )

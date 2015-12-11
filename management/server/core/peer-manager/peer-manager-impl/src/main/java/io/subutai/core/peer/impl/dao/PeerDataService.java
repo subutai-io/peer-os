@@ -1,4 +1,4 @@
-package io.subutai.core.localpeer.impl.dao;
+package io.subutai.core.peer.impl.dao;
 
 
 import java.util.Collection;
@@ -11,32 +11,33 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 
-import io.subutai.common.peer.EnvironmentId;
+import io.subutai.common.peer.Peer;
 import io.subutai.common.protocol.api.DataService;
-import io.subutai.core.localpeer.impl.entity.TunnelEntity;
+import io.subutai.common.util.JsonUtil;
+import io.subutai.core.peer.impl.entity.PeerData;
 
 
-public class TunnelDataService implements DataService<Long, TunnelEntity>
+public class PeerDataService implements DataService<String, PeerData>
 {
-    private static final Logger LOG = LoggerFactory.getLogger( TunnelDataService.class );
-    private EntityManagerFactory emf;
+    private static final Logger LOG = LoggerFactory.getLogger( PeerDataService.class );
+    EntityManagerFactory emf;
 
 
-    public TunnelDataService( EntityManagerFactory entityManagerFactory )
+    public PeerDataService( EntityManagerFactory entityManagerFactory )
     {
         this.emf = entityManagerFactory;
     }
 
 
     @Override
-    public TunnelEntity find( final Long id )
+    public PeerData find( final String id )
     {
-        TunnelEntity result = null;
+        PeerData result = null;
         EntityManager em = emf.createEntityManager();
         try
         {
             em.getTransaction().begin();
-            result = em.find( TunnelEntity.class, id );
+            result = em.find( PeerData.class, id );
             em.getTransaction().commit();
         }
         catch ( Exception e )
@@ -56,14 +57,14 @@ public class TunnelDataService implements DataService<Long, TunnelEntity>
 
 
     @Override
-    public Collection<TunnelEntity> getAll()
+    public Collection<PeerData> getAll()
     {
-        Collection<TunnelEntity> result = Lists.newArrayList();
+        Collection<PeerData> result = Lists.newArrayList();
         EntityManager em = emf.createEntityManager();
         try
         {
             em.getTransaction().begin();
-            result = em.createQuery( "select h from TunnelEntity h", TunnelEntity.class ).getResultList();
+            result = em.createQuery( "select h from PeerData h", PeerData.class ).getResultList();
             em.getTransaction().commit();
         }
         catch ( Exception e )
@@ -83,7 +84,7 @@ public class TunnelDataService implements DataService<Long, TunnelEntity>
 
 
     @Override
-    public void persist( final TunnelEntity item )
+    public void persist( final PeerData item )
     {
         EntityManager em = emf.createEntityManager();
         try
@@ -109,13 +110,13 @@ public class TunnelDataService implements DataService<Long, TunnelEntity>
 
 
     @Override
-    public void remove( final Long id )
+    public void remove( final String id )
     {
         EntityManager em = emf.createEntityManager();
         try
         {
             em.getTransaction().begin();
-            TunnelEntity item = em.find( TunnelEntity.class, id );
+            PeerData item = em.find( PeerData.class, id );
             em.remove( item );
             em.getTransaction().commit();
         }
@@ -135,7 +136,7 @@ public class TunnelDataService implements DataService<Long, TunnelEntity>
 
 
     @Override
-    public void update( TunnelEntity item )
+    public void update( PeerData item )
     {
         EntityManager em = emf.createEntityManager();
         try
@@ -159,7 +160,7 @@ public class TunnelDataService implements DataService<Long, TunnelEntity>
     }
 
 
-    public TunnelEntity saveOrUpdate( TunnelEntity item )
+    public void saveOrUpdate( PeerData peerData )
     {
         EntityManager em = emf.createEntityManager();
 
@@ -167,14 +168,13 @@ public class TunnelDataService implements DataService<Long, TunnelEntity>
         {
 
             em.getTransaction().begin();
-            if ( em.find( TunnelEntity.class, item.getId() ) == null )
+            if ( em.find( PeerData.class, peerData.getId() ) == null )
             {
-                em.persist( item );
-                em.refresh( item );
+                em.persist( peerData );
             }
             else
             {
-                item = em.merge( item );
+                peerData = em.merge( peerData );
             }
             em.getTransaction().commit();
         }
@@ -190,28 +190,5 @@ public class TunnelDataService implements DataService<Long, TunnelEntity>
         {
             em.close();
         }
-
-        return item;
-    }
-
-
-    public Collection<TunnelEntity> findByEnvironmentId( final EnvironmentId environmentId )
-    {
-        Collection<TunnelEntity> result = Lists.newArrayList();
-        EntityManager em = emf.createEntityManager();
-        try
-        {
-            result = em.createQuery( "select t from TunnelEntity t where t.environmentId = :environmentId",
-                    TunnelEntity.class ).setParameter( "environmentId", environmentId.getId() ).getResultList();
-        }
-        catch ( Exception e )
-        {
-            LOG.error( e.toString(), e );
-        }
-        finally
-        {
-            em.close();
-        }
-        return result;
     }
 }

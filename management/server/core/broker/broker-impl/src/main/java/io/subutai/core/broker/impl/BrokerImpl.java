@@ -4,7 +4,6 @@ package io.subutai.core.broker.impl;
 import java.io.File;
 import java.io.FileInputStream;
 import java.security.KeyStore;
-import java.util.LinkedList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -25,9 +24,9 @@ import org.apache.activemq.broker.SslContext;
 import org.apache.activemq.broker.region.policy.ConstantPendingMessageLimitStrategy;
 import org.apache.activemq.broker.region.policy.PolicyEntry;
 import org.apache.activemq.broker.region.policy.PolicyMap;
-import org.apache.activemq.broker.region.policy.StrictOrderDispatchPolicy;
+import org.apache.activemq.broker.region.policy.VMPendingSubscriberMessageStoragePolicy;
 import org.apache.activemq.broker.util.TimeStampingBrokerPlugin;
-import org.apache.activemq.network.ConditionalNetworkBridgeFilterFactory;
+import org.apache.activemq.store.kahadb.KahaDBPersistenceAdapter;
 import org.apache.activemq.usage.StoreUsage;
 import org.apache.activemq.usage.SystemUsage;
 import org.apache.activemq.usage.TempUsage;
@@ -348,29 +347,26 @@ public class BrokerImpl implements Broker
              * it's possible to do that using destination policy entries and broker attribute
              * schedulePeriodForDestinationPurge > 0
              */
-        getBroker().setSchedulePeriodForDestinationPurge( 300000 ); //5 minutes
+        getBroker().setSchedulePeriodForDestinationPurge( 5 * 60 * 1000 ); // 5 min
 
             /* This is to set how the broker should dispatch outgoing messages:
              * At the time being, PolicyEntry items do not aggregate (see at
              * http://activemq.2283324.n4.nabble.com/Do-policy-map-entries-aggregate-tt4297601.html#a4300231)
              * There is a best match, and the default takes the unmatched case: all topics starting with
-             * "stream." will use the stream_entry policy while all other topics will default on std_entry
+             * "stream." will use the stream_entry policy while all other topics will default on topicPolicyEntry
              * policy.
              */
         PolicyMap map = new PolicyMap();
-        PolicyEntry std_entry = new PolicyEntry();
-        PolicyEntry stream_entry = new PolicyEntry();
+        PolicyEntry topicPolicyEntry = new PolicyEntry();
 
         // All topics:
-        std_entry.setTopic( ">" );
-        stream_entry.setTopic( "stream.>" );
-        std_entry.setDispatchPolicy( new StrictOrderDispatchPolicy() );
+        topicPolicyEntry.setTopic( ">" );
+        topicPolicyEntry.setEnableAudit( false );
+        topicPolicyEntry.setDurableTopicPrefetch( 10000 );
+        topicPolicyEntry.setExpireMessagesPeriod( 4 * 60 * 1000 ); // 4 min
+        topicPolicyEntry.setOptimizedDispatch( true );
 
-        std_entry.setOptimizedDispatch( true );
-        stream_entry.setOptimizedDispatch( true );
-
-        final long EXPIRE_MSG_PERIOD = 200000; //200 seconds
-        final long STREAM_EXPIRE_MSG_PERIOD = 5000; //5 seconds
+        topicPolicyEntry.setPendingSubscriberPolicy( new VMPendingSubscriberMessageStoragePolicy() );
 
             /* Sets the strategy to calculate the maximum number of messages that are allowed
              * to be pending on consumers (in addition to their prefetch sizes).
@@ -378,68 +374,37 @@ public class BrokerImpl implements Broker
              * messages. This allows us to keep dispatching messages to slow consumers while
              * not blocking fast consumers and discarding the messages oldest first.
              */
-        final long PENDING_MSG_LIMIT = 200000; //after this, start check TTL
+        final long PENDING_MSG_LIMIT = 10000; //after this, start check TTL
         ConstantPendingMessageLimitStrategy pendMsgStrategy = new ConstantPendingMessageLimitStrategy();
         pendMsgStrategy.setLimit( ( int ) PENDING_MSG_LIMIT );
-        std_entry.setPendingMessageLimitStrategy( pendMsgStrategy );
-
-        final long STREAM_PENDING_MSG_LIMIT = 200000; //after this, start check TTL
-        ConstantPendingMessageLimitStrategy streamPendMsgStrategy = new ConstantPendingMessageLimitStrategy();
-        streamPendMsgStrategy.setLimit( ( int ) STREAM_PENDING_MSG_LIMIT );
-        stream_entry.setPendingMessageLimitStrategy( streamPendMsgStrategy );
+        topicPolicyEntry.setPendingMessageLimitStrategy( pendMsgStrategy );
 
             /* See: http://activemq.apache.org/producer-flow-control.html
              * With producer flow control disabled, messages for slow consumers will be off-lined to
              * temporary storage by default, enabling the producers and the rest of the consumers to
              * run  at  a  much  faster  rate:
              */
-        std_entry.setProducerFlowControl( false );
-
-            /* See http://activemq.apache.org/manage-durable-subscribers.html
-             * Some applications send message with specified time to live. If those messages are kept on
-             * the broker for the offline durable subscriber we need to remove them when they reach their
-             * expiry time. Just as AMQ does with queues, now AMQ checks for those messages every
-             * EXPIRE_MSG_PERIOD.
-             * This configuration complements the Timestampplugin (http://activemq.apache.org/timestampplugin.html)
-             */
-        std_entry.setExpireMessagesPeriod( ( int ) EXPIRE_MSG_PERIOD );
-        stream_entry.setProducerFlowControl( false );
-        stream_entry.setExpireMessagesPeriod( ( int ) STREAM_EXPIRE_MSG_PERIOD );
+        topicPolicyEntry.setProducerFlowControl( false );
 
             /* This will check for inactive destination and it will delete all queues (gcInactiveDestinations option)
              * if they are empty for "OfflineDurableSubscriberTimeout" millis
              */
-        std_entry.setGcInactiveDestinations( true );
-        std_entry.setInactiveTimeoutBeforeGC( 1200000 );
-        stream_entry.setGcInactiveDestinations( true );
-        stream_entry.setInactiveTimeoutBeforeGC( 1200000 );
+        topicPolicyEntry.setGcInactiveDestinations( true );
+        topicPolicyEntry.setInactiveTimeoutBeforeGC( 20 * 60 * 1000 ); // 20 min
 
-        map.setDefaultEntry( std_entry );
-
-        LinkedList<PolicyEntry> policies = new LinkedList<>();
-        policies.add( stream_entry );
-        map.setPolicyEntries( policies );
+        map.setDefaultEntry( topicPolicyEntry );
 
         getBroker().setDestinationPolicy( map );
 
-        // Set memory manager: refer to the following links for further documentation:
-        // - http://activemq.2283324.n4.nabble.com/StoreUsage-TempUsage-and-MemoryUsage-td2356734.html
-        // And also (NOT OFFIAL but rather clear explanations):
-        // - http://tmielke.blogspot.it/2011/02/observations-on-activemqs-temp-storage.html
-        // - http://java.dzone.com/articles/activemq-understanding-memory
-        // Default values (see http://activemq.apache.org/producer-flow-control.html#ProducerFlowControl-Systemusage):
-        //      - Default Memory limit is 64 mb
-        //      - Default Temp Usage limit is 100 gb
-        //      - Default Store Usage limit is 10 gb
         SystemUsage usage = getBroker().getSystemUsage();
 
         long memLimit = 1024L * 1024L,
                 tempLimit = 1024L * 1024L,
                 storeLimit = 1024L * 1024L;
 
-        memLimit *= 1024;
-        tempLimit *= 10000;
-        storeLimit *= 50000;
+        memLimit *= 256; // 256 MB to store non persistent messages in memory
+        tempLimit *= 64; // 64 MB to store temp messages in memory
+        storeLimit *= 1024;// 1 GB to store persistent messages on disk
 
         org.apache.activemq.usage.MemoryUsage memUsage = usage.getMemoryUsage();
         memUsage.setLimit( memLimit );
@@ -453,22 +418,18 @@ public class BrokerImpl implements Broker
         storeUsage.setLimit( storeLimit );
         usage.setStoreUsage( storeUsage );
 
-
         usage.setSendFailIfNoSpace( true );
-
 
         getBroker().setSystemUsage( usage );
 
-        PolicyEntry std_entry2 = new PolicyEntry();
-        std_entry2.setTopic( ">" );
-        std_entry2.setEnableAudit( false );
-        ConditionalNetworkBridgeFilterFactory bff = new ConditionalNetworkBridgeFilterFactory();
-        bff.setReplayWhenNoConsumers( true );
-        std_entry2.setNetworkBridgeFilterFactory( bff );
+        KahaDBPersistenceAdapter kahaDBPersistenceAdapter = new KahaDBPersistenceAdapter();
+        kahaDBPersistenceAdapter.setJournalMaxFileLength( 1024 * 1024 * 64 );// 64 MB
+        kahaDBPersistenceAdapter.setConcurrentStoreAndDispatchTopics( true );
+        kahaDBPersistenceAdapter.setIndexCacheSize( 15000 );
+        kahaDBPersistenceAdapter.setIndexWriteBatchSize( 1500 );
+        kahaDBPersistenceAdapter.setEnableJournalDiskSyncs( false );
 
-        LinkedList<PolicyEntry> policies2 = new LinkedList<>();
-        policies2.add( std_entry2 );
-        getBroker().getDestinationPolicy().setPolicyEntries( policies2 );
+        getBroker().setPersistenceAdapter( kahaDBPersistenceAdapter );
     }
 
 

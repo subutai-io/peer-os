@@ -106,7 +106,7 @@ public class ServerOutInterceptor extends AbstractPhaseInterceptor<Message>
         try
         {
             String targetId = peerManager.getPeerIdByIp( ip );
-            String sourceId = peerManager.getLocalPeerInfo().getId();
+            String sourceId = peerManager.getLocalPeer().getId();
             MessageContentUtil
                     .encryptContent( channelManagerImpl.getSecurityManager(), sourceId, targetId, ip, message );
         }
@@ -122,7 +122,7 @@ public class ServerOutInterceptor extends AbstractPhaseInterceptor<Message>
         try
         {
             String targetId = peerManager.getPeerIdByIp( ip ) + "-" + environmentId;
-            String sourceId = peerManager.getLocalPeerInfo().getId() + "-" + environmentId;
+            String sourceId = peerManager.getLocalPeer().getId() + "-" + environmentId;
 
             MessageContentUtil
                     .encryptContent( channelManagerImpl.getSecurityManager(), sourceId, targetId, ip, message );

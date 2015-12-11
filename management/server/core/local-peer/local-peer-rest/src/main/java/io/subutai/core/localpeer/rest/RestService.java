@@ -44,10 +44,10 @@ public interface RestService
     @Produces( MediaType.APPLICATION_JSON )
     public PeerInfo getPeerInfo();
 
-    @GET
-    @Path( "peer_policy" )
-    @Produces( MediaType.APPLICATION_JSON )
-    public Response getPeerPolicy( @QueryParam( "peerId" ) String peerId );
+//    @GET
+//    @Path( "peer_policy" )
+//    @Produces( MediaType.APPLICATION_JSON )
+//    public Response getPeerPolicy( );
 
     @GET
     @Path( "template/get" )
