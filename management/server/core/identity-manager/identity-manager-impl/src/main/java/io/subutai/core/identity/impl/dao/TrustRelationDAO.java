@@ -9,6 +9,8 @@ import javax.persistence.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Lists;
+
 import io.subutai.common.dao.DaoManager;
 import io.subutai.core.identity.api.model.Relation;
 import io.subutai.core.identity.api.model.RelationLink;
@@ -142,13 +144,47 @@ public class TrustRelationDAO
     }
 
 
-    public void findBySource()
+    public List<Relation> findBySource( final RelationLinkImpl source )
     {
+        EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
+        List<Relation> result = Lists.newArrayList();
+        try
+        {
+            Query qr = em.createQuery( "select ss from TrustRelationImpl AS ss" + " where ss.source=:source" );
+            qr.setParameter( "source", source );
+            result.addAll( qr.getResultList() );
+        }
+        catch ( Exception ex )
+        {
+            logger.warn( "Error querying for trust relation.", ex );
+        }
+        finally
+        {
+            daoManager.closeEntityManager( em );
+        }
+        return result;
     }
 
 
-    public void findByTarget()
+    public List<Relation> findByTarget( final RelationLinkImpl target )
     {
+        EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
+        List<Relation> result = Lists.newArrayList();
+        try
+        {
+            Query qr = em.createQuery( "select ss from TrustRelationImpl AS ss" + " where ss.target=:target" );
+            qr.setParameter( "target", target );
+            result.addAll( qr.getResultList() );
+        }
+        catch ( Exception ex )
+        {
+            logger.warn( "Error querying for trust relation.", ex );
+        }
+        finally
+        {
+            daoManager.closeEntityManager( em );
+        }
+        return result;
     }
 
 
@@ -157,8 +193,26 @@ public class TrustRelationDAO
     }
 
 
-    public void findByObject()
+    public List<Relation> findByObject( final RelationLinkImpl object )
     {
+        EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
+        List<Relation> result = Lists.newArrayList();
+        try
+        {
+            Query qr = em.createQuery(
+                    "select ss from TrustRelationImpl AS ss" + " where ss.trustedObject=:trustedObject" );
+            qr.setParameter( "trustedObject", object );
+            result.addAll( qr.getResultList() );
+        }
+        catch ( Exception ex )
+        {
+            logger.warn( "Error querying for trust relation.", ex );
+        }
+        finally
+        {
+            daoManager.closeEntityManager( em );
+        }
+        return result;
     }
 
 
@@ -191,8 +245,80 @@ public class TrustRelationDAO
     }
 
 
-    public void findByTargetAndObject()
+    public List<Relation> relationsBySourceAndObject( final RelationLinkImpl source, final RelationLinkImpl object )
     {
+        EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
+        List<Relation> result = Lists.newArrayList();
+        try
+        {
+            Query qr = em.createQuery( "select ss from TrustRelationImpl AS ss"
+                    + " where ss.source=:source AND ss.trustedObject=:trustedObject" );
+            qr.setParameter( "source", source );
+            qr.setParameter( "trustedObject", object );
+            result.addAll( qr.getResultList() );
+        }
+        catch ( Exception ex )
+        {
+            logger.warn( "Error querying for trust relation.", ex );
+        }
+        finally
+        {
+            daoManager.closeEntityManager( em );
+        }
+        return result;
+    }
+
+
+    public Relation relationByTargetAndObject( final RelationLinkImpl target, final RelationLinkImpl object )
+    {
+        EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
+        Relation result = null;
+        try
+        {
+            Query qr = em.createQuery( "select ss from TrustRelationImpl AS ss"
+                    + " where ss.target=:target AND ss.trustedObject=:trustedObject" );
+            qr.setParameter( "target", target );
+            qr.setParameter( "trustedObject", object );
+            List<Relation> list = qr.getResultList();
+
+            if ( list.size() > 0 )
+            {
+                result = list.get( 0 );
+            }
+        }
+        catch ( Exception ex )
+        {
+            logger.warn( "Error querying for trust relation.", ex );
+        }
+        finally
+        {
+            daoManager.closeEntityManager( em );
+        }
+        return result;
+    }
+
+
+    public List<Relation> relationsByTargetAndObject( final RelationLinkImpl target, final RelationLinkImpl object )
+    {
+        EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
+        List<Relation> result = Lists.newArrayList();
+        try
+        {
+            Query qr = em.createQuery( "select ss from TrustRelationImpl AS ss"
+                    + " where ss.target=:target AND ss.trustedObject=:trustedObject" );
+            qr.setParameter( "target", target );
+            qr.setParameter( "trustedObject", object );
+            result.addAll( qr.getResultList() );
+        }
+        catch ( Exception ex )
+        {
+            logger.warn( "Error querying for trust relation.", ex );
+        }
+        finally
+        {
+            daoManager.closeEntityManager( em );
+        }
+        return result;
     }
 
 

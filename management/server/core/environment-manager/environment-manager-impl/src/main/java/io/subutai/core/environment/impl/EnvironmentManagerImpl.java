@@ -1,7 +1,6 @@
 package io.subutai.core.environment.impl;
 
 
-import java.io.UnsupportedEncodingException;
 import java.security.AccessControlException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -1397,7 +1396,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             String encryptedRelation = new String( relationEncrypted, "UTF-8" );
             relationManager.processTrustMessage( encryptedRelation );
         }
-        catch ( UnsupportedEncodingException e )
+        catch ( Exception e )
         {
             LOG.warn( "Error message.", e );
         }

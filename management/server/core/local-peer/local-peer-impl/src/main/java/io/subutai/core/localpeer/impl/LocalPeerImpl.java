@@ -462,6 +462,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 //TODO: sign container host key with PEK
                 resourceHost.addContainerHost( containerHostEntity );
 
+                signContainerKeyWithPEK( containerHostEntity.getId(), containerHostEntity.getEnvironmentId() );
+
                 resourceHostDataService.saveOrUpdate( resourceHost );
 
                 quotaManager.setQuota( containerHostEntity.getContainerId(), containerQuota );
@@ -476,6 +478,26 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
 
         return result;
+    }
+
+
+    private void signContainerKeyWithPEK( String containerId, EnvironmentId envId ) throws PeerException
+    {
+        String pairId = String.format( "%s-%s", getId(), envId.getId() );
+        final PGPSecretKeyRing pekSecKeyRing = securityManager.getKeyManager().getSecretKeyRing( pairId );
+        try
+        {
+            PGPPublicKeyRing containerPub = securityManager.getKeyManager().getPublicKeyRing( containerId );
+
+            PGPPublicKeyRing signedKey = securityManager.getKeyManager().setKeyTrust( pekSecKeyRing, containerPub,
+                    KeyTrustLevel.Full.getId() );
+
+            securityManager.getKeyManager().updatePublicKeyRing( signedKey );
+        }
+        catch ( Exception ex )
+        {
+            throw new PeerException( ex );
+        }
     }
 
 
@@ -570,6 +592,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
                 //TODO: sign container host key with PEK
                 resourceHost.addContainerHost( containerHostEntity );
+                signContainerKeyWithPEK( containerHostEntity.getId(), containerHostEntity.getEnvironmentId() );
 
                 resourceHostDataService.saveOrUpdate( resourceHost );
 
