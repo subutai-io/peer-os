@@ -492,6 +492,7 @@ public class IdentityDataServiceImpl implements IdentityDataService
     }
 
 
+    @Override
     public List<Relation> relationsByTarget( final RelationLink target )
     {
         if ( target instanceof RelationLinkImpl )
@@ -505,11 +506,26 @@ public class IdentityDataServiceImpl implements IdentityDataService
     }
 
 
+    @Override
     public List<Relation> relationsByObject( final RelationLink object )
     {
         if ( object instanceof RelationLinkImpl )
         {
             return relationDAO.findByObject( ( RelationLinkImpl ) object );
+        }
+        else
+        {
+            return Lists.newArrayList();
+        }
+    }
+
+
+    @Override
+    public List<Relation> relationsBySource( final RelationLink source )
+    {
+        if ( source instanceof RelationLinkImpl )
+        {
+            return relationDAO.findBySource( ( RelationLinkImpl ) source );
         }
         else
         {

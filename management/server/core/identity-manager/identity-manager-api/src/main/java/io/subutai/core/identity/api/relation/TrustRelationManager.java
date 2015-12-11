@@ -27,4 +27,6 @@ public interface TrustRelationManager
     Relation buildTrustRelation( RelationInfo relationInfo, RelationMeta relationMeta );
 
     void executeRelationBuild( Relation relation );
+
+    RelationInfoManager getRelationInfoManager();
 }

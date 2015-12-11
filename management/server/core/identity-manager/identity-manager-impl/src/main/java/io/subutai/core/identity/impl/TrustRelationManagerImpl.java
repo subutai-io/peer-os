@@ -31,6 +31,7 @@ public class TrustRelationManagerImpl implements TrustRelationManager
     private IdentityManagerImpl identityManager;
     private TrustMessageManagerImpl trustMessageManager;
     private IdentityDataService identityDataService = null;
+    private RelationInfoManagerImpl relationInfoManager;
     private DaoManager daoManager = null;
 
 
@@ -39,6 +40,14 @@ public class TrustRelationManagerImpl implements TrustRelationManager
     {
         identityDataService = new IdentityDataServiceImpl( daoManager );
         trustMessageManager = new TrustMessageManagerImpl( identityManager.getSecurityManager() );
+        relationInfoManager = new RelationInfoManagerImpl( identityDataService );
+    }
+
+
+    @Override
+    public RelationInfoManagerImpl getRelationInfoManager()
+    {
+        return relationInfoManager;
     }
 
 

@@ -1,11 +1,16 @@
 package io.subutai.core.identity.api.model;
 
 
+import io.subutai.common.security.objects.PermissionObject;
+
+
 /**
  * Created by talas on 12/10/15.
  */
 public class RelationMeta
 {
+    private PermissionObject permissionObject;
+
     private String sourceId;
     private String sourcePath;
 
@@ -22,7 +27,7 @@ public class RelationMeta
 
 
     public RelationMeta( final String sourceId, final String sourcePath, final String targetId, final String targetPath,
-                         final String objectId, final String objectPath )
+                         final String objectId, final String objectPath, PermissionObject permissionObject )
     {
         this.sourceId = sourceId;
         this.sourcePath = sourcePath;
@@ -30,10 +35,12 @@ public class RelationMeta
         this.targetPath = targetPath;
         this.objectId = objectId;
         this.objectPath = objectPath;
+        this.permissionObject = permissionObject;
     }
 
 
-    public RelationMeta( final Object source, final String sourceId, final Object object, final String objectId )
+    public RelationMeta( final Object source, final String sourceId, final Object object, final String objectId,
+                         final PermissionObject permissionObject )
     {
         this.sourceId = sourceId;
         this.sourcePath = source.getClass().getSimpleName();
@@ -41,11 +48,12 @@ public class RelationMeta
         this.targetPath = source.getClass().getSimpleName();
         this.objectId = objectId;
         this.objectPath = object.getClass().getSimpleName();
+        this.permissionObject = permissionObject;
     }
 
 
     public RelationMeta( final Object source, final String sourceId, final Object target, final String targetId,
-                         final Object object, final String objectId )
+                         final Object object, final String objectId, final PermissionObject permissionObject )
     {
         this.sourceId = sourceId;
         this.sourcePath = source.getClass().getSimpleName();
@@ -53,6 +61,7 @@ public class RelationMeta
         this.targetPath = target.getClass().getSimpleName();
         this.objectId = objectId;
         this.objectPath = object.getClass().getSimpleName();
+        this.permissionObject = permissionObject;
     }
 
 
@@ -125,5 +134,17 @@ public class RelationMeta
     public void setObjectPath( final String objectPath )
     {
         this.objectPath = objectPath;
+    }
+
+
+    public PermissionObject getPermissionObject()
+    {
+        return permissionObject;
+    }
+
+
+    public void setPermissionObject( final PermissionObject permissionObject )
+    {
+        this.permissionObject = permissionObject;
     }
 }

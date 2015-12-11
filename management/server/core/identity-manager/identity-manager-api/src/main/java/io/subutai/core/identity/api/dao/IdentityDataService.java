@@ -250,4 +250,7 @@ public interface IdentityDataService
 
 
     List<Relation> relationsByObject( final RelationLink object );
+
+
+    List<Relation> relationsBySource( final RelationLink source );
 }
