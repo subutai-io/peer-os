@@ -75,4 +75,11 @@
 
   <service ref="peerManager" interface="io.subutai.core.peer.api.PeerManager" />
 
+
+  <reference-list id="peerActionListener"
+                  interface="io.subutai.core.peer.api.PeerActionListener"
+                  availability="optional" ext:proxy-method="classes">
+    <reference-listener ref="peerManager"
+                        bind-method="registerPeerActionListener" unbind-method="unregisterPeerActionListener" />
+  </reference-list>
 </blueprint>

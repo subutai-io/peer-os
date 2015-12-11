@@ -45,13 +45,13 @@ import io.subutai.common.mdc.SubutaiExecutors;
 import io.subutai.common.metric.AlertValue;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.network.Gateway;
+import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.AlertHandler;
-import io.subutai.common.peer.EnvironmentAlertHandler;
 import io.subutai.common.peer.AlertHandlerPriority;
 import io.subutai.common.peer.AlertListener;
-import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerType;
+import io.subutai.common.peer.EnvironmentAlertHandler;
 import io.subutai.common.peer.EnvironmentAlertHandlers;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
@@ -99,7 +99,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 {
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentManagerImpl.class );
 
-    private static final String TRACKER_SOURCE = "Environment Manager";
+    private static final String MODULE_NAME = "Environment Manager";
     private static final String DEFAULT_GATEWAY_TEMPLATE = "192.168.%s.1/24";
 
     private final IdentityManager identityManager;
@@ -121,7 +121,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     protected BlueprintDataService blueprintDataService;
 
     protected ExceptionUtil exceptionUtil = new ExceptionUtil();
-    //    private Set<EnvironmentAlertListener> alertListeners = new CopyOnWriteArraySet<>();
     protected Map<String, AlertHandler> alertHandlers = new ConcurrentHashMap<String, AlertHandler>();
 
 
@@ -153,14 +152,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         this.blueprintDataService = new BlueprintDataService( daoManager );
         this.environmentDataService = new EnvironmentDataService( daoManager );
         this.environmentContainerDataService = new EnvironmentContainerDataService( daoManager );
-        peerManager.registerPeerActionListener( this );
     }
 
 
     public void dispose()
     {
         executor.shutdown();
-        peerManager.unregisterPeerActionListener( this );
     }
 
 
@@ -185,6 +182,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     public IdentityManager getIdentityManager()
     {
         return identityManager;
+    }
+
+
+    @Override
+    public String getName()
+    {
+        return MODULE_NAME;
     }
 
 
@@ -287,7 +291,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                                 Common.DEFAULT_DOMAIN_NAME, containerType ) ) );
             }
         }
-        TrackerOperation operationTracker = tracker.createTrackerOperation( TRACKER_SOURCE,
+        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Creating environment %s ", environment.getId() ) );
 
         EnvironmentImportWorkflow environmentImportWorkflow =
@@ -352,7 +356,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         final EnvironmentImpl environment = createEmptyEnvironment( blueprint.getName(), cidr, blueprint.getSshKey() );
 
         //create operation tracker
-        TrackerOperation operationTracker = tracker.createTrackerOperation( TRACKER_SOURCE,
+        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Creating environment %s ", environment.getId() ) );
 
         //launch environment creation workflow
@@ -459,8 +463,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                                                           final boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
-        TrackerOperation operationTracker = tracker.createTrackerOperation( TRACKER_SOURCE,
-                String.format( "Growing environment %s", environmentId ) );
+        TrackerOperation operationTracker =
+                tracker.createTrackerOperation( MODULE_NAME, String.format( "Growing environment %s", environmentId ) );
 
         return growEnvironment( environmentId, blueprint, async, true, operationTracker );
     }
@@ -557,7 +561,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     public void setSshKey( final String environmentId, final String sshKey, final boolean async )
             throws EnvironmentNotFoundException, EnvironmentModificationException
     {
-        TrackerOperation op = tracker.createTrackerOperation( TRACKER_SOURCE,
+        TrackerOperation op = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Setting environment %s ssh key", environmentId ) );
 
         setSshKey( environmentId, sshKey, async, true, op );
@@ -604,7 +608,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                                     final boolean forceMetadataRemoval )
             throws EnvironmentDestructionException, EnvironmentNotFoundException
     {
-        TrackerOperation op = tracker.createTrackerOperation( TRACKER_SOURCE,
+        TrackerOperation op = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Destroying environment %s", environmentId ) );
 
         destroyEnvironment( environmentId, async, forceMetadataRemoval, true, op );
@@ -680,8 +684,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ), "Invalid container id" );
 
-        TrackerOperation op = tracker.createTrackerOperation( TRACKER_SOURCE,
-                String.format( "Destroying container %s", containerId ) );
+        TrackerOperation op =
+                tracker.createTrackerOperation( MODULE_NAME, String.format( "Destroying container %s", containerId ) );
 
         destroyContainer( environmentId, containerId, async, forceMetadataRemoval, true, op );
     }
@@ -922,7 +926,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         Preconditions.checkArgument( newDomain.matches( Common.HOSTNAME_REGEX ), "Invalid domain" );
         Preconditions.checkNotNull( domainLoadBalanceStrategy );
 
-        TrackerOperation operationTracker = tracker.createTrackerOperation( TRACKER_SOURCE,
+        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Assigning environment %s domain", environmentId ) );
 
         modifyEnvironmentDomain( environmentId, newDomain, domainLoadBalanceStrategy, operationTracker, true,
@@ -937,7 +941,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
 
-        TrackerOperation operationTracker = tracker.createTrackerOperation( TRACKER_SOURCE,
+        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Removing environment %s domain", environmentId ) );
 
         modifyEnvironmentDomain( environmentId, null, null, operationTracker, true, null );
@@ -1026,7 +1030,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     public void addContainerToEnvironmentDomain( final String containerHostId, final String environmentId )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
     {
-        TrackerOperation operationTracker = tracker.createTrackerOperation( TRACKER_SOURCE,
+        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Adding container %s to environment domain", containerHostId ) );
 
         toggleContainerDomain( containerHostId, environmentId, true, operationTracker, true );
@@ -1038,7 +1042,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     public int setupContainerSsh( final String containerHostId, final String environmentId )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
     {
-        TrackerOperation operationTracker = tracker.createTrackerOperation( TRACKER_SOURCE,
+        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Setting up ssh for container %s ", containerHostId ) );
 
         Preconditions.checkArgument( !Strings.isNullOrEmpty( containerHostId ), "Invalid container id" );
@@ -1071,7 +1075,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     public void removeContainerFromEnvironmentDomain( final String containerHostId, final String environmentId )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
     {
-        TrackerOperation operationTracker = tracker.createTrackerOperation( TRACKER_SOURCE,
+        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Removing container %s from environment domain", containerHostId ) );
 
         toggleContainerDomain( containerHostId, environmentId, false, operationTracker, true );
