@@ -61,6 +61,7 @@
 
   <service ref="environmentManager" interface="io.subutai.core.environment.api.EnvironmentManager" />
   <service ref="environmentManager" interface="io.subutai.common.peer.AlertListener" />
+  <service ref="environmentManager" interface="io.subutai.core.peer.api.PeerActionListener" />
 
 
   <reference-list id="alertHandler"
