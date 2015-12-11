@@ -58,6 +58,7 @@ import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.security.objects.Ownership;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.objects.PermissionOperation;
 import io.subutai.common.security.objects.PermissionScope;
@@ -477,10 +478,33 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                                                           final boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
-        TrackerOperation operationTracker = tracker.createTrackerOperation( TRACKER_SOURCE,
-                String.format( "Growing environment %s", environmentId ) );
+        try
+        {
+            //TODO check does active user have write permissions to grow this environment
 
-        return growEnvironment( environmentId, blueprint, async, true, operationTracker );
+            RelationInfo relationInfo = relationManager
+                    .generateTrustRelationship( PermissionObject.EnvironmentManagement.getName(),
+                            Sets.newHashSet( PermissionOperation.Update.getName() ), Ownership.ALL.getLevel() );
+
+            EnvironmentImpl environment = environmentDataService.find( environmentId );
+            User activeUser = identityManager.getActiveUser();
+
+            RelationMeta relationMeta =
+                    new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), environment, environmentId );
+
+            if ( relationManager.isRelationValid( relationInfo, relationMeta ) )
+            {
+                TrackerOperation operationTracker = tracker.createTrackerOperation( TRACKER_SOURCE,
+                        String.format( "Growing environment %s", environmentId ) );
+
+                return growEnvironment( environmentId, blueprint, async, true, operationTracker );
+            }
+        }
+        catch ( Exception ex )
+        {
+            LOG.info( "Environment grow exception", ex );
+        }
+        return Sets.newHashSet();
     }
 
 
@@ -841,7 +865,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         Set<Environment> environments = new HashSet<>();
         for ( Environment environment : environmentDataService.getAll() )
         {
-            //TODO check for trust relation via security manager
+            //TODO check for trust relation via relationship manager
             //            boolean trustRelation = identityManager
             //                    .isRelationValid( String.valueOf( activeUser.getId() ), activeUser.getClass()
             // .getSimpleName(),
@@ -1381,7 +1405,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                     .generateTrustRelationship( PermissionObject.EnvironmentManagement.getName(),
                             Sets.newHashSet( PermissionOperation.Delete.getName(), PermissionOperation.Read.getName(),
                                     PermissionOperation.Update.getName(), PermissionOperation.Write.getName() ),
-                            PermissionScope.OWNER_SCOPE.getName() );
+                            Ownership.USER.getLevel() );
 
             RelationMeta relationMeta = new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), environment,
                     environment.getId() );
@@ -1400,26 +1424,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             LOG.warn( "Error message.", e );
         }
-
-        //        //TODO set trust instead of setting explicit user
-        //        Map<String, String> trustRelationship = Maps.newHashMap();
-        //        trustRelationship.put( "sourceId", String.valueOf( activeUser.getId() ) );
-        //        trustRelationship.put( "sourceClass", activeUser.getClass().getSimpleName() );
-        //
-        //        trustRelationship.put( "targetId", String.valueOf( activeUser.getId() ) );
-        //        trustRelationship.put( "targetClass", activeUser.getClass().getSimpleName() );
-        //
-        //        trustRelationship.put( "objectId", environment.getId() );
-        //        trustRelationship.put( "objectClass", environment.getClass().getSimpleName() );
-        //
-        //        trustRelationship.put( "trustLevel", "Full" );
-        //        trustRelationship.put( "scope", "Read" );
-        //        trustRelationship.put( "action", "Allowed" );
-        //        trustRelationship.put( "ttl", "" );
-        //        trustRelationship.put( "type", "Environment" );
-        //
-        //        identityManager.createTrustRelationship( trustRelationship );
-
 
         environment = saveOrUpdate( environment );
 

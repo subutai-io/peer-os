@@ -15,5 +15,5 @@ public interface RelationInfo
 
     Set<String> getOperation();
 
-    String getType();
+    int getOwnershipLevel();
 }

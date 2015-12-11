@@ -1,6 +1,7 @@
 package io.subutai.core.identity.impl;
 
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -8,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.subutai.common.dao.DaoManager;
+import io.subutai.common.security.objects.PermissionOperation;
 import io.subutai.core.identity.api.dao.IdentityDataService;
 import io.subutai.core.identity.api.model.Relation;
 import io.subutai.core.identity.api.model.RelationInfo;
@@ -101,7 +103,7 @@ public class TrustRelationManagerImpl implements TrustRelationManager
             return false;
         }
 
-        if ( !relationInfo.getType().equalsIgnoreCase( parsedRelationship.getType() ) )
+        if ( relationInfo.getOwnershipLevel() < parsedRelationship.getOwnershipLevel() )
         {
             return false;
         }
@@ -111,10 +113,87 @@ public class TrustRelationManagerImpl implements TrustRelationManager
 
 
     @Override
-    public RelationInfo generateTrustRelationship( final String pObject, final Set<String> operation,
-                                                   final String type )
+    public boolean isRelationValid( final RelationInfo relationInfo, final RelationMeta relationMeta )
     {
-        return new RelationInfoImpl( pObject, operation, type );
+        RelationLinkImpl target = new RelationLinkImpl( relationMeta.getSourceId(), relationMeta.getSourcePath() );
+        List<Relation> targetRelations = identityDataService.relationsByTarget( target );
+
+        RelationLinkImpl object = new RelationLinkImpl( relationMeta.getObjectId(), relationMeta.getObjectPath() );
+        List<Relation> objectRelations = identityDataService.relationsByTarget( object );
+
+        // When relation info is found check that relation was granted from verified source
+        for ( final Relation targetRelation : targetRelations )
+        {
+            if ( targetRelation.getTrustedObject().equals( object ) )
+            {
+                // Requested relation should be less then or equal to relation that was granted
+                return compareRelationships( targetRelation.getRelationInfo(), relationInfo ) >= 0;
+            }
+        }
+
+        return false;
+    }
+
+
+    /**
+     * Compare relationship weight depending on each relationship property, if relation context or level differs then
+     * this relation is not comparable
+     */
+    private int compareRelationships( RelationInfo a, RelationInfo b )
+    {
+        if ( !a.getContext().equalsIgnoreCase( b.getContext() ) )
+        {
+            return -2;
+        }
+
+        int ownership = 0;
+        if ( a.getOwnershipLevel() > b.getOwnershipLevel() )
+        {
+            ownership = 1;
+        }
+        else if ( a.getOwnershipLevel() < b.getOwnershipLevel() )
+        {
+            ownership = -1;
+        }
+
+        //Calculate permission operations level
+        int operation = 0;
+        int operationA = sumUpOperationLevel( a.getOperation() );
+        int operationB = sumUpOperationLevel( b.getOperation() );
+
+        if ( operationA > operationB )
+        {
+            operation = 1;
+        }
+        else if ( operationA < operationB )
+        {
+            operation = -1;
+        }
+
+        if ( operation == 0 )
+        {
+            return ownership;
+        }
+        return operation;
+    }
+
+
+    private int sumUpOperationLevel( Set<String> operations )
+    {
+        int sum = 0;
+        for ( final String operation : operations )
+        {
+            sum += PermissionOperation.getByName( operation ).getId();
+        }
+        return sum;
+    }
+
+
+    @Override
+    public RelationInfo generateTrustRelationship( final String pObject, final Set<String> operation,
+                                                   final int ownershipLevel )
+    {
+        return new RelationInfoImpl( pObject, operation, ownershipLevel );
     }
 
 

@@ -21,15 +21,15 @@ import io.subutai.core.identity.impl.model.RelationLinkImpl;
 /**
  * Created by talas on 12/8/15.
  */
-public class TrustRelationDAO
+public class RelationDAO
 {
-    private static final Logger logger = LoggerFactory.getLogger( TrustRelationDAO.class );
+    private static final Logger logger = LoggerFactory.getLogger( RelationDAO.class );
     private DaoManager daoManager = null;
 
     //CRUD
 
 
-    public TrustRelationDAO( final DaoManager daoManager )
+    public RelationDAO( final DaoManager daoManager )
     {
         this.daoManager = daoManager;
     }
@@ -108,7 +108,7 @@ public class TrustRelationDAO
         {
             daoManager.startTransaction( em );
 
-            Query qr = em.createQuery( "DELETE FROM TrustRelationImpl AS ss where ss.id=:id" );
+            Query qr = em.createQuery( "DELETE FROM RelationImpl AS ss where ss.id=:id" );
             qr.setParameter( "id", trustRelationId );
             qr.executeUpdate();
 
@@ -150,7 +150,7 @@ public class TrustRelationDAO
         List<Relation> result = Lists.newArrayList();
         try
         {
-            Query qr = em.createQuery( "select ss from TrustRelationImpl AS ss" + " where ss.source=:source" );
+            Query qr = em.createQuery( "select ss from RelationImpl AS ss" + " where ss.source=:source" );
             qr.setParameter( "source", source );
             result.addAll( qr.getResultList() );
         }
@@ -172,7 +172,7 @@ public class TrustRelationDAO
         List<Relation> result = Lists.newArrayList();
         try
         {
-            Query qr = em.createQuery( "select ss from TrustRelationImpl AS ss" + " where ss.target=:target" );
+            Query qr = em.createQuery( "select ss from RelationImpl AS ss" + " where ss.target=:target" );
             qr.setParameter( "target", target );
             result.addAll( qr.getResultList() );
         }
@@ -199,8 +199,7 @@ public class TrustRelationDAO
         List<Relation> result = Lists.newArrayList();
         try
         {
-            Query qr = em.createQuery(
-                    "select ss from TrustRelationImpl AS ss" + " where ss.trustedObject=:trustedObject" );
+            Query qr = em.createQuery( "select ss from RelationImpl AS ss" + " where ss.trustedObject=:trustedObject" );
             qr.setParameter( "trustedObject", object );
             result.addAll( qr.getResultList() );
         }
@@ -222,7 +221,7 @@ public class TrustRelationDAO
         Relation result = null;
         try
         {
-            Query qr = em.createQuery( "select ss from TrustRelationImpl AS ss"
+            Query qr = em.createQuery( "select ss from RelationImpl AS ss"
                     + " where ss.source=:source AND ss.trustedObject=:trustedObject" );
             qr.setParameter( "source", source );
             qr.setParameter( "trustedObject", object );
@@ -251,7 +250,7 @@ public class TrustRelationDAO
         List<Relation> result = Lists.newArrayList();
         try
         {
-            Query qr = em.createQuery( "select ss from TrustRelationImpl AS ss"
+            Query qr = em.createQuery( "select ss from RelationImpl AS ss"
                     + " where ss.source=:source AND ss.trustedObject=:trustedObject" );
             qr.setParameter( "source", source );
             qr.setParameter( "trustedObject", object );
@@ -275,7 +274,7 @@ public class TrustRelationDAO
         Relation result = null;
         try
         {
-            Query qr = em.createQuery( "select ss from TrustRelationImpl AS ss"
+            Query qr = em.createQuery( "select ss from RelationImpl AS ss"
                     + " where ss.target=:target AND ss.trustedObject=:trustedObject" );
             qr.setParameter( "target", target );
             qr.setParameter( "trustedObject", object );
@@ -304,7 +303,7 @@ public class TrustRelationDAO
         List<Relation> result = Lists.newArrayList();
         try
         {
-            Query qr = em.createQuery( "select ss from TrustRelationImpl AS ss"
+            Query qr = em.createQuery( "select ss from RelationImpl AS ss"
                     + " where ss.target=:target AND ss.trustedObject=:trustedObject" );
             qr.setParameter( "target", target );
             qr.setParameter( "trustedObject", object );
@@ -322,13 +321,13 @@ public class TrustRelationDAO
     }
 
 
-    public RelationLink findTrustItem( final String uniqueIdentifier, final String classPath )
+    public RelationLink findRelationLink( final String uniqueIdentifier, final String classPath )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
         RelationLink result = null;
         try
         {
-            Query qr = em.createQuery( "select ss from TrustItemImpl AS ss"
+            Query qr = em.createQuery( "select ss from RelationLinkImpl AS ss"
                     + " where ss.uniqueIdentifier=:uniqueIdentifier AND ss.classPath=:classPath" );
             qr.setParameter( "uniqueIdentifier", uniqueIdentifier );
             qr.setParameter( "classPath", classPath );

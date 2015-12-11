@@ -20,7 +20,9 @@ public interface TrustRelationManager
 
     boolean isRelationValid( String sourceId, String sourcePath, String objectId, String objectPath, String statement );
 
-    RelationInfo generateTrustRelationship( String pObject, Set<String> operation, String type );
+    boolean isRelationValid( RelationInfo relationInfo, RelationMeta relationMeta );
+
+    RelationInfo generateTrustRelationship( String pObject, Set<String> operation, int ownershipLevel );
 
     Relation buildTrustRelation( RelationInfo relationInfo, RelationMeta relationMeta );
 

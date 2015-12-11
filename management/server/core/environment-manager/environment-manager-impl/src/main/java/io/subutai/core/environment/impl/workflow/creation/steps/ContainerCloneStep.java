@@ -22,9 +22,9 @@ import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
+import io.subutai.common.security.objects.Ownership;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.objects.PermissionOperation;
-import io.subutai.common.security.objects.PermissionScope;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
@@ -193,7 +193,7 @@ public class ContainerCloneStep
                         .generateTrustRelationship( PermissionObject.EnvironmentManagement.getName(),
                                 Sets.newHashSet( PermissionOperation.Delete.getName(),
                                         PermissionOperation.Read.getName(), PermissionOperation.Update.getName(),
-                                        PermissionOperation.Write.getName() ), PermissionScope.OWNER_SCOPE.getName() );
+                                        PermissionOperation.Write.getName() ), Ownership.USER.getLevel() );
 
 
                 Relation relation = relationManager.buildTrustRelation( relationInfo, relationMeta );

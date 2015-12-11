@@ -86,8 +86,8 @@ public class TrustMessageManagerImpl implements TrustMessageManager
                 case "operation":
                     relationship.setOperation( Sets.newHashSet( value.split( "," ) ) );
                     break;
-                case "type":
-                    relationship.setType( value );
+                case "ownership":
+                    relationship.setOwnershipLevel( Integer.valueOf( value ) );
                     break;
             }
         }

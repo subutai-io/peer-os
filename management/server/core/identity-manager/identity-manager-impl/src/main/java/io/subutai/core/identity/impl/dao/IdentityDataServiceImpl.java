@@ -7,6 +7,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.dao.DaoManager;
@@ -36,7 +37,7 @@ public class IdentityDataServiceImpl implements IdentityDataService
     private SessionDAO sessionDAOService = null;
     private PermissionDAO permissionDAOService = null;
     private UserTokenDAO userTokenDAOService = null;
-    private TrustRelationDAO trustRelationDAO = null;
+    private RelationDAO relationDAO = null;
 
 
     /* *************************************************
@@ -53,7 +54,7 @@ public class IdentityDataServiceImpl implements IdentityDataService
             sessionDAOService = new SessionDAO( daoManager );
             permissionDAOService = new PermissionDAO( daoManager );
             userTokenDAOService = new UserTokenDAO( daoManager );
-            trustRelationDAO = new TrustRelationDAO( daoManager );
+            relationDAO = new RelationDAO( daoManager );
         }
         else
         {
@@ -449,23 +450,24 @@ public class IdentityDataServiceImpl implements IdentityDataService
         RelationLinkImpl object =
                 new RelationLinkImpl( relationshipProp.get( "objectId" ), relationshipProp.get( "objectClass" ) );
 
-        trustRelationDAO.update( source );
-        trustRelationDAO.update( target );
-        trustRelationDAO.update( object );
+        relationDAO.update( source );
+        relationDAO.update( target );
+        relationDAO.update( object );
 
         RelationInfoImpl trustRelationship = new RelationInfoImpl( relationshipProp.get( "context" ),
-                Sets.newHashSet( relationshipProp.get( "operation" ) ), relationshipProp.get( "type" ) );
+                Sets.newHashSet( relationshipProp.get( "operation" ) ),
+                Integer.valueOf( relationshipProp.get( "ownership" ) ) );
 
         RelationImpl trustRelation = new RelationImpl( source, target, object, trustRelationship );
 
-        trustRelationDAO.update( trustRelation );
+        relationDAO.update( trustRelation );
     }
 
 
     @Override
     public RelationLink getTrustItem( final String uniqueIdentifier, final String classPath )
     {
-        return trustRelationDAO.findTrustItem( uniqueIdentifier, classPath );
+        return relationDAO.findRelationLink( uniqueIdentifier, classPath );
     }
 
 
@@ -474,7 +476,7 @@ public class IdentityDataServiceImpl implements IdentityDataService
     {
         if ( ( source instanceof RelationLinkImpl ) && ( object instanceof RelationLinkImpl ) )
         {
-            return trustRelationDAO.findBySourceAndObject( ( RelationLinkImpl ) source, ( RelationLinkImpl ) object );
+            return relationDAO.findBySourceAndObject( ( RelationLinkImpl ) source, ( RelationLinkImpl ) object );
         }
         return null;
     }
@@ -483,9 +485,35 @@ public class IdentityDataServiceImpl implements IdentityDataService
     @Override
     public void persistRelation( final Relation relation )
     {
-        trustRelationDAO.update( relation.getSource() );
-        trustRelationDAO.update( relation.getTarget() );
-        trustRelationDAO.update( relation.getTrustedObject() );
-        trustRelationDAO.update( relation );
+        relationDAO.update( relation.getSource() );
+        relationDAO.update( relation.getTarget() );
+        relationDAO.update( relation.getTrustedObject() );
+        relationDAO.update( relation );
+    }
+
+
+    public List<Relation> relationsByTarget( final RelationLink target )
+    {
+        if ( target instanceof RelationLinkImpl )
+        {
+            return relationDAO.findByTarget( ( RelationLinkImpl ) target );
+        }
+        else
+        {
+            return Lists.newArrayList();
+        }
+    }
+
+
+    public List<Relation> relationsByObject( final RelationLink object )
+    {
+        if ( object instanceof RelationLinkImpl )
+        {
+            return relationDAO.findByObject( ( RelationLinkImpl ) object );
+        }
+        else
+        {
+            return Lists.newArrayList();
+        }
     }
 }

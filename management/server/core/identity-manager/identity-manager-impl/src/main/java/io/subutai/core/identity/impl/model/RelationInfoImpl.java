@@ -16,6 +16,7 @@ import javax.persistence.Table;
 
 import com.google.common.collect.Sets;
 
+import io.subutai.common.security.objects.Ownership;
 import io.subutai.core.identity.api.model.RelationInfo;
 
 
@@ -42,8 +43,8 @@ public class RelationInfoImpl implements RelationInfo
     private Set<String> operation = Sets.newHashSet();
 
     //Permission, role
-    @Column( name = "type" )
-    private String type = "";
+    @Column( name = "ownershipLevel" )
+    private int ownershipLevel = Ownership.ALL.getLevel();
 
 
     public RelationInfoImpl()
@@ -55,15 +56,15 @@ public class RelationInfoImpl implements RelationInfo
     {
         this.context = relationInfo.getContext();
         this.operation = relationInfo.getOperation();
-        this.type = relationInfo.getType();
+        this.ownershipLevel = relationInfo.getOwnershipLevel();
     }
 
 
-    public RelationInfoImpl( final String context, final Set<String> operation, final String type )
+    public RelationInfoImpl( final String context, final Set<String> operation, final int ownershipLevel )
     {
         this.context = context;
         this.operation = operation;
-        this.type = type;
+        this.ownershipLevel = ownershipLevel;
     }
 
 
@@ -89,9 +90,9 @@ public class RelationInfoImpl implements RelationInfo
 
 
     @Override
-    public String getType()
+    public int getOwnershipLevel()
     {
-        return type;
+        return ownershipLevel;
     }
 
 
@@ -107,9 +108,9 @@ public class RelationInfoImpl implements RelationInfo
     }
 
 
-    public void setType( final String type )
+    public void setOwnershipLevel( final int ownershipLevel )
     {
-        this.type = type;
+        this.ownershipLevel = ownershipLevel;
     }
 
 
@@ -127,15 +128,15 @@ public class RelationInfoImpl implements RelationInfo
 
         final RelationInfoImpl that = ( RelationInfoImpl ) o;
 
+        if ( ownershipLevel != that.ownershipLevel )
+        {
+            return false;
+        }
         if ( context != null ? !context.equals( that.context ) : that.context != null )
         {
             return false;
         }
-        if ( operation != null ? !operation.equals( that.operation ) : that.operation != null )
-        {
-            return false;
-        }
-        return !( type != null ? !type.equals( that.type ) : that.type != null );
+        return !( operation != null ? !operation.equals( that.operation ) : that.operation != null );
     }
 
 
@@ -144,7 +145,7 @@ public class RelationInfoImpl implements RelationInfo
     {
         int result = context != null ? context.hashCode() : 0;
         result = 31 * result + ( operation != null ? operation.hashCode() : 0 );
-        result = 31 * result + ( type != null ? type.hashCode() : 0 );
+        result = 31 * result + ownershipLevel;
         return result;
     }
 }

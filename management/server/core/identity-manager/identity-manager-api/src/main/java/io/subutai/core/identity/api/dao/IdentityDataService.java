@@ -244,4 +244,10 @@ public interface IdentityDataService
     Relation getRelationBySourceObject( RelationLink source, RelationLink object );
 
     void persistRelation( Relation relation );
+
+
+    List<Relation> relationsByTarget( final RelationLink target );
+
+
+    List<Relation> relationsByObject( final RelationLink object );
 }
