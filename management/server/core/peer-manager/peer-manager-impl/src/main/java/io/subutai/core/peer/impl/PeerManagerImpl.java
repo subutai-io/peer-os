@@ -193,7 +193,7 @@ public class PeerManagerImpl implements PeerManager
     public void registerPeerActionListener( PeerActionListener peerActionListener )
     {
         Preconditions.checkNotNull( peerActionListener );
-
+        LOG.info( "Registering peer action listener: " + peerActionListener.getName() );
         this.peerActionListeners.add( peerActionListener );
     }
 
@@ -202,7 +202,7 @@ public class PeerManagerImpl implements PeerManager
     public void unregisterPeerActionListener( PeerActionListener peerActionListener )
     {
         Preconditions.checkNotNull( peerActionListener );
-
+        LOG.info( "Unregistering peer action listener: " + peerActionListener.getName() );
         this.peerActionListeners.remove( peerActionListener );
     }
 
