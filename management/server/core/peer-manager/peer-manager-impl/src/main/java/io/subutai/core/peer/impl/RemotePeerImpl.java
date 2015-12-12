@@ -86,7 +86,6 @@ public class RemotePeerImpl implements RemotePeer
 {
     private static final Logger LOG = LoggerFactory.getLogger( RemotePeerImpl.class );
 
-    private final LocalPeer localPeer;
     private SecurityManager securityManager;
     protected final PeerInfo peerInfo;
     protected final Messenger messenger;
@@ -96,13 +95,14 @@ public class RemotePeerImpl implements RemotePeer
     protected JsonUtil jsonUtil = new JsonUtil();
     private String baseUrl;
     Object provider;
+    private String localPeerId;
 
 
-    public RemotePeerImpl( LocalPeer localPeer, SecurityManager securityManager, final PeerInfo peerInfo,
+    public RemotePeerImpl( String localPeerId, SecurityManager securityManager, final PeerInfo peerInfo,
                            final Messenger messenger, CommandResponseListener commandResponseListener,
                            MessageResponseListener messageResponseListener, Object provider )
     {
-        this.localPeer = localPeer;
+        this.localPeerId = localPeerId;
         this.securityManager = securityManager;
         this.peerInfo = peerInfo;
         this.messenger = messenger;
@@ -665,8 +665,7 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkArgument( !Strings.isNullOrEmpty( recipient ), "Invalid recipient" );
         Preconditions.checkArgument( requestTimeout > 0, "Invalid request timeout" );
 
-        MessageRequest messageRequest =
-                new MessageRequest( new Payload( request, localPeer.getId() ), recipient, headers );
+        MessageRequest messageRequest = new MessageRequest( new Payload( request, localPeerId ), recipient, headers );
         Message message = messenger.createMessage( messageRequest );
 
         messageRequest.setMessageId( message.getId() );

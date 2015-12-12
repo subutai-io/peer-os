@@ -3,147 +3,159 @@ package io.subutai.common.peer;
 
 import java.util.Objects;
 
+import org.codehaus.jackson.annotate.JsonProperty;
+
+import com.google.common.base.Preconditions;
+
 
 @SuppressWarnings( "unused" )
 public class PeerPolicy
 {
+    @JsonProperty( "peerId" )
+    private String peerId;
 
-    private String remotePeerId;
-    private int diskUsagePercentageLimit;
-    private int cpuUsagePercentageLimit;
-    private int memoryUsagePercentageLimit;
-    private int networkUsagePercentageLimit;
-    private int environmentCountLimit;
-    private int containerCountLimit;
+    @JsonProperty( "diskUsageLimit" )
+    private int diskUsageLimit;
+
+    @JsonProperty( "cpuUsageLimit" )
+    private int cpuUsageLimit;
+
+    @JsonProperty( "memoryUsageLimit" )
+    private int memoryUsageLimit;
+
+    @JsonProperty( "networkUsageLimit" )
+    private int networkUsageLimit;
+
+    @JsonProperty( "environmentLimit" )
+    private int environmentLimit;
+
+    @JsonProperty( "containerLimit" )
+    private int containerLimit;
 
 
-    public PeerPolicy( String remotePeerId )
+    public PeerPolicy( @JsonProperty( "peerId" ) final String peerId,
+                       @JsonProperty( "diskUsageLimit" ) final int diskUsageLimit,
+                       @JsonProperty( "cpuUsageLimit" ) final int cpuUsageLimit,
+                       @JsonProperty( "memoryUsageLimit" ) final int memoryUsageLimit,
+                       @JsonProperty( "networkUsageLimit" ) final int networkUsageLimit,
+                       @JsonProperty( "environmentLimit" ) final int environmentLimit,
+                       @JsonProperty( "containerLimit" ) final int containerLimit )
     {
-        this.remotePeerId = remotePeerId;
+        Preconditions.checkArgument( diskUsageLimit >= 0 );
+        Preconditions.checkArgument( cpuUsageLimit >= 0 );
+        Preconditions.checkArgument( memoryUsageLimit >= 0 );
+        Preconditions.checkArgument( networkUsageLimit >= 0 );
+        Preconditions.checkArgument( environmentLimit >= 0 );
+        Preconditions.checkArgument( containerLimit >= 0 );
+        this.peerId = peerId;
+        this.diskUsageLimit = diskUsageLimit;
+        this.cpuUsageLimit = cpuUsageLimit;
+        this.memoryUsageLimit = memoryUsageLimit;
+        this.networkUsageLimit = networkUsageLimit;
+        this.environmentLimit = environmentLimit;
+        this.containerLimit = containerLimit;
     }
 
 
-    public int getDiskUsagePercentageLimit()
+    public int getDiskUsageLimit()
     {
-        return diskUsagePercentageLimit;
+        return diskUsageLimit;
     }
 
 
-    public int getCpuUsagePercentageLimit()
+    public int getCpuUsageLimit()
     {
-        return cpuUsagePercentageLimit;
+        return cpuUsageLimit;
     }
 
 
-    public int getContainerCountLimit()
+    public int getContainerLimit()
     {
-        return containerCountLimit;
+        return containerLimit;
     }
 
 
-    public int getMemoryUsagePercentageLimit()
+    public int getMemoryUsageLimit()
     {
-        return memoryUsagePercentageLimit;
+        return memoryUsageLimit;
     }
 
 
-    public int getNetworkUsagePercentageLimit()
+    public int getNetworkUsageLimit()
     {
-        return networkUsagePercentageLimit;
+        return networkUsageLimit;
     }
 
 
-    public int getEnvironmentCountLimit()
+    public int getEnvironmentLimit()
     {
-        return environmentCountLimit;
+        return environmentLimit;
     }
 
 
-    public void setContainerCountLimit( int containerCountLimit )
+    public void setContainerLimit( int containerLimit )
     {
-        int cCountLimit = containerCountLimit;
-        if ( cCountLimit < 0 )
+        if ( containerLimit < 0 )
         {
-            cCountLimit = 0;
+            throw new IllegalArgumentException( "Container limit could not be less than 0." );
         }
-        this.containerCountLimit = cCountLimit;
+        this.containerLimit = containerLimit;
     }
 
 
-    public void setCpuUsagePercentageLimit( int cpuUsagePercentageLimit )
+    public void setCpuUsageLimit( int cpuUsageLimit )
     {
-        int cpuPercentageLimit = cpuUsagePercentageLimit;
-        if ( cpuPercentageLimit > 100 )
+        if ( cpuUsageLimit < 0 || cpuUsageLimit > 100 )
         {
-            cpuPercentageLimit = 100;
+            throw new IllegalArgumentException( "Invalid CPU usage limit." );
         }
-        else if ( cpuPercentageLimit < 0 )
-        {
-            cpuPercentageLimit = 0;
-        }
-        this.cpuUsagePercentageLimit = cpuPercentageLimit;
+        this.cpuUsageLimit = cpuUsageLimit;
     }
 
 
-    public void setDiskUsagePercentageLimit( int diskUsagePercentageLimit )
+    public void setDiskUsageLimit( int diskUsageLimit )
     {
-        int diskPercentageLimit = diskUsagePercentageLimit;
-        if ( diskPercentageLimit > 100 )
+        if ( diskUsageLimit < 0 || diskUsageLimit > 100 )
         {
-            diskPercentageLimit = 100;
+            throw new IllegalArgumentException( "Invalid disk usage limit." );
         }
-        else if ( diskPercentageLimit < 0 )
-        {
-            diskPercentageLimit = 0;
-        }
-        this.diskUsagePercentageLimit = diskPercentageLimit;
+        this.diskUsageLimit = diskUsageLimit;
     }
 
 
-    public void setMemoryUsagePercentageLimit( int memoryUsagePercentageLimit )
+    public void setMemoryUsageLimit( int memoryUsageLimit )
     {
-        int memoryPercentageLimit = memoryUsagePercentageLimit;
-        if ( memoryPercentageLimit > 100 )
+        if ( memoryUsageLimit < 0 || memoryUsageLimit > 100 )
         {
-            memoryPercentageLimit = 100;
+            throw new IllegalArgumentException( "Invalid memory usage limit." );
         }
-        else if ( memoryPercentageLimit < 0 )
-        {
-            memoryPercentageLimit = 0;
-        }
-        this.memoryUsagePercentageLimit = memoryPercentageLimit;
+        this.memoryUsageLimit = memoryUsageLimit;
     }
 
 
-    public void setNetworkUsagePercentageLimit( int networkUsagePercentageLimit )
+    public void setNetworkUsageLimit( int networkUsageLimit )
     {
-        int networkPercentageLimit = networkUsagePercentageLimit;
-        if ( networkPercentageLimit > 100 )
+        if ( networkUsageLimit < 0 || networkUsageLimit > 100 )
         {
-            networkPercentageLimit = 100;
+            throw new IllegalArgumentException( "Invalid network usage limit." );
         }
-        else if ( networkPercentageLimit < 0 )
-        {
-            networkPercentageLimit = 0;
-        }
-        this.networkUsagePercentageLimit = networkPercentageLimit;
+        this.networkUsageLimit = networkUsageLimit;
     }
 
 
-    public void setEnvironmentCountLimit( int environmentCountLimit )
+    public void setEnvironmentLimit( int environmentLimit )
     {
-        int eCountLimit = environmentCountLimit;
-        if ( eCountLimit < 0 )
+        if ( environmentLimit < 0 )
         {
-            eCountLimit = 0;
+            throw new IllegalArgumentException( "Environment limit could not be less than 0." );
         }
-        this.environmentCountLimit = eCountLimit;
+        this.environmentLimit = environmentLimit;
     }
 
 
-    public String getRemotePeerId()
+    public String getPeerId()
     {
-        return remotePeerId;
+        return peerId;
     }
 
 
@@ -153,7 +165,7 @@ public class PeerPolicy
         if ( obj instanceof PeerPolicy )
         {
             PeerPolicy other = ( PeerPolicy ) obj;
-            return Objects.equals( this.getRemotePeerId(), other.getRemotePeerId() );
+            return Objects.equals( this.getPeerId(), other.getPeerId() );
         }
         return false;
     }
@@ -162,13 +174,13 @@ public class PeerPolicy
     @Override
     public int hashCode()
     {
-        int result = remotePeerId.hashCode();
-        result = 31 * result + diskUsagePercentageLimit;
-        result = 31 * result + cpuUsagePercentageLimit;
-        result = 31 * result + memoryUsagePercentageLimit;
-        result = 31 * result + networkUsagePercentageLimit;
-        result = 31 * result + environmentCountLimit;
-        result = 31 * result + containerCountLimit;
+        int result = peerId.hashCode();
+        result = 31 * result + diskUsageLimit;
+        result = 31 * result + cpuUsageLimit;
+        result = 31 * result + memoryUsageLimit;
+        result = 31 * result + networkUsageLimit;
+        result = 31 * result + environmentLimit;
+        result = 31 * result + containerLimit;
         return result;
     }
 }

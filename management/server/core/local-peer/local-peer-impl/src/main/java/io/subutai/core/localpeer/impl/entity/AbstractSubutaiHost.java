@@ -156,11 +156,6 @@ public abstract class AbstractSubutaiHost implements Host
     {
         this.lastHeartbeat = System.currentTimeMillis();
         this.hostInterfaces = hostInfo.getHostInterfaces();
-        //        // add interfaces
-        //        for ( HostInterface intf : hostInfo.getHostInterfaces() )
-        //        {
-        //            hostInterfaces.add( new HostInterfaceModel( intf ) );
-        //        }
         return false;
     }
 

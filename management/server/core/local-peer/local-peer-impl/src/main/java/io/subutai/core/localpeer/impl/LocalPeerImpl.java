@@ -2,15 +2,10 @@ package io.subutai.core.localpeer.impl;
 
 
 import java.io.IOException;
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -140,11 +135,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 {
     private static final Logger LOG = LoggerFactory.getLogger( LocalPeerImpl.class );
 
-
     public static final String PEER_SUBNET_MASK = "255.255.255.0";
     private static final int N2N_PORT = 5000;
 
-    private String externalIpInterface = "eth1";
+
     private DaoManager daoManager;
     private TemplateManager templateRegistry;
     protected ManagementHostEntity managementHost;
@@ -182,13 +176,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    public void setExternalIpInterface( final String externalIpInterface )
-    {
-        this.externalIpInterface = externalIpInterface;
-    }
-
-
-    public void init()
+    public void init() throws PeerException
     {
         LOG.debug( "********************************************** Initializing peer "
                 + "******************************************" );
@@ -209,17 +197,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             tunnelDataService = createTunnelDataService();
 
             managementHostDataService = createManagementHostDataService();
+
             Collection<ManagementHostEntity> allManagementHostEntity = managementHostDataService.getAll();
             if ( allManagementHostEntity != null && !allManagementHostEntity.isEmpty() )
             {
                 managementHost = allManagementHostEntity.iterator().next();
                 managementHost.setPeer( this );
-                managementHost.init();
-                this.peerInfo = managementHost.getPeerInfo();
-            }
-            else
-            {
-                this.peerInfo = initPeerInfo();
             }
 
             resourceHostDataService = createResourceHostDataService();
@@ -230,16 +213,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
 
             setResourceHostTransientFields( resourceHosts );
-
-            for ( ResourceHost resourceHost : getResourceHosts() )
-            {
-                for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
-                {
-                    LOG.debug( String.format( "%s %s", resourceHost.getHostname(), containerHost.getHostname() ) );
-                }
-            }
-
-            initialized = true;
         }
         catch ( Exception e )
         {
@@ -249,6 +222,15 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         addRequestListener( new CreateEnvironmentContainerGroupRequestListener( this ) );
         //add destroy environment containers requests listener
         addRequestListener( new DestroyEnvironmentContainerGroupRequestListener( this ) );
+
+        initialized = true;
+    }
+
+
+    @Override
+    public void setPeerInfo( final PeerInfo peerInfo )
+    {
+        this.peerInfo = peerInfo;
     }
 
 
@@ -267,39 +249,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     protected TunnelDataService createTunnelDataService()
     {
         return new TunnelDataService( daoManager.getEntityManagerFactory() );
-    }
-
-
-    private PeerInfo initPeerInfo()
-    {
-        peerInfo = new PeerInfo();
-        peerInfo.setId( securityManager.getKeyManager().getPeerId() );
-        peerInfo.setOwnerId( securityManager.getKeyManager().getOwnerId() );
-        setPeerIp();
-        peerInfo.setName( String.format( "Peer %s", peerInfo.getId() ) );
-        return peerInfo;
-    }
-
-
-    private void setPeerIp()
-    {
-        try
-        {
-            Enumeration<InetAddress> addressEnumeration =
-                    NetworkInterface.getByName( externalIpInterface ).getInetAddresses();
-            while ( addressEnumeration.hasMoreElements() )
-            {
-                InetAddress address = addressEnumeration.nextElement();
-                if ( address instanceof Inet4Address )
-                {
-                    peerInfo.setIp( address.getHostAddress() );
-                }
-            }
-        }
-        catch ( SocketException e )
-        {
-            LOG.error( "Error getting network interfaces", e );
-        }
     }
 
 
@@ -1210,6 +1159,23 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
+    private void initManagementHost( ResourceHostInfo hostInfo )
+    {
+        try
+        {
+            final String peerId = securityManager.getKeyManager().getPeerId();
+            managementHost = new ManagementHostEntity( peerId, hostInfo );
+            managementHost.setPeer( this );
+            managementHostDataService.persist( managementHost );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Could not initialize management host." );
+        }
+        LOG.info( "Management host initialized" );
+    }
+
+
     @Override
     public void onHeartbeat( final ResourceHostInfo resourceHostInfo, Set<QuotaAlertValue> alerts )
     {
@@ -1220,24 +1186,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             {
                 if ( managementHost == null )
                 {
-                    managementHost = new ManagementHostEntity( getId(), resourceHostInfo );
-                    managementHost.setPeer( this );
-                    try
-                    {
-                        managementHost.init();
-                    }
-                    catch ( Exception e )
-                    {
-                        LOG.error( "Error initializing management host", e );
-                    }
-                    managementHost.setPeerInfo( this.peerInfo );
-                    managementHostDataService.persist( managementHost );
+                    initManagementHost( resourceHostInfo );
                 }
-                else
-                {
-                    managementHost.updateHostInfo( resourceHostInfo );
-                    peerInfo.setIp( managementHost.getIpByInterfaceName( externalIpInterface ) );
-                }
+                managementHost.updateHostInfo( resourceHostInfo );
             }
             else
             {
