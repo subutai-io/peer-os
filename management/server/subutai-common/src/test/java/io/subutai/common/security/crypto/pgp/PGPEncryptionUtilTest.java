@@ -21,7 +21,6 @@ import org.bouncycastle.openpgp.PGPSignature;
 import org.bouncycastle.openpgp.PGPUtil;
 import org.bouncycastle.openpgp.operator.jcajce.JcaKeyFingerprintCalculator;
 import org.bouncycastle.openpgp.operator.jcajce.JcaPGPKeyConverter;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +30,6 @@ import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
 
 
-@Ignore
 public class PGPEncryptionUtilTest
 {
     private static final Logger logger = LoggerFactory.getLogger( PGPEncryptionUtilTest.class );
@@ -48,12 +46,6 @@ public class PGPEncryptionUtilTest
     private static final String SECRET_KEY_FINGERPRINT = "3E5DB4DCF15A31C93CF3C9D8D558F9A4A0B450B3";
 
 
-    public static InputStream findFile( final String file )
-    {
-        return PGPEncryptionUtilTest.class.getClassLoader().getResourceAsStream( file );
-    }
-
-
     @Test
     public void testSignVerify() throws Exception
     {
@@ -61,6 +53,12 @@ public class PGPEncryptionUtilTest
         byte[] signedMessage = PGPEncryptionUtil.sign( MESSAGE.getBytes(), secretKey, SECRET_PWD, true );
 
         assertTrue( PGPEncryptionUtil.verify( signedMessage, secretKey.getPublicKey() ) );
+    }
+
+
+    public static InputStream findFile( final String file )
+    {
+        return PGPEncryptionUtilTest.class.getClassLoader().getResourceAsStream( file );
     }
 
 
@@ -149,12 +147,10 @@ public class PGPEncryptionUtilTest
     {
         KeyPair first = PGPEncryptionUtil.generateKeyPair( "first@key.com", "first", false );
         KeyPair second = PGPEncryptionUtil.generateKeyPair( "second@key.com", "second", false );
-        KeyPair third = PGPEncryptionUtil.generateKeyPair( "third@key.com", "third", false );
         signKeyAndPrintIds( first, second, "second" );
 
         InputStream firstPublicStream = new ByteArrayInputStream( first.getPubKeyring() );
         InputStream secondPublicStream = new ByteArrayInputStream( second.getPubKeyring() );
-        InputStream thirdPublicStream = new ByteArrayInputStream( third.getPubKeyring() );
 
         PGPPublicKeyRingCollection firstPublicKeyRingCollection =
                 new PGPPublicKeyRingCollection( PGPUtil.getDecoderStream( firstPublicStream ),
@@ -170,56 +166,9 @@ public class PGPEncryptionUtilTest
             PGPPublicKeyRing secondPublicKeyRing = null;
             firstPublicKeyRing = firstPublicKeyRingCollection.getKeyRings().next();
             secondPublicKeyRing = secondPublicKeyRingCollection.getKeyRings().next();
-
-            PGPPublicKey thirdPublicKey =
-                    PGPEncryptionUtil.findPublicKeyById( thirdPublicStream, third.getPrimaryKeyId() );
-
-
-            assertEquals( false, printPublicKeySignatures( firstPublicKeyRing.getPublicKey(), thirdPublicKey ) );
-
-            if ( secondPublicKeyRing != null )
-            {
-                String keyId = Long.toHexString( secondPublicKeyRing.getPublicKey().getKeyID() );
-                firstPublicKeyRing = PGPEncryptionUtil.removeSignature( firstPublicKeyRing, keyId );
-                assertEquals( false, printPublicKeySignatures( firstPublicKeyRing.getPublicKey(),
-                        secondPublicKeyRing.getPublicKey() ) );
-            }
+            assertEquals( true,
+                    printPublicKeySignatures( firstPublicKeyRing.getPublicKey(), secondPublicKeyRing.getPublicKey() ) );
         }
-    }
-
-
-    private void printKeyInArmoredFormat( KeyPair keyPair ) throws PGPException
-    {
-        String firstPublicArmored = PGPEncryptionUtil.armorByteArrayToString( keyPair.getPubKeyring() );
-        String firstPrivateArmored = PGPEncryptionUtil.armorByteArrayToString( keyPair.getSecKeyring() );
-    }
-
-
-    private boolean printPublicKeySignatures( PGPPublicKey publicKey, final PGPPublicKey secondPublicKey )
-    {
-        boolean verification = false;
-        try
-        {
-            //            verification = PGPEncryptionUtil
-            //                    .verifyPublicKey( publicKey, Long.toHexString( publicKey.getKeyID() ),
-            // secondPublicKey );
-
-            verification = PGPEncryptionUtil
-                    .verifyPublicKey( publicKey, Long.toHexString( secondPublicKey.getKeyID() ), secondPublicKey );
-        }
-        catch ( PGPException e )
-        {
-            e.printStackTrace();
-        }
-        logger.info( "%%%%%%%%%%%%% Signature verification: " + verification );
-        Iterator keySignatures = publicKey.getSignatures();
-        while ( keySignatures.hasNext() )
-        {
-            PGPSignature signature = ( PGPSignature ) keySignatures.next();
-            signature.getSignatureType();
-            logger.info( Long.toHexString( signature.getKeyID() ) );
-        }
-        return verification;
     }
 
 
@@ -247,7 +196,6 @@ public class PGPEncryptionUtilTest
             if ( secondSecretKey != null )
             {
                 String keyId = Long.toHexString( secondSecretKey.getKeyID() );
-                //                String keyId = Long.toHexString( firstPublicKeyRing.getPublicKey().getKeyID() );
 
                 PGPPublicKeyRing firstSignedPublicKeyRing =
                         PGPEncryptionUtil.signPublicKey( firstPublicKeyRing, keyId, secondSecretKey, password );
@@ -257,5 +205,63 @@ public class PGPEncryptionUtilTest
                 first.setPubKeyring( firstSignedPublicKeyRing.getEncoded() );
             }
         }
+    }
+
+
+    private boolean printPublicKeySignatures( PGPPublicKey publicKey, final PGPPublicKey secondPublicKey )
+    {
+        boolean verification = false;
+        try
+        {
+            verification = PGPEncryptionUtil
+                    .verifyPublicKey( publicKey, Long.toHexString( secondPublicKey.getKeyID() ), secondPublicKey );
+        }
+        catch ( PGPException e )
+        {
+            e.printStackTrace();
+        }
+        logger.info( "%%%%%%%%%%%%% Signature verification: " + verification );
+        Iterator keySignatures = publicKey.getSignatures();
+        while ( keySignatures.hasNext() )
+        {
+            PGPSignature signature = ( PGPSignature ) keySignatures.next();
+            signature.getSignatureType();
+            logger.info( Long.toHexString( signature.getKeyID() ) );
+        }
+        return verification;
+    }
+
+
+    @Test
+    public void testMessageSigning() throws Exception
+    {
+        KeyPair second = PGPEncryptionUtil.generateKeyPair( "second@key.com", "second", false );
+
+        InputStream secondSecretStream = new ByteArrayInputStream( second.getSecKeyring() );
+        InputStream secondPublicStream = new ByteArrayInputStream( second.getPubKeyring() );
+
+        PGPSecretKey secondSecretKey =
+                PGPEncryptionUtil.findSecretKeyById( secondSecretStream, second.getPrimaryKeyId() );
+
+        byte[] signedMessage = PGPEncryptionUtil
+                .clearSign( "Talas\nZholdoshbekov\n".getBytes(), secondSecretKey, "second".toCharArray(), "" );
+
+        logger.info( "\n" + new String( signedMessage, "UTF-8" ) );
+
+        PGPPublicKeyRingCollection secondPublicKeyRingCollection =
+                new PGPPublicKeyRingCollection( PGPUtil.getDecoderStream( secondPublicStream ),
+                        new JcaKeyFingerprintCalculator() );
+
+        boolean result = PGPEncryptionUtil.verifyClearSign( signedMessage, secondPublicKeyRingCollection );
+        if ( result )
+        {
+            logger.info( "signature verified." );
+        }
+        else
+        {
+            logger.info( "signature verification failed." );
+        }
+
+        assertEquals( true, result );
     }
 }
