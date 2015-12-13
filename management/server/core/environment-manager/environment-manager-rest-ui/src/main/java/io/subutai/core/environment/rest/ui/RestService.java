@@ -73,7 +73,8 @@ public interface RestService
 
     @POST
     @Path("build")
-    Response startEnvironmentBuild( @FormParam( "environmentId" ) String environmentId );
+    Response startEnvironmentBuild( @FormParam( "environmentId" ) String environmentId,
+                                    @FormParam( "signedMessage" ) String signedMessage );
 
 //    @POST
 //    Response createEnvironment( @FormParam( "blueprint_json" ) String blueprintJson );

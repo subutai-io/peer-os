@@ -252,7 +252,10 @@ public class PGPEncryptionUtilTest
                 new PGPPublicKeyRingCollection( PGPUtil.getDecoderStream( secondPublicStream ),
                         new JcaKeyFingerprintCalculator() );
 
-        boolean result = PGPEncryptionUtil.verifyClearSign( signedMessage, secondPublicKeyRingCollection );
+        PGPPublicKeyRing pgpKeyring =
+                secondPublicKeyRingCollection.getPublicKeyRing( Long.parseLong( second.getSubKeyId(), 16 ) );
+
+        boolean result = PGPEncryptionUtil.verifyClearSign( signedMessage, pgpKeyring );
         if ( result )
         {
             logger.info( "signature verified." );

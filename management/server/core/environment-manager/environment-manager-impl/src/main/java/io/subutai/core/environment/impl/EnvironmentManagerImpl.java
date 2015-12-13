@@ -94,6 +94,7 @@ import io.subutai.core.environment.impl.workflow.destruction.EnvironmentDestruct
 import io.subutai.core.environment.impl.workflow.modification.EnvironmentGrowingWorkflow;
 import io.subutai.core.environment.impl.workflow.modification.SshKeyModificationWorkflow;
 import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.exception.RelationVerificationException;
 import io.subutai.core.identity.api.model.Relation;
 import io.subutai.core.identity.api.model.RelationInfo;
 import io.subutai.core.identity.api.model.RelationMeta;
@@ -122,24 +123,19 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     private final IdentityManager identityManager;
     private final TrustRelationManager relationManager;
     private final PeerManager peerManager;
-    private SecurityManager securityManager;
     private final NetworkManager networkManager;
     private final Tracker tracker;
     private final TemplateManager templateRegistry;
-
     private final DaoManager daoManager;
-
-    private boolean keyTrustCheckEnabled;
-
     protected Set<EnvironmentEventListener> listeners = Sets.newConcurrentHashSet();
     protected ExecutorService executor = SubutaiExecutors.newCachedThreadPool();
-
     protected EnvironmentDataService environmentDataService;
     protected EnvironmentContainerDataService environmentContainerDataService;
     protected BlueprintDataService blueprintDataService;
-
     protected ExceptionUtil exceptionUtil = new ExceptionUtil();
     protected Map<String, AlertHandler> alertHandlers = new ConcurrentHashMap<String, AlertHandler>();
+    private SecurityManager securityManager;
+    private boolean keyTrustCheckEnabled;
 
 
     public EnvironmentManagerImpl( final TemplateManager templateRegistry, final PeerManager peerManager,
@@ -181,15 +177,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    public void setKeyTrustCheckEnabled( final boolean keyTrustCheckEnabled )
-    {
-        this.keyTrustCheckEnabled = keyTrustCheckEnabled;
-    }
-
-
     public boolean isKeyTrustCheckEnabled()
     {
         return keyTrustCheckEnabled;
+    }
+
+
+    public void setKeyTrustCheckEnabled( final boolean keyTrustCheckEnabled )
+    {
+        this.keyTrustCheckEnabled = keyTrustCheckEnabled;
     }
 
 
@@ -263,315 +259,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             }
         }
         return inUse;
-    }
-
-
-    // TODO refactor to pass one Blueprint parameter from subutai-common
-    @Override
-    public Environment importEnvironment( final String name, final Topology topology,
-                                          final Map<NodeGroup, Set<ContainerHostInfo>> containers, final String ssh,
-                                          final Integer vlan ) throws EnvironmentCreationException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid name" );
-        Preconditions.checkNotNull( topology, "Invalid topology" );
-        Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
-
-        Map.Entry<NodeGroup, Set<ContainerHostInfo>> containersEntry = containers.entrySet().iterator().next();
-        Iterator<ContainerHostInfo> hostIterator = containersEntry.getValue().iterator();
-
-        String ip = "";
-
-        while ( hostIterator.hasNext() && StringUtil.isStringNullOrEmpty( ip ) )
-        {
-            HostInfo sampleHostInfo = hostIterator.next();
-
-            //TODO ip is chosen from first standing container host info
-            for ( final HostInterface iface : sampleHostInfo.getHostInterfaces().getAll() )
-            {
-                if ( StringUtil.isStringNullOrEmpty( iface.getIp() ) )
-                {
-                    continue;
-                }
-                ip = iface.getIp() + "/24";
-                break;
-            }
-        }
-
-        if ( StringUtil.isStringNullOrEmpty( ip ) )
-        {
-            throw new EnvironmentCreationException( "Invalid environment ip range" );
-        }
-
-        //create empty environment
-        final EnvironmentImpl environment = createEmptyEnvironment( name, ip, ssh, null );
-        for ( Map.Entry<NodeGroup, Set<ContainerHostInfo>> entry : containers.entrySet() )
-        {
-            for ( ContainerHostInfo newHost : entry.getValue() )
-            {
-                ContainerType containerType = entry.getKey().getType();
-
-                environment.addContainers( Sets.newHashSet(
-                        new EnvironmentContainerImpl( peerManager.getLocalPeer().getId(), peerManager.getLocalPeer(),
-                                entry.getKey().getName(), new ContainerHostInfoModel( newHost ),
-                                templateRegistry.getTemplate( entry.getKey().getTemplateName() ),
-                                entry.getKey().getSshGroupId(), entry.getKey().getHostsGroupId(),
-                                Common.DEFAULT_DOMAIN_NAME, containerType ) ) );
-            }
-        }
-        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
-                String.format( "Creating environment %s ", environment.getId() ) );
-
-        EnvironmentImportWorkflow environmentImportWorkflow =
-                getEnvironmentImportWorkflow( environment, topology, ssh, operationTracker );
-
-        environmentImportWorkflow.start();
-        //notify environment event listeners
-        environmentImportWorkflow.onStop( new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                notifyOnEnvironmentCreated( environment );
-            }
-        } );
-
-
-        return environment;
-    }
-
-
-    protected Topology buildTopology( final String environmentId, final String cdir, final Blueprint blueprint )
-    {
-        Topology topology = new Topology( blueprint.getName(), environmentId, cdir, blueprint.getSshKey() );
-
-        LOG.debug( "Building topology..." );
-        for ( Map.Entry<String, Set<NodeGroup>> placementEntry : blueprint.getNodeGroupsMap().entrySet() )
-        {
-            Peer peer = peerManager.getPeer( placementEntry.getKey() );
-            for ( NodeGroup nodeGroup : placementEntry.getValue() )
-            {
-                LOG.debug( String.format( "%s %s %s %s %s %s", nodeGroup.getName(), nodeGroup.getType(),
-                        nodeGroup.getNumberOfContainers(), nodeGroup.getPeerId(),
-                        nodeGroup.getContainerDistributionType() == ContainerDistributionType.AUTO ?
-                        nodeGroup.getContainerPlacementStrategy().getStrategyId() : nodeGroup.getHostId(),
-                        nodeGroup.getContainerDistributionType() ) );
-                topology.addNodeGroupPlacement( peer, nodeGroup );
-            }
-        }
-        LOG.debug( "Topology built." );
-
-        return topology;
-    }
-
-
-    @RolesAllowed( "Environment-Management|Write" )
-    @Override
-    public Environment setupRequisites( final Blueprint blueprint ) throws EnvironmentCreationException
-    {
-        Preconditions.checkNotNull( blueprint, "Invalid blueprint" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( blueprint.getName() ), "Invalid name" );
-        //        Preconditions.checkArgument( !Strings.isNullOrEmpty( blueprint.getCidr() ), "Invalid subnet CIDR" );
-        Preconditions.checkArgument( !blueprint.getNodeGroups().isEmpty(), "Placement is empty" );
-
-        String cidr = calculateCidr( blueprint );
-
-        //create empty environment
-        return createEmptyEnvironment( blueprint.getName(), cidr, blueprint.getSshKey(), blueprint );
-    }
-
-
-    @Override
-    @RolesAllowed( "Environment-Management|Write" )
-    public Environment startEnvironmentBuild( String environmentId, boolean async ) throws EnvironmentCreationException
-    {
-        //create empty environment
-        final EnvironmentImpl environment = environmentDataService.find( environmentId );
-
-        Blueprint blueprint = JsonUtil.fromJson( environment.getRawBlueprint(), Blueprint.class );
-        String cidr = calculateCidr( blueprint );
-
-        // TODO add additional step for receiving trust message
-
-        Topology topology = buildTopology( environment.getId(), cidr, blueprint );
-
-        //create operation tracker
-        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
-                String.format( "Creating environment %s ", environment.getId() ) );
-
-        //launch environment creation workflow
-        final EnvironmentCreationWorkflow environmentCreationWorkflow =
-                getEnvironmentCreationWorkflow( environment, topology, blueprint.getSshKey(), operationTracker );
-
-        //start environment creation workflow
-        executor.execute( new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                environmentCreationWorkflow.start();
-            }
-        } );
-
-        //notify environment event listeners
-        environmentCreationWorkflow.onStop( new Runnable()
-        {
-            @Override
-            public void run()
-            {
-
-                notifyOnEnvironmentCreated( environment );
-            }
-        } );
-
-        //wait
-        if ( !async )
-        {
-            environmentCreationWorkflow.join();
-
-            if ( environmentCreationWorkflow.getError() != null )
-            {
-                throw new EnvironmentCreationException(
-                        exceptionUtil.getRootCause( environmentCreationWorkflow.getError() ) );
-            }
-        }
-
-        //return created environment
-        return environment;
-    }
-
-
-    @RolesAllowed( "Environment-Management|Write" )
-    @Override
-    public Environment createEnvironment( final Blueprint blueprint, final boolean async )
-            throws EnvironmentCreationException
-    {
-        Preconditions.checkNotNull( blueprint, "Invalid blueprint" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( blueprint.getName() ), "Invalid name" );
-        //        Preconditions.checkArgument( !Strings.isNullOrEmpty( blueprint.getCidr() ), "Invalid subnet CIDR" );
-        Preconditions.checkArgument( !blueprint.getNodeGroups().isEmpty(), "Placement is empty" );
-
-        String cidr = calculateCidr( blueprint );
-
-        //create empty environment
-        final EnvironmentImpl environment =
-                createEmptyEnvironment( blueprint.getName(), cidr, blueprint.getSshKey(), blueprint );
-
-        // TODO add additional step for receiving trust message
-
-        Topology topology = buildTopology( environment.getId(), cidr, blueprint );
-
-        //create operation tracker
-        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
-                String.format( "Creating environment %s ", environment.getId() ) );
-
-        //launch environment creation workflow
-        final EnvironmentCreationWorkflow environmentCreationWorkflow =
-                getEnvironmentCreationWorkflow( environment, topology, blueprint.getSshKey(), operationTracker );
-
-        //start environment creation workflow
-        executor.execute( new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                environmentCreationWorkflow.start();
-            }
-        } );
-
-        //notify environment event listeners
-        environmentCreationWorkflow.onStop( new Runnable()
-        {
-            @Override
-            public void run()
-            {
-
-                notifyOnEnvironmentCreated( environment );
-            }
-        } );
-
-        //wait
-        if ( !async )
-        {
-            environmentCreationWorkflow.join();
-
-            if ( environmentCreationWorkflow.getError() != null )
-            {
-                throw new EnvironmentCreationException(
-                        exceptionUtil.getRootCause( environmentCreationWorkflow.getError() ) );
-            }
-        }
-
-        //return created environment
-        return environment;
-    }
-
-
-    private String calculateCidr( final Blueprint blueprint ) throws EnvironmentCreationException
-    {
-        Preconditions.checkNotNull( blueprint );
-
-        try
-        {
-            Set<String> usedGateways = new HashSet<>();
-            usedGateways.addAll( getUsedGateways( peerManager.getLocalPeer() ) );
-            for ( String peerId : blueprint.getNodeGroupsMap().keySet() )
-            {
-                Peer peer = peerManager.getPeer( peerId );
-                usedGateways.addAll( getUsedGateways( peer ) );
-            }
-
-            String environmentGatewayIp = null;
-
-            for ( int i = 1; i < 255 && environmentGatewayIp == null; i++ )
-            {
-                SubnetUtils.SubnetInfo info = new SubnetUtils( String.format( DEFAULT_GATEWAY_TEMPLATE, i ) ).getInfo();
-
-                String gw = info.getLowAddress();
-
-                if ( !usedGateways.contains( gw ) )
-                {
-                    environmentGatewayIp = info.getCidrSignature();
-                    break;
-                }
-            }
-
-            if ( environmentGatewayIp == null )
-            {
-                throw new EnvironmentCreationException( "Could not determine subnet cdir." );
-            }
-            return environmentGatewayIp;
-        }
-        catch ( PeerException e )
-        {
-            throw new EnvironmentCreationException( String.format( "Error on validating subnet: %s", e.getMessage() ) );
-        }
-    }
-
-
-    protected Set<String> getUsedGateways( Peer peer ) throws PeerException
-    {
-
-        Set<String> usedGateways = Sets.newHashSet();
-
-        for ( Gateway gateway : peer.getGateways() )
-        {
-            usedGateways.add( gateway.getIp() );
-        }
-
-        return usedGateways;
-    }
-
-
-    @RolesAllowed( "Environment-Management|Write" )
-    @Override
-    public Set<EnvironmentContainerHost> growEnvironment( final String environmentId, final Blueprint blueprint,
-                                                          final boolean async )
-            throws EnvironmentModificationException, EnvironmentNotFoundException
-    {
-        TrackerOperation operationTracker =
-                tracker.createTrackerOperation( MODULE_NAME, String.format( "Growing environment %s", environmentId ) );
-
-        return growEnvironment( environmentId, blueprint, async, true, operationTracker );
     }
 
 
@@ -670,73 +357,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    @RolesAllowed( "Environment-Management|Write" )
-    @Override
-    public void setSshKey( final String environmentId, final String sshKey, final boolean async )
-            throws EnvironmentNotFoundException, EnvironmentModificationException
-    {
-        TrackerOperation op = tracker.createTrackerOperation( MODULE_NAME,
-                String.format( "Setting environment %s ssh key", environmentId ) );
-
-        setSshKey( environmentId, sshKey, async, true, op );
-    }
-
-
-    public void setSshKey( final String environmentId, final String sshKey, final boolean async,
-                           final boolean checkAccess, final TrackerOperation operationTracker )
-            throws EnvironmentNotFoundException, EnvironmentModificationException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
-
-        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId, checkAccess );
-        User activeUser = identityManager.getActiveUser();
-
-        RelationMeta relationMeta =
-                new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), environment, environmentId,
-                        PermissionObject.EnvironmentManagement, environment.getId() );
-        if ( !relationManager.getRelationInfoManager().allHasUpdatePermissions( relationMeta ) )
-        {
-            throw new EnvironmentNotFoundException();
-        }
-        final SshKeyModificationWorkflow sshKeyModificationWorkflow =
-                getSshKeyModificationWorkflow( environment, sshKey, networkManager, operationTracker );
-
-        executor.execute( new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                sshKeyModificationWorkflow.start();
-            }
-        } );
-
-        //wait
-        if ( !async )
-        {
-            sshKeyModificationWorkflow.join();
-
-            if ( sshKeyModificationWorkflow.getError() != null )
-            {
-                throw new EnvironmentModificationException(
-                        exceptionUtil.getRootCause( sshKeyModificationWorkflow.getError() ) );
-            }
-        }
-    }
-
-
-    @RolesAllowed( "Environment-Management|Delete" )
-    @Override
-    public void destroyEnvironment( final String environmentId, final boolean async,
-                                    final boolean forceMetadataRemoval )
-            throws EnvironmentDestructionException, EnvironmentNotFoundException
-    {
-        TrackerOperation op = tracker.createTrackerOperation( MODULE_NAME,
-                String.format( "Destroying environment %s", environmentId ) );
-
-        destroyEnvironment( environmentId, async, forceMetadataRemoval, true, op );
-    }
-
-
     @RolesAllowed( "Environment-Management|Delete" )
     public void destroyEnvironment( final String environmentId, boolean async, final boolean forceMetadataRemoval,
                                     final boolean checkAccess, final TrackerOperation operationTracker )
@@ -802,6 +422,433 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                         exceptionUtil.getRootCause( environmentDestructionWorkflow.getError() ) );
             }
         }
+    }
+
+
+    @PermitAll
+    @Override
+    public Set<Environment> getEnvironments()
+    {
+        User activeUser = identityManager.getActiveUser();
+
+        final boolean viewAll = identityManager
+                .isUserPermitted( activeUser, PermissionObject.EnvironmentManagement, PermissionScope.ALL_SCOPE,
+                        PermissionOperation.Read );
+
+
+        Set<Environment> environments = new HashSet<>();
+        for ( Environment environment : environmentDataService.getAll() )
+        {
+            RelationMeta relationMeta = new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), environment,
+                    environment.getId(), PermissionObject.EnvironmentManagement, environment.getId() );
+            boolean trustedRelation = relationManager.getRelationInfoManager().allHasReadPermissions( relationMeta );
+            if ( viewAll || environment.getUserId().equals( activeUser.getId() ) || trustedRelation )
+            {
+                environments.add( environment );
+
+                setEnvironmentTransientFields( environment );
+                setContainersTransientFields( environment );
+            }
+        }
+
+
+        return environments;
+    }
+
+
+    @RolesAllowed( "Environment-Management|Write" )
+    @Override
+    public Environment setupRequisites( final Blueprint blueprint ) throws EnvironmentCreationException
+    {
+        Preconditions.checkNotNull( blueprint, "Invalid blueprint" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( blueprint.getName() ), "Invalid name" );
+        //        Preconditions.checkArgument( !Strings.isNullOrEmpty( blueprint.getCidr() ), "Invalid subnet CIDR" );
+        Preconditions.checkArgument( !blueprint.getNodeGroups().isEmpty(), "Placement is empty" );
+
+        String cidr = calculateCidr( blueprint );
+
+        //create empty environment
+        return createEmptyEnvironment( blueprint.getName(), cidr, blueprint.getSshKey(), blueprint );
+    }
+
+
+    @Override
+    @RolesAllowed( "Environment-Management|Write" )
+    public Environment startEnvironmentBuild( String environmentId, final String signedMessage, boolean async )
+            throws EnvironmentCreationException
+    {
+        //create empty environment
+        final EnvironmentImpl environment = environmentDataService.find( environmentId );
+
+        // TODO should be handled on server side when user sends signed message
+        try
+        {
+            relationManager.processTrustMessage( signedMessage, environment.getId() );
+        }
+        catch ( RelationVerificationException e )
+        {
+            throw new EnvironmentCreationException( e );
+        }
+
+        Blueprint blueprint = JsonUtil.fromJson( environment.getRawBlueprint(), Blueprint.class );
+        String cidr = calculateCidr( blueprint );
+
+        // TODO add additional step for receiving trust message
+
+        Topology topology = buildTopology( environment.getId(), cidr, blueprint );
+
+        //create operation tracker
+        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
+                String.format( "Creating environment %s ", environment.getId() ) );
+
+        //launch environment creation workflow
+        final EnvironmentCreationWorkflow environmentCreationWorkflow =
+                getEnvironmentCreationWorkflow( environment, topology, blueprint.getSshKey(), operationTracker );
+
+        //start environment creation workflow
+        executor.execute( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                environmentCreationWorkflow.start();
+            }
+        } );
+
+        //notify environment event listeners
+        environmentCreationWorkflow.onStop( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+
+                notifyOnEnvironmentCreated( environment );
+            }
+        } );
+
+        //wait
+        if ( !async )
+        {
+            environmentCreationWorkflow.join();
+
+            if ( environmentCreationWorkflow.getError() != null )
+            {
+                throw new EnvironmentCreationException(
+                        exceptionUtil.getRootCause( environmentCreationWorkflow.getError() ) );
+            }
+        }
+
+        //return created environment
+        return environment;
+    }
+
+
+    protected Topology buildTopology( final String environmentId, final String cdir, final Blueprint blueprint )
+    {
+        Topology topology = new Topology( blueprint.getName(), environmentId, cdir, blueprint.getSshKey() );
+
+        LOG.debug( "Building topology..." );
+        for ( Map.Entry<String, Set<NodeGroup>> placementEntry : blueprint.getNodeGroupsMap().entrySet() )
+        {
+            Peer peer = peerManager.getPeer( placementEntry.getKey() );
+            for ( NodeGroup nodeGroup : placementEntry.getValue() )
+            {
+                LOG.debug( String.format( "%s %s %s %s %s %s", nodeGroup.getName(), nodeGroup.getType(),
+                        nodeGroup.getNumberOfContainers(), nodeGroup.getPeerId(),
+                        nodeGroup.getContainerDistributionType() == ContainerDistributionType.AUTO ?
+                        nodeGroup.getContainerPlacementStrategy().getStrategyId() : nodeGroup.getHostId(),
+                        nodeGroup.getContainerDistributionType() ) );
+                topology.addNodeGroupPlacement( peer, nodeGroup );
+            }
+        }
+        LOG.debug( "Topology built." );
+
+        return topology;
+    }
+
+
+    @RolesAllowed( "Environment-Management|Write" )
+    @Override
+    public Environment createEnvironment( final Blueprint blueprint, final boolean async )
+            throws EnvironmentCreationException
+    {
+        Preconditions.checkNotNull( blueprint, "Invalid blueprint" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( blueprint.getName() ), "Invalid name" );
+        //        Preconditions.checkArgument( !Strings.isNullOrEmpty( blueprint.getCidr() ), "Invalid subnet CIDR" );
+        Preconditions.checkArgument( !blueprint.getNodeGroups().isEmpty(), "Placement is empty" );
+
+        String cidr = calculateCidr( blueprint );
+
+        //create empty environment
+        final EnvironmentImpl environment =
+                createEmptyEnvironment( blueprint.getName(), cidr, blueprint.getSshKey(), blueprint );
+
+        // TODO add additional step for receiving trust message
+
+        Topology topology = buildTopology( environment.getId(), cidr, blueprint );
+
+        //create operation tracker
+        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
+                String.format( "Creating environment %s ", environment.getId() ) );
+
+        //launch environment creation workflow
+        final EnvironmentCreationWorkflow environmentCreationWorkflow =
+                getEnvironmentCreationWorkflow( environment, topology, blueprint.getSshKey(), operationTracker );
+
+        //start environment creation workflow
+        executor.execute( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                environmentCreationWorkflow.start();
+            }
+        } );
+
+        //notify environment event listeners
+        environmentCreationWorkflow.onStop( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+
+                notifyOnEnvironmentCreated( environment );
+            }
+        } );
+
+        //wait
+        if ( !async )
+        {
+            environmentCreationWorkflow.join();
+
+            if ( environmentCreationWorkflow.getError() != null )
+            {
+                throw new EnvironmentCreationException(
+                        exceptionUtil.getRootCause( environmentCreationWorkflow.getError() ) );
+            }
+        }
+
+        //return created environment
+        return environment;
+    }
+
+
+    // TODO refactor to pass one Blueprint parameter from subutai-common
+    @Override
+    public Environment importEnvironment( final String name, final Topology topology,
+                                          final Map<NodeGroup, Set<ContainerHostInfo>> containers, final String ssh,
+                                          final Integer vlan ) throws EnvironmentCreationException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid name" );
+        Preconditions.checkNotNull( topology, "Invalid topology" );
+        Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
+
+        Map.Entry<NodeGroup, Set<ContainerHostInfo>> containersEntry = containers.entrySet().iterator().next();
+        Iterator<ContainerHostInfo> hostIterator = containersEntry.getValue().iterator();
+
+        String ip = "";
+
+        while ( hostIterator.hasNext() && StringUtil.isStringNullOrEmpty( ip ) )
+        {
+            HostInfo sampleHostInfo = hostIterator.next();
+
+            //TODO ip is chosen from first standing container host info
+            for ( final HostInterface iface : sampleHostInfo.getHostInterfaces().getAll() )
+            {
+                if ( StringUtil.isStringNullOrEmpty( iface.getIp() ) )
+                {
+                    continue;
+                }
+                ip = iface.getIp() + "/24";
+                break;
+            }
+        }
+
+        if ( StringUtil.isStringNullOrEmpty( ip ) )
+        {
+            throw new EnvironmentCreationException( "Invalid environment ip range" );
+        }
+
+        //create empty environment
+        final EnvironmentImpl environment = createEmptyEnvironment( name, ip, ssh, null );
+        for ( Map.Entry<NodeGroup, Set<ContainerHostInfo>> entry : containers.entrySet() )
+        {
+            for ( ContainerHostInfo newHost : entry.getValue() )
+            {
+                ContainerType containerType = entry.getKey().getType();
+
+                environment.addContainers( Sets.newHashSet(
+                        new EnvironmentContainerImpl( peerManager.getLocalPeer().getId(), peerManager.getLocalPeer(),
+                                entry.getKey().getName(), new ContainerHostInfoModel( newHost ),
+                                templateRegistry.getTemplate( entry.getKey().getTemplateName() ),
+                                entry.getKey().getSshGroupId(), entry.getKey().getHostsGroupId(),
+                                Common.DEFAULT_DOMAIN_NAME, containerType ) ) );
+            }
+        }
+        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
+                String.format( "Creating environment %s ", environment.getId() ) );
+
+        EnvironmentImportWorkflow environmentImportWorkflow =
+                getEnvironmentImportWorkflow( environment, topology, ssh, operationTracker );
+
+        environmentImportWorkflow.start();
+        //notify environment event listeners
+        environmentImportWorkflow.onStop( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                notifyOnEnvironmentCreated( environment );
+            }
+        } );
+
+
+        return environment;
+    }
+
+
+    @RolesAllowed( "Environment-Management|Write" )
+    @Override
+    public Set<EnvironmentContainerHost> growEnvironment( final String environmentId, final Blueprint blueprint,
+                                                          final boolean async )
+            throws EnvironmentModificationException, EnvironmentNotFoundException
+    {
+        TrackerOperation operationTracker =
+                tracker.createTrackerOperation( MODULE_NAME, String.format( "Growing environment %s", environmentId ) );
+
+        return growEnvironment( environmentId, blueprint, async, true, operationTracker );
+    }
+
+
+    @RolesAllowed( "Environment-Management|Write" )
+    @Override
+    public void setSshKey( final String environmentId, final String sshKey, final boolean async )
+            throws EnvironmentNotFoundException, EnvironmentModificationException
+    {
+        TrackerOperation op = tracker.createTrackerOperation( MODULE_NAME,
+                String.format( "Setting environment %s ssh key", environmentId ) );
+
+        setSshKey( environmentId, sshKey, async, true, op );
+    }
+
+
+    public void setSshKey( final String environmentId, final String sshKey, final boolean async,
+                           final boolean checkAccess, final TrackerOperation operationTracker )
+            throws EnvironmentNotFoundException, EnvironmentModificationException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+
+        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId, checkAccess );
+        User activeUser = identityManager.getActiveUser();
+
+        RelationMeta relationMeta =
+                new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), environment, environmentId,
+                        PermissionObject.EnvironmentManagement, environment.getId() );
+        if ( !relationManager.getRelationInfoManager().allHasUpdatePermissions( relationMeta ) )
+        {
+            throw new EnvironmentNotFoundException();
+        }
+        final SshKeyModificationWorkflow sshKeyModificationWorkflow =
+                getSshKeyModificationWorkflow( environment, sshKey, networkManager, operationTracker );
+
+        executor.execute( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                sshKeyModificationWorkflow.start();
+            }
+        } );
+
+        //wait
+        if ( !async )
+        {
+            sshKeyModificationWorkflow.join();
+
+            if ( sshKeyModificationWorkflow.getError() != null )
+            {
+                throw new EnvironmentModificationException(
+                        exceptionUtil.getRootCause( sshKeyModificationWorkflow.getError() ) );
+            }
+        }
+    }
+
+
+    protected SshKeyModificationWorkflow getSshKeyModificationWorkflow( final EnvironmentImpl environment,
+                                                                        final String sshKey,
+                                                                        final NetworkManager networkManager,
+                                                                        final TrackerOperation operationTracker )
+    {
+        return new SshKeyModificationWorkflow( environment, sshKey, networkManager, operationTracker, this );
+    }
+
+
+    @PermitAll
+    protected Environment loadEnvironment( final String environmentId, boolean checkAccess )
+            throws EnvironmentNotFoundException
+    {
+        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
+
+        EnvironmentImpl environment = environmentDataService.find( environmentId );
+
+        if ( environment == null )
+        {
+            throw new EnvironmentNotFoundException();
+        }
+
+        //check access to environment
+        if ( checkAccess )
+        {
+            checkAccess( environment );
+        }
+
+        //set environment's transient fields
+        setEnvironmentTransientFields( environment );
+
+        //set container's transient fields
+        setContainersTransientFields( environment );
+
+        return environment;
+    }
+
+
+    protected void checkAccess( final Environment environment )
+    {
+        if ( !( isUserAdmin() || Objects.equals( environment.getUserId(), getUserId() ) ) )
+        {
+            throw new EnvironmentSecurityException(
+                    String.format( "Access to environment %s is denied", environment.getName() ) );
+        }
+        User activeUser = identityManager.getActiveUser();
+
+        RelationMeta relationMeta =
+                new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), environment, environment.getId(),
+                        PermissionObject.EnvironmentManagement, environment.getId() );
+
+        if ( !relationManager.getRelationInfoManager().allHasReadPermissions( relationMeta ) )
+        {
+            throw new EnvironmentSecurityException(
+                    String.format( "Access to environment %s is denied", environment.getName() ) );
+        }
+    }
+
+
+    protected boolean isUserAdmin()
+    {
+        return true;//getUser().isAdmin();
+    }
+
+
+    @RolesAllowed( "Environment-Management|Delete" )
+    @Override
+    public void destroyEnvironment( final String environmentId, final boolean async,
+                                    final boolean forceMetadataRemoval )
+            throws EnvironmentDestructionException, EnvironmentNotFoundException
+    {
+        TrackerOperation op = tracker.createTrackerOperation( MODULE_NAME,
+                String.format( "Destroying environment %s", environmentId ) );
+
+        destroyEnvironment( environmentId, async, forceMetadataRemoval, true, op );
     }
 
 
@@ -902,6 +949,16 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
+    protected ContainerDestructionWorkflow getContainerDestructionWorkflow(
+            final EnvironmentManagerImpl environmentManager, final EnvironmentImpl environment,
+            final ContainerHost containerHost, final boolean forceMetadataRemoval,
+            final TrackerOperation operationTracker )
+    {
+        return new ContainerDestructionWorkflow( environmentManager, environment, containerHost, forceMetadataRemoval,
+                operationTracker );
+    }
+
+
     @PermitAll
     @Override
     public Environment loadEnvironment( final String environmentId ) throws EnvironmentNotFoundException
@@ -958,33 +1015,19 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
 
     @PermitAll
-    @Override
-    public Set<Environment> getEnvironments()
+    public void notifyOnEnvironmentDestroyed( final String environmentId )
     {
-        User activeUser = identityManager.getActiveUser();
-
-        final boolean viewAll = identityManager
-                .isUserPermitted( activeUser, PermissionObject.EnvironmentManagement, PermissionScope.ALL_SCOPE,
-                        PermissionOperation.Read );
-
-
-        Set<Environment> environments = new HashSet<>();
-        for ( Environment environment : environmentDataService.getAll() )
+        for ( final EnvironmentEventListener listener : listeners )
         {
-            RelationMeta relationMeta = new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), environment,
-                    environment.getId(), PermissionObject.EnvironmentManagement, environment.getId() );
-            boolean trustedRelation = relationManager.getRelationInfoManager().allHasReadPermissions( relationMeta );
-            if ( viewAll || environment.getUserId().equals( activeUser.getId() ) || trustedRelation )
+            executor.submit( new Runnable()
             {
-                environments.add( environment );
-
-                setEnvironmentTransientFields( environment );
-                setContainersTransientFields( environment );
-            }
+                @Override
+                public void run()
+                {
+                    listener.onEnvironmentDestroyed( environmentId );
+                }
+            } );
         }
-
-
-        return environments;
     }
 
 
@@ -1075,6 +1118,32 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     @RolesAllowed( "Environment-Management|Update" )
     @Override
+    public void removeEnvironmentDomain( final String environmentId )
+            throws EnvironmentModificationException, EnvironmentNotFoundException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+
+        EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
+        User activeUser = identityManager.getActiveUser();
+
+        RelationMeta relationMeta =
+                new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), environment, environmentId,
+                        PermissionObject.EnvironmentManagement, environment.getId() );
+
+        if ( !relationManager.getRelationInfoManager().allHasUpdatePermissions( relationMeta ) )
+        {
+            return;
+        }
+
+        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
+                String.format( "Removing environment %s domain", environmentId ) );
+
+        modifyEnvironmentDomain( environmentId, null, null, operationTracker, true, null );
+    }
+
+
+    @RolesAllowed( "Environment-Management|Update" )
+    @Override
     public void assignEnvironmentDomain( final String environmentId, final String newDomain,
                                          final DomainLoadBalanceStrategy domainLoadBalanceStrategy,
                                          final String sslCertPath )
@@ -1103,32 +1172,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         modifyEnvironmentDomain( environmentId, newDomain, domainLoadBalanceStrategy, operationTracker, true,
                 sslCertPath );
-    }
-
-
-    @RolesAllowed( "Environment-Management|Update" )
-    @Override
-    public void removeEnvironmentDomain( final String environmentId )
-            throws EnvironmentModificationException, EnvironmentNotFoundException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
-
-        EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
-        User activeUser = identityManager.getActiveUser();
-
-        RelationMeta relationMeta =
-                new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), environment, environmentId,
-                        PermissionObject.EnvironmentManagement, environment.getId() );
-
-        if ( !relationManager.getRelationInfoManager().allHasUpdatePermissions( relationMeta ) )
-        {
-            return;
-        }
-
-        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
-                String.format( "Removing environment %s domain", environmentId ) );
-
-        modifyEnvironmentDomain( environmentId, null, null, operationTracker, true, null );
     }
 
 
@@ -1208,6 +1251,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         }
     }
 
+    //************ utility methods
+
 
     @RolesAllowed( "Environment-Management|Update" )
     @Override
@@ -1278,274 +1323,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    public void toggleContainerDomain( final String containerHostId, final String environmentId, final boolean add,
-                                       final TrackerOperation operationTracker, final boolean checkAccess )
-            throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerHostId ), "Invalid container id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
-
-        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId, checkAccess );
-
-        ContainerHost containerHost = environment.getContainerHostById( containerHostId );
-        if ( checkAccess )
-        {
-            User activeUser = identityManager.getActiveUser();
-
-            RelationMeta relationMeta =
-                    new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), containerHost,
-                            containerHost.getId(), PermissionObject.EnvironmentManagement, containerHost.getId() );
-
-            if ( !relationManager.getRelationInfoManager().allHasUpdatePermissions( relationMeta ) )
-            {
-                throw new EnvironmentSecurityException(
-                        String.format( "Access to container %s is denied", environment.getName() ) );
-            }
-        }
-        try
-        {
-            if ( add )
-            {
-                peerManager.getLocalPeer()
-                           .addIpToVniDomain( containerHost.getIpByInterfaceName( Common.DEFAULT_CONTAINER_INTERFACE ),
-                                   environment.getVni() );
-            }
-            else
-            {
-                peerManager.getLocalPeer().removeIpFromVniDomain(
-                        containerHost.getIpByInterfaceName( Common.DEFAULT_CONTAINER_INTERFACE ),
-                        environment.getVni() );
-            }
-
-            operationTracker.addLogDone(
-                    String.format( "Container is %s environment domain", add ? "included in" : "excluded from" ) );
-        }
-        catch ( Exception e )
-        {
-            operationTracker.addLogFailed( String.format( "Error %s environment domain: %s",
-                    add ? "including container in" : "excluding container from", e.getMessage() ) );
-            throw new EnvironmentModificationException( e );
-        }
-    }
-
-    //************ utility methods
-
-
-    @PermitAll
-    protected EnvironmentCreationWorkflow getEnvironmentCreationWorkflow( final EnvironmentImpl environment,
-                                                                          final Topology topology, final String sshKey,
-                                                                          final TrackerOperation operationTracker )
-    {
-        User activeUser = identityManager.getActiveUser();
-
-        RelationMeta relationMeta =
-                new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), environment, environment.getId(),
-                        PermissionObject.EnvironmentManagement, environment.getId() );
-
-        if ( !relationManager.getRelationInfoManager().allHasReadPermissions( relationMeta ) )
-        {
-            throw new AccessControlException( "You don't have enough permissions to create environment" );
-        }
-        return new EnvironmentCreationWorkflow( Common.DEFAULT_DOMAIN_NAME, templateRegistry, this, networkManager,
-                peerManager, securityManager, identityManager, environment, topology, sshKey, operationTracker );
-    }
-
-
-    protected EnvironmentImportWorkflow getEnvironmentImportWorkflow( final EnvironmentImpl environment,
-                                                                      final Topology topology, final String sshKey,
-                                                                      final TrackerOperation tracker )
-    {
-        return new EnvironmentImportWorkflow( Common.DEFAULT_DOMAIN_NAME, templateRegistry, this, networkManager,
-                peerManager, securityManager, identityManager, environment, topology, sshKey, tracker );
-    }
-
-
-    protected EnvironmentGrowingWorkflow getEnvironmentGrowingWorkflow( final EnvironmentImpl environment,
-                                                                        final Topology topology, final String sshKey,
-                                                                        final TrackerOperation operationTracker )
-    {
-        return new EnvironmentGrowingWorkflow( Common.DEFAULT_DOMAIN_NAME, templateRegistry, networkManager,
-                peerManager, environment, topology, sshKey, operationTracker, this );
-    }
-
-
-    protected EnvironmentDestructionWorkflow getEnvironmentDestructionWorkflow( final PeerManager peerManager,
-                                                                                final EnvironmentManagerImpl
-                                                                                        environmentManager,
-                                                                                final EnvironmentImpl environment,
-                                                                                final boolean forceMetadataRemoval,
-                                                                                final TrackerOperation
-                                                                                        operationTracker )
-    {
-        return new EnvironmentDestructionWorkflow( environmentManager, environment, forceMetadataRemoval,
-                operationTracker );
-    }
-
-
-    protected ContainerDestructionWorkflow getContainerDestructionWorkflow(
-            final EnvironmentManagerImpl environmentManager, final EnvironmentImpl environment,
-            final ContainerHost containerHost, final boolean forceMetadataRemoval,
-            final TrackerOperation operationTracker )
-    {
-        return new ContainerDestructionWorkflow( environmentManager, environment, containerHost, forceMetadataRemoval,
-                operationTracker );
-    }
-
-
-    protected SshKeyModificationWorkflow getSshKeyModificationWorkflow( final EnvironmentImpl environment,
-                                                                        final String sshKey,
-                                                                        final NetworkManager networkManager,
-                                                                        final TrackerOperation operationTracker )
-    {
-        return new SshKeyModificationWorkflow( environment, sshKey, networkManager, operationTracker, this );
-    }
-
-
-    @PermitAll
-    protected Environment loadEnvironment( final String environmentId, boolean checkAccess )
-            throws EnvironmentNotFoundException
-    {
-        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
-
-        EnvironmentImpl environment = environmentDataService.find( environmentId );
-
-        if ( environment == null )
-        {
-            throw new EnvironmentNotFoundException();
-        }
-
-        //check access to environment
-        if ( checkAccess )
-        {
-            checkAccess( environment );
-        }
-
-        //set environment's transient fields
-        setEnvironmentTransientFields( environment );
-
-        //set container's transient fields
-        setContainersTransientFields( environment );
-
-        return environment;
-    }
-
-
-    protected void checkAccess( final Environment environment )
-    {
-        if ( !( isUserAdmin() || Objects.equals( environment.getUserId(), getUserId() ) ) )
-        {
-            throw new EnvironmentSecurityException(
-                    String.format( "Access to environment %s is denied", environment.getName() ) );
-        }
-        User activeUser = identityManager.getActiveUser();
-
-        RelationMeta relationMeta =
-                new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), environment, environment.getId(),
-                        PermissionObject.EnvironmentManagement, environment.getId() );
-
-        if ( !relationManager.getRelationInfoManager().allHasReadPermissions( relationMeta ) )
-        {
-            throw new EnvironmentSecurityException(
-                    String.format( "Access to environment %s is denied", environment.getName() ) );
-        }
-    }
-
-
-    protected boolean isUserAdmin()
-    {
-        return true;//getUser().isAdmin();
-    }
-
-
-    public void setEnvironmentTransientFields( final Environment environment )
-    {
-        ( ( EnvironmentImpl ) environment ).setEnvironmentManager( this );
-    }
-
-
-    public void setContainersTransientFields( final Environment environment )
-    {
-        User activeUser = identityManager.getActiveUser();
-        for ( ContainerHost containerHost : environment.getContainerHosts() )
-        {
-            EnvironmentContainerImpl environmentContainer = ( EnvironmentContainerImpl ) containerHost;
-
-            RelationMeta relationMeta =
-                    new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), environmentContainer,
-                            environmentContainer.getId(), PermissionObject.EnvironmentManagement,
-                            environmentContainer.getId() );
-            boolean trustedRelation = relationManager.getRelationInfoManager().allHasReadPermissions( relationMeta );
-
-            if ( trustedRelation )
-            {
-                environmentContainer.setEnvironmentManager( this );
-
-                String peerId = environmentContainer.getPeerId();
-                Peer peer = peerManager.getPeer( peerId );
-
-                environmentContainer.setPeer( peer );
-            }
-            else
-            {
-                environment.getContainerHosts().remove( environmentContainer );
-            }
-        }
-    }
-
-
-    public void registerListener( final EnvironmentEventListener listener )
-    {
-        if ( listener != null )
-        {
-            listeners.add( listener );
-        }
-    }
-
-
-    public void unregisterListener( final EnvironmentEventListener listener )
-    {
-        if ( listener != null )
-        {
-            listeners.remove( listener );
-        }
-    }
-
-
-    @PermitAll
-    public void notifyOnEnvironmentCreated( final Environment environment )
-    {
-        for ( final EnvironmentEventListener listener : listeners )
-        {
-            executor.submit( new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    listener.onEnvironmentCreated( environment );
-                }
-            } );
-        }
-    }
-
-
-    @PermitAll
-    public void notifyOnEnvironmentGrown( final Environment environment,
-                                          final Set<EnvironmentContainerHost> containers )
-    {
-        for ( final EnvironmentEventListener listener : listeners )
-        {
-            executor.submit( new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    listener.onEnvironmentGrown( environment, containers );
-                }
-            } );
-        }
-    }
-
-
     @PermitAll
     public void notifyOnContainerDestroyed( final Environment environment, final String containerId )
     {
@@ -1568,158 +1345,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     public void notifyOnContainerStateChanged( final Environment environment, final ContainerHost containerHost )
     {
         saveOrUpdate( environment );
-    }
-
-
-    @PermitAll
-    public void notifyOnEnvironmentDestroyed( final String environmentId )
-    {
-        for ( final EnvironmentEventListener listener : listeners )
-        {
-            executor.submit( new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    listener.onEnvironmentDestroyed( environmentId );
-                }
-            } );
-        }
-    }
-
-
-    @RolesAllowed( "Environment-Management|Write" )
-    protected EnvironmentImpl createEmptyEnvironment( final String name, final String subnetCidr, final String sshKey,
-                                                      final Blueprint blueprint ) throws EnvironmentCreationException
-    {
-
-        EnvironmentImpl environment =
-                new EnvironmentImpl( name, subnetCidr, sshKey, getUserId(), peerManager.getLocalPeer().getId() );
-
-        User activeUser = identityManager.getActiveUser();
-        environment.setRawBlueprint( JsonUtil.toJson( blueprint ) );
-        environment.setUserId( activeUser.getId() );
-        createEnvironmentKeyPair( environment.getEnvironmentId(), activeUser.getSecurityKeyId() );
-        try
-        {
-            KeyManager keyManager = securityManager.getKeyManager();
-            EncryptionTool encryptionTool = securityManager.getEncryptionTool();
-
-            // TODO user should send signed trust message
-            RelationInfo relationInfo = relationManager
-                    .generateTrustRelationship( PermissionObject.EnvironmentManagement.getName(),
-                            Sets.newHashSet( PermissionOperation.Delete.getName(), PermissionOperation.Read.getName(),
-                                    PermissionOperation.Update.getName(), PermissionOperation.Write.getName() ),
-                            Ownership.USER.getLevel() );
-
-            // TODO set target public key id to verify access it later to verify signature
-            RelationMeta relationMeta = new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), environment,
-                    environment.getId(), PermissionObject.EnvironmentManagement, activeUser.getSecurityKeyId() );
-
-            Relation relation = relationManager.buildTrustRelation( relationInfo, relationMeta );
-
-            String relationJson = JsonUtil.toJson( relation );
-
-            PGPPublicKey publicKey = keyManager.getPublicKey( environment.getEnvironmentId().getId() );
-            byte[] relationEncrypted = encryptionTool.encrypt( relationJson.getBytes(), publicKey, true );
-
-            String encryptedMessage = new String( relationEncrypted, "UTF-8" );
-
-            // relation declaration is created only once so if user signature verification is failed then environment
-            // creation have to fail. Declaration will be saved in encrypted format where relation information is saved
-            environment.setRelationDeclaration( encryptedMessage );
-
-            // TODO should be handled on client side
-            PGPSecretKey userSecretKey = keyManager.getSecretKey( activeUser.getSecurityKeyId() );
-            byte[] signedEncrypted = encryptionTool.sign( encryptedMessage.getBytes(), userSecretKey, "", true );
-            String signedMessage = new String( signedEncrypted, "UTF-8" );
-
-
-            // TODO should be handled on server side when user sends signed message
-            relationManager.processTrustMessage( signedMessage, environment.getId() );
-        }
-        catch ( Exception e )
-        {
-            LOG.warn( "Error message.", e );
-        }
-
-        environment = saveOrUpdate( environment );
-
-        setEnvironmentTransientFields( environment );
-
-        notifyOnEnvironmentCreated( environment );
-
-        return environment;
-    }
-
-
-    private PGPSecretKeyRing createEnvironmentKeyPair( EnvironmentId envId, String userSecKeyId )
-            throws EnvironmentCreationException
-    {
-        KeyManager keyManager = securityManager.getKeyManager();
-        String pairId = envId.getId();
-        final PGPSecretKeyRing userSecKeyRing = securityManager.getKeyManager().getSecretKeyRing( userSecKeyId );
-        try
-        {
-            KeyPair keyPair = keyManager.generateKeyPair( pairId, false );
-
-            //******Create PEK *****************************************************************
-            PGPSecretKeyRing secRing = PGPKeyUtil.readSecretKeyRing( keyPair.getSecKeyring() );
-            PGPPublicKeyRing pubRing = PGPKeyUtil.readPublicKeyRing( keyPair.getPubKeyring() );
-
-            //***************Save Keys *********************************************************
-            keyManager.saveSecretKeyRing( pairId, SecurityKeyType.EnvironmentKey.getId(), secRing );
-            keyManager.savePublicKeyRing( pairId, SecurityKeyType.EnvironmentKey.getId(), pubRing );
-
-            //***************Sign Keys *********************************************************
-            securityManager.getKeyManager().setKeyTrust( userSecKeyRing, pubRing, KeyTrustLevel.Full.getId() );
-
-            return secRing;
-        }
-        catch ( PGPException ex )
-        {
-            throw new EnvironmentCreationException( ex );
-        }
-    }
-
-
-    protected User getUser()
-    {
-        //User user = identityManager.getUser();
-
-        //if ( user == null )
-        {
-            throw new EnvironmentSecurityException( "User not authenticated" );
-        }
-
-        //return user;
-    }
-
-
-    protected Long getUserId()
-    {
-        return ( long ) 0;//getUser().getId();
-    }
-
-
-    public Peer resolvePeer( final String peerId )
-    {
-        return peerManager.getPeer( peerId );
-    }
-
-
-    public EnvironmentImpl saveOrUpdate( final Environment environment )
-    {
-        EnvironmentImpl env = environmentDataService.saveOrUpdate( environment );
-        setEnvironmentTransientFields( env );
-        setContainersTransientFields( env );
-        return env;
-    }
-
-
-    public void remove( final EnvironmentImpl environment )
-    {
-        environmentDataService.remove( environment );
     }
 
 
@@ -1756,29 +1381,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
 
     @Override
-    public String getId()
-    {
-        return "ENVIRONMENT_MANAGER";
-    }
-
-
-    @Override
-    public void onAlert( final AlertEvent alertEvent )
-    {
-        try
-        {
-            EnvironmentAlertHandlers handlers =
-                    getEnvironmentAlertHandlers( new EnvironmentId( alertEvent.getEnvironmentId() ) );
-            handleAlertPack( alertEvent, handlers );
-        }
-        catch ( Exception e )
-        {
-            LOG.error( "Error in handling alert package.", e );
-        }
-    }
-
-
-    @Override
     public EnvironmentAlertHandlers getEnvironmentAlertHandlers( final EnvironmentId environmentId )
             throws EnvironmentNotFoundException
     {
@@ -1792,52 +1394,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             handlers.add( environmentAlertHandler, alertHandlers.get( environmentAlertHandler.getAlertHandlerId() ) );
         }
         return handlers;
-    }
-
-
-    protected void handleAlertPack( final AlertEvent alertEvent, EnvironmentAlertHandlers handlers )
-    {
-        for ( final EnvironmentAlertHandler handlerId : handlers.getAllHandlers().keySet() )
-        {
-            try
-            {
-                AlertHandler handler = handlers.getHandler( handlerId );
-                if ( handler == null )
-                {
-                    alertEvent.addLog( String.format( "Alert Handler not found: %s. Skipped.", handlerId ) );
-                    continue;
-                }
-                AlertValue alertValue = alertEvent.getResource().getAlertValue( handler.getSupportedAlertValue() );
-                if ( alertValue != null )
-                {
-                    alertEvent.addLog(
-                            String.format( "Invoking pre-processor of '%s:%s'.", handlerId.getAlertHandlerId(),
-                                    handlerId.getAlertHandlerPriority() ) );
-                    handler.preProcess( alertValue );
-                    alertEvent.addLog(
-                            String.format( "Pre-processor of '%s:%s' finished.", handlerId.getAlertHandlerId(),
-                                    handlerId.getAlertHandlerPriority() ) );
-                    alertEvent.addLog(
-                            String.format( "Invoking main processor of '%s:%s'.", handlerId.getAlertHandlerId(),
-                                    handlerId.getAlertHandlerPriority() ) );
-                    handler.process( alertValue );
-                    alertEvent.addLog(
-                            String.format( "Main processor of '%s:%s' finished.", handlerId.getAlertHandlerId(),
-                                    handlerId.getAlertHandlerPriority() ) );
-                    alertEvent.addLog(
-                            String.format( "Invoking post-processor of '%s:%s'.", handlerId.getAlertHandlerId(),
-                                    handlerId.getAlertHandlerPriority() ) );
-                    handler.postProcess( alertValue );
-                    alertEvent.addLog(
-                            String.format( "Pre-processor of '%s:%s' finished.", handlerId.getAlertHandlerId(),
-                                    handlerId.getAlertHandlerPriority() ) );
-                }
-            }
-            catch ( Exception e )
-            {
-                alertEvent.addLog( e.getMessage() );
-            }
-        }
     }
 
 
@@ -1895,6 +1451,457 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             LOG.error( "Error on stop monitoring", e );
             throw new EnvironmentManagerException( e.getMessage(), e );
+        }
+    }
+
+
+    public void toggleContainerDomain( final String containerHostId, final String environmentId, final boolean add,
+                                       final TrackerOperation operationTracker, final boolean checkAccess )
+            throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerHostId ), "Invalid container id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+
+        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId, checkAccess );
+
+        ContainerHost containerHost = environment.getContainerHostById( containerHostId );
+        if ( checkAccess )
+        {
+            User activeUser = identityManager.getActiveUser();
+
+            RelationMeta relationMeta =
+                    new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), containerHost,
+                            containerHost.getId(), PermissionObject.EnvironmentManagement, containerHost.getId() );
+
+            if ( !relationManager.getRelationInfoManager().allHasUpdatePermissions( relationMeta ) )
+            {
+                throw new EnvironmentSecurityException(
+                        String.format( "Access to container %s is denied", environment.getName() ) );
+            }
+        }
+        try
+        {
+            if ( add )
+            {
+                peerManager.getLocalPeer()
+                           .addIpToVniDomain( containerHost.getIpByInterfaceName( Common.DEFAULT_CONTAINER_INTERFACE ),
+                                   environment.getVni() );
+            }
+            else
+            {
+                peerManager.getLocalPeer().removeIpFromVniDomain(
+                        containerHost.getIpByInterfaceName( Common.DEFAULT_CONTAINER_INTERFACE ),
+                        environment.getVni() );
+            }
+
+            operationTracker.addLogDone(
+                    String.format( "Container is %s environment domain", add ? "included in" : "excluded from" ) );
+        }
+        catch ( Exception e )
+        {
+            operationTracker.addLogFailed( String.format( "Error %s environment domain: %s",
+                    add ? "including container in" : "excluding container from", e.getMessage() ) );
+            throw new EnvironmentModificationException( e );
+        }
+    }
+
+
+    protected EnvironmentImportWorkflow getEnvironmentImportWorkflow( final EnvironmentImpl environment,
+                                                                      final Topology topology, final String sshKey,
+                                                                      final TrackerOperation tracker )
+    {
+        return new EnvironmentImportWorkflow( Common.DEFAULT_DOMAIN_NAME, templateRegistry, this, networkManager,
+                peerManager, securityManager, identityManager, environment, topology, sshKey, tracker );
+    }
+
+
+    @RolesAllowed( "Environment-Management|Write" )
+    protected EnvironmentImpl createEmptyEnvironment( final String name, final String subnetCidr, final String sshKey,
+                                                      final Blueprint blueprint ) throws EnvironmentCreationException
+    {
+
+        EnvironmentImpl environment =
+                new EnvironmentImpl( name, subnetCidr, sshKey, getUserId(), peerManager.getLocalPeer().getId() );
+
+        User activeUser = identityManager.getActiveUser();
+        environment.setRawBlueprint( JsonUtil.toJson( blueprint ) );
+        environment.setUserId( activeUser.getId() );
+        createEnvironmentKeyPair( environment.getEnvironmentId(), activeUser.getSecurityKeyId() );
+        try
+        {
+            KeyManager keyManager = securityManager.getKeyManager();
+            EncryptionTool encryptionTool = securityManager.getEncryptionTool();
+
+            // TODO user should send signed trust message
+            RelationInfo relationInfo = relationManager
+                    .generateTrustRelationship( PermissionObject.EnvironmentManagement.getName(),
+                            Sets.newHashSet( PermissionOperation.Delete.getName(), PermissionOperation.Read.getName(),
+                                    PermissionOperation.Update.getName(), PermissionOperation.Write.getName() ),
+                            Ownership.USER.getLevel() );
+
+            // TODO set target public key id to verify access it later to verify signature
+            RelationMeta relationMeta = new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), environment,
+                    environment.getId(), PermissionObject.EnvironmentManagement, activeUser.getSecurityKeyId() );
+
+            Relation relation = relationManager.buildTrustRelation( relationInfo, relationMeta );
+
+            String relationJson = JsonUtil.toJson( relation );
+
+            PGPPublicKey publicKey = keyManager.getPublicKey( environment.getEnvironmentId().getId() );
+            byte[] relationEncrypted = encryptionTool.encrypt( relationJson.getBytes(), publicKey, true );
+
+            String encryptedMessage = new String( relationEncrypted, "UTF-8" );
+
+            // relation declaration is created only once so if user signature verification is failed then environment
+            // creation have to fail. Declaration will be saved in encrypted format where relation information is saved
+            environment.setRelationDeclaration( encryptedMessage );
+
+            // TODO should be handled on client side
+            PGPSecretKey userSecretKey = keyManager.getSecretKey( activeUser.getSecurityKeyId() );
+            byte[] signedEncrypted = encryptionTool.clearSign( encryptedMessage.getBytes(), userSecretKey, "" );
+            String signedMessage = new String( signedEncrypted, "UTF-8" );
+
+
+            // TODO should be handled on server side when user sends signed message
+            relationManager.processTrustMessage( signedMessage, environment.getId() );
+        }
+        catch ( Exception e )
+        {
+            LOG.warn( "Error message.", e );
+        }
+
+        environment = saveOrUpdate( environment );
+
+        setEnvironmentTransientFields( environment );
+
+        notifyOnEnvironmentCreated( environment );
+
+        return environment;
+    }
+
+
+    @PermitAll
+    public void notifyOnEnvironmentCreated( final Environment environment )
+    {
+        for ( final EnvironmentEventListener listener : listeners )
+        {
+            executor.submit( new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    listener.onEnvironmentCreated( environment );
+                }
+            } );
+        }
+    }
+
+
+    private PGPSecretKeyRing createEnvironmentKeyPair( EnvironmentId envId, String userSecKeyId )
+            throws EnvironmentCreationException
+    {
+        KeyManager keyManager = securityManager.getKeyManager();
+        String pairId = envId.getId();
+        final PGPSecretKeyRing userSecKeyRing = securityManager.getKeyManager().getSecretKeyRing( userSecKeyId );
+        try
+        {
+            KeyPair keyPair = keyManager.generateKeyPair( pairId, false );
+
+            //******Create PEK *****************************************************************
+            PGPSecretKeyRing secRing = PGPKeyUtil.readSecretKeyRing( keyPair.getSecKeyring() );
+            PGPPublicKeyRing pubRing = PGPKeyUtil.readPublicKeyRing( keyPair.getPubKeyring() );
+
+            //***************Save Keys *********************************************************
+            keyManager.saveSecretKeyRing( pairId, SecurityKeyType.EnvironmentKey.getId(), secRing );
+            keyManager.savePublicKeyRing( pairId, SecurityKeyType.EnvironmentKey.getId(), pubRing );
+
+            //***************Sign Keys *********************************************************
+            securityManager.getKeyManager().setKeyTrust( userSecKeyRing, pubRing, KeyTrustLevel.Full.getId() );
+
+            return secRing;
+        }
+        catch ( PGPException ex )
+        {
+            throw new EnvironmentCreationException( ex );
+        }
+    }
+
+
+    protected Long getUserId()
+    {
+        return ( long ) 0;//getUser().getId();
+    }
+
+
+    public EnvironmentImpl saveOrUpdate( final Environment environment )
+    {
+        EnvironmentImpl env = environmentDataService.saveOrUpdate( environment );
+        setEnvironmentTransientFields( env );
+        setContainersTransientFields( env );
+        return env;
+    }
+
+
+    public void setEnvironmentTransientFields( final Environment environment )
+    {
+        ( ( EnvironmentImpl ) environment ).setEnvironmentManager( this );
+    }
+
+
+    public void setContainersTransientFields( final Environment environment )
+    {
+        User activeUser = identityManager.getActiveUser();
+        for ( ContainerHost containerHost : environment.getContainerHosts() )
+        {
+            EnvironmentContainerImpl environmentContainer = ( EnvironmentContainerImpl ) containerHost;
+
+            RelationMeta relationMeta =
+                    new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), environmentContainer,
+                            environmentContainer.getId(), PermissionObject.EnvironmentManagement,
+                            environmentContainer.getId() );
+            boolean trustedRelation = relationManager.getRelationInfoManager().allHasReadPermissions( relationMeta );
+
+            if ( trustedRelation )
+            {
+                environmentContainer.setEnvironmentManager( this );
+
+                String peerId = environmentContainer.getPeerId();
+                Peer peer = peerManager.getPeer( peerId );
+
+                environmentContainer.setPeer( peer );
+            }
+            else
+            {
+                environment.getContainerHosts().remove( environmentContainer );
+            }
+        }
+    }
+
+
+    @PermitAll
+    protected EnvironmentCreationWorkflow getEnvironmentCreationWorkflow( final EnvironmentImpl environment,
+                                                                          final Topology topology, final String sshKey,
+                                                                          final TrackerOperation operationTracker )
+    {
+        User activeUser = identityManager.getActiveUser();
+
+        RelationMeta relationMeta =
+                new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), environment, environment.getId(),
+                        PermissionObject.EnvironmentManagement, environment.getId() );
+
+        if ( !relationManager.getRelationInfoManager().allHasReadPermissions( relationMeta ) )
+        {
+            throw new AccessControlException( "You don't have enough permissions to create environment" );
+        }
+        return new EnvironmentCreationWorkflow( Common.DEFAULT_DOMAIN_NAME, templateRegistry, this, networkManager,
+                peerManager, securityManager, identityManager, environment, topology, sshKey, operationTracker );
+    }
+
+
+    private String calculateCidr( final Blueprint blueprint ) throws EnvironmentCreationException
+    {
+        Preconditions.checkNotNull( blueprint );
+
+        try
+        {
+            Set<String> usedGateways = new HashSet<>();
+            usedGateways.addAll( getUsedGateways( peerManager.getLocalPeer() ) );
+            for ( String peerId : blueprint.getNodeGroupsMap().keySet() )
+            {
+                Peer peer = peerManager.getPeer( peerId );
+                usedGateways.addAll( getUsedGateways( peer ) );
+            }
+
+            String environmentGatewayIp = null;
+
+            for ( int i = 1; i < 255 && environmentGatewayIp == null; i++ )
+            {
+                SubnetUtils.SubnetInfo info = new SubnetUtils( String.format( DEFAULT_GATEWAY_TEMPLATE, i ) ).getInfo();
+
+                String gw = info.getLowAddress();
+
+                if ( !usedGateways.contains( gw ) )
+                {
+                    environmentGatewayIp = info.getCidrSignature();
+                    break;
+                }
+            }
+
+            if ( environmentGatewayIp == null )
+            {
+                throw new EnvironmentCreationException( "Could not determine subnet cdir." );
+            }
+            return environmentGatewayIp;
+        }
+        catch ( PeerException e )
+        {
+            throw new EnvironmentCreationException( String.format( "Error on validating subnet: %s", e.getMessage() ) );
+        }
+    }
+
+
+    protected Set<String> getUsedGateways( Peer peer ) throws PeerException
+    {
+
+        Set<String> usedGateways = Sets.newHashSet();
+
+        for ( Gateway gateway : peer.getGateways() )
+        {
+            usedGateways.add( gateway.getIp() );
+        }
+
+        return usedGateways;
+    }
+
+
+    protected EnvironmentGrowingWorkflow getEnvironmentGrowingWorkflow( final EnvironmentImpl environment,
+                                                                        final Topology topology, final String sshKey,
+                                                                        final TrackerOperation operationTracker )
+    {
+        return new EnvironmentGrowingWorkflow( Common.DEFAULT_DOMAIN_NAME, templateRegistry, networkManager,
+                peerManager, environment, topology, sshKey, operationTracker, this );
+    }
+
+
+    protected EnvironmentDestructionWorkflow getEnvironmentDestructionWorkflow( final PeerManager peerManager,
+                                                                                final EnvironmentManagerImpl
+                                                                                        environmentManager,
+                                                                                final EnvironmentImpl environment,
+                                                                                final boolean forceMetadataRemoval,
+                                                                                final TrackerOperation
+                                                                                        operationTracker )
+    {
+        return new EnvironmentDestructionWorkflow( environmentManager, environment, forceMetadataRemoval,
+                operationTracker );
+    }
+
+
+    public void registerListener( final EnvironmentEventListener listener )
+    {
+        if ( listener != null )
+        {
+            listeners.add( listener );
+        }
+    }
+
+
+    public void unregisterListener( final EnvironmentEventListener listener )
+    {
+        if ( listener != null )
+        {
+            listeners.remove( listener );
+        }
+    }
+
+
+    @PermitAll
+    public void notifyOnEnvironmentGrown( final Environment environment,
+                                          final Set<EnvironmentContainerHost> containers )
+    {
+        for ( final EnvironmentEventListener listener : listeners )
+        {
+            executor.submit( new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    listener.onEnvironmentGrown( environment, containers );
+                }
+            } );
+        }
+    }
+
+
+    protected User getUser()
+    {
+        //User user = identityManager.getUser();
+
+        //if ( user == null )
+        {
+            throw new EnvironmentSecurityException( "User not authenticated" );
+        }
+
+        //return user;
+    }
+
+
+    public Peer resolvePeer( final String peerId )
+    {
+        return peerManager.getPeer( peerId );
+    }
+
+
+    public void remove( final EnvironmentImpl environment )
+    {
+        environmentDataService.remove( environment );
+    }
+
+
+    @Override
+    public String getId()
+    {
+        return "ENVIRONMENT_MANAGER";
+    }
+
+
+    @Override
+    public void onAlert( final AlertEvent alertEvent )
+    {
+        try
+        {
+            EnvironmentAlertHandlers handlers =
+                    getEnvironmentAlertHandlers( new EnvironmentId( alertEvent.getEnvironmentId() ) );
+            handleAlertPack( alertEvent, handlers );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error in handling alert package.", e );
+        }
+    }
+
+
+    protected void handleAlertPack( final AlertEvent alertEvent, EnvironmentAlertHandlers handlers )
+    {
+        for ( final EnvironmentAlertHandler handlerId : handlers.getAllHandlers().keySet() )
+        {
+            try
+            {
+                AlertHandler handler = handlers.getHandler( handlerId );
+                if ( handler == null )
+                {
+                    alertEvent.addLog( String.format( "Alert Handler not found: %s. Skipped.", handlerId ) );
+                    continue;
+                }
+                AlertValue alertValue = alertEvent.getResource().getAlertValue( handler.getSupportedAlertValue() );
+                if ( alertValue != null )
+                {
+                    alertEvent.addLog(
+                            String.format( "Invoking pre-processor of '%s:%s'.", handlerId.getAlertHandlerId(),
+                                    handlerId.getAlertHandlerPriority() ) );
+                    handler.preProcess( alertValue );
+                    alertEvent.addLog(
+                            String.format( "Pre-processor of '%s:%s' finished.", handlerId.getAlertHandlerId(),
+                                    handlerId.getAlertHandlerPriority() ) );
+                    alertEvent.addLog(
+                            String.format( "Invoking main processor of '%s:%s'.", handlerId.getAlertHandlerId(),
+                                    handlerId.getAlertHandlerPriority() ) );
+                    handler.process( alertValue );
+                    alertEvent.addLog(
+                            String.format( "Main processor of '%s:%s' finished.", handlerId.getAlertHandlerId(),
+                                    handlerId.getAlertHandlerPriority() ) );
+                    alertEvent.addLog(
+                            String.format( "Invoking post-processor of '%s:%s'.", handlerId.getAlertHandlerId(),
+                                    handlerId.getAlertHandlerPriority() ) );
+                    handler.postProcess( alertValue );
+                    alertEvent.addLog(
+                            String.format( "Pre-processor of '%s:%s' finished.", handlerId.getAlertHandlerId(),
+                                    handlerId.getAlertHandlerPriority() ) );
+                }
+            }
+            catch ( Exception e )
+            {
+                alertEvent.addLog( e.getMessage() );
+            }
         }
     }
 }

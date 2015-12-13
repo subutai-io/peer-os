@@ -14,7 +14,7 @@ import io.subutai.core.identity.api.model.RelationMeta;
  */
 public interface TrustRelationManager
 {
-    void processTrustMessage( String encrypted, final String secretKeyId ) throws RelationVerificationException;
+    void processTrustMessage( String signedMessage, final String secretKeyId ) throws RelationVerificationException;
 
     RelationInfo generateTrustRelationship( String pObject, Set<String> operation, int ownershipLevel );
 

@@ -9,8 +9,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
@@ -950,7 +948,7 @@ public class PGPEncryptionUtil
     /*
      * verify a clear text signed file
      */
-    public static boolean verifyClearSign( byte[] message, PGPPublicKeyRingCollection pgpRings ) throws Exception
+    public static boolean verifyClearSign( byte[] message, PGPPublicKeyRing pgpRings ) throws Exception
     {
         ArmoredInputStream aIn = new ArmoredInputStream( new ByteArrayInputStream( message ) );
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
@@ -1109,7 +1107,7 @@ public class PGPEncryptionUtil
 
 
     public static byte[] clearSign( byte[] message, PGPSecretKey pgpSecKey, char[] pass, String digestName )
-            throws IOException, NoSuchAlgorithmException, NoSuchProviderException, PGPException, SignatureException
+            throws IOException, PGPException, SignatureException
     {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         int digest;

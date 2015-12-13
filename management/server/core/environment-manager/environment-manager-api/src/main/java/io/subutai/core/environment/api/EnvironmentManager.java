@@ -43,7 +43,8 @@ public interface EnvironmentManager
     Environment setupRequisites( Blueprint blueprint ) throws EnvironmentCreationException;
 
 
-    Environment startEnvironmentBuild( String environmentId, boolean async ) throws EnvironmentCreationException;
+    Environment startEnvironmentBuild( String environmentId, String signedMessage, boolean async )
+            throws EnvironmentCreationException;
 
     /**
      * Creates environment based on a passed topology

@@ -58,15 +58,12 @@ import io.subutai.core.strategy.api.StrategyManager;
 public class RestServiceImpl implements RestService
 {
     private static final Logger LOG = LoggerFactory.getLogger( RestServiceImpl.class );
-
-    private Gson gson = RequiredDeserializer.createValidatingGson();
-
     private static final String ERROR_KEY = "ERROR";
-
     private final EnvironmentManager environmentManager;
     private final PeerManager peerManager;
     private final TemplateManager templateRegistry;
     private final StrategyManager strategyManager;
+    private Gson gson = RequiredDeserializer.createValidatingGson();
 
 
     public RestServiceImpl( final EnvironmentManager environmentManager, final PeerManager peerManager,
@@ -254,38 +251,11 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response startEnvironmentBuild( final String environmentId )
+    public Response startEnvironmentBuild( final String environmentId, final String signedMessage )
     {
         try
         {
-            Environment environment = environmentManager.startEnvironmentBuild( environmentId, false );
-        }
-        catch ( EnvironmentCreationException e )
-        {
-            LOG.error( "Error creating environment #createEnvironment", e );
-            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
-        }
-        catch ( JsonParseException e )
-        {
-            LOG.error( "Error validating parameters #createEnvironment", e );
-            return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) )
-                           .build();
-        }
-
-        return Response.ok().build();
-    }
-
-
-    //    @Override
-    public Response createEnvironment( final String blueprintJson )
-    {
-        try
-        {
-            Blueprint blueprint = gson.fromJson( blueprintJson, Blueprint.class );
-
-            updateContainerPlacementStrategy( blueprint );
-
-            Environment environment = environmentManager.createEnvironment( blueprint, false );
+            Environment environment = environmentManager.startEnvironmentBuild( environmentId, signedMessage, false );
         }
         catch ( EnvironmentCreationException e )
         {
@@ -408,15 +378,6 @@ public class RestServiceImpl implements RestService
     }
 
 
-    /** Environment domains **************************************************** */
-
-    @Override
-    public Response listDomainLoadBalanceStrategies()
-    {
-        return Response.ok( JsonUtil.toJson( DomainLoadBalanceStrategy.values() ) ).build();
-    }
-
-
     @Override
     public Response getEnvironmentDomain( final String environmentId )
     {
@@ -429,6 +390,15 @@ public class RestServiceImpl implements RestService
             LOG.error( "getEnvironmentDomain error", e );
             return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( e.getMessage() ) ).build();
         }
+    }
+
+
+    /** Environment domains **************************************************** */
+
+    @Override
+    public Response listDomainLoadBalanceStrategies()
+    {
+        return Response.ok( JsonUtil.toJson( DomainLoadBalanceStrategy.values() ) ).build();
     }
 
 
@@ -774,6 +744,43 @@ public class RestServiceImpl implements RestService
 
 
     @Override
+    public Response getRamQuota( final String containerId )
+    {
+        //        try
+        //        {
+        //            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
+        //
+        //            LocalPeer localPeer = peerManager.getLocalPeer();
+        //            return Response.ok( localPeer.getContainerHostById( containerId ).getRamQuota() ).build();
+        //        } catch (Exception e) {
+        //            LOG.error( "Error getting ram quota #getRamQuota", e );
+        //            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        //        }
+        return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
+    }
+
+
+    @Override
+    public Response setRamQuota( final String containerId, final int ram )
+    {
+        //        try
+        //        {
+        //            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
+        //
+        //            LocalPeer localPeer = peerManager.getLocalPeer();
+        //            localPeer.getContainerHostById( containerId ).setRamQuota( ram );
+        //            return Response.ok().build();
+        //        }
+        //        catch ( Exception e )
+        //        {
+        //            LOG.error( "Error setting ram quota #setRamQuota", e );
+        //            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        //        }
+        return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
+    }
+
+
+    @Override
     public Response getCpuQuota( final String containerId )
     {
         //        try
@@ -849,43 +856,6 @@ public class RestServiceImpl implements RestService
         //        catch ( Exception e )
         //        {
         //            LOG.error( "Error setting disk quota #setDiskQuota", e );
-        //            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
-        //        }
-        return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
-    }
-
-
-    @Override
-    public Response getRamQuota( final String containerId )
-    {
-        //        try
-        //        {
-        //            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
-        //
-        //            LocalPeer localPeer = peerManager.getLocalPeer();
-        //            return Response.ok( localPeer.getContainerHostById( containerId ).getRamQuota() ).build();
-        //        } catch (Exception e) {
-        //            LOG.error( "Error getting ram quota #getRamQuota", e );
-        //            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
-        //        }
-        return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
-    }
-
-
-    @Override
-    public Response setRamQuota( final String containerId, final int ram )
-    {
-        //        try
-        //        {
-        //            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
-        //
-        //            LocalPeer localPeer = peerManager.getLocalPeer();
-        //            localPeer.getContainerHostById( containerId ).setRamQuota( ram );
-        //            return Response.ok().build();
-        //        }
-        //        catch ( Exception e )
-        //        {
-        //            LOG.error( "Error setting ram quota #setRamQuota", e );
         //            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         //        }
         return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
@@ -990,26 +960,6 @@ public class RestServiceImpl implements RestService
     }
 
 
-    /** AUX **************************************************** */
-
-    private Set<ContainerDto> convertContainersToContainerJson( Set<EnvironmentContainerHost> containerHosts )
-    {
-        Set<ContainerDto> containerDtos = Sets.newHashSet();
-        for ( EnvironmentContainerHost containerHost : containerHosts )
-        {
-            ContainerHostState state = containerHost.getState();
-
-            HostInterface iface = containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE );
-
-
-            containerDtos.add( new ContainerDto( containerHost.getId(), containerHost.getEnvironmentId().getId(),
-                    containerHost.getHostname(), state, iface.getIp(), iface.getMac(), containerHost.getTemplateName(),
-                    containerHost.getContainerType(), containerHost.getArch().toString(), containerHost.getTags() ) );
-        }
-        return containerDtos;
-    }
-
-
     private Environment findEnvironmentByContainerId( String containerId )
     {
         for ( Environment environment : environmentManager.getEnvironments() )
@@ -1040,5 +990,52 @@ public class RestServiceImpl implements RestService
                 nodeGroup.setContainerDistributionType( ContainerDistributionType.CUSTOM );
             }
         }
+    }
+
+
+    /** AUX **************************************************** */
+
+    private Set<ContainerDto> convertContainersToContainerJson( Set<EnvironmentContainerHost> containerHosts )
+    {
+        Set<ContainerDto> containerDtos = Sets.newHashSet();
+        for ( EnvironmentContainerHost containerHost : containerHosts )
+        {
+            ContainerHostState state = containerHost.getState();
+
+            HostInterface iface = containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE );
+
+
+            containerDtos.add( new ContainerDto( containerHost.getId(), containerHost.getEnvironmentId().getId(),
+                    containerHost.getHostname(), state, iface.getIp(), iface.getMac(), containerHost.getTemplateName(),
+                    containerHost.getContainerType(), containerHost.getArch().toString(), containerHost.getTags() ) );
+        }
+        return containerDtos;
+    }
+
+
+    //    @Override
+    public Response createEnvironment( final String blueprintJson )
+    {
+        try
+        {
+            Blueprint blueprint = gson.fromJson( blueprintJson, Blueprint.class );
+
+            updateContainerPlacementStrategy( blueprint );
+
+            Environment environment = environmentManager.createEnvironment( blueprint, false );
+        }
+        catch ( EnvironmentCreationException e )
+        {
+            LOG.error( "Error creating environment #createEnvironment", e );
+            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+        }
+        catch ( JsonParseException e )
+        {
+            LOG.error( "Error validating parameters #createEnvironment", e );
+            return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) )
+                           .build();
+        }
+
+        return Response.ok().build();
     }
 }

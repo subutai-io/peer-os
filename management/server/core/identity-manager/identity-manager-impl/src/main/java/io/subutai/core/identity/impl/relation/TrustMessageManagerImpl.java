@@ -4,7 +4,7 @@ package io.subutai.core.identity.impl.relation;
 import java.io.UnsupportedEncodingException;
 
 import org.bouncycastle.openpgp.PGPException;
-import org.bouncycastle.openpgp.PGPPublicKey;
+import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
 
 import com.google.common.collect.Sets;
@@ -36,22 +36,23 @@ public class TrustMessageManagerImpl implements TrustMessageManager
 
 
     @Override
-    public Relation decryptAndVerifyMessage( final String encryptedMessage, final String secretKeyId )
+    public Relation decryptAndVerifyMessage( final String signedMessage, final String secretKeyId )
             throws PGPException, UnsupportedEncodingException, RelationVerificationException
     {
+        // todo might be will need to extract only encrypted message first and verify it after
         KeyManager keyManager = securityManager.getKeyManager();
         EncryptionTool encryptionTool = securityManager.getEncryptionTool();
 
         PGPSecretKeyRing secretKeyRing = keyManager.getSecretKeyRing( secretKeyId );
 
-        byte[] decrypted = encryptionTool.decrypt( encryptedMessage.getBytes(), secretKeyRing, "" );
+        byte[] decrypted = encryptionTool.decrypt( signedMessage.getBytes(), secretKeyRing, "" );
 
         String decryptedMessage = new String( decrypted, "UTF-8" );
 
         RelationImpl relation = JsonUtil.fromJson( decryptedMessage, RelationImpl.class );
 
-        PGPPublicKey publicKey = keyManager.getPublicKey( relation.getKeyId() );
-        if ( !encryptionTool.verify( encryptedMessage.getBytes(), publicKey ) )
+        PGPPublicKeyRing publicKey = keyManager.getPublicKeyRing( relation.getKeyId() );
+        if ( !encryptionTool.verifyClearSign( signedMessage.getBytes(), publicKey ) )
         {
             throw new RelationVerificationException( "Relation message verification failed." );
         }

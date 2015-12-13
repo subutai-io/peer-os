@@ -1,6 +1,9 @@
 package io.subutai.core.security.impl.crypto;
 
 
+import java.io.IOException;
+import java.security.SignatureException;
+
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
@@ -41,6 +44,138 @@ public class EncryptionToolImpl implements EncryptionTool
      *
      */
     @Override
+    public byte[] decrypt( final byte[] message ) throws PGPException
+    {
+        return PGPEncryptionUtil.decrypt( message, keyManager.getSecretKeyRingInputStream( null ),
+                keyManager.getSecurityKeyData().getSecretKeyringPwd() );
+    }
+
+
+    /* *****************************************
+     *
+     */
+    @Override
+    public byte[] decrypt( final byte[] message, String secretKeyHostId, String pwd ) throws PGPException
+    {
+        if ( Strings.isNullOrEmpty( pwd ) )
+        {
+            pwd = keyManager.getSecurityKeyData().getSecretKeyringPwd();
+        }
+
+        PGPSecretKeyRing secKeyRing = keyManager.getSecretKeyRing( secretKeyHostId );
+
+        return PGPEncryptionUtil.decrypt( message, secKeyRing, pwd );
+    }
+
+
+    /* *****************************************
+     *
+     */
+    @Override
+    public byte[] decryptAndVerify( final byte[] message, PGPSecretKey secretKey, String pwd, PGPPublicKey pubKey )
+            throws PGPException
+    {
+        if ( Strings.isNullOrEmpty( pwd ) )
+        {
+            pwd = keyManager.getSecurityKeyData().getSecretKeyringPwd();
+        }
+
+        return PGPEncryptionUtil.decryptAndVerify( message, secretKey, pwd, pubKey );
+    }
+
+
+    /**
+     * Verifies that a public key is signed with another public key
+     *
+     * @param keyToVerify the public key to verify
+     * @param keyToVerifyWith the key to verify with
+     *
+     * @return true if verified, false otherwise
+     */
+    @Override
+    public boolean verifyPublicKey( PGPPublicKey keyToVerify, PGPPublicKey keyToVerifyWith )
+    {
+        try
+        {
+            return PGPEncryptionUtil.verifyPublicKey( keyToVerify, keyToVerifyWith );
+        }
+        catch ( Exception e )
+        {
+            //throw custom  exception
+            throw new RuntimeException( e );
+        }
+    }
+
+
+    /**
+     * Removes signature
+     *
+     * @param keyToRemoveFrom the key to verify with
+     * @param id the id we are verifying against the public key
+     *
+     * @return true if verified, false otherwise
+     */
+    @Override
+    public PGPPublicKeyRing removeSignature( String id, PGPPublicKeyRing keyToRemoveFrom )
+    {
+        try
+        {
+            return PGPEncryptionUtil.removeSignature( keyToRemoveFrom, id );
+        }
+        catch ( Exception e )
+        {
+            //throw custom  exception
+            throw new RuntimeException( e );
+        }
+    }
+
+
+    @Override
+    public PGPPublicKeyRing removeSignature( final PGPPublicKey keySignToRemove,
+                                             final PGPPublicKeyRing keyToRemoveFrom )
+    {
+        try
+        {
+            return PGPEncryptionUtil.removeSignature( keyToRemoveFrom, keySignToRemove );
+        }
+        catch ( Exception e )
+        {
+            //throw custom  exception
+            throw new RuntimeException( e );
+        }
+    }
+
+
+    @Override
+    public byte[] decryptAndVerify( final byte[] message, final String secretKeyHostId, final String pwd,
+                                    final String publicKeyHostId ) throws PGPException
+    {
+        PGPSecretKey secKey = keyManager.getSecretKeyRing( secretKeyHostId ).getSecretKey();
+        PGPPublicKey pubKey = keyManager.getPublicKey( publicKeyHostId );
+
+        return PGPEncryptionUtil.decryptAndVerify( message, secKey, pwd, pubKey );
+    }
+
+
+    /* *****************************************
+     *
+     */
+    @Override
+    public byte[] decrypt( final byte[] message, PGPSecretKeyRing keyRing, String pwd ) throws PGPException
+    {
+        if ( Strings.isNullOrEmpty( pwd ) )
+        {
+            pwd = keyManager.getSecurityKeyData().getSecretKeyringPwd();
+        }
+
+        return PGPEncryptionUtil.decrypt( message, keyRing, pwd );
+    }
+
+
+    /* *****************************************
+     *
+     */
+    @Override
     public byte[] encrypt( final byte[] message, final PGPPublicKey publicKey, boolean armored )
     {
         try
@@ -51,6 +186,13 @@ public class EncryptionToolImpl implements EncryptionTool
         {
             return null;
         }
+    }
+
+
+    @Override
+    public byte[] encrypt( final byte[] message, final String publicKeyHostId, final boolean armored )
+    {
+        return new byte[0];
     }
 
 
@@ -101,62 +243,40 @@ public class EncryptionToolImpl implements EncryptionTool
     }
 
 
-    /* *****************************************
-     *
-     */
     @Override
-    public byte[] decrypt( final byte[] message ) throws PGPException
+    public byte[] signAndEncrypt( final byte[] message, final String secretKeyHostId, final String secretPwd,
+                                  final String publicKeyHostId, final boolean armored ) throws PGPException
     {
-        return PGPEncryptionUtil.decrypt( message, keyManager.getSecretKeyRingInputStream( null ),
-                keyManager.getSecurityKeyData().getSecretKeyringPwd() );
+        return new byte[0];
     }
 
 
-    /* *****************************************
-     *
-     */
     @Override
-    public byte[] decrypt( final byte[] message, String secretKeyHostId, String pwd ) throws PGPException
-    {
-        if ( Strings.isNullOrEmpty( pwd ) )
-        {
-            pwd = keyManager.getSecurityKeyData().getSecretKeyringPwd();
-        }
-
-        PGPSecretKeyRing secKeyRing = keyManager.getSecretKeyRing( secretKeyHostId );
-
-        return PGPEncryptionUtil.decrypt( message, secKeyRing, pwd );
-    }
-
-
-    /* *****************************************
-     *
-     */
-    @Override
-    public byte[] decryptAndVerify( final byte[] message, PGPSecretKey secretKey, String pwd, PGPPublicKey pubKey )
+    public byte[] clearSign( final byte[] message, final PGPSecretKey secretKey, final String secretPwd )
             throws PGPException
     {
-        if ( Strings.isNullOrEmpty( pwd ) )
+        try
         {
-            pwd = keyManager.getSecurityKeyData().getSecretKeyringPwd();
+            return PGPEncryptionUtil.clearSign( message, secretKey, secretPwd.toCharArray(), "" );
         }
-
-        return PGPEncryptionUtil.decryptAndVerify( message, secretKey, pwd, pubKey );
+        catch ( IOException | SignatureException e )
+        {
+            throw new PGPException( "Error signing message", e );
+        }
     }
 
 
-    /* *****************************************
-     *
-     */
     @Override
-    public byte[] decrypt( final byte[] message, PGPSecretKeyRing keyRing, String pwd ) throws PGPException
+    public boolean verifyClearSign( final byte[] message, final PGPPublicKeyRing pgpRings ) throws PGPException
     {
-        if ( Strings.isNullOrEmpty( pwd ) )
+        try
         {
-            pwd = keyManager.getSecurityKeyData().getSecretKeyringPwd();
+            return PGPEncryptionUtil.verifyClearSign( message, pgpRings );
         }
-
-        return PGPEncryptionUtil.decrypt( message, keyRing, pwd );
+        catch ( Exception e )
+        {
+            throw new PGPException( "Error verifying message signature", e );
+        }
     }
 
 
@@ -254,102 +374,6 @@ public class EncryptionToolImpl implements EncryptionTool
             //throw custom  exception
             throw new RuntimeException( e );
         }
-    }
-
-
-    /**
-     * Verifies that a public key is signed with another public key
-     *
-     * @param keyToVerify the public key to verify
-     * @param keyToVerifyWith the key to verify with
-     *
-     * @return true if verified, false otherwise
-     */
-    @Override
-    public boolean verifyPublicKey( PGPPublicKey keyToVerify, PGPPublicKey keyToVerifyWith )
-    {
-        try
-        {
-            return PGPEncryptionUtil.verifyPublicKey( keyToVerify, keyToVerifyWith );
-        }
-        catch ( Exception e )
-        {
-            //throw custom  exception
-            throw new RuntimeException( e );
-        }
-    }
-
-
-    /**
-     * Removes signature
-     *
-     * @param keyToRemoveFrom the key to verify with
-     * @param id the id we are verifying against the public key
-     *
-     * @return true if verified, false otherwise
-     */
-    @Override
-    public PGPPublicKeyRing removeSignature( String id, PGPPublicKeyRing keyToRemoveFrom )
-    {
-        try
-        {
-            return PGPEncryptionUtil.removeSignature( keyToRemoveFrom, id );
-        }
-        catch ( Exception e )
-        {
-            //throw custom  exception
-            throw new RuntimeException( e );
-        }
-    }
-
-
-    @Override
-    public PGPPublicKeyRing removeSignature( final PGPPublicKey keySignToRemove,
-                                             final PGPPublicKeyRing keyToRemoveFrom )
-    {
-        try
-        {
-            return PGPEncryptionUtil.removeSignature( keyToRemoveFrom, keySignToRemove );
-        }
-        catch ( Exception e )
-        {
-            //throw custom  exception
-            throw new RuntimeException( e );
-        }
-    }
-
-
-    @Override
-    public byte[] decryptAndVerify( final byte[] message, final String secretKeyHostId, final String pwd,
-                                    final String publicKeyHostId ) throws PGPException
-    {
-        PGPSecretKey secKey = keyManager.getSecretKeyRing( secretKeyHostId ).getSecretKey();
-        PGPPublicKey pubKey = keyManager.getPublicKey( publicKeyHostId );
-
-        return PGPEncryptionUtil.decryptAndVerify( message, secKey, pwd, pubKey );
-    }
-
-
-    @Override
-    public byte[] encrypt( final byte[] message, final String publicKeyHostId, final boolean armored )
-    {
-        return new byte[0];
-    }
-
-
-    @Override
-    public byte[] signAndEncrypt( final byte[] message, final String secretKeyHostId, final String secretPwd,
-                                  final String publicKeyHostId, final boolean armored ) throws PGPException
-    {
-        return new byte[0];
-    }
-
-
-    @Override
-    public byte[] sign( final byte[] message, final PGPSecretKey secretKey, final String secretPwd,
-                        final boolean armored ) throws PGPException
-    {
-        return PGPEncryptionUtil.sign( message, secretKey, secretPwd, armored );
     }
 
 

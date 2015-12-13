@@ -43,13 +43,6 @@ public class TrustRelationManagerImpl implements TrustRelationManager
     }
 
 
-    @Override
-    public RelationInfoManagerImpl getRelationInfoManager()
-    {
-        return relationInfoManager;
-    }
-
-
     public void setDaoManager( final DaoManager daoManager )
     {
         this.daoManager = daoManager;
@@ -63,11 +56,11 @@ public class TrustRelationManagerImpl implements TrustRelationManager
 
 
     @Override
-    public void processTrustMessage( String encrypted, String secretKeyId ) throws RelationVerificationException
+    public void processTrustMessage( String signedMessage, String secretKeyId ) throws RelationVerificationException
     {
         try
         {
-            Relation relation = trustMessageManager.decryptAndVerifyMessage( encrypted, secretKeyId );
+            Relation relation = trustMessageManager.decryptAndVerifyMessage( signedMessage, secretKeyId );
 
             if ( relation == null )
             {
@@ -147,5 +140,12 @@ public class TrustRelationManagerImpl implements TrustRelationManager
     {
         //TODO check if relation valid otherwise break relation build
         identityDataService.persistRelation( relation );
+    }
+
+
+    @Override
+    public RelationInfoManagerImpl getRelationInfoManager()
+    {
+        return relationInfoManager;
     }
 }
