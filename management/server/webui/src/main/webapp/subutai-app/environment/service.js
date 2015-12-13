@@ -10,6 +10,9 @@ function environmentService($http) {
 
 	var ENVIRONMENTS_URL = SERVER_URL + 'rest/ui/environments/';
 
+	var ENVIRONMENT_REQUISITES = ENVIRONMENTS_URL + 'requisites/';
+	var ENVIRONMENT_START_BUILD = ENVIRONMENTS_URL + 'build/';
+
 	var SSH_KEY_URL = ENVIRONMENTS_URL + 'keys/';
 	var CONTAINERS_URL = ENVIRONMENTS_URL + 'containers/';
 	var CONTAINER_TYPES_URL = CONTAINERS_URL + 'types/';
@@ -39,6 +42,8 @@ function environmentService($http) {
 
 		getEnvironments : getEnvironments,
 		createEnvironment : createEnvironment,
+		setupRequisites : setupRequisites,
+		startEnvironmentBuild : startEnvironmentBuild,
 		growEnvironment : growEnvironment,
 		destroyEnvironment: destroyEnvironment,
 
@@ -119,6 +124,24 @@ function environmentService($http) {
 		return $http.post(
 			ENVIRONMENTS_URL,
 			postData, 
+			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+		);
+	}
+
+	function setupRequisites(data) {
+		var postData = 'blueprint_json=' + data;
+		return $http.post(
+			ENVIRONMENT_REQUISITES,
+			postData,
+			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+		);
+	}
+
+	function startEnvironmentBuild(environmentId) {
+		var postData = 'environmentId=' + environmentId;
+		return $http.post(
+			ENVIRONMENT_START_BUILD,
+			postData,
 			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
 		);
 	}

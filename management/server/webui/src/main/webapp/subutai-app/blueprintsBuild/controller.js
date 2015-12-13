@@ -249,17 +249,17 @@ function BlueprintsBuildCtrl($scope, environmentService, SweetAlert, ngDialog, $
 	function buildBlueprint(){
 		if(vm.newEnvironmentName === undefined || vm.newEnvironmentName.length < 1) return;
 
-		var postJson = {};
-		postJson.nodeGroups = getNodesGroups();
-		postJson.name = vm.newEnvironmentName;
+		var blueprint = {};
+		blueprint.nodeGroups = getNodesGroups();
+		blueprint.name = vm.newEnvironmentName;
 
-		var postData = JSON.stringify(postJson);
+		var blueprintJson = JSON.stringify(blueprint);
 
 		SweetAlert.swal("Success!", "Your environment start creation.", "success");
 		ngDialog.closeAll();
 		$location.path('/environments');
 
-		environmentService.createEnvironment(encodeURI(postData)).success(function (data) {
+		environmentService.setupRequisites(encodeURI(blueprintJson)).success(function (data) {
 			SweetAlert.swal("Success!", "Your environment has been created.", "success");
 		}).error(function (error) {
 			SweetAlert.swal("ERROR!", 'Create environment error: ' + error.ERROR, "error");
