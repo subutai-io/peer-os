@@ -6,6 +6,8 @@ import javax.persistence.AccessType;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -15,6 +17,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import io.subutai.core.identity.api.model.Relation;
+import io.subutai.core.identity.api.relation.RelationStatus;
 
 
 /**
@@ -44,7 +47,14 @@ public class RelationImpl implements Relation
 
     @Column( name = "relation_info" )
     @OneToOne( cascade = CascadeType.ALL, fetch = FetchType.EAGER )
-    private RelationInfoImpl relationship;
+    private RelationInfoImpl relationInfo;
+
+    @Enumerated( EnumType.STRING )
+    @Column( name = "status", nullable = false )
+    private RelationStatus relationStatus;
+
+    @Column( name = "signature_key_id" )
+    private String keyId;
 
 
     public RelationImpl()
@@ -53,12 +63,14 @@ public class RelationImpl implements Relation
 
 
     public RelationImpl( final RelationLinkImpl source, final RelationLinkImpl target,
-                         final RelationLinkImpl trustedObject, final RelationInfoImpl relationship )
+                         final RelationLinkImpl trustedObject, final RelationInfoImpl relationInfo, final String keyId )
     {
         this.source = source;
         this.target = target;
         this.trustedObject = trustedObject;
-        this.relationship = relationship;
+        this.relationInfo = relationInfo;
+        this.relationStatus = RelationStatus.REQUESTED;
+        this.keyId = keyId;
     }
 
 
@@ -93,7 +105,27 @@ public class RelationImpl implements Relation
     @Override
     public RelationInfoImpl getRelationInfo()
     {
-        return relationship;
+        return relationInfo;
+    }
+
+
+    @Override
+    public RelationStatus getRelationStatus()
+    {
+        return relationStatus;
+    }
+
+
+    @Override
+    public String getKeyId()
+    {
+        return keyId;
+    }
+
+
+    public void setRelationStatus( final RelationStatus relationStatus )
+    {
+        this.relationStatus = relationStatus;
     }
 
 
@@ -109,17 +141,21 @@ public class RelationImpl implements Relation
             return false;
         }
 
-        final RelationImpl that = ( RelationImpl ) o;
+        final RelationImpl relation = ( RelationImpl ) o;
 
-        if ( source != null ? !source.equals( that.source ) : that.source != null )
+        if ( source != null ? !source.equals( relation.source ) : relation.source != null )
         {
             return false;
         }
-        if ( target != null ? !target.equals( that.target ) : that.target != null )
+        if ( target != null ? !target.equals( relation.target ) : relation.target != null )
         {
             return false;
         }
-        return !( trustedObject != null ? !trustedObject.equals( that.trustedObject ) : that.trustedObject != null );
+        if ( trustedObject != null ? !trustedObject.equals( relation.trustedObject ) : relation.trustedObject != null )
+        {
+            return false;
+        }
+        return !( keyId != null ? !keyId.equals( relation.keyId ) : relation.keyId != null );
     }
 
 
@@ -129,6 +165,7 @@ public class RelationImpl implements Relation
         int result = source != null ? source.hashCode() : 0;
         result = 31 * result + ( target != null ? target.hashCode() : 0 );
         result = 31 * result + ( trustedObject != null ? trustedObject.hashCode() : 0 );
+        result = 31 * result + ( keyId != null ? keyId.hashCode() : 0 );
         return result;
     }
 }

@@ -1,9 +1,9 @@
 package io.subutai.core.identity.api.relation;
 
 
-import java.util.Map;
 import java.util.Set;
 
+import io.subutai.core.identity.api.exception.RelationVerificationException;
 import io.subutai.core.identity.api.model.Relation;
 import io.subutai.core.identity.api.model.RelationInfo;
 import io.subutai.core.identity.api.model.RelationMeta;
@@ -14,17 +14,13 @@ import io.subutai.core.identity.api.model.RelationMeta;
  */
 public interface TrustRelationManager
 {
-    void processTrustMessage( String encrypted );
-
-    void createTrustRelationship( Map<String, String> relationshipProp );
-
-    boolean isRelationValid( String sourceId, String sourcePath, String objectId, String objectPath, String statement );
-
-    boolean isRelationValid( RelationInfo relationInfo, RelationMeta relationMeta );
+    void processTrustMessage( String encrypted, final String secretKeyId ) throws RelationVerificationException;
 
     RelationInfo generateTrustRelationship( String pObject, Set<String> operation, int ownershipLevel );
 
     Relation buildTrustRelation( RelationInfo relationInfo, RelationMeta relationMeta );
+
+    Relation getRelation(RelationMeta relationMeta);
 
     void executeRelationBuild( Relation relation );
 

@@ -1,4 +1,4 @@
-package io.subutai.core.identity.impl;
+package io.subutai.core.identity.impl.relation;
 
 
 import java.util.List;

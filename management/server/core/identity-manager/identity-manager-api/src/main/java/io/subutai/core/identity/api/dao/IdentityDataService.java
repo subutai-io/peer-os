@@ -2,7 +2,6 @@ package io.subutai.core.identity.api.dao;
 
 
 import java.util.List;
-import java.util.Map;
 
 import io.subutai.core.identity.api.model.Permission;
 import io.subutai.core.identity.api.model.Relation;
@@ -235,13 +234,12 @@ public interface IdentityDataService
     void invalidateSessions();
 
 
-    void createTrustRelationship( Map<String, String> relationshipProp );
-
-
-    RelationLink getTrustItem( String uniqueIdentifier, String classPath );
+    RelationLink getRelationLink( String uniqueIdentifier, String classPath );
 
 
     Relation getRelationBySourceObject( RelationLink source, RelationLink object );
+
+    Relation getRelationBySourceTargetObject( RelationLink source, RelationLink target, RelationLink object );
 
     void persistRelation( Relation relation );
 

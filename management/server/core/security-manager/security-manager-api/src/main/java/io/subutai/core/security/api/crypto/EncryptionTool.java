@@ -114,6 +114,13 @@ public interface EncryptionTool
             throws PGPException;
 
 
+    /* *********************************************************************
+     *
+     */
+    byte[] sign( final byte[] message, PGPSecretKey secretKey, String secretPwd, final boolean armored )
+            throws PGPException;
+
+
     /**
      * Decrypts message with peer private key
      *

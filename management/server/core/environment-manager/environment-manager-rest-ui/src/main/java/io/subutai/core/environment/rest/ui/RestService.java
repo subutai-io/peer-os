@@ -1,6 +1,8 @@
 package io.subutai.core.environment.rest.ui;
 
 
+import java.util.UUID;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
@@ -12,7 +14,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.UUID;
 
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
@@ -67,7 +68,15 @@ public interface RestService
     Response listEnvironments();
 
     @POST
-    Response createEnvironment( @FormParam( "blueprint_json" ) String blueprintJson );
+    @Path("requisites")
+    Response setupRequisites( @FormParam( "blueprint_json" ) String blueprintJson );
+
+    @POST
+    @Path("build")
+    Response startEnvironmentBuild( @FormParam( "environmentId" ) String environmentId );
+
+//    @POST
+//    Response createEnvironment( @FormParam( "blueprint_json" ) String blueprintJson );
 
     @POST
     @Path( "grow" )

@@ -1,19 +1,24 @@
-package io.subutai.core.identity.impl;
+package io.subutai.core.identity.impl.relation;
 
 
 import java.io.UnsupportedEncodingException;
 
 import org.bouncycastle.openpgp.PGPException;
+import org.bouncycastle.openpgp.PGPPublicKey;
+import org.bouncycastle.openpgp.PGPSecretKeyRing;
 
 import com.google.common.collect.Sets;
 
 import io.subutai.common.util.JsonUtil;
+import io.subutai.core.identity.api.exception.RelationVerificationException;
 import io.subutai.core.identity.api.model.Relation;
 import io.subutai.core.identity.api.model.RelationInfo;
 import io.subutai.core.identity.api.relation.TrustMessageManager;
 import io.subutai.core.identity.impl.model.RelationImpl;
 import io.subutai.core.identity.impl.model.RelationInfoImpl;
 import io.subutai.core.security.api.SecurityManager;
+import io.subutai.core.security.api.crypto.EncryptionTool;
+import io.subutai.core.security.api.crypto.KeyManager;
 
 
 /**
@@ -21,7 +26,7 @@ import io.subutai.core.security.api.SecurityManager;
  */
 public class TrustMessageManagerImpl implements TrustMessageManager
 {
-    private io.subutai.core.security.api.SecurityManager securityManager;
+    private SecurityManager securityManager;
 
 
     public TrustMessageManagerImpl( final SecurityManager securityManager )
@@ -31,18 +36,27 @@ public class TrustMessageManagerImpl implements TrustMessageManager
 
 
     @Override
-    public Relation decryptAndVerifyMessage( final String encryptedMessage )
-            throws PGPException, UnsupportedEncodingException
+    public Relation decryptAndVerifyMessage( final String encryptedMessage, final String secretKeyId )
+            throws PGPException, UnsupportedEncodingException, RelationVerificationException
     {
-        byte[] decrypted = securityManager.getEncryptionTool().decrypt( encryptedMessage.getBytes() );
+        KeyManager keyManager = securityManager.getKeyManager();
+        EncryptionTool encryptionTool = securityManager.getEncryptionTool();
+
+        PGPSecretKeyRing secretKeyRing = keyManager.getSecretKeyRing( secretKeyId );
+
+        byte[] decrypted = encryptionTool.decrypt( encryptedMessage.getBytes(), secretKeyRing, "" );
 
         String decryptedMessage = new String( decrypted, "UTF-8" );
 
-        //TODO Check signature
+        RelationImpl relation = JsonUtil.fromJson( decryptedMessage, RelationImpl.class );
 
-        RelationImpl trustRelation = JsonUtil.fromJson( decryptedMessage, RelationImpl.class );
+        PGPPublicKey publicKey = keyManager.getPublicKey( relation.getKeyId() );
+        if ( !encryptionTool.verify( encryptedMessage.getBytes(), publicKey ) )
+        {
+            throw new RelationVerificationException( "Relation message verification failed." );
+        }
 
-        return trustRelation;
+        return relation;
     }
 
 

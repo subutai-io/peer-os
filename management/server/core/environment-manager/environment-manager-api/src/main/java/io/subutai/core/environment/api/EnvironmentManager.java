@@ -39,6 +39,12 @@ public interface EnvironmentManager
      */
     Set<Environment> getEnvironments();
 
+
+    Environment setupRequisites( Blueprint blueprint ) throws EnvironmentCreationException;
+
+
+    Environment startEnvironmentBuild( String environmentId, boolean async ) throws EnvironmentCreationException;
+
     /**
      * Creates environment based on a passed topology
      *
@@ -267,9 +273,9 @@ public interface EnvironmentManager
     EnvironmentAlertHandlers getEnvironmentAlertHandlers( EnvironmentId environmentId )
             throws EnvironmentNotFoundException;
 
-    void startMonitoring( String handlerId, AlertHandlerPriority handlerPriority, String environmentId ) throws
-            EnvironmentManagerException;
+    void startMonitoring( String handlerId, AlertHandlerPriority handlerPriority, String environmentId )
+            throws EnvironmentManagerException;
 
-    void stopMonitoring( String handlerId, AlertHandlerPriority handlerPriority, String environmentId ) throws
-            EnvironmentManagerException;
+    void stopMonitoring( String handlerId, AlertHandlerPriority handlerPriority, String environmentId )
+            throws EnvironmentManagerException;
 }

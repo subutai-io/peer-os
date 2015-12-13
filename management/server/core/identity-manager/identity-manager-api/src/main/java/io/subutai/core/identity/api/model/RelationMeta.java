@@ -20,6 +20,8 @@ public class RelationMeta
     private String objectId;
     private String objectPath;
 
+    private String keyId;
+
 
     public RelationMeta()
     {
@@ -27,7 +29,8 @@ public class RelationMeta
 
 
     public RelationMeta( final String sourceId, final String sourcePath, final String targetId, final String targetPath,
-                         final String objectId, final String objectPath, PermissionObject permissionObject )
+                         final String objectId, final String objectPath, PermissionObject permissionObject,
+                         final String keyId )
     {
         this.sourceId = sourceId;
         this.sourcePath = sourcePath;
@@ -36,11 +39,12 @@ public class RelationMeta
         this.objectId = objectId;
         this.objectPath = objectPath;
         this.permissionObject = permissionObject;
+        this.keyId = keyId;
     }
 
 
     public RelationMeta( final Object source, final String sourceId, final Object object, final String objectId,
-                         final PermissionObject permissionObject )
+                         final PermissionObject permissionObject, final String keyId )
     {
         this.sourceId = sourceId;
         this.sourcePath = source.getClass().getSimpleName();
@@ -49,11 +53,13 @@ public class RelationMeta
         this.objectId = objectId;
         this.objectPath = object.getClass().getSimpleName();
         this.permissionObject = permissionObject;
+        this.keyId = keyId;
     }
 
 
     public RelationMeta( final Object source, final String sourceId, final Object target, final String targetId,
-                         final Object object, final String objectId, final PermissionObject permissionObject )
+                         final Object object, final String objectId, final PermissionObject permissionObject,
+                         String keyId )
     {
         this.sourceId = sourceId;
         this.sourcePath = source.getClass().getSimpleName();
@@ -62,6 +68,7 @@ public class RelationMeta
         this.objectId = objectId;
         this.objectPath = object.getClass().getSimpleName();
         this.permissionObject = permissionObject;
+        this.keyId = keyId;
     }
 
 
@@ -146,5 +153,17 @@ public class RelationMeta
     public void setPermissionObject( final PermissionObject permissionObject )
     {
         this.permissionObject = permissionObject;
+    }
+
+
+    public String getKeyId()
+    {
+        return keyId;
+    }
+
+
+    public void setKeyId( final String keyId )
+    {
+        this.keyId = keyId;
     }
 }

@@ -215,7 +215,8 @@ public class RestServiceImpl implements RestService
         {
             environmentDtos
                     .add( new EnvironmentDto( environment.getId(), environment.getName(), environment.getStatus(),
-                            convertContainersToContainerJson( environment.getContainerHosts() ) ) );
+                            convertContainersToContainerJson( environment.getContainerHosts() ),
+                            environment.getRelationDeclaration() ) );
         }
 
         return Response.ok( JsonUtil.toJson( environmentDtos ) ).build();
@@ -223,6 +224,59 @@ public class RestServiceImpl implements RestService
 
 
     @Override
+    public Response setupRequisites( final String blueprintJson )
+    {
+        EnvironmentDto environmentDto;
+        try
+        {
+            Blueprint blueprint = gson.fromJson( blueprintJson, Blueprint.class );
+
+            updateContainerPlacementStrategy( blueprint );
+
+            Environment environment = environmentManager.setupRequisites( blueprint );
+            environmentDto = new EnvironmentDto( environment.getId(), environment.getName(), environment.getStatus(),
+                    Sets.newHashSet(), environment.getRelationDeclaration() );
+        }
+        catch ( EnvironmentCreationException e )
+        {
+            LOG.error( "Error creating environment #createEnvironment", e );
+            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+        }
+        catch ( JsonParseException e )
+        {
+            LOG.error( "Error validating parameters #createEnvironment", e );
+            return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) )
+                           .build();
+        }
+
+        return Response.ok( JsonUtil.toJson( environmentDto ) ).build();
+    }
+
+
+    @Override
+    public Response startEnvironmentBuild( final String environmentId )
+    {
+        try
+        {
+            Environment environment = environmentManager.startEnvironmentBuild( environmentId, false );
+        }
+        catch ( EnvironmentCreationException e )
+        {
+            LOG.error( "Error creating environment #createEnvironment", e );
+            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+        }
+        catch ( JsonParseException e )
+        {
+            LOG.error( "Error validating parameters #createEnvironment", e );
+            return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) )
+                           .build();
+        }
+
+        return Response.ok().build();
+    }
+
+
+    //    @Override
     public Response createEnvironment( final String blueprintJson )
     {
         try
@@ -886,7 +940,9 @@ public class RestServiceImpl implements RestService
 
             ContainerHost containerHost = environment.getContainerHostById( containerId );
 
-            Set<String> tags = JsonUtil.fromJson( tagsJson, new TypeToken<Set<String>>() {}.getType() );
+            Set<String> tags = JsonUtil.fromJson( tagsJson, new TypeToken<Set<String>>()
+            {
+            }.getType() );
 
             tags.stream().forEach( tag -> containerHost.addTag( tag ) );
 

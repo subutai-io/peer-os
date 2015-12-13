@@ -2,13 +2,11 @@ package io.subutai.core.identity.impl.dao;
 
 
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.core.identity.api.dao.IdentityDataService;
@@ -19,8 +17,6 @@ import io.subutai.core.identity.api.model.Role;
 import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserToken;
-import io.subutai.core.identity.impl.model.RelationImpl;
-import io.subutai.core.identity.impl.model.RelationInfoImpl;
 import io.subutai.core.identity.impl.model.RelationLinkImpl;
 
 
@@ -441,31 +437,7 @@ public class IdentityDataServiceImpl implements IdentityDataService
 
 
     @Override
-    public void createTrustRelationship( final Map<String, String> relationshipProp )
-    {
-        RelationLinkImpl source =
-                new RelationLinkImpl( relationshipProp.get( "sourceId" ), relationshipProp.get( "sourceClass" ) );
-        RelationLinkImpl target =
-                new RelationLinkImpl( relationshipProp.get( "targetId" ), relationshipProp.get( "targetClass" ) );
-        RelationLinkImpl object =
-                new RelationLinkImpl( relationshipProp.get( "objectId" ), relationshipProp.get( "objectClass" ) );
-
-        relationDAO.update( source );
-        relationDAO.update( target );
-        relationDAO.update( object );
-
-        RelationInfoImpl trustRelationship = new RelationInfoImpl( relationshipProp.get( "context" ),
-                Sets.newHashSet( relationshipProp.get( "operation" ) ),
-                Integer.valueOf( relationshipProp.get( "ownership" ) ) );
-
-        RelationImpl trustRelation = new RelationImpl( source, target, object, trustRelationship );
-
-        relationDAO.update( trustRelation );
-    }
-
-
-    @Override
-    public RelationLink getTrustItem( final String uniqueIdentifier, final String classPath )
+    public RelationLink getRelationLink( final String uniqueIdentifier, final String classPath )
     {
         return relationDAO.findRelationLink( uniqueIdentifier, classPath );
     }
@@ -477,6 +449,20 @@ public class IdentityDataServiceImpl implements IdentityDataService
         if ( ( source instanceof RelationLinkImpl ) && ( object instanceof RelationLinkImpl ) )
         {
             return relationDAO.findBySourceAndObject( ( RelationLinkImpl ) source, ( RelationLinkImpl ) object );
+        }
+        return null;
+    }
+
+
+    @Override
+    public Relation getRelationBySourceTargetObject( final RelationLink source, final RelationLink target,
+                                                     final RelationLink object )
+    {
+        if ( ( source instanceof RelationLinkImpl ) && ( object instanceof RelationLinkImpl )
+                && ( target instanceof RelationLinkImpl ) )
+        {
+            return relationDAO.findBySourceTargetObject( ( RelationLinkImpl ) source, ( RelationLinkImpl ) target,
+                    ( RelationLinkImpl ) object );
         }
         return null;
     }

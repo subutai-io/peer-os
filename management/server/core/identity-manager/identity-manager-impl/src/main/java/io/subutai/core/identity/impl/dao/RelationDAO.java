@@ -244,6 +244,37 @@ public class RelationDAO
     }
 
 
+    public Relation findBySourceTargetObject( final RelationLinkImpl source, final RelationLinkImpl target,
+                                              final RelationLinkImpl object )
+    {
+        EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
+        Relation result = null;
+        try
+        {
+            Query qr = em.createQuery( "select ss from RelationImpl AS ss"
+                    + " where ss.source=:source AND ss.target=:target AND ss.trustedObject=:trustedObject" );
+            qr.setParameter( "source", source );
+            qr.setParameter( "target", target );
+            qr.setParameter( "trustedObject", object );
+            List<Relation> list = qr.getResultList();
+
+            if ( list.size() > 0 )
+            {
+                result = list.get( 0 );
+            }
+        }
+        catch ( Exception ex )
+        {
+            logger.warn( "Error querying for trust relation.", ex );
+        }
+        finally
+        {
+            daoManager.closeEntityManager( em );
+        }
+        return result;
+    }
+
+
     public List<Relation> relationsBySourceAndObject( final RelationLinkImpl source, final RelationLinkImpl object )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();

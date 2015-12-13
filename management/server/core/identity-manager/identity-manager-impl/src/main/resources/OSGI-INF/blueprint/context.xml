@@ -34,7 +34,7 @@
   </bean>
 
   <bean id="relationManager" scope="singleton" activation="eager" init-method="init"
-        class="io.subutai.core.identity.impl.TrustRelationManagerImpl">
+        class="io.subutai.core.identity.impl.relation.TrustRelationManagerImpl">
     <property name="daoManager" ref="daoManagerIdenity" />
     <property name="identityManager" ref="identityManager" />
   </bean>

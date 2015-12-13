@@ -289,11 +289,11 @@ public class EncryptionToolImpl implements EncryptionTool
      * @return true if verified, false otherwise
      */
     @Override
-    public PGPPublicKeyRing removeSignature( String id ,PGPPublicKeyRing keyToRemoveFrom)
+    public PGPPublicKeyRing removeSignature( String id, PGPPublicKeyRing keyToRemoveFrom )
     {
         try
         {
-            return PGPEncryptionUtil.removeSignature(keyToRemoveFrom , id );
+            return PGPEncryptionUtil.removeSignature( keyToRemoveFrom, id );
         }
         catch ( Exception e )
         {
@@ -342,6 +342,14 @@ public class EncryptionToolImpl implements EncryptionTool
                                   final String publicKeyHostId, final boolean armored ) throws PGPException
     {
         return new byte[0];
+    }
+
+
+    @Override
+    public byte[] sign( final byte[] message, final PGPSecretKey secretKey, final String secretPwd,
+                        final boolean armored ) throws PGPException
+    {
+        return PGPEncryptionUtil.sign( message, secretKey, secretPwd, armored );
     }
 
 

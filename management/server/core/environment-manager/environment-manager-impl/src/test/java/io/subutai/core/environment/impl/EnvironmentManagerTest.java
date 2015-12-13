@@ -93,7 +93,7 @@ public class EnvironmentManagerTest
                 spy( new EnvironmentManagerImpl( templateRegistry, peerManager, securityManager, networkManager,
                         daoManager, identityManager, tracker, relationManager ) );
         doReturn( environment ).when( environmentManager )
-                               .createEmptyEnvironment( anyString(), anyString(), anyString() );
+                               .createEmptyEnvironment( anyString(), anyString(), anyString(), any( Blueprint.class ) );
         //        doReturn( topology ).when( environmentManager ).buildTopology( blueprint );
         doReturn( new HashSet<>() ).when( environmentManager ).getUsedGateways( ( Peer ) any() );
         doReturn( environmentCreationWorkflow ).when( environmentManager )

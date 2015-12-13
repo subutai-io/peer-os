@@ -37,9 +37,8 @@ import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.PeerConf;
-import io.subutai.common.peer.AlertHandlerPriority;
-import io.subutai.common.peer.EnvironmentAlertHandler;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.EnvironmentAlertHandler;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Peer;
@@ -113,6 +112,12 @@ public class EnvironmentImpl implements Environment, Serializable
 
     @Column( name = "public_key", length = 3000 )
     private String publicKey;
+
+    @Column( name = "relation_declaration", length = 3000 )
+    private String relationDeclaration;
+
+    @Column( name = "initial_blueprint", length = 3000 )
+    private String rawBlueprint;
 
     @Column( name = "user_id" )
     private Long userId;
@@ -210,6 +215,31 @@ public class EnvironmentImpl implements Environment, Serializable
     public EnvironmentStatus getStatus()
     {
         return status;
+    }
+
+
+    @Override
+    public String getRelationDeclaration()
+    {
+        return relationDeclaration;
+    }
+
+
+    public void setRelationDeclaration( final String relationDeclaration )
+    {
+        this.relationDeclaration = relationDeclaration;
+    }
+
+
+    public String getRawBlueprint()
+    {
+        return rawBlueprint;
+    }
+
+
+    public void setRawBlueprint( final String rawBlueprint )
+    {
+        this.rawBlueprint = rawBlueprint;
     }
 
 
