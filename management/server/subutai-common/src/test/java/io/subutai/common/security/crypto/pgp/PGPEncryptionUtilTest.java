@@ -250,8 +250,6 @@ public class PGPEncryptionUtilTest
                 secretKeyRingCollection.getSecretKeyRing( new BigInteger( second.getPrimaryKeyId(), 16 ).longValue() );
 
         PGPSecretKey secondSecretKey = secretKeyRing.getSecretKey();
-        //                PGPEncryptionUtil.findSecretKeyById( secondSecretStream, second.getPrimaryKeyId() );
-
 
         PGPPublicKeyRingCollection secondPublicKeyRingCollection =
                 new PGPPublicKeyRingCollection( PGPUtil.getDecoderStream( secondPublicStream ),
@@ -265,12 +263,14 @@ public class PGPEncryptionUtilTest
         byte[] encryptedMessage =
                 PGPEncryptionUtil.encrypt( "Talas Zholdoshbekov".getBytes(), pgpKeyring.getPublicKey(), true );
 
-        byte[] signedMessage =
+        byte[] signedMessageArmor =
                 PGPEncryptionUtil.clearSign( encryptedMessage, secondSecretKey, "second".toCharArray(), "" );
 
-        logger.info( "\n" + new String( signedMessage, "UTF-8" ) );
+        String signedMessage = new String( signedMessageArmor, "UTF-8" );
 
-        boolean result = PGPEncryptionUtil.verifyClearSign( signedMessage, pgpKeyring );
+        logger.info( "\n" + signedMessage );
+
+        boolean result = PGPEncryptionUtil.verifyClearSign( signedMessage.getBytes(), pgpKeyring );
         if ( result )
         {
             logger.info( "signature verified." );
@@ -280,10 +280,49 @@ public class PGPEncryptionUtilTest
             logger.info( "signature verification failed." );
         }
 
-        byte[] extracted = PGPEncryptionUtil.extractContentFromClearSign( signedMessage );
+        byte[] extracted = PGPEncryptionUtil.extractContentFromClearSign( signedMessage.getBytes() );
         byte[] decrypted = PGPEncryptionUtil.decrypt( extracted, secretKeyRing, "second" );
-        logger.info( "\n" + new String( decrypted, "UTF-8" ) );
+        byte[] decrypted2 = PGPEncryptionUtil.decryptFile( extracted, secretKeyRingCollection, "second".toCharArray() );
+        logger.info( "Decrypted message \n" + new String( decrypted, "UTF-8" ) );
+        logger.info( "Decrypted message \n" + new String( decrypted2, "UTF-8" ) );
 
         assertEquals( true, result );
+    }
+
+
+    @Test
+    public void testExtractingContentFromClearSign()
+    {
+        String clearSign =
+                "-----BEGIN PGP SIGNED MESSAGE-----\n" + "Hash: SHA256\n" + "\n" + "-----BEGIN PGP MESSAGE-----\n"
+                        + "Version: BCPG v1.52\n" + "\n"
+                        + "hQEMA2Y9gO5nrCSvAQf9FpDCWPQFDgT42/o1yKb6kmFz1Q5scHR6pbp68Q4lV6LQ\n"
+                        + "ou fLFKBPIS1qAkAe2oOyzcylUu3pezeJ GlTJqyNrpEjYNPVuwUeLlqxo1s1QxU\n"
+                        + "fZhJ76EPln3csG3EjN9sgjni6sD/3XBLexw0kn9hP OHRtFVvf/vBbi0fyh0 YPu\n"
+                        + "qSfboJQokvR JoJ14TITtUqqqdrt/uEmyu3qK/A8QCyRFbLn8J0lKDcuaAmsJ51W\n"
+                        + "6IvhVaMF4vE8UF9qU4c8qBL6mWaN4B1IImYI2UOrzL8DCNOnijyD1RVINcqCpAFo\n"
+                        + "KhCM8acJE2JHqlEm/tvqARbTBKPUxH3pn9EaXsJ4xNLAqQGWJh97gPswkd2BiadC\n"
+                        + "sDICqHdMTaoPZBo0X4FnXr5ou7 bWunprRJhQfkAF55oWGV9As1ozD2kDXrNIJqy\n"
+                        + "K9NXLVbmDeKRb85kyAsHGBTqxq6cUmK9MvJy9Xynn rfdD r3TkqF6uj6ptmE/VZ\n"
+                        + "Nmhjv3DCe28j102Oj5 aKZtLURjc1qsWEQLzA IdgE08yA68h6bWR2MEPkWVttIA\n"
+                        + "F9ZTAl6dN6bfCCnV/8 b5HMfsh/g0U8e1zAp /C8ubWfhq51tvKbm7XKAj0Zl3t0\n"
+                        + "pHqBA6NVkpqIhOxsc52vFeXZ3G lAr/8UpJvKhNIwSmPx4mm1xkWwLIcRlUm UCV\n"
+                        + "pJeOBd8ShIlEBJxe7EneIwGEHxguE2m/luhn0Q8nRdUHp4NDnHoALqTBgc5MRrXv\n"
+                        + "NQW kiZDnNOLQosu0O4/8ihwgNbV a4emvojXy4zD//5gISJVnKGgw0tDeHflbkF\n" + "0q3UGAvnEZ0rSy8=\n"
+                        + "=PgL/\n" + "- -----END PGP MESSAGE-----\n" + "\n" + "-----BEGIN PGP SIGNATURE-----\n"
+                        + "Version: Subutai Social v1.0.0\n" + "Comment: https://subutai.io/\n" + "\n"
+                        + "wsFcBAEBCAAQBQJWbr2dCRCVh5hg8XTaEAAA8cQP/AzhQd1kKx7TNJfkY/vF\n"
+                        + "otXslh/QVwg9HqgAq710QdWVlim/1AS1Muzy5tLN2p3TeDwKSwEgnkRu3czL\n"
+                        + "2G8ENPRI/nQV1T6NeLhso/oiqdqyttaFpPRgq6pOm0S6CD7hqOS2Brf2ha51\n"
+                        + "SqfOWy6UgI2QEfHyKQ8bc307dW6dj4yLc6GEJuHuj4Lyk8cZTXHbmtQwZEqE\n"
+                        + "xu36G60SzbBJ88BG tp22IHRYxuCUNeDMh/zrIv/c8EHOmRgrG/AeIu3bmI1\n"
+                        + "otEYcbO2nbgpq DXLDKFaDtn2Lak8UJa6v7pZXwhWQYlR//eXPZrmSNG3T N\n"
+                        + "UGeyfZHbAu fp2o4pLCrS0kw2hWUJcoHyl3gcoto QAJRudLM7rNBDjWwvFE\n"
+                        + "WakfqmT4r2kSAckyWKXvrZibEVz0XrNxuIKBjOBo6VUOCfJu zyHxsr0/fEB\n"
+                        + "bAclK3 5eNy7rMNGHoAHBT0gaRb27LhiOlrHaASPzLYzX9iI89pyXRJfcYvm\n"
+                        + "YiAvShvqCbHSECPByFC8xu9xkGm2PgvzgLr vl7ZOgJjqu3qOuopI j3l820\n"
+                        + "2dO4el8mGYoGLkmB0Q18KCvaqkvlnDC94GQKFaI2YeV/a6JC8BxG0xkm PHf\n"
+                        + "w1RevNd8Oge0eCJeQw0aaLwaUbQgdsbY rRyjFQFtWPAcJfxtsRj0pFQRIGM\n" + "ZoSP\n" + "=8OOc\n"
+                        + "-----END PGP SIGNATURE-----";
     }
 }

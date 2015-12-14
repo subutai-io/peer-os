@@ -1621,7 +1621,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     {
         KeyManager keyManager = securityManager.getKeyManager();
         String pairId = envId.getId();
-        final PGPSecretKeyRing userSecKeyRing = securityManager.getKeyManager().getSecretKeyRing( userSecKeyId );
         try
         {
             KeyPair keyPair = keyManager.generateKeyPair( pairId, false );

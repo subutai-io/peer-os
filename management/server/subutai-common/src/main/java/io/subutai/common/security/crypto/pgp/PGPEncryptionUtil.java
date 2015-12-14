@@ -80,6 +80,8 @@ import org.bouncycastle.openpgp.operator.jcajce.JcePublicKeyDataDecryptorFactory
 import org.bouncycastle.openpgp.operator.jcajce.JcePublicKeyKeyEncryptionMethodGenerator;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.util.io.Streams;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -87,6 +89,7 @@ import org.bouncycastle.util.io.Streams;
  */
 public class PGPEncryptionUtil
 {
+    private static final Logger logger = LoggerFactory.getLogger( PGPEncryptionUtil.class );
     public static final BouncyCastleProvider provider = new BouncyCastleProvider();
     private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
 
@@ -189,12 +192,21 @@ public class PGPEncryptionUtil
     @SuppressWarnings( "unchecked" )
     private static Iterator<PGPPublicKeyEncryptedData> getEncryptedObjects( final byte[] message ) throws IOException
     {
-        final PGPObjectFactory factory =
-                new PGPObjectFactory( PGPUtil.getDecoderStream( new ByteArrayInputStream( message ) ),
-                        new JcaKeyFingerprintCalculator() );
-        final Object first = factory.nextObject();
-        final Object list = ( first instanceof PGPEncryptedDataList ) ? first : factory.nextObject();
-        return ( ( PGPEncryptedDataList ) list ).getEncryptedDataObjects();
+        try
+        {
+            final PGPObjectFactory factory =
+                    new PGPObjectFactory( PGPUtil.getDecoderStream( new ByteArrayInputStream( message ) ),
+                            new JcaKeyFingerprintCalculator() );
+            final Object first = factory.nextObject();
+            final Object list = ( first instanceof PGPEncryptedDataList ) ? first : factory.nextObject();
+            return ( ( PGPEncryptedDataList ) list ).getEncryptedDataObjects();
+        }
+        catch ( IOException e )
+        {
+            logger.error( "Error getting encrypted objects", e );
+
+            throw new IOException( e );
+        }
     }
 
 

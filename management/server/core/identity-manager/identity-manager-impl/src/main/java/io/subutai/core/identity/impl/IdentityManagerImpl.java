@@ -532,7 +532,7 @@ public class IdentityManagerImpl implements IdentityManager
             String keyId = UUID.randomUUID().toString();
             //            KeyPair kPair = securityManager.getKeyManager().generateKeyPair( keyId, false );
             //            securityManager.getKeyManager().saveKeyPair( keyId, SecurityKeyType.UserKey.getId(), kPair );
-            if ( Strings.isNullOrEmpty( publicKey ) )
+            if ( !Strings.isNullOrEmpty( publicKey ) )
             {
                 securityManager.getKeyManager().savePublicKeyRing( keyId, SecurityKeyType.UserKey.getId(), publicKey );
             }
