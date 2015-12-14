@@ -428,8 +428,15 @@ public class BrokerImpl implements Broker
         kahaDBPersistenceAdapter.setIndexCacheSize( 15000 );
         kahaDBPersistenceAdapter.setIndexWriteBatchSize( 1500 );
         kahaDBPersistenceAdapter.setEnableJournalDiskSyncs( false );
+        kahaDBPersistenceAdapter.setDirectory( getBrokerDbPath() );
 
         getBroker().setPersistenceAdapter( kahaDBPersistenceAdapter );
+    }
+
+
+    protected File getBrokerDbPath()
+    {
+        return new File( Common.SUBUTAI_APP_DATA_PATH + "/KahaDB" );
     }
 
 
