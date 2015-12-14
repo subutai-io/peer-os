@@ -137,8 +137,8 @@ function environmentService($http) {
 		);
 	}
 
-	function startEnvironmentBuild(environmentId) {
-		var postData = 'environmentId=' + environmentId;
+	function startEnvironmentBuild(environmentId, signedMsg) {
+		var postData = 'environmentId=' + environmentId + "&signedMessage=" + signedMsg;
 		return $http.post(
 			ENVIRONMENT_START_BUILD,
 			postData,

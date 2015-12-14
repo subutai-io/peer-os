@@ -12,6 +12,11 @@ var fileUploder = {};
 function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert, DTOptionsBuilder, DTColumnBuilder, $resource, $compile, ngDialog, $timeout) {
 
 	var vm = this;
+
+	vm.currentEnvironment = {};
+	vm.signedMessage = "";
+	vm.buildEnvironment = buildEnvironment;
+
 	vm.environments = [];
 	vm.domainStrategies = [];
 	vm.sshKeyForEnvironment = '';
@@ -186,31 +191,23 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 	}
 
     function startEnvironmentBuild(environmentId) {
-        SweetAlert.swal({
-                title: "Are you sure?",
-                text: "You are about to start environment creation!",
-                type: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#ff3f3c",
-                confirmButtonText: "Build",
-                cancelButtonText: "Cancel",
-                closeOnConfirm: false,
-                closeOnCancel: true,
-                showLoaderOnConfirm: true
-            },
-            function (isConfirm) {
-                if (isConfirm) {
-                    SweetAlert.swal("Delete!", "Your environment build process started!", "success");
-                    environmentService.startEnvironmentBuild(environmentId).success(function (data) {
-                        SweetAlert.swal("Destroyed!", "Your environment has been built.", "success");
-                        vm.dtInstance.reloadData(null, false);
-                    }).error(function (data) {
-                        SweetAlert.swal("ERROR!", "Your environment was not built successfully :(. Error: " + data.ERROR, "error");
-                    });
-                    vm.dtInstance.reloadData(null, false);
-                }
-            });
+    	vm.currentEnvironment = vm.users[environmentId];
+		ngDialog.open ({
+			template: "subutai-app/environment/partials/decryptMsg.html",
+			scope: $scope
+		});
     }
+
+	function buildEnvironment() {
+		environmentService.startEnvironmentBuild (vm.currentEnvironment.id, vm.signedMessage).success(function (data) {
+			SweetAlert.swal("Success!", "Your environment has started building.", "success");
+			vm.dtInstance.reloadData(null, false);
+			ngDialog.closeAll();
+		}).error(function (data) {
+			SweetAlert.swal("ERROR!", "Environment build error. Error: " + data.ERROR, "error");
+		});
+	}
+
 
 	function destroyEnvironment(environmentId) {
 		SweetAlert.swal({
