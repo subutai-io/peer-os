@@ -14,7 +14,7 @@ function userPostData(user) {
 	var postData = 'username=' + user.userName + 
 		'&full_name=' + user.fullName +
 		'&password=' + user.password +
-		'&email=' + user.email;
+		'&email=' + user.email + "&public_key=" + user.public_key;
 
 	if(currentUserRoles !== undefined) {
 		postData += '&roles=' + currentUserRoles;

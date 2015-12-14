@@ -47,7 +47,13 @@
 					pw-check="js-password" 
 					name="confirm_password" 
 					ng-attr-required="identityUserFormCtrl.user2Add.password.length > 0">
-				<span class="b-form-hint b-form-hint_red" ng-show="addUserForm.confirm_password.$error.pwmatch">Passwords don't match.</span>			
+				<span class="b-form-hint b-form-hint_red" ng-show="addUserForm.confirm_password.$error.pwmatch">Passwords don't match.</span>
+
+
+				<label class="b-popup-body-label b-popup-body-label_block">Public key</label>
+				<textarea class="b-form-input b-form-input_full b-form-input_textarea" ng-model = "identityUserFormCtrl.user2Add.public_key">
+				</textarea>
+				<div class="clear"></div>
 			</div>
 			<div class="b-popup-body b-popup-body_col-2 g-right">
 				<col-select></col-select>
