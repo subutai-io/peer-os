@@ -12,7 +12,7 @@ import io.subutai.core.identity.api.model.RelationMeta;
 /**
  * Created by talas on 12/7/15.
  */
-public interface TrustRelationManager
+public interface RelationManager
 {
     void processTrustMessage( String signedMessage, final String secretKeyId ) throws RelationVerificationException;
 

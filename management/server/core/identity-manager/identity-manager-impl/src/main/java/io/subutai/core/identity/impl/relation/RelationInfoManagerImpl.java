@@ -27,11 +27,23 @@ public class RelationInfoManagerImpl implements RelationInfoManager
 {
     private static final Logger logger = LoggerFactory.getLogger( RelationInfoManagerImpl.class );
     private IdentityDataService identityDataService;
+    private boolean keyTrustCheckEnabled;
 
 
-    public RelationInfoManagerImpl( final IdentityDataService identityDataService )
+    public RelationInfoManagerImpl( final IdentityDataService identityDataService, final boolean keyTrustCheckEnabled )
     {
         this.identityDataService = identityDataService;
+        this.keyTrustCheckEnabled = keyTrustCheckEnabled;
+    }
+
+
+    @Override
+    public boolean ownerHasReadPermissions( final RelationMeta relationMeta )
+    {
+
+        RelationInfo relationInfo = new RelationInfoImpl( relationMeta.getPermissionObject().getName(),
+                Sets.newHashSet( PermissionOperation.Read.getName() ), Ownership.USER.getLevel() );
+        return isRelationValid( relationInfo, relationMeta );
     }
 
 
@@ -40,6 +52,11 @@ public class RelationInfoManagerImpl implements RelationInfoManager
     // C should give correct verification through relationship path.
     private boolean isRelationValid( final RelationInfo relationInfo, final RelationMeta relationMeta )
     {
+        if ( !keyTrustCheckEnabled )
+        {
+            return false;
+        }
+
         RelationLinkImpl target = new RelationLinkImpl( relationMeta.getSourceId(), relationMeta.getSourcePath() );
         List<Relation> byTargetRelations = identityDataService.relationsByTarget( target );
 
@@ -125,16 +142,6 @@ public class RelationInfoManagerImpl implements RelationInfoManager
             sum += PermissionOperation.getByName( operation ).getId();
         }
         return sum;
-    }
-
-
-    @Override
-    public boolean ownerHasReadPermissions( final RelationMeta relationMeta )
-    {
-
-        RelationInfo relationInfo = new RelationInfoImpl( relationMeta.getPermissionObject().getName(),
-                Sets.newHashSet( PermissionOperation.Read.getName() ), Ownership.USER.getLevel() );
-        return isRelationValid( relationInfo, relationMeta );
     }
 
 

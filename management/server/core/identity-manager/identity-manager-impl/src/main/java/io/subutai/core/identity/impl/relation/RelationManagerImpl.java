@@ -12,8 +12,8 @@ import io.subutai.core.identity.api.exception.RelationVerificationException;
 import io.subutai.core.identity.api.model.Relation;
 import io.subutai.core.identity.api.model.RelationInfo;
 import io.subutai.core.identity.api.model.RelationMeta;
+import io.subutai.core.identity.api.relation.RelationManager;
 import io.subutai.core.identity.api.relation.RelationStatus;
-import io.subutai.core.identity.api.relation.TrustRelationManager;
 import io.subutai.core.identity.impl.IdentityManagerImpl;
 import io.subutai.core.identity.impl.dao.IdentityDataServiceImpl;
 import io.subutai.core.identity.impl.model.RelationImpl;
@@ -24,22 +24,23 @@ import io.subutai.core.identity.impl.model.RelationLinkImpl;
 /**
  * Created by talas on 12/10/15.
  */
-public class TrustRelationManagerImpl implements TrustRelationManager
+public class RelationManagerImpl implements RelationManager
 {
-    private static final Logger logger = LoggerFactory.getLogger( TrustRelationManagerImpl.class );
+    private static final Logger logger = LoggerFactory.getLogger( RelationManagerImpl.class );
     private IdentityManagerImpl identityManager;
-    private TrustMessageManagerImpl trustMessageManager;
+    private RelationMessageManagerImpl trustMessageManager;
     private IdentityDataService identityDataService = null;
     private RelationInfoManagerImpl relationInfoManager;
     private DaoManager daoManager = null;
+    private boolean keyTrustCheckEnabled;
 
 
     //*****************************************
     public void init()
     {
         identityDataService = new IdentityDataServiceImpl( daoManager );
-        trustMessageManager = new TrustMessageManagerImpl( identityManager.getSecurityManager() );
-        relationInfoManager = new RelationInfoManagerImpl( identityDataService );
+        trustMessageManager = new RelationMessageManagerImpl( identityManager.getSecurityManager() );
+        relationInfoManager = new RelationInfoManagerImpl( identityDataService, keyTrustCheckEnabled );
     }
 
 
@@ -52,6 +53,18 @@ public class TrustRelationManagerImpl implements TrustRelationManager
     public void setIdentityManager( final IdentityManagerImpl identityManager )
     {
         this.identityManager = identityManager;
+    }
+
+
+    public boolean isKeyTrustCheckEnabled()
+    {
+        return keyTrustCheckEnabled;
+    }
+
+
+    public void setKeyTrustCheckEnabled( final boolean keyTrustCheckEnabled )
+    {
+        this.keyTrustCheckEnabled = keyTrustCheckEnabled;
     }
 
 

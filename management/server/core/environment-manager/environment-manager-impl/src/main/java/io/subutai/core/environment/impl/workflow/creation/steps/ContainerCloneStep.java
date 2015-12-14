@@ -38,7 +38,7 @@ import io.subutai.core.identity.api.model.Relation;
 import io.subutai.core.identity.api.model.RelationInfo;
 import io.subutai.core.identity.api.model.RelationMeta;
 import io.subutai.core.identity.api.model.User;
-import io.subutai.core.identity.api.relation.TrustRelationManager;
+import io.subutai.core.identity.api.relation.RelationManager;
 import io.subutai.core.kurjun.api.TemplateManager;
 
 
@@ -53,9 +53,9 @@ public class ContainerCloneStep
     private final Topology topology;
     private final EnvironmentImpl environment;
     private final LocalPeer localPeer;
-    protected ExceptionUtil exceptionUtil = new ExceptionUtil();
-    private final TrustRelationManager relationManager;
+    private final RelationManager relationManager;
     private final IdentityManager identityManager;
+    protected ExceptionUtil exceptionUtil = new ExceptionUtil();
 
 
     public ContainerCloneStep( final TemplateManager templateRegistry, final String defaultDomain,

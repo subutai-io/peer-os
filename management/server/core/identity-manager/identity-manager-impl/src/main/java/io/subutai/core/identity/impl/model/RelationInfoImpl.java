@@ -23,6 +23,13 @@ import io.subutai.core.identity.api.model.RelationInfo;
 /**
  * Created by talas on 12/8/15.
  */
+
+
+/**
+ * Relation info is simple string presentation of propertyKey=propertyValue=condition with each line new condition is
+ * declared. Property values should be comparative objects so that with conditions it would be possible to identify
+ * which condition has greater scope
+ */
 @Entity
 @Table( name = "relation_info" )
 @Access( AccessType.FIELD )
@@ -96,9 +103,9 @@ public class RelationInfoImpl implements RelationInfo
     }
 
 
-    public void setContext( final String context )
+    public void setOwnershipLevel( final int ownershipLevel )
     {
-        this.context = context;
+        this.ownershipLevel = ownershipLevel;
     }
 
 
@@ -108,9 +115,19 @@ public class RelationInfoImpl implements RelationInfo
     }
 
 
-    public void setOwnershipLevel( final int ownershipLevel )
+    public void setContext( final String context )
     {
-        this.ownershipLevel = ownershipLevel;
+        this.context = context;
+    }
+
+
+    @Override
+    public int hashCode()
+    {
+        int result = context != null ? context.hashCode() : 0;
+        result = 31 * result + ( operation != null ? operation.hashCode() : 0 );
+        result = 31 * result + ownershipLevel;
+        return result;
     }
 
 
@@ -137,15 +154,5 @@ public class RelationInfoImpl implements RelationInfo
             return false;
         }
         return !( operation != null ? !operation.equals( that.operation ) : that.operation != null );
-    }
-
-
-    @Override
-    public int hashCode()
-    {
-        int result = context != null ? context.hashCode() : 0;
-        result = 31 * result + ( operation != null ? operation.hashCode() : 0 );
-        result = 31 * result + ownershipLevel;
-        return result;
     }
 }

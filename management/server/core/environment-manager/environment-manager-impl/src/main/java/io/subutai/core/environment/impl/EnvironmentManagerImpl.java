@@ -99,7 +99,7 @@ import io.subutai.core.identity.api.model.Relation;
 import io.subutai.core.identity.api.model.RelationInfo;
 import io.subutai.core.identity.api.model.RelationMeta;
 import io.subutai.core.identity.api.model.User;
-import io.subutai.core.identity.api.relation.TrustRelationManager;
+import io.subutai.core.identity.api.relation.RelationManager;
 import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerAction;
@@ -121,7 +121,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     private static final String DEFAULT_GATEWAY_TEMPLATE = "192.168.%s.1/24";
 
     private final IdentityManager identityManager;
-    private final TrustRelationManager relationManager;
+    private final RelationManager relationManager;
     private final PeerManager peerManager;
     private final NetworkManager networkManager;
     private final Tracker tracker;
@@ -141,7 +141,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     public EnvironmentManagerImpl( final TemplateManager templateRegistry, final PeerManager peerManager,
                                    SecurityManager securityManager, final NetworkManager networkManager,
                                    final DaoManager daoManager, final IdentityManager identityManager,
-                                   final Tracker tracker, final TrustRelationManager relationManager )
+                                   final Tracker tracker, final RelationManager relationManager )
     {
         Preconditions.checkNotNull( templateRegistry );
         Preconditions.checkNotNull( peerManager );
@@ -201,7 +201,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    public TrustRelationManager getRelationManager()
+    public RelationManager getRelationManager()
     {
         return relationManager;
     }
@@ -1515,6 +1515,26 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
+    @PermitAll
+    protected EnvironmentCreationWorkflow getEnvironmentCreationWorkflow( final EnvironmentImpl environment,
+                                                                          final Topology topology, final String sshKey,
+                                                                          final TrackerOperation operationTracker )
+    {
+        User activeUser = identityManager.getActiveUser();
+
+        RelationMeta relationMeta =
+                new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), environment, environment.getId(),
+                        PermissionObject.EnvironmentManagement, environment.getId() );
+
+        if ( !relationManager.getRelationInfoManager().allHasReadPermissions( relationMeta ) )
+        {
+            throw new AccessControlException( "You don't have enough permissions to create environment" );
+        }
+        return new EnvironmentCreationWorkflow( Common.DEFAULT_DOMAIN_NAME, templateRegistry, this, networkManager,
+                peerManager, securityManager, identityManager, environment, topology, sshKey, operationTracker );
+    }
+
+
     @RolesAllowed( "Environment-Management|Write" )
     protected EnvironmentImpl createEmptyEnvironment( final String name, final String subnetCidr, final String sshKey,
                                                       final Blueprint blueprint ) throws EnvironmentCreationException
@@ -1642,62 +1662,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    public void setEnvironmentTransientFields( final Environment environment )
-    {
-        ( ( EnvironmentImpl ) environment ).setEnvironmentManager( this );
-    }
-
-
-    public void setContainersTransientFields( final Environment environment )
-    {
-        User activeUser = identityManager.getActiveUser();
-        for ( ContainerHost containerHost : environment.getContainerHosts() )
-        {
-            EnvironmentContainerImpl environmentContainer = ( EnvironmentContainerImpl ) containerHost;
-
-            RelationMeta relationMeta =
-                    new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), environmentContainer,
-                            environmentContainer.getId(), PermissionObject.EnvironmentManagement,
-                            environmentContainer.getId() );
-            boolean trustedRelation = relationManager.getRelationInfoManager().allHasReadPermissions( relationMeta );
-
-            if ( trustedRelation )
-            {
-                environmentContainer.setEnvironmentManager( this );
-
-                String peerId = environmentContainer.getPeerId();
-                Peer peer = peerManager.getPeer( peerId );
-
-                environmentContainer.setPeer( peer );
-            }
-            else
-            {
-                environment.getContainerHosts().remove( environmentContainer );
-            }
-        }
-    }
-
-
-    @PermitAll
-    protected EnvironmentCreationWorkflow getEnvironmentCreationWorkflow( final EnvironmentImpl environment,
-                                                                          final Topology topology, final String sshKey,
-                                                                          final TrackerOperation operationTracker )
-    {
-        User activeUser = identityManager.getActiveUser();
-
-        RelationMeta relationMeta =
-                new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), environment, environment.getId(),
-                        PermissionObject.EnvironmentManagement, environment.getId() );
-
-        if ( !relationManager.getRelationInfoManager().allHasReadPermissions( relationMeta ) )
-        {
-            throw new AccessControlException( "You don't have enough permissions to create environment" );
-        }
-        return new EnvironmentCreationWorkflow( Common.DEFAULT_DOMAIN_NAME, templateRegistry, this, networkManager,
-                peerManager, securityManager, identityManager, environment, topology, sshKey, operationTracker );
-    }
-
-
     private String calculateCidr( final Blueprint blueprint ) throws EnvironmentCreationException
     {
         Preconditions.checkNotNull( blueprint );
@@ -1751,6 +1715,42 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         }
 
         return usedGateways;
+    }
+
+
+    public void setEnvironmentTransientFields( final Environment environment )
+    {
+        ( ( EnvironmentImpl ) environment ).setEnvironmentManager( this );
+    }
+
+
+    public void setContainersTransientFields( final Environment environment )
+    {
+        User activeUser = identityManager.getActiveUser();
+        for ( ContainerHost containerHost : environment.getContainerHosts() )
+        {
+            EnvironmentContainerImpl environmentContainer = ( EnvironmentContainerImpl ) containerHost;
+
+            RelationMeta relationMeta =
+                    new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), environmentContainer,
+                            environmentContainer.getId(), PermissionObject.EnvironmentManagement,
+                            environmentContainer.getId() );
+            boolean trustedRelation = relationManager.getRelationInfoManager().allHasReadPermissions( relationMeta );
+
+            if ( trustedRelation )
+            {
+                environmentContainer.setEnvironmentManager( this );
+
+                String peerId = environmentContainer.getPeerId();
+                Peer peer = peerManager.getPeer( peerId );
+
+                environmentContainer.setPeer( peer );
+            }
+            else
+            {
+                environment.getContainerHosts().remove( environmentContainer );
+            }
+        }
     }
 
 

@@ -7,7 +7,6 @@ import org.bouncycastle.openpgp.PGPException;
 
 import io.subutai.core.identity.api.exception.RelationVerificationException;
 import io.subutai.core.identity.api.model.Relation;
-import io.subutai.core.identity.api.model.RelationInfo;
 
 
 /**
@@ -18,7 +17,7 @@ import io.subutai.core.identity.api.model.RelationInfo;
 /**
  * TrustMEssageManager is needed to process incoming signed messages to construct trust relationships
  */
-public interface TrustMessageManager
+public interface RelationMessageManager
 {
     /**
      * Decrypt with management private key
@@ -45,7 +44,4 @@ public interface TrustMessageManager
      * @param sourceFingerprint - sender's fingerprint
      */
     boolean verifyMessageSource( Relation trustMessage, String signature, String sourceFingerprint );
-
-
-    RelationInfo serializeMessage( String rawRelationship );
 }

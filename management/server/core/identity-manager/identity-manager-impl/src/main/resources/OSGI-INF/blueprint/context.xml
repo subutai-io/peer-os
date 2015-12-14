@@ -1,13 +1,20 @@
 <blueprint xmlns:jpa="http://aries.apache.org/xmlns/jpa/v1.0.0"
            xmlns:jaas="http://karaf.apache.org/xmlns/jaas/v1.1.0"
+           xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
+           xmlns:authz="http://aries.apache.org/xmlns/authorization/v1.0.0"
            default-activation="eager"
            xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
-           xmlns:authz="http://aries.apache.org/xmlns/authorization/v1.0.0"
->
+    >
 
   <!--**************Enable Authorization ******************************-->
   <authz:enable />
   <!--*****************************************************************-->
+
+  <cm:property-placeholder persistent-id="peer" update-strategy="none">
+    <cm:default-properties>
+      <cm:property name="keyTrustCheckEnabled" value="false" />
+    </cm:default-properties>
+  </cm:property-placeholder>
 
   <!--*****************************************************************-->
   <jaas:config name="karaf" rank="1">
@@ -34,9 +41,10 @@
   </bean>
 
   <bean id="relationManager" scope="singleton" activation="eager" init-method="init"
-        class="io.subutai.core.identity.impl.relation.TrustRelationManagerImpl">
+        class="io.subutai.core.identity.impl.relation.RelationManagerImpl">
     <property name="daoManager" ref="daoManagerIdenity" />
     <property name="identityManager" ref="identityManager" />
+    <property name="keyTrustCheckEnabled" ref="{keyTrustCheckEnabled}" />
   </bean>
 
   <!--*****************************************************************-->
@@ -44,7 +52,7 @@
            interface="io.subutai.core.identity.api.IdentityManager" />
 
   <service ref="relationManager" activation="eager"
-           interface="io.subutai.core.identity.api.relation.TrustRelationManager" />
+           interface="io.subutai.core.identity.api.relation.RelationManager" />
   <!--*****************************************************************-->
 
 </blueprint>
