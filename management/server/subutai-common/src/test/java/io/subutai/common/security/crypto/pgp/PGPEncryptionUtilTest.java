@@ -17,6 +17,8 @@ import org.bouncycastle.openpgp.PGPPublicKey;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.PGPPublicKeyRingCollection;
 import org.bouncycastle.openpgp.PGPSecretKey;
+import org.bouncycastle.openpgp.PGPSecretKeyRing;
+import org.bouncycastle.openpgp.PGPSecretKeyRingCollection;
 import org.bouncycastle.openpgp.PGPSignature;
 import org.bouncycastle.openpgp.PGPUtil;
 import org.bouncycastle.openpgp.operator.jcajce.JcaKeyFingerprintCalculator;
@@ -240,20 +242,33 @@ public class PGPEncryptionUtilTest
         InputStream secondSecretStream = new ByteArrayInputStream( second.getSecKeyring() );
         InputStream secondPublicStream = new ByteArrayInputStream( second.getPubKeyring() );
 
-        PGPSecretKey secondSecretKey =
-                PGPEncryptionUtil.findSecretKeyById( secondSecretStream, second.getPrimaryKeyId() );
+        PGPSecretKeyRingCollection secretKeyRingCollection =
+                new PGPSecretKeyRingCollection( PGPUtil.getDecoderStream( secondSecretStream ),
+                        new JcaKeyFingerprintCalculator() );
 
-        byte[] signedMessage = PGPEncryptionUtil
-                .clearSign( "Talas\nZholdoshbekov\n".getBytes(), secondSecretKey, "second".toCharArray(), "" );
+        PGPSecretKeyRing secretKeyRing =
+                secretKeyRingCollection.getSecretKeyRing( new BigInteger( second.getPrimaryKeyId(), 16 ).longValue() );
 
-        logger.info( "\n" + new String( signedMessage, "UTF-8" ) );
+        PGPSecretKey secondSecretKey = secretKeyRing.getSecretKey();
+        //                PGPEncryptionUtil.findSecretKeyById( secondSecretStream, second.getPrimaryKeyId() );
+
 
         PGPPublicKeyRingCollection secondPublicKeyRingCollection =
                 new PGPPublicKeyRingCollection( PGPUtil.getDecoderStream( secondPublicStream ),
                         new JcaKeyFingerprintCalculator() );
 
-        PGPPublicKeyRing pgpKeyring =
-                secondPublicKeyRingCollection.getPublicKeyRing( Long.parseLong( second.getSubKeyId(), 16 ) );
+
+        PGPPublicKeyRing pgpKeyring = secondPublicKeyRingCollection
+                .getPublicKeyRing( new BigInteger( second.getSubKeyId(), 16 ).longValue() );
+
+
+        byte[] encryptedMessage =
+                PGPEncryptionUtil.encrypt( "Talas Zholdoshbekov".getBytes(), pgpKeyring.getPublicKey(), true );
+
+        byte[] signedMessage =
+                PGPEncryptionUtil.clearSign( encryptedMessage, secondSecretKey, "second".toCharArray(), "" );
+
+        logger.info( "\n" + new String( signedMessage, "UTF-8" ) );
 
         boolean result = PGPEncryptionUtil.verifyClearSign( signedMessage, pgpKeyring );
         if ( result )
@@ -264,6 +279,10 @@ public class PGPEncryptionUtilTest
         {
             logger.info( "signature verification failed." );
         }
+
+        byte[] extracted = PGPEncryptionUtil.extractContentFromClearSign( signedMessage );
+        byte[] decrypted = PGPEncryptionUtil.decrypt( extracted, secretKeyRing, "second" );
+        logger.info( "\n" + new String( decrypted, "UTF-8" ) );
 
         assertEquals( true, result );
     }

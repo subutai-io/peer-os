@@ -35,16 +35,17 @@ public class RelationMessageManagerImpl implements RelationMessageManager
     public Relation decryptAndVerifyMessage( final String signedMessage, final String secretKeyId )
             throws PGPException, UnsupportedEncodingException, RelationVerificationException
     {
-        // todo might be will need to extract only encrypted message first and verify it after
         KeyManager keyManager = securityManager.getKeyManager();
         EncryptionTool encryptionTool = securityManager.getEncryptionTool();
 
+
         PGPSecretKeyRing secretKeyRing = keyManager.getSecretKeyRing( secretKeyId );
 
-        byte[] decrypted = encryptionTool.decrypt( signedMessage.getBytes(), secretKeyRing, "" );
+
+        byte[] extractedText = encryptionTool.extractClearSignContent( signedMessage.getBytes() );
+        byte[] decrypted = encryptionTool.decrypt( extractedText, secretKeyRing, "" );
 
         String decryptedMessage = new String( decrypted, "UTF-8" );
-
         RelationImpl relation = JsonUtil.fromJson( decryptedMessage, RelationImpl.class );
 
         PGPPublicKeyRing publicKey = keyManager.getPublicKeyRing( relation.getKeyId() );

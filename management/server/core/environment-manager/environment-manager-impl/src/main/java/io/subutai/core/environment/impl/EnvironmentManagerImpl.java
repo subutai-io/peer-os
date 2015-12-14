@@ -64,7 +64,6 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.security.crypto.pgp.KeyPair;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
-import io.subutai.common.security.objects.KeyTrustLevel;
 import io.subutai.common.security.objects.Ownership;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.objects.PermissionOperation;
@@ -1636,7 +1635,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             keyManager.savePublicKeyRing( pairId, SecurityKeyType.EnvironmentKey.getId(), pubRing );
 
             //***************Sign Keys *********************************************************
-            securityManager.getKeyManager().setKeyTrust( userSecKeyRing, pubRing, KeyTrustLevel.Full.getId() );
+            // User private key is no longer in system
+            //            securityManager.getKeyManager().setKeyTrust( userSecKeyRing, pubRing, KeyTrustLevel.Full.getId() );
 
             return secRing;
         }

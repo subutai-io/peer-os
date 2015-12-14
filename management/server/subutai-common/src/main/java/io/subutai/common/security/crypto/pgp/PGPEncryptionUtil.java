@@ -945,6 +945,101 @@ public class PGPEncryptionUtil
     }
 
 
+    public static byte[] extractContentFromClearSign( byte[] signedMessage ) throws PGPException
+    {
+        try
+        {
+            ArmoredInputStream aIn = new ArmoredInputStream( new ByteArrayInputStream( signedMessage ) );
+            ByteArrayOutputStream bout = new ByteArrayOutputStream();
+
+
+            //
+            // write out signed section using the local line separator.
+            // note: trailing white space needs to be removed from the end of
+            // each line RFC 4880 Section 7.1
+            //
+            ByteArrayOutputStream lineOut = new ByteArrayOutputStream();
+            int lookAhead = readInputLine( lineOut, aIn );
+
+            if ( lookAhead != -1 && aIn.isClearText() )
+            {
+                bout.write( lineOut.toByteArray() );
+                while ( lookAhead != -1 && aIn.isClearText() )
+                {
+                    lookAhead = readInputLine( lineOut, lookAhead, aIn );
+                    bout.write( lineOut.toByteArray() );
+                }
+            }
+            return bout.toByteArray();
+        }
+        catch ( Exception ex )
+        {
+            throw new PGPException( "", ex );
+        }
+    }
+
+
+    private static int readInputLine( ByteArrayOutputStream bOut, InputStream fIn ) throws IOException
+    {
+        bOut.reset();
+
+        int lookAhead = -1;
+        int ch;
+
+        while ( ( ch = fIn.read() ) >= 0 )
+        {
+            bOut.write( ch );
+            if ( ch == '\r' || ch == '\n' )
+            {
+                lookAhead = readPassedEOL( bOut, ch, fIn );
+                break;
+            }
+        }
+
+        return lookAhead;
+    }
+
+
+    private static int readPassedEOL( ByteArrayOutputStream bOut, int lastCh, InputStream fIn ) throws IOException
+    {
+        int lookAhead = fIn.read();
+
+        if ( lastCh == '\r' && lookAhead == '\n' )
+        {
+            bOut.write( lookAhead );
+            lookAhead = fIn.read();
+        }
+
+        return lookAhead;
+    }
+
+
+    private static int readInputLine( ByteArrayOutputStream bOut, int lookAhead, InputStream fIn ) throws IOException
+    {
+        bOut.reset();
+
+        int ch = lookAhead;
+
+        do
+        {
+            bOut.write( ch );
+            if ( ch == '\r' || ch == '\n' )
+            {
+                lookAhead = readPassedEOL( bOut, ch, fIn );
+                break;
+            }
+        }
+        while ( ( ch = fIn.read() ) >= 0 );
+
+        if ( ch < 0 )
+        {
+            lookAhead = -1;
+        }
+
+        return lookAhead;
+    }
+
+
     /*
      * verify a clear text signed file
      */
@@ -1007,67 +1102,6 @@ public class PGPEncryptionUtil
         sigIn.close();
 
         return sig.verify();
-    }
-
-
-    private static int readInputLine( ByteArrayOutputStream bOut, InputStream fIn ) throws IOException
-    {
-        bOut.reset();
-
-        int lookAhead = -1;
-        int ch;
-
-        while ( ( ch = fIn.read() ) >= 0 )
-        {
-            bOut.write( ch );
-            if ( ch == '\r' || ch == '\n' )
-            {
-                lookAhead = readPassedEOL( bOut, ch, fIn );
-                break;
-            }
-        }
-
-        return lookAhead;
-    }
-
-
-    private static int readPassedEOL( ByteArrayOutputStream bOut, int lastCh, InputStream fIn ) throws IOException
-    {
-        int lookAhead = fIn.read();
-
-        if ( lastCh == '\r' && lookAhead == '\n' )
-        {
-            bOut.write( lookAhead );
-            lookAhead = fIn.read();
-        }
-
-        return lookAhead;
-    }
-
-
-    private static int readInputLine( ByteArrayOutputStream bOut, int lookAhead, InputStream fIn ) throws IOException
-    {
-        bOut.reset();
-
-        int ch = lookAhead;
-
-        do
-        {
-            bOut.write( ch );
-            if ( ch == '\r' || ch == '\n' )
-            {
-                lookAhead = readPassedEOL( bOut, ch, fIn );
-                break;
-            }
-        }
-        while ( ( ch = fIn.read() ) >= 0 );
-
-        if ( ch < 0 )
-        {
-            lookAhead = -1;
-        }
-
-        return lookAhead;
     }
 
 

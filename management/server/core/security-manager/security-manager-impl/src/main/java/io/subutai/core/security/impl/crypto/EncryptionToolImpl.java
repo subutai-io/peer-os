@@ -280,9 +280,16 @@ public class EncryptionToolImpl implements EncryptionTool
     }
 
 
+    @Override
+    public byte[] extractClearSignContent( final byte[] signedMessage ) throws PGPException
+    {
+        return PGPEncryptionUtil.extractContentFromClearSign( signedMessage );
+    }
+
+
     /* *****************************************
-     *
-     */
+         *
+         */
     @Override
     public ContentAndSignatures decryptAndReturnSignatures( final byte[] encryptedMessage ) throws PGPException
     {

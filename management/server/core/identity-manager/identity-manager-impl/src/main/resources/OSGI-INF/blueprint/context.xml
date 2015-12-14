@@ -1,7 +1,7 @@
 <blueprint xmlns:jpa="http://aries.apache.org/xmlns/jpa/v1.0.0"
            xmlns:jaas="http://karaf.apache.org/xmlns/jaas/v1.1.0"
-           xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
            xmlns:authz="http://aries.apache.org/xmlns/authorization/v1.0.0"
+           xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
            default-activation="eager"
            xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
     >
@@ -44,7 +44,7 @@
         class="io.subutai.core.identity.impl.relation.RelationManagerImpl">
     <property name="daoManager" ref="daoManagerIdenity" />
     <property name="identityManager" ref="identityManager" />
-    <property name="keyTrustCheckEnabled" ref="{keyTrustCheckEnabled}" />
+    <property name="keyTrustCheckEnabled" value="${keyTrustCheckEnabled}" />
   </bean>
 
   <!--*****************************************************************-->

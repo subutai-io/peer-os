@@ -128,6 +128,12 @@ public interface EncryptionTool
     boolean verifyClearSign( final byte[] message, PGPPublicKeyRing pgpRings ) throws PGPException;
 
 
+    /* *********************************************************************
+     *
+     */
+    byte[] extractClearSignContent( final byte[] signedMessage ) throws PGPException;
+
+
     /**
      * Decrypts message with peer private key
      *
