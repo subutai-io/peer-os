@@ -342,6 +342,17 @@ public class BrokerImpl implements Broker
 
     protected void tuneBroker() throws Exception
     {
+        //tune persistence
+        KahaDBPersistenceAdapter kahaDBPersistenceAdapter = new KahaDBPersistenceAdapter();
+        kahaDBPersistenceAdapter.setJournalMaxFileLength( 1024 * 1024 * 64 );// 64 MB
+        kahaDBPersistenceAdapter.setConcurrentStoreAndDispatchTopics( true );
+        kahaDBPersistenceAdapter.setIndexCacheSize( 15000 );
+        kahaDBPersistenceAdapter.setIndexWriteBatchSize( 1500 );
+        kahaDBPersistenceAdapter.setEnableJournalDiskSyncs( false );
+        kahaDBPersistenceAdapter.setDirectory( getBrokerDbPath() );
+
+        getBroker().setPersistenceAdapter( kahaDBPersistenceAdapter );
+
 
             /* We want to delete destinations that are inactive for a period of time. Since ActiveMQ version 5.4.0,
              * it's possible to do that using destination policy entries and broker attribute
@@ -421,16 +432,6 @@ public class BrokerImpl implements Broker
         usage.setSendFailIfNoSpace( true );
 
         getBroker().setSystemUsage( usage );
-
-        KahaDBPersistenceAdapter kahaDBPersistenceAdapter = new KahaDBPersistenceAdapter();
-        kahaDBPersistenceAdapter.setJournalMaxFileLength( 1024 * 1024 * 64 );// 64 MB
-        kahaDBPersistenceAdapter.setConcurrentStoreAndDispatchTopics( true );
-        kahaDBPersistenceAdapter.setIndexCacheSize( 15000 );
-        kahaDBPersistenceAdapter.setIndexWriteBatchSize( 1500 );
-        kahaDBPersistenceAdapter.setEnableJournalDiskSyncs( false );
-        kahaDBPersistenceAdapter.setDirectory( getBrokerDbPath() );
-
-        getBroker().setPersistenceAdapter( kahaDBPersistenceAdapter );
     }
 
 
