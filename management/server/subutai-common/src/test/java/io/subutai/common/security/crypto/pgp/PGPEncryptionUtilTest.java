@@ -282,9 +282,7 @@ public class PGPEncryptionUtilTest
 
         byte[] extracted = PGPEncryptionUtil.extractContentFromClearSign( signedMessage.getBytes() );
         byte[] decrypted = PGPEncryptionUtil.decrypt( extracted, secretKeyRing, "second" );
-        byte[] decrypted2 = PGPEncryptionUtil.decryptFile( extracted, secretKeyRingCollection, "second".toCharArray() );
         logger.info( "Decrypted message \n" + new String( decrypted, "UTF-8" ) );
-        logger.info( "Decrypted message \n" + new String( decrypted2, "UTF-8" ) );
 
         assertEquals( true, result );
     }

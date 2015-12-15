@@ -20,7 +20,6 @@ import javax.annotation.security.RolesAllowed;
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
-import org.bouncycastle.openpgp.PGPSecretKey;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1576,13 +1575,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             environment.setRelationDeclaration( encryptedMessage );
 
             // TODO should be handled on client side
-            PGPSecretKey userSecretKey = keyManager.getSecretKey( activeUser.getSecurityKeyId() );
-            byte[] signedEncrypted = encryptionTool.clearSign( encryptedMessage.getBytes(), userSecretKey, "" );
-            String signedMessage = new String( signedEncrypted, "UTF-8" );
+            //            PGPSecretKey userSecretKey = keyManager.getSecretKey( activeUser.getSecurityKeyId() );
+            //            byte[] signedEncrypted = encryptionTool.clearSign( encryptedMessage.getBytes(),
+            // userSecretKey, "" );
+            //            String signedMessage = new String( signedEncrypted, "UTF-8" );
 
 
             // TODO should be handled on server side when user sends signed message
-            relationManager.processTrustMessage( signedMessage, environment.getId() );
+            //            relationManager.processTrustMessage( signedMessage, environment.getId() );
         }
         catch ( Exception e )
         {
@@ -1635,7 +1635,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
             //***************Sign Keys *********************************************************
             // User private key is no longer in system
-            //            securityManager.getKeyManager().setKeyTrust( userSecKeyRing, pubRing, KeyTrustLevel.Full.getId() );
+            //            securityManager.getKeyManager().setKeyTrust( userSecKeyRing, pubRing, KeyTrustLevel.Full
+            // .getId() );
 
             return secRing;
         }
