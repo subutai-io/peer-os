@@ -95,7 +95,7 @@ public class EnvironmentManagerTest
         doReturn( environment ).when( environmentManager )
                                .createEmptyEnvironment( anyString(), anyString(), anyString(), any( Blueprint.class ) );
         //        doReturn( topology ).when( environmentManager ).buildTopology( blueprint );
-        doReturn( new HashSet<>() ).when( environmentManager ).getUsedGateways( ( Peer ) any() );
+        doReturn( new HashSet<>() ).when( environmentManager ).getUsedIps( ( Peer ) any() );
         doReturn( environmentCreationWorkflow ).when( environmentManager )
                                                .getEnvironmentCreationWorkflow( any( EnvironmentImpl.class ),
                                                        any( Topology.class ), anyString(),

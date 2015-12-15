@@ -175,15 +175,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    public boolean isKeyTrustCheckEnabled()
-    {
-        return keyTrustCheckEnabled;
-    }
-
-
     public void setKeyTrustCheckEnabled( final boolean keyTrustCheckEnabled )
     {
         this.keyTrustCheckEnabled = keyTrustCheckEnabled;
+    }
+
+
+    public boolean isKeyTrustCheckEnabled()
+    {
+        return keyTrustCheckEnabled;
     }
 
 
@@ -897,8 +897,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             operationTracker.addLogFailed( String.format( "Environment status is %s", environment.getStatus() ) );
 
-            throw new EnvironmentModificationException(
-                    String.format( "Environment status is %s", environment.getStatus() ) );
+            throw new EnvironmentModificationException( String.format( "Environment status is %s", environment.getStatus() ) );
         }
 
         ContainerHost environmentContainer;
@@ -940,8 +939,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
             if ( containerDestructionWorkflow.getError() != null )
             {
-                throw new EnvironmentModificationException(
-                        exceptionUtil.getRootCause( containerDestructionWorkflow.getError() ) );
+                throw new EnvironmentModificationException( exceptionUtil.getRootCause( containerDestructionWorkflow.getError() ) );
             }
         }
     }
@@ -1008,23 +1006,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         else
         {
             throw new AccessControlException( "You have not enough permissions." );
-        }
-    }
-
-
-    @PermitAll
-    public void notifyOnEnvironmentDestroyed( final String environmentId )
-    {
-        for ( final EnvironmentEventListener listener : listeners )
-        {
-            executor.submit( new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    listener.onEnvironmentDestroyed( environmentId );
-                }
-            } );
         }
     }
 
@@ -1321,138 +1302,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    @PermitAll
-    public void notifyOnContainerDestroyed( final Environment environment, final String containerId )
-    {
-        for ( final EnvironmentEventListener listener : listeners )
-        {
-            executor.submit( new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    listener.onContainerDestroyed( environment, containerId );
-                }
-            } );
-        }
-    }
-
-
-    @PermitAll
-    @Override
-    public void notifyOnContainerStateChanged( final Environment environment, final ContainerHost containerHost )
-    {
-        saveOrUpdate( environment );
-    }
-
-
-    @Override
-    public void addAlertHandler( final AlertHandler alertHandler )
-    {
-        if ( alertHandler != null && alertHandler.getId() != null )
-        {
-            this.alertHandlers.put( alertHandler.getId(), alertHandler );
-        }
-        else
-        {
-            LOG.warn( "Alert handler rejected: " + alertHandler );
-        }
-    }
-
-
-    @Override
-    public void removeAlertHandler( final AlertHandler alertHandler )
-    {
-        if ( alertHandler != null )
-        {
-            this.alertHandlers.remove( alertHandler.getId() );
-        }
-    }
-
-
-    @Override
-    public Collection<AlertHandler> getRegisteredAlertHandlers()
-    {
-        List<AlertHandler> result = new ArrayList<>( alertHandlers.values() );
-        return result;
-    }
-
-
-    @Override
-    public EnvironmentAlertHandlers getEnvironmentAlertHandlers( final EnvironmentId environmentId )
-            throws EnvironmentNotFoundException
-    {
-        Environment environment = loadEnvironment( environmentId.getId() );
-
-        Set<EnvironmentAlertHandler> handlerList = environment.getAlertHandlers();
-
-        EnvironmentAlertHandlers handlers = new EnvironmentAlertHandlersImpl( environment.getEnvironmentId() );
-        for ( EnvironmentAlertHandler environmentAlertHandler : handlerList )
-        {
-            handlers.add( environmentAlertHandler, alertHandlers.get( environmentAlertHandler.getAlertHandlerId() ) );
-        }
-        return handlers;
-    }
-
-
-    @Override
-    public void startMonitoring( final String handlerId, final AlertHandlerPriority handlerPriority,
-                                 final String environmentId ) throws EnvironmentManagerException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( handlerId ), "Invalid alert handler id." );
-        Preconditions.checkNotNull( handlerPriority, "Invalid alert priority." );
-
-/*
-            //make sure subscriber id is truncated to 100 characters
-            String trimmedSubscriberId = StringUtil.trimToSize( handlerId, Constants.MAX_SUBSCRIBER_ID_LEN );
-*/
-        AlertHandler alertHandler = alertHandlers.get( handlerId );
-        if ( alertHandler == null )
-        {
-            throw new EnvironmentManagerException( "Alert handler not found." );
-        }
-        try
-        {
-            Environment environment = loadEnvironment( environmentId );
-
-            environment.addAlertHandler( new EnvironmentAlertHandlerImpl( handlerId, handlerPriority ) );
-
-            saveOrUpdate( environment );
-        }
-        catch ( Exception e )
-        {
-            LOG.error( "Error on start monitoring", e );
-            throw new EnvironmentManagerException( e.getMessage(), e );
-        }
-    }
-
-
-    @Override
-    public void stopMonitoring( final String handlerId, final AlertHandlerPriority handlerPriority,
-                                final String environmentId ) throws EnvironmentManagerException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( handlerId ), "Invalid alert handler id." );
-        Preconditions.checkNotNull( handlerPriority, "Invalid alert priority." );
-
-/*
-            //make sure subscriber id is truncated to 100 characters
-            String trimmedSubscriberId = StringUtil.trimToSize( handlerId, Constants.MAX_SUBSCRIBER_ID_LEN );
-*/
-        //remove subscription from database
-        try
-        {
-            Environment environment = environmentDataService.find( environmentId );
-            environment.removeAlertHandler( new EnvironmentAlertHandlerImpl( handlerId, handlerPriority ) );
-            environmentDataService.saveOrUpdate( environment );
-        }
-        catch ( Exception e )
-        {
-            LOG.error( "Error on stop monitoring", e );
-            throw new EnvironmentManagerException( e.getMessage(), e );
-        }
-    }
-
-
     public void toggleContainerDomain( final String containerHostId, final String environmentId, final boolean add,
                                        final TrackerOperation operationTracker, final boolean checkAccess )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
@@ -1599,23 +1448,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    @PermitAll
-    public void notifyOnEnvironmentCreated( final Environment environment )
-    {
-        for ( final EnvironmentEventListener listener : listeners )
-        {
-            executor.submit( new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    listener.onEnvironmentCreated( environment );
-                }
-            } );
-        }
-    }
-
-
     private PGPSecretKeyRing createEnvironmentKeyPair( EnvironmentId envId, String userSecKeyId )
             throws EnvironmentCreationException
     {
@@ -1646,56 +1478,50 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         }
     }
 
-
-    protected Long getUserId()
-    {
-        return ( long ) 0;//getUser().getId();
-    }
-
-
-    public EnvironmentImpl saveOrUpdate( final Environment environment )
-    {
-        EnvironmentImpl env = environmentDataService.saveOrUpdate( environment );
-        setEnvironmentTransientFields( env );
-        setContainersTransientFields( env );
-        return env;
-    }
-
-
     private String calculateCidr( final Blueprint blueprint ) throws EnvironmentCreationException
     {
         Preconditions.checkNotNull( blueprint );
 
         try
         {
-            Set<String> usedGateways = new HashSet<>();
-            usedGateways.addAll( getUsedGateways( peerManager.getLocalPeer() ) );
+            Set<String> usedIps = new HashSet<>();
+            usedIps.addAll( getUsedIps( peerManager.getLocalPeer() ) );
             for ( String peerId : blueprint.getNodeGroupsMap().keySet() )
             {
                 Peer peer = peerManager.getPeer( peerId );
-                usedGateways.addAll( getUsedGateways( peer ) );
+                usedIps.addAll( getUsedIps( peer ) );
             }
 
-            String environmentGatewayIp = null;
+            String theCidr = null;
 
-            for ( int i = 1; i < 255 && environmentGatewayIp == null; i++ )
+            for ( int i = 1; i < 255; i++ )
             {
                 SubnetUtils.SubnetInfo info = new SubnetUtils( String.format( DEFAULT_GATEWAY_TEMPLATE, i ) ).getInfo();
 
-                String gw = info.getLowAddress();
+                boolean isUsed = false;
 
-                if ( !usedGateways.contains( gw ) )
+                for ( String usedIp : usedIps )
                 {
-                    environmentGatewayIp = info.getCidrSignature();
+                    if ( info.isInRange( usedIp ) )
+                    {
+                        isUsed = true;
+                        break;
+                    }
+                }
+
+                if ( !isUsed )
+                {
+                    theCidr = info.getCidrSignature();
                     break;
                 }
             }
 
-            if ( environmentGatewayIp == null )
+            if ( theCidr == null )
             {
-                throw new EnvironmentCreationException( "Could not determine subnet cdir." );
+                throw new EnvironmentCreationException( "Could not determine subnet cidr." );
             }
-            return environmentGatewayIp;
+
+            return theCidr;
         }
         catch ( PeerException e )
         {
@@ -1704,17 +1530,17 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    protected Set<String> getUsedGateways( Peer peer ) throws PeerException
+    protected Set<String> getUsedIps( Peer peer ) throws PeerException
     {
 
-        Set<String> usedGateways = Sets.newHashSet();
+        Set<String> usedIps = Sets.newHashSet();
 
-        for ( Gateway gateway : peer.getGateways() )
+        for ( HostInterface hostInterface : peer.getInterfaces().getAll() )
         {
-            usedGateways.add( gateway.getIp() );
+            usedIps.add( hostInterface.getIp() );
         }
 
-        return usedGateways;
+        return usedIps;
     }
 
 
@@ -1763,8 +1589,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    protected EnvironmentDestructionWorkflow getEnvironmentDestructionWorkflow( final PeerManager peerManager,
-                                                                                final EnvironmentManagerImpl
+    protected EnvironmentDestructionWorkflow getEnvironmentDestructionWorkflow( final PeerManager peerManager, final EnvironmentManagerImpl
                                                                                         environmentManager,
                                                                                 final EnvironmentImpl environment,
                                                                                 final boolean forceMetadataRemoval,
@@ -1795,6 +1620,23 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
 
     @PermitAll
+    public void notifyOnEnvironmentCreated( final Environment environment )
+    {
+        for ( final EnvironmentEventListener listener : listeners )
+        {
+            executor.submit( new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    listener.onEnvironmentCreated( environment );
+                }
+            } );
+        }
+    }
+
+
+    @PermitAll
     public void notifyOnEnvironmentGrown( final Environment environment,
                                           final Set<EnvironmentContainerHost> containers )
     {
@@ -1812,16 +1654,69 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    protected User getUser()
+    @PermitAll
+    public void notifyOnContainerDestroyed( final Environment environment, final String containerId )
     {
-        //User user = identityManager.getUser();
-
-        //if ( user == null )
+        for ( final EnvironmentEventListener listener : listeners )
         {
-            throw new EnvironmentSecurityException( "User not authenticated" );
+            executor.submit( new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    listener.onContainerDestroyed( environment, containerId );
+                }
+            } );
         }
+    }
 
-        //return user;
+
+    @PermitAll
+    @Override
+    public void notifyOnContainerStateChanged( final Environment environment, final ContainerHost containerHost )
+    {
+        saveOrUpdate( environment );
+    }
+
+
+    @PermitAll
+    public void notifyOnEnvironmentDestroyed( final String environmentId )
+    {
+        for ( final EnvironmentEventListener listener : listeners )
+        {
+            executor.submit( new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    listener.onEnvironmentDestroyed( environmentId );
+                }
+            } );
+        }
+    }
+
+
+    @RolesAllowed( "Environment-Management|A|Write" )
+    protected EnvironmentImpl createEmptyEnvironment( final String name, final String subnetCidr, final String sshKey )
+    {
+
+        EnvironmentImpl environment =
+                new EnvironmentImpl( name, subnetCidr, sshKey, getUserId(), peerManager.getLocalPeer().getId() );
+
+        environment.setUserId( identityManager.getActiveUser().getId() );
+        environment = saveOrUpdate( environment );
+
+        setEnvironmentTransientFields( environment );
+
+        notifyOnEnvironmentCreated( environment );
+
+        return environment;
+    }
+
+
+    protected Long getUserId()
+    {
+        return ( long ) 0;//getUser().getId();
     }
 
 
@@ -1831,9 +1726,49 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
+    public EnvironmentImpl saveOrUpdate( final Environment environment )
+    {
+        EnvironmentImpl env = environmentDataService.saveOrUpdate( environment );
+        setEnvironmentTransientFields( env );
+        setContainersTransientFields( env );
+        return env;
+    }
+
+
     public void remove( final EnvironmentImpl environment )
     {
         environmentDataService.remove( environment );
+    }
+
+
+    @Override
+    public void addAlertHandler( final AlertHandler alertHandler )
+    {
+        if ( alertHandler != null && alertHandler.getId() != null )
+        {
+            this.alertHandlers.put( alertHandler.getId(), alertHandler );
+        }
+        else
+        {
+            LOG.warn( "Alert handler rejected: " + alertHandler );
+        }
+    }
+
+
+    @Override
+    public void removeAlertHandler( final AlertHandler alertHandler )
+    {
+        if ( alertHandler != null )
+        {
+            this.alertHandlers.remove( alertHandler.getId() );
+        }
+    }
+
+
+    @Override
+    public Collection<AlertHandler> getRegisteredAlertHandlers()
+    {
+        return new ArrayList<>( alertHandlers.values() );
     }
 
 
@@ -1857,6 +1792,23 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             LOG.error( "Error in handling alert package.", e );
         }
+    }
+
+
+    @Override
+    public EnvironmentAlertHandlers getEnvironmentAlertHandlers( final EnvironmentId environmentId )
+            throws EnvironmentNotFoundException
+    {
+        Environment environment = loadEnvironment( environmentId.getId() );
+
+        Set<EnvironmentAlertHandler> handlerList = environment.getAlertHandlers();
+
+        EnvironmentAlertHandlers handlers = new EnvironmentAlertHandlersImpl( environment.getEnvironmentId() );
+        for ( EnvironmentAlertHandler environmentAlertHandler : handlerList )
+        {
+            handlers.add( environmentAlertHandler, alertHandlers.get( environmentAlertHandler.getAlertHandlerId() ) );
+        }
+        return handlers;
     }
 
 
@@ -1902,6 +1854,64 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             {
                 alertEvent.addLog( e.getMessage() );
             }
+        }
+    }
+
+
+    @Override
+    public void startMonitoring( final String handlerId, final AlertHandlerPriority handlerPriority,
+                                 final String environmentId ) throws EnvironmentManagerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( handlerId ), "Invalid alert handler id." );
+        Preconditions.checkNotNull( handlerPriority, "Invalid alert priority." );
+
+/*
+            //make sure subscriber id is truncated to 100 characters
+            String trimmedSubscriberId = StringUtil.trimToSize( handlerId, Constants.MAX_SUBSCRIBER_ID_LEN );
+*/
+        AlertHandler alertHandler = alertHandlers.get( handlerId );
+        if ( alertHandler == null )
+        {
+            throw new EnvironmentManagerException( "Alert handler not found." );
+        }
+        try
+        {
+            Environment environment = loadEnvironment( environmentId );
+
+            environment.addAlertHandler( new EnvironmentAlertHandlerImpl( handlerId, handlerPriority ) );
+
+            saveOrUpdate( environment );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error on start monitoring", e );
+            throw new EnvironmentManagerException( e.getMessage(), e );
+        }
+    }
+
+
+    @Override
+    public void stopMonitoring( final String handlerId, final AlertHandlerPriority handlerPriority,
+                                final String environmentId ) throws EnvironmentManagerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( handlerId ), "Invalid alert handler id." );
+        Preconditions.checkNotNull( handlerPriority, "Invalid alert priority." );
+
+/*
+            //make sure subscriber id is truncated to 100 characters
+            String trimmedSubscriberId = StringUtil.trimToSize( handlerId, Constants.MAX_SUBSCRIBER_ID_LEN );
+*/
+        //remove subscription from database
+        try
+        {
+            Environment environment = environmentDataService.find( environmentId );
+            environment.removeAlertHandler( new EnvironmentAlertHandlerImpl( handlerId, handlerPriority ) );
+            environmentDataService.saveOrUpdate( environment );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error on stop monitoring", e );
+            throw new EnvironmentManagerException( e.getMessage(), e );
         }
     }
 }

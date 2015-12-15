@@ -93,6 +93,10 @@ public class SubscriberDataService
         }
         catch ( PersistenceException e )
         {
+            if ( em.getTransaction().isActive() )
+            {
+                em.getTransaction().rollback();
+            }
             LOGGER.error( "Query string found to be invalid." );
             throw new DaoException( e );
         }
@@ -121,6 +125,10 @@ public class SubscriberDataService
         }
         catch ( PersistenceException e )
         {
+            if ( em.getTransaction().isActive() )
+            {
+                em.getTransaction().rollback();
+            }
             LOGGER.error( "Error getting subscriberIds" );
             throw new DaoException( e );
         }
