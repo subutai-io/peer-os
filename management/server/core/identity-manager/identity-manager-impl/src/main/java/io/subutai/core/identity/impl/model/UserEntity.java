@@ -16,8 +16,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-import javax.persistence.Transient;
-import javax.security.auth.Subject;
 
 import io.subutai.common.security.objects.UserStatus;
 import io.subutai.common.security.objects.UserType;
@@ -62,6 +60,9 @@ public class UserEntity implements User
     @Column( name = "security_key_id" )
     private String securityKeyId = ""; // PGP KeyID
 
+    @Column( name = "fingerprint" )
+    private String fingerprint = ""; // User key fingerprint
+
 
     //*********************************************
     @ManyToMany( targetEntity = RoleEntity.class, fetch = FetchType.EAGER )
@@ -70,7 +71,6 @@ public class UserEntity implements User
             inverseJoinColumns = { @JoinColumn( name = "role_id", referencedColumnName = "id" ) } )
     private List<Role> roles = new ArrayList<>();
     //*********************************************
-
 
 
     @Override
@@ -211,10 +211,25 @@ public class UserEntity implements User
         return securityKeyId;
     }
 
+
     @Override
     public void setSecurityKeyId( final String securityKeyId )
     {
         this.securityKeyId = securityKeyId;
+    }
+
+
+    @Override
+    public void setFingerprint( final String fingerprint )
+    {
+        this.fingerprint = fingerprint;
+    }
+
+
+    @Override
+    public String getFingerprint()
+    {
+        return fingerprint;
     }
 
 
@@ -230,5 +245,4 @@ public class UserEntity implements User
     {
         return UserType.values()[type - 1].getName();
     }
-
 }

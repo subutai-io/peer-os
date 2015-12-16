@@ -535,6 +535,7 @@ public class IdentityManagerImpl implements IdentityManager
             if ( !Strings.isNullOrEmpty( publicKey ) )
             {
                 securityManager.getKeyManager().savePublicKeyRing( keyId, SecurityKeyType.UserKey.getId(), publicKey );
+                user.setFingerprint( securityManager.getKeyManager().getFingerprint( keyId ) );
             }
             //******************************************
 

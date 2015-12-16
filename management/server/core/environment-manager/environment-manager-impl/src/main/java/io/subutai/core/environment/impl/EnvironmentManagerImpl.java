@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -48,7 +47,6 @@ import io.subutai.common.host.HostInterface;
 import io.subutai.common.mdc.SubutaiExecutors;
 import io.subutai.common.metric.AlertValue;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
-import io.subutai.common.network.Gateway;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.AlertHandler;
 import io.subutai.common.peer.AlertHandlerPriority;
@@ -1417,7 +1415,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             PGPPublicKey publicKey = keyManager.getPublicKey( environment.getEnvironmentId().getId() );
             byte[] relationEncrypted = encryptionTool.encrypt( relationJson.getBytes(), publicKey, true );
 
-            String encryptedMessage = new String( relationEncrypted, "UTF-8" );
+            String encryptedMessage = "\n" + new String( relationEncrypted, "UTF-8" );
 
             // relation declaration is created only once so if user signature verification is failed then environment
             // creation have to fail. Declaration will be saved in encrypted format where relation information is saved

@@ -47,8 +47,11 @@ public interface User
 
     void setSecurityKeyId( String securityKeyId );
 
+    void setFingerprint( String fingerprint );
+
+    String getFingerprint();
+
     String getStatusName();
 
     String getTypeName();
-
 }
