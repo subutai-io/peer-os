@@ -103,12 +103,12 @@ public interface IdentityManager
     /* *************************************************
      *
      */
-    void approveUser(String userName, int type);
+    void approveUser(String userName,List<Role>roles);
     /* *************************************************
      *
      */
 
-    void signUp( String username, String pwd, String fullName, String email, String keyAscii );
+    User signUp( String username, String pwd, String fullName, String email, String keyAscii );
     /* *************************************************
      *
      */

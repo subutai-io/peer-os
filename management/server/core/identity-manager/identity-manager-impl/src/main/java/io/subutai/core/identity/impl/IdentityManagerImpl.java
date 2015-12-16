@@ -640,17 +640,18 @@ public class IdentityManagerImpl implements IdentityManager
 
     @RolesAllowed( "Identity-Management|A|Write" )
     @Override
-    public void approveUser( final String userName, final int type )
+    public void approveUser( final String userName, List<Role> roles)
     {
         User user = identityDataService.getUserByUsername( userName );
+        user.setRoles( roles );
         user.setApproved( true );
-        user.setType( type );
+
 
         identityDataService.persistUser( user );
     }
 
 
-    public void signUp( String username, String pwd, String fullName, String email, String keyAscii )
+    public User signUp( String username, String pwd, String fullName, String email, String keyAscii )
     {
         if ( Strings.isNullOrEmpty( pwd ) || !validUsername( username ) )
         {
@@ -662,12 +663,16 @@ public class IdentityManagerImpl implements IdentityManager
         user.setPassword( pwd );
         user.setEmail( email );
         user.setFullName( fullName );
-
+        user.setType(UserType.Regular.getId());
         String keyId = UUID.randomUUID().toString();
         user.setSecurityKeyId( keyId );
         securityManager.getKeyManager().savePublicKeyRing(keyId,SecurityKeyType.UserKey.getId(), keyAscii);
 
+        user.setFingerprint( securityManager.getKeyManager().getFingerprint( keyId ) );
 
+        identityDataService.persistUser( user );
+
+        return user;
     }
 
 
