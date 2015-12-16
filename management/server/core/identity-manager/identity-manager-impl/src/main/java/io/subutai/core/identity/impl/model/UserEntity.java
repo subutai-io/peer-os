@@ -62,6 +62,9 @@ public class UserEntity implements User
     @Column( name = "security_key_id" )
     private String securityKeyId = ""; // PGP KeyID
 
+    @Column( name = "isApproved" )
+    private boolean isApproved = false; //requires admin approval
+
 
     //*********************************************
     @ManyToMany( targetEntity = RoleEntity.class, fetch = FetchType.EAGER )
@@ -71,6 +74,18 @@ public class UserEntity implements User
     private List<Role> roles = new ArrayList<>();
     //*********************************************
 
+    @Override
+    public boolean isApproved()
+    {
+        return isApproved;
+    }
+
+
+    @Override
+    public void setApproved( final boolean approved )
+    {
+        isApproved = approved;
+    }
 
 
     @Override

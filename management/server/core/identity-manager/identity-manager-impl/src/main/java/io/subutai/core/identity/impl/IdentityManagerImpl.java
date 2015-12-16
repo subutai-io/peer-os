@@ -85,7 +85,7 @@ public class IdentityManagerImpl implements IdentityManager
     public void init()
     {
         identityDataService = new IdentityDataServiceImpl( daoManager );
-        sessionManager = new SessionManagerImpl(identityDataService);
+        sessionManager = new SessionManagerImpl( identityDataService );
         sessionManager.startSessionController();
 
         createDefaultUsers();
@@ -270,23 +270,29 @@ public class IdentityManagerImpl implements IdentityManager
         User user = null;
 
         //-------------------------------------
-        if(login.equals( "token" ))
+        if ( login.equals( "token" ) )
+        {
             sessionId = password;
+        }
         else
+        {
             sessionId = UUID.randomUUID() + "-" + System.currentTimeMillis();
+        }
         //-------------------------------------
 
         session = sessionManager.getValidSession( sessionId );
 
-        if(session == null)
+        if ( session == null )
         {
-            user = authenticateUser( login,password );
+            user = authenticateUser( login, password );
 
-            if(user == null)
+            if ( user == null )
+            {
                 return null;
+            }
         }
 
-        session = sessionManager.startSession(sessionId ,session,  user);
+        session = sessionManager.startSession( sessionId, session, user );
 
         return session;
     }
@@ -317,7 +323,8 @@ public class IdentityManagerImpl implements IdentityManager
             }
             if ( validDate == null )
             {
-                validDate = DateUtils.addMinutes( new Date( System.currentTimeMillis() ), sessionManager.getSessionTimeout() );
+                validDate = DateUtils
+                        .addMinutes( new Date( System.currentTimeMillis() ), sessionManager.getSessionTimeout() );
             }
 
             userToken.setToken( token );
@@ -425,7 +432,7 @@ public class IdentityManagerImpl implements IdentityManager
         {
             user = identityDataService.getUserByUsername( userName );
 
-            if ( user != null )
+            if ( user != null && user.isApproved() )
             {
                 if ( !user.getPassword().equals( password ) || user.getStatus() == UserStatus.Disabled.getId() )
                 {
@@ -440,8 +447,6 @@ public class IdentityManagerImpl implements IdentityManager
 
         return user;
     }
-
-
 
 
     /* *************************************************
@@ -538,12 +543,13 @@ public class IdentityManagerImpl implements IdentityManager
                     }
                     catch ( Exception ex )
                     {
-                        LOGGER.error("**** Error!! Error running privileged action.",ex);
+                        LOGGER.error( "**** Error!! Error running privileged action.", ex );
                     }
                     return null;
                 }
             } );
-        }    }
+        }
+    }
 
 
     /* *************************************************
@@ -607,6 +613,33 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
+    @RolesAllowed( "Identity-Management|A|Write" )
+    @Override
+    public void approveUser( final String userName, final int type )
+    {
+        User user = identityDataService.getUserByUsername( userName );
+        user.setApproved( true );
+        identityDataService.persistUser( user );
+    }
+
+
+    public void signUp( String username, String pwd, String fullName, String email )
+    {
+        if ( Strings.isNullOrEmpty( pwd ) || !validUsername( username ) )
+        {
+            throw new IllegalArgumentException( "Invalid username/password" );
+        }
+        //all users are not approved by default
+        User user = new UserEntity();
+        user.setUserName( username );
+        user.setPassword( pwd );
+        user.setEmail( email );
+        user.setFullName( fullName );
+
+
+    }
+
+
     /* *************************************************
      */
     @RolesAllowed( "Identity-Management|A|Write" )
@@ -626,7 +659,8 @@ public class IdentityManagerImpl implements IdentityManager
 
             if ( Strings.isNullOrEmpty( password ) )
             {
-                password = Integer.toString( ( new Random() ).nextInt() );
+                //password = Integer.toString( ( new Random() ).nextInt() );
+                throw new IllegalArgumentException( "Invalid password" );
             }
 
             user.setUserName( userName );
@@ -662,7 +696,6 @@ public class IdentityManagerImpl implements IdentityManager
     {
         identityDataService.assignUserRole( userId, role );
     }
-
 
 
     /* *************************************************
@@ -970,7 +1003,7 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    @RolesAllowed( {"Identity-Management|A|Write", "Identity-Management|A|Update" } )
+    @RolesAllowed( { "Identity-Management|A|Write", "Identity-Management|A|Update" } )
     @Override
     public void updateUserToken( String oldName, User user, String token, String secret, String issuer, int tokenType,
                                  Date validDate )
@@ -982,7 +1015,8 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    @RolesAllowed( { "Identity-Management|A|Write", "Identity-Management|A|Delete"
+    @RolesAllowed( {
+            "Identity-Management|A|Write", "Identity-Management|A|Delete"
     } )
     @Override
     public void removeUserToken( String tokenId )
@@ -1028,5 +1062,17 @@ public class IdentityManagerImpl implements IdentityManager
     public void setSecurityManager( final SecurityManager securityManager )
     {
         this.securityManager = securityManager;
+    }
+
+
+    private boolean validUsername( String username )
+    {
+        if ( username.length() == 0 || username.isEmpty() || username.equalsIgnoreCase( "token" ) )
+        {
+            return false;
+        }
+        User user = identityDataService.getUserByUsername( username );
+
+        return user == null;
     }
 }

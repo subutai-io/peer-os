@@ -51,4 +51,8 @@ public interface User
 
     String getTypeName();
 
+    boolean isApproved();
+
+    void setApproved(boolean active);
+
 }

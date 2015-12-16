@@ -105,6 +105,11 @@ public interface IdentityManager
     /* *************************************************
      *
      */
+    void approveUser(String userName, int type);
+
+    /* *************************************************
+     *
+     */
     User createUser( String userName, String password, String fullName, String email, int type );
 
 
