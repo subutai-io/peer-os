@@ -1,30 +1,31 @@
 package io.subutai.core.kurjun.rest.template;
 
 
-import ai.subut.kurjun.metadata.common.subutai.DefaultTemplate;
-import ai.subut.kurjun.model.metadata.Architecture;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.FileUtils;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
-import org.apache.geronimo.mail.util.Hex;
 
-import io.subutai.core.kurjun.api.TemplateManager;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import ai.subut.kurjun.metadata.common.subutai.DefaultTemplate;
+import ai.subut.kurjun.model.metadata.Architecture;
 import io.subutai.common.protocol.TemplateKurjun;
+import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.kurjun.rest.RestManagerBase;
-import java.util.List;
-import java.util.stream.Collectors;
 
 
 public class RestTemplateManagerImpl extends RestManagerBase implements RestTemplateManager
@@ -44,7 +45,8 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
 
 
     @Override
-    public Response getTemplate( String repository, String md5, String name, String version, String type, boolean isKurjunClient )
+    public Response getTemplate( String repository, String md5, String name, String version, String type,
+                                 boolean isKurjunClient )
     {
         try
         {
@@ -56,9 +58,8 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
                 if ( template != null && is != null )
                 {
                     return Response.ok( is )
-                            .header( "Content-Disposition", "attachment; filename=" + makeFilename( template ) )
-                            .header( "Content-Type", "application/octet-stream" )
-                            .build();
+                                   .header( "Content-Disposition", "attachment; filename=" + makeFilename( template ) )
+                                   .header( "Content-Type", "application/octet-stream" ).build();
                 }
             }
             else
@@ -82,7 +83,8 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
 
 
     @Override
-    public Response getTemplateInfo( String repository, String md5, String name, String version, boolean isKurjunClient )
+    public Response getTemplateInfo( String repository, String md5, String name, String version,
+                                     boolean isKurjunClient )
     {
         try
         {
@@ -121,7 +123,8 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
             List<TemplateKurjun> list = templateManager.list( repository, isKurjunClient );
             if ( list != null )
             {
-                List<DefaultTemplate> deflist = list.stream().map( t -> convertToDefaultTemplate( t ) ).collect( Collectors.toList() );
+                List<DefaultTemplate> deflist =
+                        list.stream().map( t -> convertToDefaultTemplate( t ) ).collect( Collectors.toList() );
                 return Response.ok( GSON.toJson( deflist ) ).build();
             }
         }
@@ -149,7 +152,7 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
                 byte[] md5 = templateManager.upload( repository, is );
                 if ( md5 != null )
                 {
-                    return Response.ok( Hex.encode( md5 ) ).build();
+                    return Response.ok( Hex.encodeHexString( md5 ) ).build();
                 }
                 else
                 {
@@ -201,7 +204,7 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
         DefaultTemplate defaultTemplate = new DefaultTemplate();
         defaultTemplate.setName( template.getName() );
         defaultTemplate.setVersion( template.getVersion() );
-        defaultTemplate.setMd5Sum( Hex.decode( template.getMd5Sum() ) );
+        defaultTemplate.setMd5Sum( decodeMd5( template.getMd5Sum() ) );
         defaultTemplate.setArchitecture( Architecture.getByValue( template.getArchitecture() ) );
         defaultTemplate.setParent( template.getParent() );
         defaultTemplate.setPackage( template.getPackageName() );
@@ -220,5 +223,4 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
     {
         return LOGGER;
     }
-
 }

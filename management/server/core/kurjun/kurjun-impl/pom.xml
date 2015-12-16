@@ -96,7 +96,7 @@
             <Import-Package>
               io.subutai.*, org.apache.commons.codec*, org.apache.commons.logging*,
               org.apache.commons.io, org.apache.commons.lang*, com.google.common*,
-              com.google.gson*, org.slf4j, org.apache.cxf.*, javax.ws.rs*, !*
+              com.google.gson*, org.slf4j, org.apache.cxf.*, javax.ws.*, !*
             </Import-Package>
 
           </instructions>
