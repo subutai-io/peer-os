@@ -2,7 +2,14 @@ package io.subutai.core.identity.api.dao;
 
 
 import java.util.List;
-import io.subutai.core.identity.api.model.*;
+
+import io.subutai.core.identity.api.model.Permission;
+import io.subutai.core.identity.api.model.Relation;
+import io.subutai.core.identity.api.model.RelationLink;
+import io.subutai.core.identity.api.model.Role;
+import io.subutai.core.identity.api.model.Session;
+import io.subutai.core.identity.api.model.User;
+import io.subutai.core.identity.api.model.UserToken;
 
 
 /**
@@ -225,4 +232,23 @@ public interface IdentityDataService
      *
      */
     void invalidateSessions();
+
+
+    RelationLink getRelationLink( String uniqueIdentifier, String classPath );
+
+
+    Relation getRelationBySourceObject( RelationLink source, RelationLink object );
+
+    Relation getRelationBySourceTargetObject( RelationLink source, RelationLink target, RelationLink object );
+
+    void persistRelation( Relation relation );
+
+
+    List<Relation> relationsByTarget( final RelationLink target );
+
+
+    List<Relation> relationsByObject( final RelationLink object );
+
+
+    List<Relation> relationsBySource( final RelationLink source );
 }

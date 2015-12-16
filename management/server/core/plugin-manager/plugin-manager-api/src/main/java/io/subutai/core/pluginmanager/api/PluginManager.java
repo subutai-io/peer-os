@@ -5,35 +5,43 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import io.subutai.common.datatypes.RelationCondition;
+import io.subutai.common.datatypes.RelationDeclaration;
 
 
 public interface PluginManager
 {
-    public UUID installPlugin( String pluginName );
+    UUID installPlugin( String pluginName );
 
-    public UUID removePlugin( String pluginName );
+    UUID removePlugin( String pluginName );
 
-    public UUID upgradePlugin( String pluginName );
+    UUID upgradePlugin( String pluginName );
 
-    public Set<PluginInfo> getInstalledPlugins();
+    Set<PluginInfo> getInstalledPlugins();
 
-    public Set<PluginInfo> getAvailablePlugins();
+    Set<PluginInfo> getAvailablePlugins();
 
-    public Set<String> getAvailablePluginNames();
+    PluginInfo getPluginInfo( String pluginName, @RelationDeclaration( conditions = {
+            @RelationCondition( propertyKey = "scope", propertyValue = "admin", condition = "is" ),
+            @RelationCondition( propertyKey = "permission", propertyValue = "read", condition = "has" ),
+            @RelationCondition( propertyKey = "permission", propertyValue = "write", condition = "has" )
+    } ) String version );
 
-    public List<String> getAvaileblePluginVersions();
+    Set<String> getAvailablePluginNames();
 
-    public List<String> getInstalledPluginVersions();
+    List<String> getAvaileblePluginVersions();
 
-    public Set<String> getInstalledPluginNames();
+    List<String> getInstalledPluginVersions();
 
-    public String getPluginVersion( String pluginName );
+    Set<String> getInstalledPluginNames();
 
-    public boolean isUpgradeAvailable( String pluginName );
+    String getPluginVersion( String pluginName );
 
-    public String getProductKey();
+    boolean isUpgradeAvailable( String pluginName );
 
-    public boolean isInstalled( String p );
+    String getProductKey();
 
-    public boolean operationSuccessful( OperationType operationType);
+    boolean isInstalled( String p );
+
+    boolean operationSuccessful( OperationType operationType );
 }

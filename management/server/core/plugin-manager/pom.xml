@@ -17,6 +17,7 @@
   <modules>
     <module>plugin-manager-api</module>
     <module>plugin-manager-impl</module>
+    <module>plugin-manager-cli</module>
   </modules>
 
 </project>

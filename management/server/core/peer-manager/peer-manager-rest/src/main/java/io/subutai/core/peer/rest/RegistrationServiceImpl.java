@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.RegistrationData;
 import io.subutai.core.peer.api.PeerManager;
 
@@ -29,27 +30,44 @@ public class RegistrationServiceImpl implements RegistrationService
 
 
     @Override
-    public RegistrationData processRegistrationRequest( final RegistrationData registrationData )
+    public Response getPeerInfo()
     {
-        try
+        PeerInfo r = peerManager.getLocalPeer().getPeerInfo();
+
+        if ( r == null )
         {
-            return peerManager.processRegistrationRequest( registrationData );
+            return Response.serverError().entity( "Peer info not available." ).build();
         }
-        catch ( PeerException e )
+        else
         {
-            LOG.error( e.getMessage(), e );
-            Response response = Response.serverError().entity( e.getMessage() ).build();
-            throw new WebApplicationException( response );
+            return Response.ok( r ).build();
         }
     }
 
 
     @Override
-    public void processCancelRequest( final RegistrationData registrationData )
+    public Response processRegistrationRequest( final RegistrationData registrationData )
+    {
+        try
+        {
+            RegistrationData r = peerManager.processRegistrationRequest( registrationData );
+            return Response.ok( r ).build();
+        }
+        catch ( PeerException e )
+        {
+            LOG.error( e.getMessage(), e );
+            return Response.serverError().entity( e.getMessage() ).build();
+        }
+    }
+
+
+    @Override
+    public Response processCancelRequest( final RegistrationData registrationData )
     {
         try
         {
             peerManager.processCancelRequest( registrationData );
+            return Response.ok().build();
         }
         catch ( PeerException e )
         {
@@ -61,50 +79,49 @@ public class RegistrationServiceImpl implements RegistrationService
 
 
     @Override
-    public void processRejectRequest( final RegistrationData registrationData )
+    public Response processRejectRequest( final RegistrationData registrationData )
     {
         try
         {
             peerManager.processRejectRequest( registrationData );
+            return Response.ok().build();
         }
         catch ( PeerException e )
         {
             LOG.error( e.getMessage(), e );
-            Response response = Response.serverError().entity( e.getMessage() ).build();
-            throw new WebApplicationException( response );
+            return Response.serverError().entity( e.getMessage() ).build();
         }
     }
 
 
     @Override
-    public void processApproveRequest( final RegistrationData registrationData )
+    public Response processApproveRequest( final RegistrationData registrationData )
     {
         try
         {
             peerManager.processApproveRequest( registrationData );
+            return Response.ok().build();
         }
         catch ( PeerException e )
         {
             LOG.error( e.getMessage(), e );
-            Response response = Response.serverError().entity( e.getMessage() ).build();
-            throw new WebApplicationException( response );
+            return Response.serverError().entity( e.getMessage() ).build();
         }
     }
 
 
     @Override
-    public void processUnregisterRequest( final RegistrationData registrationData )
+    public Response processUnregisterRequest( final RegistrationData registrationData )
     {
         try
         {
             peerManager.processUnregisterRequest( registrationData );
+            return Response.ok().build();
         }
         catch ( PeerException e )
         {
             LOG.error( e.getMessage(), e );
-            Response response = Response.serverError().entity( e.getMessage() ).build();
-            throw new WebApplicationException( response );
+            return Response.serverError().entity( e.getMessage() ).build();
         }
     }
-
 }

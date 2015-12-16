@@ -23,6 +23,7 @@ import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.LoginContext;
 
+import org.bouncycastle.openpgp.PGPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +33,7 @@ import com.google.common.base.Strings;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.security.crypto.pgp.KeyPair;
+import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.objects.PermissionOperation;
 import io.subutai.common.security.objects.PermissionScope;
@@ -110,10 +112,14 @@ public class IdentityManagerImpl implements IdentityManager
 
 
             //***Create User ********************************************
-            User internal = createUser( "internal", "internal", "System User", "internal@subutai.io", 1 );
-            User admin = createUser( "admin", "secret", "Administrator", "admin@subutai.io", 2 );
-            User manager = createUser( "manager", "manager", "Manager", "manager@subutai.io", 2 );
-            User karaf = createUser( "karaf", "karaf", "Karaf Manager", "karaf@subutai.io", 2 );
+            User internal = createUser( "internal", "internal", "System User", "internal@subutai.io", 1,
+                    generateArmoredPublicKey() );
+            User admin =
+                    createUser( "admin", "secret", "Administrator", "admin@subutai.io", 2, generateArmoredPublicKey() );
+            User manager =
+                    createUser( "manager", "manager", "Manager", "manager@subutai.io", 2, generateArmoredPublicKey() );
+            User karaf =
+                    createUser( "karaf", "karaf", "Karaf Manager", "karaf@subutai.io", 2, generateArmoredPublicKey() );
             //***********************************************************
 
             //***Create Token *******************************************
@@ -183,6 +189,22 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
+    private String generateArmoredPublicKey()
+    {
+        String keyId = UUID.randomUUID().toString();
+        KeyPair kPair = securityManager.getKeyManager().generateKeyPair( keyId, false );
+        try
+        {
+            return PGPEncryptionUtil.armorByteArrayToString( kPair.getPubKeyring() );
+        }
+        catch ( PGPException e )
+        {
+            return null;
+        }
+    }
+
+
+
     /* *************************************************
      */
     private CallbackHandler getCalbackHandler( final String userName, final String password )
@@ -211,7 +233,6 @@ public class IdentityManagerImpl implements IdentityManager
 
         return callbackHandler;
     }
-
 
     /* *************************************************
      */
@@ -258,7 +279,6 @@ public class IdentityManagerImpl implements IdentityManager
         return sessionManager;
     }
 
-
     /* *************************************************
      */
     @PermitAll
@@ -270,29 +290,23 @@ public class IdentityManagerImpl implements IdentityManager
         User user = null;
 
         //-------------------------------------
-        if ( login.equals( "token" ) )
-        {
+        if(login.equals( "token" ))
             sessionId = password;
-        }
         else
-        {
             sessionId = UUID.randomUUID() + "-" + System.currentTimeMillis();
-        }
         //-------------------------------------
 
         session = sessionManager.getValidSession( sessionId );
 
-        if ( session == null )
+        if(session == null)
         {
-            user = authenticateUser( login, password );
+            user = authenticateUser( login,password );
 
-            if ( user == null )
-            {
+            if(user == null)
                 return null;
-            }
         }
 
-        session = sessionManager.startSession( sessionId, session, user );
+        session = sessionManager.startSession(sessionId ,session,  user);
 
         return session;
     }
@@ -300,7 +314,7 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    @RolesAllowed( "Identity-Management|A|Write" )
+    @RolesAllowed( "Identity-Management|Write" )
     @Override
     public UserToken createUserToken( User user, String token, String secret, String issuer, int tokenType,
                                       Date validDate )
@@ -323,8 +337,7 @@ public class IdentityManagerImpl implements IdentityManager
             }
             if ( validDate == null )
             {
-                validDate = DateUtils
-                        .addMinutes( new Date( System.currentTimeMillis() ), sessionManager.getSessionTimeout() );
+                validDate = DateUtils.addMinutes( new Date( System.currentTimeMillis() ), sessionManager.getSessionTimeout() );
             }
 
             userToken.setToken( token );
@@ -449,6 +462,8 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
+
+
     /* *************************************************
      */
     @PermitAll
@@ -458,6 +473,16 @@ public class IdentityManagerImpl implements IdentityManager
         List<User> result = new ArrayList<>();
         result.addAll( identityDataService.getAllUsers() );
         return result;
+    }
+
+
+    /* *************************************************
+     */
+    @RolesAllowed( "Identity-Management|Write" )
+    @Override
+    public void assignUserRole( long userId, Role role )
+    {
+        identityDataService.assignUserRole( userId, role );
     }
 
 
@@ -586,7 +611,7 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    @RolesAllowed( "Identity-Management|A|Write" )
+    @RolesAllowed( "Identity-Management|Write" )
     @Override
     public User createTempUser( String userName, String password, String fullName, String email, int type )
     {
@@ -648,9 +673,10 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    @RolesAllowed( "Identity-Management|A|Write" )
+    @RolesAllowed( "Identity-Management|Write" )
     @Override
-    public User createUser( String userName, String password, String fullName, String email, int type )
+    public User createUser( String userName, String password, String fullName, String email, int type,
+                            final String publicKey )
     {
         User user = new UserEntity();
 
@@ -675,6 +701,20 @@ public class IdentityManagerImpl implements IdentityManager
             user.setFullName( fullName );
             user.setType( type );
 
+            //** Create Key*****************************
+            // TODO check if keyId set for KeyPair is used somewhere in system
+            String keyId = UUID.randomUUID().toString();
+            //            KeyPair kPair = securityManager.getKeyManager().generateKeyPair( keyId, false );
+            //            securityManager.getKeyManager().saveKeyPair( keyId, SecurityKeyType.UserKey.getId(), kPair );
+            if ( !Strings.isNullOrEmpty( publicKey ) )
+            {
+                securityManager.getKeyManager().savePublicKeyRing( keyId, SecurityKeyType.UserKey.getId(), publicKey );
+                user.setFingerprint( securityManager.getKeyManager().getFingerprint( keyId ) );
+            }
+            //******************************************
+
+            user.setSecurityKeyId( keyId );
+
             identityDataService.persistUser( user );
         }
         catch ( Exception ex )
@@ -688,17 +728,7 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    @RolesAllowed( "Identity-Management|A|Write" )
-    @Override
-    public void assignUserRole( long userId, Role role )
-    {
-        identityDataService.assignUserRole( userId, role );
-    }
-
-
-    /* *************************************************
-     */
-    @RolesAllowed( "Identity-Management|A|Delete" )
+    @RolesAllowed( "Identity-Management|Delete" )
     @Override
     public void removeUserRole( long userId, Role role )
     {
@@ -737,7 +767,7 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    @RolesAllowed( "Identity-Management|A|Update" )
+    @RolesAllowed( "Identity-Management|Update" )
     @Override
     public void updateUser( User user )
     {
@@ -754,7 +784,7 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    @RolesAllowed( "Identity-Management|A|Delete" )
+    @RolesAllowed( "Identity-Management|Delete" )
     @Override
     public void removeUser( long userId )
     {
@@ -808,7 +838,7 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    @RolesAllowed( "Identity-Management|A|Write" )
+    @RolesAllowed( "Identity-Management|Write" )
     @Override
     public Role createRole( String roleName, int roleType )
     {
@@ -820,6 +850,10 @@ public class IdentityManagerImpl implements IdentityManager
 
         return role;
     }
+
+
+
+
 
 
     /* *************************************************
@@ -844,7 +878,7 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    @RolesAllowed( "Identity-Management|A|Update" )
+    @RolesAllowed( "Identity-Management|Update" )
     @Override
     public void updateRole( Role role )
     {
@@ -861,7 +895,7 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    @RolesAllowed( "Identity-Management|A|Delete" )
+    @RolesAllowed( "Identity-Management|Delete" )
     @Override
     public void removeRole( long roleId )
     {
@@ -880,7 +914,7 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    @RolesAllowed( "Identity-Management|A|Write" )
+    @RolesAllowed( "Identity-Management|Write" )
     @Override
     public Permission createPermission( int objectId, int scope, boolean read, boolean write, boolean update,
                                         boolean delete )
@@ -901,7 +935,7 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    @RolesAllowed( "Identity-Management|A|Write" )
+    @RolesAllowed( "Identity-Management|Write" )
     @Override
     public void assignRolePermission( long roleId, Permission permission )
     {
@@ -911,7 +945,7 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    @RolesAllowed( "Identity-Management|A|Write" )
+    @RolesAllowed( "Identity-Management|Write" )
     @Override
     public void removeAllRolePermissions( long roleId )
     {
@@ -921,7 +955,7 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    @RolesAllowed( "Identity-Management|A|Delete" )
+    @RolesAllowed( "Identity-Management|Delete" )
     @Override
     public void removePermission( long permissionId )
     {
@@ -931,7 +965,7 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    @RolesAllowed( "Identity-Management|A|Delete" )
+    @RolesAllowed( "Identity-Management|Delete" )
     @Override
     public void removeRolePermission( long roleId, Permission permission )
     {
@@ -951,7 +985,7 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    @RolesAllowed( "Identity-Management|A|Update" )
+    @RolesAllowed( "Identity-Management|Update" )
     @Override
     public void updatePermission( Permission permission )
     {
@@ -1001,7 +1035,7 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    @RolesAllowed( { "Identity-Management|A|Write", "Identity-Management|A|Update" } )
+    @RolesAllowed( { "Identity-Management|Write", "Identity-Management|Update" } )
     @Override
     public void updateUserToken( String oldName, User user, String token, String secret, String issuer, int tokenType,
                                  Date validDate )
@@ -1013,14 +1047,13 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    @RolesAllowed( {
-            "Identity-Management|A|Write", "Identity-Management|A|Delete"
-    } )
+    @RolesAllowed( { "Identity-Management|Write", "Identity-Management|Delete" } )
     @Override
     public void removeUserToken( String tokenId )
     {
         identityDataService.removeUserToken( tokenId );
     }
+
 
 
     /* *************************************************

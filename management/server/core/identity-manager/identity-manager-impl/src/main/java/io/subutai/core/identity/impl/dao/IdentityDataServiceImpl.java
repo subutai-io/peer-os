@@ -3,13 +3,21 @@ package io.subutai.core.identity.impl.dao;
 
 import java.util.List;
 
-import io.subutai.core.identity.api.model.*;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Lists;
+
 import io.subutai.common.dao.DaoManager;
 import io.subutai.core.identity.api.dao.IdentityDataService;
+import io.subutai.core.identity.api.model.Permission;
+import io.subutai.core.identity.api.model.Relation;
+import io.subutai.core.identity.api.model.RelationLink;
+import io.subutai.core.identity.api.model.Role;
+import io.subutai.core.identity.api.model.Session;
+import io.subutai.core.identity.api.model.User;
+import io.subutai.core.identity.api.model.UserToken;
+import io.subutai.core.identity.impl.model.RelationLinkImpl;
 
 
 /**
@@ -25,6 +33,7 @@ public class IdentityDataServiceImpl implements IdentityDataService
     private SessionDAO sessionDAOService = null;
     private PermissionDAO permissionDAOService = null;
     private UserTokenDAO userTokenDAOService = null;
+    private RelationDAO relationDAO = null;
 
 
     /* *************************************************
@@ -41,6 +50,7 @@ public class IdentityDataServiceImpl implements IdentityDataService
             sessionDAOService = new SessionDAO( daoManager );
             permissionDAOService = new PermissionDAO( daoManager );
             userTokenDAOService = new UserTokenDAO( daoManager );
+            relationDAO = new RelationDAO( daoManager );
         }
         else
         {
@@ -185,6 +195,7 @@ public class IdentityDataServiceImpl implements IdentityDataService
         role.getPermissions().add( permission );
         roleDAOService.update( role );
     }
+
 
     /* *************************************************
      *
@@ -424,4 +435,87 @@ public class IdentityDataServiceImpl implements IdentityDataService
         userTokenDAOService.removeInvalid();
     }
 
+
+    @Override
+    public RelationLink getRelationLink( final String uniqueIdentifier, final String classPath )
+    {
+        return relationDAO.findRelationLink( uniqueIdentifier, classPath );
+    }
+
+
+    @Override
+    public Relation getRelationBySourceObject( final RelationLink source, final RelationLink object )
+    {
+        if ( ( source instanceof RelationLinkImpl ) && ( object instanceof RelationLinkImpl ) )
+        {
+            return relationDAO.findBySourceAndObject( ( RelationLinkImpl ) source, ( RelationLinkImpl ) object );
+        }
+        return null;
+    }
+
+
+    @Override
+    public Relation getRelationBySourceTargetObject( final RelationLink source, final RelationLink target,
+                                                     final RelationLink object )
+    {
+        if ( ( source instanceof RelationLinkImpl ) && ( object instanceof RelationLinkImpl )
+                && ( target instanceof RelationLinkImpl ) )
+        {
+            return relationDAO.findBySourceTargetObject( ( RelationLinkImpl ) source, ( RelationLinkImpl ) target,
+                    ( RelationLinkImpl ) object );
+        }
+        return null;
+    }
+
+
+    @Override
+    public void persistRelation( final Relation relation )
+    {
+        relationDAO.update( relation.getSource() );
+        relationDAO.update( relation.getTarget() );
+        relationDAO.update( relation.getTrustedObject() );
+        relationDAO.update( relation );
+    }
+
+
+    @Override
+    public List<Relation> relationsByTarget( final RelationLink target )
+    {
+        if ( target instanceof RelationLinkImpl )
+        {
+            return relationDAO.findByTarget( ( RelationLinkImpl ) target );
+        }
+        else
+        {
+            return Lists.newArrayList();
+        }
+    }
+
+
+    @Override
+    public List<Relation> relationsByObject( final RelationLink object )
+    {
+        if ( object instanceof RelationLinkImpl )
+        {
+            return relationDAO.findByObject( ( RelationLinkImpl ) object );
+        }
+        else
+        {
+            return Lists.newArrayList();
+        }
+    }
+
+
+    @Override
+    public List<Relation> relationsBySource( final RelationLink source )
+    {
+        if ( source instanceof RelationLinkImpl )
+        {
+            return relationDAO.findBySource( ( RelationLinkImpl ) source );
+        }
+        else
+        {
+            return Lists.newArrayList();
+        }
+    }
 }

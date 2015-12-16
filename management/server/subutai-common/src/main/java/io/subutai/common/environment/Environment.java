@@ -4,6 +4,7 @@ package io.subutai.common.environment;
 import java.util.Map;
 import java.util.Set;
 
+import io.subutai.common.peer.EnvironmentAlertHandler;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Peer;
@@ -35,6 +36,9 @@ public interface Environment
      * @return @{code EnvironmentStatus}
      */
     EnvironmentStatus getStatus();
+
+
+    String getRelationDeclaration();
 
     /**
      * Returns creation timestamp
@@ -142,4 +146,10 @@ public interface Environment
     String getTunnelCommunityName();
 
     EnvironmentId getEnvironmentId();
+
+    Set<EnvironmentAlertHandler> getAlertHandlers();
+
+    void addAlertHandler( EnvironmentAlertHandler environmentAlertHandler );
+
+    void removeAlertHandler( EnvironmentAlertHandler environmentAlertHandler );
 }

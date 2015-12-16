@@ -1,14 +1,11 @@
 package io.subutai.core.environment.impl.workflow.creation.steps;
 
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
 import org.bouncycastle.openpgp.PGPException;
-import org.bouncycastle.openpgp.PGPPublicKey;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
-import org.bouncycastle.openpgp.PGPSecretKey;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
 
 import com.google.common.collect.Maps;
@@ -27,7 +24,6 @@ import io.subutai.common.security.objects.KeyTrustLevel;
 import io.subutai.common.security.objects.SecurityKeyType;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.security.api.SecurityManager;
-import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
 
 
@@ -87,7 +83,7 @@ public class PEKGenerationStep
     public Map<Peer, String> execute() throws PeerException
     {
         PGPSecretKeyRing envSecKeyRing =
-                createEnvironmentKeyPair( environment.getEnvironmentId(), user.getSecurityKeyId() );
+                securityManager.getKeyManager().getSecretKeyRing( environment.getEnvironmentId().getId() );
 
         Set<Peer> peers = Sets.newHashSet( topology.getAllPeers() );
         peers.add( localPeer );
@@ -103,8 +99,8 @@ public class PEKGenerationStep
 
                 PGPPublicKeyRing pubRing = PGPKeyUtil.readPublicKeyRing( publicKeyContainer.getKey() );
 
-                PGPPublicKeyRing signedPEK =
-                        securityManager.getKeyManager().setKeyTrust( envSecKeyRing, pubRing, KeyTrustLevel.Full.getId() );
+                PGPPublicKeyRing signedPEK = securityManager.getKeyManager().setKeyTrust( envSecKeyRing, pubRing,
+                        KeyTrustLevel.Full.getId() );
 
                 peer.updatePeerEnvironmentPubKey( environment.getEnvironmentId(), signedPEK );
             }

@@ -25,14 +25,14 @@ public interface EncryptionTool
     /**
      * Decrypts message with Private Key found by HostId
      */
-    public byte[] decrypt( final byte[] message,String secretKeyHostId, String pwd) throws PGPException;
+    public byte[] decrypt( final byte[] message, String secretKeyHostId, String pwd ) throws PGPException;
 
 
     /* *****************************************
      *
      */
-    public byte[] decryptAndVerify( final byte[] message,PGPSecretKey secretKey, String pwd ,PGPPublicKey pubKey) throws PGPException;
-
+    public byte[] decryptAndVerify( final byte[] message, PGPSecretKey secretKey, String pwd, PGPPublicKey pubKey )
+            throws PGPException;
 
 
     /* *****************************************
@@ -44,7 +44,7 @@ public interface EncryptionTool
     /* *****************************************
      *
      */
-    PGPPublicKeyRing removeSignature( String id, PGPPublicKeyRing keyToRemoveFrom);
+    PGPPublicKeyRing removeSignature( String id, PGPPublicKeyRing keyToRemoveFrom );
 
 
     /* *****************************************
@@ -56,13 +56,14 @@ public interface EncryptionTool
     /* *****************************************
      *
      */
-    public byte[] decryptAndVerify( final byte[] message,String secretKeyHostId, String pwd ,String publicKeyHostId) throws PGPException;
+    public byte[] decryptAndVerify( final byte[] message, String secretKeyHostId, String pwd, String publicKeyHostId )
+            throws PGPException;
 
 
     /* **********************************************
      *
      */
-    public byte[] decrypt( final byte[] message, PGPSecretKeyRing keyRing , String pwd) throws PGPException;
+    public byte[] decrypt( final byte[] message, PGPSecretKeyRing keyRing, String pwd ) throws PGPException;
 
 
     /* *****************************************
@@ -103,15 +104,34 @@ public interface EncryptionTool
      * @param publicKey - encryption key
      * @param armored - output in armored format
      */
-    public byte[] signAndEncrypt( final byte[] message,PGPSecretKey secretKey,String secretPwd, final PGPPublicKey publicKey, final boolean armored )
+    public byte[] signAndEncrypt( final byte[] message, PGPSecretKey secretKey, String secretPwd,
+                                  final PGPPublicKey publicKey, final boolean armored ) throws PGPException;
+
+
+    /* *********************************************************************
+     *
+     */
+    public byte[] signAndEncrypt( final byte[] message, String secretKeyHostId, String secretPwd,
+                                  final String publicKeyHostId, final boolean armored ) throws PGPException;
+
+
+    /* *********************************************************************
+     *
+     */
+    byte[] clearSign( final byte[] message, PGPSecretKey secretKey, String secretPwd )
             throws PGPException;
 
 
     /* *********************************************************************
      *
      */
-    public byte[] signAndEncrypt( final byte[] message,String secretKeyHostId, String secretPwd, final String publicKeyHostId, final boolean armored )
-            throws PGPException;
+    boolean verifyClearSign( final byte[] message, PGPPublicKeyRing pgpRings ) throws PGPException;
+
+
+    /* *********************************************************************
+     *
+     */
+    byte[] extractClearSignContent( final byte[] signedMessage ) throws PGPException;
 
 
     /**
@@ -122,7 +142,6 @@ public interface EncryptionTool
      * @return - {@code ContentAndSignatures}
      */
     public ContentAndSignatures decryptAndReturnSignatures( final byte[] encryptedMessage ) throws PGPException;
-
 
 
     /**
@@ -141,13 +160,9 @@ public interface EncryptionTool
     /**
      * Generated keypair
      *
-     * @param userId
-     * @param secretPwd
-     * @param armored
-     *
      * @return - KeyPair
      */
-    public KeyPair generateKeyPair ( String userId,String secretPwd, boolean armored );
+    public KeyPair generateKeyPair( String userId, String secretPwd, boolean armored );
 
 
     /**
@@ -161,7 +176,8 @@ public interface EncryptionTool
      * @return a public key ring with the signed public key
      */
 
-    public PGPPublicKeyRing signPublicKey( PGPPublicKeyRing publicKeyRing, String id, PGPSecretKey secretKey,String secretKeyPassword );
+    public PGPPublicKeyRing signPublicKey( PGPPublicKeyRing publicKeyRing, String id, PGPSecretKey secretKey,
+                                           String secretKeyPassword );
 
 
     /**
@@ -177,5 +193,4 @@ public interface EncryptionTool
 
 
     public String armorByteArrayToString( byte[] array ) throws PGPException;
-
 }

@@ -1,6 +1,7 @@
 package io.subutai.core.broker.impl;
 
 
+import java.io.File;
 import java.io.PrintStream;
 import java.util.concurrent.ExecutorService;
 
@@ -59,6 +60,7 @@ public class BrokerImplTest
     private static final String TOPIC = "topic";
     private static final String TEXT_MESSAGE = "message";
     private static final byte[] BYTE_MESSAGE = { 0 };
+    private static final String APP_DATA_PATH = "/var/lib/subutai";
     @Mock
     MessageRoutingListener messageRouter;
 
@@ -102,6 +104,8 @@ public class BrokerImplTest
     TimeStampingBrokerPlugin timeStampingBrokerPlugin;
     @Mock
     ExecutorService messageSender;
+    @Mock
+    File mockDbFile;
 
     BrokerImpl broker;
 
@@ -193,6 +197,7 @@ public class BrokerImplTest
     @Test
     public void testInit() throws Exception
     {
+        doReturn( mockDbFile ).when( broker ).getBrokerDbPath();
         broker.init();
     }
 

@@ -50,7 +50,7 @@ public abstract class AbstractSubutaiHost implements Host
     private HostArchitecture hostArchitecture;
 
     @Transient
-    protected HostInterfaces hostInterfaces /*= new CopyOnWriteArraySet<>()*/;
+    protected HostInterfaces hostInterfaces = new HostInterfaces();
 
     @Transient
     protected volatile long lastHeartbeat = 0;
@@ -156,11 +156,6 @@ public abstract class AbstractSubutaiHost implements Host
     {
         this.lastHeartbeat = System.currentTimeMillis();
         this.hostInterfaces = hostInfo.getHostInterfaces();
-        //        // add interfaces
-        //        for ( HostInterface intf : hostInfo.getHostInterfaces() )
-        //        {
-        //            hostInterfaces.add( new HostInterfaceModel( intf ) );
-        //        }
         return false;
     }
 

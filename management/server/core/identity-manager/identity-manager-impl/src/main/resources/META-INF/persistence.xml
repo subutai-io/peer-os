@@ -11,6 +11,9 @@
     <class>io.subutai.core.identity.impl.model.SessionEntity</class>
     <class>io.subutai.core.identity.impl.model.UserTokenEntity</class>
     <class>io.subutai.core.identity.impl.model.PermissionEntity</class>
+    <class>io.subutai.core.identity.impl.model.RelationLinkImpl</class>
+    <class>io.subutai.core.identity.impl.model.RelationImpl</class>
+    <class>io.subutai.core.identity.impl.model.RelationInfoImpl</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
       <!--<property name="openjpa.Log" value="DefaultLevel=WARN, Runtime=INFO, Tool=INFO, SQL=INFO" /> -->

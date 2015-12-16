@@ -171,12 +171,17 @@ public class TemplateManagerImpl implements TemplateManager
 
 
     @Override
-    public Set<URL> getRemoteRepoUrls()
+    public List<URL> getRemoteRepoUrls()
     {
-        Set<URL> urls = new HashSet<>();
+        List<URL> urls = new ArrayList<>();
         try
         {
             for ( RepoUrl r : repoUrlStore.getRemoteTemplateUrls() )
+            {
+                urls.add( r.getUrl() );
+            }
+            
+            for ( RepoUrl r : repoUrlStore.getGlobalTemplateUrls() )
             {
                 urls.add( r.getUrl() );
             }

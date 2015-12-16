@@ -41,7 +41,7 @@ import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
-import io.subutai.common.peer.AlertPack;
+import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
@@ -86,7 +86,6 @@ public class RemotePeerImpl implements RemotePeer
 {
     private static final Logger LOG = LoggerFactory.getLogger( RemotePeerImpl.class );
 
-    private final LocalPeer localPeer;
     private SecurityManager securityManager;
     protected final PeerInfo peerInfo;
     protected final Messenger messenger;
@@ -96,13 +95,14 @@ public class RemotePeerImpl implements RemotePeer
     protected JsonUtil jsonUtil = new JsonUtil();
     private String baseUrl;
     Object provider;
+    private String localPeerId;
 
 
-    public RemotePeerImpl( LocalPeer localPeer, SecurityManager securityManager, final PeerInfo peerInfo,
+    public RemotePeerImpl( String localPeerId, SecurityManager securityManager, final PeerInfo peerInfo,
                            final Messenger messenger, CommandResponseListener commandResponseListener,
                            MessageResponseListener messageResponseListener, Object provider )
     {
-        this.localPeer = localPeer;
+        this.localPeerId = localPeerId;
         this.securityManager = securityManager;
         this.peerInfo = peerInfo;
         this.messenger = messenger;
@@ -261,7 +261,7 @@ public class RemotePeerImpl implements RemotePeer
     //********** ENVIRONMENT SPECIFIC REST *************************************
 
 
-    @RolesAllowed( "Environment-Management|A|Update" )
+    @RolesAllowed( "Environment-Management|Update" )
     @Override
     public void startContainer( final ContainerId containerId ) throws PeerException
     {
@@ -279,7 +279,7 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Update" )
+    @RolesAllowed( "Environment-Management|Update" )
     @Override
     public void stopContainer( final ContainerId containerId ) throws PeerException
     {
@@ -297,7 +297,7 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Delete" )
+    @RolesAllowed( "Environment-Management|Delete" )
     @Override
     public void destroyContainer( final ContainerId containerId ) throws PeerException
     {
@@ -347,7 +347,7 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Delete" )
+    @RolesAllowed( "Environment-Management|Delete" )
     @Override
     public void cleanupEnvironmentNetworkSettings( final EnvironmentId environmentId ) throws PeerException
     {
@@ -357,7 +357,7 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Delete" )
+    @RolesAllowed( "Environment-Management|Delete" )
     @Override
     public boolean isConnected( final HostId hostId )
     {
@@ -419,7 +419,7 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Update" )
+    @RolesAllowed( "Environment-Management|Update" )
     @Override
     public void setCpuSet( final ContainerHost containerHost, final Set<Integer> cpuSet ) throws PeerException
     {
@@ -665,8 +665,7 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkArgument( !Strings.isNullOrEmpty( recipient ), "Invalid recipient" );
         Preconditions.checkArgument( requestTimeout > 0, "Invalid request timeout" );
 
-        MessageRequest messageRequest =
-                new MessageRequest( new Payload( request, localPeer.getId() ), recipient, headers );
+        MessageRequest messageRequest = new MessageRequest( new Payload( request, localPeerId ), recipient, headers );
         Message message = messenger.createMessage( messageRequest );
 
         messageRequest.setMessageId( message.getId() );
@@ -684,7 +683,7 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Write" )
+    @RolesAllowed( "Environment-Management|Write" )
     @Override
     public Set<ContainerHostInfoModel> createEnvironmentContainerGroup(
             final CreateEnvironmentContainerGroupRequest request ) throws PeerException
@@ -712,7 +711,7 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Delete" )
+    @RolesAllowed( "Environment-Management|Delete" )
     @Override
     public ContainersDestructionResult destroyContainersByEnvironment( final String environmentId ) throws PeerException
     {
@@ -743,7 +742,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     //networking
-    @RolesAllowed( "Environment-Management|A|Write" )
+    @RolesAllowed( "Environment-Management|Write" )
     @Override
     public int setupTunnels( final Map<String, String> peerIps, final String environmentId ) throws PeerException
     {
@@ -774,7 +773,7 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Write" )
+    @RolesAllowed( "Environment-Management|Write" )
     @Override
     public Vni reserveVni( final Vni vni ) throws PeerException
     {
@@ -786,7 +785,7 @@ public class RemotePeerImpl implements RemotePeer
     //************ END ENVIRONMENT SPECIFIC REST
 
 
-    @RolesAllowed( "Environment-Management|A|Read" )
+    @RolesAllowed( "Environment-Management|Read" )
     @Override
     public Set<Gateway> getGateways() throws PeerException
     {
@@ -886,7 +885,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void alert( final AlertPack alert ) throws PeerException
+    public void alert( final AlertEvent alert ) throws PeerException
     {
         new PeerWebClient( peerInfo.getIp(), provider ).alert( alert );
     }

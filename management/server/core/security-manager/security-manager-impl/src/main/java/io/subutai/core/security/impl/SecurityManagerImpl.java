@@ -216,6 +216,4 @@ public class SecurityManagerImpl implements SecurityManager
     {
         return httpContextManager;
     }
-
-
 }

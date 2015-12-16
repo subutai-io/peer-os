@@ -23,9 +23,11 @@ import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.creation.EnvironmentCreationWorkflow;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
+import io.subutai.core.identity.api.relation.RelationManager;
 import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerManager;
+import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.tracker.api.Tracker;
 
 import static junit.framework.TestCase.assertEquals;
@@ -34,8 +36,6 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
-
-import io.subutai.core.security.api.SecurityManager;
 
 
 @RunWith( MockitoJUnitRunner.class )
@@ -58,6 +58,8 @@ public class EnvironmentManagerTest
     DaoManager daoManager;
     @Mock
     IdentityManager identityManager;
+    @Mock
+    RelationManager relationManager;
     @Mock
     Tracker tracker;
     @Mock
@@ -89,11 +91,11 @@ public class EnvironmentManagerTest
 
         environmentManager =
                 spy( new EnvironmentManagerImpl( templateRegistry, peerManager, securityManager, networkManager,
-                        daoManager, identityManager, tracker ) );
+                        daoManager, identityManager, tracker, relationManager ) );
         doReturn( environment ).when( environmentManager )
-                               .createEmptyEnvironment( anyString(), anyString(), anyString() );
+                               .createEmptyEnvironment( anyString(), anyString(), anyString(), any( Blueprint.class ) );
         //        doReturn( topology ).when( environmentManager ).buildTopology( blueprint );
-        doReturn( new HashSet<>() ).when( environmentManager ).getUsedGateways( ( Peer ) any() );
+        doReturn( new HashSet<>() ).when( environmentManager ).getUsedIps( ( Peer ) any() );
         doReturn( environmentCreationWorkflow ).when( environmentManager )
                                                .getEnvironmentCreationWorkflow( any( EnvironmentImpl.class ),
                                                        any( Topology.class ), anyString(),

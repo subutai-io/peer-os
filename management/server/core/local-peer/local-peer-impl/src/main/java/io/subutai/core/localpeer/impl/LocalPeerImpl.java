@@ -2,15 +2,10 @@ package io.subutai.core.localpeer.impl;
 
 
 import java.io.IOException;
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -63,12 +58,12 @@ import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.NullHostInterface;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.ProcessResourceUsage;
-import io.subutai.common.metric.ResourceAlert;
+import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
-import io.subutai.common.peer.AlertPack;
+import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
@@ -140,11 +135,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 {
     private static final Logger LOG = LoggerFactory.getLogger( LocalPeerImpl.class );
 
-
     public static final String PEER_SUBNET_MASK = "255.255.255.0";
     private static final int N2N_PORT = 5000;
 
-    private String externalIpInterface = "eth1";
+
     private DaoManager daoManager;
     private TemplateManager templateRegistry;
     protected ManagementHostEntity managementHost;
@@ -182,13 +176,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    public void setExternalIpInterface( final String externalIpInterface )
-    {
-        this.externalIpInterface = externalIpInterface;
-    }
-
-
-    public void init()
+    public void init() throws PeerException
     {
         LOG.debug( "********************************************** Initializing peer "
                 + "******************************************" );
@@ -209,17 +197,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             tunnelDataService = createTunnelDataService();
 
             managementHostDataService = createManagementHostDataService();
+
             Collection<ManagementHostEntity> allManagementHostEntity = managementHostDataService.getAll();
             if ( allManagementHostEntity != null && !allManagementHostEntity.isEmpty() )
             {
                 managementHost = allManagementHostEntity.iterator().next();
                 managementHost.setPeer( this );
-                managementHost.init();
-                this.peerInfo = managementHost.getPeerInfo();
-            }
-            else
-            {
-                this.peerInfo = initPeerInfo();
             }
 
             resourceHostDataService = createResourceHostDataService();
@@ -230,16 +213,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
 
             setResourceHostTransientFields( resourceHosts );
-
-            for ( ResourceHost resourceHost : getResourceHosts() )
-            {
-                for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
-                {
-                    LOG.debug( String.format( "%s %s", resourceHost.getHostname(), containerHost.getHostname() ) );
-                }
-            }
-
-            initialized = true;
         }
         catch ( Exception e )
         {
@@ -249,6 +222,15 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         addRequestListener( new CreateEnvironmentContainerGroupRequestListener( this ) );
         //add destroy environment containers requests listener
         addRequestListener( new DestroyEnvironmentContainerGroupRequestListener( this ) );
+
+        initialized = true;
+    }
+
+
+    @Override
+    public void setPeerInfo( final PeerInfo peerInfo )
+    {
+        this.peerInfo = peerInfo;
     }
 
 
@@ -267,39 +249,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     protected TunnelDataService createTunnelDataService()
     {
         return new TunnelDataService( daoManager.getEntityManagerFactory() );
-    }
-
-
-    private PeerInfo initPeerInfo()
-    {
-        peerInfo = new PeerInfo();
-        peerInfo.setId( securityManager.getKeyManager().getPeerId() );
-        peerInfo.setOwnerId( securityManager.getKeyManager().getOwnerId() );
-        setPeerIp();
-        peerInfo.setName( String.format( "Peer %s", peerInfo.getId() ) );
-        return peerInfo;
-    }
-
-
-    private void setPeerIp()
-    {
-        try
-        {
-            Enumeration<InetAddress> addressEnumeration =
-                    NetworkInterface.getByName( externalIpInterface ).getInetAddresses();
-            while ( addressEnumeration.hasMoreElements() )
-            {
-                InetAddress address = addressEnumeration.nextElement();
-                if ( address instanceof Inet4Address )
-                {
-                    peerInfo.setIp( address.getHostAddress() );
-                }
-            }
-        }
-        catch ( SocketException e )
-        {
-            LOG.error( "Error getting network interfaces", e );
-        }
     }
 
 
@@ -381,7 +330,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Write" )
+    @RolesAllowed( "Environment-Management|Write" )
     @Override
     public Set<ContainerHostInfoModel> createEnvironmentContainerGroup(
             final CreateEnvironmentContainerGroupRequest request ) throws PeerException
@@ -462,6 +411,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 //TODO: sign container host key with PEK
                 resourceHost.addContainerHost( containerHostEntity );
 
+                signContainerKeyWithPEK( containerHostEntity.getId(), containerHostEntity.getEnvironmentId() );
+
                 resourceHostDataService.saveOrUpdate( resourceHost );
 
                 quotaManager.setQuota( containerHostEntity.getContainerId(), containerQuota );
@@ -476,6 +427,26 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
 
         return result;
+    }
+
+
+    private void signContainerKeyWithPEK( String containerId, EnvironmentId envId ) throws PeerException
+    {
+        String pairId = String.format( "%s-%s", getId(), envId.getId() );
+        final PGPSecretKeyRing pekSecKeyRing = securityManager.getKeyManager().getSecretKeyRing( pairId );
+        try
+        {
+            PGPPublicKeyRing containerPub = securityManager.getKeyManager().getPublicKeyRing( containerId );
+
+            PGPPublicKeyRing signedKey = securityManager.getKeyManager().setKeyTrust( pekSecKeyRing, containerPub,
+                    KeyTrustLevel.Full.getId() );
+
+            securityManager.getKeyManager().updatePublicKeyRing( signedKey );
+        }
+        catch ( Exception ex )
+        {
+            throw new PeerException( ex );
+        }
     }
 
 
@@ -570,6 +541,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
                 //TODO: sign container host key with PEK
                 resourceHost.addContainerHost( containerHostEntity );
+                signContainerKeyWithPEK( containerHostEntity.getId(), containerHostEntity.getEnvironmentId() );
 
                 resourceHostDataService.saveOrUpdate( resourceHost );
 
@@ -872,7 +844,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Update" )
+    @RolesAllowed( "Environment-Management|Update" )
     @Override
     public void startContainer( final ContainerId containerId ) throws PeerException
     {
@@ -891,7 +863,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Update" )
+    @RolesAllowed( "Environment-Management|Update" )
     @Override
     public void stopContainer( final ContainerId containerId ) throws PeerException
     {
@@ -910,7 +882,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Delete" )
+    @RolesAllowed( "Environment-Management|Delete" )
     @Override
     public void destroyContainer( final ContainerId containerId ) throws PeerException
     {
@@ -934,7 +906,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Delete" )
+    @RolesAllowed( "Environment-Management|Delete" )
     @Override
     public void cleanupEnvironmentNetworkSettings( final EnvironmentId environmentId ) throws PeerException
     {
@@ -950,7 +922,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Delete" )
+    @RolesAllowed( "Environment-Management|Delete" )
     @Override
     public void removePeerEnvironmentKeyPair( final EnvironmentId environmentId ) throws PeerException
     {
@@ -963,7 +935,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Write" )
+    @RolesAllowed( "Environment-Management|Write" )
     @Override
     public void setDefaultGateway( final ContainerGateway gateway ) throws PeerException
     {
@@ -1187,8 +1159,25 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
+    private void initManagementHost( ResourceHostInfo hostInfo )
+    {
+        try
+        {
+            final String peerId = securityManager.getKeyManager().getPeerId();
+            managementHost = new ManagementHostEntity( peerId, hostInfo );
+            managementHost.setPeer( this );
+            managementHostDataService.persist( managementHost );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Could not initialize management host." );
+        }
+        LOG.info( "Management host initialized" );
+    }
+
+
     @Override
-    public void onHeartbeat( final ResourceHostInfo resourceHostInfo, Set<ResourceAlert> alerts )
+    public void onHeartbeat( final ResourceHostInfo resourceHostInfo, Set<QuotaAlertValue> alerts )
     {
         LOG.debug( "On heartbeat: " + resourceHostInfo.getHostname() );
         if ( initialized )
@@ -1197,24 +1186,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             {
                 if ( managementHost == null )
                 {
-                    managementHost = new ManagementHostEntity( getId(), resourceHostInfo );
-                    managementHost.setPeer( this );
-                    try
-                    {
-                        managementHost.init();
-                    }
-                    catch ( Exception e )
-                    {
-                        LOG.error( "Error initializing management host", e );
-                    }
-                    managementHost.setPeerInfo( this.peerInfo );
-                    managementHostDataService.persist( managementHost );
+                    initManagementHost( resourceHostInfo );
                 }
-                else
-                {
-                    managementHost.updateHostInfo( resourceHostInfo );
-                    peerInfo.setIp( managementHost.getIpByInterfaceName( externalIpInterface ) );
-                }
+                managementHost.updateHostInfo( resourceHostInfo );
             }
             else
             {
@@ -1279,7 +1253,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Update" )
+    @RolesAllowed( "Environment-Management|Update" )
     @Override
     public void setCpuSet( final ContainerHost host, final Set<Integer> cpuSet ) throws PeerException
     {
@@ -1297,7 +1271,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Delete" )
+    @RolesAllowed( "Environment-Management|Delete" )
     @Override
     public ContainersDestructionResult destroyContainersByEnvironment( final String environmentId ) throws PeerException
     {
@@ -1329,7 +1303,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Delete" )
+    @RolesAllowed( "Environment-Management|Delete" )
     private Set<ContainerHost> destroyContainerGroup( final Set<ContainerHost> containerHosts,
                                                       final Set<Throwable> errors )
     {
@@ -1374,7 +1348,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Write" )
+    @RolesAllowed( "Environment-Management|Write" )
     @Override
     public Vni reserveVni( final Vni vni ) throws PeerException
     {
@@ -1391,7 +1365,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Write" )
+    @RolesAllowed( "Environment-Management|Write" )
     @Override
     public int setupTunnels( final Map<String, String> peerIps, final String environmentId ) throws PeerException
     {
@@ -1420,7 +1394,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Delete" )
+    @RolesAllowed( "Environment-Management|Delete" )
     @Override
     public void removeVniDomain( final Long vni ) throws PeerException
     {
@@ -1438,7 +1412,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Update" )
+    @RolesAllowed( "Environment-Management|Update" )
     @Override
     public void setVniDomain( final Long vni, final String domain,
                               final DomainLoadBalanceStrategy domainLoadBalanceStrategy, final String sslCertPath )
@@ -1475,7 +1449,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Update" )
+    @RolesAllowed( "Environment-Management|Update" )
     @Override
     public void addIpToVniDomain( final String hostIp, final Long vni ) throws PeerException
     {
@@ -1493,7 +1467,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Update" )
+    @RolesAllowed( "Environment-Management|Update" )
     @Override
     public void removeIpFromVniDomain( final String hostIp, final Long vni ) throws PeerException
     {
@@ -1511,7 +1485,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Update" )
+    @RolesAllowed( "Environment-Management|Update" )
     @Override
     public int setupContainerSsh( final String containerHostId, final int sshIdleTimeout ) throws PeerException
     {
@@ -1579,7 +1553,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     /* ***********************************************
      *  Create PEK
      */
-    @RolesAllowed( "Environment-Management|A|Write" )
+    @RolesAllowed( "Environment-Management|Write" )
     @Override
     public PublicKeyContainer createPeerEnvironmentKeyPair( EnvironmentId envId ) throws PeerException
     {
@@ -1627,7 +1601,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Update" )
+    @RolesAllowed( "Environment-Management|Update" )
     @Override
     public void setupN2NConnection( final N2NConfig config ) throws PeerException
     {
@@ -1743,7 +1717,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Delete" )
+    @RolesAllowed( "Environment-Management|Delete" )
     @Override
     public void removeN2NConnection( final EnvironmentId environmentId ) throws PeerException
     {
@@ -1771,7 +1745,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Write" )
+    @RolesAllowed( "Environment-Management|Write" )
     @Override
     public void createGateway( final Gateway gateway ) throws PeerException
     {
@@ -1917,7 +1891,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public void alert( AlertPack alert )
+    public void alert( AlertEvent alert )
     {
         monitor.addAlert( alert );
     }

@@ -31,14 +31,24 @@ public class Login extends HttpServlet
             {
                 IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
 
-                String token = identityManager.getUserToken( username, password );
+                String token = null;
+                if ( identityManager != null )
+                {
+                    token = identityManager.getUserToken( username, password );
+                }
 
                 if ( !Strings.isNullOrEmpty( token ) )
                 {
+                    User user = identityManager.authenticateByToken( token );
                     request.getSession().setAttribute( "userSessionData", token );
-                    Cookie cookie = new Cookie( "sptoken", token );
-                    cookie.setMaxAge( 1800 );
-                    response.addCookie( cookie );
+                    Cookie sptoken = new Cookie( "sptoken", token );
+                    sptoken.setMaxAge( 1800 );
+
+                    Cookie fingerprint = new Cookie( "fingerprint", user.getFingerprint() );
+                    fingerprint.setMaxAge( 1800 );
+
+                    response.addCookie( sptoken );
+                    response.addCookie( fingerprint );
                 }
                 else
                 {

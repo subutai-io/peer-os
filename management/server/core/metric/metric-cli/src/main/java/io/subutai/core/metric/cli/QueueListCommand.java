@@ -7,7 +7,7 @@ import org.apache.karaf.shell.commands.Command;
 
 import com.google.common.base.Preconditions;
 
-import io.subutai.common.peer.AlertPack;
+import io.subutai.common.peer.AlertEvent;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.metric.api.Monitor;
 
@@ -32,9 +32,9 @@ public class QueueListCommand extends SubutaiShellCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        Collection<AlertPack> alerts = monitor.getAlerts();
+        Collection<AlertEvent> alerts = monitor.getAlertEvents();
         System.out.println( "List of alerts in queue:" );
-        for ( AlertPack alert : monitor.getAlertsQueue() )
+        for ( AlertEvent alert : monitor.getAlertsQueue() )
         {
             System.out.println( alert );
         }

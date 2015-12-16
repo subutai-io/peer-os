@@ -12,6 +12,11 @@ var fileUploder = {};
 function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert, DTOptionsBuilder, DTColumnBuilder, $resource, $compile, ngDialog, $timeout) {
 
 	var vm = this;
+
+	vm.currentEnvironment = {};
+	vm.signedMessage = "";
+	vm.buildEnvironment = buildEnvironment;
+
 	vm.environments = [];
 	vm.domainStrategies = [];
 	vm.sshKeyForEnvironment = '';
@@ -20,6 +25,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 
 	// functions
 	vm.destroyEnvironment = destroyEnvironment;
+	vm.startEnvironmentBuild = startEnvironmentBuild;
 	vm.sshKey = sshKey;
 	vm.addSshKey = addSshKey;
 	vm.removeSshKey = removeSshKey;
@@ -54,6 +60,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 		DTColumnBuilder.newColumn(null).withTitle('SSH Key').renderWith(sshKeyLinks),
 		DTColumnBuilder.newColumn(null).withTitle('Domains').renderWith(domainsTag),
 		DTColumnBuilder.newColumn(null).withTitle('').renderWith(containersTags),
+		DTColumnBuilder.newColumn(null).withTitle('').notSortable().renderWith(actionStartEnvironmentBuild),
 		DTColumnBuilder.newColumn(null).withTitle('').notSortable().renderWith(actionDelete)
 	];
 
@@ -95,6 +102,10 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 		//return '<span class="b-tags b-tags_grey" ng-click="environmentViewCtrl.removeDomain(\'' + data.id + '\')">Add <i class="fa fa-plus"></i></span>';
 	}
 
+	function actionStartEnvironmentBuild(data, type, full, meta) {
+		return '<a href="" class="b-icon b-icon_build" ng-click="environmentViewCtrl.startEnvironmentBuild(\'' + data.id + '\')"></a>';
+	}
+
 	function containersTags(data, type, full, meta) {
 
 		var containersTotal = [];
@@ -126,11 +137,11 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 					} else {
 						var tooltipContent = 'State: <b>INACTIVE</b>';
 					}
-					containersHTML += '<a ui-sref="containers({environmentId:\'' + data.id + '\'})" ' 
-						+ ' class="b-tags b-tags_' + quotaColors[type] + '" ' 
+					containersHTML += '<a ui-sref="containers({environmentId:\'' + data.id + '\'})" '
+						+ ' class="b-tags b-tags_' + quotaColors[type] + '" '
 						+ 'tooltips tooltip-content=\'' + tooltipContent + '\' tooltip-hide-trigger="mouseleave click" '
-						+ '>' 
-						+ template + ': ' + containersTotal[template][type] 
+						+ '>'
+						+ template + ': ' + containersTotal[template][type]
 					+ '</a>';
 				}
 			}
@@ -139,12 +150,12 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 		/*var containersHTML = '';
 		for(var i = 0; i < data.containers.length; i++) {
 			var tooltipContent = 'IP: <b>' + data.containers[i].ip + '</b><br> Quota: <div class="b-quota-type-round b-quota-type-round_' + quotaColors[data.containers[i].type] + '"></div> <b>' + data.containers[i].type + '</b><br>State: <b>' + data.containers[i].state + '</b>';
-			containersHTML += '<span ' 
-				+ ' class="b-tags b-tags_' + quotaColors[data.containers[i].type] + '" ' 
+			containersHTML += '<span '
+				+ ' class="b-tags b-tags_' + quotaColors[data.containers[i].type] + '" '
 				+ 'tooltips tooltip-content=\'' + tooltipContent + '\' '
-				+ '>' 
-				+ '<a ui-sref="containers({environmentId:\'' + data.id + '\'})">' + data.containers[i].templateName + '</a>' 
-				+ ' <a href ng-click="environmentViewCtrl.destroyContainer(\'' + data.containers[i].id + '\')"><i class="fa fa-times"></i></a>' 
+				+ '>'
+				+ '<a ui-sref="containers({environmentId:\'' + data.id + '\'})">' + data.containers[i].templateName + '</a>'
+				+ ' <a href ng-click="environmentViewCtrl.destroyContainer(\'' + data.containers[i].id + '\')"><i class="fa fa-times"></i></a>'
 			+ '</span>';
 		}*/
 		return containersHTML;
@@ -178,6 +189,25 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 			}
 		});
 	}
+
+    function startEnvironmentBuild(environmentId) {
+    	vm.currentEnvironment = vm.users[environmentId];
+		ngDialog.open ({
+			template: "subutai-app/environment/partials/decryptMsg.html",
+			scope: $scope
+		});
+    }
+
+	function buildEnvironment() {
+		environmentService.startEnvironmentBuild (vm.currentEnvironment.id, encodeURIComponent(vm.signedMessage)).success(function (data) {
+			SweetAlert.swal("Success!", "Your environment has started building.", "success");
+			vm.dtInstance.reloadData(null, false);
+			ngDialog.closeAll();
+		}).error(function (data) {
+			SweetAlert.swal("ERROR!", "Environment build error. Error: " + data.ERROR, "error");
+		});
+	}
+
 
 	function destroyEnvironment(environmentId) {
 		SweetAlert.swal({
@@ -246,7 +276,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 				});
 			}
 		});
-	}	
+	}
 
 	function getContainers() {
 		var environment = vm.environments[vm.environmentQuota];
@@ -312,7 +342,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 				});
 			}
 		});
-	}	
+	}
 
 	function setSSHKey(sshKey) {
 		console.log(sshKey);

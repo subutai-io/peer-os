@@ -1,6 +1,7 @@
 package io.subutai.core.environment.api;
 
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -14,8 +15,12 @@ import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
+import io.subutai.common.peer.AlertHandler;
+import io.subutai.common.peer.AlertHandlerPriority;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.EnvironmentAlertHandlers;
 import io.subutai.common.peer.EnvironmentContainerHost;
+import io.subutai.common.peer.EnvironmentId;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
@@ -33,6 +38,13 @@ public interface EnvironmentManager
      * @return - set of {@code Environment}
      */
     Set<Environment> getEnvironments();
+
+
+    Environment setupRequisites( Blueprint blueprint ) throws EnvironmentCreationException;
+
+
+    Environment startEnvironmentBuild( String environmentId, String signedMessage, boolean async )
+            throws EnvironmentCreationException;
 
     /**
      * Creates environment based on a passed topology
@@ -253,8 +265,18 @@ public interface EnvironmentManager
 
     void notifyOnContainerStateChanged( Environment environment, ContainerHost containerHost );
 
-    void addAlertListener( EnvironmentAlertListener alertListener );
+    void addAlertHandler( AlertHandler alertHandler );
 
+    void removeAlertHandler( AlertHandler alertHandler );
 
-    void removeAlertListener( EnvironmentAlertListener alertListener );
+    Collection<AlertHandler> getRegisteredAlertHandlers();
+
+    EnvironmentAlertHandlers getEnvironmentAlertHandlers( EnvironmentId environmentId )
+            throws EnvironmentNotFoundException;
+
+    void startMonitoring( String handlerId, AlertHandlerPriority handlerPriority, String environmentId )
+            throws EnvironmentManagerException;
+
+    void stopMonitoring( String handlerId, AlertHandlerPriority handlerPriority, String environmentId )
+            throws EnvironmentManagerException;
 }

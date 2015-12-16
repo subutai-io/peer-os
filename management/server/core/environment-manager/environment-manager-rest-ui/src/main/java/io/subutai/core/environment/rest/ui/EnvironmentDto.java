@@ -13,17 +13,19 @@ public class EnvironmentDto
 {
     private String id;
     private String name;
+    private String relationDeclaration;
     private EnvironmentStatus status;
     private Set<ContainerDto> containers;
 
 
     public EnvironmentDto( final String id, final String name, final EnvironmentStatus status,
-                           final Set<ContainerDto> containers )
+                           final Set<ContainerDto> containers, String relationDeclaration )
     {
         this.id = id;
         this.name = name;
         this.status = status;
         this.containers = containers;
+        this.relationDeclaration = relationDeclaration;
     }
 
 
@@ -72,5 +74,17 @@ public class EnvironmentDto
     public void setContainers( final Set<ContainerDto> containers )
     {
         this.containers = containers;
+    }
+
+
+    public String getRelationDeclaration()
+    {
+        return relationDeclaration;
+    }
+
+
+    public void setRelationDeclaration( final String relationDeclaration )
+    {
+        this.relationDeclaration = relationDeclaration;
     }
 }

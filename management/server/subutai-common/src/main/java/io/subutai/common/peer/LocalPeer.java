@@ -71,7 +71,6 @@ public interface LocalPeer extends Peer
 
     //    Quota getQuota( ContainerHost host, QuotaType quota ) throws PeerException;
 
-    //    @RolesAllowed( "Environment-Management|A|Update" )
     //    void setQuota( ContainerHost host, Quota quota ) throws PeerException;
 
     /**
@@ -175,6 +174,8 @@ public interface LocalPeer extends Peer
     public void addIpToVniDomain( String hostIp, Long vni ) throws PeerException;
 
     public void removeIpFromVniDomain( String hostIp, Long vni ) throws PeerException;
+
+    void setPeerInfo( PeerInfo peerInfo );
 
     Set<ContainerHost> findContainersByEnvironmentId( final String environmentId );
 

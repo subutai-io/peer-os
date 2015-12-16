@@ -91,7 +91,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         operationTracker.addLog( "Initializing environment creation" );
 
         environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
-        environment.setSuperNode( peerManager.getLocalPeerInfo().getIp() );
+        environment.setSuperNode( peerManager.getLocalPeer().getPeerInfo().getIp() );
         environment.setSuperNodePort( Common.SUPER_NODE_PORT );
         environment = environmentManager.saveOrUpdate( environment );
         return EnvironmentCreationPhase.GENERATE_KEYS;
@@ -168,7 +168,8 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
         try
         {
-            new ContainerCloneStep( templateRegistry, defaultDomain, topology, environment, peerManager.getLocalPeer() )
+            new ContainerCloneStep( templateRegistry, defaultDomain, topology, environment, peerManager.getLocalPeer(),
+                    environmentManager )
                     .execute();
 
             environment = environmentManager.saveOrUpdate( environment );
