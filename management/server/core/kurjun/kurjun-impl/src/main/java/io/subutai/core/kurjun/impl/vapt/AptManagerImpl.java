@@ -47,7 +47,28 @@ import ai.subut.kurjun.snap.SnapMetadataParserModule;
 import ai.subut.kurjun.storage.factory.FileStoreFactory;
 import ai.subut.kurjun.storage.factory.FileStoreModule;
 import ai.subut.kurjun.subutai.SubutaiTemplateParserModule;
+
+import com.google.inject.Injector;
+
 import io.subutai.core.kurjun.api.vapt.AptManager;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.Set;
+
+import org.apache.commons.codec.binary.Hex;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class AptManagerImpl implements AptManager
@@ -59,7 +80,7 @@ public class AptManagerImpl implements AptManager
 //    private AptIndexBuilderFactory indexBuilderFactory;
 //    private PackageFilenameParser filenameParser;
 //    private PackageFilenameBuilder filenameBuilder;
-
+    
     private static final KurjunContext context = new KurjunContext( "my" );
 
     private Injector injector;

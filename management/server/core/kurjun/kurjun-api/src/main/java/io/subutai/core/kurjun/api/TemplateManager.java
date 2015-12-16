@@ -119,23 +119,12 @@ public interface TemplateManager
 
     /**
      * Adds remote repository located at supplied URL. Repositories added with this method will be used to fulfill
-     * requests in case the local repository can not handle requests. <code>useToken</code> is true for this method.
-     * To set <code>useToken</code> explicitly 
-     * use {@link #addRemoteRepository(URL, boolean) addRemoteRepository( URL url, boolean useToken )} method.
-     *
-     * @param url URL of the remote repository
-     */
-    void addRemoteRepository( URL url );
-    
-    /**
-     * Adds remote repository located at supplied URL. Repositories added with this method will be used to fulfill
      * requests in case the local repository can not handle requests.
      *
      * @param url URL of the remote repository
-     * @param useToken flag to indicate where to request access token from remote url and add this token
-     * to query parameters
+     * @param token access token to be used for the given remote repo url
      */
-    void addRemoteRepository( URL url, boolean useToken );
+    void addRemoteRepository( URL url, String token );
 
     /**
      * Removes remote repository located at supplied URL.

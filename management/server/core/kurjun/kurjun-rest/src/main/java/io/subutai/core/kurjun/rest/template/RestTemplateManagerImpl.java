@@ -45,7 +45,8 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
 
 
     @Override
-    public Response getTemplate( String repository, String md5, String name, String version, String type, boolean isKurjunClient )
+    public Response getTemplate( String repository, String md5, String name, String version, 
+            String type, boolean isKurjunClient )
     {
         try
         {
@@ -53,13 +54,16 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
             if ( md5bytes != null )
             {
                 TemplateKurjun template = templateManager.getTemplate( repository, md5bytes, isKurjunClient );
-                InputStream is = templateManager.getTemplateData( repository, md5bytes, isKurjunClient );
-                if ( template != null && is != null )
+                if ( template != null )
                 {
-                    return Response.ok( is )
-                            .header( "Content-Disposition", "attachment; filename=" + makeFilename( template ) )
-                            .header( "Content-Type", "application/octet-stream" )
-                            .build();
+                    InputStream is = templateManager.getTemplateData( repository, md5bytes, isKurjunClient );
+                    if ( is != null )
+                    {
+                        return Response.ok( is )
+                                .header( "Content-Disposition", "attachment; filename=" + makeFilename( template ) )
+                                .header( "Content-Type", "application/octet-stream" )
+                                .build();
+                    }
                 }
             }
             else
@@ -83,7 +87,8 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
 
 
     @Override
-    public Response getTemplateInfo( String repository, String md5, String name, String version, boolean isKurjunClient )
+    public Response getTemplateInfo( String repository, String md5, String name, 
+            String version, boolean isKurjunClient )
     {
         try
         {

@@ -8,7 +8,7 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
@@ -23,6 +23,8 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang3.time.DateUtils;
+
 import com.google.common.base.Preconditions;
 
 import io.subutai.common.dao.DaoManager;
@@ -34,8 +36,12 @@ import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.peer.RegistrationData;
 import io.subutai.common.peer.RegistrationStatus;
+import io.subutai.common.security.objects.TokenType;
 import io.subutai.common.settings.ChannelSettings;
 import io.subutai.common.util.SecurityUtilities;
+import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.model.User;
+import io.subutai.core.identity.api.model.UserToken;
 import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.messenger.api.Messenger;
 import io.subutai.core.peer.api.PeerAction;
@@ -76,6 +82,7 @@ public class PeerManagerImpl implements PeerManager
     private Map<String, RegistrationData> registrationRequests = new ConcurrentHashMap<>();
     private List<PeerActionListener> peerActionListeners = new CopyOnWriteArrayList<>();
     private TemplateManager templateManager;
+    private IdentityManager identityManager;
     private Map<String, Peer> peers = new ConcurrentHashMap<>();
     private Map<String, PeerPolicy> policies = new ConcurrentHashMap<>();
     private ObjectMapper mapper = new ObjectMapper();
@@ -86,7 +93,7 @@ public class PeerManagerImpl implements PeerManager
 
     public PeerManagerImpl( final Messenger messenger, LocalPeer localPeer, DaoManager daoManager,
                             MessageResponseListener messageResponseListener, SecurityManager securityManager,
-                            TemplateManager templateManager, Object provider )
+                            TemplateManager templateManager, IdentityManager identityManager, Object provider )
     {
         this.messenger = messenger;
         this.localPeer = localPeer;
@@ -94,6 +101,7 @@ public class PeerManagerImpl implements PeerManager
         this.messageResponseListener = messageResponseListener;
         this.securityManager = securityManager;
         this.templateManager = templateManager;
+        this.identityManager = identityManager;
         this.provider = provider;
         //todo expose CommandResponseListener as service "RequestListener" and inject here
         commandResponseListener = new CommandResponseListener();
@@ -241,25 +249,18 @@ public class PeerManagerImpl implements PeerManager
 
             PeerPolicy policy = getDefaultPeerPolicy( registrationData.getPeerInfo().getId() );
 
-            PeerData peerData =
-                    new PeerData( registrationData.getPeerInfo().getId(), toJson( registrationData.getPeerInfo() ),
+            PeerData peerData
+                    = new PeerData( registrationData.getPeerInfo().getId(), toJson( registrationData.getPeerInfo() ),
                             keyPhrase, toJson( policy ) );
             updatePeerData( peerData );
 
             Peer newPeer = createPeer( peerData );
 
             addPeer( newPeer );
-
-            try
-            {
-                templateManager.addRemoteRepository( new URL(
-                        String.format( KURJUN_URL_PATTERN, registrationData.getPeerInfo().getIp(),
-                                ChannelSettings.SECURE_PORT_X1 ) ) );
-            }
-            catch ( Exception ignore )
-            {
-                // ignore
-            }
+            
+             templateManager.addRemoteRepository( new URL(
+                    String.format( KURJUN_URL_PATTERN, registrationData.getPeerInfo().getIp(),
+                            ChannelSettings.SECURE_PORT_X1 ) ), registrationData.getToken() );
         }
         catch ( Exception e )
         {
@@ -268,6 +269,24 @@ public class PeerManagerImpl implements PeerManager
         }
     }
 
+    private String generateActiveUserToken() throws PeerException
+    {
+        try
+        {
+            User user = identityManager.getActiveUser();
+
+            Date date = DateUtils.addMonths( new Date(), 10 );
+
+            UserToken userToken = identityManager.createUserToken( user, "", "", "",
+                    TokenType.Permanent.getId(), date );
+
+            return userToken.getFullToken();
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Failed to generate active user token.", e );
+        }
+    }
 
     private <T> T fromJson( String value, Class<T> type ) throws IOException
     {
@@ -358,7 +377,7 @@ public class PeerManagerImpl implements PeerManager
         if ( !notifyPeerActionListeners(
                 new PeerAction( PeerActionType.UNREGISTER, registrationData.getPeerInfo().getId() ) ).succeeded() )
         {
-            throw new PeerException( "Could not register peer." );
+            throw new PeerException( "Could not unregister peer." );
         }
         //        isPeerUsed( registrationData );
 
@@ -384,9 +403,9 @@ public class PeerManagerImpl implements PeerManager
                     String.format( KURJUN_URL_PATTERN, registrationData.getPeerInfo().getIp(),
                             ChannelSettings.SECURE_PORT_X1 ) ) );
         }
-        catch ( Exception ignore )
+        catch ( Exception e )
         {
-            // ignore
+            throw new PeerException( "Could not unregister peer.", e );
         }
         //        return peerDAO.deleteInfo( SOURCE_REMOTE_PEER, p.getId() );
         removePeerData( registrationData.getPeerInfo().getId() );
@@ -552,7 +571,7 @@ public class PeerManagerImpl implements PeerManager
         }
         catch ( Exception e )
         {
-            throw new PeerException( "Could not unregister peer." );
+            throw new PeerException( "Could not unregister peer.", e );
         }
     }
 
@@ -649,9 +668,10 @@ public class PeerManagerImpl implements PeerManager
 
         final RegistrationData registrationData = buildRegistrationData( keyPhrase, RegistrationStatus.REQUESTED );
 
+        registrationData.setToken( generateActiveUserToken() );
 
         RegistrationData result = registrationClient.sendInitRequest( destinationHost, registrationData );
-
+        
         result.setKeyPhrase( keyPhrase );
         addRequest( result );
     }
@@ -675,9 +695,12 @@ public class PeerManagerImpl implements PeerManager
     public void doApproveRequest( final String keyPhrase, final RegistrationData request ) throws PeerException
     {
         getRemotePeerInfo( request.getPeerInfo().getIp() );
+        
+        RegistrationData response = buildRegistrationData( keyPhrase, RegistrationStatus.APPROVED );
+                
+        response.setToken( generateActiveUserToken() );
 
-        registrationClient.sendApproveRequest( request.getPeerInfo().getIp(),
-                buildRegistrationData( keyPhrase, RegistrationStatus.APPROVED ) );
+        registrationClient.sendApproveRequest( request.getPeerInfo().getIp(), response );
 
         register( keyPhrase, request );
 
