@@ -106,7 +106,11 @@ public interface IdentityManager
      *
      */
     void approveUser(String userName, int type);
+    /* *************************************************
+     *
+     */
 
+    void signUp( String username, String pwd, String fullName, String email, String keyAscii );
     /* *************************************************
      *
      */

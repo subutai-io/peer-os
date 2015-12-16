@@ -619,11 +619,13 @@ public class IdentityManagerImpl implements IdentityManager
     {
         User user = identityDataService.getUserByUsername( userName );
         user.setApproved( true );
+        user.setType( type );
+
         identityDataService.persistUser( user );
     }
 
 
-    public void signUp( String username, String pwd, String fullName, String email )
+    public void signUp( String username, String pwd, String fullName, String email, String keyAscii )
     {
         if ( Strings.isNullOrEmpty( pwd ) || !validUsername( username ) )
         {
@@ -635,6 +637,10 @@ public class IdentityManagerImpl implements IdentityManager
         user.setPassword( pwd );
         user.setEmail( email );
         user.setFullName( fullName );
+
+        String keyId = UUID.randomUUID().toString();
+        user.setSecurityKeyId( keyId );
+        securityManager.getKeyManager().savePublicKeyRing(keyId,SecurityKeyType.UserKey.getId(), keyAscii);
 
 
     }
@@ -668,14 +674,6 @@ public class IdentityManagerImpl implements IdentityManager
             user.setEmail( email );
             user.setFullName( fullName );
             user.setType( type );
-
-            //** Create Key*****************************
-            String keyId = UUID.randomUUID().toString();
-            KeyPair kPair = securityManager.getKeyManager().generateKeyPair( keyId, false );
-            securityManager.getKeyManager().saveKeyPair( keyId, SecurityKeyType.UserKey.getId(), kPair );
-            //******************************************
-
-            user.setSecurityKeyId( keyId );
 
             identityDataService.persistUser( user );
         }
