@@ -6,9 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -44,7 +42,6 @@ import io.subutai.common.host.HostInterface;
 import io.subutai.common.mdc.SubutaiExecutors;
 import io.subutai.common.metric.AlertValue;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
-import io.subutai.common.network.Gateway;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.AlertHandler;
 import io.subutai.common.peer.AlertHandlerPriority;
@@ -69,7 +66,6 @@ import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
-import io.subutai.core.environment.api.exception.EnvironmentSecurityException;
 import io.subutai.core.environment.impl.dao.BlueprintDataService;
 import io.subutai.core.environment.impl.dao.EnvironmentContainerDataService;
 import io.subutai.core.environment.impl.dao.EnvironmentDataService;
@@ -121,7 +117,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     protected BlueprintDataService blueprintDataService;
 
     protected ExceptionUtil exceptionUtil = new ExceptionUtil();
-    protected Map<String, AlertHandler> alertHandlers = new ConcurrentHashMap<String, AlertHandler>();
+    protected Map<String, AlertHandler> alertHandlers = new ConcurrentHashMap<>();
 
 
     public EnvironmentManagerImpl( final TemplateManager templateRegistry, final PeerManager peerManager,
@@ -407,34 +403,44 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         try
         {
-            Set<String> usedGateways = new HashSet<>();
-            usedGateways.addAll( getUsedGateways( peerManager.getLocalPeer() ) );
+            Set<String> usedIps = new HashSet<>();
+            usedIps.addAll( getUsedIps( peerManager.getLocalPeer() ) );
             for ( String peerId : blueprint.getNodeGroupsMap().keySet() )
             {
                 Peer peer = peerManager.getPeer( peerId );
-                usedGateways.addAll( getUsedGateways( peer ) );
+                usedIps.addAll( getUsedIps( peer ) );
             }
 
-            String environmentGatewayIp = null;
+            String theCidr = null;
 
-            for ( int i = 1; i < 255 && environmentGatewayIp == null; i++ )
+            for ( int i = 1; i < 255; i++ )
             {
                 SubnetUtils.SubnetInfo info = new SubnetUtils( String.format( DEFAULT_GATEWAY_TEMPLATE, i ) ).getInfo();
 
-                String gw = info.getLowAddress();
+                boolean isUsed = false;
 
-                if ( !usedGateways.contains( gw ) )
+                for ( String usedIp : usedIps )
                 {
-                    environmentGatewayIp = info.getCidrSignature();
+                    if ( info.isInRange( usedIp ) )
+                    {
+                        isUsed = true;
+                        break;
+                    }
+                }
+
+                if ( !isUsed )
+                {
+                    theCidr = info.getCidrSignature();
                     break;
                 }
             }
 
-            if ( environmentGatewayIp == null )
+            if ( theCidr == null )
             {
-                throw new EnvironmentCreationException( "Could not determine subnet cdir." );
+                throw new EnvironmentCreationException( "Could not determine subnet cidr." );
             }
-            return environmentGatewayIp;
+
+            return theCidr;
         }
         catch ( PeerException e )
         {
@@ -443,17 +449,17 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    protected Set<String> getUsedGateways( Peer peer ) throws PeerException
+    protected Set<String> getUsedIps( Peer peer ) throws PeerException
     {
 
-        Set<String> usedGateways = Sets.newHashSet();
+        Set<String> usedIps = Sets.newHashSet();
 
-        for ( Gateway gateway : peer.getGateways() )
+        for ( HostInterface hostInterface : peer.getInterfaces().getAll() )
         {
-            usedGateways.add( gateway.getIp() );
+            usedIps.add( hostInterface.getIp() );
         }
 
-        return usedGateways;
+        return usedIps;
     }
 
 
@@ -463,25 +469,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                                                           final boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
-        TrackerOperation operationTracker =
-                tracker.createTrackerOperation( MODULE_NAME, String.format( "Growing environment %s", environmentId ) );
-
-        return growEnvironment( environmentId, blueprint, async, true, operationTracker );
-    }
-
-
-    @RolesAllowed( "Environment-Management|A|Write" )
-    private Set<EnvironmentContainerHost> growEnvironment( final String environmentId, final Blueprint blueprint,
-                                                           final boolean async, final boolean checkAccess,
-                                                           TrackerOperation operationTracker )
-            throws EnvironmentModificationException, EnvironmentNotFoundException
-    {
-
         Preconditions.checkNotNull( blueprint, "Invalid blueprint" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
         Preconditions.checkArgument( !blueprint.getNodeGroups().isEmpty(), "Placement is empty" );
 
-        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId, checkAccess );
+        TrackerOperation operationTracker =
+                tracker.createTrackerOperation( MODULE_NAME, String.format( "Growing environment %s", environmentId ) );
+
+
+        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
 
         String cdir = environment.getSubnetCidr();
 
@@ -524,7 +520,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                 {
                     Set<EnvironmentContainerHost> newContainers = Sets.newHashSet( environment.getContainerHosts() );
                     newContainers.removeAll( oldContainers );
-                    notifyOnEnvironmentGrown( loadEnvironment( environment.getId(), checkAccess ), newContainers );
+                    notifyOnEnvironmentGrown( loadEnvironment( environment.getId() ), newContainers );
                 }
                 catch ( EnvironmentNotFoundException e )
                 {
@@ -561,23 +557,16 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     public void setSshKey( final String environmentId, final String sshKey, final boolean async )
             throws EnvironmentNotFoundException, EnvironmentModificationException
     {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+
         TrackerOperation op = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Setting environment %s ssh key", environmentId ) );
 
-        setSshKey( environmentId, sshKey, async, true, op );
-    }
 
-
-    public void setSshKey( final String environmentId, final String sshKey, final boolean async,
-                           final boolean checkAccess, final TrackerOperation operationTracker )
-            throws EnvironmentNotFoundException, EnvironmentModificationException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
-
-        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId, checkAccess );
+        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
 
         final SshKeyModificationWorkflow sshKeyModificationWorkflow =
-                getSshKeyModificationWorkflow( environment, sshKey, networkManager, operationTracker );
+                getSshKeyModificationWorkflow( environment, sshKey, networkManager, op );
 
         executor.execute( new Runnable()
         {
@@ -608,20 +597,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                                     final boolean forceMetadataRemoval )
             throws EnvironmentDestructionException, EnvironmentNotFoundException
     {
-        TrackerOperation op = tracker.createTrackerOperation( MODULE_NAME,
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+
+        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Destroying environment %s", environmentId ) );
 
-        destroyEnvironment( environmentId, async, forceMetadataRemoval, true, op );
-    }
-
-
-    @RolesAllowed( "Environment-Management|A|Delete" )
-    public void destroyEnvironment( final String environmentId, boolean async, final boolean forceMetadataRemoval,
-                                    final boolean checkAccess, final TrackerOperation operationTracker )
-            throws EnvironmentDestructionException, EnvironmentNotFoundException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
-        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId, checkAccess );
+        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
 
         if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
         {
@@ -632,8 +613,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         }
 
         final EnvironmentDestructionWorkflow environmentDestructionWorkflow =
-                getEnvironmentDestructionWorkflow( peerManager, this, environment, forceMetadataRemoval,
-                        operationTracker );
+                getEnvironmentDestructionWorkflow( this, environment, forceMetadataRemoval, operationTracker );
 
         executor.execute( new Runnable()
         {
@@ -680,27 +660,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                                   final boolean forceMetadataRemoval )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
-
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ), "Invalid container id" );
 
-        TrackerOperation op =
+        TrackerOperation operationTracker =
                 tracker.createTrackerOperation( MODULE_NAME, String.format( "Destroying container %s", containerId ) );
 
-        destroyContainer( environmentId, containerId, async, forceMetadataRemoval, true, op );
-    }
-
-
-    @RolesAllowed( "Environment-Management|A|Delete" )
-    public void destroyContainer( final String environmentId, final String containerId, final boolean async,
-                                  final boolean forceMetadataRemoval, final boolean checkAccess,
-                                  final TrackerOperation operationTracker )
-            throws EnvironmentModificationException, EnvironmentNotFoundException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ), "Invalid container id" );
-
-        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId, checkAccess );
+        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
 
         User activeUser = identityManager.getActiveUser();
 
@@ -762,14 +728,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    @PermitAll
-    @Override
-    public Environment loadEnvironment( final String environmentId ) throws EnvironmentNotFoundException
-    {
-        return loadEnvironment( environmentId, false );
-    }
-
-
     @Override
     public String getDefaultDomainName()
     {
@@ -783,17 +741,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
 
-        removeEnvironment( environmentId, true );
-    }
-
-
-    @RolesAllowed( "Environment-Management|A|Delete" )
-    public void removeEnvironment( final String environmentId, final boolean checkAccess )
-            throws EnvironmentNotFoundException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
-
-        Environment environment = loadEnvironment( environmentId, checkAccess );
+        Environment environment = loadEnvironment( environmentId );
 
         User activeUser = identityManager.getActiveUser();
 
@@ -929,8 +877,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Assigning environment %s domain", environmentId ) );
 
-        modifyEnvironmentDomain( environmentId, newDomain, domainLoadBalanceStrategy, operationTracker, true,
-                sslCertPath );
+        modifyEnvironmentDomain( environmentId, newDomain, domainLoadBalanceStrategy, operationTracker, sslCertPath );
     }
 
 
@@ -944,20 +891,19 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Removing environment %s domain", environmentId ) );
 
-        modifyEnvironmentDomain( environmentId, null, null, operationTracker, true, null );
+        modifyEnvironmentDomain( environmentId, null, null, operationTracker, null );
     }
 
 
     public void modifyEnvironmentDomain( final String environmentId, final String domain,
                                          final DomainLoadBalanceStrategy domainLoadBalanceStrategy,
-                                         final TrackerOperation operationTracker, boolean checkAccess,
-                                         final String sslCertPath )
+                                         final TrackerOperation operationTracker, final String sslCertPath )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
         Preconditions.checkNotNull( operationTracker );
 
-        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId, checkAccess );
+        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
 
         try
         {
@@ -988,7 +934,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
 
-        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId, true );
+        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
 
         try
         {
@@ -1009,31 +955,20 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         Preconditions.checkArgument( !Strings.isNullOrEmpty( containerHostId ), "Invalid container id" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
 
-        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId, true );
+        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
 
         try
         {
             ContainerHost containerHost = environment.getContainerHostById( containerHostId );
 
             return peerManager.getLocalPeer().isIpInVniDomain(
-                    containerHost.getIpByInterfaceName( Common.DEFAULT_CONTAINER_INTERFACE ), environment.getVni() );
+                    containerHost.getHostInterfaces().findByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp(),
+                    environment.getVni() );
         }
         catch ( ContainerHostNotFoundException | PeerException e )
         {
             throw new EnvironmentManagerException( "Error checking container domain", e );
         }
-    }
-
-
-    @RolesAllowed( "Environment-Management|A|Update" )
-    @Override
-    public void addContainerToEnvironmentDomain( final String containerHostId, final String environmentId )
-            throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
-    {
-        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
-                String.format( "Adding container %s to environment domain", containerHostId ) );
-
-        toggleContainerDomain( containerHostId, environmentId, true, operationTracker, true );
     }
 
 
@@ -1048,7 +983,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         Preconditions.checkArgument( !Strings.isNullOrEmpty( containerHostId ), "Invalid container id" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
 
-        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId, true );
+        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
 
         environment.getContainerHostById( containerHostId );
         try
@@ -1072,38 +1007,50 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     @RolesAllowed( "Environment-Management|A|Update" )
     @Override
+    public void addContainerToEnvironmentDomain( final String containerHostId, final String environmentId )
+            throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
+    {
+        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
+                String.format( "Adding container %s to environment domain", containerHostId ) );
+
+        toggleContainerDomain( containerHostId, environmentId, true, operationTracker );
+    }
+
+
+    @RolesAllowed( "Environment-Management|A|Update" )
+    @Override
     public void removeContainerFromEnvironmentDomain( final String containerHostId, final String environmentId )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
     {
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Removing container %s from environment domain", containerHostId ) );
 
-        toggleContainerDomain( containerHostId, environmentId, false, operationTracker, true );
+        toggleContainerDomain( containerHostId, environmentId, false, operationTracker );
     }
 
 
     public void toggleContainerDomain( final String containerHostId, final String environmentId, final boolean add,
-                                       final TrackerOperation operationTracker, final boolean checkAccess )
+                                       final TrackerOperation operationTracker )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( containerHostId ), "Invalid container id" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
 
-        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId, checkAccess );
+        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
 
         ContainerHost containerHost = environment.getContainerHostById( containerHostId );
         try
         {
             if ( add )
             {
-                peerManager.getLocalPeer()
-                           .addIpToVniDomain( containerHost.getIpByInterfaceName( Common.DEFAULT_CONTAINER_INTERFACE ),
-                                   environment.getVni() );
+                peerManager.getLocalPeer().addIpToVniDomain(
+                        containerHost.getHostInterfaces().findByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp(),
+                        environment.getVni() );
             }
             else
             {
                 peerManager.getLocalPeer().removeIpFromVniDomain(
-                        containerHost.getIpByInterfaceName( Common.DEFAULT_CONTAINER_INTERFACE ),
+                        containerHost.getHostInterfaces().findByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp(),
                         environment.getVni() );
             }
 
@@ -1149,13 +1096,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    protected EnvironmentDestructionWorkflow getEnvironmentDestructionWorkflow( final PeerManager peerManager,
-                                                                                final EnvironmentManagerImpl
-                                                                                        environmentManager,
-                                                                                final EnvironmentImpl environment,
-                                                                                final boolean forceMetadataRemoval,
-                                                                                final TrackerOperation
-                                                                                        operationTracker )
+    protected EnvironmentDestructionWorkflow getEnvironmentDestructionWorkflow(
+            final EnvironmentManagerImpl environmentManager, final EnvironmentImpl environment,
+            final boolean forceMetadataRemoval, final TrackerOperation operationTracker )
     {
         return new EnvironmentDestructionWorkflow( environmentManager, environment, forceMetadataRemoval,
                 operationTracker );
@@ -1182,8 +1125,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
 
     @PermitAll
-    protected Environment loadEnvironment( final String environmentId, boolean checkAccess )
-            throws EnvironmentNotFoundException
+    @Override
+    public Environment loadEnvironment( final String environmentId ) throws EnvironmentNotFoundException
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
@@ -1194,11 +1137,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             throw new EnvironmentNotFoundException();
         }
 
-        //check access to environment
-        if ( checkAccess )
-        {
-            checkAccess( environment );
-        }
 
         //set environment's transient fields
         setEnvironmentTransientFields( environment );
@@ -1207,22 +1145,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         setContainersTransientFields( environment );
 
         return environment;
-    }
-
-
-    protected void checkAccess( final Environment environment )
-    {
-        if ( !( isUserAdmin() || Objects.equals( environment.getUserId(), getUserId() ) ) )
-        {
-            throw new EnvironmentSecurityException(
-                    String.format( "Access to environment %s is denied", environment.getName() ) );
-        }
-    }
-
-
-    protected boolean isUserAdmin()
-    {
-        return true;//getUser().isAdmin();
     }
 
 
@@ -1360,19 +1282,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    protected User getUser()
-    {
-        //User user = identityManager.getUser();
-
-        //if ( user == null )
-        {
-            throw new EnvironmentSecurityException( "User not authenticated" );
-        }
-
-        //return user;
-    }
-
-
     protected Long getUserId()
     {
         return ( long ) 0;//getUser().getId();
@@ -1427,8 +1336,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     @Override
     public Collection<AlertHandler> getRegisteredAlertHandlers()
     {
-        List<AlertHandler> result = new ArrayList<>( alertHandlers.values() );
-        return result;
+        return new ArrayList<>( alertHandlers.values() );
     }
 
 
