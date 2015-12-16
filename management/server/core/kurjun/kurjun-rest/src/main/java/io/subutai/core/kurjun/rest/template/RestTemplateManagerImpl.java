@@ -14,9 +14,9 @@ import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.FileUtils;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
-import org.apache.geronimo.mail.util.Hex;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -156,7 +156,7 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
                 byte[] md5 = templateManager.upload( repository, is );
                 if ( md5 != null )
                 {
-                    return Response.ok( Hex.encode( md5 ) ).build();
+                    return Response.ok( Hex.encodeHexString( md5 ) ).build();
                 }
                 else
                 {
@@ -214,7 +214,7 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
         DefaultTemplate defaultTemplate = new DefaultTemplate();
         defaultTemplate.setName( template.getName() );
         defaultTemplate.setVersion( template.getVersion() );
-        defaultTemplate.setMd5Sum( Hex.decode( template.getMd5Sum() ) );
+        defaultTemplate.setMd5Sum( decodeMd5( template.getMd5Sum() ) );
         defaultTemplate.setArchitecture( Architecture.getByValue( template.getArchitecture() ) );
         defaultTemplate.setParent( template.getParent() );
         defaultTemplate.setPackage( template.getPackageName() );
