@@ -25,6 +25,9 @@ function identitySrv($http) {
 		deleteRole: deleteRole,
 		getTokenTypes: getTokenTypes,
 		getPermissionsScops: getPermissionsScops,
+		signUp: signUp,
+		approve: approve,
+		getKey: getKey,
 
 		getUsersUrl : function(){ return USERS_URL },
 		getRolesUrl : function(){ return ROLES_URL },
@@ -105,4 +108,26 @@ function identitySrv($http) {
 		return $http.get(USERS_URL + 'permissions/scopes', {withCredentials: true, headers: {'Content-Type': 'application/json'}});
 	}
 
+	function signUp (username, fullName, password, email, publicKey) {
+		var postData = "username=" + username + "&full_name=" + fullName + "&password=" + password + "&email=" + email + "&public_key=" + publicKey;
+		return $http.post(
+			USERS_URL + "signup",
+			postData,
+			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+		);
+	}
+
+	function approve (username, roles) {
+		var postData = "username=" + username + "&roles=" + roles;
+		console.log (postData);
+		return $http.post(
+			USERS_URL + "approve",
+			postData,
+			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+		);
+	}
+
+	function getKey (id) {
+		return $http.get (SERVER_URL + "rest/v1/security/keyman/getpublickeyring", {params: {host_id: id}});
+	}
 }

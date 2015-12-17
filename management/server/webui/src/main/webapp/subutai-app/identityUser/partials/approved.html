@@ -1,0 +1,34 @@
+<div class="b-workspace-content b-workspace-content_border">
+	<div class="b-workspace__content">
+		<div class="b-workspace-content__row">
+			<div class="b-main-table-border">
+				<table class="b-main-table b-main-table_with-header">
+					<tr>
+						<th>Username</th>
+						<th>Full name</th>
+						<th>E-mail</th>
+						<th>Roles</th>
+						<th>Actions</th>
+					</tr>
+					<td colspan="5" class="b-main-table__empty-item" ng-show="identityUserCtrl.users.length === 0">
+						You don’t have any users
+					</td>
+					<tr ng-repeat="user in identityUserCtrl.users">
+						<td>{{ user.userName }}</td>
+						<td>{{ user.fullName }}</td>
+						<td>{{ user.email }}</td>
+						<td>
+							<div ng-repeat = "role in user.roles">
+								<span class="b-tags b-tags_grey">{{ role.name }}<a href ng-click="identityUserCtrl.removeRoleFromUser(user, role.id)"><i class="fa fa-times"></i></a></span>
+							</div>
+						</td>
+						<td>
+							<a href class="b-icon b-icon_edit" ng-click="identityUserCtrl.userForm (user)"></a>
+							<a href class="b-icon b-icon_remove" ng-click="identityUserCtrl.deleteUser (user)"></a>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>

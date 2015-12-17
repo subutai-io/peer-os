@@ -54,4 +54,9 @@ public interface User
     String getStatusName();
 
     String getTypeName();
+
+    boolean isApproved();
+
+    void setApproved(boolean active);
+
 }

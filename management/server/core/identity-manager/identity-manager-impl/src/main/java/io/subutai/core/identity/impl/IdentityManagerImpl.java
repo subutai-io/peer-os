@@ -94,6 +94,13 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
+    //*****************************************
+    public void destroy()
+    {
+        sessionManager.stopSessionController();
+    }
+
+
     //*****************************************************
     private void createDefaultUsers()
     {
@@ -106,13 +113,13 @@ public class IdentityManagerImpl implements IdentityManager
 
             //***Create User ********************************************
             User internal = createUser( "internal", "internal", "System User", "internal@subutai.io", 1,
-                    generateArmoredPublicKey() );
+                    generateArmoredPublicKey(), true );
             User admin =
-                    createUser( "admin", "secret", "Administrator", "admin@subutai.io", 2, generateArmoredPublicKey() );
+                    createUser( "admin", "secret", "Administrator", "admin@subutai.io", 2, generateArmoredPublicKey(), true );
             User manager =
-                    createUser( "manager", "manager", "Manager", "manager@subutai.io", 2, generateArmoredPublicKey() );
+                    createUser( "manager", "manager", "Manager", "manager@subutai.io", 2, generateArmoredPublicKey(), true );
             User karaf =
-                    createUser( "karaf", "karaf", "Karaf Manager", "karaf@subutai.io", 2, generateArmoredPublicKey() );
+                    createUser( "karaf", "karaf", "Karaf Manager", "karaf@subutai.io", 2, generateArmoredPublicKey(), true );
             //***********************************************************
 
             //***Create Token *******************************************
@@ -197,49 +204,69 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    //*****************************************
-    public void destroy()
-    {
-        sessionManager.stopSessionController();
-    }
-
 
     /* *************************************************
      */
-    @RolesAllowed( "Identity-Management|Delete" )
-    @Override
-    public void removeRolePermission( long roleId, Permission permission )
+    private CallbackHandler getCalbackHandler( final String userName, final String password )
     {
-        identityDataService.removeRolePermission( roleId, permission );
-    }
+        CallbackHandler callbackHandler = new CallbackHandler()
+        {
+            public void handle( Callback[] callbacks ) throws IOException, UnsupportedCallbackException
+            {
+                for ( Callback callback : callbacks )
+                {
+                    if ( callback instanceof NameCallback )
+                    {
+                        ( ( NameCallback ) callback ).setName( userName );
+                    }
+                    else if ( callback instanceof PasswordCallback )
+                    {
+                        ( ( PasswordCallback ) callback ).setPassword( password.toCharArray() );
+                    }
+                    else
+                    {
+                        throw new UnsupportedCallbackException( callback );
+                    }
+                }
+            }
+        };
 
+        return callbackHandler;
+    }
 
     /* *************************************************
      */
     @PermitAll
     @Override
-    public List<Permission> getAllPermissions()
+    public Session login( String userName, String password )
     {
-        return identityDataService.getAllPermissions();
-    }
+        try
+        {
+            Session userSession = null;
 
+            CallbackHandler ch = getCalbackHandler( userName, password );
+            Subject subject = new Subject();
+            LoginContext loginContext = new LoginContext( "karaf", subject, ch );
+            loginContext.login();
 
-    /* *************************************************
-     */
-    @RolesAllowed( "Identity-Management|Update" )
-    @Override
-    public void updatePermission( Permission permission )
-    {
-        identityDataService.updatePermission( permission );
-    }
+            while ( subject.getPrivateCredentials().iterator().hasNext() )
+            {
+                Object obj = subject.getPrivateCredentials().iterator().next();
 
+                if ( obj instanceof SessionEntity )
+                {
+                    userSession = ( Session ) obj;
+                    userSession.setSubject( subject );
+                    break;
+                }
+            }
 
-    /* *************************************************
-     */
-    @Override
-    public IdentityDataService getIdentityDataService()
-    {
-        return identityDataService;
+            return userSession;
+        }
+        catch ( Exception ex )
+        {
+            return null;
+        }
     }
 
 
@@ -250,6 +277,85 @@ public class IdentityManagerImpl implements IdentityManager
     public SessionManager getSessionManager()
     {
         return sessionManager;
+    }
+
+    /* *************************************************
+     */
+    @PermitAll
+    @Override
+    public Session authenticateSession( String login, String password )
+    {
+        String sessionId;
+        Session session = null;
+        User user = null;
+
+        //-------------------------------------
+        if(login.equals( "token" ))
+            sessionId = password;
+        else
+            sessionId = UUID.randomUUID() + "-" + System.currentTimeMillis();
+        //-------------------------------------
+
+        session = sessionManager.getValidSession( sessionId );
+
+        if(session == null)
+        {
+            user = authenticateUser( login,password );
+
+            if(user == null)
+                return null;
+        }
+
+        session = sessionManager.startSession(sessionId ,session,  user);
+
+        return session;
+    }
+
+
+    /* *************************************************
+     */
+    @RolesAllowed( "Identity-Management|Write" )
+    @Override
+    public UserToken createUserToken( User user, String token, String secret, String issuer, int tokenType,
+                                      Date validDate )
+    {
+        try
+        {
+            UserToken userToken = new UserTokenEntity();
+
+            if ( Strings.isNullOrEmpty( token ) )
+            {
+                token = UUID.randomUUID().toString();
+            }
+            if ( Strings.isNullOrEmpty( issuer ) )
+            {
+                issuer = "io.subutai";
+            }
+            if ( Strings.isNullOrEmpty( secret ) )
+            {
+                secret = UUID.randomUUID().toString();
+            }
+            if ( validDate == null )
+            {
+                validDate = DateUtils.addMinutes( new Date( System.currentTimeMillis() ), sessionManager.getSessionTimeout() );
+            }
+
+            userToken.setToken( token );
+            userToken.setHashAlgorithm( "HS256" );
+            userToken.setIssuer( issuer );
+            userToken.setSecret( secret );
+            userToken.setUserId( user.getId() );
+            userToken.setType( tokenType );
+            userToken.setValidDate( validDate );
+
+            identityDataService.persistUserToken( userToken );
+
+            return userToken;
+        }
+        catch ( Exception ex )
+        {
+            return null;
+        }
     }
 
 
@@ -339,7 +445,7 @@ public class IdentityManagerImpl implements IdentityManager
         {
             user = identityDataService.getUserByUsername( userName );
 
-            if ( user != null )
+            if ( user != null && user.isApproved() )
             {
                 if ( !user.getPassword().equals( password ) || user.getStatus() == UserStatus.Disabled.getId() )
                 {
@@ -354,6 +460,8 @@ public class IdentityManagerImpl implements IdentityManager
 
         return user;
     }
+
+
 
 
     /* *************************************************
@@ -471,6 +579,38 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
+    private Subject getActiveSubject()
+    {
+
+        Subject subject = null;
+
+        try
+        {
+            AccessControlContext acc = AccessController.getContext();
+
+            if ( acc == null )
+            {
+                throw new RuntimeException( "access control context is null" );
+            }
+
+            subject = Subject.getSubject( acc );
+
+            if ( subject == null )
+            {
+                throw new RuntimeException( "subject is null" );
+            }
+        }
+        catch ( Exception ex )
+        {
+            LOGGER.error( "*** Error! Cannot get auth.subject." );
+        }
+
+        return subject;
+    }
+
+
+    /* *************************************************
+     */
     @RolesAllowed( "Identity-Management|Write" )
     @Override
     public User createTempUser( String userName, String password, String fullName, String email, int type )
@@ -498,12 +638,50 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
+    @RolesAllowed( "Identity-Management|Write" )
+    @Override
+    public void approveUser( final String userName, List<Role> roles)
+    {
+        User user = identityDataService.getUserByUsername( userName );
+        user.setRoles( roles );
+        user.setApproved( true );
+
+
+        identityDataService.updateUser( user );
+    }
+
+
+    public User signUp( String username, String pwd, String fullName, String email, String keyAscii )
+    {
+        if ( Strings.isNullOrEmpty( pwd ) || !validUsername( username ) )
+        {
+            throw new IllegalArgumentException( "Invalid username/password" );
+        }
+        //all users are not approved by default
+        User user = new UserEntity();
+        user.setUserName( username );
+        user.setPassword( pwd );
+        user.setEmail( email );
+        user.setFullName( fullName );
+        user.setType(UserType.Regular.getId());
+        String keyId = UUID.randomUUID().toString();
+        user.setSecurityKeyId( keyId );
+        securityManager.getKeyManager().savePublicKeyRing(keyId,SecurityKeyType.UserKey.getId(), keyAscii);
+
+        user.setFingerprint( securityManager.getKeyManager().getFingerprint( keyId ) );
+
+        identityDataService.persistUser( user );
+
+        return user;
+    }
+
+
     /* *************************************************
      */
     @RolesAllowed( "Identity-Management|Write" )
     @Override
     public User createUser( String userName, String password, String fullName, String email, int type,
-                            final String publicKey )
+                            final String publicKey, boolean isApproved )
     {
         User user = new UserEntity();
 
@@ -518,7 +696,8 @@ public class IdentityManagerImpl implements IdentityManager
 
             if ( Strings.isNullOrEmpty( password ) )
             {
-                password = Integer.toString( ( new Random() ).nextInt() );
+                //password = Integer.toString( ( new Random() ).nextInt() );
+                throw new IllegalArgumentException( "Invalid password" );
             }
 
             user.setUserName( userName );
@@ -526,6 +705,7 @@ public class IdentityManagerImpl implements IdentityManager
             user.setEmail( email );
             user.setFullName( fullName );
             user.setType( type );
+            user.setApproved (isApproved);
 
             //** Create Key*****************************
             // TODO check if keyId set for KeyPair is used somewhere in system
@@ -678,70 +858,8 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    /* *************************************************
-     */
-    @PermitAll
-    @Override
-    public Session login( String userName, String password )
-    {
-        try
-        {
-            Session userSession = null;
-
-            CallbackHandler ch = getCalbackHandler( userName, password );
-            Subject subject = new Subject();
-            LoginContext loginContext = new LoginContext( "karaf", subject, ch );
-            loginContext.login();
-
-            while ( subject.getPrivateCredentials().iterator().hasNext() )
-            {
-                Object obj = subject.getPrivateCredentials().iterator().next();
-
-                if ( obj instanceof SessionEntity )
-                {
-                    userSession = ( Session ) obj;
-                    userSession.setSubject( subject );
-                    break;
-                }
-            }
-
-            return userSession;
-        }
-        catch ( Exception ex )
-        {
-            return null;
-        }
-    }
 
 
-    /* *************************************************
-     */
-    private CallbackHandler getCalbackHandler( final String userName, final String password )
-    {
-        CallbackHandler callbackHandler = new CallbackHandler()
-        {
-            public void handle( Callback[] callbacks ) throws IOException, UnsupportedCallbackException
-            {
-                for ( Callback callback : callbacks )
-                {
-                    if ( callback instanceof NameCallback )
-                    {
-                        ( ( NameCallback ) callback ).setName( userName );
-                    }
-                    else if ( callback instanceof PasswordCallback )
-                    {
-                        ( ( PasswordCallback ) callback ).setPassword( password.toCharArray() );
-                    }
-                    else
-                    {
-                        throw new UnsupportedCallbackException( callback );
-                    }
-                }
-            }
-        };
-
-        return callbackHandler;
-    }
 
 
     /* *************************************************
@@ -853,88 +971,40 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    @PermitAll
+    @RolesAllowed( "Identity-Management|Delete" )
     @Override
-    public Session authenticateSession( String login, String password )
+    public void removeRolePermission( long roleId, Permission permission )
     {
-        String sessionId;
-        Session session = null;
-        User user = null;
-
-        //-------------------------------------
-        if ( login.equals( "token" ) )
-        {
-            sessionId = password;
-        }
-        else
-        {
-            sessionId = UUID.randomUUID() + "-" + System.currentTimeMillis();
-        }
-        //-------------------------------------
-
-        session = sessionManager.getValidSession( sessionId );
-
-        if ( session == null )
-        {
-            user = authenticateUser( login, password );
-
-            if ( user == null )
-            {
-                return null;
-            }
-        }
-
-        session = sessionManager.startSession( sessionId, session, user );
-
-        return session;
+        identityDataService.removeRolePermission( roleId, permission );
     }
 
 
     /* *************************************************
      */
-    @RolesAllowed( "Identity-Management|Write" )
+    @PermitAll
     @Override
-    public UserToken createUserToken( User user, String token, String secret, String issuer, int tokenType,
-                                      Date validDate )
+    public List<Permission> getAllPermissions()
     {
-        try
-        {
-            UserToken userToken = new UserTokenEntity();
+        return identityDataService.getAllPermissions();
+    }
 
-            if ( Strings.isNullOrEmpty( token ) )
-            {
-                token = UUID.randomUUID().toString();
-            }
-            if ( Strings.isNullOrEmpty( issuer ) )
-            {
-                issuer = "io.subutai";
-            }
-            if ( Strings.isNullOrEmpty( secret ) )
-            {
-                secret = UUID.randomUUID().toString();
-            }
-            if ( validDate == null )
-            {
-                validDate = DateUtils
-                        .addMinutes( new Date( System.currentTimeMillis() ), sessionManager.getSessionTimeout() );
-            }
 
-            userToken.setToken( token );
-            userToken.setHashAlgorithm( "HS256" );
-            userToken.setIssuer( issuer );
-            userToken.setSecret( secret );
-            userToken.setUserId( user.getId() );
-            userToken.setType( tokenType );
-            userToken.setValidDate( validDate );
+    /* *************************************************
+     */
+    @RolesAllowed( "Identity-Management|Update" )
+    @Override
+    public void updatePermission( Permission permission )
+    {
+        identityDataService.updatePermission( permission );
+    }
 
-            identityDataService.persistUserToken( userToken );
 
-            return userToken;
-        }
-        catch ( Exception ex )
-        {
-            return null;
-        }
+    /* *************************************************
+     */
+    @Override
+    public IdentityDataService getIdentityDataService()
+    {
+        return identityDataService;
     }
 
 
@@ -991,37 +1061,6 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    /* *************************************************
-     */
-    private Subject getActiveSubject()
-    {
-
-        Subject subject = null;
-
-        try
-        {
-            AccessControlContext acc = AccessController.getContext();
-
-            if ( acc == null )
-            {
-                throw new RuntimeException( "access control context is null" );
-            }
-
-            subject = Subject.getSubject( acc );
-
-            if ( subject == null )
-            {
-                throw new RuntimeException( "subject is null" );
-            }
-        }
-        catch ( Exception ex )
-        {
-            LOGGER.error( "*** Error! Cannot get auth.subject." );
-        }
-
-        return subject;
-    }
-
 
     /* *************************************************
      */
@@ -1060,5 +1099,17 @@ public class IdentityManagerImpl implements IdentityManager
     public void setSecurityManager( final SecurityManager securityManager )
     {
         this.securityManager = securityManager;
+    }
+
+
+    private boolean validUsername( String username )
+    {
+        if ( username.length() == 0 || username.isEmpty() || username.equalsIgnoreCase( "token" ) )
+        {
+            return false;
+        }
+        User user = identityDataService.getUserByUsername( username );
+
+        return user == null;
     }
 }
