@@ -79,6 +79,7 @@
     <!-- REST -->
     <restlet-version>2.2.2</restlet-version>
     <org.apache.cxf.version>3.1.0</org.apache.cxf.version>
+    <servlet.version>3.0.1</servlet.version>
     <!-- TEST -->
     <org.mockito.version>1.9.5</org.mockito.version>
     <com.jayway.awaitility.version>1.5.0</com.jayway.awaitility.version>
@@ -121,9 +122,9 @@
       </dependency>
 
       <!--<dependency>-->
-        <!--<groupId>${project.groupId}</groupId>-->
-        <!--<artifactId>subutai-common-datasource</artifactId>-->
-        <!--<version>${project.version}</version>-->
+      <!--<groupId>${project.groupId}</groupId>-->
+      <!--<artifactId>subutai-common-datasource</artifactId>-->
+      <!--<version>${project.version}</version>-->
       <!--</dependency>-->
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
@@ -710,7 +711,7 @@
       <dependency>
         <groupId>javax.servlet</groupId>
         <artifactId>javax.servlet-api</artifactId>
-        <version>3.1.0</version>
+        <version>${servlet.version}</version>
       </dependency>
 
       <!-- ~~~~~~~~Security Annotation ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
