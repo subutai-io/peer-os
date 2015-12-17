@@ -110,7 +110,7 @@ public class AptManagerImpl implements AptManager
         bootstrap.addModule( new SnapMetadataParserModule() );
 
         bootstrap.addModule( new RepositoryModule() );
-//        bootstrap.addModule( new SecurityModule() );
+        //        bootstrap.addModule( new SecurityModule() );
 
         bootstrap.boot();
 
@@ -122,8 +122,8 @@ public class AptManagerImpl implements AptManager
     public String getRelease( String release, String component, String arch )
     {
         UnifiedRepository repo = getRepository();
-        Optional<ReleaseFile> rel = repo.getDistributions().stream()
-                .filter( r -> r.getCodename().equals( release ) ).findFirst();
+        Optional<ReleaseFile> rel =
+                repo.getDistributions().stream().filter( r -> r.getCodename().equals( release ) ).findFirst();
 
         if ( rel.isPresent() )
         {
@@ -136,11 +136,12 @@ public class AptManagerImpl implements AptManager
 
 
     @Override
-    public InputStream getPackagesIndex( String release, String component, String arch, String packagesIndex ) throws IllegalArgumentException
+    public InputStream getPackagesIndex( String release, String component, String arch, String packagesIndex )
+            throws IllegalArgumentException
     {
         UnifiedRepository repo = getRepository();
-        Optional<ReleaseFile> distr = repo.getDistributions().stream()
-                .filter( r -> r.getCodename().equals( release ) ).findFirst();
+        Optional<ReleaseFile> distr =
+                repo.getDistributions().stream().filter( r -> r.getCodename().equals( release ) ).findFirst();
         if ( !distr.isPresent() )
         {
             throw new IllegalArgumentException( "Release not found." );
@@ -165,8 +166,8 @@ public class AptManagerImpl implements AptManager
         PackagesIndexBuilder packagesIndexBuilder = indexBuilderFactory.createPackagesIndexBuilder( context );
         try ( ByteArrayOutputStream os = new ByteArrayOutputStream() )
         {
-            packagesIndexBuilder.buildIndex( packagesProviderFactory.create( repo, component, architecture ), os,
-                                             compressionType );
+            packagesIndexBuilder
+                    .buildIndex( packagesProviderFactory.create( repo, component, architecture ), os, compressionType );
             return new ByteArrayInputStream( os.toByteArray() );
         }
         catch ( IOException ex )
@@ -295,13 +296,13 @@ public class AptManagerImpl implements AptManager
     {
         try
         {
-            if ( url != null && !url.getHost().equals( localPeer.getManagementHost().getExternalIp() ) )
+            if ( url != null && !url.getHost().equals( localPeer.getExternalIp() ) )
             {
                 repoUrlStore.addRemoteAptUrl( new RepoUrl( url, token ) );
                 remoteRepoUrls = repoUrlStore.getRemoteAptUrls();
             }
         }
-        catch ( HostNotFoundException | IOException ex )
+        catch ( IOException ex )
         {
             LOGGER.error( "Failed to add remote apt repo: {}", url, ex );
         }
@@ -355,8 +356,6 @@ public class AptManagerImpl implements AptManager
         Properties kcp = properties.getContextProperties( context );
         kcp.setProperty( FileStoreFactory.TYPE, FileStoreFactory.FILE_SYSTEM );
         kcp.setProperty( PackageMetadataStoreModule.PACKAGE_METADATA_STORE_TYPE, PackageMetadataStoreFactory.FILE_DB );
-
     }
-
 }
 
