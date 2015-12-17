@@ -45,8 +45,8 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
 
 
     @Override
-    public Response getTemplate( String repository, String md5, String name, String version, String type,
-                                 boolean isKurjunClient )
+    public Response getTemplate( String repository, String md5, String name, String version, 
+            String type, boolean isKurjunClient )
     {
         try
         {
@@ -54,12 +54,16 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
             if ( md5bytes != null )
             {
                 TemplateKurjun template = templateManager.getTemplate( repository, md5bytes, isKurjunClient );
-                InputStream is = templateManager.getTemplateData( repository, md5bytes, isKurjunClient );
-                if ( template != null && is != null )
+                if ( template != null )
                 {
-                    return Response.ok( is )
-                                   .header( "Content-Disposition", "attachment; filename=" + makeFilename( template ) )
-                                   .header( "Content-Type", "application/octet-stream" ).build();
+                    InputStream is = templateManager.getTemplateData( repository, md5bytes, isKurjunClient );
+                    if ( is != null )
+                    {
+                        return Response.ok( is )
+                                .header( "Content-Disposition", "attachment; filename=" + makeFilename( template ) )
+                                .header( "Content-Type", "application/octet-stream" )
+                                .build();
+                    }
                 }
             }
             else
@@ -83,8 +87,7 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
 
 
     @Override
-    public Response getTemplateInfo( String repository, String md5, String name, String version,
-                                     boolean isKurjunClient )
+    public Response getTemplateInfo( String repository, String md5, String name, String version, boolean isKurjunClient )
     {
         try
         {
@@ -123,8 +126,7 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
             List<TemplateKurjun> list = templateManager.list( repository, isKurjunClient );
             if ( list != null )
             {
-                List<DefaultTemplate> deflist =
-                        list.stream().map( t -> convertToDefaultTemplate( t ) ).collect( Collectors.toList() );
+                List<DefaultTemplate> deflist = list.stream().map( t -> convertToDefaultTemplate( t ) ).collect( Collectors.toList() );
                 return Response.ok( GSON.toJson( deflist ) ).build();
             }
         }
@@ -201,6 +203,12 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
 
     private DefaultTemplate convertToDefaultTemplate( TemplateKurjun template )
     {
+        return convertToDefaultTemplate( template, true );
+    }
+
+
+    private DefaultTemplate convertToDefaultTemplate( TemplateKurjun template, boolean includeFileContents )
+    {
         DefaultTemplate defaultTemplate = new DefaultTemplate();
         defaultTemplate.setName( template.getName() );
         defaultTemplate.setVersion( template.getVersion() );
@@ -208,6 +216,11 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
         defaultTemplate.setArchitecture( Architecture.getByValue( template.getArchitecture() ) );
         defaultTemplate.setParent( template.getParent() );
         defaultTemplate.setPackage( template.getPackageName() );
+        if ( includeFileContents )
+        {
+            defaultTemplate.setConfigContents( template.getConfigContents() );
+            defaultTemplate.setPackagesContents( template.getPackagesContents() );
+        }
         return defaultTemplate;
     }
 
@@ -223,4 +236,5 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
     {
         return LOGGER;
     }
+
 }

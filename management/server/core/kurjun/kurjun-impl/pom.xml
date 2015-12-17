@@ -19,6 +19,16 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>kurjun-api</artifactId>
     </dependency>
+    
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>identity-manager-api</artifactId>
+    </dependency>
+    
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>security-manager-api</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>ai.subut.kurjun</groupId>
@@ -96,7 +106,8 @@
             <Import-Package>
               io.subutai.*, org.apache.commons.codec*, org.apache.commons.logging*,
               org.apache.commons.io, org.apache.commons.lang*, com.google.common*,
-              com.google.gson*, org.slf4j, org.apache.cxf.*, javax.ws.*, !*
+              com.google.gson*, org.slf4j, org.apache.cxf.*, javax.ws.rs*, 
+              javax.annotation.*, javax.persistence*, javax.security*, !*
             </Import-Package>
 
           </instructions>

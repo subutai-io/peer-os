@@ -20,6 +20,11 @@ public class TemplateKurjun
 
     private String packageName;
 
+    @Expose
+    private String configContents;
+    @Expose
+    private String packagesContents;
+
 
     public TemplateKurjun( String md5Sum, String name, String version, String architecture, String parent, String packageName )
     {
@@ -101,6 +106,30 @@ public class TemplateKurjun
     public void setPackageName( String packageName )
     {
         this.packageName = packageName;
+    }
+
+
+    public String getConfigContents()
+    {
+        return configContents;
+    }
+
+
+    public void setConfigContents( String configContents )
+    {
+        this.configContents = configContents;
+    }
+
+
+    public String getPackagesContents()
+    {
+        return packagesContents;
+    }
+
+
+    public void setPackagesContents( String packagesContents )
+    {
+        this.packagesContents = packagesContents;
     }
 
 

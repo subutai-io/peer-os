@@ -1,6 +1,26 @@
 package io.subutai.core.kurjun.impl.vapt;
 
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.apache.commons.codec.binary.Hex;
+
+import com.google.inject.Injector;
+
 import ai.subut.kurjun.ar.CompressionType;
 import ai.subut.kurjun.cfparser.ControlFileParserModule;
 import ai.subut.kurjun.common.KurjunBootstrap;
@@ -15,40 +35,38 @@ import ai.subut.kurjun.model.metadata.Architecture;
 import ai.subut.kurjun.model.metadata.Metadata;
 import ai.subut.kurjun.model.metadata.SerializableMetadata;
 import ai.subut.kurjun.model.repository.LocalRepository;
-import ai.subut.kurjun.model.repository.UnifiedRepository;
 import ai.subut.kurjun.repo.RepositoryFactory;
 import ai.subut.kurjun.repo.RepositoryModule;
 import ai.subut.kurjun.repo.service.PackageFilenameParser;
 import ai.subut.kurjun.repo.service.PackagesIndexBuilder;
 import ai.subut.kurjun.repo.util.AptIndexBuilderFactory;
+import ai.subut.kurjun.repo.util.PackagesProviderFactory;
 import ai.subut.kurjun.repo.util.ReleaseIndexBuilder;
 import ai.subut.kurjun.riparser.ReleaseIndexParserModule;
 import ai.subut.kurjun.snap.SnapMetadataParserModule;
 import ai.subut.kurjun.storage.factory.FileStoreFactory;
 import ai.subut.kurjun.storage.factory.FileStoreModule;
 import ai.subut.kurjun.subutai.SubutaiTemplateParserModule;
+
 import com.google.inject.Injector;
-import io.subutai.common.peer.HostNotFoundException;
+
 import io.subutai.core.kurjun.api.vapt.AptManager;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.MalformedURLException;
-import java.net.NetworkInterface;
-import java.net.SocketException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
+
 import org.apache.commons.codec.binary.Hex;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,7 +80,7 @@ public class AptManagerImpl implements AptManager
 //    private AptIndexBuilderFactory indexBuilderFactory;
 //    private PackageFilenameParser filenameParser;
 //    private PackageFilenameBuilder filenameBuilder;
-
+    
     private static final KurjunContext context = new KurjunContext( "my" );
 
     private Injector injector;
@@ -76,7 +94,7 @@ public class AptManagerImpl implements AptManager
 
         KurjunProperties properties = injector.getInstance( KurjunProperties.class );
         setContexts( properties );
-        
+
 //        try
 //        {
 //            addRemoteRepository( new URL( "https://172.16.131.84:8443/rest/kurjun/vapt" ) );
@@ -124,7 +142,7 @@ public class AptManagerImpl implements AptManager
         if ( rel.isPresent() )
         {
             AptIndexBuilderFactory indexBuilderFactory = injector.getInstance( AptIndexBuilderFactory.class );
-            ReleaseIndexBuilder rib = indexBuilderFactory.createReleaseIndexBuilder( context );
+            ReleaseIndexBuilder rib = indexBuilderFactory.createReleaseIndexBuilder( repo, context );
             return rib.build( rel.get(), repo.isKurjun() );
         }
         return null;
@@ -154,11 +172,13 @@ public class AptManagerImpl implements AptManager
 
         CompressionType compressionType = CompressionType.getCompressionType( packagesIndex );
 
+        PackagesProviderFactory packagesProviderFactory = injector.getInstance( PackagesProviderFactory.class );
         AptIndexBuilderFactory indexBuilderFactory = injector.getInstance( AptIndexBuilderFactory.class );
         PackagesIndexBuilder packagesIndexBuilder = indexBuilderFactory.createPackagesIndexBuilder( context );
         try ( ByteArrayOutputStream os = new ByteArrayOutputStream() )
         {
-            packagesIndexBuilder.buildIndex( component, architecture, os, compressionType );
+            packagesIndexBuilder.buildIndex( packagesProviderFactory.create( context, component, architecture ), os,
+                                             compressionType );
             return new ByteArrayInputStream( os.toByteArray() );
         }
         catch ( IOException ex )
@@ -257,7 +277,7 @@ public class AptManagerImpl implements AptManager
     @Override
     public String getPackageInfo( byte[] md5, String name, String version )
     {
-            //        if ( checkAuthentication( Permission.GET_PACKAGE ) )
+        //        if ( checkAuthentication( Permission.GET_PACKAGE ) )
 //        {
 //            return forbiddenResponse();
 //        }
@@ -293,7 +313,7 @@ public class AptManagerImpl implements AptManager
         {
             return null;
         }
-        
+
         DefaultMetadata m = new DefaultMetadata();
         m.setMd5sum( md5 );
 
@@ -342,8 +362,6 @@ public class AptManagerImpl implements AptManager
 //        }
 //
 //    }
-
-
 //    private UnifiedRepository getRepository()
 //    {
 //        RepositoryFactory repositoryFactory = injector.getInstance( RepositoryFactory.class );
@@ -355,8 +373,6 @@ public class AptManagerImpl implements AptManager
 //        }
 //        return unifiedRepo;
 //    }
-
-
     private LocalRepository getLocalRepository()
     {
         RepositoryFactory repositoryFactory = injector.getInstance( RepositoryFactory.class );
@@ -374,3 +390,4 @@ public class AptManagerImpl implements AptManager
     }
 
 }
+
