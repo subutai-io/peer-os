@@ -113,13 +113,13 @@ public class IdentityManagerImpl implements IdentityManager
 
             //***Create User ********************************************
             User internal = createUser( "internal", "internal", "System User", "internal@subutai.io", 1,
-                    generateArmoredPublicKey() );
+                    generateArmoredPublicKey(), true );
             User admin =
-                    createUser( "admin", "secret", "Administrator", "admin@subutai.io", 2, generateArmoredPublicKey() );
+                    createUser( "admin", "secret", "Administrator", "admin@subutai.io", 2, generateArmoredPublicKey(), true );
             User manager =
-                    createUser( "manager", "manager", "Manager", "manager@subutai.io", 2, generateArmoredPublicKey() );
+                    createUser( "manager", "manager", "Manager", "manager@subutai.io", 2, generateArmoredPublicKey(), true );
             User karaf =
-                    createUser( "karaf", "karaf", "Karaf Manager", "karaf@subutai.io", 2, generateArmoredPublicKey() );
+                    createUser( "karaf", "karaf", "Karaf Manager", "karaf@subutai.io", 2, generateArmoredPublicKey(), true );
             //***********************************************************
 
             //***Create Token *******************************************
@@ -681,7 +681,7 @@ public class IdentityManagerImpl implements IdentityManager
     @RolesAllowed( "Identity-Management|Write" )
     @Override
     public User createUser( String userName, String password, String fullName, String email, int type,
-                            final String publicKey )
+                            final String publicKey, boolean isApproved )
     {
         User user = new UserEntity();
 
@@ -705,6 +705,7 @@ public class IdentityManagerImpl implements IdentityManager
             user.setEmail( email );
             user.setFullName( fullName );
             user.setType( type );
+            user.setApproved (isApproved);
 
             //** Create Key*****************************
             // TODO check if keyId set for KeyPair is used somewhere in system

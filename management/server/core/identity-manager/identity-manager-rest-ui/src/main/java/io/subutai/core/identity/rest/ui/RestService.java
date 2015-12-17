@@ -29,8 +29,9 @@ public interface RestService
                              @FormParam( "roles" ) String roles, @FormParam( "user_id" ) Long userId,
                        @FormParam( "public_key" ) String publicKey );
 
-    @Path( "/signup" )
+
     @POST
+	@Path( "/signup" )
     @Produces( { MediaType.APPLICATION_JSON } )
     Response signUp( @FormParam( "username" ) String username,
                        @FormParam( "full_name" ) String fullName,
@@ -38,8 +39,9 @@ public interface RestService
                        @FormParam( "email" ) String email,
                        @FormParam( "public_key" ) String publicKey );
 
-    @Path( "/approve" )
+
     @POST
+	@Path( "/approve" )
     @Produces( { MediaType.APPLICATION_JSON } )
     Response approve( @FormParam( "username" ) String username,@FormParam( "roles" ) String roles );
 

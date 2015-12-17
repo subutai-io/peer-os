@@ -13,30 +13,66 @@ var app = angular.module('subutai-app', [
     .controller('CurrentUserCtrl', CurrentUserCtrl)
     .run(startup);
 
-CurrentUserCtrl.$inject = ['$location', '$rootScope'];
+CurrentUserCtrl.$inject = ['$location', '$rootScope', 'ngDialog', '$http', 'SweetAlert'];
 routesConf.$inject = ['$stateProvider', '$urlRouterProvider', '$ocLazyLoadProvider'];
 startup.$inject = ['$rootScope', '$state', '$location', '$http'];
 
-function CurrentUserCtrl($location, $rootScope) {
-    var vm = this;
-    vm.currentUser = $rootScope.currentUser;
+function CurrentUserCtrl($location, $rootScope, ngDialog, $http, SweetAlert) {
+	var vm = this;
+	vm.currentUser = $rootScope.currentUser;
+	vm.user2Add = {};
+	vm.currentUserRoles = [];
 
-    //function
-    vm.logout = logout;
+	//function
+	vm.logout = logout;
+	vm.signUpWindow = signUpWindow;
+	vm.requestNewUser = requestNewUser;
 
-    function logout() {
-        removeCookie('sptoken');
-        sessionStorage.removeItem('currentUser');
-        $location.path('login');
-    }
 
-    $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
-        if (localStorage.getItem('currentUser') !== undefined) {
-            vm.currentUser = sessionStorage.getItem('currentUser');
-        } else if ($rootScope.currentUser !== undefined) {
-            vm.currentUser = $rootScope.currentUser;
-        }
-    });
+	function logout() {
+		removeCookie('sptoken');
+		sessionStorage.removeItem('currentUser');
+		$location.path('login');
+	}
+
+	$rootScope.$on('$stateChangeStart',	function(event, toState, toParams, fromState, fromParams){
+		if(localStorage.getItem('currentUser') !== undefined) {
+			vm.currentUser = sessionStorage.getItem('currentUser');
+		} else if($rootScope.currentUser !== undefined) {
+			vm.currentUser = $rootScope.currentUser;
+		}
+	});
+
+
+	function signUpWindow() {
+		console.log ("");
+		vm.newUser = {};
+		ngDialog.open ({
+			template: "signUp.html",
+			controller: "CurrentUserCtrl",
+			controllerAs: "currentUserCtrl"
+		});
+	}
+
+
+
+	//functions
+
+	function requestNewUser() {
+		console.log ("!");
+		var postData = "username=" + vm.user2Add.username + "&full_name=" + vm.user2Add.fullName + "&password=" + vm.user2Add.password + "&email=" + vm.user2Add.email + "&public_key=" + vm.user2Add.public_key;
+		$http.post(
+			SERVER_URL + 'rest/ui/identity/signup',
+			postData,
+			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
+		.success(function (data) {
+			SweetAlert.swal ("Success!", "Your request was sent.", "success");
+			vm.user2Add = {};
+			ngDialog.closeAll();
+		}).error (function (error) {
+			SweetAlert.swal ("ERROR!", "Signup error: " + error.replace(/\\n/g, " "), "error");
+		});
+	}
 }
 
 function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {

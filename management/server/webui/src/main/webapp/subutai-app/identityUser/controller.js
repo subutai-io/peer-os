@@ -4,9 +4,10 @@ angular.module('subutai.identity-user.controller', [])
 	.controller('IdentityUserCtrl', IdentityUserCtrl)
 	.controller('IdentityUserFormCtrl', IdentityUserFormCtrl)
 	.directive('pwCheck', pwCheck)
-	.directive('colSelect', colSelect);	
+	.directive('colSelect', colSelect)
+	.directive('colSelect2', colSelect2);
 
-IdentityUserCtrl.$inject = ['$scope', 'identitySrv', 'DTOptionsBuilder', 'DTColumnBuilder', '$resource', '$compile', 'SweetAlert', 'ngDialog'];
+IdentityUserCtrl.$inject = ['$scope', 'identitySrv', 'SweetAlert', 'ngDialog'];
 IdentityUserFormCtrl.$inject = ['$scope', 'identitySrv', 'ngDialog'];
 
 function userPostData(user) {
@@ -14,7 +15,8 @@ function userPostData(user) {
 	var postData = 'username=' + user.userName + 
 		'&full_name=' + user.fullName +
 		'&password=' + user.password +
-		'&email=' + user.email + "&public_key=" + encodeURIComponent(user.public_key);
+		'&email=' + user.email +
+		'&public_key=' + user.public_key;
 
 	if(currentUserRoles !== undefined) {
 		postData += '&roles=' + currentUserRoles;
@@ -27,7 +29,7 @@ function userPostData(user) {
 	return postData;
 }
 
-function IdentityUserCtrl($scope, identitySrv, DTOptionsBuilder, DTColumnBuilder, $resource, $compile, SweetAlert, ngDialog) {
+function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog) {
 
 	var vm = this;
 
@@ -35,66 +37,50 @@ function IdentityUserCtrl($scope, identitySrv, DTOptionsBuilder, DTColumnBuilder
 	vm.userForm = userForm;
 	vm.deleteUser = deleteUser;
 	vm.removeRoleFromUser = removeRoleFromUser;
+	vm.activeTab = "approved";
 
 	function userForm(user) {
 		if(user === undefined || user === null) user = false;
-
+		identitySrv.getKey (user.securityKeyId).success (function (data) {
+			user.public_key = data;
+		});
 		ngDialog.open({
 			template: 'subutai-app/identityUser/partials/userForm.html',
 			controller: 'IdentityUserFormCtrl',
 			controllerAs: 'identityUserFormCtrl',
 			data: user,
 			preCloseCallback: function(value) {
-				vm.dtInstance.reloadData(null, false);
+				getUsers();
 			}
 		});
 	}
 
-	vm.dtInstance = {};
-	vm.users = {};
-	vm.dtOptions = DTOptionsBuilder
-		.fromFnPromise(function() {
-			return $resource( identitySrv.getUsersUrl() ).query().$promise;
-		})
-		.withPaginationType('full_numbers')
-		.withOption('createdRow', createdRow)
-		.withOption('order', [[ 1, "asc" ]])
-		//.withDisplayLength(2)
-		.withOption('stateSave', true);
-
-	vm.dtColumns = [
-		//DTColumnBuilder.newColumn('id').withTitle('ID'),
-		DTColumnBuilder.newColumn(null).withTitle('').notSortable().renderWith(actionEdit),
-		DTColumnBuilder.newColumn('userName').withTitle('Username'),
-		DTColumnBuilder.newColumn('fullName').withTitle('Full name'),
-		DTColumnBuilder.newColumn('email').withTitle('Email'),
-		DTColumnBuilder.newColumn(null).withTitle('Roles').notSortable().renderWith(rolesTags),
-		DTColumnBuilder.newColumn(null).withTitle('').notSortable().renderWith(actionDelete)
-	];
-
-	function createdRow(row, data, dataIndex) {
-		$compile(angular.element(row).contents())($scope);
+	vm.users = [];
+	vm.pendingUsers = [];
+	function getUsers() {
+		vm.users = [];
+		vm.pendingUsers = [];
+		identitySrv.getUsers().success (function (data) {
+			console.log (data);
+			for (var i = 0; i < data.length; ++i) {
+				if (data[i].isApproved) {
+					vm.users.push (data[i]);
+				}
+				else {
+					vm.pendingUsers.push (data[i]);
+				}
+			}
+		});
 	}
-
-	function actionEdit(data, type, full, meta) {
-		vm.users[data.id] = data;
-		return '<a href class="b-icon b-icon_edit" ng-click="identityUserCtrl.userForm(identityUserCtrl.users[' + data.id + '])"></a>';
+	getUsers();
+	vm.roles = [];
+	function getRolesFromAPI() {
+		identitySrv.getRoles().success(function (data) {
+			vm.roles = data;
+		});
 	}
+	getRolesFromAPI();
 
-	function rolesTags(data, type, full, meta) {
-		var rolesHTML = '';
-		for(var i = 0; i < data.roles.length; i++) {
-			rolesHTML += '<span class="b-tags b-tags_grey">' 
-				+ data.roles[i].name 
-				+ ' <a href ng-click="identityUserCtrl.removeRoleFromUser(identityUserCtrl.users[' + data.id + '], ' + i + ')"><i class="fa fa-times"></i></a>' 
-			+ '</span>';
-		}
-		return rolesHTML;
-	}
-
-	function actionDelete(data, type, full, meta) {
-		return '<a href class="b-icon b-icon_remove" ng-click="identityUserCtrl.deleteUser(identityUserCtrl.users[' + data.id + '])"></a>';
-	}
 
 	function removeRoleFromUser(user, roleKey) {
 		SweetAlert.swal({
@@ -153,6 +139,72 @@ function IdentityUserCtrl($scope, identitySrv, DTOptionsBuilder, DTColumnBuilder
 			}
 		});
 	}
+
+	vm.approveWindow = approveWindow;
+	vm.reject = reject;
+	vm.colSelectUserRole = colSelectUserRole;
+	vm.approve = approve;
+	vm.currentUser = {};
+
+	function approveWindow (user) {
+		vm.currentUser = user;
+		ngDialog.open({
+			template: 'subutai-app/identityUser/partials/approveWindow.html',
+			scope: $scope
+		});
+	}
+
+	function approve() {
+		identitySrv.approve (vm.currentUser.userName, JSON.stringify (vm.currentUser.roles)).success (function (data) {
+			SweetAlert.swal ("Success!", "User was rejected.", "success");
+			getRequests();
+		}).error (function (error) {
+			SweetAlert.swal ("ERROR!", "User reject error: " + error.replace(/\\n/g, " "), "error");
+		});
+	}
+
+	function colSelectUserRole(id) {
+
+		if(vm.currentUser.roles === undefined) {
+			vm.currentUser.roles = [];
+		}
+
+		if(vm.currentUser.roles.indexOf(id) >= 0) {
+			vm.currentUser.roles.splice(vm.currentUser.roles.indexOf(id), 1);
+		} else {
+			vm.currentUser.roles.push(id);
+		}
+	}
+
+	function reject (user) {
+		SweetAlert.swal({
+			title: "Are you sure?",
+			text: "Your will not be able to undo this!",
+			type: "warning",
+			showCancelButton: true,
+			confirmButtonColor: "#ff3f3c",
+			confirmButtonText: "Delete",
+			cancelButtonText: "Cancel",
+			closeOnConfirm: false,
+			closeOnCancel: true,
+			showLoaderOnConfirm: true
+		},
+		function (isConfirm) {
+			if (isConfirm) {
+				identitySrv.reject (user.id).success (function (data) {
+					SweetAlert.swal ("Success!", "User was rejected.", "success");
+					getRequests();
+				}).error (function (error) {
+					SweetAlert.swal ("ERROR!", "User reject error: " + error.replace(/\\n/g, " "), "error");
+				});
+			}
+		});
+	}
+
+	function getKey (id) {
+		return identitySrv.getKey (id);
+	}
+
 };
 
 function IdentityUserFormCtrl($scope, identitySrv, ngDialog) {
@@ -230,6 +282,13 @@ function colSelect() {
 	return {
 		restrict: 'E',
 		templateUrl: 'subutai-app/identityUser/directives/col-select/col-select-roles.html'
+	}
+};
+
+function colSelect2() {
+	return {
+		restrict: 'E',
+		templateUrl: 'subutai-app/identityUser/directives/col-select/col-select-roles2.html'
 	}
 };
 

@@ -2,10 +2,10 @@
 <html ng-app="subutai-app">
 
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>{{ Page.title() }}</title>
+	<title>{{ Page.title() }}</title>
 
 	<!--CSS Libs-->
 	<link rel="stylesheet" href="css/libs/font-awesome.min.css"/>
@@ -22,8 +22,8 @@
 
 	<link rel="stylesheet" href="css/style.css"/>
 
-    <!-- DIRS -->
-    <!-- END DIRS -->
+	<!-- DIRS -->
+	<!-- END DIRS -->
 </head>
 
 <body>
@@ -39,20 +39,25 @@
 	<div class="b-header__userbar b-header__userbar_right" ng-controller="CurrentUserCtrl as currentUserCtrl">
 		<div class="b-header-userbar">
 			<div class="b-header-userbar__name">
-				<a href ng-click="currentUserCtrl.logout()" 
-					class="b-header-userbar-name" 
-					ng-if="currentUserCtrl.currentUser">
+				<a href ng-click="currentUserCtrl.logout()"
+				   class="b-header-userbar-name"
+				   ng-if="currentUserCtrl.currentUser">
 					{{ currentUserCtrl.currentUser }} / Logout
 				</a>
-				<a href ui-sref="login" 
-					class="b-header-userbar-name" 
-					ng-if="!currentUserCtrl.currentUser">
+				<a href ng-click = "currentUserCtrl.signUpWindow()"
+				   class="b-header-userbar-name"
+				   ng-if="!currentUserCtrl.currentUser" style = "margin-right: 20px">
+					Sign Up
+				</a>
+				<a href ui-sref="login"
+				   class="b-header-userbar-name"
+				   ng-if="!currentUserCtrl.currentUser">
 					Login
 				</a>
 			</div>
 			<div class="b-header-userbar__avatar">
 				<img src="" alt="" class="b-header-userbar-avatar"
-				onerror="this.onerror=null;this.src='assets/elements/avatar-empty.svg';"/>
+					 onerror="this.onerror=null;this.src='assets/elements/avatar-empty.svg';"/>
 			</div>
 		</div>
 	</div>
@@ -60,12 +65,12 @@
 
 <div class="b-content">
 
-    <div ng-include="'subutai-app/common/partials/nav-menu.html'"></div>
+	<div ng-include="'subutai-app/common/partials/nav-menu.html'"></div>
 
 	<div class="b-workspace">
 
 		<div ui-view></div>
-		
+
 	</div>
 
 	<div class="clear"></div>
