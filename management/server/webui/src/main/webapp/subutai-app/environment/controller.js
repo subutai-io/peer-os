@@ -71,7 +71,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 	vm.toggleSelection = toggleSelection;
 	vm.shareEnvironment = shareEnvironment;
 	function actionShare (data, type, full, meta) {
-		return '<a href="" class="b-btn b-btn_blue g-left" ng-click="environmentViewCtrl.shareEnvironmentWindow(\'' + data.id + '\')" ng-show = "' + data.status + ' === \'HEALTHY\'">Share</a>';
+		return '<a href="" class="b-btn b-btn_blue g-left" ng-click="environmentViewCtrl.shareEnvironmentWindow(\'' + data.id + '\')" ng-show = "' + data.status + ' === HEALTHY">Share</a>';
 	}
 	vm.currentUser = {};
 	identitySrv.getCurrentUser().success (function (data) {
@@ -87,6 +87,17 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 					vm.listOfUsers.push (data[i]);
 				}
 			}
+			environmentService.getShared (environmentId).success (function (data2) {
+				console.log (data2);
+				for (var i = 0; i < data2.length; ++i) {
+					for (var j = 0; j < vm.listOfUsers.length; ++j) {
+						if (vm.listOfUsers[j].id === data2[i].id) {
+							vm.checkedUsers.push (vm.listOfUsers[j]);
+							break;
+						}
+					}
+				}
+			});
 			vm.currentEnvironment = vm.users[environmentId];
 			ngDialog.open ({
 				template: "subutai-app/environment/partials/shareEnv.html",
@@ -106,7 +117,18 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 	}
 
 	function shareEnvironment() {
-		// TODO: share environment to vm.checkedUsers
+		if (vm.checkedUsers.length === 0) {
+			SweetAlert.swal("ERROR!", "You haven't selected any users.");
+		}
+		else {
+			environmentService.share (vm.checkedUsers, vm.currentEnvironment.id).success(function (data) {
+				SweetAlert.swal("Success!", "Your environment was successfully shared.", "success");
+				vm.dtInstance.reloadData(null, false);
+				ngDialog.closeAll();
+			}).error(function (data) {
+				SweetAlert.swal("ERROR!", "Your container is safe :). Error: " + data.ERROR, "error");
+			});
+		}
 	}
 
 	var refreshTable;
