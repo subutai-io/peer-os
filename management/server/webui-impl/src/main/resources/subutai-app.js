@@ -183,7 +183,8 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
                             files: [
                                 'subutai-app/environment/environment.js',
                                 'subutai-app/environment/controller.js',
-                                'subutai-app/environment/service.js'
+                                'subutai-app/environment/service.js',
+                                'subutai-app/identity/service.js'
                             ]
                         }
                     ]);
