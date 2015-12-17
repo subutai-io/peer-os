@@ -78,7 +78,6 @@ public class HostsCommandTest extends SystemOutRedirectTest
     {
         command.doExecute();
 
-        assertTrue( getSysOut().contains( MGMT_HOST_HOSTNAME ) );
         assertTrue( getSysOut().contains( RESOURCE_HOST_HOSTNAME ) );
         assertTrue( getSysOut().contains( CONTAINER_HOST_HOSTNAME ) );
     }

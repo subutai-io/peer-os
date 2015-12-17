@@ -61,6 +61,8 @@ import io.subutai.core.repository.api.RepositoryManager;
 @Entity
 @Table( name = "m_host" )
 @Access( AccessType.FIELD )
+//TODO: to remove
+@Deprecated
 public class ManagementHostEntity /*extends AbstractSubutaiHost implements ManagementHost, Disposable*/
 {
 /*    private static final Logger LOG = LoggerFactory.getLogger( ManagementHostEntity.class );

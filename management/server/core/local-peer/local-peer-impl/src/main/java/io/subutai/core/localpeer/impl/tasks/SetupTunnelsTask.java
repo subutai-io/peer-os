@@ -113,7 +113,7 @@ public class SetupTunnelsTask implements Callable<Integer>
     }
 
 
-    private void setupVniVlanMapping( final int tunnelId, final long vni, final int vlanId, final String environmentId )
+    protected void setupVniVlanMapping( final int tunnelId, final long vni, final int vlanId, final String environmentId )
             throws PeerException
     {
         try

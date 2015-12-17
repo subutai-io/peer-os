@@ -14,7 +14,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerException;
-import io.subutai.core.localpeer.impl.entity.ManagementHostEntity;
 import io.subutai.core.network.api.NetworkManager;
 
 import static junit.framework.TestCase.fail;
@@ -36,7 +35,7 @@ public class SetupTunnelsTaskTest
     @Mock
     NetworkManager networkManager;
     @Mock
-    LocalPeer managementHostEntity;
+    LocalPeer localPeer;
     @Mock
     Vni vni;
 
@@ -49,7 +48,7 @@ public class SetupTunnelsTaskTest
     {
         Map<String, String> m = new HashMap<>();
         m.put( PEER_IP, N2N_IP );
-        task = new SetupTunnelsTask( networkManager, managementHostEntity, ENV_ID, m );
+        task = new SetupTunnelsTask( networkManager, localPeer, ENV_ID, m );
     }
 
 
@@ -65,12 +64,12 @@ public class SetupTunnelsTaskTest
         catch ( PeerException e )
         {
         }
-
-//        when( managementHostEntity.findVniByEnvironmentId( ENV_ID ) ).thenReturn( vni );
-//        when( managementHostEntity.findTunnel( anyString(), anySet() ) ).thenReturn( -1 );
+//
+//        when( localPeer.findVniByEnvironmentId( ENV_ID ) ).thenReturn( vni );
+//        when( task.findTunnel( anyString(), anySet() ) ).thenReturn( -1 );
 //
 //        task.call();
 //
-//        verify( managementHostEntity ).setupVniVlanMapping( anyInt(), anyLong(), anyInt(), any( String.class ) );
+//        verify( task ).setupVniVlanMapping( anyInt(), anyLong(), anyInt(), any( String.class ) );
     }
 }

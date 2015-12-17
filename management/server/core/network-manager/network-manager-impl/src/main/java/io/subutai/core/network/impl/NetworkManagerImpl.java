@@ -22,7 +22,6 @@ import io.subutai.common.network.VniVlanMapping;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
-import io.subutai.common.peer.ManagementHost;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.Tunnel;
@@ -455,7 +454,7 @@ public class NetworkManagerImpl implements NetworkManager
     }
 
 
-    protected ResourceHost getManagementHost() throws NetworkManagerException
+    protected Host getManagementHost() throws NetworkManagerException
     {
         try
         {

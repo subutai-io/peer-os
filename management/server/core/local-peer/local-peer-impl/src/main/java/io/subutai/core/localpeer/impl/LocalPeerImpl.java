@@ -115,7 +115,6 @@ import io.subutai.core.localpeer.impl.container.CreateContainerWrapperTask;
 import io.subutai.core.localpeer.impl.container.CreateEnvironmentContainerGroupRequestListener;
 import io.subutai.core.localpeer.impl.container.DestroyContainerWrapperTask;
 import io.subutai.core.localpeer.impl.container.DestroyEnvironmentContainerGroupRequestListener;
-//import io.subutai.core.localpeer.impl.dao.ManagementHostDataService;
 import io.subutai.core.localpeer.impl.dao.ResourceHostDataService;
 import io.subutai.core.localpeer.impl.dao.TunnelDataService;
 import io.subutai.core.localpeer.impl.entity.AbstractSubutaiHost;
@@ -138,6 +137,8 @@ import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.strategy.api.StrategyManager;
 import io.subutai.core.strategy.api.StrategyNotFoundException;
 
+//import io.subutai.core.localpeer.impl.dao.ManagementHostDataService;
+
 
 /**
  * Local peer implementation
@@ -154,13 +155,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     private DaoManager daoManager;
     private TemplateManager templateRegistry;
-    protected ResourceHostEntity managementHost;
+    protected Host managementHost;
     protected Set<ResourceHost> resourceHosts = Sets.newHashSet();
     private CommandExecutor commandExecutor;
     private StrategyManager strategyManager;
     private QuotaManager quotaManager;
     private Monitor monitor;
-    //    protected ManagementHostDataService managementHostDataService;
     protected ResourceHostDataService resourceHostDataService;
     protected TunnelDataService tunnelDataService;
     private HostRegistry hostRegistry;
@@ -173,7 +173,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     protected boolean initialized = false;
-    private RepositoryManager repositoryManager;
     protected ExecutorService singleThreadExecutorService = SubutaiExecutors.newSingleThreadExecutor();
 
 
@@ -212,14 +211,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
             tunnelDataService = createTunnelDataService();
 
-            //            managementHostDataService = createManagementHostDataService();
-            //
-            //            Collection<ManagementHostEntity> allManagementHostEntity = managementHostDataService.getAll();
-            //            if ( allManagementHostEntity != null && !allManagementHostEntity.isEmpty() )
-            //            {
-            //                managementHost = allManagementHostEntity.iterator().next();
-            //                managementHost.setPeer( this );
-            //            }
 
             resourceHostDataService = createResourceHostDataService();
             resourceHosts.clear();
@@ -227,10 +218,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             {
                 for ( ResourceHost resourceHost : resourceHostDataService.getAll() )
                 {
-//                    if ( "management".equals( resourceHost.getHostname() ) )
-//                    {
-//                        managementHost = resourceHost;
-//                    }
+                    if ( "management".equals( resourceHost.getHostname() ) )
+                    {
+                        managementHost = resourceHost;
+                    }
                     resourceHosts.add( resourceHost );
                 }
             }
@@ -257,12 +248,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-//    protected ManagementHostDataService createManagementHostDataService()
-//    {
-//        return new ManagementHostDataService( daoManager.getEntityManagerFactory() );
-//    }
-
-
     protected ResourceHostDataService createResourceHostDataService()
     {
         return new ResourceHostDataService( daoManager.getEntityManagerFactory() );
@@ -278,11 +263,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public void dispose()
     {
-        if ( managementHost != null )
-        {
-            ( ( Disposable ) managementHost ).dispose();
-        }
-
         for ( ResourceHost resourceHost : getResourceHosts() )
         {
             ( ( Disposable ) resourceHost ).dispose();
@@ -454,7 +434,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     private Set<ContainerHostInfoModel> createByStrategy( final CreateEnvironmentContainerGroupRequest request )
             throws PeerException
     {
-
         //check if strategy exists
         try
         {
@@ -808,12 +787,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         Preconditions.checkNotNull( id );
 
-
-        if ( getManagementHost().getId().equals( id ) )
-        {
-            return getManagementHost();
-        }
-
         for ( ResourceHost resourceHost : getResourceHosts() )
         {
             if ( resourceHost.getId().equals( id ) )
@@ -973,7 +946,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public ResourceHost getManagementHost() throws HostNotFoundException
+    public Host getManagementHost() throws HostNotFoundException
     {
         if ( managementHost == null )
         {
@@ -988,9 +961,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         synchronized ( resourceHosts )
         {
-            final Set<ResourceHost> resourceHosts = Sets.newConcurrentHashSet( this.resourceHosts );
-            //            resourceHosts.add( managementHost );
-            return resourceHosts;
+            return Sets.newConcurrentHashSet( this.resourceHosts );
         }
     }
 
@@ -1162,42 +1133,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         return null;
     }
 
-
-    //    private void initManagementHost( ResourceHostInfo hostInfo )
-    //    {
-    //        try
-    //        {
-    //            final String peerId = securityManager.getKeyManager().getPeerId();
-    //            managementHost = new ManagementHostEntity( peerId, hostInfo );
-    //            managementHost.setPeer( this );
-    //            managementHostDataService.persist( managementHost );
-    //        }
-    //        catch ( Exception e )
-    //        {
-    //            LOG.error( "Could not initialize management host." );
-    //        }
-    //        LOG.info( "Management host initialized" );
-    //    }
-
-
     @Override
     public void onHeartbeat( final ResourceHostInfo resourceHostInfo, Set<QuotaAlertValue> alerts )
     {
         LOG.debug( "On heartbeat: " + resourceHostInfo.getHostname() );
         if ( initialized )
         {
-            //            if ( resourceHostInfo.getHostname().equals( "management" ) )
-            //            {
-            //                if ( managementHost == null )
-            //                {
-            //                    initManagementHost( resourceHostInfo );
-            //                }
-            //                managementHost.updateHostInfo( resourceHostInfo );
-            //            }
-            //            else
-            //            {
-            //            if ( managementHost != null )
-            //            {
             ResourceHostEntity host;
             try
             {
@@ -1222,8 +1163,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             {
                 managementHost = host;
             }
-            //            }
-            //            }
         }
     }
 
@@ -1355,7 +1294,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         Set<Gateway> gateways = Sets.newHashSet();
 
         //TODO: use findByName method
-        for ( HostInterface iface : managementHost.getHostInterfaces().getAll() )
+        for ( HostInterface iface : getManagementHost().getHostInterfaces().getAll() )
         {
             Matcher matcher = GATEWAY_INTERFACE_NAME_PATTERN.matcher( iface.getName().trim() );
             if ( matcher.find() )
@@ -1684,9 +1623,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public HostInterfaces getInterfaces()
+    public HostInterfaces getInterfaces() throws HostNotFoundException
     {
-        return managementHost.getHostInterfaces();
+        return getManagementHost().getHostInterfaces();
     }
 
 
@@ -2064,7 +2003,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     private Host findHostByName( final String hostname ) throws HostNotFoundException
     {
-        if ( managementHost.getHostname().equals( hostname ) )
+        if ( getManagementHost().getHostname().equals( hostname ) )
         {
             return managementHost;
         }

@@ -3,7 +3,11 @@ package io.subutai.core.localpeer.impl;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
 import org.junit.Before;
 import org.junit.Ignore;
@@ -25,9 +29,13 @@ import io.subutai.common.dao.DaoManager;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.HostInterfaceModel;
+import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.QuotaAlertValue;
+import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerHost;
@@ -43,36 +51,40 @@ import io.subutai.common.peer.RequestListener;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.protocol.TemplateKurjun;
+import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.quota.QuotaException;
 import io.subutai.common.resource.ResourceType;
 import io.subutai.common.resource.ResourceValue;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.ExceptionUtil;
+import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.kurjun.api.TemplateManager;
-import io.subutai.core.localpeer.impl.dao.ManagementHostDataService;
 import io.subutai.core.localpeer.impl.dao.ResourceHostDataService;
 import io.subutai.core.localpeer.impl.entity.ContainerHostEntity;
-import io.subutai.core.localpeer.impl.entity.ManagementHostEntity;
 import io.subutai.core.localpeer.impl.entity.ResourceHostEntity;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
+import io.subutai.core.network.api.NetworkManager;
+import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.peer.api.PeerManager;
+import io.subutai.core.repository.api.RepositoryManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.strategy.api.StrategyManager;
-import junit.framework.TestCase;
 
-import static junit.framework.Assert.assertTrue;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertNotNull;
+import static junit.framework.TestCase.assertNull;
+import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.fail;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anySet;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -111,14 +123,29 @@ public class LocalPeerImplTest
     private static final String N2N_IP = "10.11.0.1";
     private static final String RAMQUOTA = "123M";
     private static final String CPUQUOTA = "123";
+    private static final String HOST_ID = UUID.randomUUID().toString();
+    private static final String ENV_ID = UUID.randomUUID().toString();
+    private static final String NAME = "name";
+    private static final String HOSTNAME = "hostname";
+    private static final HostArchitecture ARCH = HostArchitecture.AMD64;
+    private static final String INTERFACE_NAME = "eth0";
+    private static final String MAC = "mac";
+    private static final int VLAN = 100;
+    private static final int VNI = 10000;
+    private static final int TUNNEL_ID = 123;
 
+    @Mock
+    NetworkManager networkManager;
+
+    @Mock
+    RepositoryManager repositoryManager;
 
     @Mock
     PeerManager peerManager;
     @Mock
     TemplateManager templateRegistry;
     @Mock
-    ResourceHostEntity managementHost;
+    Host managementHost;
     @Mock
     CommandExecutor commandExecutor;
     @Mock
@@ -129,8 +156,6 @@ public class LocalPeerImplTest
     Monitor monitor;
     @Mock
     IdentityManager identityManager;
-    @Mock
-    ManagementHostDataService managementHostDataService;
     @Mock
     HostRegistry hostRegistry;
     @Mock
@@ -199,6 +224,24 @@ public class LocalPeerImplTest
     @Mock
     private QuotaAlertValue quotaAlertValue;
 
+    @Mock
+    private ServiceLocator serviceLocator;
+
+    @Mock
+    private HostInterfaces hostInterfaces;
+
+    @Mock
+    private HostInterfaceModel anHostInterface;
+
+    @Mock
+    private ExecutorService singleThreadExecutorService;
+
+    @Mock
+    Callable callable;
+
+    @Mock
+    Future future;
+
 
     @Before
     public void setUp() throws Exception
@@ -212,7 +255,7 @@ public class LocalPeerImplTest
         //        localPeer.containerHostDataService = containerHostDataService;
         //        localPeer.containerGroupDataService = containerGroupDataService;
         localPeer.resourceHostDataService = resourceHostDataService;
-//        localPeer.managementHostDataService = managementHostDataService;
+        //        localPeer.managementHostDataService = managementHostDataService;
         localPeer.resourceHosts = Sets.newHashSet( ( ResourceHost ) resourceHost );
         localPeer.commandUtil = commandUtil;
         localPeer.exceptionUtil = exceptionUtil;
@@ -227,6 +270,7 @@ public class LocalPeerImplTest
 
         when( daoManager.getEntityManagerFactory() ).thenReturn( entityManagerFactory );
         when( managementHost.getId() ).thenReturn( MANAGEMENT_HOST_ID );
+        when( managementHost.getHostInterfaces() ).thenReturn( hostInterfaces );
         when( resourceHost.getId() ).thenReturn( RESOURCE_HOST_ID );
         when( containerHost.getId() ).thenReturn( CONTAINER_HOST_ID );
         when( containerHost.getContainerId() ).thenReturn( containerId );
@@ -243,7 +287,6 @@ public class LocalPeerImplTest
         when( peerInfo.getName() ).thenReturn( LOCAL_PEER_NAME );
         when( peerInfo.getOwnerId() ).thenReturn( OWNER_ID );
         when( resourceHostDataService.getAll() ).thenReturn( Sets.newHashSet( resourceHost ) );
-//        when( managementHostDataService.getAll() ).thenReturn( Sets.newHashSet( managementHost ) );
         when( templateRegistry.getTemplate( TEMPLATE_NAME ) ).thenReturn( template );
         when( template.getName() ).thenReturn( TEMPLATE_NAME );
         when( resourceHost.isConnected() ).thenReturn( true );
@@ -265,25 +308,43 @@ public class LocalPeerImplTest
         when( resourceHost.getContainerHosts() ).thenReturn( Sets.<ContainerHost>newHashSet( containerHost ) );
         when( requestListener.getRecipient() ).thenReturn( RECIPIENT );
         doReturn( RESPONSE ).when( requestListener ).onRequest( any( Payload.class ) );
+
+        peerMap = new HashMap<>();
+        peerMap.put( IP, N2N_IP );
+        when( environmentId.getId() ).thenReturn( ENV_ID );
+        when( hostInfo.getId() ).thenReturn( HOST_ID );
+        when( hostInfo.getHostname() ).thenReturn( HOSTNAME );
+        when( hostInfo.getArch() ).thenReturn( ARCH );
+        when( hostInterfaces.getAll() ).thenReturn( Sets.newHashSet( anHostInterface ) );
+        when( hostInfo.getHostInterfaces() ).thenReturn( hostInterfaces );
+        when( anHostInterface.getName() ).thenReturn( INTERFACE_NAME );
+        when( anHostInterface.getIp() ).thenReturn( IP );
+        when( anHostInterface.getMac() ).thenReturn( MAC );
+        localPeer.singleThreadExecutorService = singleThreadExecutorService;
+        localPeer.serviceLocator = serviceLocator;
+        when( singleThreadExecutorService.submit( any( Callable.class ) ) ).thenReturn( future );
+        when( serviceLocator.getService( RepositoryManager.class ) ).thenReturn( repositoryManager );
+        when( serviceLocator.getService( NetworkManager.class ) ).thenReturn( networkManager );
+//        when( localPeer.getManagementHost() ).thenReturn( managementHost );
     }
 
 
     @Test
     public void testInit() throws Exception
     {
-//        doReturn( managementHostDataService ).when( localPeer ).createManagementHostDataService();
+        //        doReturn( managementHostDataService ).when( localPeer ).createManagementHostDataService();
         doReturn( resourceHostDataService ).when( localPeer ).createResourceHostDataService();
         //        doNothing().when( localPeer ).initPeerInfo( any( PeerDAO.class ) );
 
         localPeer.init();
     }
 
-//
-//    @Test
-//    public void testGetManagementHostDataService() throws Exception
-//    {
-//        assertNotNull( localPeer.createManagementHostDataService() );
-//    }
+    //
+    //    @Test
+    //    public void testGetManagementHostDataService() throws Exception
+    //    {
+    //        assertNotNull( localPeer.createManagementHostDataService() );
+    //    }
 
 
     @Test
@@ -297,8 +358,6 @@ public class LocalPeerImplTest
     public void testDispose() throws Exception
     {
         localPeer.dispose();
-
-        verify( managementHost ).dispose();
 
         verify( resourceHost ).dispose();
     }
@@ -475,8 +534,6 @@ public class LocalPeerImplTest
     public void testBindHost() throws Exception
     {
 
-        assertEquals( managementHost, localPeer.bindHost( MANAGEMENT_HOST_ID ) );
-
         assertEquals( resourceHost, localPeer.bindHost( RESOURCE_HOST_ID ) );
 
         assertEquals( containerHost, localPeer.bindHost( CONTAINER_HOST_ID ) );
@@ -575,7 +632,7 @@ public class LocalPeerImplTest
 
         when( hostRegistry.getHostInfoById( CONTAINER_HOST_ID ) ).thenReturn( hostInfo );
 
-        TestCase.assertTrue( localPeer.isConnected( containerHost.getContainerId() ) );
+        assertTrue( localPeer.isConnected( containerHost.getContainerId() ) );
 
         HostDisconnectedException hostDisconnectedException = mock( HostDisconnectedException.class );
 
@@ -754,7 +811,6 @@ public class LocalPeerImplTest
     }
 
 
-    @Ignore
     @Test
     public void testOnHeartbeat() throws Exception
     {
@@ -764,13 +820,9 @@ public class LocalPeerImplTest
         localPeer.initialized = true;
         localPeer.onHeartbeat( resourceHostInfo, Sets.newHashSet( quotaAlertValue ) );
 
-        verify( managementHost ).updateHostInfo( resourceHostInfo );
-
         localPeer.managementHost = null;
 
         localPeer.onHeartbeat( resourceHostInfo, Sets.newHashSet( quotaAlertValue ) );
-
-        verify( managementHostDataService ).persist( any( ManagementHostEntity.class ) );
 
         when( resourceHostInfo.getHostname() ).thenReturn( RESOURCE_HOST_NAME );
         when( resourceHostInfo.getId() ).thenReturn( RESOURCE_HOST_ID );
@@ -863,13 +915,13 @@ public class LocalPeerImplTest
     }
 
 
-//    @Test
-//    public void testGetGateways() throws Exception
-//    {
-//        localPeer.getGateways();
-//
-//        verify( managementHost ).getGateways();
-//    }
+    //    @Test
+    //    public void testGetGateways() throws Exception
+    //    {
+    //        localPeer.getGateways();
+    //
+    //        verify( managementHost ).getGateways();
+    //    }
 
 
 //    @Test
@@ -879,24 +931,404 @@ public class LocalPeerImplTest
 //
 //        localPeer.reserveVni( vni );
 //
-//        verify( managementHost ).reserveVni( vni );
+//        verify( networkManager ).reserveVni( any( Vni.class ) );
 //    }
 
 
-//    @Test
-//    public void testGetReservedVnis() throws Exception
-//    {
-//        localPeer.getReservedVnis();
-//
-//        verify( managementHost ).getReservedVnis();
-//    }
-//
-//
-//    @Test
-//    public void testSetupTunnels() throws Exception
-//    {
-//        localPeer.setupTunnels( peerMap, ENVIRONMENT_ID );
-//
-//        verify( managementHost ).setupTunnels( peerMap, ENVIRONMENT_ID );
-//    }
+    //    @Test
+    //    public void testGetReservedVnis() throws Exception
+    //    {
+    //        localPeer.getReservedVnis();
+    //
+    //        verify( managementHost ).getReservedVnis();
+    //    }
+    //
+    //
+    //        @Test
+    //        public void testSetupTunnels() throws Exception
+    //        {
+    //            localPeer.setupTunnels( peerMap, ENVIRONMENT_ID );
+    //
+    //            verify( managementHost ).setupTunnels( peerMap, ENVIRONMENT_ID );
+    //        }
+
+
+    //    @Mock
+    //    Peer peer;
+    //    @Mock
+    //    ResourceHostInfo hostInfo;
+    //    @Mock
+    //    HostInterfaceModel anHostInterface;
+    //    @Mock
+    //    ExecutorService singleThreadExecutorService;
+    //    @Mock
+    //    ServiceLocator serviceLocator;
+
+
+    //
+    //    @Mock
+    //    EnvironmentId environmentId;
+    //
+    //
+    //    ManagementHostEntity managementHostEntity;
+    //
+    //    Map<String, String> peerMap = new HashMap<>();
+    //    @Mock
+    //    private HostInterfaces hostInterfaces;
+    //
+    //
+    //    @Before
+    //    public void setUp() throws Exception
+    //    {
+
+
+    //    }
+    //
+    //
+    //    @Test
+    //    public void testDispose() throws Exception
+    //    {
+    //        managementHostEntity.dispose();
+    //
+    //        verify( singleThreadExecutorService ).shutdown();
+    //    }
+    //
+    //
+    //    @Test
+    //    public void testQueueSequentialTask() throws Exception
+    //    {
+    //        managementHostEntity.queueSequentialTask( callable );
+    //
+    //        verify( singleThreadExecutorService ).submit( callable );
+    //    }
+    //
+    //
+    //    @Test
+    //    public void testGetNSetName() throws Exception
+    //    {
+    //        managementHostEntity.setName( NAME );
+    //
+    //        assertEquals( NAME, managementHostEntity.getName() );
+    //    }
+    //
+    //
+    //    @Test/*( expected = PeerException.class )*/ public void testAddAptSource() throws Exception
+    //    {
+    //        managementHostEntity.addRepository( IP );
+    //
+    //        verify( repositoryManager ).addRepository( IP );
+    //
+    //        doThrow( new RepositoryException( "" ) ).when( repositoryManager ).addRepository( anyString() );
+    //
+    //        //        managementHostEntity.addRepository( HOSTNAME, IP );
+    //    }
+    //
+    //
+    //    @Test/*( expected = PeerException.class )*/ public void testRemoveAptSource() throws Exception
+    //    {
+    //        managementHostEntity.removeRepository( HOSTNAME, IP );
+    //
+    //        verify( repositoryManager ).removeRepository( IP );
+    //
+    //        doThrow( new RepositoryException( "" ) ).when( repositoryManager ).removeRepository( anyString() );
+    //        //
+    //        //        managementHostEntity.removeRepository( HOSTNAME, IP );
+    //    }
+    //
+    //
+    //    @Test
+    //    public void testCreateGateway() throws Exception
+    //    {
+    //        managementHostEntity.createGateway( IP, VLAN );
+    //
+    //        verify( future ).get();
+    //
+    //        doThrow( new InterruptedException() ).when( future ).get();
+    //
+    //        try
+    //        {
+    //            managementHostEntity.createGateway( IP, VLAN );
+    //            fail( "Expected PeerException" );
+    //        }
+    //        catch ( PeerException e )
+    //        {
+    //        }
+    //
+    //        doThrow( new ExecutionException( null ) ).when( future ).get();
+    //
+    //        try
+    //        {
+    //            managementHostEntity.createGateway( IP, VLAN );
+    //            fail( "Expected PeerException" );
+    //        }
+    //        catch ( PeerException e )
+    //        {
+    //        }
+    //
+    //        doThrow( new ExecutionException( new PeerException( "" ) ) ).when( future ).get();
+    //
+    //        try
+    //        {
+    //            managementHostEntity.createGateway( IP, VLAN );
+    //            fail( "Expected PeerException" );
+    //        }
+    //        catch ( PeerException e )
+    //        {
+    //        }
+    //    }
+    //
+    //
+    //    @Test
+    //    @Ignore
+    //    public void testReserveVni() throws Exception
+    //    {
+    //        Vni vni = mock( Vni.class );
+    //        when( future.get() ).thenReturn( new Integer( VLAN ) );
+    //
+    //        managementHostEntity.reserveVni( vni );
+    //
+    //        verify( future ).get();
+    //
+    //        doThrow( new InterruptedException() ).when( future ).get();
+    //
+    //        try
+    //        {
+    //            managementHostEntity.reserveVni( vni );
+    //            fail( "Expected PeerException" );
+    //        }
+    //        catch ( PeerException e )
+    //        {
+    //        }
+    //
+    //        doThrow( new ExecutionException( null ) ).when( future ).get();
+    //
+    //        try
+    //        {
+    //            managementHostEntity.reserveVni( vni );
+    //            fail( "Expected PeerException" );
+    //        }
+    //        catch ( PeerException e )
+    //        {
+    //        }
+    //
+    //        doThrow( new ExecutionException( new PeerException( "" ) ) ).when( future ).get();
+    //
+    //        try
+    //        {
+    //            managementHostEntity.reserveVni( vni );
+    //            fail( "Expected PeerException" );
+    //        }
+    //        catch ( PeerException e )
+    //        {
+    //        }
+    //    }
+    //
+    //
+    //    @Test
+    //    public void testSetupTunnels() throws Exception
+    //    {
+    //        when( future.get() ).thenReturn( new Integer( VLAN ) );
+    //
+    //        managementHostEntity.setupTunnels( peerMap, ENV_ID );
+    //
+    //        verify( future ).get();
+    //
+    //        doThrow( new InterruptedException() ).when( future ).get();
+    //
+    //        try
+    //        {
+    //            managementHostEntity.setupTunnels( peerMap, ENV_ID );
+    //            fail( "Expected PeerException" );
+    //        }
+    //        catch ( PeerException e )
+    //        {
+    //        }
+    //
+    //        doThrow( new ExecutionException( null ) ).when( future ).get();
+    //
+    //        try
+    //        {
+    //            managementHostEntity.setupTunnels( peerMap, ENV_ID );
+    //            fail( "Expected PeerException" );
+    //        }
+    //        catch ( PeerException e )
+    //        {
+    //        }
+    //
+    //        doThrow( new ExecutionException( new PeerException( "" ) ) ).when( future ).get();
+    //
+    //        try
+    //        {
+    //            managementHostEntity.setupTunnels( peerMap, ENV_ID );
+    //            fail( "Expected PeerException" );
+    //        }
+    //        catch ( PeerException e )
+    //        {
+    //        }
+    //    }
+    //
+    //
+    @Test( expected = PeerException.class )
+    public void testRemoveGateway() throws Exception
+    {
+        localPeer.removeGateway( VLAN );
+
+        verify( networkManager ).removeGateway( VLAN );
+
+        doThrow( new NetworkManagerException( "" ) ).when( networkManager ).removeGateway( VLAN );
+
+        localPeer.removeGateway( VLAN );
+    }
+
+
+    @Test( expected = PeerException.class )
+    public void testCleanupEnvironmentNetworkSettings() throws Exception
+    {
+        localPeer.cleanupEnvironmentNetworkSettings( environmentId );
+
+        verify( networkManager ).cleanupEnvironmentNetworkSettings( environmentId );
+
+        doThrow( new NetworkManagerException( "" ) ).when( networkManager )
+                                                    .cleanupEnvironmentNetworkSettings( environmentId );
+
+        localPeer.cleanupEnvironmentNetworkSettings( environmentId );
+    }
+
+
+    @Test( expected = PeerException.class )
+    public void testListTunnels() throws Exception
+    {
+        localPeer.listTunnels();
+
+        verify( networkManager ).listTunnels();
+
+        doThrow( new NetworkManagerException( "" ) ).when( networkManager ).listTunnels();
+
+        localPeer.listTunnels();
+    }
+
+
+    @Test
+    public void testRemoveTunnel() throws Exception
+    {
+        Tunnel tunnel = mock( Tunnel.class );
+        when( networkManager.listTunnels() ).thenReturn( Sets.newHashSet( tunnel ) );
+        when( tunnel.getTunnelIp() ).thenReturn( IP );
+
+        localPeer.removeTunnel( IP );
+
+        verify( networkManager ).removeTunnel( anyInt() );
+    }
+
+
+    //    @Test( expected = PeerException.class )
+    //    public void testGetReservedVnis() throws Exception
+    //    {
+    //        managementHostEntity.getReservedVnis();
+    //
+    //        verify( networkManager ).getReservedVnis();
+    //
+    //        doThrow( new NetworkManagerException( "" ) ).when( networkManager ).getReservedVnis();
+    //
+    //        managementHostEntity.getReservedVnis();
+    //    }
+
+
+    @Test
+    @Ignore
+    public void testGetGateways() throws Exception
+    {
+        HostInterfaceModel hostInterfaceModelModel = mock( HostInterfaceModel.class );
+        when( hostInterfaceModelModel.getName() ).thenReturn( "br-100" );
+
+        Set<Gateway> gateways = localPeer.getGateways();
+
+        assertFalse( gateways.isEmpty() );
+    }
+
+
+    @Test
+    public void testFindVniByEnvironmentById() throws Exception
+    {
+
+        assertNull( localPeer.findVniByEnvironmentId( ENV_ID ) );
+
+        Vni vni = mock( Vni.class );
+        when( vni.getEnvironmentId() ).thenReturn( ENV_ID );
+        when( networkManager.getReservedVnis() ).thenReturn( Sets.newHashSet( vni ) );
+
+        Vni vni2 = localPeer.findVniByEnvironmentId( ENV_ID );
+
+        assertEquals( vni, vni2 );
+    }
+    //
+    //
+    //        @Test( expected = PeerException.class )
+    //        public void testSetupVniVlanMapping() throws Exception
+    //        {
+    //            VniVlanMapping vniVlanMapping = mock( VniVlanMapping.class );
+    //            when( networkManager.getVniVlanMappings() ).thenReturn( Sets.newHashSet( vniVlanMapping ) );
+    //            when( vniVlanMapping.getTunnelId() ).thenReturn( TUNNEL_ID );
+    //            when( vniVlanMapping.getEnvironmentId() ).thenReturn( ENV_ID );
+    //
+    //            managementHostEntity.setupVniVlanMapping( TUNNEL_ID, VNI, VLAN, ENV_ID );
+    //
+    //            verify( networkManager, never() ).setupVniVLanMapping( TUNNEL_ID, VNI, VLAN, ENV_ID );
+    //
+    //            when( vniVlanMapping.getTunnelId() ).thenReturn( TUNNEL_ID + 1 );
+    //
+    //            managementHostEntity.setupVniVlanMapping( TUNNEL_ID, VNI, VLAN, ENV_ID );
+    //
+    //            verify( networkManager ).setupVniVLanMapping( TUNNEL_ID, VNI, VLAN, ENV_ID );
+    //
+    //            doThrow( new NetworkManagerException( "" ) ).when( networkManager )
+    //                                                        .setupVniVLanMapping( TUNNEL_ID, VNI, VLAN, ENV_ID );
+    //
+    //            managementHostEntity.setupVniVlanMapping( TUNNEL_ID, VNI, VLAN, ENV_ID );
+    //        }
+    //
+    //
+    //    @Test
+    //    public void testFindTunnel() throws Exception
+    //    {
+    //        Tunnel tunnel = mock( Tunnel.class );
+    //        when( tunnel.getTunnelIp() ).thenReturn( IP );
+    //        when( tunnel.getTunnelId() ).thenReturn( TUNNEL_ID );
+    //
+    //        int tunnelId = managementHostEntity.findTunnel( IP, Sets.newHashSet( tunnel ) );
+    //
+    //        assertEquals( TUNNEL_ID, tunnelId );
+    //
+    //        when( tunnel.getTunnelIp() ).thenReturn( "" );
+    //
+    //        tunnelId = managementHostEntity.findTunnel( IP, Sets.newHashSet( tunnel ) );
+    //
+    //        assertThat( TUNNEL_ID, not( tunnelId ) );
+    //    }
+    //
+    //
+    //    @Test
+    //    public void testCalculateNextTunnelId() throws Exception
+    //    {
+    //        Tunnel tunnel = mock( Tunnel.class );
+    //        when( tunnel.getTunnelId() ).thenReturn( TUNNEL_ID );
+    //
+    //        int newTunnelId = managementHostEntity.calculateNextTunnelId( Sets.newHashSet( tunnel ) );
+    //
+    //        assertEquals( ( TUNNEL_ID + 1 ), newTunnelId );
+    //    }
+    //
+
+
+    //    @Test
+    //    public void testFindAvailableVlanId() throws Exception
+    //    {
+    //        Vni vni = mock( Vni.class );
+    //        when( vni.getVlan() ).thenReturn( VLAN );
+    //        when( networkManager.getReservedVnis() ).thenReturn( Sets.newHashSet( vni ) );
+    //
+    //        int newVlanId = localPeer.findAvailableVlanId();
+    //
+    //        assertEquals( ( VLAN + 1 ), newVlanId );
+    //    }
 }

@@ -10,7 +10,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import io.subutai.common.network.Vni;
-import io.subutai.core.localpeer.impl.entity.ManagementHostEntity;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.core.network.api.NetworkManager;
 
 import static org.mockito.Matchers.any;
@@ -27,34 +27,34 @@ public class ReserveVniTaskTest
     @Mock
     NetworkManager networkManager;
     @Mock
-    ManagementHostEntity managementHostEntity;
+    LocalPeer localPeer;
     @Mock
     Vni vni;
 
     ReserveVniTask task;
 
-//
-//    @Before
-//    public void setUp() throws Exception
-//    {
-//        task = new ReserveVniTask( networkManager, vni, managementHostEntity );
-//        when( vni.getEnvironmentId() ).thenReturn( ENV_ID );
-//        when( vni.getVni() ).thenReturn( VNI );
-//        when( vni.getVlan() ).thenReturn( VLAN );
-////        when( managementHostEntity.findVniByEnvironmentId( ENV_ID ) ).thenReturn( vni );
-////        when( managementHostEntity.findAvailableVlanId() ).thenReturn( VLAN );
-//    }
+
+    @Before
+    public void setUp() throws Exception
+    {
+        task = new ReserveVniTask( networkManager, vni, localPeer );
+        when( vni.getEnvironmentId() ).thenReturn( ENV_ID );
+        when( vni.getVni() ).thenReturn( VNI );
+        when( vni.getVlan() ).thenReturn( VLAN );
+        when( localPeer.findVniByEnvironmentId( ENV_ID ) ).thenReturn( vni );
+//        when( localPeer.findAvailableVlanId() ).thenReturn( VLAN );
+    }
 
 
-//    @Test
-//    public void testCall() throws Exception
-//    {
-//        task.call();
-//
-//        when( managementHostEntity.findVniByEnvironmentId( ENV_ID ) ).thenReturn( null );
-//
-//        task.call();
-//
-//        verify( networkManager ).reserveVni( any( Vni.class ) );
-//    }
+    @Test
+    public void testCall() throws Exception
+    {
+        task.call();
+
+        when( localPeer.findVniByEnvironmentId( ENV_ID ) ).thenReturn( null );
+
+        task.call();
+
+        verify( networkManager ).reserveVni( any( Vni.class ) );
+    }
 }

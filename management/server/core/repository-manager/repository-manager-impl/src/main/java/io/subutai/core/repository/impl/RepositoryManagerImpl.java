@@ -14,10 +14,10 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.peer.Host;
+import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.util.CollectionUtil;
-import io.subutai.common.peer.HostNotFoundException;
-import io.subutai.common.peer.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.repository.api.PackageInfo;
 import io.subutai.core.repository.api.RepositoryException;
@@ -138,7 +138,7 @@ public class RepositoryManagerImpl implements RepositoryManager
     }
 
 
-    protected ResourceHost getManagementHost() throws HostNotFoundException
+    protected Host getManagementHost() throws HostNotFoundException
     {
         return peerManager.getLocalPeer().getManagementHost();
     }
@@ -161,7 +161,7 @@ public class RepositoryManagerImpl implements RepositoryManager
     {
         try
         {
-            ResourceHost managementHost = getManagementHost();
+            Host managementHost = getManagementHost();
             CommandResult result = managementHost.execute( commands.getUpdateRepoCommand() );
             if ( !result.hasCompleted() )
             {

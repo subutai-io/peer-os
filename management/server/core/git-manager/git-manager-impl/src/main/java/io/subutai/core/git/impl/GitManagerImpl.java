@@ -12,6 +12,7 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.settings.Common;
@@ -644,7 +645,7 @@ public class GitManagerImpl implements GitManager
     }
 
 
-    public ResourceHost getManagementHost() throws GitException
+    public Host getManagementHost() throws GitException
     {
         try
         {
