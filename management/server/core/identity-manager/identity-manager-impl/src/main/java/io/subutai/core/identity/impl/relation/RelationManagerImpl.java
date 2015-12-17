@@ -103,7 +103,7 @@ public class RelationManagerImpl implements RelationManager
             storedRelation.setRelationStatus( RelationStatus.VERIFIED );
             // Check for relation validity is checked before relation stating link send its request
             // TODO check if source can declare this relation
-            // identityDataService.persistRelation( relation );
+            identityDataService.persistRelation( relation );
         }
         catch ( Exception e )
         {
