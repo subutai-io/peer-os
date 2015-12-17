@@ -244,7 +244,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
     }
 
 	function buildEnvironment() {
-		environmentService.startEnvironmentBuild (vm.currentEnvironment.id, encodeURIComponent(vm.signedMessage)).success(function (data) {
+		environmentService.startEnvironmentBuild (vm.currentEnvironment.id, encodeURIComponent(vm.currentEnvironment.relationDeclaration)).success(function (data) {
 			SweetAlert.swal("Success!", "Your environment has started building.", "success");
 			vm.dtInstance.reloadData(null, false);
 			ngDialog.closeAll();
