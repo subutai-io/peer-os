@@ -200,18 +200,22 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public void registerPeerActionListener( PeerActionListener peerActionListener )
     {
-        Preconditions.checkNotNull( peerActionListener );
-        LOG.info( "Registering peer action listener: " + peerActionListener.getName() );
-        this.peerActionListeners.add( peerActionListener );
+        if ( peerActionListener != null )
+        {
+            LOG.info( "Registering peer action listener: " + peerActionListener.getName() );
+            this.peerActionListeners.add( peerActionListener );
+        }
     }
 
 
     @Override
     public void unregisterPeerActionListener( PeerActionListener peerActionListener )
     {
-        Preconditions.checkNotNull( peerActionListener );
-        LOG.info( "Unregistering peer action listener: " + peerActionListener.getName() );
-        this.peerActionListeners.remove( peerActionListener );
+        if ( peerActionListener != null )
+        {
+            LOG.info( "Unregistering peer action listener: " + peerActionListener.getName() );
+            this.peerActionListeners.remove( peerActionListener );
+        }
     }
 
 
@@ -249,16 +253,16 @@ public class PeerManagerImpl implements PeerManager
 
             PeerPolicy policy = getDefaultPeerPolicy( registrationData.getPeerInfo().getId() );
 
-            PeerData peerData
-                    = new PeerData( registrationData.getPeerInfo().getId(), toJson( registrationData.getPeerInfo() ),
+            PeerData peerData =
+                    new PeerData( registrationData.getPeerInfo().getId(), toJson( registrationData.getPeerInfo() ),
                             keyPhrase, toJson( policy ) );
             updatePeerData( peerData );
 
             Peer newPeer = createPeer( peerData );
 
             addPeer( newPeer );
-            
-             templateManager.addRemoteRepository( new URL(
+
+            templateManager.addRemoteRepository( new URL(
                     String.format( KURJUN_URL_PATTERN, registrationData.getPeerInfo().getIp(),
                             ChannelSettings.SECURE_PORT_X1 ) ), registrationData.getToken() );
         }
@@ -269,6 +273,7 @@ public class PeerManagerImpl implements PeerManager
         }
     }
 
+
     private String generateActiveUserToken() throws PeerException
     {
         try
@@ -277,8 +282,8 @@ public class PeerManagerImpl implements PeerManager
 
             Date date = DateUtils.addMonths( new Date(), 10 );
 
-            UserToken userToken = identityManager.createUserToken( user, "", "", "",
-                    TokenType.Permanent.getId(), date );
+            UserToken userToken =
+                    identityManager.createUserToken( user, "", "", "", TokenType.Permanent.getId(), date );
 
             return userToken.getFullToken();
         }
@@ -287,6 +292,7 @@ public class PeerManagerImpl implements PeerManager
             throw new PeerException( "Failed to generate active user token.", e );
         }
     }
+
 
     private <T> T fromJson( String value, Class<T> type ) throws IOException
     {
@@ -671,7 +677,7 @@ public class PeerManagerImpl implements PeerManager
         registrationData.setToken( generateActiveUserToken() );
 
         RegistrationData result = registrationClient.sendInitRequest( destinationHost, registrationData );
-        
+
         result.setKeyPhrase( keyPhrase );
         addRequest( result );
     }
@@ -695,9 +701,9 @@ public class PeerManagerImpl implements PeerManager
     public void doApproveRequest( final String keyPhrase, final RegistrationData request ) throws PeerException
     {
         getRemotePeerInfo( request.getPeerInfo().getIp() );
-        
+
         RegistrationData response = buildRegistrationData( keyPhrase, RegistrationStatus.APPROVED );
-                
+
         response.setToken( generateActiveUserToken() );
 
         registrationClient.sendApproveRequest( request.getPeerInfo().getIp(), response );
