@@ -13,6 +13,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -40,6 +43,8 @@ import ai.subut.kurjun.metadata.factory.PackageMetadataStoreModule;
 import ai.subut.kurjun.model.metadata.Metadata;
 import ai.subut.kurjun.model.metadata.SerializableMetadata;
 import ai.subut.kurjun.model.repository.LocalRepository;
+import ai.subut.kurjun.model.repository.NonLocalRepository;
+import ai.subut.kurjun.model.repository.Repository;
 import ai.subut.kurjun.model.repository.UnifiedRepository;
 import ai.subut.kurjun.model.security.Identity;
 import ai.subut.kurjun.model.security.Permission;
@@ -89,9 +94,11 @@ public class TemplateManagerImpl implements TemplateManager
 
     private final RepoUrlStore repoUrlStore = new RepoUrlStore( Common.SUBUTAI_APP_DATA_PATH );
 
+    private ScheduledExecutorService metadataCacheUpdater;
+
 
     public TemplateManagerImpl( LocalPeer localPeer, IdentityManager identityManager,
-            io.subutai.core.security.api.SecurityManager securityManager, String globalKurjunUrl )
+                                io.subutai.core.security.api.SecurityManager securityManager, String globalKurjunUrl )
     {
         this.localPeer = localPeer;
         this.subutaiIdentityManager = identityManager;
@@ -135,11 +142,34 @@ public class TemplateManagerImpl implements TemplateManager
         // init contexts
         KurjunProperties properties = injector.getInstance( KurjunProperties.class );
         setContexts( properties );
+
+        // schedule metadata cache updater
+        metadataCacheUpdater = Executors.newSingleThreadScheduledExecutor();
+        metadataCacheUpdater.scheduleWithFixedDelay( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                for ( KurjunContext context : CONTEXTS )
+                {
+                    try
+                    {
+                        UnifiedRepository repo = getRepository( context.getName(), false );
+                        refreshMetadataCache( repo );
+                    }
+                    catch ( IOException ex )
+                    {
+                        LOGGER.error( "Failed to get repository", ex );
+                    }
+                }
+            }
+        }, 5, 30, TimeUnit.SECONDS );
     }
 
 
     public void dispose()
     {
+        metadataCacheUpdater.shutdown();
     }
 
 
@@ -158,8 +188,8 @@ public class TemplateManagerImpl implements TemplateManager
         if ( meta != null )
         {
             TemplateKurjun template = new TemplateKurjun( Hex.encodeHexString( meta.getMd5Sum() ), meta.getName(),
-                    meta.getVersion(), meta.getArchitecture().name(),
-                    meta.getParent(), meta.getPackage() );
+                                                          meta.getVersion(), meta.getArchitecture().name(),
+                                                          meta.getParent(), meta.getPackage() );
             template.setConfigContents( meta.getConfigContents() );
             template.setPackagesContents( meta.getPackagesContents() );
             return template;
@@ -171,7 +201,7 @@ public class TemplateManagerImpl implements TemplateManager
     @Override
     @RolesAllowed( "Template-Management|A|Read" )
     public TemplateKurjun getTemplate( String context, String name,
-            String version, boolean isKurjunClient ) throws IOException
+                                       String version, boolean isKurjunClient ) throws IOException
     {
         DefaultMetadata m = new DefaultMetadata();
         m.setName( name );
@@ -185,8 +215,8 @@ public class TemplateManagerImpl implements TemplateManager
             checkPermission( context, Permission.GET_PACKAGE, Hex.encodeHexString( meta.getMd5Sum() ) );
 
             TemplateKurjun template = new TemplateKurjun( Hex.encodeHexString( meta.getMd5Sum() ), meta.getName(),
-                    meta.getVersion(), meta.getArchitecture().name(),
-                    meta.getParent(), meta.getPackage() );
+                                                          meta.getVersion(), meta.getArchitecture().name(),
+                                                          meta.getParent(), meta.getPackage() );
             template.setConfigContents( meta.getConfigContents() );
             template.setPackagesContents( meta.getPackagesContents() );
             return template;
@@ -231,7 +261,7 @@ public class TemplateManagerImpl implements TemplateManager
     public List<TemplateKurjun> list( String context, boolean isKurjunClient ) throws IOException
     {
         UnifiedRepository repo = getRepository( context, isKurjunClient );
-        List<SerializableMetadata> metadatas = repo.listPackages();
+        List<SerializableMetadata> metadatas = listPackagesFromCache( repo );
 
         List<TemplateKurjun> result = new LinkedList<>();
         for ( SerializableMetadata metadata : metadatas )
@@ -243,8 +273,8 @@ public class TemplateManagerImpl implements TemplateManager
 
             DefaultTemplate meta = ( DefaultTemplate ) metadata;
             TemplateKurjun t = new TemplateKurjun( Hex.encodeHexString( meta.getMd5Sum() ), meta.getName(),
-                    meta.getVersion(), meta.getArchitecture().name(), meta.getParent(),
-                    meta.getPackage() );
+                                                   meta.getVersion(), meta.getArchitecture().name(), meta.getParent(),
+                                                   meta.getPackage() );
             t.setConfigContents( meta.getConfigContents() );
             t.setPackagesContents( meta.getPackagesContents() );
             result.add( t );
@@ -486,7 +516,7 @@ public class TemplateManagerImpl implements TemplateManager
             Properties kcp = properties.getContextProperties( kc );
             kcp.setProperty( FileStoreFactory.TYPE, FileStoreFactory.FILE_SYSTEM );
             kcp.setProperty( PackageMetadataStoreModule.PACKAGE_METADATA_STORE_TYPE,
-                    PackageMetadataStoreFactory.FILE_DB );
+                             PackageMetadataStoreFactory.FILE_DB );
         }
     }
 
@@ -514,7 +544,7 @@ public class TemplateManagerImpl implements TemplateManager
         {
             throw new AccessControlException(
                     String.format( "Action denied for resource %s with permission %s of identity %s",
-                            resource, permission, getActiveUserFingerprint() ) );
+                                   resource, permission, getActiveUserFingerprint() ) );
         }
     }
 
@@ -569,4 +599,60 @@ public class TemplateManagerImpl implements TemplateManager
             LOGGER.info( r.toString() );
         }
     }
+
+
+    /**
+     * Gets cached metadata from the repositories of the supplied unified repository.
+     *
+     * @param repository
+     * @return
+     */
+    private List<SerializableMetadata> listPackagesFromCache( UnifiedRepository repository )
+    {
+        List<SerializableMetadata> result = new LinkedList<>();
+
+        Set<Repository> repos = new HashSet<>();
+        repos.addAll( repository.getRepositories() );
+        repos.addAll( repository.getSecondaryRepositories() );
+
+        for ( Repository repo : repos )
+        {
+            if ( repo instanceof NonLocalRepository )
+            {
+                NonLocalRepository remote = ( NonLocalRepository ) repo;
+                List<SerializableMetadata> ls = remote.getMetadataCache().getMetadataList();
+                result.addAll( ls );
+            }
+            else
+            {
+                List<SerializableMetadata> ls = repo.listPackages();
+                result.addAll( ls );
+            }
+        }
+        return result;
+    }
+
+
+    /**
+     * Refreshes metadata cache for each repository in the supplied unified repository.
+     *
+     * @param repository
+     */
+    private void refreshMetadataCache( UnifiedRepository repository )
+    {
+        Set<Repository> repos = new HashSet<>();
+        repos.addAll( repository.getRepositories() );
+        repos.addAll( repository.getSecondaryRepositories() );
+
+        for ( Repository repo : repos )
+        {
+            if ( repo instanceof NonLocalRepository )
+            {
+                NonLocalRepository remote = ( NonLocalRepository ) repo;
+                remote.getMetadataCache().refresh();
+            }
+        }
+    }
+
 }
+
