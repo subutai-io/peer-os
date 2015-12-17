@@ -55,10 +55,14 @@ import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.resource.ResourceType;
 import io.subutai.common.resource.ResourceValue;
 import io.subutai.common.security.objects.KeyTrustLevel;
+import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.model.RelationMeta;
 import io.subutai.core.identity.api.model.User;
+import io.subutai.core.identity.api.relation.RelationManager;
+import io.subutai.core.security.api.*;
 import io.subutai.core.security.api.crypto.KeyManager;
 
 
@@ -265,21 +269,36 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
             if ( envImpl.isKeyTrustCheckEnabled() )
             {
                 IdentityManager identityManager = envImpl.getIdentityManager();
-                io.subutai.core.security.api.SecurityManager securityManager = envImpl.getSecurityManager();
+                RelationManager relationManager = envImpl.getRelationManager();
+
                 User activeUser = identityManager.getActiveUser();
                 if ( activeUser != null )
                 {
-                    KeyManager keyManager = securityManager.getKeyManager();
-                    EnvironmentId environmentId = this.getEnvironmentId();
+                    RelationMeta relationMeta =
+                            new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), environment,
+                                    environment.getId(), PermissionObject.EnvironmentManagement, environment.getId() );
+                    boolean trustedRelation =
+                            relationManager.getRelationInfoManager().groupHasReadPermissions( relationMeta );
 
-                    String environmentFingerprint = keyManager.getFingerprint( environmentId.getId() );
-                    String userFingerprint = keyManager.getFingerprint( activeUser.getSecurityKeyId() );
-
-                    if ( keyManager.getTrustLevel( userFingerprint, environmentFingerprint ) == KeyTrustLevel.Never
-                            .getId() )
+                    if ( !trustedRelation )
                     {
                         throw new CommandException( "Host was revoked to execute commands" );
                     }
+                    //
+                    //                    KeyManager keyManager = securityManager.getKeyManager();
+                    //                    EnvironmentId environmentId = this.getEnvironmentId();
+                    //
+                    //                    String environmentFingerprint = keyManager.getFingerprint( environmentId
+                    // .getId() );
+                    //                    String userFingerprint = keyManager.getFingerprint( activeUser
+                    // .getSecurityKeyId() );
+                    //
+                    //                    if ( keyManager.getTrustLevel( userFingerprint, environmentFingerprint ) ==
+                    // KeyTrustLevel.Never
+                    //                            .getId() )
+                    //                    {
+                    //                        throw new CommandException(  );
+                    //                    }
                 }
             }
         }

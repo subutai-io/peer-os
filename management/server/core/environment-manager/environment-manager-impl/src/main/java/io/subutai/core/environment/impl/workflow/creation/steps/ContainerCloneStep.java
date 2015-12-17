@@ -144,7 +144,7 @@ public class ContainerCloneStep
                     if ( !CollectionUtil.isCollectionEmpty( result.getContainers() ) )
                     {
                         environment.addContainers( result.getContainers() );
-                        constructRelationChain( environment, result.getContainers() );
+                        buildRelationChain( environment, result.getContainers() );
                     }
 
                     if ( result.getException() != null )
@@ -170,7 +170,7 @@ public class ContainerCloneStep
     }
 
 
-    private void constructRelationChain( EnvironmentImpl environment, Set<EnvironmentContainerImpl> containers )
+    private void buildRelationChain( EnvironmentImpl environment, Set<EnvironmentContainerImpl> containers )
     {
         try
         {
