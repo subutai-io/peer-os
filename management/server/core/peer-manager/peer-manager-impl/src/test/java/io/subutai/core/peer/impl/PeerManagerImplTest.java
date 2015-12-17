@@ -101,7 +101,7 @@ public class PeerManagerImplTest
 
         peerManager =
                 spy( new PeerManagerImpl( messenger, localPeer, daoManager, messageResponseListener, securityManager,
-                        templateManager, null ) );
+                        templateManager, identityManager, null ) );
 
 
         peerManager.commandResponseListener = commandResponseListener;

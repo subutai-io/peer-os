@@ -30,7 +30,22 @@ public interface AptManager
     boolean isCompressionTypeSupported( String packagesIndex );
 
 
-    // TODO void addRemoteRepository( URL url );
+    /**
+     * Adds remote repository located at supplied URL. Repositories added with this method will be used to fulfill
+     * requests in case the local repository can not handle requests.
+     *
+     * @param url URL of the remote repository
+     * @param token access token to be used for the given remote repo url
+     */
+    void addRemoteRepository( URL url, String token );
+
+
+    /**
+     * Removes remote repository located at supplied URL.
+     *
+     * @param url URL of the remote repository
+     */
+    void removeRemoteRepository( URL url );
 
 
     String getSerializedPackageInfo( String filename ) throws IllegalArgumentException;
@@ -39,3 +54,4 @@ public interface AptManager
     String getSerializedPackageInfo( byte[] md5 ) throws IllegalArgumentException;
 
 }
+
