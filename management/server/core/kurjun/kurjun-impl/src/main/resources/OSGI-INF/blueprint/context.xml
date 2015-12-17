@@ -37,8 +37,9 @@
   </bean>
     
   <bean id="aptManager" scope="singleton" activation="eager" 
-          init-method="init" destroy-method="dispose"
-          class="io.subutai.core.kurjun.impl.vapt.AptManagerImpl">
+        init-method="init" destroy-method="dispose"
+        class="io.subutai.core.kurjun.impl.vapt.AptManagerImpl">
+    <argument ref="locaPeer" />
   </bean>
 
   <service ref="templateManager"
