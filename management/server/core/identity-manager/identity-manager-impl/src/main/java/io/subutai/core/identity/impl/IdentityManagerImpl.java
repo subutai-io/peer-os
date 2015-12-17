@@ -647,7 +647,7 @@ public class IdentityManagerImpl implements IdentityManager
         user.setApproved( true );
 
 
-        identityDataService.persistUser( user );
+        identityDataService.updateUser( user );
     }
 
 
