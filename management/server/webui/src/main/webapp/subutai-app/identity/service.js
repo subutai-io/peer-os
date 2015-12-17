@@ -25,6 +25,7 @@ function identitySrv($http) {
 		deleteRole: deleteRole,
 		getTokenTypes: getTokenTypes,
 		getPermissionsScops: getPermissionsScops,
+		getCurrentUser: getCurrentUser,
 
 		getUsersUrl : function(){ return USERS_URL },
 		getRolesUrl : function(){ return ROLES_URL },
@@ -103,6 +104,10 @@ function identitySrv($http) {
 
 	function getPermissionsScops() {
 		return $http.get(USERS_URL + 'permissions/scopes', {withCredentials: true, headers: {'Content-Type': 'application/json'}});
+	}
+
+	function getCurrentUser() {
+		return $http.get (SERVER_URL + 'rest/ui/identity/user');
 	}
 
 }

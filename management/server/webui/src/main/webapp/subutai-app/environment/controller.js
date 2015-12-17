@@ -4,12 +4,12 @@ angular.module('subutai.environment.controller', [])
 	.controller('EnvironmentViewCtrl', EnvironmentViewCtrl)
 	.directive('fileModel', fileModel);
 
-EnvironmentViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'SweetAlert', 'DTOptionsBuilder', 'DTColumnBuilder', '$resource', '$compile', 'ngDialog', '$timeout'];
+EnvironmentViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'SweetAlert', 'DTOptionsBuilder', 'DTColumnBuilder', '$resource', '$compile', 'ngDialog', '$timeout', 'identitySrv'];
 fileModel.$inject = ['$parse'];
 
 var fileUploder = {};
 
-function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert, DTOptionsBuilder, DTColumnBuilder, $resource, $compile, ngDialog, $timeout) {
+function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert, DTOptionsBuilder, DTColumnBuilder, $resource, $compile, ngDialog, $timeout, identitySrv) {
 
 	var vm = this;
 
@@ -59,10 +59,55 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 		DTColumnBuilder.newColumn(null).withTitle('Environment name').renderWith(environmentNameTooltip),
 		DTColumnBuilder.newColumn(null).withTitle('SSH Key').renderWith(sshKeyLinks),
 		DTColumnBuilder.newColumn(null).withTitle('Domains').renderWith(domainsTag),
+		DTColumnBuilder.newColumn(null).withTitle('').renderWith(actionShare),
 		DTColumnBuilder.newColumn(null).withTitle('').renderWith(containersTags),
 		DTColumnBuilder.newColumn(null).withTitle('').notSortable().renderWith(actionStartEnvironmentBuild),
 		DTColumnBuilder.newColumn(null).withTitle('').notSortable().renderWith(actionDelete)
 	];
+
+	vm.listOfUsers = [];
+	vm.checkedUsers = [];
+	vm.shareEnvironmentWindow = shareEnvironmentWindow;
+	vm.toggleSelection = toggleSelection;
+	vm.shareEnvironment = shareEnvironment;
+	function actionShare (data, type, full, meta) {
+		return '<a href="" class="b-btn b-btn_blue g-left" ng-click="environmentViewCtrl.shareEnvironmentWindow(\'' + data.id + '\')" ng-show = "' + data.status + ' === \'HEALTHY\'">Share</a>';
+	}
+	vm.currentUser = {};
+	identitySrv.getCurrentUser().success (function (data) {
+		vm.currentUser = data;
+		console.log (vm.currentUser);
+	});
+	function shareEnvironmentWindow (environmentId) {
+		vm.listOfUsers = [];
+		vm.checkedUsers = [];
+		identitySrv.getUsers().success (function (data) {
+			for (var i = 0; i < data.length; ++i) {
+				if (data[i].id !== vm.currentUser.id) {
+					vm.listOfUsers.push (data[i]);
+				}
+			}
+			vm.currentEnvironment = vm.users[environmentId];
+			ngDialog.open ({
+				template: "subutai-app/environment/partials/shareEnv.html",
+				scope: $scope
+			});
+		});
+	}
+
+	function toggleSelection (user) {
+		for (var i = 0; i < vm.checkedUsers.length; ++i) {
+			if (vm.checkedUsers[i].id === user.id) {
+				vm.checkedUsers.splice (i, 1);
+				return;
+			}
+		}
+		vm.checkedUsers.push (user);
+	}
+
+	function shareEnvironment() {
+		// TODO: share environment to vm.checkedUsers
+	}
 
 	var refreshTable;
 	var reloadTableData = function() {

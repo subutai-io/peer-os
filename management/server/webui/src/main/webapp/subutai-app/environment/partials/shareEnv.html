@@ -1,0 +1,17 @@
+<div class="b-popup">
+	<div class="b-popup__header">
+		Share environment
+		<a href ng-click="closeThisDialog()"><img src="assets/elements/buttons/b-icon-close.svg" class="b-icon g-right"/></a>
+	</div>
+	<div class="b-popup__body">
+		<div class="b-form">
+			<div class="b-form__wrapper b-form__wrapper_margin-bottom">
+				<div ng-repeat = "user in environmentViewCtrl.listOfUsers">
+					<input type = "checkbox" value = "{{ user }}" ng-checked = "environmentViewCtrl.checkedUsers.indexOf (user) > -1" ng-click = "environmentViewCtrl.toggleSelection (user)">
+					<label class="b-form-label b-form-label_fix-size-1">{{ user.fullName }}</label>
+				</div>
+			</div>
+			<a href class="b-btn b-btn_blue g-left  b-btn_margin-l" ng-click="environmentViewCtrl.shareEnvironment()" style="margin-bottom: 10px; margin-top: 10px">Share</a>
+		</div>
+	</div>
+</div>
