@@ -1,0 +1,28 @@
+<div class="b-workspace-content b-workspace-content_border">
+	<div class="b-workspace__content">
+		<div class="b-workspace-content__row">
+			<div class="b-main-table-border">
+				<table class="b-main-table b-main-table_with-header">
+					<tr>
+						<th>Username</th>
+						<th>Full name</th>
+						<th>E-mail</th>
+						<th>Actions</th>
+					</tr>
+					<td colspan="4" class="b-main-table__empty-item" ng-show="identityUserCtrl.pendingUsers.length === 0">
+						You have no pending requests
+					</td>
+					<tr ng-repeat="user in identityUserCtrl.pendingUsers">
+						<td>{{ user.userName }}</td>
+						<td>{{ user.fullName }}</td>
+						<td>{{ user.email }}</td>
+						<td>
+							<a href class="b-icon b-icon_remove" ng-click="identityUserCtrl.reject (user)"></a>
+							<a href ng-click="identityUserCtrl.approveWindow (user)" style = "color: green; margin-right: 5px; font-size: 18px"><i class="fa fa-check"></i></a>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>

@@ -263,4 +263,5 @@ public class UserEntity implements User
         return UserType.values()[type - 1].getName();
     }
 
+
 }

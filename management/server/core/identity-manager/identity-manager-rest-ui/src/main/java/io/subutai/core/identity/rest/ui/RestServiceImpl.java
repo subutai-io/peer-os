@@ -75,7 +75,7 @@ public class RestServiceImpl implements RestService
             {
                 Preconditions.checkArgument( !Strings.isNullOrEmpty( password ), "Password must be set" );
                 newUser = identityManager
-                        .createUser( username, password, fullName, email, UserType.Regular.getId(), publicKey );
+                        .createUser( username, password, fullName, email, UserType.Regular.getId(), publicKey, false );
             }
             else
             {
@@ -105,18 +105,18 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response signUp( @FormParam( "username" ) final String username,
-                            @FormParam( "full_name" ) final String fullName,
-                            @FormParam( "password" ) final String password,
-                            @FormParam( "email" ) final String email,
-                            @FormParam( "public_key" ) final String publicKey )
+    public Response signUp( final String username,
+                            final String fullName,
+                            final String password,
+                            final String email,
+                            final String publicKey )
 
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( username ), "username is missing" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( fullName ), "fullname is missing" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( email ), "email must be set" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( password ), "passowrd must be set" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( password ), "publicKey must be set" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( publicKey ), "publicKey must be set" );
 
         User unApprovedUser = identityManager.signUp( username,password,fullName,email,publicKey );
 
@@ -125,7 +125,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response approve( @FormParam( "username" ) final String username, @FormParam( "roles" ) final String rolesJson )
+    public Response approve(final String username, final String rolesJson )
     {
 
         List<Long> roleIds = jsonUtil.fromJson( rolesJson, new TypeToken<ArrayList<Long>>()
