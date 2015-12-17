@@ -156,10 +156,11 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog) {
 
 	function approve() {
 		identitySrv.approve (vm.currentUser.userName, JSON.stringify (vm.currentUser.roles)).success (function (data) {
-			SweetAlert.swal ("Success!", "User was rejected.", "success");
-			getRequests();
+			SweetAlert.swal ("Success!", "User was approved.", "success");
+			getUsers();
+			ngDialog.closeAll();
 		}).error (function (error) {
-			SweetAlert.swal ("ERROR!", "User reject error: " + error.replace(/\\n/g, " "), "error");
+			SweetAlert.swal ("ERROR!", "User approve error: " + error.replace(/\\n/g, " "), "error");
 		});
 	}
 
@@ -193,7 +194,7 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog) {
 			if (isConfirm) {
 				identitySrv.reject (user.id).success (function (data) {
 					SweetAlert.swal ("Success!", "User was rejected.", "success");
-					getRequests();
+					getUsers();
 				}).error (function (error) {
 					SweetAlert.swal ("ERROR!", "User reject error: " + error.replace(/\\n/g, " "), "error");
 				});
