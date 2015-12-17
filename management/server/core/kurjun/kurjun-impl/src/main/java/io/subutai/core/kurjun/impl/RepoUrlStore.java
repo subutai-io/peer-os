@@ -1,11 +1,13 @@
 package io.subutai.core.kurjun.impl;
 
 
-import ai.subut.kurjun.db.file.FileDb;
-import com.google.common.collect.Sets;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
+
+import com.google.common.collect.Sets;
+
+import ai.subut.kurjun.db.file.FileDb;
 
 
 /**
@@ -44,6 +46,25 @@ public class RepoUrlStore
     public Set<RepoUrl> getRemoteTemplateUrls() throws IOException
     {
         return getUrls( MAP_NAME_TEMPLATE );
+    }
+
+
+    ///////////////// Remote apt methods /////////////////////
+    public void addRemoteAptUrl( RepoUrl repoUrl ) throws IOException
+    {
+        addUrl( repoUrl, MAP_NAME_APT );
+    }
+
+
+    public RepoUrl removeRemoteAptUrl( RepoUrl repoUrl ) throws IOException
+    {
+        return removeUrl( repoUrl, MAP_NAME_APT );
+    }
+
+
+    public Set<RepoUrl> getRemoteAptUrls() throws IOException
+    {
+        return getUrls( MAP_NAME_APT );
     }
 
 
