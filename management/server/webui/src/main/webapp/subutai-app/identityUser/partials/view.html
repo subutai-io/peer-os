@@ -8,23 +8,30 @@
 	</div>
 
 	<div class="b-workspace__content">
-		<div class="b-data-table">
-			<table datatable="" 
-				dt-options="identityUserCtrl.dtOptions" 
-				dt-columns="identityUserCtrl.dtColumns" 
-				dt-instance="identityUserCtrl.dtInstance" 
-				class="row-border hover">
-			</table>
+		<div class="b-tabs-menu">
+			<ul>
+				<li class="b-tabs-menu__item"
+					ng-click="identityUserCtrl.activeTab = 'approved'"
+					ng-class="identityUserCtrl.activeTab == 'approved' ? 'b-tabs-menu__item_active' : ''">
+					Approved
+				</li>
+				<li class="b-tabs-menu__item"
+					ng-click="identityUserCtrl.activeTab = 'pending'"
+					ng-class="identityUserCtrl.activeTab == 'pending' ? 'b-tabs-menu__item_active' : ''">
+					Pending
+				</li>
+			</ul>
+		</div>
+		<div
+			ng-if="identityUserCtrl.activeTab == 'approved'"
+			ng-include="'subutai-app/identityUser/partials/approved.html'">
 		</div>
 
-		<div class="b-empty-list" ng-show="identityUserCtrl.users.length == 0">
-			<div class="b-empty-list__text">
-				You don’t have any users
-			</div>
-			<a class="b-btn b-btn_blue" href ng-click="identityUserCtrl.userForm()">
-				<i class="fa fa-plus"></i> Add user
-			</a>	
-		</div>		
+		<div
+			ng-if="identityUserCtrl.activeTab == 'pending'"
+			ng-include="'subutai-app/identityUser/partials/pending.html'">
+		</div>
+
 	</div>
 
 </div>

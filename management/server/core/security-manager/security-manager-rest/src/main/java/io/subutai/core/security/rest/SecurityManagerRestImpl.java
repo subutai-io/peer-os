@@ -81,7 +81,7 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
         }
         else
         {
-            return Response.ok( key ).build();
+            return Response.status (Response.Status.OK ).entity (JsonUtil.toJson(key)).build();
         }
     }
 

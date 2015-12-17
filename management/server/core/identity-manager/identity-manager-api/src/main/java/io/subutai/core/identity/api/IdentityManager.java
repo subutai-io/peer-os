@@ -103,7 +103,17 @@ public interface IdentityManager
     /* *************************************************
      *
      */
-    User createUser( String userName, String password, String fullName, String email, int type, String publicKey );
+    void approveUser(String userName,List<Role>roles);
+    /* *************************************************
+     *
+     */
+
+    User signUp( String username, String pwd, String fullName, String email, String keyAscii );
+    /* *************************************************
+     *
+     */
+
+    User createUser( String userName, String password, String fullName, String email, int type, String publicKey, boolean isApproved );
 
 
     /* *************************************************
@@ -217,5 +227,9 @@ public interface IdentityManager
     /* *************************************************
      */
     void removeUserToken( String tokenId );
+
+
+
+
 
 }
