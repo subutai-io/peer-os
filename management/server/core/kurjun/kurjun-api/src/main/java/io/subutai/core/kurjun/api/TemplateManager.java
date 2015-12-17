@@ -5,8 +5,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
+import java.util.Map;
 
 import io.subutai.common.protocol.TemplateKurjun;
+
 import java.util.Set;
 
 
@@ -61,7 +63,7 @@ public interface TemplateManager
      *
      * @return Set of urls
      */
-    List<URL> getRemoteRepoUrls();
+    List<Map<String, Object>> getRemoteRepoUrls();
 
 
     /**

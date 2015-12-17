@@ -8,9 +8,11 @@ import java.net.SocketException;
 import java.net.URL;
 import java.security.AccessControlException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -322,19 +324,27 @@ public class TemplateManagerImpl implements TemplateManager
 
 
     @Override
-    public List<URL> getRemoteRepoUrls()
+    public List<Map<String, Object>> getRemoteRepoUrls()
     {
-        List<URL> urls = new ArrayList<>();
+        List<Map<String, Object>> urls = new ArrayList<>();
         try
         {
             for ( RepoUrl r : repoUrlStore.getRemoteTemplateUrls() )
             {
-                urls.add( r.getUrl() );
+                Map<String, Object> map = new HashMap<>( 3 );
+                map.put( "url", r.getUrl().toExternalForm() );
+                map.put( "useToken", r.getToken() != null ? "yes" : "no" );
+                map.put( "global", "no" );
+                urls.add( map );
             }
 
             for ( RepoUrl r : repoUrlStore.getGlobalTemplateUrls() )
             {
-                urls.add( r.getUrl() );
+                Map<String, Object> map = new HashMap<>( 3 );
+                map.put( "url", r.getUrl().toExternalForm() );
+                map.put( "useToken", r.getToken() != null ? "yes" : "no" );
+                map.put( "global", "yes" );
+                urls.add( map );
             }
         }
         catch ( IOException e )
