@@ -455,7 +455,7 @@ public class NetworkManagerImpl implements NetworkManager
     }
 
 
-    protected ManagementHost getManagementHost() throws NetworkManagerException
+    protected ResourceHost getManagementHost() throws NetworkManagerException
     {
         try
         {

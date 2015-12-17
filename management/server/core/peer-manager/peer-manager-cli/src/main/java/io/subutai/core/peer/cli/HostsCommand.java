@@ -45,7 +45,7 @@ public class HostsCommand extends SubutaiShellCommandSupport
 
         LocalPeer localPeer = peerManager.getLocalPeer();
 
-        ManagementHost managementHost = localPeer.getManagementHost();
+        ResourceHost managementHost = localPeer.getManagementHost();
         if ( managementHost == null )
         {
             System.out.println( "Management host not available." );

@@ -494,7 +494,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
     @Override
     public void deployResourceHost( List<String> args ) throws NodeRegistrationException
     {
-        ManagementHost managementHost = null;
+        ResourceHost managementHost = null;
         CommandResult result;
 
         try

@@ -5,27 +5,25 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 
 import io.subutai.common.network.Gateway;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
-import io.subutai.common.peer.ManagementHost;
 
 
 public class CreateGatewayTask implements Callable<Boolean>
 {
-    private final String gatewayIp;
-    private final int vlan;
+    private final Gateway gateway;
     private final NetworkManager networkManager;
-    private final ManagementHost managementHost;
+    private final LocalPeer localPeer;
 
 
-    public CreateGatewayTask( final String gatewayIp, final int vlan, final NetworkManager networkManager,
-                              final ManagementHost managementHost )
+    public CreateGatewayTask( final Gateway gateway, final NetworkManager networkManager,
+                              final LocalPeer localPeer )
     {
-        this.gatewayIp = gatewayIp;
-        this.vlan = vlan;
+        this.gateway = gateway;
         this.networkManager = networkManager;
-        this.managementHost = managementHost;
+        this.localPeer = localPeer;
     }
 
 
@@ -33,11 +31,11 @@ public class CreateGatewayTask implements Callable<Boolean>
     public Boolean call() throws Exception
     {
 
-        Gateway newGateway = new Gateway( vlan, gatewayIp );
+        Gateway newGateway = new Gateway( gateway.getVlan(), gateway.getIp() );
 
         try
         {
-            Set<Gateway> existingGateways = managementHost.getGateways();
+            Set<Gateway> existingGateways = localPeer.getGateways();
             for ( Gateway gateway : existingGateways )
             {
                 if ( newGateway.equals( gateway ) )
@@ -46,14 +44,14 @@ public class CreateGatewayTask implements Callable<Boolean>
                 }
             }
 
-            networkManager.setupGateway( gatewayIp, vlan );
+            networkManager.setupGateway( gateway.getIp(), gateway.getVlan() );
 
             return true;
         }
         catch ( NetworkManagerException e )
         {
             throw new PeerException(
-                    String.format( "Error creating gateway tap device with IP %s and VLAN %d", gatewayIp, vlan ), e );
+                    String.format( "Error creating gateway tap device with IP %s and VLAN %d", gateway.getIp(), gateway.getVlan() ), e );
         }
     }
 }

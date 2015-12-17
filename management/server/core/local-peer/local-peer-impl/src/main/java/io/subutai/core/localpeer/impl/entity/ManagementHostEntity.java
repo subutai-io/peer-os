@@ -61,9 +61,9 @@ import io.subutai.core.repository.api.RepositoryManager;
 @Entity
 @Table( name = "m_host" )
 @Access( AccessType.FIELD )
-public class ManagementHostEntity extends AbstractSubutaiHost implements ManagementHost, Disposable
+public class ManagementHostEntity /*extends AbstractSubutaiHost implements ManagementHost, Disposable*/
 {
-    private static final Logger LOG = LoggerFactory.getLogger( ManagementHostEntity.class );
+/*    private static final Logger LOG = LoggerFactory.getLogger( ManagementHostEntity.class );
 
     private static final String GATEWAY_INTERFACE_NAME_REGEX = "^br-(\\d+)$";
     private static final Pattern GATEWAY_INTERFACE_NAME_PATTERN = Pattern.compile( GATEWAY_INTERFACE_NAME_REGEX );
@@ -120,7 +120,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     }
 
 
-    @Override
+@Override
     public void removeVlanDomain( final int vlan ) throws PeerException
     {
         try
@@ -131,7 +131,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
         {
             throw new PeerException( String.format( "Error removing domain by vlan %d", vlan ), e );
         }
-    }
+    }   }
 
 
     @Override
@@ -620,5 +620,5 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
 //    public PeerInfo getPeerInfo()
 //    {
 //        return JsonUtil.fromJson( peerInfo, PeerInfo.class );
-//    }
+//    }*/
 }

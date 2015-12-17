@@ -8,6 +8,7 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.StringUtil;
 import io.subutai.common.peer.HostNotFoundException;
@@ -53,7 +54,7 @@ public class ManagerHelper
     }
 
 
-    protected ManagementHost getManagementHost() throws PluginManagerException
+    protected ResourceHost getManagementHost() throws PluginManagerException
     {
         try
         {

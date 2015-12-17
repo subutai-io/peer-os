@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import io.subutai.common.dao.DaoManager;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.PeerPolicy;
@@ -79,8 +80,7 @@ public class PeerManagerImplTest
     IdentityManager identityManager;
     @Mock
     SecurityManager securityManager;
-    @Mock
-    ManagementHostEntity managementHost;
+
     @Mock
     Set<RequestListener> requestListeners;
     @Mock
@@ -95,7 +95,7 @@ public class PeerManagerImplTest
     {
         InetAddress inetAddress = mock( InetAddress.class );
         when( peerInfo.getId() ).thenReturn( PEER_ID );
-        when( localPeer.getManagementHost() ).thenReturn( managementHost );
+//        when( localPeer.getManagementHost() ).thenReturn( managementHost );
         when( localPeer.getPeerInfo() ).thenReturn( peerInfo );
         when( localPeer.getId() ).thenReturn( PEER_ID );
 

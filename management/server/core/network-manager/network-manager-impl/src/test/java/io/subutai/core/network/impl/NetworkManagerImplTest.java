@@ -89,7 +89,7 @@ public class NetworkManagerImplTest
     @Mock
     LocalPeer localPeer;
     @Mock
-    ManagementHost managementHost;
+    ResourceHost managementHost;
     @Mock
     ResourceHost resourceHost;
     @Mock
