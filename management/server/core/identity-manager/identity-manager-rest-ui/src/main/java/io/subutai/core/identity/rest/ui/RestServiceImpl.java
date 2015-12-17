@@ -128,7 +128,7 @@ public class RestServiceImpl implements RestService
     public Response approve( @FormParam( "username" ) final String username, @FormParam( "roles" ) final String rolesJson )
     {
 
-        List<Long> roleIds = jsonUtil.fromJson( rolesJson, new TypeToken<ArrayList<Long>>()
+        List<Long> roleIds = JsonUtil.fromJson( rolesJson, new TypeToken<ArrayList<Long>>()
         {
         }.getType() );
 

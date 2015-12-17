@@ -638,7 +638,7 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    @RolesAllowed( "Identity-Management|A|Write" )
+    @RolesAllowed( "Identity-Management|Write" )
     @Override
     public void approveUser( final String userName, List<Role> roles)
     {

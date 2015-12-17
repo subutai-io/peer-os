@@ -42,6 +42,7 @@ public interface RestService
     @POST
     @Produces( { MediaType.APPLICATION_JSON } )
     Response approve( @FormParam( "username" ) String username,@FormParam( "roles" ) String roles );
+
     @DELETE
     @Path( "/{userId}" )
     Response deleteUser( @PathParam( "userId" ) Long userId );
