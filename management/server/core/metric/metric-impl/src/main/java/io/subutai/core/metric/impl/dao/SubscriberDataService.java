@@ -93,6 +93,10 @@ public class SubscriberDataService
         }
         catch ( PersistenceException e )
         {
+            if ( em.getTransaction().isActive() )
+            {
+                em.getTransaction().rollback();
+            }
             LOGGER.error( "Query string found to be invalid." );
             throw new DaoException( e );
         }
@@ -103,7 +107,7 @@ public class SubscriberDataService
     }
 
 
-    public Set<String> getEnvironmentSubscriberIds( final String environmentId ) throws DaoException
+    public Set<String> findHandlersByEnvironment( final String environmentId ) throws DaoException
     {
         Set<String> result = new HashSet<>();
         EntityManager em = emf.createEntityManager();
@@ -121,6 +125,10 @@ public class SubscriberDataService
         }
         catch ( PersistenceException e )
         {
+            if ( em.getTransaction().isActive() )
+            {
+                em.getTransaction().rollback();
+            }
             LOGGER.error( "Error getting subscriberIds" );
             throw new DaoException( e );
         }

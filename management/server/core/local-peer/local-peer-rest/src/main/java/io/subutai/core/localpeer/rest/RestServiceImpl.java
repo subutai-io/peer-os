@@ -24,7 +24,7 @@ import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
-import io.subutai.common.peer.AlertPack;
+import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerException;
@@ -32,7 +32,6 @@ import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.protocol.TemplateKurjun;
-import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.util.DateTimeParam;
@@ -79,29 +78,29 @@ public class RestServiceImpl implements RestService
     }
 
 
-    @Override
-    public Response getPeerPolicy( final String peerId )
-    {
-        try
-        {
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
-
-            PeerPolicy peerPolicy = localPeer.getPeerInfo().getPeerPolicy( peerId );
-            if ( peerPolicy == null )
-            {
-                return Response.ok().build();
-            }
-            else
-            {
-                return Response.ok( peerPolicy ).build();
-            }
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( "Error getting peer policy #getPeerPolicy", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
-        }
-    }
+//    @Override
+//    public Response getPeerPolicy( )
+//    {
+//        try
+//        {
+////            Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
+//
+//            PeerPolicy peerPolicy = localPeer.getPeerInfo().getPeerPolicy();
+//            if ( peerPolicy == null )
+//            {
+//                return Response.ok().build();
+//            }
+//            else
+//            {
+//                return Response.ok( peerPolicy ).build();
+//            }
+//        }
+//        catch ( Exception e )
+//        {
+//            LOGGER.error( "Error getting peer policy #getPeerPolicy", e );
+//            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+//        }
+//    }
 
 
     @Override
@@ -384,11 +383,11 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response putAlert( final AlertPack alertPack )
+    public Response putAlert( final AlertEvent alertEvent )
     {
         try
         {
-            localPeer.alert( alertPack );
+            localPeer.alert( alertEvent );
 
             return Response.accepted().build();
         }

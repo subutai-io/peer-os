@@ -8,13 +8,14 @@
     <non-jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=openjpa/subutaiDS)
     </non-jta-data-source>
     <class>io.subutai.core.environment.impl.entity.HostInterfaceImpl</class>
+    <class>io.subutai.core.environment.impl.entity.EnvironmentAlertHandlerImpl</class>
     <class>io.subutai.core.environment.impl.entity.EnvironmentImpl</class>
     <class>io.subutai.core.environment.impl.entity.PeerConfImpl</class>
     <class>io.subutai.core.environment.impl.entity.EnvironmentContainerImpl</class>
     <class>io.subutai.core.environment.impl.entity.EnvironmentBlueprintEntity</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
-      <property name="openjpa.Log" value="DefaultLevel=WARN, Tool=INFO" />
+      <property name="openjpa.Log" value="DefaultLevel=WARN, Tool=INFO, SQL=TRACE" />
       <property name="openjpa.ConnectionFactoryProperties" value="PrintParameters=true" />
       <property name="openjpa.RuntimeUnenhancedClasses" value="supported" />
       <property name="openjpa.jdbc.DBDictionary" value="h2" />

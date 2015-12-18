@@ -20,7 +20,6 @@ import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Lob;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -44,12 +43,10 @@ import io.subutai.common.network.VniVlanMapping;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.ManagementHost;
 import io.subutai.common.peer.PeerException;
-import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.Disposable;
 import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.settings.Common;
-import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.NumUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.localpeer.impl.tasks.CreateGatewayTask;
@@ -75,9 +72,9 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     @Column
     private String name = "Subutai Management Host";
 
-    @Lob
-    @Column
-    private String peerInfo;
+//    @Lob
+//    @Column
+//    private String peerInfo;
 
     @Transient
     protected ExecutorService singleThreadExecutorService = SubutaiExecutors.newSingleThreadExecutor();
@@ -85,7 +82,7 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     protected ServiceLocator serviceLocator = new ServiceLocator();
 
 
-    protected ManagementHostEntity()
+    public ManagementHostEntity()
     {
     }
 
@@ -93,12 +90,6 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
     public ManagementHostEntity( final String peerId, final ResourceHostInfo resourceHostInfo )
     {
         super( peerId, resourceHostInfo );
-    }
-
-
-    public void init()
-    {
-        // empty
     }
 
 
@@ -619,15 +610,15 @@ public class ManagementHostEntity extends AbstractSubutaiHost implements Managem
         return getPeer().isConnected( new HostId( getId() ) );
     }
 
-
-    public void setPeerInfo( final PeerInfo peerInfo )
-    {
-        this.peerInfo = JsonUtil.toJson( peerInfo );
-    }
-
-
-    public PeerInfo getPeerInfo()
-    {
-        return JsonUtil.fromJson( peerInfo, PeerInfo.class );
-    }
+//
+//    public void setPeerInfo( final PeerInfo peerInfo )
+//    {
+//        this.peerInfo = JsonUtil.toJson( peerInfo );
+//    }
+//
+//
+//    public PeerInfo getPeerInfo()
+//    {
+//        return JsonUtil.fromJson( peerInfo, PeerInfo.class );
+//    }
 }

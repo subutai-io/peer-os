@@ -164,6 +164,18 @@ function IdentityRoleFormCtrl($scope, identitySrv, SweetAlert, ngDialog) {
 				}
 			}
 		}
+		for (var i = 0; i < vm.permissions.length; ++i) {
+			console.log (vm.permissions[i].name);
+			for (var j = 0; j < vm.permissions2Add.length; ++j) {
+				console.log (vm.permissions2Add[j].name);
+				if (vm.permissions[i].name === vm.permissions2Add[j].name) {
+					console.log ("Found!");
+					vm.permissions.splice (i, 1);
+					--i;
+					break;
+				}
+			}
+		}
 		vm.role2Add = role;
 	}
 
@@ -178,9 +190,16 @@ function IdentityRoleFormCtrl($scope, identitySrv, SweetAlert, ngDialog) {
 
 	function addPermission2Stack(permission) {
 		vm.permissions2Add.push(angular.copy(permission));
+		for (var i = 0; i < vm.permissions.length; ++i) {
+			if (vm.permissions[i].name === permission.name) {
+				vm.permissions.splice (i, 1);
+				break;
+			}
+		}
 	}
 
 	function removePermissionFromStack(key) {
+		vm.permissions.push (vm.permissions2Add[key]);
 		vm.permissions2Add.splice(key, 1);
 	}
 

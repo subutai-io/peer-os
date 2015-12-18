@@ -2,11 +2,8 @@ package io.subutai.common.peer;
 
 
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import io.subutai.common.settings.ChannelSettings;
@@ -18,24 +15,37 @@ import io.subutai.common.settings.ChannelSettings;
 public class PeerInfo implements Serializable
 {
     @JsonProperty
-    private String ip = "127.0.0.1";
-    private String gatewayIp;
-    @JsonIgnore
-    private String keyPhrase = "";
+    private String id;
+
     @JsonProperty
-    private PeerStatus status;
-    private Set<PeerPolicy> peerPolicies = new HashSet<>();
+    private String ownerId;
+
+    @JsonProperty
+    private String ip = "127.0.0.1";
+
+//    @JsonProperty
+//    private String gatewayIp;
+//
+//    @JsonProperty
+//    private String keyPhrase = "";
+
+//    @JsonProperty
+    //    private PeerStatus status;
+
+//    @JsonProperty
+//    private PeerPolicy grantedPolicy;
 
     @JsonProperty
     private String name;
+
     @JsonProperty
-    private String id;
-    @JsonProperty
-    private String ownerId;
     private int port = Integer.valueOf( ChannelSettings.SECURE_PORT_X2 );
-    @JsonProperty
-    private int lastUsedVlanId = 100;
-    private String keyId;
+
+//    @JsonProperty
+//    private int lastUsedVlanId = 100;
+
+//    @JsonProperty
+//    private String keyId;
 
 
     public String getId()
@@ -91,29 +101,29 @@ public class PeerInfo implements Serializable
         this.ip = ip;
     }
 
-
-    public String getGatewayIp()
-    {
-        return gatewayIp;
-    }
-
-
-    public void setGatewayIp( String gatewayIp )
-    {
-        this.gatewayIp = gatewayIp;
-    }
-
-
-    public PeerStatus getStatus()
-    {
-        return status;
-    }
+//
+//    public String getGatewayIp()
+//    {
+//        return gatewayIp;
+//    }
+//
+//
+//    public void setGatewayIp( String gatewayIp )
+//    {
+//        this.gatewayIp = gatewayIp;
+//    }
 
 
-    public void setStatus( final PeerStatus status )
-    {
-        this.status = status;
-    }
+//    public PeerStatus getStatus()
+//    {
+//        return status;
+//    }
+//
+
+//    public void setStatus( final PeerStatus status )
+//    {
+//        this.status = status;
+//    }
 
 
     public int getPort()
@@ -121,64 +131,53 @@ public class PeerInfo implements Serializable
         return port;
     }
 
-
-    public int getLastUsedVlanId()
-    {
-        return lastUsedVlanId;
-    }
-
-
-    public void setLastUsedVlanId( int lastUsedVlanId )
-    {
-        this.lastUsedVlanId = lastUsedVlanId;
-    }
-
-
-    public String getKeyId()
-    {
-        return keyId;
-    }
+//
+//    public int getLastUsedVlanId()
+//    {
+//        return lastUsedVlanId;
+//    }
+//
+//
+//    public void setLastUsedVlanId( int lastUsedVlanId )
+//    {
+//        this.lastUsedVlanId = lastUsedVlanId;
+//    }
 
 
-    public void setKeyId( final String keyId )
-    {
-        this.keyId = keyId;
-    }
+//    public String getKeyId()
+//    {
+//        return keyId;
+//    }
+//
+//
+//    public void setKeyId( final String keyId )
+//    {
+//        this.keyId = keyId;
+//    }
+//
+//
+//    public String getKeyPhrase()
+//    {
+//        return keyPhrase;
+//    }
+//
+//
+//    public void setKeyPhrase( final String keyPhrase )
+//    {
+//        this.keyPhrase = keyPhrase;
+//    }
 
-
-    public String getKeyPhrase()
-    {
-        return keyPhrase;
-    }
-
-
-    public void setKeyPhrase( final String keyPhrase )
-    {
-        this.keyPhrase = keyPhrase;
-    }
-
-
-    public Set<PeerPolicy> getPeerPolicies()
-    {
-        return peerPolicies;
-    }
-
-
-    public void setPeerPolicies( final Set<PeerPolicy> peerPolicies )
-    {
-        this.peerPolicies = peerPolicies;
-    }
-
-
-    public void setPeerPolicy( final PeerPolicy peerPolicy )
-    {
-        PeerPolicy oldPeerPolicy = getPeerPolicy( peerPolicy.getRemotePeerId() );
-        if ( oldPeerPolicy != null )
-        {
-            peerPolicies.remove( oldPeerPolicy );
-        }
-        peerPolicies.add( peerPolicy );
-    }
+//
+//    public PeerPolicy getGrantedPolicy()
+//    {
+//        return grantedPolicy;
+//    }
+//
+//
+//    public void setGrantedPolicy( final PeerPolicy grantedPolicy )
+//    {
+//        this.grantedPolicy = grantedPolicy;
+//    }
 
 
     @Override
@@ -202,21 +201,21 @@ public class PeerInfo implements Serializable
     }
 
 
-    public PeerPolicy getPeerPolicy( final String remotePeerId )
-    {
-        if ( peerPolicies == null )
-        {
-            return null;
-        }
-        for ( PeerPolicy peerPolicy : peerPolicies )
-        {
-            if ( peerPolicy.getRemotePeerId().compareTo( remotePeerId ) == 0 )
-            {
-                return peerPolicy;
-            }
-        }
-        return null;
-    }
+    //    public PeerPolicy getPeerPolicy( final String remotePeerId )
+    //    {
+    //        if ( peerPolicies == null )
+    //        {
+    //            return null;
+    //        }
+    //        for ( PeerPolicy peerPolicy : peerPolicies )
+    //        {
+    //            if ( peerPolicy.getPeerId().compareTo( remotePeerId ) == 0 )
+    //            {
+    //                return peerPolicy;
+    //            }
+    //        }
+    //        return null;
+    //    }
 
 
     @Override
@@ -224,15 +223,15 @@ public class PeerInfo implements Serializable
     {
         final StringBuffer sb = new StringBuffer( "PeerInfo{" );
         sb.append( "ip='" ).append( ip ).append( '\'' );
-        sb.append( ", gatewayIp='" ).append( gatewayIp ).append( '\'' );
-        sb.append( ", status=" ).append( status );
-        sb.append( ", peerPolicies=" ).append( peerPolicies );
+//        sb.append( ", gatewayIp='" ).append( gatewayIp ).append( '\'' );
+//        sb.append( ", status=" ).append( status );
+        //        sb.append( ", peerPolicies=" ).append( peerPolicies );
         sb.append( ", name='" ).append( name ).append( '\'' );
         sb.append( ", id=" ).append( id );
         sb.append( ", ownerId=" ).append( ownerId );
         sb.append( ", port=" ).append( port );
-        sb.append( ", lastUsedVlanId=" ).append( lastUsedVlanId );
-        sb.append( ", keyId='" ).append( keyId ).append( '\'' );
+//        sb.append( ", lastUsedVlanId=" ).append( lastUsedVlanId );
+//        sb.append( ", keyId='" ).append( keyId ).append( '\'' );
         sb.append( '}' );
         return sb.toString();
     }

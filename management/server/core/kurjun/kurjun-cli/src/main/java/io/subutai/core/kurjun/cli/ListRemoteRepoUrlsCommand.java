@@ -4,7 +4,7 @@ package io.subutai.core.kurjun.cli;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.kurjun.api.TemplateManager;
 import java.net.URL;
-import java.util.Set;
+import java.util.List;
 import org.apache.karaf.shell.commands.Command;
 
 
@@ -23,7 +23,7 @@ public class ListRemoteRepoUrlsCommand extends SubutaiShellCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        Set<URL> urls = templateManager.getRemoteRepoUrls();
+        List<URL> urls = templateManager.getRemoteRepoUrls();
         System.out.println( " URL list: " );
         for ( URL url : urls )
         {
