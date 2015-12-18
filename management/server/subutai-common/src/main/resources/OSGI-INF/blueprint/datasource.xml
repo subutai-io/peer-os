@@ -8,10 +8,12 @@
 
   <!--***********  Subutai Common DataSource **************** -->
 
-  <bean id="subutaiJDBC" class="org.h2.jdbcx.JdbcDataSource">
-    <property name="URL" value="jdbc:h2:$[subutaiAppDataPath]/db/subutaiDb;AUTO_SERVER=true" />
-    <property name="user" value="sa" />
-    <property name="password" value="" />
+  <bean id="subutaiJDBC" class="org.apache.derby.jdbc.EmbeddedDataSource">
+    <!--<property name="URL" value="jdbc:h2:$[subutaiAppDataPath]/db/subutaiDb;AUTO_SERVER=true" />-->
+    <!--<property name="user" value="sa" />-->
+    <!--<property name="password" value="" />-->
+    <property name="databaseName" value="$[subutaiAppDataPath]/db/subutaiDb2"/>
+    <property name="createDatabase" value="create"/>
   </bean>
 
   <service interface="javax.sql.DataSource" ref="subutaiJDBC">
@@ -22,10 +24,12 @@
 
   <!--***********  Plugins Common DataSource **************** -->
 
-  <bean id="pluginsJDBC" class="org.h2.jdbcx.JdbcDataSource">
-    <property name="URL" value="jdbc:h2:$[subutaiAppDataPath]/db/plugins/pluginsDb;AUTO_SERVER=true" />
-    <property name="user" value="sa" />
-    <property name="password" value="" />
+  <bean id="pluginsJDBC" class="org.apache.derby.jdbc.EmbeddedDataSource">
+    <!--<property name="URL" value="jdbc:h2:$[subutaiAppDataPath]/db/plugins/pluginsDb;AUTO_SERVER=true" />-->
+    <!--<property name="user" value="sa" />-->
+    <!--<property name="password" value="" />-->
+    <property name="databaseName" value="$[subutaiAppDataPath]/db/pluginsDb2"/>
+    <property name="createDatabase" value="create"/>
   </bean>
 
   <service interface="javax.sql.DataSource" ref="pluginsJDBC">
