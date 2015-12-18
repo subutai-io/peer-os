@@ -1,0 +1,78 @@
+<div class="b-popup">
+	<div class="b-popup__header">
+		Sign Up
+		<a href ng-click="closeThisDialog()"><img src="assets/elements/buttons/b-icon-close.svg" class="b-icon g-right"/></a>
+	</div>
+	<div class="b-popup__body">
+		<div class="b-form">
+			<form ng-submit="currentUserCtrl.requestNewUser()" name="signUpForm">
+				<div class="b-popup__body">
+					<div class="b-popup-body b-popup-body_col-2">
+						<label class="b-form-label b-form-label_fix-size-1 g-left">Username:</label>
+						<div class="b-form-wrapper b-form-wrapper_margin-size-1">
+							<input type="text"
+								   placeholder="Enter username"
+								   class="b-form-input"
+								   ng-model="currentUserCtrl.user2Add.username"
+								   required>
+						</div>
+
+
+						<label class="b-form-label b-form-label_fix-size-1 g-left">Full name:</label>
+						<div class="b-form-wrapper b-form-wrapper_margin-size-1">
+							<input type="text"
+								   placeholder="Enter full name"
+								   class="b-form-input"
+								   ng-model="currentUserCtrl.user2Add.fullName"
+								   required>
+						</div>
+
+
+						<label class="b-form-label b-form-label_fix-size-1 g-left">E-mail:</label>
+						<div class="b-form-wrapper b-form-wrapper_margin-size-1">
+							<input type="email"
+								   placeholder="email@mail.com"
+								   class="b-form-input"
+								   ng-model="currentUserCtrl.user2Add.email"
+								   required>
+						</div>
+
+
+						<label class="b-form-label b-form-label_fix-size-1 g-left">Password:</label>
+						<div class="b-form-wrapper b-form-wrapper_margin-size-1">
+							<input type="password"
+								   placeholder="***********"
+								   class="b-form-input"
+								   ng-model="currentUserCtrl.user2Add.password"
+								   id="js-password"
+								   required>
+						</div>
+
+
+						<label class="b-form-label b-form-label_fix-size-1 g-left">Confirm password:</label>
+						<div class="b-form-wrapper b-form-wrapper_margin-size-1">
+							<input type="password"
+								   placeholder="***********"
+								   class="b-form-input"
+								   ng-model="currentUserCtrl.user2Add.confirm_password"
+								   pw-check="js-password"
+								   name="confirm_password"
+								   ng-attr-required="currentUserCtrl.user2Add.password.length > 0">
+						</div>
+
+						<label class="b-form-label b-form-label_fix-size-1 g-left">Public key:</label>
+						<div class="b-form-wrapper b-form-wrapper_margin-size-1">
+							<textarea class="b-form-input b-form-input_textarea" ng-model = "currentUserCtrl.user2Add.public_key" style = "width: 211px">
+							</textarea>
+						</div>
+						<span class="b-form-hint b-form-hint_red" ng-show="signUpForm.confirm_password.$error.pwmatch">Passwords don't match.</span>
+					</div>
+				</div>
+				<div class="b-popup__footer">
+					<button class="b-btn b-btn_green g-right" type="submit">Sign Up</button>
+					<div class="clear"></div>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>

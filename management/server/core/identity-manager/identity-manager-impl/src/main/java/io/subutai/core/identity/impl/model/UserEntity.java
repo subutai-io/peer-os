@@ -16,6 +16,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+import javax.security.auth.Subject;
 
 import io.subutai.common.security.objects.UserStatus;
 import io.subutai.common.security.objects.UserType;
@@ -60,6 +62,9 @@ public class UserEntity implements User
     @Column( name = "security_key_id" )
     private String securityKeyId = ""; // PGP KeyID
 
+    @Column( name = "isApproved" )
+    private boolean isApproved = false; //requires admin approval
+
     @Column( name = "fingerprint" )
     private String fingerprint = ""; // User key fingerprint
 
@@ -72,6 +77,18 @@ public class UserEntity implements User
     private List<Role> roles = new ArrayList<>();
     //*********************************************
 
+    @Override
+    public boolean isApproved()
+    {
+        return isApproved;
+    }
+
+
+    @Override
+    public void setApproved( final boolean approved )
+    {
+        isApproved = approved;
+    }
 
     @Override
     public Long getId()
@@ -245,4 +262,6 @@ public class UserEntity implements User
     {
         return UserType.values()[type - 1].getName();
     }
+
+
 }

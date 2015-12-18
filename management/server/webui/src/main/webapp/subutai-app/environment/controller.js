@@ -59,10 +59,130 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 		DTColumnBuilder.newColumn(null).withTitle('Environment name').renderWith(environmentNameTooltip),
 		DTColumnBuilder.newColumn(null).withTitle('SSH Key').renderWith(sshKeyLinks),
 		DTColumnBuilder.newColumn(null).withTitle('Domains').renderWith(domainsTag),
-		DTColumnBuilder.newColumn(null).withTitle('').renderWith(containersTags),
-		DTColumnBuilder.newColumn(null).withTitle('').notSortable().renderWith(actionStartEnvironmentBuild),
-		DTColumnBuilder.newColumn(null).withTitle('').notSortable().renderWith(actionDelete)
+		DTColumnBuilder.newColumn(null).withTitle('Share').renderWith(actionShare),
+		DTColumnBuilder.newColumn(null).withTitle('Containers').renderWith(containersTags),
+		DTColumnBuilder.newColumn(null).withTitle('Actions').notSortable().renderWith(actionStartEnvironmentBuild),
+		DTColumnBuilder.newColumn(null).withTitle('').notSortable().renderWith(actionDelete),
+		DTColumnBuilder.newColumn(null).withTitle('').notSortable().renderWith(actionSwitch)
 	];
+
+	vm.listOfUsers = [];
+	vm.shareEnvironmentWindow = shareEnvironmentWindow;
+	vm.toggleSelection = toggleSelection;
+	vm.shareEnvironment = shareEnvironment;
+	vm.users2Add = [];
+	vm.addUser2Stack = addUser2Stack;
+	vm.removeUserFromStack = removeUserFromStack;
+	function addUser2Stack(user) {
+		vm.users2Add.push(angular.copy(user));
+		for (var i = 0; i < vm.listOfUsers.length; ++i) {
+			if (vm.listOfUsers[i].fullName === user.fullName) {
+				vm.listOfUsers.splice (i, 1);
+				break;
+			}
+		}
+	}
+
+
+	function removeUserFromStack(key) {
+		vm.listOfUsers.push (vm.users2Add[key]);
+		vm.users2Add.splice(key, 1);
+	}
+
+
+
+
+	function actionShare (data, type, full, meta) {
+		return '<a href="" class="b-btn b-btn_blue g-left" ng-click="environmentViewCtrl.shareEnvironmentWindow(\'' + data.id + '\')" ng-show = "' + data.status + ' === HEALTHY">Share</a>';
+	}
+
+
+
+
+	vm.currentUser = {};
+	environmentService.getCurrentUser().success (function (data) {
+		vm.currentUser = data;
+	});
+	function shareEnvironmentWindow (environmentId) {
+		vm.listOfUsers = [];
+		vm.checkedUsers = [];
+		environmentService.getUsers().success (function (data) {
+			for (var i = 0; i < data.length; ++i) {
+				if (data[i].id !== vm.currentUser.id) {
+					vm.listOfUsers.push (data[i]);
+				}
+			}
+			for (var i = 0; i < vm.listOfUsers.length; ++i) {
+				vm.listOfUsers[i].read = true;
+				vm.listOfUsers[i].write = true;
+				vm.listOfUsers[i].update = true;
+				vm.listOfUsers[i].delete = true;
+			}
+			console.log (vm.listOfUsers);
+			environmentService.getShared (environmentId).success (function (data2) {
+				console.log (data2);
+				vm.users2Add = data2;
+				for (var i = 0; i < vm.users2Add.length; ++i) {
+					if (vm.users2Add[i].id === vm.currentUser.id) {
+						vm.users2Add.splice (i, 1);
+						--i;
+						continue;
+					}
+					for (var j = 0; j < vm.listOfUsers.length; ++j) {
+						if (vm.listOfUsers[j].id === vm.users2Add[i].id) {
+							vm.listOfUsers.splice (j, 1);
+							break;
+						}
+					}
+				}
+			});
+			vm.currentEnvironment = vm.users[environmentId];
+			ngDialog.open ({
+				template: "subutai-app/environment/partials/shareEnv.html",
+				scope: $scope
+			});
+		});
+	}
+
+	function toggleSelection (user) {
+		for (var i = 0; i < vm.checkedUsers.length; ++i) {
+			if (vm.checkedUsers[i].id === user.id) {
+				vm.checkedUsers.splice (i, 1);
+				return;
+			}
+		}
+		vm.checkedUsers.push (user);
+	}
+
+	function shareEnvironment() {
+		if (vm.users2Add.length === 0) {
+			SweetAlert.swal("ERROR!", "You haven't selected any users.");
+		}
+		else {
+			var arr = [];
+			for (var i = 0; i < vm.users2Add.length; ++i) {
+				arr.push ({
+					id: vm.users2Add[i].id,
+					read: vm.users2Add[i].read,
+					write: vm.users2Add[i].write,
+					update: vm.users2Add[i].update,
+					delete: vm.users2Add[i].delete
+				});
+			}
+			environmentService.share (JSON.stringify (arr), vm.currentEnvironment.id).success(function (data) {
+				SweetAlert.swal("Success!", "Your environment was successfully shared.", "success");
+				vm.dtInstance.reloadData(null, false);
+				ngDialog.closeAll();
+			}).error(function (data) {
+				SweetAlert.swal("ERROR!", "Your container is safe :). Error: " + data.ERROR, "error");
+			});
+		}
+	}
+
+
+	var actionSwitch (data, type, full, meta) {
+		return '<input type = "checkbox" class = "check" ng->';
+	}
 
 	var refreshTable;
 	var reloadTableData = function() {
@@ -355,7 +475,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 			ngDialog.closeAll();
 		});
 	}
-
 }
 
 function fileModel($parse) {
@@ -375,4 +494,3 @@ function fileModel($parse) {
 		}
 	};
 }
-

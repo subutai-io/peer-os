@@ -18,7 +18,7 @@ public class ChannelSettings
     public static final String SPECIAL_REST_BUS = "cxfBusAptManager";
 
     public static final String[] URL_ACCESS_PX1 = {
-
+        "/rest/ui/identity/signup",
         "/rest/v1/identity/gettoken",
         "/rest/v1/peer/id",
         "/rest/v1/pks/{$}",

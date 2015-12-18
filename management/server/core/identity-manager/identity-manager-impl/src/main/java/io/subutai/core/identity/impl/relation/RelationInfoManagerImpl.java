@@ -94,6 +94,10 @@ public class RelationInfoManagerImpl implements RelationInfoManager
     /**
      * Compare relationship weight depending on each relationship property, if relation context or level differs then
      * this relation is not comparable
+     * 1 - a is greater
+     * 0 - equal
+     * -1 - a is less than
+     * -2 - incomparable
      */
     private int compareRelationships( RelationInfo a, RelationInfo b )
     {
