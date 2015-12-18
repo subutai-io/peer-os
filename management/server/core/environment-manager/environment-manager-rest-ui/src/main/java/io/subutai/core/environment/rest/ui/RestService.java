@@ -22,15 +22,14 @@ import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 
 public interface RestService
 {
-    /** Templates *****************************************************/
+    /** Templates **************************************************** */
     @GET
     @Path( "templates" )
     @Produces( { MediaType.APPLICATION_JSON } )
     Response listTemplates();
 
 
-
-    /** Blueprints ****************************************************/
+    /** Blueprints *************************************************** */
 
     @GET
     @Path( "blueprints" )
@@ -45,15 +44,14 @@ public interface RestService
     @POST
     @Path( "blueprints" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    Response saveBlueprint( @FormParam( "blueprint_json" ) String content);
+    Response saveBlueprint( @FormParam( "blueprint_json" ) String content );
 
     @DELETE
     @Path( "blueprints/{blueprintId}" )
     Response deleteBlueprint( @PathParam( "blueprintId" ) UUID blueprintId );
 
 
-
-    /** Domain *****************************************************/
+    /** Domain **************************************************** */
 
     @GET
     @Path( "domains" )
@@ -61,8 +59,7 @@ public interface RestService
     Response getDefaultDomainName();
 
 
-
-    /** Environments *****************************************************/
+    /** Environments **************************************************** */
 
     @GET
     @Produces( { MediaType.APPLICATION_JSON } )
@@ -73,28 +70,28 @@ public interface RestService
     Response accessStatus( @PathParam( "environmentId" ) String environmentId);
 
     @POST
-    @Path("requisites")
+    @Path( "requisites" )
     Response setupRequisites( @FormParam( "blueprint_json" ) String blueprintJson );
 
     @POST
-    @Path("build")
+    @Path( "build" )
     Response startEnvironmentBuild( @FormParam( "environmentId" ) String environmentId,
                                     @FormParam( "signedMessage" ) String signedMessage );
 
-//    @POST
-//    Response createEnvironment( @FormParam( "blueprint_json" ) String blueprintJson );
+    //    @POST
+    //    Response createEnvironment( @FormParam( "blueprint_json" ) String blueprintJson );
 
     @POST
     @Path( "grow" )
-    Response growEnvironment( @FormParam( "environmentId" ) String environmentId, @FormParam( "blueprint_json" ) String blueprintJson );
+    Response growEnvironment( @FormParam( "environmentId" ) String environmentId,
+                              @FormParam( "blueprint_json" ) String blueprintJson );
 
     @DELETE
     @Path( "{environmentId}" )
     Response destroyEnvironment( @PathParam( "environmentId" ) String environmentId );
 
 
-
-    /** Environments SSH keys *****************************************************/
+    /** Environments SSH keys **************************************************** */
 
     @POST
     @Path( "keys" )
@@ -106,8 +103,7 @@ public interface RestService
     Response removeSshKey( @PathParam( "environmentId" ) String environmentId );
 
 
-
-    /** Environment domains *****************************************************/
+    /** Environment domains **************************************************** */
 
     @GET
     @Path( "{environmentId}/domain" )
@@ -120,12 +116,12 @@ public interface RestService
 
 
     @POST
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Consumes( MediaType.MULTIPART_FORM_DATA )
     @Path( "/domains" )
     Response addEnvironmentDomain( @Multipart( "environmentId" ) String environmentId,
                                    @Multipart( "hostName" ) String hostName,
                                    @Multipart( "strategy" ) String strategyJson,
-                                   @Multipart(value = "file") Attachment attr );
+                                   @Multipart( value = "file" ) Attachment attr );
 
 
     @DELETE
@@ -135,17 +131,17 @@ public interface RestService
 
     @GET
     @Path( "{environmentId}/containers/{containerId}/domain" )
-    Response isContainerDomain( @PathParam( "environmentId" ) String environmentId, @PathParam( "containerId" ) String containerId );
-
+    Response isContainerDomain( @PathParam( "environmentId" ) String environmentId,
+                                @PathParam( "containerId" ) String containerId );
 
 
     @PUT
     @Path( "{environmentId}/containers/{containerId}/domain" )
-    Response setContainerDomain( @PathParam( "environmentId" ) String environmentId, @PathParam( "containerId" ) String containerId );
+    Response setContainerDomain( @PathParam( "environmentId" ) String environmentId,
+                                 @PathParam( "containerId" ) String containerId );
 
 
-
-    /** Containers *****************************************************/
+    /** Containers **************************************************** */
 
     @GET
     @Path( "containers/{containerId}" )
@@ -172,8 +168,7 @@ public interface RestService
     Response stopContainer( @PathParam( "containerId" ) String containerId );
 
 
-
-    /** Container types *****************************************************/
+    /** Container types **************************************************** */
 
     @GET
     @Path( "containers/types" )
@@ -181,8 +176,7 @@ public interface RestService
     Response listContainerTypes();
 
 
-
-    /** Container quota *****************************************************/
+    /** Container quota **************************************************** */
 
     @GET
     @Path( "containers/{containerId}/quota" )
@@ -192,13 +186,10 @@ public interface RestService
     @POST
     @Path( "containers/{containerId}/quota" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    Response setContainerQuota( @PathParam( "containerId" ) String containerId,
-                                @FormParam( "cpu" ) int cpu,
-                                @FormParam( "ram" ) int ram,
-                                @FormParam( "disk_home" ) Double diskHome,
-                                @FormParam( "disk_var" ) Double diskVar,
-                                @FormParam( "disk_root" ) Double diskRoot,
-                                @FormParam( "disk_opt" ) Double diskOpt);
+    Response setContainerQuota( @PathParam( "containerId" ) String containerId, @FormParam( "cpu" ) int cpu,
+                                @FormParam( "ram" ) int ram, @FormParam( "disk_home" ) Double diskHome,
+                                @FormParam( "disk_var" ) Double diskVar, @FormParam( "disk_root" ) Double diskRoot,
+                                @FormParam( "disk_opt" ) Double diskOpt );
 
     @GET
     @Path( "containers/{containerId}/quota/ram" )
@@ -229,8 +220,7 @@ public interface RestService
     Response setDiskQuota( @PathParam( "containerId" ) String containerId, @FormParam( "diskQuota" ) String diskQuota );
 
 
-
-    /** Peers strategy *****************************************************/
+    /** Peers strategy **************************************************** */
 
     @GET
     @Path( "strategies" )
@@ -238,8 +228,7 @@ public interface RestService
     Response listPlacementStrategies();
 
 
-
-    /** Peers *****************************************************/
+    /** Peers **************************************************** */
 
     @GET
     @Path( "peers" )
@@ -247,19 +236,34 @@ public interface RestService
     Response getPeers();
 
 
-
-    /** Tags *****************************************************/
+    /** Tags **************************************************** */
 
     @POST
     @Path( "{environmentId}/containers/{containerId}/tags" )
-    Response addTags( @PathParam( "environmentId" ) String environmentId, @PathParam( "containerId" ) String containerId, @FormParam( "tags" ) String tags );
+    Response addTags( @PathParam( "environmentId" ) String environmentId,
+                      @PathParam( "containerId" ) String containerId, @FormParam( "tags" ) String tags );
 
     @DELETE
     @Path( "{environmentId}/containers/{containerId}/tags/{tag}" )
-    Response removeTag( @PathParam( "environmentId" ) String environmentId, @PathParam( "containerId" ) String containerId, @PathParam( "tag" ) String tag );
+    Response removeTag( @PathParam( "environmentId" ) String environmentId,
+                        @PathParam( "containerId" ) String containerId, @PathParam( "tag" ) String tag );
 
     @GET
     @Path( "{environmentId}/containers/{containerId}/ssh" )
     @Produces( { MediaType.TEXT_PLAIN } )
-    Response setupContainerSsh( @PathParam( "environmentId" ) String environmentId, @PathParam( "containerId" ) String containerId );
+    Response setupContainerSsh( @PathParam( "environmentId" ) String environmentId,
+                                @PathParam( "containerId" ) String containerId );
+
+
+    /** Share **************************************************** */
+
+    @GET
+    @Path( "shared/users/{objectId}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response getSharedUsers( @PathParam( "objectId" ) String objectId );
+
+
+    @POST
+    @Path( "share" )
+    Response shareEnvironment( @FormParam( "users" ) String users, @FormParam( "environmentId" ) String environmentId );
 }

@@ -47,6 +47,7 @@ import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
+import io.subutai.core.environment.api.ShareDto.ShareDto;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
@@ -979,6 +980,32 @@ public class RestServiceImpl implements RestService
         {
             return Response.status( Response.Status.BAD_REQUEST ).entity( e ).build();
         }
+    }
+
+
+    @Override
+    public Response getSharedUsers( final String objectId )
+    {
+        List<ShareDto> sharedUsers = environmentManager.getSharedUsers( objectId );
+        try
+        {
+            return Response.ok( JsonUtil.toJson( sharedUsers ) ).build();
+        }
+        catch ( Exception e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response shareEnvironment( final String users, final String environmentId )
+    {
+        ShareDto[] shareDto = gson.fromJson( users, ShareDto[].class );
+
+        environmentManager.shareEnvironment( shareDto , environmentId );
+
+        return Response.ok().build();
     }
 
 

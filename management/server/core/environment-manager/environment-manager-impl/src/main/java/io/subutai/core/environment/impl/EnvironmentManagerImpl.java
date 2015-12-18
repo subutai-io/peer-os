@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -27,6 +28,7 @@ import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.dao.DaoManager;
@@ -73,6 +75,7 @@ import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.StringUtil;
 import io.subutai.core.environment.api.EnvironmentEventListener;
 import io.subutai.core.environment.api.EnvironmentManager;
+import io.subutai.core.environment.api.ShareDto.ShareDto;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
@@ -93,9 +96,11 @@ import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.exception.RelationVerificationException;
 import io.subutai.core.identity.api.model.Relation;
 import io.subutai.core.identity.api.model.RelationInfo;
+import io.subutai.core.identity.api.model.RelationLink;
 import io.subutai.core.identity.api.model.RelationMeta;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.relation.RelationManager;
+import io.subutai.core.identity.api.relation.RelationStatus;
 import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerAction;
@@ -1409,7 +1414,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             // TODO set target public key id to verify access it later to verify signature
             RelationMeta relationMeta = new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), environment,
                     environment.getId(), PermissionObject.EnvironmentManagement, activeUser.getSecurityKeyId() );
-
             Relation relation = relationManager.buildTrustRelation( relationInfo, relationMeta );
 
             String relationJson = JsonUtil.toJson( relation );
@@ -1566,7 +1570,16 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                             environmentContainer.getId() );
             boolean trustedRelation = relationManager.getRelationInfoManager().allHasReadPermissions( relationMeta );
 
-            if ( !trustedRelation )
+            if ( trustedRelation )
+            {
+                environmentContainer.setEnvironmentManager( this );
+
+                String peerId = environmentContainer.getPeerId();
+                Peer peer = peerManager.getPeer( peerId );
+
+                environmentContainer.setPeer( peer );
+            }
+            else
             {
                 environment.getContainerHosts().remove( environmentContainer );
             }
@@ -1907,6 +1920,110 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             LOG.error( "Error on stop monitoring", e );
             throw new EnvironmentManagerException( e.getMessage(), e );
+        }
+    }
+
+
+    @Override
+    public List<ShareDto> getSharedUsers( final String objectId )
+    {
+        Environment environment = environmentDataService.find( objectId );
+        RelationLink objectRelationLink = identityManager.getIdentityDataService()
+                                                         .getRelationLink( String.valueOf( objectId ),
+                                                                 environment.getClass().getSimpleName() );
+
+        List<Relation> relations = identityManager.getIdentityDataService().relationsByObject( objectRelationLink );
+        List<ShareDto> sharedUsers = Lists.newArrayList();
+
+        for ( final Relation relation : relations )
+        {
+            ShareDto shareDto = new ShareDto();
+
+            shareDto.setId( Long.parseLong( relation.getTarget().getUniqueIdentifier() ) );
+
+            Set<String> mySet = relation.getRelationInfo().getOperation();
+            Iterator<String> iterator = mySet.iterator();
+            for ( final String s : mySet )
+            {
+                if (s.equals("Read" ))
+                {
+                    shareDto.setRead( true );
+                }
+                if (s.equals("Write" ))
+                {
+                    shareDto.setWrite( true );
+                }
+                if (s.equals("Update" ))
+                {
+                    shareDto.setUpdate( true );
+                }
+                if (s.equals("Delete" ))
+                {
+                    shareDto.setDelete( true );
+                }
+            }
+
+            sharedUsers.add( shareDto );
+        }
+
+        return sharedUsers;
+    }
+
+
+    @Override
+    public void shareEnvironment( final ShareDto[] shareDto, final String environmentId )
+    {
+        Environment environment = environmentDataService.find( environmentId );
+        RelationLink objectRelationLink = identityManager.getIdentityDataService()
+                                                         .getRelationLink( String.valueOf( environmentId ),
+                                                                 environment.getClass().getSimpleName() );
+
+        List<Relation> relations = identityManager.getIdentityDataService().relationsByObject( objectRelationLink );
+
+        for ( final Relation relation : relations )
+        {
+            identityManager.getIdentityDataService().removeRelation( relation.getId() );
+        }
+
+        User activeUser = identityManager.getActiveUser();
+
+        Set<String> operatoins = Sets.newHashSet();
+        for ( final ShareDto dto : shareDto )
+        {
+            if ( dto.isWrite() )
+            {
+                operatoins.add( "Write" );
+            }
+            if ( dto.isRead() )
+            {
+                operatoins.add( "Read" );
+            }
+            if ( dto.isUpdate() )
+            {
+                operatoins.add( "Update" );
+            }
+            if ( dto.isDelete() )
+            {
+                operatoins.add( "Delete" );
+            }
+
+            User targetUser = identityManager.getUser( dto.getId() );
+
+            RelationInfo relationInfo = relationManager
+                    .generateTrustRelationship( PermissionObject.EnvironmentManagement.getName(), operatoins,
+                            Ownership.GROUP.getLevel() );
+
+            RelationMeta relationMeta =
+                    new RelationMeta( String.valueOf( activeUser.getId() ), activeUser.getClass().getSimpleName(),
+                            String.valueOf( targetUser.getId() ), targetUser.getClass().getSimpleName(), environmentId,
+                            environment.getClass().getSimpleName(), PermissionObject.EnvironmentManagement,
+                            activeUser.getSecurityKeyId() );
+
+            Relation relation = relationManager.buildTrustRelation( relationInfo, relationMeta );
+            relation.setRelationStatus( RelationStatus.VERIFIED );
+            relationManager.executeRelationBuild( relation );
+
+            operatoins.clear();
         }
     }
 }

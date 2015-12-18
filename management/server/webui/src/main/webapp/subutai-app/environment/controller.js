@@ -59,11 +59,11 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 		DTColumnBuilder.newColumn(null).withTitle('Environment name').renderWith(environmentNameTooltip),
 		DTColumnBuilder.newColumn(null).withTitle('SSH Key').renderWith(sshKeyLinks),
 		DTColumnBuilder.newColumn(null).withTitle('Domains').renderWith(domainsTag),
-		DTColumnBuilder.newColumn(null).withTitle('Share').renderWith(actionShare),
+		DTColumnBuilder.newColumn(null).withTitle('Share').notSortable().renderWith(actionShare),
 		DTColumnBuilder.newColumn(null).withTitle('Containers').renderWith(containersTags),
 		DTColumnBuilder.newColumn(null).withTitle('Actions').notSortable().renderWith(actionStartEnvironmentBuild),
-		DTColumnBuilder.newColumn(null).withTitle('').notSortable().renderWith(actionDelete),
-		DTColumnBuilder.newColumn(null).withTitle('').notSortable().renderWith(actionSwitch)
+		DTColumnBuilder.newColumn(null).withTitle('Revoke').notSortable().renderWith(actionSwitch),
+		DTColumnBuilder.newColumn(null).withTitle('').notSortable().renderWith(actionDelete)
 	];
 
 	vm.listOfUsers = [];
@@ -118,7 +118,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 				vm.listOfUsers[i].update = true;
 				vm.listOfUsers[i].delete = true;
 			}
-			console.log (vm.listOfUsers);
 			environmentService.getShared (environmentId).success (function (data2) {
 				console.log (data2);
 				vm.users2Add = data2;
@@ -130,16 +129,17 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 					}
 					for (var j = 0; j < vm.listOfUsers.length; ++j) {
 						if (vm.listOfUsers[j].id === vm.users2Add[i].id) {
+							vm.users2Add[i].fullName = vm.listOfUsers[j].fullName;
 							vm.listOfUsers.splice (j, 1);
 							break;
 						}
 					}
 				}
-			});
-			vm.currentEnvironment = vm.users[environmentId];
-			ngDialog.open ({
-				template: "subutai-app/environment/partials/shareEnv.html",
-				scope: $scope
+				vm.currentEnvironment = vm.users[environmentId];
+				ngDialog.open ({
+					template: "subutai-app/environment/partials/shareEnv.html",
+					scope: $scope
+				});
 			});
 		});
 	}
@@ -155,33 +155,43 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 	}
 
 	function shareEnvironment() {
-		if (vm.users2Add.length === 0) {
-			SweetAlert.swal("ERROR!", "You haven't selected any users.");
-		}
-		else {
-			var arr = [];
-			for (var i = 0; i < vm.users2Add.length; ++i) {
-				arr.push ({
-					id: vm.users2Add[i].id,
-					read: vm.users2Add[i].read,
-					write: vm.users2Add[i].write,
-					update: vm.users2Add[i].update,
-					delete: vm.users2Add[i].delete
-				});
-			}
-			environmentService.share (JSON.stringify (arr), vm.currentEnvironment.id).success(function (data) {
-				SweetAlert.swal("Success!", "Your environment was successfully shared.", "success");
-				vm.dtInstance.reloadData(null, false);
-				ngDialog.closeAll();
-			}).error(function (data) {
-				SweetAlert.swal("ERROR!", "Your container is safe :). Error: " + data.ERROR, "error");
+		var arr = [];
+		for (var i = 0; i < vm.users2Add.length; ++i) {
+			arr.push ({
+				id: vm.users2Add[i].id,
+				read: vm.users2Add[i].read,
+				write: vm.users2Add[i].write,
+				update: vm.users2Add[i].update,
+				delete: vm.users2Add[i].delete
 			});
 		}
+		environmentService.share (JSON.stringify (arr), vm.currentEnvironment.id).success(function (data) {
+			SweetAlert.swal("Success!", "Your environment was successfully shared.", "success");
+			vm.dtInstance.reloadData(null, false);
+			ngDialog.closeAll();
+		}).error(function (data) {
+			SweetAlert.swal("ERROR!", "Your container is safe :). Error: " + data.ERROR, "error");
+		});
 	}
 
 
-	var actionSwitch (data, type, full, meta) {
-		return '<input type = "checkbox" class = "check" ng->';
+	function actionSwitch (data, type, full, meta) {
+/*		return '<input type = "checkbox" class = "check" ng-click="environmentViewCtrl.revoke(\''+data.id+'\') ng-checked =\'' + data.revoked + '\'>';*/
+		console.log (data);
+		if (typeof (data.revoke) === "boolean") {
+			return '<div class = "toggle"><input type = "checkbox" class="check" ng-click="environmentViewCtrl.revoke(\'' + data.id + '\')" ng-checked=\'' + data.revoke + '\'><div class = "toggle-bg"></div><b class = "b switch"></b></div>'
+		}
+		else {
+			return "";
+		}
+	}
+
+	vm.revoke = revoke;
+
+	function revoke (environmentId) {
+		environmentService.revoke (environmentId).success (function (data) {
+			vm.dtInstance.reloadData(null, false);
+		});
 	}
 
 	var refreshTable;
