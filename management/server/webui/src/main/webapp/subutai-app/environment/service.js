@@ -77,6 +77,10 @@ function environmentService($http) {
 
 		getPeers : getPeers,
 
+		getCurrentUser: getCurrentUser,
+		getUsers: getUsers,
+
+
 		getShared: getShared,
 		share: share,
 
@@ -297,5 +301,14 @@ function environmentService($http) {
 			postData,
 			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
 		);
+	}
+
+	function getUsers() {
+		return $http.get (SERVER_URL + 'rest/ui/identity/', {withCredentials: true, headers: {'Content-Type': 'application/json'}});
+	}
+
+
+	function getCurrentUser() {
+		return $http.get (SERVER_URL + 'rest/ui/identity/user');
 	}
 }
