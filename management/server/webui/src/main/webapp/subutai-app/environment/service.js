@@ -77,6 +77,9 @@ function environmentService($http) {
 
 		getPeers : getPeers,
 
+		getShared: getShared,
+		share: share,
+
 
 		getServerUrl : function getServerUrl() { return ENVIRONMENTS_URL; }
 	};
@@ -280,5 +283,19 @@ function environmentService($http) {
 
 	function removeTag(environmentId, containerId, tag) {
 		return $http.delete(ENVIRONMENTS_URL + environmentId + '/containers/' + containerId + '/tags/' + tag);		
+	}
+
+
+	function getShared (environmentId) {
+		return $http.get (ENVIRONMENTS_URL + "shared/users/" + environmentId);
+	}
+
+	function share (users, environmentId) {
+		var postData = "users=" + users + "&environmentId=" + environmentId;
+		return $http.post(
+			ENVIRONMENTS_URL + "share",
+			postData,
+			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+		);
 	}
 }
