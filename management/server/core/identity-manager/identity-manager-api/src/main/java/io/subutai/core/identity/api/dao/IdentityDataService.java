@@ -251,4 +251,6 @@ public interface IdentityDataService
 
 
     List<Relation> relationsBySource( final RelationLink source );
+
+    void removeRelation( Long relationId );
 }

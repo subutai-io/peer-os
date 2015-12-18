@@ -20,6 +20,12 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     Response getUsers();
 
+    @GET
+    @Path( "/user" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response getActiveUser();
+
+
     @POST
     @Produces( { MediaType.APPLICATION_JSON } )
     Response saveUser( @FormParam( "username" ) String username,
@@ -100,4 +106,6 @@ public interface RestService
     @Path( "tokens/types" )
     @Produces( { MediaType.APPLICATION_JSON } )
     Response getTokenTypes();
+
+
 }
