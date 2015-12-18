@@ -895,7 +895,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             operationTracker.addLogFailed( String.format( "Environment status is %s", environment.getStatus() ) );
 
-            throw new EnvironmentModificationException( String.format( "Environment status is %s", environment.getStatus() ) );
+            throw new EnvironmentModificationException(
+                    String.format( "Environment status is %s", environment.getStatus() ) );
         }
 
         ContainerHost environmentContainer;
@@ -937,7 +938,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
             if ( containerDestructionWorkflow.getError() != null )
             {
-                throw new EnvironmentModificationException( exceptionUtil.getRootCause( containerDestructionWorkflow.getError() ) );
+                throw new EnvironmentModificationException(
+                        exceptionUtil.getRootCause( containerDestructionWorkflow.getError() ) );
             }
         }
     }
@@ -1420,16 +1422,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             // relation declaration is created only once so if user signature verification is failed then environment
             // creation have to fail. Declaration will be saved in encrypted format where relation information is saved
             environment.setRelationDeclaration( encryptedMessage );
-
-            // TODO should be handled on client side
-            //            PGPSecretKey userSecretKey = keyManager.getSecretKey( activeUser.getSecurityKeyId() );
-            //            byte[] signedEncrypted = encryptionTool.clearSign( encryptedMessage.getBytes(),
-            // userSecretKey, "" );
-            //            String signedMessage = new String( signedEncrypted, "UTF-8" );
-
-
-            // TODO should be handled on server side when user sends signed message
-            //            relationManager.processTrustMessage( signedMessage, environment.getId() );
         }
         catch ( Exception e )
         {
@@ -1475,6 +1467,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             throw new EnvironmentCreationException( ex );
         }
     }
+
 
     private String calculateCidr( final Blueprint blueprint ) throws EnvironmentCreationException
     {
@@ -1555,22 +1548,25 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             EnvironmentContainerImpl environmentContainer = ( EnvironmentContainerImpl ) containerHost;
 
+            environmentContainer.setEnvironmentManager( this );
+
+            String peerId = environmentContainer.getPeerId();
+            Peer peer = peerManager.getPeer( peerId );
+
+            environmentContainer.setPeer( peer );
+        }
+        // remove containers which doesn't have trust relation
+        for ( ContainerHost containerHost : environment.getContainerHosts() )
+        {
+            EnvironmentContainerImpl environmentContainer = ( EnvironmentContainerImpl ) containerHost;
+
             RelationMeta relationMeta =
                     new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), environmentContainer,
                             environmentContainer.getId(), PermissionObject.EnvironmentManagement,
                             environmentContainer.getId() );
             boolean trustedRelation = relationManager.getRelationInfoManager().allHasReadPermissions( relationMeta );
 
-            if ( trustedRelation )
-            {
-                environmentContainer.setEnvironmentManager( this );
-
-                String peerId = environmentContainer.getPeerId();
-                Peer peer = peerManager.getPeer( peerId );
-
-                environmentContainer.setPeer( peer );
-            }
-            else
+            if ( !trustedRelation )
             {
                 environment.getContainerHosts().remove( environmentContainer );
             }
@@ -1587,7 +1583,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    protected EnvironmentDestructionWorkflow getEnvironmentDestructionWorkflow( final PeerManager peerManager, final EnvironmentManagerImpl
+    protected EnvironmentDestructionWorkflow getEnvironmentDestructionWorkflow( final PeerManager peerManager,
+                                                                                final EnvironmentManagerImpl
                                                                                         environmentManager,
                                                                                 final EnvironmentImpl environment,
                                                                                 final boolean forceMetadataRemoval,
