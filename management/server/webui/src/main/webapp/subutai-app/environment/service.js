@@ -84,6 +84,7 @@ function environmentService($http) {
 		getShared: getShared,
 		share: share,
 
+		revoke: revoke,
 
 		getServerUrl : function getServerUrl() { return ENVIRONMENTS_URL; }
 	};
@@ -310,5 +311,9 @@ function environmentService($http) {
 
 	function getCurrentUser() {
 		return $http.get (SERVER_URL + 'rest/ui/identity/user');
+	}
+
+	function revoke (environmentId) {
+		return $http.put (ENVIRONMENTS_URL + environmentId + "/revoke");
 	}
 }
