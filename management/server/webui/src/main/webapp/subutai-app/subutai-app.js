@@ -61,7 +61,6 @@ function CurrentUserCtrl($location, $rootScope, ngDialog, $http, SweetAlert) {
 	function requestNewUser() {
 		console.log ("!");
 		var postData = "username=" + vm.user2Add.username + "&full_name=" + vm.user2Add.fullName + "&password=" + vm.user2Add.password + "&email=" + vm.user2Add.email + "&public_key=" + vm.user2Add.public_key;
-        console.log(postData);
 		$http.post(
 			SERVER_URL + 'rest/ui/identity/signup',
 			postData,
