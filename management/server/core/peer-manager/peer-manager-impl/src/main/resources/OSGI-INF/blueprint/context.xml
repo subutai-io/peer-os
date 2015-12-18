@@ -67,6 +67,7 @@
     <argument ref="messageResponseListener" />
     <argument ref="securityManager" />
     <argument ref="templateRegistry" />
+    <argument ref="identityManager" />
     <argument ref="jsonProvider" />
     <property name="externalIpInterface" value="${externalIpInterface}" />
   </bean>

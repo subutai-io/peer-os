@@ -975,7 +975,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         if ( managementHost == null )
         {
-            throw new HostNotFoundException( "Management host not found." );
+            throw new HostNotFoundException( String.format( "Management host not found on peer %s.", getId() ) );
         }
         return managementHost;
     }
@@ -1595,9 +1595,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public HostInterfaces getInterfaces()
+    public HostInterfaces getInterfaces() throws HostNotFoundException
     {
-        return managementHost.getHostInterfaces();
+        return getManagementHost().getHostInterfaces();
     }
 
 

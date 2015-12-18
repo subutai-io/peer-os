@@ -29,7 +29,7 @@ import io.subutai.core.identity.api.model.User;
  * Implementation of User interface. Used for storing user information.
  */
 @Entity
-@Table( name = "user" )
+@Table( name = "username" )
 @Access( AccessType.FIELD )
 public class UserEntity implements User
 {

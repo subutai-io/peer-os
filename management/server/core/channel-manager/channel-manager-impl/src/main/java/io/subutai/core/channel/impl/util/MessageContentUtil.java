@@ -39,7 +39,7 @@ public class MessageContentUtil
 
 
     //***************************************************************************
-    public static void abortChain( Message message, Exception ex )
+    public static void abortChain( Message message, Throwable ex )
     {
         if(ex.getClass() == AccessControlException.class)
         {

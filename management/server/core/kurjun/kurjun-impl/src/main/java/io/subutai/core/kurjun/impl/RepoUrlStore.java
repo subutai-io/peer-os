@@ -1,12 +1,13 @@
 package io.subutai.core.kurjun.impl;
 
 
-import ai.subut.kurjun.db.file.FileDb;
-import com.google.common.collect.Sets;
 import java.io.IOException;
-import java.net.URL;
 import java.util.Map;
 import java.util.Set;
+
+import com.google.common.collect.Sets;
+
+import ai.subut.kurjun.db.file.FileDb;
 
 
 /**
@@ -36,15 +37,34 @@ public class RepoUrlStore
     }
 
 
-    public void removeRemoteTemplateUrl( URL url ) throws IOException
+    public RepoUrl removeRemoteTemplateUrl( RepoUrl repoUrl ) throws IOException
     {
-        removeUrl( url, MAP_NAME_TEMPLATE );
+        return removeUrl( repoUrl, MAP_NAME_TEMPLATE );
     }
 
 
     public Set<RepoUrl> getRemoteTemplateUrls() throws IOException
     {
         return getUrls( MAP_NAME_TEMPLATE );
+    }
+
+
+    ///////////////// Remote apt methods /////////////////////
+    public void addRemoteAptUrl( RepoUrl repoUrl ) throws IOException
+    {
+        addUrl( repoUrl, MAP_NAME_APT );
+    }
+
+
+    public RepoUrl removeRemoteAptUrl( RepoUrl repoUrl ) throws IOException
+    {
+        return removeUrl( repoUrl, MAP_NAME_APT );
+    }
+
+
+    public Set<RepoUrl> getRemoteAptUrls() throws IOException
+    {
+        return getUrls( MAP_NAME_APT );
     }
 
 
@@ -72,17 +92,24 @@ public class RepoUrlStore
     {
         try ( FileDb fileDb = new FileDb( repoFile ) )
         {
-            fileDb.put( mapName, repoUrl.getUrl().toString(), repoUrl );
+            fileDb.put( mapName, makeKey( repoUrl ), repoUrl );
         }
     }
 
 
-    private void removeUrl( URL url, String mapName ) throws IOException
+    private RepoUrl removeUrl( RepoUrl repoUrl, String mapName ) throws IOException
     {
+        RepoUrl removed = null;
         try ( FileDb fileDb = new FileDb( repoFile ) )
         {
-            fileDb.remove( mapName, url.toString() );
+            Map<String, RepoUrl> map = fileDb.get( mapName );
+            Object[] keys = map.keySet().stream().filter( u -> u.startsWith( repoUrl.getUrl().toString() ) ).toArray();
+            for ( Object key : keys )
+            {
+                removed = fileDb.remove( mapName, key );
+            }
         }
+        return removed;
     }
 
 
@@ -110,4 +137,9 @@ public class RepoUrlStore
         }
     }
 
+
+    private String makeKey( RepoUrl repoUrl )
+    {
+        return repoUrl.getUrl() + "_" + repoUrl.getToken();
+    }
 }
