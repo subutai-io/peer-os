@@ -32,16 +32,26 @@ public class RegistrationClientImpl implements RegistrationClient
     @Override
     public PeerInfo getPeerInfo( final String destinationHost ) throws PeerException
     {
+
+        WebClient client = restUtil.getTrustedWebClient( buildUrl( destinationHost, "/info" ), provider );
+
+        client.type( MediaType.APPLICATION_JSON );
+        client.accept( MediaType.APPLICATION_JSON );
+
         try
         {
-            WebClient client = restUtil.getTrustedWebClient( buildUrl( destinationHost, "/info" ), provider );
-
-            client.type( MediaType.APPLICATION_JSON );
-            client.accept( MediaType.APPLICATION_JSON );
-
             Response response = client.get();
 
-            return response.readEntity( PeerInfo.class );
+            if ( response.getStatus() != Response.Status.OK.getStatusCode() )
+            {
+                throw new PeerException(
+                        String.format( "Remote peer '%s' unavailable at this moment. Please try again later.",
+                                destinationHost ) );
+            }
+            else
+            {
+                return response.readEntity( PeerInfo.class );
+            }
         }
         catch ( Exception e )
         {

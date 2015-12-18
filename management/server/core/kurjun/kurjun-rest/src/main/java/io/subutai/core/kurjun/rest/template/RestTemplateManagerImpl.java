@@ -87,8 +87,7 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
 
 
     @Override
-    public Response getTemplateInfo( String repository, String md5, String name, 
-            String version, boolean isKurjunClient )
+    public Response getTemplateInfo( String repository, String md5, String name, String version, boolean isKurjunClient )
     {
         try
         {
@@ -127,8 +126,7 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
             List<TemplateKurjun> list = templateManager.list( repository, isKurjunClient );
             if ( list != null )
             {
-                List<DefaultTemplate> deflist = list.stream().map( t -> convertToDefaultTemplate( t, false ) ).collect(
-                        Collectors.toList() );
+                List<DefaultTemplate> deflist = list.stream().map( t -> convertToDefaultTemplate( t ) ).collect( Collectors.toList() );
                 return Response.ok( GSON.toJson( deflist ) ).build();
             }
         }

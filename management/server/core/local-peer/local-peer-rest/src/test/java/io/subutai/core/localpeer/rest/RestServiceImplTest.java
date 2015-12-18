@@ -3,6 +3,7 @@ package io.subutai.core.localpeer.rest;
 
 import java.util.UUID;
 
+import javax.ws.rs.core.Form;
 import javax.ws.rs.core.Response;
 
 import org.junit.Before;
@@ -13,7 +14,6 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.cxf.jaxrs.ext.form.Form;
 
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.ContainerGateway;

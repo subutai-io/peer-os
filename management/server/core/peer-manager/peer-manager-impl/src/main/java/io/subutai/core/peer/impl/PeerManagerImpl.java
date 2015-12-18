@@ -200,18 +200,22 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public void registerPeerActionListener( PeerActionListener peerActionListener )
     {
-        Preconditions.checkNotNull( peerActionListener );
-        LOG.info( "Registering peer action listener: " + peerActionListener.getName() );
-        this.peerActionListeners.add( peerActionListener );
+        if ( peerActionListener != null )
+        {
+            LOG.info( "Registering peer action listener: " + peerActionListener.getName() );
+            this.peerActionListeners.add( peerActionListener );
+        }
     }
 
 
     @Override
     public void unregisterPeerActionListener( PeerActionListener peerActionListener )
     {
-        Preconditions.checkNotNull( peerActionListener );
-        LOG.info( "Unregistering peer action listener: " + peerActionListener.getName() );
-        this.peerActionListeners.remove( peerActionListener );
+        if ( peerActionListener != null )
+        {
+            LOG.info( "Unregistering peer action listener: " + peerActionListener.getName() );
+            this.peerActionListeners.remove( peerActionListener );
+        }
     }
 
 
@@ -414,7 +418,6 @@ public class PeerManagerImpl implements PeerManager
         removePeer( registrationData.getPeerInfo().getId() );
     }
 
-
     @Override
     public List<Peer> getPeers()
     {
@@ -609,6 +612,7 @@ public class PeerManagerImpl implements PeerManager
         {
             throw new PeerException( "Registration record already exists." );
         }
+
         try
         {
             final RegistrationData registrationData = buildRegistrationData( keyPhrase, RegistrationStatus.REQUESTED );
@@ -633,6 +637,7 @@ public class PeerManagerImpl implements PeerManager
     public void doCancelRequest( final RegistrationData request ) throws PeerException
     {
         getRemotePeerInfo( request.getPeerInfo().getIp() );
+
         try
         {
             registrationClient.sendCancelRequest( request.getPeerInfo().getIp(),
@@ -653,7 +658,6 @@ public class PeerManagerImpl implements PeerManager
     public void doApproveRequest( final String keyPhrase, final RegistrationData request ) throws PeerException
     {
         getRemotePeerInfo( request.getPeerInfo().getIp() );
-
         try
         {
             RegistrationData response = buildRegistrationData( keyPhrase, RegistrationStatus.APPROVED );
@@ -678,10 +682,9 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public void doRejectRequest( final RegistrationData request ) throws PeerException
     {
+        getRemotePeerInfo( request.getPeerInfo().getIp() );
         try
         {
-            getRemotePeerInfo( request.getPeerInfo().getIp() );
-
             registrationClient.sendRejectRequest( request.getPeerInfo().getIp(),
                     buildRegistrationData( request.getKeyPhrase(), RegistrationStatus.REJECTED ) );
 
@@ -700,14 +703,15 @@ public class PeerManagerImpl implements PeerManager
     public void doUnregisterRequest( final RegistrationData request ) throws PeerException
     {
         getRemotePeerInfo( request.getPeerInfo().getIp() );
+
+        if ( !notifyPeerActionListeners( new PeerAction( PeerActionType.UNREGISTER, request.getPeerInfo().getId() ) )
+                .succeeded() )
+        {
+            throw new PeerException( "Could not unregister peer. Peer in use." );
+        }
+
         try
         {
-            if ( !notifyPeerActionListeners(
-                    new PeerAction( PeerActionType.UNREGISTER, request.getPeerInfo().getId() ) ).succeeded() )
-            {
-                throw new PeerException( "Could not unregister peer. Peer in use." );
-            }
-
             RegistrationClient registrationClient = new RegistrationClientImpl( provider );
             PeerData peerData = loadPeerData( request.getPeerInfo().getId() );
             registrationClient.sendUnregisterRequest( request.getPeerInfo().getIp(),
@@ -739,7 +743,6 @@ public class PeerManagerImpl implements PeerManager
 
         return r;
     }
-
 
     @Override
     public String getPeerIdByIp( final String ip ) throws PeerException
