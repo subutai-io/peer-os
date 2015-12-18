@@ -518,4 +518,11 @@ public class IdentityDataServiceImpl implements IdentityDataService
             return Lists.newArrayList();
         }
     }
+
+
+    @Override
+    public void removeRelation( final Long relationId )
+    {
+        relationDAO.remove( relationId );
+    }
 }

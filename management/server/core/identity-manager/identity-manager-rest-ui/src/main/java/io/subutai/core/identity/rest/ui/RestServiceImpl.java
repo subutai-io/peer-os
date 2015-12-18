@@ -41,7 +41,7 @@ public class RestServiceImpl implements RestService
     }
 
 
-    /** Users ***********************************************/
+    /** Users ********************************************** */
 
     @Override
     public Response getUsers()
@@ -53,6 +53,22 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOGGER.error( "Error getting users #getUsers", e );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response getActiveUser()
+    {
+        User activeUser = identityManager.getActiveUser();
+        try
+        {
+            return Response.ok( jsonUtil.to( activeUser ) ).build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error getting activeUser user #getActiveUser", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
@@ -158,7 +174,7 @@ public class RestServiceImpl implements RestService
     }
 
 
-    /** Roles ***********************************************/
+    /** Roles ********************************************** */
 
     @Override
     public Response getRoles()
@@ -240,7 +256,7 @@ public class RestServiceImpl implements RestService
     }
 
 
-    /** Permissions ***********************************************/
+    /** Permissions ********************************************** */
 
     @Override
     public Response getPermissions()
@@ -269,7 +285,7 @@ public class RestServiceImpl implements RestService
     }
 
 
-    /** Tokens ***********************************************/
+    /** Tokens ********************************************** */
 
     @Override
     public Response getAllUserTokens()
@@ -379,4 +395,5 @@ public class RestServiceImpl implements RestService
         }
         return Response.ok( JsonUtil.toJson( map ) ).build();
     }
+
 }
