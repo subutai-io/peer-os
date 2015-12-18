@@ -192,7 +192,7 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog) {
 		},
 		function (isConfirm) {
 			if (isConfirm) {
-				identitySrv.reject (user.id).success (function (data) {
+				identitySrv.deleteUser (user.id).success (function (data) {
 					SweetAlert.swal ("Success!", "User was rejected.", "success");
 					getUsers();
 				}).error (function (error) {
