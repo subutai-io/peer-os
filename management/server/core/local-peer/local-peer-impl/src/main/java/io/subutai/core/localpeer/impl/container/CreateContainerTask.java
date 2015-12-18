@@ -73,10 +73,11 @@ public class CreateContainerTask implements Callable<ContainerHostInfo>
 
         ContainerHostInfo hostInfo = null;
         String ip = null;
-        while ( System.currentTimeMillis() - start < timeoutSec * 1000 && ( hostInfo == null || Strings
-                .isNullOrEmpty( ip ) ) )
+        long timePass = System.currentTimeMillis() - start;
+        final int limit = timeoutSec * 1000;
+        while ( timePass < limit && ( hostInfo == null || Strings.isNullOrEmpty( ip ) ) )
         {
-            Thread.sleep( 100 );
+            Thread.sleep( 1000 );
             try
             {
                 hostInfo = hostRegistry.getContainerHostInfoByHostname( hostname );
@@ -92,8 +93,12 @@ public class CreateContainerTask implements Callable<ContainerHostInfo>
             }
             catch ( HostDisconnectedException e )
             {
-                //ignore
+                if ( timePass % 60000 == 0 )
+                {
+                    LOG.debug( String.format( "Still waiting %s. Time: %d/%d. %.2f\\%", hostname, timePass, limit, limit*100/timePass ) );
+                }
             }
+            timePass = System.currentTimeMillis() - start;
         }
 
         if ( hostInfo == null )
