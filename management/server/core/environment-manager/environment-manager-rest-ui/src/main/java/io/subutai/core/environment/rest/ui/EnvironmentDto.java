@@ -15,6 +15,7 @@ public class EnvironmentDto
     private String name;
     private String relationDeclaration;
     private EnvironmentStatus status;
+    private Boolean revoke;
     private Set<ContainerDto> containers;
 
 
@@ -26,6 +27,18 @@ public class EnvironmentDto
         this.status = status;
         this.containers = containers;
         this.relationDeclaration = relationDeclaration;
+    }
+
+
+    public boolean isRevoke()
+    {
+        return revoke;
+    }
+
+
+    public void setRevoke( final boolean revoke )
+    {
+        this.revoke = revoke;
     }
 
 

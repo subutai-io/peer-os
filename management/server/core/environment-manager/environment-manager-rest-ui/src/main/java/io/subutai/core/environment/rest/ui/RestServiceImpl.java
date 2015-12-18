@@ -64,6 +64,7 @@ public class RestServiceImpl implements RestService
     private final TemplateManager templateRegistry;
     private final StrategyManager strategyManager;
     private Gson gson = RequiredDeserializer.createValidatingGson();
+    private Set<EnvironmentDto> envs = Sets.newHashSet();
 
 
     public RestServiceImpl( final EnvironmentManager environmentManager, final PeerManager peerManager,
@@ -205,18 +206,39 @@ public class RestServiceImpl implements RestService
     @Override
     public Response listEnvironments()
     {
+        if ( envs.size() > 0 )
+        {
+            return Response.ok( JsonUtil.toJson( envs ) ).build();
+        }
         Set<Environment> environments = environmentManager.getEnvironments();
         Set<EnvironmentDto> environmentDtos = Sets.newHashSet();
 
         for ( Environment environment : environments )
         {
-            environmentDtos
-                    .add( new EnvironmentDto( environment.getId(), environment.getName(), environment.getStatus(),
+            EnvironmentDto environmentDto =
+                    new EnvironmentDto( environment.getId(), environment.getName(), environment.getStatus(),
                             convertContainersToContainerJson( environment.getContainerHosts() ),
-                            environment.getRelationDeclaration() ) );
+                            environment.getRelationDeclaration() );
+            environmentDto.setRevoke( true );
+            environmentDtos.add( environmentDto );
         }
 
+        envs.addAll( environmentDtos );
         return Response.ok( JsonUtil.toJson( environmentDtos ) ).build();
+    }
+
+
+    @Override
+    public Response accessStatus( final String environmentId )
+    {
+        for ( final EnvironmentDto env : envs )
+        {
+            if ( env.getId().equals( environmentId ) )
+            {
+                env.setRevoke( !env.isRevoke() );
+            }
+        }
+        return Response.ok().build();
     }
 
 
