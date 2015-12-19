@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.ws.rs.FormParam;
 import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
@@ -48,7 +47,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            return Response.ok( jsonUtil.to( identityManager.getAllUsers() ) ).build();
+            return Response.ok( jsonUtil.to( identityManager.getAllSystemUsers() ) ).build();
         }
         catch ( Exception e )
         {

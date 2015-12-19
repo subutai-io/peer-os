@@ -50,6 +50,12 @@ public interface IdentityDataService
     /* *************************************************
      *
      */
+    List<User> getAllSystemUsers();
+
+
+    /* *************************************************
+     *
+     */
     void persistUser( User item );
 
 

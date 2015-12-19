@@ -113,8 +113,15 @@ public class IdentityDataServiceImpl implements IdentityDataService
     }
 
 
+    @Override
+    public List<User> getAllSystemUsers()
+    {
+        return userDAOService.getAllSystemUsers();
+    }
+
+
     /* *************************************************
-     */
+         */
     @Override
     public void persistUser( final User item )
     {

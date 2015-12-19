@@ -72,6 +72,11 @@ public interface IdentityManager
 
     /* *************************************************
      */
+    List<User> getAllSystemUsers();
+
+
+    /* *************************************************
+     */
     void assignUserRole( long userId, Role role );
 
 

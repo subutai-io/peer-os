@@ -115,11 +115,14 @@ public class IdentityManagerImpl implements IdentityManager
             User internal = createUser( "internal", "internal", "System User", "internal@subutai.io", 1,
                     generateArmoredPublicKey(), true );
             User admin =
-                    createUser( "admin", "secret", "Administrator", "admin@subutai.io", 2, generateArmoredPublicKey(), true );
+                    createUser( "admin", "secret", "Administrator", "admin@subutai.io", 2, generateArmoredPublicKey(),
+                            true );
             User manager =
-                    createUser( "manager", "manager", "Manager", "manager@subutai.io", 2, generateArmoredPublicKey(), true );
+                    createUser( "manager", "manager", "Manager", "manager@subutai.io", 2, generateArmoredPublicKey(),
+                            true );
             User karaf =
-                    createUser( "karaf", "karaf", "Karaf Manager", "karaf@subutai.io", 2, generateArmoredPublicKey(), true );
+                    createUser( "karaf", "karaf", "Karaf Manager", "karaf@subutai.io", 2, generateArmoredPublicKey(),
+                            true );
             //***********************************************************
 
             //***Create Token *******************************************
@@ -204,7 +207,6 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-
     /* *************************************************
      */
     private CallbackHandler getCalbackHandler( final String userName, final String password )
@@ -233,6 +235,7 @@ public class IdentityManagerImpl implements IdentityManager
 
         return callbackHandler;
     }
+
 
     /* *************************************************
      */
@@ -279,6 +282,7 @@ public class IdentityManagerImpl implements IdentityManager
         return sessionManager;
     }
 
+
     /* *************************************************
      */
     @PermitAll
@@ -290,23 +294,29 @@ public class IdentityManagerImpl implements IdentityManager
         User user = null;
 
         //-------------------------------------
-        if(login.equals( "token" ))
+        if ( login.equals( "token" ) )
+        {
             sessionId = password;
+        }
         else
+        {
             sessionId = UUID.randomUUID() + "-" + System.currentTimeMillis();
+        }
         //-------------------------------------
 
         session = sessionManager.getValidSession( sessionId );
 
-        if(session == null)
+        if ( session == null )
         {
-            user = authenticateUser( login,password );
+            user = authenticateUser( login, password );
 
-            if(user == null)
+            if ( user == null )
+            {
                 return null;
+            }
         }
 
-        session = sessionManager.startSession(sessionId ,session,  user);
+        session = sessionManager.startSession( sessionId, session, user );
 
         return session;
     }
@@ -337,7 +347,8 @@ public class IdentityManagerImpl implements IdentityManager
             }
             if ( validDate == null )
             {
-                validDate = DateUtils.addMinutes( new Date( System.currentTimeMillis() ), sessionManager.getSessionTimeout() );
+                validDate = DateUtils
+                        .addMinutes( new Date( System.currentTimeMillis() ), sessionManager.getSessionTimeout() );
             }
 
             userToken.setToken( token );
@@ -462,8 +473,6 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-
-
     /* *************************************************
      */
     @PermitAll
@@ -472,6 +481,18 @@ public class IdentityManagerImpl implements IdentityManager
     {
         List<User> result = new ArrayList<>();
         result.addAll( identityDataService.getAllUsers() );
+        return result;
+    }
+
+
+    /* *************************************************
+     */
+    @RolesAllowed( "Identity-Management|Read" )
+    @Override
+    public List<User> getAllSystemUsers()
+    {
+        List<User> result = new ArrayList<>();
+        result.addAll( identityDataService.getAllSystemUsers() );
         return result;
     }
 
@@ -640,7 +661,7 @@ public class IdentityManagerImpl implements IdentityManager
 
     @RolesAllowed( "Identity-Management|Write" )
     @Override
-    public void approveUser( final String userName, List<Role> roles)
+    public void approveUser( final String userName, List<Role> roles )
     {
         User user = identityDataService.getUserByUsername( userName );
         user.setRoles( roles );
@@ -663,10 +684,10 @@ public class IdentityManagerImpl implements IdentityManager
         user.setPassword( pwd );
         user.setEmail( email );
         user.setFullName( fullName );
-        user.setType(UserType.Regular.getId());
+        user.setType( UserType.Regular.getId() );
         String keyId = UUID.randomUUID().toString();
         user.setSecurityKeyId( keyId );
-        securityManager.getKeyManager().savePublicKeyRing(keyId,SecurityKeyType.UserKey.getId(), keyAscii);
+        securityManager.getKeyManager().savePublicKeyRing( keyId, SecurityKeyType.UserKey.getId(), keyAscii );
 
         user.setFingerprint( securityManager.getKeyManager().getFingerprint( keyId ) );
 
@@ -705,7 +726,7 @@ public class IdentityManagerImpl implements IdentityManager
             user.setEmail( email );
             user.setFullName( fullName );
             user.setType( type );
-            user.setApproved (isApproved);
+            user.setApproved( isApproved );
 
             //** Create Key*****************************
             // TODO check if keyId set for KeyPair is used somewhere in system
@@ -856,10 +877,6 @@ public class IdentityManagerImpl implements IdentityManager
 
         return role;
     }
-
-
-
-
 
 
     /* *************************************************
@@ -1059,7 +1076,6 @@ public class IdentityManagerImpl implements IdentityManager
     {
         identityDataService.removeUserToken( tokenId );
     }
-
 
 
     /* *************************************************

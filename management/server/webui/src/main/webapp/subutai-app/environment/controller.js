@@ -93,7 +93,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 
 
 	function actionShare (data, type, full, meta) {
-		return '<a href="" class="b-btn b-btn_blue g-left" ng-click="environmentViewCtrl.shareEnvironmentWindow(\'' + data.id + '\')" ng-show = "' + data.status + ' === HEALTHY">Share</a>';
+		return '<a href="" class="b-btn b-btn_blue g-left" ng-click="environmentViewCtrl.shareEnvironmentWindow(\'' + data.id + '\')" ng-show = "' + (data.status === "HEALTHY") + '">Share</a>';
 	}
 
 
