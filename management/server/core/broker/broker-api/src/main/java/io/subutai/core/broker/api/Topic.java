@@ -6,5 +6,5 @@ package io.subutai.core.broker.api;
  */
 public enum Topic
 {
-    HEARTBEAT_TOPIC, RESPONSE_TOPIC, INOTIFY_TOPIC
+    HEARTBEAT_TOPIC, RESPONSE_TOPIC
 }

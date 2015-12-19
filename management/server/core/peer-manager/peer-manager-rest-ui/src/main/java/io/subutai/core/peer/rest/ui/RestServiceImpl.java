@@ -9,6 +9,7 @@ import io.subutai.common.peer.*;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.peer.api.PeerManager;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,7 +72,8 @@ public class RestServiceImpl implements RestService
     {
         List<RegistrationData> dataList = peerManager.getRegistrationRequests();
 
-        RegistrationData data = dataList.stream().filter( p -> p.getPeerInfo().getId().equals( peerId ) ).findAny().get();
+        RegistrationData data =
+                dataList.stream().filter( p -> p.getPeerInfo().getId().equals( peerId ) ).findAny().get();
 
         try
         {
@@ -91,7 +93,8 @@ public class RestServiceImpl implements RestService
     {
         List<RegistrationData> dataList = peerManager.getRegistrationRequests();
 
-        RegistrationData data = dataList.stream().filter( p -> p.getPeerInfo().getId().equals( peerId ) ).findAny().get();
+        RegistrationData data =
+                dataList.stream().filter( p -> p.getPeerInfo().getId().equals( peerId ) ).findAny().get();
 
         try
         {
@@ -111,7 +114,8 @@ public class RestServiceImpl implements RestService
     {
         List<RegistrationData> dataList = peerManager.getRegistrationRequests();
 
-        RegistrationData data = dataList.stream().filter( p -> p.getPeerInfo().getId().equals( peerId ) ).findAny().get();
+        RegistrationData data =
+                dataList.stream().filter( p -> p.getPeerInfo().getId().equals( peerId ) ).findAny().get();
 
         try
         {
@@ -131,7 +135,8 @@ public class RestServiceImpl implements RestService
     {
         List<RegistrationData> dataList = peerManager.getRegistrationRequests();
 
-        RegistrationData data = dataList.stream().filter( p -> p.getPeerInfo().getId().equals( peerId ) ).findAny().get();
+        RegistrationData data =
+                dataList.stream().filter( p -> p.getPeerInfo().getId().equals( peerId ) ).findAny().get();
 
         try
         {
@@ -144,7 +149,6 @@ public class RestServiceImpl implements RestService
 
         return Response.ok().build();
     }
-
 
 
     @Override
