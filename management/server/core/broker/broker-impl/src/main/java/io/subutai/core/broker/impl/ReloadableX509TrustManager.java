@@ -4,7 +4,6 @@ package io.subutai.core.broker.impl;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -81,28 +80,25 @@ public class ReloadableX509TrustManager implements X509TrustManager
     @Override
     public X509Certificate[] getAcceptedIssuers()
     {
-        X509Certificate[] issuers = trustManager.getAcceptedIssuers();
-        return issuers;
+        return trustManager.getAcceptedIssuers();
     }
 
 
     public void reloadTrustManager() throws Exception
     {
-
         // load keystore from specified cert store (or default)
         KeyStore ts = KeyStore.getInstance( KeyStore.getDefaultType() );
-        InputStream in = new FileInputStream( trustStorePath );
-        try
+
+        File tsFile = new File( trustStorePath );
+
+        if ( tsFile.exists() )
         {
-            ts.load( in, null );
-        }
-        catch ( Exception e )
-        {
-            e.printStackTrace();
-        }
-        finally
-        {
-            in.close();
+            char[] keystorePass = this.tspassword.toCharArray();
+
+            try ( FileInputStream fis = new FileInputStream( tsFile ) )
+            {
+                ts.load( fis, keystorePass );
+            }
         }
 
         // initialize a new TMF with the ts we just loaded
@@ -111,11 +107,11 @@ public class ReloadableX509TrustManager implements X509TrustManager
 
         // acquire X509 trust manager from factory
         TrustManager tms[] = tmf.getTrustManagers();
-        for ( int i = 0; i < tms.length; i++ )
+        for ( final TrustManager tm : tms )
         {
-            if ( tms[i] instanceof X509TrustManager )
+            if ( tm instanceof X509TrustManager )
             {
-                trustManager = ( X509TrustManager ) tms[i];
+                trustManager = ( X509TrustManager ) tm;
                 return;
             }
         }
@@ -127,27 +123,21 @@ public class ReloadableX509TrustManager implements X509TrustManager
     {
 
         // import the cert into file trust store
-        File tsfile = new File( this.trustStorePath );
+        File tsFile = new File( this.trustStorePath );
 
         char[] keystorePass = this.tspassword.toCharArray();
 
         KeyStore ts = KeyStore.getInstance( KeyStore.getDefaultType() );
 
-        if ( tsfile.exists() )
+        if ( tsFile.exists() )
         {
             Files.copy( Paths.get( this.trustStorePath ),
                     Paths.get( String.format( "%s.backup_%d", this.trustStorePath, System.currentTimeMillis() ) ),
                     StandardCopyOption.REPLACE_EXISTING );
 
-            FileInputStream fis = new FileInputStream( tsfile );
-
-            try
+            try ( FileInputStream fis = new FileInputStream( tsFile ) )
             {
                 ts.load( fis, keystorePass );
-            }
-            finally
-            {
-                fis.close();
             }
         }
 
