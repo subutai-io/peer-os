@@ -14,6 +14,7 @@ import io.subutai.common.security.objects.PermissionOperation;
 import io.subutai.core.identity.api.dao.IdentityDataService;
 import io.subutai.core.identity.api.model.Relation;
 import io.subutai.core.identity.api.model.RelationInfo;
+import io.subutai.core.identity.api.model.RelationLink;
 import io.subutai.core.identity.api.model.RelationMeta;
 import io.subutai.core.identity.api.relation.RelationInfoManager;
 import io.subutai.core.identity.impl.model.RelationInfoImpl;
@@ -57,6 +58,8 @@ public class RelationInfoManagerImpl implements RelationInfoManager
             return false;
         }
 
+        Set<RelationLink> relationLinks = Sets.newHashSet();
+
         RelationLinkImpl target = new RelationLinkImpl( relationMeta.getSourceId(), relationMeta.getSourcePath() );
         List<Relation> byTargetRelations = identityDataService.relationsByTarget( target );
 
@@ -70,6 +73,11 @@ public class RelationInfoManagerImpl implements RelationInfoManager
             {
                 // Requested relation should be less then or equal to relation that was granted
                 return compareRelationships( targetRelation.getRelationInfo(), relationInfo ) >= 0;
+            }
+            int result = getDeeper( relationInfo, targetRelation.getTrustedObject(), object, relationLinks );
+            if ( result != -3 )
+            {
+                return result >= 0;
             }
         }
 
@@ -91,13 +99,41 @@ public class RelationInfoManagerImpl implements RelationInfoManager
     }
 
 
+    // return -3 means no relation exist
+    private int getDeeper( final RelationInfo relationInfo, final RelationLink target, final RelationLink object,
+                           Set<RelationLink> relationLinks )
+    {
+        if ( !keyTrustCheckEnabled )
+        {
+            return 0;
+        }
+        List<Relation> byTargetRelations = identityDataService.relationsByTarget( target );
+        relationLinks.add( target );
+        // When relation info is found check that relation was granted from verified source
+        for ( final Relation targetRelation : byTargetRelations )
+        {
+            int compare = compareRelationships( targetRelation.getRelationInfo(), relationInfo );
+            if ( targetRelation.getTrustedObject().equals( object ) )
+            {
+                return compare;
+            }
+            if ( compare >= 0 && !relationLinks.contains( targetRelation.getTrustedObject() ) )
+            {
+                int result = getDeeper( relationInfo, targetRelation.getTrustedObject(), object, relationLinks );
+                if ( result != -3 )
+                {
+                    return result;
+                }
+            }
+        }
+
+        return -3;
+    }
+
+
     /**
      * Compare relationship weight depending on each relationship property, if relation context or level differs then
-     * this relation is not comparable
-     * 1 - a is greater
-     * 0 - equal
-     * -1 - a is less than
-     * -2 - incomparable
+     * this relation is not comparable 1 - a is greater 0 - equal -1 - a is less than -2 - incomparable
      */
     private int compareRelationships( RelationInfo a, RelationInfo b )
     {

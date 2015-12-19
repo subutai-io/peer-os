@@ -54,7 +54,6 @@ import io.subutai.common.peer.PeerId;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.resource.ResourceType;
 import io.subutai.common.resource.ResourceValue;
-import io.subutai.common.security.objects.KeyTrustLevel;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
@@ -62,8 +61,6 @@ import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.RelationMeta;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.relation.RelationManager;
-import io.subutai.core.security.api.*;
-import io.subutai.core.security.api.crypto.KeyManager;
 
 
 /**
@@ -278,7 +275,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
                             new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), environment,
                                     environment.getId(), PermissionObject.EnvironmentManagement, environment.getId() );
                     boolean trustedRelation =
-                            relationManager.getRelationInfoManager().groupHasReadPermissions( relationMeta );
+                            relationManager.getRelationInfoManager().groupHasWritePermissions( relationMeta );
 
                     if ( !trustedRelation )
                     {

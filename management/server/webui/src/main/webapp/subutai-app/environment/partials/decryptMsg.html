@@ -1,29 +1,24 @@
 <link rel="stylesheet" href="subutai-app/environment/partials/customDialog.css"/>
 <div class="b-popup">
-	<div class="b-popup__header">
-		Build environment
-		<a href ng-click="closeThisDialog()"><img src="assets/elements/buttons/b-icon-close.svg" class="b-icon g-right"/></a>
-	</div>
-	<div class="b-popup__body">
-		<div class="b-form">
-			<div class="b-form__wrapper b-form__wrapper_margin-bottom">
-				<label class="b-form-label b-form-label_fix-size-1 g-left">Message</label>
+  <div class="b-popup__header">
+    Build environment
+    <a href ng-click="closeThisDialog()"><img src="assets/elements/buttons/b-icon-close.svg"
+                                              class="b-icon g-right"/></a>
+  </div>
+  <div class="b-popup__body">
+    <div class="b-form">
+      <div class="b-form__wrapper b-form__wrapper_margin-bottom">
+        <label class="b-form-label b-form-label_fix-size-1 g-left">Message</label>
 
-				<div class="b-form-wrapper b-form-wrapper_margin-size-1 b-workspace-content__row_margin-b">
-				<textarea class="b-form-input b-form-input_full b-form-input_textarea bp-sign-target" ng-model = "environmentViewCtrl.currentEnvironment.relationDeclaration" readonly>
+        <div class="b-form-wrapper b-form-wrapper_margin-size-1 b-workspace-content__row_margin-b">
+				<textarea class="b-form-input b-form-input_full b-form-input_textarea bp-sign-target"
+                  ng-model="environmentViewCtrl.currentEnvironment.relationDeclaration">
 				</textarea>
-				</div>
-				<div class="clear"></div>
-
-				<label class="b-form-label b-form-label_fix-size-1 g-left">Signed</label>
-
-				<div class="b-form-wrapper b-form-wrapper_margin-size-1 b-workspace-content__row_margin-b">
-				<textarea class="b-form-input b-form-input_full b-form-input_textarea" ng-model = "environmentViewCtrl.currentEnvironment.relationDeclaration" placeholder = "Please sign the message above with your private key and paste here">
-				</textarea>
-				</div>
-				<div class="clear"></div>
-			</div>
-			<a href class="b-btn b-btn_blue g-left  b-btn_margin-l" ng-click="environmentViewCtrl.buildEnvironment()" style="margin-bottom: 10px; margin-top: 10px">Build</a>
-		</div>
-	</div>
+        </div>
+        <div class="clear"></div>
+      </div>
+      <a href class="b-btn b-btn_blue g-left  b-btn_margin-l" ng-click="environmentViewCtrl.buildEnvironment()"
+         style="margin-bottom: 10px; margin-top: 10px">Build</a>
+    </div>
+  </div>
 </div>

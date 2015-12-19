@@ -1548,7 +1548,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     public void setContainersTransientFields( final Environment environment )
     {
         User activeUser = identityManager.getActiveUser();
-        for ( ContainerHost containerHost : environment.getContainerHosts() )
+        Set<EnvironmentContainerHost> containers = environment.getContainerHosts();
+        for ( ContainerHost containerHost : containers )
         {
             EnvironmentContainerImpl environmentContainer = ( EnvironmentContainerImpl ) containerHost;
 
@@ -1560,30 +1561,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             environmentContainer.setPeer( peer );
         }
         // remove containers which doesn't have trust relation
-        for ( ContainerHost containerHost : environment.getContainerHosts() )
-        {
-            EnvironmentContainerImpl environmentContainer = ( EnvironmentContainerImpl ) containerHost;
-
-            RelationMeta relationMeta =
-                    new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), environmentContainer,
-                            environmentContainer.getId(), PermissionObject.EnvironmentManagement,
-                            environmentContainer.getId() );
-            boolean trustedRelation = relationManager.getRelationInfoManager().allHasReadPermissions( relationMeta );
-
-            if ( trustedRelation )
-            {
-                environmentContainer.setEnvironmentManager( this );
-
-                String peerId = environmentContainer.getPeerId();
-                Peer peer = peerManager.getPeer( peerId );
-
-                environmentContainer.setPeer( peer );
-            }
-            else
-            {
-                environment.getContainerHosts().remove( environmentContainer );
-            }
-        }
     }
 
 
@@ -1704,7 +1681,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Write" )
+    @RolesAllowed( "Environment-Management|Write" )
     protected EnvironmentImpl createEmptyEnvironment( final String name, final String subnetCidr, final String sshKey )
     {
 
@@ -1946,19 +1923,19 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             Iterator<String> iterator = mySet.iterator();
             for ( final String s : mySet )
             {
-                if (s.equals("Read" ))
+                if ( s.equals( "Read" ) )
                 {
                     shareDto.setRead( true );
                 }
-                if (s.equals("Write" ))
+                if ( s.equals( "Write" ) )
                 {
                     shareDto.setWrite( true );
                 }
-                if (s.equals("Update" ))
+                if ( s.equals( "Update" ) )
                 {
                     shareDto.setUpdate( true );
                 }
-                if (s.equals("Delete" ))
+                if ( s.equals( "Delete" ) )
                 {
                     shareDto.setDelete( true );
                 }
@@ -1983,7 +1960,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         for ( final Relation relation : relations )
         {
-            identityManager.getIdentityDataService().removeRelation( relation.getId() );
+            if ( !relation.getSource().equals( relation.getTarget() ) )
+            {
+                identityManager.getIdentityDataService().removeRelation( relation.getId() );
+            }
         }
 
         User activeUser = identityManager.getActiveUser();

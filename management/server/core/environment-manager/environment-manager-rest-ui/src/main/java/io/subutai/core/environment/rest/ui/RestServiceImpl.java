@@ -65,7 +65,7 @@ public class RestServiceImpl implements RestService
     private final TemplateManager templateRegistry;
     private final StrategyManager strategyManager;
     private Gson gson = RequiredDeserializer.createValidatingGson();
-    private Set<EnvironmentDto> envs = Sets.newHashSet();
+//    private Set<EnvironmentDto> envs = Sets.newHashSet();
 
 
     public RestServiceImpl( final EnvironmentManager environmentManager, final PeerManager peerManager,
@@ -88,8 +88,8 @@ public class RestServiceImpl implements RestService
     @Override
     public Response listTemplates()
     {
-        List<String> templates =
-                templateRegistry.list().stream().map( TemplateKurjun::getName ).collect( Collectors.toList() );
+        Set<String> templates =
+                templateRegistry.list().stream().map( TemplateKurjun::getName ).collect( Collectors.toSet() );
 
         if ( !templates.isEmpty() )
         {
@@ -207,10 +207,10 @@ public class RestServiceImpl implements RestService
     @Override
     public Response listEnvironments()
     {
-        if ( envs.size() > 0 )
-        {
-            return Response.ok( JsonUtil.toJson( envs ) ).build();
-        }
+//        if ( envs.size() > 0 )
+//        {
+//            return Response.ok( JsonUtil.toJson( envs ) ).build();
+//        }
         Set<Environment> environments = environmentManager.getEnvironments();
         Set<EnvironmentDto> environmentDtos = Sets.newHashSet();
 
@@ -220,11 +220,11 @@ public class RestServiceImpl implements RestService
                     new EnvironmentDto( environment.getId(), environment.getName(), environment.getStatus(),
                             convertContainersToContainerJson( environment.getContainerHosts() ),
                             environment.getRelationDeclaration() );
-            environmentDto.setRevoke( true );
+//            environmentDto.setRevoke( true );
             environmentDtos.add( environmentDto );
         }
 
-        envs.addAll( environmentDtos );
+//        envs.addAll( environmentDtos );
         return Response.ok( JsonUtil.toJson( environmentDtos ) ).build();
     }
 
@@ -232,13 +232,13 @@ public class RestServiceImpl implements RestService
     @Override
     public Response accessStatus( final String environmentId )
     {
-        for ( final EnvironmentDto env : envs )
-        {
-            if ( env.getId().equals( environmentId ) )
-            {
-                env.setRevoke( !env.isRevoke() );
-            }
-        }
+//        for ( final EnvironmentDto env : envs )
+//        {
+//            if ( env.getId().equals( environmentId ) )
+//            {
+//                env.setRevoke( !env.isRevoke() );
+//            }
+//        }
         return Response.ok().build();
     }
 
@@ -1003,7 +1003,7 @@ public class RestServiceImpl implements RestService
     {
         ShareDto[] shareDto = gson.fromJson( users, ShareDto[].class );
 
-        environmentManager.shareEnvironment( shareDto , environmentId );
+        environmentManager.shareEnvironment( shareDto, environmentId );
 
         return Response.ok().build();
     }
