@@ -62,7 +62,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 		DTColumnBuilder.newColumn(null).withTitle('Share').notSortable().renderWith(actionShare),
 		DTColumnBuilder.newColumn(null).withTitle('Containers').renderWith(containersTags),
 		DTColumnBuilder.newColumn(null).withTitle('Actions').notSortable().renderWith(actionStartEnvironmentBuild),
-		DTColumnBuilder.newColumn(null).withTitle('Revoke').notSortable().renderWith(actionSwitch),
+		//DTColumnBuilder.newColumn(null).withTitle('Revoke').notSortable().renderWith(actionSwitch),
 		DTColumnBuilder.newColumn(null).withTitle('').notSortable().renderWith(actionDelete)
 	];
 
