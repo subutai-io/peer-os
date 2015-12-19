@@ -128,29 +128,27 @@ public class ReloadableX509TrustManager implements X509TrustManager
 
         // import the cert into file trust store
         File tsfile = new File( this.trustStorePath );
-        java.io.FileInputStream fis;
+
+        char[] keystorePass = this.tspassword.toCharArray();
+
+        KeyStore ts = KeyStore.getInstance( KeyStore.getDefaultType() );
+
         if ( tsfile.exists() )
         {
             Files.copy( Paths.get( this.trustStorePath ),
                     Paths.get( String.format( "%s.backup_%d", this.trustStorePath, System.currentTimeMillis() ) ),
                     StandardCopyOption.REPLACE_EXISTING );
-            fis = new FileInputStream( tsfile );
-        }
-        else
-        {
-            throw new Exception( "Truststore " + tsfile.getAbsolutePath() + " does not exist!" );
-        }
 
-        KeyStore ts = KeyStore.getInstance( KeyStore.getDefaultType() );
+            FileInputStream fis = new FileInputStream( tsfile );
 
-        char[] keystorePass = this.tspassword.toCharArray();
-        try
-        {
-            ts.load( fis, keystorePass );
-        }
-        finally
-        {
-            fis.close();
+            try
+            {
+                ts.load( fis, keystorePass );
+            }
+            finally
+            {
+                fis.close();
+            }
         }
 
         ts.setCertificateEntry( alias, cert );
