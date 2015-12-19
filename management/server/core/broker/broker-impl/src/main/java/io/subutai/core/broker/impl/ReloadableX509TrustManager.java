@@ -100,6 +100,10 @@ public class ReloadableX509TrustManager implements X509TrustManager
                 ts.load( fis, keystorePass );
             }
         }
+        else
+        {
+            ts.load( null, null );
+        }
 
         // initialize a new TMF with the ts we just loaded
         TrustManagerFactory tmf = TrustManagerFactory.getInstance( TrustManagerFactory.getDefaultAlgorithm() );
@@ -139,6 +143,10 @@ public class ReloadableX509TrustManager implements X509TrustManager
             {
                 ts.load( fis, keystorePass );
             }
+        }
+        else
+        {
+            ts.load( null, null );
         }
 
         ts.setCertificateEntry( alias, cert );
