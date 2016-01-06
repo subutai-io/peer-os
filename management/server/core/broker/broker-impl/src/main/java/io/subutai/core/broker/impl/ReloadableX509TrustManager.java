@@ -16,6 +16,9 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 
+import io.subutai.common.security.crypto.certificate.CertificateData;
+import io.subutai.common.security.crypto.certificate.CertificateTool;
+
 
 public class ReloadableX509TrustManager implements X509TrustManager
 {
@@ -103,6 +106,10 @@ public class ReloadableX509TrustManager implements X509TrustManager
         else
         {
             ts.load( null, null );
+
+            CertificateTool certificateTool = new CertificateTool();
+            //add dummy cert to truststore
+            ts.setCertificateEntry( "dummy", certificateTool.generateSelfSignedCertificate( new CertificateData() ) );
         }
 
         // initialize a new TMF with the ts we just loaded
@@ -143,10 +150,6 @@ public class ReloadableX509TrustManager implements X509TrustManager
             {
                 ts.load( fis, keystorePass );
             }
-        }
-        else
-        {
-            ts.load( null, null );
         }
 
         ts.setCertificateEntry( alias, cert );
