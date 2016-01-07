@@ -53,6 +53,9 @@ public class RelationImpl implements Relation
     @Column( name = "status", nullable = false )
     private RelationStatus relationStatus;
 
+    /**
+     * Public key id to verify signed message
+     */
     @Column( name = "signature_key_id" )
     private String keyId;
 
