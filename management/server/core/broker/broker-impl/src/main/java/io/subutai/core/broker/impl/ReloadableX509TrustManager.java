@@ -110,6 +110,8 @@ public class ReloadableX509TrustManager implements X509TrustManager
             CertificateTool certificateTool = new CertificateTool();
             //add dummy cert to truststore
             ts.setCertificateEntry( "dummy", certificateTool.generateSelfSignedCertificate( new CertificateData() ) );
+
+            ts.store( new FileOutputStream( this.trustStorePath ), tspassword.toCharArray() );
         }
 
         // initialize a new TMF with the ts we just loaded
