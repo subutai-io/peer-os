@@ -8,9 +8,18 @@ public class LoginPage extends PageObject {
 
     //region WEB ELEMENTS: Fields
 
+    @FindBy(id = "subt-input__login")
+    public WebElementFacade inputLogin;
+
+    @FindBy(id = "subt-input__password")
+    public WebElementFacade inputPassword;
+
     //endregion
 
     //region WEB ELEMENTS: Buttons
+
+    @FindBy(id = "subt-button__login")
+    public WebElementFacade buttonLogin;
 
     //endregion
 

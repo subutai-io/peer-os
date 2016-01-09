@@ -6,7 +6,7 @@ I want to verify a functional: Local Environment
 So that I wrote acceptance test for it
 
 Scenario: Create Local Environment
-Given the first user is on the home page of Subutai
+Given the first user is on the Home page of Subutai
 And the user enters login and password: 'admin', 'secret'
 And the user clicks on the button: Login
 When the user clicks on the menu item: Environment
@@ -41,7 +41,7 @@ Then the user observes header: Success!
 And the user observes text: Your environment has been created.
 
 Scenario: Grow Local Environment
-Given the first user is on the home page of Subutai
+Given the first user is on the Home page of Subutai
 When the user clicks on the menu item: Environment
 And the user clicks on the menu item: Blueprint
 And the user clicks on the icon: Grow
@@ -61,7 +61,7 @@ Then the user observes header: Success!
 And the user observes text: You successfully grow environment.
 
 Scenario: Destroy Environment and Blueprint
-Given the first user is on the home page of Subutai
+Given the first user is on the Home page of Subutai
 When the user clicks on the menu item: Environment
 And the user clicks on the menu item: Blueprint
 And the user clicks on the icon: Remove
