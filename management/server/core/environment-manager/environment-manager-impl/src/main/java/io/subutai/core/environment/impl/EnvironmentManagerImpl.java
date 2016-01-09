@@ -1406,7 +1406,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
             // TODO user should send signed trust message
             RelationInfo relationInfo = relationManager
-                    .generateTrustRelationship( PermissionObject.EnvironmentManagement.getName(),
+                    .createTrustRelationship          ( PermissionObject.EnvironmentManagement.getName(),
                             Sets.newHashSet( PermissionOperation.Delete.getName(), PermissionOperation.Read.getName(),
                                     PermissionOperation.Update.getName(), PermissionOperation.Write.getName() ),
                             Ownership.USER.getLevel() );
@@ -1991,7 +1991,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             User targetUser = identityManager.getUser( dto.getId() );
 
             RelationInfo relationInfo = relationManager
-                    .generateTrustRelationship( PermissionObject.EnvironmentManagement.getName(), operatoins,
+                    .createTrustRelationship           ( PermissionObject.EnvironmentManagement.getName(), operatoins,
                             Ownership.GROUP.getLevel() );
 
             RelationMeta relationMeta =
@@ -2002,7 +2002,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
             Relation relation = relationManager.buildTrustRelation( relationInfo, relationMeta );
             relation.setRelationStatus( RelationStatus.VERIFIED );
-            relationManager.executeRelationBuild( relation );
+            relationManager.saveRelation( relation );
 
             operatoins.clear();
         }

@@ -40,19 +40,9 @@
     <property name="securityManager" ref="securityManager" />
   </bean>
 
-  <bean id="relationManager" scope="singleton" activation="eager" init-method="init"
-        class="io.subutai.core.identity.impl.relation.RelationManagerImpl">
-    <property name="daoManager" ref="daoManagerIdenity" />
-    <property name="identityManager" ref="identityManager" />
-    <property name="keyTrustCheckEnabled" value="${keyTrustCheckEnabled}" />
-  </bean>
-
   <!--*****************************************************************-->
   <service ref="identityManager" activation="eager"
            interface="io.subutai.core.identity.api.IdentityManager" />
-
-  <service ref="relationManager" activation="eager"
-           interface="io.subutai.core.identity.api.relation.RelationManager" />
   <!--*****************************************************************-->
 
 </blueprint>

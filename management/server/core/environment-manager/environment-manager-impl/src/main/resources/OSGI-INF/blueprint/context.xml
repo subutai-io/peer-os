@@ -9,7 +9,7 @@
            xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0
             http://www.w3.org/2001/XMLSchema-instance http://www.w3.org/2001/XMLSchema-instance
             http://aries.apache.org/xmlns/jpa/v1.0.0 http://aries.apache.org/xmlns/jpa/v1.0.0"
-    >
+>
 
   <!-- ***************************************************************** -->
   <authz:enable />
@@ -21,7 +21,6 @@
     </cm:default-properties>
   </cm:property-placeholder>
 
-
   <reference id="templateRegistry" availability="mandatory"
              interface="io.subutai.core.kurjun.api.TemplateManager" />
   <reference id="peerManager"
@@ -32,8 +31,8 @@
              interface="io.subutai.core.network.api.NetworkManager" />
   <reference id="identityManager"
              interface="io.subutai.core.identity.api.IdentityManager" />
-  <reference id="relationManager"
-             interface="io.subutai.core.identity.api.relation.RelationManager" />
+  <!--<reference id="relationManager"-->
+  <!--interface="io.subutai.core.identity.api.relation.RelationManager" />-->
   <reference id="tracker"
              interface="io.subutai.core.tracker.api.Tracker" />
 
@@ -60,13 +59,20 @@
     <argument ref="identityManager" />
     <argument ref="tracker" />
     <argument ref="relationManager" />
-    <property name="keyTrustCheckEnabled" value="${keyTrustCheckEnabled}"/>
+    <property name="keyTrustCheckEnabled" value="${keyTrustCheckEnabled}" />
+  </bean>
+
+  <bean id="relationManager" scope="singleton" activation="eager" init-method="init"
+        class="io.subutai.core.environment.impl.relation.RelationManagerImpl">
+    <property name="daoManager" ref="daoManagerEnv" />
+    <property name="securityManager" ref="securityManager" />
+    <property name="keyTrustCheckEnabled" value="${keyTrustCheckEnabled}" />
   </bean>
 
   <service ref="environmentManager" interface="io.subutai.core.environment.api.EnvironmentManager" />
   <service ref="environmentManager" interface="io.subutai.common.peer.AlertListener" />
+  <service ref="relationManager" activation="eager" interface="io.subutai.core.identity.api.relation.RelationManager" />
   <service ref="environmentManager" interface="io.subutai.core.peer.api.PeerActionListener" />
-
 
   <reference-list id="alertHandler"
                   interface="io.subutai.common.peer.AlertHandler"

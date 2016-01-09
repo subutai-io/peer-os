@@ -1,4 +1,4 @@
-package io.subutai.core.identity.impl.relation;
+package io.subutai.core.environment.impl.relation;
 
 
 import java.util.Set;
@@ -7,18 +7,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.subutai.common.dao.DaoManager;
-import io.subutai.core.identity.api.dao.IdentityDataService;
+import io.subutai.core.environment.impl.dao.RelationDataService;
+import io.subutai.core.environment.impl.entity.relation.RelationImpl;
+import io.subutai.core.environment.impl.entity.relation.RelationInfoImpl;
+import io.subutai.core.environment.impl.entity.relation.RelationLinkImpl;
 import io.subutai.core.identity.api.exception.RelationVerificationException;
 import io.subutai.core.identity.api.model.Relation;
 import io.subutai.core.identity.api.model.RelationInfo;
 import io.subutai.core.identity.api.model.RelationMeta;
 import io.subutai.core.identity.api.relation.RelationManager;
 import io.subutai.core.identity.api.relation.RelationStatus;
-import io.subutai.core.identity.impl.IdentityManagerImpl;
-import io.subutai.core.identity.impl.dao.IdentityDataServiceImpl;
-import io.subutai.core.identity.impl.model.RelationImpl;
-import io.subutai.core.identity.impl.model.RelationInfoImpl;
-import io.subutai.core.identity.impl.model.RelationLinkImpl;
+import io.subutai.core.security.api.SecurityManager;
 
 
 /**
@@ -27,20 +26,20 @@ import io.subutai.core.identity.impl.model.RelationLinkImpl;
 public class RelationManagerImpl implements RelationManager
 {
     private static final Logger logger = LoggerFactory.getLogger( RelationManagerImpl.class );
-    private IdentityManagerImpl identityManager;
+    private SecurityManager securityManager;
     private RelationMessageManagerImpl trustMessageManager;
-    private IdentityDataService identityDataService = null;
     private RelationInfoManagerImpl relationInfoManager;
     private DaoManager daoManager = null;
     private boolean keyTrustCheckEnabled;
+    private RelationDataService relationDataService;
 
 
     //*****************************************
     public void init()
     {
-        identityDataService = new IdentityDataServiceImpl( daoManager );
-        trustMessageManager = new RelationMessageManagerImpl( identityManager.getSecurityManager() );
-        relationInfoManager = new RelationInfoManagerImpl( identityDataService, keyTrustCheckEnabled );
+        relationDataService = new RelationDataService( daoManager );
+        trustMessageManager = new RelationMessageManagerImpl( securityManager );
+        relationInfoManager = new RelationInfoManagerImpl( relationDataService, keyTrustCheckEnabled );
     }
 
 
@@ -50,9 +49,9 @@ public class RelationManagerImpl implements RelationManager
     }
 
 
-    public void setIdentityManager( final IdentityManagerImpl identityManager )
+    public void setSecurityManager( final SecurityManager securityManager )
     {
-        this.identityManager = identityManager;
+        this.securityManager = securityManager;
     }
 
 
@@ -81,9 +80,11 @@ public class RelationManagerImpl implements RelationManager
             }
 
             // Verification check have to be applied to verify that stored data is the same as the one being supported
-            Relation storedRelation = identityDataService
-                    .getRelationBySourceTargetObject( relation.getSource(), relation.getTarget(),
-                            relation.getTrustedObject() );
+            Relation storedRelation = relationDataService
+                    .findBySourceTargetObject                                ( ( RelationLinkImpl ) relation
+                            .getSource(),
+                            ( RelationLinkImpl ) relation.getTarget(),
+                            ( RelationLinkImpl ) relation.getTrustedObject() );
 
             if ( storedRelation == null )
             {
@@ -103,7 +104,7 @@ public class RelationManagerImpl implements RelationManager
             storedRelation.setRelationStatus( RelationStatus.VERIFIED );
             // Check for relation validity is checked before relation stating link send its request
             // TODO check if source can declare this relation
-            identityDataService.persistRelation( relation );
+            saveRelation( relation );
         }
         catch ( Exception e )
         {
@@ -114,8 +115,8 @@ public class RelationManagerImpl implements RelationManager
 
 
     @Override
-    public RelationInfo generateTrustRelationship( final String pObject, final Set<String> operation,
-                                                   final int ownershipLevel )
+    public RelationInfo createTrustRelationship( final String pObject, final Set<String> operation,
+                                                 final int ownershipLevel )
     {
         return new RelationInfoImpl( pObject, operation, ownershipLevel );
     }
@@ -132,9 +133,9 @@ public class RelationManagerImpl implements RelationManager
         RelationImpl relation = new RelationImpl( source, target, object, new RelationInfoImpl( relationInfo ),
                 relationMeta.getKeyId() );
 
-        identityDataService.persistRelation( relation );
+        saveRelation( relation );
 
-        return identityDataService.getRelationBySourceTargetObject( source, target, object );
+        return relationDataService.findBySourceTargetObject( source, target, object );
     }
 
 
@@ -144,15 +145,18 @@ public class RelationManagerImpl implements RelationManager
         RelationLinkImpl source = new RelationLinkImpl( relationMeta.getSourceId(), relationMeta.getSourcePath() );
         RelationLinkImpl target = new RelationLinkImpl( relationMeta.getTargetId(), relationMeta.getTargetPath() );
         RelationLinkImpl object = new RelationLinkImpl( relationMeta.getObjectId(), relationMeta.getObjectPath() );
-        return identityDataService.getRelationBySourceTargetObject( source, target, object );
+        return relationDataService.findBySourceTargetObject( source, target, object );
     }
 
 
     @Override
-    public void executeRelationBuild( final Relation relation )
+    public void saveRelation( final Relation relation )
     {
         //TODO check if relation valid otherwise break relation build
-        identityDataService.persistRelation( relation );
+        relationDataService.update( relation.getSource() );
+        relationDataService.update( relation.getTarget() );
+        relationDataService.update( relation.getTrustedObject() );
+        relationDataService.update( ( RelationImpl ) relation );
     }
 
 

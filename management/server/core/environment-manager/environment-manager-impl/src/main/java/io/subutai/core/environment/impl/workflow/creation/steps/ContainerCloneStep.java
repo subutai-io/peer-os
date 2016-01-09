@@ -190,7 +190,7 @@ public class ContainerCloneStep
                 relationMeta.setObjectPath( container.getClass().getSimpleName() );
 
                 RelationInfo relationInfo = relationManager
-                        .generateTrustRelationship( PermissionObject.EnvironmentManagement.getName(),
+                        .createTrustRelationship                                                         ( PermissionObject.EnvironmentManagement.getName(),
                                 Sets.newHashSet( PermissionOperation.Delete.getName(),
                                         PermissionOperation.Read.getName(), PermissionOperation.Update.getName(),
                                         PermissionOperation.Write.getName() ), Ownership.USER.getLevel() );
@@ -198,7 +198,7 @@ public class ContainerCloneStep
 
                 Relation relation = relationManager.buildTrustRelation( relationInfo, relationMeta );
 
-                relationManager.executeRelationBuild( relation );
+                relationManager.saveRelation( relation );
             }
         }
         catch ( Exception ex )

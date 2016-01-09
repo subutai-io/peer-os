@@ -1,4 +1,4 @@
-package io.subutai.core.identity.impl.model;
+package io.subutai.core.environment.impl.entity.relation;
 
 
 import java.util.Set;

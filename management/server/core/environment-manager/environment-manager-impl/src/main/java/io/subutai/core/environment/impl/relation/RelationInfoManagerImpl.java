@@ -1,4 +1,4 @@
-package io.subutai.core.identity.impl.relation;
+package io.subutai.core.environment.impl.relation;
 
 
 import java.util.List;
@@ -11,14 +11,14 @@ import com.google.common.collect.Sets;
 
 import io.subutai.common.security.objects.Ownership;
 import io.subutai.common.security.objects.PermissionOperation;
-import io.subutai.core.identity.api.dao.IdentityDataService;
+import io.subutai.core.environment.impl.dao.RelationDataService;
+import io.subutai.core.environment.impl.entity.relation.RelationInfoImpl;
+import io.subutai.core.environment.impl.entity.relation.RelationLinkImpl;
 import io.subutai.core.identity.api.model.Relation;
 import io.subutai.core.identity.api.model.RelationInfo;
 import io.subutai.core.identity.api.model.RelationLink;
 import io.subutai.core.identity.api.model.RelationMeta;
 import io.subutai.core.identity.api.relation.RelationInfoManager;
-import io.subutai.core.identity.impl.model.RelationInfoImpl;
-import io.subutai.core.identity.impl.model.RelationLinkImpl;
 
 
 /**
@@ -27,13 +27,13 @@ import io.subutai.core.identity.impl.model.RelationLinkImpl;
 public class RelationInfoManagerImpl implements RelationInfoManager
 {
     private static final Logger logger = LoggerFactory.getLogger( RelationInfoManagerImpl.class );
-    private IdentityDataService identityDataService;
     private boolean keyTrustCheckEnabled;
+    private RelationDataService relationDataService;
 
 
-    public RelationInfoManagerImpl( final IdentityDataService identityDataService, final boolean keyTrustCheckEnabled )
+    public RelationInfoManagerImpl( final RelationDataService relationDataService, final boolean keyTrustCheckEnabled )
     {
-        this.identityDataService = identityDataService;
+        this.relationDataService = relationDataService;
         this.keyTrustCheckEnabled = keyTrustCheckEnabled;
     }
 
@@ -61,10 +61,10 @@ public class RelationInfoManagerImpl implements RelationInfoManager
         Set<RelationLink> relationLinks = Sets.newHashSet();
 
         RelationLinkImpl target = new RelationLinkImpl( relationMeta.getSourceId(), relationMeta.getSourcePath() );
-        List<Relation> byTargetRelations = identityDataService.relationsByTarget( target );
+        List<Relation> byTargetRelations = relationDataService.findByTarget( target );
 
         RelationLinkImpl object = new RelationLinkImpl( relationMeta.getObjectId(), relationMeta.getObjectPath() );
-        List<Relation> bySourceRelations = identityDataService.relationsBySource( target );
+        List<Relation> bySourceRelations = relationDataService.findBySource( target );
 
         // When relation info is found check that relation was granted from verified source
         for ( final Relation targetRelation : byTargetRelations )
@@ -74,7 +74,8 @@ public class RelationInfoManagerImpl implements RelationInfoManager
                 // Requested relation should be less then or equal to relation that was granted
                 return compareRelationships( targetRelation.getRelationInfo(), relationInfo ) >= 0;
             }
-            int result = getDeeper( relationInfo, targetRelation.getTrustedObject(), object, relationLinks );
+            int result = getDeeper( relationInfo, ( RelationLinkImpl ) targetRelation.getTrustedObject(), object,
+                    relationLinks );
             if ( result != -3 )
             {
                 return result >= 0;
@@ -100,14 +101,14 @@ public class RelationInfoManagerImpl implements RelationInfoManager
 
 
     // return -3 means no relation exist
-    private int getDeeper( final RelationInfo relationInfo, final RelationLink target, final RelationLink object,
+    private int getDeeper( final RelationInfo relationInfo, final RelationLinkImpl target, final RelationLink object,
                            Set<RelationLink> relationLinks )
     {
         if ( !keyTrustCheckEnabled )
         {
             return 0;
         }
-        List<Relation> byTargetRelations = identityDataService.relationsByTarget( target );
+        List<Relation> byTargetRelations = relationDataService.findByTarget( target );
         relationLinks.add( target );
         // When relation info is found check that relation was granted from verified source
         for ( final Relation targetRelation : byTargetRelations )
@@ -119,7 +120,8 @@ public class RelationInfoManagerImpl implements RelationInfoManager
             }
             if ( compare >= 0 && !relationLinks.contains( targetRelation.getTrustedObject() ) )
             {
-                int result = getDeeper( relationInfo, targetRelation.getTrustedObject(), object, relationLinks );
+                int result = getDeeper( relationInfo, ( RelationLinkImpl ) targetRelation.getTrustedObject(), object,
+                        relationLinks );
                 if ( result != -3 )
                 {
                     return result;

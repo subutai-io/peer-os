@@ -16,13 +16,13 @@ public interface RelationManager
 {
     void processTrustMessage( String signedMessage, final String secretKeyId ) throws RelationVerificationException;
 
-    RelationInfo generateTrustRelationship( String pObject, Set<String> operation, int ownershipLevel );
+    RelationInfo createTrustRelationship( String pObject, Set<String> operation, int ownershipLevel );
 
     Relation buildTrustRelation( RelationInfo relationInfo, RelationMeta relationMeta );
 
     Relation getRelation(RelationMeta relationMeta);
 
-    void executeRelationBuild( Relation relation );
+    void saveRelation( Relation relation );
 
     RelationInfoManager getRelationInfoManager();
 }
