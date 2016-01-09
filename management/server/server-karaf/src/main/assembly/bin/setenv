@@ -46,8 +46,7 @@ export JAVA_MAX_MEM=1G # Maximum memory for the JVM
 # export KARAF_BASE # Karaf base folder
 # export KARAF_ETC  # Karaf etc  folder
 # export KARAF_OPTS # Additional available Karaf options
-# export KARAF_DEBUG # Enable debug mode
-export KARAF_DEBUG=true # Enable debug mode
+# export KARAF_DEBUG=true # Enable debug mode
 # export KARAF_REDIRECT # Enable/set the std/err redirection when using bin/start
 #export SUBUTAI_APP_DATA_PATH="/apps/subutai-mng/current"
 export SUBUTAI_APP_DATA_PATH="/var/lib/subutai"
