@@ -1403,26 +1403,27 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                     continue;
                 }
                 AlertValue alertValue = alertEvent.getResource().getAlertValue( handler.getSupportedAlertValue() );
-                if ( alertValue != null )
+                if ( alertValue != null && alertEvent.getEnvironmentId() != null )
                 {
+                    final Environment environment = loadEnvironment( alertEvent.getEnvironmentId() );
                     alertEvent.addLog(
                             String.format( "Invoking pre-processor of '%s:%s'.", handlerId.getAlertHandlerId(),
                                     handlerId.getAlertHandlerPriority() ) );
-                    handler.preProcess( alertValue );
+                    handler.preProcess( environment, alertValue );
                     alertEvent.addLog(
                             String.format( "Pre-processor of '%s:%s' finished.", handlerId.getAlertHandlerId(),
                                     handlerId.getAlertHandlerPriority() ) );
                     alertEvent.addLog(
                             String.format( "Invoking main processor of '%s:%s'.", handlerId.getAlertHandlerId(),
                                     handlerId.getAlertHandlerPriority() ) );
-                    handler.process( alertValue );
+                    handler.process( environment, alertValue );
                     alertEvent.addLog(
                             String.format( "Main processor of '%s:%s' finished.", handlerId.getAlertHandlerId(),
                                     handlerId.getAlertHandlerPriority() ) );
                     alertEvent.addLog(
                             String.format( "Invoking post-processor of '%s:%s'.", handlerId.getAlertHandlerId(),
                                     handlerId.getAlertHandlerPriority() ) );
-                    handler.postProcess( alertValue );
+                    handler.postProcess( environment, alertValue );
                     alertEvent.addLog(
                             String.format( "Pre-processor of '%s:%s' finished.", handlerId.getAlertHandlerId(),
                                     handlerId.getAlertHandlerPriority() ) );

@@ -88,6 +88,7 @@ public class PeerManagerImpl implements PeerManager
     private ObjectMapper mapper = new ObjectMapper();
     private String externalIpInterface = DEFAULT_EXTERNAL_INTERFACE_NAME;
     private String localPeerId;
+    private String ownerId;
     private RegistrationClient registrationClient;
 
 
@@ -123,17 +124,26 @@ public class PeerManagerImpl implements PeerManager
             this.peerDataService = new PeerDataService( daoManager.getEntityManagerFactory() );
 
             localPeerId = securityManager.getKeyManager().getPeerId();
+            ownerId = securityManager.getKeyManager().getOwnerId();
+            final String localPeerIp = getLocalPeerIp();
 
+            if ( localPeerIp == null || ownerId == null )
+            {
+                throw new PeerException(
+                        String.format( "Could not initialize local peer: ID:%s OWNER_ID:%s IP:%s", localPeerIp, ownerId,
+                                localPeerIp ) );
+            }
             // check local peer instance
             PeerData localPeerData = peerDataService.find( localPeerId );
-            PeerInfo localPeerInfo = new PeerInfo();
+
 
             if ( localPeerData == null )
             {
+                PeerInfo localPeerInfo = new PeerInfo();
                 localPeerInfo.setId( localPeerId );
-                localPeerInfo.setOwnerId( securityManager.getKeyManager().getOwnerId() );
-                localPeerInfo.setIp( getLocalPeerIp() );
-                localPeerInfo.setName( String.format( "Peer %s %s", localPeerId, getLocalPeerIp() ) );
+                localPeerInfo.setOwnerId( ownerId );
+                localPeerInfo.setIp( localPeerIp );
+                localPeerInfo.setName( String.format( "Peer %s %s", localPeerId, localPeerIp ) );
                 PeerPolicy policy = getDefaultPeerPolicy( localPeerId );
 
                 PeerData peerData =
@@ -417,6 +427,7 @@ public class PeerManagerImpl implements PeerManager
         removePeerData( registrationData.getPeerInfo().getId() );
         removePeer( registrationData.getPeerInfo().getId() );
     }
+
 
     @Override
     public List<Peer> getPeers()
@@ -743,6 +754,7 @@ public class PeerManagerImpl implements PeerManager
 
         return r;
     }
+
 
     @Override
     public String getPeerIdByIp( final String ip ) throws PeerException

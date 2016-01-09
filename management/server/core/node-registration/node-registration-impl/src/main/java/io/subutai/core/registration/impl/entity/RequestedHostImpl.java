@@ -41,7 +41,7 @@ public class RequestedHostImpl implements RequestedHost, Serializable
 
     @JoinColumn( name = "net_interfaces" )
     @OneToMany( orphanRemoval = true,
-            targetEntity = HostHostInterface.class,
+            targetEntity = HostInterfaceImpl.class,
             cascade = CascadeType.ALL,
             fetch = FetchType.EAGER )
     private Set<HostInterface> netHostInterfaces = Sets.newHashSet();
@@ -100,9 +100,9 @@ public class RequestedHostImpl implements RequestedHost, Serializable
         Set<HostInterface> netHostInterfaces = requestedHost.getNetHostInterfaces();
         for ( final HostInterface netHostInterface : netHostInterfaces )
         {
-            HostHostInterface hostHostInterface =
-                    new HostHostInterface( netHostInterface );
-            this.netHostInterfaces.add( hostHostInterface );
+            HostInterfaceImpl hostInterfaceImpl =
+                    new HostInterfaceImpl( netHostInterface );
+            this.netHostInterfaces.add( hostInterfaceImpl );
         }
 
         Set<ContainerInfo> hostInfoSet = requestedHost.getHostInfos();
@@ -130,7 +130,7 @@ public class RequestedHostImpl implements RequestedHost, Serializable
 
         for ( final HostInterface anHostInterface : netHostInterfaces )
         {
-            this.netHostInterfaces.add( new HostHostInterface( anHostInterface ) );
+            this.netHostInterfaces.add( new HostInterfaceImpl( anHostInterface ) );
         }
 
         if ( this.arch == null )

@@ -14,6 +14,8 @@ import javax.persistence.Table;
 
 import com.google.common.base.Preconditions;
 
+import io.subutai.common.host.HostInterface;
+
 
 /**
  * Created by talas on 8/25/15.
@@ -21,7 +23,7 @@ import com.google.common.base.Preconditions;
 @Entity
 @Table( name = "node_net_interfaces" )
 @Access( AccessType.FIELD )
-public class HostHostInterface implements io.subutai.common.host.HostInterface, Serializable
+public class HostInterfaceImpl implements HostInterface, Serializable
 {
     @Id
     @GeneratedValue( strategy = GenerationType.IDENTITY )
@@ -37,13 +39,13 @@ public class HostHostInterface implements io.subutai.common.host.HostInterface, 
     private String mac;
 
 
-    public HostHostInterface()
+    public HostInterfaceImpl()
     {
 
     }
 
 
-    public HostHostInterface( final String interfaceName, final String ip, final String mac )
+    public HostInterfaceImpl( final String interfaceName, final String ip, final String mac )
     {
         this.interfaceName = interfaceName;
         this.ip = ip;
@@ -51,7 +53,7 @@ public class HostHostInterface implements io.subutai.common.host.HostInterface, 
     }
 
 
-    public HostHostInterface( final io.subutai.common.host.HostInterface aHostInterface )
+    public HostInterfaceImpl( final io.subutai.common.host.HostInterface aHostInterface )
     {
         Preconditions.checkNotNull( aHostInterface, "Invalid null argument aInterface" );
 
@@ -125,12 +127,12 @@ public class HostHostInterface implements io.subutai.common.host.HostInterface, 
         {
             return true;
         }
-        if ( !( o instanceof HostHostInterface ) )
+        if ( !( o instanceof HostInterfaceImpl ) )
         {
             return false;
         }
 
-        final HostHostInterface that = ( HostHostInterface ) o;
+        final HostInterfaceImpl that = ( HostInterfaceImpl ) o;
 
         return interfaceName.equals( that.interfaceName ) && ip.equals( that.ip ) && mac.equals( that.mac );
     }

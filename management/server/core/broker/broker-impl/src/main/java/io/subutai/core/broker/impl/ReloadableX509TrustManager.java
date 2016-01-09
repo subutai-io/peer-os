@@ -4,7 +4,6 @@ package io.subutai.core.broker.impl;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -16,6 +15,9 @@ import java.security.cert.X509Certificate;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
+
+import io.subutai.common.security.crypto.certificate.CertificateData;
+import io.subutai.common.security.crypto.certificate.CertificateTool;
 
 
 public class ReloadableX509TrustManager implements X509TrustManager
@@ -81,28 +83,35 @@ public class ReloadableX509TrustManager implements X509TrustManager
     @Override
     public X509Certificate[] getAcceptedIssuers()
     {
-        X509Certificate[] issuers = trustManager.getAcceptedIssuers();
-        return issuers;
+        return trustManager.getAcceptedIssuers();
     }
 
 
     public void reloadTrustManager() throws Exception
     {
-
         // load keystore from specified cert store (or default)
         KeyStore ts = KeyStore.getInstance( KeyStore.getDefaultType() );
-        InputStream in = new FileInputStream( trustStorePath );
-        try
+
+        File tsFile = new File( trustStorePath );
+
+        if ( tsFile.exists() )
         {
-            ts.load( in, null );
+            char[] keystorePass = this.tspassword.toCharArray();
+
+            try ( FileInputStream fis = new FileInputStream( tsFile ) )
+            {
+                ts.load( fis, keystorePass );
+            }
         }
-        catch ( Exception e )
+        else
         {
-            e.printStackTrace();
-        }
-        finally
-        {
-            in.close();
+            ts.load( null, null );
+
+            CertificateTool certificateTool = new CertificateTool();
+            //add dummy cert to truststore
+            ts.setCertificateEntry( "dummy", certificateTool.generateSelfSignedCertificate( new CertificateData() ) );
+
+            ts.store( new FileOutputStream( this.trustStorePath ), tspassword.toCharArray() );
         }
 
         // initialize a new TMF with the ts we just loaded
@@ -111,11 +120,11 @@ public class ReloadableX509TrustManager implements X509TrustManager
 
         // acquire X509 trust manager from factory
         TrustManager tms[] = tmf.getTrustManagers();
-        for ( int i = 0; i < tms.length; i++ )
+        for ( final TrustManager tm : tms )
         {
-            if ( tms[i] instanceof X509TrustManager )
+            if ( tm instanceof X509TrustManager )
             {
-                trustManager = ( X509TrustManager ) tms[i];
+                trustManager = ( X509TrustManager ) tm;
                 return;
             }
         }
@@ -127,30 +136,22 @@ public class ReloadableX509TrustManager implements X509TrustManager
     {
 
         // import the cert into file trust store
-        File tsfile = new File( this.trustStorePath );
-        java.io.FileInputStream fis;
-        if ( tsfile.exists() )
+        File tsFile = new File( this.trustStorePath );
+
+        char[] keystorePass = this.tspassword.toCharArray();
+
+        KeyStore ts = KeyStore.getInstance( KeyStore.getDefaultType() );
+
+        if ( tsFile.exists() )
         {
             Files.copy( Paths.get( this.trustStorePath ),
                     Paths.get( String.format( "%s.backup_%d", this.trustStorePath, System.currentTimeMillis() ) ),
                     StandardCopyOption.REPLACE_EXISTING );
-            fis = new FileInputStream( tsfile );
-        }
-        else
-        {
-            throw new Exception( "Truststore " + tsfile.getAbsolutePath() + " does not exist!" );
-        }
 
-        KeyStore ts = KeyStore.getInstance( KeyStore.getDefaultType() );
-
-        char[] keystorePass = this.tspassword.toCharArray();
-        try
-        {
-            ts.load( fis, keystorePass );
-        }
-        finally
-        {
-            fis.close();
+            try ( FileInputStream fis = new FileInputStream( tsFile ) )
+            {
+                ts.load( fis, keystorePass );
+            }
         }
 
         ts.setCertificateEntry( alias, cert );
