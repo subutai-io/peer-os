@@ -7,10 +7,13 @@ import org.junit.Test;
 
 import com.google.common.collect.Sets;
 
+import io.subutai.common.host.HostInterface;
 import io.subutai.common.peer.ContainerHost;
 
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 
 public class CommandsTest
@@ -217,6 +220,8 @@ public class CommandsTest
     public void testGetAddIpHostToEtcHostsCommand() throws Exception
     {
         ContainerHost containerHost = mock( ContainerHost.class );
+        final HostInterface hostInterface = mock(HostInterface.class);
+        when( containerHost.getInterfaceByName( anyString() ) ).thenReturn( hostInterface );
         assertNotNull( commands.getAddIpHostToEtcHostsCommand( DOMAIN, Sets.newHashSet( containerHost ) ) );
     }
 }

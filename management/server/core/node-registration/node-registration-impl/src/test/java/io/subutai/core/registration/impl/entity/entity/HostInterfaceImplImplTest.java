@@ -5,7 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import io.subutai.common.host.HostInterface;
-import io.subutai.core.registration.impl.entity.HostHostInterface;
+import io.subutai.core.registration.impl.entity.HostInterfaceImpl;
 
 import static org.junit.Assert.assertNotEquals;
 import static org.mockito.Mockito.mock;
@@ -15,10 +15,10 @@ import static org.mockito.Mockito.when;
 /**
  * Created by talas on 8/26/15.
  */
-public class HostHostInterfaceImplTest
+public class HostInterfaceImplImplTest
 {
 
-    private HostHostInterface hostInterface;
+    private HostInterfaceImpl hostInterface;
 
     String iname = "iname", ip = "ip", mac = "mac";
 
@@ -30,7 +30,7 @@ public class HostHostInterfaceImplTest
         when( iface.getName() ).thenReturn( iname );
         when( iface.getIp() ).thenReturn( ip );
         when( iface.getMac() ).thenReturn( mac );
-        hostInterface = new HostHostInterface( iface );
+        hostInterface = new HostInterfaceImpl( iface );
     }
 
 
