@@ -16,7 +16,6 @@
   <modules>
     <module>core</module>
     <module>subutai-common</module>
-    <!--<module>subutai-common-datasource</module>-->
     <module>subutai-features</module>
     <module>server-karaf</module>
     <module>webui</module>
