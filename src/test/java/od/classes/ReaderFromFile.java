@@ -1,4 +1,4 @@
-package od.pages;
+package od.classes;
 
 import java.io.*;
 
