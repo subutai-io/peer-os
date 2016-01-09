@@ -132,7 +132,7 @@ public class RepoUrlStore
 
             for ( RepoUrl r : map.values() )
             {
-                fileDb.remove( mapName, r.getUrl().toString() );
+                fileDb.remove( mapName, makeKey( r ) );
             }
         }
     }
