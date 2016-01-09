@@ -7,14 +7,14 @@ import io.subutai.common.host.HostInterface;
 
 
 
-public class HostHostInterfaceJson implements HostInterface
+public class HostInterfaceJson implements HostInterface
 {
     private String interfaceName;
     private String ip;
     private String mac;
 
 
-    public HostHostInterfaceJson( final HostInterface aHostInterface )
+    public HostInterfaceJson( final HostInterface aHostInterface )
     {
         Preconditions.checkNotNull( aHostInterface, "Invalid null argument aInterface" );
         this.interfaceName = aHostInterface.getName();
@@ -50,12 +50,12 @@ public class HostHostInterfaceJson implements HostInterface
         {
             return true;
         }
-        if ( !( o instanceof HostHostInterfaceJson ) )
+        if ( !( o instanceof HostInterfaceJson ) )
         {
             return false;
         }
 
-        final HostHostInterfaceJson that = ( HostHostInterfaceJson ) o;
+        final HostInterfaceJson that = ( HostInterfaceJson ) o;
 
         return interfaceName.equals( that.interfaceName ) && ip.equals( that.ip ) && mac.equals( that.mac );
     }

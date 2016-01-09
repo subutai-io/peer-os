@@ -267,7 +267,7 @@ public class Commands
 
         for ( ContainerHost host : containerHosts )
         {
-            String ip = host.getIpByInterfaceName( Common.DEFAULT_CONTAINER_INTERFACE );
+            String ip = host.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp();
             String hostname = host.getHostname();
             cleanHosts.append( ip ).append( "|" ).append( hostname ).append( "|" );
             appendHosts.append( "/bin/echo '" ).

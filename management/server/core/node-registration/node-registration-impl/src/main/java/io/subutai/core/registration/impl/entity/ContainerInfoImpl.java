@@ -61,7 +61,7 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable
 
     @JoinColumn( name = "net_interfaces" )
     @OneToMany( orphanRemoval = true,
-            targetEntity = HostHostInterface.class,
+            targetEntity = HostInterfaceImpl.class,
             cascade = CascadeType.ALL,
             fetch = FetchType.EAGER )
     private Set<HostInterface> netHostInterfaces = new HashSet<>();
@@ -105,7 +105,7 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable
         }
         for ( HostInterface anHostInterface : hostInfo.getHostInterfaces().getAll() )
         {
-            this.netHostInterfaces.add( new HostHostInterface( anHostInterface ) );
+            this.netHostInterfaces.add( new HostInterfaceImpl( anHostInterface ) );
         }
     }
 
