@@ -1,7 +1,0 @@
-*.log
-*.substvars
-files
-subutai-cli-debian-build
-debian/subutai-cli
-
-terminal.glue

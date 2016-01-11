@@ -1,6 +1,0 @@
-#!/bin/bash
-#TODO
-if [ -n "`zfs list -t snapshot | grep lxc/$LXC_NAME@template`" ]; then
-  exit 1
-fi
-

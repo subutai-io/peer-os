@@ -1,9 +1,0 @@
-/Debug
-/src/Makefile
-/src/agent
-/bin/*
-Makefile
-
-agent/SubutaiAgent/Debug/*
-agent/SubutaiAgent/Release/*
-
