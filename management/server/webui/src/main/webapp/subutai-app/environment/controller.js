@@ -4,14 +4,20 @@ angular.module('subutai.environment.controller', [])
 	.controller('EnvironmentViewCtrl', EnvironmentViewCtrl)
 	.directive('fileModel', fileModel);
 
-EnvironmentViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'SweetAlert', 'DTOptionsBuilder', 'DTColumnBuilder', '$resource', '$compile', 'ngDialog', '$timeout'];
+EnvironmentViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'SweetAlert', 'DTOptionsBuilder', 'DTColumnBuilder', '$resource', '$compile', 'ngDialog', '$timeout', 'cfpLoadingBar'];
 fileModel.$inject = ['$parse'];
 
 var fileUploder = {};
 
-function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert, DTOptionsBuilder, DTColumnBuilder, $resource, $compile, ngDialog, $timeout) {
+function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert, DTOptionsBuilder, DTColumnBuilder, $resource, $compile, ngDialog, $timeout, cfpLoadingBar) {
 
 	var vm = this;
+
+	cfpLoadingBar.start();
+	angular.element(document).ready(function () {
+		cfpLoadingBar.complete();
+	});
+
 	vm.environments = [];
 	vm.domainStrategies = [];
 	vm.sshKeyForEnvironment = '';
@@ -60,7 +66,9 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 	var refreshTable;
 	var reloadTableData = function() {
 		refreshTable = $timeout(function myFunction() {
-			vm.dtInstance.reloadData(null, false);
+			if(typeof(vm.dtInstance.reloadData) == 'function') {
+				vm.dtInstance.reloadData(null, false);
+			}
 			refreshTable = $timeout(reloadTableData, 30000);
 		}, 30000);
 	};
@@ -194,7 +202,15 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 			},
 			function (isConfirm) {
 				if (isConfirm) {
-					SweetAlert.swal("Delete!", "Your environment is being deleted!", "success");
+					SweetAlert.swal(
+							{
+								title : 'Delete!',
+								text : 'Your environment is being deleted!!',
+								timer: VARS_TOOLTIP_TIMEOUT,
+								showConfirmButton: false
+							}
+					);
+
 					environmentService.destroyEnvironment(environmentId).success(function (data) {
 						SweetAlert.swal("Destroyed!", "Your environment has been destroyed.", "success");
 						vm.dtInstance.reloadData(null, false);

@@ -5,19 +5,25 @@ angular.module('subutai.tracker.controller', [])
 	.controller('TrackerPopupCtrl', TrackerPopupCtrl);
 
 
-TrackerCtrl.$inject = ['trackerSrv', '$scope', '$rootScope', 'DTOptionsBuilder', 'DTColumnBuilder', '$resource', '$compile', 'ngDialog', '$timeout'];
+TrackerCtrl.$inject = ['trackerSrv', '$scope', '$rootScope', 'DTOptionsBuilder', 'DTColumnBuilder', '$resource', '$compile', 'ngDialog', '$timeout', 'cfpLoadingBar'];
 TrackerPopupCtrl.$inject = ['trackerSrv', '$scope', '$sce'];
 
 
-function TrackerCtrl(trackerSrv, $scope, $rootScope, DTOptionsBuilder, DTColumnBuilder, $resource, $compile, ngDialog, $timeout) {
+function TrackerCtrl(trackerSrv, $scope, $rootScope, DTOptionsBuilder, DTColumnBuilder, $resource, $compile, ngDialog, $timeout, cfpLoadingBar) {
 
 	var vm = this;
+
+	cfpLoadingBar.start();
+	angular.element(document).ready(function () {
+		cfpLoadingBar.complete();
+	});
+
 	vm.loadOperations = loadOperations;
 	vm.viewLogs = viewLogs;
 
-	vm.selectedModule = 'ENVIRONMENT_MANAGER';
-	vm.startDate = new Date("2015-01-01");
-	vm.endDate = new Date("2015-12-31");
+	vm.selectedModule = 'ENVIRONMENT MANAGER';
+	vm.startDate = new Date(new Date().getFullYear(), 0, 1);;
+	vm.endDate = new Date(new Date().getFullYear(), 11, 1);;
 
 	trackerSrv.getModules().success(function (data) {
 		vm.modules = data;
@@ -47,7 +53,9 @@ function TrackerCtrl(trackerSrv, $scope, $rootScope, DTOptionsBuilder, DTColumnB
 	var refreshTable;
 	var reloadTableData = function() {
 		refreshTable = $timeout(function myFunction() {
-			vm.dtInstance.reloadData(null, false);
+			if(typeof(vm.dtInstance.reloadData) == 'function') {
+				vm.dtInstance.reloadData(null, false);
+			}
 			refreshTable = $timeout(reloadTableData, 30000);
 		}, 30000);
 	};
@@ -72,7 +80,10 @@ function TrackerCtrl(trackerSrv, $scope, $rootScope, DTOptionsBuilder, DTColumnB
 	}
 
 	function loadOperations() {
-		vm.dtInstance.reloadData(null, false);
+		var logsDates = getDateInStringFormat();
+		if(logsDates) {
+			vm.dtInstance.reloadData(null, false);
+		}
 	}
 
 	function viewLogs(id) {
@@ -86,8 +97,8 @@ function TrackerCtrl(trackerSrv, $scope, $rootScope, DTOptionsBuilder, DTColumnB
 
 	function getDateInStringFormat() {
 		var result = {};
-		if(vm.startDate === null) return;
-		if(vm.endDate === null) return;
+		if(vm.startDate === null || isNaN(Date.parse(vm.startDate))) return;
+		if(vm.endDate === null || isNaN(Date.parse(vm.endDate))) return;
 
 		result.startDateString = vm.startDate.getFullYear() + '-' 
 			+ vm.startDate.getMonthFormatted() + '-' 

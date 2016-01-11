@@ -4,12 +4,18 @@ angular.module('subutai.tokens.controller', [])
 	.controller('TokensCtrl', TokensCtrl);
 
 
-TokensCtrl.$inject = ['identitySrv', '$scope', 'DTOptionsBuilder', 'DTColumnBuilder', '$resource', '$compile', 'ngDialog', 'SweetAlert'];
+TokensCtrl.$inject = ['identitySrv', '$scope', 'DTOptionsBuilder', 'DTColumnBuilder', '$resource', '$compile', 'ngDialog', 'SweetAlert', 'cfpLoadingBar'];
 
 
-function TokensCtrl(identitySrv, $scope, DTOptionsBuilder, DTColumnBuilder, $resource, $compile, ngDialog, SweetAlert) {
+function TokensCtrl(identitySrv, $scope, DTOptionsBuilder, DTColumnBuilder, $resource, $compile, ngDialog, SweetAlert, cfpLoadingBar) {
 
 	var vm = this;
+
+	cfpLoadingBar.start();
+	angular.element(document).ready(function () {
+		cfpLoadingBar.complete();
+	});
+
 	vm.tokens = {};
 	vm.users = [];
 	vm.newToken = {};
