@@ -1,4 +1,0 @@
-if [ -f "/etc/init.d/subutai-agent" ];then
-	sudo /etc/init.d/subutai-agent stop
-fi
-

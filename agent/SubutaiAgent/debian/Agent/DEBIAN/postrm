@@ -1,5 +1,0 @@
-sudo rm /etc/init.d/subutai-agent
-sudo rm -rf /var/log/subutai-agent
-sudo rm -rf /etc/subuta-agent/
-sudo mkdir /etc/subutai-agent/
-sudo mkdir /var/log/subutai-agent
