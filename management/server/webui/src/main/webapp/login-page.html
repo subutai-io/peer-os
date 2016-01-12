@@ -1,47 +1,70 @@
 <!DOCTYPE html>
-<html lang="en">
+<html ng-app="subutai.login">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+<meta charset="UTF-8">
+<title>Title</title>
 
-    <!--CSS-->
-    <link rel="stylesheet" href="css/style.css"/>
+<!--CSS-->
+<link rel="stylesheet" href="css/style.css"/>
 </head>
 <body class="b-body">
 <div class="b-login">
-    <div class="b-login__form b-login__form_center">
-        <div class="b-login-form-header">
-            <a href="#"><img src="assets/elements/logo.svg" height="27px" alt=""></a>
-        </div>
-        <div class="b-workspace b-workspace_login">
+	<div class="b-login__form b-login__form_center">
+		<div class="b-login-form-header">
+			<a href="#"><img src="assets/elements/logo.svg" height="27px" alt=""></a>
+		</div>
+		<div class="b-workspace b-workspace_login">
 
-            <div class="b-workspace__header">
-                <h1 class="b-title">Log in</h1>
-            </div>
+			<div class="b-workspace__header">
+				<h1 class="b-title">Log in</h1>
+			</div>
 
-            <div class="b-workspace__content">
-                <div class="b-form">
-                    <div class="b-form__wrapper b-form__wrapper_margin-bottom">
-                        <label class="b-form-label">Username</label>
-                        <input class="b-form-input b-form-input_full" type="text">
-                    </div>
-                    <div class="b-form__wrapper b-form__wrapper_margin-bottom">
-                        <label class="b-form-label">Password</label>
-                        <input class="b-form-input b-form-input_full" type="password">
-                    </div>
-                    <div class="b-form__wrapper b-form__wrapper_margin-bottom">
-                        <input type="checkbox" class="b-form-label_margin_r">
-                        <label class="b-form-label">Keep me logged in</label>
-                    </div>
-                    <div class="b-login-form-btn">
-                    <a href="#" class="b-btn b-btn_green">Login</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+			<div class="b-workspace__content" ng-controller="LoginCtrl as loginCtrl">
+				<div class="b-form">
+					<form ng-submit="loginCtrl.login()">
+						<div class="b-form__wrapper b-form__wrapper_margin-bottom">
+							<label class="b-form-label">Username</label>
+							<input
+								class="b-form-input b-form-input_full"
+								id="subt-input__login"
+								ng-model="loginCtrl.name"
+								type="text">
+						</div>
+						<div class="b-form__wrapper b-form__wrapper_margin-bottom">
+							<label class="b-form-label">Password</label>
+							<input
+								class="b-form-input b-form-input_full"
+								id="subt-input__password"
+								ng-model="loginCtrl.pass"
+								type="password">
+						</div>
+						<div class="b-form__wrapper b-form__wrapper_margin-bottom">
+							<input type="checkbox" class="b-form-label_margin_r">
+							<label class="b-form-label">Keep me logged in</label>
+						</div>
+						<div class="b-login-form-btn">
+							<button type="submit" class="b-btn b-btn_green" id="subt-button__login">
+								Login
+							</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 
-</div>
+<!-- BASE -->
+<script src="assets/js/jquery/jquery-2.1.1.min.js"></script>
+
+<!-- Angular deps -->
+<script src="assets/js/angular/angular.min.js"></script>
+<script src="assets/js/ui-router/angular-ui-router.min.js"></script>
+
+<script src="subutai-app/login/login.js"></script>
+<script src="subutai-app/login/controller.js"></script>
+<script src="subutai-app/login/service.js"></script>
+<!-- ENDBASE -->
+
 </body>
 </html>

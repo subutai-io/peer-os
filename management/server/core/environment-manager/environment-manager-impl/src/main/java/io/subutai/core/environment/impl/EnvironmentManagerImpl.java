@@ -534,10 +534,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             environmentCreationWorkflow.join();
 
-            if ( environmentCreationWorkflow.getError() != null )
+            if ( environmentCreationWorkflow.isFailed() )
             {
                 throw new EnvironmentCreationException(
-                        exceptionUtil.getRootCause( environmentCreationWorkflow.getError() ) );
+                        exceptionUtil.getRootCause( environmentCreationWorkflow.getFailedException() ) );
             }
         }
 
@@ -625,10 +625,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             environmentCreationWorkflow.join();
 
-            if ( environmentCreationWorkflow.getError() != null )
+            if ( environmentCreationWorkflow.isFailed() )
             {
                 throw new EnvironmentCreationException(
-                        exceptionUtil.getRootCause( environmentCreationWorkflow.getError() ) );
+                        exceptionUtil.getRootCause( environmentCreationWorkflow.getFailedException() ) );
             }
         }
 

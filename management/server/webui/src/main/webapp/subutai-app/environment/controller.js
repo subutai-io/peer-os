@@ -4,18 +4,19 @@ angular.module('subutai.environment.controller', [])
 	.controller('EnvironmentViewCtrl', EnvironmentViewCtrl)
 	.directive('fileModel', fileModel);
 
-EnvironmentViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'SweetAlert', 'DTOptionsBuilder', 'DTColumnBuilder', '$resource', '$compile', 'ngDialog', '$timeout'];
+EnvironmentViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'SweetAlert', 'DTOptionsBuilder', 'DTColumnBuilder', '$resource', '$compile', 'ngDialog', '$timeout', 'cfpLoadingBar'];
 fileModel.$inject = ['$parse'];
 
 var fileUploder = {};
 
-function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert, DTOptionsBuilder, DTColumnBuilder, $resource, $compile, ngDialog, $timeout) {
+function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert, DTOptionsBuilder, DTColumnBuilder, $resource, $compile, ngDialog, $timeout, cfpLoadingBar) {
 
 	var vm = this;
 
-	vm.currentEnvironment = {};
-	vm.signedMessage = "";
-	vm.buildEnvironment = buildEnvironment;
+	cfpLoadingBar.start();
+	angular.element(document).ready(function () {
+		cfpLoadingBar.complete();
+	});
 
 	vm.environments = [];
 	vm.domainStrategies = [];
@@ -25,7 +26,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 
 	// functions
 	vm.destroyEnvironment = destroyEnvironment;
-	vm.startEnvironmentBuild = startEnvironmentBuild;
 	vm.sshKey = sshKey;
 	vm.addSshKey = addSshKey;
 	vm.removeSshKey = removeSshKey;
@@ -59,145 +59,16 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 		DTColumnBuilder.newColumn(null).withTitle('Environment name').renderWith(environmentNameTooltip),
 		DTColumnBuilder.newColumn(null).withTitle('SSH Key').renderWith(sshKeyLinks),
 		DTColumnBuilder.newColumn(null).withTitle('Domains').renderWith(domainsTag),
-		DTColumnBuilder.newColumn(null).withTitle('Share').notSortable().renderWith(actionShare),
-		DTColumnBuilder.newColumn(null).withTitle('Containers').renderWith(containersTags),
-		DTColumnBuilder.newColumn(null).withTitle('Actions').notSortable().renderWith(actionStartEnvironmentBuild),
-		//DTColumnBuilder.newColumn(null).withTitle('Revoke').notSortable().renderWith(actionSwitch),
+		DTColumnBuilder.newColumn(null).withTitle('').renderWith(containersTags),
 		DTColumnBuilder.newColumn(null).withTitle('').notSortable().renderWith(actionDelete)
 	];
-
-	vm.listOfUsers = [];
-	vm.shareEnvironmentWindow = shareEnvironmentWindow;
-	vm.toggleSelection = toggleSelection;
-	vm.shareEnvironment = shareEnvironment;
-	vm.users2Add = [];
-	vm.addUser2Stack = addUser2Stack;
-	vm.removeUserFromStack = removeUserFromStack;
-	function addUser2Stack(user) {
-		vm.users2Add.push(angular.copy(user));
-		for (var i = 0; i < vm.listOfUsers.length; ++i) {
-			if (vm.listOfUsers[i].fullName === user.fullName) {
-				vm.listOfUsers.splice (i, 1);
-				break;
-			}
-		}
-	}
-
-
-	function removeUserFromStack(key) {
-		vm.listOfUsers.push (vm.users2Add[key]);
-		vm.users2Add.splice(key, 1);
-	}
-
-
-
-
-	function actionShare (data, type, full, meta) {
-		return '<a href="" class="b-btn b-btn_blue g-left" ng-click="environmentViewCtrl.shareEnvironmentWindow(\'' + data.id + '\')" ng-show = "' + (data.status === "HEALTHY") + '">Share</a>';
-	}
-
-
-
-
-	vm.currentUser = {};
-	environmentService.getCurrentUser().success (function (data) {
-		vm.currentUser = data;
-	});
-	function shareEnvironmentWindow (environmentId) {
-		vm.listOfUsers = [];
-		vm.checkedUsers = [];
-		environmentService.getUsers().success (function (data) {
-			for (var i = 0; i < data.length; ++i) {
-				if (data[i].id !== vm.currentUser.id) {
-					vm.listOfUsers.push (data[i]);
-				}
-			}
-			for (var i = 0; i < vm.listOfUsers.length; ++i) {
-				vm.listOfUsers[i].read = true;
-				vm.listOfUsers[i].write = true;
-				vm.listOfUsers[i].update = true;
-				vm.listOfUsers[i].delete = true;
-			}
-			environmentService.getShared (environmentId).success (function (data2) {
-				console.log (data2);
-				vm.users2Add = data2;
-				for (var i = 0; i < vm.users2Add.length; ++i) {
-					if (vm.users2Add[i].id === vm.currentUser.id) {
-						vm.users2Add.splice (i, 1);
-						--i;
-						continue;
-					}
-					for (var j = 0; j < vm.listOfUsers.length; ++j) {
-						if (vm.listOfUsers[j].id === vm.users2Add[i].id) {
-							vm.users2Add[i].fullName = vm.listOfUsers[j].fullName;
-							vm.listOfUsers.splice (j, 1);
-							break;
-						}
-					}
-				}
-				vm.currentEnvironment = vm.users[environmentId];
-				ngDialog.open ({
-					template: "subutai-app/environment/partials/shareEnv.html",
-					scope: $scope
-				});
-			});
-		});
-	}
-
-	function toggleSelection (user) {
-		for (var i = 0; i < vm.checkedUsers.length; ++i) {
-			if (vm.checkedUsers[i].id === user.id) {
-				vm.checkedUsers.splice (i, 1);
-				return;
-			}
-		}
-		vm.checkedUsers.push (user);
-	}
-
-	function shareEnvironment() {
-		var arr = [];
-		for (var i = 0; i < vm.users2Add.length; ++i) {
-			arr.push ({
-				id: vm.users2Add[i].id,
-				read: vm.users2Add[i].read,
-				write: vm.users2Add[i].write,
-				update: vm.users2Add[i].update,
-				delete: vm.users2Add[i].delete
-			});
-		}
-		environmentService.share (JSON.stringify (arr), vm.currentEnvironment.id).success(function (data) {
-			SweetAlert.swal("Success!", "Your environment was successfully shared.", "success");
-			vm.dtInstance.reloadData(null, false);
-			ngDialog.closeAll();
-		}).error(function (data) {
-			SweetAlert.swal("ERROR!", "Your container is safe :). Error: " + data.ERROR, "error");
-		});
-	}
-
-
-	function actionSwitch (data, type, full, meta) {
-/*		return '<input type = "checkbox" class = "check" ng-click="environmentViewCtrl.revoke(\''+data.id+'\') ng-checked =\'' + data.revoked + '\'>';*/
-		console.log (data);
-		if (typeof (data.revoke) === "boolean") {
-			return '<div class = "toggle"><input type = "checkbox" class="check" ng-click="environmentViewCtrl.revoke(\'' + data.id + '\')" ng-checked=\'' + data.revoke + '\'><div class = "toggle-bg"></div><b class = "b switch"></b></div>'
-		}
-		else {
-			return "";
-		}
-	}
-
-	vm.revoke = revoke;
-
-	function revoke (environmentId) {
-		environmentService.revoke (environmentId).success (function (data) {
-			vm.dtInstance.reloadData(null, false);
-		});
-	}
 
 	var refreshTable;
 	var reloadTableData = function() {
 		refreshTable = $timeout(function myFunction() {
-			vm.dtInstance.reloadData(null, false);
+			if(typeof(vm.dtInstance.reloadData) == 'function') {
+				vm.dtInstance.reloadData(null, false);
+			}
 			refreshTable = $timeout(reloadTableData, 30000);
 		}, 30000);
 	};
@@ -213,12 +84,12 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 	}
 
 	function statusHTML(environmentStatus, type, full, meta) {
-		return '<div class="b-status-icon b-status-icon_' + environmentStatus + '" tooltips tooltip-title="' + environmentStatus + '"></div>';
+		return '<div class="b-status-icon b-status-icon_' + environmentStatus + '" tooltips tooltip-template="' + environmentStatus + '"></div>';
 	}
 
 	function environmentNameTooltip(data, type, full, meta) {
 		vm.users[data.id] = data;
-		return '<span tooltips tooltip-content="ID: <b>' + data.id + '</b>">' + data.name + '</span>';
+		return "<span tooltips tooltip-template='<span class=\"b-nowrap\">ID: <b>" + data.id + "</b></span>'>" + data.name + "</span>";
 	}
 
 	function sshKeyLinks(data, type, full, meta) {
@@ -230,10 +101,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 	function domainsTag(data, type, full, meta) {
 		return '<button class="b-btn b-btn_grey" ng-click="environmentViewCtrl.showDomainForm(\'' + data.id + '\')">Configure</button>';
 		//return '<span class="b-tags b-tags_grey" ng-click="environmentViewCtrl.removeDomain(\'' + data.id + '\')">Add <i class="fa fa-plus"></i></span>';
-	}
-
-	function actionStartEnvironmentBuild(data, type, full, meta) {
-		return '<a href="" class="b-icon b-icon_build" ng-click="environmentViewCtrl.startEnvironmentBuild(\'' + data.id + '\')"></a>';
 	}
 
 	function containersTags(data, type, full, meta) {
@@ -263,31 +130,20 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 			for (var type in containersTotal[template]){
 				if(containersTotal[template][type] > 0) {
 					if(type != 'INACTIVE') {
-						var tooltipContent = 'Quota: <div class="b-quota-type-round b-quota-type-round_' + quotaColors[type] + '"></div> <b>' + type + '</b><br>State: <b>RUNNING</b>';
+						var tooltipContent = '<div class="b-nowrap">Quota: <div class="b-quota-type-round b-quota-type-round_' + quotaColors[type] + '"></div> <b>' + type + '</b></div><span class="b-nowrap">State: <b>RUNNING</b></span>';
 					} else {
 						var tooltipContent = 'State: <b>INACTIVE</b>';
 					}
-					containersHTML += '<a ui-sref="containers({environmentId:\'' + data.id + '\'})" '
-						+ ' class="b-tags b-tags_' + quotaColors[type] + '" '
-						+ 'tooltips tooltip-content=\'' + tooltipContent + '\' tooltip-hide-trigger="mouseleave click" '
-						+ '>'
-						+ template + ': ' + containersTotal[template][type]
+					containersHTML += '<a ui-sref="containers({environmentId:\'' + data.id + '\'})" ' 
+						+ ' class="b-tags b-tags_' + quotaColors[type] + '" ' 
+						+ 'tooltips tooltip-template=\'' + tooltipContent + '\''
+						+ '>' 
+						+ template + ': ' + containersTotal[template][type] 
 					+ '</a>';
 				}
 			}
 		}
 
-		/*var containersHTML = '';
-		for(var i = 0; i < data.containers.length; i++) {
-			var tooltipContent = 'IP: <b>' + data.containers[i].ip + '</b><br> Quota: <div class="b-quota-type-round b-quota-type-round_' + quotaColors[data.containers[i].type] + '"></div> <b>' + data.containers[i].type + '</b><br>State: <b>' + data.containers[i].state + '</b>';
-			containersHTML += '<span '
-				+ ' class="b-tags b-tags_' + quotaColors[data.containers[i].type] + '" '
-				+ 'tooltips tooltip-content=\'' + tooltipContent + '\' '
-				+ '>'
-				+ '<a ui-sref="containers({environmentId:\'' + data.id + '\'})">' + data.containers[i].templateName + '</a>'
-				+ ' <a href ng-click="environmentViewCtrl.destroyContainer(\'' + data.containers[i].id + '\')"><i class="fa fa-times"></i></a>'
-			+ '</span>';
-		}*/
 		return containersHTML;
 	}
 
@@ -320,25 +176,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 		});
 	}
 
-    function startEnvironmentBuild(environmentId) {
-    	vm.currentEnvironment = vm.users[environmentId];
-		ngDialog.open ({
-			template: "subutai-app/environment/partials/decryptMsg.html",
-			scope: $scope
-		});
-    }
-
-	function buildEnvironment() {
-		environmentService.startEnvironmentBuild (vm.currentEnvironment.id, encodeURIComponent(vm.currentEnvironment.relationDeclaration)).success(function (data) {
-			SweetAlert.swal("Success!", "Your environment has started building.", "success");
-			vm.dtInstance.reloadData(null, false);
-			ngDialog.closeAll();
-		}).error(function (data) {
-			SweetAlert.swal("ERROR!", "Environment build error. Error: " + data.ERROR, "error");
-		});
-	}
-
-
 	function destroyEnvironment(environmentId) {
 		SweetAlert.swal({
 				title: "Are you sure?",
@@ -354,7 +191,15 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 			},
 			function (isConfirm) {
 				if (isConfirm) {
-					SweetAlert.swal("Delete!", "Your environment is being deleted!", "success");
+					SweetAlert.swal(
+							{
+								title : 'Delete!',
+								text : 'Your environment is being deleted!!',
+								timer: VARS_TOOLTIP_TIMEOUT,
+								showConfirmButton: false
+							}
+					);
+
 					environmentService.destroyEnvironment(environmentId).success(function (data) {
 						SweetAlert.swal("Destroyed!", "Your environment has been destroyed.", "success");
 						vm.dtInstance.reloadData(null, false);
@@ -406,7 +251,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 				});
 			}
 		});
-	}
+	}	
 
 	function getContainers() {
 		var environment = vm.environments[vm.environmentQuota];
@@ -472,7 +317,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 				});
 			}
 		});
-	}
+	}	
 
 	function setSSHKey(sshKey) {
 		console.log(sshKey);
@@ -485,6 +330,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 			ngDialog.closeAll();
 		});
 	}
+
 }
 
 function fileModel($parse) {
@@ -504,3 +350,4 @@ function fileModel($parse) {
 		}
 	};
 }
+

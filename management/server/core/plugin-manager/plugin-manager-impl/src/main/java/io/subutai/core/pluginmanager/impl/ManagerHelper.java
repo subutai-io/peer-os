@@ -12,8 +12,8 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
-import io.subutai.common.peer.ManagementHost;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.StringUtil;
 import io.subutai.core.peer.api.PeerManager;
@@ -25,8 +25,8 @@ public class ManagerHelper
 {
     private final PeerManager peerManager;
     private CommandUtil commandUtil;
-    private static final String INFO_JSON =
-            "[" + "{" + "\"type\":\"plugin\", \"pluginName\":\"lucene\", \"version\":\"2.0.5\", \"rating\":\"5\" }, " +
+    private static final String INFO_JSON = String.format(
+            "[{\"type\":\"plugin\", \"pluginName\":\"lucene\", \"version\":\"2.0.5\", \"rating\":\"5\" }, " +
                     "{\"type\":\"plugin\", \"pluginName\":\"hipi\", \"version\":\"2.0.4\", \"rating\":\"6\" }," +
                     " {\"type\":\"plugin\", \"pluginName\":\"hadoop\", \"version\":\"2.0.4\", \"rating\":\"6\" }," +
                     "{\"type\":\"plugin\", \"pluginName\":\"presto\", \"version\":\"2.1.1\", \"rating\":\"8\" }," +
@@ -44,7 +44,7 @@ public class ManagerHelper
                     "{\"type\":\"plugin\", \"pluginName\":\"hbase\", \"version\":\"2.0.4\", \"rating\":\"9\" }," +
                     "{\"type\":\"plugin\", \"pluginName\":\"hive\", \"version\":\"2.0.4\", \"rating\":\"9\" }," +
                     "{\"type\":\"plugin\", \"pluginName\":\"lucene\", \"version\":\"2.0.4\", \"rating\":\"9\" }," +
-                    "{\"type\":\"plugin\", \"pluginName\":\"mahout\", \"version\":\"2.0.4\", \"rating\":\"9\" }]";
+                    "{\"type\":\"plugin\", \"pluginName\":\"mahout\", \"version\":\"2.0.4\", \"rating\":\"9\" }]" );
 
 
     public ManagerHelper( PeerManager peerManager )
@@ -54,7 +54,7 @@ public class ManagerHelper
     }
 
 
-    protected ManagementHost getManagementHost() throws PluginManagerException
+    protected Host getManagementHost() throws PluginManagerException
     {
         try
         {
@@ -165,9 +165,9 @@ public class ManagerHelper
 
     protected Set<PluginInfo> parseJson()
     {
-        return JsonUtil.fromJson( INFO_JSON, new TypeToken<Set<PluginInfoImpl>>()
-        {
-        }.getType() );
+        Set<PluginInfo> plugins = JsonUtil.fromJson( INFO_JSON, new TypeToken<Set<PluginInfoImpl>>()
+        {}.getType() );
+        return plugins;
     }
 
 

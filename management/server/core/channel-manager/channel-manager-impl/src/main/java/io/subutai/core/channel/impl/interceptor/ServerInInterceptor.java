@@ -3,14 +3,9 @@ package io.subutai.core.channel.impl.interceptor;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.charset.Charset;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.HttpHeaders;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.message.Message;
@@ -20,7 +15,6 @@ import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.settings.ChannelSettings;
-import io.subutai.common.settings.Common;
 import io.subutai.core.channel.impl.ChannelManagerImpl;
 import io.subutai.core.channel.impl.util.InterceptorState;
 import io.subutai.core.channel.impl.util.MessageContentUtil;
@@ -32,7 +26,7 @@ import io.subutai.core.peer.api.PeerManager;
  */
 public class ServerInInterceptor extends AbstractPhaseInterceptor<Message>
 {
-    private static final Logger LOG = LoggerFactory.getLogger( ServerInInterceptor.class );
+//    private static final Logger LOG = LoggerFactory.getLogger( ServerInInterceptor.class );
     private ChannelManagerImpl channelManagerImpl = null;
     private PeerManager peerManager;
 
@@ -69,19 +63,19 @@ public class ServerInInterceptor extends AbstractPhaseInterceptor<Message>
                 {
                     HttpHeaders headers = new HttpHeadersImpl( message.getExchange().getInMessage() );
                     //String spHeader = headers.getHeaderString( Common.HEADER_SPECIAL );
-                    LOG.info( " *** URL:" + url.getPath() );
+//                    LOG.info( " *** URL:" + url.getPath() );
                     HttpServletRequest request = ( HttpServletRequest ) message.getExchange().getInMessage()
                                                                                .get( AbstractHTTPDestination
                                                                                        .HTTP_REQUEST );
                     String remoteAddress = request.getRemoteAddr();
-                    LOG.debug( "Remote address: " + remoteAddress );
+//                    LOG.debug( "Remote address: " + remoteAddress );
 
                     String path = url.getPath();
 
                     if ( path.startsWith( "/rest/v1/peer" ) )
                     {
                         handlePeerMessage( remoteAddress, message );
-                        LOG.debug( "Path handled by peer crypto handler: " + path );
+//                        LOG.debug( "Path handled by peer crypto handler: " + path );
                     }
                     else
                     {
@@ -91,11 +85,11 @@ public class ServerInInterceptor extends AbstractPhaseInterceptor<Message>
                             String s = path.substring( prefix.length() + 1 );
                             String environmentId = s.substring( 0, s.indexOf( "/" ) );
                             handleEnvironmentMessage( remoteAddress, environmentId, message );
-                            LOG.debug( "Path handled by environment crypto handler: " + path );
+//                            LOG.debug( "Path handled by environment crypto handler: " + path );
                         }
                         else
                         {
-                            LOG.warn( "Path is not handled by crypto handler: " + path );
+//                            LOG.warn( "Path is not handled by crypto handler: " + path );
                         }
                     }
                 }
@@ -109,7 +103,7 @@ public class ServerInInterceptor extends AbstractPhaseInterceptor<Message>
 
 
         {
-            LOG.debug( "MalformedURLException", ignore.toString() );
+//            LOG.debug( "MalformedURLException", ignore.toString() );
         }
     }
 
@@ -124,7 +118,7 @@ public class ServerInInterceptor extends AbstractPhaseInterceptor<Message>
         }
         catch ( PeerException e )
         {
-            LOG.warn( e.getMessage() );
+//            LOG.warn( e.getMessage() );
         }
     }
 
@@ -140,7 +134,7 @@ public class ServerInInterceptor extends AbstractPhaseInterceptor<Message>
         }
         catch ( PeerException e )
         {
-            LOG.warn( e.getMessage() );
+//            LOG.warn( e.getMessage() );
         }
     }
     //******************************************************************

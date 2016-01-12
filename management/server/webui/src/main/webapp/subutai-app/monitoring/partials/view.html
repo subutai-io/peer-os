@@ -10,10 +10,10 @@
 
 			<div class="b-console-selects">
 
-				<div class="b-console-selects__item b-main-form__wrapper" 
+				<div class="b-console-selects__item b-main-form__wrapper"
 					ng-show="monitoringCtrl.containers.length > 0">
-					<select class="b-popup-body-input" 
-						ng-model="monitoringCtrl.currentHost" 
+					<select class="b-popup-body-input"
+						ng-model="monitoringCtrl.currentHost"
 						ng-change="monitoringCtrl.getServerData()">
 						<option value="">Select container</option>
 						<option ng-repeat="container in monitoringCtrl.containers" value="{{ container.id }}">
@@ -23,10 +23,10 @@
 					<div class="clear"></div>
 				</div>
 
-				<div class="b-console-selects__item b-main-form__wrapper" 
+				<div class="b-console-selects__item b-main-form__wrapper"
 					ng-show="monitoringCtrl.currentType == 'environments'">
-					<select class="b-popup-body-input" 
-						ng-model="monitoringCtrl.selectedEnvironment" 
+					<select class="b-popup-body-input"
+						ng-model="monitoringCtrl.selectedEnvironment"
 						ng-change="monitoringCtrl.showContainers(monitoringCtrl.selectedEnvironment)">
 						<option value="">Select environment</option>
 						<option ng-repeat="environment in monitoringCtrl.environments" value="{{ environment.id }}">
@@ -36,10 +36,10 @@
 					<div class="clear"></div>
 				</div>
 
-				<div class="b-console-selects__item b-main-form__wrapper" 
+				<div class="b-console-selects__item b-main-form__wrapper"
 					ng-show="monitoringCtrl.currentType == 'peer'">
-					<select class="b-popup-body-input" 
-						ng-model="monitoringCtrl.currentHost" 
+					<select class="b-popup-body-input"
+						ng-model="monitoringCtrl.currentHost"
 						ng-change="monitoringCtrl.getServerData()">
 						<option ng-repeat="host in monitoringCtrl.hosts" value="{{ host.id }}">
 							{{ host.hostname }} ({{ host.instance }}, {{ host.arch }})
@@ -52,13 +52,13 @@
 
 			<div class="b-toggle-buttons">
 				<ul>
-					<li class="b-toggle-buttons__item" 
-					ng-class="monitoringCtrl.currentType == 'peer' ? 'b-toggle-buttons__item_active' : ''" 
+					<li class="b-toggle-buttons__item"
+					ng-class="monitoringCtrl.currentType == 'peer' ? 'b-toggle-buttons__item_active' : ''"
 					ng-click="monitoringCtrl.setCurrentType('peer')">
 						Peer
 					</li>
 					<li class="b-toggle-buttons__item"
-					ng-class="monitoringCtrl.currentType == 'environments' ? 'b-toggle-buttons__item_active' : ''" 
+					ng-class="monitoringCtrl.currentType == 'environments' ? 'b-toggle-buttons__item_active' : ''"
 					ng-click="monitoringCtrl.setCurrentType('environments')">
 						Environment
 					</li>
@@ -66,14 +66,14 @@
 
 				<div class="b-main-form__wrapper b-main-form__wrapper_min">
 					<label class="b-popup-body-label b-popup-body-label_inline">Period (h)</label>
-					<select class="b-popup-body-input" 
-						ng-model="monitoringCtrl.period" 
+					<select class="b-popup-body-input"
+						ng-model="monitoringCtrl.period"
 						ng-change="monitoringCtrl.getServerData()">
 						<option value="1">1</option>
 						<option value="6">6</option>
 						<option value="12">12</option>
 						<option value="24">24</option>
-						<option value="24">48</option>
+						<option value="48">48</option>
 					</select>
 					<div class="clear"></div>
 				</div>
@@ -86,15 +86,10 @@
 		<div class="b-chart-block-list">
 			<div class="b-chart-block-list__item" ng-repeat="chart in monitoringCtrl.charts">
 				<div class="b-chart-block">
-					<div class="b-chart-block__title">{{ chart.name }}({{chart.unit}})</div>
+					<div class="b-chart-block__title">{{ chart.name }}</div>
+					<div class="b-chart-block__series-title">{{ chart.legend }}</div>
 					<div class="b-chart-block__body">
-						<canvas id="line{{$index}}" class="chart chart-line" chart-data="chart.values"
-							chart-options="chart.options" 
-							chart-labels="chart.labels" 
-							chart-legend="false"
-							chart-series="chart.series"
-							chart-click="monitoringCtrl.onClick">
-						</canvas>
+						<nvd3 options="chart.options" data="chart.data"></nvd3>
 					</div>
 				</div>
 			</div>
