@@ -8,8 +8,10 @@ import java.net.SocketException;
 import java.net.URL;
 import java.security.AccessControlException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -88,7 +90,7 @@ public class TemplateManagerImpl implements TemplateManager
 
     private Set<RepoUrl> remoteRepoUrls = new HashSet<>();
 
-    private Set<RepoUrl> globalRepoUrls = new HashSet<>();
+    private Set<RepoUrl> globalRepoUrls = new LinkedHashSet<>();
 
     private final LocalPeer localPeer;
 
@@ -487,7 +489,11 @@ public class TemplateManagerImpl implements TemplateManager
                         repoUrl.getUrl().toString(), null, repoUrl.getToken() ) );
             }
 
-            for ( RepoUrl repoUrl : globalRepoUrls )
+            // shuffle the global repo list to randomize and normalize usage of them
+            List<RepoUrl> list = new ArrayList<>( globalRepoUrls );
+            Collections.shuffle( list );
+
+            for ( RepoUrl repoUrl : list )
             {
                 unifiedRepo.getSecondaryRepositories().add( repositoryFactory.createNonLocalTemplate(
                         repoUrl.getUrl().toString(), null, repoUrl.getToken() ) );
