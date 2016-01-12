@@ -55,12 +55,12 @@ import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.resource.ResourceType;
 import io.subutai.common.resource.ResourceValue;
 import io.subutai.common.security.objects.PermissionObject;
+import io.subutai.common.security.relation.RelationManager;
+import io.subutai.common.security.relation.model.RelationMeta;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.identity.api.IdentityManager;
-import io.subutai.core.identity.api.model.RelationMeta;
 import io.subutai.core.identity.api.model.User;
-import io.subutai.core.identity.api.relation.RelationManager;
 
 
 /**

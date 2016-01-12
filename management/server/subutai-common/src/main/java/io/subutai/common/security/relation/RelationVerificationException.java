@@ -1,4 +1,4 @@
-package io.subutai.core.identity.api.exception;
+package io.subutai.common.security.relation;
 
 
 /**

@@ -12,10 +12,10 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Lists;
 
 import io.subutai.common.dao.DaoManager;
+import io.subutai.common.security.relation.model.Relation;
+import io.subutai.common.security.relation.model.RelationLink;
 import io.subutai.core.environment.impl.entity.relation.RelationImpl;
 import io.subutai.core.environment.impl.entity.relation.RelationLinkImpl;
-import io.subutai.core.identity.api.model.Relation;
-import io.subutai.core.identity.api.model.RelationLink;
 
 
 /**

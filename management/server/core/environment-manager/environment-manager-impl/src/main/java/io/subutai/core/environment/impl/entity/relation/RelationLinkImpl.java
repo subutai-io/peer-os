@@ -8,7 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import io.subutai.core.identity.api.model.RelationLink;
+import io.subutai.common.security.relation.model.RelationLink;
 
 
 /**

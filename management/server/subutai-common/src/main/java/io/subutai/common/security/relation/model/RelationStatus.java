@@ -1,4 +1,4 @@
-package io.subutai.core.identity.api.relation;
+package io.subutai.common.security.relation.model;
 
 
 /**

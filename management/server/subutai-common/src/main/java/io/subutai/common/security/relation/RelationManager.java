@@ -1,15 +1,14 @@
-package io.subutai.core.identity.api.relation;
+package io.subutai.common.security.relation;
 
 
 import java.util.List;
 import java.util.Set;
 
-import io.subutai.core.identity.api.exception.RelationVerificationException;
-import io.subutai.core.identity.api.model.Relation;
-import io.subutai.core.identity.api.model.RelationInfo;
-import io.subutai.core.identity.api.model.RelationInfoMeta;
-import io.subutai.core.identity.api.model.RelationLink;
-import io.subutai.core.identity.api.model.RelationMeta;
+import io.subutai.common.security.relation.model.Relation;
+import io.subutai.common.security.relation.model.RelationInfo;
+import io.subutai.common.security.relation.model.RelationInfoMeta;
+import io.subutai.common.security.relation.model.RelationLink;
+import io.subutai.common.security.relation.model.RelationMeta;
 
 
 /**

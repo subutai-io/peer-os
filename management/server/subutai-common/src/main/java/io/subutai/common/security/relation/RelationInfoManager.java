@@ -1,7 +1,7 @@
-package io.subutai.core.identity.api.relation;
+package io.subutai.common.security.relation;
 
 
-import io.subutai.core.identity.api.model.RelationMeta;
+import io.subutai.common.security.relation.model.RelationMeta;
 
 
 /**

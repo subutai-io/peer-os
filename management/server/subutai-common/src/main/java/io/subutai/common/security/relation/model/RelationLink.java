@@ -1,4 +1,4 @@
-package io.subutai.core.identity.api.model;
+package io.subutai.common.security.relation.model;
 
 
 import java.io.Serializable;

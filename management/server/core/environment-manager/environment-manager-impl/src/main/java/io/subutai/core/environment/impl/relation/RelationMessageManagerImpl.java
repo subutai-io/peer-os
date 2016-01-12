@@ -9,11 +9,11 @@ import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.subutai.common.security.relation.RelationMessageManager;
+import io.subutai.common.security.relation.RelationVerificationException;
+import io.subutai.common.security.relation.model.Relation;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.environment.impl.entity.relation.RelationImpl;
-import io.subutai.core.identity.api.exception.RelationVerificationException;
-import io.subutai.core.identity.api.model.Relation;
-import io.subutai.core.identity.api.relation.RelationMessageManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;

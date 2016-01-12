@@ -31,8 +31,6 @@
              interface="io.subutai.core.network.api.NetworkManager" />
   <reference id="identityManager"
              interface="io.subutai.core.identity.api.IdentityManager" />
-  <!--<reference id="relationManager"-->
-  <!--interface="io.subutai.core.identity.api.relation.RelationManager" />-->
   <reference id="tracker"
              interface="io.subutai.core.tracker.api.Tracker" />
 
@@ -71,7 +69,7 @@
 
   <service ref="environmentManager" interface="io.subutai.core.environment.api.EnvironmentManager" />
   <service ref="environmentManager" interface="io.subutai.common.peer.AlertListener" />
-  <service ref="relationManager" activation="eager" interface="io.subutai.core.identity.api.relation.RelationManager" />
+  <service ref="relationManager" activation="eager" interface="io.subutai.common.security.relation.RelationManager" />
   <service ref="environmentManager" interface="io.subutai.core.peer.api.PeerActionListener" />
 
   <reference-list id="alertHandler"

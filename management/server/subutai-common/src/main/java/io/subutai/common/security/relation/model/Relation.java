@@ -1,9 +1,7 @@
-package io.subutai.core.identity.api.model;
+package io.subutai.common.security.relation.model;
 
 
 import java.io.Serializable;
-
-import io.subutai.core.identity.api.relation.RelationStatus;
 
 
 /**

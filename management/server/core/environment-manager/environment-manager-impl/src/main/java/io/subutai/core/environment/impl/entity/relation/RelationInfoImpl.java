@@ -17,8 +17,8 @@ import javax.persistence.Table;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.security.objects.Ownership;
-import io.subutai.core.identity.api.model.RelationInfo;
-import io.subutai.core.identity.api.model.RelationInfoMeta;
+import io.subutai.common.security.relation.model.RelationInfo;
+import io.subutai.common.security.relation.model.RelationInfoMeta;
 
 
 /**

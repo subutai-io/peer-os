@@ -8,18 +8,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.subutai.common.dao.DaoManager;
+import io.subutai.common.security.relation.RelationManager;
+import io.subutai.common.security.relation.RelationVerificationException;
+import io.subutai.common.security.relation.model.Relation;
+import io.subutai.common.security.relation.model.RelationInfo;
+import io.subutai.common.security.relation.model.RelationInfoMeta;
+import io.subutai.common.security.relation.model.RelationLink;
+import io.subutai.common.security.relation.model.RelationMeta;
+import io.subutai.common.security.relation.model.RelationStatus;
 import io.subutai.core.environment.impl.dao.RelationDataService;
 import io.subutai.core.environment.impl.entity.relation.RelationImpl;
 import io.subutai.core.environment.impl.entity.relation.RelationInfoImpl;
 import io.subutai.core.environment.impl.entity.relation.RelationLinkImpl;
-import io.subutai.core.identity.api.exception.RelationVerificationException;
-import io.subutai.core.identity.api.model.Relation;
-import io.subutai.core.identity.api.model.RelationInfo;
-import io.subutai.core.identity.api.model.RelationInfoMeta;
-import io.subutai.core.identity.api.model.RelationLink;
-import io.subutai.core.identity.api.model.RelationMeta;
-import io.subutai.core.identity.api.relation.RelationManager;
-import io.subutai.core.identity.api.relation.RelationStatus;
 import io.subutai.core.security.api.SecurityManager;
 
 

@@ -16,8 +16,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import io.subutai.core.identity.api.model.Relation;
-import io.subutai.core.identity.api.relation.RelationStatus;
+import io.subutai.common.security.relation.model.Relation;
+import io.subutai.common.security.relation.model.RelationStatus;
 
 
 /**
