@@ -426,7 +426,7 @@ public class TemplateManagerImpl implements TemplateManager
         {
             if ( localPeer != null )
             {
-                return localPeer.getManagementHost().getExternalIp();
+                return localPeer.getExternalIp();
             }
             else
             {
@@ -434,7 +434,7 @@ public class TemplateManagerImpl implements TemplateManager
                 return ips.get( 0 ).getHostAddress();
             }
         }
-        catch ( SocketException | IndexOutOfBoundsException | HostNotFoundException ex )
+        catch ( SocketException | IndexOutOfBoundsException  ex )
         {
             LOGGER.error( "Cannot get external ip. Returning null.", ex );
             return null;
