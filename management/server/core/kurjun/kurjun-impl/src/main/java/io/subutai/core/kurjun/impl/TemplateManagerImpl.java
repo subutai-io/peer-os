@@ -245,7 +245,7 @@ public class TemplateManagerImpl implements TemplateManager
     public List<TemplateKurjun> list( String context, boolean isKurjunClient ) throws IOException
     {
         UnifiedRepository repo = getRepository( context, isKurjunClient );
-        List<SerializableMetadata> metadatas = listPackagesFromCache( repo );
+        Set<SerializableMetadata> metadatas = listPackagesFromCache( repo );
 
         List<TemplateKurjun> result = new LinkedList<>();
         for ( SerializableMetadata metadata : metadatas )
@@ -599,9 +599,9 @@ public class TemplateManagerImpl implements TemplateManager
      * @param repository
      * @return
      */
-    private List<SerializableMetadata> listPackagesFromCache( UnifiedRepository repository )
+    private Set<SerializableMetadata> listPackagesFromCache( UnifiedRepository repository )
     {
-        List<SerializableMetadata> result = new LinkedList<>();
+        Set<SerializableMetadata> result = new HashSet<>();
 
         Set<Repository> repos = new HashSet<>();
         repos.addAll( repository.getRepositories() );
