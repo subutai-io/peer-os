@@ -1133,6 +1133,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         return null;
     }
 
+
     @Override
     public void onHeartbeat( final ResourceHostInfo resourceHostInfo, Set<QuotaAlertValue> alerts )
     {
@@ -1146,20 +1147,20 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
             catch ( HostNotFoundException e )
             {
-                LOG.debug( "Host not found in #onHeartbeat", e );
                 host = new ResourceHostEntity( getId(), resourceHostInfo );
                 resourceHostDataService.persist( host );
                 addResourceHost( host );
                 Set<ResourceHost> a = Sets.newHashSet();
                 a.add( host );
                 setResourceHostTransientFields( a );
+                LOG.debug( String.format( "Resource host %s registered.", resourceHostInfo.getHostname() ) );
             }
             if ( host.updateHostInfo( resourceHostInfo ) )
             {
                 resourceHostDataService.update( host );
-                LOG.debug( String.format( "Resource host %s updated.", host.getId() ) );
+                LOG.debug( String.format( "Resource host %s updated.", resourceHostInfo.getHostname() ) );
             }
-            if ( resourceHostInfo.getHostname().equals( "management" ) )
+            if ( managementHost == null && "management".equals( resourceHostInfo.getHostname() ) )
             {
                 managementHost = host;
             }

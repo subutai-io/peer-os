@@ -54,7 +54,7 @@ public class SetupTunnelsTask implements Callable<Integer>
         {
             if ( peerIp.equals( localPeer.getId() ) )
             {
-                LOG.debug( "Skiping local peer." );
+                LOG.debug( "Skipping local peer." );
                 continue;
             }
 

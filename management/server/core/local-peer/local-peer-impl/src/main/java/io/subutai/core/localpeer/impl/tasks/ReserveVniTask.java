@@ -10,7 +10,6 @@ import io.subutai.common.network.Vni;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.settings.Common;
-import io.subutai.core.localpeer.impl.entity.ManagementHostEntity;
 import io.subutai.core.network.api.NetworkManager;
 
 

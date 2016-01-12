@@ -236,7 +236,7 @@ public class NetworkManagerImpl implements NetworkManager
         CommandResult result = execute( getManagementHost(), commands.getListVniVlanMappingsCommand() );
 
         Pattern p = Pattern.compile( String.format(
-                        "\\s*(%s\\d+)\\s*,\\s*(\\d+)\\s*,\\s*(\\d+)\\s*,\\s*([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3"
+                        "\\s*(%s\\d+)\\s*(\\d+)\\s*(\\d+)\\s*([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3"
                                 + "}-[89ab][0-9a-f]{3}-[0-9a-f]{12})\\s*", NetworkManager.TUNNEL_PREFIX ),
                 Pattern.CASE_INSENSITIVE );
 
