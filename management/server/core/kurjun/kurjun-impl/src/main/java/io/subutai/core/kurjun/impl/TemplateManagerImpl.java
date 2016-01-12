@@ -147,25 +147,7 @@ public class TemplateManagerImpl implements TemplateManager
 
         // schedule metadata cache updater
         metadataCacheUpdater = Executors.newSingleThreadScheduledExecutor();
-        metadataCacheUpdater.scheduleWithFixedDelay( new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                for ( KurjunContext context : CONTEXTS )
-                {
-                    try
-                    {
-                        UnifiedRepository repo = getRepository( context.getName(), false );
-                        refreshMetadataCache( repo );
-                    }
-                    catch ( IOException ex )
-                    {
-                        LOGGER.error( "Failed to get repository", ex );
-                    }
-                }
-            }
-        }, 5, 30, TimeUnit.SECONDS );
+        metadataCacheUpdater.scheduleWithFixedDelay( () -> refreshMetadataCache(), 5, 30, TimeUnit.SECONDS );
     }
 
 
@@ -644,23 +626,26 @@ public class TemplateManagerImpl implements TemplateManager
 
 
     /**
-     * Refreshes metadata cache for each repository in the supplied unified repository.
+     * Refreshes metadata cache for each remote repository.
      *
-     * @param repository
      */
-    private void refreshMetadataCache( UnifiedRepository repository )
+    private void refreshMetadataCache()
     {
-        Set<Repository> repos = new HashSet<>();
-        repos.addAll( repository.getRepositories() );
-        repos.addAll( repository.getSecondaryRepositories() );
+        Set<NonLocalRepository> remotes = new HashSet<>();
+        RepositoryFactory repoFactory = injector.getInstance( RepositoryFactory.class );
 
-        for ( Repository repo : repos )
+        for ( RepoUrl url : remoteRepoUrls )
         {
-            if ( repo instanceof NonLocalRepository )
-            {
-                NonLocalRepository remote = ( NonLocalRepository ) repo;
-                remote.getMetadataCache().refresh();
-            }
+            remotes.add( repoFactory.createNonLocalTemplate( url.getUrl().toString(), null, url.getToken() ) );
+        }
+        for ( RepoUrl url : globalRepoUrls )
+        {
+            remotes.add( repoFactory.createNonLocalTemplate( url.getUrl().toString(), null, url.getToken() ) );
+        }
+
+        for ( NonLocalRepository remote : remotes )
+        {
+            remote.getMetadataCache().refresh();
         }
     }
 
