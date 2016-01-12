@@ -64,6 +64,24 @@ public class RelationLinkImpl implements RelationLink
     }
 
 
+    public void setId( final String id )
+    {
+        this.id = id;
+    }
+
+
+    public void setUniqueIdentifier( final String uniqueIdentifier )
+    {
+        this.uniqueIdentifier = uniqueIdentifier;
+    }
+
+
+    public void setClassPath( final String classPath )
+    {
+        this.classPath = classPath;
+    }
+
+
     @Override
     public boolean equals( final Object o )
     {

@@ -1,7 +1,6 @@
 package io.subutai.core.environment.impl.dao;
 
 
-import java.util.Collection;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -13,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Lists;
 
 import io.subutai.common.dao.DaoManager;
-import io.subutai.common.protocol.api.DataService;
 import io.subutai.core.environment.impl.entity.relation.RelationImpl;
 import io.subutai.core.environment.impl.entity.relation.RelationLinkImpl;
 import io.subutai.core.identity.api.model.Relation;
@@ -23,7 +21,7 @@ import io.subutai.core.identity.api.model.RelationLink;
 /**
  * Created by talas on 12/8/15.
  */
-public class RelationDataService implements DataService<Long, RelationImpl>
+public class RelationDataService
 {
     private static final Logger logger = LoggerFactory.getLogger( RelationDataService.class );
     private DaoManager daoManager = null;
@@ -37,72 +35,7 @@ public class RelationDataService implements DataService<Long, RelationImpl>
     }
 
 
-    @Override
-    public Collection<RelationImpl> getAll()
-    {
-        return null;
-    }
-
-
-    @Override
-    public RelationImpl find( final Long id )
-    {
-        return null;
-    }
-
-
-    @Override
-    public void remove( final Long id )
-    {
-
-    }
-
-
-    @Override
-    public void update( final RelationImpl item )
-    {
-        EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
-
-        try
-        {
-            daoManager.startTransaction( em );
-            em.merge( item );
-            daoManager.commitTransaction( em );
-        }
-        catch ( Exception ex )
-        {
-            logger.error( "Error persisting object", ex );
-            daoManager.rollBackTransaction( em );
-        }
-        finally
-        {
-            daoManager.closeEntityManager( em );
-        }
-    }
-
-
-    public void persist( RelationImpl trustRelation )
-    {
-        EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
-
-        try
-        {
-            daoManager.startTransaction( em );
-            em.persist( trustRelation );
-            daoManager.commitTransaction( em );
-        }
-        catch ( Exception ex )
-        {
-            daoManager.rollBackTransaction( em );
-        }
-        finally
-        {
-            daoManager.closeEntityManager( em );
-        }
-    }
-
-
-    public void update( RelationLink relationLink )
+    public void update( Object relationLink )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
 

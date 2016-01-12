@@ -59,6 +59,10 @@ public class RelationImpl implements Relation
     @Column( name = "signature_key_id" )
     private String keyId;
 
+    @Column( name = "link_type" )
+    @ManyToOne( fetch = FetchType.EAGER, cascade = CascadeType.ALL )
+    private LinkType linkType;
+
 
     public RelationImpl()
     {
@@ -123,6 +127,12 @@ public class RelationImpl implements Relation
     public String getKeyId()
     {
         return keyId;
+    }
+
+
+    public LinkType getLinkType()
+    {
+        return linkType;
     }
 
 

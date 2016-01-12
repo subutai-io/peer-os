@@ -55,7 +55,8 @@ public class DestroyContainersStep
     public void execute() throws EnvironmentDestructionException, EnvironmentNotFoundException
     {
 
-        if ( environment.getStatus() == EnvironmentStatus.EMPTY || environment.getContainerHosts().isEmpty() )
+        if ( environment.getStatus() == EnvironmentStatus.PENDING || environment.getStatus() == EnvironmentStatus.EMPTY
+                || environment.getContainerHosts().isEmpty() )
         {
             environmentManager.removeEnvironment( environment.getId() );
             return;
@@ -129,9 +130,6 @@ public class DestroyContainersStep
                     }
                 }
             }
-
-
-
         }
         finally
         {

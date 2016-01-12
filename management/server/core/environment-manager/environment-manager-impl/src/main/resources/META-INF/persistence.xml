@@ -16,6 +16,7 @@
     <class>io.subutai.core.environment.impl.entity.relation.RelationImpl</class>
     <class>io.subutai.core.environment.impl.entity.relation.RelationInfoImpl</class>
     <class>io.subutai.core.environment.impl.entity.relation.RelationLinkImpl</class>
+    <class>io.subutai.core.environment.impl.entity.relation.LinkType</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
       <property name="openjpa.Log" value="DefaultLevel=WARN, Tool=INFO, SQL=TRACE" />
