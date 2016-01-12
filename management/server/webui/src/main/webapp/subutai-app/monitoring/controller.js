@@ -203,7 +203,6 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
         /** Restructure rest data into required format **/
         /** Append stub values at the beginning of VALUES array **/
         /** Generate scaled values for X axis **/
-        /** Define maximum value for right unit detection **/
         for (var item in series) {
             var values = series[item].values;
             var realValues = [];
@@ -212,11 +211,19 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
                     x: moment(values[value][0]).valueOf(),
                     y: values[value][1]
                 });
-                if (Math.round(values[value][1] * 100) / 100 > maxValue) {
-                    maxValue = Math.round(values[value][1] * 100) / 100;
-                }
             }
             series[item].values = getXAxisScaledValues(stubValues.concat(realValues));
+        }
+
+        /** Define maximum value for right unit detection **/
+        for(var serie in series) {
+            for(var item in series[serie].values) {
+                if(Math.round(series[serie].values[item].y * 100) / 100 > maxValue ) {
+                    maxValue = Math.round(series[serie].values[item].y * 100) / 100;
+                } else {
+                    continue;
+                }
+            }
         }
 
         /** Set chart's X axis labels **/

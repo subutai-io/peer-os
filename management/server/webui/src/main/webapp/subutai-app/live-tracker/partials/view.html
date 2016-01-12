@@ -69,7 +69,9 @@
 					<td>
 						<div 
 							class="b-status-icon b-status-icon_{{ operation.state }}" 
-							title="{{ operation.state }}">
+							tooltips 
+							tooltip-template="{{ operation.state }}" 
+							tooltip-side="left">
 						</div>
 					</td>
 					<td></td>

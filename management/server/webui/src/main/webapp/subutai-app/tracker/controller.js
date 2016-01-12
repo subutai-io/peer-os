@@ -72,7 +72,7 @@ function TrackerCtrl(trackerSrv, $scope, $rootScope, DTOptionsBuilder, DTColumnB
 
 	function statusHTML(data, type, full, meta) {
 		vm.users[data.id] = data;
-		return '<div class="b-status-icon b-status-icon_' + data.state + '" title="' + data.state + '"></div>';
+		return '<div class="b-status-icon b-status-icon_' + data.state + '" tooltips tooltip-template="' + data.state + '" tooltip-smart="true"></div>';
 	}
 
 	function viewLogsButton(data, type, full, meta) {

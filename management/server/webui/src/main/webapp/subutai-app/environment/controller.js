@@ -84,12 +84,12 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 	}
 
 	function statusHTML(environmentStatus, type, full, meta) {
-		return '<div class="b-status-icon b-status-icon_' + environmentStatus + '" tooltips tooltip-title="' + environmentStatus + '"></div>';
+		return '<div class="b-status-icon b-status-icon_' + environmentStatus + '" tooltips tooltip-template="' + environmentStatus + '"></div>';
 	}
 
 	function environmentNameTooltip(data, type, full, meta) {
 		vm.users[data.id] = data;
-		return '<span tooltips tooltip-content="ID: <b>' + data.id + '</b>">' + data.name + '</span>';
+		return "<span tooltips tooltip-template='<span class=\"b-nowrap\">ID: <b>" + data.id + "</b></span>'>" + data.name + "</span>";
 	}
 
 	function sshKeyLinks(data, type, full, meta) {
@@ -130,13 +130,13 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 			for (var type in containersTotal[template]){
 				if(containersTotal[template][type] > 0) {
 					if(type != 'INACTIVE') {
-						var tooltipContent = 'Quota: <div class="b-quota-type-round b-quota-type-round_' + quotaColors[type] + '"></div> <b>' + type + '</b><br>State: <b>RUNNING</b>';
+						var tooltipContent = '<div class="b-nowrap">Quota: <div class="b-quota-type-round b-quota-type-round_' + quotaColors[type] + '"></div> <b>' + type + '</b></div><span class="b-nowrap">State: <b>RUNNING</b></span>';
 					} else {
 						var tooltipContent = 'State: <b>INACTIVE</b>';
 					}
 					containersHTML += '<a ui-sref="containers({environmentId:\'' + data.id + '\'})" ' 
 						+ ' class="b-tags b-tags_' + quotaColors[type] + '" ' 
-						+ 'tooltips tooltip-content=\'' + tooltipContent + '\' tooltip-hide-trigger="mouseleave click" '
+						+ 'tooltips tooltip-template=\'' + tooltipContent + '\''
 						+ '>' 
 						+ template + ': ' + containersTotal[template][type] 
 					+ '</a>';
@@ -144,17 +144,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 			}
 		}
 
-		/*var containersHTML = '';
-		for(var i = 0; i < data.containers.length; i++) {
-			var tooltipContent = 'IP: <b>' + data.containers[i].ip + '</b><br> Quota: <div class="b-quota-type-round b-quota-type-round_' + quotaColors[data.containers[i].type] + '"></div> <b>' + data.containers[i].type + '</b><br>State: <b>' + data.containers[i].state + '</b>';
-			containersHTML += '<span ' 
-				+ ' class="b-tags b-tags_' + quotaColors[data.containers[i].type] + '" ' 
-				+ 'tooltips tooltip-content=\'' + tooltipContent + '\' '
-				+ '>' 
-				+ '<a ui-sref="containers({environmentId:\'' + data.id + '\'})">' + data.containers[i].templateName + '</a>' 
-				+ ' <a href ng-click="environmentViewCtrl.destroyContainer(\'' + data.containers[i].id + '\')"><i class="fa fa-times"></i></a>' 
-			+ '</span>';
-		}*/
 		return containersHTML;
 	}
 

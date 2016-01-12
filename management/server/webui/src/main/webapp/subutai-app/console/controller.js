@@ -28,7 +28,7 @@ function ConsoleViewCtrl($scope, consoleService, peerRegistrationService, $state
 	vm.containers = [];
 	vm.currentTab = '';
 	vm.daemon = false;
-	vm.timeOut = 0;
+	vm.timeOut = 30;
 	vm.selectedEnvironment = '';
 	vm.selectedNodeType = '';
 

@@ -96,6 +96,7 @@ input[type=checkbox] {
     border-radius: 5px;
     padding: 16px 0 32px 0;
     position: relative;
+	overflow: hidden;
 }
 
 .b-workspace__header {
@@ -293,7 +294,7 @@ input[type=checkbox] {
     border: 1px solid #dcdcdc;
     border-bottom: none;
     border-radius: 5px;
-    overflow: hidden;
+    /*overflow: hidden;*/
     position: relative;
 }
 
@@ -302,7 +303,7 @@ input[type=checkbox] {
 }
 
 .b-data-table {
-    overflow: hidden;
+    /*overflow: hidden;*/
     padding-top: 10px;
 }
 
@@ -645,8 +646,16 @@ input[type=checkbox] {
 }
 
 .b-icon:last-child {
-    margin-right: 0;
+	margin-right: 0;
     margin-bottom: 0;
+}
+
+tooltip tip-cont .b-icon {
+	margin-right: 9px!important;
+}
+
+tooltip:last-child tip-cont .b-icon {
+	margin-right: 0!important;
 }
 
 .b-icon_remove {
@@ -1931,8 +1940,8 @@ td.b-main-table__status-col {
 	position: fixed;
 	z-index: 100;
 	left: 0;
-	bottom: -20%;
-	height: 20%;
+	bottom: -40%;
+	height: 40%;
 	width: 100%;
 	background-color: #FFF;
 	resize: vertical;
@@ -2057,5 +2066,9 @@ td.b-main-table__status-col {
 	height: 10px;
 	width: 10px;
 	cursor: pointer
+}
+
+.b-nowrap {
+	white-space: nowrap;
 }
 

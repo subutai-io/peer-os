@@ -45,7 +45,14 @@
 						ng-model="cbl.blueprintFrom.currentNode.numberOfContainers" required>
 					<div class="clear"></div>
 				</div>
-				<div class="popup-body-box">
+				<div class="popup-body-box"
+					tooltips 
+					tooltip-template='
+						<span class="b-nowrap">Containers can ssh into each other</span><br>
+						<span class="b-nowrap">Similar id applies to all of the containers across these groups</span>
+					' 
+					tooltip-smart="true" 
+				>
 					<label class="b-popup-body-label">Enter SSH Group ID </label>
 					<input type="number" 
 						id="subt-input__blueprint-ssh-group-id" 
@@ -53,7 +60,14 @@
 						ng-model="cbl.blueprintFrom.currentNode.sshGroupId" required>
 					<div class="clear"></div>
 				</div>
-				<div class="popup-body-box">
+				<div class="popup-body-box"
+					tooltips 
+					tooltip-template='
+						<span class="b-nowrap">Container can address each other by hostname</span><br>
+						<span class="b-nowrap">Similar id applies to all of the containers across these groups</span>
+					' 
+					tooltip-smart="true" 
+				>
 					<label class="b-popup-body-label">Enter host Group ID </label>
 					<input type="number" 
 						id="subt-input__blueprint-host-group-id" 
@@ -79,7 +93,7 @@
 					class="b-btn b-btn_blue g-right" 
 					ng-click="cbl.addNewNode()"
 					id="subt-button__blueprint-add-node">
-						{{ cbl.nodeStatus }} node list &rarr;
+						{{ cbl.nodeStatus }} node groups &rarr;
 					</a>
 					<div class="clear"></div>
 				</div>
@@ -87,7 +101,7 @@
 			<div class="b-popup-body__box b-popup-body__box_node">
 				<div class="popup-body-box">
 					<div class="b-popup-body-label">
-						Node list
+						Node groups
 					</div>
 					<ul class="b-popup-box__node-list">
 						<li ng-repeat="(key, blueprintNode) in cbl.nodeList"
