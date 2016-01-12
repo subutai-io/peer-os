@@ -8,7 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import io.subutai.core.identity.api.model.RelationLink;
+import io.subutai.common.security.relation.model.RelationLink;
 
 
 /**
@@ -61,6 +61,24 @@ public class RelationLinkImpl implements RelationLink
     public String getClassPath()
     {
         return classPath;
+    }
+
+
+    public void setId( final String id )
+    {
+        this.id = id;
+    }
+
+
+    public void setUniqueIdentifier( final String uniqueIdentifier )
+    {
+        this.uniqueIdentifier = uniqueIdentifier;
+    }
+
+
+    public void setClassPath( final String classPath )
+    {
+        this.classPath = classPath;
     }
 
 

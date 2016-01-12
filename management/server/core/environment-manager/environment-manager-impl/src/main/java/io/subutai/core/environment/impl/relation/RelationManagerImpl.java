@@ -1,22 +1,25 @@
 package io.subutai.core.environment.impl.relation;
 
 
+import java.util.List;
 import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.subutai.common.dao.DaoManager;
+import io.subutai.common.security.relation.RelationManager;
+import io.subutai.common.security.relation.RelationVerificationException;
+import io.subutai.common.security.relation.model.Relation;
+import io.subutai.common.security.relation.model.RelationInfo;
+import io.subutai.common.security.relation.model.RelationInfoMeta;
+import io.subutai.common.security.relation.model.RelationLink;
+import io.subutai.common.security.relation.model.RelationMeta;
+import io.subutai.common.security.relation.model.RelationStatus;
 import io.subutai.core.environment.impl.dao.RelationDataService;
 import io.subutai.core.environment.impl.entity.relation.RelationImpl;
 import io.subutai.core.environment.impl.entity.relation.RelationInfoImpl;
 import io.subutai.core.environment.impl.entity.relation.RelationLinkImpl;
-import io.subutai.core.identity.api.exception.RelationVerificationException;
-import io.subutai.core.identity.api.model.Relation;
-import io.subutai.core.identity.api.model.RelationInfo;
-import io.subutai.core.identity.api.model.RelationMeta;
-import io.subutai.core.identity.api.relation.RelationManager;
-import io.subutai.core.identity.api.relation.RelationStatus;
 import io.subutai.core.security.api.SecurityManager;
 
 
@@ -26,6 +29,7 @@ import io.subutai.core.security.api.SecurityManager;
 public class RelationManagerImpl implements RelationManager
 {
     private static final Logger logger = LoggerFactory.getLogger( RelationManagerImpl.class );
+    private static final String context = "EnvironmentManager";
     private SecurityManager securityManager;
     private RelationMessageManagerImpl trustMessageManager;
     private RelationInfoManagerImpl relationInfoManager;
@@ -64,6 +68,13 @@ public class RelationManagerImpl implements RelationManager
     public void setKeyTrustCheckEnabled( final boolean keyTrustCheckEnabled )
     {
         this.keyTrustCheckEnabled = keyTrustCheckEnabled;
+    }
+
+
+    @Override
+    public String getContext()
+    {
+        return context;
     }
 
 
@@ -115,10 +126,17 @@ public class RelationManagerImpl implements RelationManager
 
 
     @Override
-    public RelationInfo createTrustRelationship( final String pObject, final Set<String> operation,
+    public RelationInfo createTrustRelationship( final String context, final Set<String> operation,
                                                  final int ownershipLevel )
     {
-        return new RelationInfoImpl( pObject, operation, ownershipLevel );
+        return new RelationInfoImpl( context, operation, ownershipLevel );
+    }
+
+
+    @Override
+    public RelationInfo createTrustRelationship( final RelationInfoMeta relationInfoMeta )
+    {
+        return new RelationInfoImpl( relationInfoMeta );
     }
 
 
@@ -156,7 +174,7 @@ public class RelationManagerImpl implements RelationManager
         relationDataService.update( relation.getSource() );
         relationDataService.update( relation.getTarget() );
         relationDataService.update( relation.getTrustedObject() );
-        relationDataService.update( ( RelationImpl ) relation );
+        relationDataService.update( relation );
     }
 
 
@@ -164,5 +182,26 @@ public class RelationManagerImpl implements RelationManager
     public RelationInfoManagerImpl getRelationInfoManager()
     {
         return relationInfoManager;
+    }
+
+
+    @Override
+    public RelationLink getRelationLink( final String uniqueId, final String objectClass )
+    {
+        return relationDataService.findRelationLink( uniqueId, objectClass );
+    }
+
+
+    @Override
+    public List<Relation> getRelationsByObject( final RelationLink objectRelationLink )
+    {
+        return relationDataService.findByObject( ( RelationLinkImpl ) objectRelationLink );
+    }
+
+
+    @Override
+    public void removeRelation( final long relationId )
+    {
+        relationDataService.remove( relationId );
     }
 }

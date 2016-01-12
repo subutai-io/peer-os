@@ -17,7 +17,8 @@ import javax.persistence.Table;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.security.objects.Ownership;
-import io.subutai.core.identity.api.model.RelationInfo;
+import io.subutai.common.security.relation.model.RelationInfo;
+import io.subutai.common.security.relation.model.RelationInfoMeta;
 
 
 /**
@@ -26,9 +27,8 @@ import io.subutai.core.identity.api.model.RelationInfo;
 
 
 /**
- * Relation info is simple string presentation of propertyKey=propertyValue=condition with each line new condition is
- * declared. Property values should be comparative objects so that with conditions it would be possible to identify
- * which condition has greater scope
+ * Relation info is simple string presentation of propertyKey=propertyValue where each pair will describe relation with
+ * other object. When verifying transitive relation, relation validity is checked upon key=pair existence.
  */
 @Entity
 @Table( name = "relation_info" )
@@ -49,8 +49,20 @@ public class RelationInfoImpl implements RelationInfo
     @ElementCollection( targetClass = String.class, fetch = FetchType.EAGER )
     private Set<String> operation = Sets.newHashSet();
 
+    @Column( name = "read_p" )
+    private boolean readPermission;
+
+    @Column( name = "write_p" )
+    private boolean writePermission;
+
+    @Column( name = "update_p" )
+    private boolean updatePermission;
+
+    @Column( name = "delete_p" )
+    private boolean deletePermission;
+
     //Permission, role
-    @Column( name = "ownershipLevel" )
+    @Column( name = "ownership_level" )
     private int ownershipLevel = Ownership.ALL.getLevel();
 
 
@@ -67,11 +79,23 @@ public class RelationInfoImpl implements RelationInfo
     }
 
 
+    @Deprecated
     public RelationInfoImpl( final String context, final Set<String> operation, final int ownershipLevel )
     {
         this.context = context;
         this.operation = operation;
         this.ownershipLevel = ownershipLevel;
+    }
+
+
+    public RelationInfoImpl( final RelationInfoMeta relationInfoMeta )
+    {
+        this.context = relationInfoMeta.getContext();
+        this.readPermission = relationInfoMeta.isReadPermission();
+        this.writePermission = relationInfoMeta.isWritePermission();
+        this.updatePermission = relationInfoMeta.isUpdatePermission();
+        this.deletePermission = relationInfoMeta.isDeletePermission();
+        this.ownershipLevel = relationInfoMeta.getOwnershipLevel();
     }
 
 
@@ -122,16 +146,6 @@ public class RelationInfoImpl implements RelationInfo
 
 
     @Override
-    public int hashCode()
-    {
-        int result = context != null ? context.hashCode() : 0;
-        result = 31 * result + ( operation != null ? operation.hashCode() : 0 );
-        result = 31 * result + ownershipLevel;
-        return result;
-    }
-
-
-    @Override
     public boolean equals( final Object o )
     {
         if ( this == o )
@@ -145,14 +159,13 @@ public class RelationInfoImpl implements RelationInfo
 
         final RelationInfoImpl that = ( RelationInfoImpl ) o;
 
-        if ( ownershipLevel != that.ownershipLevel )
-        {
-            return false;
-        }
-        if ( context != null ? !context.equals( that.context ) : that.context != null )
-        {
-            return false;
-        }
-        return !( operation != null ? !operation.equals( that.operation ) : that.operation != null );
+        return id == that.id;
+    }
+
+
+    @Override
+    public int hashCode()
+    {
+        return ( int ) ( id ^ ( id >>> 32 ) );
     }
 }

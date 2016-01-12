@@ -25,6 +25,10 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.security.objects.Ownership;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.objects.PermissionOperation;
+import io.subutai.common.security.relation.RelationManager;
+import io.subutai.common.security.relation.model.Relation;
+import io.subutai.common.security.relation.model.RelationInfo;
+import io.subutai.common.security.relation.model.RelationMeta;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
@@ -34,11 +38,7 @@ import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.creation.steps.helpers.CreatePeerNodeGroupsTask;
 import io.subutai.core.environment.impl.workflow.creation.steps.helpers.NodeGroupBuildResult;
 import io.subutai.core.identity.api.IdentityManager;
-import io.subutai.core.identity.api.model.Relation;
-import io.subutai.core.identity.api.model.RelationInfo;
-import io.subutai.core.identity.api.model.RelationMeta;
 import io.subutai.core.identity.api.model.User;
-import io.subutai.core.identity.api.relation.RelationManager;
 import io.subutai.core.kurjun.api.TemplateManager;
 
 

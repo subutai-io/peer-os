@@ -11,14 +11,14 @@ import com.google.common.collect.Sets;
 
 import io.subutai.common.security.objects.Ownership;
 import io.subutai.common.security.objects.PermissionOperation;
+import io.subutai.common.security.relation.RelationInfoManager;
+import io.subutai.common.security.relation.model.Relation;
+import io.subutai.common.security.relation.model.RelationInfo;
+import io.subutai.common.security.relation.model.RelationLink;
+import io.subutai.common.security.relation.model.RelationMeta;
 import io.subutai.core.environment.impl.dao.RelationDataService;
 import io.subutai.core.environment.impl.entity.relation.RelationInfoImpl;
 import io.subutai.core.environment.impl.entity.relation.RelationLinkImpl;
-import io.subutai.core.identity.api.model.Relation;
-import io.subutai.core.identity.api.model.RelationInfo;
-import io.subutai.core.identity.api.model.RelationLink;
-import io.subutai.core.identity.api.model.RelationMeta;
-import io.subutai.core.identity.api.relation.RelationInfoManager;
 
 
 /**
