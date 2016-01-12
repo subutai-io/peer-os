@@ -20,6 +20,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.google.gson.annotations.Expose;
+
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
@@ -37,25 +39,32 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable
 {
     @Id
     @Column( name = "id" )
+    @Expose
     private String id;
 
     @Lob
     @Column
+    @Expose
     private String publicKey;
 
     @Column( name = "host_name" )
+    @Expose
     private String hostname;
 
     @Column( name = "container_name" )
+    @Expose
     private String containerName;
 
     @Column( name = "vlan" )
+    @Expose
     private Integer vlan;
 
     @Column( name = "gateway" )
+    @Expose
     private String gateway = "";
 
     @Column( name = "template_name" )
+    @Expose
     private String templateName;
 
 
@@ -64,10 +73,12 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable
             targetEntity = HostInterfaceImpl.class,
             cascade = CascadeType.ALL,
             fetch = FetchType.EAGER )
+    @Expose
     private Set<HostInterface> netHostInterfaces = new HashSet<>();
 
     @Column( name = "arch" )
     @Enumerated( EnumType.STRING )
+    @Expose
     private HostArchitecture arch = HostArchitecture.AMD64;
 
     @ManyToOne
@@ -76,10 +87,12 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable
 
     @Column( name = "reg_status" )
     @Enumerated( EnumType.STRING )
+    @Expose
     private RegistrationStatus status = RegistrationStatus.REQUESTED;
 
     @Column( name = "state" )
     @Enumerated( EnumType.STRING )
+    @Expose
     private ContainerHostState state;
 
 
@@ -167,7 +180,7 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable
     public HostInterfaces getHostInterfaces()
     {
         HostInterfaces result = new HostInterfaces();
-        for ( HostInterface hostInterface : this.netHostInterfaces)
+        for ( HostInterface hostInterface : this.netHostInterfaces )
         {
             HostInterfaceModel model = new HostInterfaceModel( hostInterface );
             result.addHostInterface( model );
@@ -256,8 +269,8 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable
 
         final ContainerInfoImpl that = ( ContainerInfoImpl ) o;
 
-        return arch == that.arch && hostname.equals( that.hostname ) && id.equals( that.id )
-                && netHostInterfaces.equals( that.netHostInterfaces );
+        return arch == that.arch && hostname.equals( that.hostname ) && id.equals( that.id ) && netHostInterfaces
+                .equals( that.netHostInterfaces );
     }
 
 

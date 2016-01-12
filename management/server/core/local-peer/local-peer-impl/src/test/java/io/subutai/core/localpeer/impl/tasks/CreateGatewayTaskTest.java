@@ -10,6 +10,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.network.Gateway;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
@@ -30,7 +31,7 @@ public class CreateGatewayTaskTest
     @Mock
     NetworkManager networkManager;
     @Mock
-    ManagementHost managementHost;
+    LocalPeer managementHost;
     @Mock
     Gateway gateway;
 
@@ -40,7 +41,7 @@ public class CreateGatewayTaskTest
     @Before
     public void setUp() throws Exception
     {
-        task = new CreateGatewayTask( GATEWAY_IP, VLAN, networkManager, managementHost );
+        task = new CreateGatewayTask( new Gateway( VLAN, GATEWAY_IP ), networkManager, managementHost );
         when( managementHost.getGateways() ).thenReturn( Sets.newHashSet( gateway ) );
     }
 

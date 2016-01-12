@@ -5,9 +5,6 @@ import java.net.URL;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
@@ -27,7 +24,7 @@ import io.subutai.core.peer.api.PeerManager;
 public class ServerOutInterceptor extends AbstractPhaseInterceptor<Message>
 {
 
-    private static final Logger LOG = LoggerFactory.getLogger( ServerOutInterceptor.class );
+//    private static final Logger LOG = LoggerFactory.getLogger( ServerOutInterceptor.class );
     private PeerManager peerManager;
     private ChannelManagerImpl channelManagerImpl = null;
 
@@ -55,25 +52,25 @@ public class ServerOutInterceptor extends AbstractPhaseInterceptor<Message>
         {
             if ( InterceptorState.SERVER_OUT.isActive( message ) )
             {
-                LOG.info( " *** Server OutInterceptor invoked *** " );
+//                LOG.info( " *** Server OutInterceptor invoked *** " );
 
                 URL url = new URL( ( String ) message.getExchange().getInMessage().get( Message.REQUEST_URL ) );
 
                 if ( url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X2 ) )
                 {
-                    LOG.info( " *** URL:" + url.getPath() );
+//                    LOG.info( " *** URL:" + url.getPath() );
 
                     HttpServletRequest request = ( HttpServletRequest ) message.getExchange().getInMessage()
                                                                                .get( AbstractHTTPDestination
                                                                                        .HTTP_REQUEST );
                     String remoteAddress = request.getRemoteAddr();
-                    LOG.debug( "Remote address: " + remoteAddress );
+//                    LOG.debug( "Remote address: " + remoteAddress );
                     String path = url.getPath();
 
                     if ( path.startsWith( "/rest/v1/peer" ) )
                     {
                         handlePeerMessage( remoteAddress, message );
-                        LOG.debug( "Path handled by peer crypto handler: " + path );
+//                        LOG.debug( "Path handled by peer crypto handler: " + path );
                     }
                     else
                     {
@@ -83,11 +80,11 @@ public class ServerOutInterceptor extends AbstractPhaseInterceptor<Message>
                             String s = path.substring( prefix.length() + 1 );
                             String environmentId = s.substring( 0, s.indexOf( "/" ) );
                             handleEnvironmentMessage( remoteAddress, environmentId, message );
-                            LOG.debug( "Path handled by environment crypto handler: " + path );
+//                            LOG.debug( "Path handled by environment crypto handler: " + path );
                         }
                         else
                         {
-                            LOG.warn( "Path is not handled by crypto handler: " + path );
+//                            LOG.warn( "Path is not handled by crypto handler: " + path );
                         }
                     }
                 }
@@ -96,7 +93,7 @@ public class ServerOutInterceptor extends AbstractPhaseInterceptor<Message>
         }
         catch ( Exception ignore )
         {
-            LOG.debug( "MalformedURLException", ignore.toString() );
+//            LOG.debug( "MalformedURLException", ignore.toString() );
         }
     }
 
@@ -112,7 +109,7 @@ public class ServerOutInterceptor extends AbstractPhaseInterceptor<Message>
         }
         catch ( PeerException e )
         {
-            LOG.warn( e.getMessage() );
+//            LOG.warn( e.getMessage() );
         }
     }
 
@@ -129,7 +126,7 @@ public class ServerOutInterceptor extends AbstractPhaseInterceptor<Message>
         }
         catch ( PeerException e )
         {
-            LOG.warn( e.getMessage() );
+//            LOG.warn( e.getMessage() );
         }
     }
 }

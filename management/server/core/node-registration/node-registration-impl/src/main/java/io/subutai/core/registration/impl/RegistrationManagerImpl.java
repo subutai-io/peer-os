@@ -36,6 +36,7 @@ import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.ManagementHost;
@@ -494,7 +495,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
     @Override
     public void deployResourceHost( List<String> args ) throws NodeRegistrationException
     {
-        ManagementHost managementHost = null;
+        Host managementHost = null;
         CommandResult result;
 
         try

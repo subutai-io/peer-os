@@ -14,6 +14,7 @@ import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.settings.Common;
 import io.subutai.common.test.SystemOutRedirectTest;
 import io.subutai.core.git.api.GitBranch;
@@ -71,7 +72,7 @@ public class GitManagerImplTest extends SystemOutRedirectTest
     @Mock
     LocalPeer localPeer;
     @Mock
-    ManagementHost managementHost;
+    ResourceHost managementHost;
     @Mock
     CommandUtil commandUtil;
     @Mock
