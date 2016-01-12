@@ -2,27 +2,34 @@
 <div ng-controller="EnvironmentViewCtrl as environmentViewCtrl">
 
 	<div class="b-workspace__header">
-		<h1 class="b-title">Environments</h1>
+		<h1 class="b-title">Environment Manager</h1>
 	</div>
 
 	<div class="b-workspace__content">
-		<div class="b-data-table">
-			<table datatable="" ng-init="environmentViewCtrl.initDBReload()"
-				dt-options="environmentViewCtrl.dtOptions" 
-				dt-columns="environmentViewCtrl.dtColumns" 
-				dt-instance="environmentViewCtrl.dtInstance" 
-				class="row-border hover">
-			</table>
+		<div class="b-tabs-menu">
+			<ul>
+				<li class="b-tabs-menu__item"
+					ng-click="environmentViewCtrl.activeTab = 'installed'"
+					ng-class="environmentViewCtrl.activeTab == 'installed' ? 'b-tabs-menu__item_active' : ''">
+					Approved
+				</li>
+				<li class="b-tabs-menu__item"
+					ng-click="environmentViewCtrl.activeTab = 'pending'"
+					ng-class="environmentViewCtrl.activeTab == 'pending' ? 'b-tabs-menu__item_active' : ''">
+					Pending
+				</li>
+			</ul>
+		</div>
+		<div
+				ng-if="environmentViewCtrl.activeTab == 'installed'"
+				ng-include="'subutai-app/environment/partials/installed.html'">
 		</div>
 
-		<!--<div class="b-empty-list" ng-show="environmentViewCtrl.environments.length == 0">
-			<div class="b-empty-list__text">
-				You don’t have any environments, chose blueprint and build it
-			</div>
-			<a class="b-btn b-btn_blue" ui-sref="blueprints">
-				<i class="fa fa-plus"></i> Blueprints
-			</a>	
-		</div>-->
+		<div
+				ng-if="environmentViewCtrl.activeTab == 'pending'"
+				ng-include="'subutai-app/environment/partials/pending.html'">
+		</div>
+
 	</div>
-	
+
 </div>

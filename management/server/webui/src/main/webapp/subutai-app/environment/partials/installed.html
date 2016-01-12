@@ -1,0 +1,34 @@
+<div class="b-workspace-content b-workspace-content_border">
+	<div class="b-workspace__content">
+		<div class="b-workspace-content__row">
+			<div class="b-main-table-border">
+				<table class="b-main-table b-main-table_with-header">
+					<tr>
+						<th></th>
+						<th>Name</th>
+						<th>SSH Key</th>
+						<th>Domains</th>
+						<th>Containers</th>
+						<th>Actions</th>
+					</tr>
+					<td colspan = "6" class = "b-main-table__empty-item" ng-show = "!environmentViewCtrl.installed">
+						You don’t have any installed environments
+					</td>
+					<tr ng-repeat = "environment in environmentViewCtrl.environments" ng-show = "environment.status !== 'PENDING'">
+						<td>
+							<div class="b-status-icon b-status-icon_{{ environment.status }}" tooltips tooltip-title="{{ environment.status }}"></div>
+						</td>
+						<td>{{ environment.name }}</td>
+						<td><a href ng-click = "environmentViewCtrl.showSSHKeyForm(environment.id)">Add</a>/<a href ng-click="environmentViewCtrl.removeSshKey(environment.id)">Remove</a></td>
+						<td><button class="b-btn b-btn_grey" ng-click="environmentViewCtrl.showDomainForm(environment.id)">Configure</button></td>
+						<td>{{ environmentViewCtrl.containersTags (environment) }}</td>
+						<td>
+							<a href class="b-btn b-btn_blue g-left" ng-click="environmentViewCtrl.shareEnvironmentWindow (environment.id)" ng-show = "environment.status === 'HEALTHY'">Share</a>
+							<a href class="b-icon b-icon_remove" ng-click="environmentViewCtrl.destroyEnvironment(environment.id)"></a>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>

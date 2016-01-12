@@ -4,15 +4,15 @@ angular.module('subutai.environment.controller', [])
 	.controller('EnvironmentViewCtrl', EnvironmentViewCtrl)
 	.directive('fileModel', fileModel);
 
-EnvironmentViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'SweetAlert', 'DTOptionsBuilder', 'DTColumnBuilder', '$resource', '$compile', 'ngDialog', '$timeout'];
+EnvironmentViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'SweetAlert', '$resource', '$compile', 'ngDialog', '$timeout'];
 fileModel.$inject = ['$parse'];
 
 var fileUploder = {};
 
-function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert, DTOptionsBuilder, DTColumnBuilder, $resource, $compile, ngDialog, $timeout) {
+function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert, $resource, $compile, ngDialog, $timeout) {
 
 	var vm = this;
-
+	vm.activeTab = "installed"
 	vm.currentEnvironment = {};
 	vm.signedMessage = "";
 	vm.buildEnvironment = buildEnvironment;
@@ -37,14 +37,38 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 	vm.showDomainForm = showDomainForm;
 	vm.setDomain = setDomain;
 	vm.removeDomain = removeDomain;
+	vm.installed = false;
+	vm.pending = false;
+
+
+	function loadEnvironments() {
+		environmentService.getEnvironments().success (function (data) {
+			vm.environments = data;
+			for (var i = 0; i < vm.environments.length; ++i) {
+				if (vm.environments[i].status !== "PENDING") {
+					vm.installed = true;
+					if (vm.pending) {
+						break;
+					}
+				}
+				else {
+					vm.pending = true;
+					if (vm.installed) {
+						break;
+					}
+				}
+			}
+		});
+	}
+	loadEnvironments();
 
 	environmentService.getDomainStrategies().success(function (data) {
 		vm.domainStrategies = data;
 	});
 
-	vm.dtInstance = {};
+//	vm.dtInstance = {};
 	vm.users = {};
-	vm.dtOptions = DTOptionsBuilder
+/*	vm.dtOptions = DTOptionsBuilder
 		.fromFnPromise(function() {
 			return $resource( environmentService.getServerUrl() ) .query().$promise;
 		}).withPaginationType('full_numbers')
@@ -64,7 +88,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 		DTColumnBuilder.newColumn(null).withTitle('Actions').notSortable().renderWith(actionStartEnvironmentBuild),
 		//DTColumnBuilder.newColumn(null).withTitle('Revoke').notSortable().renderWith(actionSwitch),
 		DTColumnBuilder.newColumn(null).withTitle('').notSortable().renderWith(actionDelete)
-	];
+	];*/
 
 	vm.listOfUsers = [];
 	vm.shareEnvironmentWindow = shareEnvironmentWindow;
@@ -92,9 +116,9 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 
 
 
-	function actionShare (data, type, full, meta) {
+/*	function actionShare (data, type, full, meta) {
 		return '<a href="" class="b-btn b-btn_blue g-left" ng-click="environmentViewCtrl.shareEnvironmentWindow(\'' + data.id + '\')" ng-show = "' + (data.status === "HEALTHY") + '">Share</a>';
-	}
+	}*/
 
 
 
@@ -194,7 +218,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 		});
 	}
 
-	var refreshTable;
+/*	var refreshTable;
 	var reloadTableData = function() {
 		refreshTable = $timeout(function myFunction() {
 			vm.dtInstance.reloadData(null, false);
@@ -207,6 +231,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 		console.log('cancel');
 		$timeout.cancel(refreshTable);
 	});
+
 
 	function createdRow(row, data, dataIndex) {
 		$compile(angular.element(row).contents())($scope);
@@ -234,9 +259,9 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 
 	function actionStartEnvironmentBuild(data, type, full, meta) {
 		return '<a href="" class="b-icon b-icon_build" ng-click="environmentViewCtrl.startEnvironmentBuild(\'' + data.id + '\')"></a>';
-	}
+	}*/
 
-	function containersTags(data, type, full, meta) {
+	function containersTags (data) {
 
 		var containersTotal = [];
 		for(var i = 0; i < data.containers.length; i++) {
@@ -291,9 +316,9 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 		return containersHTML;
 	}
 
-	function actionDelete(data, type, full, meta) {
+/*	function actionDelete(data, type, full, meta) {
 		return '<a href="" class="b-icon b-icon_remove" ng-click="environmentViewCtrl.destroyEnvironment(\'' + data.id + '\')"></a>';
-	}
+	}*/
 
 	function destroyContainer(containerId) {
 		SweetAlert.swal({
@@ -331,7 +356,8 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 	function buildEnvironment() {
 		environmentService.startEnvironmentBuild (vm.currentEnvironment.id, encodeURIComponent(vm.currentEnvironment.relationDeclaration)).success(function (data) {
 			SweetAlert.swal("Success!", "Your environment has started building.", "success");
-			vm.dtInstance.reloadData(null, false);
+			loadEnvironments();
+			vm.activeTab = "installed";
 			ngDialog.closeAll();
 		}).error(function (data) {
 			SweetAlert.swal("ERROR!", "Environment build error. Error: " + data.ERROR, "error");
