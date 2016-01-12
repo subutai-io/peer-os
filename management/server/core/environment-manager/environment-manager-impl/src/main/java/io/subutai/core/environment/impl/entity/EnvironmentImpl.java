@@ -347,8 +347,8 @@ public class EnvironmentImpl implements Environment, Serializable
                 {
                     RelationMeta relationMeta =
                             new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), containerHost,
-                                    containerHost.getId(), PermissionObject.EnvironmentManagement,
-                                    containerHost.getId() );
+                                    containerHost.getId(), containerHost.getId(),
+                                    PermissionObject.EnvironmentManagement.getName() );
                     boolean trustedRelation =
                             relationManager.getRelationInfoManager().allHasReadPermissions( relationMeta );
                     if ( !trustedRelation )

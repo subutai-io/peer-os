@@ -10,10 +10,10 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.security.objects.Ownership;
-import io.subutai.common.security.objects.PermissionOperation;
 import io.subutai.common.security.relation.RelationInfoManager;
 import io.subutai.common.security.relation.model.Relation;
 import io.subutai.common.security.relation.model.RelationInfo;
+import io.subutai.common.security.relation.model.RelationInfoMeta;
 import io.subutai.common.security.relation.model.RelationLink;
 import io.subutai.common.security.relation.model.RelationMeta;
 import io.subutai.core.environment.impl.dao.RelationDataService;
@@ -38,16 +38,6 @@ public class RelationInfoManagerImpl implements RelationInfoManager
     }
 
 
-    @Override
-    public boolean ownerHasReadPermissions( final RelationMeta relationMeta )
-    {
-
-        RelationInfo relationInfo = new RelationInfoImpl( relationMeta.getPermissionObject().getName(),
-                Sets.newHashSet( PermissionOperation.Read.getName() ), Ownership.USER.getLevel() );
-        return isRelationValid( relationInfo, relationMeta );
-    }
-
-
     // TODO also verify source of trust, like if A -> B -> C, check does really A has permission to create relation
     // between B and C
     // C should give correct verification through relationship path.
@@ -60,10 +50,12 @@ public class RelationInfoManagerImpl implements RelationInfoManager
 
         Set<RelationLink> relationLinks = Sets.newHashSet();
 
-        RelationLinkImpl target = new RelationLinkImpl( relationMeta.getSourceId(), relationMeta.getSourcePath() );
+        RelationLinkImpl target = new RelationLinkImpl( relationMeta.getSourceId(), relationMeta.getSourcePath(),
+                relationMeta.getContext() );
         List<Relation> byTargetRelations = relationDataService.findByTarget( target );
 
-        RelationLinkImpl object = new RelationLinkImpl( relationMeta.getObjectId(), relationMeta.getObjectPath() );
+        RelationLinkImpl object = new RelationLinkImpl( relationMeta.getObjectId(), relationMeta.getObjectPath(),
+                relationMeta.getContext() );
         List<Relation> bySourceRelations = relationDataService.findBySource( target );
 
         // When relation info is found check that relation was granted from verified source
@@ -134,16 +126,16 @@ public class RelationInfoManagerImpl implements RelationInfoManager
 
 
     /**
-     * Compare relationship weight depending on each relationship property, if relation context or level differs then
-     * this relation is not comparable 1 - a is greater 0 - equal -1 - a is less than -2 - incomparable
+     * Compare relationship depending on each relationship property, if relation ownership level differs then this
+     * relation is not comparable, the rest properties simply should match, and data format should come in key=value
+     * format
+     *  1 - a is greater
+     *  0 - equal
+     * -1 - a is less than
+     * -2 - incomparable
      */
     private int compareRelationships( RelationInfo a, RelationInfo b )
     {
-        if ( !a.getContext().equalsIgnoreCase( b.getContext() ) )
-        {
-            return -2;
-        }
-
         int ownership = 0;
         if ( a.getOwnershipLevel() > b.getOwnershipLevel() )
         {
@@ -156,16 +148,15 @@ public class RelationInfoManagerImpl implements RelationInfoManager
 
         //Calculate permission operations level
         int operation = 0;
-        int operationA = sumUpOperationLevel( a.getOperation() );
-        int operationB = sumUpOperationLevel( b.getOperation() );
-
-        if ( operationA > operationB )
-        {
-            operation = 1;
-        }
-        else if ( operationA < operationB )
+        if ( !a.isDeletePermission() && b.isDeletePermission() || !a.isReadPermission() && b.isReadPermission()
+                || !a.isUpdatePermission() && b.isUpdatePermission() || !a.isWritePermission() && b
+                .isWritePermission() )
         {
             operation = -1;
+        }
+        else
+        {
+            operation = 0;
         }
 
         if ( operation == 0 )
@@ -176,22 +167,22 @@ public class RelationInfoManagerImpl implements RelationInfoManager
     }
 
 
-    private int sumUpOperationLevel( Set<String> operations )
+    @Override
+    public boolean ownerHasReadPermissions( final RelationMeta relationMeta )
     {
-        int sum = 0;
-        for ( final String operation : operations )
-        {
-            sum += PermissionOperation.getByName( operation ).getId();
-        }
-        return sum;
+        RelationInfoMeta relationInfoMeta =
+                new RelationInfoMeta( true, false, false, false, Ownership.USER.getLevel() );
+        RelationInfo relationInfo = new RelationInfoImpl( relationInfoMeta );
+        return isRelationValid( relationInfo, relationMeta );
     }
 
 
     @Override
     public boolean ownerHasWritePermissions( final RelationMeta relationMeta )
     {
-        RelationInfo relationInfo = new RelationInfoImpl( relationMeta.getPermissionObject().getName(),
-                Sets.newHashSet( PermissionOperation.Write.getName() ), Ownership.USER.getLevel() );
+        RelationInfoMeta relationInfoMeta =
+                new RelationInfoMeta( false, true, false, false, Ownership.USER.getLevel() );
+        RelationInfo relationInfo = new RelationInfoImpl( relationInfoMeta );
         return isRelationValid( relationInfo, relationMeta );
     }
 
@@ -199,8 +190,9 @@ public class RelationInfoManagerImpl implements RelationInfoManager
     @Override
     public boolean ownerHasDeletePermissions( final RelationMeta relationMeta )
     {
-        RelationInfo relationInfo = new RelationInfoImpl( relationMeta.getPermissionObject().getName(),
-                Sets.newHashSet( PermissionOperation.Delete.getName() ), Ownership.USER.getLevel() );
+        RelationInfoMeta relationInfoMeta =
+                new RelationInfoMeta( false, false, false, true, Ownership.USER.getLevel() );
+        RelationInfo relationInfo = new RelationInfoImpl( relationInfoMeta );
         return isRelationValid( relationInfo, relationMeta );
     }
 
@@ -208,8 +200,9 @@ public class RelationInfoManagerImpl implements RelationInfoManager
     @Override
     public boolean ownerHasUpdatePermissions( final RelationMeta relationMeta )
     {
-        RelationInfo relationInfo = new RelationInfoImpl( relationMeta.getPermissionObject().getName(),
-                Sets.newHashSet( PermissionOperation.Update.getName() ), Ownership.USER.getLevel() );
+        RelationInfoMeta relationInfoMeta =
+                new RelationInfoMeta( false, false, true, false, Ownership.USER.getLevel() );
+        RelationInfo relationInfo = new RelationInfoImpl( relationInfoMeta );
         return isRelationValid( relationInfo, relationMeta );
     }
 
@@ -217,8 +210,9 @@ public class RelationInfoManagerImpl implements RelationInfoManager
     @Override
     public boolean groupHasReadPermissions( final RelationMeta relationMeta )
     {
-        RelationInfo relationInfo = new RelationInfoImpl( relationMeta.getPermissionObject().getName(),
-                Sets.newHashSet( PermissionOperation.Read.getName() ), Ownership.GROUP.getLevel() );
+        RelationInfoMeta relationInfoMeta =
+                new RelationInfoMeta( true, false, false, false, Ownership.GROUP.getLevel() );
+        RelationInfo relationInfo = new RelationInfoImpl( relationInfoMeta );
         return isRelationValid( relationInfo, relationMeta );
     }
 
@@ -226,8 +220,9 @@ public class RelationInfoManagerImpl implements RelationInfoManager
     @Override
     public boolean groupHasWritePermissions( final RelationMeta relationMeta )
     {
-        RelationInfo relationInfo = new RelationInfoImpl( relationMeta.getPermissionObject().getName(),
-                Sets.newHashSet( PermissionOperation.Write.getName() ), Ownership.GROUP.getLevel() );
+        RelationInfoMeta relationInfoMeta =
+                new RelationInfoMeta( false, true, false, false, Ownership.GROUP.getLevel() );
+        RelationInfo relationInfo = new RelationInfoImpl( relationInfoMeta );
         return isRelationValid( relationInfo, relationMeta );
     }
 
@@ -235,8 +230,9 @@ public class RelationInfoManagerImpl implements RelationInfoManager
     @Override
     public boolean groupHasDeletePermissions( final RelationMeta relationMeta )
     {
-        RelationInfo relationInfo = new RelationInfoImpl( relationMeta.getPermissionObject().getName(),
-                Sets.newHashSet( PermissionOperation.Delete.getName() ), Ownership.GROUP.getLevel() );
+        RelationInfoMeta relationInfoMeta =
+                new RelationInfoMeta( false, false, false, true, Ownership.GROUP.getLevel() );
+        RelationInfo relationInfo = new RelationInfoImpl( relationInfoMeta );
         return isRelationValid( relationInfo, relationMeta );
     }
 
@@ -244,8 +240,9 @@ public class RelationInfoManagerImpl implements RelationInfoManager
     @Override
     public boolean groupHasUpdatePermissions( final RelationMeta relationMeta )
     {
-        RelationInfo relationInfo = new RelationInfoImpl( relationMeta.getPermissionObject().getName(),
-                Sets.newHashSet( PermissionOperation.Update.getName() ), Ownership.GROUP.getLevel() );
+        RelationInfoMeta relationInfoMeta =
+                new RelationInfoMeta( false, false, true, false, Ownership.GROUP.getLevel() );
+        RelationInfo relationInfo = new RelationInfoImpl( relationInfoMeta );
         return isRelationValid( relationInfo, relationMeta );
     }
 
@@ -253,9 +250,8 @@ public class RelationInfoManagerImpl implements RelationInfoManager
     @Override
     public boolean allHasReadPermissions( final RelationMeta relationMeta )
     {
-
-        RelationInfo relationInfo = new RelationInfoImpl( relationMeta.getPermissionObject().getName(),
-                Sets.newHashSet( PermissionOperation.Read.getName() ), Ownership.ALL.getLevel() );
+        RelationInfoMeta relationInfoMeta = new RelationInfoMeta( true, false, false, false, Ownership.ALL.getLevel() );
+        RelationInfo relationInfo = new RelationInfoImpl( relationInfoMeta );
         return isRelationValid( relationInfo, relationMeta );
     }
 
@@ -263,8 +259,8 @@ public class RelationInfoManagerImpl implements RelationInfoManager
     @Override
     public boolean allHasWritePermissions( final RelationMeta relationMeta )
     {
-        RelationInfo relationInfo = new RelationInfoImpl( relationMeta.getPermissionObject().getName(),
-                Sets.newHashSet( PermissionOperation.Write.getName() ), Ownership.ALL.getLevel() );
+        RelationInfoMeta relationInfoMeta = new RelationInfoMeta( false, true, false, false, Ownership.ALL.getLevel() );
+        RelationInfo relationInfo = new RelationInfoImpl( relationInfoMeta );
         return isRelationValid( relationInfo, relationMeta );
     }
 
@@ -272,8 +268,8 @@ public class RelationInfoManagerImpl implements RelationInfoManager
     @Override
     public boolean allHasDeletePermissions( final RelationMeta relationMeta )
     {
-        RelationInfo relationInfo = new RelationInfoImpl( relationMeta.getPermissionObject().getName(),
-                Sets.newHashSet( PermissionOperation.Delete.getName() ), Ownership.ALL.getLevel() );
+        RelationInfoMeta relationInfoMeta = new RelationInfoMeta( false, false, false, true, Ownership.ALL.getLevel() );
+        RelationInfo relationInfo = new RelationInfoImpl( relationInfoMeta );
         return isRelationValid( relationInfo, relationMeta );
     }
 
@@ -281,8 +277,8 @@ public class RelationInfoManagerImpl implements RelationInfoManager
     @Override
     public boolean allHasUpdatePermissions( final RelationMeta relationMeta )
     {
-        RelationInfo relationInfo = new RelationInfoImpl( relationMeta.getPermissionObject().getName(),
-                Sets.newHashSet( PermissionOperation.Update.getName() ), Ownership.ALL.getLevel() );
+        RelationInfoMeta relationInfoMeta = new RelationInfoMeta( false, false, true, false, Ownership.ALL.getLevel() );
+        RelationInfo relationInfo = new RelationInfoImpl( relationInfoMeta );
         return isRelationValid( relationInfo, relationMeta );
     }
 }

@@ -2,7 +2,6 @@ package io.subutai.common.security.relation;
 
 
 import java.util.List;
-import java.util.Set;
 
 import io.subutai.common.security.relation.model.Relation;
 import io.subutai.common.security.relation.model.RelationInfo;
@@ -19,8 +18,6 @@ public interface RelationManager
     String getContext();
 
     void processTrustMessage( String signedMessage, final String secretKeyId ) throws RelationVerificationException;
-
-    RelationInfo createTrustRelationship( String context, Set<String> operation, int ownershipLevel );
 
     RelationInfo createTrustRelationship( RelationInfoMeta relationInfoMeta );
 

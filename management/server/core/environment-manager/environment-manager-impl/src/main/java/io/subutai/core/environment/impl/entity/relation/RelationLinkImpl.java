@@ -29,17 +29,21 @@ public class RelationLinkImpl implements RelationLink
     @Column( name = "class_path" )
     private String classPath;
 
+    @Column( name = "context" )
+    private String context = "";
+
 
     public RelationLinkImpl()
     {
     }
 
 
-    public RelationLinkImpl( final String uniqueIdentifier, final String classPath )
+    public RelationLinkImpl( final String uniqueIdentifier, final String classPath, final String context )
     {
         this.uniqueIdentifier = uniqueIdentifier;
         this.classPath = classPath;
         this.id = classPath + "|" + uniqueIdentifier;
+        this.context = context;
     }
 
 
@@ -61,6 +65,19 @@ public class RelationLinkImpl implements RelationLink
     public String getClassPath()
     {
         return classPath;
+    }
+
+
+    @Override
+    public String getContext()
+    {
+        return context;
+    }
+
+
+    public void setContext( final String context )
+    {
+        this.context = context;
     }
 
 
