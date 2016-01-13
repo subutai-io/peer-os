@@ -257,10 +257,10 @@ function BlueprintsBuildCtrl($scope, environmentService, SweetAlert, ngDialog, $
 
 		SweetAlert.swal("Success!", "Your environment start creation.", "success");
 		ngDialog.closeAll();
-		$location.path('/environments');
 
 		environmentService.setupRequisites(encodeURI(blueprintJson)).success(function (data) {
 			SweetAlert.swal("Success!", "Your environment has been created.", "success");
+			$location.path('/environments/pending');
 		}).error(function (error) {
 			SweetAlert.swal("ERROR!", 'Create environment error: ' + error.ERROR, "error");
 		});

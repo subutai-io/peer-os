@@ -21,10 +21,10 @@
 						<td>{{ environment.name }}</td>
 						<td><a href ng-click = "environmentViewCtrl.showSSHKeyForm(environment.id)">Add</a>/<a href ng-click="environmentViewCtrl.removeSshKey(environment.id)">Remove</a></td>
 						<td><button class="b-btn b-btn_grey" ng-click="environmentViewCtrl.showDomainForm(environment.id)">Configure</button></td>
-						<td>{{ environmentViewCtrl.containersTags (environment) }}</td>
+						<td ng-bind-html="environmentViewCtrl.setHtml (environmentViewCtrl.containersTags (environment))"></td>
 						<td>
-							<button class="b-btn b-btn_blue" ng-click="environmentViewCtrl.startEnvironmentBuild(environment.id)">Build</button>
-							<a href class="b-icon b-icon_remove" ng-click="environmentViewCtrl.destroyEnvironment(environment.id)"></a>
+							<button class="b-btn b-btn_blue" ng-click="environmentViewCtrl.startEnvironmentBuild(environment)">Build</button>
+							<a href class="b-icon b-icon_remove" ng-click="environmentViewCtrl.destroyEnvironment(environment.id)" style = "margin-left: 10px; margin-top: 7px"></a>
 						</td>
 					</tr>
 				</table>

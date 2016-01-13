@@ -174,7 +174,7 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
             }
         })
         .state('environments', {
-            url: '/environments',
+            url: '/environments/{activeTab}',
             templateUrl: 'subutai-app/environment/partials/view.html',
             resolve: {
                 loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {

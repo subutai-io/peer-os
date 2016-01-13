@@ -4,15 +4,18 @@ angular.module('subutai.environment.controller', [])
 	.controller('EnvironmentViewCtrl', EnvironmentViewCtrl)
 	.directive('fileModel', fileModel);
 
-EnvironmentViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'SweetAlert', '$resource', '$compile', 'ngDialog', '$timeout'];
+EnvironmentViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'SweetAlert', '$resource', '$compile', 'ngDialog', '$timeout', '$sce', '$stateParams', 'DTOptionsBuilder', 'DTColumnDefBuilder'];
 fileModel.$inject = ['$parse'];
 
 var fileUploder = {};
 
-function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert, $resource, $compile, ngDialog, $timeout) {
+function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert, $resource, $compile, ngDialog, $timeout, $sce, $stateParams, DTOptionsBuilder, DTColumnDefBuilder) {
 
 	var vm = this;
-	vm.activeTab = "installed"
+	vm.activeTab = $stateParams.activeTab;
+	if (vm.activeTab !== "pending") {
+		vm.activeTab = "installed";
+	}
 	vm.currentEnvironment = {};
 	vm.signedMessage = "";
 	vm.buildEnvironment = buildEnvironment;
@@ -67,7 +70,20 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 	});
 
 //	vm.dtInstance = {};
-	vm.users = {};
+//	vm.users = {};
+	vm.dtOptions = DTOptionsBuilder
+		.newOptions()
+		.withOption('order', [[ 2, "asc" ]])
+		.withOption('stateSave', true)
+		.withPaginationType('full_numbers');
+	vm.dtColumnDefs = [
+		DTColumnDefBuilder.newColumnDef(0),
+		DTColumnDefBuilder.newColumnDef(1),
+		DTColumnDefBuilder.newColumnDef(2),
+		DTColumnDefBuilder.newColumnDef(3).notSortable(),
+		DTColumnDefBuilder.newColumnDef(4).notSortable(),
+		DTColumnDefBuilder.newColumnDef(5).notSortable()
+	];
 /*	vm.dtOptions = DTOptionsBuilder
 		.fromFnPromise(function() {
 			return $resource( environmentService.getServerUrl() ) .query().$promise;
@@ -97,6 +113,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 	vm.users2Add = [];
 	vm.addUser2Stack = addUser2Stack;
 	vm.removeUserFromStack = removeUserFromStack;
+	vm.containersTags = containersTags;
 	function addUser2Stack(user) {
 		vm.users2Add.push(angular.copy(user));
 		for (var i = 0; i < vm.listOfUsers.length; ++i) {
@@ -127,7 +144,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 	environmentService.getCurrentUser().success (function (data) {
 		vm.currentUser = data;
 	});
-	function shareEnvironmentWindow (environmentId) {
+	function shareEnvironmentWindow (environment) {
 		vm.listOfUsers = [];
 		vm.checkedUsers = [];
 		environmentService.getUsers().success (function (data) {
@@ -142,7 +159,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 				vm.listOfUsers[i].update = true;
 				vm.listOfUsers[i].delete = true;
 			}
-			environmentService.getShared (environmentId).success (function (data2) {
+			environmentService.getShared (environment.id).success (function (data2) {
 				console.log (data2);
 				vm.users2Add = data2;
 				for (var i = 0; i < vm.users2Add.length; ++i) {
@@ -159,7 +176,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 						}
 					}
 				}
-				vm.currentEnvironment = vm.users[environmentId];
+				vm.currentEnvironment = environment;
 				ngDialog.open ({
 					template: "subutai-app/environment/partials/shareEnv.html",
 					scope: $scope
@@ -191,7 +208,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 		}
 		environmentService.share (JSON.stringify (arr), vm.currentEnvironment.id).success(function (data) {
 			SweetAlert.swal("Success!", "Your environment was successfully shared.", "success");
-			vm.dtInstance.reloadData(null, false);
+			loadEnvironments();
 			ngDialog.closeAll();
 		}).error(function (data) {
 			SweetAlert.swal("ERROR!", "Your container is safe :). Error: " + data.ERROR, "error");
@@ -214,7 +231,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 
 	function revoke (environmentId) {
 		environmentService.revoke (environmentId).success (function (data) {
-			vm.dtInstance.reloadData(null, false);
+			loadEnvironments();
 		});
 	}
 
@@ -262,7 +279,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 	}*/
 
 	function containersTags (data) {
-
 		var containersTotal = [];
 		for(var i = 0; i < data.containers.length; i++) {
 			if(containersTotal[data.containers[i].templateName] === undefined) {
@@ -282,7 +298,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 				containersTotal[data.containers[i].templateName][data.containers[i].type] += 1;
 			}
 		}
-
 		var containersHTML = '';
 		for(var template in containersTotal) {
 			for (var type in containersTotal[template]){
@@ -295,13 +310,13 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 					containersHTML += '<a ui-sref="containers({environmentId:\'' + data.id + '\'})" '
 						+ ' class="b-tags b-tags_' + quotaColors[type] + '" '
 						+ 'tooltips tooltip-content=\'' + tooltipContent + '\' tooltip-hide-trigger="mouseleave click" '
+						+ 'href="/containers/' + data.id + '"'
 						+ '>'
 						+ template + ': ' + containersTotal[template][type]
 					+ '</a>';
 				}
 			}
 		}
-
 		/*var containersHTML = '';
 		for(var i = 0; i < data.containers.length; i++) {
 			var tooltipContent = 'IP: <b>' + data.containers[i].ip + '</b><br> Quota: <div class="b-quota-type-round b-quota-type-round_' + quotaColors[data.containers[i].type] + '"></div> <b>' + data.containers[i].type + '</b><br>State: <b>' + data.containers[i].state + '</b>';
@@ -337,7 +352,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 			if (isConfirm) {
 				environmentService.destroyContainer(containerId).success(function (data) {
 					SweetAlert.swal("Destroyed!", "Your container has been destroyed.", "success");
-					vm.dtInstance.reloadData(null, false);
+					loadEnvironments();
 				}).error(function (data) {
 					SweetAlert.swal("ERROR!", "Your container is safe :). Error: " + data.ERROR, "error");
 				});
@@ -345,8 +360,8 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 		});
 	}
 
-    function startEnvironmentBuild(environmentId) {
-    	vm.currentEnvironment = vm.users[environmentId];
+    function startEnvironmentBuild (environment) {
+    	vm.currentEnvironment = environment;
 		ngDialog.open ({
 			template: "subutai-app/environment/partials/decryptMsg.html",
 			scope: $scope
@@ -383,11 +398,11 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 					SweetAlert.swal("Delete!", "Your environment is being deleted!", "success");
 					environmentService.destroyEnvironment(environmentId).success(function (data) {
 						SweetAlert.swal("Destroyed!", "Your environment has been destroyed.", "success");
-						vm.dtInstance.reloadData(null, false);
+						loadEnvironments();
 					}).error(function (data) {
 						SweetAlert.swal("ERROR!", "Your environment is safe :). Error: " + data.ERROR, "error");
 					});
-					vm.dtInstance.reloadData(null, false);
+					loadEnvironments();
 				}
 			});
 	}
@@ -511,6 +526,12 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 			ngDialog.closeAll();
 		});
 	}
+
+
+	vm.setHtml = setHtml;
+	function setHtml (html) {
+		return $sce.trustAsHtml(html.toString());
+	};
 }
 
 function fileModel($parse) {

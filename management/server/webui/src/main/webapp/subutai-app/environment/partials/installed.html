@@ -21,10 +21,10 @@
 						<td>{{ environment.name }}</td>
 						<td><a href ng-click = "environmentViewCtrl.showSSHKeyForm(environment.id)">Add</a>/<a href ng-click="environmentViewCtrl.removeSshKey(environment.id)">Remove</a></td>
 						<td><button class="b-btn b-btn_grey" ng-click="environmentViewCtrl.showDomainForm(environment.id)">Configure</button></td>
-						<td>{{ environmentViewCtrl.containersTags (environment) }}</td>
+						<td></td>
 						<td>
 							<a href class="b-btn b-btn_blue g-left" ng-click="environmentViewCtrl.shareEnvironmentWindow (environment.id)" ng-show = "environment.status === 'HEALTHY'">Share</a>
-							<a href class="b-icon b-icon_remove" ng-click="environmentViewCtrl.destroyEnvironment(environment.id)"></a>
+							<a href class="b-icon b-icon_remove" ng-click="environmentViewCtrl.destroyEnvironment(environment.id)" style = "margin-left: 10px; margin-top: 5px"></a>
 						</td>
 					</tr>
 				</table>
@@ -32,3 +32,7 @@
 		</div>
 	</div>
 </div>
+
+
+
+
