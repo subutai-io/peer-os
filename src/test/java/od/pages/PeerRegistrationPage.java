@@ -1,14 +1,19 @@
 package od.pages;
 
+import net.serenitybdd.core.annotations.findby.FindBy;
 import net.serenitybdd.core.pages.PageObject;
+import net.serenitybdd.core.pages.WebElementFacade;
 
-public class HomePage extends PageObject {
+public class PeerRegistrationPage extends PageObject {
 
     //region WEB ELEMENTS: Fields
 
     //endregion
 
     //region WEB ELEMENTS: Buttons
+
+    @FindBy(id = "subt_link__create-peer")
+    public WebElementFacade buttonCreatePeer;
 
     //endregion
 
@@ -42,6 +47,8 @@ public class HomePage extends PageObject {
 
     //region WEB ELEMENTS: Headers
 
-    //endregion
+    @FindBy(xpath = "*//h1[contains(text(),\"Peer registration\")]")
+    public WebElementFacade headerPeerRegistration;
 
+    //endregion
 }

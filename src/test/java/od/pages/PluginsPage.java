@@ -1,8 +1,10 @@
 package od.pages;
 
+import net.serenitybdd.core.annotations.findby.FindBy;
 import net.serenitybdd.core.pages.PageObject;
+import net.serenitybdd.core.pages.WebElementFacade;
 
-public class HomePage extends PageObject {
+public class PluginsPage extends PageObject {
 
     //region WEB ELEMENTS: Fields
 
@@ -34,6 +36,9 @@ public class HomePage extends PageObject {
 
     //region WEB ELEMENTS: Images
 
+    @FindBy(xpath = "*//div[@class=\"b-plugins-list-item\"]")
+    public WebElementFacade pluginItems;
+
     //endregion
 
     //region WEB ELEMENTS: Icons
@@ -42,6 +47,8 @@ public class HomePage extends PageObject {
 
     //region WEB ELEMENTS: Headers
 
-    //endregion
+    @FindBy(xpath = "*//h1[contains(text(),\"Plugins\")]")
+    public WebElementFacade headerPlugins;
 
+    //endregion
 }

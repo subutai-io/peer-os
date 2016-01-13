@@ -4,22 +4,13 @@ import net.serenitybdd.core.annotations.findby.FindBy;
 import net.serenitybdd.core.pages.PageObject;
 import net.serenitybdd.core.pages.WebElementFacade;
 
-public class LoginPage extends PageObject {
+public class ConsolePage extends PageObject {
 
     //region WEB ELEMENTS: Fields
-
-    @FindBy(id = "subt-input__login")
-    public WebElementFacade inputLogin;
-
-    @FindBy(id = "subt-input__password")
-    public WebElementFacade inputPassword;
 
     //endregion
 
     //region WEB ELEMENTS: Buttons
-
-    @FindBy(id = "subt-button__login")
-    public WebElementFacade buttonLogin;
 
     //endregion
 
@@ -41,6 +32,15 @@ public class LoginPage extends PageObject {
 
     //region WEB ELEMENTS: Selectors
 
+    @FindBy(xpath = "*//div[@class=\"b-console-selects__item b-main-form__wrapper\"]")
+    public WebElementFacade itemSelectorHost;
+
+    @FindBy(xpath = "*//option[contains(text(),\"management\")]")
+    public WebElementFacade selectorHostsItemManagementHost;
+
+    @FindBy(xpath = "*//option[contains(text(),\"intra\")]")
+    public WebElementFacade selectorHostsItemRecourceHost;
+
     //endregion
 
     //region WEB ELEMENTS: Images
@@ -53,9 +53,12 @@ public class LoginPage extends PageObject {
 
     //region WEB ELEMENTS: Headers
 
-    @FindBy(xpath = "*//h1[contains(text(),\"Log in\")]")
-    public WebElementFacade headerLogin;
-
     //endregion
 
+    //region WEB ELEMENTS: Shell output
+
+    @FindBy(xpath = "*//pre[contains(text(),\"/\")]")
+    public WebElementFacade outputOfPwdCommand;
+
+    //endregion
 }

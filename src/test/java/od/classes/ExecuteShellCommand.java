@@ -1,9 +1,11 @@
 package od.classes;
 
+import net.serenitybdd.core.pages.PageObject;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
-public class ExecuteShellCommand {
+public class ExecuteShellCommand extends PageObject{
 
     public String executeCommand(String command) {
 
@@ -25,5 +27,18 @@ public class ExecuteShellCommand {
         }
         System.out.println(output.toString());
         return output.toString();
+    }
+
+    public void executeConsoleCommand(String command){
+        evaluateJavascript("function setCommand(value) {\n" +
+                "var appElement = document.getElementsByClassName('b-terminal')[0];" +
+                "var $scope = angular.element(appElement).scope();" +
+                "$scope.$apply(function() {" +
+                "$scope.commandLine = value;" +
+                "$scope.execute();" +
+                "});" +
+                "} " +
+                "setCommand('"+ command +"')");
+        waitABit(10000);
     }
 }

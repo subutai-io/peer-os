@@ -1,8 +1,10 @@
 package od.pages;
 
+import net.serenitybdd.core.annotations.findby.FindBy;
 import net.serenitybdd.core.pages.PageObject;
+import net.serenitybdd.core.pages.WebElementFacade;
 
-public class HomePage extends PageObject {
+public class RoleManagementPage extends PageObject {
 
     //region WEB ELEMENTS: Fields
 
@@ -10,6 +12,8 @@ public class HomePage extends PageObject {
 
     //region WEB ELEMENTS: Buttons
 
+    @FindBy(xpath = "*//a[@class=\"b-btn b-btn_green b-btn_header-button\"]")
+    public WebElementFacade buttonAddRole;
     //endregion
 
     //region WEB ELEMENTS: Checkboxes
@@ -17,6 +21,9 @@ public class HomePage extends PageObject {
     //endregion
 
     //region WEB ELEMENTS: Links
+
+    @FindBy(id = "subt_link__create-peer")
+    public WebElementFacade buttonCreatePeer;
 
     //endregion
 
@@ -42,6 +49,8 @@ public class HomePage extends PageObject {
 
     //region WEB ELEMENTS: Headers
 
-    //endregion
+    @FindBy(xpath = "*//h1[contains(text(),\"Role management\")]")
+    public WebElementFacade headerRoleManagement;
 
+    //endregion
 }
