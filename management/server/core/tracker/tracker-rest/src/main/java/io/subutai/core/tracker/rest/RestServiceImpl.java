@@ -1,6 +1,9 @@
 package io.subutai.core.tracker.rest;
 
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -9,14 +12,16 @@ import java.util.UUID;
 
 import javax.ws.rs.core.Response;
 
-import io.subutai.common.tracker.TrackerOperationView;
-import io.subutai.core.tracker.api.Tracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
+import io.subutai.common.settings.Common;
+import io.subutai.common.tracker.TrackerOperationView;
+import io.subutai.core.tracker.api.Tracker;
 
 
 /**
@@ -92,5 +97,25 @@ public class RestServiceImpl implements RestService
     public Response getTrackerOperationSources()
     {
         return Response.ok().entity( GSON.toJson( tracker.getTrackerOperationSources() ) ).build();
+    }
+
+
+    @Override
+    public Response getSubutaiInfo()
+    {
+        String content = null;
+
+        try
+        {
+            content = new String(
+                    Files.readAllBytes( Paths.get( String.format( "%s/subutai-version", Common.KARAF_ETC ) ) ) );
+        }
+        catch ( IOException e )
+        {
+            e.printStackTrace();
+            return null;
+        }
+
+        return Response.status( Response.Status.OK ).entity( content ).build();
     }
 }
