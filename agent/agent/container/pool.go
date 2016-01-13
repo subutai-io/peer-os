@@ -4,9 +4,9 @@ import (
 	"errors"
 	fs "gopkg.in/fsnotify.v1"
 	"strings"
-	"subutai/agent/utils"
 	"subutai/config"
 	cont "subutai/lib/container"
+	"subutai/lib/gpg"
 	"subutai/log"
 	"time"
 )
@@ -66,7 +66,7 @@ func (p *pool) Watch(path string) {
 				if event.Op&fs.Create == fs.Create {
 					contName := event.Name[strings.LastIndex(event.Name, "/")+1 : len(event.Name)]
 					time.Sleep(time.Second * 15)
-					uuid := utils.GetFingerprint(contName)
+					uuid := gpg.GetFingerprint(contName)
 					PoolInstance().AddHost(uuid, contName)
 				}
 				//delete from pool
@@ -84,7 +84,7 @@ func (p *pool) Watch(path string) {
 func (p *pool) Populate() {
 	conts := cont.Containers()
 	for _, cont := range conts {
-		uuid := utils.GetFingerprint(cont)
+		uuid := gpg.GetFingerprint(cont)
 		PoolInstance().AddHost(uuid, cont)
 	}
 }

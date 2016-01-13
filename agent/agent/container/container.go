@@ -9,11 +9,8 @@ import (
 	"subutai/agent/utils"
 	"subutai/config"
 	cont "subutai/lib/container"
+	"subutai/lib/gpg"
 	"subutai/log"
-)
-
-const (
-	utsname = "lxc.utsname"
 )
 
 type Container struct {
@@ -64,9 +61,9 @@ func GetActiveContainers(details bool) []Container {
 			continue
 		}
 
-		container.Id = utils.GetFingerprint(c)
+		container.Id = gpg.GetFingerprint(c)
 		if details {
-			container.Pk = utils.GetContainerPk(c)
+			container.Pk = gpg.GetContainerPk(c)
 		}
 		configpath := config.Agent.LxcPrefix + c + "/config"
 		container.Arch = strings.ToUpper(cont.GetConfigItem(configpath, "lxc.arch"))
