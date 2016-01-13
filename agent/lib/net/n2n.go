@@ -116,13 +116,13 @@ func PrintN2NTunnels() {
 		log.Error("PrintN2NTunnels " + err.Error())
 	} else {
 		// log.Info("ACTIVE process")
-		fmt.Printf("%0s %20s %20s %20s %20s", "LocalPeerIP", "ServerIP", "Port", "LocalInterface", "Community")
+		fmt.Printf("%0s %20s %20s", "LocalPeerIP", "LocalInterface", "Community")
 		fmt.Println()
 		for _, v := range strings.Split(string(p), "\n") {
-			if strings.Contains(string(v), "edge") {
+			if strings.Contains(string(v), "p2p") {
 				vArr := strings.Fields(string(v))
 				// fmt.Println(len(vArr))
-				fmt.Printf("%0s %20s %20s %20s", vArr[15], vArr[6], vArr[8], vArr[10])
+				fmt.Printf("%0s %20s %20s", vArr[8], vArr[6], vArr[10])
 				// fmt.Printf("%0s %20s %20s %20s %20s", vArr[15], vArr[6], vArr[17], vArr[8], vArr[10])
 				fmt.Println()
 
