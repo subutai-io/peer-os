@@ -4,14 +4,20 @@ angular.module('subutai.environment.controller', [])
 	.controller('EnvironmentViewCtrl', EnvironmentViewCtrl)
 	.directive('fileModel', fileModel);
 
-EnvironmentViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'SweetAlert', 'DTOptionsBuilder', 'DTColumnBuilder', '$resource', '$compile', 'ngDialog', '$timeout'];
+EnvironmentViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'SweetAlert', 'DTOptionsBuilder', 'DTColumnBuilder', '$resource', '$compile', 'ngDialog', '$timeout', 'cfpLoadingBar'];
 fileModel.$inject = ['$parse'];
 
 var fileUploder = {};
 
-function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert, DTOptionsBuilder, DTColumnBuilder, $resource, $compile, ngDialog, $timeout) {
+function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert, DTOptionsBuilder, DTColumnBuilder, $resource, $compile, ngDialog, $timeout, cfpLoadingBar) {
 
 	var vm = this;
+
+	cfpLoadingBar.start();
+	angular.element(document).ready(function () {
+		cfpLoadingBar.complete();
+	});
+
 	vm.environments = [];
 	vm.domainStrategies = [];
 	vm.sshKeyForEnvironment = '';
@@ -60,7 +66,9 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 	var refreshTable;
 	var reloadTableData = function() {
 		refreshTable = $timeout(function myFunction() {
-			vm.dtInstance.reloadData(null, false);
+			if(typeof(vm.dtInstance.reloadData) == 'function') {
+				vm.dtInstance.reloadData(null, false);
+			}
 			refreshTable = $timeout(reloadTableData, 30000);
 		}, 30000);
 	};
@@ -76,12 +84,12 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 	}
 
 	function statusHTML(environmentStatus, type, full, meta) {
-		return '<div class="b-status-icon b-status-icon_' + environmentStatus + '" tooltips tooltip-title="' + environmentStatus + '"></div>';
+		return '<div class="b-status-icon b-status-icon_' + environmentStatus + '" tooltips tooltip-template="' + environmentStatus + '"></div>';
 	}
 
 	function environmentNameTooltip(data, type, full, meta) {
 		vm.users[data.id] = data;
-		return '<span tooltips tooltip-content="ID: <b>' + data.id + '</b>">' + data.name + '</span>';
+		return "<span tooltips tooltip-template='<span class=\"b-nowrap\">ID: <b>" + data.id + "</b></span>'>" + data.name + "</span>";
 	}
 
 	function sshKeyLinks(data, type, full, meta) {
@@ -122,13 +130,13 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 			for (var type in containersTotal[template]){
 				if(containersTotal[template][type] > 0) {
 					if(type != 'INACTIVE') {
-						var tooltipContent = 'Quota: <div class="b-quota-type-round b-quota-type-round_' + quotaColors[type] + '"></div> <b>' + type + '</b><br>State: <b>RUNNING</b>';
+						var tooltipContent = '<div class="b-nowrap">Quota: <div class="b-quota-type-round b-quota-type-round_' + quotaColors[type] + '"></div> <b>' + type + '</b></div><span class="b-nowrap">State: <b>RUNNING</b></span>';
 					} else {
 						var tooltipContent = 'State: <b>INACTIVE</b>';
 					}
 					containersHTML += '<a ui-sref="containers({environmentId:\'' + data.id + '\'})" ' 
 						+ ' class="b-tags b-tags_' + quotaColors[type] + '" ' 
-						+ 'tooltips tooltip-content=\'' + tooltipContent + '\' tooltip-hide-trigger="mouseleave click" '
+						+ 'tooltips tooltip-template=\'' + tooltipContent + '\''
 						+ '>' 
 						+ template + ': ' + containersTotal[template][type] 
 					+ '</a>';
@@ -136,17 +144,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 			}
 		}
 
-		/*var containersHTML = '';
-		for(var i = 0; i < data.containers.length; i++) {
-			var tooltipContent = 'IP: <b>' + data.containers[i].ip + '</b><br> Quota: <div class="b-quota-type-round b-quota-type-round_' + quotaColors[data.containers[i].type] + '"></div> <b>' + data.containers[i].type + '</b><br>State: <b>' + data.containers[i].state + '</b>';
-			containersHTML += '<span ' 
-				+ ' class="b-tags b-tags_' + quotaColors[data.containers[i].type] + '" ' 
-				+ 'tooltips tooltip-content=\'' + tooltipContent + '\' '
-				+ '>' 
-				+ '<a ui-sref="containers({environmentId:\'' + data.id + '\'})">' + data.containers[i].templateName + '</a>' 
-				+ ' <a href ng-click="environmentViewCtrl.destroyContainer(\'' + data.containers[i].id + '\')"><i class="fa fa-times"></i></a>' 
-			+ '</span>';
-		}*/
 		return containersHTML;
 	}
 
@@ -194,7 +191,15 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 			},
 			function (isConfirm) {
 				if (isConfirm) {
-					SweetAlert.swal("Delete!", "Your environment is being deleted!", "success");
+					SweetAlert.swal(
+							{
+								title : 'Delete!',
+								text : 'Your environment is being deleted!!',
+								timer: VARS_TOOLTIP_TIMEOUT,
+								showConfirmButton: false
+							}
+					);
+
 					environmentService.destroyEnvironment(environmentId).success(function (data) {
 						SweetAlert.swal("Destroyed!", "Your environment has been destroyed.", "success");
 						vm.dtInstance.reloadData(null, false);

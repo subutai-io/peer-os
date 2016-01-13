@@ -1,38 +1,48 @@
-<div ng-controller="LoginCtrl as loginCtrl">
+<div class="b-login">
+	<div class="b-login__form b-login__form_center">
+		<div class="b-login-form-header">
+			<a href="#"><img src="assets/elements/logo.svg" height="27px" alt=""></a>
+		</div>
+		<div class="b-workspace b-workspace_login">
 
-	<div class="b-workspace__header">
-		<h1 class="b-title">Login</h1>
-	</div>
+			<div class="b-workspace__header">
+				<h1 class="b-title">Log in</h1>
+			</div>
 
-	<div class="b-workspace__content">
-
-		<div class="b-main-form b-main-form_token">
-
-			<form ng-submit="loginCtrl.login()">
-				<div class="b-main-form__wrapper">
-					<label class="b-popup-body-label b-popup-body-label_inline">Login</label>
-					<input type="text" 
-						id="subt-input__login" 
-						ng-model="loginCtrl.name" 
-						class="b-popup-body-input">
-				</div><!--
-
-				--><div class="b-main-form__wrapper">
-					<label class="b-popup-body-label b-popup-body-label_inline">Password</label>
-					<input type="password" 
-						id="subt-input__password" 
-						ng-model="loginCtrl.pass" 
-						class="b-popup-body-input">				
-				</div><!--
-
-				--><div class="b-main-form__wrapper">
-					<button type="submit" class="b-btn b-btn_green" id="subt-button__login">
-						Login
-					</button>
-					<div class="clear"></div>
+			<div class="b-workspace__content" ng-controller="LoginCtrl as loginCtrl">
+				<div class="b-form">
+					<div class="b-form__error-message" ng-if="loginCtrl.errorMessage">
+						{{ loginCtrl.errorMessage }}
+					</div>
+					<form ng-submit="loginCtrl.login()">
+						<div class="b-form__wrapper b-form__wrapper_margin-bottom">
+							<label class="b-form-label">Username</label>
+							<input
+									class="b-form-input b-form-input_full"
+									id="subt-input__login"
+									ng-model="loginCtrl.name"
+									type="text">
+						</div>
+						<div class="b-form__wrapper b-form__wrapper_margin-bottom">
+							<label class="b-form-label">Password</label>
+							<input
+									class="b-form-input b-form-input_full"
+									id="subt-input__password"
+									ng-model="loginCtrl.pass"
+									type="password">
+						</div>
+						<div class="b-form__wrapper b-form__wrapper_margin-bottom">
+							<input type="checkbox" class="b-form-label_margin_r" id="check-box__keep-me-logged">
+							<label class="b-form-label" for="check-box__keep-me-logged">Keep me logged in</label>
+						</div>
+						<div class="b-login-form-btn">
+							<button type="submit" class="b-btn b-btn_green" id="subt-button__login">
+								Login
+							</button>
+						</div>
+					</form>
 				</div>
-			</form>
-
-		</div>	
+			</div>
+		</div>
 	</div>
 </div>

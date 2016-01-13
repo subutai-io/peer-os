@@ -73,11 +73,11 @@
 						<span 
 							class="b-tags b-tags_{{ blueprintsBuildCtrl.colors[nodeGroup.type] }}" 
 							tooltips 
-							tooltip-content='
-								Template: <b>{{ nodeGroup.templateName }}</b><br>
-								Quota: <div class="b-quota-type-round b-quota-type-round_{{ blueprintsBuildCtrl.colors[nodeGroup.type] }}"></div> <b>{{ nodeGroup.type }}</b><br>
-								SSH Group ID: <b>{{ nodeGroup.sshGroupId }}</b><br>
-								Host Group ID: <b>{{ nodeGroup.hostsGroupId }}</b>
+							tooltip-template='
+								<span class="b-nowrap">Template: <b>{{ nodeGroup.templateName }}</b></span><br>
+								<span class="b-nowrap">Quota: <div class="b-quota-type-round b-quota-type-round_{{ blueprintsBuildCtrl.colors[nodeGroup.type] }}"></div> <b>{{ nodeGroup.type }}</b></span><br>
+								<span class="b-nowrap">SSH Group ID: <b>{{ nodeGroup.sshGroupId }}</b></span><br>
+								<span class="b-nowrap">Host Group ID: <b>{{ nodeGroup.hostsGroupId }}</b></span>
 							'>
 							{{ nodeGroup.name }}: {{ nodeGroup.numberOfContainers }}
 						</span>

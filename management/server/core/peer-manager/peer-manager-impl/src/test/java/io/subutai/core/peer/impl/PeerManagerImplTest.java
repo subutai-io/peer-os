@@ -22,7 +22,6 @@ import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.localpeer.impl.LocalPeerImpl;
-import io.subutai.core.localpeer.impl.entity.ManagementHostEntity;
 import io.subutai.core.localpeer.impl.request.MessageRequestListener;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.messenger.api.Messenger;
@@ -79,8 +78,7 @@ public class PeerManagerImplTest
     IdentityManager identityManager;
     @Mock
     SecurityManager securityManager;
-    @Mock
-    ManagementHostEntity managementHost;
+
     @Mock
     Set<RequestListener> requestListeners;
     @Mock
@@ -95,7 +93,7 @@ public class PeerManagerImplTest
     {
         InetAddress inetAddress = mock( InetAddress.class );
         when( peerInfo.getId() ).thenReturn( PEER_ID );
-        when( localPeer.getManagementHost() ).thenReturn( managementHost );
+//        when( localPeer.getManagementHost() ).thenReturn( managementHost );
         when( localPeer.getPeerInfo() ).thenReturn( peerInfo );
         when( localPeer.getId() ).thenReturn( PEER_ID );
 
