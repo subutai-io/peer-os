@@ -59,7 +59,7 @@ func CreateTunnel(l []string, tunnelPortName, tunnelIPAddress, tunnelType string
 	t1 := t[0] + "." + t[1] + "." + t[2]
 	for _, v := range l {
 		if strings.Contains(string(v), t1) {
-			ss := strings.Split(v, " ")
+			ss := strings.Split(v, "-")
 			getTun = ss[0]
 		}
 	}
