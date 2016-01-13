@@ -240,7 +240,7 @@ func removeN2NTunnel(interfaceName, communityName string) {
 	for scanner.Scan() {
 		line := scanner.Text()
 		if strings.HasPrefix(line, interfaceName) && strings.HasSuffix(line, communityName) {
-			newconf = newconf + line
+			newconf = newconf + line + "\n"
 		}
 	}
 	file.Close()
