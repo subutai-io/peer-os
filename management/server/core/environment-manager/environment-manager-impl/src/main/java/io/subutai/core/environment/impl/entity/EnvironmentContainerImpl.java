@@ -70,7 +70,7 @@ import io.subutai.core.security.api.crypto.KeyManager;
 @Access( AccessType.FIELD )
 public class EnvironmentContainerImpl implements EnvironmentContainerHost, Serializable
 {
-    private static final Logger logger = LoggerFactory.getLogger( EnvironmentContainerImpl.class );
+    private static final Logger LOGGER = LoggerFactory.getLogger( EnvironmentContainerImpl.class );
 
     @Column( name = "peer_id", nullable = false )
     private String peerId;
@@ -223,7 +223,15 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @Override
     public ContainerHostState getState()
     {
-        return getPeer().getContainerState( getContainerId() );
+        try
+        {
+            return getPeer().getContainerState( getContainerId() );
+        }
+        catch ( PeerException e )
+        {
+            LOGGER.error( "Error getting container state #getState", e );
+            return ContainerHostState.UNKNOWN;
+        }
     }
 
 
@@ -343,7 +351,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     {
         if ( environmentManager instanceof EnvironmentManagerImpl )
         {
-            logger.warn( "Trust chain validation is on..." );
+            LOGGER.warn( "Trust chain validation is on..." );
             EnvironmentManagerImpl envImpl = ( EnvironmentManagerImpl ) environmentManager;
             if ( envImpl.isKeyTrustCheckEnabled() )
             {

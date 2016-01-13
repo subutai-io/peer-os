@@ -92,7 +92,7 @@ public class EnvironmentWebClient
     }
 
 
-    public ContainerHostState getState( final String host, final ContainerId containerId )
+    public ContainerHostState getState( final String host, final ContainerId containerId ) throws PeerException
     {
         Preconditions.checkNotNull( containerId );
         Preconditions.checkNotNull( containerId.getId() );
@@ -109,8 +109,7 @@ public class EnvironmentWebClient
         }
         catch ( Exception e )
         {
-            LOG.warn( "Error on getting container state: " + e.getMessage() );
-            return ContainerHostState.UNKNOWN;
+            throw new PeerException( "Error getting container state ", e );
         }
     }
 
