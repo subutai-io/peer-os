@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	n "net"
 	"os"
+	"os/exec"
 	"strconv"
 	"strings"
 	"subutai/config"
@@ -64,13 +65,16 @@ func LxcManagementNetwork(args []string) {
 			deleteFlow(args[3], args[4])
 		}
 	case "-N", "--addn2n":
-		if len(args)-3 == 8 {
-			createN2NTunnel(args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10])
-		} else if len(args)-3 == 7 { // management port can be empty
-			createN2NTunnel(args[3], args[4], args[5], args[6], args[7], args[8], args[9], "")
-		} else {
-			log.Warn("please check you have given all arguments correctly")
-		}
+		p2pTunnel(args[5], args[6], args[7])
+		// if len(args)-3 == 8 {
+		// func createN2NTunnel(interfaceName, communityName, localPeepIPAddr) {
+		// func createN2NTunnel(superNodeIPaddr, superNodePort, interfaceName, communityName,localPeepIPAddr, keyType, keyFile, managementPort string) {
+		// createN2NTunnel(args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10])
+		// } else if len(args)-3 == 7 { // management port can be empty
+		// createN2NTunnel(args[3], args[4], args[5], args[6], args[7], args[8], args[9], "")
+		// } else {
+		// log.Warn("please check you have given all arguments correctly")
+		// }
 	case "-Z", "--vniop":
 		switch args[3] {
 		case "deleteall":
@@ -82,6 +86,10 @@ func LxcManagementNetwork(args []string) {
 			net.ListVNI()
 		}
 	}
+}
+
+func p2pTunnel(interfaceName, communityName, localPeepIPAddr string) {
+	log.Check(log.FatalLevel, "p2p command: ", exec.Command("p2p", "-dev", interfaceName, "-ip", localPeepIPAddr, "-hash", communityName).Run())
 }
 
 func createTunnel(tunnelPortName, tunnelIPAddress, tunnelType string) error {
