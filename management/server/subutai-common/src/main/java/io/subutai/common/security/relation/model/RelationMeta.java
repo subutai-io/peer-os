@@ -1,15 +1,12 @@
 package io.subutai.common.security.relation.model;
 
 
-import io.subutai.common.security.objects.PermissionObject;
-
-
 /**
  * Created by talas on 12/10/15.
  */
 public class RelationMeta
 {
-    private PermissionObject permissionObject;
+    private String context;
 
     private String sourceId;
     private String sourcePath;
@@ -29,8 +26,7 @@ public class RelationMeta
 
 
     public RelationMeta( final String sourceId, final String sourcePath, final String targetId, final String targetPath,
-                         final String objectId, final String objectPath, PermissionObject permissionObject,
-                         final String keyId )
+                         final String objectId, final String objectPath, final String keyId, final String context )
     {
         this.sourceId = sourceId;
         this.sourcePath = sourcePath;
@@ -38,13 +34,13 @@ public class RelationMeta
         this.targetPath = targetPath;
         this.objectId = objectId;
         this.objectPath = objectPath;
-        this.permissionObject = permissionObject;
         this.keyId = keyId;
+        this.context = context;
     }
 
 
     public RelationMeta( final Object source, final String sourceId, final Object object, final String objectId,
-                         final PermissionObject permissionObject, final String keyId )
+                         final String keyId, final String context )
     {
         this.sourceId = sourceId;
         this.sourcePath = source.getClass().getSimpleName();
@@ -52,14 +48,13 @@ public class RelationMeta
         this.targetPath = source.getClass().getSimpleName();
         this.objectId = objectId;
         this.objectPath = object.getClass().getSimpleName();
-        this.permissionObject = permissionObject;
         this.keyId = keyId;
+        this.context = context;
     }
 
 
     public RelationMeta( final Object source, final String sourceId, final Object target, final String targetId,
-                         final Object object, final String objectId, final PermissionObject permissionObject,
-                         String keyId )
+                         final Object object, final String objectId, final String keyId, final String context )
     {
         this.sourceId = sourceId;
         this.sourcePath = source.getClass().getSimpleName();
@@ -67,8 +62,8 @@ public class RelationMeta
         this.targetPath = target.getClass().getSimpleName();
         this.objectId = objectId;
         this.objectPath = object.getClass().getSimpleName();
-        this.permissionObject = permissionObject;
         this.keyId = keyId;
+        this.context = context;
     }
 
 
@@ -144,18 +139,6 @@ public class RelationMeta
     }
 
 
-    public PermissionObject getPermissionObject()
-    {
-        return permissionObject;
-    }
-
-
-    public void setPermissionObject( final PermissionObject permissionObject )
-    {
-        this.permissionObject = permissionObject;
-    }
-
-
     public String getKeyId()
     {
         return keyId;
@@ -165,5 +148,17 @@ public class RelationMeta
     public void setKeyId( final String keyId )
     {
         this.keyId = keyId;
+    }
+
+
+    public String getContext()
+    {
+        return context;
+    }
+
+
+    public void setContext( final String context )
+    {
+        this.context = context;
     }
 }

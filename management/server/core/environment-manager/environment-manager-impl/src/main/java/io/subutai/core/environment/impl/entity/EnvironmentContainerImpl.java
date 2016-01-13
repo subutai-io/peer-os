@@ -273,7 +273,8 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
                 {
                     RelationMeta relationMeta =
                             new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), environment,
-                                    environment.getId(), PermissionObject.EnvironmentManagement, environment.getId() );
+                                    environment.getId(), environment.getId(),
+                                    PermissionObject.EnvironmentManagement.getName() );
                     boolean trustedRelation =
                             relationManager.getRelationInfoManager().groupHasWritePermissions( relationMeta );
 

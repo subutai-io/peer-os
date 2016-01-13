@@ -2,7 +2,6 @@ package io.subutai.core.environment.impl.relation;
 
 
 import java.util.List;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -126,14 +125,6 @@ public class RelationManagerImpl implements RelationManager
 
 
     @Override
-    public RelationInfo createTrustRelationship( final String context, final Set<String> operation,
-                                                 final int ownershipLevel )
-    {
-        return new RelationInfoImpl( context, operation, ownershipLevel );
-    }
-
-
-    @Override
     public RelationInfo createTrustRelationship( final RelationInfoMeta relationInfoMeta )
     {
         return new RelationInfoImpl( relationInfoMeta );
@@ -143,13 +134,16 @@ public class RelationManagerImpl implements RelationManager
     @Override
     public Relation buildTrustRelation( final RelationInfo relationInfo, final RelationMeta relationMeta )
     {
-        RelationLinkImpl source = new RelationLinkImpl( relationMeta.getSourceId(), relationMeta.getSourcePath() );
-        RelationLinkImpl target = new RelationLinkImpl( relationMeta.getTargetId(), relationMeta.getTargetPath() );
-        RelationLinkImpl object = new RelationLinkImpl( relationMeta.getObjectId(), relationMeta.getObjectPath() );
+        RelationLinkImpl source = new RelationLinkImpl( relationMeta.getSourceId(), relationMeta.getSourcePath(),
+                relationMeta.getContext() );
+        RelationLinkImpl target = new RelationLinkImpl( relationMeta.getTargetId(), relationMeta.getTargetPath(),
+                relationMeta.getContext() );
+        RelationLinkImpl object = new RelationLinkImpl( relationMeta.getObjectId(), relationMeta.getObjectPath(),
+                relationMeta.getContext() );
 
         //TODO try to pass interface as is
-        RelationImpl relation = new RelationImpl( source, target, object, new RelationInfoImpl( relationInfo ),
-                relationMeta.getKeyId() );
+        RelationImpl relation =
+                new RelationImpl( source, target, object, ( RelationInfoImpl ) relationInfo, relationMeta.getKeyId() );
 
         saveRelation( relation );
 
@@ -160,9 +154,12 @@ public class RelationManagerImpl implements RelationManager
     @Override
     public Relation getRelation( final RelationMeta relationMeta )
     {
-        RelationLinkImpl source = new RelationLinkImpl( relationMeta.getSourceId(), relationMeta.getSourcePath() );
-        RelationLinkImpl target = new RelationLinkImpl( relationMeta.getTargetId(), relationMeta.getTargetPath() );
-        RelationLinkImpl object = new RelationLinkImpl( relationMeta.getObjectId(), relationMeta.getObjectPath() );
+        RelationLinkImpl source = new RelationLinkImpl( relationMeta.getSourceId(), relationMeta.getSourcePath(),
+                relationMeta.getContext() );
+        RelationLinkImpl target = new RelationLinkImpl( relationMeta.getTargetId(), relationMeta.getTargetPath(),
+                relationMeta.getContext() );
+        RelationLinkImpl object = new RelationLinkImpl( relationMeta.getObjectId(), relationMeta.getObjectPath(),
+                relationMeta.getContext() );
         return relationDataService.findBySourceTargetObject( source, target, object );
     }
 

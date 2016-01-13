@@ -25,6 +25,7 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.PeerPolicy;
+import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
@@ -83,7 +84,7 @@ public class RestServiceImplTest
     @Mock
     ContainerHost containerHost;
     @Mock
-    ManagementHost managementHost;
+    ResourceHost managementHost;
     @Mock
     SecurityManager securityManager;
 

@@ -8,8 +8,10 @@ import java.net.SocketException;
 import java.net.URL;
 import java.security.AccessControlException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -88,7 +90,7 @@ public class TemplateManagerImpl implements TemplateManager
 
     private Set<RepoUrl> remoteRepoUrls = new HashSet<>();
 
-    private Set<RepoUrl> globalRepoUrls = new HashSet<>();
+    private Set<RepoUrl> globalRepoUrls = new LinkedHashSet<>();
 
     private final LocalPeer localPeer;
 
@@ -245,7 +247,7 @@ public class TemplateManagerImpl implements TemplateManager
     public List<TemplateKurjun> list( String context, boolean isKurjunClient ) throws IOException
     {
         UnifiedRepository repo = getRepository( context, isKurjunClient );
-        List<SerializableMetadata> metadatas = listPackagesFromCache( repo );
+        Set<SerializableMetadata> metadatas = listPackagesFromCache( repo );
 
         List<TemplateKurjun> result = new LinkedList<>();
         for ( SerializableMetadata metadata : metadatas )
@@ -424,7 +426,7 @@ public class TemplateManagerImpl implements TemplateManager
         {
             if ( localPeer != null )
             {
-                return localPeer.getManagementHost().getExternalIp();
+                return localPeer.getExternalIp();
             }
             else
             {
@@ -432,7 +434,7 @@ public class TemplateManagerImpl implements TemplateManager
                 return ips.get( 0 ).getHostAddress();
             }
         }
-        catch ( SocketException | IndexOutOfBoundsException | HostNotFoundException ex )
+        catch ( SocketException | IndexOutOfBoundsException  ex )
         {
             LOGGER.error( "Cannot get external ip. Returning null.", ex );
             return null;
@@ -487,7 +489,11 @@ public class TemplateManagerImpl implements TemplateManager
                         repoUrl.getUrl().toString(), null, repoUrl.getToken() ) );
             }
 
-            for ( RepoUrl repoUrl : globalRepoUrls )
+            // shuffle the global repo list to randomize and normalize usage of them
+            List<RepoUrl> list = new ArrayList<>( globalRepoUrls );
+            Collections.shuffle( list );
+
+            for ( RepoUrl repoUrl : list )
             {
                 unifiedRepo.getSecondaryRepositories().add( repositoryFactory.createNonLocalTemplate(
                         repoUrl.getUrl().toString(), null, repoUrl.getToken() ) );
@@ -599,9 +605,9 @@ public class TemplateManagerImpl implements TemplateManager
      * @param repository
      * @return
      */
-    private List<SerializableMetadata> listPackagesFromCache( UnifiedRepository repository )
+    private Set<SerializableMetadata> listPackagesFromCache( UnifiedRepository repository )
     {
-        List<SerializableMetadata> result = new LinkedList<>();
+        Set<SerializableMetadata> result = new HashSet<>();
 
         Set<Repository> repos = new HashSet<>();
         repos.addAll( repository.getRepositories() );

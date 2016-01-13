@@ -23,11 +23,10 @@ import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.security.objects.Ownership;
-import io.subutai.common.security.objects.PermissionObject;
-import io.subutai.common.security.objects.PermissionOperation;
 import io.subutai.common.security.relation.RelationManager;
 import io.subutai.common.security.relation.model.Relation;
 import io.subutai.common.security.relation.model.RelationInfo;
+import io.subutai.common.security.relation.model.RelationInfoMeta;
 import io.subutai.common.security.relation.model.RelationMeta;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.ExceptionUtil;
@@ -99,7 +98,8 @@ public class ContainerCloneStep
         if ( requestedContainerCount > totalAvailableIpCount )
         {
             throw new EnvironmentCreationException(
-                    String.format( "Requested %d containers but only %d ip addresses available",
+                    String.format                                          ( "Requested %d containers but only %d ip "
+                            + "" + "" + "addresses available",
                             requestedContainerCount, totalAvailableIpCount ) );
         }
 
@@ -116,7 +116,7 @@ public class ContainerCloneStep
             Peer peer = peerPlacement.getKey();
             logger.debug( String.format( "Scheduling node group task on peer %s", peer.getId() ) );
 
-            taskCompletionService.submit(
+            taskCompletionService.submit                                                  (
                     new CreatePeerNodeGroupsTask( peer, peerPlacement.getValue(), localPeer, environment,
                             currentLastUsedIpIndex + 1, templateRegistry, defaultDomain ) );
 
@@ -189,12 +189,10 @@ public class ContainerCloneStep
                 relationMeta.setObjectId( container.getId() );
                 relationMeta.setObjectPath( container.getClass().getSimpleName() );
 
-                RelationInfo relationInfo = relationManager
-                        .createTrustRelationship                                                         ( PermissionObject.EnvironmentManagement.getName(),
-                                Sets.newHashSet( PermissionOperation.Delete.getName(),
-                                        PermissionOperation.Read.getName(), PermissionOperation.Update.getName(),
-                                        PermissionOperation.Write.getName() ), Ownership.USER.getLevel() );
 
+                RelationInfoMeta relationInfoMeta =
+                        new RelationInfoMeta( true, true, true, true, Ownership.USER.getLevel() );
+                RelationInfo relationInfo = relationManager.createTrustRelationship( relationInfoMeta );
 
                 Relation relation = relationManager.buildTrustRelation( relationInfo, relationMeta );
 

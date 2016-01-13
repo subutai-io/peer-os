@@ -48,7 +48,7 @@ public class DestroyContainersStep
 
     protected ExecutorService getExecutor( Environment environment )
     {
-        return Executors.newFixedThreadPool( environment.getPeers().size() );
+        return Executors.newFixedThreadPool( Math.max( environment.getPeers().size(), 1 ) );
     }
 
 

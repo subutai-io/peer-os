@@ -22,7 +22,6 @@ import io.subutai.common.network.VniVlanMapping;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
-import io.subutai.common.peer.ManagementHost;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.Tunnel;
@@ -237,7 +236,7 @@ public class NetworkManagerImpl implements NetworkManager
         CommandResult result = execute( getManagementHost(), commands.getListVniVlanMappingsCommand() );
 
         Pattern p = Pattern.compile( String.format(
-                        "\\s*(%s\\d+)\\s*,\\s*(\\d+)\\s*,\\s*(\\d+)\\s*,\\s*([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3"
+                        "\\s*(%s\\d+)\\s*(\\d+)\\s*(\\d+)\\s*([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3"
                                 + "}-[89ab][0-9a-f]{3}-[0-9a-f]{12})\\s*", NetworkManager.TUNNEL_PREFIX ),
                 Pattern.CASE_INSENSITIVE );
 
@@ -455,7 +454,7 @@ public class NetworkManagerImpl implements NetworkManager
     }
 
 
-    protected ManagementHost getManagementHost() throws NetworkManagerException
+    protected Host getManagementHost() throws NetworkManagerException
     {
         try
         {

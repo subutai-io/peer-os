@@ -3,10 +3,16 @@
 angular.module('subutai.plugins.controller', [])
 	.controller('PluginsCtrl', PluginsCtrl);
 
-PluginsCtrl.$inject = ['PluginsSrv'];
-function PluginsCtrl(PluginsSrv) {
+PluginsCtrl.$inject = ['PluginsSrv', 'cfpLoadingBar'];
+function PluginsCtrl(PluginsSrv, cfpLoadingBar) {
 
 	var vm = this;
+
+	cfpLoadingBar.start();
+	angular.element(document).ready(function () {
+		cfpLoadingBar.complete();
+	});
+
 	vm.plugins = [];
 
 	function getPlugins() {

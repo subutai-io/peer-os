@@ -255,7 +255,15 @@ function BlueprintsBuildCtrl($scope, environmentService, SweetAlert, ngDialog, $
 
 		var blueprintJson = JSON.stringify(blueprint);
 
-		SweetAlert.swal("Success!", "Your environment start creation.", "success");
+		SweetAlert.swal(
+			{
+				title : 'In progress!',
+				text : 'Your environment is being created!',
+				timer: VARS_TOOLTIP_TIMEOUT,
+				showConfirmButton: false
+			}
+		);
+
 		ngDialog.closeAll();
 
 		environmentService.setupRequisites(encodeURI(blueprintJson)).success(function (data) {
@@ -273,7 +281,14 @@ function BlueprintsBuildCtrl($scope, environmentService, SweetAlert, ngDialog, $
 		postJson.nodeGroups = getNodesGroups();
 		var postData = JSON.stringify(postJson);
 
-		SweetAlert.swal("Success!", "Your environment start growing.", "success");
+		SweetAlert.swal(
+				{
+					title : 'In progress!',
+					text : 'Your environment is being grown!',
+					timer: VARS_TOOLTIP_TIMEOUT,
+					showConfirmButton: false
+				}
+		);
 		ngDialog.closeAll();
 		$location.path('/environments');
 

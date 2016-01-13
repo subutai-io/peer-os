@@ -41,7 +41,7 @@
 					<select class="b-popup-body-input" 
 						ng-model="selectedPeer" 
 						ng-change="consoleViewCtrl.setConsole(selectedPeer)">
-						<option value="">Select peer</option>
+						<option value="">Select Host</option>
 						<option ng-repeat="host in consoleViewCtrl.hosts" value="{{ host.id }}">
 							{{ host.hostname }} ({{ host.instance }}, {{ host.arch }})
 						</option>

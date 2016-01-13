@@ -298,19 +298,19 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 				containersTotal[data.containers[i].templateName][data.containers[i].type] += 1;
 			}
 		}
+
 		var containersHTML = '';
 		for(var template in containersTotal) {
 			for (var type in containersTotal[template]){
 				if(containersTotal[template][type] > 0) {
 					if(type != 'INACTIVE') {
-						var tooltipContent = 'Quota: <div class="b-quota-type-round b-quota-type-round_' + quotaColors[type] + '"></div> <b>' + type + '</b><br>State: <b>RUNNING</b>';
+						var tooltipContent = '<div class="b-nowrap">Quota: <div class="b-quota-type-round b-quota-type-round_' + quotaColors[type] + '"></div> <b>' + type + '</b></div><span class="b-nowrap">State: <b>RUNNING</b></span>';
 					} else {
 						var tooltipContent = 'State: <b>INACTIVE</b>';
 					}
 					containersHTML += '<a ui-sref="containers({environmentId:\'' + data.id + '\'})" '
 						+ ' class="b-tags b-tags_' + quotaColors[type] + '" '
-						+ 'tooltips tooltip-content=\'' + tooltipContent + '\' tooltip-hide-trigger="mouseleave click" '
-						+ 'href="/containers/' + data.id + '"'
+						+ 'tooltips tooltip-template=\'' + tooltipContent + '\''
 						+ '>'
 						+ template + ': ' + containersTotal[template][type]
 					+ '</a>';
@@ -395,7 +395,15 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 			},
 			function (isConfirm) {
 				if (isConfirm) {
-					SweetAlert.swal("Delete!", "Your environment is being deleted!", "success");
+					SweetAlert.swal(
+							{
+								title : 'Delete!',
+								text : 'Your environment is being deleted!!',
+								timer: VARS_TOOLTIP_TIMEOUT,
+								showConfirmButton: false
+							}
+					);
+
 					environmentService.destroyEnvironment(environmentId).success(function (data) {
 						SweetAlert.swal("Destroyed!", "Your environment has been destroyed.", "success");
 						loadEnvironments();

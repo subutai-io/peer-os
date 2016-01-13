@@ -79,7 +79,7 @@ public class NetworkManagerImplTest
     private static final String PATH_TO_KEY_FILE = "/path/to/key/file";
     private static final String RESERVED_VNIS_OUTPUT = String.format( "%s,%s,%s", VNI, VLAN_ID, ENVIRONMENT_ID );
     private static final String VNI_VLAN_MAPPING_OUTPUT =
-            String.format( "%s,%s,%s,%s", TUNNEL_NAME, VNI, VLAN_ID, ENVIRONMENT_ID );
+            String.format( "%s\t%s\t%s\t%s", TUNNEL_NAME, VNI, VLAN_ID, ENVIRONMENT_ID );
     private static final String SSH_KEY = "SSH-KEY";
     private static final String DOMAIN = "domain";
     private static final String IP = "127.0.0.1";
@@ -89,7 +89,7 @@ public class NetworkManagerImplTest
     @Mock
     LocalPeer localPeer;
     @Mock
-    ManagementHost managementHost;
+    ResourceHost managementHost;
     @Mock
     ResourceHost resourceHost;
     @Mock

@@ -9,10 +9,7 @@ import io.subutai.common.security.objects.Ownership;
  */
 public class RelationInfoMeta
 {
-    private String context = "";
-
     //read, write, delete, update
-
     private boolean readPermission;
 
     private boolean writePermission;
@@ -30,27 +27,14 @@ public class RelationInfoMeta
     }
 
 
-    public RelationInfoMeta( final String context, final boolean readPermission, final boolean writePermission,
+    public RelationInfoMeta( final boolean readPermission, final boolean writePermission,
                              final boolean updatePermission, final boolean deletePermission, final int ownershipLevel )
     {
-        this.context = context;
         this.readPermission = readPermission;
         this.writePermission = writePermission;
         this.updatePermission = updatePermission;
         this.deletePermission = deletePermission;
         this.ownershipLevel = ownershipLevel;
-    }
-
-
-    public String getContext()
-    {
-        return context;
-    }
-
-
-    public void setContext( final String context )
-    {
-        this.context = context;
     }
 
 

@@ -28,7 +28,7 @@ import io.subutai.core.security.api.SecurityManager;
 
 public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWorkflow.EnvironmentCreationPhase>
 {
-    private static final Logger LOG = LoggerFactory.getLogger( EnvironmentCreationWorkflow.class );
+//    private static final Logger LOG = LoggerFactory.getLogger( EnvironmentCreationWorkflow.class );
 
     private final TemplateManager templateRegistry;
     private final NetworkManager networkManager;
@@ -41,12 +41,12 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
     private final TrackerOperation operationTracker;
     private final EnvironmentManagerImpl environmentManager;
 
-    private Throwable error;
+    //    private Throwable error;
     private IdentityManager identityManager;
 
 
     //environment creation phases
-    public static enum EnvironmentCreationPhase
+    public enum EnvironmentCreationPhase
     {
         INIT,
         GENERATE_KEYS,
@@ -113,8 +113,8 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         }
         catch ( Exception e )
         {
-            setError( e );
-
+            //            setError( e );
+            fail( e.getMessage(), e );
             return null;
         }
     }
@@ -134,8 +134,8 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         }
         catch ( Exception e )
         {
-            setError( e );
-
+            //            setError( e );
+            fail( e.getMessage(), e );
             return null;
         }
     }
@@ -155,8 +155,8 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         }
         catch ( Exception e )
         {
-            setError( e );
-
+            //            setError( e );
+            fail( e.getMessage(), e );
             return null;
         }
     }
@@ -178,8 +178,8 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         }
         catch ( Exception e )
         {
-            setError( e );
-
+            //            setError( e );
+            fail( e.getMessage(), e );
             return null;
         }
     }
@@ -199,8 +199,8 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         }
         catch ( Exception e )
         {
-            setError( e );
-
+            //            setError( e );
+            fail( e.getMessage(), e );
             return null;
         }
     }
@@ -220,8 +220,8 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         }
         catch ( Exception e )
         {
-            setError( e );
-
+            //            setError( e );
+            fail( e.getMessage(), e );
             return null;
         }
     }
@@ -241,8 +241,8 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         }
         catch ( Exception e )
         {
-            setError( e );
-
+            //            setError( e );
+            fail( e.getMessage(), e );
             return null;
         }
     }
@@ -250,7 +250,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
     public void FINALIZE()
     {
-        LOG.info( "Finalizing environment creation" );
+//        LOG.info( "Finalizing environment creation" );
 
         environment.setStatus( EnvironmentStatus.HEALTHY );
 
@@ -262,21 +262,36 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         stop();
     }
 
+    //    public Throwable getError()
+    //    {
+    //        return error;
+    //    }
 
-    public Throwable getError()
+
+    @Override
+    public void fail( final String message, final Throwable e )
     {
-        return error;
+        super.fail( message, e );
+        saveFailState();
     }
 
 
-    public void setError( final Throwable error )
+    private void saveFailState()
     {
         environment.setStatus( EnvironmentStatus.UNHEALTHY );
         environment = environmentManager.saveOrUpdate( environment );
-        this.error = error;
-        LOG.error( "Error creating environment", error );
-        operationTracker.addLogFailed( error.getMessage() );
-        //stop the workflow
-        stop();
+        operationTracker.addLogFailed( getFailedReason() );
     }
+
+
+    //    public void setError( final Throwable error )
+    //    {
+    //        environment.setStatus( EnvironmentStatus.UNHEALTHY );
+    //        environment = environmentManager.saveOrUpdate( environment );
+    //        this.error = error;
+    //        LOG.error( "Error creating environment", error );
+    //        operationTracker.addLogFailed( error.getMessage() );
+    //        //stop the workflow
+    //        stop();
+    //    }
 }

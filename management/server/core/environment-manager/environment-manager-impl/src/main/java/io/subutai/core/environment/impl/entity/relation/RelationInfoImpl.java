@@ -1,20 +1,14 @@
 package io.subutai.core.environment.impl.entity.relation;
 
 
-import java.util.Set;
-
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.google.common.collect.Sets;
 
 import io.subutai.common.security.objects.Ownership;
 import io.subutai.common.security.relation.model.RelationInfo;
@@ -40,15 +34,6 @@ public class RelationInfoImpl implements RelationInfo
     @Column( name = "relation_info_id" )
     private long id;
 
-    // condition
-    @Column( name = "context" )
-    private String context = "";
-
-    //read, write, delete, update
-    @Column( name = "operation" )
-    @ElementCollection( targetClass = String.class, fetch = FetchType.EAGER )
-    private Set<String> operation = Sets.newHashSet();
-
     @Column( name = "read_p" )
     private boolean readPermission;
 
@@ -71,26 +56,8 @@ public class RelationInfoImpl implements RelationInfo
     }
 
 
-    public RelationInfoImpl( final RelationInfo relationInfo )
-    {
-        this.context = relationInfo.getContext();
-        this.operation = relationInfo.getOperation();
-        this.ownershipLevel = relationInfo.getOwnershipLevel();
-    }
-
-
-    @Deprecated
-    public RelationInfoImpl( final String context, final Set<String> operation, final int ownershipLevel )
-    {
-        this.context = context;
-        this.operation = operation;
-        this.ownershipLevel = ownershipLevel;
-    }
-
-
     public RelationInfoImpl( final RelationInfoMeta relationInfoMeta )
     {
-        this.context = relationInfoMeta.getContext();
         this.readPermission = relationInfoMeta.isReadPermission();
         this.writePermission = relationInfoMeta.isWritePermission();
         this.updatePermission = relationInfoMeta.isUpdatePermission();
@@ -107,20 +74,6 @@ public class RelationInfoImpl implements RelationInfo
 
 
     @Override
-    public String getContext()
-    {
-        return context;
-    }
-
-
-    @Override
-    public Set<String> getOperation()
-    {
-        return operation;
-    }
-
-
-    @Override
     public int getOwnershipLevel()
     {
         return ownershipLevel;
@@ -133,15 +86,51 @@ public class RelationInfoImpl implements RelationInfo
     }
 
 
-    public void setOperation( final Set<String> operation )
+    public boolean isReadPermission()
     {
-        this.operation = operation;
+        return readPermission;
     }
 
 
-    public void setContext( final String context )
+    public boolean isWritePermission()
     {
-        this.context = context;
+        return writePermission;
+    }
+
+
+    public boolean isUpdatePermission()
+    {
+        return updatePermission;
+    }
+
+
+    public boolean isDeletePermission()
+    {
+        return deletePermission;
+    }
+
+
+    public void setReadPermission( final boolean readPermission )
+    {
+        this.readPermission = readPermission;
+    }
+
+
+    public void setWritePermission( final boolean writePermission )
+    {
+        this.writePermission = writePermission;
+    }
+
+
+    public void setUpdatePermission( final boolean updatePermission )
+    {
+        this.updatePermission = updatePermission;
+    }
+
+
+    public void setDeletePermission( final boolean deletePermission )
+    {
+        this.deletePermission = deletePermission;
     }
 
 

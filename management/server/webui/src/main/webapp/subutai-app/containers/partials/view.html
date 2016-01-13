@@ -81,24 +81,25 @@
 							<div 
 								class="b-status-icon b-status-icon_{{ container.state }}" 
 								tooltips 
-								tooltip-title="{{ container.state }}">
+								tooltip-template="{{ container.state }}">
 							</div>
 						</td>
 						<td>
 							<a  ui-sref="console({ containerId: container.id })" 
 								tooltips 
-								tooltip-content="EnvironmentId: <b>{{ container.environmentId }}</b><br>
-									ID: <b>{{ container.id }}</b><br>
-									Host Name: <b>{{ container.hostname }}</b>
-								" 
-								tooltip-hide-trigger="mouseleave click">
+								tooltip-template='
+									<span class="b-nowrap">EnvironmentId: <b>{{ container.environmentId }}</b></span><br>
+									<span class="b-nowrap">ID: <b>{{ container.id }}</b></span><br>
+									<span class="b-nowrap">Host Name: <b>{{ container.hostname }}</b></span>
+								' 
+								tooltip-side="right">
 								{{ container.templateName }}
 							</a>
 						</td>
 						<td class="subt_text__container-ip">
 							<span 
 								tooltips 
-								tooltip-content="mac: <b>{{ container.environmentId }}</b>">
+								tooltip-template='<span class="b-nowrap">mac: <b>{{ container.environmentId }}</b></span>'>
 								{{ container.ip }}
 							</span>
 						</td>
