@@ -134,14 +134,14 @@ func PrintN2NTunnels() {
 
 func ReturnPID(interfaceName, communityName string) string {
 	var retVal string
-	if p, err := exec.Command("ps", "aux").CombinedOutput(); err != nil {
+	if p, err := exec.Command("ps", "ax").CombinedOutput(); err != nil {
 		log.Error("ReturnPID " + err.Error())
 	} else {
 	CutTheLoop:
 		for _, v := range strings.Split(string(p), "\n") {
 			if strings.Contains(string(v), interfaceName) && strings.Contains(string(v), communityName) {
 				vArr := strings.Fields(string(v))
-				retVal = vArr[1]
+				retVal = vArr[0]
 				break CutTheLoop
 			}
 		}

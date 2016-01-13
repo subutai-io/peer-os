@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"bufio"
 	"fmt"
 	"io/ioutil"
 	n "net"
@@ -108,7 +109,7 @@ func p2pFile(line string) {
 
 func p2pTunnel(interfaceName, communityName, localPeepIPAddr string) {
 	p2pFile(interfaceName + " " + localPeepIPAddr + " " + communityName)
-	log.Check(log.FatalLevel, "p2p command: ", exec.Command("p2p", "-dev", interfaceName, "-ip", localPeepIPAddr, "-hash", communityName).Run())
+	log.Check(log.FatalLevel, "p2p command: ", exec.Command("p2p", "-dev", interfaceName, "-ip", localPeepIPAddr, "-hash", communityName).Start())
 }
 
 func createTunnel(tunnelPortName, tunnelIPAddress, tunnelType string) error {
@@ -229,22 +230,21 @@ func listOpenedN2NTunnel() {
 func removeN2NTunnel(interfaceName, communityName string) {
 	pid := net.ReturnPID(interfaceName, communityName)
 	i, _ := strconv.Atoi(pid)
+	newconf := ""
 	log.Check(log.FatalLevel, "remove n2n tunnel: ", syscall.Kill(i, syscall.SIGHUP))
-	f, err := ioutil.ReadFile(config.Agent.DataPrefix + "/var/subutai-network/edgePorts.txt")
-	if err != nil {
-		log.Error("read from edgePorts.txt " + err.Error())
-	}
-	lines := strings.Split(string(f), "\n")
-	for k, v := range lines {
-		temp := strings.Split(string(v), ",")
-		if temp[2] == interfaceName && temp[3] == communityName {
-			lines[k] = ""
+
+	file, err := os.Open(config.Agent.DataPrefix + "/var/subutai-network/p2p.txt")
+	log.Check(log.FatalLevel, "Opening p2p.txt", err)
+	scanner := bufio.NewScanner(bufio.NewReader(file))
+
+	for scanner.Scan() {
+		line := scanner.Text()
+		if strings.HasPrefix(line, interfaceName) && strings.HasSuffix(line, communityName) {
+			newconf = newconf + line
 		}
 	}
-	str := []byte(strings.Join(lines, "\n"))
-	log.Check(log.FatalLevel, "write edgePorts.txt: ",
-		ioutil.WriteFile(config.Agent.DataPrefix+"/var/subutai-network/edgePorts.txt", []byte(str), 0744))
-	log.Info(interfaceName + " " + communityName + " " + " n2n tunnel is removed")
+	file.Close()
+	log.Check(log.FatalLevel, "Removing p2p tunnel", ioutil.WriteFile(config.Agent.DataPrefix+"/var/subutai-network/p2p.txt", []byte(newconf), 0644))
 }
 
 func createGateway(vlanip, vlanid string) {
