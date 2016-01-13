@@ -88,7 +88,26 @@ func LxcManagementNetwork(args []string) {
 	}
 }
 
+func p2pFile(line string) {
+	path := config.Agent.DataPrefix + "/var/subutai-network/"
+	file := path + "p2p.txt"
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		log.Check(log.FatalLevel, "create "+path+" folder", os.MkdirAll(path, 0755))
+	}
+	if _, err := os.Stat(file); os.IsNotExist(err) {
+		_, err = os.Create(file)
+		log.Check(log.FatalLevel, "Creating "+file, err)
+	}
+
+	f, err := os.OpenFile(file, os.O_APPEND|os.O_WRONLY, 0600)
+	log.Check(log.FatalLevel, "Opening file for append "+file, err)
+	defer f.Close()
+	_, err = f.WriteString(line + "\n")
+	log.Check(log.FatalLevel, "Opening file for append "+file, err)
+}
+
 func p2pTunnel(interfaceName, communityName, localPeepIPAddr string) {
+	p2pFile(interfaceName + " " + localPeepIPAddr + " " + communityName)
 	log.Check(log.FatalLevel, "p2p command: ", exec.Command("p2p", "-dev", interfaceName, "-ip", localPeepIPAddr, "-hash", communityName).Run())
 }
 
