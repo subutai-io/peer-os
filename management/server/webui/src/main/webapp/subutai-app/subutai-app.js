@@ -82,6 +82,22 @@ function CurrentUserCtrl($location, $rootScope, ngDialog, $http, SweetAlert) {
 	}
 }
 
+function SubutaiController($rootScope) {
+	var vm = this;
+	vm.bodyClass = '';
+
+	$rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams){
+		vm.layoutType = 'subutai-app/common/layouts/' + toState.data.layout + '.html';
+		if (angular.isDefined(toState.data.bodyClass)) {
+			vm.bodyClass = toState.data.bodyClass;
+			return;
+		}
+
+		vm.bodyClass = '';
+	});
+}
+
+
 function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 
 	$urlRouterProvider.otherwise('/404');
