@@ -32,7 +32,7 @@ public interface RestService
 
     @GET
     @Path( "subutai/about" )
-    @Produces( { MediaType.APPLICATION_JSON } )
+    @Produces( { MediaType.TEXT_PLAIN } )
     public Response getSubutaiInfo();
 
 }
