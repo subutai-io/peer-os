@@ -103,7 +103,7 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable
 
     public ContainerInfoImpl( ContainerInfo hostInfo )
     {
-        this.id = hostInfo.getId().toString();
+        this.id = hostInfo.getId();
         this.hostname = hostInfo.getHostname();
         this.templateName = hostInfo.getTemplateName();
         this.state = hostInfo.getState();

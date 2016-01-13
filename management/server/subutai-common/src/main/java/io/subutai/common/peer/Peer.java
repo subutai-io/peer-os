@@ -178,7 +178,7 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
     /**
      * Returns state of container
      */
-    public ContainerHostState getContainerState( ContainerId containerId );
+    public ContainerHostState getContainerState( ContainerId containerId ) throws PeerException;
 
     //******** Quota functions ***********
 

@@ -92,7 +92,16 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
     {
         Preconditions.checkNotNull( containerId );
         Preconditions.checkNotNull( containerId.getId() );
-        return localPeer.getContainerState( containerId );
+        try
+        {
+            return localPeer.getContainerState( containerId );
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error getting container state #getContainerState", e );
+            throw new WebApplicationException(
+                    Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build() );
+        }
     }
 
 
