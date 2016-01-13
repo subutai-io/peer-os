@@ -6,13 +6,11 @@ import (
 	"subutai/agent"
 	"subutai/cli"
 	"subutai/config"
-	"subutai/lib/db"
 	"subutai/log"
 )
 
 func init() {
 	os.Setenv("PATH", "/apps/subutai/current/bin:/apps/subutai-mng/current/bin:"+os.Getenv("PATH"))
-	db.Init()
 	if len(os.Args) > 1 {
 		if os.Args[1] == "-d" {
 			log.Level(log.DebugLevel)

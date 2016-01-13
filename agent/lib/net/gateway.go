@@ -101,7 +101,7 @@ func ListTapDevice() {
 		fmt.Printf("%0s %20s\n", "TapDeviceInterface", "TapDeviceIPAddress")
 		for _, v := range strings.Split(string(ps), "\n") {
 			if strings.Contains(v, "tap_create -d") {
-				fmt.Printf("%0s %20s\n", v) // leave like this for now..
+				fmt.Println(v)
 			}
 		}
 	}
