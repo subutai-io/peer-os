@@ -2,14 +2,10 @@ package io.subutai.core.peer.impl;
 
 
 import java.io.IOException;
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +34,7 @@ import io.subutai.common.peer.RegistrationData;
 import io.subutai.common.peer.RegistrationStatus;
 import io.subutai.common.security.objects.TokenType;
 import io.subutai.common.settings.ChannelSettings;
+import io.subutai.common.util.IPUtil;
 import io.subutai.common.util.SecurityUtilities;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
@@ -177,20 +174,11 @@ public class PeerManagerImpl implements PeerManager
         String result = null;
         try
         {
-            Enumeration<InetAddress> addressEnumeration =
-                    NetworkInterface.getByName( externalIpInterface ).getInetAddresses();
-            while ( addressEnumeration.hasMoreElements() )
-            {
-                InetAddress address = addressEnumeration.nextElement();
-                if ( address instanceof Inet4Address )
-                {
-                    result = address.getHostAddress();
-                }
-            }
+            result = IPUtil.getLocalIpByInterfaceName( externalIpInterface );
         }
         catch ( SocketException e )
         {
-            LOG.error( "Error getting network interfaces", e );
+            LOG.error( "Error getting local IP", e );
         }
         if ( result == null )
         {

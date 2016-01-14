@@ -1,61 +1,10 @@
 package io.subutai.core.localpeer.impl.entity;
 
 
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.naming.NamingException;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import javax.persistence.Transient;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.apache.commons.net.util.SubnetUtils;
-
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
-
-import io.subutai.common.host.HostId;
-import io.subutai.common.host.HostInterface;
-import io.subutai.common.host.ResourceHostInfo;
-import io.subutai.common.mdc.SubutaiExecutors;
-import io.subutai.common.network.DomainLoadBalanceStrategy;
-import io.subutai.common.network.Gateway;
-import io.subutai.common.network.Vni;
-import io.subutai.common.network.VniVlanMapping;
-import io.subutai.common.peer.EnvironmentId;
-import io.subutai.common.peer.ManagementHost;
-import io.subutai.common.peer.PeerException;
-import io.subutai.common.protocol.Disposable;
-import io.subutai.common.protocol.N2NConfig;
-import io.subutai.common.protocol.Tunnel;
-import io.subutai.common.settings.Common;
-import io.subutai.common.util.NumUtil;
-import io.subutai.common.util.ServiceLocator;
-import io.subutai.core.localpeer.impl.tasks.CreateGatewayTask;
-import io.subutai.core.localpeer.impl.tasks.ReserveVniTask;
-import io.subutai.core.localpeer.impl.tasks.SetupTunnelsTask;
-import io.subutai.core.network.api.NetworkManager;
-import io.subutai.core.network.api.NetworkManagerException;
-import io.subutai.core.repository.api.RepositoryException;
-import io.subutai.core.repository.api.RepositoryManager;
 
 
 @Entity
