@@ -114,18 +114,22 @@ public class RestServiceImpl implements RestService
             input = new FileInputStream( String.format( "%s/git.properties", Common.KARAF_ETC ) );
 
             prop.load( input );
-            pojo.setProjectVersion( prop.getProperty( "git.build.version" ) );
-            pojo.setGitBuildUserEmail( prop.getProperty( "git.build.user.email" ) );
-            pojo.setGitBuildHost( prop.getProperty( "git.build.host" ) );
-            pojo.setGitClosestTagName( prop.getProperty( "git.closest.tag.name" ) );
-            pojo.setGitCommitIdDescribeShort( prop.getProperty( "git.commit.id.describe-short" ) );
+            pojo.setGitCommitId( prop.getProperty( "git.commit.id" ) );
             pojo.setGitCommitTime( prop.getProperty( "git.commit.time" ) );
             pojo.setGitBranch( prop.getProperty( "git.branch" ) );
+            pojo.setGitCommitUserName( prop.getProperty( "git.commit.user.name" ) );
+            pojo.setGitCommitUserEmail( prop.getProperty( "git.commit.user.email" ) );
+            pojo.setProjectVersion( prop.getProperty( "git.build.version" ) );
+
             pojo.setGitBuildUserName( prop.getProperty( "git.build.user.name" ) );
+            pojo.setGitBuildUserEmail( prop.getProperty( "git.build.user.email" ) );
+            pojo.setGitBuildHost( prop.getProperty( "git.build.host" ) );
+            pojo.setGitBuildTime( prop.getProperty( "git.build.time" ) );
+
+            pojo.setGitClosestTagName( prop.getProperty( "git.closest.tag.name" ) );
+            pojo.setGitCommitIdDescribeShort( prop.getProperty( "git.commit.id.describe-short" ) );
             pojo.setGitClosestTagCommitCount( prop.getProperty( "git.closest.tag.commit.count" ) );
             pojo.setGitCommitIdDescribe( prop.getProperty( "git.commit.id.describe" ) );
-            pojo.setGitCommitId( prop.getProperty( "git.commit.id" ) );
-            pojo.setGitBuildTime( prop.getProperty( "git.build.time" ) );
         }
         catch ( IOException ex )
         {
