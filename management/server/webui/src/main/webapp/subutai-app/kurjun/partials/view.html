@@ -1,0 +1,43 @@
+<div ng-controller="KurjunViewCtrl as kurjunViewCtrl">
+
+	<div class="b-workspace__header">
+		<h1 class="b-title">Kurjun</h1>
+	</div>
+
+	<div class="b-workspace__content">
+		<div class="b-tabs-menu">
+			<ul>
+				<li class="b-tabs-menu__item"
+						ng-click="kurjunViewCtrl.activeTab = 'repositories'"
+						ng-class="kurjunViewCtrl.activeTab == 'repositories' ? 'b-tabs-menu__item_active' : ''">
+					Kurgun repositories	
+				</li>
+				<li class="b-tabs-menu__item"
+						ng-click="kurjunViewCtrl.activeTab = 'templates'"
+						ng-class="kurjunViewCtrl.activeTab == 'templates' ? 'b-tabs-menu__item_active' : ''">
+					Templates
+				</li>
+				<li class="b-tabs-menu__item"
+						ng-click="kurjunViewCtrl.activeTab = 'apt'"
+						ng-class="kurjunViewCtrl.activeTab == 'apt' ? 'b-tabs-menu__item_active' : ''">
+					Apt
+				</li>
+			</ul>
+		</div>
+
+		<div
+				ng-if="kurjunViewCtrl.activeTab == 'repositories'"
+				ng-include="'subutai-app/kurjun/partials/repositories.html'">
+		</div>
+		<div
+				ng-if="kurjunViewCtrl.activeTab == 'templates'"
+				ng-include="'subutai-app/kurjun/partials/templates.html'">
+		</div>
+		<div
+				ng-if="kurjunViewCtrl.activeTab == 'apt'"
+				ng-include="'subutai-app/kurjun/partials/apt.html'">
+		</div>
+
+	</div>
+	
+</div>

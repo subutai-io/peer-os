@@ -70,13 +70,13 @@ func parsefile(hostname, lxc, cgtype, filename string, clnt client.Client, bp cl
 		value, _ := strconv.ParseInt(line[1], 10, 62)
 		if cgtype == "memory" && lxcmemory[line[0]] {
 			point, _ := client.NewPoint("lxc_"+cgtype,
-				map[string]string{"hostname": hostname, "lxc": lxc, "type": line[0]},
+				map[string]string{"hostname": lxc, "type": line[0]},
 				map[string]interface{}{"value": value / int64(runtime.NumCPU())},
 				time.Now())
 			bp.AddPoint(point)
 		} else if cgtype == "cpuacct" {
 			point, _ := client.NewPoint("lxc_cpu",
-				map[string]string{"hostname": hostname, "lxc": lxc, "type": line[0]},
+				map[string]string{"hostname": lxc, "type": line[0]},
 				map[string]interface{}{"value": value / int64(runtime.NumCPU())},
 				time.Now())
 			bp.AddPoint(point)
@@ -157,7 +157,7 @@ func netStat(clnt client.Client, bp client.BatchPoints) {
 			metric := "host_net"
 			if lxcnic[nicname] != "" {
 				metric = "lxc_net"
-				nicname = lxcnic[nicname]
+				hostname = lxcnic[nicname]
 			}
 			for i := range traffic {
 				point, _ := client.NewPoint(metric,
@@ -172,7 +172,6 @@ func netStat(clnt client.Client, bp client.BatchPoints) {
 }
 
 func btrfsStat(clnt client.Client, bp client.BatchPoints) {
-	hostname, _ := os.Hostname()
 	list := make(map[string]string)
 	out, _ := exec.Command("sudo", "btrfs", "subvolume", "list", config.Agent.LxcPrefix).Output()
 	scanner := bufio.NewScanner(bytes.NewReader(out))
@@ -188,7 +187,7 @@ func btrfsStat(clnt client.Client, bp client.BatchPoints) {
 		if lxc != "" {
 			value, _ := strconv.ParseInt(line[2], 10, 64)
 			point, _ := client.NewPoint("lxc_disk",
-				map[string]string{"hostname": hostname, "lxc": lxc, "mount": mount, "type": "used"},
+				map[string]string{"hostname": lxc, "mount": mount, "type": "used"},
 				map[string]interface{}{"value": value},
 				time.Now())
 			bp.AddPoint(point)

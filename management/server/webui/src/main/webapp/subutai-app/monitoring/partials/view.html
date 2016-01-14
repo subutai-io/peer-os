@@ -87,7 +87,9 @@
 			<div class="b-chart-block-list__item" ng-repeat="chart in monitoringCtrl.charts">
 				<div class="b-chart-block">
 					<div class="b-chart-block__title">{{ chart.name }}</div>
-					<div class="b-chart-block__series-title">{{ chart.legend }}</div>
+					<div class="b-chart-block__series-title">
+						<div class="b-chart-block__series-title_center">{{ chart.legend }}</div>
+					</div>
 					<div class="b-chart-block__body">
 						<nvd3 options="chart.options" data="chart.data"></nvd3>
 					</div>
