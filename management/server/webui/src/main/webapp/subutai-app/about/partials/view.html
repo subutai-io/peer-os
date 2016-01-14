@@ -1,12 +1,65 @@
 <div ng-controller="AboutCtrl as aboutCtrl">
 
-	<div class="b-workspace__header">
-		<h1 class="b-title">
-			<h1 class="b-title"><span class="b-title_breadcrumbs">About</span></h1>
-		</h1>
-	</div>
+  <div class="b-workspace__header">
+    <h1 class="b-title">
+      <h1 class="b-title"><span class="b-title_breadcrumbs">About</span></h1>
+    </h1>
+  </div>
 
-	<div class="b-workspace__content">
-		<p>{{ aboutCtrl.text }}</p>
-	</div>
+  <div class="b-workspace__content">
+    <div class="b-workspace-content__row">
+      <div class="b-main-table-border" style = "width: 500px">
+        <table class="b-main-table b-main-table_with-header" style = "width: 500px">
+          <tr>
+            <th>Version</th>
+            <td>{{ aboutCtrl.info.projectVersion }}</td>
+          </tr>
+          <tr>
+            <th>Branch</th>
+            <td>{{ aboutCtrl.info.gitBranch }}</td>
+          </tr>
+          <tr>
+            <th>Build User Name</th>
+            <td>{{ aboutCtrl.info.gitBuildUserName }}</td>
+          </tr>
+          <tr>
+            <th>Build User E-mail</th>
+            <td>{{ aboutCtrl.info.gitBuildUserEmail }}</td>
+          </tr>
+          <tr>
+            <th>Build Host</th>
+            <td>{{ aboutCtrl.info.gitBuildHost }}</td>
+          </tr>
+          <tr>
+            <th>Build Time</th>
+            <td>{{ aboutCtrl.info.gitBuildTime }}</td>
+          </tr>
+          <tr>
+            <th>Commit ID</th>
+            <td>{{ aboutCtrl.info.gitCommitId }}</td>
+          </tr>
+          <tr>
+            <th>Commit Time</th>
+            <td>{{ aboutCtrl.info.gitCommitTime }}</td>
+          </tr>
+          <tr>
+            <th>Commit Abstract</th>
+            <td>{{ aboutCtrl.info.gitCommitIdDescribeShort }}</td>
+          </tr>
+          <tr>
+            <th>Commit Description</th>
+            <td>{{ aboutCtrl.info.gitCommitIdDescribe }}</td>
+          </tr>
+          <tr>
+            <th>Closest Tag Commit Count</th>
+            <td>{{ aboutCtrl.info.gitClosestTagCommitCount }}</td>
+          </tr>
+          <tr>
+            <th>Closest Tag Name</th>
+            <td>{{ aboutCtrl.info.gitClosestTagName }}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
 </div>

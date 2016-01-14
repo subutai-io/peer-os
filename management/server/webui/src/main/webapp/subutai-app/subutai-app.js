@@ -412,6 +412,10 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
         .state('about', {
             url: '/about',
             templateUrl: 'subutai-app/about/partials/view.html',
+            data: {
+                bodyClass: '',
+                layout: 'default'
+            },
             resolve: {
                 loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
                     return $ocLazyLoad.load([
@@ -425,8 +429,7 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
                     ])
                 }]
             }
-        })
-		.state()
+        });
 }
 
 function startup($rootScope, $state, $location, $http) {
