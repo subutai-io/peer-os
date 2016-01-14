@@ -58,6 +58,21 @@ public class RestServiceImpl implements RestService
 
 
     @Override
+    public Response getSystemUsers()
+    {
+        try
+        {
+            return Response.ok( jsonUtil.to( identityManager.getAllSystemUsers() ) ).build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error getting users #getUsers", e );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
     public Response getActiveUser()
     {
         User activeUser = identityManager.getActiveUser();

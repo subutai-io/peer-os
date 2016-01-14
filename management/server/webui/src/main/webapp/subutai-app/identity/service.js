@@ -70,8 +70,9 @@ function identitySrv($http) {
 	}
 
 	function getUsers() {
-		return $http.get(USERS_URL, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
+		return $http.get(USERS_URL + "all", {withCredentials: true, headers: {'Content-Type': 'application/json'}});
 	}
+
 
 	function addUser(postData) {
 		return $http.post(

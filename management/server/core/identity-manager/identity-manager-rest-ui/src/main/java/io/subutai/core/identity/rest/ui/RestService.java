@@ -21,6 +21,11 @@ public interface RestService
     Response getUsers();
 
     @GET
+    @Produces( { MediaType.APPLICATION_JSON } )
+    @Path("/all")
+    Response getSystemUsers();
+
+    @GET
     @Path( "/user" )
     @Produces( { MediaType.APPLICATION_JSON } )
     Response getActiveUser();

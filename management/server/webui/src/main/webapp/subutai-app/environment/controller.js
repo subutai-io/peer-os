@@ -128,6 +128,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 		vm.currentUser = data;
 	});
 	function shareEnvironmentWindow (environment) {
+		console.log (environment);
 		vm.listOfUsers = [];
 		vm.checkedUsers = [];
 		environmentService.getUsers().success (function (data) {
@@ -340,8 +341,10 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
     }
 
 	function buildEnvironment() {
+		SweetAlert.swal("Success!", "Your environment started building.", "success");
+		ngDialog.closeAll();
 		environmentService.startEnvironmentBuild (vm.currentEnvironment.id, encodeURIComponent(vm.currentEnvironment.relationDeclaration)).success(function (data) {
-			SweetAlert.swal("Success!", "Your environment has started building.", "success");
+			SweetAlert.swal("Success!", "Your environment was built.", "success");
 			loadEnvironments();
 			vm.activeTab = "installed";
 			ngDialog.closeAll();
