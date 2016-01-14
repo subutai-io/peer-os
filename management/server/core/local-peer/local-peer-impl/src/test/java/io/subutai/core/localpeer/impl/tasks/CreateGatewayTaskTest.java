@@ -14,7 +14,6 @@ import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
-import io.subutai.common.peer.ManagementHost;
 
 import static junit.framework.TestCase.assertFalse;
 import static org.mockito.Mockito.doThrow;

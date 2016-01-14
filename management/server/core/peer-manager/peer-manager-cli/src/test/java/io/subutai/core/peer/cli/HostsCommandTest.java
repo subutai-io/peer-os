@@ -8,17 +8,17 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import com.google.common.collect.Sets;
+
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.test.SystemOutRedirectTest;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
-import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.peer.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.common.peer.ResourceHost;
-
-import com.google.common.collect.Sets;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.mockito.Mockito.when;
@@ -41,8 +41,8 @@ public class HostsCommandTest extends SystemOutRedirectTest
     User user;
     @Mock
     LocalPeer localPeer;
-//    @Mock
-//    ManagementHost managementHost;
+    //    @Mock
+    //    ManagementHost managementHost;
     @Mock
     ResourceHost resourceHost;
     @Mock
@@ -59,14 +59,14 @@ public class HostsCommandTest extends SystemOutRedirectTest
         command.setIdentityManager( identityManager );
         //when( identityManager.getUser() ).thenReturn( user );
         when( peerManager.getLocalPeer() ).thenReturn( localPeer );
-//        when( localPeer.getManagementHost() ).thenReturn( managementHost );
+        //        when( localPeer.getManagementHost() ).thenReturn( managementHost );
         when( localPeer.getResourceHosts() ).thenReturn( Sets.newHashSet( resourceHost ) );
         when( resourceHost.getContainerHosts() ).thenReturn( Sets.newHashSet( containerHost ) );
-//        when( managementHost.getHostname() ).thenReturn( MGMT_HOST_HOSTNAME );
+        //        when( managementHost.getHostname() ).thenReturn( MGMT_HOST_HOSTNAME );
         when( resourceHost.getHostname() ).thenReturn( RESOURCE_HOST_HOSTNAME );
         when( containerHost.getHostname() ).thenReturn( CONTAINER_HOST_HOSTNAME );
         //when( user.getUsername() ).thenReturn( USERNAME );
-//        when( managementHost.getId() ).thenReturn( ID );
+        //        when( managementHost.getId() ).thenReturn( ID );
         when( resourceHost.getId() ).thenReturn( ID );
         when( containerHost.getId() ).thenReturn( ID );
         when( containerHost.getState() ).thenReturn( ContainerHostState.RUNNING );

@@ -20,16 +20,15 @@ import io.subutai.common.network.VniVlanMapping;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.HostNotFoundException;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.protocol.Tunnel;
 import io.subutai.core.network.api.ContainerInfo;
 import io.subutai.core.network.api.N2NConnection;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
-import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.peer.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.common.protocol.Tunnel;
 import junit.framework.TestCase;
 
 import static junit.framework.Assert.assertFalse;
