@@ -427,7 +427,27 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 				layout: 'fullpage'
 			}
 		})
-		.state();
+        .state('about', {
+            url: '/about',
+            templateUrl: 'subutai-app/about/partials/view.html',
+            data: {
+                bodyClass: '',
+                layout: 'default'
+            },
+            resolve: {
+                loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([
+                        {
+                            name: 'subutai.about',
+                            files: [
+                                'subutai-app/about/about.js',
+                                'subutai-app/about/controller.js',
+                            ]
+                        }
+                    ])
+                }]
+            }
+        });
 
 	$httpProvider.interceptors.push(function($q, $location) {
 		return {
