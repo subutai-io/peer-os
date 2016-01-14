@@ -84,7 +84,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 	}
 
 	function statusHTML(environmentStatus, type, full, meta) {
-		return '<div class="b-status-icon b-status-icon_' + environmentStatus + '" tooltips tooltip-template="' + environmentStatus + '"></div>';
+		return '<div class="b-status-icon b-status-icon_' + environmentStatus + '" tooltips tooltip-template="' + environmentStatus + '" tooltip-side="right"></div>';
 	}
 
 	function environmentNameTooltip(data, type, full, meta) {
