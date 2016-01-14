@@ -286,6 +286,40 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             throw new EnvironmentNotFoundException();
         }
+
+        //collect participating peers
+        Set<Peer> allPeers = Sets.newHashSet();
+
+        //add new peers
+        for ( NodeGroup nodeGroup : blueprint.getNodeGroups() )
+        {
+            Peer peer = peerManager.getPeer( nodeGroup.getPeerId() );
+
+            if ( peer == null )
+            {
+                operationTracker.addLogFailed( String.format( "Peer %s is not registered", nodeGroup.getPeerId() ) );
+                throw new EnvironmentModificationException(
+                        String.format( "Peer %s is not registered", nodeGroup.getPeerId() ) );
+            }
+            else
+            {
+                allPeers.add( peer );
+            }
+        }
+
+        //add already participating peers
+        allPeers.addAll( environment.getPeers() );
+
+        //check if peers are accessible
+        for ( Peer peer : allPeers )
+        {
+            if ( !peer.isOnline() )
+            {
+                operationTracker.addLogFailed( String.format( "Peer %s is offline", peer.getId() ) );
+                throw new EnvironmentModificationException( String.format( "Peer %s is offline", peer.getId() ) );
+            }
+        }
+
         String cdir = environment.getSubnetCidr();
 
         final Topology topology = buildTopology( environmentId, cdir, blueprint );
@@ -581,6 +615,38 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         //        Preconditions.checkArgument( !Strings.isNullOrEmpty( blueprint.getCidr() ), "Invalid subnet CIDR" );
         Preconditions.checkArgument( !blueprint.getNodeGroups().isEmpty(), "Placement is empty" );
 
+        //create operation tracker
+        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
+                String.format( "Creating environment %s ", blueprint.getName() ) );
+
+        //collect participating peers
+        Set<Peer> allPeers = Sets.newHashSet();
+        for ( NodeGroup nodeGroup : blueprint.getNodeGroups() )
+        {
+            Peer peer = peerManager.getPeer( nodeGroup.getPeerId() );
+
+            if ( peer == null )
+            {
+                operationTracker.addLogFailed( String.format( "Peer %s is not registered", nodeGroup.getPeerId() ) );
+                throw new EnvironmentCreationException(
+                        String.format( "Peer %s is not registered", nodeGroup.getPeerId() ) );
+            }
+            else
+            {
+                allPeers.add( peer );
+            }
+        }
+
+        //check if peers are accessible
+        for ( Peer peer : allPeers )
+        {
+            if ( !peer.isOnline() )
+            {
+                operationTracker.addLogFailed( String.format( "Peer %s offline", peer.getId() ) );
+                throw new EnvironmentCreationException( String.format( "Peer %s is offline", peer.getId() ) );
+            }
+        }
+
         String cidr = calculateCidr( blueprint );
 
         //create empty environment
@@ -590,10 +656,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         // TODO add additional step for receiving trust message
 
         Topology topology = buildTopology( environment.getId(), cidr, blueprint );
-
-        //create operation tracker
-        TrackerOperation operationTracker = tracker.createTrackerOperation       ( MODULE_NAME,
-                String.format( "Creating environment %s ", environment.getId() ) );
 
         //launch environment creation workflow
         final EnvironmentCreationWorkflow environmentCreationWorkflow =

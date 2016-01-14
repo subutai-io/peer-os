@@ -74,7 +74,8 @@ public class EnvironmentManagerTest
     EnvironmentImpl environment;
     @Mock
     EnvironmentCreationWorkflow environmentCreationWorkflow;
-
+    @Mock
+    TrackerOperation trackerOperation;
     @Mock
     Topology topology;
 
@@ -86,6 +87,7 @@ public class EnvironmentManagerTest
     {
         when( nodeGroup.getPeerId() ).thenReturn( PEER_ID );
         when( peerManager.getPeer( PEER_ID ) ).thenReturn( peer );
+        doReturn( true ).when( peer ).isOnline();
 
         blueprint = new Blueprint( "env", null, Sets.newHashSet( nodeGroup ) );
 
@@ -104,6 +106,7 @@ public class EnvironmentManagerTest
         //doReturn( user ).when( identityManager ).getUser();
         doReturn( environment ).when( environmentDataService ).find( anyString() );
         doReturn( ENV_ID ).when( environment ).getId();
+        doReturn( trackerOperation ).when( tracker ).createTrackerOperation( anyString(), anyString() );
     }
 
 
