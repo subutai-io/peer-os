@@ -1947,10 +1947,33 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
+    @RolesAllowed( "Environment-Management|Update" )
     @Override
     public void shareEnvironment( final ShareDto[] shareDto, final String environmentId )
     {
-        Environment environment = environmentDataService.find( environmentId );
+        Environment environment;
+        try
+        {
+            environment = loadEnvironment( environmentId, true );
+        }
+        catch ( EnvironmentNotFoundException e )
+        {
+            LOG.warn("Don't have permissions.", e);
+            return;
+        }
+
+        User activeUser = identityManager.getActiveUser();
+
+        RelationMeta envRelationMeta =
+                new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), environment, environment.getId(),
+                        environment.getId(), PermissionObject.EnvironmentManagement.getName() );
+
+        if ( !relationManager.getRelationInfoManager().groupHasUpdatePermissions( envRelationMeta ) )
+        {
+            throw new EnvironmentSecurityException(
+                    String.format( "Access to environment %s is denied", environment.getName() ) );
+        }
+
         RelationLink objectRelationLink = relationManager
                 .getRelationLink( String.valueOf( environmentId ), environment.getClass().getSimpleName() );
 
@@ -1964,28 +1987,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             }
         }
 
-        User activeUser = identityManager.getActiveUser();
-
-        Set<String> operatoins = Sets.newHashSet();
         for ( final ShareDto dto : shareDto )
         {
-            if ( dto.isWrite() )
-            {
-                operatoins.add( "Write" );
-            }
-            if ( dto.isRead() )
-            {
-                operatoins.add( "Read" );
-            }
-            if ( dto.isUpdate() )
-            {
-                operatoins.add( "Update" );
-            }
-            if ( dto.isDelete() )
-            {
-                operatoins.add( "Delete" );
-            }
-
             User targetUser = identityManager.getUser( dto.getId() );
 
             RelationInfoMeta relationInfoMeta =
@@ -2003,8 +2006,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             Relation relation = relationManager.buildTrustRelation( relationInfo, relationMeta );
             relation.setRelationStatus( RelationStatus.VERIFIED );
             relationManager.saveRelation( relation );
-
-            operatoins.clear();
         }
     }
 }
