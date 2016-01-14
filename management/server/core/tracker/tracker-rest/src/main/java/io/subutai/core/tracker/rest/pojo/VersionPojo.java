@@ -1,23 +1,24 @@
 package io.subutai.core.tracker.rest.pojo;
 
 
-/**
- * Created by ermek on 1/14/16.
- */
 public class VersionPojo
 {
+    private String gitCommitId;
+    private String gitBranch;
+    private String gitCommitUserName;
+    private String gitCommitUserEmail;
     private String projectVersion;
+
+    private String gitBuildUserName;
     private String gitBuildUserEmail;
     private String gitBuildHost;
+    private String gitBuildTime;
+
     private String gitClosestTagName;
     private String gitCommitIdDescribeShort;
     private String gitCommitTime;
-    private String gitBranch;
-    private String gitBuildUserName;
     private String gitClosestTagCommitCount;
     private String gitCommitIdDescribe;
-    private String gitCommitId;
-    private String gitBuildTime;
 
 
     public String getProjectVersion()
@@ -161,5 +162,29 @@ public class VersionPojo
     public void setGitBuildTime( final String gitBuildTime )
     {
         this.gitBuildTime = gitBuildTime;
+    }
+
+
+    public String getGitCommitUserName()
+    {
+        return gitCommitUserName;
+    }
+
+
+    public void setGitCommitUserName( final String gitCommitUserName )
+    {
+        this.gitCommitUserName = gitCommitUserName;
+    }
+
+
+    public String getGitCommitUserEmail()
+    {
+        return gitCommitUserEmail;
+    }
+
+
+    public void setGitCommitUserEmail( final String gitCommitUserEmail )
+    {
+        this.gitCommitUserEmail = gitCommitUserEmail;
     }
 }
