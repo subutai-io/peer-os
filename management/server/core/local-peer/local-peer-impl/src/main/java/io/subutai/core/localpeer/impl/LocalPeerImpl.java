@@ -311,7 +311,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public ContainerHostState getContainerState( final ContainerId containerId )
+    public ContainerHostState getContainerState( final ContainerId containerId ) throws PeerException
     {
         try
         {
@@ -321,8 +321,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
         catch ( Exception e )
         {
-            LOG.error( e.getMessage(), e );
-            return ContainerHostState.UNKNOWN;
+            throw new PeerException( "Error getting container state ", e );
         }
     }
 

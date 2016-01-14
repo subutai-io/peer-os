@@ -7,7 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
-	"subutai/agent/utils"
+	"subutai/lib/gpg"
 	"subutai/log"
 )
 
@@ -26,7 +26,7 @@ func (k *Key) Store() string {
 	err := k.Write("epub.key")
 	log.Check(log.WarnLevel, "Adding Public Key(PK) to local keyring", err)
 
-	status := utils.ImportPk("epub.key")
+	status := gpg.ImportPk("epub.key")
 	os.Remove("epub.key")
 	k.Id = ExtractKeyId(status)
 	log.Debug("Found KeyID: " + k.Id)

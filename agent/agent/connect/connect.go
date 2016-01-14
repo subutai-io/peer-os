@@ -3,11 +3,11 @@ package connect
 import (
 	"bytes"
 	"crypto/tls"
-	"fmt"
 	"net/http"
 	"strconv"
 	"subutai/agent/container"
 	"subutai/agent/utils"
+	"subutai/lib/gpg"
 	"subutai/log"
 	"time"
 )
@@ -22,16 +22,15 @@ func Connect(host, port, user, pass string) {
 	mgn.Port = port
 
 	rh := NewRH()
-	rh.Pk = utils.GetPk(user)
-	rh.UUID = utils.GetFingerprint(user)
+	rh.Pk = gpg.GetPk(user)
+	rh.UUID = gpg.GetFingerprint(user)
 	rh.Cert = utils.PublicCert()
 	rh.Secret = pass
 	rh.Containers = container.GetActiveContainers(true)
 	log.Info(rh.Json())
 
 	for _, cont := range rh.Containers {
-		fmt.Printf("Importing MH key to %s\n", cont)
-		utils.ImportMHKeyNoDefaultKeyring(cont.Name)
+		gpg.ImportMHKeyNoDefaultKeyring(cont.Name)
 	}
 
 	enMsg := ""
@@ -41,7 +40,7 @@ func Connect(host, port, user, pass string) {
 		pk := mgn.GetKey()
 		if pk != nil {
 			pk.Store()
-			enMsg = utils.EncryptWrapper(user, pk.Id, rh.Json())
+			enMsg = gpg.EncryptWrapper(user, pk.Id, rh.Json())
 		}
 	}
 

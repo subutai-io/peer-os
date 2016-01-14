@@ -28,4 +28,11 @@ public interface RestService
     @Path( "operations/sources" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response getTrackerOperationSources();
+
+
+    @GET
+    @Path( "subutai/about" )
+    @Produces( { MediaType.TEXT_PLAIN } )
+    public Response getSubutaiInfo();
+
 }

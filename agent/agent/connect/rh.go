@@ -9,6 +9,7 @@ import (
 	"strings"
 	"subutai/agent/container"
 	"subutai/agent/utils"
+	"subutai/lib/gpg"
 	"subutai/log"
 )
 
@@ -54,7 +55,7 @@ func (r *RHost) Json() string {
 
 // gets gpg public key from ~/.gnupg/pubring.gpg
 func (r *RHost) GetKey(name string) string {
-	pk := utils.GetPk(name)
+	pk := gpg.GetPk(name)
 	return pk
 }
 

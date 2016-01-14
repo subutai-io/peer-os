@@ -31,7 +31,7 @@ func makeNetConf(name, ip, vlan string) {
 	container.SetContainerConf(name, [][]string{
 		{"lxc.network.ipv4", ip},
 		{"lxc.network.link", ""},
-		{"lxc.network.veth.pair", "x"},
+		{"lxc.network.veth.pair", strings.Replace(container.GetConfigItem(config.Agent.LxcPrefix+name+"/config", "lxc.network.hwaddr"), ":", "", -1)},
 		{"lxc.network.script.up", config.Agent.AppPrefix + "bin/create_ovs_interface"},
 		{"#vlan_id", vlan},
 	})

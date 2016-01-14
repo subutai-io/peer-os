@@ -129,16 +129,17 @@ func cpuLoad(h string) interface{} {
 	return res[0].Series[0].Values[0][1]
 }
 
-func diskLoad(h string) (diskused, disktotal interface{}) {
-	res, err := queryDB("SELECT last(total), last(used) FROM host_disk WHERE hostname =~ /^" + h + "$/ AND type =~ /var\\/lib\\/lxc/ GROUP BY type")
+func diskLoad(h string) (disktotal, diskused interface{}) {
+	res, err := queryDB("SELECT last(value) FROM host_disk WHERE hostname =~ /^" + h + "$/ AND mount =~ /mnt/ GROUP BY type")
 	if err != nil {
 		log.Warn("No data received for disk load")
 		return
 	}
-	if len(res[0].Series) == 0 {
+	if len(res[0].Series) < 2 {
 		return 0, 0
 	}
-	return res[0].Series[0].Values[0][2], res[0].Series[0].Values[0][1]
+
+	return res[0].Series[2].Values[0][1], res[0].Series[1].Values[0][1]
 }
 
 func cpuQuotaUsage(h string) int {

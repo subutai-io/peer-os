@@ -119,8 +119,8 @@ func LxcImport(templ string) {
 	template.Install(parent, templ)
 	container.SetContainerConf(templ, [][]string{
 		{"lxc.rootfs", config.Agent.LxcPrefix + templ + "/rootfs"},
-		{"lxc.mount", config.Agent.LxcPrefix + templ + "/fstab"},		
-		{"lxc.hook.pre-start", ""},		
+		{"lxc.mount", config.Agent.LxcPrefix + templ + "/fstab"},
+		{"lxc.hook.pre-start", ""},
 		{"lxc.include", config.Agent.AppPrefix + "share/lxc/config/ubuntu.common.conf"},
 		{"lxc.include", config.Agent.AppPrefix + "share/lxc/config/ubuntu.userns.conf"},
 		{"subutai.config.path", config.Agent.AppPrefix + "etc"},

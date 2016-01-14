@@ -71,10 +71,8 @@ import io.subutai.core.identity.api.model.User;
 @Access( AccessType.FIELD )
 public class EnvironmentContainerImpl implements EnvironmentContainerHost, Serializable
 {
-    private static final Logger logger = LoggerFactory.getLogger( EnvironmentContainerImpl.class );
-    @OneToMany( mappedBy = "host", fetch = FetchType.EAGER, cascade = CascadeType.ALL, targetEntity =
-            HostInterfaceImpl.class, orphanRemoval = true )
-    protected Set<HostInterface> hostInterfaces = new HashSet<>();
+    private static final Logger LOGGER = LoggerFactory.getLogger( EnvironmentContainerImpl.class );
+
     @Column( name = "peer_id", nullable = false )
     private String peerId;
     @Id
@@ -92,14 +90,22 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     private String templateName;
     @Column( name = "template_arch", nullable = false )
     private String templateArch;
+
     @ElementCollection( targetClass = String.class, fetch = FetchType.EAGER )
     private Set<String> tags = new HashSet<>();
+
     @ManyToOne( targetEntity = EnvironmentImpl.class, fetch = FetchType.EAGER )
     @JoinColumn( name = "environment_id" )
     private Environment environment;
+
     @Column( name = "arch", nullable = false )
     @Enumerated
     private HostArchitecture hostArchitecture;
+
+    @OneToMany( mappedBy = "host", fetch = FetchType.EAGER, cascade = CascadeType.ALL, targetEntity =
+            HostInterfaceImpl.class, orphanRemoval = true )
+    protected Set<HostInterface> hostInterfaces = new HashSet<>();
+
     @Column( name = "ssh_group_id" )
     private int sshGroupId;
     @Column( name = "hosts_group_id" )
@@ -124,6 +130,12 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
     protected EnvironmentContainerImpl()
     {
+    }
+
+
+    public void init()
+    {
+        // Empty method
     }
 
 
@@ -157,9 +169,11 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     }
 
 
-    public void init()
+    public void setPeer( final Peer peer )
     {
-        // Empty method
+        Preconditions.checkNotNull( peer );
+
+        this.peer = peer;
     }
 
 
@@ -176,6 +190,62 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
         Preconditions.checkNotNull( environment );
 
         this.environment = environment;
+    }
+
+
+    @Override
+    public void setDefaultGateway( final String gatewayIp ) throws PeerException
+    {
+        getPeer().setDefaultGateway( new ContainerGateway( getContainerId(), gatewayIp ) );
+    }
+
+
+    @Override
+    public boolean isLocal()
+    {
+        return getPeer().isLocal();
+    }
+
+
+    @Override
+    public EnvironmentId getEnvironmentId()
+    {
+        return environment.getEnvironmentId();
+    }
+
+
+    @Override
+    public String getNodeGroupName()
+    {
+        return this.nodeGroupName;
+    }
+
+
+    @Override
+    public ContainerHostState getState()
+    {
+        return getPeer().getContainerState( getContainerId() );
+    }
+
+
+    @Override
+    public String getContainerName()
+    {
+        return containerName;
+    }
+
+
+    @Override
+    public void dispose() throws PeerException
+    {
+        try
+        {
+            environmentManager.destroyContainer( environment.getId(), this.getId(), false, false );
+        }
+        catch ( EnvironmentNotFoundException | EnvironmentModificationException e )
+        {
+            throw new PeerException( e );
+        }
     }
 
 
@@ -211,20 +281,60 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
 
     @Override
-    public ContainerType getContainerType()
+    public void start() throws PeerException
     {
-        return containerType;
+        getPeer().startContainer( getContainerId() );
     }
 
 
     @Override
-    public ContainerId getContainerId()
+    public void stop() throws PeerException
     {
-        if ( containerId == null )
-        {
-            containerId = new ContainerId( getId(), getHostname(), new PeerId( getPeerId() ), getEnvironmentId() );
-        }
-        return containerId;
+        getPeer().stopContainer( getContainerId() );
+    }
+
+
+    @Override
+    public Peer getPeer()
+    {
+        return peer;
+    }
+
+
+    @Override
+    public TemplateKurjun getTemplate() throws PeerException
+    {
+        return getPeer().getTemplate( this.templateName );
+    }
+
+
+    @Override
+    public String getTemplateName()
+    {
+        return this.templateName;
+    }
+
+
+    @Override
+    public void addTag( final String tag )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( tag ) );
+        this.tags.add( tag );
+    }
+
+
+    @Override
+    public void removeTag( final String tag )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( tag ) );
+        this.tags.remove( tag );
+    }
+
+
+    @Override
+    public Set<String> getTags()
+    {
+        return this.tags;
     }
 
 
@@ -232,6 +342,13 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     public String getPeerId()
     {
         return this.peerId;
+    }
+
+
+    @Override
+    public String getId()
+    {
+        return hostId;
     }
 
 
@@ -282,21 +399,6 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
                     {
                         throw new CommandException( "Host was revoked to execute commands" );
                     }
-                    //
-                    //                    KeyManager keyManager = securityManager.getKeyManager();
-                    //                    EnvironmentId environmentId = this.getEnvironmentId();
-                    //
-                    //                    String environmentFingerprint = keyManager.getFingerprint( environmentId
-                    // .getId() );
-                    //                    String userFingerprint = keyManager.getFingerprint( activeUser
-                    // .getSecurityKeyId() );
-                    //
-                    //                    if ( keyManager.getTrustLevel( userFingerprint, environmentFingerprint ) ==
-                    // KeyTrustLevel.Never
-                    //                            .getId() )
-                    //                    {
-                    //                        throw new CommandException(  );
-                    //                    }
                 }
             }
         }
@@ -337,16 +439,29 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
 
     @Override
-    public ContainerHostState getState()
+    public HostInterfaces getHostInterfaces()
     {
-        return getPeer().getContainerState( getContainerId() );
+        HostInterfaces result = new HostInterfaces();
+        for ( HostInterface hostInterface : this.hostInterfaces )
+        {
+            HostInterfaceModel model = new HostInterfaceModel( hostInterface );
+            result.addHostInterface( model );
+        }
+        return result;
     }
 
 
-    @Override
-    public String getContainerName()
+    public void setHostInterfaces( HostInterfaces hostInterfaces )
     {
-        return containerName;
+        Preconditions.checkNotNull( hostInterfaces );
+
+        this.hostInterfaces.clear();
+        for ( HostInterface iface : hostInterfaces.getAll() )
+        {
+            HostInterfaceImpl hostInterface = new HostInterfaceImpl( iface );
+            hostInterface.setHost( this );
+            this.hostInterfaces.add( hostInterface );
+        }
     }
 
 
@@ -402,165 +517,9 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
 
     @Override
-    public String getId()
-    {
-        return hostId;
-    }
-
-
-    @Override
-    public HostInterfaces getHostInterfaces()
-    {
-        HostInterfaces result = new HostInterfaces();
-        for ( HostInterface hostInterface : this.hostInterfaces )
-        {
-            HostInterfaceModel model = new HostInterfaceModel( hostInterface );
-            result.addHostInterface( model );
-        }
-        return result;
-    }
-
-
-    public void setHostInterfaces( HostInterfaces hostInterfaces )
-    {
-        Preconditions.checkNotNull( hostInterfaces );
-
-        this.hostInterfaces.clear();
-        for ( HostInterface iface : hostInterfaces.getAll() )
-        {
-            HostInterfaceImpl hostInterface = new HostInterfaceImpl( iface );
-            hostInterface.setHost( this );
-            this.hostInterfaces.add( hostInterface );
-        }
-    }
-
-
-    @Override
     public HostArchitecture getArch()
     {
         return this.hostArchitecture;
-    }
-
-
-    @Override
-    public String getInitiatorPeerId()
-    {
-        return this.peerId;
-    }
-
-
-    @Override
-    public String getOwnerId()
-    {
-        throw new UnsupportedOperationException( "Not implemented yet." );
-    }
-
-
-    @Override
-    public EnvironmentId getEnvironmentId()
-    {
-        return environment.getEnvironmentId();
-    }
-
-
-    @Override
-    public String getNodeGroupName()
-    {
-        return this.nodeGroupName;
-    }
-
-
-    @Override
-    public void dispose() throws PeerException
-    {
-        try
-        {
-            environmentManager.destroyContainer( environment.getId(), this.getId(), false, false );
-        }
-        catch ( EnvironmentNotFoundException | EnvironmentModificationException e )
-        {
-            throw new PeerException( e );
-        }
-    }
-
-
-    @Override
-    public void start() throws PeerException
-    {
-        getPeer().startContainer( getContainerId() );
-    }
-
-
-    @Override
-    public void stop() throws PeerException
-    {
-        getPeer().stopContainer( getContainerId() );
-    }
-
-
-    @Override
-    public Peer getPeer()
-    {
-        return peer;
-    }
-
-
-    public void setPeer( final Peer peer )
-    {
-        Preconditions.checkNotNull( peer );
-
-        this.peer = peer;
-    }
-
-
-    @Override
-    public TemplateKurjun getTemplate() throws PeerException
-    {
-        return getPeer().getTemplate( this.templateName );
-    }
-
-
-    @Override
-    public String getTemplateName()
-    {
-        return this.templateName;
-    }
-
-
-    @Override
-    public void addTag( final String tag )
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( tag ) );
-        this.tags.add( tag );
-    }
-
-
-    @Override
-    public void removeTag( final String tag )
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( tag ) );
-        this.tags.remove( tag );
-    }
-
-
-    @Override
-    public Set<String> getTags()
-    {
-        return this.tags;
-    }
-
-
-    @Override
-    public void setDefaultGateway( final String gatewayIp ) throws PeerException
-    {
-        getPeer().setDefaultGateway( new ContainerGateway( getContainerId(), gatewayIp ) );
-    }
-
-
-    @Override
-    public boolean isLocal()
-    {
-        return getPeer().isLocal();
     }
 
 
@@ -606,10 +565,42 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     }
 
 
-    @Override
-    public int hashCode()
+    public int getSshGroupId()
     {
-        return hostId != null ? hostId.hashCode() : 0;
+        return sshGroupId;
+    }
+
+
+    public int getHostsGroupId()
+    {
+        return hostsGroupId;
+    }
+
+
+    public String getDomainName()
+    {
+        return domainName;
+    }
+
+
+    protected void setHostId( String id )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( id ) );
+        this.hostId = id;
+    }
+
+
+    @Override
+    public String getInitiatorPeerId()
+    {
+        return this.peerId;
+    }
+
+
+    @Override
+    public String getOwnerId()
+    {
+        throw new UnsupportedOperationException( "Not implemented yet." );
     }
 
 
@@ -633,6 +624,31 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
         }
 
         return true;
+    }
+
+
+    @Override
+    public ContainerId getContainerId()
+    {
+        if ( containerId == null )
+        {
+            containerId = new ContainerId( getId(), getHostname(), new PeerId( getPeerId() ), getEnvironmentId() );
+        }
+        return containerId;
+    }
+
+
+    @Override
+    public ContainerType getContainerType()
+    {
+        return containerType;
+    }
+
+
+    @Override
+    public int hashCode()
+    {
+        return hostId != null ? hostId.hashCode() : 0;
     }
 
 

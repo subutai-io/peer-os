@@ -14,6 +14,7 @@ import (
 	"subutai/agent/executer"
 	"subutai/agent/utils"
 	"subutai/config"
+	"subutai/lib/gpg"
 	clilog "subutai/log"
 	"time"
 )
@@ -40,10 +41,10 @@ var requestHandler mqtt.MessageHandler = func(client *mqtt.Client, msg mqtt.Mess
 		clilog.Check(clilog.WarnLevel, "Unmarshal payload", json.Unmarshal(msg.Payload(), &rsp))
 
 		email, _ := os.Hostname()
-		fingerprint := utils.GetFingerprint(email + "@subutai.io")
+		fingerprint := gpg.GetFingerprint(email + "@subutai.io")
 		if rsp.HostId == fingerprint {
 			flag = true
-			md = utils.DecryptWrapper(rsp.Request)
+			md = gpg.DecryptWrapper(rsp.Request)
 		} else {
 			flag = false
 			contName, err = container.PoolInstance().GetTargetHostName(rsp.HostId)
@@ -60,7 +61,7 @@ var requestHandler mqtt.MessageHandler = func(client *mqtt.Client, msg mqtt.Mess
 			pub = config.Agent.LxcPrefix + contName + "/public.pub"
 			keyring = config.Agent.LxcPrefix + contName + "/secret.sec"
 			log.Info("Getting puyblic keyring", "keyring", keyring)
-			md = utils.DecryptNoDefaultKeyring(rsp.Request, keyring, pub)
+			md = gpg.DecryptNoDefaultKeyring(rsp.Request, keyring, pub)
 		}
 		clilog.Debug(md)
 		i := strings.Index(md, "{")
@@ -88,9 +89,9 @@ var requestHandler mqtt.MessageHandler = func(client *mqtt.Client, msg mqtt.Mess
 					jsonR, err := json.Marshal(response)
 					clilog.Check(clilog.WarnLevel, "Marshal response", err)
 					if rsp.HostId == fingerprint {
-						payload = utils.EncryptWrapper(config.Agent.GpgUser, config.Management.GpgUser, string(jsonR))
+						payload = gpg.EncryptWrapper(config.Agent.GpgUser, config.Management.GpgUser, string(jsonR))
 					} else {
-						payload = utils.EncryptWrapperNoDefaultKeyring(contName, config.Management.GpgUser, string(jsonR), pub, keyring)
+						payload = gpg.EncryptWrapperNoDefaultKeyring(contName, config.Management.GpgUser, string(jsonR), pub, keyring)
 					}
 					message, err := json.Marshal(map[string]string{
 						"hostId":   elem.Id,
@@ -112,7 +113,7 @@ func Start(c *cli.Context) {
 	hostname, _ := os.Hostname()
 	instancetype := utils.InstanceType()
 
-	myuuid := utils.GetFingerprint(c.String("user"))
+	myuuid := gpg.GetFingerprint(c.String("user"))
 	client := mqtt.NewClient(opts)
 
 	token := client.Connect()
@@ -147,15 +148,12 @@ func Start(c *cli.Context) {
 		// log.Info("INFO", "HEARTBEAT", beat)
 		clilog.Debug(string(jbeat))
 
-		// message := utils.EncryptWrapper(config.Agent.GpgUser, config.Management.GpgUser, string(jbeat))
-
 		message, err := json.Marshal(map[string]string{
 			"hostId":   myuuid,
-			"response": utils.EncryptWrapper(config.Agent.GpgUser, config.Management.GpgUser, string(jbeat)),
+			"response": gpg.EncryptWrapper(config.Agent.GpgUser, config.Management.GpgUser, string(jbeat)),
 		})
 		clilog.Check(clilog.WarnLevel, "Marshal response json", err)
 
-		// fmt.Println(string(message))
 		client.Publish(config.Broker.HeartbeatTopic, 0, false, message)
 		time.Sleep(5 * time.Second)
 	}

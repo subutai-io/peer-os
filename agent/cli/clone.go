@@ -9,7 +9,6 @@ import (
 	"strings"
 	"subutai/config"
 	"subutai/lib/container"
-	"subutai/lib/db"
 	"subutai/lib/gpg"
 	"subutai/log"
 	"syscall"
@@ -40,6 +39,8 @@ func LxcClone(parent, child, envId, addr, token string) {
 
 	setContainerUid(child)
 	LxcStart(child)
+
+	container.AptUpdate(child)
 	// container.Start(child)
 	// log.Info(child + " successfully cloned")
 }
@@ -73,8 +74,6 @@ func addNetConf(c, addr string) {
 
 func setContainerUid(c string) {
 	var uidlast []byte
-
-	log.Info("UID from DB: " + strconv.Itoa(db.GetUid("hhh")))
 
 	uidlast, _ = ioutil.ReadFile(config.Agent.LxcPrefix + "uidmaplast")
 
