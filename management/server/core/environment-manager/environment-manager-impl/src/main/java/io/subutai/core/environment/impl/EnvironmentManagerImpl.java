@@ -342,6 +342,38 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         Preconditions.checkArgument( !Strings.isNullOrEmpty( blueprint.getName() ), "Invalid name" );
         Preconditions.checkArgument( !blueprint.getNodeGroups().isEmpty(), "Placement is empty" );
 
+        //create operation tracker
+        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
+                String.format( "Creating environment %s ", blueprint.getName() ) );
+
+        //collect participating peers
+        Set<Peer> allPeers = Sets.newHashSet();
+        for ( NodeGroup nodeGroup : blueprint.getNodeGroups() )
+        {
+            Peer peer = peerManager.getPeer( nodeGroup.getPeerId() );
+
+            if ( peer == null )
+            {
+                operationTracker.addLogFailed( String.format( "Peer %s is not registered", nodeGroup.getPeerId() ) );
+                throw new EnvironmentCreationException(
+                        String.format( "Peer %s is not registered", nodeGroup.getPeerId() ) );
+            }
+            else
+            {
+                allPeers.add( peer );
+            }
+        }
+
+        //check if peers are accessible
+        for ( Peer peer : allPeers )
+        {
+            if ( !peer.isOnline() )
+            {
+                operationTracker.addLogFailed( String.format( "Peer %s offline", peer.getId() ) );
+                throw new EnvironmentCreationException( String.format( "Peer %s is offline", peer.getId() ) );
+            }
+        }
+
         String cidr = calculateCidr( blueprint );
 
         String environmentId = UUID.randomUUID().toString();
@@ -351,9 +383,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         final EnvironmentImpl environment = createEmptyEnvironment( blueprint.getName(), cidr, blueprint.getSshKey() );
 
-        //create operation tracker
-        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
-                String.format( "Creating environment %s ", environment.getId() ) );
 
         //launch environment creation workflow
         final EnvironmentCreationWorkflow environmentCreationWorkflow =
@@ -483,11 +512,45 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
         Preconditions.checkArgument( !blueprint.getNodeGroups().isEmpty(), "Placement is empty" );
 
+
+        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
+
         TrackerOperation operationTracker =
                 tracker.createTrackerOperation( MODULE_NAME, String.format( "Growing environment %s", environmentId ) );
 
+        //collect participating peers
+        Set<Peer> allPeers = Sets.newHashSet();
 
-        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
+        //add new peers
+        for ( NodeGroup nodeGroup : blueprint.getNodeGroups() )
+        {
+            Peer peer = peerManager.getPeer( nodeGroup.getPeerId() );
+
+            if ( peer == null )
+            {
+                operationTracker.addLogFailed( String.format( "Peer %s is not registered", nodeGroup.getPeerId() ) );
+                throw new EnvironmentModificationException(
+                        String.format( "Peer %s is not registered", nodeGroup.getPeerId() ) );
+            }
+            else
+            {
+                allPeers.add( peer );
+            }
+        }
+
+        //add already participating peers
+        allPeers.addAll( environment.getPeers() );
+
+        //check if peers are accessible
+        for ( Peer peer : allPeers )
+        {
+            if ( !peer.isOnline() )
+            {
+                operationTracker.addLogFailed( String.format( "Peer %s is offline", peer.getId() ) );
+                throw new EnvironmentModificationException( String.format( "Peer %s is offline", peer.getId() ) );
+            }
+        }
+
 
         String cdir = environment.getSubnetCidr();
 
