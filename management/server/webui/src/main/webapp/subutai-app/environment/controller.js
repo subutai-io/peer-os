@@ -341,16 +341,24 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
     }
 
 	function buildEnvironment() {
-		SweetAlert.swal("Success!", "Your environment started building.", "success");
-		ngDialog.closeAll();
-		environmentService.startEnvironmentBuild (vm.currentEnvironment.id, encodeURIComponent(vm.currentEnvironment.relationDeclaration)).success(function (data) {
-			SweetAlert.swal("Success!", "Your environment was built.", "success");
-			loadEnvironments();
-			vm.activeTab = "installed";
+		/*var temp = vm.currentEnvironment.relationDeclaration;
+		var beginning = temp.substring (0, 34);
+		var end = temp.substring (0, 34);
+		if() {*/
+			SweetAlert.swal("Success!", "Your environment started building.", "success");
 			ngDialog.closeAll();
-		}).error(function (data) {
-			SweetAlert.swal("ERROR!", "Environment build error. Error: " + data.ERROR, "error");
-		});
+			environmentService.startEnvironmentBuild(vm.currentEnvironment.id, encodeURIComponent(vm.currentEnvironment.relationDeclaration)).success(function (data) {
+				SweetAlert.swal("Success!", "Your environment was built.", "success");
+				loadEnvironments();
+				vm.activeTab = "installed";
+				ngDialog.closeAll();
+			}).error(function (data) {
+				SweetAlert.swal("ERROR!", "Environment build error. Error: " + data.ERROR, "error");
+			});
+/*		}
+		else {
+			SweetAlert.swal("ERROR!", "Please sign properly.", "error");
+		}*/
 	}
 
 
