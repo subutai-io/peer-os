@@ -1,10 +1,12 @@
 package lib
 
 import (
+	"bufio"
 	"fmt"
 	"io/ioutil"
 	n "net"
 	"os"
+	"os/exec"
 	"strconv"
 	"strings"
 	"subutai/config"
@@ -23,11 +25,11 @@ func LxcManagementNetwork(args []string) {
 	case "-p", "--showport":
 		showPort(args[3])
 	case "-L", "--listn2n":
-		listOpenedN2NTunnel()
+		net.PrintN2NTunnels()
 	case "-D", "--deletegateway":
-		deleteGateway(args[3])
+		net.DeleteGateway(args[3])
 	case "-S", "--listopenedtab":
-		listOpenedTapDevice()
+		net.ListTapDevice()
 	case "-V", "--removetab":
 		removeTapDevice(args[3])
 	case "-v", "--listvnimap":
@@ -37,7 +39,7 @@ func LxcManagementNetwork(args []string) {
 	case "-e", "--reloadn2n":
 		reloadN2N(args[3], args[4])
 	case "-T", "--creategateway":
-		createGateway(args[3], args[4])
+		net.CreateGateway(args[3], args[4])
 	case "-M", "--removevni":
 		delVNI(args[3], args[4], args[5])
 	case "-R", "--removen2n":
@@ -49,7 +51,7 @@ func LxcManagementNetwork(args []string) {
 	case "-c", "--createtunnel":
 		log.Check(log.FatalLevel, "create tunnel", createTunnel(args[3], args[4], args[5]))
 	case "-f", "--addflow":
-		addFlow(args[3], args[4])
+		net.AddFlowConfig(args[3], args[4])
 		log.Info("Flow configuration added")
 	case "-l", "--listtunnel":
 		liste := listTunnel()
@@ -59,29 +61,55 @@ func LxcManagementNetwork(args []string) {
 		}
 	case "-d", "--deleteflow":
 		if len(args)-3 < 2 {
-			deleteFlow(args[3], "")
+			net.DeleteFlow(args[3], "")
 		} else {
-			deleteFlow(args[3], args[4])
+			net.DeleteFlow(args[3], args[4])
 		}
 	case "-N", "--addn2n":
-		if len(args)-3 == 8 {
-			createN2NTunnel(args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10])
-		} else if len(args)-3 == 7 { // management port can be empty
-			createN2NTunnel(args[3], args[4], args[5], args[6], args[7], args[8], args[9], "")
-		} else {
-			log.Warn("please check you have given all arguments correctly")
-		}
+		p2pTunnel(args[5], args[6], args[7])
+		// if len(args)-3 == 8 {
+		// func createN2NTunnel(interfaceName, communityName, localPeepIPAddr) {
+		// func createN2NTunnel(superNodeIPaddr, superNodePort, interfaceName, communityName, localPeepIPAddr, keyType, keyFile, managementPort string) {
+		// createN2NTunnel(args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10])
+		// } else if len(args)-3 == 7 { // management port can be empty
+		// createN2NTunnel(args[3], args[4], args[5], args[6], args[7], args[8], args[9], "")
+		// } else {
+		// log.Warn("please check you have given all arguments correctly")
+		// }
 	case "-Z", "--vniop":
 		switch args[3] {
 		case "deleteall":
 			net.DeleteAllVNI(args[4])
-			deleteGateway(args[4])
+			net.DeleteGateway(args[4])
 		case "delete":
 			net.DeleteVNI(args[4], args[5], args[6])
 		case "list":
 			net.ListVNI()
 		}
 	}
+}
+
+func p2pFile(line string) {
+	path := config.Agent.DataPrefix + "/var/subutai-network/"
+	file := path + "p2p.txt"
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		log.Check(log.FatalLevel, "create "+path+" folder", os.MkdirAll(path, 0755))
+	}
+	if _, err := os.Stat(file); os.IsNotExist(err) {
+		_, err = os.Create(file)
+		log.Check(log.FatalLevel, "Creating "+file, err)
+	}
+
+	f, err := os.OpenFile(file, os.O_APPEND|os.O_WRONLY, 0600)
+	log.Check(log.FatalLevel, "Opening file for append "+file, err)
+	defer f.Close()
+	_, err = f.WriteString(line + "\n")
+	log.Check(log.FatalLevel, "Opening file for append "+file, err)
+}
+
+func p2pTunnel(interfaceName, communityName, localPeepIPAddr string) {
+	p2pFile(interfaceName + " " + localPeepIPAddr + " " + communityName)
+	log.Check(log.FatalLevel, "p2p command: ", exec.Command("p2p", "-dev", interfaceName, "-ip", localPeepIPAddr, "-hash", communityName).Start())
 }
 
 func createTunnel(tunnelPortName, tunnelIPAddress, tunnelType string) error {
@@ -129,11 +157,6 @@ func removeTunnel(tunnelPortName string) {
 
 }
 
-func addFlow(bridgeName, flowConfiguration string) {
-	log.Info("flow configuration adding with: " + bridgeName + " " + flowConfiguration)
-	log.Check(log.FatalLevel, "addFlow: ", net.AddFlowConfig(bridgeName, flowConfiguration))
-}
-
 func showFlow(bridgeName string) {
 	s, err := net.DumpBridge(bridgeName)
 	if err != nil {
@@ -150,10 +173,6 @@ func showPort(bridgeName string) {
 	}
 	log.Info("Port informations of " + bridgeName)
 	fmt.Println(s)
-}
-func deleteFlow(bridgeName, matchCase string) {
-	log.Check(log.FatalLevel, "deleteflow ", net.DeleteFlow(bridgeName, matchCase))
-	log.Info(bridgeName + " flows are deleted according to " + matchCase)
 }
 
 // refer to n2n.go
@@ -195,43 +214,24 @@ func createN2NTunnel(superNodeIPaddr, superNodePort, interfaceName, communityNam
 
 }
 
-func listOpenedN2NTunnel() {
-	net.PrintN2NTunnels()
-}
-
 func removeN2NTunnel(interfaceName, communityName string) {
 	pid := net.ReturnPID(interfaceName, communityName)
 	i, _ := strconv.Atoi(pid)
+	newconf := ""
 	log.Check(log.FatalLevel, "remove n2n tunnel: ", syscall.Kill(i, syscall.SIGHUP))
-	f, err := ioutil.ReadFile(config.Agent.DataPrefix + "/var/subutai-network/edgePorts.txt")
-	if err != nil {
-		log.Error("read from edgePorts.txt " + err.Error())
-	}
-	lines := strings.Split(string(f), "\n")
-	for k, v := range lines {
-		temp := strings.Split(string(v), ",")
-		if temp[2] == interfaceName && temp[3] == communityName {
-			lines[k] = ""
+
+	file, err := os.Open(config.Agent.DataPrefix + "/var/subutai-network/p2p.txt")
+	log.Check(log.FatalLevel, "Opening p2p.txt", err)
+	scanner := bufio.NewScanner(bufio.NewReader(file))
+
+	for scanner.Scan() {
+		line := scanner.Text()
+		if strings.HasPrefix(line, interfaceName) && strings.HasSuffix(line, communityName) {
+			newconf = newconf + line + "\n"
 		}
 	}
-	str := []byte(strings.Join(lines, "\n"))
-	log.Check(log.FatalLevel, "write edgePorts.txt: ",
-		ioutil.WriteFile(config.Agent.DataPrefix+"/var/subutai-network/edgePorts.txt", []byte(str), 0744))
-	log.Info(interfaceName + " " + communityName + " " + " n2n tunnel is removed")
-}
-
-func createGateway(vlanip, vlanid string) {
-	net.CreateGateway(vlanip, vlanid)
-	log.Info("gateway created")
-}
-
-func deleteGateway(vlanid string) {
-	net.DeleteGateway(vlanid)
-	log.Info("gateway " + vlanid + " removed")
-}
-
-func listOpenedTapDevice() {
-	net.ListTapDevice()
+	file.Close()
+	log.Check(log.FatalLevel, "Removing p2p tunnel", ioutil.WriteFile(config.Agent.DataPrefix+"/var/subutai-network/p2p.txt", []byte(newconf), 0644))
 }
 
 func removeTapDevice(interfaceName string) {
