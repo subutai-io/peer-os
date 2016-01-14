@@ -78,10 +78,5 @@ public class ListCommandTest extends SystemOutRedirectTest
 
         assertTrue( getSysOut().contains( PEER_ID ) );
 
-        doThrow( new PeerException( ERR_MSG ) ).when( peer ).isOnline();
-
-        command.doExecute();
-
-        assertTrue( getSysOut().contains( ERR_MSG ) );
     }
 }
