@@ -239,60 +239,62 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
                 break;
             case 'host_net':
             case 'lxc_net':
-                if (maxValue / Math.pow(10, 6) > 1) {
-                    chartOptions.chart.yAxis.axisLabel = "Mbps";
-                    chartOptions.chart.forceY = maxValue / Math.pow(10, 6) + (maxValue / Math.pow(10, 6)) / 3;
-                    chartSeries.unit = "Mbps";
-                    unitCoefficient = Math.pow(10, 6);
-                    break;
+                switch (true) {
+                    case maxValue / Math.pow(10, 9) > 1:
+                        chartOptions.chart.yAxis.axisLabel = "Gbps";
+                        chartSeries.unit = "Gbps";
+                        chartOptions.chart.forceY = maxValue / Math.pow(10, 9) + (maxValue / Math.pow(10, 9)) / 3;
+                        unitCoefficient = Math.pow(10, 9);
+                        break;
+                    case maxValue / Math.pow(10, 6) > 1:
+                        chartOptions.chart.yAxis.axisLabel = "Mbps";
+                        chartSeries.unit = "Mbps";
+                        chartOptions.chart.forceY = maxValue / Math.pow(10, 6) + (maxValue / Math.pow(10, 6)) / 3;
+                        unitCoefficient = Math.pow(10, 6);
+                        break;
+                    case maxValue / Math.pow(10, 3) > 1:
+                        chartOptions.chart.yAxis.axisLabel = "Kbps";
+                        chartSeries.unit = "Kbps";
+                        chartOptions.chart.forceY = maxValue / Math.pow(10, 3) + (maxValue / Math.pow(10, 3)) / 3;
+                        unitCoefficient = Math.pow(10, 3);
+                        break;
+                    default:
+                        chartOptions.chart.yAxis.axisLabel = "bps";
+                        chartSeries.unit = "bps";
+                        chartOptions.chart.forceY = maxValue + maxValue / 3;
+                        unitCoefficient = 1;
+                        break;
                 }
-                if (maxValue / Math.pow(10, 3) > 1) {
-                    chartOptions.chart.yAxis.axisLabel = "Kbps";
-                    chartOptions.chart.forceY = (maxValue / Math.pow(10, 3)) + (maxValue / Math.pow(10, 3)) / 3;
-                    chartSeries.unit = "Kbps";
-                    unitCoefficient = Math.pow(10, 3);
-                    break;
-                }
-                else {
-                    chartOptions.chart.yAxis.axisLabel = "bps";
-                    chartOptions.chart.forceY = maxValue + maxValue / 3;
-                    chartSeries.unit = "bps";
-                    unitCoefficient = 1;
-                    break;
-                }
-                break;
                 break;
             case 'host_memory':
             case 'lxc_memory':
             case 'host_disk':
             case 'lxc_disk':
-                if (maxValue / Math.pow(10, 9) > 1) {
-                    chartOptions.chart.yAxis.axisLabel = "GB";
-                    chartOptions.chart.forceY = maxValue / Math.pow(10, 9) + (maxValue / Math.pow(10, 9)) / 3;
-                    chartSeries.unit = "GB";
-                    unitCoefficient = Math.pow(10, 9);
-                    break;
-                }
-                if (maxValue / Math.pow(10, 6) > 1) {
-                    chartOptions.chart.yAxis.axisLabel = "MB";
-                    chartOptions.chart.forceY = maxValue / Math.pow(10, 6) + (maxValue / Math.pow(10, 6)) / 3;
-                    chartSeries.unit = "MB";
-                    unitCoefficient = Math.pow(10, 6);
-                    break;
-                }
-                if (maxValue / Math.pow(10, 3) > 1) {
-                    chartOptions.chart.yAxis.axisLabel = "KB";
-                    chartOptions.chart.forceY = (maxValue / Math.pow(10, 3)) + (maxValue / Math.pow(10, 3)) / 3;
-                    chartSeries.unit = "KB";
-                    unitCoefficient = Math.pow(10, 3);
-                    break;
-                }
-                else {
-                    chartOptions.chart.yAxis.axisLabel = "Byte";
-                    chartOptions.chart.forceY = maxValue + maxValue / 3;
-                    chartSeries.unit = "Byte";
-                    unitCoefficient = 1;
-                    break;
+                switch (true) {
+                    case maxValue / Math.pow(10, 9) > 1:
+                        chartOptions.chart.yAxis.axisLabel = "GB";
+                        chartOptions.chart.forceY = maxValue / Math.pow(10, 9) + (maxValue / Math.pow(10, 9)) / 3;
+                        chartSeries.unit = "GB";
+                        unitCoefficient = Math.pow(10, 9);
+                        break;
+                    case maxValue / Math.pow(10, 6) > 1:
+                        chartOptions.chart.yAxis.axisLabel = "MB";
+                        chartOptions.chart.forceY = maxValue / Math.pow(10, 6) + (maxValue / Math.pow(10, 6)) / 3;
+                        chartSeries.unit = "MB";
+                        unitCoefficient = Math.pow(10, 6);
+                        break;
+                    case maxValue / Math.pow(10, 3):
+                        chartOptions.chart.yAxis.axisLabel = "KB";
+                        chartOptions.chart.forceY = (maxValue / Math.pow(10, 3)) + (maxValue / Math.pow(10, 3)) / 3;
+                        chartSeries.unit = "KB";
+                        unitCoefficient = Math.pow(10, 3);
+                        break;
+                    default:
+                        chartOptions.chart.yAxis.axisLabel = "Byte";
+                        chartOptions.chart.forceY = maxValue + maxValue / 3;
+                        chartSeries.unit = "Byte";
+                        unitCoefficient = 1;
+                        break;
                 }
             default:
                 break;

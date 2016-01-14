@@ -1831,8 +1831,9 @@ td.b-main-table__status-col {
     border: 1px solid #dcdcdc;
     border-radius: 5px 5px 0 0;
     margin: 0 15px 30px;
+    position: relative;
 	/*height: 100px;*/
-	overflow: hidden;
+	/*overflow: hidden;*/
 }
 
 .b-chart-block__title {
@@ -1848,13 +1849,19 @@ td.b-main-table__status-col {
 .b-chart-block__series-title {
     font-size: 10pt;
     font-weight: bold;
-    height: 15px;
+    height: 20px;
     line-height: 2;
-    text-align: center;
+    left: 50%;
+    position: absolute;
+}
+
+.b-chart-block__series-title_center {
+    position: relative;
+    left: -50%;
 }
 
 .b-chart-block__body {
-    padding: 10px 17px 20px;
+    padding: 20px 17px 20px;
 }
 
 .b-chart-block-list {
