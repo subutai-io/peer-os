@@ -21,8 +21,7 @@ var app = angular.module('subutai-app', [
 	.run(startup);
 
 CurrentUserCtrl.$inject = ['$location', '$rootScope'];
-routesConf.$inject = ['$stateProvider', '$urlRouterProvider', '$ocLazyLoadProvider'];
-startup.$inject = ['$rootScope', '$state', '$location', '$http'];
+routesConf.$inject = ['$httpProvider', '$stateProvider', '$urlRouterProvider', '$ocLazyLoadProvider'];
 startup.$inject = ['$rootScope', '$state', '$location', '$http'];
 
 function CurrentUserCtrl($location, $rootScope) {
@@ -52,23 +51,27 @@ function SubutaiController($rootScope) {
 	vm.bodyClass = '';
 
 	$rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams){
-		vm.layoutType = 'subutai-app/common/layouts/' + toState.data.layout + '.html';
-		if (angular.isDefined(toState.data.bodyClass)) {
-			vm.bodyClass = toState.data.bodyClass;
-			return;
-		}
+		if(toState.data) {
+			vm.layoutType = 'subutai-app/common/layouts/' + toState.data.layout + '.html';
+			if (angular.isDefined(toState.data.bodyClass)) {
+				vm.bodyClass = toState.data.bodyClass;
+				return;
+			}
 
-		vm.bodyClass = '';
+			vm.bodyClass = '';
+		}
 	});
 }
 
-function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
+function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 
 	$urlRouterProvider.otherwise('/404');
 
 	$ocLazyLoadProvider.config({
 		debug: false
 	});
+
+	//$locationProvider.html5Mode(true);
 
 	$stateProvider
 		.state('login', {
@@ -94,7 +97,7 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 			}
 		})
 		.state('home', {
-			url: '/',
+			url: '',
 			templateUrl: 'subutai-app/monitoring/partials/view.html',
 			data: {
 				bodyClass: '',
@@ -103,13 +106,6 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 			resolve: {
 				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
 					return $ocLazyLoad.load([
-						{
-							name: 'chart.js',
-							files: [
-								'css/libs/angular-chart.min.css',
-								'assets/js/plugins/angular-chart.min.js'
-							]
-						},
 						{
 							name: 'subutai.monitoring',
 							files: [
@@ -214,6 +210,28 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 								'subutai-app/containers/containers.js',
 								'subutai-app/containers/controller.js',
 								'subutai-app/environment/service.js'
+							]
+						}
+					]);
+				}]
+			}
+		})
+		.state('kurjun', {
+			url: '/kurjun',
+			templateUrl: 'subutai-app/kurjun/partials/view.html',
+			data: {
+				bodyClass: '',
+				layout: 'default'
+			},
+			resolve: {
+				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+					return $ocLazyLoad.load([
+						{
+							name: 'subutai.kurjun',
+							files: [
+								'subutai-app/kurjun/kurjun.js',
+								'subutai-app/kurjun/controller.js',
+								'subutai-app/kurjun/service.js'
 							]
 						}
 					]);
@@ -409,7 +427,18 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 				layout: 'fullpage'
 			}
 		})
-		.state()
+		.state();
+
+	$httpProvider.interceptors.push(function($q, $location) {
+		return {
+			'responseError': function(rejection) {
+				if (rejection.status == 401 && $.inArray($location.path(), ['/login']) === -1) {
+					$location.path('/login');
+				}
+				return $q.reject(rejection);
+			}
+		};
+	});
 }
 
 function startup($rootScope, $state, $location, $http) {
@@ -417,10 +446,10 @@ function startup($rootScope, $state, $location, $http) {
 	$rootScope.$on('$stateChangeStart',	function(event, toState, toParams, fromState, fromParams){
 		LOADING_SCREEN('none');
 		var restrictedPage = $.inArray($location.path(), ['/login']) === -1;
-		if (restrictedPage && !getCookie('sptoken')) {
-			sessionStorage.removeItem('currentUser');
-			$location.path('/login');
-		}
+		 if (restrictedPage && !getCookie('sptoken')) {
+		 sessionStorage.removeItem('currentUser');
+		 $location.path('/login');
+		 }
 	});
 
 	$rootScope.$state = $state;

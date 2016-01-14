@@ -856,12 +856,15 @@ public class RestServiceImpl implements RestService
         {
             for ( Peer peer : peerManager.getPeers() )
             {
-                peerHostMap.put( peer.getId(), Lists.newArrayList() );
-
-                Collection<ResourceHostMetric> collection = peer.getResourceHostMetrics().getResources();
-                for ( ResourceHostMetric metric : collection.toArray( new ResourceHostMetric[collection.size()] ) )
+                if ( peer.isOnline() )
                 {
-                    peerHostMap.get( peer.getId() ).add( metric.getHostInfo().getId() );
+                    peerHostMap.put( peer.getId(), Lists.newArrayList() );
+
+                    Collection<ResourceHostMetric> collection = peer.getResourceHostMetrics().getResources();
+                    for ( ResourceHostMetric metric : collection.toArray( new ResourceHostMetric[collection.size()] ) )
+                    {
+                        peerHostMap.get( peer.getId() ).add( metric.getHostInfo().getId() );
+                    }
                 }
             }
         }

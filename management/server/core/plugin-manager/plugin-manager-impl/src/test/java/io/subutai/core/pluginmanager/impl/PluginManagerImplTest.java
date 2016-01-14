@@ -8,16 +8,16 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.tracker.TrackerOperation;
-import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.peer.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.core.tracker.api.Tracker;
 import io.subutai.core.pluginmanager.api.OperationType;
 import io.subutai.core.pluginmanager.api.PluginManagerException;
+import io.subutai.core.tracker.api.Tracker;
 
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;

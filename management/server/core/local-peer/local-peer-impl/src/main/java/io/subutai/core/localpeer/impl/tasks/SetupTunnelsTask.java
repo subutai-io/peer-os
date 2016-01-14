@@ -13,7 +13,6 @@ import io.subutai.common.network.VniVlanMapping;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.Tunnel;
-import io.subutai.common.peer.ManagementHost;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
 
@@ -86,6 +85,7 @@ public class SetupTunnelsTask implements Callable<Integer>
         return environmentVni.getVlan();
     }
 
+
     public int findTunnel( String peerIp, Set<Tunnel> tunnels )
     {
         for ( Tunnel tunnel : tunnels )
@@ -98,6 +98,8 @@ public class SetupTunnelsTask implements Callable<Integer>
 
         return -1;
     }
+
+
     private int calculateNextTunnelId( Set<Tunnel> tunnels )
     {
         int maxTunnelId = 0;
@@ -113,8 +115,8 @@ public class SetupTunnelsTask implements Callable<Integer>
     }
 
 
-    protected void setupVniVlanMapping( final int tunnelId, final long vni, final int vlanId, final String environmentId )
-            throws PeerException
+    protected void setupVniVlanMapping( final int tunnelId, final long vni, final int vlanId,
+                                        final String environmentId ) throws PeerException
     {
         try
         {
