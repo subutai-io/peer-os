@@ -9,6 +9,9 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.metric.ResourceHostMetrics;
@@ -17,9 +20,6 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.test.SystemOutRedirectTest;
 import io.subutai.core.peer.api.PeerManager;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.mockito.Mockito.doThrow;
@@ -76,7 +76,7 @@ public class ListCommandTest extends SystemOutRedirectTest
     {
         command.doExecute();
 
-        assertTrue( getSysOut().contains( PEER_ID.toString() ) );
+        assertTrue( getSysOut().contains( PEER_ID ) );
 
         doThrow( new PeerException( ERR_MSG ) ).when( peer ).isOnline();
 
