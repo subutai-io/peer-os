@@ -47,7 +47,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            return Response.ok( jsonUtil.to( identityManager.getAllSystemUsers() ) ).build();
+            return Response.ok( jsonUtil.to( identityManager.getAllUsers() ) ).build();
         }
         catch ( Exception e )
         {

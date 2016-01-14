@@ -84,8 +84,7 @@
 	left: 50%;
 	margin-right: -50%;
 	transform: translate(-50%, -50%);
-	height: 370px;
-	width: 50%;
+	height: 450px;
 }
 
 .ngdialog.ngdialog-closing .ngdialog-content {

@@ -7,16 +7,15 @@
   </div>
   <div class="b-popup__body">
     <div class="b-form">
-      <div class="b-form__wrapper b-form__wrapper_margin-bottom">
-        <label class="b-form-label b-form-label_fix-size-1 g-left">Message</label>
-
-        <div class="b-form-wrapper b-form-wrapper_margin-size-1 b-workspace-content__row_margin-b">
-				<textarea class="b-form-input b-form-input_full b-form-input_textarea bp-sign-target"
-                  ng-model="environmentViewCtrl.currentEnvironment.relationDeclaration">
-				</textarea>
-        </div>
-        <div class="clear"></div>
-      </div>
+	  <div>
+	    <span class="b-form-label b-form-label_fix-size-1">Message</span>
+	  </div>
+	  <div>
+		<textarea class="b-form-input b-form-input_full b-form-input_textarea bp-sign-target"
+	      ng-model="environmentViewCtrl.currentEnvironment.relationDeclaration" style = "width: 540px; height: 300px; font-family: monospace; overflow: scroll; resize: none">
+	    </textarea>
+	  </div>
+	  <div class="clear"></div>
       <a href class="b-btn b-btn_blue g-left  b-btn_margin-l" ng-click="environmentViewCtrl.buildEnvironment()"
          style="margin-bottom: 10px; margin-top: 10px">Build</a>
     </div>
