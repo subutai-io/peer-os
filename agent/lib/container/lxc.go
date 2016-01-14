@@ -4,16 +4,18 @@ import (
 	"bufio"
 	"errors"
 	"gopkg.in/lxc/go-lxc.v2"
+	"io/ioutil"
 	"os"
 	"runtime"
 	"strconv"
+	"strings"
 	"subutai/config"
 	"subutai/lib/fs"
 	"subutai/lib/net"
 	"subutai/log"
 )
 
-// getList returns list of all containers
+// All returns list of all containers
 func All() []string {
 	return lxc.DefinedContainerNames(config.Agent.LxcPrefix)
 }
@@ -60,6 +62,12 @@ func State(name string) (state string) {
 		}
 	}
 	return "UNKNOWN"
+}
+
+func AptUpdate(name string) {
+	c, err := lxc.NewContainer(name, config.Agent.LxcPrefix)
+	log.Check(log.FatalLevel, "Looking for container "+name, err)
+	c.RunCommand([]string{"bash", "-c", "sleep 5 && apt update >/dev/null 2>&1 &"}, lxc.DefaultAttachOptions)
 }
 
 func Start(name string) {
@@ -139,10 +147,10 @@ func Clone(parent, child string) {
 	var backend lxc.BackendStore
 	backend.Set("btrfs")
 
-	a, err := lxc.NewContainer(parent, config.Agent.LxcPrefix)
+	c, err := lxc.NewContainer(parent, config.Agent.LxcPrefix)
 	log.Check(log.FatalLevel, "Looking for container "+parent, err)
 
-	err = a.Clone(child, lxc.CloneOptions{Backend: backend})
+	err = c.Clone(child, lxc.CloneOptions{Backend: backend})
 	log.Check(log.FatalLevel, "Cloning container", err)
 
 	fs.SubvolumeClone("lxc/"+parent+"-opt", "lxc/"+child+"-opt")
@@ -151,7 +159,7 @@ func Clone(parent, child string) {
 
 	SetContainerConf(child, [][]string{
 		{"lxc.network.link", ""},
-		{"lxc.network.veth.pair", "x"},
+		{"lxc.network.veth.pair", strings.Replace(GetConfigItem(config.Agent.LxcPrefix+child+"/config", "lxc.network.hwaddr"), ":", "", -1)},
 		{"lxc.network.script.up", config.Agent.AppPrefix + "bin/create_ovs_interface"},
 		{"subutai.git.branch", child},
 		{"subutai.parent", parent},
@@ -188,7 +196,7 @@ func QuotaRAM(name string, size ...string) int {
 
 func QuotaCPU(name string, size ...string) int {
 	c, _ := lxc.NewContainer(name, config.Agent.LxcPrefix)
-	cfsPeriod := 10000
+	cfsPeriod := 100000
 	quota, _ := strconv.Atoi(size[0])
 	if size[0] != "" && State(name) == "RUNNING" {
 		value := strconv.Itoa(cfsPeriod * runtime.NumCPU() * quota / 100)
@@ -212,4 +220,50 @@ func QuotaNet(name string, size ...string) string {
 	c, _ := lxc.NewContainer(name, config.Agent.LxcPrefix)
 	nic := GetConfigItem(c.ConfigFileName(), "lxc.network.veth.pair")
 	return net.RateLimit(nic, size[0])
+}
+
+func SetContainerConf(container string, conf [][]string) {
+	confPath := config.Agent.LxcPrefix + container + "/config"
+	newconf := ""
+
+	file, err := os.Open(confPath)
+	log.Check(log.FatalLevel, "Opening container config "+confPath, err)
+	scanner := bufio.NewScanner(bufio.NewReader(file))
+
+	for scanner.Scan() {
+		newline := scanner.Text() + "\n"
+		for i := 0; i < len(conf); i++ {
+			line := strings.Split(scanner.Text(), "=")
+			if len(line) > 1 && strings.Trim(line[0], " ") == conf[i][0] {
+				if newline = ""; len(conf[i][1]) > 0 {
+					newline = conf[i][0] + " = " + conf[i][1] + "\n"
+				}
+				conf = append(conf[:i], conf[i+1:]...)
+				break
+			}
+		}
+		newconf = newconf + newline
+	}
+	file.Close()
+
+	for i := range conf {
+		if conf[i][1] != "" {
+			newconf = newconf + conf[i][0] + " = " + conf[i][1] + "\n"
+		}
+	}
+
+	log.Check(log.FatalLevel, "Writing container config "+confPath, ioutil.WriteFile(confPath, []byte(newconf), 0644))
+}
+
+func GetConfigItem(path, item string) string {
+	config, _ := os.Open(path)
+	defer config.Close()
+	scanner := bufio.NewScanner(config)
+	for scanner.Scan() {
+		line := strings.Split(scanner.Text(), "=")
+		if strings.Trim(line[0], " ") == item {
+			return strings.Trim(line[1], " ")
+		}
+	}
+	return ""
 }

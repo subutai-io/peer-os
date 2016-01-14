@@ -127,7 +127,7 @@ public class PeerWebClient
     }
 
 
-    public ContainerHostState getState( final ContainerId containerId )
+    public ContainerHostState getState( final ContainerId containerId ) throws PeerException
     {
         String path = "/container/state";
         WebClient client = WebClientBuilder.buildPeerWebClient( host, path, provider );
@@ -140,8 +140,7 @@ public class PeerWebClient
         }
         catch ( Exception e )
         {
-            LOG.warn( "Error on getting container state: " + e.getMessage() );
-            return ContainerHostState.UNKNOWN;
+            throw new PeerException( "Error getting container state ", e );
         }
     }
 

@@ -20,11 +20,11 @@ import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.peer.ManagementHost;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.PeerPolicy;
+import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
@@ -32,14 +32,12 @@ import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 
 import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -83,7 +81,7 @@ public class RestServiceImplTest
     @Mock
     ContainerHost containerHost;
     @Mock
-    ManagementHost managementHost;
+    ResourceHost managementHost;
     @Mock
     SecurityManager securityManager;
 
@@ -111,14 +109,14 @@ public class RestServiceImplTest
         when( localPeer.getId() ).thenReturn( PEER_ID );
         when( localPeer.getPeerInfo() ).thenReturn( peerInfo );
         when( localPeer.bindHost( CONTAINER_ID.toString() ) ).thenReturn( containerHost );
-//        when( peerInfo.getPeerPolicy(  ) ).thenReturn( peerPolicy );
+        //        when( peerInfo.getPeerPolicy(  ) ).thenReturn( peerPolicy );
         when( peerManager.getPeer( PEER_ID.toString() ) ).thenReturn( peer );
         when( peer.getPeerInfo() ).thenReturn( peerInfo );
         when( peerInfo.getId() ).thenReturn( PEER_ID );
-//        when( peerManager.getPeerInfo( PEER_ID ) ).thenReturn( peerInfo );
+        //        when( peerManager.getPeerInfo( PEER_ID ) ).thenReturn( peerInfo );
         when( restUtil.getTrustedWebClient( anyString(), any() ) ).thenReturn( webClient );
         when( webClient.type( anyString() ) ).thenReturn( webClient );
-//        when( peerManager.getLocalPeerInfo() ).thenReturn( peerInfo );
+        //        when( peerManager.getLocalPeerInfo() ).thenReturn( peerInfo );
         when( jsonUtil.to( anyObject() ) ).thenReturn( JSON );
         when( webClient.path( anyString() ) ).thenReturn( webClient );
         when( webClient.form( any( Form.class ) ) ).thenReturn( response );
@@ -158,25 +156,25 @@ public class RestServiceImplTest
     //        verify( peerManager ).getPeerInfos();
     //    }
 
-//
-//    @Test
-//    public void testGetPeerPolicy() throws Exception
-//    {
-//
-//
-//        restService.getPeerPolicy(  );
-//
-//        verify( jsonUtil ).to( peerPolicy );
-//
-//
-//        reset( jsonUtil );
-//
-//        when( peerInfo.getPeerPolicy(  ) ).thenReturn( null );
-//
-//        Response response = restService.getPeerPolicy( );
-//
-//        assertNull( response.getEntity() );
-//    }
+    //
+    //    @Test
+    //    public void testGetPeerPolicy() throws Exception
+    //    {
+    //
+    //
+    //        restService.getPeerPolicy(  );
+    //
+    //        verify( jsonUtil ).to( peerPolicy );
+    //
+    //
+    //        reset( jsonUtil );
+    //
+    //        when( peerInfo.getPeerPolicy(  ) ).thenReturn( null );
+    //
+    //        Response response = restService.getPeerPolicy( );
+    //
+    //        assertNull( response.getEntity() );
+    //    }
 
     //
     //    @Test
@@ -205,7 +203,7 @@ public class RestServiceImplTest
 
         //verify( httpContextManager ).reloadTrustStore();
 
-//        doThrow( exception ).when( peerManager ).update( peerInfo );
+        //        doThrow( exception ).when( peerManager ).update( peerInfo );
 
         //Response response1 = restService.approveForRegistrationRequest( JSON, CERT );
 
@@ -222,7 +220,7 @@ public class RestServiceImplTest
 
         //verify( peerManager ).update( peerInfo );
 
-//        doThrow( exception ).when( peerManager ).update( peerInfo );
+        //        doThrow( exception ).when( peerManager ).update( peerInfo );
 
         //Response response1 = restService.updatePeer( JSON, CERT );
 

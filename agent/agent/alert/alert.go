@@ -85,7 +85,7 @@ func ramQuota(cont string) []int {
 
 func quotaCPU(name string) int {
 	c, _ := lxc.NewContainer(name, config.Agent.LxcPrefix)
-	cfsPeriod := 10000
+	cfsPeriod := 100000
 	quota, _ := strconv.Atoi(c.CgroupItem("cpu.cfs_quota_us")[0])
 	return quota * 100 / cfsPeriod / runtime.NumCPU()
 }

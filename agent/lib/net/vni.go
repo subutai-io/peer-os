@@ -69,16 +69,17 @@ func MakeVNIMap(tunnelPortName, vni, vlan, envid string) {
 
 func DisplayVNIMap() {
 	files, _ := ioutil.ReadDir(config.Agent.DataPrefix + "var/subutai-network/")
-	fmt.Printf("%0s %20s %20s\n", "Tunnel", "VNI", "ENV ID")
+	// fmt.Printf("%0s %20s %20s\n", "Tunnel", "VNI", "VLAN ID")
 	for _, f := range files {
 		if strings.Contains(f.Name(), "_vni_vlan") {
+			tunnelPortName := strings.Trim(f.Name(), "_vni_vlan")
 			if fcont, err := ioutil.ReadFile(config.Agent.DataPrefix + "var/subutai-network/" + f.Name()); err != nil {
 				log.Error("read error " + config.Agent.DataPrefix + "var/subutai-network/" + f.Name() + "_vni_vlan " + err.Error())
 			} else {
 				for _, v := range strings.Split(string(fcont), "\n") {
 					if v != "" {
 						s := strings.Fields(v)
-						fmt.Printf("%0s %20s %20s\n", s[0], s[1], s[2])
+						fmt.Printf("%s\t%s\t%s\t%s\n", tunnelPortName, s[0], s[1], s[2])
 					}
 				}
 			}

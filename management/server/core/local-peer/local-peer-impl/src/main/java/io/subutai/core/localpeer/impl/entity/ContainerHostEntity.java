@@ -20,6 +20,9 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
@@ -49,6 +52,7 @@ import io.subutai.common.resource.ResourceValue;
 @Access( AccessType.FIELD )
 public class ContainerHostEntity extends AbstractSubutaiHost implements ContainerHost
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger( ContainerHostEntity.class );
 
     @ManyToOne( targetEntity = ResourceHostEntity.class )
     @JoinColumn( name = "parent_id" )
@@ -198,7 +202,15 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
 
     public ContainerHostState getState()
     {
-        return getPeer().getContainerState( getContainerId() );
+        try
+        {
+            return getPeer().getContainerState( getContainerId() );
+        }
+        catch ( PeerException e )
+        {
+            LOGGER.error( "Error getting container state #getState", e );
+            return ContainerHostState.UNKNOWN;
+        }
     }
 
 
