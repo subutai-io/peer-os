@@ -409,6 +409,23 @@ function routesConf($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 				layout: 'fullpage'
 			}
 		})
+        .state('about', {
+            url: '/about',
+            templateUrl: 'subutai-app/about/partials/view.html',
+            resolve: {
+                loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([
+                        {
+                            name: 'subutai.about',
+                            files: [
+                                'subutai-app/about/about.js',
+                                'subutai-app/about/controller.js',
+                            ]
+                        }
+                    ])
+                }]
+            }
+        })
 		.state()
 }
 

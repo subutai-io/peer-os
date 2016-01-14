@@ -1,13 +1,14 @@
 package io.subutai.core.tracker.rest;
 
 
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 import java.util.UUID;
 
 import javax.ws.rs.core.Response;
@@ -21,7 +22,9 @@ import com.google.gson.GsonBuilder;
 
 import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperationView;
+import io.subutai.common.util.JsonUtil;
 import io.subutai.core.tracker.api.Tracker;
+import io.subutai.core.tracker.rest.pojo.VersionPojo;
 
 
 /**
@@ -103,19 +106,48 @@ public class RestServiceImpl implements RestService
     @Override
     public Response getSubutaiInfo()
     {
-        String content = null;
-
+        Properties prop = new Properties();
+        VersionPojo pojo = new VersionPojo();
+        InputStream input = null;
         try
         {
-            content = new String(
-                    Files.readAllBytes( Paths.get( String.format( "%s/subutai-version", Common.KARAF_ETC ) ) ) );
+            input = new FileInputStream( String.format( "%s/git.properties", Common.KARAF_ETC ) );
+
+            prop.load( input );
+            pojo.setProjectVersion( prop.getProperty( "git.build.version" ) );
+            pojo.setGitBuildUserEmail( prop.getProperty( "git.build.user.email" ) );
+            pojo.setGitBuildHost( prop.getProperty( "git.build.host" ) );
+            pojo.setGitClosestTagName( prop.getProperty( "git.closest.tag.name" ) );
+            pojo.setGitCommitIdDescribeShort( prop.getProperty( "git.commit.id.describe-short" ) );
+            pojo.setGitCommitTime( prop.getProperty( "git.commit.time" ) );
+            pojo.setGitBranch( prop.getProperty( "git.branch" ) );
+            pojo.setGitBuildUserName( prop.getProperty( "git.build.user.name" ) );
+            pojo.setGitClosestTagCommitCount( prop.getProperty( "git.closest.tag.commit.count" ) );
+            pojo.setGitCommitIdDescribe( prop.getProperty( "git.commit.id.describe" ) );
+            pojo.setGitCommitId( prop.getProperty( "git.commit.id" ) );
+            pojo.setGitBuildTime( prop.getProperty( "git.build.time" ) );
         }
-        catch ( IOException e )
+        catch ( IOException ex )
         {
-            e.printStackTrace();
-            return null;
+            ex.printStackTrace();
+        }
+        finally
+        {
+            if ( input != null )
+            {
+                try
+                {
+                    input.close();
+                }
+                catch ( IOException e )
+                {
+                    e.printStackTrace();
+                }
+            }
         }
 
-        return Response.status( Response.Status.OK ).entity( content ).build();
+        String projectInfo = JsonUtil.GSON.toJson( pojo );
+
+        return Response.status( Response.Status.OK ).entity( projectInfo ).build();
     }
 }
