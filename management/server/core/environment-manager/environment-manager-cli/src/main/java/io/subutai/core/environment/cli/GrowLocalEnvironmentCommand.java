@@ -103,7 +103,7 @@ public class GrowLocalEnvironmentCommand extends SubutaiShellCommandSupport
             System.out.println( String.format( "NodeGroup name %s", containerHost.getNodeGroupName() ) );
             System.out.println( String.format( "Template name %s", containerHost.getTemplateName() ) );
             System.out.println( String.format( "IP %s",
-                    containerHost.getIpByInterfaceName( Common.DEFAULT_CONTAINER_INTERFACE ) ) );
+                    containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp() ) );
             System.out.println( String.format( "Is connected %s", containerHost.isConnected() ) );
         }
 

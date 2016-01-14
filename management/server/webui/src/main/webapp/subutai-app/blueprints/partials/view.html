@@ -32,11 +32,11 @@
 							class="b-tags b-tags_{{ bvc.colors[nodeGroup.type] }}"
 							ng-repeat="nodeGroup in blueprint.nodeGroups" 
 							tooltips 
-							tooltip-content='
-								Template: <b>{{ nodeGroup.templateName }}</b><br>
-								Quota: <div class="b-quota-type-round b-quota-type-round_{{ bvc.colors[nodeGroup.type] }}"></div> <b>{{ nodeGroup.type }}</b><br>
-								SSH Group ID: <b>{{ nodeGroup.sshGroupId }}</b><br>
-								Host Group ID: <b>{{ nodeGroup.hostsGroupId }}</b>
+							tooltip-template='
+								<span class="b-nowrap">Template: <b>{{ nodeGroup.templateName }}</b></span><br>
+								<span class="b-nowrap">Quota: <div class="b-quota-type-round b-quota-type-round_{{ bvc.colors[nodeGroup.type] }}"></div> <b>{{ nodeGroup.type }}</b></span><br>
+								<span class="b-nowrap">SSH Group ID: <b>{{ nodeGroup.sshGroupId }}</b></span><br>
+								<span class="b-nowrap">Host Group ID: <b>{{ nodeGroup.hostsGroupId }}</b></span>
 							'>
 							{{ nodeGroup.name }}: {{ nodeGroup.numberOfContainers }}
 							<i class="fa fa-times" ng-click="bvc.removeNodeGroup( blueprint.id, nodeGroup.name )"></i>
@@ -45,17 +45,15 @@
 					<td class="b-main-table__controls">
 						<a ui-sref="blueprintsActions({ blueprintId: blueprint.id, action: 'build' })" 
 							class="b-icon b-icon_build" 
-							tooltips tooltip-title="Build" 
-							tooltip-hide-trigger="mouseleave click">
+							tooltips tooltip-template="Build">
 						</a>
 
 						<a ng-if="bvc.hasEnvironments" ui-sref="blueprintsActions({ blueprintId: blueprint.id, action: 'grow' })"
 							class="b-icon b-icon_grow" 
-							tooltips tooltip-title="Grow" 
-							tooltip-hide-trigger="mouseleave click">
+							tooltips tooltip-template="Grow">
 						</a>
 
-						<a ng-if="!bvc.hasEnvironments" tooltips tooltip-title="Grow Disabled"
+						<a ng-if="!bvc.hasEnvironments" tooltips tooltip-template="Grow Disabled"
 							 class="b-icon b-icon_grow_disabled">
 						</a>
 

@@ -14,6 +14,7 @@ import javax.ws.rs.core.Response;
 public interface RestService
 {
     @POST
+    @Produces( { MediaType.TEXT_PLAIN} )
     Response processRegisterRequest( @FormParam( "ip" ) String ip, @FormParam( "key_phrase" ) String keyPhrase );
 
     @GET
@@ -22,7 +23,7 @@ public interface RestService
 
     @PUT
     @Path( "reject" )
-    @Produces( { MediaType.APPLICATION_JSON } )
+    @Produces( { MediaType.TEXT_PLAIN } )
     Response rejectForRegistrationRequest( @FormParam( "peerId" ) String peerId );
 
     @PUT

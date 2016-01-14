@@ -340,7 +340,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     {
         Preconditions.checkNotNull( blueprint, "Invalid blueprint" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( blueprint.getName() ), "Invalid name" );
-        //        Preconditions.checkArgument( !Strings.isNullOrEmpty( blueprint.getCidr() ), "Invalid subnet CIDR" );
         Preconditions.checkArgument( !blueprint.getNodeGroups().isEmpty(), "Placement is empty" );
 
         String cidr = calculateCidr( blueprint );
@@ -349,6 +348,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         Topology topology = buildTopology( environmentId, cidr, blueprint );
 
         //create empty environment
+
         final EnvironmentImpl environment = createEmptyEnvironment( blueprint.getName(), cidr, blueprint.getSshKey() );
 
         //create operation tracker
@@ -375,8 +375,18 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             @Override
             public void run()
             {
-
                 notifyOnEnvironmentCreated( environment );
+                LOG.error( "Environment successfully created: " + environment.getEnvironmentId() );
+            }
+        } );
+
+        environmentCreationWorkflow.onFailure( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                LOG.error( "Error creating environment: " + environmentCreationWorkflow.getFailedReason(),
+                        environmentCreationWorkflow.getFailedException() );
             }
         } );
 
@@ -385,10 +395,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             environmentCreationWorkflow.join();
 
-            if ( environmentCreationWorkflow.getError() != null )
+            if ( environmentCreationWorkflow.isFailed() )
             {
                 throw new EnvironmentCreationException(
-                        exceptionUtil.getRootCause( environmentCreationWorkflow.getError() ) );
+                        exceptionUtil.getRootCause( environmentCreationWorkflow.getFailedException() ) );
             }
         }
 
@@ -1393,26 +1403,27 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                     continue;
                 }
                 AlertValue alertValue = alertEvent.getResource().getAlertValue( handler.getSupportedAlertValue() );
-                if ( alertValue != null )
+                if ( alertValue != null && alertEvent.getEnvironmentId() != null )
                 {
+                    final Environment environment = loadEnvironment( alertEvent.getEnvironmentId() );
                     alertEvent.addLog(
                             String.format( "Invoking pre-processor of '%s:%s'.", handlerId.getAlertHandlerId(),
                                     handlerId.getAlertHandlerPriority() ) );
-                    handler.preProcess( alertValue );
+                    handler.preProcess( environment, alertValue );
                     alertEvent.addLog(
                             String.format( "Pre-processor of '%s:%s' finished.", handlerId.getAlertHandlerId(),
                                     handlerId.getAlertHandlerPriority() ) );
                     alertEvent.addLog(
                             String.format( "Invoking main processor of '%s:%s'.", handlerId.getAlertHandlerId(),
                                     handlerId.getAlertHandlerPriority() ) );
-                    handler.process( alertValue );
+                    handler.process( environment, alertValue );
                     alertEvent.addLog(
                             String.format( "Main processor of '%s:%s' finished.", handlerId.getAlertHandlerId(),
                                     handlerId.getAlertHandlerPriority() ) );
                     alertEvent.addLog(
                             String.format( "Invoking post-processor of '%s:%s'.", handlerId.getAlertHandlerId(),
                                     handlerId.getAlertHandlerPriority() ) );
-                    handler.postProcess( alertValue );
+                    handler.postProcess( environment, alertValue );
                     alertEvent.addLog(
                             String.format( "Pre-processor of '%s:%s' finished.", handlerId.getAlertHandlerId(),
                                     handlerId.getAlertHandlerPriority() ) );

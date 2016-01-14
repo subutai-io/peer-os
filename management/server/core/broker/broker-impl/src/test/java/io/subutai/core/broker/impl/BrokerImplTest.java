@@ -60,7 +60,6 @@ public class BrokerImplTest
     private static final String TOPIC = "topic";
     private static final String TEXT_MESSAGE = "message";
     private static final byte[] BYTE_MESSAGE = { 0 };
-    private static final String APP_DATA_PATH = "/var/lib/subutai";
     @Mock
     MessageRoutingListener messageRouter;
 

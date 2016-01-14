@@ -3,16 +3,13 @@ package io.subutai.common.security.crypto.certificate;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
-import java.security.KeyStore;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import io.subutai.common.security.SecurityProvider;
-import io.subutai.common.security.crypto.certificate.CertificateData;
-import io.subutai.common.security.crypto.certificate.CertificateTool;
+
 import io.subutai.common.security.crypto.key.KeyManager;
 import io.subutai.common.security.crypto.key.KeyPairType;
 
@@ -27,8 +24,6 @@ public class CertificateToolTest
     private KeyPairGenerator generator;
     private KeyPair keyPair;
 
-    @Mock
-    KeyStore keyStore;
     @Mock
     CertificateData certificateData;
 
@@ -47,8 +42,7 @@ public class CertificateToolTest
     @Test( expected = RuntimeException.class )
     public void testGenerateSelfSignedCertificateException() throws Exception
     {
-        certificateTool
-                .generateSelfSignedCertificate( keyStore, keyPair, SecurityProvider.BOUNCY_CASTLE, certificateData );
+        certificateTool.generateSelfSignedCertificate( keyPair, certificateData );
     }
 
 
@@ -64,8 +58,6 @@ public class CertificateToolTest
         when( certificateData.getEmail() ).thenReturn( "email" );
 
 
-        certificateTool
-                .generateSelfSignedCertificate( keyStore, keyPair, SecurityProvider.BOUNCY_CASTLE, certificateData );
+        certificateTool.generateSelfSignedCertificate( keyPair, certificateData );
     }
-
 }

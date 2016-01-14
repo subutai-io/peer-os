@@ -25,6 +25,7 @@ import io.subutai.common.settings.ChannelSettings;
 import io.subutai.core.channel.impl.ChannelManagerImpl;
 import io.subutai.core.channel.impl.util.MessageContentUtil;
 import io.subutai.core.identity.api.model.Session;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 
 /**
@@ -88,7 +89,8 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
                         }
                         catch ( Exception ex )
                         {
-                            MessageContentUtil.abortChain( message, ex );
+                            Throwable t = ExceptionUtils.getRootCause(ex);
+                            MessageContentUtil.abortChain( message, t );
                         }
                         return null;
                     }

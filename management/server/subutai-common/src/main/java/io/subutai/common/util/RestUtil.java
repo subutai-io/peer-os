@@ -5,28 +5,27 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.KeyStore;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.core.Form;
 import javax.ws.rs.core.Response;
-
-import io.subutai.common.exception.HTTPException;
-import io.subutai.common.security.crypto.keystore.KeyStoreData;
-import io.subutai.common.security.crypto.keystore.KeyStoreTool;
-import io.subutai.common.security.crypto.ssl.SSLManager;
-import io.subutai.common.settings.ChannelSettings;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.cxf.jaxrs.ext.form.Form;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+
+import io.subutai.common.exception.HTTPException;
+import io.subutai.common.security.crypto.keystore.KeyStoreData;
+import io.subutai.common.security.crypto.keystore.KeyStoreTool;
+import io.subutai.common.security.crypto.ssl.SSLManager;
+import io.subutai.common.settings.ChannelSettings;
 
 
 public class RestUtil
@@ -313,7 +312,7 @@ public class RestUtil
             {
                 if ( requestType == RequestType.POST )
                 {
-                    form.set( entry.getKey(), entry.getValue() );
+                    form.param( entry.getKey(), entry.getValue() );
                 }
                 else
                 {

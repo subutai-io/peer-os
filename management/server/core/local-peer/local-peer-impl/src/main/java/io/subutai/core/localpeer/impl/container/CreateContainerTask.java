@@ -14,6 +14,7 @@ import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.HostInterface;
+import io.subutai.common.host.NullHostInterface;
 import io.subutai.common.peer.ContainerCreationException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.TemplateKurjun;
@@ -73,27 +74,31 @@ public class CreateContainerTask implements Callable<ContainerHostInfo>
 
         ContainerHostInfo hostInfo = null;
         String ip = null;
-        while ( System.currentTimeMillis() - start < timeoutSec * 1000 && ( hostInfo == null || Strings
-                .isNullOrEmpty( ip ) ) )
+        long timePass = System.currentTimeMillis() - start;
+        final int limit = timeoutSec * 1000;
+        int counter = 0;
+        while ( timePass < limit && ( Strings.isNullOrEmpty( ip ) ) )
         {
-            Thread.sleep( 100 );
+            Thread.sleep( 1000 );
+            counter++;
             try
             {
                 hostInfo = hostRegistry.getContainerHostInfoByHostname( hostname );
-                //TODO: use findByName() method
-                for ( HostInterface intf : hostInfo.getHostInterfaces().getAll() )
+
+                HostInterface intf = hostInfo.getHostInterfaces().findByName( Common.DEFAULT_CONTAINER_INTERFACE );
+                if ( !( intf instanceof NullHostInterface ) )
                 {
-                    if ( Common.DEFAULT_CONTAINER_INTERFACE.equals( intf.getName() ) )
-                    {
-                        ip = intf.getIp();
-                        break;
-                    }
+                    ip = intf.getIp();
                 }
             }
             catch ( HostDisconnectedException e )
             {
-                //ignore
+                if ( counter % 60 == 0 )
+                {
+                    LOG.debug( String.format( "Still waiting %s. Time: %d/%d. %d sec", hostname, timePass, limit, counter ) );
+                }
             }
+            timePass = System.currentTimeMillis() - start;
         }
 
         if ( hostInfo == null )

@@ -4,6 +4,7 @@ package io.subutai.common.peer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.subutai.common.environment.Environment;
 import io.subutai.common.metric.AlertValue;
 
 
@@ -20,13 +21,13 @@ public abstract class AbstractAlertHandler<T extends AlertValue> implements Aler
 
 
     @Override
-    public void preProcess( final T alert ) throws AlertHandlerException {}
+    public void preProcess( final Environment environment, final T alert ) throws AlertHandlerException {}
 
 
     @Override
-    abstract public void process( final T alert ) throws AlertHandlerException;
+    abstract public void process( final Environment environment, final T alert ) throws AlertHandlerException;
 
 
     @Override
-    public void postProcess( final T alert ) throws AlertHandlerException {}
+    public void postProcess( final Environment environment, final T alert ) throws AlertHandlerException {}
 }

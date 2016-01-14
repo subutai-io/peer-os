@@ -1,9 +1,0 @@
-#/bin/bash
-lxc_name="$1"
-lxc_home="$HOME/.local/share/lxc/$lxc_name"
-lxc_config="$lxc_home/config"
-lxc_mac="`cat $lxc_config | grep lxc.network.hwaddr | awk '{print $3}'`"
-port_name="`echo "${lxc_mac//:}"`-1"
-sudo ovs-vsctl del-port $port_name
-echo $lxc_config
-sudo sed -i '/lxc.network.hwaddr/d' $lxc_config

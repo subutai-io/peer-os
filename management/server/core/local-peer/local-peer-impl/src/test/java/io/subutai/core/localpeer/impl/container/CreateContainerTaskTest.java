@@ -11,6 +11,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.host.HostInterface;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.TemplateKurjun;
@@ -47,6 +48,8 @@ public class CreateContainerTaskTest
     CreateContainerTask task;
     @Mock
     private HostRegistry hostRegistry;
+    @Mock
+    private HostInterface hostInterface;
 
 
     @Before
@@ -54,12 +57,13 @@ public class CreateContainerTaskTest
     {
         task = new CreateContainerTask( hostRegistry, resourceHost, template, HOSTNAME, CIDR, VLAN, TIMEOUT, ENV_ID );
         task.commandUtil = commandUtil;
+        when( hostInterface.getIp() ).thenReturn( IP );
         when( resourceHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
         when( commandResult.hasSucceeded() ).thenReturn( true );
         when( commandResult.getStdOut() ).thenReturn( OUT );
         when( template.getName() ).thenReturn( TEMPLATE_NAME );
         when( resourceHost.getContainerHostByName( HOSTNAME ) ).thenReturn( containerHost );
-        when( containerHost.getIpByInterfaceName( Common.DEFAULT_CONTAINER_INTERFACE ) ).thenReturn( IP );
+        when( containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ) ).thenReturn( hostInterface );
     }
 
 

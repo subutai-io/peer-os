@@ -11,6 +11,7 @@ function LoginCtrl( loginSrv, $http, $location, $rootScope )
 
 	vm.name = "";
 	vm.pass = "";
+	vm.errorMessage = false;
 
 	//functions
 	vm.login = login;
@@ -20,7 +21,10 @@ function LoginCtrl( loginSrv, $http, $location, $rootScope )
 			sessionStorage.setItem('currentUser', vm.name);
 			$rootScope.currentUser = vm.name;
 			$http.defaults.headers.common['sptoken']= getCookie('sptoken');
-			$location.path('/');
+			window.location.href = '/';
+		}).error(function(error){
+			console.log(error);
+			vm.errorMessage = error;
 		});
 	}
 }

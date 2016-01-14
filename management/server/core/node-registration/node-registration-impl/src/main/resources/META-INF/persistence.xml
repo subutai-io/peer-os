@@ -6,7 +6,7 @@
   <persistence-unit name="nodeRegistrationUnit" transaction-type="RESOURCE_LOCAL">
     <non-jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=openjpa/subutaiDS)
     </non-jta-data-source>
-    <class>io.subutai.core.registration.impl.entity.HostHostInterface</class>
+    <class>io.subutai.core.registration.impl.entity.HostInterfaceImpl</class>
     <class>io.subutai.core.registration.impl.entity.ContainerTokenImpl</class>
     <class>io.subutai.core.registration.impl.entity.RequestedHostImpl</class>
     <class>io.subutai.core.registration.impl.entity.ContainerInfoImpl</class>
@@ -17,7 +17,7 @@
       <property name="openjpa.ConnectionFactoryProperties" value="PrintParameters=true" />
       <property name="openjpa.RuntimeUnenhancedClasses" value="supported" />
       <property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema" />
-      <property name="openjpa.jdbc.DBDictionary" value="h2" />
+      <property name="openjpa.jdbc.DBDictionary" value="derby" />
     </properties>
   </persistence-unit>
 

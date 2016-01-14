@@ -1,6 +1,7 @@
 package io.subutai.core.environment.impl;
 
 
+import io.subutai.common.environment.Environment;
 import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.peer.AlertHandlerException;
 import io.subutai.common.peer.ExceededQuotaAlertHandler;
@@ -27,7 +28,7 @@ public class ExampleAlertHandler extends ExceededQuotaAlertHandler
 
 
     @Override
-    public void preProcess( final QuotaAlertValue alert ) throws AlertHandlerException
+    public void preProcess( final Environment environment, final QuotaAlertValue alert ) throws AlertHandlerException
     {
         LOGGER.debug( "Example alert handler pre-processor started" );
 
@@ -38,7 +39,7 @@ public class ExampleAlertHandler extends ExceededQuotaAlertHandler
 
 
     @Override
-    public void process( final QuotaAlertValue alert )
+    public void process( final Environment environment, final QuotaAlertValue alert )
     {
         LOGGER.debug( "Example alert handler main processor started" );
 
@@ -49,7 +50,7 @@ public class ExampleAlertHandler extends ExceededQuotaAlertHandler
 
 
     @Override
-    public void postProcess( final QuotaAlertValue alert ) throws AlertHandlerException
+    public void postProcess( final Environment environment, final QuotaAlertValue alert ) throws AlertHandlerException
     {
         LOGGER.debug( "Example alert handler post-processor started" );
 

@@ -6,7 +6,7 @@ angular.module('subutai.identity-user.controller', [])
 	.directive('pwCheck', pwCheck)
 	.directive('colSelect', colSelect);	
 
-IdentityUserCtrl.$inject = ['$scope', 'identitySrv', 'DTOptionsBuilder', 'DTColumnBuilder', '$resource', '$compile', 'SweetAlert', 'ngDialog'];
+IdentityUserCtrl.$inject = ['$scope', 'identitySrv', 'DTOptionsBuilder', 'DTColumnBuilder', '$resource', '$compile', 'SweetAlert', 'ngDialog', 'cfpLoadingBar'];
 IdentityUserFormCtrl.$inject = ['$scope', 'identitySrv', 'ngDialog'];
 
 function userPostData(user) {
@@ -27,9 +27,14 @@ function userPostData(user) {
 	return postData;
 }
 
-function IdentityUserCtrl($scope, identitySrv, DTOptionsBuilder, DTColumnBuilder, $resource, $compile, SweetAlert, ngDialog) {
+function IdentityUserCtrl($scope, identitySrv, DTOptionsBuilder, DTColumnBuilder, $resource, $compile, SweetAlert, ngDialog, cfpLoadingBar) {
 
 	var vm = this;
+
+	cfpLoadingBar.start();
+	angular.element(document).ready(function () {
+		cfpLoadingBar.complete();
+	});
 
 	//functions
 	vm.userForm = userForm;

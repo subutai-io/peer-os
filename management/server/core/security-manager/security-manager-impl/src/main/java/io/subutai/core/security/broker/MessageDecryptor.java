@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import io.subutai.common.security.crypto.pgp.ContentAndSignatures;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.broker.api.ByteMessagePreProcessor;
-import io.subutai.core.broker.api.Topic;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 
 
@@ -31,42 +30,22 @@ public class MessageDecryptor implements ByteMessagePreProcessor
     @Override
     public byte[] process( final String topic, final byte[] message )
     {
-        //        LOG.debug( String.format( "INCOMING %s", new String( message ) ) );
 
-        //process incoming heartbeats and responses
-        if ( encryptionEnabled && ( Topic.RESPONSE_TOPIC.name().equalsIgnoreCase( topic ) || Topic.HEARTBEAT_TOPIC
-                .name().equalsIgnoreCase( topic ) ) )
+        if ( encryptionEnabled )
         {
             try
             {
 
                 EncryptionTool encryptionTool = MessageEncryptor.getSecurityManager().getEncryptionTool();
 
-                ContentAndSignatures contentAndSignatures = encryptionTool.decryptAndReturnSignatures( message );
+                EncryptedResponseWrapper responseWrapper =
+                        JsonUtil.fromJson( new String( message ), EncryptedResponseWrapper.class );
 
-                //obtain target host pub key by id from content for verifying
-                String hostId;
+                ContentAndSignatures contentAndSignatures =
+                        encryptionTool.decryptAndReturnSignatures( responseWrapper.getResponse().getBytes() );
 
-                if ( Topic.RESPONSE_TOPIC.name().equalsIgnoreCase( topic ) )
-                {
-                    //obtain host id from response
-                    ResponseWrapper responseWrapper =
-                            JsonUtil.fromJson( new String( contentAndSignatures.getDecryptedContent() ),
-                                    ResponseWrapper.class );
-
-                    hostId = responseWrapper.getResponse().getId();
-                }
-                else
-                {
-                    //obtain host id from heartbeat
-                    HeartBeat heartBeat = JsonUtil.fromJson( new String( contentAndSignatures.getDecryptedContent() ),
-                            HeartBeat.class );
-
-                    hostId = heartBeat.getHostInfo().getId();
-                }
-
-                PGPPublicKey hostKeyForVerifying =
-                        MessageEncryptor.getSecurityManager().getKeyManager().getPublicKey( hostId );
+                PGPPublicKey hostKeyForVerifying = MessageEncryptor.getSecurityManager().getKeyManager()
+                                                                   .getPublicKey( responseWrapper.getHostId() );
 
                 if ( encryptionTool.verifySignature( contentAndSignatures, hostKeyForVerifying ) )
                 {

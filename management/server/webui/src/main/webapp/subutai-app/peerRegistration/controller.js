@@ -4,12 +4,17 @@ angular.module('subutai.peer-registration.controller', [])
 	.controller('PeerRegistrationCtrl', PeerRegistrationCtrl)
 	.controller('PeerRegistrationPopupCtrl', PeerRegistrationPopupCtrl);
 
-PeerRegistrationCtrl.$inject = ['$scope', 'peerRegistrationService', 'DTOptionsBuilder', 'DTColumnBuilder', '$resource', '$compile', 'SweetAlert', 'ngDialog'];
+PeerRegistrationCtrl.$inject = ['$scope', 'peerRegistrationService', 'DTOptionsBuilder', 'DTColumnBuilder', '$resource', '$compile', 'SweetAlert', 'ngDialog', 'cfpLoadingBar'];
 PeerRegistrationPopupCtrl.$inject = ['$scope', 'peerRegistrationService', 'ngDialog', 'SweetAlert'];
 
-function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder, DTColumnBuilder, $resource, $compile, SweetAlert, ngDialog) {
+function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder, DTColumnBuilder, $resource, $compile, SweetAlert, ngDialog, cfpLoadingBar) {
 
 	var vm = this;
+
+	cfpLoadingBar.start();
+	angular.element(document).ready(function () {
+		cfpLoadingBar.complete();
+	});
 
 	// functions
 	vm.peerFrom = peerFrom;

@@ -1,9 +1,3 @@
-NProgress.start();
-setTimeout(function() {
-	NProgress.done();
-	$('.fade').removeClass('out');
-}, 1000);
-
 $(document).ready(function() {
 	$('.b-nav-menu-link').on('click', function(){
 		if($(this).next('.b-nav-menu__sub').length > 0) {

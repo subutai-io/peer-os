@@ -34,6 +34,7 @@ import org.apache.activemq.usage.TempUsage;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
+import io.subutai.common.security.crypto.certificate.CertificateTool;
 import io.subutai.common.settings.Common;
 import io.subutai.core.broker.api.Broker;
 import io.subutai.core.broker.api.BrokerException;
@@ -66,7 +67,7 @@ public class BrokerImpl implements Broker
     private TextMessagePostProcessor textMessagePostProcessor;
     private SslContext customSslContext;
     private ActiveMQConnectionFactory amqFactory;
-    private SslUtil sslUtil = new SslUtil();
+    private CertificateTool certificateTool = new CertificateTool();
     protected ExecutorService messageSender = Executors.newFixedThreadPool( 5 );
 
 
@@ -95,7 +96,7 @@ public class BrokerImpl implements Broker
         try
         {
             ReloadableX509TrustManager tm = ( ReloadableX509TrustManager ) getSslContext().getTrustManagersAsArray()[0];
-            tm.addServerCertAndReload( clientId, sslUtil.convertX509PemToCert( clientX509CertInPem ) );
+            tm.addServerCertAndReload( clientId, certificateTool.convertX509PemToCert( clientX509CertInPem ) );
         }
         catch ( Exception e )
         {

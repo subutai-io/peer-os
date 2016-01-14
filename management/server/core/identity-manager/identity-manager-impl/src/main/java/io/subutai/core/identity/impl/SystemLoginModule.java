@@ -45,7 +45,7 @@ public class SystemLoginModule extends AbstractKarafLoginModule
 
         try
         {
-            LOGGER.info( "Initializing Karaf login module." );
+//            LOGGER.info( "Initializing Karaf login module." );
             Class.forName( "org.apache.karaf.jaas.config.JaasRealm", true, JaasRealm.class.getClassLoader() );
             identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
         }
@@ -59,7 +59,7 @@ public class SystemLoginModule extends AbstractKarafLoginModule
     @Override
     public boolean login() throws LoginException
     {
-        LOGGER.debug( "Invoking login." );
+//        LOGGER.debug( "Invoking login." );
 
         // **************************************
         Callback[] callbacks = new Callback[2];
@@ -96,7 +96,7 @@ public class SystemLoginModule extends AbstractKarafLoginModule
                 if ( userSession.getSubject() != null ) //restore
                 {
                     principals.addAll( userSession.getSubject().getPrincipals() );
-                    LOGGER.debug( "Session restored" );
+//                    LOGGER.debug( "Session restored" );
                 }
                 else //create new subject
                 {
@@ -117,7 +117,7 @@ public class SystemLoginModule extends AbstractKarafLoginModule
                         }
                     }
                     //******************************************
-                    LOGGER.debug( "Successful login." );
+//                    LOGGER.debug( "Successful login." );
                 }
 
                 //******************************************
