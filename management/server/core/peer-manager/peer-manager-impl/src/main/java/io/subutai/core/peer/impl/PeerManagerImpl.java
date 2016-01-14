@@ -2,14 +2,10 @@ package io.subutai.core.peer.impl;
 
 
 import java.io.IOException;
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +34,7 @@ import io.subutai.common.peer.RegistrationData;
 import io.subutai.common.peer.RegistrationStatus;
 import io.subutai.common.security.objects.TokenType;
 import io.subutai.common.settings.ChannelSettings;
+import io.subutai.common.util.IPUtil;
 import io.subutai.common.util.SecurityUtilities;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
@@ -88,6 +85,7 @@ public class PeerManagerImpl implements PeerManager
     private ObjectMapper mapper = new ObjectMapper();
     private String externalIpInterface = DEFAULT_EXTERNAL_INTERFACE_NAME;
     private String localPeerId;
+    private String ownerId;
     private RegistrationClient registrationClient;
 
 
@@ -123,17 +121,26 @@ public class PeerManagerImpl implements PeerManager
             this.peerDataService = new PeerDataService( daoManager.getEntityManagerFactory() );
 
             localPeerId = securityManager.getKeyManager().getPeerId();
+            ownerId = securityManager.getKeyManager().getOwnerId();
+            final String localPeerIp = getLocalPeerIp();
 
+            if ( localPeerIp == null || ownerId == null )
+            {
+                throw new PeerException(
+                        String.format( "Could not initialize local peer: ID:%s OWNER_ID:%s IP:%s", localPeerIp, ownerId,
+                                localPeerIp ) );
+            }
             // check local peer instance
             PeerData localPeerData = peerDataService.find( localPeerId );
-            PeerInfo localPeerInfo = new PeerInfo();
+
 
             if ( localPeerData == null )
             {
+                PeerInfo localPeerInfo = new PeerInfo();
                 localPeerInfo.setId( localPeerId );
-                localPeerInfo.setOwnerId( securityManager.getKeyManager().getOwnerId() );
-                localPeerInfo.setIp( getLocalPeerIp() );
-                localPeerInfo.setName( String.format( "Peer %s %s", localPeerId, getLocalPeerIp() ) );
+                localPeerInfo.setOwnerId( ownerId );
+                localPeerInfo.setIp( localPeerIp );
+                localPeerInfo.setName( String.format( "Peer %s %s", localPeerId, localPeerIp ) );
                 PeerPolicy policy = getDefaultPeerPolicy( localPeerId );
 
                 PeerData peerData =
@@ -167,20 +174,11 @@ public class PeerManagerImpl implements PeerManager
         String result = null;
         try
         {
-            Enumeration<InetAddress> addressEnumeration =
-                    NetworkInterface.getByName( externalIpInterface ).getInetAddresses();
-            while ( addressEnumeration.hasMoreElements() )
-            {
-                InetAddress address = addressEnumeration.nextElement();
-                if ( address instanceof Inet4Address )
-                {
-                    result = address.getHostAddress();
-                }
-            }
+            result = IPUtil.getLocalIpByInterfaceName( externalIpInterface );
         }
         catch ( SocketException e )
         {
-            LOG.error( "Error getting network interfaces", e );
+            LOG.error( "Error getting local IP", e );
         }
         if ( result == null )
         {
@@ -417,6 +415,7 @@ public class PeerManagerImpl implements PeerManager
         removePeerData( registrationData.getPeerInfo().getId() );
         removePeer( registrationData.getPeerInfo().getId() );
     }
+
 
     @Override
     public List<Peer> getPeers()
@@ -743,6 +742,7 @@ public class PeerManagerImpl implements PeerManager
 
         return r;
     }
+
 
     @Override
     public String getPeerIdByIp( final String ip ) throws PeerException

@@ -9,11 +9,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.peer.ManagementHost;
+import io.subutai.common.peer.ResourceHost;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.pluginmanager.api.PluginInfo;
 import io.subutai.core.pluginmanager.api.PluginManagerException;
@@ -37,7 +38,7 @@ public class ManagerHelperTest
     @Mock
     LocalPeer localPeer;
     @Mock
-    ManagementHost managementHost;
+    ResourceHost managementHost;
     @Mock
     RequestBuilder requestBuilder;
     @Mock
@@ -85,7 +86,7 @@ public class ManagerHelperTest
     }
 
 
-    @Test (expected = PluginManagerException.class)
+    @Test( expected = PluginManagerException.class )
     public void testExecuteHasNotSucceeded() throws Exception
     {
         when( managementHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );

@@ -20,16 +20,15 @@ import io.subutai.common.network.VniVlanMapping;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.HostNotFoundException;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.protocol.Tunnel;
 import io.subutai.core.network.api.ContainerInfo;
 import io.subutai.core.network.api.N2NConnection;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
-import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.peer.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.common.protocol.Tunnel;
 import junit.framework.TestCase;
 
 import static junit.framework.Assert.assertFalse;
@@ -79,7 +78,7 @@ public class NetworkManagerImplTest
     private static final String PATH_TO_KEY_FILE = "/path/to/key/file";
     private static final String RESERVED_VNIS_OUTPUT = String.format( "%s,%s,%s", VNI, VLAN_ID, ENVIRONMENT_ID );
     private static final String VNI_VLAN_MAPPING_OUTPUT =
-            String.format( "%s,%s,%s,%s", TUNNEL_NAME, VNI, VLAN_ID, ENVIRONMENT_ID );
+            String.format( "%s\t%s\t%s\t%s", TUNNEL_NAME, VNI, VLAN_ID, ENVIRONMENT_ID );
     private static final String SSH_KEY = "SSH-KEY";
     private static final String DOMAIN = "domain";
     private static final String IP = "127.0.0.1";
@@ -89,7 +88,7 @@ public class NetworkManagerImplTest
     @Mock
     LocalPeer localPeer;
     @Mock
-    ManagementHost managementHost;
+    ResourceHost managementHost;
     @Mock
     ResourceHost resourceHost;
     @Mock

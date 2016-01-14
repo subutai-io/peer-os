@@ -340,7 +340,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     {
         Preconditions.checkNotNull( blueprint, "Invalid blueprint" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( blueprint.getName() ), "Invalid name" );
-        //        Preconditions.checkArgument( !Strings.isNullOrEmpty( blueprint.getCidr() ), "Invalid subnet CIDR" );
         Preconditions.checkArgument( !blueprint.getNodeGroups().isEmpty(), "Placement is empty" );
 
         String cidr = calculateCidr( blueprint );
@@ -349,6 +348,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         Topology topology = buildTopology( environmentId, cidr, blueprint );
 
         //create empty environment
+
         final EnvironmentImpl environment = createEmptyEnvironment( blueprint.getName(), cidr, blueprint.getSshKey() );
 
         //create operation tracker
@@ -375,8 +375,18 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             @Override
             public void run()
             {
-
                 notifyOnEnvironmentCreated( environment );
+                LOG.error( "Environment successfully created: " + environment.getEnvironmentId() );
+            }
+        } );
+
+        environmentCreationWorkflow.onFailure( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                LOG.error( "Error creating environment: " + environmentCreationWorkflow.getFailedReason(),
+                        environmentCreationWorkflow.getFailedException() );
             }
         } );
 
@@ -385,10 +395,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             environmentCreationWorkflow.join();
 
-            if ( environmentCreationWorkflow.getError() != null )
+            if ( environmentCreationWorkflow.isFailed() )
             {
                 throw new EnvironmentCreationException(
-                        exceptionUtil.getRootCause( environmentCreationWorkflow.getError() ) );
+                        exceptionUtil.getRootCause( environmentCreationWorkflow.getFailedException() ) );
             }
         }
 

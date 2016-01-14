@@ -4,21 +4,21 @@ package io.subutai.core.pluginmanager.impl;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Sets;
+import com.google.gson.reflect.TypeToken;
+
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.peer.Host;
+import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.StringUtil;
-import io.subutai.common.peer.HostNotFoundException;
-import io.subutai.common.peer.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.pluginmanager.api.PluginInfo;
 import io.subutai.core.pluginmanager.api.PluginManagerException;
-
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Sets;
-import com.google.gson.reflect.TypeToken;
 
 
 public class ManagerHelper
@@ -32,12 +32,13 @@ public class ManagerHelper
                     "{\"type\":\"plugin\", \"pluginName\":\"presto\", \"version\":\"2.1.1\", \"rating\":\"8\" }," +
                     "{\"type\":\"plugin\", \"pluginName\":\"spark\", \"version\":\"2.0.4\", \"rating\":\"1\" }," +
                     "{\"type\":\"plugin\", \"pluginName\":\"shark\", \"version\":\"2.0.4\", \"rating\":\"9\" }," +
-                    "{\"type\":\"plugin\", \"pluginName\":\"accumulo\", \"version\":\"2.0.4\", \"rating\":\"9\" },"+
+                    "{\"type\":\"plugin\", \"pluginName\":\"accumulo\", \"version\":\"2.0.4\", \"rating\":\"9\" }," +
                     "{\"type\":\"plugin\", \"pluginName\":\"flume\", \"version\":\"2.0.4\", \"rating\":\"9\" }," +
                     "{\"type\":\"plugin\", \"pluginName\":\"pig\", \"version\":\"2.0.4\", \"rating\":\"9\" }," +
-                    "{\"type\":\"plugin\", \"pluginName\":\"nutch\", \"version\":\"2.0.4\", \"rating\":\"9\" },"+
-                    "{\"type\":\"plugin\", \"pluginName\":\"elasticsearch\", \"version\":\"2.0.4\", \"rating\":\"9\" },"+
-                    "{\"type\":\"plugin\", \"pluginName\":\"zookeeper\", \"version\":\"2.0.4\", \"rating\":\"9\" },"+
+                    "{\"type\":\"plugin\", \"pluginName\":\"nutch\", \"version\":\"2.0.4\", \"rating\":\"9\" }," +
+                    "{\"type\":\"plugin\", \"pluginName\":\"elasticsearch\", \"version\":\"2.0.4\", \"rating\":\"9\" },"
+                    +
+                    "{\"type\":\"plugin\", \"pluginName\":\"zookeeper\", \"version\":\"2.0.4\", \"rating\":\"9\" }," +
                     "{\"type\":\"plugin\", \"pluginName\":\"sqoop\", \"version\":\"2.0.4\", \"rating\":\"9\" }," +
                     "{\"type\":\"plugin\", \"pluginName\":\"storm\", \"version\":\"2.0.4\", \"rating\":\"9\" }," +
                     "{\"type\":\"plugin\", \"pluginName\":\"hbase\", \"version\":\"2.0.4\", \"rating\":\"9\" }," +
@@ -53,7 +54,7 @@ public class ManagerHelper
     }
 
 
-    protected ManagementHost getManagementHost() throws PluginManagerException
+    protected Host getManagementHost() throws PluginManagerException
     {
         try
         {
@@ -71,7 +72,7 @@ public class ManagerHelper
         try
         {
             CommandResult result = commandUtil.execute( requestBuilder, getManagementHost() );
-            if( result.hasSucceeded() )
+            if ( result.hasSucceeded() )
             {
                 return result.getStdOut();
             }
@@ -95,7 +96,7 @@ public class ManagerHelper
     protected Set<String> parsePluginNames( String result )
     {
         Set<String> pluginNames = Sets.newHashSet();
-        for( String line : parseLines( result ))
+        for ( String line : parseLines( result ) )
         {
             List<String> words = parseLineIntoWords( line );
             pluginNames.add( parsePluginNameFromWord( words.get( 0 ) ) );
@@ -103,45 +104,47 @@ public class ManagerHelper
         return pluginNames;
     }
 
-    protected Set<String> parseAvailablePluginsNames( String result)
+
+    protected Set<String> parseAvailablePluginsNames( String result )
     {
         Preconditions.checkNotNull( result );
         Set<String> pluginNames = Sets.newHashSet();
-        for( String line : parseLines( result ))
+        for ( String line : parseLines( result ) )
         {
             pluginNames.add( line );
         }
         return pluginNames;
     }
 
+
     protected Set<PluginInfo> parsePluginNamesAndVersions( String result )
     {
 
-                Set<PluginInfo> plugins = Sets.newHashSet();
-                for ( String line : parseLines( result ) )
+        Set<PluginInfo> plugins = Sets.newHashSet();
+        for ( String line : parseLines( result ) )
+        {
+            if ( line.contains( Commands.PACKAGE_POSTFIX_WITHOUT_DASH ) && !( line.contains( "repo" ) ) )
+            {
+                PluginInfo plugin = new PluginInfoImpl();
+                for ( String word : parseLineIntoWords( line ) )
                 {
-                    if ( line.contains( Commands.PACKAGE_POSTFIX_WITHOUT_DASH ) && !( line.contains( "repo" )) )
+                    if ( word.contains( Commands.PACKAGE_POSTFIX_WITHOUT_DASH ) )
                     {
-                        PluginInfo plugin = new PluginInfoImpl();
-                        for ( String word : parseLineIntoWords( line ) )
-                        {
-                            if ( word.contains( Commands.PACKAGE_POSTFIX_WITHOUT_DASH ) )
-                            {
-                                String pluginName = parsePluginNameFromWord( word );
-                                plugin.setPluginName( pluginName );
-                                plugin.setType( "plugin" );
-                                plugin.setRating( findRating( parseJson(), pluginName ) );
-                            }
-                            else if ( word.contains( "." ) && !word.contains( "application" ) )
-                            {
-                                String version = word;
-                                plugin.setVersion( version );
-                            }
-                        }
-                        plugins.add( plugin );
+                        String pluginName = parsePluginNameFromWord( word );
+                        plugin.setPluginName( pluginName );
+                        plugin.setType( "plugin" );
+                        plugin.setRating( findRating( parseJson(), pluginName ) );
+                    }
+                    else if ( word.contains( "." ) && !word.contains( "application" ) )
+                    {
+                        String version = word;
+                        plugin.setVersion( version );
                     }
                 }
-                return plugins;
+                plugins.add( plugin );
+            }
+        }
+        return plugins;
     }
 
 

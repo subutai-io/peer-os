@@ -49,7 +49,6 @@ import io.subutai.common.peer.ContainersDestructionResult;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
-import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.MessageRequest;
 import io.subutai.common.peer.MessageResponse;
 import io.subutai.common.peer.Payload;
@@ -363,12 +362,14 @@ public class RemotePeerImpl implements RemotePeer
     {
         Preconditions.checkNotNull( hostId, "Host id is null" );
 
-        if ( hostId instanceof ContainerId )
+        try
         {
-            return ContainerHostState.RUNNING.equals( getContainerState( ( ContainerId ) hostId ) );
+            return hostId instanceof ContainerId && ContainerHostState.RUNNING
+                    .equals( getContainerState( ( ContainerId ) hostId ) );
         }
-        else
+        catch ( PeerException e )
         {
+            LOG.error( "Error getting container state #isConnected", e );
             return false;
         }
     }
@@ -393,7 +394,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public ContainerHostState getContainerState( final ContainerId containerId )
+    public ContainerHostState getContainerState( final ContainerId containerId ) throws PeerException
     {
         Preconditions.checkNotNull( containerId, "Container id is null" );
         Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );
