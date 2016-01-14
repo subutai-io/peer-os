@@ -44,11 +44,6 @@ public interface RestService
     @Produces( MediaType.APPLICATION_JSON )
     public PeerInfo getPeerInfo();
 
-//    @GET
-//    @Path( "peer_policy" )
-//    @Produces( MediaType.APPLICATION_JSON )
-//    public Response getPeerPolicy( );
-
     @GET
     @Path( "template/get" )
     @Produces( MediaType.APPLICATION_JSON )
@@ -155,6 +150,6 @@ public interface RestService
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
     Response getHistoricalMetrics( @PathParam( "hostname" ) final String hostName,
-                                            @PathParam( "startTime" ) final DateTimeParam startTime,
-                                            @PathParam( "endTime" ) final DateTimeParam endTime );
+                                   @PathParam( "startTime" ) final DateTimeParam startTime,
+                                   @PathParam( "endTime" ) final DateTimeParam endTime );
 }
