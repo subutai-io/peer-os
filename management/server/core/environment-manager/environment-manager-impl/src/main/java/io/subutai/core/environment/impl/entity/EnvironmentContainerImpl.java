@@ -71,7 +71,7 @@ import io.subutai.core.identity.api.model.User;
 @Access( AccessType.FIELD )
 public class EnvironmentContainerImpl implements EnvironmentContainerHost, Serializable
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger( EnvironmentContainerImpl.class );
+    private static final Logger logger = LoggerFactory.getLogger( EnvironmentContainerImpl.class );
 
     @Column( name = "peer_id", nullable = false )
     private String peerId;
@@ -224,7 +224,15 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @Override
     public ContainerHostState getState()
     {
-        return getPeer().getContainerState( getContainerId() );
+        try
+        {
+            return getPeer().getContainerState( getContainerId() );
+        }
+        catch ( PeerException e )
+        {
+            logger.error( "Error getting container state #getState", e );
+            return ContainerHostState.UNKNOWN;
+        }
     }
 
 
@@ -252,31 +260,6 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     public void destroy() throws PeerException
     {
         getPeer().destroyContainer( getContainerId() );
-    }
-
-
-    public int getSshGroupId()
-    {
-        return sshGroupId;
-    }
-
-
-    public int getHostsGroupId()
-    {
-        return hostsGroupId;
-    }
-
-
-    public String getDomainName()
-    {
-        return domainName;
-    }
-
-
-    protected void setHostId( String id )
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( id ) );
-        this.hostId = id;
     }
 
 
@@ -365,14 +348,6 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     }
 
 
-    @Override
-    public CommandResult execute( final RequestBuilder requestBuilder ) throws CommandException
-    {
-        validateTrustChain();
-        return getPeer().execute( requestBuilder, this );
-    }
-
-
     private void validateTrustChain() throws CommandException
     {
         if ( environmentManager instanceof EnvironmentManagerImpl )
@@ -402,6 +377,14 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
                 }
             }
         }
+    }
+
+
+    @Override
+    public CommandResult execute( final RequestBuilder requestBuilder ) throws CommandException
+    {
+        validateTrustChain();
+        return getPeer().execute( requestBuilder, this );
     }
 
 
