@@ -106,14 +106,11 @@ func checkBridgeName(bridgeName string) error {
 	return nil
 }
 
-func AddFlowConfig(bridgeName, flowCfg string) error {
+func AddFlowConfig(bridgeName, flowCfg string) {
 	log.Check(log.FatalLevel, "check bridge name", checkBridgeName(bridgeName))
 	log.Info("Bridge name is ok")
-	result, errExec := exec.Command("ovs-ofctl", "add-flow", bridgeName, flowCfg).CombinedOutput()
-	if errExec != nil {
-		return errors.New(string(result))
-	}
-	return nil
+	_, err := exec.Command("ovs-ofctl", "add-flow", bridgeName, flowCfg).CombinedOutput()
+	log.Check(log.FatalLevel, "Executing ovs-ofctl add-flow...", err)
 }
 
 func DumpBridge(bridgeName string) (string, error) {
@@ -134,18 +131,13 @@ func DumpPort(bridgeName string) (string, error) {
 	return string(result), nil
 }
 
-func DeleteFlow(bridgeName, matchCase string) error {
+func DeleteFlow(bridgeName, matchCase string) {
 	log.Check(log.FatalLevel, "check bridge name", checkBridgeName(bridgeName))
 	if matchCase == "all" {
 		s, err := exec.Command("ovs-ofctl", "del-flows", bridgeName).CombinedOutput()
-		if err != nil {
-			return errors.New(string(s))
-		}
+		log.Check(log.FatalLevel, "Executing ovs-ofctl del-flows: "+string(s), err)
 	} else {
 		s, err := exec.Command("ovs-ofctl", "del-flows", bridgeName, matchCase).CombinedOutput()
-		if err != nil {
-			return errors.New(string(s))
-		}
+		log.Check(log.FatalLevel, "Executing ovs-ofctl del-flows: "+string(s), err)
 	}
-	return nil
 }

@@ -34,20 +34,22 @@ func prepareStrForServiceInterface(vlanip, vlanid string) string {
 
 func writeinServiceInterface(vlanip, vlanid string) {
 	str := prepareStrForServiceInterface(vlanid, vlanip)
-	if f, err := ioutil.ReadFile(config.Agent.DataPrefix + "/var/subutai-network/service-interface"); err != nil {
+	f, err := ioutil.ReadFile(config.Agent.DataPrefix + "/var/subutai-network/service-interface")
+	if err != nil {
 		lib.CopyFile(config.Agent.AppPrefix+"/var/service-interface", config.Agent.DataPrefix+"/var/subutai-network/service-interface")
-		// log.Error("read file:" + config.Agent.DataPrefix + "/var/subutai-network/service-interface")
-	} else {
-		lines := strings.Split(string(f), "\n")
-		for k, v := range lines {
-			if strings.Contains(string(v), "#Re-init OVS Flows") {
-				lines[k] = str + "#Re-init OVS Flows\n"
-			}
-		}
-		str := strings.Join(lines, "\n")
-		log.Check(log.FatalLevel, "write "+config.Agent.DataPrefix+"/var/subutai-network/service-interface",
-			ioutil.WriteFile(config.Agent.DataPrefix+"/var/subutai-network/service-interface", []byte(str), 0744))
+		os.Chmod(config.Agent.DataPrefix+"/var/subutai-network/service-interface", 0755)
+		f, _ = ioutil.ReadFile(config.Agent.DataPrefix + "/var/subutai-network/service-interface")
 	}
+	lines := strings.Split(string(f), "\n")
+	for k, v := range lines {
+		if strings.Contains(string(v), "#Re-init OVS Flows") {
+			lines[k] = str + "#Re-init OVS Flows\n"
+		}
+	}
+	str = strings.Join(lines, "\n")
+	err = ioutil.WriteFile(config.Agent.DataPrefix+"/var/subutai-network/service-interface", []byte(str), 0755)
+	log.Check(log.FatalLevel, "write "+config.Agent.DataPrefix+"/var/subutai-network/service-interface", err)
+
 }
 func CreateGateway(vlanip, vlanid string) {
 	// check: control ip. no need to get returns.
@@ -87,7 +89,6 @@ func CreateGateway(vlanip, vlanid string) {
 }
 
 func DeleteGateway(vlanid string) {
-
 	log.Check(log.FatalLevel, "ovs-vsctl del-br",
 		exec.Command("ovs-vsctl", "del-br", "br-"+vlanid).Run())
 	log.Check(log.FatalLevel, "ovs-vsctl del-port",

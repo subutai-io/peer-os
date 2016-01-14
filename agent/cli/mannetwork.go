@@ -25,11 +25,11 @@ func LxcManagementNetwork(args []string) {
 	case "-p", "--showport":
 		showPort(args[3])
 	case "-L", "--listn2n":
-		listOpenedN2NTunnel()
+		net.PrintN2NTunnels()
 	case "-D", "--deletegateway":
-		deleteGateway(args[3])
+		net.DeleteGateway(args[3])
 	case "-S", "--listopenedtab":
-		listOpenedTapDevice()
+		net.ListTapDevice()
 	case "-V", "--removetab":
 		removeTapDevice(args[3])
 	case "-v", "--listvnimap":
@@ -39,7 +39,7 @@ func LxcManagementNetwork(args []string) {
 	case "-e", "--reloadn2n":
 		reloadN2N(args[3], args[4])
 	case "-T", "--creategateway":
-		createGateway(args[3], args[4])
+		net.CreateGateway(args[3], args[4])
 	case "-M", "--removevni":
 		delVNI(args[3], args[4], args[5])
 	case "-R", "--removen2n":
@@ -51,7 +51,7 @@ func LxcManagementNetwork(args []string) {
 	case "-c", "--createtunnel":
 		log.Check(log.FatalLevel, "create tunnel", createTunnel(args[3], args[4], args[5]))
 	case "-f", "--addflow":
-		addFlow(args[3], args[4])
+		net.AddFlowConfig(args[3], args[4])
 		log.Info("Flow configuration added")
 	case "-l", "--listtunnel":
 		liste := listTunnel()
@@ -61,15 +61,15 @@ func LxcManagementNetwork(args []string) {
 		}
 	case "-d", "--deleteflow":
 		if len(args)-3 < 2 {
-			deleteFlow(args[3], "")
+			net.DeleteFlow(args[3], "")
 		} else {
-			deleteFlow(args[3], args[4])
+			net.DeleteFlow(args[3], args[4])
 		}
 	case "-N", "--addn2n":
 		p2pTunnel(args[5], args[6], args[7])
 		// if len(args)-3 == 8 {
 		// func createN2NTunnel(interfaceName, communityName, localPeepIPAddr) {
-		// func createN2NTunnel(superNodeIPaddr, superNodePort, interfaceName, communityName,localPeepIPAddr, keyType, keyFile, managementPort string) {
+		// func createN2NTunnel(superNodeIPaddr, superNodePort, interfaceName, communityName, localPeepIPAddr, keyType, keyFile, managementPort string) {
 		// createN2NTunnel(args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10])
 		// } else if len(args)-3 == 7 { // management port can be empty
 		// createN2NTunnel(args[3], args[4], args[5], args[6], args[7], args[8], args[9], "")
@@ -80,7 +80,7 @@ func LxcManagementNetwork(args []string) {
 		switch args[3] {
 		case "deleteall":
 			net.DeleteAllVNI(args[4])
-			deleteGateway(args[4])
+			net.DeleteGateway(args[4])
 		case "delete":
 			net.DeleteVNI(args[4], args[5], args[6])
 		case "list":
@@ -157,11 +157,6 @@ func removeTunnel(tunnelPortName string) {
 
 }
 
-func addFlow(bridgeName, flowConfiguration string) {
-	log.Info("flow configuration adding with: " + bridgeName + " " + flowConfiguration)
-	log.Check(log.FatalLevel, "addFlow: ", net.AddFlowConfig(bridgeName, flowConfiguration))
-}
-
 func showFlow(bridgeName string) {
 	s, err := net.DumpBridge(bridgeName)
 	if err != nil {
@@ -178,10 +173,6 @@ func showPort(bridgeName string) {
 	}
 	log.Info("Port informations of " + bridgeName)
 	fmt.Println(s)
-}
-func deleteFlow(bridgeName, matchCase string) {
-	log.Check(log.FatalLevel, "deleteflow ", net.DeleteFlow(bridgeName, matchCase))
-	log.Info(bridgeName + " flows are deleted according to " + matchCase)
 }
 
 // refer to n2n.go
@@ -223,10 +214,6 @@ func createN2NTunnel(superNodeIPaddr, superNodePort, interfaceName, communityNam
 
 }
 
-func listOpenedN2NTunnel() {
-	net.PrintN2NTunnels()
-}
-
 func removeN2NTunnel(interfaceName, communityName string) {
 	pid := net.ReturnPID(interfaceName, communityName)
 	i, _ := strconv.Atoi(pid)
@@ -245,20 +232,6 @@ func removeN2NTunnel(interfaceName, communityName string) {
 	}
 	file.Close()
 	log.Check(log.FatalLevel, "Removing p2p tunnel", ioutil.WriteFile(config.Agent.DataPrefix+"/var/subutai-network/p2p.txt", []byte(newconf), 0644))
-}
-
-func createGateway(vlanip, vlanid string) {
-	net.CreateGateway(vlanip, vlanid)
-	log.Info("gateway created")
-}
-
-func deleteGateway(vlanid string) {
-	net.DeleteGateway(vlanid)
-	log.Info("gateway " + vlanid + " removed")
-}
-
-func listOpenedTapDevice() {
-	net.ListTapDevice()
 }
 
 func removeTapDevice(interfaceName string) {
