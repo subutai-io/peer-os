@@ -9,55 +9,58 @@
   <div class="b-workspace__content">
     <div class="b-workspace-content__row">
       <div class="b-main-table-border" style = "width: 500px">
-        <table class="b-main-table b-main-table_with-header" style = "width: 500px">
+        <table class="b-main-table b-main-table_with-header" style = "width: 500px" align = "center">
           <tr>
-            <th>Version</th>
-            <td>{{ aboutCtrl.info.projectVersion }}</td>
+            <th>Commit ID</th>
+            <td>{{ aboutCtrl.info.gitCommitId }}</td>
           </tr>
           <tr>
             <th>Branch</th>
             <td>{{ aboutCtrl.info.gitBranch }}</td>
           </tr>
           <tr>
-            <th>Build User Name</th>
+            <th>Username</th>
+            <td>{{ aboutCtrl.info.gitCommitUserName }}</td>
+          </tr>
+          <tr>
+            <th>E-mail</th>
+            <td>{{ aboutCtrl.info.gitCommitUserEmail }}</td>
+          </tr>
+          <tr>
+            <th colspan = "2" style = "text-align: center">Build info</th>
+          </tr>
+          <tr>
+            <th>User Name</th>
             <td>{{ aboutCtrl.info.gitBuildUserName }}</td>
           </tr>
           <tr>
-            <th>Build User E-mail</th>
+            <th>E-mail</th>
             <td>{{ aboutCtrl.info.gitBuildUserEmail }}</td>
-          </tr>
-          <tr>
-            <th>Build Host</th>
-            <td>{{ aboutCtrl.info.gitBuildHost }}</td>
           </tr>
           <tr>
             <th>Build Time</th>
             <td>{{ aboutCtrl.info.gitBuildTime }}</td>
           </tr>
-          <tr>
-            <th>Commit ID</th>
-            <td>{{ aboutCtrl.info.gitCommitId }}</td>
-          </tr>
-          <tr>
-            <th>Commit Time</th>
-            <td>{{ aboutCtrl.info.gitCommitTime }}</td>
-          </tr>
-          <tr>
-            <th>Commit Abstract</th>
-            <td>{{ aboutCtrl.info.gitCommitIdDescribeShort }}</td>
-          </tr>
-          <tr>
-            <th>Commit Description</th>
-            <td>{{ aboutCtrl.info.gitCommitIdDescribe }}</td>
-          </tr>
-          <tr>
-            <th>Closest Tag Commit Count</th>
-            <td>{{ aboutCtrl.info.gitClosestTagCommitCount }}</td>
-          </tr>
-          <tr>
-            <th>Closest Tag Name</th>
-            <td>{{ aboutCtrl.info.gitClosestTagName }}</td>
-          </tr>
+          <!--          <tr>
+                      <th>Commit Time</th>
+                      <td>{{ aboutCtrl.info.gitCommitTime }}</td>
+                    </tr>
+                    <tr>
+                      <th>Commit Abstract</th>
+                      <td>{{ aboutCtrl.info.gitCommitIdDescribeShort }}</td>
+                    </tr>
+                    <tr>
+                      <th>Commit Description</th>
+                      <td>{{ aboutCtrl.info.gitCommitIdDescribe }}</td>
+                    </tr>
+                    <tr>
+                      <th>Closest Tag Commit Count</th>
+                      <td>{{ aboutCtrl.info.gitClosestTagCommitCount }}</td>
+                    </tr>
+                    <tr>
+                      <th>Closest Tag Name</th>
+                      <td>{{ aboutCtrl.info.gitClosestTagName }}</td>
+                    </tr>-->
         </table>
       </div>
     </div>
