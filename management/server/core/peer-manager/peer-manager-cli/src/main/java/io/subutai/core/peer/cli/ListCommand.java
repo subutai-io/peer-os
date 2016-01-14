@@ -8,7 +8,6 @@ import org.apache.karaf.shell.commands.Command;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.peer.Peer;
-import io.subutai.common.peer.PeerException;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.peer.api.PeerManager;
 
@@ -34,18 +33,13 @@ public class ListCommand extends SubutaiShellCommandSupport
         for ( Peer peer : list )
         {
             String peerStatus = "OFFLINE";
-            try
-            {
 
-                if ( peer.isOnline() )
-                {
-                    peerStatus = "ONLINE";
-                }
-            }
-            catch ( PeerException pe )
+
+            if ( peer.isOnline() )
             {
-                peerStatus += " " + pe.getMessage();
+                peerStatus = "ONLINE";
             }
+
 
             try
             {
