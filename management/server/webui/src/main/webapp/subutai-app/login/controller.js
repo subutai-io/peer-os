@@ -3,9 +3,9 @@
 angular.module('subutai.login.controller', [])
 	.controller('LoginCtrl', LoginCtrl);
 
-LoginCtrl.$inject = ['loginSrv', '$http', '$location', '$rootScope'];
+LoginCtrl.$inject = ['loginSrv', '$http', '$location', '$rootScope', '$state'];
 
-function LoginCtrl( loginSrv, $http, $location, $rootScope )
+function LoginCtrl( loginSrv, $http, $location, $rootScope, $state )
 {
 	var vm = this;
 
@@ -21,7 +21,8 @@ function LoginCtrl( loginSrv, $http, $location, $rootScope )
 			sessionStorage.setItem('currentUser', vm.name);
 			$rootScope.currentUser = vm.name;
 			$http.defaults.headers.common['sptoken']= getCookie('sptoken');
-			window.location.href = '/';
+			//window.location.href = '/';
+			$state.go('home');
 		}).error(function(error){
 			console.log(error);
 			vm.errorMessage = error;

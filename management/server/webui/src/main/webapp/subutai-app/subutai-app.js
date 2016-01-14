@@ -97,7 +97,7 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 			}
 		})
 		.state('home', {
-			url: '',
+			url: '/',
 			templateUrl: 'subutai-app/monitoring/partials/view.html',
 			data: {
 				bodyClass: '',

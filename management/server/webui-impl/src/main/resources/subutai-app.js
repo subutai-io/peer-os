@@ -97,7 +97,7 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 			}
 		})
 		.state('home', {
-			url: '',
+			url: '/',
 			templateUrl: 'subutai-app/monitoring/partials/view.html',
 			data: {
 				bodyClass: '',
@@ -446,10 +446,10 @@ function startup($rootScope, $state, $location, $http) {
 	$rootScope.$on('$stateChangeStart',	function(event, toState, toParams, fromState, fromParams){
 		LOADING_SCREEN('none');
 		var restrictedPage = $.inArray($location.path(), ['/login']) === -1;
-		 if (restrictedPage && !getCookie('sptoken')) {
-		 sessionStorage.removeItem('currentUser');
-		 $location.path('/login');
-		 }
+		if (restrictedPage && !getCookie('sptoken')) {
+			sessionStorage.removeItem('currentUser');
+			$location.path('/login');
+		}
 	});
 
 	$rootScope.$state = $state;
