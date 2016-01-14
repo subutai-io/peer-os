@@ -1,0 +1,19 @@
+<div class="b-popup b-popup_log">
+	<div class="b-popup__header">
+		SSH Key
+		<a href ng-click="closeThisDialog()">
+			<img src="assets/elements/buttons/b-icon-close.svg" class="b-icon g-right"/>
+		</a>
+	</div>
+	<form ng-submit="environmentViewCtrl.setSSHKey(sshkey)">
+		<div class="b-popup__body">
+			<textarea class="b-sshKey-textarea" ng-model="sshkey"></textarea>
+		</div>
+		<div class="b-popup__footer">
+			<button class="b-btn b-btn_green g-right" type="submit">
+				Save
+			</button>
+			<div class="clear"></div>
+		</div>
+	</form>
+</div>
