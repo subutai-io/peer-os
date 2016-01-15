@@ -160,7 +160,7 @@ public class TemplateManagerImpl implements TemplateManager
 
 
     @Override
-    @RolesAllowed( "Template-Management|A|Read" )
+    @RolesAllowed( "Template-Management|Read" )
     public TemplateKurjun getTemplate( String context, byte[] md5, boolean isKurjunClient ) throws IOException
     {
 
@@ -185,7 +185,7 @@ public class TemplateManagerImpl implements TemplateManager
 
 
     @Override
-    @RolesAllowed( "Template-Management|A|Read" )
+    @RolesAllowed( "Template-Management|Read" )
     public TemplateKurjun getTemplate( String context, String name,
                                        String version, boolean isKurjunClient ) throws IOException
     {
@@ -212,7 +212,7 @@ public class TemplateManagerImpl implements TemplateManager
 
 
     @Override
-    @RolesAllowed( "Template-Management|A|Read" )
+    @RolesAllowed( "Template-Management|Read" )
     public TemplateKurjun getTemplate( final String name )
     {
         try
@@ -229,7 +229,7 @@ public class TemplateManagerImpl implements TemplateManager
 
 
     @Override
-    @RolesAllowed( "Template-Management|A|Read" )
+    @RolesAllowed( "Template-Management|Read" )
     public InputStream getTemplateData( String context, byte[] md5, boolean isKurjunClient ) throws IOException
     {
         checkPermission( context, Permission.GET_PACKAGE, Hex.encodeHexString( md5 ) );
@@ -243,7 +243,7 @@ public class TemplateManagerImpl implements TemplateManager
 
 
     @Override
-    @RolesAllowed( "Template-Management|A|Read" )
+    @RolesAllowed( "Template-Management|Read" )
     public List<TemplateKurjun> list( String context, boolean isKurjunClient ) throws IOException
     {
         UnifiedRepository repo = getRepository( context, isKurjunClient );
@@ -270,7 +270,7 @@ public class TemplateManagerImpl implements TemplateManager
 
 
     @Override
-    @RolesAllowed( "Template-Management|A|Read" )
+    @RolesAllowed( "Template-Management|Read" )
     public List<TemplateKurjun> list()
     {
         try
@@ -286,7 +286,7 @@ public class TemplateManagerImpl implements TemplateManager
 
 
     @Override
-    @RolesAllowed( "Template-Management|A|Write" )
+    @RolesAllowed( "Template-Management|Write" )
     public byte[] upload( String context, InputStream inputStream ) throws IOException
     {
 
@@ -318,7 +318,7 @@ public class TemplateManagerImpl implements TemplateManager
 
 
     @Override
-    @RolesAllowed( "Template-Management|A|Delete" )
+    @RolesAllowed( "Template-Management|Delete" )
     public boolean delete( String context, byte[] md5 ) throws IOException
     {
         checkPermission( context, Permission.DEL_PACKAGE, Hex.encodeHexString( md5 ) );
@@ -370,7 +370,7 @@ public class TemplateManagerImpl implements TemplateManager
 
 
     @Override
-    @RolesAllowed( "Template-Management|A|Write" )
+    @RolesAllowed( "Template-Management|Write" )
     public void addRemoteRepository( URL url, String token )
     {
         try
@@ -394,7 +394,7 @@ public class TemplateManagerImpl implements TemplateManager
 
 
     @Override
-    @RolesAllowed( "Template-Management|A|Delete" )
+    @RolesAllowed( "Template-Management|Delete" )
     public void removeRemoteRepository( URL url )
     {
         if ( url != null )

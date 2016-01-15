@@ -20,6 +20,12 @@
       <artifactId>subutai-common</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>identity-manager-api</artifactId>
+    </dependency>
+
+
   </dependencies>
 
   <build>

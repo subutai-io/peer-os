@@ -62,6 +62,12 @@ public class UserEntity implements User
     @Column( name = "security_key_id" )
     private String securityKeyId = ""; // PGP KeyID
 
+    @Column( name = "isApproved" )
+    private boolean isApproved = false; //requires admin approval
+
+    @Column( name = "fingerprint" )
+    private String fingerprint = ""; // User key fingerprint
+
 
     //*********************************************
     @ManyToMany( targetEntity = RoleEntity.class, fetch = FetchType.EAGER )
@@ -71,7 +77,18 @@ public class UserEntity implements User
     private List<Role> roles = new ArrayList<>();
     //*********************************************
 
+    @Override
+    public boolean isApproved()
+    {
+        return isApproved;
+    }
 
+
+    @Override
+    public void setApproved( final boolean approved )
+    {
+        isApproved = approved;
+    }
 
     @Override
     public Long getId()
@@ -211,10 +228,25 @@ public class UserEntity implements User
         return securityKeyId;
     }
 
+
     @Override
     public void setSecurityKeyId( final String securityKeyId )
     {
         this.securityKeyId = securityKeyId;
+    }
+
+
+    @Override
+    public void setFingerprint( final String fingerprint )
+    {
+        this.fingerprint = fingerprint;
+    }
+
+
+    @Override
+    public String getFingerprint()
+    {
+        return fingerprint;
     }
 
 
@@ -230,5 +262,6 @@ public class UserEntity implements User
     {
         return UserType.values()[type - 1].getName();
     }
+
 
 }

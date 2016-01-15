@@ -1,4 +1,7 @@
-<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:authz="http://aries.apache.org/xmlns/authorization/v1.0.0">
+
+  <authz:enable />
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="test/do">
@@ -12,4 +15,9 @@
     </command>
   </command-bundle>
 
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="test/verify">
+      <action class="io.subutai.core.test.cli.TestRoleValidation" />
+    </command>
+  </command-bundle>
 </blueprint>
