@@ -1,13 +1,9 @@
 package agent
 
 import (
-	"os"
-	"runtime"
 	"subutai/agent/alert"
 	"subutai/agent/container"
 	"subutai/agent/utils"
-	"subutai/config"
-	"subutai/log"
 )
 
 type Response struct {
@@ -23,17 +19,4 @@ type Heartbeat struct {
 	Interfaces []utils.Iface         `json:"interfaces,omitempty"`
 	Containers []container.Container `json:"containers"`
 	Alert      []alert.Load          `json:"alert, omitempty"`
-}
-
-func Beat() *Heartbeat {
-	hn, err := os.Hostname()
-	log.Check(log.WarnLevel, "Getting hostname for heartbeat", err)
-	beat := &Heartbeat{
-		Type:       config.Broker.HeartbeatTopic,
-		Hostname:   hn,
-		Arch:       runtime.GOARCH,
-		Interfaces: utils.GetInterfaces(),
-		Containers: container.GetActiveContainers(false),
-	}
-	return beat
 }

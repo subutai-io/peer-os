@@ -109,7 +109,7 @@ func p2pFile(line string) {
 
 func p2pTunnel(interfaceName, communityName, localPeepIPAddr string) {
 	p2pFile(interfaceName + " " + localPeepIPAddr + " " + communityName)
-	log.Check(log.FatalLevel, "p2p command: ", exec.Command("p2p", "-dev", interfaceName, "-ip", localPeepIPAddr, "-hash", communityName).Start())
+	log.Check(log.FatalLevel, "p2p command: ", exec.Command("p2p", "-start", "-key", communityName[0:31], "-dev", interfaceName, "-ip", localPeepIPAddr, "-hash", communityName).Start())
 }
 
 func createTunnel(tunnelPortName, tunnelIPAddress, tunnelType string) error {

@@ -153,9 +153,9 @@ func Alert() []Load {
 	var item Load
 	var hdd HDD
 	var tmp []int
-	diskMap := stat()
 
 	for _, cont := range container.GetActiveContainers(false) {
+		diskMap := stat()
 		trigger := false
 		if cont.Status != "RUNNING" {
 			continue
