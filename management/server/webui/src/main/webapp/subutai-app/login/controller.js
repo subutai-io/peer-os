@@ -4,11 +4,11 @@ angular.module('subutai.login.controller', [])
 	.controller('LoginCtrl', LoginCtrl)
 	.controller('SignupCtrl', SignupCtrl);
 
-LoginCtrl.$inject = ['loginSrv', '$http', '$location', '$rootScope'];
+LoginCtrl.$inject = ['loginSrv', '$http', '$location', '$rootScope', '$state'];
 SignupCtrl.$inject = ['ngDialog', '$http', '$scope', 'SweetAlert'];
 
 
-function LoginCtrl( loginSrv, $http, $location, $rootScope )
+function LoginCtrl( loginSrv, $http, $location, $rootScope, $state )
 {
 	var vm = this;
 
@@ -24,8 +24,8 @@ function LoginCtrl( loginSrv, $http, $location, $rootScope )
 			sessionStorage.setItem('currentUser', vm.name);
 			$rootScope.currentUser = vm.name;
 			$http.defaults.headers.common['sptoken']= getCookie('sptoken');
-			//$location.path('');
-			window.location.href = '/';
+			//window.location.href = '/';
+			$state.go('home');
 		}).error(function(error){
 			console.log(error);
 			vm.errorMessage = error;
