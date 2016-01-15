@@ -26,6 +26,7 @@ import io.subutai.core.identity.api.model.User;
 import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerManager;
+import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.tracker.api.Tracker;
 
 import static junit.framework.TestCase.assertEquals;
@@ -34,8 +35,6 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
-
-import io.subutai.core.security.api.SecurityManager;
 
 
 @RunWith( MockitoJUnitRunner.class )
@@ -72,7 +71,8 @@ public class EnvironmentManagerTest
     EnvironmentImpl environment;
     @Mock
     EnvironmentCreationWorkflow environmentCreationWorkflow;
-
+    @Mock
+    TrackerOperation trackerOperation;
     @Mock
     Topology topology;
 
@@ -84,6 +84,7 @@ public class EnvironmentManagerTest
     {
         when( nodeGroup.getPeerId() ).thenReturn( PEER_ID );
         when( peerManager.getPeer( PEER_ID ) ).thenReturn( peer );
+        doReturn( true ).when( peer ).isOnline();
 
         blueprint = new Blueprint( "env", null, Sets.newHashSet( nodeGroup ) );
 
@@ -102,6 +103,7 @@ public class EnvironmentManagerTest
         //doReturn( user ).when( identityManager ).getUser();
         doReturn( environment ).when( environmentDataService ).find( anyString() );
         doReturn( ENV_ID ).when( environment ).getId();
+        doReturn( trackerOperation ).when( tracker ).createTrackerOperation( anyString(), anyString() );
     }
 
 

@@ -414,11 +414,17 @@ public class PeerWebClient
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
 
-        Response response = client.post( alert );
-
-        if ( Response.Status.ACCEPTED.getStatusCode() != response.getStatus() )
+        try
         {
-            throw new PeerException( "Alert not accepted." );
+            Response response = client.post( alert );
+            if ( Response.Status.ACCEPTED.getStatusCode() != response.getStatus() )
+            {
+                throw new PeerException( "Alert not accepted." );
+            }
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Error on alert", e );
         }
     }
 

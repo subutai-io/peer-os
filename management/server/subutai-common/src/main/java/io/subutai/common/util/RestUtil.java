@@ -26,14 +26,15 @@ import io.subutai.common.security.crypto.keystore.KeyStoreData;
 import io.subutai.common.security.crypto.keystore.KeyStoreTool;
 import io.subutai.common.security.crypto.ssl.SSLManager;
 import io.subutai.common.settings.ChannelSettings;
+import io.subutai.common.settings.Common;
 
 
 public class RestUtil
 {
     private static final Logger LOG = LoggerFactory.getLogger( RestUtil.class );
-    private static long defaultReceiveTimeout = 1000 * 60 * 5;
-    private static long defaultConnectionTimeout = 1000 * 60;
-    private static int defaultMaxRetransmits = 3;
+    private static long defaultReceiveTimeout = Common.DEFAULT_RECEIVE_TIMEOUT;
+    private static long defaultConnectionTimeout = Common.DEFAULT_CONNECTION_TIMEOUT;
+    private static int defaultMaxRetransmits = Common.DEFAULT_MAX_RETRANSMITS;
 
 
     public WebClient createTrustedWebClientWithAuthAndProviders( final String url, final String alias,

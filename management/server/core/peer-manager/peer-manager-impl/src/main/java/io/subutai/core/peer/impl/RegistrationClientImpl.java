@@ -45,8 +45,8 @@ public class RegistrationClientImpl implements RegistrationClient
             if ( response.getStatus() != Response.Status.OK.getStatusCode() )
             {
                 throw new PeerException(
-                        String.format( "Remote peer '%s' unavailable at this moment. Please try again later.",
-                                destinationHost ) );
+                        String.format( "Remote peer '%s' return %d error code. Please try again later.",
+                                destinationHost, response.getStatus() ) );
             }
             else
             {
@@ -56,8 +56,8 @@ public class RegistrationClientImpl implements RegistrationClient
         catch ( Exception e )
         {
             throw new PeerException(
-                    String.format( "Remote peer '%s' unavailable at this moment. Please try again later.",
-                            destinationHost ) );
+                    String.format( "Error requesting remote peer '%s': %s .Please try again later.", destinationHost,
+                            e.getMessage() ) );
         }
     }
 
@@ -71,12 +71,26 @@ public class RegistrationClientImpl implements RegistrationClient
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
 
-        Response response = client.post( registrationData );
-        if ( response.getStatus() != Response.Status.OK.getStatusCode() )
+        try
         {
-            throw new PeerException( "Remote error: " + response.readEntity( String.class ) );
+            Response response = client.post( registrationData );
+            if ( response.getStatus() != Response.Status.OK.getStatusCode() )
+            {
+                throw new PeerException(
+                        String.format( "Remote peer '%s' return %d error code. Please try again later.",
+                                destinationHost, response.getStatus() ) );
+            }
+            else
+            {
+                return response.readEntity( RegistrationData.class );
+            }
         }
-        return response.readEntity( RegistrationData.class );
+        catch ( Exception e )
+        {
+            throw new PeerException(
+                    String.format( "Error requesting remote peer '%s': %s .Please try again later.", destinationHost,
+                            e.getMessage() ) );
+        }
     }
 
 
@@ -89,11 +103,21 @@ public class RegistrationClientImpl implements RegistrationClient
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
 
-        Response response = client.post( registrationData );
-        if ( response.getStatus() != Response.Status.OK.getStatusCode() )
+        try
+        {
+
+            Response response = client.post( registrationData );
+            if ( response.getStatus() != Response.Status.OK.getStatusCode() )
+            {
+                throw new PeerException(
+                        "Error on sending cancel registration request: " + response.readEntity( String.class ) );
+            }
+        }
+        catch ( Exception e )
         {
             throw new PeerException(
-                    "Error on sending cancel registration request: " + response.readEntity( String.class ) );
+                    String.format( "Error requesting remote peer '%s': %s .Please try again later.", destinationHost,
+                            e.getMessage() ) );
         }
     }
 
@@ -107,10 +131,19 @@ public class RegistrationClientImpl implements RegistrationClient
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
 
-        Response response = client.post( registrationData );
-        if ( response.getStatus() != Response.Status.OK.getStatusCode() )
+        try
         {
-            throw new PeerException( "Remote exception: " + response.readEntity( String.class ) );
+            Response response = client.post( registrationData );
+            if ( response.getStatus() != Response.Status.OK.getStatusCode() )
+            {
+                throw new PeerException( "Remote exception: " + response.readEntity( String.class ) );
+            }
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException(
+                    String.format( "Error requesting remote peer '%s': %s .Please try again later.", destinationHost,
+                            e.getMessage() ) );
         }
     }
 
@@ -124,10 +157,19 @@ public class RegistrationClientImpl implements RegistrationClient
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
 
-        Response response = client.post( registrationData );
-        if ( response.getStatus() != Response.Status.OK.getStatusCode() )
+        try
         {
-            throw new PeerException( "Remote exception: " + response.readEntity( String.class ) );
+            Response response = client.post( registrationData );
+            if ( response.getStatus() != Response.Status.OK.getStatusCode() )
+            {
+                throw new PeerException( "Remote exception: " + response.readEntity( String.class ) );
+            }
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException(
+                    String.format( "Error requesting remote peer '%s': %s .Please try again later.", destinationHost,
+                            e.getMessage() ) );
         }
     }
 
@@ -141,10 +183,19 @@ public class RegistrationClientImpl implements RegistrationClient
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
 
-        Response response = client.post( registrationData );
-        if ( response.getStatus() != Response.Status.OK.getStatusCode() )
+        try
         {
-            throw new PeerException( "Remote exception: " + response.readEntity( String.class ) );
+            Response response = client.post( registrationData );
+            if ( response.getStatus() != Response.Status.OK.getStatusCode() )
+            {
+                throw new PeerException( "Remote exception: " + response.readEntity( String.class ) );
+            }
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException(
+                    String.format( "Error requesting remote peer '%s': %s .Please try again later.", destinationHost,
+                            e.getMessage() ) );
         }
     }
 
