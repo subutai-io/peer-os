@@ -3,7 +3,7 @@ package io.subutai.common.environment;
 
 import java.util.List;
 
-import io.subutai.common.peer.ContainerType;
+import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.protocol.Criteria;
 
 
@@ -20,14 +20,14 @@ public class CreateEnvironmentContainerGroupRequest
     private final int ipAddressOffset;
     private final String templateName;
     private final ContainerDistributionType containerDistributionType;
-    private final ContainerType containerType;
+    private final ContainerSize containerSize;
 
 
     public CreateEnvironmentContainerGroupRequest( final String environmentId, final String initiatorPeerId,
                                                    final String ownerId, final String subnetCidr,
                                                    final int numberOfContainers, final String strategyId,
                                                    final List<Criteria> criteria, final int ipAddressOffset,
-                                                   final String templateName, final ContainerType containerType )
+                                                   final String templateName, final ContainerSize containerSize )
     {
         this.environmentId = environmentId;
         this.initiatorPeerId = initiatorPeerId;
@@ -40,14 +40,14 @@ public class CreateEnvironmentContainerGroupRequest
         this.templateName = templateName;
         this.containerDistributionType = ContainerDistributionType.AUTO;
         this.host = null;
-        this.containerType = containerType;
+        this.containerSize = containerSize;
     }
 
 
     public CreateEnvironmentContainerGroupRequest( final String environmentId, final String initiatorPeerId,
                                                    final String ownerId, final String subnetCidr,
                                                    final int numberOfContainers, final int ipAddressOffset,
-                                                   final String templateName, String host, ContainerType containerType )
+                                                   final String templateName, String host, ContainerSize containerSize )
     {
         this.environmentId = environmentId;
         this.initiatorPeerId = initiatorPeerId;
@@ -60,7 +60,7 @@ public class CreateEnvironmentContainerGroupRequest
         this.templateName = templateName;
         this.host = host;
         this.containerDistributionType = ContainerDistributionType.CUSTOM;
-        this.containerType = containerType;
+        this.containerSize = containerSize;
     }
 
 
@@ -130,8 +130,8 @@ public class CreateEnvironmentContainerGroupRequest
     }
 
 
-    public ContainerType getContainerType()
+    public ContainerSize getContainerSize()
     {
-        return containerType;
+        return containerSize;
     }
 }

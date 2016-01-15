@@ -52,9 +52,9 @@ import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.protocol.Tunnel;
+import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.quota.QuotaException;
-import io.subutai.common.resource.ResourceType;
-import io.subutai.common.resource.ResourceValue;
+import io.subutai.common.resource.ByteValueResource;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.common.util.ServiceLocator;
@@ -217,7 +217,7 @@ public class LocalPeerImplTest
     private ContainerGateway containerGateway;
 
     @Mock
-    private ResourceValue cpuQuota;
+    private ByteValueResource cpuQuota;
     @Mock
     private EnvironmentId environmentId;
 
@@ -648,28 +648,28 @@ public class LocalPeerImplTest
     @Ignore
     public void testGetQuotaInfo() throws Exception
     {
-        localPeer.getQuota( containerHost, ResourceType.CPU );
+        localPeer.getQuota( containerId );
 
-        verify( quotaManager ).getQuota( containerId, ResourceType.CPU );
+        verify( quotaManager ).getQuota( containerId );
 
-        doThrow( new QuotaException( "" ) ).when( quotaManager ).getQuota( containerId, ResourceType.CPU );
+        doThrow( new QuotaException( "" ) ).when( quotaManager ).getQuota( containerId );
 
-        localPeer.getQuota( containerHost, ResourceType.CPU );
+        localPeer.getQuota( containerId );
     }
 
 
     @Test( expected = PeerException.class )
     public void testSetQuota() throws Exception
     {
-        ResourceValue quotaInfo = mock( ResourceValue.class );
+        ContainerQuota quotaInfo = mock( ContainerQuota.class );
 
-        localPeer.setQuota( containerHost, ResourceType.RAM, quotaInfo );
+        localPeer.setQuota( containerId, quotaInfo );
 
-        verify( quotaManager ).setQuota( containerId, ResourceType.RAM, quotaInfo );
+        verify( quotaManager ).setQuota( containerId, quotaInfo );
 
-        doThrow( new QuotaException( "" ) ).when( quotaManager ).setQuota( containerId, ResourceType.RAM, quotaInfo );
+        doThrow( new QuotaException( "" ) ).when( quotaManager ).setQuota( containerId, quotaInfo );
 
-        localPeer.setQuota( containerHost, ResourceType.RAM, quotaInfo );
+        localPeer.setQuota( containerId, quotaInfo );
     }
 
 
@@ -879,13 +879,13 @@ public class LocalPeerImplTest
     @Test( expected = PeerException.class )
     public void testGetRamQuota() throws Exception
     {
-        localPeer.getQuota( containerHost, ResourceType.RAM );
+        localPeer.getQuota( containerId );
 
-        verify( quotaManager ).getQuota( containerId, ResourceType.RAM );
+        verify( quotaManager ).getQuota( containerId );
 
-        doThrow( new QuotaException( "" ) ).when( quotaManager ).getQuota( containerId, ResourceType.RAM );
+        doThrow( new QuotaException( "" ) ).when( quotaManager ).getQuota( containerId );
 
-        localPeer.getQuota( containerHost, ResourceType.RAM );
+        localPeer.getQuota( containerId );
     }
 
 

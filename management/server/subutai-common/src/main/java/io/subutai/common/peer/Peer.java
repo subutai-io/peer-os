@@ -23,9 +23,10 @@ import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
 import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.protocol.TemplateKurjun;
+import io.subutai.common.quota.ContainerQuota;
+import io.subutai.common.quota.ContainerResource;
 import io.subutai.common.resource.HistoricalMetrics;
-import io.subutai.common.resource.ResourceType;
-import io.subutai.common.resource.ResourceValue;
+import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.PublicKeyContainer;
 
 
@@ -254,7 +255,7 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
     /* **************************************************************
      *
      */
-    public PublicKeyContainer createPeerEnvironmentKeyPair( EnvironmentId environmentId ) throws PeerException;
+    public PublicKeyContainer createPeerEnvironmentKeyPair( EnvironmentId environmentId/*, String userToken*/ ) throws PeerException;
 
     void updatePeerEnvironmentPubKey( EnvironmentId environmentId, PGPPublicKeyRing publicKeyRing )
             throws PeerException;
@@ -276,20 +277,25 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
 
     ResourceHostMetrics getResourceHostMetrics() throws PeerException;
 
-    ResourceValue getAvailableQuota( ContainerHost containerHost, ResourceType resourceType ) throws PeerException;
+    PeerResources getResourceLimits( String peerId ) throws PeerException;
 
-    ResourceValue getQuota( ContainerHost containerHost, ResourceType resourceType ) throws PeerException;
+    ContainerQuota getAvailableQuota( ContainerId containerId ) throws PeerException;
 
-    void setQuota( ContainerHost containerHost, ResourceType resourceType, ResourceValue resourceValue )
-            throws PeerException;
+    ContainerQuota getQuota( ContainerId containerId ) throws PeerException;
+
+    void setQuota( ContainerId containerId, ContainerQuota quota ) throws PeerException;
+
+    //    void setQuota( ContainerHost containerHost, ContainerResourceType containerResourceType,
+    //                   ResourceValue resourceValue ) throws PeerException;
 
 
-    ResourceValue getAvailableQuota( ContainerId containerId, ResourceType resourceType ) throws PeerException;
+    //    <T extends ContainerResource> T getAvailableQuota( ContainerId containerId, Class<T> type ) throws
+    // PeerException;
+    //
+    //    <T extends ContainerResource> T getQuota( ContainerId containerId, Class<T> type ) throws PeerException;
 
-    ResourceValue getQuota( ContainerId containerId, ResourceType resourceType ) throws PeerException;
-
-    void setQuota( ContainerId containerId, ResourceType resourceType, ResourceValue resourceValue )
-            throws PeerException;
+    //    void setQuota( final ContainerId containerHost, final ContainerResource containerResource )
+    //            throws PeerException;
 
     void alert( AlertEvent alert ) throws PeerException;
 

@@ -1,28 +1,35 @@
 package io.subutai.common.metric;
 
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import com.google.gson.annotations.Expose;
 
 
-@XmlRootElement
-@XmlAccessorType( XmlAccessType.FIELD )
 public class Cpu
 {
     @Expose
-    @JsonProperty
+    @JsonProperty( "model" )
     String model = "UNKNOWN";
     @Expose
-    @JsonProperty
+    @JsonProperty( "idle" )
     Double idle = 0.0;
     @Expose
-    @JsonProperty
+    @JsonProperty( "coreCount" )
     int coreCount = 0;
+    @Expose
+    @JsonProperty( "frequency" )
+    double frequency = 0.0;
+
+
+    public Cpu( @JsonProperty( "model" ) final String model, @JsonProperty( "idle" ) final Double idle,
+                @JsonProperty( "coreCount" ) final int coreCount, @JsonProperty( "frequency" ) final double frequency )
+    {
+        this.model = model;
+        this.idle = idle;
+        this.coreCount = coreCount;
+        this.frequency = frequency;
+    }
 
 
     public String getModel()
@@ -58,6 +65,18 @@ public class Cpu
     public void setCoreCount( final int coreCount )
     {
         this.coreCount = coreCount;
+    }
+
+
+    public double getFrequency()
+    {
+        return frequency;
+    }
+
+
+    public void setFrequency( final double frequency )
+    {
+        this.frequency = frequency;
     }
 
 

@@ -39,7 +39,7 @@ import io.subutai.common.host.HostInterface;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.peer.ContainerType;
+import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
@@ -669,7 +669,7 @@ public class RestServiceImpl implements RestService
     @Override
     public Response listContainerTypes()
     {
-        return Response.ok().entity( gson.toJson( ContainerType.values() ) ).build();
+        return Response.ok().entity( gson.toJson( ContainerSize.values() ) ).build();
     }
 
 
@@ -1059,7 +1059,7 @@ public class RestServiceImpl implements RestService
 
             containerDtos.add( new ContainerDto( containerHost.getId(), containerHost.getEnvironmentId().getId(),
                     containerHost.getHostname(), state, iface.getIp(), iface.getMac(), containerHost.getTemplateName(),
-                    containerHost.getContainerType(), containerHost.getArch().toString(), containerHost.getTags() ) );
+                    containerHost.getContainerSize(), containerHost.getArch().toString(), containerHost.getTags() ) );
         }
         return containerDtos;
     }

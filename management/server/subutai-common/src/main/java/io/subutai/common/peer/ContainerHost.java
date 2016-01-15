@@ -6,8 +6,7 @@ import java.util.Set;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.protocol.TemplateKurjun;
-import io.subutai.common.resource.ResourceType;
-import io.subutai.common.resource.ResourceValue;
+import io.subutai.common.quota.ContainerQuota;
 
 
 /**
@@ -15,7 +14,7 @@ import io.subutai.common.resource.ResourceValue;
  */
 public interface ContainerHost extends Host, ContainerHostInfo
 {
-    ContainerType getContainerType();
+    ContainerSize getContainerSize();
 
     ContainerId getContainerId();
 
@@ -73,28 +72,21 @@ public interface ContainerHost extends Host, ContainerHostInfo
     public void setCpuSet( Set<Integer> cpuSet ) throws PeerException;
 
     /**
-     * Returns available quota value by resource type
-     *
-     * @param resourceType resource type
+     * Returns available quota values
      *
      * @return quota value
      */
-    ResourceValue getAvailableQuota( ResourceType resourceType ) throws PeerException;
+    ContainerQuota getAvailableQuota() throws PeerException;
 
     /**
-     * Returns current quota value by resource type
-     *
-     * @param resourceType resource type
+     * Returns current quota values
      *
      * @return quota value
      */
-    ResourceValue getQuota( ResourceType resourceType ) throws PeerException;
+    ContainerQuota getQuota() throws PeerException;
 
     /**
-     * Sets quota value by resource type to new value
-     *
-     * @param resourceType resource type
-     * @param newValue new quota value
+     * Sets quota values
      */
-    void setQuota( ResourceType resourceType, ResourceValue newValue ) throws PeerException;
+    void setQuota( ContainerQuota containerQuota ) throws PeerException;
 }

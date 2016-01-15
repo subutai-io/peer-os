@@ -37,7 +37,7 @@ public class QuotaAlertValue implements AlertValue<ExceededQuota>
             Preconditions.checkNotNull( value, "Value is null" );
             Preconditions.checkNotNull( value.getHostId(), "Host id is null" );
             Preconditions.checkNotNull( value.getHostId().getId(), "Host id is null" );
-            Preconditions.checkNotNull( value.getResourceType(), "Resource type is null" );
+            Preconditions.checkNotNull( value.getContainerResourceType(), "Resource type is null" );
             Preconditions.checkNotNull( value.getCurrentValue(), "Current value is null" );
             Preconditions.checkNotNull( value.getQuotaValue(), "Quota value is null" );
         }

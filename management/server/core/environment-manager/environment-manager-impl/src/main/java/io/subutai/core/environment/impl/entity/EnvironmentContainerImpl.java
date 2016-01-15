@@ -45,13 +45,17 @@ import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerId;
-import io.subutai.common.peer.ContainerType;
+import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerId;
 import io.subutai.common.protocol.TemplateKurjun;
+import io.subutai.common.quota.ContainerQuota;
+import io.subutai.common.resource.ContainerResourceType;
+import io.subutai.common.resource.ByteValueResource;
+import io.subutai.common.security.objects.KeyTrustLevel;
 import io.subutai.common.resource.ResourceType;
 import io.subutai.common.resource.ResourceValue;
 import io.subutai.common.security.objects.PermissionObject;
@@ -115,7 +119,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
     @Column( name = "type" )
     @Enumerated( EnumType.STRING )
-    private ContainerType containerType;
+    private ContainerSize containerSize;
 
 
     @Transient
@@ -141,14 +145,14 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
     public EnvironmentContainerImpl( final String localPeerId, final Peer peer, final String nodeGroupName,
                                      final ContainerHostInfoModel hostInfo, final TemplateKurjun template,
-                                     int sshGroupId, int hostsGroupId, String domainName, ContainerType containerType )
+                                     int sshGroupId, int hostsGroupId, String domainName, ContainerSize containerSize )
     {
         Preconditions.checkNotNull( peer );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( nodeGroupName ) );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( domainName ) );
         Preconditions.checkNotNull( hostInfo );
         Preconditions.checkNotNull( template );
-        Preconditions.checkNotNull( containerType );
+        Preconditions.checkNotNull( containerSize );
 
 
         this.peer = peer;
@@ -164,7 +168,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
         this.sshGroupId = sshGroupId;
         this.hostsGroupId = hostsGroupId;
         this.domainName = domainName;
-        this.containerType = containerType;
+        this.containerSize = containerSize;
         setHostInterfaces( hostInfo.getHostInterfaces() );
     }
 
@@ -528,23 +532,23 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
 
     @Override
-    public ResourceValue getAvailableQuota( final ResourceType resourceType ) throws PeerException
+    public ContainerQuota getAvailableQuota() throws PeerException
     {
-        return getPeer().getAvailableQuota( this.getContainerId(), resourceType );
+        return getPeer().getAvailableQuota( this.getContainerId() );
     }
 
 
     @Override
-    public ResourceValue getQuota( final ResourceType resourceType ) throws PeerException
+    public ContainerQuota getQuota() throws PeerException
     {
-        return getPeer().getQuota( this.getContainerId(), resourceType );
+        return getPeer().getQuota( this.getContainerId() );
     }
 
 
     @Override
-    public void setQuota( final ResourceType resourceType, final ResourceValue resourceValue ) throws PeerException
+    public void setQuota( final ContainerQuota containerQuota ) throws PeerException
     {
-        getPeer().setQuota( this.getContainerId(), resourceType, resourceValue );
+        getPeer().setQuota( this.getContainerId(), containerQuota );
     }
 
 
@@ -622,9 +626,9 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
 
     @Override
-    public ContainerType getContainerType()
+    public ContainerSize getContainerSize()
     {
-        return containerType;
+        return containerSize;
     }
 
 

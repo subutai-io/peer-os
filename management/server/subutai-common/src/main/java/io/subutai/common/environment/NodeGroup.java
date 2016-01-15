@@ -7,7 +7,7 @@ import com.google.common.base.Strings;
 
 import io.subutai.common.gson.required.GsonRequired;
 import io.subutai.common.gson.required.GsonValidation;
-import io.subutai.common.peer.ContainerType;
+import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.protocol.PlacementStrategy;
 
 
@@ -24,7 +24,7 @@ public class NodeGroup
     private String templateName;
     @GsonRequired
     @JsonProperty( "type" )
-    private ContainerType type = ContainerType.SMALL;
+    private ContainerSize type = ContainerSize.SMALL;
     @GsonRequired( validation = GsonValidation.GREATER_THAN_ZERO )
     @JsonProperty( "numberOfContainers" )
     private int numberOfContainers;
@@ -54,7 +54,7 @@ public class NodeGroup
     public NodeGroup( @JsonProperty( "name" ) final String name,
                       @JsonProperty( "templateName" ) final String templateName,
                       @JsonProperty( "numberOfContainers" ) final int numberOfContainers,
-                      @JsonProperty( "type" ) ContainerType type, @JsonProperty( "sshGroupId" ) final int sshGroupId,
+                      @JsonProperty( "type" ) ContainerSize type, @JsonProperty( "sshGroupId" ) final int sshGroupId,
                       @JsonProperty( "hostsGroupId" ) final int hostsGroupId,
                       @JsonProperty( "containerDistributionType" ) ContainerDistributionType containerDistributionType,
                       @JsonProperty( "containerPlacementStrategy" ) final PlacementStrategy containerPlacementStrategy,
@@ -99,7 +99,7 @@ public class NodeGroup
     }
 
 
-    public NodeGroup( final String name, final String templateName, ContainerType type, final int numberOfContainers,
+    public NodeGroup( final String name, final String templateName, ContainerSize type, final int numberOfContainers,
                       final int sshGroupId, final int hostsGroupId, final String peerId, final String hostId )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid node group name" );
@@ -121,7 +121,7 @@ public class NodeGroup
     }
 
 
-    public NodeGroup( final String name, final String templateName, final ContainerType type,
+    public NodeGroup( final String name, final String templateName, final ContainerSize type,
                       final int numberOfContainers, final int sshGroupId, final int hostsGroupId )
     {
         this.name = name;
@@ -169,7 +169,7 @@ public class NodeGroup
     }
 
 
-    public ContainerType getType()
+    public ContainerSize getType()
     {
         return type;
     }

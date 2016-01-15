@@ -299,4 +299,6 @@ public interface LocalPeer extends Peer
     ContainerHost findContainerById( ContainerId containerId );
 
     int setupContainerSsh( String containerHostId, int sshIdleTimeout ) throws PeerException;
+
+    List<ContainerHost> getPeerContainers( String peerId );
 }

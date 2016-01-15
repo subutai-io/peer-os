@@ -33,15 +33,14 @@ import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
-import io.subutai.common.peer.ContainerType;
+import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerId;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.TemplateKurjun;
-import io.subutai.common.resource.ResourceType;
-import io.subutai.common.resource.ResourceValue;
+import io.subutai.common.quota.ContainerQuota;
 
 
 /**
@@ -72,7 +71,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
 
     @Column( name = "container_type", nullable = true )
     @Enumerated( EnumType.STRING )
-    private ContainerType containerType = ContainerType.SMALL;
+    private ContainerSize containerSize = ContainerSize.SMALL;
 
     @Column( name = "created", nullable = false )
     @Temporal( TemporalType.TIMESTAMP )
@@ -300,23 +299,23 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
 
 
     @Override
-    public ResourceValue getAvailableQuota( final ResourceType resourceType ) throws PeerException
+    public ContainerQuota getAvailableQuota() throws PeerException
     {
-        return getPeer().getAvailableQuota( this.getContainerId(), resourceType );
+        return getPeer().getAvailableQuota( this.getContainerId());
     }
 
 
     @Override
-    public ResourceValue getQuota( final ResourceType resourceType ) throws PeerException
+    public ContainerQuota getQuota( ) throws PeerException
     {
-        return getPeer().getQuota( this.getContainerId(), resourceType );
+        return getPeer().getQuota( this.getContainerId());
     }
 
 
     @Override
-    public void setQuota( final ResourceType resourceType, ResourceValue resourceValue ) throws PeerException
+    public void setQuota( final ContainerQuota containerQuota ) throws PeerException
     {
-        getPeer().setQuota( this.getContainerId(), resourceType, resourceValue );
+        getPeer().setQuota( this.getContainerId(), containerQuota );
     }
 
 
@@ -335,15 +334,15 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
 
 
     @Override
-    public ContainerType getContainerType()
+    public ContainerSize getContainerSize()
     {
-        return containerType;
+        return containerSize;
     }
 
 
-    public void setContainerType( final ContainerType containerType )
+    public void setContainerSize( final ContainerSize containerSize )
     {
-        this.containerType = containerType;
+        this.containerSize = containerSize;
     }
 
 

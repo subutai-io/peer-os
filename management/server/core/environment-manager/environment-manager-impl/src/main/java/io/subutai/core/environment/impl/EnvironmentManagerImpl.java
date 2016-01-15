@@ -54,7 +54,7 @@ import io.subutai.common.peer.AlertHandler;
 import io.subutai.common.peer.AlertHandlerPriority;
 import io.subutai.common.peer.AlertListener;
 import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.peer.ContainerType;
+import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentAlertHandler;
 import io.subutai.common.peer.EnvironmentAlertHandlers;
 import io.subutai.common.peer.EnvironmentContainerHost;
@@ -741,7 +741,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             for ( ContainerHostInfo newHost : entry.getValue() )
             {
-                ContainerType containerType = entry.getKey().getType();
+                ContainerSize containerType = entry.getKey().getType();
 
                 environment.addContainers                                     ( Sets.newHashSet(
                         new EnvironmentContainerImpl( peerManager.getLocalPeer().getId(), peerManager.getLocalPeer(),
