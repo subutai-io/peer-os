@@ -24,12 +24,14 @@ CurrentUserCtrl.$inject = ['$location', '$rootScope'];
 routesConf.$inject = ['$httpProvider', '$stateProvider', '$urlRouterProvider', '$ocLazyLoadProvider'];
 startup.$inject = ['$rootScope', '$state', '$location', '$http'];
 
-function CurrentUserCtrl($location, $rootScope) {
+function CurrentUserCtrl($location, $rootScope, ngDialog, $http, SweetAlert) {
 	var vm = this;
 	vm.currentUser = $rootScope.currentUser;
+	vm.currentUserRoles = [];
 
 	//function
 	vm.logout = logout;
+
 
 	function logout() {
 		removeCookie('sptoken');
@@ -51,17 +53,16 @@ function SubutaiController($rootScope) {
 	vm.bodyClass = '';
 
 	$rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams){
-		if(toState.data) {
-			vm.layoutType = 'subutai-app/common/layouts/' + toState.data.layout + '.html';
-			if (angular.isDefined(toState.data.bodyClass)) {
-				vm.bodyClass = toState.data.bodyClass;
-				return;
-			}
-
-			vm.bodyClass = '';
+		vm.layoutType = 'subutai-app/common/layouts/' + toState.data.layout + '.html';
+		if (angular.isDefined(toState.data.bodyClass)) {
+			vm.bodyClass = toState.data.bodyClass;
+			return;
 		}
+
+		vm.bodyClass = '';
 	});
 }
+
 
 function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 
@@ -97,7 +98,7 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 			}
 		})
 		.state('home', {
-			url: '',
+			url: '/',
 			templateUrl: 'subutai-app/monitoring/partials/view.html',
 			data: {
 				bodyClass: '',
@@ -173,7 +174,7 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 			}
 		})
 		.state('environments', {
-			url: '/environments',
+			url: '/environments/{activeTab}',
 			templateUrl: 'subutai-app/environment/partials/view.html',
 			data: {
 				bodyClass: '',
@@ -427,27 +428,50 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 				layout: 'fullpage'
 			}
 		})
-        .state('about', {
-            url: '/about',
-            templateUrl: 'subutai-app/about/partials/view.html',
-            data: {
-                bodyClass: '',
-                layout: 'default'
-            },
-            resolve: {
-                loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
-                    return $ocLazyLoad.load([
-                        {
-                            name: 'subutai.about',
-                            files: [
-                                'subutai-app/about/about.js',
-                                'subutai-app/about/controller.js',
-                            ]
-                        }
-                    ])
-                }]
-            }
-        });
+		.state('about', {
+			url: '/about',
+			templateUrl: 'subutai-app/about/partials/view.html',
+			data: {
+				bodyClass: '',
+				layout: 'default'
+			},
+			resolve: {
+				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+					return $ocLazyLoad.load([
+						{
+							name: 'subutai.about',
+							files: [
+								'subutai-app/about/about.js',
+								'subutai-app/about/controller.js',
+							]
+						}
+					])
+				}]
+			}
+		})
+		.state('plugin_integrator', {
+			url: '/plugin_integrator',
+			templateUrl: 'subutai-app/plugin_integrator/partials/view.html',
+			data: {
+				bodyClass: '',
+				layout: 'default'
+			},
+			resolve: {
+				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+					return $ocLazyLoad.load([
+						{
+							name: 'subutai.plugin_integrator',
+							files: [
+								'subutai-app/plugin_integrator/plugin_integrator.js',
+								'subutai-app/plugin_integrator/controller.js',
+								'subutai-app/plugin_integrator/service.js',
+								'subutai-app/identity/service.js'
+							]
+						}
+					]);
+				}]
+			}
+		});
 
 	$httpProvider.interceptors.push(function($q, $location) {
 		return {
@@ -466,11 +490,12 @@ function startup($rootScope, $state, $location, $http) {
 	$rootScope.$on('$stateChangeStart',	function(event, toState, toParams, fromState, fromParams){
 		LOADING_SCREEN('none');
 		var restrictedPage = $.inArray($location.path(), ['/login']) === -1;
-		 if (restrictedPage && !getCookie('sptoken')) {
-		 sessionStorage.removeItem('currentUser');
-		 $location.path('/login');
-		 }
+		if (restrictedPage && !getCookie('sptoken')) {
+			sessionStorage.removeItem('currentUser');
+			$location.path('/login');
+		}
 	});
+	$http.defaults.headers.common['sptoken'] = getCookie('sptoken');
 
 	$rootScope.$state = $state;
 }

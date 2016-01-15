@@ -1,7 +1,6 @@
 package io.subutai.core.identity.impl.dao;
 
 
-import java.util.Collection;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -61,6 +60,29 @@ class UserDAO
      *
      */
     public List<User> getAll()
+    {
+        EntityManager em = daoManager.getEntityManagerFromFactory();
+
+        List<User> result = Lists.newArrayList();
+        try
+        {
+            result = em.createQuery( "select h from UserEntity h WHERE h.isApproved = true", User.class ).getResultList();
+        }
+        catch ( Exception e )
+        {
+        }
+        finally
+        {
+            daoManager.closeEntityManager( em );
+        }
+        return result;
+    }
+
+
+    /* *************************************************
+     *
+     */
+    public List<User> getAllSystemUsers()
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
 

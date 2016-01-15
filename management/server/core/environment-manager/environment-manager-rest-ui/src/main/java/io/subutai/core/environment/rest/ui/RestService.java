@@ -12,8 +12,10 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.UUID;
 
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
@@ -21,15 +23,14 @@ import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 
 public interface RestService
 {
-    /** Templates *****************************************************/
+    /** Templates **************************************************** */
     @GET
     @Path( "templates" )
     @Produces( { MediaType.APPLICATION_JSON } )
     Response listTemplates();
 
 
-
-    /** Blueprints ****************************************************/
+    /** Blueprints *************************************************** */
 
     @GET
     @Path( "blueprints" )
@@ -51,8 +52,7 @@ public interface RestService
     Response deleteBlueprint( @PathParam( "blueprintId" ) UUID blueprintId );
 
 
-
-    /** Domain *****************************************************/
+    /** Domain **************************************************** */
 
     @GET
     @Path( "domains" )
@@ -60,15 +60,27 @@ public interface RestService
     Response getDefaultDomainName();
 
 
-
-    /** Environments *****************************************************/
+    /** Environments **************************************************** */
 
     @GET
     @Produces( { MediaType.APPLICATION_JSON } )
     Response listEnvironments();
 
+    @PUT
+    @Path( "{environmentId}/revoke" )
+    Response accessStatus( @PathParam( "environmentId" ) String environmentId);
+
     @POST
-    Response createEnvironment( @FormParam( "blueprint_json" ) String blueprintJson );
+    @Path( "requisites" )
+    Response setupRequisites( @FormParam( "blueprint_json" ) String blueprintJson );
+
+    @POST
+    @Path( "build" )
+    Response startEnvironmentBuild( @FormParam( "environmentId" ) String environmentId,
+                                    @FormParam( "signedMessage" ) String signedMessage );
+
+    //    @POST
+    //    Response createEnvironment( @FormParam( "blueprint_json" ) String blueprintJson );
 
     @POST
     @Path( "grow" )
@@ -80,8 +92,7 @@ public interface RestService
     Response destroyEnvironment( @PathParam( "environmentId" ) String environmentId );
 
 
-
-    /** Environments SSH keys *****************************************************/
+    /** Environments SSH keys **************************************************** */
 
     @POST
     @Path( "keys" )
@@ -93,8 +104,7 @@ public interface RestService
     Response removeSshKey( @PathParam( "environmentId" ) String environmentId );
 
 
-
-    /** Environment domains *****************************************************/
+    /** Environment domains **************************************************** */
 
     @GET
     @Path( "{environmentId}/domain" )
@@ -107,7 +117,7 @@ public interface RestService
 
 
     @POST
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Consumes( MediaType.MULTIPART_FORM_DATA )
     @Path( "/domains" )
     Response addEnvironmentDomain( @Multipart( "environmentId" ) String environmentId,
                                    @Multipart( "hostName" ) String hostName,
@@ -126,15 +136,13 @@ public interface RestService
                                 @PathParam( "containerId" ) String containerId );
 
 
-
     @PUT
     @Path( "{environmentId}/containers/{containerId}/domain" )
     Response setContainerDomain( @PathParam( "environmentId" ) String environmentId,
                                  @PathParam( "containerId" ) String containerId );
 
 
-
-    /** Containers *****************************************************/
+    /** Containers **************************************************** */
 
     @GET
     @Path( "containers/{containerId}" )
@@ -161,8 +169,7 @@ public interface RestService
     Response stopContainer( @PathParam( "containerId" ) String containerId );
 
 
-
-    /** Container types *****************************************************/
+    /** Container types **************************************************** */
 
     @GET
     @Path( "containers/types" )
@@ -170,8 +177,7 @@ public interface RestService
     Response listContainerTypes();
 
 
-
-    /** Container quota *****************************************************/
+    /** Container quota **************************************************** */
 
     @GET
     @Path( "containers/{containerId}/quota" )
@@ -215,8 +221,7 @@ public interface RestService
     Response setDiskQuota( @PathParam( "containerId" ) String containerId, @FormParam( "diskQuota" ) String diskQuota );
 
 
-
-    /** Peers strategy *****************************************************/
+    /** Peers strategy **************************************************** */
 
     @GET
     @Path( "strategies" )
@@ -224,8 +229,7 @@ public interface RestService
     Response listPlacementStrategies();
 
 
-
-    /** Peers *****************************************************/
+    /** Peers **************************************************** */
 
     @GET
     @Path( "peers" )
@@ -233,8 +237,7 @@ public interface RestService
     Response getPeers();
 
 
-
-    /** Tags *****************************************************/
+    /** Tags **************************************************** */
 
     @POST
     @Path( "{environmentId}/containers/{containerId}/tags" )
@@ -249,6 +252,21 @@ public interface RestService
     @GET
     @Path( "{environmentId}/containers/{containerId}/ssh" )
     @Produces( { MediaType.TEXT_PLAIN } )
+    Response setupContainerSsh( @PathParam( "environmentId" ) String environmentId,
+                                @PathParam( "containerId" ) String containerId );
+
+
+    /** Share **************************************************** */
+
+    @GET
+    @Path( "shared/users/{objectId}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response getSharedUsers( @PathParam( "objectId" ) String objectId );
+
+
+    @POST
+    @Path( "share" )
+    Response shareEnvironment( @FormParam( "users" ) String users, @FormParam( "environmentId" ) String environmentId );
     Response setupContainerSsh( @PathParam( "environmentId" ) String environmentId,
                                 @PathParam( "containerId" ) String containerId );
 }

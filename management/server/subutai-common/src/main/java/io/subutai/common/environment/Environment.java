@@ -4,7 +4,6 @@ package io.subutai.common.environment;
 import java.util.Map;
 import java.util.Set;
 
-import io.subutai.common.peer.AlertHandlerPriority;
 import io.subutai.common.peer.EnvironmentAlertHandler;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
@@ -37,6 +36,9 @@ public interface Environment
      * @return @{code EnvironmentStatus}
      */
     EnvironmentStatus getStatus();
+
+
+    String getRelationDeclaration();
 
     /**
      * Returns creation timestamp

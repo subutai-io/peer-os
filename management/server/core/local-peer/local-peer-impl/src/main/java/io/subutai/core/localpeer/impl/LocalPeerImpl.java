@@ -165,7 +165,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     protected Set<RequestListener> requestListeners = Sets.newHashSet();
     protected PeerInfo peerInfo;
     private SecurityManager securityManager;
-//    private IdentityManager identityManager;
     protected ServiceLocator serviceLocator = new ServiceLocator();
 
 
@@ -175,7 +174,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     public LocalPeerImpl( DaoManager daoManager, TemplateManager templateRegistry, QuotaManager quotaManager,
                           StrategyManager strategyManager, CommandExecutor commandExecutor, HostRegistry hostRegistry,
-                          Monitor monitor, SecurityManager securityManager/*, IdentityManager identityManager */)
+                          Monitor monitor, SecurityManager securityManager )
     {
         this.strategyManager = strategyManager;
         this.daoManager = daoManager;
@@ -185,7 +184,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         this.commandExecutor = commandExecutor;
         this.hostRegistry = hostRegistry;
         this.securityManager = securityManager;
-//        this.identityManager = identityManager;
     }
 
 
@@ -330,7 +328,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Write" )
+    @RolesAllowed( "Environment-Management|Write" )
     @Override
     public Set<ContainerHostInfoModel> createEnvironmentContainerGroup(
             final CreateEnvironmentContainerGroupRequest request ) throws PeerException
@@ -411,10 +409,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 //TODO: sign container host key with PEK
                 resourceHost.addContainerHost( containerHostEntity );
 
+                signContainerKeyWithPEK( containerHostEntity.getId(), containerHostEntity.getEnvironmentId() );
+
                 resourceHostDataService.saveOrUpdate( resourceHost );
 
                 quotaManager.setQuota( containerHostEntity.getContainerId(), containerQuota );
-
                 result.add( new ContainerHostInfoModel( hostInfo ) );
             }
             catch ( ResourceHostException | QuotaException e )
@@ -429,210 +428,113 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    //    private Set<ContainerHostInfoModel> createByStrategy( final CreateEnvironmentContainerGroupRequest request )
-    //            throws PeerException
-    //    {
-    //
-    //        //check if strategy exists
-    //        try
-    //        {
-    //            strategyManager.findStrategyById( request.getStrategyId() );
-    //        }
-    //        catch ( StrategyNotFoundException e )
-    //        {
-    //            throw new PeerException( e );
-    //        }
-    //
-    //        SubnetUtils cidr;
-    //        try
-    //        {
-    //            cidr = new SubnetUtils( request.getSubnetCidr() );
-    //        }
-    //        catch ( IllegalArgumentException e )
-    //        {
-    //            throw new PeerException( "Failed to parse subnet CIDR", e );
-    //        }
-    //
-    //        Map<ResourceHost, Set<String>> containerDistribution = distributeContainersToResourceHosts( request );
-    //
-    //
-    //        String networkPrefix = cidr.getInfo().getCidrSignature().split( "/" )[1];
-    //        String[] allAddresses = cidr.getInfo().getAllAddresses();
-    //        String gateway = cidr.getInfo().getLowAddress();
-    //        int currentIpAddressOffset = 0;
-    //
-    //        List<Future<CreateContainerWrapperTask>> taskFutures = Lists.newArrayList();
-    //        ExecutorService executorService = getFixedPoolExecutor( request.getNumberOfContainers() );
-    //
-    //        Vni environmentVni = getManagementHost().findVniByEnvironmentId( request.getEnvironmentId() );
-    //
-    //        if ( environmentVni == null )
-    //        {
-    //            throw new PeerException(
-    //                    String.format( "No reserved vni found for environment %s", request.getEnvironmentId() ) );
-    //        }
-    //
-    //        //create containers in parallel on each resource host
-    //        for ( Map.Entry<ResourceHost, Set<String>> resourceHostDistribution : containerDistribution.entrySet() )
-    //        {
-    //            ResourceHostEntity resourceHostEntity = ( ResourceHostEntity ) resourceHostDistribution.getKey();
-    //
-    //            for ( String hostname : resourceHostDistribution.getValue() )
-    //            {
-    //
-    //                String ipAddress = allAddresses[request.getIpAddressOffset() + currentIpAddressOffset];
-    //                taskFutures.add( executorService.submit(
-    //                        new CreateContainerWrapperTask( resourceHostEntity, request.getTemplateName(), hostname,
-    //                                String.format( "%s/%s", ipAddress, networkPrefix ), environmentVni.getVlan(),
-    //                                Common.WAIT_CONTAINER_CONNECTION_SEC, request.getEnvironmentId() ) ) );
-    //
-    //                currentIpAddressOffset++;
-    //            }
-    //        }
-    //
-    //
-    //        //wait for succeeded containers
-    //        Set<ContainerHostInfoModel> result = Sets.newHashSet();
-    //
-    //        ContainerQuota containerQuota = quotaManager.getDefaultContainerQuota( request.getContainerSize() );
-    //        if ( containerQuota == null )
-    //        {
-    //            LOG.warn( "Quota not found for container type: " + request.getContainerSize() );
-    //            containerQuota = quotaManager.getDefaultContainerQuota( ContainerSize.SMALL );
-    //        }
-    //
-    //        for ( Future<CreateContainerWrapperTask> future : taskFutures )
-    //        {
-    //            try
-    //            {
-    //                CreateContainerWrapperTask task = future.get();
-    //                ContainerHostInfo hostInfo = task.getHostInfo();
-    //                ResourceHost resourceHost = task.getResourceHost();
-    //
-    //                TemplateKurjun template = getTemplateByName( request.getTemplateName() );
-    //
-    //                ContainerHostEntity containerHostEntity =
-    //                        new ContainerHostEntity( getId(), hostInfo, template.getName(), template
-    // .getArchitecture() );
-    //                containerHostEntity.setEnvironmentId( request.getEnvironmentId() );
-    //                containerHostEntity.setOwnerId( request.getOwnerId() );
-    //                containerHostEntity.setInitiatorPeerId( request.getInitiatorPeerId() );
-    //                containerHostEntity.setContainerSize( request.getContainerSize() );
-    //
-    //                //TODO: sign container host key with PEK
-    //                resourceHost.addContainerHost( containerHostEntity );
-    //
-    //                resourceHostDataService.saveOrUpdate( resourceHost );
-    //
-    //                quotaManager.setQuota( containerHostEntity.getContainerId(), containerQuota );
-    //                result.add( new ContainerHostInfoModel( hostInfo ) );
-    //            }
-    //            catch ( ExecutionException | InterruptedException | QuotaException e )
-    //            {
-    //                LOG.error( "Error creating container", e );
-    //            }
-    //        }
-    //
-    //        executorService.shutdown();
-    //
-    //        return result;
-    //    }
+    private Set<ContainerHostInfoModel> createByStrategy( final CreateEnvironmentContainerGroupRequest request )
+            throws PeerException
+    {
+        //check if strategy exists
+        try
+        {
+            strategyManager.findStrategyById( request.getStrategyId() );
+        }
+        catch ( StrategyNotFoundException e )
+        {
+            throw new PeerException( e );
+        }
+
+        SubnetUtils cidr;
+        try
+        {
+            cidr = new SubnetUtils( request.getSubnetCidr() );
+        }
+        catch ( IllegalArgumentException e )
+        {
+            throw new PeerException( "Failed to parse subnet CIDR", e );
+        }
+
+        Map<ResourceHost, Set<String>> containerDistribution = distributeContainersToResourceHosts( request );
 
 
-    //        SubnetUtils cidr;
-    //        try
-    //        {
-    //            cidr = new SubnetUtils( request.getSubnetCidr() );
-    //        }
-    //        catch ( IllegalArgumentException e )
-    //        {
-    //            throw new PeerException( "Failed to parse subnet CIDR", e );
-    //        }
-    //
-    //        Map<ResourceHost, Set<String>> containerDistribution = distributeContainersToResourceHosts( request );
-    //
-    //
-    //        String networkPrefix = cidr.getInfo().getCidrSignature().split( "/" )[1];
-    //        String[] allAddresses = cidr.getInfo().getAllAddresses();
-    //        String gateway = cidr.getInfo().getLowAddress();
-    //        int currentIpAddressOffset = 0;
-    //
-    //        List<Future<CreateContainerWrapperTask>> taskFutures = Lists.newArrayList();
-    //        ExecutorService executorService = getFixedPoolExecutor( request.getNumberOfContainers() );
-    //
-    //        Vni environmentVni = getManagementHost().findVniByEnvironmentId( request.getEnvironmentId() );
-    //
-    //        if ( environmentVni == null )
-    //        {
-    //            throw new PeerException(
-    //                    String.format( "No reserved vni found for environment %s", request.getEnvironmentId() ) );
-    //        }
-    //
-    //        //create containers in parallel on each resource host
-    //        for ( Map.Entry<ResourceHost, Set<String>> resourceHostDistribution : containerDistribution.entrySet() )
-    //        {
-    //            ResourceHostEntity resourceHostEntity = ( ResourceHostEntity ) resourceHostDistribution.getKey();
-    //
-    //            for ( String hostname : resourceHostDistribution.getValue() )
-    //            {
-    //
-    //                String ipAddress = allAddresses[request.getIpAddressOffset() + currentIpAddressOffset];
-    //                taskFutures.add( executorService.submit(
-    //                        new CreateContainerWrapperTask( resourceHostEntity, request.getTemplateName(), hostname,
-    //                                String.format( "%s/%s", ipAddress, networkPrefix ), environmentVni.getVlan(),
-    //                                Common.WAIT_CONTAINER_CONNECTION_SEC, request.getEnvironmentId() ) ) );
-    //
-    //                currentIpAddressOffset++;
-    //            }
-    //        }
-    //
-    //
-    //        //wait for succeeded containers
-    //        Set<ContainerHostInfoModel> result = Sets.newHashSet();
-    //
-    //        ContainerQuotaHolder containerQuota = quotaManager.getDefaultContainerQuota( request.getContainerType() );
-    //        if ( containerQuota == null )
-    //        {
-    //            LOG.warn( "Quota not found for container type: " + request.getContainerType() );
-    //            containerQuota = quotaManager.getDefaultContainerQuota( ContainerType.SMALL );
-    //        }
-    //
-    //        for ( Future<CreateContainerWrapperTask> future : taskFutures )
-    //        {
-    //            try
-    //            {
-    //                CreateContainerWrapperTask task = future.get();
-    //                ContainerHostInfo hostInfo = task.getHostInfo();
-    //                ResourceHost resourceHost = task.getResourceHost();
-    //
-    //                TemplateKurjun template = getTemplateByName( request.getTemplateName() );
-    //
-    //                ContainerHostEntity containerHostEntity =
-    //                        new ContainerHostEntity( getId(), hostInfo, template.getName(), template
-    // .getArchitecture() );
-    //                containerHostEntity.setEnvironmentId( request.getEnvironmentId() );
-    //                containerHostEntity.setOwnerId( request.getOwnerId() );
-    //                containerHostEntity.setInitiatorPeerId( request.getInitiatorPeerId() );
-    //                containerHostEntity.setContainerType( request.getContainerType() );
-    //
-    //                //TODO: sign container host key with PEK
-    //                resourceHost.addContainerHost( containerHostEntity );
-    //
-    //                resourceHostDataService.saveOrUpdate( resourceHost );
-    //
-    //                quotaManager.setQuota( containerHostEntity.getContainerId(), containerQuota );
-    //                result.add( new ContainerHostInfoModel( hostInfo ) );
-    //            }
-    //            catch ( ExecutionException | InterruptedException | QuotaException e )
-    //            {
-    //                LOG.error( "Error creating container", e );
-    //            }
-    //        }
-    //
-    //        executorService.shutdown();
-    //
-    //        return result;
-    //    }
+        String networkPrefix = cidr.getInfo().getCidrSignature().split( "/" )[1];
+        String[] allAddresses = cidr.getInfo().getAllAddresses();
+        String gateway = cidr.getInfo().getLowAddress();
+        int currentIpAddressOffset = 0;
+
+        List<Future<CreateContainerWrapperTask>> taskFutures = Lists.newArrayList();
+        ExecutorService executorService = getFixedPoolExecutor( request.getNumberOfContainers() );
+
+        Vni environmentVni = findVniByEnvironmentId( request.getEnvironmentId() );
+
+        if ( environmentVni == null )
+        {
+            throw new PeerException(
+                    String.format( "No reserved vni found for environment %s", request.getEnvironmentId() ) );
+        }
+
+        //create containers in parallel on each resource host
+        for ( Map.Entry<ResourceHost, Set<String>> resourceHostDistribution : containerDistribution.entrySet() )
+        {
+            ResourceHostEntity resourceHostEntity = ( ResourceHostEntity ) resourceHostDistribution.getKey();
+
+            for ( String hostname : resourceHostDistribution.getValue() )
+            {
+
+                String ipAddress = allAddresses[request.getIpAddressOffset() + currentIpAddressOffset];
+                taskFutures.add( executorService.submit(
+                        new CreateContainerWrapperTask( resourceHostEntity, request.getTemplateName(), hostname,
+                                String.format( "%s/%s", ipAddress, networkPrefix ), environmentVni.getVlan(),
+                                Common.WAIT_CONTAINER_CONNECTION_SEC, request.getEnvironmentId() ) ) );
+
+                currentIpAddressOffset++;
+            }
+        }
+
+
+        //wait for succeeded containers
+        Set<ContainerHostInfoModel> result = Sets.newHashSet();
+
+        ContainerQuotaHolder containerQuota = quotaManager.getDefaultContainerQuota( request.getContainerType() );
+        if ( containerQuota == null )
+        {
+            LOG.warn( "Quota not found for container type: " + request.getContainerType() );
+            containerQuota = quotaManager.getDefaultContainerQuota( ContainerType.SMALL );
+        }
+
+        for ( Future<CreateContainerWrapperTask> future : taskFutures )
+        {
+            try
+            {
+                CreateContainerWrapperTask task = future.get();
+                ContainerHostInfo hostInfo = task.getHostInfo();
+                ResourceHost resourceHost = task.getResourceHost();
+
+                TemplateKurjun template = getTemplateByName( request.getTemplateName() );
+
+                ContainerHostEntity containerHostEntity =
+                        new ContainerHostEntity( getId(), hostInfo, template.getName(), template.getArchitecture() );
+                containerHostEntity.setEnvironmentId( request.getEnvironmentId() );
+                containerHostEntity.setOwnerId( request.getOwnerId() );
+                containerHostEntity.setInitiatorPeerId( request.getInitiatorPeerId() );
+                containerHostEntity.setContainerType( request.getContainerType() );
+
+                //TODO: sign container host key with PEK
+                resourceHost.addContainerHost( containerHostEntity );
+                signContainerKeyWithPEK( containerHostEntity.getId(), containerHostEntity.getEnvironmentId() );
+
+                resourceHostDataService.saveOrUpdate( resourceHost );
+
+                quotaManager.setQuota( containerHostEntity.getContainerId(), containerQuota );
+                result.add( new ContainerHostInfoModel( hostInfo ) );
+            }
+            catch ( ExecutionException | InterruptedException | QuotaException e )
+            {
+                LOG.error( "Error creating container", e );
+            }
+        }
+
+        executorService.shutdown();
+
+        return result;
+    }
 
 
     protected Map<ResourceHost, Set<String>> distributeContainersToResourceHosts(
@@ -913,7 +815,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Update" )
+    @RolesAllowed( "Environment-Management|Update" )
     @Override
     public void startContainer( final ContainerId containerId ) throws PeerException
     {
@@ -932,7 +834,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Update" )
+    @RolesAllowed( "Environment-Management|Update" )
     @Override
     public void stopContainer( final ContainerId containerId ) throws PeerException
     {
@@ -951,7 +853,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Delete" )
+    @RolesAllowed( "Environment-Management|Delete" )
     @Override
     public void destroyContainer( final ContainerId containerId ) throws PeerException
     {
@@ -976,7 +878,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Delete" )
+    @RolesAllowed( "Environment-Management|Delete" )
     @Override
     public void cleanupEnvironmentNetworkSettings( final EnvironmentId environmentId ) throws PeerException
     {
@@ -994,7 +896,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Delete" )
+    @RolesAllowed( "Environment-Management|Delete" )
     @Override
     public void removePeerEnvironmentKeyPair( final EnvironmentId environmentId ) throws PeerException
     {
@@ -1007,7 +909,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Write" )
+    @RolesAllowed( "Environment-Management|Write" )
     @Override
     public void setDefaultGateway( final ContainerGateway gateway ) throws PeerException
     {
@@ -1298,7 +1200,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Update" )
+    @RolesAllowed( "Environment-Management|Update" )
     @Override
     public void setCpuSet( final ContainerHost host, final Set<Integer> cpuSet ) throws PeerException
     {
@@ -1316,7 +1218,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Delete" )
+    @RolesAllowed( "Environment-Management|Delete" )
     @Override
     public ContainersDestructionResult destroyContainersByEnvironment( final String environmentId ) throws PeerException
     {
@@ -1348,7 +1250,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Delete" )
+    @RolesAllowed( "Environment-Management|Delete" )
     private Set<ContainerHost> destroyContainerGroup( final Set<ContainerHost> containerHosts,
                                                       final Set<Throwable> errors )
     {
@@ -1408,7 +1310,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Write" )
+    @RolesAllowed( "Environment-Management|Write" )
     @Override
     public Vni reserveVni( final Vni vni ) throws PeerException
     {
@@ -1474,7 +1376,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Delete" )
+    @RolesAllowed( "Environment-Management|Delete" )
     @Override
     public void removeVniDomain( final Long vni ) throws PeerException
     {
@@ -1499,7 +1401,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Update" )
+    @RolesAllowed( "Environment-Management|Update" )
     @Override
     public void setVniDomain( final Long vni, final String domain,
                               final DomainLoadBalanceStrategy domainLoadBalanceStrategy, final String sslCertPath )
@@ -1551,7 +1453,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Update" )
+    @RolesAllowed( "Environment-Management|Update" )
     @Override
     public void addIpToVniDomain( final String hostIp, final Long vni ) throws PeerException
     {
@@ -1576,7 +1478,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Update" )
+    @RolesAllowed( "Environment-Management|Update" )
     @Override
     public void removeIpFromVniDomain( final String hostIp, final Long vni ) throws PeerException
     {
@@ -1602,7 +1504,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Update" )
+    @RolesAllowed( "Environment-Management|Update" )
     @Override
     public int setupContainerSsh( final String containerHostId, final int sshIdleTimeout ) throws PeerException
     {
@@ -1691,9 +1593,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     /* ***********************************************
      *  Create PEK
      */
-    @RolesAllowed( "Environment-Management|A|Write" )
+    @RolesAllowed( "Environment-Management|Write" )
     @Override
-    public PublicKeyContainer createPeerEnvironmentKeyPair( EnvironmentId envId/*, String userToken*/ ) throws PeerException
+    public PublicKeyContainer createPeerEnvironmentKeyPair( EnvironmentId envId ) throws PeerException
     {
         KeyManager keyManager = securityManager.getKeyManager();
         EncryptionTool encTool = securityManager.getEncryptionTool();
@@ -1714,10 +1616,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             pubRing =
                     securityManager.getKeyManager().setKeyTrust( peerSecKeyRing, pubRing, KeyTrustLevel.Full.getId() );
 
-
-
             return new PublicKeyContainer( getId(), pubRing.getPublicKey().getFingerprint(),
-                    encTool.armorByteArrayToString( pubRing.getEncoded() ));
+                    encTool.armorByteArrayToString( pubRing.getEncoded() ) );
         }
         catch ( IOException | PGPException ex )
         {
@@ -1741,7 +1641,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Update" )
+    @RolesAllowed( "Environment-Management|Update" )
     @Override
     public void setupN2NConnection( final N2NConfig config ) throws PeerException
     {
@@ -1867,7 +1767,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Delete" )
+    @RolesAllowed( "Environment-Management|Delete" )
     @Override
     public void removeN2NConnection( final EnvironmentId environmentId ) throws PeerException
     {
@@ -1903,7 +1803,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Write" )
+    @RolesAllowed( "Environment-Management|Write" )
     @Override
     public void createGateway( final Gateway gateway ) throws PeerException
     {
@@ -2206,7 +2106,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|A|Write" )
+    @RolesAllowed( "Environment-Management|Write" )
     @Override
     public int setupTunnels( final Map<String, String> peerIps, final String environmentId ) throws PeerException
     {
