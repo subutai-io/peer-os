@@ -447,7 +447,8 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
                     ])
                 }]
             }
-        });
+        })
+		.state();
 
 	$httpProvider.interceptors.push(function($q, $location) {
 		return {
