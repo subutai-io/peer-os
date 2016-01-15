@@ -2,20 +2,18 @@ package io.subutai.core.peer.rest.ui;
 
 
 import java.util.List;
-import java.util.Set;
 
-import io.subutai.common.host.ResourceHostInfo;
-import io.subutai.common.peer.*;
-import io.subutai.common.util.JsonUtil;
-import io.subutai.core.hostregistry.api.HostRegistry;
-import io.subutai.core.peer.api.PeerManager;
+import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.core.Response;
-
 import com.google.common.base.Preconditions;
+
+import io.subutai.common.peer.RegistrationData;
+import io.subutai.common.util.JsonUtil;
+import io.subutai.core.hostregistry.api.HostRegistry;
+import io.subutai.core.peer.api.PeerManager;
 
 
 public class RestServiceImpl implements RestService
@@ -58,7 +56,7 @@ public class RestServiceImpl implements RestService
         {
             peerManager.doRegistrationRequest( ip, keyPhrase );
         }
-        catch ( PeerException e )
+        catch ( Exception e )
         {
             return Response.status( Response.Status.BAD_REQUEST ).entity( e.getMessage() ).build();
         }
@@ -79,7 +77,7 @@ public class RestServiceImpl implements RestService
         {
             peerManager.doRejectRequest( data );
         }
-        catch ( PeerException e )
+        catch ( Exception e )
         {
             return Response.status( Response.Status.BAD_REQUEST ).entity( e.getMessage() ).build();
         }
@@ -100,7 +98,7 @@ public class RestServiceImpl implements RestService
         {
             peerManager.doApproveRequest( keyPhrase, data );
         }
-        catch ( PeerException e )
+        catch ( Exception e )
         {
             return Response.status( Response.Status.BAD_REQUEST ).entity( e.getMessage() ).build();
         }
@@ -121,7 +119,7 @@ public class RestServiceImpl implements RestService
         {
             peerManager.doCancelRequest( data );
         }
-        catch ( PeerException e )
+        catch ( Exception e )
         {
             return Response.status( Response.Status.BAD_REQUEST ).entity( e.getMessage() ).build();
         }
@@ -142,7 +140,7 @@ public class RestServiceImpl implements RestService
         {
             peerManager.doUnregisterRequest( data );
         }
-        catch ( PeerException e )
+        catch ( Exception e )
         {
             return Response.status( Response.Status.BAD_REQUEST ).entity( e.getMessage() ).build();
         }
@@ -154,7 +152,6 @@ public class RestServiceImpl implements RestService
     @Override
     public Response getResourceHosts()
     {
-        Set<ResourceHostInfo> reply = hostRegistry.getResourceHostsInfo();
         return Response.ok().entity( JsonUtil.toJson( hostRegistry.getResourceHostsInfo() ) ).build();
     }
 }
