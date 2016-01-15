@@ -420,6 +420,14 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 				}]
 			}
 		})
+		.state('404', {
+			url: '/404',
+			templateUrl: 'subutai-app/common/partials/404.html',
+			data: {
+				bodyClass: 'b-body',
+				layout: 'fullpage'
+			}
+		})
 		.state('about', {
 			url: '/about',
 			templateUrl: 'subutai-app/about/partials/view.html',
@@ -463,21 +471,13 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 					]);
 				}]
 			}
-		})
-		.state('404', {
-			url: '/404',
-			templateUrl: 'subutai-app/common/partials/404.html',
-			data: {
-				bodyClass: 'b-body',
-				layout: 'fullpage'
-			}
 		});
 
 	$httpProvider.interceptors.push(function($q, $location) {
 		return {
 			'responseError': function(rejection) {
 				if (rejection.status == 401 && $.inArray($location.path(), ['/login']) === -1) {
-					//$location.path('/login');
+					$location.path('/login');
 				}
 				return $q.reject(rejection);
 			}
@@ -486,8 +486,6 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 }
 
 function startup($rootScope, $state, $location, $http) {
-
-//	$http.defaults.headers.common['sptoken'] = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlMmFhNTliMS0wZDQyLTQzMzYtYjM3Yy0zNDA0ZGEzNWFlYzgiLCJpc3MiOiJpby5zdWJ1dGFpIn0.2ZUDC8mQcpsRQhDslqktuTBBP9daUKdo6iB8Zz3GRPU';
 
 	$rootScope.$on('$stateChangeStart',	function(event, toState, toParams, fromState, fromParams){
 		LOADING_SCREEN('none');
