@@ -2,7 +2,6 @@ package io.subutai.core.channel.impl.util;
 
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
@@ -25,9 +24,9 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 import io.subutai.common.settings.ChannelSettings;
+import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
-import io.subutai.core.security.api.SecurityManager;
 
 
 /**
@@ -72,7 +71,7 @@ public class MessageContentUtil
         }
         catch ( Exception e )
         {
-            //gnore
+            //ignore
             LOG.error( "Error writing to response: " + e.toString(), e );
         }
 
@@ -150,13 +149,9 @@ public class MessageContentUtil
                 LOG.debug( "Decrypted data is NULL!!!" );
             }
         }
-        catch ( IOException e )
+        catch ( Exception e )
         {
-
-        }
-        catch ( PGPException pe )
-        {
-
+            LOG.error("Error decrypting content", e);
         }
     }
 
@@ -258,13 +253,9 @@ public class MessageContentUtil
 
             org.apache.commons.io.IOUtils.closeQuietly( os );
         }
-        catch ( IOException ioe )
+        catch ( Exception ioe )
         {
             throw new RuntimeException( ioe );
-        }
-        catch ( PGPException pe )
-        {
-
         }
     }
 
