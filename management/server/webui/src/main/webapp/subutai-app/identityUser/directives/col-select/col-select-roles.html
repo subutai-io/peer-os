@@ -1,7 +1,7 @@
 <div class="b-popup-body-list-title ">All roles</div>
 <ul class="b-popup-body-list b-popup-body-list_table">
 	<li class="b-popup-body-list-table__link" 
-	ng-repeat="role in identityUserFormCtrl.roles" 
+	ng-repeat="role in identityUserFormCtrl.roles"
 	ng-if="(identityUserFormCtrl.user2Add.roles === undefined || identityUserFormCtrl.user2Add.roles.indexOf(role.id) < 0)" 
 	ng-click="identityUserFormCtrl.colSelectUserRole(role.id)">
 		{{ role.name }}

@@ -52,7 +52,7 @@ function BlueprintsBuildCtrl($scope, environmentService, SweetAlert, ngDialog, $
 			vm.transportNodes[i].options = {
 				start: vm.transportNodes[i].numberOfContainers, 
 				range: {
-					min: minSlider, 
+					min: minSlider,
 					max: vm.transportNodes[i].numberOfContainers
 				}, 
 				step: 1,
@@ -145,7 +145,7 @@ function BlueprintsBuildCtrl($scope, environmentService, SweetAlert, ngDialog, $
 			var temp = angular.copy(node);
 			temp.parentNode = parentKey;
 			temp.placement = angular.copy(vm.buildWith);
-			temp.numberOfContainers = node.options.start;			
+			temp.numberOfContainers = node.options.start;
 			vm.nodesToCreate.push(temp);
 		}
 
@@ -174,7 +174,7 @@ function BlueprintsBuildCtrl($scope, environmentService, SweetAlert, ngDialog, $
 				if(
 					currentNode.peer == node.peer && 
 					currentNode.name == node.name && 
-					currentNode.createOption == node.createOption && 
+					currentNode.createOption == node.createOption &&
 					currentNode.templateName == node.templateName
 				) {
 					return i;
@@ -249,11 +249,11 @@ function BlueprintsBuildCtrl($scope, environmentService, SweetAlert, ngDialog, $
 	function buildBlueprint(){
 		if(vm.newEnvironmentName === undefined || vm.newEnvironmentName.length < 1) return;
 
-		var postJson = {};
-		postJson.nodeGroups = getNodesGroups();
-		postJson.name = vm.newEnvironmentName;
+		var blueprint = {};
+		blueprint.nodeGroups = getNodesGroups();
+		blueprint.name = vm.newEnvironmentName;
 
-		var postData = JSON.stringify(postJson);
+		var blueprintJson = JSON.stringify(blueprint);
 
 		SweetAlert.swal(
 			{
@@ -265,10 +265,10 @@ function BlueprintsBuildCtrl($scope, environmentService, SweetAlert, ngDialog, $
 		);
 
 		ngDialog.closeAll();
-		$location.path('/environments');
 
-		environmentService.createEnvironment(encodeURI(postData)).success(function (data) {
+		environmentService.setupRequisites(encodeURI(blueprintJson)).success(function (data) {
 			SweetAlert.swal("Success!", "Your environment has been created.", "success");
+			$location.path('/environments/pending');
 		}).error(function (error) {
 			SweetAlert.swal("ERROR!", 'Create environment error: ' + error.ERROR, "error");
 		});
