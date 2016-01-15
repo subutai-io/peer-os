@@ -73,6 +73,8 @@ public class MessageEncryptor implements TextMessagePostProcessor
                 PGPPublicKey hostKeyForEncrypting =
                         MessageEncryptor.getSecurityManager().getKeyManager().getPublicKey( originalRequest.getId() );
 
+
+                //TODO move container token out to LocalPeer
                 if ( originalRequest.getCommand().toLowerCase().matches( CLONE_CMD_REGEX ) )
                 {
 
