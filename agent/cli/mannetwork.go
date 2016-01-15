@@ -28,9 +28,9 @@ func LxcManagementNetwork(args []string) {
 		net.PrintN2NTunnels()
 	case "-D", "--deletegateway":
 		net.DeleteGateway(args[3])
-	case "-S", "--listopenedtab":
+	case "-S", "--listopenedtap":
 		net.ListTapDevice()
-	case "-V", "--removetab":
+	case "-V", "--removetap":
 		removeTapDevice(args[3])
 	case "-v", "--listvnimap":
 		listVNIMap()

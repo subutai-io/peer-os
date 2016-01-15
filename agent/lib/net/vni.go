@@ -1,13 +1,16 @@
 package net
 
 import (
+	"bufio"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 	"subutai/config"
 	"subutai/log"
+	"syscall"
 )
 
 func CreateVNIFile(name string) {
@@ -144,22 +147,16 @@ func ListVNI() {
 }
 
 func DeleteAllVNI(vlan string) {
-	if _, err := os.Stat(config.Agent.DataPrefix + "/var/subutai-network/vni_reserve"); os.IsNotExist(err) {
-		log.Error(config.Agent.DataPrefix + "/var/subutai-network/vni_reserve does not exist " + err.Error())
-	}
-
 	f, err := ioutil.ReadFile(config.Agent.DataPrefix + "/var/subutai-network/vni_reserve")
-	log.Check(log.ErrorLevel, "Reading "+config.Agent.DataPrefix+"/var/subutai-network/vni_reserve", err)
-
-	for _, v := range strings.Split(string(f), "\n") {
-		s := strings.Fields(v)
-		if len(s) > 2 && s[1] == vlan {
-			DeleteVNI(s[0], s[1], s[2])
-			break
+	if !log.Check(log.DebugLevel, "Reading "+config.Agent.DataPrefix+"/var/subutai-network/vni_reserve", err) {
+		for _, v := range strings.Split(string(f), "\n") {
+			s := strings.Fields(v)
+			if len(s) > 2 && s[1] == vlan {
+				DeleteVNI(s[0], s[1], s[2])
+				break
+			}
 		}
 	}
-
-	log.Info("All VNI's deleted.")
 }
 
 func DeleteVNI(vni, vlan, envid string) {
@@ -175,11 +172,24 @@ func DeleteVNI(vni, vlan, envid string) {
 	lines = strings.Split(string(f), "\n")
 	for k, v := range lines {
 		if v == vni+" "+vlan+" "+envid {
+			pid, _ := strconv.Atoi(ReturnPID("p2p", envid))
+			newconf := ""
+			log.Check(log.WarnLevel, "remove n2n tunnel: ", syscall.Kill(pid, syscall.SIGHUP))
+			file, err := os.Open(config.Agent.DataPrefix + "/var/subutai-network/p2p.txt")
+			if !log.Check(log.WarnLevel, "Opening p2p.txt", err) {
+				scanner := bufio.NewScanner(bufio.NewReader(file))
+				for scanner.Scan() {
+					line := scanner.Text()
+					if strings.HasSuffix(line, envid) {
+						newconf = newconf + line + "\n"
+					}
+				}
+				file.Close()
+				log.Check(log.FatalLevel, "Removing p2p tunnel", ioutil.WriteFile(config.Agent.DataPrefix+"/var/subutai-network/p2p.txt", []byte(newconf), 0644))
+			}
 			lines[k] = ""
 		}
 	}
 	err = ioutil.WriteFile(config.Agent.DataPrefix+"/var/subutai-network/vni_reserve", []byte(strings.Join(lines, "\n")), 0744)
 	log.Check(log.FatalLevel, "config.Agent.DataPrefix + /var/subutai-network/vni_reserve delete vni", err)
-
-	log.Info(vni + " " + vlan + " " + envid + " deleted")
 }
