@@ -2,6 +2,7 @@ package io.subutai.core.environment.api;
 
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -21,6 +22,7 @@ import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentAlertHandlers;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
+import io.subutai.core.environment.api.ShareDto.ShareDto;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
@@ -38,6 +40,13 @@ public interface EnvironmentManager
      * @return - set of {@code Environment}
      */
     Set<Environment> getEnvironments();
+
+
+    Environment setupRequisites( Blueprint blueprint ) throws EnvironmentCreationException;
+
+
+    Environment startEnvironmentBuild( String environmentId, String signedMessage, boolean async )
+            throws EnvironmentCreationException;
 
     /**
      * Creates environment based on a passed topology
@@ -267,9 +276,13 @@ public interface EnvironmentManager
     EnvironmentAlertHandlers getEnvironmentAlertHandlers( EnvironmentId environmentId )
             throws EnvironmentNotFoundException;
 
-    void startMonitoring( String handlerId, AlertHandlerPriority handlerPriority, String environmentId ) throws
-            EnvironmentManagerException;
+    void startMonitoring( String handlerId, AlertHandlerPriority handlerPriority, String environmentId )
+            throws EnvironmentManagerException;
 
-    void stopMonitoring( String handlerId, AlertHandlerPriority handlerPriority, String environmentId ) throws
-            EnvironmentManagerException;
+    void stopMonitoring( String handlerId, AlertHandlerPriority handlerPriority, String environmentId )
+            throws EnvironmentManagerException;
+
+    List<ShareDto> getSharedUsers( String objectId );
+
+    void shareEnvironment( ShareDto[] shareDto, String environmentId );
 }

@@ -666,6 +666,14 @@ tooltip:last-child tip-cont .b-icon {
     transform: rotateY(360deg);
 }
 
+.b-icon_share {
+    background-image: url('../assets/elements/buttons/Share_icon.svg');
+}
+
+.b-icon_share:hover {
+    transform: rotate(-30deg);
+}
+
 .b-icon_build {
     background-image: url('../assets/elements/buttons/b-icon-build.svg');
 }
@@ -1238,7 +1246,7 @@ td.b-main-table__status-col {
 
 .b-workspace-content__row {
     position: relative;
-    overflow: hidden;
+    /*overflow: hidden;*/
     margin-bottom: 20px;
 }
 

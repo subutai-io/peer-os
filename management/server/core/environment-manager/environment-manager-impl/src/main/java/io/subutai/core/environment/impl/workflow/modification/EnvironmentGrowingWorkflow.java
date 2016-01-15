@@ -160,7 +160,8 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
 
         try
         {
-            new ContainerCloneStep( templateRegistry, defaultDomain, topology, environment, peerManager.getLocalPeer() )
+            new ContainerCloneStep( templateRegistry, defaultDomain, topology, environment, peerManager.getLocalPeer(),
+                    environmentManager )
                     .execute();
 
             environment = environmentManager.saveOrUpdate( environment );

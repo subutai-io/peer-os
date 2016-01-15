@@ -1,13 +1,11 @@
 package io.subutai.core.identity.api;
 
 
-import java.security.PrivilegedAction;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
 
 import javax.annotation.security.PermitAll;
-import javax.annotation.security.RolesAllowed;
 
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.objects.PermissionOperation;
@@ -74,6 +72,11 @@ public interface IdentityManager
 
     /* *************************************************
      */
+    List<User> getAllSystemUsers();
+
+
+    /* *************************************************
+     */
     void assignUserRole( long userId, Role role );
 
 
@@ -105,7 +108,17 @@ public interface IdentityManager
     /* *************************************************
      *
      */
-    User createUser( String userName, String password, String fullName, String email, int type );
+    void approveUser(String userName,List<Role>roles);
+    /* *************************************************
+     *
+     */
+
+    User signUp( String username, String pwd, String fullName, String email, String keyAscii );
+    /* *************************************************
+     *
+     */
+
+    User createUser( String userName, String password, String fullName, String email, int type, String publicKey, boolean isApproved );
 
 
     /* *************************************************
@@ -219,4 +232,9 @@ public interface IdentityManager
     /* *************************************************
      */
     void removeUserToken( String tokenId );
+
+
+
+
+
 }
