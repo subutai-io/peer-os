@@ -109,6 +109,7 @@ import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.localpeer.impl.command.CommandRequestListener;
+import io.subutai.core.localpeer.impl.container.CreateContainerWrapperTask;
 import io.subutai.core.localpeer.impl.container.CreateEnvironmentContainerGroupRequestListener;
 import io.subutai.core.localpeer.impl.container.DestroyContainerWrapperTask;
 import io.subutai.core.localpeer.impl.container.DestroyEnvironmentContainerGroupRequestListener;
@@ -132,6 +133,7 @@ import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.strategy.api.StrategyManager;
+import io.subutai.core.strategy.api.StrategyNotFoundException;
 
 //import io.subutai.core.localpeer.impl.dao.ManagementHostDataService;
 
@@ -428,6 +430,26 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
+    private void signContainerKeyWithPEK( String containerId, EnvironmentId envId ) throws PeerException
+    {
+        String pairId = String.format( "%s-%s", getId(), envId.getId() );
+        final PGPSecretKeyRing pekSecKeyRing = securityManager.getKeyManager().getSecretKeyRing( pairId );
+        try
+        {
+            PGPPublicKeyRing containerPub = securityManager.getKeyManager().getPublicKeyRing( containerId );
+
+            PGPPublicKeyRing signedKey = securityManager.getKeyManager().setKeyTrust( pekSecKeyRing, containerPub,
+                    KeyTrustLevel.Full.getId() );
+
+            securityManager.getKeyManager().updatePublicKeyRing( signedKey );
+        }
+        catch ( Exception ex )
+        {
+            throw new PeerException( ex );
+        }
+    }
+
+
     private Set<ContainerHostInfoModel> createByStrategy( final CreateEnvironmentContainerGroupRequest request )
             throws PeerException
     {
@@ -492,11 +514,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         //wait for succeeded containers
         Set<ContainerHostInfoModel> result = Sets.newHashSet();
 
-        ContainerQuotaHolder containerQuota = quotaManager.getDefaultContainerQuota( request.getContainerType() );
+        ContainerQuota containerQuota = quotaManager.getDefaultContainerQuota( request.getContainerSize() );
         if ( containerQuota == null )
         {
-            LOG.warn( "Quota not found for container type: " + request.getContainerType() );
-            containerQuota = quotaManager.getDefaultContainerQuota( ContainerType.SMALL );
+            LOG.warn( "Quota not found for container type: " + request.getContainerSize() );
+            containerQuota = quotaManager.getDefaultContainerQuota( ContainerSize.SMALL );
         }
 
         for ( Future<CreateContainerWrapperTask> future : taskFutures )
@@ -514,7 +536,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 containerHostEntity.setEnvironmentId( request.getEnvironmentId() );
                 containerHostEntity.setOwnerId( request.getOwnerId() );
                 containerHostEntity.setInitiatorPeerId( request.getInitiatorPeerId() );
-                containerHostEntity.setContainerType( request.getContainerType() );
+                containerHostEntity.setContainerSize( request.getContainerSize() );
 
                 //TODO: sign container host key with PEK
                 resourceHost.addContainerHost( containerHostEntity );

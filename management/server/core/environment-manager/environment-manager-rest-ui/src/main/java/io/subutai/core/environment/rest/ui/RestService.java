@@ -12,10 +12,8 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.UUID;
 
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
@@ -68,7 +66,7 @@ public interface RestService
 
     @PUT
     @Path( "{environmentId}/revoke" )
-    Response accessStatus( @PathParam( "environmentId" ) String environmentId);
+    Response accessStatus( @PathParam( "environmentId" ) String environmentId );
 
     @POST
     @Path( "requisites" )
@@ -267,6 +265,4 @@ public interface RestService
     @POST
     @Path( "share" )
     Response shareEnvironment( @FormParam( "users" ) String users, @FormParam( "environmentId" ) String environmentId );
-    Response setupContainerSsh( @PathParam( "environmentId" ) String environmentId,
-                                @PathParam( "containerId" ) String containerId );
 }

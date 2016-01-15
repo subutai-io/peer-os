@@ -1059,7 +1059,7 @@ public class RestServiceImpl implements RestService
 
             containerDtos.add( new ContainerDto( containerHost.getId(), containerHost.getEnvironmentId().getId(),
                     containerHost.getHostname(), state, iface.getIp(), iface.getMac(), containerHost.getTemplateName(),
-                    containerHost.getContainerType(), containerHost.getArch().toString(), containerHost.getTags() ) );
+                    containerHost.getContainerSize(), containerHost.getArch().toString(), containerHost.getTags() ) );
         }
         return containerDtos;
     }
