@@ -39,7 +39,7 @@ public interface RestService
     Response addEnvironmentDomain( @Multipart( "environmentId" ) String environmentId,
                                    @Multipart( "hostName" ) String hostName,
                                    @Multipart( "strategy" ) DomainLoadBalanceStrategy strategy,
-                                   @Multipart(value = "file") Attachment attr );
+                                   @Multipart( value = "file" ) Attachment attr );
 
     @GET
     @Path( "container/environmentId" )

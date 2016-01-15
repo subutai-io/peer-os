@@ -12,9 +12,10 @@ import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.host.ResourceHostInfoModel;
 import io.subutai.common.metric.ExceededQuota;
 import io.subutai.common.metric.QuotaAlertValue;
-import io.subutai.common.resource.MeasureUnit;
-import io.subutai.common.resource.ResourceType;
-import io.subutai.common.resource.ResourceValue;
+import io.subutai.common.resource.ByteUnit;
+import io.subutai.common.resource.ContainerResourceType;
+import io.subutai.common.resource.ByteValueResource;
+import io.subutai.common.resource.NumericValueResource;
 
 
 /**
@@ -58,9 +59,9 @@ public class HeartBeat
             {
 
                 QuotaAlertValue cpuAlert = new QuotaAlertValue(
-                        new ExceededQuota( new HostId( a.getId() ), ResourceType.CPU,
-                                new ResourceValue( a.getCpu().getCurrent(), MeasureUnit.PERCENT ),
-                                new ResourceValue( a.getCpu().getQuota(), MeasureUnit.PERCENT ) ) );
+                        new ExceededQuota( new HostId( a.getId() ), ContainerResourceType.CPU,
+                                new NumericValueResource( a.getCpu().getCurrent() ),
+                                new NumericValueResource( a.getCpu().getQuota() ) ) );
                 alerts.add( cpuAlert );
             }
             catch ( Exception e )
@@ -78,9 +79,9 @@ public class HeartBeat
             try
             {
                 QuotaAlertValue ramAlert = new QuotaAlertValue(
-                        new ExceededQuota( new HostId( a.getId() ), ResourceType.RAM,
-                                new ResourceValue( a.getRam().getCurrent(), MeasureUnit.MB ),
-                                new ResourceValue( a.getRam().getQuota(), MeasureUnit.MB ) ) );
+                        new ExceededQuota( new HostId( a.getId() ), ContainerResourceType.RAM,
+                                new ByteValueResource( a.getRam().getCurrent(), ByteUnit.MB ),
+                                new ByteValueResource( a.getRam().getQuota(), ByteUnit.MB ) ) );
 
                 alerts.add( ramAlert );
             }
@@ -99,9 +100,9 @@ public class HeartBeat
             try
             {
                 QuotaAlertValue cpuAlert = new QuotaAlertValue(
-                        new ExceededQuota( new HostId( a.getId() ), ResourceType.RAM,
-                                new ResourceValue( a.getRam().getCurrent(), MeasureUnit.MB ),
-                                new ResourceValue( a.getRam().getQuota(), MeasureUnit.MB ) ) );
+                        new ExceededQuota( new HostId( a.getId() ), ContainerResourceType.RAM,
+                                new ByteValueResource( a.getRam().getCurrent(), ByteUnit.MB ),
+                                new ByteValueResource( a.getRam().getQuota(), ByteUnit.MB ) ) );
                 alerts.add( cpuAlert );
             }
             catch ( Exception e )

@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -41,13 +42,15 @@ import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.mdc.SubutaiExecutors;
 import io.subutai.common.metric.AlertValue;
+import io.subutai.common.metric.ResourceHostMetric;
+import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.AlertHandler;
 import io.subutai.common.peer.AlertHandlerPriority;
 import io.subutai.common.peer.AlertListener;
 import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.peer.ContainerType;
+import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentAlertHandler;
 import io.subutai.common.peer.EnvironmentAlertHandlers;
 import io.subutai.common.peer.EnvironmentContainerHost;
@@ -87,6 +90,9 @@ import io.subutai.core.peer.api.PeerActionListener;
 import io.subutai.core.peer.api.PeerActionResponse;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
+import io.subutai.core.strategy.api.ContainerPlacementStrategy;
+import io.subutai.core.strategy.api.StrategyManager;
+import io.subutai.core.strategy.api.StrategyNotFoundException;
 import io.subutai.core.tracker.api.Tracker;
 
 
@@ -118,12 +124,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     protected ExceptionUtil exceptionUtil = new ExceptionUtil();
     protected Map<String, AlertHandler> alertHandlers = new ConcurrentHashMap<>();
+//    private StrategyManager strategyManager;
 
 
     public EnvironmentManagerImpl( final TemplateManager templateRegistry, final PeerManager peerManager,
                                    SecurityManager securityManager, final NetworkManager networkManager,
                                    final DaoManager daoManager, final IdentityManager identityManager,
-                                   final Tracker tracker )
+                                   /*final StrategyManager strategyManager,*/ final Tracker tracker )
     {
         Preconditions.checkNotNull( templateRegistry );
         Preconditions.checkNotNull( peerManager );
@@ -131,6 +138,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         Preconditions.checkNotNull( daoManager );
         Preconditions.checkNotNull( identityManager );
         Preconditions.checkNotNull( securityManager );
+//        Preconditions.checkNotNull( strategyManager );
         Preconditions.checkNotNull( tracker );
 
         this.templateRegistry = templateRegistry;
@@ -139,6 +147,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         this.networkManager = networkManager;
         this.daoManager = daoManager;
         this.identityManager = identityManager;
+//        this.strategyManager = strategyManager;
         this.tracker = tracker;
     }
 
@@ -277,14 +286,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             for ( ContainerHostInfo newHost : entry.getValue() )
             {
-                ContainerType containerType = entry.getKey().getType();
+                ContainerSize containerSize = entry.getKey().getType();
 
                 environment.addContainers( Sets.newHashSet(
                         new EnvironmentContainerImpl( peerManager.getLocalPeer().getId(), peerManager.getLocalPeer(),
                                 entry.getKey().getName(), new ContainerHostInfoModel( newHost ),
                                 templateRegistry.getTemplate( entry.getKey().getTemplateName() ),
                                 entry.getKey().getSshGroupId(), entry.getKey().getHostsGroupId(),
-                                Common.DEFAULT_DOMAIN_NAME, containerType ) ) );
+                                Common.DEFAULT_DOMAIN_NAME, containerSize ) ) );
             }
         }
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
@@ -374,6 +383,39 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             }
         }
 
+
+//        if ( blueprint.getDistributionType() == ContainerDistributionType.AUTO )
+//        {
+//            try
+//            {
+//                String strategyId = blueprint.getStrategyId();
+//                ContainerPlacementStrategy placementStrategy = strategyManager.findStrategyById( strategyId );
+//                final List<ResourceHostMetric> resourceHostMetrics = new ArrayList<>();
+//                Set<String> peers = blueprint.getPeers();
+//                for ( String peerId : peers )
+//                {
+//                    ResourceHostMetrics metrics = peerManager.getPeer( peerId ).getResourceHostMetrics();
+//                    resourceHostMetrics.addAll( metrics.getResourceLimits() );
+//                }
+//                // distribute blueprint to resources hosts
+////                placementStrategy.distribute( blueprint, resourceHostMetrics );
+//            }
+//            catch ( StrategyNotFoundException e )
+//            {
+//                throw new EnvironmentCreationException(
+//                        String.format( "No such container placement strategy: '%s'", e.getMessage() ) );
+//            }
+//            catch ( PeerException e )
+//            {
+//                throw new EnvironmentCreationException(
+//                        String.format( "Error on getting peer resources: '%s'", e.getMessage() ) );
+//            }
+//        }
+
+        if ( !blueprint.isDistributed() )
+        {
+            throw new EnvironmentCreationException( "Node groups does not distributed." );
+        }
         String cidr = calculateCidr( blueprint );
 
         String environmentId = UUID.randomUUID().toString();
@@ -405,7 +447,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             public void run()
             {
                 notifyOnEnvironmentCreated( environment );
-                LOG.error( "Environment successfully created: " + environment.getEnvironmentId() );
+                LOG.info( "Environment successfully created: " + environment.getEnvironmentId() );
             }
         } );
 

@@ -22,7 +22,7 @@ import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.host.HostInterface;
-import io.subutai.common.peer.ContainerType;
+import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Peer;
@@ -85,7 +85,7 @@ public class RestServiceImplTest
         when( containerHost.getInterfaceByName( anyString() ) ).thenReturn( netIntf );
         when( containerHost.getTemplateName() ).thenReturn( TestUtil.TEMPLATE_NAME );
         when( containerHost.getState() ).thenReturn( TestUtil.CONTAINER_STATE );
-        when( containerHost.getContainerType() ).thenReturn( ContainerType.LARGE );
+        when( containerHost.getContainerSize() ).thenReturn( ContainerSize.LARGE );
         when( environmentManager.getEnvironments() ).thenReturn( Sets.newHashSet( environment ) );
         when( environmentManager.loadEnvironment( TestUtil.ENV_ID ) ).thenReturn( environment );
         when( environment.getContainerHostById( TestUtil.CONTAINER_ID ) ).thenReturn( containerHost );

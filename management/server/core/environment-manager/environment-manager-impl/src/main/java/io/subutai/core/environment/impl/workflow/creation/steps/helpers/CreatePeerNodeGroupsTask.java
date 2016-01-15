@@ -14,7 +14,7 @@ import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.host.ContainerHostInfoModel;
-import io.subutai.common.peer.ContainerType;
+import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.util.ExceptionUtil;
@@ -61,7 +61,7 @@ public class CreatePeerNodeGroupsTask implements Callable<Set<NodeGroupBuildResu
         {
             LOG.debug( String.format( "Scheduling on %s %s %s", nodeGroup.getPeerId(), nodeGroup.getName(),
                     nodeGroup.getContainerDistributionType() ) );
-            ContainerType containerType = nodeGroup.getType();
+            ContainerSize containerSize = nodeGroup.getType();
             NodeGroupBuildException exception = null;
             Set<EnvironmentContainerImpl> containers = Sets.newHashSet();
             try
@@ -93,7 +93,7 @@ public class CreatePeerNodeGroupsTask implements Callable<Set<NodeGroupBuildResu
 
                     containers.add( new EnvironmentContainerImpl( localPeer.getId(), peer, nodeGroup.getName(), newHost,
                             templateRegistry.getTemplate( nodeGroup.getTemplateName() ), nodeGroup.getSshGroupId(),
-                            nodeGroup.getHostsGroupId(), defaultDomain, containerType ) );
+                            nodeGroup.getHostsGroupId(), defaultDomain, containerSize ) );
                 }
 
                 if ( containers.size() < nodeGroup.getNumberOfContainers() )

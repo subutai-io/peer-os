@@ -12,9 +12,9 @@ import io.subutai.common.metric.QuotaAlert;
 import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.resource.MeasureUnit;
-import io.subutai.common.resource.ResourceType;
-import io.subutai.common.resource.ResourceValue;
+import io.subutai.common.resource.ByteUnit;
+import io.subutai.common.resource.ContainerResourceType;
+import io.subutai.common.resource.ByteValueResource;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 
 
@@ -35,10 +35,11 @@ public class PutAlertCommand extends SubutaiShellCommandSupport
     protected Object doExecute() throws Exception
     {
         QuotaAlertValue alertValue = new QuotaAlertValue(
-                new ExceededQuota( new HostId( "hostId" ), ResourceType.RAM, new ResourceValue( "1.1", MeasureUnit.MB ),
-                        new ResourceValue( "2.2", MeasureUnit.MB ) ) );
+                new ExceededQuota( new HostId( "hostId" ), ContainerResourceType.RAM,
+                        new ByteValueResource( ByteValueResource.toBytes( "1.1", ByteUnit.MB ) ),
+                        new ByteValueResource( ByteValueResource.toBytes( "2.2", ByteUnit.MB ) ) ) );
         QuotaAlert value = new QuotaAlert( alertValue, System.currentTimeMillis() );
-        AlertEvent alertEvent = new AlertEvent( localPeer.getId(), "enironmentId", "containerId", "master", value,
+        AlertEvent alertEvent = new AlertEvent( localPeer.getId(), "environmentId", "containerId", "master", value,
                 DateUtils.addMinutes( new Date(), 1 ).getTime() );
         localPeer.alert( alertEvent );
         return null;

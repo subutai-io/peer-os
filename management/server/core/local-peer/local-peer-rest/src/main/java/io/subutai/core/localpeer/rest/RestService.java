@@ -88,7 +88,8 @@ public interface RestService
     @Path( "pek" )
     @Produces( MediaType.APPLICATION_JSON )
     @Consumes( MediaType.APPLICATION_JSON )
-    PublicKeyContainer createEnvironmentKeyPair( EnvironmentId environmentId );
+    PublicKeyContainer createEnvironmentKeyPair( /*@PathParam( "userToken" ) String userToken,*/
+                                                 EnvironmentId environmentId );
 
     @PUT
     @Path( "pek" )
@@ -152,4 +153,10 @@ public interface RestService
     Response getHistoricalMetrics( @PathParam( "hostname" ) final String hostName,
                                    @PathParam( "startTime" ) final DateTimeParam startTime,
                                    @PathParam( "endTime" ) final DateTimeParam endTime );
+
+    @GET
+    @Path( "limits/{peerId}" )
+    @Consumes( MediaType.APPLICATION_JSON )
+    @Produces( MediaType.APPLICATION_JSON )
+    Response getResourceLimits( @PathParam( "peerId" ) final String peerId );
 }

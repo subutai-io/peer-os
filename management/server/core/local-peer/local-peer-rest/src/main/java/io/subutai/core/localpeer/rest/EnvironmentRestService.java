@@ -15,8 +15,7 @@ import javax.ws.rs.core.Response;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerId;
-import io.subutai.common.resource.ResourceType;
-import io.subutai.common.resource.ResourceValue;
+import io.subutai.common.quota.ContainerQuota;
 
 
 public interface EnvironmentRestService
@@ -66,23 +65,20 @@ public interface EnvironmentRestService
     Response setCpuSet( @PathParam( "containerId" ) ContainerId containerId, Set<Integer> cpuSet );
 
     @GET
-    @Path( "{environmentId}/container/{containerId}/quota/{resourceType}" )
+    @Path( "{environmentId}/container/{containerId}/quota" )
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
-    Response getQuota( @PathParam( "containerId" ) ContainerId containerId,
-                       @PathParam( "resourceType" ) ResourceType resourceType );
+    Response getQuota( @PathParam( "containerId" ) ContainerId containerId );
 
     @POST
-    @Path( "{environmentId}/container/{containerId}/quota/{resourceType}" )
+    @Path( "{environmentId}/container/{containerId}/quota" )
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
-    Response setQuota( @PathParam( "containerId" ) ContainerId containerId,
-                       @PathParam( "resourceType" ) ResourceType resourceType, ResourceValue resourceValue );
+    Response setQuota( @PathParam( "containerId" ) ContainerId containerId, ContainerQuota containerQuota );
 
     @GET
-    @Path( "{environmentId}/container/{containerId}/quota/{resourceType}/available" )
+    @Path( "{environmentId}/container/{containerId}/quota/available" )
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
-    Response getAvailableQuota( @PathParam( "containerId" ) ContainerId containerId,
-                                @PathParam( "resourceType" ) ResourceType resourceType );
+    Response getAvailableQuota( @PathParam( "containerId" ) ContainerId containerId );
 }
