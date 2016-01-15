@@ -25,13 +25,13 @@ func templMd5(templ, arch, token string) string {
 	client := &http.Client{}
 	response, err := client.Get(config.Management.Kurjun + "/public/get?name=" + templ + "&type=md5&sptoken=" + token)
 	log.Debug(config.Management.Kurjun + "/public/get?name=" + templ + "&type=md5&sptoken=" + token)
-	if log.Check(log.FatalLevel, "Getting kurjun response", err) || response.StatusCode != 200 {
+	if log.Check(log.WarnLevel, "Getting kurjun response", err) || response.StatusCode != 200 {
 		return ""
 	}
 
 	hash, err := ioutil.ReadAll(response.Body)
 	response.Body.Close()
-	if log.Check(log.FatalLevel, "Reading response body", err) {
+	if log.Check(log.WarnLevel, "Reading response body", err) {
 		return ""
 	}
 
