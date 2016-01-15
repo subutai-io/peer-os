@@ -221,9 +221,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 /*	var refreshTable;
 	var reloadTableData = function() {
 		refreshTable = $timeout(function myFunction() {
-			if(typeof(vm.dtInstance.reloadData) == 'function') {
-				vm.dtInstance.reloadData(null, false);
-			}
+			vm.dtInstance.reloadData(null, false);
 			refreshTable = $timeout(reloadTableData, 30000);
 		}, 30000);
 	};
@@ -240,12 +238,12 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 	}
 
 	function statusHTML(environmentStatus, type, full, meta) {
-		return '<div class="b-status-icon b-status-icon_' + environmentStatus + '" tooltips tooltip-template="' + environmentStatus + '" tooltip-side="right"></div>';
+		return '<div class="b-status-icon b-status-icon_' + environmentStatus + '" tooltips tooltip-title="' + environmentStatus + '"></div>';
 	}
 
 	function environmentNameTooltip(data, type, full, meta) {
 		vm.users[data.id] = data;
-		return "<span tooltips tooltip-template='<span class=\"b-nowrap\">ID: <b>" + data.id + "</b></span>'>" + data.name + "</span>";
+		return '<span tooltips tooltip-content="ID: <b>' + data.id + '</b>">' + data.name + '</span>';
 	}
 
 	function sshKeyLinks(data, type, full, meta) {
@@ -342,14 +340,24 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
     }
 
 	function buildEnvironment() {
-		environmentService.startEnvironmentBuild (vm.currentEnvironment.id, encodeURIComponent(vm.currentEnvironment.relationDeclaration)).success(function (data) {
-			SweetAlert.swal("Success!", "Your environment has started building.", "success");
-			loadEnvironments();
-			vm.activeTab = "installed";
+		/*var temp = vm.currentEnvironment.relationDeclaration;
+		var beginning = temp.substring (0, 34);
+		var end = temp.substring (0, 34);
+		if() {*/
+			SweetAlert.swal("Success!", "Your environment started building.", "success");
 			ngDialog.closeAll();
-		}).error(function (data) {
-			SweetAlert.swal("ERROR!", "Environment build error. Error: " + data.ERROR, "error");
-		});
+			environmentService.startEnvironmentBuild(vm.currentEnvironment.id, encodeURIComponent(vm.currentEnvironment.relationDeclaration)).success(function (data) {
+				SweetAlert.swal("Success!", "Your environment was built.", "success");
+				loadEnvironments();
+				vm.activeTab = "installed";
+				ngDialog.closeAll();
+			}).error(function (data) {
+				SweetAlert.swal("ERROR!", "Environment build error. Error: " + data.ERROR, "error");
+			});
+/*		}
+		else {
+			SweetAlert.swal("ERROR!", "Please sign properly.", "error");
+		}*/
 	}
 
 
