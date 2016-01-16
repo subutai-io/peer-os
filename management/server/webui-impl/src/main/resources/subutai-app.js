@@ -420,14 +420,6 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 				}]
 			}
 		})
-		.state('404', {
-			url: '/404',
-			templateUrl: 'subutai-app/common/partials/404.html',
-			data: {
-				bodyClass: 'b-body',
-				layout: 'fullpage'
-			}
-		})
 		.state('about', {
 			url: '/about',
 			templateUrl: 'subutai-app/about/partials/view.html',
@@ -471,7 +463,16 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 					]);
 				}]
 			}
-		});
+		})
+		.state('404', {
+			url: '/404',
+			templateUrl: 'subutai-app/common/partials/404.html',
+			data: {
+				bodyClass: 'b-body',
+				layout: 'fullpage'
+			}
+		})
+		.state();
 
 	$httpProvider.interceptors.push(function($q, $location) {
 		return {
@@ -495,7 +496,6 @@ function startup($rootScope, $state, $location, $http) {
 			$location.path('/login');
 		}
 	});
-	$http.defaults.headers.common['sptoken'] = getCookie('sptoken');
 
 	$rootScope.$state = $state;
 }

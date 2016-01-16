@@ -135,6 +135,11 @@ public interface IdentityManager
      */
     void updateUser( User user );
 
+    /*
+     * ************************************************
+     */
+    void updateUser( User user, String publicKey );
+
 
     /* *************************************************
      */

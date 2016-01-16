@@ -811,6 +811,34 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
+    @RolesAllowed( "Identity-Management|Update" )
+    @Override
+    public void updateUser( User user, String publicKey )
+    {
+        //******Cannot update Internal User *************
+        if ( user.getType() == UserType.System.getId() )
+        {
+            throw new AccessControlException( "Internal User cannot be updated" );
+        }
+        //***********************************************
+
+        String keyId = UUID.randomUUID().toString();
+        if ( !Strings.isNullOrEmpty( publicKey ) )
+        {
+            securityManager.getKeyManager().savePublicKeyRing( keyId, SecurityKeyType.UserKey.getId(), publicKey );
+            user.setFingerprint( securityManager.getKeyManager().getFingerprint( keyId ) );
+        }
+        //******************************************
+
+        user.setSecurityKeyId( keyId );
+
+        identityDataService.updateUser( user );
+    }
+
+
+
+    /* *************************************************
+     */
     @RolesAllowed( "Identity-Management|Delete" )
     @Override
     public void removeUser( long userId )
