@@ -18,7 +18,6 @@ import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.Peer;
-import io.subutai.common.security.relation.RelationManager;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.dao.EnvironmentDataService;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
@@ -28,6 +27,7 @@ import io.subutai.core.identity.api.model.User;
 import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerManager;
+import io.subutai.core.relation.api.RelationManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.tracker.api.Tracker;
 

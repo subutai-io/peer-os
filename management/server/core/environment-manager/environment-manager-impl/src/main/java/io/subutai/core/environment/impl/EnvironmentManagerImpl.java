@@ -68,14 +68,6 @@ import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.objects.PermissionOperation;
 import io.subutai.common.security.objects.PermissionScope;
 import io.subutai.common.security.objects.SecurityKeyType;
-import io.subutai.common.security.relation.RelationManager;
-import io.subutai.common.security.relation.RelationVerificationException;
-import io.subutai.common.security.relation.model.Relation;
-import io.subutai.common.security.relation.model.RelationInfo;
-import io.subutai.common.security.relation.model.RelationInfoMeta;
-import io.subutai.common.security.relation.model.RelationLink;
-import io.subutai.common.security.relation.model.RelationMeta;
-import io.subutai.common.security.relation.model.RelationStatus;
 import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.ExceptionUtil;
@@ -108,6 +100,14 @@ import io.subutai.core.peer.api.PeerAction;
 import io.subutai.core.peer.api.PeerActionListener;
 import io.subutai.core.peer.api.PeerActionResponse;
 import io.subutai.core.peer.api.PeerManager;
+import io.subutai.core.relation.api.RelationManager;
+import io.subutai.core.relation.api.RelationVerificationException;
+import io.subutai.core.relation.api.model.Relation;
+import io.subutai.core.relation.api.model.RelationInfo;
+import io.subutai.core.relation.api.model.RelationInfoMeta;
+import io.subutai.core.relation.api.model.RelationLink;
+import io.subutai.core.relation.api.model.RelationMeta;
+import io.subutai.core.relation.api.model.RelationStatus;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
@@ -1981,9 +1981,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
 
     @Override
-    public List<ShareDto> getSharedUsers( final String objectId )
+    public List<ShareDto> getSharedUsers( final String objectId ) throws EnvironmentNotFoundException
     {
-        Environment environment = environmentDataService.find( objectId );
+        Environment environment = loadEnvironment( objectId, true );
         RelationLink objectRelationLink =
                 relationManager.getRelationLink( String.valueOf( objectId ), environment.getClass().getSimpleName() );
 

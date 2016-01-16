@@ -53,18 +53,13 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerId;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.quota.ContainerQuota;
-import io.subutai.common.resource.ContainerResourceType;
-import io.subutai.common.resource.ByteValueResource;
-import io.subutai.common.security.objects.KeyTrustLevel;
-import io.subutai.common.resource.ResourceType;
-import io.subutai.common.resource.ResourceValue;
 import io.subutai.common.security.objects.PermissionObject;
-import io.subutai.common.security.relation.RelationManager;
-import io.subutai.common.security.relation.model.RelationMeta;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
+import io.subutai.core.relation.api.RelationManager;
+import io.subutai.core.relation.api.model.RelationMeta;
 
 
 /**
