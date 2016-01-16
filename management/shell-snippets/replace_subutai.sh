@@ -10,7 +10,7 @@ mgt="/home/vagrant/subutai-tar/target"
 # path to snappy build folder
 snappy_repo="/home/vagrant/snappy-build"
 
-package="subutai-4.0.0-RC5.tar.gz"
+package="subutai-4.0.0-RC6.tar.gz"
 folder=`echo $package | awk -F ".tar" '{print $1}'`
 
 rm -rf ./$folder
@@ -19,7 +19,7 @@ tar -xf $mgt/$package
 files=(
 'lib'
 'system'
-'deploy/webui-4.0.0-RC5.war' 
+'deploy/webui-4.0.0-RC6.war'
 'etc/subutai-mng/git.properties' 
 'etc/subutai-mng/quota.cfg'
 )
@@ -31,7 +31,7 @@ do
 done
 
 
-# for file in 'lib' 'system' 'deploy/webui-4.0.0-RC5.war' 'etc/subutai-mng/git.properties' 'etc/subutai-mng/quota.cfg';
+# for file in 'lib' 'system' 'deploy/webui-4.0.0-RC6.war' 'etc/subutai-mng/git.properties' 'etc/subutai-mng/quota.cfg';
 # do 
 # 	rm -rf $snappy_repo/subutai-mng/$file; 
 # 	cp -rf $folder/$file $snappy_repo/subutai-mng/$file; 
