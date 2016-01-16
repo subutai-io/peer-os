@@ -39,13 +39,13 @@ func SubvolumeDestroy(path string) {
 	}
 	qgroupDestroy(path)
 	err = exec.Command("btrfs", "subvolume", "delete", config.Agent.LxcPrefix+path).Run()
-	log.Check(log.FatalLevel, "Destroying subvolume "+path, err)
+	log.Check(log.WarnLevel, "Destroying subvolume "+path, err)
 }
 
 func qgroupDestroy(path string) {
 	index := id(path)
 	err := exec.Command("btrfs", "qgroup", "destroy", index, config.Agent.LxcPrefix).Run()
-	log.Check(log.FatalLevel, "Destroying qgroup "+path+" "+index, err)
+	log.Check(log.WarnLevel, "Destroying qgroup "+path+" "+index, err)
 }
 
 func id(path string) string {
