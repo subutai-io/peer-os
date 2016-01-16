@@ -1,5 +1,10 @@
 <div ng-controller="IntegratorCtrl as integratorCtrl">
 	<div class="b-workspace__header">
+		<button 
+		class="b-btn b-btn_green b-btn_header-button" 
+		ng-click="integratorCtrl.uploadPluginWindow()">
+			<i class="fa fa-plus"></i> Upload new plugin
+		</button>
 		<h1 class="b-title">Plugin Integrator</h1>
 	</div>
 	<div class="b-workspace__content">
@@ -27,7 +32,6 @@
 			</div>
 		</div>
 		<div>
-			<button class = "b-btn b-btn_blue g-left" style = "margin-top: 10px" ng-click = "integratorCtrl.uploadPluginWindow()">Upload new plugin</button>
 		</div>
 	</div>
 

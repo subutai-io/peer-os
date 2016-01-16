@@ -78,7 +78,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 		.withOption('stateSave', true)
 		.withPaginationType('full_numbers');
 	vm.dtColumnDefsInstallTable = [
-		DTColumnDefBuilder.newColumnDef(0),
+		DTColumnDefBuilder.newColumnDef(0).notSortable(),
 		DTColumnDefBuilder.newColumnDef(1),
 		DTColumnDefBuilder.newColumnDef(2).notSortable(),
 		DTColumnDefBuilder.newColumnDef(3).notSortable(),
@@ -93,9 +93,9 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 		.withOption('stateSave', true)
 		.withPaginationType('full_numbers');
 	vm.dtColumnDefsPendingTable = [
-		DTColumnDefBuilder.newColumnDef(0),
+		DTColumnDefBuilder.newColumnDef(0).notSortable(),
 		DTColumnDefBuilder.newColumnDef(1),
-		DTColumnDefBuilder.newColumnDef(2).notSortable(),
+		DTColumnDefBuilder.newColumnDef(2).notSortable()
 	];
 
 	vm.listOfUsers = [];
@@ -161,7 +161,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 				}
 				vm.currentEnvironment = environment;
 				ngDialog.open ({
-					template: "subutai-app/environment/partials/shareEnv.html",
+					template: "subutai-app/environment/partials/popups/shareEnv.html",
 					scope: $scope
 				});
 			});
@@ -221,7 +221,9 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 /*	var refreshTable;
 	var reloadTableData = function() {
 		refreshTable = $timeout(function myFunction() {
-			vm.dtInstance.reloadData(null, false);
+			if(typeof(vm.dtInstance.reloadData) == 'function') {
+				vm.dtInstance.reloadData(null, false);
+			}
 			refreshTable = $timeout(reloadTableData, 30000);
 		}, 30000);
 	};
@@ -238,12 +240,12 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 	}
 
 	function statusHTML(environmentStatus, type, full, meta) {
-		return '<div class="b-status-icon b-status-icon_' + environmentStatus + '" tooltips tooltip-title="' + environmentStatus + '"></div>';
+		return '<div class="b-status-icon b-status-icon_' + environmentStatus + '" tooltips tooltip-template="' + environmentStatus + '" tooltip-side="right"></div>';
 	}
 
 	function environmentNameTooltip(data, type, full, meta) {
 		vm.users[data.id] = data;
-		return '<span tooltips tooltip-content="ID: <b>' + data.id + '</b>">' + data.name + '</span>';
+		return "<span tooltips tooltip-template='<span class=\"b-nowrap\">ID: <b>" + data.id + "</b></span>'>" + data.name + "</span>";
 	}
 
 	function sshKeyLinks(data, type, full, meta) {
@@ -334,30 +336,21 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
     function startEnvironmentBuild (environment) {
     	vm.currentEnvironment = environment;
 		ngDialog.open ({
-			template: "subutai-app/environment/partials/decryptMsg.html",
-			scope: $scope
+			template: "subutai-app/environment/partials/popups/decryptMsg.html",
+			scope: $scope,
+			className: 'environmentDialog'
 		});
     }
 
 	function buildEnvironment() {
-		/*var temp = vm.currentEnvironment.relationDeclaration;
-		var beginning = temp.substring (0, 34);
-		var end = temp.substring (0, 34);
-		if() {*/
-			SweetAlert.swal("Success!", "Your environment started building.", "success");
+		environmentService.startEnvironmentBuild (vm.currentEnvironment.id, encodeURIComponent(vm.currentEnvironment.relationDeclaration)).success(function (data) {
+			SweetAlert.swal("Success!", "Your environment has started building.", "success");
+			loadEnvironments();
+			vm.activeTab = "installed";
 			ngDialog.closeAll();
-			environmentService.startEnvironmentBuild(vm.currentEnvironment.id, encodeURIComponent(vm.currentEnvironment.relationDeclaration)).success(function (data) {
-				SweetAlert.swal("Success!", "Your environment was built.", "success");
-				loadEnvironments();
-				vm.activeTab = "installed";
-				ngDialog.closeAll();
-			}).error(function (data) {
-				SweetAlert.swal("ERROR!", "Environment build error. Error: " + data.ERROR, "error");
-			});
-/*		}
-		else {
-			SweetAlert.swal("ERROR!", "Please sign properly.", "error");
-		}*/
+		}).error(function (data) {
+			SweetAlert.swal("ERROR!", "Environment build error. Error: " + data.ERROR, "error");
+		});
 	}
 
 
@@ -446,7 +439,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 	function showSSHKeyForm(environmentId) {
 		vm.sshKeyForEnvironment = environmentId;
 		ngDialog.open({
-			template: 'subutai-app/environment/partials/sshKeyForm.html',
+			template: 'subutai-app/environment/partials/popups/sshKeyForm.html',
 			scope: $scope
 		});
 	}
@@ -458,7 +451,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 		environmentService.getDomain(environmentId).success(function (data) {
 			vm.currentDomain = data;
 			ngDialog.open({
-				template: 'subutai-app/environment/partials/domainForm.html',
+				template: 'subutai-app/environment/partials/popups/domainForm.html',
 				scope: $scope
 			});
 			LOADING_SCREEN('none');

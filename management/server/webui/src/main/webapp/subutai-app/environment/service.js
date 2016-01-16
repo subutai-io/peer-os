@@ -305,7 +305,7 @@ function environmentService($http) {
 	}
 
 	function getUsers() {
-		return $http.get (SERVER_URL + 'rest/ui/identity', {withCredentials: true, headers: {'Content-Type': 'application/json'}});
+		return $http.get (SERVER_URL + 'rest/ui/identity/', {withCredentials: true, headers: {'Content-Type': 'application/json'}});
 	}
 
 

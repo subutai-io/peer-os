@@ -1,5 +1,4 @@
-<link rel="stylesheet" href="subutai-app/environment/partials/environments.css"/>
-<div ng-controller="EnvironmentViewCtrl as environmentViewCtrl">
+<div ng-controller="EnvironmentViewCtrl as environmentViewCtrl" class="b-workspace__environments">
 
 	<div class="b-workspace__header">
 		<h1 class="b-title">Environment Manager</h1>
@@ -8,12 +7,12 @@
 	<div class="b-workspace__content">
 		<div class="b-tabs-menu">
 			<ul>
-				<li class="b-tabs-menu__item" style = "z-index: 1"
+				<li class="b-tabs-menu__item"
 					ng-click="environmentViewCtrl.activeTab = 'installed'"
 					ng-class="environmentViewCtrl.activeTab == 'installed' ? 'b-tabs-menu__item_active' : ''">
 					Installed
 				</li>
-				<li class="b-tabs-menu__item" style = "z-index: 1"
+				<li class="b-tabs-menu__item"
 					ng-click="environmentViewCtrl.activeTab = 'pending'"
 					ng-class="environmentViewCtrl.activeTab == 'pending' ? 'b-tabs-menu__item_active' : ''">
 					Pending
