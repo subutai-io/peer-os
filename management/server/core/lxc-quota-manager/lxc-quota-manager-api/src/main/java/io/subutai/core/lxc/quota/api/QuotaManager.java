@@ -1,6 +1,7 @@
 package io.subutai.core.lxc.quota.api;
 
 
+import java.util.Map;
 import java.util.Set;
 
 import io.subutai.common.peer.ContainerId;
@@ -99,4 +100,6 @@ public interface QuotaManager
      * @param containerId
      */
     void removeQuota( ContainerId containerId );
+
+    Map<ContainerSize,ContainerQuota> getDefaultQuotas();
 }

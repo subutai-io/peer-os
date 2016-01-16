@@ -1,0 +1,17 @@
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="strategy/distribute">
+      <action class="io.subutai.core.strategy.cli.DistributeCommand">
+        <argument ref="strategyManager" />
+        <argument ref="peerManager" />
+        <argument ref="quotaManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <reference id="strategyManager" availability="mandatory" interface="io.subutai.core.strategy.api.StrategyManager" />
+  <reference id="peerManager" availability="mandatory" interface="io.subutai.core.lxc.quota.api.QuotaManager" />
+  <reference id="quotaManager" availability="mandatory" interface="io.subutai.core.peer.api.PeerManager" />
+
+</blueprint>

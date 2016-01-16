@@ -2,6 +2,7 @@ package io.subutai.core.registration.impl;
 
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -36,6 +37,7 @@ import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
@@ -361,6 +363,8 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
 
         LocalPeer localPeer = peerManager.getLocalPeer();
 
+        final List<ResourceHost> resourceHosts = new ArrayList(localPeer.getResourceHosts());
+
         for ( final Map.Entry<Integer, Map<String, Set<ContainerInfo>>> mapEntry : groupedContainersByVlan.entrySet() )
         {
             //TODO: check this run. Topology constructor changed
@@ -372,9 +376,11 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
             {
                 //place where to create node groups
                 String templateName = entry.getKey();
+                //TODO: please change this distribution
                 NodeGroup nodeGroup =
-                        new NodeGroup( String.format( "%s_group", templateName ), templateName, entry.getValue().size(),
-                                1, 1, new PlacementStrategy( "ROUND_ROBIN" ), localPeer.getId() );
+                        new NodeGroup( String.format( "%s_group", templateName ), templateName, /*entry.getValue().size()*/
+                                ContainerSize.SMALL,
+                                1, 1, localPeer.getId(), resourceHosts.get( 0 ).getId() );
                 topology.addNodeGroupPlacement( localPeer, nodeGroup );
 
                 Set<ContainerHostInfo> converter = Sets.newHashSet();

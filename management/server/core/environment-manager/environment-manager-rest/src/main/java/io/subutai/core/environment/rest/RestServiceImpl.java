@@ -126,10 +126,10 @@ public class RestServiceImpl implements RestService
         {
             throw new EnvironmentCreationException( "Invalid node group name" );
         }
-        else if ( nodeGroup.getNumberOfContainers() <= 0 )
-        {
-            throw new EnvironmentCreationException( "Invalid number of containers" );
-        }
+//        else if ( nodeGroup.getNumberOfContainers() <= 0 )
+//        {
+//            throw new EnvironmentCreationException( "Invalid number of containers" );
+//        }
         else if ( Strings.isNullOrEmpty( nodeGroup.getTemplateName() ) )
         {
             throw new EnvironmentCreationException( "Invalid templateName" );
@@ -139,11 +139,11 @@ public class RestServiceImpl implements RestService
             throw new EnvironmentCreationException(
                     String.format( "Template %s does not exist", nodeGroup.getTemplateName() ) );
         }
-        else if ( nodeGroup.getContainerDistributionType() == ContainerDistributionType.AUTO
-                && nodeGroup.getContainerPlacementStrategy() == null )
-        {
-            throw new EnvironmentCreationException( "Invalid node container placement strategy" );
-        }
+//        else if ( nodeGroup.getContainerDistributionType() == ContainerDistributionType.AUTO
+//                && nodeGroup.getContainerPlacementStrategy() == null )
+//        {
+//            throw new EnvironmentCreationException( "Invalid node container placement strategy" );
+//        }
     }
 
 
@@ -167,10 +167,10 @@ public class RestServiceImpl implements RestService
             {
                 throw new EnvironmentCreationException( "Invalid node group name" );
             }
-            else if ( nodeGroup.getNumberOfContainers() <= 0 )
-            {
-                throw new EnvironmentCreationException( "Invalid number of containers" );
-            }
+//            else if ( nodeGroup.getNumberOfContainers() <= 0 )
+//            {
+//                throw new EnvironmentCreationException( "Invalid number of containers" );
+//            }
             else if ( Strings.isNullOrEmpty( nodeGroup.getTemplateName() ) )
             {
                 throw new EnvironmentCreationException( "Invalid templateName" );
@@ -180,10 +180,10 @@ public class RestServiceImpl implements RestService
                 throw new EnvironmentCreationException(
                         String.format( "Template %s does not exist", nodeGroup.getTemplateName() ) );
             }
-            else if ( nodeGroup.getContainerPlacementStrategy() == null )
-            {
-                throw new EnvironmentCreationException( "Invalid node container placement strategy" );
-            }
+//            else if ( nodeGroup.getContainerPlacementStrategy() == null )
+//            {
+//                throw new EnvironmentCreationException( "Invalid node container placement strategy" );
+//            }
         }
     }
 
