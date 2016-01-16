@@ -293,10 +293,10 @@ public class QuotaManagerImpl implements QuotaManager
             final ContainerRootfsResource rootfs = containerQuota.getRootfs();
             cpuAccumulo = cpuAccumulo.add( cpu.getResource().getValue() );
             ramAccumulo = ramAccumulo.add( ram.getResource().getValue() );
-            final BigDecimal disk = home.getResource().getValue().add( opt.getResource().getValue()
-                                                                          .add( var.getResource().getValue()
-                                                                                   .add( rootfs.getResource()
-                                                                                               .getValue() ) ) );
+            BigDecimal disk = home.getResource().getValue();
+            disk = disk.add( opt.getResource().getValue() );
+            disk = disk.add( var.getResource().getValue() );
+            disk = disk.add( rootfs.getResource().getValue() );
             diskAccumulo = diskAccumulo.add( disk );
         }
 

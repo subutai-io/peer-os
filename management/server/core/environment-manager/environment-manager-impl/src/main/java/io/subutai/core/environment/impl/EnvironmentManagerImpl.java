@@ -631,7 +631,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                     throw new EnvironmentCreationException( "Peer not found: " + peerId );
                 }
 
-                groupResources.addPeerResources( peer.getResourceLimits( peerId ) );
+                groupResources.addPeerResources( peer.getResourceLimits( peerManager.getLocalPeer().getId() ) );
             }
 
 

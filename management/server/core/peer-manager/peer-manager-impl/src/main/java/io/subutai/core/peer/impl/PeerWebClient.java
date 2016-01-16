@@ -459,7 +459,7 @@ public class PeerWebClient
         {
             String path = String.format( "/limits/%s", peerId );
 
-            WebClient client = WebClientBuilder.buildPeerWebClient( host, path, provider );
+            WebClient client = WebClientBuilder.buildPeerWebClient( host, path, provider,  500, 7000, 1 );
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
             return client.get( PeerResources.class );

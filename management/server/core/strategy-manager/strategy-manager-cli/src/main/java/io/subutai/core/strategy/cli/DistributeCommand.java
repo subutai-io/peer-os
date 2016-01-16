@@ -78,7 +78,7 @@ public class DistributeCommand extends SubutaiShellCommandSupport
                     return null;
                 }
 
-                groupResources.addPeerResources( peer.getResourceLimits( peerId ) );
+                groupResources.addPeerResources( peer.getResourceLimits( peerManager.getLocalPeer().getId() ) );
             }
 
 
