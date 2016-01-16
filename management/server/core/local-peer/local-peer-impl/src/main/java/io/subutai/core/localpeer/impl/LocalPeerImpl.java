@@ -47,6 +47,7 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
+import io.subutai.common.environment.ContainerDistributionType;
 import io.subutai.common.environment.ContainersDestructionResultImpl;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.host.ContainerHostInfo;
@@ -338,14 +339,14 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         Preconditions.checkNotNull( request );
 
         Set<ContainerHostInfoModel> result;
-        //        if ( request.getContainerDistributionType() == ContainerDistributionType.AUTO )
-        //        {
-        //            result = createByStrategy( request );
-        //        }
-        //        else
-        //        {
-        result = createByHost( request );
-        //        }
+        if ( request.getContainerDistributionType() == ContainerDistributionType.AUTO )
+        {
+            result = createByStrategy( request );
+        }
+        else
+        {
+            result = createByHost( request );
+        }
 
         return result;
     }
