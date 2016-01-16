@@ -17,8 +17,7 @@ import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.PeerException;
-import io.subutai.common.resource.ResourceType;
-import io.subutai.common.resource.ResourceValue;
+import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.security.WebClientBuilder;
 
 
@@ -176,11 +175,10 @@ public class EnvironmentWebClient
     }
 
 
-    public ResourceValue getAvailableQuota( final String host, final ContainerId containerId,
-                                            final ResourceType resourceType ) throws PeerException
+    public ContainerQuota getAvailableQuota( final String host, final ContainerId containerId ) throws PeerException
     {
-        String path = String.format( "/%s/container/%s/quota/%s/available", containerId.getEnvironmentId().getId(),
-                containerId.getId(), resourceType );
+        String path = String.format( "/%s/container/%s/quota/available", containerId.getEnvironmentId().getId(),
+                containerId.getId() );
 
         WebClient client = WebClientBuilder.buildEnvironmentWebClient( host, path, provider );
 
@@ -188,7 +186,7 @@ public class EnvironmentWebClient
         client.accept( MediaType.APPLICATION_JSON );
         try
         {
-            return client.get( ResourceValue.class );
+            return client.get( ContainerQuota.class );
         }
         catch ( Exception e )
         {
@@ -197,12 +195,10 @@ public class EnvironmentWebClient
     }
 
 
-    public ResourceValue getQuota( final String host, final ContainerId containerId, final ResourceType resourceType )
-            throws PeerException
+    public ContainerQuota getQuota( final String host, final ContainerId containerId ) throws PeerException
     {
         String path =
-                String.format( "/%s/container/%s/quota/%s", containerId.getEnvironmentId().getId(), containerId.getId(),
-                        resourceType );
+                String.format( "/%s/container/%s/quota", containerId.getEnvironmentId().getId(), containerId.getId() );
 
         WebClient client = WebClientBuilder.buildEnvironmentWebClient( host, path, provider );
 
@@ -210,7 +206,7 @@ public class EnvironmentWebClient
         client.accept( MediaType.APPLICATION_JSON );
         try
         {
-            return client.get( ResourceValue.class );
+            return client.get( ContainerQuota.class );
         }
         catch ( Exception e )
         {
@@ -219,14 +215,12 @@ public class EnvironmentWebClient
     }
 
 
-    public void setQuota( final String host, final ContainerId containerId, final ResourceType resourceType,
-                          ResourceValue resourceValue )
+    public void setQuota( final String host, final ContainerId containerId, final ContainerQuota containerQuota )
 
             throws PeerException
     {
         String path =
-                String.format( "/%s/container/%s/quota/%s", containerId.getEnvironmentId().getId(), containerId.getId(),
-                        resourceType );
+                String.format( "/%s/container/%s/quota", containerId.getEnvironmentId().getId(), containerId.getId() );
 
         WebClient client = WebClientBuilder.buildEnvironmentWebClient( host, path, provider );
 
@@ -234,7 +228,7 @@ public class EnvironmentWebClient
         client.accept( MediaType.APPLICATION_JSON );
         try
         {
-            client.post( resourceValue );
+            client.post( containerQuota );
         }
         catch ( Exception e )
         {

@@ -39,7 +39,7 @@ public interface RestService
     Response addEnvironmentDomain( @Multipart( "environmentId" ) String environmentId,
                                    @Multipart( "hostName" ) String hostName,
                                    @Multipart( "strategy" ) DomainLoadBalanceStrategy strategy,
-                                   @Multipart(value = "file") Attachment attr );
+                                   @Multipart( value = "file" ) Attachment attr );
 
     @GET
     @Path( "container/environmentId" )
@@ -52,10 +52,10 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response viewEnvironment( @PathParam( "environmentId" ) String environmentId );
 
-    @POST
-    @Consumes( MediaType.APPLICATION_JSON )
-    @Produces( MediaType.APPLICATION_JSON )
-    public Response createEnvironment( Blueprint blueprint );
+    //    @POST
+    //    @Consumes( MediaType.APPLICATION_JSON )
+    //    @Produces( MediaType.APPLICATION_JSON )
+    //    public Response createEnvironment( Blueprint blueprint );
 
     @PUT
     @Path( "{environmentId}" )

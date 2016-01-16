@@ -22,7 +22,7 @@ public class QuotaAlert extends AbstractAlert<QuotaAlertValue> implements Alert
         Preconditions.checkNotNull( alertValue );
         Preconditions.checkNotNull( alertValue.getValue() );
         Preconditions.checkNotNull( alertValue.getValue().getHostId() );
-        Preconditions.checkNotNull( alertValue.getValue().getResourceType() );
+        Preconditions.checkNotNull( alertValue.getValue().getContainerResourceType() );
         Preconditions.checkNotNull( alertValue.getValue().getCurrentValue() );
         Preconditions.checkNotNull( alertValue.getValue().getQuotaValue() );
         this.createdTime = createdTime;
@@ -33,7 +33,7 @@ public class QuotaAlert extends AbstractAlert<QuotaAlertValue> implements Alert
     @Override
     public String getId()
     {
-        return getHostId() + ":" + alert.getValue().getResourceType();
+        return getHostId() + ":" + alert.getValue().getContainerResourceType();
     }
 
 

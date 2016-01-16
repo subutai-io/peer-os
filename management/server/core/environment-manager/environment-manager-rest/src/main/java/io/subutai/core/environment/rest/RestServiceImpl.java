@@ -62,7 +62,7 @@ public class RestServiceImpl implements RestService
     }
 
 
-    @Override
+    //    @Override
     public Response createEnvironment( final Blueprint blueprint )
     {
         //validate params
@@ -596,7 +596,7 @@ public class RestServiceImpl implements RestService
 
 
             jsonSet.add( new ContainerDto( containerHost.getId(), containerHost.getEnvironmentId().getId(),
-                    containerHost.getHostname(), containerHost.getContainerType(), state,
+                    containerHost.getHostname(), containerHost.getContainerSize(), state,
                     containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp(),
                     containerHost.getTemplateName() ) );
         }

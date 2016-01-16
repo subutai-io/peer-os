@@ -8,9 +8,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import io.subutai.common.environment.EnvironmentStatus;
 
 import com.google.common.collect.Sets;
+
+import io.subutai.common.environment.EnvironmentStatus;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;

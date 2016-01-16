@@ -85,33 +85,6 @@
 
   <build>
     <plugins>
-
-      <!--<plugin>-->
-        <!--<groupId>com.internetitem</groupId>-->
-        <!--<artifactId>write-properties-file-maven-plugin</artifactId>-->
-        <!--<version>1.0.1</version>-->
-        <!--<executions>-->
-          <!--<execution>-->
-            <!--<id>one</id>-->
-            <!--<phase>compile</phase>-->
-            <!--<goals>-->
-              <!--<goal>write-properties-file</goal>-->
-            <!--</goals>-->
-            <!--<configuration>-->
-
-              <!--<filename>subutai.properties</filename>-->
-              <!--<outputDirectory>${project.basedir}/src/main/assembly/etc</outputDirectory>-->
-              <!--<properties>-->
-                <!--<property>-->
-                  <!--<name>project.version</name>-->
-                  <!--<value>${project.version}</value>-->
-                <!--</property>-->
-              <!--</properties>-->
-            <!--</configuration>-->
-          <!--</execution>-->
-        <!--</executions>-->
-      <!--</plugin>-->
-
       <plugin>
         <groupId>pl.project13.maven</groupId>
         <artifactId>git-commit-id-plugin</artifactId>
@@ -193,6 +166,7 @@
           </execution>
         </executions>
       </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-antrun-plugin</artifactId>
@@ -207,6 +181,9 @@
               <tasks>
                 <delete>
                   <fileset dir="${project.basedir}/target/assembly/etc" includes="*.*" />
+                </delete>
+                <delete>
+                  <fileset dir="${project.basedir}/src/main/assembly/etc" includes="git.properties" />
                 </delete>
               </tasks>
             </configuration>

@@ -171,8 +171,7 @@ public class PermissionEntity implements Permission
         {
             String permString = "";
 
-            permString += ( PermissionObject.values() )[object - 1].getName() + "|A|";
-            //permString +="|"+(PermissionScope.values())[scope-1].getName()+"|";
+            permString += ( PermissionObject.values() )[object - 1].getName() + "|";
 
             if ( read )
             {

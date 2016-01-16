@@ -431,7 +431,7 @@ input[type=checkbox] {
     text-decoration: none;
     font-size: 11px;
     border-radius: 5px;
-    margin: 0 5px 5px 0;
+    margin: 0;
     /*transition: all .4s ease-in-out;	*/
 }
 
@@ -664,6 +664,14 @@ tooltip:last-child tip-cont .b-icon {
 
 .b-icon_remove:hover {
     transform: rotateY(360deg);
+}
+
+.b-icon_share {
+    background-image: url('../assets/elements/buttons/Share_icon.svg');
+}
+
+.b-icon_share:hover {
+    transform: rotate(-30deg);
 }
 
 .b-icon_build {
@@ -1238,7 +1246,7 @@ td.b-main-table__status-col {
 
 .b-workspace-content__row {
     position: relative;
-    overflow: hidden;
+    /*overflow: hidden;*/
     margin-bottom: 20px;
 }
 

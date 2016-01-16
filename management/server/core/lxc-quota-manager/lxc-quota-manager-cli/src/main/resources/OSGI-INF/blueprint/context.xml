@@ -31,4 +31,12 @@
     </command>
   </command-bundle>
 
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="quota/limits">
+      <action class="io.subutai.core.lxc.quota.cli.GetResourceLimits">
+        <argument ref="quotaManager" />
+        <argument ref="localPeer" />
+      </action>
+    </command>
+  </command-bundle>
 </blueprint>
