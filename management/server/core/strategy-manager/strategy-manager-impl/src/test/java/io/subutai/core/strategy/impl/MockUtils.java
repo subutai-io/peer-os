@@ -9,9 +9,6 @@ package io.subutai.core.strategy.impl;
 import java.util.UUID;
 
 import io.subutai.core.strategy.api.ContainerPlacementStrategy;
-import io.subutai.core.strategy.impl.BestServerStrategy;
-import io.subutai.core.strategy.impl.DefaultContainerPlacementStrategy;
-import io.subutai.core.strategy.impl.RoundRobinStrategy;
 
 
 /**
@@ -34,20 +31,20 @@ public class MockUtils
     private static final String LXC_HOSTNAME_3 = "py111-lxc-333";
 
 
-    public static ContainerPlacementStrategy getDefaultContainerPlacementStrategy()
+    public static ContainerPlacementStrategy getMasterPlacementStrategy()
     {
-        return new DefaultContainerPlacementStrategy();
+        return MasterPlacementStrategy.getInstance();
     }
 
-
-    public static ContainerPlacementStrategy getRoundRobinPlacementStrategy()
-    {
-        return new RoundRobinStrategy();
-    }
-
-
-    public static ContainerPlacementStrategy getBestServerPlacementStrategy()
-    {
-        return new BestServerStrategy();
-    }
+//
+//    public static ContainerPlacementStrategy getRoundRobinPlacementStrategy()
+//    {
+//        return new RoundRobinStrategy();
+//    }
+//
+//
+//    public static ContainerPlacementStrategy getBestServerPlacementStrategy()
+//    {
+//        return new BestServerStrategy();
+//    }
 }

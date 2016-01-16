@@ -47,6 +47,7 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
+import io.subutai.common.environment.ContainerDistributionType;
 import io.subutai.common.environment.ContainersDestructionResultImpl;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.host.ContainerHostInfo;
@@ -337,17 +338,17 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         Preconditions.checkNotNull( request );
 
-        Set<ContainerHostInfoModel> result;
+        return createByHost( request );
         //        if ( request.getContainerDistributionType() == ContainerDistributionType.AUTO )
         //        {
         //            result = createByStrategy( request );
         //        }
         //        else
         //        {
-        result = createByHost( request );
+        //            result = createByHost( request );
         //        }
 
-        return result;
+//        return result;
     }
 
 
@@ -366,7 +367,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         ResourceHost resourceHost = getResourceHostById( request.getHost() );
         Set<String> containerDistribution =
-                generateCloneNames( request.getTemplateName(), request.getNumberOfContainers() );
+                generateCloneNames( request.getTemplateName(), /*request.getNumberOfContainers()*/1 );
         String networkPrefix = cidr.getInfo().getCidrSignature().split( "/" )[1];
         String[] allAddresses = cidr.getInfo().getAllAddresses();
         String gateway = cidr.getInfo().getLowAddress();
@@ -450,113 +451,114 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    private Set<ContainerHostInfoModel> createByStrategy( final CreateEnvironmentContainerGroupRequest request )
-            throws PeerException
-    {
-        //check if strategy exists
-        try
-        {
-            strategyManager.findStrategyById( request.getStrategyId() );
-        }
-        catch ( StrategyNotFoundException e )
-        {
-            throw new PeerException( e );
-        }
-
-        SubnetUtils cidr;
-        try
-        {
-            cidr = new SubnetUtils( request.getSubnetCidr() );
-        }
-        catch ( IllegalArgumentException e )
-        {
-            throw new PeerException( "Failed to parse subnet CIDR", e );
-        }
-
-        Map<ResourceHost, Set<String>> containerDistribution = distributeContainersToResourceHosts( request );
-
-
-        String networkPrefix = cidr.getInfo().getCidrSignature().split( "/" )[1];
-        String[] allAddresses = cidr.getInfo().getAllAddresses();
-        String gateway = cidr.getInfo().getLowAddress();
-        int currentIpAddressOffset = 0;
-
-        List<Future<CreateContainerWrapperTask>> taskFutures = Lists.newArrayList();
-        ExecutorService executorService = getFixedPoolExecutor( request.getNumberOfContainers() );
-
-        Vni environmentVni = findVniByEnvironmentId( request.getEnvironmentId() );
-
-        if ( environmentVni == null )
-        {
-            throw new PeerException(
-                    String.format( "No reserved vni found for environment %s", request.getEnvironmentId() ) );
-        }
-
-        //create containers in parallel on each resource host
-        for ( Map.Entry<ResourceHost, Set<String>> resourceHostDistribution : containerDistribution.entrySet() )
-        {
-            ResourceHostEntity resourceHostEntity = ( ResourceHostEntity ) resourceHostDistribution.getKey();
-
-            for ( String hostname : resourceHostDistribution.getValue() )
-            {
-
-                String ipAddress = allAddresses[request.getIpAddressOffset() + currentIpAddressOffset];
-                taskFutures.add( executorService.submit(
-                        new CreateContainerWrapperTask( resourceHostEntity, request.getTemplateName(), hostname,
-                                String.format( "%s/%s", ipAddress, networkPrefix ), environmentVni.getVlan(),
-                                Common.WAIT_CONTAINER_CONNECTION_SEC, request.getEnvironmentId() ) ) );
-
-                currentIpAddressOffset++;
-            }
-        }
-
-
-        //wait for succeeded containers
-        Set<ContainerHostInfoModel> result = Sets.newHashSet();
-
-        ContainerQuota containerQuota = quotaManager.getDefaultContainerQuota( request.getContainerSize() );
-        if ( containerQuota == null )
-        {
-            LOG.warn( "Quota not found for container type: " + request.getContainerSize() );
-            containerQuota = quotaManager.getDefaultContainerQuota( ContainerSize.SMALL );
-        }
-
-        for ( Future<CreateContainerWrapperTask> future : taskFutures )
-        {
-            try
-            {
-                CreateContainerWrapperTask task = future.get();
-                ContainerHostInfo hostInfo = task.getHostInfo();
-                ResourceHost resourceHost = task.getResourceHost();
-
-                TemplateKurjun template = getTemplateByName( request.getTemplateName() );
-
-                ContainerHostEntity containerHostEntity =
-                        new ContainerHostEntity( getId(), hostInfo, template.getName(), template.getArchitecture() );
-                containerHostEntity.setEnvironmentId( request.getEnvironmentId() );
-                containerHostEntity.setOwnerId( request.getOwnerId() );
-                containerHostEntity.setInitiatorPeerId( request.getInitiatorPeerId() );
-                containerHostEntity.setContainerSize( request.getContainerSize() );
-
-                //TODO: sign container host key with PEK
-                resourceHost.addContainerHost( containerHostEntity );
-                signContainerKeyWithPEK( containerHostEntity.getId(), containerHostEntity.getEnvironmentId() );
-
-                resourceHostDataService.saveOrUpdate( resourceHost );
-
-                quotaManager.setQuota( containerHostEntity.getContainerId(), containerQuota );
-                result.add( new ContainerHostInfoModel( hostInfo ) );
-            }
-            catch ( ExecutionException | InterruptedException | QuotaException e )
-            {
-                LOG.error( "Error creating container", e );
-            }
-        }
-
-        executorService.shutdown();
-
-        return result;
-    }
+    //    private Set<ContainerHostInfoModel> createByStrategy( final CreateEnvironmentContainerGroupRequest request )
+    //            throws PeerException
+    //    {
+    //        //check if strategy exists
+    //        try
+    //        {
+    //            strategyManager.findStrategyById( request.getStrategyId() );
+    //        }
+    //        catch ( StrategyNotFoundException e )
+    //        {
+    //            throw new PeerException( e );
+    //        }
+    //
+    //        SubnetUtils cidr;
+    //        try
+    //        {
+    //            cidr = new SubnetUtils( request.getSubnetCidr() );
+    //        }
+    //        catch ( IllegalArgumentException e )
+    //        {
+    //            throw new PeerException( "Failed to parse subnet CIDR", e );
+    //        }
+    //
+    //        Map<ResourceHost, Set<String>> containerDistribution = distributeContainersToResourceHosts( request );
+    //
+    //
+    //        String networkPrefix = cidr.getInfo().getCidrSignature().split( "/" )[1];
+    //        String[] allAddresses = cidr.getInfo().getAllAddresses();
+    //        String gateway = cidr.getInfo().getLowAddress();
+    //        int currentIpAddressOffset = 0;
+    //
+    //        List<Future<CreateContainerWrapperTask>> taskFutures = Lists.newArrayList();
+    //        ExecutorService executorService = getFixedPoolExecutor( /*request.getNumberOfContainers()*/1 );
+    //
+    //        Vni environmentVni = findVniByEnvironmentId( request.getEnvironmentId() );
+    //
+    //        if ( environmentVni == null )
+    //        {
+    //            throw new PeerException(
+    //                    String.format( "No reserved vni found for environment %s", request.getEnvironmentId() ) );
+    //        }
+    //
+    //        //create containers in parallel on each resource host
+    //        for ( Map.Entry<ResourceHost, Set<String>> resourceHostDistribution : containerDistribution.entrySet() )
+    //        {
+    //            ResourceHostEntity resourceHostEntity = ( ResourceHostEntity ) resourceHostDistribution.getKey();
+    //
+    //            for ( String hostname : resourceHostDistribution.getValue() )
+    //            {
+    //
+    //                String ipAddress = allAddresses[request.getIpAddressOffset() + currentIpAddressOffset];
+    //                taskFutures.add( executorService.submit(
+    //                        new CreateContainerWrapperTask( resourceHostEntity, request.getTemplateName(), hostname,
+    //                                String.format( "%s/%s", ipAddress, networkPrefix ), environmentVni.getVlan(),
+    //                                Common.WAIT_CONTAINER_CONNECTION_SEC, request.getEnvironmentId() ) ) );
+    //
+    //                currentIpAddressOffset++;
+    //            }
+    //        }
+    //
+    //
+    //        //wait for succeeded containers
+    //        Set<ContainerHostInfoModel> result = Sets.newHashSet();
+    //
+    //        ContainerQuota containerQuota = quotaManager.getDefaultContainerQuota( request.getContainerSize() );
+    //        if ( containerQuota == null )
+    //        {
+    //            LOG.warn( "Quota not found for container type: " + request.getContainerSize() );
+    //            containerQuota = quotaManager.getDefaultContainerQuota( ContainerSize.SMALL );
+    //        }
+    //
+    //        for ( Future<CreateContainerWrapperTask> future : taskFutures )
+    //        {
+    //            try
+    //            {
+    //                CreateContainerWrapperTask task = future.get();
+    //                ContainerHostInfo hostInfo = task.getHostInfo();
+    //                ResourceHost resourceHost = task.getResourceHost();
+    //
+    //                TemplateKurjun template = getTemplateByName( request.getTemplateName() );
+    //
+    //                ContainerHostEntity containerHostEntity =
+    //                        new ContainerHostEntity( getId(), hostInfo, template.getName(), template
+    // .getArchitecture() );
+    //                containerHostEntity.setEnvironmentId( request.getEnvironmentId() );
+    //                containerHostEntity.setOwnerId( request.getOwnerId() );
+    //                containerHostEntity.setInitiatorPeerId( request.getInitiatorPeerId() );
+    //                containerHostEntity.setContainerSize( request.getContainerSize() );
+    //
+    //                //TODO: sign container host key with PEK
+    //                resourceHost.addContainerHost( containerHostEntity );
+    //                signContainerKeyWithPEK( containerHostEntity.getId(), containerHostEntity.getEnvironmentId() );
+    //
+    //                resourceHostDataService.saveOrUpdate( resourceHost );
+    //
+    //                quotaManager.setQuota( containerHostEntity.getContainerId(), containerQuota );
+    //                result.add( new ContainerHostInfoModel( hostInfo ) );
+    //            }
+    //            catch ( ExecutionException | InterruptedException | QuotaException e )
+    //            {
+    //                LOG.error( "Error creating container", e );
+    //            }
+    //        }
+    //
+    //        executorService.shutdown();
+    //
+    //        return result;
+    //    }
 
 
     protected Map<ResourceHost, Set<String>> distributeContainersToResourceHosts(
@@ -580,7 +582,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             throw new PeerException( "There are no connected resource hosts" );
         }
-        int numOfRequestedContainers = request.getNumberOfContainers();
+        int numOfRequestedContainers = /*request.getNumberOfContainers()*/1;
         int j = 0;
         int leftOver = numOfRequestedContainers;
         int avgNumOfContainersPerRh = numOfRequestedContainers / resourceHosts.size();

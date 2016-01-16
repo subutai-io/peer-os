@@ -26,9 +26,11 @@ import io.subutai.core.environment.impl.workflow.creation.EnvironmentCreationWor
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.kurjun.api.TemplateManager;
+import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
+import io.subutai.core.strategy.api.StrategyManager;
 import io.subutai.core.tracker.api.Tracker;
 
 import static junit.framework.TestCase.assertEquals;
@@ -81,6 +83,10 @@ public class EnvironmentManagerTest
     Topology topology;
 
     Blueprint blueprint;
+    @Mock
+    private StrategyManager strategyManager;
+    @Mock
+    private QuotaManager quotaManager;
 
 
     @Before
@@ -90,11 +96,11 @@ public class EnvironmentManagerTest
         when( peerManager.getPeer( PEER_ID ) ).thenReturn( peer );
         doReturn( true ).when( peer ).isOnline();
 
-        blueprint = new Blueprint( "env", null, Sets.newHashSet( nodeGroup ) );
+        blueprint = new Blueprint( "env", null, Sets.newHashSet( nodeGroup ),null );
 
         environmentManager =
                 spy( new EnvironmentManagerImpl( templateRegistry, peerManager, securityManager, networkManager,
-                        daoManager, identityManager, tracker, relationManager ) );
+                        daoManager, identityManager, tracker, relationManager, strategyManager, quotaManager) );
         doReturn( environment ).when( environmentManager )
                                .createEmptyEnvironment( anyString(), anyString(), anyString(), any( Blueprint.class ) );
         //        doReturn( topology ).when( environmentManager ).buildTopology( blueprint );

@@ -44,16 +44,17 @@ func ProxyAdd(vlan, domain, node, policy, cert string) {
 }
 
 func ProxyDel(vlan, node string, domain bool) {
-	if !isVlanExist(vlan) {
-		log.Error("Domain doesn't exist")
+	if isVlanExist(vlan) {
+		if domain && node == "" {
+			delDomain(vlan)
+		}
+		if node != "" {
+			delNode(vlan, node)
+		}
+		restart()
+	} else {
+		os.Exit(1)
 	}
-	if domain && node == "" {
-		delDomain(vlan)
-	}
-	if node != "" {
-		delNode(vlan, node)
-	}
-	restart()
 }
 
 func ProxyCheck(vlan, node string, domain bool) {
@@ -136,9 +137,8 @@ func setPolicy(vlan, policy string) {
 }
 
 func addLine(path, after, line string, replace bool) bool {
-	if f, err := ioutil.ReadFile(path); err != nil {
-		log.Error("Cannot read file " + path)
-	} else {
+	f, err := ioutil.ReadFile(path)
+	if !log.Check(log.DebugLevel, "Cannot read file "+path, err) {
 		lines := strings.Split(string(f), "\n")
 		for k, v := range lines {
 			if strings.Contains(v, after) {
@@ -164,9 +164,9 @@ func addLine(path, after, line string, replace bool) bool {
 
 func delLine(path, line string) {
 	var lines2 []string
-	if f, err := ioutil.ReadFile(path); err != nil {
-		log.Error("Cannot read file " + path)
-	} else {
+	f, err := ioutil.ReadFile(path)
+	if !log.Check(log.DebugLevel, "Cannot read file "+path, err) {
+
 		lines := strings.Split(string(f), "\n")
 		for _, v := range lines {
 			if !strings.Contains(v, line) {

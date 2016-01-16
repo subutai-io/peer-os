@@ -73,14 +73,15 @@ public class BuildLocalEnvironmentCommand extends SubutaiShellCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        NodeGroup nodeGroup = new NodeGroup( "NodeGroup1", templateName, numberOfContainers, 1, 1,
-                new PlacementStrategy( "ROUND_ROBIN" ), peerManager.getLocalPeer().getId() );
-
-        Blueprint blueprint = new Blueprint( "Dummy environment name", null, Sets.newHashSet( nodeGroup ) );
-
-        Environment environment = environmentManager.createEnvironment( blueprint, async );
-
-        System.out.println( String.format( "Environment created with id %s", environment.getId() ) );
+        //TODO: please reimplement it
+//        NodeGroup nodeGroup = new NodeGroup( "NodeGroup1", templateName, /*numberOfContainers,*/ 1, 1,
+//                /*new PlacementStrategy( "ROUND_ROBIN" ),*/ peerManager.getLocalPeer().getId() );
+//
+//        Blueprint blueprint = new Blueprint( "Dummy environment name", null, Sets.newHashSet( nodeGroup ) );
+//
+//        Environment environment = environmentManager.createEnvironment( blueprint, async );
+//
+//        System.out.println( String.format( "Environment created with id %s", environment.getId() ) );
 
         return null;
     }

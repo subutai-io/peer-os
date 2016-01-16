@@ -144,22 +144,16 @@ func ListVNI() {
 }
 
 func DeleteAllVNI(vlan string) {
-	if _, err := os.Stat(config.Agent.DataPrefix + "/var/subutai-network/vni_reserve"); os.IsNotExist(err) {
-		log.Error(config.Agent.DataPrefix + "/var/subutai-network/vni_reserve does not exist " + err.Error())
-	}
-
 	f, err := ioutil.ReadFile(config.Agent.DataPrefix + "/var/subutai-network/vni_reserve")
-	log.Check(log.ErrorLevel, "Reading "+config.Agent.DataPrefix+"/var/subutai-network/vni_reserve", err)
-
-	for _, v := range strings.Split(string(f), "\n") {
-		s := strings.Fields(v)
-		if len(s) > 2 && s[1] == vlan {
-			DeleteVNI(s[0], s[1], s[2])
-			break
+	if !log.Check(log.DebugLevel, "Reading "+config.Agent.DataPrefix+"/var/subutai-network/vni_reserve", err) {
+		for _, v := range strings.Split(string(f), "\n") {
+			s := strings.Fields(v)
+			if len(s) > 2 && s[1] == vlan {
+				DeleteVNI(s[0], s[1], s[2])
+				break
+			}
 		}
 	}
-
-	log.Info("All VNI's deleted.")
 }
 
 func DeleteVNI(vni, vlan, envid string) {
@@ -175,11 +169,10 @@ func DeleteVNI(vni, vlan, envid string) {
 	lines = strings.Split(string(f), "\n")
 	for k, v := range lines {
 		if v == vni+" "+vlan+" "+envid {
+			RemoveP2PTunnel(envid)
 			lines[k] = ""
 		}
 	}
 	err = ioutil.WriteFile(config.Agent.DataPrefix+"/var/subutai-network/vni_reserve", []byte(strings.Join(lines, "\n")), 0744)
 	log.Check(log.FatalLevel, "config.Agent.DataPrefix + /var/subutai-network/vni_reserve delete vni", err)
-
-	log.Info(vni + " " + vlan + " " + envid + " deleted")
 }

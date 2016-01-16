@@ -128,7 +128,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 		vm.currentUser = data;
 	});
 	function shareEnvironmentWindow (environment) {
-		console.log (environment);
 		vm.listOfUsers = [];
 		vm.checkedUsers = [];
 		environmentService.getUsers().success (function (data) {
