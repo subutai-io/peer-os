@@ -1,16 +1,13 @@
 package net
 
 import (
-	"bufio"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
-	"strconv"
 	"strings"
 	"subutai/config"
 	"subutai/log"
-	"syscall"
 )
 
 func CreateVNIFile(name string) {
@@ -172,21 +169,7 @@ func DeleteVNI(vni, vlan, envid string) {
 	lines = strings.Split(string(f), "\n")
 	for k, v := range lines {
 		if v == vni+" "+vlan+" "+envid {
-			pid, _ := strconv.Atoi(ReturnPID("p2p", envid))
-			newconf := ""
-			log.Check(log.WarnLevel, "remove n2n tunnel: ", syscall.Kill(pid, syscall.SIGHUP))
-			file, err := os.Open(config.Agent.DataPrefix + "/var/subutai-network/p2p.txt")
-			if !log.Check(log.WarnLevel, "Opening p2p.txt", err) {
-				scanner := bufio.NewScanner(bufio.NewReader(file))
-				for scanner.Scan() {
-					line := scanner.Text()
-					if strings.HasSuffix(line, envid) {
-						newconf = newconf + line + "\n"
-					}
-				}
-				file.Close()
-				log.Check(log.FatalLevel, "Removing p2p tunnel", ioutil.WriteFile(config.Agent.DataPrefix+"/var/subutai-network/p2p.txt", []byte(newconf), 0644))
-			}
+			RemoveP2PTunnel(envid)
 			lines[k] = ""
 		}
 	}

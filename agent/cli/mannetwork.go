@@ -1,18 +1,12 @@
 package lib
 
 import (
-	"bufio"
 	"fmt"
-	"io/ioutil"
-	n "net"
 	"os"
-	"os/exec"
-	"strconv"
 	"strings"
 	"subutai/config"
 	"subutai/lib/net"
 	"subutai/log"
-	"syscall"
 )
 
 func LxcManagementNetwork(args []string) {
@@ -30,8 +24,6 @@ func LxcManagementNetwork(args []string) {
 		net.DeleteGateway(args[3])
 	case "-S", "--listopenedtap":
 		net.ListTapDevice()
-	case "-V", "--removetap":
-		removeTapDevice(args[3])
 	case "-v", "--listvnimap":
 		listVNIMap()
 	case "-r", "--removetunnel":
@@ -43,7 +35,7 @@ func LxcManagementNetwork(args []string) {
 	case "-M", "--removevni":
 		delVNI(args[3], args[4], args[5])
 	case "-R", "--removen2n":
-		removeN2NTunnel(args[3], args[4])
+		net.RemoveP2PTunnel(args[4])
 	case "-E", "--reservvni":
 		reservVNI(args[3], args[4], args[5])
 	case "-m", "--createvnimap":
@@ -66,16 +58,7 @@ func LxcManagementNetwork(args []string) {
 			net.DeleteFlow(args[3], args[4])
 		}
 	case "-N", "--addn2n":
-		p2pTunnel(args[5], args[6], args[7])
-		// if len(args)-3 == 8 {
-		// func createN2NTunnel(interfaceName, communityName, localPeepIPAddr) {
-		// func createN2NTunnel(superNodeIPaddr, superNodePort, interfaceName, communityName, localPeepIPAddr, keyType, keyFile, managementPort string) {
-		// createN2NTunnel(args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10])
-		// } else if len(args)-3 == 7 { // management port can be empty
-		// createN2NTunnel(args[3], args[4], args[5], args[6], args[7], args[8], args[9], "")
-		// } else {
-		// log.Warn("please check you have given all arguments correctly")
-		// }
+		net.CreateP2PTunnel(args[5], args[6], args[7])
 	case "-Z", "--vniop":
 		switch args[3] {
 		case "deleteall":
@@ -87,29 +70,6 @@ func LxcManagementNetwork(args []string) {
 			net.ListVNI()
 		}
 	}
-}
-
-func p2pFile(line string) {
-	path := config.Agent.DataPrefix + "/var/subutai-network/"
-	file := path + "p2p.txt"
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		log.Check(log.FatalLevel, "create "+path+" folder", os.MkdirAll(path, 0755))
-	}
-	if _, err := os.Stat(file); os.IsNotExist(err) {
-		_, err = os.Create(file)
-		log.Check(log.FatalLevel, "Creating "+file, err)
-	}
-
-	f, err := os.OpenFile(file, os.O_APPEND|os.O_WRONLY, 0600)
-	log.Check(log.FatalLevel, "Opening file for append "+file, err)
-	defer f.Close()
-	_, err = f.WriteString(line + "\n")
-	log.Check(log.FatalLevel, "Opening file for append "+file, err)
-}
-
-func p2pTunnel(interfaceName, communityName, localPeepIPAddr string) {
-	p2pFile(interfaceName + " " + localPeepIPAddr + " " + communityName)
-	log.Check(log.FatalLevel, "p2p command: ", exec.Command("p2p", "-start", "-key", communityName[0:31], "-dev", interfaceName, "-ip", localPeepIPAddr, "-hash", communityName).Start())
 }
 
 func createTunnel(tunnelPortName, tunnelIPAddress, tunnelType string) error {
@@ -175,72 +135,6 @@ func showPort(bridgeName string) {
 	fmt.Println(s)
 }
 
-// refer to n2n.go
-func createN2NTunnel(superNodeIPaddr, superNodePort, interfaceName, communityName,
-	localPeepIPAddr, keyType, keyFile, managementPort string) {
-	// check: if there is /var/subutai-network/edgePorts.txt
-	log.Info("n2n create tunnel started")
-	log.Info("superNode IP: " + superNodeIPaddr)
-	log.Info("superNode port: " + superNodePort)
-	log.Info("interface name: " + interfaceName)
-	log.Info("community name: " + communityName)
-	log.Info("local peer IP: " + localPeepIPAddr)
-	log.Info("key type: " + keyType)
-	log.Info("key file: " + keyFile)
-	log.Info("management port: " + managementPort)
-	net.CheckOrCreateEdgePortFile()
-	// check: if port is given or available.
-
-	if managementPort == "" {
-	CutTheLoop:
-		for i := 5645; i < 65535; i++ {
-			_, err := n.Listen("udp", ":"+string(i))
-			if err != nil {
-				// then this port is empty.
-				managementPort = strconv.Itoa(i)
-				break CutTheLoop // cut the loop
-			}
-		}
-	} else if _, err := n.Listen("udp", managementPort); err == nil {
-		// ups this is port is being used...
-		log.Error("port is used by other process. " + err.Error())
-	}
-	if managementPort == "" {
-		// still??? then there is no port left
-		log.Error("no available port in computer")
-	}
-	net.ProcessEdge(superNodeIPaddr, superNodePort, interfaceName, communityName,
-		localPeepIPAddr, keyType, keyFile, managementPort)
-
-}
-
-func removeN2NTunnel(interfaceName, communityName string) {
-	pid := net.ReturnPID(interfaceName, communityName)
-	i, _ := strconv.Atoi(pid)
-	newconf := ""
-	log.Check(log.FatalLevel, "remove n2n tunnel: ", syscall.Kill(i, syscall.SIGHUP))
-
-	file, err := os.Open(config.Agent.DataPrefix + "/var/subutai-network/p2p.txt")
-	log.Check(log.FatalLevel, "Opening p2p.txt", err)
-	scanner := bufio.NewScanner(bufio.NewReader(file))
-
-	for scanner.Scan() {
-		line := scanner.Text()
-		if strings.HasPrefix(line, interfaceName) && strings.HasSuffix(line, communityName) {
-			newconf = newconf + line + "\n"
-		}
-	}
-	file.Close()
-	log.Check(log.FatalLevel, "Removing p2p tunnel", ioutil.WriteFile(config.Agent.DataPrefix+"/var/subutai-network/p2p.txt", []byte(newconf), 0644))
-}
-
-func removeTapDevice(interfaceName string) {
-	pid := net.ReturnPID(interfaceName, " ") // i don't know if this will work..
-	i, _ := strconv.Atoi(pid)
-	log.Check(log.FatalLevel, "remove tap device: ", syscall.Kill(i, syscall.SIGHUP))
-	log.Info(interfaceName + " tap device removed")
-}
-
 func createVNIMap(tunnelPortName, vni, vlan, envid string) {
 	// check: if there is vni file
 	if _, err := os.Stat(config.Agent.DataPrefix + "/var/subutai-network/vni_reserve"); os.IsNotExist(err) {
@@ -290,7 +184,5 @@ func reservVNI(vni, vlan, envid string) {
 }
 
 func reloadN2N(interfaceName, communityName string) {
-	net.CheckOrCreateEdgePortFile()
-	net.ReloadN2N(interfaceName, communityName)
-	log.Info(interfaceName + " " + communityName + " reloaded")
+	log.Info("This function is not implemented yet")
 }
