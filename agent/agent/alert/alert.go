@@ -64,8 +64,7 @@ func id(path string) string {
 }
 
 func stat() string {
-	args := []string{"qgroup", "show", "-r", "--raw", config.Agent.LxcPrefix}
-	out, err := exec.Command("btrfs", args...).Output()
+	out, err := exec.Command("btrfs", "qgroup", "show", "-r", "--raw", config.Agent.LxcPrefix).Output()
 	log.Check(log.DebugLevel, "Geting btrfs stats", err)
 
 	return string(out)

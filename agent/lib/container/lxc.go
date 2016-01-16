@@ -116,7 +116,9 @@ func AttachExec(name string, command []string) (output []string, err error) {
 
 func Destroy(name string) {
 	c, err := lxc.NewContainer(name, config.Agent.LxcPrefix)
-	log.Check(log.FatalLevel, "Creating container object", err)
+	if log.Check(log.WarnLevel, "Creating container object", err) {
+		return
+	}
 
 	if c.State() == lxc.RUNNING {
 		err := c.Stop()
