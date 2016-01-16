@@ -64,7 +64,7 @@ const defaultConfig = `
 	version = 4.0.0
 	gpgUser =
 	gpgPassword = 12345678
-	debug = true
+	debug = false
 	appPrefix = /apps/subutai/current/
 	dataPrefix = /var/lib/apps/subutai/current/
 	lxcPrefix = /mnt/lib/lxc/    
@@ -139,8 +139,8 @@ func init() {
 	name, _ := os.Hostname()
 	config.Agent.GpgUser = name + "@subutai.io"
 
-	if !config.Agent.Debug {
-		log.Level(log.InfoLevel)
+	if config.Agent.Debug {
+		log.Level(log.DebugLevel)
 	}
 
 	Misc = config.Misc

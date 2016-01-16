@@ -20,14 +20,44 @@ func init() {
 
 func main() {
 	app := cli.NewApp()
-	app.Name = "Subutai CLI"
+	app.Name = "Subutai"
 	app.Version = "4.0.0 RC5"
+	app.Usage = "daemon and command line interface binary"
 
 	app.Flags = []cli.Flag{cli.BoolFlag{
 		Name:  "d",
 		Usage: "debug mode"}}
 
 	app.Commands = []cli.Command{{
+		Name: "clone", Usage: "clone Subutai container",
+		Flags: []cli.Flag{
+			cli.StringFlag{Name: "e", Usage: "set environment id for container"},
+			cli.StringFlag{Name: "i", Usage: "set container IP address and VLAN"},
+			cli.StringFlag{Name: "t", Usage: "token to verify with MH"}},
+		Action: func(c *cli.Context) {
+			lib.LxcClone(c.Args().Get(0), c.Args().Get(1), c.String("e"), c.String("i"), c.String("t"))
+		}}, {
+
+		Name: "cleanup", Usage: "clean Subutai environment",
+		Action: func(c *cli.Context) {
+			lib.Cleanup(c.Args().Get(0))
+		}}, {
+
+		Name: "collect", Usage: "collect performance stats",
+		Action: func(c *cli.Context) {
+			lib.CollectStats()
+		}}, {
+
+		Name: "config", Usage: "containerName add/del key value",
+		Flags: []cli.Flag{
+			cli.StringFlag{Name: "o", Usage: "add/del key value"},
+			cli.StringFlag{Name: "k", Usage: "add/del key value"},
+			cli.StringFlag{Name: "v", Usage: "add/del key value"},
+		},
+		Action: func(c *cli.Context) {
+			lib.LxcConfig(c.Args().Get(0), c.String("o"), c.String("k"), c.String("v"))
+		}}, {
+
 		Name: "daemon", Usage: "start an agent",
 		Action: agent.Start,
 		Flags: []cli.Flag{
@@ -37,39 +67,13 @@ func main() {
 			cli.StringFlag{Name: "secret", Value: config.Management.Secret, Usage: "send secret passphrase via flag"},
 		}}, {
 
-		Name: "collect", Usage: "collect performance stats",
+		Name: "demote", Usage: "demote Subutai container",
+		Flags: []cli.Flag{
+			cli.StringFlag{Name: "i", Usage: "network value ie 192.168.1.1/24"},
+			cli.StringFlag{Name: "v", Usage: "vlan id"},
+		},
 		Action: func(c *cli.Context) {
-			lib.CollectStats()
-		}}, {
-
-		Name: "rename", Usage: "rename Subutai container",
-		Action: func(c *cli.Context) {
-			lib.LxcRename(c.Args().Get(0), c.Args().Get(1))
-		}}, {
-
-		Name: "import", Usage: "import Subutai template",
-		Action: func(c *cli.Context) {
-			lib.LxcImport(c.Args().Get(0))
-		}}, {
-
-		Name: "stats", Usage: "statistics from host",
-		Action: func(c *cli.Context) {
-			lib.Stats(c.Args().Get(0), c.Args().Get(1), c.Args().Get(2))
-		}}, {
-
-		Name: "start", Usage: "start Subutai container",
-		Action: func(c *cli.Context) {
-			lib.LxcStart(c.Args().Get(0))
-		}}, {
-
-		Name: "stop", Usage: "stop Subutai container",
-		Action: func(c *cli.Context) {
-			lib.LxcStop(c.Args().Get(0))
-		}}, {
-
-		Name: "tunnel", Usage: "create SSH tunnel to container",
-		Action: func(c *cli.Context) {
-			lib.SshTunnel(c.Args().Get(0), c.Args().Get(1))
+			lib.LxcDemote(c.Args().Get(0), c.String("i"), c.String("v"))
 		}}, {
 
 		Name: "destroy", Usage: "destroy Subutai container",
@@ -77,12 +81,14 @@ func main() {
 			lib.LxcDestroy(c.Args().Get(0))
 		}}, {
 
-		Name: "metrics", Usage: "list Subutai container",
-		Flags: []cli.Flag{
-			cli.StringFlag{Name: "s", Usage: "start time"},
-			cli.StringFlag{Name: "e", Usage: "end time"}},
+		Name: "export", Usage: "export Subutai container",
 		Action: func(c *cli.Context) {
-			lib.HostMetrics(c.Args().Get(0), c.String("s"), c.String("e"))
+			lib.LxcExport(c.Args().Get(0))
+		}}, {
+
+		Name: "import", Usage: "import Subutai template",
+		Action: func(c *cli.Context) {
+			lib.LxcImport(c.Args().Get(0))
 		}}, {
 
 		Name: "list", Usage: "list Subutai container",
@@ -98,50 +104,56 @@ func main() {
 			lib.LxcList(c.Args().Get(0), c.Bool("c"), c.Bool("t"), c.Bool("r"), c.Bool("i"), c.Bool("a"), c.Bool("f"), c.Bool("p"))
 		}}, {
 
-		Name: "clone", Usage: "clone Subutai container",
-		Flags: []cli.Flag{
-			cli.StringFlag{Name: "e", Usage: "set environment id for container"},
-			cli.StringFlag{Name: "i", Usage: "set container IP address and VLAN"},
-			cli.StringFlag{Name: "t", Usage: "token to verify with MH"}},
+		Name: "management_network", Usage: "configure management network",
+		Flags: []cli.Flag{cli.BoolFlag{Name: "listtunnel, l", Usage: "-l"},
+			cli.StringFlag{Name: "removetunnel, r", Usage: "-r tunnerPortName"},
+			cli.StringFlag{Name: "reservvni, E", Usage: "-E vni, vlanid, envid"},
+			cli.StringFlag{Name: "removevni, M", Usage: "-M TUNNELPORTNAME VNI VLANID"},
+			cli.StringFlag{Name: "createvnimap, m", Usage: "-m TUNNELPORTNAME VNI VLANID ENV_ID"},
+			cli.StringFlag{Name: "createtunnel, c", Usage: "-c TUNNELPORTNAME TUNNELIPADDRESS TUNNELTYPE"},
+
+			cli.StringFlag{Name: "addflow, f", Usage: "-f BRIDGENAME FLOWCONFIGURATION"},
+			cli.StringFlag{Name: "showflow, s", Usage: "-s BRIDGENAME"},
+			cli.StringFlag{Name: "deleteflow, d", Usage: "-d BRIDGENAME MATCHCASE"},
+			cli.StringFlag{Name: "showport, p", Usage: "-p BRIDGENAME"},
+
+			cli.BoolFlag{Name: "listn2n, L", Usage: "-L"},
+			cli.StringFlag{Name: "reloadn2n, e", Usage: "-e INTERFACENAME COMMUNITYNAME"},
+			cli.StringFlag{Name: "removen2n, R", Usage: "-R INTERFACENAME COMMUNITYNAME"},
+			cli.StringFlag{Name: "addn2n, N", Usage: "superNodeIPaddr, superNodePort, interfaceName, communityName, localPeepIPAddr, keyType, keyFile, managementPort"},
+
+			cli.BoolFlag{Name: "listvnimap, v", Usage: "-v"},
+			cli.BoolFlag{Name: "listopenedtab, S", Usage: "-S"},
+			cli.StringFlag{Name: "deletegateway, D", Usage: "-D VLANID"},
+			cli.StringFlag{Name: "removetab, V", Usage: "-V INTERFACENAME"},
+			cli.StringFlag{Name: "creategateway, T", Usage: "-T VLANIP/SUBNET VLANID"},
+			cli.StringFlag{Name: "vniop, Z", Usage: "-Z [delete] | [deleteall] | [list]"}},
 		Action: func(c *cli.Context) {
-			lib.LxcClone(c.Args().Get(0), c.Args().Get(1), c.String("e"), c.String("i"), c.String("t"))
+			lib.LxcManagementNetwork(os.Args)
 		}}, {
 
-		Name: "quota", Usage: "set quotas for Subutai container",
+		Name: "metrics", Usage: "list Subutai container",
 		Flags: []cli.Flag{
-			cli.StringFlag{Name: "s", Usage: "set quota for the specified resource type"},
-			cli.StringFlag{Name: "m", Usage: "get the maximum quota can be set to the specified container and resource_type in their default units"}},
+			cli.StringFlag{Name: "s", Usage: "start time"},
+			cli.StringFlag{Name: "e", Usage: "end time"}},
 		Action: func(c *cli.Context) {
-			lib.LxcQuota(c.Args().Get(0), c.Args().Get(1), c.String("s"), c.String("m"))
+			lib.HostMetrics(c.Args().Get(0), c.String("s"), c.String("e"))
+		}}, {
+
+		Name: "network", Usage: "containerName set/remove/list network vlan id",
+		Flags: []cli.Flag{
+			cli.StringFlag{Name: "set, s", Usage: "IPADDRESS/NETMASK"},
+			cli.StringFlag{Name: "vlan, v", Usage: "vlanid"},
+			cli.BoolFlag{Name: "remove, r", Usage: ""},
+			cli.BoolFlag{Name: "list, l", Usage: ""},
+		},
+		Action: func(c *cli.Context) {
+			lib.LxcNetwork(c.Args().Get(0), c.String("s"), c.String("vlan"), c.Bool("r"), c.Bool("l"))
 		}}, {
 
 		Name: "promote", Usage: "promote Subutai container",
 		Action: func(c *cli.Context) {
 			lib.LxcPromote(c.Args().Get(0))
-		}}, {
-
-		Name: "export", Usage: "export Subutai container",
-		Action: func(c *cli.Context) {
-			lib.LxcExport(c.Args().Get(0))
-		}}, {
-
-		Name: "register", Usage: "register Subutai container",
-		Action: func(c *cli.Context) {
-			lib.LxcRegister(c.Args().Get(0))
-		}}, {
-
-		Name: "unregister", Usage: "unregister Subutai container",
-		Action: func(c *cli.Context) {
-			lib.LxcUnregister(c.Args().Get(0))
-		}}, {
-
-		Name: "demote", Usage: "demote Subutai container",
-		Flags: []cli.Flag{
-			cli.StringFlag{Name: "i", Usage: "network value ie 192.168.1.1/24"},
-			cli.StringFlag{Name: "v", Usage: "vlan id"},
-		},
-		Action: func(c *cli.Context) {
-			lib.LxcDemote(c.Args().Get(0), c.String("i"), c.String("v"))
 		}}, {
 
 		Name: "proxy", Usage: "Subutai reverse proxy",
@@ -183,52 +195,47 @@ func main() {
 			},
 		}}, {
 
-		Name: "management_network", Usage: "configure management network",
-		Flags: []cli.Flag{cli.BoolFlag{Name: "listtunnel, l", Usage: "-l"},
-			cli.StringFlag{Name: "removetunnel, r", Usage: "-r tunnerPortName"},
-			cli.StringFlag{Name: "reservvni, E", Usage: "-E vni, vlanid, envid"},
-			cli.StringFlag{Name: "removevni, M", Usage: "-M TUNNELPORTNAME VNI VLANID"},
-			cli.StringFlag{Name: "createvnimap, m", Usage: "-m TUNNELPORTNAME VNI VLANID ENV_ID"},
-			cli.StringFlag{Name: "createtunnel, c", Usage: "-c TUNNELPORTNAME TUNNELIPADDRESS TUNNELTYPE"},
-
-			cli.StringFlag{Name: "addflow, f", Usage: "-f BRIDGENAME FLOWCONFIGURATION"},
-			cli.StringFlag{Name: "showflow, s", Usage: "-s BRIDGENAME"},
-			cli.StringFlag{Name: "deleteflow, d", Usage: "-d BRIDGENAME MATCHCASE"},
-			cli.StringFlag{Name: "showport, p", Usage: "-p BRIDGENAME"},
-
-			cli.BoolFlag{Name: "listn2n, L", Usage: "-L"},
-			cli.StringFlag{Name: "reloadn2n, e", Usage: "-e INTERFACENAME COMMUNITYNAME"},
-			cli.StringFlag{Name: "removen2n, R", Usage: "-R INTERFACENAME COMMUNITYNAME"},
-			cli.StringFlag{Name: "addn2n, N", Usage: "superNodeIPaddr, superNodePort, interfaceName, communityName, localPeepIPAddr, keyType, keyFile, managementPort"},
-
-			cli.BoolFlag{Name: "listvnimap, v", Usage: "-v"},
-			cli.BoolFlag{Name: "listopenedtab, S", Usage: "-S"},
-			cli.StringFlag{Name: "deletegateway, D", Usage: "-D VLANID"},
-			cli.StringFlag{Name: "removetab, V", Usage: "-V INTERFACENAME"},
-			cli.StringFlag{Name: "creategateway, T", Usage: "-T VLANIP/SUBNET VLANID"},
-			cli.StringFlag{Name: "vniop, Z", Usage: "-Z [delete] | [deleteall] | [list]"}},
+		Name: "quota", Usage: "set quotas for Subutai container",
+		Flags: []cli.Flag{
+			cli.StringFlag{Name: "s", Usage: "set quota for the specified resource type"},
+			cli.StringFlag{Name: "m", Usage: "get the maximum quota can be set to the specified container and resource_type in their default units"}},
 		Action: func(c *cli.Context) {
-			lib.LxcManagementNetwork(os.Args)
+			lib.LxcQuota(c.Args().Get(0), c.Args().Get(1), c.String("s"), c.String("m"))
 		}}, {
 
-		Name: "config", Usage: "containerName add/del key value",
-		Flags: []cli.Flag{
-			cli.StringFlag{Name: "o", Usage: "add/del key value"},
-			cli.StringFlag{Name: "k", Usage: "add/del key value"},
-			cli.StringFlag{Name: "v", Usage: "add/del key value"},
-		},
+		Name: "rename", Usage: "rename Subutai container",
 		Action: func(c *cli.Context) {
-			lib.LxcConfig(c.Args().Get(0), c.String("o"), c.String("k"), c.String("v"))
+			lib.LxcRename(c.Args().Get(0), c.Args().Get(1))
 		}}, {
-		Name: "network", Usage: "containerName set/remove/list network vlan id",
-		Flags: []cli.Flag{
-			cli.StringFlag{Name: "set, s", Usage: "IPADDRESS/NETMASK"},
-			cli.StringFlag{Name: "vlan, v", Usage: "vlanid"},
-			cli.BoolFlag{Name: "remove, r", Usage: ""},
-			cli.BoolFlag{Name: "list, l", Usage: ""},
-		},
+
+		Name: "register", Usage: "register Subutai container",
 		Action: func(c *cli.Context) {
-			lib.LxcNetwork(c.Args().Get(0), c.String("s"), c.String("vlan"), c.Bool("r"), c.Bool("l"))
+			lib.LxcRegister(c.Args().Get(0))
+		}}, {
+
+		Name: "stats", Usage: "statistics from host",
+		Action: func(c *cli.Context) {
+			lib.Stats(c.Args().Get(0), c.Args().Get(1), c.Args().Get(2))
+		}}, {
+
+		Name: "start", Usage: "start Subutai container",
+		Action: func(c *cli.Context) {
+			lib.LxcStart(c.Args().Get(0))
+		}}, {
+
+		Name: "stop", Usage: "stop Subutai container",
+		Action: func(c *cli.Context) {
+			lib.LxcStop(c.Args().Get(0))
+		}}, {
+
+		Name: "tunnel", Usage: "create SSH tunnel to container",
+		Action: func(c *cli.Context) {
+			lib.SshTunnel(c.Args().Get(0), c.Args().Get(1))
+		}}, {
+
+		Name: "unregister", Usage: "unregister Subutai container",
+		Action: func(c *cli.Context) {
+			lib.LxcUnregister(c.Args().Get(0))
 		}},
 	}
 
