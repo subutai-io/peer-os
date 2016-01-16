@@ -195,7 +195,9 @@ func GetToken() string {
 	client := &http.Client{Transport: tr}
 
 	resp, err := client.Get("https://" + config.Management.Host + ":" + config.Management.Port + config.Management.RestToken + "?username=" + config.Management.Login + "&password=" + config.Management.Password)
-	log.Check(log.ErrorLevel, "Getting token", err)
+	if log.Check(log.WarnLevel, "Getting token", err) {
+		return ""
+	}
 
 	defer resp.Body.Close()
 	token, _ := ioutil.ReadAll(resp.Body)

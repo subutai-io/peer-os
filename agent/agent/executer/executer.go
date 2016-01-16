@@ -147,7 +147,12 @@ func Run(req RequestOptions, out_c chan<- ResponseOptions) {
 			cmd.Process.Kill()
 			response.Type = config.Broker.ExecuteTimeout
 			cmd.Process.Wait()
-			response.ExitCode = strconv.Itoa(cmd.ProcessState.Sys().(syscall.WaitStatus).ExitStatus())
+			if cmd.ProcessState != nil {
+				response.ExitCode = strconv.Itoa(cmd.ProcessState.Sys().(syscall.WaitStatus).ExitStatus())
+			} else {
+				response.ExitCode = "unknown"
+			}
+			// log.Info("22222222222222222222")
 			out_c <- response
 		}
 	}
