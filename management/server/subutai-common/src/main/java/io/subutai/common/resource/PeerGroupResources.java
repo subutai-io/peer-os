@@ -1,7 +1,9 @@
 package io.subutai.common.resource;
 
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 
 /**
@@ -9,16 +11,33 @@ import java.util.Collection;
  */
 public class PeerGroupResources
 {
-    private Collection<PeerResources> resources;
+    private List<PeerResources> resources = new ArrayList<>();
 
 
-    public PeerGroupResources( final Collection<PeerResources> resources )
+    public PeerGroupResources()
+    {
+
+    }
+
+
+    public PeerGroupResources( final List<PeerResources> resources )
     {
         this.resources = resources;
     }
 
 
-    public Collection<PeerResources> getResources()
+    public void addPeerResources( PeerResources peerResources )
+    {
+        if ( peerResources == null )
+        {
+            throw new IllegalArgumentException( "Peer resources could not be null." );
+        }
+
+        resources.add( peerResources );
+    }
+
+
+    public List<PeerResources> getResources()
     {
         return resources;
     }

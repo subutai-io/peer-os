@@ -31,11 +31,14 @@ public class MasterPlacementStrategy implements ContainerPlacementStrategy
 
     static
     {
+/*
         schema.add( new NodeSchema( "Huge master", ContainerSize.HUGE, "master" ) );
         schema.add( new NodeSchema( "Large master", ContainerSize.LARGE, "master" ) );
         schema.add( new NodeSchema( "Medium master", ContainerSize.MEDIUM, "master" ) );
-        schema.add( new NodeSchema( "Small master", ContainerSize.SMALL, "master" ) );
-        schema.add( new NodeSchema( "Tiny master", ContainerSize.TINY, "master" ) );
+*/
+        schema.add( new NodeSchema( "master", ContainerSize.TINY, "master" ) );
+        schema.add( new NodeSchema( "hadoop", ContainerSize.TINY, "hadoop" ) );
+        schema.add( new NodeSchema( "cassandra", ContainerSize.TINY, "cassandra" ) );
     }
 
     public static MasterPlacementStrategy getInstance()
@@ -122,7 +125,7 @@ public class MasterPlacementStrategy implements ContainerPlacementStrategy
                 for ( ResourceAllocator.AllocatedContainer container : containers )
                 {
                     NodeGroup nodeGroup =
-                            new NodeGroup( container.getName(), container.getTemplateName(), container.getSize(), 1, 0,
+                            new NodeGroup( container.getName(), container.getTemplateName(), container.getSize(), 0,
                                     0, container.getPeerId(), container.getHostId() );
                     nodeGroups.add( nodeGroup );
                 }

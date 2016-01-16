@@ -4,6 +4,9 @@ package io.subutai.core.environment.impl.workflow.creation.steps;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.collect.Maps;
@@ -25,6 +28,7 @@ import io.subutai.common.peer.LocalPeer;
  */
 public class VNISetupStep
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger( VNISetupStep.class );
     private final Topology topology;
     private final EnvironmentImpl environment;
     private final LocalPeer localPeer;
@@ -40,6 +44,8 @@ public class VNISetupStep
 
     public void execute() throws EnvironmentCreationException, PeerException
     {
+        LOGGER.debug( "VNI setup started..." );
+
         Set<Peer> peers = Sets.newHashSet( topology.getAllPeers() );
         peers.add( localPeer );
 
@@ -69,6 +75,7 @@ public class VNISetupStep
             }
         }
 
+        LOGGER.debug( "Find free VNI..." );
         //calculate new vni
         long freeVni = findFreeVni( peers );
 
@@ -76,7 +83,7 @@ public class VNISetupStep
         Vni newVni = new Vni( freeVni, environment.getId() );
 
         //reserve new vni and create gateway
-
+        LOGGER.debug( "Creating gateways..." );
         for ( final Peer peer : peers )
         {
             Vni reservedVni = peer.reserveVni( newVni );

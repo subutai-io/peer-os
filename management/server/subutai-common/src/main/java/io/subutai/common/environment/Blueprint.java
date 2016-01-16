@@ -37,19 +37,19 @@ public class Blueprint
     @JsonProperty( "nodegroups" )
     @GsonRequired
     private Set<NodeGroup> nodeGroups;
-//    @JsonProperty( "strategyId" )
-//    private String strategyId;
+    @JsonProperty( "strategyId" )
+    private String strategyId;
     @JsonProperty( "containerDistributionType" )
     private ContainerDistributionType distributionType = ContainerDistributionType.AUTO;
 
 
     public Blueprint( @JsonProperty( "name" ) final String name, @JsonProperty( "sshKey" ) final String sshKey,
-                      @JsonProperty( "nodegroups" ) final Set<NodeGroup> nodeGroups/*, final String strategyId*/ )
+                      @JsonProperty( "nodegroups" ) final Set<NodeGroup> nodeGroups, final String strategyId )
     {
         this.name = name;
         this.nodeGroups = nodeGroups;
         this.sshKey = sshKey;
-//        this.strategyId = strategyId;
+        this.strategyId = strategyId;
     }
 
 
@@ -82,10 +82,10 @@ public class Blueprint
     }
 
 
-//    public String getStrategyId()
-//    {
-//        return strategyId;
-//    }
+    public String getStrategyId()
+    {
+        return strategyId;
+    }
 
 
     public ContainerDistributionType getDistributionType()
