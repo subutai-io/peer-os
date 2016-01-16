@@ -197,4 +197,23 @@ public class NodeGroup
     {
         this.containerDistributionType = containerDistributionType;
     }
+
+
+    @Override
+    public String toString()
+    {
+        final StringBuffer sb = new StringBuffer( "NodeGroup{" );
+        sb.append( "name='" ).append( name ).append( '\'' );
+        sb.append( ", templateName='" ).append( templateName ).append( '\'' );
+        sb.append( ", type=" ).append( type );
+        sb.append( ", numberOfContainers=" ).append( numberOfContainers );
+        sb.append( ", sshGroupId=" ).append( sshGroupId );
+        sb.append( ", hostsGroupId=" ).append( hostsGroupId );
+        sb.append( ", containerPlacementStrategy=" ).append( containerPlacementStrategy );
+        sb.append( ", peerId='" ).append( peerId ).append( '\'' );
+        sb.append( ", hostId='" ).append( hostId ).append( '\'' );
+        sb.append( ", containerDistributionType=" ).append( containerDistributionType );
+        sb.append( '}' );
+        return sb.toString();
+    }
 }

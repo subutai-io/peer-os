@@ -151,4 +151,18 @@ public class Blueprint
         }
         return true;
     }
+
+
+    @Override
+    public String toString()
+    {
+        final StringBuffer sb = new StringBuffer( "Blueprint{" );
+        sb.append( "id=" ).append( id );
+        sb.append( ", name='" ).append( name ).append( '\'' );
+        sb.append( ", sshKey='" ).append( sshKey ).append( '\'' );
+        sb.append( ", nodeGroups=" ).append( nodeGroups );
+        sb.append( ", distributionType=" ).append( distributionType );
+        sb.append( '}' );
+        return sb.toString();
+    }
 }
