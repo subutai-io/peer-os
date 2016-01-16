@@ -24,7 +24,7 @@ function LoginCtrl( loginSrv, $http, $location, $rootScope, $state )
 			sessionStorage.setItem('currentUser', vm.name);
 			$rootScope.currentUser = vm.name;
 			$http.defaults.headers.common['sptoken']= getCookie('sptoken');
-			//window.location.href = '/';
+			//$location.path('');
 			$state.go('home');
 		}).error(function(error){
 			console.log(error);

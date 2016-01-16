@@ -33,6 +33,11 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 
 	var vm = this;
 
+	//cfpLoadingBar.start();
+	//angular.element(document).ready(function () {
+	//	cfpLoadingBar.complete();
+	//});
+
 	//functions
 	vm.userForm = userForm;
 	vm.deleteUser = deleteUser;
