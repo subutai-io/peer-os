@@ -122,7 +122,7 @@ public class RestServiceImpl implements RestService
                 newUser.setRoles(
                         roleIds.stream().map( r -> identityManager.getRole( r ) ).collect( Collectors.toList() ) );
             }
-            identityManager.updateUser( newUser );
+            identityManager.updateUser( newUser, publicKey );
         }
         catch ( Exception e )
         {
