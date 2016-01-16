@@ -57,6 +57,7 @@ import ai.subut.kurjun.model.security.Permission;
 import ai.subut.kurjun.quota.DataUnit;
 import ai.subut.kurjun.quota.QuotaException;
 import ai.subut.kurjun.quota.QuotaInfoStore;
+import ai.subut.kurjun.quota.QuotaManagementModule;
 import ai.subut.kurjun.quota.QuotaManagerFactory;
 import ai.subut.kurjun.quota.disk.DiskQuota;
 import ai.subut.kurjun.quota.disk.DiskQuotaManager;
@@ -498,6 +499,7 @@ public class TemplateManagerImpl implements TemplateManager
 
         bootstrap.addModule( new RepositoryModule() );
         bootstrap.addModule( new SecurityModule() );
+        bootstrap.addModule( new QuotaManagementModule() );
 
         bootstrap.boot();
 
