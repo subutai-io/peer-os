@@ -3,13 +3,16 @@ package io.subutai.core.identity.impl.dao;
 
 import java.util.List;
 
-import io.subutai.core.identity.api.model.*;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.core.identity.api.dao.IdentityDataService;
+import io.subutai.core.identity.api.model.Permission;
+import io.subutai.core.identity.api.model.Role;
+import io.subutai.core.identity.api.model.Session;
+import io.subutai.core.identity.api.model.User;
+import io.subutai.core.identity.api.model.UserToken;
 
 
 /**
@@ -103,8 +106,15 @@ public class IdentityDataServiceImpl implements IdentityDataService
     }
 
 
+    @Override
+    public List<User> getAllSystemUsers()
+    {
+        return userDAOService.getAllSystemUsers();
+    }
+
+
     /* *************************************************
-     */
+         */
     @Override
     public void persistUser( final User item )
     {
@@ -185,6 +195,7 @@ public class IdentityDataServiceImpl implements IdentityDataService
         role.getPermissions().add( permission );
         roleDAOService.update( role );
     }
+
 
     /* *************************************************
      *
@@ -423,5 +434,4 @@ public class IdentityDataServiceImpl implements IdentityDataService
     {
         userTokenDAOService.removeInvalid();
     }
-
 }

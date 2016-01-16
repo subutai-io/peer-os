@@ -3,12 +3,13 @@ package io.subutai.core.pluginmanager.impl;
 
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.pluginmanager.api.OperationType;
 import io.subutai.core.pluginmanager.api.PluginManagerException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 public class PluginOperationHandler implements Runnable
@@ -68,7 +69,7 @@ public class PluginOperationHandler implements Runnable
         try
         {
             RequestBuilder command = manager.getCommands().makeRemoveCommand( pluginName );
-            if( managerHelper.execute( command ) == null )
+            if ( managerHelper.execute( command ) == null )
             {
                 throw new PluginManagerException( "Remove operation is failed." );
             }
@@ -82,7 +83,6 @@ public class PluginOperationHandler implements Runnable
         }
         setIsRemoveSuccessful( true );
         trackerOperation.addLogDone( "Plugin is removed successfully." );
-
     }
 
 
@@ -92,11 +92,11 @@ public class PluginOperationHandler implements Runnable
         try
         {
             RequestBuilder command = manager.getCommands().makeInstallCommand( pluginName );
-            if( managerHelper.execute( command ) == null )
+            if ( managerHelper.execute( command ) == null )
             {
-                throw  new PluginManagerException( "Installation is failed" );
+                throw new PluginManagerException( "Installation is failed" );
             }
-            if( !manager.isInstalled( pluginName ))
+            if ( !manager.isInstalled( pluginName ) )
             {
                 trackerOperation.addLogFailed( "Installation failed" );
                 return;
@@ -111,23 +111,16 @@ public class PluginOperationHandler implements Runnable
         }
         setIsInstallSuccessful( true );
         trackerOperation.addLogDone( "Plugin is installed successfully." );
-
     }
 
 
     private void upgradePlugin()
     {
-        //        String result = null;
         trackerOperation.addLog( "Upgrading plugin.." );
         RequestBuilder command = manager.getCommands().makeUpgradeCommand( pluginName );
         try
         {
             managerHelper.execute( command );
-            //result = managerHelper.execute( command );
-            /*if( result.equals( "fail" ))
-            {
-                throw new PluginManagerException( "Operation is failed" );
-            }*/
         }
         catch ( PluginManagerException e )
         {

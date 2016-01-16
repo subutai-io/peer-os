@@ -29,7 +29,6 @@ import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
-import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.security.PublicKeyContainer;
@@ -78,29 +77,29 @@ public class RestServiceImpl implements RestService
     }
 
 
-//    @Override
-//    public Response getPeerPolicy( )
-//    {
-//        try
-//        {
-////            Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
-//
-//            PeerPolicy peerPolicy = localPeer.getPeerInfo().getPeerPolicy();
-//            if ( peerPolicy == null )
-//            {
-//                return Response.ok().build();
-//            }
-//            else
-//            {
-//                return Response.ok( peerPolicy ).build();
-//            }
-//        }
-//        catch ( Exception e )
-//        {
-//            LOGGER.error( "Error getting peer policy #getPeerPolicy", e );
-//            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
-//        }
-//    }
+    //    @Override
+    //    public Response getPeerPolicy( )
+    //    {
+    //        try
+    //        {
+    ////            Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
+    //
+    //            PeerPolicy peerPolicy = localPeer.getPeerInfo().getPeerPolicy();
+    //            if ( peerPolicy == null )
+    //            {
+    //                return Response.ok().build();
+    //            }
+    //            else
+    //            {
+    //                return Response.ok( peerPolicy ).build();
+    //            }
+    //        }
+    //        catch ( Exception e )
+    //        {
+    //            LOGGER.error( "Error getting peer policy #getPeerPolicy", e );
+    //            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+    //        }
+    //    }
 
 
     @Override
@@ -229,13 +228,13 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public PublicKeyContainer createEnvironmentKeyPair( final EnvironmentId environmentId )
+    public PublicKeyContainer createEnvironmentKeyPair( /*final String userToken,*/ final EnvironmentId environmentId )
     {
         Preconditions.checkNotNull( environmentId );
 
         try
         {
-            return localPeer.createPeerEnvironmentKeyPair( environmentId );
+            return localPeer.createPeerEnvironmentKeyPair( environmentId/*, userToken*/ );
         }
         catch ( Exception ex )
         {
@@ -407,6 +406,21 @@ public class RestServiceImpl implements RestService
         {
             return Response.ok( localPeer.getHistoricalMetrics( hostName, startTime.getDate(), endTime.getDate() ) )
                            .build();
+        }
+        catch ( PeerException e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            return Response.serverError().build();
+        }
+    }
+
+
+    @Override
+    public Response getResourceLimits( final String peerId )
+    {
+        try
+        {
+            return Response.ok( localPeer.getResourceLimits( peerId ) ).build();
         }
         catch ( PeerException e )
         {

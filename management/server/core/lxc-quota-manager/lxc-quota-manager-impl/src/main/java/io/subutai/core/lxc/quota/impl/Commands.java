@@ -4,8 +4,8 @@ package io.subutai.core.lxc.quota.impl;
 import com.google.common.collect.Lists;
 
 import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.resource.ResourceType;
-import io.subutai.common.resource.ResourceValue;
+import io.subutai.common.quota.ContainerResource;
+import io.subutai.common.resource.ContainerResourceType;
 
 
 /**
@@ -16,26 +16,27 @@ public class Commands
     private static final String QUOTA_BINDING = "subutai quota";
 
 
-    public RequestBuilder getReadQuotaCommand( String containerHostname, ResourceType resourceType )
+    public RequestBuilder getReadQuotaCommand( String containerHostname, ContainerResourceType containerResourceType )
     {
         return new RequestBuilder( QUOTA_BINDING )
-                .withCmdArgs( Lists.newArrayList( containerHostname, resourceType.getKey() ) );
+                .withCmdArgs( Lists.newArrayList( containerHostname, containerResourceType.getKey() ) );
     }
 
 
-    public RequestBuilder getWriteQuotaCommand( String containerHostname, ResourceType resourceType,
-                                                ResourceValue resourceValue )
+    public RequestBuilder getWriteQuotaCommand( String containerHostname,
+                                                ContainerResource resourceValue )
     {
         return new RequestBuilder( QUOTA_BINDING ).withCmdArgs(
-                Lists.newArrayList( containerHostname, resourceType.getKey(), "-s",
-                        resourceValue.getWriteValue( resourceType.getDefaultMeasureUnit() ) ) );
+                Lists.newArrayList( containerHostname, resourceValue.getContainerResourceType().getKey(), "-s",
+                        resourceValue.getWriteValue() ) );
     }
 
 
-    public RequestBuilder getReadAvailableQuotaCommand( final String containerName, final ResourceType resourceType )
+    public RequestBuilder getReadAvailableQuotaCommand( final String containerName,
+                                                        final ContainerResourceType containerResourceType )
     {
         return new RequestBuilder( QUOTA_BINDING )
-                .withCmdArgs( Lists.newArrayList( containerName, resourceType.getKey(), "-m" ) );
+                .withCmdArgs( Lists.newArrayList( containerName, containerResourceType.getKey(), "-m" ) );
     }
 
 

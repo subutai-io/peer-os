@@ -5,7 +5,8 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import io.subutai.common.host.HostId;
-import io.subutai.common.resource.ResourceType;
+import io.subutai.common.resource.ByteValueResource;
+import io.subutai.common.resource.ContainerResourceType;
 import io.subutai.common.resource.ResourceValue;
 
 
@@ -17,21 +18,20 @@ public class ExceededQuota
     @JsonProperty( "hostId" )
     protected final HostId hostId;
     @JsonProperty( "resourceType" )
-    protected final ResourceType resourceType;
+    protected final ContainerResourceType containerResourceType;
     @JsonProperty( "currentValue" )
     protected final ResourceValue currentValue;
     @JsonProperty( "quotaValue" )
     protected final ResourceValue quotaValue;
 
 
-
     public ExceededQuota( @JsonProperty( "hostId" ) final HostId hostId,
-                          @JsonProperty( "resourceType" ) final ResourceType resourceType,
+                          @JsonProperty( "resourceType" ) final ContainerResourceType containerResourceType,
                           @JsonProperty( "currentValue" ) final ResourceValue currentValue,
                           @JsonProperty( "quotaValue" ) final ResourceValue quotaValue )
     {
         this.hostId = hostId;
-        this.resourceType = resourceType;
+        this.containerResourceType = containerResourceType;
         this.currentValue = currentValue;
         this.quotaValue = quotaValue;
     }
@@ -43,9 +43,9 @@ public class ExceededQuota
     }
 
 
-    public ResourceType getResourceType()
+    public ContainerResourceType getContainerResourceType()
     {
-        return resourceType;
+        return containerResourceType;
     }
 
 
@@ -64,7 +64,7 @@ public class ExceededQuota
     @JsonIgnore
     public String getDescription()
     {
-        return String.format( "%s/%s", currentValue.getPrintValue(), quotaValue.getPrintValue() );
+        return String.format( "%s/%s", currentValue, quotaValue );
     }
 
 
@@ -73,7 +73,7 @@ public class ExceededQuota
     {
         final StringBuffer sb = new StringBuffer( "ResourceAlert{" );
         sb.append( "hostId=" ).append( hostId );
-        sb.append( ", resourceType=" ).append( resourceType );
+        sb.append( ", resourceType=" ).append( containerResourceType );
         sb.append( ", currentValue=" ).append( currentValue );
         sb.append( ", quotaValue=" ).append( quotaValue );
         sb.append( '}' );

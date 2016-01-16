@@ -2,7 +2,7 @@ package io.subutai.core.environment.rest;
 
 
 import io.subutai.common.host.ContainerHostState;
-import io.subutai.common.peer.ContainerType;
+import io.subutai.common.peer.ContainerSize;
 
 
 /**
@@ -14,19 +14,19 @@ public class ContainerDto
     private String environmentId;
     private String hostname;
     private ContainerHostState state;
-    private ContainerType containerType;
+    private ContainerSize containerSize;
     private String ip;
     private String templateName;
 
 
     public ContainerDto( final String id, final String environmentId, final String hostname,
-                         final ContainerType containerType, final ContainerHostState state, final String ip,
+                         final ContainerSize containerSize, final ContainerHostState state, final String ip,
                          final String templateName )
     {
         this.id = id;
         this.environmentId = environmentId;
         this.hostname = hostname;
-        this.containerType = containerType;
+        this.containerSize = containerSize;
         this.state = state;
         this.ip = ip;
         this.templateName = templateName;

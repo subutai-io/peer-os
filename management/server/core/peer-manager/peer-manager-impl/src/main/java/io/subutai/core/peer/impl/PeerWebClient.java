@@ -29,6 +29,7 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.N2NConfig;
 import io.subutai.common.resource.HistoricalMetrics;
+import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.WebClientBuilder;
 import io.subutai.common.util.DateTimeParam;
@@ -183,9 +184,10 @@ public class PeerWebClient
     }
 
 
-    public PublicKeyContainer createEnvironmentKeyPair( EnvironmentId environmentId ) throws PeerException
+    public PublicKeyContainer createEnvironmentKeyPair( EnvironmentId environmentId/*, String userToken*/ )
+            throws PeerException
     {
-        String path = "/pek";
+        String path = "/pek"/* + userToken*/;
 
 
         WebClient client = WebClientBuilder.buildPeerWebClient( host, path, provider );
@@ -447,6 +449,24 @@ public class PeerWebClient
         catch ( Exception e )
         {
             throw new PeerException( "Error on retrieving historical metrics from remote peer", e );
+        }
+    }
+
+
+    public PeerResources getResourceLimits( final String peerId ) throws PeerException
+    {
+        try
+        {
+            String path = String.format( "/limits/%s", peerId );
+
+            WebClient client = WebClientBuilder.buildPeerWebClient( host, path, provider );
+            client.type( MediaType.APPLICATION_JSON );
+            client.accept( MediaType.APPLICATION_JSON );
+            return client.get( PeerResources.class );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Error on retrieving peer limits.", e );
         }
     }
 }

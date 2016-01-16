@@ -37,15 +37,19 @@ import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.PeerConf;
-import io.subutai.common.peer.AlertHandlerPriority;
-import io.subutai.common.peer.EnvironmentAlertHandler;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.EnvironmentAlertHandler;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Peer;
+import io.subutai.common.security.objects.PermissionObject;
+import io.subutai.common.security.relation.RelationManager;
+import io.subutai.common.security.relation.model.RelationMeta;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.N2NUtil;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
+import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.model.User;
 
 
 /**
@@ -113,6 +117,12 @@ public class EnvironmentImpl implements Environment, Serializable
 
     @Column( name = "public_key", length = 3000 )
     private String publicKey;
+
+    @Column( name = "relation_declaration", length = 3000 )
+    private String relationDeclaration;
+
+    @Column( name = "initial_blueprint", length = 3000 )
+    private String rawBlueprint;
 
     @Column( name = "user_id" )
     private Long userId;
@@ -214,6 +224,31 @@ public class EnvironmentImpl implements Environment, Serializable
 
 
     @Override
+    public String getRelationDeclaration()
+    {
+        return relationDeclaration;
+    }
+
+
+    public void setRelationDeclaration( final String relationDeclaration )
+    {
+        this.relationDeclaration = relationDeclaration;
+    }
+
+
+    public String getRawBlueprint()
+    {
+        return rawBlueprint;
+    }
+
+
+    public void setRawBlueprint( final String rawBlueprint )
+    {
+        this.rawBlueprint = rawBlueprint;
+    }
+
+
+    @Override
     public String getPeerId()
     {
         return peerId;
@@ -300,7 +335,30 @@ public class EnvironmentImpl implements Environment, Serializable
     @Override
     public Set<EnvironmentContainerHost> getContainerHosts()
     {
-        return containers;
+        Set<EnvironmentContainerHost> containerHosts = Sets.newConcurrentHashSet( containers );
+        if ( environmentManager != null )
+        {
+            RelationManager relationManager = environmentManager.getRelationManager();
+            IdentityManager identityManager = environmentManager.getIdentityManager();
+            User activeUser = identityManager.getActiveUser();
+            if ( activeUser != null )
+            {
+                for ( final EnvironmentContainerHost containerHost : containerHosts )
+                {
+                    RelationMeta relationMeta =
+                            new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), containerHost,
+                                    containerHost.getId(), containerHost.getId(),
+                                    PermissionObject.EnvironmentManagement.getName() );
+                    boolean trustedRelation =
+                            relationManager.getRelationInfoManager().allHasReadPermissions( relationMeta );
+                    if ( !trustedRelation )
+                    {
+                        containerHosts.remove( containerHost );
+                    }
+                }
+            }
+        }
+        return containerHosts;
     }
 
 

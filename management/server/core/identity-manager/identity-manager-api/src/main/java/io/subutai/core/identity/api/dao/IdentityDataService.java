@@ -2,7 +2,12 @@ package io.subutai.core.identity.api.dao;
 
 
 import java.util.List;
-import io.subutai.core.identity.api.model.*;
+
+import io.subutai.core.identity.api.model.Permission;
+import io.subutai.core.identity.api.model.Role;
+import io.subutai.core.identity.api.model.Session;
+import io.subutai.core.identity.api.model.User;
+import io.subutai.core.identity.api.model.UserToken;
 
 
 /**
@@ -38,6 +43,12 @@ public interface IdentityDataService
      *
      */
     List<User> getAllUsers();
+
+
+    /* *************************************************
+     *
+     */
+    List<User> getAllSystemUsers();
 
 
     /* *************************************************

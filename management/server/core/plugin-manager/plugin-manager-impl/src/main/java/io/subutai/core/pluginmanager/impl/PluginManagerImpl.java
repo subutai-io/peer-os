@@ -8,19 +8,24 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import io.subutai.core.peer.api.PeerManager;
-import io.subutai.core.tracker.api.Tracker;
-import io.subutai.core.pluginmanager.api.OperationType;
-import io.subutai.core.pluginmanager.api.PluginInfo;
-import io.subutai.core.pluginmanager.api.PluginManager;
-import io.subutai.core.pluginmanager.api.PluginManagerException;
+import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 
+import io.subutai.core.peer.api.PeerManager;
+import io.subutai.core.pluginmanager.api.OperationType;
+import io.subutai.core.pluginmanager.api.PluginInfo;
+import io.subutai.core.pluginmanager.api.PluginManager;
+import io.subutai.core.pluginmanager.api.PluginManagerException;
+import io.subutai.core.tracker.api.Tracker;
 
+
+@PermitAll
 public class PluginManagerImpl implements PluginManager
 
 {
@@ -113,7 +118,24 @@ public class PluginManagerImpl implements PluginManager
     @Override
     public Set<PluginInfo> getAvailablePlugins()
     {
-        return managerHelper.getDifferenceBetweenPlugins( getInstalledPlugins(), managerHelper.parseJson() );
+        return managerHelper.parseJson();
+    }
+
+
+    @Override
+    @RolesAllowed( "admin" )
+    public PluginInfo getPluginInfo( final String pluginName, final String version )
+    {
+        Set<PluginInfo> pluginInfoSet = managerHelper.parseJson();
+        for ( final PluginInfo pluginInfo : pluginInfoSet )
+        {
+            if ( pluginInfo.getPluginName().equalsIgnoreCase( pluginName ) && pluginInfo.getVersion()
+                                                                                        .equalsIgnoreCase( version ) )
+            {
+                return pluginInfo;
+            }
+        }
+        return null;
     }
 
 
@@ -152,18 +174,6 @@ public class PluginManagerImpl implements PluginManager
         }
         return versions;
     }
-
-
-    //    @Override
-    //    public List<String> getInstalledPluginNames()
-    //    {
-    //        List<String> names = new ArrayList<>();
-    //        for ( PluginInfo p : getInstalledPlugins() )
-    //        {
-    //            names.add( p.getPluginName() );
-    //        }
-    //        return names;
-    //    }
 
 
     @Override
