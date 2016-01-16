@@ -9,8 +9,6 @@ import java.util.Map;
 
 import io.subutai.common.protocol.TemplateKurjun;
 
-import java.util.Set;
-
 
 /**
  * TemplateKurjun manager interface that wraps Kurjun repositories. <p> This is the first version and further changes
