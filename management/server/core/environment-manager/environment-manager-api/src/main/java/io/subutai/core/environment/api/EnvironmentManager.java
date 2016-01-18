@@ -92,8 +92,8 @@ public interface EnvironmentManager
             throws EnvironmentModificationException, EnvironmentNotFoundException;
 
     /**
-     * Assigns ssh key to environment and inserts it into authorized_keys file of all the containers within the
-     * environment
+     * !!This method is deprecated. Use addSshKey/removeSshKey instead!!! Assigns ssh key to environment and inserts it
+     * into authorized_keys file of all the containers within the environment
      *
      * @param environmentId - environment id
      * @param sshKey - ssh key content
@@ -103,9 +103,30 @@ public interface EnvironmentManager
      * @throws io.subutai.common.environment.EnvironmentModificationException - thrown if error occurs during key
      * insertion
      */
+    @Deprecated
     void setSshKey( String environmentId, String sshKey, boolean async )
             throws EnvironmentNotFoundException, EnvironmentModificationException;
 
+    /**
+     * Assigns ssh key to environment and inserts it into authorized_keys file of all the containers within the
+     * environment
+     *
+     * @param environmentId - environment id
+     * @param sshKey - ssh key content
+     * @param async - indicates whether ssh key is added synchronously or asynchronously to the calling party
+     */
+    void addSshKey( final String environmentId, final String sshKey, final boolean async )
+            throws EnvironmentNotFoundException, EnvironmentModificationException;
+
+    /**
+     * Removes ssh key from environment containers authorized_keys file
+     *
+     * @param environmentId - environment id
+     * @param sshKey - ssh key content
+     * @param async - indicates whether ssh key is removed synchronously or asynchronously to the calling party
+     */
+    void removeSshKey( final String environmentId, final String sshKey, final boolean async )
+            throws EnvironmentNotFoundException, EnvironmentModificationException;
 
     /**
      * Destroys environment by id.

@@ -100,7 +100,9 @@ import io.subutai.core.environment.impl.workflow.creation.EnvironmentCreationWor
 import io.subutai.core.environment.impl.workflow.destruction.ContainerDestructionWorkflow;
 import io.subutai.core.environment.impl.workflow.destruction.EnvironmentDestructionWorkflow;
 import io.subutai.core.environment.impl.workflow.modification.EnvironmentGrowingWorkflow;
+import io.subutai.core.environment.impl.workflow.modification.SshKeyAdditionWorkflow;
 import io.subutai.core.environment.impl.workflow.modification.SshKeyModificationWorkflow;
+import io.subutai.core.environment.impl.workflow.modification.SshKeyRemovalWorkflow;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.kurjun.api.TemplateManager;
@@ -885,6 +887,101 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
+    public void addSshKey( final String environmentId, final String sshKey, final boolean async )
+            throws EnvironmentNotFoundException, EnvironmentModificationException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( sshKey ), "Invalid ssh key" );
+
+        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId, true );
+
+        TrackerOperation op = tracker.createTrackerOperation( MODULE_NAME,
+                String.format( "Adding ssh key %s to environment %s ", sshKey, environmentId ) );
+
+        User activeUser = identityManager.getActiveUser();
+
+        RelationMeta relationMeta =
+                new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), environment, environmentId,
+                        environment.getId(), PermissionObject.EnvironmentManagement.getName() );
+        if ( !relationManager.getRelationInfoManager().allHasUpdatePermissions( relationMeta ) )
+        {
+            throw new EnvironmentNotFoundException();
+        }
+
+        final SshKeyAdditionWorkflow sshKeyAdditionWorkflow =
+                getSshKeyAdditionWorkflow( environment, sshKey, networkManager, op );
+
+        executor.execute( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                sshKeyAdditionWorkflow.start();
+            }
+        } );
+
+        //wait
+        if ( !async )
+        {
+            sshKeyAdditionWorkflow.join();
+
+            if ( sshKeyAdditionWorkflow.getError() != null )
+            {
+                throw new EnvironmentModificationException(
+                        exceptionUtil.getRootCause( sshKeyAdditionWorkflow.getError() ) );
+            }
+        }
+    }
+
+
+    @Override
+    public void removeSshKey( final String environmentId, final String sshKey, final boolean async )
+            throws EnvironmentNotFoundException, EnvironmentModificationException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( sshKey ), "Invalid ssh key" );
+
+        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId, true );
+
+        TrackerOperation op = tracker.createTrackerOperation( MODULE_NAME,
+                String.format( "Removing ssh key %s from environment %s ", sshKey, environmentId ) );
+
+        User activeUser = identityManager.getActiveUser();
+
+        RelationMeta relationMeta =
+                new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), environment, environmentId,
+                        environment.getId(), PermissionObject.EnvironmentManagement.getName() );
+        if ( !relationManager.getRelationInfoManager().allHasUpdatePermissions( relationMeta ) )
+        {
+            throw new EnvironmentNotFoundException();
+        }
+
+        final SshKeyRemovalWorkflow sshKeyRemovalWorkflow =
+                getSshKeyRemovalWorkflow( environment, sshKey, networkManager, op );
+
+        executor.execute( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                sshKeyRemovalWorkflow.start();
+            }
+        } );
+
+        //wait
+        if ( !async )
+        {
+            sshKeyRemovalWorkflow.join();
+
+            if ( sshKeyRemovalWorkflow.getError() != null )
+            {
+                throw new EnvironmentModificationException(
+                        exceptionUtil.getRootCause( sshKeyRemovalWorkflow.getError() ) );
+            }
+        }
+    }
+
+
     public void setSshKey( final String environmentId, final String sshKey, final boolean async,
                            final boolean checkAccess, final TrackerOperation operationTracker )
             throws EnvironmentNotFoundException, EnvironmentModificationException
@@ -933,6 +1030,22 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                                                                         final TrackerOperation operationTracker )
     {
         return new SshKeyModificationWorkflow( environment, sshKey, networkManager, operationTracker, this );
+    }
+
+
+    protected SshKeyAdditionWorkflow getSshKeyAdditionWorkflow( final EnvironmentImpl environment, final String sshKey,
+                                                                final NetworkManager networkManager,
+                                                                final TrackerOperation operationTracker )
+    {
+        return new SshKeyAdditionWorkflow( environment, sshKey, networkManager, operationTracker, this );
+    }
+
+
+    protected SshKeyRemovalWorkflow getSshKeyRemovalWorkflow( final EnvironmentImpl environment, final String sshKey,
+                                                              final NetworkManager networkManager,
+                                                              final TrackerOperation operationTracker )
+    {
+        return new SshKeyRemovalWorkflow( environment, sshKey, networkManager, operationTracker, this );
     }
 
 
@@ -1833,24 +1946,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                 }
             } );
         }
-    }
-
-
-    @RolesAllowed( "Environment-Management|Write" )
-    protected EnvironmentImpl createEmptyEnvironment( final String name, final String subnetCidr, final String sshKey )
-    {
-
-        EnvironmentImpl environment =
-                new EnvironmentImpl( name, subnetCidr, sshKey, getUserId(), peerManager.getLocalPeer().getId() );
-
-        environment.setUserId( identityManager.getActiveUser().getId() );
-        environment = saveOrUpdate( environment );
-
-        setEnvironmentTransientFields( environment );
-
-        notifyOnEnvironmentCreated( environment );
-
-        return environment;
     }
 
 

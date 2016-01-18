@@ -12,6 +12,7 @@ import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
 
 
+@Deprecated
 public class SetSshKeyStep
 {
     private final String sshKey;
