@@ -33,6 +33,7 @@ import io.subutai.common.util.N2NUtil;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.entity.PeerConfImpl;
+import io.subutai.core.peer.api.PeerManager;
 
 
 /**
@@ -44,14 +45,14 @@ public class SetupN2NStep
 
     private final Topology topology;
     private final EnvironmentImpl env;
-    private final LocalPeer localPeer;
+    private final PeerManager peerManager;
 
 
-    public SetupN2NStep( final Topology topology, final EnvironmentImpl environment, final LocalPeer localPeer )
+    public SetupN2NStep( final Topology topology, final EnvironmentImpl environment, final PeerManager peerManager)
     {
         this.topology = topology;
         this.env = environment;
-        this.localPeer = localPeer;
+        this.peerManager = peerManager;
     }
 
 
@@ -60,9 +61,9 @@ public class SetupN2NStep
         try
         {
             //obtain already participating peers
-            Set<Peer> peers = Sets.newHashSet( topology.getAllPeers() );
+            Set<Peer> peers = peerManager.resolve( topology.getAllPeers() );
 
-            peers.add( localPeer );
+            peers.add( peerManager.getLocalPeer() );
             // creating new n2n tunnels
             Set<String> existingNetworks = getTunnelNetworks( peers );
 

@@ -1,9 +1,6 @@
 package io.subutai.core.environment.impl.workflow.creation;
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.apache.servicemix.beanflow.Workflow;
 
 import io.subutai.common.environment.EnvironmentStatus;
@@ -28,7 +25,7 @@ import io.subutai.core.security.api.SecurityManager;
 
 public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWorkflow.EnvironmentCreationPhase>
 {
-//    private static final Logger LOG = LoggerFactory.getLogger( EnvironmentCreationWorkflow.class );
+    //    private static final Logger LOG = LoggerFactory.getLogger( EnvironmentCreationWorkflow.class );
 
     private final TemplateManager templateRegistry;
     private final NetworkManager networkManager;
@@ -104,7 +101,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
         try
         {
-            new PEKGenerationStep( topology, environment, peerManager.getLocalPeer(), securityManager,
+            new PEKGenerationStep( topology, environment, peerManager, securityManager,
                     identityManager.getActiveUser() ).execute();
 
             environment = environmentManager.saveOrUpdate( environment );
@@ -126,7 +123,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
         try
         {
-            new VNISetupStep( topology, environment, peerManager.getLocalPeer() ).execute();
+            new VNISetupStep( topology, environment, peerManager ).execute();
 
             environment = environmentManager.saveOrUpdate( environment );
 
@@ -147,7 +144,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
         try
         {
-            new SetupN2NStep( topology, environment, peerManager.getLocalPeer() ).execute();
+            new SetupN2NStep( topology, environment, peerManager ).execute();
 
             environment = environmentManager.saveOrUpdate( environment );
 
@@ -168,9 +165,8 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
         try
         {
-            new ContainerCloneStep( templateRegistry, defaultDomain, topology, environment, peerManager.getLocalPeer(),
-                    environmentManager )
-                    .execute();
+            new ContainerCloneStep( templateRegistry, defaultDomain, topology, environment, peerManager,
+                    environmentManager ).execute();
 
             environment = environmentManager.saveOrUpdate( environment );
 
@@ -250,7 +246,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
     public void FINALIZE()
     {
-//        LOG.info( "Finalizing environment creation" );
+        //        LOG.info( "Finalizing environment creation" );
 
         environment.setStatus( EnvironmentStatus.HEALTHY );
 

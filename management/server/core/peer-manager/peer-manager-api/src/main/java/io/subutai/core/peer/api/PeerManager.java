@@ -2,6 +2,7 @@ package io.subutai.core.peer.api;
 
 
 import java.util.List;
+import java.util.Set;
 
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
@@ -47,7 +48,7 @@ public interface PeerManager
     /**
      * Returns peer instance by peer id
      */
-    public Peer getPeer( String peerId );
+    public Peer getPeer( String peerId ) throws PeerException;
 
 
     /**
@@ -83,4 +84,6 @@ public interface PeerManager
     PeerPolicy getAvailablePolicy();
 
     PeerPolicy getPolicy( String peerId );
+
+    Set<Peer> resolve( Set<String> peers ) throws PeerException;
 }

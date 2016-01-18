@@ -3,7 +3,7 @@
 
 
   <bean id="masterPlacementStrategy"
-        class="io.subutai.core.strategy.impl.MasterPlacementStrategy">
+        class="io.subutai.core.strategy.impl.ExamplePlacementStrategy">
   </bean>
 
   <!--<bean id="roundRobinStrategy"
