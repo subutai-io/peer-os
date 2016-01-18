@@ -4,6 +4,7 @@ package io.subutai.core.lxc.quota.impl;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -109,10 +110,6 @@ public class QuotaManagerImpl implements QuotaManager
         int i = 0;
         for ( ContainerSize containerSize : ContainerSize.values() )
         {
-            if ( i > ContainerSize.values().length - 2 )
-            {
-                break;
-            }
             LOGGER.debug( String.format( "Settings for %s: %s", containerSize, settings[i] ) );
             String[] quotas = settings[i++].split( "\\|" );
 
@@ -296,10 +293,10 @@ public class QuotaManagerImpl implements QuotaManager
             final ContainerRootfsResource rootfs = containerQuota.getRootfs();
             cpuAccumulo = cpuAccumulo.add( cpu.getResource().getValue() );
             ramAccumulo = ramAccumulo.add( ram.getResource().getValue() );
-            final BigDecimal disk = home.getResource().getValue().add( opt.getResource().getValue()
-                                                                          .add( var.getResource().getValue()
-                                                                                   .add( rootfs.getResource()
-                                                                                               .getValue() ) ) );
+            BigDecimal disk = home.getResource().getValue();
+            disk = disk.add( opt.getResource().getValue() );
+            disk = disk.add( var.getResource().getValue() );
+            disk = disk.add( rootfs.getResource().getValue() );
             diskAccumulo = diskAccumulo.add( disk );
         }
 
@@ -408,6 +405,13 @@ public class QuotaManagerImpl implements QuotaManager
     public ContainerQuota getDefaultContainerQuota( final ContainerSize containerSize )
     {
         return containerQuotas.get( containerSize );
+    }
+
+
+    @Override
+    public Map<ContainerSize, ContainerQuota> getDefaultQuotas()
+    {
+        return Collections.unmodifiableMap( containerQuotas );
     }
 
 

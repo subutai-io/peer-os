@@ -3,6 +3,8 @@ package io.subutai.core.localpeer.impl.container;
 
 import java.util.concurrent.Callable;
 
+import javax.naming.NamingException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,8 +22,10 @@ import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.NumUtil;
+import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
+import io.subutai.core.registration.api.RegistrationManager;
 
 
 public class CreateContainerTask implements Callable<ContainerHostInfo>
@@ -61,13 +65,20 @@ public class CreateContainerTask implements Callable<ContainerHostInfo>
     }
 
 
+    public static RegistrationManager getRegistrationManager() throws NamingException
+    {
+
+        return ServiceLocator.getServiceNoCache( RegistrationManager.class );
+    }
+
+
     @Override
     public ContainerHostInfo call() throws Exception
     {
 
-
         commandUtil.execute( new RequestBuilder( "subutai clone" ).withCmdArgs(
-                Lists.newArrayList( template.getName(), hostname, "-i", String.format( "\"%s %s\"", ip, vlan ) ) )
+                Lists.newArrayList( template.getName(), hostname, "-i", String.format( "\"%s %s\"", ip, vlan ), "-t",
+                        getRegistrationManager().generateContainerTTLToken( ( timeoutSec + 10 ) * 1000L ).getToken() ) )
                                                                   .withTimeout( 1 ).daemon(), resourceHost );
 
         long start = System.currentTimeMillis();
@@ -95,7 +106,8 @@ public class CreateContainerTask implements Callable<ContainerHostInfo>
             {
                 if ( counter % 60 == 0 )
                 {
-                    LOG.debug( String.format( "Still waiting %s. Time: %d/%d. %d sec", hostname, timePass, limit, counter ) );
+                    LOG.debug( String.format( "Still waiting %s. Time: %d/%d. %d sec", hostname, timePass, limit,
+                            counter ) );
                 }
             }
             timePass = System.currentTimeMillis() - start;

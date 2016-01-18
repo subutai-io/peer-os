@@ -191,7 +191,7 @@ public class PeerManagerImpl implements PeerManager
     public PeerPolicy getDefaultPeerPolicy( String peerId )
     {
         //TODO: make values configurable
-        return new PeerPolicy( peerId, 10, 10, 10, 10, 10, 10 );
+        return new PeerPolicy( peerId, 90, 50, 90, 90, 3, 10 );
     }
 
 
