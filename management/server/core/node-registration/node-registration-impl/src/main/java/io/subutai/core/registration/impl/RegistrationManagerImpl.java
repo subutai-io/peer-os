@@ -44,7 +44,6 @@ import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
-import io.subutai.common.protocol.PlacementStrategy;
 import io.subutai.common.util.N2NUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.broker.api.Broker;
@@ -363,12 +362,12 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
 
         LocalPeer localPeer = peerManager.getLocalPeer();
 
-        final List<ResourceHost> resourceHosts = new ArrayList(localPeer.getResourceHosts());
+        final List<ResourceHost> resourceHosts = new ArrayList( localPeer.getResourceHosts() );
 
         for ( final Map.Entry<Integer, Map<String, Set<ContainerInfo>>> mapEntry : groupedContainersByVlan.entrySet() )
         {
             //TODO: check this run. Topology constructor changed
-            Topology topology = new Topology( "Imported-environment", null, null, null );
+            Topology topology = new Topology( "Imported-environment", 0, 0 );
             Map<String, Set<ContainerInfo>> rawNodeGroup = mapEntry.getValue();
             Map<NodeGroup, Set<ContainerHostInfo>> classification = Maps.newHashMap();
 
@@ -377,11 +376,10 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
                 //place where to create node groups
                 String templateName = entry.getKey();
                 //TODO: please change this distribution
-                NodeGroup nodeGroup =
-                        new NodeGroup( String.format( "%s_group", templateName ), templateName, /*entry.getValue().size()*/
-                                ContainerSize.SMALL,
-                                1, 1, localPeer.getId(), resourceHosts.get( 0 ).getId() );
-                topology.addNodeGroupPlacement( localPeer, nodeGroup );
+                NodeGroup nodeGroup = new NodeGroup( String.format( "%s_group", templateName ), templateName, /*entry
+                .getValue().size()*/
+                        ContainerSize.SMALL, 1, 1, localPeer.getId(), resourceHosts.get( 0 ).getId() );
+                topology.addNodeGroupPlacement( localPeer.getId(), nodeGroup );
 
                 Set<ContainerHostInfo> converter = Sets.newHashSet();
                 converter.addAll( entry.getValue() );

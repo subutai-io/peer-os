@@ -37,11 +37,13 @@ import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.PeerConf;
+import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentAlertHandler;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Peer;
+import io.subutai.common.peer.PeerException;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.relation.RelationManager;
 import io.subutai.common.security.relation.model.RelationMeta;
@@ -236,13 +238,13 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
-    public String getRawBlueprint()
+    public String getRawTopology()
     {
         return rawBlueprint;
     }
 
 
-    public void setRawBlueprint( final String rawBlueprint )
+    public void setRawTopology( final String rawBlueprint )
     {
         this.rawBlueprint = rawBlueprint;
     }
@@ -372,12 +374,12 @@ public class EnvironmentImpl implements Environment, Serializable
 
     //TODO: remove environmentId param
     @Override
-    public Set<EnvironmentContainerHost> growEnvironment( final String environmentId, final Blueprint blueprint,
+    public Set<EnvironmentContainerHost> growEnvironment( final String environmentId, final Topology topology,
                                                           boolean async ) throws EnvironmentModificationException
     {
         try
         {
-            return environmentManager.growEnvironment( environmentId, blueprint, async );
+            return environmentManager.growEnvironment( environmentId, topology, async );
         }
         catch ( EnvironmentNotFoundException e )
         {
@@ -389,7 +391,7 @@ public class EnvironmentImpl implements Environment, Serializable
 
 
     @Override
-    public Set<Peer> getPeers()
+    public Set<Peer> getPeers() throws PeerException
     {
         Set<Peer> peers = Sets.newHashSet();
 

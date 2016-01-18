@@ -14,13 +14,13 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import com.google.common.collect.Sets;
 
-import io.subutai.common.environment.Blueprint;
 import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.NodeGroup;
+import io.subutai.common.environment.Topology;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentContainerHost;
@@ -45,6 +45,7 @@ import static org.mockito.Mockito.when;
 @RunWith( MockitoJUnitRunner.class )
 public class RestServiceImplTest
 {
+    private static final String PEER_ID = UUID.randomUUID().toString();
     @Mock
     EnvironmentManager environmentManager;
     @Mock
@@ -74,7 +75,7 @@ public class RestServiceImplTest
         when( netIntf.getIp() ).thenReturn( TestUtil.IP );
         when( peerManager.getPeer( TestUtil.PEER_ID ) ).thenReturn( peer );
         when( templateRegistry.getTemplate( TestUtil.TEMPLATE_NAME ) ).thenReturn( template );
-        when( environmentManager.createEnvironment( any( Blueprint.class ), anyBoolean() ) ).thenReturn( environment );
+        when( environmentManager.createEnvironment( any( Topology.class ), anyBoolean() ) ).thenReturn( environment );
         when( environment.getId() ).thenReturn( TestUtil.ENV_ID );
         when( environment.getName() ).thenReturn( TestUtil.ENV_NAME );
         when( environment.getStatus() ).thenReturn( EnvironmentStatus.HEALTHY );
@@ -97,7 +98,7 @@ public class RestServiceImplTest
 
     {
         doThrow( new EnvironmentCreationException( "" ) ).when( environmentManager )
-                                                         .createEnvironment( any( Blueprint.class ), anyBoolean() );
+                                                         .createEnvironment( any( Topology.class ), anyBoolean() );
 
         doThrow( new EnvironmentNotFoundException( "" ) ).when( environmentManager )
                                                          .loadEnvironment( any( String.class ) );
@@ -108,8 +109,9 @@ public class RestServiceImplTest
     public void testCreateEnvironment() throws EnvironmentCreationException
     {
         NodeGroup nodeGroup = JsonUtil.fromJson( TestUtil.NODE_GROUP_JSON, NodeGroup.class );
-        Blueprint blueprint = new Blueprint( TestUtil.ENV_NAME, TestUtil.SSH_KEY, Sets.newHashSet( nodeGroup ), null );
-        restService.createEnvironment( blueprint );
+        Topology topology = new Topology( TestUtil.ENV_NAME, 0, 0 );
+        topology.addNodeGroupPlacement( PEER_ID, nodeGroup );
+        restService.createEnvironment( topology );
     }
 
 
@@ -228,11 +230,13 @@ public class RestServiceImplTest
     public void testGrowEnvironment() throws Exception
     {
         NodeGroup nodeGroup = JsonUtil.fromJson( TestUtil.NODE_GROUP_JSON, NodeGroup.class );
-        Blueprint blueprint = new Blueprint( TestUtil.ENV_NAME, TestUtil.SSH_KEY, Sets.newHashSet( nodeGroup ) , null);
+        Topology topology = new Topology( TestUtil.ENV_NAME, 0, 0 );
 
-        restService.growEnvironment( "ENV_ID", blueprint );
+        topology.addNodeGroupPlacement( PEER_ID, nodeGroup );
 
-        restService.growEnvironment( "", blueprint );
+        restService.growEnvironment( "ENV_ID", topology );
+
+        restService.growEnvironment( "", topology );
 
         //        assertEquals( Response.Status.BAD_REQUEST.getStatusCode(), response.getState() );
         //

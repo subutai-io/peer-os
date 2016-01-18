@@ -6,9 +6,11 @@ import java.net.SocketException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -424,6 +426,19 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
+    @Override
+    public Set<Peer> resolve( final Set<String> peers ) throws PeerException
+    {
+        Set<Peer> result = new HashSet<>();
+        for ( String peerId : peers )
+        {
+
+            result.add( getPeer( peerId ) );
+        }
+        return result;
+    }
+
+
     private List<PeerPolicy> getPolicies()
     {
         List<PeerPolicy> result = new ArrayList<>();
@@ -444,9 +459,14 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
-    public Peer getPeer( final String peerId )
+    public Peer getPeer( final String peerId ) throws PeerException
     {
-        return this.peers.get( peerId );
+        Peer result = this.peers.get( peerId );
+        if ( result == null )
+        {
+            throw new PeerException( "Peer not found: " + peerId );
+        }
+        return result;
     }
 
 

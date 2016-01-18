@@ -33,10 +33,10 @@
              interface="io.subutai.core.identity.api.IdentityManager" />
   <reference id="tracker"
              interface="io.subutai.core.tracker.api.Tracker" />
-  <reference id="strategyManager"
+  <!--<reference id="strategyManager"
              interface="io.subutai.core.strategy.api.StrategyManager" />
   <reference id="quotaManager"
-             interface="io.subutai.core.lxc.quota.api.QuotaManager" />
+             interface="io.subutai.core.lxc.quota.api.QuotaManager" />-->
   <!-- ************************************************************************************************* -->
   <bean id="daoManagerEnv" init-method="init" class="io.subutai.common.dao.DaoManager" activation="eager">
     <jpa:unit unitname="envExtManagerPUnit2" property="entityManagerFactory" />
@@ -60,8 +60,8 @@
     <argument ref="identityManager" />
     <argument ref="tracker" />
     <argument ref="relationManager" />
-    <argument ref="strategyManager" />
-    <argument ref="quotaManager" />
+<!--    <argument ref="strategyManager" />
+    <argument ref="quotaManager" />-->
     <property name="keyTrustCheckEnabled" value="${keyTrustCheckEnabled}" />
   </bean>
 

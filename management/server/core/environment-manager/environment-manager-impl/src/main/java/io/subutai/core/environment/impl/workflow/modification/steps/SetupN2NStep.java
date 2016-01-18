@@ -15,8 +15,6 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.commons.net.util.SubnetUtils;
 
-import com.google.common.collect.Sets;
-
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
@@ -25,6 +23,7 @@ import io.subutai.common.util.N2NUtil;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.entity.PeerConfImpl;
+import io.subutai.core.peer.api.PeerManager;
 
 
 public class SetupN2NStep
@@ -32,19 +31,20 @@ public class SetupN2NStep
     private static final Logger LOGGER = LoggerFactory.getLogger( SetupN2NStep.class );
     private final Topology topology;
     private final EnvironmentImpl environment;
+    private final PeerManager peerManager;
 
 
-    public SetupN2NStep( final Topology topology, final EnvironmentImpl environment )
+    public SetupN2NStep( final Topology topology, final EnvironmentImpl environment, final PeerManager peerManager )
     {
         this.topology = topology;
         this.environment = environment;
+        this.peerManager = peerManager;
     }
 
 
-    public void execute() throws EnvironmentManagerException, InterruptedException, ExecutionException
+    public void execute() throws EnvironmentManagerException, InterruptedException, ExecutionException, PeerException
     {
-        Set<Peer> peers = Sets.newHashSet( topology.getAllPeers() );
-
+        Set<Peer> peers = peerManager.resolve( topology.getAllPeers() );
         SubnetUtils.SubnetInfo info =
                 new SubnetUtils( environment.getTunnelNetwork(), N2NUtil.N2N_SUBNET_MASK ).getInfo();
 

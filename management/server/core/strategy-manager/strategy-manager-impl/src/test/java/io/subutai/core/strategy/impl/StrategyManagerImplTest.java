@@ -79,7 +79,7 @@ public class StrategyManagerImplTest
     public void testFindStategyById() throws Exception
     {
         strategyManager.registerStrategy( masterPlacementStrategy );
-        assertNotNull( strategyManager.findStrategyById( "MASTER-STRATEGY" ) );
+        assertNotNull( strategyManager.findStrategyById( masterPlacementStrategy.getId() ) );
     }
 
 

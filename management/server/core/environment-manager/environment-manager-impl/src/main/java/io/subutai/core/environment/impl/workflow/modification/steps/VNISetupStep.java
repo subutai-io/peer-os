@@ -8,7 +8,6 @@ import java.util.Set;
 import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.Topology;
@@ -17,31 +16,31 @@ import io.subutai.common.network.Vni;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
-import io.subutai.common.peer.LocalPeer;
+import io.subutai.core.peer.api.PeerManager;
 
 
 public class VNISetupStep
 {
     private final Topology topology;
     private final EnvironmentImpl environment;
-    private final LocalPeer localPeer;
+    private final PeerManager peerManager;
 
 
-    public VNISetupStep( final Topology topology, final EnvironmentImpl environment, final LocalPeer localPeer )
+    public VNISetupStep( final Topology topology, final EnvironmentImpl environment, final PeerManager peerManager )
     {
         this.topology = topology;
         this.environment = environment;
-        this.localPeer = localPeer;
+        this.peerManager = peerManager;
     }
 
 
     public void execute() throws EnvironmentModificationException, PeerException
     {
 
-        Set<Peer> newPeers = Sets.newHashSet( topology.getAllPeers() );
+        Set<Peer> newPeers = peerManager.resolve( topology.getAllPeers() );
         //remove already participating peers
         newPeers.removeAll( environment.getPeers() );
-        newPeers.remove( localPeer );
+        newPeers.remove( peerManager.getLocalPeer() );
 
         //obtain reserved gateways
         Map<Peer, Set<Gateway>> reservedGateways = Maps.newHashMap();
