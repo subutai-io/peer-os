@@ -17,7 +17,6 @@ import com.google.common.collect.Sets;
 import io.subutai.common.environment.Blueprint;
 import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
-import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.NodeGroup;
@@ -228,7 +227,7 @@ public class RestServiceImplTest
     public void testGrowEnvironment() throws Exception
     {
         NodeGroup nodeGroup = JsonUtil.fromJson( TestUtil.NODE_GROUP_JSON, NodeGroup.class );
-        Blueprint blueprint = new Blueprint( TestUtil.ENV_NAME, TestUtil.SSH_KEY, Sets.newHashSet( nodeGroup ) , null);
+        Blueprint blueprint = new Blueprint( TestUtil.ENV_NAME, TestUtil.SSH_KEY, Sets.newHashSet( nodeGroup ), null );
 
         restService.growEnvironment( "ENV_ID", blueprint );
 
@@ -330,65 +329,5 @@ public class RestServiceImplTest
         response = restService.stopContainer( UUID.randomUUID().toString() );
 
         assertEquals( Response.Status.NOT_FOUND.getStatusCode(), response.getStatus() );
-    }
-
-
-    @Test
-    public void testSetSshKey() throws Exception
-    {
-        Response response = restService.setSshKey( TestUtil.ENV_ID, TestUtil.SSH_KEY );
-
-        assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
-
-        doThrow( new EnvironmentNotFoundException( "" ) ).when( environmentManager )
-                                                         .setSshKey( any( String.class ), anyString(), anyBoolean() );
-
-        response = restService.setSshKey( TestUtil.ENV_ID, TestUtil.SSH_KEY );
-
-        assertEquals( Response.Status.NOT_FOUND.getStatusCode(), response.getStatus() );
-
-        doThrow( new EnvironmentModificationException( "" ) ).when( environmentManager )
-                                                             .setSshKey( any( String.class ), anyString(),
-                                                                     anyBoolean() );
-
-        response = restService.setSshKey( TestUtil.ENV_ID, TestUtil.SSH_KEY );
-
-        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus() );
-
-        response = restService.setSshKey( "", TestUtil.SSH_KEY );
-
-        assertEquals( Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus() );
-
-        response = restService.setSshKey( TestUtil.ENV_ID, null );
-
-        assertEquals( Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus() );
-    }
-
-
-    @Test
-    public void testRemoveSshKey() throws Exception
-    {
-        Response response = restService.removeSshKey( TestUtil.ENV_ID );
-
-        assertEquals( Response.Status.OK.getStatusCode(), response.getStatus() );
-
-        response = restService.removeSshKey( "" );
-
-        assertEquals( Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus() );
-
-        doThrow( new EnvironmentNotFoundException( "" ) ).when( environmentManager )
-                                                         .setSshKey( any( String.class ), anyString(), anyBoolean() );
-
-        response = restService.removeSshKey( TestUtil.ENV_ID );
-
-        assertEquals( Response.Status.NOT_FOUND.getStatusCode(), response.getStatus() );
-
-        doThrow( new EnvironmentModificationException( "" ) ).when( environmentManager )
-                                                             .setSshKey( any( String.class ), anyString(),
-                                                                     anyBoolean() );
-
-        response = restService.removeSshKey( TestUtil.ENV_ID );
-
-        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus() );
     }
 }

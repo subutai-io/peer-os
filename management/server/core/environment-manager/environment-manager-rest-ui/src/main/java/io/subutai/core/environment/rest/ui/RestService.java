@@ -12,6 +12,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -94,12 +95,17 @@ public interface RestService
 
     @POST
     @Path( "keys" )
-    Response setSshKey( @FormParam( "environmentId" ) String environmentId, @FormParam( "key" ) String key );
+    Response addSshKey( @FormParam( "environmentId" ) String environmentId, @FormParam( "key" ) String key );
 
 
     @DELETE
     @Path( "{environmentId}/keys" )
-    Response removeSshKey( @PathParam( "environmentId" ) String environmentId );
+    Response removeSshKey( @PathParam( "environmentId" ) String environmentId, @QueryParam( "key" ) String key );
+
+    @GET
+    @Path( "{environmentId}/keys" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response getEnvironmentSShKeys( @PathParam( "environmentId" ) String environmentId );
 
 
     /** Environment domains **************************************************** */

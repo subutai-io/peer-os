@@ -66,7 +66,6 @@ public interface EnvironmentManager
      *
      * @param name - environment name
      * @param topology - {@code Topology} //@param subnetCidr - subnet in CIDR-notation string, e.g. "192.168.0.1/16"
-     * @param ssh - optional ssh key content //@param async - indicates whether environment is created synchronously or
      * asynchronously to the calling party
      *
      * @return - created environment
@@ -74,7 +73,7 @@ public interface EnvironmentManager
      * @throws EnvironmentCreationException - thrown if error occurs during environment creation
      */
     Environment importEnvironment( String name, Topology topology, Map<NodeGroup, Set<ContainerHostInfo>> containers,
-                                   String ssh, Integer vlan ) throws EnvironmentCreationException;
+                                   Integer vlan ) throws EnvironmentCreationException;
 
 
     /**
@@ -91,21 +90,6 @@ public interface EnvironmentManager
     Set<EnvironmentContainerHost> growEnvironment( String environmentId, Blueprint blueprint, boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException;
 
-    /**
-     * !!This method is deprecated. Use addSshKey/removeSshKey instead!!! Assigns ssh key to environment and inserts it
-     * into authorized_keys file of all the containers within the environment
-     *
-     * @param environmentId - environment id
-     * @param sshKey - ssh key content
-     * @param async - indicates whether ssh key is applied synchronously or asynchronously to the calling party
-     *
-     * @throws io.subutai.common.environment.EnvironmentNotFoundException - thrown if environment not found
-     * @throws io.subutai.common.environment.EnvironmentModificationException - thrown if error occurs during key
-     * insertion
-     */
-    @Deprecated
-    void setSshKey( String environmentId, String sshKey, boolean async )
-            throws EnvironmentNotFoundException, EnvironmentModificationException;
 
     /**
      * Assigns ssh key to environment and inserts it into authorized_keys file of all the containers within the

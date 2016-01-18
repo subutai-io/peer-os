@@ -25,7 +25,7 @@ public interface RestService
 {
 
     @GET
-    @Produces(  MediaType.APPLICATION_JSON  )
+    @Produces( MediaType.APPLICATION_JSON )
     public Response listEnvironments();
 
     @GET
@@ -34,7 +34,7 @@ public interface RestService
     public Response getDefaultDomainName();
 
     @POST
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Consumes( MediaType.MULTIPART_FORM_DATA )
     @Path( "domain" )
     Response addEnvironmentDomain( @Multipart( "environmentId" ) String environmentId,
                                    @Multipart( "hostName" ) String hostName,
@@ -64,12 +64,13 @@ public interface RestService
 
     @POST
     @Path( "key" )
-    public Response setSshKey( @FormParam( "environmentId" ) String environmentId, @FormParam( "key" ) String key );
+    public Response addSshKey( @FormParam( "environmentId" ) String environmentId, @FormParam( "key" ) String key );
 
 
     @DELETE
     @Path( "key" )
-    public Response removeSshKey( @QueryParam( "environmentId" ) String environmentId );
+    public Response removeSshKey( @QueryParam( "environmentId" ) String environmentId,
+                                  @QueryParam( "key" ) String key );
 
     @DELETE
     @Path( "{environmentId}" )

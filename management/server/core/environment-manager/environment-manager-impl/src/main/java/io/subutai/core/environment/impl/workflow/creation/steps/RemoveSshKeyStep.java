@@ -32,13 +32,10 @@ public class RemoveSshKeyStep
     {
         if ( !Strings.isNullOrEmpty( sshKey ) )
         {
-
-            //todo remove ssh key from environment keys
-            //            environment.removeKey( sshKey );
+            environment.removeSshKey( sshKey );
 
             Set<ContainerHost> ch = Sets.newHashSet();
             ch.addAll( environment.getContainerHosts() );
-
 
             //add ssh key to each environment container
             networkManager.removeSshKeyFromAuthorizedKeys( ch, sshKey );

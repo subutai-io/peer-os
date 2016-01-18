@@ -6,6 +6,8 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.servicemix.beanflow.Workflow;
 
+import com.google.common.collect.Sets;
+
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
@@ -69,7 +71,7 @@ public class SshKeyAdditionWorkflow extends Workflow<SshKeyAdditionWorkflow.SshK
 
         try
         {
-            new AddSshKeyStep( sshKey, environment, networkManager ).execute();
+            new AddSshKeyStep( Sets.newHashSet( sshKey ), environment, networkManager ).execute();
 
             environment = environmentManager.saveOrUpdate( environment );
 

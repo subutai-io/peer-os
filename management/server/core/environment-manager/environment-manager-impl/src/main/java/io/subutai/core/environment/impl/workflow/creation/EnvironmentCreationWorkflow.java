@@ -1,10 +1,9 @@
 package io.subutai.core.environment.impl.workflow.creation;
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.apache.servicemix.beanflow.Workflow;
+
+import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.Topology;
@@ -12,11 +11,11 @@ import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.workflow.creation.steps.AddSshKeyStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.ContainerCloneStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.PEKGenerationStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterHostsStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterSshStep;
-import io.subutai.core.environment.impl.workflow.creation.steps.SetSshKeyStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.SetupN2NStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.VNISetupStep;
 import io.subutai.core.identity.api.IdentityManager;
@@ -28,7 +27,7 @@ import io.subutai.core.security.api.SecurityManager;
 
 public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWorkflow.EnvironmentCreationPhase>
 {
-//    private static final Logger LOG = LoggerFactory.getLogger( EnvironmentCreationWorkflow.class );
+    //    private static final Logger LOG = LoggerFactory.getLogger( EnvironmentCreationWorkflow.class );
 
     private final TemplateManager templateRegistry;
     private final NetworkManager networkManager;
@@ -169,8 +168,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         try
         {
             new ContainerCloneStep( templateRegistry, defaultDomain, topology, environment, peerManager.getLocalPeer(),
-                    environmentManager )
-                    .execute();
+                    environmentManager ).execute();
 
             environment = environmentManager.saveOrUpdate( environment );
 
@@ -233,7 +231,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
         try
         {
-            new SetSshKeyStep( sshKey, environment, networkManager ).execute();
+            new AddSshKeyStep( Sets.newHashSet( sshKey ), environment, networkManager ).execute();
 
             environment = environmentManager.saveOrUpdate( environment );
 
@@ -250,7 +248,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
     public void FINALIZE()
     {
-//        LOG.info( "Finalizing environment creation" );
+        //        LOG.info( "Finalizing environment creation" );
 
         environment.setStatus( EnvironmentStatus.HEALTHY );
 

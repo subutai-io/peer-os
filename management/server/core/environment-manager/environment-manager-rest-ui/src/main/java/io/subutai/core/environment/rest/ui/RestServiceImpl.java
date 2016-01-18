@@ -63,7 +63,7 @@ public class RestServiceImpl implements RestService
     private final TemplateManager templateRegistry;
     private final StrategyManager strategyManager;
     private Gson gson = RequiredDeserializer.createValidatingGson();
-//    private Set<EnvironmentDto> envs = Sets.newHashSet();
+    //    private Set<EnvironmentDto> envs = Sets.newHashSet();
 
 
     public RestServiceImpl( final EnvironmentManager environmentManager, final PeerManager peerManager,
@@ -146,16 +146,17 @@ public class RestServiceImpl implements RestService
         try
         {
             Blueprint blueprint = gson.fromJson( content, Blueprint.class );
-//
-//            for ( NodeGroup nodeGroup : blueprint.getNodeGroups() )
-//            {
-//                if ( nodeGroup.getNumberOfContainers() <= 0 )
-//                {
-//                    return Response.status( Response.Status.BAD_REQUEST )
-//                                   .entity( JsonUtil.toJson( ERROR_KEY, "You must specify at least 1 container" ) )
-//                                   .build();
-//                }
-//            }
+            //
+            //            for ( NodeGroup nodeGroup : blueprint.getNodeGroups() )
+            //            {
+            //                if ( nodeGroup.getNumberOfContainers() <= 0 )
+            //                {
+            //                    return Response.status( Response.Status.BAD_REQUEST )
+            //                                   .entity( JsonUtil.toJson( ERROR_KEY, "You must specify at least 1
+            // container" ) )
+            //                                   .build();
+            //                }
+            //            }
 
             if ( blueprint.getId() == null )
             {
@@ -205,10 +206,10 @@ public class RestServiceImpl implements RestService
     @Override
     public Response listEnvironments()
     {
-//        if ( envs.size() > 0 )
-//        {
-//            return Response.ok( JsonUtil.toJson( envs ) ).build();
-//        }
+        //        if ( envs.size() > 0 )
+        //        {
+        //            return Response.ok( JsonUtil.toJson( envs ) ).build();
+        //        }
         Set<Environment> environments = environmentManager.getEnvironments();
         Set<EnvironmentDto> environmentDtos = Sets.newHashSet();
 
@@ -218,11 +219,11 @@ public class RestServiceImpl implements RestService
                     new EnvironmentDto( environment.getId(), environment.getName(), environment.getStatus(),
                             convertContainersToContainerJson( environment.getContainerHosts() ),
                             environment.getRelationDeclaration() );
-//            environmentDto.setRevoke( true );
+            //            environmentDto.setRevoke( true );
             environmentDtos.add( environmentDto );
         }
 
-//        envs.addAll( environmentDtos );
+        //        envs.addAll( environmentDtos );
         return Response.ok( JsonUtil.toJson( environmentDtos ) ).build();
     }
 
@@ -230,13 +231,13 @@ public class RestServiceImpl implements RestService
     @Override
     public Response accessStatus( final String environmentId )
     {
-//        for ( final EnvironmentDto env : envs )
-//        {
-//            if ( env.getId().equals( environmentId ) )
-//            {
-//                env.setRevoke( !env.isRevoke() );
-//            }
-//        }
+        //        for ( final EnvironmentDto env : envs )
+        //        {
+        //            if ( env.getId().equals( environmentId ) )
+        //            {
+        //                env.setRevoke( !env.isRevoke() );
+        //            }
+        //        }
         return Response.ok().build();
     }
 
@@ -249,7 +250,7 @@ public class RestServiceImpl implements RestService
         {
             Blueprint blueprint = gson.fromJson( blueprintJson, Blueprint.class );
 
-//            updateContainerPlacementStrategy( blueprint );
+            //            updateContainerPlacementStrategy( blueprint );
 
             Environment environment = environmentManager.setupRequisites( blueprint );
             environmentDto = new EnvironmentDto( environment.getId(), environment.getName(), environment.getStatus(),
@@ -301,7 +302,7 @@ public class RestServiceImpl implements RestService
         {
             Blueprint blueprint = gson.fromJson( blueprintJson, Blueprint.class );
 
-//            updateContainerPlacementStrategy( blueprint );
+            //            updateContainerPlacementStrategy( blueprint );
 
             Set<EnvironmentContainerHost> environment =
                     environmentManager.growEnvironment( environmentId, blueprint, false );
@@ -340,9 +341,14 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response setSshKey( final String environmentId, final String key )
+    public Response addSshKey( final String environmentId, final String key )
     {
-        if ( Strings.isNullOrEmpty( key ) )
+        if ( Strings.isNullOrEmpty( environmentId ) )
+        {
+            return Response.status( Response.Status.BAD_REQUEST )
+                           .entity( JsonUtil.toJson( ERROR_KEY, "Invalid environment id" ) ).build();
+        }
+        else if ( Strings.isNullOrEmpty( key ) )
         {
             return Response.status( Response.Status.BAD_REQUEST )
                            .entity( JsonUtil.toJson( ERROR_KEY, "Invalid ssh key" ) ).build();
@@ -352,7 +358,7 @@ public class RestServiceImpl implements RestService
         try
         {
             byte[] bytesEncoded = Base64.decodeBase64( key.getBytes() );
-            environmentManager.setSshKey( environmentId, new String( bytesEncoded ), false );
+            environmentManager.removeSshKey( environmentId, new String( bytesEncoded ), false );
         }
         catch ( EnvironmentNotFoundException e )
         {
@@ -377,12 +383,23 @@ public class RestServiceImpl implements RestService
     /** Environments SSH keys **************************************************** */
 
     @Override
-    public Response removeSshKey( final String environmentId )
+    public Response removeSshKey( final String environmentId, final String key )
     {
+
+        if ( Strings.isNullOrEmpty( environmentId ) )
+        {
+            return Response.status( Response.Status.BAD_REQUEST )
+                           .entity( JsonUtil.toJson( ERROR_KEY, "Invalid environment id" ) ).build();
+        }
+        else if ( Strings.isNullOrEmpty( key ) )
+        {
+            return Response.status( Response.Status.BAD_REQUEST )
+                           .entity( JsonUtil.toJson( ERROR_KEY, "Invalid ssh key" ) ).build();
+        }
 
         try
         {
-            environmentManager.setSshKey( environmentId, null, false );
+            environmentManager.removeSshKey( environmentId, key, false );
         }
         catch ( EnvironmentNotFoundException e )
         {
@@ -420,6 +437,23 @@ public class RestServiceImpl implements RestService
     public Response listDomainLoadBalanceStrategies()
     {
         return Response.ok( JsonUtil.toJson( DomainLoadBalanceStrategy.values() ) ).build();
+    }
+
+
+    @Override
+    public Response getEnvironmentSShKeys( final String environmentId )
+    {
+        try
+        {
+            Environment environment = environmentManager.loadEnvironment( environmentId );
+
+            return Response.ok( JsonUtil.toJson( environment.getSshKeys() ) ).build();
+        }
+        catch ( EnvironmentNotFoundException e )
+        {
+            LOG.error( "Cannot find environment ", e );
+            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+        }
     }
 
 
@@ -935,8 +969,7 @@ public class RestServiceImpl implements RestService
             ContainerHost containerHost = environment.getContainerHostById( containerId );
 
             Set<String> tags = JsonUtil.fromJson( tagsJson, new TypeToken<Set<String>>()
-            {
-            }.getType() );
+            {}.getType() );
 
             tags.stream().forEach( tag -> containerHost.addTag( tag ) );
 
@@ -1027,20 +1060,20 @@ public class RestServiceImpl implements RestService
     }
 
 
-//    private void updateContainerPlacementStrategy( Blueprint blueprint )
-//    {
-//        for ( NodeGroup nodeGroup : blueprint.getNodeGroups() )
-//        {
-//            if ( nodeGroup.getHostId() == null )
-//            {
-//                nodeGroup.setContainerDistributionType( ContainerDistributionType.AUTO );
-//            }
-//            else
-//            {
-//                nodeGroup.setContainerDistributionType( ContainerDistributionType.CUSTOM );
-//            }
-//        }
-//    }
+    //    private void updateContainerPlacementStrategy( Blueprint blueprint )
+    //    {
+    //        for ( NodeGroup nodeGroup : blueprint.getNodeGroups() )
+    //        {
+    //            if ( nodeGroup.getHostId() == null )
+    //            {
+    //                nodeGroup.setContainerDistributionType( ContainerDistributionType.AUTO );
+    //            }
+    //            else
+    //            {
+    //                nodeGroup.setContainerDistributionType( ContainerDistributionType.CUSTOM );
+    //            }
+    //        }
+    //    }
 
 
     /** AUX **************************************************** */
@@ -1070,7 +1103,7 @@ public class RestServiceImpl implements RestService
         {
             Blueprint blueprint = gson.fromJson( blueprintJson, Blueprint.class );
 
-//            updateContainerPlacementStrategy( blueprint );
+            //            updateContainerPlacementStrategy( blueprint );
 
             Environment environment = environmentManager.createEnvironment( blueprint, false );
         }

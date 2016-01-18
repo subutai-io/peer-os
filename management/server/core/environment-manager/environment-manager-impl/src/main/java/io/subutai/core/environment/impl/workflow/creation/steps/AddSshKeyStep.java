@@ -14,14 +14,15 @@ import io.subutai.core.network.api.NetworkManagerException;
 
 public class AddSshKeyStep
 {
-    private final String sshKey;
+    private final Set<String> sshKeys;
     private final EnvironmentImpl environment;
     private final NetworkManager networkManager;
 
 
-    public AddSshKeyStep( final String sshKey, final EnvironmentImpl environment, final NetworkManager networkManager )
+    public AddSshKeyStep( final Set<String> sshKeys, final EnvironmentImpl environment,
+                          final NetworkManager networkManager )
     {
-        this.sshKey = sshKey;
+        this.sshKeys = sshKeys;
         this.environment = environment;
         this.networkManager = networkManager;
     }
@@ -29,18 +30,18 @@ public class AddSshKeyStep
 
     public void execute() throws NetworkManagerException
     {
-        if ( !Strings.isNullOrEmpty( sshKey ) )
+        Set<ContainerHost> ch = Sets.newHashSet();
+        ch.addAll( environment.getContainerHosts() );
+
+        for ( String sshKey : sshKeys )
         {
+            if ( !Strings.isNullOrEmpty( sshKey ) )
+            {
+                environment.addSshKey( sshKey );
 
-            //todo add ssh key to environment keys
-            //            environment.saveSshKey( sshKey );
-
-            Set<ContainerHost> ch = Sets.newHashSet();
-            ch.addAll( environment.getContainerHosts() );
-
-
-            //add ssh key to each environment container
-            networkManager.addSshKeyToAuthorizedKeys( ch, sshKey );
+                //add ssh key to each environment container
+                networkManager.addSshKeyToAuthorizedKeys( ch, sshKey );
+            }
         }
     }
 }
