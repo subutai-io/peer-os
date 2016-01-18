@@ -108,7 +108,7 @@ public class RestServiceImplTest
     public void testCreateEnvironment() throws EnvironmentCreationException
     {
         NodeGroup nodeGroup = JsonUtil.fromJson( TestUtil.NODE_GROUP_JSON, NodeGroup.class );
-        Blueprint blueprint = new Blueprint( TestUtil.ENV_NAME, TestUtil.SSH_KEY, Sets.newHashSet( nodeGroup ) );
+        Blueprint blueprint = new Blueprint( TestUtil.ENV_NAME, TestUtil.SSH_KEY, Sets.newHashSet( nodeGroup ), null );
         restService.createEnvironment( blueprint );
     }
 
@@ -228,7 +228,7 @@ public class RestServiceImplTest
     public void testGrowEnvironment() throws Exception
     {
         NodeGroup nodeGroup = JsonUtil.fromJson( TestUtil.NODE_GROUP_JSON, NodeGroup.class );
-        Blueprint blueprint = new Blueprint( TestUtil.ENV_NAME, TestUtil.SSH_KEY, Sets.newHashSet( nodeGroup ) );
+        Blueprint blueprint = new Blueprint( TestUtil.ENV_NAME, TestUtil.SSH_KEY, Sets.newHashSet( nodeGroup ) , null);
 
         restService.growEnvironment( "ENV_ID", blueprint );
 

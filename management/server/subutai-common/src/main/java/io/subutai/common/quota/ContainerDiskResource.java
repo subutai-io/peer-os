@@ -28,7 +28,7 @@ public abstract class ContainerDiskResource extends ContainerResource<ByteValueR
     @Override
     public String getWriteValue()
     {
-        BigDecimal v = resource.convert( ByteUnit.MB );
+        BigDecimal v = resource.convert( ByteUnit.GB );
         return String.format( "%d", v.intValue() );
     }
 
@@ -40,6 +40,6 @@ public abstract class ContainerDiskResource extends ContainerResource<ByteValueR
     @Override
     public String getPrintValue()
     {
-        return String.format( "%s%s", resource.convert( ByteUnit.MB ), ByteUnit.MB.getAcronym() );
+        return String.format( "%s%s", resource.convert( ByteUnit.GB ), ByteUnit.GB.getAcronym() );
     }
 }

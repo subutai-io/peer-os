@@ -90,7 +90,8 @@ public class ContainerCloneStep
         {
             for ( NodeGroup nodeGroup : nodeGroups )
             {
-                requestedContainerCount += nodeGroup.getNumberOfContainers();
+//                requestedContainerCount += nodeGroup.getNumberOfContainers();
+                requestedContainerCount ++;
             }
         }
 
@@ -122,7 +123,8 @@ public class ContainerCloneStep
 
             for ( NodeGroup nodeGroup : peerPlacement.getValue() )
             {
-                currentLastUsedIpIndex += nodeGroup.getNumberOfContainers();
+//                currentLastUsedIpIndex += nodeGroup.getNumberOfContainers();
+                currentLastUsedIpIndex ++;
             }
 
 

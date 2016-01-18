@@ -82,30 +82,31 @@ public class GrowLocalEnvironmentCommand extends SubutaiShellCommandSupport
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
 
-        Environment environment = environmentManager.loadEnvironment( environmentId );
-        NodeGroup nodeGroup = new NodeGroup( String.format( "NodeGroup%s", System.currentTimeMillis() ), templateName,
-                numberOfContainers, 1, 1, new PlacementStrategy( "ROUND_ROBIN" ), peerManager.getLocalPeer().getId() );
-
-        Blueprint blueprint = new Blueprint( environment.getName(), null, Sets.newHashSet( nodeGroup ) );
-
-        Set<EnvironmentContainerHost> newContainers =
-                environmentManager.growEnvironment( environmentId, blueprint, async );
-
-        System.out.println( "New containers created:" );
-
-        for ( EnvironmentContainerHost containerHost : newContainers )
-        {
-            System.out.println( "-----------------------------------------------------------------" );
-
-            System.out.println( String.format( "Container id %s", containerHost.getId() ) );
-            System.out.println( String.format( "Container hostname %s", containerHost.getHostname() ) );
-            System.out.println( String.format( "Environment id %s", containerHost.getEnvironmentId() ) );
-            System.out.println( String.format( "NodeGroup name %s", containerHost.getNodeGroupName() ) );
-            System.out.println( String.format( "Template name %s", containerHost.getTemplateName() ) );
-            System.out.println( String.format( "IP %s",
-                    containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp() ) );
-            System.out.println( String.format( "Is connected %s", containerHost.isConnected() ) );
-        }
+        //TODO: please reimplement it
+//        Environment environment = environmentManager.loadEnvironment( environmentId );
+//        NodeGroup nodeGroup = new NodeGroup( String.format( "NodeGroup%s", System.currentTimeMillis() ), templateName,
+//               /* numberOfContainers,*/ 1, 1, new PlacementStrategy( "ROUND_ROBIN" ), peerManager.getLocalPeer().getId() );
+//
+//        Blueprint blueprint = new Blueprint( environment.getName(), null, Sets.newHashSet( nodeGroup ) );
+//
+//        Set<EnvironmentContainerHost> newContainers =
+//                environmentManager.growEnvironment( environmentId, blueprint, async );
+//
+//        System.out.println( "New containers created:" );
+//
+//        for ( EnvironmentContainerHost containerHost : newContainers )
+//        {
+//            System.out.println( "-----------------------------------------------------------------" );
+//
+//            System.out.println( String.format( "Container id %s", containerHost.getId() ) );
+//            System.out.println( String.format( "Container hostname %s", containerHost.getHostname() ) );
+//            System.out.println( String.format( "Environment id %s", containerHost.getEnvironmentId() ) );
+//            System.out.println( String.format( "NodeGroup name %s", containerHost.getNodeGroupName() ) );
+//            System.out.println( String.format( "Template name %s", containerHost.getTemplateName() ) );
+//            System.out.println( String.format( "IP %s",
+//                    containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp() ) );
+//            System.out.println( String.format( "Is connected %s", containerHost.isConnected() ) );
+//        }
 
         return null;
     }

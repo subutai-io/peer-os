@@ -47,7 +47,7 @@ public class GetResourceLimits extends SubutaiShellCommandSupport
             System.out.println( "Peer not found." );
             return null;
         }
-        final PeerResources limits = peer.getResourceLimits( peerId );
+        final PeerResources limits = peer.getResourceLimits( peerManager.getLocalPeer().getId() );
 
         System.out.println(
                 String.format( "%s, env:%d, cont:%d, net: %d", limits.getPeerId(), limits.getEnvironmentLimit(),
