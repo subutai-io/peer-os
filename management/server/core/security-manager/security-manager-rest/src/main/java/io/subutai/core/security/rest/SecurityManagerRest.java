@@ -45,7 +45,8 @@ public interface SecurityManagerRest
      */
     @GET
     @Path( "keyman/getpublickeyring" )
-    @Produces( { MediaType.APPLICATION_JSON } )
+//    @Produces( { MediaType.APPLICATION_JSON } ) @todo Larik changes
+    @Produces( { MediaType.TEXT_PLAIN } )
     public Response getPublicKeyRing( @QueryParam( "hostid" ) String identityId );
 
 
