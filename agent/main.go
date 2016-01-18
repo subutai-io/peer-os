@@ -59,7 +59,10 @@ func main() {
 		}}, {
 
 		Name: "daemon", Usage: "start an agent",
-		Action: agent.Start,
+		Action: func(c *cli.Context) {
+			config.InitAgentDebug()
+			agent.Start(c)
+		},
 		Flags: []cli.Flag{
 			cli.StringFlag{Name: "server", Value: config.Management.Host, Usage: "management host ip address/host name"},
 			cli.StringFlag{Name: "port", Value: config.Management.Port, Usage: "management host port number"},
