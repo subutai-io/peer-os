@@ -27,12 +27,10 @@ import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
 
 import io.subutai.common.environment.Blueprint;
-import io.subutai.common.environment.ContainerDistributionType;
 import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
-import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.gson.required.RequiredDeserializer;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInterface;
@@ -148,16 +146,16 @@ public class RestServiceImpl implements RestService
         try
         {
             Blueprint blueprint = gson.fromJson( content, Blueprint.class );
-
-            for ( NodeGroup nodeGroup : blueprint.getNodeGroups() )
-            {
-                if ( nodeGroup.getNumberOfContainers() <= 0 )
-                {
-                    return Response.status( Response.Status.BAD_REQUEST )
-                                   .entity( JsonUtil.toJson( ERROR_KEY, "You must specify at least 1 container" ) )
-                                   .build();
-                }
-            }
+//
+//            for ( NodeGroup nodeGroup : blueprint.getNodeGroups() )
+//            {
+//                if ( nodeGroup.getNumberOfContainers() <= 0 )
+//                {
+//                    return Response.status( Response.Status.BAD_REQUEST )
+//                                   .entity( JsonUtil.toJson( ERROR_KEY, "You must specify at least 1 container" ) )
+//                                   .build();
+//                }
+//            }
 
             if ( blueprint.getId() == null )
             {
@@ -251,7 +249,7 @@ public class RestServiceImpl implements RestService
         {
             Blueprint blueprint = gson.fromJson( blueprintJson, Blueprint.class );
 
-            updateContainerPlacementStrategy( blueprint );
+//            updateContainerPlacementStrategy( blueprint );
 
             Environment environment = environmentManager.setupRequisites( blueprint );
             environmentDto = new EnvironmentDto( environment.getId(), environment.getName(), environment.getStatus(),
@@ -303,7 +301,7 @@ public class RestServiceImpl implements RestService
         {
             Blueprint blueprint = gson.fromJson( blueprintJson, Blueprint.class );
 
-            updateContainerPlacementStrategy( blueprint );
+//            updateContainerPlacementStrategy( blueprint );
 
             Set<EnvironmentContainerHost> environment =
                     environmentManager.growEnvironment( environmentId, blueprint, false );
@@ -1029,20 +1027,20 @@ public class RestServiceImpl implements RestService
     }
 
 
-    private void updateContainerPlacementStrategy( Blueprint blueprint )
-    {
-        for ( NodeGroup nodeGroup : blueprint.getNodeGroups() )
-        {
-            if ( nodeGroup.getHostId() == null )
-            {
-                nodeGroup.setContainerDistributionType( ContainerDistributionType.AUTO );
-            }
-            else
-            {
-                nodeGroup.setContainerDistributionType( ContainerDistributionType.CUSTOM );
-            }
-        }
-    }
+//    private void updateContainerPlacementStrategy( Blueprint blueprint )
+//    {
+//        for ( NodeGroup nodeGroup : blueprint.getNodeGroups() )
+//        {
+//            if ( nodeGroup.getHostId() == null )
+//            {
+//                nodeGroup.setContainerDistributionType( ContainerDistributionType.AUTO );
+//            }
+//            else
+//            {
+//                nodeGroup.setContainerDistributionType( ContainerDistributionType.CUSTOM );
+//            }
+//        }
+//    }
 
 
     /** AUX **************************************************** */
@@ -1072,7 +1070,7 @@ public class RestServiceImpl implements RestService
         {
             Blueprint blueprint = gson.fromJson( blueprintJson, Blueprint.class );
 
-            updateContainerPlacementStrategy( blueprint );
+//            updateContainerPlacementStrategy( blueprint );
 
             Environment environment = environmentManager.createEnvironment( blueprint, false );
         }

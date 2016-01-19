@@ -33,7 +33,6 @@ import com.google.common.collect.Sets;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.Blueprint;
-import io.subutai.common.environment.ContainerDistributionType;
 import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
@@ -61,6 +60,8 @@ import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.quota.ContainerQuota;
+import io.subutai.common.resource.PeerGroupResources;
 import io.subutai.common.security.crypto.pgp.KeyPair;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.Ownership;
@@ -95,6 +96,7 @@ import io.subutai.core.environment.impl.workflow.modification.SshKeyModification
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.kurjun.api.TemplateManager;
+import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerAction;
 import io.subutai.core.peer.api.PeerActionListener;
@@ -111,6 +113,9 @@ import io.subutai.core.relation.api.model.RelationStatus;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
+import io.subutai.core.strategy.api.ContainerPlacementStrategy;
+import io.subutai.core.strategy.api.StrategyException;
+import io.subutai.core.strategy.api.StrategyManager;
 import io.subutai.core.tracker.api.Tracker;
 
 
@@ -138,12 +143,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     protected Map<String, AlertHandler> alertHandlers = new ConcurrentHashMap<String, AlertHandler>();
     private SecurityManager securityManager;
     private boolean keyTrustCheckEnabled;
+    private StrategyManager strategyManager;
+    private QuotaManager quotaManager;
 
 
     public EnvironmentManagerImpl( final TemplateManager templateRegistry, final PeerManager peerManager,
                                    SecurityManager securityManager, final NetworkManager networkManager,
                                    final DaoManager daoManager, final IdentityManager identityManager,
-                                   final Tracker tracker, final RelationManager relationManager )
+                                   final Tracker tracker, final RelationManager relationManager,
+                                   final StrategyManager strategyManager, final QuotaManager quotaManager )
     {
         Preconditions.checkNotNull( templateRegistry );
         Preconditions.checkNotNull( peerManager );
@@ -152,6 +160,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         Preconditions.checkNotNull( identityManager );
         Preconditions.checkNotNull( relationManager );
         Preconditions.checkNotNull( securityManager );
+        Preconditions.checkNotNull( strategyManager );
+        Preconditions.checkNotNull( quotaManager );
         Preconditions.checkNotNull( tracker );
 
         this.templateRegistry = templateRegistry;
@@ -162,6 +172,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         this.identityManager = identityManager;
         this.relationManager = relationManager;
         this.tracker = tracker;
+        this.strategyManager = strategyManager;
+        this.quotaManager = quotaManager;
     }
 
 
@@ -420,7 +432,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         final EnvironmentDestructionWorkflow environmentDestructionWorkflow =
                 getEnvironmentDestructionWorkflow( peerManager, this, environment, forceMetadataRemoval,
-                        operationTracker         );
+                        operationTracker );
 
         executor.execute( new Runnable()
         {
@@ -468,8 +480,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         User activeUser = identityManager.getActiveUser();
 
         final boolean viewAll = identityManager
-                .isUserPermitted                 ( activeUser, PermissionObject.EnvironmentManagement,
-                        PermissionScope.ALL_SCOPE,
+                .isUserPermitted( activeUser, PermissionObject.EnvironmentManagement, PermissionScope.ALL_SCOPE,
                         PermissionOperation.Read );
 
 
@@ -528,14 +539,34 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         }
 
         Blueprint blueprint = JsonUtil.fromJson( environment.getRawBlueprint(), Blueprint.class );
+
+
         String cidr = calculateCidr( blueprint );
 
         // TODO add additional step for receiving trust message
 
-        Topology topology = buildTopology( environment.getId(), cidr, blueprint );
+        boolean isHostBased = true;
+        for ( NodeGroup nodeGroup : blueprint.getNodeGroups() )
+        {
+            if ( nodeGroup.getHostId() == null )
+            {
+                isHostBased = false;
+                break;
+            }
+        }
 
+        Topology topology;
+        if ( isHostBased )
+        {
+            topology = buildTopology( environment.getId(), cidr, blueprint );
+        }
+        else
+        {
+            final String strategyId = "MASTER-STRATEGY";
+            topology = buildTopologyByStrategy( environment.getId(), cidr, blueprint, strategyId );
+        }
         //create operation tracker
-        TrackerOperation operationTracker = tracker.createTrackerOperation       ( MODULE_NAME,
+        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Creating environment %s ", environment.getId() ) );
 
         //launch environment creation workflow
@@ -580,22 +611,78 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
+    private Topology buildTopologyByStrategy( final String environmentId, final String cidr, final Blueprint blueprint,
+                                              final String strategyId ) throws EnvironmentCreationException
+    {
+        LOG.debug( "Building topology..." );
+
+        Topology topology = new Topology( blueprint.getName(), environmentId, cidr, blueprint.getSshKey() );
+
+        try
+        {
+            Set<String> peers = blueprint.getPeers();
+            ContainerPlacementStrategy strategy = strategyManager.findStrategyById( strategyId );
+            PeerGroupResources groupResources = new PeerGroupResources();
+            for ( String peerId : peers )
+            {
+                Peer peer = peerManager.getPeer( peerId );
+                if ( peer == null )
+                {
+                    throw new EnvironmentCreationException( "Peer not found: " + peerId );
+                }
+
+                groupResources.addPeerResources( peer.getResourceLimits( peerManager.getLocalPeer().getId() ) );
+            }
+
+
+            final Map<ContainerSize, ContainerQuota> quotas = quotaManager.getDefaultQuotas();
+            Blueprint newBlueprint = strategy.distribute( groupResources, quotas );
+
+            for ( Map.Entry<String, Set<NodeGroup>> placementEntry : newBlueprint.getNodeGroupsMap().entrySet() )
+            {
+                Peer peer = peerManager.getPeer( placementEntry.getKey() );
+                for ( NodeGroup nodeGroup : placementEntry.getValue() )
+                {
+                    topology.addNodeGroupPlacement( peer, nodeGroup );
+                }
+            }
+        }
+        catch ( StrategyException e )
+        {
+            throw new EnvironmentCreationException( "Container placement strategy not found by name: " + strategyId );
+        }
+        catch ( PeerException e )
+        {
+            new EnvironmentCreationException( "Could not retrieve peer limits. Error message: " + e.getMessage() );
+        }
+
+
+        LOG.debug( "Topology built." );
+
+        return topology;
+    }
+
+
     protected Topology buildTopology( final String environmentId, final String cdir, final Blueprint blueprint )
     {
         Topology topology = new Topology( blueprint.getName(), environmentId, cdir, blueprint.getSshKey() );
 
         LOG.debug( "Building topology..." );
+
+
         for ( Map.Entry<String, Set<NodeGroup>> placementEntry : blueprint.getNodeGroupsMap().entrySet() )
         {
             Peer peer = peerManager.getPeer( placementEntry.getKey() );
             for ( NodeGroup nodeGroup : placementEntry.getValue() )
             {
-                LOG.debug                                                                ( String.format
-                        ( "%s %s " + "%s %s %s %s", nodeGroup.getName(), nodeGroup.getType(),
-                        nodeGroup.getNumberOfContainers(), nodeGroup.getPeerId(),
-                        nodeGroup.getContainerDistributionType() == ContainerDistributionType.AUTO ?
-                        nodeGroup.getContainerPlacementStrategy().getStrategyId()                  : nodeGroup
-                                .getHostId(), nodeGroup.getContainerDistributionType() ) );
+                //                LOG.debug                                                                ( String
+                // .format
+                //                        ( "%s %s " + "%s %s %s %s", nodeGroup.getName(), nodeGroup.getType()/*,
+                //                        nodeGroup.getNumberOfContainers()*/, nodeGroup.getPeerId(),
+                //                        nodeGroup.getContainerDistributionType() == ContainerDistributionType.AUTO ?
+                //                        nodeGroup.getContainerPlacementStrategy().getStrategyId()
+                // : nodeGroup
+                //                                .getHostId(), nodeGroup.getContainerDistributionType() ) );
                 topology.addNodeGroupPlacement( peer, nodeGroup );
             }
         }
@@ -743,15 +830,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             {
                 ContainerSize containerType = entry.getKey().getType();
 
-                environment.addContainers                                     ( Sets.newHashSet(
+                environment.addContainers( Sets.newHashSet(
                         new EnvironmentContainerImpl( peerManager.getLocalPeer().getId(), peerManager.getLocalPeer(),
                                 entry.getKey().getName(), new ContainerHostInfoModel( newHost ),
                                 templateRegistry.getTemplate( entry.getKey().getTemplateName() ),
                                 entry.getKey().getSshGroupId(), entry.getKey().getHostsGroupId(),
-                                Common.DEFAULT_DOMAIN_NAME, containerType )                    ) );
+                                Common.DEFAULT_DOMAIN_NAME, containerType ) ) );
             }
         }
-        TrackerOperation operationTracker = tracker.createTrackerOperation       ( MODULE_NAME,
+        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Creating environment %s ", environment.getId() ) );
 
         EnvironmentImportWorkflow environmentImportWorkflow =
@@ -791,7 +878,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     public void setSshKey( final String environmentId, final String sshKey, final boolean async )
             throws EnvironmentNotFoundException, EnvironmentModificationException
     {
-        TrackerOperation op = tracker.createTrackerOperation                     ( MODULE_NAME,
+        TrackerOperation op = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Setting environment %s ssh key", environmentId ) );
 
         setSshKey( environmentId, sshKey, async, true, op );
@@ -911,7 +998,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                                     final boolean forceMetadataRemoval )
             throws EnvironmentDestructionException, EnvironmentNotFoundException
     {
-        TrackerOperation op = tracker.createTrackerOperation                ( MODULE_NAME,
+        TrackerOperation op = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Destroying environment %s", environmentId ) );
 
         destroyEnvironment( environmentId, async, forceMetadataRemoval, true, op );
@@ -949,8 +1036,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         User activeUser = identityManager.getActiveUser();
 
         final boolean deleteAll = identityManager
-                .isUserPermitted                   ( activeUser, PermissionObject.EnvironmentManagement,
-                        PermissionScope.ALL_SCOPE,
+                .isUserPermitted( activeUser, PermissionObject.EnvironmentManagement, PermissionScope.ALL_SCOPE,
                         PermissionOperation.Delete );
         RelationMeta relationMeta =
                 new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), environment, environmentId,
@@ -991,7 +1077,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         final ContainerDestructionWorkflow containerDestructionWorkflow =
                 getContainerDestructionWorkflow( this, environment, environmentContainer, forceMetadataRemoval,
-                        operationTracker       );
+                        operationTracker );
 
         executor.execute( new Runnable()
         {
@@ -1066,8 +1152,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         boolean canDelete = relationManager.getRelationInfoManager().allHasDeletePermissions( relationMeta );
 
         final boolean deleteAll = identityManager
-                .isUserPermitted                   ( activeUser, PermissionObject.EnvironmentManagement,
-                        PermissionScope.ALL_SCOPE,
+                .isUserPermitted( activeUser, PermissionObject.EnvironmentManagement, PermissionScope.ALL_SCOPE,
                         PermissionOperation.Delete );
 
         if ( deleteAll || environment.getUserId().equals( activeUser.getId() ) || canDelete )
@@ -1186,7 +1271,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             return;
         }
 
-        TrackerOperation operationTracker = tracker.createTrackerOperation       ( MODULE_NAME,
+        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Removing environment %s domain", environmentId ) );
 
         modifyEnvironmentDomain( environmentId, null, null, operationTracker, true, null );
@@ -1218,11 +1303,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         }
 
 
-        TrackerOperation operationTracker = tracker.createTrackerOperation        ( MODULE_NAME,
+        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Assigning environment %s domain", environmentId ) );
 
         modifyEnvironmentDomain( environmentId, newDomain, domainLoadBalanceStrategy, operationTracker, true,
-                sslCertPath    );
+                sslCertPath );
     }
 
 
@@ -1293,7 +1378,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             ContainerHost containerHost = environment.getContainerHostById( containerHostId );
 
-            return peerManager.getLocalPeer().isIpInVniDomain                                                      (
+            return peerManager.getLocalPeer().isIpInVniDomain(
                     containerHost.getIpByInterfaceName( Common.DEFAULT_CONTAINER_INTERFACE ), environment.getVni() );
         }
         catch ( ContainerHostNotFoundException | PeerException e )
@@ -1310,7 +1395,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     public void addContainerToEnvironmentDomain( final String containerHostId, final String environmentId )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
     {
-        TrackerOperation operationTracker = tracker.createTrackerOperation                    ( MODULE_NAME,
+        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Adding container %s to environment domain", containerHostId ) );
 
         toggleContainerDomain( containerHostId, environmentId, true, operationTracker, true );
@@ -1340,7 +1425,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             throw new ContainerHostNotFoundException( "Container host not found." );
         }
 
-        TrackerOperation operationTracker = tracker.createTrackerOperation           ( MODULE_NAME,
+        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Setting up ssh for container %s ", containerHostId ) );
 
         environment.getContainerHostById( containerHostId );
@@ -1349,14 +1434,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             int sshPort =
                     peerManager.getLocalPeer().setupContainerSsh( containerHostId, Common.CONTAINER_SSH_TIMEOUT_SEC );
 
-            operationTracker.addLogDone                                                                   (
+            operationTracker.addLogDone(
                     String.format( "Ssh for container %s is ready on port %d", containerHostId, sshPort ) );
 
             return sshPort;
         }
         catch ( Exception e )
         {
-            operationTracker.addLogFailed                                                                         (
+            operationTracker.addLogFailed(
                     String.format( "Error setting up ssh for container %s: %s", containerHostId, e.getMessage() ) );
             throw new EnvironmentModificationException( e );
         }
@@ -1368,7 +1453,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     public void removeContainerFromEnvironmentDomain( final String containerHostId, final String environmentId )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
     {
-        TrackerOperation operationTracker = tracker.createTrackerOperation                        ( MODULE_NAME,
+        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Removing container %s from environment domain", containerHostId ) );
 
         toggleContainerDomain( containerHostId, environmentId, false, operationTracker, true );
@@ -1405,24 +1490,22 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             if ( add )
             {
                 peerManager.getLocalPeer()
-                           .addIpToVniDomain            ( containerHost.getIpByInterfaceName( Common
-                                   .DEFAULT_CONTAINER_INTERFACE ),
+                           .addIpToVniDomain( containerHost.getIpByInterfaceName( Common.DEFAULT_CONTAINER_INTERFACE ),
                                    environment.getVni() );
             }
             else
             {
                 peerManager.getLocalPeer().removeIpFromVniDomain(
                         containerHost.getIpByInterfaceName( Common.DEFAULT_CONTAINER_INTERFACE ),
-                        environment.getVni()                    );
+                        environment.getVni() );
             }
 
-            operationTracker.addLogDone                                                                          (
+            operationTracker.addLogDone(
                     String.format( "Container is %s environment domain", add ? "included in" : "excluded from" ) );
         }
         catch ( Exception e )
         {
-            operationTracker.addLogFailed                                                         ( String.format
-                    ( "Error %s environment domain: %s",
+            operationTracker.addLogFailed( String.format( "Error %s environment domain: %s",
                     add ? "including container in" : "excluding container from", e.getMessage() ) );
             throw new EnvironmentModificationException( e );
         }
@@ -1885,32 +1968,26 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                 if ( alertValue != null && alertEvent.getEnvironmentId() != null )
                 {
                     final Environment environment = loadEnvironment( alertEvent.getEnvironmentId() );
-                    alertEvent.addLog                                     (
-                            String.format                               ( "Invoking pre-processor of" + " '%s:%s'.",
-                                    handlerId.getAlertHandlerId(),
+                    alertEvent.addLog(
+                            String.format( "Invoking pre-processor of" + " '%s:%s'.", handlerId.getAlertHandlerId(),
                                     handlerId.getAlertHandlerPriority() ) );
                     handler.preProcess( environment, alertValue );
-                    alertEvent
-                            .addLog                                       ( String.format( "Pre-processor of '%s:%s' "
-                                    + "finished.", handlerId.getAlertHandlerId(),
+                    alertEvent.addLog(
+                            String.format( "Pre-processor of '%s:%s' " + "finished.", handlerId.getAlertHandlerId(),
                                     handlerId.getAlertHandlerPriority() ) );
-                    alertEvent.addLog                                     (
-                            String.format                               ( "Invoking main processor of '%s:%s'.",
-                                    handlerId.getAlertHandlerId(),
+                    alertEvent.addLog(
+                            String.format( "Invoking main processor of '%s:%s'.", handlerId.getAlertHandlerId(),
                                     handlerId.getAlertHandlerPriority() ) );
                     handler.process( environment, alertValue );
-                    alertEvent.addLog                                     (
-                            String.format                               ( "Main processor of '%s:%s' finished.",
-                                    handlerId.getAlertHandlerId(),
+                    alertEvent.addLog(
+                            String.format( "Main processor of '%s:%s' finished.", handlerId.getAlertHandlerId(),
                                     handlerId.getAlertHandlerPriority() ) );
-                    alertEvent.addLog                                     (
-                            String.format                               ( "Invoking post-processor of '%s:%s'.",
-                                    handlerId.getAlertHandlerId(),
+                    alertEvent.addLog(
+                            String.format( "Invoking post-processor of '%s:%s'.", handlerId.getAlertHandlerId(),
                                     handlerId.getAlertHandlerPriority() ) );
                     handler.postProcess( environment, alertValue );
-                    alertEvent.addLog                                     (
-                            String.format                               ( "Pre-processor of '%s:%s' " + "finished.",
-                                    handlerId.getAlertHandlerId(),
+                    alertEvent.addLog(
+                            String.format( "Pre-processor of '%s:%s' " + "finished.", handlerId.getAlertHandlerId(),
                                     handlerId.getAlertHandlerPriority() ) );
                 }
             }
@@ -2020,7 +2097,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         }
         catch ( EnvironmentNotFoundException e )
         {
-            LOG.warn("Don't have permissions.", e);
+            LOG.warn( "Don't have permissions.", e );
             return;
         }
 

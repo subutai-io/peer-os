@@ -89,10 +89,22 @@ func CreateGateway(vlanip, vlanid string) {
 }
 
 func DeleteGateway(vlanid string) {
-	log.Check(log.FatalLevel, "ovs-vsctl del-br",
-		exec.Command("ovs-vsctl", "del-br", "br-"+vlanid).Run())
-	log.Check(log.FatalLevel, "ovs-vsctl del-port",
-		exec.Command("ovs-vsctl", "del-port", "br-int", "intto"+vlanid).Run())
+	exec.Command("ovs-vsctl", "del-port", "br-int", "intto"+vlanid).Run()
+	exec.Command("ovs-vsctl", "del-br", "br-"+vlanid).Run()
+	ports, err := exec.Command("ovs-vsctl", "show").Output()
+	log.Check(log.WarnLevel, "Getting bridge ports", err)
+	line := strings.Split(string(ports), "\n")
+	iface := ""
+	for k, v := range line {
+		if strings.Trim(v, " ") == "tag: "+vlanid {
+			iface = line[k+1]
+			break
+		}
+	}
+	port := strings.Fields(iface)
+	if len(port) > 1 {
+		exec.Command("ovs-vsctl", "del-port", "br-int", strings.Trim(port[1], "\"")).Run()
+	}
 }
 
 func ListTapDevice() {
