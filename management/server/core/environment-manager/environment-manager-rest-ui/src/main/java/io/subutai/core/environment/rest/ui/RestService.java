@@ -1,6 +1,7 @@
 package io.subutai.core.environment.rest.ui;
 
 
+import java.util.List;
 import java.util.UUID;
 
 import javax.ws.rs.Consumes;
@@ -28,28 +29,6 @@ public interface RestService
     Response listTemplates();
 
 
-    /** Blueprints *************************************************** */
-
-    @GET
-    @Path( "blueprints" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    Response getBlueprints();
-
-    @GET
-    @Path( "blueprints/{blueprintId}" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    Response getBlueprint( @PathParam( "blueprintId" ) UUID blueprintId );
-
-    @POST
-    @Path( "blueprints" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    Response saveBlueprint( @FormParam( "blueprint_json" ) String content );
-
-    @DELETE
-    @Path( "blueprints/{blueprintId}" )
-    Response deleteBlueprint( @PathParam( "blueprintId" ) UUID blueprintId );
-
-
     /** Domain **************************************************** */
 
     @GET
@@ -68,9 +47,16 @@ public interface RestService
     @Path( "{environmentId}/revoke" )
     Response accessStatus( @PathParam( "environmentId" ) String environmentId );
 
+
+    @POST
+    @Path( "requisites/strategy" )
+    Response setupStrategyRequisites( @FormParam( "name" ) String name, @FormParam( "strategy" ) String strategy,
+                                      @FormParam( "sshId" ) int sshId, @FormParam( "hostId" ) int hostId,
+                                      @FormParam( "peers" ) List<String> peers );
+
     @POST
     @Path( "requisites" )
-    Response setupRequisites( @FormParam( "blueprint_json" ) String blueprintJson );
+    Response setupRequisites( @FormParam( "topology" ) String topologyJson );
 
     @POST
     @Path( "build" )

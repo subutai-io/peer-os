@@ -7,7 +7,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
@@ -52,15 +51,11 @@ import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.api.ShareDto.ShareDto;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
-import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.strategy.api.ContainerPlacementStrategy;
-import io.subutai.core.strategy.api.ExampleStrategy;
-import io.subutai.core.strategy.api.StrategyException;
 import io.subutai.core.strategy.api.StrategyManager;
-import io.subutai.core.strategy.api.StrategyNotFoundException;
 
 
 public class RestServiceImpl implements RestService
@@ -71,8 +66,8 @@ public class RestServiceImpl implements RestService
     private final PeerManager peerManager;
     private final TemplateManager templateRegistry;
     private final StrategyManager strategyManager;
+    private final QuotaManager quotaManager;
     private Gson gson = RequiredDeserializer.createValidatingGson();
-    private QuotaManager quotaManager;
     //    private Set<EnvironmentDto> envs = Sets.newHashSet();
 
 
@@ -109,97 +104,6 @@ public class RestServiceImpl implements RestService
         {
             return Response.status( Response.Status.NOT_FOUND ).build();
         }
-    }
-
-
-    /** Blueprints *************************************************** */
-
-    @Override
-    public Response getBlueprints()
-    {
-        try
-        {
-            return Response.ok( gson.toJson( environmentManager.getBlueprints() ) ).build();
-        }
-        catch ( EnvironmentManagerException e )
-        {
-            return Response.status( Response.Status.BAD_REQUEST )
-                           .entity( JsonUtil.toJson( ERROR_KEY, "Error loading blueprints" ) ).build();
-        }
-    }
-
-
-    @Override
-    public Response getBlueprint( UUID blueprintId )
-    {
-        //        try
-        //        {
-        //            Blueprint blueprint = environmentManager.getBlueprint( blueprintId );
-        //            if ( blueprint != null )
-        //            {
-        //                return Response.ok( gson.toJson( blueprint ) ).build();
-        //            }
-        //            else
-        //            {
-        return Response.status( Response.Status.NOT_FOUND ).build();
-        //            }
-        //        }
-        //        catch ( EnvironmentManagerException e )
-        //        {
-        //            return Response.status( Response.Status.BAD_REQUEST )
-        //                           .entity( JsonUtil.toJson( ERROR_KEY, "Error blueprint not found" ) ).build();
-        //        }
-    }
-
-
-    @Override
-    public Response saveBlueprint( final String content )
-    {
-        //        try
-        //        {
-        //            Blueprint blueprint = gson.fromJson( content, Blueprint.class );
-        ////
-        ////            for ( NodeGroup nodeGroup : blueprint.getNodeGroups() )
-        ////            {
-        ////                if ( nodeGroup.getNumberOfContainers() <= 0 )
-        ////                {
-        ////                    return Response.status( Response.Status.BAD_REQUEST )
-        ////                                   .entity( JsonUtil.toJson( ERROR_KEY, "You must specify at least 1
-        // container" ) )
-        ////                                   .build();
-        ////                }
-        ////            }
-        //
-        //            if ( blueprint.getId() == null )
-        //            {
-        //                blueprint.setId( UUID.randomUUID() );
-        //            }
-        //
-        //            environmentManager.saveBlueprint( blueprint );
-        //
-        //            return Response.ok( gson.toJson( blueprint ) ).build();
-        //        }
-        //        catch ( Exception e )
-        //        {
-        //            LOG.error( "Error validating blueprint", e );
-        return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( ERROR_KEY ) ).build();
-        //        }
-    }
-
-
-    @Override
-    public Response deleteBlueprint( final UUID blueprintId )
-    {
-        //        try
-        //        {
-        //            environmentManager.removeBlueprint( blueprintId );
-        //            return Response.ok().build();
-        //        }
-        //        catch ( EnvironmentManagerException e )
-        //        {
-        return Response.status( Response.Status.BAD_REQUEST )
-                       .entity( JsonUtil.toJson( ERROR_KEY, "Error deleting blueprint " + blueprintId ) ).build();
-        //        }
     }
 
 
@@ -254,32 +158,66 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response setupRequisites( final String blueprintJson )
+    public Response setupStrategyRequisites( final String name, final String strategy, int sshId, int hostId, List<String> peerIdList )
     {
-        //        EnvironmentDto environmentDto;
-        //        try
-        //        {
-        //            Blueprint blueprint = gson.fromJson( blueprintJson, Blueprint.class );
-        //
-        //            //            updateContainerPlacementStrategy( blueprint );
-        //
-        //            Environment environment = environmentManager.setupRequisites( blueprint );
-        //            environmentDto = new EnvironmentDto( environment.getId(), environment.getName(), environment
-        // .getStatus(),
-        //                    Sets.newHashSet(), environment.getRelationDeclaration() );
-        //        }
-        //        catch ( EnvironmentCreationException e )
-        //        {
-        //            LOG.error( "Error creating environment #createEnvironment", e );
-        //            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
-        //        }
-        //        catch ( JsonParseException e )
-        //        {
-        //            LOG.error( "Error validating parameters #createEnvironment", e );
-        return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( ERROR_KEY ) ).build();
-        //        }
+        EnvironmentDto environmentDto = null;
 
-        //        return Response.ok( JsonUtil.toJson( environmentDto ) ).build();
+        try
+        {
+            ContainerPlacementStrategy placementStrategy = strategyManager.findStrategyById( strategy );
+
+            final List<PeerResources> resources = new ArrayList<>();
+            for ( String peerId : peerIdList )
+            {
+                PeerResources peerResources = peerManager.getPeer( peerId ).getResourceLimits( peerManager.getLocalPeer().getId() );
+                resources.add( peerResources );
+            }
+
+            final PeerGroupResources peerGroupResources = new PeerGroupResources( resources );
+
+            final Map<ContainerSize, ContainerQuota> quotas = quotaManager.getDefaultQuotas();
+
+            Topology topology = placementStrategy.distribute( name, sshId, hostId, peerGroupResources, quotas );
+
+            Environment environment = environmentManager.setupRequisites( topology );
+
+            environmentDto = new EnvironmentDto( environment.getId(), environment.getName(), environment.getStatus(),
+                    Sets.newHashSet(), environment.getRelationDeclaration() );
+        }
+        catch ( Exception e ) {
+            e.printStackTrace();
+        }
+
+        return Response.ok( JsonUtil.toJson( environmentDto ) ).build();
+    }
+
+
+    @Override
+    public Response setupRequisites( final String topologyJson )
+    {
+        EnvironmentDto environmentDto;
+        try
+        {
+            Topology topology = gson.fromJson( topologyJson, Topology.class );
+
+
+
+            Environment environment = environmentManager.setupRequisites( topology );
+            environmentDto = new EnvironmentDto( environment.getId(), environment.getName(), environment.getStatus(),
+                    Sets.newHashSet(), environment.getRelationDeclaration() );
+        }
+        catch ( EnvironmentCreationException e )
+        {
+            LOG.error( "Error creating environment #createEnvironment", e );
+            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+        }
+        catch ( JsonParseException e )
+        {
+            LOG.error( "Error validating parameters #createEnvironment", e );
+            return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+        }
+
+        return Response.ok( JsonUtil.toJson( environmentDto ) ).build();
     }
 
 
@@ -1078,42 +1016,6 @@ public class RestServiceImpl implements RestService
     //    @Override
     public Response createEnvironment( final String blueprintJson )
     {
-
-        try
-        {
-            ContainerPlacementStrategy strategy = strategyManager.findStrategyById( ExampleStrategy.ID );
-            final String environmentName = "test";
-            final List<PeerResources> resources = new ArrayList<>();
-            final String[] peerIdList = new String[] { "Id1, Id2" };
-            for ( String peerId : peerIdList )
-            {
-                PeerResources peerResources = peerManager.getPeer( peerId ).getResourceLimits( peerManager.getLocalPeer().getId() );
-                resources.add( peerResources );
-            }
-            final PeerGroupResources peerGroupResources = new PeerGroupResources( resources );
-
-            final Map<ContainerSize, ContainerQuota> quotas = quotaManager.getDefaultQuotas();
-
-            Topology topology = strategy.distribute( environmentName, 0, 0, peerGroupResources, quotas );
-
-            environmentManager.createEnvironment( topology, false );
-        }
-        catch ( StrategyNotFoundException e )
-        {
-            e.printStackTrace();
-        }
-        catch ( StrategyException e )
-        {
-            e.printStackTrace();
-        }
-        catch ( PeerException e )
-        {
-            e.printStackTrace();
-        }
-        catch ( EnvironmentCreationException e )
-        {
-            e.printStackTrace();
-        }
         //        try
         //        {
         //            Blueprint blueprint = gson.fromJson( blueprintJson, Blueprint.class );
