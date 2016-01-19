@@ -1,11 +1,11 @@
-package io.subutai.core.relation.api;
+package io.subutai.core.trust.api;
 
 
 import java.io.UnsupportedEncodingException;
 
 import org.bouncycastle.openpgp.PGPException;
 
-import io.subutai.core.relation.api.model.Relation;
+import io.subutai.core.trust.api.model.Relation;
 
 
 /**

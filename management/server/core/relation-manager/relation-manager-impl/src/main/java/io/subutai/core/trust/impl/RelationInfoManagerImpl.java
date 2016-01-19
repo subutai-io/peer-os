@@ -1,4 +1,4 @@
-package io.subutai.core.relation.impl;
+package io.subutai.core.trust.impl;
 
 
 import java.util.List;
@@ -10,15 +10,15 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.security.objects.Ownership;
-import io.subutai.core.relation.api.RelationInfoManager;
-import io.subutai.core.relation.api.model.Relation;
-import io.subutai.core.relation.api.model.RelationInfo;
-import io.subutai.core.relation.api.model.RelationInfoMeta;
-import io.subutai.core.relation.api.model.RelationLink;
-import io.subutai.core.relation.api.model.RelationMeta;
-import io.subutai.core.relation.impl.dao.RelationDataService;
-import io.subutai.core.relation.impl.entity.RelationInfoImpl;
-import io.subutai.core.relation.impl.entity.RelationLinkImpl;
+import io.subutai.core.trust.api.RelationInfoManager;
+import io.subutai.core.trust.api.model.Relation;
+import io.subutai.core.trust.api.model.RelationInfo;
+import io.subutai.core.trust.api.model.RelationInfoMeta;
+import io.subutai.core.trust.api.model.RelationLink;
+import io.subutai.core.trust.api.model.RelationMeta;
+import io.subutai.core.trust.impl.dao.RelationDataService;
+import io.subutai.core.trust.impl.entity.RelationInfoImpl;
+import io.subutai.core.trust.impl.entity.RelationLinkImpl;
 
 
 /**

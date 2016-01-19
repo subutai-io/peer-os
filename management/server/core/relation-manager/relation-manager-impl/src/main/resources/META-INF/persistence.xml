@@ -7,10 +7,10 @@
 
     <non-jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=openjpa/subutaiDS)
     </non-jta-data-source>
-    <class>io.subutai.core.relation.impl.entity.RelationImpl</class>
-    <class>io.subutai.core.relation.impl.entity.RelationInfoImpl</class>
-    <class>io.subutai.core.relation.impl.entity.RelationLinkImpl</class>
-    <class>io.subutai.core.relation.impl.entity.LinkType</class>
+    <class>io.subutai.core.trust.impl.entity.RelationImpl</class>
+    <class>io.subutai.core.trust.impl.entity.RelationInfoImpl</class>
+    <class>io.subutai.core.trust.impl.entity.RelationLinkImpl</class>
+    <class>io.subutai.core.trust.impl.entity.LinkType</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
       <property name="openjpa.Log" value="DefaultLevel=WARN, Tool=INFO, SQL=TRACE" />

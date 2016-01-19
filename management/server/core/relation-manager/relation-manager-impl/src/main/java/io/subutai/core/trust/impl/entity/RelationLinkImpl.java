@@ -1,4 +1,4 @@
-package io.subutai.core.relation.impl.entity;
+package io.subutai.core.trust.impl.entity;
 
 
 import javax.persistence.Access;
@@ -8,7 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import io.subutai.core.relation.api.model.RelationLink;
+import io.subutai.core.trust.api.model.RelationLink;
 
 
 /**

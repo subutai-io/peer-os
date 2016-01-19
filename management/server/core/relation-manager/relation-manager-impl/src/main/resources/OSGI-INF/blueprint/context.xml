@@ -30,12 +30,12 @@
   <!-- ************************************************************************************************** -->
 
   <bean id="relationManager" scope="singleton" activation="eager" init-method="init"
-        class="io.subutai.core.relation.impl.RelationManagerImpl">
+        class="io.subutai.core.trust.impl.RelationManagerImpl">
     <property name="daoManager" ref="daoManagerEnv" />
     <property name="securityManager" ref="securityManager" />
     <property name="keyTrustCheckEnabled" value="${keyTrustCheckEnabled}" />
   </bean>
 
-  <service ref="relationManager" activation="eager" interface="io.subutai.core.relation.api.RelationManager" />
+  <service ref="relationManager" activation="eager" interface="io.subutai.core.trust.api.RelationManager" />
 
 </blueprint>

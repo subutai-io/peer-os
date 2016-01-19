@@ -102,14 +102,6 @@ import io.subutai.core.peer.api.PeerAction;
 import io.subutai.core.peer.api.PeerActionListener;
 import io.subutai.core.peer.api.PeerActionResponse;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.core.relation.api.RelationManager;
-import io.subutai.core.relation.api.RelationVerificationException;
-import io.subutai.core.relation.api.model.Relation;
-import io.subutai.core.relation.api.model.RelationInfo;
-import io.subutai.core.relation.api.model.RelationInfoMeta;
-import io.subutai.core.relation.api.model.RelationLink;
-import io.subutai.core.relation.api.model.RelationMeta;
-import io.subutai.core.relation.api.model.RelationStatus;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
@@ -117,6 +109,14 @@ import io.subutai.core.strategy.api.ContainerPlacementStrategy;
 import io.subutai.core.strategy.api.StrategyException;
 import io.subutai.core.strategy.api.StrategyManager;
 import io.subutai.core.tracker.api.Tracker;
+import io.subutai.core.trust.api.RelationManager;
+import io.subutai.core.trust.api.RelationVerificationException;
+import io.subutai.core.trust.api.model.Relation;
+import io.subutai.core.trust.api.model.RelationInfo;
+import io.subutai.core.trust.api.model.RelationInfoMeta;
+import io.subutai.core.trust.api.model.RelationLink;
+import io.subutai.core.trust.api.model.RelationMeta;
+import io.subutai.core.trust.api.model.RelationStatus;
 
 
 @PermitAll

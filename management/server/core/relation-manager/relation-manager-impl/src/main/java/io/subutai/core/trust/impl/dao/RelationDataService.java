@@ -1,4 +1,4 @@
-package io.subutai.core.relation.impl.dao;
+package io.subutai.core.trust.impl.dao;
 
 
 import java.util.List;
@@ -12,10 +12,10 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Lists;
 
 import io.subutai.common.dao.DaoManager;
-import io.subutai.core.relation.api.model.Relation;
-import io.subutai.core.relation.api.model.RelationLink;
-import io.subutai.core.relation.impl.entity.RelationImpl;
-import io.subutai.core.relation.impl.entity.RelationLinkImpl;
+import io.subutai.core.trust.api.model.Relation;
+import io.subutai.core.trust.api.model.RelationLink;
+import io.subutai.core.trust.impl.entity.RelationImpl;
+import io.subutai.core.trust.impl.entity.RelationLinkImpl;
 
 
 /**

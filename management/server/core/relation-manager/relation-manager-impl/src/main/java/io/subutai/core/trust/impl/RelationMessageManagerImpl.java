@@ -1,4 +1,4 @@
-package io.subutai.core.relation.impl;
+package io.subutai.core.trust.impl;
 
 
 import java.io.UnsupportedEncodingException;
@@ -9,13 +9,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.subutai.common.util.JsonUtil;
-import io.subutai.core.relation.api.RelationMessageManager;
-import io.subutai.core.relation.api.RelationVerificationException;
-import io.subutai.core.relation.api.model.Relation;
-import io.subutai.core.relation.impl.entity.RelationImpl;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
+import io.subutai.core.trust.api.RelationMessageManager;
+import io.subutai.core.trust.api.RelationVerificationException;
+import io.subutai.core.trust.api.model.Relation;
+import io.subutai.core.trust.impl.entity.RelationImpl;
 
 
 /**

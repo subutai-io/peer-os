@@ -1,13 +1,13 @@
-package io.subutai.core.relation.api;
+package io.subutai.core.trust.api;
 
 
 import java.util.List;
 
-import io.subutai.core.relation.api.model.Relation;
-import io.subutai.core.relation.api.model.RelationInfo;
-import io.subutai.core.relation.api.model.RelationInfoMeta;
-import io.subutai.core.relation.api.model.RelationLink;
-import io.subutai.core.relation.api.model.RelationMeta;
+import io.subutai.core.trust.api.model.Relation;
+import io.subutai.core.trust.api.model.RelationInfo;
+import io.subutai.core.trust.api.model.RelationInfoMeta;
+import io.subutai.core.trust.api.model.RelationLink;
+import io.subutai.core.trust.api.model.RelationMeta;
 
 
 /**

@@ -1,4 +1,4 @@
-package io.subutai.core.relation.api;
+package io.subutai.core.trust.api;
 
 
 /**

@@ -1,4 +1,4 @@
-package io.subutai.core.relation.impl.entity;
+package io.subutai.core.trust.impl.entity;
 
 
 import java.io.Serializable;

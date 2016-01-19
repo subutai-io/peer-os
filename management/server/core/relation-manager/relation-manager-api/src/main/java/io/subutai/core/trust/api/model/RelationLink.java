@@ -1,4 +1,4 @@
-package io.subutai.core.relation.api.model;
+package io.subutai.core.trust.api.model;
 
 
 import java.io.Serializable;

@@ -38,7 +38,7 @@
   <reference id="quotaManager"
              interface="io.subutai.core.lxc.quota.api.QuotaManager" />
   <reference id="relationManager"
-             interface="io.subutai.core.relation.api.RelationManager" />
+             interface="io.subutai.core.trust.api.RelationManager" />
 
   <!-- ************************************************************************************************* -->
   <bean id="daoManagerEnv" init-method="init" class="io.subutai.common.dao.DaoManager" activation="eager">
@@ -68,16 +68,8 @@
     <property name="keyTrustCheckEnabled" value="${keyTrustCheckEnabled}" />
   </bean>
 
-  <bean id="relationManager" scope="singleton" activation="eager" init-method="init"
-        class="io.subutai.core.environment.impl.relation.RelationManagerImpl">
-    <property name="daoManager" ref="daoManagerEnv" />
-    <property name="securityManager" ref="securityManager" />
-    <property name="keyTrustCheckEnabled" value="${keyTrustCheckEnabled}" />
-  </bean>
-
   <service ref="environmentManager" interface="io.subutai.core.environment.api.EnvironmentManager" />
   <service ref="environmentManager" interface="io.subutai.common.peer.AlertListener" />
-  <service ref="relationManager" activation="eager" interface="io.subutai.common.security.relation.RelationManager" />
   <service ref="environmentManager" interface="io.subutai.core.peer.api.PeerActionListener" />
 
   <reference-list id="alertHandler"

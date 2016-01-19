@@ -28,10 +28,10 @@ import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.core.relation.api.RelationManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.strategy.api.StrategyManager;
 import io.subutai.core.tracker.api.Tracker;
+import io.subutai.core.trust.api.RelationManager;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.mockito.Matchers.any;

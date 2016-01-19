@@ -1,4 +1,4 @@
-package io.subutai.core.relation.impl.entity;
+package io.subutai.core.trust.impl.entity;
 
 
 import javax.persistence.Access;
@@ -16,8 +16,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import io.subutai.core.relation.api.model.Relation;
-import io.subutai.core.relation.api.model.RelationStatus;
+import io.subutai.core.trust.api.model.Relation;
+import io.subutai.core.trust.api.model.RelationStatus;
 
 
 /**

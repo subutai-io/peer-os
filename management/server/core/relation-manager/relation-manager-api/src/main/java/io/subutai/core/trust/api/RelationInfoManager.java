@@ -1,7 +1,7 @@
-package io.subutai.core.relation.api;
+package io.subutai.core.trust.api;
 
 
-import io.subutai.core.relation.api.model.RelationMeta;
+import io.subutai.core.trust.api.model.RelationMeta;
 
 
 /**
