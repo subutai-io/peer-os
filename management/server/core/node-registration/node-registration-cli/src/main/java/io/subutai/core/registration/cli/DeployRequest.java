@@ -35,8 +35,8 @@ public class DeployRequest extends SubutaiShellCommandSupport
     @Argument( index = 4, name = "region", multiValued = false, required = true, description = "AWS region" )
     private String region;
 
-    //-s N2N password
-    @Argument( index = 5, name = "password", multiValued = false, required = true, description = "N2N password" )
+    //-s P2P password
+    @Argument( index = 5, name = "password", multiValued = false, required = true, description = "P2P password" )
     private String pass;
 
 

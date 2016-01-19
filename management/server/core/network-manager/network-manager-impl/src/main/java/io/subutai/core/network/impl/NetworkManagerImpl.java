@@ -59,7 +59,7 @@ public class NetworkManagerImpl implements NetworkManager
                                     final String pathToKeyFile ) throws NetworkManagerException
     {
         execute( getManagementHost(),
-                commands.getSetupN2NConnectionCommand( superNodeIp, superNodePort, interfaceName, communityName,
+                commands.getSetupP2PConnectionCommand( superNodeIp, superNodePort, interfaceName, communityName,
                         localIp, keyType, pathToKeyFile ) );
     }
 
@@ -68,7 +68,7 @@ public class NetworkManagerImpl implements NetworkManager
     public void removeP2PConnection( final String interfaceName, final String communityName )
             throws NetworkManagerException
     {
-        execute( getManagementHost(), commands.getRemoveN2NConnectionCommand( interfaceName, communityName ) );
+        execute( getManagementHost(), commands.getRemoveP2PConnectionCommand( interfaceName, communityName ) );
     }
 
 
@@ -87,7 +87,7 @@ public class NetworkManagerImpl implements NetworkManager
     {
         Set<P2PConnection> connections = Sets.newHashSet();
 
-        CommandResult result = execute( getManagementHost(), commands.getListN2NConnectionsCommand() );
+        CommandResult result = execute( getManagementHost(), commands.getListP2PConnectionsCommand() );
 
         StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
 

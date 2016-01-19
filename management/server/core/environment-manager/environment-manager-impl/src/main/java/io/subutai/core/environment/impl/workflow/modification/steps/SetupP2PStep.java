@@ -20,21 +20,21 @@ import com.google.common.collect.Sets;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
-import io.subutai.common.protocol.N2NConfig;
-import io.subutai.common.util.N2NUtil;
+import io.subutai.common.protocol.P2PConfig;
+import io.subutai.common.util.P2PUtil;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.entity.PeerConfImpl;
 
 
-public class SetupN2NStep
+public class SetupP2PStep
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger( SetupN2NStep.class );
+    private static final Logger LOGGER = LoggerFactory.getLogger( SetupP2PStep.class );
     private final Topology topology;
     private final EnvironmentImpl environment;
 
 
-    public SetupN2NStep( final Topology topology, final EnvironmentImpl environment )
+    public SetupP2PStep( final Topology topology, final EnvironmentImpl environment )
     {
         this.topology = topology;
         this.environment = environment;
@@ -46,7 +46,7 @@ public class SetupN2NStep
         Set<Peer> peers = Sets.newHashSet( topology.getAllPeers() );
 
         SubnetUtils.SubnetInfo info =
-                new SubnetUtils( environment.getTunnelNetwork(), N2NUtil.N2N_SUBNET_MASK ).getInfo();
+                new SubnetUtils( environment.getTunnelNetwork(), P2PUtil.P2P_SUBNET_MASK ).getInfo();
 
         String sharedKey = "secret";
         final String[] addresses = info.getAllAddresses();
@@ -55,17 +55,17 @@ public class SetupN2NStep
         {
             if ( !environment.isMember( peer ) )
             {
-                N2NConfig config = new N2NConfig( peer.getId(), environment.getId(), environment.getSuperNode(),
+                P2PConfig config = new P2PConfig( peer.getId(), environment.getId(), environment.getSuperNode(),
                         environment.getSuperNodePort(), environment.getTunnelInterfaceName(),
                         environment.getTunnelCommunityName(), addresses[counter], sharedKey );
                 try
                 {
-                    peer.setupN2NConnection( config );
+                    peer.setupP2PConnection( config );
                     environment.addEnvironmentPeer( new PeerConfImpl( config ) );
                 }
                 catch ( PeerException e )
                 {
-                    throw new EnvironmentManagerException( "Could not create n2n connection on peer: " + peer.getId(),
+                    throw new EnvironmentManagerException( "Could not create P2P connection on peer: " + peer.getId(),
                             e );
                 }
                 counter++;

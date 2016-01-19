@@ -21,10 +21,9 @@ import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
-import io.subutai.common.protocol.N2NConfig;
+import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.quota.ContainerQuota;
-import io.subutai.common.quota.ContainerResource;
 import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.PublicKeyContainer;
@@ -267,9 +266,9 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
 
     HostInterfaces getInterfaces() throws PeerException;
 
-    void setupN2NConnection( N2NConfig config ) throws PeerException;
+    void setupP2PConnection( P2PConfig config ) throws PeerException;
 
-    void removeN2NConnection( EnvironmentId environmentId ) throws PeerException;
+    void removeP2PConnection( EnvironmentId environmentId ) throws PeerException;
 
     void createGateway( Gateway gateway ) throws PeerException;
 

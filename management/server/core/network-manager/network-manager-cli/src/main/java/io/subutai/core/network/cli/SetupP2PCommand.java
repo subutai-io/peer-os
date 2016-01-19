@@ -14,10 +14,10 @@ import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
 
 
-@Command( scope = "net", name = "setup-n2n", description = "Sets up N2N connection with supernode" )
-public class SetupN2NCommand extends SubutaiShellCommandSupport
+@Command( scope = "net", name = "setup-p2p", description = "Sets up P2P connection with control peer" )
+public class SetupP2PCommand extends SubutaiShellCommandSupport
 {
-    private static final Logger LOG = LoggerFactory.getLogger( SetupN2NCommand.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( SetupP2PCommand.class.getName() );
 
     private final NetworkManager networkManager;
 
@@ -44,7 +44,7 @@ public class SetupN2NCommand extends SubutaiShellCommandSupport
     String pathToKeyFile;
 
 
-    public SetupN2NCommand( final NetworkManager networkManager )
+    public SetupP2PCommand( final NetworkManager networkManager )
     {
         Preconditions.checkNotNull( networkManager );
 
@@ -66,7 +66,7 @@ public class SetupN2NCommand extends SubutaiShellCommandSupport
         catch ( NetworkManagerException e )
         {
             System.out.println( e.getMessage() );
-            LOG.error( "Error in SetupN2NCommand", e );
+            LOG.error( "Error in SetupP2PCommand", e );
         }
 
         return null;

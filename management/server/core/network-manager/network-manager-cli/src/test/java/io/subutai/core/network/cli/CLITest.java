@@ -29,7 +29,7 @@ public class CLITest extends SystemOutRedirectTest
     @Mock
     NetworkManagerException exception;
 
-    SetupN2NCommand setupN2NCommand;
+    SetupP2PCommand setupP2PCommand;
     SetupTunnelCommand setupTunnelCommand;
 
 
@@ -61,28 +61,28 @@ public class CLITest extends SystemOutRedirectTest
 
 
     @Test
-    public void testRemoveN2NCommand() throws Exception
+    public void testRemoveP2PCommand() throws Exception
     {
 
         try
         {
-            new RemoveN2NCommand( null );
+            new RemoveP2PCommand( null );
             fail( "Expected NullPointerException" );
         }
         catch ( NullPointerException e )
         {
         }
 
-        RemoveN2NCommand removeN2NCommand = new RemoveN2NCommand( networkManager );
+        RemoveP2PCommand removeP2PCommand = new RemoveP2PCommand( networkManager );
 
-        removeN2NCommand.doExecute();
+        removeP2PCommand.doExecute();
 
         assertEquals( "OK", getSysOut() );
 
 
         doThrow( exception ).when( networkManager ).removeP2PConnection( anyString(), anyString() );
 
-        removeN2NCommand.doExecute();
+        removeP2PCommand.doExecute();
 
         verify( exception ).printStackTrace( any( PrintStream.class ) );
     }
@@ -143,18 +143,18 @@ public class CLITest extends SystemOutRedirectTest
 
 
     @Test
-    public void testSetN2NCommand() throws Exception
+    public void testSetP2PCommand() throws Exception
     {
         try
         {
-            new SetupN2NCommand( null );
+            new SetupP2PCommand( null );
             fail( "Expected NullPointerException" );
         }
         catch ( NullPointerException e )
         {
         }
 
-        SetupN2NCommand command = new SetupN2NCommand( networkManager );
+        SetupP2PCommand command = new SetupP2PCommand( networkManager );
 
         command.doExecute();
 

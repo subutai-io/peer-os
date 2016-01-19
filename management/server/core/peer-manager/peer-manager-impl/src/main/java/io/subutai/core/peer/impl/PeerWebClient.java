@@ -27,7 +27,7 @@ import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
-import io.subutai.common.protocol.N2NConfig;
+import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.PublicKeyContainer;
@@ -266,12 +266,12 @@ public class PeerWebClient
     }
 
 
-    public void setupN2NConnection( final N2NConfig config ) throws PeerException
+    public void setupP2PConnection( final P2PConfig config ) throws PeerException
     {
-        LOG.debug( String.format( "Adding remote peer to n2n community: %s:%d %s %s %s", config.getSuperNodeIp(),
-                config.getN2NPort(), config.getInterfaceName(), config.getCommunityName(), config.getAddress() ) );
+        LOG.debug( String.format( "Adding remote peer to P2P community: %s:%d %s %s %s", config.getSuperNodeIp(),
+                config.getP2PPort(), config.getInterfaceName(), config.getCommunityName(), config.getAddress() ) );
 
-        String path = "/n2ntunnel";
+        String path = "/p2ptunnel";
 
         WebClient client = WebClientBuilder.buildPeerWebClient( host, path, provider );
 
@@ -284,16 +284,16 @@ public class PeerWebClient
         }
         catch ( Exception e )
         {
-            throw new PeerException( "Error setting up n2n connection", e );
+            throw new PeerException( "Error setting up P2P connection", e );
         }
     }
 
 
-    public void removeN2NConnection( final EnvironmentId environmentId ) throws PeerException
+    public void removeP2PConnection( final EnvironmentId environmentId ) throws PeerException
     {
-        LOG.debug( String.format( "Removing remote peer from n2n community: %s", environmentId.getId() ) );
+        LOG.debug( String.format( "Removing remote peer from p2p community: %s", environmentId.getId() ) );
 
-        String path = String.format( "/n2ntunnel/%s", environmentId.getId() );
+        String path = String.format( "/p2ptunnel/%s", environmentId.getId() );
 
         WebClient client = WebClientBuilder.buildPeerWebClient( host, path, provider );
 
@@ -306,7 +306,7 @@ public class PeerWebClient
         }
         catch ( Exception e )
         {
-            throw new PeerException( "Error removing n2n connection", e );
+            throw new PeerException( "Error removing p2p connection", e );
         }
     }
 
@@ -459,7 +459,7 @@ public class PeerWebClient
         {
             String path = String.format( "/limits/%s", peerId );
 
-            WebClient client = WebClientBuilder.buildPeerWebClient( host, path, provider,  500, 7000, 1 );
+            WebClient client = WebClientBuilder.buildPeerWebClient( host, path, provider, 500, 7000, 1 );
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
             return client.get( PeerResources.class );

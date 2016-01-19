@@ -8,9 +8,8 @@ import java.util.Set;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
-import io.subutai.common.protocol.N2NConfig;
+import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.TemplateKurjun;
-import io.subutai.common.protocol.Tunnel;
 
 
 /**
@@ -85,7 +84,7 @@ public interface LocalPeer extends Peer
     String getExternalIp();
 
 
-    void setupN2NConnection( N2NConfig config ) throws PeerException;
+    void setupP2PConnection( P2PConfig config ) throws PeerException;
 
 //    /**
 //     * Returns reverse proxy environment domain assigned to vlan if any
@@ -288,9 +287,9 @@ public interface LocalPeer extends Peer
 
     Set<ContainerHost> findContainersByOwnerId( final String ownerId );
 
-    List<N2NConfig> setupN2NConnection( String environmentId, Set<Peer> peers ) throws PeerException;
+    List<P2PConfig> setupP2PConnection( String environmentId, Set<Peer> peers ) throws PeerException;
 
-    void addToTunnel( N2NConfig config ) throws PeerException;
+    void addToTunnel( P2PConfig config ) throws PeerException;
 
     List<TemplateKurjun> getTemplates();
 

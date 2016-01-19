@@ -7,12 +7,12 @@ import com.google.common.base.Preconditions;
 
 
 /**
- * N2N utils.
+ * P2P utils.
  */
-public abstract class N2NUtil
+public abstract class P2PUtil
 {
-    public static String N2N_SUBNET_MASK = "255.255.255.0";
-    public static final String N2N_INTERFACE_IP_PATTERN = "^10\\..*";
+    public static String P2P_SUBNET_MASK = "255.255.255.0";
+    public static final String P2P_INTERFACE_IP_PATTERN = "^10\\..*";
 
 
     public static String findFreeTunnelNetwork( final Set<String> excludedNetworks )
@@ -71,6 +71,6 @@ public abstract class N2NUtil
 
     public static String generateInterfaceName( final String ip )
     {
-        return String.format( "n2n_%s", ip.replace( ".", "_" ) );
+        return String.format( "p2p_%s", ip.replace( ".", "_" ) );
     }
 }

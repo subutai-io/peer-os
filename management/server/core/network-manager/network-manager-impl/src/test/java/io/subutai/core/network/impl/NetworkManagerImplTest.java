@@ -72,7 +72,7 @@ public class NetworkManagerImplTest
                     + "Environment IP and VLAN ID.                                                                   "
                     + "[   OK    ]";
     private static final String LIST_TUNNELS_OUTPUT = "List of Tunnels\n" + "--------\n" + "tunnel1-10.2.1.3";
-    private static final String LIST_N2N_OUTPUT = "LocalPeerIP ServerIP Port LocalInterface Community\n"
+    private static final String LIST_P2P_OUTPUT = "LocalPeerIP ServerIP Port LocalInterface Community\n"
             + "10.1.2.3    212.167.154.154 5000    com community1 ";
     private static final String KEY_TYPE = "key type";
     private static final String PATH_TO_KEY_FILE = "/path/to/key/file";
@@ -139,7 +139,7 @@ public class NetworkManagerImplTest
 
 
     @Test
-    public void testSetupN2NConnection() throws Exception
+    public void testSetupP2PConnection() throws Exception
     {
         networkManager
                 .setupP2PConnection( SUPER_NODE_IP, SUPER_NODE_PORT, INTERFACE_NAME, COMMUNITY_NAME, LOCAL_IP, KEY_TYPE,
@@ -147,19 +147,19 @@ public class NetworkManagerImplTest
 
         verify( localPeer ).getManagementHost();
         verify( commands )
-                .getSetupN2NConnectionCommand( SUPER_NODE_IP, SUPER_NODE_PORT, INTERFACE_NAME, COMMUNITY_NAME, LOCAL_IP,
+                .getSetupP2PConnectionCommand( SUPER_NODE_IP, SUPER_NODE_PORT, INTERFACE_NAME, COMMUNITY_NAME, LOCAL_IP,
                         KEY_TYPE, PATH_TO_KEY_FILE );
         verify( managementHost ).execute( any( RequestBuilder.class ) );
     }
 
 
     @Test
-    public void testRemoveN2NConnection() throws Exception
+    public void testRemoveP2PConnection() throws Exception
     {
         networkManager.removeP2PConnection( INTERFACE_NAME, COMMUNITY_NAME );
 
         verify( localPeer ).getManagementHost();
-        verify( commands ).getRemoveN2NConnectionCommand( INTERFACE_NAME, COMMUNITY_NAME );
+        verify( commands ).getRemoveP2PConnectionCommand( INTERFACE_NAME, COMMUNITY_NAME );
         verify( managementHost ).execute( any( RequestBuilder.class ) );
     }
 
@@ -308,9 +308,9 @@ public class NetworkManagerImplTest
 
 
     @Test
-    public void testListN2NConnections() throws Exception
+    public void testListP2PConnections() throws Exception
     {
-        when( commandResult.getStdOut() ).thenReturn( LIST_N2N_OUTPUT );
+        when( commandResult.getStdOut() ).thenReturn( LIST_P2P_OUTPUT );
 
 
         Set<P2PConnection> connections = networkManager.listP2PConnections();

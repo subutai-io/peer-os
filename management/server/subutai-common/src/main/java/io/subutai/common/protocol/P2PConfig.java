@@ -5,14 +5,14 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 
 /**
- * N2N config
+ * P2P config
  */
 @XmlRootElement
-public class N2NConfig
+public class P2PConfig
 {
     private String peerId;
     private String superNodeIp;
-    private int n2NPort;
+    private int P2PPort;
     private String interfaceName;
     private String communityName;
     private String address;
@@ -20,19 +20,19 @@ public class N2NConfig
     private String environmentId;
 
 
-    public N2NConfig()
+    public P2PConfig()
     {
     }
 
 
-    public N2NConfig( final String peerId, final String environmentId, final String superNodeIp, final int n2nPort,
+    public P2PConfig( final String peerId, final String environmentId, final String superNodeIp, final int p2pPort,
                       final String interfaceName, final String communityName, final String address,
                       final String sharedKey )
     {
         this.peerId = peerId;
         this.environmentId = environmentId;
         this.superNodeIp = superNodeIp;
-        this.n2NPort = n2nPort;
+        this.P2PPort = p2pPort;
         this.interfaceName = interfaceName;
         this.communityName = communityName;
         this.address = address;
@@ -40,7 +40,7 @@ public class N2NConfig
     }
 
 
-    public N2NConfig( final String address, final String interfaceName, final String communityName )
+    public P2PConfig( final String address, final String interfaceName, final String communityName )
     {
         this.address = address;
         this.interfaceName = interfaceName;
@@ -72,15 +72,15 @@ public class N2NConfig
     }
 
 
-    public int getN2NPort()
+    public int getP2PPort()
     {
-        return n2NPort;
+        return P2PPort;
     }
 
 
-    public void setN2NPort( final int n2nPort )
+    public void setP2PPort( final int p2pPort )
     {
-        this.n2NPort = n2nPort;
+        this.P2PPort = p2pPort;
     }
 
 
@@ -139,12 +139,12 @@ public class N2NConfig
         {
             return true;
         }
-        if ( !( o instanceof N2NConfig ) )
+        if ( !( o instanceof P2PConfig ) )
         {
             return false;
         }
 
-        final N2NConfig config = ( N2NConfig ) o;
+        final P2PConfig config = ( P2PConfig ) o;
 
         return address.equals( config.address );
     }

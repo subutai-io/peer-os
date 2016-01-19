@@ -57,7 +57,7 @@ import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.RecipientType;
 import io.subutai.common.peer.RemotePeer;
 import io.subutai.common.peer.Timeouts;
-import io.subutai.common.protocol.N2NConfig;
+import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.resource.HistoricalMetrics;
@@ -843,19 +843,19 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void setupN2NConnection( final N2NConfig config ) throws PeerException
+    public void setupP2PConnection( final P2PConfig config ) throws PeerException
     {
-        Preconditions.checkNotNull( config, "Invalid n2n config" );
+        Preconditions.checkNotNull( config, "Invalid p2p config" );
 
-        new PeerWebClient( peerInfo.getIp(), provider ).setupN2NConnection( config );
+        new PeerWebClient( peerInfo.getIp(), provider ).setupP2PConnection( config );
     }
 
 
     @Override
-    public void removeN2NConnection( final EnvironmentId environmentId ) throws PeerException
+    public void removeP2PConnection( final EnvironmentId environmentId ) throws PeerException
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment ID" );
-        new PeerWebClient( peerInfo.getIp(), provider ).removeN2NConnection( environmentId );
+        new PeerWebClient( peerInfo.getIp(), provider ).removeP2PConnection( environmentId );
     }
 
 

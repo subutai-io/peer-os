@@ -2,7 +2,7 @@ package io.subutai.core.network.api;
 
 
 /**
- * N2N Connection
+ * P2P Connection
  */
 public interface P2PConnection
 {

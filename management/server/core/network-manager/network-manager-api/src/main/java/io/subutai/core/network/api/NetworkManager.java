@@ -15,18 +15,18 @@ public interface NetworkManager
 {
     String TUNNEL_PREFIX = "tunnel";
     String TUNNEL_TYPE = "vxlan";
-    String N2N_STRING_KEY = "string";
+    String P2P_STRING_KEY = "string";
 
 
     /**
-     * Sets up an N2N connection to super node on management host
+     * Sets up an P2P connection to super node on management host
      */
     public void setupP2PConnection( String superNodeIp, int superNodePort, String interfaceName, String communityName,
                                     String localIp, String keyType, String pathToKeyFile )
             throws NetworkManagerException;
 
     /**
-     * Removes N2N connection to super node on management host
+     * Removes P2P connection to super node on management host
      */
     public void removeP2PConnection( String interfaceName, String communityName ) throws NetworkManagerException;
 
@@ -41,7 +41,7 @@ public interface NetworkManager
 
 
     /**
-     * Lists existing N2N connections on management host
+     * Lists existing P2P connections on management host
      */
     public Set<P2PConnection> listP2PConnections() throws NetworkManagerException;
 

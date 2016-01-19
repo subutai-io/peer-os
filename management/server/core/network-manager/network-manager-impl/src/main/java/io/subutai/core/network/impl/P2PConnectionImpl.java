@@ -5,7 +5,7 @@ import io.subutai.core.network.api.P2PConnection;
 
 
 /**
- * N2NConnection implementation
+ * P2PConnection implementation
  */
 public class P2PConnectionImpl implements P2PConnection
 {

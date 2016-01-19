@@ -28,26 +28,26 @@ import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
-import io.subutai.common.protocol.N2NConfig;
-import io.subutai.common.util.N2NUtil;
+import io.subutai.common.protocol.P2PConfig;
+import io.subutai.common.util.P2PUtil;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.entity.PeerConfImpl;
 
 
 /**
- * N2N setup step
+ * P2P setup step
  */
-public class SetupN2NStep
+public class SetupP2PStep
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger( SetupN2NStep.class );
+    private static final Logger LOGGER = LoggerFactory.getLogger( SetupP2PStep.class );
 
     private final Topology topology;
     private final EnvironmentImpl env;
     private final LocalPeer localPeer;
 
 
-    public SetupN2NStep( final Topology topology, final EnvironmentImpl environment, final LocalPeer localPeer )
+    public SetupP2PStep( final Topology topology, final EnvironmentImpl environment, final LocalPeer localPeer )
     {
         this.topology = topology;
         this.env = environment;
@@ -63,10 +63,10 @@ public class SetupN2NStep
             Set<Peer> peers = Sets.newHashSet( topology.getAllPeers() );
 
             peers.add( localPeer );
-            // creating new n2n tunnels
+            // creating new p2p tunnels
             Set<String> existingNetworks = getTunnelNetworks( peers );
 
-            String freeTunnelNetwork = N2NUtil.findFreeTunnelNetwork( existingNetworks );
+            String freeTunnelNetwork = P2PUtil.findFreeTunnelNetwork( existingNetworks );
             LOGGER.debug( String.format( "Free tunnel network: %s", freeTunnelNetwork ) );
             if ( freeTunnelNetwork == null )
             {
@@ -74,34 +74,34 @@ public class SetupN2NStep
             }
             env.setTunnelNetwork( freeTunnelNetwork );
             String sharedKey = "secret";
-            SubnetUtils.SubnetInfo subnetInfo = new SubnetUtils( freeTunnelNetwork, N2NUtil.N2N_SUBNET_MASK ).getInfo();
+            SubnetUtils.SubnetInfo subnetInfo = new SubnetUtils( freeTunnelNetwork, P2PUtil.P2P_SUBNET_MASK ).getInfo();
             final String[] addresses = subnetInfo.getAllAddresses();
             int counter = 0;
 
-            ExecutorService n2nExecutor = Executors.newFixedThreadPool( peers.size() );
+            ExecutorService p2pExecutor = Executors.newFixedThreadPool( peers.size() );
 
-            ExecutorCompletionService<N2NConfig> n2nCompletionService = new ExecutorCompletionService<>( n2nExecutor );
+            ExecutorCompletionService<P2PConfig> p2pCompletionService = new ExecutorCompletionService<>( p2pExecutor );
 
-            // n2n2 setup
-            List<N2NConfig> result = new ArrayList<>( peers.size() );
+            // p2p setup
+            List<P2PConfig> result = new ArrayList<>( peers.size() );
             for ( Peer peer : peers )
             {
-                N2NConfig config = new N2NConfig( peer.getId(), env.getId(), env.getSuperNode(), env.getSuperNodePort(),
+                P2PConfig config = new P2PConfig( peer.getId(), env.getId(), env.getSuperNode(), env.getSuperNodePort(),
                         env.getTunnelInterfaceName(), env.getTunnelCommunityName(), addresses[counter], sharedKey );
-                n2nCompletionService.submit( new SetupN2NConnectionTask( peer, config ) );
+                p2pCompletionService.submit( new SetupP2PConnectionTask( peer, config ) );
                 counter++;
             }
 
             for ( Peer peer : peers )
             {
-                final Future<N2NConfig> f = n2nCompletionService.take();
-                N2NConfig config = f.get();
+                final Future<P2PConfig> f = p2pCompletionService.take();
+                P2PConfig config = f.get();
                 result.add( config );
             }
 
-            n2nExecutor.shutdown();
+            p2pExecutor.shutdown();
 
-            for ( N2NConfig config : result )
+            for ( P2PConfig config : result )
             {
                 env.addEnvironmentPeer( new PeerConfImpl( config ) );
             }
@@ -132,7 +132,7 @@ public class SetupN2NStep
         catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new EnvironmentManagerException( "Could not create n2n tunnel.", e );
+            throw new EnvironmentManagerException( "Could not create P2P tunnel.", e );
         }
     }
 
@@ -143,7 +143,7 @@ public class SetupN2NStep
 
         for ( Peer peer : peers )
         {
-            Set<HostInterfaceModel> r = peer.getInterfaces().filterByIp( N2NUtil.N2N_INTERFACE_IP_PATTERN );
+            Set<HostInterfaceModel> r = peer.getInterfaces().filterByIp( P2PUtil.P2P_INTERFACE_IP_PATTERN );
 
             Collection tunnels = CollectionUtils.collect( r, new Transformer()
             {
@@ -151,7 +151,7 @@ public class SetupN2NStep
                 public Object transform( final Object o )
                 {
                     HostInterface i = ( HostInterface ) o;
-                    SubnetUtils u = new SubnetUtils( i.getIp(), N2NUtil.N2N_SUBNET_MASK );
+                    SubnetUtils u = new SubnetUtils( i.getIp(), P2PUtil.P2P_SUBNET_MASK );
                     return u.getInfo().getNetworkAddress();
                 }
             } );
@@ -163,24 +163,24 @@ public class SetupN2NStep
     }
 
 
-    private class SetupN2NConnectionTask implements Callable<N2NConfig>
+    private class SetupP2PConnectionTask implements Callable<P2PConfig>
     {
         private Peer peer;
-        private N2NConfig n2NConfig;
+        private P2PConfig p2PConfig;
 
 
-        public SetupN2NConnectionTask( final Peer peer, final N2NConfig config )
+        public SetupP2PConnectionTask( final Peer peer, final P2PConfig config )
         {
             this.peer = peer;
-            this.n2NConfig = config;
+            this.p2PConfig = config;
         }
 
 
         @Override
-        public N2NConfig call() throws Exception
+        public P2PConfig call() throws Exception
         {
-            peer.setupN2NConnection( n2NConfig );
-            return n2NConfig;
+            peer.setupP2PConnection( p2PConfig );
+            return p2PConfig;
         }
     }
 

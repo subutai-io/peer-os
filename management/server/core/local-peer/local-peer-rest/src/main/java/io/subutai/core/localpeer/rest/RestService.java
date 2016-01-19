@@ -23,7 +23,7 @@ import io.subutai.common.network.Vni;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerInfo;
-import io.subutai.common.protocol.N2NConfig;
+import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.util.DateTimeParam;
 
@@ -129,16 +129,16 @@ public interface RestService
     HostInterfaces getNetworkInterfaces();
 
     @POST
-    @Path( "n2ntunnel" )
+    @Path( "p2ptunnel" )
     @Produces( MediaType.APPLICATION_JSON )
     @Consumes( MediaType.APPLICATION_JSON )
-    void setupN2NConnection( N2NConfig config );
+    void setupP2PConnection( P2PConfig config );
 
     @DELETE
-    @Path( "n2ntunnel/{environmentId}" )
+    @Path( "p2ptunnel/{environmentId}" )
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
-    void removeN2NConnection( @PathParam( "environmentId" ) EnvironmentId environmentId );
+    void removeP2PConnection( @PathParam( "environmentId" ) EnvironmentId environmentId );
 
     @POST
     @Path( "alert" )
