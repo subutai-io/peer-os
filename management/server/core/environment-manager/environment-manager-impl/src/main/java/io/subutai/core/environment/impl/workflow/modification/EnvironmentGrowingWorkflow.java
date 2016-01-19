@@ -16,7 +16,7 @@ import io.subutai.core.environment.impl.workflow.creation.steps.RegisterHostsSte
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterSshStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.SetSshKeyStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.PEKGenerationStep;
-import io.subutai.core.environment.impl.workflow.modification.steps.SetupN2NStep;
+import io.subutai.core.environment.impl.workflow.modification.steps.SetupP2PStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.VNISetupStep;
 import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.network.api.NetworkManager;
@@ -47,7 +47,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
         INIT,
         GENERATE_KEYS,
         SETUP_VNI,
-        SETUP_N2N,
+        SETUP_P2P,
         CLONE_CONTAINERS,
         CONFIGURE_HOSTS,
         CONFIGURE_SSH,
@@ -122,7 +122,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
 
             environment = environmentManager.saveOrUpdate( environment );
 
-            return EnvironmentGrowingPhase.SETUP_N2N;
+            return EnvironmentGrowingPhase.SETUP_P2P;
         }
         catch ( Exception e )
         {
@@ -133,13 +133,13 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
     }
 
 
-    public EnvironmentGrowingPhase SETUP_N2N()
+    public EnvironmentGrowingPhase SETUP_P2P()
     {
-        operationTracker.addLog( "Setting up N2N" );
+        operationTracker.addLog( "Setting up P2P" );
 
         try
         {
-            new SetupN2NStep( topology, environment ).execute();
+            new SetupP2PStep( topology, environment ).execute();
 
             environment = environmentManager.saveOrUpdate( environment );
 

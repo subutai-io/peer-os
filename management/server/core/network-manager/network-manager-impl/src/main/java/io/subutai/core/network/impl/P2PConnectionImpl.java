@@ -1,13 +1,13 @@
 package io.subutai.core.network.impl;
 
 
-import io.subutai.core.network.api.N2NConnection;
+import io.subutai.core.network.api.P2PConnection;
 
 
 /**
- * N2NConnection implementation
+ * P2PConnection implementation
  */
-public class N2NConnectionImpl implements N2NConnection
+public class P2PConnectionImpl implements P2PConnection
 {
 
     private final String localIp;
@@ -17,7 +17,7 @@ public class N2NConnectionImpl implements N2NConnection
     private final String communityName;
 
 
-    public N2NConnectionImpl( final String localIp, final String superNodeIp, final int superNodePort,
+    public P2PConnectionImpl( final String localIp, final String superNodeIp, final int superNodePort,
                               final String interfaceName, final String communityName )
     {
         this.localIp = localIp;

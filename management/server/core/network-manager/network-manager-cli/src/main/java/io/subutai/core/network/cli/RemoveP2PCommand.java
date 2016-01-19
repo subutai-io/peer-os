@@ -13,10 +13,10 @@ import org.apache.karaf.shell.commands.Command;
 import com.google.common.base.Preconditions;
 
 
-@Command( scope = "net", name = "remove-n2n", description = "Removes N2N connection" )
-public class RemoveN2NCommand extends SubutaiShellCommandSupport
+@Command( scope = "net", name = "remove-p2p", description = "Removes P2P connection" )
+public class RemoveP2PCommand extends SubutaiShellCommandSupport
 {
-    private static final Logger LOG = LoggerFactory.getLogger( RemoveN2NCommand.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( RemoveP2PCommand.class.getName() );
 
     private final NetworkManager networkManager;
 
@@ -28,7 +28,7 @@ public class RemoveN2NCommand extends SubutaiShellCommandSupport
     String communityName;
 
 
-    public RemoveN2NCommand( final NetworkManager networkManager )
+    public RemoveP2PCommand( final NetworkManager networkManager )
     {
         Preconditions.checkNotNull( networkManager );
 
@@ -42,13 +42,13 @@ public class RemoveN2NCommand extends SubutaiShellCommandSupport
 
         try
         {
-            networkManager.removeN2NConnection( interfaceName, communityName );
+            networkManager.removeP2PConnection( interfaceName, communityName );
             System.out.println( "OK" );
         }
         catch ( NetworkManagerException e )
         {
             System.out.println( e.getMessage() );
-            LOG.error( "Error in RemoveN2NCommand", e );
+            LOG.error( "Error in RemoveP2PCommand", e );
         }
 
         return null;

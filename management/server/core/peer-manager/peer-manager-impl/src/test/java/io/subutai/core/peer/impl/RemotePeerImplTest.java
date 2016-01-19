@@ -91,7 +91,7 @@ public class RemotePeerImplTest
     private static final Object REQUEST = new Object();
     private static final String SUBNET = "192.168.1.0/24";
     private static final String RESPONSE = "RESPONSE";
-    private static final String N2N_IP = "10.11.0.1";
+    private static final String P2P_IP = "10.11.0.1";
     @Mock
     LocalPeer localPeer;
     @Mock
@@ -148,7 +148,7 @@ public class RemotePeerImplTest
     public void setUp() throws Exception
     {
         peerMap = new HashMap<>();
-        peerMap.put( IP, N2N_IP );
+        peerMap.put( IP, P2P_IP );
         requestBuilder = new RequestBuilder( "pwd" );
         params = Maps.newHashMap();
         params.put( PARAM_NAME, PARAM_VALUE );
