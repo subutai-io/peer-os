@@ -159,12 +159,12 @@
       <!-- Relation-manager -->
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>relation-manager-api</artifactId>
+        <artifactId>trust-manager-api</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>relation-manager-impl</artifactId>
+        <artifactId>trust-manager-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
 

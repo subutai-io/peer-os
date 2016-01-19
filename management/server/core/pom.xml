@@ -40,7 +40,7 @@
     <module>environment-manager</module>
     <module>test</module>
     <module>kurjun</module>
-    <module>relation-manager</module>
+    <module>trust-manager</module>
   </modules>
 
 </project>

@@ -9,13 +9,13 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>relation-manager</artifactId>
+  <artifactId>trust-manager</artifactId>
+  <name>Subutai Trust Manager Impl</name>
+  <description>Subutai Trust Manager Impl</description>
   <packaging>pom</packaging>
-  <name>Subutai Relation Manager Impl</name>
-  <description>Subutai Relation Manager Impl</description>
   <modules>
-    <module>relation-manager-api</module>
-    <module>relation-manager-impl</module>
+    <module>trust-manager-api</module>
+    <module>trust-manager-impl</module>
   </modules>
 
 </project>

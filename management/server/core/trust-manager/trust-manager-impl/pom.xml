@@ -3,21 +3,21 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
-    <artifactId>relation-manager</artifactId>
+    <artifactId>trust-manager</artifactId>
     <groupId>io.subutai</groupId>
     <version>4.0.0-RC6</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>relation-manager-impl</artifactId>
-  <name>Subutai Relation Manager Impl</name>
-  <description>Subutai Relation Manager Impl</description>
+  <artifactId>trust-manager-impl</artifactId>
+  <name>Subutai Trust Manager Impl</name>
+  <description>Subutai Trust Manager Impl</description>
   <packaging>bundle</packaging>
 
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>relation-manager-api</artifactId>
+      <artifactId>trust-manager-api</artifactId>
     </dependency>
 
     <dependency>
