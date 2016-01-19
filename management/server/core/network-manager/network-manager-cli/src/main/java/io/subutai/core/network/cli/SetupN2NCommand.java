@@ -59,7 +59,7 @@ public class SetupN2NCommand extends SubutaiShellCommandSupport
         try
         {
             networkManager
-                    .setupN2NConnection( superNodeIp, superNodePort, interfaceName, communityName, localIp, keyType,
+                    .setupP2PConnection( superNodeIp, superNodePort, interfaceName, communityName, localIp, keyType,
                             pathToKeyFile );
             System.out.println( "OK" );
         }

@@ -42,7 +42,7 @@ public class RemoveN2NCommand extends SubutaiShellCommandSupport
 
         try
         {
-            networkManager.removeN2NConnection( interfaceName, communityName );
+            networkManager.removeP2PConnection( interfaceName, communityName );
             System.out.println( "OK" );
         }
         catch ( NetworkManagerException e )

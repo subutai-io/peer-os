@@ -6,7 +6,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 
-public class N2NConnectionImplTest
+public class P2PConnectionImplTest
 {
     private static final String SUPER_NODE_IP = "super.node.ip";
     private static final int SUPER_NODE_PORT = 1234;
@@ -18,8 +18,8 @@ public class N2NConnectionImplTest
     @Test
     public void testProperties() throws Exception
     {
-        N2NConnectionImpl connection =
-                new N2NConnectionImpl( LOCAL_IP, SUPER_NODE_IP, SUPER_NODE_PORT, INTERFACE_NAME, COMMUNITY_NAME );
+        P2PConnectionImpl connection =
+                new P2PConnectionImpl( LOCAL_IP, SUPER_NODE_IP, SUPER_NODE_PORT, INTERFACE_NAME, COMMUNITY_NAME );
 
         assertEquals( LOCAL_IP, connection.getLocalIp() );
         assertEquals( SUPER_NODE_IP, connection.getSuperNodeIp() );

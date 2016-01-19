@@ -70,6 +70,13 @@ public class Commands
     }
 
 
+    public RequestBuilder getResetP2PSecretKey( String p2pHash, String newSecretKey )
+    {
+        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
+                .withCmdArgs( Lists.newArrayList( "-e", p2pHash, newSecretKey ) );
+    }
+
+
     public RequestBuilder getListN2NConnectionsCommand()
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs( Lists.newArrayList( "-L" ) );

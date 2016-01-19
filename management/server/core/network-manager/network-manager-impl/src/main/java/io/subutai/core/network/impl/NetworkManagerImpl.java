@@ -28,7 +28,7 @@ import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.NumUtil;
 import io.subutai.core.network.api.ContainerInfo;
-import io.subutai.core.network.api.N2NConnection;
+import io.subutai.core.network.api.P2PConnection;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.peer.api.PeerManager;
@@ -54,7 +54,7 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public void setupN2NConnection( final String superNodeIp, final int superNodePort, final String interfaceName,
+    public void setupP2PConnection( final String superNodeIp, final int superNodePort, final String interfaceName,
                                     final String communityName, final String localIp, final String keyType,
                                     final String pathToKeyFile ) throws NetworkManagerException
     {
@@ -65,10 +65,48 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public void removeN2NConnection( final String interfaceName, final String communityName )
+    public void removeP2PConnection( final String interfaceName, final String communityName )
             throws NetworkManagerException
     {
         execute( getManagementHost(), commands.getRemoveN2NConnectionCommand( interfaceName, communityName ) );
+    }
+
+
+    @Override
+    public void resetP2PSecretKey( String p2pHash, String newSecretKey ) throws NetworkManagerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pHash ), "Invalid P2P hash" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( newSecretKey ), "Invalid secret key" );
+
+        execute( getManagementHost(), commands.getResetP2PSecretKey( p2pHash, newSecretKey ) );
+    }
+
+
+    @Override
+    public Set<P2PConnection> listP2PConnections() throws NetworkManagerException
+    {
+        Set<P2PConnection> connections = Sets.newHashSet();
+
+        CommandResult result = execute( getManagementHost(), commands.getListN2NConnectionsCommand() );
+
+        StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
+
+        Pattern p = Pattern.compile(
+                "(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s+(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s+(\\d+)"
+                        + "\\s+(\\w+)\\s+(\\w+)" );
+
+        while ( st.hasMoreTokens() )
+        {
+            Matcher m = p.matcher( st.nextToken() );
+
+            if ( m.find() && m.groupCount() == 5 )
+            {
+                connections.add( new P2PConnectionImpl( m.group( 1 ), m.group( 2 ), Integer.parseInt( m.group( 3 ) ),
+                        m.group( 4 ), m.group( 5 ) ) );
+            }
+        }
+
+        return connections;
     }
 
 
@@ -172,32 +210,6 @@ public class NetworkManagerImpl implements NetworkManager
     }
 
 
-    @Override
-    public Set<N2NConnection> listN2NConnections() throws NetworkManagerException
-    {
-        Set<N2NConnection> connections = Sets.newHashSet();
-
-        CommandResult result = execute( getManagementHost(), commands.getListN2NConnectionsCommand() );
-
-        StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
-
-        Pattern p = Pattern.compile(
-                "(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s+(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s+(\\d+)"
-                        + "\\s+(\\w+)\\s+(\\w+)" );
-
-        while ( st.hasMoreTokens() )
-        {
-            Matcher m = p.matcher( st.nextToken() );
-
-            if ( m.find() && m.groupCount() == 5 )
-            {
-                connections.add( new N2NConnectionImpl( m.group( 1 ), m.group( 2 ), Integer.parseInt( m.group( 3 ) ),
-                        m.group( 4 ), m.group( 5 ) ) );
-            }
-        }
-
-        return connections;
-    }
 
 
     @Override

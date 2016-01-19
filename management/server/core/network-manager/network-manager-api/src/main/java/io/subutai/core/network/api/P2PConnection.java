@@ -4,7 +4,7 @@ package io.subutai.core.network.api;
 /**
  * N2N Connection
  */
-public interface N2NConnection
+public interface P2PConnection
 {
     public String getSuperNodeIp();
 

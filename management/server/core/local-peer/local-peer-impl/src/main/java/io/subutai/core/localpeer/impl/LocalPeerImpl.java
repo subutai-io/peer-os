@@ -47,7 +47,6 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
-import io.subutai.common.environment.ContainerDistributionType;
 import io.subutai.common.environment.ContainersDestructionResultImpl;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.host.ContainerHostInfo;
@@ -110,7 +109,6 @@ import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.localpeer.impl.command.CommandRequestListener;
-import io.subutai.core.localpeer.impl.container.CreateContainerWrapperTask;
 import io.subutai.core.localpeer.impl.container.CreateEnvironmentContainerGroupRequestListener;
 import io.subutai.core.localpeer.impl.container.DestroyContainerWrapperTask;
 import io.subutai.core.localpeer.impl.container.DestroyEnvironmentContainerGroupRequestListener;
@@ -134,7 +132,6 @@ import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.strategy.api.StrategyManager;
-import io.subutai.core.strategy.api.StrategyNotFoundException;
 
 //import io.subutai.core.localpeer.impl.dao.ManagementHostDataService;
 
@@ -1675,7 +1672,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         try
         {
             getNetworkManager()
-                    .setupN2NConnection( config.getSuperNodeIp(), config.getN2NPort(), config.getInterfaceName(),
+                    .setupP2PConnection( config.getSuperNodeIp(), config.getN2NPort(), config.getInterfaceName(),
                             config.getCommunityName(), config.getAddress(), NetworkManager.N2N_STRING_KEY,
                             config.getSharedKey() );
         }
@@ -1809,7 +1806,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                         config.getAddress() ) );
                 try
                 {
-                    getNetworkManager().removeN2NConnection( config.getInterfaceName(), config.getCommunityName() );
+                    getNetworkManager().removeP2PConnection( config.getInterfaceName(), config.getCommunityName() );
                 }
                 catch ( PeerException | NetworkManagerException e )
                 {

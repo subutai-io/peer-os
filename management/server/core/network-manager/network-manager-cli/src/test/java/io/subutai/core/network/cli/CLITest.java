@@ -80,7 +80,7 @@ public class CLITest extends SystemOutRedirectTest
         assertEquals( "OK", getSysOut() );
 
 
-        doThrow( exception ).when( networkManager ).removeN2NConnection( anyString(), anyString() );
+        doThrow( exception ).when( networkManager ).removeP2PConnection( anyString(), anyString() );
 
         removeN2NCommand.doExecute();
 
@@ -162,7 +162,7 @@ public class CLITest extends SystemOutRedirectTest
 
 
         doThrow( exception ).when( networkManager )
-                            .setupN2NConnection( anyString(), anyInt(), anyString(), anyString(), anyString(),
+                            .setupP2PConnection( anyString(), anyInt(), anyString(), anyString(), anyString(),
                                     anyString(), anyString() );
 
         command.doExecute();

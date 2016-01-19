@@ -25,7 +25,7 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.core.network.api.ContainerInfo;
-import io.subutai.core.network.api.N2NConnection;
+import io.subutai.core.network.api.P2PConnection;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.peer.api.PeerManager;
@@ -142,7 +142,7 @@ public class NetworkManagerImplTest
     public void testSetupN2NConnection() throws Exception
     {
         networkManager
-                .setupN2NConnection( SUPER_NODE_IP, SUPER_NODE_PORT, INTERFACE_NAME, COMMUNITY_NAME, LOCAL_IP, KEY_TYPE,
+                .setupP2PConnection( SUPER_NODE_IP, SUPER_NODE_PORT, INTERFACE_NAME, COMMUNITY_NAME, LOCAL_IP, KEY_TYPE,
                         PATH_TO_KEY_FILE );
 
         verify( localPeer ).getManagementHost();
@@ -156,7 +156,7 @@ public class NetworkManagerImplTest
     @Test
     public void testRemoveN2NConnection() throws Exception
     {
-        networkManager.removeN2NConnection( INTERFACE_NAME, COMMUNITY_NAME );
+        networkManager.removeP2PConnection( INTERFACE_NAME, COMMUNITY_NAME );
 
         verify( localPeer ).getManagementHost();
         verify( commands ).getRemoveN2NConnectionCommand( INTERFACE_NAME, COMMUNITY_NAME );
@@ -313,7 +313,7 @@ public class NetworkManagerImplTest
         when( commandResult.getStdOut() ).thenReturn( LIST_N2N_OUTPUT );
 
 
-        Set<N2NConnection> connections = networkManager.listN2NConnections();
+        Set<P2PConnection> connections = networkManager.listP2PConnections();
 
         TestCase.assertFalse( connections.isEmpty() );
     }
