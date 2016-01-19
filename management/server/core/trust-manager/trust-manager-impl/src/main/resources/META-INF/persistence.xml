@@ -3,16 +3,14 @@
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
 
-  <persistence-unit name="envExtManagerPUnit2" transaction-type="RESOURCE_LOCAL">
+  <persistence-unit name="relExtManagerPUnit2" transaction-type="RESOURCE_LOCAL">
 
     <non-jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=openjpa/subutaiDS)
     </non-jta-data-source>
-    <class>io.subutai.core.environment.impl.entity.HostInterfaceImpl</class>
-    <class>io.subutai.core.environment.impl.entity.EnvironmentAlertHandlerImpl</class>
-    <class>io.subutai.core.environment.impl.entity.EnvironmentImpl</class>
-    <class>io.subutai.core.environment.impl.entity.PeerConfImpl</class>
-    <class>io.subutai.core.environment.impl.entity.EnvironmentContainerImpl</class>
-    <class>io.subutai.core.environment.impl.entity.EnvironmentBlueprintEntity</class>
+    <class>io.subutai.core.trust.impl.entity.RelationImpl</class>
+    <class>io.subutai.core.trust.impl.entity.RelationInfoImpl</class>
+    <class>io.subutai.core.trust.impl.entity.RelationLinkImpl</class>
+    <class>io.subutai.core.trust.impl.entity.LinkType</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
       <property name="openjpa.Log" value="DefaultLevel=WARN, Tool=INFO, SQL=TRACE" />
