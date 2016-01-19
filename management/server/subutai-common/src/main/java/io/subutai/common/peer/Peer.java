@@ -22,6 +22,7 @@ import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
 import io.subutai.common.protocol.P2PConfig;
+import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.resource.HistoricalMetrics;
@@ -254,7 +255,8 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
     /* **************************************************************
      *
      */
-    public PublicKeyContainer createPeerEnvironmentKeyPair( EnvironmentId environmentId/*, String userToken*/ ) throws PeerException;
+    public PublicKeyContainer createPeerEnvironmentKeyPair( EnvironmentId environmentId/*, String userToken*/ )
+            throws PeerException;
 
     void updatePeerEnvironmentPubKey( EnvironmentId environmentId, PGPPublicKeyRing publicKeyRing )
             throws PeerException;
@@ -265,6 +267,14 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
      */
 
     HostInterfaces getInterfaces() throws PeerException;
+
+    /**
+     * Resets a secret key for a given P2P network
+     *
+     * @param p2PCredentials - P2P network credentials
+     */
+    void resetP2PSecretKey( P2PCredentials p2PCredentials ) throws PeerException;
+
 
     void setupP2PConnection( P2PConfig config ) throws PeerException;
 
@@ -284,17 +294,6 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
 
     void setQuota( ContainerId containerId, ContainerQuota quota ) throws PeerException;
 
-    //    void setQuota( ContainerHost containerHost, ContainerResourceType containerResourceType,
-    //                   ResourceValue resourceValue ) throws PeerException;
-
-
-    //    <T extends ContainerResource> T getAvailableQuota( ContainerId containerId, Class<T> type ) throws
-    // PeerException;
-    //
-    //    <T extends ContainerResource> T getQuota( ContainerId containerId, Class<T> type ) throws PeerException;
-
-    //    void setQuota( final ContainerId containerHost, final ContainerResource containerResource )
-    //            throws PeerException;
 
     void alert( AlertEvent alert ) throws PeerException;
 

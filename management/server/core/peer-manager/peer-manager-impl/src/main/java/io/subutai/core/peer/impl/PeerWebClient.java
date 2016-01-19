@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInterfaces;
@@ -28,6 +29,7 @@ import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.P2PConfig;
+import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.PublicKeyContainer;
@@ -184,10 +186,9 @@ public class PeerWebClient
     }
 
 
-    public PublicKeyContainer createEnvironmentKeyPair( EnvironmentId environmentId/*, String userToken*/ )
-            throws PeerException
+    public PublicKeyContainer createEnvironmentKeyPair( EnvironmentId environmentId ) throws PeerException
     {
-        String path = "/pek"/* + userToken*/;
+        String path = "/pek";
 
 
         WebClient client = WebClientBuilder.buildPeerWebClient( host, path, provider );
@@ -262,6 +263,28 @@ public class PeerWebClient
         catch ( Exception e )
         {
             throw new PeerException( "Error getting interfaces", e );
+        }
+    }
+
+
+    public void resetP2PSecretKey( final String p2pHash, final String newSecretKey ) throws PeerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pHash ), "Invalid P2P hash" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( newSecretKey ), "Invalid secret key" );
+
+        String path = "/p2presetkey";
+
+        WebClient client = WebClientBuilder.buildPeerWebClient( host, path, provider );
+
+        client.type( MediaType.APPLICATION_JSON );
+        client.accept( MediaType.APPLICATION_JSON );
+        try
+        {
+            client.post( new P2PCredentials( p2pHash, newSecretKey ) );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Error resetting P2P secret key", e );
         }
     }
 

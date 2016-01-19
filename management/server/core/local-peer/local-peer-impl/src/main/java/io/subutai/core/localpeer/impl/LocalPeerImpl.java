@@ -85,6 +85,7 @@ import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.protocol.Disposable;
 import io.subutai.common.protocol.P2PConfig;
+import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.quota.ContainerQuota;
@@ -99,8 +100,8 @@ import io.subutai.common.security.objects.SecurityKeyType;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.ExceptionUtil;
-import io.subutai.common.util.P2PUtil;
 import io.subutai.common.util.NumUtil;
+import io.subutai.common.util.P2PUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.common.util.StringUtil;
 import io.subutai.core.executor.api.CommandExecutor;
@@ -345,7 +346,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         //            result = createByHost( request );
         //        }
 
-//        return result;
+        //        return result;
     }
 
 
@@ -1659,6 +1660,23 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public HostInterfaces getInterfaces() throws HostNotFoundException
     {
         return getManagementHost().getHostInterfaces();
+    }
+
+
+    @Override
+    public void resetP2PSecretKey( final P2PCredentials p2PCredentials ) throws PeerException
+    {
+
+        Preconditions.checkNotNull( p2PCredentials, "Invalid p2p credentials" );
+
+        try
+        {
+            getNetworkManager().resetP2PSecretKey( p2PCredentials.getP2pHash(), p2PCredentials.getP2pSecretKey() );
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new PeerException( "Error resetting P2P secret key", e );
+        }
     }
 
 

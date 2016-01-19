@@ -58,6 +58,7 @@ import io.subutai.common.peer.RecipientType;
 import io.subutai.common.peer.RemotePeer;
 import io.subutai.common.peer.Timeouts;
 import io.subutai.common.protocol.P2PConfig;
+import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.resource.HistoricalMetrics;
@@ -434,38 +435,6 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
-    //    @Override
-    //    public ContainerQuota getQuota( final ContainerId containerId  ) throws PeerException
-    //    {
-    //        Preconditions.checkNotNull( containerId, "Container id is null" );
-    //
-    //        return new EnvironmentWebClient( provider )
-    //                .getQuota( peerInfo.getIp(), containerId);
-    //    }
-
-
-    //    @Override
-    //    public void setQuota( final ContainerId containerId, final ContainerQuota containerQuota ) throws
-    // PeerException
-    //    {
-    //        Preconditions.checkNotNull( containerId, "Container id is null" );
-    //        Preconditions.checkNotNull( containerQuota, "Container quota is null" );
-    //
-    //        new EnvironmentWebClient( provider )
-    //                .setQuota( peerInfo.getIp(), containerId, containerQuota );
-    //    }
-    //
-    //
-    //    @Override
-    //    public ContainerQuota getAvailableQuota( final ContainerId containerHost) throws PeerException
-    //    {
-    //        Preconditions.checkNotNull( containerHost, "Container host is null" );
-    //
-    //        return new EnvironmentWebClient( provider )
-    //                .getAvailableQuota( peerInfo.getIp(), containerHost.getContainerId() );
-    //    }
-
-
     @Override
     public ContainerQuota getQuota( final ContainerId containerId ) throws PeerException
     {
@@ -800,13 +769,11 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public PublicKeyContainer createPeerEnvironmentKeyPair( EnvironmentId environmentId/*, String userToken*/ )
-            throws PeerException
+    public PublicKeyContainer createPeerEnvironmentKeyPair( EnvironmentId environmentId ) throws PeerException
     {
         Preconditions.checkNotNull( environmentId, "Invalid environmentId" );
-//        Preconditions.checkNotNull( userToken, "Invalid user token" );
 
-        return new PeerWebClient( peerInfo.getIp(), provider ).createEnvironmentKeyPair( environmentId/*, userToken*/ );
+        return new PeerWebClient( peerInfo.getIp(), provider ).createEnvironmentKeyPair( environmentId );
     }
 
 
@@ -839,6 +806,17 @@ public class RemotePeerImpl implements RemotePeer
     public HostInterfaces getInterfaces() throws PeerException
     {
         return new PeerWebClient( peerInfo.getIp(), provider ).getInterfaces();
+    }
+
+
+    @Override
+    public void resetP2PSecretKey( final P2PCredentials p2PCredentials ) throws PeerException
+    {
+        Preconditions.checkNotNull( p2PCredentials, "Invalid p2p credentials" );
+
+
+        new PeerWebClient( peerInfo.getIp(), provider )
+                .resetP2PSecretKey( p2PCredentials.getP2pHash(), p2PCredentials.getP2pSecretKey() );
     }
 
 

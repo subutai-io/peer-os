@@ -24,6 +24,7 @@ import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.P2PConfig;
+import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.util.DateTimeParam;
 
@@ -127,6 +128,12 @@ public interface RestService
     @Produces( MediaType.APPLICATION_JSON )
     @Consumes( MediaType.APPLICATION_JSON )
     HostInterfaces getNetworkInterfaces();
+
+    @POST
+    @Path( "p2presetkey" )
+    @Produces( MediaType.APPLICATION_JSON )
+    @Consumes( MediaType.APPLICATION_JSON )
+    void resetP2PSecretKey( P2PCredentials p2PCredentials );
 
     @POST
     @Path( "p2ptunnel" )

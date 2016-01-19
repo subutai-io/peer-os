@@ -30,6 +30,7 @@ import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.P2PConfig;
+import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
@@ -331,6 +332,20 @@ public class RestServiceImpl implements RestService
         try
         {
             return localPeer.getResourceHostMetrics();
+        }
+        catch ( Exception e )
+        {
+            throw new WebApplicationException( e );
+        }
+    }
+
+
+    @Override
+    public void resetP2PSecretKey( final P2PCredentials p2PCredentials )
+    {
+        try
+        {
+            localPeer.resetP2PSecretKey( p2PCredentials );
         }
         catch ( Exception e )
         {
