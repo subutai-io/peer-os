@@ -96,12 +96,6 @@ public class EnvironmentImpl implements Environment, Serializable
     @Column( name = "vni" )
     private Long vni;
 
-    @Column( name = "super_node" )
-    private String superNode;
-
-    @Column( name = "super_node_port" )
-    private int superNodePort;
-
 
     @Column( name = "tunnel_network" )
     private String tunnelNetwork;
@@ -439,6 +433,7 @@ public class EnvironmentImpl implements Environment, Serializable
     public void removeContainer( ContainerHost container )
     {
         Preconditions.checkNotNull( container );
+
         containers.remove( container );
     }
 
@@ -532,32 +527,6 @@ public class EnvironmentImpl implements Environment, Serializable
     public void setLastUsedIpIndex( int lastUsedIpIndex )
     {
         this.lastUsedIpIndex = lastUsedIpIndex;
-    }
-
-
-    @Override
-    public String getSuperNode()
-    {
-        return superNode;
-    }
-
-
-    public void setSuperNode( final String superNode )
-    {
-        this.superNode = superNode;
-    }
-
-
-    @Override
-    public int getSuperNodePort()
-    {
-        return superNodePort;
-    }
-
-
-    public void setSuperNodePort( final int superNodePort )
-    {
-        this.superNodePort = superNodePort;
     }
 
 
@@ -662,33 +631,18 @@ public class EnvironmentImpl implements Environment, Serializable
     @Override
     public void removeAlertHandler( EnvironmentAlertHandler environmentAlertHandler )
     {
-        boolean result = alertHandlers.remove( environmentAlertHandler );
+        alertHandlers.remove( environmentAlertHandler );
     }
 
 
     @Override
     public String toString()
     {
-        final StringBuffer sb = new StringBuffer( "EnvironmentImpl{" );
-        sb.append( "environmentId='" ).append( environmentId ).append( '\'' );
-        sb.append( ", version=" ).append( version );
-        sb.append( ", peerId='" ).append( peerId ).append( '\'' );
-        sb.append( ", name='" ).append( name ).append( '\'' );
-        sb.append( ", creationTimestamp=" ).append( creationTimestamp );
-        sb.append( ", subnetCidr='" ).append( subnetCidr ).append( '\'' );
-        sb.append( ", lastUsedIpIndex=" ).append( lastUsedIpIndex );
-        sb.append( ", vni=" ).append( vni );
-        sb.append( ", superNode='" ).append( superNode ).append( '\'' );
-        sb.append( ", superNodePort=" ).append( superNodePort );
-        sb.append( ", tunnelNetwork='" ).append( tunnelNetwork ).append( '\'' );
-        sb.append( ", containers=" ).append( containers );
-        sb.append( ", peerConfs=" ).append( peerConfs );
-        sb.append( ", status=" ).append( status );
-        sb.append( ", sshKeys='" ).append( sshKeys ).append( '\'' );
-        sb.append( ", userId=" ).append( userId );
-        sb.append( ", alertHandlers=" ).append( alertHandlers );
-        sb.append( ", envId=" ).append( envId );
-        sb.append( '}' );
-        return sb.toString();
+        return "EnvironmentImpl{" + "environmentId='" + environmentId + '\'' + ", version=" + version + ", peerId='"
+                + peerId + '\'' + ", name='" + name + '\'' + ", creationTimestamp=" + creationTimestamp
+                + ", subnetCidr='" + subnetCidr + '\'' + ", lastUsedIpIndex=" + lastUsedIpIndex + ", vni=" + vni
+                + ", tunnelNetwork='" + tunnelNetwork + '\'' + ", containers=" + containers + ", peerConfs=" + peerConfs
+                + ", status=" + status + ", sshKeys='" + sshKeys + '\'' + ", userId=" + userId + ", alertHandlers="
+                + alertHandlers + ", envId=" + envId + '}';
     }
 }

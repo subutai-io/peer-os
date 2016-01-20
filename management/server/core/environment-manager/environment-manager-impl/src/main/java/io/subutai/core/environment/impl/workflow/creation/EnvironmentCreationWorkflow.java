@@ -7,7 +7,6 @@ import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.Topology;
-import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
@@ -27,7 +26,7 @@ import io.subutai.core.security.api.SecurityManager;
 
 public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWorkflow.EnvironmentCreationPhase>
 {
-//    private static final Logger LOG = LoggerFactory.getLogger( EnvironmentCreationWorkflow.class );
+    //    private static final Logger LOG = LoggerFactory.getLogger( EnvironmentCreationWorkflow.class );
 
     private final TemplateManager templateRegistry;
     private final NetworkManager networkManager;
@@ -90,8 +89,6 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         operationTracker.addLog( "Initializing environment creation" );
 
         environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
-        environment.setSuperNode( peerManager.getLocalPeer().getPeerInfo().getIp() );
-        environment.setSuperNodePort( Common.SUPER_NODE_PORT );
         environment = environmentManager.saveOrUpdate( environment );
         return EnvironmentCreationPhase.GENERATE_KEYS;
     }
@@ -248,7 +245,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
     public void FINALIZE()
     {
-//        LOG.info( "Finalizing environment creation" );
+        //        LOG.info( "Finalizing environment creation" );
 
         environment.setStatus( EnvironmentStatus.HEALTHY );
 

@@ -133,10 +133,6 @@ public interface Environment
 
     boolean isMember( Peer peer );
 
-    String getSuperNode();
-
-    int getSuperNodePort();
-
     String getTunnelInterfaceName();
 
     String getTunnelCommunityName();

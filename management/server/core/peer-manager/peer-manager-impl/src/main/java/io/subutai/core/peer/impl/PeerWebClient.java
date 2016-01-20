@@ -294,8 +294,8 @@ public class PeerWebClient
 
     public void setupP2PConnection( final P2PConfig config ) throws PeerException
     {
-        LOG.debug( String.format( "Adding remote peer to P2P community: %s:%d %s %s %s", config.getSuperNodeIp(),
-                config.getP2PPort(), config.getInterfaceName(), config.getCommunityName(), config.getAddress() ) );
+        LOG.debug( String.format( "Adding remote peer to P2P community: %s %s %s", config.getInterfaceName(),
+                config.getCommunityName(), config.getAddress() ) );
 
         String path = "/p2ptunnel";
 

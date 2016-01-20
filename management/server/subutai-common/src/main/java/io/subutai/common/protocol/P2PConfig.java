@@ -1,50 +1,37 @@
 package io.subutai.common.protocol;
 
 
-import javax.xml.bind.annotation.XmlRootElement;
-
-
 /**
  * P2P config
  */
-@XmlRootElement
 public class P2PConfig
 {
     private String peerId;
-    private String superNodeIp;
-    private int P2PPort;
     private String interfaceName;
     private String communityName;
     private String address;
-    private String sharedKey;
+    private String secretKey;
     private String environmentId;
+    private long secretKeyTtlSec;
 
 
-    public P2PConfig()
-    {
-    }
-
-
-    public P2PConfig( final String peerId, final String environmentId, final String superNodeIp, final int p2pPort,
-                      final String interfaceName, final String communityName, final String address,
-                      final String sharedKey )
+    public P2PConfig( final String peerId, final String environmentId, final String interfaceName,
+                      final String communityName, final String address, final String secretKey,
+                      final long secretKeyTtlSec )
     {
         this.peerId = peerId;
         this.environmentId = environmentId;
-        this.superNodeIp = superNodeIp;
-        this.P2PPort = p2pPort;
         this.interfaceName = interfaceName;
         this.communityName = communityName;
         this.address = address;
-        this.sharedKey = sharedKey;
+        this.secretKey = secretKey;
+        this.secretKeyTtlSec = secretKeyTtlSec;
     }
 
 
-    public P2PConfig( final String address, final String interfaceName, final String communityName )
+    public long getSecretKeyTtlSec()
     {
-        this.address = address;
-        this.interfaceName = interfaceName;
-        this.communityName = communityName;
+        return secretKeyTtlSec;
     }
 
 
@@ -57,18 +44,6 @@ public class P2PConfig
     public void setPeerId( final String peerId )
     {
         this.peerId = peerId;
-    }
-
-
-    public String getSuperNodeIp()
-    {
-        return superNodeIp;
-    }
-
-
-    public int getP2PPort()
-    {
-        return P2PPort;
     }
 
 
@@ -102,9 +77,9 @@ public class P2PConfig
     }
 
 
-    public String getSharedKey()
+    public String getSecretKey()
     {
-        return sharedKey;
+        return secretKey;
     }
 
 

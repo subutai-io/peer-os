@@ -1587,14 +1587,14 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         Preconditions.checkNotNull( config );
 
-        LOG.debug( String.format( "Adding local peer to P2P community: %s:%d %s %s %s", config.getSuperNodeIp(),
-                config.getP2PPort(), config.getInterfaceName(), config.getCommunityName(), config.getAddress() ) );
+        LOG.debug( String.format( "Adding local peer to P2P community: %s %s %s", config.getInterfaceName(),
+                config.getCommunityName(), config.getAddress() ) );
 
         try
         {
             getNetworkManager()
                     .setupP2PConnection( config.getInterfaceName(), config.getAddress(), config.getCommunityName(),
-                            config.getSharedKey(), Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC );
+                            config.getSecretKey(), config.getSecretKeyTtlSec() );
         }
         catch ( NetworkManagerException e )
         {
@@ -1688,8 +1688,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             for ( Peer peer : peers )
             {
                 P2PConfig config =
-                        new P2PConfig( peer.getId(), environmentId, superNodeIp, P2P_PORT, interfaceName, communityName,
-                                addresses[counter], sharedKey );
+                        new P2PConfig( peer.getId(), environmentId, interfaceName, communityName, addresses[counter],
+                                sharedKey, Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC );
                 executorCompletionService.submit( new SetupP2PConnectionTask( peer, config ) );
                 counter++;
             }
@@ -1725,22 +1725,19 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             try
             {
-                P2PConfig config = new P2PConfig( tunnel.getTunnelAddress(), tunnel.getInterfaceName(),
-                        tunnel.getCommunityName() );
 
-                LOG.debug( String.format( "Removing peer from P2P community: %s:%d %s %s %s", config.getSuperNodeIp(),
-                        config.getP2PPort(), config.getInterfaceName(), config.getCommunityName(),
-                        config.getAddress() ) );
+                LOG.debug( String.format( "Removing peer from P2P community:  %s %s %s", tunnel.getInterfaceName(),
+                        tunnel.getCommunityName(), tunnel.getTunnelAddress() ) );
                 try
                 {
-                    getNetworkManager().removeP2PConnection( config.getCommunityName() );
+                    getNetworkManager().removeP2PConnection( tunnel.getCommunityName() );
                 }
                 catch ( PeerException | NetworkManagerException e )
                 {
                     LOG.warn( "Unable remove host from P2P tunnel.", e );
                 }
 
-                removeTunnel( config.getAddress() );
+                removeTunnel( tunnel.getTunnelAddress() );
                 tunnelDataService.remove( tunnel.getId() );
             }
             catch ( Exception e )

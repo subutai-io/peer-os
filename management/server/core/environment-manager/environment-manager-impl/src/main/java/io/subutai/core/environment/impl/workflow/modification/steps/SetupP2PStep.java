@@ -19,6 +19,7 @@ import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.P2PConfig;
+import io.subutai.common.settings.Common;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
@@ -55,9 +56,10 @@ public class SetupP2PStep
         {
             if ( !environment.isMember( peer ) )
             {
-                P2PConfig config = new P2PConfig( peer.getId(), environment.getId(), environment.getSuperNode(),
-                        environment.getSuperNodePort(), environment.getTunnelInterfaceName(),
-                        environment.getTunnelCommunityName(), addresses[counter], sharedKey );
+                P2PConfig config =
+                        new P2PConfig( peer.getId(), environment.getId(), environment.getTunnelInterfaceName(),
+                                environment.getTunnelCommunityName(), addresses[counter], sharedKey,
+                                Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC );
                 try
                 {
                     peer.setupP2PConnection( config );
