@@ -23,6 +23,8 @@ public class Commands
     private static final String MANAGEMENT_HOST_NETWORK_BINDING = "subutai management_network";
     private static final String RESOURCE_HOST_NETWORK_BINDING = "subutai network";
     private static final String MANAGEMENT_PROXY_BINDING = "subutai proxy";
+    private static final String SSH_FOLDER = "/root/.ssh";
+    private static final String SSH_FILE = String.format( "%s/authorized_keys", SSH_FOLDER );
 
 
     //container commands
@@ -227,43 +229,58 @@ public class Commands
 
     public RequestBuilder getCreateSSHCommand()
     {
-        return new RequestBuilder( "rm -rf /root/.ssh && " +
-                "mkdir -p /root/.ssh && " +
-                "chmod 700 /root/.ssh && " +
-                "ssh-keygen -t dsa -P '' -f /root/.ssh/id_dsa" );
+        return new RequestBuilder( String.format( "rm -rf %1$s && " +
+                "mkdir -p %1$s && " +
+                "chmod 700 %1$s && " +
+                "ssh-keygen -t dsa -P '' -f %1$s/id_dsa", SSH_FOLDER ) );
     }
 
 
     public RequestBuilder getReadSSHCommand()
     {
-        return new RequestBuilder( "cat /root/.ssh/id_dsa.pub" );
+        return new RequestBuilder( String.format( "cat %s/id_dsa.pub", SSH_FOLDER ) );
     }
 
 
     public RequestBuilder getAppendSshKeyCommand( String key )
     {
-        return new RequestBuilder( String.format( "mkdir -p /root/.ssh && " +
-                "chmod 700 /root/.ssh && " +
-                "echo '%s' >> /root/.ssh/authorized_keys && " +
-                "chmod 644 /root/.ssh/authorized_keys", key ) );
+        return new RequestBuilder( String.format(
+                "if [ ! -f '%2$s' ]; then " + "mkdir -p '%1$s' && " + "chmod 700 '%1$s' && "
+                        + "echo '%3$s' > '%2$s' && " + "chmod 644 '%2$s' ; else " + "chmod 700 '%2$s' ; "
+                        + "if grep -zvq '%3$s' '%2$s'; then echo '%3$s' >> '%2$s'; fi; " + "chmod 644 '%2$s';  fi;",
+                SSH_FOLDER, SSH_FILE, key ) );
     }
 
 
     public RequestBuilder getReplaceSshKeyCommand( String oldKey, String newKey )
     {
-        return new RequestBuilder( String.format( "mkdir -p /root/.ssh && " +
-                "chmod 700 /root/.ssh && " +
-                "sed -i \"\\,%s,d\" /root/.ssh/authorized_keys ; " +
-                "echo '%s' >> /root/.ssh/authorized_keys && " +
-                "chmod 644 /root/.ssh/authorized_keys", oldKey, newKey ) );
+        return new RequestBuilder( String.format( "mkdir -p %1$s && " +
+                "chmod 700 %1$s && " +
+                "sed -i \"\\,%3$s,d\" %2$s ; " +
+                "echo '%4$s' >> %2$s && " +
+                "chmod 644 %2$s", SSH_FOLDER, SSH_FILE, oldKey, newKey ) );
     }
 
 
     public RequestBuilder getConfigSSHCommand()
     {
-        return new RequestBuilder( "echo 'Host *' > /root/.ssh/config && " +
-                "echo '    StrictHostKeyChecking no' >> /root/.ssh/config && " +
-                "chmod 644 /root/.ssh/config" );
+        return new RequestBuilder( String.format( "echo 'Host *' > %1$s/config && " +
+                "echo '    StrictHostKeyChecking no' >> %1$s/config && " +
+                "chmod 644 %1$s/config", SSH_FOLDER ) );
+    }
+
+
+    public RequestBuilder getRemoveSshKeyCommand( final String key )
+    {
+        return new RequestBuilder( String.format( "chmod 700 %1$s && " +
+                "sed -i \"\\,%3$s,d\" %2$s && " +
+                "chmod 644 %2$s", SSH_FOLDER, SSH_FILE, key ) );
+    }
+
+
+    public RequestBuilder getSetupContainerSshCommand( final String containerIp, final int sshIdleTimeout )
+    {
+        return new RequestBuilder( String.format( "subutai tunnel %s %d", containerIp, sshIdleTimeout ) );
     }
 
 
@@ -296,19 +313,5 @@ public class Commands
         appendHosts.append( "/bin/echo '127.0.0.1 localhost " ).append( "' >> '/etc/hosts';" );
 
         return new RequestBuilder( appendHosts.toString() );
-    }
-
-
-    public RequestBuilder getRemoveSshKeyCommand( final String key )
-    {
-        return new RequestBuilder( String.format( "chmod 700 /root/.ssh && " +
-                "sed -i \"\\,%s,d\" /root/.ssh/authorized_keys && " +
-                "chmod 644 /root/.ssh/authorized_keys", key ) );
-    }
-
-
-    public RequestBuilder getSetupContainerSshCommand( final String containerIp, final int sshIdleTimeout )
-    {
-        return new RequestBuilder( String.format( "subutai tunnel %s %d", containerIp, sshIdleTimeout ) );
     }
 }

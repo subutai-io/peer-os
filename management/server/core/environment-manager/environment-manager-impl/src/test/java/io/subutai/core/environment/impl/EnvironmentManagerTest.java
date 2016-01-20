@@ -82,7 +82,6 @@ public class EnvironmentManagerTest
     @Mock
     Topology topology;
 
-    Blueprint blueprint;
     @Mock
     private StrategyManager strategyManager;
     @Mock
@@ -96,13 +95,13 @@ public class EnvironmentManagerTest
         when( peerManager.getPeer( PEER_ID ) ).thenReturn( peer );
         doReturn( true ).when( peer ).isOnline();
 
-        blueprint = new Blueprint( "env", null, Sets.newHashSet( nodeGroup ),null );
+//        blueprint = new Blueprint( "env", null, Sets.newHashSet( nodeGroup ) );
 
         environmentManager =
                 spy( new EnvironmentManagerImpl( templateRegistry, peerManager, securityManager, networkManager,
-                        daoManager, identityManager, tracker, relationManager, strategyManager, quotaManager) );
+                        daoManager, identityManager, tracker, relationManager/*, strategyManager, quotaManager*/) );
         doReturn( environment ).when( environmentManager )
-                               .createEmptyEnvironment( anyString(), anyString(), anyString(), any( Blueprint.class ) );
+                               .createEmptyEnvironment( anyString(), anyString(), anyString() );
         //        doReturn( topology ).when( environmentManager ).buildTopology( blueprint );
         doReturn( new HashSet<>() ).when( environmentManager ).getUsedIps( ( Peer ) any() );
         doReturn( environmentCreationWorkflow ).when( environmentManager )
@@ -121,7 +120,7 @@ public class EnvironmentManagerTest
     @Ignore
     public void testCreateEnvironment() throws Exception
     {
-        Environment environment1 = environmentManager.createEnvironment( blueprint, true );
+        Environment environment1 = environmentManager.createEnvironment( topology, true );
 
         assertEquals( environment1, environment );
     }

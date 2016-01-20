@@ -1,0 +1,22 @@
+<div class="b-popup-body-list-title ">All peers</div>
+<ul class="b-popup-body-list b-popup-body-list_table">
+	<li class="b-popup-body-list-table__link"
+	ng-repeat="peer in environmentViewCtrl.peers"
+	ng-click="environmentViewCtrl.colSelectPeer(peer.id)">
+		{{ peer.name }}
+	</li>
+</ul>
+<div class="b-popup-body-list-buttons g-right">
+	<a href class="b-btn-grey"><i class="fa fa-angle-double-down"></i></a>
+	<a href class="b-btn-grey"><i class="fa fa-angle-double-up"></i></a>
+</div>
+<div class="clear"></div>
+<div class="b-popup-body-list-title ">Selected peers</div>
+<ul class="b-popup-body-list b-popup-body-list_table">
+	<li class="b-popup-body-list-table__link"
+	ng-repeat="role in identityUserFormCtrl.roles"
+	ng-if="(identityUserFormCtrl.user2Add.roles !== undefined && identityUserFormCtrl.user2Add.roles.indexOf(role.id) >= 0)"
+	ng-click="identityUserFormCtrl.colSelectUserRole(role.id)">
+		{{ role.name }}
+	</li>
+</ul>

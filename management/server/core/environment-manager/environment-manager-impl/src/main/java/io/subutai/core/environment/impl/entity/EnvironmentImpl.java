@@ -3,6 +3,7 @@ package io.subutai.core.environment.impl.entity;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -11,6 +12,7 @@ import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -37,11 +39,13 @@ import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.PeerConf;
+import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentAlertHandler;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Peer;
+import io.subutai.common.peer.PeerException;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.P2PUtil;
@@ -115,9 +119,6 @@ public class EnvironmentImpl implements Environment, Serializable
     @Column( name = "status", nullable = false )
     private EnvironmentStatus status = EnvironmentStatus.EMPTY;
 
-    @Column( name = "public_key", length = 3000 )
-    private String publicKey;
-
     @Column( name = "relation_declaration", length = 3000 )
     private String relationDeclaration;
 
@@ -130,6 +131,10 @@ public class EnvironmentImpl implements Environment, Serializable
     @OneToMany( mappedBy = "environment", fetch = FetchType.EAGER, targetEntity = EnvironmentAlertHandlerImpl.class,
             cascade = CascadeType.ALL, orphanRemoval = true )
     private Set<EnvironmentAlertHandler> alertHandlers = Sets.newHashSet();
+
+
+    @ElementCollection( targetClass = String.class, fetch = FetchType.EAGER )
+    private Set<String> sshKeys = new HashSet<>();
 
     @Transient
     private EnvironmentId envId;
@@ -148,7 +153,10 @@ public class EnvironmentImpl implements Environment, Serializable
 
         this.name = name;
         this.subnetCidr = cidr.getInfo().getCidrSignature();
-        this.publicKey = Strings.isNullOrEmpty( sshKey ) ? null : sshKey.trim();
+        if ( !Strings.isNullOrEmpty( sshKey ) )
+        {
+            sshKeys.add( sshKey.trim() );
+        }
         this.environmentId = UUID.randomUUID().toString();
         this.creationTimestamp = System.currentTimeMillis();
         this.status = EnvironmentStatus.EMPTY;
@@ -166,32 +174,59 @@ public class EnvironmentImpl implements Environment, Serializable
 
 
     @Override
-    public String getSshKey()
-    {
-        return publicKey;
-    }
-
-
-    @Override
-    public void setSshKey( final String sshKey, boolean async ) throws EnvironmentModificationException
+    public void addSshKey( final String sshKey, final boolean async ) throws EnvironmentModificationException
     {
         try
         {
-            environmentManager.setSshKey( getId(), sshKey, async );
+            environmentManager.addSshKey( getId(), sshKey, async );
         }
         catch ( EnvironmentNotFoundException e )
         {
             //this should not happen
-            LOG.error( String.format( "Error setting ssh key to environment %s", getName() ), e );
+            LOG.error( String.format( "Error adding ssh key to environment %s", getName() ), e );
             throw new EnvironmentModificationException( e );
         }
     }
 
 
-    public void saveSshKey( final String sshKey )
+    @Override
+    public void removeSshKey( final String sshKey, final boolean async ) throws EnvironmentModificationException
     {
-        this.publicKey = Strings.isNullOrEmpty( sshKey ) ? null : sshKey.trim();
-        //        dataService.update( this );
+        try
+        {
+            environmentManager.removeSshKey( getId(), sshKey, async );
+        }
+        catch ( EnvironmentNotFoundException e )
+        {
+            //this should not happen
+            LOG.error( String.format( "Error removing ssh key from environment %s", getName() ), e );
+            throw new EnvironmentModificationException( e );
+        }
+    }
+
+
+    @Override
+    public Set<String> getSshKeys()
+    {
+        return sshKeys;
+    }
+
+
+    public void addSshKey( final String sshKey )
+    {
+        if ( !Strings.isNullOrEmpty( sshKey ) )
+        {
+            sshKeys.add( sshKey );
+        }
+    }
+
+
+    public void removeSshKey( final String sshKey )
+    {
+        if ( !Strings.isNullOrEmpty( sshKey ) )
+        {
+            sshKeys.remove( sshKey );
+        }
     }
 
 
@@ -236,13 +271,13 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
-    public String getRawBlueprint()
+    public String getRawTopology()
     {
         return rawBlueprint;
     }
 
 
-    public void setRawBlueprint( final String rawBlueprint )
+    public void setRawTopology( final String rawBlueprint )
     {
         this.rawBlueprint = rawBlueprint;
     }
@@ -372,12 +407,12 @@ public class EnvironmentImpl implements Environment, Serializable
 
     //TODO: remove environmentId param
     @Override
-    public Set<EnvironmentContainerHost> growEnvironment( final String environmentId, final Blueprint blueprint,
+    public Set<EnvironmentContainerHost> growEnvironment( final String environmentId, final Topology topology,
                                                           boolean async ) throws EnvironmentModificationException
     {
         try
         {
-            return environmentManager.growEnvironment( environmentId, blueprint, async );
+            return environmentManager.growEnvironment( environmentId, topology, async );
         }
         catch ( EnvironmentNotFoundException e )
         {
@@ -389,7 +424,7 @@ public class EnvironmentImpl implements Environment, Serializable
 
 
     @Override
-    public Set<Peer> getPeers()
+    public Set<Peer> getPeers() throws PeerException
     {
         Set<Peer> peers = Sets.newHashSet();
 
@@ -654,7 +689,7 @@ public class EnvironmentImpl implements Environment, Serializable
         sb.append( ", containers=" ).append( containers );
         sb.append( ", peerConfs=" ).append( peerConfs );
         sb.append( ", status=" ).append( status );
-        sb.append( ", publicKey='" ).append( publicKey ).append( '\'' );
+        sb.append( ", sshKeys='" ).append( sshKeys ).append( '\'' );
         sb.append( ", userId=" ).append( userId );
         sb.append( ", alertHandlers=" ).append( alertHandlers );
         sb.append( ", envId=" ).append( envId );

@@ -33,7 +33,7 @@ public class MockUtils
 
     public static ContainerPlacementStrategy getMasterPlacementStrategy()
     {
-        return MasterPlacementStrategy.getInstance();
+        return ExamplePlacementStrategy.getInstance();
     }
 
 //

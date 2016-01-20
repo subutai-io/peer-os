@@ -12,10 +12,10 @@ import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.workflow.creation.steps.AddSshKeyStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.PEKGenerationStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterHostsStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterSshStep;
-import io.subutai.core.environment.impl.workflow.creation.steps.SetSshKeyStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.SetupP2PStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.VNISetupStep;
 import io.subutai.core.identity.api.IdentityManager;
@@ -36,7 +36,6 @@ public class EnvironmentImportWorkflow extends Workflow<EnvironmentImportWorkflo
     private final SecurityManager securityManager;
     private EnvironmentImpl environment;
     private final Topology topology;
-    private final String sshKey;
     private final String defaultDomain;
     private final TrackerOperation operationTracker;
     private final EnvironmentManagerImpl environmentManager;
@@ -49,7 +48,7 @@ public class EnvironmentImportWorkflow extends Workflow<EnvironmentImportWorkflo
                                       EnvironmentManagerImpl environmentManager, NetworkManager networkManager,
                                       PeerManager peerManager, SecurityManager securityManager,
                                       IdentityManager identityManager, EnvironmentImpl environment, Topology topology,
-                                      String sshKey, TrackerOperation operationTracker )
+                                      TrackerOperation operationTracker )
     {
         super( Phase.INIT );
         this.identityManager = identityManager;
@@ -60,7 +59,6 @@ public class EnvironmentImportWorkflow extends Workflow<EnvironmentImportWorkflo
         this.networkManager = networkManager;
         this.environment = environment;
         this.topology = topology;
-        this.sshKey = sshKey;
         this.operationTracker = operationTracker;
         this.defaultDomain = defaultDomain;
     }
@@ -98,7 +96,7 @@ public class EnvironmentImportWorkflow extends Workflow<EnvironmentImportWorkflo
 
         try
         {
-            new PEKGenerationStep( topology, environment, peerManager.getLocalPeer(), securityManager,
+            new PEKGenerationStep( topology, environment, peerManager, securityManager,
                     identityManager.getActiveUser() ).execute();
 
             environment = environmentManager.saveOrUpdate( environment );
@@ -120,7 +118,7 @@ public class EnvironmentImportWorkflow extends Workflow<EnvironmentImportWorkflo
 
         try
         {
-            new VNISetupStep( topology, environment, peerManager.getLocalPeer() ).execute();
+            new VNISetupStep( topology, environment, peerManager ).execute();
 
             environment = environmentManager.saveOrUpdate( environment );
 
@@ -141,7 +139,7 @@ public class EnvironmentImportWorkflow extends Workflow<EnvironmentImportWorkflo
 
         try
         {
-            new SetupP2PStep( topology, environment, peerManager.getLocalPeer() ).execute();
+            new SetupP2PStep( topology, environment, peerManager ).execute();
 
             environment = environmentManager.saveOrUpdate( environment );
 
@@ -204,7 +202,7 @@ public class EnvironmentImportWorkflow extends Workflow<EnvironmentImportWorkflo
 
         try
         {
-            new SetSshKeyStep( sshKey, environment, networkManager ).execute();
+            new AddSshKeyStep( environment.getSshKeys(), environment, networkManager ).execute();
 
             environment = environmentManager.saveOrUpdate( environment );
 
