@@ -945,9 +945,9 @@ public class RestServiceImpl implements RestService
     @Override
     public Response getSharedUsers( final String objectId )
     {
-        List<ShareDto> sharedUsers = environmentManager.getSharedUsers( objectId );
         try
         {
+            List<ShareDto> sharedUsers = environmentManager.getSharedUsers( objectId );
             return Response.ok( JsonUtil.toJson( sharedUsers ) ).build();
         }
         catch ( Exception e )

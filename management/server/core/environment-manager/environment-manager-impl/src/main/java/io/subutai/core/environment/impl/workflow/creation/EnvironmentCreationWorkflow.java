@@ -14,7 +14,7 @@ import io.subutai.core.environment.impl.workflow.creation.steps.PEKGenerationSte
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterHostsStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterSshStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.SetSshKeyStep;
-import io.subutai.core.environment.impl.workflow.creation.steps.SetupN2NStep;
+import io.subutai.core.environment.impl.workflow.creation.steps.SetupP2PStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.VNISetupStep;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.kurjun.api.TemplateManager;
@@ -25,7 +25,7 @@ import io.subutai.core.security.api.SecurityManager;
 
 public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWorkflow.EnvironmentCreationPhase>
 {
-    //    private static final Logger LOG = LoggerFactory.getLogger( EnvironmentCreationWorkflow.class );
+//    private static final Logger LOG = LoggerFactory.getLogger( EnvironmentCreationWorkflow.class );
 
     private final TemplateManager templateRegistry;
     private final NetworkManager networkManager;
@@ -48,7 +48,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         INIT,
         GENERATE_KEYS,
         SETUP_VNI,
-        SETUP_N2N,
+        SETUP_P2P,
         CLONE_CONTAINERS,
         CONFIGURE_HOSTS,
         CONFIGURE_SSH,
@@ -127,7 +127,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
             environment = environmentManager.saveOrUpdate( environment );
 
-            return EnvironmentCreationPhase.SETUP_N2N;
+            return EnvironmentCreationPhase.SETUP_P2P;
         }
         catch ( Exception e )
         {
@@ -138,13 +138,13 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
     }
 
 
-    public EnvironmentCreationPhase SETUP_N2N()
+    public EnvironmentCreationPhase SETUP_P2P()
     {
-        operationTracker.addLog( "Setting up N2N" );
+        operationTracker.addLog( "Setting up P2P" );
 
         try
         {
-            new SetupN2NStep( topology, environment, peerManager ).execute();
+            new SetupP2PStep( topology, environment, peerManager ).execute();
 
             environment = environmentManager.saveOrUpdate( environment );
 
@@ -246,7 +246,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
     public void FINALIZE()
     {
-        //        LOG.info( "Finalizing environment creation" );
+//        LOG.info( "Finalizing environment creation" );
 
         environment.setStatus( EnvironmentStatus.HEALTHY );
 

@@ -261,7 +261,7 @@ public class PGPEncryptionUtilTest
 
 
         byte[] encryptedMessage =
-                PGPEncryptionUtil.encrypt( "Time is the most luxurious thing have.".getBytes(), pgpKeyring.getPublicKey(), true );
+                PGPEncryptionUtil.encrypt( "Time is the most luxurious thing we have.".getBytes(), pgpKeyring.getPublicKey(), true );
 
         byte[] signedMessageArmor =
                 PGPEncryptionUtil.clearSign( encryptedMessage, secondSecretKey, "second".toCharArray(), "" );

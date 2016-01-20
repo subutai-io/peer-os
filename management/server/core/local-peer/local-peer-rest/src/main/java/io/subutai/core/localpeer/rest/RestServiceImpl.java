@@ -29,7 +29,8 @@ import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
-import io.subutai.common.protocol.N2NConfig;
+import io.subutai.common.protocol.P2PConfig;
+import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
@@ -340,11 +341,11 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public void setupN2NConnection( final N2NConfig config )
+    public void resetP2PSecretKey( final P2PCredentials p2PCredentials )
     {
         try
         {
-            localPeer.setupN2NConnection( config );
+            localPeer.resetP2PSecretKey( p2PCredentials );
         }
         catch ( Exception e )
         {
@@ -354,11 +355,25 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public void removeN2NConnection( final EnvironmentId environmentId )
+    public void setupP2PConnection( final P2PConfig config )
     {
         try
         {
-            localPeer.removeN2NConnection( environmentId );
+            localPeer.setupP2PConnection( config );
+        }
+        catch ( Exception e )
+        {
+            throw new WebApplicationException( e );
+        }
+    }
+
+
+    @Override
+    public void removeP2PConnection( final EnvironmentId environmentId )
+    {
+        try
+        {
+            localPeer.removeP2PConnection( environmentId );
         }
         catch ( Exception e )
         {
