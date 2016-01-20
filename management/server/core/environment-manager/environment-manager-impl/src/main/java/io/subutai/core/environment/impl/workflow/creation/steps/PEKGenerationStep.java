@@ -23,6 +23,7 @@ import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.KeyTrustLevel;
 import io.subutai.common.security.objects.SecurityKeyType;
 import io.subutai.core.identity.api.model.User;
+import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.KeyManager;
 
@@ -34,17 +35,17 @@ public class PEKGenerationStep
 {
     private final Topology topology;
     private final Environment environment;
-    private final LocalPeer localPeer;
+    private final PeerManager peerManager;
     private final User user;
     private SecurityManager securityManager;
 
 
-    public PEKGenerationStep( final Topology topology, final Environment environment, final LocalPeer localPeer,
+    public PEKGenerationStep( final Topology topology, final Environment environment, final PeerManager peerManager,
                               SecurityManager securityManager, User user )
     {
         this.topology = topology;
         this.environment = environment;
-        this.localPeer = localPeer;
+        this.peerManager = peerManager;
         this.securityManager = securityManager;
         this.user = user;
     }
@@ -85,8 +86,9 @@ public class PEKGenerationStep
         PGPSecretKeyRing envSecKeyRing =
                 securityManager.getKeyManager().getSecretKeyRing( environment.getEnvironmentId().getId() );
 
-        Set<Peer> peers = Sets.newHashSet( topology.getAllPeers() );
-        peers.add( localPeer );
+        Set<Peer> peers = peerManager.resolve( topology.getAllPeers() );
+
+        peers.add( peerManager.getLocalPeer() );
 
         Map<Peer, String> peerPekPubKeys = Maps.newHashMap();
 

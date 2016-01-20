@@ -50,6 +50,7 @@ import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.Peer;
+import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.util.JsonUtil;
@@ -415,12 +416,13 @@ public class MonitorImpl implements Monitor, HostListener
 
     private void deliverAlertPackToPeer( final AlertEvent alertEvent )
     {
-        Peer peer = peerManager.getPeer( alertEvent.getPeerId() );
-        if ( peer != null )
+        Peer peer = null;
+        try
         {
+            peer = peerManager.getPeer( alertEvent.getPeerId() );
             new AlertDeliver( peer, alertEvent ).run();
         }
-        else
+        catch ( PeerException e )
         {
             LOG.warn( String.format( "Destination peer '%s' for alert '%s' not found.", alertEvent.getPeerId(),
                     alertEvent.getResource().getId() ) );

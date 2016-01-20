@@ -9,7 +9,8 @@ var app = angular.module('subutai-app', [
 		'720kb.tooltips',
 		'ngTagsInput',
 		'nvd3',
-		'cfp.loadingBar'
+		'cfp.loadingBar',
+		'uiSwitch'
 	])
 	.config(routesConf)
 
@@ -188,7 +189,8 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 							files: [
 								'subutai-app/environment/environment.js',
 								'subutai-app/environment/controller.js',
-								'subutai-app/environment/service.js'
+								'subutai-app/environment/service.js',
+								'subutai-app/peerRegistration/service.js'
 							]
 						}
 					]);

@@ -98,7 +98,7 @@ public class EnvironmentImportWorkflow extends Workflow<EnvironmentImportWorkflo
 
         try
         {
-            new PEKGenerationStep( topology, environment, peerManager.getLocalPeer(), securityManager,
+            new PEKGenerationStep( topology, environment, peerManager, securityManager,
                     identityManager.getActiveUser() ).execute();
 
             environment = environmentManager.saveOrUpdate( environment );
@@ -120,7 +120,7 @@ public class EnvironmentImportWorkflow extends Workflow<EnvironmentImportWorkflo
 
         try
         {
-            new VNISetupStep( topology, environment, peerManager.getLocalPeer() ).execute();
+            new VNISetupStep( topology, environment, peerManager ).execute();
 
             environment = environmentManager.saveOrUpdate( environment );
 
@@ -141,7 +141,7 @@ public class EnvironmentImportWorkflow extends Workflow<EnvironmentImportWorkflo
 
         try
         {
-            new SetupP2PStep( topology, environment, peerManager.getLocalPeer() ).execute();
+            new SetupP2PStep( topology, environment, peerManager ).execute();
 
             environment = environmentManager.saveOrUpdate( environment );
 

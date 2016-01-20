@@ -37,19 +37,19 @@ public class Blueprint
     @JsonProperty( "nodegroups" )
     @GsonRequired
     private Set<NodeGroup> nodeGroups;
-    @JsonProperty( "strategyId" )
-    private String strategyId;
-    @JsonProperty( "containerDistributionType" )
-    private ContainerDistributionType distributionType = ContainerDistributionType.AUTO;
+//    @JsonProperty( "strategyId" )
+//    private String strategyId;
+//    @JsonProperty( "containerDistributionType" )
+//    private ContainerDistributionType distributionType = ContainerDistributionType.AUTO;
 
 
     public Blueprint( @JsonProperty( "name" ) final String name, @JsonProperty( "sshKey" ) final String sshKey,
-                      @JsonProperty( "nodegroups" ) final Set<NodeGroup> nodeGroups, final String strategyId )
+                      @JsonProperty( "nodegroups" ) final Set<NodeGroup> nodeGroups/*, final String strategyId*/ )
     {
         this.name = name;
         this.nodeGroups = nodeGroups;
         this.sshKey = sshKey;
-        this.strategyId = strategyId;
+//        this.strategyId = strategyId;
     }
 
 
@@ -82,16 +82,16 @@ public class Blueprint
     }
 
 
-    public String getStrategyId()
-    {
-        return strategyId;
-    }
-
-
-    public ContainerDistributionType getDistributionType()
-    {
-        return distributionType;
-    }
+//    public String getStrategyId()
+//    {
+//        return strategyId;
+//    }
+//
+//
+//    public ContainerDistributionType getDistributionType()
+//    {
+//        return distributionType;
+//    }
 
 
     public Set<NodeGroup> getNodeGroups()
@@ -161,7 +161,7 @@ public class Blueprint
         sb.append( ", name='" ).append( name ).append( '\'' );
         sb.append( ", sshKey='" ).append( sshKey ).append( '\'' );
         sb.append( ", nodeGroups=" ).append( nodeGroups );
-        sb.append( ", distributionType=" ).append( distributionType );
+//        sb.append( ", distributionType=" ).append( distributionType );
         sb.append( '}' );
         return sb.toString();
     }

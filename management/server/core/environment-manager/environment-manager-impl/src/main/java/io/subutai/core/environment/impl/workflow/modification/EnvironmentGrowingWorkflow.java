@@ -97,7 +97,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
 
         try
         {
-            new PEKGenerationStep( topology, environment, peerManager.getLocalPeer() ).execute();
+            new PEKGenerationStep( topology, environment, peerManager ).execute();
 
             environment = environmentManager.saveOrUpdate( environment );
 
@@ -118,7 +118,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
 
         try
         {
-            new VNISetupStep( topology, environment, peerManager.getLocalPeer() ).execute();
+            new VNISetupStep( topology, environment, peerManager ).execute();
 
             environment = environmentManager.saveOrUpdate( environment );
 
@@ -139,7 +139,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
 
         try
         {
-            new SetupP2PStep( topology, environment ).execute();
+            new SetupP2PStep( topology, environment, peerManager ).execute();
 
             environment = environmentManager.saveOrUpdate( environment );
 
@@ -160,9 +160,8 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
 
         try
         {
-            new ContainerCloneStep( templateRegistry, defaultDomain, topology, environment, peerManager.getLocalPeer(),
-                    environmentManager )
-                    .execute();
+            new ContainerCloneStep( templateRegistry, defaultDomain, topology, environment, peerManager,
+                    environmentManager ).execute();
 
             environment = environmentManager.saveOrUpdate( environment );
 
