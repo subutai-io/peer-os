@@ -40,25 +40,25 @@ public class CommandsTest
 
 
     @Test
-    public void testGetSetupN2NConnectionCommand() throws Exception
+    public void testGetSetupP2PConnectionCommand() throws Exception
     {
         assertNotNull(
-                commands.getSetupN2NConnectionCommand( SUPER_NODE_IP, SUPER_NODE_PORT, INTERFACE_NAME, COMMUNITY_NAME,
+                commands.getSetupP2PConnectionCommand( SUPER_NODE_IP, SUPER_NODE_PORT, INTERFACE_NAME, COMMUNITY_NAME,
                         LOCAL_IP, KEY_TYPE, PATH_TO_KEY_FILE ) );
     }
 
 
     @Test
-    public void testGetRemoveN2NConnectionCommand() throws Exception
+    public void testGetRemoveP2PConnectionCommand() throws Exception
     {
-        assertNotNull( commands.getRemoveN2NConnectionCommand( INTERFACE_NAME, COMMUNITY_NAME ) );
+        assertNotNull( commands.getRemoveP2PConnectionCommand( INTERFACE_NAME, COMMUNITY_NAME ) );
     }
 
 
     @Test
-    public void testGetListN2NConnectionsCommand() throws Exception
+    public void testGetListP2PConnectionsCommand() throws Exception
     {
-        assertNotNull( commands.getListN2NConnectionsCommand() );
+        assertNotNull( commands.getListP2PConnectionsCommand() );
     }
 
 

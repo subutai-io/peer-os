@@ -287,7 +287,7 @@ public interface EnvironmentManager
     void stopMonitoring( String handlerId, AlertHandlerPriority handlerPriority, String environmentId )
             throws EnvironmentManagerException;
 
-    List<ShareDto> getSharedUsers( String objectId );
+    List<ShareDto> getSharedUsers( String objectId ) throws EnvironmentNotFoundException;
 
     void shareEnvironment( ShareDto[] shareDto, String environmentId );
 }

@@ -69,14 +69,6 @@ import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.objects.PermissionOperation;
 import io.subutai.common.security.objects.PermissionScope;
 import io.subutai.common.security.objects.SecurityKeyType;
-import io.subutai.common.security.relation.RelationManager;
-import io.subutai.common.security.relation.RelationVerificationException;
-import io.subutai.common.security.relation.model.Relation;
-import io.subutai.common.security.relation.model.RelationInfo;
-import io.subutai.common.security.relation.model.RelationInfoMeta;
-import io.subutai.common.security.relation.model.RelationLink;
-import io.subutai.common.security.relation.model.RelationMeta;
-import io.subutai.common.security.relation.model.RelationStatus;
 import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.ExceptionUtil;
@@ -118,6 +110,14 @@ import io.subutai.core.strategy.api.ContainerPlacementStrategy;
 import io.subutai.core.strategy.api.StrategyException;
 import io.subutai.core.strategy.api.StrategyManager;
 import io.subutai.core.tracker.api.Tracker;
+import io.subutai.core.trust.api.RelationManager;
+import io.subutai.core.trust.api.RelationVerificationException;
+import io.subutai.core.trust.api.model.Relation;
+import io.subutai.core.trust.api.model.RelationInfo;
+import io.subutai.core.trust.api.model.RelationInfoMeta;
+import io.subutai.core.trust.api.model.RelationLink;
+import io.subutai.core.trust.api.model.RelationMeta;
+import io.subutai.core.trust.api.model.RelationStatus;
 
 
 @PermitAll
@@ -2090,9 +2090,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
 
     @Override
-    public List<ShareDto> getSharedUsers( final String objectId )
+    public List<ShareDto> getSharedUsers( final String objectId ) throws EnvironmentNotFoundException
     {
-        Environment environment = environmentDataService.find( objectId );
+        Environment environment = loadEnvironment( objectId, true );
         RelationLink objectRelationLink =
                 relationManager.getRelationLink( String.valueOf( objectId ), environment.getClass().getSimpleName() );
 

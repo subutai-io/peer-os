@@ -16,7 +16,7 @@ import io.subutai.core.environment.impl.workflow.creation.steps.AddSshKeyStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.PEKGenerationStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterHostsStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterSshStep;
-import io.subutai.core.environment.impl.workflow.creation.steps.SetupN2NStep;
+import io.subutai.core.environment.impl.workflow.creation.steps.SetupP2PStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.VNISetupStep;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.kurjun.api.TemplateManager;
@@ -69,7 +69,7 @@ public class EnvironmentImportWorkflow extends Workflow<EnvironmentImportWorkflo
         INIT,
         GENERATE_KEYS,
         SETUP_VNI,
-        SETUP_N2N,
+        SETUP_P2P,
         CONFIGURE_HOSTS,
         CONFIGURE_SSH,
         SET_ENVIRONMENT_SSH_KEY,
@@ -122,7 +122,7 @@ public class EnvironmentImportWorkflow extends Workflow<EnvironmentImportWorkflo
 
             environment = environmentManager.saveOrUpdate( environment );
 
-            return Phase.SETUP_N2N;
+            return Phase.SETUP_P2P;
         }
         catch ( Exception e )
         {
@@ -133,14 +133,13 @@ public class EnvironmentImportWorkflow extends Workflow<EnvironmentImportWorkflo
     }
 
 
-    public Phase SETUP_N2N()
+    public Phase SETUP_P2P()
     {
-        operationTracker.addLog( "Setting up N2N" );
+        operationTracker.addLog( "Setting up P2P" );
 
         try
         {
-            new SetupN2NStep( topology, environment, /*peerManager.getLocalPeer().getPeerInfo().getIp(),
-                    Common.SUPER_NODE_PORT, */peerManager.getLocalPeer() ).execute();
+            new SetupP2PStep( topology, environment, peerManager.getLocalPeer() ).execute();
 
             environment = environmentManager.saveOrUpdate( environment );
 

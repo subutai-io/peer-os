@@ -44,7 +44,7 @@ import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
-import io.subutai.common.util.N2NUtil;
+import io.subutai.common.util.P2PUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.broker.api.Broker;
 import io.subutai.core.broker.api.BrokerException;
@@ -241,7 +241,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
             Set<HostInterfaceModel> r = null;
             try
             {
-                r = peer.getInterfaces().filterByIp( N2NUtil.N2N_INTERFACE_IP_PATTERN );
+                r = peer.getInterfaces().filterByIp( P2PUtil.P2P_INTERFACE_IP_PATTERN );
             }
             catch ( PeerException e )
             {
@@ -254,7 +254,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
                 public Object transform( final Object o )
                 {
                     HostInterface i = ( HostInterface ) o;
-                    SubnetUtils u = new SubnetUtils( i.getIp(), N2NUtil.N2N_SUBNET_MASK );
+                    SubnetUtils u = new SubnetUtils( i.getIp(), P2PUtil.P2P_SUBNET_MASK );
                     return u.getInfo().getNetworkAddress();
                 }
             } );
@@ -362,7 +362,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
 
         LocalPeer localPeer = peerManager.getLocalPeer();
 
-        final List<ResourceHost> resourceHosts = new ArrayList( localPeer.getResourceHosts() );
+        final List<ResourceHost> resourceHosts = new ArrayList(localPeer.getResourceHosts());
 
         for ( final Map.Entry<Integer, Map<String, Set<ContainerInfo>>> mapEntry : groupedContainersByVlan.entrySet() )
         {
@@ -376,9 +376,10 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
                 //place where to create node groups
                 String templateName = entry.getKey();
                 //TODO: please change this distribution
-                NodeGroup nodeGroup = new NodeGroup( String.format( "%s_group", templateName ), templateName, /*entry
-                .getValue().size()*/
-                        ContainerSize.SMALL, 1, 1, localPeer.getId(), resourceHosts.get( 0 ).getId() );
+                NodeGroup nodeGroup =
+                        new NodeGroup( String.format( "%s_group", templateName ), templateName, /*entry.getValue().size()*/
+                                ContainerSize.SMALL,
+                                1, 1, localPeer.getId(), resourceHosts.get( 0 ).getId() );
                 topology.addNodeGroupPlacement( localPeer, nodeGroup );
 
                 Set<ContainerHostInfo> converter = Sets.newHashSet();
@@ -509,7 +510,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
 
             Set<String> existingNetworks = getTunnelNetworks( peers );
 
-            String freeTunnelNetwork = N2NUtil.findFreeTunnelNetwork( existingNetworks );
+            String freeTunnelNetwork = P2PUtil.findFreeTunnelNetwork( existingNetworks );
             args.add( "-I" );
             freeTunnelNetwork = freeTunnelNetwork.substring( 0, freeTunnelNetwork.length() - 1 ) + (
                     Integer.valueOf( freeTunnelNetwork.substring( freeTunnelNetwork.length() - 1 ) ) + 1 );
@@ -520,11 +521,11 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
             args.add( "-i" );
             args.add( ipRh );
 
-            String communityName = N2NUtil.generateCommunityName( freeTunnelNetwork );
+            String communityName = P2PUtil.generateCommunityName( freeTunnelNetwork );
             args.add( "-n" );
             args.add( communityName );
 
-            String deviceName = N2NUtil.generateInterfaceName( freeTunnelNetwork );
+            String deviceName = P2PUtil.generateInterfaceName( freeTunnelNetwork );
             args.add( "-d" );
             args.add( deviceName );
             String runUser = "root";

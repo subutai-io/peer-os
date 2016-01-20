@@ -45,13 +45,13 @@ import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.security.objects.PermissionObject;
-import io.subutai.common.security.relation.RelationManager;
-import io.subutai.common.security.relation.model.RelationMeta;
 import io.subutai.common.util.CollectionUtil;
-import io.subutai.common.util.N2NUtil;
+import io.subutai.common.util.P2PUtil;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
+import io.subutai.core.trust.api.RelationManager;
+import io.subutai.core.trust.api.model.RelationMeta;
 
 
 /**
@@ -608,7 +608,7 @@ public class EnvironmentImpl implements Environment, Serializable
         {
             throw new IllegalStateException( "Tunnel network not defined yet." );
         }
-        return N2NUtil.generateInterfaceName( tunnelNetwork );
+        return P2PUtil.generateInterfaceName( tunnelNetwork );
     }
 
 
@@ -619,7 +619,7 @@ public class EnvironmentImpl implements Environment, Serializable
         {
             throw new IllegalStateException( "Tunnel network does not defined yet." );
         }
-        return N2NUtil.generateCommunityName( this.environmentId );
+        return P2PUtil.generateCommunityName( this.environmentId );
     }
 
 
