@@ -52,7 +52,7 @@ public interface RestService
     @Path( "requisites/strategy" )
     Response setupStrategyRequisites( @FormParam( "name" ) String name, @FormParam( "strategy" ) String strategy,
                                       @FormParam( "sshId" ) int sshId, @FormParam( "hostId" ) int hostId,
-                                      @FormParam( "peers" ) List<String> peers );
+                                      @FormParam( "peers" ) String list );
 
     @POST
     @Path( "requisites" )
