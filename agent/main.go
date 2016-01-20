@@ -134,9 +134,11 @@ func main() {
 				cli.BoolFlag{Name: "c", Usage: "create p2p instance (p2p -c interfaceName localPeepIPAddr hash key ttl)"},
 				cli.BoolFlag{Name: "d", Usage: "delete p2p instance (p2p -d hash)"},
 				cli.BoolFlag{Name: "u", Usage: "update p2p instance encryption key (p2p -u hash newkey ttl)"},
-				cli.BoolFlag{Name: "l", Usage: "list of p2p instances (p2p -l)"}},
+				cli.BoolFlag{Name: "l", Usage: "list of p2p instances (p2p -l)"},
 				cli.BoolFlag{Name: "p", Usage: "list of p2p participants (p2p -p hash)"}},
-			Action: func(c *cli.Context) { lib.P2P(c.Bool("c"), c.Bool("d"), c.Bool("u"), c.Bool("l"), c.Bool("p"), os.Args) }}},
+			Action: func(c *cli.Context) {
+				lib.P2P(c.Bool("c"), c.Bool("d"), c.Bool("u"), c.Bool("l"), c.Bool("p"), os.Args)
+			}}},
 
 		Action: func(c *cli.Context) {
 			lib.LxcManagementNetwork(os.Args)
