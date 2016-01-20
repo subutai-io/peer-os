@@ -13,8 +13,9 @@ import (
 )
 
 var (
-	conf    = config.Agent.AppPrefix + "etc/lighttpd.conf"
-	confinc = config.Agent.AppPrefix + "etc/lighttpd-includes/"
+	conf     = config.Agent.AppPrefix + "etc/nginx/nginx.conf"
+	conftmpl = config.Agent.AppPrefix + "etc/nginx/tmpl/"
+	confinc  = config.Agent.DataPrefix + "nginx-includes/"
 )
 
 func ProxyAdd(vlan, domain, node, policy, cert string) {
@@ -27,11 +28,11 @@ func ProxyAdd(vlan, domain, node, policy, cert string) {
 		addDomain(vlan, domain, cert)
 		switch policy {
 		case "rr":
-			setPolicy(vlan, "round-robin")
+			setPolicy(vlan, "")
 		case "lb":
-			setPolicy(vlan, "fair")
+			setPolicy(vlan, "least_conn;")
 		case "hash":
-			setPolicy(vlan, "hash")
+			setPolicy(vlan, "ip_hash;")
 		}
 		restart()
 	} else if node != "" {
@@ -77,34 +78,70 @@ func ProxyCheck(vlan, node string, domain bool) {
 }
 
 func restart() {
-	log.Check(log.FatalLevel, "systemctl restart",
-		exec.Command("systemctl", "restart", "subutai-mng_lighttpd_*").Run())
+	log.Check(log.FatalLevel, "nginx -s reload",
+		exec.Command("nginx", "-s", "reload").Run())
 }
 
 func addDomain(vlan, domain, cert string) {
-	addLine(conf, "#Add new includes here", "include \""+confinc+vlan+".conf\"", false)
-	if cert != "" && gpg.ValidatePem(cert) {
-		lib.CopyFile(confinc+"vhost-ssl.example", confinc+vlan+".conf")
-		lib.CopyFile(cert, config.Agent.DataPrefix+"/web/ssl/"+domain+".pem")
-		addLine(confinc+vlan+".conf", "url.redirect = (\".*\" => \"https://DOMAIN$0\")", "url.redirect = (\".*\" => \"https://"+domain+"$0\")", true)
-		addLine(confinc+vlan+".conf", "ssl.pemfile = \""+config.Agent.DataPrefix+"web/ssl/DOMAIN.pem\"", "ssl.pemfile = \""+config.Agent.DataPrefix+"web/ssl/"+domain+".pem\"", true)
-	} else {
-		lib.CopyFile(confinc+"vhost.example", confinc+vlan+".conf")
+	if _, err := os.Stat(confinc); os.IsNotExist(err) {
+		err := os.MkdirAll(confinc,0755)
+		if err != nil {
+ 			log.Info("Cannot create nginx-include directory "+confinc)
+		}		
 	}
-	addLine(confinc+vlan+".conf", "$HTTP[\"host\"] == \"DOMAIN\" {", "$HTTP[\"host\"] == \""+domain+"\" {", true)
+	if cert != "" && gpg.ValidatePem(cert) {
+        	if _, err := os.Stat(config.Agent.DataPrefix+"/web/ssl/"); os.IsNotExist(err) {
+                	err := os.MkdirAll(config.Agent.DataPrefix+"/web/ssl/",0755)
+                	if err != nil {
+                        	log.Info("Cannot create ssl directory "+config.Agent.DataPrefix+"/web/ssl/")
+				os.Exit(1)
+                	}
+        	}
+		lib.CopyFile(conftmpl+"vhost-ssl.example", confinc+vlan+".conf")
+		crt, key := gpg.ParsePem(cert)
+		err := ioutil.WriteFile(config.Agent.DataPrefix+"web/ssl/"+domain+".crt", crt, 0644)
+    		if err != nil {
+        		log.Info("Cannot create crt file "+config.Agent.DataPrefix+"web/ssl/"+domain+".crt")
+			os.Exit(1)
+    		}
+		err = ioutil.WriteFile(config.Agent.DataPrefix+"web/ssl/"+domain+".key", key, 0644)
+    		if err != nil {
+			log.Info("Cannot create key file "+config.Agent.DataPrefix+"web/ssl/"+domain+".key")
+                        os.Exit(1)
+    		}
+		addLine(confinc+vlan+".conf", "ssl_certificate /var/lib/apps/subutai-mng/current/web/ssl/DOMAIN.crt;",
+			"	ssl_certificate "+config.Agent.DataPrefix+"web/ssl/"+domain+".crt;", true)
+		addLine(confinc+vlan+".conf", "ssl_certificate_key /var/lib/apps/subutai-mng/current/web/ssl/DOMAIN.key;",
+			"	ssl_certificate_key "+config.Agent.DataPrefix+"web/ssl/"+domain+".key;", true)
+	} else {
+		lib.CopyFile(conftmpl+"vhost.example", confinc+vlan+".conf")
+	}
+	addLine(confinc+vlan+".conf", "upstream DOMAIN-upstream {", "upstream "+domain+"-upstream {", true)
+	addLine(confinc+vlan+".conf", "server_name DOMAIN;", "	server_name "+domain+";", true)
+	addLine(confinc+vlan+".conf", "proxy_pass http://DOMAIN-upstream/;", "	proxy_pass http://"+domain+"-upstream/;", true)
 }
 
 func addNode(vlan, node string) {
-	addLine(confinc+vlan+".conf", "#Add new host here", "( \"host\" => \""+node+"\" ),", false)
+	delLine(confinc+vlan+".conf", "server localhost:81;")
+	addLine(confinc+vlan+".conf", "#Add new host here", "	server "+node+";", false)
 }
 
 func delDomain(vlan string) {
-	delLine(conf, "include \""+confinc+vlan+".conf\"")
+	domain := getDomain(vlan)
 	os.Remove(confinc + vlan + ".conf")
+	if _, err := os.Stat(config.Agent.DataPrefix+"web/ssl/"+domain+".crt"); err == nil {
+		os.Remove(config.Agent.DataPrefix+"web/ssl/"+domain+".crt")
+	}
+        if _, err := os.Stat(config.Agent.DataPrefix+"web/ssl/"+domain+".key"); err == nil {
+                os.Remove(config.Agent.DataPrefix+"web/ssl/"+domain+".key")
+        }
 }
 
 func delNode(vlan, node string) {
-	delLine(confinc+vlan+".conf", "( \"host\" => \""+node+"\" ),")
+	delLine(confinc+vlan+".conf", "server "+node+";")
+	if nodeCount(vlan) == 0 {
+		addLine(confinc+vlan+".conf", "#Add new host here", "   server localhost:81;", false)
+	}
 }
 
 func getDomain(vlan string) string {
@@ -114,10 +151,10 @@ func getDomain(vlan string) string {
 	}
 	lines := strings.Split(string(f), "\n")
 	for _, v := range lines {
-		if strings.Contains(v, "$HTTP[\"host\"]") {
+		if strings.Contains(v, "server_name") {
 			line := strings.Fields(v)
-			if len(line) > 3 {
-				return strings.Trim(line[2], "\"")
+			if len(line) > 1 {
+				return strings.Trim(line[1], ";")
 			}
 		}
 	}
@@ -125,15 +162,29 @@ func getDomain(vlan string) string {
 }
 
 func isVlanExist(vlan string) bool {
-	return addLine(conf, "include \""+confinc+vlan+".conf\"", "", false)
+	if _, err := os.Stat(confinc+vlan+".conf"); err == nil {
+		return true
+	} else {
+		return false
+	}
 }
 
 func isNodeExist(vlan, node string) bool {
-	return addLine(confinc+vlan+".conf", "( \"host\" => \""+node+"\" ),", "", false)
+	return addLine(confinc+vlan+".conf", "server "+node+";", "", false)
+}
+
+func nodeCount(vlan string) int {
+	f, err := ioutil.ReadFile(confinc+vlan+".conf")
+	if !log.Check(log.DebugLevel, "Cannot read file "+confinc+vlan+".conf", err) {
+		return strings.Count(string(f), "server ")
+	}
+	return 0
 }
 
 func setPolicy(vlan, policy string) {
-	addLine(confinc+vlan+".conf", "balance = \"round-robin\"", "balance = \""+policy+"\"", true)
+	delLine(confinc+vlan+".conf", "ip_hash;")
+	delLine(confinc+vlan+".conf", "least_time header;")
+	addLine(confinc+vlan+".conf", "#Add new host here", "	"+policy, false)
 }
 
 func addLine(path, after, line string, replace bool) bool {

@@ -327,3 +327,13 @@ func ValidatePem(cert string) bool {
 	}
 	return false
 }
+
+func ParsePem(cert string) (crt, key []byte) {
+        key, _ = exec.Command("openssl", "pkey", "-in", cert).Output()
+
+	f, err := ioutil.ReadFile(cert)
+	if !log.Check(log.DebugLevel, "Cannot read file "+cert, err) {
+        	crt = bytes.Replace(f, key, []byte(""), -1)
+	}
+	return crt, key 
+}
