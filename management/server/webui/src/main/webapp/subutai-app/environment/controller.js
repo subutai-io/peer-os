@@ -4,16 +4,15 @@ angular.module('subutai.environment.controller', [])
 	.controller('EnvironmentViewCtrl', EnvironmentViewCtrl)
 	.directive('fileModel', fileModel);
 
-EnvironmentViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'SweetAlert', '$resource', '$compile', 'ngDialog', '$timeout', '$sce', '$stateParams', 'DTOptionsBuilder', 'DTColumnDefBuilder'];
+EnvironmentViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'peerRegistrationService', 'SweetAlert', '$resource', '$compile', 'ngDialog', '$timeout', '$sce', '$stateParams', 'DTOptionsBuilder', 'DTColumnDefBuilder'];
 fileModel.$inject = ['$parse'];
 
 var fileUploder = {};
 
-function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert, $resource, $compile, ngDialog, $timeout, $sce, $stateParams, DTOptionsBuilder, DTColumnDefBuilder) {
+function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistrationService, SweetAlert, $resource, $compile, ngDialog, $timeout, $sce, $stateParams, DTOptionsBuilder, DTColumnDefBuilder) {
 
 	var vm = this;
 	vm.activeTab = $stateParams.activeTab;
-	console.log ($stateParams);
 	if (vm.activeTab !== "pending") {
 		vm.activeTab = "installed";
 	}
@@ -23,11 +22,14 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 
 	vm.environments = [];
 	vm.domainStrategies = [];
+	vm.strategies = [];
 	vm.sshKeyForEnvironment = '';
 	vm.environmentForDomain = '';
 	vm.currentDomain = {};
+	vm.selectedPeers = [];
 
 	// functions
+	vm.showEnvironmentForm = showEnvironmentForm;
 	vm.destroyEnvironment = destroyEnvironment;
 	vm.startEnvironmentBuild = startEnvironmentBuild;
 	vm.sshKey = sshKey;
@@ -41,6 +43,10 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 	vm.showDomainForm = showDomainForm;
 	vm.setDomain = setDomain;
 	vm.removeDomain = removeDomain;
+	vm.createEnvironment = createEnvironment;
+	vm.togglePeer = togglePeer;
+	vm.setupStrategyRequisites = setupStrategyRequisites;
+	vm.isDataValid = isDataValid;
 	vm.installed = false;
 	vm.pending = false;
 
@@ -67,8 +73,17 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 	}
 	loadEnvironments();
 
+	environmentService.getStrategies().success(function (data) {
+		vm.strategies = data;
+	});
+
 	environmentService.getDomainStrategies().success(function (data) {
 		vm.domainStrategies = data;
+	});
+
+	peerRegistrationService.getRequestedPeers().success(function (peers) {
+		peers.unshift({peerInfo: {id: 'local'}});
+		vm.peers = peers;
 	});
 
 	//installed environment table options
@@ -198,6 +213,25 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 		});
 	}
 
+	function setupStrategyRequisites(environment) {
+		environmentService.setupStrategyRequisites(
+			environment.name,
+			environment.strategy,
+			environment.sshGroupId,
+			environment.hostGroupId,
+			vm.selectedPeers
+		).success(function () {
+			vm.selectedPeers = [];
+			ngDialog.closeAll();
+			SweetAlert.swal("Success!!", "Your environment was successfully configured, please approve it.", "success");
+		}).error(function (data) {
+			SweetAlert.swal("ERROR!", "Your container is safe :). Error: " + data.ERROR, "error");
+		});
+	}
+
+	function isDataValid() {
+		return vm.selectedPeers.length > 0;
+	}
 
 	function actionSwitch (data, type, full, meta) {
 /*		return '<input type = "checkbox" class = "check" ng-click="environmentViewCtrl.revoke(\''+data.id+'\') ng-checked =\'' + data.revoked + '\'>';*/
@@ -341,6 +375,23 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 			className: 'environmentDialog'
 		});
     }
+
+	function showEnvironmentForm() {
+		ngDialog.open({
+			template: 'subutai-app/environment/partials/popups/createEnvironment.html',
+			scope: $scope
+		})
+	}
+
+	function createEnvironment(environment) {
+		console.log(environment);
+	}
+
+	function togglePeer(peerId) {
+		vm.selectedPeers.indexOf(peerId) === -1 ?
+				vm.selectedPeers.push(peerId) :
+				vm.selectedPeers.splice(vm.selectedPeers.indexOf(peerId), 1);
+	}
 
 	function buildEnvironment() {
 		environmentService.startEnvironmentBuild (vm.currentEnvironment.id, encodeURIComponent(vm.currentEnvironment.relationDeclaration)).success(function (data) {

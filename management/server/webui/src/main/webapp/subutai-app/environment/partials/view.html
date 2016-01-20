@@ -1,6 +1,12 @@
 <div ng-controller="EnvironmentViewCtrl as environmentViewCtrl" class="b-workspace__environments">
 
 	<div class="b-workspace__header">
+		<a class="b-btn b-btn_green b-btn_header-button"
+		   href
+		   id="subt-button__create-blueprint-first"
+		   ng-click="environmentViewCtrl.showEnvironmentForm()">
+			<i class="fa fa-plus"></i> Create Environment
+		</a>
 		<h1 class="b-title">Environment Manager</h1>
 	</div>
 

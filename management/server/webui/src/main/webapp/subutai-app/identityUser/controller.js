@@ -51,7 +51,7 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 
 	function userForm(user) {
 		if(user === undefined || user === null) user = false;
-		identitySrv.getKey (user.securityKeyId).success (function (data) {
+		identitySrv.getKey(user.securityKeyId).success(function(data) {
 			user.public_key = data;
 		});
 		ngDialog.open({
