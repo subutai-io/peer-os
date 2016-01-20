@@ -11,6 +11,7 @@ function environmentService($http) {
 	var ENVIRONMENTS_URL = SERVER_URL + 'rest/ui/environments/';
 
 	var ENVIRONMENT_REQUISITES = ENVIRONMENTS_URL + 'requisites/';
+	var ENVIRONMENT_STRATEGY_REQUISITES = ENVIRONMENT_REQUISITES + 'strategy/';
 	var ENVIRONMENT_START_BUILD = ENVIRONMENTS_URL + 'build/';
 
 	var SSH_KEY_URL = ENVIRONMENTS_URL + 'keys/';
@@ -43,6 +44,7 @@ function environmentService($http) {
 		getEnvironments : getEnvironments,
 		createEnvironment : createEnvironment,
 		setupRequisites : setupRequisites,
+		setupStrategyRequisites : setupStrategyRequisites,
 		startEnvironmentBuild : startEnvironmentBuild,
 		growEnvironment : growEnvironment,
 		destroyEnvironment: destroyEnvironment,
@@ -141,6 +143,20 @@ function environmentService($http) {
 		return $http.post(
 			ENVIRONMENT_REQUISITES,
 			postData,
+			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+		);
+	}
+
+	function setupStrategyRequisites( name, strategy, sshId, hostId, peers ) {
+		var postDate = 'name=' + name +
+						'&strategy=' + strategy +
+						'&sshId=' + sshId +
+						'&hostId=' + hostId +
+						'&peers=' + JSON.stringify(peers);
+
+		return $http.post(
+			ENVIRONMENT_STRATEGY_REQUISITES,
+			postDate,
 			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
 		);
 	}
@@ -305,7 +321,7 @@ function environmentService($http) {
 	}
 
 	function getUsers() {
-		return $http.get (SERVER_URL + 'rest/ui/identity', {withCredentials: true, headers: {'Content-Type': 'application/json'}});
+		return $http.get (SERVER_URL + 'rest/ui/identity/', {withCredentials: true, headers: {'Content-Type': 'application/json'}});
 	}
 
 

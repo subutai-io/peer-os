@@ -16,7 +16,7 @@ function userPostData(user) {
 		'&full_name=' + user.fullName +
 		'&password=' + user.password +
 		'&email=' + user.email +
-		'&public_key=' + encodeURIComponent(user.public_key);
+		'&public_key=' + user.public_key;
 
 	if(currentUserRoles !== undefined) {
 		postData += '&roles=' + currentUserRoles;
@@ -51,7 +51,7 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 
 	function userForm(user) {
 		if(user === undefined || user === null) user = false;
-		identitySrv.getKey (user.securityKeyId).success (function (data) {
+		identitySrv.getKey(user.securityKeyId).success(function(data) {
 			user.public_key = data;
 		});
 		ngDialog.open({

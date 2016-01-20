@@ -6,23 +6,27 @@
 	<div class="b-popup__body">
 		<div class="b-form">
 			<div class="b-form__wrapper b-form__wrapper_margin-bottom">
-				<label class="b-form-label b-form-label_fix-size-1 g-left">Name</label>
 
-				<div class="b-form-wrapper b-form-wrapper_margin-size-1">
-					<input class="b-form-input b-form-input_full" type="text"
-						   placeholder="Enter plugin name"
-						   ng-model="integratorCtrl.newPlugin.name"
-						   required>
+				<div class="popup-body-box">
+					<label class="b-popup-body-label">Name</label>
+
+					<input type="text" 
+						placeholder="Enter plugin name" 
+						class="b-popup-body-input b-popup-body-input_box" 
+						ng-model="integratorCtrl.newPlugin.name" required>
+					<div class="clear"></div>
 				</div>
 
-				<label class="b-form-label b-form-label_fix-size-1 g-left">Version</label>
+				<div class="popup-body-box">
+					<label class="b-popup-body-label">Version</label>
 
-				<div class="b-form-wrapper b-form-wrapper_margin-size-1">
-					<input class="b-form-input b-form-input_full" type="text"
-						   placeholder="Enter plugin version"
-						   ng-model="integratorCtrl.newPlugin.version"
-						   required>
+					<input type="text" 
+						placeholder="Enter plugin name" 
+						class="b-popup-body-input b-popup-body-input_box" 
+						ng-model="integratorCtrl.newPlugin.version" required>
+					<div class="clear"></div>
 				</div>
+
 				<div style = "height: 26px">
 					<div class="b-file-uploader" style = "float: left">
 						<div class="fileUpload b-btn b-btn_light-grey" style = "width: 82px">

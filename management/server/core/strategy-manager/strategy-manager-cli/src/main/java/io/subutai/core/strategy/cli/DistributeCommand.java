@@ -6,15 +6,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 
 import io.subutai.common.environment.Blueprint;
+import io.subutai.common.environment.NodeGroup;
+import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.resource.PeerGroupResources;
+import io.subutai.common.util.JsonUtil;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.peer.api.PeerManager;
@@ -26,7 +32,7 @@ import io.subutai.core.strategy.api.StrategyNotFoundException;
 @Command( scope = "strategy", name = "distribute" )
 public class DistributeCommand extends SubutaiShellCommandSupport
 {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger( DistributeCommand.class );
     private StrategyManager strategyManager;
     private PeerManager peerManager;
     private QuotaManager quotaManager;
@@ -83,8 +89,19 @@ public class DistributeCommand extends SubutaiShellCommandSupport
 
 
             final Map<ContainerSize, ContainerQuota> quotas = quotaManager.getDefaultQuotas();
-            Blueprint blueprint = strategy.distribute( groupResources, quotas );
-            System.out.println( blueprint );
+            Topology topology = strategy.distribute( "Test", 0, 0, groupResources, quotas );
+            System.out.println( topology.getEnvironmentName() );
+            for ( String peer : topology.getNodeGroupPlacement().keySet() )
+            {
+                for ( NodeGroup ng : topology.getNodeGroupPlacement().get( peer ) )
+                {
+                    System.out.println(
+                            String.format( "%s\t%s\t\t%s\t\t%s\t%s", ng.getPeerId(), ng.getHostId(), ng.getName(),
+                                    ng.getTemplateName(), ng.getType() ) );
+                }
+            }
+
+            LOGGER.debug( JsonUtil.toJson( topology ) );
         }
         catch ( StrategyNotFoundException e )
         {

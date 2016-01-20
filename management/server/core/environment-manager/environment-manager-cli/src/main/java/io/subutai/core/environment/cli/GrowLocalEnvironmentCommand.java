@@ -13,7 +13,10 @@ import com.google.common.collect.Sets;
 import io.subutai.common.environment.Blueprint;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.NodeGroup;
+import io.subutai.common.environment.Topology;
+import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentContainerHost;
+import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.PlacementStrategy;
 import io.subutai.common.settings.Common;
 import io.subutai.core.environment.api.EnvironmentManager;
@@ -82,31 +85,40 @@ public class GrowLocalEnvironmentCommand extends SubutaiShellCommandSupport
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
 
-        //TODO: please reimplement it
-//        Environment environment = environmentManager.loadEnvironment( environmentId );
-//        NodeGroup nodeGroup = new NodeGroup( String.format( "NodeGroup%s", System.currentTimeMillis() ), templateName,
-//               /* numberOfContainers,*/ 1, 1, new PlacementStrategy( "ROUND_ROBIN" ), peerManager.getLocalPeer().getId() );
-//
-//        Blueprint blueprint = new Blueprint( environment.getName(), null, Sets.newHashSet( nodeGroup ) );
-//
-//        Set<EnvironmentContainerHost> newContainers =
-//                environmentManager.growEnvironment( environmentId, blueprint, async );
-//
-//        System.out.println( "New containers created:" );
-//
-//        for ( EnvironmentContainerHost containerHost : newContainers )
-//        {
-//            System.out.println( "-----------------------------------------------------------------" );
-//
-//            System.out.println( String.format( "Container id %s", containerHost.getId() ) );
-//            System.out.println( String.format( "Container hostname %s", containerHost.getHostname() ) );
-//            System.out.println( String.format( "Environment id %s", containerHost.getEnvironmentId() ) );
-//            System.out.println( String.format( "NodeGroup name %s", containerHost.getNodeGroupName() ) );
-//            System.out.println( String.format( "Template name %s", containerHost.getTemplateName() ) );
-//            System.out.println( String.format( "IP %s",
-//                    containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp() ) );
-//            System.out.println( String.format( "Is connected %s", containerHost.isConnected() ) );
-//        }
+        String peerId = peerManager.getLocalPeer().getId();
+        final Set<ResourceHost> resourceHosts = peerManager.getLocalPeer().getResourceHosts();
+
+        if ( resourceHosts.size() < 1 )
+        {
+            System.out.println( "There are no resource hosts to build environment" );
+            return null;
+        }
+        String hostId = resourceHosts.iterator().next().getId();
+        Environment environment = environmentManager.loadEnvironment( environmentId );
+        NodeGroup nodeGroup = new NodeGroup( String.format( "NodeGroup%s", System.currentTimeMillis() ), templateName,
+                ContainerSize.TINY, 1, 1, peerId, hostId );
+        //
+        Topology topology = new Topology( environment.getName(), 1, 1 );
+        topology.addNodeGroupPlacement( peerId, nodeGroup );
+
+        Set<EnvironmentContainerHost> newContainers =
+                environmentManager.growEnvironment( environmentId, topology, async );
+
+        System.out.println( "New containers created:" );
+
+        for ( EnvironmentContainerHost containerHost : newContainers )
+        {
+            System.out.println( "-----------------------------------------------------------------" );
+
+            System.out.println( String.format( "Container id %s", containerHost.getId() ) );
+            System.out.println( String.format( "Container hostname %s", containerHost.getHostname() ) );
+            System.out.println( String.format( "Environment id %s", containerHost.getEnvironmentId() ) );
+            System.out.println( String.format( "NodeGroup name %s", containerHost.getNodeGroupName() ) );
+            System.out.println( String.format( "Template name %s", containerHost.getTemplateName() ) );
+            System.out.println( String.format( "IP %s",
+                    containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp() ) );
+            System.out.println( String.format( "Is connected %s", containerHost.isConnected() ) );
+        }
 
         return null;
     }

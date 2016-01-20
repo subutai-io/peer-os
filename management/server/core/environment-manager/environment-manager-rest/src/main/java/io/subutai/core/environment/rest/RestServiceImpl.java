@@ -3,6 +3,7 @@ package io.subutai.core.environment.rest;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
@@ -18,12 +19,13 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
-import io.subutai.common.environment.Blueprint;
+
 import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.NodeGroup;
+import io.subutai.common.environment.Topology;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.peer.ContainerHost;
@@ -62,18 +64,20 @@ public class RestServiceImpl implements RestService
 
 
     //    @Override
-    public Response createEnvironment( final Blueprint blueprint )
+    public Response createEnvironment( final Topology topology )
     {
         //validate params
         try
         {
-            Preconditions.checkNotNull( blueprint );
-            Preconditions.checkNotNull( blueprint.getNodeGroups() );
-            Preconditions.checkArgument( blueprint.getNodeGroups().size() > 0, "Nodegroup size must be great than 0" );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( blueprint.getName() ), "Invalid blueprint name" );
-            //            Preconditions.checkArgument( !Strings.isNullOrEmpty( blueprint.getCidr() ), "Invalid subnet
+            Preconditions.checkNotNull( topology );
+            Preconditions.checkNotNull( topology.getNodeGroupPlacement() );
+            Preconditions.checkArgument( topology.getNodeGroupPlacement().size() > 0,
+                    "Nodegroup size must be great than 0" );
+            Preconditions
+                    .checkArgument( !Strings.isNullOrEmpty( topology.getEnvironmentName() ), "Invalid topology name" );
+            //            Preconditions.checkArgument( !Strings.isNullOrEmpty( topology.getCidr() ), "Invalid subnet
             // cidr" );
-            checkBlueprint( blueprint );
+            checkBlueprint( topology );
         }
         catch ( Exception e )
         {
@@ -86,7 +90,7 @@ public class RestServiceImpl implements RestService
 
         try
         {
-            Environment environment = environmentManager.createEnvironment( blueprint, false );
+            Environment environment = environmentManager.createEnvironment( topology, false );
 
             Response response = Response.ok( environment.getEnvironmentId() ).build();
 
@@ -101,11 +105,14 @@ public class RestServiceImpl implements RestService
     }
 
 
-    private void checkBlueprint( Blueprint blueprint ) throws EnvironmentCreationException
+    private void checkBlueprint( Topology topology ) throws EnvironmentCreationException
     {
-        for ( NodeGroup nodegroup : blueprint.getNodeGroups() )
+        for ( Collection<NodeGroup> nodegroups : topology.getNodeGroupPlacement().values() )
         {
-            checkNodeGroup( nodegroup );
+            for ( NodeGroup nodeGroup : nodegroups )
+            {
+                checkNodeGroup( nodeGroup );
+            }
         }
     }
 
@@ -117,18 +124,25 @@ public class RestServiceImpl implements RestService
         {
             throw new EnvironmentCreationException( "Invalid peer id" );
         }
-        else if ( peerManager.getPeer( peerId ) == null )
+        else
         {
-            throw new EnvironmentCreationException( String.format( "Peer %s not found", peerId ) );
+            try
+            {
+                peerManager.getPeer( peerId );
+            }
+            catch ( PeerException e )
+            {
+                throw new EnvironmentCreationException( String.format( "Peer %s not found", peerId ) );
+            }
         }
         if ( Strings.isNullOrEmpty( nodeGroup.getName() ) )
         {
             throw new EnvironmentCreationException( "Invalid node group name" );
         }
-        //        else if ( nodeGroup.getNumberOfContainers() <= 0 )
-        //        {
-        //            throw new EnvironmentCreationException( "Invalid number of containers" );
-        //        }
+//        else if ( nodeGroup.getNumberOfContainers() <= 0 )
+//        {
+//            throw new EnvironmentCreationException( "Invalid number of containers" );
+//        }
         else if ( Strings.isNullOrEmpty( nodeGroup.getTemplateName() ) )
         {
             throw new EnvironmentCreationException( "Invalid templateName" );
@@ -138,11 +152,11 @@ public class RestServiceImpl implements RestService
             throw new EnvironmentCreationException(
                     String.format( "Template %s does not exist", nodeGroup.getTemplateName() ) );
         }
-        //        else if ( nodeGroup.getContainerDistributionType() == ContainerDistributionType.AUTO
-        //                && nodeGroup.getContainerPlacementStrategy() == null )
-        //        {
-        //            throw new EnvironmentCreationException( "Invalid node container placement strategy" );
-        //        }
+//        else if ( nodeGroup.getContainerDistributionType() == ContainerDistributionType.AUTO
+//                && nodeGroup.getContainerPlacementStrategy() == null )
+//        {
+//            throw new EnvironmentCreationException( "Invalid node container placement strategy" );
+//        }
     }
 
 
@@ -156,9 +170,16 @@ public class RestServiceImpl implements RestService
         {
             throw new EnvironmentCreationException( "Invalid peer id" );
         }
-        else if ( peerManager.getPeer( peerId ) == null )
+        else
         {
-            throw new EnvironmentCreationException( String.format( "Peer %s not found", peerId ) );
+            try
+            {
+                peerManager.getPeer( peerId );
+            }
+            catch ( PeerException e )
+            {
+                throw new EnvironmentCreationException( String.format( "Peer %s not found", peerId ) );
+            }
         }
         for ( NodeGroup nodeGroup : nodeGroups )
         {
@@ -166,10 +187,10 @@ public class RestServiceImpl implements RestService
             {
                 throw new EnvironmentCreationException( "Invalid node group name" );
             }
-            //            else if ( nodeGroup.getNumberOfContainers() <= 0 )
-            //            {
-            //                throw new EnvironmentCreationException( "Invalid number of containers" );
-            //            }
+//            else if ( nodeGroup.getNumberOfContainers() <= 0 )
+//            {
+//                throw new EnvironmentCreationException( "Invalid number of containers" );
+//            }
             else if ( Strings.isNullOrEmpty( nodeGroup.getTemplateName() ) )
             {
                 throw new EnvironmentCreationException( "Invalid templateName" );
@@ -179,10 +200,10 @@ public class RestServiceImpl implements RestService
                 throw new EnvironmentCreationException(
                         String.format( "Template %s does not exist", nodeGroup.getTemplateName() ) );
             }
-            //            else if ( nodeGroup.getContainerPlacementStrategy() == null )
-            //            {
-            //                throw new EnvironmentCreationException( "Invalid node container placement strategy" );
-            //            }
+//            else if ( nodeGroup.getContainerPlacementStrategy() == null )
+//            {
+//                throw new EnvironmentCreationException( "Invalid node container placement strategy" );
+//            }
         }
     }
 
@@ -381,19 +402,21 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public void growEnvironment( final String environmentId, final Blueprint blueprint )
+    public void growEnvironment( final String environmentId, final Topology topology )
     {
         //validate params
         try
         {
             Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
-            Preconditions.checkNotNull( blueprint );
-            Preconditions.checkNotNull( blueprint.getNodeGroups() );
-            Preconditions.checkArgument( blueprint.getNodeGroups().size() > 0, "Nodegroup size must be great than 0" );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( blueprint.getName() ), "Invalid blueprint name" );
-            //            Preconditions.checkArgument( !Strings.isNullOrEmpty( blueprint.getCidr() ), "Invalid subnet
+            Preconditions.checkNotNull( topology );
+            Preconditions.checkNotNull( topology.getNodeGroupPlacement() );
+            Preconditions.checkArgument( topology.getNodeGroupPlacement().size() > 0,
+                    "Nodegroup size must be great than 0" );
+            Preconditions
+                    .checkArgument( !Strings.isNullOrEmpty( topology.getEnvironmentName() ), "Invalid topology name" );
+            //            Preconditions.checkArgument( !Strings.isNullOrEmpty( topology.getCidr() ), "Invalid subnet
             // cidr" );
-            checkBlueprint( blueprint );
+            checkBlueprint( topology );
         }
         catch ( Exception e )
         {
@@ -407,7 +430,7 @@ public class RestServiceImpl implements RestService
         try
         {
             /*Set<EnvironmentContainerHost> newContainers = */
-            environmentManager.growEnvironment( environmentId, blueprint, false );
+            environmentManager.growEnvironment( environmentId, topology, false );
 
             //            return Response.ok( JsonUtil.toJson( convertContainersToContainerJson( newContainers ) ) )
             // .build();

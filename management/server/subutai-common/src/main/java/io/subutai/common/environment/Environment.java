@@ -8,6 +8,7 @@ import io.subutai.common.peer.EnvironmentAlertHandler;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Peer;
+import io.subutai.common.peer.PeerException;
 
 
 /**
@@ -70,10 +71,10 @@ public interface Environment
      * Grows environment according to the passed blueprint
      *
      * @param environmentId = environment id to use when growing
-     * @param blueprint = blueprint to use when growing
+     * @param topology = topology to use when growing
      * @param async - sync or async to the calling party
      */
-    Set<EnvironmentContainerHost> growEnvironment( String environmentId, Blueprint blueprint, boolean async )
+    Set<EnvironmentContainerHost> growEnvironment( String environmentId, Topology topology, boolean async )
             throws EnvironmentModificationException;
 
 
@@ -86,7 +87,7 @@ public interface Environment
     /**
      * Returns pees which host any container(s) from this environment
      */
-    Set<Peer> getPeers();
+    Set<Peer> getPeers() throws PeerException;
 
     /**
      * Network subnet of the environment in CIDR format notation.

@@ -18,6 +18,7 @@ import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 
 import io.subutai.common.environment.Blueprint;
+import io.subutai.common.environment.Topology;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 
 
@@ -60,7 +61,7 @@ public interface RestService
     @PUT
     @Path( "{environmentId}" )
     @Consumes( MediaType.APPLICATION_JSON )
-    public void growEnvironment( @PathParam( "environmentId" ) String environmentId, final Blueprint blueprint );
+    public void growEnvironment( @PathParam( "environmentId" ) String environmentId, final Topology topology );
 
     @POST
     @Path( "key" )
