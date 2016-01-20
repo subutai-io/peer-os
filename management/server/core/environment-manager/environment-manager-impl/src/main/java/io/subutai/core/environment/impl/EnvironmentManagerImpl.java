@@ -94,7 +94,6 @@ import io.subutai.core.environment.impl.workflow.modification.SshKeyRemovalWorkf
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.kurjun.api.TemplateManager;
-import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerAction;
 import io.subutai.core.peer.api.PeerActionListener;
@@ -103,7 +102,6 @@ import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
-import io.subutai.core.strategy.api.StrategyManager;
 import io.subutai.core.tracker.api.Tracker;
 import io.subutai.core.trust.api.RelationManager;
 import io.subutai.core.trust.api.RelationVerificationException;
@@ -139,8 +137,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     protected Map<String, AlertHandler> alertHandlers = new ConcurrentHashMap<String, AlertHandler>();
     private SecurityManager securityManager;
     private boolean keyTrustCheckEnabled;
-//    private StrategyManager strategyManager;
-//    private QuotaManager quotaManager;
+    //    private StrategyManager strategyManager;
+    //    private QuotaManager quotaManager;
 
 
     public EnvironmentManagerImpl( final TemplateManager templateRegistry, final PeerManager peerManager,
@@ -156,8 +154,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         Preconditions.checkNotNull( identityManager );
         Preconditions.checkNotNull( relationManager );
         Preconditions.checkNotNull( securityManager );
-//        Preconditions.checkNotNull( strategyManager );
-//        Preconditions.checkNotNull( quotaManager );
+        //        Preconditions.checkNotNull( strategyManager );
+        //        Preconditions.checkNotNull( quotaManager );
         Preconditions.checkNotNull( tracker );
 
         this.templateRegistry = templateRegistry;
@@ -168,8 +166,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         this.identityManager = identityManager;
         this.relationManager = relationManager;
         this.tracker = tracker;
-//        this.strategyManager = strategyManager;
-//        this.quotaManager = quotaManager;
+        //        this.strategyManager = strategyManager;
+        //        this.quotaManager = quotaManager;
     }
 
 
@@ -679,80 +677,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     //    }
 
 
-        try
-        {
-            Set<String> peers = blueprint.getPeers();
-            ContainerPlacementStrategy strategy = strategyManager.findStrategyById( strategyId );
-            PeerGroupResources groupResources = new PeerGroupResources();
-            for ( String peerId : peers )
-            {
-                Peer peer = peerManager.getPeer( peerId );
-                if ( peer == null )
-                {
-                    throw new EnvironmentCreationException( "Peer not found: " + peerId );
-                }
-
-                groupResources.addPeerResources( peer.getResourceLimits( peerManager.getLocalPeer().getId() ) );
-            }
-
-
-            final Map<ContainerSize, ContainerQuota> quotas = quotaManager.getDefaultQuotas();
-            Blueprint newBlueprint = strategy.distribute( groupResources, quotas );
-
-            for ( Map.Entry<String, Set<NodeGroup>> placementEntry : newBlueprint.getNodeGroupsMap().entrySet() )
-            {
-                Peer peer = peerManager.getPeer( placementEntry.getKey() );
-                for ( NodeGroup nodeGroup : placementEntry.getValue() )
-                {
-                    topology.addNodeGroupPlacement( peer, nodeGroup );
-                }
-            }
-        }
-        catch ( StrategyException e )
-        {
-            throw new EnvironmentCreationException( "Container placement strategy not found by name: " + strategyId );
-        }
-        catch ( PeerException e )
-        {
-            new EnvironmentCreationException( "Could not retrieve peer limits. Error message: " + e.getMessage() );
-        }
-
-
-        LOG.debug( "Topology built." );
-
-        return topology;
-    }
-
-
-    protected Topology buildTopology( final String environmentId, final String cdir, final Blueprint blueprint )
-    {
-        Topology topology = new Topology( blueprint.getName(), environmentId, cdir, blueprint.getSshKey() );
-
-        LOG.debug( "Building topology..." );
-
-
-        for ( Map.Entry<String, Set<NodeGroup>> placementEntry : blueprint.getNodeGroupsMap().entrySet() )
-        {
-            Peer peer = peerManager.getPeer( placementEntry.getKey() );
-            for ( NodeGroup nodeGroup : placementEntry.getValue() )
-            {
-                //                LOG.debug                                                                ( String
-                // .format
-                //                        ( "%s %s " + "%s %s %s %s", nodeGroup.getName(), nodeGroup.getType()/*,
-                //                        nodeGroup.getNumberOfContainers()*/, nodeGroup.getPeerId(),
-                //                        nodeGroup.getContainerDistributionType() == ContainerDistributionType.AUTO ?
-                //                        nodeGroup.getContainerPlacementStrategy().getStrategyId()
-                // : nodeGroup
-                //                                .getHostId(), nodeGroup.getContainerDistributionType() ) );
-                topology.addNodeGroupPlacement( peer, nodeGroup );
-            }
-        }
-        LOG.debug( "Topology built." );
-
-        return topology;
-    }
-
-
     @RolesAllowed( "Environment-Management|Write" )
     @Override
     public Environment createEnvironment( final Topology topology, final boolean async )
@@ -875,7 +799,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         }
 
         //create empty environment
-        final EnvironmentImpl environment = createEmptyEnvironment( name, ip );
+        final EnvironmentImpl environment = createEmptyEnvironment( name, ip, topology.getSshKey() );
         for ( Map.Entry<NodeGroup, Set<ContainerHostInfo>> entry : containers.entrySet() )
         {
             for ( ContainerHostInfo newHost : entry.getValue() )
@@ -1937,6 +1861,24 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                 }
             } );
         }
+    }
+
+
+    @RolesAllowed( "Environment-Management|Write" )
+    protected EnvironmentImpl createEmptyEnvironment( final String name, final String subnetCidr, final String sshKey )
+    {
+
+        EnvironmentImpl environment =
+                new EnvironmentImpl( name, subnetCidr, sshKey, getUserId(), peerManager.getLocalPeer().getId() );
+
+        environment.setUserId( identityManager.getActiveUser().getId() );
+        environment = saveOrUpdate( environment );
+
+        setEnvironmentTransientFields( environment );
+
+        notifyOnEnvironmentCreated( environment );
+
+        return environment;
     }
 
 
