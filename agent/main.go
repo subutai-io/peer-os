@@ -120,17 +120,23 @@ func main() {
 			cli.StringFlag{Name: "deleteflow, d", Usage: "-d BRIDGENAME MATCHCASE"},
 			cli.StringFlag{Name: "showport, p", Usage: "-p BRIDGENAME"},
 
-			cli.BoolFlag{Name: "L", Usage: "-L shows list of P2P instances"},
-			cli.StringFlag{Name: "e", Usage: "-e updates P2P encryption key"},
-			cli.StringFlag{Name: "R", Usage: "-R removes P2P instance"},
-			cli.StringFlag{Name: "N", Usage: "-N creates P2P instance"},
-
 			cli.BoolFlag{Name: "listvnimap, v", Usage: "-v"},
 			cli.BoolFlag{Name: "listopenedtab, S", Usage: "-S"},
 			cli.StringFlag{Name: "deletegateway, D", Usage: "-D VLANID"},
 			cli.StringFlag{Name: "removetab, V", Usage: "-V INTERFACENAME"},
 			cli.StringFlag{Name: "creategateway, T", Usage: "-T VLANIP/SUBNET VLANID"},
 			cli.StringFlag{Name: "vniop, Z", Usage: "-Z [delete] | [deleteall] | [list]"}},
+
+		Subcommands: []cli.Command{{
+			Name:  "p2p",
+			Usage: "p2p network operation",
+			Flags: []cli.Flag{
+				cli.BoolFlag{Name: "c", Usage: "create p2p instance (p2p -c interfaceName localPeepIPAddr hash key ttl)"},
+				cli.BoolFlag{Name: "d", Usage: "delete p2p instance (p2p -d hash)"},
+				cli.BoolFlag{Name: "u", Usage: "update p2p instance encryption key (p2p -u hash newkey ttl)"},
+				cli.BoolFlag{Name: "l", Usage: "list of p2p instances (p2p -l)"}},
+			Action: func(c *cli.Context) { lib.P2P(c.Bool("c"), c.Bool("d"), c.Bool("u"), c.Bool("l"), os.Args) }}},
+
 		Action: func(c *cli.Context) {
 			lib.LxcManagementNetwork(os.Args)
 		}}, {

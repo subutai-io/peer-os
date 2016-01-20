@@ -10,6 +10,24 @@ import (
 	"subutai/log"
 )
 
+func P2P(c, d, u, l bool, args []string) {
+	if c {
+		if len(args) > 8 {
+			p2p.Create(args[4], args[5], args[6], args[7], args[8])
+		}
+	} else if u {
+		if len(args) > 6 {
+			p2p.UpdateKey(args[4], args[5], args[6])
+		}
+	} else if d {
+		if len(args) > 4 {
+			p2p.Remove(args[4])
+		}
+	} else if l {
+		p2p.Print()
+	}
+}
+
 func LxcManagementNetwork(args []string) {
 	if len(args) < 3 {
 		log.Error("Not enough arguments")
@@ -52,15 +70,6 @@ func LxcManagementNetwork(args []string) {
 		} else {
 			net.DeleteFlow(args[3], args[4])
 		}
-
-	case "-L":
-		p2p.Print()
-	case "-R":
-		p2p.Remove(args[4])
-	case "-e":
-		p2p.UpdateKey(args[3], args[4])
-	case "-N":
-		p2p.Create(args[5], args[6], args[7])
 
 	case "-Z", "--vniop":
 		switch args[3] {

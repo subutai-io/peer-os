@@ -29,21 +29,21 @@ func p2pFile(line string) {
 	log.Check(log.FatalLevel, "Opening file for append "+file, err)
 }
 
-func Create(interfaceName, hash, localPeepIPAddr string) {
-	p2pFile(interfaceName + " " + localPeepIPAddr + " " + hash[0:32] + " " + hash)
-	log.Check(log.FatalLevel, "p2p command: ", exec.Command("p2p", "-start", "-key", hash[0:32], "-dev", interfaceName, "-ip", localPeepIPAddr, "-hash", hash).Run())
+func Create(interfaceName, localPeepIPAddr, hash, key, ttl string) {
+	p2pFile(interfaceName + " " + localPeepIPAddr + " " + key + " " + ttl + " " + hash)
+	log.Check(log.FatalLevel, "p2p command: ", exec.Command("p2p", "-start", "-key", key, "-dev", interfaceName, "-ip", localPeepIPAddr, "-hash", hash).Run())
 }
 
 func Print() {
-	fmt.Println("LocalPeerIP\tLocalInterface\tCommunity")
+	fmt.Println("Interface\tLocalPeerIP\tHash")
 
 	file, err := os.Open(config.Agent.DataPrefix + "/var/subutai-network/p2p.txt")
 	log.Check(log.FatalLevel, "Opening p2p.txt", err)
 	scanner := bufio.NewScanner(bufio.NewReader(file))
 	for scanner.Scan() {
 		line := strings.Fields(scanner.Text())
-		if len(line) > 3 {
-			fmt.Println(line[1] + "\t" + line[0] + "\t" + line[3])
+		if len(line) > 4 {
+			fmt.Println(line[0] + "\t" + line[1] + "\t" + line[4])
 		}
 	}
 	file.Close()
@@ -66,7 +66,7 @@ func Remove(hash string) {
 	log.Check(log.FatalLevel, "Removing p2p tunnel", ioutil.WriteFile(config.Agent.DataPrefix+"/var/subutai-network/p2p.txt", []byte(newconf), 0644))
 }
 
-func UpdateKey(hash, newkey string) {
+func UpdateKey(hash, newkey, ttl string) {
 	err := exec.Command("p2p", "-add-key", "-key", newkey, "-hash", hash).Run()
 	log.Check(log.FatalLevel, "p2p command: ", err)
 }
