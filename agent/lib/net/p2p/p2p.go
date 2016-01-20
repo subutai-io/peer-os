@@ -1,4 +1,4 @@
-package net
+package p2p
 
 import (
 	"bufio"
@@ -29,12 +29,12 @@ func p2pFile(line string) {
 	log.Check(log.FatalLevel, "Opening file for append "+file, err)
 }
 
-func CreateP2PTunnel(interfaceName, communityName, localPeepIPAddr string) {
+func Create(interfaceName, communityName, localPeepIPAddr string) {
 	p2pFile(interfaceName + " " + localPeepIPAddr + " " + communityName[0:32] + " " + communityName)
-	log.Check(log.FatalLevel, "p2p command: ", exec.Command("p2p", "-start", "-key", communityName[0:32], "-dev", interfaceName, "-ip", localPeepIPAddr, "-hash", communityName).Start())
+	log.Check(log.FatalLevel, "p2p command: ", exec.Command("p2p", "-start", "-key", communityName[0:32], "-dev", interfaceName, "-ip", localPeepIPAddr, "-hash", communityName).Run())
 }
 
-func PrintN2NTunnels() {
+func Print() {
 	fmt.Println("LocalPeerIP\tLocalInterface\tCommunity")
 
 	file, err := os.Open(config.Agent.DataPrefix + "/var/subutai-network/p2p.txt")
@@ -49,8 +49,8 @@ func PrintN2NTunnels() {
 	file.Close()
 }
 
-func RemoveP2PTunnel(communityName string) {
-	log.Check(log.FatalLevel, "p2p command: ", exec.Command("p2p", "-stop", "-hash", communityName).Start())
+func Remove(communityName string) {
+	log.Check(log.FatalLevel, "p2p command: ", exec.Command("p2p", "-stop", "-hash", communityName).Run())
 
 	file, err := os.Open(config.Agent.DataPrefix + "/var/subutai-network/p2p.txt")
 	log.Check(log.FatalLevel, "Opening p2p.txt", err)
@@ -64,4 +64,9 @@ func RemoveP2PTunnel(communityName string) {
 	}
 	file.Close()
 	log.Check(log.FatalLevel, "Removing p2p tunnel", ioutil.WriteFile(config.Agent.DataPrefix+"/var/subutai-network/p2p.txt", []byte(newconf), 0644))
+}
+
+func UpdateKey(hash, newkey string) {
+	err := exec.Command("p2p", "-add-key", "-key", newkey, "-hash", communityName).Run()
+	log.Check(log.FatalLevel, "p2p command: ", err)
 }

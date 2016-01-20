@@ -120,10 +120,10 @@ func main() {
 			cli.StringFlag{Name: "deleteflow, d", Usage: "-d BRIDGENAME MATCHCASE"},
 			cli.StringFlag{Name: "showport, p", Usage: "-p BRIDGENAME"},
 
-			cli.BoolFlag{Name: "listn2n, L", Usage: "-L"},
-			cli.StringFlag{Name: "reloadn2n, e", Usage: "-e INTERFACENAME COMMUNITYNAME"},
-			cli.StringFlag{Name: "removen2n, R", Usage: "-R INTERFACENAME COMMUNITYNAME"},
-			cli.StringFlag{Name: "addn2n, N", Usage: "superNodeIPaddr, superNodePort, interfaceName, communityName, localPeepIPAddr, keyType, keyFile, managementPort"},
+			cli.BoolFlag{Name: "L", Usage: "-L shows list of P2P instances"},
+			cli.StringFlag{Name: "e", Usage: "-e updates P2P encryption key"},
+			cli.StringFlag{Name: "R", Usage: "-R removes P2P instance"},
+			cli.StringFlag{Name: "N", Usage: "-N creates P2P instance"},
 
 			cli.BoolFlag{Name: "listvnimap, v", Usage: "-v"},
 			cli.BoolFlag{Name: "listopenedtab, S", Usage: "-S"},
