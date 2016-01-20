@@ -7,9 +7,11 @@ import org.slf4j.LoggerFactory;
 import org.apache.servicemix.beanflow.Workflow;
 
 import io.subutai.common.environment.EnvironmentStatus;
+import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.workflow.modification.steps.P2PSecretKeyResetStep;
 
 
 public class P2PSecretKeyModificationWorkflow
@@ -18,7 +20,8 @@ public class P2PSecretKeyModificationWorkflow
     private static final Logger LOG = LoggerFactory.getLogger( P2PSecretKeyModificationWorkflow.class );
 
     private EnvironmentImpl environment;
-    private final String sshKey;
+    private final String p2pSecretKey;
+    private final long p2pSecretKeyTtlSeconds;
     private final TrackerOperation operationTracker;
     private final EnvironmentManagerImpl environmentManager;
 
@@ -32,13 +35,14 @@ public class P2PSecretKeyModificationWorkflow
 
 
     public P2PSecretKeyModificationWorkflow( final EnvironmentImpl environment, final String p2pSecretKey,
-                                             final TrackerOperation operationTracker,
+                                             final long p2pSecretKeyTtlSeconds, final TrackerOperation operationTracker,
                                              final EnvironmentManagerImpl environmentManager )
     {
         super( P2PSecretKeyModificationPhase.INIT );
 
         this.environment = environment;
-        this.sshKey = p2pSecretKey;
+        this.p2pSecretKey = p2pSecretKey;
+        this.p2pSecretKeyTtlSeconds = p2pSecretKeyTtlSeconds;
         this.operationTracker = operationTracker;
         this.environmentManager = environmentManager;
     }
@@ -66,7 +70,9 @@ public class P2PSecretKeyModificationWorkflow
 
         try
         {
-            //TODO change key here
+            new P2PSecretKeyResetStep( environment,
+                    new P2PCredentials( environment.getTunnelCommunityName(), p2pSecretKey, p2pSecretKeyTtlSeconds ) )
+                    .execute();
 
             environment = environmentManager.saveOrUpdate( environment );
 
