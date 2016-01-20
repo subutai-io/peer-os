@@ -1,14 +1,10 @@
 package io.subutai.core.tracker.rest;
 
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Properties;
 import java.util.UUID;
 
 import javax.ws.rs.core.Response;
@@ -20,7 +16,7 @@ import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import io.subutai.common.settings.Common;
+import io.subutai.common.about.SubutaiInfo;
 import io.subutai.common.tracker.TrackerOperationView;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.tracker.api.Tracker;
@@ -106,49 +102,16 @@ public class RestServiceImpl implements RestService
     @Override
     public Response getSubutaiInfo()
     {
-        Properties prop = new Properties();
         VersionPojo pojo = new VersionPojo();
-        InputStream input = null;
-        try
-        {
-            input = new FileInputStream( String.format( "%s/git.properties", Common.KARAF_ETC ) );
 
-            prop.load( input );
-            pojo.setGitCommitId( prop.getProperty( "git.commit.id" ) );
-            pojo.setGitCommitTime( prop.getProperty( "git.commit.time" ) );
-            pojo.setGitBranch( prop.getProperty( "git.branch" ) );
-            pojo.setGitCommitUserName( prop.getProperty( "git.commit.user.name" ) );
-            pojo.setGitCommitUserEmail( prop.getProperty( "git.commit.user.email" ) );
-            pojo.setProjectVersion( prop.getProperty( "git.build.version" ) );
-
-            pojo.setGitBuildUserName( prop.getProperty( "git.build.user.name" ) );
-            pojo.setGitBuildUserEmail( prop.getProperty( "git.build.user.email" ) );
-            pojo.setGitBuildHost( prop.getProperty( "git.build.host" ) );
-            pojo.setGitBuildTime( prop.getProperty( "git.build.time" ) );
-
-            pojo.setGitClosestTagName( prop.getProperty( "git.closest.tag.name" ) );
-            pojo.setGitCommitIdDescribeShort( prop.getProperty( "git.commit.id.describe-short" ) );
-            pojo.setGitClosestTagCommitCount( prop.getProperty( "git.closest.tag.commit.count" ) );
-            pojo.setGitCommitIdDescribe( prop.getProperty( "git.commit.id.describe" ) );
-        }
-        catch ( IOException ex )
-        {
-            ex.printStackTrace();
-        }
-        finally
-        {
-            if ( input != null )
-            {
-                try
-                {
-                    input.close();
-                }
-                catch ( IOException e )
-                {
-                    e.printStackTrace();
-                }
-            }
-        }
+        pojo.setGitCommitId( SubutaiInfo.getCommitId() );
+        pojo.setGitBranch( SubutaiInfo.getBranch() );
+        pojo.setGitCommitUserName( SubutaiInfo.getCommitterUserName() );
+        pojo.setGitCommitUserEmail( SubutaiInfo.getCommitterUserEmail() );
+        pojo.setGitBuildUserName( SubutaiInfo.getBuilderUserName() );
+        pojo.setGitBuildUserEmail( SubutaiInfo.getBuilderUserEmail() );
+        pojo.setGitBuildTime( SubutaiInfo.getBuildTime() );
+        pojo.setProjectVersion( SubutaiInfo.getVersion() );
 
         String projectInfo = JsonUtil.GSON.toJson( pojo );
 
