@@ -158,17 +158,25 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response setupStrategyRequisites( final String name, final String strategy, int sshId, int hostId, List<String> peerIdList )
+    public Response setupStrategyRequisites( final String name, final String strategy, int sshId, int hostId, String peerIdList )
     {
         EnvironmentDto environmentDto = null;
 
         try
         {
+            List<String> peerIds = JsonUtil.fromJson( peerIdList , new TypeToken<List<String>>(){}.getType() );
+
             ContainerPlacementStrategy placementStrategy = strategyManager.findStrategyById( strategy );
 
             final List<PeerResources> resources = new ArrayList<>();
-            for ( String peerId : peerIdList )
+            for ( String peerId : peerIds )
             {
+                if( "local".equals( peerId ) )
+                {
+                    resources.add( peerManager.getLocalPeer().getResourceLimits( peerManager.getLocalPeer().getId() ) );
+                    continue;
+                }
+
                 PeerResources peerResources = peerManager.getPeer( peerId ).getResourceLimits( peerManager.getLocalPeer().getId() );
                 resources.add( peerResources );
             }
@@ -1010,33 +1018,5 @@ public class RestServiceImpl implements RestService
                     containerHost.getContainerSize(), containerHost.getArch().toString(), containerHost.getTags() ) );
         }
         return containerDtos;
-    }
-
-
-    //    @Override
-    public Response createEnvironment( final String blueprintJson )
-    {
-        //        try
-        //        {
-        //            Blueprint blueprint = gson.fromJson( blueprintJson, Blueprint.class );
-        //
-        ////            updateContainerPlacementStrategy( blueprint );
-        //
-        //            Environment environment = environmentManager.createEnvironment( blueprint, false );
-        //        }
-        //        catch ( EnvironmentCreationException e )
-        //        {
-        //            LOG.error( "Error creating environment #createEnvironment", e );
-        //            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
-        //        }
-        //        catch ( JsonParseException e )
-        //        {
-        //            LOG.error( "Error validating parameters #createEnvironment", e );
-        //            return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( ERROR_KEY, e
-        // .getMessage() ) )
-        //                           .build();
-        //        }
-        //
-        return Response.ok().build();
     }
 }
