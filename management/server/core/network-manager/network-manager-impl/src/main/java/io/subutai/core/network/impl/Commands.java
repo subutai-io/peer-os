@@ -53,7 +53,7 @@ public class Commands
     //management host commands
 
 
-    public RequestBuilder getSetupN2NConnectionCommand( String superNodeIp, int superNodePort, String interfaceName,
+    public RequestBuilder getSetupP2PConnectionCommand( String superNodeIp, int superNodePort, String interfaceName,
                                                         String communityName, String localIp, String keyType,
                                                         String pathToKeyFile )
     {
@@ -63,14 +63,21 @@ public class Commands
     }
 
 
-    public RequestBuilder getRemoveN2NConnectionCommand( String interfaceName, String communityName )
+    public RequestBuilder getRemoveP2PConnectionCommand( String interfaceName, String communityName )
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
                 .withCmdArgs( Lists.newArrayList( "-R", interfaceName, communityName ) );
     }
 
 
-    public RequestBuilder getListN2NConnectionsCommand()
+    public RequestBuilder getResetP2PSecretKey( String p2pHash, String newSecretKey )
+    {
+        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
+                .withCmdArgs( Lists.newArrayList( "-e", p2pHash, newSecretKey ) );
+    }
+
+
+    public RequestBuilder getListP2PConnectionsCommand()
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs( Lists.newArrayList( "-L" ) );
     }

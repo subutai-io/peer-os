@@ -47,7 +47,6 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
-import io.subutai.common.environment.ContainerDistributionType;
 import io.subutai.common.environment.ContainersDestructionResultImpl;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.host.ContainerHostInfo;
@@ -85,7 +84,8 @@ import io.subutai.common.peer.RequestListener;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.protocol.Disposable;
-import io.subutai.common.protocol.N2NConfig;
+import io.subutai.common.protocol.P2PConfig;
+import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.quota.ContainerQuota;
@@ -100,8 +100,8 @@ import io.subutai.common.security.objects.SecurityKeyType;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.ExceptionUtil;
-import io.subutai.common.util.N2NUtil;
 import io.subutai.common.util.NumUtil;
+import io.subutai.common.util.P2PUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.common.util.StringUtil;
 import io.subutai.core.executor.api.CommandExecutor;
@@ -110,7 +110,6 @@ import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.localpeer.impl.command.CommandRequestListener;
-import io.subutai.core.localpeer.impl.container.CreateContainerWrapperTask;
 import io.subutai.core.localpeer.impl.container.CreateEnvironmentContainerGroupRequestListener;
 import io.subutai.core.localpeer.impl.container.DestroyContainerWrapperTask;
 import io.subutai.core.localpeer.impl.container.DestroyEnvironmentContainerGroupRequestListener;
@@ -134,7 +133,6 @@ import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.strategy.api.StrategyManager;
-import io.subutai.core.strategy.api.StrategyNotFoundException;
 
 //import io.subutai.core.localpeer.impl.dao.ManagementHostDataService;
 
@@ -148,7 +146,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     private static final Logger LOG = LoggerFactory.getLogger( LocalPeerImpl.class );
 
     public static final String PEER_SUBNET_MASK = "255.255.255.0";
-    private static final int N2N_PORT = 5000;
+    private static final int P2P_PORT = 5000;
     private static final String GATEWAY_INTERFACE_NAME_REGEX = "^br-(\\d+)$";
     private static final Pattern GATEWAY_INTERFACE_NAME_PATTERN = Pattern.compile( GATEWAY_INTERFACE_NAME_REGEX );
 
@@ -348,7 +346,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         //            result = createByHost( request );
         //        }
 
-//        return result;
+        //        return result;
     }
 
 
@@ -1665,23 +1663,40 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
+    @Override
+    public void resetP2PSecretKey( final P2PCredentials p2PCredentials ) throws PeerException
+    {
+
+        Preconditions.checkNotNull( p2PCredentials, "Invalid p2p credentials" );
+
+        try
+        {
+            getNetworkManager().resetP2PSecretKey( p2PCredentials.getP2pHash(), p2PCredentials.getP2pSecretKey() );
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new PeerException( "Error resetting P2P secret key", e );
+        }
+    }
+
+
     @RolesAllowed( "Environment-Management|Update" )
     @Override
-    public void setupN2NConnection( final N2NConfig config ) throws PeerException
+    public void setupP2PConnection( final P2PConfig config ) throws PeerException
     {
-        LOG.debug( String.format( "Adding local peer to n2n community: %s:%d %s %s %s", config.getSuperNodeIp(),
-                config.getN2NPort(), config.getInterfaceName(), config.getCommunityName(), config.getAddress() ) );
+        LOG.debug( String.format( "Adding local peer to P2P community: %s:%d %s %s %s", config.getSuperNodeIp(),
+                config.getP2PPort(), config.getInterfaceName(), config.getCommunityName(), config.getAddress() ) );
 
         try
         {
             getNetworkManager()
-                    .setupN2NConnection( config.getSuperNodeIp(), config.getN2NPort(), config.getInterfaceName(),
-                            config.getCommunityName(), config.getAddress(), NetworkManager.N2N_STRING_KEY,
+                    .setupP2PConnection( config.getSuperNodeIp(), config.getP2PPort(), config.getInterfaceName(),
+                            config.getCommunityName(), config.getAddress(), NetworkManager.P2P_STRING_KEY,
                             config.getSharedKey() );
         }
         catch ( NetworkManagerException e )
         {
-            throw new PeerException( "Unable add host to n2n tunnel.", e );
+            throw new PeerException( "Unable add host to P2P tunnel.", e );
         }
 
         TunnelEntity tunnel = new TunnelEntity();
@@ -1695,13 +1710,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     /**
-     * Returns set of currently used n2n subnets of given peers.
+     * Returns set of currently used p2p subnets of given peers.
      *
      * @param peers set of peers
      *
-     * @return set of currently used n2n subnets.
+     * @return set of currently used p2p subnets.
      */
-    private Set<String> getN2NSubnets( final Set<Peer> peers ) throws PeerException
+    private Set<String> getP2PSubnets( final Set<Peer> peers ) throws PeerException
     {
         Set<String> result = new HashSet<>();
 
@@ -1709,7 +1724,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             HostInterfaces intfs = peer.getInterfaces();
 
-            Set<HostInterfaceModel> r = intfs.filterByIp( N2NUtil.N2N_INTERFACE_IP_PATTERN );
+            Set<HostInterfaceModel> r = intfs.filterByIp( P2PUtil.P2P_INTERFACE_IP_PATTERN );
 
             Collection peerSubnets = CollectionUtils.<String>collect( r, new Transformer()
             {
@@ -1730,16 +1745,16 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public List<N2NConfig> setupN2NConnection( final String environmentId, final Set<Peer> peers ) throws PeerException
+    public List<P2PConfig> setupP2PConnection( final String environmentId, final Set<Peer> peers ) throws PeerException
     {
-        Set<String> usedN2NSubnets = getN2NSubnets( peers );
-        LOG.debug( String.format( "Found %d n2n subnets:", usedN2NSubnets.size() ) );
-        for ( String s : usedN2NSubnets )
+        Set<String> usedP2PSubnets = getP2PSubnets( peers );
+        LOG.debug( String.format( "Found %d p2p subnets:", usedP2PSubnets.size() ) );
+        for ( String s : usedP2PSubnets )
         {
             LOG.debug( s );
         }
 
-        String freeSubnet = N2NUtil.findFreeTunnelNetwork( usedN2NSubnets );
+        String freeSubnet = P2PUtil.findFreeTunnelNetwork( usedP2PSubnets );
 
         LOG.debug( String.format( "Free subnet for peer: %s", freeSubnet ) );
         try
@@ -1749,33 +1764,33 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 throw new IllegalStateException( "Could not calculate subnet." );
             }
             String superNodeIp = getExternalIp();
-            String interfaceName = N2NUtil.generateInterfaceName( freeSubnet );
-            String communityName = N2NUtil.generateCommunityName( freeSubnet );
+            String interfaceName = P2PUtil.generateInterfaceName( freeSubnet );
+            String communityName = P2PUtil.generateCommunityName( freeSubnet );
             String sharedKey = UUID.randomUUID().toString();
-            SubnetUtils.SubnetInfo subnetInfo = new SubnetUtils( freeSubnet, N2NUtil.N2N_SUBNET_MASK ).getInfo();
+            SubnetUtils.SubnetInfo subnetInfo = new SubnetUtils( freeSubnet, P2PUtil.P2P_SUBNET_MASK ).getInfo();
             final String[] addresses = subnetInfo.getAllAddresses();
             int counter = 0;
 
             ExecutorService taskExecutor = Executors.newFixedThreadPool( peers.size() );
 
-            ExecutorCompletionService<N2NConfig> executorCompletionService =
+            ExecutorCompletionService<P2PConfig> executorCompletionService =
                     new ExecutorCompletionService<>( taskExecutor );
 
 
-            List<N2NConfig> result = new ArrayList<>( peers.size() );
+            List<P2PConfig> result = new ArrayList<>( peers.size() );
             for ( Peer peer : peers )
             {
-                N2NConfig config =
-                        new N2NConfig( peer.getId(), environmentId, superNodeIp, N2N_PORT, interfaceName, communityName,
+                P2PConfig config =
+                        new P2PConfig( peer.getId(), environmentId, superNodeIp, P2P_PORT, interfaceName, communityName,
                                 addresses[counter], sharedKey );
-                executorCompletionService.submit( new SetupN2NConnectionTask( peer, config ) );
+                executorCompletionService.submit( new SetupP2PConnectionTask( peer, config ) );
                 counter++;
             }
 
             for ( Peer ignored : peers )
             {
-                final Future<N2NConfig> f = executorCompletionService.take();
-                N2NConfig config = f.get();
+                final Future<P2PConfig> f = executorCompletionService.take();
+                P2PConfig config = f.get();
                 result.add( config );
                 counter++;
             }
@@ -1786,14 +1801,14 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
         catch ( Exception e )
         {
-            throw new PeerException( "Could not create n2n tunnel.", e );
+            throw new PeerException( "Could not create P2P tunnel.", e );
         }
     }
 
 
     @RolesAllowed( "Environment-Management|Delete" )
     @Override
-    public void removeN2NConnection( final EnvironmentId environmentId ) throws PeerException
+    public void removeP2PConnection( final EnvironmentId environmentId ) throws PeerException
     {
         Collection<TunnelEntity> tunnels = tunnelDataService.findByEnvironmentId( environmentId );
 
@@ -1801,19 +1816,19 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             try
             {
-                N2NConfig config = new N2NConfig( tunnel.getTunnelAddress(), tunnel.getInterfaceName(),
+                P2PConfig config = new P2PConfig( tunnel.getTunnelAddress(), tunnel.getInterfaceName(),
                         tunnel.getCommunityName() );
 
-                LOG.debug( String.format( "Removing peer from n2n community: %s:%d %s %s %s", config.getSuperNodeIp(),
-                        config.getN2NPort(), config.getInterfaceName(), config.getCommunityName(),
+                LOG.debug( String.format( "Removing peer from P2P community: %s:%d %s %s %s", config.getSuperNodeIp(),
+                        config.getP2PPort(), config.getInterfaceName(), config.getCommunityName(),
                         config.getAddress() ) );
                 try
                 {
-                    getNetworkManager().removeN2NConnection( config.getInterfaceName(), config.getCommunityName() );
+                    getNetworkManager().removeP2PConnection( config.getInterfaceName(), config.getCommunityName() );
                 }
                 catch ( PeerException | NetworkManagerException e )
                 {
-                    LOG.warn( "Unable remove host from n2n tunnel.", e );
+                    LOG.warn( "Unable remove host from P2P tunnel.", e );
                 }
 
                 removeTunnel( config.getAddress() );
@@ -1892,9 +1907,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public void addToTunnel( final N2NConfig config ) throws PeerException
+    public void addToTunnel( final P2PConfig config ) throws PeerException
     {
-        setupN2NConnection( config );
+        setupP2PConnection( config );
     }
 
 
@@ -2080,24 +2095,24 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    private class SetupN2NConnectionTask implements Callable<N2NConfig>
+    private class SetupP2PConnectionTask implements Callable<P2PConfig>
     {
         private Peer peer;
-        private N2NConfig n2NConfig;
+        private P2PConfig p2PConfig;
 
 
-        public SetupN2NConnectionTask( final Peer peer, final N2NConfig config )
+        public SetupP2PConnectionTask( final Peer peer, final P2PConfig config )
         {
             this.peer = peer;
-            this.n2NConfig = config;
+            this.p2PConfig = config;
         }
 
 
         @Override
-        public N2NConfig call() throws Exception
+        public P2PConfig call() throws Exception
         {
-            peer.setupN2NConnection( n2NConfig );
-            return n2NConfig;
+            peer.setupP2PConnection( p2PConfig );
+            return p2PConfig;
         }
     }
 
