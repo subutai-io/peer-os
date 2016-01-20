@@ -8,7 +8,6 @@ import org.apache.servicemix.beanflow.Workflow;
 
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.Topology;
-import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
@@ -81,8 +80,6 @@ public class EnvironmentImportWorkflow extends Workflow<EnvironmentImportWorkflo
     {
 
         environment.setStatus( EnvironmentStatus.IMPORTING );
-        environment.setSuperNode( peerManager.getLocalPeer().getPeerInfo().getIp() );
-        environment.setSuperNodePort( Common.SUPER_NODE_PORT );
 
         environment = environmentManager.saveOrUpdate( environment );
 

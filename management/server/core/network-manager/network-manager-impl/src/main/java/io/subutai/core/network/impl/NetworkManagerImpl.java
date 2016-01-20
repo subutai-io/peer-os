@@ -1,6 +1,7 @@
 package io.subutai.core.network.impl;
 
 
+import java.time.Instant;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
@@ -28,9 +29,9 @@ import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.NumUtil;
 import io.subutai.core.network.api.ContainerInfo;
-import io.subutai.core.network.api.P2PConnection;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
+import io.subutai.core.network.api.P2PConnection;
 import io.subutai.core.peer.api.PeerManager;
 
 
@@ -54,31 +55,38 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public void setupP2PConnection( final String superNodeIp, final int superNodePort, final String interfaceName,
-                                    final String communityName, final String localIp, final String keyType,
-                                    final String pathToKeyFile ) throws NetworkManagerException
+    public void setupP2PConnection( String interfaceName, String localIp, String communityName, String secretKey,
+                                    long secretKeyTtlSec ) throws NetworkManagerException
     {
         execute( getManagementHost(),
-                commands.getSetupP2PConnectionCommand( superNodeIp, superNodePort, interfaceName, communityName,
-                        localIp, keyType, pathToKeyFile ) );
+                commands.getSetupP2PConnectionCommand( interfaceName, localIp, communityName, secretKey,
+                        getUnixTimestampOffset( secretKeyTtlSec ) ) );
     }
 
 
-    @Override
-    public void removeP2PConnection( final String interfaceName, final String communityName )
-            throws NetworkManagerException
+    private long getUnixTimestampOffset( long offsetSec )
     {
-        execute( getManagementHost(), commands.getRemoveP2PConnectionCommand( interfaceName, communityName ) );
+        long unixTimestamp = Instant.now().getEpochSecond();
+        return unixTimestamp + offsetSec;
     }
 
 
     @Override
-    public void resetP2PSecretKey( String p2pHash, String newSecretKey ) throws NetworkManagerException
+    public void removeP2PConnection( final String communityName ) throws NetworkManagerException
+    {
+        execute( getManagementHost(), commands.getRemoveP2PConnectionCommand( communityName ) );
+    }
+
+
+    @Override
+    public void resetP2PSecretKey( String p2pHash, String newSecretKey, long ttlSeconds ) throws NetworkManagerException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pHash ), "Invalid P2P hash" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( newSecretKey ), "Invalid secret key" );
+        Preconditions.checkArgument( ttlSeconds > 0, "Invalid time-to-live" );
 
-        execute( getManagementHost(), commands.getResetP2PSecretKey( p2pHash, newSecretKey ) );
+        execute( getManagementHost(),
+                commands.getResetP2PSecretKey( p2pHash, newSecretKey, getUnixTimestampOffset( ttlSeconds ) ) );
     }
 
 
@@ -91,18 +99,15 @@ public class NetworkManagerImpl implements NetworkManager
 
         StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
 
-        Pattern p = Pattern.compile(
-                "(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s+(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s+(\\d+)"
-                        + "\\s+(\\w+)\\s+(\\w+)" );
+        Pattern p = Pattern.compile( "(\\w+)\\s+(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s+(\\w+)" );
 
         while ( st.hasMoreTokens() )
         {
             Matcher m = p.matcher( st.nextToken() );
 
-            if ( m.find() && m.groupCount() == 5 )
+            if ( m.find() && m.groupCount() == 3 )
             {
-                connections.add( new P2PConnectionImpl( m.group( 1 ), m.group( 2 ), Integer.parseInt( m.group( 3 ) ),
-                        m.group( 4 ), m.group( 5 ) ) );
+                connections.add( new P2PConnectionImpl( m.group( 1 ), m.group( 2 ), m.group( 3 ) ) );
             }
         }
 
@@ -208,8 +213,6 @@ public class NetworkManagerImpl implements NetworkManager
         LOG.debug( String.format( "Total count of tunnel: %d", tunnels.size() ) );
         return tunnels;
     }
-
-
 
 
     @Override

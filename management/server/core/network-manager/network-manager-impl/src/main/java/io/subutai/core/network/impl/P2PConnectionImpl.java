@@ -10,19 +10,15 @@ import io.subutai.core.network.api.P2PConnection;
 public class P2PConnectionImpl implements P2PConnection
 {
 
-    private final String localIp;
-    private final String superNodeIp;
-    private final int superNodePort;
     private final String interfaceName;
+    private final String localIp;
     private final String communityName;
 
 
-    public P2PConnectionImpl( final String localIp, final String superNodeIp, final int superNodePort,
-                              final String interfaceName, final String communityName )
+    public P2PConnectionImpl( final String interfaceName, final String localIp, final String communityName )
     {
         this.localIp = localIp;
-        this.superNodeIp = superNodeIp;
-        this.superNodePort = superNodePort;
+
         this.interfaceName = interfaceName;
         this.communityName = communityName;
     }
@@ -32,20 +28,6 @@ public class P2PConnectionImpl implements P2PConnection
     public String getLocalIp()
     {
         return localIp;
-    }
-
-
-    @Override
-    public String getSuperNodeIp()
-    {
-        return superNodeIp;
-    }
-
-
-    @Override
-    public int getSuperNodePort()
-    {
-        return superNodePort;
     }
 
 
