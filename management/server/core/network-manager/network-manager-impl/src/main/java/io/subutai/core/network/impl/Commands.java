@@ -72,10 +72,10 @@ public class Commands
     }
 
 
-    public RequestBuilder getResetP2PSecretKey( String p2pHash, String newSecretKey )
+    public RequestBuilder getResetP2PSecretKey( String p2pHash, String newSecretKey, long ttlSeconds )
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
-                .withCmdArgs( Lists.newArrayList( "-e", p2pHash, newSecretKey ) );
+                .withCmdArgs( Lists.newArrayList( "p2p", "-u", p2pHash, newSecretKey, String.valueOf( ttlSeconds ) ) );
     }
 
 

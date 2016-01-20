@@ -36,8 +36,10 @@ public interface NetworkManager
      *
      * @param p2pHash - P2P network hash
      * @param newSecretKey - new secret key to set
+     * @param ttlSeconds - time-to-live for the new secret key
      */
-    public void resetP2PSecretKey( String p2pHash, String newSecretKey ) throws NetworkManagerException;
+    public void resetP2PSecretKey( String p2pHash, String newSecretKey, long ttlSeconds )
+            throws NetworkManagerException;
 
 
     /**

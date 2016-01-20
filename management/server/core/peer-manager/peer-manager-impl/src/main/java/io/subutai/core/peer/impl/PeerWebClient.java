@@ -267,10 +267,13 @@ public class PeerWebClient
     }
 
 
-    public void resetP2PSecretKey( final String p2pHash, final String newSecretKey ) throws PeerException
+    public void resetP2PSecretKey( final String p2pHash, final String newSecretKey, final long ttlSeconds )
+            throws PeerException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pHash ), "Invalid P2P hash" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( newSecretKey ), "Invalid secret key" );
+        Preconditions.checkArgument( ttlSeconds > 0, "Invalid time-to-live" );
+
 
         String path = "/p2presetkey";
 
@@ -280,7 +283,7 @@ public class PeerWebClient
         client.accept( MediaType.APPLICATION_JSON );
         try
         {
-            client.post( new P2PCredentials( p2pHash, newSecretKey ) );
+            client.post( new P2PCredentials( p2pHash, newSecretKey, ttlSeconds ) );
         }
         catch ( Exception e )
         {

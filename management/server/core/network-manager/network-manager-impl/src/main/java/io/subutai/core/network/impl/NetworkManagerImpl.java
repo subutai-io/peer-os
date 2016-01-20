@@ -1,6 +1,7 @@
 package io.subutai.core.network.impl;
 
 
+import java.time.Instant;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
@@ -28,9 +29,9 @@ import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.NumUtil;
 import io.subutai.core.network.api.ContainerInfo;
-import io.subutai.core.network.api.P2PConnection;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
+import io.subutai.core.network.api.P2PConnection;
 import io.subutai.core.peer.api.PeerManager;
 
 
@@ -73,12 +74,15 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public void resetP2PSecretKey( String p2pHash, String newSecretKey ) throws NetworkManagerException
+    public void resetP2PSecretKey( String p2pHash, String newSecretKey, long ttlSeconds ) throws NetworkManagerException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pHash ), "Invalid P2P hash" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( newSecretKey ), "Invalid secret key" );
+        Preconditions.checkArgument( ttlSeconds > 0, "Invalid time-to-live" );
 
-        execute( getManagementHost(), commands.getResetP2PSecretKey( p2pHash, newSecretKey ) );
+        long unixTimestamp = Instant.now().getEpochSecond();
+        execute( getManagementHost(),
+                commands.getResetP2PSecretKey( p2pHash, newSecretKey, unixTimestamp + ttlSeconds ) );
     }
 
 
@@ -208,8 +212,6 @@ public class NetworkManagerImpl implements NetworkManager
         LOG.debug( String.format( "Total count of tunnel: %d", tunnels.size() ) );
         return tunnels;
     }
-
-
 
 
     @Override
