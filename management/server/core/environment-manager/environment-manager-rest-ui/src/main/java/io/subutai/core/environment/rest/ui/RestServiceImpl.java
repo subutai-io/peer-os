@@ -193,7 +193,7 @@ public class RestServiceImpl implements RestService
                     Sets.newHashSet(), environment.getRelationDeclaration() );
         }
         catch ( Exception e ) {
-            e.printStackTrace();
+            return Response.ok( JsonUtil.toJson( e.getMessage() ) ).build();
         }
 
         return Response.ok( JsonUtil.toJson( environmentDto ) ).build();
