@@ -29,9 +29,9 @@ func p2pFile(line string) {
 	log.Check(log.FatalLevel, "Opening file for append "+file, err)
 }
 
-func Create(interfaceName, communityName, localPeepIPAddr string) {
-	p2pFile(interfaceName + " " + localPeepIPAddr + " " + communityName[0:32] + " " + communityName)
-	log.Check(log.FatalLevel, "p2p command: ", exec.Command("p2p", "-start", "-key", communityName[0:32], "-dev", interfaceName, "-ip", localPeepIPAddr, "-hash", communityName).Run())
+func Create(interfaceName, hash, localPeepIPAddr string) {
+	p2pFile(interfaceName + " " + localPeepIPAddr + " " + hash[0:32] + " " + hash)
+	log.Check(log.FatalLevel, "p2p command: ", exec.Command("p2p", "-start", "-key", hash[0:32], "-dev", interfaceName, "-ip", localPeepIPAddr, "-hash", hash).Run())
 }
 
 func Print() {
@@ -49,8 +49,8 @@ func Print() {
 	file.Close()
 }
 
-func Remove(communityName string) {
-	log.Check(log.FatalLevel, "p2p command: ", exec.Command("p2p", "-stop", "-hash", communityName).Run())
+func Remove(hash string) {
+	log.Check(log.FatalLevel, "p2p command: ", exec.Command("p2p", "-stop", "-hash", hash).Run())
 
 	file, err := os.Open(config.Agent.DataPrefix + "/var/subutai-network/p2p.txt")
 	log.Check(log.FatalLevel, "Opening p2p.txt", err)
@@ -58,7 +58,7 @@ func Remove(communityName string) {
 	newconf := ""
 	for scanner.Scan() {
 		line := scanner.Text()
-		if !strings.HasSuffix(line, communityName) {
+		if !strings.HasSuffix(line, hash) {
 			newconf = newconf + line + "\n"
 		}
 	}
@@ -67,6 +67,6 @@ func Remove(communityName string) {
 }
 
 func UpdateKey(hash, newkey string) {
-	err := exec.Command("p2p", "-add-key", "-key", newkey, "-hash", communityName).Run()
+	err := exec.Command("p2p", "-add-key", "-key", newkey, "-hash", hash).Run()
 	log.Check(log.FatalLevel, "p2p command: ", err)
 }
