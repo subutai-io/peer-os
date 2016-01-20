@@ -621,7 +621,7 @@ public class EnvironmentImpl implements Environment, Serializable
         {
             throw new IllegalStateException( "Tunnel network does not defined yet." );
         }
-        return P2PUtil.generateCommunityName( this.environmentId );
+        return P2PUtil.generateCommunityName( tunnelNetwork );
     }
 
 
