@@ -10,7 +10,7 @@ import (
 	"subutai/log"
 )
 
-func P2P(c, d, u, l bool, args []string) {
+func P2P(c, d, u, l, p bool, args []string) {
 	if c {
 		if len(args) > 8 {
 			p2p.Create(args[4], args[5], args[6], args[7], args[8])
@@ -23,6 +23,8 @@ func P2P(c, d, u, l bool, args []string) {
 		if len(args) > 4 {
 			p2p.Remove(args[4])
 		}
+	} else if p {
+		p2p.Peers(args[4])
 	} else if l {
 		p2p.Print()
 	}

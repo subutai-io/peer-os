@@ -31,7 +31,7 @@ func p2pFile(line string) {
 
 func Create(interfaceName, localPeepIPAddr, hash, key, ttl string) {
 	p2pFile(interfaceName + " " + localPeepIPAddr + " " + key + " " + ttl + " " + hash)
-	log.Check(log.FatalLevel, "p2p command: ", exec.Command("p2p", "-start", "-key", key, "-dev", interfaceName, "-ip", localPeepIPAddr, "-hash", hash).Run())
+	log.Check(log.FatalLevel, "Creating p2p interface", exec.Command("p2p", "-start", "-key", key, "-dev", interfaceName, "-ip", localPeepIPAddr, "-hash", hash).Run())
 }
 
 func Print() {
@@ -50,7 +50,7 @@ func Print() {
 }
 
 func Remove(hash string) {
-	log.Check(log.FatalLevel, "p2p command: ", exec.Command("p2p", "-stop", "-hash", hash).Run())
+	log.Check(log.FatalLevel, "Removing p2p interface", exec.Command("p2p", "-stop", "-hash", hash).Run())
 
 	file, err := os.Open(config.Agent.DataPrefix + "/var/subutai-network/p2p.txt")
 	log.Check(log.FatalLevel, "Opening p2p.txt", err)
@@ -68,5 +68,11 @@ func Remove(hash string) {
 
 func UpdateKey(hash, newkey, ttl string) {
 	err := exec.Command("p2p", "-add-key", "-key", newkey, "-hash", hash).Run()
-	log.Check(log.FatalLevel, "p2p command: ", err)
+	log.Check(log.FatalLevel, "Updating p2p key: ", err)
+}
+
+func Peers(hash string) {
+	out, err := exec.Command("p2p", "-show", hash).Output()
+	log.Check(log.FatalLevel, "Getting list of p2p participants", err)
+	fmt.Println(string(out))
 }
