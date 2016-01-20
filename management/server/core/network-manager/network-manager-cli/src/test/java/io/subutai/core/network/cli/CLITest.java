@@ -80,7 +80,7 @@ public class CLITest extends SystemOutRedirectTest
         assertEquals( "OK", getSysOut() );
 
 
-        doThrow( exception ).when( networkManager ).removeP2PConnection( anyString(), anyString() );
+        doThrow( exception ).when( networkManager ).removeP2PConnection(  anyString() );
 
         removeP2PCommand.doExecute();
 

@@ -51,7 +51,7 @@ public class CommandsTest
     @Test
     public void testGetRemoveP2PConnectionCommand() throws Exception
     {
-        assertNotNull( commands.getRemoveP2PConnectionCommand( INTERFACE_NAME, COMMUNITY_NAME ) );
+        assertNotNull( commands.getRemoveP2PConnectionCommand( COMMUNITY_NAME ) );
     }
 
 

@@ -66,10 +66,9 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public void removeP2PConnection( final String interfaceName, final String communityName )
-            throws NetworkManagerException
+    public void removeP2PConnection( final String communityName ) throws NetworkManagerException
     {
-        execute( getManagementHost(), commands.getRemoveP2PConnectionCommand( interfaceName, communityName ) );
+        execute( getManagementHost(), commands.getRemoveP2PConnectionCommand( communityName ) );
     }
 
 
@@ -95,18 +94,15 @@ public class NetworkManagerImpl implements NetworkManager
 
         StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
 
-        Pattern p = Pattern.compile(
-                "(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s+(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s+(\\d+)"
-                        + "\\s+(\\w+)\\s+(\\w+)" );
+        Pattern p = Pattern.compile( "(\\w+)\\s+(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s+(\\w+)" );
 
         while ( st.hasMoreTokens() )
         {
             Matcher m = p.matcher( st.nextToken() );
 
-            if ( m.find() && m.groupCount() == 5 )
+            if ( m.find() && m.groupCount() == 3 )
             {
-                connections.add( new P2PConnectionImpl( m.group( 1 ), m.group( 2 ), Integer.parseInt( m.group( 3 ) ),
-                        m.group( 4 ), m.group( 5 ) ) );
+                connections.add( new P2PConnectionImpl( m.group( 1 ), m.group( 2 ), m.group( 3 ) ) );
             }
         }
 

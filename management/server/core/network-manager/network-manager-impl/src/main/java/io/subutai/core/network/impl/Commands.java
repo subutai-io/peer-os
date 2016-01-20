@@ -65,10 +65,10 @@ public class Commands
     }
 
 
-    public RequestBuilder getRemoveP2PConnectionCommand( String interfaceName, String communityName )
+    public RequestBuilder getRemoveP2PConnectionCommand( String communityName )
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
-                .withCmdArgs( Lists.newArrayList( "-R", interfaceName, communityName ) );
+                .withCmdArgs( Lists.newArrayList( "p2p", "-d", communityName ) );
     }
 
 
@@ -81,7 +81,7 @@ public class Commands
 
     public RequestBuilder getListP2PConnectionsCommand()
     {
-        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs( Lists.newArrayList( "-L" ) );
+        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs( Lists.newArrayList( "p2p", "-l" ) );
     }
 
 

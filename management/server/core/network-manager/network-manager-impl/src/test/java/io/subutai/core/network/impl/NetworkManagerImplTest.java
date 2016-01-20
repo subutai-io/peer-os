@@ -25,9 +25,9 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.core.network.api.ContainerInfo;
-import io.subutai.core.network.api.P2PConnection;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
+import io.subutai.core.network.api.P2PConnection;
 import io.subutai.core.peer.api.PeerManager;
 import junit.framework.TestCase;
 
@@ -72,8 +72,7 @@ public class NetworkManagerImplTest
                     + "Environment IP and VLAN ID.                                                                   "
                     + "[   OK    ]";
     private static final String LIST_TUNNELS_OUTPUT = "List of Tunnels\n" + "--------\n" + "tunnel1-10.2.1.3";
-    private static final String LIST_P2P_OUTPUT = "LocalPeerIP ServerIP Port LocalInterface Community\n"
-            + "10.1.2.3    212.167.154.154 5000    com community1 ";
+    private static final String LIST_P2P_OUTPUT = "Interface LocalPeerIP Hash\n" + "com 10.1.2.3 community1";
     private static final String KEY_TYPE = "key type";
     private static final String PATH_TO_KEY_FILE = "/path/to/key/file";
     private static final String RESERVED_VNIS_OUTPUT = String.format( "%s,%s,%s", VNI, VLAN_ID, ENVIRONMENT_ID );
@@ -156,10 +155,10 @@ public class NetworkManagerImplTest
     @Test
     public void testRemoveP2PConnection() throws Exception
     {
-        networkManager.removeP2PConnection( INTERFACE_NAME, COMMUNITY_NAME );
+        networkManager.removeP2PConnection( COMMUNITY_NAME );
 
         verify( localPeer ).getManagementHost();
-        verify( commands ).getRemoveP2PConnectionCommand( INTERFACE_NAME, COMMUNITY_NAME );
+        verify( commands ).getRemoveP2PConnectionCommand( COMMUNITY_NAME );
         verify( managementHost ).execute( any( RequestBuilder.class ) );
     }
 

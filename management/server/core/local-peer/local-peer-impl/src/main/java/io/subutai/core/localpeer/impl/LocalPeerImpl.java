@@ -1825,7 +1825,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                         config.getAddress() ) );
                 try
                 {
-                    getNetworkManager().removeP2PConnection( config.getInterfaceName(), config.getCommunityName() );
+                    getNetworkManager().removeP2PConnection( config.getCommunityName() );
                 }
                 catch ( PeerException | NetworkManagerException e )
                 {
