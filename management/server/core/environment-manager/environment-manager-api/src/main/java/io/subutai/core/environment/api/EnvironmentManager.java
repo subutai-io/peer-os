@@ -34,6 +34,7 @@ import io.subutai.core.environment.api.exception.EnvironmentManagerException;
  */
 public interface EnvironmentManager
 {
+    //TODO implement startContainer, stopContainer and resetP2PSecretKey methods
 
     /**
      * Returns all existing environments

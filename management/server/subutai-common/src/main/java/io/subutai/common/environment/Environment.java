@@ -16,6 +16,9 @@ import io.subutai.common.peer.PeerException;
  */
 public interface Environment
 {
+
+    //TODO implement startContainer, stopContainer and resetP2PSecretKey methods
+
     /**
      * Return id of environment creator user
      */
