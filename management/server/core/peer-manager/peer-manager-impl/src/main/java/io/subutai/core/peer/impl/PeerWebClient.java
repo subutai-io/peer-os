@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInterfaces;
@@ -27,7 +28,8 @@ import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
-import io.subutai.common.protocol.N2NConfig;
+import io.subutai.common.protocol.P2PConfig;
+import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.PublicKeyContainer;
@@ -184,10 +186,9 @@ public class PeerWebClient
     }
 
 
-    public PublicKeyContainer createEnvironmentKeyPair( EnvironmentId environmentId/*, String userToken*/ )
-            throws PeerException
+    public PublicKeyContainer createEnvironmentKeyPair( EnvironmentId environmentId ) throws PeerException
     {
-        String path = "/pek"/* + userToken*/;
+        String path = "/pek";
 
 
         WebClient client = WebClientBuilder.buildPeerWebClient( host, path, provider );
@@ -266,12 +267,34 @@ public class PeerWebClient
     }
 
 
-    public void setupN2NConnection( final N2NConfig config ) throws PeerException
+    public void resetP2PSecretKey( final String p2pHash, final String newSecretKey ) throws PeerException
     {
-        LOG.debug( String.format( "Adding remote peer to n2n community: %s:%d %s %s %s", config.getSuperNodeIp(),
-                config.getN2NPort(), config.getInterfaceName(), config.getCommunityName(), config.getAddress() ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pHash ), "Invalid P2P hash" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( newSecretKey ), "Invalid secret key" );
 
-        String path = "/n2ntunnel";
+        String path = "/p2presetkey";
+
+        WebClient client = WebClientBuilder.buildPeerWebClient( host, path, provider );
+
+        client.type( MediaType.APPLICATION_JSON );
+        client.accept( MediaType.APPLICATION_JSON );
+        try
+        {
+            client.post( new P2PCredentials( p2pHash, newSecretKey ) );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Error resetting P2P secret key", e );
+        }
+    }
+
+
+    public void setupP2PConnection( final P2PConfig config ) throws PeerException
+    {
+        LOG.debug( String.format( "Adding remote peer to P2P community: %s:%d %s %s %s", config.getSuperNodeIp(),
+                config.getP2PPort(), config.getInterfaceName(), config.getCommunityName(), config.getAddress() ) );
+
+        String path = "/p2ptunnel";
 
         WebClient client = WebClientBuilder.buildPeerWebClient( host, path, provider );
 
@@ -284,16 +307,16 @@ public class PeerWebClient
         }
         catch ( Exception e )
         {
-            throw new PeerException( "Error setting up n2n connection", e );
+            throw new PeerException( "Error setting up P2P connection", e );
         }
     }
 
 
-    public void removeN2NConnection( final EnvironmentId environmentId ) throws PeerException
+    public void removeP2PConnection( final EnvironmentId environmentId ) throws PeerException
     {
-        LOG.debug( String.format( "Removing remote peer from n2n community: %s", environmentId.getId() ) );
+        LOG.debug( String.format( "Removing remote peer from p2p community: %s", environmentId.getId() ) );
 
-        String path = String.format( "/n2ntunnel/%s", environmentId.getId() );
+        String path = String.format( "/p2ptunnel/%s", environmentId.getId() );
 
         WebClient client = WebClientBuilder.buildPeerWebClient( host, path, provider );
 
@@ -306,7 +329,7 @@ public class PeerWebClient
         }
         catch ( Exception e )
         {
-            throw new PeerException( "Error removing n2n connection", e );
+            throw new PeerException( "Error removing p2p connection", e );
         }
     }
 
@@ -459,7 +482,7 @@ public class PeerWebClient
         {
             String path = String.format( "/limits/%s", peerId );
 
-            WebClient client = WebClientBuilder.buildPeerWebClient( host, path, provider,  500, 7000, 1 );
+            WebClient client = WebClientBuilder.buildPeerWebClient( host, path, provider, 500, 7000, 1 );
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
             return client.get( PeerResources.class );

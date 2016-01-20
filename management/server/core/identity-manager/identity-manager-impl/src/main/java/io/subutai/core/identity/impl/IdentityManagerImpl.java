@@ -827,6 +827,7 @@ public class IdentityManagerImpl implements IdentityManager
         {
             securityManager.getKeyManager().savePublicKeyRing( keyId, SecurityKeyType.UserKey.getId(), publicKey );
             user.setFingerprint( securityManager.getKeyManager().getFingerprint( keyId ) );
+            LOGGER.warn( user.getFingerprint() );
         }
         //******************************************
 
@@ -834,7 +835,6 @@ public class IdentityManagerImpl implements IdentityManager
 
         identityDataService.updateUser( user );
     }
-
 
 
     /* *************************************************

@@ -120,7 +120,7 @@ public class LocalPeerImplTest
     private static final int QUOTA = 123;
     private static final String ALIAS = "alias";
     private static final String CERT = "cert";
-    private static final String N2N_IP = "10.11.0.1";
+    private static final String P2P_IP = "10.11.0.1";
     private static final String RAMQUOTA = "123M";
     private static final String CPUQUOTA = "123";
     private static final String HOST_ID = UUID.randomUUID().toString();
@@ -247,7 +247,7 @@ public class LocalPeerImplTest
     public void setUp() throws Exception
     {
         peerMap = new HashMap<>();
-        peerMap.put( IP, N2N_IP );
+        peerMap.put( IP, P2P_IP );
         localPeer =
                 spy( new LocalPeerImpl( daoManager, templateRegistry, quotaManager, strategyManager, commandExecutor,
                         hostRegistry, monitor, securityManager ) );
@@ -310,7 +310,7 @@ public class LocalPeerImplTest
         doReturn( RESPONSE ).when( requestListener ).onRequest( any( Payload.class ) );
 
         peerMap = new HashMap<>();
-        peerMap.put( IP, N2N_IP );
+        peerMap.put( IP, P2P_IP );
         when( environmentId.getId() ).thenReturn( ENV_ID );
         when( hostInfo.getId() ).thenReturn( HOST_ID );
         when( hostInfo.getHostname() ).thenReturn( HOSTNAME );

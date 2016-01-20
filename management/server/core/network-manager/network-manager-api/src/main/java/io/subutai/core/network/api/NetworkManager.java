@@ -15,20 +15,36 @@ public interface NetworkManager
 {
     String TUNNEL_PREFIX = "tunnel";
     String TUNNEL_TYPE = "vxlan";
-    String N2N_STRING_KEY = "string";
+    String P2P_STRING_KEY = "string";
 
 
     /**
-     * Sets up an N2N connection to super node on management host
+     * Sets up an P2P connection to super node on management host
      */
-    public void setupN2NConnection( String superNodeIp, int superNodePort, String interfaceName, String communityName,
+    public void setupP2PConnection( String superNodeIp, int superNodePort, String interfaceName, String communityName,
                                     String localIp, String keyType, String pathToKeyFile )
             throws NetworkManagerException;
 
     /**
-     * Removes N2N connection to super node on management host
+     * Removes P2P connection to super node on management host
      */
-    public void removeN2NConnection( String interfaceName, String communityName ) throws NetworkManagerException;
+    public void removeP2PConnection( String interfaceName, String communityName ) throws NetworkManagerException;
+
+
+    /**
+     * Resets a secret key for a given P2P network
+     *
+     * @param p2pHash - P2P network hash
+     * @param newSecretKey - new secret key to set
+     */
+    public void resetP2PSecretKey( String p2pHash, String newSecretKey ) throws NetworkManagerException;
+
+
+    /**
+     * Lists existing P2P connections on management host
+     */
+    public Set<P2PConnection> listP2PConnections() throws NetworkManagerException;
+
 
     /**
      * Sets up tunnel to another peer on management host
@@ -89,10 +105,6 @@ public interface NetworkManager
      */
     public Set<Tunnel> listTunnels() throws NetworkManagerException;
 
-    /**
-     * Lists existing N2N connections on management host
-     */
-    public Set<N2NConnection> listN2NConnections() throws NetworkManagerException;
 
     /**
      * Sets up VNI-VLAN mapping on management host

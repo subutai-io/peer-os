@@ -1,9 +1,6 @@
 package io.subutai.core.environment.impl.workflow.creation;
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.apache.servicemix.beanflow.Workflow;
 
 import io.subutai.common.environment.EnvironmentStatus;
@@ -17,7 +14,7 @@ import io.subutai.core.environment.impl.workflow.creation.steps.PEKGenerationSte
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterHostsStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterSshStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.SetSshKeyStep;
-import io.subutai.core.environment.impl.workflow.creation.steps.SetupN2NStep;
+import io.subutai.core.environment.impl.workflow.creation.steps.SetupP2PStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.VNISetupStep;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.kurjun.api.TemplateManager;
@@ -51,7 +48,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         INIT,
         GENERATE_KEYS,
         SETUP_VNI,
-        SETUP_N2N,
+        SETUP_P2P,
         CLONE_CONTAINERS,
         CONFIGURE_HOSTS,
         CONFIGURE_SSH,
@@ -130,7 +127,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
             environment = environmentManager.saveOrUpdate( environment );
 
-            return EnvironmentCreationPhase.SETUP_N2N;
+            return EnvironmentCreationPhase.SETUP_P2P;
         }
         catch ( Exception e )
         {
@@ -141,13 +138,13 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
     }
 
 
-    public EnvironmentCreationPhase SETUP_N2N()
+    public EnvironmentCreationPhase SETUP_P2P()
     {
-        operationTracker.addLog( "Setting up N2N" );
+        operationTracker.addLog( "Setting up P2P" );
 
         try
         {
-            new SetupN2NStep( topology, environment, peerManager.getLocalPeer() ).execute();
+            new SetupP2PStep( topology, environment, peerManager.getLocalPeer() ).execute();
 
             environment = environmentManager.saveOrUpdate( environment );
 

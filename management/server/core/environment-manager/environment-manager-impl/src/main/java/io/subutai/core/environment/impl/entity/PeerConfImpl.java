@@ -17,7 +17,7 @@ import javax.persistence.Version;
 
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.PeerConf;
-import io.subutai.common.protocol.N2NConfig;
+import io.subutai.common.protocol.P2PConfig;
 
 
 @Entity
@@ -44,7 +44,7 @@ public class PeerConfImpl implements PeerConf, Serializable
     private Environment environment;
 
 
-    public PeerConfImpl( final N2NConfig config )
+    public PeerConfImpl( final P2PConfig config )
     {
         this.peerId = config.getPeerId();
         this.tunnelAddress = config.getAddress();
