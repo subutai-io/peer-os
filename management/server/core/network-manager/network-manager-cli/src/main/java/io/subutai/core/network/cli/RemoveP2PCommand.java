@@ -1,9 +1,6 @@
 package io.subutai.core.network.cli;
 
 
-import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
-import io.subutai.core.network.api.NetworkManager;
-import io.subutai.core.network.api.NetworkManagerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,6 +8,10 @@ import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 
 import com.google.common.base.Preconditions;
+
+import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
+import io.subutai.core.network.api.NetworkManager;
+import io.subutai.core.network.api.NetworkManagerException;
 
 
 @Command( scope = "net", name = "remove-p2p", description = "Removes P2P connection" )
@@ -20,10 +21,7 @@ public class RemoveP2PCommand extends SubutaiShellCommandSupport
 
     private final NetworkManager networkManager;
 
-    @Argument( index = 0, name = "interface name", required = true, multiValued = false,
-            description = "interface name" )
-    String interfaceName;
-    @Argument( index = 1, name = "community name", required = true, multiValued = false,
+    @Argument( index = 0, name = "community name", required = true, multiValued = false,
             description = "community name" )
     String communityName;
 
@@ -42,7 +40,7 @@ public class RemoveP2PCommand extends SubutaiShellCommandSupport
 
         try
         {
-            networkManager.removeP2PConnection( interfaceName, communityName );
+            networkManager.removeP2PConnection( communityName );
             System.out.println( "OK" );
         }
         catch ( NetworkManagerException e )

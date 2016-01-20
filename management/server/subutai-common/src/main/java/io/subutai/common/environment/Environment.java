@@ -16,6 +16,9 @@ import io.subutai.common.peer.PeerException;
  */
 public interface Environment
 {
+
+    //TODO implement startContainer, stopContainer and resetP2PSecretKey methods
+
     /**
      * Return id of environment creator user
      */
@@ -129,10 +132,6 @@ public interface Environment
     Map<String, String> getTunnels();
 
     boolean isMember( Peer peer );
-
-    String getSuperNode();
-
-    int getSuperNodePort();
 
     String getTunnelInterfaceName();
 
