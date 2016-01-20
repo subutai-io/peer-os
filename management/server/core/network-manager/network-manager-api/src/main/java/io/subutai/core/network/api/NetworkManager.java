@@ -34,9 +34,8 @@ public interface NetworkManager
     /**
      * Sets up an P2P connection to super node on management host
      */
-    public void setupP2PConnection( String superNodeIp, int superNodePort, String interfaceName, String communityName,
-                                    String localIp, String keyType, String pathToKeyFile )
-            throws NetworkManagerException;
+    public void setupP2PConnection( String interfaceName, String localIp, String communityName, String secretKey,
+                                    long secretKeyTtlSec ) throws NetworkManagerException;
 
     /**
      * Removes P2P connection

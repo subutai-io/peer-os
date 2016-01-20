@@ -24,6 +24,7 @@ import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.Tunnel;
+import io.subutai.common.settings.Common;
 import io.subutai.core.network.api.ContainerInfo;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
@@ -36,7 +37,9 @@ import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
 import static junit.framework.TestCase.assertNotNull;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -52,8 +55,6 @@ import static org.mockito.Mockito.when;
 public class NetworkManagerImplTest
 {
 
-    private static final String SUPER_NODE_IP = "123.123.123.123";
-    private static final int SUPER_NODE_PORT = 1234;
     private static final String INTERFACE_NAME = "interface name";
     private static final String COMMUNITY_NAME = "community name";
     private static final String LOCAL_IP = "127.0.0.1";
@@ -73,14 +74,12 @@ public class NetworkManagerImplTest
                     + "[   OK    ]";
     private static final String LIST_TUNNELS_OUTPUT = "List of Tunnels\n" + "--------\n" + "tunnel1-10.2.1.3";
     private static final String LIST_P2P_OUTPUT = "Interface LocalPeerIP Hash\n" + "com 10.1.2.3 community1";
-    private static final String KEY_TYPE = "key type";
-    private static final String PATH_TO_KEY_FILE = "/path/to/key/file";
+    private static final String SECRET_KEY = "secret";
     private static final String RESERVED_VNIS_OUTPUT = String.format( "%s,%s,%s", VNI, VLAN_ID, ENVIRONMENT_ID );
     private static final String VNI_VLAN_MAPPING_OUTPUT =
             String.format( "%s\t%s\t%s\t%s", TUNNEL_NAME, VNI, VLAN_ID, ENVIRONMENT_ID );
     private static final String SSH_KEY = "SSH-KEY";
     private static final String DOMAIN = "domain";
-    private static final String IP = "127.0.0.1";
 
     @Mock
     PeerManager peerManager;
@@ -140,14 +139,12 @@ public class NetworkManagerImplTest
     @Test
     public void testSetupP2PConnection() throws Exception
     {
-        networkManager
-                .setupP2PConnection( SUPER_NODE_IP, SUPER_NODE_PORT, INTERFACE_NAME, COMMUNITY_NAME, LOCAL_IP, KEY_TYPE,
-                        PATH_TO_KEY_FILE );
+        networkManager.setupP2PConnection( INTERFACE_NAME, LOCAL_IP, COMMUNITY_NAME, SECRET_KEY,
+                Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC );
 
         verify( localPeer ).getManagementHost();
-        verify( commands )
-                .getSetupP2PConnectionCommand( SUPER_NODE_IP, SUPER_NODE_PORT, INTERFACE_NAME, COMMUNITY_NAME, LOCAL_IP,
-                        KEY_TYPE, PATH_TO_KEY_FILE );
+        verify( commands ).getSetupP2PConnectionCommand( eq(INTERFACE_NAME),eq( LOCAL_IP), eq(COMMUNITY_NAME), eq(SECRET_KEY),
+                anyLong() );
         verify( managementHost ).execute( any( RequestBuilder.class ) );
     }
 

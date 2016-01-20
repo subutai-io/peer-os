@@ -55,13 +55,19 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public void setupP2PConnection( final String superNodeIp, final int superNodePort, final String interfaceName,
-                                    final String communityName, final String localIp, final String keyType,
-                                    final String pathToKeyFile ) throws NetworkManagerException
+    public void setupP2PConnection( String interfaceName, String localIp, String communityName, String secretKey,
+                                    long secretKeyTtlSec ) throws NetworkManagerException
     {
         execute( getManagementHost(),
-                commands.getSetupP2PConnectionCommand( superNodeIp, superNodePort, interfaceName, communityName,
-                        localIp, keyType, pathToKeyFile ) );
+                commands.getSetupP2PConnectionCommand( interfaceName, localIp, communityName, secretKey,
+                        getUnixTimestampOffset( secretKeyTtlSec ) ) );
+    }
+
+
+    private long getUnixTimestampOffset( long offsetSec )
+    {
+        long unixTimestamp = Instant.now().getEpochSecond();
+        return unixTimestamp + offsetSec;
     }
 
 
@@ -79,9 +85,8 @@ public class NetworkManagerImpl implements NetworkManager
         Preconditions.checkArgument( !Strings.isNullOrEmpty( newSecretKey ), "Invalid secret key" );
         Preconditions.checkArgument( ttlSeconds > 0, "Invalid time-to-live" );
 
-        long unixTimestamp = Instant.now().getEpochSecond();
         execute( getManagementHost(),
-                commands.getResetP2PSecretKey( p2pHash, newSecretKey, unixTimestamp + ttlSeconds ) );
+                commands.getResetP2PSecretKey( p2pHash, newSecretKey, getUnixTimestampOffset( ttlSeconds ) ) );
     }
 
 

@@ -616,11 +616,7 @@ public class EnvironmentImpl implements Environment, Serializable
     @Override
     public String getTunnelCommunityName()
     {
-        if ( tunnelNetwork == null )
-        {
-            throw new IllegalStateException( "Tunnel network does not defined yet." );
-        }
-        return P2PUtil.generateCommunityName( tunnelNetwork );
+        return P2PUtil.generateCommunityName( environmentId );
     }
 
 

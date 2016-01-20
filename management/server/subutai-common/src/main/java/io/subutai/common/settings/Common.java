@@ -37,6 +37,7 @@ public class Common
     public static final String GIT_REPO_URL = "git@gw.intra.lan:/opt/git/project.git";
     public static final int SUPER_NODE_PORT = 5000;
     public static final int CONTAINER_SSH_TIMEOUT_SEC = 1800;
+    public static final long DEFAULT_P2P_SECRET_KEY_TTL_SEC = 60 * 60;
     public static String DEFAULT_TEMPLATE_VERSION = "2.1.0";
     public static final String PACKAGE_PREFIX = "subutai-";
     public static final String PACKAGE_PREFIX_WITHOUT_DASH = "subutai";

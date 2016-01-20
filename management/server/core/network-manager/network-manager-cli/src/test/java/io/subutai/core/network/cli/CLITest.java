@@ -16,6 +16,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
@@ -80,7 +81,7 @@ public class CLITest extends SystemOutRedirectTest
         assertEquals( "OK", getSysOut() );
 
 
-        doThrow( exception ).when( networkManager ).removeP2PConnection(  anyString() );
+        doThrow( exception ).when( networkManager ).removeP2PConnection( anyString() );
 
         removeP2PCommand.doExecute();
 
@@ -162,8 +163,7 @@ public class CLITest extends SystemOutRedirectTest
 
 
         doThrow( exception ).when( networkManager )
-                            .setupP2PConnection( anyString(), anyInt(), anyString(), anyString(), anyString(),
-                                    anyString(), anyString() );
+                            .setupP2PConnection( anyString(), anyString(), anyString(), anyString(), anyLong() );
 
         command.doExecute();
 

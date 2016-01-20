@@ -55,13 +55,12 @@ public class Commands
     //management host commands
 
 
-    public RequestBuilder getSetupP2PConnectionCommand( String superNodeIp, int superNodePort, String interfaceName,
-                                                        String communityName, String localIp, String keyType,
-                                                        String pathToKeyFile )
+    public RequestBuilder getSetupP2PConnectionCommand( String interfaceName, String localIp, String communityName,
+                                                        String secretKey, long secretKeyTtlSec )
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs(
-                Lists.newArrayList( "-N", superNodeIp, String.valueOf( superNodePort ), interfaceName, communityName,
-                        localIp, keyType, pathToKeyFile ) ).withTimeout( 15 ).daemon();
+                Lists.newArrayList( "p2p", "-c", interfaceName, localIp, communityName, secretKey,
+                        String.valueOf( secretKeyTtlSec ) ) );
     }
 
 

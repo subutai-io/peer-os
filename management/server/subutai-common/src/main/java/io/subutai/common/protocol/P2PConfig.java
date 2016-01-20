@@ -66,21 +66,9 @@ public class P2PConfig
     }
 
 
-    public void setSuperNodeIp( final String superNodeIp )
-    {
-        this.superNodeIp = superNodeIp;
-    }
-
-
     public int getP2PPort()
     {
         return P2PPort;
-    }
-
-
-    public void setP2PPort( final int p2pPort )
-    {
-        this.P2PPort = p2pPort;
     }
 
 
@@ -102,12 +90,6 @@ public class P2PConfig
     }
 
 
-    public void setCommunityName( final String communityName )
-    {
-        this.communityName = communityName;
-    }
-
-
     public String getAddress()
     {
         return address;
@@ -123,12 +105,6 @@ public class P2PConfig
     public String getSharedKey()
     {
         return sharedKey;
-    }
-
-
-    public void setSharedKey( final String sharedKey )
-    {
-        this.sharedKey = sharedKey;
     }
 
 
