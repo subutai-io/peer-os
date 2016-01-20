@@ -2,6 +2,7 @@ package io.subutai.core.localpeer.impl.container;
 
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
 import javax.naming.NamingException;
 
@@ -90,7 +91,7 @@ public class CreateContainerTask implements Callable<ContainerHostInfo>
         int counter = 0;
         while ( timePass < limit && ( Strings.isNullOrEmpty( ip ) ) )
         {
-            Thread.sleep( 1000 );
+            TimeUnit.SECONDS.sleep( 1 );
             counter++;
             try
             {
@@ -104,7 +105,7 @@ public class CreateContainerTask implements Callable<ContainerHostInfo>
             }
             catch ( HostDisconnectedException e )
             {
-                if ( counter % 60 == 0 )
+                if ( counter % 30 == 0 )
                 {
                     LOG.debug( String.format( "Still waiting %s. Time: %d/%d. %d sec", hostname, timePass, limit,
                             counter ) );
@@ -123,7 +124,8 @@ public class CreateContainerTask implements Callable<ContainerHostInfo>
             //TODO sign CH key with PEK identified by LocalPeerId+environmentId
             //at this point the CH key is already in the KeyStore and might be just updated.
         }
-
+        LOG.info( String.format( "Container '%s' successfully created.", hostname ) );
+        LOG.debug( hostInfo.toString() );
         return hostInfo;
     }
 }
