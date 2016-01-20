@@ -89,7 +89,8 @@ import io.subutai.core.environment.impl.workflow.creation.EnvironmentCreationWor
 import io.subutai.core.environment.impl.workflow.destruction.ContainerDestructionWorkflow;
 import io.subutai.core.environment.impl.workflow.destruction.EnvironmentDestructionWorkflow;
 import io.subutai.core.environment.impl.workflow.modification.EnvironmentGrowingWorkflow;
-import io.subutai.core.environment.impl.workflow.modification.SshKeyModificationWorkflow;
+import io.subutai.core.environment.impl.workflow.modification.SshKeyAdditionWorkflow;
+import io.subutai.core.environment.impl.workflow.modification.SshKeyRemovalWorkflow;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.kurjun.api.TemplateManager;
@@ -363,7 +364,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         //launch environment growing workflow
 
         final EnvironmentGrowingWorkflow environmentGrowingWorkflow =
-                getEnvironmentGrowingWorkflow( environment, topology, environment.getSshKey(), operationTracker );
+                getEnvironmentGrowingWorkflow( environment, topology, operationTracker );
 
         //start environment growing workflow
         executor.execute( new Runnable()
@@ -678,6 +679,80 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     //    }
 
 
+        try
+        {
+            Set<String> peers = blueprint.getPeers();
+            ContainerPlacementStrategy strategy = strategyManager.findStrategyById( strategyId );
+            PeerGroupResources groupResources = new PeerGroupResources();
+            for ( String peerId : peers )
+            {
+                Peer peer = peerManager.getPeer( peerId );
+                if ( peer == null )
+                {
+                    throw new EnvironmentCreationException( "Peer not found: " + peerId );
+                }
+
+                groupResources.addPeerResources( peer.getResourceLimits( peerManager.getLocalPeer().getId() ) );
+            }
+
+
+            final Map<ContainerSize, ContainerQuota> quotas = quotaManager.getDefaultQuotas();
+            Blueprint newBlueprint = strategy.distribute( groupResources, quotas );
+
+            for ( Map.Entry<String, Set<NodeGroup>> placementEntry : newBlueprint.getNodeGroupsMap().entrySet() )
+            {
+                Peer peer = peerManager.getPeer( placementEntry.getKey() );
+                for ( NodeGroup nodeGroup : placementEntry.getValue() )
+                {
+                    topology.addNodeGroupPlacement( peer, nodeGroup );
+                }
+            }
+        }
+        catch ( StrategyException e )
+        {
+            throw new EnvironmentCreationException( "Container placement strategy not found by name: " + strategyId );
+        }
+        catch ( PeerException e )
+        {
+            new EnvironmentCreationException( "Could not retrieve peer limits. Error message: " + e.getMessage() );
+        }
+
+
+        LOG.debug( "Topology built." );
+
+        return topology;
+    }
+
+
+    protected Topology buildTopology( final String environmentId, final String cdir, final Blueprint blueprint )
+    {
+        Topology topology = new Topology( blueprint.getName(), environmentId, cdir, blueprint.getSshKey() );
+
+        LOG.debug( "Building topology..." );
+
+
+        for ( Map.Entry<String, Set<NodeGroup>> placementEntry : blueprint.getNodeGroupsMap().entrySet() )
+        {
+            Peer peer = peerManager.getPeer( placementEntry.getKey() );
+            for ( NodeGroup nodeGroup : placementEntry.getValue() )
+            {
+                //                LOG.debug                                                                ( String
+                // .format
+                //                        ( "%s %s " + "%s %s %s %s", nodeGroup.getName(), nodeGroup.getType()/*,
+                //                        nodeGroup.getNumberOfContainers()*/, nodeGroup.getPeerId(),
+                //                        nodeGroup.getContainerDistributionType() == ContainerDistributionType.AUTO ?
+                //                        nodeGroup.getContainerPlacementStrategy().getStrategyId()
+                // : nodeGroup
+                //                                .getHostId(), nodeGroup.getContainerDistributionType() ) );
+                topology.addNodeGroupPlacement( peer, nodeGroup );
+            }
+        }
+        LOG.debug( "Topology built." );
+
+        return topology;
+    }
+
+
     @RolesAllowed( "Environment-Management|Write" )
     @Override
     public Environment createEnvironment( final Topology topology, final boolean async )
@@ -766,8 +841,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     // TODO refactor to pass one Blueprint parameter from subutai-common
     @Override
     public Environment importEnvironment( final String name, final Topology topology,
-                                          final Map<NodeGroup, Set<ContainerHostInfo>> containers, final String ssh,
-                                          final Integer vlan ) throws EnvironmentCreationException
+                                          final Map<NodeGroup, Set<ContainerHostInfo>> containers, final Integer vlan )
+            throws EnvironmentCreationException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid name" );
         Preconditions.checkNotNull( topology, "Invalid topology" );
@@ -800,7 +875,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         }
 
         //create empty environment
-        final EnvironmentImpl environment = createEmptyEnvironment( name, ip, ssh );
+        final EnvironmentImpl environment = createEmptyEnvironment( name, ip );
         for ( Map.Entry<NodeGroup, Set<ContainerHostInfo>> entry : containers.entrySet() )
         {
             for ( ContainerHostInfo newHost : entry.getValue() )
@@ -819,7 +894,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                 String.format( "Creating environment %s ", environment.getId() ) );
 
         EnvironmentImportWorkflow environmentImportWorkflow =
-                getEnvironmentImportWorkflow( environment, topology, ssh, operationTracker );
+                getEnvironmentImportWorkflow( environment, topology, operationTracker );
 
         environmentImportWorkflow.start();
         //notify environment event listeners
@@ -850,25 +925,17 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    @RolesAllowed( "Environment-Management|Write" )
-    @Override
-    public void setSshKey( final String environmentId, final String sshKey, final boolean async )
-            throws EnvironmentNotFoundException, EnvironmentModificationException
-    {
-        TrackerOperation op = tracker.createTrackerOperation( MODULE_NAME,
-                String.format( "Setting environment %s ssh key", environmentId ) );
-
-        setSshKey( environmentId, sshKey, async, true, op );
-    }
-
-
-    public void setSshKey( final String environmentId, final String sshKey, final boolean async,
-                           final boolean checkAccess, final TrackerOperation operationTracker )
+    public void addSshKey( final String environmentId, final String sshKey, final boolean async )
             throws EnvironmentNotFoundException, EnvironmentModificationException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( sshKey ), "Invalid ssh key" );
 
-        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId, checkAccess );
+        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId, true );
+
+        TrackerOperation op = tracker.createTrackerOperation( MODULE_NAME,
+                String.format( "Adding ssh key %s to environment %s ", sshKey, environmentId ) );
+
         User activeUser = identityManager.getActiveUser();
 
         RelationMeta relationMeta =
@@ -878,38 +945,94 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             throw new EnvironmentNotFoundException();
         }
-        final SshKeyModificationWorkflow sshKeyModificationWorkflow =
-                getSshKeyModificationWorkflow( environment, sshKey, networkManager, operationTracker );
+
+        final SshKeyAdditionWorkflow sshKeyAdditionWorkflow =
+                getSshKeyAdditionWorkflow( environment, sshKey, networkManager, op );
 
         executor.execute( new Runnable()
         {
             @Override
             public void run()
             {
-                sshKeyModificationWorkflow.start();
+                sshKeyAdditionWorkflow.start();
             }
         } );
 
         //wait
         if ( !async )
         {
-            sshKeyModificationWorkflow.join();
+            sshKeyAdditionWorkflow.join();
 
-            if ( sshKeyModificationWorkflow.getError() != null )
+            if ( sshKeyAdditionWorkflow.getError() != null )
             {
                 throw new EnvironmentModificationException(
-                        exceptionUtil.getRootCause( sshKeyModificationWorkflow.getError() ) );
+                        exceptionUtil.getRootCause( sshKeyAdditionWorkflow.getError() ) );
             }
         }
     }
 
 
-    protected SshKeyModificationWorkflow getSshKeyModificationWorkflow( final EnvironmentImpl environment,
-                                                                        final String sshKey,
-                                                                        final NetworkManager networkManager,
-                                                                        final TrackerOperation operationTracker )
+    @Override
+    public void removeSshKey( final String environmentId, final String sshKey, final boolean async )
+            throws EnvironmentNotFoundException, EnvironmentModificationException
     {
-        return new SshKeyModificationWorkflow( environment, sshKey, networkManager, operationTracker, this );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( sshKey ), "Invalid ssh key" );
+
+        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId, true );
+
+        TrackerOperation op = tracker.createTrackerOperation( MODULE_NAME,
+                String.format( "Removing ssh key %s from environment %s ", sshKey, environmentId ) );
+
+        User activeUser = identityManager.getActiveUser();
+
+        RelationMeta relationMeta =
+                new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), environment, environmentId,
+                        environment.getId(), PermissionObject.EnvironmentManagement.getName() );
+        if ( !relationManager.getRelationInfoManager().allHasUpdatePermissions( relationMeta ) )
+        {
+            throw new EnvironmentNotFoundException();
+        }
+
+        final SshKeyRemovalWorkflow sshKeyRemovalWorkflow =
+                getSshKeyRemovalWorkflow( environment, sshKey, networkManager, op );
+
+        executor.execute( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                sshKeyRemovalWorkflow.start();
+            }
+        } );
+
+        //wait
+        if ( !async )
+        {
+            sshKeyRemovalWorkflow.join();
+
+            if ( sshKeyRemovalWorkflow.getError() != null )
+            {
+                throw new EnvironmentModificationException(
+                        exceptionUtil.getRootCause( sshKeyRemovalWorkflow.getError() ) );
+            }
+        }
+    }
+
+
+    protected SshKeyAdditionWorkflow getSshKeyAdditionWorkflow( final EnvironmentImpl environment, final String sshKey,
+                                                                final NetworkManager networkManager,
+                                                                final TrackerOperation operationTracker )
+    {
+        return new SshKeyAdditionWorkflow( environment, sshKey, networkManager, operationTracker, this );
+    }
+
+
+    protected SshKeyRemovalWorkflow getSshKeyRemovalWorkflow( final EnvironmentImpl environment, final String sshKey,
+                                                              final NetworkManager networkManager,
+                                                              final TrackerOperation operationTracker )
+    {
+        return new SshKeyRemovalWorkflow( environment, sshKey, networkManager, operationTracker, this );
     }
 
 
@@ -1490,11 +1613,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
 
     protected EnvironmentImportWorkflow getEnvironmentImportWorkflow( final EnvironmentImpl environment,
-                                                                      final Topology topology, final String sshKey,
+                                                                      final Topology topology,
                                                                       final TrackerOperation tracker )
     {
         return new EnvironmentImportWorkflow( Common.DEFAULT_DOMAIN_NAME, templateRegistry, this, networkManager,
-                peerManager, securityManager, identityManager, environment, topology, sshKey, tracker );
+                peerManager, securityManager, identityManager, environment, topology, tracker );
     }
 
 
@@ -1701,11 +1824,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
 
     protected EnvironmentGrowingWorkflow getEnvironmentGrowingWorkflow( final EnvironmentImpl environment,
-                                                                        final Topology topology, final String sshKey,
+                                                                        final Topology topology,
                                                                         final TrackerOperation operationTracker )
     {
         return new EnvironmentGrowingWorkflow( Common.DEFAULT_DOMAIN_NAME, templateRegistry, networkManager,
-                peerManager, environment, topology, sshKey, operationTracker, this );
+                peerManager, environment, topology, operationTracker, this );
     }
 
 
@@ -1814,24 +1937,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                 }
             } );
         }
-    }
-
-
-    @RolesAllowed( "Environment-Management|Write" )
-    protected EnvironmentImpl createEmptyEnvironment( final String name, final String subnetCidr, final String sshKey )
-    {
-
-        EnvironmentImpl environment =
-                new EnvironmentImpl( name, subnetCidr, sshKey, getUserId(), peerManager.getLocalPeer().getId() );
-
-        environment.setUserId( identityManager.getActiveUser().getId() );
-        environment = saveOrUpdate( environment );
-
-        setEnvironmentTransientFields( environment );
-
-        notifyOnEnvironmentCreated( environment );
-
-        return environment;
     }
 
 

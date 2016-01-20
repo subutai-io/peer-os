@@ -19,6 +19,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
+
 import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
@@ -138,10 +139,10 @@ public class RestServiceImpl implements RestService
         {
             throw new EnvironmentCreationException( "Invalid node group name" );
         }
-        //        else if ( nodeGroup.getNumberOfContainers() <= 0 )
-        //        {
-        //            throw new EnvironmentCreationException( "Invalid number of containers" );
-        //        }
+//        else if ( nodeGroup.getNumberOfContainers() <= 0 )
+//        {
+//            throw new EnvironmentCreationException( "Invalid number of containers" );
+//        }
         else if ( Strings.isNullOrEmpty( nodeGroup.getTemplateName() ) )
         {
             throw new EnvironmentCreationException( "Invalid templateName" );
@@ -151,11 +152,11 @@ public class RestServiceImpl implements RestService
             throw new EnvironmentCreationException(
                     String.format( "Template %s does not exist", nodeGroup.getTemplateName() ) );
         }
-        //        else if ( nodeGroup.getContainerDistributionType() == ContainerDistributionType.AUTO
-        //                && nodeGroup.getContainerPlacementStrategy() == null )
-        //        {
-        //            throw new EnvironmentCreationException( "Invalid node container placement strategy" );
-        //        }
+//        else if ( nodeGroup.getContainerDistributionType() == ContainerDistributionType.AUTO
+//                && nodeGroup.getContainerPlacementStrategy() == null )
+//        {
+//            throw new EnvironmentCreationException( "Invalid node container placement strategy" );
+//        }
     }
 
 
@@ -186,10 +187,10 @@ public class RestServiceImpl implements RestService
             {
                 throw new EnvironmentCreationException( "Invalid node group name" );
             }
-            //            else if ( nodeGroup.getNumberOfContainers() <= 0 )
-            //            {
-            //                throw new EnvironmentCreationException( "Invalid number of containers" );
-            //            }
+//            else if ( nodeGroup.getNumberOfContainers() <= 0 )
+//            {
+//                throw new EnvironmentCreationException( "Invalid number of containers" );
+//            }
             else if ( Strings.isNullOrEmpty( nodeGroup.getTemplateName() ) )
             {
                 throw new EnvironmentCreationException( "Invalid templateName" );
@@ -199,10 +200,10 @@ public class RestServiceImpl implements RestService
                 throw new EnvironmentCreationException(
                         String.format( "Template %s does not exist", nodeGroup.getTemplateName() ) );
             }
-            //            else if ( nodeGroup.getContainerPlacementStrategy() == null )
-            //            {
-            //                throw new EnvironmentCreationException( "Invalid node container placement strategy" );
-            //            }
+//            else if ( nodeGroup.getContainerPlacementStrategy() == null )
+//            {
+//                throw new EnvironmentCreationException( "Invalid node container placement strategy" );
+//            }
         }
     }
 
@@ -547,7 +548,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response setSshKey( final String environmentId, final String key )
+    public Response addSshKey( final String environmentId, final String key )
     {
         if ( Strings.isNullOrEmpty( environmentId ) )
         {
@@ -562,7 +563,7 @@ public class RestServiceImpl implements RestService
 
         try
         {
-            environmentManager.setSshKey( environmentId, key, false );
+            environmentManager.addSshKey( environmentId, key, false );
 
             return Response.ok().build();
         }
@@ -580,18 +581,22 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response removeSshKey( final String environmentId )
+    public Response removeSshKey( final String environmentId, final String key )
     {
         if ( Strings.isNullOrEmpty( environmentId ) )
         {
             return Response.status( Response.Status.BAD_REQUEST ).entity( new ErrorDto( "Invalid environment id" ) )
                            .build();
         }
+        else if ( Strings.isNullOrEmpty( key ) )
+        {
+            return Response.status( Response.Status.BAD_REQUEST ).entity( new ErrorDto( "Invalid ssh key" ) ).build();
+        }
 
 
         try
         {
-            environmentManager.setSshKey( environmentId, null, false );
+            environmentManager.removeSshKey( environmentId, key, false );
 
             return Response.ok().build();
         }

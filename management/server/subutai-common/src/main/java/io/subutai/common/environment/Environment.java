@@ -48,12 +48,6 @@ public interface Environment
 
     Set<PeerConf> getPeerConfs();
 
-    /**
-     * Returns ssh key if any of environment
-     *
-     * @return - key or null
-     */
-    String getSshKey();
 
     /**
      * Returns contained container hosts
@@ -84,13 +78,11 @@ public interface Environment
             throws EnvironmentModificationException;
 
 
-    /**
-     * Sets/removes ssh key
-     *
-     * @param sshKey - ssh key or null to remove
-     * @param async - sync or async to the calling party
-     */
-    void setSshKey( String sshKey, boolean async ) throws EnvironmentModificationException;
+    void addSshKey( String sshKey, boolean async ) throws EnvironmentModificationException;
+
+    void removeSshKey( String sshKey, boolean async ) throws EnvironmentModificationException;
+
+    Set<String> getSshKeys();
 
     /**
      * Returns pees which host any container(s) from this environment

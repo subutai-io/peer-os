@@ -6,17 +6,19 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.servicemix.beanflow.Workflow;
 
+import com.google.common.collect.Sets;
+
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
-import io.subutai.core.environment.impl.workflow.creation.steps.SetSshKeyStep;
+import io.subutai.core.environment.impl.workflow.creation.steps.AddSshKeyStep;
 import io.subutai.core.network.api.NetworkManager;
 
 
-public class SshKeyModificationWorkflow extends Workflow<SshKeyModificationWorkflow.SshKeyModificationPhase>
+public class SshKeyAdditionWorkflow extends Workflow<SshKeyAdditionWorkflow.SshKeyAdditionPhase>
 {
-    private static final Logger LOG = LoggerFactory.getLogger( SshKeyModificationWorkflow.class );
+    private static final Logger LOG = LoggerFactory.getLogger( SshKeyAdditionWorkflow.class );
 
     private EnvironmentImpl environment;
     private final String sshKey;
@@ -27,17 +29,17 @@ public class SshKeyModificationWorkflow extends Workflow<SshKeyModificationWorkf
     private Throwable error;
 
 
-    public static enum SshKeyModificationPhase
+    public static enum SshKeyAdditionPhase
     {
-        INIT, REPLACE_KEY, FINALIZE
+        INIT, ADD_KEY, FINALIZE
     }
 
 
-    public SshKeyModificationWorkflow( final EnvironmentImpl environment, final String sshKey,
-                                       final NetworkManager networkManager, final TrackerOperation operationTracker,
-                                       final EnvironmentManagerImpl environmentManager )
+    public SshKeyAdditionWorkflow( final EnvironmentImpl environment, final String sshKey,
+                                   final NetworkManager networkManager, final TrackerOperation operationTracker,
+                                   final EnvironmentManagerImpl environmentManager )
     {
-        super( SshKeyModificationPhase.INIT );
+        super( SshKeyAdditionPhase.INIT );
 
         this.environment = environment;
         this.sshKey = sshKey;
@@ -50,30 +52,30 @@ public class SshKeyModificationWorkflow extends Workflow<SshKeyModificationWorkf
     //********************* WORKFLOW STEPS ************
 
 
-    public SshKeyModificationPhase INIT()
+    public SshKeyAdditionPhase INIT()
     {
-        operationTracker.addLog( "Initializing ssh key modification" );
+        operationTracker.addLog( "Initializing ssh key addition" );
 
         environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
 
         environment = environmentManager.saveOrUpdate( environment );
 
-        return SshKeyModificationPhase.REPLACE_KEY;
+        return SshKeyAdditionPhase.ADD_KEY;
     }
 
 
-    public SshKeyModificationPhase REPLACE_KEY()
+    public SshKeyAdditionPhase ADD_KEY()
     {
 
-        operationTracker.addLog( "Modifying ssh key in containers" );
+        operationTracker.addLog( "Adding ssh key to containers" );
 
         try
         {
-            new SetSshKeyStep( sshKey, environment, networkManager ).execute();
+            new AddSshKeyStep( Sets.newHashSet( sshKey ), environment, networkManager ).execute();
 
             environment = environmentManager.saveOrUpdate( environment );
 
-            return SshKeyModificationPhase.FINALIZE;
+            return SshKeyAdditionPhase.FINALIZE;
         }
         catch ( Exception e )
         {
@@ -86,13 +88,13 @@ public class SshKeyModificationWorkflow extends Workflow<SshKeyModificationWorkf
 
     public void FINALIZE()
     {
-        LOG.info( "Finalizing ssh key modification" );
+        LOG.info( "Finalizing ssh key addition" );
 
         environment.setStatus( EnvironmentStatus.HEALTHY );
 
         environment = environmentManager.saveOrUpdate( environment );
 
-        operationTracker.addLogDone( "Ssh key is modified" );
+        operationTracker.addLogDone( "Ssh key is added" );
 
         //this is a must have call
         stop();
@@ -112,7 +114,7 @@ public class SshKeyModificationWorkflow extends Workflow<SshKeyModificationWorkf
         environment = environmentManager.saveOrUpdate( environment );
 
         this.error = error;
-        LOG.error( "Error modifying ssh key", error );
+        LOG.error( "Error adding ssh key", error );
         operationTracker.addLogFailed( error.getMessage() );
         //stop the workflow
         stop();

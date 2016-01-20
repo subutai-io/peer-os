@@ -3,17 +3,19 @@ package io.subutai.core.environment.impl.workflow.creation;
 
 import org.apache.servicemix.beanflow.Workflow;
 
+import com.google.common.collect.Sets;
+
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.workflow.creation.steps.AddSshKeyStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.ContainerCloneStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.PEKGenerationStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterHostsStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterSshStep;
-import io.subutai.core.environment.impl.workflow.creation.steps.SetSshKeyStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.SetupP2PStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.VNISetupStep;
 import io.subutai.core.identity.api.IdentityManager;
@@ -229,7 +231,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
         try
         {
-            new SetSshKeyStep( sshKey, environment, networkManager ).execute();
+            new AddSshKeyStep( Sets.newHashSet( sshKey ), environment, networkManager ).execute();
 
             environment = environmentManager.saveOrUpdate( environment );
 
