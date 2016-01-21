@@ -39,7 +39,7 @@ function LiveTrackerCtrl(liveTrackerSrv, $scope, $rootScope, $timeout, $sce) {
 			refreshCurrentOperations = $timeout(reloadCurrentOperations, 3000);
 		}, 3000);
 	};
-	reloadCurrentOperations();
+	//reloadCurrentOperations();
 
 	function getOperarions(module) {
 		if(module === null) return;
@@ -72,7 +72,7 @@ function LiveTrackerCtrl(liveTrackerSrv, $scope, $rootScope, $timeout, $sce) {
 			refreshCurrentLog = $timeout(reloadCurrentLog, 1000);
 		}, 1000);
 	};
-	reloadCurrentLog();
+	//reloadCurrentLog();
 
 	function setHtml(html) {
 		return $sce.trustAsHtml(html.toString());

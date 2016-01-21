@@ -1,6 +1,7 @@
 package io.subutai.core.environment.rest.ui;
 
 
+import java.util.List;
 import java.util.UUID;
 
 import javax.ws.rs.Consumes;
@@ -12,6 +13,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -26,28 +28,6 @@ public interface RestService
     @Path( "templates" )
     @Produces( { MediaType.APPLICATION_JSON } )
     Response listTemplates();
-
-
-    /** Blueprints *************************************************** */
-
-    @GET
-    @Path( "blueprints" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    Response getBlueprints();
-
-    @GET
-    @Path( "blueprints/{blueprintId}" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    Response getBlueprint( @PathParam( "blueprintId" ) UUID blueprintId );
-
-    @POST
-    @Path( "blueprints" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    Response saveBlueprint( @FormParam( "blueprint_json" ) String content );
-
-    @DELETE
-    @Path( "blueprints/{blueprintId}" )
-    Response deleteBlueprint( @PathParam( "blueprintId" ) UUID blueprintId );
 
 
     /** Domain **************************************************** */
@@ -68,9 +48,16 @@ public interface RestService
     @Path( "{environmentId}/revoke" )
     Response accessStatus( @PathParam( "environmentId" ) String environmentId );
 
+
+    @POST
+    @Path( "requisites/strategy" )
+    Response setupStrategyRequisites( @FormParam( "name" ) String name, @FormParam( "strategy" ) String strategy,
+                                      @FormParam( "sshId" ) int sshId, @FormParam( "hostId" ) int hostId,
+                                      @FormParam( "peers" ) String list );
+
     @POST
     @Path( "requisites" )
-    Response setupRequisites( @FormParam( "blueprint_json" ) String blueprintJson );
+    Response setupRequisites( @FormParam( "topology" ) String topologyJson );
 
     @POST
     @Path( "build" )
@@ -94,12 +81,17 @@ public interface RestService
 
     @POST
     @Path( "keys" )
-    Response setSshKey( @FormParam( "environmentId" ) String environmentId, @FormParam( "key" ) String key );
+    Response addSshKey( @FormParam( "environmentId" ) String environmentId, @FormParam( "key" ) String key );
 
 
     @DELETE
     @Path( "{environmentId}/keys" )
-    Response removeSshKey( @PathParam( "environmentId" ) String environmentId );
+    Response removeSshKey( @PathParam( "environmentId" ) String environmentId, @QueryParam( "key" ) String key );
+
+    @GET
+    @Path( "{environmentId}/keys" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response getEnvironmentSShKeys( @PathParam( "environmentId" ) String environmentId );
 
 
     /** Environment domains **************************************************** */

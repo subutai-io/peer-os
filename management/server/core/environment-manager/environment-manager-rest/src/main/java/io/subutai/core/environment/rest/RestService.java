@@ -18,6 +18,7 @@ import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 
 import io.subutai.common.environment.Blueprint;
+import io.subutai.common.environment.Topology;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 
 
@@ -25,7 +26,7 @@ public interface RestService
 {
 
     @GET
-    @Produces(  MediaType.APPLICATION_JSON  )
+    @Produces( MediaType.APPLICATION_JSON )
     public Response listEnvironments();
 
     @GET
@@ -34,7 +35,7 @@ public interface RestService
     public Response getDefaultDomainName();
 
     @POST
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Consumes( MediaType.MULTIPART_FORM_DATA )
     @Path( "domain" )
     Response addEnvironmentDomain( @Multipart( "environmentId" ) String environmentId,
                                    @Multipart( "hostName" ) String hostName,
@@ -60,16 +61,17 @@ public interface RestService
     @PUT
     @Path( "{environmentId}" )
     @Consumes( MediaType.APPLICATION_JSON )
-    public void growEnvironment( @PathParam( "environmentId" ) String environmentId, final Blueprint blueprint );
+    public void growEnvironment( @PathParam( "environmentId" ) String environmentId, final Topology topology );
 
     @POST
     @Path( "key" )
-    public Response setSshKey( @FormParam( "environmentId" ) String environmentId, @FormParam( "key" ) String key );
+    public Response addSshKey( @FormParam( "environmentId" ) String environmentId, @FormParam( "key" ) String key );
 
 
     @DELETE
     @Path( "key" )
-    public Response removeSshKey( @QueryParam( "environmentId" ) String environmentId );
+    public Response removeSshKey( @QueryParam( "environmentId" ) String environmentId,
+                                  @QueryParam( "key" ) String key );
 
     @DELETE
     @Path( "{environmentId}" )

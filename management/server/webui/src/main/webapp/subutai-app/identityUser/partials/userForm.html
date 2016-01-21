@@ -27,14 +27,14 @@
 				<label class="b-popup-body-label b-popup-body-label_block">E-mail:</label>
 				<input type="email"
 					   placeholder="email@mail.com"
-					   class="b-popup-body-input b-popup-body-input_full b-popup-body-input_margin-bttm-b"
+					   class="b-popup-body-input b-popup-body-input_full b-popup-body-input_margin-bttm" 
 					   ng-model="identityUserFormCtrl.user2Add.email"
 					   required>
 
 				<label class="b-popup-body-label b-popup-body-label_block">Password:</label>
 				<input type="password"
 					   placeholder="***********"
-					   class="b-popup-body-input b-popup-body-input_full b-popup-body-input_margin-bttm"
+					   class="b-popup-body-input b-popup-body-input_full b-popup-body-input_margin-bttm" 
 					   ng-model="identityUserFormCtrl.user2Add.password"
 					   id="js-password"
 					   required>
@@ -42,8 +42,8 @@
 				<label class="b-popup-body-label b-popup-body-label_block">Confirm password:</label>
 				<input type="password"
 					   placeholder="***********"
-					   class="b-popup-body-input b-popup-body-input_full"
-					   ng-model="identityUserFormCtrl.user2Add.confirm_password"
+					   class="b-popup-body-input b-popup-body-input_full b-popup-body-input_margin-bttm" 
+					   ng-model="identityUserFormCtrl.user2Add.confirm_password" 
 					   pw-check="js-password"
 					   name="confirm_password"
 					   ng-attr-required="identityUserFormCtrl.user2Add.password.length > 0">

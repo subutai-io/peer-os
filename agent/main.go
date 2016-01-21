@@ -59,7 +59,10 @@ func main() {
 		}}, {
 
 		Name: "daemon", Usage: "start an agent",
-		Action: agent.Start,
+		Action: func(c *cli.Context) {
+			config.InitAgentDebug()
+			agent.Start(c)
+		},
 		Flags: []cli.Flag{
 			cli.StringFlag{Name: "server", Value: config.Management.Host, Usage: "management host ip address/host name"},
 			cli.StringFlag{Name: "port", Value: config.Management.Port, Usage: "management host port number"},
@@ -117,17 +120,26 @@ func main() {
 			cli.StringFlag{Name: "deleteflow, d", Usage: "-d BRIDGENAME MATCHCASE"},
 			cli.StringFlag{Name: "showport, p", Usage: "-p BRIDGENAME"},
 
-			cli.BoolFlag{Name: "listn2n, L", Usage: "-L"},
-			cli.StringFlag{Name: "reloadn2n, e", Usage: "-e INTERFACENAME COMMUNITYNAME"},
-			cli.StringFlag{Name: "removen2n, R", Usage: "-R INTERFACENAME COMMUNITYNAME"},
-			cli.StringFlag{Name: "addn2n, N", Usage: "superNodeIPaddr, superNodePort, interfaceName, communityName, localPeepIPAddr, keyType, keyFile, managementPort"},
-
 			cli.BoolFlag{Name: "listvnimap, v", Usage: "-v"},
 			cli.BoolFlag{Name: "listopenedtab, S", Usage: "-S"},
 			cli.StringFlag{Name: "deletegateway, D", Usage: "-D VLANID"},
 			cli.StringFlag{Name: "removetab, V", Usage: "-V INTERFACENAME"},
 			cli.StringFlag{Name: "creategateway, T", Usage: "-T VLANIP/SUBNET VLANID"},
 			cli.StringFlag{Name: "vniop, Z", Usage: "-Z [delete] | [deleteall] | [list]"}},
+
+		Subcommands: []cli.Command{{
+			Name:  "p2p",
+			Usage: "p2p network operation",
+			Flags: []cli.Flag{
+				cli.BoolFlag{Name: "c", Usage: "create p2p instance (p2p -c interfaceName localPeepIPAddr hash key ttl)"},
+				cli.BoolFlag{Name: "d", Usage: "delete p2p instance (p2p -d hash)"},
+				cli.BoolFlag{Name: "u", Usage: "update p2p instance encryption key (p2p -u hash newkey ttl)"},
+				cli.BoolFlag{Name: "l", Usage: "list of p2p instances (p2p -l)"},
+				cli.BoolFlag{Name: "p", Usage: "list of p2p participants (p2p -p hash)"}},
+			Action: func(c *cli.Context) {
+				lib.P2P(c.Bool("c"), c.Bool("d"), c.Bool("u"), c.Bool("l"), c.Bool("p"), os.Args)
+			}}},
+
 		Action: func(c *cli.Context) {
 			lib.LxcManagementNetwork(os.Args)
 		}}, {

@@ -149,9 +149,7 @@ function IdentityRoleFormCtrl($scope, identitySrv, SweetAlert, ngDialog) {
 
 	var vm = this;
 
-	vm.permissions = angular.copy(permissionsDefault);
-	vm.permissions2Add = [];
-	vm.scopes = [];
+	vm.permissions2Add = angular.copy(permissionsDefault);
 	vm.role2Add = {}
 	vm.editRole = false;
 
@@ -160,11 +158,14 @@ function IdentityRoleFormCtrl($scope, identitySrv, SweetAlert, ngDialog) {
 		vm.editRole = true;
 
 		var role = $scope.ngDialogData;
-		vm.permissions2Add = role.permissions;
-		for(var i = 0; i < vm.permissions2Add.length; i++) {
-			for(var j = 0; j < vm.permissions.length; j++) {
-				if(vm.permissions[j].object == vm.permissions2Add[i].object) {
-					vm.permissions2Add[i].name = vm.permissions[j].name;
+		for(var i = 0; i < role.permissions.length; i++) {
+			for(var j = 0; j < vm.permissions2Add.length; j++) {
+				if(vm.permissions2Add[j].object == role.permissions[i].object) {
+					vm.permissions2Add[j].selected = true;
+					vm.permissions2Add[j].read = role.permissions[i].read;
+					vm.permissions2Add[j].write = role.permissions[i].write;
+					vm.permissions2Add[j].update = role.permissions[i].update;
+					vm.permissions2Add[j].delete = role.permissions[i].delete;
 					break;
 				}
 			}
@@ -172,17 +173,12 @@ function IdentityRoleFormCtrl($scope, identitySrv, SweetAlert, ngDialog) {
 		vm.role2Add = role;
 	}
 
-	identitySrv.getPermissionsScops().success(function (data) {
-		vm.scopes = data;
-	});
-
 	//functions
 	vm.addPermission2Stack = addPermission2Stack;
-	vm.removePermissionFromStack = removePermissionFromStack;
 	vm.addRole = addRole;
 
 	function addPermission2Stack(permission) {
-		vm.permissions2Add.push(angular.copy(permission));
+		permission.selected = !permission.selected;
 	}
 
 	function removePermissionFromStack(key) {
@@ -197,8 +193,15 @@ function IdentityRoleFormCtrl($scope, identitySrv, SweetAlert, ngDialog) {
 			postData += '&role_id=' + vm.role2Add.id;
 		}
 
-		if(vm.permissions2Add.length > 0) {
-			postData += '&permission=' + JSON.stringify(vm.permissions2Add);
+		var permissionsArray = [];
+		for(var i = 0; i < vm.permissions2Add.length; i++) {
+			if(vm.permissions2Add[i].selected === true) {
+				permissionsArray.push(vm.permissions2Add[i]);
+			}
+		}
+
+		if(permissionsArray.length > 0) {
+			postData += '&permission=' + JSON.stringify(permissionsArray);
 		}
 
 		identitySrv.addRole(postData).success(function (data) {

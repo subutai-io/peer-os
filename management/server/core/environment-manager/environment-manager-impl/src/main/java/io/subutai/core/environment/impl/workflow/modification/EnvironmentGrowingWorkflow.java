@@ -11,10 +11,10 @@ import io.subutai.common.environment.Topology;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.workflow.creation.steps.AddSshKeyStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.ContainerCloneStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterHostsStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterSshStep;
-import io.subutai.core.environment.impl.workflow.creation.steps.SetSshKeyStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.PEKGenerationStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.SetupP2PStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.VNISetupStep;
@@ -33,7 +33,6 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
     private final PeerManager peerManager;
     private EnvironmentImpl environment;
     private final Topology topology;
-    private final String sshKey;
     private final String defaultDomain;
     private final TrackerOperation operationTracker;
     private final EnvironmentManagerImpl environmentManager;
@@ -59,7 +58,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
 
     public EnvironmentGrowingWorkflow( String defaultDomain, TemplateManager templateRegistry,
                                        NetworkManager networkManager, PeerManager peerManager,
-                                       EnvironmentImpl environment, Topology topology, String sshKey,
+                                       EnvironmentImpl environment, Topology topology,
                                        TrackerOperation operationTracker, EnvironmentManagerImpl environmentManager )
     {
         super( EnvironmentGrowingPhase.INIT );
@@ -69,7 +68,6 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
         this.networkManager = networkManager;
         this.environment = environment;
         this.topology = topology;
-        this.sshKey = sshKey;
         this.operationTracker = operationTracker;
         this.defaultDomain = defaultDomain;
         this.environmentManager = environmentManager;
@@ -97,7 +95,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
 
         try
         {
-            new PEKGenerationStep( topology, environment, peerManager.getLocalPeer() ).execute();
+            new PEKGenerationStep( topology, environment, peerManager ).execute();
 
             environment = environmentManager.saveOrUpdate( environment );
 
@@ -118,7 +116,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
 
         try
         {
-            new VNISetupStep( topology, environment, peerManager.getLocalPeer() ).execute();
+            new VNISetupStep( topology, environment, peerManager ).execute();
 
             environment = environmentManager.saveOrUpdate( environment );
 
@@ -139,7 +137,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
 
         try
         {
-            new SetupP2PStep( topology, environment ).execute();
+            new SetupP2PStep( topology, environment, peerManager ).execute();
 
             environment = environmentManager.saveOrUpdate( environment );
 
@@ -160,9 +158,8 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
 
         try
         {
-            new ContainerCloneStep( templateRegistry, defaultDomain, topology, environment, peerManager.getLocalPeer(),
-                    environmentManager )
-                    .execute();
+            new ContainerCloneStep( templateRegistry, defaultDomain, topology, environment, peerManager,
+                    environmentManager ).execute();
 
             environment = environmentManager.saveOrUpdate( environment );
 
@@ -225,7 +222,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
 
         try
         {
-            new SetSshKeyStep( sshKey, environment, networkManager ).execute();
+            new AddSshKeyStep( environment.getSshKeys(), environment, networkManager ).execute();
 
             environment = environmentManager.saveOrUpdate( environment );
 

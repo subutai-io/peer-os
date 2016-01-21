@@ -20,8 +20,8 @@ import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.environment.Topology;
-import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
+import io.subutai.common.peer.PeerException;
 import io.subutai.common.security.objects.Ownership;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.ExceptionUtil;
@@ -39,6 +39,7 @@ import io.subutai.core.trust.api.model.Relation;
 import io.subutai.core.trust.api.model.RelationInfo;
 import io.subutai.core.trust.api.model.RelationInfoMeta;
 import io.subutai.core.trust.api.model.RelationMeta;
+import io.subutai.core.peer.api.PeerManager;
 
 
 /**
@@ -51,30 +52,30 @@ public class ContainerCloneStep
     private final String defaultDomain;
     private final Topology topology;
     private final EnvironmentImpl environment;
-    private final LocalPeer localPeer;
     private final RelationManager relationManager;
     private final IdentityManager identityManager;
     protected ExceptionUtil exceptionUtil = new ExceptionUtil();
+    private PeerManager peerManager;
 
 
     public ContainerCloneStep( final TemplateManager templateRegistry, final String defaultDomain,
-                               final Topology topology, final EnvironmentImpl environment, final LocalPeer localPeer,
-                               final EnvironmentManagerImpl environmentManager )
+                               final Topology topology, final EnvironmentImpl environment,
+                               final PeerManager peerManager, final EnvironmentManagerImpl environmentManager )
     {
         this.templateRegistry = templateRegistry;
         this.defaultDomain = defaultDomain;
         this.topology = topology;
         this.environment = environment;
-        this.localPeer = localPeer;
+        this.peerManager = peerManager;
         this.relationManager = environmentManager.getRelationManager();
         this.identityManager = environmentManager.getIdentityManager();
     }
 
 
-    public void execute() throws EnvironmentCreationException
+    public void execute() throws EnvironmentCreationException, PeerException
     {
 
-        Map<Peer, Set<NodeGroup>> placement = topology.getNodeGroupPlacement();
+        Map<String, Set<NodeGroup>> placement = topology.getNodeGroupPlacement();
 
         SubnetUtils cidr = new SubnetUtils( environment.getSubnetCidr() );
 
@@ -90,8 +91,8 @@ public class ContainerCloneStep
         {
             for ( NodeGroup nodeGroup : nodeGroups )
             {
-//                requestedContainerCount += nodeGroup.getNumberOfContainers();
-                requestedContainerCount ++;
+                //                requestedContainerCount += nodeGroup.getNumberOfContainers();
+                requestedContainerCount++;
             }
         }
 
@@ -99,8 +100,7 @@ public class ContainerCloneStep
         if ( requestedContainerCount > totalAvailableIpCount )
         {
             throw new EnvironmentCreationException(
-                    String.format                                          ( "Requested %d containers but only %d ip "
-                            + "" + "" + "addresses available",
+                    String.format( "Requested %d containers but only %d ip " + "" + "" + "addresses available",
                             requestedContainerCount, totalAvailableIpCount ) );
         }
 
@@ -112,19 +112,19 @@ public class ContainerCloneStep
 
 
         //submit parallel environment part creation tasks across peers
-        for ( Map.Entry<Peer, Set<NodeGroup>> peerPlacement : placement.entrySet() )
+        for ( Map.Entry<String, Set<NodeGroup>> peerPlacement : placement.entrySet() )
         {
-            Peer peer = peerPlacement.getKey();
+            Peer peer = peerManager.getPeer( peerPlacement.getKey() );
             logger.debug( String.format( "Scheduling node group task on peer %s", peer.getId() ) );
 
-            taskCompletionService.submit                                                  (
-                    new CreatePeerNodeGroupsTask( peer, peerPlacement.getValue(), localPeer, environment,
-                            currentLastUsedIpIndex + 1, templateRegistry, defaultDomain ) );
+            taskCompletionService.submit(
+                    new CreatePeerNodeGroupsTask( peer, peerPlacement.getValue(), peerManager.getLocalPeer(),
+                            environment, currentLastUsedIpIndex + 1, templateRegistry, defaultDomain ) );
 
             for ( NodeGroup nodeGroup : peerPlacement.getValue() )
             {
-//                currentLastUsedIpIndex += nodeGroup.getNumberOfContainers();
-                currentLastUsedIpIndex ++;
+                //                currentLastUsedIpIndex += nodeGroup.getNumberOfContainers();
+                currentLastUsedIpIndex++;
             }
 
 

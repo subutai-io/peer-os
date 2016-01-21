@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"strings"
 	"subutai/config"
+	"subutai/lib/net/p2p"
 	"subutai/log"
 )
 
@@ -169,7 +170,7 @@ func DeleteVNI(vni, vlan, envid string) {
 	lines = strings.Split(string(f), "\n")
 	for k, v := range lines {
 		if v == vni+" "+vlan+" "+envid {
-			RemoveP2PTunnel(envid)
+			p2p.Remove(envid)
 			lines[k] = ""
 		}
 	}

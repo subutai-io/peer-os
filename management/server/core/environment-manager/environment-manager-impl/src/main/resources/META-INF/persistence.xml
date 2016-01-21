@@ -12,7 +12,7 @@
     <class>io.subutai.core.environment.impl.entity.EnvironmentImpl</class>
     <class>io.subutai.core.environment.impl.entity.PeerConfImpl</class>
     <class>io.subutai.core.environment.impl.entity.EnvironmentContainerImpl</class>
-    <class>io.subutai.core.environment.impl.entity.EnvironmentBlueprintEntity</class>
+    <class>io.subutai.core.environment.impl.entity.EnvironmentTopologyEntity</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
       <property name="openjpa.Log" value="DefaultLevel=WARN, Tool=INFO, SQL=TRACE" />
