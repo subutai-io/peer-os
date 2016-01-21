@@ -2,7 +2,6 @@ package lib
 
 import (
 	"crypto/md5"
-	// "crypto/tls"
 	"encoding/hex"
 	"fmt"
 	"github.com/pivotal-golang/archiver/extractor"
@@ -10,10 +9,12 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"os/exec"
 	"runtime"
 	"strings"
 	"subutai/config"
 	"subutai/lib/container"
+	"subutai/lib/fs"
 	"subutai/lib/gpg"
 	"subutai/lib/template"
 	"subutai/log"
@@ -87,7 +88,36 @@ func download(file, md5, token string) string {
 	return ""
 }
 
+func initMng() {
+	fs.ReadOnly("management", false)
+
+	exec.Command("ovs-vsctl", "--may-exist", "add-br", "br-mng").Run()
+	exec.Command("ovs-vsctl", "--may-exist", "add-br", "br-tun").Run()
+	exec.Command("ovs-vsctl", "--may-exist", "add-port", "br-mng", "eth1").Run()
+	exec.Command("ovs-vsctl", "--may-exist", "add-port", "br-tun", "tunTOint").Run()
+	exec.Command("ovs-vsctl", "--may-exist", "add-port", "br-mng", "intTOtun").Run()
+	exec.Command("ovs-vsctl", "set", "interface", "tunTOint", "type=patch", "options:peer=intTOtun").Run()
+	exec.Command("ovs-vsctl", "set", "interface", "intTOtun", "type=patch", "options:peer=tunTOint").Run()
+	exec.Command("ovs-vsctl", "set", "bridge", "br-tun", "stp_enable=true").Run()
+	exec.Command("ovs-ofctl", "add-flow", "br-tun", "\"priority=2500,dl_vlan=0xffff actions=drop\"").Run()
+
+	LxcStart("management")
+
+	exec.Command("ifconfig", "eth1", "0").Run()
+	log.Check(log.WarnLevel, "Running dhclient on br-mng", exec.Command("dhclient", "br-mng").Run())
+
+	f, err := os.OpenFile("/etc/hosts", os.O_APPEND|os.O_WRONLY, 0600)
+	log.Check(log.WarnLevel, "Opening /etc/hosts file", err)
+	defer f.Close()
+	_, err = f.WriteString("10.10.10.1	management gw.intra.lan")
+	log.Check(log.WarnLevel, "Adding gw.intra.lan to hosts", err)
+
+	os.Exit(0)
+}
+
 func LxcImport(templ string) {
+	config.CheckKurjun()
+
 	fullname := templ + "-subutai-template_" + config.Misc.Version + "_" + config.Misc.Arch + ".tar.gz"
 	if container.IsTemplate(templ) {
 		log.Info(templ + " template exist")
@@ -117,6 +147,11 @@ func LxcImport(templ string) {
 
 	log.Info("Installing template " + templ)
 	template.Install(parent, templ)
+
+	if templ == "management" {
+		initMng()
+	}
+
 	container.SetContainerConf(templ, [][]string{
 		{"lxc.rootfs", config.Agent.LxcPrefix + templ + "/rootfs"},
 		{"lxc.mount", config.Agent.LxcPrefix + templ + "/fstab"},

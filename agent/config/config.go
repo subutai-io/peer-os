@@ -3,10 +3,12 @@ package config
 import (
 	"code.google.com/p/gcfg"
 	"io/ioutil"
+	"net"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"subutai/log"
+	"time"
 )
 
 type agentConfig struct {
@@ -149,5 +151,12 @@ func init() {
 func InitAgentDebug() {
 	if config.Agent.Debug {
 		log.Level(log.DebugLevel)
+	}
+}
+
+func CheckKurjun() {
+	_, err := net.DialTimeout("tcp", "gw.intra.lan:8551", time.Duration(3)*time.Second)
+	if log.Check(log.WarnLevel, "Connecting local Kurjun", err) {
+		Management.Kurjun = "http://repo.critical-factor.com:8081/rest/kurjun/templates"
 	}
 }
