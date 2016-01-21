@@ -124,6 +124,7 @@ public class CreateContainerTask implements Callable<ContainerHostInfo>
             //TODO sign CH key with PEK identified by LocalPeerId+environmentId
             //at this point the CH key is already in the KeyStore and might be just updated.
         }
+
         LOG.info( String.format( "Container '%s' successfully created.", hostname ) );
         LOG.debug( hostInfo.toString() );
         return hostInfo;

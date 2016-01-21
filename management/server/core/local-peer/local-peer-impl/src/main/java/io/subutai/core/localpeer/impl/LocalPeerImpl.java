@@ -1806,11 +1806,31 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
+    private void cleanup( final EnvironmentId environmentId ) throws PeerException
+    {
+        Vni vni = findVniByEnvironmentId( environmentId.getId() );
+        for ( ResourceHost resourceHost : getResourceHosts() )
+        {
+            try
+            {
+                resourceHost.cleanup( environmentId, vni.getVlan() );
+            }
+            catch ( ResourceHostException e )
+            {
+                throw new PeerException( e.getMessage() );
+            }
+        }
+    }
+
+
     @RolesAllowed( "Environment-Management|Delete" )
     @Override
     public void removeP2PConnection( final EnvironmentId environmentId ) throws PeerException
     {
+        cleanup(environmentId);
+
         Collection<TunnelEntity> tunnels = tunnelDataService.findByEnvironmentId( environmentId );
+
 
         for ( TunnelEntity tunnel : tunnels )
         {
