@@ -53,9 +53,10 @@ func ProxyDel(vlan, node string, domain bool) {
 			delNode(vlan, node)
 		}
 		restart()
-	} else {
-		os.Exit(1)
 	}
+	// else {
+	// 	os.Exit(1)
+	// }
 }
 
 func ProxyCheck(vlan, node string, domain bool) {
@@ -84,31 +85,31 @@ func restart() {
 
 func addDomain(vlan, domain, cert string) {
 	if _, err := os.Stat(confinc); os.IsNotExist(err) {
-		err := os.MkdirAll(confinc,0755)
+		err := os.MkdirAll(confinc, 0755)
 		if err != nil {
- 			log.Info("Cannot create nginx-include directory "+confinc)
-		}		
+			log.Info("Cannot create nginx-include directory " + confinc)
+		}
 	}
 	if cert != "" && gpg.ValidatePem(cert) {
-        	if _, err := os.Stat(config.Agent.DataPrefix+"/web/ssl/"); os.IsNotExist(err) {
-                	err := os.MkdirAll(config.Agent.DataPrefix+"/web/ssl/",0755)
-                	if err != nil {
-                        	log.Info("Cannot create ssl directory "+config.Agent.DataPrefix+"/web/ssl/")
+		if _, err := os.Stat(config.Agent.DataPrefix + "/web/ssl/"); os.IsNotExist(err) {
+			err := os.MkdirAll(config.Agent.DataPrefix+"/web/ssl/", 0755)
+			if err != nil {
+				log.Info("Cannot create ssl directory " + config.Agent.DataPrefix + "/web/ssl/")
 				os.Exit(1)
-                	}
-        	}
+			}
+		}
 		lib.CopyFile(conftmpl+"vhost-ssl.example", confinc+vlan+".conf")
 		crt, key := gpg.ParsePem(cert)
 		err := ioutil.WriteFile(config.Agent.DataPrefix+"web/ssl/"+domain+".crt", crt, 0644)
-    		if err != nil {
-        		log.Info("Cannot create crt file "+config.Agent.DataPrefix+"web/ssl/"+domain+".crt")
+		if err != nil {
+			log.Info("Cannot create crt file " + config.Agent.DataPrefix + "web/ssl/" + domain + ".crt")
 			os.Exit(1)
-    		}
+		}
 		err = ioutil.WriteFile(config.Agent.DataPrefix+"web/ssl/"+domain+".key", key, 0644)
-    		if err != nil {
-			log.Info("Cannot create key file "+config.Agent.DataPrefix+"web/ssl/"+domain+".key")
-                        os.Exit(1)
-    		}
+		if err != nil {
+			log.Info("Cannot create key file " + config.Agent.DataPrefix + "web/ssl/" + domain + ".key")
+			os.Exit(1)
+		}
 		addLine(confinc+vlan+".conf", "ssl_certificate /var/lib/apps/subutai-mng/current/web/ssl/DOMAIN.crt;",
 			"	ssl_certificate "+config.Agent.DataPrefix+"web/ssl/"+domain+".crt;", true)
 		addLine(confinc+vlan+".conf", "ssl_certificate_key /var/lib/apps/subutai-mng/current/web/ssl/DOMAIN.key;",
@@ -129,12 +130,12 @@ func addNode(vlan, node string) {
 func delDomain(vlan string) {
 	domain := getDomain(vlan)
 	os.Remove(confinc + vlan + ".conf")
-	if _, err := os.Stat(config.Agent.DataPrefix+"web/ssl/"+domain+".crt"); err == nil {
-		os.Remove(config.Agent.DataPrefix+"web/ssl/"+domain+".crt")
+	if _, err := os.Stat(config.Agent.DataPrefix + "web/ssl/" + domain + ".crt"); err == nil {
+		os.Remove(config.Agent.DataPrefix + "web/ssl/" + domain + ".crt")
 	}
-        if _, err := os.Stat(config.Agent.DataPrefix+"web/ssl/"+domain+".key"); err == nil {
-                os.Remove(config.Agent.DataPrefix+"web/ssl/"+domain+".key")
-        }
+	if _, err := os.Stat(config.Agent.DataPrefix + "web/ssl/" + domain + ".key"); err == nil {
+		os.Remove(config.Agent.DataPrefix + "web/ssl/" + domain + ".key")
+	}
 }
 
 func delNode(vlan, node string) {
@@ -162,7 +163,7 @@ func getDomain(vlan string) string {
 }
 
 func isVlanExist(vlan string) bool {
-	if _, err := os.Stat(confinc+vlan+".conf"); err == nil {
+	if _, err := os.Stat(confinc + vlan + ".conf"); err == nil {
 		return true
 	} else {
 		return false
@@ -174,7 +175,7 @@ func isNodeExist(vlan, node string) bool {
 }
 
 func nodeCount(vlan string) int {
-	f, err := ioutil.ReadFile(confinc+vlan+".conf")
+	f, err := ioutil.ReadFile(confinc + vlan + ".conf")
 	if !log.Check(log.DebugLevel, "Cannot read file "+confinc+vlan+".conf", err) {
 		return strings.Count(string(f), "server ")
 	}
