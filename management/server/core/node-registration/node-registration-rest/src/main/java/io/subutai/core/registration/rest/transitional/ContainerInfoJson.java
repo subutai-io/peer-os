@@ -104,6 +104,10 @@ public class ContainerInfoJson implements ContainerInfo
     public HostInterfaces getHostInterfaces()
     {
         HostInterfaces result = new HostInterfaces();
+        if ( this.interfaces == null )
+        {
+            return result;
+        }
         for ( HostInterface hostInterface : this.interfaces )
         {
             HostInterfaceModel model = new HostInterfaceModel( hostInterface );

@@ -814,9 +814,9 @@ public class RemotePeerImpl implements RemotePeer
     {
         Preconditions.checkNotNull( p2PCredentials, "Invalid p2p credentials" );
 
-
         new PeerWebClient( peerInfo.getIp(), provider )
-                .resetP2PSecretKey( p2PCredentials.getP2pHash(), p2PCredentials.getP2pSecretKey() );
+                .resetP2PSecretKey( p2PCredentials.getP2pHash(), p2PCredentials.getP2pSecretKey(),
+                        p2PCredentials.getP2pTtlSeconds() );
     }
 
 

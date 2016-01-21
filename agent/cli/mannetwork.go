@@ -6,8 +6,29 @@ import (
 	"strings"
 	"subutai/config"
 	"subutai/lib/net"
+	"subutai/lib/net/p2p"
 	"subutai/log"
 )
+
+func P2P(c, d, u, l, p bool, args []string) {
+	if c {
+		if len(args) > 8 {
+			p2p.Create(args[4], args[5], args[6], args[7], args[8])
+		}
+	} else if u {
+		if len(args) > 6 {
+			p2p.UpdateKey(args[4], args[5], args[6])
+		}
+	} else if d {
+		if len(args) > 4 {
+			p2p.Remove(args[4])
+		}
+	} else if p {
+		p2p.Peers(args[4])
+	} else if l {
+		p2p.Print()
+	}
+}
 
 func LxcManagementNetwork(args []string) {
 	if len(args) < 3 {
@@ -18,8 +39,6 @@ func LxcManagementNetwork(args []string) {
 		showFlow(args[3])
 	case "-p", "--showport":
 		showPort(args[3])
-	case "-L", "--listn2n":
-		net.PrintN2NTunnels()
 	case "-D", "--deletegateway":
 		net.DeleteGateway(args[3])
 	case "-S", "--listopenedtap":
@@ -28,14 +47,10 @@ func LxcManagementNetwork(args []string) {
 		listVNIMap()
 	case "-r", "--removetunnel":
 		removeTunnel(args[3])
-	case "-e", "--reloadn2n":
-		reloadN2N(args[3], args[4])
 	case "-T", "--creategateway":
 		net.CreateGateway(args[3], args[4])
 	case "-M", "--removevni":
 		delVNI(args[3], args[4], args[5])
-	case "-R", "--removen2n":
-		net.RemoveP2PTunnel(args[4])
 	case "-E", "--reservvni":
 		reservVNI(args[3], args[4], args[5])
 	case "-m", "--createvnimap":
@@ -57,8 +72,7 @@ func LxcManagementNetwork(args []string) {
 		} else {
 			net.DeleteFlow(args[3], args[4])
 		}
-	case "-N", "--addn2n":
-		net.CreateP2PTunnel(args[5], args[6], args[7])
+
 	case "-Z", "--vniop":
 		switch args[3] {
 		case "deleteall":
@@ -181,8 +195,4 @@ func reservVNI(vni, vlan, envid string) {
 	net.MakeReservation(vni, vlan, envid)
 	log.Info(vni + " " + vlan + " " + envid + " is reserved")
 
-}
-
-func reloadN2N(interfaceName, communityName string) {
-	log.Info("This function is not implemented yet")
 }

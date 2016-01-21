@@ -199,7 +199,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
-            return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( e.getMessage() ) ).build();
+            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
         }
 
         return Response.ok( JsonUtil.toJson( environmentDto ) ).build();
