@@ -1716,6 +1716,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     private void cleanup( final EnvironmentId environmentId ) throws PeerException
     {
         Vni vni = findVniByEnvironmentId( environmentId.getId() );
+        if ( vni == null )
+        {
+            return;
+        }
         for ( ResourceHost resourceHost : getResourceHosts() )
         {
             try
@@ -1736,7 +1740,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         Preconditions.checkNotNull( environmentId );
 
-        cleanup(environmentId);
+        cleanup( environmentId );
 
         Collection<TunnelEntity> tunnels = tunnelDataService.findByEnvironmentId( environmentId );
 
