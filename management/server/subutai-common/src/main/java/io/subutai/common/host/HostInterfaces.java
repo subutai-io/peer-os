@@ -60,7 +60,10 @@ public class HostInterfaces
     {
         Preconditions.checkNotNull( name );
         HostInterfaceModel result = NullHostInterface.getInstance();
-
+        if ( interfaces == null )
+        {
+            return result;
+        }
         for ( Iterator<HostInterfaceModel> i = interfaces.iterator();
               i.hasNext() && result instanceof NullHostInterface; )
         {

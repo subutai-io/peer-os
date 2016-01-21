@@ -1,23 +1,36 @@
 package io.subutai.common.protocol;
 
 
+import org.codehaus.jackson.annotate.JsonProperty;
+
+
 /**
  * P2P config
  */
 public class P2PConfig
 {
+    @JsonProperty( "peerId" )
     private String peerId;
+    @JsonProperty( "interfaceName" )
     private String interfaceName;
+    @JsonProperty( "communityName" )
     private String communityName;
+    @JsonProperty( "address" )
     private String address;
+    @JsonProperty( "secretKey" )
     private String secretKey;
+    @JsonProperty( "environmentId" )
     private String environmentId;
+    @JsonProperty( "secretKeyTtlSec" )
     private long secretKeyTtlSec;
 
 
-    public P2PConfig( final String peerId, final String environmentId, final String interfaceName,
-                      final String communityName, final String address, final String secretKey,
-                      final long secretKeyTtlSec )
+    public P2PConfig( @JsonProperty( "peerId" ) final String peerId,
+                      @JsonProperty( "environmentId" ) final String environmentId,
+                      @JsonProperty( "interfaceName" ) final String interfaceName,
+                      @JsonProperty( "communityName" ) final String communityName, final String address,
+                      @JsonProperty( "secretKey" ) final String secretKey,
+                      @JsonProperty( "secretKeyTtlSec" ) final long secretKeyTtlSec )
     {
         this.peerId = peerId;
         this.environmentId = environmentId;
