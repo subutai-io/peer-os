@@ -12,9 +12,8 @@ Given the user enters login and password: 'admin', 'secret'
 And the user clicks on the button: Login
 When the user clicks on the menu item: Monitoring
 Then the user should observe web elements on: Monitoring page
-When the user clicks on the menu item: Blueprints
-Then the user should observe web elements on: Blueprints page
-When the user clicks on the menu item: Environments
+When the user clicks on the menu item: Environment
+And the user clicks on the menu item: Environments
 Then the user should observe web elements on: Environments page
 When the user clicks on the menu item: Containers
 Then the user should observe web elements on: Containers page
@@ -39,3 +38,7 @@ When the user clicks on the menu item: Tracker
 Then the user should observe web elements on: Tracker page
 When the user clicks on the menu item: Plugins
 Then the user should observe web elements on: Plugins page
+When the user clicks on the menu item: Plugin Integrator
+Then the user should observe web elements on: Plugin Integrator page
+When the user clicks on the menu item: About
+Then the user should observe web elements on: About page

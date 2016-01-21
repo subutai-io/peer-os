@@ -4,16 +4,15 @@ import net.serenitybdd.core.annotations.findby.FindBy;
 import net.serenitybdd.core.pages.PageObject;
 import net.serenitybdd.core.pages.WebElementFacade;
 
-public class EnvironmentsPage extends PageObject {
+public class PluginIntegratorPage extends PageObject {
 
     //region WEB ELEMENTS: Fields
 
     //endregion
 
     //region WEB ELEMENTS: Buttons
-
-    @FindBy(id = "subt-button__create-blueprint-first")
-    public WebElementFacade buttonCreateEnvironment;
+    @FindBy(xpath = "*//button[@class=\"b-btn b-btn_green b-btn_header-button\"]")
+    public WebElementFacade buttonUploadNewPlugin;
 
     //endregion
 
@@ -47,8 +46,8 @@ public class EnvironmentsPage extends PageObject {
 
     //region WEB ELEMENTS: Headers
 
-    @FindBy(xpath = "*//h1[contains(text(),\"Environment Manager\")]")
-    public WebElementFacade headerEnvironments;
+    @FindBy(xpath = "*//h1[contains(text(),\"Plugin Integrator\")]")
+    public WebElementFacade headerPluginIntegrator;
 
     //endregion
 }

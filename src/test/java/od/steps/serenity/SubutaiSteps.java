@@ -31,6 +31,8 @@ public class SubutaiSteps extends ScenarioSteps {
     ResourceNodesPage resourceNodesPage;
     TrackerPage trackerPage;
     PluginsPage pluginsPage;
+    PluginIntegratorPage pluginIntegratorPage;
+    AboutPage aboutPage;
     //endregion
 
     //region ACTION: Open Page
@@ -160,6 +162,16 @@ public class SubutaiSteps extends ScenarioSteps {
         commonPage.linkPlugins.click();
     }
 
+    @Step
+    public void clickOnMenuItemPluginIntegrator() {
+        commonPage.linkPluginIntegrator.click();
+    }
+
+    @Step
+    public void clickOnMenuItemAbout() {
+        commonPage.linkAbout.click();
+    }
+
     //endregion
 
     //region ACTION: Wait
@@ -281,6 +293,26 @@ public class SubutaiSteps extends ScenarioSteps {
     @Step
     public void userShouldObservePluginItems() {
         assertThat(pluginsPage.pluginItems.isVisible(), is(true));
+    }
+
+    @Step
+    public void userShouldObserveHeaderPluginIntegrator() {
+        assertThat(pluginIntegratorPage.headerPluginIntegrator.isVisible(), is(true));
+    }
+
+    @Step
+    public void userShouldObserveButtonUploadNewPlugin() {
+        assertThat(pluginIntegratorPage.buttonUploadNewPlugin.isVisible(), is(true));
+    }
+
+    @Step
+    public void userShouldObserveHeaderAbout() {
+        assertThat(aboutPage.headerAbout.isVisible(), is(true));
+    }
+
+    @Step
+    public void userShouldObserveButtonCreateEnvironment() {
+        assertThat(environmentsPage.buttonCreateEnvironment.isVisible(), is(true));
     }
     //endregion
 

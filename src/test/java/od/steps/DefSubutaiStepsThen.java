@@ -34,6 +34,7 @@ public class DefSubutaiStepsThen {
     public void user_observe_environments(){
         subutaiSteps.userShouldObserveHeaderEnvironments();
         subutaiSteps.userShouldObserveFieldSearch();
+        subutaiSteps.userShouldObserveButtonCreateEnvironment();
     }
 
     @Then("the user should observe web elements on: Containers page")
@@ -86,6 +87,17 @@ public class DefSubutaiStepsThen {
     @Then("the user should observe web elements on: Plugins page")
     public void user_observe_plugins() {
         subutaiSteps.userShouldObserveHeaderPlugins();
-        subutaiSteps.userShouldObservePluginItems();
+        //subutaiSteps.userShouldObservePluginItems();
+    }
+
+    @Then("the user should observe web elements on: Plugin Integrator page")
+    public void user_observe_plugin_integrator(){
+        subutaiSteps.userShouldObserveHeaderPluginIntegrator();
+        subutaiSteps.userShouldObserveButtonUploadNewPlugin();
+    }
+
+    @Then("the user should observe web elements on: About page")
+    public void user_observe_about(){
+        subutaiSteps.userShouldObserveHeaderAbout();
     }
 }

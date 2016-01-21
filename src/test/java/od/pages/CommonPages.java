@@ -65,6 +65,12 @@ public class CommonPages extends PageObject {
     @FindBy(id = "subt-link__plugisns")
     public WebElementFacade linkPlugins;
 
+    @FindBy(id="subt-link__plugin_integrator")
+    public WebElementFacade linkPluginIntegrator;
+
+    @FindBy(id = "subt-link__about")
+    public WebElementFacade linkAbout;
+
     //endregion
 
     //region WEB ELEMENTS: Tables
