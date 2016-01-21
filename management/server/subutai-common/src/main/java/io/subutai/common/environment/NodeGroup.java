@@ -7,7 +7,6 @@ import com.google.common.base.Strings;
 
 import io.subutai.common.gson.required.GsonRequired;
 import io.subutai.common.peer.ContainerSize;
-import io.subutai.common.protocol.PlacementStrategy;
 
 
 /**
