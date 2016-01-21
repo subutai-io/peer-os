@@ -50,10 +50,14 @@ func Print() {
 }
 
 func Remove(hash string) {
-	log.Check(log.FatalLevel, "Removing p2p interface", exec.Command("p2p", "-stop", "-hash", hash).Run())
+	if log.Check(log.WarnLevel, "Removing p2p interface", exec.Command("p2p", "-stop", "-hash", hash).Run()) {
+		return
+	}
 
 	file, err := os.Open(config.Agent.DataPrefix + "/var/subutai-network/p2p.txt")
-	log.Check(log.FatalLevel, "Opening p2p.txt", err)
+	if log.Check(log.WarnLevel, "Opening p2p.txt", err) {
+		return
+	}
 	scanner := bufio.NewScanner(bufio.NewReader(file))
 	newconf := ""
 	for scanner.Scan() {
