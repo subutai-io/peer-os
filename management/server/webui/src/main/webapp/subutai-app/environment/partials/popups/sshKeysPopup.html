@@ -1,0 +1,11 @@
+<div class="b-popup b-popup_log">
+  <div class="b-popup__header">
+    SSH Keys
+    <a href ng-click="closeThisDialog()">
+      <img src="assets/elements/buttons/b-icon-close.svg" class="b-icon g-right"/>
+    </a>
+  </div>
+  <div ng-repeat="sshKey as environmentViewCtrl.sshKeys">
+    {{ sshKey }}
+  </div>
+</div>
