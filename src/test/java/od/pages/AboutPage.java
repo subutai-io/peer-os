@@ -4,16 +4,13 @@ import net.serenitybdd.core.annotations.findby.FindBy;
 import net.serenitybdd.core.pages.PageObject;
 import net.serenitybdd.core.pages.WebElementFacade;
 
-public class EnvironmentsPage extends PageObject {
+public class AboutPage extends PageObject {
 
     //region WEB ELEMENTS: Fields
 
     //endregion
 
     //region WEB ELEMENTS: Buttons
-
-    @FindBy(id = "subt-button__create-blueprint-first")
-    public WebElementFacade buttonCreateEnvironment;
 
     //endregion
 
@@ -22,6 +19,8 @@ public class EnvironmentsPage extends PageObject {
     //endregion
 
     //region WEB ELEMENTS: Links
+
+
 
     //endregion
 
@@ -47,8 +46,8 @@ public class EnvironmentsPage extends PageObject {
 
     //region WEB ELEMENTS: Headers
 
-    @FindBy(xpath = "*//h1[contains(text(),\"Environment Manager\")]")
-    public WebElementFacade headerEnvironments;
+    @FindBy(xpath = "*//span[contains(text(),\"About\")]")
+    public WebElementFacade headerAbout;
 
     //endregion
 }

@@ -14,9 +14,13 @@ public class DefSubutaiStepsWhen {
         subutaiSteps.clickOnMenuItemMonitoring();
     }
 
+    @When("the user clicks on the menu item: Environment")
+    public void user_click_environment(){
+        subutaiSteps.clickOnMenuEnvironment();
+    }
+
     @When("the user clicks on the menu item: Blueprints")
     public void user_clicks_blueprints() {
-        subutaiSteps.clickOnMenuEnvironment();
         subutaiSteps.clickOnMenuItemBlueprints();
     }
 
@@ -86,5 +90,15 @@ public class DefSubutaiStepsWhen {
     @When("the user clicks on the menu item: Plugins")
     public void user_clicks_plugins() {
         subutaiSteps.clickOnMenuItemPlugins();
+    }
+
+    @When("the user clicks on the menu item: Plugin Integrator")
+    public void user_clicks_plugin_integrator(){
+        subutaiSteps.clickOnMenuItemPluginIntegrator();
+    }
+
+    @When("the user clicks on the menu item: About")
+    public void user_click_about(){
+        subutaiSteps.clickOnMenuItemAbout();
     }
 }
