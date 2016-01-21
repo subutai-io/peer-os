@@ -34,6 +34,7 @@ import io.subutai.core.environment.api.exception.EnvironmentManagerException;
  */
 public interface EnvironmentManager
 {
+    //TODO implement startContainer, stopContainer and resetP2PSecretKey methods
 
     /**
      * Returns all existing environments
@@ -100,7 +101,7 @@ public interface EnvironmentManager
      * @param sshKey - ssh key content
      * @param async - indicates whether ssh key is added synchronously or asynchronously to the calling party
      */
-    void addSshKey( final String environmentId, final String sshKey, final boolean async )
+    void addSshKey( String environmentId, String sshKey, boolean async )
             throws EnvironmentNotFoundException, EnvironmentModificationException;
 
     /**
@@ -110,7 +111,17 @@ public interface EnvironmentManager
      * @param sshKey - ssh key content
      * @param async - indicates whether ssh key is removed synchronously or asynchronously to the calling party
      */
-    void removeSshKey( final String environmentId, final String sshKey, final boolean async )
+    void removeSshKey( String environmentId, String sshKey, boolean async )
+            throws EnvironmentNotFoundException, EnvironmentModificationException;
+
+    /**
+     * Allows to change p2p network's secret key
+     *
+     * @param environmentId - environment id
+     * @param newP2pSecretKey - new secret key
+     * @param p2pSecretKeyTtlSec - new secret key's time-to-live in seconds
+     */
+    void resetP2PSecretKey( String environmentId, String newP2pSecretKey, long p2pSecretKeyTtlSec, boolean async )
             throws EnvironmentNotFoundException, EnvironmentModificationException;
 
     /**
@@ -263,7 +274,7 @@ public interface EnvironmentManager
      *
      * @return port for ssh connection
      */
-    int setupContainerSsh( final String containerHostId, final String environmentId )
+    int setupContainerSsh( String containerHostId, String environmentId )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException;
 
     void removeContainerFromEnvironmentDomain( String containerHostId, String environmentId )

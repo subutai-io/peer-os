@@ -9,6 +9,7 @@ import org.apache.karaf.shell.commands.Command;
 
 import com.google.common.base.Preconditions;
 
+import io.subutai.common.settings.Common;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
@@ -21,27 +22,21 @@ public class SetupP2PCommand extends SubutaiShellCommandSupport
 
     private final NetworkManager networkManager;
 
-    @Argument( index = 0, name = "super node ip", required = true, multiValued = false,
-            description = "super node ip" )
-    String superNodeIp;
-    @Argument( index = 1, name = "super node port", required = true, multiValued = false,
-            description = "super node port" )
-    int superNodePort;
-    @Argument( index = 2, name = "interface name", required = true, multiValued = false,
+    @Argument( index = 0, name = "interface name", required = true, multiValued = false,
             description = "interface name" )
     String interfaceName;
-    @Argument( index = 3, name = "community name", required = true, multiValued = false,
+    @Argument( index = 1, name = "community name", required = true, multiValued = false,
             description = "community name" )
     String communityName;
-    @Argument( index = 4, name = "local peer IP", required = true, multiValued = false,
+    @Argument( index = 2, name = "local peer IP", required = true, multiValued = false,
             description = "local peer IP" )
     String localIp;
-    @Argument( index = 5, name = "key type", required = true, multiValued = false,
-            description = "type of key" )
-    String keyType;
-    @Argument( index = 6, name = "key file path", required = true, multiValued = false,
-            description = "path to key file" )
-    String pathToKeyFile;
+    @Argument( index = 3, name = "secret key", required = true, multiValued = false,
+            description = "p2p secret key" )
+    String secretKey;
+    @Argument( index = 4, name = "secret key ttl", required = false, multiValued = false,
+            description = "p2p secret key tie-to-live in seconds" )
+    Long secretKeyTtl = Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC;
 
 
     public SetupP2PCommand( final NetworkManager networkManager )
@@ -58,9 +53,7 @@ public class SetupP2PCommand extends SubutaiShellCommandSupport
 
         try
         {
-            networkManager
-                    .setupP2PConnection( superNodeIp, superNodePort, interfaceName, communityName, localIp, keyType,
-                            pathToKeyFile );
+            networkManager.setupP2PConnection( interfaceName, localIp, communityName, secretKey, secretKeyTtl );
             System.out.println( "OK" );
         }
         catch ( NetworkManagerException e )

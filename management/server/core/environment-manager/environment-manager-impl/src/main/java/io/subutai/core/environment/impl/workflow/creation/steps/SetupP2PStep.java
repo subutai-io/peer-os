@@ -20,15 +20,13 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.net.util.SubnetUtils;
 
-import com.google.common.collect.Sets;
-
 import io.subutai.common.environment.Topology;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaceModel;
-import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.P2PConfig;
+import io.subutai.common.settings.Common;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
@@ -48,7 +46,7 @@ public class SetupP2PStep
     private final PeerManager peerManager;
 
 
-    public SetupP2PStep( final Topology topology, final EnvironmentImpl environment, final PeerManager peerManager)
+    public SetupP2PStep( final Topology topology, final EnvironmentImpl environment, final PeerManager peerManager )
     {
         this.topology = topology;
         this.env = environment;
@@ -87,8 +85,9 @@ public class SetupP2PStep
             List<P2PConfig> result = new ArrayList<>( peers.size() );
             for ( Peer peer : peers )
             {
-                P2PConfig config = new P2PConfig( peer.getId(), env.getId(), env.getSuperNode(), env.getSuperNodePort(),
-                        env.getTunnelInterfaceName(), env.getTunnelCommunityName(), addresses[counter], sharedKey );
+                P2PConfig config = new P2PConfig( peer.getId(), env.getId(), env.getTunnelInterfaceName(),
+                        env.getTunnelCommunityName(), addresses[counter], sharedKey,
+                        Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC );
                 p2pCompletionService.submit( new SetupP2PConnectionTask( peer, config ) );
                 counter++;
             }

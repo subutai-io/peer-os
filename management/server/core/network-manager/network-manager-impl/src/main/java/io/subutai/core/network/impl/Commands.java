@@ -55,33 +55,32 @@ public class Commands
     //management host commands
 
 
-    public RequestBuilder getSetupP2PConnectionCommand( String superNodeIp, int superNodePort, String interfaceName,
-                                                        String communityName, String localIp, String keyType,
-                                                        String pathToKeyFile )
+    public RequestBuilder getSetupP2PConnectionCommand( String interfaceName, String localIp, String communityName,
+                                                        String secretKey, long secretKeyTtlSec )
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs(
-                Lists.newArrayList( "-N", superNodeIp, String.valueOf( superNodePort ), interfaceName, communityName,
-                        localIp, keyType, pathToKeyFile ) ).withTimeout( 15 ).daemon();
+                Lists.newArrayList( "p2p", "-c", interfaceName, localIp, communityName, secretKey,
+                        String.valueOf( secretKeyTtlSec ) ) );
     }
 
 
-    public RequestBuilder getRemoveP2PConnectionCommand( String interfaceName, String communityName )
+    public RequestBuilder getRemoveP2PConnectionCommand( String communityName )
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
-                .withCmdArgs( Lists.newArrayList( "-R", interfaceName, communityName ) );
+                .withCmdArgs( Lists.newArrayList( "p2p", "-d", communityName ) );
     }
 
 
-    public RequestBuilder getResetP2PSecretKey( String p2pHash, String newSecretKey )
+    public RequestBuilder getResetP2PSecretKey( String p2pHash, String newSecretKey, long ttlSeconds )
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
-                .withCmdArgs( Lists.newArrayList( "-e", p2pHash, newSecretKey ) );
+                .withCmdArgs( Lists.newArrayList( "p2p", "-u", p2pHash, newSecretKey, String.valueOf( ttlSeconds ) ) );
     }
 
 
     public RequestBuilder getListP2PConnectionsCommand()
     {
-        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs( Lists.newArrayList( "-L" ) );
+        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs( Lists.newArrayList( "p2p", "-l" ) );
     }
 
 

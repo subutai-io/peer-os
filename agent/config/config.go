@@ -64,7 +64,7 @@ const defaultConfig = `
 	version = 4.0.0
 	gpgUser =
 	gpgPassword = 12345678
-	debug = false
+	debug = true
 	appPrefix = /apps/subutai/current/
 	dataPrefix = /var/lib/apps/subutai/current/
 	lxcPrefix = /mnt/lib/lxc/    
@@ -139,13 +139,15 @@ func init() {
 	name, _ := os.Hostname()
 	config.Agent.GpgUser = name + "@subutai.io"
 
-	if config.Agent.Debug {
-		log.Level(log.DebugLevel)
-	}
-
 	Misc = config.Misc
 	Agent = config.Agent
 	Broker = config.Broker
 	Influxdb = config.Influxdb
 	Management = config.Management
+}
+
+func InitAgentDebug() {
+	if config.Agent.Debug {
+		log.Level(log.DebugLevel)
+	}
 }
