@@ -261,7 +261,7 @@ public class Commands
 
         return new RequestBuilder( String.format(
                 "mkdir -p '%1$s' && " + "echo '%3$s' >> '%2$s' && " + "chmod 700 -R '%1$s' && "
-                        + "awk -i inplace '!x[$0]++' '%2$s'", SSH_FOLDER, SSH_FILE, key ) );
+                        + "sort -u '%2$s' -o '%2$s'", SSH_FOLDER, SSH_FILE, key ) );
     }
 
 
