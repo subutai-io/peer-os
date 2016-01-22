@@ -1,9 +1,6 @@
 package io.subutai.core.environment.rest.ui;
 
 
-import java.util.List;
-import java.util.UUID;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
@@ -57,15 +54,12 @@ public interface RestService
 
     @POST
     @Path( "requisites" )
-    Response setupRequisites( @FormParam( "topology" ) String topologyJson );
+    Response setupRequisites( @FormParam( "name" ) String name, @FormParam( "topology" ) String topologyJson );
 
     @POST
     @Path( "build" )
     Response startEnvironmentBuild( @FormParam( "environmentId" ) String environmentId,
                                     @FormParam( "signedMessage" ) String signedMessage );
-
-    //    @POST
-    //    Response createEnvironment( @FormParam( "blueprint_json" ) String blueprintJson );
 
     @POST
     @Path( "grow" )
@@ -98,7 +92,7 @@ public interface RestService
 
     @GET
     @Path( "{environmentId}/domain" )
-    public Response getEnvironmentDomain( @PathParam( "environmentId" ) String environmentId );
+    Response getEnvironmentDomain( @PathParam( "environmentId" ) String environmentId );
 
 
     @GET
