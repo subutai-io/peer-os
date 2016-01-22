@@ -32,8 +32,8 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
     public enum EnvironmentDestructionPhase
     {
         INIT,
-        DESTROY_CONTAINERS,
-        CLEANUP_NETWORKING,
+/*        DESTROY_CONTAINERS,
+        CLEANUP_NETWORKING,*/
         CLEANUP_P2P,
         REMOVE_KEYS,
         FINALIZE
@@ -78,48 +78,6 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
 
             environment = environmentManager.saveOrUpdate( environment );
 
-            return EnvironmentDestructionPhase.DESTROY_CONTAINERS;
-        }
-        catch ( Exception e )
-        {
-            setError( e );
-
-            return null;
-        }
-    }
-
-
-    public EnvironmentDestructionPhase DESTROY_CONTAINERS()
-    {
-        operationTracker.addLog( "Destroying containers" );
-
-        try
-        {
-            new DestroyContainersStep( environment, environmentManager, forceMetadataRemoval ).execute();
-
-            environment = environmentManager.saveOrUpdate( environment );
-
-            return EnvironmentDestructionPhase.CLEANUP_NETWORKING;
-        }
-        catch ( Exception e )
-        {
-            setError( e );
-
-            return null;
-        }
-    }
-
-
-    public EnvironmentDestructionPhase CLEANUP_NETWORKING()
-    {
-        operationTracker.addLog( "Cleaning up networking" );
-
-        try
-        {
-            new CleanUpNetworkStep( environment ).execute();
-
-            environment = environmentManager.saveOrUpdate( environment );
-
             return EnvironmentDestructionPhase.REMOVE_KEYS;
         }
         catch ( Exception e )
@@ -129,6 +87,48 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
             return null;
         }
     }
+
+
+//    public EnvironmentDestructionPhase DESTROY_CONTAINERS()
+//    {
+//        operationTracker.addLog( "Destroying containers" );
+//
+//        try
+//        {
+//            new DestroyContainersStep( environment, environmentManager, forceMetadataRemoval ).execute();
+//
+//            environment = environmentManager.saveOrUpdate( environment );
+//
+//            return EnvironmentDestructionPhase.CLEANUP_NETWORKING;
+//        }
+//        catch ( Exception e )
+//        {
+//            setError( e );
+//
+//            return null;
+//        }
+//    }
+//
+//
+//    public EnvironmentDestructionPhase CLEANUP_NETWORKING()
+//    {
+//        operationTracker.addLog( "Cleaning up networking" );
+//
+//        try
+//        {
+//            new CleanUpNetworkStep( environment ).execute();
+//
+//            environment = environmentManager.saveOrUpdate( environment );
+//
+//            return EnvironmentDestructionPhase.REMOVE_KEYS;
+//        }
+//        catch ( Exception e )
+//        {
+//            setError( e );
+//
+//            return null;
+//        }
+//    }
 
 
     public EnvironmentDestructionPhase REMOVE_KEYS()

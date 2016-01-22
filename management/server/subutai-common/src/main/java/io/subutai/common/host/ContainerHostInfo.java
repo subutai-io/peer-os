@@ -21,4 +21,5 @@ public interface ContainerHostInfo extends HostInfo
      * Returns lxc container name
      */
     public String getContainerName();
+
 }

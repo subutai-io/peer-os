@@ -1,6 +1,10 @@
+.b-popup .switch {
+	margin-left: 10px;
+}
+
 .switch {
-  background: #fff;
-  border: 1px solid #dfdfdf;
+  background: #E6E6E6;
+  border: 1px solid #CCCCCC;
   position: relative;
   display: inline-block;
   box-sizing: content-box;
