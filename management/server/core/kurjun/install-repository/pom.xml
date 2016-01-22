@@ -315,6 +315,18 @@
                         </configuration>
                     </execution>
                     
+                    <execution>
+                        <id>install_25</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <file>${lib.dir}/kurjun-quota-${ai.subut.kurjun.version}.jar</file>
+                            <pomFile>${lib.dir}/poms/kurjun-quota/${ai.subut.kurjun.version}/kurjun-quota-${ai.subut.kurjun.version}.pom</pomFile>
+                        </configuration>
+                    </execution>
+                    
                 </executions>
             </plugin>
             
