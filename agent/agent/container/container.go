@@ -2,6 +2,7 @@ package container
 
 import (
 	"bufio"
+	"fmt"
 	lxc "gopkg.in/lxc/go-lxc.v2"
 	"os"
 	"strconv"
@@ -98,7 +99,7 @@ func GetContainerIfaces(name string) []utils.Iface {
 
 	iface := new(utils.Iface)
 	iface.InterfaceName = "eth0"
-
+	fmt.Println(list)
 	for _, line := range list {
 		if iface.Mac != "" && strings.Contains(line, "inet addr") {
 			iface.Ip = strings.Split(strings.Fields(line)[1], ":")[1]

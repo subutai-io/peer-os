@@ -59,6 +59,15 @@ func setEnvironmentId(container, envId string) {
 	config.Sync()
 }
 
+func setStaticNetwork(name string) {
+	data, err := ioutil.ReadFile(config.Agent.LxcPrefix + name + "/rootfs/etc/network/interfaces")
+	log.Check(log.WarnLevel, "Opening /etc/network/interfaces", err)
+
+	err = ioutil.WriteFile(config.Agent.LxcPrefix+name+"/rootfs/etc/network/interfaces",
+		[]byte(strings.Replace(string(data), "dhcp", "manual", 1)), 0644)
+	log.Check(log.WarnLevel, "Setting internal eth0 interface to manual", err)
+}
+
 func addNetConf(c, addr string) {
 	ipvlan := strings.Fields(addr)
 	_, network, _ := net.ParseCIDR(ipvlan[0])
@@ -70,6 +79,7 @@ func addNetConf(c, addr string) {
 		{"lxc.network.mtu", "1340"},
 		{"#vlan_id", ipvlan[1]},
 	})
+	setStaticNetwork(c)
 }
 
 func setContainerUid(c string) {
