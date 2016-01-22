@@ -22,6 +22,7 @@ import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -460,6 +461,14 @@ public class TemplateManagerImpl implements TemplateManager
                 LOGGER.error( "Failed to remove remote host url: {}", url, e );
             }
         }
+    }
+
+
+    @Override
+    @RolesAllowed( "Template-Management|Read" )
+    public Set<String> getContexts()
+    {
+        return Collections.unmodifiableSet( CONTEXTS.stream().map( c -> c.getName() ).collect( Collectors.toSet() ) );
     }
 
 

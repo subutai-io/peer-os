@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import io.subutai.common.protocol.TemplateKurjun;
 
@@ -132,5 +133,11 @@ public interface TemplateManager
      * @param url URL of the remote repository
      */
     void removeRemoteRepository( URL url );
+    
+    /**
+     * Gets the set of contexts
+     * @return 
+     */
+    Set<String> getContexts();
 }
 
