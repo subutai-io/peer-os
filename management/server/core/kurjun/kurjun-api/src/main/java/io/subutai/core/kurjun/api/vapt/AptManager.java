@@ -4,6 +4,9 @@ package io.subutai.core.kurjun.api.vapt;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
+import java.util.List;
+
+import io.subutai.common.protocol.AptPackage;
 
 
 public interface AptManager
@@ -25,6 +28,9 @@ public interface AptManager
 
 
     URI upload( InputStream is );
+    
+    
+    List<AptPackage> list();
 
 
     boolean isCompressionTypeSupported( String packagesIndex );
