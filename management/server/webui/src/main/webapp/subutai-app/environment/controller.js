@@ -251,6 +251,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 
 	function setupStrategyRequisites(environment) {
 		LOADING_SCREEN();
+		ngDialog.closeAll();
 		environmentService.setupStrategyRequisites(
 			environment.name,
 			environment.strategy,
@@ -259,7 +260,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 			vm.selectedPeers
 		).success(function () {
 			vm.selectedPeers = [];
-			ngDialog.closeAll();
 			SweetAlert.swal("Success!!", "Your environment was successfully configured, please approve it.", "success");
 			vm.activeTab = 'pending';
 			LOADING_SCREEN("none");
@@ -275,8 +275,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 	}
 
 	function actionSwitch (data, type, full, meta) {
-/*		return '<input type = "checkbox" class = "check" ng-click="environmentViewCtrl.revoke(\''+data.id+'\') ng-checked =\'' + data.revoked + '\'>';*/
-		console.log (data);
 		if (typeof (data.revoke) === "boolean") {
 			return '<div class = "toggle"><input type = "checkbox" class="check" ng-click="environmentViewCtrl.revoke(\'' + data.id + '\')" ng-checked=\'' + data.revoke + '\'><div class = "toggle-bg"></div><b class = "b switch"></b></div>'
 		}
@@ -293,12 +291,10 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 		});
 	}
 
-/*	var refreshTable;
+	var refreshTable;
 	var reloadTableData = function() {
 		refreshTable = $timeout(function myFunction() {
-			if(typeof(vm.dtInstance.reloadData) == 'function') {
-				vm.dtInstance.reloadData(null, false);
-			}
+			loadEnvironments();
 			refreshTable = $timeout(reloadTableData, 30000);
 		}, 30000);
 	};
@@ -310,7 +306,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 	});
 
 
-	function createdRow(row, data, dataIndex) {
+	/*	function createdRow(row, data, dataIndex) {
 		$compile(angular.element(row).contents())($scope);
 	}
 
@@ -431,11 +427,11 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 	}
 
 	function buildEnvironment() {
+		ngDialog.closeAll();
+		vm.activeTab = "installed";
 		environmentService.startEnvironmentBuild (vm.currentEnvironment.id, encodeURIComponent(vm.currentEnvironment.relationDeclaration)).success(function (data) {
 			SweetAlert.swal("Success!", "Your environment has started building.", "success");
 			loadEnvironments();
-			vm.activeTab = "installed";
-			ngDialog.closeAll();
 		}).error(function (data) {
 			SweetAlert.swal("ERROR!", "Environment build error. Error: " + data.ERROR, "error");
 		});
