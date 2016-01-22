@@ -160,18 +160,18 @@ public class SshManager
         for ( ContainerHost host : containerHosts )
         {
             int i = 0;
-            StringBuilder keyBuilder = new StringBuilder();
+            StringBuilder keysString = new StringBuilder();
             for ( String key : keys )
             {
-                keyBuilder.append( key );
+                keysString.append( key );
                 i++;
                 if ( i % 5 == 0 || i == keys.size() )
                 {
                     try
                     {
-                        commandUtil.execute( commands.getAppendSshKeyCommand( keyBuilder.toString() ), host );
+                        commandUtil.execute( commands.getCreateNewAuthKeysFileCommand( keysString.toString() ), host );
 
-                        keyBuilder.setLength( 0 );
+                        keysString.setLength( 0 );
                     }
                     catch ( CommandException e )
                     {

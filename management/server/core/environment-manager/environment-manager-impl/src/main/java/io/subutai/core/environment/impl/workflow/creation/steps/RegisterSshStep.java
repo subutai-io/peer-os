@@ -29,7 +29,7 @@ public class RegisterSshStep
     }
 
 
-    public void execute() throws NetworkManagerException
+    public void execute( Set<String> additionalSshKeys ) throws NetworkManagerException
     {
         configureSsh( environment.getContainerHosts() );
     }
