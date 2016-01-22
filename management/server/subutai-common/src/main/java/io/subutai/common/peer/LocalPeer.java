@@ -185,5 +185,4 @@ public interface LocalPeer extends Peer
 
     List<ContainerHost> getPeerContainers( String peerId );
 
-    ControlNetworkConfig getControlNetworkConfig() throws PeerException;
 }

@@ -18,6 +18,8 @@ import io.subutai.common.protocol.ControlNetworkConfig;
  */
 public class ControlNetworkUtil
 {
+    public static final String EMPTY_NETWORK = "1.1.1.1";
+    public static final long DEFAULT_TTL = 10000;
     public static String NETWORK_MASK = "255.255.255.0";
     public static String NETWORK_PREFIX = "10.200";
     public static final String IP_PATTERN = "^10\\.200\\..*";
@@ -43,29 +45,47 @@ public class ControlNetworkUtil
         for ( ControlNetworkConfig config : configs )
         {
             final String address = config.getAddress();
-            if ( address == null || !info.isInRange( address ) || usedAddresses.contains( address ) || !fingerprint
-                    .equals( config.getFingerprint() ) )
+            if ( address == null )
             {
                 throw new ControlNetworkException(
-                        String.format( "Illegal control network config on peer '%s'.", config.getPeerId() ) );
+                        String.format( "Illegal control network config on peer '%s'. Address is null.",
+                                config.getPeerId() ) );
+            }
+            if ( !info.isInRange( address ) )
+            {
+                throw new ControlNetworkException(
+                        String.format( "Illegal control network config on peer '%s'. Address out of range.",
+                                config.getPeerId() ) );
+            }
+            if ( usedAddresses.contains( address ) )
+            {
+                throw new ControlNetworkException(
+                        String.format( "Illegal control network config on peer '%s'. Address already used.",
+                                config.getPeerId() ) );
+            }
+            if ( !fingerprint.equals( config.getFingerprint() ) )
+            {
+                throw new ControlNetworkException(
+                        String.format( "Illegal control network config on peer '%s'. Invalid fingerprint.",
+                                config.getPeerId() ) );
             }
             usedAddresses.add( address );
         }
     }
 
 
-    public boolean isClashes( ControlNetworkConfig config )
+    public boolean isClashes( final String fingerprint, ControlNetworkConfig config )
     {
         Preconditions.checkNotNull( config );
         Preconditions.checkNotNull( config.getUsedNetworks() );
 
-        return config.getUsedNetworks().contains( this.network );
+        return !fingerprint.equals( config.getFingerprint() ) && config.getUsedNetworks().contains( this.network );
     }
 
 
     public void add( final ControlNetworkConfig config ) throws ControlNetworkException
     {
-        if ( isClashes( config ) )
+        if ( isClashes( fingerprint, config ) )
         {
             throw new ControlNetworkException( "Control networks clashes." );
         }
@@ -99,8 +119,8 @@ public class ControlNetworkUtil
 
 
     public static List<ControlNetworkConfig> rebuild( final String fingerprint, final String network,
-                                                     final String secretKey, final long secretKeyTtl,
-                                                     List<ControlNetworkConfig> configs )
+                                                      final String secretKey, final long secretKeyTtl,
+                                                      List<ControlNetworkConfig> configs )
     {
         List<ControlNetworkConfig> result = new ArrayList<>();
         final String[] addresses = new SubnetUtils( network, NETWORK_MASK ).getInfo().getAllAddresses();
@@ -122,7 +142,7 @@ public class ControlNetworkUtil
         Set<String> networks = new HashSet<>();
         for ( ControlNetworkConfig config : configs )
         {
-            for (String s : config.getUsedNetworks())
+            for ( String s : config.getUsedNetworks() )
             {
                 networks.add( extractNetwork( s ) );
             }
@@ -146,6 +166,11 @@ public class ControlNetworkUtil
 
     public static String extractNetwork( final String ip )
     {
+        if ( ip == null )
+        {
+            return null;
+        }
+
         return new SubnetUtils( ip, NETWORK_MASK ).getInfo().getNetworkAddress();
     }
 }

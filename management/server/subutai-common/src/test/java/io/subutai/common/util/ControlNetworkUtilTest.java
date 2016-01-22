@@ -14,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import io.subutai.common.protocol.ControlNetworkConfig;
+import sun.security.provider.MD5;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
@@ -27,9 +28,10 @@ public class ControlNetworkUtilTest
     private static final String PEER_ID1 = UUID.randomUUID().toString();
     private static final String PEER_ID2 = UUID.randomUUID().toString();
     private static final String PEER_ID3 = UUID.randomUUID().toString();
-    private static final String[] PEER_1_USED_NETWORKS = { "10.200.0.0" };
-    private static final String[] PEER_2_USED_NETWORKS = { "10.200.0.0", "10.200.1.0" };
-    private static final String[] PEER_3_USED_NETWORKS = { "10.200.0.0", "10.200.1.0" , "10.200.2.0" };
+    private static final String[] PEER_1_USED_NETWORKS = {};
+    private static final String[] PEER_2_USED_NETWORKS = { "10.200.1.0" };
+    private static final String[] PEER_3_USED_NETWORKS =
+            { "10.200.0.0", "10.200.1.0", "10.200.2.0", "10.200.3.0", "10.200.4.0", "10.200.5.0" };
     private static String FINGERPRINT = UUID.randomUUID().toString();
     private static String NETWORK = "10.200.0.0";
     private static String IP1 = "10.200.0.1";
@@ -64,7 +66,8 @@ public class ControlNetworkUtilTest
         for ( String s : PEER_2_USED_NETWORKS )
         {
             usedNets2.add( s );
-        }        usedNets3 = new ArrayList<>();
+        }
+        usedNets3 = new ArrayList<>();
         for ( String s : PEER_3_USED_NETWORKS )
         {
             usedNets3.add( s );
@@ -77,7 +80,6 @@ public class ControlNetworkUtilTest
         existingConfig.add( config2 );
 
         config3 = new ControlNetworkConfig( PEER_ID3, null, null, null, 0, usedNets3 );
-        existingConfig.add( config2 );
     }
 
 
@@ -98,7 +100,7 @@ public class ControlNetworkUtilTest
                 new ControlNetworkUtil( FINGERPRINT, NETWORK, SECRET_KEY, SECRET_TTL, existingConfig );
 
         ControlNetworkConfig config =
-                new ControlNetworkConfig( PEER_ID3, null, FINGERPRINT, SECRET_KEY, SECRET_TTL, usedNets3 );
+                new ControlNetworkConfig( PEER_ID3, null, null, SECRET_KEY, SECRET_TTL, usedNets3 );
         util.add( config );
     }
 
@@ -121,13 +123,21 @@ public class ControlNetworkUtilTest
     @Test
     public void testFindFreeNetwork() throws ControlNetworkException
     {
-        final List<ControlNetworkConfig> l = new ArrayList<>();
+        List<ControlNetworkConfig> l = new ArrayList<>();
         l.add( config1 );
         l.add( config2 );
 
         String s = ControlNetworkUtil.findFreeNetwork( l );
-        assertEquals( "10.200.2.0", s );
+        assertEquals( "10.200.0.0", s );
+        l = new ArrayList<>();
+        l.add( config1 );
+        l.add( config2 );
+        l.add( config3 );
+
+        s = ControlNetworkUtil.findFreeNetwork( l );
+        assertEquals( "10.200.6.0", s );
     }
+
 
     @Test
     public void testRebuild() throws ControlNetworkException
@@ -138,12 +148,13 @@ public class ControlNetworkUtilTest
         l.add( config3 );
 
         String network = ControlNetworkUtil.findFreeNetwork( l );
-        assertEquals( "10.200.3.0", network );
+        assertEquals( "10.200.6.0", network );
 
-        List<ControlNetworkConfig> result = ControlNetworkUtil.rebuild( FINGERPRINT, network,SECRET_KEY, SECRET_TTL, l );
+        List<ControlNetworkConfig> result =
+                ControlNetworkUtil.rebuild( FINGERPRINT, network, SECRET_KEY, SECRET_TTL, l );
         assertEquals( 3, result.size() );
-        assertEquals( "10.200.3.1", result.get(0).getAddress());
-        assertEquals( "10.200.3.2", result.get(1).getAddress());
-        assertEquals( "10.200.3.3", result.get(2).getAddress());
+        assertEquals( "10.200.6.1", result.get( 0 ).getAddress() );
+        assertEquals( "10.200.6.2", result.get( 1 ).getAddress() );
+        assertEquals( "10.200.6.3", result.get( 2 ).getAddress() );
     }
 }

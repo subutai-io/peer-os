@@ -31,6 +31,7 @@ import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.net.util.SubnetUtils;
@@ -1463,17 +1464,16 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public ControlNetworkConfig getControlNetworkConfig() throws PeerException
+    public ControlNetworkConfig getControlNetworkConfig( final String peerId ) throws PeerException
     {
         String address = null;
-        final String fingerprint = securityManager.getKeyManager().getFingerprint( getId() );
         final List<String> usedNetworks = new ArrayList<>();
         try
         {
             final Set<P2PConnection> connections = getNetworkManager().listP2PConnections();
             for ( P2PConnection connection : connections )
             {
-                if ( fingerprint.equals( connection.getCommunityName() ) )
+                if ( peerId.equals( connection.getCommunityName() ) )
                 {
                     address = connection.getLocalIp();
                 }
@@ -1492,7 +1492,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             LOG.error( e.getMessage(), e );
         }
 
-        return new ControlNetworkConfig( getId(), address, fingerprint, usedNetworks );
+        return new ControlNetworkConfig( getId(), address, peerId, usedNetworks );
     }
 
 
@@ -1709,7 +1709,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
             String interfaceName = P2PUtil.generateInterfaceName( freeSubnet );
             String communityName = P2PUtil.generateCommunityName( environmentId );
-            String sharedKey = UUID.randomUUID().toString();
+            String sharedKey = DigestUtils.md5Hex( UUID.randomUUID().toString() );
             SubnetUtils.SubnetInfo subnetInfo = new SubnetUtils( freeSubnet, P2PUtil.P2P_SUBNET_MASK ).getInfo();
             final String[] addresses = subnetInfo.getAllAddresses();
             int counter = 0;

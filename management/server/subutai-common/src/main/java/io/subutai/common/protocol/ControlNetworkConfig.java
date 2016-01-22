@@ -10,6 +10,7 @@ public class ControlNetworkConfig
 {
     @JsonProperty( "peerId" )
     private String peerId;
+    //TODO: rename to "communityName"
     @JsonProperty( "fingerprint" )
     private String fingerprint;
     @JsonProperty( "address" )

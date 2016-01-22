@@ -11,11 +11,20 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="localpeer/control-network-config">
       <action class="io.subutai.core.localpeer.cli.GetControlNetworkCommand">
-        <argument ref="localPeer" />
+        <argument ref="peerManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="localpeer/control-network-update">
+      <action class="io.subutai.core.localpeer.cli.UpdateControlNetworkCommand">
+        <argument ref="peerManager" />
       </action>
     </command>
   </command-bundle>
 
   <reference id="localPeer" availability="mandatory" interface="io.subutai.common.peer.LocalPeer" />
+  <reference id="peerManager" availability="mandatory" interface="io.subutai.core.peer.api.PeerManager" />
 
 </blueprint>

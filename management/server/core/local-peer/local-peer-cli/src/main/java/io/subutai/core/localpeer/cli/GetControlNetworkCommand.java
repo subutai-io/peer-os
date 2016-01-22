@@ -1,45 +1,48 @@
 package io.subutai.core.localpeer.cli;
 
 
-import java.util.Date;
-
-import org.apache.commons.lang.time.DateUtils;
 import org.apache.karaf.shell.commands.Command;
 
-import io.subutai.common.host.HostId;
-import io.subutai.common.metric.ExceededQuota;
-import io.subutai.common.metric.QuotaAlert;
-import io.subutai.common.metric.QuotaAlertValue;
-import io.subutai.common.peer.AlertEvent;
-import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.peer.Peer;
 import io.subutai.common.protocol.ControlNetworkConfig;
-import io.subutai.common.resource.ByteUnit;
-import io.subutai.common.resource.ByteValueResource;
-import io.subutai.common.resource.ContainerResourceType;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
+import io.subutai.core.peer.api.PeerManager;
 
 
 @Command( scope = "localpeer", name = "control-network-config" )
 public class GetControlNetworkCommand extends SubutaiShellCommandSupport
 {
 
-    private LocalPeer localPeer;
+    private PeerManager peerManager;
 
 
-    public GetControlNetworkCommand( final LocalPeer localPeer )
+    public GetControlNetworkCommand( final PeerManager peerManager )
     {
-        this.localPeer = localPeer;
+        this.peerManager = peerManager;
     }
 
 
     @Override
     protected Object doExecute() throws Exception
     {
-        final ControlNetworkConfig result = localPeer.getControlNetworkConfig();
-        System.out.println( String.format( "%s %s %s", result.getPeerId(), result.getFingerprint(), result.getAddress() ));
-        System.out.println( "Used networks:" );
-        for (String s : result.getUsedNetworks()) {
-            System.out.println( s );
+        final String localPeerId = peerManager.getLocalPeer().getId();
+        for ( Peer peer : peerManager.getPeers() )
+        {
+            if ( peer.isOnline() )
+            {
+                final ControlNetworkConfig result = peer.getControlNetworkConfig( localPeerId );
+                System.out.println(
+                        String.format( "%s %s %s", result.getPeerId(), result.getFingerprint(), result.getAddress() ) );
+                System.out.println( "Used networks:" );
+                for ( String s : result.getUsedNetworks() )
+                {
+                    System.out.println( s );
+                }
+            }
+            else
+            {
+                System.out.println( String.format( "Peer %s is down at this moment.", peer.getId() ) );
+            }
         }
         return null;
     }

@@ -319,10 +319,9 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    protected void addToControlNetwork( final Peer peer )
+    protected void addToControlNetwork( final Peer peer ) throws PeerException
     {
-        //TODO: implement me
-        ControlNetworkConfig localConfig = localPeer.getControlNetworkConfig();
+//        ControlNetworkConfig localConfig = localPeer.getControlNetworkConfig();
     }
 
 
