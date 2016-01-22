@@ -484,7 +484,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
         //so pick one container's domain name as the group domain name
         networkManager.registerHosts( containerHosts, domainName );
 
-        networkManager.exchangeSshKeys( containerHosts );
+        networkManager.exchangeSshKeys( containerHosts, Sets.<String>newHashSet() );
     }
 
 

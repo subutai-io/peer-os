@@ -9,6 +9,7 @@ import com.google.common.collect.Sets;
 
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentContainerHost;
+import io.subutai.common.util.CollectionUtil;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.network.api.NetworkManager;
@@ -31,16 +32,10 @@ public class RegisterSshStep
 
     public void execute( Set<String> additionalSshKeys ) throws NetworkManagerException
     {
-        configureSsh( environment.getContainerHosts() );
-    }
-
-
-    public void configureSsh( final Set<EnvironmentContainerHost> containerHosts ) throws NetworkManagerException
-    {
         Map<Integer, Set<EnvironmentContainerHost>> sshGroups = Maps.newHashMap();
 
         //group containers by ssh group
-        for ( EnvironmentContainerHost containerHost : containerHosts )
+        for ( EnvironmentContainerHost containerHost : environment.getContainerHosts() )
         {
             int sshGroupId = ( ( EnvironmentContainerImpl ) containerHost ).getSshGroupId();
             Set<EnvironmentContainerHost> groupedContainers = sshGroups.get( sshGroupId );
@@ -61,10 +56,14 @@ public class RegisterSshStep
             Set<EnvironmentContainerHost> groupedContainers = sshGroup.getValue();
             Set<ContainerHost> ch = Sets.newHashSet();
             ch.addAll( groupedContainers );
-            //ignore group ids <= 0
+
             if ( sshGroupId > 0 )
             {
-                networkManager.exchangeSshKeys( ch );
+                networkManager.exchangeSshKeys( ch, additionalSshKeys );
+            }
+            else if ( !CollectionUtil.isCollectionEmpty( additionalSshKeys ) )
+            {
+                networkManager.appendSshKeys( ch, additionalSshKeys );
             }
         }
     }

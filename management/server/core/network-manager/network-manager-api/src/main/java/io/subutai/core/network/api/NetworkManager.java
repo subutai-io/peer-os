@@ -152,8 +152,18 @@ public interface NetworkManager
      * Enables passwordless ssh access between containers
      *
      * @param containers - set of {@code ContainerHost}
+     * @param additionalSshKeys - set of additional ssh keys to add to each container
      */
-    public void exchangeSshKeys( Set<ContainerHost> containers ) throws NetworkManagerException;
+    public void exchangeSshKeys( Set<ContainerHost> containers, Set<String> additionalSshKeys )
+            throws NetworkManagerException;
+
+    /**
+     * Appends ssh keys to each container
+     *
+     * @param containers - containers
+     * @param sshKeys - ssh keys
+     */
+    public void appendSshKeys( Set<ContainerHost> containers, Set<String> sshKeys ) throws NetworkManagerException;
 
     /**
      * Adds supplied ssh key to authorized_keys file of given containers
