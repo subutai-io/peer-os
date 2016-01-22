@@ -20,7 +20,7 @@ public class ControlNetworkUtil
 {
     public static String NETWORK_MASK = "255.255.255.0";
     public static String NETWORK_PREFIX = "10.200";
-    public static final String INTERFACE_IP_PATTERN = "^10\\.200\\..*";
+    public static final String IP_PATTERN = "^10\\.200\\..*";
     private final SubnetUtils.SubnetInfo info;
     private final String fingerprint;
     private final Set<String> usedAddresses = new HashSet<>();
@@ -124,7 +124,7 @@ public class ControlNetworkUtil
         {
             for (String s : config.getUsedNetworks())
             {
-                networks.add( new SubnetUtils( s, NETWORK_MASK ).getInfo().getNetworkAddress() );
+                networks.add( extractNetwork( s ) );
             }
         }
 
@@ -141,5 +141,11 @@ public class ControlNetworkUtil
         }
 
         return result;
+    }
+
+
+    public static String extractNetwork( final String ip )
+    {
+        return new SubnetUtils( ip, NETWORK_MASK ).getInfo().getNetworkAddress();
     }
 }

@@ -83,6 +83,7 @@ import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.RequestListener;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
+import io.subutai.common.protocol.ControlNetworkConfig;
 import io.subutai.common.protocol.Disposable;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
@@ -128,6 +129,7 @@ import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
+import io.subutai.core.network.api.P2PConnection;
 import io.subutai.core.repository.api.RepositoryException;
 import io.subutai.core.repository.api.RepositoryManager;
 import io.subutai.core.security.api.SecurityManager;
@@ -1457,6 +1459,40 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             result.addAll( resourceHost.getContainerHostsByPeerId( peerId ) );
         }
         return result;
+    }
+
+
+    @Override
+    public ControlNetworkConfig getControlNetworkConfig() throws PeerException
+    {
+        String address = null;
+        final String fingerprint = securityManager.getKeyManager().getFingerprint( getId() );
+        final List<String> usedNetworks = new ArrayList<>();
+        try
+        {
+            final Set<P2PConnection> connections = getNetworkManager().listP2PConnections();
+            for ( P2PConnection connection : connections )
+            {
+                if ( fingerprint.equals( connection.getCommunityName() ) )
+                {
+                    address = connection.getLocalIp();
+                }
+                else
+                {
+                    if ( connection.getLocalIp().startsWith( ControlNetworkUtil.NETWORK_PREFIX ) )
+                    {
+                        String usedNetwork = ControlNetworkUtil.extractNetwork( connection.getLocalIp() );
+                        usedNetworks.add( usedNetwork );
+                    }
+                }
+            }
+        }
+        catch ( NetworkManagerException e )
+        {
+            LOG.error( e.getMessage(), e );
+        }
+
+        return new ControlNetworkConfig( getId(), address, fingerprint, usedNetworks );
     }
 
 

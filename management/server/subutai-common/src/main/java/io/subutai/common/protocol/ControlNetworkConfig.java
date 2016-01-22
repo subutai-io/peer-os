@@ -38,6 +38,16 @@ public class ControlNetworkConfig
     }
 
 
+    public ControlNetworkConfig( final String peerId, final String address, final String fingerprint,
+                                 final List<String> usedNetworks )
+    {
+        this.peerId = peerId;
+        this.address = address;
+        this.fingerprint= fingerprint;
+        this.usedNetworks = usedNetworks;
+    }
+
+
     public String getPeerId()
     {
         return peerId;

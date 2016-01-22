@@ -34,6 +34,7 @@ import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.peer.RegistrationData;
 import io.subutai.common.peer.RegistrationStatus;
+import io.subutai.common.protocol.ControlNetworkConfig;
 import io.subutai.common.security.objects.TokenType;
 import io.subutai.common.settings.ChannelSettings;
 import io.subutai.common.util.IPUtil;
@@ -312,13 +313,33 @@ public class PeerManagerImpl implements PeerManager
         {
             throw new IllegalArgumentException( "Peer could not be null." );
         }
+
+        addToControlNetwork( peer );
         this.peers.put( peer.getId(), peer );
     }
 
 
-    private void removePeer( String id )
+    protected void addToControlNetwork( final Peer peer )
     {
-        this.peers.remove( id );
+        //TODO: implement me
+        ControlNetworkConfig localConfig = localPeer.getControlNetworkConfig();
+    }
+
+
+    protected void removePeer( String id )
+    {
+        Peer peer = this.peers.get( id );
+        if ( peer != null )
+        {
+            removeFromControlNetwork( peer );
+            this.peers.remove( id );
+        }
+    }
+
+
+    protected void removeFromControlNetwork( final Peer peer )
+    {
+        //TODO: implement me
     }
 
 
