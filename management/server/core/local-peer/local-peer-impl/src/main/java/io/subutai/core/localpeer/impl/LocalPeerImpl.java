@@ -99,6 +99,7 @@ import io.subutai.common.security.objects.KeyTrustLevel;
 import io.subutai.common.security.objects.SecurityKeyType;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.CollectionUtil;
+import io.subutai.common.util.ControlNetworkUtil;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.common.util.NumUtil;
 import io.subutai.common.util.P2PUtil;
@@ -1670,7 +1671,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             {
                 throw new IllegalStateException( "Could not calculate subnet." );
             }
-            String superNodeIp = getExternalIp();
             String interfaceName = P2PUtil.generateInterfaceName( freeSubnet );
             String communityName = P2PUtil.generateCommunityName( environmentId );
             String sharedKey = UUID.randomUUID().toString();

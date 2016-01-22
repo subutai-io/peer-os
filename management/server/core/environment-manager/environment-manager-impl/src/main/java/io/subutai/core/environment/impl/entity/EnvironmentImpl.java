@@ -363,6 +363,10 @@ public class EnvironmentImpl implements Environment, Serializable
     @Override
     public Set<EnvironmentContainerHost> getContainerHosts()
     {
+        if ( containers == null )
+        {
+            containers = Sets.newHashSet();
+        }
         Set<EnvironmentContainerHost> containerHosts = Sets.newConcurrentHashSet( containers );
         if ( environmentManager != null )
         {
