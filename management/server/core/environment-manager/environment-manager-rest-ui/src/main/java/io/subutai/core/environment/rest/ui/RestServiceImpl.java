@@ -4,6 +4,7 @@ package io.subutai.core.environment.rest.ui;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -13,6 +14,7 @@ import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Node;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
@@ -30,6 +32,7 @@ import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
+import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.gson.required.RequiredDeserializer;
 import io.subutai.common.host.ContainerHostState;
@@ -204,12 +207,27 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response setupRequisites( final String topologyJson )
+    public Response setupRequisites( final String name, final String topologyJson )
     {
         EnvironmentDto environmentDto;
         try
         {
-            Topology topology = gson.fromJson( topologyJson, Topology.class );
+            Map<String, Set<NodeGroup>> nodeGroupPlacement = gson.fromJson( topologyJson, new TypeToken<Map<String, Set<NodeGroup>>>() {}.getType() );
+
+
+            Topology topology = new Topology( name, 0, 0 );
+
+
+            Iterator it = nodeGroupPlacement.entrySet().iterator();
+            while( it.hasNext() )
+            {
+                Map.Entry pair = (Map.Entry)it.next();
+
+                for( NodeGroup nodeGroup : (Set<NodeGroup>)pair.getValue() )
+                {
+                    topology.addNodeGroupPlacement( (String) pair.getKey(), nodeGroup );
+                }
+            }
 
 
             Environment environment = environmentManager.setupRequisites( topology );
@@ -965,6 +983,9 @@ public class RestServiceImpl implements RestService
     }
 
 
+    /** Additional ****************************************/
+
+
     @Override
     public Response setupContainerSsh( final String environmentId, final String containerId )
     {
@@ -1020,22 +1041,6 @@ public class RestServiceImpl implements RestService
 
         return null;
     }
-
-
-    //    private void updateContainerPlacementStrategy( Blueprint blueprint )
-    //    {
-    //        for ( NodeGroup nodeGroup : blueprint.getNodeGroups() )
-    //        {
-    //            if ( nodeGroup.getHostId() == null )
-    //            {
-    //                nodeGroup.setContainerDistributionType( ContainerDistributionType.AUTO );
-    //            }
-    //            else
-    //            {
-    //                nodeGroup.setContainerDistributionType( ContainerDistributionType.CUSTOM );
-    //            }
-    //        }
-    //    }
 
 
     /** AUX **************************************************** */

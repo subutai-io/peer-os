@@ -3,14 +3,11 @@ package io.subutai.core.environment.impl.workflow.creation;
 
 import org.apache.servicemix.beanflow.Workflow;
 
-import com.google.common.collect.Sets;
-
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
-import io.subutai.core.environment.impl.workflow.creation.steps.AddSshKeyStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.ContainerCloneStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.PEKGenerationStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterHostsStep;
@@ -53,7 +50,6 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         CLONE_CONTAINERS,
         CONFIGURE_HOSTS,
         CONFIGURE_SSH,
-        SET_ENVIRONMENT_SSH_KEY,
         FINALIZE
 
     }
@@ -207,28 +203,9 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
         try
         {
-            new RegisterSshStep( environment, networkManager ).execute();
+            environment.addSshKey( sshKey );
 
-            environment = environmentManager.saveOrUpdate( environment );
-
-            return EnvironmentCreationPhase.SET_ENVIRONMENT_SSH_KEY;
-        }
-        catch ( Exception e )
-        {
-            //            setError( e );
-            fail( e.getMessage(), e );
-            return null;
-        }
-    }
-
-
-    public EnvironmentCreationPhase SET_ENVIRONMENT_SSH_KEY()
-    {
-        operationTracker.addLog( "Setting environment ssh key to containers" );
-
-        try
-        {
-            new AddSshKeyStep( Sets.newHashSet( sshKey ), environment, networkManager ).execute();
+            new RegisterSshStep( environment, networkManager ).execute( environment.getSshKeys() );
 
             environment = environmentManager.saveOrUpdate( environment );
 

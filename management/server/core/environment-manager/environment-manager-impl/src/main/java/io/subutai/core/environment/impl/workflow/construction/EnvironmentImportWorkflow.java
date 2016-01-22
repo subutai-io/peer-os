@@ -11,7 +11,6 @@ import io.subutai.common.environment.Topology;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
-import io.subutai.core.environment.impl.workflow.creation.steps.AddSshKeyStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.PEKGenerationStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterHostsStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterSshStep;
@@ -71,7 +70,6 @@ public class EnvironmentImportWorkflow extends Workflow<EnvironmentImportWorkflo
         SETUP_P2P,
         CONFIGURE_HOSTS,
         CONFIGURE_SSH,
-        SET_ENVIRONMENT_SSH_KEY,
         FINALIZE
     }
 
@@ -178,28 +176,7 @@ public class EnvironmentImportWorkflow extends Workflow<EnvironmentImportWorkflo
 
         try
         {
-            new RegisterSshStep( environment, networkManager ).execute();
-
-            environment = environmentManager.saveOrUpdate( environment );
-
-            return Phase.SET_ENVIRONMENT_SSH_KEY;
-        }
-        catch ( Exception e )
-        {
-            setError( e );
-
-            return null;
-        }
-    }
-
-
-    public Phase SET_ENVIRONMENT_SSH_KEY()
-    {
-        operationTracker.addLog( "Setting environment ssh key to containers" );
-
-        try
-        {
-            new AddSshKeyStep( environment.getSshKeys(), environment, networkManager ).execute();
+            new RegisterSshStep( environment, networkManager ).execute( environment.getSshKeys() );
 
             environment = environmentManager.saveOrUpdate( environment );
 
