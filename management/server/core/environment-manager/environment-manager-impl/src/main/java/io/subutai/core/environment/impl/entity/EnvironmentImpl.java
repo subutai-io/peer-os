@@ -4,6 +4,7 @@ package io.subutai.core.environment.impl.entity;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -381,17 +382,19 @@ public class EnvironmentImpl implements Environment, Serializable
             User activeUser = identityManager.getActiveUser();
             if ( activeUser != null )
             {
-                for ( final EnvironmentContainerHost containerHost : containerHosts )
+                for ( Iterator<EnvironmentContainerHost> iterator = containerHosts.iterator(); iterator.hasNext(); )
                 {
+                    final EnvironmentContainerHost containerHost = iterator.next();
                     RelationMeta relationMeta =
                             new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), containerHost,
                                     containerHost.getId(), containerHost.getId(),
                                     PermissionObject.EnvironmentManagement.getName() );
                     boolean trustedRelation =
                             relationManager.getRelationInfoManager().allHasReadPermissions( relationMeta );
+
                     if ( !trustedRelation )
                     {
-                        containerHosts.remove( containerHost );
+                        iterator.remove();
                     }
                 }
             }
