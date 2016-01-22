@@ -363,8 +363,18 @@ public class EnvironmentImpl implements Environment, Serializable
     @Override
     public Set<EnvironmentContainerHost> getContainerHosts()
     {
-        Set<EnvironmentContainerHost> containerHosts = Sets.newConcurrentHashSet( containers );
-        if ( environmentManager != null )
+        Set<EnvironmentContainerHost> containerHosts;
+
+        if ( containers == null )
+        {
+            containerHosts = Sets.newHashSet();
+        }
+        else
+        {
+            containerHosts = Sets.newConcurrentHashSet( containers );
+        }
+
+        if ( !CollectionUtil.isCollectionEmpty( containerHosts ) && environmentManager != null )
         {
             RelationManager relationManager = environmentManager.getRelationManager();
             IdentityManager identityManager = environmentManager.getIdentityManager();
@@ -386,6 +396,7 @@ public class EnvironmentImpl implements Environment, Serializable
                 }
             }
         }
+
         return containerHosts;
     }
 
