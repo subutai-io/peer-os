@@ -530,9 +530,18 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public void exchangeSshKeys( final Set<ContainerHost> containers ) throws NetworkManagerException
+    public void exchangeSshKeys( final Set<ContainerHost> containers, final Set<String> additionalSshKeys )
+            throws NetworkManagerException
     {
-        getSshManager( containers ).execute();
+        getSshManager( containers ).execute( additionalSshKeys, false );
+    }
+
+
+    @Override
+    public void appendSshKeys( final Set<ContainerHost> containers, final Set<String> sshKeys )
+            throws NetworkManagerException
+    {
+        getSshManager( containers ).execute( sshKeys, true );
     }
 
 
