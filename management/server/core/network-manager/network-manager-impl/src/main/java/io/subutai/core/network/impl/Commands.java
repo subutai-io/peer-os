@@ -252,11 +252,16 @@ public class Commands
 
     public RequestBuilder getAppendSshKeyCommand( String key )
     {
+        //        return new RequestBuilder( String.format(
+        //                "if [ ! -f '%2$s' ]; then " + "mkdir -p '%1$s' && " + "chmod 700 '%1$s' && "
+        //                        + "echo '%3$s' > '%2$s' && " + "chmod 644 '%2$s' ; else " + "chmod 700 '%2$s' ; "
+        //                        + "if grep -zvq '%3$s' '%2$s'; then echo '%3$s' >> '%2$s'; fi; " + "chmod 644
+        // '%2$s';  fi;",
+        //                SSH_FOLDER, SSH_FILE, key ) );
+
         return new RequestBuilder( String.format(
-                "if [ ! -f '%2$s' ]; then " + "mkdir -p '%1$s' && " + "chmod 700 '%1$s' && "
-                        + "echo '%3$s' > '%2$s' && " + "chmod 644 '%2$s' ; else " + "chmod 700 '%2$s' ; "
-                        + "if grep -zvq '%3$s' '%2$s'; then echo '%3$s' >> '%2$s'; fi; " + "chmod 644 '%2$s';  fi;",
-                SSH_FOLDER, SSH_FILE, key ) );
+                "mkdir -p '%1$s' && " + "echo '%3$s' >> '%2$s' && " + "chmod 700 -R '%1$s' && "
+                        + "awk -i inplace '!x[$0]++' '%2$s'", SSH_FOLDER, SSH_FILE, key ) );
     }
 
 
