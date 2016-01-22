@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
@@ -45,7 +46,15 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
 
 
     @Override
-    public Response getTemplate( String repository, String md5, String name, String version, 
+    public Response getRepositories()
+    {
+        Set<String> list = templateManager.getContexts();
+        return Response.ok( GSON.toJson( list ) ).build();
+    }
+
+
+    @Override
+    public Response getTemplate( String repository, String md5, String name, String version,
             String type, boolean isKurjunClient )
     {
         try

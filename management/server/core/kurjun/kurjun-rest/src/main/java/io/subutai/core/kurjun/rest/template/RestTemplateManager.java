@@ -33,6 +33,11 @@ public interface RestTemplateManager
     static final String RESPONSE_TYPE_MD5 = "md5";
 
     @GET
+    @Path( "repositories" )
+    @Produces( MediaType.APPLICATION_JSON )
+    Response getRepositories();
+    
+    @GET
     @Path( "{repository}/get" )
     @Produces( MediaType.TEXT_PLAIN )
     Response getTemplate( @PathParam( "repository" ) String repository,
