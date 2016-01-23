@@ -55,6 +55,13 @@ public class Commands
     //management host commands
 
 
+    public RequestBuilder getListPeersInEnvironmentCommand( String communityName )
+    {
+        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
+                .withCmdArgs( Lists.newArrayList( "p2p", "-p", communityName ) );
+    }
+
+
     public RequestBuilder getSetupP2PConnectionCommand( String interfaceName, String localIp, String communityName,
                                                         String secretKey, long secretKeyTtlSec )
     {
