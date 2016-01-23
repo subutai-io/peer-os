@@ -1067,9 +1067,20 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 resourceHostDataService.update( host );
                 LOG.debug( String.format( "Resource host %s updated.", resourceHostInfo.getHostname() ) );
             }
-            if ( managementHost == null && "management".equals( resourceHostInfo.getHostname() ) )
+            if ( managementHost == null )
             {
-                managementHost = host;
+                try
+                {
+                    managementHost = findHostByName( "management" );
+                }
+                catch ( HostNotFoundException e )
+                {
+                    //ignore}
+                }
+                //            if ( managementHost == null && "management".equals( resourceHostInfo.getHostname() ) )
+                //            {
+                //                managementHost = host;
+                //            }
             }
         }
     }
