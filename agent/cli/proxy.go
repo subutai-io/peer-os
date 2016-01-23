@@ -13,7 +13,6 @@ import (
 )
 
 var (
-	conf     = config.Agent.AppPrefix + "etc/nginx/nginx.conf"
 	conftmpl = config.Agent.AppPrefix + "etc/nginx/tmpl/"
 	confinc  = config.Agent.DataPrefix + "nginx-includes/"
 )

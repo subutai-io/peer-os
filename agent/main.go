@@ -29,6 +29,7 @@ func main() {
 		Usage: "debug mode"}}
 
 	app.Commands = []cli.Command{{
+
 		Name: "clone", Usage: "clone Subutai container",
 		Flags: []cli.Flag{
 			cli.StringFlag{Name: "e", Usage: "set environment id for container"},
@@ -108,24 +109,19 @@ func main() {
 		}}, {
 
 		Name: "management_network", Usage: "configure management network",
-		Flags: []cli.Flag{cli.BoolFlag{Name: "listtunnel, l", Usage: "-l"},
-			cli.StringFlag{Name: "removetunnel, r", Usage: "-r tunnerPortName"},
-			cli.StringFlag{Name: "reservvni, E", Usage: "-E vni, vlanid, envid"},
-			cli.StringFlag{Name: "removevni, M", Usage: "-M TUNNELPORTNAME VNI VLANID"},
-			cli.StringFlag{Name: "createvnimap, m", Usage: "-m TUNNELPORTNAME VNI VLANID ENV_ID"},
+		Flags: []cli.Flag{
+			cli.BoolFlag{Name: "listtunnel, l", Usage: "-l"},
 			cli.StringFlag{Name: "createtunnel, c", Usage: "-c TUNNELPORTNAME TUNNELIPADDRESS TUNNELTYPE"},
-
-			cli.StringFlag{Name: "addflow, f", Usage: "-f BRIDGENAME FLOWCONFIGURATION"},
-			cli.StringFlag{Name: "showflow, s", Usage: "-s BRIDGENAME"},
-			cli.StringFlag{Name: "deleteflow, d", Usage: "-d BRIDGENAME MATCHCASE"},
-			cli.StringFlag{Name: "showport, p", Usage: "-p BRIDGENAME"},
+			cli.StringFlag{Name: "removetunnel, r", Usage: "-r tunnerPortName"},
 
 			cli.BoolFlag{Name: "listvnimap, v", Usage: "-v"},
-			cli.BoolFlag{Name: "listopenedtab, S", Usage: "-S"},
+			cli.StringFlag{Name: "createvnimap, m", Usage: "-m TUNNELPORTNAME VNI VLANID ENV_ID"},
+			cli.StringFlag{Name: "reservvni, E", Usage: "-E vni, vlanid, envid"},
+			cli.StringFlag{Name: "removevni, M", Usage: "-M TUNNELPORTNAME VNI VLANID"},
+
 			cli.StringFlag{Name: "deletegateway, D", Usage: "-D VLANID"},
-			cli.StringFlag{Name: "removetab, V", Usage: "-V INTERFACENAME"},
 			cli.StringFlag{Name: "creategateway, T", Usage: "-T VLANIP/SUBNET VLANID"},
-			cli.StringFlag{Name: "vniop, Z", Usage: "-Z [delete] | [deleteall] | [list]"}},
+			cli.StringFlag{Name: "vniop, Z", Usage: "-Z [deleteall] | [list]"}},
 
 		Subcommands: []cli.Command{{
 			Name:  "p2p",

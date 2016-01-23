@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"crypto/tls"
 	"errors"
-	p "golang.org/x/crypto/openpgp"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -21,24 +20,12 @@ var (
 	ErrUserKeyRingNotFound    = errors.New("Keyring not found")
 	ErrUnreadableKeyring      = errors.New("Could not read keyring")
 	ErrUnverifiedMessage      = errors.New("Message does not contain signature")
-	pass_bytes                = []byte(config.Agent.GpgPassword)
 )
 
 const (
 	MANAGEMENT_HOST_PK = "/root/.gnupg/pubring.gpg"
 	gnupg              = "gpg"
 )
-
-func keyByEmail(keyring *p.EntityList, email string) (*p.Entity, error) {
-	for _, entity := range *keyring {
-		for _, ident := range entity.Identities {
-			if ident.UserId.Email == email {
-				return entity, nil
-			}
-		}
-	}
-	return nil, ErrUserKeyNotFoundByEmail
-}
 
 //import PK gpg2 --import pubkey.key
 func ImportPk(file string) string {
