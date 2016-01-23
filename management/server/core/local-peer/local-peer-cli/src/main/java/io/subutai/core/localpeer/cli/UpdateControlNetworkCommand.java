@@ -47,7 +47,6 @@ public class UpdateControlNetworkCommand extends SubutaiShellCommandSupport
                         String.format( "Peer '%s' is down at this moment. Skipping this peer.", peer.getId() ) );
                 continue;
             }
-
             configs.add( peer.getControlNetworkConfig( localPeerId ) );
         }
 

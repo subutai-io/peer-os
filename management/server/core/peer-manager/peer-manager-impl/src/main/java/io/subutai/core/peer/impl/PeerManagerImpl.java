@@ -147,7 +147,7 @@ public class PeerManagerImpl implements PeerManager
                 PeerPolicy policy = getDefaultPeerPolicy( localPeerId );
 
                 PeerData peerData =
-                        new PeerData( localPeerInfo.getId(), toJson( localPeerInfo ), "", toJson( policy ) );
+                        new PeerData( localPeerInfo.getId(), toJson( localPeerInfo ), "", toJson( policy ), 1 );
 
                 updatePeerData( peerData );
             }
@@ -254,9 +254,10 @@ public class PeerManagerImpl implements PeerManager
 
             PeerPolicy policy = getDefaultPeerPolicy( registrationData.getPeerInfo().getId() );
 
+            final Integer order = getNextOrder();
             PeerData peerData =
                     new PeerData( registrationData.getPeerInfo().getId(), toJson( registrationData.getPeerInfo() ),
-                            keyPhrase, toJson( policy ) );
+                            keyPhrase, toJson( policy ), order );
             updatePeerData( peerData );
 
             Peer newPeer = createPeer( peerData );
@@ -321,7 +322,7 @@ public class PeerManagerImpl implements PeerManager
 
     protected void addToControlNetwork( final Peer peer ) throws PeerException
     {
-//        ControlNetworkConfig localConfig = localPeer.getControlNetworkConfig();
+        //        ControlNetworkConfig localConfig = localPeer.getControlNetworkConfig();
     }
 
 
@@ -853,8 +854,7 @@ public class PeerManagerImpl implements PeerManager
     {
         try
         {
-            PeerPolicy peerPolicy = fromJson( peerDataService.find( peerId ).getPolicy(), PeerPolicy.class );
-            return peerPolicy;
+            return fromJson( peerDataService.find( peerId ).getPolicy(), PeerPolicy.class );
         }
         catch ( IOException e )
         {
@@ -906,6 +906,27 @@ public class PeerManagerImpl implements PeerManager
             {
                 LOG.error( e.getMessage(), e );
             }
+        }
+    }
+
+
+    public synchronized Integer getNextOrder() throws PeerException
+    {
+        try
+        {
+            Integer currentOrder = 2;
+            for ( PeerData peerData : peerDataService.getAll() )
+            {
+                if ( peerData.getOrder() > currentOrder )
+                {
+                    currentOrder = peerData.getOrder();
+                }
+            }
+            return currentOrder + 1;
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Could not get peer order." );
         }
     }
 

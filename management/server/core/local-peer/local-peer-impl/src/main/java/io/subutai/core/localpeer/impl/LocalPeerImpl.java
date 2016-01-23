@@ -138,9 +138,6 @@ import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.strategy.api.StrategyManager;
 
-//import io.subutai.core.localpeer.impl.dao.ManagementHostDataService;
-
-
 /**
  * Local peer implementation
  */
@@ -342,13 +339,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         Preconditions.checkNotNull( request );
 
-        return createByHost( request );
-    }
-
-
-    private Set<ContainerHostInfoModel> createByHost( final CreateEnvironmentContainerGroupRequest request )
-            throws PeerException
-    {
         SubnetUtils cidr;
         try
         {
