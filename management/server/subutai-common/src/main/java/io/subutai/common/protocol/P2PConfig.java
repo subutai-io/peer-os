@@ -28,7 +28,8 @@ public class P2PConfig
     public P2PConfig( @JsonProperty( "peerId" ) final String peerId,
                       @JsonProperty( "environmentId" ) final String environmentId,
                       @JsonProperty( "interfaceName" ) final String interfaceName,
-                      @JsonProperty( "communityName" ) final String communityName, final String address,
+                      @JsonProperty( "communityName" ) final String communityName,
+                      @JsonProperty( "address" ) final String address,
                       @JsonProperty( "secretKey" ) final String secretKey,
                       @JsonProperty( "secretKeyTtlSec" ) final long secretKeyTtlSec )
     {

@@ -922,19 +922,11 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    public synchronized Integer getNextOrder() throws PeerException
+    protected synchronized Integer getNextOrder() throws PeerException
     {
         try
         {
-            Integer currentOrder = 2;
-            for ( PeerData peerData : peerDataService.getAll() )
-            {
-                if ( peerData.getOrder() > currentOrder )
-                {
-                    currentOrder = peerData.getOrder();
-                }
-            }
-            return currentOrder + 1;
+            return peerDataService.getAll().size() + 1;
         }
         catch ( Exception e )
         {
@@ -980,6 +972,7 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
+    @Override
     public void updateControlNetwork()
     {
         String key = DigestUtils.md5Hex( UUID.randomUUID().toString() );

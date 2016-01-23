@@ -103,6 +103,7 @@ import io.subutai.common.settings.Common;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.ControlNetworkUtil;
 import io.subutai.common.util.ExceptionUtil;
+import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.NumUtil;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.common.util.ServiceLocator;
@@ -1518,14 +1519,32 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             String suggestedNetwork = ControlNetworkUtil.extractNetwork( config.getAddress() );
 
             final Set<P2PConnection> connections = getNetworkManager().listP2PConnections();
+            boolean conflict = false;
             for ( P2PConnection connection : connections )
             {
                 if ( connection.getLocalIp().startsWith( ControlNetworkUtil.NETWORK_PREFIX ) )
                 {
                     String net = ControlNetworkUtil.extractNetwork( connection.getLocalIp() );
-                    if (suggestedNetwork.equals( net ))
-                    connections.add( connection );
+                    if ( suggestedNetwork.equals( net ) && !connection.getCommunityName()
+                                                                      .equals( config.getCommunityName() ) )
+                    {
+                        conflict = true;
+                        LOG.warn( "Conflicts control network between '%s' and '%s'.", getId(),
+                                config.getCommunityName() );
+                    }
                 }
+            }
+            if ( !conflict )
+            {
+                LOG.info( "Updating control network." );
+                LOG.debug( JsonUtil.toJson( config ) );
+                // update control network
+            }
+            else
+            {
+                // send conflict
+                LOG.warn( "Conflict of control networks." );
+                LOG.debug( JsonUtil.toJson( config ) );
             }
         }
         catch ( NetworkManagerException e )
