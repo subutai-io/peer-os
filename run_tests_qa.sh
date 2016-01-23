@@ -70,10 +70,10 @@ function choice_stories(){
       cp -r src/test/resources/stories/playbooks src/test/resources/stories/tests_run
 
       echo "$ns_path" > src/test/resources/parameters/ns_path
-      cat src/test/java/od/jbehave/AcceptanceTestSuite.java | while read i;
+      cat src/test/java/od/AcceptanceTestSuite.java | while read i;
       do echo ${i//directory_stories=*/directory_stories=\"stories/tests_run/*/*\"\;};
       done > newfile;
-      mv newfile src/test/java/od/jbehave/AcceptanceTestSuite.java;
+      mv newfile src/test/java/od/AcceptanceTestSuite.java;
       cd src/test/resources/stories/tests_run
       echo
       echo "PLAYBOOKS FOR RUN: "
@@ -90,10 +90,10 @@ function choice_stories(){
      done
 
       echo "$ns_path" > src/test/resources/parameters/ns_path
-      cat src/test/java/od/jbehave/AcceptanceTestSuite.java | while read i;
+      cat src/test/java/od/AcceptanceTestSuite.java | while read i;
       do echo ${i//directory_stories=*/directory_stories=\"stories/tests_run/*\"\;};
       done > newfile;
-      mv newfile src/test/java/od/jbehave/AcceptanceTestSuite.java;
+      mv newfile src/test/java/od/AcceptanceTestSuite.java;
       cd src/test/resources/stories/tests_run
       echo
       echo "PLAYBOOKS FOR RUN: "
