@@ -1,47 +1,23 @@
 package io.subutai.core.pluginmanager.api;
 
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 
-import io.subutai.common.datatypes.RelationCondition;
-import io.subutai.common.datatypes.RelationDeclaration;
+import io.subutai.core.pluginmanager.api.dao.ConfigDataService;
+import io.subutai.core.pluginmanager.api.model.PermissionJson;
+import io.subutai.core.pluginmanager.api.model.PluginDetails;
 
 
 public interface PluginManager
 {
-    UUID installPlugin( String pluginName );
+    public void register( String name, String version, String pathToKar, ArrayList<PermissionJson> permissions );
 
-    UUID removePlugin( String pluginName );
+    public ConfigDataService getConfigDataService();
 
-    UUID upgradePlugin( String pluginName );
+    public List<PluginDetails> getInstalledPlugins();
 
-    Set<PluginInfo> getInstalledPlugins();
+    public void unregister( Long pluginId );
 
-    Set<PluginInfo> getAvailablePlugins();
-
-    PluginInfo getPluginInfo( String pluginName, @RelationDeclaration( conditions = {
-            @RelationCondition( propertyKey = "scope", propertyValue = "admin", condition = "is" ),
-            @RelationCondition( propertyKey = "permission", propertyValue = "read", condition = "has" ),
-            @RelationCondition( propertyKey = "permission", propertyValue = "write", condition = "has" )
-    } ) String version );
-
-    Set<String> getAvailablePluginNames();
-
-    List<String> getAvaileblePluginVersions();
-
-    List<String> getInstalledPluginVersions();
-
-    Set<String> getInstalledPluginNames();
-
-    String getPluginVersion( String pluginName );
-
-    boolean isUpgradeAvailable( String pluginName );
-
-    String getProductKey();
-
-    boolean isInstalled( String p );
-
-    boolean operationSuccessful( OperationType operationType );
+    public void setPermissions( Long pluginId, String permissionJson );
 }
