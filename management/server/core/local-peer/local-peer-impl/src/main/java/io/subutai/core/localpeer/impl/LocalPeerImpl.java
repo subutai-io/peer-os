@@ -131,12 +131,14 @@ import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.network.api.P2PConnection;
+import io.subutai.core.network.api.P2PPeerInfo;
 import io.subutai.core.repository.api.RepositoryException;
 import io.subutai.core.repository.api.RepositoryManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.strategy.api.StrategyManager;
+
 
 /**
  * Local peer implementation
@@ -1454,6 +1456,28 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
+    public String getCurrentControlNetwork() throws PeerException
+    {
+        try
+        {
+            Set<P2PPeerInfo> s = getNetworkManager().listPeersInEnvironment( getId() );
+            for ( P2PPeerInfo info : s )
+            {
+                if ( info.getP2pPeerIP().endsWith( ".1" ) )
+                {
+                    return ControlNetworkUtil.extractNetwork( info.getP2pPeerIP() );
+                }
+            }
+        }
+        catch ( NetworkManagerException e )
+        {
+            LOG.error( e.getMessage(), e );
+        }
+        return null;
+    }
+
+
+    @Override
     public ControlNetworkConfig getControlNetworkConfig( final String peerId ) throws PeerException
     {
         String address = null;
@@ -1483,6 +1507,31 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
 
         return new ControlNetworkConfig( getId(), address, peerId, usedNetworks );
+    }
+
+
+    @Override
+    public void updateControlNetworkConfig( final ControlNetworkConfig config ) throws PeerException
+    {
+        try
+        {
+            String suggestedNetwork = ControlNetworkUtil.extractNetwork( config.getAddress() );
+
+            final Set<P2PConnection> connections = getNetworkManager().listP2PConnections();
+            for ( P2PConnection connection : connections )
+            {
+                if ( connection.getLocalIp().startsWith( ControlNetworkUtil.NETWORK_PREFIX ) )
+                {
+                    String net = ControlNetworkUtil.extractNetwork( connection.getLocalIp() );
+                    if (suggestedNetwork.equals( net ))
+                    connections.add( connection );
+                }
+            }
+        }
+        catch ( NetworkManagerException e )
+        {
+            LOG.error( e.getMessage(), e );
+        }
     }
 
 
