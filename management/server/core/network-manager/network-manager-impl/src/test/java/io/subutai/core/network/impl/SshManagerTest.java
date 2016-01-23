@@ -7,7 +7,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.command.CommandException;
@@ -49,7 +48,7 @@ public class SshManagerTest
         when( commandUtil.execute( any( RequestBuilder.class ), any( ContainerHost.class ) ) ).thenReturn( result );
         when( result.getStdOut() ).thenReturn( SSH_KEY );
         sshManager.commandUtil = commandUtil;
-        sshManager.keys = Lists.newArrayList( SSH_KEY );
+        sshManager.keys = Sets.newHashSet( SSH_KEY );
     }
 
 
@@ -155,13 +154,13 @@ public class SshManagerTest
     @Test( expected = NetworkManagerException.class )
     public void testWrite() throws Exception
     {
-        sshManager.write();
+        sshManager.write( Sets.<String>newHashSet() );
 
         verifyCommandUtilExec();
 
         throwCommandException();
 
-        sshManager.write();
+        sshManager.write( Sets.<String>newHashSet() );
     }
 
 
@@ -181,7 +180,7 @@ public class SshManagerTest
     @Test
     public void testExecute() throws Exception
     {
-        sshManager.execute();
+        sshManager.execute( Sets.<String>newHashSet(), false );
 
         verifyCommandUtilExec();
     }

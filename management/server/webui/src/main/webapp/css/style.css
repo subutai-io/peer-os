@@ -661,6 +661,17 @@ tooltip tip-cont .b-icon {
 tooltip:last-child tip-cont .b-icon {
 	margin-right: 0!important;
 }
+.b-icon_add {
+    background-color: rgba(1, 1, 1, 0.03);
+    border-radius: 5px;
+    cursor: pointer;
+    min-width: 50px;
+    padding: 5px
+}
+
+.b-icon_add:hover {
+    background-color: rgba(112, 116, 112, 0.2);
+}
 
 .b-icon_remove {
     background-image: url('../assets/elements/buttons/b-icon-remove.svg');
@@ -812,7 +823,7 @@ tooltip:last-child tip-cont .b-icon {
     width: 355px;
 }
 
-.b-popup_environment_creation {
+.b-popup_environment-creation {
     width: 430px;
 }
 
@@ -1540,14 +1551,12 @@ td.b-main-table__status-col {
     left: -1px; /* align the dropdown to the left */
     right: -1px; /* align the dropdown to the right */
     opacity: 0; /* hide the dropdown */
-    -webkit-transition: opacity 0.4s ease-in-out;
-    -moz-transition: opacity 0.4s ease-in-out;
-    -o-transition: opacity 0.4s ease-in-out;
-    -ms-transition: opacity 0.4s ease-in-out;
-    transition: opacity 0.4s ease-in-out;
     pointer-events: none; /* avoid mouse click events inside the dropdown */
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
+    background-color: #F1F4F8;
+    max-height: 150px;
+    overflow-y: auto;
 }
 
 .is-active .b-form-input-dropdown-list {
@@ -1557,6 +1566,7 @@ td.b-main-table__status-col {
 
 .b-form-input-dropdown-list-li {
     border-bottom: 1px solid #dcdcdc;
+    vertical-align: middle;
 }
 
 .b-form-input-dropdown-list-li-label {
@@ -1569,7 +1579,7 @@ td.b-main-table__status-col {
     background-color: #fff;
     height: 25px;
     line-height: 25px;
-    padding: 5px 10px;
+    padding-left: 5px;
 }
 
 .b-form-input-dropdown-list-li-label input {
@@ -2216,5 +2226,9 @@ td.b-main-table__status-col {
 
 .b-select-roles-approve .b-workspace-content-row_col-2 {
 	width: 180px;
+}
+
+.b-popup-body__box tooltip {
+	width: 100%;
 }
 

@@ -143,8 +143,8 @@ public class NetworkManagerImplTest
                 Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC );
 
         verify( localPeer ).getManagementHost();
-        verify( commands ).getSetupP2PConnectionCommand( eq(INTERFACE_NAME),eq( LOCAL_IP), eq(COMMUNITY_NAME), eq(SECRET_KEY),
-                anyLong() );
+        verify( commands ).getSetupP2PConnectionCommand( eq( INTERFACE_NAME ), eq( LOCAL_IP ), eq( COMMUNITY_NAME ),
+                eq( SECRET_KEY ), anyLong() );
         verify( managementHost ).execute( any( RequestBuilder.class ) );
     }
 
@@ -418,9 +418,9 @@ public class NetworkManagerImplTest
     @Test
     public void testExchangeSshKeys() throws Exception
     {
-        spyNetworkManager.exchangeSshKeys( containers );
+        spyNetworkManager.exchangeSshKeys( containers, Sets.<String>newHashSet() );
 
-        verify( sshManager ).execute();
+        verify( sshManager ).execute( Sets.<String>newHashSet(), false );
     }
 
 

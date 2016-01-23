@@ -45,12 +45,14 @@ function environmentService($http) {
 		createEnvironment : createEnvironment,
 		setupRequisites : setupRequisites,
 		setupStrategyRequisites : setupStrategyRequisites,
+		setupAdvancedEnvironment : setupAdvancedEnvironment,
 		startEnvironmentBuild : startEnvironmentBuild,
 		growEnvironment : growEnvironment,
 		destroyEnvironment: destroyEnvironment,
 
 
 		setSshKey : setSshKey,
+		getSshKey : getSshKey,
 		removeSshKey : removeSshKey,
 
 
@@ -161,6 +163,16 @@ function environmentService($http) {
 		);
 	}
 
+	function setupAdvancedEnvironment( name, topology ) {
+		var postDate = 'name=' + name + '&topology=' + JSON.stringify( topology );
+
+		return $http.post(
+			ENVIRONMENT_REQUISITES,
+			postDate,
+			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+		);
+	}
+
 	function startEnvironmentBuild(environmentId, signedMsg) {
 		var postData = 'environmentId=' + environmentId + "&signedMessage=" + signedMsg;
 		return $http.post(
@@ -211,6 +223,10 @@ function environmentService($http) {
 			postData, 
 			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
 		);
+	}
+
+	function getSshKey(environmentId) {
+		return $http.get(ENVIRONMENTS_URL + environmentId + '/keys');
 	}
 
 	function removeSshKey(environmentId) {

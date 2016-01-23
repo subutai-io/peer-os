@@ -77,5 +77,6 @@ public interface ResourceHost extends Host, ResourceHostInfo
 
     void addContainerHost( ContainerHost host );
 
-//    ResourceHostMetric getMetric();
+    void cleanup( EnvironmentId environmentId, int vlan ) throws ResourceHostException;
+
 }
