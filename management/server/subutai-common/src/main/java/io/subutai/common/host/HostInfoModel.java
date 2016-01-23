@@ -72,7 +72,7 @@ public class HostInfoModel implements HostInfo
     @Override
     public HostInterfaces getHostInterfaces()
     {
-        return new HostInterfaces( this.hostInterfaces );
+        return new HostInterfaces( this.id, this.hostInterfaces );
     }
 
 

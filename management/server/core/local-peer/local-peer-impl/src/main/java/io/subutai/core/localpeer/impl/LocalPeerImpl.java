@@ -31,6 +31,7 @@ import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.net.util.SubnetUtils;
@@ -83,6 +84,7 @@ import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.RequestListener;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
+import io.subutai.common.protocol.ControlNetworkConfig;
 import io.subutai.common.protocol.Disposable;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
@@ -99,6 +101,7 @@ import io.subutai.common.security.objects.KeyTrustLevel;
 import io.subutai.common.security.objects.SecurityKeyType;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.CollectionUtil;
+import io.subutai.common.util.ControlNetworkUtil;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.common.util.NumUtil;
 import io.subutai.common.util.P2PUtil;
@@ -127,6 +130,7 @@ import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
+import io.subutai.core.network.api.P2PConnection;
 import io.subutai.core.repository.api.RepositoryException;
 import io.subutai.core.repository.api.RepositoryManager;
 import io.subutai.core.security.api.SecurityManager;
@@ -1459,6 +1463,39 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
+    @Override
+    public ControlNetworkConfig getControlNetworkConfig( final String peerId ) throws PeerException
+    {
+        String address = null;
+        final List<String> usedNetworks = new ArrayList<>();
+        try
+        {
+            final Set<P2PConnection> connections = getNetworkManager().listP2PConnections();
+            for ( P2PConnection connection : connections )
+            {
+                if ( peerId.equals( connection.getCommunityName() ) )
+                {
+                    address = connection.getLocalIp();
+                }
+                else
+                {
+                    if ( connection.getLocalIp().startsWith( ControlNetworkUtil.NETWORK_PREFIX ) )
+                    {
+                        String usedNetwork = ControlNetworkUtil.extractNetwork( connection.getLocalIp() );
+                        usedNetworks.add( usedNetwork );
+                    }
+                }
+            }
+        }
+        catch ( NetworkManagerException e )
+        {
+            LOG.error( e.getMessage(), e );
+        }
+
+        return new ControlNetworkConfig( getId(), address, peerId, usedNetworks );
+    }
+
+
     protected Integer getVlanByVni( long vni ) throws PeerException
     {
         Set<Vni> reservedVnis = getReservedVnis();
@@ -1670,10 +1707,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             {
                 throw new IllegalStateException( "Could not calculate subnet." );
             }
-            String superNodeIp = getExternalIp();
             String interfaceName = P2PUtil.generateInterfaceName( freeSubnet );
             String communityName = P2PUtil.generateCommunityName( environmentId );
-            String sharedKey = UUID.randomUUID().toString();
+            String sharedKey = DigestUtils.md5Hex( UUID.randomUUID().toString() );
             SubnetUtils.SubnetInfo subnetInfo = new SubnetUtils( freeSubnet, P2PUtil.P2P_SUBNET_MASK ).getInfo();
             final String[] addresses = subnetInfo.getAllAddresses();
             int counter = 0;

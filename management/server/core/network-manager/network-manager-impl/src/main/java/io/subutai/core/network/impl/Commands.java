@@ -55,6 +55,13 @@ public class Commands
     //management host commands
 
 
+    public RequestBuilder getListPeersInEnvironmentCommand( String communityName )
+    {
+        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
+                .withCmdArgs( Lists.newArrayList( "p2p", "-p", communityName ) );
+    }
+
+
     public RequestBuilder getSetupP2PConnectionCommand( String interfaceName, String localIp, String communityName,
                                                         String secretKey, long secretKeyTtlSec )
     {
@@ -261,7 +268,7 @@ public class Commands
 
         return new RequestBuilder( String.format(
                 "mkdir -p '%1$s' && " + "echo '%3$s' >> '%2$s' && " + "chmod 700 -R '%1$s' && "
-                        + "awk -i inplace '!x[$0]++' '%2$s'", SSH_FOLDER, SSH_FILE, key ) );
+                        + "sort -u '%2$s' -o '%2$s'", SSH_FOLDER, SSH_FILE, key ) );
     }
 
 
