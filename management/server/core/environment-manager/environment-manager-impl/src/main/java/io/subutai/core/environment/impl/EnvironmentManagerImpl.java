@@ -435,7 +435,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             if ( !peer.isOnline() )
             {
-                operationTracker.addLogFailed( String.format( "Peer %s offline", peer.getId() ) );
+                operationTracker.addLogFailed( String.format( "Peer %s is offline", peer.getId() ) );
                 throw new EnvironmentCreationException( String.format( "Peer %s is offline", peer.getId() ) );
             }
         }

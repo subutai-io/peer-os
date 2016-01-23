@@ -301,4 +301,6 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
     HistoricalMetrics getHistoricalMetrics( String hostName, Date startTime, Date endTime ) throws PeerException;
 
     ControlNetworkConfig getControlNetworkConfig( String localPeerId ) throws PeerException;
+
+    void updateControlNetworkConfig( ControlNetworkConfig config ) throws PeerException;
 }
