@@ -4,14 +4,11 @@ import (
 	"io/ioutil"
 	"net"
 	"os"
-	"os/exec"
-	"strconv"
 	"strings"
 	"subutai/config"
 	"subutai/lib/container"
 	"subutai/lib/gpg"
 	"subutai/log"
-	"syscall"
 )
 
 func LxcClone(parent, child, envId, addr, token string) {
@@ -37,7 +34,7 @@ func LxcClone(parent, child, envId, addr, token string) {
 		addNetConf(child, addr)
 	}
 
-	setContainerUid(child)
+	container.SetContainerUid(child)
 	LxcStart(child)
 
 	container.AptUpdate(child)
@@ -80,36 +77,4 @@ func addNetConf(c, addr string) {
 		{"#vlan_id", ipvlan[1]},
 	})
 	setStaticNetwork(c)
-}
-
-func setContainerUid(c string) {
-	var uidlast []byte
-
-	uidlast, _ = ioutil.ReadFile(config.Agent.LxcPrefix + "uidmaplast")
-
-	uid, _ := strconv.Atoi(string(uidlast))
-	newuid := strconv.Itoa(uid + 65536)
-
-	err := ioutil.WriteFile(config.Agent.LxcPrefix+"uidmaplast", []byte(newuid), 0644)
-	log.Check(log.FatalLevel, "Writing new uid to map", err)
-
-	container.SetContainerConf(c, [][]string{
-		{"lxc.include", config.Agent.AppPrefix + "share/lxc/config/ubuntu.common.conf"},
-		{"lxc.include", config.Agent.AppPrefix + "share/lxc/config/ubuntu.userns.conf"},
-		{"lxc.id_map", "u 0 " + newuid + " 65536"},
-		{"lxc.id_map", "g 0 " + newuid + " 65536"},
-	})
-
-	s, _ := os.Stat(config.Agent.LxcPrefix + c + "/rootfs")
-	parentuid := strconv.Itoa(int(s.Sys().(*syscall.Stat_t).Uid))
-
-	exec.Command("uidmapshift", "-b", config.Agent.LxcPrefix+c+"/rootfs/", parentuid, newuid, "65536").Run()
-	exec.Command("uidmapshift", "-b", config.Agent.LxcPrefix+"lxc/"+c+"-opt/", parentuid, newuid, "65536").Run()
-	exec.Command("uidmapshift", "-b", config.Agent.LxcPrefix+"lxc-data/"+c+"-home/", parentuid, newuid, "65536").Run()
-	exec.Command("uidmapshift", "-b", config.Agent.LxcPrefix+"lxc-data/"+c+"-var/", parentuid, newuid, "65536").Run()
-
-	err = os.Chmod(config.Agent.LxcPrefix+c, 0755)
-	if err != nil {
-		log.Error("Chmod for " + c + " failed: " + err.Error())
-	}
 }

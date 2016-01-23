@@ -12,6 +12,7 @@ import (
 	"subutai/agent/executer"
 	"subutai/agent/utils"
 	"subutai/config"
+	cont "subutai/lib/container"
 	"subutai/lib/gpg"
 	"subutai/log"
 	"time"
@@ -33,6 +34,11 @@ type Heartbeat struct {
 }
 
 func initAgent() {
+	if cont.State("management") != "RUNNING" {
+		cont.Start("management")
+		cont.AttachExec("management", []string{"dhclient eth1"})
+	}
+
 	container.PoolInstance()
 	Instance()
 }
