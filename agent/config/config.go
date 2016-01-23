@@ -126,6 +126,7 @@ func init() {
 	log.Check(log.InfoLevel, "Loading default config ", err)
 
 	file, _ := exec.LookPath("subutai")
+
 	cfgFile := filepath.Dir(file) + "/../etc/agent.gcfg"
 	err = gcfg.ReadFileInto(&config, cfgFile)
 	log.Check(log.WarnLevel, "Opening Agent config file "+cfgFile, err)

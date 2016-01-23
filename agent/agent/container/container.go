@@ -2,7 +2,6 @@ package container
 
 import (
 	"bufio"
-	"fmt"
 	lxc "gopkg.in/lxc/go-lxc.v2"
 	"os"
 	"strconv"
@@ -89,26 +88,14 @@ func GetActiveContainers(details bool) []Container {
 }
 
 func GetContainerIfaces(name string) []utils.Iface {
-	if name == "" {
-		return nil
-	}
-	list, err := cont.AttachExec(name, []string{"ifconfig"})
-	if log.Check(log.DebugLevel, "Executing ifconfig inside container", err) {
-		return nil
-	}
+	c, err := lxc.NewContainer(name, config.Agent.LxcPrefix)
+	log.Check(log.FatalLevel, "Looking for container "+name, err)
 
 	iface := new(utils.Iface)
 	iface.InterfaceName = "eth0"
-	fmt.Println(list)
-	for _, line := range list {
-		if iface.Mac != "" && strings.Contains(line, "inet addr") {
-			iface.Ip = strings.Split(strings.Fields(line)[1], ":")[1]
-			break
-		}
-		if strings.HasPrefix(line, iface.InterfaceName) {
-			iface.Mac = strings.Fields(line)[4]
-		}
-	}
-	log.Debug("Getting interface information from container " + name + " Name:" + iface.InterfaceName + " IP:" + iface.Ip + " MAC:" + iface.Mac)
+	listip, _ := c.IPAddress(iface.InterfaceName)
+	iface.Ip = strings.Join(listip, " ")
+	iface.Mac = cont.GetConfigItem(config.Agent.LxcPrefix+"/"+name+"/config", "lxc.network.hwaddr")
+
 	return []utils.Iface{*iface}
 }

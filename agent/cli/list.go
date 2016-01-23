@@ -2,8 +2,11 @@ package lib
 
 import (
 	"fmt"
+	lxc "gopkg.in/lxc/go-lxc.v2"
 	"strings"
+	"subutai/config"
 	"subutai/lib/container"
+	"subutai/log"
 )
 
 func printHeader(c, t, r, i, a, f, p bool) {
@@ -102,26 +105,13 @@ func addAncestors(list []string) []string {
 }
 
 func info(name string) (result []string) {
-	if name == "" {
-		return
-	}
-	list, err := container.AttachExec(name, []string{"ifconfig"})
-	if err != nil {
-		result = append(result, name+"\t"+container.State(name))
-		return
-	}
+	c, err := lxc.NewContainer(name, config.Agent.LxcPrefix)
+	log.Check(log.FatalLevel, "Looking for container "+name, err)
 
 	nic := "eth0"
-	var ip, mac string
-	for _, line := range list {
-		if mac != "" && strings.Contains(line, "inet addr") {
-			ip = strings.Split(strings.Fields(line)[1], ":")[1]
-			result = append(result, name+"\tRUNNING\t"+mac+"\t"+ip+"\t"+nic)
-			return
-		}
-		if strings.HasPrefix(line, nic) {
-			mac = strings.Fields(line)[4]
-		}
-	}
-	return append(result, name+"\tRUNNING")
+	listip, _ := c.IPAddress(nic)
+	ip := strings.Join(listip, " ")
+	mac := container.GetConfigItem(config.Agent.LxcPrefix+"/"+name+"/config", "lxc.network.hwaddr")
+
+	return append(result, name+"\tRUNNING\t"+mac+"\t"+ip+"\t"+nic)
 }

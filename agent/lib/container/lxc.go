@@ -3,6 +3,7 @@ package container
 import (
 	"bufio"
 	"errors"
+	"fmt"
 	"gopkg.in/lxc/go-lxc.v2"
 	"io/ioutil"
 	"os"
@@ -90,24 +91,33 @@ func AttachExec(name string, command []string) (output []string, err error) {
 		return output, errors.New("Container does not exists")
 	}
 
-	container, _ := lxc.NewContainer(name, config.Agent.LxcPrefix)
+	container, err := lxc.NewContainer(name, config.Agent.LxcPrefix)
+	log.Check(log.FatalLevel, "Looking for container "+name, err)
 	if container.State() != lxc.RUNNING {
 		return output, errors.New("Container is " + container.State().String())
 	}
 
 	buf_r, buf_w, _ := os.Pipe()
+	err_r, err_w, _ := os.Pipe()
 	container.RunCommand(command, lxc.AttachOptions{
 		Namespaces: -1,
 		UID:        0,
 		GID:        0,
 		StdoutFd:   buf_w.Fd(),
+		StderrFd:   err_w.Fd(),
 	})
 
 	buf_w.Close()
+	err_w.Close()
 	defer buf_r.Close()
 
+	err_o := bufio.NewScanner(err_r)
+	for err_o.Scan() {
+		fmt.Println(err_o.Text())
+	}
 	out := bufio.NewScanner(buf_r)
 	for out.Scan() {
+		fmt.Println(out.Text())
 		output = append(output, out.Text())
 	}
 

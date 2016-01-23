@@ -38,7 +38,9 @@ func Print() {
 	fmt.Println("Interface\tLocalPeerIP\tHash")
 
 	file, err := os.Open(config.Agent.DataPrefix + "/var/subutai-network/p2p.txt")
-	log.Check(log.FatalLevel, "Opening p2p.txt", err)
+	if log.Check(log.DebugLevel, "Opening p2p.txt", err) {
+		return
+	}
 	scanner := bufio.NewScanner(bufio.NewReader(file))
 	for scanner.Scan() {
 		line := strings.Fields(scanner.Text())

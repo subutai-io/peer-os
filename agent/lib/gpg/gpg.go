@@ -121,7 +121,7 @@ func EncryptWrapper(user string, recipient string, message string) string {
 	stdin.Close()
 
 	output, err := command.Output()
-	if log.Check(log.WarnLevel, "Encrypting message "+string(output), err) {
+	if log.Check(log.WarnLevel, "Encrypting message ", err) {
 		return ""
 	}
 
@@ -135,7 +135,7 @@ func EncryptWrapperNoDefaultKeyring(user, recipient, message, pub, sec string) s
 	stdin.Close()
 
 	output, err := command.Output()
-	log.Check(log.WarnLevel, "Encrypting message "+string(output), err)
+	log.Check(log.WarnLevel, "Encrypting message ", err)
 	return string(output)
 }
 
@@ -329,11 +329,11 @@ func ValidatePem(cert string) bool {
 }
 
 func ParsePem(cert string) (crt, key []byte) {
-        key, _ = exec.Command("openssl", "pkey", "-in", cert).Output()
+	key, _ = exec.Command("openssl", "pkey", "-in", cert).Output()
 
 	f, err := ioutil.ReadFile(cert)
 	if !log.Check(log.DebugLevel, "Cannot read file "+cert, err) {
-        	crt = bytes.Replace(f, key, []byte(""), -1)
+		crt = bytes.Replace(f, key, []byte(""), -1)
 	}
-	return crt, key 
+	return crt, key
 }
