@@ -16,6 +16,7 @@ import java.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.net.util.SubnetUtils;
@@ -72,7 +73,7 @@ public class SetupP2PStep
                 throw new IllegalStateException( "Could not calculate tunnel network." );
             }
             env.setTunnelNetwork( freeTunnelNetwork );
-            String sharedKey = "secret";
+            String sharedKey = DigestUtils.md5Hex( "secret" );
             SubnetUtils.SubnetInfo subnetInfo = new SubnetUtils( freeTunnelNetwork, P2PUtil.P2P_SUBNET_MASK ).getInfo();
             final String[] addresses = subnetInfo.getAllAddresses();
             int counter = 0;

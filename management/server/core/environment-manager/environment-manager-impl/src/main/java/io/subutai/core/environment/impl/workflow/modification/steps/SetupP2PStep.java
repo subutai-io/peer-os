@@ -13,6 +13,7 @@ import java.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.net.util.SubnetUtils;
 
 import io.subutai.common.environment.Topology;
@@ -49,7 +50,7 @@ public class SetupP2PStep
         SubnetUtils.SubnetInfo info =
                 new SubnetUtils( environment.getTunnelNetwork(), P2PUtil.P2P_SUBNET_MASK ).getInfo();
 
-        String sharedKey = "secret";
+        String sharedKey = DigestUtils.md5Hex( "secret" );
         final String[] addresses = info.getAllAddresses();
         int counter = environment.getPeerConfs().size();
         for ( Peer peer : peers )

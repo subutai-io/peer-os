@@ -28,6 +28,7 @@ import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
+import io.subutai.common.protocol.ControlNetworkConfig;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.resource.HistoricalMetrics;
@@ -493,6 +494,24 @@ public class PeerWebClient
         catch ( Exception e )
         {
             throw new PeerException( "Error on retrieving peer limits.", e );
+        }
+    }
+
+
+    public ControlNetworkConfig getControlNetworkConfig( final String localPeerId ) throws PeerException
+    {
+        try
+        {
+            String path = String.format( "/control/config/%s", localPeerId );
+
+            WebClient client = WebClientBuilder.buildPeerWebClient( host, path, provider, 500, 7000, 1 );
+            client.type( MediaType.APPLICATION_JSON );
+            client.accept( MediaType.APPLICATION_JSON );
+            return client.get( ControlNetworkConfig.class );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Error on retrieving control network config.", e );
         }
     }
 }

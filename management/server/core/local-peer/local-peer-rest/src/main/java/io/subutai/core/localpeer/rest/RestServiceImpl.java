@@ -443,4 +443,19 @@ public class RestServiceImpl implements RestService
             return Response.serverError().build();
         }
     }
+
+
+    @Override
+    public Response getControlNetworkConfig( final String peerId )
+    {
+        try
+        {
+            return Response.ok( localPeer.getControlNetworkConfig( peerId ) ).build();
+        }
+        catch ( PeerException e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            return Response.serverError().build();
+        }
+    }
 }
