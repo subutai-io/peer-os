@@ -34,7 +34,7 @@ type Heartbeat struct {
 }
 
 func initAgent() {
-	if cont.State("management") != "RUNNING" {
+	if cont.State("management") == "STOPPED" {
 		cont.Start("management")
 		cont.AttachExec("management", []string{"dhclient eth1"})
 	}
