@@ -35,9 +35,6 @@ function list_stories(){
     echo
     cd src/test/resources/stories/general_playbooks/
     find * -type f
-    cd ..
-    cd playbooks
-    find * -type f
     echo "======================================================================"
 }
 
