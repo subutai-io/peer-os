@@ -22,7 +22,7 @@ public interface ContainerInfo extends ContainerHostInfo
 //    /**
 //     * Returns network interfaces of host
 //     */
-//    public Set<Interface> getInterfaces();
+//    public Set<Interface> getUsedNetworks();
 //
 //
 //    /**

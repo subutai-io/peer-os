@@ -166,4 +166,10 @@ public interface RestService
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
     Response getResourceLimits( @PathParam( "peerId" ) final String peerId );
+
+    @GET
+    @Path( "control/config/{peerId}" )
+    @Consumes( MediaType.APPLICATION_JSON )
+    @Produces( MediaType.APPLICATION_JSON )
+    Response getControlNetworkConfig( @PathParam( "peerId" ) final String peerId );
 }

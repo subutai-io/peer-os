@@ -21,6 +21,7 @@ import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
+import io.subutai.common.protocol.ControlNetworkConfig;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.TemplateKurjun;
@@ -298,4 +299,6 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
     void alert( AlertEvent alert ) throws PeerException;
 
     HistoricalMetrics getHistoricalMetrics( String hostName, Date startTime, Date endTime ) throws PeerException;
+
+    ControlNetworkConfig getControlNetworkConfig( String localPeerId ) throws PeerException;
 }
