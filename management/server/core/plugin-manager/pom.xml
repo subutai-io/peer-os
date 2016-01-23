@@ -10,14 +10,11 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>plugin-manager</artifactId>
-  <name>Subutai Plugin Manager Parent</name>
-  <description>Subutai Plugin Manager Parent</description>
-
   <packaging>pom</packaging>
   <modules>
     <module>plugin-manager-api</module>
     <module>plugin-manager-impl</module>
-    <module>plugin-manager-cli</module>
+    <module>plugin-manager-rest</module>
   </modules>
 
 </project>
