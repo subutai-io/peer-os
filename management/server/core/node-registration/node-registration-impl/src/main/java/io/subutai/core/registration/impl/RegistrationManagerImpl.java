@@ -345,7 +345,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
             }
 
 
-            if ( containerInfo.getVlan() != 0 )
+            if ( containerInfo.getVlan() != null && containerInfo.getVlan() != 0 )
             {
                 groupedContainers.put( containerInfo.getTemplateName(), group );
                 groupedContainersByVlan.put( containerInfo.getVlan(), groupedContainers );
