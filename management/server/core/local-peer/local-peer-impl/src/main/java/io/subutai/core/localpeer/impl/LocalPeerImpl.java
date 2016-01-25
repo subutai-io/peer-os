@@ -103,6 +103,7 @@ import io.subutai.common.settings.Common;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.ControlNetworkUtil;
 import io.subutai.common.util.ExceptionUtil;
+import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.NumUtil;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.common.util.ServiceLocator;
@@ -131,14 +132,13 @@ import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.network.api.P2PConnection;
+import io.subutai.core.network.api.P2PPeerInfo;
 import io.subutai.core.repository.api.RepositoryException;
 import io.subutai.core.repository.api.RepositoryManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.strategy.api.StrategyManager;
-
-//import io.subutai.core.localpeer.impl.dao.ManagementHostDataService;
 
 
 /**
@@ -342,13 +342,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         Preconditions.checkNotNull( request );
 
-        return createByHost( request );
-    }
-
-
-    private Set<ContainerHostInfoModel> createByHost( final CreateEnvironmentContainerGroupRequest request )
-            throws PeerException
-    {
         SubnetUtils cidr;
         try
         {
@@ -1475,6 +1468,28 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
+    public String getCurrentControlNetwork() throws PeerException
+    {
+        try
+        {
+            Set<P2PPeerInfo> s = getNetworkManager().listPeersInEnvironment( getId() );
+            for ( P2PPeerInfo info : s )
+            {
+                if ( info.getP2pPeerIP().endsWith( ".1" ) )
+                {
+                    return ControlNetworkUtil.extractNetwork( info.getP2pPeerIP() );
+                }
+            }
+        }
+        catch ( NetworkManagerException e )
+        {
+            LOG.error( e.getMessage(), e );
+        }
+        return null;
+    }
+
+
+    @Override
     public ControlNetworkConfig getControlNetworkConfig( final String peerId ) throws PeerException
     {
         String address = null;
@@ -1504,6 +1519,49 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
 
         return new ControlNetworkConfig( getId(), address, peerId, usedNetworks );
+    }
+
+
+    @Override
+    public void updateControlNetworkConfig( final ControlNetworkConfig config ) throws PeerException
+    {
+        try
+        {
+            String suggestedNetwork = ControlNetworkUtil.extractNetwork( config.getAddress() );
+
+            final Set<P2PConnection> connections = getNetworkManager().listP2PConnections();
+            boolean conflict = false;
+            for ( P2PConnection connection : connections )
+            {
+                if ( connection.getLocalIp().startsWith( ControlNetworkUtil.NETWORK_PREFIX ) )
+                {
+                    String net = ControlNetworkUtil.extractNetwork( connection.getLocalIp() );
+                    if ( suggestedNetwork.equals( net ) && !connection.getCommunityName()
+                                                                      .equals( config.getCommunityName() ) )
+                    {
+                        conflict = true;
+                        LOG.warn( "Conflicts control network between '%s' and '%s'.", getId(),
+                                config.getCommunityName() );
+                    }
+                }
+            }
+            if ( !conflict )
+            {
+                LOG.info( "Updating control network." );
+                LOG.debug( JsonUtil.toJson( config ) );
+                // update control network
+            }
+            else
+            {
+                // send conflict
+                LOG.warn( "Conflict of control networks." );
+                LOG.debug( JsonUtil.toJson( config ) );
+            }
+        }
+        catch ( NetworkManagerException e )
+        {
+            LOG.error( e.getMessage(), e );
+        }
     }
 
 

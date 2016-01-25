@@ -514,4 +514,28 @@ public class PeerWebClient
             throw new PeerException( "Error on retrieving control network config.", e );
         }
     }
+
+
+    public void updateControlNetworkConfig( final ControlNetworkConfig config ) throws PeerException
+    {
+        Preconditions.checkNotNull( config );
+        Preconditions.checkNotNull( config.getAddress() );
+        Preconditions.checkNotNull( config.getCommunityName() );
+        Preconditions.checkNotNull( config.getPeerId() );
+        Preconditions.checkNotNull( config.getSecretKey() );
+        Preconditions.checkArgument( config.getSecretKeyTtlSec() > 0 );
+        try
+        {
+            String path = "/control/update";
+
+            WebClient client = WebClientBuilder.buildPeerWebClient( host, path, provider, 500, 7000, 1 );
+            client.type( MediaType.APPLICATION_JSON );
+            client.accept( MediaType.APPLICATION_JSON );
+            client.put( config );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Error on updating control network config.", e );
+        }
+    }
 }

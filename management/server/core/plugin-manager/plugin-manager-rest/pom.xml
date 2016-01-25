@@ -9,24 +9,47 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>plugin-manager-impl</artifactId>
+  <artifactId>plugin-manager-rest</artifactId>
+  <name>Subutai Plugin Manager REST</name>
+  <description>Subutai Plugin Manager REST</description>
   <packaging>bundle</packaging>
-  <name>Subutai Plugin Manager Impl</name>
-  <description>Subutai Plugin Manager Impl</description>
 
   <dependencies>
+
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>subutai-common</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>io.subutai</groupId>
       <artifactId>plugin-manager-api</artifactId>
       <version>4.0.0-RC6</version>
     </dependency>
+
+    <!--CXF-->
     <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>identity-manager-api</artifactId>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-rt-frontend-jaxrs</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-all</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-rt-rs-extension-providers</artifactId>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>subutai-common</artifactId>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-rt-rs-client</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-rt-transports-http-hc</artifactId>
     </dependency>
 
   </dependencies>
@@ -36,18 +59,20 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Meta-Persistence>META-INF/persistence.xml</Meta-Persistence>
-            <Bundle-SymbolicName>${project.groupId}.core.pluginmanager.impl</Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.groupId}.core.pluginmanager.rest</Bundle-SymbolicName>
             <Export-Package>
               {local-packages};version=${project.version};-noimport:=true
             </Export-Package>
-            <Import-Package>*</Import-Package>
           </instructions>
         </configuration>
       </plugin>
