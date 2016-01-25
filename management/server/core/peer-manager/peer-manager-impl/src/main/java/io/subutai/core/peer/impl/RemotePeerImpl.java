@@ -887,9 +887,9 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void updateControlNetworkConfig( final ControlNetworkConfig config ) throws PeerException
+    public boolean updateControlNetworkConfig( final ControlNetworkConfig config ) throws PeerException
     {
-        new PeerWebClient( peerInfo.getIp(), provider ).updateControlNetworkConfig( config );
+        return new PeerWebClient( peerInfo.getIp(), provider ).updateControlNetworkConfig( config );
     }
 
 

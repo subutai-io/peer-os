@@ -984,7 +984,16 @@ public class PeerManagerImpl implements PeerManager
             {
                 renewControlNetwork();
             }
+        }
+        catch ( PeerException e )
+        {
+            LOG.error( e.getMessage(), e );
+        }
 
+
+        boolean isOk = false;
+        while ( !isOk )
+        {
             String[] addresses =
                     new SubnetUtils( currentNetwork, ControlNetworkUtil.NETWORK_MASK ).getInfo().getAllAddresses();
 
@@ -996,13 +1005,30 @@ public class PeerManagerImpl implements PeerManager
                     continue;
                 }
                 ControlNetworkConfig config =
-                        new ControlNetworkConfig( peer.getId(), addresses[data.getOrder()], localPeerId, key, 100000 );
-                peer.updateControlNetworkConfig( config );
+                        new ControlNetworkConfig( peer.getId(), addresses[data.getOrder()], localPeerId.toLowerCase(),
+                                key, 100000 );
+
+                try
+                {
+                    isOk = peer.updateControlNetworkConfig( config );
+                    if ( !isOk )
+                    {
+                        renewControlNetwork();
+                        break;
+                    }
+                }
+                catch ( PeerException e )
+                {
+                    LOG.warn( "Could not update control network config. Error: " + e.getMessage() );
+                }
             }
-        }
-        catch ( PeerException e )
-        {
-            LOG.error( e.getMessage(), e );
+
+            if ( !isOk )
+            {
+                LOG.warn( "Control network config conflict. Selecting another network." );
+                renewControlNetwork();
+                LOG.warn( "New control network: " + currentNetwork );
+            }
         }
     }
 
