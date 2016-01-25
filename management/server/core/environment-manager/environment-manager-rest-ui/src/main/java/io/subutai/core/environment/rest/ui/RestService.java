@@ -53,6 +53,11 @@ public interface RestService
                                       @FormParam( "peers" ) String list );
 
     @POST
+    @Path( "build/auto" )
+    @Produces( { MediaType.TEXT_PLAIN } )
+    Response buildAuto( @FormParam( "name" ) String name, @FormParam( "containers" ) String containersJson );
+
+    @POST
     @Path( "requisites" )
     Response setupRequisites( @FormParam( "name" ) String name, @FormParam( "topology" ) String topologyJson );
 
