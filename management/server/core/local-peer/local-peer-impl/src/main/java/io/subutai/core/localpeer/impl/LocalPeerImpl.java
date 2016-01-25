@@ -2052,7 +2052,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ) );
 
 
-        if ( getManagementHost().getHostname().equals( hostname ) )
+        if ( managementHost != null && getManagementHost().getHostname().equals( hostname ) )
         {
             return managementHost;
         }
