@@ -2,7 +2,6 @@ package io.subutai.core.registration.impl;
 
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -362,7 +361,6 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
 
         LocalPeer localPeer = peerManager.getLocalPeer();
 
-        final List<ResourceHost> resourceHosts = new ArrayList( localPeer.getResourceHosts() );
 
         for ( final Map.Entry<Integer, Map<String, Set<ContainerInfo>>> mapEntry : groupedContainersByVlan.entrySet() )
         {
@@ -376,9 +374,9 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
                 //place where to create node groups
                 String templateName = entry.getKey();
                 //TODO: please change this distribution
-                NodeGroup nodeGroup = new NodeGroup( String.format( "%s_group", templateName ), templateName, /*entry
-                .getValue().size()*/
-                        ContainerSize.SMALL, 1, 1, localPeer.getId(), resourceHosts.get( 0 ).getId() );
+                NodeGroup nodeGroup =
+                        new NodeGroup( String.format( "%s_group", templateName ), templateName, ContainerSize.SMALL, 1,
+                                1, localPeer.getId(), registrationRequest.getId() );
                 topology.addNodeGroupPlacement( localPeer.getId(), nodeGroup );
 
                 Set<ContainerHostInfo> converter = Sets.newHashSet();
