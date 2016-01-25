@@ -14,17 +14,27 @@ func P2P(c, d, u, l, p bool, args []string) {
 	if c {
 		if len(args) > 8 {
 			p2p.Create(args[4], args[5], args[6], args[7], args[8])
+		} else {
+			fmt.Println("Wrong usage")
 		}
 	} else if u {
 		if len(args) > 6 {
 			p2p.UpdateKey(args[4], args[5], args[6])
+		} else {
+			fmt.Println("Wrong usage")
 		}
 	} else if d {
 		if len(args) > 4 {
 			p2p.Remove(args[4])
+		} else {
+			fmt.Println("Wrong usage")
 		}
 	} else if p {
-		p2p.Peers(args[4])
+		if len(args) > 4 {
+			p2p.Peers(args[4])
+		} else {
+			fmt.Println("Wrong usage")
+		}
 	} else if l {
 		p2p.Print()
 	}
