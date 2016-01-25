@@ -219,10 +219,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             {
                 for ( ResourceHost resourceHost : resourceHostDataService.getAll() )
                 {
-                    if ( "management".equals( resourceHost.getHostname() ) )
-                    {
-                        managementHost = resourceHost;
-                    }
+//                    if ( "management".equals( resourceHost.getHostname() ) )
+//                    {
+//                        managementHost = resourceHost;
+//                    }
                     resourceHosts.add( resourceHost );
                 }
             }
@@ -852,6 +852,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             throw new HostNotFoundException( String.format( "Management host not found on peer %s.", getId() ) );
         }
+
         return managementHost;
     }
 
@@ -1064,7 +1065,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             {
                 try
                 {
-                    managementHost = findHostByName( "management" );
+                    final Host managementLxc = findHostByName( "management" );
+                    if ( managementLxc instanceof ContainerHostEntity )
+                    {
+                        managementHost = ( ( ContainerHostEntity ) managementLxc ).getParent();
+                    }
                 }
                 catch ( HostNotFoundException e )
                 {
