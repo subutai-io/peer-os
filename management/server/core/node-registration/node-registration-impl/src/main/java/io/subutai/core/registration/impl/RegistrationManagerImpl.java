@@ -287,7 +287,8 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
             importHostPublicKey( containerInfo.getId(), containerInfo.getPublicKey() );
         }
 
-        processEnvironmentImport( registrationRequest );
+        //TODO @Talas implement this method correctly asap. Temporarily disabling it
+        //processEnvironmentImport( registrationRequest );
     }
 
 
