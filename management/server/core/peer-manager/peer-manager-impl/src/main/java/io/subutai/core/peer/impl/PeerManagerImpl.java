@@ -12,9 +12,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -961,11 +966,11 @@ public class PeerManagerImpl implements PeerManager
             LOG.debug( "Background task runner started..." );
             try
             {
-                //                updateControlNetworkConfig();
+//                updateControlNetwork();
             }
             catch ( Exception e )
             {
-                LOG.warn( "Background task execution faild: " + e.getMessage() );
+                LOG.warn( "Background task execution failed: " + e.getMessage() );
             }
             LOG.debug( "Background task runner finished." );
         }
@@ -996,7 +1001,7 @@ public class PeerManagerImpl implements PeerManager
         {
             String[] addresses =
                     new SubnetUtils( currentNetwork, ControlNetworkUtil.NETWORK_MASK ).getInfo().getAllAddresses();
-
+            List<UpdateControlNetworkTask> updateTasks = new ArrayList<>();
             for ( Peer peer : getPeers() )
             {
                 PeerData data = loadPeerData( peer.getId() );
@@ -1007,19 +1012,32 @@ public class PeerManagerImpl implements PeerManager
                 ControlNetworkConfig config =
                         new ControlNetworkConfig( peer.getId(), addresses[data.getOrder()], localPeerId.toLowerCase(),
                                 key, 100000 );
+                updateTasks.add( new UpdateControlNetworkTask( config ) );
+            }
+            final ExecutorService pool = Executors.newFixedThreadPool( updateTasks.size() );
+            final ExecutorCompletionService<Boolean> executor = new ExecutorCompletionService<Boolean>( pool );
+            for ( UpdateControlNetworkTask task : updateTasks )
+            {
+                executor.submit( task );
+            }
 
+            pool.shutdown();
+
+            for ( UpdateControlNetworkTask task : updateTasks )
+            {
                 try
                 {
-                    isOk = peer.updateControlNetworkConfig( config );
+                    final Future<Boolean> result = executor.take();
+                    isOk = result.get();
                     if ( !isOk )
                     {
-                        renewControlNetwork();
+                        // Network conflict. Skipping other result. Needs renew network.
                         break;
                     }
                 }
-                catch ( PeerException e )
+                catch ( InterruptedException | ExecutionException e )
                 {
-                    LOG.warn( "Could not update control network config. Error: " + e.getMessage() );
+                    // ignore
                 }
             }
 
@@ -1028,6 +1046,33 @@ public class PeerManagerImpl implements PeerManager
                 LOG.warn( "Control network config conflict. Selecting another network." );
                 renewControlNetwork();
                 LOG.warn( "New control network: " + currentNetwork );
+            }
+        }
+    }
+
+
+    private class UpdateControlNetworkTask implements Callable<Boolean>
+    {
+        private ControlNetworkConfig config;
+
+
+        public UpdateControlNetworkTask( final ControlNetworkConfig config )
+        {
+            this.config = config;
+        }
+
+
+        @Override
+        public Boolean call() throws Exception
+        {
+            try
+            {
+                return getPeer( config.getPeerId() ).updateControlNetworkConfig( config );
+            }
+            catch ( Exception e )
+            {
+                // Ignoring any exception.
+                return true;
             }
         }
     }

@@ -1463,7 +1463,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             Set<P2PConnection> connections = getNetworkManager().listP2PConnections();
             for ( P2PConnection connection : connections )
             {
-                if ( getId().equals( connection.getCommunityName() ) )
+                if ( getId().toLowerCase().equals( connection.getCommunityName() ) )
                 {
                     return ControlNetworkUtil.extractNetwork( connection.getLocalIp() );
                 }
