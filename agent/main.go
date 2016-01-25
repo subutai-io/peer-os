@@ -91,8 +91,10 @@ func main() {
 		}}, {
 
 		Name: "import", Usage: "import Subutai template",
+		Flags: []cli.Flag{
+			cli.StringFlag{Name: "t", Usage: "token to access kurjun repo"}},
 		Action: func(c *cli.Context) {
-			lib.LxcImport(c.Args().Get(0))
+			lib.LxcImport(c.Args().Get(0), c.String("t"))
 		}}, {
 
 		Name: "list", Usage: "list Subutai container",
