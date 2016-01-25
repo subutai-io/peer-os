@@ -1,0 +1,35 @@
+<div class="b-popup">
+    <div class="b-popup__header">
+		<span>Settings {{ environmentViewCtrl.currentTemplate.get('templateName') }}</span>
+        <a href ng-click="closeThisDialog()">
+            <img src="assets/elements/buttons/b-icon-close.svg" class="b-icon g-right"/>
+        </a>
+    </div>
+
+	<form ng-submit="environmentViewCtrl.addSettingsToTemplate(templateSettings)">
+		<div class="b-popup__body">
+			<div class="b-popup-body" style="width: 300px;">
+				<div class="popup-body-box">
+					<label class="b-popup-body-label">Select quota size</label>
+					<select class="b-popup-body-input b-popup-body-input_box" 
+						ng-init="templateSettings.quotaSize = environmentViewCtrl.containersType[1]" 
+						ng-model="templateSettings.quotaSize"
+					>
+						<option ng-repeat="type in environmentViewCtrl.containersType" value="{{ type }}">
+							{{ type }}
+						</option>
+					</select>
+					<div class="clear"></div>
+				</div>
+			</div>
+		</div>
+
+		<div class="b-popup__footer">
+			<button type="submit" class="b-btn b-btn_green g-right">
+				Save
+			</button>
+			<div class="clear"></div>
+		</div>
+	</form>
+
+</div>

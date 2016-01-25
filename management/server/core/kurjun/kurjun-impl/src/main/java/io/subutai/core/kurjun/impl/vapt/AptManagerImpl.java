@@ -8,10 +8,12 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +29,7 @@ import ai.subut.kurjun.common.service.KurjunContext;
 import ai.subut.kurjun.common.service.KurjunProperties;
 import ai.subut.kurjun.index.PackagesIndexParserModule;
 import ai.subut.kurjun.metadata.common.DefaultMetadata;
+import ai.subut.kurjun.metadata.common.apt.DefaultPackageMetadata;
 import ai.subut.kurjun.metadata.factory.PackageMetadataStoreFactory;
 import ai.subut.kurjun.metadata.factory.PackageMetadataStoreModule;
 import ai.subut.kurjun.model.index.ReleaseFile;
@@ -47,8 +50,8 @@ import ai.subut.kurjun.snap.SnapMetadataParserModule;
 import ai.subut.kurjun.storage.factory.FileStoreFactory;
 import ai.subut.kurjun.storage.factory.FileStoreModule;
 import ai.subut.kurjun.subutai.SubutaiTemplateParserModule;
-import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.protocol.AptPackage;
 import io.subutai.common.settings.Common;
 import io.subutai.core.kurjun.api.vapt.AptManager;
 import io.subutai.core.kurjun.impl.RepoUrl;
@@ -122,8 +125,8 @@ public class AptManagerImpl implements AptManager
     public String getRelease( String release, String component, String arch )
     {
         UnifiedRepository repo = getRepository();
-        Optional<ReleaseFile> rel =
-                repo.getDistributions().stream().filter( r -> r.getCodename().equals( release ) ).findFirst();
+        Optional<ReleaseFile> rel
+                = repo.getDistributions().stream().filter( r -> r.getCodename().equals( release ) ).findFirst();
 
         if ( rel.isPresent() )
         {
@@ -140,8 +143,8 @@ public class AptManagerImpl implements AptManager
             throws IllegalArgumentException
     {
         UnifiedRepository repo = getRepository();
-        Optional<ReleaseFile> distr =
-                repo.getDistributions().stream().filter( r -> r.getCodename().equals( release ) ).findFirst();
+        Optional<ReleaseFile> distr
+                = repo.getDistributions().stream().filter( r -> r.getCodename().equals( release ) ).findFirst();
         if ( !distr.isPresent() )
         {
             throw new IllegalArgumentException( "Release not found." );
@@ -245,6 +248,25 @@ public class AptManagerImpl implements AptManager
             LOGGER.error( "Failed to upload", ex );
             throw new IllegalArgumentException( "Failed to upload", ex );
         }
+    }
+
+
+    @Override
+    public List<AptPackage> list()
+    {
+        List<SerializableMetadata> list = getRepository().listPackages();
+        List<AptPackage> deflist = list.stream().map( t -> convertToAptPackage( ( DefaultPackageMetadata ) t ) ).collect( Collectors.toList() );
+        return deflist;
+    }
+
+
+    private AptPackage convertToAptPackage( DefaultPackageMetadata meta )
+    {
+        return new AptPackage(
+                Hex.encodeHexString( meta.getMd5Sum() ), meta.getName(), meta.getVersion(),
+                meta.getSource(), meta.getMaintainer(), meta.getArchitecture().name(), 
+                meta.getInstalledSize(), meta.getDescription()
+        );
     }
 
 
@@ -358,4 +380,3 @@ public class AptManagerImpl implements AptManager
         kcp.setProperty( PackageMetadataStoreModule.PACKAGE_METADATA_STORE_TYPE, PackageMetadataStoreFactory.FILE_DB );
     }
 }
-

@@ -1,0 +1,53 @@
+<div class="b-popup b-popup_max">
+	<div class="b-popup__header">
+		Build Environment
+		<a href ng-click="closeThisDialog()">
+			<img src="assets/elements/buttons/b-icon-close.svg" class="b-icon g-right"/>
+		</a>
+	</div>
+	<div ng-if="environmentViewCtrl.buildStep == 'confirm'">
+		<table class="b-main-table b-main-table_with-header b-main-table_white-header">
+			<tbody>
+				<tr ng-repeat="(templateName, templateCount) in environmentViewCtrl.env2Build">
+					<td class="b-title">
+						<span class="b-cloud-item">
+							<img src="assets/templates/{{ templateName }}.jpg" alt="" >
+						</span> 
+						<span class="b-cloud-item-text">{{ templateName }}</span>
+					</td>
+					<td>{{ templateCount }}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<div class="b-popup__body" ng-if="environmentViewCtrl.buildStep == 'pgpKey'">
+		<div class="b-form">
+			<div>
+				<span class="b-form-label b-form-label_fix-size-1">Message</span>
+			</div>
+			<div>
+				<textarea class="b-form-input b-form-input_full b-form-input_textarea bp-sign-target"
+					ng-model="environmentViewCtrl.newEnvID[1]" 
+					style = "width: 540px; height: 300px; font-family: monospace; overflow: scroll; resize: none">
+				</textarea>
+			</div>
+			<div class="clear"></div>
+		</div>
+	</div>
+	<div class="b-popup__footer b-popup__footer_undertable">
+
+		<button class="b-btn b-btn_green" 
+		ng-if="environmentViewCtrl.buildStep == 'pgpKey'" 
+		ng-click="environmentViewCtrl.buildEnvironment()">
+			Build
+		</button>
+
+		<button class="b-btn b-btn_green" 
+		ng-if="environmentViewCtrl.buildStep == 'confirm'" 
+		ng-click="environmentViewCtrl.sendToPending()">
+			Next
+		</button>
+
+		<div class="clear"></div>
+	</div>
+</div>
