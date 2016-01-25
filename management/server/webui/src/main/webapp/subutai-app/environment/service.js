@@ -90,6 +90,8 @@ function environmentService($http) {
 
 		revoke: revoke,
 
+		startEnvironmentAutoBuild: startEnvironmentAutoBuild,
+
 		getServerUrl : function getServerUrl() { return ENVIRONMENTS_URL; }
 	};
 
@@ -347,5 +349,14 @@ function environmentService($http) {
 
 	function revoke (environmentId) {
 		return $http.put (ENVIRONMENTS_URL + environmentId + "/revoke");
+	}
+
+	function startEnvironmentAutoBuild(environmentName, containers) {
+		var postData = 'name=' + environmentName + "&containers=" + containers;
+		return $http.post(
+			ENVIRONMENT_START_BUILD + 'auto',
+			postData,
+			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+		);
 	}
 }

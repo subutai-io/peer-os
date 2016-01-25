@@ -2,9 +2,9 @@
 	<div class="b-workspace-content__row">
 
 		<h2 class="b-workspace-content-row-h2">
-			APT List
-			<button class="b-btn b-btn_green b-btn_header-button" ng-click="kurjunViewCtrl.addAPTForm()">
-				<i class="fa fa-plus"></i> Add APT
+			Templates List
+			<button class="b-btn b-btn_green b-btn_header-button" ng-click="kurjunViewCtrl.addSubutaiTemplateForm()">
+				<i class="fa fa-plus"></i> Add Template
 			</button>
 		</h2>
 
@@ -16,23 +16,24 @@
 				<thead>
 					<tr>
 						<th>Name</th>
+						<th>Context</th>
 						<th></th>
 					</tr>
 				</thead>
 				<tbody>
-					<tr ng-repeat="apt in kurjunViewCtrl.aptList">
-						<td>{{ apt.name }}</td>
+					<tr ng-repeat="template in kurjunViewCtrl.templates">
+						<td>{{ template.name }}</td>
+						<td>{{ template.repository }}</td>
 						<td>
 							<a href 
-								class="b-icon b-icon_remove">
-								<!--ng-click="kurjunViewCtrl.deleteTemplate(apt.id, key)">-->
+								class="b-icon b-icon_remove" 
+								ng-click="kurjunViewCtrl.deleteTemplate(template)">
 							</a>
 						</td>
 					</tr>
 				</tbody>
 			</table>
 		</div>
-
 	</div>
 </div>
 

@@ -8,33 +8,24 @@
 		<div class="b-tabs-menu">
 			<ul>
 				<li class="b-tabs-menu__item"
-						ng-click="kurjunViewCtrl.activeTab = 'repositories'"
-						ng-class="kurjunViewCtrl.activeTab == 'repositories' ? 'b-tabs-menu__item_active' : ''">
-					Kurgun repositories	
+						ng-click="kurjunViewCtrl.openTab('subutai-templates')"
+						ng-class="kurjunViewCtrl.activeTab == 'subutai-templates' ? 'b-tabs-menu__item_active' : ''">
+					Subutai templates
 				</li>
 				<li class="b-tabs-menu__item"
-						ng-click="kurjunViewCtrl.activeTab = 'templates'"
-						ng-class="kurjunViewCtrl.activeTab == 'templates' ? 'b-tabs-menu__item_active' : ''">
-					Templates
-				</li>
-				<li class="b-tabs-menu__item"
-						ng-click="kurjunViewCtrl.activeTab = 'apt'"
-						ng-class="kurjunViewCtrl.activeTab == 'apt' ? 'b-tabs-menu__item_active' : ''">
-					Apt
+						ng-click="kurjunViewCtrl.openTab('apt-templates')"
+						ng-class="kurjunViewCtrl.activeTab == 'apt-templates' ? 'b-tabs-menu__item_active' : ''">
+					APT
 				</li>
 			</ul>
 		</div>
 
 		<div
-				ng-if="kurjunViewCtrl.activeTab == 'repositories'"
-				ng-include="'subutai-app/kurjun/partials/repositories.html'">
+				ng-if="kurjunViewCtrl.activeTab == 'subutai-templates'"
+				ng-include="'subutai-app/kurjun/partials/subutai-templates.html'">
 		</div>
 		<div
-				ng-if="kurjunViewCtrl.activeTab == 'templates'"
-				ng-include="'subutai-app/kurjun/partials/templates.html'">
-		</div>
-		<div
-				ng-if="kurjunViewCtrl.activeTab == 'apt'"
+				ng-if="kurjunViewCtrl.activeTab == 'apt-templates'"
 				ng-include="'subutai-app/kurjun/partials/apt.html'">
 		</div>
 
