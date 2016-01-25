@@ -86,7 +86,7 @@ func download(file, md5, token string) string {
 	return ""
 }
 
-func LxcImport(templ string) {
+func LxcImport(templ, token string) {
 	config.CheckKurjun()
 
 	fullname := templ + "-subutai-template_" + config.Misc.Version + "_" + config.Misc.Arch + ".tar.gz"
@@ -95,7 +95,9 @@ func LxcImport(templ string) {
 		return
 	}
 
-	token := gpg.GetToken()
+	if token == "" {
+		token = gpg.GetToken()
+	}
 	md5 := templMd5(templ, runtime.GOARCH, token)
 
 	archive := checkLocal(templ, md5, runtime.GOARCH)
@@ -113,7 +115,7 @@ func LxcImport(templ string) {
 	parent := container.GetConfigItem(templdir+"/config", "subutai.parent")
 	if parent != "" && parent != templ && !container.IsTemplate(parent) {
 		log.Info("Parent template: " + parent)
-		LxcImport(parent)
+		LxcImport(parent, token)
 	}
 
 	log.Info("Installing template " + templ)
