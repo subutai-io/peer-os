@@ -302,5 +302,5 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
 
     ControlNetworkConfig getControlNetworkConfig( String localPeerId ) throws PeerException;
 
-    void updateControlNetworkConfig( ControlNetworkConfig config ) throws PeerException;
+    boolean updateControlNetworkConfig( ControlNetworkConfig config ) throws PeerException;
 }

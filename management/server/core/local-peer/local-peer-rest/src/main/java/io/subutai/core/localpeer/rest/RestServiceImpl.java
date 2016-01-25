@@ -474,8 +474,7 @@ public class RestServiceImpl implements RestService
 
         try
         {
-            localPeer.updateControlNetworkConfig( config );
-            return Response.ok().build();
+            return Response.ok( localPeer.updateControlNetworkConfig( config ) ).build();
         }
         catch ( PeerException e )
         {
