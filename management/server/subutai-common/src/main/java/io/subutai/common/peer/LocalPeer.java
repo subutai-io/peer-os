@@ -6,6 +6,7 @@ import java.util.Set;
 
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.network.Vni;
+import io.subutai.common.protocol.ControlNetworkConfig;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.TemplateKurjun;
 
@@ -183,4 +184,6 @@ public interface LocalPeer extends Peer
     int setupContainerSsh( String containerHostId, int sshIdleTimeout ) throws PeerException;
 
     List<ContainerHost> getPeerContainers( String peerId );
+
+    String getCurrentControlNetwork() throws PeerException;
 }

@@ -32,6 +32,7 @@ import io.subutai.core.network.api.ContainerInfo;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.network.api.P2PConnection;
+import io.subutai.core.network.api.P2PPeerInfo;
 import io.subutai.core.peer.api.PeerManager;
 
 
@@ -112,6 +113,34 @@ public class NetworkManagerImpl implements NetworkManager
         }
 
         return connections;
+    }
+
+
+    @Override
+    public Set<P2PPeerInfo> listPeersInEnvironment( final String communityName ) throws NetworkManagerException
+    {
+        Set<P2PPeerInfo> p2PPeerInfos = Sets.newHashSet();
+
+        CommandResult result =
+                execute( getManagementHost(), commands.getListPeersInEnvironmentCommand( communityName ) );
+
+
+        StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
+
+        Pattern p = Pattern.compile( "(.+)\\s+(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s+(.+)" );
+
+        while ( st.hasMoreTokens() )
+        {
+            Matcher m = p.matcher( st.nextToken() );
+
+            if ( m.find() && m.groupCount() == 3 )
+            {
+                p2PPeerInfos.add( new P2PPeerInfo( m.group( 1 ), m.group( 2 ), m.group( 3 ) ) );
+            }
+        }
+
+
+        return p2PPeerInfos;
     }
 
 

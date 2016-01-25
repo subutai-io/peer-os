@@ -494,7 +494,7 @@
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>plugin-manager-cli</artifactId>
+        <artifactId>plugin-manager-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
 

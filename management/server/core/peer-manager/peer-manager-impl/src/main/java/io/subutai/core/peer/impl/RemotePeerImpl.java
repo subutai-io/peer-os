@@ -57,6 +57,7 @@ import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.RecipientType;
 import io.subutai.common.peer.RemotePeer;
 import io.subutai.common.peer.Timeouts;
+import io.subutai.common.protocol.ControlNetworkConfig;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.TemplateKurjun;
@@ -875,6 +876,20 @@ public class RemotePeerImpl implements RemotePeer
     public PeerResources getResourceLimits( final String peerId ) throws PeerException
     {
         return new PeerWebClient( peerInfo.getIp(), provider ).getResourceLimits( peerId );
+    }
+
+
+    @Override
+    public ControlNetworkConfig getControlNetworkConfig( final String localPeerId ) throws PeerException
+    {
+        return new PeerWebClient( peerInfo.getIp(), provider ).getControlNetworkConfig( localPeerId );
+    }
+
+
+    @Override
+    public void updateControlNetworkConfig( final ControlNetworkConfig config ) throws PeerException
+    {
+        new PeerWebClient( peerInfo.getIp(), provider ).updateControlNetworkConfig( config );
     }
 
 
