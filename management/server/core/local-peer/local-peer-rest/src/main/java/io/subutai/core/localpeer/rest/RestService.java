@@ -23,6 +23,7 @@ import io.subutai.common.network.Vni;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerInfo;
+import io.subutai.common.protocol.ControlNetworkConfig;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.security.PublicKeyContainer;
@@ -166,4 +167,16 @@ public interface RestService
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
     Response getResourceLimits( @PathParam( "peerId" ) final String peerId );
+
+    @GET
+    @Path( "control/config/{peerId}" )
+    @Consumes( MediaType.APPLICATION_JSON )
+    @Produces( MediaType.APPLICATION_JSON )
+    Response getControlNetworkConfig( @PathParam( "peerId" ) final String peerId );
+
+    @PUT
+    @Path( "control/update" )
+    @Consumes( MediaType.APPLICATION_JSON )
+    @Produces( MediaType.APPLICATION_JSON )
+    Response updateControlNetworkConfig( ControlNetworkConfig config );
 }

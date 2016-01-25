@@ -86,4 +86,6 @@ public interface PeerManager
     PeerPolicy getPolicy( String peerId );
 
     Set<Peer> resolve( Set<String> peers ) throws PeerException;
+
+    void updateControlNetwork();
 }

@@ -21,7 +21,7 @@ public abstract class P2PUtil
         int i = 11;
         int j = 0;
 
-        while ( result == null && i < 254 )
+        while ( result == null && i < 200 )
         {
             String s = String.format( "10.%d.%d.0", i, j );
             if ( !excludedNetworks.contains( s ) )

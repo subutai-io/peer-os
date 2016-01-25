@@ -60,6 +60,8 @@ public interface NetworkManager
     public Set<P2PConnection> listP2PConnections() throws NetworkManagerException;
 
 
+    public Set<P2PPeerInfo> listPeersInEnvironment( String communityName ) throws NetworkManagerException;
+
     /**
      * Sets up tunnel to another peer on management host
      */

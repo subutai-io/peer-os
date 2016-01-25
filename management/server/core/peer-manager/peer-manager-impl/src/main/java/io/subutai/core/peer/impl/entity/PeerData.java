@@ -25,6 +25,9 @@ public class PeerData implements Serializable
     @Column( name = "key_phrase" )
     private String keyPhrase;
 
+    @Column
+    private Integer order;
+
     @Lob
     @Column( name = "info" )
     private String info;
@@ -34,12 +37,13 @@ public class PeerData implements Serializable
     private String policy;
 
 
-    public PeerData( final String id, final String info, final String keyPhrase, final String policy )
+    public PeerData( final String id, final String info, final String keyPhrase, final String policy, final Integer order )
     {
         this.id = id;
         this.info = info;
         this.keyPhrase = keyPhrase;
         this.policy = policy;
+        this.order = order;
     }
 
 
@@ -88,5 +92,11 @@ public class PeerData implements Serializable
     public void setPolicy( final String policy )
     {
         this.policy = policy;
+    }
+
+
+    public Integer getOrder()
+    {
+        return order;
     }
 }
