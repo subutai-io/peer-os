@@ -64,6 +64,12 @@ public interface RestTemplateManager
     @Produces( MediaType.APPLICATION_JSON )
     Response getTemplateList( @PathParam( "repository") String repository,
                               @QueryParam( IS_KURJUN_CLIENT_PARAM ) boolean isKurjunClient );
+    
+    
+    @GET
+    @Path( "{repository}/template-list" )
+    @Produces( MediaType.APPLICATION_JSON )
+    Response getTemplateListSimple( @PathParam( "repository") String repository );
 
 
     @POST
