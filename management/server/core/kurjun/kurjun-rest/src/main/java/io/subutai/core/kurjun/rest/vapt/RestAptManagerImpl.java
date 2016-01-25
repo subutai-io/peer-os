@@ -177,6 +177,13 @@ public class RestAptManagerImpl extends RestManagerBase implements RestAptManage
     }
 
 
+    @Override
+    public Response listPackages()
+    {
+        return Response.ok( MetadataUtils.JSON.toJson( aptManager.list() ) ).build();
+    }
+
+
     private String makePackageFilename( PackageMetadata metadata )
     {
         StringBuilder sb = new StringBuilder();

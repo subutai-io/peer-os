@@ -15,19 +15,17 @@
 				class="row-border hover subt_table-containers-table">
 				<thead>
 					<tr>
-						<th>ID</th>
 						<th>Name</th>
 						<th></th>
 					</tr>
 				</thead>
 				<tbody>
-					<tr ng-repeat="(key, apt) in kurjunViewCtrl.apts">
-						<td>{{ apt.id }}</td>
+					<tr ng-repeat="apt in kurjunViewCtrl.aptList">
 						<td>{{ apt.name }}</td>
 						<td>
 							<a href 
-								class="b-icon b-icon_remove" 
-								ng-click="kurjunViewCtrl.deleteTemplate(apt.id, key)">
+								class="b-icon b-icon_remove">
+								<!--ng-click="kurjunViewCtrl.deleteTemplate(apt.id, key)">-->
 							</a>
 						</td>
 					</tr>
