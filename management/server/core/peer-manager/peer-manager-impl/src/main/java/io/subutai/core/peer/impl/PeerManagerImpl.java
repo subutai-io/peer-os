@@ -11,8 +11,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -21,7 +25,9 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.base.Preconditions;
 
@@ -37,6 +43,7 @@ import io.subutai.common.peer.RegistrationStatus;
 import io.subutai.common.protocol.ControlNetworkConfig;
 import io.subutai.common.security.objects.TokenType;
 import io.subutai.common.settings.ChannelSettings;
+import io.subutai.common.util.ControlNetworkUtil;
 import io.subutai.common.util.IPUtil;
 import io.subutai.common.util.SecurityUtilities;
 import io.subutai.core.identity.api.IdentityManager;
@@ -90,6 +97,8 @@ public class PeerManagerImpl implements PeerManager
     private String localPeerId;
     private String ownerId;
     private RegistrationClient registrationClient;
+    protected ScheduledExecutorService backgroundTasksExecutorService;
+    private String currentNetwork;
 
 
     public PeerManagerImpl( final Messenger messenger, LocalPeer localPeer, DaoManager daoManager,
@@ -108,6 +117,8 @@ public class PeerManagerImpl implements PeerManager
         commandResponseListener = new CommandResponseListener();
         localPeer.addRequestListener( commandResponseListener );
         registrationClient = new RegistrationClientImpl( provider );
+        backgroundTasksExecutorService = Executors.newScheduledThreadPool( 1 );
+        backgroundTasksExecutorService.scheduleWithFixedDelay( new BackgroundTasksRunner(), 10, 30, TimeUnit.SECONDS );
     }
 
 
@@ -147,7 +158,7 @@ public class PeerManagerImpl implements PeerManager
                 PeerPolicy policy = getDefaultPeerPolicy( localPeerId );
 
                 PeerData peerData =
-                        new PeerData( localPeerInfo.getId(), toJson( localPeerInfo ), "", toJson( policy ) );
+                        new PeerData( localPeerInfo.getId(), toJson( localPeerInfo ), "", toJson( policy ), 1 );
 
                 updatePeerData( peerData );
             }
@@ -169,6 +180,7 @@ public class PeerManagerImpl implements PeerManager
     public void destroy()
     {
         commandResponseListener.dispose();
+        backgroundTasksExecutorService.shutdown();
     }
 
 
@@ -254,9 +266,10 @@ public class PeerManagerImpl implements PeerManager
 
             PeerPolicy policy = getDefaultPeerPolicy( registrationData.getPeerInfo().getId() );
 
+            final Integer order = getNextOrder();
             PeerData peerData =
                     new PeerData( registrationData.getPeerInfo().getId(), toJson( registrationData.getPeerInfo() ),
-                            keyPhrase, toJson( policy ) );
+                            keyPhrase, toJson( policy ), order );
             updatePeerData( peerData );
 
             Peer newPeer = createPeer( peerData );
@@ -321,7 +334,7 @@ public class PeerManagerImpl implements PeerManager
 
     protected void addToControlNetwork( final Peer peer ) throws PeerException
     {
-//        ControlNetworkConfig localConfig = localPeer.getControlNetworkConfig();
+        //        ControlNetworkConfig localConfig = localPeer.getControlNetworkConfig();
     }
 
 
@@ -853,8 +866,7 @@ public class PeerManagerImpl implements PeerManager
     {
         try
         {
-            PeerPolicy peerPolicy = fromJson( peerDataService.find( peerId ).getPolicy(), PeerPolicy.class );
-            return peerPolicy;
+            return fromJson( peerDataService.find( peerId ).getPolicy(), PeerPolicy.class );
         }
         catch ( IOException e )
         {
@@ -910,6 +922,19 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
+    protected synchronized Integer getNextOrder() throws PeerException
+    {
+        try
+        {
+            return peerDataService.getAll().size() + 1;
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Could not get peer order." );
+        }
+    }
+
+
     private class PeerActionResponses extends ArrayList<PeerActionResponse>
     {
         boolean succeeded()
@@ -925,6 +950,78 @@ public class PeerManagerImpl implements PeerManager
             }
             return result;
         }
+    }
+
+
+    private class BackgroundTasksRunner implements Runnable
+    {
+        @Override
+        public void run()
+        {
+            LOG.debug( "Background task runner started..." );
+            try
+            {
+                //                updateControlNetworkConfig();
+            }
+            catch ( Exception e )
+            {
+                LOG.warn( "Background task execution faild: " + e.getMessage() );
+            }
+            LOG.debug( "Background task runner finished." );
+        }
+    }
+
+
+    @Override
+    public void updateControlNetwork()
+    {
+        String key = DigestUtils.md5Hex( UUID.randomUUID().toString() );
+        try
+        {
+            currentNetwork = localPeer.getCurrentControlNetwork();
+
+            if ( currentNetwork == null )
+            {
+                renewControlNetwork();
+            }
+
+            String[] addresses =
+                    new SubnetUtils( currentNetwork, ControlNetworkUtil.NETWORK_MASK ).getInfo().getAllAddresses();
+
+            for ( Peer peer : getPeers() )
+            {
+                PeerData data = loadPeerData( peer.getId() );
+                if ( data.getOrder() == null )
+                {
+                    continue;
+                }
+                ControlNetworkConfig config =
+                        new ControlNetworkConfig( peer.getId(), addresses[data.getOrder()], localPeerId, key, 100000 );
+                peer.updateControlNetworkConfig( config );
+            }
+        }
+        catch ( PeerException e )
+        {
+            LOG.error( e.getMessage(), e );
+        }
+    }
+
+
+    private void renewControlNetwork()
+    {
+        List<ControlNetworkConfig> configs = new ArrayList<>();
+        for ( Peer peer : getPeers() )
+        {
+            try
+            {
+                configs.add( peer.getControlNetworkConfig( localPeerId ) );
+            }
+            catch ( PeerException e )
+            {
+                //ignore
+            }
+        }
+        currentNetwork = ControlNetworkUtil.findFreeNetwork( configs );
     }
 }
 

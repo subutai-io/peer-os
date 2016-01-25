@@ -10,9 +10,8 @@ public class ControlNetworkConfig
 {
     @JsonProperty( "peerId" )
     private String peerId;
-    //TODO: rename to "communityName"
-    @JsonProperty( "fingerprint" )
-    private String fingerprint;
+    @JsonProperty( "communityName" )
+    private String communityName;
     @JsonProperty( "address" )
     private String address;
     @JsonProperty( "secretKey" )
@@ -25,27 +24,38 @@ public class ControlNetworkConfig
 
     public ControlNetworkConfig( @JsonProperty( "peerId" ) final String peerId,
                                  @JsonProperty( "address" ) final String address,
-                                 @JsonProperty( "fingerprint" ) final String fingerprint,
+                                 @JsonProperty( "communityName" ) final String communityName,
                                  @JsonProperty( "secretKey" ) final String secretKey,
                                  @JsonProperty( "secretKeyTtlSec" ) final long secretKeyTtlSec,
                                  @JsonProperty( "usedNetworks" ) final List<String> usedNetworks )
     {
         this.peerId = peerId;
         this.address = address;
-        this.fingerprint= fingerprint;
+        this.communityName = communityName;
         this.secretKey = secretKey;
         this.secretKeyTtlSec = secretKeyTtlSec;
         this.usedNetworks = usedNetworks;
     }
 
 
-    public ControlNetworkConfig( final String peerId, final String address, final String fingerprint,
+    public ControlNetworkConfig( final String peerId, final String address, final String communityName,
                                  final List<String> usedNetworks )
     {
         this.peerId = peerId;
         this.address = address;
-        this.fingerprint= fingerprint;
+        this.communityName = communityName;
         this.usedNetworks = usedNetworks;
+    }
+
+
+    public ControlNetworkConfig( final String peerId, final String address, final String communityName,
+                                 final String secretKey, final long secretKeyTtlSec )
+    {
+        this.peerId = peerId;
+        this.address = address;
+        this.communityName = communityName;
+        this.secretKey = secretKey;
+        this.secretKeyTtlSec = secretKeyTtlSec;
     }
 
 
@@ -67,9 +77,9 @@ public class ControlNetworkConfig
     }
 
 
-    public String getFingerprint()
+    public String getCommunityName()
     {
-        return fingerprint;
+        return communityName;
     }
 
 

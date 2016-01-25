@@ -2,19 +2,14 @@ package io.subutai.core.localpeer.cli;
 
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 
-import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.protocol.ControlNetworkConfig;
-import io.subutai.common.util.ControlNetworkException;
 import io.subutai.common.util.ControlNetworkUtil;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.peer.api.PeerManager;
@@ -47,7 +42,6 @@ public class UpdateControlNetworkCommand extends SubutaiShellCommandSupport
                         String.format( "Peer '%s' is down at this moment. Skipping this peer.", peer.getId() ) );
                 continue;
             }
-
             configs.add( peer.getControlNetworkConfig( localPeerId ) );
         }
 
@@ -60,7 +54,7 @@ public class UpdateControlNetworkCommand extends SubutaiShellCommandSupport
         for ( ControlNetworkConfig config : result )
         {
             System.out.println(
-                    String.format( "%s %s %s", config.getPeerId(), config.getFingerprint(), config.getAddress() ) );
+                    String.format( "%s %s %s", config.getPeerId(), config.getCommunityName(), config.getAddress() ) );
         }
         return null;
     }

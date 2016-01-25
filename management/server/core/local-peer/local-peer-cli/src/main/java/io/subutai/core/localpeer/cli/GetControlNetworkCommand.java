@@ -32,7 +32,7 @@ public class GetControlNetworkCommand extends SubutaiShellCommandSupport
             {
                 final ControlNetworkConfig result = peer.getControlNetworkConfig( localPeerId );
                 System.out.println(
-                        String.format( "%s %s %s", result.getPeerId(), result.getFingerprint(), result.getAddress() ) );
+                        String.format( "%s %s %s", result.getPeerId(), result.getCommunityName(), result.getAddress() ) );
                 System.out.println( "Used networks:" );
                 for ( String s : result.getUsedNetworks() )
                 {

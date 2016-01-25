@@ -30,7 +30,6 @@
     <module>broker</module>
     <module>host-registry</module>
     <module>command-executor</module>
-    <module>plugin-manager</module>
     <module>identity-manager</module>
     <module>channel-manager</module>
     <module>cli-controller</module>
@@ -41,6 +40,7 @@
     <module>test</module>
     <module>kurjun</module>
     <module>trust-manager</module>
+    <module>plugin-manager</module>
   </modules>
 
 </project>

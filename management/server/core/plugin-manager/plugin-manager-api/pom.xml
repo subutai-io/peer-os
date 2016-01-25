@@ -12,32 +12,12 @@
   <artifactId>plugin-manager-api</artifactId>
   <name>Subutai Plugin Manager Api</name>
   <description>Subutai Plugin Manager Api</description>
-
   <packaging>bundle</packaging>
 
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>subutai-common</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-all</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-all</artifactId>
-      <scope>test</scope>
+      <artifactId>identity-manager-api</artifactId>
     </dependency>
   </dependencies>
 
@@ -53,6 +33,9 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.core.pluginmanager.api</Bundle-SymbolicName>
+            <Export-Package>
+              {local-packages};version=${project.version};-noimport:=true
+            </Export-Package>
           </instructions>
         </configuration>
       </plugin>
