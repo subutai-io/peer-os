@@ -74,7 +74,7 @@ const defaultConfig = `
 	[management]
 	gpgUser =
 	port = 8443
-	host = gw.intra.lan
+	host = 10.10.10.1
 	login = admin
 	password = secret
 	secret = secret
@@ -86,7 +86,7 @@ const defaultConfig = `
 	[broker]
 	port = 8883
 	password = client
-	url = ssl://gw.intra.lan
+	url = ssl://10.10.10.1
 	responseTopic = RESPONSE_TOPIC
 	executeTimeout = EXECUTE_TIMEOUT
 	BroadcastTopic = BROADCAST_TOPIC
