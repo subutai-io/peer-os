@@ -81,7 +81,7 @@ const defaultConfig = `
 	restToken = /rest/v1/identity/gettoken
 	restPublicKey = /rest/v1/registration/public-key
 	restVerify = /rest/v1/registration/verify/container-token
-    kurjun = http://gw.intra.lan:8551/rest/kurjun/templates
+    kurjun = http://10.10.10.1:8551/rest/kurjun/templates
 
 	[broker]
 	port = 8883
@@ -95,7 +95,7 @@ const defaultConfig = `
 	executeTerminated = EXECUTE_TERMINATED
 
 	[influxdb]
-	server = gw.intra.lan
+	server = 10.10.10.1
 	user = root
 	pass = root
 	db = metrics
@@ -156,7 +156,7 @@ func InitAgentDebug() {
 }
 
 func CheckKurjun() {
-	_, err := net.DialTimeout("tcp", "gw.intra.lan:8551", time.Duration(3)*time.Second)
+	_, err := net.DialTimeout("tcp", "10.10.10.1:8551", time.Duration(3)*time.Second)
 	if log.Check(log.WarnLevel, "Connecting local Kurjun", err) {
 		Management.Kurjun = "http://repo.critical-factor.com:8081/rest/kurjun/templates"
 	}
