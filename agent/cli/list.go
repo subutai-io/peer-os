@@ -109,6 +109,9 @@ func info(name string) (result []string) {
 	log.Check(log.FatalLevel, "Looking for container "+name, err)
 
 	nic := "eth0"
+	if name == "management" {
+		nic = "eth1"
+	}
 	listip, _ := c.IPAddress(nic)
 	ip := strings.Join(listip, " ")
 	mac := container.GetConfigItem(config.Agent.LxcPrefix+"/"+name+"/config", "lxc.network.hwaddr")

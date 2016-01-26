@@ -95,9 +95,9 @@ func LxcImport(templ, token string) {
 		return
 	}
 
-	if token == "" {
-		token = gpg.GetToken()
-	}
+	// if token == "" {
+	token = gpg.GetToken()
+	// }
 	md5 := templMd5(templ, runtime.GOARCH, token)
 
 	archive := checkLocal(templ, md5, runtime.GOARCH)

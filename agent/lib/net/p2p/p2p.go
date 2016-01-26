@@ -31,7 +31,7 @@ func p2pFile(line string) {
 
 func Create(interfaceName, localPeepIPAddr, hash, key, ttl string) {
 	p2pFile(interfaceName + " " + localPeepIPAddr + " " + key + " " + ttl + " " + hash)
-	log.Check(log.FatalLevel, "Creating p2p interface", exec.Command("p2p", "-start", "-key", key, "-dev", interfaceName, "-ip", localPeepIPAddr, "-hash", hash).Run())
+	log.Check(log.FatalLevel, "Creating p2p interface", exec.Command("p2p", "-start", "-key", key, "-dev", interfaceName, "-ip", localPeepIPAddr, "-ttl", ttl, "-hash", hash).Run())
 }
 
 func Print() {
@@ -73,7 +73,7 @@ func Remove(hash string) {
 }
 
 func UpdateKey(hash, newkey, ttl string) {
-	err := exec.Command("p2p", "-add-key", "-key", newkey, "-hash", hash).Run()
+	err := exec.Command("p2p", "-add-key", "-key", newkey, "-ttl", ttl, "-hash", hash).Run()
 	log.Check(log.FatalLevel, "Updating p2p key: ", err)
 }
 
