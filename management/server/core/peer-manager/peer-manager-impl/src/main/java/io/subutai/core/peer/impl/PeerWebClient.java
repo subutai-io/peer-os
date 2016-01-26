@@ -516,7 +516,7 @@ public class PeerWebClient
     }
 
 
-    public void updateControlNetworkConfig( final ControlNetworkConfig config ) throws PeerException
+    public boolean updateControlNetworkConfig( final ControlNetworkConfig config ) throws PeerException
     {
         Preconditions.checkNotNull( config );
         Preconditions.checkNotNull( config.getAddress() );
@@ -531,7 +531,7 @@ public class PeerWebClient
             WebClient client = WebClientBuilder.buildPeerWebClient( host, path, provider, 500, 7000, 1 );
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
-            client.put( config );
+            return client.put( config, Boolean.class );
         }
         catch ( Exception e )
         {

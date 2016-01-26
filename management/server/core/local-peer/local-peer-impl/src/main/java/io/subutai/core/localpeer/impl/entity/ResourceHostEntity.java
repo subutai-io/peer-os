@@ -543,8 +543,21 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             }
             catch ( HostNotFoundException e )
             {
-                LOG.warn( String.format( "Found not registered container host: %s %s", info.getId(),
-                        info.getHostname() ) );
+                if ( "management".equals( info.getHostname() ) )
+                {
+                    containerHost = new ContainerHostEntity( peerId, info, "master", "amd64" );
+//                    containerHost.setEnvironmentId( request.getEnvironmentId() );
+//                    containerHost.setOwnerId( request.getOwnerId() );
+//                    containerHost.setInitiatorPeerId( request.getInitiatorPeerId() );
+//                    containerHost.setContainerSize( request.getContainerSize() );
+                    addContainerHost( containerHost );
+                    result = true;
+                }
+                else
+                {
+                    LOG.warn( String.format( "Found not registered container host: %s %s", info.getId(),
+                            info.getHostname() ) );
+                }
                 //                if ( !Strings.isNullOrEmpty( info.getId() ) )
                 //                {
                 //                    containerHost = new ContainerHostEntity( peerId, info );
