@@ -3,7 +3,7 @@ package template
 import (
 	"crypto/rand"
 	"fmt"
-	"io/ioutil"
+	// "io/ioutil"
 	"os"
 	"os/exec"
 	"subutai/lib/container"
@@ -27,13 +27,13 @@ func MngInit() {
 		{"lxc.network.hwaddr", mac()},
 	})
 
-	exec.Command("ovs-vsctl", "--may-exist", "add-br", "br-mng").Run()
-	exec.Command("ovs-vsctl", "del-port", "br-int", "eth0").Run()
-	exec.Command("ovs-vsctl", "--may-exist", "add-port", "br-mng", "eth0").Run()
-	exec.Command("dhclient", "-r", "br-int").Run()
-	exec.Command("dhclient", "br-mng").Run()
+	// exec.Command("ovs-vsctl", "--may-exist", "add-br", "br-mng").Run()
+	// exec.Command("ovs-vsctl", "del-port", "br-int", "eth0").Run()
+	// exec.Command("ovs-vsctl", "--may-exist", "add-port", "br-mng", "eth0").Run()
+	// exec.Command("dhclient", "-r", "br-int").Run()
+	// exec.Command("dhclient", "br-mng").Run()
 
-	exec.Command("ovs-vsctl", "--may-exist", "add-port", "br-int", "eth1").Run()
+	// exec.Command("ovs-vsctl", "--may-exist", "add-port", "br-int", "eth1").Run()
 	exec.Command("ovs-vsctl", "--may-exist", "add-br", "br-tun").Run()
 	exec.Command("ovs-vsctl", "--may-exist", "add-port", "br-tun", "tunTOint").Run()
 	exec.Command("ovs-vsctl", "--may-exist", "add-port", "br-int", "intTOtun").Run()
@@ -42,16 +42,16 @@ func MngInit() {
 	exec.Command("ovs-vsctl", "set", "bridge", "br-tun", "stp_enable=true").Run()
 	exec.Command("ovs-ofctl", "add-flow", "br-tun", "\"priority=2500,dl_vlan=0xffff actions=drop\"").Run()
 
-	err := ioutil.WriteFile("/writable/system-data/etc/network/interfaces.d/eth0",
-		[]byte("allow-hotplug eth0\niface eth0 inet manual\n"), 0644)
-	log.Check(log.WarnLevel, "Writing eth0 config", err)
+	// err := ioutil.WriteFile("/writable/system-data/etc/network/interfaces.d/eth0",
+	// 	[]byte("allow-hotplug eth0\niface eth0 inet manual\n"), 0644)
+	// log.Check(log.WarnLevel, "Writing eth0 config", err)
 
-	err = ioutil.WriteFile("/writable/system-data/etc/network/interfaces.d/eth1",
-		[]byte("allow-hotplug eth1\niface eth1 inet manual\n"), 0644)
-	log.Check(log.WarnLevel, "Writing eth1 config", err)
+	// err = ioutil.WriteFile("/writable/system-data/etc/network/interfaces.d/eth1",
+	// 	[]byte("allow-hotplug eth1\niface eth1 inet manual\n"), 0644)
+	// log.Check(log.WarnLevel, "Writing eth1 config", err)
 
 	container.Start("management")
-	exec.Command("ifconfig", "eth1", "up").Run()
+	// exec.Command("ifconfig", "eth1", "up").Run()
 	exec.Command("dhclient", "br-int").Run()
 
 	f, err := os.OpenFile("/etc/hosts", os.O_APPEND|os.O_WRONLY, 0600)
@@ -64,10 +64,10 @@ func MngInit() {
 }
 
 func MngDel() {
-	exec.Command("ovs-vsctl", "del-br", "br-mng").Run()
-	exec.Command("ovs-vsctl", "del-port", "br-int", "eth1").Run()
-	exec.Command("ovs-vsctl", "del-port", "br-int", "mng-lan").Run()
-	exec.Command("ovs-vsctl", "add-port", "br-int", "eth0").Run()
+	// exec.Command("ovs-vsctl", "del-br", "br-mng").Run()
+	// exec.Command("ovs-vsctl", "del-port", "br-int", "eth1").Run()
+	// exec.Command("ovs-vsctl", "del-port", "br-int", "mng-lan").Run()
+	// exec.Command("ovs-vsctl", "add-port", "br-int", "eth0").Run()
 	exec.Command("dhclient", "-r", "br-int").Run()
-	exec.Command("dhclient", "br-int").Run()
+	// exec.Command("dhclient", "br-int").Run()
 }
