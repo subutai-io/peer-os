@@ -1,11 +1,13 @@
 package io.subutai.core.kurjun.impl;
 
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.security.AccessControlException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,6 +22,7 @@ import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -52,6 +55,15 @@ import ai.subut.kurjun.model.repository.Repository;
 import ai.subut.kurjun.model.repository.UnifiedRepository;
 import ai.subut.kurjun.model.security.Identity;
 import ai.subut.kurjun.model.security.Permission;
+import ai.subut.kurjun.quota.DataUnit;
+import ai.subut.kurjun.quota.QuotaException;
+import ai.subut.kurjun.quota.QuotaInfoStore;
+import ai.subut.kurjun.quota.QuotaManagementModule;
+import ai.subut.kurjun.quota.QuotaManagerFactory;
+import ai.subut.kurjun.quota.disk.DiskQuota;
+import ai.subut.kurjun.quota.disk.DiskQuotaManager;
+import ai.subut.kurjun.quota.transfer.TransferQuota;
+import ai.subut.kurjun.quota.transfer.TransferQuotaManager;
 import ai.subut.kurjun.repo.RepositoryFactory;
 import ai.subut.kurjun.repo.RepositoryModule;
 import ai.subut.kurjun.riparser.ReleaseIndexParserModule;
@@ -61,7 +73,6 @@ import ai.subut.kurjun.snap.SnapMetadataParserModule;
 import ai.subut.kurjun.storage.factory.FileStoreFactory;
 import ai.subut.kurjun.storage.factory.FileStoreModule;
 import ai.subut.kurjun.subutai.SubutaiTemplateParserModule;
-import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.settings.Common;
@@ -146,6 +157,14 @@ public class TemplateManagerImpl implements TemplateManager
         // init contexts
         KurjunProperties properties = injector.getInstance( KurjunProperties.class );
         setContexts( properties );
+        try
+        {
+            readQuotaInfo( properties );
+        }
+        catch ( IOException ex )
+        {
+            LOGGER.error( "Failed to read quota info", ex );
+        }
 
         // schedule metadata cache updater
         metadataCacheUpdater = Executors.newSingleThreadScheduledExecutor();
@@ -238,7 +257,15 @@ public class TemplateManagerImpl implements TemplateManager
         m.setMd5sum( md5 );
 
         UnifiedRepository repo = getRepository( context, isKurjunClient );
-        return repo.getPackageStream( m );
+        InputStream is = repo.getPackageStream( m );
+
+        if ( is != null )
+        {
+            QuotaManagerFactory quotaManagerFactory = injector.getInstance( QuotaManagerFactory.class );
+            TransferQuotaManager qm = quotaManagerFactory.createTransferQuotaManager( new KurjunContext( context ) );
+            return qm.createManagedStream( is );
+        }
+        return null;
     }
 
 
@@ -293,9 +320,22 @@ public class TemplateManagerImpl implements TemplateManager
         checkPermission( context, Permission.ADD_PACKAGE, "*" );
 
         LocalRepository repo = getLocalRepository( context );
+        QuotaManagerFactory quotaManagerFactory = injector.getInstance( QuotaManagerFactory.class );
+        DiskQuotaManager diskQuotaManager = quotaManagerFactory.createDiskQuotaManager( new KurjunContext( context ) );
+
+        Path dump = null;
         try
         {
-            Metadata m = repo.put( inputStream, CompressionType.GZIP );
+            dump = diskQuotaManager.copyStream( inputStream );
+        }
+        catch ( QuotaException ex )
+        {
+            throw new IOException( ex );
+        }
+
+        try ( InputStream is = new FileInputStream( dump.toFile() ) )
+        {
+            Metadata m = repo.put( is, CompressionType.GZIP );
 
             if ( !PUBLIC_REPO.equals( context ) )
             {
@@ -312,6 +352,10 @@ public class TemplateManagerImpl implements TemplateManager
         catch ( IOException ex )
         {
             LOGGER.error( "Failed to put template", ex );
+        }
+        finally
+        {
+            dump.toFile().delete();
         }
         return null;
     }
@@ -420,6 +464,14 @@ public class TemplateManagerImpl implements TemplateManager
     }
 
 
+    @Override
+    @RolesAllowed( "Template-Management|Read" )
+    public Set<String> getContexts()
+    {
+        return Collections.unmodifiableSet( CONTEXTS.stream().map( c -> c.getName() ).collect( Collectors.toSet() ) );
+    }
+
+
     private String getExternalIp()
     {
         try
@@ -456,6 +508,7 @@ public class TemplateManagerImpl implements TemplateManager
 
         bootstrap.addModule( new RepositoryModule() );
         bootstrap.addModule( new SecurityModule() );
+        bootstrap.addModule( new QuotaManagementModule() );
 
         bootstrap.boot();
 
@@ -654,6 +707,53 @@ public class TemplateManagerImpl implements TemplateManager
             remote.getMetadataCache().refresh();
         }
     }
+
+
+    /**
+     * Reads quota info specified in properties file. Property keys are context aware, i.e. disk quota info for context
+     * "my" is specified by keys "my.disk.threshold" and "my.disk.unit".
+     *
+     * @param properties
+     */
+    private void readQuotaInfo( KurjunProperties properties ) throws IOException
+    {
+        QuotaInfoStore quotaInfoStore = injector.getInstance( QuotaInfoStore.class );
+
+        for ( KurjunContext context : CONTEXTS )
+        {
+            // --- look up disk quotas ---
+            String key1 = String.join( ".", context.getName(), "disk", "threshold" );
+            String key2 = String.join( ".", context.getName(), "disk", "unit" );
+
+            Integer diskThreshold = properties.getInteger( key1 );
+            if ( diskThreshold != null )
+            {
+                DiskQuota diskQuota = new DiskQuota();
+                diskQuota.setThreshold( diskThreshold );
+                diskQuota.setUnit( DataUnit.getByName( properties.getWithDefault( key2, DataUnit.MB.toString() ) ) );
+                quotaInfoStore.saveDiskQuota( diskQuota, context );
+            }
+
+            // --- look up transfer quotas ---
+            String key3 = String.join( ".", context.getName(), "transfer", "threshold" );
+            String key4 = String.join( ".", context.getName(), "transfer", "unit" );
+            String key5 = String.join( ".", context.getName(), "transfer", "time", "minutes" );
+
+            Integer transferThreshold = properties.getInteger( key3 );
+            Integer timeFrame = properties.getInteger( key5 );
+            if ( transferThreshold != null && timeFrame != null )
+            {
+                TransferQuota transferQuota = new TransferQuota();
+                transferQuota.setThreshold( transferThreshold );
+                transferQuota.setUnit( DataUnit.getByName( properties.getWithDefault( key4, DataUnit.MB.toString() ) ) );
+                transferQuota.setTime( timeFrame );
+                transferQuota.setTimeUnit( TimeUnit.MINUTES );
+                quotaInfoStore.saveTransferQuota( transferQuota, context );
+            }
+
+        }
+    }
+
 
 }
 

@@ -33,6 +33,11 @@ public interface RestTemplateManager
     static final String RESPONSE_TYPE_MD5 = "md5";
 
     @GET
+    @Path( "repositories" )
+    @Produces( MediaType.APPLICATION_JSON )
+    Response getRepositories();
+    
+    @GET
     @Path( "{repository}/get" )
     @Produces( MediaType.TEXT_PLAIN )
     Response getTemplate( @PathParam( "repository" ) String repository,
@@ -59,6 +64,12 @@ public interface RestTemplateManager
     @Produces( MediaType.APPLICATION_JSON )
     Response getTemplateList( @PathParam( "repository") String repository,
                               @QueryParam( IS_KURJUN_CLIENT_PARAM ) boolean isKurjunClient );
+    
+    
+    @GET
+    @Path( "{repository}/template-list" )
+    @Produces( MediaType.APPLICATION_JSON )
+    Response getTemplateListSimple( @PathParam( "repository") String repository );
 
 
     @POST

@@ -58,7 +58,9 @@ import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.strategy.api.ContainerPlacementStrategy;
+import io.subutai.core.strategy.api.ExampleStrategy;
 import io.subutai.core.strategy.api.StrategyManager;
+import io.subutai.core.strategy.api.StrategyNotFoundException;
 
 
 public class RestServiceImpl implements RestService
@@ -157,6 +159,41 @@ public class RestServiceImpl implements RestService
         //            }
         //        }
         return Response.ok().build();
+    }
+
+
+    @Override
+    public Response buildAuto( final String name, final String containersJson )
+    {
+
+        Environment environment = null;
+
+        try
+        {
+            ContainerPlacementStrategy placementStrategy = placementStrategy = strategyManager.findStrategyById( ExampleStrategy.ID );
+
+            final List<PeerResources> resources = new ArrayList<>();
+            for ( final Peer peer : peerManager.getPeers() )
+            {
+                PeerResources peerResources =
+                        peerManager.getPeer( peer.getId() ).getResourceLimits( peerManager.getLocalPeer().getId() );
+                resources.add( peerResources );
+            }
+
+
+            final PeerGroupResources peerGroupResources = new PeerGroupResources( resources );
+            final Map<ContainerSize, ContainerQuota> quotas = quotaManager.getDefaultQuotas();
+
+            Topology topology = placementStrategy.distribute( name, 0, 0, peerGroupResources, quotas );
+
+            environment = environmentManager.setupRequisites( topology );
+        }
+        catch ( Exception e )
+        {
+            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+        }
+
+        return Response.ok( JsonUtil.toJson( Lists.newArrayList( environment.getId(), environment.getRelationDeclaration() ) ) ).build();
     }
 
 

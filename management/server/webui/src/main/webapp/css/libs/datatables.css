@@ -20,7 +20,7 @@ table.dataTable {
 	border-collapse: separate;
 	border-spacing: 0;
 	border: 1px solid #dcdcdc;	
-	border-radius: 5px;
+	/*border-radius: 5px;*/
 	/*
 	 * Header and footer styles
 	 */

@@ -22,6 +22,7 @@ public class ControlNetworkConfig
     private List<String> usedNetworks;
 
 
+
     public ControlNetworkConfig( @JsonProperty( "peerId" ) final String peerId,
                                  @JsonProperty( "address" ) final String address,
                                  @JsonProperty( "communityName" ) final String communityName,

@@ -132,7 +132,6 @@ import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.network.api.P2PConnection;
-import io.subutai.core.network.api.P2PPeerInfo;
 import io.subutai.core.repository.api.RepositoryException;
 import io.subutai.core.repository.api.RepositoryManager;
 import io.subutai.core.security.api.SecurityManager;
@@ -219,10 +218,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             {
                 for ( ResourceHost resourceHost : resourceHostDataService.getAll() )
                 {
-                    if ( "management".equals( resourceHost.getHostname() ) )
-                    {
-                        managementHost = resourceHost;
-                    }
+//                    if ( "management".equals( resourceHost.getHostname() ) )
+//                    {
+//                        managementHost = resourceHost;
+//                    }
                     resourceHosts.add( resourceHost );
                 }
             }
@@ -852,6 +851,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             throw new HostNotFoundException( String.format( "Management host not found on peer %s.", getId() ) );
         }
+
         return managementHost;
     }
 
@@ -1060,9 +1060,24 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 resourceHostDataService.update( host );
                 LOG.debug( String.format( "Resource host %s updated.", resourceHostInfo.getHostname() ) );
             }
-            if ( managementHost == null && "management".equals( resourceHostInfo.getHostname() ) )
+            if ( managementHost == null )
             {
-                managementHost = host;
+                try
+                {
+                    final Host managementLxc = findHostByName( "management" );
+                    if ( managementLxc instanceof ContainerHostEntity )
+                    {
+                        managementHost = ( ( ContainerHostEntity ) managementLxc ).getParent();
+                    }
+                }
+                catch ( HostNotFoundException e )
+                {
+                    //ignore}
+                }
+                //            if ( managementHost == null && "management".equals( resourceHostInfo.getHostname() ) )
+                //            {
+                //                managementHost = host;
+                //            }
             }
         }
     }
@@ -1461,12 +1476,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         try
         {
-            Set<P2PPeerInfo> s = getNetworkManager().listPeersInEnvironment( getId() );
-            for ( P2PPeerInfo info : s )
+            Set<P2PConnection> connections = getNetworkManager().listP2PConnections();
+            for ( P2PConnection connection : connections )
             {
-                if ( info.getP2pPeerIP().endsWith( ".1" ) )
+                if ( getId().toLowerCase().equals( connection.getCommunityName() ) )
                 {
-                    return ControlNetworkUtil.extractNetwork( info.getP2pPeerIP() );
+                    return ControlNetworkUtil.extractNetwork( connection.getLocalIp() );
                 }
             }
         }
@@ -1512,7 +1527,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public void updateControlNetworkConfig( final ControlNetworkConfig config ) throws PeerException
+    public boolean updateControlNetworkConfig( final ControlNetworkConfig config ) throws PeerException
     {
         try
         {
@@ -1534,23 +1549,44 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                     }
                 }
             }
+
             if ( !conflict )
             {
                 LOG.info( "Updating control network." );
                 LOG.debug( JsonUtil.toJson( config ) );
                 // update control network
+
+                ControlNetworkConfig currentConfig = getControlNetworkConfig( config.getCommunityName() );
+                if ( config.getAddress().equals( currentConfig.getAddress() ) )
+                {
+                    // connection already exists, just resetting hash and TTL
+                    getNetworkManager().resetP2PSecretKey( config.getCommunityName(), config.getSecretKey(),
+                            config.getSecretKeyTtlSec() );
+                }
+                else
+                {
+                    getNetworkManager().removeP2PConnection( config.getCommunityName() );
+                    getNetworkManager().setupP2PConnection( P2PUtil.generateInterfaceName( config.getAddress() ),
+                            config.getAddress(), config.getCommunityName(), config.getSecretKey(),
+                            config.getSecretKeyTtlSec() );
+                }
+
+
             }
             else
             {
                 // send conflict
                 LOG.warn( "Conflict of control networks." );
                 LOG.debug( JsonUtil.toJson( config ) );
+                return false;
             }
         }
         catch ( NetworkManagerException e )
         {
             LOG.error( e.getMessage(), e );
         }
+
+        return true;
     }
 
 
@@ -2041,7 +2077,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ) );
 
 
-        if ( getManagementHost().getHostname().equals( hostname ) )
+        if ( managementHost != null && getManagementHost().getHostname().equals( hostname ) )
         {
             return managementHost;
         }
