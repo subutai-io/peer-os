@@ -1,13 +1,26 @@
 <div ng-controller="IdentityUserCtrl as identityUserCtrl">
 
 	<div class="b-workspace__header">
-		<a class="b-btn b-btn_green b-btn_header-button" ng-click="identityUserCtrl.userForm()" href>
-			<i class="fa fa-plus"></i> Add user
-		</a>
+		<div class="b-header__userbar b-header__userbar_right" ng-controller="CurrentUserCtrl as currentUserCtrl">
+			<a href ng-click="currentUserCtrl.logout()"
+			   class="b-header-userbar-name"
+			   ng-if="currentUserCtrl.currentUser">
+				{{ currentUserCtrl.currentUser }} <i class="fa fa-sign-out b-header-userbar__icon"></i>
+			</a>
+			<a href ui-sref="login"
+			   class="b-header-userbar-name"
+			   ng-if="!currentUserCtrl.currentUser">
+				<i class="fa fa-sign-in b-header-userbar__icon"></i>
+			</a>
+		</div>
+
 		<h1 class="b-title">User management</h1>
 	</div>
 
 	<div class="b-workspace__content">
+		<a class="b-btn b-btn_green g-margin-bottom" ng-click="identityUserCtrl.userForm()" href>
+			<i class="fa fa-plus"></i> Add user
+		</a>
 		<div class="b-tabs-menu">
 			<ul>
 				<li class="b-tabs-menu__item"

@@ -21,6 +21,8 @@ public interface ContainerPlacementStrategy
 
     List<NodeSchema> getScheme();
 
+    void setScheme( List<NodeSchema> scheme );
+
     Topology distribute( String environmentName, int sshGroupId, int hostGroupId, PeerGroupResources peerGroupResources,
                          Map<ContainerSize, ContainerQuota> quotas ) throws StrategyException;
 }

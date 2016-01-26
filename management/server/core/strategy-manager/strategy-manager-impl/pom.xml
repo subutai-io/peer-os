@@ -11,7 +11,7 @@
 
   <artifactId>strategy-manager-impl</artifactId>
   <packaging>bundle</packaging>
-  <name>Subutai Strategy Manager</name>
+  <name>Subutai Strategy Manager Impl</name>
   <description>Subutai Strategy Manager Impl</description>
 
   <dependencies>

@@ -78,6 +78,7 @@ public interface RestAptManager
 
     @POST
     @Path( "upload" )
+    @Produces( MediaType.TEXT_PLAIN )
     @Consumes( MediaType.MULTIPART_FORM_DATA )
     Response upload( @Multipart( PACKAGE_FILE_PART_NAME ) Attachment attachment );
 }

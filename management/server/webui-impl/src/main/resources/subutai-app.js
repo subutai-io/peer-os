@@ -10,7 +10,8 @@ var app = angular.module('subutai-app', [
 		'ngTagsInput',
 		'nvd3',
 		'cfp.loadingBar',
-		'uiSwitch'
+		'uiSwitch',
+		'ngFileUpload'
 	])
 	.config(routesConf)
 
@@ -176,7 +177,7 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 		})
 		.state('environments', {
 			url: '/environments/{activeTab}',
-			templateUrl: 'subutai-app/environment/partials/view.html',
+			templateUrl: 'subutai-app/environment/partials/dragAndDrop.html',
 			data: {
 				bodyClass: '',
 				layout: 'default'

@@ -9,13 +9,27 @@
 	<form ng-submit="environmentViewCtrl.addSettingsToTemplate(templateSettings)">
 		<div class="b-popup__body">
 			<div class="b-popup-body" style="width: 300px;">
+
+				<div class="popup-body-box">
+					<label class="b-popup-body-label">Container name</label>
+					<input type="text" 
+						id="subt-input__environment-node-name" 
+						class="b-popup-body-input b-popup-body-input_box" 
+						ng-init="templateSettings.containerName = environmentViewCtrl.currentTemplate.get('containerName')" 
+						ng-model="templateSettings.containerName" required>
+					<div class="clear"></div>
+				</div>
+
 				<div class="popup-body-box">
 					<label class="b-popup-body-label">Select quota size</label>
 					<select class="b-popup-body-input b-popup-body-input_box" 
-						ng-init="templateSettings.quotaSize = environmentViewCtrl.containersType[1]" 
+						ng-init="templateSettings.quotaSize = environmentViewCtrl.currentTemplate.get('quotaSize')" 
 						ng-model="templateSettings.quotaSize"
 					>
-						<option ng-repeat="type in environmentViewCtrl.containersType" value="{{ type }}">
+						<option 
+						ng-repeat="type in environmentViewCtrl.containersType" 
+						value="{{ type }}" 
+						ng-selected="type == environmentViewCtrl.currentTemplate.get('quotaSize')">
 							{{ type }}
 						</option>
 					</select>

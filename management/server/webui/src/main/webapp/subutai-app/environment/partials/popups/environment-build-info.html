@@ -23,9 +23,15 @@
 	<div class="b-popup__body" ng-if="environmentViewCtrl.buildStep == 'pgpKey'">
 		<div class="b-form">
 			<div>
-				<span class="b-form-label b-form-label_fix-size-1">Message</span>
+				<span class="b-form-label b-form-label_fix-size-1 js-accordeon-message">Message</span>
+				<i class="fa fa-caret-down"></i>
 			</div>
-			<div>
+			<script>
+				$('.js-accordeon-message').on('click', function(){
+					$(this).parent().next().slideTouggle();
+				});
+			</script>
+			<div style="display: none;">
 				<textarea class="b-form-input b-form-input_full b-form-input_textarea bp-sign-target"
 					ng-model="environmentViewCtrl.newEnvID[1]" 
 					style = "width: 540px; height: 300px; font-family: monospace; overflow: scroll; resize: none">

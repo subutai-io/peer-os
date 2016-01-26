@@ -1,21 +1,26 @@
-<div class="b-popup b-popup_middle" ng-controller="KurjunViewCtrl as kurjunViewCtrl">
+<div class="b-popup b-popup_middle">
     <div class="b-popup__header">
-        <span>Add APT template</span>
+        <span>Add APT</span>
         <a href ng-click="closeThisDialog()">
             <img src="assets/elements/buttons/b-icon-close.svg" class="b-icon g-right"/>
         </a>
     </div>
-    <form ng-submit="kurjunViewCtrl.addAptTemplate()">
+    <form ng-submit="kurjunViewCtrl.proceedTemplate(kurjunCtrl.currentTemplate); processing=true">
         <div class="b-popup__body">
 
             <div class="popup-body-box">
                 <label class="b-popup-body-label">Template upload</label>
                 <div class="b-file-uploader">
                     <div class="fileUpload b-btn b-btn_light-grey">
-                        <span>Upload SSL cert</span>
-                        <input id="js-uploadBtn" type="file" class="upload" file-model="kurjunViewCtrl.file"/>
+                        <span>Upload archive</span>
+                        <input id="js-uploadBtn" type="file" class="upload" file-model="kurjunCtrl.currentTemplate.file" required/>
                     </div>
                     <input id="js-uploadFile" class="b-form-input b-form-input_fix-size-1" placeholder="Choose File" disabled="disabled" />
+                </div>
+                <div class="b-progress" ng-style="processing ? {'display':'block'} : {'display':'none'}">
+                    <div class="b-progress-bar" ng-style="{'width': kurjunCtrl.currentTemplate.file.progress + '%'}">
+                        {{ kurjunCtrl.currentTemplate.file.progress }}%
+                    </div>
                 </div>
                 <div class="clear"></div>
             </div>

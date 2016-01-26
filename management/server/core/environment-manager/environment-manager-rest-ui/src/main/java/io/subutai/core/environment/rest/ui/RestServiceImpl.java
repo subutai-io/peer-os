@@ -14,7 +14,6 @@ import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Node;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
@@ -59,8 +58,8 @@ import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.strategy.api.ContainerPlacementStrategy;
 import io.subutai.core.strategy.api.ExampleStrategy;
+import io.subutai.core.strategy.api.NodeSchema;
 import io.subutai.core.strategy.api.StrategyManager;
-import io.subutai.core.strategy.api.StrategyNotFoundException;
 
 
 public class RestServiceImpl implements RestService
@@ -170,7 +169,17 @@ public class RestServiceImpl implements RestService
 
         try
         {
-            ContainerPlacementStrategy placementStrategy = placementStrategy = strategyManager.findStrategyById( ExampleStrategy.ID );
+            ContainerPlacementStrategy placementStrategy = strategyManager.findStrategyById(
+                    ExampleStrategy.ID );
+
+//            if( !(placementStrategy instanceof GroupPlacementStrategy ) )
+//            {
+//                return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, "Internal error, GroupPlacementStrategy strategy not found" ) ).build();
+//            }
+
+            List<NodeSchema> schema = JsonUtil.fromJson( containersJson, new TypeToken<List<NodeSchema>>() {}.getType() );
+
+            placementStrategy.setScheme( schema );
 
             final List<PeerResources> resources = new ArrayList<>();
             for ( final Peer peer : peerManager.getPeers() )

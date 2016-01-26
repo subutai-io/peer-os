@@ -12,110 +12,208 @@ var fileUploder = {};
 function KurjunViewCtrl($scope, $rootScope, kurjunSrv, SweetAlert, DTOptionsBuilder, DTColumnDefBuilder, $resource, $compile, ngDialog, $timeout, cfpLoadingBar) {
 
 	var vm = this;
-	vm.activeTab = 'subutai-templates';
+	vm.activeTab = 'templates';
 	vm.repositories = [];
 	vm.templates = [];
 	vm.apts = [];
 
-	vm.deleteTemplate = deleteTemplate;
-	vm.addSubutaiTemplateForm = addSubutaiTemplateForm;
-	vm.proceedTemplate = proceedTemplate;
-	vm.addTemplate = addTemplate;
-	vm.addAPTForm = addAPTForm;
-	vm.addAptTemplate = addAptTemplate;
 	vm.openTab = openTab;
+	vm.addTemplate = addTemplate;
+	vm.proceedTemplate = proceedTemplate;
+	vm.deleteTemplate = deleteTemplate;
+	vm.deleteAPT = deleteAPT;
 
-	kurjunSrv.getRepositories().success(function (repositories) {
-		vm.repositories = repositories;
-		vm.templates = [];
-		getTemplates(0, repositories);
-	});
+	/*** Get templates according to repositories ***/
+	function getTemplates() {
+		kurjunSrv.getRepositories().success(function (repositories) {
+			vm.repositories = repositories;
+			vm.templates = [];
+			var getTemplatesRecursively = function (index, repositories) {
+				kurjunSrv.getTemplates(repositories[index]).then(function (templates) {
+					for (var template in templates.data) {
+						templates.data[template].repository = repositories[index];
+						vm.templates.push(templates.data[template]);
+					}
+					if (( index + 1 ) < repositories.length) {
+						getTemplatesRecursively(index + 1, repositories);
+					} else {
+						return;
+					}
+				});
+			};
+			getTemplatesRecursively(0, repositories);
+		});
+	}
+	getTemplates();
 
-	kurjunSrv.getAPTList().success(function (aptList) {
-		vm.aptList = aptList;
-	});
+	/*** Get all APTs ***/
+	function getAPTs() {
+		kurjunSrv.getAPTList().success(function (aptList) {
+			vm.aptList = aptList;
+		});
+	}
+	getAPTs();
 
 	function openTab(tab) {
-		if(tab == 'apt-templates' ) {
-			vm.dtOptions = DTOptionsBuilder
-					.newOptions()
-					.withOption('order', [[ 0, "desc" ]])
-					.withOption('stateSave', true)
-					.withPaginationType('full_numbers');
-			vm.dtColumnDefs = [
-				DTColumnDefBuilder.newColumnDef(0),
-				DTColumnDefBuilder.newColumnDef(1)
-			];
-		}
-		if(tab == 'subutai-templates') {
-			vm.dtOptions = DTOptionsBuilder
-					.newOptions()
-					.withOption('order', [[ 0, "desc" ]])
-					.withOption('stateSave', true)
-					.withPaginationType('full_numbers');
-			vm.dtColumnDefs = [
-				DTColumnDefBuilder.newColumnDef(0),
-				DTColumnDefBuilder.newColumnDef(1),
-				DTColumnDefBuilder.newColumnDef(2).notSortable(),
-			];
+		vm.dtOptions = DTOptionsBuilder
+				.newOptions()
+				.withOption('order', [[ 0, "desc" ]])
+				.withOption('stateSave', true)
+				.withPaginationType('full_numbers');
+
+		switch (tab) {
+			case 'templates':
+				vm.dtColumnDefs = [
+					DTColumnDefBuilder.newColumnDef(0),
+					DTColumnDefBuilder.newColumnDef(1),
+					DTColumnDefBuilder.newColumnDef(2).notSortable(),
+				];
+				break;
+			case 'apt':
+				vm.dtColumnDefs = [
+					DTColumnDefBuilder.newColumnDef(0),
+					DTColumnDefBuilder.newColumnDef(1)
+				];
+				break;
+			default:
+				break;
 		}
 		vm.activeTab = tab;
 	}
 
-	function addSubutaiTemplateForm() {
-		ngDialog.open({
-			template: 'subutai-app/kurjun/partials/domainForm.html',
-			scoep: $scope
-		});
+	function addTemplate(repository) {
+		switch (vm.activeTab) {
+			case 'templates':
+				vm.currentTemplate = {file: null};
+				ngDialog.open({
+					template: 'subutai-app/kurjun/partials/template-form.html',
+					scope: $scope
+				});
+				break;
+			case 'apt':
+				vm.currentTemplate = {repository: null,file: null};
+				ngDialog.open({
+					template: 'subutai-app/kurjun/partials/apt-form.html',
+					scope: $scope
+				});
+				break;
+			default:
+				break;
+		}
 	}
 
-	function proceedTemplate(test) {
-		console.log(test);
-	}
-
-	function getTemplates(index, repositories) {
-		kurjunSrv.getTemplates(repositories[index]).then(function (templates) {
-			for(var template in templates.data) {
-				templates.data[template].repository = repositories[index];
-				vm.templates.push(templates.data[template]);
-			}
-			if(( index + 1 )<repositories.length) {
-				getTemplates(index + 1, repositories);
-			} else {
-				return;
-			}
-		});
+	function proceedTemplate(template) {
+		switch (vm.activeTab) {
+			case 'templates':
+				kurjunSrv.addTemplate(template.repository, template.file).then(function (response) {
+					template.file.result = response.data;
+					LOADING_SCREEN('none');
+					SweetAlert.swal("Success!", "You have successfully uploaded template", "success");
+					getTemplates();
+				}, function (response) {
+					if (response.status > 0) {
+						ngDialog.closeAll();
+						LOADING_SCREEN('none');
+						SweetAlert.swal("ERROR!", "Your template is safe. Error: " + response.data, "error");
+					}
+				}, function (event) {
+					template.file.progress = Math.min(100, parseInt(100.0 * event.loaded / event.total));
+					if(template.file.progress == 100) {
+						$timeout(function () {
+							ngDialog.closeAll();
+							LOADING_SCREEN();
+						}, 1000);
+					}
+				});
+				break;
+			case 'apt':
+				kurjunSrv.addApt(template.file).then(function (response) {
+					template.file.result = response.data;
+					LOADING_SCREEN('none');
+					SweetAlert.swal("Success!", "You have successfully uploaded APT", "success");
+					getAPTs();
+				}, function (response) {
+					if (response.status > 0) {
+						ngDialog.closeAll();
+						LOADING_SCREEN('none');
+						SweetAlert.swal("ERROR!", "Your APT is safe. Error: " + response.data, "error");
+					}
+				}, function (event) {
+					template.file.progress = Math.min(100, parseInt(100.0 * event.loaded / event.total));
+					if (template.file.progress == 100) {
+						LOADING_SCREEN();
+						$timeout(function () {
+							ngDialog.closeAll();
+						}, 1000);
+					}
+				});
+				break;
+			default:
+				break;
+		}
 	}
 
 	function deleteTemplate(template) {
-		kurjunSrv.deleteTemplate(template.md5Sum, template.repository).success(function () {
-			kurjunSrv.getRepositories().success(function (repositories) {
-				vm.repositories = repositories;
-				vm.templates = [];
-				getTemplates(0, repositories);
-			});
-		});
+		SweetAlert.swal({
+					title: "Are you sure?",
+					text: "Delete template!",
+					type: "warning",
+					showCancelButton: true,
+					confirmButtonColor: "#ff3f3c",
+					confirmButtonText: "Delete",
+					cancelButtonText: "Cancel",
+					closeOnConfirm: false,
+					closeOnCancel: true,
+					showLoaderOnConfirm: true
+				},
+				function (isConfirm) {
+					if (isConfirm) {
+						LOADING_SCREEN();
+						kurjunSrv.deleteTemplate(template.md5Sum, template.repository).success(function (data) {
+							LOADING_SCREEN('none');
+							SweetAlert.swal("Deleted!", "Your template has been deleted.", "success");
+							getTemplates();
+						}).error(function (data) {
+							LOADING_SCREEN('none');
+							SweetAlert.swal("ERROR!", "Your template is safe. Error: " + data, "error");
+						});
+					}
+				});
 	}
 
-	function addTemplate(repository) {
-		kurjunSrv.addTemplate(repository, vm.file);
-	}
-
-	function addAptTemplate() {
-		kurjunSrv.addAptTemplate(vm.file);
-	}
-
-
-	function addAPTForm() {
-		ngDialog.open({
-			template: 'subutai-app/kurjun/partials/apt-form.html',
-			scoep: $scope
-		});
+	function deleteAPT(apt) {
+		SweetAlert.swal({
+					title: "Are you sure?",
+					text: "Delete template!",
+					type: "warning",
+					showCancelButton: true,
+					confirmButtonColor: "#ff3f3c",
+					confirmButtonText: "Delete",
+					cancelButtonText: "Cancel",
+					closeOnConfirm: false,
+					closeOnCancel: true,
+					showLoaderOnConfirm: true
+				},
+				function (isConfirm) {
+					if (isConfirm) {
+						LOADING_SCREEN();
+						kurjunSrv.deleteAPT(apt.md5Sum).success(function (data) {
+							LOADING_SCREEN('none');
+							SweetAlert.swal("Deleted!", "Your APT has been deleted.", "success");
+							getAPTs();
+						}).error(function (data) {
+							LOADING_SCREEN('none');
+							SweetAlert.swal("ERROR!", "Your template is safe. Error: REST Endpoint is under modification", "error");
+						});
+					}
+				});
 	}
 
 	cfpLoadingBar.start();
 	angular.element(document).ready(function () {
-		cfpLoadingBar.complete();
+		$timeout(function () {
+			cfpLoadingBar.complete();
+		}, 500);
 	});
 }
 

@@ -1,6 +1,19 @@
 <div ng-controller="ContainerViewCtrl as containerViewCtrl">
 
 	<div class="b-workspace__header">
+		<div class="b-header__userbar b-header__userbar_right" ng-controller="CurrentUserCtrl as currentUserCtrl">
+			<a href ng-click="currentUserCtrl.logout()"
+			   class="b-header-userbar-name"
+			   ng-if="currentUserCtrl.currentUser">
+				{{ currentUserCtrl.currentUser }} <i class="fa fa-sign-out b-header-userbar__icon"></i>
+			</a>
+			<a href ui-sref="login"
+			   class="b-header-userbar-name"
+			   ng-if="!currentUserCtrl.currentUser">
+				<i class="fa fa-sign-in b-header-userbar__icon"></i>
+			</a>
+		</div>
+
 		<h1 class="b-title">Containers</h1>
 	</div>
 
