@@ -1,6 +1,19 @@
 <div ng-controller="KurjunViewCtrl as kurjunViewCtrl">
 
 	<div class="b-workspace__header">
+		<div class="b-header__userbar b-header__userbar_right" ng-controller="CurrentUserCtrl as currentUserCtrl">
+			<a href ng-click="currentUserCtrl.logout()"
+			   class="b-header-userbar-name"
+			   ng-if="currentUserCtrl.currentUser">
+				{{ currentUserCtrl.currentUser }} <i class="fa fa-sign-out b-header-userbar__icon"></i>
+			</a>
+			<a href ui-sref="login"
+			   class="b-header-userbar-name"
+			   ng-if="!currentUserCtrl.currentUser">
+				<i class="fa fa-sign-in b-header-userbar__icon"></i>
+			</a>
+		</div>
+
 		<h1 class="b-title">Kurjun</h1>
 	</div>
 
@@ -8,24 +21,24 @@
 		<div class="b-tabs-menu">
 			<ul>
 				<li class="b-tabs-menu__item"
-						ng-click="kurjunViewCtrl.openTab('subutai-templates')"
-						ng-class="kurjunViewCtrl.activeTab == 'subutai-templates' ? 'b-tabs-menu__item_active' : ''">
-					Subutai templates
+						ng-click="kurjunViewCtrl.openTab('templates')"
+						ng-class="kurjunViewCtrl.activeTab == 'templates' ? 'b-tabs-menu__item_active' : ''">
+					Templates
 				</li>
 				<li class="b-tabs-menu__item"
-						ng-click="kurjunViewCtrl.openTab('apt-templates')"
-						ng-class="kurjunViewCtrl.activeTab == 'apt-templates' ? 'b-tabs-menu__item_active' : ''">
+						ng-click="kurjunViewCtrl.openTab('apt')"
+						ng-class="kurjunViewCtrl.activeTab == 'apt' ? 'b-tabs-menu__item_active' : ''">
 					APT
 				</li>
 			</ul>
 		</div>
 
 		<div
-				ng-if="kurjunViewCtrl.activeTab == 'subutai-templates'"
-				ng-include="'subutai-app/kurjun/partials/subutai-templates.html'">
+				ng-if="kurjunViewCtrl.activeTab == 'templates'"
+				ng-include="'subutai-app/kurjun/partials/templates.html'">
 		</div>
 		<div
-				ng-if="kurjunViewCtrl.activeTab == 'apt-templates'"
+				ng-if="kurjunViewCtrl.activeTab == 'apt'"
 				ng-include="'subutai-app/kurjun/partials/apt.html'">
 		</div>
 

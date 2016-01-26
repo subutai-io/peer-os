@@ -408,7 +408,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 
 	function buildEnvironment() {
 		ngDialog.closeAll();
-
 		environmentService.startEnvironmentBuild (vm.newEnvID[0], encodeURIComponent(vm.newEnvID[1])).success(function (data) {
 			SweetAlert.swal("Success!", "Your environment has been built successfully.", "success");
 			loadEnvironments();
@@ -725,6 +724,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 					'<g class="scalable">',
 						'<rect class="b-border"/>',
 					'</g>',
+					'<title/>',
 					'<image/>',
 					'<rect class="b-magnet"/>',
 				'</g>'
@@ -734,6 +734,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 				type: 'tm.devElement',
 				size: { width: 70, height: 70 },
 				attrs: {
+					title: {text: 'Static Tooltip'},
 					'rect.b-border': {fill: '#fff', stroke: '#dcdcdc', 'stroke-width': 1, width: 70, height: 70, rx: 50, ry: 50},
 					'rect.b-magnet': {fill: '#04346E', width: 10, height: 10, rx: 2, ry: 2, magnet: true, transform: 'translate(30,53)'},
 					image: {'ref-x': 9, 'ref-y': 9, ref: 'rect', width: 50, height: 50},
@@ -843,8 +844,8 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 				{
 					vm.templateGrid[i][j] = 1;
 					cellView.model.set('position', p1);
-					vm.cubeGrowth = vm.cubeGrowth < i ? i : vm.cubeGrowth;
-					vm.cubeGrowth = vm.cubeGrowth < j ? j : vm.cubeGrowth;
+					vm.cubeGrowth = vm.cubeGrowth < ( i + 1 ) ? ( i + 1 ) : vm.cubeGrowth;
+					vm.cubeGrowth = vm.cubeGrowth < ( j + 1 ) ? ( j + 1 ) : vm.cubeGrowth;
 
 					i = Math.floor( p0.x / GRID_CELL_SIZE );
 					j = Math.floor( p0.y / GRID_CELL_SIZE );
@@ -857,37 +858,36 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 		);
 
 		$('.js-scrollbar').perfectScrollbar();
+		var containerCounter = 1;
 		$('.b-tools-menu').on('click', '.js-add-dev-element', function(){
 			var pos = findEmptyCubePostion();
+			var img = $(this).find('img');
 			var devElement = new joint.shapes.tm.devElement({
 				position: { x: (GRID_CELL_SIZE * pos.x) + 20, y: (GRID_CELL_SIZE * pos.y) + 20 },
 				//devType: $(this).data('type'),
 				templateName: $(this).data('template'),
 				quotaSize: 'SMALL',
+				containerName: vm.environment2BuildName + ' ' + (containerCounter++).toString(),
 				attrs: {
-					image: { 'xlink:href': $(this).data('img') },
+					image: { 'xlink:href': img.attr('src') },
+					title: {text: $(this).data('template')}
 				}
 			});
 			graph.addCell(devElement);
 			return false;
 		});
 
-		function findEmptyCubePostion()
-		{
-			for( var j = 0; j < vm.cubeGrowth; j++ )
-			{
-				for( var i = 0; i < vm.cubeGrowth; i++ )
-				{
-					if( vm.templateGrid[i] === undefined )
-					{
+		function findEmptyCubePostion() {
+			for( var j = 0; j < vm.cubeGrowth; j++ ) {
+				for( var i = 0; i < vm.cubeGrowth; i++ ) {
+					if( vm.templateGrid[i] === undefined ) {
 						vm.templateGrid[i] = new Array();
 						vm.templateGrid[i][j] = 1;
 
 						return {x:i, y:j};
 					}
 
-					if( vm.templateGrid[i][j] !== 1 )
-					{
+					if( vm.templateGrid[i][j] !== 1 ) {
 						vm.templateGrid[i][j] = 1;
 						return {x:i, y:j};
 					}
@@ -899,6 +899,34 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 			vm.cubeGrowth++;
 			return { x : vm.cubeGrowth - 1, y : 0 };
 		}
+
+		paper.$el.on('mousewheel DOMMouseScroll', onMouseWheel);
+
+		function onMouseWheel(e) {
+
+			e.preventDefault();
+			e = e.originalEvent;
+
+			var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail))) / 50;
+			var offsetX = (e.offsetX || e.clientX - $(this).offset().left); // offsetX is not defined in FF
+			var offsetY = (e.offsetY || e.clientY - $(this).offset().top); // offsetY is not defined in FF
+			var p = offsetToLocalPoint(offsetX, offsetY);
+			var newScale = V(paper.viewport).scale().sx + delta; // the current paper scale changed by delta
+
+			if (newScale > 0.4 && newScale < 2) {
+				paper.setOrigin(0, 0); // reset the previous viewport translation
+				paper.scale(newScale, newScale, p.x, p.y);
+			}
+		}
+
+		function offsetToLocalPoint(x, y) {
+			var svgPoint = paper.svg.createSVGPoint();
+			svgPoint.x = x;
+			svgPoint.y = y;
+			// Transform point into the viewport coordinate system.
+			var pointTransformed = svgPoint.matrixTransform(paper.viewport.getCTM().inverse());
+			return pointTransformed;
+		}
 	}
 
 	vm.buildStep = 'confirm';
@@ -909,15 +937,22 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 		vm.buildStep = 'confirm';
 		console.log(allElements);
 		for(var i = 0; i < allElements.length; i++) {
-			var currentElement = allElements[i].get('templateName');
-			var container2Build = {"size": allElements[i].get('quotaSize'), "template": currentElement};
-			if(vm.env2Build[currentElement] === undefined) {
-				vm.env2Build[currentElement] = 1;
+			var currentElement = allElements[i];
+			var currentTemplateName = allElements[i].get('templateName');
+			var container2Build = {
+				"size": currentElement.get('quotaSize'),
+				"templateName": currentTemplateName,
+				"name": currentElement.get('containerName'),
+				"position": currentElement.get('position')
+			};
+			if(vm.env2Build[currentTemplateName] === undefined) {
+				vm.env2Build[currentTemplateName] = 1;
 			} else {
-				vm.env2Build[currentElement]++;
+				vm.env2Build[currentTemplateName]++;
 			}
 			vm.containers2Build.push(container2Build);
 		}
+		console.log(vm.containers2Build);
 		ngDialog.open({
 			template: 'subutai-app/environment/partials/popups/environment-build-info.html',
 			scope: $scope,
@@ -934,13 +969,18 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 				vm.buildStep = 'pgpKey';
 				LOADING_SCREEN('none');
 			}).error(function(error){
-				VARS_MODAL_ERROR( SweetAlert, 'Error: ' + data );
+				if(error.ERROR === undefined) {
+					VARS_MODAL_ERROR( SweetAlert, 'Error: ' + error );
+				} else {
+					VARS_MODAL_ERROR( SweetAlert, 'Error: ' + error.ERROR );
+				}
 				LOADING_SCREEN('none');
 			});
 	}
 
 	function addSettingsToTemplate(settings) {
 		vm.currentTemplate.set('quotaSize', settings.quotaSize);
+		vm.currentTemplate.set('containerName', settings.containerName);
 		ngDialog.closeAll();
 	}
 }
