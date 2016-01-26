@@ -6,7 +6,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
@@ -45,7 +49,15 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
 
 
     @Override
-    public Response getTemplate( String repository, String md5, String name, String version, 
+    public Response getRepositories()
+    {
+        Set<String> list = templateManager.getContexts();
+        return Response.ok( GSON.toJson( list ) ).build();
+    }
+
+
+    @Override
+    public Response getTemplate( String repository, String md5, String name, String version,
             String type, boolean isKurjunClient )
     {
         try
@@ -139,6 +151,39 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
         return Response.ok( "No templates" ).build();
     }
 
+    
+    @Override
+    public Response getTemplateListSimple( String repository )
+    {
+        try
+        {
+            List<TemplateKurjun> list = templateManager.list( repository, false );
+            if ( list != null )
+            {
+                List simpleList = new ArrayList();
+                for ( TemplateKurjun template : list )
+                {
+                    Map<String, Object> simple = new HashMap<>();
+                    simple.put( "name", template.getName() );
+                    simple.put( "md5Sum", template.getMd5Sum() );
+                    simple.put( "parent", template.getParent() );
+                    simple.put( "architecture", template.getArchitecture() );
+                    simple.put( "version", template.getVersion() );
+
+                    simpleList.add( simple );
+                }
+                return Response.ok( GSON.toJson( simpleList ) ).build();
+            }
+        }
+        catch ( IOException ex )
+        {
+            String msg = "Failed to get template list info";
+            LOGGER.error( msg, ex );
+            return Response.serverError().entity( msg ).build();
+        }
+        return Response.ok( "No templates" ).build();
+    }
+    
 
     @Override
     public Response uploadTemplate( String repository, Attachment attachment )
