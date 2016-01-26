@@ -19,7 +19,7 @@ table.dataTable {
 	clear: both;
 	border-collapse: separate;
 	border-spacing: 0;
-	border: 1px solid #dcdcdc;	
+	border: 1px solid #e6eaf5;	
 	/*border-radius: 5px;*/
 	/*
 	 * Header and footer styles
@@ -35,7 +35,7 @@ table.dataTable tfoot th {
 table.dataTable thead th,
 table.dataTable thead td {
 	padding: 18px 18px;
-	background-color: #f1f4f8;
+	background-color: #f8fbfd;
 	font-size: 13px;
 	color: #04346E;
 	text-align: left; 
@@ -379,7 +379,7 @@ table.dataTable thead .sorting_desc {
 				   text-decoration: underline;
 			   }
 			   .dataTables_wrapper .dataTables_paginate .paginate_button.current, .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
-				   background-color: #f1f4f8;
+				   background-color: #f8fbfd;
 				   color: #04346E!important;
 				   text-decoration: none;
 			   }
@@ -391,7 +391,7 @@ table.dataTable thead .sorting_desc {
 			   }
 			   .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
 				   color: #04346E !important;
-				   background-color: #f1f4f8;
+				   background-color: #f8fbfd;
 				   text-decoration: none;
 			   }
 			   .dataTables_wrapper .dataTables_paginate .paginate_button:active {

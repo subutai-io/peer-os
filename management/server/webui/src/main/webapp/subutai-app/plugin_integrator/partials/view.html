@@ -1,13 +1,26 @@
 <div ng-controller="IntegratorCtrl as integratorCtrl">
 	<div class="b-workspace__header">
-		<button 
-		class="b-btn b-btn_green b-btn_header-button" 
-		ng-click="integratorCtrl.uploadPluginWindow()">
-			<i class="fa fa-plus"></i> Upload new plugin
-		</button>
+		<div class="b-header__userbar b-header__userbar_right" ng-controller="CurrentUserCtrl as currentUserCtrl">
+			<a href ng-click="currentUserCtrl.logout()"
+			   class="b-header-userbar-name"
+			   ng-if="currentUserCtrl.currentUser">
+				{{ currentUserCtrl.currentUser }} <i class="fa fa-sign-out b-header-userbar__icon"></i>
+			</a>
+			<a href ui-sref="login"
+			   class="b-header-userbar-name"
+			   ng-if="!currentUserCtrl.currentUser">
+				<i class="fa fa-sign-in b-header-userbar__icon"></i>
+			</a>
+		</div>
+
 		<h1 class="b-title">Plugin Integrator</h1>
 	</div>
 	<div class="b-workspace__content">
+		<button
+				class="b-btn b-btn_green g-margin-bottom"
+				ng-click="integratorCtrl.uploadPluginWindow()">
+			<i class="fa fa-plus"></i> Upload new plugin
+		</button>
 		<div class="b-workspace-content__row">
 			<div class="b-main-table-border">
 				<table class="b-main-table b-main-table_with-header">

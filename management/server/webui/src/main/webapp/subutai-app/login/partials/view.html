@@ -1,7 +1,7 @@
 <div class="b-login">
 	<div class="b-login__form b-login__form_center">
 		<div class="b-login-form-header">
-			<a href="#"><img src="assets/elements/logo.svg" height="27px" alt=""></a>
+			<a href="#"><img src="assets/elements/logo.svg" width="323px" alt=""></a>
 		</div>
 		<div class="b-workspace b-workspace_login">
 
@@ -15,7 +15,7 @@
 						{{ loginCtrl.errorMessage }}
 					</div>
 					<form ng-submit="loginCtrl.login()">
-						<div class="b-form__wrapper b-form__wrapper_margin-bottom">
+						<div class="b-form__wrapper g-margin-bottom-half">
 							<label class="b-form-label">Username</label>
 							<input
 									class="b-form-input b-form-input_full"
@@ -23,7 +23,7 @@
 									ng-model="loginCtrl.name"
 									type="text">
 						</div>
-						<div class="b-form__wrapper b-form__wrapper_margin-bottom">
+						<div class="b-form__wrapper g-margin-bottom">
 							<label class="b-form-label">Password</label>
 							<input
 									class="b-form-input b-form-input_full"
@@ -31,22 +31,17 @@
 									ng-model="loginCtrl.pass"
 									type="password">
 						</div>
-						<div class="b-form__wrapper b-form__wrapper_margin-bottom">
-							<input type="checkbox" class="b-form-label_margin_r" id="check-box__keep-me-logged">
-							<label class="b-form-label" for="check-box__keep-me-logged">Keep me logged in</label>
-						</div>
 						<div class="b-login-form-btn">
-							<button type="submit" class="b-btn b-btn_green" id="subt-button__login">
+							<button type="submit" class="b-btn b-btn_green b-btn_full-width" id="subt-button__login">
 								Login
 							</button>
 						</div>
-						<div class="b-login-form-btn">
-							<span class = "b-form-label">or</span>
-						</div>
-						<div class="b-login-form-btn" ng-controller = "SignupCtrl as signupCtrl">
-							<a href class = "b-btn b-btn_blue" ng-click = "signupCtrl.signUpWindow()">Sign Up</a>
-						</div>
 					</form>
+				</div>
+			</div>
+			<div class="b-workspace__footer b-workspace__footer_login">
+				<div class="b-login-form-btn" ng-controller = "SignupCtrl as signupCtrl">
+					<a href class = "b-btn b-btn_blue b-btn_full-width" ng-click = "signupCtrl.signUpWindow()">Sign Up</a>
 				</div>
 			</div>
 		</div>

@@ -34,7 +34,7 @@
   background: #078DD0;
   position: absolute;
   z-index: 10002;
-  top: 57px;
+  top: 0px;
   left: 0;
   width: 100%;
   height: 3px;
@@ -52,7 +52,7 @@
 }
 
 #loading-bar-spinner {
-  display: block;
+  display: none;
   z-index: 10002;
   top: 21px;
   left: 285px;
