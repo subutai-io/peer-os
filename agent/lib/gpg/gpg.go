@@ -13,6 +13,7 @@ import (
 	"subutai/config"
 	"subutai/lib/container"
 	"subutai/log"
+	"time"
 )
 
 var (
@@ -179,7 +180,7 @@ func GetFingerprint(email string) (fingerprint string) {
 
 func GetToken() string {
 	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
-	client := &http.Client{Transport: tr}
+	client := &http.Client{Transport: tr, Timeout: time.Duration(3 * time.Second)}
 
 	resp, err := client.Get("https://" + config.Management.Host + ":" + config.Management.Port + config.Management.RestToken + "?username=" + config.Management.Login + "&password=" + config.Management.Password)
 	if log.Check(log.WarnLevel, "Getting token", err) {
