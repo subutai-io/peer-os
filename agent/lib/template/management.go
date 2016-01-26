@@ -51,6 +51,7 @@ func MngInit() {
 	log.Check(log.WarnLevel, "Writing eth1 config", err)
 
 	container.Start("management")
+	exec.Command("ifconfig", "eth1", "up").Run()
 	exec.Command("dhclient", "br-int").Run()
 
 	f, err := os.OpenFile("/etc/hosts", os.O_APPEND|os.O_WRONLY, 0600)
@@ -68,5 +69,5 @@ func MngDel() {
 	exec.Command("ovs-vsctl", "del-port", "br-int", "mng-lan").Run()
 	exec.Command("ovs-vsctl", "add-port", "br-int", "eth0").Run()
 	exec.Command("dhclient", "-r", "br-int").Run()
-	exec.Command("dhclient", "br-int").Start()
+	exec.Command("dhclient", "br-int").Run()
 }
