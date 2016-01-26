@@ -10,7 +10,8 @@ var app = angular.module('subutai-app', [
 		'ngTagsInput',
 		'nvd3',
 		'cfp.loadingBar',
-		'uiSwitch'
+		'uiSwitch',
+		'ngFileUpload'
 	])
 	.config(routesConf)
 

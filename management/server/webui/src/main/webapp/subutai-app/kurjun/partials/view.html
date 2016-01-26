@@ -1,24 +1,20 @@
 <div ng-controller="KurjunViewCtrl as kurjunViewCtrl">
 
-	<div class="b-workspace__header">
-		<div class="b-header__userbar b-header__userbar_right" ng-controller="CurrentUserCtrl as currentUserCtrl">
-			<a href ng-click="currentUserCtrl.logout()"
-			   class="b-header-userbar-name"
-			   ng-if="currentUserCtrl.currentUser">
-				{{ currentUserCtrl.currentUser }} <i class="fa fa-sign-out b-header-userbar__icon"></i>
-			</a>
-			<a href ui-sref="login"
-			   class="b-header-userbar-name"
-			   ng-if="!currentUserCtrl.currentUser">
-				<i class="fa fa-sign-in b-header-userbar__icon"></i>
-			</a>
-		</div>
+	<div class="b-workspace__header b-workspace__header_tabs">
 
-		<h1 class="b-title">Kurjun</h1>
-	</div>
-
-	<div class="b-workspace__content">
-		<div class="b-tabs-menu">
+		<div class="b-tabs-menu b-tabs-menu_header">
+			<div class="b-header__userbar b-header__userbar_tabs b-header__userbar_right" ng-controller="CurrentUserCtrl as currentUserCtrl">
+				<a href ng-click="currentUserCtrl.logout()"
+				   class="b-header-userbar-name"
+				   ng-if="currentUserCtrl.currentUser">
+					{{ currentUserCtrl.currentUser }} <i class="fa fa-sign-out b-header-userbar__icon"></i>
+				</a>
+				<a href ui-sref="login"
+				   class="b-header-userbar-name"
+				   ng-if="!currentUserCtrl.currentUser">
+					<i class="fa fa-sign-in b-header-userbar__icon"></i>
+				</a>
+			</div>
 			<ul>
 				<li class="b-tabs-menu__item"
 						ng-click="kurjunViewCtrl.openTab('templates')"
@@ -32,6 +28,9 @@
 				</li>
 			</ul>
 		</div>
+	</div>
+
+	<div class="b-workspace__content">
 
 		<div
 				ng-if="kurjunViewCtrl.activeTab == 'templates'"

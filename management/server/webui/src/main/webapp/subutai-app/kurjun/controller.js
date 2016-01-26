@@ -211,7 +211,9 @@ function KurjunViewCtrl($scope, $rootScope, kurjunSrv, SweetAlert, DTOptionsBuil
 
 	cfpLoadingBar.start();
 	angular.element(document).ready(function () {
-		cfpLoadingBar.complete();
+		$timeout(function () {
+			cfpLoadingBar.complete();
+		}, 500);
 	});
 }
 

@@ -53,7 +53,9 @@ input[type=checkbox] {
     float: left;
     display: inline-block;
 }
-
+.b-header__userbar_tabs {
+    padding-right: 15px;
+}
 .b-header__userbar_right {
     float: right;
     display: inline-block;
@@ -106,9 +108,13 @@ input[type=checkbox] {
 }
 
 .b-workspace__header {
-    padding: 15px;
-    /*margin: 0 0 21px 0;*/
+    padding: 0 15px;
+    line-height: 52px;
+    height: 52px;
     border-bottom: 1px solid #e6eaf5;
+}
+.b-workspace__header_tabs {
+    padding: 0;
 }
 .b-workspace__header_cloud-env {
     margin: 0;
@@ -647,15 +653,18 @@ input[type=checkbox] {
 
 .b-nav-menu-link {
     text-decoration: none;
-    font-weight: 600;
+    font-weight: 400;
     font-size: 14px;
     color: #04346E;
 }
 
 .b-nav-menu-link:hover .b-nav-menu-icon path,
 .b-nav-menu-link:hover .b-nav-menu-icon polygon,
-.b-nav-menu-link:hover .b-nav-menu-icon rect {
-    fill: #078DD0;
+.b-nav-menu-link:hover .b-nav-menu-icon rect,
+.b-nav-menu-link:hover .b-nav-menu-icon line,
+.b-nav-menu-link:hover .b-nav-menu-icon polyline,
+.b-nav-menu-link:hover .b-nav-menu-icon circle {
+    stroke: #078DD0;
 }
 
 .b-nav-menu-link:hover {
@@ -1879,6 +1888,9 @@ td.b-main-table__status-col {
     border: 1px solid #e6eaf5;
     margin-bottom: -1px;
 }
+.b-tabs-menu_header ul {
+    border: none;
+}
 .b-tabs-menu_cloud-env ul {
     border: none;
     border-bottom: 1px solid #e6eaf5;
@@ -1895,6 +1907,10 @@ td.b-main-table__status-col {
     /*border-radius: 5px 5px 0 0;*/
     cursor: pointer;
     margin-bottom: -2px;
+}
+.b-tabs-menu_header ul .b-tabs-menu__item {
+    margin-bottom: -1px;
+    padding: 14px 35px;
 }
 .b-tabs-menu__item:hover {
     background-color: #fcfcfc;
