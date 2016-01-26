@@ -34,20 +34,20 @@ public class ExamplePlacementStrategy implements ExampleStrategy
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( ExamplePlacementStrategy.class );
 
-    private static List<NodeSchema> scheme = new ArrayList<>();
+    private List<NodeSchema> scheme = new ArrayList<>();
     private static ExamplePlacementStrategy instance;
 
-    static
-    {
+//    static
+//    {
 /*
         scheme.add( new NodeSchema( "Huge master", ContainerSize.HUGE, "master" ) );
         scheme.add( new NodeSchema( "Large master", ContainerSize.LARGE, "master" ) );
         scheme.add( new NodeSchema( "Medium master", ContainerSize.MEDIUM, "master" ) );
 */
-        scheme.add( new NodeSchema( "master", ContainerSize.TINY, "master" ) );
-        scheme.add( new NodeSchema( "hadoop", ContainerSize.TINY, "hadoop" ) );
-        scheme.add( new NodeSchema( "cassandra", ContainerSize.TINY, "cassandra" ) );
-    }
+//        scheme.add( new NodeSchema( "master", ContainerSize.TINY, "master" ) );
+//        scheme.add( new NodeSchema( "hadoop", ContainerSize.TINY, "hadoop" ) );
+//        scheme.add( new NodeSchema( "cassandra", ContainerSize.TINY, "cassandra" ) );
+//    }
 
     public static ExamplePlacementStrategy getInstance()
     {
@@ -95,6 +95,13 @@ public class ExamplePlacementStrategy implements ExampleStrategy
     public List<NodeSchema> getScheme()
     {
         return scheme;
+    }
+
+
+    @Override
+    public void setScheme( List<NodeSchema> scheme )
+    {
+        this.scheme = scheme;
     }
 
 

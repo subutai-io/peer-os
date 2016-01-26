@@ -408,6 +408,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 
 	function buildEnvironment() {
 		ngDialog.closeAll();
+
 		environmentService.startEnvironmentBuild (vm.newEnvID[0], encodeURIComponent(vm.newEnvID[1])).success(function (data) {
 			SweetAlert.swal("Success!", "Your environment has been built successfully.", "success");
 			loadEnvironments();

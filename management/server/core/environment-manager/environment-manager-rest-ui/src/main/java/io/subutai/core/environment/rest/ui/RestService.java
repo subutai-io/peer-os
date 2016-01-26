@@ -54,7 +54,6 @@ public interface RestService
 
     @POST
     @Path( "build/auto" )
-    @Produces( { MediaType.TEXT_PLAIN } )
     Response buildAuto( @FormParam( "name" ) String name, @FormParam( "containers" ) String containersJson );
 
     @POST
