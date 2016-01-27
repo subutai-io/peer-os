@@ -11,7 +11,10 @@
 				<tr ng-repeat="(templateName, templateCount) in environmentViewCtrl.env2Build">
 					<td class="b-title">
 						<span class="b-cloud-item">
-							<img src="assets/templates/{{ templateName }}.jpg" alt="" >
+							<img 
+								src="assets/templates/{{ templateName }}.jpg" 
+								alt="{{ templateName }}" 
+								onError="this.onerror=null;this.src='assets/templates/no-image.jpg';">
 						</span> 
 						<span class="b-cloud-item-text">{{ templateName }}</span>
 					</td>

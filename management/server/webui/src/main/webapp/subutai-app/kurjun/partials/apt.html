@@ -11,13 +11,24 @@
             <thead>
             <tr>
                 <th>Name</th>
+                <th>Architecture</th>
+                <th>Installed Size</th>
+                <th>Version</th>
                 <th></th>
             </tr>
             </thead>
             <tbody>
             <tr ng-repeat="apt in kurjunViewCtrl.aptList">
                 <td>{{ apt.name }}</td>
+                <td>{{ apt.architecture }}</td>
+                <td>{{ apt.installedSize }}</td>
+                <td>{{ apt.version }}</td>
                 <td>
+                    <a href class="b-icon b-icon_info"
+                       tooltips
+                       tooltip-template="{{ apt.description }}"
+                       tooltip-class="description-tooltip">
+                    </a>
                     <a href
                        class="b-icon b-icon_remove"
                        ng-click="kurjunViewCtrl.deleteAPT(apt)">

@@ -66,13 +66,19 @@ function KurjunViewCtrl($scope, $rootScope, kurjunSrv, SweetAlert, DTOptionsBuil
 				vm.dtColumnDefs = [
 					DTColumnDefBuilder.newColumnDef(0),
 					DTColumnDefBuilder.newColumnDef(1),
-					DTColumnDefBuilder.newColumnDef(2).notSortable(),
+					DTColumnDefBuilder.newColumnDef(2),
+					DTColumnDefBuilder.newColumnDef(3),
+					DTColumnDefBuilder.newColumnDef(4),
+					DTColumnDefBuilder.newColumnDef(5).notSortable()
 				];
 				break;
 			case 'apt':
 				vm.dtColumnDefs = [
 					DTColumnDefBuilder.newColumnDef(0),
-					DTColumnDefBuilder.newColumnDef(1)
+					DTColumnDefBuilder.newColumnDef(1),
+					DTColumnDefBuilder.newColumnDef(2),
+					DTColumnDefBuilder.newColumnDef(3),
+					DTColumnDefBuilder.newColumnDef(4).notSortable()
 				];
 				break;
 			default:
@@ -117,7 +123,7 @@ function KurjunViewCtrl($scope, $rootScope, kurjunSrv, SweetAlert, DTOptionsBuil
 						$timeout(function () {
 							ngDialog.closeAll();
 							LOADING_SCREEN('none');
-							SweetAlert.swal("ERROR!", "Your template is safe. Error: " + response.data, "error");
+							SweetAlert.swal("ERROR!", response.data, "error");
 						}, 2000);
 					}
 				}, function (event) {
@@ -143,7 +149,7 @@ function KurjunViewCtrl($scope, $rootScope, kurjunSrv, SweetAlert, DTOptionsBuil
 						$timeout(function () {
 							ngDialog.closeAll();
 							LOADING_SCREEN('none');
-							SweetAlert.swal("ERROR!", "Your APT is safe. Error: " + response.data, "error");
+							SweetAlert.swal("ERROR!", response.data, "error");
 						}, 2000);
 					}
 				}, function (event) {

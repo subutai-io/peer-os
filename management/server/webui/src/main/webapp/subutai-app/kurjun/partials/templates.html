@@ -11,6 +11,9 @@
             <tr>
                 <th>Name</th>
                 <th>Context</th>
+                <th>Architecture</th>
+                <th>Parent</th>
+                <th>Version</th>
                 <th></th>
             </tr>
             </thead>
@@ -18,6 +21,9 @@
             <tr ng-repeat="template in kurjunViewCtrl.templates">
                 <td>{{ template.name }}</td>
                 <td>{{ template.repository }}</td>
+                <td>{{ template.architecture }}</td>
+                <td>{{ template.parent }}</td>
+                <td>{{ template.version }}</td>
                 <td>
                     <a href
                        class="b-icon b-icon_remove"
