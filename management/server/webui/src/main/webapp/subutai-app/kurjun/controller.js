@@ -106,15 +106,19 @@ function KurjunViewCtrl($scope, $rootScope, kurjunSrv, SweetAlert, DTOptionsBuil
 		switch (vm.activeTab) {
 			case 'templates':
 				kurjunSrv.addTemplate(template.repository, template.file).then(function (response) {
-					template.file.result = response.data;
-					LOADING_SCREEN('none');
-					SweetAlert.swal("Success!", "You have successfully uploaded template", "success");
-					getTemplates();
+					$timeout(function () {
+						template.file.result = response.data;
+						LOADING_SCREEN('none');
+						SweetAlert.swal("Success!", "You have successfully uploaded template", "success");
+						getTemplates();
+					}, 2000);
 				}, function (response) {
 					if (response.status > 0) {
-						ngDialog.closeAll();
-						LOADING_SCREEN('none');
-						SweetAlert.swal("ERROR!", "Your template is safe. Error: " + response.data, "error");
+						$timeout(function () {
+							ngDialog.closeAll();
+							LOADING_SCREEN('none');
+							SweetAlert.swal("ERROR!", "Your template is safe. Error: " + response.data, "error");
+						}, 2000);
 					}
 				}, function (event) {
 					template.file.progress = Math.min(100, parseInt(100.0 * event.loaded / event.total));
@@ -129,21 +133,25 @@ function KurjunViewCtrl($scope, $rootScope, kurjunSrv, SweetAlert, DTOptionsBuil
 			case 'apt':
 				kurjunSrv.addApt(template.file).then(function (response) {
 					template.file.result = response.data;
-					LOADING_SCREEN('none');
-					SweetAlert.swal("Success!", "You have successfully uploaded APT", "success");
-					getAPTs();
+					$timeout(function () {
+						LOADING_SCREEN('none');
+						SweetAlert.swal("Success!", "You have successfully uploaded APT", "success");
+						getAPTs();
+					}, 2000);
 				}, function (response) {
 					if (response.status > 0) {
-						ngDialog.closeAll();
-						LOADING_SCREEN('none');
-						SweetAlert.swal("ERROR!", "Your APT is safe. Error: " + response.data, "error");
+						$timeout(function () {
+							ngDialog.closeAll();
+							LOADING_SCREEN('none');
+							SweetAlert.swal("ERROR!", "Your APT is safe. Error: " + response.data, "error");
+						}, 2000);
 					}
 				}, function (event) {
 					template.file.progress = Math.min(100, parseInt(100.0 * event.loaded / event.total));
 					if (template.file.progress == 100) {
-						LOADING_SCREEN();
 						$timeout(function () {
 							ngDialog.closeAll();
+							LOADING_SCREEN();
 						}, 1000);
 					}
 				});

@@ -109,7 +109,7 @@ input[type=checkbox] {
 
 .b-workspace__header {
     padding: 0 15px;
-    line-height: 52px;
+    line-height: 51px;
     height: 52px;
     border-bottom: 1px solid #e6eaf5;
 }
@@ -316,6 +316,11 @@ input[type=checkbox] {
 
 .b-btn_light-grey:hover {
     background-color: #F1F4F8;
+}
+
+.b-btn:disabled {
+    background-color: #F1F4F8;
+    color: #333333;
 }
 
 .b-btn-light-grey-icon {
