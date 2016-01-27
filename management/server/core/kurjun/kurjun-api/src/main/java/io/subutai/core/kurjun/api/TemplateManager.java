@@ -86,6 +86,9 @@ public interface TemplateManager
      * @return list of JSON encoded meta data
      */
     List<TemplateKurjun> list( String context, boolean isKurjunClient ) throws IOException;
+    
+    
+    List<Map<String, Object>> listAsSimple( String context ) throws IOException;
 
     /**
      * Lists packages in public repository context.
@@ -96,6 +99,15 @@ public interface TemplateManager
     List<TemplateKurjun> list();
 
 
+    /**
+     * Checks whether current active user session can do upload to the given context
+     *
+     * @param context
+     * @return
+     */
+    public boolean isUploadAllowed( String context );
+    
+    
     /**
      * Uploads package data from supplied input stream to the repository defined by supplied context.
      *
