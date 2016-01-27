@@ -99,7 +99,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 	function loadEnvironments() {
 		vm.containersTotal = [];
 		environmentService.getEnvironments().success (function (data) {
-			vm.environments = data;
+			/*vm.environments = data;
 			for (var i = 0; i < vm.environments.length; ++i) {
 				if (vm.environments[i].status !== "PENDING") {
 					vm.installed = true;
@@ -112,6 +112,12 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 					if (vm.installed) {
 						break;
 					}
+				}
+			}*/
+			vm.environments = [];
+			for (var i = 0; i < data.length; ++i) {
+				if (data[i].status !== "PENDING") {
+					vm.environments.push(data[i]);
 				}
 			}
 		});

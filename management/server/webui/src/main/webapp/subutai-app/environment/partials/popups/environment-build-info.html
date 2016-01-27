@@ -11,7 +11,10 @@
 				<tr ng-repeat="(templateName, templateCount) in environmentViewCtrl.env2Build">
 					<td class="b-title">
 						<span class="b-cloud-item">
-							<img src="assets/templates/{{ templateName }}.jpg" alt="" >
+							<img 
+								src="assets/templates/{{ templateName }}.jpg" 
+								alt="{{ templateName }}" 
+								onError="this.onerror=null;this.src='assets/templates/no-image.jpg';">
 						</span> 
 						<span class="b-cloud-item-text">{{ templateName }}</span>
 					</td>
@@ -22,29 +25,36 @@
 	</div>
 	<div class="b-popup__body" ng-if="environmentViewCtrl.buildStep == 'pgpKey'">
 		<div class="b-form">
-			<div>
-				<span class="b-form-label b-form-label_fix-size-1 js-accordeon-message">Message</span>
-				<i class="fa fa-caret-down"></i>
+			<div class="js-accordeon-message">
+				<span class="b-form-label b-form-label_fix-size-1">
+					Message 
+					<i class="fa fa-caret-down"></i>
+				</span>
 			</div>
-			<script>
-				$('.js-accordeon-message').on('click', function(){
-					$(this).parent().next().slideTouggle();
-				});
-			</script>
 			<div style="display: none;">
-				<textarea class="b-form-input b-form-input_full b-form-input_textarea bp-sign-target"
+				<textarea class="b-form-input b-form-input_full b-form-input_textarea bp-sign-target js-bp-message"
 					ng-model="environmentViewCtrl.newEnvID[1]" 
 					style = "width: 540px; height: 300px; font-family: monospace; overflow: scroll; resize: none">
 				</textarea>
 			</div>
+			<script>
+				$('.js-accordeon-message').on('click', function(){
+					$(this).next().slideToggle();
+				});
+
+				$('.js-bp-message').on('change', function(){
+					$('.js-environment-build').prop('disabled', false);
+				});
+			</script>
 			<div class="clear"></div>
 		</div>
 	</div>
 	<div class="b-popup__footer b-popup__footer_undertable">
 
-		<button class="b-btn b-btn_green" 
+		<button class="b-btn b-btn_green js-environment-build" 
 		ng-if="environmentViewCtrl.buildStep == 'pgpKey'" 
-		ng-click="environmentViewCtrl.buildEnvironment()">
+		ng-click="environmentViewCtrl.buildEnvironment()" 
+		disabled>
 			Build
 		</button>
 

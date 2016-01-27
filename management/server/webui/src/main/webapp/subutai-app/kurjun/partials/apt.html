@@ -1,39 +1,43 @@
-<div class="b-workspace-content b-workspace-content_border">
-	<div class="b-workspace-content__row">
+<div class="b-workspace-content__row">
+    <button class="b-btn b-btn_green g-margin-bottom" ng-click="kurjunViewCtrl.addTemplate()">
+        <i class="fa fa-plus"></i> Add APT
+    </button>
 
-		<h2 class="b-workspace-content-row-h2">
-			<h2 class="b-workspace-content-row-h2">
-				<button class="b-btn b-btn_green b-btn_header-button b-btn_margin-b-10" ng-click="kurjunViewCtrl.addTemplate()">
-					<i class="fa fa-plus"></i> Add APT
-				</button>
-			</h2>
-		</h2>
+    <div class="b-data-table">
+        <table datatable="ng"
+               dt-options="kurjunViewCtrl.dtOptions"
+               dt-column-defs="kurjunViewCtrl.dtColumnDefs"
+               class="b-main-table b-main-table_with-header">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Architecture</th>
+                <th>Installed Size</th>
+                <th>Version</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="apt in kurjunViewCtrl.aptList">
+                <td>{{ apt.name }}</td>
+                <td>{{ apt.architecture }}</td>
+                <td>{{ apt.installedSize }}</td>
+                <td>{{ apt.version }}</td>
+                <td>
+                    <a href class="b-icon b-icon_info"
+                       tooltips
+                       tooltip-template="{{ apt.description }}"
+                       tooltip-class="description-tooltip">
+                    </a>
+                    <a href
+                       class="b-icon b-icon_remove"
+                       ng-click="kurjunViewCtrl.deleteAPT(apt)">
+                    </a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 
-		<div class="b-data-table">
-			<table datatable="ng" 
-				dt-options="kurjunViewCtrl.dtOptions" 
-				dt-column-defs="kurjunViewCtrl.dtColumnDefs" 
-				class="b-main-table b-main-table_with-header">
-				<thead>
-					<tr>
-						<th>Name</th>
-						<th></th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr ng-repeat="apt in kurjunViewCtrl.aptList">
-						<td>{{ apt.name }}</td>
-						<td>
-							<a href 
-								class="b-icon b-icon_remove"
-								ng-click="kurjunViewCtrl.deleteAPT(apt)">
-							</a>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-
-	</div>
 </div>
 

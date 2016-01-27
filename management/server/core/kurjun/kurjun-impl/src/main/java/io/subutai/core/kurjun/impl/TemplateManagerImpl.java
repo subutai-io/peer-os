@@ -113,7 +113,7 @@ public class TemplateManagerImpl implements TemplateManager
 
 
     public TemplateManagerImpl( LocalPeer localPeer, IdentityManager identityManager,
-                                io.subutai.core.security.api.SecurityManager securityManager, String globalKurjunUrl )
+            io.subutai.core.security.api.SecurityManager securityManager, String globalKurjunUrl )
     {
         this.localPeer = localPeer;
         this.subutaiIdentityManager = identityManager;
@@ -193,8 +193,8 @@ public class TemplateManagerImpl implements TemplateManager
         if ( meta != null )
         {
             TemplateKurjun template = new TemplateKurjun( Hex.encodeHexString( meta.getMd5Sum() ), meta.getName(),
-                                                          meta.getVersion(), meta.getArchitecture().name(),
-                                                          meta.getParent(), meta.getPackage() );
+                    meta.getVersion(), meta.getArchitecture().name(),
+                    meta.getParent(), meta.getPackage() );
             template.setConfigContents( meta.getConfigContents() );
             template.setPackagesContents( meta.getPackagesContents() );
             return template;
@@ -206,7 +206,7 @@ public class TemplateManagerImpl implements TemplateManager
     @Override
     @RolesAllowed( "Template-Management|Read" )
     public TemplateKurjun getTemplate( String context, String name,
-                                       String version, boolean isKurjunClient ) throws IOException
+            String version, boolean isKurjunClient ) throws IOException
     {
         DefaultMetadata m = new DefaultMetadata();
         m.setName( name );
@@ -220,8 +220,8 @@ public class TemplateManagerImpl implements TemplateManager
             checkPermission( context, Permission.GET_PACKAGE, Hex.encodeHexString( meta.getMd5Sum() ) );
 
             TemplateKurjun template = new TemplateKurjun( Hex.encodeHexString( meta.getMd5Sum() ), meta.getName(),
-                                                          meta.getVersion(), meta.getArchitecture().name(),
-                                                          meta.getParent(), meta.getPackage() );
+                    meta.getVersion(), meta.getArchitecture().name(),
+                    meta.getParent(), meta.getPackage() );
             template.setConfigContents( meta.getConfigContents() );
             template.setPackagesContents( meta.getPackagesContents() );
             return template;
@@ -286,13 +286,52 @@ public class TemplateManagerImpl implements TemplateManager
 
             DefaultTemplate meta = ( DefaultTemplate ) metadata;
             TemplateKurjun t = new TemplateKurjun( Hex.encodeHexString( meta.getMd5Sum() ), meta.getName(),
-                                                   meta.getVersion(), meta.getArchitecture().name(), meta.getParent(),
-                                                   meta.getPackage() );
+                    meta.getVersion(), meta.getArchitecture().name(), meta.getParent(),
+                    meta.getPackage() );
             t.setConfigContents( meta.getConfigContents() );
             t.setPackagesContents( meta.getPackagesContents() );
             result.add( t );
         }
         return result;
+    }
+
+
+    @Override
+    @RolesAllowed( "Template-Management|Read" )
+    public List<Map<String, Object>> listAsSimple( String context ) throws IOException
+    {
+        List<Map<String, Object>> simpleList = new ArrayList<>();
+
+        LocalRepository localRepo = getLocalRepository( context );
+
+        List<SerializableMetadata> localList = localRepo.listPackages();
+
+        for ( SerializableMetadata metadata : localList )
+        {
+            if ( !isAllowed( context, Permission.GET_PACKAGE, Hex.encodeHexString( metadata.getMd5Sum() ) ) )
+            {
+                continue;
+            }
+
+            simpleList.add( convertToSimple( ( DefaultTemplate ) metadata, true ) );
+        }
+
+        UnifiedRepository unifiedRepo = getRepository( context, false );
+
+        List<SerializableMetadata> unifiedList = unifiedRepo.listPackages();
+
+        unifiedList.removeAll( localList );
+
+        for ( SerializableMetadata metadata : unifiedList )
+        {
+            if ( !isAllowed( context, Permission.GET_PACKAGE, Hex.encodeHexString( metadata.getMd5Sum() ) ) )
+            {
+                continue;
+            }
+
+            simpleList.add( convertToSimple( ( DefaultTemplate ) metadata, false ) );
+        }
+        return simpleList;
     }
 
 
@@ -309,6 +348,13 @@ public class TemplateManagerImpl implements TemplateManager
             LOGGER.error( "Error in list", e );
             return Lists.newArrayList();
         }
+    }
+
+
+    @Override
+    public boolean isUploadAllowed( String context )
+    {
+        return isAllowed( context, Permission.ADD_PACKAGE, "*" );
     }
 
 
@@ -486,7 +532,7 @@ public class TemplateManagerImpl implements TemplateManager
                 return ips.get( 0 ).getHostAddress();
             }
         }
-        catch ( SocketException | IndexOutOfBoundsException  ex )
+        catch ( SocketException | IndexOutOfBoundsException ex )
         {
             LOGGER.error( "Cannot get external ip. Returning null.", ex );
             return null;
@@ -567,7 +613,7 @@ public class TemplateManagerImpl implements TemplateManager
             Properties kcp = properties.getContextProperties( kc );
             kcp.setProperty( FileStoreFactory.TYPE, FileStoreFactory.FILE_SYSTEM );
             kcp.setProperty( PackageMetadataStoreModule.PACKAGE_METADATA_STORE_TYPE,
-                             PackageMetadataStoreFactory.FILE_DB );
+                    PackageMetadataStoreFactory.FILE_DB );
         }
     }
 
@@ -595,7 +641,7 @@ public class TemplateManagerImpl implements TemplateManager
         {
             throw new AccessControlException(
                     String.format( "Action denied for resource %s with permission %s of identity %s",
-                                   resource, permission, getActiveUserFingerprint() ) );
+                            resource, permission, getActiveUserFingerprint() ) );
         }
     }
 
@@ -649,6 +695,20 @@ public class TemplateManagerImpl implements TemplateManager
         {
             LOGGER.info( r.toString() );
         }
+    }
+
+
+    private Map<String, Object> convertToSimple( DefaultTemplate template, boolean deletable )
+    {
+        Map<String, Object> simple = new HashMap<>();
+        simple.put( "name", template.getName() );
+        simple.put( "md5Sum", Hex.encodeHexString( template.getMd5Sum() ) );
+        simple.put( "parent", template.getParent() );
+        simple.put( "architecture", template.getArchitecture() );
+        simple.put( "version", template.getVersion() );
+        simple.put( "deletable", deletable );
+
+        return simple;
     }
 
 
@@ -754,6 +814,4 @@ public class TemplateManagerImpl implements TemplateManager
         }
     }
 
-
 }
-

@@ -54,6 +54,13 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
         Set<String> list = templateManager.getContexts();
         return Response.ok( GSON.toJson( list ) ).build();
     }
+    
+    
+    @Override
+    public Response checkUploadAllowed( String repository )
+    {
+        return Response.ok( templateManager.isUploadAllowed( repository ) ).build();
+    }
 
 
     @Override
@@ -151,27 +158,15 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
         return Response.ok( "No templates" ).build();
     }
 
-    
+   
     @Override
     public Response getTemplateListSimple( String repository )
     {
         try
         {
-            List<TemplateKurjun> list = templateManager.list( repository, false );
-            if ( list != null )
+            List<Map<String, Object>> simpleList = templateManager.listAsSimple( repository );
+            if ( simpleList != null )
             {
-                List simpleList = new ArrayList();
-                for ( TemplateKurjun template : list )
-                {
-                    Map<String, Object> simple = new HashMap<>();
-                    simple.put( "name", template.getName() );
-                    simple.put( "md5Sum", template.getMd5Sum() );
-                    simple.put( "parent", template.getParent() );
-                    simple.put( "architecture", template.getArchitecture() );
-                    simple.put( "version", template.getVersion() );
-
-                    simpleList.add( simple );
-                }
                 return Response.ok( GSON.toJson( simpleList ) ).build();
             }
         }
@@ -183,7 +178,7 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
         }
         return Response.ok( "No templates" ).build();
     }
-    
+
 
     @Override
     public Response uploadTemplate( String repository, Attachment attachment )

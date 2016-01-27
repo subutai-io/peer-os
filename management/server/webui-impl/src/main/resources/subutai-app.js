@@ -28,7 +28,7 @@ startup.$inject = ['$rootScope', '$state', '$location', '$http'];
 
 function CurrentUserCtrl($location, $rootScope, ngDialog, $http, SweetAlert) {
 	var vm = this;
-	vm.currentUser = $rootScope.currentUser;
+	vm.currentUser = sessionStorage.getItem('currentUser');
 	vm.currentUserRoles = [];
 
 	//function
