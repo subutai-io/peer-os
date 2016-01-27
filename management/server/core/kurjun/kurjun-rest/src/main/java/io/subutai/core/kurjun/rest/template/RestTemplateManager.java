@@ -36,7 +36,14 @@ public interface RestTemplateManager
     @Path( "repositories" )
     @Produces( MediaType.APPLICATION_JSON )
     Response getRepositories();
-    
+
+
+    @GET
+    @Path( "{repository}/can-upload" )
+    @Produces( MediaType.TEXT_PLAIN )
+    Response checkUploadAllowed( @PathParam( "repository" ) String repository );
+
+
     @GET
     @Path( "{repository}/get" )
     @Produces( MediaType.TEXT_PLAIN )
