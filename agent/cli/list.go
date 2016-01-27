@@ -112,9 +112,10 @@ func info(name string) (result []string) {
 	if name == "management" {
 		nic = "eth1"
 	}
+
 	listip, _ := c.IPAddress(nic)
 	ip := strings.Join(listip, " ")
 	mac := container.GetConfigItem(config.Agent.LxcPrefix+"/"+name+"/config", "lxc.network.hwaddr")
 
-	return append(result, name+"\tRUNNING\t"+mac+"\t"+ip+"\t"+nic)
+	return append(result, name+"\t"+container.State(name)+"\t"+mac+"\t"+ip+"\t"+nic)
 }

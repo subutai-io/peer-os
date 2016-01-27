@@ -165,7 +165,6 @@ func Clone(parent, child string) {
 		{"lxc.network.link", ""},
 		{"lxc.network.veth.pair", strings.Replace(GetConfigItem(config.Agent.LxcPrefix+child+"/config", "lxc.network.hwaddr"), ":", "", -1)},
 		{"lxc.network.script.up", config.Agent.AppPrefix + "bin/create_ovs_interface"},
-		{"subutai.git.branch", child},
 		{"subutai.parent", parent},
 		{"lxc.mount.entry", config.Agent.LxcPrefix + "lxc/" + child + "-opt opt none bind,rw 0 0"},
 		{"lxc.mount.entry", config.Agent.LxcPrefix + "lxc-data/" + child + "-home home none bind,rw 0 0"},
