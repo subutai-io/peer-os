@@ -17,7 +17,12 @@
 					<td>{{ user.fullName }}</td>
 					<td>{{ user.email }}</td>
 					<td>
-						<span ng-repeat="role in user.roles" class="b-tags b-tags_grey">{{ role.name }}<a href ng-click="identityUserCtrl.removeRoleFromUser(user, role.id)"><i class="fa fa-times"></i></a></span>
+						<span ng-repeat="(roleKey, role) in user.roles" class="b-tags b-tags_grey">
+							{{ role.name }} 
+							<a href ng-click="identityUserCtrl.removeRoleFromUser(user, roleKey)">
+								<i class="fa fa-times"></i>
+							</a>
+						</span>
 					</td>
 					<td>
 						<a href class="b-icon b-icon_edit" ng-click="identityUserCtrl.userForm (user)"></a>

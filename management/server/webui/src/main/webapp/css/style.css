@@ -768,7 +768,7 @@ input[type=checkbox] {
 }
 
 tooltip tip-cont .b-icon {
-    margin: 0 9px !important;
+    margin-right: 9px !important;
 }
 
 tooltip:last-child tip-cont .b-icon {
@@ -781,8 +781,7 @@ tooltip i {
 }
 
 tip.description-tooltip {
-    white-space:nowrap;
-    max-width:none
+    width: 200px;
 }
 
 .b-icon_add {
@@ -2023,7 +2022,7 @@ td.b-main-table__status-col {
     line-height: 20px;
     color: #fff;
     text-align: center;
-    background-color: #337ab7;
+    background-color: #4BBC6E;
     -webkit-box-shadow: inset 0 -1px 0 rgba(0,0,0,.15);
     box-shadow: inset 0 -1px 0 rgba(0,0,0,.15);
     -webkit-transition: width .6s ease;

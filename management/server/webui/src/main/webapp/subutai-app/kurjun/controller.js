@@ -16,12 +16,14 @@ function KurjunViewCtrl($scope, $rootScope, kurjunSrv, SweetAlert, DTOptionsBuil
 	vm.repositories = [];
 	vm.templates = [];
 	vm.apts = [];
+	vm.isUploadAllowed = false;
 
 	vm.openTab = openTab;
 	vm.addTemplate = addTemplate;
 	vm.proceedTemplate = proceedTemplate;
 	vm.deleteTemplate = deleteTemplate;
 	vm.deleteAPT = deleteAPT;
+	vm.checkRepositoryStatus = checkRepositoryStatus;
 
 	/*** Get templates according to repositories ***/
 	function getTemplates() {
@@ -221,6 +223,12 @@ function KurjunViewCtrl($scope, $rootScope, kurjunSrv, SweetAlert, DTOptionsBuil
 						});
 					}
 				});
+	}
+
+	function checkRepositoryStatus(repository) {
+		kurjunSrv.isUploadAllowed(repository).success(function (data) {
+			vm.isUploadAllowed = (data === 'false' ? false : true);
+		});
 	}
 
 	cfpLoadingBar.start();
