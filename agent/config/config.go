@@ -5,8 +5,6 @@ import (
 	"io/ioutil"
 	"net"
 	"os"
-	"os/exec"
-	"path/filepath"
 	"subutai/log"
 	"time"
 )
@@ -125,11 +123,8 @@ func init() {
 	err := gcfg.ReadStringInto(&config, defaultConfig)
 	log.Check(log.InfoLevel, "Loading default config ", err)
 
-	file, _ := exec.LookPath("subutai")
-
-	cfgFile := filepath.Dir(file) + "/../etc/agent.gcfg"
-	err = gcfg.ReadFileInto(&config, cfgFile)
-	log.Check(log.WarnLevel, "Opening Agent config file "+cfgFile, err)
+	err = gcfg.ReadFileInto(&config, "/apps/subutai/current/etc/agent.gcfg")
+	log.Check(log.WarnLevel, "Opening Agent config file /apps/subutai/current/etc/agent.gcfg", err)
 
 	files, _ := ioutil.ReadDir("/apps/")
 	for _, f := range files {
