@@ -71,7 +71,7 @@ func GetActiveContainers(details bool) []Container {
 		container.Parent = cont.GetConfigItem(configpath, "subutai.parent")
 		container.Status = lxc_c.State().String()
 		container.Hostname = c
-		container.Interfaces = GetContainerIfaces(lxc_c)
+		container.Interfaces = GetContainerIfaces(container.Name)
 
 		PoolInstance().AddHost(container.Id, container.Name)
 		vlan_id := cont.GetConfigItem(configpath, "#vlan_id")
@@ -87,39 +87,15 @@ func GetActiveContainers(details bool) []Container {
 	return contArr
 }
 
-func GetContainerIfaces(c *lxc.Container) []utils.Iface {
-	buf_r, buf_w, _ := os.Pipe()
-	var output []string
-	c.RunCommand([]string{"ifconfig"}, lxc.AttachOptions{
-		Namespaces: -1,
-		UID:        0,
-		GID:        0,
-		StdoutFd:   buf_w.Fd(),
-	})
-	buf_w.Close()
-	defer buf_r.Close()
+func GetContainerIfaces(name string) []utils.Iface {
+	c, err := lxc.NewContainer(name, config.Agent.LxcPrefix)
+	log.Check(log.FatalLevel, "Looking for container "+name, err)
 
-	out := bufio.NewScanner(buf_r)
-	for out.Scan() {
-		output = append(output, out.Text())
-	}
-
-	interface_arr := []utils.Iface{}
 	iface := new(utils.Iface)
 	iface.InterfaceName = "eth0"
+	listip, _ := c.IPAddress(iface.InterfaceName)
+	iface.Ip = strings.Join(listip, " ")
+	iface.Mac = cont.GetConfigItem(config.Agent.LxcPrefix+"/"+name+"/config", "lxc.network.hwaddr")
 
-	for _, line := range output {
-		if strings.HasPrefix(line, "eth0") {
-			iface.Mac = strings.Fields(line)[4]
-		}
-		if iface.Mac != "" && strings.Contains(line, "inet addr") {
-			if strings.Split(strings.Fields(line)[1], ":")[1] != "127.0.0.1" {
-				iface.Ip = strings.Split(strings.Fields(line)[1], ":")[1]
-			}
-			break
-		}
-	}
-
-	interface_arr = append(interface_arr, *iface)
-	return interface_arr
+	return []utils.Iface{*iface}
 }

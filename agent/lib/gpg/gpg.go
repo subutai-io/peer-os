@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"crypto/tls"
 	"errors"
-	p "golang.org/x/crypto/openpgp"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -14,6 +13,7 @@ import (
 	"subutai/config"
 	"subutai/lib/container"
 	"subutai/log"
+	"time"
 )
 
 var (
@@ -21,24 +21,12 @@ var (
 	ErrUserKeyRingNotFound    = errors.New("Keyring not found")
 	ErrUnreadableKeyring      = errors.New("Could not read keyring")
 	ErrUnverifiedMessage      = errors.New("Message does not contain signature")
-	pass_bytes                = []byte(config.Agent.GpgPassword)
 )
 
 const (
 	MANAGEMENT_HOST_PK = "/root/.gnupg/pubring.gpg"
 	gnupg              = "gpg"
 )
-
-func keyByEmail(keyring *p.EntityList, email string) (*p.Entity, error) {
-	for _, entity := range *keyring {
-		for _, ident := range entity.Identities {
-			if ident.UserId.Email == email {
-				return entity, nil
-			}
-		}
-	}
-	return nil, ErrUserKeyNotFoundByEmail
-}
 
 //import PK gpg2 --import pubkey.key
 func ImportPk(file string) string {
@@ -121,7 +109,7 @@ func EncryptWrapper(user string, recipient string, message string) string {
 	stdin.Close()
 
 	output, err := command.Output()
-	if log.Check(log.WarnLevel, "Encrypting message "+string(output), err) {
+	if log.Check(log.WarnLevel, "Encrypting message ", err) {
 		return ""
 	}
 
@@ -135,7 +123,7 @@ func EncryptWrapperNoDefaultKeyring(user, recipient, message, pub, sec string) s
 	stdin.Close()
 
 	output, err := command.Output()
-	log.Check(log.WarnLevel, "Encrypting message "+string(output), err)
+	log.Check(log.WarnLevel, "Encrypting message ", err)
 	return string(output)
 }
 
@@ -192,7 +180,7 @@ func GetFingerprint(email string) (fingerprint string) {
 
 func GetToken() string {
 	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
-	client := &http.Client{Transport: tr}
+	client := &http.Client{Transport: tr, Timeout: time.Duration(3 * time.Second)}
 
 	resp, err := client.Get("https://" + config.Management.Host + ":" + config.Management.Port + config.Management.RestToken + "?username=" + config.Management.Login + "&password=" + config.Management.Password)
 	if log.Check(log.WarnLevel, "Getting token", err) {
@@ -329,11 +317,11 @@ func ValidatePem(cert string) bool {
 }
 
 func ParsePem(cert string) (crt, key []byte) {
-        key, _ = exec.Command("openssl", "pkey", "-in", cert).Output()
+	key, _ = exec.Command("openssl", "pkey", "-in", cert).Output()
 
 	f, err := ioutil.ReadFile(cert)
 	if !log.Check(log.DebugLevel, "Cannot read file "+cert, err) {
-        	crt = bytes.Replace(f, key, []byte(""), -1)
+		crt = bytes.Replace(f, key, []byte(""), -1)
 	}
-	return crt, key 
+	return crt, key
 }

@@ -6,6 +6,7 @@ import (
 	"gopkg.in/lxc/go-lxc.v2"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"runtime"
 	"strconv"
 	"strings"
@@ -13,6 +14,7 @@ import (
 	"subutai/lib/fs"
 	"subutai/lib/net"
 	"subutai/log"
+	"syscall"
 )
 
 // All returns list of all containers
@@ -163,7 +165,6 @@ func Clone(parent, child string) {
 		{"lxc.network.link", ""},
 		{"lxc.network.veth.pair", strings.Replace(GetConfigItem(config.Agent.LxcPrefix+child+"/config", "lxc.network.hwaddr"), ":", "", -1)},
 		{"lxc.network.script.up", config.Agent.AppPrefix + "bin/create_ovs_interface"},
-		{"subutai.git.branch", child},
 		{"subutai.parent", parent},
 		{"lxc.mount.entry", config.Agent.LxcPrefix + "lxc/" + child + "-opt opt none bind,rw 0 0"},
 		{"lxc.mount.entry", config.Agent.LxcPrefix + "lxc-data/" + child + "-home home none bind,rw 0 0"},
@@ -268,4 +269,33 @@ func GetConfigItem(path, item string) string {
 		}
 	}
 	return ""
+}
+
+func SetContainerUid(c string) {
+	var uidlast []byte
+
+	uidlast, _ = ioutil.ReadFile(config.Agent.LxcPrefix + "uidmaplast")
+
+	uid, _ := strconv.Atoi(string(uidlast))
+	newuid := strconv.Itoa(uid + 65536)
+
+	err := ioutil.WriteFile(config.Agent.LxcPrefix+"uidmaplast", []byte(newuid), 0644)
+	log.Check(log.FatalLevel, "Writing new uid to map", err)
+
+	SetContainerConf(c, [][]string{
+		{"lxc.include", config.Agent.AppPrefix + "share/lxc/config/ubuntu.common.conf"},
+		{"lxc.include", config.Agent.AppPrefix + "share/lxc/config/ubuntu.userns.conf"},
+		{"lxc.id_map", "u 0 " + newuid + " 65536"},
+		{"lxc.id_map", "g 0 " + newuid + " 65536"},
+	})
+
+	s, _ := os.Stat(config.Agent.LxcPrefix + c + "/rootfs")
+	parentuid := strconv.Itoa(int(s.Sys().(*syscall.Stat_t).Uid))
+
+	exec.Command("uidmapshift", "-b", config.Agent.LxcPrefix+c+"/rootfs/", parentuid, newuid, "65536").Run()
+	exec.Command("uidmapshift", "-b", config.Agent.LxcPrefix+"lxc/"+c+"-opt/", parentuid, newuid, "65536").Run()
+	exec.Command("uidmapshift", "-b", config.Agent.LxcPrefix+"lxc-data/"+c+"-home/", parentuid, newuid, "65536").Run()
+	exec.Command("uidmapshift", "-b", config.Agent.LxcPrefix+"lxc-data/"+c+"-var/", parentuid, newuid, "65536").Run()
+
+	log.Check(log.ErrorLevel, "Setting chmod 755 on lxc home", os.Chmod(config.Agent.LxcPrefix+c, 0755))
 }

@@ -2,7 +2,6 @@ package lib
 
 import (
 	"crypto/md5"
-	// "crypto/tls"
 	"encoding/hex"
 	"fmt"
 	"github.com/pivotal-golang/archiver/extractor"
@@ -87,14 +86,18 @@ func download(file, md5, token string) string {
 	return ""
 }
 
-func LxcImport(templ string) {
+func LxcImport(templ, token string) {
+	config.CheckKurjun()
+
 	fullname := templ + "-subutai-template_" + config.Misc.Version + "_" + config.Misc.Arch + ".tar.gz"
 	if container.IsTemplate(templ) {
 		log.Info(templ + " template exist")
 		return
 	}
 
-	token := gpg.GetToken()
+	// if token == "" {
+	token = gpg.GetToken()
+	// }
 	md5 := templMd5(templ, runtime.GOARCH, token)
 
 	archive := checkLocal(templ, md5, runtime.GOARCH)
@@ -112,11 +115,16 @@ func LxcImport(templ string) {
 	parent := container.GetConfigItem(templdir+"/config", "subutai.parent")
 	if parent != "" && parent != templ && !container.IsTemplate(parent) {
 		log.Info("Parent template: " + parent)
-		LxcImport(parent)
+		LxcImport(parent, token)
 	}
 
 	log.Info("Installing template " + templ)
 	template.Install(parent, templ)
+
+	if templ == "management" {
+		template.MngInit()
+	}
+
 	container.SetContainerConf(templ, [][]string{
 		{"lxc.rootfs", config.Agent.LxcPrefix + templ + "/rootfs"},
 		{"lxc.mount", config.Agent.LxcPrefix + templ + "/fstab"},

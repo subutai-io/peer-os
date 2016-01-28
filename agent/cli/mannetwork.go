@@ -14,17 +14,27 @@ func P2P(c, d, u, l, p bool, args []string) {
 	if c {
 		if len(args) > 8 {
 			p2p.Create(args[4], args[5], args[6], args[7], args[8])
+		} else {
+			fmt.Println("Wrong usage")
 		}
 	} else if u {
 		if len(args) > 6 {
 			p2p.UpdateKey(args[4], args[5], args[6])
+		} else {
+			fmt.Println("Wrong usage")
 		}
 	} else if d {
 		if len(args) > 4 {
 			p2p.Remove(args[4])
+		} else {
+			fmt.Println("Wrong usage")
 		}
 	} else if p {
-		p2p.Peers(args[4])
+		if len(args) > 4 {
+			p2p.Peers(args[4])
+		} else {
+			fmt.Println("Wrong usage")
+		}
 	} else if l {
 		p2p.Print()
 	}
@@ -35,14 +45,8 @@ func LxcManagementNetwork(args []string) {
 		log.Error("Not enough arguments")
 	}
 	switch args[2] {
-	case "-s", "--showflow":
-		showFlow(args[3])
-	case "-p", "--showport":
-		showPort(args[3])
 	case "-D", "--deletegateway":
 		net.DeleteGateway(args[3])
-	case "-S", "--listopenedtap":
-		net.ListTapDevice()
 	case "-v", "--listvnimap":
 		listVNIMap()
 	case "-r", "--removetunnel":
@@ -57,22 +61,12 @@ func LxcManagementNetwork(args []string) {
 		createVNIMap(args[3], args[4], args[5], args[6])
 	case "-c", "--createtunnel":
 		log.Check(log.FatalLevel, "create tunnel", createTunnel(args[3], args[4], args[5]))
-	case "-f", "--addflow":
-		net.AddFlowConfig(args[3], args[4])
-		log.Info("Flow configuration added")
 	case "-l", "--listtunnel":
 		liste := listTunnel()
 		fmt.Println("List of Tunnels\n--------")
 		for _, v := range liste {
 			fmt.Println(string(v))
 		}
-	case "-d", "--deleteflow":
-		if len(args)-3 < 2 {
-			net.DeleteFlow(args[3], "")
-		} else {
-			net.DeleteFlow(args[3], args[4])
-		}
-
 	case "-Z", "--vniop":
 		switch args[3] {
 		case "deleteall":
@@ -129,24 +123,6 @@ func removeTunnel(tunnelPortName string) {
 		log.Info(tunnelPortName + " not exists in system so NOT to remove")
 	}
 
-}
-
-func showFlow(bridgeName string) {
-	s, err := net.DumpBridge(bridgeName)
-	if err != nil {
-		log.Error("showFlow " + string(s))
-	}
-	log.Info("Flow Table informations of " + bridgeName)
-	fmt.Println(s) // uufff...
-}
-
-func showPort(bridgeName string) {
-	s, err := net.DumpPort(bridgeName)
-	if err != nil {
-		log.Error("showPort ", string(s))
-	}
-	log.Info("Port informations of " + bridgeName)
-	fmt.Println(s)
 }
 
 func createVNIMap(tunnelPortName, vni, vlan, envid string) {

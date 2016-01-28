@@ -3,10 +3,12 @@ package config
 import (
 	"code.google.com/p/gcfg"
 	"io/ioutil"
+	"net"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"subutai/log"
+	"time"
 )
 
 type agentConfig struct {
@@ -72,19 +74,19 @@ const defaultConfig = `
 	[management]
 	gpgUser =
 	port = 8443
-	host = gw.intra.lan
+	host = 10.10.10.1
 	login = admin
 	password = secret
 	secret = secret
 	restToken = /rest/v1/identity/gettoken
 	restPublicKey = /rest/v1/registration/public-key
 	restVerify = /rest/v1/registration/verify/container-token
-    kurjun = http://gw.intra.lan:8551/rest/kurjun/templates
+    kurjun = http://10.10.10.1:8551/rest/kurjun/templates
 
 	[broker]
 	port = 8883
 	password = client
-	url = ssl://gw.intra.lan
+	url = ssl://10.10.10.1
 	responseTopic = RESPONSE_TOPIC
 	executeTimeout = EXECUTE_TIMEOUT
 	BroadcastTopic = BROADCAST_TOPIC
@@ -93,7 +95,7 @@ const defaultConfig = `
 	executeTerminated = EXECUTE_TERMINATED
 
 	[influxdb]
-	server = gw.intra.lan
+	server = 10.10.10.1
 	user = root
 	pass = root
 	db = metrics
@@ -124,6 +126,7 @@ func init() {
 	log.Check(log.InfoLevel, "Loading default config ", err)
 
 	file, _ := exec.LookPath("subutai")
+
 	cfgFile := filepath.Dir(file) + "/../etc/agent.gcfg"
 	err = gcfg.ReadFileInto(&config, cfgFile)
 	log.Check(log.WarnLevel, "Opening Agent config file "+cfgFile, err)
@@ -149,5 +152,12 @@ func init() {
 func InitAgentDebug() {
 	if config.Agent.Debug {
 		log.Level(log.DebugLevel)
+	}
+}
+
+func CheckKurjun() {
+	_, err := net.DialTimeout("tcp", "10.10.10.1:8551", time.Duration(3)*time.Second)
+	if log.Check(log.WarnLevel, "Connecting local Kurjun", err) {
+		Management.Kurjun = "http://repo.critical-factor.com:8081/rest/kurjun/templates"
 	}
 }

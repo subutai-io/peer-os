@@ -1,7 +1,6 @@
 package net
 
 import (
-	"fmt"
 	"io"
 	"io/ioutil"
 	"net"
@@ -104,19 +103,6 @@ func DeleteGateway(vlanid string) {
 	port := strings.Fields(iface)
 	if len(port) > 1 {
 		exec.Command("ovs-vsctl", "del-port", "br-int", strings.Trim(port[1], "\"")).Run()
-	}
-}
-
-func ListTapDevice() {
-	if ps, err := exec.Command("ps", "ax").CombinedOutput(); err != nil {
-		log.Error("ps exec error", err.Error())
-	} else {
-		fmt.Printf("%0s %20s\n", "TapDeviceInterface", "TapDeviceIPAddress")
-		for _, v := range strings.Split(string(ps), "\n") {
-			if strings.Contains(v, "tap_create -d") {
-				fmt.Println(v)
-			}
-		}
 	}
 }
 

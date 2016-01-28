@@ -75,7 +75,7 @@ func queryDB(cmd string) (res []client.Result, err error) {
 		}
 		res = response.Results
 	}
-	if len(res[0].Series) == 0 {
+	if len(res) == 0 || len(res[0].Series) == 0 {
 		err = errors.New("No result")
 	}
 	return res, err
