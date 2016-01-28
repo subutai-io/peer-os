@@ -31,6 +31,7 @@ import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
@@ -218,10 +219,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             {
                 for ( ResourceHost resourceHost : resourceHostDataService.getAll() )
                 {
-//                    if ( "management".equals( resourceHost.getHostname() ) )
-//                    {
-//                        managementHost = resourceHost;
-//                    }
+                    //                    if ( "management".equals( resourceHost.getHostname() ) )
+                    //                    {
+                    //                        managementHost = resourceHost;
+                    //                    }
                     resourceHosts.add( resourceHost );
                 }
             }
@@ -1074,10 +1075,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 {
                     //ignore}
                 }
-                //            if ( managementHost == null && "management".equals( resourceHostInfo.getHostname() ) )
-                //            {
-                //                managementHost = host;
-                //            }
             }
         }
     }
@@ -1559,19 +1556,24 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 ControlNetworkConfig currentConfig = getControlNetworkConfig( config.getCommunityName() );
                 if ( config.getAddress().equals( currentConfig.getAddress() ) )
                 {
-                    // connection already exists, just resetting hash and TTL
-                    getNetworkManager().resetP2PSecretKey( config.getCommunityName(), config.getSecretKey(),
-                            config.getSecretKeyTtlSec() );
+                    if ( config.getSecretKey() != null )
+                    {
+                        // connection already exists, just resetting hash and TTL
+                        getNetworkManager().resetP2PSecretKey( config.getCommunityName(),
+                                Hex.encodeHexString( config.getSecretKey() ), config.getSecretKeyTtlSec() );
+                    }
                 }
                 else
                 {
                     getNetworkManager().removeP2PConnection( config.getCommunityName() );
+                    if ( config.getSecretKey() == null )
+                    {
+                        return false;
+                    }
                     getNetworkManager().setupP2PConnection( P2PUtil.generateInterfaceName( config.getAddress() ),
-                            config.getAddress(), config.getCommunityName(), config.getSecretKey(),
-                            config.getSecretKeyTtlSec() );
+                            config.getAddress(), config.getCommunityName(),
+                            Hex.encodeHexString( config.getSecretKey() ), config.getSecretKeyTtlSec() );
                 }
-
-
             }
             else
             {

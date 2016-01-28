@@ -15,18 +15,17 @@ public class ControlNetworkConfig
     @JsonProperty( "address" )
     private String address;
     @JsonProperty( "secretKey" )
-    private String secretKey;
+    private byte[] secretKey;
     @JsonProperty( "secretKeyTtlSec" )
     private long secretKeyTtlSec;
     @JsonProperty( "usedNetworks" )
     private List<String> usedNetworks;
 
 
-
     public ControlNetworkConfig( @JsonProperty( "peerId" ) final String peerId,
                                  @JsonProperty( "address" ) final String address,
                                  @JsonProperty( "communityName" ) final String communityName,
-                                 @JsonProperty( "secretKey" ) final String secretKey,
+                                 @JsonProperty( "secretKey" ) final byte[] secretKey,
                                  @JsonProperty( "secretKeyTtlSec" ) final long secretKeyTtlSec,
                                  @JsonProperty( "usedNetworks" ) final List<String> usedNetworks )
     {
@@ -50,7 +49,7 @@ public class ControlNetworkConfig
 
 
     public ControlNetworkConfig( final String peerId, final String address, final String communityName,
-                                 final String secretKey, final long secretKeyTtlSec )
+                                 final byte[] secretKey, final long secretKeyTtlSec )
     {
         this.peerId = peerId;
         this.address = address;
@@ -84,7 +83,7 @@ public class ControlNetworkConfig
     }
 
 
-    public String getSecretKey()
+    public byte[] getSecretKey()
     {
         return secretKey;
     }

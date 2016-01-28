@@ -27,12 +27,12 @@ public class ControlNetworkUtil
     private final String fingerprint;
     private final Set<String> usedAddresses = new HashSet<>();
     private final long secretKeyTtl;
-    private final String secretKey;
+    private final byte[] secretKey;
     private final String network;
     private final List<ControlNetworkConfig> configs;
 
 
-    public ControlNetworkUtil( final String fingerprint, final String network, final String secretKey,
+    public ControlNetworkUtil( final String fingerprint, final String network, final byte[] secretKey,
                                final long secretKeyTtl, final List<ControlNetworkConfig> configs )
             throws ControlNetworkException
     {
@@ -119,7 +119,7 @@ public class ControlNetworkUtil
 
 
     public static List<ControlNetworkConfig> rebuild( final String fingerprint, final String network,
-                                                      final String secretKey, final long secretKeyTtl,
+                                                      final byte[] secretKey, final long secretKeyTtl,
                                                       List<ControlNetworkConfig> configs )
     {
         List<ControlNetworkConfig> result = new ArrayList<>();
