@@ -337,8 +337,8 @@ public class PeerManagerImpl implements PeerManager
             throw new IllegalArgumentException( "Peer could not be null." );
         }
         this.peers.put( peer.getId(), peer );
-        selectControlNetwork();
-        updateControlNetwork();
+//        selectControlNetwork();
+//        updateControlNetwork();
     }
 
 
@@ -348,13 +348,13 @@ public class PeerManagerImpl implements PeerManager
         if ( peer != null )
         {
             this.peers.remove( id );
-            selectControlNetwork();
-            updateControlNetwork();
+//            selectControlNetwork();
+//            updateControlNetwork();
         }
     }
 
 
-    private PeerData loadPeerData( final String id )
+    protected PeerData loadPeerData( final String id )
     {
         return peerDataService.find( id );
     }
@@ -1121,14 +1121,14 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    private void selectControlNetwork()
+    protected void selectControlNetwork()
     {
         List<ControlNetworkConfig> configs = new ArrayList<>();
         for ( Peer peer : getPeers() )
         {
             try
             {
-                configs.add( peer.getControlNetworkConfig( localPeerId ) );
+                configs.add( peer.getControlNetworkConfig( localPeer.getId() ) );
             }
             catch ( PeerException e )
             {
