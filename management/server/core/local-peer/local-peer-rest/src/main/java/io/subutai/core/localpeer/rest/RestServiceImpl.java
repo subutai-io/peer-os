@@ -482,4 +482,23 @@ public class RestServiceImpl implements RestService
             return Response.serverError().build();
         }
     }
+
+
+    @Override
+    public Response getCommunityDistances( final String communityName, final Integer count )
+    {
+
+        Preconditions.checkNotNull( communityName );
+        Preconditions.checkNotNull( count );
+
+        try
+        {
+            return Response.ok( localPeer.getCommunityDistances( communityName, count ) ).build();
+        }
+        catch ( PeerException e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            return Response.serverError().build();
+        }
+    }
 }
