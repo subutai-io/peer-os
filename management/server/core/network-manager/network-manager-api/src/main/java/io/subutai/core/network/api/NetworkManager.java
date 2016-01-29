@@ -8,6 +8,10 @@ import io.subutai.common.network.Vni;
 import io.subutai.common.network.VniVlanMapping;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentId;
+import io.subutai.common.peer.Host;
+import io.subutai.common.protocol.P2PConnection;
+import io.subutai.common.protocol.P2PPeerInfo;
+import io.subutai.common.protocol.PingDistance;
 import io.subutai.common.protocol.Tunnel;
 
 
@@ -59,6 +63,8 @@ public interface NetworkManager
      */
     public Set<P2PConnection> listP2PConnections() throws NetworkManagerException;
 
+
+    PingDistance getPingDistance( Host host, String sourceHostIp, String targetHostIp ) throws NetworkManagerException;
 
     public Set<P2PPeerInfo> listPeersInEnvironment( String communityName ) throws NetworkManagerException;
 

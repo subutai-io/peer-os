@@ -1,6 +1,7 @@
 package io.subutai.common.protocol;
 
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,8 +25,46 @@ public class PingDistances
     }
 
 
+    public PingDistances()
+    {
+
+    }
+
+
+    public void add( PingDistance distance )
+    {
+        if ( distance == null )
+        {
+            throw new IllegalArgumentException( "Ping distance could not be null." );
+        }
+
+        distanceMap.put( distance.getSourceIp() + "-" + distance.getTargetIp(), distance );
+    }
+
+
+    public void addAll( Collection<PingDistance> distances )
+    {
+        if ( distances == null )
+        {
+            throw new IllegalArgumentException( "Ping distances could not be null." );
+        }
+
+        for ( PingDistance distance : distances )
+        {
+            distanceMap.put( distance.getSourceIp() + "-" + distance.getTargetIp(), distance );
+        }
+    }
+
+
     @JsonIgnore
-    public PingDistance getDistance( final String source, final String target )
+    public Collection<PingDistance> getAll()
+    {
+        return distanceMap.values();
+    }
+
+
+    @JsonIgnore
+    public PingDistance get( final String source, final String target )
     {
         if ( distanceMap == null )
         {

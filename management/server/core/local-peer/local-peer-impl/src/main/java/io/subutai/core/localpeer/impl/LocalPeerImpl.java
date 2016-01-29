@@ -88,7 +88,10 @@ import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.protocol.ControlNetworkConfig;
 import io.subutai.common.protocol.Disposable;
 import io.subutai.common.protocol.P2PConfig;
+import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.P2PCredentials;
+import io.subutai.common.protocol.PingDistance;
+import io.subutai.common.protocol.PingDistances;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.quota.ContainerQuota;
@@ -132,7 +135,7 @@ import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
-import io.subutai.core.network.api.P2PConnection;
+import io.subutai.common.protocol.P2PConnection;
 import io.subutai.core.repository.api.RepositoryException;
 import io.subutai.core.repository.api.RepositoryManager;
 import io.subutai.core.security.api.SecurityManager;
@@ -150,7 +153,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     private static final Logger LOG = LoggerFactory.getLogger( LocalPeerImpl.class );
 
     public static final String PEER_SUBNET_MASK = "255.255.255.0";
-    private static final int P2P_PORT = 5000;
     private static final String GATEWAY_INTERFACE_NAME_REGEX = "^br-(\\d+)$";
     private static final Pattern GATEWAY_INTERFACE_NAME_PATTERN = Pattern.compile( GATEWAY_INTERFACE_NAME_REGEX );
 
@@ -2287,6 +2289,84 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public String getExternalIp()
     {
         return getPeerInfo().getIp();
+    }
+
+
+    @Override
+    public PingDistances getCommunityDistances( final String communityName, final Integer maxAddress ) throws PeerException
+    {
+        PingDistances result = new PingDistances();
+        try
+        {
+            final P2PConnection communityConnection = new P2PConnections( getNetworkManager().listP2PConnections() )
+                    .findCommunityConnection( communityName );
+
+            if ( communityConnection == null )
+            {
+                return result;
+            }
+            String communityNetwork = communityConnection.getLocalIp();
+            final SubnetUtils.SubnetInfo info =
+                    new SubnetUtils( communityNetwork, ControlNetworkUtil.NETWORK_MASK ).getInfo();
+
+            ExecutorService pool = Executors.newFixedThreadPool( maxAddress );
+            ExecutorCompletionService<PingDistance> completionService = new ExecutorCompletionService<>( pool );
+            for ( int i = 0; i < maxAddress; i++ )
+            {
+                completionService
+                        .submit( new PingDistanceTask( communityConnection.getLocalIp(), info.getAllAddresses()[i] ) );
+            }
+
+            pool.shutdown();
+
+            int counter = maxAddress;
+            while ( counter-- > 0 )
+            {
+                try
+                {
+                    Future<PingDistance> d = completionService.take();
+                    result.add( d.get() );
+                }
+                catch ( ExecutionException | InterruptedException e )
+                {
+                    // ignore
+                }
+            }
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( e.getMessage() );
+        }
+        return result;
+    }
+
+
+    private class PingDistanceTask implements Callable<PingDistance>
+    {
+        private final String sourceIp;
+        private final String targetIp;
+
+
+        public PingDistanceTask( final String sourceIp, final String targetIp )
+        {
+            this.sourceIp = sourceIp;
+            this.targetIp = targetIp;
+        }
+
+
+        @Override
+        public PingDistance call() throws Exception
+        {
+            try
+            {
+                return getNetworkManager().getPingDistance( getManagementHost(), sourceIp, targetIp );
+            }
+            catch ( Exception e )
+            {
+                return new PingDistance( sourceIp, targetIp, null, null, null, null );
+            }
+        }
     }
 }
 

@@ -9,6 +9,10 @@ import org.codehaus.jackson.annotate.JsonProperty;
  */
 public class PingDistance
 {
+    @JsonProperty( "sourceIp" )
+    private String sourceIp;
+    @JsonProperty( "targetIp" )
+    private String targetIp;
     @JsonProperty( "min" )
     private Double min;
     @JsonProperty( "avg" )
@@ -19,9 +23,13 @@ public class PingDistance
     private Double mdev;
 
 
-    public PingDistance( @JsonProperty( "min" ) final double min, @JsonProperty( "avg" ) final double avg,
-                         @JsonProperty( "max" ) final double max, @JsonProperty( "mdev" ) final double mdev )
+    public PingDistance( @JsonProperty( "sourceIp" ) final String sourceIp,
+                         @JsonProperty( "targetIp" ) final String targetIp, @JsonProperty( "min" ) final Double min,
+                         @JsonProperty( "avg" ) final Double avg, @JsonProperty( "max" ) final Double max,
+                         @JsonProperty( "mdev" ) final Double mdev )
     {
+        this.sourceIp = sourceIp;
+        this.targetIp = targetIp;
         this.min = min;
         this.avg = avg;
         this.max = max;
@@ -29,25 +37,37 @@ public class PingDistance
     }
 
 
-    public double getMin()
+    public String getSourceIp()
+    {
+        return sourceIp;
+    }
+
+
+    public String getTargetIp()
+    {
+        return targetIp;
+    }
+
+
+    public Double getMin()
     {
         return min;
     }
 
 
-    public double getAvg()
+    public Double getAvg()
     {
         return avg;
     }
 
 
-    public double getMax()
+    public Double getMax()
     {
         return max;
     }
 
 
-    public double getMdev()
+    public Double getMdev()
     {
         return mdev;
     }

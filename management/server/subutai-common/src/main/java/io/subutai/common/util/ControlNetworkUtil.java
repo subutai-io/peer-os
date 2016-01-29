@@ -18,7 +18,6 @@ import io.subutai.common.protocol.ControlNetworkConfig;
  */
 public class ControlNetworkUtil
 {
-    public static final String EMPTY_NETWORK = "1.1.1.1";
     public static final long DEFAULT_TTL = 10000;
     public static String NETWORK_MASK = "255.255.255.0";
     public static String NETWORK_PREFIX = "10.200";

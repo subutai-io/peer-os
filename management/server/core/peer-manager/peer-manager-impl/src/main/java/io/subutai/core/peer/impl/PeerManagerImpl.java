@@ -47,6 +47,7 @@ import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.peer.RegistrationData;
 import io.subutai.common.peer.RegistrationStatus;
 import io.subutai.common.protocol.ControlNetworkConfig;
+import io.subutai.common.protocol.PingDistances;
 import io.subutai.common.security.objects.TokenType;
 import io.subutai.common.settings.ChannelSettings;
 import io.subutai.common.util.ControlNetworkUtil;
@@ -275,7 +276,7 @@ public class PeerManagerImpl implements PeerManager
 
             PeerPolicy policy = getDefaultPeerPolicy( registrationData.getPeerInfo().getId() );
 
-            final Integer order = getNextOrder();
+            final Integer order = getMaxOrder() + 1;
             PeerData peerData =
                     new PeerData( registrationData.getPeerInfo().getId(), toJson( registrationData.getPeerInfo() ),
                             keyPhrase, toJson( policy ), order );
@@ -335,15 +336,9 @@ public class PeerManagerImpl implements PeerManager
         {
             throw new IllegalArgumentException( "Peer could not be null." );
         }
-
-        addToControlNetwork( peer );
         this.peers.put( peer.getId(), peer );
-    }
-
-
-    protected void addToControlNetwork( final Peer peer ) throws PeerException
-    {
-        //        ControlNetworkConfig localConfig = localPeer.getControlNetworkConfig();
+        selectControlNetwork();
+        updateControlNetwork();
     }
 
 
@@ -352,15 +347,10 @@ public class PeerManagerImpl implements PeerManager
         Peer peer = this.peers.get( id );
         if ( peer != null )
         {
-            removeFromControlNetwork( peer );
             this.peers.remove( id );
+            selectControlNetwork();
+            updateControlNetwork();
         }
-    }
-
-
-    protected void removeFromControlNetwork( final Peer peer )
-    {
-        //TODO: implement me
     }
 
 
@@ -931,11 +921,19 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    protected synchronized Integer getNextOrder() throws PeerException
+    protected synchronized Integer getMaxOrder() throws PeerException
     {
         try
         {
-            return peerDataService.getAll().size() + 1;
+            int result = 1;
+            for ( PeerData peerData : peerDataService.getAll() )
+            {
+                if ( peerData.getOrder() > result )
+                {
+                    result = peerData.getOrder();
+                }
+            }
+            return result;
         }
         catch ( Exception e )
         {
@@ -982,14 +980,45 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
+    public PingDistances getCommunityDistances()
+    {
+        PingDistances result = new PingDistances();
+
+        final List<Peer> peers = getPeers();
+        ExecutorService pool = Executors.newFixedThreadPool( peers.size() );
+        ExecutorCompletionService<PingDistances> completionService = new ExecutorCompletionService<>( pool );
+        for ( Peer peer : peers )
+        {
+            completionService.submit( new CommunityDistanceTask( peer ) );
+        }
+
+        pool.shutdown();
+
+        for ( int i = 0; i < peers.size(); i++ )
+        {
+            try
+            {
+                final Future<PingDistances> f = completionService.take();
+                PingDistances r = f.get();
+                result.addAll( r.getAll() );
+            }
+            catch ( ExecutionException | InterruptedException e )
+            {
+                LOG.warn( "Could not get distances : " + e.getMessage() );
+            }
+        }
+        return result;
+    }
+
+
+    @Override
     public void updateControlNetwork()
     {
         try
         {
-            controlNetwork = localPeer.getCurrentControlNetwork();
-
             if ( controlNetwork == null )
             {
+                controlNetwork = localPeer.getCurrentControlNetwork();
                 selectControlNetwork();
             }
         }
@@ -1005,7 +1034,8 @@ public class PeerManagerImpl implements PeerManager
         {
             if ( controlNetworkTtl <= System.currentTimeMillis() )
             {
-                controlNetworkTtl = System.currentTimeMillis() + TimeUnit.MINUTES.toMillis( CONTROL_NETWORK_TTL_IN_MIN );
+                controlNetworkTtl =
+                        System.currentTimeMillis() + TimeUnit.MINUTES.toMillis( CONTROL_NETWORK_TTL_IN_MIN );
                 key = DigestUtils.md5( UUID.randomUUID().toString() );
             }
             String[] addresses =
@@ -1107,6 +1137,25 @@ public class PeerManagerImpl implements PeerManager
         }
         controlNetwork = ControlNetworkUtil.findFreeNetwork( configs );
         controlNetworkTtl = 0;
+    }
+
+
+    private class CommunityDistanceTask implements Callable<PingDistances>
+    {
+        private Peer peer;
+
+
+        public CommunityDistanceTask( final Peer peer )
+        {
+            this.peer = peer;
+        }
+
+
+        @Override
+        public PingDistances call() throws Exception
+        {
+            return peer.getCommunityDistances( getLocalPeer().getId(), getMaxOrder() );
+        }
     }
 }
 

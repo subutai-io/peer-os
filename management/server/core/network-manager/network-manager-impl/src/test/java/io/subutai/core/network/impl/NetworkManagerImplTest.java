@@ -28,7 +28,7 @@ import io.subutai.common.settings.Common;
 import io.subutai.core.network.api.ContainerInfo;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
-import io.subutai.core.network.api.P2PConnection;
+import io.subutai.common.protocol.P2PConnection;
 import io.subutai.core.peer.api.PeerManager;
 import junit.framework.TestCase;
 
