@@ -2,6 +2,7 @@ package io.subutai.common.peer;
 
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -24,6 +25,8 @@ import io.subutai.common.network.Vni;
 import io.subutai.common.protocol.ControlNetworkConfig;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
+import io.subutai.common.protocol.PingDistance;
+import io.subutai.common.protocol.PingDistances;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.resource.HistoricalMetrics;
@@ -303,4 +306,6 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
     ControlNetworkConfig getControlNetworkConfig( String localPeerId ) throws PeerException;
 
     boolean updateControlNetworkConfig( ControlNetworkConfig config ) throws PeerException;
+
+    PingDistances getCommunityDistances( String communityName, Integer maxAddress ) throws PeerException;
 }

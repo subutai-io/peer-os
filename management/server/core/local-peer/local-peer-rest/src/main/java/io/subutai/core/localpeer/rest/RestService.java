@@ -179,4 +179,11 @@ public interface RestService
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
     Response updateControlNetworkConfig( ControlNetworkConfig config );
+
+    @GET
+    @Path( "control/{communityName}/{count}/distance/" )
+    @Consumes( MediaType.APPLICATION_JSON )
+    @Produces( MediaType.APPLICATION_JSON )
+    Response getCommunityDistances( @PathParam( "communityName" ) final String communityName,
+                                    @PathParam( "count" ) final Integer count );
 }
