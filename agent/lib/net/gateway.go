@@ -1,9 +1,9 @@
 package net
 
 import (
-        "github.com/subutai-io/Subutai/agent/cli/lib"
-        "github.com/subutai-io/Subutai/agent/config"
-        "github.com/subutai-io/Subutai/agent/log"
+	"github.com/subutai-io/Subutai/agent/cli/lib"
+	"github.com/subutai-io/Subutai/agent/config"
+	"github.com/subutai-io/Subutai/agent/log"
 	"io"
 	"io/ioutil"
 	"net"
