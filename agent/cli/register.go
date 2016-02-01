@@ -4,13 +4,13 @@ import (
 	"bytes"
 	// "crypto/tls"
 	"fmt"
+	"github.com/subutai-io/Subutai/agent/config"
+	"github.com/subutai-io/Subutai/agent/lib/gpg"
+	"github.com/subutai-io/Subutai/agent/log"
 	"io"
 	"mime/multipart"
 	"net/http"
 	"os"
-	"subutai/config"
-	"subutai/lib/gpg"
-	"subutai/log"
 )
 
 func LxcRegister(name string) {

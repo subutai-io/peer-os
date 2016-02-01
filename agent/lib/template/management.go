@@ -4,11 +4,11 @@ import (
 	"crypto/rand"
 	"fmt"
 	// "io/ioutil"
+	"github.com/subutai-io/Subutai/agent/lib/container"
+	"github.com/subutai-io/Subutai/agent/lib/fs"
+	"github.com/subutai-io/Subutai/agent/log"
 	"os"
 	"os/exec"
-	"subutai/lib/container"
-	"subutai/lib/fs"
-	"subutai/log"
 )
 
 func mac() string {

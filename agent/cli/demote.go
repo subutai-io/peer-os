@@ -1,10 +1,10 @@
 package lib
 
 import (
-	"subutai/lib/container"
-	"subutai/lib/fs"
-	"subutai/lib/template"
-	"subutai/log"
+	"github.com/subutai-io/Subutai/agent/lib/container"
+	"github.com/subutai-io/Subutai/agent/lib/fs"
+	"github.com/subutai-io/Subutai/agent/lib/template"
+	"github.com/subutai-io/Subutai/agent/log"
 )
 
 func LxcDemote(name, ip, vlan string) {

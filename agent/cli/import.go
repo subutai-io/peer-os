@@ -5,17 +5,17 @@ import (
 	"encoding/hex"
 	"fmt"
 	"github.com/pivotal-golang/archiver/extractor"
+	"github.com/subutai-io/Subutai/agent/config"
+	"github.com/subutai-io/Subutai/agent/lib/container"
+	"github.com/subutai-io/Subutai/agent/lib/gpg"
+	"github.com/subutai-io/Subutai/agent/lib/template"
+	"github.com/subutai-io/Subutai/agent/log"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"runtime"
 	"strings"
-	"subutai/config"
-	"subutai/lib/container"
-	"subutai/lib/gpg"
-	"subutai/lib/template"
-	"subutai/log"
 )
 
 func templMd5(templ, arch, token string) string {

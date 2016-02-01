@@ -2,11 +2,11 @@ package main
 
 import (
 	"github.com/codegangsta/cli"
+	"github.com/subutai-io/Subutai/agent/agent"
+	"github.com/subutai-io/Subutai/agent/cli"
+	"github.com/subutai-io/Subutai/agent/config"
+	"github.com/subutai-io/Subutai/agent/log"
 	"os"
-	"subutai/agent"
-	"subutai/cli"
-	"subutai/config"
-	"subutai/log"
 )
 
 func init() {

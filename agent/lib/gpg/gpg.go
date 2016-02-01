@@ -5,14 +5,14 @@ import (
 	"bytes"
 	"crypto/tls"
 	"errors"
+	"github.com/subutai-io/Subutai/agent/config"
+	"github.com/subutai-io/Subutai/agent/lib/container"
+	"github.com/subutai-io/Subutai/agent/log"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"os/exec"
 	"strings"
-	"subutai/config"
-	"subutai/lib/container"
-	"subutai/log"
 	"time"
 )
 

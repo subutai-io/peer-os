@@ -1,12 +1,12 @@
 package lib
 
 import (
+	"github.com/subutai-io/Subutai/agent/config"
+	"github.com/subutai-io/Subutai/agent/lib/container"
+	"github.com/subutai-io/Subutai/agent/log"
 	"io/ioutil"
 	"os"
 	"strings"
-	"subutai/config"
-	"subutai/lib/container"
-	"subutai/log"
 )
 
 // LxcConfig add or delete config item from config file

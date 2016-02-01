@@ -3,9 +3,9 @@ package lib
 import (
 	"bufio"
 	"fmt"
+	"github.com/subutai-io/Subutai/agent/log"
 	"os/exec"
 	"strings"
-	"subutai/log"
 )
 
 func SshTunnel(remoteip, timeout string) {

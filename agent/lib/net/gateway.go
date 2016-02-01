@@ -1,15 +1,15 @@
 package net
 
 import (
+	"github.com/subutai-io/Subutai/agent/cli/lib"
+	"github.com/subutai-io/Subutai/agent/config"
+	"github.com/subutai-io/Subutai/agent/log"
 	"io"
 	"io/ioutil"
 	"net"
 	"os"
 	"os/exec"
 	"strings"
-	"subutai/cli/lib"
-	"subutai/config"
-	"subutai/log"
 )
 
 func CalculateGW(ipS string) string {

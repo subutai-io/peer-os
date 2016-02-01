@@ -2,11 +2,11 @@ package lib
 
 import (
 	"fmt"
+	"github.com/subutai-io/Subutai/agent/config"
+	"github.com/subutai-io/Subutai/agent/lib/container"
+	"github.com/subutai-io/Subutai/agent/log"
 	lxc "gopkg.in/lxc/go-lxc.v2"
 	"strings"
-	"subutai/config"
-	"subutai/lib/container"
-	"subutai/log"
 )
 
 func printHeader(c, t, r, i, a, f, p bool) {

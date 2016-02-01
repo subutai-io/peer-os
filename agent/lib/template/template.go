@@ -3,12 +3,12 @@ package template
 import (
 	"crypto/tls"
 	"github.com/jhoonb/archivex"
+	"github.com/subutai-io/Subutai/agent/config"
+	"github.com/subutai-io/Subutai/agent/lib/fs"
+	"github.com/subutai-io/Subutai/agent/log"
 	"io"
 	"net/http"
 	"os"
-	"subutai/config"
-	"subutai/lib/fs"
-	"subutai/log"
 )
 
 func IsRegistered(templateName string) bool {

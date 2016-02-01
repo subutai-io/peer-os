@@ -2,10 +2,10 @@ package config
 
 import (
 	"code.google.com/p/gcfg"
+	"github.com/subutai-io/Subutai/agent/log"
 	"io/ioutil"
 	"net"
 	"os"
-	"subutai/log"
 	"time"
 )
 

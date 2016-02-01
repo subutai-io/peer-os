@@ -1,8 +1,8 @@
 package lib
 
 import (
-	"subutai/lib/container"
-	"subutai/log"
+	"github.com/subutai-io/Subutai/agent/lib/container"
+	"github.com/subutai-io/Subutai/agent/log"
 )
 
 // LxcStop stops the given containerName
