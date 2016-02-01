@@ -3,6 +3,7 @@ package io.subutai.core.peer.impl;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
@@ -60,6 +61,8 @@ import io.subutai.common.peer.Timeouts;
 import io.subutai.common.protocol.ControlNetworkConfig;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
+import io.subutai.common.protocol.PingDistance;
+import io.subutai.common.protocol.PingDistances;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.resource.HistoricalMetrics;
@@ -890,6 +893,14 @@ public class RemotePeerImpl implements RemotePeer
     public boolean updateControlNetworkConfig( final ControlNetworkConfig config ) throws PeerException
     {
         return new PeerWebClient( peerInfo.getIp(), provider ).updateControlNetworkConfig( config );
+    }
+
+
+    @Override
+    public PingDistances getCommunityDistances( final String communityName, final Integer maxAddress )
+            throws PeerException
+    {
+        return new PeerWebClient( peerInfo.getIp(), provider ).getCommunityDistances( communityName, maxAddress );
     }
 
 

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.SocketException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -46,6 +47,7 @@ import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.peer.RegistrationData;
 import io.subutai.common.peer.RegistrationStatus;
 import io.subutai.common.protocol.ControlNetworkConfig;
+import io.subutai.common.protocol.PingDistances;
 import io.subutai.common.security.objects.TokenType;
 import io.subutai.common.settings.ChannelSettings;
 import io.subutai.common.util.ControlNetworkUtil;
@@ -75,6 +77,8 @@ import io.subutai.core.security.api.SecurityManager;
 @PermitAll
 public class PeerManagerImpl implements PeerManager
 {
+    final static int CONTROL_NETWORK_TTL_IN_MIN = 10;
+
     private static final Logger LOG = LoggerFactory.getLogger( PeerManagerImpl.class );
     private static final String KURJUN_URL_PATTERN = "https://%s:%s/rest/kurjun/templates/public";
     private static final String DEFAULT_EXTERNAL_INTERFACE_NAME = "eth1";
@@ -103,7 +107,8 @@ public class PeerManagerImpl implements PeerManager
     private String ownerId;
     private RegistrationClient registrationClient;
     protected ScheduledExecutorService backgroundTasksExecutorService;
-    private String currentNetwork;
+    private String controlNetwork;
+    private long controlNetworkTtl = 0;
 
 
     public PeerManagerImpl( final Messenger messenger, LocalPeer localPeer, DaoManager daoManager,
@@ -271,7 +276,7 @@ public class PeerManagerImpl implements PeerManager
 
             PeerPolicy policy = getDefaultPeerPolicy( registrationData.getPeerInfo().getId() );
 
-            final Integer order = getNextOrder();
+            final Integer order = getMaxOrder() + 1;
             PeerData peerData =
                     new PeerData( registrationData.getPeerInfo().getId(), toJson( registrationData.getPeerInfo() ),
                             keyPhrase, toJson( policy ), order );
@@ -331,15 +336,9 @@ public class PeerManagerImpl implements PeerManager
         {
             throw new IllegalArgumentException( "Peer could not be null." );
         }
-
-        addToControlNetwork( peer );
         this.peers.put( peer.getId(), peer );
-    }
-
-
-    protected void addToControlNetwork( final Peer peer ) throws PeerException
-    {
-        //        ControlNetworkConfig localConfig = localPeer.getControlNetworkConfig();
+//        selectControlNetwork();
+//        updateControlNetwork();
     }
 
 
@@ -348,19 +347,14 @@ public class PeerManagerImpl implements PeerManager
         Peer peer = this.peers.get( id );
         if ( peer != null )
         {
-            removeFromControlNetwork( peer );
             this.peers.remove( id );
+//            selectControlNetwork();
+//            updateControlNetwork();
         }
     }
 
 
-    protected void removeFromControlNetwork( final Peer peer )
-    {
-        //TODO: implement me
-    }
-
-
-    private PeerData loadPeerData( final String id )
+    protected PeerData loadPeerData( final String id )
     {
         return peerDataService.find( id );
     }
@@ -927,11 +921,19 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    protected synchronized Integer getNextOrder() throws PeerException
+    protected synchronized Integer getMaxOrder() throws PeerException
     {
         try
         {
-            return peerDataService.getAll().size() + 1;
+            int result = 1;
+            for ( PeerData peerData : peerDataService.getAll() )
+            {
+                if ( peerData.getOrder() > result )
+                {
+                    result = peerData.getOrder();
+                }
+            }
+            return result;
         }
         catch ( Exception e )
         {
@@ -966,7 +968,7 @@ public class PeerManagerImpl implements PeerManager
             LOG.debug( "Background task runner started..." );
             try
             {
-//                updateControlNetwork();
+                //                updateControlNetwork();
             }
             catch ( Exception e )
             {
@@ -978,16 +980,46 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
+    public PingDistances getCommunityDistances()
+    {
+        PingDistances result = new PingDistances();
+
+        final List<Peer> peers = getPeers();
+        ExecutorService pool = Executors.newFixedThreadPool( peers.size() );
+        ExecutorCompletionService<PingDistances> completionService = new ExecutorCompletionService<>( pool );
+        for ( Peer peer : peers )
+        {
+            completionService.submit( new CommunityDistanceTask( peer ) );
+        }
+
+        pool.shutdown();
+
+        for ( int i = 0; i < peers.size(); i++ )
+        {
+            try
+            {
+                final Future<PingDistances> f = completionService.take();
+                PingDistances r = f.get();
+                result.addAll( r.getAll() );
+            }
+            catch ( ExecutionException | InterruptedException e )
+            {
+                LOG.warn( "Could not get distances : " + e.getMessage() );
+            }
+        }
+        return result;
+    }
+
+
+    @Override
     public void updateControlNetwork()
     {
-        String key = DigestUtils.md5Hex( UUID.randomUUID().toString() );
         try
         {
-            currentNetwork = localPeer.getCurrentControlNetwork();
-
-            if ( currentNetwork == null )
+            if ( controlNetwork == null )
             {
-                renewControlNetwork();
+                controlNetwork = localPeer.getCurrentControlNetwork();
+                selectControlNetwork();
             }
         }
         catch ( PeerException e )
@@ -997,10 +1029,17 @@ public class PeerManagerImpl implements PeerManager
 
 
         boolean isOk = false;
+        byte[] key = null;
         while ( !isOk )
         {
+            if ( controlNetworkTtl <= System.currentTimeMillis() )
+            {
+                controlNetworkTtl =
+                        System.currentTimeMillis() + TimeUnit.MINUTES.toMillis( CONTROL_NETWORK_TTL_IN_MIN );
+                key = DigestUtils.md5( UUID.randomUUID().toString() );
+            }
             String[] addresses =
-                    new SubnetUtils( currentNetwork, ControlNetworkUtil.NETWORK_MASK ).getInfo().getAllAddresses();
+                    new SubnetUtils( controlNetwork, ControlNetworkUtil.NETWORK_MASK ).getInfo().getAllAddresses();
             List<UpdateControlNetworkTask> updateTasks = new ArrayList<>();
             for ( Peer peer : getPeers() )
             {
@@ -1011,7 +1050,7 @@ public class PeerManagerImpl implements PeerManager
                 }
                 ControlNetworkConfig config =
                         new ControlNetworkConfig( peer.getId(), addresses[data.getOrder()], localPeerId.toLowerCase(),
-                                key, 100000 );
+                                key, controlNetworkTtl );
                 updateTasks.add( new UpdateControlNetworkTask( config ) );
             }
             final ExecutorService pool = Executors.newFixedThreadPool( updateTasks.size() );
@@ -1044,8 +1083,12 @@ public class PeerManagerImpl implements PeerManager
             if ( !isOk )
             {
                 LOG.warn( "Control network config conflict. Selecting another network." );
-                renewControlNetwork();
-                LOG.warn( "New control network: " + currentNetwork );
+                selectControlNetwork();
+                LOG.warn( "New control network: " + controlNetwork );
+            }
+            else if ( key != null )
+            {
+                Arrays.fill( key, ( byte ) 0 );
             }
         }
     }
@@ -1078,21 +1121,41 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    private void renewControlNetwork()
+    protected void selectControlNetwork()
     {
         List<ControlNetworkConfig> configs = new ArrayList<>();
         for ( Peer peer : getPeers() )
         {
             try
             {
-                configs.add( peer.getControlNetworkConfig( localPeerId ) );
+                configs.add( peer.getControlNetworkConfig( localPeer.getId() ) );
             }
             catch ( PeerException e )
             {
                 //ignore
             }
         }
-        currentNetwork = ControlNetworkUtil.findFreeNetwork( configs );
+        controlNetwork = ControlNetworkUtil.findFreeNetwork( configs );
+        controlNetworkTtl = 0;
+    }
+
+
+    private class CommunityDistanceTask implements Callable<PingDistances>
+    {
+        private Peer peer;
+
+
+        public CommunityDistanceTask( final Peer peer )
+        {
+            this.peer = peer;
+        }
+
+
+        @Override
+        public PingDistances call() throws Exception
+        {
+            return peer.getCommunityDistances( getLocalPeer().getId(), getMaxOrder() );
+        }
     }
 }
 

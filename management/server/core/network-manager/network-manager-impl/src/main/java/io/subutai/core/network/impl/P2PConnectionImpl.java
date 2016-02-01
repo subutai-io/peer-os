@@ -1,7 +1,7 @@
 package io.subutai.core.network.impl;
 
 
-import io.subutai.core.network.api.P2PConnection;
+import io.subutai.common.protocol.P2PConnection;
 
 
 /**

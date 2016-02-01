@@ -4,6 +4,7 @@ package io.subutai.core.peer.impl;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.ws.rs.core.MediaType;
@@ -31,6 +32,8 @@ import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.ControlNetworkConfig;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
+import io.subutai.common.protocol.PingDistance;
+import io.subutai.common.protocol.PingDistances;
 import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.PublicKeyContainer;
@@ -536,6 +539,27 @@ public class PeerWebClient
         catch ( Exception e )
         {
             throw new PeerException( "Error on updating control network config.", e );
+        }
+    }
+
+
+    public PingDistances getCommunityDistances( final String communityName, final Integer maxAddress )
+            throws PeerException
+    {
+        Preconditions.checkNotNull( communityName );
+        Preconditions.checkNotNull( maxAddress );
+        try
+        {
+            String path = String.format( "/control/%s/distances/%d", communityName, maxAddress );
+
+            WebClient client = WebClientBuilder.buildPeerWebClient( host, path, provider, 500, 7000, 1 );
+            client.type( MediaType.APPLICATION_JSON );
+            client.accept( MediaType.APPLICATION_JSON );
+            return client.get( PingDistances.class );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Error on getting community distances.", e );
         }
     }
 }

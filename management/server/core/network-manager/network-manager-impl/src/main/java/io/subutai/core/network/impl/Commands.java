@@ -334,4 +334,10 @@ public class Commands
 
         return new RequestBuilder( appendHosts.toString() );
     }
+
+
+    public RequestBuilder getPingDistanceCommand( final String ip )
+    {
+        return new RequestBuilder( "ping -c 10 -i 0.2 -w 3 " + ip );
+    }
 }

@@ -10,6 +10,7 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.peer.RegistrationData;
+import io.subutai.common.protocol.PingDistances;
 
 
 public interface PeerManager
@@ -86,6 +87,8 @@ public interface PeerManager
     PeerPolicy getPolicy( String peerId );
 
     Set<Peer> resolve( Set<String> peers ) throws PeerException;
+
+    PingDistances getCommunityDistances();
 
     void updateControlNetwork();
 }

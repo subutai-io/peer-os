@@ -28,7 +28,7 @@ startup.$inject = ['$rootScope', '$state', '$location', '$http'];
 
 function CurrentUserCtrl($location, $rootScope, ngDialog, $http, SweetAlert) {
 	var vm = this;
-	vm.currentUser = sessionStorage.getItem('currentUser');
+	vm.currentUser = localStorage.getItem('currentUser');
 	vm.currentUserRoles = [];
 
 	//function
@@ -37,13 +37,13 @@ function CurrentUserCtrl($location, $rootScope, ngDialog, $http, SweetAlert) {
 
 	function logout() {
 		removeCookie('sptoken');
-		sessionStorage.removeItem('currentUser');
+		localStorage.removeItem('currentUser');
 		$location.path('login');
 	}
 
 	$rootScope.$on('$stateChangeStart',	function(event, toState, toParams, fromState, fromParams){
 		if(localStorage.getItem('currentUser') !== undefined) {
-			vm.currentUser = sessionStorage.getItem('currentUser');
+			vm.currentUser = localStorage.getItem('currentUser');
 		} else if($rootScope.currentUser !== undefined) {
 			vm.currentUser = $rootScope.currentUser;
 		}
@@ -495,7 +495,7 @@ function startup($rootScope, $state, $location, $http) {
 		LOADING_SCREEN('none');
 		var restrictedPage = $.inArray($location.path(), ['/login']) === -1;
 		if (restrictedPage && !getCookie('sptoken')) {
-			sessionStorage.removeItem('currentUser');
+			localStorage.removeItem('currentUser');
 			$location.path('/login');
 		}
 	});

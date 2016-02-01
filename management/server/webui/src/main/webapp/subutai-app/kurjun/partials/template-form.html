@@ -5,14 +5,15 @@
 			<img src="assets/elements/buttons/b-icon-close.svg" class="b-icon g-right"/>
 		</a>
 	</div>
-	<form ng-submit="kurjunViewCtrl.proceedTemplate(kurjunCtrl.currentTemplate); processing=true">
+	<form ng-submit="kurjunViewCtrl.proceedTemplate(kurjunViewCtrl.currentTemplate); processing=true">
 		<div class="b-popup__body">
 
 			<div class="popup-body-box">
 				<label class="b-popup-body-label">Repository</label>
 				<select ng-init=""
 						class="b-popup-body-input b-popup-body-input_box"
-						ng-model="kurjunCtrl.currentTemplate.repository"
+						ng-change="kurjunViewCtrl.checkRepositoryStatus(kurjunViewCtrl.currentTemplate.repository)"
+						ng-model="kurjunViewCtrl.currentTemplate.repository"
 						ng-options="repository for repository in kurjunViewCtrl.repositories">
 				</select>
 				<div class="clear"></div>
@@ -23,13 +24,22 @@
 				<div class="b-file-uploader">
 					<div class="fileUpload b-btn b-btn_light-grey">
 						<span>Upload archive</span>
-						<input ngf-select id="js-uploadBtn" type="file" class="upload" ng-model="kurjunCtrl.currentTemplate.file" required/>
+						<input id="js-uploadBtn"
+							   type="file"
+							   class="upload"
+							   ngf-select
+							   ng-model="kurjunViewCtrl.currentTemplate.file"
+							   ng-disabled="!kurjunViewCtrl.isUploadAllowed"
+							   required/>
 					</div>
-					<input id="js-uploadFile" class="b-form-input b-form-input_fix-size-1" placeholder="Choose File" disabled="disabled" />
+					<input id="js-uploadFile"
+						   class="b-form-input b-form-input_fix-size-1"
+						   placeholder="{{ kurjunViewCtrl.currentTemplate.file.name ? kurjunViewCtrl.currentTemplate.file.name :  'Choose File' }}"
+						   disabled="disabled" />
 				</div>
 				<div class="b-progress" ng-style="processing ? {'display':'block'} : {'display':'none'}">
-					<div class="b-progress-bar" ng-style="{'width': kurjunCtrl.currentTemplate.file.progress + '%'}">
-						{{ kurjunCtrl.currentTemplate.file.progress }}%
+					<div class="b-progress-bar" ng-style="{'width': kurjunViewCtrl.currentTemplate.file.progress + '%'}">
+						{{ kurjunViewCtrl.currentTemplate.file.progress }}%
 					</div>
 				</div>
 				<div class="clear"></div>
@@ -41,7 +51,7 @@
 					class="b-btn b-btn_green g-right"
 					type="submit"
 					id="subt_button__environment-add-domain"
-					ng-disabled="!kurjunCtrl.currentTemplate.repository">
+					ng-disabled="!kurjunViewCtrl.currentTemplate.repository || !kurjunViewCtrl.isUploadAllowed">
 				Add
 			</button>
 			<div class="clear"></div>
