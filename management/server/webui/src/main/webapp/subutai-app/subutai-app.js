@@ -474,8 +474,7 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
                 bodyClass: 'b-body',
                 layout: 'fullpage'
             }
-        })
-        .state();
+        });
 
     $httpProvider.interceptors.push(function($q, $location) {
         return {
@@ -491,13 +490,15 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 
 function startup($rootScope, $state, $location, $http) {
 
+    $http.defaults.headers.common['sptoken'] = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI4YmE0ODdiNS05NmFlLTQ1YjMtODgwMy0xNDQ1NTQwMzU0ZTYiLCJpc3MiOiJpby5zdWJ1dGFpIn0.6sIgNAez0CRyfoNgTRy4VT2FGFlU4bds6yHMdzcl5Xo';
+
     $rootScope.$on('$stateChangeStart',	function(event, toState, toParams, fromState, fromParams){
         LOADING_SCREEN('none');
-        var restrictedPage = $.inArray($location.path(), ['/login']) === -1;
-        if (restrictedPage && !getCookie('sptoken')) {
-            localStorage.removeItem('currentUser');
-            $location.path('/login');
-        }
+        //var restrictedPage = $.inArray($location.path(), ['/login']) === -1;
+        //if (restrictedPage && !getCookie('sptoken')) {
+        //    localStorage.removeItem('currentUser');
+        //    $location.path('/login');
+        //}
     });
 
     $rootScope.$state = $state;
