@@ -1,9 +1,9 @@
 package net
 
 import (
-	"github.com/subutai-io/Subutai/agent/cli/lib"
-	"github.com/subutai-io/Subutai/agent/config"
-	"github.com/subutai-io/Subutai/agent/log"
+        "github.com/subutai-io/Subutai/agent/cli/lib"
+        "github.com/subutai-io/Subutai/agent/config"
+        "github.com/subutai-io/Subutai/agent/log"
 	"io"
 	"io/ioutil"
 	"net"
@@ -51,40 +51,41 @@ func writeinServiceInterface(vlanip, vlanid string) {
 
 }
 func CreateGateway(vlanip, vlanid string) {
-	// check: control ip. no need to get returns.
-	// controlIp(vlanip)
-	// check: add to ovs-vsctl --db=unix:$SUBUTAI_DATA_PREFIX/ovs/db.sock add-br br-$vlanID + ifconfig  br-$vlanID $ipAdd
-	log.Check(log.FatalLevel, "ovs-vsctl add-br ", exec.Command("ovs-vsctl", "add-br", "br-"+vlanid).Run())
-	log.Check(log.FatalLevel, "ifconfig ", exec.Command("ifconfig", "br-"+vlanid, vlanip).Run())
-	log.Check(log.FatalLevel, "add-port br-vlan",
-		exec.Command("ovs-vsctl", "add-port", "br-"+vlanid, vlanid+"toint").Run())
-	log.Check(log.FatalLevel, "set interface 1",
-		exec.Command("ovs-vsctl", "set", "interface", vlanid+"toint", "type=patch").Run())
-	log.Check(log.FatalLevel, "set interface 2",
-		exec.Command("ovs-vsctl", "set", "interface", vlanid+"toint", "options:peer=intto"+vlanid).Run())
-	log.Check(log.FatalLevel, "add-port br-int",
-		exec.Command("ovs-vsctl", "add-port", "br-int", "intto"+vlanid).Run())
-	log.Check(log.FatalLevel, "set interface 3",
-		exec.Command("ovs-vsctl", "set", "interface", "intto"+vlanid, "type=patch").Run())
-	log.Check(log.FatalLevel, "set interface 4",
-		exec.Command("ovs-vsctl", "set", "interface", "intto"+vlanid, "options:peer="+vlanid+"toint").Run())
-	log.Check(log.FatalLevel, "set port",
-		exec.Command("ovs-vsctl", "set", "port", "br-"+vlanid, "tag="+vlanid).Run())
-	// check: "ovs-ofctl"
+	return
+	// // check: control ip. no need to get returns.
+	// // controlIp(vlanip)
+	// // check: add to ovs-vsctl --db=unix:$SUBUTAI_DATA_PREFIX/ovs/db.sock add-br br-$vlanID + ifconfig  br-$vlanID $ipAdd
+	// log.Check(log.FatalLevel, "ovs-vsctl add-br ", exec.Command("ovs-vsctl", "add-br", "br-"+vlanid).Run())
+	// log.Check(log.FatalLevel, "ifconfig ", exec.Command("ifconfig", "br-"+vlanid, vlanip).Run())
+	// log.Check(log.FatalLevel, "add-port br-vlan",
+	// 	exec.Command("ovs-vsctl", "add-port", "br-"+vlanid, vlanid+"toint").Run())
+	// log.Check(log.FatalLevel, "set interface 1",
+	// 	exec.Command("ovs-vsctl", "set", "interface", vlanid+"toint", "type=patch").Run())
+	// log.Check(log.FatalLevel, "set interface 2",
+	// 	exec.Command("ovs-vsctl", "set", "interface", vlanid+"toint", "options:peer=intto"+vlanid).Run())
+	// log.Check(log.FatalLevel, "add-port br-int",
+	// 	exec.Command("ovs-vsctl", "add-port", "br-int", "intto"+vlanid).Run())
+	// log.Check(log.FatalLevel, "set interface 3",
+	// 	exec.Command("ovs-vsctl", "set", "interface", "intto"+vlanid, "type=patch").Run())
+	// log.Check(log.FatalLevel, "set interface 4",
+	// 	exec.Command("ovs-vsctl", "set", "interface", "intto"+vlanid, "options:peer="+vlanid+"toint").Run())
+	// log.Check(log.FatalLevel, "set port",
+	// 	exec.Command("ovs-vsctl", "set", "port", "br-"+vlanid, "tag="+vlanid).Run())
+	// // check: "ovs-ofctl"
 
-	log.Check(log.FatalLevel, "ovsflow 1",
-		exec.Command("ovs-ofctl", "add-flow", "br-"+vlanid, "priority=2500,ip,nw_src=10.10.10.0/24 actions=drop").Run())
-	log.Check(log.FatalLevel, "ovsFlow 2",
-		exec.Command("ovs-ofctl", "add-flow", "br-int", "priority=2500,ip,nw_src=10.10.10.0/24,nw_dst="+vlanip+" actions=drop").Run())
-	log.Check(log.FatalLevel, "ovsFlow 3",
-		exec.Command("ovs-ofctl", "add-flow", "br-"+vlanid, "priority=2600,ip,nw_src=10.10.10.1 actions=normal").Run())
-	log.Check(log.FatalLevel, "ovsFlow 4",
-		exec.Command("ovs-ofctl", "add-flow", "br-int", "priority=2600,ip,nw_src=10.10.10.1,nw_dst="+vlanip+" actions=normal").Run())
+	// log.Check(log.FatalLevel, "ovsflow 1",
+	// 	exec.Command("ovs-ofctl", "add-flow", "br-"+vlanid, "priority=2500,ip,nw_src=10.10.10.0/24 actions=drop").Run())
+	// log.Check(log.FatalLevel, "ovsFlow 2",
+	// 	exec.Command("ovs-ofctl", "add-flow", "br-int", "priority=2500,ip,nw_src=10.10.10.0/24,nw_dst="+vlanip+" actions=drop").Run())
+	// log.Check(log.FatalLevel, "ovsFlow 3",
+	// 	exec.Command("ovs-ofctl", "add-flow", "br-"+vlanid, "priority=2600,ip,nw_src=10.10.10.1 actions=normal").Run())
+	// log.Check(log.FatalLevel, "ovsFlow 4",
+	// 	exec.Command("ovs-ofctl", "add-flow", "br-int", "priority=2600,ip,nw_src=10.10.10.1,nw_dst="+vlanip+" actions=normal").Run())
 
-	// check: write them service-interface file
-	writeinServiceInterface(vlanid, vlanip)
-	// check: br-int + eth and only ip.
-	// since we are not using openflow aynmore we do not need net_bridge_blocker!
+	// // check: write them service-interface file
+	// writeinServiceInterface(vlanid, vlanip)
+	// // check: br-int + eth and only ip.
+	// // since we are not using openflow aynmore we do not need net_bridge_blocker!
 }
 
 func DeleteGateway(vlanid string) {
