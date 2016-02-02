@@ -2518,3 +2518,9 @@ td.b-main-table__status-col {
 .b-cloud-space__table .dataTables_paginate {
     margin: 15px 15px 15px 0;
 }
+
+.b-plugin-version {
+	font-size: 13px;
+	color: #04346E;
+}
+

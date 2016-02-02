@@ -1,4 +1,17 @@
 <div class="b-header__userbar b-header__userbar_right" ng-controller="CurrentUserCtrl as currentUserCtrl">
+	<span id="js-plugin-version" class="b-plugin-version"></span>
+	<script>
+		$(document).ready(function(){
+			if($('#bp-plugin-version').val().length > 0) {
+				$('#js-plugin-version').text('plugin version: ' + $('#bp-plugin-version').val() + ' / ');
+			}
+			$('body').on('change', '#bp-plugin-version', function(){
+				if($(this).val().length > 0) {
+					$('#js-plugin-version').text('plugin version: ' + $(this).val() + ' / ');
+				}
+			});
+		});
+	</script>
 	<a href ng-click="currentUserCtrl.logout()"
 		class="b-header-userbar-name"
 		ng-if="currentUserCtrl.currentUser">

@@ -79,13 +79,15 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 	vm.sendToPending = sendToPending;
 	vm.addSettingsToTemplate = addSettingsToTemplate;
 
-	environmentService.getTemplates()
+	/*environmentService.getTemplates()
 		.success(function (data) {
 			vm.templates = data;
 		})
 		.error(function (data) {
 			VARS_MODAL_ERROR( SweetAlert, 'Error on getting templates ' + data );
-		});
+		});*/
+
+	vm.templates = ['cassandra', 'mongo', 'zookeer', 'master', 'hadoop', 'spark', 'solr'];
 
 	environmentService.getContainersType()
 		.success(function (data) {
@@ -720,12 +722,18 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 						'<polygon transform="scale(1.2) translate(-5, -5)" fill="#292F6C" points="8.4,2.4 7.6,1.6 5,4.3 2.4,1.6 1.6,2.4 4.3,5 1.6,7.6 2.4,8.4 5,5.7 7.6,8.4 8.4,7.6 5.7,5 "/>',
 						'<title>Remove</title>',
 					'</g>',
+					'<g class="element-call-menu">',
+						'<circle fill="#F8FBFD" r="8" stroke="#dcdcdc"/>',
+						'<polygon transform="scale(1.2) translate(-5, -5)" fill="#292F6C" points="8.4,2.4 7.6,1.6 5,4.3 2.4,1.6 1.6,2.4 4.3,5 1.6,7.6 2.4,8.4 5,5.7 7.6,8.4 8.4,7.6 5.7,5 "/>',
+						'<title>Menu</title>',
+					'</g>',
 				'</g>'
 			].join(''),
 
 			defaults: joint.util.deepSupplement({
 				attrs: {
 					text: { 'font-weight': 400, 'font-size': 'small', fill: 'black', 'text-anchor': 'middle', 'ref-x': .5, 'ref-y': .5, 'y-alignment': 'middle' },
+					'g.element-call-menu': {'ref-x': 18, 'ref-y': 25}
 				},
 			}, joint.shapes.basic.Generic.prototype.defaults)
 
@@ -775,6 +783,8 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 				}
 				return this;
 			},
+			mouseover: function(evt, x, y) {
+			},
 			pointerclick: function (evt, x, y) {
 				this._dx = x;
 				this._dy = y;
@@ -787,6 +797,16 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 						this.model.remove();
 						$('.js-devops-item-info-block').hide();
 						delete vm.templateGrid[Math.floor( x / GRID_CELL_SIZE )][ Math.floor( y / GRID_CELL_SIZE )];
+						return;
+						break;
+					case 'element-call-menu':
+						console.log(this.model);
+						var elementPos = this.model.get('position');
+						$('.js-dropen-menu').css({
+							'left': (elementPos.x + 70) + 'px',
+							'top': (elementPos.y + 83) + 'px',
+							'display': 'block'
+						});
 						return;
 						break;
 					case 'rotatable':
