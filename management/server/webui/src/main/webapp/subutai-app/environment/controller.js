@@ -76,6 +76,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 	vm.setupAdvancedEnvironment = setupAdvancedEnvironment;
 	vm.initJointJs = initJointJs;
 	vm.buildEnvironmentByJoint = buildEnvironmentByJoint;
+	vm.clearWorkspace = clearWorkspace;
 	vm.sendToPending = sendToPending;
 	vm.addSettingsToTemplate = addSettingsToTemplate;
 
@@ -992,6 +993,12 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 			scope: $scope,
 			className: 'b-build-environment-info'
 		});
+	}
+
+	function clearWorkspace() {
+		vm.cubeGrowth = 0;
+		vm.templateGrid = [];
+		graph.resetCells();
 	}
 
 	function sendToPending() {
