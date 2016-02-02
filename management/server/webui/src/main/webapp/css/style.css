@@ -1076,7 +1076,7 @@ tip.description-tooltip {
 .b-popup-body-input {
     box-sizing: border-box;
     height: 29px;
-    border: 1px solid #e6eaf5;
+    border: 1px solid #CCCEEE;
     /*border-radius: 5px;*/
     padding: 0 5px;
     font-family: 'Ubuntu', sans-serif;
@@ -2050,6 +2050,32 @@ td.b-main-table__status-col {
 .b-file-uploader {
     font-size: 0px;
     line-height: 0;
+}
+
+.b-file-uploader input:disabled {
+    border-radius: 5px 0 0 5px;
+    border-right: 0;
+    background-color: transparent;
+    vertical-align: middle;
+}
+
+.b-file-uploader label {
+    vertical-align: middle;
+    height: 29px;
+    line-height: 29px;
+    padding: 0 8px;
+    display: inline-block;
+    font-family: 'Ubuntu', sans-serif;
+    font-size: 13px;
+    background-color: #F8FBFD;
+    cursor: pointer;
+    border: 1px solid #CCCEEE;
+    border-radius: 0 5px 5px 0;
+}
+
+.b-file-uploader label.disabled {
+    background-color: #F1F4F8;
+    color: #333333;
 }
 
 .b-file-uploader .fileUpload {
