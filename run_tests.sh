@@ -18,21 +18,21 @@ function print_help() {
 }
 
 function choice_mngh1(){
-    cd /home/ubuntu/playbooks-newui
+    cd /home/ubuntu/Subutai-playbooks
     mh1=$OPTARG;
     ./node-approve $mh1
     echo "$mh1" > src/test/resources/parameters/mng_h1
 }
 
 function choice_mngh2(){
-    cd /home/ubuntu/playbooks-newui
+    cd /home/ubuntu/Subutai-playbooks
     mh2=$OPTARG;
     ./node-approve $mh2
     echo "$mh2" > src/test/resources/parameters/mng_h2
 }
 
 function list_stories(){
-    cd /home/ubuntu/playbooks-newui
+    cd /home/ubuntu/Subutai-playbooks
     echo "======================================================================"
     echo "LIST of the ALL PLAYBOOKS: "
     echo
@@ -45,7 +45,7 @@ function list_playbooks(){
     echo "======================================================================"
     echo "LIST of the RUN PLAYBOOKS: "
     echo
-    cd /home/ubuntu/playbooks-newui
+    cd /home/ubuntu/Subutai-playbooks
     DIR="src/test/resources/stories/tests_run/"
      if [[ -d "$DIR" && "$(ls -A $DIR)" ]]; then
         cd "$DIR"
@@ -59,7 +59,7 @@ function list_playbooks(){
 }
 
 function choice_stories(){
-    cd /home/ubuntu/playbooks-newui
+    cd /home/ubuntu/Subutai-playbooks
     mvn clean;
     ns_path=$OPTARG;
     arr=($ns_path);
@@ -105,7 +105,7 @@ function choice_stories(){
 }
 
 function run_tests(){
-    cd /home/ubuntu/playbooks-newui
+    cd /home/ubuntu/Subutai-playbooks
     Xvfb :10 -ac &
     export DISPLAY=:10
     firefox &
@@ -115,7 +115,7 @@ function run_tests(){
 function copy_results(){
     buildName=$OPTARG;
     echo DEBUG Entered Copy files, build name is $buildName
-    scp -r /home/ubuntu/playbooks-newui/target/site/serenity/ ubuntu@10.10.12.1:$buildName 2>&1>/dev/null
+    scp -r /home/ubuntu/Subutai-playbooks/target/site/serenity/ ubuntu@10.10.12.1:$buildName 2>&1>/dev/null
 }
 
 if [ $# = 0 ]; then
@@ -123,7 +123,7 @@ if [ $# = 0 ]; then
 fi
 
 
-cd /home/ubuntu/playbooks-newui
+cd /home/ubuntu/Subutai-playbooks
 git clean -fd >/dev/null
 git reset --hard HEAD >/dev/null
 git pull origin master >/dev/null
