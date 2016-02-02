@@ -12,7 +12,7 @@
   <!-- ***************************************************************** -->
 
   <!-- Allow the use of system properties -->
-<!--
+
   <ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]" />
 
   <cm:property-placeholder persistent-id="peer" update-strategy="none">
@@ -20,7 +20,6 @@
       <cm:property name="externalIpInterface" value="eth1" />
     </cm:default-properties>
   </cm:property-placeholder>
--->
 
   <!-- ***************************************************************** -->
   <bean id="daoManagerPeer" init-method="init" class="io.subutai.common.dao.DaoManager" scope="prototype">
@@ -38,7 +37,9 @@
 
   <reference id="hostRegistry" interface="io.subutai.core.hostregistry.api.HostRegistry" />
 
+<!--
   <reference id="strategyManager" interface="io.subutai.core.strategy.api.StrategyManager" />
+-->
 
   <reference id="quotaManager" availability="mandatory"
              interface="io.subutai.core.lxc.quota.api.QuotaManager" />
@@ -57,11 +58,12 @@
     <argument ref="daoManagerPeer" />
     <argument ref="templateRegistry" />
     <argument ref="quotaManager" />
-    <argument ref="strategyManager" />
+<!--    <argument ref="strategyManager" />-->
     <argument ref="commandExecutor" />
     <argument ref="hostRegistry" />
     <argument ref="monitor" />
     <argument ref="securityManager" />
+    <property name="externalIpInterface" value="${externalIpInterface}" />
   </bean>
 
   <bean id="messageRequestListener" class="io.subutai.core.localpeer.impl.request.MessageRequestListener"
