@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 
 import io.subutai.common.peer.Peer;
+import io.subutai.common.peer.PeerException;
 import io.subutai.common.security.WebClientBuilder;
 import io.subutai.common.util.JsonUtil;
 
@@ -38,27 +39,36 @@ public class RemotePeerMessageSender implements Callable<Boolean>
     @Override
     public Boolean call()
     {
-        WebClient client = getWebClient( targetPeer.getPeerInfo().getIp() );
-
-        for ( Envelope envelope : envelopes )
+        WebClient client = null;
+        try
         {
-            try
+            client = getWebClient( targetPeer.getPeerInfo().getIp() );
+            for ( Envelope envelope : envelopes )
             {
-                client.post( JsonUtil.toJson( envelope ) );
+                try
+                {
+                    client.post( JsonUtil.toJson( envelope ) );
 
-                messengerDao.markAsSent( envelope );
+                    messengerDao.markAsSent( envelope );
+                }
+                catch ( Exception e )
+                {
+                    messengerDao.incrementDeliveryAttempts( envelope );
+
+                    LOG.error( "Error in PeerMessenger", e );
+
+                    //break transmission of all subsequent messages for this peer in this round
+                    break;
+                }
             }
-            catch ( Exception e )
-            {
-                messengerDao.incrementDeliveryAttempts( envelope );
-
-                LOG.error( "Error in PeerMessenger", e );
-
-                //break transmission of all subsequent messages for this peer in this round
-                break;
-            }
+            return true;
         }
-        return true;
+        catch ( PeerException e )
+        {
+            LOG.error( e.getMessage() );
+        }
+
+        return false;
     }
 
 

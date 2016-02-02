@@ -74,6 +74,7 @@ import ai.subut.kurjun.storage.factory.FileStoreFactory;
 import ai.subut.kurjun.storage.factory.FileStoreModule;
 import ai.subut.kurjun.subutai.SubutaiTemplateParserModule;
 import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.settings.Common;
 import io.subutai.core.identity.api.IdentityManager;
@@ -113,13 +114,12 @@ public class TemplateManagerImpl implements TemplateManager
 
 
     public TemplateManagerImpl( LocalPeer localPeer, IdentityManager identityManager,
-            io.subutai.core.security.api.SecurityManager securityManager, String globalKurjunUrl )
+                                io.subutai.core.security.api.SecurityManager securityManager, String globalKurjunUrl )
     {
         this.localPeer = localPeer;
         this.subutaiIdentityManager = identityManager;
         this.securityManager = securityManager;
         parseGlobalKurjunUrls( globalKurjunUrl );
-
     }
 
 
@@ -192,9 +192,9 @@ public class TemplateManagerImpl implements TemplateManager
         DefaultTemplate meta = ( DefaultTemplate ) repo.getPackageInfo( m );
         if ( meta != null )
         {
-            TemplateKurjun template = new TemplateKurjun( Hex.encodeHexString( meta.getMd5Sum() ), meta.getName(),
-                    meta.getVersion(), meta.getArchitecture().name(),
-                    meta.getParent(), meta.getPackage() );
+            TemplateKurjun template =
+                    new TemplateKurjun( Hex.encodeHexString( meta.getMd5Sum() ), meta.getName(), meta.getVersion(),
+                            meta.getArchitecture().name(), meta.getParent(), meta.getPackage() );
             template.setConfigContents( meta.getConfigContents() );
             template.setPackagesContents( meta.getPackagesContents() );
             return template;
@@ -205,8 +205,8 @@ public class TemplateManagerImpl implements TemplateManager
 
     @Override
     @RolesAllowed( "Template-Management|Read" )
-    public TemplateKurjun getTemplate( String context, String name,
-            String version, boolean isKurjunClient ) throws IOException
+    public TemplateKurjun getTemplate( String context, String name, String version, boolean isKurjunClient )
+            throws IOException
     {
         DefaultMetadata m = new DefaultMetadata();
         m.setName( name );
@@ -219,9 +219,9 @@ public class TemplateManagerImpl implements TemplateManager
         {
             checkPermission( context, Permission.GET_PACKAGE, Hex.encodeHexString( meta.getMd5Sum() ) );
 
-            TemplateKurjun template = new TemplateKurjun( Hex.encodeHexString( meta.getMd5Sum() ), meta.getName(),
-                    meta.getVersion(), meta.getArchitecture().name(),
-                    meta.getParent(), meta.getPackage() );
+            TemplateKurjun template =
+                    new TemplateKurjun( Hex.encodeHexString( meta.getMd5Sum() ), meta.getName(), meta.getVersion(),
+                            meta.getArchitecture().name(), meta.getParent(), meta.getPackage() );
             template.setConfigContents( meta.getConfigContents() );
             template.setPackagesContents( meta.getPackagesContents() );
             return template;
@@ -285,9 +285,9 @@ public class TemplateManagerImpl implements TemplateManager
             }
 
             DefaultTemplate meta = ( DefaultTemplate ) metadata;
-            TemplateKurjun t = new TemplateKurjun( Hex.encodeHexString( meta.getMd5Sum() ), meta.getName(),
-                    meta.getVersion(), meta.getArchitecture().name(), meta.getParent(),
-                    meta.getPackage() );
+            TemplateKurjun t =
+                    new TemplateKurjun( Hex.encodeHexString( meta.getMd5Sum() ), meta.getName(), meta.getVersion(),
+                            meta.getArchitecture().name(), meta.getParent(), meta.getPackage() );
             t.setConfigContents( meta.getConfigContents() );
             t.setPackagesContents( meta.getPackagesContents() );
             result.add( t );
@@ -498,7 +498,8 @@ public class TemplateManagerImpl implements TemplateManager
                 }
                 else
                 {
-                    LOGGER.warn( "Failed to remove remote host url: {}. Either it does not exist or it is a global url", url );
+                    LOGGER.warn( "Failed to remove remote host url: {}. Either it does not exist or it is a global url",
+                            url );
                 }
                 remoteRepoUrls = repoUrlStore.getRemoteTemplateUrls();
             }
@@ -532,7 +533,7 @@ public class TemplateManagerImpl implements TemplateManager
                 return ips.get( 0 ).getHostAddress();
             }
         }
-        catch ( SocketException | IndexOutOfBoundsException ex )
+        catch ( PeerException | SocketException | IndexOutOfBoundsException ex )
         {
             LOGGER.error( "Cannot get external ip. Returning null.", ex );
             return null;
@@ -584,8 +585,8 @@ public class TemplateManagerImpl implements TemplateManager
         {
             for ( RepoUrl repoUrl : remoteRepoUrls )
             {
-                unifiedRepo.getRepositories().add( repositoryFactory.createNonLocalTemplate(
-                        repoUrl.getUrl().toString(), null, repoUrl.getToken() ) );
+                unifiedRepo.getRepositories().add( repositoryFactory
+                        .createNonLocalTemplate( repoUrl.getUrl().toString(), null, repoUrl.getToken() ) );
             }
 
             // shuffle the global repo list to randomize and normalize usage of them
@@ -594,8 +595,8 @@ public class TemplateManagerImpl implements TemplateManager
 
             for ( RepoUrl repoUrl : list )
             {
-                unifiedRepo.getSecondaryRepositories().add( repositoryFactory.createNonLocalTemplate(
-                        repoUrl.getUrl().toString(), null, repoUrl.getToken() ) );
+                unifiedRepo.getSecondaryRepositories().add( repositoryFactory
+                        .createNonLocalTemplate( repoUrl.getUrl().toString(), null, repoUrl.getToken() ) );
             }
         }
         return unifiedRepo;
@@ -640,8 +641,8 @@ public class TemplateManagerImpl implements TemplateManager
         if ( !isAllowed( context, permission, resource ) )
         {
             throw new AccessControlException(
-                    String.format( "Action denied for resource %s with permission %s of identity %s",
-                            resource, permission, getActiveUserFingerprint() ) );
+                    String.format( "Action denied for resource %s with permission %s of identity %s", resource,
+                            permission, getActiveUserFingerprint() ) );
         }
     }
 
@@ -714,9 +715,6 @@ public class TemplateManagerImpl implements TemplateManager
 
     /**
      * Gets cached metadata from the repositories of the supplied unified repository.
-     *
-     * @param repository
-     * @return
      */
     private Set<SerializableMetadata> listPackagesFromCache( UnifiedRepository repository )
     {
@@ -746,7 +744,6 @@ public class TemplateManagerImpl implements TemplateManager
 
     /**
      * Refreshes metadata cache for each remote repository.
-     *
      */
     private void refreshMetadataCache()
     {
@@ -772,8 +769,6 @@ public class TemplateManagerImpl implements TemplateManager
     /**
      * Reads quota info specified in properties file. Property keys are context aware, i.e. disk quota info for context
      * "my" is specified by keys "my.disk.threshold" and "my.disk.unit".
-     *
-     * @param properties
      */
     private void readQuotaInfo( KurjunProperties properties ) throws IOException
     {
@@ -805,13 +800,12 @@ public class TemplateManagerImpl implements TemplateManager
             {
                 TransferQuota transferQuota = new TransferQuota();
                 transferQuota.setThreshold( transferThreshold );
-                transferQuota.setUnit( DataUnit.getByName( properties.getWithDefault( key4, DataUnit.MB.toString() ) ) );
+                transferQuota
+                        .setUnit( DataUnit.getByName( properties.getWithDefault( key4, DataUnit.MB.toString() ) ) );
                 transferQuota.setTime( timeFrame );
                 transferQuota.setTimeUnit( TimeUnit.MINUTES );
                 quotaInfoStore.saveTransferQuota( transferQuota, context );
             }
-
         }
     }
-
 }
