@@ -39,6 +39,7 @@ import com.google.common.base.Preconditions;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.peer.Encrypted;
+import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
@@ -197,11 +198,13 @@ public class PeerManagerImpl implements PeerManager
     private String getLocalPeerIp() throws PeerException
     {
         String result = null;
+
+
         try
         {
-            result = IPUtil.getLocalIpByInterfaceName( externalIpInterface );
+            result = localPeer.getManagementHost().getInterfaceByName( externalIpInterface ).getIp();
         }
-        catch ( SocketException e )
+        catch ( HostNotFoundException e )
         {
             LOG.error( "Error getting local IP", e );
         }
@@ -337,8 +340,8 @@ public class PeerManagerImpl implements PeerManager
             throw new IllegalArgumentException( "Peer could not be null." );
         }
         this.peers.put( peer.getId(), peer );
-//        selectControlNetwork();
-//        updateControlNetwork();
+        //        selectControlNetwork();
+        //        updateControlNetwork();
     }
 
 
@@ -348,8 +351,8 @@ public class PeerManagerImpl implements PeerManager
         if ( peer != null )
         {
             this.peers.remove( id );
-//            selectControlNetwork();
-//            updateControlNetwork();
+            //            selectControlNetwork();
+            //            updateControlNetwork();
         }
     }
 
