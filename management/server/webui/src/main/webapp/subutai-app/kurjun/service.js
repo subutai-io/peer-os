@@ -29,11 +29,17 @@ function kurjunService($http, Upload) {
 	}
 
 	function getTemplates(repository) {
-		return $http.get(KURJUN_URL + 'templates/' + repository + '/template-list', {withCredentials: true,headers: {'Content-Type': 'application/json'}});
+		return $http.get(KURJUN_URL + 'templates/' + repository + '/template-list', {
+			withCredentials: true,
+			headers: {'Content-Type': 'application/json'}
+		});
 	}
 
 	function getAPTList() {
-		return $http.get(KURJUN_URL + 'vapt/list', {withCredentials: true,headers: {'Content-Type': 'application/json'}});
+		return $http.get(KURJUN_URL + 'vapt/list', {
+			withCredentials: true,
+			headers: {'Content-Type': 'application/json'}
+		});
 	}
 
 	function addTemplate(repository, file) {
@@ -45,15 +51,24 @@ function kurjunService($http, Upload) {
 	}
 
 	function deleteTemplate(md5, repository) {
-		return $http.delete(KURJUN_URL + 'templates/' + repository, {params: {md5: md5}}, {withCredentials: true,headers: {'Content-Type': 'application/json'}});
+		return $http.delete(KURJUN_URL + 'templates/' + repository, {params: {md5: md5}}, {
+			withCredentials: true,
+			headers: {'Content-Type': 'application/json'}
+		});
 	}
 
 	function deleteAPT(md5) {
-		return $http.delete(KURJUN_URL + 'apt/delete', {params: {md5: md5}}, {withCredentials: true,headers: {'Content-Type': 'application/json'}});
+		return $http.delete(KURJUN_URL + 'vapt/delete', {params: {md5: md5}}, {
+			withCredentials: true,
+			headers: {'Content-Type': 'application/json'}
+		});
 	}
 
 	function isUploadAllowed(repository) {
-		return $http.get(KURJUN_URL + 'templates/' + repository + '/can-upload', {withCredentials: true,headers: {'Content-Type': 'application/json'}});
+		return $http.get(KURJUN_URL + 'templates/' + repository + '/can-upload', {
+			withCredentials: true,
+			headers: {'Content-Type': 'application/json'}
+		});
 	}
 
 	function uploadFile(file, url) {
