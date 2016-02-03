@@ -136,6 +136,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 
 	environmentService.getPeers().success(function (data) {
 		vm.peerIds = data;
+		console.log(vm.peerIds);
 	});
 
 	peerRegistrationService.getRequestedPeers().success(function (peers) {
