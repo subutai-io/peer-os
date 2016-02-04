@@ -22,6 +22,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 	vm.currentEnvironment = {};
 	vm.signedMessage = "";
 	vm.buildEnvironment = buildEnvironment;
+	vm.growEnvironment = growEnvironment;
 
 	vm.environments = [];
 	vm.domainStrategies = [];
@@ -32,6 +33,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 	vm.selectedPeers = [];
 	vm.installed = false;
 	vm.pending = false;
+	vm.isEditing = false;
 	vm.isDataValid = isDataValid;
 
 	vm.peerIds = [];
@@ -61,6 +63,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 	//vm.getEnvironments = getEnvironments;
 	vm.showContainersList = showContainersList;
 	vm.destroyContainer = destroyContainer;
+	vm.editEnvironment = editEnvironment;
 	vm.setSSHKey = setSSHKey;
 	vm.showSSHKeyForm = showSSHKeyForm;
 	vm.showSSHKeysPopup = showSSHKeysPopup;
@@ -368,7 +371,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 		vm.installedContainers = containersTotal;
 	}
 
-	function destroyContainer(containerId) {
+	function destroyContainer(containerId, cell, callback) {
 		SweetAlert.swal({
 			title: "Are you sure?",
 			text: "You will not be able to recover this Container!",
@@ -384,10 +387,11 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 		function (isConfirm) {
 			if (isConfirm) {
 				environmentService.destroyContainer(containerId).success(function (data) {
+					callback(cell);
 					SweetAlert.swal("Destroyed!", "Your container has been destroyed.", "success");
 					loadEnvironments();
 				}).error(function (data) {
-					SweetAlert.swal("ERROR!", "Your container is safe :). Error: " + data.ERROR, "error");
+					SweetAlert.swal("ERROR!", data.ERROR, "error");
 				});
 			}
 		});
@@ -433,6 +437,63 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 		});
 	}
 
+	function growEnvironment() {
+		SweetAlert.swal({
+				title: "Are you sure?",
+				text: "Your environment will change!",
+				type: "warning",
+				showCancelButton: true,
+				confirmButtonColor: "#ff3f3c",
+				confirmButtonText: "Grow",
+				cancelButtonText: "Cancel",
+				closeOnConfirm: false,
+				closeOnCancel: true,
+				showLoaderOnConfirm: true
+			},
+			function (isConfirm) {
+				if (isConfirm) {
+					var allElements = graph.getCells();
+					vm.containers2Build = [];
+					vm.env2Build = {};
+					for(var i = 0; i < allElements.length; i++) {
+						if(allElements[i].attributes.containerId) {
+							continue;
+						}
+						var currentElement = allElements[i];
+						var currentTemplateName = allElements[i].get('templateName');
+						var container2Build = {
+							"size": currentElement.get('quotaSize'),
+							"templateName": currentTemplateName,
+							"name": currentElement.get('containerName'),
+							"position": currentElement.get('position')
+						};
+						if(vm.env2Build[currentTemplateName] === undefined) {
+							vm.env2Build[currentTemplateName] = 1;
+						} else {
+							vm.env2Build[currentTemplateName]++;
+						}
+						vm.containers2Build.push(container2Build);
+					}
+					SweetAlert.swal(
+						{
+							title : 'Growing!',
+							text : 'Your environment is growing like Universe!!',
+							timer: VARS_TOOLTIP_TIMEOUT,
+							showConfirmButton: false
+						}
+					);
+
+					environmentService.growEnvironment(vm.currentEnvironment.id, vm.containers2Build).success(function (data) {
+						SweetAlert.swal("Grown!", "Your environment has been grown.", "success");
+						loadEnvironments();
+					}).error(function (data) {
+						SweetAlert.swal("ERROR!", data.ERROR, "error");
+					});
+					loadEnvironments();
+				}
+			});
+	}
+
 
 	function destroyEnvironment(environmentId) {
 		SweetAlert.swal({
@@ -467,6 +528,28 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 					loadEnvironments();
 				}
 			});
+	}
+
+	function editEnvironment(environment) {
+		vm.clearWorkspace();
+		vm.currentEnvironment = environment;
+		vm.isEditing = true;
+		var containerCounter = 1;
+		for(var container in environment.containers) {
+			var pos = vm.findEmptyCubePostion();
+			var devElement = new joint.shapes.tm.devElement({
+				position: { x: (GRID_CELL_SIZE * pos.x) + 20, y: (GRID_CELL_SIZE * pos.y) + 20 },
+				templateName: environment.containers[container].templateName,
+				quotaSize: environment.containers[container].type,
+				containerName: environment.name + ' ' + (containerCounter++).toString(),
+				containerId: environment.containers[container].id,
+				attrs: {
+					image: { 'xlink:href': 'assets/templates/' + environment.containers[container].templateName + '.jpg' },
+					title: {text: environment.containers[container].templateName}
+				}
+			});
+			graph.addCell(devElement);
+		}
 	}
 
 	function showContainersList(key) {
@@ -793,15 +876,24 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 				var className = evt.target.parentNode.getAttribute('class');
 				switch (className) {
 					case 'element-tool-remove':
-						$('.js-add-dev-element[data-type=' + this.model.attributes.devType + ']')
-							.removeClass('b-devops-menu__li-link_active');
-						this.model.remove();
-						$('.js-devops-item-info-block').hide();
-						delete vm.templateGrid[Math.floor( x / GRID_CELL_SIZE )][ Math.floor( y / GRID_CELL_SIZE )];
+						if(this.model.attributes.containerId) {
+							destroyContainer(this.model.attributes.containerId, this, function(cell) {
+								$('.js-add-dev-element[data-type=' + cell.model.attributes.devType + ']')
+									.removeClass('b-devops-menu__li-link_active');
+								cell.model.remove();
+								$('.js-devops-item-info-block').hide();
+								delete vm.templateGrid[Math.floor( cell._dx / GRID_CELL_SIZE )][ Math.floor( cell._dy / GRID_CELL_SIZE )];
+							});
+						} else {
+							$('.js-add-dev-element[data-type=' + this.model.attributes.devType + ']')
+								.removeClass('b-devops-menu__li-link_active');
+							this.model.remove();
+							$('.js-devops-item-info-block').hide();
+							delete vm.templateGrid[Math.floor( x / GRID_CELL_SIZE )][ Math.floor( y / GRID_CELL_SIZE )];
+						}
 						return;
 						break;
 					case 'element-call-menu':
-						console.log(this.model);
 						var elementPos = this.model.get('position');
 						$('.js-dropen-menu').css({
 							'left': (elementPos.x + 70) + 'px',
@@ -811,7 +903,9 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 						return;
 						break;
 					case 'rotatable':
-						console.log(this.model);
+						if(this.model.attributes.containerId) {
+							return;
+						}
 						vm.currentTemplate = this.model;
 						ngDialog.open({
 							template: 'subutai-app/environment/partials/popups/templateSettings.html',
@@ -935,6 +1029,8 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 			return { x : vm.cubeGrowth - 1, y : 0 };
 		}
 
+		vm.findEmptyCubePostion = findEmptyCubePostion;
+
 		paper.$el.on('mousewheel DOMMouseScroll', onMouseWheel);
 
 		function onMouseWheel(e) {
@@ -996,6 +1092,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 	}
 
 	function clearWorkspace() {
+		vm.isEditing = false;
 		vm.cubeGrowth = 0;
 		vm.templateGrid = [];
 		graph.resetCells();
