@@ -6,13 +6,13 @@ import (
 	"github.com/subutai-io/Subutai/agent/log"
 )
 
-func LxcDestroy(c string) {
-	if !container.IsContainer(c) {
-		log.Error(c + " doesn't exist")
+func LxcDestroy(name string) {
+	if !container.IsContainer(name) {
+		log.Error(name + " doesn't exist")
 	}
-	container.Destroy(c)
+	container.Destroy(name)
 
-	if c == "management" {
+	if name == "management" {
 		template.MngDel()
 	}
 }

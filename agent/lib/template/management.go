@@ -4,9 +4,9 @@ import (
 	"crypto/rand"
 	"fmt"
 	"github.com/subutai-io/Subutai/agent/config"
-        "github.com/subutai-io/Subutai/agent/lib/container"
-        "github.com/subutai-io/Subutai/agent/lib/fs"
-        "github.com/subutai-io/Subutai/agent/log"
+	"github.com/subutai-io/Subutai/agent/lib/container"
+	"github.com/subutai-io/Subutai/agent/lib/fs"
+	"github.com/subutai-io/Subutai/agent/log"
 	"os"
 	"os/exec"
 )
@@ -29,12 +29,17 @@ func MngInit() {
 	})
 
 	container.Start("management")
-	exec.Command("dhclient", "mng-net")
+	exec.Command("dhclient", "mng-net").Run()
 	os.Exit(0)
+}
 
+func MngStop() {
+	exec.Command("iptables", "-t", "nat", "--flush", "PREROUTING")
 }
 
 func MngDel() {
+	exec.Command("iptables", "-t", "nat", "--flush", "PREROUTING")
 	exec.Command("ovs-vsctl", "del-port", "wan", "management").Run()
 	exec.Command("ovs-vsctl", "del-port", "wan", "mng-gw").Run()
+	exec.Command("dhclient", "-r", "mng-net").Run()
 }
