@@ -21,8 +21,6 @@ function environmentService($http) {
 
 	var BLUEPRINT_URL = ENVIRONMENTS_URL + 'blueprints/';
 
-	var GROW_BLUEPRINT_URL = ENVIRONMENTS_URL + 'grow/';
-
 	var STRATEGIES_URL = ENVIRONMENTS_URL + 'strategies/';
 
 	var TEMPLATES_URL = ENVIRONMENTS_URL + 'templates/';
@@ -184,10 +182,10 @@ function environmentService($http) {
 		);
 	}
 
-	function growEnvironment(environmentId, data) {
-		var postData = 'environmentId=' + environmentId + '&blueprint_json=' + data;
+	function growEnvironment(environmentId, topology) {
+		var postData = 'topology=' + JSON.stringify( topology );
 		return $http.post(
-			GROW_BLUEPRINT_URL,
+			ENVIRONMENTS_URL + environmentId + '/grow',
 			postData, 
 			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
 		);
