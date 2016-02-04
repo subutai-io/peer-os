@@ -66,9 +66,9 @@ public interface RestService
                                     @FormParam( "signedMessage" ) String signedMessage );
 
     @POST
-    @Path( "grow" )
-    Response growEnvironment( @FormParam( "environmentId" ) String environmentId,
-                              @FormParam( "blueprint_json" ) String blueprintJson );
+    @Path( "{environmentId}/grow" )
+    Response growEnvironment( @PathParam( "environmentId" ) String environmentId,
+                              @FormParam( "topology" ) String topology );
 
     @DELETE
     @Path( "{environmentId}" )

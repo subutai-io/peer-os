@@ -31,6 +31,7 @@ $(".b-form-input-dropdown-list").click(function(e) {
 });
 
 $('.js-scrollbar').perfectScrollbar();
+$('.js-scrollbar-cloud').perfectScrollbar();
 
 var UPDATE_NIGHTLY_BUILD_STATUS;
 

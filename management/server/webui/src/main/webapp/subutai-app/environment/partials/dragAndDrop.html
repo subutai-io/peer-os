@@ -68,8 +68,15 @@
                             </button>
 							<button
 							class="b-btn b-btn_green"
+							ng-if="!environmentViewCtrl.isEditing"
 							ng-click="environmentViewCtrl.buildEnvironmentByJoint()">
 								Save
+							</button>
+							<button
+							class="b-btn b-btn_green"
+							ng-if="environmentViewCtrl.isEditing"
+							ng-click="environmentViewCtrl.growEnvironment()">
+								Grow
 							</button>
 						</div>
 					</div>
@@ -122,6 +129,7 @@
 											ng-show = "environment.status === 'HEALTHY'"
 											style = "margin-left: 10px; margin-top: 5px">
 										</a>
+										<a href class="b-icon b-icon_edit" ng-click="environmentViewCtrl.editEnvironment(environment)" style = "margin-left: 10px; margin-top: 5px; visibility: visible"></a>
 										<a href class="b-icon b-icon_remove" ng-click="environmentViewCtrl.destroyEnvironment(environment.id)" style = "margin-left: 10px; margin-top: 5px"></a>
 									</td>
 								</tr>
