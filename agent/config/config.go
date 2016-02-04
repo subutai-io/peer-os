@@ -79,7 +79,7 @@ const defaultConfig = `
 	restToken = /rest/v1/identity/gettoken
 	restPublicKey = /rest/v1/registration/public-key
 	restVerify = /rest/v1/registration/verify/container-token
-    kurjun = http://10.10.10.1:8551/rest/kurjun/templates
+    kurjun = http://subutai.ddns.net:8081/rest/kurjun/templates
 
 	[broker]
 	port = 8883
@@ -152,7 +152,7 @@ func InitAgentDebug() {
 
 func CheckKurjun() {
 	_, err := net.DialTimeout("tcp", "10.10.10.1:8551", time.Duration(3)*time.Second)
-	if log.Check(log.WarnLevel, "Connecting local Kurjun", err) {
-		Management.Kurjun = "http://repo.critical-factor.com:8081/rest/kurjun/templates"
+	if !log.Check(log.InfoLevel, "Connecting to local Kurjun", err) {
+		Management.Kurjun = "http://10.10.10.1:8551/rest/kurjun/templates"
 	}
 }

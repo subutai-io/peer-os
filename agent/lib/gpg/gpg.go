@@ -183,7 +183,7 @@ func GetToken() string {
 	client := &http.Client{Transport: tr, Timeout: time.Duration(3 * time.Second)}
 
 	resp, err := client.Get("https://" + config.Management.Host + ":" + config.Management.Port + config.Management.RestToken + "?username=" + config.Management.Login + "&password=" + config.Management.Password)
-	if log.Check(log.WarnLevel, "Getting token", err) {
+	if log.Check(log.DebugLevel, "Getting token", err) {
 		return ""
 	}
 

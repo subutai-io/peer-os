@@ -3,15 +3,15 @@ package main
 import (
 	"fmt"
 	"github.com/subutai-io/Subutai/agent/d2s/parser"
+	"github.com/subutai-io/Subutai/agent/lib/template"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"strings"
-	"subutai/lib/template"
 )
 
 func main() {
-	tmpdir := "/home/ubuntu/tmp/"
+	tmpdir := "/home/ubuntu/tmpfs/"
 	if len(os.Args) <= 1 {
 		fmt.Println("Please specify path to Dockerfile")
 		os.Exit(1)
