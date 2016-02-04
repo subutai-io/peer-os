@@ -72,7 +72,6 @@ public class RestServiceImpl implements RestService
     private final StrategyManager strategyManager;
     private final QuotaManager quotaManager;
     private Gson gson = RequiredDeserializer.createValidatingGson();
-    //    private Set<EnvironmentDto> envs = Sets.newHashSet();
 
 
     public RestServiceImpl( final EnvironmentManager environmentManager, final PeerManager peerManager,
@@ -320,24 +319,39 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response growEnvironment( final String environmentId, final String blueprintJson )
+    public Response growEnvironment( final String environmentId, final String topologyJson )
     {
-        //        try
-        //        {
-        //            Blueprint blueprint = gson.fromJson( blueprintJson, Blueprint.class );
-        //
-        //            //            updateContainerPlacementStrategy( blueprint );
-        //
-        //            Set<EnvironmentContainerHost> environment =
-        //                    environmentManager.growEnvironment( environmentId, blueprint, false );
-        //        }
-        //        catch ( Exception e )
-        //        {
-        //            LOG.error( "Error validating parameters #growEnvironment", e );
-        //            return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( ERROR_KEY, e
-        // .getMessage() ) )
-        //                           .build();
-        //        }
+        try
+        {
+            Map<String, Set<NodeGroup>> nodeGroupPlacement = gson.fromJson( topologyJson, new TypeToken<Map<String, Set<NodeGroup>>>() {}.getType() );
+
+            String name = environmentManager.getEnvironments().stream().filter( e -> e.getEnvironmentId().equals( environmentId )).findFirst( ).get().getName();
+
+            Topology topology = new Topology( name, 0, 0 );
+
+
+            Iterator it = nodeGroupPlacement.entrySet().iterator();
+            while( it.hasNext() )
+            {
+                Map.Entry pair = (Map.Entry)it.next();
+
+                for( NodeGroup nodeGroup : (Set<NodeGroup>)pair.getValue() )
+                {
+                    topology.addNodeGroupPlacement( (String) pair.getKey(), nodeGroup );
+                }
+            }
+
+
+
+            Set<EnvironmentContainerHost> environment =
+                    environmentManager.growEnvironment( environmentId, topology, false );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error validating parameters #growEnvironment", e );
+            return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) )
+                           .build();
+        }
 
         return Response.ok().build();
     }
