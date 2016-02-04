@@ -12,6 +12,7 @@
 			});
 		});
 	</script>
+	<i class="fa fa-sign-in b-plugin-version"></i>
 	<a href ng-click="currentUserCtrl.logout()"
 		class="b-header-userbar-name"
 		ng-if="currentUserCtrl.currentUser">
@@ -20,6 +21,6 @@
 	<a href ui-sref="login"
 		class="b-header-userbar-name"
 		ng-if="!currentUserCtrl.currentUser">
-		<i class="fa fa-sign-in b-header-userbar__icon"></i>
+		Logout
 	</a>
 </div>
