@@ -2547,6 +2547,11 @@ td.b-main-table__status-col {
 	position: relative;
 }
 
+.b-cloud-space-work svg {
+	position: relative;
+	z-index: 2;
+}
+
 .b-cloud-create-buttons {
 	text-align: center;
 	vertical-align: middle;
@@ -2572,5 +2577,67 @@ td.b-main-table__status-col {
 .b-plugin-version {
 	font-size: 13px;
 	color: #04346E;
+}
+
+.b-recource-host-block {
+}
+
+.b-recource-host {
+	position: absolute;
+	pointer-events: none;
+
+	border: 1px solid #CCCEEE;
+	background-color: #F5F6FB;
+	border-radius: 4px;
+	box-sizing: border-box;
+	padding: 5px;
+}
+
+.b-peer-title {
+	position: absolute;
+	width: 100%;
+	left: 0;
+	top: -23px;
+	font-size: 16px;
+	color: #19286E;
+	text-align: center;
+}
+
+.b-recource-host__inner {
+	border: 1px solid #CCCEEE;
+	background-color: #fff;
+	width: 100%;
+	height: 100%;
+	box-sizing: border-box;
+	border-radius: 4px;
+	padding: 31px 5px 5px 5px;
+}
+
+.b-recouce-host-title {
+	font-size: 16px;
+	color: #19286E;
+	text-align: center;
+	position: absolute;
+	top: 11px;
+	left: 0;
+	width: 100%;
+}
+
+.b-recource-host__containers {
+	height: 100%;
+	width: 100%;
+	padding: 5px;
+	border: 1px solid #CCCEEE;
+	box-sizing: border-box;
+	border-radius: 4px;
+}
+
+.b-recource-host-containers {
+	height: 100%;
+	width: 100%;
+	background-image: url('../assets/elements/empty-container.png');
+	background-repeat: repeat;
+	background-position: 0 0;
+	box-sizing: border-box;
 }
 

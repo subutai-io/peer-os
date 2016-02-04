@@ -244,7 +244,11 @@ Do not allow adding new vertices: .connection-wrap { pointer-events: none; }
 .element .element-tools {
 	display: none;
 	cursor: pointer;
-	transform: translate(51px, 5px);
+	transform: translate(36px, 2px);
+}
+
+.recourceHost .element-tools {
+	transform: translate(155px, 0);
 }
 
 .element:hover .element-tools {
