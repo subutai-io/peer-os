@@ -1969,7 +1969,8 @@ td.b-main-table__status-col {
 }
 .b-tabs-menu_header ul .b-tabs-menu__item {
     margin-bottom: -1px;
-    padding: 14px 35px;
+    padding: 18.5px 35px;
+    font-size: 18px;
 }
 .b-tabs-menu__item:hover {
     background-color: #fbfbfb;
@@ -2300,7 +2301,7 @@ td.b-main-table__status-col {
 }
 
 .b-resize-line {
-    border-top: 2px solid #CCCEEE;
+    border-top: 1px solid #CCCEEE;
     height: 0;
     cursor: n-resize;
 }
@@ -2338,14 +2339,15 @@ td.b-main-table__status-col {
 .b-live-tracker__icon {
     position: absolute;
     right: 49px;
-    top: -27px;
-    height: 26px;
-    line-height: 26px;
+    top: -32px;
+    height: 30px;
+    line-height: 30px;
     text-align: center;
-    width: 29px;
-    border: 1px solid #e7ebf5;
-    /*border-radius: 5px 5px 0 0;*/
+    width: 30px;
+    border: 1px solid #ccceee;
+    border-radius: 2px 2px 0 0;
     background-color: #FFF;
+    border-bottom: none;
 }
 
 .b-login__form_error {
@@ -2525,6 +2527,7 @@ td.b-main-table__status-col {
     width: 200px;
     background-color: #fff;
     border-left: 1px solid #ccceee;
+    box-shadow: -1px 0 0 rgba(0, 0, 0, 0.1);
 }
 
 .b-tools-menu {
@@ -2785,7 +2788,7 @@ td.b-main-table__status-col {
 }
 .b-toggle_cloud .b-check:checked ~ .b-switch {
     right: -1px;
-    left: 50%;
+    left: 44%;
 }
 .b-check:checked ~ .b-toggle-bg {
     background-color: #61caea;
@@ -2816,20 +2819,28 @@ td.b-main-table__status-col {
     position: absolute;
     font-size: 13px;
     top: 9px;
-    left: 17px;
-    color: #04346E;
+    left: 13px;
+    color: #fff;
     font-weight: 400;
     line-height: 10px;
+    z-index: 5;
 }
 .b-toggle_cloud .b-toggle-bg:after {
     content: "Advanced";
     position: absolute;
     font-size: 13px;
     top: 9px;
-    right: 7px;
+    right: 12px;
     color: #04346E;
     font-weight: 400;
     line-height: 10px;
+}
+.b-toggle_cloud .b-check:checked ~ .b-toggle-bg:after  {
+    color: #fff;
+    z-index: 5;
+}
+.b-toggle_cloud .b-check:checked ~ .b-toggle-bg:before {
+    color: #04346E;
 }
 .b-switch {
     position: absolute;
@@ -2851,21 +2862,7 @@ td.b-main-table__status-col {
     top: -1px;
     bottom: -1px;
     position: absolute;
-    right: 50%;
+    right: 56%;
     border-radius: 2px;
 
-}
-.b-toggle_cloud .b-switch:before {
-    content: "Simple";
-    position: absolute;
-    font-size: 13px;
-    top: 9.5px;
-    left: 17.5px;
-    color: #fff;
-    font-weight: 400;
-    line-height: 10px;
-}
-.b-toggle_cloud .b-check:checked ~ .b-switch:before {
-    content: "Advanced";
-    left: 7.5px;
 }
