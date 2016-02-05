@@ -2551,6 +2551,9 @@ td.b-main-table__status-col {
     padding: 10px 20px;
     border-bottom: 1px solid #ccceee;
 }
+.b-tools-menu_advanced ul li:last-child {
+    border-bottom: none;
+}
 .b-progress__cloud_rh {
     padding-left: 10px;
 }
@@ -2644,4 +2647,148 @@ td.b-main-table__status-col {
 	font-size: 13px;
 	color: #04346E;
 }
+.b-switcher {
+    padding: 7px 0;
+}
+/*Toggle btn*/
+.b-toggle, .b-toggler {
+    display: inline-block;
+}
 
+.b-toggler {
+    color: slategray;
+    transition: .2s;
+}
+
+.b-toggler--is-active {
+    color: black;
+}
+
+.b-b {
+    display: block;
+}
+
+.b-toggle {
+    position: relative;
+    width: 25px;
+    height: 16px;
+    border-radius: 100px;
+    background-color: #61caea;
+    overflow: hidden;
+    box-shadow: inset 0 0 2px 1px rgba(0, 0, 0, 0.05);
+}
+.b-toggle_cloud {
+    width: 130px;
+    height: 25px;
+    background-color: #fff;
+    border: 1px solid #ccceee;
+    box-sizing: border-box;
+    overflow: visible;
+    border-radius: 2px;
+}
+
+.b-check {
+    position: absolute;
+    display: block;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    z-index: 6;
+}
+
+.b-check:checked ~ .b-switch {
+    right: 2px;
+    left: 43.5%;
+    transition: 0.25s cubic-bezier(0.785, 0.135, 0.15, 0.86);
+    transition-property: left, right;
+    transition-delay: .08s, 0s;
+}
+.b-toggle_cloud .b-check:checked ~ .b-switch {
+    right: -1px;
+    left: 50%;
+}
+.b-check:checked ~ .b-toggle-bg {
+    background-color: #61caea;
+    transition: 0.25s cubic-bezier(0.785, 0.135, 0.15, 0.86);
+    transition-property: left, right;
+    transition-delay: .08s, 0s;
+}
+.b-toggle_cloud .b-check:checked ~ .b-toggle-bg {
+    background-color: transparent;
+}
+
+.b-toggle-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #e95761;
+    transition: 0.25s cubic-bezier(0.785, 0.135, 0.15, 0.86);
+    transition-property: left, right;
+    transition-delay: .08s, 0s;
+}
+.b-toggle_cloud .b-toggle-bg {
+    background-color: transparent;
+}
+.b-toggle_cloud .b-toggle-bg:before {
+    content: "Simple";
+    position: absolute;
+    font-size: 11px;
+    top: 7px;
+    left: 16px;
+    color: #04346E;
+    font-weight: 400;
+    line-height: 10px;
+}
+.b-toggle_cloud .b-toggle-bg:after {
+    content: "Advanced";
+    position: absolute;
+    font-size: 11px;
+    top: 7px;
+    right: 7px;
+    color: #04346E;
+    font-weight: 400;
+    line-height: 10px;
+}
+.b-switch {
+    position: absolute;
+    left: 2px;
+    top: 2px;
+    bottom: 2px;
+    right: 43.5%;
+    background-color: #fff;
+    border-radius: 36px;
+    z-index: 1;
+    transition: 0.25s cubic-bezier(0.785, 0.135, 0.15, 0.86);
+    transition-property: left, right;
+    transition-delay: 0s, .08s;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+.b-toggle_cloud .b-switch {
+    background-color: #04346E;
+    left: -1px;
+    top: -1px;
+    bottom: -1px;
+    position: absolute;
+    right: 50%;
+    border-radius: 2px;
+
+}
+.b-toggle_cloud .b-switch:before {
+    content: "Simple";
+    position: absolute;
+    font-size: 11px;
+    top: 7.5px;
+    left: 15.5px;
+    color: #fff;
+    font-weight: 400;
+    line-height: 10px;
+}
+.b-toggle_cloud .b-check:checked ~ .b-switch:before {
+    content: "Advanced";
+    left: 7.5px;
+}
