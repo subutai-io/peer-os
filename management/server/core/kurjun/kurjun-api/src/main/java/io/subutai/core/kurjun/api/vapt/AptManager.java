@@ -1,6 +1,7 @@
 package io.subutai.core.kurjun.api.vapt;
 
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
@@ -31,6 +32,9 @@ public interface AptManager
     
     
     List<AptPackage> list();
+    
+
+    boolean delete( byte[] md5 ) throws IOException;
 
 
     boolean isCompressionTypeSupported( String packagesIndex );

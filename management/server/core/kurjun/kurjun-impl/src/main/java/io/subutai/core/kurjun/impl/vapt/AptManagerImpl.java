@@ -260,6 +260,23 @@ public class AptManagerImpl implements AptManager
                                        .collect( Collectors.toList() );
         return deflist;
     }
+    
+    
+    @Override
+    public boolean delete( byte[] md5 ) throws IOException
+    {
+        LocalRepository repo = getLocalRepository();
+        try
+        {
+            repo.delete( md5 );
+            return true;
+        }
+        catch ( IOException ex )
+        {
+            LOGGER.error( "Failed to delete apt package", ex );
+            return false;
+        }
+    }
 
 
     private AptPackage convertToAptPackage( DefaultPackageMetadata meta )

@@ -216,12 +216,12 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
 
 
     @Override
-    public Response deleteTemplates( String repository, String md5 )
+    public Response deleteTemplate( String repository, String md5 )
     {
         byte[] md5bytes = decodeMd5( md5 );
         if ( md5bytes != null )
         {
-            String err = "Failed to delete templates";
+            String err = "Failed to delete template";
             try
             {
                 boolean deleted = templateManager.delete( repository, md5bytes );
