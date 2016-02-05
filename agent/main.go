@@ -29,6 +29,10 @@ func main() {
 		Usage: "debug mode"}}
 
 	app.Commands = []cli.Command{{
+		Name: "attach", Usage: "attach to container",
+		Action: func(c *cli.Context) {
+			lib.LxcAttach(c.Args().Get(0))
+		}}, {
 
 		Name: "clone", Usage: "clone Subutai container",
 		Flags: []cli.Flag{
