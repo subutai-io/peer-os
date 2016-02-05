@@ -14,6 +14,8 @@ import (
 )
 
 func LxcRegister(name string) {
+	config.CheckKurjun()
+
 	tarFullPath := config.Agent.LxcPrefix + "lxc-data/tmpdir/" + name + "-subutai-template_" + config.Misc.Version + "_" + config.Misc.Arch + ".tar.gz"
 
 	_, err := os.Stat(tarFullPath)

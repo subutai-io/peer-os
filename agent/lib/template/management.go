@@ -43,7 +43,7 @@ func MngInit() {
 			log.Info("******************************")
 			log.Info("Subutai Management UI will shortly be available at https://" + ip[0] + ":8443 (admin/secret)")
 			log.Info("SSH access to Management: ssh root@" + ip[0] + " -p2222 (ubuntu)")
-			log.Info("Don't forget change default passwords")
+			log.Info("Don't forget to change default passwords")
 			log.Info("******************************")
 		}
 	}
