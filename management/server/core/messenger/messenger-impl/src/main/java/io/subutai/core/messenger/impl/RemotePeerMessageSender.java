@@ -11,6 +11,7 @@ import org.apache.cxf.jaxrs.client.WebClient;
 
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.security.WebClientBuilder;
 import io.subutai.common.util.JsonUtil;
 
@@ -22,14 +23,17 @@ public class RemotePeerMessageSender implements Callable<Boolean>
 {
     private static final Logger LOG = LoggerFactory.getLogger( RemotePeerMessageSender.class.getName() );
 
+    private Peer localPeer;
     private Peer targetPeer;
     private Set<Envelope> envelopes;
 
     private MessengerDao messengerDao;
 
 
-    public RemotePeerMessageSender( MessengerDao messengerDao, final Peer targetPeer, final Set<Envelope> envelopes )
+    public RemotePeerMessageSender( MessengerDao messengerDao, final Peer localPeer, final Peer targetPeer,
+                                    final Set<Envelope> envelopes )
     {
+        this.localPeer = localPeer;
         this.targetPeer = targetPeer;
         this.envelopes = envelopes;
         this.messengerDao = messengerDao;
@@ -42,7 +46,7 @@ public class RemotePeerMessageSender implements Callable<Boolean>
         WebClient client = null;
         try
         {
-            client = getWebClient( targetPeer.getPeerInfo().getIp() );
+            client = getWebClient( localPeer.getId(), targetPeer.getPeerInfo() );
             for ( Envelope envelope : envelopes )
             {
                 try
@@ -72,8 +76,8 @@ public class RemotePeerMessageSender implements Callable<Boolean>
     }
 
 
-    protected WebClient getWebClient( String targetPeerIP )
+    protected WebClient getWebClient( String localPeerId, PeerInfo peerInfo )
     {
-        return WebClientBuilder.buildPeerWebClient( targetPeerIP, "/messenger/message" );
+        return WebClientBuilder.buildPeerWebClient( localPeerId, peerInfo, "/messenger/message" );
     }
 }

@@ -21,7 +21,7 @@ public class PeerInfo implements Serializable
     private String ownerId;
 
     @JsonProperty
-    private String ip = "127.0.0.1";
+    private String ip = "0.0.0.0";
 
     //    @JsonProperty
     //    private String gatewayIp;

@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 
 import org.apache.karaf.shell.commands.Command;
 
+import io.subutai.common.host.HostInterface;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.LocalPeer;
@@ -71,5 +72,9 @@ public class HostsCommand extends SubutaiShellCommandSupport
 
         System.out
                 .println( String.format( "%s+--%s %s %s", padding, host.getHostname(), host.getId(), containerInfo ) );
+        for ( HostInterface hostInterface : host.getHostInterfaces().getAll() )
+        {
+            System.out.println( String.format( "\t%s %s", hostInterface.getName(), hostInterface.getIp() ) );
+        }
     }
 }

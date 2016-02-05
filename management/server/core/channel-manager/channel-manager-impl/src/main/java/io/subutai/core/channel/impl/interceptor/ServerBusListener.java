@@ -42,6 +42,9 @@ public class ServerBusListener extends AbstractFeature
             //***** PRE_STREAM **********************************
             bus.getOutInterceptors().add( new ClientOutInterceptor(channelManagerImpl, peerManager) );
 
+            //***** POST_LOGICAL **********************************
+            bus.getOutInterceptors().add( new ClientHeaderInterceptor(channelManagerImpl, peerManager) );
+
             //***** RECEIVE    **********************************
             bus.getInInterceptors().add( new ServerInInterceptor(channelManagerImpl, peerManager) );
 

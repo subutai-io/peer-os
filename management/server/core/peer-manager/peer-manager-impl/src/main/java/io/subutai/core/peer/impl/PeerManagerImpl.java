@@ -139,7 +139,7 @@ public class PeerManagerImpl implements PeerManager
 
             localPeerId = securityManager.getKeyManager().getPeerId();
             ownerId = securityManager.getKeyManager().getOwnerId();
-            final String localPeerIp = "127.0.0.1";
+            //            final String localPeerIp = "127.0.0.1";
             //
             //            if ( localPeerIp == null || ownerId == null )
             //            {
@@ -598,6 +598,8 @@ public class PeerManagerImpl implements PeerManager
         }
         register( initRequest.getKeyPhrase(), registrationData );
         removeRequest( registrationData.getPeerInfo().getId() );
+        securityManager.getKeyManager().getRemoteHostPublicKey( registrationData.getPeerInfo().getId(),
+                registrationData.getPeerInfo().getIp() );
     }
 
 
@@ -718,6 +720,8 @@ public class PeerManagerImpl implements PeerManager
             register( keyPhrase, request );
 
             removeRequest( request.getPeerInfo().getId() );
+            securityManager.getKeyManager()
+                           .getRemoteHostPublicKey( request.getPeerInfo().getId(), request.getPeerInfo().getIp() );
         }
         catch ( Exception e )
         {
