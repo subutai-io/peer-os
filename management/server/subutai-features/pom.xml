@@ -458,11 +458,11 @@
     <!-- identity -->
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>trust-manager-api</artifactId>
+      <artifactId>object-relation-manager-api</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>trust-manager-impl</artifactId>
+      <artifactId>object-relation-manager-impl</artifactId>
     </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->

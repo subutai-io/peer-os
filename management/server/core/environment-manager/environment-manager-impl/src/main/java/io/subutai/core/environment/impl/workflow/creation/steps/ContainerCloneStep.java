@@ -34,11 +34,11 @@ import io.subutai.core.environment.impl.workflow.creation.steps.helpers.NodeGrou
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.kurjun.api.TemplateManager;
-import io.subutai.core.trust.api.RelationManager;
-import io.subutai.core.trust.api.model.Relation;
-import io.subutai.core.trust.api.model.RelationInfo;
-import io.subutai.core.trust.api.model.RelationInfoMeta;
-import io.subutai.core.trust.api.model.RelationMeta;
+import io.subutai.core.object.relation.api.RelationManager;
+import io.subutai.core.object.relation.api.model.Relation;
+import io.subutai.core.object.relation.api.model.RelationInfo;
+import io.subutai.core.object.relation.api.model.RelationInfoMeta;
+import io.subutai.core.object.relation.api.model.RelationMeta;
 import io.subutai.core.peer.api.PeerManager;
 
 

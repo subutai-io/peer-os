@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.security.AccessControlContext;
 import java.security.AccessControlException;
 import java.security.AccessController;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Date;
@@ -56,6 +58,7 @@ import io.subutai.core.identity.impl.model.RoleEntity;
 import io.subutai.core.identity.impl.model.SessionEntity;
 import io.subutai.core.identity.impl.model.UserEntity;
 import io.subutai.core.identity.impl.model.UserTokenEntity;
+import io.subutai.core.identity.impl.utils.SecurityUtil;
 import io.subutai.core.security.api.SecurityManager;
 
 
@@ -117,9 +120,6 @@ public class IdentityManagerImpl implements IdentityManager
             User admin =
                     createUser( "admin", "secret", "Administrator", "admin@subutai.io", 2, generateArmoredPublicKey(),
                             true );
-            User manager =
-                    createUser( "manager", "manager", "Manager", "manager@subutai.io", 2, generateArmoredPublicKey(),
-                            true );
             User karaf =
                     createUser( "karaf", "karaf", "Karaf Manager", "karaf@subutai.io", 2, generateArmoredPublicKey(),
                             true );
@@ -155,7 +155,6 @@ public class IdentityManagerImpl implements IdentityManager
 
             //*********************************************
             role = createRole( "Manager", UserType.Regular.getId() );
-            assignUserRole( manager.getId(), role );
 
             //*********************************************
             for ( int a = 0; a < permsp.length; a++ )
@@ -458,7 +457,10 @@ public class IdentityManagerImpl implements IdentityManager
 
             if ( user != null && user.isApproved() )
             {
-                if ( !user.getPassword().equals( password ) || user.getStatus() == UserStatus.Disabled.getId() )
+                String pswHash1 = SecurityUtil.generateSecurePassword( user.getPassword(), user.getSalt() );
+                String pswHash2 = SecurityUtil.generateSecurePassword( password, user.getSalt() );
+
+                if ( !pswHash1.equals( pswHash2 ) || user.getStatus() == UserStatus.Disabled.getId() )
                 {
                     return null;
                 }
@@ -636,24 +638,42 @@ public class IdentityManagerImpl implements IdentityManager
     @Override
     public User createTempUser( String userName, String password, String fullName, String email, int type )
     {
-        //***************Cannot use TOKEN keyword *******
-        if ( userName.equalsIgnoreCase( "token" ) )
-        {
-            throw new IllegalArgumentException( "Cannot use TOKEN keyword." );
-        }
-        //***********************************************
+        String salt = null;
+        User user = null;
 
-        if ( Strings.isNullOrEmpty( password ) )
+        try
         {
-            password = Integer.toString( ( new Random() ).nextInt() );
-        }
+            //***************Cannot use TOKEN keyword *******
+            if ( userName.equalsIgnoreCase( "token" ) )
+            {
+                throw new IllegalArgumentException( "Cannot use TOKEN keyword." );
+            }
+            //***********************************************
 
-        User user = new UserEntity();
-        user.setUserName( userName );
-        user.setPassword( password );
-        user.setEmail( email );
-        user.setFullName( fullName );
-        user.setType( type );
+            if ( Strings.isNullOrEmpty( password ) )
+            {
+                password = Integer.toString( ( new Random() ).nextInt() );
+            }
+
+            salt = SecurityUtil.generateSecureRandom();
+            password = SecurityUtil.generateSecurePassword( password, salt );
+
+            user = new UserEntity();
+            user.setUserName( userName );
+            user.setPassword( password );
+            user.setSalt( salt );
+            user.setEmail( email );
+            user.setFullName( fullName );
+            user.setType( type );
+        }
+        catch ( NoSuchAlgorithmException e )
+        {
+            e.printStackTrace();
+        }
+        catch ( NoSuchProviderException e )
+        {
+            e.printStackTrace();
+        }
 
         return user;
     }
@@ -704,7 +724,8 @@ public class IdentityManagerImpl implements IdentityManager
     public User createUser( String userName, String password, String fullName, String email, int type,
                             final String publicKey, boolean isApproved )
     {
-        User user = new UserEntity();
+        User user   = new UserEntity();
+        String salt = "";
 
         try
         {
@@ -720,9 +741,15 @@ public class IdentityManagerImpl implements IdentityManager
                 //password = Integer.toString( ( new Random() ).nextInt() );
                 throw new IllegalArgumentException( "Invalid password" );
             }
+            else
+            {
+                salt = SecurityUtil.generateSecureRandom();
+                password = SecurityUtil.generateSecurePassword( password, salt );
+            }
 
             user.setUserName( userName );
             user.setPassword( password );
+            user.setSalt( salt );
             user.setEmail( email );
             user.setFullName( fullName );
             user.setType( type );

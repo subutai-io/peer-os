@@ -58,8 +58,8 @@ import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
-import io.subutai.core.trust.api.RelationManager;
-import io.subutai.core.trust.api.model.RelationMeta;
+import io.subutai.core.object.relation.api.RelationManager;
+import io.subutai.core.object.relation.api.model.RelationMeta;
 
 
 /**

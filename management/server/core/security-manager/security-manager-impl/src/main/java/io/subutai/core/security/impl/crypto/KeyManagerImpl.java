@@ -88,44 +88,17 @@ public class KeyManagerImpl implements KeyManager
     {
         try
         {
-            InputStream ownerPubStream = PGPEncryptionUtil.getFileInputStream( keyData.getOwnerPublicKeyringFile() );
-            InputStream peerPubStream = PGPEncryptionUtil.getFileInputStream( keyData.getPublicKeyringFile() );
-            InputStream peerSecStream = PGPEncryptionUtil.getFileInputStream( keyData.getSecretKeyringFile() );
+            //Generate KeyPair for Peer **************************
+            KeyPair keyPair  = generateKeyPair( "" , false );
+            PGPPublicKeyRing peerPubRing = PGPKeyUtil.readPublicKeyRing( keyPair.getPubKeyring() );
+            String peerId = PGPKeyUtil.getKeyId(  peerPubRing.getPublicKey().getFingerprint());
+            keyData.setManHostId( peerId );
 
-            if ( ownerPubStream == null || peerPubStream == null || peerSecStream == null )
-            {
-                LOG.info( " **** Error loading PGPPublicKeyRing/PGPSecretKeyRing files. Files not found.**** :" );
-                //todo System.exit(1) with error message
-            }
-            else
-            {
-                PGPPublicKeyRing peerPubRing = PGPKeyUtil.readPublicKeyRing( peerPubStream );
-                PGPPublicKeyRing ownerPeerPubRing = PGPKeyUtil.readPublicKeyRing( ownerPubStream );
-
-                String peerId = PGPKeyUtil.getFingerprint( peerPubRing.getPublicKey().getFingerprint() );
-                String ownerPeerFPrint = PGPKeyUtil.getFingerprint( ownerPeerPubRing.getPublicKey().getFingerprint() );
-
-                keyData.setManHostId( peerId );
-                saveSecretKeyRing( keyData.getManHostId(), SecurityKeyType.PeerKey.getId(),
-                        PGPKeyUtil.readSecretKeyRing( peerSecStream ) );
-                savePublicKeyRing( keyData.getManHostId(), SecurityKeyType.PeerKey.getId(), peerPubRing );
-                savePublicKeyRing( getOwnerKeyIdx(), SecurityKeyType.PeerOwnerKey.getId(), ownerPeerPubRing );
-
-                //************************************************************
-                saveKeyTrustData( ownerPeerFPrint, peerId, KeyTrustLevel.Full.getId() );
-                //************************************************************
-
-                //************************************************************
-                //ownerPubStream.close();
-                //peerPubStream.close();
-                //peerSecStream.close();
-                //************************************************************
-
-            }
+            saveKeyPair( peerId, SecurityKeyType.PeerKey.getId(), keyPair);
         }
         catch ( Exception ex )
         {
-            LOG.error( " **** Error loading PGPPublicKeyRing/PGPSecretKeyRing **** :" + ex.toString() );
+            LOG.error( " **** Error creating Keypair for LocalPeer **** :" + ex.toString(),ex );
         }
     }
 
@@ -417,7 +390,7 @@ public class KeyManagerImpl implements KeyManager
         }
         catch ( Exception ex )
         {
-            LOG.error( " **** Error!!! Error removing key trust:" + ex.toString(), ex );
+            LOG.error( " ******** Error!!! Error removing key trust:" + ex.toString(), ex );
         }
     }
 
@@ -434,7 +407,7 @@ public class KeyManagerImpl implements KeyManager
         }
         catch ( Exception ex )
         {
-            LOG.error( " **** Error!!! Error removing key trust:" + ex.toString(), ex );
+            LOG.error( " ******** Error!!! Error removing key trust:" + ex.toString(), ex );
         }
     }
 
@@ -451,7 +424,7 @@ public class KeyManagerImpl implements KeyManager
         }
         catch ( Exception ex )
         {
-            LOG.error( " **** Error!!! Error removing key trust:" + ex.toString(), ex );
+            LOG.error( " ******** Error!!! Error removing key trust:" + ex.toString(), ex );
         }
     }
 
@@ -469,7 +442,7 @@ public class KeyManagerImpl implements KeyManager
         }
         catch ( Exception ex )
         {
-            LOG.error( " **** Error!!! Error saving key trust:" + ex.toString(), ex );
+            LOG.error( " ******** Error!!! Error saving key trust:" + ex.toString(), ex );
         }
 
         return keyTrustData;
@@ -500,7 +473,7 @@ public class KeyManagerImpl implements KeyManager
         }
         catch ( Exception ex )
         {
-            LOG.error( "Error storing Public key:" + ex.toString() );
+            LOG.error( " ******** Error storing Public key:" + ex.toString(),ex );
         }
     }
 
@@ -522,7 +495,7 @@ public class KeyManagerImpl implements KeyManager
         }
         catch ( Exception ex )
         {
-            LOG.error( "Error storing Public key:" + ex.toString() );
+            LOG.error( " ******** Error storing Public key:" + ex.toString(),ex );
         }
     }
 
@@ -555,7 +528,7 @@ public class KeyManagerImpl implements KeyManager
         }
         catch ( Exception ex )
         {
-            LOG.error( "Error storing Public key:" + ex.toString() );
+            LOG.error( " ******** Error storing Public key:" + ex.toString(),ex );
         }
     }
 
@@ -580,7 +553,7 @@ public class KeyManagerImpl implements KeyManager
         }
         catch ( Exception ex )
         {
-            LOG.error( "Error removing Public key:" + ex.toString() );
+            LOG.error( " ******** Error removing Public key:" + ex.toString(),ex );
         }
     }
 
@@ -611,7 +584,7 @@ public class KeyManagerImpl implements KeyManager
         }
         catch ( Exception ex )
         {
-            LOG.error( "Error removing Secret key:" + ex.toString() );
+            LOG.error( " ******** Error removing Secret key:" + ex.toString(), ex);
         }
     }
 
@@ -677,7 +650,7 @@ public class KeyManagerImpl implements KeyManager
         }
         catch ( Exception ex )
         {
-            LOG.error( "Error removing security key:" + ex.toString(), ex );
+            LOG.error( " ***** Error removing security key:" + ex.toString(), ex );
         }
     }
 
@@ -700,7 +673,7 @@ public class KeyManagerImpl implements KeyManager
             }
             else
             {
-                LOG.error( "********* Error getting Public key ********" );
+                LOG.info( "********* Public key not found with identityId:" + identityId );
                 return null;
             }
         }
@@ -752,7 +725,7 @@ public class KeyManagerImpl implements KeyManager
 
             if ( keyIden == null )
             {
-                LOG.error( "Error !Public key not found :" );
+                LOG.info( "********* Public key not found with identityId:" + identityId );
                 return "";
             }
             {
@@ -763,7 +736,7 @@ public class KeyManagerImpl implements KeyManager
         }
         catch ( Exception ex )
         {
-            LOG.error( "Error getting Public keyRing:" + ex.toString() );
+            LOG.error( " ***** Error getting Public keyRing:" + ex.toString(),ex );
             return "";
         }
     }
@@ -802,7 +775,7 @@ public class KeyManagerImpl implements KeyManager
         }
         catch ( Exception ex )
         {
-            LOG.error( "Error getting Public key:" + ex.toString() );
+            LOG.error( " ***** Error getting Public key:" + ex.toString() );
             return null;
         }
     }
@@ -827,7 +800,7 @@ public class KeyManagerImpl implements KeyManager
         }
         catch ( Exception ex )
         {
-            LOG.error( "Error getting public key fingerprint", ex );
+            LOG.error( " ***** Error getting public key fingerprint", ex );
             return null;
         }
     }
@@ -851,7 +824,7 @@ public class KeyManagerImpl implements KeyManager
 
             if ( keyIden == null )
             {
-                LOG.error( " **** Error! Identity Info not found for host:" + identityId );
+                LOG.info( " **** Identity Info not found for host:" + identityId );
                 return null;
             }
             else
@@ -866,7 +839,7 @@ public class KeyManagerImpl implements KeyManager
                 }
                 else
                 {
-                    LOG.error( " **** Error! Object not found with fprint:" + fingerprint );
+                    LOG.info( " **** Object not found with fprint:" + fingerprint );
                     return null;
                 }
             }
@@ -906,7 +879,7 @@ public class KeyManagerImpl implements KeyManager
         }
         catch ( Exception ex )
         {
-            LOG.error( "Error getting Secret key:" + ex.toString() );
+            LOG.error( " ***** Error getting Secret key:" + ex.toString(),ex );
             return null;
         }
     }
@@ -938,7 +911,7 @@ public class KeyManagerImpl implements KeyManager
         }
         catch ( Exception ex )
         {
-            LOG.error( "Error getting Secret key:" + ex.toString() );
+            LOG.error( " ***** Error getting Secret key:" + ex.toString(),ex );
             return null;
         }
     }
@@ -974,7 +947,7 @@ public class KeyManagerImpl implements KeyManager
         }
         catch ( Exception ex )
         {
-            LOG.error( "Error getting Private key:" + ex.toString() );
+            LOG.error( " ***** Error getting Private key:" + ex.toString(),ex );
             return null;
         }
     }
@@ -1014,7 +987,7 @@ public class KeyManagerImpl implements KeyManager
         }
         catch ( Exception ex )
         {
-            LOG.error( "Error getting Secret key:" + ex.toString() );
+            LOG.error( " ***** Error getting Secret key:" + ex.toString(),ex );
         }
 
         return secretKey;
@@ -1109,7 +1082,7 @@ public class KeyManagerImpl implements KeyManager
             }
             else
             {
-                LOG.error( identityId + " Cannot be removed (possibly ManagementHost):" );
+                LOG.info( identityId + " Cannot be removed (possibly ManagementHost):" );
             }
         }
         catch ( Exception ignored )
