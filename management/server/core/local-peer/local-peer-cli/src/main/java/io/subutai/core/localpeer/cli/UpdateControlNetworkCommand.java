@@ -49,7 +49,7 @@ public class UpdateControlNetworkCommand extends SubutaiShellCommandSupport
 
         final String secretKey = DigestUtils.md5Hex( UUID.randomUUID().toString() );
         List<ControlNetworkConfig> result = ControlNetworkUtil
-                .rebuild( localPeerId, newNetwork, secretKey, ControlNetworkUtil.DEFAULT_TTL, configs );
+                .rebuild( localPeerId, newNetwork, secretKey.getBytes(), ControlNetworkUtil.DEFAULT_TTL, configs );
 
         for ( ControlNetworkConfig config : result )
         {

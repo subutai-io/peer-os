@@ -1,4 +1,4 @@
-package io.subutai.core.network.api;
+package io.subutai.common.protocol;
 
 
 public class P2PPeerInfo

@@ -13,6 +13,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import org.apache.commons.codec.digest.DigestUtils;
+
 import io.subutai.common.protocol.ControlNetworkConfig;
 import sun.security.provider.MD5;
 
@@ -23,7 +25,7 @@ import static org.mockito.Mockito.when;
 @RunWith( MockitoJUnitRunner.class )
 public class ControlNetworkUtilTest
 {
-    private static final String SECRET_KEY = "secret";
+    private static final byte[] SECRET_KEY = DigestUtils.md5( "secret" );
     private static final long SECRET_TTL = 100;
     private static final String PEER_ID1 = UUID.randomUUID().toString();
     private static final String PEER_ID2 = UUID.randomUUID().toString();
