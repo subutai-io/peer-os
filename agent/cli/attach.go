@@ -9,9 +9,8 @@ import (
 	"sync"
 )
 
-func LxcAttach(name string) {
+func LxcAttach(name string, clear, x86, regular bool) {
 	var wg sync.WaitGroup
-	clear, x86, regular := false, false, false
 
 	c, err := lxc.NewContainer(name, config.Agent.LxcPrefix)
 	log.Check(log.ErrorLevel, "Creating container object", err)

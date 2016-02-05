@@ -30,8 +30,12 @@ func main() {
 
 	app.Commands = []cli.Command{{
 		Name: "attach", Usage: "attach to container",
+		Flags: []cli.Flag{
+			cli.BoolFlag{Name: "c", Usage: "clear environment"},
+			cli.BoolFlag{Name: "x", Usage: "use x86 personality"},
+			cli.BoolFlag{Name: "r", Usage: "connect as regular user"}},
 		Action: func(c *cli.Context) {
-			lib.LxcAttach(c.Args().Get(0))
+			lib.LxcAttach(c.Args().Get(0), c.Bool("c"), c.Bool("x"), c.Bool("r"))
 		}}, {
 
 		Name: "clone", Usage: "clone Subutai container",

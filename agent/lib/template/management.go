@@ -7,8 +7,10 @@ import (
 	"github.com/subutai-io/Subutai/agent/lib/container"
 	"github.com/subutai-io/Subutai/agent/lib/fs"
 	"github.com/subutai-io/Subutai/agent/log"
+	"net"
 	"os"
 	"os/exec"
+	"strings"
 )
 
 func mac() string {
@@ -30,6 +32,22 @@ func MngInit() {
 
 	container.Start("management")
 	exec.Command("dhclient", "mng-net").Run()
+
+	wan, err := net.InterfaceByName("wan")
+	log.Check(log.ErrorLevel, "Getting WAN interface info", err)
+	wanIP, err := wan.Addrs()
+	log.Check(log.ErrorLevel, "Getting WAN interface adresses", err)
+	if len(wanIP) > 0 {
+		ip := strings.Split(wanIP[0].String(), "/")
+		if len(ip) > 0 {
+			log.Info("******************************")
+			log.Info("Subutai Management UI will shortly be available at https://" + ip[0] + ":8443 (admin/secret)")
+			log.Info("SSH access to Management: ssh root@" + ip[0] + " -p2222 (ubuntu)")
+			log.Info("Don't forget change default passwords")
+			log.Info("******************************")
+		}
+	}
+
 	os.Exit(0)
 }
 
