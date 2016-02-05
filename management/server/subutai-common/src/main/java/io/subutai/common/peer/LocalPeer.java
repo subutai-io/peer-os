@@ -48,7 +48,7 @@ public interface LocalPeer extends Peer
     /**
      * Returns external IP of mgmt host
      */
-    String getExternalIp();
+    String getExternalIp() throws PeerException;
 
 
     /**
