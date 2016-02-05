@@ -22,6 +22,7 @@ import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.EnvironmentId;
+import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.ControlNetworkConfig;
 import io.subutai.common.protocol.P2PConfig;
@@ -44,7 +45,7 @@ public interface RestService
     @GET
     @Path( "/info" )
     @Produces( MediaType.APPLICATION_JSON )
-    public PeerInfo getPeerInfo();
+    public PeerInfo getPeerInfo() throws PeerException;
 
     @GET
     @Path( "template/get" )

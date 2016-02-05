@@ -3,6 +3,7 @@ package io.subutai.common.settings;
 
 public class Common
 {
+    public static final String SUBUTAI_HTTP_HEADER = "sbt-hdr";
     public static final String KARAF_ETC = System.getProperty( "karaf.etc" );
     public static final String CONTAINER_GROUP_NOT_FOUND = "Container group not found";
     public static final String SUBUTAI_APP_DATA_PATH = System.getProperty( "subutaiAppDataPath" );

@@ -32,15 +32,14 @@ public class RegistrationServiceImpl implements RegistrationService
     @Override
     public Response getPeerInfo()
     {
-        PeerInfo r = peerManager.getLocalPeer().getPeerInfo();
-
-        if ( r == null )
+        try
+        {
+            PeerInfo r = peerManager.getLocalPeer().getPeerInfo();
+            return Response.ok( r ).build();
+        }
+        catch ( Exception e )
         {
             return Response.serverError().entity( "Peer info not available." ).build();
-        }
-        else
-        {
-            return Response.ok( r ).build();
         }
     }
 

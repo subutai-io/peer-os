@@ -40,24 +40,25 @@ public class MessageContentUtil
     //***************************************************************************
     public static void abortChain( Message message, Throwable ex )
     {
-        if(ex.getClass() == AccessControlException.class)
+        if ( ex.getClass() == AccessControlException.class )
         {
-            abortChain( message, 403, "Access Denied to the resource");
+            abortChain( message, 403, "Access Denied to the resource" );
         }
-        else if(ex.getClass() == LoginException.class)
+        else if ( ex.getClass() == LoginException.class )
         {
-            abortChain( message, 401, "User is not authorized");
+            abortChain( message, 401, "User is not authorized" );
         }
         else
         {
-            abortChain( message, 500, "Internal system Error 500");
+            abortChain( message, 500, "Internal system Error 500" );
         }
 
-        LOG.error( "****** Error !! Error in doIntercept:" + ex.toString(),ex );
+        LOG.error( "****** Error !! Error in doIntercept:" + ex.toString(), ex );
     }
 
+
     //***************************************************************************
-    public static void abortChain( Message message, int errorStatus, String errorMessage)
+    public static void abortChain( Message message, int errorStatus, String errorMessage )
     {
         HttpServletResponse response = ( HttpServletResponse ) message.getExchange().getInMessage()
                                                                       .get( AbstractHTTPDestination.HTTP_RESPONSE );
@@ -67,7 +68,6 @@ public class MessageContentUtil
             response.getOutputStream().write( errorMessage.getBytes( Charset.forName( "UTF-8" ) ) );
             response.getOutputStream().flush();
             LOG.error( "****** Error !! Error in doIntercept:" + errorMessage );
-
         }
         catch ( Exception e )
         {
@@ -83,9 +83,9 @@ public class MessageContentUtil
     public static int checkUrlAccessibility( final int currentStatus, final URL url )
     {
         int status = currentStatus;
-        String  basePath = url.getPath();
+        String basePath = url.getPath();
 
-        if ( url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X1 ) ||  url.getPort() == 8080 )
+        if ( url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X1 ) || url.getPort() == 8080 )
         {
             if ( ChannelSettings.checkURLArray( basePath, ChannelSettings.URL_ACCESS_PX1 ) == 0 )
             {
@@ -101,7 +101,7 @@ public class MessageContentUtil
         }
         else if ( url.getPort() == Integer.parseInt( ChannelSettings.SPECIAL_PORT_X1 ) ) //file server
         {
-            if ( basePath.startsWith( "/rest/kurjun" ))
+            if ( basePath.startsWith( "/rest/kurjun" ) )
             {
                 status = 1;
             }
@@ -151,7 +151,7 @@ public class MessageContentUtil
         }
         catch ( Exception e )
         {
-            LOG.error("Error decrypting content", e);
+            LOG.error( "Error decrypting content", e );
         }
     }
 
@@ -210,7 +210,7 @@ public class MessageContentUtil
     *
     */
     public static void encryptContent( SecurityManager securityManager, String hostIdSource, String hostIdTarget,
-                                       String ip, Message message )
+                                       Message message )
     {
         OutputStream os = message.getContent( OutputStream.class );
 
@@ -234,8 +234,7 @@ public class MessageContentUtil
 
             //do something with original message to produce finalMessage
             byte[] finalMessage = originalMessage.length > 0 ?
-                                  encryptData( securityManager, hostIdSource, hostIdTarget, ip, originalMessage ) :
-                                  null;
+                                  encryptData( securityManager, hostIdSource, hostIdTarget, originalMessage ) : null;
 
             if ( finalMessage != null )
             {
@@ -266,7 +265,7 @@ public class MessageContentUtil
 
 
     private static byte[] encryptData( SecurityManager securityManager, String hostIdSource, String hostIdTarget,
-                                       String ip, byte[] data ) throws PGPException
+                                       byte[] data ) throws PGPException
     {
         try
         {
@@ -278,7 +277,7 @@ public class MessageContentUtil
             {
                 EncryptionTool encTool = securityManager.getEncryptionTool();
                 KeyManager keyMan = securityManager.getKeyManager();
-                PGPPublicKey pubKey = keyMan.getRemoteHostPublicKey( hostIdTarget, ip );
+                PGPPublicKey pubKey = keyMan.getRemoteHostPublicKey( hostIdTarget, "UNKNOWN" );
 
                 if ( pubKey != null )
                 {
