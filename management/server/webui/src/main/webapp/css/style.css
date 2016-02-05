@@ -2608,7 +2608,9 @@ td.b-main-table__status-col {
     background: #fff url("../assets/elements/patter-stripes.png");
 }
 .b-cloud-space__work {
-    height: 400px;
+    height: 480px;
+	position: relative;
+	z-index: 2;
 }
 .b-cloud-space__table {
     background-color: #fff;
@@ -2626,6 +2628,11 @@ td.b-main-table__status-col {
 .b-cloud-create-buttons {
 	text-align: center;
 	vertical-align: middle;
+	position: absolute;
+	width: 100%;
+	left: 0;
+	bottom: 20px;
+	z-index: 3;
 }
 
 .b-cloud-create-buttons .b-btn {
@@ -2650,10 +2657,10 @@ td.b-main-table__status-col {
 	color: #04346E;
 }
 
-.b-recource-host-block {
+.b-resource-host-block {
 }
 
-.b-recource-host {
+.b-resource-host {
 	position: absolute;
 	pointer-events: none;
 
@@ -2674,7 +2681,7 @@ td.b-main-table__status-col {
 	text-align: center;
 }
 
-.b-recource-host__inner {
+.b-resource-host__inner {
 	border: 1px solid #CCCEEE;
 	background-color: #fff;
 	width: 100%;
@@ -2694,7 +2701,7 @@ td.b-main-table__status-col {
 	width: 100%;
 }
 
-.b-recource-host__containers {
+.b-resource-host__containers {
 	height: 100%;
 	width: 100%;
 	padding: 5px;
@@ -2703,7 +2710,7 @@ td.b-main-table__status-col {
 	border-radius: 4px;
 }
 
-.b-recource-host-containers {
+.b-resource-host-containers {
 	height: 100%;
 	width: 100%;
 	background-image: url('../assets/elements/empty-container.png');

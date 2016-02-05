@@ -831,11 +831,11 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 		});
 		joint.shapes.tm.devElementView = joint.shapes.tm.ToolElementView;
 
-		//recource host object
-		joint.shapes.recourceHostHtml = {};
-		joint.shapes.recourceHostHtml.Element = joint.shapes.basic.Rect.extend({
+		//resource host object
+		joint.shapes.resourceHostHtml = {};
+		joint.shapes.resourceHostHtml.Element = joint.shapes.basic.Rect.extend({
 			defaults: joint.util.deepSupplement({
-				type: 'recourceHostHtml.Element',
+				type: 'resourceHostHtml.Element',
 				attrs: {
 					rect: { stroke: 'none', 'fill-opacity': 0 }
 				}
@@ -845,15 +845,15 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 		// Create a custom view for that element that displays an HTML div above it.
 		// -------------------------------------------------------------------------
 
-		joint.shapes.recourceHostHtml.ElementView = joint.dia.ElementView.extend({
+		joint.shapes.resourceHostHtml.ElementView = joint.dia.ElementView.extend({
 
 			template: [
-				'<div class="b-recource-host">',
+				'<div class="b-resource-host">',
 					'<div class="b-peer-title"></div>',
-					'<div class="b-recource-host__inner">',
+					'<div class="b-resource-host__inner">',
 						'<div class="b-recouce-host-title"></div>',
-						'<div class="b-recource-host__containers">',
-							'<div class="b-recource-host-containers">',
+						'<div class="b-resource-host__containers">',
+							'<div class="b-resource-host-containers">',
 							'</div>',
 						'</div>',
 					'</div>',
@@ -883,7 +883,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 				var bbox = this.model.getBBox();
 
 				this.$box.find('.b-peer-title').text(this.model.get('peerName'));
-				this.$box.find('.b-recouce-host-title').text(this.model.get('recourceHostName'));
+				this.$box.find('.b-recouce-host-title').text(this.model.get('resourceHostName'));
 				this.$box.css({ width: bbox.width, height: bbox.height, left: bbox.x, top: bbox.y, transform: 'rotate(' + (this.model.get('angle') || 0) + 'deg)' });
 			},
 			removeBox: function(evt) {
@@ -961,8 +961,8 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 		var containerCounter = 1;
 		$('.b-tools-menu').on('click', '.js-add-dev-element', function(){
 			//var pos = findEmptyCubePostion();
-			var parentPos = mainRecourceHost.get('position');
-			var pos = findEmptyPostionInRecource();
+			var parentPos = mainResourceHost.get('position');
+			var pos = findEmptyPostionInResource();
 			var img = $(this).find('img');
 
 			var devElement = new joint.shapes.tm.devElement({
@@ -979,72 +979,71 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 			});
 
 			graph.addCell(devElement);
-			mainRecourceHost.embed(devElement);
-			vm.containersInRecource.push(devElement);
+			mainResourceHost.embed(devElement);
+			vm.containersInResource.push(devElement);
 			return false;
 		});
 
-		var mainRecourceHost = new joint.shapes.recourceHostHtml.Element({
+		var mainResourceHost = new joint.shapes.resourceHostHtml.Element({
 			position: { x: 80, y: 80 },
 			size: { width: 155, height: 185 },
-			'recourceHostName': 'RH1',
+			'resourceHostName': 'RH1',
 			'peerName': 'Peer 1'
 		});
-		graph.addCell(mainRecourceHost);
+		graph.addCell(mainResourceHost);
 
 
-		//add recource host
-		$('.b-tools-menu').on('click', '.js-add-recource-host', function(){
+		//add resource host
+		$('.b-tools-menu').on('click', '.js-add-resource-host', function(){
 			var pos = findEmptyCubePostion();
 			var img = $(this).find('img');
-			var recourceHost = new joint.shapes.recourceHostHtml.Element({
+			var resourceHost = new joint.shapes.resourceHostHtml.Element({
 				position: { x: 80, y: 80 },
 				size: { width: 155, height: 185 },
-				'recourceHostName': 'RH1',
+				'resourceHostName': 'RH1',
 				'peerName': 'Peer 1'
 			});
-			graph.addCell(recourceHost);
+			graph.addCell(resourceHost);
 			return false;
 		});
 
-		vm.containersInRecource = [];
-		vm.containersInRecourceMax = 4;
+		vm.containersInResource = [];
+		vm.containersInResourceMax = 4;
 		vm.containersInRow = 2;
-		function findEmptyPostionInRecource() {
-			console.log(mainRecourceHost.get('position'));
-			if(vm.containersInRecource.length == 0) {
+		function findEmptyPostionInResource() {
+			if(vm.containersInResource.length == 0) {
 				return {x: 28, y: 54};
 			} else {
 				var row = 0;
-				for(var i = 0; i < vm.containersInRecource.length; i++) {
+				for(var i = 0; i < vm.containersInResource.length; i++) {
 					if((i + 1) % vm.containersInRow == 0) {
 						row++;
 					}
 				}
 
 				var x = 88;
-				if(vm.containersInRecource.length % vm.containersInRow == 0) {
+				if(vm.containersInResource.length % vm.containersInRow == 0) {
 					x = 28;
 				}
 
-				if(vm.containersInRecource.length == vm.containersInRecourceMax) {
-					if(vm.containersInRecourceMax == 4) {
-						vm.containersInRecourceMax = vm.containersInRecourceMax + 5;
+				if(vm.containersInResource.length == vm.containersInResourceMax) {
+					if(vm.containersInResourceMax == 4) {
+						vm.containersInResourceMax = vm.containersInResourceMax + 5;
 					} else {
-						vm.containersInRecourceMax = vm.containersInRecourceMax + (vm.containersInRecourceMax + 2);
+						vm.containersInResourceMax = vm.containersInResourceMax + (vm.containersInResourceMax + 2);
 					}
 
-					//vm.containersInRecourceMax = vm.containersInRecourceMax + 2;
+					//vm.containersInResourceMax = vm.containersInResourceMax + 2;
 
-					var currentSize = mainRecourceHost.get('size');
+					var currentSize = mainResourceHost.get('size');
 					vm.containersInRow++;
-					mainRecourceHost.resize(currentSize.width + 60, currentSize.height + 60);
+					mainResourceHost.resize(currentSize.width + 60, currentSize.height + 60);
 				}
 				return {x: x, y: (row * 60) + 54};
 			}
 		}
 
-		findEmptyPostionInRecource();
+		findEmptyPostionInResource();
 
 		function findEmptyCubePostion() {
 			for( var j = 0; j < vm.cubeGrowth; j++ ) {
@@ -1107,19 +1106,21 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 		console.log(allElements);
 		for(var i = 0; i < allElements.length; i++) {
 			var currentElement = allElements[i];
-			var currentTemplateName = allElements[i].get('templateName');
-			var container2Build = {
-				"size": currentElement.get('quotaSize'),
-				"templateName": currentTemplateName,
-				"name": currentElement.get('containerName'),
-				"position": currentElement.get('position')
-			};
-			if(vm.env2Build[currentTemplateName] === undefined) {
-				vm.env2Build[currentTemplateName] = 1;
-			} else {
-				vm.env2Build[currentTemplateName]++;
+			if(currentElement.get('type') == 'tm.devElement') {
+				var currentTemplateName = allElements[i].get('templateName');
+				var container2Build = {
+					"size": currentElement.get('quotaSize'),
+					"templateName": currentTemplateName,
+					"name": currentElement.get('containerName'),
+					"position": currentElement.get('position')
+				};
+				if(vm.env2Build[currentTemplateName] === undefined) {
+					vm.env2Build[currentTemplateName] = 1;
+				} else {
+					vm.env2Build[currentTemplateName]++;
+				}
+				vm.containers2Build.push(container2Build);
 			}
-			vm.containers2Build.push(container2Build);
 		}
 		console.log(vm.containers2Build);
 		ngDialog.open({
