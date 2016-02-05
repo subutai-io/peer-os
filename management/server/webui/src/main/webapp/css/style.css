@@ -2528,7 +2528,7 @@ td.b-main-table__status-col {
 }
 
 .b-tools-menu {
-    height: 453px;
+    height: 533px;
     position: relative;
     overflow-y: auto;
 }
@@ -2725,7 +2725,7 @@ td.b-main-table__status-col {
 
 
 .b-switcher {
-    padding: 7px 0;
+    padding: 10px 0;
 }
 
 /*Toggle btn*/
@@ -2755,8 +2755,8 @@ td.b-main-table__status-col {
     box-shadow: inset 0 0 2px 1px rgba(0, 0, 0, 0.05);
 }
 .b-toggle_cloud {
-    width: 130px;
-    height: 25px;
+    width: 150px;
+    height: 30px;
     background-color: #fff;
     border: 1px solid #ccceee;
     box-sizing: border-box;
@@ -2814,9 +2814,9 @@ td.b-main-table__status-col {
 .b-toggle_cloud .b-toggle-bg:before {
     content: "Simple";
     position: absolute;
-    font-size: 11px;
-    top: 7px;
-    left: 16px;
+    font-size: 13px;
+    top: 9px;
+    left: 17px;
     color: #04346E;
     font-weight: 400;
     line-height: 10px;
@@ -2824,8 +2824,8 @@ td.b-main-table__status-col {
 .b-toggle_cloud .b-toggle-bg:after {
     content: "Advanced";
     position: absolute;
-    font-size: 11px;
-    top: 7px;
+    font-size: 13px;
+    top: 9px;
     right: 7px;
     color: #04346E;
     font-weight: 400;
@@ -2858,9 +2858,9 @@ td.b-main-table__status-col {
 .b-toggle_cloud .b-switch:before {
     content: "Simple";
     position: absolute;
-    font-size: 11px;
-    top: 7.5px;
-    left: 15.5px;
+    font-size: 13px;
+    top: 9.5px;
+    left: 17.5px;
     color: #fff;
     font-weight: 400;
     line-height: 10px;
