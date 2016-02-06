@@ -88,6 +88,7 @@ import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.protocol.ControlNetworkConfig;
 import io.subutai.common.protocol.Disposable;
 import io.subutai.common.protocol.P2PConfig;
+import io.subutai.common.protocol.P2PConnection;
 import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.PingDistance;
@@ -135,13 +136,11 @@ import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
-import io.subutai.common.protocol.P2PConnection;
 import io.subutai.core.repository.api.RepositoryException;
 import io.subutai.core.repository.api.RepositoryManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
-import io.subutai.core.strategy.api.StrategyManager;
 
 
 /**
@@ -155,13 +154,14 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public static final String PEER_SUBNET_MASK = "255.255.255.0";
     private static final String GATEWAY_INTERFACE_NAME_REGEX = "^br-(\\d+)$";
     private static final Pattern GATEWAY_INTERFACE_NAME_PATTERN = Pattern.compile( GATEWAY_INTERFACE_NAME_REGEX );
+    private static final String DEFAULT_EXTERNAL_INTERFACE_NAME = "eth1";
 
+    private String externalIpInterface = DEFAULT_EXTERNAL_INTERFACE_NAME;
     private DaoManager daoManager;
     private TemplateManager templateRegistry;
     protected Host managementHost;
     protected Set<ResourceHost> resourceHosts = Sets.newHashSet();
     private CommandExecutor commandExecutor;
-    private StrategyManager strategyManager;
     private QuotaManager quotaManager;
     private Monitor monitor;
     protected ResourceHostDataService resourceHostDataService;
@@ -180,10 +180,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     public LocalPeerImpl( DaoManager daoManager, TemplateManager templateRegistry, QuotaManager quotaManager,
-                          StrategyManager strategyManager, CommandExecutor commandExecutor, HostRegistry hostRegistry,
-                          Monitor monitor, SecurityManager securityManager )
+                          CommandExecutor commandExecutor, HostRegistry hostRegistry, Monitor monitor,
+                          SecurityManager securityManager )
     {
-        this.strategyManager = strategyManager;
         this.daoManager = daoManager;
         this.templateRegistry = templateRegistry;
         this.quotaManager = quotaManager;
@@ -241,6 +240,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         addRequestListener( new DestroyEnvironmentContainerGroupRequestListener( this ) );
 
         initialized = true;
+    }
+
+
+    public void setExternalIpInterface( final String externalIpInterface )
+    {
+        this.externalIpInterface = externalIpInterface;
     }
 
 
@@ -307,9 +312,18 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public PeerInfo getPeerInfo()
+    public PeerInfo getPeerInfo() throws PeerException
     {
-        return peerInfo;
+        try
+        {
+            this.peerInfo.setIp( managementHost.getInterfaceByName( externalIpInterface ).getIp() );
+            return peerInfo;
+        }
+        catch ( Exception e ) {
+            LOG.warn( "Could not generate peer info: "+ e.getMessage() );
+
+        }
+        throw new PeerException( "Peer info unavailable." );
     }
 
 
@@ -2286,14 +2300,15 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public String getExternalIp()
+    public String getExternalIp() throws PeerException
     {
         return getPeerInfo().getIp();
     }
 
 
     @Override
-    public PingDistances getCommunityDistances( final String communityName, final Integer maxAddress ) throws PeerException
+    public PingDistances getCommunityDistances( final String communityName, final Integer maxAddress )
+            throws PeerException
     {
         PingDistances result = new PingDistances();
         try

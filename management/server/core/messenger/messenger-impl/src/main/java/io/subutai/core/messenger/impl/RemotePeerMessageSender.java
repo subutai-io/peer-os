@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 
 import io.subutai.common.peer.Peer;
+import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.security.WebClientBuilder;
 import io.subutai.common.util.JsonUtil;
 
@@ -21,14 +23,17 @@ public class RemotePeerMessageSender implements Callable<Boolean>
 {
     private static final Logger LOG = LoggerFactory.getLogger( RemotePeerMessageSender.class.getName() );
 
+    private Peer localPeer;
     private Peer targetPeer;
     private Set<Envelope> envelopes;
 
     private MessengerDao messengerDao;
 
 
-    public RemotePeerMessageSender( MessengerDao messengerDao, final Peer targetPeer, final Set<Envelope> envelopes )
+    public RemotePeerMessageSender( MessengerDao messengerDao, final Peer localPeer, final Peer targetPeer,
+                                    final Set<Envelope> envelopes )
     {
+        this.localPeer = localPeer;
         this.targetPeer = targetPeer;
         this.envelopes = envelopes;
         this.messengerDao = messengerDao;
@@ -38,32 +43,41 @@ public class RemotePeerMessageSender implements Callable<Boolean>
     @Override
     public Boolean call()
     {
-        WebClient client = getWebClient( targetPeer.getPeerInfo().getIp() );
-
-        for ( Envelope envelope : envelopes )
+        WebClient client = null;
+        try
         {
-            try
+            client = getWebClient( localPeer.getId(), targetPeer.getPeerInfo() );
+            for ( Envelope envelope : envelopes )
             {
-                client.post( JsonUtil.toJson( envelope ) );
+                try
+                {
+                    client.post( JsonUtil.toJson( envelope ) );
 
-                messengerDao.markAsSent( envelope );
+                    messengerDao.markAsSent( envelope );
+                }
+                catch ( Exception e )
+                {
+                    messengerDao.incrementDeliveryAttempts( envelope );
+
+                    LOG.error( "Error in PeerMessenger", e );
+
+                    //break transmission of all subsequent messages for this peer in this round
+                    break;
+                }
             }
-            catch ( Exception e )
-            {
-                messengerDao.incrementDeliveryAttempts( envelope );
-
-                LOG.error( "Error in PeerMessenger", e );
-
-                //break transmission of all subsequent messages for this peer in this round
-                break;
-            }
+            return true;
         }
-        return true;
+        catch ( PeerException e )
+        {
+            LOG.error( e.getMessage() );
+        }
+
+        return false;
     }
 
 
-    protected WebClient getWebClient( String targetPeerIP )
+    protected WebClient getWebClient( String localPeerId, PeerInfo peerInfo )
     {
-        return WebClientBuilder.buildPeerWebClient( targetPeerIP, "/messenger/message" );
+        return WebClientBuilder.buildPeerWebClient( localPeerId, peerInfo, "/messenger/message" );
     }
 }

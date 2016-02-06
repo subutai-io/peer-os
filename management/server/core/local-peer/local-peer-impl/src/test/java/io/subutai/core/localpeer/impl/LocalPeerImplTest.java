@@ -246,10 +246,19 @@ public class LocalPeerImplTest
     @Before
     public void setUp() throws Exception
     {
+        when( peerInfo.getId() ).thenReturn( LOCAL_PEER_ID );
+        when( peerInfo.getName() ).thenReturn( LOCAL_PEER_NAME );
+        when( peerInfo.getOwnerId() ).thenReturn( OWNER_ID );
+        when( peerInfo.getIp() ).thenReturn( IP );
+
+        when( anHostInterface.getName() ).thenReturn( INTERFACE_NAME );
+        when( anHostInterface.getIp() ).thenReturn( IP );
+        when( anHostInterface.getMac() ).thenReturn( MAC );
+
         peerMap = new HashMap<>();
         peerMap.put( IP, P2P_IP );
         localPeer =
-                spy( new LocalPeerImpl( daoManager, templateRegistry, quotaManager, strategyManager, commandExecutor,
+                spy( new LocalPeerImpl( daoManager, templateRegistry, quotaManager,/* strategyManager,*/ commandExecutor,
                         hostRegistry, monitor, securityManager ) );
 
         //        localPeer.containerHostDataService = containerHostDataService;
@@ -262,6 +271,7 @@ public class LocalPeerImplTest
         localPeer.managementHost = managementHost;
         localPeer.requestListeners = Sets.newHashSet( requestListener );
         localPeer.setPeerInfo( peerInfo );
+        localPeer.setExternalIpInterface( INTERFACE_NAME );
 
         //        when( cpuQuota.getValue( MeasureUnit.PERCENT ).intValue() ).thenReturn( Integer.parseInt( CPUQUOTA
         // ) );
@@ -271,6 +281,8 @@ public class LocalPeerImplTest
         when( daoManager.getEntityManagerFactory() ).thenReturn( entityManagerFactory );
         when( managementHost.getId() ).thenReturn( MANAGEMENT_HOST_ID );
         when( managementHost.getHostInterfaces() ).thenReturn( hostInterfaces );
+        when( managementHost.getInterfaceByName( INTERFACE_NAME ) ).thenReturn( anHostInterface );
+
         when( resourceHost.getId() ).thenReturn( RESOURCE_HOST_ID );
         when( containerHost.getId() ).thenReturn( CONTAINER_HOST_ID );
         when( containerHost.getContainerId() ).thenReturn( containerId );
@@ -280,12 +292,7 @@ public class LocalPeerImplTest
         when( containerId.getPeerId() ).thenReturn( peerId );
         when( resourceHost.getContainerHostById( CONTAINER_HOST_ID ) ).thenReturn( containerHost );
         when( resourceHost.getHostname() ).thenReturn( RESOURCE_HOST_NAME );
-        when( localPeer.getPeerInfo() ).thenReturn( peerInfo );
         when( securityManager.getKeyManager() ).thenReturn( keyManager );
-        when( localPeer.getPeerInfo() ).thenReturn( peerInfo );
-        when( peerInfo.getId() ).thenReturn( LOCAL_PEER_ID );
-        when( peerInfo.getName() ).thenReturn( LOCAL_PEER_NAME );
-        when( peerInfo.getOwnerId() ).thenReturn( OWNER_ID );
         when( resourceHostDataService.getAll() ).thenReturn( Sets.newHashSet( resourceHost ) );
         when( templateRegistry.getTemplate( TEMPLATE_NAME ) ).thenReturn( template );
         when( template.getName() ).thenReturn( TEMPLATE_NAME );
@@ -317,9 +324,7 @@ public class LocalPeerImplTest
         when( hostInfo.getArch() ).thenReturn( ARCH );
         when( hostInterfaces.getAll() ).thenReturn( Sets.newHashSet( anHostInterface ) );
         when( hostInfo.getHostInterfaces() ).thenReturn( hostInterfaces );
-        when( anHostInterface.getName() ).thenReturn( INTERFACE_NAME );
-        when( anHostInterface.getIp() ).thenReturn( IP );
-        when( anHostInterface.getMac() ).thenReturn( MAC );
+
         localPeer.singleThreadExecutorService = singleThreadExecutorService;
         localPeer.serviceLocator = serviceLocator;
         when( singleThreadExecutorService.submit( any( Callable.class ) ) ).thenReturn( future );

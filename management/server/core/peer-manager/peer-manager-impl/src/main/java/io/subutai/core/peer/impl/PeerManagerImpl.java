@@ -39,6 +39,7 @@ import com.google.common.base.Preconditions;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.peer.Encrypted;
+import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
@@ -81,7 +82,6 @@ public class PeerManagerImpl implements PeerManager
 
     private static final Logger LOG = LoggerFactory.getLogger( PeerManagerImpl.class );
     private static final String KURJUN_URL_PATTERN = "https://%s:%s/rest/kurjun/templates/public";
-    private static final String DEFAULT_EXTERNAL_INTERFACE_NAME = "eth1";
     final int MAX_CONTAINER_LIMIT = 20;
     final int MAX_ENVIRONMENT_LIMIT = 20;
 
@@ -100,9 +100,8 @@ public class PeerManagerImpl implements PeerManager
     private TemplateManager templateManager;
     private IdentityManager identityManager;
     private Map<String, Peer> peers = new ConcurrentHashMap<>();
-    private Map<String, PeerPolicy> policies = new ConcurrentHashMap<>();
+    //    private Map<String, PeerPolicy> policies = new ConcurrentHashMap<>();
     private ObjectMapper mapper = new ObjectMapper();
-    private String externalIpInterface = DEFAULT_EXTERNAL_INTERFACE_NAME;
     private String localPeerId;
     private String ownerId;
     private RegistrationClient registrationClient;
@@ -132,12 +131,6 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    public void setExternalIpInterface( final String externalIpInterface )
-    {
-        this.externalIpInterface = externalIpInterface;
-    }
-
-
     public void init() throws PeerException
     {
         try
@@ -146,14 +139,15 @@ public class PeerManagerImpl implements PeerManager
 
             localPeerId = securityManager.getKeyManager().getPeerId();
             ownerId = securityManager.getKeyManager().getOwnerId();
-            final String localPeerIp = getLocalPeerIp();
-
-            if ( localPeerIp == null || ownerId == null )
-            {
-                throw new PeerException(
-                        String.format( "Could not initialize local peer: ID:%s OWNER_ID:%s IP:%s", localPeerIp, ownerId,
-                                localPeerIp ) );
-            }
+            //            final String localPeerIp = "127.0.0.1";
+            //
+            //            if ( localPeerIp == null || ownerId == null )
+            //            {
+            //                throw new PeerException(
+            //                        String.format( "Could not initialize local peer: ID:%s OWNER_ID:%s IP:%s",
+            // localPeerIp, ownerId,
+            //                                localPeerIp ) );
+            //            }
             // check local peer instance
             PeerData localPeerData = peerDataService.find( localPeerId );
 
@@ -163,8 +157,9 @@ public class PeerManagerImpl implements PeerManager
                 PeerInfo localPeerInfo = new PeerInfo();
                 localPeerInfo.setId( localPeerId );
                 localPeerInfo.setOwnerId( ownerId );
-                localPeerInfo.setIp( localPeerIp );
-                localPeerInfo.setName( String.format( "Peer %s %s", localPeerId, localPeerIp ) );
+                //                localPeerInfo.setIp( localPeerIp );
+                //                localPeerInfo.setName( String.format( "Peer %s %s", localPeerId, localPeerIp ) );
+                localPeerInfo.setName( "NOT INITIALIZED" );
                 PeerPolicy policy = getDefaultPeerPolicy( localPeerId );
 
                 PeerData peerData =
@@ -194,23 +189,25 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    private String getLocalPeerIp() throws PeerException
-    {
-        String result = null;
-        try
-        {
-            result = IPUtil.getLocalIpByInterfaceName( externalIpInterface );
-        }
-        catch ( SocketException e )
-        {
-            LOG.error( "Error getting local IP", e );
-        }
-        if ( result == null )
-        {
-            throw new PeerException( "Could not determine IP address of peer." );
-        }
-        return result;
-    }
+    //    private String getLocalPeerIp() throws PeerException
+    //    {
+    //        String result = null;
+    //
+    //
+    //        try
+    //        {
+    //            result = localPeer.getManagementHost().getInterfaceByName( externalIpInterface ).getIp();
+    //        }
+    //        catch ( HostNotFoundException e )
+    //        {
+    //            LOG.error( "Error getting local IP", e );
+    //        }
+    //        if ( result == null )
+    //        {
+    //            throw new PeerException( "Could not determine IP address of peer." );
+    //        }
+    //        return result;
+    //    }
 
 
     public PeerPolicy getDefaultPeerPolicy( String peerId )
@@ -337,8 +334,8 @@ public class PeerManagerImpl implements PeerManager
             throw new IllegalArgumentException( "Peer could not be null." );
         }
         this.peers.put( peer.getId(), peer );
-//        selectControlNetwork();
-//        updateControlNetwork();
+        //        selectControlNetwork();
+        //        updateControlNetwork();
     }
 
 
@@ -348,8 +345,8 @@ public class PeerManagerImpl implements PeerManager
         if ( peer != null )
         {
             this.peers.remove( id );
-//            selectControlNetwork();
-//            updateControlNetwork();
+            //            selectControlNetwork();
+            //            updateControlNetwork();
         }
     }
 
@@ -601,10 +598,13 @@ public class PeerManagerImpl implements PeerManager
         }
         register( initRequest.getKeyPhrase(), registrationData );
         removeRequest( registrationData.getPeerInfo().getId() );
+        securityManager.getKeyManager().getRemoteHostPublicKey( registrationData.getPeerInfo().getId(),
+                registrationData.getPeerInfo().getIp() );
     }
 
 
     private RegistrationData buildRegistrationData( final String keyPhrase, RegistrationStatus status )
+            throws PeerException
     {
         RegistrationData result = new RegistrationData( localPeer.getPeerInfo(), keyPhrase, status );
         switch ( status )
@@ -720,6 +720,8 @@ public class PeerManagerImpl implements PeerManager
             register( keyPhrase, request );
 
             removeRequest( request.getPeerInfo().getId() );
+            securityManager.getKeyManager()
+                           .getRemoteHostPublicKey( request.getPeerInfo().getId(), request.getPeerInfo().getIp() );
         }
         catch ( Exception e )
         {
@@ -788,7 +790,14 @@ public class PeerManagerImpl implements PeerManager
         {
             if ( !peer.getId().equals( localPeer.getId() ) )
             {
-                r.add( new RegistrationData( peer.getPeerInfo(), RegistrationStatus.APPROVED ) );
+                try
+                {
+                    r.add( new RegistrationData( peer.getPeerInfo(), RegistrationStatus.APPROVED ) );
+                }
+                catch ( PeerException e )
+                {
+                    LOG.warn( String.format( "Could not get peer info from %s. %s", peer.getId(), e.getMessage() ) );
+                }
             }
         }
 
