@@ -1930,6 +1930,8 @@ td.b-main-table__status-col {
 .b-tabs-menu {
     position: relative;
     z-index: 8;
+	background-color: #FFF;
+	border-left: 1px solid #CCCEEE;
 }
 
 .b-tabs-menu ul {
@@ -2512,25 +2514,44 @@ td.b-main-table__status-col {
     width: 100%;
 }
 
-.b-cloud__tools {
-    position: relative;
-    width: 247px;
-/*    border-left: 1px solid #CCCEEE;*/
+.b-cloud {
+	position: relative;
 }
+
+.b-cloud__tools {
+    position: absolute;
+	z-index: 5;
+	right: 0;
+	top: 0;
+	height: 100%;
+    width: 247px;
+}
+
+.b-cloud-tools {
+	height: 100%;
+}
+
 .b-cloud-add-tools {
     position: absolute;
-    left: -202px;
+    left: 0;
     top: 0;
-    z-index: 999;
+    z-index: 5;
     width: 200px;
     background-color: #fff;
-    border-left: 1px solid #ccceee;
+	z-index: 2;
 }
 
 .b-tools-menu {
-    height: 453px;
+    height: 100%;
+	box-sizing: border-box;
     position: relative;
-    overflow-y: auto;
+	z-index: 5;
+	background-color: #FFF;
+	border-left: 1px solid #CCCEEE;
+}
+
+.b-tools-menu_custom-scroll-huc {
+	padding-bottom: 46px;
 }
 
 .b-tools-menu ul {
@@ -2590,6 +2611,14 @@ td.b-main-table__status-col {
     display: block;
     vertical-align: middle;
 }
+
+.b-cloud-item-resource-name {
+    text-decoration: none;
+    display: block;
+    vertical-align: middle;
+	color: #04346E;
+}
+
 .b-cloud-item img {
     max-width: 25px;
     max-height: 25px;
@@ -2604,7 +2633,7 @@ td.b-main-table__status-col {
     overflow: hidden;
 }
 .b-cloud-space_border-right {
-    border-right: 1px solid #CCCEEE;
+    /*border-right: 1px solid #CCCEEE;*/
     background: #fff url("../assets/elements/patter-stripes.png");
 }
 .b-cloud-space__work {

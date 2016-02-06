@@ -33,6 +33,11 @@ $(".b-form-input-dropdown-list").click(function(e) {
 $('.js-scrollbar').perfectScrollbar();
 $('.js-scrollbar-cloud').perfectScrollbar();
 
+$('body').on('click', '.js-hide-resources', function(){
+	$('.b-cloud-add-tools').animate({'left': 0}, 300);
+	return false;
+});
+
 var UPDATE_NIGHTLY_BUILD_STATUS;
 
 //document.getElementById("uploadBtn").onchange = function () {
