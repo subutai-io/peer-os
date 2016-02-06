@@ -5,14 +5,14 @@ import (
 	"bytes"
 	"crypto/tls"
 	"errors"
+	"github.com/subutai-io/Subutai/agent/config"
+	"github.com/subutai-io/Subutai/agent/lib/container"
+	"github.com/subutai-io/Subutai/agent/log"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"os/exec"
 	"strings"
-	"subutai/config"
-	"subutai/lib/container"
-	"subutai/log"
 	"time"
 )
 
@@ -183,7 +183,7 @@ func GetToken() string {
 	client := &http.Client{Transport: tr, Timeout: time.Duration(3 * time.Second)}
 
 	resp, err := client.Get("https://" + config.Management.Host + ":" + config.Management.Port + config.Management.RestToken + "?username=" + config.Management.Login + "&password=" + config.Management.Password)
-	if log.Check(log.WarnLevel, "Getting token", err) {
+	if log.Check(log.DebugLevel, "Getting token", err) {
 		return ""
 	}
 

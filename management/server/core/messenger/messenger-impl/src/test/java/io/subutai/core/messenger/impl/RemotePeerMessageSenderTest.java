@@ -18,6 +18,8 @@ import com.google.common.collect.Sets;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerInfo;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -40,6 +42,8 @@ public class RemotePeerMessageSenderTest
 
     @Mock
     Peer peer;
+    @Mock
+    Peer localPeer;
 
     @Mock
     MessengerDao messengerDao;
@@ -61,11 +65,12 @@ public class RemotePeerMessageSenderTest
         when( peerInfo.getId() ).thenReturn( uuid );
 
         envelope = new Envelope( message, TARGET_PEER_ID, RECIPIENT, TIME_TO_LIVE, HEADERS );
-        remotePeerMessageSender = spy( new RemotePeerMessageSender( messengerDao, peer, Sets.newHashSet( envelope ) ) );
+        remotePeerMessageSender =
+                spy( new RemotePeerMessageSender( messengerDao, localPeer, peer, Sets.newHashSet( envelope ) ) );
 
         when( peer.getPeerInfo() ).thenReturn( peerInfo );
         when( peerInfo.getIp() ).thenReturn( IP );
-        doReturn( webClient ).when( remotePeerMessageSender ).getWebClient( anyString() );
+        doReturn( webClient ).when( remotePeerMessageSender ).getWebClient( anyString(), any( PeerInfo.class ) );
     }
 
 

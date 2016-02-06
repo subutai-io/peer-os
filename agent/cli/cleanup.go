@@ -1,9 +1,9 @@
 package lib
 
 import (
-	"subutai/config"
-	"subutai/lib/container"
-	"subutai/lib/net"
+	"github.com/subutai-io/Subutai/agent/config"
+	"github.com/subutai-io/Subutai/agent/lib/container"
+	"github.com/subutai-io/Subutai/agent/lib/net"
 )
 
 func Cleanup(vlan string) {
