@@ -3,6 +3,7 @@ package io.subutai.common.security;
 
 import java.security.KeyStore;
 import java.util.Arrays;
+import java.util.Collections;
 
 import javax.ws.rs.core.MediaType;
 
@@ -14,6 +15,7 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 
+import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.security.crypto.keystore.KeyStoreData;
 import io.subutai.common.security.crypto.keystore.KeyStoreTool;
 import io.subutai.common.security.crypto.ssl.SSLManager;
@@ -47,7 +49,7 @@ public class WebClientBuilder
         }
         else
         {
-            client = WebClient.create( effectiveUrl, Arrays.asList( provider ) );
+            client = WebClient.create( effectiveUrl, Collections.singletonList( provider ) );
         }
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
@@ -132,8 +134,8 @@ public class WebClientBuilder
     }
 
 
-    public static WebClient buildPeerWebClient( final String host, final String path )
+    public static WebClient buildPeerWebClient( final PeerInfo host, final String path )
     {
-        return buildPeerWebClient( host, path, null );
+        return buildPeerWebClient( host.getIp(), path, null );
     }
 }

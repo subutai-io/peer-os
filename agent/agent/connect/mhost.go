@@ -2,10 +2,10 @@ package connect
 
 import (
 	"crypto/tls"
+	"github.com/subutai-io/Subutai/agent/config"
+	"github.com/subutai-io/Subutai/agent/log"
 	"io/ioutil"
 	"net/http"
-	"subutai/config"
-	"subutai/log"
 	"time"
 )
 

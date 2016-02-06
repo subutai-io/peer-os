@@ -13,6 +13,7 @@ import javax.ws.rs.core.HttpHeaders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
@@ -25,6 +26,7 @@ import io.subutai.common.settings.ChannelSettings;
 import io.subutai.core.channel.impl.ChannelManagerImpl;
 import io.subutai.core.channel.impl.util.MessageContentUtil;
 import io.subutai.core.identity.api.model.Session;
+
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 
@@ -66,9 +68,13 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
                 status = MessageContentUtil.checkUrlAccessibility( status, url );
                 //----------------------------------------------------------------------------------------------
                 if ( status == 1 ) //require tokenauth
+                {
                     userSession = authenticateAccess( message );
+                }
                 else if ( status == 0 ) // auth with system user
+                {
                     userSession = authenticateAccess( null );
+                }
                 else if ( status == 2 )
                 {
                     MessageContentUtil.abortChain( message, 403, "Permission denied" );
@@ -89,7 +95,7 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
                         }
                         catch ( Exception ex )
                         {
-                            Throwable t = ExceptionUtils.getRootCause(ex);
+                            Throwable t = ExceptionUtils.getRootCause( ex );
                             MessageContentUtil.abortChain( message, t );
                         }
                         return null;
@@ -105,6 +111,10 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
         catch ( MalformedURLException ignore )
         {
             LOG.debug( "MalformedURLException", ignore.toString() );
+        }
+        catch ( Exception e )
+        {
+            throw new Fault( e );
         }
     }
 
@@ -145,9 +155,13 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
             }
 
             if ( Strings.isNullOrEmpty( sptoken ) )
+            {
                 return null;
+            }
             else
+            {
                 return channelManagerImpl.getIdentityManager().login( "token", sptoken );
+            }
         }
     }
     //******************************************************************

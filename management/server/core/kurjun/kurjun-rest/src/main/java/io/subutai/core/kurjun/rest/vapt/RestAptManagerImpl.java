@@ -184,6 +184,32 @@ public class RestAptManagerImpl extends RestManagerBase implements RestAptManage
     }
 
 
+    @Override
+    public Response deletePackage( String md5 )
+    {
+        byte[] md5bytes = decodeMd5( md5 );
+        if ( md5bytes != null )
+        {
+            String err = "Failed to delete apt package";
+            try
+            {
+                boolean deleted = aptManager.delete( md5bytes );
+                if ( deleted )
+                {
+                    return Response.ok( "Apt package deleted" ).build();
+                }
+                return Response.serverError().entity( err ).build();
+            }
+            catch ( IOException ex )
+            {
+                LOGGER.error( err, ex );
+                return Response.serverError().entity( err ).build();
+            }
+        }
+        return badRequest( "Invalid md5 checksum" );
+    }
+
+
     private String makePackageFilename( PackageMetadata metadata )
     {
         StringBuilder sb = new StringBuilder();

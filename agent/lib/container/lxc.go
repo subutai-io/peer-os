@@ -3,6 +3,10 @@ package container
 import (
 	"bufio"
 	"errors"
+	"github.com/subutai-io/Subutai/agent/config"
+	"github.com/subutai-io/Subutai/agent/lib/fs"
+	"github.com/subutai-io/Subutai/agent/lib/net"
+	"github.com/subutai-io/Subutai/agent/log"
 	"gopkg.in/lxc/go-lxc.v2"
 	"io/ioutil"
 	"os"
@@ -10,10 +14,6 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
-	"subutai/config"
-	"subutai/lib/fs"
-	"subutai/lib/net"
-	"subutai/log"
 	"syscall"
 )
 

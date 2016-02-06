@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/influxdb/influxdb/client/v2"
+	"github.com/subutai-io/Subutai/agent/config"
 	"os"
-	"subutai/config"
 )
 
 var (

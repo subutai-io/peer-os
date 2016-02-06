@@ -2,13 +2,13 @@ package net
 
 import (
 	"fmt"
+	"github.com/subutai-io/Subutai/agent/config"
+	"github.com/subutai-io/Subutai/agent/lib/net/p2p"
+	"github.com/subutai-io/Subutai/agent/log"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"strings"
-	"subutai/config"
-	"subutai/lib/net/p2p"
-	"subutai/log"
 )
 
 func CreateVNIFile(name string) {

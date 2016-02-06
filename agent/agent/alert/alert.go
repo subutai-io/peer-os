@@ -3,6 +3,9 @@ package alert
 import (
 	"bufio"
 	"bytes"
+	"github.com/subutai-io/Subutai/agent/agent/container"
+	"github.com/subutai-io/Subutai/agent/config"
+	"github.com/subutai-io/Subutai/agent/log"
 	"gopkg.in/lxc/go-lxc.v2"
 	"io/ioutil"
 	"os"
@@ -10,9 +13,6 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
-	"subutai/agent/container"
-	"subutai/config"
-	"subutai/log"
 )
 
 type Values struct {

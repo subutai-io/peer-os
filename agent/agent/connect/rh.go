@@ -3,14 +3,14 @@ package connect
 import (
 	"encoding/json"
 	"errors"
+	"github.com/subutai-io/Subutai/agent/agent/container"
+	"github.com/subutai-io/Subutai/agent/agent/utils"
+	"github.com/subutai-io/Subutai/agent/lib/gpg"
+	"github.com/subutai-io/Subutai/agent/log"
 	"net"
 	"os"
 	"runtime"
 	"strings"
-	"subutai/agent/container"
-	"subutai/agent/utils"
-	"subutai/lib/gpg"
-	"subutai/log"
 )
 
 const (

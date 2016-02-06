@@ -2,6 +2,7 @@ package io.subutai.core.kurjun.rest.vapt;
 
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -10,6 +11,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 
@@ -81,4 +83,10 @@ public interface RestAptManager
     @Produces( MediaType.TEXT_PLAIN )
     @Consumes( MediaType.MULTIPART_FORM_DATA )
     Response upload( @Multipart( PACKAGE_FILE_PART_NAME ) Attachment attachment );
+
+
+    @DELETE
+    @Path( "delete" )
+    @Produces( MediaType.TEXT_PLAIN )
+    Response deletePackage( @QueryParam( MD5_PARAM ) String md5 );
 }
