@@ -2,14 +2,14 @@ package lib
 
 import (
 	"fmt"
+	"github.com/subutai-io/Subutai/agent/cli/lib"
+	"github.com/subutai-io/Subutai/agent/config"
+	"github.com/subutai-io/Subutai/agent/lib/gpg"
+	"github.com/subutai-io/Subutai/agent/log"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"strings"
-	"subutai/cli/lib"
-	"subutai/config"
-	"subutai/lib/gpg"
-	"subutai/log"
 )
 
 var (

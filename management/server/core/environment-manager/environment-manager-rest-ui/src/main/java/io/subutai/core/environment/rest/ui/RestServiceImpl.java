@@ -72,7 +72,6 @@ public class RestServiceImpl implements RestService
     private final StrategyManager strategyManager;
     private final QuotaManager quotaManager;
     private Gson gson = RequiredDeserializer.createValidatingGson();
-    //    private Set<EnvironmentDto> envs = Sets.newHashSet();
 
 
     public RestServiceImpl( final EnvironmentManager environmentManager, final PeerManager peerManager,
@@ -320,24 +319,42 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response growEnvironment( final String environmentId, final String blueprintJson )
+    public Response growEnvironment( final String environmentId, final String topologyJson )
     {
-        //        try
-        //        {
-        //            Blueprint blueprint = gson.fromJson( blueprintJson, Blueprint.class );
-        //
-        //            //            updateContainerPlacementStrategy( blueprint );
-        //
-        //            Set<EnvironmentContainerHost> environment =
-        //                    environmentManager.growEnvironment( environmentId, blueprint, false );
-        //        }
-        //        catch ( Exception e )
-        //        {
-        //            LOG.error( "Error validating parameters #growEnvironment", e );
-        //            return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( ERROR_KEY, e
-        // .getMessage() ) )
-        //                           .build();
-        //        }
+        try
+        {
+            String name = environmentManager.getEnvironments().stream().filter( e -> e.getEnvironmentId().equals( environmentId )).findFirst( ).get().getName();
+
+            ContainerPlacementStrategy placementStrategy = strategyManager.findStrategyById(
+                    ExampleStrategy.ID );
+
+
+            List<NodeSchema> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<NodeSchema>>() {}.getType() );
+
+            placementStrategy.setScheme( schema );
+
+            final List<PeerResources> resources = new ArrayList<>();
+            for ( final Peer peer : peerManager.getPeers() )
+            {
+                PeerResources peerResources =
+                        peerManager.getPeer( peer.getId() ).getResourceLimits( peerManager.getLocalPeer().getId() );
+                resources.add( peerResources );
+            }
+
+
+            final PeerGroupResources peerGroupResources = new PeerGroupResources( resources );
+            final Map<ContainerSize, ContainerQuota> quotas = quotaManager.getDefaultQuotas();
+
+            Topology topology = placementStrategy.distribute( name, 0, 0, peerGroupResources, quotas );
+
+            environmentManager.setupRequisites( topology );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error validating parameters #growEnvironment", e );
+            return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) )
+                           .build();
+        }
 
         return Response.ok().build();
     }

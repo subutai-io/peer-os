@@ -1,14 +1,14 @@
 package lib
 
 import (
+	"github.com/subutai-io/Subutai/agent/cli/lib"
+	"github.com/subutai-io/Subutai/agent/config"
+	"github.com/subutai-io/Subutai/agent/lib/container"
+	"github.com/subutai-io/Subutai/agent/lib/fs"
+	"github.com/subutai-io/Subutai/agent/lib/template"
+	"github.com/subutai-io/Subutai/agent/log"
 	"os"
 	"runtime"
-	"subutai/cli/lib"
-	"subutai/config"
-	"subutai/lib/container"
-	"subutai/lib/fs"
-	"subutai/lib/template"
-	"subutai/log"
 )
 
 // cfg declared in promote.go

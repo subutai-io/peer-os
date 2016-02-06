@@ -28,9 +28,9 @@ public class ChannelSettings
         "/rest/v1/handshake/approve",
         "/rest/v1/handshake/cancel",
         "/rest/v1/handshake/reject",
-        "/rest/v1/handshake/unregister",
+        "/rest/v1/handshake/unregister"
 
-
+        /*
         "/rest/registry/templates",
         "/rest/registry/templates/import",
         "/rest/registry/templates/arch/{$}",
@@ -51,7 +51,7 @@ public class ChannelSettings
         "/rest/registry/templates/{$}/{$}/arch/{$}/children",
         "/rest/registry/templates/{$}/{$}/is-used-on-fai",
         "/rest/registry/templates/{$}/{$}/fai/{$}/is-used/{$}"
-
+        */
 
     };
 

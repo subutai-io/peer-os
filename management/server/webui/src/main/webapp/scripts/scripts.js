@@ -21,7 +21,9 @@ $(document).ready(function() {
 	}
 	colEqualHeight();
 });
-
+$('.js-cloud-btn').click(function(event) {
+	$( ".js-grid-list-switcher_list" ).toggleClass( "js-grid-list-switcher_list_show" );
+});
 $(".b-form-input_dropdown").click(function () {
 	$(this).toggleClass("is-active");
 });
@@ -31,6 +33,12 @@ $(".b-form-input-dropdown-list").click(function(e) {
 });
 
 $('.js-scrollbar').perfectScrollbar();
+$('.js-scrollbar-cloud').perfectScrollbar();
+
+$('body').on('click', '.js-hide-resources', function(){
+	$('.b-cloud-add-tools').animate({'left': 0}, 300);
+	return false;
+});
 
 var UPDATE_NIGHTLY_BUILD_STATUS;
 
