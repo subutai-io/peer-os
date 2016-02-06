@@ -40,21 +40,9 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
     });
 
     monitoringSrv.getResourceHosts().success(function (data) {
-        vm.hosts = data;
-        for (var i = 0; i < vm.hosts.length; i++) {
-            if (vm.hosts[i].hostname == 'management') {
-
-                vm.hosts[i].id = '';
-
-                var temp = angular.copy(vm.hosts[0]);
-                vm.hosts[0] = angular.copy(vm.hosts[i]);
-                vm.currentHost = vm.hosts[i].id;
-                vm.hosts[i] = temp;
-
-                getServerData();
-                break;
-            }
-        }
+		vm.hosts = data;
+		vm.currentHost = vm.hosts[0].id;
+		getServerData();
     });
 
     function setCurrentType(type) {

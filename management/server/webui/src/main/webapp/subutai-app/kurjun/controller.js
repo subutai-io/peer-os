@@ -1,15 +1,15 @@
 'use strict';
 
 angular.module('subutai.kurjun.controller', [])
-	.controller('KurjunViewCtrl', KurjunViewCtrl)
+	.controller('KurjunCtrl', KurjunCtrl)
 	.directive('fileModel', fileModel);
 
-KurjunViewCtrl.$inject = ['$scope', '$rootScope', 'kurjunSrv', 'SweetAlert', 'DTOptionsBuilder', 'DTColumnDefBuilder', '$resource', '$compile', 'ngDialog', '$timeout', 'cfpLoadingBar'];
+KurjunCtrl.$inject = ['$scope', '$rootScope', 'kurjunSrv', 'SweetAlert', 'DTOptionsBuilder', 'DTColumnDefBuilder', '$resource', '$compile', 'ngDialog', '$timeout', 'cfpLoadingBar'];
 fileModel.$inject = ['$parse'];
 
 var fileUploder = {};
 
-function KurjunViewCtrl($scope, $rootScope, kurjunSrv, SweetAlert, DTOptionsBuilder, DTColumnDefBuilder, $resource, $compile, ngDialog, $timeout, cfpLoadingBar) {
+function KurjunCtrl($scope, $rootScope, kurjunSrv, SweetAlert, DTOptionsBuilder, DTColumnDefBuilder, $resource, $compile, ngDialog, $timeout, cfpLoadingBar) {
 
 	var vm = this;
 	vm.activeTab = 'templates';
@@ -24,6 +24,7 @@ function KurjunViewCtrl($scope, $rootScope, kurjunSrv, SweetAlert, DTOptionsBuil
 	vm.deleteTemplate = deleteTemplate;
 	vm.deleteAPT = deleteAPT;
 	vm.checkRepositoryStatus = checkRepositoryStatus;
+	vm.setDefaultRepository = setDefaultRepository;
 
 	/*** Get templates according to repositories ***/
 	function getTemplates() {
@@ -58,10 +59,10 @@ function KurjunViewCtrl($scope, $rootScope, kurjunSrv, SweetAlert, DTOptionsBuil
 
 	function openTab(tab) {
 		vm.dtOptions = DTOptionsBuilder
-				.newOptions()
-				.withOption('order', [[ 0, "desc" ]])
-				.withOption('stateSave', true)
-				.withPaginationType('full_numbers');
+			.newOptions()
+			.withOption('order', [[0, "desc"]])
+			.withOption('stateSave', true)
+			.withPaginationType('full_numbers');
 
 		switch (tab) {
 			case 'templates':
@@ -99,7 +100,7 @@ function KurjunViewCtrl($scope, $rootScope, kurjunSrv, SweetAlert, DTOptionsBuil
 				});
 				break;
 			case 'apt':
-				vm.currentTemplate = {repository: null,file: null};
+				vm.currentTemplate = {repository: null, file: null};
 				ngDialog.open({
 					template: 'subutai-app/kurjun/partials/apt-form.html',
 					scope: $scope
@@ -130,7 +131,7 @@ function KurjunViewCtrl($scope, $rootScope, kurjunSrv, SweetAlert, DTOptionsBuil
 					}
 				}, function (event) {
 					template.file.progress = Math.min(100, parseInt(100.0 * event.loaded / event.total));
-					if(template.file.progress == 100) {
+					if (template.file.progress == 100) {
 						$timeout(function () {
 							ngDialog.closeAll();
 							LOADING_SCREEN();
@@ -171,64 +172,69 @@ function KurjunViewCtrl($scope, $rootScope, kurjunSrv, SweetAlert, DTOptionsBuil
 
 	function deleteTemplate(template) {
 		SweetAlert.swal({
-					title: "Are you sure?",
-					text: "Delete template!",
-					type: "warning",
-					showCancelButton: true,
-					confirmButtonColor: "#ff3f3c",
-					confirmButtonText: "Delete",
-					cancelButtonText: "Cancel",
-					closeOnConfirm: false,
-					closeOnCancel: true,
-					showLoaderOnConfirm: true
-				},
-				function (isConfirm) {
-					if (isConfirm) {
-						LOADING_SCREEN();
-						kurjunSrv.deleteTemplate(template.md5Sum, template.repository).success(function (data) {
-							LOADING_SCREEN('none');
-							SweetAlert.swal("Deleted!", "Your template has been deleted.", "success");
-							getTemplates();
-						}).error(function (data) {
-							LOADING_SCREEN('none');
-							SweetAlert.swal("ERROR!", "Your template is safe. Error: " + data, "error");
-						});
-					}
-				});
+				title: "Are you sure?",
+				text: "Delete template!",
+				type: "warning",
+				showCancelButton: true,
+				confirmButtonColor: "#ff3f3c",
+				confirmButtonText: "Delete",
+				cancelButtonText: "Cancel",
+				closeOnConfirm: false,
+				closeOnCancel: true,
+				showLoaderOnConfirm: true
+			},
+			function (isConfirm) {
+				if (isConfirm) {
+					LOADING_SCREEN();
+					kurjunSrv.deleteTemplate(template.md5Sum, template.repository).success(function (data) {
+						LOADING_SCREEN('none');
+						SweetAlert.swal("Deleted!", "Template has been deleted.", "success");
+						getTemplates();
+					}).error(function (data) {
+						LOADING_SCREEN('none');
+						SweetAlert.swal("ERROR!", data, "error");
+					});
+				}
+			});
 	}
 
 	function deleteAPT(apt) {
 		SweetAlert.swal({
-					title: "Are you sure?",
-					text: "Delete template!",
-					type: "warning",
-					showCancelButton: true,
-					confirmButtonColor: "#ff3f3c",
-					confirmButtonText: "Delete",
-					cancelButtonText: "Cancel",
-					closeOnConfirm: false,
-					closeOnCancel: true,
-					showLoaderOnConfirm: true
-				},
-				function (isConfirm) {
-					if (isConfirm) {
-						LOADING_SCREEN();
-						kurjunSrv.deleteAPT(apt.md5Sum).success(function (data) {
-							LOADING_SCREEN('none');
-							SweetAlert.swal("Deleted!", "Your APT has been deleted.", "success");
-							getAPTs();
-						}).error(function (data) {
-							LOADING_SCREEN('none');
-							SweetAlert.swal("ERROR!", "Your template is safe. Error: REST Endpoint is under modification", "error");
-						});
-					}
-				});
+				title: "Are you sure?",
+				text: "Delete template!",
+				type: "warning",
+				showCancelButton: true,
+				confirmButtonColor: "#ff3f3c",
+				confirmButtonText: "Delete",
+				cancelButtonText: "Cancel",
+				closeOnConfirm: false,
+				closeOnCancel: true,
+				showLoaderOnConfirm: true
+			},
+			function (isConfirm) {
+				if (isConfirm) {
+					LOADING_SCREEN();
+					kurjunSrv.deleteAPT(apt.md5Sum).success(function (data) {
+						LOADING_SCREEN('none');
+						SweetAlert.swal("Deleted!", "APT package has been deleted.", "success");
+						getAPTs();
+					}).error(function (data) {
+						LOADING_SCREEN('none');
+						SweetAlert.swal("ERROR!", data, "error");
+					});
+				}
+			});
 	}
 
 	function checkRepositoryStatus(repository) {
 		kurjunSrv.isUploadAllowed(repository).success(function (data) {
 			vm.isUploadAllowed = (data === 'false' ? false : true);
 		});
+	}
+
+	function setDefaultRepository() {
+		vm.currentTemplate.repository = vm.repositories[0];
+		vm.checkRepositoryStatus(vm.currentTemplate.repository)
 	}
 
 	cfpLoadingBar.start();
@@ -242,13 +248,13 @@ function KurjunViewCtrl($scope, $rootScope, kurjunSrv, SweetAlert, DTOptionsBuil
 function fileModel($parse) {
 	return {
 		restrict: 'A',
-		link: function(scope, element, attrs) {
+		link: function (scope, element, attrs) {
 			var model = $parse(attrs.fileModel);
 			var modelSetter = model.assign;
 
-			element.bind('change', function(){
+			element.bind('change', function () {
 				document.getElementById("js-uploadFile").value = element[0].files[0].name;
-				scope.$apply(function(){
+				scope.$apply(function () {
 					modelSetter(scope, element[0].files[0]);
 					fileUploder = element[0].files[0];
 				});

@@ -1,45 +1,54 @@
-<div class="b-popup b-popup_middle">
+<div class="b-popup b-popup">
 	<div class="b-popup__header">
 		<span>Add template</span>
 		<a href ng-click="closeThisDialog()">
 			<img src="assets/elements/buttons/b-icon-close.svg" class="b-icon g-right"/>
 		</a>
 	</div>
-	<form ng-submit="kurjunViewCtrl.proceedTemplate(kurjunViewCtrl.currentTemplate); processing=true">
+	<form ng-submit="kurjunCtrl.proceedTemplate(kurjunCtrl.currentTemplate); processing=true">
 		<div class="b-popup__body">
 
 			<div class="popup-body-box">
 				<label class="b-popup-body-label">Repository</label>
-				<select ng-init=""
-						class="b-popup-body-input b-popup-body-input_box"
-						ng-change="kurjunViewCtrl.checkRepositoryStatus(kurjunViewCtrl.currentTemplate.repository)"
-						ng-model="kurjunViewCtrl.currentTemplate.repository"
-						ng-options="repository for repository in kurjunViewCtrl.repositories">
+				<select ng-init="kurjunCtrl.setDefaultRepository()"
+						class="b-popup-body-input b-popup-body-input_full"
+						ng-change="kurjunCtrl.checkRepositoryStatus(kurjunCtrl.currentTemplate.repository)"
+						ng-model="kurjunCtrl.currentTemplate.repository"
+						ng-options="repository for repository in kurjunCtrl.repositories">
 				</select>
 				<div class="clear"></div>
 			</div>
 
-			<div class="popup-body-box">
+			<div class="popup-body-box" ng-if="!kurjunCtrl.isUploadAllowed">
+				<span class="b-error-h3">Sorry you haven't a permission to upload</span>
+				<br/>
+				<span class="b-error-h3"> to this repository. Try with another one</span>
+			</div>
+
+			<div class="popup-body-box" ng-if="kurjunCtrl.isUploadAllowed">
 				<label class="b-popup-body-label">Template upload</label>
+
 				<div class="b-file-uploader">
-					<div class="fileUpload b-btn b-btn_light-grey">
-						<span>Upload archive</span>
-						<input id="js-uploadBtn"
-							   type="file"
-							   class="upload"
-							   ngf-select
-							   ng-model="kurjunViewCtrl.currentTemplate.file"
-							   ng-disabled="!kurjunViewCtrl.isUploadAllowed"
-							   required/>
-					</div>
-					<input id="js-uploadFile"
-						   class="b-form-input b-form-input_fix-size-1"
-						   placeholder="{{ kurjunViewCtrl.currentTemplate.file.name ? kurjunViewCtrl.currentTemplate.file.name :  'Choose File' }}"
-						   disabled="disabled" />
+					<input type="text"
+						   placeholder="{{ kurjunCtrl.currentTemplate.file.name ? kurjunCtrl.currentTemplate.file.name : 'File name' }}"
+						   class="b-popup-body-input"
+						   disabled="disabled">
+					<label for="js-uploadBtn"
+						   class="b-popup-body-label"
+						   ng-class="!kurjunCtrl.isUploadAllowed ? 'disabled' : ''">Browse</label>
+					<input id="js-uploadBtn"
+						   type="file"
+						   class="upload"
+						   accept=".tar.gz, .deb"
+						   ng-hide="true"
+						   ngf-select
+						   ng-model="kurjunCtrl.currentTemplate.file"
+						   ng-disabled="!kurjunCtrl.isUploadAllowed"
+						   required/>
 				</div>
 				<div class="b-progress" ng-style="processing ? {'display':'block'} : {'display':'none'}">
-					<div class="b-progress-bar" ng-style="{'width': kurjunViewCtrl.currentTemplate.file.progress + '%'}">
-						{{ kurjunViewCtrl.currentTemplate.file.progress }}%
+					<div class="b-progress-bar" ng-style="{'width': kurjunCtrl.currentTemplate.file.progress + '%'}">
+						{{ kurjunCtrl.currentTemplate.file.progress }}%
 					</div>
 				</div>
 				<div class="clear"></div>
@@ -51,7 +60,10 @@
 					class="b-btn b-btn_green g-right"
 					type="submit"
 					id="subt_button__environment-add-domain"
-					ng-disabled="!kurjunViewCtrl.currentTemplate.repository || !kurjunViewCtrl.isUploadAllowed">
+					ng-disabled="!kurjunCtrl.currentTemplate.repository ||
+					!kurjunCtrl.isUploadAllowed ||
+					!kurjunCtrl.currentTemplate.file ||
+					processing">
 				Add
 			</button>
 			<div class="clear"></div>

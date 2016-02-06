@@ -99,6 +99,28 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 				}]
 			}
 		})
+		.state('change-pass', {
+			url: '/change-pass',
+			templateUrl: 'subutai-app/login/partials/change-pass.html',
+			data: {
+				bodyClass: '',
+				layout: 'default'
+			},
+			resolve: {
+				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+					return $ocLazyLoad.load([
+						{
+							name: 'subutai.login',
+							files: [
+								'subutai-app/login/login.js',
+								'subutai-app/login/controller.js',
+								'subutai-app/login/service.js'
+							]
+						}
+					])
+				}]
+			}
+		})
 		.state('home', {
 			url: '/',
 			templateUrl: 'subutai-app/monitoring/partials/view.html',
@@ -612,13 +634,13 @@ function VARS_MODAL_ERROR( object, text )
 }
 
 quotaColors = [];
-quotaColors['CUSTOM'] = 'blue';
-quotaColors['HUGE'] = 'bark-red';
-quotaColors['LARGE'] = 'red';
-quotaColors['MEDIUM'] = 'orange';
-quotaColors['SMALL'] = 'yellow';
-quotaColors['TINY'] = 'green';
-quotaColors['INACTIVE'] = 'grey';
+quotaColors['CUSTOM'] = '#000000';
+quotaColors['HUGE'] = '#0071bc';
+quotaColors['LARGE'] = '#22b573';
+quotaColors['MEDIUM'] = '#c1272d';
+quotaColors['SMALL'] = '#fbb03b';
+quotaColors['TINY'] = '#d9e021';
+quotaColors['INACTIVE'] = '#b3b3b3';
 
 var permissionsDefault = [
 	{

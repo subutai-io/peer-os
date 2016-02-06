@@ -4,9 +4,9 @@ angular.module('subutai.environment.service', [])
 	.factory('environmentService', environmentService);
 
 
-environmentService.$inject = ['$http'];
+environmentService.$inject = ['$http', 'peerRegistrationService'];
 
-function environmentService($http) {
+function environmentService($http, peerRegistrationService) {
 
 	var ENVIRONMENTS_URL = SERVER_URL + 'rest/ui/environments/';
 
@@ -20,8 +20,6 @@ function environmentService($http) {
 	var DOMAINS_URL = ENVIRONMENTS_URL + 'domains/';
 
 	var BLUEPRINT_URL = ENVIRONMENTS_URL + 'blueprints/';
-
-	var GROW_BLUEPRINT_URL = ENVIRONMENTS_URL + 'grow/';
 
 	var STRATEGIES_URL = ENVIRONMENTS_URL + 'strategies/';
 
@@ -92,11 +90,13 @@ function environmentService($http) {
 
 		startEnvironmentAutoBuild: startEnvironmentAutoBuild,
 
+		getRequestedPeers: getRequestedPeers,
+		getResourceHosts: getResourceHosts,
+
 		getServerUrl : function getServerUrl() { return ENVIRONMENTS_URL; }
 	};
 
 	return environmentService;
-
 
 
 
@@ -184,10 +184,10 @@ function environmentService($http) {
 		);
 	}
 
-	function growEnvironment(environmentId, data) {
-		var postData = 'environmentId=' + environmentId + '&blueprint_json=' + data;
+	function growEnvironment(environmentId, topology) {
+		var postData = 'topology=' + JSON.stringify( topology );
 		return $http.post(
-			GROW_BLUEPRINT_URL,
+			ENVIRONMENTS_URL + environmentId + '/grow',
 			postData, 
 			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
 		);
@@ -358,5 +358,17 @@ function environmentService($http) {
 			postData,
 			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
 		);
+	}
+
+	function getRequestedPeers() {
+		return peerRegistrationService.getRequestedPeers();
+	}
+
+	function getRequestedPeers() {
+		return peerRegistrationService.getRequestedPeers();
+	}
+
+	function getResourceHosts() {
+		return peerRegistrationService.getResourceHosts();
 	}
 }
