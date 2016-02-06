@@ -17,6 +17,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.objects.UserStatus;
 import io.subutai.common.security.objects.UserType;
 import io.subutai.core.identity.api.model.Role;
@@ -288,6 +289,6 @@ public class UserEntity implements User
     @Override
     public String getContext()
     {
-        return "IdentityManager";
+        return PermissionObject.IdentityManagement.getName();
     }
 }

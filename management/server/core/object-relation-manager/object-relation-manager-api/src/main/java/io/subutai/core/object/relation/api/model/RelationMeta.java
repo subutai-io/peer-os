@@ -17,58 +17,26 @@ public class RelationMeta
 
     private String keyId;
 
-    private String context;
-
-
     public RelationMeta()
     {
     }
 
-    //    public RelationMeta( final Object source, final String sourceId, final Object target, final String targetId,
-    //                         final Object object, final String objectId, final String keyId, final String context )
-    //    {
-    //        this.sourceId = sourceId;
-    //        this.sourcePath = source.getClass().getSimpleName();
-    //        this.targetId = targetId;
-    //        this.targetPath = target.getClass().getSimpleName();
-    //        this.objectId = objectId;
-    //        this.objectPath = object.getClass().getSimpleName();
-    //        this.keyId = keyId;
-    //        this.context = context;
-    //    }
-
-
     public RelationMeta( final RelationLink source, final RelationLink target, final RelationLink object,
-                         final String keyId, final String context )
+                         final String keyId)
     {
         this.source = source;
         this.target = target;
         this.object = object;
         this.keyId = keyId;
-        this.context = context;
     }
 
 
-    public RelationMeta( final RelationLink source, final RelationLink object, final String keyId,
-                         final String context )
+    public RelationMeta( final RelationLink source, final RelationLink object, final String keyId)
     {
         this.source = source;
         this.target = source;
         this.object = object;
         this.keyId = keyId;
-        this.context = context;
-    }
-
-
-    public String getContext()
-    {
-        return context;
-    }
-
-
-    public void setContext( final String context )
-    {
-        this.context = context;
     }
 
 

@@ -8,6 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.core.identity.api.model.UserDelegate;
 
 
@@ -95,6 +96,6 @@ public class UserDelegateEntity implements UserDelegate
     @Override
     public String getContext()
     {
-        return "LocalPeerManager";
+        return PermissionObject.IdentityManagement.getName();
     }
 }

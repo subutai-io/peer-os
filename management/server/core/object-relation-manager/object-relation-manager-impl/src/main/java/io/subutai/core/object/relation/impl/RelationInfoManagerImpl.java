@@ -11,6 +11,9 @@ import com.google.common.collect.Sets;
 
 import io.subutai.common.security.objects.Ownership;
 import io.subutai.common.security.relation.RelationLink;
+import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.model.User;
+import io.subutai.core.identity.api.model.UserDelegate;
 import io.subutai.core.object.relation.api.RelationInfoManager;
 import io.subutai.core.object.relation.api.model.Relation;
 import io.subutai.core.object.relation.api.model.RelationInfo;
@@ -29,12 +32,23 @@ public class RelationInfoManagerImpl implements RelationInfoManager
     private static final Logger logger = LoggerFactory.getLogger( RelationInfoManagerImpl.class );
     private boolean keyTrustCheckEnabled;
     private RelationDataService relationDataService;
+    private IdentityManager identityManager;
 
 
-    public RelationInfoManagerImpl( final RelationDataService relationDataService, final boolean keyTrustCheckEnabled )
+    public RelationInfoManagerImpl( final RelationDataService relationDataService, final boolean keyTrustCheckEnabled,
+                                    final IdentityManager identityManager )
     {
+        this.identityManager = identityManager;
         this.relationDataService = relationDataService;
         this.keyTrustCheckEnabled = keyTrustCheckEnabled;
+    }
+
+
+    private RelationMeta getUserLinkRelation( RelationLink relationLink )
+    {
+        User activeUser = identityManager.getActiveUser();
+        UserDelegate delegatedUser = identityManager.getUserDelegate( activeUser.getId() );
+        return new RelationMeta( delegatedUser, relationLink, relationLink.getLinkId() );
     }
 
 
@@ -126,11 +140,7 @@ public class RelationInfoManagerImpl implements RelationInfoManager
     /**
      * Compare relationship depending on each relationship property, if relation ownership level differs then this
      * relation is not comparable, the rest properties simply should match, and data format should come in key=value
-     * format
-     *  1 - a is greater
-     *  0 - equal
-     * -1 - a is less than
-     * -2 - incomparable
+     * format 1 - a is greater 0 - equal -1 - a is less than -2 - incomparable
      */
     private int compareRelationships( RelationInfo a, RelationInfo b )
     {
@@ -278,5 +288,121 @@ public class RelationInfoManagerImpl implements RelationInfoManager
         RelationInfoMeta relationInfoMeta = new RelationInfoMeta( false, false, true, false, Ownership.ALL.getLevel() );
         RelationInfo relationInfo = new RelationInfoImpl( relationInfoMeta );
         return isRelationValid( relationInfo, relationMeta );
+    }
+
+
+    @Override
+    public boolean ownerHasReadPermissions( final RelationLink relationLink )
+    {
+        RelationInfoMeta relationInfoMeta =
+                new RelationInfoMeta( true, false, false, false, Ownership.USER.getLevel() );
+        RelationInfo relationInfo = new RelationInfoImpl( relationInfoMeta );
+        return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
+    }
+
+
+    @Override
+    public boolean ownerHasWritePermissions( final RelationLink relationLink )
+    {
+        RelationInfoMeta relationInfoMeta =
+                new RelationInfoMeta( false, true, false, false, Ownership.USER.getLevel() );
+        RelationInfo relationInfo = new RelationInfoImpl( relationInfoMeta );
+        return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
+    }
+
+
+    @Override
+    public boolean ownerHasDeletePermissions( final RelationLink relationLink )
+    {
+        RelationInfoMeta relationInfoMeta =
+                new RelationInfoMeta( false, false, false, true, Ownership.USER.getLevel() );
+        RelationInfo relationInfo = new RelationInfoImpl( relationInfoMeta );
+        return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
+    }
+
+
+    @Override
+    public boolean ownerHasUpdatePermissions( final RelationLink relationLink )
+    {
+        RelationInfoMeta relationInfoMeta =
+                new RelationInfoMeta( false, false, true, false, Ownership.USER.getLevel() );
+        RelationInfo relationInfo = new RelationInfoImpl( relationInfoMeta );
+        return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
+    }
+
+
+    @Override
+    public boolean groupHasReadPermissions( final RelationLink relationLink )
+    {
+        RelationInfoMeta relationInfoMeta =
+                new RelationInfoMeta( true, false, false, false, Ownership.GROUP.getLevel() );
+        RelationInfo relationInfo = new RelationInfoImpl( relationInfoMeta );
+        return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
+    }
+
+
+    @Override
+    public boolean groupHasWritePermissions( final RelationLink relationLink )
+    {
+        RelationInfoMeta relationInfoMeta =
+                new RelationInfoMeta( false, true, false, false, Ownership.GROUP.getLevel() );
+        RelationInfo relationInfo = new RelationInfoImpl( relationInfoMeta );
+        return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
+    }
+
+
+    @Override
+    public boolean groupHasDeletePermissions( final RelationLink relationLink )
+    {
+        RelationInfoMeta relationInfoMeta =
+                new RelationInfoMeta( false, false, false, true, Ownership.GROUP.getLevel() );
+        RelationInfo relationInfo = new RelationInfoImpl( relationInfoMeta );
+        return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
+    }
+
+
+    @Override
+    public boolean groupHasUpdatePermissions( final RelationLink relationLink )
+    {
+        RelationInfoMeta relationInfoMeta =
+                new RelationInfoMeta( false, false, true, false, Ownership.GROUP.getLevel() );
+        RelationInfo relationInfo = new RelationInfoImpl( relationInfoMeta );
+        return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
+    }
+
+
+    @Override
+    public boolean allHasReadPermissions( final RelationLink relationLink )
+    {
+        RelationInfoMeta relationInfoMeta = new RelationInfoMeta( true, false, false, false, Ownership.ALL.getLevel() );
+        RelationInfo relationInfo = new RelationInfoImpl( relationInfoMeta );
+        return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
+    }
+
+
+    @Override
+    public boolean allHasWritePermissions( final RelationLink relationLink )
+    {
+        RelationInfoMeta relationInfoMeta = new RelationInfoMeta( false, true, false, false, Ownership.ALL.getLevel() );
+        RelationInfo relationInfo = new RelationInfoImpl( relationInfoMeta );
+        return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
+    }
+
+
+    @Override
+    public boolean allHasDeletePermissions( final RelationLink relationLink )
+    {
+        RelationInfoMeta relationInfoMeta = new RelationInfoMeta( false, false, false, true, Ownership.ALL.getLevel() );
+        RelationInfo relationInfo = new RelationInfoImpl( relationInfoMeta );
+        return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
+    }
+
+
+    @Override
+    public boolean allHasUpdatePermissions( final RelationLink relationLink )
+    {
+        RelationInfoMeta relationInfoMeta = new RelationInfoMeta( false, false, true, false, Ownership.ALL.getLevel() );
+        RelationInfo relationInfo = new RelationInfoImpl( relationInfoMeta );
+        return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
     }
 }

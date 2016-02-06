@@ -21,6 +21,7 @@
   </cm:property-placeholder>
 
   <reference id="securityManager" interface="io.subutai.core.security.api.SecurityManager" />
+  <reference id="identityManager" interface="io.subutai.core.identity.api.IdentityManager" />
 
   <!-- ************************************************************************************************* -->
   <bean id="daoManagerEnv" init-method="init" class="io.subutai.common.dao.DaoManager" activation="eager">
@@ -32,6 +33,7 @@
         class="io.subutai.core.object.relation.impl.RelationManagerImpl">
     <property name="daoManager" ref="daoManagerEnv" />
     <property name="securityManager" ref="securityManager" />
+    <property name="identityManager" ref="identityManager" />
     <property name="keyTrustCheckEnabled" value="${keyTrustCheckEnabled}" />
   </bean>
 

@@ -1,6 +1,7 @@
 package io.subutai.core.object.relation.api;
 
 
+import io.subutai.common.security.relation.RelationLink;
 import io.subutai.core.object.relation.api.model.RelationMeta;
 
 
@@ -38,4 +39,28 @@ public interface RelationInfoManager
     boolean allHasDeletePermissions( RelationMeta relationMeta );
 
     boolean allHasUpdatePermissions( RelationMeta relationMeta );
+
+    boolean ownerHasReadPermissions( RelationLink relationLink );
+
+    boolean ownerHasWritePermissions( RelationLink relationLink );
+
+    boolean ownerHasDeletePermissions( RelationLink relationLink );
+
+    boolean ownerHasUpdatePermissions( RelationLink relationLink );
+
+    boolean groupHasReadPermissions( RelationLink relationLink );
+
+    boolean groupHasWritePermissions( RelationLink relationLink );
+
+    boolean groupHasDeletePermissions( RelationLink relationLink );
+
+    boolean groupHasUpdatePermissions( RelationLink relationLink );
+
+    boolean allHasReadPermissions( RelationLink relationLink );
+
+    boolean allHasWritePermissions( RelationLink relationLink );
+
+    boolean allHasDeletePermissions( RelationLink relationLink );
+
+    boolean allHasUpdatePermissions( RelationLink relationLink );
 }

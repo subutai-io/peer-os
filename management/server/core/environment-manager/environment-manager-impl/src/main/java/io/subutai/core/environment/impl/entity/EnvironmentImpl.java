@@ -386,8 +386,7 @@ public class EnvironmentImpl implements Environment, Serializable
                 {
                     final EnvironmentContainerHost containerHost = iterator.next();
                     RelationMeta relationMeta =
-                            new RelationMeta( activeUser, activeUser, containerHost, containerHost.getId(),
-                                    PermissionObject.EnvironmentManagement.getName() );
+                            new RelationMeta( activeUser, activeUser, containerHost, containerHost.getId() );
                     boolean trustedRelation =
                             relationManager.getRelationInfoManager().allHasReadPermissions( relationMeta );
 
@@ -684,6 +683,6 @@ public class EnvironmentImpl implements Environment, Serializable
     @Override
     public String getContext()
     {
-        return "EnvironmentManager";
+        return PermissionObject.EnvironmentManagement.getName();
     }
 }

@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.security.relation.RelationLink;
+import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.object.relation.api.RelationManager;
 import io.subutai.core.object.relation.api.RelationVerificationException;
 import io.subutai.core.object.relation.api.model.Relation;
@@ -30,6 +31,7 @@ public class RelationManagerImpl implements RelationManager
     private static final Logger logger = LoggerFactory.getLogger( RelationManagerImpl.class );
     private static final String context = "RelationManager";
     private SecurityManager securityManager;
+    private IdentityManager identityManager;
     private RelationMessageManagerImpl trustMessageManager;
     private RelationInfoManagerImpl relationInfoManager;
     private DaoManager daoManager = null;
@@ -42,13 +44,19 @@ public class RelationManagerImpl implements RelationManager
     {
         relationDataService = new RelationDataService( daoManager );
         trustMessageManager = new RelationMessageManagerImpl( securityManager );
-        relationInfoManager = new RelationInfoManagerImpl( relationDataService, keyTrustCheckEnabled );
+        relationInfoManager = new RelationInfoManagerImpl( relationDataService, keyTrustCheckEnabled, identityManager );
     }
 
 
     public void setDaoManager( final DaoManager daoManager )
     {
         this.daoManager = daoManager;
+    }
+
+
+    public void setIdentityManager( final IdentityManager identityManager )
+    {
+        this.identityManager = identityManager;
     }
 
 
