@@ -9,13 +9,27 @@ import javax.ws.rs.core.Response;
 
 
 /**
- * Created by ermek on 2/5/16.
+ * Created by ermek on 2/6/16.
  */
 public interface RestService
 {
     @GET
-    @Path( "subutai/about" )
-    @Produces( { MediaType.TEXT_PLAIN } )
+    @Path( "about" )
+    @Produces( { MediaType.APPLICATION_JSON } )
     public Response getSubutaiInfo();
 
+    @GET
+    @Path( "peer_settings" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getPeerSettings();
+
+    @GET
+    @Path( "kurjun_settings" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getKurjunSettings();
+
+    @GET
+    @Path( "peer_policy" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getPeerPolicy();
 }

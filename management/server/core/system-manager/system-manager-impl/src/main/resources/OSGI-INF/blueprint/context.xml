@@ -8,9 +8,6 @@
             http://www.w3.org/2001/XMLSchema-instance http://www.w3.org/2001/XMLSchema-instance
             http://aries.apache.org/xmlns/jpa/v1.0.0 http://aries.apache.org/xmlns/jpa/v1.0.0">
 
-  <!--<reference id="identityManager" availability="mandatory"-->
-             <!--interface="io.subutai.core.identity.api.IdentityManager" />-->
-
   <!-- ***************************************************************** -->
   <!--<bean id="daoManagerPlugin" init-method="init" class="io.subutai.common.dao.DaoManager" scope="prototype">-->
     <!--<jpa:unit unitname="PluginInjectorConfigPUnit" property="entityManagerFactory" />-->
@@ -20,11 +17,10 @@
 
   <bean id="systemManagerImpl" scope="singleton"
         class="io.subutai.core.systemmanager.impl.SystemManagerImpl">
-    <!--<property name="identityManager" ref="identityManager" />-->
     <!--<argument ref="daoManagerPlugin" />-->
   </bean>
 
   <service ref="systemManagerImpl"
-           interface="io.subutai.core.pluginmanager.api.PluginManager" />
+           interface="io.subutai.core.systemmanager.api.SystemManager" />
 
 </blueprint>

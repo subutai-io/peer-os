@@ -5,7 +5,7 @@
 
   http://cxf.apache.org/blueprint/jaxrs http://cxf.apache.org/schemas/blueprint/jaxrs.xsd">
 
-  <cxf:bus id="cxfBusSystem">
+  <cxf:bus id="cxfBusSystemManger">
     <cxf:features>
       <cxf:logging />
     </cxf:features>
@@ -14,14 +14,21 @@
   <reference id="systemManager" availability="mandatory"
              interface="io.subutai.core.systemmanager.api.SystemManager" />
 
-  <bean id="systemImpl" class="io.subutai.core.systemmanager.rest.RestServiceImpl">
+  <reference id="peerManager" availability="mandatory"
+             interface="io.subutai.core.peer.api.PeerManager" />
+
+  <bean id="systemManagerRestServiceImpl" class="io.subutai.core.systemmanager.rest.RestServiceImpl">
     <property name="systemManager" ref="systemManager" />
+    <property name="peerManager" ref="peerManager" />
   </bean>
 
-  <jaxrs:server address="/v1/system" id="systemRestService">
+  <jaxrs:server address="/v1/system" id="systemManagerRestService">
     <jaxrs:serviceBeans>
-      <ref component-id="systemImpl" />
+      <ref component-id="systemManagerRestServiceImpl" />
     </jaxrs:serviceBeans>
+    <jaxrs:providers>
+      <bean class="org.codehaus.jackson.jaxrs.JacksonJsonProvider" />
+    </jaxrs:providers>
   </jaxrs:server>
 
 </blueprint>
