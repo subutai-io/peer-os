@@ -127,19 +127,22 @@ public class NetworkManagerImpl implements NetworkManager
 
         StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
 
+        PingDistance distance = new PingDistance( sourceHostIp, targetHostIp, null, null, null, null );
         Pattern p = Pattern.compile( "^rtt.*(\\d+\\.\\d+)/(\\d+\\.\\d+)/(\\d+\\.\\d+)/(\\d+\\.\\d+).*" );
 
-        Matcher m = p.matcher( result.getStdOut() );
+        while ( st.hasMoreTokens() )
+        {
+            String nextToken = st.nextToken();
+            Matcher m = p.matcher( nextToken );
 
-        if ( m.find() && m.groupCount() == 4 )
-        {
-            return new PingDistance( sourceHostIp, targetHostIp, new Double( m.group( 1 ) ), new Double( m.group( 2 ) ),
-                    new Double( m.group( 3 ) ), new Double( m.group( 4 ) ) );
+            if ( m.find() && m.groupCount() == 4 )
+            {
+                distance = new PingDistance( sourceHostIp, targetHostIp, new Double( m.group( 1 ) ),
+                        new Double( m.group( 2 ) ), new Double( m.group( 3 ) ), new Double( m.group( 4 ) ) );
+                break;
+            }
         }
-        else
-        {
-            return new PingDistance( sourceHostIp, targetHostIp, null, null, null, null );
-        }
+        return distance;
     }
 
 

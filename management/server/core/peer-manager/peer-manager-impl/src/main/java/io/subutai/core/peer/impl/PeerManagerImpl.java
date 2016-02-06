@@ -1057,9 +1057,8 @@ public class PeerManagerImpl implements PeerManager
                 {
                     continue;
                 }
-                ControlNetworkConfig config =
-                        new ControlNetworkConfig( peer.getId(), addresses[data.getOrder()], localPeerId.toLowerCase(),
-                                key, controlNetworkTtl );
+                ControlNetworkConfig config = new ControlNetworkConfig( peer.getId(), addresses[data.getOrder() - 1],
+                        localPeerId.toLowerCase(), key, controlNetworkTtl );
                 updateTasks.add( new UpdateControlNetworkTask( config ) );
             }
             final ExecutorService pool = Executors.newFixedThreadPool( updateTasks.size() );
