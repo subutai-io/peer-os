@@ -85,6 +85,23 @@ public class MessageContentUtil
         int status = currentStatus;
         String basePath = url.getPath();
 
+        if ( basePath.startsWith( "/rest/kurjun" ) )
+        {
+            status = 1;
+        }
+        else
+        {
+            if ( ChannelSettings.checkURLArray( basePath, ChannelSettings.URL_ACCESS_PX1 ) == 0 )
+            {
+                status = 1;
+            }
+            else
+            {
+                status = 0;
+            }
+        }
+
+        /*
         if ( url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X1 ) || url.getPort() == 8080 )
         {
             if ( ChannelSettings.checkURLArray( basePath, ChannelSettings.URL_ACCESS_PX1 ) == 0 )
@@ -113,7 +130,7 @@ public class MessageContentUtil
         else
         {
             status = 0;
-        }
+        }*/
 
         return status;
     }
