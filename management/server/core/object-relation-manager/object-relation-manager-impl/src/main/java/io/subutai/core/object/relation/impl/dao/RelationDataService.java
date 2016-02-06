@@ -12,8 +12,8 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Lists;
 
 import io.subutai.common.dao.DaoManager;
+import io.subutai.common.security.relation.RelationLink;
 import io.subutai.core.object.relation.api.model.Relation;
-import io.subutai.core.object.relation.api.model.RelationLink;
 import io.subutai.core.object.relation.impl.model.RelationImpl;
 import io.subutai.core.object.relation.impl.model.RelationLinkImpl;
 

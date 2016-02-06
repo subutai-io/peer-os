@@ -1,4 +1,4 @@
-package io.subutai.core.object.relation.api.model;
+package io.subutai.common.security.relation;
 
 
 import java.io.Serializable;
@@ -9,7 +9,7 @@ import java.io.Serializable;
  */
 public interface RelationLink extends Serializable
 {
-    String getId();
+    String getLinkId();
 
     String getUniqueIdentifier();
 

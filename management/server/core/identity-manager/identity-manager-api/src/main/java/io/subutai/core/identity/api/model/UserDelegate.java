@@ -1,10 +1,13 @@
 package io.subutai.core.identity.api.model;
 
 
+import io.subutai.common.security.relation.RelationLink;
+
+
 /**
  * Delegate for User
  */
-public interface UserDelegate
+public interface UserDelegate extends RelationLink
 {
 
     String getId();

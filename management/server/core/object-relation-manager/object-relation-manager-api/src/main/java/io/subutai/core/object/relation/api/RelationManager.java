@@ -3,10 +3,10 @@ package io.subutai.core.object.relation.api;
 
 import java.util.List;
 
+import io.subutai.common.security.relation.RelationLink;
 import io.subutai.core.object.relation.api.model.Relation;
 import io.subutai.core.object.relation.api.model.RelationInfo;
 import io.subutai.core.object.relation.api.model.RelationInfoMeta;
-import io.subutai.core.object.relation.api.model.RelationLink;
 import io.subutai.core.object.relation.api.model.RelationMeta;
 
 

@@ -363,8 +363,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
                 if ( activeUser != null )
                 {
                     RelationMeta relationMeta =
-                            new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), environment,
-                                    environment.getId(), environment.getId(),
+                            new RelationMeta( activeUser, activeUser, environment, environment.getId(),
                                     PermissionObject.EnvironmentManagement.getName() );
                     boolean trustedRelation =
                             relationManager.getRelationInfoManager().groupHasWritePermissions( relationMeta );
@@ -656,5 +655,33 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
             return hostname.compareTo( o.getHostname() );
         }
         return -1;
+    }
+
+
+    @Override
+    public String getLinkId()
+    {
+        return String.format( "%s|%s", getClassPath(), getUniqueIdentifier() );
+    }
+
+
+    @Override
+    public String getUniqueIdentifier()
+    {
+        return getId();
+    }
+
+
+    @Override
+    public String getClassPath()
+    {
+        return this.getClass().getSimpleName();
+    }
+
+
+    @Override
+    public String getContext()
+    {
+        return "EnvironmentManager";
     }
 }

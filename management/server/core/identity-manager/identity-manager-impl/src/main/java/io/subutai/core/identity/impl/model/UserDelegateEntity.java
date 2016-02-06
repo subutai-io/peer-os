@@ -70,4 +70,31 @@ public class UserDelegateEntity implements UserDelegate
     {
         this.type = type;
     }
+
+    @Override
+    public String getLinkId()
+    {
+        return String.format("%s|%s", getClassPath(), getUniqueIdentifier() );
+    }
+
+
+    @Override
+    public String getUniqueIdentifier()
+    {
+        return getId();
+    }
+
+
+    @Override
+    public String getClassPath()
+    {
+        return this.getClass().getSimpleName();
+    }
+
+
+    @Override
+    public String getContext()
+    {
+        return "LocalPeerManager";
+    }
 }

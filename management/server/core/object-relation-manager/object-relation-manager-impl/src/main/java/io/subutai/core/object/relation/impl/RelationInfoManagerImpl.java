@@ -10,11 +10,11 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.security.objects.Ownership;
+import io.subutai.common.security.relation.RelationLink;
 import io.subutai.core.object.relation.api.RelationInfoManager;
 import io.subutai.core.object.relation.api.model.Relation;
 import io.subutai.core.object.relation.api.model.RelationInfo;
 import io.subutai.core.object.relation.api.model.RelationInfoMeta;
-import io.subutai.core.object.relation.api.model.RelationLink;
 import io.subutai.core.object.relation.api.model.RelationMeta;
 import io.subutai.core.object.relation.impl.dao.RelationDataService;
 import io.subutai.core.object.relation.impl.model.RelationInfoImpl;
@@ -50,12 +50,10 @@ public class RelationInfoManagerImpl implements RelationInfoManager
 
         Set<RelationLink> relationLinks = Sets.newHashSet();
 
-        RelationLinkImpl target = new RelationLinkImpl( relationMeta.getSourceId(), relationMeta.getSourcePath(),
-                relationMeta.getContext() );
+        RelationLinkImpl target = new RelationLinkImpl( relationMeta.getSource() );
         List<Relation> byTargetRelations = relationDataService.findByTarget( target );
 
-        RelationLinkImpl object = new RelationLinkImpl( relationMeta.getObjectId(), relationMeta.getObjectPath(),
-                relationMeta.getContext() );
+        RelationLinkImpl object = new RelationLinkImpl( relationMeta.getObject() );
         List<Relation> bySourceRelations = relationDataService.findBySource( target );
 
         // When relation info is found check that relation was granted from verified source

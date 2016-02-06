@@ -100,7 +100,8 @@ public class ContainerCloneStep
         if ( requestedContainerCount > totalAvailableIpCount )
         {
             throw new EnvironmentCreationException(
-                    String.format( "Requested %d containers but only %d ip " + "" + "" + "addresses available",
+                    String.format                                          ( "Requested %d containers but only %d ip "
+                            + "" + "" + "" + "addresses available",
                             requestedContainerCount, totalAvailableIpCount ) );
         }
 
@@ -117,7 +118,7 @@ public class ContainerCloneStep
             Peer peer = peerManager.getPeer( peerPlacement.getKey() );
             logger.debug( String.format( "Scheduling node group task on peer %s", peer.getId() ) );
 
-            taskCompletionService.submit(
+            taskCompletionService.submit                                                               (
                     new CreatePeerNodeGroupsTask( peer, peerPlacement.getValue(), peerManager.getLocalPeer(),
                             environment, currentLastUsedIpIndex + 1, templateRegistry, defaultDomain ) );
 
@@ -182,15 +183,9 @@ public class ContainerCloneStep
                 //TODO create environment <-> container ownership
 
                 RelationMeta relationMeta = new RelationMeta();
-                relationMeta.setSourceId( String.valueOf( activeUser.getId() ) );
-                relationMeta.setSourcePath( activeUser.getClass().getSimpleName() );
-
-                relationMeta.setTargetId( environment.getId() );
-                relationMeta.setTargetPath( environment.getClass().getSimpleName() );
-
-                relationMeta.setObjectId( container.getId() );
-                relationMeta.setObjectPath( container.getClass().getSimpleName() );
-
+                relationMeta.setSource( activeUser );
+                relationMeta.setTarget( environment );
+                relationMeta.setObject( container );
 
                 RelationInfoMeta relationInfoMeta =
                         new RelationInfoMeta( true, true, true, true, Ownership.USER.getLevel() );

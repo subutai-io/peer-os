@@ -3,8 +3,10 @@ package io.subutai.core.identity.api.model;
 
 import java.util.List;
 
+import io.subutai.common.security.relation.RelationLink;
 
-public interface User
+
+public interface User extends RelationLink
 {
 
 

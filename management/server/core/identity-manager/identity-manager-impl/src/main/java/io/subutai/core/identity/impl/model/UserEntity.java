@@ -16,8 +16,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-import javax.persistence.Transient;
-import javax.security.auth.Subject;
 
 import io.subutai.common.security.objects.UserStatus;
 import io.subutai.common.security.objects.UserType;
@@ -266,4 +264,30 @@ public class UserEntity implements User
     }
 
 
+    @Override
+    public String getLinkId()
+    {
+        return String.format("%s|%s", getClassPath(), getUniqueIdentifier() );
+    }
+
+
+    @Override
+    public String getUniqueIdentifier()
+    {
+        return String.valueOf( getId() );
+    }
+
+
+    @Override
+    public String getClassPath()
+    {
+        return this.getClass().getSimpleName();
+    }
+
+
+    @Override
+    public String getContext()
+    {
+        return "IdentityManager";
+    }
 }

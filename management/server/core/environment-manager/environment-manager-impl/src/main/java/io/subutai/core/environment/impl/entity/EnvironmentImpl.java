@@ -386,8 +386,7 @@ public class EnvironmentImpl implements Environment, Serializable
                 {
                     final EnvironmentContainerHost containerHost = iterator.next();
                     RelationMeta relationMeta =
-                            new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), containerHost,
-                                    containerHost.getId(), containerHost.getId(),
+                            new RelationMeta( activeUser, activeUser, containerHost, containerHost.getId(),
                                     PermissionObject.EnvironmentManagement.getName() );
                     boolean trustedRelation =
                             relationManager.getRelationInfoManager().allHasReadPermissions( relationMeta );
@@ -658,5 +657,33 @@ public class EnvironmentImpl implements Environment, Serializable
                 + ", tunnelNetwork='" + tunnelNetwork + '\'' + ", containers=" + containers + ", peerConfs=" + peerConfs
                 + ", status=" + status + ", sshKeys='" + sshKeys + '\'' + ", userId=" + userId + ", alertHandlers="
                 + alertHandlers + ", envId=" + envId + '}';
+    }
+
+
+    @Override
+    public String getLinkId()
+    {
+        return String.format( "%s|%s", getClassPath(), getUniqueIdentifier() );
+    }
+
+
+    @Override
+    public String getUniqueIdentifier()
+    {
+        return getId();
+    }
+
+
+    @Override
+    public String getClassPath()
+    {
+        return this.getClass().getSimpleName();
+    }
+
+
+    @Override
+    public String getContext()
+    {
+        return "EnvironmentManager";
     }
 }

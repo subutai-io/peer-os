@@ -8,7 +8,9 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import io.subutai.core.object.relation.api.model.RelationLink;
+import com.google.common.base.Preconditions;
+
+import io.subutai.common.security.relation.RelationLink;
 
 
 /**
@@ -20,8 +22,8 @@ import io.subutai.core.object.relation.api.model.RelationLink;
 public class RelationLinkImpl implements RelationLink
 {
     @Id
-    @Column( name = "item_id" )
-    private String id;
+    @Column( name = "link_id" )
+    private String linkId;
 
     @Column( name = "unique_identifier" )
     private String uniqueIdentifier;
@@ -42,15 +44,25 @@ public class RelationLinkImpl implements RelationLink
     {
         this.uniqueIdentifier = uniqueIdentifier;
         this.classPath = classPath;
-        this.id = classPath + "|" + uniqueIdentifier;
+        this.linkId = classPath + "|" + uniqueIdentifier;
         this.context = context;
     }
 
 
-    @Override
-    public String getId()
+    public RelationLinkImpl( RelationLink relationLink )
     {
-        return id;
+        Preconditions.checkNotNull( relationLink, "Error relationLink is null." );
+        this.uniqueIdentifier = relationLink.getUniqueIdentifier();
+        this.classPath = relationLink.getClassPath();
+        this.linkId = relationLink.getLinkId();
+        this.context = relationLink.getContext();
+    }
+
+
+    @Override
+    public String getLinkId()
+    {
+        return linkId;
     }
 
 
@@ -81,9 +93,9 @@ public class RelationLinkImpl implements RelationLink
     }
 
 
-    public void setId( final String id )
+    public void setLinkId( final String id )
     {
-        this.id = id;
+        this.linkId = id;
     }
 
 
@@ -135,7 +147,7 @@ public class RelationLinkImpl implements RelationLink
     public String toString()
     {
         return "RelationLinkImpl{" +
-                "id=" + id +
+                "id=" + linkId +
                 ", uniqueIdentifier='" + uniqueIdentifier + '\'' +
                 ", classPath='" + classPath + '\'' +
                 '}';

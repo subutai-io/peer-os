@@ -65,6 +65,7 @@ import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.objects.PermissionOperation;
 import io.subutai.common.security.objects.PermissionScope;
 import io.subutai.common.security.objects.SecurityKeyType;
+import io.subutai.common.security.relation.RelationLink;
 import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.ExceptionUtil;
@@ -93,8 +94,16 @@ import io.subutai.core.environment.impl.workflow.modification.SshKeyAdditionWork
 import io.subutai.core.environment.impl.workflow.modification.SshKeyRemovalWorkflow;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
+import io.subutai.core.identity.api.model.UserDelegate;
 import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.network.api.NetworkManager;
+import io.subutai.core.object.relation.api.RelationManager;
+import io.subutai.core.object.relation.api.RelationVerificationException;
+import io.subutai.core.object.relation.api.model.Relation;
+import io.subutai.core.object.relation.api.model.RelationInfo;
+import io.subutai.core.object.relation.api.model.RelationInfoMeta;
+import io.subutai.core.object.relation.api.model.RelationMeta;
+import io.subutai.core.object.relation.api.model.RelationStatus;
 import io.subutai.core.peer.api.PeerAction;
 import io.subutai.core.peer.api.PeerActionListener;
 import io.subutai.core.peer.api.PeerActionResponse;
@@ -103,14 +112,6 @@ import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.tracker.api.Tracker;
-import io.subutai.core.object.relation.api.RelationManager;
-import io.subutai.core.object.relation.api.RelationVerificationException;
-import io.subutai.core.object.relation.api.model.Relation;
-import io.subutai.core.object.relation.api.model.RelationInfo;
-import io.subutai.core.object.relation.api.model.RelationInfoMeta;
-import io.subutai.core.object.relation.api.model.RelationLink;
-import io.subutai.core.object.relation.api.model.RelationMeta;
-import io.subutai.core.object.relation.api.model.RelationStatus;
 
 
 @PermitAll
@@ -281,15 +282,16 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         User activeUser = identityManager.getActiveUser();
 
         final boolean viewAll = identityManager
-                .isUserPermitted( activeUser, PermissionObject.EnvironmentManagement, PermissionScope.ALL_SCOPE,
+                .isUserPermitted                 ( activeUser, PermissionObject.EnvironmentManagement,
+                        PermissionScope.ALL_SCOPE,
                         PermissionOperation.Read );
 
 
         Set<Environment> environments = new HashSet<>();
         for ( Environment environment : environmentDataService.getAll() )
         {
-            RelationMeta relationMeta = new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), environment,
-                    environment.getId(), environment.getId(), PermissionObject.EnvironmentManagement.getName() );
+            RelationMeta relationMeta = new RelationMeta( activeUser, environment, environment.getId(),
+                    PermissionObject.EnvironmentManagement.getName() );
             boolean trustedRelation = relationManager.getRelationInfoManager().allHasReadPermissions( relationMeta );
             if ( environment.getUserId().equals( activeUser.getId() ) || trustedRelation )
             {
@@ -360,7 +362,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
 
         //create operation tracker
-        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
+        TrackerOperation operationTracker = tracker.createTrackerOperation       ( MODULE_NAME,
                 String.format( "Creating environment %s ", environment.getId() ) );
 
         //launch environment creation workflow
@@ -415,7 +417,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
 
         //create operation tracker
-        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
+        TrackerOperation operationTracker = tracker.createTrackerOperation                 ( MODULE_NAME,
                 String.format( "Creating environment %s ", topology.getEnvironmentName() ) );
 
         //collect participating peers
@@ -534,15 +536,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             {
                 ContainerSize containerType = entry.getKey().getType();
 
-                environment.addContainers( Sets.newHashSet(
+                environment.addContainers                                     ( Sets.newHashSet(
                         new EnvironmentContainerImpl( peerManager.getLocalPeer().getId(), peerManager.getLocalPeer(),
                                 entry.getKey().getName(), new ContainerHostInfoModel( newHost ),
                                 templateRegistry.getTemplate( entry.getKey().getTemplateName() ),
                                 entry.getKey().getSshGroupId(), entry.getKey().getHostsGroupId(),
-                                Common.DEFAULT_DOMAIN_NAME, containerType ) ) );
+                                Common.DEFAULT_DOMAIN_NAME, containerType )                    ) );
             }
         }
-        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
+        TrackerOperation operationTracker = tracker.createTrackerOperation       ( MODULE_NAME,
                 String.format( "Creating environment %s ", environment.getId() ) );
 
         EnvironmentImportWorkflow environmentImportWorkflow =
@@ -578,9 +580,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
         User activeUser = identityManager.getActiveUser();
 
-        RelationMeta relationMeta =
-                new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), environment, environmentId,
-                        environment.getId(), PermissionObject.EnvironmentManagement.getName() );
+        RelationMeta relationMeta = new RelationMeta( activeUser, environment, environment.getId(),
+                PermissionObject.EnvironmentManagement.getName() );
 
         if ( !relationManager.getRelationInfoManager().groupHasUpdatePermissions( relationMeta ) )
         {
@@ -696,15 +697,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         User activeUser = identityManager.getActiveUser();
 
-        RelationMeta relationMeta =
-                new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), environment, environmentId,
-                        environment.getId(), PermissionObject.EnvironmentManagement.getName() );
+        RelationMeta relationMeta = new RelationMeta( activeUser, environment, environment.getId(),
+                PermissionObject.EnvironmentManagement.getName() );
         if ( !relationManager.getRelationInfoManager().allHasUpdatePermissions( relationMeta ) )
         {
             throw new EnvironmentNotFoundException();
         }
 
-        TrackerOperation op = tracker.createTrackerOperation( MODULE_NAME,
+        TrackerOperation op = tracker.createTrackerOperation                                   ( MODULE_NAME,
                 String.format( "Adding ssh key %s to environment %s ", sshKey, environmentId ) );
 
         final SshKeyAdditionWorkflow sshKeyAdditionWorkflow =
@@ -746,15 +746,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         User activeUser = identityManager.getActiveUser();
 
-        RelationMeta relationMeta =
-                new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), environment, environmentId,
-                        environment.getId(), PermissionObject.EnvironmentManagement.getName() );
+        RelationMeta relationMeta = new RelationMeta( activeUser, environment, environment.getId(),
+                PermissionObject.EnvironmentManagement.getName() );
         if ( !relationManager.getRelationInfoManager().allHasUpdatePermissions( relationMeta ) )
         {
             throw new EnvironmentNotFoundException();
         }
 
-        TrackerOperation op = tracker.createTrackerOperation( MODULE_NAME,
+        TrackerOperation op = tracker.createTrackerOperation                                       ( MODULE_NAME,
                 String.format( "Removing ssh key %s from environment %s ", sshKey, environmentId ) );
 
         final SshKeyRemovalWorkflow sshKeyRemovalWorkflow =
@@ -798,15 +797,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         User activeUser = identityManager.getActiveUser();
 
-        RelationMeta relationMeta =
-                new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), environment, environmentId,
-                        environment.getId(), PermissionObject.EnvironmentManagement.getName() );
+        RelationMeta relationMeta = new RelationMeta( activeUser, environment, environment.getId(),
+                PermissionObject.EnvironmentManagement.getName() );
         if ( !relationManager.getRelationInfoManager().allHasUpdatePermissions( relationMeta ) )
         {
             throw new EnvironmentNotFoundException();
         }
 
-        TrackerOperation op = tracker.createTrackerOperation( MODULE_NAME,
+        TrackerOperation op = tracker.createTrackerOperation                                   ( MODULE_NAME,
                 String.format( "Resetting p2p secret key for environment %s ", environmentId ) );
 
         final P2PSecretKeyModificationWorkflow p2PSecretKeyModificationWorkflow =
@@ -880,16 +878,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
         User activeUser = identityManager.getActiveUser();
 
-        RelationMeta relationMeta =
-                new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), environment, environmentId,
-                        environment.getId(), PermissionObject.EnvironmentManagement.getName() );
+        RelationMeta relationMeta = new RelationMeta( activeUser, environment, environment.getId(),
+                PermissionObject.EnvironmentManagement.getName() );
 
         if ( !relationManager.getRelationInfoManager().allHasDeletePermissions( relationMeta ) )
         {
             throw new EnvironmentNotFoundException();
         }
 
-        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
+        TrackerOperation operationTracker = tracker.createTrackerOperation  ( MODULE_NAME,
                 String.format( "Destroying environment %s", environmentId ) );
 
         if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
@@ -902,7 +899,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         final EnvironmentDestructionWorkflow environmentDestructionWorkflow =
                 getEnvironmentDestructionWorkflow( peerManager, this, environment, forceMetadataRemoval,
-                        operationTracker );
+                        operationTracker         );
 
         executor.execute( new Runnable()
         {
@@ -959,11 +956,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         User activeUser = identityManager.getActiveUser();
 
         final boolean deleteAll = identityManager
-                .isUserPermitted( activeUser, PermissionObject.EnvironmentManagement, PermissionScope.ALL_SCOPE,
+                .isUserPermitted                   ( activeUser, PermissionObject.EnvironmentManagement,
+                        PermissionScope.ALL_SCOPE,
                         PermissionOperation.Delete );
-        RelationMeta relationMeta =
-                new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), environment, environmentId,
-                        environment.getId(), PermissionObject.EnvironmentManagement.getName() );
+        RelationMeta relationMeta = new RelationMeta( activeUser, environment, environmentId,
+                PermissionObject.EnvironmentManagement.getName() );
         boolean canDelete = relationManager.getRelationInfoManager().allHasDeletePermissions( relationMeta );
         if ( !( deleteAll || environment.getUserId().equals( activeUser.getId() ) || canDelete ) )
         {
@@ -985,8 +982,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         try
         {
             environmentContainer = environment.getContainerHostById( containerId );
-            relationMeta = new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), environmentContainer,
-                    containerId, environmentContainer.getId(), PermissionObject.EnvironmentManagement.getName() );
+            relationMeta = new RelationMeta( activeUser, environmentContainer, environmentContainer.getId(),
+                    PermissionObject.EnvironmentManagement.getName() );
             if ( !relationManager.getRelationInfoManager().allHasDeletePermissions( relationMeta ) )
             {
                 throw new ContainerHostNotFoundException( "Container host not found." );
@@ -1002,7 +999,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         final ContainerDestructionWorkflow containerDestructionWorkflow =
                 getContainerDestructionWorkflow( this, environment, environmentContainer, forceMetadataRemoval,
-                        operationTracker );
+                        operationTracker       );
 
         executor.execute( new Runnable()
         {
@@ -1053,9 +1050,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         //check access to environment
         User activeUser = identityManager.getActiveUser();
 
-        RelationMeta relationMeta =
-                new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), environment, environment.getId(),
-                        environment.getId(), PermissionObject.EnvironmentManagement.getName() );
+        RelationMeta relationMeta = new RelationMeta( activeUser, environment, environment.getId(),
+                PermissionObject.EnvironmentManagement.getName() );
 
         if ( !relationManager.getRelationInfoManager().allHasReadPermissions( relationMeta ) )
         {
@@ -1089,13 +1085,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         Environment environment = loadEnvironment( environmentId );
 
         User activeUser = identityManager.getActiveUser();
-        RelationMeta relationMeta =
-                new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), environment, environmentId,
-                        environment.getId(), PermissionObject.EnvironmentManagement.getName() );
+        RelationMeta relationMeta = new RelationMeta( activeUser, environment, environmentId,
+                PermissionObject.EnvironmentManagement.getName() );
         boolean canDelete = relationManager.getRelationInfoManager().allHasDeletePermissions( relationMeta );
 
         final boolean deleteAll = identityManager
-                .isUserPermitted( activeUser, PermissionObject.EnvironmentManagement, PermissionScope.ALL_SCOPE,
+                .isUserPermitted                   ( activeUser, PermissionObject.EnvironmentManagement,
+                        PermissionScope.ALL_SCOPE,
                         PermissionOperation.Delete );
 
         if ( deleteAll || environment.getUserId().equals( activeUser.getId() ) || canDelete )
@@ -1168,8 +1164,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                     User activeUser = identityManager.getActiveUser();
 
                     RelationMeta relationMeta =
-                            new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), environmentContainer,
-                                    environmentContainer.getId(), environmentContainer.getId(),
+                            new RelationMeta( activeUser, environmentContainer, environmentContainer.getId(),
                                     PermissionObject.EnvironmentManagement.getName() );
 
                     if ( !relationManager.getRelationInfoManager().allHasDeletePermissions( relationMeta ) )
@@ -1205,9 +1200,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
         User activeUser = identityManager.getActiveUser();
 
-        RelationMeta relationMeta =
-                new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), environment, environmentId,
-                        environment.getId(), PermissionObject.EnvironmentManagement.getName() );
+        RelationMeta relationMeta = new RelationMeta( activeUser, environment, environmentId,
+                PermissionObject.EnvironmentManagement.getName() );
 
         if ( !relationManager.getRelationInfoManager().allHasUpdatePermissions( relationMeta ) )
         {
@@ -1233,9 +1227,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         EnvironmentImpl environment = environmentDataService.find( environmentId );
         User activeUser = identityManager.getActiveUser();
 
-        RelationMeta relationMeta =
-                new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), environment, environmentId,
-                        environment.getId(), PermissionObject.EnvironmentManagement.getName() );
+        RelationMeta relationMeta = new RelationMeta( activeUser, activeUser, environment, environment.getId(),
+                PermissionObject.EnvironmentManagement.getName() );
 
         if ( !relationManager.getRelationInfoManager().allHasUpdatePermissions( relationMeta ) )
         {
@@ -1257,7 +1250,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
 
         boolean assign = !Strings.isNullOrEmpty( domain );
-        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
+        TrackerOperation operationTracker = tracker.createTrackerOperation        ( MODULE_NAME,
                 String.format( "Modifying environment %s domain", environmentId ) );
         try
         {
@@ -1315,7 +1308,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             ContainerHost containerHost = environment.getContainerHostById( containerHostId );
 
-            return peerManager.getLocalPeer().isIpInVniDomain(
+            return peerManager.getLocalPeer().isIpInVniDomain                                                      (
                     containerHost.getIpByInterfaceName( Common.DEFAULT_CONTAINER_INTERFACE ), environment.getVni() );
         }
         catch ( ContainerHostNotFoundException | PeerException e )
@@ -1340,17 +1333,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         User activeUser = identityManager.getActiveUser();
 
         EnvironmentContainerImpl environmentContainer = environmentContainerDataService.find( containerHostId );
-        RelationMeta relationMeta =
-                new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), environmentContainer,
-                        containerHostId, environmentContainer.getId(),
-                        PermissionObject.EnvironmentManagement.getName() );
+        RelationMeta relationMeta = new RelationMeta( activeUser, environmentContainer, environmentContainer.getId(),
+                PermissionObject.EnvironmentManagement.getName() );
 
         if ( !relationManager.getRelationInfoManager().allHasUpdatePermissions( relationMeta ) )
         {
             throw new ContainerHostNotFoundException( "Container host not found." );
         }
 
-        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
+        TrackerOperation operationTracker = tracker.createTrackerOperation           ( MODULE_NAME,
                 String.format( "Setting up ssh for container %s ", containerHostId ) );
 
         environment.getContainerHostById( containerHostId );
@@ -1359,14 +1350,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             int sshPort =
                     peerManager.getLocalPeer().setupContainerSsh( containerHostId, Common.CONTAINER_SSH_TIMEOUT_SEC );
 
-            operationTracker.addLogDone(
+            operationTracker.addLogDone                                                                   (
                     String.format( "Ssh for container %s is ready on port %d", containerHostId, sshPort ) );
 
             return sshPort;
         }
         catch ( Exception e )
         {
-            operationTracker.addLogFailed(
+            operationTracker.addLogFailed                                                                         (
                     String.format( "Error setting up ssh for container %s: %s", containerHostId, e.getMessage() ) );
             throw new EnvironmentModificationException( e );
         }
@@ -1406,8 +1397,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         User activeUser = identityManager.getActiveUser();
 
-        RelationMeta relationMeta = new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), containerHost,
-                containerHost.getId(), containerHost.getId(), PermissionObject.EnvironmentManagement.getName() );
+        RelationMeta relationMeta = new RelationMeta( activeUser, containerHost, containerHost.getId(),
+                PermissionObject.EnvironmentManagement.getName() );
 
         if ( !relationManager.getRelationInfoManager().allHasUpdatePermissions( relationMeta ) )
         {
@@ -1415,30 +1406,33 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                     String.format( "Access to container %s is denied", environment.getName() ) );
         }
 
-        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
+        TrackerOperation operationTracker = tracker.createTrackerOperation                                          (
+                MODULE_NAME,
                 String.format( "%s container %s environment domain", add ? "Adding" : "Removing", containerHostId ) );
         try
         {
             if ( add )
             {
                 peerManager.getLocalPeer()
-                           .addIpToVniDomain( containerHost.getIpByInterfaceName( Common.DEFAULT_CONTAINER_INTERFACE ),
+                           .addIpToVniDomain            ( containerHost.getIpByInterfaceName( Common
+                                   .DEFAULT_CONTAINER_INTERFACE ),
                                    environment.getVni() );
             }
             else
             {
                 peerManager.getLocalPeer().removeIpFromVniDomain(
                         containerHost.getIpByInterfaceName( Common.DEFAULT_CONTAINER_INTERFACE ),
-                        environment.getVni() );
+                        environment.getVni()                    );
             }
 
-            operationTracker.addLogDone(
+            operationTracker.addLogDone                                                                          (
                     String.format( "Container is %s environment domain", add ? "included in" : "excluded from" ) );
         }
         catch ( Exception e )
         {
-            operationTracker.addLogFailed( String.format( "Error %s environment domain: %s",
-                    add ? "including container in" : "excluding container from", e.getMessage() ) );
+            operationTracker.addLogFailed                                                         ( String.format(
+                    "Error %s environment domain: %s",
+                    add ? "including container in" : "excluding container from", e.getMessage()                  ) );
             throw new EnvironmentModificationException( e );
         }
     }
@@ -1460,9 +1454,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     {
         User activeUser = identityManager.getActiveUser();
 
-        RelationMeta relationMeta =
-                new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), environment, environment.getId(),
-                        environment.getId(), PermissionObject.EnvironmentManagement.getName() );
+        RelationMeta relationMeta = new RelationMeta( activeUser, activeUser, environment, environment.getId(),
+                PermissionObject.EnvironmentManagement.getName() );
 
         if ( !relationManager.getRelationInfoManager().allHasReadPermissions( relationMeta ) )
         {
@@ -1483,24 +1476,31 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         environment.setStatus( EnvironmentStatus.PENDING );
 
         User activeUser = identityManager.getActiveUser();
+        UserDelegate delegatedUser = identityManager.createUserDelegate( activeUser, null, true );
+
+        // User - Delegated user - Environment
+        // Delegated user - Delegated user - Environment
+        // Delegated user - Environment - Container
+
+        // TODO create relation between activeUser and delegatedUser
         environment.setRawTopology( JsonUtil.toJson( topology ) );
         environment.setUserId( activeUser.getId() );
-        createEnvironmentKeyPair( environment.getEnvironmentId(), activeUser.getSecurityKeyId() );
+        createEnvironmentKeyPair( environment.getEnvironmentId(), delegatedUser.getId() );
         try
         {
             KeyManager keyManager = securityManager.getKeyManager();
             EncryptionTool encryptionTool = securityManager.getEncryptionTool();
 
-            // TODO user should send signed trust message
+            // TODO user should send signed trust message between delegatedUser and himself
             RelationInfoMeta relationInfoMeta =
                     new RelationInfoMeta( true, true, true, true, Ownership.USER.getLevel() );
 
             RelationInfo relationInfo = relationManager.createTrustRelationship( relationInfoMeta );
 
             // TODO set target public key id to verify access it later to verify signature
-            RelationMeta relationMeta = new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), environment,
-                    environment.getId(), activeUser.getSecurityKeyId(),
-                    PermissionObject.EnvironmentManagement.getName() );
+            RelationMeta relationMeta =
+                    new RelationMeta( activeUser, delegatedUser, environment, activeUser.getSecurityKeyId(),
+                            PermissionObject.EnvironmentManagement.getName() );
             Relation relation = relationManager.buildTrustRelation( relationInfo, relationMeta );
 
             String relationJson = JsonUtil.toJson( relation );
@@ -1904,26 +1904,32 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                 if ( alertValue != null && alertEvent.getEnvironmentId() != null )
                 {
                     final Environment environment = loadEnvironment( alertEvent.getEnvironmentId() );
-                    alertEvent.addLog(
-                            String.format( "Invoking pre-processor of" + " '%s:%s'.", handlerId.getAlertHandlerId(),
+                    alertEvent.addLog                                     (
+                            String.format                               ( "Invoking pre-processor of" + " '%s:%s'.",
+                                    handlerId.getAlertHandlerId(),
                                     handlerId.getAlertHandlerPriority() ) );
                     handler.preProcess( environment, alertValue );
-                    alertEvent.addLog(
-                            String.format( "Pre-processor of '%s:%s' " + "finished.", handlerId.getAlertHandlerId(),
+                    alertEvent.addLog                                     (
+                            String.format                               ( "Pre-processor of '%s:%s' " + "finished.",
+                                    handlerId.getAlertHandlerId(),
                                     handlerId.getAlertHandlerPriority() ) );
-                    alertEvent.addLog(
-                            String.format( "Invoking main processor of '%s:%s'.", handlerId.getAlertHandlerId(),
+                    alertEvent.addLog                                     (
+                            String.format                               ( "Invoking main processor of '%s:%s'.",
+                                    handlerId.getAlertHandlerId(),
                                     handlerId.getAlertHandlerPriority() ) );
                     handler.process( environment, alertValue );
-                    alertEvent.addLog(
-                            String.format( "Main processor of '%s:%s' finished.", handlerId.getAlertHandlerId(),
+                    alertEvent.addLog                                     (
+                            String.format                               ( "Main processor of '%s:%s' finished.",
+                                    handlerId.getAlertHandlerId(),
                                     handlerId.getAlertHandlerPriority() ) );
-                    alertEvent.addLog(
-                            String.format( "Invoking post-processor of '%s:%s'.", handlerId.getAlertHandlerId(),
+                    alertEvent.addLog                                     (
+                            String.format                               ( "Invoking post-processor of '%s:%s'.",
+                                    handlerId.getAlertHandlerId(),
                                     handlerId.getAlertHandlerPriority() ) );
                     handler.postProcess( environment, alertValue );
-                    alertEvent.addLog(
-                            String.format( "Pre-processor of '%s:%s' " + "finished.", handlerId.getAlertHandlerId(),
+                    alertEvent.addLog                                     (
+                            String.format                               ( "Pre-processor of '%s:%s' " + "finished.",
+                                    handlerId.getAlertHandlerId(),
                                     handlerId.getAlertHandlerPriority() ) );
                 }
             }
@@ -2039,9 +2045,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         User activeUser = identityManager.getActiveUser();
 
-        RelationMeta envRelationMeta =
-                new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), environment, environment.getId(),
-                        environment.getId(), PermissionObject.EnvironmentManagement.getName() );
+        RelationMeta envRelationMeta = new RelationMeta( activeUser, environment, environment.getId(),
+                PermissionObject.EnvironmentManagement.getName() );
 
         if ( !relationManager.getRelationInfoManager().groupHasUpdatePermissions( envRelationMeta ) )
         {
@@ -2073,9 +2078,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             RelationInfo relationInfo = relationManager.createTrustRelationship( relationInfoMeta );
 
             RelationMeta relationMeta =
-                    new RelationMeta( String.valueOf( activeUser.getId() ), activeUser.getClass().getSimpleName(),
-                            String.valueOf( targetUser.getId() ), targetUser.getClass().getSimpleName(), environmentId,
-                            environment.getClass().getSimpleName(), activeUser.getSecurityKeyId(),
+                    new RelationMeta( activeUser, targetUser, environment, activeUser.getSecurityKeyId(),
                             PermissionObject.EnvironmentManagement.getName() );
 
             Relation relation = relationManager.buildTrustRelation( relationInfo, relationMeta );
