@@ -78,6 +78,6 @@ public class RemotePeerMessageSender implements Callable<Boolean>
 
     protected WebClient getWebClient( String localPeerId, PeerInfo peerInfo )
     {
-        return WebClientBuilder.buildPeerWebClient( localPeerId, peerInfo, "/messenger/message" );
+        return WebClientBuilder.buildPeerWebClient( peerInfo, "/messenger/message" );
     }
 }
