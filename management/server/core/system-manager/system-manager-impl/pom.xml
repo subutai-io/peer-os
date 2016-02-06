@@ -14,6 +14,13 @@
   <name>Subutai System Manager Impl</name>
   <description>Subutai System Manager Impl</description>
 
+  <dependencies>
+    <dependency>
+      <groupId>io.subutai</groupId>
+      <artifactId>system-manager-api</artifactId>
+    </dependency>
+  </dependencies>
+
   <build>
     <plugins>
       <plugin>
