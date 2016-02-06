@@ -470,6 +470,12 @@ input[type=checkbox] {
 .b-main-table__20 {
     width: 20px;
 }
+.b-main-table__20 img {
+    max-height: 15px; max-width: 15px
+}
+.b-main-table__right {
+    float: right;
+}
 .b-main-table th {
     padding: 15px 0 15px 18px;
     background-color: #f8fbfd;
@@ -528,6 +534,15 @@ input[type=checkbox] {
 }
 .b-main-table_none-border td {
     padding: 2px 0;
+}
+.b-main-table_custom-1 tr {
+    border-bottom: 1px dashed #ccceee;
+}
+.b-main-table_custom-1 tr:last-child {
+    border-bottom: 1px solid #ccceee;
+}
+.b-main-table_custom-1 td {
+    padding: 6px
 }
 .b-main-table_white-header td {
     padding: 8px 0 8px 7px;
@@ -950,6 +965,12 @@ tip.description-tooltip {
 }
 .g-margin-right-quarter {
     margin-right: 4px !important;
+}
+.g-margin-left-half {
+    margin-left: 7px !important;
+}
+.g-margin-left-quarter {
+    margin-left: 4px !important;
 }
 .g-no-padding {
     padding: 0 !important;
@@ -1710,7 +1731,9 @@ td.b-main-table__status-col {
 .b-form-input_fix-size-2 {
     width: 144px;
 }
-
+.b-form-input_fix-size-3 {
+    width: 200px;
+}
 .b-form-label_margin_r {
     margin-right: 15px;
 }
@@ -2964,4 +2987,26 @@ td.b-main-table__status-col {
 }
 .js-btn-build-show-message_hide {
     display: none;
+}
+
+.g-circle-label {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    line-height: 18px;
+    text-align: center;
+    font-size: 12px;
+    color: #fff;
+    background-color: #2b2b2b;
+    border-radius: 2px;
+
+}
+.g-circle-label_green {
+    background-color: #4bbc6e;
+}
+.g-circle-label_blue {
+    background-color: #179cee;
+}
+.g-circle-label_red {
+    background-color: #ef3f61;
 }
