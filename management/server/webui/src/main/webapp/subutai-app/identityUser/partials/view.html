@@ -50,10 +50,10 @@
 						You don’t have any users
 					</td>
 					<tr ng-repeat="user in identityUserCtrl.users">
-						<td>{{ user.userName }}</td>
-						<td>{{ user.fullName }}</td>
-						<td>{{ user.email }}</td>
-						<td>
+						<td ng-class = "{'trust': user.trustLevel < 3}">{{ user.userName }}</td>
+						<td ng-class = "{'trust': user.trustLevel < 3}">{{ user.fullName }}</td>
+						<td ng-class = "{'trust': user.trustLevel < 3}">{{ user.email }}</td>
+						<td ng-class = "{'trust': user.trustLevel < 3}">
 						<span ng-repeat="(roleKey, role) in user.roles" class="b-tags b-tags_grey">
 							{{ role.name }}
 							<a href ng-click="identityUserCtrl.removeRoleFromUser(user, roleKey)">
@@ -61,8 +61,8 @@
 							</a>
 						</span>
 						</td>
-						<td>{{ user.trustLevel }}</td>
-						<td>
+						<td ng-class = "{'trust': user.trustLevel < 3}">{{ user.trustLevel }}</td>
+						<td ng-class = "{'trust': user.trustLevel < 3}">
 							<a href class="b-icon b-icon_edit" ng-click="identityUserCtrl.userForm (user)"></a>
 							<a href class="b-icon b-icon_remove" ng-click="identityUserCtrl.deleteUser (user)"></a>
 						</td>

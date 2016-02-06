@@ -72,14 +72,15 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 		vm.pendingUsers = [];
 		identitySrv.getUsers().success (function (data) {
 			console.log (data);
-			for (var i = 0; i < data.length; ++i) {
+			vm.users = data;
+/*			for (var i = 0; i < data.length; ++i) {
 				if (data[i].isApproved) {
 					vm.users.push (data[i]);
 				}
 				else {
 					vm.pendingUsers.push (data[i]);
 				}
-			}
+			}*/
 		});
 	}
 	getUsers();
