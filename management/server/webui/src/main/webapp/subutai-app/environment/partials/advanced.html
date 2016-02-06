@@ -14,28 +14,26 @@
 
 	<div class="b-workspace__content b-workspace__content_cloud-env">
 		<div class="b-cloud">
-			<div class="b-cloud__tools g-right">
+			<div class="b-cloud__tools">
 				<div class="b-cloud-tools">
 					<div class="b-tabs-menu b-tabs-menu_cloud-env">
 						<ul>
-							<li class="b-tabs-menu__item b-tabs-menu__item_active"
+							<li class="b-tabs-menu__item"
+								ng-click="environmentViewCtrl.activeCloudTab = 'peers'"
+								ng-class="environmentViewCtrl.activeCloudTab == 'peers' ? 'b-tabs-menu__item_active' : ''">
+								Peers
+							</li>
+							<li class="b-tabs-menu__item js-hide-resources"
 								ng-click="environmentViewCtrl.activeCloudTab = 'templates'"
 								ng-class="environmentViewCtrl.activeCloudTab == 'templates' ? 'b-tabs-menu__item_active' : ''">
 								Templates
 							</li>
-							<li class="b-tabs-menu__item"
-								ng-click="environmentViewCtrl.activeCloudTab = 'more'"
-								ng-class="environmentViewCtrl.activeCloudTab == 'more' ? 'b-tabs-menu__item_active' : ''">
-								More
-							</li>
 						</ul>
 					</div>
-					<div class="b-tools-menu js-scrollbar">
-						<ul>
+					<div class="b-tools-menu b-tools-menu_custom-scroll-huc js-scrollbar" ng-show="environmentViewCtrl.activeCloudTab == 'templates'">
+						<ul class="">
 							<li ng-repeat="template in environmentViewCtrl.templates">
-								<a href="#"
-									class="js-add-recource-host"
-									data-template="{{ template }}">
+								<a href ng-click="environmentViewCtrl.addContainer(template, $event)">
 									<span class="b-cloud-item">
 										<img
 											src="assets/templates/{{ template }}.jpg"
@@ -47,25 +45,99 @@
 							</li>
 						</ul>
 					</div>
+					<div class="b-tools-menu b-tools-menu_custom-scroll-huc b-tools-menu_advanced js-scrollbar-cloud" 
+					ng-show="environmentViewCtrl.activeCloudTab == 'peers'">
+						<ul>
+							<li ng-repeat="(peerId, peersResources) in environmentViewCtrl.peerIds"
+							tooltips 
+							tooltip-template="{{ peerId }}" 
+							tooltip-side="left" 
+							ng-click="environmentViewCtrl.showResources(peerId, peersResources)">
+								<a href="#" class="b-cloud-item-text g-margin-bottom-half">
+									Peer {{$index + 1}}
+								</a>
+
+								<div class="b-progress__cloud">
+									<div class="b-progress-cloud g-margin-bottom-half">
+										<div class="b-progress-cloud-fill" style="width: 15%"></div>
+									</div>
+									<div class="b-progress-text">
+										<span class="g-text-blue">15%</span> resources used
+									</div>
+								</div>
+							</li>
+						</ul>
+					</div>
+					<div class="b-cloud-add-tools">
+						<div class="b-tabs-menu b-tabs-menu_cloud-env">
+							<div>
+								Resource hosts 
+								<a href="#" class="js-hide-resources">
+									<i class="fa fa-arrow-right g-right g-text-grey"></i>
+								</a>
+							</div>
+						</div>
+						<div class="b-tools-menu b-tools-menu_advanced js-scrollbar-cloud">
+							<ul ng-show="environmentViewCtrl.currentResourceHosts.length > 0">
+								<li ng-repeat="resourceHost in environmentViewCtrl.resourceHosts" 
+								ng-if="environmentViewCtrl.currentResourceHosts.indexOf(resourceHost.id) > -1" 
+								ng-click="environmentViewCtrl.addResource2Build(resourceHost)">
+									<span class="b-cloud-item-resource-name g-margin-bottom">
+										{{ resourceHost.hostname }}
+									</span>
+									<div class="b-progress__cloud b-progress__cloud_rh">
+										<div class="b-progress-text g-margin-bottom">
+											<i class="b-icon b-icon_cloud b-icon_cpu g-margin-right-quarter"></i> 
+											CPU:Intel Core 2 Duo
+										</div>
+										<div class="g-margin-bottom">
+											<div class="b-progress-text g-margin-bottom-half">
+												<i class="b-icon b-icon_cloud b-icon_hdd g-margin-right-quarter"></i> 
+												HDD:2048MB
+											</div>
+											<div class="b-progress-cloud g-margin-bottom-half">
+												<div class="b-progress-cloud-fill" style="width: 15%"></div>
+											</div>
+											<div class="b-progress-text">
+												<span class="g-text-blue">1024MB</span> used
+											</div>
+										</div>
+										<div>
+											<div class="b-progress-text g-margin-bottom-half">
+												<i class="b-icon b-icon_cloud b-icon_ram g-margin-right-quarter"></i> 
+												RAM:  256MB
+											</div>
+											<div class="b-progress-cloud g-margin-bottom-half">
+												<div class="b-progress-cloud-fill" style="width: 15%"></div>
+											</div>
+											<div class="b-progress-text">
+												<span class="g-text-blue">21MB</span> used
+											</div>
+										</div>
+									</div>
+								</li>
+							</ul>
+						</div>
+					</div>
 				</div>
 			</div>
 			<div class="b-cloud__space">
 				<div class="b-cloud-space b-cloud-space_border-right">
 					<div class="b-cloud-space__work">
 						<div
-							class="b-cloud-space-work"
-							id="js-environment-creation"
-							ng-init="environmentViewCtrl.initJointJs()">
+						class="b-cloud-space-work"
+						id="js-environment-creation"
+						ng-init="environmentViewCtrl.initJointJs()">
 							<div
 								class="js-dropen-menu"
 								style="width: 100px; height: 100px; background-color: red; position: absolute; display: none;">
 							</div>
 						</div>
 						<div class="b-cloud-create-buttons">
-                            <button class="b-btn b-btn_white"
-                                    ng-click="environmentViewCtrl.clearWorkspace()">
-                                Cancel
-                            </button>
+							<button class="b-btn b-btn_white"
+							ng-click="environmentViewCtrl.clearWorkspace()">
+								Cancel
+							</button>
 							<button
 							class="b-btn b-btn_green"
 							ng-click="environmentViewCtrl.buildEnvironmentByJoint()">

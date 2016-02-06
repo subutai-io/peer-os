@@ -49,21 +49,14 @@
       /* there must be 'bottom' for ps-scrollbar-x */
       height: 8px; }
   .ps-container > .ps-scrollbar-y-rail {
-    display: none;
+    display: block;
     position: absolute;
     /* please don't change 'position' */
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    -ms-border-radius: 4px;
-    border-radius: 4px;
-    opacity: 0;
-    -webkit-transition: background-color 0.2s linear, opacity 0.2s linear;
-    -moz-transition: background-color 0.2s linear, opacity 0.2s linear;
-    -o-transition: background-color 0.2s linear, opacity 0.2s linear;
-    transition: background-color 0.2s linear, opacity 0.2s linear;
+    opacity: 1;
     right: 0;
     /* there must be 'right' for ps-scrollbar-y-rail */
-    width: 8px; }
+    width: 5px;
+  background-color: #f8fbfd}
     .ps-container > .ps-scrollbar-y-rail > .ps-scrollbar-y {
       position: absolute;
       /* please don't change 'position' */
@@ -73,8 +66,9 @@
       -o-transition: background-color 0.2s linear;
       transition: background-color 0.2s linear;
       right: 0;
+      opacity: 0.7;
       /* there must be 'right' for ps-scrollbar-y */
-      width: 8px; }
+      width: 5px; }
   .ps-container:hover.ps-in-scrolling {
     pointer-events: none; }
     .ps-container:hover.ps-in-scrolling.ps-x > .ps-scrollbar-x-rail {
