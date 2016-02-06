@@ -1,11 +1,11 @@
 <div class="b-workspace-content__row">
-        <button class="b-btn b-btn_green g-margin-bottom" ng-click="kurjunViewCtrl.addTemplate()">
+        <button class="b-btn b-btn_green g-margin-bottom" ng-click="kurjunCtrl.addTemplate()">
             <i class="fa fa-plus"></i> Add Template
         </button>
     <div class="b-data-table">
         <table datatable="ng"
-               dt-options="kurjunViewCtrl.dtOptions"
-               dt-column-defs="kurjunViewCtrl.dtColumnDefs"
+               dt-options="kurjunCtrl.dtOptions"
+               dt-column-defs="kurjunCtrl.dtColumnDefs"
                class="b-main-table b-main-table_with-header">
             <thead>
             <tr>
@@ -18,7 +18,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr ng-repeat="template in kurjunViewCtrl.templates">
+            <tr ng-repeat="template in kurjunCtrl.templates">
                 <td>{{ template.name }}</td>
                 <td>{{ template.repository }}</td>
                 <td>{{ template.architecture }}</td>
@@ -28,7 +28,7 @@
                     <a href
                        class="b-icon b-icon_remove"
                        ng-if="template.deletable"
-                       ng-click="kurjunViewCtrl.deleteTemplate(template)">
+                       ng-click="kurjunCtrl.deleteTemplate(template)">
                     </a>
                 </td>
             </tr>

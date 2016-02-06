@@ -9,6 +9,7 @@ import javax.ws.rs.core.HttpHeaders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
@@ -65,20 +66,14 @@ public class ServerOutInterceptor extends AbstractPhaseInterceptor<Message>
                 if ( url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X2 ) )
                 {
                     //                    LOG.info( " *** URL:" + url.getPath() );
-
-                    HttpServletRequest request =
-                            ( HttpServletRequest ) message.getExchange().getInMessage().get( AbstractHTTPDestination
-
-                                    .HTTP_REQUEST );
                     HttpHeaders headers = new HttpHeadersImpl( message.getExchange().getInMessage() );
-                    String remoteId = headers.getHeaderString( Common.SUBUTAI_HTTP_HEADER );
-
-                    //                    LOG.debug( "Remote address: " + remoteId );
+                    String subutaiHeader = headers.getHeaderString( Common.SUBUTAI_HTTP_HEADER );
+                    //                    LOG.debug( "Remote address: " + subutaiHeader );
                     String path = url.getPath();
 
                     if ( path.startsWith( "/rest/v1/peer" ) )
                     {
-                        handlePeerMessage( remoteId, message );
+                        handlePeerMessage( subutaiHeader, message );
                         //                        LOG.debug( "Path handled by peer crypto handler: " + path );
                     }
                     else
@@ -88,7 +83,7 @@ public class ServerOutInterceptor extends AbstractPhaseInterceptor<Message>
                         {
                             String s = path.substring( prefix.length() + 1 );
                             String environmentId = s.substring( 0, s.indexOf( "/" ) );
-                            handleEnvironmentMessage( remoteId, environmentId, message );
+                            handleEnvironmentMessage( subutaiHeader, environmentId, message );
                             //                            LOG.debug( "Path handled by environment crypto handler: " +
                             // path );
                         }
@@ -104,23 +99,15 @@ public class ServerOutInterceptor extends AbstractPhaseInterceptor<Message>
         catch ( Exception e )
         {
             LOG.warn( "Error on handling message: ", e.getMessage() );
+            throw new Fault( e );
         }
     }
 
 
     private void handlePeerMessage( final String targetId, final Message message )
     {
-//        try
-        //        {
-//            String targetId = peerManager.getPeerIdByIp( ip );
-            String sourceId = peerManager.getLocalPeer().getId();
-            MessageContentUtil
-                    .encryptContent( channelManagerImpl.getSecurityManager(), sourceId, targetId, message );
-//        }
-//        catch ( PeerException e )
-//        {
-//            //            LOG.warn( e.getMessage() );
-//        }
+        String sourceId = peerManager.getLocalPeer().getId();
+        MessageContentUtil.encryptContent( channelManagerImpl.getSecurityManager(), sourceId, targetId, message );
     }
 
 
@@ -131,8 +118,7 @@ public class ServerOutInterceptor extends AbstractPhaseInterceptor<Message>
             String targetId = peerManager.getPeerIdByIp( ip ) + "-" + environmentId;
             String sourceId = peerManager.getLocalPeer().getId() + "-" + environmentId;
 
-            MessageContentUtil
-                    .encryptContent( channelManagerImpl.getSecurityManager(), sourceId, targetId, message );
+            MessageContentUtil.encryptContent( channelManagerImpl.getSecurityManager(), sourceId, targetId, message );
         }
         catch ( PeerException e )
         {

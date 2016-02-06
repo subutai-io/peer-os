@@ -3,12 +3,12 @@ package p2p
 import (
 	"bufio"
 	"fmt"
+	"github.com/subutai-io/Subutai/agent/config"
+	"github.com/subutai-io/Subutai/agent/log"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"strings"
-	"subutai/config"
-	"subutai/log"
 )
 
 func p2pFile(line string) {

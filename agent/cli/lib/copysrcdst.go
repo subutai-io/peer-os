@@ -1,9 +1,9 @@
 package lib
 
 import (
+	"github.com/subutai-io/Subutai/agent/log"
 	"io"
 	"os"
-	"subutai/log"
 )
 
 func CopyFile(source string, dest string) {

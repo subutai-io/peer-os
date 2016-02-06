@@ -1,12 +1,28 @@
 <div class="b-header__userbar b-header__userbar_right" ng-controller="CurrentUserCtrl as currentUserCtrl">
-	<a href ng-click="currentUserCtrl.logout()"
-		class="b-header-userbar-name"
-		ng-if="currentUserCtrl.currentUser">
-		{{ currentUserCtrl.currentUser }} <i class="fa fa-sign-out b-header-userbar__icon"></i>
-	</a>
+	<span id="js-plugin-version" class="b-plugin-version"></span>
+	<script>
+		$(document).ready(function(){
+			if($('#bp-plugin-version').val().length > 0) {
+				$('#js-plugin-version').text('plugin version: ' + $('#bp-plugin-version').val() + ' / ');
+			}
+			$('body').on('change', '#bp-plugin-version', function(){
+				if($(this).val().length > 0) {
+					$('#js-plugin-version').text('plugin version: ' + $(this).val() + ' / ');
+				}
+			});
+		});
+	</script>
+	<!--<i class="fa fa-sign-in b-plugin-version"></i>-->
+	<span ng-if="currentUserCtrl.currentUser" class="b-header-userbar-name">
+		<a href ui-sref="change-pass" class="b-header-userbar-name">Change password</a>
+		/ 
+		<a href ng-click="currentUserCtrl.logout()" class="b-header-userbar-name">
+			{{ currentUserCtrl.currentUser }} <i class="fa fa-sign-out b-header-userbar__icon"></i>
+		</a>
+	</span>
 	<a href ui-sref="login"
 		class="b-header-userbar-name"
 		ng-if="!currentUserCtrl.currentUser">
-		<i class="fa fa-sign-in b-header-userbar__icon"></i>
+		Login
 	</a>
 </div>

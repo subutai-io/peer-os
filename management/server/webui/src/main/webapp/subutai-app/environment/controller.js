@@ -22,6 +22,10 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 	vm.currentEnvironment = {};
 	vm.signedMessage = "";
 	vm.buildEnvironment = buildEnvironment;
+	vm.growEnvironment = growEnvironment;
+	vm.notifyChanges = notifyChanges;
+	vm.applyChanges = applyChanges;
+	vm.getQuotaColor = getQuotaColor;
 
 	vm.environments = [];
 	vm.domainStrategies = [];
@@ -32,6 +36,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 	vm.selectedPeers = [];
 	vm.installed = false;
 	vm.pending = false;
+	vm.isEditing = false;
 	vm.isDataValid = isDataValid;
 
 	vm.peerIds = [];
@@ -61,6 +66,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 	//vm.getEnvironments = getEnvironments;
 	vm.showContainersList = showContainersList;
 	vm.destroyContainer = destroyContainer;
+	vm.editEnvironment = editEnvironment;
 	vm.setSSHKey = setSSHKey;
 	vm.showSSHKeyForm = showSSHKeyForm;
 	vm.showSSHKeysPopup = showSSHKeysPopup;
@@ -76,16 +82,19 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 	vm.setupAdvancedEnvironment = setupAdvancedEnvironment;
 	vm.initJointJs = initJointJs;
 	vm.buildEnvironmentByJoint = buildEnvironmentByJoint;
+	vm.clearWorkspace = clearWorkspace;
 	vm.sendToPending = sendToPending;
 	vm.addSettingsToTemplate = addSettingsToTemplate;
 
-	environmentService.getTemplates()
+	/*environmentService.getTemplates()
 		.success(function (data) {
 			vm.templates = data;
 		})
 		.error(function (data) {
 			VARS_MODAL_ERROR( SweetAlert, 'Error on getting templates ' + data );
-		});
+		});*/
+
+	vm.templates = ['cassandra', 'mongo', 'zookeer', 'master', 'hadoop', 'spark', 'solr'];
 
 	environmentService.getContainersType()
 		.success(function (data) {
@@ -134,6 +143,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 
 	environmentService.getPeers().success(function (data) {
 		vm.peerIds = data;
+		console.log(vm.peerIds);
 	});
 
 	peerRegistrationService.getRequestedPeers().success(function (peers) {
@@ -384,7 +394,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 					SweetAlert.swal("Destroyed!", "Your container has been destroyed.", "success");
 					loadEnvironments();
 				}).error(function (data) {
-					SweetAlert.swal("ERROR!", "Your container is safe :). Error: " + data.ERROR, "error");
+					SweetAlert.swal("ERROR!", data.ERROR, "error");
 				});
 			}
 		});
@@ -430,6 +440,86 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 		});
 	}
 
+	function growEnvironment() {
+		var allElements = graph.getCells();
+		vm.containers2Build = [];
+		vm.env2Build = {};
+		for (var i = 0; i < allElements.length; i++) {
+			if (allElements[i].attributes.containerId) {
+				continue;
+			}
+			var currentElement = allElements[i];
+			var currentTemplateName = allElements[i].get('templateName');
+			var container2Build = {
+				"size": currentElement.get('quotaSize'),
+				"templateName": currentTemplateName,
+				"name": currentElement.get('containerName'),
+				"position": currentElement.get('position')
+			};
+			if (vm.env2Build[currentTemplateName] === undefined) {
+				vm.env2Build[currentTemplateName] = 1;
+			} else {
+				vm.env2Build[currentTemplateName]++;
+			}
+			vm.containers2Build.push(container2Build);
+		}
+
+		environmentService.growEnvironment(vm.currentEnvironment.id, vm.containers2Build).success(function (data) {
+			$timeout(function () {
+				SweetAlert.swal("Success!", "Changes have been applied!.", "success");
+				loadEnvironments();
+			}, 2000 );
+		}).error(function (data) {
+			SweetAlert.swal("ERROR!", data.ERROR, "error");
+		});
+		loadEnvironments();
+	}
+
+	function notifyChanges() {
+		vm.dialog = ngDialog.open({
+			template: 'subutai-app/environment/partials/popups/environment-modification-info.html',
+			scope: $scope,
+			className: 'b-build-environment-info'
+		});
+	}
+
+	function applyChanges() {
+		SweetAlert.swal({
+				title: "Are you sure?",
+				text: "You are going to modify environment!",
+				type: "warning",
+				showCancelButton: true,
+				confirmButtonColor: "#ff3f3c",
+				confirmButtonText: "Ok",
+				cancelButtonText: "Cancel",
+				closeOnConfirm: true,
+				closeOnCancel: true,
+				showLoaderOnConfirm: true
+			},
+			function (isConfirm) {
+				vm.isApplyingChanges = true;
+				if (isConfirm) {
+					removeContainersRecursively(vm.currentEnvironment.excludedContainers, 0, growEnvironment);
+				}
+			});
+	}
+
+	function removeContainersRecursively(containers, index, callback) {
+		if (index < containers.length) {
+			containers[index].status = 'removing';
+			environmentService.destroyContainer(containers[index].attributes.containerId).success(function (data) {
+				$timeout(function () {
+					containers[index].status = 'removed';
+					removeContainersRecursively(containers, index + 1, callback);
+				}, 2000);
+			}).error(function (data) {
+				SweetAlert.swal("ERROR!", data.ERROR, "error");
+			});
+		} else {
+			clearWorkspace();
+			//callback();
+		}
+	}
 
 	function destroyEnvironment(environmentId) {
 		SweetAlert.swal({
@@ -464,6 +554,29 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 					loadEnvironments();
 				}
 			});
+	}
+
+	function editEnvironment(environment) {
+		vm.clearWorkspace();
+		vm.currentEnvironment = environment;
+		vm.currentEnvironment.excludedContainers = [];
+		vm.currentEnvironment.includedContainers = [];
+		vm.isEditing = true;
+		for(var container in environment.containers) {
+			var pos = vm.findEmptyCubePostion();
+			var devElement = new joint.shapes.tm.devElement({
+				position: { x: (GRID_CELL_SIZE * pos.x) + 20, y: (GRID_CELL_SIZE * pos.y) + 20 },
+				templateName: environment.containers[container].templateName,
+				quotaSize: environment.containers[container].type,
+				hostname: environment.containers[container].hostname,
+				containerId: environment.containers[container].id,
+				attrs: {
+					image: { 'xlink:href': 'assets/templates/' + environment.containers[container].templateName + '.jpg' },
+					title: {text: environment.containers[container].templateName}
+				}
+			});
+			graph.addCell(devElement);
+		}
 	}
 
 	function showContainersList(key) {
@@ -711,6 +824,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 
 		joint.shapes.tm = {};
 
+		//simple creatiom templates
 		joint.shapes.tm.toolElement = joint.shapes.basic.Generic.extend({
 
 			toolMarkup: [
@@ -720,12 +834,18 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 						'<polygon transform="scale(1.2) translate(-5, -5)" fill="#292F6C" points="8.4,2.4 7.6,1.6 5,4.3 2.4,1.6 1.6,2.4 4.3,5 1.6,7.6 2.4,8.4 5,5.7 7.6,8.4 8.4,7.6 5.7,5 "/>',
 						'<title>Remove</title>',
 					'</g>',
+					/*'<g class="element-call-menu">',
+						'<circle fill="#F8FBFD" r="8" stroke="#dcdcdc"/>',
+						'<polygon transform="scale(1.2) translate(-5, -5)" fill="#292F6C" points="8.4,2.4 7.6,1.6 5,4.3 2.4,1.6 1.6,2.4 4.3,5 1.6,7.6 2.4,8.4 5,5.7 7.6,8.4 8.4,7.6 5.7,5 "/>',
+						'<title>Menu</title>',
+					'</g>',*/
 				'</g>'
 			].join(''),
 
 			defaults: joint.util.deepSupplement({
 				attrs: {
 					text: { 'font-weight': 400, 'font-size': 'small', fill: 'black', 'text-anchor': 'middle', 'ref-x': .5, 'ref-y': .5, 'y-alignment': 'middle' },
+					'g.element-call-menu': {'ref-x': 18, 'ref-y': 25}
 				},
 			}, joint.shapes.basic.Generic.prototype.defaults)
 
@@ -775,6 +895,8 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 				}
 				return this;
 			},
+			mouseover: function(evt, x, y) {
+			},
 			pointerclick: function (evt, x, y) {
 				this._dx = x;
 				this._dy = y;
@@ -782,15 +904,37 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 				var className = evt.target.parentNode.getAttribute('class');
 				switch (className) {
 					case 'element-tool-remove':
-						$('.js-add-dev-element[data-type=' + this.model.attributes.devType + ']')
-							.removeClass('b-devops-menu__li-link_active');
-						this.model.remove();
-						$('.js-devops-item-info-block').hide();
-						delete vm.templateGrid[Math.floor( x / GRID_CELL_SIZE )][ Math.floor( y / GRID_CELL_SIZE )];
+						if (this.model.attributes.containerId) {
+							vm.currentEnvironment.excludedContainers.push(this.model);
+							$('.js-add-dev-element[data-type=' + this.model.attributes.devType + ']')
+								.removeClass('b-devops-menu__li-link_active');
+							this.model.remove();
+							$('.js-devops-item-info-block').hide();
+							delete vm.templateGrid[Math.floor(x / GRID_CELL_SIZE)][Math.floor(y / GRID_CELL_SIZE)];
+						} else {
+							var object = getElementByField('id', this.model.id, vm.currentEnvironment.includedContainers);
+							object !== null ? vm.currentEnvironment.includedContainers.splice(object.index, 1): null;
+							$('.js-add-dev-element[data-type=' + this.model.attributes.devType + ']')
+								.removeClass('b-devops-menu__li-link_active');
+							this.model.remove();
+							$('.js-devops-item-info-block').hide();
+							delete vm.templateGrid[Math.floor(x / GRID_CELL_SIZE)][Math.floor(y / GRID_CELL_SIZE)];
+						}
+						return;
+						break;
+					case 'element-call-menu':
+						var elementPos = this.model.get('position');
+						$('.js-dropen-menu').css({
+							'left': (elementPos.x + 70) + 'px',
+							'top': (elementPos.y + 83) + 'px',
+							'display': 'block'
+						});
 						return;
 						break;
 					case 'rotatable':
-						console.log(this.model);
+						if(this.model.attributes.containerId) {
+							return;
+						}
 						vm.currentTemplate = this.model;
 						ngDialog.open({
 							template: 'subutai-app/environment/partials/popups/templateSettings.html',
@@ -804,6 +948,94 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 			}
 		});
 		joint.shapes.tm.devElementView = joint.shapes.tm.ToolElementView;
+
+		//recource host object
+		joint.shapes.tm.recourceHostTools = joint.shapes.basic.Generic.extend({
+
+			toolMarkup: [
+				'<g class="element-tools">',
+					'<g class="element-tool-remove">',
+						'<circle fill="#F8FBFD" r="8" stroke="#dcdcdc"/>',
+						'<polygon transform="scale(1.2) translate(-5, -5)" fill="#292F6C" points="8.4,2.4 7.6,1.6 5,4.3 2.4,1.6 1.6,2.4 4.3,5 1.6,7.6 2.4,8.4 5,5.7 7.6,8.4 8.4,7.6 5.7,5 "/>',
+						'<title>Remove</title>',
+					'</g>',
+				'</g>'
+			].join(''),
+
+			defaults: joint.util.deepSupplement({
+				attrs: {
+					text: { 'font-weight': 400, 'font-size': 'small', fill: 'black', 'text-anchor': 'middle', 'ref-x': .5, 'ref-y': .5, 'y-alignment': 'middle' },
+				},
+			}, joint.shapes.basic.Generic.prototype.defaults)
+
+		});
+
+		joint.shapes.tm.recourceHost = joint.shapes.tm.recourceHostTools.extend({
+
+			markup: [
+				'<g class="rotatable">',
+					'<g class="scalable">',
+						'<rect class="b-border-level1"/>',
+						'<rect class="b-border-level2"/>',
+					'</g>',
+					'<title/>',
+				'</g>'
+			].join(''),
+
+			defaults: joint.util.deepSupplement({
+				type: 'tm.recourceHost',
+				size: { width: 155, height: 185 },
+				attrs: {
+					title: {text: 'Static Tooltip'},
+					'rect.b-border-level1': {fill: '#F5F6FB', stroke: '#dcdcdc', 'stroke-width': 1, width: 155, height: 185, rx: 4, ry: 4},
+					'rect.b-border-level2': {'ref-x': 5, 'ref-y': 5, fill: '#fff', stroke: '#dcdcdc', 'stroke-width': 1, width: 145, height: 175, rx: 4, ry: 4},
+					'rect.b-border-level3': {'ref-x': 5, 'ref-y': 35, fill: '#fff', stroke: '#dcdcdc', 'stroke-width': 1, width: 135, height: 135, rx: 4, ry: 4},
+					//image: {'ref-x': 9, 'ref-y': 9, ref: 'rect', width: 50, height: 50},
+				}
+			}, joint.shapes.tm.toolElement.prototype.defaults)
+		});
+
+		//custom view
+		joint.shapes.tm.RecourceHostToolsView = joint.dia.ElementView.extend({
+			initialize: function() {
+				joint.dia.ElementView.prototype.initialize.apply(this, arguments);
+			},
+			render: function () {
+				joint.dia.ElementView.prototype.render.apply(this, arguments);
+				this.renderTools();
+				this.update();
+				return this;
+			},
+			renderTools: function () {
+				var toolMarkup = this.model.toolMarkup || this.model.get('toolMarkup');
+				if (toolMarkup) {
+					var nodes = V(toolMarkup);
+					V(this.el).append(nodes);
+				}
+				return this;
+			},
+			mouseover: function(evt, x, y) {
+			},
+			pointerclick: function (evt, x, y) {
+				this._dx = x;
+				this._dy = y;
+				this._action = '';
+				var className = evt.target.parentNode.getAttribute('class');
+				switch (className) {
+					case 'element-tool-remove':
+						this.model.remove();
+						return;
+						break;
+					case 'rotatable':
+						console.log(this.model);
+						return;
+						break;
+					default:
+				}
+				joint.dia.CellView.prototype.pointerclick.apply(this, arguments);
+			}
+		});
+		joint.shapes.tm.recourceHostView = joint.shapes.tm.RecourceHostToolsView;		
 
 		var paper = new joint.dia.Paper({
 			el: $('#js-environment-creation'),
@@ -878,7 +1110,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 			var img = $(this).find('img');
 			var devElement = new joint.shapes.tm.devElement({
 				position: { x: (GRID_CELL_SIZE * pos.x) + 20, y: (GRID_CELL_SIZE * pos.y) + 20 },
-				//devType: $(this).data('type'),
 				templateName: $(this).data('template'),
 				quotaSize: 'SMALL',
 				containerName: vm.environment2BuildName + ' ' + (containerCounter++).toString(),
@@ -887,7 +1118,24 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 					title: {text: $(this).data('template')}
 				}
 			});
+			vm.isEditing ? vm.currentEnvironment.includedContainers.push(devElement) : null;
 			graph.addCell(devElement);
+			return false;
+		});
+
+
+		//add recource host
+		$('.b-tools-menu').on('click', '.js-add-recource-host', function(){
+			var pos = findEmptyCubePostion();
+			var img = $(this).find('img');
+			var recourceHost = new joint.shapes.tm.recourceHost({
+				position: { x: (GRID_CELL_SIZE * pos.x) + 20, y: (GRID_CELL_SIZE * pos.y) + 20 },
+				attrs: {
+					image: { 'xlink:href': img.attr('src') },
+					title: {text: $(this).data('template')}
+				}
+			});
+			graph.addCell(recourceHost);
 			return false;
 		});
 
@@ -913,6 +1161,8 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 			vm.cubeGrowth++;
 			return { x : vm.cubeGrowth - 1, y : 0 };
 		}
+
+		vm.findEmptyCubePostion = findEmptyCubePostion;
 
 		paper.$el.on('mousewheel DOMMouseScroll', onMouseWheel);
 
@@ -974,6 +1224,13 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 		});
 	}
 
+	function clearWorkspace() {
+		vm.isEditing = false;
+		vm.cubeGrowth = 0;
+		vm.templateGrid = [];
+		graph.resetCells();
+	}
+
 	function sendToPending() {
 		LOADING_SCREEN();
 		environmentService.startEnvironmentAutoBuild(vm.environment2BuildName, JSON.stringify(vm.containers2Build))
@@ -996,6 +1253,22 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 		vm.currentTemplate.set('quotaSize', settings.quotaSize);
 		vm.currentTemplate.set('containerName', settings.containerName);
 		ngDialog.closeAll();
+	}
+
+	function getElementByField(field, value, collection) {
+		for(var index = 0; index < collection.length; index++) {
+			if(collection[index][field] === value) {
+				return {
+					container: collection[index],
+					index: index
+				};
+			}
+		}
+		return null;
+	}
+
+	function getQuotaColor(quotaSize) {
+		return quotaColors[quotaSize];
 	}
 }
 
