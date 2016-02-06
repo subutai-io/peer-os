@@ -66,6 +66,7 @@ public class ClientHeaderInterceptor extends AbstractPhaseInterceptor<Message>
         catch ( Exception ex )
         {
             LOG.warn( ex.getMessage() );
+            throw new Fault( ex );
         }
     }
 }

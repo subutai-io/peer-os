@@ -37,9 +37,8 @@ public class WebClientBuilder
     private static final String ENVIRONMENT_URL_TEMPLATE = "https://%s:%s/rest/v1/env%s";
 
 
-    public static WebClient buildPeerWebClient( final String subutaiHeader, final String host, final String path,
-                                                final Object provider, long connectTimeoutMs, long readTimeoutMs,
-                                                int maxAttempts )
+    public static WebClient buildPeerWebClient( final String host, final String path, final Object provider,
+                                                long connectTimeoutMs, long readTimeoutMs, int maxAttempts )
     {
         String effectiveUrl = String.format( PEER_URL_TEMPLATE, host, ChannelSettings.SECURE_PORT_X2,
                 ( path.startsWith( "/" ) ? path : "/" + path ) );
@@ -52,7 +51,6 @@ public class WebClientBuilder
         {
             client = WebClient.create( effectiveUrl, Collections.singletonList( provider ) );
         }
-        client.getHeaders().put( Common.SUBUTAI_HTTP_HEADER, Collections.singletonList( subutaiHeader ) );
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
 
@@ -90,10 +88,9 @@ public class WebClientBuilder
     }
 
 
-    public static WebClient buildPeerWebClient( final String id, final String host, final String path,
-                                                final Object provider )
+    public static WebClient buildPeerWebClient( final String host, final String path, final Object provider )
     {
-        return buildPeerWebClient( id, host, path, provider, DEFAULT_CONNECTION_TIMEOUT, DEFAULT_RECEIVE_TIMEOUT,
+        return buildPeerWebClient( host, path, provider, DEFAULT_CONNECTION_TIMEOUT, DEFAULT_RECEIVE_TIMEOUT,
                 DEFAULT_MAX_RETRANSMITS );
     }
 
@@ -137,8 +134,8 @@ public class WebClientBuilder
     }
 
 
-    public static WebClient buildPeerWebClient( final String id, final PeerInfo host, final String path )
+    public static WebClient buildPeerWebClient( final PeerInfo host, final String path )
     {
-        return buildPeerWebClient( id, host.getIp(), path, null );
+        return buildPeerWebClient( host.getIp(), path, null );
     }
 }

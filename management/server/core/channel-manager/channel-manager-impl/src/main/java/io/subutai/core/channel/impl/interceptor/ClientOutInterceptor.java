@@ -89,6 +89,7 @@ public class ClientOutInterceptor extends AbstractPhaseInterceptor<Message>
         catch ( Exception ex )
         {
             //            LOG.warn( ex.getMessage() );
+            throw new Fault( ex );
         }
     }
 
@@ -105,8 +106,7 @@ public class ClientOutInterceptor extends AbstractPhaseInterceptor<Message>
         {
             String targetId = peerManager.getPeerIdByIp( ip );
             String sourceId = peerManager.getLocalPeer().getId();
-            MessageContentUtil
-                    .encryptContent( channelManagerImpl.getSecurityManager(), sourceId, targetId, message );
+            MessageContentUtil.encryptContent( channelManagerImpl.getSecurityManager(), sourceId, targetId, message );
         }
         catch ( PeerException e )
         {
@@ -122,8 +122,7 @@ public class ClientOutInterceptor extends AbstractPhaseInterceptor<Message>
             String targetId = peerManager.getPeerIdByIp( ip ) + "-" + environmentId;
             String sourceId = peerManager.getLocalPeer().getId() + "-" + environmentId;
 
-            MessageContentUtil
-                    .encryptContent( channelManagerImpl.getSecurityManager(), sourceId, targetId, message );
+            MessageContentUtil.encryptContent( channelManagerImpl.getSecurityManager(), sourceId, targetId, message );
         }
         catch ( PeerException e )
         {
