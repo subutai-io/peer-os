@@ -934,7 +934,7 @@ public class PeerManagerImpl implements PeerManager
     {
         try
         {
-            int result = 1;
+            int result = 0;
             for ( PeerData peerData : peerDataService.getAll() )
             {
                 if ( peerData.getOrder() > result )

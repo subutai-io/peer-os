@@ -548,7 +548,7 @@ public class PeerWebClient
         Preconditions.checkNotNull( maxAddress );
         try
         {
-            String path = String.format( "/control/%s/distances/%d", communityName, maxAddress );
+            String path = String.format( "/control/%s/%d/distance", communityName, maxAddress );
 
             WebClient client = WebClientBuilder.buildPeerWebClient( host.getIp(), path, provider, 500, 7000, 1 );
             client.type( MediaType.APPLICATION_JSON );
