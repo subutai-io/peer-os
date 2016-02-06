@@ -250,12 +250,18 @@ input[type=checkbox] {
     cursor: pointer;
     box-sizing: border-box;
 }
-
+.b-btn:hover {
+    text-decoration: none;
+    background-color: #ccc;
+}
 .b-btn_light-grey {
     background-color: #f8fbfd;
     color: #333333;
+    border: 1px solid #ccceee;
 }
-
+.b-btn_light-grey:hover {
+    background-color: #ebebf2;
+}
 .b-btn-light-grey-icon {
     font-size: 14px;
 }
@@ -272,10 +278,6 @@ input[type=checkbox] {
     margin-right: 20px;
 }
 
-.b-btn:hover {
-    text-decoration: none;
-    background-color: #ccc;
-}
 
 .b-btn_blue {
     background-color: #179cee;
@@ -314,10 +316,6 @@ input[type=checkbox] {
 .b-btn_light-grey {
     background-color: #f8fbfd;
     color: #333333;
-}
-
-.b-btn_light-grey:hover {
-    background-color: #f8fbfd;
 }
 
 .b-btn:disabled {
@@ -469,7 +467,9 @@ input[type=checkbox] {
 .b-main-table__checkbox {
     width: 46px;
 }
-
+.b-main-table__20 {
+    width: 20px;
+}
 .b-main-table th {
     padding: 15px 0 15px 18px;
     background-color: #f8fbfd;
@@ -505,11 +505,13 @@ input[type=checkbox] {
 .b-main-table tr {
     border-bottom: 1px solid #CCCEEE;
 }
-
+.b-main-table_none-border tr,
 .b-main-table_white-header tr {
     border: none;
 }
-
+.b-main-table_none-border tr:hover {
+    background: none;
+}
 .b-main-table tr:hover {
     background-color: #fbfbfb;
 }
@@ -524,7 +526,9 @@ input[type=checkbox] {
     padding: 15px 0 15px 18px;
     text-align: left;
 }
-
+.b-main-table_none-border td {
+    padding: 2px 0;
+}
 .b-main-table_white-header td {
     padding: 8px 0 8px 7px;
     font-size: 12px;
@@ -953,6 +957,16 @@ tip.description-tooltip {
 .g-padding-vertical {
     padding: 0 15px !important;
 }
+.g-padding {
+    padding: 15px;
+}
+.g-border {
+    border: 1px solid #ccceee;
+}
+.g-text {
+    font-size: 13px;
+    color: #04346E;
+}
 .g-block {
     display: block;
 }
@@ -961,6 +975,15 @@ tip.description-tooltip {
 }
 .g-text-grey {
     color: #ccceee;
+}
+.g-text-green {
+    color: #4bbc6e;
+}
+.g-text-red {
+    color: #ef3f61;
+}
+.g-text-center {
+    text-align: center;
 }
 /*Popup*/
 .b-popup {
@@ -2938,4 +2961,7 @@ td.b-main-table__status-col {
     position: absolute;
     right: 56%;
     border-radius: 2px;
+}
+.js-btn-build-show-message_hide {
+    display: none;
 }
