@@ -25,7 +25,6 @@ import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.LoginContext;
 
-import org.bouncycastle.openpgp.PGPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +34,6 @@ import com.google.common.base.Strings;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.security.crypto.pgp.KeyPair;
-import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.objects.PermissionOperation;
 import io.subutai.common.security.objects.PermissionScope;
@@ -51,11 +49,13 @@ import io.subutai.core.identity.api.model.Permission;
 import io.subutai.core.identity.api.model.Role;
 import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.identity.api.model.User;
+import io.subutai.core.identity.api.model.UserDelegate;
 import io.subutai.core.identity.api.model.UserToken;
 import io.subutai.core.identity.impl.dao.IdentityDataServiceImpl;
 import io.subutai.core.identity.impl.model.PermissionEntity;
 import io.subutai.core.identity.impl.model.RoleEntity;
 import io.subutai.core.identity.impl.model.SessionEntity;
+import io.subutai.core.identity.impl.model.UserDelegateEntity;
 import io.subutai.core.identity.impl.model.UserEntity;
 import io.subutai.core.identity.impl.model.UserTokenEntity;
 import io.subutai.core.identity.impl.utils.SecurityUtil;
@@ -115,21 +115,15 @@ public class IdentityManagerImpl implements IdentityManager
 
 
             //***Create User ********************************************
-            User internal = createUser( "internal", "internal", "System User", "internal@subutai.io", 1,
-                    generateArmoredPublicKey(), true );
-            User admin =
-                    createUser( "admin", "secret", "Administrator", "admin@subutai.io", 2, generateArmoredPublicKey(),
-                            true );
-            User karaf =
-                    createUser( "karaf", "karaf", "Karaf Manager", "karaf@subutai.io", 2, generateArmoredPublicKey(),
-                            true );
+            User internal = createUser( "internal", "internal", "System User", "internal@subutai.io", 1,3 );
+            User karaf = createUser( "karaf", "karaf", "Karaf Manager", "karaf@subutai.io", 1 ,3);
+            User admin = createUser( "admin", "secret", "Administrator", "admin@subutai.io", 2 ,3,true);
             //***********************************************************
 
             //***Create Token *******************************************
             Date tokenDate = DateUtils.addMonths( new Date( System.currentTimeMillis() ), 1 );
             createUserToken( internal, "", "", "", TokenType.Permanent.getId(), tokenDate );
             //***********************************************************
-
 
             //****Create Roles ******************************************
             role = createRole( "Karaf-Manager", UserType.Regular.getId() );
@@ -187,21 +181,6 @@ public class IdentityManagerImpl implements IdentityManager
                 }
             }
             //*********************************************
-        }
-    }
-
-
-    private String generateArmoredPublicKey()
-    {
-        String keyId = UUID.randomUUID().toString();
-        KeyPair kPair = securityManager.getKeyManager().generateKeyPair( keyId, false );
-        try
-        {
-            return PGPEncryptionUtil.armorByteArrayToString( kPair.getPubKeyring() );
-        }
-        catch ( PGPException e )
-        {
-            return null;
         }
     }
 
@@ -455,12 +434,11 @@ public class IdentityManagerImpl implements IdentityManager
         {
             user = identityDataService.getUserByUsername( userName );
 
-            if ( user != null && user.isApproved() )
+            if ( user != null && ( user.getTrustLevel() > 1 ) )
             {
-                String pswHash1 = SecurityUtil.generateSecurePassword( user.getPassword(), user.getSalt() );
-                String pswHash2 = SecurityUtil.generateSecurePassword( password, user.getSalt() );
+                String pswHash = SecurityUtil.generateSecurePassword( password, user.getSalt() );
 
-                if ( !pswHash1.equals( pswHash2 ) || user.getStatus() == UserStatus.Disabled.getId() )
+                if ( !pswHash.equals( user.getPassword() ) || user.getStatus() == UserStatus.Disabled.getId() )
                 {
                     return null;
                 }
@@ -472,6 +450,51 @@ public class IdentityManagerImpl implements IdentityManager
         }
 
         return user;
+    }
+
+
+    /* *************************************************
+     */
+    @PermitAll
+    @Override
+    public UserDelegate getUserDelegate( long userId )
+    {
+        return identityDataService.getUserDelegateByUserId(userId);
+    }
+
+
+    /* *************************************************
+     */
+    @PermitAll
+    @Override
+    public UserDelegate getUserDelegate( String id )
+    {
+        return identityDataService.getUserDelegate( id );
+    }
+
+
+    /* *************************************************
+     */
+    @PermitAll
+    @Override
+    public void setUserPublicKey( long userId, String publicKeyASCII )
+    {
+
+        User user = identityDataService.getUser( userId );
+
+        if(user!=null)
+        {
+            String secId = user.getSecurityKeyId();
+
+            if(Strings.isNullOrEmpty(secId))
+            {
+                secId = userId + "-"+ UUID.randomUUID();
+                user.setSecurityKeyId( secId );
+                identityDataService.updateUser( user );
+            }
+
+            securityManager.getKeyManager().savePublicKeyRing( secId,1,publicKeyASCII );
+        }
     }
 
 
@@ -679,39 +702,73 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    @RolesAllowed( "Identity-Management|Write" )
+    //**************************************************************
+    @RolesAllowed( { "Identity-Management|Write", "Identity-Management|Update" } )
     @Override
-    public void approveUser( final String userName, List<Role> roles )
+    public void setTrustLevel( User user, int trustLevel )
     {
-        User user = identityDataService.getUserByUsername( userName );
-        user.setRoles( roles );
-        user.setApproved( true );
+        //TODO Check Public Key for Trust
 
+        user.setTrustLevel( trustLevel );
 
         identityDataService.updateUser( user );
     }
 
 
-    public User signUp( String username, String pwd, String fullName, String email, String keyAscii )
+    /* *************************************************
+     */
+    @RolesAllowed( "Identity-Management|Write" )
+    @Override
+    public UserDelegate createUserDelegate( User user, String delegateUserId, boolean genKeyPair )
     {
-        if ( Strings.isNullOrEmpty( pwd ) || !validUsername( username ) )
+        String id = "";
+
+        if ( Strings.isNullOrEmpty( delegateUserId ) )
         {
-            throw new IllegalArgumentException( "Invalid username/password" );
+            id = user.getId() + "-" + UUID.randomUUID();
         }
-        //all users are not approved by default
-        User user = new UserEntity();
-        user.setUserName( username );
-        user.setPassword( pwd );
-        user.setEmail( email );
-        user.setFullName( fullName );
-        user.setType( UserType.Regular.getId() );
-        String keyId = UUID.randomUUID().toString();
-        user.setSecurityKeyId( keyId );
-        securityManager.getKeyManager().savePublicKeyRing( keyId, SecurityKeyType.UserKey.getId(), keyAscii );
 
-        user.setFingerprint( securityManager.getKeyManager().getFingerprint( keyId ) );
+        UserDelegate userDelegate = new UserDelegateEntity();
+        userDelegate.setId( id );
+        userDelegate.setUserId( user.getId() );
+        identityDataService.persistUserDelegate( userDelegate );
 
-        identityDataService.persistUser( user );
+
+        if(genKeyPair)
+        {
+            generateKeyPair(id,SecurityKeyType.UserKey.getId());
+        }
+
+        return userDelegate;
+    }
+
+
+    /* *************************************************
+     */
+    private void generateKeyPair( String securityKeyId, int type )
+    {
+        KeyPair kp = securityManager.getKeyManager().generateKeyPair( securityKeyId, false );
+        securityManager.getKeyManager().saveKeyPair(securityKeyId,type, kp );
+    }
+
+
+
+    /* *************************************************
+     */
+    @RolesAllowed( "Identity-Management|Write" )
+    @Override
+    public User createUser( String userName, String password, String fullName, String email, int type, int trustLevel,
+                            boolean generateKeyPair )
+    {
+        User user = createUser( userName, password, fullName, email, type, trustLevel);
+
+        if(generateKeyPair)
+        {
+            String securityKeyId = user.getId() + "-" + UUID.randomUUID();
+            generateKeyPair( securityKeyId, 1 );
+            user.setSecurityKeyId( securityKeyId);
+            identityDataService.updateUser( user );
+        }
 
         return user;
     }
@@ -721,8 +778,7 @@ public class IdentityManagerImpl implements IdentityManager
      */
     @RolesAllowed( "Identity-Management|Write" )
     @Override
-    public User createUser( String userName, String password, String fullName, String email, int type,
-                            final String publicKey, boolean isApproved )
+    public User createUser( String userName, String password, String fullName, String email, int type, int trustLevel)
     {
         User user   = new UserEntity();
         String salt = "";
@@ -753,23 +809,13 @@ public class IdentityManagerImpl implements IdentityManager
             user.setEmail( email );
             user.setFullName( fullName );
             user.setType( type );
-            user.setApproved( isApproved );
-
-            //** Create Key*****************************
-            // TODO check if keyId set for KeyPair is used somewhere in system
-            String keyId = UUID.randomUUID().toString();
-            //            KeyPair kPair = securityManager.getKeyManager().generateKeyPair( keyId, false );
-            //            securityManager.getKeyManager().saveKeyPair( keyId, SecurityKeyType.UserKey.getId(), kPair );
-            if ( !Strings.isNullOrEmpty( publicKey ) )
-            {
-                securityManager.getKeyManager().savePublicKeyRing( keyId, SecurityKeyType.UserKey.getId(), publicKey );
-                user.setFingerprint( securityManager.getKeyManager().getFingerprint( keyId ) );
-            }
-            //******************************************
-
-            user.setSecurityKeyId( keyId );
+            user.setTrustLevel( trustLevel );
 
             identityDataService.persistUser( user );
+
+            //***************************************
+            createUserDelegate( user,null,true );
+            //***************************************
         }
         catch ( Exception ex )
         {

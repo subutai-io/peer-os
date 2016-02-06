@@ -7,6 +7,7 @@ import io.subutai.core.identity.api.model.Permission;
 import io.subutai.core.identity.api.model.Role;
 import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.identity.api.model.User;
+import io.subutai.core.identity.api.model.UserDelegate;
 import io.subutai.core.identity.api.model.UserToken;
 
 
@@ -236,4 +237,34 @@ public interface IdentityDataService
      *
      */
     void invalidateSessions();
+
+    /* ******UserDelegate *********************************
+         *
+         */
+    List<UserDelegate> getAllUserDelegates();
+
+    /* *************************************************
+         *
+         */
+    UserDelegate getUserDelegate( String id );
+
+    /* *************************************************
+         *
+         */
+    UserDelegate getUserDelegateByUserId( long userId );
+
+    /* *************************************************
+         *
+         */
+    void persistUserDelegate( UserDelegate item );
+
+    /* *************************************************
+         *
+         */
+    void updateUserDelegate( UserDelegate item );
+
+    /* *************************************************
+         *
+         */
+    void removeUserDelegate( String id );
 }

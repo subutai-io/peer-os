@@ -12,6 +12,7 @@ import io.subutai.core.identity.api.model.Permission;
 import io.subutai.core.identity.api.model.Role;
 import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.identity.api.model.User;
+import io.subutai.core.identity.api.model.UserDelegate;
 import io.subutai.core.identity.api.model.UserToken;
 
 
@@ -28,6 +29,7 @@ public class IdentityDataServiceImpl implements IdentityDataService
     private SessionDAO sessionDAOService = null;
     private PermissionDAO permissionDAOService = null;
     private UserTokenDAO userTokenDAOService = null;
+    private UserDelegateDAO userDelegateDAOService = null;
 
 
     /* *************************************************
@@ -434,4 +436,66 @@ public class IdentityDataServiceImpl implements IdentityDataService
     {
         userTokenDAOService.removeInvalid();
     }
+
+
+    /* ******UserDelegate *********************************
+     *
+     */
+    @Override
+    public List<UserDelegate> getAllUserDelegates()
+    {
+        return userDelegateDAOService.getAll();
+    }
+
+
+    /* *************************************************
+     *
+     */
+    @Override
+    public UserDelegate getUserDelegate( String id )
+    {
+        return userDelegateDAOService.find( id );
+    }
+
+
+    /* *************************************************
+     *
+     */
+    @Override
+    public UserDelegate getUserDelegateByUserId( long userId )
+    {
+        return userDelegateDAOService.findByUserId( userId );
+    }
+
+
+
+    /* *************************************************
+     *
+     */
+    @Override
+    public void persistUserDelegate( final UserDelegate item )
+    {
+        userDelegateDAOService.persist( item );
+    }
+
+
+    /* *************************************************
+     *
+     */
+    @Override
+    public void updateUserDelegate( final UserDelegate item )
+    {
+        userDelegateDAOService.update( item );
+    }
+
+
+    /* *************************************************
+     *
+     */
+    @Override
+    public void removeUserDelegate( String id )
+    {
+        userDelegateDAOService.remove( id );
+    }
+
 }

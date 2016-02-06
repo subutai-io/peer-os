@@ -7,6 +7,11 @@ import java.util.List;
 public interface User
 {
 
+
+    int getTrustLevel();
+
+    void setTrustLevel( int trustLevel );
+
     Long getId();
 
     void setId( Long id );
@@ -55,8 +60,5 @@ public interface User
 
     String getTypeName();
 
-    boolean isApproved();
-
-    void setApproved(boolean active);
 
 }

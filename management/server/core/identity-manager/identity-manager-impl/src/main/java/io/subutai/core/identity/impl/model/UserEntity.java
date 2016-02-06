@@ -29,7 +29,7 @@ import io.subutai.core.identity.api.model.User;
  * Implementation of User interface. Used for storing user information.
  */
 @Entity
-@Table( name = "username" )
+@Table( name = "userl" )
 @Access( AccessType.FIELD )
 public class UserEntity implements User
 {
@@ -62,8 +62,8 @@ public class UserEntity implements User
     @Column( name = "security_key_id" )
     private String securityKeyId = ""; // PGP KeyID
 
-    @Column( name = "isApproved" )
-    private boolean isApproved = false; //requires admin approval
+    @Column( name = "trust_level" )
+    private int trustLevel = 3; //Default Full Trust
 
     @Column( name = "fingerprint" )
     private String fingerprint = ""; // User key fingerprint
@@ -77,18 +77,20 @@ public class UserEntity implements User
     private List<Role> roles = new ArrayList<>();
     //*********************************************
 
+
     @Override
-    public boolean isApproved()
+    public int getTrustLevel()
     {
-        return isApproved;
+        return trustLevel;
     }
 
 
     @Override
-    public void setApproved( final boolean approved )
+    public void setTrustLevel( final int trustLevel )
     {
-        isApproved = approved;
+        this.trustLevel = trustLevel;
     }
+
 
     @Override
     public Long getId()

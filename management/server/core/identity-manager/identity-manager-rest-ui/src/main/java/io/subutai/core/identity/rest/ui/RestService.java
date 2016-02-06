@@ -41,21 +41,6 @@ public interface RestService
                        @FormParam( "public_key" ) String publicKey );
 
 
-    @POST
-	@Path( "/signup" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    Response signUp( @FormParam( "username" ) String username,
-                       @FormParam( "full_name" ) String fullName,
-                       @FormParam( "password" ) String password,
-                       @FormParam( "email" ) String email,
-                       @FormParam( "public_key" ) String publicKey );
-
-
-    @POST
-	@Path( "/approve" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    Response approve( @FormParam( "username" ) String username,@FormParam( "roles" ) String roles );
-
     @DELETE
     @Path( "/{userId}" )
     Response deleteUser( @PathParam( "userId" ) Long userId );

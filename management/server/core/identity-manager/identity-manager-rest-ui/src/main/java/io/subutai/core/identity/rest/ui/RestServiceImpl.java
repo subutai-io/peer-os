@@ -105,7 +105,7 @@ public class RestServiceImpl implements RestService
             {
                 Preconditions.checkArgument( !Strings.isNullOrEmpty( password ), "Password must be set" );
                 newUser = identityManager
-                        .createUser( username, password, fullName, email, UserType.Regular.getId(), publicKey, false );
+                        .createUser( username, password, fullName, email, UserType.Regular.getId() ,1 );
             }
             else
             {
@@ -133,42 +133,6 @@ public class RestServiceImpl implements RestService
         return Response.ok().build();
     }
 
-
-    @Override
-    public Response signUp( final String username,
-                            final String fullName,
-                            final String password,
-                            final String email,
-                            final String publicKey )
-
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( username ), "username is missing" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( fullName ), "fullname is missing" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( email ), "email must be set" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( password ), "passowrd must be set" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( publicKey ), "publicKey must be set" );
-
-        User unApprovedUser = identityManager.signUp( username,password,fullName,email,publicKey );
-
-        return Response.ok().build();
-    }
-
-
-    @Override
-    public Response approve(final String username, final String rolesJson )
-    {
-
-        List<Long> roleIds = JsonUtil.fromJson( rolesJson, new TypeToken<ArrayList<Long>>()
-        {
-        }.getType() );
-
-        List<Role> roles = roleIds.stream().map( r -> identityManager.getRole( r ) ).collect( Collectors.toList() );
-
-        identityManager.approveUser( username,roles );
-
-        return Response.ok().build();
-
-    }
 
 
     @Override

@@ -20,8 +20,7 @@
     </cm:default-properties>
   </cm:property-placeholder>
 
-  <reference id="securityManager"
-             interface="io.subutai.core.security.api.SecurityManager" />
+  <reference id="securityManager" interface="io.subutai.core.security.api.SecurityManager" />
 
   <!-- ************************************************************************************************* -->
   <bean id="daoManagerEnv" init-method="init" class="io.subutai.common.dao.DaoManager" activation="eager">

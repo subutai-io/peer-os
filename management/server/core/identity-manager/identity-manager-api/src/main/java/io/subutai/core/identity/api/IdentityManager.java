@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.objects.PermissionOperation;
@@ -15,6 +16,7 @@ import io.subutai.core.identity.api.model.Permission;
 import io.subutai.core.identity.api.model.Role;
 import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.identity.api.model.User;
+import io.subutai.core.identity.api.model.UserDelegate;
 import io.subutai.core.identity.api.model.UserToken;
 
 
@@ -55,6 +57,7 @@ public interface IdentityManager
      */
     String getUserToken( String userName, String password );
 
+
     /* *************************************************
      */
     User authenticateByToken( String token );
@@ -63,6 +66,21 @@ public interface IdentityManager
     /* *************************************************
      */
     User authenticateUser( String userName, String password );
+
+
+    /* *************************************************
+     */
+    UserDelegate getUserDelegate( long userId );
+
+
+    /* *************************************************
+     */
+    UserDelegate getUserDelegate( String id );
+
+
+    /* *************************************************
+     */
+    void setUserPublicKey( long userId, String publicKeyASCII );
 
 
     /* *************************************************
@@ -101,24 +119,30 @@ public interface IdentityManager
 
 
     /* *************************************************
-         */
+     */
     User createTempUser( String userName, String password, String fullName, String email, int type );
 
 
-    /* *************************************************
-     *
-     */
-    void approveUser(String userName,List<Role>roles);
-    /* *************************************************
-     *
-     */
+    //**************************************************************
+    void setTrustLevel( User user, int trustLevel );
 
-    User signUp( String username, String pwd, String fullName, String email, String keyAscii );
-    /* *************************************************
-     *
-     */
 
-    User createUser( String userName, String password, String fullName, String email, int type, String publicKey, boolean isApproved );
+
+    /* *************************************************
+     */
+    UserDelegate createUserDelegate( User user, String delegateUserId, boolean genKeyPair );
+
+
+    /* *************************************************
+    */
+    User createUser( String userName, String password, String fullName, String email, int type, int trustLevel,
+                     boolean generateKeyPair );
+
+
+    /* *************************************************
+    */
+    User createUser( String userName, String password, String fullName, String email, int type, int trustLevel);
+
 
 
     /* *************************************************
@@ -205,11 +229,11 @@ public interface IdentityManager
 
     /* *************************************************
      */
-    @PermitAll
     Session authenticateSession( String login, String password );
 
+
     /* *************************************************
-         */
+    */
     UserToken createUserToken( User user, String token, String secret, String issuer, int tokenType, Date validDate );
 
 
