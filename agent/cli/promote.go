@@ -1,15 +1,15 @@
 package lib
 
 import (
+	"github.com/subutai-io/Subutai/agent/config"
+	"github.com/subutai-io/Subutai/agent/lib/container"
+	"github.com/subutai-io/Subutai/agent/lib/fs"
+	"github.com/subutai-io/Subutai/agent/lib/net"
+	"github.com/subutai-io/Subutai/agent/log"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"strings"
-	"subutai/config"
-	"subutai/lib/container"
-	"subutai/lib/fs"
-	"subutai/lib/net"
-	"subutai/log"
 	"syscall"
 )
 
