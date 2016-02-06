@@ -722,7 +722,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 	function showResources(peerId, resourcesId) {
 		vm.currentResourceHosts = resourcesId;
 		vm.currentPeer = peerId;
-		$('.b-cloud-add-tools').animate({'left': '-202px'}, 300);
+		$('.b-cloud-add-tools').animate({'left': '-200px'}, 300);
 	}
 
 	var graph = new joint.dia.Graph;

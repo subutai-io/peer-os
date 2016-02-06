@@ -21,7 +21,9 @@ $(document).ready(function() {
 	}
 	colEqualHeight();
 });
-
+$('.js-cloud-btn').click(function(event) {
+	$( ".js-grid-list-switcher_list" ).toggleClass( "js-grid-list-switcher_list_show" );
+});
 $(".b-form-input_dropdown").click(function () {
 	$(this).toggleClass("is-active");
 });
