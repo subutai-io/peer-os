@@ -9,10 +9,10 @@
 
 	<div class="b-workspace__content">
 
-		<div class="b-main-form b-main-form_token">
+		<div class="b-main-form b-main-form_change-pass">
 
 			<form ng-submit="changePassCtrl.changePass(changePassCtrl.newPassword)" name="changePassForm">
-				<div class="b-main-form__wrapper">
+				<div class="b-main-form__element">
 					<label class="b-popup-body-label b-popup-body-label_inline">New password</label>
 					<input type="password" 
 						ng-model="changePassCtrl.newPassword" 
@@ -21,7 +21,7 @@
 						required>
 				</div><!--
 
-				--><div class="b-main-form__wrapper">
+				--><div class="b-main-form__element">
 					<label class="b-popup-body-label b-popup-body-label_inline">Confirm password</label>
 					<input type="password" 
 						ng-model="changePassCtrl.newToken.period" 
@@ -31,7 +31,7 @@
 						required>
 				</div><!--
 
-				--><div class="b-main-form__wrapper">
+				--><div class="b-main-form__element">
 					<button class="b-btn b-btn_green" type="submit">Save</button>
 					<div class="clear"></div>
 				</div>

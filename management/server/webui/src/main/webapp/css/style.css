@@ -1156,6 +1156,20 @@ input.b-popup-body-checkbox {
     margin-right: 20px;
 }
 
+.b-main-form_change-pass {
+	
+}
+
+.b-main-form__element {
+	margin-bottom: 17px;
+}
+
+.b-main-form_change-pass .b-popup-body-label_inline {
+	margin-right: 5px;
+    width: 120px;
+    display: inline-block;
+}
+
 .b-popup-body-input__error {
     box-shadow: 0px 0px 10px rgba(255, 0, 0, 0.6);
 }
