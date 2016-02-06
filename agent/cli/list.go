@@ -2,11 +2,11 @@ package lib
 
 import (
 	"fmt"
+	"github.com/subutai-io/Subutai/agent/config"
+	"github.com/subutai-io/Subutai/agent/lib/container"
+	"github.com/subutai-io/Subutai/agent/log"
 	lxc "gopkg.in/lxc/go-lxc.v2"
 	"strings"
-	"subutai/config"
-	"subutai/lib/container"
-	"subutai/log"
 )
 
 func printHeader(c, t, r, i, a, f, p bool) {
@@ -109,9 +109,6 @@ func info(name string) (result []string) {
 	log.Check(log.FatalLevel, "Looking for container "+name, err)
 
 	nic := "eth0"
-	if name == "management" {
-		nic = "eth1"
-	}
 
 	listip, _ := c.IPAddress(nic)
 	ip := strings.Join(listip, " ")

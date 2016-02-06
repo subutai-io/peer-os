@@ -1,8 +1,9 @@
 package lib
 
 import (
-	"subutai/lib/container"
-	"subutai/log"
+	"github.com/subutai-io/Subutai/agent/lib/container"
+	"github.com/subutai-io/Subutai/agent/lib/template"
+	"github.com/subutai-io/Subutai/agent/log"
 )
 
 // LxcStop stops the given containerName
@@ -12,6 +13,9 @@ func LxcStop(name string) {
 	}
 	if container.State(name) == "STOPPED" {
 		log.Info(name + " stopped")
+		if name == "management" {
+			template.MngStop()
+		}
 	} else {
 		log.Error(name + " stop failed")
 	}

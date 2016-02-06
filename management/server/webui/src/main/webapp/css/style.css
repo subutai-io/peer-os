@@ -77,7 +77,6 @@ input[type=checkbox] {
 .b-header-userbar-name {
     font-size: 13px;
     color: #04346E;
-    text-decoration: underline;
 }
 
 .b-header-userbar__avatar {
@@ -1180,6 +1179,20 @@ input.b-popup-body-checkbox {
     margin-right: 20px;
 }
 
+.b-main-form_change-pass {
+	
+}
+
+.b-main-form__element {
+	margin-bottom: 17px;
+}
+
+.b-main-form_change-pass .b-popup-body-label_inline {
+	margin-right: 5px;
+    width: 120px;
+    display: inline-block;
+}
+
 .b-popup-body-input__error {
     box-shadow: 0px 0px 10px rgba(255, 0, 0, 0.6);
 }
@@ -1990,6 +2003,8 @@ td.b-main-table__status-col {
 .b-tabs-menu {
     position: relative;
     z-index: 8;
+	background-color: #FFF;
+	border-left: 1px solid #CCCEEE;
 }
 
 .b-tabs-menu ul {
@@ -2574,31 +2589,43 @@ td.b-main-table__status-col {
     width: 100%;
 }
 
-.b-cloud__tools {
-    position: relative;
-    width: 247px;
-/*    border-left: 1px solid #CCCEEE;*/
+.b-cloud {
+	position: relative;
 }
+
+.b-cloud__tools {
+    position: absolute;
+	z-index: 5;
+	right: 0;
+	top: 0;
+	height: 100%;
+    width: 247px;
+}
+
+.b-cloud-tools {
+	height: 100%;
+}
+
 .b-cloud-add-tools {
     position: absolute;
-    left: -202px;
+    left: 0;
     top: 0;
-    z-index: 999;
+    z-index: 5;
     width: 200px;
     background-color: #fff;
-    border-left: 1px solid #ccceee;
-    box-shadow: -1px 0 0 rgba(0, 0, 0, 0.1);
-    transition: 0.25s cubic-bezier(0.785, 0.135, 0.15, 0.86);
-    transition-property: left, right;
-    transition-delay: 0s, .08s;
-}
-.b-cloud-add-tools_hide {
-    left: 248px;
+	z-index: 2;
 }
 .b-tools-menu {
-    height: 533px;
+    height: 100%;
+	box-sizing: border-box;
     position: relative;
-    overflow-y: auto;
+	z-index: 5;
+	background-color: #FFF;
+	border-left: 1px solid #CCCEEE;
+}
+
+.b-tools-menu_custom-scroll-huc {
+	padding-bottom: 46px;
 }
 
 .b-tools-menu ul {
@@ -2618,9 +2645,6 @@ td.b-main-table__status-col {
     font-size: 13px;
     padding: 10px 20px;
     border-bottom: 1px solid #ccceee;
-}
-.b-tools-menu_advanced ul li:last-child {
-    border-bottom: none;
 }
 .b-progress__cloud_rh {
     padding-left: 10px;
@@ -2661,6 +2685,14 @@ td.b-main-table__status-col {
     display: block;
     vertical-align: middle;
 }
+
+.b-cloud-item-resource-name {
+    text-decoration: none;
+    display: block;
+    vertical-align: middle;
+	color: #04346E;
+}
+
 .b-cloud-item img {
     max-width: 25px;
     max-height: 25px;
@@ -2675,7 +2707,7 @@ td.b-main-table__status-col {
     overflow: hidden;
 }
 .b-cloud-space_border-right {
-    border-right: 1px solid #CCCEEE;
+    /*border-right: 1px solid #CCCEEE;*/
     background: #fff url("../assets/elements/patter-stripes.png");
 }
 .b-cloud-space__work {

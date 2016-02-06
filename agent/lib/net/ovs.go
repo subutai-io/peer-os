@@ -3,10 +3,10 @@ package net
 import (
 	"bufio"
 	"bytes"
+	"github.com/subutai-io/Subutai/agent/log"
 	"os/exec"
 	"strconv"
 	"strings"
-	"subutai/log"
 )
 
 func RateLimit(nic string, rate ...string) string {

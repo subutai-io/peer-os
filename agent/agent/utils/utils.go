@@ -3,11 +3,11 @@ package utils
 import (
 	"bufio"
 	"bytes"
+	"github.com/subutai-io/Subutai/agent/config"
+	"github.com/subutai-io/Subutai/agent/log"
 	"io/ioutil"
 	"net"
 	"strings"
-	"subutai/config"
-	"subutai/log"
 	"time"
 )
 

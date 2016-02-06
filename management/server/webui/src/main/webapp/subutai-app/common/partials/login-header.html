@@ -12,15 +12,17 @@
 			});
 		});
 	</script>
-	<i class="fa fa-sign-in b-plugin-version"></i>
-	<a href ng-click="currentUserCtrl.logout()"
-		class="b-header-userbar-name"
-		ng-if="currentUserCtrl.currentUser">
-		{{ currentUserCtrl.currentUser }} <i class="fa fa-sign-out b-header-userbar__icon"></i>
-	</a>
+	<!--<i class="fa fa-sign-in b-plugin-version"></i>-->
+	<span ng-if="currentUserCtrl.currentUser" class="b-header-userbar-name">
+		<a href ui-sref="change-pass" class="b-header-userbar-name">Change password</a>
+		/ 
+		<a href ng-click="currentUserCtrl.logout()" class="b-header-userbar-name">
+			{{ currentUserCtrl.currentUser }} <i class="fa fa-sign-out b-header-userbar__icon"></i>
+		</a>
+	</span>
 	<a href ui-sref="login"
 		class="b-header-userbar-name"
 		ng-if="!currentUserCtrl.currentUser">
-		Logout
+		Login
 	</a>
 </div>

@@ -141,7 +141,6 @@ import io.subutai.core.repository.api.RepositoryManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
-import io.subutai.core.strategy.api.StrategyManager;
 
 
 /**
@@ -313,10 +312,18 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public PeerInfo getPeerInfo()
+    public PeerInfo getPeerInfo() throws PeerException
     {
-        this.peerInfo.setIp( managementHost.getInterfaceByName( externalIpInterface ).getIp() );
-        return peerInfo;
+        try
+        {
+            this.peerInfo.setIp( managementHost.getInterfaceByName( externalIpInterface ).getIp() );
+            return peerInfo;
+        }
+        catch ( Exception e ) {
+            LOG.warn( "Could not generate peer info: "+ e.getMessage() );
+
+        }
+        throw new PeerException( "Peer info unavailable." );
     }
 
 
@@ -2293,7 +2300,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public String getExternalIp()
+    public String getExternalIp() throws PeerException
     {
         return getPeerInfo().getIp();
     }

@@ -323,28 +323,31 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            Map<String, Set<NodeGroup>> nodeGroupPlacement = gson.fromJson( topologyJson, new TypeToken<Map<String, Set<NodeGroup>>>() {}.getType() );
-
             String name = environmentManager.getEnvironments().stream().filter( e -> e.getEnvironmentId().equals( environmentId )).findFirst( ).get().getName();
 
-            Topology topology = new Topology( name, 0, 0 );
+            ContainerPlacementStrategy placementStrategy = strategyManager.findStrategyById(
+                    ExampleStrategy.ID );
 
 
-            Iterator it = nodeGroupPlacement.entrySet().iterator();
-            while( it.hasNext() )
+            List<NodeSchema> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<NodeSchema>>() {}.getType() );
+
+            placementStrategy.setScheme( schema );
+
+            final List<PeerResources> resources = new ArrayList<>();
+            for ( final Peer peer : peerManager.getPeers() )
             {
-                Map.Entry pair = (Map.Entry)it.next();
-
-                for( NodeGroup nodeGroup : (Set<NodeGroup>)pair.getValue() )
-                {
-                    topology.addNodeGroupPlacement( (String) pair.getKey(), nodeGroup );
-                }
+                PeerResources peerResources =
+                        peerManager.getPeer( peer.getId() ).getResourceLimits( peerManager.getLocalPeer().getId() );
+                resources.add( peerResources );
             }
 
 
+            final PeerGroupResources peerGroupResources = new PeerGroupResources( resources );
+            final Map<ContainerSize, ContainerQuota> quotas = quotaManager.getDefaultQuotas();
 
-            Set<EnvironmentContainerHost> environment =
-                    environmentManager.growEnvironment( environmentId, topology, false );
+            Topology topology = placementStrategy.distribute( name, 0, 0, peerGroupResources, quotas );
+
+            environmentManager.setupRequisites( topology );
         }
         catch ( Exception e )
         {

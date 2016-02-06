@@ -99,6 +99,28 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 				}]
 			}
 		})
+		.state('change-pass', {
+			url: '/change-pass',
+			templateUrl: 'subutai-app/login/partials/change-pass.html',
+			data: {
+				bodyClass: '',
+				layout: 'default'
+			},
+			resolve: {
+				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+					return $ocLazyLoad.load([
+						{
+							name: 'subutai.login',
+							files: [
+								'subutai-app/login/login.js',
+								'subutai-app/login/controller.js',
+								'subutai-app/login/service.js'
+							]
+						}
+					])
+				}]
+			}
+		})
 		.state('home', {
 			url: '/',
 			templateUrl: 'subutai-app/monitoring/partials/view.html',

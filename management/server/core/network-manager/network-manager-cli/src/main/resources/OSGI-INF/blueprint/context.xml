@@ -45,5 +45,12 @@
       </action>
     </command>
   </command-bundle>
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="net/list-p2p">
+      <action class="io.subutai.core.network.cli.ListP2PCommand">
+        <argument ref="networkManager" />
+      </action>
+    </command>
+  </command-bundle>
 
 </blueprint>

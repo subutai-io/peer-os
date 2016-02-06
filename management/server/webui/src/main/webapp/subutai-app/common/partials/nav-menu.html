@@ -266,7 +266,7 @@
 			</a>
 		</li>
 		<li class="b-nav-menu">
-			<a class="b-nav-menu-link" ui-sref="plugins" id="subt-link__plugisns">
+			<a class="b-nav-menu-link" href id="subt-link__plugins-manager">
 				<span class="b-nav-menu__icon b-nav-menu-link__item">
 					<svg version="1.1" class="b-nav-menu-icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 						 viewBox="0 0 15 15" enable-background="new 0 0 15 15" xml:space="preserve">
@@ -284,36 +284,20 @@
 					</svg>
 				</span><!--
 					--><span class="b-nav-menu__title b-nav-menu-link__item">
-					<span class="b-nav-menu-link">
-					Plugins
-					</span>
+					Plugin Manager
+				</span>
+				<span class="b-nav-menu__add">
+					<span class="b-bav-menu-add"><i class="fa fa-caret-down"></i></span>
 				</span>
 			</a>
-		</li>
-		<li class="b-nav-menu">
-			<a class="b-nav-menu-link" ui-sref="plugin_integrator" id="subt-link__plugin_integrator">
-				<span class="b-nav-menu__icon b-nav-menu-link__item">
-					<svg version="1.1" class="b-nav-menu-icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-						 viewBox="0 0 15 15" enable-background="new 0 0 15 15" xml:space="preserve">
-					<g>
-
-							<line fill="none" stroke="#04346E" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="5" y1="1" x2="5" y2="5.1"/>
-
-							<line fill="none" stroke="#04346E" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="7.5" y1="11.6" x2="7.5" y2="14"/>
-
-							<line fill="none" stroke="#04346E" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="10.1" y1="1" x2="10.1" y2="5.1"/>
-						<path fill="none" stroke="#04346E" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" d="M7.5,11.6L7.5,11.6
-							c-2.8,0-5-1.7-5-3.9V5.1h9.9v2.6C12.5,9.9,10.3,11.6,7.5,11.6z"/>
-						<path fill="none" stroke="#04346E" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" d="M5,5.1"/>
-					</g>
-					</svg>
-				</span><!--
-					--><span class="b-nav-menu__title b-nav-menu-link__item">
-					<span class="b-nav-menu-link">
-					Plugin Integrator
-					</span>
-				</span>
-			</a>
+			<ul class="b-nav-menu__sub">
+				<li class="b-nav-menu-sub b-nav-menu-sub_disabled">
+					<a ui-sref="plugins" id="subt-link__plugins">Plugins</a>
+				</li>
+				<li class="b-nav-menu-sub b-nav-menu-sub_disabled">
+					<a ui-sref="plugin_integrator" id="subt-link__plugin-integrator">Integrator</a>
+				</li>
+			</ul>
 		</li>
 		<li class="b-nav-menu">
 			<a class="b-nav-menu-link" ui-sref="about" id="subt-link__about">
