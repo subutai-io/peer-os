@@ -19,6 +19,11 @@ function IdentityRoleCtrl($scope, identitySrv, DTOptionsBuilder, DTColumnBuilder
 	vm.permissions2Add = angular.copy(permissionsDefault);
 	vm.role2Add = {}
 
+	vm.rolesTypes = {
+		1: "Systemt",
+		2: "Regular",
+	};
+
 	//functions
 	vm.roleForm = roleForm;
 	vm.deleteRole = deleteRole;
@@ -52,12 +57,17 @@ function IdentityRoleCtrl($scope, identitySrv, DTOptionsBuilder, DTColumnBuilder
 	vm.dtColumns = [
 		DTColumnBuilder.newColumn(null).withTitle('').notSortable().renderWith(actionEdit),
 		DTColumnBuilder.newColumn('name').withTitle('Roles'),
+		DTColumnBuilder.newColumn('type').withTitle('Role type').renderWith(getRoleType),
 		DTColumnBuilder.newColumn(null).withTitle('Role permissions').renderWith(permissionsTags),
 		DTColumnBuilder.newColumn(null).withTitle('').notSortable().renderWith(actionDelete)
 	];
 
 	function createdRow(row, data, dataIndex) {
 		$compile(angular.element(row).contents())($scope);
+	}
+
+	function getRoleType(type) {
+		return vm.rolesTypes[type];
 	}
 
 	function actionEdit(data, type, full, meta) {
