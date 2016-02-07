@@ -913,7 +913,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 						$('.js-devops-item-info-block').hide();
 						delete vm.templateGrid[Math.floor(x / GRID_CELL_SIZE)][Math.floor(y / GRID_CELL_SIZE)];
 					} else {
-						console.log(vm.currentEnvironment.includedContainers);
 						var object = getElementByField('id', this.model.id, vm.currentEnvironment.includedContainers);
 						object !== null ? vm.currentEnvironment.includedContainers.splice(object.index, 1): null;
 						$('.js-add-dev-element[data-type=' + this.model.attributes.devType + ']')
