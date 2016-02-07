@@ -120,15 +120,6 @@ public class KeyManagerImpl implements KeyManager
     }
 
 
-    /* ***************************************************************
-     *
-     */
-    @Override
-    public String getOwnerId()
-    {
-        return PGPKeyUtil.getFingerprint( getPublicKey( getOwnerKeyIdx() ).getFingerprint() );
-    }
-
 
     /* ***************************************************************
      *
