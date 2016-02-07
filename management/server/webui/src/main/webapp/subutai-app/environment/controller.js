@@ -478,7 +478,34 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 	}
 
 	function notifyChanges() {
-		vm.dialog = ngDialog.open({
+		var templates = {};
+		var containers = vm.currentEnvironment.excludedContainers;
+		for (var index = 0; index < containers.length; index++) {
+			var quotaSize = containers[index].attributes.quotaSize;
+			var templateName = containers[index].attributes.templateName;
+			if (!templates[templateName]) {
+				templates[templateName] = {};
+				templates[templateName].quotas = {};
+				templates[templateName]
+					.quotas[quotaSize] = 1;
+			} else {
+				if (!templates[templateName].quotas) {
+					templates[templateName].quotas = {};
+					templates[templateName]
+						.quotas[quotaSize] = 1;
+				} else {
+					if (!templates[templateName].quotas[quotaSize]) {
+						templates[templateName]
+							.quotas[quotaSize] = 1;
+					} else {
+						templates[containers[index].attributes.templateName]
+							.quotas[quotaSize] += 1;
+					}
+				}
+			}
+		}
+
+		ngDialog.open({
 			template: 'subutai-app/environment/partials/popups/environment-modification-info.html',
 			scope: $scope,
 			className: 'b-build-environment-info'
@@ -519,6 +546,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 			});
 		} else {
 			clearWorkspace();
+			vm.isApplyingChanges = false;
 			//callback();
 		}
 	}
@@ -913,7 +941,10 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 						$('.js-devops-item-info-block').hide();
 						delete vm.templateGrid[Math.floor(x / GRID_CELL_SIZE)][Math.floor(y / GRID_CELL_SIZE)];
 					} else {
-						var object = getElementByField('id', this.model.id, vm.currentEnvironment.includedContainers);
+						var object =
+							vm.currentEnvironment.includedContainers ?
+								getElementByField('id', this.model.id, vm.currentEnvironment.includedContainers) :
+								null;
 						object !== null ? vm.currentEnvironment.includedContainers.splice(object.index, 1): null;
 						$('.js-add-dev-element[data-type=' + this.model.attributes.devType + ']')
 							.removeClass('b-devops-menu__li-link_active');
