@@ -138,7 +138,8 @@ public class PeerManagerImpl implements PeerManager
             this.peerDataService = new PeerDataService( daoManager.getEntityManagerFactory() );
 
             localPeerId = securityManager.getKeyManager().getPeerId();
-            ownerId = securityManager.getKeyManager().getOwnerId();
+            ownerId     = "owner"+localPeerId;
+
             //            final String localPeerIp = "127.0.0.1";
             //
             //            if ( localPeerIp == null || ownerId == null )
@@ -934,7 +935,7 @@ public class PeerManagerImpl implements PeerManager
     {
         try
         {
-            int result = 1;
+            int result = 0;
             for ( PeerData peerData : peerDataService.getAll() )
             {
                 if ( peerData.getOrder() > result )
@@ -1057,9 +1058,8 @@ public class PeerManagerImpl implements PeerManager
                 {
                     continue;
                 }
-                ControlNetworkConfig config =
-                        new ControlNetworkConfig( peer.getId(), addresses[data.getOrder()], localPeerId.toLowerCase(),
-                                key, controlNetworkTtl );
+                ControlNetworkConfig config = new ControlNetworkConfig( peer.getId(), addresses[data.getOrder() - 1],
+                        localPeerId.toLowerCase(), key, controlNetworkTtl );
                 updateTasks.add( new UpdateControlNetworkTask( config ) );
             }
             final ExecutorService pool = Executors.newFixedThreadPool( updateTasks.size() );
