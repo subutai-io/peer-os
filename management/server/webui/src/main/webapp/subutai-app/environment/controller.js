@@ -87,6 +87,8 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 	vm.addSettingsToTemplate = addSettingsToTemplate;
 
 	vm.addContainer = addContainer;
+	vm.signKey = signKey;
+	vm.hasPGPplugin = hasPGPplugin();
 
 	/*environmentService.getTemplates()
 		.success(function (data) {
@@ -425,7 +427,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 	}
 
 	function buildEnvironment() {
-		ngDialog.closeAll();
+		/*ngDialog.closeAll();
 		SweetAlert.swal(
 			{
 				title : 'Environment',
@@ -433,12 +435,30 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 				timer: VARS_TOOLTIP_TIMEOUT,
 				showConfirmButton: false
 			}
-		);		
+		);*/
+
+		vm.buildStep = 'showLogs';
+		var currentLog = {
+			"time": '',
+			"status": 'in-progress',
+			"classes": ['fa-spinner', 'fa-pulse'],
+			"text": 'Environment creation has been started'
+		};
+		vm.logMessages.push(currentLog);
+
 		environmentService.startEnvironmentBuild (vm.newEnvID[0], encodeURIComponent(vm.newEnvID[1])).success(function (data) {
 			SweetAlert.swal("Success!", "Your environment has been built successfully.", "success");
+
+			currentLog.status = 'success';
+			currentLog.classes = ['fa-check', 'g-text-green'];
+			currentLog.time = moment().format('h:mm:ss');
+
 			loadEnvironments();
 		}).error(function (data) {
 			SweetAlert.swal("ERROR!", "Environment build error. Error: " + data.ERROR, "error");
+			currentLog.status = 'fail';
+			currentLog.classes = ['fa-times', 'g-text-red'];
+			currentLog.time = moment().format('h:mm:ss');
 		});
 	}
 
@@ -1107,27 +1127,45 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 
 	vm.buildStep = 'confirm';
 	function buildEnvironmentByJoint() {
+
+		vm.newEnvID = [];		
+
 		var allElements = graph.getCells();
 		vm.env2Build = {};
 		vm.containers2Build = [];
 		vm.buildStep = 'confirm';
 		console.log(allElements);
+
 		for(var i = 0; i < allElements.length; i++) {
 			var currentElement = allElements[i];
-			var currentTemplateName = allElements[i].get('templateName');
 			var container2Build = {
 				"size": currentElement.get('quotaSize'),
-				"templateName": currentTemplateName,
+				"templateName": currentElement.get('templateName'),
 				"name": currentElement.get('containerName'),
 				"position": currentElement.get('position')
 			};
-			if(vm.env2Build[currentTemplateName] === undefined) {
-				vm.env2Build[currentTemplateName] = 1;
+
+			if (vm.env2Build[currentElement.get('templateName')] === undefined) {
+				vm.env2Build[currentElement.get('templateName')] = {};
+				vm.env2Build[currentElement.get('templateName')].count = 1;
+				vm.env2Build[currentElement.get('templateName')]
+					.sizes = {};
+				vm.env2Build[currentElement.get('templateName')]
+					.sizes[currentElement.get('quotaSize')] = 1;
 			} else {
-				vm.env2Build[currentTemplateName]++;
+				vm.env2Build[currentElement.get('templateName')].count++;
+				if(vm.env2Build[currentElement.get('templateName')].sizes[currentElement.get('quotaSize')] === undefined) {
+					vm.env2Build[currentElement.get('templateName')]
+						.sizes[currentElement.get('quotaSize')] = 1;
+				} else {
+					vm.env2Build[currentElement.get('templateName')]
+						.sizes[currentElement.get('quotaSize')]++;
+				}
 			}
+
 			vm.containers2Build.push(container2Build);
 		}
+
 		console.log(vm.containers2Build);
 		ngDialog.open({
 			template: 'subutai-app/environment/partials/popups/environment-build-info.html',
@@ -1143,22 +1181,61 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 		graph.resetCells();
 	}
 
+	vm.logMessages = [];
 	function sendToPending() {
-		LOADING_SCREEN();
+		vm.buildStep = 'pgpKey';
+
+		vm.logMessages = [];
+		var currentLog = {
+			"time": '',
+			"status": 'in-progress',
+			"classes": ['fa-spinner', 'fa-pulse'],
+			"text": 'Registering environment'
+		};
+		vm.logMessages.push(currentLog);
+
 		environmentService.startEnvironmentAutoBuild(vm.environment2BuildName, JSON.stringify(vm.containers2Build))
 			.success(function(data){
-				console.log(data);
 				vm.newEnvID = data;
-				vm.buildStep = 'pgpKey';
-				LOADING_SCREEN('none');
+				currentLog.status = 'success';
+				currentLog.classes = ['fa-check', 'g-text-green'];
+				currentLog.time = moment().format('h:mm:ss');
+
+				var currentLogText = 'Please sign PGP key manually';
+				if(vm.hasPGPplugin) {
+					currentLogText = 'Signing PGP key';
+				}
+
+				currentLog = {
+					"time": '',
+					"status": 'in-progress',
+					"classes": ['fa-spinner', 'fa-pulse'],
+					"text": currentLogText
+				};
+
+				vm.logMessages.push(currentLog);
 			}).error(function(error){
+				ngDialog.closeAll();
 				if(error.ERROR === undefined) {
 					VARS_MODAL_ERROR( SweetAlert, 'Error: ' + error );
 				} else {
 					VARS_MODAL_ERROR( SweetAlert, 'Error: ' + error.ERROR );
 				}
-				LOADING_SCREEN('none');
 			});
+	}
+
+	function signKey() {
+		var currentLog = vm.logMessages[vm.logMessages.length - 1];
+		currentLog.status = 'success';
+		currentLog.classes = ['fa-check', 'g-text-green'];
+		currentLog.time = moment().format('h:mm:ss');
+		console.log(currentLog);
+		if(vm.hasPGPplugin) {
+			console.log(vm.logMessages);
+			buildEnvironment();
+		} else {
+			$('.js-environment-build').prop('disabled', false);
+		}
 	}
 
 	function addSettingsToTemplate(settings) {

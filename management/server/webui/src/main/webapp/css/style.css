@@ -436,6 +436,10 @@ input[type=checkbox] {
     text-transform: capitalize;
 }
 
+.b-main-table__mini-icon {
+	width: 20px;
+}
+
 .b-main-table__tags {
     width: 250px;
 }
@@ -3004,6 +3008,7 @@ td.b-main-table__status-col {
     border-radius: 2px;
 
 }
+
 .g-circle-label_green {
     background-color: #4bbc6e;
 }
@@ -3013,3 +3018,8 @@ td.b-main-table__status-col {
 .g-circle-label_red {
     background-color: #ef3f61;
 }
+
+.js-popup-loading-screen {
+	display: none!important;
+}
+
