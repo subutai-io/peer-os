@@ -56,6 +56,7 @@ import io.subutai.common.settings.Common;
 import io.subutai.core.kurjun.api.vapt.AptManager;
 import io.subutai.core.kurjun.impl.RepoUrl;
 import io.subutai.core.kurjun.impl.RepoUrlStore;
+import io.subutai.core.kurjun.impl.TrustedWebClientFactoryModule;
 
 
 public class AptManagerImpl implements AptManager
@@ -113,6 +114,7 @@ public class AptManagerImpl implements AptManager
         bootstrap.addModule( new SnapMetadataParserModule() );
 
         bootstrap.addModule( new RepositoryModule() );
+        bootstrap.addModule( new TrustedWebClientFactoryModule() );
         //        bootstrap.addModule( new SecurityModule() );
 
         bootstrap.boot();

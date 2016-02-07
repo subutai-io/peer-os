@@ -553,6 +553,7 @@ public class TemplateManagerImpl implements TemplateManager
         bootstrap.addModule( new SnapMetadataParserModule() );
 
         bootstrap.addModule( new RepositoryModule() );
+        bootstrap.addModule( new TrustedWebClientFactoryModule() );
         bootstrap.addModule( new SecurityModule() );
         bootstrap.addModule( new QuotaManagementModule() );
 
