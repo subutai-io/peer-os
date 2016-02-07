@@ -715,3 +715,12 @@ function toggle (source, name) {
 		checkboxes[i].checked = source.checked;
 	}
 }
+
+function hasPGPplugin() {
+	if($('#bp-plugin-version').val().length > 0) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
