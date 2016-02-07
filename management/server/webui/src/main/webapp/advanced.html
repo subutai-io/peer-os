@@ -636,6 +636,22 @@
 <!--directive dep-->
 <script src="assets/js/directives.js"></script>
 <script src="scripts/scripts.js"></script>
+<script>
+$('a.js-cbox-modal').colorbox({
+	title: " ",
+	transition: "none",
+	previous: false,
+	next: false,
+	arrowKey: false,
+	rel: false,
+	overlayClose: true,
+	opacity: 0.8,
+	closeButton: false,
+	onComplete: function() {
+		$.colorbox.resize();
+	}
+});
+</script>
 </body>
 
 </html>

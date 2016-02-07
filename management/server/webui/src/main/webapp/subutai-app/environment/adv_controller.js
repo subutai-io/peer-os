@@ -150,18 +150,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 		DTColumnDefBuilder.newColumnDef(5).notSortable(),
 	];
 
-	//pending environment table options
-	vm.dtOptionsPendingTable = DTOptionsBuilder
-		.newOptions()
-		.withOption('order', [[ 1, "asc" ]])
-		.withOption('stateSave', true)
-		.withPaginationType('full_numbers');
-	vm.dtColumnDefsPendingTable = [
-		DTColumnDefBuilder.newColumnDef(0).notSortable(),
-		DTColumnDefBuilder.newColumnDef(1),
-		DTColumnDefBuilder.newColumnDef(2).notSortable()
-	];
-
 	vm.listOfUsers = [];
 	vm.shareEnvironmentWindow = shareEnvironmentWindow;
 	vm.toggleSelection = toggleSelection;
@@ -587,7 +575,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 	}
 
 	function setSSHKey(sshKey) {
-		console.log(sshKey);
 		if(sshKey === undefined || sshKey.length <= 0 || sshKey === null) return;
 		environmentService.setSshKey(sshKey, vm.sshKeyForEnvironment).success(function (data) {
 			SweetAlert.swal("Success!", "You have successfully added SSH key for " + vm.sshKeyForEnvironment + " environment!", "success");
@@ -680,7 +667,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 			}
 		}
 
-		console.log(cloneContainers);
 		LOADING_SCREEN();
 		ngDialog.closeAll();
 		vm.activeTab = 'pending';

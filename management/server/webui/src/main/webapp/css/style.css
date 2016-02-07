@@ -2027,6 +2027,9 @@ td.b-main-table__status-col {
     position: relative;
     z-index: 8;
 	background-color: #FFF;
+}
+
+.b-cloud__tools .b-tabs-menu {
 	border-left: 1px solid #CCCEEE;
 }
 

@@ -43,7 +43,7 @@ var UPDATE_NIGHTLY_BUILD_STATUS;
 //document.getElementById("uploadBtn").onchange = function () {
 //	document.getElementById("uploadFile").value = this.value;
 //};
-$('a.js-cbox-modal').colorbox({
+/*$('a.js-cbox-modal').colorbox({
 	title: " ",
 	transition: "none",
 	previous: false,
@@ -56,4 +56,4 @@ $('a.js-cbox-modal').colorbox({
 	onComplete: function() {
 		$.colorbox.resize();
 	}
-});
+});*/

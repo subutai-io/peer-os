@@ -31,6 +31,24 @@
 					   ng-model="identityUserFormCtrl.user2Add.email"
 					   required>
 
+				<label class="b-popup-body-label b-popup-body-label_block">User type:</label>
+				<select type="type"
+					   class="b-popup-body-input b-popup-body-input_full b-popup-body-input_margin-bttm" 
+					   ng-model="identityUserFormCtrl.user2Add.type"
+					   required>
+					<option value="1">Test</option>
+					<option value="2">Test2</option>
+				</select>
+
+				<label class="b-popup-body-label b-popup-body-label_block">Trust Level:</label>
+				<select type="trustLevel" 
+					   class="b-popup-body-input b-popup-body-input_full b-popup-body-input_margin-bttm" 
+					   ng-model="identityUserFormCtrl.user2Add.trustLevel" 
+					   required>
+					<option value="1">Test</option>
+					<option value="2">Test2</option>
+				</select>
+
 				<label class="b-popup-body-label b-popup-body-label_block">Password:</label>
 				<input type="password"
 					   placeholder="***********"

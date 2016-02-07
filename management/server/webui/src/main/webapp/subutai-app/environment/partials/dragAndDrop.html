@@ -33,9 +33,7 @@
 					<div class="b-tools-menu js-scrollbar">
 						<ul>
 							<li ng-repeat="template in environmentViewCtrl.templates">
-								<a href="#"
-									class="js-add-dev-element"
-									data-template="{{ template }}">
+								<a href ng-click="environmentViewCtrl.addContainer(template, $event)">
 									<span class="b-cloud-item">
 										<img
 											src="assets/templates/{{ template }}.jpg"
