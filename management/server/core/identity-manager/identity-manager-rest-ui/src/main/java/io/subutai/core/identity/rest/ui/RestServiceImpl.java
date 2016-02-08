@@ -179,6 +179,7 @@ public class RestServiceImpl implements RestService
         {
             User activeUser = identityManager.getActiveUser();
             UserDelegate userDelegate = identityManager.getUserDelegate( activeUser.getId() );
+            LOGGER.info( userDelegate.getId());
             return Response.ok( userDelegate.getRelationDocument() ).build();
         }
         catch ( Exception e )

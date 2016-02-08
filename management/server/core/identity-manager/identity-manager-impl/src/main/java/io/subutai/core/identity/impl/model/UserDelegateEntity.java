@@ -30,7 +30,7 @@ public class UserDelegateEntity implements UserDelegate
     @Column( name = "type" )
     private int type = 2; // System User
 
-    @Column(name = "relation_document")
+    @Column(name = "relation_document", length = 3000)
     private String relationDocument;
 
 

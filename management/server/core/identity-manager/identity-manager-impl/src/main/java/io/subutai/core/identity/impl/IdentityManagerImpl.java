@@ -824,6 +824,9 @@ public class IdentityManagerImpl implements IdentityManager
 
             String encryptedMessage = "\n" + new String( relationEncrypted, "UTF-8" );
             delegatedUser.setRelationDocument( encryptedMessage );
+            identityDataService.updateUserDelegate( delegatedUser );
+            LOGGER.info(encryptedMessage);
+            LOGGER.info(delegatedUser.getId());
         }
         catch ( NamingException e )
         {
