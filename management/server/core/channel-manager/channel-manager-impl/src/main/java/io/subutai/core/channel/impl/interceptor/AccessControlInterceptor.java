@@ -125,7 +125,9 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
         if ( message == null )
         {
             //***********internal auth ********* for regisration and 8444 port
-            return channelManagerImpl.getIdentityManager().login( "internal", "internal" );
+            String intToken = channelManagerImpl.getIdentityManager().getUserToken( "internal", "secretSubutai" );
+
+            return channelManagerImpl.getIdentityManager().login( "token", intToken );
         }
         else
         {

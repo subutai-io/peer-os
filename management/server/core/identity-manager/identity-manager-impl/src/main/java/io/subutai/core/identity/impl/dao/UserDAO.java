@@ -66,29 +66,6 @@ class UserDAO
         List<User> result = Lists.newArrayList();
         try
         {
-            result = em.createQuery( "select h from UserEntity h WHERE h.isApproved = true", User.class ).getResultList();
-        }
-        catch ( Exception e )
-        {
-        }
-        finally
-        {
-            daoManager.closeEntityManager( em );
-        }
-        return result;
-    }
-
-
-    /* *************************************************
-     *
-     */
-    public List<User> getAllSystemUsers()
-    {
-        EntityManager em = daoManager.getEntityManagerFromFactory();
-
-        List<User> result = Lists.newArrayList();
-        try
-        {
             result = em.createQuery( "select h from UserEntity h", User.class ).getResultList();
         }
         catch ( Exception e )
@@ -105,7 +82,7 @@ class UserDAO
     /* *************************************************
      *
      */
-    public void persist( final User item )
+    public void persist( User item )
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
         try
@@ -113,6 +90,7 @@ class UserDAO
             daoManager.startTransaction( em );
             em.persist( item );
             em.flush();
+
             daoManager.commitTransaction( em );
         }
         catch ( Exception e )

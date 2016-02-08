@@ -62,7 +62,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            return Response.ok( jsonUtil.to( identityManager.getAllSystemUsers() ) ).build();
+            return Response.ok( jsonUtil.to( identityManager.getAllUsers() ) ).build();
         }
         catch ( Exception e )
         {
@@ -105,7 +105,7 @@ public class RestServiceImpl implements RestService
             {
                 Preconditions.checkArgument( !Strings.isNullOrEmpty( password ), "Password must be set" );
                 newUser = identityManager
-                        .createUser( username, password, fullName, email, UserType.Regular.getId() ,1 );
+                        .createUser( username, password, fullName, email, UserType.Regular.getId() ,1,false,true );
             }
             else
             {

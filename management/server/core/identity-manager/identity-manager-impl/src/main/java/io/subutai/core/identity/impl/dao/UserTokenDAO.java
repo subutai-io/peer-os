@@ -136,14 +136,14 @@ public class UserTokenDAO
     /* *************************************************
      *
      */
-    public void persist( final UserToken item )
+    public void persist( UserToken item )
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
         try
         {
             daoManager.startTransaction( em );
             em.persist( item );
-            //em.flush();
+            em.flush();
             daoManager.commitTransaction( em );
         }
         catch ( Exception e )

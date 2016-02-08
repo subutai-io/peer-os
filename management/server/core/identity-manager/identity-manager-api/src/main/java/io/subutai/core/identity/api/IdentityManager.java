@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 
 import io.subutai.common.security.objects.PermissionObject;
@@ -90,16 +89,16 @@ public interface IdentityManager
 
     /* *************************************************
      */
-    List<User> getAllSystemUsers();
-
-
-    /* *************************************************
-     */
     void assignUserRole( long userId, Role role );
 
 
     /* *************************************************
      */
+    void assignUserRole( User user, Role role );
+
+
+    /* *************************************************
+      */
     User getUser( long userId );
 
 
@@ -136,13 +135,7 @@ public interface IdentityManager
     /* *************************************************
     */
     User createUser( String userName, String password, String fullName, String email, int type, int trustLevel,
-                     boolean generateKeyPair );
-
-
-    /* *************************************************
-    */
-    User createUser( String userName, String password, String fullName, String email, int type, int trustLevel);
-
+                     boolean generateKeyPair, boolean createUserDelegate );
 
 
     /* *************************************************
@@ -152,6 +145,11 @@ public interface IdentityManager
 
     /* *************************************************
      */
+    @RolesAllowed( "Identity-Management|Delete" )
+    void removeUserRole( User user, Role role );
+
+    /* *************************************************
+         */
     boolean changeUserPassword( long userId, String oldPassword, String newPassword );
 
 
@@ -219,6 +217,11 @@ public interface IdentityManager
 
     /* *************************************************
      */
+    void assignRolePermission( Role role, Permission permission );
+
+
+    /* *************************************************
+     */
     void removeAllRolePermissions( long roleId );
 
 
@@ -261,8 +264,6 @@ public interface IdentityManager
     /* *************************************************
      */
     void removeUserToken( String tokenId );
-
-
 
 
 

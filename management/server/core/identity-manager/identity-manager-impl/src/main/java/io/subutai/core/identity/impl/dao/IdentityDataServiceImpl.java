@@ -46,6 +46,7 @@ public class IdentityDataServiceImpl implements IdentityDataService
             sessionDAOService = new SessionDAO( daoManager );
             permissionDAOService = new PermissionDAO( daoManager );
             userTokenDAOService = new UserTokenDAO( daoManager );
+            userDelegateDAOService = new UserDelegateDAO(daoManager);
         }
         else
         {
@@ -81,8 +82,21 @@ public class IdentityDataServiceImpl implements IdentityDataService
     public void assignUserRole( long userId, Role role )
     {
         User user = userDAOService.find( userId );
-        user.getRoles().add( role );
-        userDAOService.update( user );
+        assignUserRole( user, role );
+    }
+
+
+    /* *************************************************
+     *
+     */
+    @Override
+    public void assignUserRole( User user, Role role )
+    {
+        if(user!=null)
+        {
+            user.getRoles().add( role );
+            userDAOService.update( user );
+        }
     }
 
 
@@ -93,9 +107,21 @@ public class IdentityDataServiceImpl implements IdentityDataService
     public void removeUserRole( long userId, Role role )
     {
         User user = userDAOService.find( userId );
+        removeUserRole( user, role );
+    }
 
-        user.getRoles().remove( role );
-        userDAOService.update( user );
+
+    /* *************************************************
+     *
+     */
+    @Override
+    public void removeUserRole( User user, Role role )
+    {
+        if(user!=null)
+        {
+            user.getRoles().remove( role );
+            userDAOService.update( user );
+        }
     }
 
 
@@ -108,15 +134,8 @@ public class IdentityDataServiceImpl implements IdentityDataService
     }
 
 
-    @Override
-    public List<User> getAllSystemUsers()
-    {
-        return userDAOService.getAllSystemUsers();
-    }
-
-
     /* *************************************************
-         */
+     */
     @Override
     public void persistUser( final User item )
     {
@@ -194,8 +213,21 @@ public class IdentityDataServiceImpl implements IdentityDataService
     public void assignRolePermission( long roleId, Permission permission )
     {
         Role role = roleDAOService.find( roleId );
-        role.getPermissions().add( permission );
-        roleDAOService.update( role );
+        assignRolePermission( role, permission );
+    }
+
+
+    /* *************************************************
+     *
+     */
+    @Override
+    public void assignRolePermission( Role role, Permission permission )
+    {
+        if(role != null)
+        {
+            role.getPermissions().add( permission );
+            roleDAOService.update( role );
+        }
     }
 
 
@@ -206,8 +238,21 @@ public class IdentityDataServiceImpl implements IdentityDataService
     public void removeAllRolePermissions( long roleId )
     {
         Role role = roleDAOService.find( roleId );
-        role.getPermissions().clear();
-        roleDAOService.update( role );
+        removeAllRolePermissions( role );
+    }
+
+
+    /* *************************************************
+     *
+     */
+    @Override
+    public void removeAllRolePermissions( Role role )
+    {
+        if(role!=null)
+        {
+            role.getPermissions().clear();
+            roleDAOService.update( role );
+        }
     }
 
 
@@ -263,8 +308,20 @@ public class IdentityDataServiceImpl implements IdentityDataService
     public void removeRolePermission( final long roleId, Permission permission )
     {
         Role role = roleDAOService.find( roleId );
-        role.getPermissions().remove( permission );
-        roleDAOService.update( role );
+        removeRolePermission( role, permission );
+    }
+
+
+    /* *************************************************
+     */
+    @Override
+    public void removeRolePermission( Role role, Permission permission )
+    {
+        if(role != null)
+        {
+            role.getPermissions().remove( permission );
+            roleDAOService.update( role );
+        }
     }
 
 
