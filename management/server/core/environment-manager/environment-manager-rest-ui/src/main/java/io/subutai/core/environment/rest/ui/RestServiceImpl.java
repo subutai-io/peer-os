@@ -57,9 +57,9 @@ import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.strategy.api.ContainerPlacementStrategy;
-import io.subutai.core.strategy.api.ExampleStrategy;
 import io.subutai.core.strategy.api.NodeSchema;
 import io.subutai.core.strategy.api.StrategyManager;
+import io.subutai.core.strategy.api.UnlimitedStrategy;
 
 
 public class RestServiceImpl implements RestService
@@ -168,7 +168,7 @@ public class RestServiceImpl implements RestService
 
         try
         {
-            ContainerPlacementStrategy placementStrategy = strategyManager.findStrategyById( ExampleStrategy.ID );
+            ContainerPlacementStrategy placementStrategy = strategyManager.findStrategyById( UnlimitedStrategy.ID );
 
             //            if( !(placementStrategy instanceof GroupPlacementStrategy ) )
             //            {
@@ -330,7 +330,7 @@ public class RestServiceImpl implements RestService
                                             .filter( e -> e.getEnvironmentId().equals( environmentId ) ).findFirst()
                                             .get().getName();
 
-            ContainerPlacementStrategy placementStrategy = strategyManager.findStrategyById( ExampleStrategy.ID );
+            ContainerPlacementStrategy placementStrategy = strategyManager.findStrategyById( UnlimitedStrategy.ID );
 
 
             List<NodeSchema> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<NodeSchema>>() {}.getType() );
