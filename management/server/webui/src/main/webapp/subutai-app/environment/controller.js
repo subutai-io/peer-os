@@ -4,12 +4,12 @@ angular.module('subutai.environment.controller', [])
 	.controller('EnvironmentViewCtrl', EnvironmentViewCtrl)
 	.directive('fileModel', fileModel);
 
-EnvironmentViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'peerRegistrationService', 'SweetAlert', '$resource', '$compile', 'ngDialog', '$timeout', '$sce', '$stateParams', 'DTOptionsBuilder', 'DTColumnDefBuilder'];
+EnvironmentViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'trackerSrv', 'SweetAlert', '$resource', '$compile', 'ngDialog', '$timeout', '$sce', '$stateParams', 'DTOptionsBuilder', 'DTColumnDefBuilder'];
 fileModel.$inject = ['$parse'];
 
 var fileUploder = {};
 
-function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistrationService, SweetAlert, $resource, $compile, ngDialog, $timeout, $sce, $stateParams, DTOptionsBuilder, DTColumnDefBuilder) {
+function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv, SweetAlert, $resource, $compile, ngDialog, $timeout, $sce, $stateParams, DTOptionsBuilder, DTColumnDefBuilder) {
 
 	var vm = this;
 	var GRID_CELL_SIZE = 100;
@@ -90,15 +90,15 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 	vm.signKey = signKey;
 	vm.hasPGPplugin = hasPGPplugin();
 
-	/*environmentService.getTemplates()
+	environmentService.getTemplates()
 		.success(function (data) {
 			vm.templates = data;
 		})
 		.error(function (data) {
 			VARS_MODAL_ERROR( SweetAlert, 'Error on getting templates ' + data );
-		});*/
+		});
 
-	vm.templates = ['cassandra', 'mongo', 'zookeer', 'master', 'hadoop', 'spark', 'solr'];
+	//vm.templates = ['cassandra', 'mongo', 'zookeer', 'master', 'hadoop', 'spark', 'solr'];
 
 	environmentService.getContainersType()
 		.success(function (data) {
@@ -147,12 +147,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 
 	environmentService.getPeers().success(function (data) {
 		vm.peerIds = data;
-		console.log(vm.peerIds);
-	});
-
-	peerRegistrationService.getRequestedPeers().success(function (peers) {
-		peers.unshift({peerInfo: {id: 'local'}});
-		vm.peers = peers;
 	});
 
 	//installed environment table options
@@ -426,6 +420,91 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 				vm.selectedPeers.splice(vm.selectedPeers.indexOf(peerId), 1);
 	}
 
+	function getLogsFromTracker(environmentId) {
+		trackerSrv.getOperations('ENVIRONMENT MANAGER', moment().format('YYYY-MM-DD'), moment().format('YYYY-MM-DD'), 100)
+			.success(function (data) {
+				for(var i = 0; i < data.length; i++) {
+					if(data[i].description.includes(environmentId)) {
+						getLogById(data[i].id, true);
+					}
+				}
+				return false;
+			}).error(function(error) {
+				console.log(error);
+			});		
+	}
+
+	function checkLastLog(status) {
+		var lastLog = vm.logMessages[vm.logMessages.length - 1];
+		lastLog.time = moment().format('h:mm:ss');
+		if(status === true) {
+			lastLog.status = 'success';
+			lastLog.classes = ['fa-check', 'g-text-green'];
+		} else {
+			lastLog.status = 'success';
+			lastLog.classes = ['fa-times', 'g-text-red'];
+		}
+	}
+
+	function getLogById(id, checkLast, prevLogs) {
+		if(checkLast === undefined || checkLast === null) checkLast = false;
+		if(prevLogs === undefined || prevLogs === null) prevLogs = false;
+		trackerSrv.getOperation('ENVIRONMENT MANAGER', id)
+			.success(function (data) {
+				if(data.state == 'RUNNING') {
+
+					if(checkLast) {
+						checkLastLog(true);
+					}
+
+					var logs = data.log.split(/(?:\r\n|\r|\n)/g);
+					var result = [];
+					var i = 0;
+					if(prevLogs) {
+						i = prevLogs.length;
+						if(logs.length > prevLogs.length) {
+							checkLastLog(true);
+						}
+					}
+					for(i; i < logs.length; i++) {
+
+						var logTime = moment().format('h:mm:ss');
+						var logStatus = 'success';
+						var logClasses = ['fa-check', 'g-text-green'];
+						if(i+1 == logs.length) {
+							logTime = '';
+							logStatus = 'in-progress';
+							logClasses = ['fa-spinner', 'fa-pulse'];
+						}
+
+						var  currentLog = {
+							"time": logTime,
+							"status": logStatus,
+							"classes": logClasses,
+							"text": logs[i]
+						};
+						result.push(currentLog);
+					}
+
+					vm.logMessages = vm.logMessages.concat(result);
+
+					setTimeout(function() {
+						getLogById(id, false, logs);
+					}, 2000);					
+
+					return result;
+				} else {
+					if(data.state == 'FAILED') {
+						checkLastLog(false);
+					} else {
+						checkLastLog(true);
+					}
+				}
+			}).error(function(error) {
+				console.log(error);
+			});
+	}
+
 	function buildEnvironment() {
 		/*ngDialog.closeAll();
 		SweetAlert.swal(
@@ -460,6 +539,10 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 			currentLog.classes = ['fa-times', 'g-text-red'];
 			currentLog.time = moment().format('h:mm:ss');
 		});
+
+		$timeout(function() {
+			var logId = getLogsFromTracker(vm.newEnvID[0]);
+		}, 3000);
 	}
 
 	function growEnvironment() {
@@ -756,7 +839,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 	}
 
 	function setSSHKey(sshKey) {
-		console.log(sshKey);
 		if(sshKey === undefined || sshKey.length <= 0 || sshKey === null) return;
 		environmentService.setSshKey(sshKey, vm.sshKeyForEnvironment).success(function (data) {
 			SweetAlert.swal("Success!", "You have successfully added SSH key for " + vm.sshKeyForEnvironment + " environment!", "success");
@@ -1134,7 +1216,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 		vm.env2Build = {};
 		vm.containers2Build = [];
 		vm.buildStep = 'confirm';
-		console.log(allElements);
 
 		for(var i = 0; i < allElements.length; i++) {
 			var currentElement = allElements[i];
@@ -1216,7 +1297,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 				vm.logMessages.push(currentLog);
 			}).error(function(error){
 				ngDialog.closeAll();
-				if(error.ERROR === undefined) {
+				if(error && error.ERROR === undefined) {
 					VARS_MODAL_ERROR( SweetAlert, 'Error: ' + error );
 				} else {
 					VARS_MODAL_ERROR( SweetAlert, 'Error: ' + error.ERROR );
@@ -1225,13 +1306,8 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 	}
 
 	function signKey() {
-		var currentLog = vm.logMessages[vm.logMessages.length - 1];
-		currentLog.status = 'success';
-		currentLog.classes = ['fa-check', 'g-text-green'];
-		currentLog.time = moment().format('h:mm:ss');
-		console.log(currentLog);
+		checkLastLog(true);
 		if(vm.hasPGPplugin) {
-			console.log(vm.logMessages);
 			buildEnvironment();
 		} else {
 			$('.js-environment-build').prop('disabled', false);

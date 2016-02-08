@@ -4,9 +4,9 @@ angular.module('subutai.environment.service', [])
 	.factory('environmentService', environmentService);
 
 
-environmentService.$inject = ['$http', 'peerRegistrationService'];
+environmentService.$inject = ['$http'];
 
-function environmentService($http, peerRegistrationService) {
+function environmentService($http) {
 
 	var ENVIRONMENTS_URL = SERVER_URL + 'rest/ui/environments/';
 
@@ -89,9 +89,6 @@ function environmentService($http, peerRegistrationService) {
 		revoke: revoke,
 
 		startEnvironmentAutoBuild: startEnvironmentAutoBuild,
-
-		getRequestedPeers: getRequestedPeers,
-		getResourceHosts: getResourceHosts,
 
 		getServerUrl : function getServerUrl() { return ENVIRONMENTS_URL; }
 	};
@@ -360,15 +357,4 @@ function environmentService($http, peerRegistrationService) {
 		);
 	}
 
-	function getRequestedPeers() {
-		return peerRegistrationService.getRequestedPeers();
-	}
-
-	function getRequestedPeers() {
-		return peerRegistrationService.getRequestedPeers();
-	}
-
-	function getResourceHosts() {
-		return peerRegistrationService.getResourceHosts();
-	}
 }
