@@ -299,27 +299,48 @@
 				</li>
 			</ul>
 		</li>
-		<li class="b-nav-menu">
-			<a class="b-nav-menu-link" ui-sref="about" id="subt-link__about">
+<li class="b-nav-menu">
+			<a class="b-nav-menu-link" href id="subt-link__settings">
 				<span class="b-nav-menu__icon b-nav-menu-link__item">
 					<svg version="1.1" class="b-nav-menu-icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 						 viewBox="0 0 15 15" enable-background="new 0 0 15 15" xml:space="preserve">
 					<g>
 
-							<line fill="none" stroke="#04346E" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="7.5" y1="11.8" x2="7.5" y2="7.5"/>
+							<line fill="none" stroke="#04346E" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="5" y1="1" x2="5" y2="5.1"/>
 
-							<circle fill="none" stroke="#04346E" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" cx="7.5" cy="7.5" r="7"/>
+							<line fill="none" stroke="#04346E" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="7.5" y1="11.6" x2="7.5" y2="14"/>
 
-							<circle fill="none" stroke="#04346E" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" cx="7.5" cy="4.3" r="1"/>
+							<line fill="none" stroke="#04346E" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="10.1" y1="1" x2="10.1" y2="5.1"/>
+						<path fill="none" stroke="#04346E" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" d="M7.5,11.6L7.5,11.6
+							c-2.8,0-5-1.7-5-3.9V5.1h9.9v2.6C12.5,9.9,10.3,11.6,7.5,11.6z"/>
+						<path fill="none" stroke="#04346E" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" d="M5,5.1"/>
 					</g>
 					</svg>
 				</span><!--
 					--><span class="b-nav-menu__title b-nav-menu-link__item">
-					<span class="b-nav-menu-link">
-					About
-					</span>
+					System Settings
+				</span>
+				<span class="b-nav-menu__add">
+					<span class="b-bav-menu-add"><i class="fa fa-caret-down"></i></span>
 				</span>
 			</a>
+			<ul class="b-nav-menu__sub">
+				<li class="b-nav-menu-sub b-nav-menu-sub_disabled">
+					<a ui-sref="settings-peer" id="subt-link__settings-peer">Peer settings</a>
+				</li>
+				<li class="b-nav-menu-sub b-nav-menu-sub_disabled">
+					<a ui-sref="settings-kurjun" id="subt-link__settings-kurjun">Kurjun Settings</a>
+				</li>
+				<li class="b-nav-menu-sub b-nav-menu-sub_disabled">
+					<a ui-sref="peer-policy" id="subt-link__peer-policy">Peer Policy</a>
+				</li>
+				<li class="b-nav-menu-sub b-nav-menu-sub_disabled">
+					<a ui-sref="updates" id="subt-link__updates">Updates</a>
+				</li>
+				<li class="b-nav-menu-sub b-nav-menu-sub_disabled">
+					<a ui-sref="about" id="subt-link__about">About</a>
+				</li>
+			</ul>
 		</li>
 	</ul>
 </nav>
