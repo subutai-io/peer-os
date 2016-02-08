@@ -1016,7 +1016,6 @@ tip.description-tooltip {
     /*width: 610px;*/
     background-color: #fff;
     border: 1px solid #CCCEEE;
-
 }
 
 .b-popup_wide {
@@ -1035,6 +1034,7 @@ tip.description-tooltip {
 
 .b-popup_middle {
     width: 355px;
+
 }
 
 .b-popup_environment-creation {

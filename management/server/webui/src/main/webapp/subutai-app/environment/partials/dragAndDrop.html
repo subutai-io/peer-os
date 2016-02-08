@@ -32,7 +32,7 @@
 								<a href ng-click="environmentViewCtrl.addContainer(template, $event)">
 									<span class="b-cloud-item">
 										<img
-											src="assets/templates/{{ template }}.jpg"
+											ng-src="assets/templates/{{ template }}.jpg"
 											alt="{{ template }}"
 											onError="this.onerror=null;this.src='assets/templates/no-image.jpg';">
 									</span>

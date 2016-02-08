@@ -22,7 +22,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	vm.currentEnvironment = {};
 	vm.signedMessage = "";
 	vm.buildEnvironment = buildEnvironment;
-	vm.growEnvironment = growEnvironment;
 	vm.notifyChanges = notifyChanges;
 	vm.applyChanges = applyChanges;
 	vm.getQuotaColor = getQuotaColor;
@@ -65,7 +64,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	vm.removeSshKey = removeSshKey;
 	//vm.getEnvironments = getEnvironments;
 	vm.showContainersList = showContainersList;
-	vm.destroyContainer = destroyContainer;
 	vm.editEnvironment = editEnvironment;
 	vm.setSSHKey = setSSHKey;
 	vm.showSSHKeyForm = showSSHKeyForm;
@@ -373,31 +371,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 		vm.installedContainers = containersTotal;
 	}
 
-	function destroyContainer(containerId) {
-		SweetAlert.swal({
-			title: "Are you sure?",
-			text: "You will not be able to recover this Container!",
-			type: "warning",
-			showCancelButton: true,
-			confirmButtonColor: "#ff3f3c",
-			confirmButtonText: "Destroy",
-			cancelButtonText: "Cancel",
-			closeOnConfirm: false,
-			closeOnCancel: true,
-			showLoaderOnConfirm: true
-		},
-		function (isConfirm) {
-			if (isConfirm) {
-				environmentService.destroyContainer(containerId).success(function (data) {
-					SweetAlert.swal("Destroyed!", "Your container has been destroyed.", "success");
-					loadEnvironments();
-				}).error(function (data) {
-					SweetAlert.swal("ERROR!", data.ERROR, "error");
-				});
-			}
-		});
-	}
-
     function startEnvironmentBuild (environment) {
     	vm.currentEnvironment = environment;
 		ngDialog.open ({
@@ -545,68 +518,11 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 		}, 3000);
 	}
 
-	function growEnvironment() {
-		var allElements = graph.getCells();
-		vm.containers2Build = [];
-		vm.env2Build = {};
-		for (var i = 0; i < allElements.length; i++) {
-			if (allElements[i].attributes.containerId) {
-				continue;
-			}
-			var currentElement = allElements[i];
-			var currentTemplateName = allElements[i].get('templateName');
-			var container2Build = {
-				"size": currentElement.get('quotaSize'),
-				"templateName": currentTemplateName,
-				"name": currentElement.get('containerName'),
-				"position": currentElement.get('position')
-			};
-			if (vm.env2Build[currentTemplateName] === undefined) {
-				vm.env2Build[currentTemplateName] = 1;
-			} else {
-				vm.env2Build[currentTemplateName]++;
-			}
-			vm.containers2Build.push(container2Build);
-		}
-
-		environmentService.growEnvironment(vm.currentEnvironment.id, vm.containers2Build).success(function (data) {
-			$timeout(function () {
-				SweetAlert.swal("Success!", "Changes have been applied!.", "success");
-				loadEnvironments();
-			}, 2000 );
-		}).error(function (data) {
-			SweetAlert.swal("ERROR!", data.ERROR, "error");
-		});
-		loadEnvironments();
-	}
-
 	function notifyChanges() {
-		var templates = {};
-		var containers = vm.currentEnvironment.excludedContainers;
-		for (var index = 0; index < containers.length; index++) {
-			var quotaSize = containers[index].attributes.quotaSize;
-			var templateName = containers[index].attributes.templateName;
-			if (!templates[templateName]) {
-				templates[templateName] = {};
-				templates[templateName].quotas = {};
-				templates[templateName]
-					.quotas[quotaSize] = 1;
-			} else {
-				if (!templates[templateName].quotas) {
-					templates[templateName].quotas = {};
-					templates[templateName]
-						.quotas[quotaSize] = 1;
-				} else {
-					if (!templates[templateName].quotas[quotaSize]) {
-						templates[templateName]
-							.quotas[quotaSize] = 1;
-					} else {
-						templates[containers[index].attributes.templateName]
-							.quotas[quotaSize] += 1;
-					}
-				}
-			}
-		}
+		vm.currentEnvironment.excludedContainersByQuota =
+			getSortedContainersByQuota(vm.currentEnvironment.excludedContainers);
+		vm.currentEnvironment.includedContainersByQuota =
+			getSortedContainersByQuota(vm.currentEnvironment.includedContainers);
 
 		ngDialog.open({
 			template: 'subutai-app/environment/partials/popups/environment-modification-info.html',
@@ -615,43 +531,76 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 		});
 	}
 
-	function applyChanges() {
-		SweetAlert.swal({
-				title: "Are you sure?",
-				text: "You are going to modify environment!",
-				type: "warning",
-				showCancelButton: true,
-				confirmButtonColor: "#ff3f3c",
-				confirmButtonText: "Ok",
-				cancelButtonText: "Cancel",
-				closeOnConfirm: true,
-				closeOnCancel: true,
-				showLoaderOnConfirm: true
-			},
-			function (isConfirm) {
-				vm.isApplyingChanges = true;
-				if (isConfirm) {
-					removeContainersRecursively(vm.currentEnvironment.excludedContainers, 0, growEnvironment);
+	function getSortedContainersByQuota(containers) {
+		var sortedContainers = containers.length > 0 ? {} : null;
+		for (var index = 0; index < containers.length; index++) {
+			var quotaSize = containers[index].attributes.quotaSize;
+			var templateName = containers[index].attributes.templateName;
+			if (!sortedContainers[templateName]) {
+				sortedContainers[templateName] = {};
+				sortedContainers[templateName].quotas = {};
+				sortedContainers[templateName]
+					.quotas[quotaSize] = 1;
+			} else {
+				if (!sortedContainers[templateName].quotas) {
+					sortedContainers[templateName].quotas = {};
+					sortedContainers[templateName]
+						.quotas[quotaSize] = 1;
+				} else {
+					if (!sortedContainers[templateName].quotas[quotaSize]) {
+						sortedContainers[templateName]
+							.quotas[quotaSize] = 1;
+					} else {
+						sortedContainers[containers[index].attributes.templateName]
+							.quotas[quotaSize] += 1;
+					}
 				}
-			});
+			}
+		}
+		return sortedContainers;
 	}
 
-	function removeContainersRecursively(containers, index, callback) {
-		if (index < containers.length) {
-			containers[index].status = 'removing';
-			environmentService.destroyContainer(containers[index].attributes.containerId).success(function (data) {
-				$timeout(function () {
-					containers[index].status = 'removed';
-					removeContainersRecursively(containers, index + 1, callback);
-				}, 2000);
-			}).error(function (data) {
-				SweetAlert.swal("ERROR!", data.ERROR, "error");
-			});
-		} else {
-			clearWorkspace();
-			vm.isApplyingChanges = false;
-			//callback();
+	function applyChanges() {
+		vm.isApplyingChanges = true;
+		ngDialog.closeAll();
+
+		var excludedContainers = [];
+		for (var i = 0; i < vm.currentEnvironment.excludedContainers.length; i++) {
+			excludedContainers.push(vm.currentEnvironment.excludedContainers[i].get('id'));
 		}
+		var includedContainers = [];
+		for (var i = 0; i < vm.currentEnvironment.includedContainers.length; i++) {
+			includedContainers.push({
+				"size": vm.currentEnvironment.includedContainers[i].get('quotaSize'),
+				"templateName": vm.currentEnvironment.includedContainers[i].get('templateName'),
+				"name": vm.currentEnvironment.includedContainers[i].get('containerName'),
+				"position": vm.currentEnvironment.includedContainers[i].get('position')
+			});
+		}
+		vm.currentEnvironment.modificationData = {
+			included: includedContainers,
+			excluded: excludedContainers,
+			environmentId: vm.currentEnvironment.id
+		};
+
+		ngDialog.open({
+			template: 'subutai-app/environment/partials/popups/environment-modification-status.html',
+			scope: $scope,
+			className: 'b-build-environment-info'
+		});
+
+		vm.currentEnvironment.modifyStatus = 'modifying';
+		environmentService.modifyEnvironment(vm.currentEnvironment.modificationData).success(function (data) {
+			vm.currentEnvironment.modifyStatus = 'modified';
+			clearWorkspace();
+			vm.isEditing = false;
+			vm.isApplyingChanges = false;
+		}).error(function (data) {
+			vm.currentEnvironment.modifyStatus = 'error';
+			clearWorkspace();
+			vm.isEditing = false;
+			vm.isApplyingChanges = false;
+		});
 	}
 
 	function destroyEnvironment(environmentId) {
@@ -691,6 +640,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 
 	function editEnvironment(environment) {
 		vm.clearWorkspace();
+		vm.isApplyingChanges = false;
 		vm.currentEnvironment = environment;
 		vm.currentEnvironment.excludedContainers = [];
 		vm.currentEnvironment.includedContainers = [];
