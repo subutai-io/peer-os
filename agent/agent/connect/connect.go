@@ -3,12 +3,12 @@ package connect
 import (
 	"bytes"
 	"crypto/tls"
+	"github.com/subutai-io/Subutai/agent/agent/container"
+	"github.com/subutai-io/Subutai/agent/agent/utils"
+	"github.com/subutai-io/Subutai/agent/lib/gpg"
+	"github.com/subutai-io/Subutai/agent/log"
 	"net/http"
 	"strconv"
-	"subutai/agent/container"
-	"subutai/agent/utils"
-	"subutai/lib/gpg"
-	"subutai/log"
 	"time"
 )
 

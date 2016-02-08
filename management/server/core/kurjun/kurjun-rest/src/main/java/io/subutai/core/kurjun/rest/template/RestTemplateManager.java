@@ -91,7 +91,7 @@ public interface RestTemplateManager
     @DELETE
     @Path( "{repository}" )
     @Produces( MediaType.TEXT_PLAIN )
-    Response deleteTemplates( @PathParam( "repository" ) String repository,
+    Response deleteTemplate( @PathParam( "repository" ) String repository,
                               @QueryParam( MD5_PARAM ) String md5
     );
 }

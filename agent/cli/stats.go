@@ -6,15 +6,15 @@ import (
 	"errors"
 	"fmt"
 	"github.com/influxdb/influxdb/client/v2"
+	"github.com/subutai-io/Subutai/agent/config"
+	"github.com/subutai-io/Subutai/agent/lib/container"
+	"github.com/subutai-io/Subutai/agent/lib/fs"
+	"github.com/subutai-io/Subutai/agent/log"
 	"os"
 	"regexp"
 	"runtime"
 	"strconv"
 	"strings"
-	"subutai/config"
-	"subutai/lib/container"
-	"subutai/lib/fs"
-	"subutai/log"
 )
 
 var (

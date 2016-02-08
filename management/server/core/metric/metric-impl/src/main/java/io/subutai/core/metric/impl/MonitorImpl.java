@@ -147,7 +147,6 @@ public class MonitorImpl implements Monitor, HostListener
             if ( commandResult.hasSucceeded() )
             {
                 result = JsonUtil.fromJson( commandResult.getStdOut(), ResourceHostMetric.class );
-
                 LOG.debug( String.format( "Host %s metrics fetched successfully.", resourceHost.getHostname() ) );
             }
             else
@@ -158,7 +157,6 @@ public class MonitorImpl implements Monitor, HostListener
         catch ( CommandException | JsonSyntaxException e )
         {
             LOG.error( e.getMessage(), e );
-            result = new ResourceHostMetric( resourceHost.getPeerId() );
         }
 
         return result;
@@ -326,28 +324,29 @@ public class MonitorImpl implements Monitor, HostListener
         for ( ResourceHost resourceHost : peerManager.getLocalPeer().getResourceHosts() )
         {
 
-            ResourceHostMetric resourceHostMetric = new ResourceHostMetric( peerManager.getLocalPeer().getId() );
             try
             {
+                ResourceHostMetric resourceHostMetric = new ResourceHostMetric( peerManager.getLocalPeer().getId() );
                 HostInfo hostInfo = hostRegistry.getHostInfoById( resourceHost.getId() );
                 resourceHostMetric.setHostInfo( new ResourceHostInfoModel( hostInfo ) );
                 ResourceHostMetric m = fetchResourceHostMetric( resourceHost );
                 if ( m != null )
                 {
                     resourceHostMetric.updateMetrics( m );
+                    resourceHostMetric.setConnected( true );
+                    result.addMetric( resourceHostMetric );
                 }
-                resourceHostMetric.setConnected( true );
             }
-            catch ( HostDisconnectedException hde )
+            catch ( Exception ignore )
             {
-                HostInfoModel defaultHostInfo =
-                        new HostInfoModel( resourceHost.getId(), resourceHost.getHostname(), new HostInterfaces(),
-                                HostArchitecture.UNKNOWN );
-                resourceHostMetric.setHostInfo( defaultHostInfo );
-                resourceHostMetric.setConnected( false );
+                // ignore
+                //                HostInfoModel defaultHostInfo =
+                //                        new HostInfoModel( resourceHost.getId(), resourceHost.getHostname(), new
+                // HostInterfaces(),
+                //                                HostArchitecture.UNKNOWN );
+                //                resourceHostMetric.setHostInfo( defaultHostInfo );
+                //                resourceHostMetric.setConnected( false );
             }
-
-            result.addMetric( resourceHostMetric );
         }
 
         return result;

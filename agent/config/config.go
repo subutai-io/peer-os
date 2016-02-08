@@ -2,12 +2,10 @@ package config
 
 import (
 	"code.google.com/p/gcfg"
+	"github.com/subutai-io/Subutai/agent/log"
 	"io/ioutil"
 	"net"
 	"os"
-	"os/exec"
-	"path/filepath"
-	"subutai/log"
 	"time"
 )
 
@@ -81,7 +79,7 @@ const defaultConfig = `
 	restToken = /rest/v1/identity/gettoken
 	restPublicKey = /rest/v1/registration/public-key
 	restVerify = /rest/v1/registration/verify/container-token
-    kurjun = http://10.10.10.1:8551/rest/kurjun/templates
+    kurjun = http://subutai.ddns.net:8081/rest/kurjun/templates
 
 	[broker]
 	port = 8883
@@ -125,11 +123,8 @@ func init() {
 	err := gcfg.ReadStringInto(&config, defaultConfig)
 	log.Check(log.InfoLevel, "Loading default config ", err)
 
-	file, _ := exec.LookPath("subutai")
-
-	cfgFile := filepath.Dir(file) + "/../etc/agent.gcfg"
-	err = gcfg.ReadFileInto(&config, cfgFile)
-	log.Check(log.WarnLevel, "Opening Agent config file "+cfgFile, err)
+	err = gcfg.ReadFileInto(&config, "/apps/subutai/current/etc/agent.gcfg")
+	log.Check(log.WarnLevel, "Opening Agent config file /apps/subutai/current/etc/agent.gcfg", err)
 
 	files, _ := ioutil.ReadDir("/apps/")
 	for _, f := range files {
@@ -157,7 +152,7 @@ func InitAgentDebug() {
 
 func CheckKurjun() {
 	_, err := net.DialTimeout("tcp", "10.10.10.1:8551", time.Duration(3)*time.Second)
-	if log.Check(log.WarnLevel, "Connecting local Kurjun", err) {
-		Management.Kurjun = "http://repo.critical-factor.com:8081/rest/kurjun/templates"
+	if !log.Check(log.InfoLevel, "Connecting to local Kurjun", err) {
+		Management.Kurjun = "http://10.10.10.1:8551/rest/kurjun/templates"
 	}
 }

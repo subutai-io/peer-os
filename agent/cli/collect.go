@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/influxdb/influxdb/client/v2"
+	"github.com/subutai-io/Subutai/agent/config"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -12,7 +13,6 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
-	"subutai/config"
 	"time"
 )
 

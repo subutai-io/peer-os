@@ -2,10 +2,10 @@ package net
 
 import (
 	"errors"
+	"github.com/subutai-io/Subutai/agent/log"
 	"net"
 	"os/exec"
 	"strings"
-	"subutai/log"
 )
 
 func RemovePort(tunnelPortName string) error {

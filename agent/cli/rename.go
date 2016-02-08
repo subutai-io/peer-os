@@ -1,10 +1,10 @@
 package lib
 
 import (
+	"github.com/subutai-io/Subutai/agent/config"
+	"github.com/subutai-io/Subutai/agent/lib/container"
+	"github.com/subutai-io/Subutai/agent/log"
 	"os"
-	"subutai/config"
-	"subutai/lib/container"
-	"subutai/log"
 )
 
 //LxcRename renames the container
