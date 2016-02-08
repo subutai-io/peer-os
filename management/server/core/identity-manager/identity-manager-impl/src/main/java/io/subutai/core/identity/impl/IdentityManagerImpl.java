@@ -515,10 +515,11 @@ public class IdentityManagerImpl implements IdentityManager
             {
                 secId = userId + "-"+ UUID.randomUUID();
                 user.setSecurityKeyId( secId );
-                identityDataService.updateUser( user );
             }
-
+            publicKeyASCII = publicKeyASCII.trim();
             securityManager.getKeyManager().savePublicKeyRing( secId,1,publicKeyASCII );
+            user.setFingerprint( securityManager.getKeyManager().getFingerprint( secId ) );
+            identityDataService.updateUser( user );
         }
     }
 

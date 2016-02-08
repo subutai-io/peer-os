@@ -115,4 +115,29 @@ public class UserDelegateEntity implements UserDelegate
     {
         return PermissionObject.IdentityManagement.getName();
     }
+
+
+    @Override
+    public boolean equals( final Object o )
+    {
+        if ( this == o )
+        {
+            return true;
+        }
+        if ( !( o instanceof UserDelegateEntity ) )
+        {
+            return false;
+        }
+
+        final UserDelegateEntity that = ( UserDelegateEntity ) o;
+
+        return id != null ? id.equals( that.id ) : that.id == null;
+    }
+
+
+    @Override
+    public int hashCode()
+    {
+        return id != null ? id.hashCode() : 0;
+    }
 }

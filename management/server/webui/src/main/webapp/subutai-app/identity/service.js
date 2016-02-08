@@ -168,6 +168,6 @@ function identitySrv($http) {
 	}
 
 	function getKey (id) {
-		return $http.get (SERVER_URL + "rest/v1/security/keyman/getpublickeyring", {params: {host_id: id}});
+		return $http.get (SERVER_URL + "rest/v1/security/keyman/getpublickeyring", {params: {hostid: id}});
 	}
 }

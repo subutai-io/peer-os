@@ -39,8 +39,8 @@ function AccountCtrl(identitySrv, $scope, DTOptionsBuilder, DTColumnBuilder, $re
     identitySrv.getCurrentUser().success(function (data) {
         vm.activeUser = data;
         identitySrv.getKey(vm.activeUser.securityKeyId).success(function (key) {
-            vm.activeUser.publicKey = key;
             console.log(key);
+            vm.activeUser.publicKey = key;
         });
     });
 

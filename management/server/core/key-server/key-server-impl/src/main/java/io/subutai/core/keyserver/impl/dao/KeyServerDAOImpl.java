@@ -171,13 +171,13 @@ public class KeyServerDAOImpl implements KeyServerDAO
         try
         {
             daoManager.startTransaction( em );
-            em.persist( keyStore );
+            em.merge( keyStore );
             daoManager.commitTransaction( em );
 
         }
         catch(Exception ex)
         {
-            LOG.error( "KeyManagerDAOImpl save:"+ex.toString() );
+            LOG.error( "KeyManagerDAOImpl save:"+ex.toString(), ex );
             daoManager.rollBackTransaction( em );
         }
         finally

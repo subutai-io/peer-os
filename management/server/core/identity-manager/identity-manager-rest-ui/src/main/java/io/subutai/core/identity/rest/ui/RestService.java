@@ -55,7 +55,7 @@ public interface RestService
 
     @GET
     @Path("/delegate-identity")
-    @Produces( { MediaType.APPLICATION_JSON } )
+    @Produces( { MediaType.TEXT_PLAIN } )
     Response getIdentityDelegationDocument();
 
 

@@ -6,6 +6,9 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.collect.Lists;
 
 import io.subutai.common.dao.DaoManager;
@@ -18,6 +21,7 @@ import io.subutai.core.identity.impl.model.UserEntity;
  */
 class UserDAO
 {
+    private static final Logger logger = LoggerFactory.getLogger( UserDAO.class );
     private DaoManager daoManager = null;
 
 
@@ -142,6 +146,7 @@ class UserDAO
         }
         catch ( Exception e )
         {
+            logger.error("Error updating user", e);
             daoManager.rollBackTransaction( em );
         }
         finally
