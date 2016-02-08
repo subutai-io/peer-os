@@ -1014,6 +1014,12 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public void updateControlNetwork()
     {
+        if ( getPeers().size() < 2 )
+        {
+            // standalone peer
+            return;
+        }
+
         try
         {
             if ( controlNetwork == null )

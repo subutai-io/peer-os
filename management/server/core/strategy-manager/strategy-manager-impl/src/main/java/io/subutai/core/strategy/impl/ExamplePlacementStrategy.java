@@ -37,17 +37,19 @@ public class ExamplePlacementStrategy implements ExampleStrategy
     private List<NodeSchema> scheme = new ArrayList<>();
     private static ExamplePlacementStrategy instance;
 
-//    static
-//    {
-/*
-        scheme.add( new NodeSchema( "Huge master", ContainerSize.HUGE, "master" ) );
-        scheme.add( new NodeSchema( "Large master", ContainerSize.LARGE, "master" ) );
-        scheme.add( new NodeSchema( "Medium master", ContainerSize.MEDIUM, "master" ) );
-*/
-//        scheme.add( new NodeSchema( "master", ContainerSize.TINY, "master" ) );
-//        scheme.add( new NodeSchema( "hadoop", ContainerSize.TINY, "hadoop" ) );
-//        scheme.add( new NodeSchema( "cassandra", ContainerSize.TINY, "cassandra" ) );
-//    }
+
+    //    static
+    //    {
+    ///*
+    //        scheme.add( new NodeSchema( "Huge master", ContainerSize.HUGE, "master" ) );
+    //        scheme.add( new NodeSchema( "Large master", ContainerSize.LARGE, "master" ) );
+    //        scheme.add( new NodeSchema( "Medium master", ContainerSize.MEDIUM, "master" ) );
+    //*/
+    //        scheme.add( new NodeSchema( "master", ContainerSize.TINY, "master" ) );
+    //        scheme.add( new NodeSchema( "hadoop", ContainerSize.TINY, "hadoop" ) );
+    //        scheme.add( new NodeSchema( "cassandra", ContainerSize.TINY, "cassandra" ) );
+    //    }
+
 
     public static ExamplePlacementStrategy getInstance()
     {
@@ -56,6 +58,14 @@ public class ExamplePlacementStrategy implements ExampleStrategy
             instance = new ExamplePlacementStrategy();
         }
         return instance;
+    }
+
+
+    public ExamplePlacementStrategy()
+    {
+        scheme.add( new NodeSchema( "master", ContainerSize.TINY, "master" ) );
+        scheme.add( new NodeSchema( "hadoop", ContainerSize.TINY, "hadoop" ) );
+        scheme.add( new NodeSchema( "cassandra", ContainerSize.TINY, "cassandra" ) );
     }
 
 
@@ -78,11 +88,27 @@ public class ExamplePlacementStrategy implements ExampleStrategy
                                 PeerGroupResources peerGroupResources, Map<ContainerSize, ContainerQuota> quotas )
             throws StrategyException
     {
-
         Topology result = new Topology( environmentName, sshGroupId, hostGroupId );
 
-        Set<NodeGroup> nodeGroups = distribute( peerGroupResources, quotas );
+        Set<NodeGroup> nodeGroups = distribute( getScheme(), peerGroupResources, quotas );
         for ( NodeGroup nodeGroup : nodeGroups )
+        {
+            result.addNodeGroupPlacement( nodeGroup.getPeerId(), nodeGroup );
+        }
+
+        return result;
+    }
+
+
+    @Override
+    public Topology distribute( final String environmentName, final int sshGroupId, final int hostGroupId,
+                                final List<NodeSchema> nodeSchema, final PeerGroupResources peerGroupResources,
+                                final Map<ContainerSize, ContainerQuota> quotas ) throws StrategyException
+    {
+        Topology result = new Topology( environmentName, sshGroupId, hostGroupId );
+
+        Set<NodeGroup> ng = distribute( nodeSchema, peerGroupResources, quotas );
+        for ( NodeGroup nodeGroup : ng )
         {
             result.addNodeGroupPlacement( nodeGroup.getPeerId(), nodeGroup );
         }
@@ -98,14 +124,7 @@ public class ExamplePlacementStrategy implements ExampleStrategy
     }
 
 
-    @Override
-    public void setScheme( List<NodeSchema> scheme )
-    {
-        this.scheme = scheme;
-    }
-
-
-    protected Set<NodeGroup> distribute( PeerGroupResources peerGroupResources,
+    protected Set<NodeGroup> distribute( List<NodeSchema> nodeSchemas, PeerGroupResources peerGroupResources,
                                          Map<ContainerSize, ContainerQuota> quotas ) throws StrategyException
     {
 
@@ -122,7 +141,7 @@ public class ExamplePlacementStrategy implements ExampleStrategy
 
 
         // distribute node groups
-        for ( NodeSchema nodeSchema : this.getScheme() )
+        for ( NodeSchema nodeSchema : nodeSchemas )
         {
             String containerName = generateContainerName( nodeSchema );
 
@@ -167,6 +186,7 @@ public class ExamplePlacementStrategy implements ExampleStrategy
 
         return nodeGroups;
     }
+
 
     private List<ResourceAllocator> getPreferredAllocators( final List<ResourceAllocator> allocators )
     {
@@ -218,5 +238,4 @@ public class ExamplePlacementStrategy implements ExampleStrategy
     //
     //        return topology;
     //    }
-
 }
