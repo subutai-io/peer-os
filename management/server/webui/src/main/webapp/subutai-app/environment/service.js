@@ -47,6 +47,7 @@ function environmentService($http, peerRegistrationService) {
 		startEnvironmentBuild : startEnvironmentBuild,
 		growEnvironment : growEnvironment,
 		destroyEnvironment: destroyEnvironment,
+		modifyEnvironment: modifyEnvironment,
 
 
 		setSshKey : setSshKey,
@@ -197,7 +198,14 @@ function environmentService($http, peerRegistrationService) {
 		return $http.delete(ENVIRONMENTS_URL + environmentId);
 	}
 
-
+	function modifyEnvironment(containers) {
+		var postData = 'include=' + JSON.stringify( containers.included ) + '&exclude=' + JSON.stringify( containers.excluded );
+		return $http.post(
+			ENVIRONMENTS_URL + containers.environmentId + '/modify',
+			postData,
+			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+		);
+	}
 
 	function switchContainer(containerId, type) {
 		return $http.post(
