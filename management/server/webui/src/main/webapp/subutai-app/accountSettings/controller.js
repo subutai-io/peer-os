@@ -22,6 +22,9 @@ function AccountCtrl(identitySrv, $scope, DTOptionsBuilder, DTColumnBuilder, $re
         identitySrv.getIdentityDelegateDocument().success(function(data) {
             console.log(data);
             vm.message = data;
+            if (vm.message) {
+                $('.bp-sign-input').addClass('bp-sign-target');
+            }
         });
     };
 
