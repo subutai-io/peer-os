@@ -15,6 +15,7 @@ public class RelationMeta
 
     private RelationLink object;
 
+    // Key id to verify relation
     private String keyId;
 
     public RelationMeta()

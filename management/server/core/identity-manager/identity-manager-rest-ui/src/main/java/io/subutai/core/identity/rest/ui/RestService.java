@@ -33,12 +33,30 @@ public interface RestService
 
     @POST
     @Produces( { MediaType.APPLICATION_JSON } )
-    Response saveUser( @FormParam( "username" ) String username,
-                             @FormParam( "full_name" ) String fullName,
-                             @FormParam( "password" ) String password,
-                             @FormParam( "email" ) String email,
-                             @FormParam( "roles" ) String roles, @FormParam( "user_id" ) Long userId,
+    Response saveUser( @FormParam( "username" ) String username, @FormParam( "full_name" ) String fullName,
+                       @FormParam( "password" ) String password, @FormParam( "email" ) String email,
+                       @FormParam( "roles" ) String roles, @FormParam( "user_id" ) Long userId,
                        @FormParam( "public_key" ) String publicKey );
+
+    @POST
+    @Path("/approve-delegate")
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response approveDelegatedUser( @FormParam( "trustMessage" ) String trustMessage);
+
+    @POST
+    @Path("/set-public-key")
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response setUserPublicKey(@FormParam( "publicKey" ) String publicKey);
+
+    @POST
+    @Path("/delegate-identity")
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response createIdentityDelegationDocument();
+
+    @GET
+    @Path("/delegate-identity")
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response getIdentityDelegationDocument();
 
 
     @DELETE

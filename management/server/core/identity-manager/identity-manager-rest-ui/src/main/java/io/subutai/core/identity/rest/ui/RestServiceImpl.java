@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import javax.ws.rs.FormParam;
 import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
@@ -25,6 +26,7 @@ import io.subutai.common.util.JsonUtil;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Role;
 import io.subutai.core.identity.api.model.User;
+import io.subutai.core.identity.api.model.UserDelegate;
 
 
 public class RestServiceImpl implements RestService
@@ -133,6 +135,73 @@ public class RestServiceImpl implements RestService
         return Response.ok().build();
     }
 
+
+    @Override
+    public Response approveDelegatedUser( @FormParam( "trustMessage" ) final String trustMessage )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( trustMessage ), "username is missing" );
+
+        try
+        {
+            identityManager.approveDelegatedUser(trustMessage);
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error setting new user #setUser", e );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+
+        return Response.ok().build();
+    }
+
+
+    @Override
+    public Response createIdentityDelegationDocument()
+    {
+        try
+        {
+            identityManager.createIdentityDelegationDocument();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error setting new user #setUser", e );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+
+        return Response.ok().build();
+    }
+
+
+    @Override
+    public Response getIdentityDelegationDocument()
+    {
+        try
+        {
+            User activeUser = identityManager.getActiveUser();
+            UserDelegate userDelegate = identityManager.getUserDelegate( activeUser.getId() );
+            return Response.ok( userDelegate.getRelationDocument() ).build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error setting new user #setUser", e );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response setUserPublicKey(String publicKey)
+    {
+        try
+        {
+            identityManager.setUserPublicKey( identityManager.getActiveUser().getId(), publicKey );
+        }
+        catch ( Exception e ) {
+            LOGGER.error("Error updating user public key", e);
+            return Response.serverError().build();
+        }
+        return Response.ok().build();
+    }
 
 
     @Override

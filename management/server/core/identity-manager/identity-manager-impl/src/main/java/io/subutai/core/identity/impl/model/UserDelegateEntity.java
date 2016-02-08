@@ -30,6 +30,9 @@ public class UserDelegateEntity implements UserDelegate
     @Column( name = "type" )
     private int type = 2; // System User
 
+    @Column(name = "relation_document")
+    private String relationDocument;
+
 
     @Override
     public String getId()
@@ -71,6 +74,20 @@ public class UserDelegateEntity implements UserDelegate
     {
         this.type = type;
     }
+
+
+    public String getRelationDocument()
+    {
+        return relationDocument;
+    }
+
+
+    @Override
+    public void setRelationDocument( final String relationDocument )
+    {
+        this.relationDocument = relationDocument;
+    }
+
 
     @Override
     public String getLinkId()

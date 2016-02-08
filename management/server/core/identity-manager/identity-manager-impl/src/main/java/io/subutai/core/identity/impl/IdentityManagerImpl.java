@@ -2,6 +2,7 @@ package io.subutai.core.identity.impl;
 
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.security.AccessControlContext;
 import java.security.AccessControlException;
 import java.security.AccessController;
@@ -17,6 +18,7 @@ import java.util.concurrent.Callable;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
+import javax.naming.NamingException;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -25,6 +27,7 @@ import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.LoginContext;
 
+import org.bouncycastle.openpgp.PGPPublicKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +37,7 @@ import com.google.common.base.Strings;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.security.crypto.pgp.KeyPair;
+import io.subutai.common.security.objects.Ownership;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.objects.PermissionOperation;
 import io.subutai.common.security.objects.PermissionScope;
@@ -42,6 +46,8 @@ import io.subutai.common.security.objects.TokenType;
 import io.subutai.common.security.objects.UserStatus;
 import io.subutai.common.security.objects.UserType;
 import io.subutai.common.security.token.TokenUtil;
+import io.subutai.common.util.JsonUtil;
+import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.SessionManager;
 import io.subutai.core.identity.api.dao.IdentityDataService;
@@ -59,7 +65,15 @@ import io.subutai.core.identity.impl.model.UserDelegateEntity;
 import io.subutai.core.identity.impl.model.UserEntity;
 import io.subutai.core.identity.impl.model.UserTokenEntity;
 import io.subutai.core.identity.impl.utils.SecurityUtil;
+import io.subutai.core.object.relation.api.RelationManager;
+import io.subutai.core.object.relation.api.RelationVerificationException;
+import io.subutai.core.object.relation.api.model.Relation;
+import io.subutai.core.object.relation.api.model.RelationInfo;
+import io.subutai.core.object.relation.api.model.RelationInfoMeta;
+import io.subutai.core.object.relation.api.model.RelationMeta;
 import io.subutai.core.security.api.SecurityManager;
+import io.subutai.core.security.api.crypto.EncryptionTool;
+import io.subutai.core.security.api.crypto.KeyManager;
 
 
 /**
@@ -752,8 +766,78 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
+    @Override
+    public void approveDelegatedUser( final String trustMessage )
+    {
+        try
+        {
+            RelationManager relationManager = ServiceLocator.getServiceNoCache( RelationManager.class );
+            if ( relationManager != null )
+            {
+                User activeUser = getActiveUser();
+                UserDelegate delegatedUser = getUserDelegate( activeUser.getId() );
+                relationManager.processTrustMessage( delegatedUser.getRelationDocument(), delegatedUser.getId() );
+            }
+        }
+        catch ( NamingException e )
+        {
+            LOGGER.error("RelationManager service not found", e);
+        }
+        catch ( RelationVerificationException e )
+        {
+            LOGGER.error("Message verification failed", e);
+        }
+    }
+
+
+    @Override
+    public void createIdentityDelegationDocument()
+    {
+        try
+        {
+            RelationManager relationManager = ServiceLocator.getServiceNoCache( RelationManager.class );
+            User activeUser = getActiveUser();
+            UserDelegate delegatedUser = getUserDelegate( activeUser.getId() );
+            if ( delegatedUser == null ) {
+                delegatedUser = createUserDelegate( activeUser, null, true );
+            }
+
+            KeyManager keyManager = securityManager.getKeyManager();
+            EncryptionTool encryptionTool = securityManager.getEncryptionTool();
+
+            // TODO user should send signed trust message between delegatedUser and himself
+            RelationInfoMeta relationInfoMeta =
+                    new RelationInfoMeta( true, true, true, true, Ownership.USER.getLevel() );
+
+            assert relationManager != null;
+            RelationInfo relationInfo = relationManager.createTrustRelationship( relationInfoMeta );
+
+            // TODO relation verification should be done by delegated user, automatically
+            RelationMeta relationMeta =
+                    new RelationMeta( activeUser, delegatedUser, delegatedUser, activeUser.getSecurityKeyId() );
+            Relation relation = relationManager.buildTrustRelation( relationInfo, relationMeta );
+
+            String relationJson = JsonUtil.toJson( relation );
+
+            PGPPublicKey publicKey = keyManager.getPublicKey( delegatedUser.getId() );
+            byte[] relationEncrypted = encryptionTool.encrypt( relationJson.getBytes(), publicKey, true );
+
+            String encryptedMessage = "\n" + new String( relationEncrypted, "UTF-8" );
+            delegatedUser.setRelationDocument( encryptedMessage );
+        }
+        catch ( NamingException e )
+        {
+            LOGGER.error("Relation Manager service is unavailable", e);
+        }
+        catch ( UnsupportedEncodingException e )
+        {
+            LOGGER.error("Error decoding byte array", e);
+        }
+    }
+
+
     /* *************************************************
-     */
+             */
     private void generateKeyPair( String securityKeyId, int type )
     {
         KeyPair kp = securityManager.getKeyManager().generateKeyPair( securityKeyId, false );

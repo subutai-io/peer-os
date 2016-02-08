@@ -385,7 +385,7 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
 					return $ocLazyLoad.load([
 						{
-							name: 'subutai.tokens',
+							name: 'subutai.accountSettings',
 							files: [
 								'subutai-app/accountSettings/tokens.js',
 								'subutai-app/accountSettings/controller.js',

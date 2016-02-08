@@ -3,7 +3,7 @@
  */
 'use strict';
 
-angular.module('subutai.tokens', [
-    'subutai.tokens.controller',
+angular.module('subutai.accountSettings', [
+    'subutai.accountSettings.controller',
     'subutai.identity.service'
 ])

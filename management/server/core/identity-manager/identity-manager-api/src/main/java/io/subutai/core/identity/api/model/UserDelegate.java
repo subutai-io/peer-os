@@ -22,4 +22,8 @@ public interface UserDelegate extends RelationLink
 
     void setType( int type );
 
+    void setRelationDocument(String relationDocument);
+
+    String getRelationDocument();
+
 }

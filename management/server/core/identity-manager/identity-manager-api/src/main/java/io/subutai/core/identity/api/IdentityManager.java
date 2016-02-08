@@ -138,6 +138,12 @@ public interface IdentityManager
                      boolean generateKeyPair, boolean createUserDelegate );
 
 
+    void approveDelegatedUser( String trustMessage );
+
+
+    void createIdentityDelegationDocument();
+
+
     /* *************************************************
      */
     void removeUserRole( long userId, Role role );
