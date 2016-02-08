@@ -120,7 +120,6 @@ public class MessageSender
             for ( Map.Entry<String, Set<Envelope>> envelopsPerPeer : peerEnvelopesMap.entrySet() )
             {
                 Peer targetPeer = messenger.getPeerManager().getPeer( envelopsPerPeer.getKey() );
-                Peer localPeer = messenger.getPeerManager().getLocalPeer();
                 if ( targetPeer.isLocal() )
                 {
                     completer.submit(
@@ -129,7 +128,7 @@ public class MessageSender
                 else
                 {
                     completer.submit(
-                            new RemotePeerMessageSender( messengerDao, localPeer, targetPeer, envelopsPerPeer.getValue() ) );
+                            new RemotePeerMessageSender( messengerDao, targetPeer, envelopsPerPeer.getValue() ) );
                 }
             }
 
