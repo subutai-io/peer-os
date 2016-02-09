@@ -1,9 +1,6 @@
 package io.subutai.core.kurjun.api;
 
 
-import java.util.concurrent.TimeUnit;
-
-
 /**
  * Interface that exposes methods to set repository quota values.
  *
@@ -12,25 +9,43 @@ public interface QuotaManagedRepository
 {
 
     /**
+     * Gets disk quota value in MB for the supplied context of the repository. If context is not applicable to the
+     * repository then context value is ignored.
+     *
+     * @param context context to get transfer quota for, if applicable; ignored if n/a
+     * @return the Integer
+     */
+    Long getDiskQuota( String context );
+
+
+    /**
      * Sets disk quota for the repository.
      *
      * @param size disk quota value in MB
      * @param context context for which to set quota; pass {@code null} if not applicable
      * @return {@code true} if quota value successfully sey; {@code false} otherwise
      */
-    boolean setDiskQuota( int size, String context );
+    boolean setDiskQuota( long size, String context );
+
+
+    /**
+     * Gets transfer quota info for the supplied context of the repository. If context is not applicable to the
+     * repository then context value is ignored.
+     *
+     * @param context context to get transfer quota for, if applicable; ignored if n/a
+     * @return
+     */
+    KurjunTransferQuota getTransferQuota( String context );
 
 
     /**
      * Sets transfer quota for the repository.
      *
-     * @param threshold transfer quota value in MB
-     * @param timeFrame time frame for the supplied threshold value
-     * @param timeUnit unit of the time frame
+     * @param quota transfer quota info
      * @param context context for which to set quota; pass {@code null} if not applicable
-     * @return {@code true} if quota value successfully sey; {@code false} otherwise
+     * @return the boolean
      */
-    boolean setTransferQuota( int threshold, int timeFrame, TimeUnit timeUnit, String context );
+    boolean setTransferQuota( KurjunTransferQuota quota, String context );
 
 }
 

@@ -78,6 +78,7 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.settings.Common;
 import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.kurjun.api.KurjunTransferQuota;
 import io.subutai.core.kurjun.api.TemplateManager;
 
 
@@ -512,13 +513,30 @@ public class TemplateManagerImpl implements TemplateManager
 
 
     @Override
-    public boolean setDiskQuota( int size, String context )
+    public Long getDiskQuota( String context )
+    {
+        KurjunContext c = getContext( context );
+        QuotaInfoStore quotaInfoStore = injector.getInstance( QuotaInfoStore.class );
+        try
+        {
+            DiskQuota diskQuota = quotaInfoStore.getDiskQuota( c );
+            if ( diskQuota != null )
+            {
+                return diskQuota.getThreshold() * diskQuota.getUnit().toBytes() / DataUnit.MB.toBytes();
+            }
+        }
+        catch ( IOException ex )
+        {
+            LOGGER.error( "Failed to get disk quota", ex );
+        }
+        return null;
+    }
+
+
+    @Override
+    public boolean setDiskQuota( long size, String context )
     {
         KurjunContext kurjunContext = getContext( context );
-        if ( kurjunContext == null )
-        {
-            throw new IllegalArgumentException( "Invalid context" );
-        }
 
         DiskQuota diskQuota = new DiskQuota( size, DataUnit.MB );
         QuotaInfoStore quotaInfoStore = injector.getInstance( QuotaInfoStore.class );
@@ -536,19 +554,36 @@ public class TemplateManagerImpl implements TemplateManager
 
 
     @Override
-    public boolean setTransferQuota( int threshold, int timeFrame, TimeUnit timeUnit, String context )
+    public KurjunTransferQuota getTransferQuota( String context )
+    {
+        KurjunContext c = getContext( context );
+        QuotaInfoStore quotaInfoStore = injector.getInstance( QuotaInfoStore.class );
+        try
+        {
+            TransferQuota q = quotaInfoStore.getTransferQuota( c );
+            if ( q != null )
+            {
+                return new KurjunTransferQuota( q.getThreshold(), q.getTime(), q.getTimeUnit() );
+            }
+        }
+        catch ( IOException ex )
+        {
+            LOGGER.error( "Failed to get disk quota", ex );
+        }
+        return null;
+    }
+
+
+    @Override
+    public boolean setTransferQuota( KurjunTransferQuota quota, String context )
     {
         KurjunContext kurjunContext = getContext( context );
-        if ( kurjunContext == null )
-        {
-            throw new IllegalArgumentException( "Invalid context" );
-        }
 
         TransferQuota transferQuota = new TransferQuota();
-        transferQuota.setThreshold( threshold );
+        transferQuota.setThreshold( quota.getThreshold() );
         transferQuota.setUnit( DataUnit.MB );
-        transferQuota.setTime( timeFrame );
-        transferQuota.setTimeUnit( timeUnit );
+        transferQuota.setTime( quota.getTimeFrame() );
+        transferQuota.setTimeUnit( quota.getTimeUnit() );
 
         QuotaInfoStore quotaInfoStore = injector.getInstance( QuotaInfoStore.class );
         try
@@ -611,13 +646,16 @@ public class TemplateManagerImpl implements TemplateManager
 
     private LocalRepository getLocalRepository( String context ) throws IOException
     {
-        KurjunContext c = getContext( context );
-        if ( c != null )
+        try
         {
+            KurjunContext c = getContext( context );
             RepositoryFactory repositoryFactory = injector.getInstance( RepositoryFactory.class );
             return repositoryFactory.createLocalTemplate( c );
         }
-        throw new IOException( "Invalid context" );
+        catch ( IllegalArgumentException ex )
+        {
+            throw new IOException( ex );
+        }
     }
 
 
@@ -660,13 +698,16 @@ public class TemplateManagerImpl implements TemplateManager
             Properties kcp = properties.getContextProperties( kc );
             kcp.setProperty( FileStoreFactory.TYPE, FileStoreFactory.FILE_SYSTEM );
             kcp.setProperty( PackageMetadataStoreModule.PACKAGE_METADATA_STORE_TYPE,
-                    PackageMetadataStoreFactory.FILE_DB );
+                             PackageMetadataStoreFactory.FILE_DB );
         }
     }
 
 
     /**
      * Gets Kurjun context for templates repository type.
+     *
+     * @return context instance
+     * @throws IllegalArgumentException if invalid/unknown context value is supplied
      */
     private KurjunContext getContext( String context )
     {
@@ -678,7 +719,7 @@ public class TemplateManagerImpl implements TemplateManager
                 return c;
             }
         }
-        return null;
+        throw new IllegalArgumentException( "Invalid context" );
     }
 
 

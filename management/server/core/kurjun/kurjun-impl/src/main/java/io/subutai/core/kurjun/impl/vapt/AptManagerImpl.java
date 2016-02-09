@@ -13,7 +13,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -59,6 +58,7 @@ import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.AptPackage;
 import io.subutai.common.settings.Common;
+import io.subutai.core.kurjun.api.KurjunTransferQuota;
 import io.subutai.core.kurjun.api.vapt.AptManager;
 import io.subutai.core.kurjun.impl.RepoUrl;
 import io.subutai.core.kurjun.impl.RepoUrlStore;
@@ -373,9 +373,28 @@ public class AptManagerImpl implements AptManager
         }
     }
 
+    @Override
+    public Long getDiskQuota( String context )
+    {
+        QuotaInfoStore quotaInfoStore = injector.getInstance( QuotaInfoStore.class );
+        try
+        {
+            DiskQuota diskQuota = quotaInfoStore.getDiskQuota( AptManagerImpl.context );
+            if ( diskQuota != null )
+            {
+                return diskQuota.getThreshold() * diskQuota.getUnit().toBytes() / DataUnit.MB.toBytes();
+            }
+        }
+        catch ( IOException ex )
+        {
+            LOGGER.error( "Failed to get disk quota", ex );
+        }
+        return null;
+    }
+
 
     @Override
-    public boolean setDiskQuota( int size, String context )
+    public boolean setDiskQuota( long size, String context )
     {
         DiskQuota diskQuota = new DiskQuota( size, DataUnit.MB );
         QuotaInfoStore quotaInfoStore = injector.getInstance( QuotaInfoStore.class );
@@ -393,13 +412,33 @@ public class AptManagerImpl implements AptManager
 
 
     @Override
-    public boolean setTransferQuota( int threshold, int timeFrame, TimeUnit timeUnit, String context )
+    public KurjunTransferQuota getTransferQuota( String context )
+    {
+        QuotaInfoStore quotaInfoStore = injector.getInstance( QuotaInfoStore.class );
+        try
+        {
+            TransferQuota q = quotaInfoStore.getTransferQuota( AptManagerImpl.context );
+            if ( q != null )
+            {
+                return new KurjunTransferQuota( q.getThreshold(), q.getTime(), q.getTimeUnit() );
+            }
+        }
+        catch ( IOException ex )
+        {
+            LOGGER.error( "Failed to get transfer quota", ex );
+        }
+        return null;
+    }
+
+
+    @Override
+    public boolean setTransferQuota( KurjunTransferQuota quota, String context )
     {
         TransferQuota transferQuota = new TransferQuota();
-        transferQuota.setThreshold( threshold );
+        transferQuota.setThreshold( quota.getThreshold() );
         transferQuota.setUnit( DataUnit.MB );
-        transferQuota.setTime( timeFrame );
-        transferQuota.setTimeUnit( timeUnit );
+        transferQuota.setTime( quota.getTimeFrame() );
+        transferQuota.setTimeUnit( quota.getTimeUnit() );
 
         QuotaInfoStore quotaInfoStore = injector.getInstance( QuotaInfoStore.class );
         try
