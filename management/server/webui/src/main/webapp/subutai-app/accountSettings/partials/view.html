@@ -1,44 +1,59 @@
 <div ng-controller="AccountCtrl as tokensCtrl">
 
-  <div class="b-workspace__header">
+	<div class="b-workspace__header b-workspace__header_tabs">
 
-    <div ng-include="'subutai-app/common/partials/login-header.html'"></div>
+		<div class="b-tabs-menu b-tabs-menu_header">
 
-    <h1 class="b-title">Tokens</h1>
-  </div>
+			<div ng-include="'subutai-app/common/partials/login-header.html'"></div>
+			
+			<ul>
+				<li class="b-tabs-menu__item b-tabs-menu__item_active">
+					Public key
+				</li>
+				<li class="b-tabs-menu__item" ui-sref="change-pass">
+					Change password
+				</li>
+			</ul>
+		</div>
+	</div>
 
-  <div class="b-workspace__content">
+	<div class="b-workspace__content">
 
-    <div class="b-form">
-      <div>
-        <span class="b-form-label b-form-label_fix-size-1">Message</span>
-      </div>
-      <div>
-		<textarea class="b-form-input b-form-input_full b-form-input_textarea bp-sign-input"
-              ng-model="tokensCtrl.message"
-              style="width: 540px; height: 300px; font-family: monospace; overflow: scroll; resize: none">
-	    </textarea>
-      </div>
-      <div class="clear"></div>
-      <a href class="b-btn b-btn_blue g-left  b-btn_margin-l" ng-click="tokensCtrl.approveDocument()"
-         style="margin-bottom: 10px; margin-top: 10px">Approve delegate document</a>
+		<div class="b-form">
+			<div class="b-pgp-page-block">
+				<div class="b-form-label b-form-label_fix-size-1">Message</div>
 
-      <a href class="b-btn b-btn_blue g-left  b-btn_margin-l" ng-click="tokensCtrl.createDelegateDocument()"
-         style="margin-bottom: 10px; margin-top: 10px">Create Delegate Document</a>
+				<div>
+					<textarea class="b-form-input b-form-input_full b-form-input_textarea bp-sign-input" 
+						ng-model="tokensCtrl.message" 
+						style="width: 420px; height: 160px; font-family: monospace;">
+					</textarea>
+				</div>
 
-      <a href class="b-btn b-btn_blue g-left  b-btn_margin-l" ng-click="tokensCtrl.getDelegateDocument()"
-         style="margin-bottom: 10px; margin-top: 10px">Get Delegate Document</a>
-    </div>
+				<div class="b-pgp-page-block__buttons">
+					<button class="b-btn b-btn_blue" ng-click="tokensCtrl.approveDocument()">
+						Approve delegate document
+					</button>
+					<div class="clear"></div>
+				</div>
+			</div>
 
-    <label class="b-popup-body-label b-popup-body-label_block">Public key</label>
-				<textarea class="b-form-input b-form-input_textarea bp-set-pub-key"
-                  ng-model="tokensCtrl.activeUser.publicKey"
-                  style="width: 540px; height: 300px; font-family: monospace; overflow: scroll; resize: none">
+			<div class="b-pgp-page-block">
+				<div class="b-form-label b-form-label_fix-size-1">Public key</div>
+				<textarea class="b-form-input b-form-input_textarea bp-set-pub-key" 
+					ng-model="tokensCtrl.activeUser.publicKey" 
+					style="width: 420px; height: 160px; font-family: monospace;">
 				</textarea>
-    <a href class="b-btn b-btn_blue g-left  b-btn_margin-l" ng-click="tokensCtrl.setPublicKey()"
-       style="margin-bottom: 10px; margin-top: 10px">Set public key</a>
-    <div class="clear"></div>
-  </div>
+
+				<div class="b-pgp-page-block__buttons">
+					<button class="b-btn b-btn_blue" ng-click="tokensCtrl.setPublicKey()">
+						Set public key
+					</button>
+					<div class="clear"></div>
+				</div>
+			</div>
+		</div>
+	</div>
 
 </div>
 

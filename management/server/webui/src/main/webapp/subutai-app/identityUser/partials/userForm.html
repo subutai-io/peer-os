@@ -24,6 +24,14 @@
 					   ng-model="identityUserFormCtrl.user2Add.fullName"
 					   required>
 
+				<label class="b-popup-body-label b-popup-body-label_block">Trusted Level:</label>
+				<select class="b-popup-body-input b-popup-body-input_full b-popup-body-input_margin-bttm" 
+					ng-model="identityUserFormCtrl.user2Add.trustedLevel">
+					<option ng-repeat="(trystedLevelId, trustedLevel) in identityUserFormCtrl.trustedLevels" value="{{ trystedLevelId }}">
+						{{ trustedLevel }}
+					</option>
+				</select>				
+
 				<label class="b-popup-body-label b-popup-body-label_block">E-mail:</label>
 				<input type="email"
 					   placeholder="email@mail.com"

@@ -1,10 +1,20 @@
 <div ng-controller="ChangePassCtrl as changePassCtrl">
 
-	<div class="b-workspace__header">
+	<div class="b-workspace__header b-workspace__header_tabs">
 
-		<div ng-include="'subutai-app/common/partials/login-header.html'"></div>
+		<div class="b-tabs-menu b-tabs-menu_header">
 
-		<h1 class="b-title">Change password</h1>
+			<div ng-include="'subutai-app/common/partials/login-header.html'"></div>
+			
+			<ul>
+				<li class="b-tabs-menu__item" ui-sref="account-settings">
+					Public key
+				</li>
+				<li class="b-tabs-menu__item b-tabs-menu__item_active">
+					Change password
+				</li>
+			</ul>
+		</div>
 	</div>
 
 	<div class="b-workspace__content">
