@@ -127,7 +127,7 @@ public class PeerManagerImpl implements PeerManager
         localPeer.addRequestListener( commandResponseListener );
         registrationClient = new RegistrationClientImpl( provider );
         backgroundTasksExecutorService = Executors.newScheduledThreadPool( 1 );
-        backgroundTasksExecutorService.scheduleWithFixedDelay( new BackgroundTasksRunner(), 10, 30, TimeUnit.SECONDS );
+        backgroundTasksExecutorService.scheduleWithFixedDelay( new BackgroundTasksRunner(), 10, 60, TimeUnit.SECONDS );
     }
 
 
@@ -978,7 +978,7 @@ public class PeerManagerImpl implements PeerManager
             LOG.debug( "Background task runner started..." );
             try
             {
-                //                updateControlNetwork();
+                updateControlNetwork();
             }
             catch ( Exception e )
             {
@@ -1024,6 +1024,12 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public void updateControlNetwork()
     {
+        if ( getPeers().size() < 2 )
+        {
+            // standalone peer
+            return;
+        }
+
         try
         {
             if ( controlNetwork == null )
