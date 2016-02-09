@@ -65,12 +65,11 @@ public class RemotePeerMessageSenderTest
         when( peerInfo.getId() ).thenReturn( uuid );
 
         envelope = new Envelope( message, TARGET_PEER_ID, RECIPIENT, TIME_TO_LIVE, HEADERS );
-        remotePeerMessageSender =
-                spy( new RemotePeerMessageSender( messengerDao, localPeer, peer, Sets.newHashSet( envelope ) ) );
+        remotePeerMessageSender = spy( new RemotePeerMessageSender( messengerDao, peer, Sets.newHashSet( envelope ) ) );
 
         when( peer.getPeerInfo() ).thenReturn( peerInfo );
         when( peerInfo.getIp() ).thenReturn( IP );
-        doReturn( webClient ).when( remotePeerMessageSender ).getWebClient( anyString(), any( PeerInfo.class ) );
+        doReturn( webClient ).when( remotePeerMessageSender ).getWebClient( any( PeerInfo.class ) );
     }
 
 

@@ -119,12 +119,12 @@ public class RemotePeerImpl implements RemotePeer
         {
             case ChannelSettings.OPEN_PORT:
             case ChannelSettings.SPECIAL_PORT_X1:
-                url = String.format( "http://%s:%s/rest/v1/peer", peerInfo, peerInfo.getPort() );
+                url = String.format( "http://%s:%s/rest/v1/peer", peerInfo.getIp(), peerInfo.getPort() );
                 break;
             case ChannelSettings.SECURE_PORT_X1:
             case ChannelSettings.SECURE_PORT_X2:
             case ChannelSettings.SECURE_PORT_X3:
-                url = String.format( "https://%s:%s/rest/v1/peer", peerInfo, peerInfo.getPort() );
+                url = String.format( "https://%s:%s/rest/v1/peer", peerInfo.getIp(), peerInfo.getPort() );
                 break;
         }
         this.baseUrl = url;
