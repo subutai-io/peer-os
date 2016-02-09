@@ -127,7 +127,7 @@ public class PeerManagerImpl implements PeerManager
         localPeer.addRequestListener( commandResponseListener );
         registrationClient = new RegistrationClientImpl( provider );
         backgroundTasksExecutorService = Executors.newScheduledThreadPool( 1 );
-        backgroundTasksExecutorService.scheduleWithFixedDelay( new BackgroundTasksRunner(), 10, 30, TimeUnit.SECONDS );
+        backgroundTasksExecutorService.scheduleWithFixedDelay( new BackgroundTasksRunner(), 10, 60, TimeUnit.SECONDS );
     }
 
 
@@ -139,16 +139,7 @@ public class PeerManagerImpl implements PeerManager
 
             localPeerId = securityManager.getKeyManager().getPeerId();
             ownerId = securityManager.getKeyManager().getOwnerId();
-            //            final String localPeerIp = "127.0.0.1";
-            //
-            //            if ( localPeerIp == null || ownerId == null )
-            //            {
-            //                throw new PeerException(
-            //                        String.format( "Could not initialize local peer: ID:%s OWNER_ID:%s IP:%s",
-            // localPeerIp, ownerId,
-            //                                localPeerIp ) );
-            //            }
-            // check local peer instance
+
             PeerData localPeerData = peerDataService.find( localPeerId );
 
 
@@ -977,7 +968,7 @@ public class PeerManagerImpl implements PeerManager
             LOG.debug( "Background task runner started..." );
             try
             {
-                //                updateControlNetwork();
+                updateControlNetwork();
             }
             catch ( Exception e )
             {
@@ -1023,6 +1014,12 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public void updateControlNetwork()
     {
+        if ( getPeers().size() < 2 )
+        {
+            // standalone peer
+            return;
+        }
+
         try
         {
             if ( controlNetwork == null )
