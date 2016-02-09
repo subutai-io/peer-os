@@ -17,7 +17,6 @@ import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 
 import org.bouncycastle.openpgp.PGPException;
-import org.bouncycastle.openpgp.PGPPublicKey;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.slf4j.Logger;
@@ -98,7 +97,6 @@ import io.subutai.core.identity.api.model.UserDelegate;
 import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.object.relation.api.RelationManager;
-import io.subutai.core.object.relation.api.RelationVerificationException;
 import io.subutai.core.object.relation.api.model.Relation;
 import io.subutai.core.object.relation.api.model.RelationInfo;
 import io.subutai.core.object.relation.api.model.RelationInfoMeta;
@@ -109,7 +107,6 @@ import io.subutai.core.peer.api.PeerActionListener;
 import io.subutai.core.peer.api.PeerActionResponse;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
-import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.tracker.api.Tracker;
 
@@ -336,14 +333,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         final EnvironmentImpl environment = environmentDataService.find( environmentId );
 
         // TODO should be handled on server side when user sends signed message
-        try
-        {
-            relationManager.processTrustMessage( signedMessage, environment.getId() );
-        }
-        catch ( RelationVerificationException e )
-        {
-            throw new EnvironmentCreationException( e );
-        }
+//        try
+//        {
+//            relationManager.processTrustMessage( signedMessage, environment.getId() );
+//        }
+//        catch ( RelationVerificationException e )
+//        {
+//            throw new EnvironmentCreationException( e );
+//        }
 
         Topology topology = JsonUtil.fromJson( environment.getRawTopology(), Topology.class );
 
@@ -1405,7 +1402,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         environment.setStatus( EnvironmentStatus.PENDING );
 
         User activeUser = identityManager.getActiveUser();
-        UserDelegate delegatedUser = identityManager.createUserDelegate( activeUser, null, true );
+        UserDelegate delegatedUser = identityManager.getUserDelegate( activeUser.getId() );
 
         // User - Delegated user - Environment
         // Delegated user - Delegated user - Environment
@@ -1417,8 +1414,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         createEnvironmentKeyPair( environment.getEnvironmentId(), delegatedUser.getId() );
         try
         {
-            KeyManager keyManager = securityManager.getKeyManager();
-            EncryptionTool encryptionTool = securityManager.getEncryptionTool();
+//            KeyManager keyManager = securityManager.getKeyManager();
+//            EncryptionTool encryptionTool = securityManager.getEncryptionTool();
 
             // TODO user should send signed trust message between delegatedUser and himself
             RelationInfoMeta relationInfoMeta =
@@ -1428,19 +1425,21 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
             // TODO relation verification should be done by delegated user, automatically
             RelationMeta relationMeta =
-                    new RelationMeta( activeUser, delegatedUser, environment, activeUser.getSecurityKeyId() );
+                    new RelationMeta( delegatedUser, delegatedUser, environment, activeUser.getSecurityKeyId() );
             Relation relation = relationManager.buildTrustRelation( relationInfo, relationMeta );
+            relation.setRelationStatus( RelationStatus.VERIFIED );
+            relationManager.saveRelation( relation );
 
-            String relationJson = JsonUtil.toJson( relation );
+//            String relationJson = JsonUtil.toJson( relation );
 
-            PGPPublicKey publicKey = keyManager.getPublicKey( environment.getEnvironmentId().getId() );
-            byte[] relationEncrypted = encryptionTool.encrypt( relationJson.getBytes(), publicKey, true );
+//            PGPPublicKey publicKey = keyManager.getPublicKey( environment.getEnvironmentId().getId() );
+//            byte[] relationEncrypted = encryptionTool.encrypt( relationJson.getBytes(), publicKey, true );
 
-            String encryptedMessage = "\n" + new String( relationEncrypted, "UTF-8" );
+//            String encryptedMessage = "\n" + new String( relationEncrypted, "UTF-8" );
 
             // relation declaration is created only once so if user signature verification is failed then environment
             // creation have to fail. Declaration will be saved in encrypted format where relation information is saved
-            environment.setRelationDeclaration( encryptedMessage );
+//            environment.setRelationDeclaration( encryptedMessage );
         }
         catch ( Exception e )
         {
