@@ -32,6 +32,7 @@ function AccountCtrl(identitySrv, $scope, ngDialog, SweetAlert, cfpLoadingBar) {
 	vm.approveDocument = function () {
 		LOADING_SCREEN();
 		identitySrv.approveIdentityDelegate(encodeURIComponent(vm.message)).success(function() {
+			LOADING_SCREEN('none');
 			SweetAlert.swal("Approved!", "Message was successfully approved.", "success");
 		}).error(function(error) {
 			LOADING_SCREEN('none');
