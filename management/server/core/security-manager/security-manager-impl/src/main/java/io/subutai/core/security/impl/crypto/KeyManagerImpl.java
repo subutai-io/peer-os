@@ -91,7 +91,7 @@ public class KeyManagerImpl implements KeyManager
             //Generate KeyPair for Peer **************************
             KeyPair keyPair  = generateKeyPair( "" , false );
             PGPPublicKeyRing peerPubRing = PGPKeyUtil.readPublicKeyRing( keyPair.getPubKeyring() );
-            String peerId = PGPKeyUtil.getKeyId(  peerPubRing.getPublicKey().getFingerprint());
+            String peerId = PGPKeyUtil.getFingerprint( peerPubRing.getPublicKey().getFingerprint());
             keyData.setManHostId( peerId );
 
             saveKeyPair( peerId, SecurityKeyType.PeerKey.getId(), keyPair);
@@ -100,13 +100,6 @@ public class KeyManagerImpl implements KeyManager
         {
             LOG.error( " **** Error creating Keypair for LocalPeer **** :" + ex.toString(),ex );
         }
-    }
-
-
-    //todo Nurkaly please revise this so that we take owner idx from the constant
-    private String getOwnerKeyIdx()
-    {
-        return "owner-" + keyData.getManHostId();
     }
 
 

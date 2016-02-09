@@ -41,7 +41,7 @@ public interface RestService
     @POST
     @Path("/approve-delegate")
     @Produces( { MediaType.APPLICATION_JSON } )
-    Response approveDelegatedUser( @FormParam( "trustMessage" ) String trustMessage);
+    Response approveDelegatedUser( @FormParam( "signedDocument" ) String trustMessage);
 
     @POST
     @Path("/set-public-key")
