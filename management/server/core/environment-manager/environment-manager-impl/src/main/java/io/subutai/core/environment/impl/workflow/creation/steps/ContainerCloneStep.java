@@ -33,6 +33,7 @@ import io.subutai.core.environment.impl.workflow.creation.steps.helpers.CreatePe
 import io.subutai.core.environment.impl.workflow.creation.steps.helpers.NodeGroupBuildResult;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
+import io.subutai.core.identity.api.model.UserDelegate;
 import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.object.relation.api.RelationManager;
 import io.subutai.core.object.relation.api.model.Relation;
@@ -178,12 +179,13 @@ public class ContainerCloneStep
         try
         {
             User activeUser = identityManager.getActiveUser();
+            UserDelegate delegatedUser = identityManager.getUserDelegate( activeUser.getId() );
             for ( final EnvironmentContainerImpl container : containers )
             {
                 //TODO create environment <-> container ownership
 
                 RelationMeta relationMeta = new RelationMeta();
-                relationMeta.setSource( activeUser );
+                relationMeta.setSource( delegatedUser );
                 relationMeta.setTarget( environment );
                 relationMeta.setObject( container );
 
