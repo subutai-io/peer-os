@@ -57,14 +57,12 @@ public class ClientOutInterceptor extends AbstractPhaseInterceptor<Message>
             if ( InterceptorState.CLIENT_OUT.isActive( message ) )
             {
                 //LOG.debug( " ****** Client OutInterceptor invoked ******** " );
-                HttpServletRequest req = ( HttpServletRequest ) message.getExchange().getOutMessage()
-                                                                       .get( AbstractHTTPDestination.HTTP_REQUEST );
 
                 URL url = getUrl( message );
 
-                if ( req.getLocalPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X2 ) )
+                if ( url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X2 ) )
                 {
-                    String path = req.getRequestURI();
+                    String path = url.getPath();
                     String ip = url.getHost();
 
                     if ( path.startsWith( "/rest/v1/peer" ) )
