@@ -2,12 +2,12 @@ package lib
 
 import (
 	"errors"
+	"github.com/subutai-io/Subutai/agent/config"
+	"github.com/subutai-io/Subutai/agent/lib/fs"
+	"github.com/subutai-io/Subutai/agent/lib/template"
+	"github.com/subutai-io/Subutai/agent/log"
 	"net/http"
 	"os/exec"
-	"subutai/config"
-	"subutai/lib/fs"
-	"subutai/lib/template"
-	"subutai/log"
 )
 
 func LxcUnregister(containerName string) {

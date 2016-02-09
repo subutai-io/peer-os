@@ -4,17 +4,17 @@ import (
 	"encoding/json"
 	mqtt "git.eclipse.org/gitroot/paho/org.eclipse.paho.mqtt.golang.git"
 	"github.com/codegangsta/cli"
+	"github.com/subutai-io/Subutai/agent/agent/alert"
+	"github.com/subutai-io/Subutai/agent/agent/container"
+	"github.com/subutai-io/Subutai/agent/agent/executer"
+	"github.com/subutai-io/Subutai/agent/agent/utils"
+	"github.com/subutai-io/Subutai/agent/config"
+	cont "github.com/subutai-io/Subutai/agent/lib/container"
+	"github.com/subutai-io/Subutai/agent/lib/gpg"
+	"github.com/subutai-io/Subutai/agent/log"
 	"os"
 	"runtime"
 	"strings"
-	"subutai/agent/alert"
-	"subutai/agent/container"
-	"subutai/agent/executer"
-	"subutai/agent/utils"
-	"subutai/config"
-	cont "subutai/lib/container"
-	"subutai/lib/gpg"
-	"subutai/log"
 	"time"
 )
 
@@ -36,9 +36,7 @@ type Heartbeat struct {
 func initAgent() {
 	if cont.State("management") == "STOPPED" {
 		cont.Start("management")
-		cont.AttachExec("management", []string{"dhclient eth1"})
 	}
-
 	container.PoolInstance()
 	Instance()
 }

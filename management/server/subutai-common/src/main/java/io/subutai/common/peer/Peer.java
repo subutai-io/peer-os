@@ -58,7 +58,7 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
     /**
      * Returns metadata object of peer
      */
-    public PeerInfo getPeerInfo();
+    public PeerInfo getPeerInfo() throws PeerException;
 
     /**
      * Creates environment container group on the peer

@@ -1,0 +1,83 @@
+<div class="b-popup">
+    <div class="b-popup__header">
+        Changes
+        <a href ng-click="closeThisDialog()">
+            <img src="assets/elements/buttons/b-icon-close.svg" class="b-icon g-right"/>
+        </a>
+    </div>
+    <div class="b-popup__body">
+        <div>
+            <div class="b-popup-body-label"
+                 ng-if="environmentViewCtrl.currentEnvironment.excludedContainers.length > 0">
+                Following containers will be removed from your environment!
+            </div>
+            <table class="b-main-table b-main-table_with-header b-main-table_white-header"
+                   ng-if="environmentViewCtrl.currentEnvironment.excludedContainers.length > 0">
+                <tbody>
+                <tr ng-repeat="container in environmentViewCtrl.currentEnvironment.excludedContainers">
+                    <td class="b-title">
+						<span class="b-cloud-item">
+							<img
+                                    ng-src="assets/templates/{{ container.attributes.templateName }}.jpg"
+                                    alt="{{ container.templateName }}"
+                                    onError="this.onerror=null;this.src='assets/templates/no-image.jpg';">
+						</span>
+                        <span class="b-cloud-item-text">{{ container.attributes.templateName  }}</span>
+                    </td>
+                    <td>
+                        {{ container.attributes.hostname }}
+                    </td>
+                    <td>
+                        <div class="b-container-quota"
+                             ng-style="{'background-color' : environmentViewCtrl.getQuotaColor(container.attributes.quotaSize)}"
+                             tooltips
+                             tooltip-template="{{container.attributes.quotaSize}}">
+                        </div>
+                    </td>
+                    <td>
+                        <div ng-class="container.status == 'removing' ? 'b-loading b-btn-light-grey-icon_green' : container.status == 'removed' ? 'fa fa-check fa-1 b-btn-light-grey-icon_green' : ''">
+                            {{ container.status == 'removing' ? 'Destroying' : container.status == 'removed' ?
+                            'Destroyed' : ''}}
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div>
+            <div class="b-popup-body-label"
+                 ng-if="environmentViewCtrl.currentEnvironment.includedContainers.length > 0">
+                The following containers will be added to your environment!
+            </div>
+            <table class="b-main-table b-main-table_with-header b-main-table_white-header"
+                   ng-if="environmentViewCtrl.currentEnvironment.includedContainers.length > 0">
+                <tbody>
+                <tr ng-repeat="container in environmentViewCtrl.currentEnvironment.includedContainers">
+                    <td class="b-title">
+						<span class="b-cloud-item">
+							<img
+                                    ng-src="assets/templates/{{ container.attributes.templateName }}.jpg"
+                                    alt="{{ templateName }}"
+                                    onError="this.onerror=null;this.src='assets/templates/no-image.jpg';">
+						</span>
+                        <span class="b-cloud-item-text">{{ container.attributes.templateName }}</span>
+                    </td>
+                    <td>{{ container.attributes.quotaSize }}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="b-popup__footer b-popup__footer_undertable">
+
+        <button class="b-btn b-btn_green"
+                ng-click="environmentViewCtrl.applyChanges()" ng-disabled="environmentViewCtrl.isApplyingChanges">
+            Apply changes
+        </button>
+
+        <div class="clear"></div>
+    </div>
+    <div class="b-loading-screen js-popup-loading-screen">
+        <div class="b-load-icon"></div>
+    </div>
+</div>

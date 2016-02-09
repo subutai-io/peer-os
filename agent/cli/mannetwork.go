@@ -2,12 +2,12 @@ package lib
 
 import (
 	"fmt"
+	"github.com/subutai-io/Subutai/agent/config"
+	"github.com/subutai-io/Subutai/agent/lib/net"
+	"github.com/subutai-io/Subutai/agent/lib/net/p2p"
+	"github.com/subutai-io/Subutai/agent/log"
 	"os"
 	"strings"
-	"subutai/config"
-	"subutai/lib/net"
-	"subutai/lib/net/p2p"
-	"subutai/log"
 )
 
 func P2P(c, d, u, l, p bool, args []string) {

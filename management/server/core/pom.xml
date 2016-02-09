@@ -41,6 +41,7 @@
     <module>kurjun</module>
     <module>trust-manager</module>
     <module>plugin-manager</module>
+    <module>system-manager</module>
   </modules>
 
 </project>

@@ -56,6 +56,7 @@ import ai.subut.kurjun.storage.factory.FileStoreFactory;
 import ai.subut.kurjun.storage.factory.FileStoreModule;
 import ai.subut.kurjun.subutai.SubutaiTemplateParserModule;
 import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.AptPackage;
 import io.subutai.common.settings.Common;
 import io.subutai.core.kurjun.api.vapt.AptManager;
@@ -132,8 +133,8 @@ public class AptManagerImpl implements AptManager
     public String getRelease( String release, String component, String arch )
     {
         UnifiedRepository repo = getRepository();
-        Optional<ReleaseFile> rel
-                = repo.getDistributions().stream().filter( r -> r.getCodename().equals( release ) ).findFirst();
+        Optional<ReleaseFile> rel =
+                repo.getDistributions().stream().filter( r -> r.getCodename().equals( release ) ).findFirst();
 
         if ( rel.isPresent() )
         {
@@ -150,8 +151,8 @@ public class AptManagerImpl implements AptManager
             throws IllegalArgumentException
     {
         UnifiedRepository repo = getRepository();
-        Optional<ReleaseFile> distr
-                = repo.getDistributions().stream().filter( r -> r.getCodename().equals( release ) ).findFirst();
+        Optional<ReleaseFile> distr =
+                repo.getDistributions().stream().filter( r -> r.getCodename().equals( release ) ).findFirst();
         if ( !distr.isPresent() )
         {
             throw new IllegalArgumentException( "Release not found." );
@@ -262,7 +263,8 @@ public class AptManagerImpl implements AptManager
     public List<AptPackage> list()
     {
         List<SerializableMetadata> list = getRepository().listPackages();
-        List<AptPackage> deflist = list.stream().map( t -> convertToAptPackage( ( DefaultPackageMetadata ) t ) ).collect( Collectors.toList() );
+        List<AptPackage> deflist = list.stream().map( t -> convertToAptPackage( ( DefaultPackageMetadata ) t ) )
+                                       .collect( Collectors.toList() );
         return deflist;
     }
     
@@ -286,11 +288,9 @@ public class AptManagerImpl implements AptManager
 
     private AptPackage convertToAptPackage( DefaultPackageMetadata meta )
     {
-        return new AptPackage(
-                Hex.encodeHexString( meta.getMd5Sum() ), meta.getName(), meta.getVersion(),
-                meta.getSource(), meta.getMaintainer(), meta.getArchitecture().name(), 
-                meta.getInstalledSize(), meta.getDescription()
-        );
+        return new AptPackage( Hex.encodeHexString( meta.getMd5Sum() ), meta.getName(), meta.getVersion(),
+                meta.getSource(), meta.getMaintainer(), meta.getArchitecture().name(), meta.getInstalledSize(),
+                meta.getDescription() );
     }
 
 
@@ -348,7 +348,7 @@ public class AptManagerImpl implements AptManager
                 remoteRepoUrls = repoUrlStore.getRemoteAptUrls();
             }
         }
-        catch ( IOException ex )
+        catch ( PeerException | IOException ex )
         {
             LOGGER.error( "Failed to add remote apt repo: {}", url, ex );
         }

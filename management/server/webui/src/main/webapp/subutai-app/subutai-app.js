@@ -467,6 +467,72 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 				}]
 			}
 		})
+		.state('settings-peer', {
+			url: '/settings-peer',
+			templateUrl: 'subutai-app/settingsPeer/partials/view.html',
+			data: {
+				bodyClass: '',
+				layout: 'default'
+			},
+			resolve: {
+				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+					return $ocLazyLoad.load([
+						{
+							name: 'subutai.settings-peer',
+							files: [
+								'subutai-app/settingsPeer/settingsPeer.js',
+								'subutai-app/settingsPeer/controller.js',
+								'subutai-app/settingsPeer/service.js'
+							]
+						}
+					]);
+				}]
+			}
+		})
+		.state('settings-kurjun', {
+			url: '/settings-kurjun',
+			templateUrl: 'subutai-app/settingsKurjun/partials/view.html',
+			data: {
+				bodyClass: '',
+				layout: 'default'
+			},
+			resolve: {
+				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+					return $ocLazyLoad.load([
+						{
+							name: 'subutai.settings-kurjun',
+							files: [
+								'subutai-app/settingsKurjun/settingsKurjun.js',
+								'subutai-app/settingsKurjun/controller.js',
+								'subutai-app/settingsKurjun/service.js'
+							]
+						}
+					]);
+				}]
+			}
+		})
+		.state('peer-policy', {
+			url: '/peer-policy',
+			templateUrl: 'subutai-app/peerPolicy/partials/view.html',
+			data: {
+				bodyClass: '',
+				layout: 'default'
+			},
+			resolve: {
+				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+					return $ocLazyLoad.load([
+						{
+							name: 'subutai.peer-policy',
+							files: [
+								'subutai-app/peerPolicy/peerPolicy.js',
+								'subutai-app/peerPolicy/controller.js',
+								'subutai-app/peerPolicy/service.js'
+							]
+						}
+					]);
+				}]
+			}
+		})
 		.state('404', {
 			url: '/404',
 			templateUrl: 'subutai-app/common/partials/404.html',

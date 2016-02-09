@@ -57,9 +57,9 @@ import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.strategy.api.ContainerPlacementStrategy;
-import io.subutai.core.strategy.api.ExampleStrategy;
 import io.subutai.core.strategy.api.NodeSchema;
 import io.subutai.core.strategy.api.StrategyManager;
+import io.subutai.core.strategy.api.UnlimitedStrategy;
 
 
 public class RestServiceImpl implements RestService
@@ -72,7 +72,6 @@ public class RestServiceImpl implements RestService
     private final StrategyManager strategyManager;
     private final QuotaManager quotaManager;
     private Gson gson = RequiredDeserializer.createValidatingGson();
-    //    private Set<EnvironmentDto> envs = Sets.newHashSet();
 
 
     public RestServiceImpl( final EnvironmentManager environmentManager, final PeerManager peerManager,
@@ -169,17 +168,18 @@ public class RestServiceImpl implements RestService
 
         try
         {
-            ContainerPlacementStrategy placementStrategy = strategyManager.findStrategyById(
-                    ExampleStrategy.ID );
+            ContainerPlacementStrategy placementStrategy = strategyManager.findStrategyById( UnlimitedStrategy.ID );
 
-//            if( !(placementStrategy instanceof GroupPlacementStrategy ) )
-//            {
-//                return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, "Internal error, GroupPlacementStrategy strategy not found" ) ).build();
-//            }
+            //            if( !(placementStrategy instanceof GroupPlacementStrategy ) )
+            //            {
+            //                return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, "Internal error,
+            // GroupPlacementStrategy strategy not found" ) ).build();
+            //            }
 
-            List<NodeSchema> schema = JsonUtil.fromJson( containersJson, new TypeToken<List<NodeSchema>>() {}.getType() );
+            List<NodeSchema> schema =
+                    JsonUtil.fromJson( containersJson, new TypeToken<List<NodeSchema>>() {}.getType() );
 
-            placementStrategy.setScheme( schema );
+            //            placementStrategy.setScheme( schema );
 
             final List<PeerResources> resources = new ArrayList<>();
             for ( final Peer peer : peerManager.getPeers() )
@@ -193,7 +193,7 @@ public class RestServiceImpl implements RestService
             final PeerGroupResources peerGroupResources = new PeerGroupResources( resources );
             final Map<ContainerSize, ContainerQuota> quotas = quotaManager.getDefaultQuotas();
 
-            Topology topology = placementStrategy.distribute( name, 0, 0, peerGroupResources, quotas );
+            Topology topology = placementStrategy.distribute( name, 0, 0, schema, peerGroupResources, quotas );
 
             environment = environmentManager.setupRequisites( topology );
         }
@@ -202,7 +202,8 @@ public class RestServiceImpl implements RestService
             return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
         }
 
-        return Response.ok( JsonUtil.toJson( Lists.newArrayList( environment.getId(), environment.getRelationDeclaration() ) ) ).build();
+        return Response.ok( JsonUtil
+                .toJson( Lists.newArrayList( environment.getId(), environment.getRelationDeclaration() ) ) ).build();
     }
 
 
@@ -258,20 +259,21 @@ public class RestServiceImpl implements RestService
         EnvironmentDto environmentDto;
         try
         {
-            Map<String, Set<NodeGroup>> nodeGroupPlacement = gson.fromJson( topologyJson, new TypeToken<Map<String, Set<NodeGroup>>>() {}.getType() );
+            Map<String, Set<NodeGroup>> nodeGroupPlacement =
+                    gson.fromJson( topologyJson, new TypeToken<Map<String, Set<NodeGroup>>>() {}.getType() );
 
 
             Topology topology = new Topology( name, 0, 0 );
 
 
             Iterator it = nodeGroupPlacement.entrySet().iterator();
-            while( it.hasNext() )
+            while ( it.hasNext() )
             {
-                Map.Entry pair = (Map.Entry)it.next();
+                Map.Entry pair = ( Map.Entry ) it.next();
 
-                for( NodeGroup nodeGroup : (Set<NodeGroup>)pair.getValue() )
+                for ( NodeGroup nodeGroup : ( Set<NodeGroup> ) pair.getValue() )
                 {
-                    topology.addNodeGroupPlacement( (String) pair.getKey(), nodeGroup );
+                    topology.addNodeGroupPlacement( ( String ) pair.getKey(), nodeGroup );
                 }
             }
 
@@ -320,24 +322,41 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response growEnvironment( final String environmentId, final String blueprintJson )
+    public Response growEnvironment( final String environmentId, final String topologyJson )
     {
-        //        try
-        //        {
-        //            Blueprint blueprint = gson.fromJson( blueprintJson, Blueprint.class );
-        //
-        //            //            updateContainerPlacementStrategy( blueprint );
-        //
-        //            Set<EnvironmentContainerHost> environment =
-        //                    environmentManager.growEnvironment( environmentId, blueprint, false );
-        //        }
-        //        catch ( Exception e )
-        //        {
-        //            LOG.error( "Error validating parameters #growEnvironment", e );
-        //            return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( ERROR_KEY, e
-        // .getMessage() ) )
-        //                           .build();
-        //        }
+        try
+        {
+            String name = environmentManager.getEnvironments().stream()
+                                            .filter( e -> e.getEnvironmentId().equals( environmentId ) ).findFirst()
+                                            .get().getName();
+
+            ContainerPlacementStrategy placementStrategy = strategyManager.findStrategyById( UnlimitedStrategy.ID );
+
+
+            List<NodeSchema> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<NodeSchema>>() {}.getType() );
+
+            final List<PeerResources> resources = new ArrayList<>();
+            for ( final Peer peer : peerManager.getPeers() )
+            {
+                PeerResources peerResources =
+                        peerManager.getPeer( peer.getId() ).getResourceLimits( peerManager.getLocalPeer().getId() );
+                resources.add( peerResources );
+            }
+
+
+            final PeerGroupResources peerGroupResources = new PeerGroupResources( resources );
+            final Map<ContainerSize, ContainerQuota> quotas = quotaManager.getDefaultQuotas();
+
+            Topology topology = placementStrategy.distribute( name, 0, 0, schema, peerGroupResources, quotas );
+
+            environmentManager.setupRequisites( topology );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error validating parameters #growEnvironment", e );
+            return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) )
+                           .build();
+        }
 
         return Response.ok().build();
     }

@@ -1,12 +1,12 @@
 <div class="b-workspace-content__row">
-    <button class="b-btn b-btn_green g-margin-bottom" ng-click="kurjunViewCtrl.addTemplate()">
+    <button class="b-btn b-btn_green g-margin-bottom" ng-click="kurjunCtrl.addTemplate()">
         <i class="fa fa-plus"></i> Add APT
     </button>
 
     <div class="b-data-table">
         <table datatable="ng"
-               dt-options="kurjunViewCtrl.dtOptions"
-               dt-column-defs="kurjunViewCtrl.dtColumnDefs"
+               dt-options="kurjunCtrl.dtOptions"
+               dt-column-defs="kurjunCtrl.dtColumnDefs"
                class="b-main-table b-main-table_with-header">
             <thead>
             <tr>
@@ -18,7 +18,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr ng-repeat="apt in kurjunViewCtrl.aptList">
+            <tr ng-repeat="apt in kurjunCtrl.aptList">
                 <td>{{ apt.name }}</td>
                 <td>{{ apt.architecture }}</td>
                 <td>{{ apt.installedSize }}</td>
@@ -33,7 +33,7 @@
                     </a>
                     <a href
                        class="b-icon b-icon_remove"
-                       ng-click="kurjunViewCtrl.deleteAPT(apt)">
+                       ng-click="kurjunCtrl.deleteAPT(apt)">
                     </a>
                 </td>
             </tr>

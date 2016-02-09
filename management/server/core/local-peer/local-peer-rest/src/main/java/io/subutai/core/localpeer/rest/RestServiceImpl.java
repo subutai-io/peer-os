@@ -73,7 +73,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public PeerInfo getPeerInfo()
+    public PeerInfo getPeerInfo() throws PeerException
     {
         return localPeer.getPeerInfo();
     }

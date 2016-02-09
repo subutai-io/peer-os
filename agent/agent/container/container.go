@@ -2,15 +2,15 @@ package container
 
 import (
 	"bufio"
+	"github.com/subutai-io/Subutai/agent/agent/utils"
+	"github.com/subutai-io/Subutai/agent/config"
+	cont "github.com/subutai-io/Subutai/agent/lib/container"
+	"github.com/subutai-io/Subutai/agent/lib/gpg"
+	"github.com/subutai-io/Subutai/agent/log"
 	lxc "gopkg.in/lxc/go-lxc.v2"
 	"os"
 	"strconv"
 	"strings"
-	"subutai/agent/utils"
-	"subutai/config"
-	cont "subutai/lib/container"
-	"subutai/lib/gpg"
-	"subutai/log"
 )
 
 type Container struct {

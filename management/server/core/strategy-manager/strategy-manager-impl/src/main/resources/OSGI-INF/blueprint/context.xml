@@ -6,10 +6,10 @@
         class="io.subutai.core.strategy.impl.ExamplePlacementStrategy">
   </bean>
 
-  <!--<bean id="roundRobinStrategy"
-        class="io.subutai.core.strategy.impl.RoundRobinStrategy">
+  <bean id="unlimitedStrategy"
+        class="io.subutai.core.strategy.impl.UnlimitedPlacementStrategy">
   </bean>
-
+<!--
   <bean id="bestServerStrategy"
         class="io.subutai.core.strategy.impl.BestServerStrategy">
   </bean>
@@ -28,6 +28,7 @@
 
   <service ref="strategyManager" interface="io.subutai.core.strategy.api.StrategyManager" />
   <service ref="masterPlacementStrategy" interface="io.subutai.core.strategy.api.ContainerPlacementStrategy" />
+  <service ref="unlimitedStrategy" interface="io.subutai.core.strategy.api.ContainerPlacementStrategy" />
 <!--
   <service ref="roundRobinStrategy" interface="io.subutai.core.strategy.api.ContainerPlacementStrategy" />
   <service ref="bestServerStrategy" interface="io.subutai.core.strategy.api.ContainerPlacementStrategy" />

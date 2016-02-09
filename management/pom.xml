@@ -481,7 +481,7 @@
       </dependency>
 
       <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-      <!--plugin-master -->
+      <!--plugin-manager -->
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>plugin-manager-api</artifactId>
@@ -495,6 +495,24 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>plugin-manager-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+      <!--system-manager -->
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>system-manager-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>system-manager-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>system-manager-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
 

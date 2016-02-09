@@ -8,13 +8,13 @@ import (
 	"crypto/x509/pkix"
 	"encoding/pem"
 	"git.eclipse.org/gitroot/paho/org.eclipse.paho.mqtt.golang.git"
+	"github.com/subutai-io/Subutai/agent/agent/connect"
+	"github.com/subutai-io/Subutai/agent/agent/utils"
+	"github.com/subutai-io/Subutai/agent/config"
+	"github.com/subutai-io/Subutai/agent/log"
 	"io/ioutil"
 	"math/big"
 	"os"
-	"subutai/agent/connect"
-	"subutai/agent/utils"
-	"subutai/config"
-	"subutai/log"
 	"time"
 )
 
