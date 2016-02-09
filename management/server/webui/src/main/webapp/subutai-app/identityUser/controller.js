@@ -23,6 +23,7 @@ function userPostData(user) {
 		'&full_name=' + user.fullName +
 		'&password=' + user.password +
 		'&email=' + user.email +
+		'&trustLevel=' + user.trustLevel +
 		'&public_key=' + encodeURIComponent( user.public_key );
 
 	if(currentUserRoles !== undefined) {
