@@ -1,10 +1,13 @@
-package io.subutai.core.systemmanager.rest.pojo;
+package io.subutai.core.systemmanager.impl.pojo;
+
+
+import io.subutai.core.systemmanager.api.pojo.KurjunSettings;
 
 
 /**
  * Created by ermek on 2/6/16.
  */
-public class KurjunSettingsPojo
+public class KurjunSettingsPojo implements KurjunSettings
 {
     private String globalKurjunUrls;
 

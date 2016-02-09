@@ -1,10 +1,11 @@
 package io.subutai.common.settings;
 
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
 
 
 /**
@@ -12,66 +13,51 @@ import java.util.Properties;
  */
 public class PeerSettings
 {
-    private static Properties PROPERTIES = loadProperties();
+    private static final Logger LOG = LoggerFactory.getLogger( PeerSettings.class );
+    private static PropertiesConfiguration PROPERTIES = loadProperties();
 
-    public static Properties loadProperties()
+    public static PropertiesConfiguration loadProperties()
     {
-        Properties prop = new Properties();
-        InputStream input = null;
+        PropertiesConfiguration config = null;
         try
         {
-            input = new FileInputStream( String.format( "%s/peer.cfg", Common.KARAF_ETC ) );
-            prop.load( input );
+            config = new PropertiesConfiguration( String.format( "%s/peer.cfg", Common.KARAF_ETC ) );
         }
-        catch ( IOException ex )
+        catch ( ConfigurationException e )
         {
-            ex.printStackTrace();
+            LOG.error( "Error in loading peer.cfg file." );
+            e.printStackTrace();
         }
-        finally
-        {
-            if ( input != null )
-            {
-                try
-                {
-                    input.close();
-                }
-                catch ( IOException e )
-                {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return prop;
+        return config;
     }
 
-    public static String getExternalIpInterface()
+
+    public static Object getExternalIpInterface()
     {
         return PROPERTIES.getProperty( "externalIpInterface" );
     }
 
 
-    public static String getEncryptionState()
+    public static Object getEncryptionState()
     {
         return PROPERTIES.getProperty( "encryptionEnabled" );
     }
 
 
-    public static String getRestEncryptionState()
+    public static Object getRestEncryptionState()
     {
         return PROPERTIES.getProperty( "restEncryptionEnabled" );
     }
 
 
-    public static String getIntegrationState()
+    public static Object getIntegrationState()
     {
         return PROPERTIES.getProperty( "integrationEnabled" );
     }
 
 
-    public static String getKeyTrustCheckState()
+    public static Object getKeyTrustCheckState()
     {
         return PROPERTIES.getProperty( "keyTrustCheckEnabled" );
     }
-
-
 }

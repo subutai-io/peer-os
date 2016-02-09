@@ -16,11 +16,8 @@ import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import io.subutai.common.about.SubutaiInfo;
 import io.subutai.common.tracker.TrackerOperationView;
-import io.subutai.common.util.JsonUtil;
 import io.subutai.core.tracker.api.Tracker;
-import io.subutai.core.tracker.rest.pojo.VersionPojo;
 
 
 /**
@@ -96,25 +93,5 @@ public class RestServiceImpl implements RestService
     public Response getTrackerOperationSources()
     {
         return Response.ok().entity( GSON.toJson( tracker.getTrackerOperationSources() ) ).build();
-    }
-
-
-    @Override
-    public Response getSubutaiInfo()
-    {
-        VersionPojo pojo = new VersionPojo();
-
-        pojo.setGitCommitId( SubutaiInfo.getCommitId() );
-        pojo.setGitBranch( SubutaiInfo.getBranch() );
-        pojo.setGitCommitUserName( SubutaiInfo.getCommitterUserName() );
-        pojo.setGitCommitUserEmail( SubutaiInfo.getCommitterUserEmail() );
-        pojo.setGitBuildUserName( SubutaiInfo.getBuilderUserName() );
-        pojo.setGitBuildUserEmail( SubutaiInfo.getBuilderUserEmail() );
-        pojo.setGitBuildTime( SubutaiInfo.getBuildTime() );
-        pojo.setProjectVersion( SubutaiInfo.getVersion() );
-
-        String projectInfo = JsonUtil.GSON.toJson( pojo );
-
-        return Response.status( Response.Status.OK ).entity( projectInfo ).build();
     }
 }
