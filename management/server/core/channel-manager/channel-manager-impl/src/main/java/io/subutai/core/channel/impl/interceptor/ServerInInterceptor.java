@@ -59,14 +59,15 @@ public class ServerInInterceptor extends AbstractPhaseInterceptor<Message>
         {
             if ( InterceptorState.SERVER_IN.isActive( message ) )
             {
-                URL url = new URL( ( String ) message.get( Message.REQUEST_URL ) );
 
-                if ( url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X2 ) )
+                HttpServletRequest req = ( HttpServletRequest ) message.get( AbstractHTTPDestination.HTTP_REQUEST );
+
+                if ( req.getLocalPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X2 ) )
                 {
                     HttpHeaders headers = new HttpHeadersImpl( message.getExchange().getInMessage() );
                     String subutaiHeader = headers.getHeaderString( Common.SUBUTAI_HTTP_HEADER );
 
-                    String path = url.getPath();
+                    String path = req.getRequestURI();
 
                     if ( path.startsWith( "/rest/v1/peer" ) )
                     {
@@ -93,10 +94,6 @@ public class ServerInInterceptor extends AbstractPhaseInterceptor<Message>
             }
 
             //-----------------------------------------------------------------------------------------------
-        }
-        catch ( MalformedURLException ignore )
-        {
-            //            LOG.debug( "MalformedURLException", ignore.toString() );
         }
         catch ( Exception e )
         {

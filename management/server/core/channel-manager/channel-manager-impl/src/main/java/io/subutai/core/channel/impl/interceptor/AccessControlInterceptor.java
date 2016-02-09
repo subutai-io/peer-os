@@ -55,25 +55,25 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
     {
         try
         {
-            URL url = new URL( ( String ) message.get( Message.REQUEST_URL ) );
+            HttpServletRequest req = ( HttpServletRequest ) message.get( AbstractHTTPDestination.HTTP_REQUEST );
             Session userSession = null;
 
-            if ( url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X2 ) )
+            if ( req.getLocalPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X2 ) )
             {
-                userSession = authenticateAccess( null );
+                userSession = authenticateAccess( null,null );
             }
             else
             {
                 int status = 0;
-                status = MessageContentUtil.checkUrlAccessibility( status, url );
+                status = MessageContentUtil.checkUrlAccessibility( status, req );
                 //----------------------------------------------------------------------------------------------
                 if ( status == 1 ) //require tokenauth
                 {
-                    userSession = authenticateAccess( message );
+                    userSession = authenticateAccess( message,req );
                 }
                 else if ( status == 0 ) // auth with system user
                 {
-                    userSession = authenticateAccess( null );
+                    userSession = authenticateAccess( null,null );
                 }
                 else if ( status == 2 )
                 {
@@ -108,10 +108,6 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
             }
             //-----------------------------------------------------------------------------------------------
         }
-        catch ( MalformedURLException ignore )
-        {
-            LOG.debug( "MalformedURLException", ignore.toString() );
-        }
         catch ( Exception e )
         {
             throw new Fault( e );
@@ -120,20 +116,15 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
 
 
     //******************************************************************
-    private Session authenticateAccess( Message message )
+    private Session authenticateAccess( Message message, HttpServletRequest req )
     {
         if ( message == null )
         {
             //***********internal auth ********* for regisration and 8444 port
-            String intToken = channelManagerImpl.getIdentityManager().getUserToken( "internal", "secretSubutai" );
-
-            return channelManagerImpl.getIdentityManager().login( "token", intToken );
+            return channelManagerImpl.getIdentityManager().login( "internal", "secretSubutai" );
         }
         else
         {
-            HttpServletRequest req = ( HttpServletRequest ) message.getExchange().getInMessage()
-                                                                   .get( AbstractHTTPDestination.HTTP_REQUEST );
-
             String sptoken = req.getParameter( "sptoken" );
 
             if ( Strings.isNullOrEmpty( sptoken ) )

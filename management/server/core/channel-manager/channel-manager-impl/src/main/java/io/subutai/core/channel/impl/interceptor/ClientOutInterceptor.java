@@ -7,10 +7,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.settings.ChannelSettings;
@@ -53,19 +56,21 @@ public class ClientOutInterceptor extends AbstractPhaseInterceptor<Message>
         {
             if ( InterceptorState.CLIENT_OUT.isActive( message ) )
             {
-                //                LOG.debug( " ****** Client OutInterceptor invoked ******** " );
+                //LOG.debug( " ****** Client OutInterceptor invoked ******** " );
+                HttpServletRequest req = ( HttpServletRequest ) message.getExchange().getOutMessage()
+                                                                       .get( AbstractHTTPDestination.HTTP_REQUEST );
 
                 URL url = getUrl( message );
 
-                if ( url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X2 ) )
+                if ( req.getLocalPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X2 ) )
                 {
-                    String path = url.getPath();
+                    String path = req.getRequestURI();
                     String ip = url.getHost();
 
                     if ( path.startsWith( "/rest/v1/peer" ) )
                     {
                         handlePeerMessage( ip, message );
-                        //                        LOG.debug( "Path handled by peer crypto handler: " + path );
+                        //LOG.debug( "Path handled by peer crypto handler: " + path );
                     }
                     else
                     {
@@ -75,12 +80,12 @@ public class ClientOutInterceptor extends AbstractPhaseInterceptor<Message>
                             String s = path.substring( prefix.length() + 1 );
                             String environmentId = s.substring( 0, s.indexOf( "/" ) );
                             handleEnvironmentMessage( ip, environmentId, message );
-                            //                            LOG.debug( "Path handled by environment crypto handler: " +
+                            // LOG.debug( "Path handled by environment crypto handler: " +
                             // path );
                         }
                         else
                         {
-                            //                            LOG.warn( "Path is not handled by crypto handler: " + path );
+                            //LOG.warn( "Path is not handled by crypto handler: " + path );
                         }
                     }
                 }
@@ -88,7 +93,6 @@ public class ClientOutInterceptor extends AbstractPhaseInterceptor<Message>
         }
         catch ( Exception ex )
         {
-            //            LOG.warn( ex.getMessage() );
             throw new Fault( ex );
         }
     }
