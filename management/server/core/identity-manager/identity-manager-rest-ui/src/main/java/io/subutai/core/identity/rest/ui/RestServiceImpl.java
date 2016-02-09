@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.ws.rs.FormParam;
 import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
@@ -137,9 +136,9 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response approveDelegatedUser( @FormParam( "trustMessage" ) final String trustMessage )
+    public Response approveDelegatedUser( final String trustMessage )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( trustMessage ), "username is missing" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( trustMessage ), "message is missing" );
 
         try
         {
