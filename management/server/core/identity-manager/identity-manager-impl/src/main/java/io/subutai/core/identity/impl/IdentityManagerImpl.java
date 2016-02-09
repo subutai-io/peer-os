@@ -777,7 +777,7 @@ public class IdentityManagerImpl implements IdentityManager
             {
                 User activeUser = getActiveUser();
                 UserDelegate delegatedUser = getUserDelegate( activeUser.getId() );
-                relationManager.processTrustMessage( delegatedUser.getRelationDocument(), delegatedUser.getId() );
+                relationManager.processTrustMessage( trustMessage, delegatedUser.getId() );
             }
         }
         catch ( NamingException e )
@@ -797,14 +797,21 @@ public class IdentityManagerImpl implements IdentityManager
         try
         {
             RelationManager relationManager = ServiceLocator.getServiceNoCache( RelationManager.class );
+            KeyManager keyManager = securityManager.getKeyManager();
+            EncryptionTool encryptionTool = securityManager.getEncryptionTool();
+
             User activeUser = getActiveUser();
             UserDelegate delegatedUser = getUserDelegate( activeUser.getId() );
-            if ( delegatedUser == null ) {
+            if ( delegatedUser == null )
+            {
                 delegatedUser = createUserDelegate( activeUser, null, true );
             }
 
-            KeyManager keyManager = securityManager.getKeyManager();
-            EncryptionTool encryptionTool = securityManager.getEncryptionTool();
+            if ( keyManager.getPrivateKey( delegatedUser.getId() ) == null )
+            {
+                generateKeyPair( delegatedUser.getId(), SecurityKeyType.UserKey.getId() );
+            }
+
 
             // TODO user should send signed trust message between delegatedUser and himself
             RelationInfoMeta relationInfoMeta =
@@ -815,7 +822,7 @@ public class IdentityManagerImpl implements IdentityManager
 
             // TODO relation verification should be done by delegated user, automatically
             RelationMeta relationMeta =
-                    new RelationMeta( activeUser, delegatedUser, delegatedUser, activeUser.getSecurityKeyId() );
+                    new RelationMeta( activeUser, delegatedUser, delegatedUser, delegatedUser.getId() );
             Relation relation = relationManager.buildTrustRelation( relationInfo, relationMeta );
 
             String relationJson = JsonUtil.toJson( relation );
