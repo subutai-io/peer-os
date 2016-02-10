@@ -56,14 +56,12 @@ public class ClientInInterceptor extends AbstractPhaseInterceptor<Message>
             if ( InterceptorState.CLIENT_IN.isActive( message ) )
             {
                 //                LOG.debug( " ****** Client InInterceptor invoked ******** " );
-                HttpServletRequest req = ( HttpServletRequest ) message.getExchange().getOutMessage()
-                                                                       .get( AbstractHTTPDestination.HTTP_REQUEST );
 
                 URL url = new URL( ( String ) message.getExchange().getOutMessage().get( Message.ENDPOINT_ADDRESS ) );
 
-                if ( req.getLocalPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X2 ) )
+                if ( url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X2 ) )
                 {
-                    String path = req.getRequestURI();
+                    String path = url.getPath();
                     String ip = url.getHost();
                     HttpHeaders headers = new HttpHeadersImpl( message.getExchange().getInMessage() );
                     String spHeader = headers.getHeaderString( Common.SUBUTAI_HTTP_HEADER );

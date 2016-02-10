@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
@@ -24,6 +25,7 @@ import com.google.common.base.Strings;
 
 import io.subutai.common.settings.ChannelSettings;
 import io.subutai.core.channel.impl.ChannelManagerImpl;
+import io.subutai.core.channel.impl.util.InterceptorState;
 import io.subutai.core.channel.impl.util.MessageContentUtil;
 import io.subutai.core.identity.api.model.Session;
 
@@ -55,58 +57,61 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
     {
         try
         {
-            HttpServletRequest req = ( HttpServletRequest ) message.get( AbstractHTTPDestination.HTTP_REQUEST );
-            Session userSession = null;
+            if ( InterceptorState.SERVER_IN.isActive( message ) )
+            {
+                HttpServletRequest req = ( HttpServletRequest ) message.get( AbstractHTTPDestination.HTTP_REQUEST );
+                Session userSession = null;
 
-            if ( req.getLocalPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X2 ) )
-            {
-                userSession = authenticateAccess( null,null );
-            }
-            else
-            {
-                int status = 0;
-                status = MessageContentUtil.checkUrlAccessibility( status, req );
-                //----------------------------------------------------------------------------------------------
-                if ( status == 1 ) //require tokenauth
-                {
-                    userSession = authenticateAccess( message,req );
-                }
-                else if ( status == 0 ) // auth with system user
+                if ( req.getLocalPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X2 ) )
                 {
                     userSession = authenticateAccess( null,null );
                 }
-                else if ( status == 2 )
+                else
                 {
-                    MessageContentUtil.abortChain( message, 403, "Permission denied" );
+                    int status = 0;
+                    status = MessageContentUtil.checkUrlAccessibility( status, req );
+                    //----------------------------------------------------------------------------------------------
+                    if ( status == 1 ) //require tokenauth
+                    {
+                        userSession = authenticateAccess( message,req );
+                    }
+                    else if ( status == 0 ) // auth with system user
+                    {
+                        userSession = authenticateAccess( null,null );
+                    }
+                    else if ( status == 2 )
+                    {
+                        MessageContentUtil.abortChain( message, 403, "Permission denied" );
+                    }
+                }
+
+                //******Authenticate************************************************
+                if ( userSession != null )
+                {
+                    Subject.doAs( userSession.getSubject(), new PrivilegedAction<Void>()
+                    {
+                        @Override
+                        public Void run()
+                        {
+                            try
+                            {
+                                message.getInterceptorChain().doIntercept( message );
+                            }
+                            catch ( Exception ex )
+                            {
+                                Throwable t = ExceptionUtils.getRootCause( ex );
+                                MessageContentUtil.abortChain( message, t );
+                            }
+                            return null;
+                        }
+                    } );
+                }
+                else
+                {
+                    MessageContentUtil.abortChain( message, 401, "User is not authorized" );
                 }
             }
-
-            //******Authenticate************************************************
-            if ( userSession != null )
-            {
-                Subject.doAs( userSession.getSubject(), new PrivilegedAction<Void>()
-                {
-                    @Override
-                    public Void run()
-                    {
-                        try
-                        {
-                            message.getInterceptorChain().doIntercept( message );
-                        }
-                        catch ( Exception ex )
-                        {
-                            Throwable t = ExceptionUtils.getRootCause( ex );
-                            MessageContentUtil.abortChain( message, t );
-                        }
-                        return null;
-                    }
-                } );
-            }
-            else
-            {
-                MessageContentUtil.abortChain( message, 401, "User is not authorized" );
-            }
-            //-----------------------------------------------------------------------------------------------
+                //-----------------------------------------------------------------------------------------------
         }
         catch ( Exception e )
         {
