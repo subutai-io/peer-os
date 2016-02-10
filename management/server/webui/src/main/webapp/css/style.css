@@ -2046,6 +2046,7 @@ td.b-main-table__status-col {
 }
 .b-tabs-menu_header ul {
     border: none;
+    border-bottom: 1px solid #ccceee;
 }
 .b-tabs-menu_cloud-env ul {
     border: none;
@@ -2073,7 +2074,7 @@ td.b-main-table__status-col {
     border-bottom: 1px solid #ccceee;
 }
 .b-tabs-menu_header ul .b-tabs-menu__item {
-    margin-bottom: -1px;
+    margin-bottom: -2px;
     padding: 18.5px 35px;
     font-size: 18px;
 }
