@@ -86,11 +86,11 @@
     <xz.version>1.5</xz.version>
     <jdeb.version>1.4</jdeb.version>
     <bcpg-jdk15on.version>1.52</bcpg-jdk15on.version>
-    <subutai.version>4.0.0-RC6</subutai.version>
     <org.osgi.core.version>6.0.0</org.osgi.core.version>
     <org.osgi.compendium.version>5.0.0</org.osgi.compendium.version>
     <!-- CXF JAX-RS version is kept to be the same with Subutai Common utility classes -->
     <cxf-rt-frontend-jaxrs.version>3.1.0</cxf-rt-frontend-jaxrs.version>
+    <cxf-rt-rs-client.version>3.1.0</cxf-rt-rs-client.version>
     <aws-java-sdk-s3.version>1.10.42</aws-java-sdk-s3.version>
     <mapdb.version>1.0.8</mapdb.version>
     <hikariCp.version>2.4.1</hikariCp.version>
@@ -388,6 +388,12 @@
         <artifactId>guice-assistedinject</artifactId>
         <version>4.0</version>
       </dependency>
+
+      <dependency>
+        <groupId>com.google.inject.extensions</groupId>
+        <artifactId>guice-multibindings</artifactId>
+        <version>4.0</version>
+      </dependency>
       
       <dependency>
         <groupId>org.ops4j</groupId>
@@ -444,12 +450,6 @@
       </dependency>
 
       <dependency>
-        <groupId>io.subutai</groupId>
-        <artifactId>subutai-common</artifactId>
-        <version>4.0.0-RC6</version>
-      </dependency>
-      
-      <dependency>
         <groupId>org.osgi</groupId>
         <artifactId>org.osgi.core</artifactId>
         <version>6.0.0</version>
@@ -464,6 +464,12 @@
       <dependency>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-rt-frontend-jaxrs</artifactId>
+        <version>3.1.0</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-rt-rs-client</artifactId>
         <version>3.1.0</version>
       </dependency>
 
