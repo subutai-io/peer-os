@@ -4,9 +4,9 @@ angular.module('subutai.environment.service', [])
 	.factory('environmentService', environmentService);
 
 
-environmentService.$inject = ['$http', 'peerRegistrationService'];
+environmentService.$inject = ['$http'];
 
-function environmentService($http, peerRegistrationService) {
+function environmentService($http) {
 
 	var ENVIRONMENTS_URL = SERVER_URL + 'rest/ui/environments/';
 
@@ -47,6 +47,7 @@ function environmentService($http, peerRegistrationService) {
 		startEnvironmentBuild : startEnvironmentBuild,
 		growEnvironment : growEnvironment,
 		destroyEnvironment: destroyEnvironment,
+		modifyEnvironment: modifyEnvironment,
 
 
 		setSshKey : setSshKey,
@@ -89,9 +90,6 @@ function environmentService($http, peerRegistrationService) {
 		revoke: revoke,
 
 		startEnvironmentAutoBuild: startEnvironmentAutoBuild,
-
-		getRequestedPeers: getRequestedPeers,
-		getResourceHosts: getResourceHosts,
 
 		getServerUrl : function getServerUrl() { return ENVIRONMENTS_URL; }
 	};
@@ -197,7 +195,14 @@ function environmentService($http, peerRegistrationService) {
 		return $http.delete(ENVIRONMENTS_URL + environmentId);
 	}
 
-
+	function modifyEnvironment(containers) {
+		var postData = 'include=' + JSON.stringify( containers.included ) + '&exclude=' + JSON.stringify( containers.excluded );
+		return $http.post(
+			ENVIRONMENTS_URL + containers.environmentId + '/modify',
+			postData,
+			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+		);
+	}
 
 	function switchContainer(containerId, type) {
 		return $http.post(
@@ -360,15 +365,4 @@ function environmentService($http, peerRegistrationService) {
 		);
 	}
 
-	function getRequestedPeers() {
-		return peerRegistrationService.getRequestedPeers();
-	}
-
-	function getRequestedPeers() {
-		return peerRegistrationService.getRequestedPeers();
-	}
-
-	function getResourceHosts() {
-		return peerRegistrationService.getResourceHosts();
-	}
 }

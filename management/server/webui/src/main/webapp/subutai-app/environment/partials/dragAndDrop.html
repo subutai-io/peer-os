@@ -19,26 +19,20 @@
 					<div class="b-tabs-menu b-tabs-menu_cloud-env">
 						<ul>
 							<li class="b-tabs-menu__item b-tabs-menu__item_active"
+								style="width: 100%" 
 								ng-click="environmentViewCtrl.activeCloudTab = 'templates'"
 								ng-class="environmentViewCtrl.activeCloudTab == 'templates' ? 'b-tabs-menu__item_active' : ''">
 								Templates
-							</li>
-							<li class="b-tabs-menu__item"
-								ng-click="environmentViewCtrl.activeCloudTab = 'more'"
-								ng-class="environmentViewCtrl.activeCloudTab == 'more' ? 'b-tabs-menu__item_active' : ''">
-								More
 							</li>
 						</ul>
 					</div>
 					<div class="b-tools-menu js-scrollbar">
 						<ul>
 							<li ng-repeat="template in environmentViewCtrl.templates">
-								<a href="#"
-									class="js-add-dev-element"
-									data-template="{{ template }}">
+								<a href ng-click="environmentViewCtrl.addContainer(template, $event)">
 									<span class="b-cloud-item">
 										<img
-											src="assets/templates/{{ template }}.jpg"
+											ng-src="assets/templates/{{ template }}.jpg"
 											alt="{{ template }}"
 											onError="this.onerror=null;this.src='assets/templates/no-image.jpg';">
 									</span>

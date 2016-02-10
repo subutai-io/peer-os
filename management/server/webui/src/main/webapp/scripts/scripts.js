@@ -21,9 +21,7 @@ $(document).ready(function() {
 	}
 	colEqualHeight();
 });
-$('.js-cloud-btn').click(function(event) {
-	$( ".js-grid-list-switcher_list" ).toggleClass( "js-grid-list-switcher_list_show" );
-});
+
 $(".b-form-input_dropdown").click(function () {
 	$(this).toggleClass("is-active");
 });
@@ -45,3 +43,17 @@ var UPDATE_NIGHTLY_BUILD_STATUS;
 //document.getElementById("uploadBtn").onchange = function () {
 //	document.getElementById("uploadFile").value = this.value;
 //};
+/*$('a.js-cbox-modal').colorbox({
+	title: " ",
+	transition: "none",
+	previous: false,
+	next: false,
+	arrowKey: false,
+	rel: false,
+	overlayClose: true,
+	opacity: 0.8,
+	closeButton: false,
+	onComplete: function() {
+		$.colorbox.resize();
+	}
+});*/
