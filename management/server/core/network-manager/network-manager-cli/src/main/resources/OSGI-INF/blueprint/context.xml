@@ -11,13 +11,6 @@
     </command>
   </command-bundle>
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="net/remove-p2p">
-      <action class="io.subutai.core.network.cli.RemoveP2PCommand">
-        <argument ref="networkManager" />
-      </action>
-    </command>
-  </command-bundle>
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="net/setup-tunnel">
       <action class="io.subutai.core.network.cli.SetupTunnelCommand">
         <argument ref="networkManager" />
@@ -46,8 +39,15 @@
     </command>
   </command-bundle>
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="net/list-p2p">
+    <command name="p2p/list">
       <action class="io.subutai.core.network.cli.ListP2PCommand">
+        <argument ref="networkManager" />
+      </action>
+    </command>
+  </command-bundle>
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="p2p/remove">
+      <action class="io.subutai.core.network.cli.RemoveP2PCommand">
         <argument ref="networkManager" />
       </action>
     </command>

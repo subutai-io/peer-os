@@ -96,8 +96,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 			VARS_MODAL_ERROR( SweetAlert, 'Error on getting templates ' + data );
 		});
 
-	//vm.templates = ['cassandra', 'mongo', 'zookeer', 'master', 'hadoop', 'spark', 'solr'];
-
 	environmentService.getContainersType()
 		.success(function (data) {
 			vm.containersType = data;
@@ -404,7 +402,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 				return false;
 			}).error(function(error) {
 				console.log(error);
-			});		
+			});
 	}
 
 	function checkLastLog(status) {
@@ -463,7 +461,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 
 					setTimeout(function() {
 						getLogById(id, false, logs);
-					}, 2000);					
+					}, 2000);
 
 					return result;
 				} else {
@@ -901,7 +899,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	}
 
 	var graph = new joint.dia.Graph;
-	
+
 	//custom shapes
 	joint.shapes.tm = {};
 
@@ -1078,7 +1076,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 		return { x : vm.cubeGrowth - 1, y : 0 };
 	}
 
-	vm.findEmptyCubePostion = findEmptyCubePostion;	
+	vm.findEmptyCubePostion = findEmptyCubePostion;
 
 	function initJointJs() {
 
@@ -1160,7 +1158,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	vm.buildStep = 'confirm';
 	function buildEnvironmentByJoint() {
 
-		vm.newEnvID = [];		
+		vm.newEnvID = [];
 
 		var allElements = graph.getCells();
 		vm.env2Build = {};

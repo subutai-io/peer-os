@@ -106,62 +106,62 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 
 	function removeRoleFromUser(user, roleKey) {
 		SweetAlert.swal({
-			title: "Are you sure?",
-			text: 'Remove "' + user.roles[roleKey].name + '" role from user "' + user.userName + '"!',
-			type: "warning",
-			showCancelButton: true,
-			confirmButtonColor: "#ff3f3c",
-			confirmButtonText: "Remove",
-			cancelButtonText: "Cancel",
-			closeOnConfirm: false,
-			closeOnCancel: true,
-			showLoaderOnConfirm: true
-		},
-		function (isConfirm) {
-			if (isConfirm) {
-				user.roles.splice(roleKey, 1);
-				var userRoles = [];
-				for(var i = 0; i < user.roles.length; i++) {
-					userRoles.push(user.roles[i].id);
+				title: "Are you sure?",
+				text: 'Remove "' + user.roles[roleKey].name + '" role from user "' + user.userName + '"!',
+				type: "warning",
+				showCancelButton: true,
+				confirmButtonColor: "#ff3f3c",
+				confirmButtonText: "Remove",
+				cancelButtonText: "Cancel",
+				closeOnConfirm: false,
+				closeOnCancel: true,
+				showLoaderOnConfirm: true
+			},
+			function (isConfirm) {
+				if (isConfirm) {
+					user.roles.splice(roleKey, 1);
+					var userRoles = [];
+					for(var i = 0; i < user.roles.length; i++) {
+						userRoles.push(user.roles[i].id);
+					}
+					user.roles = userRoles;
+					var postData = userPostData(user);
+					console.log(postData);
+					identitySrv.addUser(postData).success(function (data) {
+						SweetAlert.swal("Removed!", "Role has been removed.", "success");
+						//vm.dtInstance.reloadData(null, false);
+						getUsers();
+					}).error(function (data) {
+						SweetAlert.swal("ERROR!", "User role is safe :). Error: " + data, "error");
+					});
 				}
-				user.roles = userRoles;
-				var postData = userPostData(user);
-				console.log(postData);
-				identitySrv.addUser(postData).success(function (data) {
-					SweetAlert.swal("Removed!", "Role has been removed.", "success");
-					//vm.dtInstance.reloadData(null, false);
-					getUsers();
-				}).error(function (data) {
-					SweetAlert.swal("ERROR!", "User role is safe :). Error: " + data, "error");
-				});
-			}
-		});
+			});
 	}
 
 	function deleteUser(user) {
 		SweetAlert.swal({
-			title: "Are you sure?",
-			text: "You will not be able to recover this user!",
-			type: "warning",
-			showCancelButton: true,
-			confirmButtonColor: "#ff3f3c",
-			confirmButtonText: "Delete",
-			cancelButtonText: "Cancel",
-			closeOnConfirm: false,
-			closeOnCancel: true,
-			showLoaderOnConfirm: true
-		},
-		function (isConfirm) {
-			if (isConfirm) {
-				identitySrv.deleteUser(user.id).success(function (data) {
-					SweetAlert.swal("Deleted!", "User has been deleted.", "success");
-					//vm.dtInstance.reloadData(null, false);
-					getUsers();
-				}).error(function (data) {
-					SweetAlert.swal("ERROR!", "User is safe :). Error: " + data, "error");
-				});
-			}
-		});
+				title: "Are you sure?",
+				text: "You will not be able to recover this user!",
+				type: "warning",
+				showCancelButton: true,
+				confirmButtonColor: "#ff3f3c",
+				confirmButtonText: "Delete",
+				cancelButtonText: "Cancel",
+				closeOnConfirm: false,
+				closeOnCancel: true,
+				showLoaderOnConfirm: true
+			},
+			function (isConfirm) {
+				if (isConfirm) {
+					identitySrv.deleteUser(user.id).success(function (data) {
+						SweetAlert.swal("Deleted!", "User has been deleted.", "success");
+						//vm.dtInstance.reloadData(null, false);
+						getUsers();
+					}).error(function (data) {
+						SweetAlert.swal("ERROR!", "User is safe :). Error: " + data, "error");
+					});
+				}
+			});
 	}
 
 	vm.approveWindow = approveWindow;
@@ -203,27 +203,27 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 
 	function reject (user) {
 		SweetAlert.swal({
-			title: "Are you sure?",
-			text: "Your will not be able to undo this!",
-			type: "warning",
-			showCancelButton: true,
-			confirmButtonColor: "#ff3f3c",
-			confirmButtonText: "Delete",
-			cancelButtonText: "Cancel",
-			closeOnConfirm: false,
-			closeOnCancel: true,
-			showLoaderOnConfirm: true
-		},
-		function (isConfirm) {
-			if (isConfirm) {
-				identitySrv.deleteUser (user.id).success (function (data) {
-					SweetAlert.swal ("Success!", "User was rejected.", "success");
-					getUsers();
-				}).error (function (error) {
-					SweetAlert.swal ("ERROR!", "User reject error: " + error.replace(/\\n/g, " "), "error");
-				});
-			}
-		});
+				title: "Are you sure?",
+				text: "Your will not be able to undo this!",
+				type: "warning",
+				showCancelButton: true,
+				confirmButtonColor: "#ff3f3c",
+				confirmButtonText: "Delete",
+				cancelButtonText: "Cancel",
+				closeOnConfirm: false,
+				closeOnCancel: true,
+				showLoaderOnConfirm: true
+			},
+			function (isConfirm) {
+				if (isConfirm) {
+					identitySrv.deleteUser (user.id).success (function (data) {
+						SweetAlert.swal ("Success!", "User was rejected.", "success");
+						getUsers();
+					}).error (function (error) {
+						SweetAlert.swal ("ERROR!", "User reject error: " + error.replace(/\\n/g, " "), "error");
+					});
+				}
+			});
 	}
 
 	function getKey (id) {
