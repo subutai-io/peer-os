@@ -25,7 +25,7 @@ public class KurjunSettings
         }
         catch ( ConfigurationException e )
         {
-            LOG.error( "Error in loading peer.cfg file." );
+            LOG.error( "Error in loading kurjun.cfg file." );
             e.printStackTrace();
         }
         return config;
@@ -36,5 +36,17 @@ public class KurjunSettings
         return PROPERTIES.getProperty( "globalKurjunUrls" );
     }
 
-
+    public static void setSettings( String urls )
+    {
+        try
+        {
+            PROPERTIES.setProperty( "globalKurjunUrls", urls );
+            PROPERTIES.save();
+        }
+        catch ( ConfigurationException e )
+        {
+            LOG.error( "Error in saving kurjun.cfg file." );
+            e.printStackTrace();
+        }
+    }
 }

@@ -10,19 +10,19 @@ public interface PeerSettings
 
     public void setExternalIpInterface( final String externalIpInterface );
 
-    public String getEncryptionState();
+    public boolean getEncryptionState();
 
-    public void setEncryptionState( final String encryptionState );
+    public void setEncryptionState( final boolean encryptionState );
 
-    public String getRestEncryptionState();
+    public boolean getRestEncryptionState();
 
-    public void setRestEncryptionState( final String restEncryptionState );
+    public void setRestEncryptionState( final boolean restEncryptionState );
 
-    public String getIntegrationState();
+    public boolean getIntegrationState();
 
-    public void setIntegrationState( final String integrationState );
+    public void setIntegrationState( final boolean integrationState );
 
-    public String getKeyTrustCheckState();
+    public boolean getKeyTrustCheckState();
 
-    public void setKeyTrustCheckState( final String keyTrustCheckState );
+    public void setKeyTrustCheckState( final boolean keyTrustCheckState );
 }

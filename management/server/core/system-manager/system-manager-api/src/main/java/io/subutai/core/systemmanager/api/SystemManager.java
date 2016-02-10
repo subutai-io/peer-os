@@ -14,9 +14,15 @@ public interface SystemManager
 {
     public PeerSettings getPeerSettings();
 
+    public void setPeerSettings( PeerSettings settings );
+
     public KurjunSettings getKurjunSettings();
 
-    public SystemInfo getSystemInfo();
+    public void setKurjunSettings( KurjunSettings settings );
 
     public ChannelSettings getChannelSettings();
+
+    public void setChannelSettings( ChannelSettings settings );
+
+    public SystemInfo getSystemInfo();
 }

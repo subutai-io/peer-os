@@ -10,10 +10,11 @@ import io.subutai.core.systemmanager.api.pojo.PeerSettings;
 public class PeerSettingsPojo implements PeerSettings
 {
     private String externalIpInterface;
-    private String encryptionState;
-    private String restEncryptionState;
-    private String integrationState;
-    private String keyTrustCheckState;
+    private boolean encryptionState;
+    private boolean restEncryptionState;
+    private boolean integrationState;
+    private boolean keyTrustCheckState;
+
 
     public String getExternalIpInterface()
     {
@@ -27,49 +28,49 @@ public class PeerSettingsPojo implements PeerSettings
     }
 
 
-    public String getEncryptionState()
+    public boolean getEncryptionState()
     {
         return encryptionState;
     }
 
 
-    public void setEncryptionState( final String encryptionState )
+    public void setEncryptionState( final boolean encryptionState )
     {
         this.encryptionState = encryptionState;
     }
 
 
-    public String getRestEncryptionState()
+    public boolean getRestEncryptionState()
     {
         return restEncryptionState;
     }
 
 
-    public void setRestEncryptionState( final String restEncryptionState )
+    public void setRestEncryptionState( final boolean restEncryptionState )
     {
         this.restEncryptionState = restEncryptionState;
     }
 
 
-    public String getIntegrationState()
+    public boolean getIntegrationState()
     {
         return integrationState;
     }
 
 
-    public void setIntegrationState( final String integrationState )
+    public void setIntegrationState( final boolean integrationState )
     {
         this.integrationState = integrationState;
     }
 
 
-    public String getKeyTrustCheckState()
+    public boolean getKeyTrustCheckState()
     {
         return keyTrustCheckState;
     }
 
 
-    public void setKeyTrustCheckState( final String keyTrustCheckState )
+    public void setKeyTrustCheckState( final boolean keyTrustCheckState )
     {
         this.keyTrustCheckState = keyTrustCheckState;
     }

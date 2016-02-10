@@ -1,6 +1,8 @@
 package io.subutai.common.settings;
 
 
+import java.util.Objects;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,6 +17,7 @@ public class PeerSettings
 {
     private static final Logger LOG = LoggerFactory.getLogger( PeerSettings.class );
     private static PropertiesConfiguration PROPERTIES = loadProperties();
+
 
     public static PropertiesConfiguration loadProperties()
     {
@@ -38,26 +41,50 @@ public class PeerSettings
     }
 
 
-    public static Object getEncryptionState()
+    public static boolean getEncryptionState()
     {
-        return PROPERTIES.getProperty( "encryptionEnabled" );
+        String state = String.valueOf( PROPERTIES.getProperty( "encryptionEnabled" ) );
+        return Objects.equals( state, "true" );
     }
 
 
-    public static Object getRestEncryptionState()
+    public static boolean getRestEncryptionState()
     {
-        return PROPERTIES.getProperty( "restEncryptionEnabled" );
+        String state = String.valueOf( PROPERTIES.getProperty( "restEncryptionEnabled" ) );
+        return Objects.equals( state, "true" );
     }
 
 
-    public static Object getIntegrationState()
+    public static boolean getIntegrationState()
     {
-        return PROPERTIES.getProperty( "integrationEnabled" );
+        String state = String.valueOf( PROPERTIES.getProperty( "integrationEnabled" ) );
+        return Objects.equals( state, "true" );
     }
 
 
-    public static Object getKeyTrustCheckState()
+    public static boolean getKeyTrustCheckState()
     {
-        return PROPERTIES.getProperty( "keyTrustCheckEnabled" );
+        String state = String.valueOf( PROPERTIES.getProperty( "keyTrustCheckEnabled" ) );
+        return Objects.equals( state, "true" );
+    }
+
+
+    public static void setSettings( final String externalIpInterface, final boolean encryptionState,
+                                    final boolean restEncryptionState, final boolean integrationState,
+                                    final boolean keyTrustCheckState )
+    {
+        try
+        {
+            PROPERTIES.setProperty( "externalIpInterface", externalIpInterface );
+            PROPERTIES.setProperty( "encryptionEnabled", encryptionState );
+            PROPERTIES.setProperty( "restEncryptionEnabled", restEncryptionState );
+            PROPERTIES.setProperty( "integrationEnabled", integrationState );
+            PROPERTIES.setProperty( "keyTrustCheckEnabled", keyTrustCheckState );
+            PROPERTIES.save();
+        }
+        catch ( ConfigurationException e )
+        {
+            e.printStackTrace();
+        }
     }
 }

@@ -77,12 +77,6 @@ public class SubutaiInfo
     {
         return PROPERTIES.getProperty( "git.build.version" );
     }
-
-    public static void setVersion( Object version)
-    {
-        PROPERTIES.setProperty( "git.build.version", version );
-
-    }
 }
 
 

@@ -25,13 +25,22 @@ public class SystemManagerImpl implements SystemManager
 
         pojo.setExternalIpInterface(
                 String.valueOf( io.subutai.common.settings.PeerSettings.getExternalIpInterface() ) );
-        pojo.setEncryptionState( String.valueOf( io.subutai.common.settings.PeerSettings.getEncryptionState() ) );
-        pojo.setRestEncryptionState(
-                String.valueOf( io.subutai.common.settings.PeerSettings.getRestEncryptionState() ) );
-        pojo.setIntegrationState( String.valueOf( io.subutai.common.settings.PeerSettings.getIntegrationState() ) );
-        pojo.setKeyTrustCheckState( String.valueOf( io.subutai.common.settings.PeerSettings.getKeyTrustCheckState() ) );
+        pojo.setEncryptionState( io.subutai.common.settings.PeerSettings.getEncryptionState() );
+        pojo.setRestEncryptionState( io.subutai.common.settings.PeerSettings.getRestEncryptionState() );
+        pojo.setIntegrationState( io.subutai.common.settings.PeerSettings.getIntegrationState() );
+        pojo.setKeyTrustCheckState( io.subutai.common.settings.PeerSettings.getKeyTrustCheckState() );
 
         return pojo;
+    }
+
+
+    @Override
+    public void setPeerSettings( final PeerSettings settings )
+    {
+        io.subutai.common.settings.PeerSettings
+                .setSettings( settings.getExternalIpInterface(), settings.getEncryptionState(),
+                        settings.getRestEncryptionState(), settings.getIntegrationState(),
+                        settings.getKeyTrustCheckState() );
     }
 
 
@@ -43,6 +52,13 @@ public class SystemManagerImpl implements SystemManager
         pojo.setGlobalKurjunUrls( String.valueOf( io.subutai.common.settings.KurjunSettings.getGlobalKurjunUrls() ) );
 
         return pojo;
+    }
+
+
+    @Override
+    public void setKurjunSettings( final KurjunSettings settings )
+    {
+        io.subutai.common.settings.KurjunSettings.setSettings( settings.getGlobalKurjunUrls() );
     }
 
 
@@ -76,5 +92,12 @@ public class SystemManagerImpl implements SystemManager
         pojo.setSpecialPortX1( io.subutai.common.settings.ChannelSettings.SPECIAL_PORT_X1 );
 
         return pojo;
+    }
+
+
+    @Override
+    public void setChannelSettings( final ChannelSettings settings )
+    {
+
     }
 }
