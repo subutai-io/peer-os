@@ -38,6 +38,10 @@ import ai.subut.kurjun.model.metadata.Metadata;
 import ai.subut.kurjun.model.metadata.SerializableMetadata;
 import ai.subut.kurjun.model.repository.LocalRepository;
 import ai.subut.kurjun.model.repository.UnifiedRepository;
+import ai.subut.kurjun.quota.DataUnit;
+import ai.subut.kurjun.quota.QuotaInfoStore;
+import ai.subut.kurjun.quota.disk.DiskQuota;
+import ai.subut.kurjun.quota.transfer.TransferQuota;
 import ai.subut.kurjun.repo.RepositoryFactory;
 import ai.subut.kurjun.repo.RepositoryModule;
 import ai.subut.kurjun.repo.service.PackageFilenameParser;
@@ -54,9 +58,11 @@ import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.AptPackage;
 import io.subutai.common.settings.Common;
+import io.subutai.core.kurjun.api.KurjunTransferQuota;
 import io.subutai.core.kurjun.api.vapt.AptManager;
 import io.subutai.core.kurjun.impl.RepoUrl;
 import io.subutai.core.kurjun.impl.RepoUrlStore;
+import io.subutai.core.kurjun.impl.TrustedWebClientFactoryModule;
 
 
 public class AptManagerImpl implements AptManager
@@ -114,6 +120,7 @@ public class AptManagerImpl implements AptManager
         bootstrap.addModule( new SnapMetadataParserModule() );
 
         bootstrap.addModule( new RepositoryModule() );
+        bootstrap.addModule( new TrustedWebClientFactoryModule() );
         //        bootstrap.addModule( new SecurityModule() );
 
         bootstrap.boot();
@@ -363,6 +370,86 @@ public class AptManagerImpl implements AptManager
         catch ( IOException ex )
         {
             LOGGER.error( "Failed to remove remote apr repo: {}", url, ex );
+        }
+    }
+
+    @Override
+    public Long getDiskQuota( String context )
+    {
+        QuotaInfoStore quotaInfoStore = injector.getInstance( QuotaInfoStore.class );
+        try
+        {
+            DiskQuota diskQuota = quotaInfoStore.getDiskQuota( AptManagerImpl.context );
+            if ( diskQuota != null )
+            {
+                return diskQuota.getThreshold() * diskQuota.getUnit().toBytes() / DataUnit.MB.toBytes();
+            }
+        }
+        catch ( IOException ex )
+        {
+            LOGGER.error( "Failed to get disk quota", ex );
+        }
+        return null;
+    }
+
+
+    @Override
+    public boolean setDiskQuota( long size, String context )
+    {
+        DiskQuota diskQuota = new DiskQuota( size, DataUnit.MB );
+        QuotaInfoStore quotaInfoStore = injector.getInstance( QuotaInfoStore.class );
+        try
+        {
+            quotaInfoStore.saveDiskQuota( diskQuota, AptManagerImpl.context );
+            return true;
+        }
+        catch ( IOException ex )
+        {
+            LOGGER.error( "Failed to save disk quota", ex );
+            return false;
+        }
+    }
+
+
+    @Override
+    public KurjunTransferQuota getTransferQuota( String context )
+    {
+        QuotaInfoStore quotaInfoStore = injector.getInstance( QuotaInfoStore.class );
+        try
+        {
+            TransferQuota q = quotaInfoStore.getTransferQuota( AptManagerImpl.context );
+            if ( q != null )
+            {
+                return new KurjunTransferQuota( q.getThreshold(), q.getTime(), q.getTimeUnit() );
+            }
+        }
+        catch ( IOException ex )
+        {
+            LOGGER.error( "Failed to get transfer quota", ex );
+        }
+        return null;
+    }
+
+
+    @Override
+    public boolean setTransferQuota( KurjunTransferQuota quota, String context )
+    {
+        TransferQuota transferQuota = new TransferQuota();
+        transferQuota.setThreshold( quota.getThreshold() );
+        transferQuota.setUnit( DataUnit.MB );
+        transferQuota.setTime( quota.getTimeFrame() );
+        transferQuota.setTimeUnit( quota.getTimeUnit() );
+
+        QuotaInfoStore quotaInfoStore = injector.getInstance( QuotaInfoStore.class );
+        try
+        {
+            quotaInfoStore.saveTransferQuota( transferQuota, AptManagerImpl.context );
+            return true;
+        }
+        catch ( IOException ex )
+        {
+            LOGGER.error( "Failed to save transfer quota", ex );
+            return false;
         }
     }
 

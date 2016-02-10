@@ -8,9 +8,10 @@ import java.net.URL;
 import java.util.List;
 
 import io.subutai.common.protocol.AptPackage;
+import io.subutai.core.kurjun.api.QuotaManagedRepository;
 
 
-public interface AptManager
+public interface AptManager extends QuotaManagedRepository
 {
 
     String getRelease( String release, String component, String arch );
