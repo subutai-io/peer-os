@@ -1991,6 +1991,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             User activeUser = identityManager.getActiveUser();
             UserDelegate delegatedUser = identityManager.getUserDelegate( activeUser.getId() );
             User targetUser = identityManager.getUser( dto.getId() );
+            UserDelegate targetDelegate = identityManager.getUserDelegate(targetUser.getId());
 
             RelationInfoMeta relationInfoMeta =
                     new RelationInfoMeta( dto.isRead(), dto.isWrite(), dto.isUpdate(), dto.isDelete(),
@@ -1999,7 +2000,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             RelationInfo relationInfo = relationManager.createTrustRelationship( relationInfoMeta );
 
             RelationMeta relationMeta =
-                    new RelationMeta( delegatedUser, targetUser, environment, delegatedUser.getLinkId() );
+                    new RelationMeta( delegatedUser, targetDelegate, environment, delegatedUser.getId() );
 
             Relation relation = relationManager.buildTrustRelation( relationInfo, relationMeta );
             relation.setRelationStatus( RelationStatus.VERIFIED );
