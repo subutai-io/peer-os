@@ -15,7 +15,7 @@ import io.subutai.common.protocol.TemplateKurjun;
  * TemplateKurjun manager interface that wraps Kurjun repositories. <p> This is the first version and further changes
  * will be applied.
  */
-public interface TemplateManager
+public interface TemplateManager extends QuotaManagedRepository
 {
 
     /**
