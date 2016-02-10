@@ -4,20 +4,20 @@
 		<a href ng-click="closeThisDialog()"><i class="fa fa-times g-right"></i></a>
 	</div>
 
-	<div class="b-popup__body" ng-if="environmentViewCtrl.buildStep == 'confirm'">
+	<div class="b-popup__body" ng-if="environmentSimpleViewCtrl.buildStep == 'confirm'">
 		<div class="b-form-group g-margin-bottom">
 			<div class="g-text g-margin-bottom-half">Enter environment name</div>
 			<input type="text" 
 				class="b-form-input b-form-input_fix-size-3" 
 				id="env-name" 
-				ng-model="environmentViewCtrl.environment2BuildName">
+				ng-model="environmentSimpleViewCtrl.environment2BuildName">
 		</div>
 
 		<div class="g-text g-margin-bottom-half">Create environment with following containers</div>
 		<div class="b-main-table-border">
 			<table class="b-main-table b-main-table_custom-1 g-margin-bottom-half">
 
-				<tr ng-repeat="(templateName, templateInfo) in environmentViewCtrl.env2Build">
+				<tr ng-repeat="(templateName, templateInfo) in environmentSimpleViewCtrl.env2Build">
 					<td class="b-main-table__20 g-text-center">
 						<img 
 							src="assets/templates/{{ templateName }}.jpg" 
@@ -29,7 +29,7 @@
 						<span 
 						class="g-circle-label g-margin-left-quarter" 
 						ng-repeat="(sizeName, count) in templateInfo.sizes" 
-						style="background-color: {{ environmentViewCtrl.colors[sizeName] }}" 
+						style="background-color: {{ environmentSimpleViewCtrl.colors[sizeName] }}" 
 						tooltips 
 						tooltip-template="{{ sizeName }}">
 							{{ count }}
@@ -41,24 +41,24 @@
 		</div>
 	</div>
 
-	<div class="b-popup__body" ng-if="environmentViewCtrl.buildStep == 'pgpKey' || environmentViewCtrl.buildStep == 'showLogs'">
+	<div class="b-popup__body" ng-if="environmentSimpleViewCtrl.buildStep == 'pgpKey' || environmentSimpleViewCtrl.buildStep == 'showLogs'">
 		<table class="b-main-table b-main-table_none-border g-margin-bottom-half">
-			<tr ng-repeat="(key, log) in environmentViewCtrl.logMessages">
+			<tr ng-repeat="(key, log) in environmentSimpleViewCtrl.logMessages">
 				<td>{{ log.time }}</td>
 				<td class="b-main-table__mini-icon"><i class="fa" ng-class="log.classes"></i></td>
 				<td>{{ log.text }}</td>
 			</tr>
 		</table>
 		<div class="b-form">
-			<div class="g-text-center" ng-show="!environmentViewCtrl.hasPGPplugin">
+			<div class="g-text-center" ng-show="!environmentSimpleViewCtrl.hasPGPplugin">
 				<button class="b-btn b-btn_light-grey js-btn-build-show-message js-accordeon-message">
 					Show message
 				</button>
 			</div>
-			<div style="display: none;" ng-if="environmentViewCtrl.newEnvID[1]">
+			<div style="display: none;" ng-if="environmentSimpleViewCtrl.newEnvID[1]">
 				<textarea class="b-form-input b-form-input_full b-form-input_textarea g-margin-bottom bp-sign-target js-bp-message" 
-					ng-change="environmentViewCtrl.signKey()" 
-					ng-model="environmentViewCtrl.newEnvID[1]">
+					ng-change="environmentSimpleViewCtrl.signKey()" 
+					ng-model="environmentSimpleViewCtrl.newEnvID[1]">
 				</textarea>
 			</div>
 			<script>
@@ -72,15 +72,15 @@
 	<div class="b-popup__footer b-popup__footer_undertable">
 
 		<button class="b-btn b-btn_green js-environment-build" 
-		ng-if="environmentViewCtrl.buildStep == 'pgpKey' && !environmentViewCtrl.hasPGPplugin" 
-		ng-click="environmentViewCtrl.buildEnvironment()" 
+		ng-if="environmentSimpleViewCtrl.buildStep == 'pgpKey' && !environmentSimpleViewCtrl.hasPGPplugin" 
+		ng-click="environmentSimpleViewCtrl.buildEnvironment()" 
 		disabled>
 			Build
 		</button>
 
 		<button class="b-btn b-btn_green" 
-		ng-if="environmentViewCtrl.buildStep == 'confirm'" 
-		ng-click="environmentViewCtrl.sendToPending()">
+		ng-if="environmentSimpleViewCtrl.buildStep == 'confirm'" 
+		ng-click="environmentSimpleViewCtrl.sendToPending()">
 			Next
 		</button>
 
