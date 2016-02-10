@@ -34,6 +34,7 @@ import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.KeyTrustLevel;
 import io.subutai.common.security.objects.SecurityKeyType;
 import io.subutai.common.settings.ChannelSettings;
+import io.subutai.common.settings.SecuritySettings;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.keyserver.api.KeyServer;
 import io.subutai.core.security.api.crypto.EncryptionTool;
@@ -88,13 +89,38 @@ public class KeyManagerImpl implements KeyManager
     {
         try
         {
+            /*
             //Generate KeyPair for Peer **************************
             KeyPair keyPair  = generateKeyPair( "" , false );
             PGPPublicKeyRing peerPubRing = PGPKeyUtil.readPublicKeyRing( keyPair.getPubKeyring() );
             String peerId = PGPKeyUtil.getFingerprint( peerPubRing.getPublicKey().getFingerprint());
             keyData.setManHostId( peerId );
 
-            saveKeyPair( peerId, SecurityKeyType.PeerKey.getId(), keyPair);
+            saveKeyPair( peerId, SecurityKeyType.PeerKey.getId(), keyPair);*/
+
+
+            //InputStream ownerPubStream = PGPEncryptionUtil.getFileInputStream( keyData.getOwnerPublicKeyringFile() );
+            InputStream peerSecStream = PGPEncryptionUtil.getFileInputStream( System.getenv( "SUBUTAI_APP_KEYSTORE_PATH") + "/peer.secret.key" );
+            InputStream peerPubStream = PGPEncryptionUtil.getFileInputStream( System.getenv( "SUBUTAI_APP_KEYSTORE_PATH") + "/peer.signed.public.key" );
+
+            if ( peerPubStream == null || peerSecStream == null )
+            {
+                LOG.info( " **** Error loading PGPPublicKeyRing/PGPSecretKeyRing files. Files not found.**** :" );
+                //todo System.exit(1) with error message
+            }
+            else
+            {
+                PGPPublicKeyRing peerPubRing = PGPKeyUtil.readPublicKeyRing( peerPubStream );
+
+                String peerId = PGPKeyUtil.getFingerprint( peerPubRing.getPublicKey().getFingerprint() );
+
+                keyData.setManHostId( peerId );
+                saveSecretKeyRing( keyData.getManHostId(), SecurityKeyType.PeerKey.getId(),
+                        PGPKeyUtil.readSecretKeyRing( peerSecStream ) );
+                savePublicKeyRing( keyData.getManHostId(), SecurityKeyType.PeerKey.getId(), peerPubRing );
+                //************************************************************
+            }
+                //************************************************************
         }
         catch ( Exception ex )
         {
