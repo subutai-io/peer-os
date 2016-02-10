@@ -25,6 +25,7 @@ import io.subutai.common.util.JsonUtil;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Role;
 import io.subutai.core.identity.api.model.User;
+import io.subutai.core.identity.api.model.UserDelegate;
 
 
 public class RestServiceImpl implements RestService
@@ -62,7 +63,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            return Response.ok( jsonUtil.to( identityManager.getAllSystemUsers() ) ).build();
+            return Response.ok( jsonUtil.to( identityManager.getAllUsers() ) ).build();
         }
         catch ( Exception e )
         {
@@ -105,7 +106,7 @@ public class RestServiceImpl implements RestService
             {
                 Preconditions.checkArgument( !Strings.isNullOrEmpty( password ), "Password must be set" );
                 newUser = identityManager
-                        .createUser( username, password, fullName, email, UserType.Regular.getId(), publicKey, false );
+                        .createUser( username, password, fullName, email, UserType.Regular.getId() ,1,false,true );
             }
             else
             {
@@ -135,39 +136,70 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response signUp( final String username,
-                            final String fullName,
-                            final String password,
-                            final String email,
-                            final String publicKey )
-
+    public Response approveDelegatedUser( final String trustMessage )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( username ), "username is missing" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( fullName ), "fullname is missing" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( email ), "email must be set" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( password ), "passowrd must be set" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( publicKey ), "publicKey must be set" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( trustMessage ), "message is missing" );
 
-        User unApprovedUser = identityManager.signUp( username,password,fullName,email,publicKey );
+        try
+        {
+            identityManager.approveDelegatedUser(trustMessage);
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error setting new user #setUser", e );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
 
         return Response.ok().build();
     }
 
 
     @Override
-    public Response approve(final String username, final String rolesJson )
+    public Response createIdentityDelegationDocument()
     {
-
-        List<Long> roleIds = JsonUtil.fromJson( rolesJson, new TypeToken<ArrayList<Long>>()
+        try
         {
-        }.getType() );
-
-        List<Role> roles = roleIds.stream().map( r -> identityManager.getRole( r ) ).collect( Collectors.toList() );
-
-        identityManager.approveUser( username,roles );
+            identityManager.createIdentityDelegationDocument();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error setting new user #setUser", e );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
 
         return Response.ok().build();
+    }
 
+
+    @Override
+    public Response getIdentityDelegationDocument()
+    {
+        try
+        {
+            User activeUser = identityManager.getActiveUser();
+            UserDelegate userDelegate = identityManager.getUserDelegate( activeUser.getId() );
+            return Response.ok( userDelegate.getRelationDocument() ).build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error setting new user #setUser", e );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response setUserPublicKey(String publicKey)
+    {
+        try
+        {
+            identityManager.setUserPublicKey( identityManager.getActiveUser().getId(), publicKey );
+        }
+        catch ( Exception e ) {
+            LOGGER.error("Error updating user public key", e);
+            return Response.serverError().build();
+        }
+        return Response.ok().build();
     }
 
 

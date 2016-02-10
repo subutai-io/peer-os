@@ -1,0 +1,59 @@
+<div ng-controller="AccountCtrl as tokensCtrl">
+
+	<div class="b-workspace__header b-workspace__header_tabs">
+
+		<div class="b-tabs-menu b-tabs-menu_header">
+
+			<div ng-include="'subutai-app/common/partials/login-header.html'"></div>
+			
+			<ul>
+				<li class="b-tabs-menu__item b-tabs-menu__item_active">
+					Public key
+				</li>
+				<li class="b-tabs-menu__item" ui-sref="change-pass">
+					Change password
+				</li>
+			</ul>
+		</div>
+	</div>
+
+	<div class="b-workspace__content">
+
+		<div class="b-form">
+			<div class="b-pgp-page-block">
+				<div class="b-form-label b-form-label_fix-size-1">Message</div>
+
+				<div>
+					<textarea class="b-form-input b-form-input_full b-form-input_textarea bp-sign-input" 
+						ng-model="tokensCtrl.message" 
+						style="width: 420px; height: 160px; font-family: monospace;">
+					</textarea>
+				</div>
+
+				<div class="b-pgp-page-block__buttons">
+					<button class="b-btn b-btn_blue" ng-click="tokensCtrl.approveDocument()">
+						Approve delegate document
+					</button>
+					<div class="clear"></div>
+				</div>
+			</div>
+
+			<div class="b-pgp-page-block">
+				<div class="b-form-label b-form-label_fix-size-1">Public key</div>
+				<textarea class="b-form-input b-form-input_textarea bp-set-pub-key" 
+					ng-model="tokensCtrl.activeUser.publicKey" 
+					style="width: 420px; height: 160px; font-family: monospace;">
+				</textarea>
+
+				<div class="b-pgp-page-block__buttons">
+					<button class="b-btn b-btn_blue" ng-click="tokensCtrl.setPublicKey()">
+						Set public key
+					</button>
+					<div class="clear"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div>
+

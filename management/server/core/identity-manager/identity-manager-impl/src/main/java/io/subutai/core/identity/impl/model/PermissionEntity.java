@@ -162,9 +162,6 @@ public class PermissionEntity implements Permission
         if ( PermissionObject.values()[object - 1] == PermissionObject.KarafServerAdministration )
         {
             perms.add( "admin" );
-        }
-        else if ( PermissionObject.values()[object - 1] == PermissionObject.KarafServerManagement )
-        {
             perms.add( "manager" );
         }
         else

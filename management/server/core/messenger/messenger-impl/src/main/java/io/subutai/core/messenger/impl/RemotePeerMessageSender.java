@@ -23,17 +23,15 @@ public class RemotePeerMessageSender implements Callable<Boolean>
 {
     private static final Logger LOG = LoggerFactory.getLogger( RemotePeerMessageSender.class.getName() );
 
-    private Peer localPeer;
+    //    private Peer localPeer;
     private Peer targetPeer;
     private Set<Envelope> envelopes;
 
     private MessengerDao messengerDao;
 
 
-    public RemotePeerMessageSender( MessengerDao messengerDao, final Peer localPeer, final Peer targetPeer,
-                                    final Set<Envelope> envelopes )
+    public RemotePeerMessageSender( MessengerDao messengerDao, final Peer targetPeer, final Set<Envelope> envelopes )
     {
-        this.localPeer = localPeer;
         this.targetPeer = targetPeer;
         this.envelopes = envelopes;
         this.messengerDao = messengerDao;
@@ -46,7 +44,7 @@ public class RemotePeerMessageSender implements Callable<Boolean>
         WebClient client = null;
         try
         {
-            client = getWebClient( localPeer.getId(), targetPeer.getPeerInfo() );
+            client = getWebClient( targetPeer.getPeerInfo() );
             for ( Envelope envelope : envelopes )
             {
                 try
@@ -76,7 +74,7 @@ public class RemotePeerMessageSender implements Callable<Boolean>
     }
 
 
-    protected WebClient getWebClient( String localPeerId, PeerInfo peerInfo )
+    protected WebClient getWebClient( PeerInfo peerInfo )
     {
         return WebClientBuilder.buildPeerWebClient( peerInfo, "/messenger/message" );
     }
