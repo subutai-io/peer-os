@@ -86,15 +86,13 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistr
 	vm.sendToPending = sendToPending;
 	vm.addSettingsToTemplate = addSettingsToTemplate;
 
-	/*environmentService.getTemplates()
+	environmentService.getTemplates()
 		.success(function (data) {
 			vm.templates = data;
 		})
 		.error(function (data) {
 			VARS_MODAL_ERROR( SweetAlert, 'Error on getting templates ' + data );
-		});*/
-
-	vm.templates = ['cassandra', 'mongo', 'zookeer', 'master', 'hadoop', 'spark', 'solr'];
+		});
 
 	environmentService.getContainersType()
 		.success(function (data) {
