@@ -58,8 +58,8 @@ import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
-import io.subutai.core.trust.api.RelationManager;
-import io.subutai.core.trust.api.model.RelationMeta;
+import io.subutai.core.object.relation.api.RelationManager;
+import io.subutai.core.object.relation.api.model.RelationMeta;
 
 
 /**
@@ -363,9 +363,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
                 if ( activeUser != null )
                 {
                     RelationMeta relationMeta =
-                            new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), environment,
-                                    environment.getId(), environment.getId(),
-                                    PermissionObject.EnvironmentManagement.getName() );
+                            new RelationMeta( activeUser, activeUser, environment, environment.getId() );
                     boolean trustedRelation =
                             relationManager.getRelationInfoManager().groupHasWritePermissions( relationMeta );
 
@@ -656,5 +654,33 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
             return hostname.compareTo( o.getHostname() );
         }
         return -1;
+    }
+
+
+    @Override
+    public String getLinkId()
+    {
+        return String.format( "%s|%s", getClassPath(), getUniqueIdentifier() );
+    }
+
+
+    @Override
+    public String getUniqueIdentifier()
+    {
+        return getId();
+    }
+
+
+    @Override
+    public String getClassPath()
+    {
+        return this.getClass().getSimpleName();
+    }
+
+
+    @Override
+    public String getContext()
+    {
+        return PermissionObject.EnvironmentManagement.getName();
     }
 }

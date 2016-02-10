@@ -3,9 +3,16 @@ package io.subutai.core.identity.api.model;
 
 import java.util.List;
 
+import io.subutai.common.security.relation.RelationLink;
 
-public interface User
+
+public interface User extends RelationLink
 {
+
+
+    int getTrustLevel();
+
+    void setTrustLevel( int trustLevel );
 
     Long getId();
 
@@ -55,8 +62,5 @@ public interface User
 
     String getTypeName();
 
-    boolean isApproved();
-
-    void setApproved(boolean active);
 
 }

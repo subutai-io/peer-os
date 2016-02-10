@@ -7,12 +7,13 @@ import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.quota.ContainerQuota;
+import io.subutai.common.security.relation.RelationLink;
 
 
 /**
  * Container host interface.
  */
-public interface ContainerHost extends Host, ContainerHostInfo
+public interface ContainerHost extends Host, ContainerHostInfo, RelationLink
 {
     ContainerSize getContainerSize();
 

@@ -77,6 +77,7 @@ input[type=checkbox] {
 .b-header-userbar-name {
     font-size: 13px;
     color: #04346E;
+    text-decoration: underline;
 }
 
 .b-header-userbar__avatar {
@@ -1034,7 +1035,6 @@ tip.description-tooltip {
 
 .b-popup_middle {
     width: 355px;
-
 }
 
 .b-popup_environment-creation {
@@ -1202,10 +1202,6 @@ input.b-popup-body-checkbox {
 
 .b-main-form_token .b-main-form__wrapper {
     margin-right: 20px;
-}
-
-.b-main-form_change-pass {
-	
 }
 
 .b-main-form__element {
@@ -1392,42 +1388,6 @@ input.b-popup-body-checkbox {
 
 .b-main-place {
     padding: 20px 0 0 0;
-}
-
-.b-container-quota {
-    width: 15px;
-    height: 15px;
-    border: 1px solid #CCCEEE;
-    border-radius: 50%;
-    box-sizing: border-box;
-    cursor: pointer;
-}
-
-.b-loading {
-    font-size: 13px;
-    width: 100px;
-}
-
-.b-loading:after {
-    overflow: hidden;
-    display: inline-block;
-    vertical-align: bottom;
-    -webkit-animation: ellipsis steps(4,end) 900ms infinite;
-    animation: ellipsis steps(4,end) 900ms infinite;
-    content: "\2026"; /* ascii code for the ellipsis character */
-    width: 0px;
-}
-
-@keyframes ellipsis {
-    to {
-        width: 1.25em;
-    }
-}
-
-@-webkit-keyframes ellipsis {
-    to {
-        width: 1.25em;
-    }
 }
 
 /*Slider style*/
@@ -2738,7 +2698,6 @@ td.b-main-table__status-col {
     overflow: hidden;
 }
 .b-cloud-space_border-right {
-    /*border-right: 1px solid #CCCEEE;*/
     background: #fff url("../assets/elements/patter-stripes.png");
 }
 .b-cloud-space__work {
