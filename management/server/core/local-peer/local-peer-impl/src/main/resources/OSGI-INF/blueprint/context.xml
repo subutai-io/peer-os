@@ -64,6 +64,7 @@
     <argument ref="monitor" />
     <argument ref="securityManager" />
     <property name="externalIpInterface" value="${externalIpInterface}" />
+    <property name="publicUrl" value="${publicURL}" />
   </bean>
 
   <bean id="messageRequestListener" class="io.subutai.core.localpeer.impl.request.MessageRequestListener"

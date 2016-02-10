@@ -177,6 +177,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     protected boolean initialized = false;
     protected ExecutorService singleThreadExecutorService = SubutaiExecutors.newSingleThreadExecutor();
+    private String publicUrl;
 
 
     public LocalPeerImpl( DaoManager daoManager, TemplateManager templateRegistry, QuotaManager quotaManager,
@@ -249,6 +250,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
+    public void setPublicUrl( final String publicUrl )
+    {
+        this.publicUrl = publicUrl;
+    }
+
+
     @Override
     public void setPeerInfo( final PeerInfo peerInfo )
     {
@@ -316,7 +323,14 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         try
         {
-            this.peerInfo.setIp( managementHost.getInterfaceByName( externalIpInterface ).getIp() );
+            if ( this.publicUrl == null )
+            {
+                this.peerInfo.setIp( managementHost.getInterfaceByName( externalIpInterface ).getIp() );
+            }
+            else
+            {
+                this.peerInfo.setIp( managementHost.getInterfaceByName( externalIpInterface ).getIp() );
+            }
             return peerInfo;
         }
         catch ( Exception e )
