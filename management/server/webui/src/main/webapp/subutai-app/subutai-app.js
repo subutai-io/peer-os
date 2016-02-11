@@ -577,7 +577,29 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 				}]
 			}
 		})
-		.state('404', {
+        .state('settings-channel', {
+            url: '/settings-channel',
+            templateUrl: 'subutai-app/settingsChannel/partials/view.html',
+            data: {
+                bodyClass: '',
+                layout: 'default'
+            },
+            resolve: {
+                loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([
+                        {
+                            name: 'subutai.settings-channel',
+                            files: [
+                                'subutai-app/settingsChannel/settingsChannel.js',
+                                'subutai-app/settingsChannel/controller.js',
+                                'subutai-app/settingsChannel/service.js'
+                            ]
+                        }
+                    ]);
+                }]
+            }
+        })
+        .state('404', {
 			url: '/404',
 			templateUrl: 'subutai-app/common/partials/404.html',
 			data: {

@@ -1,7 +1,10 @@
-package io.subutai.core.systemmanager.rest.pojo;
+package io.subutai.core.systemmanager.impl.pojo;
 
 
-public class VersionPojo
+import io.subutai.core.systemmanager.api.pojo.SystemInfo;
+
+
+public class SystemInfoPojo implements SystemInfo
 {
     private String gitCommitId;
     private String gitBranch;

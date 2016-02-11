@@ -32,4 +32,9 @@ public interface RestService
     @Path( "peer_policy" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response getPeerPolicy();
+
+    @GET
+    @Path( "channel_settings" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getChannelSettings();
 }
