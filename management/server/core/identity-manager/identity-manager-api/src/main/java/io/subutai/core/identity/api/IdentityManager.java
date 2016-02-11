@@ -5,7 +5,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import javax.annotation.security.RolesAllowed;
+
+import javax.annotation.security.PermitAll;
 
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.objects.PermissionOperation;
@@ -66,6 +67,26 @@ public interface IdentityManager
      */
     User authenticateUser( String userName, String password );
 
+
+
+    /* *************************************************
+     */
+    void setPeerOwner( User user );
+
+
+    /* *************************************************
+     */
+    String getPeerOwnerId();
+
+
+    /* *************************************************
+     */
+    User getUserByKeyId( String keyId );
+
+
+    /* *************************************************
+     */
+    User getUserByFingerprint( String fingerprint );
 
     /* *************************************************
      */
@@ -151,11 +172,11 @@ public interface IdentityManager
 
     /* *************************************************
      */
-    @RolesAllowed( "Identity-Management|Delete" )
     void removeUserRole( User user, Role role );
 
+
     /* *************************************************
-         */
+     */
     boolean changeUserPassword( long userId, String oldPassword, String newPassword );
 
 
