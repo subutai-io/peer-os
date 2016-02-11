@@ -10,10 +10,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.google.common.collect.Sets;
-
 import io.subutai.common.dao.DaoManager;
-import io.subutai.common.environment.Blueprint;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.environment.Topology;
@@ -31,7 +28,7 @@ import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.strategy.api.StrategyManager;
 import io.subutai.core.tracker.api.Tracker;
-import io.subutai.core.trust.api.RelationManager;
+import io.subutai.core.object.relation.api.RelationManager;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.mockito.Matchers.any;

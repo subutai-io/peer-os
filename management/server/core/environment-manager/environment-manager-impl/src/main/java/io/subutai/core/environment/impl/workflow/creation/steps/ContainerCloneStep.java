@@ -33,12 +33,13 @@ import io.subutai.core.environment.impl.workflow.creation.steps.helpers.CreatePe
 import io.subutai.core.environment.impl.workflow.creation.steps.helpers.NodeGroupBuildResult;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
+import io.subutai.core.identity.api.model.UserDelegate;
 import io.subutai.core.kurjun.api.TemplateManager;
-import io.subutai.core.trust.api.RelationManager;
-import io.subutai.core.trust.api.model.Relation;
-import io.subutai.core.trust.api.model.RelationInfo;
-import io.subutai.core.trust.api.model.RelationInfoMeta;
-import io.subutai.core.trust.api.model.RelationMeta;
+import io.subutai.core.object.relation.api.RelationManager;
+import io.subutai.core.object.relation.api.model.Relation;
+import io.subutai.core.object.relation.api.model.RelationInfo;
+import io.subutai.core.object.relation.api.model.RelationInfoMeta;
+import io.subutai.core.object.relation.api.model.RelationMeta;
 import io.subutai.core.peer.api.PeerManager;
 
 
@@ -100,7 +101,8 @@ public class ContainerCloneStep
         if ( requestedContainerCount > totalAvailableIpCount )
         {
             throw new EnvironmentCreationException(
-                    String.format( "Requested %d containers but only %d ip " + "" + "" + "addresses available",
+                    String.format                                          ( "Requested %d containers but only %d ip "
+                            + "" + "" + "" + "addresses available",
                             requestedContainerCount, totalAvailableIpCount ) );
         }
 
@@ -117,7 +119,7 @@ public class ContainerCloneStep
             Peer peer = peerManager.getPeer( peerPlacement.getKey() );
             logger.debug( String.format( "Scheduling node group task on peer %s", peer.getId() ) );
 
-            taskCompletionService.submit(
+            taskCompletionService.submit                                                               (
                     new CreatePeerNodeGroupsTask( peer, peerPlacement.getValue(), peerManager.getLocalPeer(),
                             environment, currentLastUsedIpIndex + 1, templateRegistry, defaultDomain ) );
 
@@ -177,20 +179,15 @@ public class ContainerCloneStep
         try
         {
             User activeUser = identityManager.getActiveUser();
+            UserDelegate delegatedUser = identityManager.getUserDelegate( activeUser.getId() );
             for ( final EnvironmentContainerImpl container : containers )
             {
                 //TODO create environment <-> container ownership
 
                 RelationMeta relationMeta = new RelationMeta();
-                relationMeta.setSourceId( String.valueOf( activeUser.getId() ) );
-                relationMeta.setSourcePath( activeUser.getClass().getSimpleName() );
-
-                relationMeta.setTargetId( environment.getId() );
-                relationMeta.setTargetPath( environment.getClass().getSimpleName() );
-
-                relationMeta.setObjectId( container.getId() );
-                relationMeta.setObjectPath( container.getClass().getSimpleName() );
-
+                relationMeta.setSource( delegatedUser );
+                relationMeta.setTarget( environment );
+                relationMeta.setObject( container );
 
                 RelationInfoMeta relationInfoMeta =
                         new RelationInfoMeta( true, true, true, true, Ownership.USER.getLevel() );

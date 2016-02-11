@@ -3,6 +3,7 @@ package io.subutai.core.channel.impl.interceptor;
 
 import java.net.URL;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.HttpHeaders;
 
 import org.apache.cxf.interceptor.Fault;
@@ -10,6 +11,7 @@ import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.settings.ChannelSettings;
@@ -59,9 +61,6 @@ public class ClientInInterceptor extends AbstractPhaseInterceptor<Message>
 
                 if ( url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X2 ) )
                 {
-
-                    //                    LOG.info( " *** URL:" + url.getPath() );
-
                     String path = url.getPath();
                     String ip = url.getHost();
                     HttpHeaders headers = new HttpHeadersImpl( message.getExchange().getInMessage() );

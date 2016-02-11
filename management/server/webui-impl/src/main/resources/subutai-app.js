@@ -397,6 +397,28 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 				}]
 			}
 		})
+		.state('account-settings', {
+			url: '/account-settings',
+			templateUrl: 'subutai-app/accountSettings/partials/view.html',
+			data: {
+				bodyClass: '',
+				layout: 'default'
+			},
+			resolve: {
+				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+					return $ocLazyLoad.load([
+						{
+							name: 'subutai.accountSettings',
+							files: [
+								'subutai-app/accountSettings/tokens.js',
+								'subutai-app/accountSettings/controller.js',
+								'subutai-app/identity/service.js'
+							]
+						}
+					]);
+				}]
+			}
+		})
 		.state('console', {
 			url: '/console/{containerId}',
 			templateUrl: 'subutai-app/console/partials/view.html',

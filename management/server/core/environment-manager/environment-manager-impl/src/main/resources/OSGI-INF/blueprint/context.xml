@@ -34,7 +34,7 @@
   <reference id="tracker"
              interface="io.subutai.core.tracker.api.Tracker" />
   <reference id="relationManager"
-             interface="io.subutai.core.trust.api.RelationManager" />
+             interface="io.subutai.core.object.relation.api.RelationManager" />
 
   <!-- ************************************************************************************************* -->
   <bean id="daoManagerEnv" init-method="init" class="io.subutai.common.dao.DaoManager" activation="eager">

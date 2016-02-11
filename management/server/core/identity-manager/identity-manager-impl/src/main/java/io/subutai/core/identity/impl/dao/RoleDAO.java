@@ -77,7 +77,7 @@ class RoleDAO
     /* *************************************************
      *
      */
-    public void persist( final Role item )
+    public void persist( Role item )
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
         try

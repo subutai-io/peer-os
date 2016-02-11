@@ -1,0 +1,19 @@
+<div class="b-popup b-popup_log">
+	<div class="b-popup__header">
+		Token
+		<a href ng-click="closeThisDialog()">
+			<img src="assets/elements/buttons/b-icon-close.svg" class="b-icon g-right"/>
+		</a>
+	</div>
+	<div class="b-popup__body">
+		<div class="b-logs-view b-logs-view_token">
+			{{ tokensCtrl.showSecret }}
+		</div>
+	</div>
+	<div class="b-popup__footer">
+		<button class="b-btn b-btn_green g-right" ng-click="closeThisDialog()">
+			OK
+		</button>
+		<div class="clear"></div>
+	</div>
+</div>

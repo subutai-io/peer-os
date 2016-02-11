@@ -41,6 +41,7 @@ import io.subutai.common.peer.PeerId;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.quota.ContainerQuota;
+import io.subutai.common.security.objects.PermissionObject;
 
 
 /**
@@ -360,5 +361,32 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
             containerId = new ContainerId( getId(), getHostname(), new PeerId( getPeerId() ), getEnvironmentId() );
         }
         return containerId;
+    }
+
+    @Override
+    public String getLinkId()
+    {
+        return String.format("%s|%s", getClassPath(), getUniqueIdentifier() );
+    }
+
+
+    @Override
+    public String getUniqueIdentifier()
+    {
+        return getId();
+    }
+
+
+    @Override
+    public String getClassPath()
+    {
+        return this.getClass().getSimpleName();
+    }
+
+
+    @Override
+    public String getContext()
+    {
+        return PermissionObject.PeerManagement.getName();
     }
 }
