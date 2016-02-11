@@ -3,7 +3,7 @@
   <div class="b-workspace__header">
     <div ng-include="'subutai-app/common/partials/login-header.html'"></div>
 
-    <h1 class="b-title"><span class="b-title_breadcrumbs">Owner Settings</span></h1>
+    <h1 class="b-title"><span class="b-title_breadcrumbs">Peer Settings</span></h1>
   </div>
 
   <div class="b-workspace__content">
@@ -11,8 +11,12 @@
       <div class="b-main-table-border" style = "width: 500px">
         <table class="b-main-table b-main-table_with-header" style = "width: 500px" align = "center">
           <tr>
-            <th>Current Owner</th>
-            <td style = "padding-right: 18px"><input class="b-form-input b-form-input_full" type="text" ng-model="settingsOwnerCtrl.config.openPort" required></td>
+            <th>Current Owner ID</th>
+            <td style = "padding-right: 18px"><input class="b-form-input b-form-input_full" type="text" ng-model="settingsOwnerCtrl.config.peerOwnerId" required></td>
+          </tr>
+          <tr>
+            <th>Current Owner Name</th>
+            <td style = "padding-right: 18px"><input class="b-form-input b-form-input_full" type="text" ng-model="settingsOwnerCtrl.config.userPeerOwnerName" required></td>
           </tr>
         </table>
       </div>

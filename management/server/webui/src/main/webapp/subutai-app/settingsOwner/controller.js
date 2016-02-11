@@ -4,8 +4,8 @@ angular.module ("subutai.settings-owner.controller", [])
     .controller ("SettingsOwnerCtrl", SettingsOwnerCtrl);
 
 
-SettingsOwnerCtrl.$inject = ["$scope", "SettingsOwnerSrv"];
-function SettingsOwnerCtrl ($scope, SettingsOwnerSrv) {
+SettingsOwnerCtrl.$inject = ["$scope", "SettingsOwnerSrv", "SweetAlert"];
+function SettingsOwnerCtrl ($scope, SettingsOwnerSrv, SweetAlert) {
     var vm = this;
     vm.config = {};
 
