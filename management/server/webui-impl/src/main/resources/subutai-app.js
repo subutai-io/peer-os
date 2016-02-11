@@ -199,7 +199,7 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 		})
 		.state('environments', {
 			url: '/environments/{activeTab}',
-			templateUrl: 'subutai-app/environment/partials/dragAndDrop.html',
+			templateUrl: 'subutai-app/environment/partials/view.html',
 			data: {
 				bodyClass: '',
 				layout: 'default'
@@ -212,6 +212,8 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 							files: [
 								'subutai-app/environment/environment.js',
 								'subutai-app/environment/controller.js',
+								'subutai-app/environment/simple-controller.js',
+								'subutai-app/environment/advanced-controller.js',
 								'subutai-app/environment/service.js',
 								'subutai-app/peerRegistration/service.js',
 								'subutai-app/tracker/service.js'
