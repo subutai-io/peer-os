@@ -128,6 +128,7 @@ func Start(c *cli.Context) {
 	for token.Wait(); log.Check(log.WarnLevel, "Connecting to MQTT Broker", token.Error()); {
 		token = client.Connect()
 		time.Sleep(time.Second * 5)
+		InitClientOptions(c.String("server"), c.String("port"), c.String("user"), c.String("secret"))
 	}
 
 	for {

@@ -1,83 +1,64 @@
-<div class="b-popup">
+<div class="b-popup b-popup_middle">
     <div class="b-popup__header">
-        Changes
-        <a href ng-click="closeThisDialog()">
-            <img src="assets/elements/buttons/b-icon-close.svg" class="b-icon g-right"/>
-        </a>
+        Apply changes
+        <a href ng-click="closeThisDialog()"><i class="fa fa-times g-right"></i></a>
     </div>
     <div class="b-popup__body">
-        <div>
-            <div class="b-popup-body-label"
-                 ng-if="environmentViewCtrl.currentEnvironment.excludedContainers.length > 0">
-                Following containers will be removed from your environment!
+        <div class="g-margin-bottom" ng-if="environmentViewCtrl.currentEnvironment.excludedContainersByQuota">
+            <div class="g-text g-margin-bottom-half">Following containers will be removed from your environment</div>
+            <div class="b-main-table-border">
+                <table class="b-main-table b-main-table_custom-1 g-margin-bottom-half">
+                    <tr ng-repeat="(containerName, container) in environmentViewCtrl.currentEnvironment.excludedContainersByQuota">
+                        <td class="b-main-table__20 g-text-center">
+                            <img ng-src="assets/templates/{{containerName}}.jpg" alt="{{containerName}}"
+                                 onerror="this.onerror=null;this.src='assets/templates/no-image.jpg';">
+                        </td>
+                        <td>{{containerName}}</td>
+                        <td class="b-main-table__right">
+                            <span class="g-circle-label g-margin-left-quarter"
+                                  ng-repeat="(quotaName, quantity) in container.quotas"
+                                  ng-style="{'background-color' : environmentViewCtrl.getQuotaColor(quotaName)}"
+                                  tooltips
+                                  tooltip-template="{{ quotaName }}">
+                                {{quantity}}
+                            </span>
+                        </td>
+                    </tr>
+                </table>
             </div>
-            <table class="b-main-table b-main-table_with-header b-main-table_white-header"
-                   ng-if="environmentViewCtrl.currentEnvironment.excludedContainers.length > 0">
-                <tbody>
-                <tr ng-repeat="container in environmentViewCtrl.currentEnvironment.excludedContainers">
-                    <td class="b-title">
-						<span class="b-cloud-item">
-							<img
-                                    ng-src="assets/templates/{{ container.attributes.templateName }}.jpg"
-                                    alt="{{ container.templateName }}"
-                                    onError="this.onerror=null;this.src='assets/templates/no-image.jpg';">
-						</span>
-                        <span class="b-cloud-item-text">{{ container.attributes.templateName  }}</span>
-                    </td>
-                    <td>
-                        {{ container.attributes.hostname }}
-                    </td>
-                    <td>
-                        <div class="b-container-quota"
-                             ng-style="{'background-color' : environmentViewCtrl.getQuotaColor(container.attributes.quotaSize)}"
-                             tooltips
-                             tooltip-template="{{container.attributes.quotaSize}}">
-                        </div>
-                    </td>
-                    <td>
-                        <div ng-class="container.status == 'removing' ? 'b-loading b-btn-light-grey-icon_green' : container.status == 'removed' ? 'fa fa-check fa-1 b-btn-light-grey-icon_green' : ''">
-                            {{ container.status == 'removing' ? 'Destroying' : container.status == 'removed' ?
-                            'Destroyed' : ''}}
-                        </div>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+        </div>
+        <div class="g-margin-bottom" ng-if="environmentViewCtrl.currentEnvironment.includedContainersByQuota">
+            <div class="g-text g-margin-bottom-half">Following containers will be added to your environment</div>
+            <div class="b-main-table-border">
+                <table class="b-main-table b-main-table_custom-1 g-margin-bottom-half">
+                    <tr ng-repeat="(containerName, container) in environmentViewCtrl.currentEnvironment.includedContainersByQuota">
+                        <td class="b-main-table__20 g-text-center">
+                            <img ng-src="assets/templates/{{containerName}}.jpg" alt="{{containerName}}"
+                                 onerror="this.onerror=null;this.src='assets/templates/no-image.jpg';">
+                        </td>
+                        <td>{{containerName}}</td>
+                        <td class="b-main-table__right">
+                            <span class="g-circle-label g-circle-label_blue g-margin-left-quarter"
+                                  ng-repeat="(quotaName, quantity) in container.quotas"
+                                  ng-style="{'background-color' : environmentViewCtrl.getQuotaColor(quotaName)}"
+                                  tooltips
+                                  tooltip-template="{{quotaName}}">
+                                {{quantity}}
+                            </span>
+                        </td>
+                    </tr>
+                </table>
+            </div>
         </div>
         <div>
-            <div class="b-popup-body-label"
-                 ng-if="environmentViewCtrl.currentEnvironment.includedContainers.length > 0">
-                The following containers will be added to your environment!
-            </div>
-            <table class="b-main-table b-main-table_with-header b-main-table_white-header"
-                   ng-if="environmentViewCtrl.currentEnvironment.includedContainers.length > 0">
-                <tbody>
-                <tr ng-repeat="container in environmentViewCtrl.currentEnvironment.includedContainers">
-                    <td class="b-title">
-						<span class="b-cloud-item">
-							<img
-                                    ng-src="assets/templates/{{ container.attributes.templateName }}.jpg"
-                                    alt="{{ templateName }}"
-                                    onError="this.onerror=null;this.src='assets/templates/no-image.jpg';">
-						</span>
-                        <span class="b-cloud-item-text">{{ container.attributes.templateName }}</span>
-                    </td>
-                    <td>{{ container.attributes.quotaSize }}</td>
-                </tr>
-                </tbody>
-            </table>
+            <button href="#"
+                    ng-click="environmentViewCtrl.applyChanges()"
+                    ng-disabled="environmentViewCtrl.isApplyingChanges"
+                    class="b-btn b-btn_green g-right">
+                Next
+            </button>
+            <div class="clear"></div>
         </div>
-    </div>
-    <div class="b-popup__footer b-popup__footer_undertable">
-
-        <button class="b-btn b-btn_green"
-                ng-click="environmentViewCtrl.applyChanges()" ng-disabled="environmentViewCtrl.isApplyingChanges">
-            Apply changes
-        </button>
-
-        <div class="clear"></div>
-    </div>
-    <div class="b-loading-screen js-popup-loading-screen">
-        <div class="b-load-icon"></div>
     </div>
 </div>
+

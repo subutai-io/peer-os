@@ -44,6 +44,18 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 	vm.removeRoleFromUser = removeRoleFromUser;
 	vm.activeTab = "approved";
 
+	vm.trustedLevels = {
+		1: "Never Trust",
+		2: "Marginal",
+		3: "Full",
+		4: "Ultimate Trust"
+	};
+
+	vm.userTypes = {
+		1: "Systemt",
+		2: "Regular",
+	};
+
 	cfpLoadingBar.start();
 	angular.element(document).ready(function () {
 		cfpLoadingBar.complete();

@@ -213,7 +213,8 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 								'subutai-app/environment/environment.js',
 								'subutai-app/environment/controller.js',
 								'subutai-app/environment/service.js',
-								'subutai-app/peerRegistration/service.js'
+								'subutai-app/peerRegistration/service.js',
+								'subutai-app/tracker/service.js'
 							]
 						}
 					]);
@@ -803,3 +804,12 @@ function toggle (source, name) {
 		checkboxes[i].checked = source.checked;
 	}
 }
+
+function hasPGPplugin() {
+	if($('#bp-plugin-version').val().length > 0) {
+		return true;
+	} else {
+		return false;
+	}
+}
+

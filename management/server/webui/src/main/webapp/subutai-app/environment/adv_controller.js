@@ -4,12 +4,12 @@ angular.module('subutai.environment.controller', [])
 	.controller('EnvironmentViewCtrl', EnvironmentViewCtrl)
 	.directive('fileModel', fileModel);
 
-EnvironmentViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'SweetAlert', '$resource', '$compile', 'ngDialog', '$timeout', '$sce', '$stateParams', 'DTOptionsBuilder', 'DTColumnDefBuilder'];
+EnvironmentViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'peerRegistrationService', 'SweetAlert', '$resource', '$compile', 'ngDialog', '$timeout', '$sce', '$stateParams', 'DTOptionsBuilder', 'DTColumnDefBuilder'];
 fileModel.$inject = ['$parse'];
 
 var fileUploder = {};
 
-function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert, $resource, $compile, ngDialog, $timeout, $sce, $stateParams, DTOptionsBuilder, DTColumnDefBuilder) {
+function EnvironmentViewCtrl($scope, $rootScope, environmentService, peerRegistrationService, SweetAlert, $resource, $compile, ngDialog, $timeout, $sce, $stateParams, DTOptionsBuilder, DTColumnDefBuilder) {
 
 	var vm = this;
 	var GRID_CELL_SIZE = 100;
@@ -109,21 +109,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 	function loadEnvironments() {
 		vm.containersTotal = [];
 		environmentService.getEnvironments().success (function (data) {
-			/*vm.environments = data;
-			for (var i = 0; i < vm.environments.length; ++i) {
-				if (vm.environments[i].status !== "PENDING") {
-					vm.installed = true;
-					if (vm.pending) {
-						break;
-					}
-				}
-				else {
-					vm.pending = true;
-					if (vm.installed) {
-						break;
-					}
-				}
-			}*/
 			vm.environments = [];
 			for (var i = 0; i < data.length; ++i) {
 				if (data[i].status !== "PENDING") {
@@ -146,13 +131,8 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 		vm.peerIds = data;
 	});
 
-	environmentService.getResourceHosts().success(function (data) {
+	peerRegistrationService.getResourceHosts().success(function (data) {
 		vm.resourceHosts = data;
-	});
-
-	environmentService.getRequestedPeers().success(function (peers) {
-		peers.unshift({peerInfo: {id: 'local'}});
-		vm.peers = peers;
 	});
 
 	//installed environment table options
@@ -168,18 +148,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 		DTColumnDefBuilder.newColumnDef(3).notSortable(),
 		DTColumnDefBuilder.newColumnDef(4).notSortable(),
 		DTColumnDefBuilder.newColumnDef(5).notSortable(),
-	];
-
-	//pending environment table options
-	vm.dtOptionsPendingTable = DTOptionsBuilder
-		.newOptions()
-		.withOption('order', [[ 1, "asc" ]])
-		.withOption('stateSave', true)
-		.withPaginationType('full_numbers');
-	vm.dtColumnDefsPendingTable = [
-		DTColumnDefBuilder.newColumnDef(0).notSortable(),
-		DTColumnDefBuilder.newColumnDef(1),
-		DTColumnDefBuilder.newColumnDef(2).notSortable()
 	];
 
 	vm.listOfUsers = [];
@@ -607,7 +575,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 	}
 
 	function setSSHKey(sshKey) {
-		console.log(sshKey);
 		if(sshKey === undefined || sshKey.length <= 0 || sshKey === null) return;
 		environmentService.setSshKey(sshKey, vm.sshKeyForEnvironment).success(function (data) {
 			SweetAlert.swal("Success!", "You have successfully added SSH key for " + vm.sshKeyForEnvironment + " environment!", "success");
@@ -700,7 +667,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, SweetAlert,
 			}
 		}
 
-		console.log(cloneContainers);
 		LOADING_SCREEN();
 		ngDialog.closeAll();
 		vm.activeTab = 'pending';

@@ -1,50 +1,69 @@
-<div class="b-popup b-popup_max">
+<div class="b-popup b-popup_middle">
 	<div class="b-popup__header">
 		Build Environment
-		<a href ng-click="closeThisDialog()">
-			<img src="assets/elements/buttons/b-icon-close.svg" class="b-icon g-right"/>
-		</a>
+		<a href ng-click="closeThisDialog()"><i class="fa fa-times g-right"></i></a>
 	</div>
-	<div ng-if="environmentViewCtrl.buildStep == 'confirm'">
-		<table class="b-main-table b-main-table_with-header b-main-table_white-header">
-			<tbody>
-				<tr ng-repeat="(templateName, templateCount) in environmentViewCtrl.env2Build">
-					<td class="b-title">
-						<span class="b-cloud-item">
-							<img 
-								src="assets/templates/{{ templateName }}.jpg" 
-								alt="{{ templateName }}" 
-								onError="this.onerror=null;this.src='assets/templates/no-image.jpg';">
-						</span> 
-						<span class="b-cloud-item-text">{{ templateName }}</span>
+
+	<div class="b-popup__body" ng-if="environmentViewCtrl.buildStep == 'confirm'">
+		<div class="b-form-group g-margin-bottom">
+			<div class="g-text g-margin-bottom-half">Enter environment name</div>
+			<input type="text" 
+				class="b-form-input b-form-input_fix-size-3" 
+				id="env-name" 
+				ng-model="environmentViewCtrl.environment2BuildName">
+		</div>
+
+		<div class="g-text g-margin-bottom-half">Create environment with following containers</div>
+		<div class="b-main-table-border">
+			<table class="b-main-table b-main-table_custom-1 g-margin-bottom-half">
+
+				<tr ng-repeat="(templateName, templateInfo) in environmentViewCtrl.env2Build">
+					<td class="b-main-table__20 g-text-center">
+						<img 
+							src="assets/templates/{{ templateName }}.jpg" 
+							alt="{{ templateName }}" 
+							onError="this.onerror=null;this.src='assets/templates/no-image.jpg';">
 					</td>
-					<td>{{ templateCount }}</td>
+					<td>{{ templateName }}</td>
+					<td class="b-main-table__right">
+						<span 
+						class="g-circle-label g-margin-left-quarter" 
+						ng-repeat="(sizeName, count) in templateInfo.sizes" 
+						style="background-color: {{ environmentViewCtrl.colors[sizeName] }}" 
+						tooltips 
+						tooltip-template="{{ sizeName }}">
+							{{ count }}
+						</span>
+					</td>
 				</tr>
-			</tbody>
-		</table>
+
+			</table>
+		</div>
 	</div>
-	<div class="b-popup__body" ng-if="environmentViewCtrl.buildStep == 'pgpKey'">
+
+	<div class="b-popup__body" ng-if="environmentViewCtrl.buildStep == 'pgpKey' || environmentViewCtrl.buildStep == 'showLogs'">
+		<table class="b-main-table b-main-table_none-border g-margin-bottom-half">
+			<tr ng-repeat="(key, log) in environmentViewCtrl.logMessages">
+				<td>{{ log.time }}</td>
+				<td class="b-main-table__mini-icon"><i class="fa" ng-class="log.classes"></i></td>
+				<td>{{ log.text }}</td>
+			</tr>
+		</table>
 		<div class="b-form">
-			<div class="js-accordeon-message">
-				<span class="b-form-label b-form-label_fix-size-1">
-					Message 
-					<i class="fa fa-caret-down"></i>
-				</span>
+			<div class="g-text-center" ng-show="!environmentViewCtrl.hasPGPplugin">
+				<button class="b-btn b-btn_light-grey js-btn-build-show-message js-accordeon-message">
+					Show message
+				</button>
 			</div>
-			<div style="display: none;">
-				<textarea class="b-form-input b-form-input_full b-form-input_textarea bp-sign-target js-bp-message"
-					ng-model="environmentViewCtrl.newEnvID[1]" 
-					style = "width: 540px; height: 300px; font-family: monospace; overflow: scroll; resize: none">
+			<div style="display: none;" ng-if="environmentViewCtrl.newEnvID[1]">
+				<textarea class="b-form-input b-form-input_full b-form-input_textarea g-margin-bottom bp-sign-target js-bp-message" 
+					ng-change="environmentViewCtrl.signKey()" 
+					ng-model="environmentViewCtrl.newEnvID[1]">
 				</textarea>
 			</div>
 			<script>
 				$('.js-accordeon-message').on('click', function(){
-					$(this).next().slideToggle();
-				});
-
-				$('.js-bp-message').on('change', function(){
-					$('.js-environment-build').prop('disabled', false);
-					$('.js-popup-loading-screen').hide();
+					$(this).parent().next().slideToggle();
 				});
 			</script>
 			<div class="clear"></div>
@@ -53,7 +72,7 @@
 	<div class="b-popup__footer b-popup__footer_undertable">
 
 		<button class="b-btn b-btn_green js-environment-build" 
-		ng-if="environmentViewCtrl.buildStep == 'pgpKey'" 
+		ng-if="environmentViewCtrl.buildStep == 'pgpKey' && !environmentViewCtrl.hasPGPplugin" 
 		ng-click="environmentViewCtrl.buildEnvironment()" 
 		disabled>
 			Build

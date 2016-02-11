@@ -22,6 +22,7 @@
     <link rel="stylesheet" href="css/libs/loading-bar.css">
     <link rel="stylesheet" href="css/libs/angular-ui-switch.css">
     <link rel="stylesheet" href="css/libs/perfect-scrollbar.css">
+    <link rel="stylesheet" href="css/libs/colorbox.css">
     <!--CSS-->
 
     <link rel="stylesheet" href="css/style.css"/>
@@ -263,6 +264,9 @@
         </div>
 
         <div class="b-workspace__content b-workspace__content_cloud-env">
+            <a href="_popup-advanced-build-environment.html" class="b-btn js-cbox-modal">Build environment</a>
+            <a href="_popup-advanced-build-environment-next.html" class="b-btn js-cbox-modal">Build environment:next</a>
+            <a href="_popup-advanced-apply-changes.html" class="b-btn js-cbox-modal">Apply changes</a>
             <div class="b-cloud">
                 <div class="b-cloud__tools g-right">
                     <div class="b-cloud-tools">
@@ -601,7 +605,10 @@
 <script src="assets/js/plugins/Chart.js"></script>
 <script src="assets/js/plugins/moment.min.js"></script>
 <script src="assets/js/plugins/d3.js"></script>
+
+<script src="scripts/libs/jquery.colorbox-min.js" type="text/javascript"></script>
 <script src="scripts/scripts.js"></script>
+
 
 <!-- Angular deps -->
 <script src="assets/js/angular/angular.min.js"></script>
@@ -629,6 +636,22 @@
 <!--directive dep-->
 <script src="assets/js/directives.js"></script>
 <script src="scripts/scripts.js"></script>
+<script>
+$('a.js-cbox-modal').colorbox({
+	title: " ",
+	transition: "none",
+	previous: false,
+	next: false,
+	arrowKey: false,
+	rel: false,
+	overlayClose: true,
+	opacity: 0.8,
+	closeButton: false,
+	onComplete: function() {
+		$.colorbox.resize();
+	}
+});
+</script>
 </body>
 
 </html>
