@@ -5,9 +5,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-
-import javax.annotation.security.PermitAll;
-
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.objects.PermissionOperation;
 import io.subutai.common.security.objects.PermissionScope;
@@ -88,6 +85,7 @@ public interface IdentityManager
      */
     User getUserByFingerprint( String fingerprint );
 
+
     /* *************************************************
      */
     UserDelegate getUserDelegate( long userId );
@@ -95,11 +93,11 @@ public interface IdentityManager
 
     /* *************************************************
      */
-    @PermitAll
     UserDelegate getUserDelegate( User user );
 
+
     /* *************************************************
-         */
+     */
     UserDelegate getUserDelegate( String id );
 
 
