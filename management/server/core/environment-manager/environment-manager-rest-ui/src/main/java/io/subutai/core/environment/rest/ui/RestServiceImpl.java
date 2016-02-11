@@ -176,7 +176,7 @@ public class RestServiceImpl implements RestService
         }
 
         return Response.ok( JsonUtil
-                .toJson( environment ) ).build();
+                .toJson( environment.getId() ) ).build();
     }
 
 
@@ -226,49 +226,49 @@ public class RestServiceImpl implements RestService
 //    }
 
 
-    @Override
-    public Response buildTopology(final String name, final String topologyJson )
-    {
-        EnvironmentDto environmentDto;
-        try
-        {
-            Map<String, Set<NodeGroup>> nodeGroupPlacement =
-                    gson.fromJson( topologyJson, new TypeToken<Map<String, Set<NodeGroup>>>() {}.getType() );
-
-
-            Topology topology = new Topology( name, 0, 0 );
-
-
-            Iterator it = nodeGroupPlacement.entrySet().iterator();
-            while ( it.hasNext() )
-            {
-                Map.Entry pair = ( Map.Entry ) it.next();
-
-                for ( NodeGroup nodeGroup : ( Set<NodeGroup> ) pair.getValue() )
-                {
-                    topology.addNodeGroupPlacement( ( String ) pair.getKey(), nodeGroup );
-                }
-            }
-
-
-            Environment environment = environmentManager.setupRequisites( topology );
-            environmentDto = new EnvironmentDto( environment.getId(), environment.getName(), environment.getStatus(),
-                    Sets.newHashSet(), environment.getRelationDeclaration() );
-        }
-        catch ( EnvironmentCreationException e )
-        {
-            LOG.error( "Error creating environment #createEnvironment", e );
-            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
-        }
-        catch ( JsonParseException e )
-        {
-            LOG.error( "Error validating parameters #createEnvironment", e );
-            return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) )
-                           .build();
-        }
-
-        return Response.ok( JsonUtil.toJson( environmentDto ) ).build();
-    }
+//    @Override
+//    public Response buildTopology(final String name, final String topologyJson )
+//    {
+//        EnvironmentDto environmentDto;
+//        try
+//        {
+//            Map<String, Set<NodeGroup>> nodeGroupPlacement =
+//                    gson.fromJson( topologyJson, new TypeToken<Map<String, Set<NodeGroup>>>() {}.getType() );
+//
+//
+//            Topology topology = new Topology( name, 0, 0 );
+//
+//
+//            Iterator it = nodeGroupPlacement.entrySet().iterator();
+//            while ( it.hasNext() )
+//            {
+//                Map.Entry pair = ( Map.Entry ) it.next();
+//
+//                for ( NodeGroup nodeGroup : ( Set<NodeGroup> ) pair.getValue() )
+//                {
+//                    topology.addNodeGroupPlacement( ( String ) pair.getKey(), nodeGroup );
+//                }
+//            }
+//
+//
+//            Environment environment = environmentManager.setupRequisites( topology );
+//            environmentDto = new EnvironmentDto( environment.getId(), environment.getName(), environment.getStatus(),
+//                    Sets.newHashSet(), environment.getRelationDeclaration() );
+//        }
+//        catch ( EnvironmentCreationException e )
+//        {
+//            LOG.error( "Error creating environment #createEnvironment", e );
+//            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+//        }
+//        catch ( JsonParseException e )
+//        {
+//            LOG.error( "Error validating parameters #createEnvironment", e );
+//            return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) )
+//                           .build();
+//        }
+//
+//        return Response.ok( JsonUtil.toJson( environmentDto ) ).build();
+//    }
 
 
 //    @Override

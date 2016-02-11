@@ -43,11 +43,9 @@ public interface RestService
 
     @POST
     @Path( "build" )
+    @Produces( { MediaType.TEXT_PLAIN } )
     Response buildAuto( @FormParam( "name" ) String name, @FormParam( "containers" ) String containersJson );
 
-    @POST
-    @Path( "requisites" )
-    Response buildTopology(@FormParam( "name" ) String name, @FormParam( "topology" ) String topologyJson );
 
     @POST
     @Path( "{environmentId}/modify" )

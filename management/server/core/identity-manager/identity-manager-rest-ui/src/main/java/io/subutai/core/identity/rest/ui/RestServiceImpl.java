@@ -120,8 +120,7 @@ public class RestServiceImpl implements RestService
                 }.getType() );
 
 
-                newUser.setRoles(
-                        roleIds.stream().map( r -> identityManager.getRole( r ) ).collect( Collectors.toList() ) );
+                roleIds.stream().forEach( r -> identityManager.assignUserRole( newUser, identityManager.getRole( r ) ) );
             }
         }
         catch ( Exception e )
