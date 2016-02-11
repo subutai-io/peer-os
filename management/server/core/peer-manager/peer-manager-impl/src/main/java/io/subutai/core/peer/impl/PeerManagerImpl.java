@@ -138,18 +138,8 @@ public class PeerManagerImpl implements PeerManager
             this.peerDataService = new PeerDataService( daoManager.getEntityManagerFactory() );
 
             localPeerId = securityManager.getKeyManager().getPeerId();
-            ownerId     = "owner-"+localPeerId;
+            ownerId     = securityManager.getKeyManager().getPeerOwnerId();
 
-            //            final String localPeerIp = "127.0.0.1";
-            //
-            //            if ( localPeerIp == null || ownerId == null )
-            //            {
-            //                throw new PeerException(
-            //                        String.format( "Could not initialize local peer: ID:%s OWNER_ID:%s IP:%s",
-            // localPeerIp, ownerId,
-            //                                localPeerIp ) );
-            //            }
-            // check local peer instance
             PeerData localPeerData = peerDataService.find( localPeerId );
 
 
