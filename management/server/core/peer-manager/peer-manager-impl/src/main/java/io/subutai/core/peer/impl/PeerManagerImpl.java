@@ -138,7 +138,7 @@ public class PeerManagerImpl implements PeerManager
             this.peerDataService = new PeerDataService( daoManager.getEntityManagerFactory() );
 
             localPeerId = securityManager.getKeyManager().getPeerId();
-            ownerId     = "owner"+localPeerId;
+            ownerId     = "owner-"+localPeerId;
 
             //            final String localPeerIp = "127.0.0.1";
             //
