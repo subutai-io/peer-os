@@ -3,6 +3,7 @@ package io.subutai.core.systemmanager.api;
 
 import io.subutai.core.systemmanager.api.pojo.ChannelSettings;
 import io.subutai.core.systemmanager.api.pojo.KurjunSettings;
+import io.subutai.core.systemmanager.api.pojo.PeerOwner;
 import io.subutai.core.systemmanager.api.pojo.PeerSettings;
 import io.subutai.core.systemmanager.api.pojo.SystemInfo;
 
@@ -25,4 +26,8 @@ public interface SystemManager
     public void setChannelSettings( ChannelSettings settings );
 
     public SystemInfo getSystemInfo();
+
+    public void setPeerOwner();
+
+    public PeerOwner getPeerOwnerInfo();
 }
