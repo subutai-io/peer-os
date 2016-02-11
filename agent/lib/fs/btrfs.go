@@ -67,6 +67,7 @@ func Receive(src, dst, delta string, parent bool) {
 	if !parent {
 		args = []string{"receive", config.Agent.LxcPrefix + dst}
 	}
+	log.Debug(strings.Join(args, " "))
 	receive := exec.Command("btrfs", args...)
 	input, err := os.Open(config.Agent.LxcPrefix + "lxc-data/tmpdir/" + delta)
 	receive.Stdin = input
@@ -87,7 +88,7 @@ func Send(src, dst, delta string) {
 }
 
 func ReadOnly(container string, flag bool) {
-	for _, path := range []string{container + "/rootfs/", "lxc/" + container + "-opt", "lxc-data/" + container + "-var", "lxc-data/" + container + "-home"} {
+	for _, path := range []string{container + "/rootfs/", container + "/opt", container + "/var", container + "/home"} {
 		arg := []string{"property", "set", "-ts", config.Agent.LxcPrefix + path, "ro", strconv.FormatBool(flag)}
 		log.Check(log.FatalLevel, "Setting readonly: "+strconv.FormatBool(flag), exec.Command("btrfs", arg...).Run())
 	}

@@ -128,9 +128,9 @@ func Destroy(name string) {
 		log.Check(log.FatalLevel, "Stopping container", err)
 	}
 
-	fs.SubvolumeDestroy("lxc/" + name + "-opt")
-	fs.SubvolumeDestroy("lxc-data/" + name + "-home")
-	fs.SubvolumeDestroy("lxc-data/" + name + "-var")
+	fs.SubvolumeDestroy(name + "/opt")
+	fs.SubvolumeDestroy(name + "/home")
+	fs.SubvolumeDestroy(name + "/var")
 
 	err = c.Destroy()
 	log.Check(log.FatalLevel, "Destroying container", err)
@@ -158,18 +158,18 @@ func Clone(parent, child string) {
 	err = c.Clone(child, lxc.CloneOptions{Backend: backend})
 	log.Check(log.FatalLevel, "Cloning container", err)
 
-	fs.SubvolumeClone("lxc/"+parent+"-opt", "lxc/"+child+"-opt")
-	fs.SubvolumeClone("lxc-data/"+parent+"-home", "lxc-data/"+child+"-home")
-	fs.SubvolumeClone("lxc-data/"+parent+"-var", "lxc-data/"+child+"-var")
+	fs.SubvolumeClone(parent+"/home", child+"/home")
+	fs.SubvolumeClone(parent+"/opt", child+"/opt")
+	fs.SubvolumeClone(parent+"/var", child+"/var")
 
 	SetContainerConf(child, [][]string{
 		{"lxc.network.link", ""},
 		{"lxc.network.veth.pair", strings.Replace(GetConfigItem(config.Agent.LxcPrefix+child+"/config", "lxc.network.hwaddr"), ":", "", -1)},
 		{"lxc.network.script.up", config.Agent.AppPrefix + "bin/create_ovs_interface"},
 		{"subutai.parent", parent},
-		{"lxc.mount.entry", config.Agent.LxcPrefix + "lxc/" + child + "-opt opt none bind,rw 0 0"},
-		{"lxc.mount.entry", config.Agent.LxcPrefix + "lxc-data/" + child + "-home home none bind,rw 0 0"},
-		{"lxc.mount.entry", config.Agent.LxcPrefix + "lxc-data/" + child + "-var var none bind,rw 0 0"},
+		{"lxc.mount.entry", config.Agent.LxcPrefix + child + "/home home none bind,rw 0 0"},
+		{"lxc.mount.entry", config.Agent.LxcPrefix + child + "/opt opt none bind,rw 0 0"},
+		{"lxc.mount.entry", config.Agent.LxcPrefix + child + "/var var none bind,rw 0 0"},
 	})
 }
 
@@ -317,9 +317,9 @@ func SetContainerUid(c string) {
 	parentuid := strconv.Itoa(int(s.Sys().(*syscall.Stat_t).Uid))
 
 	exec.Command("uidmapshift", "-b", config.Agent.LxcPrefix+c+"/rootfs/", parentuid, newuid, "65536").Run()
-	exec.Command("uidmapshift", "-b", config.Agent.LxcPrefix+"lxc/"+c+"-opt/", parentuid, newuid, "65536").Run()
-	exec.Command("uidmapshift", "-b", config.Agent.LxcPrefix+"lxc-data/"+c+"-home/", parentuid, newuid, "65536").Run()
-	exec.Command("uidmapshift", "-b", config.Agent.LxcPrefix+"lxc-data/"+c+"-var/", parentuid, newuid, "65536").Run()
+	exec.Command("uidmapshift", "-b", config.Agent.LxcPrefix+c+"/home/", parentuid, newuid, "65536").Run()
+	exec.Command("uidmapshift", "-b", config.Agent.LxcPrefix+c+"/opt/", parentuid, newuid, "65536").Run()
+	exec.Command("uidmapshift", "-b", config.Agent.LxcPrefix+c+"/var/", parentuid, newuid, "65536").Run()
 
 	log.Check(log.ErrorLevel, "Setting chmod 755 on lxc home", os.Chmod(config.Agent.LxcPrefix+c, 0755))
 }

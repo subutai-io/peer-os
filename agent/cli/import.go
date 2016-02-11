@@ -120,6 +120,10 @@ func LxcImport(templ, token string) {
 
 	log.Info("Installing template " + templ)
 	template.Install(parent, templ)
+	// TODO following lines kept for back compatibility with old templates, should be deleted when all templates will be replaced.
+	os.Rename(config.Agent.LxcPrefix+templ+"/"+templ+"-home", config.Agent.LxcPrefix+templ+"/home")
+	os.Rename(config.Agent.LxcPrefix+templ+"/"+templ+"-var", config.Agent.LxcPrefix+templ+"/var")
+	os.Rename(config.Agent.LxcPrefix+templ+"/"+templ+"-opt", config.Agent.LxcPrefix+templ+"/opt")
 
 	if templ == "management" {
 		template.MngInit()
@@ -133,9 +137,9 @@ func LxcImport(templ, token string) {
 		{"lxc.include", config.Agent.AppPrefix + "share/lxc/config/ubuntu.userns.conf"},
 		{"subutai.config.path", config.Agent.AppPrefix + "etc"},
 		{"lxc.network.script.up", config.Agent.AppPrefix + "bin/create_ovs_interface"},
-		{"lxc.mount.entry", config.Agent.LxcPrefix + "lxc/" + templ + "-opt opt none bind,rw 0 0"},
-		{"lxc.mount.entry", config.Agent.LxcPrefix + "lxc-data/" + templ + "-home home none bind,rw 0 0"},
-		{"lxc.mount.entry", config.Agent.LxcPrefix + "/lxc-data/" + templ + "-var var none bind,rw 0 0"},
+		{"lxc.mount.entry", config.Agent.LxcPrefix + templ + "/home home none bind,rw 0 0"},
+		{"lxc.mount.entry", config.Agent.LxcPrefix + templ + "/opt opt none bind,rw 0 0"},
+		{"lxc.mount.entry", config.Agent.LxcPrefix + templ + "/var var none bind,rw 0 0"},
 	})
 	log.Check(log.FatalLevel, "Removing temp dir "+templdir, os.RemoveAll(templdir))
 }
