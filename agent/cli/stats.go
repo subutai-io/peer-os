@@ -2,6 +2,7 @@ package lib
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -10,11 +11,14 @@ import (
 	"github.com/subutai-io/Subutai/agent/lib/container"
 	"github.com/subutai-io/Subutai/agent/lib/fs"
 	"github.com/subutai-io/Subutai/agent/log"
+	"io/ioutil"
 	"os"
+	"os/exec"
 	"regexp"
 	"runtime"
 	"strconv"
 	"strings"
+	"time"
 )
 
 var (
@@ -120,26 +124,56 @@ func ramLoad(h string) (memfree, memtotal interface{}) {
 	return
 }
 
+func getCPUstat() (idle, total uint64) {
+	contents, err := ioutil.ReadFile("/proc/stat")
+	if err != nil {
+		return
+	}
+	lines := strings.Split(string(contents), "\n")
+	for _, line := range lines {
+		fields := strings.Fields(line)
+		if fields[0] == "cpu" {
+			numFields := len(fields)
+			for i := 1; i < numFields; i++ {
+				val, err := strconv.ParseUint(fields[i], 10, 64)
+				if err != nil {
+					fmt.Println("Error: ", i, fields[i], err)
+				}
+				total += val
+				if i == 4 {
+					idle = val
+				}
+			}
+			return
+		}
+	}
+	return
+}
+
 func cpuLoad(h string) interface{} {
 	res, err := queryDB("SELECT non_negative_derivative(mean(value),1s) FROM host_cpu WHERE hostname =~ /^" + h + "$/ AND type =~ /idle/ AND time > now() - 1m GROUP BY time(10s), type, hostname fill(none)")
-	if err != nil {
-		log.Warn("No data received for cpu load")
-		return ""
+	if err == nil && len(res) > 0 && len(res[0].Series) > 0 && len(res[0].Series[0].Values) > 0 && len(res[0].Series[0].Values[0]) > 1 {
+		return res[0].Series[0].Values[0][1]
 	}
-	return res[0].Series[0].Values[0][1]
+	idle0, total0 := getCPUstat()
+	time.Sleep(3 * time.Second)
+	idle1, total1 := getCPUstat()
+	cpuUsage := 100 * (float64(total1-total0) - float64(idle1-idle0)) / float64(total1-total0)
+	return 100 - cpuUsage
 }
 
 func diskLoad(h string) (disktotal, diskused interface{}) {
-	res, err := queryDB("SELECT last(value) FROM host_disk WHERE hostname =~ /^" + h + "$/ AND mount =~ /mnt/ GROUP BY type")
-	if err != nil {
-		log.Warn("No data received for disk load")
-		return
+	out, _ := exec.Command("df", "-TB1").Output()
+	scanner := bufio.NewScanner(bytes.NewReader(out))
+	for scanner.Scan() {
+		line := strings.Fields(scanner.Text())
+		if strings.HasPrefix(line[1], "btrfs") {
+			disktotal, _ = strconv.Atoi(line[3])
+			diskused, _ = strconv.Atoi(line[2])
+			break
+		}
 	}
-	if len(res[0].Series) < 2 {
-		return 0, 0
-	}
-
-	return res[0].Series[2].Values[0][1], res[0].Series[1].Values[0][1]
+	return
 }
 
 func cpuQuotaUsage(h string) int {

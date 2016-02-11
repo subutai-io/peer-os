@@ -8,37 +8,16 @@ import (
 	"strings"
 )
 
-func RemovePort(tunnelPortName string) error {
+func IfTunExist(name string) {
+	ret, err := exec.Command("ovs-vsctl", "list-ports", "wan").CombinedOutput()
+	log.Check(log.FatalLevel, "Getting port list", err)
+	ports := strings.Split(string(ret), "\n")
 
-	log.Check(log.FatalLevel, "remove port 1",
-		exec.Command("ovs-vsctl", "--if-exists", "del-port", tunnelPortName).Run())
-	log.Check(log.FatalLevel, "remove port 2",
-		exec.Command("ovs-vsctl", "--if-exists", "del-br", "br-"+tunnelPortName).Run())
-	log.Check(log.FatalLevel, "remove port 3",
-		exec.Command("ovs-vsctl", "--if-exists", "del-port", "br-int", "intto"+tunnelPortName).Run())
-	return nil
-}
-func CheckTunnelPortNameValidity(name string) error {
-
-	ret, _ := exec.Command("ovs-vsctl", "list-ports", "br-"+name).CombinedOutput()
-	str := strings.Split(string(ret), "\n")
-	if !strings.Contains(name, "tunnel") {
-		return errors.New("tunnel name must containe \"tunnel\" tag")
-	}
-	for _, v := range str {
-		if strings.Contains(string(v), "no bridge named") {
-			return nil
-		} else if strings.Contains(string(v), name) {
-			return errors.New("Tunnel Port Name " + name + " is already exists")
+	for _, port := range ports {
+		if port == name {
+			log.Error("Tunnel port " + name + " is already exists")
 		}
 	}
-	return nil
-}
-
-func ListTunnels() string {
-	list, err := exec.Command("ovs-vsctl", "show").CombinedOutput()
-	log.Check(log.FatalLevel, "Getting OVS interfaces", err)
-	return string(list)
 }
 
 func CheckIPValidity(l []string, name string) error {
@@ -48,49 +27,6 @@ func CheckIPValidity(l []string, name string) error {
 		if strings.Contains(string(v), ip.String()) {
 			return errors.New(ip.String() + " is already used")
 		}
-	}
-	return nil
-}
-
-func CreateTunnel(l []string, tunnelPortName, tunnelIPAddress, tunnelType string) error {
-	// check: ip addr is already checked if valid... so
-	var getTun string
-	t := strings.Split(tunnelIPAddress, ".")
-	t1 := t[0] + "." + t[1] + "." + t[2]
-	for _, v := range l {
-		if strings.Contains(string(v), t1) {
-			ss := strings.Split(v, "-")
-			getTun = ss[0]
-		}
-	}
-	if getTun != "" {
-		log.Info("getTun: " + getTun)
-		out, err := exec.Command("ovs-vsctl", "--may-exist", "add-port", "br-"+getTun, tunnelPortName).CombinedOutput()
-		log.Check(log.FatalLevel, "Adding port to Open vSwitch"+string(out), err)
-		out, err = exec.Command("ovs-vsctl", "set", "Interface", tunnelPortName, "type="+tunnelType, "options:key=flow", "options:remote_ip="+tunnelIPAddress).CombinedOutput()
-		log.Check(log.FatalLevel, "Adding tunnel to Open vSwitch"+string(out), err)
-	} else {
-		log.Check(log.FatalLevel, "Create tunnel 0",
-			exec.Command("ovs-vsctl", "--may-exist", "add-br", "br-"+tunnelPortName).Run())
-		log.Check(log.FatalLevel, "Create tunnel 1",
-			exec.Command("ovs-vsctl", "set", "bridge", "br-"+tunnelPortName, "stp_enable=true").Run())
-		log.Check(log.FatalLevel, "Create tunnel 2",
-			exec.Command("ovs-vsctl", "add-port", "br-"+tunnelPortName, tunnelPortName+"toint").Run())
-		log.Check(log.FatalLevel, "Create tunnel 3",
-			exec.Command("ovs-vsctl", "set", "Interface", tunnelPortName+"toint", "type=patch").Run())
-		log.Check(log.FatalLevel, "Create tunnel 4",
-			exec.Command("ovs-vsctl", "set", "Interface", tunnelPortName+"toint", "options:peer=intto"+tunnelPortName).Run())
-		log.Check(log.FatalLevel, "Create tunnel 5",
-			exec.Command("ovs-vsctl", "add-port", "br-int", "intto"+tunnelPortName).Run())
-		log.Check(log.FatalLevel, "Create tunnel 6",
-			exec.Command("ovs-vsctl", "set", "Interface", "intto"+tunnelPortName, "type=patch").Run())
-		log.Check(log.FatalLevel, "Create tunnel 7",
-			exec.Command("ovs-vsctl", "set", "Interface", "intto"+tunnelPortName, "options:peer="+tunnelPortName+"toint").Run())
-		log.Check(log.FatalLevel, "Create tunnel 8",
-			exec.Command("ovs-vsctl", "--may-exist", "add-port", "br-"+tunnelPortName, tunnelPortName).Run())
-		log.Check(log.FatalLevel, "Create tunnel 9",
-			exec.Command("ovs-vsctl", "set", "Interface", tunnelPortName, "type="+tunnelType,
-				"options:key=flow", "options:remote_ip="+tunnelIPAddress).Run())
 	}
 	return nil
 }
