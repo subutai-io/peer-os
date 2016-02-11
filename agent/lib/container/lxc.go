@@ -2,6 +2,7 @@ package container
 
 import (
 	"bufio"
+	"bytes"
 	"errors"
 	"github.com/subutai-io/Subutai/agent/config"
 	"github.com/subutai-io/Subutai/agent/lib/fs"
@@ -197,17 +198,40 @@ func QuotaRAM(name string, size ...string) int {
 	return int(limit / 1024 / 1024)
 }
 
+// QuotaCPU sets container CPU limitation and return current value in percents.
+// If passed value < 100, we assume that this value mean percents.
+// If passed value > 100, we assume that this value mean MHz.
 func QuotaCPU(name string, size ...string) int {
 	c, _ := lxc.NewContainer(name, config.Agent.LxcPrefix)
 	cfsPeriod := 100000
-	quota, _ := strconv.Atoi(size[0])
+	tmp, _ := strconv.Atoi(size[0])
+	quota := float32(tmp)
+
+	if quota > 100 {
+		out, err := ioutil.ReadFile("/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq")
+		freq, _ := strconv.Atoi(strings.TrimSpace(string(out)))
+		freq = freq / 1000
+		if log.Check(log.DebugLevel, "Getting CPU max frequency", err) {
+			out, _ := ioutil.ReadFile("/proc/cpuinfo")
+			scanner := bufio.NewScanner(bytes.NewReader(out))
+			for scanner.Scan() {
+				if strings.HasPrefix(scanner.Text(), "cpu MHz") {
+					freq, _ = strconv.Atoi(strings.TrimSpace(strings.Split(strings.Split(scanner.Text(), ":")[1], ".")[0]))
+					break
+				}
+			}
+		}
+		quota = quota * 100 / float32(freq) / float32(runtime.NumCPU())
+	}
+
 	if size[0] != "" && State(name) == "RUNNING" {
-		value := strconv.Itoa(cfsPeriod * runtime.NumCPU() * quota / 100)
+		value := strconv.Itoa(int(float32(cfsPeriod) * float32(runtime.NumCPU()) * quota / 100))
 		c.SetCgroupItem("cpu.cfs_quota_us", value)
 		SetContainerConf(name, [][]string{{"lxc.cgroup.cpu.cfs_quota_us", value}})
 	}
-	quota, _ = strconv.Atoi(c.CgroupItem("cpu.cfs_quota_us")[0])
-	return quota * 100 / cfsPeriod / runtime.NumCPU()
+
+	result, _ := strconv.Atoi(c.CgroupItem("cpu.cfs_quota_us")[0])
+	return result * 100 / cfsPeriod / runtime.NumCPU()
 }
 
 func QuotaCPUset(name string, size ...string) string {

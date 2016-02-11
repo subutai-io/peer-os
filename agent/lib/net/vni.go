@@ -13,13 +13,11 @@ import (
 
 func CreateVNIFile(name string) {
 	if _, err := os.Stat(config.Agent.DataPrefix + "var/subutai-network/"); os.IsNotExist(err) {
-		log.Check(log.FatalLevel, "create /var/subutai-network folder", os.MkdirAll(config.Agent.DataPrefix+"var/subutai-network", 0755))
+		log.Check(log.FatalLevel, "Creating network data folder", os.MkdirAll(config.Agent.DataPrefix+"var/subutai-network", 0755))
 	}
 	if _, err := os.Stat(config.Agent.DataPrefix + "var/subutai-network/" + name); os.IsNotExist(err) {
 		_, err = os.Create(config.Agent.DataPrefix + "var/subutai-network/" + name)
-		if err != nil {
-			log.Error("/var/subutai-network/" + name + " create " + err.Error())
-		}
+		log.Check(log.ErrorLevel, "Creating VNI file", err)
 	}
 }
 
@@ -106,25 +104,23 @@ func DelVNI(tunnelPortName, vni, vlan string) {
 }
 
 func MakeReservation(vni, vlan, envid string) {
-	// regexpControl(envid)
 	ret, lines := CheckVNIFile("vni_reserve", vni, vlan, envid)
 	if ret[0] == true {
-		log.Error("vni found.")
+		log.Error("VNI already exist")
 	}
 	if ret[1] == true {
-		log.Error("vlanid found.")
+		log.Error("VLAN already exist")
 	}
 	if ret[2] == true {
-		log.Error("envid found.")
+		log.Error("Env ID already exist")
 	}
 	if ret[3] == true {
-		log.Error("revervation found.")
+		log.Error("Reservation exist")
 	}
 
-	log.Info("no reserv found. reserving...")
 	lines = append(lines, vni+" "+vlan+" "+envid)
 	str := strings.Join(lines, "\n")
-	log.Check(log.FatalLevel, "reserv write ",
+	log.Check(log.FatalLevel, "Writing reserve",
 		ioutil.WriteFile(config.Agent.DataPrefix+"var/subutai-network/vni_reserve", []byte(str), 0744))
 }
 
