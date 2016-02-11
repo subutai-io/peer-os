@@ -310,8 +310,13 @@ function IdentityUserFormCtrl($scope, identitySrv, ngDialog) {
 	function addUser() {
 		if ($scope.addUserForm.$valid) {
 			var postData = userPostData(vm.user2Add);
+			LOADING_SCREEN();
 			identitySrv.addUser(postData).success(function (data) {
+				LOADING_SCREEN('none');
 				ngDialog.closeAll();
+			}).error(function(error){
+				LOADING_SCREEN('none');
+				SweetAlert.swal ("ERROR!", "Error: " + error, "error");
 			});
 			$scope.addUserForm.$setPristine();
 			$scope.addUserForm.$setUntouched();
