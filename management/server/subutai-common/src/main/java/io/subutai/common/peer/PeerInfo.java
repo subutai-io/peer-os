@@ -2,6 +2,8 @@ package io.subutai.common.peer;
 
 
 import java.io.Serializable;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Objects;
 
 import org.codehaus.jackson.annotate.JsonProperty;
@@ -21,7 +23,10 @@ public class PeerInfo implements Serializable
     private String ownerId;
 
     @JsonProperty
-    private String ip = "0.0.0.0";
+    private String publicUrl = "";
+
+    @JsonProperty
+    private String ip = "UNKNOWN";
 
     //    @JsonProperty
     //    private String gatewayIp;
@@ -39,7 +44,7 @@ public class PeerInfo implements Serializable
     private String name;
 
     @JsonProperty
-    private int port = Integer.valueOf( ChannelSettings.SECURE_PORT_X2 );
+    private int port = ChannelSettings.SECURE_PORT_X2;
 
     //    @JsonProperty
     //    private int lastUsedVlanId = 100;
@@ -72,12 +77,6 @@ public class PeerInfo implements Serializable
     }
 
 
-    public void setPort( final int port )
-    {
-        this.port = port;
-    }
-
-
     public String getOwnerId()
     {
         return ownerId;
@@ -96,22 +95,28 @@ public class PeerInfo implements Serializable
     }
 
 
-    public void setIp( final String ip )
+    public String getPublicUrl()
     {
-        this.ip = ip;
+        return publicUrl;
     }
 
-    //
-    //    public String getGatewayIp()
-    //    {
-    //        return gatewayIp;
-    //    }
-    //
-    //
-    //    public void setGatewayIp( String gatewayIp )
-    //    {
-    //        this.gatewayIp = gatewayIp;
-    //    }
+
+    public void setPublicUrl( final String publicUrl )
+    {
+        try
+        {
+            URL url = new URL( publicUrl );
+            this.ip = url.getHost();
+            this.port = url.getPort() == -1 ? url.getDefaultPort() : url.getPort();
+            this.publicUrl = publicUrl;
+        }
+        catch ( MalformedURLException e )
+        {
+            // assume this is IP or domain name
+            this.ip = publicUrl;
+            this.publicUrl = String.format( "https://%s:%s/", publicUrl, ChannelSettings.SECURE_PORT_X1 );
+        }
+    }
 
 
     //    public PeerStatus getStatus()
@@ -229,7 +234,7 @@ public class PeerInfo implements Serializable
         sb.append( ", name='" ).append( name ).append( '\'' );
         sb.append( ", id=" ).append( id );
         sb.append( ", ownerId=" ).append( ownerId );
-        sb.append( ", port=" ).append( port );
+        //        sb.append( ", port=" ).append( port );
         //        sb.append( ", lastUsedVlanId=" ).append( lastUsedVlanId );
         //        sb.append( ", keyId='" ).append( keyId ).append( '\'' );
         sb.append( '}' );

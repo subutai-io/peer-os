@@ -323,13 +323,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         try
         {
-            if ( this.publicUrl == null )
+            if ( StringUtil.isStringNullOrEmpty( this.publicUrl ) )
             {
-                this.peerInfo.setIp( managementHost.getInterfaceByName( externalIpInterface ).getIp() );
+                this.peerInfo.setPublicUrl( managementHost.getInterfaceByName( externalIpInterface ).getIp() );
             }
             else
             {
-                this.peerInfo.setIp( managementHost.getInterfaceByName( externalIpInterface ).getIp() );
+                this.peerInfo.setPublicUrl( this.publicUrl );
             }
             return peerInfo;
         }

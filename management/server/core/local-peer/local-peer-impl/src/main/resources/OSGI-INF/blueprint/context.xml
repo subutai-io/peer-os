@@ -18,6 +18,7 @@
   <cm:property-placeholder persistent-id="peer" update-strategy="none">
     <cm:default-properties>
       <cm:property name="externalIpInterface" value="eth1" />
+      <cm:property name="publicURL" value=""/>
     </cm:default-properties>
   </cm:property-placeholder>
 
@@ -37,9 +38,9 @@
 
   <reference id="hostRegistry" interface="io.subutai.core.hostregistry.api.HostRegistry" />
 
-<!--
-  <reference id="strategyManager" interface="io.subutai.core.strategy.api.StrategyManager" />
--->
+  <!--
+    <reference id="strategyManager" interface="io.subutai.core.strategy.api.StrategyManager" />
+  -->
 
   <reference id="quotaManager" availability="mandatory"
              interface="io.subutai.core.lxc.quota.api.QuotaManager" />
@@ -58,7 +59,7 @@
     <argument ref="daoManagerPeer" />
     <argument ref="templateRegistry" />
     <argument ref="quotaManager" />
-<!--    <argument ref="strategyManager" />-->
+    <!--    <argument ref="strategyManager" />-->
     <argument ref="commandExecutor" />
     <argument ref="hostRegistry" />
     <argument ref="monitor" />
