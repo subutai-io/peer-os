@@ -359,7 +359,7 @@ function environmentService($http) {
 	function startEnvironmentAutoBuild(environmentName, containers) {
 		var postData = 'name=' + environmentName + "&containers=" + containers;
 		return $http.post(
-			ENVIRONMENT_START_BUILD + 'auto',
+			ENVIRONMENT_START_BUILD,
 			postData,
 			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
 		);

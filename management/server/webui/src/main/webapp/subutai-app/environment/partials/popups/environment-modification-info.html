@@ -4,11 +4,11 @@
         <a href ng-click="closeThisDialog()"><i class="fa fa-times g-right"></i></a>
     </div>
     <div class="b-popup__body">
-        <div class="g-margin-bottom" ng-if="environmentViewCtrl.currentEnvironment.excludedContainersByQuota">
+        <div class="g-margin-bottom" ng-if="environmentSimpleViewCtrl.currentEnvironment.excludedContainersByQuota">
             <div class="g-text g-margin-bottom-half">Following containers will be removed from your environment</div>
             <div class="b-main-table-border">
                 <table class="b-main-table b-main-table_custom-1 g-margin-bottom-half">
-                    <tr ng-repeat="(containerName, container) in environmentViewCtrl.currentEnvironment.excludedContainersByQuota">
+                    <tr ng-repeat="(containerName, container) in environmentSimpleViewCtrl.currentEnvironment.excludedContainersByQuota">
                         <td class="b-main-table__20 g-text-center">
                             <img ng-src="assets/templates/{{containerName}}.jpg" alt="{{containerName}}"
                                  onerror="this.onerror=null;this.src='assets/templates/no-image.jpg';">
@@ -17,7 +17,7 @@
                         <td class="b-main-table__right">
                             <span class="g-circle-label g-margin-left-quarter"
                                   ng-repeat="(quotaName, quantity) in container.quotas"
-                                  ng-style="{'background-color' : environmentViewCtrl.getQuotaColor(quotaName)}"
+                                  ng-style="{'background-color' : environmentSimpleViewCtrl.getQuotaColor(quotaName)}"
                                   tooltips
                                   tooltip-template="{{ quotaName }}">
                                 {{quantity}}
@@ -27,11 +27,11 @@
                 </table>
             </div>
         </div>
-        <div class="g-margin-bottom" ng-if="environmentViewCtrl.currentEnvironment.includedContainersByQuota">
+        <div class="g-margin-bottom" ng-if="environmentSimpleViewCtrl.currentEnvironment.includedContainersByQuota">
             <div class="g-text g-margin-bottom-half">Following containers will be added to your environment</div>
             <div class="b-main-table-border">
                 <table class="b-main-table b-main-table_custom-1 g-margin-bottom-half">
-                    <tr ng-repeat="(containerName, container) in environmentViewCtrl.currentEnvironment.includedContainersByQuota">
+                    <tr ng-repeat="(containerName, container) in environmentSimpleViewCtrl.currentEnvironment.includedContainersByQuota">
                         <td class="b-main-table__20 g-text-center">
                             <img ng-src="assets/templates/{{containerName}}.jpg" alt="{{containerName}}"
                                  onerror="this.onerror=null;this.src='assets/templates/no-image.jpg';">
@@ -40,7 +40,7 @@
                         <td class="b-main-table__right">
                             <span class="g-circle-label g-circle-label_blue g-margin-left-quarter"
                                   ng-repeat="(quotaName, quantity) in container.quotas"
-                                  ng-style="{'background-color' : environmentViewCtrl.getQuotaColor(quotaName)}"
+                                  ng-style="{'background-color' : environmentSimpleViewCtrl.getQuotaColor(quotaName)}"
                                   tooltips
                                   tooltip-template="{{quotaName}}">
                                 {{quantity}}
@@ -52,8 +52,8 @@
         </div>
         <div>
             <button href="#"
-                    ng-click="environmentViewCtrl.applyChanges()"
-                    ng-disabled="environmentViewCtrl.isApplyingChanges"
+                    ng-click="environmentSimpleViewCtrl.applyChanges()"
+                    ng-disabled="environmentSimpleViewCtrl.isApplyingChanges"
                     class="b-btn b-btn_green g-right">
                 Next
             </button>

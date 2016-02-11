@@ -44,6 +44,7 @@ function AccountCtrl(identitySrv, $scope, ngDialog, SweetAlert, cfpLoadingBar) {
 		LOADING_SCREEN();
 		identitySrv.updatePublicKey(encodeURIComponent(vm.activeUser.publicKey)).success(function(data) {
 			identitySrv.createIdentityDelegateDocument().success(function() {
+				LOADING_SCREEN('none');
 				getDelegateDocument();
 			}).error(function(error) {
 				LOADING_SCREEN('none');
