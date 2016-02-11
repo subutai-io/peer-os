@@ -278,10 +278,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     {
         User activeUser = identityManager.getActiveUser();
 
-        final boolean viewAll = identityManager
-                .isUserPermitted                 ( activeUser, PermissionObject.EnvironmentManagement,
-                        PermissionScope.ALL_SCOPE,
-                        PermissionOperation.Read );
+        //final boolean viewAll = identityManager
+                //.isUserPermitted                 ( activeUser, PermissionObject.EnvironmentManagement,
+                        //PermissionScope.ALL_SCOPE,
+                        //PermissionOperation.Read );
 
 
         Set<Environment> environments = new HashSet<>();
@@ -925,12 +925,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         User activeUser = identityManager.getActiveUser();
 
-        final boolean deleteAll = identityManager
-                .isUserPermitted                   ( activeUser, PermissionObject.EnvironmentManagement,
-                        PermissionScope.ALL_SCOPE,
-                        PermissionOperation.Delete );
+        //final boolean deleteAll = identityManager
+                //.isUserPermitted                   ( activeUser, PermissionObject.EnvironmentManagement,
+                        //PermissionScope.ALL_SCOPE,
+                        //PermissionOperation.Delete );
         boolean canDelete = relationManager.getRelationInfoManager().allHasDeletePermissions( environment );
-        if ( !( deleteAll || environment.getUserId().equals( activeUser.getId() ) || canDelete ) )
+        if ( !( environment.getUserId().equals( activeUser.getId() ) || canDelete ) )
         {
             throw new AccessControlException( "You have not enough permissions." );
         }
@@ -1048,12 +1048,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         User activeUser = identityManager.getActiveUser();
         boolean canDelete = relationManager.getRelationInfoManager().allHasDeletePermissions( environment );
 
-        final boolean deleteAll = identityManager
-                .isUserPermitted                   ( activeUser, PermissionObject.EnvironmentManagement,
-                        PermissionScope.ALL_SCOPE,
-                        PermissionOperation.Delete );
+        //final boolean deleteAll = identityManager
+                //.isUserPermitted                   ( activeUser, PermissionObject.EnvironmentManagement,
+                       // PermissionScope.ALL_SCOPE,
+                        //PermissionOperation.Delete );
 
-        if ( deleteAll || environment.getUserId().equals( activeUser.getId() ) || canDelete )
+        if ( environment.getUserId().equals( activeUser.getId() ) || canDelete )
         {
             environmentDataService.remove( ( EnvironmentImpl ) environment );
             notifyOnEnvironmentDestroyed( environmentId );

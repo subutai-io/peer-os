@@ -184,4 +184,35 @@ class UserDAO
         }
         return result;
     }
+
+
+
+    /* *************************************************
+     *
+     */
+    public User findByKeyId( final String keyId )
+    {
+        EntityManager em = daoManager.getEntityManagerFromFactory();
+        User result = null;
+        try
+        {
+            TypedQuery<UserEntity> query =
+                    em.createQuery( "select u from UserEntity u where u.securityKeyId = :keyId", UserEntity.class );
+            query.setParameter( "keyId", keyId );
+
+            List<UserEntity> users = query.getResultList();
+            if ( users.size() > 0 )
+            {
+                result = users.iterator().next();
+            }
+        }
+        catch ( Exception e )
+        {
+        }
+        finally
+        {
+            daoManager.closeEntityManager( em );
+        }
+        return result;
+    }
 }

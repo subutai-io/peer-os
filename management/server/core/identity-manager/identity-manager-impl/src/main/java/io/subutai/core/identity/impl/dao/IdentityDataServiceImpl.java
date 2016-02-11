@@ -69,6 +69,15 @@ public class IdentityDataServiceImpl implements IdentityDataService
      *
      */
     @Override
+    public User getUserByKeyId( String keyId )
+    {
+        return userDAOService.findByKeyId( keyId );
+    }
+
+    /* *************************************************
+         *
+         */
+    @Override
     public User getUser( long userId )
     {
         return userDAOService.find( userId );
