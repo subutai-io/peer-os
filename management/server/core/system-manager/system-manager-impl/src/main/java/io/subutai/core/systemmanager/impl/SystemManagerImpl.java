@@ -2,6 +2,8 @@ package io.subutai.core.systemmanager.impl;
 
 
 import io.subutai.common.settings.SubutaiInfo;
+import io.subutai.core.kurjun.api.KurjunTransferQuota;
+import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.systemmanager.api.SystemManager;
 import io.subutai.core.systemmanager.api.pojo.ChannelSettings;
 import io.subutai.core.systemmanager.api.pojo.KurjunSettings;
@@ -18,6 +20,9 @@ import io.subutai.core.systemmanager.impl.pojo.SystemInfoPojo;
  */
 public class SystemManagerImpl implements SystemManager
 {
+    private TemplateManager templateManager;
+
+
     @Override
     public PeerSettings getPeerSettings()
     {
@@ -48,6 +53,27 @@ public class SystemManagerImpl implements SystemManager
     public KurjunSettings getKurjunSettings()
     {
         KurjunSettings pojo = new KurjunSettingsPojo();
+
+        KurjunTransferQuota publicTransferQuota = templateManager.getTransferQuota( "public" );
+        KurjunTransferQuota trustTransferQuota = templateManager.getTransferQuota( "trust" );
+        Long publicDiskQuota = templateManager.getDiskQuota( "public" );
+        Long trustDiskQuota = templateManager.getDiskQuota( "trust" );
+
+        if ( publicDiskQuota != null && publicTransferQuota != null )
+        {
+            pojo.setPublicDiskQuota( publicDiskQuota );
+            pojo.setPublicThreshold( publicTransferQuota.getThreshold() );
+            pojo.setPublicTimeFrame( publicTransferQuota.getTimeFrame() );
+            pojo.setPublicTimeUnit( publicTransferQuota.getTimeUnit() );
+        }
+
+        if ( trustDiskQuota != null && trustTransferQuota != null )
+        {
+            pojo.setTrustDiskQuota( trustDiskQuota );
+            pojo.setTrustThreshold( trustTransferQuota.getThreshold() );
+            pojo.setTrustTimeFrame( trustTransferQuota.getTimeFrame() );
+            pojo.setTrustTimeUnit( trustTransferQuota.getTimeUnit() );
+        }
 
         pojo.setGlobalKurjunUrls( String.valueOf( io.subutai.common.settings.KurjunSettings.getGlobalKurjunUrls() ) );
 
@@ -98,6 +124,11 @@ public class SystemManagerImpl implements SystemManager
     @Override
     public void setChannelSettings( final ChannelSettings settings )
     {
+    }
 
+
+    public void setTemplateManager( final TemplateManager templateManager )
+    {
+        this.templateManager = templateManager;
     }
 }

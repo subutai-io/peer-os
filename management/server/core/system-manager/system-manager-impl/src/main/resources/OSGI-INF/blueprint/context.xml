@@ -13,11 +13,14 @@
     <!--<jpa:unit unitname="PluginInjectorConfigPUnit" property="entityManagerFactory" />-->
   <!--</bean>-->
   <!-- ***************************************************************** -->
+  <reference id="templateManager" availability="mandatory"
+             interface="io.subutai.core.kurjun.api.TemplateManager" />
 
 
   <bean id="systemManagerImpl" scope="singleton"
         class="io.subutai.core.systemmanager.impl.SystemManagerImpl">
     <!--<argument ref="daoManagerPlugin" />-->
+    <property name="templateManager" ref="templateManager" />
   </bean>
 
   <service ref="systemManagerImpl"
