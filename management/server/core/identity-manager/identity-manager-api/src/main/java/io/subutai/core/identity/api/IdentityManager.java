@@ -95,6 +95,11 @@ public interface IdentityManager
 
     /* *************************************************
      */
+    @PermitAll
+    UserDelegate getUserDelegate( User user );
+
+    /* *************************************************
+         */
     UserDelegate getUserDelegate( String id );
 
 
