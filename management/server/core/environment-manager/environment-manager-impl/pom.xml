@@ -65,7 +65,7 @@
 
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>trust-manager-api</artifactId>
+      <artifactId>object-relation-manager-api</artifactId>
     </dependency>
 
     <dependency>

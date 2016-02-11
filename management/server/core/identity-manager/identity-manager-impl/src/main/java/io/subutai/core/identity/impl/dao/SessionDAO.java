@@ -150,14 +150,14 @@ class SessionDAO
     /* *************************************************
      *
      */
-    public void persist( final Session item )
+    public void persist( Session item )
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
         try
         {
             daoManager.startTransaction( em );
             em.persist( item );
-            //em.flush();
+            em.flush();
             daoManager.commitTransaction( em );
         }
         catch ( Exception e )

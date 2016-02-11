@@ -9,12 +9,13 @@ import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.security.relation.RelationLink;
 
 
 /**
  * Environment
  */
-public interface Environment
+public interface Environment extends RelationLink
 {
 
     //TODO implement startContainer, stopContainer and resetP2PSecretKey methods

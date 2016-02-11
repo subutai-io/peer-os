@@ -59,17 +59,18 @@ public class ServerOutInterceptor extends AbstractPhaseInterceptor<Message>
         {
             if ( InterceptorState.SERVER_OUT.isActive( message ) )
             {
-                //                LOG.info( " *** Server OutInterceptor invoked *** " );
+                //LOG.info( " *** Server OutInterceptor invoked *** " );
 
-                URL url = new URL( ( String ) message.getExchange().getInMessage().get( Message.REQUEST_URL ) );
+                HttpServletRequest req = ( HttpServletRequest ) message.getExchange().getInMessage()
+                                                                       .get( AbstractHTTPDestination.HTTP_REQUEST );
 
-                if ( url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X2 ) )
+                if ( req.getLocalPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X2 ) )
                 {
-                    //                    LOG.info( " *** URL:" + url.getPath() );
+                    //LOG.info( " *** URL:" + url.getPath() );
                     HttpHeaders headers = new HttpHeadersImpl( message.getExchange().getInMessage() );
                     String subutaiHeader = headers.getHeaderString( Common.SUBUTAI_HTTP_HEADER );
-                    //                    LOG.debug( "Remote address: " + subutaiHeader );
-                    String path = url.getPath();
+                    //LOG.debug( "Remote address: " + subutaiHeader );
+                    String path = req.getRequestURI();
 
                     if ( path.startsWith( "/rest/v1/peer" ) )
                     {
@@ -84,12 +85,12 @@ public class ServerOutInterceptor extends AbstractPhaseInterceptor<Message>
                             String s = path.substring( prefix.length() + 1 );
                             String environmentId = s.substring( 0, s.indexOf( "/" ) );
                             handleEnvironmentMessage( subutaiHeader, environmentId, message );
-                            //                            LOG.debug( "Path handled by environment crypto handler: " +
+                            //LOG.debug( "Path handled by environment crypto handler: " +
                             // path );
                         }
                         else
                         {
-                            //                            LOG.warn( "Path is not handled by crypto handler: " + path );
+                            //LOG.warn( "Path is not handled by crypto handler: " + path );
                         }
                     }
                 }
@@ -122,7 +123,7 @@ public class ServerOutInterceptor extends AbstractPhaseInterceptor<Message>
         }
         catch ( PeerException e )
         {
-            //            LOG.warn( e.getMessage() );
+            //LOG.warn( e.getMessage() );
         }
     }
 }

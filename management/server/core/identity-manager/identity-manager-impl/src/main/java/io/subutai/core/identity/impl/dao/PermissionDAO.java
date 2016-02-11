@@ -76,7 +76,7 @@ class PermissionDAO
     /* *************************************************
      *
      */
-    public void persist( final Permission item )
+    public void persist( Permission item )
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
         try

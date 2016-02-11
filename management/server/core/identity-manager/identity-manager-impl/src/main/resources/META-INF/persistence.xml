@@ -10,6 +10,7 @@
     <class>io.subutai.core.identity.impl.model.RoleEntity</class>
     <class>io.subutai.core.identity.impl.model.SessionEntity</class>
     <class>io.subutai.core.identity.impl.model.UserTokenEntity</class>
+    <class>io.subutai.core.identity.impl.model.UserDelegateEntity</class>
     <class>io.subutai.core.identity.impl.model.PermissionEntity</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>

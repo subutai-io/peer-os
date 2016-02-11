@@ -32,6 +32,8 @@ public interface SecurityDataService
     public SecurityKey getKeyData( String identityId );
 
 
+    List<SecurityKey> getKeyDataByType( int type );
+
     /******************************************
      * Get SecurityKey entity from DB
      */

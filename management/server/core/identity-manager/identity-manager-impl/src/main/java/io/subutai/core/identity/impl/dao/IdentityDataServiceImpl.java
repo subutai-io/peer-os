@@ -12,6 +12,7 @@ import io.subutai.core.identity.api.model.Permission;
 import io.subutai.core.identity.api.model.Role;
 import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.identity.api.model.User;
+import io.subutai.core.identity.api.model.UserDelegate;
 import io.subutai.core.identity.api.model.UserToken;
 
 
@@ -28,6 +29,7 @@ public class IdentityDataServiceImpl implements IdentityDataService
     private SessionDAO sessionDAOService = null;
     private PermissionDAO permissionDAOService = null;
     private UserTokenDAO userTokenDAOService = null;
+    private UserDelegateDAO userDelegateDAOService = null;
 
 
     /* *************************************************
@@ -44,6 +46,7 @@ public class IdentityDataServiceImpl implements IdentityDataService
             sessionDAOService = new SessionDAO( daoManager );
             permissionDAOService = new PermissionDAO( daoManager );
             userTokenDAOService = new UserTokenDAO( daoManager );
+            userDelegateDAOService = new UserDelegateDAO(daoManager);
         }
         else
         {
@@ -79,8 +82,21 @@ public class IdentityDataServiceImpl implements IdentityDataService
     public void assignUserRole( long userId, Role role )
     {
         User user = userDAOService.find( userId );
-        user.getRoles().add( role );
-        userDAOService.update( user );
+        assignUserRole( user, role );
+    }
+
+
+    /* *************************************************
+     *
+     */
+    @Override
+    public void assignUserRole( User user, Role role )
+    {
+        if(user!=null)
+        {
+            user.getRoles().add( role );
+            userDAOService.update( user );
+        }
     }
 
 
@@ -91,9 +107,21 @@ public class IdentityDataServiceImpl implements IdentityDataService
     public void removeUserRole( long userId, Role role )
     {
         User user = userDAOService.find( userId );
+        removeUserRole( user, role );
+    }
 
-        user.getRoles().remove( role );
-        userDAOService.update( user );
+
+    /* *************************************************
+     *
+     */
+    @Override
+    public void removeUserRole( User user, Role role )
+    {
+        if(user!=null)
+        {
+            user.getRoles().remove( role );
+            userDAOService.update( user );
+        }
     }
 
 
@@ -106,15 +134,8 @@ public class IdentityDataServiceImpl implements IdentityDataService
     }
 
 
-    @Override
-    public List<User> getAllSystemUsers()
-    {
-        return userDAOService.getAllSystemUsers();
-    }
-
-
     /* *************************************************
-         */
+     */
     @Override
     public void persistUser( final User item )
     {
@@ -192,8 +213,21 @@ public class IdentityDataServiceImpl implements IdentityDataService
     public void assignRolePermission( long roleId, Permission permission )
     {
         Role role = roleDAOService.find( roleId );
-        role.getPermissions().add( permission );
-        roleDAOService.update( role );
+        assignRolePermission( role, permission );
+    }
+
+
+    /* *************************************************
+     *
+     */
+    @Override
+    public void assignRolePermission( Role role, Permission permission )
+    {
+        if(role != null)
+        {
+            role.getPermissions().add( permission );
+            roleDAOService.update( role );
+        }
     }
 
 
@@ -204,8 +238,21 @@ public class IdentityDataServiceImpl implements IdentityDataService
     public void removeAllRolePermissions( long roleId )
     {
         Role role = roleDAOService.find( roleId );
-        role.getPermissions().clear();
-        roleDAOService.update( role );
+        removeAllRolePermissions( role );
+    }
+
+
+    /* *************************************************
+     *
+     */
+    @Override
+    public void removeAllRolePermissions( Role role )
+    {
+        if(role!=null)
+        {
+            role.getPermissions().clear();
+            roleDAOService.update( role );
+        }
     }
 
 
@@ -261,8 +308,20 @@ public class IdentityDataServiceImpl implements IdentityDataService
     public void removeRolePermission( final long roleId, Permission permission )
     {
         Role role = roleDAOService.find( roleId );
-        role.getPermissions().remove( permission );
-        roleDAOService.update( role );
+        removeRolePermission( role, permission );
+    }
+
+
+    /* *************************************************
+     */
+    @Override
+    public void removeRolePermission( Role role, Permission permission )
+    {
+        if(role != null)
+        {
+            role.getPermissions().remove( permission );
+            roleDAOService.update( role );
+        }
     }
 
 
@@ -434,4 +493,66 @@ public class IdentityDataServiceImpl implements IdentityDataService
     {
         userTokenDAOService.removeInvalid();
     }
+
+
+    /* ******UserDelegate *********************************
+     *
+     */
+    @Override
+    public List<UserDelegate> getAllUserDelegates()
+    {
+        return userDelegateDAOService.getAll();
+    }
+
+
+    /* *************************************************
+     *
+     */
+    @Override
+    public UserDelegate getUserDelegate( String id )
+    {
+        return userDelegateDAOService.find( id );
+    }
+
+
+    /* *************************************************
+     *
+     */
+    @Override
+    public UserDelegate getUserDelegateByUserId( long userId )
+    {
+        return userDelegateDAOService.findByUserId( userId );
+    }
+
+
+
+    /* *************************************************
+     *
+     */
+    @Override
+    public void persistUserDelegate( final UserDelegate item )
+    {
+        userDelegateDAOService.persist( item );
+    }
+
+
+    /* *************************************************
+     *
+     */
+    @Override
+    public void updateUserDelegate( final UserDelegate item )
+    {
+        userDelegateDAOService.update( item );
+    }
+
+
+    /* *************************************************
+     *
+     */
+    @Override
+    public void removeUserDelegate( String id )
+    {
+        userDelegateDAOService.remove( id );
+    }
+
 }

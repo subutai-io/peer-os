@@ -52,8 +52,8 @@ import io.subutai.common.util.P2PUtil;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
-import io.subutai.core.trust.api.RelationManager;
-import io.subutai.core.trust.api.model.RelationMeta;
+import io.subutai.core.object.relation.api.RelationManager;
+import io.subutai.core.object.relation.api.model.RelationMeta;
 
 
 /**
@@ -386,9 +386,7 @@ public class EnvironmentImpl implements Environment, Serializable
                 {
                     final EnvironmentContainerHost containerHost = iterator.next();
                     RelationMeta relationMeta =
-                            new RelationMeta( activeUser, String.valueOf( activeUser.getId() ), containerHost,
-                                    containerHost.getId(), containerHost.getId(),
-                                    PermissionObject.EnvironmentManagement.getName() );
+                            new RelationMeta( activeUser, activeUser, containerHost, containerHost.getId() );
                     boolean trustedRelation =
                             relationManager.getRelationInfoManager().allHasReadPermissions( relationMeta );
 
@@ -658,5 +656,33 @@ public class EnvironmentImpl implements Environment, Serializable
                 + ", tunnelNetwork='" + tunnelNetwork + '\'' + ", containers=" + containers + ", peerConfs=" + peerConfs
                 + ", status=" + status + ", sshKeys='" + sshKeys + '\'' + ", userId=" + userId + ", alertHandlers="
                 + alertHandlers + ", envId=" + envId + '}';
+    }
+
+
+    @Override
+    public String getLinkId()
+    {
+        return String.format( "%s|%s", getClassPath(), getUniqueIdentifier() );
+    }
+
+
+    @Override
+    public String getUniqueIdentifier()
+    {
+        return getId();
+    }
+
+
+    @Override
+    public String getClassPath()
+    {
+        return this.getClass().getSimpleName();
+    }
+
+
+    @Override
+    public String getContext()
+    {
+        return PermissionObject.EnvironmentManagement.getName();
     }
 }

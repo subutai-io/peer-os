@@ -24,6 +24,14 @@
 					   ng-model="identityUserFormCtrl.user2Add.fullName"
 					   required>
 
+				<label class="b-popup-body-label b-popup-body-label_block">Trusted Level:</label>
+				<select class="b-popup-body-input b-popup-body-input_full b-popup-body-input_margin-bttm" 
+					ng-model="identityUserFormCtrl.user2Add.trustedLevel">
+					<option ng-repeat="(trystedLevelId, trustedLevel) in identityUserFormCtrl.trustedLevels" value="{{ trystedLevelId }}">
+						{{ trustedLevel }}
+					</option>
+				</select>				
+
 				<label class="b-popup-body-label b-popup-body-label_block">E-mail:</label>
 				<input type="email"
 					   placeholder="email@mail.com"
@@ -50,10 +58,10 @@
 				<span class="b-form-hint b-form-hint_red" ng-show="addUserForm.confirm_password.$error.pwmatch">Passwords don't match.</span>
 
 
-				<label class="b-popup-body-label b-popup-body-label_block">Public key</label>
+				<!--<label class="b-popup-body-label b-popup-body-label_block">Public key</label>
 				<textarea class="b-form-input b-form-input_full b-form-input_textarea bp-set-pub-key" ng-model = "identityUserFormCtrl.user2Add.public_key">
 				</textarea>
-				<div class="clear"></div>
+				<div class="clear"></div>-->
 			</div>
 			<div class="b-popup-body b-popup-body_col-2 g-right">
 				<col-select></col-select>
