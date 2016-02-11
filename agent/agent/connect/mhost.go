@@ -6,6 +6,7 @@ import (
 	"github.com/subutai-io/Subutai/agent/log"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -53,7 +54,7 @@ func (m *mhost) GetKey() *Key {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		log.Warn("Failed to fetch PK from Management Server. Status Code " + string(resp.StatusCode) + " url " + m.URL())
+		log.Warn("Failed to fetch PK from Management Server. Status Code " + strconv.Itoa(resp.StatusCode) + " url " + m.URL())
 		return nil
 	}
 

@@ -10,6 +10,7 @@ import java.nio.charset.Charset;
 import java.security.AccessControlException;
 
 import javax.security.auth.login.LoginException;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.bouncycastle.openpgp.PGPException;
@@ -80,26 +81,28 @@ public class MessageContentUtil
 
 
     //***************************************************************************
-    public static int checkUrlAccessibility( final int currentStatus, final URL url )
+    public static int checkUrlAccessibility( final int currentStatus, HttpServletRequest req )
     {
         int status = currentStatus;
-        String basePath = url.getPath();
+        int inPort = req.getLocalPort();
+        String basePath = req.getRequestURI();
 
-        if ( url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X1 ) || url.getPort() == 8080 )
+
+        if ( inPort == Integer.parseInt( ChannelSettings.SECURE_PORT_X1 ))
         {
-            if ( ChannelSettings.checkURLArray( basePath, ChannelSettings.URL_ACCESS_PX1 ) == 0 )
+            if ( ChannelSettings.checkURLAccess( basePath, ChannelSettings.URL_ACCESS_PX1 ) == 0 )
             {
                 status = 1;
             }
         }
-        else if ( url.getPort() == Integer.parseInt( ChannelSettings.OPEN_PORT ) )
+        else if ( inPort == Integer.parseInt( ChannelSettings.OPEN_PORT ) )
         {
-            if ( ChannelSettings.checkURLArray( basePath, ChannelSettings.URL_ACCESS_PX1 ) == 0 )
+            if ( ChannelSettings.checkURLAccess( basePath, ChannelSettings.URL_ACCESS_PX1 ) == 0 )
             {
                 status = 1;
             }
         }
-        else if ( url.getPort() == Integer.parseInt( ChannelSettings.SPECIAL_PORT_X1 ) ) //file server
+        else if ( inPort == Integer.parseInt( ChannelSettings.SPECIAL_PORT_X1 ) ) //file server
         {
             if ( basePath.startsWith( "/rest/kurjun" ) )
             {

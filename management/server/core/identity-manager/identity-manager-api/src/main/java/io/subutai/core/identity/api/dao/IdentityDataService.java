@@ -7,6 +7,7 @@ import io.subutai.core.identity.api.model.Permission;
 import io.subutai.core.identity.api.model.Role;
 import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.identity.api.model.User;
+import io.subutai.core.identity.api.model.UserDelegate;
 import io.subutai.core.identity.api.model.UserToken;
 
 
@@ -36,22 +37,26 @@ public interface IdentityDataService
     /* *************************************************
      *
      */
+    void assignUserRole( User user, Role role );
+
+    /* *************************************************
+         *
+         */
     void removeUserRole( long userId, Role role );
 
 
     /* *************************************************
      *
      */
+    void removeUserRole( User user, Role role );
+
+    /* *************************************************
+         *
+         */
     List<User> getAllUsers();
 
 
-    /* *************************************************
-     *
-     */
-    List<User> getAllSystemUsers();
-
-
-    /* *************************************************
+     /* *************************************************
      *
      */
     void persistUser( User item );
@@ -106,7 +111,19 @@ public interface IdentityDataService
     /* *************************************************
      *
      */
+    void assignRolePermission( Role role, Permission permission );
+
+
+    /* *************************************************
+     *
+     */
     void removeAllRolePermissions( long roleId );
+
+
+    /* *************************************************
+     *
+     */
+    void removeAllRolePermissions( Role role );
 
 
     /*
@@ -143,6 +160,12 @@ public interface IdentityDataService
      */
     void removeRolePermission( long roleId, Permission permission );
 
+
+    /* *************************************************
+     */
+    void removeRolePermission( Role role, Permission permission );
+
+
     /* ******Session************************
      *
      */
@@ -154,16 +177,17 @@ public interface IdentityDataService
     Session getSession( long sessionId );
 
 
-
     /* *************************************************
      *
      */
     List<Session> getSessionsByUserId( long userId );
 
+
     /* *************************************************
      *
      */
     Session getValidSession( long userId );
+
 
     /* *************************************************
      *
@@ -182,6 +206,7 @@ public interface IdentityDataService
      */
     void updateSession( Session item );
 
+
     /* ******UserToken *********************************
     *
     */
@@ -199,15 +224,18 @@ public interface IdentityDataService
      */
     UserToken getValidUserToken( String token );
 
+
     /* *************************************************
      *
      */
     UserToken getUserToken( long userId );
 
+
     /* *************************************************
      *
      */
     UserToken getValidUserToken( long userId );
+
 
     /* *************************************************
      *
@@ -219,6 +247,7 @@ public interface IdentityDataService
      *
      */
     void updateUserToken( UserToken item );
+
 
     /* *************************************************
      *
@@ -236,4 +265,40 @@ public interface IdentityDataService
      *
      */
     void invalidateSessions();
+
+
+    /* ******UserDelegate *********************************
+     *
+     */
+    List<UserDelegate> getAllUserDelegates();
+
+
+    /* *************************************************
+     *
+     */
+    UserDelegate getUserDelegate( String id );
+
+
+    /* *************************************************
+     *
+     */
+    UserDelegate getUserDelegateByUserId( long userId );
+
+
+    /* *************************************************
+     *
+     */
+    void persistUserDelegate( UserDelegate item );
+
+
+    /* *************************************************
+     *
+     */
+    void updateUserDelegate( UserDelegate item );
+
+
+    /* *************************************************
+     *
+     */
+    void removeUserDelegate( String id );
 }

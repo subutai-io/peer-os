@@ -159,12 +159,12 @@
       <!-- Relation-manager -->
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>trust-manager-api</artifactId>
+        <artifactId>object-relation-manager-api</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>trust-manager-impl</artifactId>
+        <artifactId>object-relation-manager-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -975,14 +975,14 @@
   <build>
     <plugins>
 
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-release-plugin</artifactId>
-        <version>2.5.3</version>
-        <configuration>
-          <tagNameFormat>v@{project.version}</tagNameFormat>
-        </configuration>
-      </plugin>
+      <!--<plugin>-->
+        <!--<groupId>org.apache.maven.plugins</groupId>-->
+        <!--<artifactId>maven-release-plugin</artifactId>-->
+        <!--<version>2.5.3</version>-->
+        <!--<configuration>-->
+          <!--<tagNameFormat>v@{project.version}</tagNameFormat>-->
+        <!--</configuration>-->
+      <!--</plugin>-->
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
