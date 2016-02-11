@@ -83,7 +83,9 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 			.success(function (data) {
 				for(var i = 0; i < data.length; i++) {
 					if(data[i].description.includes(environmentId)) {
+						console.log(data[i]);
 						getLogById(data[i].id, true);
+						break;
 					}
 				}
 				return false;
@@ -94,7 +96,7 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 
 	function checkLastLog(status) {
 		var lastLog = vm.logMessages[vm.logMessages.length - 1];
-		lastLog.time = moment().format('h:mm:ss');
+		lastLog.time = moment().format('HH:mm:ss');
 		if(status === true) {
 			lastLog.status = 'success';
 			lastLog.classes = ['fa-check', 'g-text-green'];
@@ -126,7 +128,7 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 					}
 					for(i; i < logs.length; i++) {
 
-						var logTime = moment().format('h:mm:ss');
+						var logTime = moment().format('HH:mm:ss');
 						var logStatus = 'success';
 						var logClasses = ['fa-check', 'g-text-green'];
 						if(i+1 == logs.length) {
@@ -155,6 +157,7 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 					if(data.state == 'FAILED') {
 						checkLastLog(false);
 					} else {
+						SweetAlert.swal("Success!", "Your environment has been built successfully.", "success");
 						checkLastLog(true);
 					}
 				}
@@ -179,14 +182,14 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 
 			currentLog.status = 'success';
 			currentLog.classes = ['fa-check', 'g-text-green'];
-			currentLog.time = moment().format('h:mm:ss');
+			currentLog.time = moment().format('HH:mm:ss');
 
 			loadEnvironments();
 		}).error(function (data) {
 			SweetAlert.swal("ERROR!", "Environment build error. Error: " + data.ERROR, "error");
 			currentLog.status = 'fail';
 			currentLog.classes = ['fa-times', 'g-text-red'];
-			currentLog.time = moment().format('h:mm:ss');
+			currentLog.time = moment().format('HH:mm:ss');
 		});
 
 		$timeout(function() {
@@ -212,9 +215,9 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 				vm.newEnvID = data;
 				currentLog.status = 'success';
 				currentLog.classes = ['fa-check', 'g-text-green'];
-				currentLog.time = moment().format('h:mm:ss');
+				currentLog.time = moment().format('HH:mm:ss');
 
-				var currentLog = {
+				currentLog = {
 					"time": '',
 					"status": 'in-progress',
 					"classes": ['fa-spinner', 'fa-pulse'],
@@ -222,10 +225,10 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 				};
 				vm.logMessages.push(currentLog);
 
-				var logId = getLogsFromTracker(vm.newEnvID);
+				//var logId = getLogsFromTracker(vm.newEnvID);
+				var logId = getLogsFromTracker(vm.environment2BuildName);
 
 			}).error(function(error){
-				//ngDialog.closeAll();
 				if(error && error.ERROR === undefined) {
 					VARS_MODAL_ERROR( SweetAlert, 'Error: ' + error );
 				} else {
@@ -233,7 +236,7 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 				}
 				currentLog.status = 'fail';
 				currentLog.classes = ['fa-times', 'g-text-red'];
-				currentLog.time = moment().format('h:mm:ss');				
+				currentLog.time = moment().format('HH:mm:ss');				
 			});
 	}
 
