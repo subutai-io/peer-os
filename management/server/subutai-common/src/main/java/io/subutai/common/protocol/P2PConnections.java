@@ -36,7 +36,7 @@ public class P2PConnections
         for ( Iterator<P2PConnection> i = connections.iterator(); i.hasNext() && result == null; )
         {
             P2PConnection c = i.next();
-            if ( communityName.equals( c.getCommunityName() ) )
+            if ( communityName.equalsIgnoreCase( c.getCommunityName() ) )
             {
                 result = c;
             }

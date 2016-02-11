@@ -1,0 +1,27 @@
+/*.node {
+  cursor: pointer;
+}
+
+.node circle {
+  fill: #fff;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
+.node text {
+  font-family: 'Ubuntu', sans-serif;
+  font-size: 16px;
+  fill: #04346e;
+}
+
+.link {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 1.5px;
+}*/
+
+.node {
+  font-family: 'Ubuntu', sans-serif;
+  font-size: 16px;
+  color: #04346e;
+}

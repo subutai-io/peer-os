@@ -3,7 +3,6 @@ package io.subutai.core.peer.impl;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
@@ -61,7 +60,6 @@ import io.subutai.common.peer.Timeouts;
 import io.subutai.common.protocol.ControlNetworkConfig;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
-import io.subutai.common.protocol.PingDistance;
 import io.subutai.common.protocol.PingDistances;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.quota.ContainerQuota;
@@ -121,12 +119,12 @@ public class RemotePeerImpl implements RemotePeer
         {
             case ChannelSettings.OPEN_PORT:
             case ChannelSettings.SPECIAL_PORT_X1:
-                url = String.format( "http://%s:%s/rest/v1/peer", peerInfo, peerInfo.getPort() );
+                url = String.format( "http://%s:%s/rest/v1/peer", peerInfo.getIp(), peerInfo.getPort() );
                 break;
             case ChannelSettings.SECURE_PORT_X1:
             case ChannelSettings.SECURE_PORT_X2:
             case ChannelSettings.SECURE_PORT_X3:
-                url = String.format( "https://%s:%s/rest/v1/peer", peerInfo, peerInfo.getPort() );
+                url = String.format( "https://%s:%s/rest/v1/peer", peerInfo.getIp(), peerInfo.getPort() );
                 break;
         }
         this.baseUrl = url;
@@ -176,7 +174,7 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public PeerInfo check() throws PeerException
     {
-        PeerInfo response = new PeerWebClient( localPeerId, peerInfo, provider ).getInfo();
+        PeerInfo response = new PeerWebClient( peerInfo, provider ).getInfo();
         if ( !peerInfo.getId().equals( response.getId() ) )
         {
             throw new PeerException( String.format(
@@ -274,7 +272,7 @@ public class RemotePeerImpl implements RemotePeer
 
         if ( containerId.getEnvironmentId() == null )
         {
-            new PeerWebClient( localPeerId, peerInfo, provider ).startContainer( containerId );
+            new PeerWebClient( peerInfo, provider ).startContainer( containerId );
         }
         else
         {
@@ -292,7 +290,7 @@ public class RemotePeerImpl implements RemotePeer
 
         if ( containerId.getEnvironmentId() == null )
         {
-            new PeerWebClient( localPeerId, peerInfo, provider ).stopContainer( containerId );
+            new PeerWebClient( peerInfo, provider ).stopContainer( containerId );
         }
         else
         {
@@ -308,7 +306,7 @@ public class RemotePeerImpl implements RemotePeer
 
         if ( containerId.getEnvironmentId() == null )
         {
-            new PeerWebClient( localPeerId, peerInfo, provider ).destroyContainer( containerId );
+            new PeerWebClient( peerInfo, provider ).destroyContainer( containerId );
         }
         else
         {
@@ -347,7 +345,7 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public void removePeerEnvironmentKeyPair( final EnvironmentId environmentId ) throws PeerException
     {
-        new PeerWebClient( localPeerId, peerInfo, provider ).removePeerEnvironmentKeyPair( environmentId );
+        new PeerWebClient( peerInfo, provider ).removePeerEnvironmentKeyPair( environmentId );
     }
 
 
@@ -357,7 +355,7 @@ public class RemotePeerImpl implements RemotePeer
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
-        new PeerWebClient( localPeerId, peerInfo, provider ).cleanupEnvironmentNetworkSettings( environmentId );
+        new PeerWebClient( peerInfo, provider ).cleanupEnvironmentNetworkSettings( environmentId );
     }
 
 
@@ -389,7 +387,7 @@ public class RemotePeerImpl implements RemotePeer
 
         if ( containerId.getEnvironmentId() == null )
         {
-            return new PeerWebClient( localPeerId, peerInfo, provider ).getProcessResourceUsage( containerId, pid );
+            return new PeerWebClient( peerInfo, provider ).getProcessResourceUsage( containerId, pid );
         }
         else
         {
@@ -406,7 +404,7 @@ public class RemotePeerImpl implements RemotePeer
 
         if ( containerId.getEnvironmentId() == null )
         {
-            return new PeerWebClient( localPeerId, peerInfo, provider ).getState( containerId );
+            return new PeerWebClient( peerInfo, provider ).getState( containerId );
         }
         else
         {
@@ -744,7 +742,7 @@ public class RemotePeerImpl implements RemotePeer
     {
         Preconditions.checkNotNull( vni, "Invalid vni" );
 
-        return new PeerWebClient( localPeerId, peerInfo, provider ).reserveVni( vni );
+        return new PeerWebClient( peerInfo, provider ).reserveVni( vni );
     }
 
     //************ END ENVIRONMENT SPECIFIC REST
@@ -756,7 +754,7 @@ public class RemotePeerImpl implements RemotePeer
     {
         try
         {
-            return new PeerWebClient( localPeerId, peerInfo, provider ).getGateways();
+            return new PeerWebClient( peerInfo, provider ).getGateways();
         }
         catch ( Exception e )
         {
@@ -768,7 +766,7 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public Set<Vni> getReservedVnis() throws PeerException
     {
-        return new PeerWebClient( localPeerId, peerInfo, provider ).getReservedVnis();
+        return new PeerWebClient( peerInfo, provider ).getReservedVnis();
     }
 
 
@@ -777,7 +775,7 @@ public class RemotePeerImpl implements RemotePeer
     {
         Preconditions.checkNotNull( environmentId, "Invalid environmentId" );
 
-        return new PeerWebClient( localPeerId, peerInfo, provider ).createEnvironmentKeyPair( environmentId );
+        return new PeerWebClient( peerInfo, provider ).createEnvironmentKeyPair( environmentId );
     }
 
 
@@ -796,7 +794,7 @@ public class RemotePeerImpl implements RemotePeer
             final PublicKeyContainer publicKeyContainer =
                     new PublicKeyContainer( environmentId.getId(), publicKeyRing.getPublicKey().getFingerprint(),
                             exportedPubKeyRing );
-            new PeerWebClient( localPeerId, peerInfo, provider ).updateEnvironmentPubKey( publicKeyContainer );
+            new PeerWebClient( peerInfo, provider ).updateEnvironmentPubKey( publicKeyContainer );
         }
         catch ( IOException | PGPException e )
         {
@@ -809,7 +807,7 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public HostInterfaces getInterfaces() throws PeerException
     {
-        return new PeerWebClient( localPeerId, peerInfo, provider ).getInterfaces();
+        return new PeerWebClient( peerInfo, provider ).getInterfaces();
     }
 
 
@@ -818,7 +816,7 @@ public class RemotePeerImpl implements RemotePeer
     {
         Preconditions.checkNotNull( p2PCredentials, "Invalid p2p credentials" );
 
-        new PeerWebClient( localPeerId, peerInfo, provider )
+        new PeerWebClient( peerInfo, provider )
                 .resetP2PSecretKey( p2PCredentials.getP2pHash(), p2PCredentials.getP2pSecretKey(),
                         p2PCredentials.getP2pTtlSeconds() );
     }
@@ -829,7 +827,7 @@ public class RemotePeerImpl implements RemotePeer
     {
         Preconditions.checkNotNull( config, "Invalid p2p config" );
 
-        new PeerWebClient( localPeerId, peerInfo, provider ).setupP2PConnection( config );
+        new PeerWebClient( peerInfo, provider ).setupP2PConnection( config );
     }
 
 
@@ -837,7 +835,7 @@ public class RemotePeerImpl implements RemotePeer
     public void removeP2PConnection( final EnvironmentId environmentId ) throws PeerException
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment ID" );
-        new PeerWebClient( localPeerId, peerInfo, provider ).removeP2PConnection( environmentId );
+        new PeerWebClient( peerInfo, provider ).removeP2PConnection( environmentId );
     }
 
 
@@ -849,21 +847,21 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkArgument( gateway.getVlan() > 0 );
 
 
-        new PeerWebClient( localPeerId, peerInfo, provider ).createGateway( gateway );
+        new PeerWebClient( peerInfo, provider ).createGateway( gateway );
     }
 
 
     @Override
     public ResourceHostMetrics getResourceHostMetrics() throws PeerException
     {
-        return new PeerWebClient( localPeerId, peerInfo, provider ).getResourceHostMetrics();
+        return new PeerWebClient( peerInfo, provider ).getResourceHostMetrics();
     }
 
 
     @Override
     public void alert( final AlertEvent alert ) throws PeerException
     {
-        new PeerWebClient( localPeerId, peerInfo, provider ).alert( alert );
+        new PeerWebClient( peerInfo, provider ).alert( alert );
     }
 
 
@@ -871,29 +869,28 @@ public class RemotePeerImpl implements RemotePeer
     public HistoricalMetrics getHistoricalMetrics( final String hostname, final Date startTime, final Date endTime )
             throws PeerException
     {
-        return new PeerWebClient( localPeerId, peerInfo, provider )
-                .getHistoricalMetrics( hostname, startTime, endTime );
+        return new PeerWebClient( peerInfo, provider ).getHistoricalMetrics( hostname, startTime, endTime );
     }
 
 
     @Override
     public PeerResources getResourceLimits( final String peerId ) throws PeerException
     {
-        return new PeerWebClient( localPeerId, peerInfo, provider ).getResourceLimits( peerId );
+        return new PeerWebClient( peerInfo, provider ).getResourceLimits( peerId );
     }
 
 
     @Override
     public ControlNetworkConfig getControlNetworkConfig( final String localPeerId ) throws PeerException
     {
-        return new PeerWebClient( localPeerId, peerInfo, provider ).getControlNetworkConfig( localPeerId );
+        return new PeerWebClient( peerInfo, provider ).getControlNetworkConfig( localPeerId );
     }
 
 
     @Override
     public boolean updateControlNetworkConfig( final ControlNetworkConfig config ) throws PeerException
     {
-        return new PeerWebClient( localPeerId, peerInfo, provider ).updateControlNetworkConfig( config );
+        return new PeerWebClient( peerInfo, provider ).updateControlNetworkConfig( config );
     }
 
 
@@ -901,7 +898,7 @@ public class RemotePeerImpl implements RemotePeer
     public PingDistances getCommunityDistances( final String communityName, final Integer maxAddress )
             throws PeerException
     {
-        return new PeerWebClient( localPeerId, peerInfo, provider ).getCommunityDistances( communityName, maxAddress );
+        return new PeerWebClient( peerInfo, provider ).getCommunityDistances( communityName, maxAddress );
     }
 
 

@@ -5,6 +5,7 @@ import java.net.URL;
 
 import javax.ws.rs.core.HttpHeaders;
 
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
@@ -91,7 +92,7 @@ public class ClientInInterceptor extends AbstractPhaseInterceptor<Message>
         }
         catch ( Exception ex )
         {
-
+            throw new Fault( ex );
         }
     }
 

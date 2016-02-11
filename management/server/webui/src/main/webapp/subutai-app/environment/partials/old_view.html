@@ -1,0 +1,32 @@
+<div ng-controller="EnvironmentViewCtrl as environmentViewCtrl" class="b-workspace__environments">
+
+	<div ng-include="'subutai-app/common/partials/header.html'"></div>
+
+	<div class="b-workspace__content">
+		<div class="b-tabs-menu">
+			<ul>
+				<li class="b-tabs-menu__item"
+					ng-click="environmentViewCtrl.activeTab = 'installed'"
+					ng-class="environmentViewCtrl.activeTab == 'installed' ? 'b-tabs-menu__item_active' : ''">
+					Installed
+				</li>
+				<li class="b-tabs-menu__item"
+					ng-click="environmentViewCtrl.activeTab = 'pending'"
+					ng-class="environmentViewCtrl.activeTab == 'pending' ? 'b-tabs-menu__item_active' : ''">
+					Pending
+				</li>
+			</ul>
+		</div>
+		<div
+				ng-if="environmentViewCtrl.activeTab == 'installed'"
+				ng-include="'subutai-app/environment/partials/installed.html'">
+		</div>
+
+		<div
+				ng-if="environmentViewCtrl.activeTab == 'pending'"
+				ng-include="'subutai-app/environment/partials/pending.html'">
+		</div>
+
+	</div>
+
+</div>

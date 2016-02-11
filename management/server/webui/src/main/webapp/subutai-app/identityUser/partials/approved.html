@@ -1,4 +1,4 @@
-<div class="b-workspace-content b-workspace-content_border">
+<div class="b-workspace-content g-no-padding">
 	<div class="b-workspace-content__row">
 		<div class="b-main-table-border">
 			<table class="b-main-table b-main-table_with-header">
@@ -6,6 +6,8 @@
 					<th>Username</th>
 					<th>Full name</th>
 					<th>E-mail</th>
+					<th>User type</th>
+					<th>Trust Level</th>
 					<th>Roles</th>
 					<th>Actions</th>
 				</tr>
@@ -16,6 +18,8 @@
 					<td>{{ user.userName }}</td>
 					<td>{{ user.fullName }}</td>
 					<td>{{ user.email }}</td>
+					<td>{{ identityUserCtrl.userTypes[user.type] }}</td>
+					<td>{{ identityUserCtrl.trustedLevels[user.trustLevel] }}</td>
 					<td>
 						<span ng-repeat="(roleKey, role) in user.roles" class="b-tags b-tags_grey">
 							{{ role.name }} 

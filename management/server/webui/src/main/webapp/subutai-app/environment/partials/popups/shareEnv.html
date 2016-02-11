@@ -27,70 +27,69 @@
 	</div>
 	<form class="form-horizontal">
 
-		<div class="b-popup__header">
-			<input type="text"
-				   class="b-popup-body-input b-popup-body-input_role"
-				   ng-model="environmentViewCtrl.currentEnvironment.name" style = "color: #04346E"
-				   required readonly>
-		</div>
+		<!--<div class="b-popup__header">-->
+		<!--</div>-->
 
 		<div class="b-popup__body">
 			<div class="b-popup-body b-popup-body_role b-nav_left">
-				<div class="b-popup-body-list-title ">All roles</div>
-				<div class="b-main-table-border">
-					<table class="b-main-table b-main-table_with-header b-main-table_white-header">
-						<tr>
-							<th>Name</th>
-							<th></th>
-						</tr>
-						<tr ng-repeat="user in environmentViewCtrl.listOfUsers">
-							<td class="b-main-table__name">{{ user.fullName }}</td>
-							<td>
-								<a href
-								   class="b-btn-circle b-btn_green"
-								   ng-click="environmentViewCtrl.addUser2Stack (user)">
-									<i class="fa fa-plus"></i>
-								</a>
-							</td>
-						</tr>
-					</table>
+				<div class="popup-body-box">
+					<div class="b-popup-body-list-title ">Environment name</div>
+					<input type="text"
+						   class="b-popup-body-input b-popup-body-input_role"
+						   ng-model="environmentViewCtrl.currentEnvironment.name" style="color: #04346E"
+						   required readonly>
+				</div>
+				<div class="popup-body-box">
+					<div class="b-popup-body-list-title ">Select user</div>
+					<div class="b-main-table-border" ng-if="environmentViewCtrl.listOfUsers.length > 0">
+						<table class="b-main-table b-main-table_with-header b-main-table_white-header">
+							<tr ng-repeat="user in environmentViewCtrl.listOfUsers"
+								ng-click="environmentViewCtrl.addUser2Stack(user)">
+								<td class="b-main-table__name">{{ user.fullName }}</td>
+							</tr>
+						</table>
+					</div>
+					<span ng-if="environmentViewCtrl.listOfUsers.length <= 0"
+						class="b-popup-body-label">No more users...</span>
 				</div>
 			</div>
 			<div class="b-popup-body b-popup-body_role-100">
-				<div class="b-popup-body-list-title ">Trusted users</div>
-				<div class="b-main-table-border">
-					<table class="b-main-table b-main-table_with-header b-main-table_white-header">
-						<tr>
-							<th>Name</th>
-							<th>Read</th>
-							<th>Write</th>
-							<th>Update</th>
-							<th>Delete</th>
-							<th></th>
-						</tr>
-						<tr ng-repeat="(key, user) in environmentViewCtrl.users2Add">
-							<td class="b-main-table__name">{{ user.fullName }}</td>
-							<td class="b-main-table__checkbox">
-								<input type="checkbox" ng-model="user.read">
-							</td>
-							<td class="b-main-table__checkbox">
-								<input type="checkbox" ng-model="user.write">
-							</td>
-							<td class="b-main-table__checkbox">
-								<input type="checkbox" ng-model="user.update">
-							</td>
-							<td class="b-main-table__checkbox">
-								<input type="checkbox" ng-model="user.delete">
-							</td>
-							<td class="b-main-table__checkbox">
-								<a href
-								   class="b-btn-circle b-btn_red"
-								   ng-click="environmentViewCtrl.removeUserFromStack(key)">
-									<i class="fa fa-times"></i>
-								</a>
-							</td>
-						</tr>
-					</table>
+				<div class="popup-body-box">
+					<div class="b-popup-body-list-title ">Trusted users</div>
+					<div class="b-main-table-border">
+						<table class="b-main-table b-main-table_with-header b-main-table_white-header">
+							<tr>
+								<th>Name</th>
+								<th>Read</th>
+								<th>Write</th>
+								<th>Update</th>
+								<th>Delete</th>
+								<th></th>
+							</tr>
+							<tr ng-repeat="(key, user) in environmentViewCtrl.users2Add"
+								ng-mouseenter="showRemoveLink = true" ng-mouseleave="showRemoveLink = false">
+								<td class="b-main-table__name">{{ user.fullName }}</td>
+								<td class="b-main-table__checkbox">
+									<input type="checkbox" ng-model="user.read">
+								</td>
+								<td class="b-main-table__checkbox">
+									<input type="checkbox" ng-model="user.write">
+								</td>
+								<td class="b-main-table__checkbox">
+									<input type="checkbox" ng-model="user.update">
+								</td>
+								<td class="b-main-table__checkbox">
+									<input type="checkbox" ng-model="user.delete">
+								</td>
+								<td class="b-main-table__checkbox">
+									<a href ng-click="environmentViewCtrl.removeUserFromStack(key)"
+									   ng-style="{'visibility': showRemoveLink ? 'visible' : 'hidden'}">
+										Remove
+									</a>
+								</td>
+							</tr>
+						</table>
+					</div>
 				</div>
 			</div>
 			<div class="clear"></div>

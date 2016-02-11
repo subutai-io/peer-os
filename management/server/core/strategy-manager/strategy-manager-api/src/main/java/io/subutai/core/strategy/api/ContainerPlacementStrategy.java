@@ -4,6 +4,7 @@ package io.subutai.core.strategy.api;
 import java.util.List;
 import java.util.Map;
 
+import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.quota.ContainerQuota;
@@ -21,8 +22,10 @@ public interface ContainerPlacementStrategy
 
     List<NodeSchema> getScheme();
 
-    void setScheme( List<NodeSchema> scheme );
-
     Topology distribute( String environmentName, int sshGroupId, int hostGroupId, PeerGroupResources peerGroupResources,
                          Map<ContainerSize, ContainerQuota> quotas ) throws StrategyException;
+
+    Topology distribute( String environmentName, int sshGroupId, int hostGroupId, List<NodeSchema> nodegroups,
+                         PeerGroupResources peerGroupResources, Map<ContainerSize, ContainerQuota> quotas )
+            throws StrategyException;
 }

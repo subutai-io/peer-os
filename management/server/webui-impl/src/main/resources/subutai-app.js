@@ -99,6 +99,28 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 				}]
 			}
 		})
+		.state('change-pass', {
+			url: '/change-pass',
+			templateUrl: 'subutai-app/login/partials/change-pass.html',
+			data: {
+				bodyClass: '',
+				layout: 'default'
+			},
+			resolve: {
+				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+					return $ocLazyLoad.load([
+						{
+							name: 'subutai.login',
+							files: [
+								'subutai-app/login/login.js',
+								'subutai-app/login/controller.js',
+								'subutai-app/login/service.js'
+							]
+						}
+					])
+				}]
+			}
+		})
 		.state('home', {
 			url: '/',
 			templateUrl: 'subutai-app/monitoring/partials/view.html',
@@ -191,7 +213,8 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 								'subutai-app/environment/environment.js',
 								'subutai-app/environment/controller.js',
 								'subutai-app/environment/service.js',
-								'subutai-app/peerRegistration/service.js'
+								'subutai-app/peerRegistration/service.js',
+								'subutai-app/tracker/service.js'
 							]
 						}
 					]);
@@ -467,6 +490,72 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 				}]
 			}
 		})
+		.state('settings-peer', {
+			url: '/settings-peer',
+			templateUrl: 'subutai-app/settingsPeer/partials/view.html',
+			data: {
+				bodyClass: '',
+				layout: 'default'
+			},
+			resolve: {
+				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+					return $ocLazyLoad.load([
+						{
+							name: 'subutai.settings-peer',
+							files: [
+								'subutai-app/settingsPeer/settingsPeer.js',
+								'subutai-app/settingsPeer/controller.js',
+								'subutai-app/settingsPeer/service.js'
+							]
+						}
+					]);
+				}]
+			}
+		})
+		.state('settings-kurjun', {
+			url: '/settings-kurjun',
+			templateUrl: 'subutai-app/settingsKurjun/partials/view.html',
+			data: {
+				bodyClass: '',
+				layout: 'default'
+			},
+			resolve: {
+				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+					return $ocLazyLoad.load([
+						{
+							name: 'subutai.settings-kurjun',
+							files: [
+								'subutai-app/settingsKurjun/settingsKurjun.js',
+								'subutai-app/settingsKurjun/controller.js',
+								'subutai-app/settingsKurjun/service.js'
+							]
+						}
+					]);
+				}]
+			}
+		})
+		.state('peer-policy', {
+			url: '/peer-policy',
+			templateUrl: 'subutai-app/peerPolicy/partials/view.html',
+			data: {
+				bodyClass: '',
+				layout: 'default'
+			},
+			resolve: {
+				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+					return $ocLazyLoad.load([
+						{
+							name: 'subutai.peer-policy',
+							files: [
+								'subutai-app/peerPolicy/peerPolicy.js',
+								'subutai-app/peerPolicy/controller.js',
+								'subutai-app/peerPolicy/service.js'
+							]
+						}
+					]);
+				}]
+			}
+		})
 		.state('404', {
 			url: '/404',
 			templateUrl: 'subutai-app/common/partials/404.html',
@@ -612,13 +701,13 @@ function VARS_MODAL_ERROR( object, text )
 }
 
 quotaColors = [];
-quotaColors['CUSTOM'] = 'blue';
-quotaColors['HUGE'] = 'bark-red';
-quotaColors['LARGE'] = 'red';
-quotaColors['MEDIUM'] = 'orange';
-quotaColors['SMALL'] = 'yellow';
-quotaColors['TINY'] = 'green';
-quotaColors['INACTIVE'] = 'grey';
+quotaColors['CUSTOM'] = '#000000';
+quotaColors['HUGE'] = '#0071bc';
+quotaColors['LARGE'] = '#22b573';
+quotaColors['MEDIUM'] = '#c1272d';
+quotaColors['SMALL'] = '#fbb03b';
+quotaColors['TINY'] = '#d9e021';
+quotaColors['INACTIVE'] = '#b3b3b3';
 
 var permissionsDefault = [
 	{
@@ -693,3 +782,12 @@ function toggle (source, name) {
 		checkboxes[i].checked = source.checked;
 	}
 }
+
+function hasPGPplugin() {
+	if($('#bp-plugin-version').val().length > 0) {
+		return true;
+	} else {
+		return false;
+	}
+}
+

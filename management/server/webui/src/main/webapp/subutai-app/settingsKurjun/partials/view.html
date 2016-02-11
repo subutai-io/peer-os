@@ -1,0 +1,27 @@
+<div ng-controller="SettingsKurjunCtrl as settingsKurjunCtrl">
+
+	<div class="b-workspace__header">
+		<div ng-include="'subutai-app/common/partials/login-header.html'"></div>
+
+		<h1 class="b-title"><span class="b-title_breadcrumbs">Kurjun Settings</span></h1>
+	</div>
+
+	<div class="b-workspace__content">
+		<div class="b-workspace-content__row">
+			<div class="b-main-table-border" style = "width: 500px">
+				<table class="b-main-table b-main-table_with-header" style = "width: 500px" align = "center">
+					<tr>
+						<th>Global Kurjun URLs</th>
+						<td style = "padding-right: 18px"><input class="b-form-input b-form-input_full" type="text" ng-model="settingsKurjunCtrl.config.globalKurjunUrls" required></td>
+					</tr>
+				</table>
+			</div>
+			<button
+					class="b-btn b-btn_green g-left g-margin-bottom"
+					ng-click="settingsKurjunCtrl.updateConfig()"
+					style = "margin-top: 15px">
+				<i class="fa fa-floppy-o"></i>&#160;&#160;Save
+			</button>
+		</div>
+	</div>
+</div>

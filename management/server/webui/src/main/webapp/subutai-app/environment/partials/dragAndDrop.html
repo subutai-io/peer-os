@@ -18,30 +18,24 @@
 				<div class="b-cloud-tools">
 					<div class="b-tabs-menu b-tabs-menu_cloud-env">
 						<ul>
-							<li class="b-tabs-menu__item b-tabs-menu__item_active" 
-								ng-click="environmentViewCtrl.activeCloudTab = 'templates'" 
+							<li class="b-tabs-menu__item b-tabs-menu__item_active"
+								style="width: 100%" 
+								ng-click="environmentViewCtrl.activeCloudTab = 'templates'"
 								ng-class="environmentViewCtrl.activeCloudTab == 'templates' ? 'b-tabs-menu__item_active' : ''">
 								Templates
-							</li>
-							<li class="b-tabs-menu__item" 
-								ng-click="environmentViewCtrl.activeCloudTab = 'more'" 
-								ng-class="environmentViewCtrl.activeCloudTab == 'more' ? 'b-tabs-menu__item_active' : ''">
-								More
 							</li>
 						</ul>
 					</div>
 					<div class="b-tools-menu js-scrollbar">
 						<ul>
 							<li ng-repeat="template in environmentViewCtrl.templates">
-								<a href="#" 
-									class="js-add-dev-element"
-									data-template="{{ template }}">
+								<a href ng-click="environmentViewCtrl.addContainer(template, $event)">
 									<span class="b-cloud-item">
 										<img
-											src="assets/templates/{{ template }}.jpg"
-											alt="{{ template }}" 
+											ng-src="assets/templates/{{ template }}.jpg"
+											alt="{{ template }}"
 											onError="this.onerror=null;this.src='assets/templates/no-image.jpg';">
-									</span> 
+									</span>
 									<span class="b-cloud-item-text">{{ template }}</span>
 								</a>
 							</li>
@@ -52,17 +46,31 @@
 			<div class="b-cloud__space">
 				<div class="b-cloud-space b-cloud-space_border-right">
 					<div class="b-cloud-space__work">
-						<div 
-							class="b-cloud-space-work" 
-							id="js-environment-creation" 
+						<div
+							class="b-cloud-space-work"
+							id="js-environment-creation"
 							ng-init="environmentViewCtrl.initJointJs()">
+							<div
+								class="js-dropen-menu"
+								style="width: 100px; height: 100px; background-color: red; position: absolute; display: none;">
+							</div>
 						</div>
 						<div class="b-cloud-create-buttons">
-							<button class="b-btn b-btn_white">Cancel</button>
-							<button 
-							class="b-btn b-btn_green" 
+                            <button class="b-btn b-btn_white"
+                                    ng-click="environmentViewCtrl.clearWorkspace()">
+                                Cancel
+                            </button>
+							<button
+							class="b-btn b-btn_green"
+							ng-if="!environmentViewCtrl.isEditing"
 							ng-click="environmentViewCtrl.buildEnvironmentByJoint()">
 								Save
+							</button>
+							<button
+							class="b-btn b-btn_green"
+							ng-if="environmentViewCtrl.isEditing"
+							ng-click="environmentViewCtrl.notifyChanges()">
+								Apply
 							</button>
 						</div>
 					</div>
@@ -115,6 +123,7 @@
 											ng-show = "environment.status === 'HEALTHY'"
 											style = "margin-left: 10px; margin-top: 5px">
 										</a>
+										<a href class="b-icon b-icon_edit" ng-click="environmentViewCtrl.editEnvironment(environment)" style = "margin-left: 10px; margin-top: 5px; visibility: visible"></a>
 										<a href class="b-icon b-icon_remove" ng-click="environmentViewCtrl.destroyEnvironment(environment.id)" style = "margin-left: 10px; margin-top: 5px"></a>
 									</td>
 								</tr>

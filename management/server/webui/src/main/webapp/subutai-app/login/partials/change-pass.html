@@ -1,0 +1,45 @@
+<div ng-controller="ChangePassCtrl as changePassCtrl">
+
+	<div class="b-workspace__header">
+
+		<div ng-include="'subutai-app/common/partials/login-header.html'"></div>
+
+		<h1 class="b-title">Change password</h1>
+	</div>
+
+	<div class="b-workspace__content">
+
+		<div class="b-main-form b-main-form_change-pass">
+
+			<form ng-submit="changePassCtrl.changePass(changePassCtrl.newPassword)" name="changePassForm">
+				<div class="b-main-form__element">
+					<label class="b-popup-body-label b-popup-body-label_inline">New password</label>
+					<input type="password" 
+						ng-model="changePassCtrl.newPassword" 
+						id="js-password" 
+						class="b-popup-body-input" 
+						required>
+				</div><!--
+
+				--><div class="b-main-form__element">
+					<label class="b-popup-body-label b-popup-body-label_inline">Confirm password</label>
+					<input type="password" 
+						ng-model="changePassCtrl.newToken.period" 
+						pw-check="js-password" 
+						name="confirm_password" 
+						class="b-popup-body-input" 
+						required>
+				</div><!--
+
+				--><div class="b-main-form__element">
+					<button class="b-btn b-btn_green" type="submit">Save</button>
+					<div class="clear"></div>
+				</div>
+				<span class="b-form-hint b-form-hint_red" ng-show="changePassForm.confirm_password.$error.pwmatch">Passwords don't match.</span>
+			</form>
+
+		</div>
+	</div>	
+
+</div>
+
