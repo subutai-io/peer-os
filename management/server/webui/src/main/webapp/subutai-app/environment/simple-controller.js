@@ -14,6 +14,7 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 	vm.activeMode = 'simple';
 
 	vm.currentEnvironment = {};
+	vm.currentTemplate = {};
 	vm.buildEnvironment = buildEnvironment;
 	vm.editEnvironment = editEnvironment;
 	vm.notifyChanges = notifyChanges;
@@ -44,11 +45,9 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 	vm.initJointJs = initJointJs;
 	vm.buildEnvironmentByJoint = buildEnvironmentByJoint;
 	vm.clearWorkspace = clearWorkspace;
-	vm.sendToPending = sendToPending;
 	vm.addSettingsToTemplate = addSettingsToTemplate;
 
 	vm.addContainer = addContainer;
-	vm.signKey = signKey;
 	vm.hasPGPplugin = hasPGPplugin();
 
 	environmentService.getTemplates()
@@ -164,7 +163,7 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 			});
 	}
 
-	function buildEnvironment() {
+	/*function buildEnvironment() {
 
 		vm.buildStep = 'showLogs';
 		var currentLog = {
@@ -193,6 +192,49 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 		$timeout(function() {
 			var logId = getLogsFromTracker(vm.newEnvID[0]);
 		}, 3000);
+	}*/
+
+	vm.logMessages = [];
+	function buildEnvironment() {
+		vm.buildStep = 'showLogs';
+
+		vm.logMessages = [];
+		var currentLog = {
+			"time": '',
+			"status": 'in-progress',
+			"classes": ['fa-spinner', 'fa-pulse'],
+			"text": 'Registering environment'
+		};
+		vm.logMessages.push(currentLog);
+
+		environmentService.startEnvironmentAutoBuild(vm.environment2BuildName, JSON.stringify(vm.containers2Build))
+			.success(function(data){
+				vm.newEnvID = data;
+				currentLog.status = 'success';
+				currentLog.classes = ['fa-check', 'g-text-green'];
+				currentLog.time = moment().format('h:mm:ss');
+
+				var currentLog = {
+					"time": '',
+					"status": 'in-progress',
+					"classes": ['fa-spinner', 'fa-pulse'],
+					"text": 'Environment creation has been started'
+				};
+				vm.logMessages.push(currentLog);
+
+				var logId = getLogsFromTracker(vm.newEnvID);
+
+			}).error(function(error){
+				//ngDialog.closeAll();
+				if(error && error.ERROR === undefined) {
+					VARS_MODAL_ERROR( SweetAlert, 'Error: ' + error );
+				} else {
+					VARS_MODAL_ERROR( SweetAlert, 'Error: ' + error.ERROR );
+				}
+				currentLog.status = 'fail';
+				currentLog.classes = ['fa-times', 'g-text-red'];
+				currentLog.time = moment().format('h:mm:ss');				
+			});
 	}
 
 	function notifyChanges() {
@@ -278,41 +320,6 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 			vm.isEditing = false;
 			vm.isApplyingChanges = false;
 		});
-	}
-
-	function destroyEnvironment(environmentId) {
-		SweetAlert.swal({
-				title: "Are you sure?",
-				text: "You will not be able to recover this Environment!",
-				type: "warning",
-				showCancelButton: true,
-				confirmButtonColor: "#ff3f3c",
-				confirmButtonText: "Delete",
-				cancelButtonText: "Cancel",
-				closeOnConfirm: false,
-				closeOnCancel: true,
-				showLoaderOnConfirm: true
-			},
-			function (isConfirm) {
-				if (isConfirm) {
-					SweetAlert.swal(
-						{
-							title : 'Delete!',
-							text : 'Your environment is being deleted!!',
-							timer: VARS_TOOLTIP_TIMEOUT,
-							showConfirmButton: false
-						}
-					);
-
-					environmentService.destroyEnvironment(environmentId).success(function (data) {
-						SweetAlert.swal("Destroyed!", "Your environment has been destroyed.", "success");
-						loadEnvironments();
-					}).error(function (data) {
-						SweetAlert.swal("ERROR!", "Your environment is safe :). Error: " + data.ERROR, "error");
-					});
-					loadEnvironments();
-				}
-			});
 	}
 
 	function editEnvironment(environment) {
@@ -766,58 +773,6 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 		vm.cubeGrowth = 0;
 		vm.templateGrid = [];
 		graph.resetCells();
-	}
-
-	vm.logMessages = [];
-	function sendToPending() {
-		vm.buildStep = 'pgpKey';
-
-		vm.logMessages = [];
-		var currentLog = {
-			"time": '',
-			"status": 'in-progress',
-			"classes": ['fa-spinner', 'fa-pulse'],
-			"text": 'Registering environment'
-		};
-		vm.logMessages.push(currentLog);
-
-		environmentService.startEnvironmentAutoBuild(vm.environment2BuildName, JSON.stringify(vm.containers2Build))
-			.success(function(data){
-				vm.newEnvID = data;
-				currentLog.status = 'success';
-				currentLog.classes = ['fa-check', 'g-text-green'];
-				currentLog.time = moment().format('h:mm:ss');
-
-				var currentLogText = 'Please sign PGP key manually';
-				if(vm.hasPGPplugin) {
-					currentLogText = 'Signing PGP key';
-				}
-
-				currentLog = {
-					"time": '',
-					"status": 'in-progress',
-					"classes": ['fa-spinner', 'fa-pulse'],
-					"text": currentLogText
-				};
-
-				vm.logMessages.push(currentLog);
-			}).error(function(error){
-				ngDialog.closeAll();
-				if(error && error.ERROR === undefined) {
-					VARS_MODAL_ERROR( SweetAlert, 'Error: ' + error );
-				} else {
-					VARS_MODAL_ERROR( SweetAlert, 'Error: ' + error.ERROR );
-				}
-			});
-	}
-
-	function signKey() {
-		checkLastLog(true);
-		if(vm.hasPGPplugin) {
-			buildEnvironment();
-		} else {
-			$('.js-environment-build').prop('disabled', false);
-		}
 	}
 
 	function addSettingsToTemplate(settings) {
