@@ -20,25 +20,25 @@ func IsSubvolumeReadonly(path string) bool {
 }
 
 func SubvolumeClone(src, dst string) {
-	err := exec.Command("btrfs", "subvolume", "snapshot", config.Agent.LxcPrefix+src, config.Agent.LxcPrefix+dst).Run()
+	err := exec.Command("btrfs", "subvolume", "snapshot", src, dst).Run()
 	log.Check(log.FatalLevel, "Creating snapshot", err)
 }
 
 func SubvolumeDestroy(path string) {
-	nestedvol, err := exec.Command("btrfs", "subvolume", "list", "-o", config.Agent.LxcPrefix+path).Output()
-	log.Check(log.WarnLevel, "Getting nested subvolumes in "+config.Agent.LxcPrefix+path, err)
+	nestedvol, err := exec.Command("btrfs", "subvolume", "list", "-o", path).Output()
+	log.Check(log.WarnLevel, "Getting nested subvolumes in "+path, err)
 	scanner := bufio.NewScanner(bytes.NewReader(nestedvol))
 	for scanner.Scan() {
 		line := strings.Fields(scanner.Text())
 		if len(line) > 8 {
-			subvol := strings.Split(line[8], path)
-			if len(subvol) > 1 {
-				SubvolumeDestroy(path + subvol[1])
+			// subvol := strings.Split(line[8], path)
+			if len(line[8]) > 1 {
+				SubvolumeDestroy(GetBtrfsRoot(path) + line[8])
 			}
 		}
 	}
 	qgroupDestroy(path)
-	err = exec.Command("btrfs", "subvolume", "delete", config.Agent.LxcPrefix+path).Run()
+	err = exec.Command("btrfs", "subvolume", "delete", path).Run()
 	log.Check(log.WarnLevel, "Destroying subvolume "+path, err)
 }
 
@@ -48,7 +48,9 @@ func qgroupDestroy(path string) {
 	log.Check(log.WarnLevel, "Destroying qgroup "+path+" "+index, err)
 }
 
+// NEED REFACTORING
 func id(path string) string {
+	path = strings.Replace(path, config.Agent.LxcPrefix, "", -1)
 	out, _ := exec.Command("btrfs", "subvolume", "list", config.Agent.LxcPrefix).Output()
 	scanner := bufio.NewScanner(bytes.NewReader(out))
 	for scanner.Scan() {
@@ -63,9 +65,9 @@ func id(path string) string {
 }
 
 func Receive(src, dst, delta string, parent bool) {
-	args := []string{"receive", "-p", config.Agent.LxcPrefix + src, config.Agent.LxcPrefix + dst}
+	args := []string{"receive", "-p", src, dst}
 	if !parent {
-		args = []string{"receive", config.Agent.LxcPrefix + dst}
+		args = []string{"receive", dst}
 	}
 	receive := exec.Command("btrfs", args...)
 	input, err := os.Open(config.Agent.LxcPrefix + "lxc-data/tmpdir/" + delta)
@@ -91,6 +93,11 @@ func ReadOnly(container string, flag bool) {
 		arg := []string{"property", "set", "-ts", config.Agent.LxcPrefix + path, "ro", strconv.FormatBool(flag)}
 		log.Check(log.FatalLevel, "Setting readonly: "+strconv.FormatBool(flag), exec.Command("btrfs", arg...).Run())
 	}
+}
+
+func SetVolReadOnly(subvol string, flag bool) {
+	arg := []string{"property", "set", "-ts", subvol, "ro", strconv.FormatBool(flag)}
+	log.Check(log.FatalLevel, "Setting readonly: "+strconv.FormatBool(flag), exec.Command("btrfs", arg...).Run())
 }
 
 func Stat(path, index string, raw bool) string {
@@ -156,4 +163,20 @@ func GetChildren(uuid string) []string {
 		}
 	}
 	return child
+}
+
+// GetBtrfsRoot	NEED TO FIX
+// working only one btrfs mount on system
+func GetBtrfsRoot(path string) string {
+	data, err := exec.Command("mount").Output()
+	log.Check(log.FatalLevel, "Find btrfs mount point "+path, err)
+
+	scanner := bufio.NewScanner(bytes.NewReader(data))
+	for scanner.Scan() {
+		line := strings.Fields(scanner.Text())
+		if strings.Contains(line[3], "btrfs") {
+			return (line[2] + "/")
+		}
+	}
+	return ""
 }

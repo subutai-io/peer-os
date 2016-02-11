@@ -3,7 +3,6 @@ package container
 import (
 	"bufio"
 	"errors"
-	"gopkg.in/lxc/go-lxc.v2"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -15,6 +14,8 @@ import (
 	"subutai/lib/net"
 	"subutai/log"
 	"syscall"
+
+	"gopkg.in/lxc/go-lxc.v2"
 )
 
 // All returns list of all containers
@@ -127,9 +128,9 @@ func Destroy(name string) {
 		log.Check(log.FatalLevel, "Stopping container", err)
 	}
 
-	fs.SubvolumeDestroy("lxc/" + name + "-opt")
-	fs.SubvolumeDestroy("lxc-data/" + name + "-home")
-	fs.SubvolumeDestroy("lxc-data/" + name + "-var")
+	fs.SubvolumeDestroy(config.Agent.LxcPrefix + "lxc/" + name + "-opt")
+	fs.SubvolumeDestroy(config.Agent.LxcPrefix + "lxc-data/" + name + "-home")
+	fs.SubvolumeDestroy(config.Agent.LxcPrefix + "lxc-data/" + name + "-var")
 
 	err = c.Destroy()
 	log.Check(log.FatalLevel, "Destroying container", err)
@@ -157,9 +158,9 @@ func Clone(parent, child string) {
 	err = c.Clone(child, lxc.CloneOptions{Backend: backend})
 	log.Check(log.FatalLevel, "Cloning container", err)
 
-	fs.SubvolumeClone("lxc/"+parent+"-opt", "lxc/"+child+"-opt")
-	fs.SubvolumeClone("lxc-data/"+parent+"-home", "lxc-data/"+child+"-home")
-	fs.SubvolumeClone("lxc-data/"+parent+"-var", "lxc-data/"+child+"-var")
+	fs.SubvolumeClone(config.Agent.LxcPrefix+"lxc/"+parent+"-opt", config.Agent.LxcPrefix+"lxc/"+child+"-opt")
+	fs.SubvolumeClone(config.Agent.LxcPrefix+"lxc-data/"+parent+"-home", config.Agent.LxcPrefix+"lxc-data/"+child+"-home")
+	fs.SubvolumeClone(config.Agent.LxcPrefix+"lxc-data/"+parent+"-var", config.Agent.LxcPrefix+"lxc-data/"+child+"-var")
 
 	SetContainerConf(child, [][]string{
 		{"lxc.network.link", ""},
