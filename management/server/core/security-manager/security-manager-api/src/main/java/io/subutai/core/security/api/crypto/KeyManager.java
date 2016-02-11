@@ -105,6 +105,16 @@ public interface KeyManager
     /* ***************************************************************
      *
      */
+    void setPeerOwnerId( String id );
+
+    /* ***************************************************************
+     *
+     */
+    String getPeerOwnerId();
+
+    /* ***************************************************************
+             *
+             */
     PGPPublicKeyRing signKey( PGPSecretKeyRing sourceSecRing, PGPPublicKeyRing targetPubRing, int trustLevel );
 
 

@@ -12,6 +12,7 @@ public class SecurityKeyData
     private String secretKeyringPwd;
     private String manHostId;
     private String manHostKeyFingerprint;
+    private String peerOwnerId;
     private Object jsonProvider;
 
 
@@ -61,4 +62,15 @@ public class SecurityKeyData
         this.jsonProvider = jsonProvider;
     }
 
+
+    public String getPeerOwnerId()
+    {
+        return peerOwnerId;
+    }
+
+
+    public void setPeerOwnerId( final String peerOwnerId )
+    {
+        this.peerOwnerId = peerOwnerId;
+    }
 }

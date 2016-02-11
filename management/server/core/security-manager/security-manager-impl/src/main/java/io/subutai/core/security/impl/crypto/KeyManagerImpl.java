@@ -123,8 +123,6 @@ public class KeyManagerImpl implements KeyManager
 
         try
         {
-            InputStream ownerSecStream = PGPEncryptionUtil.getFileInputStream(
-                    System.getenv( "SUBUTAI_APP_KEYSTORE_PATH" ) + "/owner.public.key" );
             InputStream peerSecStream = PGPEncryptionUtil.getFileInputStream(
                     System.getenv( "SUBUTAI_APP_KEYSTORE_PATH" ) + "/peer.secret.key" );
             InputStream peerPubStream = PGPEncryptionUtil.getFileInputStream(
@@ -138,17 +136,14 @@ public class KeyManagerImpl implements KeyManager
             else
             {
                 PGPPublicKeyRing peerPubRing  = PGPKeyUtil.readPublicKeyRing( peerPubStream );
-                PGPPublicKeyRing ownerPubRing = PGPKeyUtil.readPublicKeyRing( ownerSecStream );
                 PGPSecretKeyRing peerSecRing  = PGPKeyUtil.readSecretKeyRing( peerSecStream );
 
                 String peerId  = PGPKeyUtil.getFingerprint( peerPubRing.getPublicKey().getFingerprint() );
-                String ownerId = "owner-"+peerId;
 
                 keyData.setManHostId( peerId );
 
                 saveSecretKeyRing( peerId, SecurityKeyType.PeerKey.getId(),peerSecRing);
                 savePublicKeyRing( peerId, SecurityKeyType.PeerKey.getId(), peerPubRing );
-                savePublicKeyRing( ownerId, SecurityKeyType.PeerOwnerKey.getId(), ownerPubRing );
                 //************************************************************
             }
                 //************************************************************
@@ -169,6 +164,24 @@ public class KeyManagerImpl implements KeyManager
         return keyData.getManHostId();
     }
 
+
+    /* ***************************************************************
+     *
+     */
+    @Override
+    public void setPeerOwnerId(String id)
+    {
+        keyData.setPeerOwnerId( id );
+    }
+
+    /* ***************************************************************
+     *
+     */
+    @Override
+    public String getPeerOwnerId()
+    {
+        return keyData.getPeerOwnerId();
+    }
 
     /* ***************************************************************
      *

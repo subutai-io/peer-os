@@ -26,6 +26,12 @@ public interface IdentityDataService
     /* *************************************************
      *
      */
+    User getUserByKeyId( String keyId );
+
+
+    /* *************************************************
+     *
+     */
     User getUser( long userId );
 
     /* *************************************************
@@ -301,4 +307,5 @@ public interface IdentityDataService
      *
      */
     void removeUserDelegate( String id );
+
 }
