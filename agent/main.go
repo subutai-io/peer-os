@@ -1,12 +1,13 @@
 package main
 
 import (
-	"github.com/codegangsta/cli"
 	"os"
 	"subutai/agent"
 	"subutai/cli"
 	"subutai/config"
 	"subutai/log"
+
+	"github.com/codegangsta/cli"
 )
 
 func init() {
@@ -246,6 +247,21 @@ func main() {
 		Name: "unregister", Usage: "unregister Subutai container",
 		Action: func(c *cli.Context) {
 			lib.LxcUnregister(c.Args().Get(0))
+		}}, {
+
+		Name: "backup", Usage: "backup Subutai container",
+		Flags: []cli.Flag{
+			cli.BoolFlag{Name: "full", Usage: "make full backup"}},
+		Action: func(c *cli.Context) {
+			lib.BackupContainer(c.Args().Get(0), c.Bool("full"))
+		}}, {
+
+		Name: "restore", Usage: "restore Subutai container",
+		Flags: []cli.Flag{
+			cli.StringFlag{Name: "d", Usage: "date of backup snapshot"},
+			cli.StringFlag{Name: "c", Usage: "name of new container"}},
+		Action: func(c *cli.Context) {
+			lib.RestoreContainer(c.Args().Get(0), c.Args().Get(1), c.Args().Get(2))
 		}},
 	}
 
