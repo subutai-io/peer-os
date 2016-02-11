@@ -2952,6 +2952,19 @@ td.b-main-table__status-col {
     right: 56%;
     border-radius: 2px;
 }
+
+.b-pgp-page-block {
+	width: 420px;
+}
+
+.b-pgp-page-block__buttons {
+	padding: 15px 0 0 0;
+}
+
+.b-pgp-page-block__buttons .b-btn {
+	float: right;
+}
+
 .js-btn-build-show-message_hide {
     display: none;
 }
