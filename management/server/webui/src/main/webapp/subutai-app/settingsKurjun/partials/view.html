@@ -14,6 +14,44 @@
 						<th>Global Kurjun URLs</th>
 						<td style = "padding-right: 18px"><input class="b-form-input b-form-input_full" type="text" ng-model="settingsKurjunCtrl.config.globalKurjunUrls" required></td>
 					</tr>
+          <tr>
+            <th colspan="2">Transfer Quota fields (Public repository)</th>
+          </tr>
+          <tr>
+            <th>Disk Quota</th>
+            <td style = "padding-right: 18px"><input class="b-form-input b-form-input_full" type="text" ng-model="settingsKurjunCtrl.config.publicDiskQuota" required></td>
+          </tr>
+          <tr>
+            <th>Threshold</th>
+            <td style = "padding-right: 18px"><input class="b-form-input b-form-input_full" type="text" ng-model="settingsKurjunCtrl.config.publicThreshold" required></td>
+          </tr>
+          <tr>
+            <th>TimeFrame</th>
+            <td style = "padding-right: 18px"><input class="b-form-input b-form-input_full" type="text" ng-model="settingsKurjunCtrl.config.publicTimeFrame" required></td>
+          </tr>
+          <tr>
+            <th>TimeUnit</th>
+            <td style = "padding-right: 18px"><input class="b-form-input b-form-input_full" type="text" ng-model="settingsKurjunCtrl.config.publicTimeUnit" required></td>
+          </tr>
+          <tr>
+            <th colspan="2">Transfer Quota fields (Trust repository)</th>
+          </tr>
+          <tr>
+            <th>Disk Quota</th>
+            <td style = "padding-right: 18px"><input class="b-form-input b-form-input_full" type="text" ng-model="settingsKurjunCtrl.config.trustDiskQuota" required></td>
+          </tr>
+          <tr>
+            <th>Threshold</th>
+            <td style = "padding-right: 18px"><input class="b-form-input b-form-input_full" type="text" ng-model="settingsKurjunCtrl.config.trustThreshold" required></td>
+          </tr>
+          <tr>
+            <th>TimeFrame</th>
+            <td style = "padding-right: 18px"><input class="b-form-input b-form-input_full" type="text" ng-model="settingsKurjunCtrl.config.trustTimeFrame" required></td>
+          </tr>
+          <tr>
+            <th>TimeUnit</th>
+            <td style = "padding-right: 18px"><input class="b-form-input b-form-input_full" type="text" ng-model="settingsKurjunCtrl.config.trustTimeUnit" required></td>
+          </tr>
 				</table>
 			</div>
 			<button

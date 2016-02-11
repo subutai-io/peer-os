@@ -284,7 +284,10 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
 
         for ( final ContainerInfo containerInfo : registrationRequest.getHostInfos() )
         {
-            importHostPublicKey( containerInfo.getId(), containerInfo.getPublicKey() );
+            if ( !"management".equals( containerInfo.getHostname() ) )
+            {
+                importHostPublicKey( containerInfo.getId(), containerInfo.getPublicKey() );
+            }
         }
 
         //TODO @Talas implement this method correctly asap. Temporarily disabling it

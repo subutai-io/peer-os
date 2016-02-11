@@ -1,10 +1,13 @@
 package io.subutai.common.settings;
 
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
+import java.util.Objects;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
 
 
 /**
@@ -12,66 +15,76 @@ import java.util.Properties;
  */
 public class PeerSettings
 {
-    private static Properties PROPERTIES = loadProperties();
+    private static final Logger LOG = LoggerFactory.getLogger( PeerSettings.class );
+    private static PropertiesConfiguration PROPERTIES = loadProperties();
 
-    public static Properties loadProperties()
+
+    public static PropertiesConfiguration loadProperties()
     {
-        Properties prop = new Properties();
-        InputStream input = null;
+        PropertiesConfiguration config = null;
         try
         {
-            input = new FileInputStream( String.format( "%s/peer.cfg", Common.KARAF_ETC ) );
-            prop.load( input );
+            config = new PropertiesConfiguration( String.format( "%s/peer.cfg", Common.KARAF_ETC ) );
         }
-        catch ( IOException ex )
+        catch ( ConfigurationException e )
         {
-            ex.printStackTrace();
+            LOG.error( "Error in loading peer.cfg file." );
+            e.printStackTrace();
         }
-        finally
-        {
-            if ( input != null )
-            {
-                try
-                {
-                    input.close();
-                }
-                catch ( IOException e )
-                {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return prop;
+        return config;
     }
 
-    public static String getExternalIpInterface()
+
+    public static Object getExternalIpInterface()
     {
         return PROPERTIES.getProperty( "externalIpInterface" );
     }
 
 
-    public static String getEncryptionState()
+    public static boolean getEncryptionState()
     {
-        return PROPERTIES.getProperty( "encryptionEnabled" );
+        String state = String.valueOf( PROPERTIES.getProperty( "encryptionEnabled" ) );
+        return Objects.equals( state, "true" );
     }
 
 
-    public static String getRestEncryptionState()
+    public static boolean getRestEncryptionState()
     {
-        return PROPERTIES.getProperty( "restEncryptionEnabled" );
+        String state = String.valueOf( PROPERTIES.getProperty( "restEncryptionEnabled" ) );
+        return Objects.equals( state, "true" );
     }
 
 
-    public static String getIntegrationState()
+    public static boolean getIntegrationState()
     {
-        return PROPERTIES.getProperty( "integrationEnabled" );
+        String state = String.valueOf( PROPERTIES.getProperty( "integrationEnabled" ) );
+        return Objects.equals( state, "true" );
     }
 
 
-    public static String getKeyTrustCheckState()
+    public static boolean getKeyTrustCheckState()
     {
-        return PROPERTIES.getProperty( "keyTrustCheckEnabled" );
+        String state = String.valueOf( PROPERTIES.getProperty( "keyTrustCheckEnabled" ) );
+        return Objects.equals( state, "true" );
     }
 
 
+    public static void setSettings( final String externalIpInterface, final boolean encryptionState,
+                                    final boolean restEncryptionState, final boolean integrationState,
+                                    final boolean keyTrustCheckState )
+    {
+        try
+        {
+            PROPERTIES.setProperty( "externalIpInterface", externalIpInterface );
+            PROPERTIES.setProperty( "encryptionEnabled", encryptionState );
+            PROPERTIES.setProperty( "restEncryptionEnabled", restEncryptionState );
+            PROPERTIES.setProperty( "integrationEnabled", integrationState );
+            PROPERTIES.setProperty( "keyTrustCheckEnabled", keyTrustCheckState );
+            PROPERTIES.save();
+        }
+        catch ( ConfigurationException e )
+        {
+            e.printStackTrace();
+        }
+    }
 }

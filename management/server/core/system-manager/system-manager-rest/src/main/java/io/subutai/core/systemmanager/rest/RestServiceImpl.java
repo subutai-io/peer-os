@@ -3,16 +3,14 @@ package io.subutai.core.systemmanager.rest;
 
 import javax.ws.rs.core.Response;
 
-import io.subutai.common.about.SubutaiInfo;
 import io.subutai.common.peer.PeerPolicy;
-import io.subutai.common.settings.KurjunSettings;
-import io.subutai.common.settings.PeerSettings;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.systemmanager.api.SystemManager;
-import io.subutai.core.systemmanager.rest.pojo.KurjunSettingsPojo;
-import io.subutai.core.systemmanager.rest.pojo.PeerSettingsPojo;
-import io.subutai.core.systemmanager.rest.pojo.VersionPojo;
+import io.subutai.core.systemmanager.api.pojo.ChannelSettings;
+import io.subutai.core.systemmanager.api.pojo.KurjunSettings;
+import io.subutai.core.systemmanager.api.pojo.PeerSettings;
+import io.subutai.core.systemmanager.api.pojo.SystemInfo;
 
 
 /**
@@ -27,17 +25,7 @@ public class RestServiceImpl implements RestService
     @Override
     public Response getSubutaiInfo()
     {
-        VersionPojo pojo = new VersionPojo();
-
-        pojo.setGitCommitId( SubutaiInfo.getCommitId() );
-        pojo.setGitBranch( SubutaiInfo.getBranch() );
-        pojo.setGitCommitUserName( SubutaiInfo.getCommitterUserName() );
-        pojo.setGitCommitUserEmail( SubutaiInfo.getCommitterUserEmail() );
-        pojo.setGitBuildUserName( SubutaiInfo.getBuilderUserName() );
-        pojo.setGitBuildUserEmail( SubutaiInfo.getBuilderUserEmail() );
-        pojo.setGitBuildTime( SubutaiInfo.getBuildTime() );
-        pojo.setProjectVersion( SubutaiInfo.getVersion() );
-
+        SystemInfo pojo = systemManager.getSystemInfo();
         String projectInfo = JsonUtil.GSON.toJson( pojo );
 
         return Response.status( Response.Status.OK ).entity( projectInfo ).build();
@@ -47,14 +35,7 @@ public class RestServiceImpl implements RestService
     @Override
     public Response getPeerSettings()
     {
-        PeerSettingsPojo pojo = new PeerSettingsPojo();
-
-        pojo.setExternalIpInterface( PeerSettings.getExternalIpInterface() );
-        pojo.setEncryptionState( PeerSettings.getEncryptionState() );
-        pojo.setRestEncryptionState( PeerSettings.getRestEncryptionState() );
-        pojo.setIntegrationState( PeerSettings.getIntegrationState() );
-        pojo.setKeyTrustCheckState( PeerSettings.getKeyTrustCheckState() );
-
+        PeerSettings pojo = systemManager.getPeerSettings();
         String peerSettingsInfo = JsonUtil.GSON.toJson( pojo );
 
         return Response.status( Response.Status.OK ).entity( peerSettingsInfo ).build();
@@ -64,10 +45,7 @@ public class RestServiceImpl implements RestService
     @Override
     public Response getKurjunSettings()
     {
-        KurjunSettingsPojo pojo = new KurjunSettingsPojo();
-
-        pojo.setGlobalKurjunUrls( KurjunSettings.getGlobalKurjunUrls() );
-
+        KurjunSettings pojo = systemManager.getKurjunSettings();
         String kurjunSettingsInfo = JsonUtil.GSON.toJson( pojo );
 
         return Response.status( Response.Status.OK ).entity( kurjunSettingsInfo ).build();
@@ -77,9 +55,19 @@ public class RestServiceImpl implements RestService
     @Override
     public Response getPeerPolicy()
     {
-        PeerPolicy peerPolicy =  peerManager.getPolicy( peerManager.getLocalPeer().getId() );
+        PeerPolicy peerPolicy = peerManager.getPolicy( peerManager.getLocalPeer().getId() );
 
         return Response.status( Response.Status.OK ).entity( peerPolicy ).build();
+    }
+
+
+    @Override
+    public Response getChannelSettings()
+    {
+        ChannelSettings pojo = systemManager.getChannelSettings();
+        String channelSettingsInfo = JsonUtil.GSON.toJson( pojo );
+
+        return Response.status( Response.Status.OK ).entity( channelSettingsInfo ).build();
     }
 
 
