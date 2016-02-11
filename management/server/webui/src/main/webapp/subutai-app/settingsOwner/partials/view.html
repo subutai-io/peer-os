@@ -1,0 +1,31 @@
+<div ng-controller="SettingsOwnerCtrl as settingsOwnerCtrl">
+
+  <div class="b-workspace__header">
+    <div ng-include="'subutai-app/common/partials/login-header.html'"></div>
+
+    <h1 class="b-title"><span class="b-title_breadcrumbs">Peer Settings</span></h1>
+  </div>
+
+  <div class="b-workspace__content">
+    <div class="b-workspace-content__row">
+      <div class="b-main-table-border" style = "width: 500px">
+        <table class="b-main-table b-main-table_with-header" style = "width: 500px" align = "center">
+          <tr>
+            <th>Current Owner ID</th>
+            <td style = "padding-right: 18px"><input class="b-form-input b-form-input_full" type="text" ng-model="settingsOwnerCtrl.config.peerOwnerId" required></td>
+          </tr>
+          <tr>
+            <th>Current Owner Name</th>
+            <td style = "padding-right: 18px"><input class="b-form-input b-form-input_full" type="text" ng-model="settingsOwnerCtrl.config.userPeerOwnerName" required></td>
+          </tr>
+        </table>
+      </div>
+      <button
+          class="b-btn b-btn_green g-left g-margin-bottom"
+          ng-click="settingsOwnerCtrl.updateConfig()"
+          style = "margin-top: 15px">
+        <i class="fa fa-floppy-o"></i>&#160;&#160;Set Peer Owner
+      </button>
+    </div>
+  </div>
+</div>
