@@ -9,6 +9,7 @@ import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.systemmanager.api.SystemManager;
 import io.subutai.core.systemmanager.api.pojo.ChannelSettings;
 import io.subutai.core.systemmanager.api.pojo.KurjunSettings;
+import io.subutai.core.systemmanager.api.pojo.PeerOwner;
 import io.subutai.core.systemmanager.api.pojo.PeerSettings;
 import io.subutai.core.systemmanager.api.pojo.SystemInfo;
 
@@ -68,6 +69,24 @@ public class RestServiceImpl implements RestService
         String channelSettingsInfo = JsonUtil.GSON.toJson( pojo );
 
         return Response.status( Response.Status.OK ).entity( channelSettingsInfo ).build();
+    }
+
+
+    @Override
+    public Response setPeerOwner()
+    {
+        systemManager.setPeerOwner();
+        return Response.status( Response.Status.OK ).build();
+    }
+
+
+    @Override
+    public Response getPeerOwner()
+    {
+        PeerOwner pojo = systemManager.getPeerOwnerInfo();
+        String peerOwnerInfo = JsonUtil.GSON.toJson( pojo );
+
+        return Response.status( Response.Status.OK ).entity( peerOwnerInfo ).build();
     }
 
 

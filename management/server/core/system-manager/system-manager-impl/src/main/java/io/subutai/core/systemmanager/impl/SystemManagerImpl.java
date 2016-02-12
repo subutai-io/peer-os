@@ -2,15 +2,19 @@ package io.subutai.core.systemmanager.impl;
 
 
 import io.subutai.common.settings.SubutaiInfo;
+import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.model.User;
 import io.subutai.core.kurjun.api.KurjunTransferQuota;
 import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.systemmanager.api.SystemManager;
 import io.subutai.core.systemmanager.api.pojo.ChannelSettings;
 import io.subutai.core.systemmanager.api.pojo.KurjunSettings;
+import io.subutai.core.systemmanager.api.pojo.PeerOwner;
 import io.subutai.core.systemmanager.api.pojo.PeerSettings;
 import io.subutai.core.systemmanager.api.pojo.SystemInfo;
 import io.subutai.core.systemmanager.impl.pojo.ChannelSettingsPojo;
 import io.subutai.core.systemmanager.impl.pojo.KurjunSettingsPojo;
+import io.subutai.core.systemmanager.impl.pojo.PeerOwnerPojo;
 import io.subutai.core.systemmanager.impl.pojo.PeerSettingsPojo;
 import io.subutai.core.systemmanager.impl.pojo.SystemInfoPojo;
 
@@ -21,6 +25,7 @@ import io.subutai.core.systemmanager.impl.pojo.SystemInfoPojo;
 public class SystemManagerImpl implements SystemManager
 {
     private TemplateManager templateManager;
+    private IdentityManager identityManager;
 
 
     @Override
@@ -107,6 +112,28 @@ public class SystemManagerImpl implements SystemManager
 
 
     @Override
+    public void setPeerOwner()
+    {
+        identityManager.setPeerOwner( identityManager.getActiveUser() );
+    }
+
+
+    @Override
+    public PeerOwner getPeerOwnerInfo()
+    {
+        String peerOwnerId = identityManager.getPeerOwnerId();
+        User user = identityManager.getUserByKeyId( peerOwnerId );
+
+        PeerOwner pojo = new PeerOwnerPojo();
+
+        pojo.setPeerOwnerId( peerOwnerId );
+        pojo.setUserPeerOwnerName( user.getUserName() );
+
+        return pojo;
+    }
+
+
+    @Override
     public ChannelSettings getChannelSettings()
     {
         ChannelSettings pojo = new ChannelSettingsPojo();
@@ -130,5 +157,11 @@ public class SystemManagerImpl implements SystemManager
     public void setTemplateManager( final TemplateManager templateManager )
     {
         this.templateManager = templateManager;
+    }
+
+
+    public void setIdentityManager( final IdentityManager identityManager )
+    {
+        this.identityManager = identityManager;
     }
 }

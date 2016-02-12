@@ -1,30 +1,32 @@
 <div ng-controller="EnvironmentViewCtrl as environmentViewCtrl" class="b-workspace__environments">
 
-	<div ng-include="'subutai-app/common/partials/header.html'"></div>
+	<div class="b-workspace__header b-workspace__header_cloud-env">
 
-	<div class="b-workspace__content">
-		<div class="b-tabs-menu">
-			<ul>
-				<li class="b-tabs-menu__item"
-					ng-click="environmentViewCtrl.activeTab = 'installed'"
-					ng-class="environmentViewCtrl.activeTab == 'installed' ? 'b-tabs-menu__item_active' : ''">
-					Installed
-				</li>
-				<li class="b-tabs-menu__item"
-					ng-click="environmentViewCtrl.activeTab = 'pending'"
-					ng-class="environmentViewCtrl.activeTab == 'pending' ? 'b-tabs-menu__item_active' : ''">
-					Pending
-				</li>
-			</ul>
-		</div>
-		<div
-				ng-if="environmentViewCtrl.activeTab == 'installed'"
-				ng-include="'subutai-app/environment/partials/installed.html'">
+		<div ng-include="'subutai-app/common/partials/login-header.html'"></div>
+
+		<div class="b-switcher">
+			<div class="b-toggle b-toggle_cloud">
+				<input type="checkbox" 
+					class="b-check" 
+					ng-model="environmentMode" 
+					ng-change="environmentViewCtrl.chengeMode(environmentMode)">
+
+				<div class="b-toggle-bg"></div>
+				<b class="b-b b-switch"></b>
+			</div>
 		</div>
 
+	</div>
+
+	<div class="b-workspace__content b-workspace__content_cloud-env">
 		<div
-				ng-if="environmentViewCtrl.activeTab == 'pending'"
-				ng-include="'subutai-app/environment/partials/pending.html'">
+				ng-if="environmentViewCtrl.activeMode == 'simple'"
+				ng-include="'subutai-app/environment/partials/simple.html'">
+		</div>
+
+		<div
+				ng-if="environmentViewCtrl.activeMode == 'advanced'"
+				ng-include="'subutai-app/environment/partials/advanced.html'">
 		</div>
 
 	</div>

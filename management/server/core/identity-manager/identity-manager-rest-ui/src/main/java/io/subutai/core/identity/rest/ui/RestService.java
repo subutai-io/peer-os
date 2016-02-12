@@ -36,7 +36,7 @@ public interface RestService
     Response saveUser( @FormParam( "username" ) String username, @FormParam( "full_name" ) String fullName,
                        @FormParam( "password" ) String password, @FormParam( "email" ) String email,
                        @FormParam( "roles" ) String roles, @FormParam( "user_id" ) Long userId,
-                       @FormParam( "public_key" ) String publicKey );
+                       @FormParam( "trustLevel" ) String trustLevel );
 
     @POST
     @Path("/approve-delegate")
