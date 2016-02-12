@@ -11,7 +11,7 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 	var GRID_CELL_SIZE = 100;
 	var GRID_SIZE = 100;
 
-	vm.activeMode = 'simple';
+	vm.popupLogState = 'full';
 
 	vm.currentEnvironment = {};
 	vm.currentTemplate = {};
@@ -48,7 +48,7 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 	vm.addSettingsToTemplate = addSettingsToTemplate;
 
 	vm.addContainer = addContainer;
-	vm.hasPGPplugin = hasPGPplugin();
+	vm.minimizeLogs = minimizeLogs;
 
 	environmentService.getTemplates()
 		.success(function (data) {
@@ -77,6 +77,24 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 	environmentService.getPeers().success(function (data) {
 		vm.peerIds = data;
 	});
+
+	function minimizeLogs() {
+		var that = $('.ngdialog');
+		var dialogOverlay = that.find('.ngdialog-overlay');
+		if(vm.popupLogState == 'full') {
+			vm.popupLogState = 'min';
+			that.addClass('ngdialog_minimize');
+			dialogOverlay.css({
+				'top': ($(window).height() - 47) + 'px'
+			});
+		} else {
+			vm.popupLogState = 'full';
+			that.removeClass('ngdialog_minimize');
+			dialogOverlay.css({
+				'top': 0
+			});
+		}
+	}
 
 	function getLogsFromTracker(environmentId) {
 		trackerSrv.getOperations('ENVIRONMENT MANAGER', moment().format('YYYY-MM-DD'), moment().format('YYYY-MM-DD'), 100)
@@ -165,37 +183,6 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 				console.log(error);
 			});
 	}
-
-	/*function buildEnvironment() {
-
-		vm.buildStep = 'showLogs';
-		var currentLog = {
-			"time": '',
-			"status": 'in-progress',
-			"classes": ['fa-spinner', 'fa-pulse'],
-			"text": 'Environment creation has been started'
-		};
-		vm.logMessages.push(currentLog);
-
-		environmentService.startEnvironmentBuild (vm.newEnvID[0], encodeURIComponent(vm.newEnvID[1])).success(function (data) {
-			SweetAlert.swal("Success!", "Your environment has been built successfully.", "success");
-
-			currentLog.status = 'success';
-			currentLog.classes = ['fa-check', 'g-text-green'];
-			currentLog.time = moment().format('HH:mm:ss');
-
-			loadEnvironments();
-		}).error(function (data) {
-			SweetAlert.swal("ERROR!", "Environment build error. Error: " + data.ERROR, "error");
-			currentLog.status = 'fail';
-			currentLog.classes = ['fa-times', 'g-text-red'];
-			currentLog.time = moment().format('HH:mm:ss');
-		});
-
-		$timeout(function() {
-			var logId = getLogsFromTracker(vm.newEnvID[0]);
-		}, 3000);
-	}*/
 
 	vm.logMessages = [];
 	function buildEnvironment() {
@@ -670,7 +657,8 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 
 		$('.js-scrollbar').perfectScrollbar();
 
-		paper.$el.on('mousewheel DOMMouseScroll', onMouseWheel);
+		//zoom on scroll
+		/*paper.$el.on('mousewheel DOMMouseScroll', onMouseWheel);
 
 		function onMouseWheel(e) {
 
@@ -696,7 +684,7 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 			// Transform point into the viewport coordinate system.
 			var pointTransformed = svgPoint.matrixTransform(paper.viewport.getCTM().inverse());
 			return pointTransformed;
-		}
+		}*/
 	}
 
 	vm.buildStep = 'confirm';

@@ -58,6 +58,12 @@
   left: 0;
 }
 
+.ngdialog_minimize {
+	position: absolute;
+	bottom: auto;
+	right: auto;
+}
+
 .ngdialog-overlay {
 	position: fixed;
 	background: rgba(0, 0, 0, 0.4);
@@ -71,6 +77,13 @@
 	display: flex;
 	justify-content: center;
 	align-items: center; 
+    /*transition: all 0.2s ease-out;*/
+}
+
+.ngdialog_minimize .ngdialog-overlay {
+	display: absolute;
+	bottom: auto;
+	right: auto;
 }
 
 .ngdialog.ngdialog-closing .ngdialog-overlay {

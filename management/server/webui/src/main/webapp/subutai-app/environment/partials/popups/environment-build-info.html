@@ -1,7 +1,8 @@
 <div class="b-popup b-popup_middle">
 	<div class="b-popup__header">
 		Build Environment
-		<a href ng-click="closeThisDialog()"><i class="fa fa-times g-right"></i></a>
+		<a href ng-click="closeThisDialog()" class="b-popup-header-controls"><i class="fa fa-times"></i></a>
+		<a href ng-click="environmentSimpleViewCtrl.minimizeLogs()" class="b-popup-header-controls"><i class="fa fa-minus"></i></a>
 	</div>
 
 	<div class="b-popup__body" ng-if="environmentSimpleViewCtrl.buildStep == 'confirm'">

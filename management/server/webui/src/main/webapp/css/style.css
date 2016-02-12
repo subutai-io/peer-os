@@ -1041,6 +1041,15 @@ tip.description-tooltip {
     width: 430px;
 }
 
+.b-popup-header-controls {
+	float: right;
+	margin: 0 0 0 10px;
+}
+
+.b-popup-header-controls:last-child {
+	margin-left: 0;
+}
+
 .b-popup__header {
     box-sizing: border-box;
     width: 100%;
