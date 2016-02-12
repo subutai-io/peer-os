@@ -76,10 +76,7 @@ public interface RestService
                                 @FormParam( "gatewayIp" ) String gatewayIp );
 
 
-    @POST
-    @Path( "gateways" )
-    @Consumes( MediaType.APPLICATION_JSON )
-    Response createGateway( Gateway gateway );
+    ;
 
 
     @POST

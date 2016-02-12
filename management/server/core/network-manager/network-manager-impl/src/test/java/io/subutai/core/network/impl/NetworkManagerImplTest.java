@@ -23,12 +23,12 @@ import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.protocol.P2PConnection;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.settings.Common;
 import io.subutai.core.network.api.ContainerInfo;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
-import io.subutai.common.protocol.P2PConnection;
 import io.subutai.core.peer.api.PeerManager;
 import junit.framework.TestCase;
 
@@ -183,18 +183,6 @@ public class NetworkManagerImplTest
 
 
     @Test
-    public void testSetupGateway() throws Exception
-    {
-        networkManager.setupGateway( GATEWAY_IP, VLAN_ID );
-
-
-        verify( localPeer ).getManagementHost();
-        verify( commands ).getSetupGatewayCommand( GATEWAY_IP, VLAN_ID );
-        verify( managementHost ).execute( any( RequestBuilder.class ) );
-    }
-
-
-    @Test
     public void testRemoveGateway() throws Exception
     {
         networkManager.removeGateway( VLAN_ID );
@@ -203,18 +191,6 @@ public class NetworkManagerImplTest
         verify( localPeer ).getManagementHost();
         verify( commands ).getRemoveGatewayCommand( VLAN_ID );
         verify( managementHost ).execute( any( RequestBuilder.class ) );
-    }
-
-
-    @Test
-    public void testSetupGatewayOnContainer() throws Exception
-    {
-        networkManager.setupGatewayOnContainer( CONTAINER_NAME, GATEWAY_IP, INTERFACE_NAME );
-
-
-        verify( localPeer ).getContainerHostByName( CONTAINER_NAME );
-        verify( commands ).getSetupGatewayOnContainerCommand( GATEWAY_IP, INTERFACE_NAME );
-        verify( containerHost ).execute( any( RequestBuilder.class ) );
     }
 
 

@@ -10,7 +10,7 @@ public class Common
     public static final String SUBUTAI_APP_KEYSTORES_PATH = System.getProperty( "subutaiKeystorePath" );
     public static final String SUBUTAI_APP_CERTS_PATH = System.getProperty( "subutaiCertsPath" );
     public static final String DEFAULT_CONTAINER_INTERFACE = "eth0";
-    //10 hours including possible template download
+    //10 min including possible template download
     public static final int WAIT_CONTAINER_CONNECTION_SEC = 10 * 60;   // 10 min
     public static final int BROKER_MESSAGE_TIMEOUT_SEC = 30;
     public static final int MIN_COMMAND_TIMEOUT_SEC = 1;
