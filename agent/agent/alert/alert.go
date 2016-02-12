@@ -178,17 +178,17 @@ func Alert() []Load {
 			trigger = true
 			item.Disk = append(item.Disk, hdd)
 		}
-		if tmp = diskQuota(id("lxc/"+cont.Name+"-opt"), diskMap); tmp[0] > 80 {
+		if tmp = diskQuota(id(cont.Name+"/opt"), diskMap); tmp[0] > 80 {
 			hdd.Partition = "Opt"
 			trigger = true
 			item.Disk = append(item.Disk, hdd)
 		}
-		if tmp = diskQuota(id("lxc-data/"+cont.Name+"-var"), diskMap); tmp[0] > 80 {
+		if tmp = diskQuota(id(cont.Name+"/var"), diskMap); tmp[0] > 80 {
 			hdd.Partition = "Var"
 			trigger = true
 			item.Disk = append(item.Disk, hdd)
 		}
-		if tmp = diskQuota(id("lxc-data/"+cont.Name+"-home"), diskMap); tmp[0] > 80 {
+		if tmp = diskQuota(id(cont.Name+"/home"), diskMap); tmp[0] > 80 {
 			hdd.Partition = "Home"
 			trigger = true
 			item.Disk = append(item.Disk, hdd)
