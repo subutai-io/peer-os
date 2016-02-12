@@ -55,12 +55,12 @@ func copy(src string, dst string) {
 func Install(parent, child string) {
 	delta := map[string][]string{
 		child + "/deltas/rootfs.delta": {parent + "/rootfs", child},
-		child + "/deltas/home.delta":   {parent + "/home", child},
-		child + "/deltas/opt.delta":    {parent + "/opt", child},
-		child + "/deltas/var.delta":    {parent + "/var", child},
+		child + "/deltas/opt.delta":    {"lxc/" + parent + "-opt", "lxc/"},
+		child + "/deltas/home.delta":   {"lxc-data/" + parent + "-home", "lxc-data/"},
+		child + "/deltas/var.delta":    {"lxc-data/" + parent + "-var", "lxc-data/"},
 	}
 
-	fs.SubvolumeCreate(config.Agent.LxcPrefix + child)
+	log.Check(log.FatalLevel, "Creating dir "+child, os.MkdirAll(config.Agent.LxcPrefix+child, 0700))
 
 	p := true
 	if parent == child || parent == "" {

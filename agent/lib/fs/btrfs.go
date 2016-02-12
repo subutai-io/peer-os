@@ -3,7 +3,6 @@ package fs
 import (
 	"bufio"
 	"bytes"
-	"fmt"
 	"github.com/subutai-io/Subutai/agent/config"
 	"github.com/subutai-io/Subutai/agent/log"
 	"os"
@@ -18,11 +17,6 @@ func IsSubvolumeReadonly(path string) bool {
 		return true
 	}
 	return false
-}
-
-func SubvolumeCreate(dst string) {
-	err := exec.Command("btrfs", "subvolume", "create", dst).Run()
-	log.Check(log.FatalLevel, "Creating subvolume "+dst, err)
 }
 
 func SubvolumeClone(src, dst string) {
@@ -73,7 +67,6 @@ func Receive(src, dst, delta string, parent bool) {
 	if !parent {
 		args = []string{"receive", config.Agent.LxcPrefix + dst}
 	}
-	log.Debug(strings.Join(args, " "))
 	receive := exec.Command("btrfs", args...)
 	input, err := os.Open(config.Agent.LxcPrefix + "lxc-data/tmpdir/" + delta)
 	receive.Stdin = input
@@ -94,7 +87,7 @@ func Send(src, dst, delta string) {
 }
 
 func ReadOnly(container string, flag bool) {
-	for _, path := range []string{container + "/rootfs/", container + "/opt", container + "/var", container + "/home"} {
+	for _, path := range []string{container + "/rootfs/", "lxc/" + container + "-opt", "lxc-data/" + container + "-var", "lxc-data/" + container + "-home"} {
 		arg := []string{"property", "set", "-ts", config.Agent.LxcPrefix + path, "ro", strconv.FormatBool(flag)}
 		log.Check(log.FatalLevel, "Setting readonly: "+strconv.FormatBool(flag), exec.Command("btrfs", arg...).Run())
 	}
@@ -123,19 +116,6 @@ func Stat(path, index string, raw bool) string {
 		}
 	}
 	return ""
-}
-
-func DiskQuota(path string, size ...string) string {
-	parent := id(path)
-	exec.Command("btrfs", "qgroup", "create", "1/"+parent, config.Agent.LxcPrefix+path).Run()
-	for _, subvol := range []string{"/rootfs", "/opt", "/var", "/home"} {
-		index := id(path + subvol)
-		exec.Command("btrfs", "qgroup", "assign", "0/"+index, "1/"+parent, config.Agent.LxcPrefix+path).Run()
-	}
-	if size != nil {
-		exec.Command("btrfs", "qgroup", "limit", size[0]+"G", "1/"+parent, config.Agent.LxcPrefix+path).Run()
-	}
-	return Stat(path, "quota", false)
 }
 
 func Quota(path string, size ...string) string {

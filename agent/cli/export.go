@@ -38,9 +38,9 @@ func LxcExport(name string) {
 	os.MkdirAll(diffFolder, 0755)
 
 	fs.Send(config.Agent.LxcPrefix+parent+"/rootfs", config.Agent.LxcPrefix+name+"/rootfs", deltaFolder+"/rootfs.delta")
-	fs.Send(config.Agent.LxcPrefix+parent+"/home", config.Agent.LxcPrefix+name+"/home", deltaFolder+"/home.delta")
-	fs.Send(config.Agent.LxcPrefix+parent+"/opt", config.Agent.LxcPrefix+name+"/opt", deltaFolder+"/opt.delta")
-	fs.Send(config.Agent.LxcPrefix+parent+"/var", config.Agent.LxcPrefix+name+"/var", deltaFolder+"/var.delta")
+	fs.Send(config.Agent.LxcPrefix+"lxc/"+parent+"-opt", config.Agent.LxcPrefix+"lxc/"+name+"-opt", deltaFolder+"/opt.delta")
+	fs.Send(config.Agent.LxcPrefix+"lxc-data/"+parent+"-home", config.Agent.LxcPrefix+"lxc-data/"+name+"-home", deltaFolder+"/home.delta")
+	fs.Send(config.Agent.LxcPrefix+"lxc-data/"+parent+"-var", config.Agent.LxcPrefix+"lxc-data/"+name+"-var", deltaFolder+"/var.delta")
 
 	// changeConfigFile(name, packageVersion, tarPackageName)
 	container.SetContainerConf(name, [][]string{
