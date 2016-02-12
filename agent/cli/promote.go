@@ -9,8 +9,8 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
-	"syscall"
 )
 
 // LxcPromote promotes the given container name.
@@ -50,16 +50,18 @@ func LxcPromote(name string) {
 	log.Info(name + " promoted")
 }
 
+func clearFile(path string, f os.FileInfo, err error) error {
+	if !f.IsDir() {
+		ioutil.WriteFile(path, []byte{}, 0775)
+	}
+	return nil
+}
+
 func cleanupFS(path string, perm os.FileMode) {
 	if perm == 0000 {
 		os.RemoveAll(path)
 	} else {
-		fi, _ := os.Stat(path)
-		uid := fi.Sys().(*syscall.Stat_t).Uid
-		gid := fi.Sys().(*syscall.Stat_t).Gid
-		os.RemoveAll(path)
-		os.MkdirAll(path, perm)
-		os.Chown(path, int(uid), int(gid))
+		filepath.Walk(path, clearFile)
 	}
 }
 
