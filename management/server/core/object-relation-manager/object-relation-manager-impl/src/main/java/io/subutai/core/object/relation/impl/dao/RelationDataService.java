@@ -309,7 +309,7 @@ public class RelationDataService
     }
 
 
-    public RelationLink findRelationLink( final String uniqueIdentifier, final String classPath )
+    public RelationLink findRelationLink( final RelationLink relationLink )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
         RelationLink result = null;
@@ -317,8 +317,8 @@ public class RelationDataService
         {
             Query qr = em.createQuery( "select ss from RelationLinkImpl AS ss"
                     + " where ss.uniqueIdentifier=:uniqueIdentifier AND ss.classPath=:classPath" );
-            qr.setParameter( "uniqueIdentifier", uniqueIdentifier );
-            qr.setParameter( "classPath", classPath );
+            qr.setParameter( "uniqueIdentifier", relationLink.getUniqueIdentifier() );
+            qr.setParameter( "classPath", relationLink.getClassPath() );
             List<RelationLink> list = qr.getResultList();
 
             if ( list.size() > 0 )
