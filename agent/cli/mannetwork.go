@@ -53,7 +53,8 @@ func LxcManagementNetwork(args []string) {
 	case "-r", "--removetunnel":
 		removeTunnel(args[3])
 	case "-T", "--creategateway":
-		net.CreateGateway(args[3], args[4])
+		return
+		// net.CreateGateway(args[3], args[4])
 	case "-M", "--removevni":
 		delVNI(args[3], args[4], args[5])
 	case "-E", "--reservevni":
