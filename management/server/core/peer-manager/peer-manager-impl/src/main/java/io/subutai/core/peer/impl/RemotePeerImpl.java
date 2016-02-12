@@ -840,18 +840,6 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void createGateway( final Gateway gateway ) throws PeerException
-    {
-        Preconditions.checkNotNull( gateway );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( gateway.getIp() ) );
-        Preconditions.checkArgument( gateway.getVlan() > 0 );
-
-
-        new PeerWebClient( peerInfo, provider ).createGateway( gateway );
-    }
-
-
-    @Override
     public ResourceHostMetrics getResourceHostMetrics() throws PeerException
     {
         return new PeerWebClient( peerInfo, provider ).getResourceHostMetrics();

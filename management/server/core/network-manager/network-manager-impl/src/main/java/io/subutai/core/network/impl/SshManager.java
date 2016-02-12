@@ -106,38 +106,20 @@ public class SshManager
     {
         if ( !justAdd )
         {
-            create();
-            read();
+            createAndRead();
         }
         write( additionalSshKeys );
         config();
     }
 
 
-    protected void create() throws NetworkManagerException
+    protected void createAndRead() throws NetworkManagerException
     {
         for ( ContainerHost host : containerHosts )
         {
             try
             {
-                commandUtil.execute( commands.getCreateSSHCommand(), host );
-            }
-            catch ( CommandException e )
-            {
-                LOG.error( String.format( "Error in create: %s", e.getMessage() ), e );
-                throw new NetworkManagerException( e );
-            }
-        }
-    }
-
-
-    protected void read() throws NetworkManagerException
-    {
-        for ( ContainerHost host : containerHosts )
-        {
-            try
-            {
-                CommandResult command = commandUtil.execute( commands.getReadSSHCommand(), host );
+                CommandResult command = commandUtil.execute( commands.getCreateNReadSSHCommand(), host );
                 if ( !Strings.isNullOrEmpty( command.getStdOut() ) )
                 {
                     keys.add( command.getStdOut() );
@@ -145,7 +127,7 @@ public class SshManager
             }
             catch ( CommandException e )
             {
-                LOG.error( String.format( "Error in read: %s", e.getMessage() ), e );
+                LOG.error( String.format( "Error in createAndRead: %s", e.getMessage() ), e );
                 throw new NetworkManagerException( e );
             }
         }
