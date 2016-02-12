@@ -7,7 +7,6 @@ import java.util.Set;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
-import io.subutai.common.command.OutputRedirection;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.peer.ContainerHost;
@@ -108,14 +107,6 @@ public class Commands
     public RequestBuilder getListTunnelsCommand()
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs( Lists.newArrayList( "-l" ) );
-    }
-
-
-    public RequestBuilder getSetupGatewayCommand( String gatewayIp, int vLanId )
-    {
-        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
-                .withCmdArgs( Lists.newArrayList( "-T", gatewayIp, String.valueOf( vLanId ) ) ).withTimeout( 90 )
-                .withStdOutRedirection( OutputRedirection.NO );
     }
 
 
@@ -233,18 +224,12 @@ public class Commands
     // ssh and hosts
 
 
-    public RequestBuilder getCreateSSHCommand()
+    public RequestBuilder getCreateNReadSSHCommand()
     {
         return new RequestBuilder( String.format( "rm -rf %1$s && " +
                 "mkdir -p %1$s && " +
                 "chmod 700 %1$s && " +
-                "ssh-keygen -t dsa -P '' -f %1$s/id_dsa", SSH_FOLDER ) );
-    }
-
-
-    public RequestBuilder getReadSSHCommand()
-    {
-        return new RequestBuilder( String.format( "cat %s/id_dsa.pub", SSH_FOLDER ) );
+                "ssh-keygen -t dsa -P '' -f %1$s/id_dsa && " + "cat %1$s/id_dsa.pub", SSH_FOLDER ) );
     }
 
 
@@ -259,13 +244,6 @@ public class Commands
 
     public RequestBuilder getAppendSshKeyCommand( String key )
     {
-        //        return new RequestBuilder( String.format(
-        //                "if [ ! -f '%2$s' ]; then " + "mkdir -p '%1$s' && " + "chmod 700 '%1$s' && "
-        //                        + "echo '%3$s' > '%2$s' && " + "chmod 644 '%2$s' ; else " + "chmod 700 '%2$s' ; "
-        //                        + "if grep -zvq '%3$s' '%2$s'; then echo '%3$s' >> '%2$s'; fi; " + "chmod 644
-        // '%2$s';  fi;",
-        //                SSH_FOLDER, SSH_FILE, key ) );
-
         return new RequestBuilder( String.format(
                 "mkdir -p '%1$s' && " + "echo '%3$s' >> '%2$s' && " + "chmod 700 -R '%1$s' && "
                         + "sort -u '%2$s' -o '%2$s'", SSH_FOLDER, SSH_FILE, key ) );

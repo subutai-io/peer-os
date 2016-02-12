@@ -102,13 +102,6 @@ public class CommandsTest
 
 
     @Test
-    public void testGetSetupGatewayCommand() throws Exception
-    {
-        assertNotNull( commands.getSetupGatewayCommand( GATEWAY_IP, VLAN_ID ) );
-    }
-
-
-    @Test
     public void testGetSetupGatewayOnContainerCommand() throws Exception
     {
         assertNotNull( commands.getSetupGatewayOnContainerCommand( GATEWAY_IP, INTERFACE_NAME ) );
@@ -168,20 +161,6 @@ public class CommandsTest
     public void testGetListReservedVnisCommand() throws Exception
     {
         assertNotNull( commands.getListReservedVnisCommand() );
-    }
-
-
-    @Test
-    public void testGetCreateSSHCommand() throws Exception
-    {
-        assertNotNull( commands.getCreateSSHCommand() );
-    }
-
-
-    @Test
-    public void testGetReadSSHCommand() throws Exception
-    {
-        assertNotNull( commands.getReadSSHCommand() );
     }
 
 
