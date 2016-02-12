@@ -52,6 +52,7 @@ import io.subutai.common.util.P2PUtil;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
+import io.subutai.core.identity.api.model.UserDelegate;
 import io.subutai.core.object.relation.api.RelationManager;
 import io.subutai.core.object.relation.api.model.RelationMeta;
 
@@ -380,13 +381,16 @@ public class EnvironmentImpl implements Environment, Serializable
             RelationManager relationManager = environmentManager.getRelationManager();
             IdentityManager identityManager = environmentManager.getIdentityManager();
             User activeUser = identityManager.getActiveUser();
-            if ( activeUser != null )
+            UserDelegate userDelegate = identityManager.getUserDelegate( activeUser );
+
+
+            if ( userDelegate != null )
             {
                 for ( Iterator<EnvironmentContainerHost> iterator = containerHosts.iterator(); iterator.hasNext(); )
                 {
                     final EnvironmentContainerHost containerHost = iterator.next();
                     RelationMeta relationMeta =
-                            new RelationMeta( activeUser, activeUser, containerHost, containerHost.getId() );
+                            new RelationMeta( userDelegate, userDelegate, containerHost, containerHost.getId() );
                     boolean trustedRelation =
                             relationManager.getRelationInfoManager().allHasReadPermissions( relationMeta );
 

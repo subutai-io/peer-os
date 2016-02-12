@@ -602,6 +602,28 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
                 }]
             }
         })
+        .state('settings-owner', {
+            url: '/settings-owner',
+            templateUrl: 'subutai-app/settingsOwner/partials/view.html',
+            data: {
+                bodyClass: '',
+                layout: 'default'
+            },
+            resolve: {
+                loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([
+                        {
+                            name: 'subutai.settings-owner',
+                            files: [
+                                'subutai-app/settingsOwner/settingsOwner.js',
+                                'subutai-app/settingsOwner/controller.js',
+                                'subutai-app/settingsOwner/service.js'
+                            ]
+                        }
+                    ]);
+                }]
+            }
+        })
         .state('404', {
 			url: '/404',
 			templateUrl: 'subutai-app/common/partials/404.html',

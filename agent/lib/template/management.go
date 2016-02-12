@@ -28,6 +28,10 @@ func MngInit() {
 		{"lxc.network.veth.pair", "management"},
 		{"lxc.network.script.up", config.Agent.AppPrefix + "bin/create_ovs_interface"},
 		{"lxc.network.link", ""},
+		// TODO following lines kept for back compatibility with old templates, should be deleted when all templates will be replaced.
+		{"lxc.mount.entry", config.Agent.LxcPrefix + "management/home home none bind,rw 0 0"},
+		{"lxc.mount.entry", config.Agent.LxcPrefix + "management/opt opt none bind,rw 0 0"},
+		{"lxc.mount.entry", config.Agent.LxcPrefix + "management/var var none bind,rw 0 0"},
 	})
 
 	container.Start("management")

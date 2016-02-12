@@ -485,7 +485,7 @@ public class IdentityManagerImpl implements IdentityManager
      */
     @PermitAll
     @Override
-    public void setPeerOwner(User user)
+    public void setPeerOwner( User user )
     {
         securityManager.getKeyManager().setPeerOwnerId( user.getSecurityKeyId() );
     }
@@ -529,6 +529,19 @@ public class IdentityManagerImpl implements IdentityManager
     public UserDelegate getUserDelegate( long userId )
     {
         return identityDataService.getUserDelegateByUserId(userId);
+    }
+
+
+    /* *************************************************
+     */
+    @PermitAll
+    @Override
+    public UserDelegate getUserDelegate(User user)
+    {
+        if(user == null)
+            return null;
+        else
+            return identityDataService.getUserDelegateByUserId(user.getId());
     }
 
 

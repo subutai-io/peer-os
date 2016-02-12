@@ -15,12 +15,15 @@
   <!-- ***************************************************************** -->
   <reference id="templateManager" availability="mandatory"
              interface="io.subutai.core.kurjun.api.TemplateManager" />
+  <reference id="identityManager" availability="mandatory"
+             interface="io.subutai.core.identity.api.IdentityManager" />
 
 
   <bean id="systemManagerImpl" scope="singleton"
         class="io.subutai.core.systemmanager.impl.SystemManagerImpl">
     <!--<argument ref="daoManagerPlugin" />-->
     <property name="templateManager" ref="templateManager" />
+    <property name="identityManager" ref="identityManager" />
   </bean>
 
   <service ref="systemManagerImpl"
