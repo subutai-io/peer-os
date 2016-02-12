@@ -37,9 +37,9 @@ func LxcPromote(name string) {
 	net.RemoveDefaultGW(name)
 
 	cleanupFS(config.Agent.LxcPrefix+name+"/rootfs/.git", 0000)
-	cleanupFS(config.Agent.LxcPrefix+"lxc-data/"+name+"-var/log/", 0775)
-	cleanupFS(config.Agent.LxcPrefix+"lxc-data/"+name+"-var/cache", 0775)
-	cleanupFS(config.Agent.LxcPrefix+"lxc-data/"+name+"-var/lib/apt/lists/", 0775)
+	cleanupFS(config.Agent.LxcPrefix+name+"/var/log/", 0775)
+	cleanupFS(config.Agent.LxcPrefix+name+"/var/cache", 0775)
+	cleanupFS(config.Agent.LxcPrefix+name+"/var/lib/apt/lists/", 0775)
 
 	makeDiff(name)
 
@@ -70,9 +70,9 @@ func makeDiff(name string) {
 	}
 	os.MkdirAll(config.Agent.LxcPrefix+name+"/diff", 0600)
 	execDiff(config.Agent.LxcPrefix+parent+"/rootfs", config.Agent.LxcPrefix+name+"/rootfs", config.Agent.LxcPrefix+name+"/diff/rootfs.diff")
-	execDiff(config.Agent.LxcPrefix+"lxc/"+parent+"-opt", config.Agent.LxcPrefix+"lxc/"+name+"-opt", config.Agent.LxcPrefix+name+"/diff/opt.diff")
-	execDiff(config.Agent.LxcPrefix+"lxc-data/"+parent+"-var", config.Agent.LxcPrefix+"lxc-data/"+name+"-var", config.Agent.LxcPrefix+name+"/diff/var.diff")
-	execDiff(config.Agent.LxcPrefix+"lxc-data/"+parent+"-home", config.Agent.LxcPrefix+"lxc-data/"+name+"-home", config.Agent.LxcPrefix+name+"/diff/home.diff")
+	execDiff(config.Agent.LxcPrefix+parent+"/home", config.Agent.LxcPrefix+name+"/home", config.Agent.LxcPrefix+name+"/diff/home.diff")
+	execDiff(config.Agent.LxcPrefix+parent+"/opt", config.Agent.LxcPrefix+name+"/opt", config.Agent.LxcPrefix+name+"/diff/opt.diff")
+	execDiff(config.Agent.LxcPrefix+parent+"/var", config.Agent.LxcPrefix+name+"/var", config.Agent.LxcPrefix+name+"/diff/var.diff")
 }
 
 func execDiff(dir1, dir2, output string) {
