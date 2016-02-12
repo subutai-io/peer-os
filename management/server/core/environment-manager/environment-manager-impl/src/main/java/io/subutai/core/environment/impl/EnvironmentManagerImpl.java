@@ -278,11 +278,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     {
         User activeUser = identityManager.getActiveUser();
 
-        //final boolean viewAll = identityManager
-                //.isUserPermitted                 ( activeUser, PermissionObject.EnvironmentManagement,
-                        //PermissionScope.ALL_SCOPE,
-                        //PermissionOperation.Read );
-
 
         Set<Environment> environments = new HashSet<>();
         for ( Environment environment : environmentDataService.getAll() )
