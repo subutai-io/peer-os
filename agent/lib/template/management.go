@@ -56,11 +56,11 @@ func MngInit() {
 }
 
 func MngStop() {
-	exec.Command("iptables", "-t", "nat", "--flush", "PREROUTING")
+	exec.Command("iptables", "-t", "nat", "--flush", "PREROUTING").Run()
 }
 
 func MngDel() {
-	exec.Command("iptables", "-t", "nat", "--flush", "PREROUTING")
+	exec.Command("iptables", "-t", "nat", "--flush", "PREROUTING").Run()
 	exec.Command("ovs-vsctl", "del-port", "wan", "management").Run()
 	exec.Command("ovs-vsctl", "del-port", "wan", "mng-gw").Run()
 	exec.Command("dhclient", "-r", "mng-net").Run()
