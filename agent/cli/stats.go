@@ -242,9 +242,9 @@ func quota(h string) string {
 	usage.CPU = cpuQuotaUsage(h)
 	usage.RAM = ramQuotaUsage(h)
 	usage.Disk.Rootfs = diskQuotaUsage(h + "/rootfs")
-	usage.Disk.Opt = diskQuotaUsage("lxc/" + h + "-opt")
-	usage.Disk.Var = diskQuotaUsage("lxc-data/" + h + "-var")
-	usage.Disk.Home = diskQuotaUsage("lxc-data/" + h + "-home")
+	usage.Disk.Home = diskQuotaUsage(h + "/home")
+	usage.Disk.Opt = diskQuotaUsage(h + "/opt")
+	usage.Disk.Var = diskQuotaUsage(h + "/var")
 
 	a, err := json.Marshal(usage)
 	if err != nil {

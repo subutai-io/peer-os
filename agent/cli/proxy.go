@@ -78,8 +78,8 @@ func ProxyCheck(vlan, node string, domain bool) {
 }
 
 func restart() {
-	log.Check(log.FatalLevel, "nginx -s reload",
-		exec.Command("nginx", "-s", "reload").Run())
+	log.Check(log.FatalLevel, "Reloading nginx",
+		exec.Command("nginx.sh", "-s", "reload").Run())
 }
 
 func addDomain(vlan, domain, cert string) {
