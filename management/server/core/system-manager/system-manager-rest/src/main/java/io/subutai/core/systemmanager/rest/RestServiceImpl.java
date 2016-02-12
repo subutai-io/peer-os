@@ -7,10 +7,10 @@ import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.systemmanager.api.SystemManager;
-import io.subutai.core.systemmanager.api.pojo.ChannelSettings;
 import io.subutai.core.systemmanager.api.pojo.KurjunSettings;
-import io.subutai.core.systemmanager.api.pojo.PeerOwner;
+import io.subutai.core.systemmanager.api.pojo.NetworkSettings;
 import io.subutai.core.systemmanager.api.pojo.PeerSettings;
+import io.subutai.core.systemmanager.api.pojo.SecuritySettings;
 import io.subutai.core.systemmanager.api.pojo.SystemInfo;
 
 
@@ -30,6 +30,14 @@ public class RestServiceImpl implements RestService
         String projectInfo = JsonUtil.GSON.toJson( pojo );
 
         return Response.status( Response.Status.OK ).entity( projectInfo ).build();
+    }
+
+
+    @Override
+    public Response setPeerSettings()
+    {
+        systemManager.setPeerSettings();
+        return Response.status( Response.Status.OK ).build();
     }
 
 
@@ -63,30 +71,22 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getChannelSettings()
+    public Response getNetworkSettings()
     {
-        ChannelSettings pojo = systemManager.getChannelSettings();
-        String channelSettingsInfo = JsonUtil.GSON.toJson( pojo );
+        NetworkSettings pojo = systemManager.getNetworkSettings();
+        String networkSettingsInfo = JsonUtil.GSON.toJson( pojo );
 
-        return Response.status( Response.Status.OK ).entity( channelSettingsInfo ).build();
+        return Response.status( Response.Status.OK ).entity( networkSettingsInfo ).build();
     }
 
 
     @Override
-    public Response setPeerOwner()
+    public Response getSecuritySettings()
     {
-        systemManager.setPeerOwner();
-        return Response.status( Response.Status.OK ).build();
-    }
+        SecuritySettings pojo = systemManager.getSecuritySettings();
+        String securitySettingsInfo = JsonUtil.GSON.toJson( pojo );
 
-
-    @Override
-    public Response getPeerOwner()
-    {
-        PeerOwner pojo = systemManager.getPeerOwnerInfo();
-        String peerOwnerInfo = JsonUtil.GSON.toJson( pojo );
-
-        return Response.status( Response.Status.OK ).entity( peerOwnerInfo ).build();
+        return Response.status( Response.Status.OK ).entity( securitySettingsInfo ).build();
     }
 
 

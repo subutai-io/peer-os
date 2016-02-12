@@ -25,22 +25,4 @@ function SettingsPeerCtrl ($scope, SettingsPeerSrv, SweetAlert) {
 			SweetAlert.swal ("ERROR!", "Save config error: " + error.replace(/\\n/g, " "), "error");
 		});
 	}
-
-	vm.reverse = reverse;
-	function reverse (field) {
-		switch (field) {
-			case (0):
-				vm.config.encryptionEnabled = !vm.config.encryptionEnabled;
-				break;
-			case (1):
-				vm.config.restEncryptionEnabled = !vm.config.restEncryptionEnabled;
-				break;
-			case (2):
-				vm.config.integrationEnabled = !vm.config.integrationEnabled;
-				break;
-			case (3):
-				vm.config.keyTrustCheckEnabled = !vm.config.keyTrustCheckEnabled;
-				break;
-		}
-	}
 }

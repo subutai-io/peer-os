@@ -69,13 +69,11 @@ public class PeerSettings
     }
 
 
-    public static void setSettings( final String externalIpInterface, final boolean encryptionState,
-                                    final boolean restEncryptionState, final boolean integrationState,
-                                    final boolean keyTrustCheckState )
+    public static void setSettings( final boolean encryptionState, final boolean restEncryptionState,
+                                    final boolean integrationState, final boolean keyTrustCheckState )
     {
         try
         {
-            PROPERTIES.setProperty( "externalIpInterface", externalIpInterface );
             PROPERTIES.setProperty( "encryptionEnabled", encryptionState );
             PROPERTIES.setProperty( "restEncryptionEnabled", restEncryptionState );
             PROPERTIES.setProperty( "integrationEnabled", integrationState );

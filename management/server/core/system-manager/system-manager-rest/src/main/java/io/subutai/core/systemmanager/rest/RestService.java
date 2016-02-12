@@ -24,6 +24,11 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response getPeerSettings();
 
+    @POST
+    @Path( "update_peer_settings" )
+    @Produces( { MediaType.TEXT_PLAIN } )
+    public Response setPeerSettings();
+
     @GET
     @Path( "kurjun_settings" )
     @Produces( { MediaType.APPLICATION_JSON } )
@@ -35,17 +40,12 @@ public interface RestService
     public Response getPeerPolicy();
 
     @GET
-    @Path( "channel_settings" )
+    @Path( "network_settings" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getChannelSettings();
-
-    @POST
-    @Path( "update_peerowner" )
-    @Produces( { MediaType.TEXT_PLAIN } )
-    public Response setPeerOwner();
+    public Response getNetworkSettings();
 
     @GET
-    @Path( "peerowner" )
+    @Path( "security_settings" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getPeerOwner();
+    public Response getSecuritySettings();
 }

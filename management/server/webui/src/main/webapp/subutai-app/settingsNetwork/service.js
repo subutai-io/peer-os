@@ -1,18 +1,18 @@
 "use strict";
 
-angular.module ("subutai.settings-channel.service",[])
-    .factory ("SettingsChannelSrv", SettingsChannelSrv);
+angular.module ("subutai.settings-network.service",[])
+    .factory ("SettingsNetworkSrv", SettingsNetworkSrv);
 
-SettingsChannelSrv.$inject = ["$http"];
+SettingsNetworkSrv.$inject = ["$http"];
 
-function SettingsChannelSrv ($http) {
-    var SettingsChannelSrv = {
+function SettingsNetworkSrv ($http) {
+    var SettingsNetworkSrv = {
         getConfig: getConfig,
         updateConfig: updateConfig
     };
 
     function getConfig() {
-        return $http.get (SERVER_URL + "rest/v1/system/channel_settings", {withCredentials: true, headers: {'Content-Type': 'application/json'}});
+        return $http.get (SERVER_URL + "rest/v1/system/network_settings", {withCredentials: true, headers: {'Content-Type': 'application/json'}});
     }
 
     function updateConfig (config) {
@@ -25,5 +25,5 @@ function SettingsChannelSrv ($http) {
     }
 
 
-    return SettingsChannelSrv;
+    return SettingsNetworkSrv;
 }

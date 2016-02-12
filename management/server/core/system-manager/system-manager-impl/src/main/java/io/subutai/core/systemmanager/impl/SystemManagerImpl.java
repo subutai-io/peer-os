@@ -7,15 +7,15 @@ import io.subutai.core.identity.api.model.User;
 import io.subutai.core.kurjun.api.KurjunTransferQuota;
 import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.systemmanager.api.SystemManager;
-import io.subutai.core.systemmanager.api.pojo.ChannelSettings;
+import io.subutai.core.systemmanager.api.pojo.NetworkSettings;
 import io.subutai.core.systemmanager.api.pojo.KurjunSettings;
-import io.subutai.core.systemmanager.api.pojo.PeerOwner;
 import io.subutai.core.systemmanager.api.pojo.PeerSettings;
+import io.subutai.core.systemmanager.api.pojo.SecuritySettings;
 import io.subutai.core.systemmanager.api.pojo.SystemInfo;
-import io.subutai.core.systemmanager.impl.pojo.ChannelSettingsPojo;
+import io.subutai.core.systemmanager.impl.pojo.NetworkSettingsPojo;
 import io.subutai.core.systemmanager.impl.pojo.KurjunSettingsPojo;
-import io.subutai.core.systemmanager.impl.pojo.PeerOwnerPojo;
 import io.subutai.core.systemmanager.impl.pojo.PeerSettingsPojo;
+import io.subutai.core.systemmanager.impl.pojo.SecuritySettingsPojo;
 import io.subutai.core.systemmanager.impl.pojo.SystemInfoPojo;
 
 
@@ -29,12 +29,10 @@ public class SystemManagerImpl implements SystemManager
 
 
     @Override
-    public PeerSettings getPeerSettings()
+    public SecuritySettings getSecuritySettings()
     {
-        PeerSettings pojo = new PeerSettingsPojo();
+        SecuritySettings pojo = new SecuritySettingsPojo();
 
-        pojo.setExternalIpInterface(
-                String.valueOf( io.subutai.common.settings.PeerSettings.getExternalIpInterface() ) );
         pojo.setEncryptionState( io.subutai.common.settings.PeerSettings.getEncryptionState() );
         pojo.setRestEncryptionState( io.subutai.common.settings.PeerSettings.getRestEncryptionState() );
         pojo.setIntegrationState( io.subutai.common.settings.PeerSettings.getIntegrationState() );
@@ -45,10 +43,10 @@ public class SystemManagerImpl implements SystemManager
 
 
     @Override
-    public void setPeerSettings( final PeerSettings settings )
+    public void setSecuritySettings( final SecuritySettings settings )
     {
         io.subutai.common.settings.PeerSettings
-                .setSettings( settings.getExternalIpInterface(), settings.getEncryptionState(),
+                .setSettings( settings.getEncryptionState(),
                         settings.getRestEncryptionState(), settings.getIntegrationState(),
                         settings.getKeyTrustCheckState() );
     }
@@ -112,19 +110,19 @@ public class SystemManagerImpl implements SystemManager
 
 
     @Override
-    public void setPeerOwner()
+    public void setPeerSettings()
     {
         identityManager.setPeerOwner( identityManager.getActiveUser() );
     }
 
 
     @Override
-    public PeerOwner getPeerOwnerInfo()
+    public PeerSettings getPeerSettings()
     {
         String peerOwnerId = identityManager.getPeerOwnerId();
         User user = identityManager.getUserByKeyId( peerOwnerId );
 
-        PeerOwner pojo = new PeerOwnerPojo();
+        PeerSettings pojo = new PeerSettingsPojo();
 
         pojo.setPeerOwnerId( peerOwnerId );
         pojo.setUserPeerOwnerName( user.getUserName() );
@@ -134,10 +132,12 @@ public class SystemManagerImpl implements SystemManager
 
 
     @Override
-    public ChannelSettings getChannelSettings()
+    public NetworkSettings getNetworkSettings()
     {
-        ChannelSettings pojo = new ChannelSettingsPojo();
+        NetworkSettings pojo = new NetworkSettingsPojo();
 
+        pojo.setExternalIpInterface(
+                String.valueOf( io.subutai.common.settings.PeerSettings.getExternalIpInterface() ) );
         pojo.setOpenPort( io.subutai.common.settings.ChannelSettings.OPEN_PORT );
         pojo.setSecurePortX1( io.subutai.common.settings.ChannelSettings.SECURE_PORT_X1 );
         pojo.setSecurePortX2( io.subutai.common.settings.ChannelSettings.SECURE_PORT_X2 );
@@ -149,7 +149,7 @@ public class SystemManagerImpl implements SystemManager
 
 
     @Override
-    public void setChannelSettings( final ChannelSettings settings )
+    public void setNetworkSettings( final NetworkSettings settings )
     {
     }
 

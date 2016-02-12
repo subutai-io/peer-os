@@ -1,19 +1,32 @@
 package io.subutai.core.systemmanager.impl.pojo;
 
 
-import io.subutai.core.systemmanager.api.pojo.ChannelSettings;
+import io.subutai.core.systemmanager.api.pojo.NetworkSettings;
 
 
 /**
  * Created by ermek on 2/9/16.
  */
-public class ChannelSettingsPojo implements ChannelSettings
+public class NetworkSettingsPojo implements NetworkSettings
 {
+    private String externalIpInterface;
     public String openPort = "8080";
     public String securePortX1 = "8443";
     public String securePortX2 = "8444";
     public String securePortX3 = "8445";
     public String specialPortX1 = "8551";
+
+
+    public String getExternalIpInterface()
+    {
+        return externalIpInterface;
+    }
+
+
+    public void setExternalIpInterface( final String externalIpInterface )
+    {
+        this.externalIpInterface = externalIpInterface;
+    }
 
 
     public String getOpenPort()

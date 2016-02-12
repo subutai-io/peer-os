@@ -1,10 +1,10 @@
 package io.subutai.core.systemmanager.api;
 
 
-import io.subutai.core.systemmanager.api.pojo.ChannelSettings;
+import io.subutai.core.systemmanager.api.pojo.NetworkSettings;
 import io.subutai.core.systemmanager.api.pojo.KurjunSettings;
-import io.subutai.core.systemmanager.api.pojo.PeerOwner;
 import io.subutai.core.systemmanager.api.pojo.PeerSettings;
+import io.subutai.core.systemmanager.api.pojo.SecuritySettings;
 import io.subutai.core.systemmanager.api.pojo.SystemInfo;
 
 
@@ -13,21 +13,21 @@ import io.subutai.core.systemmanager.api.pojo.SystemInfo;
  */
 public interface SystemManager
 {
-    public PeerSettings getPeerSettings();
+    public SecuritySettings getSecuritySettings();
 
-    public void setPeerSettings( PeerSettings settings );
+    public void setSecuritySettings( SecuritySettings settings );
 
     public KurjunSettings getKurjunSettings();
 
     public void setKurjunSettings( KurjunSettings settings );
 
-    public ChannelSettings getChannelSettings();
+    public NetworkSettings getNetworkSettings();
 
-    public void setChannelSettings( ChannelSettings settings );
+    public void setNetworkSettings( NetworkSettings settings );
 
     public SystemInfo getSystemInfo();
 
-    public void setPeerOwner();
+    public void setPeerSettings();
 
-    public PeerOwner getPeerOwnerInfo();
+    public PeerSettings getPeerSettings();
 }
