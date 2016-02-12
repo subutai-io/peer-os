@@ -6,6 +6,9 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.collect.Lists;
 
 import io.subutai.common.dao.DaoManager;
@@ -18,6 +21,7 @@ import io.subutai.core.identity.impl.model.UserEntity;
  */
 class UserDAO
 {
+    private static final Logger logger = LoggerFactory.getLogger( UserDAO.class );
     private DaoManager daoManager = null;
 
 
@@ -66,29 +70,6 @@ class UserDAO
         List<User> result = Lists.newArrayList();
         try
         {
-            result = em.createQuery( "select h from UserEntity h WHERE h.isApproved = true", User.class ).getResultList();
-        }
-        catch ( Exception e )
-        {
-        }
-        finally
-        {
-            daoManager.closeEntityManager( em );
-        }
-        return result;
-    }
-
-
-    /* *************************************************
-     *
-     */
-    public List<User> getAllSystemUsers()
-    {
-        EntityManager em = daoManager.getEntityManagerFromFactory();
-
-        List<User> result = Lists.newArrayList();
-        try
-        {
             result = em.createQuery( "select h from UserEntity h", User.class ).getResultList();
         }
         catch ( Exception e )
@@ -105,7 +86,7 @@ class UserDAO
     /* *************************************************
      *
      */
-    public void persist( final User item )
+    public void persist( User item )
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
         try
@@ -113,6 +94,7 @@ class UserDAO
             daoManager.startTransaction( em );
             em.persist( item );
             em.flush();
+
             daoManager.commitTransaction( em );
         }
         catch ( Exception e )
@@ -164,6 +146,7 @@ class UserDAO
         }
         catch ( Exception e )
         {
+            logger.error("Error updating user", e);
             daoManager.rollBackTransaction( em );
         }
         finally
@@ -185,6 +168,37 @@ class UserDAO
             TypedQuery<UserEntity> query =
                     em.createQuery( "select u from UserEntity u where u.userName = :userName", UserEntity.class );
             query.setParameter( "userName", userName );
+
+            List<UserEntity> users = query.getResultList();
+            if ( users.size() > 0 )
+            {
+                result = users.iterator().next();
+            }
+        }
+        catch ( Exception e )
+        {
+        }
+        finally
+        {
+            daoManager.closeEntityManager( em );
+        }
+        return result;
+    }
+
+
+
+    /* *************************************************
+     *
+     */
+    public User findByKeyId( final String keyId )
+    {
+        EntityManager em = daoManager.getEntityManagerFromFactory();
+        User result = null;
+        try
+        {
+            TypedQuery<UserEntity> query =
+                    em.createQuery( "select u from UserEntity u where u.securityKeyId = :keyId", UserEntity.class );
+            query.setParameter( "keyId", keyId );
 
             List<UserEntity> users = query.getResultList();
             if ( users.size() > 0 )

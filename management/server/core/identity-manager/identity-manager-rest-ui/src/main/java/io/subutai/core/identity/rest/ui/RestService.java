@@ -33,28 +33,31 @@ public interface RestService
 
     @POST
     @Produces( { MediaType.APPLICATION_JSON } )
-    Response saveUser( @FormParam( "username" ) String username,
-                             @FormParam( "full_name" ) String fullName,
-                             @FormParam( "password" ) String password,
-                             @FormParam( "email" ) String email,
-                             @FormParam( "roles" ) String roles, @FormParam( "user_id" ) Long userId,
-                       @FormParam( "public_key" ) String publicKey );
-
+    Response saveUser( @FormParam( "username" ) String username, @FormParam( "full_name" ) String fullName,
+                       @FormParam( "password" ) String password, @FormParam( "email" ) String email,
+                       @FormParam( "roles" ) String roles, @FormParam( "user_id" ) Long userId,
+                       @FormParam( "trustLevel" ) String trustLevel );
 
     @POST
-	@Path( "/signup" )
+    @Path("/approve-delegate")
     @Produces( { MediaType.APPLICATION_JSON } )
-    Response signUp( @FormParam( "username" ) String username,
-                       @FormParam( "full_name" ) String fullName,
-                       @FormParam( "password" ) String password,
-                       @FormParam( "email" ) String email,
-                       @FormParam( "public_key" ) String publicKey );
-
+    Response approveDelegatedUser( @FormParam( "signedDocument" ) String trustMessage);
 
     @POST
-	@Path( "/approve" )
+    @Path("/set-public-key")
     @Produces( { MediaType.APPLICATION_JSON } )
-    Response approve( @FormParam( "username" ) String username,@FormParam( "roles" ) String roles );
+    Response setUserPublicKey(@FormParam( "publicKey" ) String publicKey);
+
+    @POST
+    @Path("/delegate-identity")
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response createIdentityDelegationDocument();
+
+    @GET
+    @Path("/delegate-identity")
+    @Produces( { MediaType.TEXT_PLAIN } )
+    Response getIdentityDelegationDocument();
+
 
     @DELETE
     @Path( "/{userId}" )

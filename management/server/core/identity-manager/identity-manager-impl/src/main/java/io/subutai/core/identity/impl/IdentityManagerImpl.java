@@ -2,9 +2,12 @@ package io.subutai.core.identity.impl;
 
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.security.AccessControlContext;
 import java.security.AccessControlException;
 import java.security.AccessController;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Date;
@@ -15,6 +18,7 @@ import java.util.concurrent.Callable;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
+import javax.naming.NamingException;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -23,7 +27,7 @@ import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.LoginContext;
 
-import org.bouncycastle.openpgp.PGPException;
+import org.bouncycastle.openpgp.PGPPublicKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +37,7 @@ import com.google.common.base.Strings;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.security.crypto.pgp.KeyPair;
-import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
+import io.subutai.common.security.objects.Ownership;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.objects.PermissionOperation;
 import io.subutai.common.security.objects.PermissionScope;
@@ -42,6 +46,8 @@ import io.subutai.common.security.objects.TokenType;
 import io.subutai.common.security.objects.UserStatus;
 import io.subutai.common.security.objects.UserType;
 import io.subutai.common.security.token.TokenUtil;
+import io.subutai.common.util.JsonUtil;
+import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.SessionManager;
 import io.subutai.core.identity.api.dao.IdentityDataService;
@@ -49,14 +55,25 @@ import io.subutai.core.identity.api.model.Permission;
 import io.subutai.core.identity.api.model.Role;
 import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.identity.api.model.User;
+import io.subutai.core.identity.api.model.UserDelegate;
 import io.subutai.core.identity.api.model.UserToken;
 import io.subutai.core.identity.impl.dao.IdentityDataServiceImpl;
 import io.subutai.core.identity.impl.model.PermissionEntity;
 import io.subutai.core.identity.impl.model.RoleEntity;
 import io.subutai.core.identity.impl.model.SessionEntity;
+import io.subutai.core.identity.impl.model.UserDelegateEntity;
 import io.subutai.core.identity.impl.model.UserEntity;
 import io.subutai.core.identity.impl.model.UserTokenEntity;
+import io.subutai.core.identity.impl.utils.SecurityUtil;
+import io.subutai.core.object.relation.api.RelationManager;
+import io.subutai.core.object.relation.api.RelationVerificationException;
+import io.subutai.core.object.relation.api.model.Relation;
+import io.subutai.core.object.relation.api.model.RelationInfo;
+import io.subutai.core.object.relation.api.model.RelationInfoMeta;
+import io.subutai.core.object.relation.api.model.RelationMeta;
 import io.subutai.core.security.api.SecurityManager;
+import io.subutai.core.security.api.crypto.EncryptionTool;
+import io.subutai.core.security.api.crypto.KeyManager;
 
 
 /**
@@ -112,17 +129,9 @@ public class IdentityManagerImpl implements IdentityManager
 
 
             //***Create User ********************************************
-            User internal = createUser( "internal", "internal", "System User", "internal@subutai.io", 1,
-                    generateArmoredPublicKey(), true );
-            User admin =
-                    createUser( "admin", "secret", "Administrator", "admin@subutai.io", 2, generateArmoredPublicKey(),
-                            true );
-            User manager =
-                    createUser( "manager", "manager", "Manager", "manager@subutai.io", 2, generateArmoredPublicKey(),
-                            true );
-            User karaf =
-                    createUser( "karaf", "karaf", "Karaf Manager", "karaf@subutai.io", 2, generateArmoredPublicKey(),
-                            true );
+            User internal = createUser( "internal", "secretSubutai", "System User", "internal@subutai.io", 1,3,false,false );
+            User karaf = createUser( "karaf", "secret", "Karaf Manager", "karaf@subutai.io", 1 ,3,false,false);
+            User admin = createUser( "admin", "secret", "Administrator", "admin@subutai.io", 2 ,3,true,true);
             //***********************************************************
 
             //***Create Token *******************************************
@@ -130,16 +139,13 @@ public class IdentityManagerImpl implements IdentityManager
             createUserToken( internal, "", "", "", TokenType.Permanent.getId(), tokenDate );
             //***********************************************************
 
-
             //****Create Roles ******************************************
-            role = createRole( "Karaf-Manager", UserType.Regular.getId() );
-            assignUserRole( karaf.getId(), role );
-            assignUserRole( admin.getId(), role );
+            role = createRole( "Karaf-Manager", UserType.System.getId() );
+            assignUserRole( karaf, role );
+            assignUserRole( admin, role );
 
             per = createPermission( PermissionObject.KarafServerAdministration.getId(), 1, true, true, true, true );
-            assignRolePermission( role.getId(), per );
-            per = createPermission( PermissionObject.KarafServerManagement.getId(), 1, true, true, true, true );
-            assignRolePermission( role.getId(), per );
+            assignRolePermission( role, per );
             //*********************************************
 
             //*********************************************
@@ -149,60 +155,60 @@ public class IdentityManagerImpl implements IdentityManager
             for ( int a = 0; a < permsp.length; a++ )
             {
                 per = createPermission( permsp[a].getId(), 1, true, true, true, true );
-                assignRolePermission( role.getId(), per );
+                assignRolePermission( role, per );
             }
             //*********************************************
 
             //*********************************************
-            role = createRole( "Manager", UserType.Regular.getId() );
-            assignUserRole( manager.getId(), role );
+            role = createRole( "Peer-Manager", UserType.System.getId() );
+
+            //*********************************************
+            for ( int a = 0; a < permsp.length; a++ )
+            {
+                if (permsp[a] == PermissionObject.PeerManagement ||
+                    permsp[a] == PermissionObject.ResourceManagement )
+                {
+                    per = createPermission( permsp[a].getId(), 3, true, true, true, true );
+                    assignRolePermission( role, per );
+                }
+            }
+            //*********************************************
+
+            //*********************************************
+            role = createRole( "Environment-Manager", UserType.System.getId() );
 
             //*********************************************
             for ( int a = 0; a < permsp.length; a++ )
             {
                 if ( permsp[a] != PermissionObject.IdentityManagement &&
                         permsp[a] != PermissionObject.KarafServerAdministration &&
-                        permsp[a] != PermissionObject.KarafServerManagement &&
                         permsp[a] != PermissionObject.PeerManagement &&
                         permsp[a] != PermissionObject.ResourceManagement )
                 {
                     per = createPermission( permsp[a].getId(), 3, true, true, true, true );
-                    assignRolePermission( role.getId(), per );
+                    assignRolePermission( role, per );
                 }
             }
             //*********************************************
 
             //*********************************************
             role = createRole( "Internal-System", UserType.System.getId() );
-            assignUserRole( internal.getId(), role );
+            assignUserRole( internal, role );
 
             //*********************************************
             for ( int a = 0; a < permsp.length; a++ )
             {
                 if ( permsp[a] != PermissionObject.IdentityManagement &&
-                        permsp[a] != PermissionObject.KarafServerAdministration &&
-                        permsp[a] != PermissionObject.KarafServerManagement )
+                        permsp[a] != PermissionObject.KarafServerAdministration )
                 {
                     per = createPermission( permsp[a].getId(), 1, true, true, true, true );
-                    assignRolePermission( role.getId(), per );
+                    assignRolePermission( role, per );
                 }
             }
-            //*********************************************
-        }
-    }
 
-
-    private String generateArmoredPublicKey()
-    {
-        String keyId = UUID.randomUUID().toString();
-        KeyPair kPair = securityManager.getKeyManager().generateKeyPair( keyId, false );
-        try
-        {
-            return PGPEncryptionUtil.armorByteArrayToString( kPair.getPubKeyring() );
-        }
-        catch ( PGPException e )
-        {
-            return null;
+            //***** setPeer Owner By Default ***************
+            setPeerOwner( admin );
+            //**********************************************
         }
     }
 
@@ -456,9 +462,11 @@ public class IdentityManagerImpl implements IdentityManager
         {
             user = identityDataService.getUserByUsername( userName );
 
-            if ( user != null && user.isApproved() )
+            if ( user != null && ( user.getTrustLevel() > 1 ) )
             {
-                if ( !user.getPassword().equals( password ) || user.getStatus() == UserStatus.Disabled.getId() )
+                String pswHash = SecurityUtil.generateSecurePassword( password, user.getSalt() );
+
+                if ( !pswHash.equals( user.getPassword() ) || user.getStatus() == UserStatus.Disabled.getId() )
                 {
                     return null;
                 }
@@ -477,22 +485,110 @@ public class IdentityManagerImpl implements IdentityManager
      */
     @PermitAll
     @Override
-    public List<User> getAllUsers()
+    public void setPeerOwner( User user )
     {
-        List<User> result = new ArrayList<>();
-        result.addAll( identityDataService.getAllUsers() );
-        return result;
+        securityManager.getKeyManager().setPeerOwnerId( user.getSecurityKeyId() );
     }
 
 
     /* *************************************************
      */
-    @RolesAllowed( "Identity-Management|Read" )
+    @PermitAll
     @Override
-    public List<User> getAllSystemUsers()
+    public String getPeerOwnerId()
+    {
+        return securityManager.getKeyManager().getPeerOwnerId();
+    }
+
+
+    /* *************************************************
+     */
+    @PermitAll
+    @Override
+    public User getUserByKeyId( String keyId )
+    {
+        return identityDataService.getUserByKeyId( keyId );
+    }
+
+
+    /* *************************************************
+     */
+    @PermitAll
+    @Override
+    public User getUserByFingerprint( String fingerprint )
+    {
+        String keyId = securityManager.getKeyManager().getKeyDataByFingerprint( fingerprint ).getIdentityId();
+        return identityDataService.getUserByKeyId( keyId);
+    }
+
+
+    /* *************************************************
+     */
+    @PermitAll
+    @Override
+    public UserDelegate getUserDelegate( long userId )
+    {
+        return identityDataService.getUserDelegateByUserId(userId);
+    }
+
+
+    /* *************************************************
+     */
+    @PermitAll
+    @Override
+    public UserDelegate getUserDelegate(User user)
+    {
+        if(user == null)
+            return null;
+        else
+            return identityDataService.getUserDelegateByUserId(user.getId());
+    }
+
+
+    /* *************************************************
+     */
+    @PermitAll
+    @Override
+    public UserDelegate getUserDelegate( String id )
+    {
+        return identityDataService.getUserDelegate( id );
+    }
+
+
+    /* *************************************************
+     */
+    @PermitAll
+    @Override
+    public void setUserPublicKey( long userId, String publicKeyASCII )
+    {
+
+        User user = identityDataService.getUser( userId );
+
+        if(user!=null)
+        {
+            String secId = user.getSecurityKeyId();
+
+            if(Strings.isNullOrEmpty(secId))
+            {
+                secId = userId + "-"+ UUID.randomUUID();
+                user.setSecurityKeyId( secId );
+            }
+            publicKeyASCII = publicKeyASCII.trim();
+            securityManager.getKeyManager().savePublicKeyRing( secId,1,publicKeyASCII );
+            user.setFingerprint( securityManager.getKeyManager().getFingerprint( secId ) );
+            identityDataService.updateUser( user );
+        }
+    }
+
+
+    /* *************************************************
+     */
+    @PermitAll
+    @Override
+    public List<User> getAllUsers()
     {
         List<User> result = new ArrayList<>();
-        result.addAll( identityDataService.getAllSystemUsers() );
+        result.addAll( identityDataService.getAllUsers() );
         return result;
     }
 
@@ -504,6 +600,16 @@ public class IdentityManagerImpl implements IdentityManager
     public void assignUserRole( long userId, Role role )
     {
         identityDataService.assignUserRole( userId, role );
+    }
+
+
+    /* *************************************************
+     */
+    @RolesAllowed( "Identity-Management|Write" )
+    @Override
+    public void assignUserRole( User user, Role role )
+    {
+        identityDataService.assignUserRole( user, role );
     }
 
 
@@ -636,75 +742,8 @@ public class IdentityManagerImpl implements IdentityManager
     @Override
     public User createTempUser( String userName, String password, String fullName, String email, int type )
     {
-        //***************Cannot use TOKEN keyword *******
-        if ( userName.equalsIgnoreCase( "token" ) )
-        {
-            throw new IllegalArgumentException( "Cannot use TOKEN keyword." );
-        }
-        //***********************************************
-
-        if ( Strings.isNullOrEmpty( password ) )
-        {
-            password = Integer.toString( ( new Random() ).nextInt() );
-        }
-
-        User user = new UserEntity();
-        user.setUserName( userName );
-        user.setPassword( password );
-        user.setEmail( email );
-        user.setFullName( fullName );
-        user.setType( type );
-
-        return user;
-    }
-
-
-    @RolesAllowed( "Identity-Management|Write" )
-    @Override
-    public void approveUser( final String userName, List<Role> roles )
-    {
-        User user = identityDataService.getUserByUsername( userName );
-        user.setRoles( roles );
-        user.setApproved( true );
-
-
-        identityDataService.updateUser( user );
-    }
-
-
-    public User signUp( String username, String pwd, String fullName, String email, String keyAscii )
-    {
-        if ( Strings.isNullOrEmpty( pwd ) || !validUsername( username ) )
-        {
-            throw new IllegalArgumentException( "Invalid username/password" );
-        }
-        //all users are not approved by default
-        User user = new UserEntity();
-        user.setUserName( username );
-        user.setPassword( pwd );
-        user.setEmail( email );
-        user.setFullName( fullName );
-        user.setType( UserType.Regular.getId() );
-        String keyId = UUID.randomUUID().toString();
-        user.setSecurityKeyId( keyId );
-        securityManager.getKeyManager().savePublicKeyRing( keyId, SecurityKeyType.UserKey.getId(), keyAscii );
-
-        user.setFingerprint( securityManager.getKeyManager().getFingerprint( keyId ) );
-
-        identityDataService.persistUser( user );
-
-        return user;
-    }
-
-
-    /* *************************************************
-     */
-    @RolesAllowed( "Identity-Management|Write" )
-    @Override
-    public User createUser( String userName, String password, String fullName, String email, int type,
-                            final String publicKey, boolean isApproved )
-    {
-        User user = new UserEntity();
+        String salt = null;
+        User user = null;
 
         try
         {
@@ -717,32 +756,220 @@ public class IdentityManagerImpl implements IdentityManager
 
             if ( Strings.isNullOrEmpty( password ) )
             {
-                //password = Integer.toString( ( new Random() ).nextInt() );
-                throw new IllegalArgumentException( "Invalid password" );
+                password = Integer.toString( ( new Random() ).nextInt() );
+            }
+
+            salt = SecurityUtil.generateSecureRandom();
+            password = SecurityUtil.generateSecurePassword( password, salt );
+
+            user = new UserEntity();
+            user.setUserName( userName );
+            user.setPassword( password );
+            user.setSalt( salt );
+            user.setEmail( email );
+            user.setFullName( fullName );
+            user.setType( type );
+        }
+        catch ( NoSuchAlgorithmException e )
+        {
+            e.printStackTrace();
+        }
+        catch ( NoSuchProviderException e )
+        {
+            e.printStackTrace();
+        }
+
+        return user;
+    }
+
+
+    //**************************************************************
+    @RolesAllowed( { "Identity-Management|Write", "Identity-Management|Update" } )
+    @Override
+    public void setTrustLevel( User user, int trustLevel )
+    {
+        //TODO Check Public Key for Trust
+
+        user.setTrustLevel( trustLevel );
+
+        identityDataService.updateUser( user );
+    }
+
+
+    /* *************************************************
+     */
+    @RolesAllowed( "Identity-Management|Write" )
+    @Override
+    public UserDelegate createUserDelegate( User user, String delegateUserId, boolean genKeyPair )
+    {
+        String id = "";
+
+        if ( Strings.isNullOrEmpty( delegateUserId ) )
+        {
+            id = user.getId() + "-" + UUID.randomUUID();
+        }
+
+        UserDelegate userDelegate = new UserDelegateEntity();
+        userDelegate.setId( id );
+        userDelegate.setUserId( user.getId() );
+        identityDataService.persistUserDelegate( userDelegate );
+
+
+        if(genKeyPair)
+        {
+            generateKeyPair(id,SecurityKeyType.UserKey.getId());
+        }
+
+        return userDelegate;
+    }
+
+
+    /* *************************************************
+     */
+    @Override
+    public void approveDelegatedUser( final String trustMessage )
+    {
+        try
+        {
+            RelationManager relationManager = ServiceLocator.getServiceNoCache( RelationManager.class );
+            if ( relationManager != null )
+            {
+                User activeUser = getActiveUser();
+                UserDelegate delegatedUser = getUserDelegate( activeUser.getId() );
+                relationManager.processTrustMessage( trustMessage, delegatedUser.getId() );
+            }
+        }
+        catch ( NamingException e )
+        {
+            LOGGER.error("RelationManager service not found", e);
+        }
+        catch ( RelationVerificationException e )
+        {
+            LOGGER.error("Message verification failed", e);
+        }
+    }
+
+
+    /* *************************************************
+     */
+    @Override
+    public void createIdentityDelegationDocument()
+    {
+        try
+        {
+            RelationManager relationManager = ServiceLocator.getServiceNoCache( RelationManager.class );
+            KeyManager keyManager = securityManager.getKeyManager();
+            EncryptionTool encryptionTool = securityManager.getEncryptionTool();
+
+            User activeUser = getActiveUser();
+            UserDelegate delegatedUser = getUserDelegate( activeUser.getId() );
+            if ( delegatedUser == null )
+            {
+                delegatedUser = createUserDelegate( activeUser, null, true );
+            }
+
+            if ( keyManager.getPrivateKey( delegatedUser.getId() ) == null )
+            {
+                generateKeyPair( delegatedUser.getId(), SecurityKeyType.UserKey.getId() );
+            }
+
+
+            // TODO user should send signed trust message between delegatedUser and himself
+            RelationInfoMeta relationInfoMeta =
+                    new RelationInfoMeta( true, true, true, true, Ownership.USER.getLevel() );
+
+            assert relationManager != null;
+            RelationInfo relationInfo = relationManager.createTrustRelationship( relationInfoMeta );
+
+            // TODO relation verification should be done by delegated user, automatically
+            RelationMeta relationMeta =
+                    new RelationMeta( activeUser, delegatedUser, delegatedUser, delegatedUser.getId() );
+            Relation relation = relationManager.buildTrustRelation( relationInfo, relationMeta );
+
+            String relationJson = JsonUtil.toJson( relation );
+
+            PGPPublicKey publicKey = keyManager.getPublicKey( delegatedUser.getId() );
+            byte[] relationEncrypted = encryptionTool.encrypt( relationJson.getBytes(), publicKey, true );
+
+            String encryptedMessage = "\n" + new String( relationEncrypted, "UTF-8" );
+            delegatedUser.setRelationDocument( encryptedMessage );
+            identityDataService.updateUserDelegate( delegatedUser );
+            LOGGER.info(encryptedMessage);
+            LOGGER.info(delegatedUser.getId());
+        }
+        catch ( NamingException e )
+        {
+            LOGGER.error("Relation Manager service is unavailable", e);
+        }
+        catch ( UnsupportedEncodingException e )
+        {
+            LOGGER.error("Error decoding byte array", e);
+        }
+    }
+
+
+    /* *************************************************
+     */
+    private void generateKeyPair( String securityKeyId, int type )
+    {
+        KeyPair kp = securityManager.getKeyManager().generateKeyPair( securityKeyId, false );
+        securityManager.getKeyManager().saveKeyPair(securityKeyId,type, kp );
+    }
+
+
+    /* *************************************************
+     */
+    @RolesAllowed( "Identity-Management|Write" )
+    @Override
+    public User createUser( String userName, String password, String fullName, String email, int type, int trustLevel,
+                            boolean generateKeyPair,boolean createUserDelegate)
+    {
+        User user   = new UserEntity();
+        String salt = "";
+
+        try
+        {
+            if ( isValidUserName( userName ) != 0)
+            {
+                throw new IllegalArgumentException( "Error!!! Invalid username:" + userName);
+            }
+
+            if ( isValidPassword( userName, password ) != 0)
+            {
+                throw new IllegalArgumentException( "Error!!! Invalid password" );
+            }
+            else
+            {
+                salt = SecurityUtil.generateSecureRandom();
+                password = SecurityUtil.generateSecurePassword( password, salt );
             }
 
             user.setUserName( userName );
             user.setPassword( password );
+            user.setSalt( salt );
             user.setEmail( email );
             user.setFullName( fullName );
             user.setType( type );
-            user.setApproved( isApproved );
-
-            //** Create Key*****************************
-            // TODO check if keyId set for KeyPair is used somewhere in system
-            String keyId = UUID.randomUUID().toString();
-            //            KeyPair kPair = securityManager.getKeyManager().generateKeyPair( keyId, false );
-            //            securityManager.getKeyManager().saveKeyPair( keyId, SecurityKeyType.UserKey.getId(), kPair );
-            if ( !Strings.isNullOrEmpty( publicKey ) )
-            {
-                securityManager.getKeyManager().savePublicKeyRing( keyId, SecurityKeyType.UserKey.getId(), publicKey );
-                user.setFingerprint( securityManager.getKeyManager().getFingerprint( keyId ) );
-            }
-            //******************************************
-
-            user.setSecurityKeyId( keyId );
+            user.setTrustLevel( trustLevel );
 
             identityDataService.persistUser( user );
+
+            //***************************************
+            if(generateKeyPair)
+            {
+                String securityKeyId = user.getId() + "-" + UUID.randomUUID();
+                generateKeyPair( securityKeyId, 1 );
+                user.setSecurityKeyId( securityKeyId);
+                identityDataService.updateUser( user );
+            }
+            //***************************************
+
+            //***************************************
+            if(createUserDelegate)
+            {
+                createUserDelegate( user,null,true );
+            }
+            //***************************************
         }
         catch ( Exception ex )
         {
@@ -765,30 +992,54 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
+    @RolesAllowed( "Identity-Management|Delete" )
+    @Override
+    public void removeUserRole( User user, Role role )
+    {
+        identityDataService.removeUserRole( user, role );
+    }
+
+
+    /* *************************************************
+     */
     @PermitAll
     @Override
     public boolean changeUserPassword( long userId, String oldPassword, String newPassword )
     {
         User user = identityDataService.getUser( userId );
-
+        String salt;
         //******Cannot update Internal User *************
         if ( user.getType() == UserType.System.getId() )
         {
             throw new AccessControlException( "Internal User cannot be updated" );
         }
 
-        //***********************************************
-        if ( !user.getPassword().equals( oldPassword ) )
+        String pswHash = SecurityUtil.generateSecurePassword( oldPassword, user.getSalt() );
+
+        if ( !pswHash.equals( user.getPassword() ) )
         {
             throw new AccessControlException( "Invalid old password specified" );
         }
         else
         {
-            user.setPassword( newPassword );
-            identityDataService.updateUser( user );
-            return true;
+            if ( isValidPassword( user.getUserName(), newPassword ) != 0 )
+            {
+                throw new IllegalArgumentException( "Error!!! Invalid password" );
+            }
+            else
+            {
+                try
+                {
+                    salt = SecurityUtil.generateSecureRandom();
+                    newPassword = SecurityUtil.generateSecurePassword( newPassword, salt );
+                    user.setPassword( newPassword );
+                    identityDataService.updateUser( user );
+                }
+                catch ( NoSuchAlgorithmException | NoSuchProviderException e ){}
+            }
         }
-        //***********************************************
+
+        return true;
     }
 
 
@@ -822,17 +1073,6 @@ public class IdentityManagerImpl implements IdentityManager
         }
         //***********************************************
 
-        String keyId = UUID.randomUUID().toString();
-        if ( !Strings.isNullOrEmpty( publicKey ) )
-        {
-            securityManager.getKeyManager().savePublicKeyRing( keyId, SecurityKeyType.UserKey.getId(), publicKey );
-            user.setFingerprint( securityManager.getKeyManager().getFingerprint( keyId ) );
-            LOGGER.warn( user.getFingerprint() );
-        }
-        //******************************************
-
-        user.setSecurityKeyId( keyId );
-
         identityDataService.updateUser( user );
     }
 
@@ -852,6 +1092,65 @@ public class IdentityManagerImpl implements IdentityManager
         //***********************************************
 
         identityDataService.removeUser( userId );
+    }
+
+
+    /* *************************************************
+     */
+    private int isValidUserName( String userName)
+    {
+        if(Strings.isNullOrEmpty(userName))
+        {
+            return 1;
+        }
+        else
+        {
+            //***************Cannot use TOKEN keyword *******
+            if ( userName.length() < 4)
+            {
+                return 2;
+            }
+            else if ( userName.equalsIgnoreCase( "token" )  ||
+                    userName.equalsIgnoreCase( "administrator" ) ||
+                    userName.equalsIgnoreCase( "system" ))
+            {
+                return 1;
+            }
+            else
+            {
+                return 0;
+            }
+            //***********************************************
+        }
+    }
+
+
+    /* *************************************************
+     */
+    private int isValidPassword( String userName, String password)
+    {
+        if(Strings.isNullOrEmpty(password))
+        {
+            return 1;
+        }
+        else
+        {
+            //***************Cannot use TOKEN keyword *******
+            if ( password.length() < 4 )
+            {
+                return 2;
+            }
+            else if ( password.equalsIgnoreCase( userName ) ||
+                      password.equalsIgnoreCase( "password" ) ||
+                      password.equalsIgnoreCase( "system" ) )
+            {
+                return 1;
+            }
+            else
+            {
+                return 0;
+            }
+        }
     }
 
 
@@ -991,6 +1290,16 @@ public class IdentityManagerImpl implements IdentityManager
     public void assignRolePermission( long roleId, Permission permission )
     {
         identityDataService.assignRolePermission( roleId, permission );
+    }
+
+
+    /* *************************************************
+     */
+    @RolesAllowed( "Identity-Management|Write" )
+    @Override
+    public void assignRolePermission( Role role, Permission permission )
+    {
+        identityDataService.assignRolePermission( role, permission );
     }
 
 
@@ -1146,6 +1455,8 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
+    /* *************************************************
+     */
     private boolean validUsername( String username )
     {
         if ( username.length() == 0 || username.isEmpty() || username.equalsIgnoreCase( "token" ) )

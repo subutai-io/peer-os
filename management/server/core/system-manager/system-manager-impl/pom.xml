@@ -28,7 +28,10 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>subutai-common</artifactId>
     </dependency>
-
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>kurjun-api</artifactId>
+    </dependency>
   </dependencies>
 
   <build>

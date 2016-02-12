@@ -1,0 +1,43 @@
+<div ng-controller="SettingsChannelCtrl as settingsChannelCtrl">
+
+	<div class="b-workspace__header">
+		<div ng-include="'subutai-app/common/partials/login-header.html'"></div>
+
+		<h1 class="b-title"><span class="b-title_breadcrumbs">Network Settings</span></h1>
+	</div>
+
+	<div class="b-workspace__content">
+		<div class="b-workspace-content__row">
+			<div class="b-main-table-border" style = "width: 500px">
+				<table class="b-main-table b-main-table_with-header" style = "width: 500px" align = "center">
+					<tr>
+						<th>Open HTTP Port</th>
+						<td style = "padding-right: 18px"><input class="b-form-input b-form-input_full" type="text" ng-model="settingsChannelCtrl.config.openPort" required></td>
+					</tr>
+					<tr>
+						<th>SSL Port</th>
+						<td style = "padding-right: 18px"><input class="b-form-input b-form-input_full" type="text" ng-model="settingsChannelCtrl.config.securePortX1" required></td>
+					</tr>
+					<tr>
+						<th>SSL Mutual Port</th>
+						<td style = "padding-right: 18px"><input class="b-form-input b-form-input_full" type="text" ng-model="settingsChannelCtrl.config.securePortX2" required></td>
+					</tr>
+					<tr>
+						<th>Reserved SSL Port</th>
+						<td style = "padding-right: 18px"><input class="b-form-input b-form-input_full" type="text" ng-model="settingsChannelCtrl.config.securePortX3" required></td>
+					</tr>
+          <tr>
+            <th>Reserved HTTP Port</th>
+            <td style = "padding-right: 18px"><input class="b-form-input b-form-input_full" type="text" ng-model="settingsChannelCtrl.config.specialPortX1" required></td>
+          </tr>
+				</table>
+			</div>
+			<button
+					class="b-btn b-btn_green g-left g-margin-bottom"
+					ng-click="settingsChannelCtrl.updateConfig()"
+					style = "margin-top: 15px">
+				<i class="fa fa-floppy-o"></i>&#160;&#160;Save
+			</button>
+		</div>
+	</div>
+</div>

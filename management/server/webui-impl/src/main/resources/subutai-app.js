@@ -199,7 +199,7 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 		})
 		.state('environments', {
 			url: '/environments/{activeTab}',
-			templateUrl: 'subutai-app/environment/partials/dragAndDrop.html',
+			templateUrl: 'subutai-app/environment/partials/view.html',
 			data: {
 				bodyClass: '',
 				layout: 'default'
@@ -212,6 +212,8 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 							files: [
 								'subutai-app/environment/environment.js',
 								'subutai-app/environment/controller.js',
+								'subutai-app/environment/simple-controller.js',
+								'subutai-app/environment/advanced-controller.js',
 								'subutai-app/environment/service.js',
 								'subutai-app/peerRegistration/service.js',
 								'subutai-app/tracker/service.js'
@@ -397,6 +399,28 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 				}]
 			}
 		})
+		.state('account-settings', {
+			url: '/account-settings',
+			templateUrl: 'subutai-app/accountSettings/partials/view.html',
+			data: {
+				bodyClass: '',
+				layout: 'default'
+			},
+			resolve: {
+				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+					return $ocLazyLoad.load([
+						{
+							name: 'subutai.accountSettings',
+							files: [
+								'subutai-app/accountSettings/tokens.js',
+								'subutai-app/accountSettings/controller.js',
+								'subutai-app/identity/service.js'
+							]
+						}
+					]);
+				}]
+			}
+		})
 		.state('console', {
 			url: '/console/{containerId}',
 			templateUrl: 'subutai-app/console/partials/view.html',
@@ -556,7 +580,51 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 				}]
 			}
 		})
-		.state('404', {
+        .state('settings-channel', {
+            url: '/settings-channel',
+            templateUrl: 'subutai-app/settingsChannel/partials/view.html',
+            data: {
+                bodyClass: '',
+                layout: 'default'
+            },
+            resolve: {
+                loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([
+                        {
+                            name: 'subutai.settings-channel',
+                            files: [
+                                'subutai-app/settingsChannel/settingsChannel.js',
+                                'subutai-app/settingsChannel/controller.js',
+                                'subutai-app/settingsChannel/service.js'
+                            ]
+                        }
+                    ]);
+                }]
+            }
+        })
+        .state('settings-owner', {
+            url: '/settings-owner',
+            templateUrl: 'subutai-app/settingsOwner/partials/view.html',
+            data: {
+                bodyClass: '',
+                layout: 'default'
+            },
+            resolve: {
+                loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([
+                        {
+                            name: 'subutai.settings-owner',
+                            files: [
+                                'subutai-app/settingsOwner/settingsOwner.js',
+                                'subutai-app/settingsOwner/controller.js',
+                                'subutai-app/settingsOwner/service.js'
+                            ]
+                        }
+                    ]);
+                }]
+            }
+        })
+        .state('404', {
 			url: '/404',
 			templateUrl: 'subutai-app/common/partials/404.html',
 			data: {

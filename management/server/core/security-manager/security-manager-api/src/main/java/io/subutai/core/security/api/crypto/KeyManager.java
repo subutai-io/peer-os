@@ -59,9 +59,10 @@ public interface KeyManager
      */
     void removeKeyData( String identityId );
 
+
     /* *****************************
-                 * Gets KeyRing from the store and returns Publickey object
-                 */
+     * Gets KeyRing from the store and returns Publickey object
+     */
     public PGPPublicKey getPublicKey( String identityId );
 
 
@@ -69,12 +70,6 @@ public interface KeyManager
      *
      */
     public String getPeerId();
-
-
-    /* *****************************
-     *
-     */
-    public String getOwnerId();
 
 
     /* *****************************
@@ -110,6 +105,16 @@ public interface KeyManager
     /* ***************************************************************
      *
      */
+    void setPeerOwnerId( String id );
+
+    /* ***************************************************************
+     *
+     */
+    String getPeerOwnerId();
+
+    /* ***************************************************************
+             *
+             */
     PGPPublicKeyRing signKey( PGPSecretKeyRing sourceSecRing, PGPPublicKeyRing targetPubRing, int trustLevel );
 
 
