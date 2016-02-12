@@ -155,6 +155,7 @@ func Clone(parent, child string) {
 	c, err := lxc.NewContainer(parent, config.Agent.LxcPrefix)
 	log.Check(log.FatalLevel, "Looking for container "+parent, err)
 
+	fs.SubvolumeCreate(config.Agent.LxcPrefix + child)
 	err = c.Clone(child, lxc.CloneOptions{Backend: backend})
 	log.Check(log.FatalLevel, "Cloning container", err)
 

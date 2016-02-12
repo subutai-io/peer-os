@@ -60,7 +60,7 @@ func Install(parent, child string) {
 		child + "/deltas/var.delta":    {parent + "/var", child},
 	}
 
-	log.Check(log.FatalLevel, "Creating dir "+child, os.MkdirAll(config.Agent.LxcPrefix+child, 0700))
+	fs.SubvolumeCreate(config.Agent.LxcPrefix + child)
 
 	p := true
 	if parent == child || parent == "" {

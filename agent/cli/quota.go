@@ -19,6 +19,8 @@ func LxcQuota(name, res, size, max string) {
 		fmt.Println(fs.Quota(name+"/var", size))
 	case "diskOpt":
 		fmt.Println(fs.Quota(name+"/opt", size))
+	case "disk":
+		fmt.Println(fs.DiskQuota(name, size))
 	case "cpuset":
 		fmt.Println(container.QuotaCPUset(name, size))
 	case "ram":
