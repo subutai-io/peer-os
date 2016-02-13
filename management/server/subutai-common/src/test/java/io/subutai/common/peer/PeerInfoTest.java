@@ -40,7 +40,7 @@ public class PeerInfoTest
         peerInfo = new PeerInfo();
         peerInfo.setId( UUID.randomUUID().toString() );
 //        peerInfo.setGatewayIp( "testGateWayIp" );
-        peerInfo.setPublicUrl( "testIp" );
+        peerInfo.setPublicUrl( "localhost" );
 //        peerInfo.setKeyId( "testKeyId" );
 //        peerInfo.setLastUsedVlanId( 555 );
         peerInfo.setName( "testName" );

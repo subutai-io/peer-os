@@ -11,16 +11,6 @@
   <authz:enable />
   <!-- ***************************************************************** -->
 
-  <!-- Allow the use of system properties -->
-
-  <ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]" />
-
-  <cm:property-placeholder persistent-id="peer" update-strategy="none">
-    <cm:default-properties>
-      <cm:property name="externalIpInterface" value="eth1" />
-      <cm:property name="publicURL" value=""/>
-    </cm:default-properties>
-  </cm:property-placeholder>
 
   <!-- ***************************************************************** -->
   <bean id="daoManagerPeer" init-method="init" class="io.subutai.common.dao.DaoManager" scope="prototype">
@@ -64,8 +54,9 @@
     <argument ref="hostRegistry" />
     <argument ref="monitor" />
     <argument ref="securityManager" />
+<!--
     <property name="externalIpInterface" value="${externalIpInterface}" />
-    <property name="publicUrl" value="${publicURL}" />
+-->
   </bean>
 
   <bean id="messageRequestListener" class="io.subutai.core.localpeer.impl.request.MessageRequestListener"

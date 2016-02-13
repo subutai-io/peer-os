@@ -109,6 +109,8 @@ public class PeerManagerImpl implements PeerManager
     private String ownerId;
     private RegistrationClient registrationClient;
     protected ScheduledExecutorService backgroundTasksExecutorService;
+    private String publicUrl;
+
     private String controlNetwork;
     private long controlNetworkTtl = 0;
 
@@ -141,7 +143,7 @@ public class PeerManagerImpl implements PeerManager
             this.peerDataService = new PeerDataService( daoManager.getEntityManagerFactory() );
 
             localPeerId = securityManager.getKeyManager().getPeerId();
-            ownerId     = securityManager.getKeyManager().getPeerOwnerId();
+            ownerId = securityManager.getKeyManager().getPeerOwnerId();
 
             PeerData localPeerData = peerDataService.find( localPeerId );
 
@@ -151,9 +153,8 @@ public class PeerManagerImpl implements PeerManager
                 PeerInfo localPeerInfo = new PeerInfo();
                 localPeerInfo.setId( localPeerId );
                 localPeerInfo.setOwnerId( ownerId );
-                //                localPeerInfo.setIp( localPeerIp );
-                //                localPeerInfo.setName( String.format( "Peer %s %s", localPeerId, localPeerIp ) );
-                localPeerInfo.setName( "NOT INITIALIZED" );
+                localPeerInfo.setPublicUrl( publicUrl );
+                localPeerInfo.setName( String.format( "Peer %s %s", localPeerId, publicUrl ) );
                 PeerPolicy policy = getDefaultPeerPolicy( localPeerId );
 
                 PeerData peerData =
@@ -183,25 +184,10 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    //    private String getLocalPeerIp() throws PeerException
-    //    {
-    //        String result = null;
-    //
-    //
-    //        try
-    //        {
-    //            result = localPeer.getManagementHost().getInterfaceByName( externalIpInterface ).getIp();
-    //        }
-    //        catch ( HostNotFoundException e )
-    //        {
-    //            LOG.error( "Error getting local IP", e );
-    //        }
-    //        if ( result == null )
-    //        {
-    //            throw new PeerException( "Could not determine IP address of peer." );
-    //        }
-    //        return result;
-    //    }
+    public void setPublicUrl( final String publicUrl )
+    {
+        this.publicUrl = publicUrl;
+    }
 
 
     public PeerPolicy getDefaultPeerPolicy( String peerId )
