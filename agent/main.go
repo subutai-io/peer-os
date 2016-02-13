@@ -40,6 +40,13 @@ func main() {
 			lib.LxcAttach(c.Args().Get(0), c.Bool("c"), c.Bool("x"), c.Bool("r"))
 		}}, {
 
+		Name: "batch", Usage: "batch commands execution",
+		Flags: []cli.Flag{
+			cli.StringFlag{Name: "json", Usage: "JSON string with commands"}},
+		Action: func(c *cli.Context) {
+			lib.Batch(c.String("json"))
+		}}, {
+
 		Name: "clone", Usage: "clone Subutai container",
 		Flags: []cli.Flag{
 			cli.StringFlag{Name: "e", Usage: "set environment id for container"},

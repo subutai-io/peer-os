@@ -87,14 +87,13 @@ func download(file, md5, token string) string {
 }
 
 func LxcImport(templ, token string) {
-	config.CheckKurjun()
-
-	fullname := templ + "-subutai-template_" + config.Misc.Version + "_" + config.Misc.Arch + ".tar.gz"
 	if container.IsTemplate(templ) {
 		log.Info(templ + " template exist")
 		return
 	}
 
+	config.CheckKurjun()
+	fullname := templ + "-subutai-template_" + config.Misc.Version + "_" + config.Misc.Arch + ".tar.gz"
 	// if token == "" {
 	token = gpg.GetToken()
 	// }
