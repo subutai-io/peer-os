@@ -28,32 +28,25 @@
     {
 
         addRh( "rh 1", "rhId 1", "peer 1", "peerId 1" );
-        setTimeout(function(){
+
             addRh( "rh 2", "rhId 2", "peer 1", "peerId 1" );
-        }, 300);
 
 
-        setTimeout(function(){
+
+
         addRh( "rh 1", "rhId 1", "peer 2", "peerId 2" );
-        }, 600);
-            setTimeout(function(){
+
         addRh( "rh 1", "rhId 1", "peer 3", "peerId 3" );
-            }, 900);
-                setTimeout(function(){
+
         addRh( "rh 2", "rhId 2", "peer 3", "peerId 3" );
-                }, 1200);
-                    setTimeout(function(){
+
         addRh( "rh 3", "rhId 3", "peer 3", "peerId 3" );
-                    }, 1500);
-                        setTimeout(function(){
+
         addRh( "rh 4", "rhId 4", "peer 3", "peerId 3" );
-                        }, 1800);
-                            setTimeout(function(){
+
         addRh( "rh 1", "rhId 1", "peer 4", "peerId 4" );
-                            }, 2100);
-                                setTimeout(function(){
+
         addRh( "rh 1", "rhId 1", "peer 5", "peerId 5" );
-                                }, 2400);
     }
 
 
@@ -166,15 +159,6 @@
         return PEER_MAP[id].id;
     }
 
-    paper.on('cell:pointerdown', function(cellView) {
-        console.log(cellView);
-    });
-
-    paper.on('cell:pointerup', function(cellView) {
-
-        console.log(cellView)
-    });
-
     function addRh( rhName, rhId, peerName, peerId )
     {
         var peerCellId= addPeer( peerName, peerId );
@@ -261,6 +245,42 @@
     }
 
 
+    paper.on('cell:pointerdown', function(cellView) {
+        cellView.prevPos = cellView.model.get('position');
+    });
+
+    paper.on('cell:pointerup', function(cellView) {
+
+        if( cellView.model.get( 'containerName' ) === undefined )
+            return;
+
+        var models = graph.findModelsFromPoint({x : cellView._dx, y: cellView._dy});
+
+        for( var i = 0; i < models.length; i++ ) {
+            if (models[i].get('hostId') !== undefined) {
+                if( cellView.model.get("parent") != models[i].id )
+                {
+                    var rh = cellView.model.get('rh');
+                    var prevParent = graph.getCell(cellView.model.get("parent"));
+                    prevParent.unembed(cellView.model);
+                    delete prevParent.get('grid')[rh.x][rh.y];
+
+                    var rPos = models[i].get('position');
+                    var gPos = placeRhSimple( models[i].get('grid'), models[i].get('gridSize') );
+
+                    cellView.model.set('rh', { model: models[i].id, x: gPos.x, y: gPos.y});
+                    cellView.model.set('position', { x: rPos.x + gPos.x * GRID_SIZE + GRID_SPACING, y: rPos.y + gPos.y * GRID_SIZE + GRID_SPACING });
+
+                    models[i].embed(cellView.model);
+
+
+                    return;
+                }
+            }
+        }
+
+        cellView.model.set('position', cellView.prevPos);
+    });
 
 //    graph.on('change:position', function(cell) {
 //
