@@ -14,6 +14,6 @@ func Cleanup(vlan string) {
 	}
 
 	net.DeleteGateway(vlan)
-	net.DeleteAllVNI(vlan)
+	ClearVlan(vlan)
 	ProxyDel(vlan, "", true)
 }
