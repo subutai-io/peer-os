@@ -115,7 +115,7 @@ public class CreateContainerTask implements Callable<ContainerHostInfo>
 
 
         final ArrayList<String> arg = Lists.newArrayList( JsonUtil.toJson( actions ) );
-        commandUtil.execute( new RequestBuilder( "subutai batch -json" ).withCmdArgs( arg ), resourceHost );
+        commandUtil.execute( new RequestBuilder( String.format( "subutai batch -json '%s'", arg ) ), resourceHost );
 
         long start = System.currentTimeMillis();
 
@@ -180,7 +180,7 @@ public class CreateContainerTask implements Callable<ContainerHostInfo>
         }
 
 
-        public BatchAction( final String quota )
+        public BatchAction( final String action )
         {
             this.action = action;
         }
