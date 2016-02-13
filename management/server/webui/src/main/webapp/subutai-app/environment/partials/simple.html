@@ -14,7 +14,7 @@
 			<div class="b-tools-menu js-scrollbar">
 				<ul>
 					<li ng-repeat="template in environmentSimpleViewCtrl.templates">
-						<a href ng-click="environmentSimpleViewCtrl.addContainer(template, $event)">
+						<span class="b-tools-menu__item" ng-click="environmentSimpleViewCtrl.addContainer(template, $event)">
 							<span class="b-cloud-item">
 								<img
 									ng-src="assets/templates/{{ template }}.jpg"
@@ -22,7 +22,7 @@
 									onError="this.onerror=null;this.src='assets/templates/no-image.jpg';">
 							</span>
 							<span class="b-cloud-item-text">{{ template }}</span>
-						</a>
+						</span>
 					</li>
 				</ul>
 			</div>
@@ -99,17 +99,16 @@
 									{{key}}:{{value.counts}}
 								</a>
 							</td>
-							<td>
+							<td class="b-main-table__controls">
 								<a href
 									class="b-icon b-icon_share"
 									tooltips
 									tooltip-template='Share'
 									ng-click="environmentViewCtrl.shareEnvironmentWindow (environment)"
-									ng-show = "environment.status === 'HEALTHY'"
-									style = "margin-left: 10px; margin-top: 5px">
+									ng-show = "environment.status === 'HEALTHY'">
 								</a>
-								<a href class="b-icon b-icon_edit" ng-click="environmentSimpleViewCtrl.editEnvironment(environment)" style = "margin-left: 10px; margin-top: 5px; visibility: visible"></a>
-								<a href class="b-icon b-icon_remove" ng-click="environmentViewCtrl.destroyEnvironment(environment.id)" style = "margin-left: 10px; margin-top: 5px"></a>
+								<a href class="b-icon b-icon_edit" ng-click="environmentSimpleViewCtrl.editEnvironment(environment)" style = "visibility: visible"></a>
+								<a href class="b-icon b-icon_remove" ng-click="environmentViewCtrl.destroyEnvironment(environment.id)"></a>
 							</td>
 						</tr>
 					</tbody>

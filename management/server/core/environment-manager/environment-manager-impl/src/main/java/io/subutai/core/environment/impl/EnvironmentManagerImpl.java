@@ -60,9 +60,6 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.security.crypto.pgp.KeyPair;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.Ownership;
-import io.subutai.common.security.objects.PermissionObject;
-import io.subutai.common.security.objects.PermissionOperation;
-import io.subutai.common.security.objects.PermissionScope;
 import io.subutai.common.security.objects.SecurityKeyType;
 import io.subutai.common.security.relation.RelationLink;
 import io.subutai.common.settings.Common;
@@ -1925,17 +1922,20 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     public List<ShareDto> getSharedUsers( final String objectId ) throws EnvironmentNotFoundException
     {
         Environment environment = loadEnvironment( objectId );
-        RelationLink objectRelationLink =
-                relationManager.getRelationLink( String.valueOf( objectId ), environment.getClass().getSimpleName() );
+        RelationLink objectRelationLink = relationManager.getRelationLink( environment );
 
         List<Relation> relations = relationManager.getRelationsByObject( objectRelationLink );
         List<ShareDto> sharedUsers = Lists.newArrayList();
 
         for ( final Relation relation : relations )
         {
+            UserDelegate delegatedUser = identityManager.getUserDelegate( relation.getTarget().getUniqueIdentifier() );
+            if ( delegatedUser == null )
+            {
+                continue;
+            }
             ShareDto shareDto = new ShareDto();
-
-            shareDto.setId( Long.parseLong( relation.getTarget().getUniqueIdentifier() ) );
+            shareDto.setId( delegatedUser.getUserId() );
 
             RelationInfo relationInfo = relation.getRelationInfo();
             shareDto.setRead( relationInfo.isReadPermission() );

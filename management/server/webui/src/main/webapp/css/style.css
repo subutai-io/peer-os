@@ -1041,6 +1041,15 @@ tip.description-tooltip {
     width: 430px;
 }
 
+.b-popup-header-controls {
+	float: right;
+	margin: 0 0 0 10px;
+}
+
+.b-popup-header-controls:last-child {
+	margin-left: 0;
+}
+
 .b-popup__header {
     box-sizing: border-box;
     width: 100%;
@@ -2627,7 +2636,17 @@ td.b-main-table__status-col {
 
 .b-tools-menu ul li {
     padding: 10px;
+	position: relative;
 }
+
+.b-template-drag {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0;
+}
+
 .b-tools-menu ul li:hover {
     background-color: #fbfbfb;
     cursor: pointer;
@@ -2671,10 +2690,11 @@ td.b-main-table__status-col {
     display: inline-block;
     vertical-align: middle;
 }
-.b-tools-menu ul li a {
+.b-tools-menu__item {
     text-decoration: none;
     display: block;
     vertical-align: middle;
+	color: #04346E;
 }
 
 .b-cloud-item-resource-name {
@@ -2953,8 +2973,18 @@ td.b-main-table__status-col {
     border-radius: 2px;
 }
 
+.b-pgp-page-row {
+	
+}
+
 .b-pgp-page-block {
 	width: 420px;
+	float: left;
+	margin: 0 100px 0 0;
+}
+
+.b-pgp-page-block:last-child {
+	margin-right: 0;
 }
 
 .b-pgp-page-block__buttons {
