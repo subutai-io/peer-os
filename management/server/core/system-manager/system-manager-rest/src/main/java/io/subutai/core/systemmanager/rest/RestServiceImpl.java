@@ -3,6 +3,7 @@ package io.subutai.core.systemmanager.rest;
 
 import javax.ws.rs.core.Response;
 
+import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.peer.api.PeerManager;
@@ -71,6 +72,28 @@ public class RestServiceImpl implements RestService
 
 
     @Override
+    public Response setPeerPolicy( final String peerId, final String diskUsageLimit, final String cpuUsageLimit,
+                                   final String memoryUsageLimit, final String environmentLimit,
+                                   final String containerLimit )
+    {
+        PeerPolicy peerPolicy =
+                new PeerPolicy( peerId, Integer.parseInt( diskUsageLimit ), Integer.parseInt( cpuUsageLimit ),
+                        Integer.parseInt( memoryUsageLimit ), 90, Integer.parseInt( environmentLimit ),
+                        Integer.parseInt( containerLimit ) );
+        try
+        {
+            peerManager.setPolicy( peerId, peerPolicy );
+        }
+        catch ( PeerException e )
+        {
+            Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
+            e.printStackTrace();
+        }
+        return Response.status( Response.Status.OK ).build();
+    }
+
+
+    @Override
     public Response getNetworkSettings()
     {
         NetworkSettings pojo = systemManager.getNetworkSettings();
@@ -81,12 +104,33 @@ public class RestServiceImpl implements RestService
 
 
     @Override
+    public Response setNetworkSettings( final String externalIpInterface, final String openPort,
+                                        final String securePortX1, final String securePortX2, final String securePortX3,
+                                        final String specialPortX1 )
+    {
+        systemManager.setNetworkSettings( externalIpInterface, openPort, securePortX1, securePortX2, securePortX3,
+                specialPortX1 );
+        return Response.status( Response.Status.OK ).build();
+    }
+
+
+    @Override
     public Response getSecuritySettings()
     {
         SecuritySettings pojo = systemManager.getSecuritySettings();
         String securitySettingsInfo = JsonUtil.GSON.toJson( pojo );
 
         return Response.status( Response.Status.OK ).entity( securitySettingsInfo ).build();
+    }
+
+
+    @Override
+    public Response setSecuritySettings( final boolean encryptionEnabled, final boolean restEncryptionEnabled,
+                                         final boolean integrationEnabled, final boolean keyTrustCheckEnabled )
+    {
+        systemManager.setSecuritySettings( encryptionEnabled, restEncryptionEnabled, integrationEnabled,
+                keyTrustCheckEnabled );
+        return Response.status( Response.Status.OK ).build();
     }
 
 

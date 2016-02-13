@@ -19,9 +19,10 @@ function SettingsSecuritySrv($http) {
     }
 
     function updateConfig(config) {
-        var postData = "encryptionEnabled=" + config.encryptionEnabled + "&restEncryptionEnabled=" + config.restEncryptionEnabled + "&integrationEnabled=" + config.integrationEnabled + "&keyTrustCheckEnabled=" + config.keyTrustCheckEnabled;
+        console.log(config);
+        var postData = "encryptionEnabled=" + config.encryptionState + "&restEncryptionEnabled=" + config.restEncryptionState + "&integrationEnabled=" + config.integrationState + "&keyTrustCheckEnabled=" + config.keyTrustCheckState;
         return $http.post(
-            SERVER_URL + "",
+            SERVER_URL + "rest/v1/system/update_security_settings",
             postData,
             {withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
         );

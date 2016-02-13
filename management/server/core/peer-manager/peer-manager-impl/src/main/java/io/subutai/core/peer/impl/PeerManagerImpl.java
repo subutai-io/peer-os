@@ -2,7 +2,6 @@ package io.subutai.core.peer.impl;
 
 
 import java.io.IOException;
-import java.net.SocketException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,7 +38,6 @@ import com.google.common.base.Preconditions;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.peer.Encrypted;
-import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
@@ -52,7 +50,6 @@ import io.subutai.common.protocol.PingDistances;
 import io.subutai.common.security.objects.TokenType;
 import io.subutai.common.settings.ChannelSettings;
 import io.subutai.common.util.ControlNetworkUtil;
-import io.subutai.common.util.IPUtil;
 import io.subutai.common.util.SecurityUtilities;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
@@ -874,7 +871,7 @@ public class PeerManagerImpl implements PeerManager
         return null;
     }
 
-
+    @Override
     public void setPolicy( String peerId, PeerPolicy peerPolicy ) throws PeerException
     {
         Peer peer = getPeer( peerId );
@@ -900,7 +897,8 @@ public class PeerManagerImpl implements PeerManager
         }
         catch ( Exception e )
         {
-            throw new PeerException( "Invalid policy: " + e.getMessage(), e );
+            e.printStackTrace();
+//            throw new PeerException( "Invalid policy: " + e.getMessage(), e );
         }
 
 

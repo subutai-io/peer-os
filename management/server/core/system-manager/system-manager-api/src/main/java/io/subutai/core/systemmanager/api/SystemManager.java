@@ -15,19 +15,21 @@ public interface SystemManager
 {
     public SecuritySettings getSecuritySettings();
 
-    public void setSecuritySettings( SecuritySettings settings );
-
     public KurjunSettings getKurjunSettings();
 
     public void setKurjunSettings( KurjunSettings settings );
 
     public NetworkSettings getNetworkSettings();
 
-    public void setNetworkSettings( NetworkSettings settings );
-
     public SystemInfo getSystemInfo();
 
     public void setPeerSettings();
 
     public PeerSettings getPeerSettings();
+
+    void setNetworkSettings( String externalIpInterface, String openPort, String securePortX1, String securePortX2,
+                             String securePortX3, String specialPortX1 );
+
+    void setSecuritySettings( boolean encryptionEnabled, boolean restEncryptionEnabled, boolean integrationEnabled,
+                              boolean keyTrustCheckEnabled );
 }

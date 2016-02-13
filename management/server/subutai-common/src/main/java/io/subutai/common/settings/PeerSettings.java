@@ -35,9 +35,9 @@ public class PeerSettings
     }
 
 
-    public static Object getExternalIpInterface()
+    public static String getExternalIpInterface()
     {
-        return PROPERTIES.getProperty( "externalIpInterface" );
+        return String.valueOf( PROPERTIES.getProperty( "externalIpInterface" ) );
     }
 
 
@@ -69,19 +69,76 @@ public class PeerSettings
     }
 
 
-    public static void setSettings( final boolean encryptionState, final boolean restEncryptionState,
-                                    final boolean integrationState, final boolean keyTrustCheckState )
+    public static void setExternalIpInterface( String externalIpInterface )
     {
         try
         {
-            PROPERTIES.setProperty( "encryptionEnabled", encryptionState );
-            PROPERTIES.setProperty( "restEncryptionEnabled", restEncryptionState );
-            PROPERTIES.setProperty( "integrationEnabled", integrationState );
-            PROPERTIES.setProperty( "keyTrustCheckEnabled", keyTrustCheckState );
+            PROPERTIES.setProperty( "externalIpInterface", externalIpInterface );
             PROPERTIES.save();
         }
         catch ( ConfigurationException e )
         {
+            LOG.error( "Error in saving peer.cfg file." );
+            e.printStackTrace();
+        }
+    }
+
+
+    public static void setEncryptionState( boolean encryptionEnabled )
+    {
+        try
+        {
+            PROPERTIES.setProperty( "encryptionEnabled", encryptionEnabled );
+            PROPERTIES.save();
+        }
+        catch ( ConfigurationException e )
+        {
+            LOG.error( "Error in saving peer.cfg file." );
+            e.printStackTrace();
+        }
+    }
+
+
+    public static void setRestEncryptionState( boolean restEncryptionEnabled )
+    {
+        try
+        {
+            PROPERTIES.setProperty( "restEncryptionEnabled", restEncryptionEnabled );
+            PROPERTIES.save();
+        }
+        catch ( ConfigurationException e )
+        {
+            LOG.error( "Error in saving peer.cfg file." );
+            e.printStackTrace();
+        }
+    }
+
+
+    public static void setIntegrationState( boolean integrationEnabled )
+    {
+        try
+        {
+            PROPERTIES.setProperty( "integrationEnabled", integrationEnabled );
+            PROPERTIES.save();
+        }
+        catch ( ConfigurationException e )
+        {
+            LOG.error( "Error in saving peer.cfg file." );
+            e.printStackTrace();
+        }
+    }
+
+
+    public static void setKeyTrustCheckState( boolean keyTrustCheckEnabled)
+    {
+        try
+        {
+            PROPERTIES.setProperty( "keyTrustCheckEnabled", keyTrustCheckEnabled );
+            PROPERTIES.save();
+        }
+        catch ( ConfigurationException e )
+        {
+            LOG.error( "Error in saving peer.cfg file." );
             e.printStackTrace();
         }
     }
