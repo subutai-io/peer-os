@@ -138,11 +138,11 @@ public class SystemManagerImpl implements SystemManager
     {
         ChannelSettings pojo = new ChannelSettingsPojo();
 
-        pojo.setOpenPort( io.subutai.common.settings.ChannelSettings.OPEN_PORT );
-        pojo.setSecurePortX1( io.subutai.common.settings.ChannelSettings.SECURE_PORT_X1 );
-        pojo.setSecurePortX2( io.subutai.common.settings.ChannelSettings.SECURE_PORT_X2 );
-        pojo.setSecurePortX3( io.subutai.common.settings.ChannelSettings.SECURE_PORT_X3 );
-        pojo.setSpecialPortX1( io.subutai.common.settings.ChannelSettings.SPECIAL_PORT_X1 );
+        pojo.setOpenPort( Integer.toString( io.subutai.common.settings.ChannelSettings.OPEN_PORT ) );
+        pojo.setSecurePortX1( Integer.toString( io.subutai.common.settings.ChannelSettings.SECURE_PORT_X1 ) );
+        pojo.setSecurePortX2( Integer.toString( io.subutai.common.settings.ChannelSettings.SECURE_PORT_X2 ) );
+        pojo.setSecurePortX3( Integer.toString( io.subutai.common.settings.ChannelSettings.SECURE_PORT_X3 ) );
+        pojo.setSpecialPortX1( Integer.toString( io.subutai.common.settings.ChannelSettings.SPECIAL_PORT_X1 ) );
 
         return pojo;
     }
