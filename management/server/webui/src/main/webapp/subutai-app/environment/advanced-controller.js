@@ -191,20 +191,19 @@ function AdvancedEnvironmentCtrl($scope, environmentService, peerRegistrationSer
 	}
 
 	//add resource host
-	var mainResourceHost;
 	function addResource2Build(currentResource) {
-		vm.containersInResource = [];
-		mainResourceHost = new joint.shapes.resourceHostHtml.Element({
-			position: { x: 80, y: 80 },
+		var resourceHost = new joint.shapes.resourceHostHtml.Element({
+			position: { x: 40, y: 40 },
 			size: { width: 155, height: 185 },
 			peerId: vm.currentPeer,
+			hostId: currentResource.id,
+			children: 0,
 			grid: [],
 			gridSize: { size: 2 },
-			hostId: currentResource.id,
 			'resourceHostName': 'RH1',
 			'peerName': 'Peer 1'
 		});
-		graph.addCell(mainResourceHost);
+		graph.addCell(resourceHost);
 		return false;
 	}
 
@@ -441,7 +440,7 @@ function AdvancedEnvironmentCtrl($scope, environmentService, peerRegistrationSer
 					delete prevParent.get('grid')[rh.x][rh.y];
 
 					var rPos = models[i].get('position');
-					var gPos = placeRhSimple( models[i].get('grid'), models[i].get('gridSize') );
+					var gPos = placeRhSimple( models[i] );
 
 					cellView.model.set('rh', { model: models[i].id, x: gPos.x, y: gPos.y});
 					cellView.model.set('position', { x: rPos.x + gPos.x * GRID_SIZE + GRID_SPACING, y: rPos.y + gPos.y * GRID_SIZE + GRID_SPACING });
@@ -536,8 +535,12 @@ var PEER_SPACE = 20;
 var RH_WIDTH = 100;
 var RH_SPACE = 10;
 
-function placeRhSimple( array, sizeObj ) {
+function placeRhSimple( model ) {
+	var array = model.attributes.grid;
+	var sizeObj = model.attributes.gridSize;
+	var children = model.get('children');
 	var size = sizeObj.size;
+
 	for( var j = 0; j < size; j++ ) {
 		for( var i = 0; i < size; i++ ) {
 			if( array[i] === undefined ) {
@@ -554,10 +557,16 @@ function placeRhSimple( array, sizeObj ) {
 		}
 	}
 
-	size++;
-	sizeObj.size = size;
+	if(children >= (size * size)) {
+		console.log('lolol');
+		var currentModelSize = model.get('size');
+		model.resize(currentModelSize.width + 60, currentModelSize.height + 60);
+	}
+
 	array[size] = new Array();
 	array[size][0] = 1;
+	size++;
+	sizeObj.size = size;
 
 	return { x : size - 1, y : 0 };
 }
@@ -596,7 +605,6 @@ function findEmptyPostionInResource() {
 }
 
 function startDrag( event ) {
-	console.log($(event.target));
 	event.dataTransfer.setData( "template", $(event.target).data('template') );
 	event.dataTransfer.setData( "img", $(event.target).find('img').attr('src') );
 }
@@ -618,7 +626,7 @@ function drop(event) {
 		if( models[i].attributes.hostId !== undefined )
 		{
 			var rPos = models[i].attributes.position;
-			var gPos = placeRhSimple( models[i].attributes.grid, models[i].attributes.gridSize );
+			var gPos = placeRhSimple( models[i], models );
 
 			var x = (rPos.x + gPos.x * GRID_SIZE + GRID_SPACING) + 23;
 			var y = (rPos.y + gPos.y * GRID_SIZE + GRID_SPACING) + 49;
@@ -626,6 +634,8 @@ function drop(event) {
 			var devElement = new joint.shapes.tm.devElement({
 				position: { x: x, y: y },
 				templateName: data,
+				parentPeerId: models[i].get('peerId'),
+				parentHostId: models[i].get('hostId'),
 				quotaSize: 'SMALL',
 				containerName: 'Container ' + (containerCounter++).toString(),
 				attrs: {
@@ -642,6 +652,7 @@ function drop(event) {
 
 			graph.addCell(devElement);
 			models[i].embed(devElement);
+			models[i].set('children', models[i].get('children') + 1);
 		}
 	}
 }
