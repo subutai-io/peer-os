@@ -92,7 +92,6 @@ public class ContainerCloneStep
         {
             for ( NodeGroup nodeGroup : nodeGroups )
             {
-                //                requestedContainerCount += nodeGroup.getNumberOfContainers();
                 requestedContainerCount++;
             }
         }
@@ -101,8 +100,7 @@ public class ContainerCloneStep
         if ( requestedContainerCount > totalAvailableIpCount )
         {
             throw new EnvironmentCreationException(
-                    String.format                                          ( "Requested %d containers but only %d ip "
-                            + "" + "" + "" + "addresses available",
+                    String.format( "Requested %d containers but only %d ip " + "" + "" + "" + "addresses available",
                             requestedContainerCount, totalAvailableIpCount ) );
         }
 
@@ -119,13 +117,12 @@ public class ContainerCloneStep
             Peer peer = peerManager.getPeer( peerPlacement.getKey() );
             logger.debug( String.format( "Scheduling node group task on peer %s", peer.getId() ) );
 
-            taskCompletionService.submit                                                               (
+            taskCompletionService.submit(
                     new CreatePeerNodeGroupsTask( peer, peerPlacement.getValue(), peerManager.getLocalPeer(),
                             environment, currentLastUsedIpIndex + 1, templateRegistry, defaultDomain ) );
 
             for ( NodeGroup nodeGroup : peerPlacement.getValue() )
             {
-                //                currentLastUsedIpIndex += nodeGroup.getNumberOfContainers();
                 currentLastUsedIpIndex++;
             }
 

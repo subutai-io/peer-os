@@ -3,7 +3,6 @@ package fs
 import (
 	"bufio"
 	"bytes"
-	"fmt"
 	"github.com/subutai-io/Subutai/agent/config"
 	"github.com/subutai-io/Subutai/agent/log"
 	"os"

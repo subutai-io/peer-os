@@ -94,16 +94,6 @@ public interface NetworkManager
      */
     public ContainerInfo getContainerIp( String containerName ) throws NetworkManagerException;
 
-    /**
-     * Sets up gateway IP for specified VLAN on management host
-     */
-    public void setupGateway( String gatewayIp, int vLanId ) throws NetworkManagerException;
-
-    /**
-     * Sets up gateway IP on a container
-     */
-    public void setupGatewayOnContainer( String containerName, String gatewayIp, String interfaceName )
-            throws NetworkManagerException;
 
     /**
      * Removes gateway IP for specified VLAN on management host

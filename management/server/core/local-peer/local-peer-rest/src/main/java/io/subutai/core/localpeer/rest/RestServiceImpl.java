@@ -214,29 +214,13 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response createGateway( final Gateway gateway )
-    {
-        try
-        {
-            localPeer.createGateway( gateway );
-
-            return Response.ok().status( Response.Status.CREATED ).build();
-        }
-        catch ( Exception ex )
-        {
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( ex ).build();
-        }
-    }
-
-
-    @Override
-    public PublicKeyContainer createEnvironmentKeyPair( /*final String userToken,*/ final EnvironmentId environmentId )
+    public PublicKeyContainer createEnvironmentKeyPair( final EnvironmentId environmentId )
     {
         Preconditions.checkNotNull( environmentId );
 
         try
         {
-            return localPeer.createPeerEnvironmentKeyPair( environmentId/*, userToken*/ );
+            return localPeer.createPeerEnvironmentKeyPair( environmentId );
         }
         catch ( Exception ex )
         {
