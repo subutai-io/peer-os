@@ -112,10 +112,8 @@ public class RemotePeerImpl implements RemotePeer
         this.messageResponseListener = messageResponseListener;
         String url = "";
 
-        String port = String.valueOf( peerInfo.getPort() );
-
         //switch case for formatting request url
-        switch ( port )
+        switch ( peerInfo.getPort() )
         {
             case ChannelSettings.OPEN_PORT:
             case ChannelSettings.SPECIAL_PORT_X1:

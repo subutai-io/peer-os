@@ -2,8 +2,10 @@ package io.subutai.core.peer.impl;
 
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.SocketException;
 import java.net.URL;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -26,6 +28,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
+import javax.crypto.BadPaddingException;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
@@ -106,6 +109,8 @@ public class PeerManagerImpl implements PeerManager
     private String ownerId;
     private RegistrationClient registrationClient;
     protected ScheduledExecutorService backgroundTasksExecutorService;
+    private String publicUrl;
+
     private String controlNetwork;
     private long controlNetworkTtl = 0;
 
@@ -138,7 +143,7 @@ public class PeerManagerImpl implements PeerManager
             this.peerDataService = new PeerDataService( daoManager.getEntityManagerFactory() );
 
             localPeerId = securityManager.getKeyManager().getPeerId();
-            ownerId     = securityManager.getKeyManager().getPeerOwnerId();
+            ownerId = securityManager.getKeyManager().getPeerOwnerId();
 
             PeerData localPeerData = peerDataService.find( localPeerId );
 
@@ -148,9 +153,8 @@ public class PeerManagerImpl implements PeerManager
                 PeerInfo localPeerInfo = new PeerInfo();
                 localPeerInfo.setId( localPeerId );
                 localPeerInfo.setOwnerId( ownerId );
-                //                localPeerInfo.setIp( localPeerIp );
-                //                localPeerInfo.setName( String.format( "Peer %s %s", localPeerId, localPeerIp ) );
-                localPeerInfo.setName( "NOT INITIALIZED" );
+                localPeerInfo.setPublicUrl( publicUrl );
+                localPeerInfo.setName( String.format( "Peer %s %s", localPeerId, publicUrl ) );
                 PeerPolicy policy = getDefaultPeerPolicy( localPeerId );
 
                 PeerData peerData =
@@ -180,25 +184,10 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    //    private String getLocalPeerIp() throws PeerException
-    //    {
-    //        String result = null;
-    //
-    //
-    //        try
-    //        {
-    //            result = localPeer.getManagementHost().getInterfaceByName( externalIpInterface ).getIp();
-    //        }
-    //        catch ( HostNotFoundException e )
-    //        {
-    //            LOG.error( "Error getting local IP", e );
-    //        }
-    //        if ( result == null )
-    //        {
-    //            throw new PeerException( "Could not determine IP address of peer." );
-    //        }
-    //        return result;
-    //    }
+    public void setPublicUrl( final String publicUrl )
+    {
+        this.publicUrl = publicUrl;
+    }
 
 
     public PeerPolicy getDefaultPeerPolicy( String peerId )
@@ -277,6 +266,10 @@ public class PeerManagerImpl implements PeerManager
             templateManager.addRemoteRepository( new URL(
                     String.format( KURJUN_URL_PATTERN, registrationData.getPeerInfo().getIp(),
                             ChannelSettings.SECURE_PORT_X1 ) ), registrationData.getToken() );
+        }
+        catch ( GeneralSecurityException e )
+        {
+            throw new PeerException( "Invalid keyphrase or general security exception." );
         }
         catch ( Exception e )
         {
@@ -648,7 +641,8 @@ public class PeerManagerImpl implements PeerManager
         Preconditions.checkNotNull( destinationHost );
         Preconditions.checkNotNull( keyPhrase );
 
-        PeerInfo peerInfo = getRemotePeerInfo( destinationHost );
+        String destinationUrl = buildDestinationUrl( destinationHost );
+        PeerInfo peerInfo = getRemotePeerInfo( destinationUrl );
 
         if ( getRequest( peerInfo.getId() ) != null )
         {
@@ -661,7 +655,7 @@ public class PeerManagerImpl implements PeerManager
 
             registrationData.setToken( generateActiveUserToken() );
 
-            RegistrationData result = registrationClient.sendInitRequest( destinationHost, registrationData );
+            RegistrationData result = registrationClient.sendInitRequest( destinationUrl, registrationData );
 
             result.setKeyPhrase( keyPhrase );
             addRequest( result );
@@ -670,6 +664,20 @@ public class PeerManagerImpl implements PeerManager
         {
             LOG.error( e.getMessage(), e );
             throw new PeerException( e.getMessage() );
+        }
+    }
+
+
+    private String buildDestinationUrl( final String destinationHost )
+    {
+        try
+        {
+            URL url = new URL( destinationHost );
+            return destinationHost;
+        }
+        catch ( MalformedURLException e )
+        {
+            return String.format( "https://%s:%d/", destinationHost, ChannelSettings.SECURE_PORT_X1 );
         }
     }
 
@@ -699,14 +707,14 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public void doApproveRequest( final String keyPhrase, final RegistrationData request ) throws PeerException
     {
-        getRemotePeerInfo( request.getPeerInfo().getIp() );
+        getRemotePeerInfo( request.getPeerInfo().getPublicUrl() );
         try
         {
             RegistrationData response = buildRegistrationData( keyPhrase, RegistrationStatus.APPROVED );
 
             response.setToken( generateActiveUserToken() );
 
-            registrationClient.sendApproveRequest( request.getPeerInfo().getIp(), response );
+            registrationClient.sendApproveRequest( request.getPeerInfo().getPublicUrl(), response );
 
             register( keyPhrase, request );
 

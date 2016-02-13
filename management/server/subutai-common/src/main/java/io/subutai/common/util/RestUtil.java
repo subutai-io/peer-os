@@ -203,8 +203,7 @@ public class RestUtil
         try
         {
             URL urlObject = new URL( url );
-            String port = String.valueOf( urlObject.getPort() );
-            switch ( port )
+            switch ( urlObject.getPort() )
             {
                 case ChannelSettings.SECURE_PORT_X1:
                     client = createTrustedWebClient( url, provider );
@@ -258,8 +257,7 @@ public class RestUtil
         try
         {
             URL urlObject = new URL( url );
-            String port = String.valueOf( urlObject.getPort() );
-            switch ( port )
+            switch ( urlObject.getPort() )
             {
                 case ChannelSettings.SECURE_PORT_X1:
                     client = createTrustedWebClient( url );

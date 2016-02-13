@@ -265,7 +265,7 @@ public class LocalPeerImplTest
         localPeer.managementHost = managementHost;
         localPeer.requestListeners = Sets.newHashSet( requestListener );
         localPeer.setPeerInfo( peerInfo );
-        localPeer.setExternalIpInterface( INTERFACE_NAME );
+//        localPeer.setExternalIpInterface( INTERFACE_NAME );
 
         //        when( cpuQuota.getValue( MeasureUnit.PERCENT ).intValue() ).thenReturn( Integer.parseInt( CPUQUOTA
         // ) );

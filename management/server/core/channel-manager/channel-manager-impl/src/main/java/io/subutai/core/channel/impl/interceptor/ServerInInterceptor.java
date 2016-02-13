@@ -62,7 +62,7 @@ public class ServerInInterceptor extends AbstractPhaseInterceptor<Message>
 
                 HttpServletRequest req = ( HttpServletRequest ) message.get( AbstractHTTPDestination.HTTP_REQUEST );
 
-                if ( req.getLocalPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X2 ) )
+                if ( req.getLocalPort() == ChannelSettings.SECURE_PORT_X2 )
                 {
                     HttpHeaders headers = new HttpHeadersImpl( message.getExchange().getInMessage() );
                     String subutaiHeader = headers.getHeaderString( Common.SUBUTAI_HTTP_HEADER );

@@ -64,7 +64,7 @@ public class ServerOutInterceptor extends AbstractPhaseInterceptor<Message>
                 HttpServletRequest req = ( HttpServletRequest ) message.getExchange().getInMessage()
                                                                        .get( AbstractHTTPDestination.HTTP_REQUEST );
 
-                if ( req.getLocalPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X2 ) )
+                if ( req.getLocalPort() == ChannelSettings.SECURE_PORT_X2 )
                 {
                     //LOG.info( " *** URL:" + url.getPath() );
                     HttpHeaders headers = new HttpHeadersImpl( message.getExchange().getInMessage() );

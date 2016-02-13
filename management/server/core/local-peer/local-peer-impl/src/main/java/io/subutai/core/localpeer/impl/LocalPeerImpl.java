@@ -155,9 +155,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public static final String PEER_SUBNET_MASK = "255.255.255.0";
     private static final String GATEWAY_INTERFACE_NAME_REGEX = "^br-(\\d+)$";
     private static final Pattern GATEWAY_INTERFACE_NAME_PATTERN = Pattern.compile( GATEWAY_INTERFACE_NAME_REGEX );
-    private static final String DEFAULT_EXTERNAL_INTERFACE_NAME = "eth1";
+    //    private static final String DEFAULT_EXTERNAL_INTERFACE_NAME = "eth1";
 
-    private String externalIpInterface = DEFAULT_EXTERNAL_INTERFACE_NAME;
     private DaoManager daoManager;
     private TemplateManager templateRegistry;
     protected Host managementHost;
@@ -239,11 +238,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         initialized = true;
     }
 
-
-    public void setExternalIpInterface( final String externalIpInterface )
-    {
-        this.externalIpInterface = externalIpInterface;
-    }
+    //
+    //    public void setExternalIpInterface( final String externalIpInterface )
+    //    {
+    //        this.externalIpInterface = externalIpInterface;
+    //    }
 
 
     @Override
@@ -311,16 +310,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public PeerInfo getPeerInfo() throws PeerException
     {
-        try
+        if ( peerInfo == null )
         {
-            this.peerInfo.setIp( managementHost.getInterfaceByName( externalIpInterface ).getIp() );
-            return peerInfo;
+            throw new PeerException( "Peer info unavailable." );
         }
-        catch ( Exception e )
-        {
-            LOG.warn( "Could not generate peer info: " + e.getMessage() );
-        }
-        throw new PeerException( "Peer info unavailable." );
+        return peerInfo;
     }
 
 
