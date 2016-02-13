@@ -319,8 +319,10 @@ function AdvancedEnvironmentCtrl($scope, environmentService, peerRegistrationSer
 			var className = evt.target.parentNode.getAttribute('class');
 			switch (className) {
 				case 'element-tool-remove':
+					var rh = this.model.attributes.rh;
+					delete graph.getCell(rh.model).attributes.grid[rh.x][rh.y];
 					this.model.remove();
-					delete vm.templateGrid[Math.floor( x / GRID_CELL_SIZE )][ Math.floor( y / GRID_CELL_SIZE )];
+					//delete vm.templateGrid[Math.floor( x / GRID_CELL_SIZE )][ Math.floor( y / GRID_CELL_SIZE )];
 					return;
 					break;
 				case 'element-call-menu':
@@ -558,7 +560,6 @@ function placeRhSimple( model ) {
 	}
 
 	if(children >= (size * size)) {
-		console.log('lolol');
 		var currentModelSize = model.get('size');
 		model.resize(currentModelSize.width + 60, currentModelSize.height + 60);
 	}
