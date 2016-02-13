@@ -1,6 +1,9 @@
 package io.subutai.core.localpeer.impl.container;
 
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
@@ -11,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 import io.subutai.common.command.CommandUtil;
@@ -21,7 +25,10 @@ import io.subutai.common.host.NullHostInterface;
 import io.subutai.common.peer.ContainerCreationException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.TemplateKurjun;
+import io.subutai.common.quota.ContainerQuota;
+import io.subutai.common.quota.ContainerResource;
 import io.subutai.common.settings.Common;
+import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.NumUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
@@ -35,17 +42,19 @@ public class CreateContainerTask implements Callable<ContainerHostInfo>
     private final ResourceHost resourceHost;
     private final String hostname;
     private final TemplateKurjun template;
+
     private final String ip;
     private final int vlan;
     private final int timeoutSec;
     private final String environmentId;
+    private final ContainerQuota quota;
     protected CommandUtil commandUtil = new CommandUtil();
     private HostRegistry hostRegistry;
 
 
     public CreateContainerTask( HostRegistry hostRegistry, final ResourceHost resourceHost,
-                                final TemplateKurjun template, final String hostname, final String ip, final int vlan,
-                                final int timeoutSec, final String environmentId )
+                                final TemplateKurjun template, final String hostname, final ContainerQuota quota,
+                                final String ip, final int vlan, final int timeoutSec, final String environmentId )
     {
         Preconditions.checkNotNull( resourceHost );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ) );
@@ -63,6 +72,7 @@ public class CreateContainerTask implements Callable<ContainerHostInfo>
         this.vlan = vlan;
         this.timeoutSec = timeoutSec;
         this.environmentId = environmentId;
+        this.quota = quota;
     }
 
 
@@ -77,10 +87,35 @@ public class CreateContainerTask implements Callable<ContainerHostInfo>
     public ContainerHostInfo call() throws Exception
     {
 
-        commandUtil.execute( new RequestBuilder( "subutai clone" ).withCmdArgs(
+        //        commandUtil.execute( new RequestBuilder( "subutai clone" ).withCmdArgs(
+        //                Lists.newArrayList( template.getName(), hostname, "-i", String.format( "\"%s %s\"", ip,
+        // vlan ), "-t",
+        //                        getRegistrationManager().generateContainerTTLToken( ( timeoutSec + 10 ) * 1000L )
+        // .getToken() ) )
+        //                                                                  .withTimeout( 1 ).daemon(), resourceHost );
+
+        List<BatchAction> actions = new ArrayList<>();
+
+        BatchAction cloneAction = new BatchAction( "clone",
                 Lists.newArrayList( template.getName(), hostname, "-i", String.format( "\"%s %s\"", ip, vlan ), "-t",
-                        getRegistrationManager().generateContainerTTLToken( ( timeoutSec + 10 ) * 1000L ).getToken() ) )
-                                                                  .withTimeout( 1 ).daemon(), resourceHost );
+                        getRegistrationManager().generateContainerTTLToken( ( timeoutSec + 10 ) * 1000L )
+                                                .getToken() ) );
+
+        actions.add( cloneAction );
+        for ( ContainerResource r : quota.getAllResources() )
+        {
+
+            BatchAction quotaAction = new BatchAction( "quota" );
+            quotaAction.addArgument( hostname );
+            quotaAction.addArgument( r.getContainerResourceType().getKey() );
+            quotaAction.addArgument( "-s" );
+            quotaAction.addArgument( r.getWriteValue() );
+            actions.add( quotaAction );
+        }
+
+
+        final ArrayList<String> arg = Lists.newArrayList( JsonUtil.toJson( actions ) );
+        commandUtil.execute( new RequestBuilder( "subutai batch -json" ).withCmdArgs( arg ), resourceHost );
 
         long start = System.currentTimeMillis();
 
@@ -129,5 +164,31 @@ public class CreateContainerTask implements Callable<ContainerHostInfo>
         LOG.info( String.format( "Container '%s' successfully created.", hostname ) );
         LOG.debug( hostInfo.toString() );
         return hostInfo;
+    }
+
+
+    protected class BatchAction
+    {
+        private String action;
+        private List<String> args = new ArrayList<>();
+
+
+        public BatchAction( final String action, final List<String> args )
+        {
+            this.action = action;
+            this.args = args;
+        }
+
+
+        public BatchAction( final String quota )
+        {
+            this.action = action;
+        }
+
+
+        public void addArgument( final String arg )
+        {
+            this.args.add( arg );
+        }
     }
 }
