@@ -2636,7 +2636,17 @@ td.b-main-table__status-col {
 
 .b-tools-menu ul li {
     padding: 10px;
+	position: relative;
 }
+
+.b-template-drag {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0;
+}
+
 .b-tools-menu ul li:hover {
     background-color: #fbfbfb;
     cursor: pointer;
@@ -2680,10 +2690,11 @@ td.b-main-table__status-col {
     display: inline-block;
     vertical-align: middle;
 }
-.b-tools-menu ul li a {
+.b-tools-menu__item {
     text-decoration: none;
     display: block;
     vertical-align: middle;
+	color: #04346E;
 }
 
 .b-cloud-item-resource-name {

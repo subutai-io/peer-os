@@ -28,7 +28,6 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 	vm.peerIds = [];
 	vm.colors = quotaColors;
 	vm.templates = [];
-	vm.containersType = [];
 
 	vm.activeCloudTab = 'templates';
 
@@ -56,14 +55,6 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 		})
 		.error(function (data) {
 			VARS_MODAL_ERROR( SweetAlert, 'Error on getting templates ' + data );
-		});
-
-	environmentService.getContainersType()
-		.success(function (data) {
-			vm.containersType = data;
-		})
-		.error(function (data) {
-			VARS_MODAL_ERROR( SweetAlert, data );
 		});
 
 	environmentService.getStrategies().success(function (data) {
