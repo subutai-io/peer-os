@@ -5,6 +5,8 @@ angular.module('subutai.environment.adv-controller', [])
 
 AdvancedEnvironmentCtrl.$inject = ['$scope', 'environmentService', 'peerRegistrationService', 'SweetAlert', 'ngDialog'];
 
+var graph = new joint.dia.Graph;
+
 function AdvancedEnvironmentCtrl($scope, environmentService, peerRegistrationService, SweetAlert, ngDialog) {
 
 	var vm = this;
@@ -189,9 +191,6 @@ function AdvancedEnvironmentCtrl($scope, environmentService, peerRegistrationSer
 		$('.b-cloud-add-tools').animate({'left': '-200px'}, 300);
 	}
 
-	var graph = new joint.dia.Graph;
-
-	//jontjs elements
 	//custom shapes
 	joint.shapes.tm = {};
 
@@ -405,6 +404,8 @@ function AdvancedEnvironmentCtrl($scope, environmentService, peerRegistrationSer
 			position: { x: 80, y: 80 },
 			size: { width: 155, height: 185 },
 			peerId: vm.currentPeer,
+			grid: [],
+			gridSize: { size: 2 },
 			hostId: currentResource.id,
 			'resourceHostName': 'RH1',
 			'peerName': 'Peer 1'
@@ -520,7 +521,7 @@ function AdvancedEnvironmentCtrl($scope, environmentService, peerRegistrationSer
 
 		$('.js-scrollbar').perfectScrollbar();
 
-		paper.$el.on('mousewheel DOMMouseScroll', onMouseWheel);
+		/*paper.$el.on('mousewheel DOMMouseScroll', onMouseWheel);
 
 		function onMouseWheel(e) {
 
@@ -546,7 +547,7 @@ function AdvancedEnvironmentCtrl($scope, environmentService, peerRegistrationSer
 			// Transform point into the viewport coordinate system.
 			var pointTransformed = svgPoint.matrixTransform(paper.viewport.getCTM().inverse());
 			return pointTransformed;
-		}
+		}*/
 	}
 
 	vm.buildStep = 'confirm';
@@ -613,5 +614,89 @@ function AdvancedEnvironmentCtrl($scope, environmentService, peerRegistrationSer
 		vm.currentTemplate.set('containerName', settings.containerName);
 		ngDialog.closeAll();
 	}
+}
+
+function startDrag( event ) {
+	event.dataTransfer.setData( "template", $(event.target).data('template') );
+}
+
+function drop(event) {
+	event.preventDefault();
+	var data = event.dataTransfer.getData("template");
+	console.log(event);
+
+	var posX = event.offsetX;
+	var posY = event.offsetY;
+
+	var models = graph.findModelsFromPoint({x :posX, y: posY});
+
+	for( var i = 0; i < models.length; i++ )
+	{
+		if( models[i].attributes.hostId !== undefined )
+		{
+			var rPos = models[i].attributes.position;
+			console.log(models);
+			var gPos = placeRhSimple( models[i].attributes.grid, models[i].attributes.gridSize );
+
+			var devElement = new joint.shapes.tm.devElement({
+				position: { x: rPos.x + gPos.x * GRID_SIZE + GRID_SPACING, y: rPos.y + gPos.y * GRID_SIZE + GRID_SPACING },
+				templateName: data,
+				quotaSize: 'SMALL', // var
+				containerName: "EPTA NAME", // var
+				attrs: {
+					image: { 'xlink:href': 'assets/elements/avatar-empty.svg'}, // var
+					'rect.b-magnet': {fill: "#CC00FF"}, // var
+					title: {text: data}
+				},
+				rh: {
+					model: models[i].id,
+					x: gPos.x,
+					y: gPos.y
+				}
+			});
+
+			graph.addCell(devElement);
+			//models[i].embed(devElement);
+		}
+	}
+}
+
+function dragOver( event ) {
+	event.preventDefault();
+}
+
+var GRID_SIZE = 50;
+var GRID_SPACING = 5;
+
+var PEER_MAP = {};
+var PEER_WIDTH = 120;
+var PEER_SPACE = 20;
+
+var RH_WIDTH = 100;
+var RH_SPACE = 10;
+function placeRhSimple( array, sizeObj ) {
+	var size = sizeObj.size;
+	for( var j = 0; j < size; j++ ) {
+		for( var i = 0; i < size; i++ ) {
+			if( array[i] === undefined ) {
+				array[i] = new Array();
+				array[i][j] = 1;
+
+				return {x:i, y:j};
+			}
+
+			if( array[i][j] !== 1 ) {
+				array[i][j] = 1;
+				return {x:i, y:j};
+			}
+		}
+	}
+
+	size++;
+	sizeObj.size = size;
+	array[size] = new Array();
+	array[size][0] = 1;
+
+	return { x : size - 1, y : 0 };
 }
 

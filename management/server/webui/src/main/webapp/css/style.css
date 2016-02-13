@@ -2962,8 +2962,18 @@ td.b-main-table__status-col {
     border-radius: 2px;
 }
 
+.b-pgp-page-row {
+	
+}
+
 .b-pgp-page-block {
 	width: 420px;
+	float: left;
+	margin: 0 100px 0 0;
+}
+
+.b-pgp-page-block:last-child {
+	margin-right: 0;
 }
 
 .b-pgp-page-block__buttons {

@@ -42,7 +42,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	vm.containersType = [];
 	vm.listOfUsers = [];
 	vm.users2Add = [];
-	vm.installedContainers = null;	
+	vm.installedContainers = [];
 	vm.currentUser = {};
 
 	// functions
@@ -185,6 +185,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 				vm.listOfUsers[i].delete = true;
 			}
 			environmentService.getShared(environment.id).success(function (data2) {
+				console.log(data2);
 				vm.users2Add = data2;
 				for (var i = 0; i < vm.users2Add.length; ++i) {
 					if (vm.users2Add[i].id === vm.currentUser.id) {
@@ -281,6 +282,8 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	}
 
 	function containersTags (data) {
+		vm.installedContainers = [];
+
 		var containersTotal = {};
 		for(var i = 0; i < data.containers.length; i++) {
 			if(containersTotal[data.containers[i].templateName] === undefined) {

@@ -2,14 +2,23 @@
 	<span id="js-plugin-version" class="b-plugin-version"></span>
 	<script>
 		$(document).ready(function(){
-			if($('#bp-plugin-version').val().length > 0) {
-				$('#js-plugin-version').text('plugin version: ' + $('#bp-plugin-version').val() + ' / ');
+
+			function addPluginVersion(pluginVersion) {
+				$('#js-plugin-version').text('plugin version: ' + pluginVersion + ' / ');
 			}
+
+			setTimeout(function(){
+				if($('#bp-plugin-version').val().length > 0) {
+					addPluginVersion($('#bp-plugin-version').val());
+				}
+			}, 2000);
+
 			$('body').on('change', '#bp-plugin-version', function(){
 				if($(this).val().length > 0) {
-					$('#js-plugin-version').text('plugin version: ' + $(this).val() + ' / ');
+					addPluginVersion($(this).val());
 				}
 			});
+
 		});
 	</script>
 	<!--<i class="fa fa-sign-in b-plugin-version"></i>-->
