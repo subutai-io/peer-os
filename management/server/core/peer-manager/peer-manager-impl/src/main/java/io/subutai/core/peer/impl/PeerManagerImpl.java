@@ -3,7 +3,6 @@ package io.subutai.core.peer.impl;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.SocketException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
@@ -28,7 +27,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
-import javax.crypto.BadPaddingException;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
@@ -42,7 +40,6 @@ import com.google.common.base.Preconditions;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.peer.Encrypted;
-import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
@@ -55,7 +52,6 @@ import io.subutai.common.protocol.PingDistances;
 import io.subutai.common.security.objects.TokenType;
 import io.subutai.common.settings.ChannelSettings;
 import io.subutai.common.util.ControlNetworkUtil;
-import io.subutai.common.util.IPUtil;
 import io.subutai.common.util.SecurityUtilities;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
@@ -154,7 +150,7 @@ public class PeerManagerImpl implements PeerManager
                 localPeerInfo.setId( localPeerId );
                 localPeerInfo.setOwnerId( ownerId );
                 localPeerInfo.setPublicUrl( publicUrl );
-                localPeerInfo.setName( String.format( "Peer %s %s", localPeerId, publicUrl ) );
+                localPeerInfo.setName( String.format( "Peer %s on %s", localPeerId, publicUrl ) );
                 PeerPolicy policy = getDefaultPeerPolicy( localPeerId );
 
                 PeerData peerData =
@@ -318,8 +314,6 @@ public class PeerManagerImpl implements PeerManager
             throw new IllegalArgumentException( "Peer could not be null." );
         }
         this.peers.put( peer.getId(), peer );
-        //        selectControlNetwork();
-        //        updateControlNetwork();
     }
 
 
@@ -329,8 +323,6 @@ public class PeerManagerImpl implements PeerManager
         if ( peer != null )
         {
             this.peers.remove( id );
-            //            selectControlNetwork();
-            //            updateControlNetwork();
         }
     }
 
@@ -1016,6 +1008,32 @@ public class PeerManagerImpl implements PeerManager
             }
         }
         return result;
+    }
+
+
+    @Override
+    public void setPublicUrl( final String peerId, final String publicUrl ) throws PeerException
+    {
+        Preconditions.checkNotNull( peerId );
+
+        PeerData peerData = peerDataService.find( peerId );
+        if ( peerData == null )
+        {
+            throw new PeerException( "Peer not found." );
+        }
+        try
+        {
+            PeerInfo peerInfo = fromJson( peerData.getInfo(), PeerInfo.class );
+            peerInfo.setPublicUrl( publicUrl );
+            peerData.setInfo( toJson( peerInfo ) );
+            peerDataService.saveOrUpdate( peerData );
+            Peer peer= createPeer( peerData );
+            addPeer( peer );
+        }
+        catch ( IOException e )
+        {
+            throw new PeerException( "Unexpected error: " + e.getMessage() );
+        }
     }
 
 
