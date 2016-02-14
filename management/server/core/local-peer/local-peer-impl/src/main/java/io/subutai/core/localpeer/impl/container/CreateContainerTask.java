@@ -97,7 +97,7 @@ public class CreateContainerTask implements Callable<ContainerHostInfo>
         List<BatchAction> actions = new ArrayList<>();
 
         BatchAction cloneAction = new BatchAction( "clone",
-                Lists.newArrayList( template.getName(), hostname, "-i", String.format( "\"%s %s\"", ip, vlan ), "-t",
+                Lists.newArrayList( template.getName(), hostname, "-i", String.format( "%s %s", ip, vlan ), "-t",
                         getRegistrationManager().generateContainerTTLToken( ( timeoutSec + 10 ) * 1000L )
                                                 .getToken() ) );
 
@@ -113,9 +113,9 @@ public class CreateContainerTask implements Callable<ContainerHostInfo>
             actions.add( quotaAction );
         }
 
-        commandUtil
-                .execute( new RequestBuilder( String.format( "subutai batch -json '%s'", JsonUtil.toJson( actions ) ) ),
-                        resourceHost );
+        commandUtil.execute(
+                new RequestBuilder( String.format( "subutai batch -json '%s'", JsonUtil.toJson( actions ) ) )
+                        .withTimeout( 1 ).daemon(), resourceHost );
 
         long start = System.currentTimeMillis();
 
