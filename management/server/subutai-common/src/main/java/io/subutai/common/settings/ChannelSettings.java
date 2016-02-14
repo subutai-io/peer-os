@@ -6,12 +6,12 @@ package io.subutai.common.settings;
  */
 public class ChannelSettings
 {
-    public static String OPEN_PORT = "8080";
+    public static int OPEN_PORT = 8080;
 
-    public static String SECURE_PORT_X1 = "8443";
-    public static String SECURE_PORT_X2 = "8444";
-    public static String SECURE_PORT_X3 = "8445";
-    public static String SPECIAL_PORT_X1 = "8551";
+    public static int SECURE_PORT_X1 = 8443;
+    public static int SECURE_PORT_X2 = 8444;
+    public static int SECURE_PORT_X3 = 8445;
+    public static int SPECIAL_PORT_X1 = 8551;
     public static final String SPECIAL_REST_BUS = "cxfBusAptManager";
 
     public static final String[] URL_ACCESS_PX1 = {
@@ -77,31 +77,31 @@ public class ChannelSettings
     }
 
 
-    public static void setOpenPort( String openPort )
+    public static void setOpenPort( int openPort )
     {
         OPEN_PORT = openPort;
     }
 
 
-    public static void setSecurePortX1( String securePortX1 )
+    public static void setSecurePortX1( int securePortX1 )
     {
         SECURE_PORT_X1 = securePortX1;
     }
 
 
-    public static void setSecurePortX2( String securePortX2 )
+    public static void setSecurePortX2( int securePortX2 )
     {
         SECURE_PORT_X2 = securePortX2;
     }
 
 
-    public static void setSecurePortX3( String securePortX3 )
+    public static void setSecurePortX3( int securePortX3 )
     {
         SECURE_PORT_X3 = securePortX3;
     }
 
 
-    public static void setSpecialPortX1( String specialPortX1 )
+    public static void setSpecialPortX1( int specialPortX1 )
     {
         SPECIAL_PORT_X1 = specialPortX1;
     }

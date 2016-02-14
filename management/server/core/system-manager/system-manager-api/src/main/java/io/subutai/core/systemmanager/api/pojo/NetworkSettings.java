@@ -10,23 +10,23 @@ public interface NetworkSettings
 
     public void setExternalIpInterface( final String externalIpInterface );
 
-    public void setOpenPort( String openPort );
+    public void setOpenPort( int openPort );
 
-    public String getOpenPort();
+    public int getOpenPort();
 
-    public void setSecurePortX1( final String securePortX1 );
+    public void setSecurePortX1( final int securePortX1 );
 
-    public String getSecurePortX1();
+    public int getSecurePortX1();
 
-    public void setSecurePortX2( final String securePortX2 );
+    public void setSecurePortX2( final int securePortX2 );
 
-    public String getSecurePortX2();
+    public int getSecurePortX2();
 
-    public void setSecurePortX3( final String securePortX3 );
+    public void setSecurePortX3( final int securePortX3 );
 
-    public String getSecurePortX3();
+    public int getSecurePortX3();
 
-    public void setSpecialPortX1( final String specialPortX1 );
+    public void setSpecialPortX1( final int specialPortX1 );
 
-    public String getSpecialPortX1();
+    public int getSpecialPortX1();
 }
