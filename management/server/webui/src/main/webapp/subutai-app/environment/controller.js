@@ -40,6 +40,10 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	vm.colors = quotaColors;
 	vm.templates = [];
 	vm.containersType = [];
+	vm.listOfUsers = [];
+	vm.users2Add = [];
+	vm.installedContainers = [];
+	vm.currentUser = {};
 
 	// functions
 	vm.chengeMode = chengeMode;
@@ -57,6 +61,15 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	vm.removeDomain = removeDomain;
 	vm.togglePeer = togglePeer;
 	vm.setupStrategyRequisites = setupStrategyRequisites;
+	vm.minimizeLogs = minimizeLogs;
+
+	//share environment functions
+	vm.shareEnvironmentWindow = shareEnvironmentWindow;
+	vm.toggleSelection = toggleSelection;
+	vm.shareEnvironment = shareEnvironment;
+	vm.addUser2Stack = addUser2Stack;
+	vm.removeUserFromStack = removeUserFromStack;
+	vm.containersTags = containersTags;
 
 	function chengeMode(modeStatus) {
 		if(modeStatus) {
@@ -65,6 +78,10 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 			vm.activeMode = 'simple';
 		}
 	}
+
+	environmentService.getCurrentUser().success (function (data) {
+		vm.currentUser = data;
+	});
 
 	environmentService.getTemplates()
 		.success(function (data) {
@@ -123,27 +140,20 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 		DTColumnDefBuilder.newColumnDef(5).notSortable(),
 	];
 
-	//pending environment table options
-	vm.dtOptionsPendingTable = DTOptionsBuilder
-		.newOptions()
-		.withOption('order', [[ 1, "asc" ]])
-		.withOption('stateSave', true)
-		.withPaginationType('full_numbers');
-	vm.dtColumnDefsPendingTable = [
-		DTColumnDefBuilder.newColumnDef(0).notSortable(),
-		DTColumnDefBuilder.newColumnDef(1),
-		DTColumnDefBuilder.newColumnDef(2).notSortable()
-	];
+	var refreshTable;
+	var reloadTableData = function() {
+		refreshTable = $timeout(function myFunction() {
+			loadEnvironments();
+			refreshTable = $timeout(reloadTableData, 30000);
+		}, 30000);
+	};
+	reloadTableData();
 
-	vm.listOfUsers = [];
-	vm.shareEnvironmentWindow = shareEnvironmentWindow;
-	vm.toggleSelection = toggleSelection;
-	vm.shareEnvironment = shareEnvironment;
-	vm.users2Add = [];
-	vm.addUser2Stack = addUser2Stack;
-	vm.removeUserFromStack = removeUserFromStack;
-	vm.containersTags = containersTags;
-	vm.installedContainers = null;
+	$rootScope.$on('$stateChangeStart',	function(event, toState, toParams, fromState, fromParams){
+		console.log('cancel');
+		$timeout.cancel(refreshTable);
+	});
+
 	function addUser2Stack(user) {
 		vm.users2Add.push(angular.copy(user));
 		for (var i = 0; i < vm.listOfUsers.length; ++i) {
@@ -160,10 +170,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 		vm.users2Add.splice(key, 1);
 	}
 
-	vm.currentUser = {};
-	environmentService.getCurrentUser().success (function (data) {
-		vm.currentUser = data;
-	});
 	function shareEnvironmentWindow(environment) {
 		vm.listOfUsers = [];
 		vm.checkedUsers = [];
@@ -180,6 +186,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 				vm.listOfUsers[i].delete = true;
 			}
 			environmentService.getShared(environment.id).success(function (data2) {
+				console.log(data2);
 				vm.users2Add = data2;
 				for (var i = 0; i < vm.users2Add.length; ++i) {
 					if (vm.users2Add[i].id === vm.currentUser.id) {
@@ -275,22 +282,9 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 		});
 	}
 
-	var refreshTable;
-	var reloadTableData = function() {
-		refreshTable = $timeout(function myFunction() {
-			loadEnvironments();
-			refreshTable = $timeout(reloadTableData, 30000);
-		}, 30000);
-	};
-	reloadTableData();
-
-	$rootScope.$on('$stateChangeStart',	function(event, toState, toParams, fromState, fromParams){
-		console.log('cancel');
-		$timeout.cancel(refreshTable);
-	});
-
-
 	function containersTags (data) {
+		vm.installedContainers = [];
+
 		var containersTotal = {};
 		for(var i = 0; i < data.containers.length; i++) {
 			if(containersTotal[data.containers[i].templateName] === undefined) {
@@ -571,6 +565,24 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 
 	function getQuotaColor(quotaSize) {
 		return quotaColors[quotaSize];
+	}
+
+	function minimizeLogs() {
+		var that = $('.ngdialog');
+		var dialogOverlay = that.find('.ngdialog-overlay');
+		if(vm.popupLogState == 'full') {
+			vm.popupLogState = 'min';
+			that.addClass('ngdialog_minimize');
+			dialogOverlay.css({
+				'top': ($(window).height() - 47) + 'px'
+			});
+		} else {
+			vm.popupLogState = 'full';
+			that.removeClass('ngdialog_minimize');
+			dialogOverlay.css({
+				'top': 0
+			});
+		}
 	}
 }
 

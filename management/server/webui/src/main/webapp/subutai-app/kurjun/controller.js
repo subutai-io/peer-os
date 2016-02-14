@@ -17,6 +17,7 @@ function KurjunCtrl($scope, $rootScope, kurjunSrv, SweetAlert, DTOptionsBuilder,
 	vm.templates = [];
 	vm.apts = [];
 	vm.isUploadAllowed = false;
+	vm.listOfUsers = [];
 
 	vm.openTab = openTab;
 	vm.addTemplate = addTemplate;
@@ -56,6 +57,12 @@ function KurjunCtrl($scope, $rootScope, kurjunSrv, SweetAlert, DTOptionsBuilder,
 		});
 	}
 	getAPTs();
+
+	function shareTemplateWindow(template) {
+		vm.listOfUsers = [];
+
+	}
+
 
 	function openTab(tab) {
 		vm.dtOptions = DTOptionsBuilder

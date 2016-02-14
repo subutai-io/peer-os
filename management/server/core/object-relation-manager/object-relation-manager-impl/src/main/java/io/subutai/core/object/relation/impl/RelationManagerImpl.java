@@ -185,9 +185,9 @@ public class RelationManagerImpl implements RelationManager
 
 
     @Override
-    public RelationLink getRelationLink( final String uniqueId, final String objectClass )
+    public RelationLink getRelationLink( final RelationLink relationLink )
     {
-        return relationDataService.findRelationLink( uniqueId, objectClass );
+        return relationDataService.findRelationLink( relationLink );
     }
 
 
