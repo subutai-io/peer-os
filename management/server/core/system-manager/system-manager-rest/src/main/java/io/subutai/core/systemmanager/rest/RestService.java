@@ -35,6 +35,19 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response getKurjunSettings();
 
+
+    @POST
+    @Path( "update_kurjun_settings" )
+    @Produces( { MediaType.TEXT_PLAIN } )
+    public Response setKurjunSettings( @FormParam( "globalKurjunUrls" ) String globalKurjunUrls,
+                                       @FormParam( "publicDiskQuota" ) String publicDiskQuota,
+                                       @FormParam( "publicThreshold" ) String publicThreshold,
+                                       @FormParam( "publicTimeFrame" ) String publicTimeFrame,
+                                       @FormParam( "trustDiskQuota" ) String trustDiskQuota,
+                                       @FormParam( "trustThreshold" ) String trustThreshold,
+                                       @FormParam( "trustTimeFrame" ) String trustTimeFrame );
+
+
     @GET
     @Path( "peer_policy" )
     @Produces( { MediaType.APPLICATION_JSON } )

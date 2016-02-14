@@ -4,8 +4,8 @@ angular.module("subutai.settings-kurjun.controller", [])
     .controller("SettingsKurjunCtrl", SettingsKurjunCtrl);
 
 
-SettingsKurjunCtrl.$inject = ["$scope", "SettingsKurjunSrv"];
-function SettingsKurjunCtrl($scope, SettingsKurjunSrv) {
+SettingsKurjunCtrl.$inject = ["$scope", "SettingsKurjunSrv", "SweetAlert"];
+function SettingsKurjunCtrl($scope, SettingsKurjunSrv, SweetAlert) {
     var vm = this;
     vm.config = {};
 
@@ -20,7 +20,7 @@ function SettingsKurjunCtrl($scope, SettingsKurjunSrv) {
 
     vm.updateConfig = updateConfig;
     function updateConfig() {
-        SettingsPeerSrv.updateConfig(vm.config).success(function (data) {
+        SettingsKurjunSrv.updateConfig(vm.config).success(function (data) {
             SweetAlert.swal("Success!", "Your settings were saved.", "success");
         }).error(function (error) {
             SweetAlert.swal("ERROR!", "Save config error: " + error.replace(/\\n/g, " "), "error");

@@ -1,9 +1,7 @@
 package io.subutai.core.systemmanager.impl;
 
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import io.subutai.common.settings.ChannelSettings;
 import io.subutai.common.settings.SubutaiInfo;
@@ -73,18 +71,9 @@ public class SystemManagerImpl implements SystemManager
             pojo.setTrustTimeUnit( trustTransferQuota.getTimeUnit() );
         }
 
-        List<String> urls = parseGlobalKurjunUrls(
-                String.valueOf( io.subutai.common.settings.KurjunSettings.getGlobalKurjunUrls() ) );
-        pojo.setGlobalKurjunUrls( urls );
+        pojo.setGlobalKurjunUrls( io.subutai.common.settings.KurjunSettings.getGlobalKurjunUrls() );
 
         return pojo;
-    }
-
-
-    @Override
-    public void setKurjunSettings( final KurjunSettings settings )
-    {
-        //        io.subutai.common.settings.KurjunSettings.setSettings( settings.getGlobalKurjunUrls() );
     }
 
 
@@ -93,14 +82,14 @@ public class SystemManagerImpl implements SystemManager
     {
         SystemInfo pojo = new SystemInfoPojo();
 
-        pojo.setGitCommitId( String.valueOf( SubutaiInfo.getCommitId() ) );
-        pojo.setGitBranch( String.valueOf( SubutaiInfo.getBranch() ) );
-        pojo.setGitCommitUserName( String.valueOf( SubutaiInfo.getCommitterUserName() ) );
-        pojo.setGitCommitUserEmail( String.valueOf( SubutaiInfo.getCommitterUserEmail() ) );
-        pojo.setGitBuildUserName( String.valueOf( SubutaiInfo.getBuilderUserName() ) );
-        pojo.setGitBuildUserEmail( String.valueOf( SubutaiInfo.getBuilderUserEmail() ) );
-        pojo.setGitBuildTime( String.valueOf( SubutaiInfo.getBuildTime() ) );
-        pojo.setProjectVersion( String.valueOf( SubutaiInfo.getVersion() ) );
+        pojo.setGitCommitId( SubutaiInfo.getCommitId() );
+        pojo.setGitBranch( SubutaiInfo.getBranch() );
+        pojo.setGitCommitUserName( SubutaiInfo.getCommitterUserName() );
+        pojo.setGitCommitUserEmail( SubutaiInfo.getCommitterUserEmail() );
+        pojo.setGitBuildUserName( SubutaiInfo.getBuilderUserName() );
+        pojo.setGitBuildUserEmail( SubutaiInfo.getBuilderUserEmail() );
+        pojo.setGitBuildTime( SubutaiInfo.getBuildTime() );
+        pojo.setProjectVersion( SubutaiInfo.getVersion() );
 
         return pojo;
     }
@@ -153,6 +142,28 @@ public class SystemManagerImpl implements SystemManager
 
 
     @Override
+    public boolean setKurjunSettings( final String globalKurjunUrls, final long publicDiskQuota,
+                                      final long publicThreshold, final long publicTimeFrame, final long trustDiskQuota,
+                                      final long trustThreshold, final long trustTimeFrame )
+    {
+        io.subutai.common.settings.KurjunSettings.setSettings( globalKurjunUrls );
+
+        templateManager.setDiskQuota( publicDiskQuota, "public" );
+        templateManager.setDiskQuota( trustDiskQuota, "trust" );
+
+        KurjunTransferQuota publicTransferQuota =
+                new KurjunTransferQuota( publicThreshold, publicTimeFrame, TimeUnit.HOURS );
+        KurjunTransferQuota trustTransferQuota =
+                new KurjunTransferQuota( trustThreshold, trustTimeFrame, TimeUnit.HOURS );
+
+        boolean isPublicQuotaSaved = templateManager.setTransferQuota( publicTransferQuota, "public" );
+        boolean isTrustQuotaSaved = templateManager.setTransferQuota( trustTransferQuota, "trust" );
+
+        return isPublicQuotaSaved && isTrustQuotaSaved;
+    }
+
+
+    @Override
     public NetworkSettings getNetworkSettings()
     {
         NetworkSettings pojo = new NetworkSettingsPojo();
@@ -165,16 +176,6 @@ public class SystemManagerImpl implements SystemManager
         pojo.setSpecialPortX1( io.subutai.common.settings.ChannelSettings.SPECIAL_PORT_X1 );
 
         return pojo;
-    }
-
-
-    private List<String> parseGlobalKurjunUrls( String globalKurjunUrl )
-    {
-        String replace = globalKurjunUrl.replace( "[", "" );
-        String replace1 = replace.replace( "]", "" );
-        List<String> kurjunUrls = new ArrayList<String>( Arrays.asList( replace1.split( "," ) ) );
-
-        return kurjunUrls;
     }
 
 

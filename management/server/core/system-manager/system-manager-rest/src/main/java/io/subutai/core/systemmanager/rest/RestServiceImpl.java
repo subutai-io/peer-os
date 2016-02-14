@@ -63,6 +63,28 @@ public class RestServiceImpl implements RestService
 
 
     @Override
+    public Response setKurjunSettings( final String globalKurjunUrls, final String publicDiskQuota,
+                                       final String publicThreshold, final String publicTimeFrame,
+                                       final String trustDiskQuota, final String trustThreshold,
+                                       final String trustTimeFrame )
+    {
+
+        boolean isSaved = systemManager.setKurjunSettings( globalKurjunUrls, Long.parseLong( publicDiskQuota ),
+                Long.parseLong( publicThreshold ), Long.parseLong( publicTimeFrame ), Long.parseLong( trustDiskQuota ),
+                Long.parseLong( trustThreshold ), Long.parseLong( trustTimeFrame ) );
+
+        if ( isSaved )
+        {
+            return Response.status( Response.Status.OK ).build();
+        }
+        else
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
+        }
+    }
+
+
+    @Override
     public Response getPeerPolicy()
     {
         PeerPolicy peerPolicy = peerManager.getPolicy( peerManager.getLocalPeer().getId() );
