@@ -73,7 +73,6 @@ function AdvancedEnvironmentCtrl($scope, environmentService, trackerSrv, SweetAl
 			.success(function (data) {
 				for(var i = 0; i < data.length; i++) {
 					if(data[i].description.includes(environmentId)) {
-						console.log(data[i]);
 						getLogById(data[i].id, true);
 						break;
 					}
@@ -208,8 +207,12 @@ function AdvancedEnvironmentCtrl($scope, environmentService, trackerSrv, SweetAl
 
 	//add resource host
 	function addResource2Build(currentResource, index) {
+		if( PEER_MAP[index] !== undefined ) return PEER_MAP[index].id;
+		var pos = calculatePeerPos();
+
 		var resourceHost = new joint.shapes.resourceHostHtml.Element({
-			position: { x: 40, y: 40 },
+			//position: { x: 40, y: 40 },
+			position: { x: pos * ( PEER_WIDTH + PEER_SPACE ), y: 30 },
 			size: { width: 155, height: 185 },
 			peerId: vm.currentPeer,
 			hostId: currentResource,
@@ -219,31 +222,36 @@ function AdvancedEnvironmentCtrl($scope, environmentService, trackerSrv, SweetAl
 			'resourceHostName': 'RH' + (index + 1),
 			'peerName': 'Peer ' + (vm.currentPeerIndex + 1)
 		});
+		PEER_MAP[index] = { id : resourceHost.id, position : pos + 1 };
 		graph.addCell(resourceHost);
 		return false;
 	}
 
-	function findEmptyCubePostion() {
-		for( var j = 0; j < vm.cubeGrowth; j++ ) {
-			for( var i = 0; i < vm.cubeGrowth; i++ ) {
-				if( vm.templateGrid[i] === undefined ) {
-					vm.templateGrid[i] = new Array();
-					vm.templateGrid[i][j] = 1;
+	function calculatePeerPos() {
+		var pos = [];
 
-					return {x:i, y:j};
-				}
-
-				if( vm.templateGrid[i][j] !== 1 ) {
-					vm.templateGrid[i][j] = 1;
-					return {x:i, y:j};
-				}
+		for (var key in PEER_MAP) {
+			if (PEER_MAP.hasOwnProperty(key)) {
+				pos.push( PEER_MAP[key].position );
 			}
 		}
 
-		vm.templateGrid[vm.cubeGrowth] = new Array();
-		vm.templateGrid[vm.cubeGrowth][0] = 1;
-		vm.cubeGrowth++;
-		return { x : vm.cubeGrowth - 1, y : 0 };
+		if( pos.length == 0 )
+			return 0;
+		if( pos.length == 1 )
+			return 1;
+
+		pos.sort();
+
+		for( var i = 1; i < pos.length; i++ )
+		{
+			if( pos[i - 1] + 1 !== pos[i] )
+			{
+				return pos[i - 1] + 1;
+			}
+		}
+
+		return pos[pos.length - 1];
 	}
 
 	//custom shapes
@@ -491,7 +499,6 @@ function AdvancedEnvironmentCtrl($scope, environmentService, trackerSrv, SweetAl
 			if(allElements[i].get('type') == 'tm.devElement') {
 
 				var currentElement = allElements[i];
-				console.log(currentElement);
 				var container2Build = {
 					"size": currentElement.get('quotaSize'),
 					"templateName": currentElement.get('templateName'),
@@ -551,8 +558,8 @@ var GRID_SIZE = 60;
 var GRID_SPACING = 5;
 
 var PEER_MAP = {};
-var PEER_WIDTH = 120;
-var PEER_SPACE = 20;
+var PEER_WIDTH = 155;
+var PEER_SPACE = 30;
 
 var RH_WIDTH = 100;
 var RH_SPACE = 10;
