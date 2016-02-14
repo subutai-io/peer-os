@@ -3026,3 +3026,7 @@ td.b-main-table__status-col {
 	display: none!important;
 }
 
+.b-untrusted-user {
+	background-color: #FFE5E5;
+}
+

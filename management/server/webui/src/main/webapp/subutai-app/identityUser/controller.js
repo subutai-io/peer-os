@@ -73,6 +73,11 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 		.withPaginationType('full_numbers')
 		.withOption('stateSave', true)
 		.withOption('order', [[ 1, "asc" ]])
+		.withOption('rowCallback', function(row, data, index){
+			if(data.trustLevel <= 1) {
+				$(row).addClass('b-untrusted-user');
+			}
+		})
 		.withOption('createdRow', createdRow);
 
 	vm.dtColumns = [
