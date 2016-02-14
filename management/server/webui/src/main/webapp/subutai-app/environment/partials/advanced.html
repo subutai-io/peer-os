@@ -17,8 +17,10 @@
 			</div>
 			<div class="b-tools-menu b-tools-menu_custom-scroll-huc js-scrollbar" ng-show="advEnvCtrl.activeCloudTab == 'templates'">
 				<ul class="">
-					<li ng-repeat="template in advEnvCtrl.templates">
-						<a href ng-click="advEnvCtrl.addContainer(template, $event)">
+					<li ng-repeat="template in advEnvCtrl.templates" 
+						ondragstart="startDrag(event)" ondrop="drop(event)" draggable="true" 
+						data-template="{{ template }}">
+						<span class="b-tools-menu__item">
 							<span class="b-cloud-item">
 								<img
 									src="assets/templates/{{ template }}.jpg"
@@ -26,7 +28,7 @@
 									onError="this.onerror=null;this.src='assets/templates/no-image.jpg';">
 							</span>
 							<span class="b-cloud-item-text">{{ template }}</span>
-						</a>
+						</span>
 					</li>
 				</ul>
 			</div>
@@ -37,10 +39,10 @@
 					tooltips 
 					tooltip-template="{{ peerId }}" 
 					tooltip-side="left" 
-					ng-click="advEnvCtrl.showResources(peerId, peersResources)">
-						<a href="#" class="b-cloud-item-text g-margin-bottom-half">
+					ng-click="advEnvCtrl.showResources(peerId, peersResources, $index)">
+						<span class="b-tools-menu__item" class="b-cloud-item-text g-margin-bottom-half">
 							Peer {{$index + 1}}
-						</a>
+						</span>
 
 						<div class="b-progress__cloud">
 							<div class="b-progress-cloud g-margin-bottom-half">
@@ -64,11 +66,10 @@
 				</div>
 				<div class="b-tools-menu b-tools-menu_advanced js-scrollbar-cloud">
 					<ul ng-show="advEnvCtrl.currentResourceHosts.length > 0">
-						<li ng-repeat="resourceHost in advEnvCtrl.resourceHosts" 
-						ng-if="advEnvCtrl.currentResourceHosts.indexOf(resourceHost.id) > -1" 
-						ng-click="advEnvCtrl.addResource2Build(resourceHost)">
+						<li ng-repeat="resourceHost in advEnvCtrl.currentResourceHosts" 
+						ng-click="advEnvCtrl.addResource2Build(resourceHost, $index)">
 							<span class="b-cloud-item-resource-name g-margin-bottom">
-								{{ resourceHost.hostname }}
+								Recource Host {{$index + 1}}
 							</span>
 							<div class="b-progress__cloud b-progress__cloud_rh">
 								<div class="b-progress-text g-margin-bottom">
@@ -112,7 +113,8 @@
 				<div
 				class="b-cloud-space-work"
 				id="js-environment-creation"
-				ng-init="advEnvCtrl.initJointJs()">
+				ng-init="advEnvCtrl.initJointJs()" 
+				ondragover="dragOver(event)" ondrop="drop(event)">
 					<div
 						class="js-dropen-menu"
 						style="width: 100px; height: 100px; background-color: red; position: absolute; display: none;">
