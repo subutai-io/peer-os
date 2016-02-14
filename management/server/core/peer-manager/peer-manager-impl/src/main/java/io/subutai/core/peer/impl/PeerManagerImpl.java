@@ -1020,6 +1020,30 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
+    public void setPublicUrl( final String peerId, final String publicUrl ) throws PeerException
+    {
+        Preconditions.checkNotNull( peerId );
+
+        PeerData peerData = peerDataService.find( peerId );
+        if ( peerData == null )
+        {
+            throw new PeerException( "Peer not found." );
+        }
+        try
+        {
+            PeerInfo peerInfo = fromJson( peerData.getInfo(), PeerInfo.class );
+            peerInfo.setPublicUrl( publicUrl );
+            peerData.setInfo( toJson( peerInfo ) );
+            peerDataService.saveOrUpdate( peerData );
+        }
+        catch ( IOException e )
+        {
+            throw new PeerException( "Unexpected error: " + e.getMessage() );
+        }
+    }
+
+
+    @Override
     public void updateControlNetwork()
     {
         if ( getPeers().size() < 2 )
