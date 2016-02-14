@@ -3,7 +3,6 @@ package io.subutai.core.peer.impl;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.SocketException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
@@ -28,7 +27,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
-import javax.crypto.BadPaddingException;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
@@ -42,7 +40,6 @@ import com.google.common.base.Preconditions;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.peer.Encrypted;
-import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
@@ -55,7 +52,6 @@ import io.subutai.common.protocol.PingDistances;
 import io.subutai.common.security.objects.TokenType;
 import io.subutai.common.settings.ChannelSettings;
 import io.subutai.common.util.ControlNetworkUtil;
-import io.subutai.common.util.IPUtil;
 import io.subutai.common.util.SecurityUtilities;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
