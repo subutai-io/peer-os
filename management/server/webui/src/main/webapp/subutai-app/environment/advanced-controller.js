@@ -3,11 +3,11 @@
 angular.module('subutai.environment.adv-controller', [])
 	.controller('AdvancedEnvironmentCtrl', AdvancedEnvironmentCtrl);
 
-AdvancedEnvironmentCtrl.$inject = ['$scope', 'environmentService', 'peerRegistrationService', 'SweetAlert', 'ngDialog'];
+AdvancedEnvironmentCtrl.$inject = ['$scope', 'environmentService', 'trackerSrv', 'SweetAlert', 'ngDialog'];
 
 var graph = new joint.dia.Graph;
 
-function AdvancedEnvironmentCtrl($scope, environmentService, peerRegistrationService, SweetAlert, ngDialog) {
+function AdvancedEnvironmentCtrl($scope, environmentService, trackerSrv, SweetAlert, ngDialog) {
 
 	var vm = this;
 	var GRID_CELL_SIZE = 100;
@@ -23,7 +23,6 @@ function AdvancedEnvironmentCtrl($scope, environmentService, peerRegistrationSer
 	vm.resourceHosts = [];
 	vm.currentResourceHosts = [];
 	vm.advancedEnv = {};
-	vm.advancedEnv.currentNode = getDefaultValues();
 	vm.nodeStatus = 'Add to';
 	vm.nodeList = [];
 	vm.colors = quotaColors;
@@ -33,17 +32,13 @@ function AdvancedEnvironmentCtrl($scope, environmentService, peerRegistrationSer
 	vm.cubeGrowth = 1;
 	vm.environment2BuildName = 'Environment name';
 	vm.currentPeer = false;
+	vm.currentPeerIndex = false;
 
 	// functions
 
-	vm.addNewNode = addNewNode;
-	vm.removeNodeGroup = removeNodeGroup;
-	vm.setNodeData = setNodeData;
-	vm.setupAdvancedEnvironment = setupAdvancedEnvironment;
 	vm.initJointJs = initJointJs;
 	vm.buildEnvironmentByJoint = buildEnvironmentByJoint;
 	vm.clearWorkspace = clearWorkspace;
-	vm.sendToPending = sendToPending;
 	vm.addSettingsToTemplate = addSettingsToTemplate;
 
 	vm.showResources = showResources;
@@ -69,139 +64,160 @@ function AdvancedEnvironmentCtrl($scope, environmentService, peerRegistrationSer
 		vm.peerIds = data;
 	});
 
-	peerRegistrationService.getResourceHosts().success(function (data) {
+	/*peerRegistrationService.getResourceHosts().success(function (data) {
 		vm.resourceHosts = data;
-	});
+	});*/
 
-	function buildEnvironment() {
-		ngDialog.closeAll();
-		SweetAlert.swal(
-			{
-				title : 'Environment',
-				text : 'Creation has been started',
-				timer: VARS_TOOLTIP_TIMEOUT,
-				showConfirmButton: false
-			}
-		);		
-		environmentService.startEnvironmentBuild (vm.newEnvID[0], encodeURIComponent(vm.newEnvID[1])).success(function (data) {
-			SweetAlert.swal("Success!", "Your environment has been built successfully.", "success");
-			loadEnvironments();
-		}).error(function (data) {
-			SweetAlert.swal("ERROR!", "Environment build error. Error: " + data.ERROR, "error");
-		});
-	}
-
-	function addNewNode() {
-		if(vm.nodeStatus == 'Add to') {
-			var tempNode = vm.advancedEnv.currentNode;
-
-			if(tempNode === undefined) return;
-			if(tempNode.name === undefined || tempNode.name.length < 1) return;
-			if(tempNode.numberOfContainers === undefined || tempNode.numberOfContainers < 1) return;
-			if(tempNode.sshGroupId === undefined) return;
-			if(tempNode.hostsGroupId === undefined) return;
-
-			if( jQuery.grep( vm.nodeList, function( i ) {
-					return tempNode.name == i.name;
-				}).length != 0
-			) return;
-
-			vm.nodeList.push(tempNode);
-		} else {
-			vm.nodeStatus = 'Add to';
-		}
-
-
-		vm.advancedEnv.currentNode = angular.copy( vm.advancedEnv.currentNode );
-		vm.advancedEnv.currentNode.name = "";
-	}
-
-	function setNodeData(key) {
-		vm.nodeStatus = 'Update in';
-		vm.advancedEnv.currentNode = vm.nodeList[key];
-	}
-
-	function removeNodeGroup(key)
-	{
-		vm.nodeList.splice(key, 1);
-	}
-
-	function getDefaultValues() {
-		var defaultVal = {
-			'templateName': 'master',
-			'numberOfContainers': 2,
-			'sshGroupId': 0,
-			'hostsGroupId': 0,
-			'type': 'TINY'
-		};
-		return defaultVal;
-	}
-
-	function setupAdvancedEnvironment() {
-		if(vm.advancedEnv.name === undefined) return;
-		if(vm.nodeList === undefined || vm.nodeList.length == 0) return;
-
-		var finalEnvironment = vm.advancedEnv;
-		finalEnvironment.nodeGroups = vm.nodeList;
-		if(finalEnvironment.currentNod !== undefined) {
-			finalEnvironment.nodeGroups.push(finalEnvironment.currentNode);
-		}
-		delete finalEnvironment.currentNode;
-
-		var cloneContainers = {};
-
-		for( var i = 0; i < finalEnvironment.nodeGroups.length; i++ )
-		{
-			var node = finalEnvironment.nodeGroups[i];
-			for( var j = 0; j < node.numberOfContainers; j++ )
-			{
-				if( j < 0 ) break;
-
-				if( cloneContainers[node.peerId] === undefined )
-				{
-					cloneContainers[node.peerId] = [];
+	function getLogsFromTracker(environmentId) {
+		trackerSrv.getOperations('ENVIRONMENT MANAGER', moment().format('YYYY-MM-DD'), moment().format('YYYY-MM-DD'), 100)
+			.success(function (data) {
+				for(var i = 0; i < data.length; i++) {
+					if(data[i].description.includes(environmentId)) {
+						console.log(data[i]);
+						getLogById(data[i].id, true);
+						break;
+					}
 				}
-
-				cloneContainers[node.peerId].push(node);
-			}
-		}
-
-		LOADING_SCREEN();
-		ngDialog.closeAll();
-		vm.activeTab = 'pending';
-		environmentService.setupAdvancedEnvironment(finalEnvironment.name, cloneContainers)
-			.success(function(data){
-				console.log(data);
-				loadEnvironments();
-				LOADING_SCREEN('none');
-			}).error(function(error){
+				return false;
+			}).error(function(error) {
 				console.log(error);
-				LOADING_SCREEN('none');
-			});
-
-		vm.nodeList = [];
-		vm.advancedEnv = {};
-		vm.advancedEnv.currentNode = getDefaultValues();
+			});		
 	}
 
-	function showResources(peerId, resourcesId) {
+	function checkLastLog(status) {
+		var lastLog = vm.logMessages[vm.logMessages.length - 1];
+		lastLog.time = moment().format('HH:mm:ss');
+		if(status === true) {
+			lastLog.status = 'success';
+			lastLog.classes = ['fa-check', 'g-text-green'];
+		} else {
+			lastLog.status = 'success';
+			lastLog.classes = ['fa-times', 'g-text-red'];
+		}
+	}
+
+	function getLogById(id, checkLast, prevLogs) {
+		if(checkLast === undefined || checkLast === null) checkLast = false;
+		if(prevLogs === undefined || prevLogs === null) prevLogs = false;
+		trackerSrv.getOperation('ENVIRONMENT MANAGER', id)
+			.success(function (data) {
+				if(data.state == 'RUNNING') {
+
+					if(checkLast) {
+						checkLastLog(true);
+					}
+
+					var logs = data.log.split(/(?:\r\n|\r|\n)/g);
+					var result = [];
+					var i = 0;
+					if(prevLogs) {
+						i = prevLogs.length;
+						if(logs.length > prevLogs.length) {
+							checkLastLog(true);
+						}
+					}
+					for(i; i < logs.length; i++) {
+
+						var logTime = moment().format('HH:mm:ss');
+						var logStatus = 'success';
+						var logClasses = ['fa-check', 'g-text-green'];
+						if(i+1 == logs.length) {
+							logTime = '';
+							logStatus = 'in-progress';
+							logClasses = ['fa-spinner', 'fa-pulse'];
+						}
+
+						var  currentLog = {
+							"time": logTime,
+							"status": logStatus,
+							"classes": logClasses,
+							"text": logs[i]
+						};
+						result.push(currentLog);
+					}
+
+					vm.logMessages = vm.logMessages.concat(result);
+
+					setTimeout(function() {
+						getLogById(id, false, logs);
+					}, 2000);					
+
+					return result;
+				} else {
+					if(data.state == 'FAILED') {
+						checkLastLog(false);
+					} else {
+						SweetAlert.swal("Success!", "Your environment has been built successfully.", "success");
+						checkLastLog(true);
+					}
+				}
+			}).error(function(error) {
+				console.log(error);
+			});
+	}
+
+	vm.logMessages = [];
+	function buildEnvironment() {
+		vm.buildStep = 'showLogs';
+
+		vm.logMessages = [];
+		var currentLog = {
+			"time": '',
+			"status": 'in-progress',
+			"classes": ['fa-spinner', 'fa-pulse'],
+			"text": 'Registering environment'
+		};
+		vm.logMessages.push(currentLog);
+
+		environmentService.startEnvironmentAutoBuild(vm.environment2BuildName, JSON.stringify(vm.containers2Build))
+			.success(function(data){
+				vm.newEnvID = data;
+				currentLog.status = 'success';
+				currentLog.classes = ['fa-check', 'g-text-green'];
+				currentLog.time = moment().format('HH:mm:ss');
+
+				currentLog = {
+					"time": '',
+					"status": 'in-progress',
+					"classes": ['fa-spinner', 'fa-pulse'],
+					"text": 'Environment creation has been started'
+				};
+				vm.logMessages.push(currentLog);
+
+				//var logId = getLogsFromTracker(vm.newEnvID);
+				var logId = getLogsFromTracker(vm.environment2BuildName);
+
+			}).error(function(error){
+				if(error && error.ERROR === undefined) {
+					VARS_MODAL_ERROR( SweetAlert, 'Error: ' + error );
+				} else {
+					VARS_MODAL_ERROR( SweetAlert, 'Error: ' + error.ERROR );
+				}
+				currentLog.status = 'fail';
+				currentLog.classes = ['fa-times', 'g-text-red'];
+				currentLog.time = moment().format('HH:mm:ss');				
+			});
+	}
+
+	function showResources(peerId, resourcesId, index) {
 		vm.currentResourceHosts = resourcesId;
 		vm.currentPeer = peerId;
+		vm.currentPeerIndex = index;
 		$('.b-cloud-add-tools').animate({'left': '-200px'}, 300);
 	}
 
 	//add resource host
-	function addResource2Build(currentResource) {
+	function addResource2Build(currentResource, index) {
 		var resourceHost = new joint.shapes.resourceHostHtml.Element({
 			position: { x: 40, y: 40 },
 			size: { width: 155, height: 185 },
 			peerId: vm.currentPeer,
-			hostId: currentResource.id,
+			hostId: currentResource,
 			children: 0,
 			grid: [],
 			gridSize: { size: 2 },
-			'resourceHostName': 'RH1',
-			'peerName': 'Peer 1'
+			'resourceHostName': 'RH' + (index + 1),
+			'peerName': 'Peer ' + (vm.currentPeerIndex + 1)
 		});
 		graph.addCell(resourceHost);
 		return false;
@@ -463,32 +479,54 @@ function AdvancedEnvironmentCtrl($scope, environmentService, peerRegistrationSer
 
 	vm.buildStep = 'confirm';
 	function buildEnvironmentByJoint() {
+
+		vm.newEnvID = [];		
+
 		var allElements = graph.getCells();
 		vm.env2Build = {};
 		vm.containers2Build = [];
 		vm.buildStep = 'confirm';
-		console.log(allElements);
+
 		for(var i = 0; i < allElements.length; i++) {
-			var currentElement = allElements[i];
-			if(currentElement.get('type') == 'tm.devElement') {
-				var currentTemplateName = allElements[i].get('templateName');
+			if(allElements[i].get('type') == 'tm.devElement') {
+
+				var currentElement = allElements[i];
+				console.log(currentElement);
 				var container2Build = {
 					"size": currentElement.get('quotaSize'),
-					"templateName": currentTemplateName,
+					"templateName": currentElement.get('templateName'),
 					"name": currentElement.get('containerName'),
+					"peerId": currentElement.get('parentPeerId'),
+					"hostId": currentElement.get('parentHostId'),
 					"position": currentElement.get('position')
 				};
-				if(vm.env2Build[currentTemplateName] === undefined) {
-					vm.env2Build[currentTemplateName] = 1;
+
+				if (vm.env2Build[currentElement.get('templateName')] === undefined) {
+					vm.env2Build[currentElement.get('templateName')] = {};
+					vm.env2Build[currentElement.get('templateName')].count = 1;
+					vm.env2Build[currentElement.get('templateName')]
+						.sizes = {};
+					vm.env2Build[currentElement.get('templateName')]
+						.sizes[currentElement.get('quotaSize')] = 1;
 				} else {
-					vm.env2Build[currentTemplateName]++;
+					vm.env2Build[currentElement.get('templateName')].count++;
+					if(vm.env2Build[currentElement.get('templateName')].sizes[currentElement.get('quotaSize')] === undefined) {
+						vm.env2Build[currentElement.get('templateName')]
+							.sizes[currentElement.get('quotaSize')] = 1;
+					} else {
+						vm.env2Build[currentElement.get('templateName')]
+							.sizes[currentElement.get('quotaSize')]++;
+					}
 				}
+
 				vm.containers2Build.push(container2Build);
+
 			}
 		}
+
 		console.log(vm.containers2Build);
 		ngDialog.open({
-			template: 'subutai-app/environment/partials/popups/environment-build-info.html',
+			template: 'subutai-app/environment/partials/popups/environment-build-info-advanced.html',
 			scope: $scope,
 			className: 'b-build-environment-info'
 		});
@@ -499,24 +537,6 @@ function AdvancedEnvironmentCtrl($scope, environmentService, peerRegistrationSer
 		vm.templateGrid = [];
 		graph.resetCells();
 		$('.b-resource-host').remove();
-	}
-
-	function sendToPending() {
-		LOADING_SCREEN();
-		environmentService.startEnvironmentAutoBuild(vm.environment2BuildName, JSON.stringify(vm.containers2Build))
-			.success(function(data){
-				console.log(data);
-				vm.newEnvID = data;
-				vm.buildStep = 'pgpKey';
-				LOADING_SCREEN('none');
-			}).error(function(error){
-				if(error.ERROR === undefined) {
-					VARS_MODAL_ERROR( SweetAlert, 'Error: ' + error );
-				} else {
-					VARS_MODAL_ERROR( SweetAlert, 'Error: ' + error.ERROR );
-				}
-				LOADING_SCREEN('none');
-			});
 	}
 
 	function addSettingsToTemplate(settings) {

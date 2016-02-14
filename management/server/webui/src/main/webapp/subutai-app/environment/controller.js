@@ -61,6 +61,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	vm.removeDomain = removeDomain;
 	vm.togglePeer = togglePeer;
 	vm.setupStrategyRequisites = setupStrategyRequisites;
+	vm.minimizeLogs = minimizeLogs;
 
 	//share environment functions
 	vm.shareEnvironmentWindow = shareEnvironmentWindow;
@@ -564,6 +565,24 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 
 	function getQuotaColor(quotaSize) {
 		return quotaColors[quotaSize];
+	}
+
+	function minimizeLogs() {
+		var that = $('.ngdialog');
+		var dialogOverlay = that.find('.ngdialog-overlay');
+		if(vm.popupLogState == 'full') {
+			vm.popupLogState = 'min';
+			that.addClass('ngdialog_minimize');
+			dialogOverlay.css({
+				'top': ($(window).height() - 47) + 'px'
+			});
+		} else {
+			vm.popupLogState = 'full';
+			that.removeClass('ngdialog_minimize');
+			dialogOverlay.css({
+				'top': 0
+			});
+		}
 	}
 }
 

@@ -47,7 +47,6 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 	vm.addSettingsToTemplate = addSettingsToTemplate;
 
 	vm.addContainer = addContainer;
-	vm.minimizeLogs = minimizeLogs;
 
 	environmentService.getTemplates()
 		.success(function (data) {
@@ -68,24 +67,6 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 	environmentService.getPeers().success(function (data) {
 		vm.peerIds = data;
 	});
-
-	function minimizeLogs() {
-		var that = $('.ngdialog');
-		var dialogOverlay = that.find('.ngdialog-overlay');
-		if(vm.popupLogState == 'full') {
-			vm.popupLogState = 'min';
-			that.addClass('ngdialog_minimize');
-			dialogOverlay.css({
-				'top': ($(window).height() - 47) + 'px'
-			});
-		} else {
-			vm.popupLogState = 'full';
-			that.removeClass('ngdialog_minimize');
-			dialogOverlay.css({
-				'top': 0
-			});
-		}
-	}
 
 	function getLogsFromTracker(environmentId) {
 		trackerSrv.getOperations('ENVIRONMENT MANAGER', moment().format('YYYY-MM-DD'), moment().format('YYYY-MM-DD'), 100)
