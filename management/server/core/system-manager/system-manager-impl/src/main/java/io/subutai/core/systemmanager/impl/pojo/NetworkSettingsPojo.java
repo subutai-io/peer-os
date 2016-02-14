@@ -10,11 +10,11 @@ import io.subutai.core.systemmanager.api.pojo.NetworkSettings;
 public class NetworkSettingsPojo implements NetworkSettings
 {
     private String externalIpInterface;
-    public String openPort = "8080";
-    public String securePortX1 = "8443";
-    public String securePortX2 = "8444";
-    public String securePortX3 = "8445";
-    public String specialPortX1 = "8551";
+    public int openPort;
+    public int securePortX1;
+    public int securePortX2 ;
+    public int securePortX3;
+    public int specialPortX1;
 
 
     public String getExternalIpInterface()
@@ -29,61 +29,61 @@ public class NetworkSettingsPojo implements NetworkSettings
     }
 
 
-    public String getOpenPort()
+    public int getOpenPort()
     {
         return openPort;
     }
 
 
-    public void setOpenPort( final String openPort )
+    public void setOpenPort( final int openPort )
     {
         this.openPort = openPort;
     }
 
 
-    public String getSecurePortX1()
+    public int getSecurePortX1()
     {
         return securePortX1;
     }
 
 
-    public void setSecurePortX1( final String securePortX1 )
+    public void setSecurePortX1( final int securePortX1 )
     {
         this.securePortX1 = securePortX1;
     }
 
 
-    public String getSecurePortX2()
+    public int getSecurePortX2()
     {
         return securePortX2;
     }
 
 
-    public void setSecurePortX2( final String securePortX2 )
+    public void setSecurePortX2( final int securePortX2 )
     {
         this.securePortX2 = securePortX2;
     }
 
 
-    public String getSecurePortX3()
+    public int getSecurePortX3()
     {
         return securePortX3;
     }
 
 
-    public void setSecurePortX3( final String securePortX3 )
+    public void setSecurePortX3( final int securePortX3 )
     {
         this.securePortX3 = securePortX3;
     }
 
 
-    public String getSpecialPortX1()
+    public int getSpecialPortX1()
     {
         return specialPortX1;
     }
 
 
-    public void setSpecialPortX1( final String specialPortX1 )
+    public void setSpecialPortX1( final int specialPortX1 )
     {
         this.specialPortX1 = specialPortX1;
     }

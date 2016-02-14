@@ -122,11 +122,11 @@ public class SystemManagerImpl implements SystemManager
                                     final String securePortX2, final String securePortX3, final String specialPortX1 )
     {
         io.subutai.common.settings.PeerSettings.setExternalIpInterface( externalIpInterface );
-        ChannelSettings.setOpenPort( openPort );
-        ChannelSettings.setSecurePortX1( securePortX1 );
-        ChannelSettings.setSecurePortX2( securePortX2 );
-        ChannelSettings.setSecurePortX3( securePortX3 );
-        ChannelSettings.setSpecialPortX1( specialPortX1 );
+        ChannelSettings.setOpenPort( Integer.parseInt( openPort ) );
+        ChannelSettings.setSecurePortX1( Integer.parseInt( securePortX1 ) );
+        ChannelSettings.setSecurePortX2( Integer.parseInt( securePortX2 ) );
+        ChannelSettings.setSecurePortX3( Integer.parseInt( securePortX3 ) );
+        ChannelSettings.setSpecialPortX1( Integer.parseInt( specialPortX1 ) );
     }
 
 
