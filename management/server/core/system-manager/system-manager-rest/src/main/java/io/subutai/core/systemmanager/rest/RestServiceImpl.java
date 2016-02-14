@@ -3,14 +3,15 @@ package io.subutai.core.systemmanager.rest;
 
 import javax.ws.rs.core.Response;
 
+import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.systemmanager.api.SystemManager;
-import io.subutai.core.systemmanager.api.pojo.ChannelSettings;
 import io.subutai.core.systemmanager.api.pojo.KurjunSettings;
-import io.subutai.core.systemmanager.api.pojo.PeerOwner;
+import io.subutai.core.systemmanager.api.pojo.NetworkSettings;
 import io.subutai.core.systemmanager.api.pojo.PeerSettings;
+import io.subutai.core.systemmanager.api.pojo.SecuritySettings;
 import io.subutai.core.systemmanager.api.pojo.SystemInfo;
 
 
@@ -30,6 +31,14 @@ public class RestServiceImpl implements RestService
         String projectInfo = JsonUtil.GSON.toJson( pojo );
 
         return Response.status( Response.Status.OK ).entity( projectInfo ).build();
+    }
+
+
+    @Override
+    public Response setPeerSettings()
+    {
+        systemManager.setPeerSettings();
+        return Response.status( Response.Status.OK ).build();
     }
 
 
@@ -54,6 +63,28 @@ public class RestServiceImpl implements RestService
 
 
     @Override
+    public Response setKurjunSettings( final String globalKurjunUrls, final String publicDiskQuota,
+                                       final String publicThreshold, final String publicTimeFrame,
+                                       final String trustDiskQuota, final String trustThreshold,
+                                       final String trustTimeFrame )
+    {
+
+        boolean isSaved = systemManager.setKurjunSettings( globalKurjunUrls, Long.parseLong( publicDiskQuota ),
+                Long.parseLong( publicThreshold ), Long.parseLong( publicTimeFrame ), Long.parseLong( trustDiskQuota ),
+                Long.parseLong( trustThreshold ), Long.parseLong( trustTimeFrame ) );
+
+        if ( isSaved )
+        {
+            return Response.status( Response.Status.OK ).build();
+        }
+        else
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
+        }
+    }
+
+
+    @Override
     public Response getPeerPolicy()
     {
         PeerPolicy peerPolicy = peerManager.getPolicy( peerManager.getLocalPeer().getId() );
@@ -63,30 +94,65 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getChannelSettings()
+    public Response setPeerPolicy( final String peerId, final String diskUsageLimit, final String cpuUsageLimit,
+                                   final String memoryUsageLimit, final String environmentLimit,
+                                   final String containerLimit )
     {
-        ChannelSettings pojo = systemManager.getChannelSettings();
-        String channelSettingsInfo = JsonUtil.GSON.toJson( pojo );
-
-        return Response.status( Response.Status.OK ).entity( channelSettingsInfo ).build();
-    }
-
-
-    @Override
-    public Response setPeerOwner()
-    {
-        systemManager.setPeerOwner();
+        PeerPolicy peerPolicy =
+                new PeerPolicy( peerId, Integer.parseInt( diskUsageLimit ), Integer.parseInt( cpuUsageLimit ),
+                        Integer.parseInt( memoryUsageLimit ), 90, Integer.parseInt( environmentLimit ),
+                        Integer.parseInt( containerLimit ) );
+        try
+        {
+            peerManager.setPolicy( peerId, peerPolicy );
+        }
+        catch ( PeerException e )
+        {
+            Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
+            e.printStackTrace();
+        }
         return Response.status( Response.Status.OK ).build();
     }
 
 
     @Override
-    public Response getPeerOwner()
+    public Response getNetworkSettings()
     {
-        PeerOwner pojo = systemManager.getPeerOwnerInfo();
-        String peerOwnerInfo = JsonUtil.GSON.toJson( pojo );
+        NetworkSettings pojo = systemManager.getNetworkSettings();
+        String networkSettingsInfo = JsonUtil.GSON.toJson( pojo );
 
-        return Response.status( Response.Status.OK ).entity( peerOwnerInfo ).build();
+        return Response.status( Response.Status.OK ).entity( networkSettingsInfo ).build();
+    }
+
+
+    @Override
+    public Response setNetworkSettings( final String externalIpInterface, final String openPort,
+                                        final String securePortX1, final String securePortX2, final String securePortX3,
+                                        final String specialPortX1 )
+    {
+        systemManager.setNetworkSettings( externalIpInterface, openPort, securePortX1, securePortX2, securePortX3,
+                specialPortX1 );
+        return Response.status( Response.Status.OK ).build();
+    }
+
+
+    @Override
+    public Response getSecuritySettings()
+    {
+        SecuritySettings pojo = systemManager.getSecuritySettings();
+        String securitySettingsInfo = JsonUtil.GSON.toJson( pojo );
+
+        return Response.status( Response.Status.OK ).entity( securitySettingsInfo ).build();
+    }
+
+
+    @Override
+    public Response setSecuritySettings( final boolean encryptionEnabled, final boolean restEncryptionEnabled,
+                                         final boolean integrationEnabled, final boolean keyTrustCheckEnabled )
+    {
+        systemManager.setSecuritySettings( encryptionEnabled, restEncryptionEnabled, integrationEnabled,
+                keyTrustCheckEnabled );
+        return Response.status( Response.Status.OK ).build();
     }
 
 

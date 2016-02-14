@@ -7,7 +7,6 @@ import java.util.Set;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
-import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.peer.RegistrationData;
 import io.subutai.common.protocol.PingDistances;
@@ -85,6 +84,8 @@ public interface PeerManager
     PeerPolicy getAvailablePolicy();
 
     PeerPolicy getPolicy( String peerId );
+
+    void setPolicy(String peerId, PeerPolicy peerPolicy ) throws PeerException;
 
     Set<Peer> resolve( Set<String> peers ) throws PeerException;
 

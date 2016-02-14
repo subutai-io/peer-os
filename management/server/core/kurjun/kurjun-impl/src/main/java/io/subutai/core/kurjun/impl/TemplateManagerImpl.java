@@ -77,6 +77,7 @@ import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.settings.Common;
+import io.subutai.common.settings.KurjunSettings;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.kurjun.api.KurjunTransferQuota;
 import io.subutai.core.kurjun.api.TemplateManager;
@@ -136,7 +137,7 @@ public class TemplateManagerImpl implements TemplateManager
 
             // Refresh global urls
             repoUrlStore.removeAllGlobalTemplateUrl();
-            for ( String url : globalKurjunUrlList )
+            for ( String url : KurjunSettings.getGlobalKurjunUrls() )
             {
                 repoUrlStore.addGlobalTemplateUrl( new RepoUrl( new URL( url ), null ) );
             }

@@ -13,14 +13,13 @@ public class SubutaiInfo
     private static final Logger LOG = LoggerFactory.getLogger( SubutaiInfo.class );
     private static PropertiesConfiguration PROPERTIES = loadProperties();
 
+
     public static PropertiesConfiguration loadProperties()
     {
         PropertiesConfiguration config = null;
         try
         {
-            config = new PropertiesConfiguration( String.format( "%s/git.properties", Common
-                        .KARAF_ETC ) );
-
+            config = new PropertiesConfiguration( String.format( "%s/git.properties", Common.KARAF_ETC ) );
         }
         catch ( ConfigurationException e )
         {
@@ -31,51 +30,51 @@ public class SubutaiInfo
     }
 
 
-    public static Object getCommitId()
+    public static String getCommitId()
     {
-        return PROPERTIES.getProperty( "git.commit.id" );
+        return String.valueOf( PROPERTIES.getProperty( "git.commit.id" ) );
     }
 
 
-    public static Object getBranch()
+    public static String getBranch()
     {
-        return PROPERTIES.getProperty( "git.branch" );
+        return String.valueOf( PROPERTIES.getProperty( "git.branch" ) );
     }
 
 
-    public static Object getCommitterUserName()
+    public static String getCommitterUserName()
     {
-        return PROPERTIES.getProperty( "git.commit.user.name" );
+        return String.valueOf( PROPERTIES.getProperty( "git.commit.user.name" ));
     }
 
 
-    public static Object getCommitterUserEmail()
+    public static String getCommitterUserEmail()
     {
-        return PROPERTIES.getProperty( "git.commit.user.email" );
+        return String.valueOf( PROPERTIES.getProperty( "git.commit.user.email" ));
     }
 
 
-    public static Object getBuilderUserName()
+    public static String getBuilderUserName()
     {
-        return PROPERTIES.getProperty( "git.build.user.name" );
+        return String.valueOf( PROPERTIES.getProperty( "git.build.user.name" ));
     }
 
 
-    public static Object getBuilderUserEmail()
+    public static String getBuilderUserEmail()
     {
-        return PROPERTIES.getProperty( "git.build.user.email" );
+        return String.valueOf( PROPERTIES.getProperty( "git.build.user.email" ));
     }
 
 
-    public static Object getBuildTime()
+    public static String getBuildTime()
     {
-        return PROPERTIES.getProperty( "git.build.time" );
+        return String.valueOf( PROPERTIES.getProperty( "git.build.time" ));
     }
 
 
-    public static Object getVersion()
+    public static String getVersion()
     {
-        return PROPERTIES.getProperty( "git.build.version" );
+        return String.valueOf( PROPERTIES.getProperty( "git.build.version" ));
     }
 }
 

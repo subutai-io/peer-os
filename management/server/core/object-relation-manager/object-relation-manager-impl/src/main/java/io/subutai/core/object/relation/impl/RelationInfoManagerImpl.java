@@ -11,6 +11,7 @@ import com.google.common.collect.Sets;
 
 import io.subutai.common.security.objects.Ownership;
 import io.subutai.common.security.relation.RelationLink;
+import io.subutai.common.settings.PeerSettings;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserDelegate;
@@ -57,7 +58,7 @@ public class RelationInfoManagerImpl implements RelationInfoManager
     // C should give correct verification through relationship path.
     private boolean isRelationValid( final RelationInfo relationInfo, final RelationMeta relationMeta )
     {
-        if ( !keyTrustCheckEnabled )
+        if ( !PeerSettings.getKeyTrustCheckState() )
         {
             return false;
         }
@@ -108,7 +109,7 @@ public class RelationInfoManagerImpl implements RelationInfoManager
     private int getDeeper( final RelationInfo relationInfo, final RelationLinkImpl target, final RelationLink object,
                            Set<RelationLink> relationLinks )
     {
-        if ( !keyTrustCheckEnabled )
+        if ( !PeerSettings.getKeyTrustCheckState() )
         {
             return 0;
         }

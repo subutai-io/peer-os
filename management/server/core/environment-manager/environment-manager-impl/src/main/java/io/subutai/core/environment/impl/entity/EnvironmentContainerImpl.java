@@ -54,6 +54,7 @@ import io.subutai.common.peer.PeerId;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.security.objects.PermissionObject;
+import io.subutai.common.settings.PeerSettings;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.identity.api.IdentityManager;
@@ -354,7 +355,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
             logger.warn( "Trust chain validation is on..." );
             // TODO call relationManager validation here instead
             EnvironmentManagerImpl envImpl = ( EnvironmentManagerImpl ) environmentManager;
-            if ( envImpl.isKeyTrustCheckEnabled() )
+            if ( PeerSettings.getKeyTrustCheckState() )
             {
                 IdentityManager identityManager = envImpl.getIdentityManager();
                 RelationManager relationManager = envImpl.getRelationManager();

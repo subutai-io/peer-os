@@ -5,73 +5,34 @@ import io.subutai.core.systemmanager.api.pojo.PeerSettings;
 
 
 /**
- * Created by ermek on 2/6/16.
+ * Created by ermek on 2/11/16.
  */
 public class PeerSettingsPojo implements PeerSettings
 {
-    private String externalIpInterface;
-    private boolean encryptionState;
-    private boolean restEncryptionState;
-    private boolean integrationState;
-    private boolean keyTrustCheckState;
+    private String peerOwnerId;
+    private String userPeerOwnerName;
 
 
-    public String getExternalIpInterface()
+    public String getPeerOwnerId()
     {
-        return externalIpInterface;
+        return peerOwnerId;
     }
 
 
-    public void setExternalIpInterface( final String externalIpInterface )
+    public void setPeerOwnerId( final String peerOwnerId )
     {
-        this.externalIpInterface = externalIpInterface;
+        this.peerOwnerId = peerOwnerId;
     }
 
 
-    public boolean getEncryptionState()
+    public String getUserPeerOwnerName()
     {
-        return encryptionState;
+        return userPeerOwnerName;
     }
 
 
-    public void setEncryptionState( final boolean encryptionState )
+    public void setUserPeerOwnerName( final String userPeerOwnerName )
     {
-        this.encryptionState = encryptionState;
-    }
-
-
-    public boolean getRestEncryptionState()
-    {
-        return restEncryptionState;
-    }
-
-
-    public void setRestEncryptionState( final boolean restEncryptionState )
-    {
-        this.restEncryptionState = restEncryptionState;
-    }
-
-
-    public boolean getIntegrationState()
-    {
-        return integrationState;
-    }
-
-
-    public void setIntegrationState( final boolean integrationState )
-    {
-        this.integrationState = integrationState;
-    }
-
-
-    public boolean getKeyTrustCheckState()
-    {
-        return keyTrustCheckState;
-    }
-
-
-    public void setKeyTrustCheckState( final boolean keyTrustCheckState )
-    {
-        this.keyTrustCheckState = keyTrustCheckState;
+        this.userPeerOwnerName = userPeerOwnerName;
     }
 }

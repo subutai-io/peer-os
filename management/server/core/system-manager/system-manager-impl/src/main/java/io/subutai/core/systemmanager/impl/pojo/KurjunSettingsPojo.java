@@ -1,6 +1,7 @@
 package io.subutai.core.systemmanager.impl.pojo;
 
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.subutai.core.systemmanager.api.pojo.KurjunSettings;
@@ -11,7 +12,7 @@ import io.subutai.core.systemmanager.api.pojo.KurjunSettings;
  */
 public class KurjunSettingsPojo implements KurjunSettings
 {
-    private String globalKurjunUrls;
+    private List<String> globalKurjunUrls;
     private Long publicDiskQuota;
     private Long publicThreshold;
     private Long publicTimeFrame;
@@ -20,18 +21,6 @@ public class KurjunSettingsPojo implements KurjunSettings
     private Long trustThreshold;
     private Long trustTimeFrame;
     private TimeUnit trustTimeUnit;
-
-
-    public String getGlobalKurjunUrls()
-    {
-        return globalKurjunUrls;
-    }
-
-
-    public void setGlobalKurjunUrls( final String globalKurjunUrls )
-    {
-        this.globalKurjunUrls = globalKurjunUrls;
-    }
 
 
     public Long getPublicDiskQuota()
@@ -127,5 +116,17 @@ public class KurjunSettingsPojo implements KurjunSettings
     public void setTrustTimeUnit( final TimeUnit trustTimeUnit )
     {
         this.trustTimeUnit = trustTimeUnit;
+    }
+
+
+    public List<String> getGlobalKurjunUrls()
+    {
+        return globalKurjunUrls;
+    }
+
+
+    public void setGlobalKurjunUrls( final List<String> globalKurjunUrls )
+    {
+        this.globalKurjunUrls = globalKurjunUrls;
     }
 }
