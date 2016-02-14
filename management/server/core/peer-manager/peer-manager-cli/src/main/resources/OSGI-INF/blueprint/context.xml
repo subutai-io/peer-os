@@ -109,7 +109,7 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="peer/set-public-url">
       <action class="io.subutai.core.peer.cli.SetPublicUrlCommand">
-        <property name="peerManager" ref="peerManager" />
+        <argument ref="peerManager" />
       </action>
     </command>
   </command-bundle>

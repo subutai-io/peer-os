@@ -150,7 +150,7 @@ public class PeerManagerImpl implements PeerManager
                 localPeerInfo.setId( localPeerId );
                 localPeerInfo.setOwnerId( ownerId );
                 localPeerInfo.setPublicUrl( publicUrl );
-                localPeerInfo.setName( String.format( "Peer %s %s", localPeerId, publicUrl ) );
+                localPeerInfo.setName( String.format( "Peer %s on %s", localPeerId, publicUrl ) );
                 PeerPolicy policy = getDefaultPeerPolicy( localPeerId );
 
                 PeerData peerData =
@@ -314,8 +314,6 @@ public class PeerManagerImpl implements PeerManager
             throw new IllegalArgumentException( "Peer could not be null." );
         }
         this.peers.put( peer.getId(), peer );
-        //        selectControlNetwork();
-        //        updateControlNetwork();
     }
 
 
@@ -325,8 +323,6 @@ public class PeerManagerImpl implements PeerManager
         if ( peer != null )
         {
             this.peers.remove( id );
-            //            selectControlNetwork();
-            //            updateControlNetwork();
         }
     }
 
@@ -1031,6 +1027,8 @@ public class PeerManagerImpl implements PeerManager
             peerInfo.setPublicUrl( publicUrl );
             peerData.setInfo( toJson( peerInfo ) );
             peerDataService.saveOrUpdate( peerData );
+            Peer peer= createPeer( peerData );
+            addPeer( peer );
         }
         catch ( IOException e )
         {
