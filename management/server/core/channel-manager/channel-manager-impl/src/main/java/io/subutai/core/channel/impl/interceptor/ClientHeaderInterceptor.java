@@ -14,6 +14,7 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 
 import io.subutai.common.settings.Common;
+import io.subutai.common.settings.PeerSettings;
 import io.subutai.core.channel.impl.ChannelManagerImpl;
 import io.subutai.core.channel.impl.util.InterceptorState;
 import io.subutai.core.peer.api.PeerManager;
@@ -43,7 +44,7 @@ public class ClientHeaderInterceptor extends AbstractPhaseInterceptor<Message>
     @Override
     public void handleMessage( final Message message )
     {
-        if ( !channelManagerImpl.isEncryptionEnabled() )
+        if ( !PeerSettings.getEncryptionState() )
         {
             return;
         }

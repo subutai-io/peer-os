@@ -580,9 +580,9 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 				}]
 			}
 		})
-        .state('settings-channel', {
-            url: '/settings-channel',
-            templateUrl: 'subutai-app/settingsChannel/partials/view.html',
+        .state('settings-network', {
+            url: '/settings-network',
+            templateUrl: 'subutai-app/settingsNetwork/partials/view.html',
             data: {
                 bodyClass: '',
                 layout: 'default'
@@ -591,20 +591,20 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
                 loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
                     return $ocLazyLoad.load([
                         {
-                            name: 'subutai.settings-channel',
+                            name: 'subutai.settings-network',
                             files: [
-                                'subutai-app/settingsChannel/settingsChannel.js',
-                                'subutai-app/settingsChannel/controller.js',
-                                'subutai-app/settingsChannel/service.js'
+                                'subutai-app/settingsNetwork/settingsNetwork.js',
+                                'subutai-app/settingsNetwork/controller.js',
+                                'subutai-app/settingsNetwork/service.js'
                             ]
                         }
                     ]);
                 }]
             }
         })
-        .state('settings-owner', {
-            url: '/settings-owner',
-            templateUrl: 'subutai-app/settingsOwner/partials/view.html',
+        .state('settings-security', {
+            url: '/settings-security',
+            templateUrl: 'subutai-app/settingsSecurity/partials/view.html',
             data: {
                 bodyClass: '',
                 layout: 'default'
@@ -613,11 +613,11 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
                 loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
                     return $ocLazyLoad.load([
                         {
-                            name: 'subutai.settings-owner',
+                            name: 'subutai.settings-security',
                             files: [
-                                'subutai-app/settingsOwner/settingsOwner.js',
-                                'subutai-app/settingsOwner/controller.js',
-                                'subutai-app/settingsOwner/service.js'
+                                'subutai-app/settingsSecurity/settingsSecurity.js',
+                                'subutai-app/settingsSecurity/controller.js',
+                                'subutai-app/settingsSecurity/service.js'
                             ]
                         }
                     ]);

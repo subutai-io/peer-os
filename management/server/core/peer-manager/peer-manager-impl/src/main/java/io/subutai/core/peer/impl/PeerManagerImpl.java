@@ -874,7 +874,7 @@ public class PeerManagerImpl implements PeerManager
         return null;
     }
 
-
+    @Override
     public void setPolicy( String peerId, PeerPolicy peerPolicy ) throws PeerException
     {
         Peer peer = getPeer( peerId );

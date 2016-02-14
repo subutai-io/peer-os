@@ -1,6 +1,10 @@
 package io.subutai.common.settings;
 
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,6 +19,7 @@ public class KurjunSettings
 {
     private static final Logger LOG = LoggerFactory.getLogger( KurjunSettings.class );
     private static PropertiesConfiguration PROPERTIES = loadProperties();
+
 
     public static PropertiesConfiguration loadProperties()
     {
@@ -31,10 +36,16 @@ public class KurjunSettings
         return config;
     }
 
-    public static Object getGlobalKurjunUrls()
+
+    public static List<String> getGlobalKurjunUrls()
     {
-        return PROPERTIES.getProperty( "globalKurjunUrls" );
+        String urls = String.valueOf( PROPERTIES.getProperty( "globalKurjunUrls" ) );
+        String replace = urls.replace( "[", "" );
+        String replace1 = replace.replace( "]", "" );
+
+        return new ArrayList<String>( Arrays.asList( replace1.split( "," ) ) );
     }
+
 
     public static void setSettings( String urls )
     {
