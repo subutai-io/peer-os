@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.subutai.common.command.Request;
+import io.subutai.common.settings.PeerSettings;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.broker.api.TextMessagePostProcessor;
@@ -41,7 +42,7 @@ public class MessageEncryptor implements TextMessagePostProcessor
     public String process( final String topic, final String message )
     {
 
-        if ( encryptionEnabled )
+        if ( PeerSettings.getEncryptionState() )
         {
             try
             {

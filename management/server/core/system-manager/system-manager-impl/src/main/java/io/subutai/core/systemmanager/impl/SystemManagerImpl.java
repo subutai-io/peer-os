@@ -1,21 +1,24 @@
 package io.subutai.core.systemmanager.impl;
 
 
+import java.util.concurrent.TimeUnit;
+
+import io.subutai.common.settings.ChannelSettings;
 import io.subutai.common.settings.SubutaiInfo;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.kurjun.api.KurjunTransferQuota;
 import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.systemmanager.api.SystemManager;
-import io.subutai.core.systemmanager.api.pojo.ChannelSettings;
 import io.subutai.core.systemmanager.api.pojo.KurjunSettings;
-import io.subutai.core.systemmanager.api.pojo.PeerOwner;
+import io.subutai.core.systemmanager.api.pojo.NetworkSettings;
 import io.subutai.core.systemmanager.api.pojo.PeerSettings;
+import io.subutai.core.systemmanager.api.pojo.SecuritySettings;
 import io.subutai.core.systemmanager.api.pojo.SystemInfo;
-import io.subutai.core.systemmanager.impl.pojo.ChannelSettingsPojo;
 import io.subutai.core.systemmanager.impl.pojo.KurjunSettingsPojo;
-import io.subutai.core.systemmanager.impl.pojo.PeerOwnerPojo;
+import io.subutai.core.systemmanager.impl.pojo.NetworkSettingsPojo;
 import io.subutai.core.systemmanager.impl.pojo.PeerSettingsPojo;
+import io.subutai.core.systemmanager.impl.pojo.SecuritySettingsPojo;
 import io.subutai.core.systemmanager.impl.pojo.SystemInfoPojo;
 
 
@@ -29,28 +32,16 @@ public class SystemManagerImpl implements SystemManager
 
 
     @Override
-    public PeerSettings getPeerSettings()
+    public SecuritySettings getSecuritySettings()
     {
-        PeerSettings pojo = new PeerSettingsPojo();
+        SecuritySettings pojo = new SecuritySettingsPojo();
 
-        pojo.setExternalIpInterface(
-                String.valueOf( io.subutai.common.settings.PeerSettings.getExternalIpInterface() ) );
         pojo.setEncryptionState( io.subutai.common.settings.PeerSettings.getEncryptionState() );
         pojo.setRestEncryptionState( io.subutai.common.settings.PeerSettings.getRestEncryptionState() );
         pojo.setIntegrationState( io.subutai.common.settings.PeerSettings.getIntegrationState() );
         pojo.setKeyTrustCheckState( io.subutai.common.settings.PeerSettings.getKeyTrustCheckState() );
 
         return pojo;
-    }
-
-
-    @Override
-    public void setPeerSettings( final PeerSettings settings )
-    {
-        io.subutai.common.settings.PeerSettings
-                .setSettings( settings.getExternalIpInterface(), settings.getEncryptionState(),
-                        settings.getRestEncryptionState(), settings.getIntegrationState(),
-                        settings.getKeyTrustCheckState() );
     }
 
 
@@ -80,16 +71,9 @@ public class SystemManagerImpl implements SystemManager
             pojo.setTrustTimeUnit( trustTransferQuota.getTimeUnit() );
         }
 
-        pojo.setGlobalKurjunUrls( String.valueOf( io.subutai.common.settings.KurjunSettings.getGlobalKurjunUrls() ) );
+        pojo.setGlobalKurjunUrls( io.subutai.common.settings.KurjunSettings.getGlobalKurjunUrls() );
 
         return pojo;
-    }
-
-
-    @Override
-    public void setKurjunSettings( final KurjunSettings settings )
-    {
-        io.subutai.common.settings.KurjunSettings.setSettings( settings.getGlobalKurjunUrls() );
     }
 
 
@@ -98,33 +82,33 @@ public class SystemManagerImpl implements SystemManager
     {
         SystemInfo pojo = new SystemInfoPojo();
 
-        pojo.setGitCommitId( String.valueOf( SubutaiInfo.getCommitId() ) );
-        pojo.setGitBranch( String.valueOf( SubutaiInfo.getBranch() ) );
-        pojo.setGitCommitUserName( String.valueOf( SubutaiInfo.getCommitterUserName() ) );
-        pojo.setGitCommitUserEmail( String.valueOf( SubutaiInfo.getCommitterUserEmail() ) );
-        pojo.setGitBuildUserName( String.valueOf( SubutaiInfo.getBuilderUserName() ) );
-        pojo.setGitBuildUserEmail( String.valueOf( SubutaiInfo.getBuilderUserEmail() ) );
-        pojo.setGitBuildTime( String.valueOf( SubutaiInfo.getBuildTime() ) );
-        pojo.setProjectVersion( String.valueOf( SubutaiInfo.getVersion() ) );
+        pojo.setGitCommitId( SubutaiInfo.getCommitId() );
+        pojo.setGitBranch( SubutaiInfo.getBranch() );
+        pojo.setGitCommitUserName( SubutaiInfo.getCommitterUserName() );
+        pojo.setGitCommitUserEmail( SubutaiInfo.getCommitterUserEmail() );
+        pojo.setGitBuildUserName( SubutaiInfo.getBuilderUserName() );
+        pojo.setGitBuildUserEmail( SubutaiInfo.getBuilderUserEmail() );
+        pojo.setGitBuildTime( SubutaiInfo.getBuildTime() );
+        pojo.setProjectVersion( SubutaiInfo.getVersion() );
 
         return pojo;
     }
 
 
     @Override
-    public void setPeerOwner()
+    public void setPeerSettings()
     {
         identityManager.setPeerOwner( identityManager.getActiveUser() );
     }
 
 
     @Override
-    public PeerOwner getPeerOwnerInfo()
+    public PeerSettings getPeerSettings()
     {
         String peerOwnerId = identityManager.getPeerOwnerId();
         User user = identityManager.getUserByKeyId( peerOwnerId );
 
-        PeerOwner pojo = new PeerOwnerPojo();
+        PeerSettings pojo = new PeerSettingsPojo();
 
         pojo.setPeerOwnerId( peerOwnerId );
         pojo.setUserPeerOwnerName( user.getUserName() );
@@ -134,23 +118,64 @@ public class SystemManagerImpl implements SystemManager
 
 
     @Override
-    public ChannelSettings getChannelSettings()
+    public void setNetworkSettings( final String externalIpInterface, final String openPort, final String securePortX1,
+                                    final String securePortX2, final String securePortX3, final String specialPortX1 )
     {
-        ChannelSettings pojo = new ChannelSettingsPojo();
-
-        pojo.setOpenPort( Integer.toString( io.subutai.common.settings.ChannelSettings.OPEN_PORT ) );
-        pojo.setSecurePortX1( Integer.toString( io.subutai.common.settings.ChannelSettings.SECURE_PORT_X1 ) );
-        pojo.setSecurePortX2( Integer.toString( io.subutai.common.settings.ChannelSettings.SECURE_PORT_X2 ) );
-        pojo.setSecurePortX3( Integer.toString( io.subutai.common.settings.ChannelSettings.SECURE_PORT_X3 ) );
-        pojo.setSpecialPortX1( Integer.toString( io.subutai.common.settings.ChannelSettings.SPECIAL_PORT_X1 ) );
-
-        return pojo;
+        io.subutai.common.settings.PeerSettings.setExternalIpInterface( externalIpInterface );
+        ChannelSettings.setOpenPort( openPort );
+        ChannelSettings.setSecurePortX1( securePortX1 );
+        ChannelSettings.setSecurePortX2( securePortX2 );
+        ChannelSettings.setSecurePortX3( securePortX3 );
+        ChannelSettings.setSpecialPortX1( specialPortX1 );
     }
 
 
     @Override
-    public void setChannelSettings( final ChannelSettings settings )
+    public void setSecuritySettings( final boolean encryptionEnabled, final boolean restEncryptionEnabled,
+                                     final boolean integrationEnabled, final boolean keyTrustCheckEnabled )
     {
+        io.subutai.common.settings.PeerSettings.setEncryptionState( encryptionEnabled );
+        io.subutai.common.settings.PeerSettings.setRestEncryptionState( restEncryptionEnabled );
+        io.subutai.common.settings.PeerSettings.setIntegrationState( integrationEnabled );
+        io.subutai.common.settings.PeerSettings.setKeyTrustCheckState( keyTrustCheckEnabled );
+    }
+
+
+    @Override
+    public boolean setKurjunSettings( final String globalKurjunUrls, final long publicDiskQuota,
+                                      final long publicThreshold, final long publicTimeFrame, final long trustDiskQuota,
+                                      final long trustThreshold, final long trustTimeFrame )
+    {
+        io.subutai.common.settings.KurjunSettings.setSettings( globalKurjunUrls );
+
+        templateManager.setDiskQuota( publicDiskQuota, "public" );
+        templateManager.setDiskQuota( trustDiskQuota, "trust" );
+
+        KurjunTransferQuota publicTransferQuota =
+                new KurjunTransferQuota( publicThreshold, publicTimeFrame, TimeUnit.HOURS );
+        KurjunTransferQuota trustTransferQuota =
+                new KurjunTransferQuota( trustThreshold, trustTimeFrame, TimeUnit.HOURS );
+
+        boolean isPublicQuotaSaved = templateManager.setTransferQuota( publicTransferQuota, "public" );
+        boolean isTrustQuotaSaved = templateManager.setTransferQuota( trustTransferQuota, "trust" );
+
+        return isPublicQuotaSaved && isTrustQuotaSaved;
+    }
+
+
+    @Override
+    public NetworkSettings getNetworkSettings()
+    {
+        NetworkSettings pojo = new NetworkSettingsPojo();
+
+        pojo.setExternalIpInterface( io.subutai.common.settings.PeerSettings.getExternalIpInterface() );
+        pojo.setOpenPort( io.subutai.common.settings.ChannelSettings.OPEN_PORT );
+        pojo.setSecurePortX1( io.subutai.common.settings.ChannelSettings.SECURE_PORT_X1 );
+        pojo.setSecurePortX2( io.subutai.common.settings.ChannelSettings.SECURE_PORT_X2 );
+        pojo.setSecurePortX3( io.subutai.common.settings.ChannelSettings.SECURE_PORT_X3 );
+        pojo.setSpecialPortX1( io.subutai.common.settings.ChannelSettings.SPECIAL_PORT_X1 );
+
+        return pojo;
     }
 
 

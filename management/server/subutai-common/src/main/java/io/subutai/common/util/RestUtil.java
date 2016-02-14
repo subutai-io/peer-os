@@ -6,6 +6,7 @@ import java.net.URL;
 import java.security.KeyStore;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.Response;
@@ -203,19 +204,35 @@ public class RestUtil
         try
         {
             URL urlObject = new URL( url );
-            switch ( urlObject.getPort() )
+            String port = String.valueOf( urlObject.getPort() );
+
+            if ( Objects.equals( port, ChannelSettings.SECURE_PORT_X1 ) )
             {
-                case ChannelSettings.SECURE_PORT_X1:
-                    client = createTrustedWebClient( url, provider );
-                    break;
-                case ChannelSettings.SECURE_PORT_X2:
-                    LOG.debug( String.format( "Request type: %s, %s", requestType, url ) );
-                    client = createTrustedWebClientWithAuth( url, alias );
-                    break;
-                default:
-                    client = createWebClient( url );
-                    break;
+                client = createTrustedWebClient( url, provider );
             }
+            else if ( Objects.equals( port, ChannelSettings.SECURE_PORT_X2 ) )
+            {
+                LOG.debug( String.format( "Request type: %s, %s", requestType, url ) );
+                client = createTrustedWebClientWithAuth( url, alias );
+            }
+            else
+            {
+                client = createWebClient( url );
+            }
+
+            //            switch ( port )
+            //            {
+            //                case ChannelSettings.getSecurePortX1():
+            //                    client = createTrustedWebClient( url, provider );
+            //                    break;
+            //                case ChannelSettings.SECURE_PORT_X2:
+            //                    LOG.debug( String.format( "Request type: %s, %s", requestType, url ) );
+            //                    client = createTrustedWebClientWithAuth( url, alias );
+            //                    break;
+            //                default:
+            //                    client = createWebClient( url );
+            //                    break;
+            //            }
             Form form = new Form();
             constructClientParams( params, requestType, form, client, headers );
             switch ( requestType )
@@ -257,19 +274,36 @@ public class RestUtil
         try
         {
             URL urlObject = new URL( url );
-            switch ( urlObject.getPort() )
+            String port = String.valueOf( urlObject.getPort() );
+
+            if ( Objects.equals( port, ChannelSettings.SECURE_PORT_X1 ) )
             {
-                case ChannelSettings.SECURE_PORT_X1:
-                    client = createTrustedWebClient( url );
-                    break;
-                case ChannelSettings.SECURE_PORT_X2:
-                    LOG.debug( String.format( "Request type: %s, %s", requestType, url ) );
-                    client = createTrustedWebClientWithAuth( url, alias );
-                    break;
-                default:
-                    client = createWebClient( url );
-                    break;
+                client = createTrustedWebClient( url );
             }
+            else if ( Objects.equals( port, ChannelSettings.SECURE_PORT_X2 ) )
+            {
+                LOG.debug( String.format( "Request type: %s, %s", requestType, url ) );
+                client = createTrustedWebClientWithAuth( url, alias );
+            }
+            else
+            {
+                client = createWebClient( url );
+            }
+
+
+            //            switch ( port )
+            //            {
+            //                case ChannelSettings.SECURE_PORT_X1:
+            //                    client = createTrustedWebClient( url );
+            //                    break;
+            //                case ChannelSettings.SECURE_PORT_X2:
+            //                    LOG.debug( String.format( "Request type: %s, %s", requestType, url ) );
+            //                    client = createTrustedWebClientWithAuth( url, alias );
+            //                    break;
+            //                default:
+            //                    client = createWebClient( url );
+            //                    break;
+            //            }
             Form form = new Form();
             constructClientParams( params, requestType, form, client, headers );
             switch ( requestType )

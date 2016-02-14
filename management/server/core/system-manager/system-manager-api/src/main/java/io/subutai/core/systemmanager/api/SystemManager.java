@@ -1,10 +1,10 @@
 package io.subutai.core.systemmanager.api;
 
 
-import io.subutai.core.systemmanager.api.pojo.ChannelSettings;
 import io.subutai.core.systemmanager.api.pojo.KurjunSettings;
-import io.subutai.core.systemmanager.api.pojo.PeerOwner;
+import io.subutai.core.systemmanager.api.pojo.NetworkSettings;
 import io.subutai.core.systemmanager.api.pojo.PeerSettings;
+import io.subutai.core.systemmanager.api.pojo.SecuritySettings;
 import io.subutai.core.systemmanager.api.pojo.SystemInfo;
 
 
@@ -13,21 +13,25 @@ import io.subutai.core.systemmanager.api.pojo.SystemInfo;
  */
 public interface SystemManager
 {
-    public PeerSettings getPeerSettings();
+    SecuritySettings getSecuritySettings();
 
-    public void setPeerSettings( PeerSettings settings );
+    KurjunSettings getKurjunSettings();
 
-    public KurjunSettings getKurjunSettings();
 
-    public void setKurjunSettings( KurjunSettings settings );
+    NetworkSettings getNetworkSettings();
 
-    public ChannelSettings getChannelSettings();
+    SystemInfo getSystemInfo();
 
-    public void setChannelSettings( ChannelSettings settings );
+    void setPeerSettings();
 
-    public SystemInfo getSystemInfo();
+    PeerSettings getPeerSettings();
 
-    public void setPeerOwner();
+    void setNetworkSettings( String externalIpInterface, String openPort, String securePortX1, String securePortX2,
+                             String securePortX3, String specialPortX1 );
 
-    public PeerOwner getPeerOwnerInfo();
+    void setSecuritySettings( boolean encryptionEnabled, boolean restEncryptionEnabled, boolean integrationEnabled,
+                              boolean keyTrustCheckEnabled );
+
+    boolean setKurjunSettings( String globalKurjunUrls, long publicDiskQuota, long publicThreshold,
+                               long publicTimeFrame, long trustDiskQuota, long trustThreshold, long trustTimeFrame );
 }

@@ -4,8 +4,12 @@ package io.subutai.core.systemmanager.api.pojo;
 /**
  * Created by ermek on 2/9/16.
  */
-public interface ChannelSettings
+public interface NetworkSettings
 {
+    public String getExternalIpInterface();
+
+    public void setExternalIpInterface( final String externalIpInterface );
+
     public void setOpenPort( String openPort );
 
     public String getOpenPort();
