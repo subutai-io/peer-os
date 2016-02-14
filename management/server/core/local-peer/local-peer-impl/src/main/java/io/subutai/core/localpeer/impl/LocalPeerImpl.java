@@ -411,7 +411,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                     try
                     {
                         //TODO add quota switch to clone binding
+                        quotaManager.getDefaultContainerQuota( request.getContainerSize() );
                         ContainerHostInfo hostInfo = resourceHost.createContainer( request.getTemplateName(), cloneName,
+                                quotaManager.getDefaultContainerQuota( request.getContainerSize() ),
                                 String.format( "%s/%s", ipAddress, networkPrefix ), environmentVni.getVlan(),
                                 Common.WAIT_CONTAINER_CONNECTION_SEC, request.getEnvironmentId() );
 
