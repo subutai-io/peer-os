@@ -54,7 +54,7 @@ public class ClientOutInterceptor extends AbstractPhaseInterceptor<Message>
 
                 URL url = getUrl( message );
 
-                if ( url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X2 ) )
+                if ( url.getPort() == ChannelSettings.SECURE_PORT_X2 )
                 {
                     String path = url.getPath();
                     String ip = url.getHost();

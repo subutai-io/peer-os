@@ -92,4 +92,6 @@ public interface PeerManager
     PingDistances getCommunityDistances();
 
     void updateControlNetwork();
+
+    void setPublicUrl( String peerId, String publicUrl ) throws PeerException;
 }

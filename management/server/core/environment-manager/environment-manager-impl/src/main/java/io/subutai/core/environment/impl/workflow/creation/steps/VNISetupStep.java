@@ -88,9 +88,7 @@ public class VNISetupStep
         LOGGER.debug( "Creating gateways..." );
         for ( final Peer peer : peers )
         {
-            Vni reservedVni = peer.reserveVni( newVni );
-
-            peer.createGateway( new Gateway( reservedVni.getVlan(), environmentGatewayIp ) );
+           peer.reserveVni( newVni );
         }
 
         //store vni in environment metadata

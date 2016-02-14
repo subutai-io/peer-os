@@ -88,21 +88,21 @@ public class MessageContentUtil
         String basePath = req.getRequestURI();
 
 
-        if ( inPort == Integer.parseInt( ChannelSettings.SECURE_PORT_X1 ))
+        if ( inPort == ChannelSettings.SECURE_PORT_X1 )
         {
             if ( ChannelSettings.checkURLAccess( basePath, ChannelSettings.URL_ACCESS_PX1 ) == 0 )
             {
                 status = 1;
             }
         }
-        else if ( inPort == Integer.parseInt( ChannelSettings.OPEN_PORT ) )
+        else if ( inPort == ChannelSettings.OPEN_PORT )
         {
             if ( ChannelSettings.checkURLAccess( basePath, ChannelSettings.URL_ACCESS_PX1 ) == 0 )
             {
                 status = 1;
             }
         }
-        else if ( inPort == Integer.parseInt( ChannelSettings.SPECIAL_PORT_X1 ) ) //file server
+        else if ( inPort ==  ChannelSettings.SPECIAL_PORT_X1 ) //file server
         {
             if ( basePath.startsWith( "/rest/kurjun" ) )
             {
