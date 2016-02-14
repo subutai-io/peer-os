@@ -3030,3 +3030,11 @@ td.b-main-table__status-col {
 	background-color: #FFE5E5;
 }
 
+.b-trusted-user {
+	background-color: #BCE8D5;
+}
+
+.b-midletrusted-user {
+	background-color: #FEEFD7;
+}
+

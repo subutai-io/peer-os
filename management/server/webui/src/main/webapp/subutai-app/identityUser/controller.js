@@ -74,8 +74,12 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 		.withOption('stateSave', true)
 		.withOption('order', [[ 1, "asc" ]])
 		.withOption('rowCallback', function(row, data, index){
-			if(data.trustLevel <= 1) {
+			if(data.trustLevel == 1) {
 				$(row).addClass('b-untrusted-user');
+			} else if(data.trustLevel == 2) {
+				$(row).addClass('b-midletrusted-user');
+			} else {
+				$(row).addClass('b-trusted-user');
 			}
 		})
 		.withOption('createdRow', createdRow);
