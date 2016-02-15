@@ -4,6 +4,7 @@ package io.subutai.core.peer.impl;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.core.MediaType;
@@ -541,5 +542,18 @@ public class PeerWebClient
         {
             throw new PeerException( "Error on getting community distances.", e );
         }
+    }
+
+
+    public int setupTunnels( final Map<String, String> peerIps, final String environmentId )
+    {
+        Preconditions.checkNotNull( peerIps );
+        Preconditions.checkNotNull( environmentId );
+        String path = String.format( "/tunnels/%s", environmentId );
+
+        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo.getIp(), path, provider, 500, 7000, 1 );
+        client.type( MediaType.APPLICATION_JSON );
+        client.accept( MediaType.TEXT_PLAIN );
+        return client.post( peerIps, Integer.class );
     }
 }
