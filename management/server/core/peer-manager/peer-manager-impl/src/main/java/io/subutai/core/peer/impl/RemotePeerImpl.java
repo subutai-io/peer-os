@@ -80,6 +80,12 @@ import io.subutai.core.peer.impl.command.CommandResponseListener;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
 import io.subutai.core.security.api.SecurityManager;
 
+import static io.subutai.common.settings.ChannelSettings.OPEN_PORT;
+import static io.subutai.common.settings.ChannelSettings.SECURE_PORT_X1;
+import static io.subutai.common.settings.ChannelSettings.SECURE_PORT_X2;
+import static io.subutai.common.settings.ChannelSettings.SECURE_PORT_X3;
+import static io.subutai.common.settings.ChannelSettings.SPECIAL_PORT_X1;
+
 
 /**
  * Remote Peer implementation
@@ -113,28 +119,26 @@ public class RemotePeerImpl implements RemotePeer
         this.messageResponseListener = messageResponseListener;
         String url = "";
 
-        String port = String.valueOf( peerInfo.getPort() );
+        int port = peerInfo.getPort();
 
-
-        if ( Objects.equals( port, ChannelSettings.SPECIAL_PORT_X1 ) )
+        if ( port == ChannelSettings.SPECIAL_PORT_X1 || port == ChannelSettings.OPEN_PORT )
         {
             url = String.format( "http://%s:%s/rest/v1/peer", peerInfo.getIp(), peerInfo.getPort() );
         }
-        else if ( Objects.equals( port, ChannelSettings.SECURE_PORT_X3 ) )
+        else
         {
             url = String.format( "https://%s:%s/rest/v1/peer", peerInfo.getIp(), peerInfo.getPort() );
         }
 
-        //switch case for formatting request url
-        //        switch ( port )
+        //        switch ( peerInfo.getPort() )
         //        {
-        //            case ChannelSettings.OPEN_PORT:
-        //            case ChannelSettings.SPECIAL_PORT_X1:
+        //            case OPEN_PORT:
+        //            case SPECIAL_PORT_X1:
         //                url = String.format( "http://%s:%s/rest/v1/peer", peerInfo.getIp(), peerInfo.getPort() );
         //                break;
-        //            case ChannelSettings.SECURE_PORT_X1:
-        //            case ChannelSettings.SECURE_PORT_X2:
-        //            case ChannelSettings.SECURE_PORT_X3:
+        //            case SECURE_PORT_X1:
+        //            case SECURE_PORT_X2:
+        //            case SECURE_PORT_X3:
         //                url = String.format( "https://%s:%s/rest/v1/peer", peerInfo.getIp(), peerInfo.getPort() );
         //                break;
         //        }
@@ -727,18 +731,28 @@ public class RemotePeerImpl implements RemotePeer
 
         String path = "/tunnels";
 
+
+        //        try
+        //        {
+        //            //*********construct Secure Header ****************************
+        //            Map<String, String> headers = Maps.newHashMap();
+        //            //*************************************************************
+        //            Map<String, String> params = Maps.newHashMap();
+        //            params.put( "peerIps", jsonUtil.to( peerIps ) );
+        //            params.put( "environmentId", environmentId );
+        //
+        //            String response = post( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, params, headers );
+        //
+        //            return Integer.parseInt( response );
+        //        }
+        //        catch ( Exception e )
+        //        {
+        //            throw new PeerException( String.format( "Error setting up tunnels on peer %s", getName() ), e );
+        //        }
+
         try
         {
-            //*********construct Secure Header ****************************
-            Map<String, String> headers = Maps.newHashMap();
-            //*************************************************************
-            Map<String, String> params = Maps.newHashMap();
-            params.put( "peerIps", jsonUtil.to( peerIps ) );
-            params.put( "environmentId", environmentId );
-
-            String response = post( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, params, headers );
-
-            return Integer.parseInt( response );
+            return new PeerWebClient( peerInfo, provider ).setupTunnels( peerIps, environmentId );
         }
         catch ( Exception e )
         {
