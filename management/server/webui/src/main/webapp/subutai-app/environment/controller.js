@@ -106,6 +106,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 			vm.environments = [];
 			for (var i = 0; i < data.length; ++i) {
 				if (data[i].status !== "PENDING") {
+					data[i].containersByQuota = getContainersSortedByQuota(data[i].containers);
 					vm.environments.push(data[i]);
 				}
 			}
@@ -323,6 +324,37 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 			}
 		}
 		vm.installedContainers = containersTotal;
+	}
+
+	function getContainersSortedByQuota(containers) {
+		var sortedContainers = containers.length > 0 ? {} : null;
+		for (var index = 0; index < containers.length; index++) {
+			var quotaSize = containers[index].type;
+			var templateName = containers[index].templateName;
+			if (!sortedContainers[quotaSize]) {
+				sortedContainers[quotaSize] = {};
+				sortedContainers[quotaSize].quantity = 1;
+				sortedContainers[quotaSize].containers = {};
+				sortedContainers[quotaSize].containers[templateName] = 1;
+			} else {
+				if (!sortedContainers[quotaSize].containers[templateName]) {
+					sortedContainers[quotaSize].quantity += 1;
+					sortedContainers[quotaSize].containers[templateName] = 1;
+				} else {
+					sortedContainers[quotaSize].quantity += 1;
+					sortedContainers[quotaSize].containers[templateName] += 1;
+				}
+			}
+		}
+
+		for(var item in sortedContainers) {
+			sortedContainers[item].tooltip = "";
+			for(var container in sortedContainers[item].containers) {
+				sortedContainers[item].tooltip += container + ":&nbsp;<b>" + sortedContainers[item].containers[container] + "</b> ";
+			}
+		}
+		console.log();
+		return sortedContainers;
 	}
 
 	function togglePeer(peerId) {

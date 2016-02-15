@@ -26,6 +26,11 @@ $(".b-form-input_dropdown").click(function () {
 	$(this).toggleClass("is-active");
 });
 
+$('body').on('click', '.js-notification', function() {
+	$(this).next('.b-hub-status__dropdown').slideToggle(200);
+	return false;
+});
+
 $(".b-form-input-dropdown-list").click(function(e) {
 	e.stopPropagation();
 });

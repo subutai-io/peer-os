@@ -28,7 +28,6 @@ function AdvancedEnvironmentCtrl($scope, environmentService, trackerSrv, SweetAl
 	vm.colors = quotaColors;
 	vm.templates = [];
 
-	vm.templateGrid = [];
 	vm.cubeGrowth = 1;
 	vm.environment2BuildName = 'Environment name';
 	vm.currentPeer = false;
@@ -44,13 +43,15 @@ function AdvancedEnvironmentCtrl($scope, environmentService, trackerSrv, SweetAl
 	vm.showResources = showResources;
 	vm.addResource2Build = addResource2Build;
 
-	environmentService.getTemplates()
+	/*environmentService.getTemplates()
 		.success(function (data) {
 			vm.templates = data;
 		})
 		.error(function (data) {
 			VARS_MODAL_ERROR( SweetAlert, 'Error on getting templates ' + data );
-		});
+		});*/
+
+	vm.templates = ['mongo', 'cassandra', 'master', 'hadoop'];
 
 	environmentService.getStrategies().success(function (data) {
 		vm.strategies = data;
@@ -207,24 +208,61 @@ function AdvancedEnvironmentCtrl($scope, environmentService, trackerSrv, SweetAl
 
 	//add resource host
 	function addResource2Build(currentResource, index) {
-		if( PEER_MAP[index] !== undefined ) return PEER_MAP[index].id;
-		var pos = calculatePeerPos();
+		//var pos = calculatePeerPos();
+		var posX = calculatePeerPos();
+		var posY = calculateResourceHostPos(vm.currentPeer);
+
+		if( PEER_MAP[vm.currentPeer] !== undefined ) {
+			if( PEER_MAP[vm.currentPeer].rh[currentResource] !== undefined ) {
+				return PEER_MAP[vm.currentPeer].rh[currentResource];
+			}
+		} else {
+			PEER_MAP[vm.currentPeer] = { rh: [], position : posX };
+		}
 
 		var resourceHost = new joint.shapes.resourceHostHtml.Element({
 			//position: { x: 40, y: 40 },
-			position: { x: pos * ( PEER_WIDTH + PEER_SPACE ), y: 30 },
-			size: { width: 155, height: 185 },
+			position: { x: PEER_MAP[vm.currentPeer].position * ( PEER_WIDTH + PEER_SPACE ), y: posY },
+			size: { width: 155, height: 173 },
 			peerId: vm.currentPeer,
 			hostId: currentResource,
 			children: 0,
 			grid: [],
 			gridSize: { size: 2 },
 			'resourceHostName': 'RH' + (index + 1),
-			'peerName': 'Peer ' + (vm.currentPeerIndex + 1)
+			'peerName': 'Peer ' + (vm.currentPeerIndex + 1),
+			'addClass': 'b-resource-host_last'
 		});
-		PEER_MAP[index] = { id : resourceHost.id, position : pos + 1 };
+
+		if(Object.keys(PEER_MAP[vm.currentPeer].rh).length > 0) {
+			var lastResourceInPeer = graph.getCell(PEER_MAP[vm.currentPeer].rh[
+				Object.keys(PEER_MAP[vm.currentPeer].rh)[
+					Object.keys(PEER_MAP[vm.currentPeer].rh).length - 1
+				]
+			]);
+			lastResourceInPeer.set('addClass', '');
+			lastResourceInPeer.set('removeClass', 'b-resource-host_last');
+		}
+
 		graph.addCell(resourceHost);
+		PEER_MAP[vm.currentPeer].rh[currentResource] = resourceHost.id;
+
 		return false;
+	}
+
+	function calculateResourceHostPos(peerId) {
+		if(PEER_MAP[peerId]) {
+			var posY = 30;
+			for(var key in PEER_MAP[peerId].rh) {
+				var currentResource = graph.getCell(PEER_MAP[peerId].rh[key]);
+				var currentResourceSize = currentResource.get('size');
+				var currentResourcePos = currentResource.get('position');
+				posY = posY + (currentResourcePos.x + currentResourceSize.height);
+			}
+			return posY - 8;
+		} else {
+			return 30;
+		}
 	}
 
 	function calculatePeerPos() {
@@ -346,7 +384,6 @@ function AdvancedEnvironmentCtrl($scope, environmentService, trackerSrv, SweetAl
 					var rh = this.model.attributes.rh;
 					delete graph.getCell(rh.model).attributes.grid[rh.x][rh.y];
 					this.model.remove();
-					//delete vm.templateGrid[Math.floor( x / GRID_CELL_SIZE )][ Math.floor( y / GRID_CELL_SIZE )];
 					return;
 					break;
 				case 'element-call-menu':
@@ -381,7 +418,7 @@ function AdvancedEnvironmentCtrl($scope, environmentService, trackerSrv, SweetAl
 		defaults: joint.util.deepSupplement({
 			type: 'resourceHostHtml.Element',
 			attrs: {
-				rect: { stroke: 'none', 'fill-opacity': 0 }
+				rect: { stroke: 'none', 'fill-opacity': 0, 'pointer-events':'none' }
 			}
 		}, joint.shapes.basic.Rect.prototype.defaults)
 	});
@@ -394,6 +431,7 @@ function AdvancedEnvironmentCtrl($scope, environmentService, trackerSrv, SweetAl
 		template: [
 			'<div class="b-resource-host">',
 				'<div class="b-peer-title"></div>',
+				'<button class="b-peer-delete js-delete-peer"></button>',
 				'<div class="b-resource-host__inner">',
 					'<div class="b-recouce-host-title"></div>',
 					'<div class="b-resource-host__containers">',
@@ -409,7 +447,7 @@ function AdvancedEnvironmentCtrl($scope, environmentService, trackerSrv, SweetAl
 			joint.dia.ElementView.prototype.initialize.apply(this, arguments);
 
 			this.$box = $(_.template(this.template)());
-			this.$box.find('.delete').on('click', _.bind(this.model.remove, this.model));
+			this.$box.find('.js-delete-peer').on('click', _.bind(this.model.remove, this.model));
 			this.model.on('change', this.updateBox, this);
 			// Remove the box when the model gets removed from the graph.
 			this.model.on('remove', this.removeBox, this);
@@ -426,11 +464,44 @@ function AdvancedEnvironmentCtrl($scope, environmentService, trackerSrv, SweetAl
 			// Set the position and dimension of the box so that it covers the JointJS element.
 			var bbox = this.model.getBBox();
 
+			if(this.model.get('addClass')) {
+				this.$box.addClass(this.model.get('addClass'));
+			}
+
+			if(this.model.get('removeClass')) {
+				this.$box.removeClass(this.model.get('removeClass'));
+			}
+
 			this.$box.find('.b-peer-title').text(this.model.get('peerName'));
 			this.$box.find('.b-recouce-host-title').text(this.model.get('resourceHostName'));
 			this.$box.css({ width: bbox.width, height: bbox.height, left: bbox.x, top: bbox.y, transform: 'rotate(' + (this.model.get('angle') || 0) + 'deg)' });
 		},
 		removeBox: function(evt) {
+			var keys = Object.keys(PEER_MAP[vm.currentPeer].rh);
+			keys.splice(keys.indexOf(this.model.get('hostId')), 1);
+			var emptyPlace = this.model.get('size').height - 8;
+			delete PEER_MAP[this.model.get('peerId')].rh[this.model.get('hostId')];
+
+			if(Object.keys(PEER_MAP[this.model.get('peerId')].rh).length == 0) {
+				delete PEER_MAP[this.model.get('peerId')];
+			} else {
+
+				for(var i = 0; i < keys.length; i++) {
+					var resourceHost = graph.getCell(PEER_MAP[vm.currentPeer].rh[keys[i]]);
+					var resourceHostPosition = resourceHost.get('position');
+					console.log(resourceHostPosition);
+					resourceHost.set('position', {x: resourceHostPosition.x, y: (resourceHostPosition.y - emptyPlace)});
+				}
+
+				var lastResourceInPeer = graph.getCell(PEER_MAP[vm.currentPeer].rh[
+					Object.keys(PEER_MAP[vm.currentPeer].rh)[
+						Object.keys(PEER_MAP[vm.currentPeer].rh).length - 1
+					]
+				]);
+				lastResourceInPeer.set('addClass', 'b-resource-host_last');
+				lastResourceInPeer.set('removeClass', '');
+			}
+
 			this.$box.remove();
 		}
 	});	
@@ -541,7 +612,7 @@ function AdvancedEnvironmentCtrl($scope, environmentService, trackerSrv, SweetAl
 
 	function clearWorkspace() {
 		vm.cubeGrowth = 0;
-		vm.templateGrid = [];
+		PEER_MAP = [];
 		graph.resetCells();
 		$('.b-resource-host').remove();
 	}
@@ -597,39 +668,6 @@ function placeRhSimple( model ) {
 	sizeObj.size = size;
 
 	return { x : size - 1, y : 0 };
-}
-
-function findEmptyPostionInResource() {
-	if(vm.containersInResource.length == 0) {
-		return {x: 28, y: 54};
-	} else {
-		var row = 0;
-		for(var i = 0; i < vm.containersInResource.length; i++) {
-			if((i + 1) % vm.containersInRow == 0) {
-				row++;
-			}
-		}
-
-		var x = 88;
-		if(vm.containersInResource.length % vm.containersInRow == 0) {
-			x = 28;
-		}
-
-		if(vm.containersInResource.length == vm.containersInResourceMax) {
-			if(vm.containersInResourceMax == 4) {
-				vm.containersInResourceMax = vm.containersInResourceMax + 5;
-			} else {
-				vm.containersInResourceMax = vm.containersInResourceMax + (vm.containersInResourceMax + 2);
-			}
-
-			//vm.containersInResourceMax = vm.containersInResourceMax + 2;
-
-			var currentSize = mainResourceHost.get('size');
-			vm.containersInRow++;
-			mainResourceHost.resize(currentSize.width + 60, currentSize.height + 60);
-		}
-		return {x: x, y: (row * 60) + 54};
-	}
 }
 
 function startDrag( event ) {
