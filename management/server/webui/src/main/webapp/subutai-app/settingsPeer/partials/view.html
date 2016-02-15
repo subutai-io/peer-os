@@ -6,29 +6,31 @@
 
     <h1 class="b-title"><span class="b-title_breadcrumbs">Peer Settings</span></h1>
   </div>
+	<div class="b-workspace__content">
+		<div class="b-tabs-menu">
+			<ul>
+				<li class="b-tabs-menu__item"
+					ng-click="settingsPeerCtrl.activeTab = 'settings'"
+					ng-class="settingsPeerCtrl.activeTab == 'settings' ? 'b-tabs-menu__item_active' : ''">
+					Settings
+				</li>
+				<li class="b-tabs-menu__item"
+					ng-click="settingsPeerCtrl.activeTab = 'policy'"
+					ng-class="settingsPeerCtrl.activeTab == 'policy' ? 'b-tabs-menu__item_active' : ''">
+					Policy
+				</li>
+			</ul>
+		</div>
+		<div
+				ng-if="settingsPeerCtrl.activeTab == 'settings'"
+				ng-include="'subutai-app/settingsPeer/partials/settings.html'">
+		</div>
 
-  <div class="b-workspace__content">
-    <div class="b-workspace-content__row">
-      <div class="b-main-table-border" style="width: 500px">
-        <table class="b-main-table b-main-table_with-header" style="width: 500px" align="center">
-          <tr>
-            <th>Current Owner ID</th>
-            <td style="padding-right: 18px"><input class="b-form-input b-form-input_full" type="text"
-                                                   ng-model="settingsPeerCtrl.config.peerOwnerId" required></td>
-          </tr>
-          <tr>
-            <th>Current Owner Name</th>
-            <td style="padding-right: 18px"><input class="b-form-input b-form-input_full" type="text"
-                                                   ng-model="settingsPeerCtrl.config.userPeerOwnerName" required></td>
-          </tr>
-        </table>
-      </div>
-      <button
-          class="b-btn b-btn_green g-left g-margin-bottom"
-          ng-click="settingsPeerCtrl.updateConfig()"
-          style="margin-top: 15px">
-        <i class="fa fa-floppy-o"></i>&#160;&#160;Set Peer Owner
-      </button>
-    </div>
+		<div
+				ng-if="settingsPeerCtrl.activeTab == 'policy'"
+				ng-include="'subutai-app/settingsPeer/partials/policy.html'">
+		</div>
+	</div>
+
   </div>
 </div>
