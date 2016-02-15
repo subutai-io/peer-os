@@ -42,7 +42,7 @@ public interface EnvironmentRestService
     @GET
     @Path( "{environmentId}/container/{containerId}/state" )
     @Consumes( MediaType.APPLICATION_JSON )
-    @Produces( { MediaType.APPLICATION_JSON } )
+    @Produces( MediaType.APPLICATION_JSON )
     ContainerHostState getContainerState( @PathParam( "containerId" ) ContainerId containerId );
 
     @GET
