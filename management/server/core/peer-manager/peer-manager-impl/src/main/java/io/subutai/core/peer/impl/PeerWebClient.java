@@ -556,4 +556,17 @@ public class PeerWebClient
         client.accept( MediaType.TEXT_PLAIN );
         return client.post( peerIps, Integer.class );
     }
+
+
+    public void addPeerEnvironmentPubKey( final String keyId, final String pubKeyRing )
+    {
+        Preconditions.checkNotNull( keyId );
+        Preconditions.checkNotNull( pubKeyRing );
+        String path = String.format( "/pek/add/%s", keyId );
+
+        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo.getIp(), path, provider, 500, 7000, 1 );
+        client.type( MediaType.APPLICATION_JSON );
+        client.accept( MediaType.APPLICATION_JSON );
+        client.post( pubKeyRing );
+    }
 }
