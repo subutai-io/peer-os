@@ -1740,6 +1740,16 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
+    public void addPeerEnvironmentPubKey( final String keyId, final PGPPublicKeyRing pubRing )
+    {
+        Preconditions.checkNotNull( keyId );
+        Preconditions.checkNotNull( pubRing );
+
+        securityManager.getKeyManager().savePublicKeyRing( keyId, SecurityKeyType.PeerEnvironmentKey.getId(), pubRing );
+    }
+
+
+    @Override
     public HostInterfaces getInterfaces() throws HostNotFoundException
     {
         return getManagementHost().getHostInterfaces();

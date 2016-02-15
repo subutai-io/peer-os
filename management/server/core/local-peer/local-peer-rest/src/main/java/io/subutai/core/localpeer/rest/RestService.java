@@ -103,6 +103,12 @@ public interface RestService
     @Path( "pek/{environmentId}" )
     void removeEnvironmentKeyPair( @PathParam( "environmentId" ) EnvironmentId environmentId );
 
+    @POST
+    @Path( "pek/add/{keyId}" )
+    @Produces( MediaType.APPLICATION_JSON )
+    @Consumes( MediaType.APPLICATION_JSON )
+    void addInitiatorPeerEnvironmentPubKey( @PathParam( "keyId" ) String keyId, String pek );
+
     @DELETE
     @Path( "network/{environmentId}" )
     void cleanupNetwork( @PathParam( "environmentId" ) EnvironmentId environmentId );

@@ -101,7 +101,7 @@ public class EnvironmentWebClient
         WebClient client = WebClientBuilder.buildEnvironmentWebClient( host, path, provider );
 
         client.type( MediaType.APPLICATION_JSON );
-        client.accept( MediaType.APPLICATION_JSON );
+        client.accept( MediaType.APPLICATION_JSON);
         try
         {
             return client.get( ContainerHostState.class );

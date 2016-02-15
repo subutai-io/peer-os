@@ -18,7 +18,6 @@ import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.gson.reflect.TypeToken;
 
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ResourceHostMetrics;
@@ -255,6 +254,21 @@ public class RestServiceImpl implements RestService
         try
         {
             localPeer.removePeerEnvironmentKeyPair( environmentId );
+        }
+        catch ( Exception e )
+        {
+            throw new WebApplicationException( e );
+        }
+    }
+
+
+    @Override
+    public void addInitiatorPeerEnvironmentPubKey( final String keyId, final String pek )
+    {
+        try
+        {
+            PGPPublicKeyRing pubKeyRing = PGPKeyUtil.readPublicKeyRing( pek );
+            localPeer.addPeerEnvironmentPubKey( keyId, pubKeyRing );
         }
         catch ( Exception e )
         {
