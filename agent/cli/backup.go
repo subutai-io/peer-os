@@ -6,6 +6,8 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"path/filepath"
+	"reflect"
 	"strconv"
 	"strings"
 	"time"
@@ -25,68 +27,67 @@ func BackupContainer(container string, full bool) {
 		currentDT = currentDT + "_Full"
 	}
 
-	tmpBackupDir := config.Agent.LxcPrefix + "lxc-data/tmpdir/" + container + "_" + currentDT + "/"
+	// for easy removal of backup directory
+	if _, err := os.Stat(backupDir + container); os.IsNotExist(err) {
+		fs.SubvolumeCreate(backupDir + container)
+	}
+
+	lastSnapshotDir := GetLastSnapshotDir(currentDT, backupDir+container)
+	log.Debug("last snapshot dir: " + lastSnapshotDir)
+
+	if !full && lastSnapshotDir == "" {
+		log.Fatal("Last backup not found or corrupted. Try make full backup.")
+	}
+
+	containerSnapshotDir := backupDir + container + "/" + currentDT
+	log.Check(log.FatalLevel, "Create dir for snapshots: "+containerSnapshotDir,
+		os.MkdirAll(containerSnapshotDir, 0755))
+
+	tmpBackupDir := backupDir + "tmpdir/" + container + "_" + currentDT + "/"
+	log.Check(log.FatalLevel, "Create Backup tmp dir: "+tmpBackupDir,
+		os.MkdirAll(tmpBackupDir, 0755))
+
 	tarballName := backupDir + container + "_" + currentDT + ".tar.gz"
 	changelogName := backupDir + container + "_" + currentDT + "_changelog.txt"
 
-	for _, subv := range GetContainerMountPoints(container) {
-		subvBase := path.Base(subv) // ubuntu64efd4c3be6345f3a0deb57e3c7016be-home
+	for _, subvol := range GetContainerMountPoints(container) {
+		subvolBase := path.Base(subvol)
 
-		subvBaseMountpoint := ""
-		if slice := strings.Split(subvBase, "-"); len(slice) > 1 {
-			subvBaseMountpoint = slice[len(slice)-1]
-		} else {
-			subvBaseMountpoint = strings.Join(slice, "")
+		subvolBaseMountpointPath := "/" + subvolBase
+		if subvolBase == "rootfs" {
+			subvolBaseMountpointPath = ""
 		}
 
-		subvBaseMountpointPath := "/" + subvBaseMountpoint // /home
+		containerSnapshotName := containerSnapshotDir + "/" + subvolBase
 
-		if subvBase == "rootfs" {
-			subvBase = container + "-" + subvBase // ubuntu64efd4c3be6345f3a0deb57e3c7016be-rootfs
-			subvBaseMountpointPath = ""
-		}
-
-		log.Check(log.FatalLevel, "Create Backup tmp dir",
-			os.MkdirAll(tmpBackupDir, 0755))
-
-		// log.Check(log.DebugLevel, "btrfs"+"subvolume"+"delete"+config.Agent.BackupPrefix+subvBase+"@yesterday",
-		// 	exec.Command("btrfs", "subvolume", "delete", config.Agent.BackupPrefix+subvBase+"@yesterday").Run())
-		fs.SubvolumeDestroy(backupDir + subvBase + "@yesterday")
-
-		log.Check(log.DebugLevel, "Rename @today snapshot to @yesterday - "+subv,
-			exec.Command("mv", backupDir+subvBase+"@today", backupDir+subvBase+"@yesterday").Run())
-
-		// log.Check(log.FatalLevel, "btrfs"+"subvolume"+"snapshot"+"-r"+string(subv)+config.Agent.BackupPrefix+subvBase+"@today",
-		// 	exec.Command("btrfs", "subvolume", "snapshot", "-r", string(subv), config.Agent.BackupPrefix+subvBase+"@today").Run())
-		fs.SubvolumeClone(string(subv), backupDir+subvBase+"@today")
-		fs.SetVolReadOnly(backupDir+subvBase+"@today", true)
+		fs.SubvolumeClone(subvol, containerSnapshotName)
+		fs.SetVolReadOnly(containerSnapshotName, true)
 
 		if full {
-			// log.Check(log.FatalLevel, "btrfs"+"send"+"-f"+tmpBackupDir+string(subvBaseMountpoint)+config.Agent.BackupPrefix+subvBase+"@today",
-			// 	exec.Command("btrfs", "send", "-f", tmpBackupDir+string(subvBaseMountpoint), config.Agent.BackupPrefix+subvBase+"@today").Run())
-			fs.Send(backupDir+subvBase+"@today", backupDir+subvBase+"@today",
-				tmpBackupDir+string(subvBaseMountpoint)+".delta")
+			fs.Send(containerSnapshotDir+"/"+subvolBase, containerSnapshotDir+"/"+subvolBase,
+				tmpBackupDir+string(subvolBase)+".delta")
 		} else {
-			// log.Check(log.FatalLevel, "btrfs"+"send"+"-f"+tmpBackupDir+string(subvBaseMountpoint)+"-p"+config.Agent.BackupPrefix+subvBase+"@yesterday"+config.Agent.BackupPrefix+subvBase+"@today",
-			// 	exec.Command("btrfs", "send", "-f", tmpBackupDir+string(subvBaseMountpoint), "-p", config.Agent.BackupPrefix+subvBase+"@yesterday", config.Agent.BackupPrefix+subvBase+"@today").Run())
-			fs.Send(backupDir+subvBase+"@yesterday", backupDir+subvBase+"@today",
-				tmpBackupDir+string(subvBaseMountpoint)+".delta")
+			fs.Send(lastSnapshotDir+"/"+subvolBase, containerSnapshotDir+"/"+subvolBase,
+				tmpBackupDir+string(subvolBase)+".delta")
 		}
 
-		changelog = append(changelog, GetModifiedList(backupDir+subvBase+"@today/", backupDir+subvBase+"@yesterday/", subvBaseMountpointPath+"/")...)
+		if lastSnapshotDir != "" {
+			changelog = append(changelog, GetModifiedList(containerSnapshotDir+"/"+subvolBase+"/",
+				lastSnapshotDir+"/"+subvolBase+"/",
+				subvolBaseMountpointPath+"/")...)
+
+		}
 	}
 
 	log.Check(log.FatalLevel, "Copy meta files",
 		exec.Command("rsync", "-av", `--exclude`, `/rootfs`, config.Agent.LxcPrefix+container+"/", tmpBackupDir+"meta").Run())
-	// if full don't generate changelog
-	if !full {
-		log.Check(log.FatalLevel, "Create Changelog file on tmpdir",
-			ioutil.WriteFile(changelogName, []byte(strings.Join(changelog, "\n")), 0644))
-	}
+
+	log.Check(log.FatalLevel, "Create Changelog file on tmpdir",
+		ioutil.WriteFile(changelogName, []byte(strings.Join(changelog, "\n")), 0644))
 
 	template.Tar(tmpBackupDir, tarballName)
 
-	log.Check(log.FatalLevel, "Remove tmpdir", os.RemoveAll(tmpBackupDir))
+	log.Check(log.FatalLevel, "Remove tmpdir", os.RemoveAll(backupDir+"/tmpdir"))
 }
 
 func GetContainerMountPoints(container string) []string {
@@ -154,4 +155,19 @@ func GetModifiedList(td, ytd, rdir string) []string {
 	}
 
 	return list
+}
+
+// there make some checks of dir
+func GetLastSnapshotDir(currentDT, path string) string {
+	dirs, _ := filepath.Glob(path + "/*")
+	dirs_orig := []string{path + "/home", path + "/opt", path + "/rootfs", path + "/var"}
+
+	if reflect.DeepEqual(dirs, dirs_orig) {
+		if len(dirs) != 0 {
+			return dirs[len(dirs)-1]
+		}
+
+	}
+
+	return ""
 }
