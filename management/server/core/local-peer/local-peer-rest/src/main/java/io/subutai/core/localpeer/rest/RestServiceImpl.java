@@ -279,13 +279,13 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response setupTunnels( final String peerIps, final String environmentId )
+    public Response setupTunnels( final String environmentId, final Map<String, String> peerIps )
     {
+        Preconditions.checkNotNull( environmentId );
+        Preconditions.checkNotNull( peerIps );
         try
         {
-            int vlan = localPeer
-                    .setupTunnels( jsonUtil.<Map<String, String>>from( peerIps, new TypeToken<Map<String, String>>()
-                    {}.getType() ), environmentId );
+            int vlan = localPeer.setupTunnels( peerIps, environmentId );
 
             return Response.ok( vlan ).build();
         }

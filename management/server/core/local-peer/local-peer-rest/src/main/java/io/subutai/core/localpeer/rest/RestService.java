@@ -2,6 +2,7 @@ package io.subutai.core.localpeer.rest;
 
 
 import java.util.Collection;
+import java.util.Map;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -80,9 +81,10 @@ public interface RestService
 
 
     @POST
-    @Path( "tunnels" )
-    @Produces( { MediaType.TEXT_PLAIN } )
-    Response setupTunnels( @FormParam( "peerIps" ) String peerIps, @FormParam( "environmentId" ) String environmentId );
+    @Path( "tunnels/{environmentId}" )
+    @Consumes( MediaType.APPLICATION_JSON )
+    @Produces( MediaType.TEXT_PLAIN )
+    Response setupTunnels( @PathParam( "environmentId" ) String environmentId, Map<String, String> peerIps );
 
     @POST
     @Path( "pek" )
