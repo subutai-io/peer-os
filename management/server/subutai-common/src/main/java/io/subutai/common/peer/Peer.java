@@ -304,4 +304,6 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
     boolean updateControlNetworkConfig( ControlNetworkConfig config ) throws PeerException;
 
     PingDistances getCommunityDistances( String communityName, Integer maxAddress ) throws PeerException;
+
+    void addPeerEnvironmentPubKey( String keyId, PGPPublicKeyRing pek );
 }
