@@ -1,0 +1,33 @@
+<div class="b-workspace-content b-workspace-content_border">
+	<div class="b-workspace-content__row">
+		<div class="b-workspace-content-row_col-2 b-workspace-content-row_col-2_padding-right">
+			<div class="b-main-table-border" style = "width: 500px">
+				<table class="b-main-table b-main-table_with-header" style="width: 500px" align="center">
+					<tr>
+						<th>Global Kurjun URLs</th>
+						<td style="padding-right: 18px; width: 300px">
+							<div ng-repeat="url in settingsKurjunCtrl.config.globalKurjunUrls track by $index">
+								<input class="b-form-input b-form-input_full" type="text"
+									   ng-model="settingsKurjunCtrl.config.globalKurjunUrls[$index]" ng-focus = "settingsKurjunCtrl.config.globalKurjunUrlsHint = true" ng-blur = "settingsKurjunCtrl.config.globalKurjunUrlsHint = false" required
+									   style="display: inline; width: 280px; margin-top: 5px; margin-bottom: 5px"><i class="fa fa-times"
+																													 ng-click="settingsKurjunCtrl.removeUrl ($index)"
+																													 style="width: 10px; float: right; margin-top: 13px; cursor: pointer"></i>
+							</div>
+							<button class="b-btn b-btn_green" ng-click="settingsKurjunCtrl.addUrl()"><i class="fa fa-plus"></i>&#160;&#160;Add
+							</button>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+		<div class="b-workspace-content-row_col-2 b-workspace-content-row_col-2_padding-left g-right" style = "width: 440px">
+			<div class="b-main-table-border" style="width: 400px; border: none">
+				<table class="b-main-table" style="width: 400px;" align="center">
+					<tr style = "border: none">
+						<td style="padding-right: 18px; height: 40px; font-style: italic"><span ng-show = "settingsKurjunCtrl.config.globalKurjunUrlsHint">test</span></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>

@@ -7,11 +7,12 @@ angular.module("subutai.settings-kurjun.controller", [])
 SettingsKurjunCtrl.$inject = ["$scope", "SettingsKurjunSrv", "SweetAlert"];
 function SettingsKurjunCtrl($scope, SettingsKurjunSrv, SweetAlert) {
     var vm = this;
-    vm.config = {};
-
+    vm.config = {globalKurjunUrls: [""]};
+	vm.activeTab = "urls";
     function getConfig() {
         SettingsKurjunSrv.getConfig().success(function (data) {
             vm.config = data;
+            vm.config.globalKurjunUrlsHint = vm.config.publicDiskQuotaHintHint = vm.config.publicThresholdHint = vm.config.publicTimeFrameHint = vm.config.trustDiskQuotaHint = vm.config.trustThresholdHint = vm.config.trustTimeFrameHint = false;
         });
     }
 
