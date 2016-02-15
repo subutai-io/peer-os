@@ -3120,6 +3120,7 @@ td.b-main-table__status-col {
     display: block;
 }
 .b-hub-status__dropdown {
+	display: none;
     line-height: normal;
     position: absolute;
     top: 52px;
