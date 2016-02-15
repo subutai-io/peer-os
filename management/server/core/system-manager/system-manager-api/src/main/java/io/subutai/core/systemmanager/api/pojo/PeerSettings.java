@@ -16,4 +16,10 @@ public interface PeerSettings
 
 
     public void setUserPeerOwnerName( final String userPeerOwnerName );
+
+
+    public boolean isRegisteredToHub();
+
+
+    public void setRegisteredToHub( final boolean isRegisteredToHub );
 }

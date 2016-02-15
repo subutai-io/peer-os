@@ -1,6 +1,7 @@
 package io.subutai.core.systemmanager.rest;
 
 
+import javax.ws.rs.FormParam;
 import javax.ws.rs.core.Response;
 
 import io.subutai.common.peer.PeerException;
@@ -38,6 +39,14 @@ public class RestServiceImpl implements RestService
     public Response setPeerSettings()
     {
         systemManager.setPeerSettings();
+        return Response.status( Response.Status.OK ).build();
+    }
+
+
+    @Override
+    public Response setRegistrationStatus( @FormParam( "status" ) final String status )
+    {
+        io.subutai.common.settings.PeerSettings.setRegisterToHubState( Boolean.valueOf( status ) );
         return Response.status( Response.Status.OK ).build();
     }
 

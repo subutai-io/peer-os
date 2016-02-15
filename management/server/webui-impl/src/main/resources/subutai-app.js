@@ -558,28 +558,6 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 				}]
 			}
 		})
-		.state('peer-policy', {
-			url: '/peer-policy',
-			templateUrl: 'subutai-app/peerPolicy/partials/view.html',
-			data: {
-				bodyClass: '',
-				layout: 'default'
-			},
-			resolve: {
-				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
-					return $ocLazyLoad.load([
-						{
-							name: 'subutai.peer-policy',
-							files: [
-								'subutai-app/peerPolicy/peerPolicy.js',
-								'subutai-app/peerPolicy/controller.js',
-								'subutai-app/peerPolicy/service.js'
-							]
-						}
-					]);
-				}]
-			}
-		})
         .state('settings-network', {
             url: '/settings-network',
             templateUrl: 'subutai-app/settingsNetwork/partials/view.html',

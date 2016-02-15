@@ -69,6 +69,28 @@ public class PeerSettings
     }
 
 
+    public static boolean isRegisteredToHub()
+    {
+        String state = String.valueOf( PROPERTIES.getProperty( "isRegisteredToHub" ) );
+        return Objects.equals( state, "true" );
+    }
+
+
+    public static void setRegisterToHubState( boolean registrationState )
+    {
+        try
+        {
+            PROPERTIES.setProperty( "isRegisteredToHub", registrationState );
+            PROPERTIES.save();
+        }
+        catch ( ConfigurationException e )
+        {
+            LOG.error( "Error in saving peer.cfg file." );
+            e.printStackTrace();
+        }
+    }
+
+
     public static void setExternalIpInterface( String externalIpInterface )
     {
         try
@@ -129,7 +151,7 @@ public class PeerSettings
     }
 
 
-    public static void setKeyTrustCheckState( boolean keyTrustCheckEnabled)
+    public static void setKeyTrustCheckState( boolean keyTrustCheckEnabled )
     {
         try
         {
