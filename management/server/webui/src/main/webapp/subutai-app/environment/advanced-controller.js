@@ -465,7 +465,6 @@ function AdvancedEnvironmentCtrl($scope, environmentService, trackerSrv, SweetAl
 			var bbox = this.model.getBBox();
 
 			if(this.model.get('addClass')) {
-				//this.$box.find('.b-resource-host').addClass(this.model.get('className'));
 				this.$box.addClass(this.model.get('addClass'));
 			}
 
@@ -478,10 +477,23 @@ function AdvancedEnvironmentCtrl($scope, environmentService, trackerSrv, SweetAl
 			this.$box.css({ width: bbox.width, height: bbox.height, left: bbox.x, top: bbox.y, transform: 'rotate(' + (this.model.get('angle') || 0) + 'deg)' });
 		},
 		removeBox: function(evt) {
+			var keys = Object.keys(PEER_MAP[vm.currentPeer].rh);
+			keys.splice(keys.indexOf(this.model.get('hostId')), 1);
+			var emptyPlace = this.model.get('size').height - 8;
 			delete PEER_MAP[this.model.get('peerId')].rh[this.model.get('hostId')];
+
 			if(Object.keys(PEER_MAP[this.model.get('peerId')].rh).length == 0) {
 				delete PEER_MAP[this.model.get('peerId')];
 			} else {
+
+				for(var i = 0; i < keys.length; i++) {
+					var resourceHost = graph.getCell(PEER_MAP[vm.currentPeer].rh[keys[i]]);
+					var resourceHostPosition = resourceHost.get('position');
+					console.log(resourceHostPosition);
+					resourceHost.set('position', {x: resourceHostPosition.x, y: (resourceHostPosition.y - emptyPlace)});
+					console.log(resourceHost);
+				}
+
 				var lastResourceInPeer = graph.getCell(PEER_MAP[vm.currentPeer].rh[
 					Object.keys(PEER_MAP[vm.currentPeer].rh)[
 						Object.keys(PEER_MAP[vm.currentPeer].rh).length - 1
