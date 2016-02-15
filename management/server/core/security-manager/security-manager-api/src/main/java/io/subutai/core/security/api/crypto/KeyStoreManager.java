@@ -9,19 +9,19 @@ public interface KeyStoreManager
     /* *****************************
      *
      */
-    public void importCertAsTrusted(String port, String storeAlias, String certificateHEX);
+    public void importCertAsTrusted(int port, String storeAlias, String certificateHEX);
 
 
     /* *****************************
      *
      */
-    public String exportCertificate(String port,String storeAlias);
+    public String exportCertificate(int port,String storeAlias);
 
 
     /* *****************************
     *
     */
-    public void removeCertFromTrusted(String port, String storeAlias);
+    public void removeCertFromTrusted(int port, String storeAlias);
 
 
 }

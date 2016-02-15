@@ -1,6 +1,7 @@
 package io.subutai.core.systemmanager.api.pojo;
 
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 
@@ -9,9 +10,11 @@ import java.util.concurrent.TimeUnit;
  */
 public interface KurjunSettings
 {
-    public String getGlobalKurjunUrls();
+    public List<String> getGlobalKurjunUrls();
 
-    public void setGlobalKurjunUrls( final String globalKurjunUrls );
+
+    public void setGlobalKurjunUrls( final List<String> globalKurjunUrls );
+
 
     public Long getPublicDiskQuota();
 

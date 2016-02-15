@@ -62,7 +62,7 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
                 HttpServletRequest req = ( HttpServletRequest ) message.get( AbstractHTTPDestination.HTTP_REQUEST );
                 Session userSession = null;
 
-                if ( req.getLocalPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X2 ) )
+                if ( req.getLocalPort() == ChannelSettings.SECURE_PORT_X2 )
                 {
                     userSession = authenticateAccess( null,null );
                 }

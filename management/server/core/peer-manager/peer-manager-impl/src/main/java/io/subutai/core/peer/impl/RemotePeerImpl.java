@@ -4,6 +4,7 @@ package io.subutai.core.peer.impl;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
 
@@ -114,19 +115,29 @@ public class RemotePeerImpl implements RemotePeer
 
         String port = String.valueOf( peerInfo.getPort() );
 
-        //switch case for formatting request url
-        switch ( port )
+
+        if ( Objects.equals( port, ChannelSettings.SPECIAL_PORT_X1 ) )
         {
-            case ChannelSettings.OPEN_PORT:
-            case ChannelSettings.SPECIAL_PORT_X1:
-                url = String.format( "http://%s:%s/rest/v1/peer", peerInfo.getIp(), peerInfo.getPort() );
-                break;
-            case ChannelSettings.SECURE_PORT_X1:
-            case ChannelSettings.SECURE_PORT_X2:
-            case ChannelSettings.SECURE_PORT_X3:
-                url = String.format( "https://%s:%s/rest/v1/peer", peerInfo.getIp(), peerInfo.getPort() );
-                break;
+            url = String.format( "http://%s:%s/rest/v1/peer", peerInfo.getIp(), peerInfo.getPort() );
         }
+        else if ( Objects.equals( port, ChannelSettings.SECURE_PORT_X3 ) )
+        {
+            url = String.format( "https://%s:%s/rest/v1/peer", peerInfo.getIp(), peerInfo.getPort() );
+        }
+
+        //switch case for formatting request url
+        //        switch ( port )
+        //        {
+        //            case ChannelSettings.OPEN_PORT:
+        //            case ChannelSettings.SPECIAL_PORT_X1:
+        //                url = String.format( "http://%s:%s/rest/v1/peer", peerInfo.getIp(), peerInfo.getPort() );
+        //                break;
+        //            case ChannelSettings.SECURE_PORT_X1:
+        //            case ChannelSettings.SECURE_PORT_X2:
+        //            case ChannelSettings.SECURE_PORT_X3:
+        //                url = String.format( "https://%s:%s/rest/v1/peer", peerInfo.getIp(), peerInfo.getPort() );
+        //                break;
+        //        }
         this.baseUrl = url;
         this.provider = provider;
     }
@@ -836,18 +847,6 @@ public class RemotePeerImpl implements RemotePeer
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment ID" );
         new PeerWebClient( peerInfo, provider ).removeP2PConnection( environmentId );
-    }
-
-
-    @Override
-    public void createGateway( final Gateway gateway ) throws PeerException
-    {
-        Preconditions.checkNotNull( gateway );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( gateway.getIp() ) );
-        Preconditions.checkArgument( gateway.getVlan() > 0 );
-
-
-        new PeerWebClient( peerInfo, provider ).createGateway( gateway );
     }
 
 

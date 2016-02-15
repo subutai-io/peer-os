@@ -27,7 +27,10 @@
 				<label class="b-popup-body-label b-popup-body-label_block">Trusted Level:</label>
 				<select class="b-popup-body-input b-popup-body-input_full b-popup-body-input_margin-bttm" 
 					ng-model="identityUserFormCtrl.user2Add.trustLevel">
-					<option ng-repeat="(trystedLevelId, trustLevel) in identityUserFormCtrl.trustedLevels" value="{{ trystedLevelId }}">
+					<option 
+					ng-repeat="(trystedLevelId, trustLevel) in identityUserFormCtrl.trustedLevels" 
+					value="{{ trystedLevelId }}" 
+					ng-selected="trystedLevelId == identityUserFormCtrl.user2Add.trustLevel">
 						{{ trustLevel }}
 					</option>
 				</select>				

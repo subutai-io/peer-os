@@ -418,25 +418,6 @@ public class PeerWebClient
     }
 
 
-    public void createGateway( final Gateway gateway ) throws PeerException
-    {
-        String path = "/gateways";
-
-        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo.getIp(), path, provider );
-        client.type( MediaType.APPLICATION_JSON );
-        client.accept( MediaType.APPLICATION_JSON );
-
-        try
-        {
-            client.post( gateway );
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException( "Error on creating gateway", e );
-        }
-    }
-
-
     public void alert( final AlertEvent alert ) throws PeerException
     {
         String path = "/alert";

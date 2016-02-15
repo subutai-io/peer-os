@@ -27,7 +27,7 @@
 						ng-model="templateSettings.quotaSize"
 					>
 						<option 
-						ng-repeat="type in environmentSimpleViewCtrl.containersType" 
+						ng-repeat="type in environmentViewCtrl.containersType" 
 						value="{{ type }}" 
 						ng-selected="type == environmentSimpleViewCtrl.currentTemplate.get('quotaSize')">
 							{{ type }}

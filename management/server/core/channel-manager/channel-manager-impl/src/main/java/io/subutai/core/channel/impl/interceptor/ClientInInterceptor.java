@@ -3,7 +3,6 @@ package io.subutai.core.channel.impl.interceptor;
 
 import java.net.URL;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.HttpHeaders;
 
 import org.apache.cxf.interceptor.Fault;
@@ -11,11 +10,11 @@ import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
-import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.settings.ChannelSettings;
 import io.subutai.common.settings.Common;
+import io.subutai.common.settings.PeerSettings;
 import io.subutai.core.channel.impl.ChannelManagerImpl;
 import io.subutai.core.channel.impl.util.InterceptorState;
 import io.subutai.core.channel.impl.util.MessageContentUtil;
@@ -46,7 +45,7 @@ public class ClientInInterceptor extends AbstractPhaseInterceptor<Message>
     @Override
     public void handleMessage( final Message message )
     {
-        if ( !channelManagerImpl.isEncryptionEnabled() )
+        if ( !PeerSettings.getEncryptionState() )
         {
             return;
         }
@@ -59,7 +58,7 @@ public class ClientInInterceptor extends AbstractPhaseInterceptor<Message>
 
                 URL url = new URL( ( String ) message.getExchange().getOutMessage().get( Message.ENDPOINT_ADDRESS ) );
 
-                if ( url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X2 ) )
+                if ( url.getPort() == ChannelSettings.SECURE_PORT_X2 )
                 {
                     String path = url.getPath();
                     String ip = url.getHost();
