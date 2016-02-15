@@ -1,27 +1,73 @@
 <div ng-controller="SettingsKurjunCtrl as settingsKurjunCtrl">
 
-	<div class="b-workspace__header">
-		<div ng-include="'subutai-app/common/partials/login-header.html'"></div>
+  <div class="b-workspace__header">
+    <div ng-include="'subutai-app/common/partials/login-header.html'"></div>
 
-		<h1 class="b-title"><span class="b-title_breadcrumbs">Kurjun Settings</span></h1>
-	</div>
+    <h1 class="b-title"><span class="b-title_breadcrumbs">Kurjun Settings</span></h1>
+  </div>
 
-	<div class="b-workspace__content">
-		<div class="b-workspace-content__row">
-			<div class="b-main-table-border" style = "width: 500px">
-				<table class="b-main-table b-main-table_with-header" style = "width: 500px" align = "center">
-					<tr>
-						<th>Global Kurjun URLs</th>
-						<td style = "padding-right: 18px"><input class="b-form-input b-form-input_full" type="text" ng-model="settingsKurjunCtrl.config.globalKurjunUrls" required></td>
-					</tr>
-				</table>
-			</div>
-			<button
-					class="b-btn b-btn_green g-left g-margin-bottom"
-					ng-click="settingsKurjunCtrl.updateConfig()"
-					style = "margin-top: 15px">
-				<i class="fa fa-floppy-o"></i>&#160;&#160;Save
-			</button>
-		</div>
-	</div>
+  <div class="b-workspace__content">
+    <div class="b-workspace-content__row">
+      <div class="b-main-table-border" style="width: 500px">
+        <table class="b-main-table b-main-table_with-header" style="width: 500px" align="center">
+          <tr>
+            <th>Global Kurjun URLs</th>
+            <td style="padding-right: 18px; width: 300px">
+              <div ng-repeat="url in settingsKurjunCtrl.config.globalKurjunUrls track by $index">
+                <input class="b-form-input b-form-input_full" type="text"
+                       ng-model="settingsKurjunCtrl.config.globalKurjunUrls[$index]" required
+                       style="display: inline; width: 280px; margin-top: 5px; margin-bottom: 5px"><i class="fa fa-times"
+                                                                                                     ng-click="settingsKurjunCtrl.removeUrl ($index)"
+                                                                                                     style="width: 10px; float: right; margin-top: 13px; cursor: pointer"></i>
+              </div>
+              <button class="b-btn b-btn_green" ng-click="settingsKurjunCtrl.addUrl()"><i class="fa fa-plus"></i>&#160;&#160;Add
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <th colspan="2">Transfer Quota fields (Public repository)</th>
+          </tr>
+          <tr>
+            <th>Disk Quota</th>
+            <td style="padding-right: 18px"><input class="b-form-input b-form-input_full" type="text"
+                                                   ng-model="settingsKurjunCtrl.config.publicDiskQuota" required></td>
+          </tr>
+          <tr>
+            <th>Threshold</th>
+            <td style="padding-right: 18px"><input class="b-form-input b-form-input_full" type="text"
+                                                   ng-model="settingsKurjunCtrl.config.publicThreshold" required></td>
+          </tr>
+          <tr>
+            <th>TimeFrame</th>
+            <td style="padding-right: 18px"><input class="b-form-input b-form-input_full" type="text"
+                                                   ng-model="settingsKurjunCtrl.config.publicTimeFrame" required></td>
+          </tr>
+          <tr>
+            <th colspan="2">Transfer Quota fields (Trust repository)</th>
+          </tr>
+          <tr>
+            <th>Disk Quota</th>
+            <td style="padding-right: 18px"><input class="b-form-input b-form-input_full" type="text"
+                                                   ng-model="settingsKurjunCtrl.config.trustDiskQuota" required></td>
+          </tr>
+          <tr>
+            <th>Threshold</th>
+            <td style="padding-right: 18px"><input class="b-form-input b-form-input_full" type="text"
+                                                   ng-model="settingsKurjunCtrl.config.trustThreshold" required></td>
+          </tr>
+          <tr>
+            <th>TimeFrame</th>
+            <td style="padding-right: 18px"><input class="b-form-input b-form-input_full" type="text"
+                                                   ng-model="settingsKurjunCtrl.config.trustTimeFrame" required></td>
+          </tr>
+        </table>
+      </div>
+      <button
+          class="b-btn b-btn_green g-left g-margin-bottom"
+          ng-click="settingsKurjunCtrl.updateConfig()"
+          style="margin-top: 15px">
+        <i class="fa fa-floppy-o"></i>&#160;&#160;Save
+      </button>
+    </div>
+  </div>
 </div>

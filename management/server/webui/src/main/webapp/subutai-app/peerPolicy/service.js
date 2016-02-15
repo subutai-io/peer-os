@@ -18,7 +18,7 @@ function PeerPolicySrv ($http) {
 	function updateConfig (config) {
 		var postData = "peerId=" + config.peerId + "&diskUsageLimit=" + config.diskUsageLimit + "&cpuUsageLimit=" + config.cpuUsageLimit + "&memoryUsageLimit=" + config.memoryUsageLimit /*+ "&networkUsageLimit=" + config.networkUsageLimit*/ + "&environmentLimit=" + config.environmentLimit + "&containerLimit=" + config.containerLimit;
 		return $http.post(
-			SERVER_URL + "",
+			SERVER_URL + "rest/v1/system/update_peer_policy",
 			postData,
 			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
 		);

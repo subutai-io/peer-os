@@ -1,11 +1,6 @@
 package io.subutai.core.channel.impl.interceptor;
 
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.List;
-import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.HttpHeaders;
 
@@ -16,9 +11,9 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
-import io.subutai.common.peer.PeerException;
 import io.subutai.common.settings.ChannelSettings;
 import io.subutai.common.settings.Common;
+import io.subutai.common.settings.PeerSettings;
 import io.subutai.core.channel.impl.ChannelManagerImpl;
 import io.subutai.core.channel.impl.util.InterceptorState;
 import io.subutai.core.channel.impl.util.MessageContentUtil;
@@ -50,7 +45,7 @@ public class ServerInInterceptor extends AbstractPhaseInterceptor<Message>
     @Override
     public void handleMessage( final Message message )
     {
-        if ( !channelManagerImpl.isEncryptionEnabled() )
+        if ( !PeerSettings.getEncryptionState() )
         {
             return;
         }
@@ -62,7 +57,7 @@ public class ServerInInterceptor extends AbstractPhaseInterceptor<Message>
 
                 HttpServletRequest req = ( HttpServletRequest ) message.get( AbstractHTTPDestination.HTTP_REQUEST );
 
-                if ( req.getLocalPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X2 ) )
+                if ( req.getLocalPort() == ChannelSettings.SECURE_PORT_X2 )
                 {
                     HttpHeaders headers = new HttpHeadersImpl( message.getExchange().getInMessage() );
                     String subutaiHeader = headers.getHeaderString( Common.SUBUTAI_HTTP_HEADER );

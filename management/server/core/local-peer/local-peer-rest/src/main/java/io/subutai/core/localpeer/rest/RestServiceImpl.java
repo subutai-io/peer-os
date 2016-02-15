@@ -18,7 +18,6 @@ import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.gson.reflect.TypeToken;
 
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ResourceHostMetrics;
@@ -214,29 +213,13 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response createGateway( final Gateway gateway )
-    {
-        try
-        {
-            localPeer.createGateway( gateway );
-
-            return Response.ok().status( Response.Status.CREATED ).build();
-        }
-        catch ( Exception ex )
-        {
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( ex ).build();
-        }
-    }
-
-
-    @Override
-    public PublicKeyContainer createEnvironmentKeyPair( /*final String userToken,*/ final EnvironmentId environmentId )
+    public PublicKeyContainer createEnvironmentKeyPair( final EnvironmentId environmentId )
     {
         Preconditions.checkNotNull( environmentId );
 
         try
         {
-            return localPeer.createPeerEnvironmentKeyPair( environmentId/*, userToken*/ );
+            return localPeer.createPeerEnvironmentKeyPair( environmentId );
         }
         catch ( Exception ex )
         {
@@ -280,6 +263,21 @@ public class RestServiceImpl implements RestService
 
 
     @Override
+    public void addInitiatorPeerEnvironmentPubKey( final String keyId, final String pek )
+    {
+        try
+        {
+            PGPPublicKeyRing pubKeyRing = PGPKeyUtil.readPublicKeyRing( pek );
+            localPeer.addPeerEnvironmentPubKey( keyId, pubKeyRing );
+        }
+        catch ( Exception e )
+        {
+            throw new WebApplicationException( e );
+        }
+    }
+
+
+    @Override
     public Vni reserveVni( final Vni vni )
     {
         try
@@ -295,13 +293,13 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response setupTunnels( final String peerIps, final String environmentId )
+    public Response setupTunnels( final String environmentId, final Map<String, String> peerIps )
     {
+        Preconditions.checkNotNull( environmentId );
+        Preconditions.checkNotNull( peerIps );
         try
         {
-            int vlan = localPeer
-                    .setupTunnels( jsonUtil.<Map<String, String>>from( peerIps, new TypeToken<Map<String, String>>()
-                    {}.getType() ), environmentId );
+            int vlan = localPeer.setupTunnels( peerIps, environmentId );
 
             return Response.ok( vlan ).build();
         }

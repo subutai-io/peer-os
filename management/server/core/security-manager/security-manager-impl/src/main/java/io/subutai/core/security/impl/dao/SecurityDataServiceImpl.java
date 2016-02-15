@@ -108,6 +108,16 @@ public class SecurityDataServiceImpl implements SecurityDataService
      *
      */
     @Override
+    public List<SecurityKey> getKeyDataByType( int type )
+    {
+        return securityKeyDAO.findByType( type );
+    }
+
+
+    /******************************************
+     *
+     */
+    @Override
     public SecurityKey getKeyDataByFingerprint( final String fingerprint )
     {
         return securityKeyDAO.findByFingerprint( fingerprint );

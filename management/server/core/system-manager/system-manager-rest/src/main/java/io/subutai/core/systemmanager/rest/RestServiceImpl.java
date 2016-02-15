@@ -1,18 +1,19 @@
 package io.subutai.core.systemmanager.rest;
 
 
+import javax.ws.rs.FormParam;
 import javax.ws.rs.core.Response;
 
-import io.subutai.common.about.SubutaiInfo;
+import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerPolicy;
-import io.subutai.common.settings.KurjunSettings;
-import io.subutai.common.settings.PeerSettings;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.systemmanager.api.SystemManager;
-import io.subutai.core.systemmanager.rest.pojo.KurjunSettingsPojo;
-import io.subutai.core.systemmanager.rest.pojo.PeerSettingsPojo;
-import io.subutai.core.systemmanager.rest.pojo.VersionPojo;
+import io.subutai.core.systemmanager.api.pojo.KurjunSettings;
+import io.subutai.core.systemmanager.api.pojo.NetworkSettings;
+import io.subutai.core.systemmanager.api.pojo.PeerSettings;
+import io.subutai.core.systemmanager.api.pojo.SecuritySettings;
+import io.subutai.core.systemmanager.api.pojo.SystemInfo;
 
 
 /**
@@ -27,17 +28,7 @@ public class RestServiceImpl implements RestService
     @Override
     public Response getSubutaiInfo()
     {
-        VersionPojo pojo = new VersionPojo();
-
-        pojo.setGitCommitId( SubutaiInfo.getCommitId() );
-        pojo.setGitBranch( SubutaiInfo.getBranch() );
-        pojo.setGitCommitUserName( SubutaiInfo.getCommitterUserName() );
-        pojo.setGitCommitUserEmail( SubutaiInfo.getCommitterUserEmail() );
-        pojo.setGitBuildUserName( SubutaiInfo.getBuilderUserName() );
-        pojo.setGitBuildUserEmail( SubutaiInfo.getBuilderUserEmail() );
-        pojo.setGitBuildTime( SubutaiInfo.getBuildTime() );
-        pojo.setProjectVersion( SubutaiInfo.getVersion() );
-
+        SystemInfo pojo = systemManager.getSystemInfo();
         String projectInfo = JsonUtil.GSON.toJson( pojo );
 
         return Response.status( Response.Status.OK ).entity( projectInfo ).build();
@@ -45,16 +36,25 @@ public class RestServiceImpl implements RestService
 
 
     @Override
+    public Response setPeerSettings()
+    {
+        systemManager.setPeerSettings();
+        return Response.status( Response.Status.OK ).build();
+    }
+
+
+    @Override
+    public Response setRegistrationStatus( @FormParam( "status" ) final String status )
+    {
+        io.subutai.common.settings.PeerSettings.setRegisterToHubState( Boolean.valueOf( status ) );
+        return Response.status( Response.Status.OK ).build();
+    }
+
+
+    @Override
     public Response getPeerSettings()
     {
-        PeerSettingsPojo pojo = new PeerSettingsPojo();
-
-        pojo.setExternalIpInterface( PeerSettings.getExternalIpInterface() );
-        pojo.setEncryptionState( PeerSettings.getEncryptionState() );
-        pojo.setRestEncryptionState( PeerSettings.getRestEncryptionState() );
-        pojo.setIntegrationState( PeerSettings.getIntegrationState() );
-        pojo.setKeyTrustCheckState( PeerSettings.getKeyTrustCheckState() );
-
+        PeerSettings pojo = systemManager.getPeerSettings();
         String peerSettingsInfo = JsonUtil.GSON.toJson( pojo );
 
         return Response.status( Response.Status.OK ).entity( peerSettingsInfo ).build();
@@ -64,10 +64,7 @@ public class RestServiceImpl implements RestService
     @Override
     public Response getKurjunSettings()
     {
-        KurjunSettingsPojo pojo = new KurjunSettingsPojo();
-
-        pojo.setGlobalKurjunUrls( KurjunSettings.getGlobalKurjunUrls() );
-
+        KurjunSettings pojo = systemManager.getKurjunSettings();
         String kurjunSettingsInfo = JsonUtil.GSON.toJson( pojo );
 
         return Response.status( Response.Status.OK ).entity( kurjunSettingsInfo ).build();
@@ -75,11 +72,96 @@ public class RestServiceImpl implements RestService
 
 
     @Override
+    public Response setKurjunSettings( final String globalKurjunUrls, final String publicDiskQuota,
+                                       final String publicThreshold, final String publicTimeFrame,
+                                       final String trustDiskQuota, final String trustThreshold,
+                                       final String trustTimeFrame )
+    {
+
+        boolean isSaved = systemManager.setKurjunSettings( globalKurjunUrls, Long.parseLong( publicDiskQuota ),
+                Long.parseLong( publicThreshold ), Long.parseLong( publicTimeFrame ), Long.parseLong( trustDiskQuota ),
+                Long.parseLong( trustThreshold ), Long.parseLong( trustTimeFrame ) );
+
+        if ( isSaved )
+        {
+            return Response.status( Response.Status.OK ).build();
+        }
+        else
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
+        }
+    }
+
+
+    @Override
     public Response getPeerPolicy()
     {
-        PeerPolicy peerPolicy =  peerManager.getPolicy( peerManager.getLocalPeer().getId() );
+        PeerPolicy peerPolicy = peerManager.getPolicy( peerManager.getLocalPeer().getId() );
 
         return Response.status( Response.Status.OK ).entity( peerPolicy ).build();
+    }
+
+
+    @Override
+    public Response setPeerPolicy( final String peerId, final String diskUsageLimit, final String cpuUsageLimit,
+                                   final String memoryUsageLimit, final String environmentLimit,
+                                   final String containerLimit )
+    {
+        PeerPolicy peerPolicy =
+                new PeerPolicy( peerId, Integer.parseInt( diskUsageLimit ), Integer.parseInt( cpuUsageLimit ),
+                        Integer.parseInt( memoryUsageLimit ), 90, Integer.parseInt( environmentLimit ),
+                        Integer.parseInt( containerLimit ) );
+        try
+        {
+            peerManager.setPolicy( peerId, peerPolicy );
+        }
+        catch ( PeerException e )
+        {
+            Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
+            e.printStackTrace();
+        }
+        return Response.status( Response.Status.OK ).build();
+    }
+
+
+    @Override
+    public Response getNetworkSettings()
+    {
+        NetworkSettings pojo = systemManager.getNetworkSettings();
+        String networkSettingsInfo = JsonUtil.GSON.toJson( pojo );
+
+        return Response.status( Response.Status.OK ).entity( networkSettingsInfo ).build();
+    }
+
+
+    @Override
+    public Response setNetworkSettings( final String externalIpInterface, final String openPort,
+                                        final String securePortX1, final String securePortX2, final String securePortX3,
+                                        final String specialPortX1 )
+    {
+        systemManager.setNetworkSettings( externalIpInterface, openPort, securePortX1, securePortX2, securePortX3,
+                specialPortX1 );
+        return Response.status( Response.Status.OK ).build();
+    }
+
+
+    @Override
+    public Response getSecuritySettings()
+    {
+        SecuritySettings pojo = systemManager.getSecuritySettings();
+        String securitySettingsInfo = JsonUtil.GSON.toJson( pojo );
+
+        return Response.status( Response.Status.OK ).entity( securitySettingsInfo ).build();
+    }
+
+
+    @Override
+    public Response setSecuritySettings( final boolean encryptionEnabled, final boolean restEncryptionEnabled,
+                                         final boolean integrationEnabled, final boolean keyTrustCheckEnabled )
+    {
+        systemManager.setSecuritySettings( encryptionEnabled, restEncryptionEnabled, integrationEnabled,
+                keyTrustCheckEnabled );
+        return Response.status( Response.Status.OK ).build();
     }
 
 

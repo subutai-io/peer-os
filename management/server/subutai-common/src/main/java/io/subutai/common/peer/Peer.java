@@ -2,7 +2,6 @@ package io.subutai.common.peer;
 
 
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -25,7 +24,6 @@ import io.subutai.common.network.Vni;
 import io.subutai.common.protocol.ControlNetworkConfig;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
-import io.subutai.common.protocol.PingDistance;
 import io.subutai.common.protocol.PingDistances;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.quota.ContainerQuota;
@@ -284,8 +282,6 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
 
     void removeP2PConnection( EnvironmentId environmentId ) throws PeerException;
 
-    void createGateway( Gateway gateway ) throws PeerException;
-
     void removePeerEnvironmentKeyPair( EnvironmentId environmentId ) throws PeerException;
 
     ResourceHostMetrics getResourceHostMetrics() throws PeerException;
@@ -308,4 +304,6 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
     boolean updateControlNetworkConfig( ControlNetworkConfig config ) throws PeerException;
 
     PingDistances getCommunityDistances( String communityName, Integer maxAddress ) throws PeerException;
+
+    void addPeerEnvironmentPubKey( String keyId, PGPPublicKeyRing pek );
 }

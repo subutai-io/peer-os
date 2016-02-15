@@ -92,7 +92,7 @@ public class RestServiceImpl implements RestService
     // @todo convert to User object
     @Override
     public Response saveUser( final String username, final String fullName, final String password, final String email,
-                              final String rolesJson, final Long userId, final String publicKey )
+                              final String rolesJson, final Long userId, final String trustLevel )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( username ), "username is missing" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( fullName ), "fullname is missing" );
@@ -106,7 +106,7 @@ public class RestServiceImpl implements RestService
             {
                 Preconditions.checkArgument( !Strings.isNullOrEmpty( password ), "Password must be set" );
                 newUser = identityManager
-                        .createUser( username, password, fullName, email, UserType.Regular.getId() ,1,false,true );
+                        .createUser( username, password, fullName, email, UserType.Regular.getId(), Integer.parseInt( trustLevel ), false, true );
             }
             else
             {
@@ -120,10 +120,8 @@ public class RestServiceImpl implements RestService
                 }.getType() );
 
 
-                newUser.setRoles(
-                        roleIds.stream().map( r -> identityManager.getRole( r ) ).collect( Collectors.toList() ) );
+                roleIds.stream().forEach( r -> identityManager.assignUserRole( newUser, identityManager.getRole( r ) ) );
             }
-            identityManager.updateUser( newUser, publicKey );
         }
         catch ( Exception e )
         {

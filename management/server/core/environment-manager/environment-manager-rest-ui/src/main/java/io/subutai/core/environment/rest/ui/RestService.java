@@ -41,34 +41,17 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     Response listEnvironments();
 
-    @PUT
-    @Path( "{environmentId}/revoke" )
-    Response accessStatus( @PathParam( "environmentId" ) String environmentId );
-
-
-    @POST
-    @Path( "requisites/strategy" )
-    Response setupStrategyRequisites( @FormParam( "name" ) String name, @FormParam( "strategy" ) String strategy,
-                                      @FormParam( "sshId" ) int sshId, @FormParam( "hostId" ) int hostId,
-                                      @FormParam( "peers" ) String list );
-
-    @POST
-    @Path( "build/auto" )
-    Response buildAuto( @FormParam( "name" ) String name, @FormParam( "containers" ) String containersJson );
-
-    @POST
-    @Path( "requisites" )
-    Response setupRequisites( @FormParam( "name" ) String name, @FormParam( "topology" ) String topologyJson );
-
     @POST
     @Path( "build" )
-    Response startEnvironmentBuild( @FormParam( "environmentId" ) String environmentId,
-                                    @FormParam( "signedMessage" ) String signedMessage );
+    @Produces( { MediaType.TEXT_PLAIN } )
+    Response buildAuto( @FormParam( "name" ) String name, @FormParam( "containers" ) String containersJson );
+
 
     @POST
-    @Path( "{environmentId}/grow" )
-    Response growEnvironment( @PathParam( "environmentId" ) String environmentId,
-                              @FormParam( "topology" ) String topology );
+    @Path( "{environmentId}/modify" )
+    Response modifyEnvironment(@PathParam( "environmentId" ) String environmentId,
+                               @FormParam( "topology" ) String topology,
+                               @FormParam( "containers" ) String containers );
 
     @DELETE
     @Path( "{environmentId}" )

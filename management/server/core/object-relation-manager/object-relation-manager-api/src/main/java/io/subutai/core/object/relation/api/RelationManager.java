@@ -29,7 +29,7 @@ public interface RelationManager
 
     RelationInfoManager getRelationInfoManager();
 
-    RelationLink getRelationLink( String uniqueId, String objectClass );
+    RelationLink getRelationLink( RelationLink relationLink );
 
     List<Relation> getRelationsByObject( RelationLink objectRelationLink );
 

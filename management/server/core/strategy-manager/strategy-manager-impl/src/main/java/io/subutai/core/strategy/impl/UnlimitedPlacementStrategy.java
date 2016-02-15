@@ -115,13 +115,14 @@ public class UnlimitedPlacementStrategy implements UnlimitedStrategy
         List<RandomAllocator> allocators = new ArrayList<>();
         for ( PeerResources peerResources : peerGroupResources.getResources() )
         {
-            if ( peerResources.getEnvironmentLimit() > 0 )
-            {
-                RandomAllocator resourceAllocator = new RandomAllocator( peerResources );
-                allocators.add( resourceAllocator );
-            }
+            RandomAllocator resourceAllocator = new RandomAllocator( peerResources );
+            allocators.add( resourceAllocator );
         }
 
+        if ( allocators.size() < 1 )
+        {
+            throw new StrategyException( "There are no resource hosts to place containers." );
+        }
 
         // distribute node groups
         for ( NodeSchema nodeSchema : nodeSchemas )

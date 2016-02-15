@@ -205,7 +205,10 @@ public class IdentityManagerImpl implements IdentityManager
                     assignRolePermission( role, per );
                 }
             }
-            //*********************************************
+
+            //***** setPeer Owner By Default ***************
+            setPeerOwner( admin );
+            //**********************************************
         }
     }
 
@@ -482,9 +485,63 @@ public class IdentityManagerImpl implements IdentityManager
      */
     @PermitAll
     @Override
+    public void setPeerOwner( User user )
+    {
+        securityManager.getKeyManager().setPeerOwnerId( user.getSecurityKeyId() );
+    }
+
+
+    /* *************************************************
+     */
+    @PermitAll
+    @Override
+    public String getPeerOwnerId()
+    {
+        return securityManager.getKeyManager().getPeerOwnerId();
+    }
+
+
+    /* *************************************************
+     */
+    @PermitAll
+    @Override
+    public User getUserByKeyId( String keyId )
+    {
+        return identityDataService.getUserByKeyId( keyId );
+    }
+
+
+    /* *************************************************
+     */
+    @PermitAll
+    @Override
+    public User getUserByFingerprint( String fingerprint )
+    {
+        String keyId = securityManager.getKeyManager().getKeyDataByFingerprint( fingerprint ).getIdentityId();
+        return identityDataService.getUserByKeyId( keyId);
+    }
+
+
+    /* *************************************************
+     */
+    @PermitAll
+    @Override
     public UserDelegate getUserDelegate( long userId )
     {
         return identityDataService.getUserDelegateByUserId(userId);
+    }
+
+
+    /* *************************************************
+     */
+    @PermitAll
+    @Override
+    public UserDelegate getUserDelegate(User user)
+    {
+        if(user == null)
+            return null;
+        else
+            return identityDataService.getUserDelegateByUserId(user.getId());
     }
 
 
@@ -767,6 +824,8 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
+    /* *************************************************
+     */
     @Override
     public void approveDelegatedUser( final String trustMessage )
     {
@@ -791,6 +850,8 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
+    /* *************************************************
+     */
     @Override
     public void createIdentityDelegationDocument()
     {
@@ -848,7 +909,7 @@ public class IdentityManagerImpl implements IdentityManager
 
 
     /* *************************************************
-             */
+     */
     private void generateKeyPair( String securityKeyId, int type )
     {
         KeyPair kp = securityManager.getKeyManager().generateKeyPair( securityKeyId, false );
@@ -1394,6 +1455,8 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
+    /* *************************************************
+     */
     private boolean validUsername( String username )
     {
         if ( username.length() == 0 || username.isEmpty() || username.equalsIgnoreCase( "token" ) )

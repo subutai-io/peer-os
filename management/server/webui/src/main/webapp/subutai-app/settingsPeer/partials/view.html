@@ -1,76 +1,34 @@
 <link rel="stylesheet" href="subutai-app/settingsPeer/partials/switch.css">
 <div ng-controller="SettingsPeerCtrl as settingsPeerCtrl">
 
-	<div class="b-workspace__header">
-		<div ng-include="'subutai-app/common/partials/login-header.html'"></div>
+  <div class="b-workspace__header">
+    <div ng-include="'subutai-app/common/partials/login-header.html'"></div>
 
-		<h1 class="b-title"><span class="b-title_breadcrumbs">Peer Settings</span></h1>
-	</div>
+    <h1 class="b-title"><span class="b-title_breadcrumbs">Peer Settings</span></h1>
+  </div>
 
-	<div class="b-workspace__content">
-		<div class="b-workspace-content__row">
-			<div class="b-main-table-border" style = "width: 500px">
-				<table class="b-main-table b-main-table_with-header" style = "width: 500px" align = "center">
-					<tr>
-						<th>External IP Interface</th>
-						<td style = "padding-right: 18px"><input class="b-form-input b-form-input_full" type="text" ng-model="settingsPeerCtrl.config.externalIpInterface" required></td>
-					</tr>
-					<tr>
-						<th>Encryption</th>
-						<td style = "padding-right: 18px">
-							<div class="b-toggle">
-								<input type="checkbox" class="b-check" ng-model = "settingsPeerCtrl.config.encryptionState">
-								<label ng-click = "settingsPeerCtrl.reverse (0)">
-                                </label>
-								<div class="b-toggle-bg"></div>
-								<b class="b-b b-switch"></b>
-							</div>
-						</td>
-					</tr>
-					<tr>
-						<th>REST Encryption</th>
-						<td style = "padding-right: 18px">
-                            <div class="b-toggle">
-                                <input type="checkbox" class="b-check" ng-model = "settingsPeerCtrl.config.restEncryptionState">
-                                <label ng-click = "settingsPeerCtrl.reverse (1)">
-                                </label>
-                                <div class="b-toggle-bg"></div>
-                                <b class="b-b b-switch"></b>
-                            </div>
-						</td>
-					</tr>
-					<tr>
-						<th>Integration</th>
-						<td style = "padding-right: 18px">
-                            <div class="b-toggle">
-                                <input type="checkbox" class="b-check" ng-model = "settingsPeerCtrl.config.integrationState">
-                                <label ng-click = "settingsPeerCtrl.reverse (2)">
-                                </label>
-                                <div class="b-toggle-bg"></div>
-                                <b class="b-b b-switch"></b>
-                            </div>
-						</td>
-					</tr>
-					<tr>
-						<th>Key Trust Check</th>
-						<td style = "padding-right: 18px">
-                            <div class="b-toggle">
-                                <input type="checkbox" class="b-check" ng-model = "settingsPeerCtrl.config.keyTrustCheckState">
-                                <label ng-click = "settingsPeerCtrl.reverse (3)">
-                                </label>
-                                <div class="b-toggle-bg"></div>
-                                <b class="b-b b-switch"></b>
-                            </div>
-						</td>
-					</tr>
-				</table>
-			</div>
-			<button
-					class="b-btn b-btn_green g-left g-margin-bottom"
-					ng-click="settingsPeerCtrl.updateConfig()"
-					style = "margin-top: 15px">
-				<i class="fa fa-floppy-o"></i>&#160;&#160;Save
-			</button>
-		</div>
-	</div>
+  <div class="b-workspace__content">
+    <div class="b-workspace-content__row">
+      <div class="b-main-table-border" style="width: 500px">
+        <table class="b-main-table b-main-table_with-header" style="width: 500px" align="center">
+          <tr>
+            <th>Current Owner ID</th>
+            <td style="padding-right: 18px"><input class="b-form-input b-form-input_full" type="text"
+                                                   ng-model="settingsPeerCtrl.config.peerOwnerId" required></td>
+          </tr>
+          <tr>
+            <th>Current Owner Name</th>
+            <td style="padding-right: 18px"><input class="b-form-input b-form-input_full" type="text"
+                                                   ng-model="settingsPeerCtrl.config.userPeerOwnerName" required></td>
+          </tr>
+        </table>
+      </div>
+      <button
+          class="b-btn b-btn_green g-left g-margin-bottom"
+          ng-click="settingsPeerCtrl.updateConfig()"
+          style="margin-top: 15px">
+        <i class="fa fa-floppy-o"></i>&#160;&#160;Set Peer Owner
+      </button>
+    </div>
+  </div>
 </div>

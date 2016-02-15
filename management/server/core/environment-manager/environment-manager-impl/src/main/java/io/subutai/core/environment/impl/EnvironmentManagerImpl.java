@@ -60,9 +60,6 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.security.crypto.pgp.KeyPair;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.Ownership;
-import io.subutai.common.security.objects.PermissionObject;
-import io.subutai.common.security.objects.PermissionOperation;
-import io.subutai.common.security.objects.PermissionScope;
 import io.subutai.common.security.objects.SecurityKeyType;
 import io.subutai.common.security.relation.RelationLink;
 import io.subutai.common.settings.Common;
@@ -278,11 +275,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     {
         User activeUser = identityManager.getActiveUser();
 
-        final boolean viewAll = identityManager
-                .isUserPermitted                 ( activeUser, PermissionObject.EnvironmentManagement,
-                        PermissionScope.ALL_SCOPE,
-                        PermissionOperation.Read );
-
 
         Set<Environment> environments = new HashSet<>();
         for ( Environment environment : environmentDataService.getAll() )
@@ -412,7 +404,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
 
         //create operation tracker
-        TrackerOperation operationTracker = tracker.createTrackerOperation                 ( MODULE_NAME,
+        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Creating environment %s ", topology.getEnvironmentName() ) );
 
         //collect participating peers
@@ -925,12 +917,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         User activeUser = identityManager.getActiveUser();
 
-        final boolean deleteAll = identityManager
-                .isUserPermitted                   ( activeUser, PermissionObject.EnvironmentManagement,
-                        PermissionScope.ALL_SCOPE,
-                        PermissionOperation.Delete );
+        //final boolean deleteAll = identityManager
+                //.isUserPermitted                   ( activeUser, PermissionObject.EnvironmentManagement,
+                        //PermissionScope.ALL_SCOPE,
+                        //PermissionOperation.Delete );
         boolean canDelete = relationManager.getRelationInfoManager().allHasDeletePermissions( environment );
-        if ( !( deleteAll || environment.getUserId().equals( activeUser.getId() ) || canDelete ) )
+        if ( !( environment.getUserId().equals( activeUser.getId() ) || canDelete ) )
         {
             throw new AccessControlException( "You have not enough permissions." );
         }
@@ -1048,12 +1040,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         User activeUser = identityManager.getActiveUser();
         boolean canDelete = relationManager.getRelationInfoManager().allHasDeletePermissions( environment );
 
-        final boolean deleteAll = identityManager
-                .isUserPermitted                   ( activeUser, PermissionObject.EnvironmentManagement,
-                        PermissionScope.ALL_SCOPE,
-                        PermissionOperation.Delete );
+        //final boolean deleteAll = identityManager
+                //.isUserPermitted                   ( activeUser, PermissionObject.EnvironmentManagement,
+                       // PermissionScope.ALL_SCOPE,
+                        //PermissionOperation.Delete );
 
-        if ( deleteAll || environment.getUserId().equals( activeUser.getId() ) || canDelete )
+        if ( environment.getUserId().equals( activeUser.getId() ) || canDelete )
         {
             environmentDataService.remove( ( EnvironmentImpl ) environment );
             notifyOnEnvironmentDestroyed( environmentId );
@@ -1930,17 +1922,20 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     public List<ShareDto> getSharedUsers( final String objectId ) throws EnvironmentNotFoundException
     {
         Environment environment = loadEnvironment( objectId );
-        RelationLink objectRelationLink =
-                relationManager.getRelationLink( String.valueOf( objectId ), environment.getClass().getSimpleName() );
+        RelationLink objectRelationLink = relationManager.getRelationLink( environment );
 
         List<Relation> relations = relationManager.getRelationsByObject( objectRelationLink );
         List<ShareDto> sharedUsers = Lists.newArrayList();
 
         for ( final Relation relation : relations )
         {
+            UserDelegate delegatedUser = identityManager.getUserDelegate( relation.getTarget().getUniqueIdentifier() );
+            if ( delegatedUser == null )
+            {
+                continue;
+            }
             ShareDto shareDto = new ShareDto();
-
-            shareDto.setId( Long.parseLong( relation.getTarget().getUniqueIdentifier() ) );
+            shareDto.setId( delegatedUser.getUserId() );
 
             RelationInfo relationInfo = relation.getRelationInfo();
             shareDto.setRead( relationInfo.isReadPermission() );

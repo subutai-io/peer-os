@@ -112,21 +112,29 @@ public class RemotePeerImpl implements RemotePeer
         this.messageResponseListener = messageResponseListener;
         String url = "";
 
-        String port = String.valueOf( peerInfo.getPort() );
+        int port = peerInfo.getPort();
 
-        //switch case for formatting request url
-        switch ( port )
+        if ( port == ChannelSettings.SPECIAL_PORT_X1 || port == ChannelSettings.OPEN_PORT )
         {
-            case ChannelSettings.OPEN_PORT:
-            case ChannelSettings.SPECIAL_PORT_X1:
-                url = String.format( "http://%s:%s/rest/v1/peer", peerInfo.getIp(), peerInfo.getPort() );
-                break;
-            case ChannelSettings.SECURE_PORT_X1:
-            case ChannelSettings.SECURE_PORT_X2:
-            case ChannelSettings.SECURE_PORT_X3:
-                url = String.format( "https://%s:%s/rest/v1/peer", peerInfo.getIp(), peerInfo.getPort() );
-                break;
+            url = String.format( "http://%s:%s/rest/v1/peer", peerInfo.getIp(), peerInfo.getPort() );
         }
+        else
+        {
+            url = String.format( "https://%s:%s/rest/v1/peer", peerInfo.getIp(), peerInfo.getPort() );
+        }
+
+        //        switch ( peerInfo.getPort() )
+        //        {
+        //            case OPEN_PORT:
+        //            case SPECIAL_PORT_X1:
+        //                url = String.format( "http://%s:%s/rest/v1/peer", peerInfo.getIp(), peerInfo.getPort() );
+        //                break;
+        //            case SECURE_PORT_X1:
+        //            case SECURE_PORT_X2:
+        //            case SECURE_PORT_X3:
+        //                url = String.format( "https://%s:%s/rest/v1/peer", peerInfo.getIp(), peerInfo.getPort() );
+        //                break;
+        //        }
         this.baseUrl = url;
         this.provider = provider;
     }
@@ -716,18 +724,28 @@ public class RemotePeerImpl implements RemotePeer
 
         String path = "/tunnels";
 
+
+        //        try
+        //        {
+        //            //*********construct Secure Header ****************************
+        //            Map<String, String> headers = Maps.newHashMap();
+        //            //*************************************************************
+        //            Map<String, String> params = Maps.newHashMap();
+        //            params.put( "peerIps", jsonUtil.to( peerIps ) );
+        //            params.put( "environmentId", environmentId );
+        //
+        //            String response = post( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, params, headers );
+        //
+        //            return Integer.parseInt( response );
+        //        }
+        //        catch ( Exception e )
+        //        {
+        //            throw new PeerException( String.format( "Error setting up tunnels on peer %s", getName() ), e );
+        //        }
+
         try
         {
-            //*********construct Secure Header ****************************
-            Map<String, String> headers = Maps.newHashMap();
-            //*************************************************************
-            Map<String, String> params = Maps.newHashMap();
-            params.put( "peerIps", jsonUtil.to( peerIps ) );
-            params.put( "environmentId", environmentId );
-
-            String response = post( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, params, headers );
-
-            return Integer.parseInt( response );
+            return new PeerWebClient( peerInfo, provider ).setupTunnels( peerIps, environmentId );
         }
         catch ( Exception e )
         {
@@ -798,8 +816,24 @@ public class RemotePeerImpl implements RemotePeer
         }
         catch ( IOException | PGPException e )
         {
+        }
+    }
 
 
+    @Override
+    public void addPeerEnvironmentPubKey( final String keyId, final PGPPublicKeyRing pek )
+    {
+        Preconditions.checkNotNull( keyId, "Invalid key ID" );
+        Preconditions.checkNotNull( pek, "Public key ring is null" );
+
+
+        try
+        {
+            String exportedPubKeyRing = securityManager.getEncryptionTool().armorByteArrayToString( pek.getEncoded() );
+            new PeerWebClient( peerInfo, provider ).addPeerEnvironmentPubKey( keyId, exportedPubKeyRing );
+        }
+        catch ( IOException | PGPException e )
+        {
         }
     }
 
@@ -836,18 +870,6 @@ public class RemotePeerImpl implements RemotePeer
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment ID" );
         new PeerWebClient( peerInfo, provider ).removeP2PConnection( environmentId );
-    }
-
-
-    @Override
-    public void createGateway( final Gateway gateway ) throws PeerException
-    {
-        Preconditions.checkNotNull( gateway );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( gateway.getIp() ) );
-        Preconditions.checkArgument( gateway.getVlan() > 0 );
-
-
-        new PeerWebClient( peerInfo, provider ).createGateway( gateway );
     }
 
 

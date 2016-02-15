@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Sets;
 
-import io.subutai.common.environment.ContainerDistributionType;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.NodeGroup;
@@ -59,8 +58,7 @@ public class CreatePeerNodeGroupsTask implements Callable<Set<NodeGroupBuildResu
 
         for ( NodeGroup nodeGroup : nodeGroups )
         {
-            LOG.debug( String.format( "Scheduling on %s %s", nodeGroup.getPeerId(), nodeGroup.getName()/*,
-                    nodeGroup.getContainerDistributionType()*/ ) );
+            LOG.debug( String.format( "Scheduling on %s %s", nodeGroup.getPeerId(), nodeGroup.getName() ) );
             ContainerSize containerSize = nodeGroup.getType();
             NodeGroupBuildException exception = null;
             Set<EnvironmentContainerImpl> containers = Sets.newHashSet();
@@ -68,27 +66,12 @@ public class CreatePeerNodeGroupsTask implements Callable<Set<NodeGroupBuildResu
             {
                 final CreateEnvironmentContainerGroupRequest request;
 
-                //                if ( ContainerDistributionType.AUTO == nodeGroup.getContainerDistributionType() )
-                //                {
-                //                    request = new CreateEnvironmentContainerGroupRequest( environment.getId(),
-                // localPeer.getId(),
-                //                            localPeer.getOwnerId(), environment.getSubnetCidr(), nodeGroup
-                // .getNumberOfContainers(),
-                //                            nodeGroup.getContainerPlacementStrategy().getStrategyId(),
-                //                            nodeGroup.getContainerPlacementStrategy().getCriteriaAsList(),
-                //                            ipAddressOffset + currentIpAddressOffset, nodeGroup.getTemplateName(),
-                //                            nodeGroup.getType() );
-                //                }
-                //                else
-                //                {
                 request = new CreateEnvironmentContainerGroupRequest( environment.getId(), localPeer.getId(),
-                        localPeer.getOwnerId(), environment.getSubnetCidr(),/* nodeGroup.getNumberOfContainers(),*/
-                        ipAddressOffset + currentIpAddressOffset, nodeGroup.getTemplateName(), nodeGroup.getHostId(),
-                        nodeGroup.getType() );
-                //                }
+                        localPeer.getOwnerId(), environment.getSubnetCidr(), ipAddressOffset + currentIpAddressOffset,
+                        nodeGroup.getTemplateName(), nodeGroup.getHostId(), nodeGroup.getType() );
+
                 Set<ContainerHostInfoModel> newHosts = peer.createEnvironmentContainerGroup( request );
 
-                //                currentIpAddressOffset += nodeGroup.getNumberOfContainers();
                 currentIpAddressOffset++;
 
                 for ( ContainerHostInfoModel newHost : newHosts )
@@ -99,11 +82,9 @@ public class CreatePeerNodeGroupsTask implements Callable<Set<NodeGroupBuildResu
                             nodeGroup.getHostsGroupId(), defaultDomain, containerSize ) );
                 }
 
-                if ( containers.size() < /*nodeGroup.getNumberOfContainers()*/1 )
+                if ( containers.isEmpty() )
                 {
-                    exception =
-                            new NodeGroupBuildException( String.format( "Requested %d but created only %d containers",
-                                    /*nodeGroup.getNumberOfContainers()*/1, containers.size() ), null );
+                    exception = new NodeGroupBuildException( "Requested container has not been created", null );
                 }
             }
             catch ( Exception e )

@@ -9,8 +9,8 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
-	"syscall"
 )
 
 // LxcPromote promotes the given container name.
@@ -37,9 +37,9 @@ func LxcPromote(name string) {
 	net.RemoveDefaultGW(name)
 
 	cleanupFS(config.Agent.LxcPrefix+name+"/rootfs/.git", 0000)
-	cleanupFS(config.Agent.LxcPrefix+"lxc-data/"+name+"-var/log/", 0775)
-	cleanupFS(config.Agent.LxcPrefix+"lxc-data/"+name+"-var/cache", 0775)
-	cleanupFS(config.Agent.LxcPrefix+"lxc-data/"+name+"-var/lib/apt/lists/", 0775)
+	cleanupFS(config.Agent.LxcPrefix+name+"/var/log/", 0775)
+	cleanupFS(config.Agent.LxcPrefix+name+"/var/cache", 0775)
+	cleanupFS(config.Agent.LxcPrefix+name+"/var/lib/apt/lists/", 0775)
 
 	makeDiff(name)
 
@@ -50,16 +50,18 @@ func LxcPromote(name string) {
 	log.Info(name + " promoted")
 }
 
+func clearFile(path string, f os.FileInfo, err error) error {
+	if !f.IsDir() {
+		ioutil.WriteFile(path, []byte{}, 0775)
+	}
+	return nil
+}
+
 func cleanupFS(path string, perm os.FileMode) {
 	if perm == 0000 {
 		os.RemoveAll(path)
 	} else {
-		fi, _ := os.Stat(path)
-		uid := fi.Sys().(*syscall.Stat_t).Uid
-		gid := fi.Sys().(*syscall.Stat_t).Gid
-		os.RemoveAll(path)
-		os.MkdirAll(path, perm)
-		os.Chown(path, int(uid), int(gid))
+		filepath.Walk(path, clearFile)
 	}
 }
 
@@ -70,9 +72,9 @@ func makeDiff(name string) {
 	}
 	os.MkdirAll(config.Agent.LxcPrefix+name+"/diff", 0600)
 	execDiff(config.Agent.LxcPrefix+parent+"/rootfs", config.Agent.LxcPrefix+name+"/rootfs", config.Agent.LxcPrefix+name+"/diff/rootfs.diff")
-	execDiff(config.Agent.LxcPrefix+"lxc/"+parent+"-opt", config.Agent.LxcPrefix+"lxc/"+name+"-opt", config.Agent.LxcPrefix+name+"/diff/opt.diff")
-	execDiff(config.Agent.LxcPrefix+"lxc-data/"+parent+"-var", config.Agent.LxcPrefix+"lxc-data/"+name+"-var", config.Agent.LxcPrefix+name+"/diff/var.diff")
-	execDiff(config.Agent.LxcPrefix+"lxc-data/"+parent+"-home", config.Agent.LxcPrefix+"lxc-data/"+name+"-home", config.Agent.LxcPrefix+name+"/diff/home.diff")
+	execDiff(config.Agent.LxcPrefix+parent+"/home", config.Agent.LxcPrefix+name+"/home", config.Agent.LxcPrefix+name+"/diff/home.diff")
+	execDiff(config.Agent.LxcPrefix+parent+"/opt", config.Agent.LxcPrefix+name+"/opt", config.Agent.LxcPrefix+name+"/diff/opt.diff")
+	execDiff(config.Agent.LxcPrefix+parent+"/var", config.Agent.LxcPrefix+name+"/var", config.Agent.LxcPrefix+name+"/diff/var.diff")
 }
 
 func execDiff(dir1, dir2, output string) {

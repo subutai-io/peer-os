@@ -4,6 +4,7 @@ package io.subutai.core.peer.impl;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.core.MediaType;
@@ -418,25 +419,6 @@ public class PeerWebClient
     }
 
 
-    public void createGateway( final Gateway gateway ) throws PeerException
-    {
-        String path = "/gateways";
-
-        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo.getIp(), path, provider );
-        client.type( MediaType.APPLICATION_JSON );
-        client.accept( MediaType.APPLICATION_JSON );
-
-        try
-        {
-            client.post( gateway );
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException( "Error on creating gateway", e );
-        }
-    }
-
-
     public void alert( final AlertEvent alert ) throws PeerException
     {
         String path = "/alert";
@@ -560,5 +542,31 @@ public class PeerWebClient
         {
             throw new PeerException( "Error on getting community distances.", e );
         }
+    }
+
+
+    public int setupTunnels( final Map<String, String> peerIps, final String environmentId )
+    {
+        Preconditions.checkNotNull( peerIps );
+        Preconditions.checkNotNull( environmentId );
+        String path = String.format( "/tunnels/%s", environmentId );
+
+        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo.getIp(), path, provider, 500, 7000, 1 );
+        client.type( MediaType.APPLICATION_JSON );
+        client.accept( MediaType.TEXT_PLAIN );
+        return client.post( peerIps, Integer.class );
+    }
+
+
+    public void addPeerEnvironmentPubKey( final String keyId, final String pubKeyRing )
+    {
+        Preconditions.checkNotNull( keyId );
+        Preconditions.checkNotNull( pubKeyRing );
+        String path = String.format( "/pek/add/%s", keyId );
+
+        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo.getIp(), path, provider, 500, 7000, 1 );
+        client.type( MediaType.APPLICATION_JSON );
+        client.accept( MediaType.APPLICATION_JSON );
+        client.post( pubKeyRing );
     }
 }

@@ -2,6 +2,7 @@ package io.subutai.core.localpeer.rest;
 
 
 import java.util.Collection;
+import java.util.Map;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -76,16 +77,14 @@ public interface RestService
                                 @FormParam( "gatewayIp" ) String gatewayIp );
 
 
+    ;
+
+
     @POST
-    @Path( "gateways" )
+    @Path( "tunnels/{environmentId}" )
     @Consumes( MediaType.APPLICATION_JSON )
-    Response createGateway( Gateway gateway );
-
-
-    @POST
-    @Path( "tunnels" )
-    @Produces( { MediaType.TEXT_PLAIN } )
-    Response setupTunnels( @FormParam( "peerIps" ) String peerIps, @FormParam( "environmentId" ) String environmentId );
+    @Produces( MediaType.TEXT_PLAIN )
+    Response setupTunnels( @PathParam( "environmentId" ) String environmentId, Map<String, String> peerIps );
 
     @POST
     @Path( "pek" )
@@ -103,6 +102,12 @@ public interface RestService
     @DELETE
     @Path( "pek/{environmentId}" )
     void removeEnvironmentKeyPair( @PathParam( "environmentId" ) EnvironmentId environmentId );
+
+    @POST
+    @Path( "pek/add/{keyId}" )
+    @Produces( MediaType.APPLICATION_JSON )
+    @Consumes( MediaType.APPLICATION_JSON )
+    void addInitiatorPeerEnvironmentPubKey( @PathParam( "keyId" ) String keyId, String pek );
 
     @DELETE
     @Path( "network/{environmentId}" )

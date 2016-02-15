@@ -12,15 +12,15 @@
   <!-- ***************************************************************** -->
 
   <!-- Allow the use of system properties -->
-  <!--
+
   <ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]" />
 
   <cm:property-placeholder persistent-id="peer" update-strategy="none">
     <cm:default-properties>
-      <cm:property name="externalIpInterface" value="eth1" />
+      <cm:property name="publicURL" value="" />
     </cm:default-properties>
   </cm:property-placeholder>
-  -->
+
   <!-- ***************************************************************** -->
   <bean id="daoManagerPeer" init-method="init" class="io.subutai.common.dao.DaoManager" scope="prototype">
     <jpa:unit unitname="peerManagerPUnit" property="entityManagerFactory" />
@@ -70,13 +70,13 @@
     <argument ref="templateRegistry" />
     <argument ref="identityManager" />
     <argument ref="jsonProvider" />
-    <!--<property name="externalIpInterface" value="${externalIpInterface}" />-->
+    <property name="publicUrl" value="${publicURL}" />
+
   </bean>
 
   <service ref="messageResponseListener" interface="io.subutai.core.messenger.api.MessageListener" />
 
   <service ref="peerManager" interface="io.subutai.core.peer.api.PeerManager" />
-
 
   <reference-list id="peerActionListener"
                   interface="io.subutai.core.peer.api.PeerActionListener"

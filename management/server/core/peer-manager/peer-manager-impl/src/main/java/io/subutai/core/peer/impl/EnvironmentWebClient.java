@@ -50,7 +50,7 @@ public class EnvironmentWebClient
         }
         catch ( Exception e )
         {
-            throw new PeerException( "Error starting container", e );
+            throw new PeerException( "Error starting container: " + e.getMessage() );
         }
     }
 
@@ -68,7 +68,7 @@ public class EnvironmentWebClient
         }
         catch ( Exception e )
         {
-            throw new PeerException( "Error stopping container", e );
+            throw new PeerException( "Error stopping container:" + e.getMessage() );
         }
     }
 
@@ -86,7 +86,7 @@ public class EnvironmentWebClient
         }
         catch ( Exception e )
         {
-            throw new PeerException( "Error destroying container", e );
+            throw new PeerException( "Error destroying container: " + e.getMessage() );
         }
     }
 
@@ -101,14 +101,14 @@ public class EnvironmentWebClient
         WebClient client = WebClientBuilder.buildEnvironmentWebClient( host, path, provider );
 
         client.type( MediaType.APPLICATION_JSON );
-        client.accept( MediaType.APPLICATION_JSON );
+        client.accept( MediaType.APPLICATION_JSON);
         try
         {
             return client.get( ContainerHostState.class );
         }
         catch ( Exception e )
         {
-            throw new PeerException( "Error getting container state ", e );
+            throw new PeerException( "Error getting container state: " + e.getMessage() );
         }
     }
 
@@ -129,7 +129,7 @@ public class EnvironmentWebClient
         }
         catch ( Exception e )
         {
-            throw new PeerException( "Error on obtaining process resource usage", e );
+            throw new PeerException( "Error on obtaining process resource usage: " + e.getMessage() );
         }
     }
 
@@ -149,7 +149,7 @@ public class EnvironmentWebClient
         }
         catch ( Exception e )
         {
-            throw new PeerException( "Error on obtaining cpu set", e );
+            throw new PeerException( "Error on obtaining cpu set" + e.getMessage() );
         }
     }
 
@@ -170,7 +170,7 @@ public class EnvironmentWebClient
         }
         catch ( Exception e )
         {
-            throw new PeerException( "Error on setting cpu set", e );
+            throw new PeerException( "Error on setting cpu set: " + e.getMessage() );
         }
     }
 
@@ -190,7 +190,7 @@ public class EnvironmentWebClient
         }
         catch ( Exception e )
         {
-            throw new PeerException( "Error on obtaining available quota", e );
+            throw new PeerException( "Error on obtaining available quota: " + e.getMessage() );
         }
     }
 
@@ -210,7 +210,7 @@ public class EnvironmentWebClient
         }
         catch ( Exception e )
         {
-            throw new PeerException( "Error on obtaining available quota", e );
+            throw new PeerException( "Error on obtaining available quota: " + e.getMessage() );
         }
     }
 
@@ -232,7 +232,7 @@ public class EnvironmentWebClient
         }
         catch ( Exception e )
         {
-            throw new PeerException( "Error on setting quota", e );
+            throw new PeerException( "Error on setting quota: " + e.getMessage() );
         }
     }
 }

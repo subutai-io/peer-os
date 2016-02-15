@@ -1,6 +1,9 @@
 package io.subutai.core.peer.impl;
 
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -19,7 +22,7 @@ import io.subutai.core.peer.api.RegistrationClient;
 public class RegistrationClientImpl implements RegistrationClient
 {
     protected RestUtil restUtil = new RestUtil();
-    private static final String urlTemplate = "https://%s:8443/rest/v1/handshake/%s";
+    private static final String urlTemplate = "%s/rest/v1/handshake/%s";
     private Object provider;
 
 
@@ -200,8 +203,16 @@ public class RegistrationClientImpl implements RegistrationClient
     }
 
 
-    private String buildUrl( String destination, String action )
+    private String buildUrl( String destination, String action ) throws PeerException
     {
-        return String.format( urlTemplate, destination, action );
+        try
+        {
+            URL url = new URL( destination );
+            return String.format( urlTemplate, url, action );
+        }
+        catch ( MalformedURLException e )
+        {
+            throw new PeerException( "Invalid URL." );
+        }
     }
 }

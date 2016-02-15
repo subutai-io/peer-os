@@ -3,6 +3,7 @@ package connect
 import (
 	"bufio"
 	"bytes"
+	"github.com/subutai-io/Subutai/agent/config"
 	"github.com/subutai-io/Subutai/agent/lib/gpg"
 	"github.com/subutai-io/Subutai/agent/log"
 	"io/ioutil"
@@ -30,7 +31,7 @@ func (k *Key) Store() string {
 	os.Remove("epub.key")
 	k.Id = ExtractKeyId(status)
 	log.Debug("Found KeyID: " + k.Id)
-
+	config.Management.GpgUser = k.Id
 	return status
 }
 

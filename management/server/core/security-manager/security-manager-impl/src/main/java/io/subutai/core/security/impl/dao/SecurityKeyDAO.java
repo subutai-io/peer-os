@@ -6,6 +6,8 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import com.google.common.collect.Lists;
+
 import io.subutai.common.dao.DaoManager;
 import io.subutai.core.security.api.model.SecurityKey;
 import io.subutai.core.security.impl.model.SecurityKeyEntity;
@@ -17,6 +19,7 @@ import io.subutai.core.security.impl.model.SecurityKeyEntity;
 class SecurityKeyDAO
 {
     private DaoManager daoManager = null;
+
 
     /******************************************
      *
@@ -60,8 +63,8 @@ class SecurityKeyDAO
         SecurityKey key = null;
         try
         {
-            Query qr = em.createQuery( "select ss from SecurityKeyEntity AS ss"
-                            + " where ss.publicKeyFingerprint=:publicKeyFingerprint" );
+            Query qr = em.createQuery(
+                    "select ss from SecurityKeyEntity AS ss" + " where ss.publicKeyFingerprint=:publicKeyFingerprint" );
             qr.setParameter( "publicKeyFingerprint", fingerprint );
             List<SecurityKeyEntity> result = qr.getResultList();
 
@@ -82,11 +85,36 @@ class SecurityKeyDAO
     }
 
 
+    /* *************************************************
+     *
+     */
+    public List<SecurityKey> findByType( int keyType )
+    {
+        EntityManager em = daoManager.getEntityManagerFromFactory();
+
+        List<SecurityKey> result = Lists.newArrayList();
+        try
+        {
+            Query qr = em.createQuery( "select h from SecurityKeyEntity h where h.type=:keyType", SecurityKey.class );
+
+            qr.setParameter( "keyType",keyType );
+            result = qr.getResultList();
+        }
+        catch ( Exception e )
+        {
+        }
+        finally
+        {
+            daoManager.closeEntityManager( em );
+        }
+        return result;
+    }
+
 
     /******************************************
      *
      */
-    public void persist(SecurityKey SecurityKey )
+    public void persist( SecurityKey SecurityKey )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
 
@@ -110,7 +138,7 @@ class SecurityKeyDAO
     /******************************************
      *
      */
-    public void update(SecurityKey SecurityKey )
+    public void update( SecurityKey SecurityKey )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
 
@@ -143,7 +171,7 @@ class SecurityKeyDAO
             daoManager.startTransaction( em );
 
             Query qr = em.createQuery( "delete from SecurityKeyEntity AS ss where ss.identityId=:identityId" );
-            qr.setParameter( "identityId",identityId );
+            qr.setParameter( "identityId", identityId );
             qr.executeUpdate();
 
             daoManager.commitTransaction( em );
@@ -157,5 +185,4 @@ class SecurityKeyDAO
             daoManager.closeEntityManager( em );
         }
     }
-
 }

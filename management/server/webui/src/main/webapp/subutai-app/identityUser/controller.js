@@ -19,12 +19,12 @@ var trustedLevels = {
 
 function userPostData(user) {
 	var currentUserRoles = JSON.stringify(user.roles);
+	console.log(user);
 	var postData = 'username=' + user.userName +
 		'&full_name=' + user.fullName +
 		'&password=' + user.password +
 		'&email=' + user.email +
-		'&trustLevel=' + user.trustLevel +
-		'&public_key=' + encodeURIComponent( user.public_key );
+		'&trustLevel=' + user.trustLevel;
 
 	if(currentUserRoles !== undefined) {
 		postData += '&roles=' + currentUserRoles;
@@ -60,18 +60,6 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 		2: "Regular",
 	};
 
-	vm.trustedLevels = {
-		1: "Never Trust",
-		2: "Marginal",
-		3: "Full",
-		4: "Ultimate Trust"
-	};
-
-	vm.userTypes = {
-		1: "Systemt",
-		2: "Regular",
-	};
-
 	cfpLoadingBar.start();
 	angular.element(document).ready(function () {
 		cfpLoadingBar.complete();
@@ -85,6 +73,15 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 		.withPaginationType('full_numbers')
 		.withOption('stateSave', true)
 		.withOption('order', [[ 1, "asc" ]])
+		.withOption('rowCallback', function(row, data, index){
+			if(data.trustLevel == 1) {
+				$(row).addClass('b-untrusted-user');
+			} else if(data.trustLevel == 2) {
+				$(row).addClass('b-midletrusted-user');
+			} else {
+				$(row).addClass('b-trusted-user');
+			}
+		})
 		.withOption('createdRow', createdRow);
 
 	vm.dtColumns = [
@@ -322,8 +319,13 @@ function IdentityUserFormCtrl($scope, identitySrv, ngDialog) {
 	function addUser() {
 		if ($scope.addUserForm.$valid) {
 			var postData = userPostData(vm.user2Add);
+			LOADING_SCREEN();
 			identitySrv.addUser(postData).success(function (data) {
+				LOADING_SCREEN('none');
 				ngDialog.closeAll();
+			}).error(function(error){
+				LOADING_SCREEN('none');
+				SweetAlert.swal ("ERROR!", "Error: " + error, "error");
 			});
 			$scope.addUserForm.$setPristine();
 			$scope.addUserForm.$setUntouched();

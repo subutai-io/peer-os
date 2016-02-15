@@ -195,22 +195,7 @@ public class NetworkManagerImpl implements NetworkManager
     }
 
 
-    @Override
-    public void setupGateway( final String gatewayIp, final int vLanId ) throws NetworkManagerException
-    {
-        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
 
-        execute( getManagementHost(), commands.getSetupGatewayCommand( gatewayIp, vLanId ) );
-    }
-
-
-    @Override
-    public void setupGatewayOnContainer( final String containerName, final String gatewayIp,
-                                         final String interfaceName ) throws NetworkManagerException
-    {
-        execute( getContainerHost( containerName ),
-                commands.getSetupGatewayOnContainerCommand( gatewayIp, interfaceName ) );
-    }
 
 
     @Override

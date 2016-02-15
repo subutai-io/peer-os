@@ -8,6 +8,7 @@ import org.apache.karaf.shell.commands.Command;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.peer.Peer;
+import io.subutai.common.peer.PeerInfo;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.peer.api.PeerManager;
 
@@ -29,48 +30,34 @@ public class ListCommand extends SubutaiShellCommandSupport
     protected Object doExecute() throws Exception
     {
         List<Peer> list = peerManager.getPeers();
-        System.out.println( "Found " + list.size() + " registered peers" );
-        for ( Peer peer : list )
+        System.out.println( "Found " + list.size() + " registered peer(s)" );
+        if ( list.size() > 0 )
         {
-            String peerStatus = "OFFLINE";
+            System.out.println( "Status\tL/R\tID\tOwner ID\tHost name\tPeer name\tPublic URL" );
 
-
-            if ( peer.isOnline() )
+            for ( Peer peer : list )
             {
-                peerStatus = "ONLINE";
-            }
+                String peerStatus = "OFFLINE";
 
 
-            try
-            {
-                System.out.println(
-                        peer.getId() + " " + peer.getPeerInfo().getIp() + " " + peer.getName() + " " + peerStatus );
-
-                HostInterfaces ints = peer.getInterfaces();
-                System.out.println( String.format( "Interfaces count: %d", ints != null ? ints.size() : -1 ) );
-
-                for ( HostInterface i : ints.getAll() )
+                if ( peer.isOnline() )
                 {
-                    System.out.println( String.format( "\t%-15s %-15s %-15s", i.getName(), i.getIp(), i.getMac() ) );
+                    peerStatus = "ONLINE";
+                }
+
+
+                try
+                {
+                    PeerInfo info = peer.getPeerInfo();
+                    System.out.println( String.format( "%s\t%s\t%s\t%s\t%s\t%s\t%s", peerStatus,
+                                    peer.isLocal() ? "local" : "remote", peer.getId(), info.getOwnerId(), info.getIp(),
+                                    info.getName(), info.getPublicUrl() ) );
+                }
+                catch ( Exception e )
+                {
+                    log.error( e.getMessage(), e );
                 }
             }
-            catch ( Exception e )
-            {
-                log.error( e.getMessage(), e );
-            }
-
-
-            //            final Collection<ResourceHostMetric> resourceHostMetrics = peer.getResourceHostMetrics()
-            // .getResources();
-            //            System.out.println( String.format( "Resource hosts: %d",
-            //                    resourceHostMetrics != null ? resourceHostMetrics.size() : -1 ) );
-            //            for ( ResourceHostMetric m : resourceHostMetrics )
-            //            {
-            //                System.out.println(
-            //                        String.format( "%s %s %d %s", m.getHostName(), m.getHostInfo().getId(), m
-            // .getContainersCount(),
-            //                                m.getCpuModel() ) );
-            //            }
         }
         return null;
     }

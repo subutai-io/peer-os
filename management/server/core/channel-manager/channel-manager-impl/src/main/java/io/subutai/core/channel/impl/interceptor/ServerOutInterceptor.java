@@ -1,8 +1,6 @@
 package io.subutai.core.channel.impl.interceptor;
 
 
-import java.net.URL;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.HttpHeaders;
 
@@ -19,6 +17,7 @@ import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.settings.ChannelSettings;
 import io.subutai.common.settings.Common;
+import io.subutai.common.settings.PeerSettings;
 import io.subutai.core.channel.impl.ChannelManagerImpl;
 import io.subutai.core.channel.impl.util.InterceptorState;
 import io.subutai.core.channel.impl.util.MessageContentUtil;
@@ -50,7 +49,7 @@ public class ServerOutInterceptor extends AbstractPhaseInterceptor<Message>
     @Override
     public void handleMessage( final Message message )
     {
-        if ( !channelManagerImpl.isEncryptionEnabled() )
+        if ( !PeerSettings.getEncryptionState() )
         {
             return;
         }
@@ -64,7 +63,7 @@ public class ServerOutInterceptor extends AbstractPhaseInterceptor<Message>
                 HttpServletRequest req = ( HttpServletRequest ) message.getExchange().getInMessage()
                                                                        .get( AbstractHTTPDestination.HTTP_REQUEST );
 
-                if ( req.getLocalPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X2 ) )
+                if ( req.getLocalPort() == ChannelSettings.SECURE_PORT_X2 )
                 {
                     //LOG.info( " *** URL:" + url.getPath() );
                     HttpHeaders headers = new HttpHeadersImpl( message.getExchange().getInMessage() );
@@ -112,18 +111,12 @@ public class ServerOutInterceptor extends AbstractPhaseInterceptor<Message>
     }
 
 
-    private void handleEnvironmentMessage( final String ip, final String environmentId, final Message message )
+    private void handleEnvironmentMessage( final String targetId, final String environmentId, final Message message )
     {
-        try
-        {
-            String targetId = peerManager.getPeerIdByIp( ip ) + "-" + environmentId;
-            String sourceId = peerManager.getLocalPeer().getId() + "-" + environmentId;
+        String sourceId = peerManager.getLocalPeer().getId() + "-" + environmentId;
 
-            MessageContentUtil.encryptContent( channelManagerImpl.getSecurityManager(), sourceId, targetId, message );
-        }
-        catch ( PeerException e )
-        {
-            //LOG.warn( e.getMessage() );
-        }
+        MessageContentUtil
+                .encryptContent( channelManagerImpl.getSecurityManager(), sourceId, targetId + "-" + environmentId,
+                        message );
     }
 }
