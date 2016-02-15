@@ -4,7 +4,6 @@ package io.subutai.core.peer.impl;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
 
@@ -79,12 +78,6 @@ import io.subutai.core.peer.impl.command.BlockingCommandCallback;
 import io.subutai.core.peer.impl.command.CommandResponseListener;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
 import io.subutai.core.security.api.SecurityManager;
-
-import static io.subutai.common.settings.ChannelSettings.OPEN_PORT;
-import static io.subutai.common.settings.ChannelSettings.SECURE_PORT_X1;
-import static io.subutai.common.settings.ChannelSettings.SECURE_PORT_X2;
-import static io.subutai.common.settings.ChannelSettings.SECURE_PORT_X3;
-import static io.subutai.common.settings.ChannelSettings.SPECIAL_PORT_X1;
 
 
 /**
@@ -823,8 +816,24 @@ public class RemotePeerImpl implements RemotePeer
         }
         catch ( IOException | PGPException e )
         {
+        }
+    }
 
 
+    @Override
+    public void addPeerEnvironmentPubKey( final String keyId, final PGPPublicKeyRing pek )
+    {
+        Preconditions.checkNotNull( keyId, "Invalid key ID" );
+        Preconditions.checkNotNull( pek, "Public key ring is null" );
+
+
+        try
+        {
+            String exportedPubKeyRing = securityManager.getEncryptionTool().armorByteArrayToString( pek.getEncoded() );
+            new PeerWebClient( peerInfo, provider ).addPeerEnvironmentPubKey( keyId, exportedPubKeyRing );
+        }
+        catch ( IOException | PGPException e )
+        {
         }
     }
 

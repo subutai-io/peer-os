@@ -94,10 +94,14 @@
 							<td><a href ng-click = "environmentViewCtrl.showSSHKeyForm(environment.id)">Add</a>/
 								<a href ng-click="environmentViewCtrl.showSSHKeysPopup(environment.id)">Remove</a></td>
 							<td><button class="b-btn b-btn_grey" ng-click="environmentViewCtrl.showDomainForm(environment.id)">Configure</button></td>
-							<td ng-init="environmentViewCtrl.containersTags(environment)">
-								<a ng-repeat="(key, value) in environmentViewCtrl.installedContainers" ui-sref="containers({environmentId: value.dataID})" class="b-tags b-tags_{{value.color}}" tooltips tooltip-template="{{value.tooltip}}">
-									{{key}}:{{value.counts}}
-								</a>
+							<td>
+								<span class="g-circle-label g-circle-label_blue g-margin-left-quarter"
+									  ng-repeat="(key, value) in environment.containersByQuota"
+									  ng-style="{'background-color' : environmentSimpleViewCtrl.getQuotaColor(key)}"
+									  tooltips
+									  tooltip-template="{{value.tooltip}}">
+									{{value.quantity}}
+                            	</span>
 							</td>
 							<td class="b-main-table__controls">
 								<a href
