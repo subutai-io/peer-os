@@ -15,7 +15,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	var GRID_CELL_SIZE = 100;
 	var GRID_SIZE = 100;
 
-	vm.activeMode = 'advanced';
+	vm.activeMode = 'simple';
 
 	vm.currentEnvironment = {};
 

@@ -491,7 +491,6 @@ function AdvancedEnvironmentCtrl($scope, environmentService, trackerSrv, SweetAl
 					var resourceHostPosition = resourceHost.get('position');
 					console.log(resourceHostPosition);
 					resourceHost.set('position', {x: resourceHostPosition.x, y: (resourceHostPosition.y - emptyPlace)});
-					console.log(resourceHost);
 				}
 
 				var lastResourceInPeer = graph.getCell(PEER_MAP[vm.currentPeer].rh[
