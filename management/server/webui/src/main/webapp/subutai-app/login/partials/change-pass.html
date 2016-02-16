@@ -23,6 +23,13 @@
 
 			<form ng-submit="changePassCtrl.changePass(changePassCtrl.newPassword)" name="changePassForm">
 				<div class="b-main-form__element">
+					<label class="b-popup-body-label b-popup-body-label_inline">Old password</label>
+					<input type="password"
+								 ng-model="changePassCtrl.oldPassword"
+								 class="b-popup-body-input"
+								 required>
+				</div>
+				<div class="b-main-form__element">
 					<label class="b-popup-body-label b-popup-body-label_inline">New password</label>
 					<input type="password" 
 						ng-model="changePassCtrl.newPassword" 
