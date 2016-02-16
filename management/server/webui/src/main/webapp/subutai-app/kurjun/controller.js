@@ -4,12 +4,12 @@ angular.module('subutai.kurjun.controller', [])
 	.controller('KurjunCtrl', KurjunCtrl)
 	.directive('fileModel', fileModel);
 
-KurjunCtrl.$inject = ['$scope', '$rootScope', 'kurjunSrv', 'SweetAlert', 'DTOptionsBuilder', 'DTColumnDefBuilder', '$resource', '$compile', 'ngDialog', '$timeout', 'cfpLoadingBar'];
+KurjunCtrl.$inject = ['$scope', '$rootScope', 'kurjunSrv', 'identitySrv', 'SweetAlert', 'DTOptionsBuilder', 'DTColumnDefBuilder', '$resource', '$compile', 'ngDialog', '$timeout', 'cfpLoadingBar'];
 fileModel.$inject = ['$parse'];
 
-var fileUploder = {};
+var fileUploader = {};
 
-function KurjunCtrl($scope, $rootScope, kurjunSrv, SweetAlert, DTOptionsBuilder, DTColumnDefBuilder, $resource, $compile, ngDialog, $timeout, cfpLoadingBar) {
+function KurjunCtrl($scope, $rootScope, kurjunSrv, identitySrv, SweetAlert, DTOptionsBuilder, DTColumnDefBuilder, $resource, $compile, ngDialog, $timeout, cfpLoadingBar) {
 
 	var vm = this;
 	vm.activeTab = 'templates';
@@ -33,7 +33,7 @@ function KurjunCtrl($scope, $rootScope, kurjunSrv, SweetAlert, DTOptionsBuilder,
 	vm.addUser2Stack = addUser2Stack;
 	vm.removeUserFromStack = removeUserFromStack;
 
-	kurjunSrv.getCurrentUser().success (function (data) {
+	identitySrv.getCurrentUser().success (function (data) {
 		vm.currentUser = data;
 	});
 
@@ -239,10 +239,12 @@ function KurjunCtrl($scope, $rootScope, kurjunSrv, SweetAlert, DTOptionsBuilder,
 			});
 	}
 
+
+
 	function openShareWindow(template) {
 		vm.listOfUsers = [];
 		vm.checkedUsers = [];
-		kurjunSrv.getUsers().success(function (data) {
+		identitySrv.getUsers().success(function (data) {
 			for (var i = 0; i < data.length; ++i) {
 				if (data[i].id !== vm.currentUser.id) {
 					vm.listOfUsers.push (data[i]);
@@ -345,7 +347,7 @@ function fileModel($parse) {
 				document.getElementById("js-uploadFile").value = element[0].files[0].name;
 				scope.$apply(function () {
 					modelSetter(scope, element[0].files[0]);
-					fileUploder = element[0].files[0];
+					fileUploader = element[0].files[0];
 				});
 			});
 		}
