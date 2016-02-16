@@ -21,10 +21,6 @@ function kurjunService($http, Upload) {
 		deleteTemplate: deleteTemplate,
 		deleteAPT: deleteAPT,
 		isUploadAllowed: isUploadAllowed,
-
-		// General function
-		getCurrentUser: getCurrentUser,
-		getUsers: getUsers,
 		getShared: getShared
 	};
 
@@ -84,14 +80,6 @@ function kurjunService($http, Upload) {
 			withCredentials: true,
 			headers: {'Content-Type': 'application/json'}
 		});
-	}
-
-	function getCurrentUser() {
-		return $http.get (SERVER_URL + 'rest/ui/identity/user');
-	}
-
-	function getUsers() {
-		return $http.get (SERVER_URL + 'rest/ui/identity/', {withCredentials: true, headers: {'Content-Type': 'application/json'}});
 	}
 
 	function getShared(templateId) {

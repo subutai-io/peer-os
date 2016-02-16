@@ -4,12 +4,12 @@ angular.module('subutai.environment.controller', [])
 	.controller('EnvironmentViewCtrl', EnvironmentViewCtrl)
 	.directive('fileModel', fileModel);
 
-EnvironmentViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'trackerSrv', 'SweetAlert', '$resource', '$compile', 'ngDialog', '$timeout', '$sce', '$stateParams', 'DTOptionsBuilder', 'DTColumnDefBuilder'];
+EnvironmentViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'trackerSrv', 'identitySrv', 'SweetAlert', '$resource', '$compile', 'ngDialog', '$timeout', '$sce', '$stateParams', 'DTOptionsBuilder', 'DTColumnDefBuilder'];
 fileModel.$inject = ['$parse'];
 
 var fileUploader = {};
 
-function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv, SweetAlert, $resource, $compile, ngDialog, $timeout, $sce, $stateParams, DTOptionsBuilder, DTColumnDefBuilder) {
+function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv, identitySrv, SweetAlert, $resource, $compile, ngDialog, $timeout, $sce, $stateParams, DTOptionsBuilder, DTColumnDefBuilder) {
 
 	var vm = this;
 	var GRID_CELL_SIZE = 100;
@@ -77,7 +77,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 		}
 	}
 
-	environmentService.getCurrentUser().success (function (data) {
+	identitySrv.getCurrentUser().success (function (data) {
 		vm.currentUser = data;
 	});
 
@@ -136,7 +136,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 		DTColumnDefBuilder.newColumnDef(2).notSortable(),
 		DTColumnDefBuilder.newColumnDef(3).notSortable(),
 		DTColumnDefBuilder.newColumnDef(4).notSortable(),
-		DTColumnDefBuilder.newColumnDef(5).notSortable(),
+		DTColumnDefBuilder.newColumnDef(5).notSortable()
 	];
 
 	var refreshTable;
@@ -171,7 +171,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 
 	function shareEnvironmentWindow(environment) {
 		vm.listOfUsers = [];
-		environmentService.getUsers().success(function (data) {
+		identitySrv.getUsers().success(function (data) {
 			for (var i = 0; i < data.length; ++i) {
 				if (data[i].id !== vm.currentUser.id) {
 					vm.listOfUsers.push (data[i]);
