@@ -438,7 +438,7 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 						{
 							name: 'subutai.accountSettings',
 							files: [
-								'subutai-app/accountSettings/tokens.js',
+								'subutai-app/accountSettings/accountSettings.js',
 								'subutai-app/accountSettings/controller.js',
 								'subutai-app/identity/service.js'
 							]

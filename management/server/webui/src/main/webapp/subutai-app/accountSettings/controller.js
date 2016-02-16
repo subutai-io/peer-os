@@ -1,11 +1,9 @@
 'use strict';
 
 angular.module('subutai.accountSettings.controller', [])
-.controller('AccountCtrl', AccountCtrl);
-
+	.controller('AccountCtrl', AccountCtrl);
 
 AccountCtrl.$inject = ['identitySrv', '$scope', 'ngDialog', 'SweetAlert', 'cfpLoadingBar', '$timeout'];
-
 
 function AccountCtrl(identitySrv, $scope, ngDialog, SweetAlert, cfpLoadingBar, $timeout) {
 
@@ -33,6 +31,9 @@ function AccountCtrl(identitySrv, $scope, ngDialog, SweetAlert, cfpLoadingBar, $
 		vm.activeUser = data;
 		identitySrv.getKey(vm.activeUser.securityKeyId).success(function (key) {
 			vm.activeUser.publicKey = key;
+			if(key.length == 0 && hasPGPplugin()) {
+				$('.js-auto-set-key').addClass('bp-set-pub-key');
+			}
 		});
 	});
 
@@ -69,6 +70,7 @@ function AccountCtrl(identitySrv, $scope, ngDialog, SweetAlert, cfpLoadingBar, $
 
 	function setPublicKey() {
 		LOADING_SCREEN();
+		$('#js-public-key-manager').removeClass('js-public-key-manager_show');
 		identitySrv.updatePublicKey(encodeURIComponent(vm.activeUser.publicKey)).success(function(data) {
 			identitySrv.createIdentityDelegateDocument().success(function() {
 				LOADING_SCREEN('none');
