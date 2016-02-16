@@ -44,6 +44,6 @@ public class Common
 
     //http/rest client settings
     public static final long DEFAULT_RECEIVE_TIMEOUT = 1000 * 60 * 5;
-    public static final long DEFAULT_CONNECTION_TIMEOUT = 1000 * 10;
+    public static final long DEFAULT_CONNECTION_TIMEOUT = 1000 * 15;
     public static final int DEFAULT_MAX_RETRANSMITS = 3;
 }

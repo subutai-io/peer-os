@@ -35,6 +35,8 @@ function identitySrv($http) {
 		getIdentityDelegateDocument: getIdentityDelegateDocument,
 		approveIdentityDelegate: approveIdentityDelegate,
 
+		getPublicKeyData: getPublicKeyData,
+
 		getUsersUrl : function(){ return USERS_URL },
 		getRolesUrl : function(){ return ROLES_URL },
 		getTokensUrl : function(){ return TOKENS_URL }
@@ -169,5 +171,9 @@ function identitySrv($http) {
 
 	function getKey (id) {
 		return $http.get (SERVER_URL + "rest/v1/security/keyman/getpublickeyring", {params: {hostid: id}});
+	}
+
+	function getPublicKeyData(userId) {
+		return $http.get(USERS_URL + 'key-data/' + userId, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
 	}
 }
