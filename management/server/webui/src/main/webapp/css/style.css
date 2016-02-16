@@ -3207,3 +3207,8 @@ td.b-main-table__status-col {
 .b-hub-status__dropdown .show-more:hover {
     background-color: #fff;
 }
+
+.element-tool-remove {
+	cursor: pointer;
+}
+
