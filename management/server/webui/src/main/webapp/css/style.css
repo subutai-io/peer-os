@@ -492,6 +492,15 @@ input[type=checkbox] {
     font-weight: 400;
 }
 
+.b-main-table_horizontal {
+	
+}
+
+.b-main-table_horizontal th {
+	padding-right: 15px;
+	border-right: 1px solid #CCCEEE;
+}
+
 .b-main-table_white-header {
     border-bottom: 1px solid #CCCEEE;
 }
@@ -3022,6 +3031,10 @@ td.b-main-table__status-col {
 	width: 420px;
 	float: left;
 	margin: 0 100px 0 0;
+}
+
+.b-pgp-page-block_auto-width {
+	width: auto;
 }
 
 .b-pgp-page-block:last-child {

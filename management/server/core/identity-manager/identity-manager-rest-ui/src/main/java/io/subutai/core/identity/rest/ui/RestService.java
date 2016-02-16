@@ -30,6 +30,10 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     Response getActiveUser();
 
+    @GET
+    @Path( "/key-data/{userId}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response getPublicKeyData( @PathParam( "userId" ) Long userId );
 
     @POST
     @Produces( { MediaType.APPLICATION_JSON } )

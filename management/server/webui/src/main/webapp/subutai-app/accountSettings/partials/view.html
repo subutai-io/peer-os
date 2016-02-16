@@ -1,94 +1,87 @@
-<div ng-controller="AccountCtrl as tokensCtrl">
+<div ng-controller="AccountCtrl as accountCtrl">
 
-  <div class="b-workspace__header b-workspace__header_tabs">
+	<div class="b-workspace__header b-workspace__header_tabs">
 
-    <div class="b-tabs-menu b-tabs-menu_header">
+		<div class="b-tabs-menu b-tabs-menu_header">
 
-      <div ng-include="'subutai-app/common/partials/login-header.html'"></div>
+			<div ng-include="'subutai-app/common/partials/login-header.html'"></div>
 
-      <ul>
-        <li class="b-tabs-menu__item b-tabs-menu__item_active">
-          Public key
-        </li>
-        <li class="b-tabs-menu__item" ui-sref="change-pass">
-          Change password
-        </li>
-      </ul>
-    </div>
-  </div>
+			<ul>
+				<li class="b-tabs-menu__item b-tabs-menu__item_active">
+					Public key
+				</li>
+				<li class="b-tabs-menu__item" ui-sref="change-pass">
+					Change password
+				</li>
+			</ul>
+		</div>
+</div>
 
-  <div class="b-workspace__content">
-    <div class="b-form">
-      <div class="b-pgp-page-row">
-        <div class="b-pgp-page-row_list">
-          <div class="b-pgp-page-block">
-            <div class="b-form-label b-form-label_fix-size-1">User Info</div>
-            <div class="b-main-table-border">
-              <table class="b-main-table b-main-table_with-header" align="center">
-                <tr>
-                  <th>Status</th>
-                  <td>Active</td>
-                </tr>
-                <tr>
-                  <th>Full Name</th>
-                  <td>{{ tokensCtrl.activeUser.fullName }}</td>
-                </tr>
-                <tr>
-                  <th>Fingerprint</th>
-                  <td>{{ tokensCtrl.activeUser.fingerprint }}</td>
-                </tr>
-                <tr>
-                  <th>Email</th>
-                  <td>{{ tokensCtrl.activeUser.email }}</td>
-                </tr>
-                <tr>
-                  <th>Public Key:</th>
-                  <td>
-                    <textarea class="b-form-input b-form-input_textarea bp-set-pub-key"
-                              ng-model="tokensCtrl.activeUser.publicKey"
-                              style="width: 380px; height: 160px; font-family: monospace;">
-                    </textarea>
-                   </td>
-                </tr>
-                <tr>
-                  <th></th>
-                  <td><button class="b-btn b-btn_blue" ng-click="tokensCtrl.setPublicKey()">
-                    Set public key
-                  </button>
-                  </td>
-                </tr>
-              </table>
-            </div>
-          </div>
-        </div>
+	<div class="b-workspace__content">
+		<div class="b-form">
 
-        <div class="clear"></div>
-      </div>
+			<div class="b-pgp-page-row">
+				<div class="b-pgp-page-row_list">
+					<div class="b-pgp-page-block b-pgp-page-block_auto-width">
+						<div class="b-form-label b-form-label_fix-size-1">User Info</div>
+						<div class="b-main-table-border">
+							<table class="b-main-table b-main-table_with-header b-main-table_horizontal" align="center">
+								<tr>
+									<th>Status</th>
+									<td>Active</td>
+								</tr>
+								<tr>
+									<th>Full Name</th>
+									<td>{{ accountCtrl.publicKeyInfo.UsernName }}</td>
+								</tr>
+								<tr>
+									<th>PublicKey</th>
+									<td>{{ accountCtrl.publicKeyInfo.PublicKey }}</td>
+								</tr>
+								<tr>
+									<th>Fingerprint</th>
+									<td>{{ accountCtrl.publicKeyInfo.fingerprint }}</td>
+								</tr>
+								<tr>
+									<th>Public Key:</th>
+									<td>
+										<textarea class="b-form-input b-form-input_textarea bp-set-pub-key"
+											ng-model="accountCtrl.activeUser.publicKey"
+											style="width: 380px; height: 160px; font-family: monospace;">
+										</textarea>
+										<div class="b-pgp-page-block__buttons">
+											<button class="b-btn b-btn_blue" ng-click="accountCtrl.setPublicKey()">
+												Set public key
+											</button>
+											<div class="clear"></div>
+										</div>
+									</td>
+								</tr>
+								<tr ng-show="!accountCtrl.hasPGPplugin">
+									<th>Message:</th>
+									<td>
+										<textarea class="b-form-input b-form-input_full b-form-input_textarea bp-sign-input"
+											ng-model="accountCtrl.message"
+											ng-change="accountCtrl.autoSign()"
+											style="width: 380px; height: 160px; font-family: monospace;">
+										</textarea>
+										<div class="b-pgp-page-block__buttons">
+											<button class="b-btn b-btn_blue" ng-click="accountCtrl.approveDocument()">
+												Approve delegate document
+											</button>
+											<div class="clear"></div>
+										</div>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</div>
+					<div class="clear"></div>
+				</div>
+			</div>
 
-      <div class="b-pgp-page-row">
-        <div class="b-pgp-page-block" ng-show="!tokensCtrl.hasPGPplugin">
-          <div class="b-form-label b-form-label_fix-size-1">Message</div>
-
-          <div>
-						<textarea class="b-form-input b-form-input_full b-form-input_textarea bp-sign-input"
-                      ng-model="tokensCtrl.message"
-                      ng-change="tokensCtrl.autoSign()"
-                      style="width: 420px; height: 160px; font-family: monospace;">
-						</textarea>
-          </div>
-
-          <div class="b-pgp-page-block__buttons">
-            <button class="b-btn b-btn_blue" ng-click="tokensCtrl.approveDocument()">
-              Approve delegate document
-            </button>
-            <div class="clear"></div>
-          </div>
-        </div>
-        <div class="clear"></div>
-      </div>
-
-    </div>
-  </div>
+		</div>
+	</div>
 
 </div>
 
