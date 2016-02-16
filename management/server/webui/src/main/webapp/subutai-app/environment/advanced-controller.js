@@ -415,10 +415,21 @@ function AdvancedEnvironmentCtrl($scope, environmentService, trackerSrv, SweetAl
 	//resource host object
 	joint.shapes.resourceHostHtml = {};
 	joint.shapes.resourceHostHtml.Element = joint.shapes.basic.Rect.extend({
+
+		markup: [
+			'<g class="rotatable">',
+				'<g class="scalable">',
+					'<rect />',
+					//'<circle class="b-peer-remove js-delete-peer"/>',
+				'</g>',
+			'</g>'
+		].join(''),
+
 		defaults: joint.util.deepSupplement({
 			type: 'resourceHostHtml.Element',
 			attrs: {
-				rect: { stroke: 'none', 'fill-opacity': 0, 'pointer-events':'none' }
+				rect: { stroke: 'none', 'fill-opacity': 0, 'pointer-events':'none' },
+				'circle.b-peer-remove': {fill: '#F8FBFD', stroke: '#CCCEEE', "stroke-width": 1, r: 8, transform: 'translate(16,28)'},
 			}
 		}, joint.shapes.basic.Rect.prototype.defaults)
 	});
@@ -431,7 +442,7 @@ function AdvancedEnvironmentCtrl($scope, environmentService, trackerSrv, SweetAl
 		template: [
 			'<div class="b-resource-host">',
 				'<div class="b-peer-title"></div>',
-				'<button class="b-peer-delete js-delete-peer"></button>',
+				//'<button class="b-peer-delete js-delete-peer"></button>',
 				'<div class="b-resource-host__inner">',
 					'<div class="b-recouce-host-title"></div>',
 					'<div class="b-resource-host__containers">',
