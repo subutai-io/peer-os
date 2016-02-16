@@ -7,7 +7,7 @@ angular.module('subutai.environment.controller', [])
 EnvironmentViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'trackerSrv', 'SweetAlert', '$resource', '$compile', 'ngDialog', '$timeout', '$sce', '$stateParams', 'DTOptionsBuilder', 'DTColumnDefBuilder'];
 fileModel.$inject = ['$parse'];
 
-var fileUploder = {};
+var fileUploader = {};
 
 function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv, SweetAlert, $resource, $compile, ngDialog, $timeout, $sce, $stateParams, DTOptionsBuilder, DTColumnDefBuilder) {
 
@@ -430,7 +430,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	}
 
 	function setDomain(domain) {
-		var file = fileUploder;
+		var file = fileUploader;
 		LOADING_SCREEN();
 		environmentService.setDomain(domain, vm.environmentForDomain, file).success(function (data) {
 			SweetAlert.swal("Success!", "You have successfully added domain for " + vm.environmentForDomain + " environment!", "success");
@@ -573,7 +573,7 @@ function fileModel($parse) {
 				document.getElementById("js-uploadFile").value = element[0].files[0].name;
 				scope.$apply(function(){
 					modelSetter(scope, element[0].files[0]);
-					fileUploder = element[0].files[0];
+					fileUploader = element[0].files[0];
 				});
 			});
 		}
