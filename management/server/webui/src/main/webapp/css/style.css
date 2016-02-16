@@ -2787,7 +2787,7 @@ td.b-main-table__status-col {
 
 .b-resource-host {
 	position: absolute;
-	z-index: 4;
+	z-index: 2;
 	pointer-events: none;
 
 	border: 1px solid #CCCEEE;
