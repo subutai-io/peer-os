@@ -13,14 +13,14 @@
 					<div class="b-popup-body-list-title ">Template name</div>
 					<input type="text"
 						   class="b-popup-body-input b-popup-body-input_role"
-						   ng-model="kurjunCtrl.currentEnvironment.name" style="color: #04346E"
+						   ng-model="kurjunCtrl.currentTemplate.name" style="color: #04346E"
 						   required readonly>
 				</div>
 				<div class="popup-body-box">
 					<div class="b-popup-body-list-title ">Select user</div>
 					<div class="b-main-table-border" ng-if="kurjunCtrl.listOfUsers.length > 0">
 						<table class="b-main-table b-main-table_with-header b-main-table_white-header">
-							<tr ng-repeat="user in KurjunCtrl.listOfUsers"
+							<tr ng-repeat="user in kurjunCtrl.listOfUsers"
 								ng-click="kurjunCtrl.addUser2Stack(user)">
 								<td class="b-main-table__name">{{ user.fullName }}</td>
 							</tr>
@@ -72,7 +72,7 @@
 			<div class="clear"></div>
 		</div>
 		<div class="b-popup__footer">
-			<button class="b-btn b-btn_blue g-right" ng-click="kurjunCtrl.shareEnvironment()">Save</button>
+			<button class="b-btn b-btn_blue g-right" ng-click="kurjunCtrl.shareTemplate(kurjunCtrl.currentTemplate)">Save</button>
 			<div class="clear"></div>
 		</div>
 	</form>
