@@ -43,15 +43,15 @@ function AdvancedEnvironmentCtrl($scope, environmentService, trackerSrv, SweetAl
 	vm.showResources = showResources;
 	vm.addResource2Build = addResource2Build;
 
-	/*environmentService.getTemplates()
+	environmentService.getTemplates()
 		.success(function (data) {
 			vm.templates = data;
 		})
 		.error(function (data) {
 			VARS_MODAL_ERROR( SweetAlert, 'Error on getting templates ' + data );
-		});*/
+		});
 
-	vm.templates = ['mongo', 'cassandra', 'master', 'hadoop'];
+	//vm.templates = ['mongo', 'cassandra', 'master', 'hadoop'];
 
 	environmentService.getStrategies().success(function (data) {
 		vm.strategies = data;

@@ -237,7 +237,8 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 								'subutai-app/environment/advanced-controller.js',
 								'subutai-app/environment/service.js',
 								'subutai-app/peerRegistration/service.js',
-								'subutai-app/tracker/service.js'
+								'subutai-app/tracker/service.js',
+								'subutai-app/identity/service.js'
 							]
 						}
 					]);
@@ -281,7 +282,8 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 							files: [
 								'subutai-app/kurjun/kurjun.js',
 								'subutai-app/kurjun/controller.js',
-								'subutai-app/kurjun/service.js'
+								'subutai-app/kurjun/service.js',
+								'subutai-app/identity/service.js'
 							]
 						}
 					]);
