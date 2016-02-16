@@ -65,7 +65,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 
 	//share environment functions
 	vm.shareEnvironmentWindow = shareEnvironmentWindow;
-	vm.toggleSelection = toggleSelection;
 	vm.shareEnvironment = shareEnvironment;
 	vm.addUser2Stack = addUser2Stack;
 	vm.removeUserFromStack = removeUserFromStack;
@@ -172,7 +171,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 
 	function shareEnvironmentWindow(environment) {
 		vm.listOfUsers = [];
-		vm.checkedUsers = [];
 		environmentService.getUsers().success(function (data) {
 			for (var i = 0; i < data.length; ++i) {
 				if (data[i].id !== vm.currentUser.id) {
@@ -209,16 +207,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 				});
 			});
 		});
-	}
-
-	function toggleSelection (user) {
-		for (var i = 0; i < vm.checkedUsers.length; ++i) {
-			if (vm.checkedUsers[i].id === user.id) {
-				vm.checkedUsers.splice (i, 1);
-				return;
-			}
-		}
-		vm.checkedUsers.push (user);
 	}
 
 	function shareEnvironment() {
