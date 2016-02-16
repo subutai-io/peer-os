@@ -43,15 +43,13 @@ public class RestServiceImpl implements RestService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( RestServiceImpl.class );
     private final LocalPeer localPeer;
-    //    private Monitor monitor;
     protected JsonUtil jsonUtil = new JsonUtil();
     protected RestUtil restUtil = new RestUtil();
 
 
-    public RestServiceImpl( final LocalPeer localPeer/*, Monitor monitor*/ )
+    public RestServiceImpl( final LocalPeer localPeer )
     {
         this.localPeer = localPeer;
-        //        this.monitor = monitor;
     }
 
 
@@ -75,51 +73,6 @@ public class RestServiceImpl implements RestService
     public PeerInfo getPeerInfo() throws PeerException
     {
         return localPeer.getPeerInfo();
-    }
-
-
-    //    @Override
-    //    public Response getPeerPolicy( )
-    //    {
-    //        try
-    //        {
-    ////            Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
-    //
-    //            PeerPolicy peerPolicy = localPeer.getPeerInfo().getPeerPolicy();
-    //            if ( peerPolicy == null )
-    //            {
-    //                return Response.ok().build();
-    //            }
-    //            else
-    //            {
-    //                return Response.ok( peerPolicy ).build();
-    //            }
-    //        }
-    //        catch ( Exception e )
-    //        {
-    //            LOGGER.error( "Error getting peer policy #getPeerPolicy", e );
-    //            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
-    //        }
-    //    }
-
-
-    @Override
-    public Response updatePeer( PeerInfo peerInfo )
-    {
-        try
-        {
-            //            PeerInfo p = jsonUtil.from( peerInfo, PeerInfo.class );
-            //            p.setIp( getRequestIp() );
-            //            p.setName( String.format( "Peer %s", p.getId() ) );
-            //            localPeer.update( p );
-
-            return Response.ok( /*jsonUtil.to( p )*/ ).build();
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( "Error updating peerInfo #updatePeer", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
-        }
     }
 
 

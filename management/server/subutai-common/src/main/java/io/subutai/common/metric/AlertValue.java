@@ -20,7 +20,7 @@ import org.codehaus.jackson.annotate.JsonTypeInfo;
 public interface AlertValue<T>
 {
     @JsonProperty( "value" )
-    <T> T getValue();
+    T getValue();
 
     //TODO: throw ValidationException and return exception descriptions
     boolean validate();
