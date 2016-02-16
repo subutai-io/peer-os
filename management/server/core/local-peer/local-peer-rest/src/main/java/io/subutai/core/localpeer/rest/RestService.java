@@ -76,10 +76,6 @@ public interface RestService
     Response setDefaultGateway( @FormParam( "containerId" ) String containerId,
                                 @FormParam( "gatewayIp" ) String gatewayIp );
 
-
-    ;
-
-
     @POST
     @Path( "tunnels/{environmentId}" )
     @Consumes( MediaType.APPLICATION_JSON )
@@ -90,8 +86,7 @@ public interface RestService
     @Path( "pek" )
     @Produces( MediaType.APPLICATION_JSON )
     @Consumes( MediaType.APPLICATION_JSON )
-    PublicKeyContainer createEnvironmentKeyPair( /*@PathParam( "userToken" ) String userToken,*/
-                                                 EnvironmentId environmentId );
+    PublicKeyContainer createEnvironmentKeyPair( EnvironmentId environmentId );
 
     @PUT
     @Path( "pek" )
@@ -113,16 +108,9 @@ public interface RestService
     @Path( "network/{environmentId}" )
     void cleanupNetwork( @PathParam( "environmentId" ) EnvironmentId environmentId );
 
-    @PUT
-    @Path( "update" )
-    @Consumes( MediaType.APPLICATION_JSON )
-    @Produces( MediaType.APPLICATION_JSON )
-    public Response updatePeer( PeerInfo peerInfo );
-
     @GET
     @Path( "container/info" )
     Response getContainerHostInfoById( @QueryParam( "containerId" ) String containerId );
-
 
     @GET
     @Path( "resources" )

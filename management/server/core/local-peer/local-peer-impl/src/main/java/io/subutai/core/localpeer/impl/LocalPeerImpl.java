@@ -1684,11 +1684,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         return Collections.unmodifiableSet( requestListeners );
     }
 
-    //todo Create Environment Key (EK )  with Environment ID
-    //todo Sign EK with UserKey (getActiveSession.getUser.getSecurityKeyID)
-    //todo Create PEK
-    //todo Sign PEK with EK and PEER Key
-
 
     /* ***********************************************
      *  Create PEK

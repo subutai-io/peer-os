@@ -30,50 +30,20 @@ public class PEKGenerationStep
     private final Topology topology;
     private final Environment environment;
     private final PeerManager peerManager;
-    private final User user;
     private SecurityManager securityManager;
 
 
     public PEKGenerationStep( final Topology topology, final Environment environment, final PeerManager peerManager,
-                              SecurityManager securityManager, User user )
+                              SecurityManager securityManager )
     {
         this.topology = topology;
         this.environment = environment;
         this.peerManager = peerManager;
         this.securityManager = securityManager;
-        this.user = user;
     }
 
 
     //TODO this EK should be uploaded by user when creating environment via UI. @Nurkaly!
-    //    private PGPSecretKeyRing createEnvironmentKeyPair( EnvironmentId envId, String userSecKeyId ) throws
-    // PeerException
-    //    {
-    //        KeyManager keyManager = securityManager.getKeyManager();
-    //        String pairId = envId.getId();
-    //        final PGPSecretKeyRing userSecKeyRing = securityManager.getKeyManager().getSecretKeyRing( userSecKeyId );
-    //        try
-    //        {
-    //            KeyPair keyPair = keyManager.generateKeyPair( pairId, false );
-    //
-    //            //******Create PEK *****************************************************************
-    //            PGPSecretKeyRing secRing = PGPKeyUtil.readSecretKeyRing( keyPair.getSecKeyring() );
-    //            PGPPublicKeyRing pubRing = PGPKeyUtil.readPublicKeyRing( keyPair.getPubKeyring() );
-    //
-    //            //***************Save Keys *********************************************************
-    //            keyManager.saveSecretKeyRing( pairId, SecurityKeyType.EnvironmentKey.getId(), secRing );
-    //            keyManager.savePublicKeyRing( pairId, SecurityKeyType.EnvironmentKey.getId(), pubRing );
-    //
-    //            //***************Sign Keys *********************************************************
-    //            securityManager.getKeyManager().setKeyTrust( userSecKeyRing, pubRing, KeyTrustLevel.Full.getId() );
-    //
-    //            return secRing;
-    //        }
-    //        catch ( PGPException ex )
-    //        {
-    //            throw new PeerException( ex );
-    //        }
-    //    }
 
 
     public Map<Peer, String> execute() throws PeerException
@@ -125,8 +95,9 @@ public class PEKGenerationStep
                         peerManager.getLocalPeer().getId() + "-" + environment.getEnvironmentId().getId(),
                         localPeerSignedPEK );
 
-                peerManager.getLocalPeer().addPeerEnvironmentPubKey(
-                        peer.getId() + "-" + environment.getEnvironmentId().getId(), signedPEK );
+                peerManager.getLocalPeer()
+                           .addPeerEnvironmentPubKey( peer.getId() + "-" + environment.getEnvironmentId().getId(),
+                                   signedPEK );
             }
             catch ( PGPException e )
             {

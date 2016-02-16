@@ -91,8 +91,7 @@ public class EnvironmentImportWorkflow extends Workflow<EnvironmentImportWorkflo
 
         try
         {
-            new PEKGenerationStep( topology, environment, peerManager, securityManager,
-                    identityManager.getActiveUser() ).execute();
+            new PEKGenerationStep( topology, environment, peerManager, securityManager ).execute();
 
             environment = environmentManager.saveOrUpdate( environment );
 
