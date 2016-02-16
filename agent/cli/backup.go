@@ -80,7 +80,7 @@ func BackupContainer(container string, full bool) {
 	}
 
 	log.Check(log.FatalLevel, "Copy meta files",
-		exec.Command("rsync", "-av", `--exclude`, `/rootfs`, config.Agent.LxcPrefix+container+"/", tmpBackupDir+"meta").Run())
+		exec.Command("rsync", "-av", `--exclude`, `/rootfs`, `--exclude`, `/home`, `--exclude`, `/opt`, `--exclude`, `/var`, config.Agent.LxcPrefix+container+"/", tmpBackupDir+"meta").Run())
 
 	log.Check(log.FatalLevel, "Create Changelog file on tmpdir",
 		ioutil.WriteFile(changelogName, []byte(strings.Join(changelog, "\n")), 0644))
@@ -157,17 +157,23 @@ func GetModifiedList(td, ytd, rdir string) []string {
 	return list
 }
 
-// there make some checks of dir
 func GetLastSnapshotDir(currentDT, path string) string {
+	lastSnapshot := ""
+
 	dirs, _ := filepath.Glob(path + "/*")
-	dirs_orig := []string{path + "/home", path + "/opt", path + "/rootfs", path + "/var"}
-
-	if reflect.DeepEqual(dirs, dirs_orig) {
-		if len(dirs) != 0 {
-			return dirs[len(dirs)-1]
-		}
-
+	if len(dirs) == 0 {
+		return ""
 	}
 
-	return ""
+	lastSnapshot = dirs[len(dirs)-1]
+
+	dirs_last, _ := filepath.Glob(lastSnapshot + "/*")
+	dirs_orig := []string{lastSnapshot + "/home", lastSnapshot + "/opt", lastSnapshot + "/rootfs", lastSnapshot + "/var"}
+
+	// check last snapshot dir
+	if !reflect.DeepEqual(dirs_last, dirs_orig) {
+		return ""
+	}
+
+	return lastSnapshot
 }
