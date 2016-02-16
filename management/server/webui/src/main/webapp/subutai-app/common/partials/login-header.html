@@ -1,79 +1,64 @@
-<div class="b-header__userbar b-header__userbar_right" ng-controller="CurrentUserCtrl as currentUserCtrl">
-	<span id="js-plugin-version" class="b-plugin-version"></span>
-	<script>
-		$(document).ready(function(){
+<div ng-controller="CurrentUserCtrl as currentUserCtrl">
+	<div class="b-header__userbar b-header__userbar_right">
+		<span id="js-plugin-version" class="b-plugin-version"></span>
+		<script>
+			$(document).ready(function(){
 
-			function addPluginVersion(pluginVersion) {
-				$('#js-plugin-version').text('plugin version: ' + pluginVersion + ' / ');
-			}
-
-			setTimeout(function(){
-				if($('#bp-plugin-version').val().length > 0) {
-					addPluginVersion($('#bp-plugin-version').val());
+				function addPluginVersion(pluginVersion) {
+					$('#js-plugin-version').text('plugin version: ' + pluginVersion + ' / ');
 				}
-			}, 2000);
 
-			$('body').on('change', '#bp-plugin-version', function(){
-				if($(this).val().length > 0) {
-					addPluginVersion($(this).val());
-				}
+				setTimeout(function(){
+					if($('#bp-plugin-version').val().length > 0) {
+						addPluginVersion($('#bp-plugin-version').val());
+					}
+				}, 2000);
+
+				$('body').on('change', '#bp-plugin-version', function(){
+					if($(this).val().length > 0) {
+						addPluginVersion($(this).val());
+					}
+				});
+
 			});
-
-		});
-	</script>
-	<!--<i class="fa fa-sign-in b-plugin-version"></i>-->
-	<span ng-if="currentUserCtrl.currentUser" class="b-header-userbar-name">
-		<a href ng-click="currentUserCtrl.logout()" class="b-header-userbar-name">
-			{{ currentUserCtrl.currentUser }} <i class="fa fa-sign-out b-header-userbar__icon"></i>
+		</script>
+		<!--<i class="fa fa-sign-in b-plugin-version"></i>-->
+		<span ng-if="currentUserCtrl.currentUser" class="b-header-userbar-name">
+			<a href ng-click="currentUserCtrl.logout()" class="b-header-userbar-name">
+				{{ currentUserCtrl.currentUser }} <i class="fa fa-sign-out b-header-userbar__icon"></i>
+			</a>
+		</span>
+		<a href ui-sref="login"
+			class="b-header-userbar-name"
+			ng-if="!currentUserCtrl.currentUser">
+			Login
 		</a>
-	</span>
-	<a href ui-sref="login"
-		class="b-header-userbar-name"
-		ng-if="!currentUserCtrl.currentUser">
-		Login
-	</a>
-</div>
-<div class="b-hub-status g-right">
-	<a href="#" class="b-hub-status__btn b-hub-status__btn_active g-margin-right-half js-notification">hub <i class="fa fa-angle-down"></i></a>
-	<div class="b-hub-status__dropdown">
-		<div class="header">
-			Log in
-		</div>
-		<div class="body">
-			<div class="b-form-group g-margin-bottom">
-				<div class="g-text g-margin-bottom-half">Login</div>
-				<input type="text" class="b-form-input b-form-input_full" value="Login">
+	</div>
+	<div class="b-hub-status g-right">
+		<a href="#" ng-class="{'b-hub-status__btn_active' : currentUserCtrl.hubStatus }" class="b-hub-status__btn g-margin-right-half js-notification">hub <i class="fa fa-angle-down"></i></a>
+		<div class="b-hub-status__dropdown">
+			<div ng-if="!currentUserCtrl.hubStatus">
+				<div class="header">
+					Log in
+				</div>
+				<div class="body">
+					<div class="b-form-group g-margin-bottom">
+						<div class="g-text g-margin-bottom-half">Login</div>
+						<input type="text" class="b-form-input b-form-input_full" ng-model="currentUserCtrl.login">
+					</div>
+					<div class="b-form-group">
+						<div class="g-text g-margin-bottom-half">Password</div>
+						<input type="password" class="b-form-input b-form-input_full" value="******" ng-model="currentUserCtrl.pass">
+					</div>
+				</div>
+				<div class="footer">
+					<a href="https://hub.subut.ai" class="b-form-label">Register</a> 
+					<button class="b-btn b-btn_green g-right" ng-click="currentUserCtrl.hubRegister()">Login</button>
+				</div>
 			</div>
-			<div class="b-form-group">
-				<div class="g-text g-margin-bottom-half">Password</div>
-				<input type="password" class="b-form-input b-form-input_full" value="******">
+			<div ng-if="currentUserCtrl.hubStatus">
+				Already registered
 			</div>
-		</div>
-		<div class="footer">
-			<a class="b-form-label">Register</a> <a href="#" class="b-btn b-btn_green g-right">Login</a>
-		</div>
-		<div class="js-hidden-public-key" style="display: none;">
-			<textarea class="b-form-input b-form-input_textarea bp-set-pub-key" 
-				ng-model="tokensCtrl.activeUser.publicKey" 
-				style="height: 160px; font-family: monospace;">
-			</textarea>
 		</div>
 	</div>
-	<!--<div class="b-hub-status__dropdown">
-		<ul class="list">
-			<li><a href="#">Your SS version is obsolete, please update
-				it to 4.0.0-RC7</a>
-				<div class="date">8 February at 22:25</div>
-			</li>
-			<li><a href="#">Your SS version is obsolete, please update
-				it to 4.0.0-RC7</a>
-				<div class="date">8 February at 22:25</div>
-				<div class="buttons">
-					<a href="#" class="b-btn b-btn_green">Register</a>
-					<a href="#" class="b-btn b-btn_white">Ignore</a>
-				</div>
-			</li>
-		</ul>
-		<a href="#" class="show-more">Show more</a>
-	</div>-->
 </div>
