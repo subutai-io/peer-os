@@ -7,7 +7,7 @@ angular.module('subutai.environment.controller', [])
 EnvironmentViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'trackerSrv', 'SweetAlert', '$resource', '$compile', 'ngDialog', '$timeout', '$sce', '$stateParams', 'DTOptionsBuilder', 'DTColumnDefBuilder'];
 fileModel.$inject = ['$parse'];
 
-var fileUploder = {};
+var fileUploader = {};
 
 function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv, SweetAlert, $resource, $compile, ngDialog, $timeout, $sce, $stateParams, DTOptionsBuilder, DTColumnDefBuilder) {
 
@@ -46,7 +46,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	vm.currentUser = {};
 
 	// functions
-	vm.chengeMode = chengeMode;
+	vm.changeMode = changeMode;
 
 	vm.destroyEnvironment = destroyEnvironment;
 	vm.sshKey = sshKey;
@@ -65,13 +65,11 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 
 	//share environment functions
 	vm.shareEnvironmentWindow = shareEnvironmentWindow;
-	vm.toggleSelection = toggleSelection;
 	vm.shareEnvironment = shareEnvironment;
 	vm.addUser2Stack = addUser2Stack;
 	vm.removeUserFromStack = removeUserFromStack;
-	vm.containersTags = containersTags;
 
-	function chengeMode(modeStatus) {
+	function changeMode(modeStatus) {
 		if(modeStatus) {
 			vm.activeMode = 'advanced';
 		} else {
@@ -173,7 +171,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 
 	function shareEnvironmentWindow(environment) {
 		vm.listOfUsers = [];
-		vm.checkedUsers = [];
 		environmentService.getUsers().success(function (data) {
 			for (var i = 0; i < data.length; ++i) {
 				if (data[i].id !== vm.currentUser.id) {
@@ -210,16 +207,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 				});
 			});
 		});
-	}
-
-	function toggleSelection (user) {
-		for (var i = 0; i < vm.checkedUsers.length; ++i) {
-			if (vm.checkedUsers[i].id === user.id) {
-				vm.checkedUsers.splice (i, 1);
-				return;
-			}
-		}
-		vm.checkedUsers.push (user);
 	}
 
 	function shareEnvironment() {
@@ -283,49 +270,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 		});
 	}
 
-	function containersTags (data) {
-		vm.installedContainers = [];
-
-		var containersTotal = {};
-		for(var i = 0; i < data.containers.length; i++) {
-			if(containersTotal[data.containers[i].templateName] === undefined) {
-				containersTotal[data.containers[i].templateName] = {};
-			}
-
-			if(containersTotal[data.containers[i].templateName][data.containers[i].type] === undefined) {
-				containersTotal[data.containers[i].templateName][data.containers[i].type] = 0;
-			}
-
-			if(data.containers[i].state != 'RUNNING') {
-				if(containersTotal[data.containers[i].templateName]['INACTIVE'] === undefined) {
-					containersTotal[data.containers[i].templateName]['INACTIVE'] = 0;
-				}
-				containersTotal[data.containers[i].templateName]['INACTIVE'] += 1;
-			} else {
-				containersTotal[data.containers[i].templateName][data.containers[i].type] += 1;
-			}
-		}
-
-		var containersHTML = '';
-		for(var template in containersTotal) {
-			for (var type in containersTotal[template]){
-				if(containersTotal[template][type] > 0) {
-					if(type != 'INACTIVE') {
-						var tooltipContent = '<div class="b-nowrap">Quota: <div class="b-quota-type-round b-quota-type-round_' + quotaColors[type] + '"></div> <b>' + type + '</b></div><span class="b-nowrap">State: <b>RUNNING</b></span>';
-					} else {
-						var tooltipContent = 'State: <b>INACTIVE</b>';
-					}
-					containersTotal[template].color = quotaColors[type];
-					containersTotal[template].counts = containersTotal[template][type];
-					containersTotal[template].type = type;
-					containersTotal[template].tooltip = tooltipContent;
-					containersTotal[template].dataID = data.id;
-				}
-			}
-		}
-		vm.installedContainers = containersTotal;
-	}
-
 	function getContainersSortedByQuota(containers) {
 		var sortedContainers = containers.length > 0 ? {} : null;
 		for (var index = 0; index < containers.length; index++) {
@@ -350,7 +294,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 		for(var item in sortedContainers) {
 			sortedContainers[item].tooltip = "";
 			for(var container in sortedContainers[item].containers) {
-				sortedContainers[item].tooltip += container + ":&nbsp;<b>" + sortedContainers[item].containers[container] + "</b> ";
+				sortedContainers[item].tooltip += container + ":&nbsp;<b>" + sortedContainers[item].containers[container] + "</b><br/>";
 			}
 		}
 		console.log();
@@ -486,7 +430,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	}
 
 	function setDomain(domain) {
-		var file = fileUploder;
+		var file = fileUploader;
 		LOADING_SCREEN();
 		environmentService.setDomain(domain, vm.environmentForDomain, file).success(function (data) {
 			SweetAlert.swal("Success!", "You have successfully added domain for " + vm.environmentForDomain + " environment!", "success");
@@ -629,7 +573,7 @@ function fileModel($parse) {
 				document.getElementById("js-uploadFile").value = element[0].files[0].name;
 				scope.$apply(function(){
 					modelSetter(scope, element[0].files[0]);
-					fileUploder = element[0].files[0];
+					fileUploader = element[0].files[0];
 				});
 			});
 		}
