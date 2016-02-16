@@ -69,7 +69,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	vm.shareEnvironment = shareEnvironment;
 	vm.addUser2Stack = addUser2Stack;
 	vm.removeUserFromStack = removeUserFromStack;
-	vm.containersTags = containersTags;
 
 	function chengeMode(modeStatus) {
 		if(modeStatus) {
@@ -281,49 +280,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 		environmentService.revoke (environmentId).success (function (data) {
 			loadEnvironments();
 		});
-	}
-
-	function containersTags (data) {
-		vm.installedContainers = [];
-
-		var containersTotal = {};
-		for(var i = 0; i < data.containers.length; i++) {
-			if(containersTotal[data.containers[i].templateName] === undefined) {
-				containersTotal[data.containers[i].templateName] = {};
-			}
-
-			if(containersTotal[data.containers[i].templateName][data.containers[i].type] === undefined) {
-				containersTotal[data.containers[i].templateName][data.containers[i].type] = 0;
-			}
-
-			if(data.containers[i].state != 'RUNNING') {
-				if(containersTotal[data.containers[i].templateName]['INACTIVE'] === undefined) {
-					containersTotal[data.containers[i].templateName]['INACTIVE'] = 0;
-				}
-				containersTotal[data.containers[i].templateName]['INACTIVE'] += 1;
-			} else {
-				containersTotal[data.containers[i].templateName][data.containers[i].type] += 1;
-			}
-		}
-
-		var containersHTML = '';
-		for(var template in containersTotal) {
-			for (var type in containersTotal[template]){
-				if(containersTotal[template][type] > 0) {
-					if(type != 'INACTIVE') {
-						var tooltipContent = '<div class="b-nowrap">Quota: <div class="b-quota-type-round b-quota-type-round_' + quotaColors[type] + '"></div> <b>' + type + '</b></div><span class="b-nowrap">State: <b>RUNNING</b></span>';
-					} else {
-						var tooltipContent = 'State: <b>INACTIVE</b>';
-					}
-					containersTotal[template].color = quotaColors[type];
-					containersTotal[template].counts = containersTotal[template][type];
-					containersTotal[template].type = type;
-					containersTotal[template].tooltip = tooltipContent;
-					containersTotal[template].dataID = data.id;
-				}
-			}
-		}
-		vm.installedContainers = containersTotal;
 	}
 
 	function getContainersSortedByQuota(containers) {
