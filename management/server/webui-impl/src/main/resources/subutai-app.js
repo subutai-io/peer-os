@@ -28,11 +28,15 @@ startup.$inject = ['$rootScope', '$state', '$location', '$http'];
 
 function CurrentUserCtrl($location, $rootScope, $http) {
 	var vm = this;
-	localStorage.setItem('hubRegistered', 'false');
 	vm.currentUser = localStorage.getItem('currentUser');
 	vm.hubStatus = localStorage.getItem('hubRegistered');
 	vm.currentUserRoles = [];
-	console.log(vm.hubStatus);
+
+	if( vm.hubStatus != true )
+	{
+		vm.hubStatus = false;
+	}
+
 
 	vm.login;
 	vm.pass;

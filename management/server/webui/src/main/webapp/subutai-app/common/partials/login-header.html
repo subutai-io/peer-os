@@ -34,7 +34,7 @@
 	</a>
 </div>
 <div class="b-hub-status g-right">
-	<a href="#" ng-class="{b-hub-status__btn_active : currentUserCtrl.hubStatus}" class="b-hub-status__btn g-margin-right-half js-notification">hub <i class="fa fa-angle-down"></i></a>
+	<a href="#" ng-class="{'b-hub-status__btn_active' : currentUserCtrl.hubStatus }" class="b-hub-status__btn g-margin-right-half js-notification">hub <i class="fa fa-angle-down"></i></a>
 	<div class="b-hub-status__dropdown">
 		<div ng-if="!currentUserCtrl.hubStatus">
 			<div class="header">
@@ -51,7 +51,7 @@
 				</div>
 			</div>
 			<div class="footer">
-				<a href="hub.subut.ai" class="b-form-label">Register</a> <a ng-click="currentUserCtrl.hubRegister()" class="b-btn b-btn_green g-right">Login</a>
+				<a href="https://hub.subut.ai" class="b-form-label">Register</a> <a ng-click="currentUserCtrl.hubRegister()" class="b-btn b-btn_green g-right">Login</a>
 			</div>
 		</div>
 		<div ng-if="currentUserCtrl.hubStatus">
