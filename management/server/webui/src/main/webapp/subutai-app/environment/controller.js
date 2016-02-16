@@ -46,7 +46,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	vm.currentUser = {};
 
 	// functions
-	vm.chengeMode = chengeMode;
+	vm.changeMode = changeMode;
 
 	vm.destroyEnvironment = destroyEnvironment;
 	vm.sshKey = sshKey;
@@ -70,7 +70,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	vm.addUser2Stack = addUser2Stack;
 	vm.removeUserFromStack = removeUserFromStack;
 
-	function chengeMode(modeStatus) {
+	function changeMode(modeStatus) {
 		if(modeStatus) {
 			vm.activeMode = 'advanced';
 		} else {
