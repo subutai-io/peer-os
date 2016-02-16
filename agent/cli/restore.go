@@ -10,7 +10,9 @@ import (
 	"time"
 
 	"github.com/subutai-io/Subutai/agent/config"
+	lxcContainer "github.com/subutai-io/Subutai/agent/lib/container"
 	"github.com/subutai-io/Subutai/agent/lib/fs"
+	"github.com/subutai-io/Subutai/agent/lib/template"
 	"github.com/subutai-io/Subutai/agent/log"
 
 	"github.com/pivotal-golang/archiver/extractor"
@@ -21,18 +23,20 @@ func RestoreContainer(container, date, newContainer string) {
 
 	currentDT := strconv.Itoa(int(time.Now().Unix()))
 	tmpUnpackDir := config.Agent.LxcPrefix + "lxc-data/tmpdir/unpacking_" + currentDT + "/"
+
+	// tmpUnpackDir := backupDir + "tmpdir/unpacking_" + container + "_" + currentDT + "/"
+	log.Check(log.FatalLevel, "Create UnPack tmp dir: "+tmpUnpackDir,
+		os.MkdirAll(tmpUnpackDir, 0755))
+
 	newContainerTmpDir := tmpUnpackDir + newContainer + "/"
 
 	// making dir to newContainer
 	log.Check(log.FatalLevel, "Create tmp dir for extract",
 		os.MkdirAll(tmpUnpackDir+"/"+newContainer, 0755))
 
-	// subutai restore container date newcontainer
-	// argsWithoutProg := os.Args[1:]
-	// var flist []string
 	flist, _ := filepath.Glob(backupDir + "*.tar.gz")
 	tarball, _ := filepath.Glob(backupDir + container + "_" + date + "*.tar.gz")
-	log.Info(backupDir + container + "_" + date + "*.tar.gz")
+
 	if len(tarball) == 0 {
 		log.Fatal("Backup file for found: " + backupDir + container + "_" + date + "*.tar.gz")
 	}
@@ -45,7 +49,6 @@ func RestoreContainer(container, date, newContainer string) {
 		flist = tarball
 	}
 
-	log.Info(strings.Join(flist, ", "))
 	if !strings.Contains(flist[0], "Full") {
 		log.Fatal("Cannot find Full Backup")
 	}
@@ -55,56 +58,43 @@ func RestoreContainer(container, date, newContainer string) {
 		log.Check(log.WarnLevel, "Remove unpacked deltas dir",
 			os.RemoveAll(tmpUnpackDir+container))
 
-		log.Info("unpacking " + file)
+		log.Debug("unpacking " + file)
 		Unpack(file, tmpUnpackDir+container)
 		deltas, _ := filepath.Glob(tmpUnpackDir + container + "/*.delta")
 
 		// install deltas
 		for _, deltaFile := range deltas {
 			deltaName := strings.Replace(path.Base(deltaFile), ".delta", "", -1)
-			parent := (newContainerTmpDir + container + "-" + deltaName + "@parent")
-			dst := (newContainerTmpDir)
-			if strings.Contains(file, "Full") {
-				parent = dst
-			}
-			log.Info(parent + ";" + dst + ";" + "unpacking_" + currentDT + "/" + container + "/" + path.Base(deltaFile))
+			parent := (newContainerTmpDir + deltaName + "@parent")
+			dst := newContainerTmpDir
+			// if strings.Contains(file, "Full") {
+			// 	parent = dst
+			// }
 			fs.Receive(parent, dst, "unpacking_"+currentDT+"/"+container+"/"+path.Base(deltaFile),
 				!strings.Contains(file, "Full"))
 
-			fs.SubvolumeDestroy(newContainerTmpDir + container + "-" + deltaName + "@parent")
-			log.Check(log.DebugLevel, "Rename unpacked subvolume to @parent "+newContainerTmpDir+container+"-"+deltaName+"@today"+" -> "+newContainerTmpDir+container+"-"+deltaName+"@parent",
+			fs.SubvolumeDestroy(newContainerTmpDir + deltaName + "@parent")
+			log.Check(log.DebugLevel, "Rename unpacked subvolume to @parent "+newContainerTmpDir+deltaName+" -> "+newContainerTmpDir+deltaName+"@parent",
 				exec.Command("mv",
-					newContainerTmpDir+container+"-"+deltaName+"@today",
-					newContainerTmpDir+container+"-"+deltaName+"@parent").Run())
+					newContainerTmpDir+deltaName,
+					newContainerTmpDir+deltaName+"@parent").Run())
 		}
-
 	}
+
+	// create NewContainer subvolume
+	fs.SubvolumeCreate(config.Agent.LxcPrefix + newContainer)
 
 	// move volumes
 	volumes, _ := filepath.Glob(newContainerTmpDir + "/*")
-	log.Info(strings.Join(volumes, ", "))
 
 	for _, volume := range volumes {
 		fs.SetVolReadOnly(volume, false)
-
-		switch {
-		case strings.Contains(volume, "rootfs"):
-			log.Check(log.FatalLevel, "Create Container dir",
-				os.MkdirAll(config.Agent.LxcPrefix+newContainer, 0755))
-			log.Check(log.DebugLevel, "Move rootfs volume to "+config.Agent.LxcPrefix+newContainer,
-				exec.Command("mv", volume, config.Agent.LxcPrefix+newContainer+"/rootfs").Run())
-		case strings.Contains(volume, "opt"):
-			log.Check(log.DebugLevel, "Move opt volume to "+config.Agent.LxcPrefix+newContainer,
-				exec.Command("mv", volume, config.Agent.LxcPrefix+"/lxc/"+newContainer+"-opt").Run())
-		case strings.Contains(volume, "home"):
-			log.Check(log.DebugLevel, "Move home volume to "+config.Agent.LxcPrefix+newContainer,
-				exec.Command("mv", volume, config.Agent.LxcPrefix+"/lxc-data/"+newContainer+"-home").Run())
-		case strings.Contains(volume, "var"):
-			log.Check(log.DebugLevel, "Move car volume to "+config.Agent.LxcPrefix+newContainer,
-				exec.Command("mv", volume, config.Agent.LxcPrefix+"/lxc-data/"+newContainer+"-var").Run())
-
-		}
+		volumeName := path.Base(volume)
+		volumeName = strings.Replace(volumeName, "@parent", "", -1)
+		log.Check(log.DebugLevel, "Move "+volumeName+" volume to "+config.Agent.LxcPrefix+newContainer+"/"+volumeName,
+			exec.Command("mv", volume, config.Agent.LxcPrefix+newContainer+"/"+volumeName).Run())
 	}
+
 	// restore meta files
 	log.Check(log.FatalLevel, "Restore meta files",
 		exec.Command("rsync", "-av", tmpUnpackDir+container+"/meta/", config.Agent.LxcPrefix+newContainer).Run())
@@ -112,6 +102,23 @@ func RestoreContainer(container, date, newContainer string) {
 	// clean
 	log.Check(log.WarnLevel, "Remove unpacked deltas dir",
 		os.RemoveAll(tmpUnpackDir))
+
+	// changing newcontainer mac
+	lxcContainer.SetContainerConf(newContainer, [][]string{
+		{"lxc.network.hwaddr", template.Mac()},
+	})
+
+	// changing newcontainer config
+	lxcContainer.SetContainerConf(newContainer, [][]string{
+		{"lxc.network.veth.pair", strings.Replace(lxcContainer.GetConfigItem(config.Agent.LxcPrefix+newContainer+"/config", "lxc.network.hwaddr"), ":", "", -1)},
+		{"lxc.network.script.up", config.Agent.AppPrefix + "bin/create_ovs_interface"},
+		{"lxc.rootfs", config.Agent.LxcPrefix + newContainer + "/rootfs"},
+		{"lxc.mount.entry", config.Agent.LxcPrefix + newContainer + "/home home none bind,rw 0 0"},
+		{"lxc.mount.entry", config.Agent.LxcPrefix + newContainer + "/opt opt none bind,rw 0 0"},
+		{"lxc.mount.entry", config.Agent.LxcPrefix + newContainer + "/var var none bind,rw 0 0"},
+		{"lxc.utsname", newContainer},
+		{"lxc.mount", config.Agent.LxcPrefix + newContainer + "/fstab"},
+	})
 
 }
 

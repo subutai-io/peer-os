@@ -13,7 +13,7 @@ import (
 	"strings"
 )
 
-func mac() string {
+func Mac() string {
 	buf := make([]byte, 6)
 	_, err := rand.Read(buf)
 	log.Check(log.ErrorLevel, "Generating random mac", err)
@@ -24,7 +24,7 @@ func MngInit() {
 	fs.ReadOnly("management", false)
 	container.SetContainerUid("management")
 	container.SetContainerConf("management", [][]string{
-		{"lxc.network.hwaddr", mac()},
+		{"lxc.network.hwaddr", Mac()},
 		{"lxc.network.veth.pair", "management"},
 		{"lxc.network.script.up", config.Agent.AppPrefix + "bin/create_ovs_interface"},
 		{"lxc.network.link", ""},
