@@ -2876,7 +2876,8 @@ td.b-main-table__status-col {
 
 
 .b-switcher {
-    padding: 10px 0;
+    padding: 11px 0;
+    line-height: normal;
 }
 
 /*Toggle btn*/
@@ -3083,6 +3084,11 @@ td.b-main-table__status-col {
 
 /*Hub status*/
 .b-hub-status {
+    line-height: normal;
+    padding: 11px;
+    position: relative;
+}
+.b-hub-statu.b-switchers {
     position: relative;
     color: #04346E;
 }
@@ -3092,8 +3098,8 @@ td.b-main-table__status-col {
     border: 2px solid #ccceee;
     border-radius: 2px;
     width: 50px;
-    height: 30px;
-    line-height: 30px;
+    height: 26px;
+    line-height: 26px;
     vertical-align: middle;
     text-align: center;
     text-decoration: none;
