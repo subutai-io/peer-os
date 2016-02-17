@@ -116,7 +116,15 @@
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="peer/reject">
-      <action class="io.subutai.core.peer.cli.RejectRegistrationCommand">
+      <action class="io.subutai.core.peer.cli.RejectPeerCommand">
+        <property name="peerManager" ref="peerManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="peer/unregister">
+      <action class="io.subutai.core.peer.cli.UnregisterPeerCommand">
         <property name="peerManager" ref="peerManager" />
       </action>
     </command>
