@@ -7,11 +7,11 @@ package io.subutai.core.identity.rest.ui;
 public class KeyDataJson
 {
     private int keyType = 1;
-    private String key;
-    private String fingerprint;
-    private String id;
-    private String userId;
-    private String expiryDate;
+    private String key = "";
+    private String fingerprint = "";
+    private String id = "";
+    private String userId = "";
+    private String expiryDate = "";
 
 
     public int getKeyType()
