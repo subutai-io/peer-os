@@ -420,16 +420,20 @@ function AdvancedEnvironmentCtrl($scope, environmentService, trackerSrv, SweetAl
 			'<g class="rotatable">',
 				'<g class="scalable">',
 					'<rect />',
-					//'<circle class="b-peer-remove js-delete-peer"/>',
 				'</g>',
-			'</g>'
+			'</g>',
+			'<g class="element-tool-remove">',
+				'<circle fill="#F8FBFD" r="10" stroke="#dcdcdc"/>',
+				'<polygon transform="scale(1.2) translate(-5, -5)" fill="#292F6C" points="8.4,2.4 7.6,1.6 5,4.3 2.4,1.6 1.6,2.4 4.3,5 1.6,7.6 2.4,8.4 5,5.7 7.6,8.4 8.4,7.6 5.7,5 "/>',
+				'<title>Remove</title>',
+			'</g>',
 		].join(''),
 
 		defaults: joint.util.deepSupplement({
 			type: 'resourceHostHtml.Element',
 			attrs: {
 				rect: { stroke: 'none', 'fill-opacity': 0, 'pointer-events':'none' },
-				'circle.b-peer-remove': {fill: '#F8FBFD', stroke: '#CCCEEE', "stroke-width": 1, r: 8, transform: 'translate(16,28)'},
+				'g.element-tool-remove': {'ref-x': 156, 'ref-y': 0}
 			}
 		}, joint.shapes.basic.Rect.prototype.defaults)
 	});
@@ -471,6 +475,19 @@ function AdvancedEnvironmentCtrl($scope, environmentService, trackerSrv, SweetAl
 			this.updateBox();
 			return this;
 		},
+		pointerclick: function (evt, x, y) {
+			var className = evt.target.parentNode.getAttribute('class');
+			switch (className) {
+				case 'element-tool-remove':
+					this.model.remove();
+					return;
+					break;
+				default:
+			}
+		},
+		pointermove: function(evt, x, y) {
+			return false;
+		},
 		updateBox: function() {
 			// Set the position and dimension of the box so that it covers the JointJS element.
 			var bbox = this.model.getBBox();
@@ -488,8 +505,10 @@ function AdvancedEnvironmentCtrl($scope, environmentService, trackerSrv, SweetAl
 			this.$box.css({ width: bbox.width, height: bbox.height, left: bbox.x, top: bbox.y, transform: 'rotate(' + (this.model.get('angle') || 0) + 'deg)' });
 		},
 		removeBox: function(evt) {
-			var keys = Object.keys(PEER_MAP[vm.currentPeer].rh);
-			keys.splice(keys.indexOf(this.model.get('hostId')), 1);
+			var rhKeys = Object.keys(PEER_MAP[vm.currentPeer].rh);
+			var hostIndex = rhKeys.indexOf(this.model.get('hostId'));
+			//var swapFrom = rhKeys.slice(hostIndex, -1);
+
 			var emptyPlace = this.model.get('size').height - 8;
 			delete PEER_MAP[this.model.get('peerId')].rh[this.model.get('hostId')];
 
@@ -497,8 +516,8 @@ function AdvancedEnvironmentCtrl($scope, environmentService, trackerSrv, SweetAl
 				delete PEER_MAP[this.model.get('peerId')];
 			} else {
 
-				for(var i = 0; i < keys.length; i++) {
-					var resourceHost = graph.getCell(PEER_MAP[vm.currentPeer].rh[keys[i]]);
+				for(var i = hostIndex + 1; i < rhKeys.length; i++) {
+					var resourceHost = graph.getCell(PEER_MAP[vm.currentPeer].rh[rhKeys[i]]);
 					var resourceHostPosition = resourceHost.get('position');
 					console.log(resourceHostPosition);
 					resourceHost.set('position', {x: resourceHostPosition.x, y: (resourceHostPosition.y - emptyPlace)});
@@ -671,6 +690,7 @@ function placeRhSimple( model ) {
 	if(children >= (size * size)) {
 		var currentModelSize = model.get('size');
 		model.resize(currentModelSize.width + 60, currentModelSize.height + 60);
+		model.attr('g.element-tool-remove/ref-x', model.get('size').width + 1);
 	}
 
 	array[size] = new Array();
