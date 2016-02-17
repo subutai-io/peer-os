@@ -1,10 +1,10 @@
 package io.subutai.core.bazaar.api;
 
 
-import io.subutai.core.bazaar.api.model.Plugin;
-import io.subutai.plugin.hub.api.HubPluginException;
-
 import java.util.List;
+
+import io.subutai.core.bazaar.api.model.Plugin;
+import io.subutai.core.hubmanager.api.HubPluginException;
 
 public interface Bazaar
 {

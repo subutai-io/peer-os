@@ -15,9 +15,9 @@
     <module>bazaar-plugin-api</module>
     <module>bazaar-plugin-impl</module>
     <module>bazaar-plugin-rest</module>
-	<module>plugin-manager-api</module>
-	<module>plugin-manager-impl</module>
-	<module>plugin-manager-rest</module>
+    <module>plugin-manager-api</module>
+    <module>plugin-manager-impl</module>
+    <module>plugin-manager-rest</module>
   </modules>
 
 </project>

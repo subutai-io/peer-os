@@ -10,7 +10,7 @@
 
 
 	<reference id="integration"
-			   interface="io.subutai.plugin.hub.api.Integration" />
+			   interface="io.subutai.core.hubmanager.api.Integration" />
 
 	<bean id="daoManagerPlugin" init-method="init" class="io.subutai.common.dao.DaoManager" scope="prototype">
 		<jpa:unit unitname="BazaarConfigPUnit" property="entityManagerFactory" />

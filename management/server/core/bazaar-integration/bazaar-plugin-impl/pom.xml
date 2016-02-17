@@ -19,12 +19,12 @@
 	<dependency>
 		<groupId>${project.groupId}</groupId>
 		<artifactId>bazaar-plugin-api</artifactId>
-		<version>4.0.0-RC6</version>
+    <version>${project.version}</version>
 	</dependency>
 	<dependency>
 		<groupId>${project.groupId}</groupId>
-		<artifactId>hub-plugin-api</artifactId>
-		<version>4.0.0-RC6</version>
+		<artifactId>hub-manager-api</artifactId>
+    <version>${project.version}</version>
 	</dependency>
   </dependencies>
 

@@ -1,10 +1,11 @@
 package io.subutai.core.bazaar.rest;
 
-import io.subutai.common.util.JsonUtil;
-import io.subutai.core.bazaar.api.Bazaar;
-import io.subutai.plugin.hub.api.HubPluginException;
 
 import javax.ws.rs.core.Response;
+
+import io.subutai.common.util.JsonUtil;
+import io.subutai.core.bazaar.api.Bazaar;
+import io.subutai.core.hubmanager.api.HubPluginException;
 
 public class RestServiceImpl implements RestService
 {

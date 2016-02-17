@@ -8,8 +8,8 @@ import io.subutai.core.bazaar.api.Bazaar;
 import io.subutai.core.bazaar.api.dao.ConfigDataService;
 import io.subutai.core.bazaar.api.model.Plugin;
 import io.subutai.core.bazaar.impl.dao.ConfigDataServiceImpl;
-import io.subutai.plugin.hub.api.HubPluginException;
-import io.subutai.plugin.hub.api.Integration;
+import io.subutai.core.hubmanager.api.HubPluginException;
+import io.subutai.core.hubmanager.api.Integration;
 
 
 public class BazaarImpl implements Bazaar
