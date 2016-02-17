@@ -4,12 +4,14 @@ package io.subutai.core.identity.rest.ui;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
 
+import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,26 +20,32 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.google.gson.reflect.TypeToken;
 
+import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
+import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.PermissionScope;
 import io.subutai.common.security.objects.TokenType;
 import io.subutai.common.security.objects.UserType;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.identity.api.model.Role;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserDelegate;
+import io.subutai.core.security.api.model.SecurityKey;
 
 
 public class RestServiceImpl implements RestService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( RestServiceImpl.class );
+    private SecurityManager securityManager = null;
     protected JsonUtil jsonUtil = new JsonUtil();
     private IdentityManager identityManager;
 
 
-    public RestServiceImpl( final IdentityManager identityManager )
+    public RestServiceImpl( final IdentityManager identityManager, final SecurityManager securityManager )
     {
         this.identityManager = identityManager;
+        this.securityManager = securityManager;
     }
 
 
@@ -91,10 +99,27 @@ public class RestServiceImpl implements RestService
     @Override
     public Response getPublicKeyData( final Long userId )
     {
-        User activeUser = identityManager.getActiveUser();
+        User user = identityManager.getUser( userId );
+        KeyDataJson keyData = new KeyDataJson();
+
         try
         {
-            return Response.ok( jsonUtil.to( activeUser ) ).build();
+            PGPPublicKeyRing pubRing = securityManager.getKeyManager().getPublicKeyRing( user.getSecurityKeyId() );
+
+            keyData.setFingerprint( PGPKeyUtil.getFingerprint( pubRing.getPublicKey().getFingerprint()));
+            keyData.setKey( PGPEncryptionUtil.armorByteArrayToString( pubRing.getEncoded() ) );
+
+            for (Iterator<String> iter = pubRing.getPublicKey().getUserIDs(); iter.hasNext(); )
+            {
+                String id = iter.next();
+
+                if(!Strings.isNullOrEmpty( id ))
+                {
+                    keyData.setUserId( keyData.getUserId()+":"+ id);
+                }
+            }
+
+            return Response.ok( jsonUtil.to( keyData ) ).build();
         }
         catch ( Exception e )
         {
@@ -102,6 +127,39 @@ public class RestServiceImpl implements RestService
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
+
+
+    @Override
+    public Response checkUserKey( final Long userId )
+    {
+        User user = identityManager.getUser( userId );
+
+        try
+        {
+            int status = 0;
+
+            SecurityKey keyData = securityManager.getKeyManager().getKeyData( user.getSecurityKeyId() );
+
+            if(keyData != null)
+            {
+                String pFprint = keyData.getPublicKeyFingerprint();
+                String sFprint = keyData.getSecretKeyFingerprint();
+
+                if(pFprint.equals( sFprint ))
+                    status = 1;
+                else
+                    status = 2;
+            }
+
+            return Response.ok( jsonUtil.to( status ) ).build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error getting Public Key Data #getPublicKeyData", e );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
 
 
     // @todo convert to User object
