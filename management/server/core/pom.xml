@@ -42,6 +42,7 @@
     <module>object-relation-manager</module>
     <module>system-manager</module>
     <module>bazaar-integration</module>
+    <module>hub-manager</module>
   </modules>
 
 </project>

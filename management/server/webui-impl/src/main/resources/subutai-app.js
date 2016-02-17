@@ -53,7 +53,7 @@ function CurrentUserCtrl($location, $rootScope, $http) {
 
 	function hubRegister()
 	{
-		$http.post( SERVER_URL + 'rest/hub/register?hubIp=hub.subut.ai&email=' + vm.login + '&password=' + vm.pass, {withCredentials: true} )
+		$http.post( SERVER_URL + 'rest/v1/hub/register?hubIp=hub.subut.ai&email=' + vm.login + '&password=' + vm.pass, {withCredentials: true} )
 			.success(function () {
 				localStorage.setItem('hubRegistered', true);
 				vm.hubStatus = true;

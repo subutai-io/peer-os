@@ -19,7 +19,7 @@
 	  <dependency>
 		  <groupId>${project.groupId}</groupId>
 		  <artifactId>bazaar-plugin-api</artifactId>
-		  <version>4.0.0-RC6</version>
+      <version>${project.version}</version>
 	  </dependency>
 	  <dependency>
 		  <groupId>org.apache.cxf</groupId>
@@ -29,7 +29,7 @@
 	  <dependency>
 		  <groupId>io.subutai</groupId>
 		  <artifactId>subutai-common</artifactId>
-		  <version>4.0.0-RC6</version>
+      <version>${project.version}</version>
 	  </dependency>
   </dependencies>
 
