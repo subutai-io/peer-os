@@ -36,6 +36,7 @@ function identitySrv($http) {
 		approveIdentityDelegate: approveIdentityDelegate,
 
 		getPublicKeyData: getPublicKeyData,
+		checkUserKey: checkUserKey,
 
 		getUsersUrl : function(){ return USERS_URL },
 		getRolesUrl : function(){ return ROLES_URL },
