@@ -170,7 +170,7 @@ function identitySrv($http) {
 	}
 
 	function getKey (id) {
-		return $http.get (SERVER_URL + "rest/v1/security/keyman/getpublickeyring", {params: {hostid: id}});
+		return $http.get (SERVER_URL + "rest/v1/security/keyman/getpublickey", {params: {hostid: id}});
 	}
 
 	function getPublicKeyData(userId) {
