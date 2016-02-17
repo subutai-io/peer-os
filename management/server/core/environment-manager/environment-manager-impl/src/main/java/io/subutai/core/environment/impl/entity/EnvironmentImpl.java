@@ -390,7 +390,7 @@ public class EnvironmentImpl implements Environment, Serializable
                 {
                     final EnvironmentContainerHost containerHost = iterator.next();
                     RelationMeta relationMeta =
-                            new RelationMeta( userDelegate, userDelegate, containerHost, containerHost.getId() );
+                            new RelationMeta( userDelegate, this, containerHost, containerHost.getId() );
                     boolean trustedRelation =
                             relationManager.getRelationInfoManager().allHasReadPermissions( relationMeta );
 

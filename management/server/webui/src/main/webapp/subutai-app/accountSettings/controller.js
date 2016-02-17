@@ -11,6 +11,7 @@ function AccountCtrl(identitySrv, $scope, ngDialog, SweetAlert, cfpLoadingBar, $
 
 	vm.message = "That's my message!";
 	vm.activeUser = {publicKey: ''};
+	vm.publicKey = '';
 
 	vm.hasPGPplugin = true;
 	$timeout(function() {
@@ -27,23 +28,21 @@ function AccountCtrl(identitySrv, $scope, ngDialog, SweetAlert, cfpLoadingBar, $
 	vm.autoSign = autoSign;
 	vm.setPublicKey = setPublicKey;
 
-	identitySrv.getCurrentUser().success(function (data) {
+	identitySrv.getCurrentUser().success(function (data)
+	{
 		vm.activeUser = data;
-		identitySrv.getKey(vm.activeUser.securityKeyId).success(function (key) {
-			vm.activeUser.publicKey = key;
-			if(key.length == 0 && hasPGPplugin()) {
-				$('.js-auto-set-key').addClass('bp-set-pub-key');
-			}
-		});
 
 		identitySrv.getPublicKeyData(vm.activeUser.id).success(function (data) {
 			vm.publicKeyInfo = data;
 		});
+
+		identitySrv.checkUserKey(vm.activeUser.id).success(function (data) {
+			if(data <= 1) {
+				$('.js-auto-set-key').addClass('bp-set-pub-key');
+			}
+		});
 	});
 
-	identitySrv.getTokenTypes().success(function (data) {
-		vm.tokensType = data;
-	});
 
 	function getDelegateDocument() {
 		identitySrv.getIdentityDelegateDocument().success(function(data) {
@@ -72,10 +71,10 @@ function AccountCtrl(identitySrv, $scope, ngDialog, SweetAlert, cfpLoadingBar, $
 		}
 	}
 
-	function setPublicKey() {
+	function setPublicKey(publicKey) {
 		LOADING_SCREEN();
 		$('#js-public-key-manager').removeClass('js-public-key-manager_show');
-		identitySrv.updatePublicKey(encodeURIComponent(vm.activeUser.publicKey)).success(function(data) {
+		identitySrv.updatePublicKey(encodeURIComponent(publicKey)).success(function(data) {
 			identitySrv.createIdentityDelegateDocument().success(function() {
 				LOADING_SCREEN('none');
 				getDelegateDocument();
@@ -89,4 +88,3 @@ function AccountCtrl(identitySrv, $scope, ngDialog, SweetAlert, cfpLoadingBar, $
 		});
 	};
 }
-

@@ -59,6 +59,7 @@ import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
+import io.subutai.core.identity.api.model.UserDelegate;
 import io.subutai.core.object.relation.api.RelationManager;
 import io.subutai.core.object.relation.api.model.RelationMeta;
 
@@ -361,10 +362,12 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
                 RelationManager relationManager = envImpl.getRelationManager();
 
                 User activeUser = identityManager.getActiveUser();
+                UserDelegate userDelegate = identityManager.getUserDelegate( activeUser );
+
                 if ( activeUser != null )
                 {
                     RelationMeta relationMeta =
-                            new RelationMeta( activeUser, activeUser, environment, environment.getId() );
+                            new RelationMeta( userDelegate, userDelegate, environment, environment.getId() );
                     boolean trustedRelation =
                             relationManager.getRelationInfoManager().groupHasWritePermissions( relationMeta );
 

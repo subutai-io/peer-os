@@ -36,6 +36,7 @@ function identitySrv($http) {
 		approveIdentityDelegate: approveIdentityDelegate,
 
 		getPublicKeyData: getPublicKeyData,
+		checkUserKey: checkUserKey,
 
 		getUsersUrl : function(){ return USERS_URL },
 		getRolesUrl : function(){ return ROLES_URL },
@@ -175,5 +176,9 @@ function identitySrv($http) {
 
 	function getPublicKeyData(userId) {
 		return $http.get(USERS_URL + 'key-data/' + userId, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
+	}
+
+	function checkUserKey(userId) {
+		return $http.get(USERS_URL + 'check-user-key/' + userId, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
 	}
 }
