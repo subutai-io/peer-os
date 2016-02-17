@@ -48,7 +48,7 @@ import io.subutai.core.peer.api.PeerManager;
  */
 public class ContainerCloneStep
 {
-    private static final Logger logger = LoggerFactory.getLogger( ContainerCloneStep.class );
+    private static final Logger LOGGER = LoggerFactory.getLogger( ContainerCloneStep.class );
     private final TemplateManager templateRegistry;
     private final String defaultDomain;
     private final Topology topology;
@@ -104,7 +104,7 @@ public class ContainerCloneStep
                             requestedContainerCount, totalAvailableIpCount ) );
         }
 
-        ExecutorService taskExecutor = getExecutor( placement.size() );
+        ExecutorService taskExecutor = Executors.newFixedThreadPool( placement.size() );
 
         CompletionService<Set<NodeGroupBuildResult>> taskCompletionService = getCompletionService( taskExecutor );
 
@@ -115,7 +115,7 @@ public class ContainerCloneStep
         for ( Map.Entry<String, Set<NodeGroup>> peerPlacement : placement.entrySet() )
         {
             Peer peer = peerManager.getPeer( peerPlacement.getKey() );
-            logger.debug( String.format( "Scheduling node group task on peer %s", peer.getId() ) );
+            LOGGER.debug( String.format( "Scheduling node group task on peer %s", peer.getId() ) );
 
             taskCompletionService.submit(
                     new CreatePeerNodeGroupsTask( peer, peerPlacement.getValue(), peerManager.getLocalPeer(),
@@ -130,6 +130,8 @@ public class ContainerCloneStep
             environment.setLastUsedIpIndex( currentLastUsedIpIndex );
         }
 
+        taskExecutor.shutdown();
+
         //collect results
         Set<String> errors = Sets.newHashSet();
 
@@ -141,7 +143,7 @@ public class ContainerCloneStep
                 Set<NodeGroupBuildResult> results = futures.get();
                 for ( NodeGroupBuildResult result : results )
                 {
-                    logger.debug( String.format( "Node group build result: %s", result ) );
+                    LOGGER.debug( String.format( "Node group build result: %s", result ) );
                     if ( !CollectionUtil.isCollectionEmpty( result.getContainers() ) )
                     {
                         environment.addContainers( result.getContainers() );
@@ -159,8 +161,6 @@ public class ContainerCloneStep
                 errors.add( exceptionUtil.getRootCauseMessage( e ) );
             }
         }
-
-        taskExecutor.shutdown();
 
         if ( !errors.isEmpty() )
         {
@@ -197,14 +197,8 @@ public class ContainerCloneStep
         }
         catch ( Exception ex )
         {
-            logger.info( "Error building relation", ex );
+            LOGGER.info( "Error building relation", ex );
         }
-    }
-
-
-    protected ExecutorService getExecutor( int numOfThreads )
-    {
-        return Executors.newFixedThreadPool( numOfThreads );
     }
 
 
