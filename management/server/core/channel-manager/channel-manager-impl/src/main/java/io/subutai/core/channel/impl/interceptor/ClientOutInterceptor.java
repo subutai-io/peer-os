@@ -4,6 +4,9 @@ package io.subutai.core.channel.impl.interceptor;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
@@ -23,7 +26,7 @@ import io.subutai.core.peer.api.PeerManager;
  */
 public class ClientOutInterceptor extends AbstractPhaseInterceptor<Message>
 {
-    //    private static final Logger LOG = LoggerFactory.getLogger( ClientOutInterceptor.class );
+    private static final Logger LOG = LoggerFactory.getLogger( ClientOutInterceptor.class );
     private final PeerManager peerManager;
 
     private ChannelManagerImpl channelManagerImpl = null;
@@ -106,7 +109,7 @@ public class ClientOutInterceptor extends AbstractPhaseInterceptor<Message>
         }
         catch ( PeerException e )
         {
-            //            LOG.warn( e.getMessage() );
+            LOG.warn( e.getMessage() );
         }
     }
 
@@ -122,7 +125,7 @@ public class ClientOutInterceptor extends AbstractPhaseInterceptor<Message>
         }
         catch ( PeerException e )
         {
-            //            LOG.warn( e.getMessage() );
+            LOG.warn( e.getMessage() );
         }
     }
 }

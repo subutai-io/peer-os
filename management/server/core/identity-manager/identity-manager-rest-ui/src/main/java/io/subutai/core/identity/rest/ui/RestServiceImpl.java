@@ -88,6 +88,21 @@ public class RestServiceImpl implements RestService
         }
     }
 
+    @Override
+    public Response getPublicKeyData( final Long userId )
+    {
+        User activeUser = identityManager.getActiveUser();
+        try
+        {
+            return Response.ok( jsonUtil.to( activeUser ) ).build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error getting Public Key Data #getPublicKeyData", e );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
 
     // @todo convert to User object
     @Override

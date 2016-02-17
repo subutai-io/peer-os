@@ -34,6 +34,10 @@ function AccountCtrl(identitySrv, $scope, ngDialog, SweetAlert, cfpLoadingBar, $
 		identitySrv.getKey(vm.activeUser.securityKeyId).success(function (key) {
 			vm.activeUser.publicKey = key;
 		});
+
+		identitySrv.getPublicKeyData(vm.activeUser.id).success(function (data) {
+			vm.publicKeyInfo = data;
+		});
 	});
 
 	identitySrv.getTokenTypes().success(function (data) {

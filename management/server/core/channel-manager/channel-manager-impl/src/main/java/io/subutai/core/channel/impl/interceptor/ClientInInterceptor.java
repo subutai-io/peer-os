@@ -5,6 +5,9 @@ import java.net.URL;
 
 import javax.ws.rs.core.HttpHeaders;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.message.Message;
@@ -27,7 +30,7 @@ import io.subutai.core.peer.api.PeerManager;
 public class ClientInInterceptor extends AbstractPhaseInterceptor<Message>
 {
 
-    //    private static final Logger LOG = LoggerFactory.getLogger( ClientInInterceptor.class );
+    private static final Logger LOG = LoggerFactory.getLogger( ClientInInterceptor.class );
     private ChannelManagerImpl channelManagerImpl = null;
     private PeerManager peerManager;
 
@@ -82,7 +85,7 @@ public class ClientInInterceptor extends AbstractPhaseInterceptor<Message>
                         }
                         else
                         {
-                            //                            LOG.warn( "Path is not handled by crypto handler: " + path );
+//                            LOG.warn( "Path is not handled by crypto handler: " + path );
                         }
                     }
                 }
@@ -105,7 +108,7 @@ public class ClientInInterceptor extends AbstractPhaseInterceptor<Message>
         }
         catch ( PeerException e )
         {
-            //            LOG.warn( e.getMessage() );
+            LOG.warn( e.getMessage() );
         }
     }
 
@@ -121,7 +124,7 @@ public class ClientInInterceptor extends AbstractPhaseInterceptor<Message>
         }
         catch ( PeerException e )
         {
-            //            LOG.warn( e.getMessage() );
+            LOG.warn( e.getMessage() );
         }
     }
 }
