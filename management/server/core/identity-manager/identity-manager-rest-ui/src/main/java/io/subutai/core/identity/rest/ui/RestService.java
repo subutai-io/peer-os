@@ -35,6 +35,13 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     Response getPublicKeyData( @PathParam( "userId" ) Long userId );
 
+
+    @GET
+    @Path( "/check-user-key/{userId}" )
+    @Produces( { MediaType.TEXT_PLAIN } )
+    Response checkUserKey( @PathParam( "userId" ) Long userId );
+
+
     @POST
     @Produces( { MediaType.APPLICATION_JSON } )
     Response saveUser( @FormParam( "username" ) String username, @FormParam( "full_name" ) String fullName,
