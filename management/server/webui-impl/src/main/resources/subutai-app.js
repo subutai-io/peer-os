@@ -17,8 +17,12 @@ var app = angular.module('subutai-app', [
 
 	.controller('SubutaiController', SubutaiController)
 	.controller('CurrentUserCtrl', CurrentUserCtrl)
+
 	.controller('LiveTrackerCtrl', LiveTrackerCtrl)
 	.factory('liveTrackerSrv', liveTrackerSrv)
+
+	.controller('AccountCtrl', AccountCtrl)
+	.factory('identitySrv', identitySrv)
 
 	.run(startup);
 
@@ -438,7 +442,7 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 						{
 							name: 'subutai.accountSettings',
 							files: [
-								'subutai-app/accountSettings/tokens.js',
+								'subutai-app/accountSettings/accountSettings.js',
 								'subutai-app/accountSettings/controller.js',
 								'subutai-app/identity/service.js'
 							]

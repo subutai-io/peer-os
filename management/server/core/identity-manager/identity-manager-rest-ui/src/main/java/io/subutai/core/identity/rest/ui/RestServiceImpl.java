@@ -31,6 +31,7 @@ import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.identity.api.model.Role;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserDelegate;
+import io.subutai.core.security.api.model.SecurityKey;
 
 
 public class RestServiceImpl implements RestService
@@ -126,6 +127,39 @@ public class RestServiceImpl implements RestService
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
+
+
+    @Override
+    public Response checkUserKey( final Long userId )
+    {
+        User user = identityManager.getUser( userId );
+
+        try
+        {
+            int status = 0;
+
+            SecurityKey keyData = securityManager.getKeyManager().getKeyData( user.getSecurityKeyId() );
+
+            if(keyData != null)
+            {
+                String pFprint = keyData.getPublicKeyFingerprint();
+                String sFprint = keyData.getSecretKeyFingerprint();
+
+                if(pFprint.equals( sFprint ))
+                    status = 1;
+                else
+                    status = 2;
+            }
+
+            return Response.ok( jsonUtil.to( status ) ).build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error getting Public Key Data #getPublicKeyData", e );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
 
 
     // @todo convert to User object
