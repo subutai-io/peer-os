@@ -12,11 +12,9 @@ function SettingsPeerCtrl ($scope, SettingsPeerSrv, SweetAlert) {
 	function getConfig() {
 		SettingsPeerSrv.getSettingsConfig().success (function (data) {
 			vm.settingsConfig = data;
-			vm.settingsConfig.peerOwnerIdHint = vm.settingsConfig.userPeerOwnerNameHint = false;
 		});
 		SettingsPeerSrv.getPolicyConfig().success (function (data) {
 			vm.policyConfig = data;
-            vm.policyConfig.peerIdHint = vm.policyConfig.diskUsageLimitHint = vm.policyConfig.cpuUsageLimitHint = vm.policyConfig.memoryUsageLimitHint = vm.policyConfig.environmentLimitHint = vm.policyConfig.containerLimitHint = false;
 		});
 	}
 	getConfig();

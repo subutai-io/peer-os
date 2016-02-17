@@ -12,8 +12,8 @@ function SettingsKurjunCtrl($scope, SettingsKurjunSrv, SweetAlert) {
     function getConfig() {
         SettingsKurjunSrv.getConfig().success(function (data) {
             vm.config = data;
+    	});
     }
-
     getConfig();
 
 
