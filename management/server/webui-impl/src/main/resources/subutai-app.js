@@ -517,29 +517,6 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 				}]
 			}
 		})
-		.state('plugin_integrator', {
-			url: '/plugin_integrator',
-			templateUrl: 'subutai-app/plugin_integrator/partials/view.html',
-			data: {
-				bodyClass: '',
-				layout: 'default'
-			},
-			resolve: {
-				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
-					return $ocLazyLoad.load([
-						{
-							name: 'subutai.plugin_integrator',
-							files: [
-								'subutai-app/plugin_integrator/plugin_integrator.js',
-								'subutai-app/plugin_integrator/controller.js',
-								'subutai-app/plugin_integrator/service.js',
-								'subutai-app/identity/service.js'
-							]
-						}
-					]);
-				}]
-			}
-		})
 		.state('settings-peer', {
 			url: '/settings-peer',
 			templateUrl: 'subutai-app/settingsPeer/partials/view.html',
@@ -622,6 +599,29 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
                                 'subutai-app/settingsSecurity/settingsSecurity.js',
                                 'subutai-app/settingsSecurity/controller.js',
                                 'subutai-app/settingsSecurity/service.js'
+                            ]
+                        }
+                    ]);
+                }]
+            }
+        })
+        .state('bazaar', {
+            url: '/bazaar',
+            templateUrl: 'subutai-app/bazaar/partials/view.html',
+            data: {
+                bodyClass: '',
+                layout: 'default'
+            },
+            resolve: {
+                loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([
+                        {
+                            name: 'subutai.bazaar',
+                            files: [
+                                'subutai-app/bazaar/bazaar.js',
+                                'subutai-app/bazaar/controller.js',
+                                'subutai-app/bazaar/service.js',
+                                'subutai-app/identity/service.js'
                             ]
                         }
                     ]);
