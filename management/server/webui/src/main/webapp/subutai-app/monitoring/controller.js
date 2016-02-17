@@ -41,7 +41,7 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
 
     monitoringSrv.getResourceHosts().success(function (data) {
 		vm.hosts = data;
-		vm.currentHost = vm.hosts[0].id;
+		vm.currentHost = vm.hosts.length > 0 ? vm.hosts[0].id : null;
 		getServerData();
     });
 
@@ -62,14 +62,14 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
     }
 
     function getServerData() {
-        if (vm.period > 0) {
+        if (vm.period > 0 && vm.currentHost) {
             LOADING_SCREEN();
             monitoringSrv.getInfo(vm.selectedEnvironment, vm.currentHost, vm.period).success(function (data) {
                 vm.charts = [];
-                for (var i = 0; i < data.metrics.length; i++) {
-                    angular.equals(data.metrics[i], {}) ?
+                for (var i = 0; i < data['metrics'].length; i++) {
+                    angular.equals(data['metrics'][i], {}) ?
                         vm.charts.push({data: [], name: "NO DATA"}) :
-                        vm.charts.push(getChartData(data.metrics[i]));
+                        vm.charts.push(getChartData(data['metrics'][i]));
                 }
                 LOADING_SCREEN('none');
             }).error(function (error) {

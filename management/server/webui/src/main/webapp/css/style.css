@@ -2787,7 +2787,7 @@ td.b-main-table__status-col {
 
 .b-resource-host {
 	position: absolute;
-	z-index: 4;
+	z-index: 2;
 	pointer-events: none;
 
 	border: 1px solid #CCCEEE;
@@ -3213,3 +3213,23 @@ td.b-main-table__status-col {
 .b-hub-status__dropdown .show-more:hover {
     background-color: #fff;
 }
+
+.element-tool-remove {
+	cursor: pointer;
+}
+
+.b-public-key-manager {
+	position: fixed;
+	z-index: 10;
+	background-color: #FFF;
+	right: -442px;
+	top: 25%;
+	padding: 10px;
+	border: 1px solid #CCCEEE;
+    transition: all .4s ease-in-out;
+}
+
+.js-public-key-manager_show {
+	right: -2px;
+}
+

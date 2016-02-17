@@ -17,25 +17,53 @@ var app = angular.module('subutai-app', [
 
 	.controller('SubutaiController', SubutaiController)
 	.controller('CurrentUserCtrl', CurrentUserCtrl)
+
 	.controller('LiveTrackerCtrl', LiveTrackerCtrl)
 	.factory('liveTrackerSrv', liveTrackerSrv)
 
+	.controller('AccountCtrl', AccountCtrl)
+	.factory('identitySrv', identitySrv)
+
 	.run(startup);
 
-CurrentUserCtrl.$inject = ['$location', '$rootScope'];
+CurrentUserCtrl.$inject = ['$location', '$rootScope', '$http'];
 routesConf.$inject = ['$httpProvider', '$stateProvider', '$urlRouterProvider', '$ocLazyLoadProvider'];
 startup.$inject = ['$rootScope', '$state', '$location', '$http'];
 
-function CurrentUserCtrl($location, $rootScope, ngDialog, $http, SweetAlert) {
+function CurrentUserCtrl($location, $rootScope, $http) {
 	var vm = this;
 	vm.currentUser = localStorage.getItem('currentUser');
+	vm.hubStatus = localStorage.getItem('hubRegistered');
 	vm.currentUserRoles = [];
+
+	if( vm.hubStatus != true )
+	{
+		vm.hubStatus = false;
+	}
+
+
+	vm.login;
+	vm.pass;
+
 
 	//function
 	vm.logout = logout;
+	vm.hubRegister = hubRegister;
 
 
-	function logout() {
+	function hubRegister()
+	{
+		$http.post( SERVER_URL + 'hub/register?hubIp=hub.subut.ai&email=' + vm.login + '&password=' + vm.pass, {withCredentials: true} )
+			.success(function () {
+				localStorage.setItem('hubRegistered', true);
+				vm.hubStatus = true;
+			}).error (function (error) {
+			console.log('hub/register error: ', error);
+		});
+	}
+
+	function logout()
+	{
 		removeCookie('sptoken');
 		localStorage.removeItem('currentUser');
 		$location.path('login');
@@ -414,7 +442,7 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 						{
 							name: 'subutai.accountSettings',
 							files: [
-								'subutai-app/accountSettings/tokens.js',
+								'subutai-app/accountSettings/accountSettings.js',
 								'subutai-app/accountSettings/controller.js',
 								'subutai-app/identity/service.js'
 							]
@@ -652,6 +680,14 @@ function startup($rootScope, $state, $location, $http) {
 
 	$rootScope.$on('$stateChangeStart',	function(event, toState, toParams, fromState, fromParams){
 		LOADING_SCREEN('none');
+
+		$http.get( SERVER_URL + 'rest/v1/system/peer_settings', {withCredentials: true} )
+			.success(function (data) {
+				localStorage.setItem('hubRegistered', data.isRegisteredToHub);
+			}).error (function (error) {
+			console.log("peer_settings error: ", error);
+		});
+
 		var restrictedPage = $.inArray($location.path(), ['/login']) === -1;
 		if (restrictedPage && !getCookie('sptoken')) {
 			localStorage.removeItem('currentUser');
