@@ -35,6 +35,7 @@ function BazaarCtrl($scope, BazaarSrv, ngDialog, SweetAlert, $location) {
 							for (var j = 0; j < vm.installedHubPlugins.length; ++j) {
 								if (vm.plugins[i].name === vm.installedHubPlugins[j].name) {
 									vm.plugins[i].installed = true;
+									vm.plugins[i].launch = true;
 									vm.plugins[i].hubId = vm.installedHubPlugins[j].id;
 									vm.plugins[i].url = vm.installedHubPlugins[j].url;
 									break;
@@ -103,6 +104,7 @@ function BazaarCtrl($scope, BazaarSrv, ngDialog, SweetAlert, $location) {
 				for (var j = 0; j < vm.installedHubPlugins.length; ++j) {
 					if (vm.plugins[i].name === vm.installedHubPlugins[j].name) {
 						vm.plugins[i].installed = true;
+						vm.plugins[i].launch = true;
 						vm.plugins[i].hubId = vm.installedHubPlugins[j].id;
 						break;
 					}
@@ -401,6 +403,7 @@ function BazaarCtrl($scope, BazaarSrv, ngDialog, SweetAlert, $location) {
 
 	vm.uninstallPlugin = uninstallPlugin;
 	function uninstallPlugin (plugin) {
+		plugin.launch = false;
 		plugin.uninstallButton.options.callback = function (instance) {
 			var progress = 0,
 				interval = setInterval (function() {
@@ -471,4 +474,3 @@ function fileModel($parse) {
 		}
 	};
 }
-
