@@ -31,12 +31,8 @@
 									<td>Active</td>
 								</tr>
 								<tr>
-									<th>Full Name</th>
-									<td>{{ accountCtrl.publicKeyInfo.UsernName }}</td>
-								</tr>
-								<tr>
-									<th>PublicKey</th>
-									<td>{{ accountCtrl.publicKeyInfo.PublicKey }}</td>
+									<th>KeyId(UserId)</th>
+									<td>{{ accountCtrl.publicKeyInfo.userId }}</td>
 								</tr>
 								<tr>
 									<th>Fingerprint</th>
@@ -46,7 +42,7 @@
 									<th>Public Key:</th>
 									<td>
 										<textarea class="b-form-input b-form-input_textarea bp-set-pub-key"
-											ng-model="accountCtrl.activeUser.publicKey"
+											ng-model="accountCtrl.publicKeyInfo.key"
 											style="width: 420px; height: 160px; font-family: monospace;">
 										</textarea>
 										<div class="b-pgp-page-block__buttons">

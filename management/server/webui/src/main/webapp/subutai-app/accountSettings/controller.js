@@ -29,20 +29,20 @@ function AccountCtrl(identitySrv, $scope, ngDialog, SweetAlert, cfpLoadingBar, $
 	vm.autoSign = autoSign;
 	vm.setPublicKey = setPublicKey;
 
-	identitySrv.getCurrentUser().success(function (data) {
+	identitySrv.getCurrentUser().success(function (data)
+	{
 		vm.activeUser = data;
-		identitySrv.getKey(vm.activeUser.securityKeyId).success(function (key) {
-			vm.activeUser.publicKey = key;
-		});
 
-		identitySrv.getPublicKeyData(vm.activeUser.id).success(function (data) {
+		//identitySrv.getKey(vm.activeUser.securityKeyId).success(function (key) {
+		//	vm.activeUser.publicKey = key;
+		//});
+
+		identitySrv.getPublicKeyData(vm.activeUser.id).success(function (data)
+		{
 			vm.publicKeyInfo = data;
 		});
 	});
 
-	identitySrv.getTokenTypes().success(function (data) {
-		vm.tokensType = data;
-	});
 
 	function getDelegateDocument() {
 		identitySrv.getIdentityDelegateDocument().success(function(data) {
@@ -71,9 +71,10 @@ function AccountCtrl(identitySrv, $scope, ngDialog, SweetAlert, cfpLoadingBar, $
 		}
 	}
 
-	function setPublicKey() {
+	function setPublicKey()
+	{
 		LOADING_SCREEN();
-		identitySrv.updatePublicKey(encodeURIComponent(vm.activeUser.publicKey)).success(function(data) {
+		identitySrv.updatePublicKey(encodeURIComponent(vm.publicKeyInfo.key)).success(function(data) {
 			identitySrv.createIdentityDelegateDocument().success(function() {
 				LOADING_SCREEN('none');
 				getDelegateDocument();
