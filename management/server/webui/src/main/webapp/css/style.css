@@ -1589,7 +1589,20 @@ td.b-main-table__status-col {
     vertical-align: top;
     box-sizing: border-box;
 }
-
+.b-workspace-content-row_col-3 {
+    position: relative;
+    width: 33.3%;
+    display: inline-block;
+    vertical-align: top;
+    box-sizing: border-box;
+}
+.b-workspace-content-row_col-4 {
+    position: relative;
+    width: 25%;
+    display: inline-block;
+    vertical-align: top;
+    box-sizing: border-box;
+}
 .b-workspace-content-row_col-2_padding-right {
     padding-right: 25px;
 }
