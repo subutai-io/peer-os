@@ -12,8 +12,6 @@ function SettingsKurjunCtrl($scope, SettingsKurjunSrv, SweetAlert) {
     function getConfig() {
         SettingsKurjunSrv.getConfig().success(function (data) {
             vm.config = data;
-            vm.config.globalKurjunUrlsHint = vm.config.publicDiskQuotaHintHint = vm.config.publicThresholdHint = vm.config.publicTimeFrameHint = vm.config.trustDiskQuotaHint = vm.config.trustThresholdHint = vm.config.trustTimeFrameHint = false;
-        });
     }
 
     getConfig();

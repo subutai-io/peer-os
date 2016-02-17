@@ -1,32 +1,16 @@
 <div class="b-workspace-content b-workspace-content_border" style = "height: 150px">
 	<div class="b-workspace-content__row">
-		<div class="b-workspace-content-row_col-2 b-workspace-content-row_col-2_padding-right">
-			<div class="b-main-table-border" style="width: 500px">
-				<table class="b-main-table b-main-table_with-header" style="width: 500px" align="center">
-					<tr>
-						<th>Current Owner ID</th>
-						<td style="padding-right: 18px"><input class="b-form-input b-form-input_full" type="text"
-															   ng-model="settingsPeerCtrl.settingsConfig.peerOwnerId" ng-focus = "settingsPeerCtrl.settingsConfig.peerOwnerIdHint = true" ng-blur = "settingsPeerCtrl.settingsConfig.peerOwnerIdHint = false" required></td>
-					</tr>
-					<tr>
-						<th>Current Owner Name</th>
-						<td style="padding-right: 18px"><input class="b-form-input b-form-input_full" type="text"
-															   ng-model="settingsPeerCtrl.settingsConfig.userPeerOwnerName" ng-focus = "settingsPeerCtrl.settingsConfig.userPeerOwnerNameHint = true" ng-blur = "settingsPeerCtrl.settingsConfig.userPeerOwnerNameHint = false" required></td>
-					</tr>
-				</table>
-			</div>
-		</div>
-		<div class="b-workspace-content-row_col-2 b-workspace-content-row_col-2_padding-left g-right">
-			<div class="b-main-table-border" style="width: 400px; border: none">
-				<table class="b-main-table" style="width: 400px" align="center">
-					<tr style = "border: none">
-						<td style="padding-right: 18px; height: 30px; font-style: italic"><span ng-show = "settingsPeerCtrl.settingsConfig.peerOwnerIdHint"></span></td>
-					</tr>
-					<tr style = "border: none">
-						<td style="padding-right: 18px; height: 30px; font-style: italic"><span ng-show = "settingsPeerCtrl.settingsConfig.userPeerOwnerNameHint"></span></td>
-					</tr>
-				</table>
-			</div>
+		<div class="b-main-table-border" style="width: 500px">
+			<table class="b-main-table b-main-table_with-header" style="width: 500px" align="center">
+				<tr>
+					<th>Current Owner ID&#160;&#160;<i class="fa fa-question" tooltips tooltip-template="<div style = 'width: 250px'><label class = 'b-form-label'>The ID of the User that owns Peer</label></div>"></i></th>
+					<td style="padding-right: 18px"><input class="b-form-input b-form-input_full" type="text" ng-model="settingsPeerCtrl.settingsConfig.peerOwnerId" required></td>
+				</tr>
+				<tr>
+					<th>Current Owner Name&#160;&#160;<i class="fa fa-question" tooltips tooltip-template="<div style = 'width: 250px'><label class = 'b-form-label'>The Name/Login of the User that owns Peer</label></div>"></i></th>
+					<td style="padding-right: 18px"><input class="b-form-input b-form-input_full" type="text" ng-model="settingsPeerCtrl.settingsConfig.userPeerOwnerName" required></td>
+				</tr>
+			</table>
 		</div>
 		<button
 				class="b-btn b-btn_green g-left g-margin-bottom"

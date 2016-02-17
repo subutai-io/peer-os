@@ -10,30 +10,30 @@
 		<div class="b-workspace-content__row">
 			<div class="b-main-table-border" style = "width: 500px">
 				<table class="b-main-table b-main-table_with-header" style = "width: 500px" align = "center">
-          <tr>
-            <th>External IP Interface</th>
-            <td style = "padding-right: 18px"><input class="b-form-input b-form-input_full" type="text" ng-model="settingsNetworkCtrl.config.externalIpInterface" required></td>
-          </tr>
-          <tr>
-						<th>Open HTTP Port</th>
+				    <tr>
+						<th>External IP Interface&#160;&#160;<i class="fa fa-question" tooltips tooltip-template="<div style = 'width: 250px'><label class = 'b-form-label'>Name of interface containing external host IP</label></div>"></i></th>
+						<td style = "padding-right: 18px"><input class="b-form-input b-form-input_full" type="text" ng-model="settingsNetworkCtrl.config.externalIpInterface" required></td>
+				    </tr>
+				    <tr>
+						<th>Open HTTP Port&#160;&#160;<i class="fa fa-question" tooltips tooltip-template="<div style = 'width: 250px'><label class = 'b-form-label'>Open HTTP port used for UI</label></div>"></i></th>
 						<td style = "padding-right: 18px"><input class="b-form-input b-form-input_full" type="text" ng-model="settingsNetworkCtrl.config.openPort" required></td>
 					</tr>
 					<tr>
-						<th>SSL Port</th>
+						<th>SSL Port&#160;&#160;<i class="fa fa-question" tooltips tooltip-template="<div style = 'width: 250px'><label class = 'b-form-label'>SSL port for all Management-Console communications</label></div>"></i></th>
 						<td style = "padding-right: 18px"><input class="b-form-input b-form-input_full" type="text" ng-model="settingsNetworkCtrl.config.securePortX1" required></td>
 					</tr>
 					<tr>
-						<th>SSL Mutual Port</th>
+						<th>SSL Mutual Port&#160;&#160;<i class="fa fa-question" tooltips tooltip-template="<div style = 'width: 250px'><label class = 'b-form-label'>Peer2Peer communication port</label></div>"></i></th>
 						<td style = "padding-right: 18px"><input class="b-form-input b-form-input_full" type="text" ng-model="settingsNetworkCtrl.config.securePortX2" required></td>
 					</tr>
 					<tr>
-						<th>Reserved SSL Port</th>
+						<th>Reserved SSL Port&#160;&#160;<i class="fa fa-question" tooltips tooltip-template="<div style = 'width: 250px'><label class = 'b-form-label'>Reserved SSL port for all Management-Console communications</label></div>"></i></th>
 						<td style = "padding-right: 18px"><input class="b-form-input b-form-input_full" type="text" ng-model="settingsNetworkCtrl.config.securePortX3" required></td>
 					</tr>
-          <tr>
-            <th>Reserved HTTP Port</th>
-            <td style = "padding-right: 18px"><input class="b-form-input b-form-input_full" type="text" ng-model="settingsNetworkCtrl.config.specialPortX1" required></td>
-          </tr>
+          			<tr>
+            			<th>Reserved HTTP Port&#160;&#160;<i class="fa fa-question" tooltips tooltip-template="<div style = 'width: 250px'><label class = 'b-form-label'>Reserved HTTP port used for UI</label></div>"></i></th>
+            			<td style = "padding-right: 18px"><input class="b-form-input b-form-input_full" type="text" ng-model="settingsNetworkCtrl.config.specialPortX1" required></td>
+          			</tr>
 				</table>
 			</div>
 			<button

@@ -1,76 +1,38 @@
 <div class="b-workspace-content b-workspace-content_border">
 	<div class="b-workspace-content__row">
-		<div class="b-workspace-content-row_col-2 b-workspace-content-row_col-2_padding-right">
-			<div class="b-main-table-border" style = "width: 500px">
-				<table class="b-main-table b-main-table_with-header" style="width: 500px" align="center">
-					<tr>
-						<th colspan="2">Transfer Quota fields (Public repository)</th>
-					</tr>
-					<tr>
-						<th>Disk Quota</th>
-						<td style="padding-right: 18px"><input class="b-form-input b-form-input_full" type="text"
-															   ng-model="settingsKurjunCtrl.config.publicDiskQuota" ng-focus = "settingsKurjunCtrl.config.publicDiskQuotaHint = true" ng-blur = "settingsKurjunCtrl.config.publicDiskQuotaHint = false" required></td>
-					</tr>
-					<tr>
-						<th>Threshold</th>
-						<td style="padding-right: 18px"><input class="b-form-input b-form-input_full" type="text"
-															   ng-model="settingsKurjunCtrl.config.publicThreshold" ng-focus = "settingsKurjunCtrl.config.publicThresholdHint = true" ng-blur = "settingsKurjunCtrl.config.publicThresholdHint = false" required></td>
-					</tr>
-					<tr>
-						<th>TimeFrame</th>
-						<td style="padding-right: 18px"><input class="b-form-input b-form-input_full" type="text"
-															   ng-model="settingsKurjunCtrl.config.publicTimeFrame" ng-focus = "settingsKurjunCtrl.config.publicTimeFrameHint = true" ng-blur = "settingsKurjunCtrl.config.publicTimeFrameHint = false" required></td>
-					</tr>
-					<tr>
-						<th colspan="2">Transfer Quota fields (Trust repository)</th>
-					</tr>
-					<tr>
-						<th>Disk Quota</th>
-						<td style="padding-right: 18px"><input class="b-form-input b-form-input_full" type="text"
-															   ng-model="settingsKurjunCtrl.config.trustDiskQuota" ng-focus = "settingsKurjunCtrl.config.trustDiskQuotaHint = true" ng-blur = "settingsKurjunCtrl.config.trustDiskQuotaHint = false" required></td>
-					</tr>
-					<tr>
-						<th>Threshold</th>
-						<td style="padding-right: 18px"><input class="b-form-input b-form-input_full" type="text"
-															   ng-model="settingsKurjunCtrl.config.trustThreshold" ng-focus = "settingsKurjunCtrl.config.trustThresholdHint = true" ng-blur = "settingsKurjunCtrl.config.trustThresholdHint = false" required></td>
-					</tr>
-					<tr>
-						<th>TimeFrame</th>
-						<td style="padding-right: 18px"><input class="b-form-input b-form-input_full" type="text"
-															   ng-model="settingsKurjunCtrl.config.trustTimeFrame" ng-focus = "settingsKurjunCtrl.config.trustTimeFrameHint = true" ng-blur = "settingsKurjunCtrl.config.trustTimeFrameHint = false" required></td>
-					</tr>
-				</table>
-			</div>
-		</div>
-		<div class="b-workspace-content-row_col-2 b-workspace-content-row_col-2_padding-left g-right" style = "width: 440px">
-			<div class="b-main-table-border" style="width: 400px; border: none">
-				<table class="b-main-table" style="width: 400px;" align="center">
-					<tr style = "border: none">
-						<td style = "height: 16px"></td>
-					</tr>
-					<tr style = "border: none">
-						<td style="padding-right: 18px; height: 30px; font-style: italic"><span ng-show = "settingsKurjunCtrl.config.publicDiskQuotaHint"></span></td>
-					</tr>
-					<tr style = "border: none">
-						<td style="padding-right: 18px; height: 30px; font-style: italic"><span ng-show = "settingsKurjunCtrl.config.publicThresholdHint"></span></td>
-					</tr>
-					<tr style = "border: none">
-						<td style="padding-right: 18px; height: 30px; font-style: italic"><span ng-show = "settingsKurjunCtrl.config.publicTimeFrameHint"></span></td>
-					</tr>
-					<tr style = "border: none">
-						<td style = "height: 16px"></td>
-					</tr>
-					<tr style = "border: none">
-						<td style="padding-right: 18px; height: 30px; font-style: italic"><span ng-show = "settingsKurjunCtrl.config.trustDiskQuotaHint"></span></td>
-					</tr>
-					<tr style = "border: none">
-						<td style="padding-right: 18px; height: 30px; font-style: italic"><span ng-show = "settingsKurjunCtrl.config.trustThresholdHint"></span></td>
-					</tr>
-					<tr style = "border: none">
-						<td style="padding-right: 18px; height: 30px; font-style: italic"><span ng-show = "settingsKurjunCtrl.config.trustTimeFrameHint"></span></td>
-					</tr>
-				</table>
-			</div>
+		<div class="b-main-table-border" style = "width: 500px">
+			<table class="b-main-table b-main-table_with-header" style="width: 500px" align="center">
+				<tr>
+					<th colspan="2">Transfer Quota fields (Public repository)</th>
+				</tr>
+				<tr>
+					<th>Disk Quota&#160;&#160;<i class="fa fa-question" tooltips tooltip-template="<div style = 'width: 250px'><label class = 'b-form-label'>Limit of space reserved for repository</label></div>"></i></th>
+					<td style="padding-right: 18px"><input class="b-form-input b-form-input_full" type="text" required></td>
+				</tr>
+				<tr>
+					<th>Threshold&#160;&#160;<i class="fa fa-question" tooltips tooltip-template="<div style = 'width: 250px'><label class = 'b-form-label'>Disk quota unit. Allowed units are: B, KB, MB, GB, TB (default - MB)</label></div>"></i></th>
+					<td style="padding-right: 18px"><input class="b-form-input b-form-input_full" type="text" required></td>
+				</tr>
+				<tr>
+					<th>TimeFrame&#160;&#160;<i class="fa fa-question" tooltips tooltip-template="<div style = 'width: 250px'><label class = 'b-form-label'>Time interval after which the internal counter of transferred data amount will be reset. Allowed units are: ns, μs, ms, s, min, hour, day (default - hour)</label></div>"></i></th>
+					<td style="padding-right: 18px"><input class="b-form-input b-form-input_full" type="text" required></td>
+				</tr>
+				<tr>
+					<th colspan="2">Transfer Quota fields (Trust repository)</th>
+				</tr>
+				<tr>
+					<th>Disk Quota&#160;&#160;<i class="fa fa-question" tooltips tooltip-template="<div style = 'width: 250px'><label class = 'b-form-label'>Limit of space reserved for repository</label></div>"></i></th>
+					<td style="padding-right: 18px"><input class="b-form-input b-form-input_full" type="text" required></td>
+				</tr>
+				<tr>
+					<th>Threshold&#160;&#160;<i class="fa fa-question" tooltips tooltip-template="<div style = 'width: 250px'><label class = 'b-form-label'>Transfer quota unit. Allowed units are: B, KB, MB, GB, TB (default - MB)</label></div>"></i></th>
+					<td style="padding-right: 18px"><input class="b-form-input b-form-input_full" type="text" required></td>
+				</tr>
+				<tr>
+					<th>TimeFrame&#160;&#160;<i class="fa fa-question" tooltips tooltip-template="<div style = 'width: 250px'><label class = 'b-form-label'>Time interval after which the internal counter of transferred data amount will be reset. Allowed units are: ns, μs, ms, s, min, hour, day (default - hour)</label></div>"></i></th>
+					<td style="padding-right: 18px"><input class="b-form-input b-form-input_full" type="text" required></td>
+				</tr>
+			</table>
 		</div>
 	</div>
 </div>
