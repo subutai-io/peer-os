@@ -1,18 +1,18 @@
 package io.subutai.core.peer.cli;
 
 
+import java.util.List;
+
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 
-import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.RegistrationData;
-import io.subutai.common.peer.RegistrationStatus;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.peer.api.PeerManager;
 
 
-@Command( scope = "peer", name = "reject" )
-public class RejectRegistrationCommand extends SubutaiShellCommandSupport
+@Command( scope = "peer", name = "unregister" )
+public class UnregisterPeerCommand extends SubutaiShellCommandSupport
 {
 
     private PeerManager peerManager;
@@ -37,9 +37,24 @@ public class RejectRegistrationCommand extends SubutaiShellCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        Peer peer = peerManager.getPeer( peerId );
-        RegistrationData request = new RegistrationData( peer.getPeerInfo(), RegistrationStatus.APPROVED );
-        peerManager.doRejectRequest( request );
+        final List<RegistrationData> requests = peerManager.getRegistrationRequests();
+        RegistrationData request = null;
+        for ( int i = 0; i < requests.size() && request == null; i++ )
+        {
+            if ( requests.get( i ).getPeerInfo().getId().equals( peerId ) )
+            {
+                request = requests.get( i );
+            }
+        }
+
+        if ( request != null )
+        {
+            peerManager.doUnregisterRequest( request );
+        }
+        else
+        {
+            System.out.println( "Registration request not found." );
+        }
         return null;
     }
 }
