@@ -21,6 +21,10 @@ import (
 func RestoreContainer(container, date, newContainer string) {
 	const backupDir = "/mnt/backups/"
 
+	if lxcContainer.IsContainer(newContainer) {
+		log.Fatal("Container " + newContainer + " is already exist!")
+	}
+
 	currentDT := strconv.Itoa(int(time.Now().Unix()))
 	tmpUnpackDir := config.Agent.LxcPrefix + "lxc-data/tmpdir/unpacking_" + currentDT + "/"
 
