@@ -43,15 +43,15 @@ function AdvancedEnvironmentCtrl($scope, environmentService, trackerSrv, SweetAl
 	vm.showResources = showResources;
 	vm.addResource2Build = addResource2Build;
 
-	/*environmentService.getTemplates()
+	environmentService.getTemplates()
 		.success(function (data) {
 			vm.templates = data;
 		})
 		.error(function (data) {
 			VARS_MODAL_ERROR( SweetAlert, 'Error on getting templates ' + data );
-		});*/
+		});
 
-	vm.templates = ['mongo', 'cassandra', 'master', 'hadoop'];
+	//vm.templates = ['mongo', 'cassandra', 'master', 'hadoop'];
 
 	environmentService.getStrategies().success(function (data) {
 		vm.strategies = data;
@@ -63,8 +63,7 @@ function AdvancedEnvironmentCtrl($scope, environmentService, trackerSrv, SweetAl
 
 	environmentService.getPeers().success(function (data) {
 		vm.peerIds = data;
-		vm.peerIds['testPeer'] = ['rh1', 'rh2', 'rh3'];
-		console.log(vm.peerIds);
+		//vm.peerIds['testPeer'] = ['rh1', 'rh2', 'rh3'];
 	});
 
 	/*peerRegistrationService.getResourceHosts().success(function (data) {
@@ -695,35 +694,6 @@ function placeRhSimple( model ) {
 		}
 	}
 
-	if(children >= (size * size)) {
-
-		var peerId = model.get('peerId');
-		var hostId = model.get('hostId');
-		var rhKeys = Object.keys(PEER_MAP[peerId].rh);
-		var hostIndex = rhKeys.indexOf(model.get('hostId'));
-
-		var counter = 0;
-		for(var key in PEER_MAP[peerId].rh) {
-			var resourceHost = graph.getCell(PEER_MAP[peerId].rh[key]);
-			growResourceHost(resourceHost);
-
-			if(key !== hostId) {
-				resourceHost.set('children', children + 1);
-			}
-
-			if(counter > 0) {
-				var resourceHostPosition = resourceHost.get('position');
-				console.log(resourceHost.get('embeds'));
-				var yPosMod = (counter * 60);
-				resourceHost.set('position', {x: resourceHostPosition.x, y: (resourceHostPosition.y + yPosMod)});
-				changePositionToEmbeds(resourceHost.get('embeds'), false, yPosMod);
-			}
-
-			counter++;
-		}
-		movePeer(peerId, 60, 1);
-	}
-
 	array[size] = new Array();
 	array[size][0] = 1;
 	size++;
@@ -780,6 +750,41 @@ function changePositionToEmbeds(embeds, posX, posY) {
 	}
 }
 
+function checkResourceHost(model) {
+	var sizeObj = model.attributes.gridSize;
+	var children = model.get('children');
+	var size = sizeObj.size;
+
+	if(children >= (size * size)) {
+
+		var peerId = model.get('peerId');
+		var hostId = model.get('hostId');
+		var rhKeys = Object.keys(PEER_MAP[peerId].rh);
+		var hostIndex = rhKeys.indexOf(model.get('hostId'));
+
+		var counter = 0;
+		for(var key in PEER_MAP[peerId].rh) {
+			var resourceHost = graph.getCell(PEER_MAP[peerId].rh[key]);
+			growResourceHost(resourceHost);
+
+			if(key !== hostId) {
+				resourceHost.attributes.gridSize.size = size + 1;
+			}
+
+			if(counter > 0) {
+				var resourceHostPosition = resourceHost.get('position');
+				var yPosMod = (counter * 60);
+				resourceHost.set('position', {x: resourceHostPosition.x, y: (resourceHostPosition.y + yPosMod)});
+				changePositionToEmbeds(resourceHost.get('embeds'), false, yPosMod);
+			}
+
+			counter++;
+		}
+		movePeer(peerId, 60, 1);
+	}
+	
+}
+
 function startDrag( event ) {
 	event.dataTransfer.setData( "template", $(event.target).data('template') );
 	event.dataTransfer.setData( "img", $(event.target).find('img').attr('src') );
@@ -801,8 +806,9 @@ function drop(event) {
 	{
 		if( models[i].attributes.hostId !== undefined )
 		{
+			checkResourceHost(models[i]);
 			var rPos = models[i].attributes.position;
-			var gPos = placeRhSimple( models[i], models );
+			var gPos = placeRhSimple( models[i] );
 
 			var x = (rPos.x + gPos.x * GRID_SIZE + GRID_SPACING) + 23;
 			var y = (rPos.y + gPos.y * GRID_SIZE + GRID_SPACING) + 49;
