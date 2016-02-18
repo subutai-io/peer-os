@@ -1,7 +1,6 @@
 package net
 
 import (
-	"github.com/subutai-io/Subutai/agent/cli/lib"
 	"github.com/subutai-io/Subutai/agent/config"
 	"github.com/subutai-io/Subutai/agent/log"
 	"io"
@@ -9,7 +8,6 @@ import (
 	"net"
 	"os"
 	"os/exec"
-	"strings"
 )
 
 func CalculateGW(ipS string) string {
@@ -21,90 +19,16 @@ func CalculateGW(ipS string) string {
 	return ip.String()
 }
 
-func prepareStrForServiceInterface(vlanip, vlanid string) string {
-	str := "    ifconfig br-" + vlanid + " " + vlanip + "\n" +
-		"    ovs-ofctl add-flow br-" + vlanid + " priority=2500,ip,nw_src=10.10.10.0/24 actions=drop\n" +
-		"    ovs-ofctl add-flow br-int priority=2500,ip,nw_src=10.10.10.0/24,nw_dst=" + vlanip + " actions=drop\n" +
-		"    ovs-ofctl add-flow br-" + vlanid + " priority=2600,ip,nw_src=10.10.10.1 actions=normal\n" +
-		"    ovs-ofctl add-flow br-int priority=2600,ip,nw_src=10.10.10.1,nw_dst=" + vlanip + " actions=normal\n"
-
-	return str
+func DeleteGateway(vlan string) {
+	log.Debug("Removeing gateway gw-" + vlan)
+	exec.Command("ovs-vsctl", "del-port", "gw-"+vlan).Run()
+	exec.Command("ifconfig", "gw-"+vlan, "down").Run()
 }
 
-func writeinServiceInterface(vlanip, vlanid string) {
-	str := prepareStrForServiceInterface(vlanid, vlanip)
-	f, err := ioutil.ReadFile(config.Agent.DataPrefix + "/var/subutai-network/service-interface")
-	if err != nil {
-		lib.CopyFile(config.Agent.AppPrefix+"/var/service-interface", config.Agent.DataPrefix+"/var/subutai-network/service-interface")
-		os.Chmod(config.Agent.DataPrefix+"/var/subutai-network/service-interface", 0755)
-		f, _ = ioutil.ReadFile(config.Agent.DataPrefix + "/var/subutai-network/service-interface")
-	}
-	lines := strings.Split(string(f), "\n")
-	for k, v := range lines {
-		if strings.Contains(string(v), "#Re-init OVS Flows") {
-			lines[k] = str + "#Re-init OVS Flows\n"
-		}
-	}
-	str = strings.Join(lines, "\n")
-	err = ioutil.WriteFile(config.Agent.DataPrefix+"/var/subutai-network/service-interface", []byte(str), 0755)
-	log.Check(log.FatalLevel, "write "+config.Agent.DataPrefix+"/var/subutai-network/service-interface", err)
-
-}
-func CreateGateway(vlanip, vlanid string) {
-	return
-	// // check: control ip. no need to get returns.
-	// // controlIp(vlanip)
-	// // check: add to ovs-vsctl --db=unix:$SUBUTAI_DATA_PREFIX/ovs/db.sock add-br br-$vlanID + ifconfig  br-$vlanID $ipAdd
-	// log.Check(log.FatalLevel, "ovs-vsctl add-br ", exec.Command("ovs-vsctl", "add-br", "br-"+vlanid).Run())
-	// log.Check(log.FatalLevel, "ifconfig ", exec.Command("ifconfig", "br-"+vlanid, vlanip).Run())
-	// log.Check(log.FatalLevel, "add-port br-vlan",
-	// 	exec.Command("ovs-vsctl", "add-port", "br-"+vlanid, vlanid+"toint").Run())
-	// log.Check(log.FatalLevel, "set interface 1",
-	// 	exec.Command("ovs-vsctl", "set", "interface", vlanid+"toint", "type=patch").Run())
-	// log.Check(log.FatalLevel, "set interface 2",
-	// 	exec.Command("ovs-vsctl", "set", "interface", vlanid+"toint", "options:peer=intto"+vlanid).Run())
-	// log.Check(log.FatalLevel, "add-port br-int",
-	// 	exec.Command("ovs-vsctl", "add-port", "br-int", "intto"+vlanid).Run())
-	// log.Check(log.FatalLevel, "set interface 3",
-	// 	exec.Command("ovs-vsctl", "set", "interface", "intto"+vlanid, "type=patch").Run())
-	// log.Check(log.FatalLevel, "set interface 4",
-	// 	exec.Command("ovs-vsctl", "set", "interface", "intto"+vlanid, "options:peer="+vlanid+"toint").Run())
-	// log.Check(log.FatalLevel, "set port",
-	// 	exec.Command("ovs-vsctl", "set", "port", "br-"+vlanid, "tag="+vlanid).Run())
-	// // check: "ovs-ofctl"
-
-	// log.Check(log.FatalLevel, "ovsflow 1",
-	// 	exec.Command("ovs-ofctl", "add-flow", "br-"+vlanid, "priority=2500,ip,nw_src=10.10.10.0/24 actions=drop").Run())
-	// log.Check(log.FatalLevel, "ovsFlow 2",
-	// 	exec.Command("ovs-ofctl", "add-flow", "br-int", "priority=2500,ip,nw_src=10.10.10.0/24,nw_dst="+vlanip+" actions=drop").Run())
-	// log.Check(log.FatalLevel, "ovsFlow 3",
-	// 	exec.Command("ovs-ofctl", "add-flow", "br-"+vlanid, "priority=2600,ip,nw_src=10.10.10.1 actions=normal").Run())
-	// log.Check(log.FatalLevel, "ovsFlow 4",
-	// 	exec.Command("ovs-ofctl", "add-flow", "br-int", "priority=2600,ip,nw_src=10.10.10.1,nw_dst="+vlanip+" actions=normal").Run())
-
-	// // check: write them service-interface file
-	// writeinServiceInterface(vlanid, vlanip)
-	// // check: br-int + eth and only ip.
-	// // since we are not using openflow aynmore we do not need net_bridge_blocker!
-}
-
-func DeleteGateway(vlanid string) {
-	exec.Command("ovs-vsctl", "del-port", "br-int", "intto"+vlanid).Run()
-	exec.Command("ovs-vsctl", "del-br", "br-"+vlanid).Run()
-	ports, err := exec.Command("ovs-vsctl", "show").Output()
-	log.Check(log.WarnLevel, "Getting bridge ports", err)
-	line := strings.Split(string(ports), "\n")
-	iface := ""
-	for k, v := range line {
-		if strings.Trim(v, " ") == "tag: "+vlanid {
-			iface = line[k+1]
-			break
-		}
-	}
-	port := strings.Fields(iface)
-	if len(port) > 1 {
-		exec.Command("ovs-vsctl", "del-port", "br-int", strings.Trim(port[1], "\"")).Run()
-	}
+func DelIface(iface string) {
+	log.Debug("Removing interface " + iface)
+	exec.Command("ovs-vsctl", "del-port", iface).Run()
+	exec.Command("ifconfig", iface, "down").Run()
 }
 
 func RemoveDefaultGW(contName string) {

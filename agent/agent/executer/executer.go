@@ -152,7 +152,6 @@ func Run(req RequestOptions, out_c chan<- ResponseOptions) {
 			} else {
 				response.ExitCode = "unknown"
 			}
-			// log.Info("22222222222222222222")
 			out_c <- response
 		}
 	}
