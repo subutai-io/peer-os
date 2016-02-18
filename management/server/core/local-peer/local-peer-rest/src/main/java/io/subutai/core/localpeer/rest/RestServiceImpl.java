@@ -18,7 +18,6 @@ import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.gson.reflect.TypeToken;
 
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ResourceHostMetrics;
@@ -44,15 +43,13 @@ public class RestServiceImpl implements RestService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( RestServiceImpl.class );
     private final LocalPeer localPeer;
-    //    private Monitor monitor;
     protected JsonUtil jsonUtil = new JsonUtil();
     protected RestUtil restUtil = new RestUtil();
 
 
-    public RestServiceImpl( final LocalPeer localPeer/*, Monitor monitor*/ )
+    public RestServiceImpl( final LocalPeer localPeer )
     {
         this.localPeer = localPeer;
-        //        this.monitor = monitor;
     }
 
 
@@ -76,51 +73,6 @@ public class RestServiceImpl implements RestService
     public PeerInfo getPeerInfo() throws PeerException
     {
         return localPeer.getPeerInfo();
-    }
-
-
-    //    @Override
-    //    public Response getPeerPolicy( )
-    //    {
-    //        try
-    //        {
-    ////            Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
-    //
-    //            PeerPolicy peerPolicy = localPeer.getPeerInfo().getPeerPolicy();
-    //            if ( peerPolicy == null )
-    //            {
-    //                return Response.ok().build();
-    //            }
-    //            else
-    //            {
-    //                return Response.ok( peerPolicy ).build();
-    //            }
-    //        }
-    //        catch ( Exception e )
-    //        {
-    //            LOGGER.error( "Error getting peer policy #getPeerPolicy", e );
-    //            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
-    //        }
-    //    }
-
-
-    @Override
-    public Response updatePeer( PeerInfo peerInfo )
-    {
-        try
-        {
-            //            PeerInfo p = jsonUtil.from( peerInfo, PeerInfo.class );
-            //            p.setIp( getRequestIp() );
-            //            p.setName( String.format( "Peer %s", p.getId() ) );
-            //            localPeer.update( p );
-
-            return Response.ok( /*jsonUtil.to( p )*/ ).build();
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( "Error updating peerInfo #updatePeer", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
-        }
     }
 
 
@@ -264,6 +216,21 @@ public class RestServiceImpl implements RestService
 
 
     @Override
+    public void addInitiatorPeerEnvironmentPubKey( final String keyId, final String pek )
+    {
+        try
+        {
+            PGPPublicKeyRing pubKeyRing = PGPKeyUtil.readPublicKeyRing( pek );
+            localPeer.addPeerEnvironmentPubKey( keyId, pubKeyRing );
+        }
+        catch ( Exception e )
+        {
+            throw new WebApplicationException( e );
+        }
+    }
+
+
+    @Override
     public Vni reserveVni( final Vni vni )
     {
         try
@@ -279,13 +246,13 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response setupTunnels( final String peerIps, final String environmentId )
+    public Response setupTunnels( final String environmentId, final Map<String, String> peerIps )
     {
+        Preconditions.checkNotNull( environmentId );
+        Preconditions.checkNotNull( peerIps );
         try
         {
-            int vlan = localPeer
-                    .setupTunnels( jsonUtil.<Map<String, String>>from( peerIps, new TypeToken<Map<String, String>>()
-                    {}.getType() ), environmentId );
+            int vlan = localPeer.setupTunnels( peerIps, environmentId );
 
             return Response.ok( vlan ).build();
         }

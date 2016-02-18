@@ -17,25 +17,53 @@ var app = angular.module('subutai-app', [
 
 	.controller('SubutaiController', SubutaiController)
 	.controller('CurrentUserCtrl', CurrentUserCtrl)
+
 	.controller('LiveTrackerCtrl', LiveTrackerCtrl)
 	.factory('liveTrackerSrv', liveTrackerSrv)
 
+	.controller('AccountCtrl', AccountCtrl)
+	.factory('identitySrv', identitySrv)
+
 	.run(startup);
 
-CurrentUserCtrl.$inject = ['$location', '$rootScope'];
+CurrentUserCtrl.$inject = ['$location', '$rootScope', '$http'];
 routesConf.$inject = ['$httpProvider', '$stateProvider', '$urlRouterProvider', '$ocLazyLoadProvider'];
 startup.$inject = ['$rootScope', '$state', '$location', '$http'];
 
-function CurrentUserCtrl($location, $rootScope, ngDialog, $http, SweetAlert) {
+function CurrentUserCtrl($location, $rootScope, $http) {
 	var vm = this;
 	vm.currentUser = localStorage.getItem('currentUser');
+	vm.hubStatus = localStorage.getItem('hubRegistered');
 	vm.currentUserRoles = [];
+
+	if( vm.hubStatus != true )
+	{
+		vm.hubStatus = false;
+	}
+
+
+	vm.login;
+	vm.pass;
+
 
 	//function
 	vm.logout = logout;
+	vm.hubRegister = hubRegister;
 
 
-	function logout() {
+	function hubRegister()
+	{
+		$http.post( SERVER_URL + 'rest/v1/hub/register?hubIp=hub.subut.ai&email=' + vm.login + '&password=' + vm.pass, {withCredentials: true} )
+			.success(function () {
+				localStorage.setItem('hubRegistered', true);
+				vm.hubStatus = true;
+			}).error (function (error) {
+			console.log('hub/register error: ', error);
+		});
+	}
+
+	function logout()
+	{
 		removeCookie('sptoken');
 		localStorage.removeItem('currentUser');
 		$location.path('login');
@@ -216,7 +244,8 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 								'subutai-app/environment/advanced-controller.js',
 								'subutai-app/environment/service.js',
 								'subutai-app/peerRegistration/service.js',
-								'subutai-app/tracker/service.js'
+								'subutai-app/tracker/service.js',
+								'subutai-app/identity/service.js'
 							]
 						}
 					]);
@@ -260,7 +289,8 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 							files: [
 								'subutai-app/kurjun/kurjun.js',
 								'subutai-app/kurjun/controller.js',
-								'subutai-app/kurjun/service.js'
+								'subutai-app/kurjun/service.js',
+								'subutai-app/identity/service.js'
 							]
 						}
 					]);
@@ -412,7 +442,7 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 						{
 							name: 'subutai.accountSettings',
 							files: [
-								'subutai-app/accountSettings/tokens.js',
+								'subutai-app/accountSettings/accountSettings.js',
 								'subutai-app/accountSettings/controller.js',
 								'subutai-app/identity/service.js'
 							]
@@ -491,29 +521,6 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 				}]
 			}
 		})
-		.state('plugin_integrator', {
-			url: '/plugin_integrator',
-			templateUrl: 'subutai-app/plugin_integrator/partials/view.html',
-			data: {
-				bodyClass: '',
-				layout: 'default'
-			},
-			resolve: {
-				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
-					return $ocLazyLoad.load([
-						{
-							name: 'subutai.plugin_integrator',
-							files: [
-								'subutai-app/plugin_integrator/plugin_integrator.js',
-								'subutai-app/plugin_integrator/controller.js',
-								'subutai-app/plugin_integrator/service.js',
-								'subutai-app/identity/service.js'
-							]
-						}
-					]);
-				}]
-			}
-		})
 		.state('settings-peer', {
 			url: '/settings-peer',
 			templateUrl: 'subutai-app/settingsPeer/partials/view.html',
@@ -552,28 +559,6 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 								'subutai-app/settingsKurjun/settingsKurjun.js',
 								'subutai-app/settingsKurjun/controller.js',
 								'subutai-app/settingsKurjun/service.js'
-							]
-						}
-					]);
-				}]
-			}
-		})
-		.state('peer-policy', {
-			url: '/peer-policy',
-			templateUrl: 'subutai-app/peerPolicy/partials/view.html',
-			data: {
-				bodyClass: '',
-				layout: 'default'
-			},
-			resolve: {
-				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
-					return $ocLazyLoad.load([
-						{
-							name: 'subutai.peer-policy',
-							files: [
-								'subutai-app/peerPolicy/peerPolicy.js',
-								'subutai-app/peerPolicy/controller.js',
-								'subutai-app/peerPolicy/service.js'
 							]
 						}
 					]);
@@ -624,6 +609,29 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
                 }]
             }
         })
+        .state('bazaar', {
+            url: '/bazaar',
+            templateUrl: 'subutai-app/bazaar/partials/view.html',
+            data: {
+                bodyClass: '',
+                layout: 'default'
+            },
+            resolve: {
+                loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([
+                        {
+                            name: 'subutai.bazaar',
+                            files: [
+                                'subutai-app/bazaar/bazaar.js',
+                                'subutai-app/bazaar/controller.js',
+                                'subutai-app/bazaar/service.js',
+                                'subutai-app/identity/service.js'
+                            ]
+                        }
+                    ]);
+                }]
+            }
+        })
         .state('404', {
 			url: '/404',
 			templateUrl: 'subutai-app/common/partials/404.html',
@@ -650,6 +658,14 @@ function startup($rootScope, $state, $location, $http) {
 
 	$rootScope.$on('$stateChangeStart',	function(event, toState, toParams, fromState, fromParams){
 		LOADING_SCREEN('none');
+
+		$http.get( SERVER_URL + 'rest/v1/system/peer_settings', {withCredentials: true} )
+			.success(function (data) {
+				localStorage.setItem('hubRegistered', data.isRegisteredToHub);
+			}).error (function (error) {
+			console.log("peer_settings error: ", error);
+		});
+
 		var restrictedPage = $.inArray($location.path(), ['/login']) === -1;
 		if (restrictedPage && !getCookie('sptoken')) {
 			localStorage.removeItem('currentUser');

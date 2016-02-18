@@ -26,6 +26,12 @@
                 <td>{{ template.version }}</td>
                 <td>
                     <a href
+                       class="b-icon b-icon_share"
+                       tooltips
+                       tooltip-template='Share'
+                       ng-click="kurjunCtrl.openShareWindow(template)">
+                    </a>
+                    <a href
                        class="b-icon b-icon_remove"
                        ng-if="template.deletable"
                        ng-click="kurjunCtrl.deleteTemplate(template)">

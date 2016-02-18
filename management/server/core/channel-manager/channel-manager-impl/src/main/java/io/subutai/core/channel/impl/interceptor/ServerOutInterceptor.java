@@ -98,7 +98,6 @@ public class ServerOutInterceptor extends AbstractPhaseInterceptor<Message>
         }
         catch ( Exception e )
         {
-            LOG.warn( "Error on handling message: ", e.getMessage() );
             throw new Fault( e );
         }
     }
@@ -111,18 +110,12 @@ public class ServerOutInterceptor extends AbstractPhaseInterceptor<Message>
     }
 
 
-    private void handleEnvironmentMessage( final String ip, final String environmentId, final Message message )
+    private void handleEnvironmentMessage( final String targetId, final String environmentId, final Message message )
     {
-        try
-        {
-            String targetId = peerManager.getPeerIdByIp( ip ) + "-" + environmentId;
-            String sourceId = peerManager.getLocalPeer().getId() + "-" + environmentId;
+        String sourceId = peerManager.getLocalPeer().getId() + "-" + environmentId;
 
-            MessageContentUtil.encryptContent( channelManagerImpl.getSecurityManager(), sourceId, targetId, message );
-        }
-        catch ( PeerException e )
-        {
-            //LOG.warn( e.getMessage() );
-        }
+        MessageContentUtil
+                .encryptContent( channelManagerImpl.getSecurityManager(), sourceId, targetId + "-" + environmentId,
+                        message );
     }
 }
