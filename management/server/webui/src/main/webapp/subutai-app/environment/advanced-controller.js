@@ -3,11 +3,11 @@
 angular.module('subutai.environment.adv-controller', [])
 	.controller('AdvancedEnvironmentCtrl', AdvancedEnvironmentCtrl);
 
-AdvancedEnvironmentCtrl.$inject = ['$scope', 'environmentService', 'trackerSrv', 'SweetAlert', 'ngDialog'];
+AdvancedEnvironmentCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'trackerSrv', 'SweetAlert', 'ngDialog'];
 
 var graph = new joint.dia.Graph;
 
-function AdvancedEnvironmentCtrl($scope, environmentService, trackerSrv, SweetAlert, ngDialog) {
+function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, trackerSrv, SweetAlert, ngDialog) {
 
 	var vm = this;
 	var GRID_CELL_SIZE = 100;
@@ -43,15 +43,15 @@ function AdvancedEnvironmentCtrl($scope, environmentService, trackerSrv, SweetAl
 	vm.showResources = showResources;
 	vm.addResource2Build = addResource2Build;
 
-	environmentService.getTemplates()
+	/*environmentService.getTemplates()
 		.success(function (data) {
 			vm.templates = data;
 		})
 		.error(function (data) {
 			VARS_MODAL_ERROR( SweetAlert, 'Error on getting templates ' + data );
-		});
+		});*/
 
-	//vm.templates = ['mongo', 'cassandra', 'master', 'hadoop'];
+	vm.templates = ['mongo', 'cassandra', 'master', 'hadoop'];
 
 	environmentService.getStrategies().success(function (data) {
 		vm.strategies = data;
@@ -63,7 +63,8 @@ function AdvancedEnvironmentCtrl($scope, environmentService, trackerSrv, SweetAl
 
 	environmentService.getPeers().success(function (data) {
 		vm.peerIds = data;
-		//vm.peerIds['testPeer'] = ['rh1', 'rh2', 'rh3'];
+		vm.peerIds['testPeer'] = ['rh1', 'rh2', 'rh3'];
+		console.log(vm.peerIds);
 	});
 
 	/*peerRegistrationService.getResourceHosts().success(function (data) {
@@ -173,6 +174,12 @@ function AdvancedEnvironmentCtrl($scope, environmentService, trackerSrv, SweetAl
 		environmentService.startEnvironmentAutoBuild(vm.environment2BuildName, JSON.stringify(vm.containers2Build))
 			.success(function(data){
 				vm.newEnvID = data;
+
+				$rootScope.notifications = {
+					"message": "Environment(" + data + ") creation has been started", 
+					"date": moment().format('MMMM Do YYYY, HH:mm:ss')
+				};
+
 				currentLog.status = 'success';
 				currentLog.classes = ['fa-check', 'g-text-green'];
 				currentLog.time = moment().format('HH:mm:ss');
@@ -197,6 +204,11 @@ function AdvancedEnvironmentCtrl($scope, environmentService, trackerSrv, SweetAl
 				currentLog.status = 'fail';
 				currentLog.classes = ['fa-times', 'g-text-red'];
 				currentLog.time = moment().format('HH:mm:ss');				
+
+				$rootScope.notifications = {
+					"message": "Error on creating environment. " + error, 
+					"date": moment().format('MMMM Do YYYY, HH:mm:ss')
+				};
 			});
 	}
 

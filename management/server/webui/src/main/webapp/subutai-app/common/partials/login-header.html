@@ -61,4 +61,41 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="b-hub-status g-right">
+		<a href="#" 
+		ng-class="{'b-hub-status__btn_active' : currentUserCtrl.notificationNew }" 
+		class="b-hub-status__btn g-margin-right-half js-notification" 
+		ng-click="currentUserCtrl.notificationNew = false">
+			Logs 
+			<i class="fa fa-angle-down"></i>
+		</a>
+		<div class="b-hub-status__dropdown">
+			<ul class="list">
+				<li ng-repeat="notification in currentUserCtrl.notifications">
+					<a href="#">
+						{{ notification.message }}
+					</a>
+					<div class="date">
+						{{ notification.date }}
+					</div>
+					<div class="b-dropdown-buttons" ng-if="notification.links">
+						<a ng-repeat="link in notification.links" href="{{ link.href }}" class="b-btn b-btn_green">{{ link.text }}</a>
+					</div>
+				</li>
+				<li ng-if="currentUserCtrl.notifications.length <= 0" style="text-align: center;">
+					<a href>No logs</a>
+				</li>
+				<!--<li><a href="#">Your SS version is obsolete, please update
+					it to 4.0.0-RC7</a>
+					<div class="date">8 February at 22:25</div>
+					<div class="buttons">
+						<a href="#" class="b-btn b-btn_green">Register</a>
+						<a href="#" class="b-btn b-btn_white">Ignore</a>
+					</div>
+				</li>-->
+			</ul>
+			<a href ng-click="currentUserCtrl.clearLogs()" class="show-more">Clear logs</a>
+		</div>
+	</div>
 </div>
