@@ -12,12 +12,15 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.junit.Test;
+
 import io.subutai.common.tracker.OperationState;
 import io.subutai.common.util.UUIDUtil;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -76,7 +79,8 @@ public class TrackerOperationImplTest
         poi.addLog( DUMMY_LOG );
         poi.addLog( DUMMY_LOG );
 
-        assertEquals( DUMMY_LOG + "\n" + DUMMY_LOG, poi.getLog() );
+
+        assertThat( poi.getLog(), containsString( DUMMY_LOG ) );
     }
 
 
@@ -87,7 +91,7 @@ public class TrackerOperationImplTest
 
         poi.addLogDone( DUMMY_LOG );
 
-        assertEquals( DUMMY_LOG, poi.getLog() );
+        assertThat( poi.getLog(), containsString( DUMMY_LOG ) );
 
         assertEquals( OperationState.SUCCEEDED, poi.getState() );
     }
@@ -100,7 +104,7 @@ public class TrackerOperationImplTest
 
         poi.addLogFailed( DUMMY_LOG );
 
-        assertEquals( DUMMY_LOG, poi.getLog() );
+        assertThat( poi.getLog(), containsString( DUMMY_LOG ) );
 
         assertEquals( OperationState.FAILED, poi.getState() );
     }
