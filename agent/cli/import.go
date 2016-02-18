@@ -18,11 +18,15 @@ import (
 	"strings"
 )
 
-func templMd5(templ, arch, token string) string {
+func templMd5(templ, arch, version, token string) string {
 	// tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
 	// client := &http.Client{Transport: tr}
 	client := &http.Client{}
-	response, err := client.Get(config.Management.Kurjun + "/public/get?name=" + templ + "&type=md5&sptoken=" + token)
+	url := config.Management.Kurjun + "/public/get?name=" + templ + "&type=md5&sptoken=" + token
+	if len(version) != 0 {
+		url = config.Management.Kurjun + "/public/get?name=" + templ + "&version=" + version + "&type=md5&sptoken=" + token
+	}
+	response, err := client.Get(url)
 	log.Debug(config.Management.Kurjun + "/public/get?name=" + templ + "&type=md5&sptoken=" + token)
 	if log.Check(log.WarnLevel, "Getting kurjun response", err) || response.StatusCode != 200 {
 		return ""
@@ -86,26 +90,25 @@ func download(file, md5, token string) string {
 	return ""
 }
 
-func LxcImport(templ, token string) {
-	config.CheckKurjun()
-
-	fullname := templ + "-subutai-template_" + config.Misc.Version + "_" + config.Misc.Arch + ".tar.gz"
+func LxcImport(templ, version, token string) {
 	if container.IsTemplate(templ) {
 		log.Info(templ + " template exist")
 		return
 	}
 
-	// if token == "" {
+	config.CheckKurjun()
+	fullname := templ + "-subutai-template_" + config.Misc.Version + "_" + config.Misc.Arch + ".tar.gz"
+	// if len(token) == 0 {
 	token = gpg.GetToken()
 	// }
-	md5 := templMd5(templ, runtime.GOARCH, token)
+	md5 := templMd5(templ, runtime.GOARCH, version, token)
 
 	archive := checkLocal(templ, md5, runtime.GOARCH)
 	if len(archive) == 0 && len(md5) != 0 {
 		log.Info("Downloading " + templ)
 		archive = download(fullname, md5, token)
 	} else if len(archive) == 0 && len(md5) == 0 {
-		log.Error(templ + " template not found")
+		log.Error(templ + " " + version + " template not found")
 	}
 
 	log.Info("Unpacking template " + templ)
@@ -115,7 +118,7 @@ func LxcImport(templ, token string) {
 	parent := container.GetConfigItem(templdir+"/config", "subutai.parent")
 	if parent != "" && parent != templ && !container.IsTemplate(parent) {
 		log.Info("Parent template: " + parent)
-		LxcImport(parent, token)
+		LxcImport(parent, "", token)
 	}
 
 	log.Info("Installing template " + templ)
