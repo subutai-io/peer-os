@@ -55,6 +55,8 @@ import io.subutai.common.peer.RegistrationData;
 import io.subutai.common.peer.RegistrationStatus;
 import io.subutai.common.protocol.ControlNetworkConfig;
 import io.subutai.common.protocol.PingDistances;
+import io.subutai.common.resource.PeerGroupResources;
+import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.objects.TokenType;
 import io.subutai.common.settings.ChannelSettings;
 import io.subutai.common.util.ControlNetworkUtil;
@@ -116,6 +118,7 @@ public class PeerManagerImpl implements PeerManager
     private String controlNetwork;
     private long controlNetworkTtl = 0;
     private String externalInterfaceName;
+    private PingDistances distances;
 
 
     public PeerManagerImpl( final Messenger messenger, LocalPeer localPeer, DaoManager daoManager,
@@ -514,6 +517,16 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public RegistrationData processRegistrationRequest( final RegistrationData registrationData ) throws PeerException
     {
+        try
+        {
+            PeerInfo p = getRemotePeerInfo( registrationData.getPeerInfo().getPublicUrl() );
+        }
+        catch ( PeerException e )
+        {
+            throw new PeerException( String.format( "Registration request rejected. Provided URL %s not accessable.",
+                    registrationData.getPeerInfo().getPublicUrl() ) );
+        }
+
         addRequest( registrationData );
         return new RegistrationData( localPeer.getPeerInfo(), registrationData.getKeyPhrase(),
                 RegistrationStatus.WAIT );
@@ -832,6 +845,20 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
+    public PeerGroupResources getPeerGroupResources() throws PeerException
+    {
+        final List<PeerResources> resources = new ArrayList<>();
+        for ( final Peer peer : getPeers() )
+        {
+            PeerResources peerResources = getPeer( peer.getId() ).getResourceLimits( localPeerId );
+            resources.add( peerResources );
+        }
+
+        return new PeerGroupResources( resources, getCommunityDistances() );
+    }
+
+
+    @Override
     public PeerPolicy getAvailablePolicy()
     {
         PeerPolicy result = new PeerPolicy( getLocalPeer().getId(), 0, 0, 0, 0, 0, 0 );
@@ -985,7 +1012,7 @@ public class PeerManagerImpl implements PeerManager
             }
             catch ( Exception e )
             {
-                LOG.warn( "Background task execution failed: " + e.getMessage() );
+                LOG.warn( "Peer background tasks execution failed: " + e.getMessage() );
             }
             LOG.debug( "Peer background tasks finished." );
         }
@@ -1070,7 +1097,12 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public PingDistances getCommunityDistances()
     {
-        PingDistances result = new PingDistances();
+        if ( distances != null )
+        {
+            return distances;
+        }
+
+        distances = new PingDistances();
 
         final List<Peer> peers = getPeers();
         ExecutorService pool = Executors.newFixedThreadPool( peers.size() );
@@ -1088,14 +1120,14 @@ public class PeerManagerImpl implements PeerManager
             {
                 final Future<PingDistances> f = completionService.take();
                 PingDistances r = f.get();
-                result.addAll( r.getAll() );
+                distances.addAll( r.getAll() );
             }
             catch ( ExecutionException | InterruptedException e )
             {
                 LOG.warn( "Could not get distances : " + e.getMessage() );
             }
         }
-        return result;
+        return distances;
     }
 
 
@@ -1157,6 +1189,7 @@ public class PeerManagerImpl implements PeerManager
                 controlNetworkTtl =
                         System.currentTimeMillis() + TimeUnit.MINUTES.toMillis( CONTROL_NETWORK_TTL_IN_MIN );
                 key = DigestUtils.md5( UUID.randomUUID().toString() );
+                this.distances = null;
             }
             String[] addresses =
                     new SubnetUtils( controlNetwork, ControlNetworkUtil.NETWORK_MASK ).getInfo().getAllAddresses();
