@@ -1,12 +1,14 @@
 package config
 
 import (
-	"code.google.com/p/gcfg"
-	"github.com/subutai-io/Subutai/agent/log"
 	"io/ioutil"
 	"net"
 	"os"
 	"time"
+
+	"github.com/subutai-io/Subutai/agent/log"
+
+	"code.google.com/p/gcfg"
 )
 
 type agentConfig struct {
@@ -67,7 +69,7 @@ const defaultConfig = `
 	debug = true
 	appPrefix = /apps/subutai/current/
 	dataPrefix = /var/lib/apps/subutai/current/
-	lxcPrefix = /mnt/lib/lxc/    
+	lxcPrefix = /mnt/lib/lxc/
 
 	[management]
 	gpgUser =
@@ -79,7 +81,7 @@ const defaultConfig = `
 	restToken = /rest/v1/identity/gettoken
 	restPublicKey = /rest/v1/registration/public-key
 	restVerify = /rest/v1/registration/verify/container-token
-    kurjun = http://subutai.ddns.net:8081/rest/kurjun/templates
+	kurjun = http://10.10.10.1:8551/rest/kurjun/templates
 
 	[broker]
 	port = 8883
@@ -98,9 +100,9 @@ const defaultConfig = `
 	pass = root
 	db = metrics
 
-    [misc]
-    version = 4.0.0
-    arch = amd64
+	[misc]
+	version = 4.0.0
+	arch = amd64
 `
 
 var (
