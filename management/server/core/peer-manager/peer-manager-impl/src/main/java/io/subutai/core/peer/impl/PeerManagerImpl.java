@@ -514,6 +514,17 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public RegistrationData processRegistrationRequest( final RegistrationData registrationData ) throws PeerException
     {
+        try
+        {
+            PeerInfo p = getRemotePeerInfo( registrationData.getPeerInfo().getPublicUrl() );
+        }
+        catch ( PeerException e )
+        {
+            throw new PeerException(
+                    String.format( "Registration request rejected. Provided URL %s not accessable.",
+                            registrationData.getPeerInfo().getPublicUrl() ) );
+        }
+
         addRequest( registrationData );
         return new RegistrationData( localPeer.getPeerInfo(), registrationData.getKeyPhrase(),
                 RegistrationStatus.WAIT );
@@ -985,7 +996,7 @@ public class PeerManagerImpl implements PeerManager
             }
             catch ( Exception e )
             {
-                LOG.warn( "Background task execution failed: " + e.getMessage() );
+                LOG.warn( "Peer background tasks execution failed: " + e.getMessage() );
             }
             LOG.debug( "Peer background tasks finished." );
         }
