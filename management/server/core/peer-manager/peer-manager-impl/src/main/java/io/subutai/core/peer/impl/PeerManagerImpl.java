@@ -42,7 +42,6 @@ import org.apache.commons.net.util.SubnetUtils;
 import com.google.common.base.Preconditions;
 
 import io.subutai.common.dao.DaoManager;
-import io.subutai.common.host.HostInterface;
 import io.subutai.common.peer.Encrypted;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
@@ -1005,42 +1004,56 @@ public class PeerManagerImpl implements PeerManager
         public void run()
         {
             LOG.debug( "Peer background tasks started..." );
-            try
-            {
-                checkPeers();
-                updateControlNetwork();
-            }
-            catch ( Exception e )
-            {
-                LOG.warn( "Peer background tasks execution failed: " + e.getMessage() );
-            }
+
+            checkPeers();
+            checkNetwork();
+
             LOG.debug( "Peer background tasks finished." );
         }
 
 
+        private void checkNetwork()
+        {
+            try
+            {
+                updateControlNetwork();
+            }
+            catch ( Exception e )
+            {
+                LOG.warn( e.getMessage() );
+            }
+        }
+
         private void checkPeers()
         {
-            for ( Peer peer : getPeers() )
+            try
             {
-                try
+                for ( Peer peer : getPeers() )
                 {
-                    if ( peer.isLocal() )
+                    try
                     {
-                        LocalPeer localPeer = ( LocalPeer ) peer;
-                        if ( "UNKNOWN".equals( localPeer.getPeerInfo().getIp() ) )
+                        if ( peer.isLocal() )
                         {
-                            setDefaultPublicUrl( localPeer );
+                            LocalPeer localPeer = ( LocalPeer ) peer;
+                            if ( "UNKNOWN".equals( localPeer.getPeerInfo().getIp() ) )
+                            {
+                                setDefaultPublicUrl( localPeer );
+                            }
+                        }
+                        else
+                        {
+                            //todo: check remote peer.
                         }
                     }
-                    else
+                    catch ( Exception e )
                     {
-                        //todo: check remote peer.
+                        LOG.warn( e.getMessage() );
                     }
                 }
-                catch ( Exception e )
-                {
-                    LOG.warn( e.getMessage() );
-                }
+            }
+            catch ( Exception e )
+            {
+                LOG.warn( e.getMessage() );
             }
         }
 

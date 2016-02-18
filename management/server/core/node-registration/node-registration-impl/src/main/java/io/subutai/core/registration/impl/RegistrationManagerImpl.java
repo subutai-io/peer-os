@@ -4,6 +4,7 @@ package io.subutai.core.registration.impl;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -31,6 +32,7 @@ import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.host.ContainerHostInfo;
+import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.ResourceHostInfo;
@@ -52,7 +54,6 @@ import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
-import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registration.api.RegistrationManager;
 import io.subutai.core.registration.api.RegistrationStatus;
 import io.subutai.core.registration.api.exception.NodeRegistrationException;
@@ -80,7 +81,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
     private DaoManager daoManager;
     private Broker broker;
     private String domainName;
-    private PeerManager peerManager;
+    private LocalPeer localPeer;
     private EnvironmentManager environmentManager;
     private NetworkManager networkManager;
 
@@ -114,33 +115,15 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
     }
 
 
-    public EnvironmentManager getEnvironmentManager()
-    {
-        return environmentManager;
-    }
-
-
     public void setEnvironmentManager( final EnvironmentManager environmentManager )
     {
         this.environmentManager = environmentManager;
     }
 
 
-    public PeerManager getPeerManager()
+    public void setLocalPeer( final LocalPeer localPeer )
     {
-        return peerManager;
-    }
-
-
-    public void setPeerManager( final PeerManager peerManager )
-    {
-        this.peerManager = peerManager;
-    }
-
-
-    public Broker getBroker()
-    {
-        return broker;
+        this.localPeer = localPeer;
     }
 
 
@@ -199,6 +182,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
             {
                 throw new NodeRegistrationException( "Failed adding resource host registration request to queue", ex );
             }
+            checkManagement( registrationRequest );
         }
     }
 
@@ -363,9 +347,6 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
         Map<Integer, Map<String, Set<ContainerInfo>>> groupedContainersByVlan =
                 groupContainersByVlan( registrationRequest.getHostInfos() );
 
-        LocalPeer localPeer = peerManager.getLocalPeer();
-
-
         for ( final Map.Entry<Integer, Map<String, Set<ContainerInfo>>> mapEntry : groupedContainersByVlan.entrySet() )
         {
             //TODO: check this run. Topology constructor changed
@@ -434,7 +415,6 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
         RequestedHostImpl requestedHost = requestDataService.find( resourceHostInfo.getId() );
         if ( requestedHost != null && requestedHost.getStatus() == RegistrationStatus.APPROVED )
         {
-            LocalPeer localPeer = peerManager.getLocalPeer();
             try
             {
                 ResourceHost resourceHost = localPeer.getResourceHostById( resourceHostInfo.getId() );
@@ -505,7 +485,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
 
         try
         {
-            managementHost = peerManager.getLocalPeer().getManagementHost();
+            managementHost = localPeer.getManagementHost();
 
             Set<Peer> peers = Sets.newHashSet( managementHost.getPeer() );
 
@@ -590,5 +570,48 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
             throw new NodeRegistrationException( "Failed to store container pubkey", ex );
         }
         return containerToken;
+    }
+
+
+    private void checkManagement( RequestedHost requestedHost )
+    {
+        try
+        {
+            try
+            {
+                localPeer.getManagementHost();
+            }
+            catch ( HostNotFoundException nfe )
+            {
+                String requestId = findManagementNode( requestedHost );
+                if ( requestId != null
+                        && requestedHost.getStatus() == io.subutai.core.registration.api.RegistrationStatus.REQUESTED )
+                {
+                    approveRequest( requestId );
+                }
+            }
+        }
+        catch ( Exception e )
+        {
+            // ignore
+        }
+    }
+
+
+    private String findManagementNode( RequestedHost h )
+    {
+        String result = null;
+        if ( h.getStatus() == io.subutai.core.registration.api.RegistrationStatus.REQUESTED )
+        {
+            for ( HostInfo info : h.getHostInfos() )
+            {
+                if ( "management".equalsIgnoreCase( info.getHostname() ) )
+                {
+                    result = h.getId();
+                    break;
+                }
+            }
+        }
+        return result;
     }
 }
