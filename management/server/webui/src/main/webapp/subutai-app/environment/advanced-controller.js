@@ -43,15 +43,15 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 	vm.showResources = showResources;
 	vm.addResource2Build = addResource2Build;
 
-	/*environmentService.getTemplates()
+	environmentService.getTemplates()
 		.success(function (data) {
 			vm.templates = data;
 		})
 		.error(function (data) {
 			VARS_MODAL_ERROR( SweetAlert, 'Error on getting templates ' + data );
-		});*/
+		});
 
-	vm.templates = ['mongo', 'cassandra', 'master', 'hadoop'];
+	//vm.templates = ['mongo', 'cassandra', 'master', 'hadoop'];
 
 	environmentService.getStrategies().success(function (data) {
 		vm.strategies = data;
@@ -63,8 +63,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
 	environmentService.getPeers().success(function (data) {
 		vm.peerIds = data;
-		vm.peerIds['testPeer'] = ['rh1', 'rh2', 'rh3'];
-		console.log(vm.peerIds);
+		//vm.peerIds['testPeer'] = ['rh1', 'rh2', 'rh3'];
 	});
 
 	/*peerRegistrationService.getResourceHosts().success(function (data) {
