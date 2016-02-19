@@ -9,7 +9,6 @@ import java.security.AccessControlException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.UUID;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -34,7 +33,7 @@ import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.KeyTrustLevel;
 import io.subutai.common.security.objects.SecurityKeyType;
-import io.subutai.common.settings.ChannelSettings;
+import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.keyserver.api.KeyServer;
 import io.subutai.core.security.api.crypto.EncryptionTool;
@@ -1164,7 +1163,7 @@ public class KeyManagerImpl implements KeyManager
 
             if ( pubRing == null ) // Get from HTTP
             {
-                String baseUrl = String.format( "https://%s:%s/rest/v1", ip, ChannelSettings.SECURE_PORT_X1 );
+                String baseUrl = String.format( "https://%s:%s/rest/v1", ip, SystemSettings.getSecurePortX1() );
                 WebClient client = RestUtil.createTrustedWebClient( baseUrl, keyData.getJsonProvider() );
                 client.type( MediaType.MULTIPART_FORM_DATA ).accept( MediaType.APPLICATION_JSON );
 
@@ -1199,7 +1198,7 @@ public class KeyManagerImpl implements KeyManager
 
         String peerId = "";
 
-        String baseUrl = String.format( "https://%s:%s/rest/v1/peer", ip, ChannelSettings.SECURE_PORT_X1 );
+        String baseUrl = String.format( "https://%s:%s/rest/v1/peer", ip, SystemSettings.getSecurePortX1() );
         WebClient clientPeerId = RestUtil.createTrustedWebClient( baseUrl, keyData.getJsonProvider() );
         clientPeerId.type( MediaType.APPLICATION_JSON ).accept( MediaType.APPLICATION_JSON );
         PeerInfo peerInfo = clientPeerId.path( "/info" ).get( PeerInfo.class );

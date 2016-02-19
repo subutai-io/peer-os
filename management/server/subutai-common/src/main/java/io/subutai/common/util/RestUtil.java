@@ -26,8 +26,8 @@ import io.subutai.common.exception.HTTPException;
 import io.subutai.common.security.crypto.keystore.KeyStoreData;
 import io.subutai.common.security.crypto.keystore.KeyStoreTool;
 import io.subutai.common.security.crypto.ssl.SSLManager;
-import io.subutai.common.settings.ChannelSettings;
 import io.subutai.common.settings.Common;
+import io.subutai.common.settings.SystemSettings;
 
 
 public class RestUtil
@@ -206,11 +206,11 @@ public class RestUtil
             URL urlObject = new URL( url );
             String port = String.valueOf( urlObject.getPort() );
 
-            if ( Objects.equals( port, ChannelSettings.SECURE_PORT_X1 ) )
+            if ( Objects.equals( port, SystemSettings.getSecurePortX1() ) )
             {
                 client = createTrustedWebClient( url, provider );
             }
-            else if ( Objects.equals( port, ChannelSettings.SECURE_PORT_X2 ) )
+            else if ( Objects.equals( port, SystemSettings.getSecurePortX2() ) )
             {
                 LOG.debug( String.format( "Request type: %s, %s", requestType, url ) );
                 client = createTrustedWebClientWithAuth( url, alias );
@@ -225,7 +225,7 @@ public class RestUtil
             //                case ChannelSettings.getSecurePortX1():
             //                    client = createTrustedWebClient( url, provider );
             //                    break;
-            //                case ChannelSettings.SECURE_PORT_X2:
+            //                case SystemSettings.getSecurePortX2():
             //                    LOG.debug( String.format( "Request type: %s, %s", requestType, url ) );
             //                    client = createTrustedWebClientWithAuth( url, alias );
             //                    break;
@@ -276,11 +276,11 @@ public class RestUtil
             URL urlObject = new URL( url );
             String port = String.valueOf( urlObject.getPort() );
 
-            if ( Objects.equals( port, ChannelSettings.SECURE_PORT_X1 ) )
+            if ( Objects.equals( port, SystemSettings.getSecurePortX1() ) )
             {
                 client = createTrustedWebClient( url );
             }
-            else if ( Objects.equals( port, ChannelSettings.SECURE_PORT_X2 ) )
+            else if ( Objects.equals( port, SystemSettings.getSecurePortX2() ) )
             {
                 LOG.debug( String.format( "Request type: %s, %s", requestType, url ) );
                 client = createTrustedWebClientWithAuth( url, alias );
@@ -296,7 +296,7 @@ public class RestUtil
             //                case ChannelSettings.SECURE_PORT_X1:
             //                    client = createTrustedWebClient( url );
             //                    break;
-            //                case ChannelSettings.SECURE_PORT_X2:
+            //                case SystemSettings.getSecurePortX2():
             //                    LOG.debug( String.format( "Request type: %s, %s", requestType, url ) );
             //                    client = createTrustedWebClientWithAuth( url, alias );
             //                    break;
