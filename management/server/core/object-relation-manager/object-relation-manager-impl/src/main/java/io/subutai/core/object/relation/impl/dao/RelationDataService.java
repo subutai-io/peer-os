@@ -35,6 +35,27 @@ public class RelationDataService
     }
 
 
+    public void save( Object relationLink )
+    {
+        EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
+
+        try
+        {
+            daoManager.startTransaction( em );
+            em.persist( relationLink );
+            daoManager.commitTransaction( em );
+        }
+        catch ( Exception ex )
+        {
+            logger.error( "Error persisting object", ex );
+            daoManager.rollBackTransaction( em );
+        }
+        finally
+        {
+            daoManager.closeEntityManager( em );
+        }
+    }
+
     public void update( Object relationLink )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
