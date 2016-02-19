@@ -2,9 +2,7 @@ package io.subutai.core.environment.rest.ui;
 
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,7 +22,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
-import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
 
 import io.subutai.common.environment.ContainerHostNotFoundException;
@@ -46,12 +43,10 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.resource.PeerGroupResources;
-import io.subutai.common.resource.PeerResources;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.api.ShareDto.ShareDto;
-import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
 import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.lxc.quota.api.QuotaManager;
@@ -162,6 +157,7 @@ public class RestServiceImpl implements RestService
         return Response.ok( JsonUtil.toJson( environment.getId() ) ).build();
     }
 
+
     @Override
     public Response buildAdvanced( final String name, final String containersJson )
     {
@@ -170,13 +166,12 @@ public class RestServiceImpl implements RestService
 
         try
         {
-            List<NodeGroup> schema =
-                    JsonUtil.fromJson( containersJson, new TypeToken<List<NodeGroup>>() {}.getType() );
+            List<NodeGroup> schema = JsonUtil.fromJson( containersJson, new TypeToken<List<NodeGroup>>() {}.getType() );
 
             Topology topology = new Topology( name, 0, 0 );
 
 
-            schema.forEach( s -> topology.addNodeGroupPlacement(s.getPeerId(), s) );
+            schema.forEach( s -> topology.addNodeGroupPlacement( s.getPeerId(), s ) );
 
             environment = environmentManager.createEnvironment( topology, true );
         }
@@ -195,8 +190,8 @@ public class RestServiceImpl implements RestService
         try
         {
             String name = environmentManager.getEnvironments().stream()
-                                            .filter( e -> e.getEnvironmentId().equals( environmentId ) ).findFirst()
-                                            .get().getName();
+                                            .filter( e -> e.getEnvironmentId().getId().equals( environmentId ) )
+                                            .findFirst().get().getName();
 
             ContainerPlacementStrategy placementStrategy = strategyManager.findStrategyById( UnlimitedStrategy.ID );
 
@@ -907,7 +902,7 @@ public class RestServiceImpl implements RestService
     }
 
 
-    /** Additional ****************************************/
+    /** Additional *************************************** */
 
 
     @Override
