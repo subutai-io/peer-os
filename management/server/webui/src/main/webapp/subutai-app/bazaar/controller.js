@@ -2,12 +2,13 @@
 
 angular.module('subutai.bazaar.controller', [])
 	.controller('BazaarCtrl', BazaarCtrl)
-	.directive('fileModel', fileModel);
+	.directive('fileModel', fileModel)
+
 fileModel.$inject = ["$parse"];
 
 var karUploader = {};
-BazaarCtrl.$inject = ['$scope', 'BazaarSrv', 'ngDialog', 'SweetAlert', '$location'];
-function BazaarCtrl($scope, BazaarSrv, ngDialog, SweetAlert, $location) {
+BazaarCtrl.$inject = ['$scope', 'BazaarSrv', 'ngDialog', 'SweetAlert', '$location', 'cfpLoadingBar'];
+function BazaarCtrl($scope, BazaarSrv, ngDialog, SweetAlert, $location, cfpLoadingBar) {
 
 	var vm = this;
 
@@ -19,6 +20,7 @@ function BazaarCtrl($scope, BazaarSrv, ngDialog, SweetAlert, $location) {
 	vm.notRegistered = true;
 	function getHubPlugins() {
 		BazaarSrv.checkRegistration().success (function (data) {
+			console.log (data);
 			if (data.isRegisteredToHub) {
 				vm.notRegistered = false;
 				BazaarSrv.getHubPlugins().success (function (data) {
@@ -446,8 +448,28 @@ function BazaarCtrl($scope, BazaarSrv, ngDialog, SweetAlert, $location) {
 			SweetAlert.swal ("ERROR!", "Peer registration failed. Please, check the procedure of registering peer and come back again.", "error");
 		});
 	}
-}
 
+
+	cfpLoadingBar.start();
+	angular.element(document).ready(function () {
+		cfpLoadingBar.complete();
+	});
+
+	vm.refOldPlugins = [];
+
+	function getRefOldPlugins() {
+		console.log ("here");
+		try {
+			BazaarSrv.getRefOldPlugins().success(function(data) {
+				vm.refOldPlugins = data;
+			});
+		} catch(e) {}
+	}
+	getRefOldPlugins();
+
+
+
+}
 
 
 function fileModel($parse) {

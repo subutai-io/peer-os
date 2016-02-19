@@ -13,8 +13,7 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 
 import io.subutai.common.peer.PeerException;
-import io.subutai.common.settings.ChannelSettings;
-import io.subutai.common.settings.PeerSettings;
+import io.subutai.common.settings.SystemSettings;
 import io.subutai.core.channel.impl.ChannelManagerImpl;
 import io.subutai.core.channel.impl.util.InterceptorState;
 import io.subutai.core.channel.impl.util.MessageContentUtil;
@@ -45,7 +44,7 @@ public class ClientOutInterceptor extends AbstractPhaseInterceptor<Message>
     @Override
     public void handleMessage( final Message message )
     {
-        if ( !PeerSettings.getEncryptionState() )
+        if ( !SystemSettings.getEncryptionState() )
         {
             return;
         }
@@ -57,7 +56,7 @@ public class ClientOutInterceptor extends AbstractPhaseInterceptor<Message>
 
                 URL url = getUrl( message );
 
-                if ( url.getPort() == ChannelSettings.SECURE_PORT_X2 )
+                if ( url.getPort() == SystemSettings.getSecurePortX2() )
                 {
                     String path = url.getPath();
                     String ip = url.getHost();

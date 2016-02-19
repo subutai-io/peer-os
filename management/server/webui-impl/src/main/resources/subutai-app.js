@@ -516,28 +516,6 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 				}]
 			}
 		})
-		.state('plugins', {
-			url: '/plugins',
-			templateUrl: 'subutai-app/plugins/partials/view.html',
-			data: {
-				bodyClass: '',
-				layout: 'default'
-			},
-			resolve: {
-				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
-					return $ocLazyLoad.load([
-						{
-							name: 'subutai.plugins',
-							files: [
-								'subutai-app/plugins/plugins.js',
-								'subutai-app/plugins/controller.js',
-								'subutai-app/plugins/service.js'
-							]
-						}
-					]);
-				}]
-			}
-		})
 		.state('about', {
 			url: '/about',
 			templateUrl: 'subutai-app/about/partials/view.html',

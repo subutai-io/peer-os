@@ -9,7 +9,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import org.apache.cxf.message.Message;
 
-import io.subutai.common.settings.PeerSettings;
+import io.subutai.common.settings.SystemSettings;
 import io.subutai.core.channel.impl.ChannelManagerImpl;
 import io.subutai.core.peer.api.PeerManager;
 
@@ -32,7 +32,7 @@ public class ServerInInterceptorTest
     @Mock
     Object object;
     @Mock
-    PeerSettings peerSettings;
+    SystemSettings peerSettings;
 
 
     @Before

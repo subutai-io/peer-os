@@ -157,6 +157,7 @@ public class RestServiceImpl implements RestService
         return Response.ok( JsonUtil.toJson( environment.getId() ) ).build();
     }
 
+
     @Override
     public Response buildAdvanced( final String name, final String containersJson )
     {
@@ -165,13 +166,12 @@ public class RestServiceImpl implements RestService
 
         try
         {
-            List<NodeGroup> schema =
-                    JsonUtil.fromJson( containersJson, new TypeToken<List<NodeGroup>>() {}.getType() );
+            List<NodeGroup> schema = JsonUtil.fromJson( containersJson, new TypeToken<List<NodeGroup>>() {}.getType() );
 
             Topology topology = new Topology( name, 0, 0 );
 
 
-            schema.forEach( s -> topology.addNodeGroupPlacement(s.getPeerId(), s) );
+            schema.forEach( s -> topology.addNodeGroupPlacement( s.getPeerId(), s ) );
 
             environment = environmentManager.createEnvironment( topology, true );
         }
@@ -190,8 +190,8 @@ public class RestServiceImpl implements RestService
         try
         {
             String name = environmentManager.getEnvironments().stream()
-                                            .filter( e -> e.getEnvironmentId().equals( environmentId ) ).findFirst()
-                                            .get().getName();
+                                            .filter( e -> e.getEnvironmentId().getId().equals( environmentId ) )
+                                            .findFirst().get().getName();
 
             ContainerPlacementStrategy placementStrategy = strategyManager.findStrategyById( UnlimitedStrategy.ID );
 
@@ -902,7 +902,7 @@ public class RestServiceImpl implements RestService
     }
 
 
-    /** Additional ****************************************/
+    /** Additional *************************************** */
 
 
     @Override

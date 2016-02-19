@@ -12,7 +12,6 @@ import io.subutai.core.systemmanager.api.SystemManager;
 import io.subutai.core.systemmanager.api.pojo.KurjunSettings;
 import io.subutai.core.systemmanager.api.pojo.NetworkSettings;
 import io.subutai.core.systemmanager.api.pojo.PeerSettings;
-import io.subutai.core.systemmanager.api.pojo.SecuritySettings;
 import io.subutai.core.systemmanager.api.pojo.SystemInfo;
 
 
@@ -46,7 +45,7 @@ public class RestServiceImpl implements RestService
     @Override
     public Response setRegistrationStatus( @FormParam( "status" ) final String status )
     {
-        io.subutai.common.settings.PeerSettings.setRegisterToHubState( Boolean.valueOf( status ) );
+        io.subutai.common.settings.SystemSettings.setRegisterToHubState( Boolean.valueOf( status ) );
         return Response.status( Response.Status.OK ).build();
     }
 
@@ -135,32 +134,10 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response setNetworkSettings( final String externalIpInterface, final String openPort,
-                                        final String securePortX1, final String securePortX2, final String securePortX3,
-                                        final String specialPortX1 )
+    public Response setNetworkSettings( final String securePortX1, final String securePortX2,
+                                        final String securePortX3 )
     {
-        systemManager.setNetworkSettings( externalIpInterface, openPort, securePortX1, securePortX2, securePortX3,
-                specialPortX1 );
-        return Response.status( Response.Status.OK ).build();
-    }
-
-
-    @Override
-    public Response getSecuritySettings()
-    {
-        SecuritySettings pojo = systemManager.getSecuritySettings();
-        String securitySettingsInfo = JsonUtil.GSON.toJson( pojo );
-
-        return Response.status( Response.Status.OK ).entity( securitySettingsInfo ).build();
-    }
-
-
-    @Override
-    public Response setSecuritySettings( final boolean encryptionEnabled, final boolean restEncryptionEnabled,
-                                         final boolean integrationEnabled, final boolean keyTrustCheckEnabled )
-    {
-        systemManager.setSecuritySettings( encryptionEnabled, restEncryptionEnabled, integrationEnabled,
-                keyTrustCheckEnabled );
+        systemManager.setNetworkSettings( securePortX1, securePortX2, securePortX3 );
         return Response.status( Response.Status.OK ).build();
     }
 

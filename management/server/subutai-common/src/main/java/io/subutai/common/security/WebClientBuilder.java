@@ -19,9 +19,9 @@ import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.security.crypto.keystore.KeyStoreData;
 import io.subutai.common.security.crypto.keystore.KeyStoreTool;
 import io.subutai.common.security.crypto.ssl.SSLManager;
-import io.subutai.common.settings.ChannelSettings;
 import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SecuritySettings;
+import io.subutai.common.settings.SystemSettings;
 
 
 /**
@@ -40,7 +40,7 @@ public class WebClientBuilder
     public static WebClient buildPeerWebClient( final String host, final String path, final Object provider,
                                                 long connectTimeoutMs, long readTimeoutMs, int maxAttempts )
     {
-        String effectiveUrl = String.format( PEER_URL_TEMPLATE, host, ChannelSettings.SECURE_PORT_X2,
+        String effectiveUrl = String.format( PEER_URL_TEMPLATE, host, SystemSettings.getSecurePortX2(),
                 ( path.startsWith( "/" ) ? path : "/" + path ) );
         WebClient client;
         if ( provider == null )
@@ -97,7 +97,7 @@ public class WebClientBuilder
 
     public static WebClient buildEnvironmentWebClient( final String host, final String path, final Object provider )
     {
-        String effectiveUrl = String.format( ENVIRONMENT_URL_TEMPLATE, host, ChannelSettings.SECURE_PORT_X2,
+        String effectiveUrl = String.format( ENVIRONMENT_URL_TEMPLATE, host, SystemSettings.getSecurePortX2(),
                 ( path.startsWith( "/" ) ? path : "/" + path ) );
         WebClient client = WebClient.create( effectiveUrl, Arrays.asList( provider ) );
         HTTPConduit httpConduit = ( HTTPConduit ) WebClient.getConfig( client ).getConduit();
