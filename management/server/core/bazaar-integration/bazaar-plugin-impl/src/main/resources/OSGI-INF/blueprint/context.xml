@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint default-activation="eager"
+		   xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		   xmlns:jpa="http://aries.apache.org/xmlns/jpa/v1.0.0"
+		   xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
+		   xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0"
+		   xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0
+            http://www.w3.org/2001/XMLSchema-instance http://www.w3.org/2001/XMLSchema-instance
+            http://aries.apache.org/xmlns/jpa/v1.0.0 http://aries.apache.org/xmlns/jpa/v1.0.0">
+
+
+	<reference id="integration"
+			   interface="io.subutai.core.hubmanager.api.Integration" />
+
+	<bean id="daoManagerPlugin" init-method="init" class="io.subutai.common.dao.DaoManager" scope="prototype">
+		<jpa:unit unitname="BazaarConfigPUnit" property="entityManagerFactory" />
+	</bean>
+
+
+	<service id="bazaarPlugin" ref="bazaarPluginImpl" interface="io.subutai.core.bazaar.api.Bazaar">
+	</service>
+	<bean id="bazaarPluginImpl" class="io.subutai.core.bazaar.impl.BazaarImpl"
+		  scope="singleton" activation="eager">
+		<argument ref="integration" />
+		<argument ref="daoManagerPlugin" />
+	</bean>
+
+
+<!--	<service ref="integration" interface="io.subutai.webui.api.WebuiModule" />
+
+
+	<bean id="module" scope="singleton" class="io.subutai.plugin.bazaar.impl.BazaarWebModule">
+	</bean>-->
+</blueprint>

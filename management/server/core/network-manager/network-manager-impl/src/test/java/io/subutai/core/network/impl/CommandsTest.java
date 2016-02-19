@@ -7,16 +7,18 @@ import org.junit.Test;
 
 import com.google.common.collect.Sets;
 
+import io.subutai.common.host.HostInterface;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.settings.Common;
 
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 
 public class CommandsTest
 {
-    private static final String SUPER_NODE_IP = "super.node.ip";
-    private static final int SUPER_NODE_PORT = 1234;
     private static final String INTERFACE_NAME = "interface name";
     private static final String COMMUNITY_NAME = "community name";
     private static final String LOCAL_IP = "local.ip";
@@ -27,8 +29,7 @@ public class CommandsTest
     private static final int VLAN_ID = 100;
     private static final String ENVIRONMENT_ID = UUID.randomUUID().toString();
     private static final String CONTAINER_NAME = "container";
-    private static final String PATH_TO_KEY_FILE = "/path/to/key/file";
-    private static final String KEY_TYPE = "key type";
+    private static final String SECRET_KEY = "secret key";
     private static final int NET_MASK = 24;
     private static final int VNI = 100;
     private static final String KEY = "KEY";
@@ -37,25 +38,24 @@ public class CommandsTest
 
 
     @Test
-    public void testGetSetupN2NConnectionCommand() throws Exception
+    public void testGetSetupP2PConnectionCommand() throws Exception
     {
-        assertNotNull(
-                commands.getSetupN2NConnectionCommand( SUPER_NODE_IP, SUPER_NODE_PORT, INTERFACE_NAME, COMMUNITY_NAME,
-                        LOCAL_IP, KEY_TYPE, PATH_TO_KEY_FILE ) );
+        assertNotNull( commands.getSetupP2PConnectionCommand( INTERFACE_NAME, LOCAL_IP, COMMUNITY_NAME, SECRET_KEY,
+                Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC ) );
     }
 
 
     @Test
-    public void testGetRemoveN2NConnectionCommand() throws Exception
+    public void testGetRemoveP2PConnectionCommand() throws Exception
     {
-        assertNotNull( commands.getRemoveN2NConnectionCommand( INTERFACE_NAME, COMMUNITY_NAME ) );
+        assertNotNull( commands.getRemoveP2PConnectionCommand( COMMUNITY_NAME ) );
     }
 
 
     @Test
-    public void testGetListN2NConnectionsCommand() throws Exception
+    public void testGetListP2PConnectionsCommand() throws Exception
     {
-        assertNotNull( commands.getListN2NConnectionsCommand() );
+        assertNotNull( commands.getListP2PConnectionsCommand() );
     }
 
 
@@ -98,13 +98,6 @@ public class CommandsTest
     public void testGetRemoveContainerIpCommand() throws Exception
     {
         assertNotNull( commands.getRemoveContainerIpCommand( CONTAINER_NAME ) );
-    }
-
-
-    @Test
-    public void testGetSetupGatewayCommand() throws Exception
-    {
-        assertNotNull( commands.getSetupGatewayCommand( GATEWAY_IP, VLAN_ID ) );
     }
 
 
@@ -172,20 +165,6 @@ public class CommandsTest
 
 
     @Test
-    public void testGetCreateSSHCommand() throws Exception
-    {
-        assertNotNull( commands.getCreateSSHCommand() );
-    }
-
-
-    @Test
-    public void testGetReadSSHCommand() throws Exception
-    {
-        assertNotNull( commands.getReadSSHCommand() );
-    }
-
-
-    @Test
     public void testGetAppendSshKeyCommand() throws Exception
     {
         assertNotNull( commands.getAppendSshKeyCommand( KEY ) );
@@ -217,6 +196,8 @@ public class CommandsTest
     public void testGetAddIpHostToEtcHostsCommand() throws Exception
     {
         ContainerHost containerHost = mock( ContainerHost.class );
+        final HostInterface hostInterface = mock( HostInterface.class );
+        when( containerHost.getInterfaceByName( anyString() ) ).thenReturn( hostInterface );
         assertNotNull( commands.getAddIpHostToEtcHostsCommand( DOMAIN, Sets.newHashSet( containerHost ) ) );
     }
 }

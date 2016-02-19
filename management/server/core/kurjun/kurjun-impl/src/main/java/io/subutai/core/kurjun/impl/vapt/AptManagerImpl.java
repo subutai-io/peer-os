@@ -1,6 +1,27 @@
 package io.subutai.core.kurjun.impl.vapt;
 
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.apache.commons.codec.binary.Hex;
+
+import com.google.inject.Injector;
+
 import ai.subut.kurjun.ar.CompressionType;
 import ai.subut.kurjun.cfparser.ControlFileParserModule;
 import ai.subut.kurjun.common.KurjunBootstrap;
@@ -8,6 +29,7 @@ import ai.subut.kurjun.common.service.KurjunContext;
 import ai.subut.kurjun.common.service.KurjunProperties;
 import ai.subut.kurjun.index.PackagesIndexParserModule;
 import ai.subut.kurjun.metadata.common.DefaultMetadata;
+import ai.subut.kurjun.metadata.common.apt.DefaultPackageMetadata;
 import ai.subut.kurjun.metadata.factory.PackageMetadataStoreFactory;
 import ai.subut.kurjun.metadata.factory.PackageMetadataStoreModule;
 import ai.subut.kurjun.model.index.ReleaseFile;
@@ -16,58 +38,50 @@ import ai.subut.kurjun.model.metadata.Metadata;
 import ai.subut.kurjun.model.metadata.SerializableMetadata;
 import ai.subut.kurjun.model.repository.LocalRepository;
 import ai.subut.kurjun.model.repository.UnifiedRepository;
+import ai.subut.kurjun.quota.DataUnit;
+import ai.subut.kurjun.quota.QuotaInfoStore;
+import ai.subut.kurjun.quota.disk.DiskQuota;
+import ai.subut.kurjun.quota.transfer.TransferQuota;
 import ai.subut.kurjun.repo.RepositoryFactory;
 import ai.subut.kurjun.repo.RepositoryModule;
 import ai.subut.kurjun.repo.service.PackageFilenameParser;
 import ai.subut.kurjun.repo.service.PackagesIndexBuilder;
 import ai.subut.kurjun.repo.util.AptIndexBuilderFactory;
+import ai.subut.kurjun.repo.util.PackagesProviderFactory;
 import ai.subut.kurjun.repo.util.ReleaseIndexBuilder;
 import ai.subut.kurjun.riparser.ReleaseIndexParserModule;
 import ai.subut.kurjun.snap.SnapMetadataParserModule;
 import ai.subut.kurjun.storage.factory.FileStoreFactory;
 import ai.subut.kurjun.storage.factory.FileStoreModule;
 import ai.subut.kurjun.subutai.SubutaiTemplateParserModule;
-import com.google.inject.Injector;
-import io.subutai.common.peer.HostNotFoundException;
+import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.peer.PeerException;
+import io.subutai.common.protocol.AptPackage;
+import io.subutai.common.settings.Common;
+import io.subutai.core.kurjun.api.KurjunTransferQuota;
 import io.subutai.core.kurjun.api.vapt.AptManager;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.MalformedURLException;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.Set;
-import org.apache.commons.codec.binary.Hex;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.subutai.core.kurjun.impl.RepoUrl;
+import io.subutai.core.kurjun.impl.RepoUrlStore;
+import io.subutai.core.kurjun.impl.TrustedWebClientFactoryModule;
 
 
 public class AptManagerImpl implements AptManager
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( AptManagerImpl.class );
 
-//    private RepositoryFactory repositoryFactory;
-//    private AuthManager authManager;
-//    private AptIndexBuilderFactory indexBuilderFactory;
-//    private PackageFilenameParser filenameParser;
-//    private PackageFilenameBuilder filenameBuilder;
-
     private static final KurjunContext context = new KurjunContext( "my" );
 
     private Injector injector;
 
-    private final Set<URL> remoteRepoUrls = new HashSet<>();
+    private final LocalPeer localPeer;
+    private Set<RepoUrl> remoteRepoUrls;
+    private final RepoUrlStore repoUrlStore = new RepoUrlStore( Common.SUBUTAI_APP_DATA_PATH );
+
+
+    public AptManagerImpl( LocalPeer localPeer )
+    {
+        this.localPeer = localPeer;
+    }
 
 
     public void init()
@@ -76,15 +90,15 @@ public class AptManagerImpl implements AptManager
 
         KurjunProperties properties = injector.getInstance( KurjunProperties.class );
         setContexts( properties );
-        
-//        try
-//        {
-//            addRemoteRepository( new URL( "https://172.16.131.84:8443/rest/kurjun/vapt" ) );
-//        }
-//        catch ( MalformedURLException ex )
-//        {
-//            LOGGER.error( "", ex );
-//        }
+
+        try
+        {
+            remoteRepoUrls = repoUrlStore.getRemoteAptUrls();
+        }
+        catch ( IOException ex )
+        {
+            LOGGER.error( "Failed to load remote apt repositories", ex );
+        }
     }
 
 
@@ -106,7 +120,8 @@ public class AptManagerImpl implements AptManager
         bootstrap.addModule( new SnapMetadataParserModule() );
 
         bootstrap.addModule( new RepositoryModule() );
-//        bootstrap.addModule( new SecurityModule() );
+        bootstrap.addModule( new TrustedWebClientFactoryModule() );
+        //        bootstrap.addModule( new SecurityModule() );
 
         bootstrap.boot();
 
@@ -117,14 +132,14 @@ public class AptManagerImpl implements AptManager
     @Override
     public String getRelease( String release, String component, String arch )
     {
-        LocalRepository repo = getLocalRepository();
-        Optional<ReleaseFile> rel = repo.getDistributions().stream()
-                .filter( r -> r.getCodename().equals( release ) ).findFirst();
+        UnifiedRepository repo = getRepository();
+        Optional<ReleaseFile> rel =
+                repo.getDistributions().stream().filter( r -> r.getCodename().equals( release ) ).findFirst();
 
         if ( rel.isPresent() )
         {
             AptIndexBuilderFactory indexBuilderFactory = injector.getInstance( AptIndexBuilderFactory.class );
-            ReleaseIndexBuilder rib = indexBuilderFactory.createReleaseIndexBuilder( context );
+            ReleaseIndexBuilder rib = indexBuilderFactory.createReleaseIndexBuilder( repo, context );
             return rib.build( rel.get(), repo.isKurjun() );
         }
         return null;
@@ -132,10 +147,12 @@ public class AptManagerImpl implements AptManager
 
 
     @Override
-    public InputStream getPackagesIndex( String release, String component, String arch, String packagesIndex ) throws IllegalArgumentException
+    public InputStream getPackagesIndex( String release, String component, String arch, String packagesIndex )
+            throws IllegalArgumentException
     {
-        Optional<ReleaseFile> distr = getLocalRepository().getDistributions().stream()
-                .filter( r -> r.getCodename().equals( release ) ).findFirst();
+        UnifiedRepository repo = getRepository();
+        Optional<ReleaseFile> distr =
+                repo.getDistributions().stream().filter( r -> r.getCodename().equals( release ) ).findFirst();
         if ( !distr.isPresent() )
         {
             throw new IllegalArgumentException( "Release not found." );
@@ -154,11 +171,14 @@ public class AptManagerImpl implements AptManager
 
         CompressionType compressionType = CompressionType.getCompressionType( packagesIndex );
 
+        PackagesProviderFactory packagesProviderFactory = injector.getInstance( PackagesProviderFactory.class );
         AptIndexBuilderFactory indexBuilderFactory = injector.getInstance( AptIndexBuilderFactory.class );
+
         PackagesIndexBuilder packagesIndexBuilder = indexBuilderFactory.createPackagesIndexBuilder( context );
         try ( ByteArrayOutputStream os = new ByteArrayOutputStream() )
         {
-            packagesIndexBuilder.buildIndex( component, architecture, os, compressionType );
+            packagesIndexBuilder
+                    .buildIndex( packagesProviderFactory.create( repo, component, architecture ), os, compressionType );
             return new ByteArrayInputStream( os.toByteArray() );
         }
         catch ( IOException ex )
@@ -180,24 +200,14 @@ public class AptManagerImpl implements AptManager
     @Override
     public InputStream getPackageByFilename( String filename ) throws IllegalArgumentException
     {
-//        if ( checkAuthentication( Permission.GET_PACKAGE ) )
-//        {
-//            return forbiddenResponse();
-//        }
-
         SerializableMetadata meta = getPackageInfoByFilename( filename );
-        return ( meta != null ) ? getLocalRepository().getPackageStream( meta ) : null;
+        return ( meta != null ) ? getRepository().getPackageStream( meta ) : null;
     }
 
 
     @Override
     public String getSerializedPackageInfo( String filename ) throws IllegalArgumentException
     {
-//        if ( checkAuthentication( Permission.GET_PACKAGE ) )
-//        {
-//            return forbiddenResponse();
-//        }
-
         SerializableMetadata meta = getPackageInfoByFilename( filename );
         return ( meta != null ) ? meta.serialize() : null;
     }
@@ -208,7 +218,7 @@ public class AptManagerImpl implements AptManager
     {
         DefaultMetadata m = new DefaultMetadata();
         m.setMd5sum( md5 );
-        SerializableMetadata meta = getLocalRepository().getPackageInfo( m );
+        SerializableMetadata meta = getRepository().getPackageInfo( m );
         return ( meta != null ) ? meta.serialize() : null;
     }
 
@@ -228,18 +238,13 @@ public class AptManagerImpl implements AptManager
         m.setName( packageName );
         m.setVersion( version );
 
-        return getLocalRepository().getPackageInfo( m );
+        return getRepository().getPackageInfo( m );
     }
 
 
     @Override
     public URI upload( InputStream is )
     {
-//        if ( checkAuthentication( Permission.ADD_PACKAGE ) )
-//        {
-//            return forbiddenResponse();
-//        }
-
         Objects.requireNonNull( is, "The uploaded InputStream cannot be null" );
         try
         {
@@ -255,13 +260,43 @@ public class AptManagerImpl implements AptManager
 
 
     @Override
+    public List<AptPackage> list()
+    {
+        List<SerializableMetadata> list = getRepository().listPackages();
+        List<AptPackage> deflist = list.stream().map( t -> convertToAptPackage( ( DefaultPackageMetadata ) t ) )
+                                       .collect( Collectors.toList() );
+        return deflist;
+    }
+    
+    
+    @Override
+    public boolean delete( byte[] md5 ) throws IOException
+    {
+        LocalRepository repo = getLocalRepository();
+        try
+        {
+            repo.delete( md5 );
+            return true;
+        }
+        catch ( IOException ex )
+        {
+            LOGGER.error( "Failed to delete apt package", ex );
+            return false;
+        }
+    }
+
+
+    private AptPackage convertToAptPackage( DefaultPackageMetadata meta )
+    {
+        return new AptPackage( Hex.encodeHexString( meta.getMd5Sum() ), meta.getName(), meta.getVersion(),
+                meta.getSource(), meta.getMaintainer(), meta.getArchitecture().name(), meta.getInstalledSize(),
+                meta.getDescription() );
+    }
+
+
+    @Override
     public String getPackageInfo( byte[] md5, String name, String version )
     {
-            //        if ( checkAuthentication( Permission.GET_PACKAGE ) )
-//        {
-//            return forbiddenResponse();
-//        }
-
         if ( md5 == null && name == null && version == null )
         {
             return null;
@@ -272,7 +307,7 @@ public class AptManagerImpl implements AptManager
         m.setName( name );
         m.setVersion( version );
 
-        SerializableMetadata meta = getLocalRepository().getPackageInfo( m );
+        SerializableMetadata meta = getRepository().getPackageInfo( m );
         if ( meta != null )
         {
             return meta.serialize();
@@ -284,20 +319,15 @@ public class AptManagerImpl implements AptManager
     @Override
     public InputStream getPackage( byte[] md5 )
     {
-//        if ( checkAuthentication( Permission.GET_PACKAGE ) )
-//        {
-//            return forbiddenResponse();
-//        }
-
         if ( md5 == null )
         {
             return null;
         }
-        
+
         DefaultMetadata m = new DefaultMetadata();
         m.setMd5sum( md5 );
 
-        LocalRepository repo = getLocalRepository();
+        UnifiedRepository repo = getRepository();
         SerializableMetadata meta = repo.getPackageInfo( m );
         if ( meta != null )
         {
@@ -307,54 +337,136 @@ public class AptManagerImpl implements AptManager
     }
 
 
-//    @Override
-//    public void addRemoteRepository( URL url )
-//    {
-//        String hostAddr = null;
-//        try
-//        {
-//            NetworkInterface ni = NetworkInterface.getByName( "eth0" );
-//            Enumeration<InetAddress> inetAddress = ni.getInetAddresses();
-//
-//            for ( ; inetAddress.hasMoreElements(); )
-//            {
-//                InetAddress addr = inetAddress.nextElement();
-//                if ( addr instanceof Inet4Address )
-//                {
-//                    hostAddr = addr.getHostAddress();
-//                }
-//            }
-//        }
-//        catch ( SocketException ex )
-//        {
-//            LOGGER.error( "", ex );
-//        }
-//
-//        if ( url != null && !url.getHost().equals( hostAddr ) )
-//        {
-//            remoteRepoUrls.add( url );
-//            LOGGER.error( "remoteRepoUrls = " + remoteRepoUrls );
-//            LOGGER.info( "Remote host url is added: {}", url );
-//        }
-//        else
-//        {
-//            LOGGER.error( "Failed to add remote host url: {}", url );
-//        }
-//
-//    }
+    @Override
+    public void addRemoteRepository( URL url, String token )
+    {
+        try
+        {
+            if ( url != null && !url.getHost().equals( localPeer.getExternalIp() ) )
+            {
+                repoUrlStore.addRemoteAptUrl( new RepoUrl( url, token ) );
+                remoteRepoUrls = repoUrlStore.getRemoteAptUrls();
+            }
+        }
+        catch ( PeerException | IOException ex )
+        {
+            LOGGER.error( "Failed to add remote apt repo: {}", url, ex );
+        }
+    }
 
 
-//    private UnifiedRepository getRepository()
-//    {
-//        RepositoryFactory repositoryFactory = injector.getInstance( RepositoryFactory.class );
-//        UnifiedRepository unifiedRepo = repositoryFactory.createUnifiedRepo();
-//        unifiedRepo.getRepositories().add( getLocalRepository() );
-//        for ( URL url : remoteRepoUrls )
-//        {
-//            unifiedRepo.getRepositories().add( repositoryFactory.createNonLocalApt( url ) );
-//        }
-//        return unifiedRepo;
-//    }
+    @Override
+    public void removeRemoteRepository( URL url )
+    {
+        Objects.requireNonNull( url, "URL to remove" );
+        try
+        {
+            RepoUrl r = repoUrlStore.removeRemoteAptUrl( new RepoUrl( url, null ) );
+            if ( r != null )
+            {
+                remoteRepoUrls = repoUrlStore.getRemoteAptUrls();
+            }
+        }
+        catch ( IOException ex )
+        {
+            LOGGER.error( "Failed to remove remote apr repo: {}", url, ex );
+        }
+    }
+
+    @Override
+    public Long getDiskQuota( String context )
+    {
+        QuotaInfoStore quotaInfoStore = injector.getInstance( QuotaInfoStore.class );
+        try
+        {
+            DiskQuota diskQuota = quotaInfoStore.getDiskQuota( AptManagerImpl.context );
+            if ( diskQuota != null )
+            {
+                return diskQuota.getThreshold() * diskQuota.getUnit().toBytes() / DataUnit.MB.toBytes();
+            }
+        }
+        catch ( IOException ex )
+        {
+            LOGGER.error( "Failed to get disk quota", ex );
+        }
+        return null;
+    }
+
+
+    @Override
+    public boolean setDiskQuota( long size, String context )
+    {
+        DiskQuota diskQuota = new DiskQuota( size, DataUnit.MB );
+        QuotaInfoStore quotaInfoStore = injector.getInstance( QuotaInfoStore.class );
+        try
+        {
+            quotaInfoStore.saveDiskQuota( diskQuota, AptManagerImpl.context );
+            return true;
+        }
+        catch ( IOException ex )
+        {
+            LOGGER.error( "Failed to save disk quota", ex );
+            return false;
+        }
+    }
+
+
+    @Override
+    public KurjunTransferQuota getTransferQuota( String context )
+    {
+        QuotaInfoStore quotaInfoStore = injector.getInstance( QuotaInfoStore.class );
+        try
+        {
+            TransferQuota q = quotaInfoStore.getTransferQuota( AptManagerImpl.context );
+            if ( q != null )
+            {
+                return new KurjunTransferQuota( q.getThreshold(), q.getTime(), q.getTimeUnit() );
+            }
+        }
+        catch ( IOException ex )
+        {
+            LOGGER.error( "Failed to get transfer quota", ex );
+        }
+        return null;
+    }
+
+
+    @Override
+    public boolean setTransferQuota( KurjunTransferQuota quota, String context )
+    {
+        TransferQuota transferQuota = new TransferQuota();
+        transferQuota.setThreshold( quota.getThreshold() );
+        transferQuota.setUnit( DataUnit.MB );
+        transferQuota.setTime( quota.getTimeFrame() );
+        transferQuota.setTimeUnit( quota.getTimeUnit() );
+
+        QuotaInfoStore quotaInfoStore = injector.getInstance( QuotaInfoStore.class );
+        try
+        {
+            quotaInfoStore.saveTransferQuota( transferQuota, AptManagerImpl.context );
+            return true;
+        }
+        catch ( IOException ex )
+        {
+            LOGGER.error( "Failed to save transfer quota", ex );
+            return false;
+        }
+    }
+
+
+    private UnifiedRepository getRepository()
+    {
+        RepositoryFactory repositoryFactory = injector.getInstance( RepositoryFactory.class );
+
+        UnifiedRepository unifiedRepo = repositoryFactory.createUnifiedRepo();
+        unifiedRepo.getRepositories().add( repositoryFactory.createLocalApt( context ) );
+
+        for ( RepoUrl remote : remoteRepoUrls )
+        {
+            unifiedRepo.getRepositories().add( repositoryFactory.createNonLocalApt( remote.getUrl() ) );
+        }
+        return unifiedRepo;
+    }
 
 
     private LocalRepository getLocalRepository()
@@ -364,13 +476,11 @@ public class AptManagerImpl implements AptManager
     }
 
 
-    private static void setContexts( KurjunProperties properties )
+    private void setContexts( KurjunProperties properties )
     {
         // init apt type context
         Properties kcp = properties.getContextProperties( context );
         kcp.setProperty( FileStoreFactory.TYPE, FileStoreFactory.FILE_SYSTEM );
         kcp.setProperty( PackageMetadataStoreModule.PACKAGE_METADATA_STORE_TYPE, PackageMetadataStoreFactory.FILE_DB );
-
     }
-
 }

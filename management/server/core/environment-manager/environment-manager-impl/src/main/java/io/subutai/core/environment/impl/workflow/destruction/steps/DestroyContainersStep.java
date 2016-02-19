@@ -11,13 +11,13 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
-import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainersDestructionResult;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Peer;
+import io.subutai.common.peer.PeerException;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.ExceptionUtil;
@@ -46,26 +46,30 @@ public class DestroyContainersStep
     }
 
 
-    protected ExecutorService getExecutor( Environment environment )
+    protected ExecutorService getExecutor( int size )
     {
-        return Executors.newFixedThreadPool( environment.getPeers().size() );
+        return Executors.newFixedThreadPool( size );
     }
 
 
     public void execute() throws EnvironmentDestructionException, EnvironmentNotFoundException
     {
 
-        if ( environment.getStatus() == EnvironmentStatus.EMPTY || environment.getContainerHosts().isEmpty() )
+        if ( environment.getStatus() == EnvironmentStatus.PENDING || environment.getStatus() == EnvironmentStatus.EMPTY
+                || environment.getContainerHosts().isEmpty() )
         {
             environmentManager.removeEnvironment( environment.getId() );
             return;
         }
 
 
-        ExecutorService executorService = getExecutor( environment );
-
+        ExecutorService executorService = null;
         try
         {
+            int size = Math.max( environment.getPeers().size(), 1 );
+
+            executorService = getExecutor( size );
+
             Set<Throwable> exceptions = Sets.newHashSet();
 
             Set<Future<ContainersDestructionResult>> futures = Sets.newHashSet();
@@ -129,13 +133,17 @@ public class DestroyContainersStep
                     }
                 }
             }
-
-
-
+        }
+        catch ( PeerException e )
+        {
+            throw new EnvironmentDestructionException( e.getMessage() );
         }
         finally
         {
-            executorService.shutdown();
+            if ( executorService != null )
+            {
+                executorService.shutdown();
+            }
         }
     }
 }

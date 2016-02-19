@@ -6,7 +6,7 @@
   <parent>
     <groupId>io.subutai</groupId>
     <artifactId>peer-manager-parent</artifactId>
-    <version>4.0.0-RC5</version>
+    <version>4.0.0-RC6</version>
   </parent>
 
   <artifactId>peer-manager-impl</artifactId>
@@ -102,11 +102,6 @@
       <groupId>org.mockito</groupId>
       <artifactId>mockito-all</artifactId>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.json</groupId>
-      <artifactId>json</artifactId>
-      <version>20131018</version>
     </dependency>
     <dependency>
       <groupId>org.apache.openjpa</groupId>

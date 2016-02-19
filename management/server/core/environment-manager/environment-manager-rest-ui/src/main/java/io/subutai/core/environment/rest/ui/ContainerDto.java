@@ -3,8 +3,8 @@ package io.subutai.core.environment.rest.ui;
 
 import java.util.Set;
 
-import io.subutai.common.peer.ContainerType;
 import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.peer.ContainerSize;
 
 
 /**
@@ -19,7 +19,7 @@ public class ContainerDto
     private String ip;
     private String mac;
     private String templateName;
-    private ContainerType type;
+    private ContainerSize type;
     private String arch;
     private Set<String> tags;
 
@@ -27,7 +27,7 @@ public class ContainerDto
 
     public ContainerDto( final String id, final String environmentId, final String hostname,
                          final ContainerHostState state, final String ip, final String mac, final String templateName,
-                         final ContainerType type, final String arch, final Set<String> tags )
+                         final ContainerSize type, final String arch, final Set<String> tags )
     {
         this.id = id;
         this.environmentId = environmentId;
@@ -114,13 +114,13 @@ public class ContainerDto
     }
 
 
-    public ContainerType getType()
+    public ContainerSize getType()
     {
         return type;
     }
 
 
-    public void setType( final ContainerType type )
+    public void setType( final ContainerSize type )
     {
         this.type = type;
     }

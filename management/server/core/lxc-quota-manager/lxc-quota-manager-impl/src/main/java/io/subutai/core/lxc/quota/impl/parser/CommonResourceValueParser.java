@@ -1,13 +1,7 @@
 package io.subutai.core.lxc.quota.impl.parser;
 
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
-
-import io.subutai.common.resource.MeasureUnit;
+import io.subutai.common.resource.ContainerResourceType;
 import io.subutai.common.resource.ResourceValue;
 import io.subutai.common.resource.ResourceValueParser;
 
@@ -15,41 +9,46 @@ import io.subutai.common.resource.ResourceValueParser;
 /**
  * Common resource value parser
  */
-public class CommonResourceValueParser implements ResourceValueParser
+public final class CommonResourceValueParser
 {
-    private static final String QUOTA_REGEX = "(\\d+(?:[\\.,]\\d+)?)(K|M|G|T|P|E)?";
-    private static final Pattern QUOTA_PATTERN = Pattern.compile( QUOTA_REGEX );
-
-    private static CommonResourceValueParser instance;
-
-    public static CommonResourceValueParser getInstance()
+    public static ResourceValueParser getInstance( ContainerResourceType type )
     {
-        if ( instance == null )
+        ResourceValueParser result = null;
+        switch ( type )
         {
-            instance = new CommonResourceValueParser();
+            case CPU:
+                result = CpuResourceValueParser.getInstance();
+                break;
+            case RAM:
+                result = RamResourceValueParser.getInstance();
+                break;
+            default:
+                result = DiskValueResourceParser.getInstance();
+                break;
         }
-        return instance;
+        return result;
     }
 
 
-    private CommonResourceValueParser() {}
-
-
-    public ResourceValue parse( String resource )
+    public static ResourceValue parse( String resource, ContainerResourceType type )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( resource ), "Invalid resource string" );
+        ResourceValueParser parser = getInstance( type );
+        if ( parser == null )
+        {
+            throw new IllegalArgumentException( "Resource value parser not registered for type: " + type );
+        }
+        return parser.parse( resource );
+    }
 
-        Matcher quotaMatcher = QUOTA_PATTERN.matcher( resource.trim() );
-        if ( quotaMatcher.matches() )
+
+    public static <T> T parse( String resource, ContainerResourceType type, Class<T> format )
+    {
+        ResourceValueParser parser = getInstance( type );
+        if ( parser == null )
         {
-            String value = quotaMatcher.group( 1 );
-            String acronym = quotaMatcher.group( 2 );
-            MeasureUnit measureUnit = MeasureUnit.parseFromAcronym( acronym );
-            return new ResourceValue( value, measureUnit == null ? MeasureUnit.BYTE : measureUnit );
+            throw new IllegalArgumentException( "Resource value parser not registered for type: " + type );
         }
-        else
-        {
-            throw new IllegalArgumentException( String.format( "Could not parse resource: %s", resource ) );
-        }
+        ResourceValue resourceValue = parser.parse( resource );
+        return ( T ) resourceValue;
     }
 }

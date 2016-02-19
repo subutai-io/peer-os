@@ -1,0 +1,30 @@
+<div class="b-popup b-popup_middle">
+    <div class="b-popup__header">
+        Applying changes
+        <a href ng-click="closeThisDialog()"><i class="fa fa-times g-right"></i></a>
+    </div>
+    <div class="b-popup__body">
+        <table class="b-main-table b-main-table_none-border g-margin-bottom-half">
+            <tr>
+                <td></td>
+                <td>
+                    <i class="fa"
+                       ng-class="environmentSimpleViewCtrl.currentEnvironment.modifyStatus == 'modified' ?
+                       'fa-check g-text-green' : environmentSimpleViewCtrl.currentEnvironment.modifyStatus == 'modifying' ?
+                       'fa-spinner fa-pulse' : 'fa fa-times g-text-red'">
+                    </i>
+                </td>
+                <td>Applying your changes...</td>
+            </tr>
+        </table>
+
+        <div>
+            <a href="#" class="b-btn b-btn_green g-right"
+               ng-disabled="vm.currentEnvironment.modifyStatus = 'modifying'"
+               ng-click="closeThisDialog()">
+                Ok
+            </a>
+            <div class="clear"></div>
+        </div>
+    </div>
+</div>

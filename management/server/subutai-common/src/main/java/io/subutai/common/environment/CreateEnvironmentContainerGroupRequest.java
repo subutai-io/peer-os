@@ -3,7 +3,7 @@ package io.subutai.common.environment;
 
 import java.util.List;
 
-import io.subutai.common.peer.ContainerType;
+import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.protocol.Criteria;
 
 
@@ -13,54 +13,54 @@ public class CreateEnvironmentContainerGroupRequest
     private final String initiatorPeerId;
     private final String ownerId;
     private final String subnetCidr;
-    private final int numberOfContainers;
+//    private final int numberOfContainers;
     private final String strategyId;
     private final List<Criteria> criteria;
     private final String host;
     private final int ipAddressOffset;
     private final String templateName;
-    private final ContainerDistributionType containerDistributionType;
-    private final ContainerType containerType;
+//    private final ContainerDistributionType containerDistributionType;
+    private final ContainerSize containerSize;
+
+
+//    public CreateEnvironmentContainerGroupRequest( final String environmentId, final String initiatorPeerId,
+//                                                   final String ownerId, final String subnetCidr,
+//                                                   /*final int numberOfContainers,*/ final String strategyId,
+//                                                   final List<Criteria> criteria, final int ipAddressOffset,
+//                                                   final String templateName, final ContainerSize containerSize )
+//    {
+//        this.environmentId = environmentId;
+//        this.initiatorPeerId = initiatorPeerId;
+//        this.ownerId = ownerId;
+//        this.subnetCidr = subnetCidr;
+////        this.numberOfContainers = numberOfContainers;
+//        this.strategyId = strategyId;
+//        this.criteria = criteria;
+//        this.ipAddressOffset = ipAddressOffset;
+//        this.templateName = templateName;
+////        this.containerDistributionType = ContainerDistributionType.AUTO;
+//        this.host = null;
+//        this.containerSize = containerSize;
+//    }
 
 
     public CreateEnvironmentContainerGroupRequest( final String environmentId, final String initiatorPeerId,
                                                    final String ownerId, final String subnetCidr,
-                                                   final int numberOfContainers, final String strategyId,
-                                                   final List<Criteria> criteria, final int ipAddressOffset,
-                                                   final String templateName, final ContainerType containerType )
+                                                   /*final int numberOfContainers,*/ final int ipAddressOffset,
+                                                   final String templateName, String host, ContainerSize containerSize )
     {
         this.environmentId = environmentId;
         this.initiatorPeerId = initiatorPeerId;
         this.ownerId = ownerId;
         this.subnetCidr = subnetCidr;
-        this.numberOfContainers = numberOfContainers;
-        this.strategyId = strategyId;
-        this.criteria = criteria;
-        this.ipAddressOffset = ipAddressOffset;
-        this.templateName = templateName;
-        this.containerDistributionType = ContainerDistributionType.AUTO;
-        this.host = null;
-        this.containerType = containerType;
-    }
-
-
-    public CreateEnvironmentContainerGroupRequest( final String environmentId, final String initiatorPeerId,
-                                                   final String ownerId, final String subnetCidr,
-                                                   final int numberOfContainers, final int ipAddressOffset,
-                                                   final String templateName, String host, ContainerType containerType )
-    {
-        this.environmentId = environmentId;
-        this.initiatorPeerId = initiatorPeerId;
-        this.ownerId = ownerId;
-        this.subnetCidr = subnetCidr;
-        this.numberOfContainers = numberOfContainers;
+//        this.numberOfContainers = numberOfContainers;
         this.strategyId = null;
         this.criteria = null;
         this.ipAddressOffset = ipAddressOffset;
         this.templateName = templateName;
         this.host = host;
-        this.containerDistributionType = ContainerDistributionType.CUSTOM;
-        this.containerType = containerType;
+//        this.containerDistributionType = ContainerDistributionType.CUSTOM;
+        this.containerSize = containerSize;
     }
 
 
@@ -94,10 +94,10 @@ public class CreateEnvironmentContainerGroupRequest
     }
 
 
-    public int getNumberOfContainers()
-    {
-        return numberOfContainers;
-    }
+//    public int getNumberOfContainers()
+//    {
+//        return numberOfContainers;
+//    }
 
 
     public String getStrategyId()
@@ -124,14 +124,14 @@ public class CreateEnvironmentContainerGroupRequest
     }
 
 
-    public ContainerDistributionType getContainerDistributionType()
-    {
-        return containerDistributionType;
-    }
+//    public ContainerDistributionType getContainerDistributionType()
+//    {
+//        return containerDistributionType;
+//    }
 
 
-    public ContainerType getContainerType()
+    public ContainerSize getContainerSize()
     {
-        return containerType;
+        return containerSize;
     }
 }

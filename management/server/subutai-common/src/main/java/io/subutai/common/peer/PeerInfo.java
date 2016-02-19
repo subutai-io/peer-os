@@ -2,11 +2,10 @@ package io.subutai.common.peer;
 
 
 import java.io.Serializable;
-import java.util.HashSet;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Objects;
-import java.util.Set;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import io.subutai.common.settings.ChannelSettings;
@@ -18,24 +17,40 @@ import io.subutai.common.settings.ChannelSettings;
 public class PeerInfo implements Serializable
 {
     @JsonProperty
-    private String ip = "127.0.0.1";
-    private String gatewayIp;
-    @JsonIgnore
-    private String keyPhrase = "";
+    private String id;
+
     @JsonProperty
-    private PeerStatus status;
-    private Set<PeerPolicy> peerPolicies = new HashSet<>();
+    private String ownerId;
+
+    @JsonProperty
+    private String publicUrl = "";
+
+    @JsonProperty
+    private String ip = "UNKNOWN";
+
+    //    @JsonProperty
+    //    private String gatewayIp;
+    //
+    //    @JsonProperty
+    //    private String keyPhrase = "";
+
+    //    @JsonProperty
+    //    private PeerStatus status;
+
+    //    @JsonProperty
+    //    private PeerPolicy grantedPolicy;
 
     @JsonProperty
     private String name;
+
     @JsonProperty
-    private String id;
-    @JsonProperty
-    private String ownerId;
-    private int port = Integer.valueOf( ChannelSettings.SECURE_PORT_X2 );
-    @JsonProperty
-    private int lastUsedVlanId = 100;
-    private String keyId;
+    private int port = ChannelSettings.SECURE_PORT_X2;
+
+    //    @JsonProperty
+    //    private int lastUsedVlanId = 100;
+
+    //    @JsonProperty
+    //    private String keyId;
 
 
     public String getId()
@@ -52,19 +67,13 @@ public class PeerInfo implements Serializable
 
     public String getName()
     {
-        return name;
+        return String.format( "Peer %s on %s ", id, ip );
     }
 
 
     public void setName( final String name )
     {
         this.name = name;
-    }
-
-
-    public void setPort( final int port )
-    {
-        this.port = port;
     }
 
 
@@ -86,98 +95,41 @@ public class PeerInfo implements Serializable
     }
 
 
-    public void setIp( final String ip )
+    public String getPublicUrl()
     {
-        this.ip = ip;
+        return publicUrl;
     }
 
 
-    public String getGatewayIp()
+    public void setPublicUrl( final String publicUrl )
     {
-        return gatewayIp;
-    }
-
-
-    public void setGatewayIp( String gatewayIp )
-    {
-        this.gatewayIp = gatewayIp;
-    }
-
-
-    public PeerStatus getStatus()
-    {
-        return status;
-    }
-
-
-    public void setStatus( final PeerStatus status )
-    {
-        this.status = status;
+        try
+        {
+            URL url = new URL( publicUrl );
+            this.ip = url.getHost();
+            this.publicUrl = publicUrl;
+        }
+        catch ( MalformedURLException e )
+        {
+            // assume this is IP or domain name
+            final String u = String.format( "https://%s:%s/", publicUrl, ChannelSettings.SECURE_PORT_X1 );
+            try
+            {
+                URL url = new URL( u );
+                this.ip = url.getHost();
+                this.publicUrl = u;
+            }
+            catch ( MalformedURLException e1 )
+            {
+                throw new IllegalArgumentException( "Invalid public URL." );
+            }
+        }
     }
 
 
     public int getPort()
     {
         return port;
-    }
-
-
-    public int getLastUsedVlanId()
-    {
-        return lastUsedVlanId;
-    }
-
-
-    public void setLastUsedVlanId( int lastUsedVlanId )
-    {
-        this.lastUsedVlanId = lastUsedVlanId;
-    }
-
-
-    public String getKeyId()
-    {
-        return keyId;
-    }
-
-
-    public void setKeyId( final String keyId )
-    {
-        this.keyId = keyId;
-    }
-
-
-    public String getKeyPhrase()
-    {
-        return keyPhrase;
-    }
-
-
-    public void setKeyPhrase( final String keyPhrase )
-    {
-        this.keyPhrase = keyPhrase;
-    }
-
-
-    public Set<PeerPolicy> getPeerPolicies()
-    {
-        return peerPolicies;
-    }
-
-
-    public void setPeerPolicies( final Set<PeerPolicy> peerPolicies )
-    {
-        this.peerPolicies = peerPolicies;
-    }
-
-
-    public void setPeerPolicy( final PeerPolicy peerPolicy )
-    {
-        PeerPolicy oldPeerPolicy = getPeerPolicy( peerPolicy.getRemotePeerId() );
-        if ( oldPeerPolicy != null )
-        {
-            peerPolicies.remove( oldPeerPolicy );
-        }
-        peerPolicies.add( peerPolicy );
     }
 
 
@@ -202,37 +154,14 @@ public class PeerInfo implements Serializable
     }
 
 
-    public PeerPolicy getPeerPolicy( final String remotePeerId )
-    {
-        if ( peerPolicies == null )
-        {
-            return null;
-        }
-        for ( PeerPolicy peerPolicy : peerPolicies )
-        {
-            if ( peerPolicy.getRemotePeerId().compareTo( remotePeerId ) == 0 )
-            {
-                return peerPolicy;
-            }
-        }
-        return null;
-    }
-
-
     @Override
     public String toString()
     {
         final StringBuffer sb = new StringBuffer( "PeerInfo{" );
         sb.append( "ip='" ).append( ip ).append( '\'' );
-        sb.append( ", gatewayIp='" ).append( gatewayIp ).append( '\'' );
-        sb.append( ", status=" ).append( status );
-        sb.append( ", peerPolicies=" ).append( peerPolicies );
         sb.append( ", name='" ).append( name ).append( '\'' );
         sb.append( ", id=" ).append( id );
         sb.append( ", ownerId=" ).append( ownerId );
-        sb.append( ", port=" ).append( port );
-        sb.append( ", lastUsedVlanId=" ).append( lastUsedVlanId );
-        sb.append( ", keyId='" ).append( keyId ).append( '\'' );
         sb.append( '}' );
         return sb.toString();
     }

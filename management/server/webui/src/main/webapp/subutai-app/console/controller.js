@@ -10,11 +10,17 @@ angular.module('subutai.console.controller', [])
 		//terminalConfigurationProvider.config('vintage').startSoundUrl ='example/content/start.wav';
 	}]);
 
-ConsoleViewCtrl.$inject = ['$scope', 'consoleService', 'peerRegistrationService', '$stateParams', 'ngDialog'];
+ConsoleViewCtrl.$inject = ['$scope', 'consoleService', 'peerRegistrationService', '$stateParams', 'ngDialog', 'cfpLoadingBar'];
 
-function ConsoleViewCtrl($scope, consoleService, peerRegistrationService, $stateParams, ngDialog) {
+function ConsoleViewCtrl($scope, consoleService, peerRegistrationService, $stateParams, ngDialog, cfpLoadingBar) {
 
-	var vm = this;	
+	var vm = this;
+
+	cfpLoadingBar.start();
+	angular.element(document).ready(function () {
+		cfpLoadingBar.complete();
+	});
+
 	vm.currentType = 'peer';
 	vm.activeConsole = false;
 	vm.hosts = [];
@@ -22,7 +28,7 @@ function ConsoleViewCtrl($scope, consoleService, peerRegistrationService, $state
 	vm.containers = [];
 	vm.currentTab = '';
 	vm.daemon = false;
-	vm.timeOut = 0;
+	vm.timeOut = 30;
 	vm.selectedEnvironment = '';
 	vm.selectedNodeType = '';
 

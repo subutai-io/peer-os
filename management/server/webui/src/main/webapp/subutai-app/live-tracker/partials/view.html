@@ -1,0 +1,91 @@
+<div ng-controller="LiveTrackerCtrl as liveTrackerCtrl">
+	<script>
+		$(document).ready(function(){
+			$('#js-show-tracker').click(function(){
+				if($('.b-live-tracker').hasClass('b-live-tracker_open')) {
+					var trackerHeight = $('.b-live-tracker').height();
+					$('.b-live-tracker').stop().animate({'bottom': -trackerHeight + 'px'}, 300);
+					$('.b-live-tracker').removeClass('b-live-tracker_open');
+				} else {
+					$('.b-live-tracker').stop().animate({'bottom': 0}, 300);
+					$('.b-live-tracker').addClass('b-live-tracker_open');
+				}
+			});
+			$('.b-live-tracker__content').height($('.b-live-tracker').height() - $('.b-live-tracker__tabs').height());
+
+			var h = $('#js-resize-line');
+			var windowHeight = $(window).height() - 2;
+			var liveTrackerBlock = $('.b-live-tracker');
+
+			var isDragging = false;
+
+			h.mousedown(function(e){
+				isDragging = true;
+				e.preventDefault();
+			});
+			$(document).mouseup(function(){
+				isDragging = false;
+				$('body').css({cursor: 'default'});
+			}).mousemove(function(e){
+				if(isDragging){
+					var newHeight = windowHeight - e.clientY;
+					if(newHeight <= (windowHeight - 28)) {
+						$('.b-live-tracker__content').height(newHeight - $('.b-live-tracker__tabs').height());
+						liveTrackerBlock.css('height', newHeight);
+					}
+					$('body').css({cursor: 'n-resize'});
+				}
+			});
+		});
+	</script>
+	<!--<div class="b-live-tracker" ng-if="liveTrackerCtrl.modules.lenght > 0">-->
+	<div class="b-live-tracker">
+		<div class="b-live-tracker__icon" id="js-show-tracker">
+			<span class="b-icon b-icon_settings"></span>
+		</div>
+		<div class="b-live-tracker__tabs">
+			<div class="b-resize-line" id="js-resize-line"></div>
+			<ul class="b-live-tracker-tabs">
+				<li class="b-live-tracker-tabs__item" 
+					ng-repeat="module in liveTrackerCtrl.modules" 
+					ng-class="liveTrackerCtrl.selectedModule == module ? 'b-live-tracker-tabs__item_active' : ''" 
+					ng-click="liveTrackerCtrl.getOperarions(module)">
+					{{ module }}
+				</li>
+			</ul>
+		</div>
+		<div class="b-live-tracker__content js-scrollbar">
+			<table class="b-live-tracker-operations-table"
+				ng-class="liveTrackerCtrl.currentOperattion ? 'b-live-tracker-operations-table_60' : ''"
+			>
+				<tr ng-repeat="operation in liveTrackerCtrl.operations" 
+				ng-click="liveTrackerCtrl.viewLogs(operation.id)" style="cursor: pointer;">
+					<td>
+						{{ operation.createDate }}
+					</td>
+					<td>
+						{{ operation.description }}
+					</td>
+					<td>
+						<div 
+							class="b-status-icon b-status-icon_{{ operation.state }}" 
+							tooltips 
+							tooltip-template="{{ operation.state }}" 
+							tooltip-side="left">
+						</div>
+					</td>
+					<td></td>
+				</tr>
+			</table>
+			<div class="b-live-tracker__log b-logs-view" ng-if="liveTrackerCtrl.currentOperattion">
+				<div class="b-live-tracker__log__close">
+					<img src="assets/elements/buttons/b-icon-close.svg" ng-click="liveTrackerCtrl.closeLog()">
+				</div>
+				<div 
+					ng-bind-html="liveTrackerCtrl.setHtml(liveTrackerCtrl.logText)">
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+

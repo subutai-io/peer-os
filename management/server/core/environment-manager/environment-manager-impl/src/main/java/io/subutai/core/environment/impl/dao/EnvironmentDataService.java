@@ -70,7 +70,7 @@ public class EnvironmentDataService implements DataService<String, EnvironmentIm
         EntityManager em = daoManager.getEntityManagerFromFactory();
         try
         {
-            result = em.createQuery( "select h from EnvironmentImpl h", EnvironmentImpl.class ).getResultList();
+            result = em.createQuery( "select e from EnvironmentImpl e left join fetch e.containers" ).getResultList();
         }
         catch ( Exception e )
         {

@@ -11,26 +11,4 @@
     </cxf:features>
   </cxf:bus>
 
-  <reference id="environmentManager" availability="mandatory"
-             interface="io.subutai.core.environment.api.EnvironmentManager" />
-  <reference id="peerManager" availability="mandatory"
-             interface="io.subutai.core.peer.api.PeerManager" />
-  <reference id="templateRegistry" availability="mandatory"
-             interface="io.subutai.core.kurjun.api.TemplateManager" />
-
-  <bean id="environmentRestServiceImpl" class="io.subutai.core.environment.rest.RestServiceImpl">
-    <argument ref="environmentManager" />
-    <argument ref="peerManager" />
-    <argument ref="templateRegistry" />
-  </bean>
-
-  <jaxrs:server address="/v1/environments" id="environmentRestService">
-    <jaxrs:serviceBeans>
-      <ref component-id="environmentRestServiceImpl" />
-    </jaxrs:serviceBeans>
-    <jaxrs:providers>
-      <bean class="org.codehaus.jackson.jaxrs.JacksonJsonProvider" />
-    </jaxrs:providers>
-  </jaxrs:server>
-
 </blueprint>

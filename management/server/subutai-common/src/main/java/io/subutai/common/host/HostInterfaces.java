@@ -23,18 +23,30 @@ public class HostInterfaces
 {
     private static final Logger LOG = LoggerFactory.getLogger( HostInterfaces.class );
 
-    @JsonProperty
+    @JsonProperty( "hostId" )
+    private String hostId;
+
+    @JsonProperty( "interfaces" )
     private Set<HostInterfaceModel> interfaces = new HashSet<>();
+
+
+    public HostInterfaces( @JsonProperty( "hostId" ) final String hostId,
+                           @JsonProperty( "interfaces" ) final Set<HostInterfaceModel> interfaces )
+    {
+        this.hostId = hostId;
+        this.interfaces = interfaces;
+    }
 
 
     public HostInterfaces()
     {
+
     }
 
 
-    public HostInterfaces( final Set<HostInterfaceModel> interfaces )
+    public String getHostId()
     {
-        this.interfaces = interfaces;
+        return hostId;
     }
 
 
@@ -60,7 +72,10 @@ public class HostInterfaces
     {
         Preconditions.checkNotNull( name );
         HostInterfaceModel result = NullHostInterface.getInstance();
-
+        if ( interfaces == null )
+        {
+            return result;
+        }
         for ( Iterator<HostInterfaceModel> i = interfaces.iterator();
               i.hasNext() && result instanceof NullHostInterface; )
         {

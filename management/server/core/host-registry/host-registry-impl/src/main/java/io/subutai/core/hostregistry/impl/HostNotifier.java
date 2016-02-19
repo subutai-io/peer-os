@@ -4,7 +4,7 @@ package io.subutai.core.hostregistry.impl;
 import java.util.Set;
 
 import io.subutai.common.host.ResourceHostInfo;
-import io.subutai.common.metric.ResourceAlert;
+import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.core.hostregistry.api.HostListener;
 
 import org.slf4j.Logger;
@@ -20,10 +20,10 @@ public class HostNotifier implements Runnable
 
     private HostListener listener;
     private ResourceHostInfo info;
-    private Set<ResourceAlert> alerts;
+    private Set<QuotaAlertValue> alerts;
 
 
-    public HostNotifier( final HostListener listener, final ResourceHostInfo info, final Set<ResourceAlert> alerts )
+    public HostNotifier( final HostListener listener, final ResourceHostInfo info, final Set<QuotaAlertValue> alerts )
     {
         this.listener = listener;
         this.info = info;

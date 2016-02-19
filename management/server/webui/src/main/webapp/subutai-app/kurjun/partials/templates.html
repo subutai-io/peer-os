@@ -1,0 +1,45 @@
+<div class="b-workspace-content__row">
+        <button class="b-btn b-btn_green g-margin-bottom" ng-click="kurjunCtrl.addTemplate()">
+            <i class="fa fa-plus"></i> Add Template
+        </button>
+    <div class="b-data-table">
+        <table datatable="ng"
+               dt-options="kurjunCtrl.dtOptions"
+               dt-column-defs="kurjunCtrl.dtColumnDefs"
+               class="b-main-table b-main-table_with-header">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Context</th>
+                <th>Architecture</th>
+                <th>Parent</th>
+                <th>Version</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="template in kurjunCtrl.templates">
+                <td>{{ template.name }}</td>
+                <td>{{ template.repository }}</td>
+                <td>{{ template.architecture }}</td>
+                <td>{{ template.parent }}</td>
+                <td>{{ template.version }}</td>
+                <td>
+                    <a href
+                       class="b-icon b-icon_share"
+                       tooltips
+                       tooltip-template='Share'
+                       ng-click="kurjunCtrl.openShareWindow(template)">
+                    </a>
+                    <a href
+                       class="b-icon b-icon_remove"
+                       ng-if="template.deletable"
+                       ng-click="kurjunCtrl.deleteTemplate(template)">
+                    </a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+

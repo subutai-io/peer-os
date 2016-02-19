@@ -8,25 +8,25 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import com.google.common.collect.Lists;
+
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.Host;
+import io.subutai.common.peer.HostNotFoundException;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.settings.Common;
 import io.subutai.common.test.SystemOutRedirectTest;
 import io.subutai.core.git.api.GitBranch;
 import io.subutai.core.git.api.GitChangedFile;
 import io.subutai.core.git.api.GitException;
 import io.subutai.core.git.api.GitFileStatus;
-
-import io.subutai.common.peer.HostNotFoundException;
-import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.peer.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
-
-import com.google.common.collect.Lists;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -71,7 +71,7 @@ public class GitManagerImplTest extends SystemOutRedirectTest
     @Mock
     LocalPeer localPeer;
     @Mock
-    ManagementHost managementHost;
+    ResourceHost managementHost;
     @Mock
     CommandUtil commandUtil;
     @Mock

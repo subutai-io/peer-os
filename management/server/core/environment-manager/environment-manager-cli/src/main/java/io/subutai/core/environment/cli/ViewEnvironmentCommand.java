@@ -8,7 +8,7 @@ import com.google.common.base.Preconditions;
 
 import io.subutai.common.environment.Environment;
 import io.subutai.common.peer.EnvironmentContainerHost;
-import io.subutai.common.resource.ResourceType;
+import io.subutai.common.resource.ContainerResourceType;
 import io.subutai.common.settings.Common;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
@@ -62,18 +62,14 @@ public class ViewEnvironmentCommand extends SubutaiShellCommandSupport
                     containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp() ) );
             System.out.println( String.format( "Is connected %s", containerHost.isConnected() ) );
 
-            for ( ResourceType resourceType : ResourceType.values() )
+            try
             {
-                try
-                {
-                    System.out.println(
-                            String.format( "%s quota: %s/%s", resourceType, containerHost.getQuota( resourceType ),
-                                    containerHost.getAvailableQuota( resourceType ) ) );
-                }
-                catch ( Exception e )
-                {
-                    System.out.println( "ERROR: " + e.getMessage() );
-                }
+                System.out.println( String.format( "quota: %s/%s", containerHost.getQuota(),
+                                containerHost.getAvailableQuota() ) );
+            }
+            catch ( Exception e )
+            {
+                System.out.println( "ERROR: " + e.getMessage() );
             }
         }
 

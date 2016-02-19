@@ -3,6 +3,7 @@ package io.subutai.common.security;
 
 import java.security.KeyStore;
 import java.util.Arrays;
+import java.util.Collections;
 
 import javax.ws.rs.core.MediaType;
 
@@ -14,10 +15,12 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 
+import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.security.crypto.keystore.KeyStoreData;
 import io.subutai.common.security.crypto.keystore.KeyStoreTool;
 import io.subutai.common.security.crypto.ssl.SSLManager;
 import io.subutai.common.settings.ChannelSettings;
+import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SecuritySettings;
 
 
@@ -27,9 +30,9 @@ import io.subutai.common.settings.SecuritySettings;
 public class WebClientBuilder
 {
     private static final Logger LOG = LoggerFactory.getLogger( WebClientBuilder.class );
-    public static final long DEFAULT_RECEIVE_TIMEOUT = 1000 * 60 * 5;
-    public static final long DEFAULT_CONNECTION_TIMEOUT = 1000 * 60;
-    public static final int DEFAULT_MAX_RETRANSMITS = 3;
+    public static final long DEFAULT_RECEIVE_TIMEOUT = Common.DEFAULT_RECEIVE_TIMEOUT;
+    public static final long DEFAULT_CONNECTION_TIMEOUT = Common.DEFAULT_CONNECTION_TIMEOUT;
+    public static final int DEFAULT_MAX_RETRANSMITS = Common.DEFAULT_MAX_RETRANSMITS;
     private static final String PEER_URL_TEMPLATE = "https://%s:%s/rest/v1/peer%s";
     private static final String ENVIRONMENT_URL_TEMPLATE = "https://%s:%s/rest/v1/env%s";
 
@@ -46,7 +49,7 @@ public class WebClientBuilder
         }
         else
         {
-            client = WebClient.create( effectiveUrl, Arrays.asList( provider ) );
+            client = WebClient.create( effectiveUrl, Collections.singletonList( provider ) );
         }
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
@@ -131,8 +134,8 @@ public class WebClientBuilder
     }
 
 
-    public static WebClient buildPeerWebClient( final String host, final String path )
+    public static WebClient buildPeerWebClient( final PeerInfo host, final String path )
     {
-        return buildPeerWebClient( host, path, null );
+        return buildPeerWebClient( host.getIp(), path, null );
     }
 }

@@ -1,6 +1,9 @@
 <div ng-controller="PluginsCtrl as pluginsCtrl">
 
 	<div class="b-workspace__header">
+
+		<div ng-include="'subutai-app/common/partials/login-header.html'"></div>
+
 		<h1 class="b-title">Plugins</h1>
 	</div>
 
@@ -14,7 +17,7 @@
 						<table class="b-vertical-helper">
 							<tr>
 								<td>
-									<img src="{{ plugin.img }}" alt="{{ plugin.name }}">
+									<img ng-src="{{ plugin.img }}" alt="{{ plugin.name }}">
 								</td>
 							</tr>
 						</table>
@@ -31,7 +34,7 @@
 			</div>
 
 		</div>
-	</div>	
+	</div>
 
 </div>
 

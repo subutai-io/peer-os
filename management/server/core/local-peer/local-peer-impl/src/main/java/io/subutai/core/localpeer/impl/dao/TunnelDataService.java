@@ -191,7 +191,7 @@ public class TunnelDataService implements DataService<Long, TunnelEntity>
             em.close();
         }
 
-        return ( TunnelEntity ) item;
+        return item;
     }
 
 

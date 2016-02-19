@@ -1,17 +1,19 @@
 <div ng-controller="PeerRegistrationCtrl as peerRegistrationCtrl">
 
 	<div class="b-workspace__header">
-		<a class="b-btn b-btn_green b-btn_header-button" 
-			href 
-			id="subt_link__create-peer" 
-			ng-click="peerRegistrationCtrl.peerFrom()">
-			<i class="fa fa-plus"></i> Create peer
-		</a>
+
+		<div ng-include="'subutai-app/common/partials/login-header.html'"></div>
+
 		<h1 class="b-title">Peer registration</h1>
 	</div>
 
 	<div class="b-workspace__content">
-
+		<a class="b-btn b-btn_green g-margin-bottom"
+		   href
+		   id="subt_link__create-peer"
+		   ng-click="peerRegistrationCtrl.peerFrom()">
+			<i class="fa fa-plus"></i> Create peer
+		</a>
 		<div class="b-data-table">
 			<table datatable="" 
 				dt-options="peerRegistrationCtrl.dtOptions" 

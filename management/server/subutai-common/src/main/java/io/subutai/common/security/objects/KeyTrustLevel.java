@@ -14,7 +14,7 @@ public enum KeyTrustLevel
     private String name;
     private int id;
 
-    private KeyTrustLevel(  int id, String name)
+    KeyTrustLevel(  int id, String name)
     {
         this.id = id;
         this.name = name;
