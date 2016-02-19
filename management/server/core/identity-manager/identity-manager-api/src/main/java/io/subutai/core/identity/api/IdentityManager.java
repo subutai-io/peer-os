@@ -159,7 +159,9 @@ public interface IdentityManager
     /* *************************************************
     */
     User createUser( String userName, String password, String fullName, String email, int type, int trustLevel,
-                     boolean generateKeyPair, boolean createUserDelegate );
+                     boolean generateKeyPair, boolean createUserDelegate ) throws Exception;
+
+    User modifyUser( User user ) throws Exception;
 
 
     void approveDelegatedUser( String trustMessage );

@@ -61,7 +61,7 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOGGER.error( "Error getting users #getUsers", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) ).build();
         }
     }
 
@@ -76,7 +76,7 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOGGER.error( "Error getting users #getUsers", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) ).build();
         }
     }
 
@@ -92,7 +92,7 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOGGER.error( "Error getting activeUser user #getActiveUser", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) ).build();
         }
     }
 
@@ -124,7 +124,7 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOGGER.error( "Error getting Public Key Data #getPublicKeyData", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) ).build();
         }
     }
 
@@ -180,26 +180,37 @@ public class RestServiceImpl implements RestService
                 Preconditions.checkArgument( !Strings.isNullOrEmpty( password ), "Password must be set" );
                 newUser = identityManager
                         .createUser( username, password, fullName, email, UserType.Regular.getId(), Integer.parseInt( trustLevel ), false, true );
+
+                if ( !Strings.isNullOrEmpty( rolesJson ) )
+                {
+                    List<Long> roleIds = jsonUtil.fromJson( rolesJson, new TypeToken<ArrayList<Long>>()
+                    {}.getType() );
+
+
+                    roleIds.stream().forEach( r -> identityManager.assignUserRole( newUser, identityManager.getRole( r ) ) );
+                }
             }
             else
             {
                 newUser = identityManager.getUser( userId );
-            }
+                newUser.setEmail(email);
+                newUser.setFullName(fullName);
+                newUser.setTrustLevel(Integer.parseInt( trustLevel ));
 
-            if ( !Strings.isNullOrEmpty( rolesJson ) )
-            {
                 List<Long> roleIds = jsonUtil.fromJson( rolesJson, new TypeToken<ArrayList<Long>>()
-                {
-                }.getType() );
+                {}.getType() );
 
+                newUser.setRoles( roleIds.stream().map( r -> identityManager.getRole( r )).collect( Collectors.toList()));
 
-                roleIds.stream().forEach( r -> identityManager.assignUserRole( newUser, identityManager.getRole( r ) ) );
+                identityManager.modifyUser(newUser);
             }
+
+
         }
         catch ( Exception e )
         {
             LOGGER.error( "Error setting new user #setUser", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) ).build();
         }
 
         return Response.ok().build();
@@ -218,7 +229,7 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOGGER.error( "Error setting new user #setUser", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) ).build();
         }
 
         return Response.ok().build();
@@ -235,7 +246,7 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOGGER.error( "Error setting new user #setUser", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) ).build();
         }
 
         return Response.ok().build();
@@ -284,7 +295,7 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOGGER.error( "Error deleting user #deleteUser", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) ).build();
         }
 
         return Response.ok().build();
@@ -303,7 +314,7 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOGGER.error( "Error getting roles #getRoles", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) ).build();
         }
     }
 
@@ -349,7 +360,7 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOGGER.error( "Error setting new role #createRole", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) ).build();
         }
 
         return Response.ok().build();
@@ -366,7 +377,7 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOGGER.error( "Error deleting role #deleteRole", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) ).build();
         }
 
         return Response.ok().build();
@@ -385,7 +396,7 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOGGER.error( "Error receiving permissions", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) ).build();
         }
     }
 
@@ -421,7 +432,7 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOGGER.error( "Error receiving user tokens", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) ).build();
         }
     }
 
@@ -446,7 +457,7 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOGGER.error( "Error creating new user token", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) ).build();
         }
 
         return Response.ok().build();
@@ -475,7 +486,7 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOGGER.error( "Error updating user token", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) ).build();
         }
 
         return Response.ok().build();
@@ -494,7 +505,7 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOGGER.error( "Error updating new user token", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) ).build();
         }
 
 
@@ -510,6 +521,7 @@ public class RestServiceImpl implements RestService
         {
             map.put( tokenType.getId(), tokenType.getName() );
         }
+
         return Response.ok( JsonUtil.toJson( map ) ).build();
     }
 

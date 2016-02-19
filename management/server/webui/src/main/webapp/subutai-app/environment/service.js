@@ -10,9 +10,8 @@ function environmentService($http) {
 
 	var ENVIRONMENTS_URL = SERVER_URL + 'rest/ui/environments/';
 
-	var ENVIRONMENT_REQUISITES = ENVIRONMENTS_URL + 'requisites/';
-	var ENVIRONMENT_STRATEGY_REQUISITES = ENVIRONMENT_REQUISITES + 'strategy/';
 	var ENVIRONMENT_START_BUILD = ENVIRONMENTS_URL + 'build/';
+	var ENVIRONMENT_ADVANCED_BUILD = ENVIRONMENTS_URL + 'build/advanced';
 
 	var SSH_KEY_URL = ENVIRONMENTS_URL + 'keys/';
 	var CONTAINERS_URL = ENVIRONMENTS_URL + 'containers/';
@@ -40,11 +39,8 @@ function environmentService($http) {
 
 
 		getEnvironments : getEnvironments,
-		createEnvironment : createEnvironment,
-		setupRequisites : setupRequisites,
-		setupStrategyRequisites : setupStrategyRequisites,
-		setupAdvancedEnvironment : setupAdvancedEnvironment,
-		startEnvironmentBuild : startEnvironmentBuild,
+		startEnvironmentAdvancedBuild : startEnvironmentAdvancedBuild,
+		startEnvironmentAutoBuild: startEnvironmentAutoBuild,
 		growEnvironment : growEnvironment,
 		destroyEnvironment: destroyEnvironment,
 		modifyEnvironment: modifyEnvironment,
@@ -86,8 +82,6 @@ function environmentService($http) {
 
 		revoke: revoke,
 
-		startEnvironmentAutoBuild: startEnvironmentAutoBuild,
-
 		getServerUrl : function getServerUrl() { return ENVIRONMENTS_URL; }
 	};
 
@@ -128,56 +122,25 @@ function environmentService($http) {
 		return $http.get(ENVIRONMENTS_URL, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
 	}
 
-	function createEnvironment(data) {
-		var postData = 'blueprint_json=' + data;
-		return $http.post(
-			ENVIRONMENTS_URL,
-			postData, 
-			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
-		);
-	}
 
-	function setupRequisites(data) {
-		var postData = 'blueprint_json=' + data;
-		return $http.post(
-			ENVIRONMENT_REQUISITES,
-			postData,
-			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
-		);
-	}
-
-	function setupStrategyRequisites( name, strategy, sshId, hostId, peers ) {
-		var postDate = 'name=' + name +
-						'&strategy=' + strategy +
-						'&sshId=' + sshId +
-						'&hostId=' + hostId +
-						'&peers=' + JSON.stringify(peers);
-
-		return $http.post(
-			ENVIRONMENT_STRATEGY_REQUISITES,
-			postDate,
-			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
-		);
-	}
-
-	function setupAdvancedEnvironment( name, topology ) {
-		var postDate = 'name=' + name + '&topology=' + JSON.stringify( topology );
-
-		return $http.post(
-			ENVIRONMENT_REQUISITES,
-			postDate,
-			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
-		);
-	}
-
-	function startEnvironmentBuild(environmentId, signedMsg) {
-		var postData = 'environmentId=' + environmentId + "&signedMessage=" + signedMsg;
+	function startEnvironmentAutoBuild(environmentName, containers) {
+		var postData = 'name=' + environmentName + "&containers=" + containers;
 		return $http.post(
 			ENVIRONMENT_START_BUILD,
 			postData,
 			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
 		);
 	}
+
+	function startEnvironmentAdvancedBuild(environmentName, containers) {
+		var postData = 'name=' + environmentName + "&containers=" + containers;
+		return $http.post(
+			ENVIRONMENT_ADVANCED_BUILD,
+			postData,
+			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+		);
+	}
+
 
 	function growEnvironment(environmentId, topology) {
 		var postData = 'topology=' + JSON.stringify( topology );
@@ -343,14 +306,4 @@ function environmentService($http) {
 	function revoke (environmentId) {
 		return $http.put (ENVIRONMENTS_URL + environmentId + "/revoke");
 	}
-
-	function startEnvironmentAutoBuild(environmentName, containers) {
-		var postData = 'name=' + environmentName + "&containers=" + containers;
-		return $http.post(
-			ENVIRONMENT_START_BUILD,
-			postData,
-			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
-		);
-	}
-
 }
