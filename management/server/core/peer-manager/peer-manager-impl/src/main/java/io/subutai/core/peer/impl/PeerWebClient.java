@@ -4,6 +4,7 @@ package io.subutai.core.peer.impl;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.core.MediaType;
@@ -61,7 +62,7 @@ public class PeerWebClient
     {
         String path = "/info";
 
-        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo.getIp(), path, provider, 500, 3000, 1 );
+        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo.getIp(), path, provider, 4000, 7000, 1 );
 
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
@@ -469,7 +470,7 @@ public class PeerWebClient
         {
             String path = String.format( "/limits/%s", peerId );
 
-            WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo.getIp(), path, provider, 500, 7000, 1 );
+            WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo.getIp(), path, provider, 4000, 7000, 1 );
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
             return client.get( PeerResources.class );
@@ -487,7 +488,7 @@ public class PeerWebClient
         {
             String path = String.format( "/control/config/%s", localPeerId );
 
-            WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo.getIp(), path, provider, 500, 7000, 1 );
+            WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo.getIp(), path, provider, 4000, 7000, 1 );
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
             return client.get( ControlNetworkConfig.class );
@@ -511,7 +512,7 @@ public class PeerWebClient
         {
             String path = "/control/update";
 
-            WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo.getIp(), path, provider, 500, 7000, 1 );
+            WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo.getIp(), path, provider, 4000, 7000, 1 );
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
             return client.put( config, Boolean.class );
@@ -532,7 +533,7 @@ public class PeerWebClient
         {
             String path = String.format( "/control/%s/%d/distance", communityName, maxAddress );
 
-            WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo.getIp(), path, provider, 500, 7000, 1 );
+            WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo.getIp(), path, provider, 4000, 7000, 1 );
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
             return client.get( PingDistances.class );
@@ -541,5 +542,31 @@ public class PeerWebClient
         {
             throw new PeerException( "Error on getting community distances.", e );
         }
+    }
+
+
+    public int setupTunnels( final Map<String, String> peerIps, final String environmentId )
+    {
+        Preconditions.checkNotNull( peerIps );
+        Preconditions.checkNotNull( environmentId );
+        String path = String.format( "/tunnels/%s", environmentId );
+
+        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo.getIp(), path, provider, 500, 7000, 1 );
+        client.type( MediaType.APPLICATION_JSON );
+        client.accept( MediaType.TEXT_PLAIN );
+        return client.post( peerIps, Integer.class );
+    }
+
+
+    public void addPeerEnvironmentPubKey( final String keyId, final String pubKeyRing )
+    {
+        Preconditions.checkNotNull( keyId );
+        Preconditions.checkNotNull( pubKeyRing );
+        String path = String.format( "/pek/add/%s", keyId );
+
+        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo.getIp(), path, provider, 500, 7000, 1 );
+        client.type( MediaType.APPLICATION_JSON );
+        client.accept( MediaType.APPLICATION_JSON );
+        client.post( pubKeyRing );
     }
 }

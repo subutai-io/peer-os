@@ -4,7 +4,6 @@ package io.subutai.core.peer.impl;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
 
@@ -113,28 +112,26 @@ public class RemotePeerImpl implements RemotePeer
         this.messageResponseListener = messageResponseListener;
         String url = "";
 
-        String port = String.valueOf( peerInfo.getPort() );
+        int port = peerInfo.getPort();
 
-
-        if ( Objects.equals( port, ChannelSettings.SPECIAL_PORT_X1 ) )
+        if ( port == ChannelSettings.SPECIAL_PORT_X1 || port == ChannelSettings.OPEN_PORT )
         {
             url = String.format( "http://%s:%s/rest/v1/peer", peerInfo.getIp(), peerInfo.getPort() );
         }
-        else if ( Objects.equals( port, ChannelSettings.SECURE_PORT_X3 ) )
+        else
         {
             url = String.format( "https://%s:%s/rest/v1/peer", peerInfo.getIp(), peerInfo.getPort() );
         }
 
-        //switch case for formatting request url
-        //        switch ( port )
+        //        switch ( peerInfo.getPort() )
         //        {
-        //            case ChannelSettings.OPEN_PORT:
-        //            case ChannelSettings.SPECIAL_PORT_X1:
+        //            case OPEN_PORT:
+        //            case SPECIAL_PORT_X1:
         //                url = String.format( "http://%s:%s/rest/v1/peer", peerInfo.getIp(), peerInfo.getPort() );
         //                break;
-        //            case ChannelSettings.SECURE_PORT_X1:
-        //            case ChannelSettings.SECURE_PORT_X2:
-        //            case ChannelSettings.SECURE_PORT_X3:
+        //            case SECURE_PORT_X1:
+        //            case SECURE_PORT_X2:
+        //            case SECURE_PORT_X3:
         //                url = String.format( "https://%s:%s/rest/v1/peer", peerInfo.getIp(), peerInfo.getPort() );
         //                break;
         //        }
@@ -729,16 +726,7 @@ public class RemotePeerImpl implements RemotePeer
 
         try
         {
-            //*********construct Secure Header ****************************
-            Map<String, String> headers = Maps.newHashMap();
-            //*************************************************************
-            Map<String, String> params = Maps.newHashMap();
-            params.put( "peerIps", jsonUtil.to( peerIps ) );
-            params.put( "environmentId", environmentId );
-
-            String response = post( path, SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS, params, headers );
-
-            return Integer.parseInt( response );
+            return new PeerWebClient( peerInfo, provider ).setupTunnels( peerIps, environmentId );
         }
         catch ( Exception e )
         {
@@ -809,8 +797,24 @@ public class RemotePeerImpl implements RemotePeer
         }
         catch ( IOException | PGPException e )
         {
+        }
+    }
 
 
+    @Override
+    public void addPeerEnvironmentPubKey( final String keyId, final PGPPublicKeyRing pek )
+    {
+        Preconditions.checkNotNull( keyId, "Invalid key ID" );
+        Preconditions.checkNotNull( pek, "Public key ring is null" );
+
+
+        try
+        {
+            String exportedPubKeyRing = securityManager.getEncryptionTool().armorByteArrayToString( pek.getEncoded() );
+            new PeerWebClient( peerInfo, provider ).addPeerEnvironmentPubKey( keyId, exportedPubKeyRing );
+        }
+        catch ( IOException | PGPException e )
+        {
         }
     }
 

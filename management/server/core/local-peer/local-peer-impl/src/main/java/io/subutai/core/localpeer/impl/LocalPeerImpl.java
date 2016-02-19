@@ -156,7 +156,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public static final String PEER_SUBNET_MASK = "255.255.255.0";
     private static final String GATEWAY_INTERFACE_NAME_REGEX = "^br-(\\d+)$";
     private static final Pattern GATEWAY_INTERFACE_NAME_PATTERN = Pattern.compile( GATEWAY_INTERFACE_NAME_REGEX );
-    //    private static final String DEFAULT_EXTERNAL_INTERFACE_NAME = "eth1";
 
     private DaoManager daoManager;
     private TemplateManager templateRegistry;
@@ -1684,11 +1683,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         return Collections.unmodifiableSet( requestListeners );
     }
 
-    //todo Create Environment Key (EK )  with Environment ID
-    //todo Sign EK with UserKey (getActiveSession.getUser.getSecurityKeyID)
-    //todo Create PEK
-    //todo Sign PEK with EK and PEER Key
-
 
     /* ***********************************************
      *  Create PEK
@@ -1736,6 +1730,16 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         Preconditions.checkNotNull( pubKeyRing );
 
         securityManager.getKeyManager().updatePublicKeyRing( pubKeyRing );
+    }
+
+
+    @Override
+    public void addPeerEnvironmentPubKey( final String keyId, final PGPPublicKeyRing pubRing )
+    {
+        Preconditions.checkNotNull( keyId );
+        Preconditions.checkNotNull( pubRing );
+
+        securityManager.getKeyManager().savePublicKeyRing( keyId, SecurityKeyType.PeerEnvironmentKey.getId(), pubRing );
     }
 
 

@@ -19,9 +19,12 @@
 
   <bean id="identityRestUIServiceImpl" class="io.subutai.core.identity.rest.ui.RestServiceImpl">
     <argument ref="identityManager" />
+    <argument ref="securityManager" />
   </bean>
 
   <reference id="identityManager" availability="mandatory"
              interface="io.subutai.core.identity.api.IdentityManager" />
 
+  <reference id="securityManager" availability="mandatory"
+             interface="io.subutai.core.security.api.SecurityManager" />
 </blueprint>

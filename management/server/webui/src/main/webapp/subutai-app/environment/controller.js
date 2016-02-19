@@ -4,12 +4,12 @@ angular.module('subutai.environment.controller', [])
 	.controller('EnvironmentViewCtrl', EnvironmentViewCtrl)
 	.directive('fileModel', fileModel);
 
-EnvironmentViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'trackerSrv', 'SweetAlert', '$resource', '$compile', 'ngDialog', '$timeout', '$sce', '$stateParams', 'DTOptionsBuilder', 'DTColumnDefBuilder'];
+EnvironmentViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'trackerSrv', 'identitySrv', 'SweetAlert', '$resource', '$compile', 'ngDialog', '$timeout', '$sce', '$stateParams', 'DTOptionsBuilder', 'DTColumnDefBuilder'];
 fileModel.$inject = ['$parse'];
 
-var fileUploder = {};
+var fileUploader = {};
 
-function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv, SweetAlert, $resource, $compile, ngDialog, $timeout, $sce, $stateParams, DTOptionsBuilder, DTColumnDefBuilder) {
+function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv, identitySrv, SweetAlert, $resource, $compile, ngDialog, $timeout, $sce, $stateParams, DTOptionsBuilder, DTColumnDefBuilder) {
 
 	var vm = this;
 	var GRID_CELL_SIZE = 100;
@@ -46,7 +46,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	vm.currentUser = {};
 
 	// functions
-	vm.chengeMode = chengeMode;
+	vm.changeMode = changeMode;
 
 	vm.destroyEnvironment = destroyEnvironment;
 	vm.sshKey = sshKey;
@@ -65,13 +65,11 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 
 	//share environment functions
 	vm.shareEnvironmentWindow = shareEnvironmentWindow;
-	vm.toggleSelection = toggleSelection;
 	vm.shareEnvironment = shareEnvironment;
 	vm.addUser2Stack = addUser2Stack;
 	vm.removeUserFromStack = removeUserFromStack;
-	vm.containersTags = containersTags;
 
-	function chengeMode(modeStatus) {
+	function changeMode(modeStatus) {
 		if(modeStatus) {
 			vm.activeMode = 'advanced';
 		} else {
@@ -79,7 +77,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 		}
 	}
 
-	environmentService.getCurrentUser().success (function (data) {
+	identitySrv.getCurrentUser().success (function (data) {
 		vm.currentUser = data;
 	});
 
@@ -106,6 +104,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 			vm.environments = [];
 			for (var i = 0; i < data.length; ++i) {
 				if (data[i].status !== "PENDING") {
+					data[i].containersByQuota = getContainersSortedByQuota(data[i].containers);
 					vm.environments.push(data[i]);
 				}
 			}
@@ -137,7 +136,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 		DTColumnDefBuilder.newColumnDef(2).notSortable(),
 		DTColumnDefBuilder.newColumnDef(3).notSortable(),
 		DTColumnDefBuilder.newColumnDef(4).notSortable(),
-		DTColumnDefBuilder.newColumnDef(5).notSortable(),
+		DTColumnDefBuilder.newColumnDef(5).notSortable()
 	];
 
 	var refreshTable;
@@ -172,8 +171,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 
 	function shareEnvironmentWindow(environment) {
 		vm.listOfUsers = [];
-		vm.checkedUsers = [];
-		environmentService.getUsers().success(function (data) {
+		identitySrv.getUsers().success(function (data) {
 			for (var i = 0; i < data.length; ++i) {
 				if (data[i].id !== vm.currentUser.id) {
 					vm.listOfUsers.push (data[i]);
@@ -209,16 +207,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 				});
 			});
 		});
-	}
-
-	function toggleSelection (user) {
-		for (var i = 0; i < vm.checkedUsers.length; ++i) {
-			if (vm.checkedUsers[i].id === user.id) {
-				vm.checkedUsers.splice (i, 1);
-				return;
-			}
-		}
-		vm.checkedUsers.push (user);
 	}
 
 	function shareEnvironment() {
@@ -282,47 +270,35 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 		});
 	}
 
-	function containersTags (data) {
-		vm.installedContainers = [];
-
-		var containersTotal = {};
-		for(var i = 0; i < data.containers.length; i++) {
-			if(containersTotal[data.containers[i].templateName] === undefined) {
-				containersTotal[data.containers[i].templateName] = {};
-			}
-
-			if(containersTotal[data.containers[i].templateName][data.containers[i].type] === undefined) {
-				containersTotal[data.containers[i].templateName][data.containers[i].type] = 0;
-			}
-
-			if(data.containers[i].state != 'RUNNING') {
-				if(containersTotal[data.containers[i].templateName]['INACTIVE'] === undefined) {
-					containersTotal[data.containers[i].templateName]['INACTIVE'] = 0;
-				}
-				containersTotal[data.containers[i].templateName]['INACTIVE'] += 1;
+	function getContainersSortedByQuota(containers) {
+		var sortedContainers = containers.length > 0 ? {} : null;
+		for (var index = 0; index < containers.length; index++) {
+			var quotaSize = containers[index].type;
+			var templateName = containers[index].templateName;
+			if (!sortedContainers[quotaSize]) {
+				sortedContainers[quotaSize] = {};
+				sortedContainers[quotaSize].quantity = 1;
+				sortedContainers[quotaSize].containers = {};
+				sortedContainers[quotaSize].containers[templateName] = 1;
 			} else {
-				containersTotal[data.containers[i].templateName][data.containers[i].type] += 1;
-			}
-		}
-
-		var containersHTML = '';
-		for(var template in containersTotal) {
-			for (var type in containersTotal[template]){
-				if(containersTotal[template][type] > 0) {
-					if(type != 'INACTIVE') {
-						var tooltipContent = '<div class="b-nowrap">Quota: <div class="b-quota-type-round b-quota-type-round_' + quotaColors[type] + '"></div> <b>' + type + '</b></div><span class="b-nowrap">State: <b>RUNNING</b></span>';
-					} else {
-						var tooltipContent = 'State: <b>INACTIVE</b>';
-					}
-					containersTotal[template].color = quotaColors[type];
-					containersTotal[template].counts = containersTotal[template][type];
-					containersTotal[template].type = type;
-					containersTotal[template].tooltip = tooltipContent;
-					containersTotal[template].dataID = data.id;
+				if (!sortedContainers[quotaSize].containers[templateName]) {
+					sortedContainers[quotaSize].quantity += 1;
+					sortedContainers[quotaSize].containers[templateName] = 1;
+				} else {
+					sortedContainers[quotaSize].quantity += 1;
+					sortedContainers[quotaSize].containers[templateName] += 1;
 				}
 			}
 		}
-		vm.installedContainers = containersTotal;
+
+		for(var item in sortedContainers) {
+			sortedContainers[item].tooltip = "";
+			for(var container in sortedContainers[item].containers) {
+				sortedContainers[item].tooltip += container + ":&nbsp;<b>" + sortedContainers[item].containers[container] + "</b><br/>";
+			}
+		}
+		console.log();
+		return sortedContainers;
 	}
 
 	function togglePeer(peerId) {
@@ -454,7 +430,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	}
 
 	function setDomain(domain) {
-		var file = fileUploder;
+		var file = fileUploader;
 		LOADING_SCREEN();
 		environmentService.setDomain(domain, vm.environmentForDomain, file).success(function (data) {
 			SweetAlert.swal("Success!", "You have successfully added domain for " + vm.environmentForDomain + " environment!", "success");
@@ -597,7 +573,7 @@ function fileModel($parse) {
 				document.getElementById("js-uploadFile").value = element[0].files[0].name;
 				scope.$apply(function(){
 					modelSetter(scope, element[0].files[0]);
-					fileUploder = element[0].files[0];
+					fileUploader = element[0].files[0];
 				});
 			});
 		}

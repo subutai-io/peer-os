@@ -16,10 +16,12 @@ function kurjunService($http, Upload) {
 		getTemplates: getTemplates,
 		getAPTList: getAPTList,
 		addTemplate: addTemplate,
+		shareTemplate: shareTemplate,
 		addApt: addApt,
 		deleteTemplate: deleteTemplate,
 		deleteAPT: deleteAPT,
-		isUploadAllowed: isUploadAllowed
+		isUploadAllowed: isUploadAllowed,
+		getShared: getShared
 	};
 
 	return kurjunService;
@@ -57,6 +59,15 @@ function kurjunService($http, Upload) {
 		});
 	}
 
+	function shareTemplate(users, templateId) {
+		var postData = "users=" + users + "&templateId=" + templateId;
+		return $http.post(
+			KURJUN_URL + "share",
+			postData,
+			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+		);
+	}
+
 	function deleteAPT(md5) {
 		return $http.delete(KURJUN_URL + 'vapt/delete', {params: {md5: md5}}, {
 			withCredentials: true,
@@ -69,6 +80,10 @@ function kurjunService($http, Upload) {
 			withCredentials: true,
 			headers: {'Content-Type': 'application/json'}
 		});
+	}
+
+	function getShared(templateId) {
+		return $http.get (KURJUN_URL + "shared/users/" + templateId);
 	}
 
 	function uploadFile(file, url) {
