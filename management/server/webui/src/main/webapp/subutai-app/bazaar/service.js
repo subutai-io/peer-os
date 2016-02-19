@@ -9,6 +9,7 @@ function BazaarSrv($http) {
 
 	var BAZAAR_URL = SERVER_URL + "rest/v1/bazaar/";
 	var PLUGIN_URL = SERVER_URL + "rest/v1/plugin-integrator/"
+	var PLUGINS_URL = SERVER_URL + 'js/plugins.json';
 
 	var BazaarSrv = {
 		uploadPlugin: uploadPlugin,
@@ -21,7 +22,8 @@ function BazaarSrv($http) {
 		getInstalledHubPlugins: getInstalledHubPlugins,
 		uninstallHubPlugin: uninstallHubPlugin,
 		registerPeer: registerPeer,
-		checkRegistration: checkRegistration
+		checkRegistration: checkRegistration,
+		getRefOldPlugins: getRefOldPlugins
 	};
 
 	return BazaarSrv;
@@ -114,6 +116,10 @@ function BazaarSrv($http) {
 
 	function checkRegistration() {
 		return $http.get (SERVER_URL + "rest/v1/system/peer_settings", {withCredentials: true, headers: {'Content-Type': 'application/json'}});
+	}
+
+	function getRefOldPlugins() {
+		return $http.get(PLUGINS_URL, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
 	}
 }
 

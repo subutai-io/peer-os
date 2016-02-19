@@ -8,11 +8,9 @@
             http://www.w3.org/2001/XMLSchema-instance http://www.w3.org/2001/XMLSchema-instance
             http://aries.apache.org/xmlns/jpa/v1.0.0 http://aries.apache.org/xmlns/jpa/v1.0.0">
 
-  <!-- ***************************************************************** -->
-  <!--<bean id="daoManagerPlugin" init-method="init" class="io.subutai.common.dao.DaoManager" scope="prototype">-->
-    <!--<jpa:unit unitname="PluginInjectorConfigPUnit" property="entityManagerFactory" />-->
-  <!--</bean>-->
-  <!-- ***************************************************************** -->
+  <cm:property-placeholder persistent-id="subutaisystem" update-strategy="reload" />
+
+
   <reference id="templateManager" availability="mandatory"
              interface="io.subutai.core.kurjun.api.TemplateManager" />
   <reference id="identityManager" availability="mandatory"
@@ -21,9 +19,23 @@
 
   <bean id="systemManagerImpl" scope="singleton"
         class="io.subutai.core.systemmanager.impl.SystemManagerImpl">
-    <!--<argument ref="daoManagerPlugin" />-->
     <property name="templateManager" ref="templateManager" />
     <property name="identityManager" ref="identityManager" />
+
+    <!--<argument value="${externalInterfaceName}" />-->
+    <!--<argument value="${publicURL}" />-->
+    <!--<argument value="${isRegisteredToHub}" />-->
+    <!--<argument value="${encryptionEnabled}" />-->
+    <!--<argument value="${restEncryptionEnabled}" />-->
+    <!--<argument value="${integrationEnabled}" />-->
+    <!--<argument value="${keyTrustCheckEnabled}" />-->
+    <argument value="${globalKurjunUrls}" />
+    <!--<argument value="${openPort}" />-->
+    <argument value="${securePortX1}" />
+    <argument value="${securePortX2}" />
+    <argument value="${securePortX3}" />
+    <!--<argument value="${specialPortX1}" />-->
+
   </bean>
 
   <service ref="systemManagerImpl"

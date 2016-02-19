@@ -5,6 +5,8 @@ import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -22,6 +24,10 @@ import io.subutai.common.security.relation.RelationLink;
 public class RelationLinkImpl implements RelationLink
 {
     @Id
+    @GeneratedValue( strategy = GenerationType.IDENTITY )
+    @Column(name = "rl_id")
+    private long id;
+
     @Column( name = "link_id" )
     private String linkId;
 
@@ -123,23 +129,16 @@ public class RelationLinkImpl implements RelationLink
             return false;
         }
 
-        final RelationLinkImpl trustItem = ( RelationLinkImpl ) o;
+        final RelationLinkImpl that = ( RelationLinkImpl ) o;
 
-        if ( uniqueIdentifier != null ? !uniqueIdentifier.equals( trustItem.uniqueIdentifier ) :
-             trustItem.uniqueIdentifier != null )
-        {
-            return false;
-        }
-        return !( classPath != null ? !classPath.equals( trustItem.classPath ) : trustItem.classPath != null );
+        return linkId != null ? linkId.equals( that.linkId ) : that.linkId == null;
     }
 
 
     @Override
     public int hashCode()
     {
-        int result = uniqueIdentifier != null ? uniqueIdentifier.hashCode() : 0;
-        result = 31 * result + ( classPath != null ? classPath.hashCode() : 0 );
-        return result;
+        return linkId != null ? linkId.hashCode() : 0;
     }
 
 
@@ -147,9 +146,11 @@ public class RelationLinkImpl implements RelationLink
     public String toString()
     {
         return "RelationLinkImpl{" +
-                "id=" + linkId +
+                "id=" + id +
+                ", linkId='" + linkId + '\'' +
                 ", uniqueIdentifier='" + uniqueIdentifier + '\'' +
                 ", classPath='" + classPath + '\'' +
+                ", context='" + context + '\'' +
                 '}';
     }
 }

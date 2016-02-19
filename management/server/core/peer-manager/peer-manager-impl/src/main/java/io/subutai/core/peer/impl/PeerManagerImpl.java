@@ -57,7 +57,7 @@ import io.subutai.common.protocol.PingDistances;
 import io.subutai.common.resource.PeerGroupResources;
 import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.objects.TokenType;
-import io.subutai.common.settings.ChannelSettings;
+import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.ControlNetworkUtil;
 import io.subutai.common.util.SecurityUtilities;
 import io.subutai.core.identity.api.IdentityManager;
@@ -159,14 +159,14 @@ public class PeerManagerImpl implements PeerManager
                 localPeerInfo.setId( localPeerId );
                 localPeerInfo.setOwnerId( ownerId );
 
-                if ( StringUtils.isEmpty( publicUrl ) )
+                if ( StringUtils.isEmpty( SystemSettings.getPublicUrl() ) )
                 {
                     localPeerInfo.setName( String.format( "Peer %s ", localPeerId ) );
                 }
                 else
                 {
-                    localPeerInfo.setPublicUrl( publicUrl );
-                    localPeerInfo.setName( String.format( "Peer %s on %s", localPeerId, publicUrl ) );
+                    localPeerInfo.setPublicUrl( SystemSettings.getPublicUrl() );
+                    localPeerInfo.setName( String.format( "Peer %s on %s", localPeerId, SystemSettings.getPublicUrl() ) );
                 }
 
                 PeerPolicy policy = getDefaultPeerPolicy( localPeerId );
@@ -267,7 +267,7 @@ public class PeerManagerImpl implements PeerManager
             byte[] key = SecurityUtilities.generateKey( keyPhrase.getBytes( "UTF-8" ) );
             String decryptedCert = encryptedData.decrypt( key, String.class );
             securityManager.getKeyStoreManager()
-                           .importCertAsTrusted( ChannelSettings.SECURE_PORT_X2, registrationData.getPeerInfo().getId(),
+                           .importCertAsTrusted( SystemSettings.getSecurePortX2(), registrationData.getPeerInfo().getId(),
                                    decryptedCert );
             securityManager.getHttpContextManager().reloadKeyStore();
 
@@ -285,7 +285,7 @@ public class PeerManagerImpl implements PeerManager
 
             templateManager.addRemoteRepository( new URL(
                     String.format( KURJUN_URL_PATTERN, registrationData.getPeerInfo().getIp(),
-                            ChannelSettings.SECURE_PORT_X1 ) ), registrationData.getToken() );
+                            SystemSettings.getSecurePortX1() ) ), registrationData.getToken() );
         }
         catch ( GeneralSecurityException e )
         {
@@ -424,7 +424,7 @@ public class PeerManagerImpl implements PeerManager
             //            mgmHost.removeRepository( p.getId(), p.getIp() );
             templateManager.removeRemoteRepository( new URL(
                     String.format( KURJUN_URL_PATTERN, registrationData.getPeerInfo().getIp(),
-                            ChannelSettings.SECURE_PORT_X1 ) ) );
+                            SystemSettings.getSecurePortX1() ) ) );
         }
         catch ( Exception e )
         {
@@ -610,7 +610,7 @@ public class PeerManagerImpl implements PeerManager
             case REQUESTED:
             case APPROVED:
                 String cert =
-                        securityManager.getKeyStoreManager().exportCertificate( ChannelSettings.SECURE_PORT_X2, "" );
+                        securityManager.getKeyStoreManager().exportCertificate( SystemSettings.getSecurePortX2(), "" );
                 try
                 {
                     byte[] key = SecurityUtilities.generateKey( keyPhrase.getBytes( "UTF-8" ) );
@@ -624,7 +624,7 @@ public class PeerManagerImpl implements PeerManager
                 break;
             case UNREGISTERED:
                 String ip =
-                        securityManager.getKeyStoreManager().exportCertificate( ChannelSettings.SECURE_PORT_X2, "" );
+                        securityManager.getKeyStoreManager().exportCertificate( SystemSettings.getSecurePortX2(), "" );
                 try
                 {
                     byte[] key = SecurityUtilities.generateKey( keyPhrase.getBytes( "UTF-8" ) );
@@ -691,7 +691,7 @@ public class PeerManagerImpl implements PeerManager
         }
         catch ( MalformedURLException e )
         {
-            return String.format( "https://%s:%d/", destinationHost, ChannelSettings.SECURE_PORT_X1 );
+            return String.format( "https://%s:%d/", destinationHost, SystemSettings.getSecurePortX1() );
         }
     }
 
@@ -1085,7 +1085,7 @@ public class PeerManagerImpl implements PeerManager
         {
             Host rh = localPeer.getResourceHostByContainerName( "management" );
 
-            return rh.getInterfaceByName( externalInterfaceName ).getIp();
+            return rh.getInterfaceByName( SystemSettings.getExternalIpInterface() ).getIp();
         }
 
 

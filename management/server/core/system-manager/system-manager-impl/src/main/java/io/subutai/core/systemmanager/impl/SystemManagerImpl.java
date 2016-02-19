@@ -3,8 +3,11 @@ package io.subutai.core.systemmanager.impl;
 
 import java.util.concurrent.TimeUnit;
 
-import io.subutai.common.settings.ChannelSettings;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+
 import io.subutai.common.settings.SubutaiInfo;
+import io.subutai.common.settings.SystemSettings;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.kurjun.api.KurjunTransferQuota;
@@ -13,12 +16,10 @@ import io.subutai.core.systemmanager.api.SystemManager;
 import io.subutai.core.systemmanager.api.pojo.KurjunSettings;
 import io.subutai.core.systemmanager.api.pojo.NetworkSettings;
 import io.subutai.core.systemmanager.api.pojo.PeerSettings;
-import io.subutai.core.systemmanager.api.pojo.SecuritySettings;
 import io.subutai.core.systemmanager.api.pojo.SystemInfo;
 import io.subutai.core.systemmanager.impl.pojo.KurjunSettingsPojo;
 import io.subutai.core.systemmanager.impl.pojo.NetworkSettingsPojo;
 import io.subutai.core.systemmanager.impl.pojo.PeerSettingsPojo;
-import io.subutai.core.systemmanager.impl.pojo.SecuritySettingsPojo;
 import io.subutai.core.systemmanager.impl.pojo.SystemInfoPojo;
 
 
@@ -31,17 +32,36 @@ public class SystemManagerImpl implements SystemManager
     private IdentityManager identityManager;
 
 
-    @Override
-    public SecuritySettings getSecuritySettings()
+    //    public SystemManagerImpl( final String externalInterfaceName, final String publicURL,
+    //                              final boolean isRegisteredToHub, final boolean encryptionEnabled,
+    //                              final boolean restEncryptionEnabled, final boolean integrationEnabled,
+    //                              final boolean keyTrustCheckEnabled, final String globalKurjunUrls,final int
+    // openPort, final int securePortX1,
+    //                              final int securePortX2, final int securePortX3, final int specialPortX1  )
+
+
+    public SystemManagerImpl( final String globalKurjunUrls, final int securePortX1,
+                              final int securePortX2, final int securePortX3 )
+
     {
-        SecuritySettings pojo = new SecuritySettingsPojo();
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( globalKurjunUrls ), "Invalid Global Kurjun URLs" );
 
-        pojo.setEncryptionState( io.subutai.common.settings.PeerSettings.getEncryptionState() );
-        pojo.setRestEncryptionState( io.subutai.common.settings.PeerSettings.getRestEncryptionState() );
-        pojo.setIntegrationState( io.subutai.common.settings.PeerSettings.getIntegrationState() );
-        pojo.setKeyTrustCheckState( io.subutai.common.settings.PeerSettings.getKeyTrustCheckState() );
+//        SystemSettings.setExternalIpInterface( externalInterfaceName );
+//        SystemSettings.setPublicUrl( publicURL );
+//        SystemSettings.setRegisterToHubState( isRegisteredToHub );
+//
+//        SystemSettings.setEncryptionState( encryptionEnabled );
+//        SystemSettings.setRestEncryptionState( restEncryptionEnabled );
+//        SystemSettings.setIntegrationState( integrationEnabled );
+//        SystemSettings.setKeyTrustCheckState( keyTrustCheckEnabled );
 
-        return pojo;
+
+        SystemSettings.setGlobalKurjunUrls( globalKurjunUrls );
+//        SystemSettings.setOpenPort( openPort );
+        SystemSettings.setSecurePortX1( securePortX1 );
+        SystemSettings.setSecurePortX2( securePortX2 );
+        SystemSettings.setSecurePortX3( securePortX3 );
+//        SystemSettings.setSpecialPortX1( specialPortX1 );
     }
 
 
@@ -71,7 +91,7 @@ public class SystemManagerImpl implements SystemManager
             pojo.setTrustTimeUnit( trustTransferQuota.getTimeUnit() );
         }
 
-        pojo.setGlobalKurjunUrls( io.subutai.common.settings.KurjunSettings.getGlobalKurjunUrls() );
+        pojo.setGlobalKurjunUrls( io.subutai.common.settings.SystemSettings.getGlobalKurjunUrls() );
 
         return pojo;
     }
@@ -112,33 +132,18 @@ public class SystemManagerImpl implements SystemManager
 
         pojo.setPeerOwnerId( peerOwnerId );
         pojo.setUserPeerOwnerName( user.getUserName() );
-        pojo.setRegisteredToHub( io.subutai.common.settings.PeerSettings.isRegisteredToHub() );
+        pojo.setRegisteredToHub( io.subutai.common.settings.SystemSettings.isRegisteredToHub() );
 
         return pojo;
     }
 
 
     @Override
-    public void setNetworkSettings( final String externalIpInterface, final String openPort, final String securePortX1,
-                                    final String securePortX2, final String securePortX3, final String specialPortX1 )
+    public void setNetworkSettings( final String securePortX1, final String securePortX2, final String securePortX3 )
     {
-        io.subutai.common.settings.PeerSettings.setExternalIpInterface( externalIpInterface );
-        ChannelSettings.setOpenPort( Integer.parseInt( openPort ) );
-        ChannelSettings.setSecurePortX1( Integer.parseInt( securePortX1 ) );
-        ChannelSettings.setSecurePortX2( Integer.parseInt( securePortX2 ) );
-        ChannelSettings.setSecurePortX3( Integer.parseInt( securePortX3 ) );
-        ChannelSettings.setSpecialPortX1( Integer.parseInt( specialPortX1 ) );
-    }
-
-
-    @Override
-    public void setSecuritySettings( final boolean encryptionEnabled, final boolean restEncryptionEnabled,
-                                     final boolean integrationEnabled, final boolean keyTrustCheckEnabled )
-    {
-        io.subutai.common.settings.PeerSettings.setEncryptionState( encryptionEnabled );
-        io.subutai.common.settings.PeerSettings.setRestEncryptionState( restEncryptionEnabled );
-        io.subutai.common.settings.PeerSettings.setIntegrationState( integrationEnabled );
-        io.subutai.common.settings.PeerSettings.setKeyTrustCheckState( keyTrustCheckEnabled );
+        SystemSettings.setSecurePortX1( Integer.parseInt( securePortX1 ) );
+        SystemSettings.setSecurePortX2( Integer.parseInt( securePortX2 ) );
+        SystemSettings.setSecurePortX3( Integer.parseInt( securePortX3 ) );
     }
 
 
@@ -147,7 +152,7 @@ public class SystemManagerImpl implements SystemManager
                                       final long publicThreshold, final long publicTimeFrame, final long trustDiskQuota,
                                       final long trustThreshold, final long trustTimeFrame )
     {
-        io.subutai.common.settings.KurjunSettings.setSettings( globalKurjunUrls );
+        io.subutai.common.settings.SystemSettings.setGlobalKurjunUrls( globalKurjunUrls );
 
         templateManager.setDiskQuota( publicDiskQuota, "public" );
         templateManager.setDiskQuota( trustDiskQuota, "trust" );
@@ -169,12 +174,9 @@ public class SystemManagerImpl implements SystemManager
     {
         NetworkSettings pojo = new NetworkSettingsPojo();
 
-        pojo.setExternalIpInterface( io.subutai.common.settings.PeerSettings.getExternalIpInterface() );
-        pojo.setOpenPort( io.subutai.common.settings.ChannelSettings.OPEN_PORT );
-        pojo.setSecurePortX1( io.subutai.common.settings.ChannelSettings.SECURE_PORT_X1 );
-        pojo.setSecurePortX2( io.subutai.common.settings.ChannelSettings.SECURE_PORT_X2 );
-        pojo.setSecurePortX3( io.subutai.common.settings.ChannelSettings.SECURE_PORT_X3 );
-        pojo.setSpecialPortX1( io.subutai.common.settings.ChannelSettings.SPECIAL_PORT_X1 );
+        pojo.setSecurePortX1( io.subutai.common.settings.SystemSettings.getSecurePortX1() );
+        pojo.setSecurePortX2( io.subutai.common.settings.SystemSettings.getSecurePortX2() );
+        pojo.setSecurePortX3( io.subutai.common.settings.SystemSettings.getSecurePortX3() );
 
         return pojo;
     }

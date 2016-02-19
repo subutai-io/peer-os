@@ -35,6 +35,28 @@ public class RelationDataService
     }
 
 
+    public void save( Object relationLink )
+    {
+        EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
+
+        try
+        {
+            daoManager.startTransaction( em );
+            em.persist( relationLink );
+            daoManager.commitTransaction( em );
+        }
+        catch ( Exception ex )
+        {
+            logger.error( "Error persisting object", ex );
+            daoManager.rollBackTransaction( em );
+        }
+        finally
+        {
+            daoManager.closeEntityManager( em );
+        }
+    }
+
+
     public void update( Object relationLink )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
@@ -107,8 +129,8 @@ public class RelationDataService
         List<Relation> result = Lists.newArrayList();
         try
         {
-            Query qr = em.createQuery( "select ss from RelationImpl AS ss" + " where ss.source=:source" );
-            qr.setParameter( "source", source );
+            Query qr = em.createQuery( "select ss from RelationImpl AS ss" + " where ss.source.linkId=:source" );
+            qr.setParameter( "source", source.getLinkId() );
             result.addAll( qr.getResultList() );
         }
         catch ( Exception ex )
@@ -129,8 +151,8 @@ public class RelationDataService
         List<Relation> result = Lists.newArrayList();
         try
         {
-            Query qr = em.createQuery( "select ss from RelationImpl AS ss" + " where ss.target=:target" );
-            qr.setParameter( "target", target );
+            Query qr = em.createQuery( "select ss from RelationImpl AS ss" + " where ss.target.linkId=:target" );
+            qr.setParameter( "target", target.getLinkId() );
             result.addAll( qr.getResultList() );
         }
         catch ( Exception ex )
@@ -156,8 +178,8 @@ public class RelationDataService
         List<Relation> result = Lists.newArrayList();
         try
         {
-            Query qr = em.createQuery( "select ss from RelationImpl AS ss" + " where ss.trustedObject=:trustedObject" );
-            qr.setParameter( "trustedObject", object );
+            Query qr = em.createQuery( "select ss from RelationImpl AS ss" + " where ss.trustedObject.linkId=:trustedObject" );
+            qr.setParameter( "trustedObject", object.getLinkId() );
             result.addAll( qr.getResultList() );
         }
         catch ( Exception ex )
@@ -179,9 +201,9 @@ public class RelationDataService
         try
         {
             Query qr = em.createQuery( "select ss from RelationImpl AS ss"
-                    + " where ss.source=:source AND ss.trustedObject=:trustedObject" );
-            qr.setParameter( "source", source );
-            qr.setParameter( "trustedObject", object );
+                    + " where ss.source.linkId=:source AND ss.trustedObject.linkId=:trustedObject" );
+            qr.setParameter( "source", source.getLinkId() );
+            qr.setParameter( "trustedObject", object.getLinkId() );
             List<Relation> list = qr.getResultList();
 
             if ( list.size() > 0 )
@@ -209,10 +231,11 @@ public class RelationDataService
         try
         {
             Query qr = em.createQuery( "select ss from RelationImpl AS ss"
-                    + " where ss.source=:source AND ss.target=:target AND ss.trustedObject=:trustedObject" );
-            qr.setParameter( "source", source );
-            qr.setParameter( "target", target );
-            qr.setParameter( "trustedObject", object );
+                    + " where ss.source.linkId=:source AND ss.target.linkId=:target AND ss.trustedObject"
+                    + ".linkId=:trustedObject" );
+            qr.setParameter( "source", source.getLinkId() );
+            qr.setParameter( "target", target.getLinkId() );
+            qr.setParameter( "trustedObject", object.getLinkId() );
             List<Relation> list = qr.getResultList();
 
             if ( list.size() > 0 )
@@ -239,9 +262,9 @@ public class RelationDataService
         try
         {
             Query qr = em.createQuery( "select ss from RelationImpl AS ss"
-                    + " where ss.source=:source AND ss.trustedObject=:trustedObject" );
-            qr.setParameter( "source", source );
-            qr.setParameter( "trustedObject", object );
+                    + " where ss.source.linkId=:source AND ss.trustedObject.linkId=:trustedObject" );
+            qr.setParameter( "source", source.getLinkId() );
+            qr.setParameter( "trustedObject", object.getLinkId() );
             result.addAll( qr.getResultList() );
         }
         catch ( Exception ex )
@@ -263,9 +286,9 @@ public class RelationDataService
         try
         {
             Query qr = em.createQuery( "select ss from RelationImpl AS ss"
-                    + " where ss.target=:target AND ss.trustedObject=:trustedObject" );
-            qr.setParameter( "target", target );
-            qr.setParameter( "trustedObject", object );
+                    + " where ss.target.linkId=:target AND ss.trustedObject.linkId=:trustedObject" );
+            qr.setParameter( "target", target.getLinkId() );
+            qr.setParameter( "trustedObject", object.getLinkId() );
             List<Relation> list = qr.getResultList();
 
             if ( list.size() > 0 )
@@ -292,9 +315,9 @@ public class RelationDataService
         try
         {
             Query qr = em.createQuery( "select ss from RelationImpl AS ss"
-                    + " where ss.target=:target AND ss.trustedObject=:trustedObject" );
-            qr.setParameter( "target", target );
-            qr.setParameter( "trustedObject", object );
+                    + " where ss.target.linkId=:target AND ss.trustedObject.linkId=:trustedObject" );
+            qr.setParameter( "target", target.getLinkId() );
+            qr.setParameter( "trustedObject", object.getLinkId() );
             result.addAll( qr.getResultList() );
         }
         catch ( Exception ex )
