@@ -43,6 +43,7 @@
     <module>system-manager</module>
     <module>bazaar-integration</module>
     <module>hub-manager</module>
+    <module>common-plugin</module>
   </modules>
 
 </project>
