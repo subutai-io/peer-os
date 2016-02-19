@@ -132,6 +132,7 @@ public class IntegrationImpl implements Integration
         RegistrationManager registrationManager = new RegistrationManager( this, configManager );
 
         registrationManager.registerPeer( email, password );
+        sendHeartbeat();
     }
 
 
