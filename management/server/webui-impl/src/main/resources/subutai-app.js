@@ -39,8 +39,11 @@ function CurrentUserCtrl($location, $rootScope, $http) {
 	vm.currentUserRoles = [];
 	$rootScope.notifications = {};
 
-	if( vm.hubStatus != true ) {
+	if( vm.hubStatus != "true" ) {
 		vm.hubStatus = false;
+	}
+	else {
+		vm.hubStatus = true;
 	}
 
 
