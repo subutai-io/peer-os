@@ -134,6 +134,7 @@ public interface RestService
 
     @DELETE
     @Path( "users/tokens/{tokenId}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
     Response removeUserToken( @PathParam( "tokenId" ) String tokenId );
 
 
