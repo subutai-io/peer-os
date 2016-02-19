@@ -289,7 +289,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             }
         }
 
-
         return environments;
     }
 
@@ -431,51 +430,58 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         topology.setSubnet( calculateCidr( allPeers ) );
 
-        //create empty environment
-        final EnvironmentImpl environment = createEmptyEnvironment( topology );
-
-        // TODO add additional step for receiving trust message
-
-
-        //launch environment creation workflow
-        final EnvironmentCreationWorkflow environmentCreationWorkflow =
-                getEnvironmentCreationWorkflow( environment, topology, topology.getSshKey(), operationTracker );
-
-        //start environment creation workflow
-        executor.execute( new Runnable()
+        try
         {
-            @Override
-            public void run()
+            //create empty environment
+            final EnvironmentImpl environment = createEmptyEnvironment( topology );
+            // TODO add additional step for receiving trust message
+
+
+            //launch environment creation workflow
+            final EnvironmentCreationWorkflow environmentCreationWorkflow =
+                    getEnvironmentCreationWorkflow( environment, topology, topology.getSshKey(), operationTracker );
+
+            //start environment creation workflow
+            executor.execute( new Runnable()
             {
-                environmentCreationWorkflow.start();
-            }
-        } );
+                @Override
+                public void run()
+                {
+                    environmentCreationWorkflow.start();
+                }
+            } );
 
-        //notify environment event listeners
-        environmentCreationWorkflow.onStop( new Runnable()
-        {
-            @Override
-            public void run()
+            //notify environment event listeners
+            environmentCreationWorkflow.onStop( new Runnable()
             {
+                @Override
+                public void run()
+                {
 
-                notifyOnEnvironmentCreated( environment );
-            }
-        } );
+                    notifyOnEnvironmentCreated( environment );
+                }
+            } );
 
-        //wait
-        if ( !async )
-        {
-            environmentCreationWorkflow.join();
-
-            if ( environmentCreationWorkflow.isFailed() )
+            //wait
+            if ( !async )
             {
-                throw new EnvironmentCreationException(
-                        exceptionUtil.getRootCause( environmentCreationWorkflow.getFailedException() ) );
+                environmentCreationWorkflow.join();
+
+                if ( environmentCreationWorkflow.isFailed() )
+                {
+                    throw new EnvironmentCreationException(
+                            exceptionUtil.getRootCause( environmentCreationWorkflow.getFailedException() ) );
+                }
             }
+
+            //return created environment
+            return environment;
         }
-
-        //return created environment
-        return environment;
+        catch ( EnvironmentCreationException e )
+        {
+            operationTracker.addLogFailed( e.getMessage() );
+            throw new EnvironmentCreationException( e );
+        }
     }
 
 
@@ -1436,6 +1442,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         catch ( Exception e )
         {
             LOG.warn( "Error message.", e );
+            throw new EnvironmentCreationException( e );
         }
 
         environment = saveOrUpdate( environment );
