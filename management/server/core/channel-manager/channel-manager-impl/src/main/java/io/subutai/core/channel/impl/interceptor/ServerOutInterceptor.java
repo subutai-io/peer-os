@@ -98,7 +98,6 @@ public class ServerOutInterceptor extends AbstractPhaseInterceptor<Message>
         }
         catch ( Exception e )
         {
-            LOG.warn( "Error on handling message: ", e.getMessage() );
             throw new Fault( e );
         }
     }

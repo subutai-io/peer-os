@@ -74,18 +74,7 @@ public class DistributeCommand extends SubutaiShellCommandSupport
         try
         {
             ContainerPlacementStrategy strategy = strategyManager.findStrategyById( strategyId );
-            PeerGroupResources groupResources = new PeerGroupResources();
-            for ( String peerId : peers )
-            {
-                Peer peer = peerManager.getPeer( peerId );
-                if ( peer == null )
-                {
-                    System.out.println( "Peer not found: " + peerId );
-                    return null;
-                }
-
-                groupResources.addPeerResources( peer.getResourceLimits( peerManager.getLocalPeer().getId() ) );
-            }
+            PeerGroupResources groupResources = peerManager.getPeerGroupResources();
 
 
             final Map<ContainerSize, ContainerQuota> quotas = quotaManager.getDefaultQuotas();

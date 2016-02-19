@@ -6,8 +6,8 @@
 			<div class="b-pgp-page-row_list">
 				<div class="b-form-label">Public key</div>
 				<textarea class="b-form-input b-form-input_textarea js-auto-set-key" 
-					ng-model="accountCtrl.activeUser.publicKey" 
-					ng-change="accountCtrl.setPublicKey()" 
+					ng-model="publicKey" 
+					ng-change="accountCtrl.setPublicKey(publicKey)" 
 					style="width: 420px; height: 160px; font-family: monospace;">
 				</textarea>
 			</div>

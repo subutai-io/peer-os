@@ -40,8 +40,10 @@
     <module>test</module>
     <module>kurjun</module>
     <module>object-relation-manager</module>
-    <module>plugin-manager</module>
     <module>system-manager</module>
+    <module>bazaar-integration</module>
+    <module>hub-manager</module>
+    <module>common-plugin</module>
   </modules>
 
 </project>

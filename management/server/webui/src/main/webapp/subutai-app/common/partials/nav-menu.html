@@ -92,9 +92,6 @@
 					<a ui-sref="identity-role" id="subt-link__role-management">Role management</a>
 				</li>
 				<li class="b-nav-menu-sub b-nav-menu-sub_disabled">
-					<a ui-sref="account-settings" id="subt-link__account-settings">Account Settings</a>
-				</li>
-				<li class="b-nav-menu-sub b-nav-menu-sub_disabled">
 					<a ui-sref="tokens" id="subt-link__tokens">Tokens</a>
 				</li>
 			</ul>
@@ -136,29 +133,30 @@
 			</a>
 		</li>
 		<li class="b-nav-menu">
-			<a class="b-nav-menu-link" href id="subt-link__plugins-manager">
+			<a ui-sref="plugins" class="b-nav-menu-link" id="subt-link__plugins">
 				<span class="b-nav-menu__icon b-nav-menu-link__item">
 					<svg class="b-nav-menu-icon">
 						<use xlink:href="assets\elements\icons.svg#nav-plugins"></use>
 					</svg>
 				</span><!--
 					--><span class="b-nav-menu__title b-nav-menu-link__item">
-					Plugin Manager
-				</span>
-				<span class="b-nav-menu__add">
-					<span class="b-bav-menu-add"><i class="fa fa-caret-down"></i></span>
+					Plugins
 				</span>
 			</a>
-			<ul class="b-nav-menu__sub">
-				<li class="b-nav-menu-sub b-nav-menu-sub_disabled">
-					<a ui-sref="plugins" id="subt-link__plugins">Plugins</a>
-				</li>
-				<li class="b-nav-menu-sub b-nav-menu-sub_disabled">
-					<a ui-sref="plugin_integrator" id="subt-link__plugin-integrator">Integrator</a>
-				</li>
-			</ul>
 		</li>
-<li class="b-nav-menu">
+		<li class="b-nav-menu">
+			<a ui-sref="bazaar" class="b-nav-menu-link" id="subt-link__bazaar">
+				<span class="b-nav-menu__icon b-nav-menu-link__item">
+					<svg class="b-nav-menu-icon">
+						<use xlink:href="assets\elements\icons.svg#nav-bazaar"></use>
+					</svg>
+				</span><!--
+					--><span class="b-nav-menu__title b-nav-menu-link__item">
+					Bazaar
+				</span>
+			</a>
+		</li>
+		<li class="b-nav-menu">
 			<a class="b-nav-menu-link" href id="subt-link__settings">
 				<span class="b-nav-menu__icon b-nav-menu-link__item">
 					<svg class="b-nav-menu-icon">
@@ -180,14 +178,8 @@
 					<a ui-sref="settings-kurjun" id="subt-link__settings-kurjun">Kurjun Settings</a>
 				</li>
 				<li class="b-nav-menu-sub b-nav-menu-sub_disabled">
-					<a ui-sref="peer-policy" id="subt-link__peer-policy">Peer Policy</a>
+					<a ui-sref="settings-network" id="subt-link__settings-network">Network Settings</a>
 				</li>
-        <li class="b-nav-menu-sub b-nav-menu-sub_disabled">
-          <a ui-sref="settings-network" id="subt-link__settings-network">Network Settings</a>
-        </li>
-        <li class="b-nav-menu-sub b-nav-menu-sub_disabled">
-          <a ui-sref="settings-security" id="subt-link__settings-security">Security Settings</a>
-        </li>
 				<li class="b-nav-menu-sub b-nav-menu-sub_disabled">
 					<a ui-sref="updates" id="subt-link__updates">Updates</a>
 				</li>

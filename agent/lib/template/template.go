@@ -2,13 +2,15 @@ package template
 
 import (
 	"crypto/tls"
-	"github.com/jhoonb/archivex"
-	"github.com/subutai-io/Subutai/agent/config"
-	"github.com/subutai-io/Subutai/agent/lib/fs"
-	"github.com/subutai-io/Subutai/agent/log"
 	"io"
 	"net/http"
 	"os"
+
+	"github.com/subutai-io/Subutai/agent/config"
+	"github.com/subutai-io/Subutai/agent/lib/fs"
+	"github.com/subutai-io/Subutai/agent/log"
+
+	"github.com/jhoonb/archivex"
 )
 
 func IsRegistered(templateName string) bool {
@@ -68,7 +70,7 @@ func Install(parent, child string) {
 	}
 
 	for delta, path := range delta {
-		fs.Receive(path[0], path[1], delta, p)
+		fs.Receive(config.Agent.LxcPrefix+path[0], config.Agent.LxcPrefix+path[1], delta, p)
 	}
 
 	for _, file := range []string{"config", "fstab", "packages"} {

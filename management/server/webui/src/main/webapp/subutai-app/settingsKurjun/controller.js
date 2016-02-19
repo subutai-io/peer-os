@@ -7,14 +7,13 @@ angular.module("subutai.settings-kurjun.controller", [])
 SettingsKurjunCtrl.$inject = ["$scope", "SettingsKurjunSrv", "SweetAlert"];
 function SettingsKurjunCtrl($scope, SettingsKurjunSrv, SweetAlert) {
     var vm = this;
-    vm.config = {};
-
+    vm.config = {globalKurjunUrls: [""]};
+	vm.activeTab = "urls";
     function getConfig() {
         SettingsKurjunSrv.getConfig().success(function (data) {
             vm.config = data;
-        });
+    	});
     }
-
     getConfig();
 
 

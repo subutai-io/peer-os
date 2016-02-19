@@ -10,6 +10,7 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.peer.RegistrationData;
 import io.subutai.common.protocol.PingDistances;
+import io.subutai.common.resource.PeerGroupResources;
 
 
 public interface PeerManager
@@ -80,6 +81,8 @@ public interface PeerManager
     void processRejectRequest( RegistrationData registrationData ) throws PeerException;
 
     String getPeerIdByIp( String ip ) throws PeerException;
+
+    PeerGroupResources getPeerGroupResources() throws PeerException;
 
     PeerPolicy getAvailablePolicy();
 

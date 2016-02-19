@@ -9,11 +9,11 @@ import (
 func Cleanup(vlan string) {
 	for _, name := range container.Containers() {
 		if container.GetConfigItem(config.Agent.LxcPrefix+name+"/config", "#vlan_id") == vlan {
-			container.Destroy(name)
+			LxcDestroy(name)
 		}
 	}
 
 	net.DeleteGateway(vlan)
-	net.DeleteAllVNI(vlan)
+	ClearVlan(vlan)
 	ProxyDel(vlan, "", true)
 }
