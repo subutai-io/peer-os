@@ -8,7 +8,7 @@ import java.util.Objects;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 
-import io.subutai.common.settings.ChannelSettings;
+import io.subutai.common.settings.SystemSettings;
 
 
 /**
@@ -44,7 +44,7 @@ public class PeerInfo implements Serializable
     private String name;
 
     @JsonProperty
-    private int port = ChannelSettings.SECURE_PORT_X2;
+    private int port = SystemSettings.getSecurePortX2();
 
     //    @JsonProperty
     //    private int lastUsedVlanId = 100;
@@ -112,7 +112,7 @@ public class PeerInfo implements Serializable
         catch ( MalformedURLException e )
         {
             // assume this is IP or domain name
-            final String u = String.format( "https://%s:%s/", publicUrl, ChannelSettings.SECURE_PORT_X1 );
+            final String u = String.format( "https://%s:%s/", publicUrl, SystemSettings.getSecurePortX1() );
             try
             {
                 URL url = new URL( u );

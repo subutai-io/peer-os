@@ -1,8 +1,6 @@
 package io.subutai.core.channel.impl.interceptor;
 
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.security.PrivilegedAction;
 
 import javax.security.auth.Subject;
@@ -13,23 +11,21 @@ import javax.ws.rs.core.HttpHeaders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 import com.google.common.base.Strings;
 
-import io.subutai.common.settings.ChannelSettings;
+import io.subutai.common.settings.SystemSettings;
 import io.subutai.core.channel.impl.ChannelManagerImpl;
 import io.subutai.core.channel.impl.util.InterceptorState;
 import io.subutai.core.channel.impl.util.MessageContentUtil;
 import io.subutai.core.identity.api.model.Session;
-
-import org.apache.commons.lang3.exception.ExceptionUtils;
 
 
 /**
@@ -62,7 +58,7 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
                 HttpServletRequest req = ( HttpServletRequest ) message.get( AbstractHTTPDestination.HTTP_REQUEST );
                 Session userSession = null;
 
-                if ( req.getLocalPort() == ChannelSettings.SECURE_PORT_X2 )
+                if ( req.getLocalPort() == SystemSettings.getSecurePortX2() )
                 {
                     userSession = authenticateAccess( null,null );
                 }

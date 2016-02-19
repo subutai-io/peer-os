@@ -5,8 +5,7 @@ import java.security.KeyStore;
 
 import io.subutai.common.security.crypto.keystore.KeyStoreData;
 import io.subutai.common.security.crypto.keystore.KeyStoreTool;
-import io.subutai.common.settings.ChannelSettings;
-import io.subutai.common.settings.SecuritySettings;
+import io.subutai.common.settings.SystemSettings;
 import io.subutai.core.security.api.crypto.KeyStoreManager;
 
 
@@ -27,11 +26,11 @@ public class KeyStoreManagerImpl implements KeyStoreManager
 
         keyStoreData = new KeyStoreData();
 
-        if ( port == ChannelSettings.SECURE_PORT_X1 )
+        if ( port == SystemSettings.getSecurePortX1() )
         {
             keyStoreData.setupTrustStorePx1();
         }
-        else if ( port == ChannelSettings.SECURE_PORT_X2 )
+        else if ( port == SystemSettings.getSecurePortX2() )
         {
             keyStoreData.setupTrustStorePx2();
         }
@@ -59,12 +58,12 @@ public class KeyStoreManagerImpl implements KeyStoreManager
 
         keyStoreData = new KeyStoreData();
 
-        if ( port == ChannelSettings.SECURE_PORT_X1 )
+        if ( port == SystemSettings.getSecurePortX1() )
         {
             keyStoreData = new KeyStoreData();
             keyStoreData.setupKeyStorePx1();
         }
-        else if ( port == ChannelSettings.SECURE_PORT_X2 )
+        else if ( port == SystemSettings.getSecurePortX2() )
         {
             keyStoreData = new KeyStoreData();
             keyStoreData.setupKeyStorePx2();
@@ -91,11 +90,11 @@ public class KeyStoreManagerImpl implements KeyStoreManager
 
         keyStoreData = new KeyStoreData();
 
-        if ( port == ChannelSettings.SECURE_PORT_X1 )
+        if ( port == SystemSettings.getSecurePortX1() )
         {
             keyStoreData.setupTrustStorePx1();
         }
-        else if ( port == ChannelSettings.SECURE_PORT_X2 )
+        else if ( port == SystemSettings.getSecurePortX2() )
         {
             keyStoreData.setupTrustStorePx2();
         }

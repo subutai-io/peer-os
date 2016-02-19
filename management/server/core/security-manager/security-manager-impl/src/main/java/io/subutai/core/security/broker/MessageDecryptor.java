@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.subutai.common.security.crypto.pgp.ContentAndSignatures;
-import io.subutai.common.settings.PeerSettings;
+import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.broker.api.ByteMessagePreProcessor;
 import io.subutai.core.security.api.crypto.EncryptionTool;
@@ -32,7 +32,7 @@ public class MessageDecryptor implements ByteMessagePreProcessor
     public byte[] process( final String topic, final byte[] message )
     {
 
-        if ( PeerSettings.getEncryptionState() )
+        if ( SystemSettings.getEncryptionState() )
         {
             try
             {

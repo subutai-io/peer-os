@@ -34,7 +34,7 @@ public interface RestService
     @POST
     @Path( "update_registration_status" )
     @Produces( { MediaType.TEXT_PLAIN } )
-    public Response setRegistrationStatus(@FormParam( "status" ) String status);
+    public Response setRegistrationStatus( @FormParam( "status" ) String status );
 
 
     @GET
@@ -79,25 +79,7 @@ public interface RestService
     @POST
     @Path( "update_network_settings" )
     @Produces( { MediaType.TEXT_PLAIN } )
-    public Response setNetworkSettings( @FormParam( "externalIpInterface" ) String externalIpInterface,
-                                        @FormParam( "openPort" ) String openPort,
-                                        @FormParam( "securePortX1" ) String securePortX1,
+    public Response setNetworkSettings( @FormParam( "securePortX1" ) String securePortX1,
                                         @FormParam( "securePortX2" ) String securePortX2,
-                                        @FormParam( "securePortX3" ) String securePortX3,
-                                        @FormParam( "specialPortX1" ) String specialPortX1 );
-
-
-    @GET
-    @Path( "security_settings" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getSecuritySettings();
-
-
-    @POST
-    @Path( "update_security_settings" )
-    @Produces( { MediaType.TEXT_PLAIN } )
-    public Response setSecuritySettings( @FormParam( "encryptionEnabled" ) boolean encryptionEnabled,
-                                         @FormParam( "restEncryptionEnabled" ) boolean restEncryptionEnabled,
-                                         @FormParam( "integrationEnabled" ) boolean integrationEnabled,
-                                         @FormParam( "keyTrustCheckEnabled" ) boolean keyTrustCheckEnabled );
+                                        @FormParam( "securePortX3" ) String securePortX3 );
 }
