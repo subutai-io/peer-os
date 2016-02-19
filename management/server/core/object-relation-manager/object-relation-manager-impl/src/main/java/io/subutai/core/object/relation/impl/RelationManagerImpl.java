@@ -170,9 +170,9 @@ public class RelationManagerImpl implements RelationManager
     public void saveRelation( final Relation relation )
     {
         //TODO check if relation valid otherwise break relation build
-        relationDataService.save( relation.getSource() );
-        relationDataService.save( relation.getTarget() );
-        relationDataService.save( relation.getTrustedObject() );
+        relationDataService.save( new RelationLinkImpl( relation.getSource() ) );
+        relationDataService.save( new RelationLinkImpl( relation.getTarget() ) );
+        relationDataService.save( new RelationLinkImpl( relation.getTrustedObject() ) );
         relationDataService.update( relation );
     }
 
