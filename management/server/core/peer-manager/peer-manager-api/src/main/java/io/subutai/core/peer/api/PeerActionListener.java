@@ -6,5 +6,7 @@ package io.subutai.core.peer.api;
  */
 public interface PeerActionListener
 {
+    public String getName();
+
     public PeerActionResponse onPeerAction( PeerAction peerAction );
 }

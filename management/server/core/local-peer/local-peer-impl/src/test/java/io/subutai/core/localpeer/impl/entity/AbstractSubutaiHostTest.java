@@ -233,7 +233,7 @@ public class AbstractSubutaiHostTest
     //
     //        verify( hostInterface ).setHost( host );
     //
-    //        assertTrue( host.getInterfaces().contains( hostInterface ) );
+    //        assertTrue( host.getUsedNetworks().contains( hostInterface ) );
     //    }
 
 
@@ -247,7 +247,7 @@ public class AbstractSubutaiHostTest
     //
     //        host.setNetInterfaces( Sets.newHashSet( anInterface ) );
     //
-    //        assertTrue( host.getInterfaces().size() == 1 );
+    //        assertTrue( host.getUsedNetworks().size() == 1 );
     //    }
     //
 

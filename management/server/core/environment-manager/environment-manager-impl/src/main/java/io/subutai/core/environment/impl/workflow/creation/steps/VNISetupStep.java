@@ -4,6 +4,9 @@ package io.subutai.core.environment.impl.workflow.creation.steps;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.collect.Maps;
@@ -18,6 +21,7 @@ import io.subutai.common.settings.Common;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.common.peer.LocalPeer;
+import io.subutai.core.peer.api.PeerManager;
 
 
 /**
@@ -25,23 +29,27 @@ import io.subutai.common.peer.LocalPeer;
  */
 public class VNISetupStep
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger( VNISetupStep.class );
     private final Topology topology;
     private final EnvironmentImpl environment;
-    private final LocalPeer localPeer;
+    private final PeerManager peerManager;
 
 
-    public VNISetupStep( final Topology topology, final EnvironmentImpl environment, final LocalPeer localPeer )
+    public VNISetupStep( final Topology topology, final EnvironmentImpl environment, final PeerManager peerManager )
     {
         this.topology = topology;
         this.environment = environment;
-        this.localPeer = localPeer;
+        this.peerManager = peerManager;
     }
 
 
     public void execute() throws EnvironmentCreationException, PeerException
     {
-        Set<Peer> peers = Sets.newHashSet( topology.getAllPeers() );
-        peers.add( localPeer );
+        LOGGER.debug( "VNI setup started..." );
+
+        Set<Peer> peers = peerManager.resolve( topology.getAllPeers() );
+
+        peers.add( peerManager.getLocalPeer() );
 
         //obtain reserved gateways
         Map<Peer, Set<Gateway>> reservedGateways = Maps.newHashMap();
@@ -69,6 +77,7 @@ public class VNISetupStep
             }
         }
 
+        LOGGER.debug( "Find free VNI..." );
         //calculate new vni
         long freeVni = findFreeVni( peers );
 
@@ -76,12 +85,10 @@ public class VNISetupStep
         Vni newVni = new Vni( freeVni, environment.getId() );
 
         //reserve new vni and create gateway
-
+        LOGGER.debug( "Creating gateways..." );
         for ( final Peer peer : peers )
         {
-            Vni reservedVni = peer.reserveVni( newVni );
-
-            peer.createGateway( new Gateway( reservedVni.getVlan(), environmentGatewayIp ) );
+           peer.reserveVni( newVni );
         }
 
         //store vni in environment metadata

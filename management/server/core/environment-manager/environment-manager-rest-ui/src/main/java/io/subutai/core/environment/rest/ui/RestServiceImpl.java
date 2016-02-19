@@ -2,11 +2,12 @@ package io.subutai.core.environment.rest.ui;
 
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
@@ -26,51 +27,56 @@ import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
 
-import io.subutai.common.environment.Blueprint;
-import io.subutai.common.environment.ContainerDistributionType;
 import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.NodeGroup;
+import io.subutai.common.environment.Topology;
 import io.subutai.common.gson.required.RequiredDeserializer;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.peer.ContainerType;
+import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.TemplateKurjun;
+import io.subutai.common.quota.ContainerQuota;
+import io.subutai.common.resource.PeerGroupResources;
+import io.subutai.common.resource.PeerResources;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
+import io.subutai.core.environment.api.ShareDto.ShareDto;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
-import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.kurjun.api.TemplateManager;
+import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.peer.api.PeerManager;
+import io.subutai.core.strategy.api.ContainerPlacementStrategy;
+import io.subutai.core.strategy.api.NodeSchema;
 import io.subutai.core.strategy.api.StrategyManager;
+import io.subutai.core.strategy.api.UnlimitedStrategy;
 
 
 public class RestServiceImpl implements RestService
 {
     private static final Logger LOG = LoggerFactory.getLogger( RestServiceImpl.class );
-
-    private Gson gson = RequiredDeserializer.createValidatingGson();
-
     private static final String ERROR_KEY = "ERROR";
-
     private final EnvironmentManager environmentManager;
     private final PeerManager peerManager;
     private final TemplateManager templateRegistry;
     private final StrategyManager strategyManager;
+    private final QuotaManager quotaManager;
+    private Gson gson = RequiredDeserializer.createValidatingGson();
 
 
     public RestServiceImpl( final EnvironmentManager environmentManager, final PeerManager peerManager,
-                            final TemplateManager templateRegistry, final StrategyManager strategyManager )
+                            final TemplateManager templateRegistry, final StrategyManager strategyManager,
+                            final QuotaManager quotaManager )
     {
         Preconditions.checkNotNull( environmentManager );
         Preconditions.checkNotNull( peerManager );
@@ -81,6 +87,7 @@ public class RestServiceImpl implements RestService
         this.peerManager = peerManager;
         this.templateRegistry = templateRegistry;
         this.strategyManager = strategyManager;
+        this.quotaManager = quotaManager;
     }
 
 
@@ -89,100 +96,10 @@ public class RestServiceImpl implements RestService
     @Override
     public Response listTemplates()
     {
-        List<String> templates =
-                templateRegistry.list().stream().map( TemplateKurjun::getName ).collect( Collectors.toList() );
+        Set<String> templates =
+                templateRegistry.list().stream().map( TemplateKurjun::getName ).collect( Collectors.toSet() );
 
-        if ( !templates.isEmpty() )
-        {
-            return Response.ok().entity( gson.toJson( templates ) ).build();
-        }
-        else
-        {
-            return Response.status( Response.Status.NOT_FOUND ).build();
-        }
-    }
-
-
-    /** Blueprints *************************************************** */
-
-    @Override
-    public Response getBlueprints()
-    {
-        try
-        {
-            return Response.ok( gson.toJson( environmentManager.getBlueprints() ) ).build();
-        }
-        catch ( EnvironmentManagerException e )
-        {
-            return Response.status( Response.Status.BAD_REQUEST )
-                           .entity( JsonUtil.toJson( ERROR_KEY, "Error loading blueprints" ) ).build();
-        }
-    }
-
-
-    @Override
-    public Response getBlueprint( UUID blueprintId )
-    {
-        try
-        {
-            return Response.ok( gson.toJson( environmentManager.getBlueprint( blueprintId ) ) ).build();
-        }
-        catch ( EnvironmentManagerException e )
-        {
-            return Response.status( Response.Status.BAD_REQUEST )
-                           .entity( JsonUtil.toJson( ERROR_KEY, "Error blueprint not found" ) ).build();
-        }
-    }
-
-
-    @Override
-    public Response saveBlueprint( final String content )
-    {
-        try
-        {
-            Blueprint blueprint = gson.fromJson( content, Blueprint.class );
-
-            for ( NodeGroup nodeGroup : blueprint.getNodeGroups() )
-            {
-                if ( nodeGroup.getNumberOfContainers() <= 0 )
-                {
-                    return Response.status( Response.Status.BAD_REQUEST )
-                                   .entity( JsonUtil.toJson( ERROR_KEY, "You must specify at least 1 container" ) )
-                                   .build();
-                }
-            }
-
-            if ( blueprint.getId() == null )
-            {
-                blueprint.setId( UUID.randomUUID() );
-            }
-
-            environmentManager.saveBlueprint( blueprint );
-
-            return Response.ok( gson.toJson( blueprint ) ).build();
-        }
-        catch ( Exception e )
-        {
-            LOG.error( "Error validating blueprint", e );
-            return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) )
-                           .build();
-        }
-    }
-
-
-    @Override
-    public Response deleteBlueprint( final UUID blueprintId )
-    {
-        try
-        {
-            environmentManager.removeBlueprint( blueprintId );
-            return Response.ok().build();
-        }
-        catch ( EnvironmentManagerException e )
-        {
-            return Response.status( Response.Status.BAD_REQUEST )
-                           .entity( JsonUtil.toJson( ERROR_KEY, "Error deleting blueprint " + blueprintId ) ).build();
-        }
+        return Response.ok().entity( gson.toJson( templates ) ).build();
     }
 
 
@@ -205,9 +122,11 @@ public class RestServiceImpl implements RestService
 
         for ( Environment environment : environments )
         {
-            environmentDtos
-                    .add( new EnvironmentDto( environment.getId(), environment.getName(), environment.getStatus(),
-                            convertContainersToContainerJson( environment.getContainerHosts() ) ) );
+            EnvironmentDto environmentDto =
+                    new EnvironmentDto( environment.getId(), environment.getName(), environment.getStatus(),
+                            convertContainersToContainerJson( environment.getContainerHosts() ),
+                            environment.getRelationDeclaration() );
+            environmentDtos.add( environmentDto );
         }
 
         return Response.ok( JsonUtil.toJson( environmentDtos ) ).build();
@@ -215,47 +134,85 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response createEnvironment( final String blueprintJson )
+    public Response buildAuto( final String name, final String containersJson )
     {
+
+        Environment environment = null;
+
         try
         {
-            Blueprint blueprint = gson.fromJson( blueprintJson, Blueprint.class );
+            ContainerPlacementStrategy placementStrategy = strategyManager.findStrategyById( UnlimitedStrategy.ID );
 
-            updateContainerPlacementStrategy( blueprint );
+            List<NodeSchema> schema =
+                    JsonUtil.fromJson( containersJson, new TypeToken<List<NodeSchema>>() {}.getType() );
 
-            Environment environment = environmentManager.createEnvironment( blueprint, false );
+
+            final PeerGroupResources peerGroupResources = peerManager.getPeerGroupResources();
+            final Map<ContainerSize, ContainerQuota> quotas = quotaManager.getDefaultQuotas();
+
+            Topology topology = placementStrategy.distribute( name, 0, 0, schema, peerGroupResources, quotas );
+
+            environment = environmentManager.createEnvironment( topology, true );
         }
-        catch ( EnvironmentCreationException e )
+        catch ( Exception e )
         {
-            LOG.error( "Error creating environment #createEnvironment", e );
             return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
         }
-        catch ( JsonParseException e )
+
+        return Response.ok( JsonUtil.toJson( environment.getId() ) ).build();
+    }
+
+    @Override
+    public Response buildAdvanced( final String name, final String containersJson )
+    {
+
+        Environment environment = null;
+
+        try
         {
-            LOG.error( "Error validating parameters #createEnvironment", e );
-            return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) )
-                           .build();
+            List<NodeGroup> schema =
+                    JsonUtil.fromJson( containersJson, new TypeToken<List<NodeGroup>>() {}.getType() );
+
+            Topology topology = new Topology( name, 0, 0 );
+
+
+            schema.forEach( s -> topology.addNodeGroupPlacement(s.getPeerId(), s) );
+
+            environment = environmentManager.createEnvironment( topology, true );
+        }
+        catch ( Exception e )
+        {
+            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
         }
 
-        return Response.ok().build();
+        return Response.ok( JsonUtil.toJson( environment.getId() ) ).build();
     }
 
 
     @Override
-    public Response growEnvironment( final String environmentId, final String blueprintJson )
+    public Response modifyEnvironment( final String environmentId, final String topologyJson, final String containers )
     {
         try
         {
-            Blueprint blueprint = gson.fromJson( blueprintJson, Blueprint.class );
+            String name = environmentManager.getEnvironments().stream()
+                                            .filter( e -> e.getEnvironmentId().equals( environmentId ) ).findFirst()
+                                            .get().getName();
 
-            updateContainerPlacementStrategy( blueprint );
+            ContainerPlacementStrategy placementStrategy = strategyManager.findStrategyById( UnlimitedStrategy.ID );
 
-            Set<EnvironmentContainerHost> environment =
-                    environmentManager.growEnvironment( environmentId, blueprint, false );
+
+            List<NodeSchema> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<NodeSchema>>() {}.getType() );
+
+            final PeerGroupResources peerGroupResources = peerManager.getPeerGroupResources();
+            final Map<ContainerSize, ContainerQuota> quotas = quotaManager.getDefaultQuotas();
+
+            Topology topology = placementStrategy.distribute( name, 0, 0, schema, peerGroupResources, quotas );
+
+            environmentManager.setupRequisites( topology );
         }
         catch ( Exception e )
         {
-            LOG.error( "Error validating parameters #growEnvironment", e );
+            LOG.error( "Error validating parameters #modifyEnvrionment", e );
             return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) )
                            .build();
         }
@@ -287,9 +244,31 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response setSshKey( final String environmentId, final String key )
+    public Response getEnvironmentSShKeys( final String environmentId )
     {
-        if ( Strings.isNullOrEmpty( key ) )
+        try
+        {
+            Environment environment = environmentManager.loadEnvironment( environmentId );
+
+            return Response.ok( JsonUtil.toJson( environment.getSshKeys() ) ).build();
+        }
+        catch ( EnvironmentNotFoundException e )
+        {
+            LOG.error( "Cannot find environment ", e );
+            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+        }
+    }
+
+
+    @Override
+    public Response addSshKey( final String environmentId, final String key )
+    {
+        if ( Strings.isNullOrEmpty( environmentId ) )
+        {
+            return Response.status( Response.Status.BAD_REQUEST )
+                           .entity( JsonUtil.toJson( ERROR_KEY, "Invalid environment id" ) ).build();
+        }
+        else if ( Strings.isNullOrEmpty( key ) )
         {
             return Response.status( Response.Status.BAD_REQUEST )
                            .entity( JsonUtil.toJson( ERROR_KEY, "Invalid ssh key" ) ).build();
@@ -299,7 +278,7 @@ public class RestServiceImpl implements RestService
         try
         {
             byte[] bytesEncoded = Base64.decodeBase64( key.getBytes() );
-            environmentManager.setSshKey( environmentId, new String( bytesEncoded ), false );
+            environmentManager.addSshKey( environmentId, new String( bytesEncoded ), false );
         }
         catch ( EnvironmentNotFoundException e )
         {
@@ -324,12 +303,24 @@ public class RestServiceImpl implements RestService
     /** Environments SSH keys **************************************************** */
 
     @Override
-    public Response removeSshKey( final String environmentId )
+    public Response removeSshKey( final String environmentId, final String key )
     {
+
+        if ( Strings.isNullOrEmpty( environmentId ) )
+        {
+            return Response.status( Response.Status.BAD_REQUEST )
+                           .entity( JsonUtil.toJson( ERROR_KEY, "Invalid environment id" ) ).build();
+        }
+        else if ( Strings.isNullOrEmpty( key ) )
+        {
+            return Response.status( Response.Status.BAD_REQUEST )
+                           .entity( JsonUtil.toJson( ERROR_KEY, "Invalid ssh key" ) ).build();
+        }
 
         try
         {
-            environmentManager.setSshKey( environmentId, null, false );
+            byte[] bytesEncoded = Base64.decodeBase64( key.getBytes() );
+            environmentManager.removeSshKey( environmentId, new String( bytesEncoded ), false );
         }
         catch ( EnvironmentNotFoundException e )
         {
@@ -346,15 +337,6 @@ public class RestServiceImpl implements RestService
     }
 
 
-    /** Environment domains **************************************************** */
-
-    @Override
-    public Response listDomainLoadBalanceStrategies()
-    {
-        return Response.ok( JsonUtil.toJson( DomainLoadBalanceStrategy.values() ) ).build();
-    }
-
-
     @Override
     public Response getEnvironmentDomain( final String environmentId )
     {
@@ -367,6 +349,15 @@ public class RestServiceImpl implements RestService
             LOG.error( "getEnvironmentDomain error", e );
             return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( e.getMessage() ) ).build();
         }
+    }
+
+
+    /** Environment domains **************************************************** */
+
+    @Override
+    public Response listDomainLoadBalanceStrategies()
+    {
+        return Response.ok( JsonUtil.toJson( DomainLoadBalanceStrategy.values() ) ).build();
     }
 
 
@@ -614,7 +605,7 @@ public class RestServiceImpl implements RestService
     @Override
     public Response listContainerTypes()
     {
-        return Response.ok().entity( gson.toJson( ContainerType.values() ) ).build();
+        return Response.ok().entity( gson.toJson( ContainerSize.values() ) ).build();
     }
 
 
@@ -712,6 +703,43 @@ public class RestServiceImpl implements RestService
 
 
     @Override
+    public Response getRamQuota( final String containerId )
+    {
+        //        try
+        //        {
+        //            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
+        //
+        //            LocalPeer localPeer = peerManager.getLocalPeer();
+        //            return Response.ok( localPeer.getContainerHostById( containerId ).getRamQuota() ).build();
+        //        } catch (Exception e) {
+        //            LOG.error( "Error getting ram quota #getRamQuota", e );
+        //            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        //        }
+        return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
+    }
+
+
+    @Override
+    public Response setRamQuota( final String containerId, final int ram )
+    {
+        //        try
+        //        {
+        //            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
+        //
+        //            LocalPeer localPeer = peerManager.getLocalPeer();
+        //            localPeer.getContainerHostById( containerId ).setRamQuota( ram );
+        //            return Response.ok().build();
+        //        }
+        //        catch ( Exception e )
+        //        {
+        //            LOG.error( "Error setting ram quota #setRamQuota", e );
+        //            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        //        }
+        return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
+    }
+
+
+    @Override
     public Response getCpuQuota( final String containerId )
     {
         //        try
@@ -793,43 +821,6 @@ public class RestServiceImpl implements RestService
     }
 
 
-    @Override
-    public Response getRamQuota( final String containerId )
-    {
-        //        try
-        //        {
-        //            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
-        //
-        //            LocalPeer localPeer = peerManager.getLocalPeer();
-        //            return Response.ok( localPeer.getContainerHostById( containerId ).getRamQuota() ).build();
-        //        } catch (Exception e) {
-        //            LOG.error( "Error getting ram quota #getRamQuota", e );
-        //            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
-        //        }
-        return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
-    }
-
-
-    @Override
-    public Response setRamQuota( final String containerId, final int ram )
-    {
-        //        try
-        //        {
-        //            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
-        //
-        //            LocalPeer localPeer = peerManager.getLocalPeer();
-        //            localPeer.getContainerHostById( containerId ).setRamQuota( ram );
-        //            return Response.ok().build();
-        //        }
-        //        catch ( Exception e )
-        //        {
-        //            LOG.error( "Error setting ram quota #setRamQuota", e );
-        //            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
-        //        }
-        return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
-    }
-
-
     /** Peers strategy **************************************************** */
     @Override
     public Response listPlacementStrategies()
@@ -848,12 +839,15 @@ public class RestServiceImpl implements RestService
         {
             for ( Peer peer : peerManager.getPeers() )
             {
-                peerHostMap.put( peer.getId(), Lists.newArrayList() );
-
-                Collection<ResourceHostMetric> collection = peer.getResourceHostMetrics().getResources();
-                for ( ResourceHostMetric metric : collection.toArray( new ResourceHostMetric[collection.size()] ) )
+                if ( peer.isOnline() )
                 {
-                    peerHostMap.get( peer.getId() ).add( metric.getHostInfo().getId() );
+                    peerHostMap.put( peer.getId(), Lists.newArrayList() );
+
+                    Collection<ResourceHostMetric> collection = peer.getResourceHostMetrics().getResources();
+                    for ( ResourceHostMetric metric : collection.toArray( new ResourceHostMetric[collection.size()] ) )
+                    {
+                        peerHostMap.get( peer.getId() ).add( metric.getHostInfo().getId() );
+                    }
                 }
             }
         }
@@ -878,7 +872,8 @@ public class RestServiceImpl implements RestService
 
             ContainerHost containerHost = environment.getContainerHostById( containerId );
 
-            Set<String> tags = JsonUtil.fromJson( tagsJson, new TypeToken<Set<String>>() {}.getType() );
+            Set<String> tags = JsonUtil.fromJson( tagsJson, new TypeToken<Set<String>>()
+            {}.getType() );
 
             tags.stream().forEach( tag -> containerHost.addTag( tag ) );
 
@@ -912,6 +907,9 @@ public class RestServiceImpl implements RestService
     }
 
 
+    /** Additional ****************************************/
+
+
     @Override
     public Response setupContainerSsh( final String environmentId, final String containerId )
     {
@@ -926,23 +924,29 @@ public class RestServiceImpl implements RestService
     }
 
 
-    /** AUX **************************************************** */
-
-    private Set<ContainerDto> convertContainersToContainerJson( Set<EnvironmentContainerHost> containerHosts )
+    @Override
+    public Response getSharedUsers( final String objectId )
     {
-        Set<ContainerDto> containerDtos = Sets.newHashSet();
-        for ( EnvironmentContainerHost containerHost : containerHosts )
+        try
         {
-            ContainerHostState state = containerHost.getState();
-
-            HostInterface iface = containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE );
-
-
-            containerDtos.add( new ContainerDto( containerHost.getId(), containerHost.getEnvironmentId().getId(),
-                    containerHost.getHostname(), state, iface.getIp(), iface.getMac(), containerHost.getTemplateName(),
-                    containerHost.getContainerType(), containerHost.getArch().toString(), containerHost.getTags() ) );
+            List<ShareDto> sharedUsers = environmentManager.getSharedUsers( objectId );
+            return Response.ok( JsonUtil.toJson( sharedUsers ) ).build();
         }
-        return containerDtos;
+        catch ( Exception e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public Response shareEnvironment( final String users, final String environmentId )
+    {
+        ShareDto[] shareDto = gson.fromJson( users, ShareDto[].class );
+
+        environmentManager.shareEnvironment( shareDto, environmentId );
+
+        return Response.ok().build();
     }
 
 
@@ -963,18 +967,22 @@ public class RestServiceImpl implements RestService
     }
 
 
-    private void updateContainerPlacementStrategy( Blueprint blueprint )
+    /** AUX **************************************************** */
+
+    private Set<ContainerDto> convertContainersToContainerJson( Set<EnvironmentContainerHost> containerHosts )
     {
-        for ( NodeGroup nodeGroup : blueprint.getNodeGroups() )
+        Set<ContainerDto> containerDtos = Sets.newHashSet();
+        for ( EnvironmentContainerHost containerHost : containerHosts )
         {
-            if ( nodeGroup.getHostId() == null )
-            {
-                nodeGroup.setContainerDistributionType( ContainerDistributionType.AUTO );
-            }
-            else
-            {
-                nodeGroup.setContainerDistributionType( ContainerDistributionType.CUSTOM );
-            }
+            ContainerHostState state = containerHost.getState();
+
+            HostInterface iface = containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE );
+
+
+            containerDtos.add( new ContainerDto( containerHost.getId(), containerHost.getEnvironmentId().getId(),
+                    containerHost.getHostname(), state, iface.getIp(), iface.getMac(), containerHost.getTemplateName(),
+                    containerHost.getContainerSize(), containerHost.getArch().toString(), containerHost.getTags() ) );
         }
+        return containerDtos;
     }
 }

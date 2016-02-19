@@ -115,7 +115,7 @@ public class MessageSenderTest
         when( peerManager.getPeer( TARGET_PEER_ID ) ).thenReturn( peer );
         when( peer.getId() ).thenReturn( TARGET_PEER_ID );
         when( peerManager.getLocalPeer() ).thenReturn( localPeer );
-        when( peerManager.getLocalPeerInfo() ).thenReturn( peerInfo );
+//        when( peerManager.getLocalPeerInfo() ).thenReturn( peerInfo );
         when( peerInfo.getId() ).thenReturn( UUID.randomUUID().toString() );
         when( localPeer.isLocal() ).thenReturn( false );
         when( localPeer.getId() ).thenReturn( UUID.randomUUID().toString() );

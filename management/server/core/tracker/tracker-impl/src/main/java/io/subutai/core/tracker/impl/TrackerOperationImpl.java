@@ -6,15 +6,17 @@
 package io.subutai.core.tracker.impl;
 
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
+
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 
 import io.subutai.common.tracker.OperationState;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.UUIDUtil;
-
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 
 
 /**
@@ -127,7 +129,9 @@ public class TrackerOperationImpl implements TrackerOperation
             {
                 log.append( "\n" );
             }
-            log.append( logString );
+            log.append( String.format( "%s: %s",
+                    new SimpleDateFormat( "dd.MM.yyyy HH:mm:ss" ).format( Calendar.getInstance().getTime() ),
+                    logString ) );
         }
         this.state = state;
         tracker.saveTrackerOperation( source, this );

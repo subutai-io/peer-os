@@ -12,30 +12,32 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.common.peer.LocalPeer;
+import io.subutai.core.peer.api.PeerManager;
 
 
 public class PEKGenerationStep
 {
     private final Topology topology;
     private final EnvironmentImpl environment;
-    private final LocalPeer localPeer;
+    private final PeerManager peerManager;
 
 
-    public PEKGenerationStep( final Topology topology, final EnvironmentImpl environment, final LocalPeer localPeer )
+    public PEKGenerationStep( final Topology topology, final EnvironmentImpl environment,
+                              final PeerManager peerManager )
     {
         this.topology = topology;
         this.environment = environment;
-        this.localPeer = localPeer;
+        this.peerManager = peerManager;
     }
 
 
     public Map<Peer, String> execute() throws PeerException
     {
-        Set<Peer> peers = Sets.newHashSet( topology.getAllPeers() );
+        Set<Peer> peers = peerManager.resolve( topology.getAllPeers() );
 
         //remove already existing peers
         peers.removeAll( environment.getPeers() );
-        peers.remove( localPeer );
+        peers.remove( peerManager.getLocalPeer() );
 
         Map<Peer, String> peerPekPubKeys = Maps.newHashMap();
 

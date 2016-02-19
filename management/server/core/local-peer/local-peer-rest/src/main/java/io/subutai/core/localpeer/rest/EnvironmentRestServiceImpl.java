@@ -16,8 +16,7 @@ import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.resource.ResourceType;
-import io.subutai.common.resource.ResourceValue;
+import io.subutai.common.quota.ContainerQuota;
 
 
 /**
@@ -92,7 +91,16 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
     {
         Preconditions.checkNotNull( containerId );
         Preconditions.checkNotNull( containerId.getId() );
-        return localPeer.getContainerState( containerId );
+        try
+        {
+            return localPeer.getContainerState( containerId );
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error getting container state #getContainerState", e );
+            throw new WebApplicationException(
+                    Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build() );
+        }
     }
 
 
@@ -155,14 +163,13 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
 
 
     @Override
-    public Response getQuota( final ContainerId containerId, final ResourceType resourceType )
+    public Response getQuota( final ContainerId containerId )
     {
         Preconditions.checkNotNull( containerId );
-        Preconditions.checkNotNull( resourceType );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId.getId() ) );
         try
         {
-            ResourceValue resourceValue = localPeer.getQuota( containerId, resourceType );
+            ContainerQuota resourceValue = localPeer.getQuota( containerId );
             return Response.ok( resourceValue ).build();
         }
         catch ( Exception e )
@@ -174,17 +181,15 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
 
 
     @Override
-    public Response setQuota( final ContainerId containerId, final ResourceType resourceType,
-                              final ResourceValue resourceValue )
+    public Response setQuota( final ContainerId containerId, ContainerQuota containerQuota )
     {
         Preconditions.checkNotNull( containerId );
-        Preconditions.checkNotNull( resourceType );
-        Preconditions.checkNotNull( resourceValue );
+        Preconditions.checkNotNull( containerQuota );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId.getId() ) );
 
         try
         {
-            localPeer.setQuota( containerId, resourceType, resourceValue );
+            localPeer.setQuota( containerId, containerQuota );
             return Response.ok().build();
         }
         catch ( Exception e )
@@ -196,15 +201,14 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
 
 
     @Override
-    public Response getAvailableQuota( final ContainerId containerId, final ResourceType resourceType )
+    public Response getAvailableQuota( final ContainerId containerId )
     {
         Preconditions.checkNotNull( containerId );
-        Preconditions.checkNotNull( resourceType );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId.getId() ) );
         try
         {
 
-            ResourceValue resourceValue = localPeer.getAvailableQuota( containerId, resourceType );
+            ContainerQuota resourceValue = localPeer.getAvailableQuota( containerId );
             return Response.ok( resourceValue ).build();
         }
         catch ( Exception e )

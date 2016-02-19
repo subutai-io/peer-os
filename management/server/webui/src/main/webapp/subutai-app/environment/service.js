@@ -10,14 +10,15 @@ function environmentService($http) {
 
 	var ENVIRONMENTS_URL = SERVER_URL + 'rest/ui/environments/';
 
+	var ENVIRONMENT_START_BUILD = ENVIRONMENTS_URL + 'build/';
+	var ENVIRONMENT_ADVANCED_BUILD = ENVIRONMENTS_URL + 'build/advanced';
+
 	var SSH_KEY_URL = ENVIRONMENTS_URL + 'keys/';
 	var CONTAINERS_URL = ENVIRONMENTS_URL + 'containers/';
 	var CONTAINER_TYPES_URL = CONTAINERS_URL + 'types/';
 	var DOMAINS_URL = ENVIRONMENTS_URL + 'domains/';
 
 	var BLUEPRINT_URL = ENVIRONMENTS_URL + 'blueprints/';
-
-	var GROW_BLUEPRINT_URL = ENVIRONMENTS_URL + 'grow/';
 
 	var STRATEGIES_URL = ENVIRONMENTS_URL + 'strategies/';
 
@@ -38,12 +39,15 @@ function environmentService($http) {
 
 
 		getEnvironments : getEnvironments,
-		createEnvironment : createEnvironment,
+		startEnvironmentAdvancedBuild : startEnvironmentAdvancedBuild,
+		startEnvironmentAutoBuild: startEnvironmentAutoBuild,
 		growEnvironment : growEnvironment,
 		destroyEnvironment: destroyEnvironment,
+		modifyEnvironment: modifyEnvironment,
 
 
 		setSshKey : setSshKey,
+		getSshKey : getSshKey,
 		removeSshKey : removeSshKey,
 
 
@@ -73,11 +77,15 @@ function environmentService($http) {
 		getPeers : getPeers,
 
 
+		getShared: getShared,
+		share: share,
+
+		revoke: revoke,
+
 		getServerUrl : function getServerUrl() { return ENVIRONMENTS_URL; }
 	};
 
 	return environmentService;
-
 
 
 
@@ -114,19 +122,30 @@ function environmentService($http) {
 		return $http.get(ENVIRONMENTS_URL, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
 	}
 
-	function createEnvironment(data) {
-		var postData = 'blueprint_json=' + data;
+
+	function startEnvironmentAutoBuild(environmentName, containers) {
+		var postData = 'name=' + environmentName + "&containers=" + containers;
 		return $http.post(
-			ENVIRONMENTS_URL,
-			postData, 
+			ENVIRONMENT_START_BUILD,
+			postData,
 			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
 		);
 	}
 
-	function growEnvironment(environmentId, data) {
-		var postData = 'environmentId=' + environmentId + '&blueprint_json=' + data;
+	function startEnvironmentAdvancedBuild(environmentName, containers) {
+		var postData = 'name=' + environmentName + "&containers=" + containers;
 		return $http.post(
-			GROW_BLUEPRINT_URL,
+			ENVIRONMENT_ADVANCED_BUILD,
+			postData,
+			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+		);
+	}
+
+
+	function growEnvironment(environmentId, topology) {
+		var postData = 'topology=' + JSON.stringify( topology );
+		return $http.post(
+			ENVIRONMENTS_URL + environmentId + '/grow',
 			postData, 
 			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
 		);
@@ -136,7 +155,14 @@ function environmentService($http) {
 		return $http.delete(ENVIRONMENTS_URL + environmentId);
 	}
 
-
+	function modifyEnvironment(containers) {
+		var postData = 'include=' + JSON.stringify( containers.included ) + '&exclude=' + JSON.stringify( containers.excluded );
+		return $http.post(
+			ENVIRONMENTS_URL + containers.environmentId + '/modify',
+			postData,
+			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+		);
+	}
 
 	function switchContainer(containerId, type) {
 		return $http.post(
@@ -164,6 +190,10 @@ function environmentService($http) {
 			postData, 
 			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
 		);
+	}
+
+	function getSshKey(environmentId) {
+		return $http.get(ENVIRONMENTS_URL + environmentId + '/keys');
 	}
 
 	function removeSshKey(environmentId) {
@@ -257,5 +287,23 @@ function environmentService($http) {
 
 	function removeTag(environmentId, containerId, tag) {
 		return $http.delete(ENVIRONMENTS_URL + environmentId + '/containers/' + containerId + '/tags/' + tag);		
+	}
+
+
+	function getShared (environmentId) {
+		return $http.get (ENVIRONMENTS_URL + "shared/users/" + environmentId);
+	}
+
+	function share (users, environmentId) {
+		var postData = "users=" + users + "&environmentId=" + environmentId;
+		return $http.post(
+			ENVIRONMENTS_URL + "share",
+			postData,
+			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+		);
+	}
+
+	function revoke (environmentId) {
+		return $http.put (ENVIRONMENTS_URL + environmentId + "/revoke");
 	}
 }

@@ -90,6 +90,25 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
      *
      */
     @Override
+    public Response getPublicKey( final String identityId )
+    {
+        String key = securityManager.getKeyManager().getPublicKeyRingAsASCII( identityId );
+
+        if ( Strings.isNullOrEmpty( key ) )
+        {
+            return Response.status( Response.Status.NOT_FOUND ).entity( "Object Not found" ).build();
+        }
+        else
+        {
+            return Response.ok( key ).build();
+        }
+    }
+
+
+    /* ******************************
+     *
+     */
+    @Override
     public Response getPublicKeyId( final String identityId )
     {
         PGPPublicKey key = securityManager.getKeyManager().getPublicKeyRing( identityId ).getPublicKey();

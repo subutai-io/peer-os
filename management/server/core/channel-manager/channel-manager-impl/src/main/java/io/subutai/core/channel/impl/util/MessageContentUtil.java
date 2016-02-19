@@ -2,7 +2,6 @@ package io.subutai.core.channel.impl.util;
 
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
@@ -11,6 +10,7 @@ import java.nio.charset.Charset;
 import java.security.AccessControlException;
 
 import javax.security.auth.login.LoginException;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.bouncycastle.openpgp.PGPException;
@@ -25,9 +25,9 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 import io.subutai.common.settings.ChannelSettings;
+import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
-import io.subutai.core.security.api.SecurityManager;
 
 
 /**
@@ -39,26 +39,27 @@ public class MessageContentUtil
 
 
     //***************************************************************************
-    public static void abortChain( Message message, Exception ex )
+    public static void abortChain( Message message, Throwable ex )
     {
-        if(ex.getClass() == AccessControlException.class)
+        if ( ex.getClass() == AccessControlException.class )
         {
-            abortChain( message, 403, "Access Denied to the resource");
+            abortChain( message, 403, "Access Denied to the resource" );
         }
-        else if(ex.getClass() == LoginException.class)
+        else if ( ex.getClass() == LoginException.class )
         {
-            abortChain( message, 401, "User is not authorized");
+            abortChain( message, 401, "User is not authorized" );
         }
         else
         {
-            abortChain( message, 500, "Internal system Error 500");
+            abortChain( message, 500, "Internal system Error 500" );
         }
 
-        LOG.error( "****** Error !! Error in doIntercept:" + ex.toString(),ex );
+        LOG.error( "****** Error !! Error in doIntercept:" + ex.toString(), ex );
     }
 
+
     //***************************************************************************
-    public static void abortChain( Message message, int errorStatus, String errorMessage)
+    public static void abortChain( Message message, int errorStatus, String errorMessage )
     {
         HttpServletResponse response = ( HttpServletResponse ) message.getExchange().getInMessage()
                                                                       .get( AbstractHTTPDestination.HTTP_RESPONSE );
@@ -68,11 +69,10 @@ public class MessageContentUtil
             response.getOutputStream().write( errorMessage.getBytes( Charset.forName( "UTF-8" ) ) );
             response.getOutputStream().flush();
             LOG.error( "****** Error !! Error in doIntercept:" + errorMessage );
-
         }
         catch ( Exception e )
         {
-            //gnore
+            //ignore
             LOG.error( "Error writing to response: " + e.toString(), e );
         }
 
@@ -81,28 +81,30 @@ public class MessageContentUtil
 
 
     //***************************************************************************
-    public static int checkUrlAccessibility( final int currentStatus, final URL url )
+    public static int checkUrlAccessibility( final int currentStatus, HttpServletRequest req )
     {
         int status = currentStatus;
-        String  basePath = url.getPath();
+        int inPort = req.getLocalPort();
+        String basePath = req.getRequestURI();
 
-        if ( url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X1 ) ||  url.getPort() == 8080 )
+
+        if ( inPort == ChannelSettings.SECURE_PORT_X1 )
         {
-            if ( ChannelSettings.checkURLArray( basePath, ChannelSettings.URL_ACCESS_PX1 ) == 0 )
+            if ( ChannelSettings.checkURLAccess( basePath, ChannelSettings.URL_ACCESS_PX1 ) == 0 )
             {
                 status = 1;
             }
         }
-        else if ( url.getPort() == Integer.parseInt( ChannelSettings.OPEN_PORT ) )
+        else if ( inPort == ChannelSettings.OPEN_PORT )
         {
-            if ( ChannelSettings.checkURLArray( basePath, ChannelSettings.URL_ACCESS_PX1 ) == 0 )
+            if ( ChannelSettings.checkURLAccess( basePath, ChannelSettings.URL_ACCESS_PX1 ) == 0 )
             {
                 status = 1;
             }
         }
-        else if ( url.getPort() == Integer.parseInt( ChannelSettings.SPECIAL_PORT_X1 ) ) //file server
+        else if ( inPort ==  ChannelSettings.SPECIAL_PORT_X1 ) //file server
         {
-            if ( basePath.startsWith( "/rest/kurjun" ))
+            if ( basePath.startsWith( "/rest/kurjun" ) )
             {
                 status = 1;
             }
@@ -150,13 +152,9 @@ public class MessageContentUtil
                 LOG.debug( "Decrypted data is NULL!!!" );
             }
         }
-        catch ( IOException e )
+        catch ( Exception e )
         {
-
-        }
-        catch ( PGPException pe )
-        {
-
+            LOG.error( "Error decrypting content", e );
         }
     }
 
@@ -215,7 +213,7 @@ public class MessageContentUtil
     *
     */
     public static void encryptContent( SecurityManager securityManager, String hostIdSource, String hostIdTarget,
-                                       String ip, Message message )
+                                       Message message )
     {
         OutputStream os = message.getContent( OutputStream.class );
 
@@ -239,8 +237,7 @@ public class MessageContentUtil
 
             //do something with original message to produce finalMessage
             byte[] finalMessage = originalMessage.length > 0 ?
-                                  encryptData( securityManager, hostIdSource, hostIdTarget, ip, originalMessage ) :
-                                  null;
+                                  encryptData( securityManager, hostIdSource, hostIdTarget, originalMessage ) : null;
 
             if ( finalMessage != null )
             {
@@ -258,13 +255,9 @@ public class MessageContentUtil
 
             org.apache.commons.io.IOUtils.closeQuietly( os );
         }
-        catch ( IOException ioe )
+        catch ( Exception ioe )
         {
             throw new RuntimeException( ioe );
-        }
-        catch ( PGPException pe )
-        {
-
         }
     }
 
@@ -275,7 +268,7 @@ public class MessageContentUtil
 
 
     private static byte[] encryptData( SecurityManager securityManager, String hostIdSource, String hostIdTarget,
-                                       String ip, byte[] data ) throws PGPException
+                                       byte[] data ) throws PGPException
     {
         try
         {
@@ -287,7 +280,7 @@ public class MessageContentUtil
             {
                 EncryptionTool encTool = securityManager.getEncryptionTool();
                 KeyManager keyMan = securityManager.getKeyManager();
-                PGPPublicKey pubKey = keyMan.getRemoteHostPublicKey( hostIdTarget, ip );
+                PGPPublicKey pubKey = keyMan.getRemoteHostPublicKey( hostIdTarget, "UNKNOWN" );
 
                 if ( pubKey != null )
                 {

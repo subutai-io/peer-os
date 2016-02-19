@@ -1,0 +1,13 @@
+<div class="b-popup" style = "height: 400px; width: 500px">
+	<div class="b-popup__header">
+		{{ bazaarCtrl.currentHubPlugin.name }}
+		<a href ng-click="closeThisDialog()"><img src="assets/elements/buttons/b-icon-close.svg" class="b-icon g-right"/></a>
+	</div>
+	<div class="b-popup__body">
+		<div class="b-form">
+			<div class="b-form__wrapper b-form__wrapper_margin-bottom">
+				<label class = "b-form-label">{{ bazaarCtrl.currentHubPlugin.description }}</label>
+			</div>
+		</div>
+	</div>
+</div>

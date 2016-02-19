@@ -6,8 +6,6 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import com.google.common.base.MoreObjects;
 import com.google.gson.annotations.SerializedName;
 
-import io.subutai.common.metric.Alert;
-
 
 /**
  * Implementation of ContainerHostInfo
@@ -21,9 +19,9 @@ public class ContainerHostInfoModel extends HostInfoModel implements ContainerHo
     @SerializedName( "status" )
     @JsonProperty( "status" )
     protected ContainerHostState state;
-    @SerializedName( "alert" )
-    @JsonProperty( "alert" )
-    protected Alert alert;
+//    @SerializedName( "alert" )
+//    @JsonProperty( "alert" )
+//    protected Alert alert;
 
 
     public ContainerHostInfoModel( final ContainerHostInfo containerHost )

@@ -1,15 +1,25 @@
 package io.subutai.core.registration.rest;
 
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.PhaseInterceptorChain;
+import org.apache.cxf.transport.http.AbstractHTTPDestination;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import io.subutai.common.settings.Common;
+import io.subutai.common.util.IPUtil;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.registration.api.RegistrationManager;
 import io.subutai.core.registration.api.service.RequestedHost;
-import io.subutai. core.registration.rest.transitional.RequestedHostJson;
+import io.subutai.core.registration.rest.transitional.RequestedHostJson;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 
@@ -19,6 +29,7 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
     private static final Logger LOGGER = LoggerFactory.getLogger( RegistrationRestServiceImpl.class );
     private SecurityManager securityManager;
     private RegistrationManager registrationManager;
+    private Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create();
 
 
     public RegistrationRestServiceImpl( final SecurityManager securityManager,
@@ -36,6 +47,14 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
     }
 
 
+    protected String getClientIP()
+    {
+        Message message = PhaseInterceptorChain.getCurrentMessage();
+        HttpServletRequest request = ( HttpServletRequest ) message.get( AbstractHTTPDestination.HTTP_REQUEST );
+        return request.getRemoteAddr();
+    }
+
+
     @Override
     public Response registerPublicKey( final String message )
     {
@@ -45,9 +64,16 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
         {
             byte[] decrypted = encryptionTool.decrypt( message.getBytes() );
             String decryptedMessage = new String( decrypted, "UTF-8" );
-            RequestedHost temp = JsonUtil.fromJson( decryptedMessage, RequestedHostJson.class );
+            RequestedHost requestedHost = JsonUtil.fromJson( decryptedMessage, RequestedHostJson.class );
 
-            registrationManager.queueRequest( temp );
+            registrationManager.queueRequest( requestedHost );
+
+            //temp workaround to approve MH automatically
+            if ( IPUtil.getLocalIps().contains( getClientIP() ) && Common.MANAGEMENT_HOSTNAME
+                    .equalsIgnoreCase( requestedHost.getHostname() ) )
+            {
+                registrationManager.approveRequest( requestedHost.getId() );
+            }
         }
         catch ( Exception e )
         {
@@ -93,7 +119,8 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
     @Override
     public Response getRegistrationRequests()
     {
-        return Response.ok( JsonUtil.toJson( registrationManager.getRequests() ) ).build();
+        String result = gson.toJson( registrationManager.getRequests() );
+        return Response.ok( result ).build();
     }
 
 

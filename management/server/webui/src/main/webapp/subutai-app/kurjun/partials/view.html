@@ -1,0 +1,37 @@
+<div ng-controller="KurjunCtrl as kurjunCtrl">
+
+	<div class="b-workspace__header b-workspace__header_tabs">
+
+		<div class="b-tabs-menu b-tabs-menu_header">
+
+			<div ng-include="'subutai-app/common/partials/login-header.html'"></div>
+			
+			<ul>
+				<li class="b-tabs-menu__item"
+						ng-click="kurjunCtrl.openTab('templates')"
+						ng-class="kurjunCtrl.activeTab == 'templates' ? 'b-tabs-menu__item_active' : ''">
+					Templates
+				</li>
+				<li class="b-tabs-menu__item"
+						ng-click="kurjunCtrl.openTab('apt')"
+						ng-class="kurjunCtrl.activeTab == 'apt' ? 'b-tabs-menu__item_active' : ''">
+					APT
+				</li>
+			</ul>
+		</div>
+	</div>
+
+	<div class="b-workspace__content">
+
+		<div
+				ng-if="kurjunCtrl.activeTab == 'templates'"
+				ng-include="'subutai-app/kurjun/partials/templates.html'">
+		</div>
+		<div
+				ng-if="kurjunCtrl.activeTab == 'apt'"
+				ng-include="'subutai-app/kurjun/partials/apt.html'">
+		</div>
+
+	</div>
+	
+</div>

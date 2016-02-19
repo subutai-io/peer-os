@@ -1,0 +1,51 @@
+/* Styling for the ngProgress itself */
+#ngProgress {
+    margin: 0;
+    padding: 0;
+    z-index: 99998;
+    background-color: #29d!important;
+    color: #29d!important;
+    height: 3px!important;
+    opacity: 1;
+
+    /* Add CSS3 styles for transition smoothing */
+    -webkit-transition: all 0.5s ease-in-out;
+    -moz-transition: all 0.5s ease-in-out;
+    -o-transition: all 0.5s ease-in-out;
+    transition: all 0.5s ease-in-out;
+}
+
+/* Styling for the ngProgress-container */
+#ngProgress-container {
+    position: fixed;
+    margin: 0;
+    padding: 0;
+    top: 57px;
+    left: 0;
+    right: 0;
+    z-index: 99999;
+}
+
+/*Progress loader page*/
+#nprogress .bar {
+    background: #078DD0;
+    height: 3px;
+    position: absolute;
+    left: 0;
+    top: 57px;
+}
+
+#nprogress .peg {
+    display: none;
+}
+
+#nprogress .spinner {
+    top: 21px;
+    left: 285px;
+    position: absolute;
+}
+
+#nprogress .spinner-icon {
+    border-top-color: #078DD0;
+    border-left-color: #078DD0;
+}

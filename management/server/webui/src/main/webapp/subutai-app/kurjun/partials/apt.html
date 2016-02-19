@@ -1,0 +1,45 @@
+<div class="b-workspace-content__row">
+    <button class="b-btn b-btn_green g-margin-bottom" ng-click="kurjunCtrl.addTemplate()">
+        <i class="fa fa-plus"></i> Add APT
+    </button>
+
+    <div class="b-data-table">
+        <table datatable="ng"
+               dt-options="kurjunCtrl.dtOptions"
+               dt-column-defs="kurjunCtrl.dtColumnDefs"
+               class="b-main-table b-main-table_with-header">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Architecture</th>
+                <th>Installed Size</th>
+                <th>Version</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="apt in kurjunCtrl.aptList">
+                <td>{{ apt.name }}</td>
+                <td>{{ apt.architecture }}</td>
+                <td>{{ apt.installedSize }}</td>
+                <td>{{ apt.version }}</td>
+                <td>
+                    <a href class="b-icon b-icon_info"
+                       tooltips
+                       tooltip-speed="0"
+                       tooltip-size="large"
+                       tooltip-template="{{ apt.description }}"
+                       tooltip-class="description-tooltip" style="margin: 0 9px !important;">
+                    </a>
+                    <a href
+                       class="b-icon b-icon_remove"
+                       ng-click="kurjunCtrl.deleteAPT(apt)">
+                    </a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+

@@ -5,36 +5,37 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.KeyStore;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
+import javax.ws.rs.core.Form;
 import javax.ws.rs.core.Response;
-
-import io.subutai.common.exception.HTTPException;
-import io.subutai.common.security.crypto.keystore.KeyStoreData;
-import io.subutai.common.security.crypto.keystore.KeyStoreTool;
-import io.subutai.common.security.crypto.ssl.SSLManager;
-import io.subutai.common.settings.ChannelSettings;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.cxf.jaxrs.ext.form.Form;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
+import io.subutai.common.exception.HTTPException;
+import io.subutai.common.security.crypto.keystore.KeyStoreData;
+import io.subutai.common.security.crypto.keystore.KeyStoreTool;
+import io.subutai.common.security.crypto.ssl.SSLManager;
+import io.subutai.common.settings.ChannelSettings;
+import io.subutai.common.settings.Common;
+
 
 public class RestUtil
 {
     private static final Logger LOG = LoggerFactory.getLogger( RestUtil.class );
-    private static long defaultReceiveTimeout = 1000 * 60 * 5;
-    private static long defaultConnectionTimeout = 1000 * 60;
-    private static int defaultMaxRetransmits = 3;
+    private static long defaultReceiveTimeout = Common.DEFAULT_RECEIVE_TIMEOUT;
+    private static long defaultConnectionTimeout = Common.DEFAULT_CONNECTION_TIMEOUT;
+    private static int defaultMaxRetransmits = Common.DEFAULT_MAX_RETRANSMITS;
 
 
     public WebClient createTrustedWebClientWithAuthAndProviders( final String url, final String alias,
@@ -204,19 +205,34 @@ public class RestUtil
         {
             URL urlObject = new URL( url );
             String port = String.valueOf( urlObject.getPort() );
-            switch ( port )
+
+            if ( Objects.equals( port, ChannelSettings.SECURE_PORT_X1 ) )
             {
-                case ChannelSettings.SECURE_PORT_X1:
-                    client = createTrustedWebClient( url, provider );
-                    break;
-                case ChannelSettings.SECURE_PORT_X2:
-                    LOG.debug( String.format( "Request type: %s, %s", requestType, url ) );
-                    client = createTrustedWebClientWithAuth( url, alias );
-                    break;
-                default:
-                    client = createWebClient( url );
-                    break;
+                client = createTrustedWebClient( url, provider );
             }
+            else if ( Objects.equals( port, ChannelSettings.SECURE_PORT_X2 ) )
+            {
+                LOG.debug( String.format( "Request type: %s, %s", requestType, url ) );
+                client = createTrustedWebClientWithAuth( url, alias );
+            }
+            else
+            {
+                client = createWebClient( url );
+            }
+
+            //            switch ( port )
+            //            {
+            //                case ChannelSettings.getSecurePortX1():
+            //                    client = createTrustedWebClient( url, provider );
+            //                    break;
+            //                case ChannelSettings.SECURE_PORT_X2:
+            //                    LOG.debug( String.format( "Request type: %s, %s", requestType, url ) );
+            //                    client = createTrustedWebClientWithAuth( url, alias );
+            //                    break;
+            //                default:
+            //                    client = createWebClient( url );
+            //                    break;
+            //            }
             Form form = new Form();
             constructClientParams( params, requestType, form, client, headers );
             switch ( requestType )
@@ -259,19 +275,35 @@ public class RestUtil
         {
             URL urlObject = new URL( url );
             String port = String.valueOf( urlObject.getPort() );
-            switch ( port )
+
+            if ( Objects.equals( port, ChannelSettings.SECURE_PORT_X1 ) )
             {
-                case ChannelSettings.SECURE_PORT_X1:
-                    client = createTrustedWebClient( url );
-                    break;
-                case ChannelSettings.SECURE_PORT_X2:
-                    LOG.debug( String.format( "Request type: %s, %s", requestType, url ) );
-                    client = createTrustedWebClientWithAuth( url, alias );
-                    break;
-                default:
-                    client = createWebClient( url );
-                    break;
+                client = createTrustedWebClient( url );
             }
+            else if ( Objects.equals( port, ChannelSettings.SECURE_PORT_X2 ) )
+            {
+                LOG.debug( String.format( "Request type: %s, %s", requestType, url ) );
+                client = createTrustedWebClientWithAuth( url, alias );
+            }
+            else
+            {
+                client = createWebClient( url );
+            }
+
+
+            //            switch ( port )
+            //            {
+            //                case ChannelSettings.SECURE_PORT_X1:
+            //                    client = createTrustedWebClient( url );
+            //                    break;
+            //                case ChannelSettings.SECURE_PORT_X2:
+            //                    LOG.debug( String.format( "Request type: %s, %s", requestType, url ) );
+            //                    client = createTrustedWebClientWithAuth( url, alias );
+            //                    break;
+            //                default:
+            //                    client = createWebClient( url );
+            //                    break;
+            //            }
             Form form = new Form();
             constructClientParams( params, requestType, form, client, headers );
             switch ( requestType )
@@ -313,7 +345,7 @@ public class RestUtil
             {
                 if ( requestType == RequestType.POST )
                 {
-                    form.set( entry.getKey(), entry.getValue() );
+                    form.param( entry.getKey(), entry.getValue() );
                 }
                 else
                 {

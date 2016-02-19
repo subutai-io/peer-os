@@ -15,7 +15,7 @@
       <property name="openjpa.Log" value="DefaultLevel=WARN, Tool=INFO" />
       <property name="openjpa.ConnectionFactoryProperties" value="PrintParameters=true" />
       <property name="openjpa.RuntimeUnenhancedClasses" value="supported" />
-      <property name="openjpa.jdbc.DBDictionary" value="h2" />
+      <property name="openjpa.jdbc.DBDictionary" value="derby" />
       <property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema(ForeignKeys=true)" />
     </properties>
   </persistence-unit>

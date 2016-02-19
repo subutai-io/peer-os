@@ -1,67 +1,171 @@
 package io.subutai.core.identity.rest.ui;
 
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import javax.ws.rs.core.Response;
+
+import org.bouncycastle.openpgp.PGPPublicKeyRing;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.google.gson.reflect.TypeToken;
 
+import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
+import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.PermissionScope;
 import io.subutai.common.security.objects.TokenType;
 import io.subutai.common.security.objects.UserType;
-import io.subutai.core.identity.api.*;
+import io.subutai.common.util.JsonUtil;
+import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.identity.api.model.Role;
 import io.subutai.core.identity.api.model.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import io.subutai.common.util.JsonUtil;
-
-import javax.ws.rs.FormParam;
-import javax.ws.rs.core.Response;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import io.subutai.core.identity.api.model.UserDelegate;
+import io.subutai.core.security.api.model.SecurityKey;
 
 
 public class RestServiceImpl implements RestService
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(RestServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger( RestServiceImpl.class );
+    private SecurityManager securityManager = null;
     protected JsonUtil jsonUtil = new JsonUtil();
     private IdentityManager identityManager;
 
 
-    public RestServiceImpl( final IdentityManager identityManager )
+    public RestServiceImpl( final IdentityManager identityManager, final SecurityManager securityManager )
     {
         this.identityManager = identityManager;
+        this.securityManager = securityManager;
     }
 
 
-
-    /** Users ***********************************************/
+    /** Users ********************************************** */
 
     @Override
     public Response getUsers()
     {
         try
         {
-            return Response.ok(jsonUtil.to( identityManager.getAllUsers() )).build();
+            return Response.ok( jsonUtil.to( identityManager.getAllUsers() ) ).build();
         }
         catch ( Exception e )
         {
             LOGGER.error( "Error getting users #getUsers", e );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) ).build();
+        }
+    }
+
+
+    @Override
+    public Response getSystemUsers()
+    {
+        try
+        {
+            return Response.ok( jsonUtil.to( identityManager.getAllUsers() ) ).build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error getting users #getUsers", e );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) ).build();
+        }
+    }
+
+
+    @Override
+    public Response getActiveUser()
+    {
+        User activeUser = identityManager.getActiveUser();
+        try
+        {
+            return Response.ok( jsonUtil.to( activeUser ) ).build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error getting activeUser user #getActiveUser", e );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) ).build();
+        }
+    }
+
+    @Override
+    public Response getPublicKeyData( final Long userId )
+    {
+        User user = identityManager.getUser( userId );
+        KeyDataJson keyData = new KeyDataJson();
+
+        try
+        {
+            PGPPublicKeyRing pubRing = securityManager.getKeyManager().getPublicKeyRing( user.getSecurityKeyId() );
+
+            keyData.setFingerprint( PGPKeyUtil.getFingerprint( pubRing.getPublicKey().getFingerprint()));
+            keyData.setKey( PGPEncryptionUtil.armorByteArrayToString( pubRing.getEncoded() ) );
+
+            for (Iterator<String> iter = pubRing.getPublicKey().getUserIDs(); iter.hasNext(); )
+            {
+                String id = iter.next();
+
+                if(!Strings.isNullOrEmpty( id ))
+                {
+                    keyData.setUserId( keyData.getUserId()+":"+ id);
+                }
+            }
+
+            return Response.ok( jsonUtil.to( keyData ) ).build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error getting Public Key Data #getPublicKeyData", e );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) ).build();
+        }
+    }
+
+
+    @Override
+    public Response checkUserKey( final Long userId )
+    {
+        User user = identityManager.getUser( userId );
+
+        try
+        {
+            int status = 0;
+
+            SecurityKey keyData = securityManager.getKeyManager().getKeyData( user.getSecurityKeyId() );
+
+            if(keyData != null)
+            {
+                String pFprint = keyData.getPublicKeyFingerprint();
+                String sFprint = keyData.getSecretKeyFingerprint();
+
+                if(pFprint.equals( sFprint ))
+                    status = 1;
+                else
+                    status = 2;
+            }
+
+            return Response.ok( jsonUtil.to( status ) ).build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error getting Public Key Data #getPublicKeyData", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
     }
 
+
+
     // @todo convert to User object
     @Override
-    public Response saveUser( final String username, final String fullName,
-                             final String password, final String email,
-                             final String rolesJson, final Long userId )
+    public Response saveUser( final String username, final String fullName, final String password, final String email,
+                              final String rolesJson, final Long userId, final String trustLevel )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( username ), "username is missing" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( fullName ), "fullname is missing" );
@@ -71,66 +175,146 @@ public class RestServiceImpl implements RestService
         {
             User newUser;
 
-            if( userId == null || userId <= 0 )
+            if ( userId == null || userId <= 0 )
             {
-                Preconditions.checkArgument( !Strings.isNullOrEmpty( password ), "User name must be set" );
-                newUser = identityManager.createUser( username, password, fullName, email, UserType.Regular.getId());
+                Preconditions.checkArgument( !Strings.isNullOrEmpty( password ), "Password must be set" );
+                newUser = identityManager
+                        .createUser( username, password, fullName, email, UserType.Regular.getId(), Integer.parseInt( trustLevel ), false, true );
+
+                if ( !Strings.isNullOrEmpty( rolesJson ) )
+                {
+                    List<Long> roleIds = jsonUtil.fromJson( rolesJson, new TypeToken<ArrayList<Long>>()
+                    {}.getType() );
+
+
+                    roleIds.stream().forEach( r -> identityManager.assignUserRole( newUser, identityManager.getRole( r ) ) );
+                }
             }
             else
             {
                 newUser = identityManager.getUser( userId );
+                newUser.setEmail(email);
+                newUser.setFullName(fullName);
+                newUser.setTrustLevel(Integer.parseInt( trustLevel ));
+
+                List<Long> roleIds = jsonUtil.fromJson( rolesJson, new TypeToken<ArrayList<Long>>()
+                {}.getType() );
+
+                newUser.setRoles( roleIds.stream().map( r -> identityManager.getRole( r )).collect( Collectors.toList()));
+
+                identityManager.modifyUser(newUser);
             }
 
-            if(!Strings.isNullOrEmpty(rolesJson)) {
-                List<Long> roleIds = jsonUtil.fromJson(
-                    rolesJson, new TypeToken<ArrayList<Long>>() {}.getType()
-                );
+
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error setting new user #setUser", e );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) ).build();
+        }
+
+        return Response.ok().build();
+    }
 
 
-                newUser.setRoles( roleIds.stream().map( r -> identityManager.getRole(r) ).collect( Collectors.toList() ) );
-            }
-            identityManager.updateUser(newUser);
+    @Override
+    public Response approveDelegatedUser( final String trustMessage )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( trustMessage ), "message is missing" );
+
+        try
+        {
+            identityManager.approveDelegatedUser(trustMessage);
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error setting new user #setUser", e );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) ).build();
+        }
+
+        return Response.ok().build();
+    }
+
+
+    @Override
+    public Response createIdentityDelegationDocument()
+    {
+        try
+        {
+            identityManager.createIdentityDelegationDocument();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error setting new user #setUser", e );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) ).build();
+        }
+
+        return Response.ok().build();
+    }
+
+
+    @Override
+    public Response getIdentityDelegationDocument()
+    {
+        try
+        {
+            User activeUser = identityManager.getActiveUser();
+            UserDelegate userDelegate = identityManager.getUserDelegate( activeUser.getId() );
+            return Response.ok( userDelegate.getRelationDocument() ).build();
         }
         catch ( Exception e )
         {
             LOGGER.error( "Error setting new user #setUser", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
         }
+    }
 
+
+    @Override
+    public Response setUserPublicKey(String publicKey)
+    {
+        try
+        {
+            identityManager.setUserPublicKey( identityManager.getActiveUser().getId(), publicKey );
+        }
+        catch ( Exception e ) {
+            LOGGER.error("Error updating user public key", e);
+            return Response.serverError().build();
+        }
         return Response.ok().build();
     }
+
 
     @Override
     public Response deleteUser( final Long userId )
     {
         try
         {
-            identityManager.removeUser(userId);
+            identityManager.removeUser( userId );
         }
         catch ( Exception e )
         {
             LOGGER.error( "Error deleting user #deleteUser", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) ).build();
         }
 
         return Response.ok().build();
     }
 
 
-
-    /** Roles ***********************************************/
+    /** Roles ********************************************** */
 
     @Override
     public Response getRoles()
     {
         try
         {
-            return Response.ok(jsonUtil.to(identityManager.getAllRoles())).build();
+            return Response.ok( jsonUtil.to( identityManager.getAllRoles() ) ).build();
         }
         catch ( Exception e )
         {
             LOGGER.error( "Error getting roles #getRoles", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) ).build();
         }
     }
 
@@ -140,78 +324,79 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            Preconditions.checkArgument(!Strings.isNullOrEmpty(rolename));
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( rolename ) );
 
             Role role;
 
-            if(roleId == null || roleId <= 0){
+            if ( roleId == null || roleId <= 0 )
+            {
                 role = identityManager.createRole( rolename, UserType.Regular.getId() );
-            } else {
-                role = identityManager.getRole(roleId);
+            }
+            else
+            {
+                role = identityManager.getRole( roleId );
             }
 
-            if(!Strings.isNullOrEmpty(permissionJson)) {
-                ArrayList<PermissionJson> permissions = JsonUtil.fromJson(
-                    permissionJson, new TypeToken<ArrayList<PermissionJson>>() {}.getType()
-                );
+            if ( !Strings.isNullOrEmpty( permissionJson ) )
+            {
+                ArrayList<PermissionJson> permissions =
+                        JsonUtil.fromJson( permissionJson, new TypeToken<ArrayList<PermissionJson>>()
+                        {
+                        }.getType() );
 
 
-                if(!Strings.isNullOrEmpty(rolename)) {
-                    role.setName(rolename);
+                if ( !Strings.isNullOrEmpty( rolename ) )
+                {
+                    role.setName( rolename );
                 }
 
-                role.setPermissions( permissions.stream().map( p -> identityManager.createPermission(
-                        p.getObject(),
-                        p.getScope(),
-                        p.getRead(),
-                        p.getWrite(),
-                        p.getUpdate(),
-                        p.getDelete()
-                        ) ).collect( Collectors.toList() ) );
+                role.setPermissions( permissions.stream().map( p -> identityManager
+                        .createPermission( p.getObject(), p.getScope(), p.getRead(), p.getWrite(), p.getUpdate(),
+                                p.getDelete() ) ).collect( Collectors.toList() ) );
             }
 
-            identityManager.updateRole(role);
+            identityManager.updateRole( role );
         }
         catch ( Exception e )
         {
             LOGGER.error( "Error setting new role #createRole", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) ).build();
         }
 
         return Response.ok().build();
     }
+
 
     @Override
     public Response deleteRole( final Long roleId )
     {
         try
         {
-            identityManager.removeRole(roleId);
+            identityManager.removeRole( roleId );
         }
         catch ( Exception e )
         {
             LOGGER.error( "Error deleting role #deleteRole", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) ).build();
         }
 
         return Response.ok().build();
     }
 
 
-
-    /** Permissions ***********************************************/
+    /** Permissions ********************************************** */
 
     @Override
     public Response getPermissions()
     {
         try
         {
-            return Response.ok( jsonUtil.to(identityManager.getAllPermissions()) ).build();
+            return Response.ok( jsonUtil.to( identityManager.getAllPermissions() ) ).build();
         }
         catch ( Exception e )
         {
             LOGGER.error( "Error receiving permissions", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) ).build();
         }
     }
 
@@ -220,7 +405,7 @@ public class RestServiceImpl implements RestService
     public Response getPermissionScopes()
     {
         Map<Integer, String> map = Maps.newHashMap();
-        for( PermissionScope permissionScope : PermissionScope.values() )
+        for ( PermissionScope permissionScope : PermissionScope.values() )
         {
             map.put( permissionScope.getId(), permissionScope.getName() );
         }
@@ -228,31 +413,26 @@ public class RestServiceImpl implements RestService
     }
 
 
-
-    /** Tokens ***********************************************/
+    /** Tokens ********************************************** */
 
     @Override
     public Response getAllUserTokens()
     {
         try
         {
-            List<UserTokenJson> list = identityManager.getAllUserTokens().stream().map( p -> new UserTokenJson(
-                    p.getUserId(),
-                    identityManager.getUser( p.getUserId() ).getUserName(),
-                    p.getToken(),
-                    p.getFullToken(),
-                    p.getType(),
-                    p.getHashAlgorithm(),
-                    p.getIssuer(),
-                    p.getValidDate()
-            ) ).collect( Collectors.toList() );
+            List<UserTokenJson> list = identityManager.getAllUserTokens().stream()
+                                                      .map( p -> new UserTokenJson( p.getUserId(),
+                                                              identityManager.getUser( p.getUserId() ).getUserName(),
+                                                              p.getToken(), p.getFullToken(), p.getType(),
+                                                              p.getHashAlgorithm(), p.getIssuer(), p.getValidDate() ) )
+                                                      .collect( Collectors.toList() );
 
             return Response.ok( JsonUtil.toJson( list ) ).build();
         }
         catch ( Exception e )
         {
             LOGGER.error( "Error receiving user tokens", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) ).build();
         }
     }
 
@@ -266,26 +446,27 @@ public class RestServiceImpl implements RestService
             Preconditions.checkArgument( !Strings.isNullOrEmpty( token ), "Invalid token" );
             Preconditions.checkNotNull( period, "Invalid period" );
 
-            Date newDate = new Date( );
+            Date newDate = new Date();
             java.util.Calendar cal = Calendar.getInstance();
             cal.setTime( newDate );
             cal.add( Calendar.HOUR_OF_DAY, period );
 
-            identityManager.createUserToken( identityManager.getUser( userId ), token, null, "subutai.io", 2, cal.getTime() );
+            identityManager
+                    .createUserToken( identityManager.getUser( userId ), token, null, "subutai.io", 2, cal.getTime() );
         }
         catch ( Exception e )
         {
             LOGGER.error( "Error creating new user token", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) ).build();
         }
 
         return Response.ok().build();
     }
 
 
-
     @Override
-    public Response updateUserToken( final Long userId, final String token, final String newToken, final Integer period )
+    public Response updateUserToken( final Long userId, final String token, final String newToken,
+                                     final Integer period )
     {
         try
         {
@@ -294,17 +475,18 @@ public class RestServiceImpl implements RestService
             Preconditions.checkArgument( !Strings.isNullOrEmpty( newToken ), "Invalid newToken" );
             Preconditions.checkNotNull( period, "Invalid period" );
 
-            Date newDate = new Date( );
+            Date newDate = new Date();
             java.util.Calendar cal = Calendar.getInstance();
             cal.setTime( newDate );
             cal.add( Calendar.HOUR_OF_DAY, period );
 
-            identityManager.updateUserToken( token, identityManager.getUser( userId ), newToken, null, "issuer", 1, cal.getTime() );
+            identityManager.updateUserToken( token, identityManager.getUser( userId ), newToken, null, "issuer", 1,
+                    cal.getTime() );
         }
         catch ( Exception e )
         {
             LOGGER.error( "Error updating user token", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) ).build();
         }
 
         return Response.ok().build();
@@ -323,7 +505,7 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOGGER.error( "Error updating new user token", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) ).build();
         }
 
 
@@ -335,10 +517,12 @@ public class RestServiceImpl implements RestService
     public Response getTokenTypes()
     {
         Map<Integer, String> map = Maps.newHashMap();
-        for( TokenType tokenType : TokenType.values() )
+        for ( TokenType tokenType : TokenType.values() )
         {
             map.put( tokenType.getId(), tokenType.getName() );
         }
+
         return Response.ok( JsonUtil.toJson( map ) ).build();
     }
+
 }

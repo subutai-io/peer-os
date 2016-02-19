@@ -1,0 +1,48 @@
+<link rel="stylesheet" type="text/css" href="subutai-app/bazaar/partials/css/normalize.css" />
+<link rel="stylesheet" type="text/css" href="subutai-app/bazaar/partials/css/demo.css" />
+<link rel="stylesheet" type="text/css" href="subutai-app/bazaar/partials/css/component.css" />
+<div ng-controller="BazaarCtrl as bazaarCtrl">
+
+	<div class="b-workspace__header b-workspace__header_tabs">
+		<div class="b-tabs-menu b-tabs-menu_header">
+			<ul>
+				<li class="b-tabs-menu__item"
+					ng-click="bazaarCtrl.activeTab = 'hub'"
+					ng-class="bazaarCtrl.activeTab == 'hub' ? 'b-tabs-menu__item_active' : ''">
+					Available
+				</li>
+				<li class="b-tabs-menu__item"
+					ng-click="bazaarCtrl.activeTab = 'plugins'"
+					ng-class="bazaarCtrl.activeTab == 'plugins' ? 'b-tabs-menu__item_active' : ''">
+					Installed
+				</li>
+				<li class="b-tabs-menu__item"
+					ng-click="bazaarCtrl.activeTab = 'other'"
+					ng-class="bazaarCtrl.activeTab == 'other' ? 'b-tabs-menu__item_active' : ''">
+					Advanced
+				</li>
+			</ul>
+		</div>
+	</div>
+	<div class="b-workspace__content">
+<!--		<div
+				ng-if="bazaarCtrl.activeTab == 'hub'"
+				ng-include="'subutai-app/bazaar/partials/hub.html'" onload = "bazaarCtrl.buttonCheck (this)">
+		</div>-->
+		<div
+				ng-if="bazaarCtrl.activeTab == 'hub'"
+				ng-include="'subutai-app/bazaar/partials/hub.html'">
+		</div>
+		<div
+				ng-if="bazaarCtrl.activeTab == 'plugins'"
+				ng-include="'subutai-app/bazaar/partials/plugins.html'">
+		</div>
+		<div
+				ng-if="bazaarCtrl.activeTab == 'other'"
+				ng-include="'subutai-app/bazaar/partials/other.html'">
+		</div>
+
+	</div>
+
+</div>
+
