@@ -171,7 +171,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 		};
 		vm.logMessages.push(currentLog);
 
-		environmentService.startEnvironmentAutoBuild(vm.environment2BuildName, JSON.stringify(vm.containers2Build))
+		environmentService.startEnvironmentAdvancedBuild(vm.environment2BuildName, JSON.stringify(vm.containers2Build))
 			.success(function(data){
 				vm.newEnvID = data;
 
@@ -625,7 +625,9 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 					"name": currentElement.get('containerName'),
 					"peerId": currentElement.get('parentPeerId'),
 					"hostId": currentElement.get('parentHostId'),
-					"position": currentElement.get('position')
+					"position": currentElement.get('position'),
+					"sshGroupId" : 0,
+					"hostsGroupId" : 0
 				};
 
 				if (vm.env2Build[currentElement.get('templateName')] === undefined) {

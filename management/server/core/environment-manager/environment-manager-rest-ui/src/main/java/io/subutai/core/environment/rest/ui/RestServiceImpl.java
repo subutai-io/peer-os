@@ -99,14 +99,7 @@ public class RestServiceImpl implements RestService
         Set<String> templates =
                 templateRegistry.list().stream().map( TemplateKurjun::getName ).collect( Collectors.toSet() );
 
-        if ( !templates.isEmpty() )
-        {
-            return Response.ok().entity( gson.toJson( templates ) ).build();
-        }
-        else
-        {
-            return Response.status( Response.Status.NOT_FOUND ).build();
-        }
+        return Response.ok().entity( gson.toJson( templates ) ).build();
     }
 
 
@@ -150,7 +143,6 @@ public class RestServiceImpl implements RestService
         {
             ContainerPlacementStrategy placementStrategy = strategyManager.findStrategyById( UnlimitedStrategy.ID );
 
-
             List<NodeSchema> schema =
                     JsonUtil.fromJson( containersJson, new TypeToken<List<NodeSchema>>() {}.getType() );
 
@@ -170,6 +162,31 @@ public class RestServiceImpl implements RestService
         return Response.ok( JsonUtil.toJson( environment.getId() ) ).build();
     }
 
+    @Override
+    public Response buildAdvanced( final String name, final String containersJson )
+    {
+
+        Environment environment = null;
+
+        try
+        {
+            List<NodeGroup> schema =
+                    JsonUtil.fromJson( containersJson, new TypeToken<List<NodeGroup>>() {}.getType() );
+
+            Topology topology = new Topology( name, 0, 0 );
+
+
+            schema.forEach( s -> topology.addNodeGroupPlacement(s.getPeerId(), s) );
+
+            environment = environmentManager.createEnvironment( topology, true );
+        }
+        catch ( Exception e )
+        {
+            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+        }
+
+        return Response.ok( JsonUtil.toJson( environment.getId() ) ).build();
+    }
 
     //    @Override
     //    public Response setupStrategyRequisites( final String name, final String strategy, int sshId, int hostId,
