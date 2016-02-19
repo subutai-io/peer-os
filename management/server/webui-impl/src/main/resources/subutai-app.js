@@ -34,11 +34,16 @@ function CurrentUserCtrl($location, $rootScope, $http) {
 	var vm = this;
 	vm.currentUser = localStorage.getItem('currentUser');
 	vm.hubStatus = localStorage.getItem('hubRegistered');
+	vm.notifications = localStorage.getItem('notifications');
+	vm.notificationNew = false;
 	vm.currentUserRoles = [];
+	$rootScope.notifications = {};
 
-	if( vm.hubStatus != true )
-	{
+	if( vm.hubStatus != "true" ) {
 		vm.hubStatus = false;
+	}
+	else {
+		vm.hubStatus = true;
 	}
 
 
@@ -49,21 +54,22 @@ function CurrentUserCtrl($location, $rootScope, $http) {
 	//function
 	vm.logout = logout;
 	vm.hubRegister = hubRegister;
+	vm.clearLogs = clearLogs;
 
 
 	function hubRegister()
 	{
-		$http.post( SERVER_URL + 'rest/v1/hub/register?hubIp=hub.subut.ai&email=' + vm.login + '&password=' + vm.pass, {withCredentials: true} )
+		//$http.post( SERVER_URL + 'rest/v1/hub/register?hubIp=hub.subut.ai&email=' + vm.login + '&password=' + vm.pass, {withCredentials: true} )
+		$http.post( SERVER_URL + 'hub/register?hubIp=hub.subut.ai&email=' + vm.login + '&password=' + vm.pass, {withCredentials: true} )
 			.success(function () {
 				localStorage.setItem('hubRegistered', true);
 				vm.hubStatus = true;
 			}).error (function (error) {
-			console.log('hub/register error: ', error);
-		});
+				console.log('hub/register error: ', error);
+			});
 	}
 
-	function logout()
-	{
+	function logout() {
 		removeCookie('sptoken');
 		localStorage.removeItem('currentUser');
 		$location.path('login');
@@ -76,6 +82,38 @@ function CurrentUserCtrl($location, $rootScope, $http) {
 			vm.currentUser = $rootScope.currentUser;
 		}
 	});
+
+	//localStorage.removeItem('notifications');
+	$rootScope.$watch('notifications', function() {
+
+		var notifications = localStorage.getItem('notifications');
+		console.log(notifications);
+		if(
+			notifications == null ||
+			notifications == undefined ||
+			notifications == 'null' ||
+			notifications.length <= 0
+		) {
+			var notifications = [];
+			localStorage.setItem('notifications', notifications);
+		} else {
+			notifications = JSON.parse(notifications);
+		}
+
+		if($rootScope.notifications.message) {
+			if(!localStorage.getItem('notifications').includes(JSON.stringify($rootScope.notifications.message))) {
+				notifications.push($rootScope.notifications);
+				localStorage.setItem('notifications', JSON.stringify(notifications));
+			}
+			vm.notificationNew = true;
+		}
+		vm.notifications = notifications;
+	});
+
+	function clearLogs() {
+		vm.notifications = [];
+		localStorage.removeItem('notifications');
+	}
 }
 
 function SubutaiController($rootScope) {
