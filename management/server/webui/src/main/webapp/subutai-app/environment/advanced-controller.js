@@ -3,11 +3,11 @@
 angular.module('subutai.environment.adv-controller', [])
 	.controller('AdvancedEnvironmentCtrl', AdvancedEnvironmentCtrl);
 
-AdvancedEnvironmentCtrl.$inject = ['$scope', 'environmentService', 'trackerSrv', 'SweetAlert', 'ngDialog'];
+AdvancedEnvironmentCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'trackerSrv', 'SweetAlert', 'ngDialog'];
 
 var graph = new joint.dia.Graph;
 
-function AdvancedEnvironmentCtrl($scope, environmentService, trackerSrv, SweetAlert, ngDialog) {
+function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, trackerSrv, SweetAlert, ngDialog) {
 
 	var vm = this;
 	var GRID_CELL_SIZE = 100;
@@ -63,6 +63,7 @@ function AdvancedEnvironmentCtrl($scope, environmentService, trackerSrv, SweetAl
 
 	environmentService.getPeers().success(function (data) {
 		vm.peerIds = data;
+		//vm.peerIds['testPeer'] = ['rh1', 'rh2', 'rh3'];
 	});
 
 	/*peerRegistrationService.getResourceHosts().success(function (data) {
@@ -172,6 +173,12 @@ function AdvancedEnvironmentCtrl($scope, environmentService, trackerSrv, SweetAl
 		environmentService.startEnvironmentAutoBuild(vm.environment2BuildName, JSON.stringify(vm.containers2Build))
 			.success(function(data){
 				vm.newEnvID = data;
+
+				$rootScope.notifications = {
+					"message": "Environment(" + data + ") creation has been started", 
+					"date": moment().format('MMMM Do YYYY, HH:mm:ss')
+				};
+
 				currentLog.status = 'success';
 				currentLog.classes = ['fa-check', 'g-text-green'];
 				currentLog.time = moment().format('HH:mm:ss');
@@ -196,6 +203,11 @@ function AdvancedEnvironmentCtrl($scope, environmentService, trackerSrv, SweetAl
 				currentLog.status = 'fail';
 				currentLog.classes = ['fa-times', 'g-text-red'];
 				currentLog.time = moment().format('HH:mm:ss');				
+
+				$rootScope.notifications = {
+					"message": "Error on creating environment. " + error, 
+					"date": moment().format('MMMM Do YYYY, HH:mm:ss')
+				};
 			});
 	}
 
@@ -208,9 +220,7 @@ function AdvancedEnvironmentCtrl($scope, environmentService, trackerSrv, SweetAl
 
 	//add resource host
 	function addResource2Build(currentResource, index) {
-		//var pos = calculatePeerPos();
 		var posX = calculatePeerPos();
-		var posY = calculateResourceHostPos(vm.currentPeer);
 
 		if( PEER_MAP[vm.currentPeer] !== undefined ) {
 			if( PEER_MAP[vm.currentPeer].rh[currentResource] !== undefined ) {
@@ -220,8 +230,18 @@ function AdvancedEnvironmentCtrl($scope, environmentService, trackerSrv, SweetAl
 			PEER_MAP[vm.currentPeer] = { rh: [], position : posX };
 		}
 
+		if(Object.keys(PEER_MAP[vm.currentPeer].rh).length > 0) {
+			var lastResourceInPeer = graph.getCell(PEER_MAP[vm.currentPeer].rh[
+				Object.keys(PEER_MAP[vm.currentPeer].rh)[
+					Object.keys(PEER_MAP[vm.currentPeer].rh).length - 1
+				]
+			]);
+			lastResourceInPeer.set('addClass', '');
+			lastResourceInPeer.set('removeClass', 'b-resource-host_last');
+		}
+		var posY = calculateResourceHostPos(vm.currentPeer);
+
 		var resourceHost = new joint.shapes.resourceHostHtml.Element({
-			//position: { x: 40, y: 40 },
 			position: { x: PEER_MAP[vm.currentPeer].position * ( PEER_WIDTH + PEER_SPACE ), y: posY },
 			size: { width: 155, height: 173 },
 			peerId: vm.currentPeer,
@@ -233,16 +253,6 @@ function AdvancedEnvironmentCtrl($scope, environmentService, trackerSrv, SweetAl
 			'peerName': 'Peer ' + (vm.currentPeerIndex + 1),
 			'addClass': 'b-resource-host_last'
 		});
-
-		if(Object.keys(PEER_MAP[vm.currentPeer].rh).length > 0) {
-			var lastResourceInPeer = graph.getCell(PEER_MAP[vm.currentPeer].rh[
-				Object.keys(PEER_MAP[vm.currentPeer].rh)[
-					Object.keys(PEER_MAP[vm.currentPeer].rh).length - 1
-				]
-			]);
-			lastResourceInPeer.set('addClass', '');
-			lastResourceInPeer.set('removeClass', 'b-resource-host_last');
-		}
 
 		graph.addCell(resourceHost);
 		PEER_MAP[vm.currentPeer].rh[currentResource] = resourceHost.id;
@@ -257,9 +267,9 @@ function AdvancedEnvironmentCtrl($scope, environmentService, trackerSrv, SweetAl
 				var currentResource = graph.getCell(PEER_MAP[peerId].rh[key]);
 				var currentResourceSize = currentResource.get('size');
 				var currentResourcePos = currentResource.get('position');
-				posY = posY + (currentResourcePos.x + currentResourceSize.height);
+				posY = posY + (currentResourceSize.height - 8);
 			}
-			return posY - 8;
+			return posY;
 		} else {
 			return 30;
 		}
@@ -505,27 +515,33 @@ function AdvancedEnvironmentCtrl($scope, environmentService, trackerSrv, SweetAl
 			this.$box.css({ width: bbox.width, height: bbox.height, left: bbox.x, top: bbox.y, transform: 'rotate(' + (this.model.get('angle') || 0) + 'deg)' });
 		},
 		removeBox: function(evt) {
-			var rhKeys = Object.keys(PEER_MAP[vm.currentPeer].rh);
+			var parentPeerId = this.model.get('peerId');
+			var rhKeys = Object.keys(PEER_MAP[parentPeerId].rh);
 			var hostIndex = rhKeys.indexOf(this.model.get('hostId'));
 			//var swapFrom = rhKeys.slice(hostIndex, -1);
 
 			var emptyPlace = this.model.get('size').height - 8;
-			delete PEER_MAP[this.model.get('peerId')].rh[this.model.get('hostId')];
+			delete PEER_MAP[parentPeerId].rh[this.model.get('hostId')];
 
-			if(Object.keys(PEER_MAP[this.model.get('peerId')].rh).length == 0) {
-				delete PEER_MAP[this.model.get('peerId')];
+			if(Object.keys(PEER_MAP[parentPeerId].rh).length == 0) {
+
+				var peerWidth = this.model.get('size').width;
+				var posMod = (peerWidth + PEER_SPACE) * -1;
+				movePeer(parentPeerId, posMod);
+				delete PEER_MAP[parentPeerId];
+
 			} else {
 
 				for(var i = hostIndex + 1; i < rhKeys.length; i++) {
-					var resourceHost = graph.getCell(PEER_MAP[vm.currentPeer].rh[rhKeys[i]]);
+					var resourceHost = graph.getCell(PEER_MAP[parentPeerId].rh[rhKeys[i]]);
 					var resourceHostPosition = resourceHost.get('position');
-					console.log(resourceHostPosition);
 					resourceHost.set('position', {x: resourceHostPosition.x, y: (resourceHostPosition.y - emptyPlace)});
+					changePositionToEmbeds(resourceHost.get('embeds'), false, (emptyPlace * -1));
 				}
 
-				var lastResourceInPeer = graph.getCell(PEER_MAP[vm.currentPeer].rh[
-					Object.keys(PEER_MAP[vm.currentPeer].rh)[
-						Object.keys(PEER_MAP[vm.currentPeer].rh).length - 1
+				var lastResourceInPeer = graph.getCell(PEER_MAP[parentPeerId].rh[
+					Object.keys(PEER_MAP[parentPeerId].rh)[
+						Object.keys(PEER_MAP[parentPeerId].rh).length - 1
 					]
 				]);
 				lastResourceInPeer.set('addClass', 'b-resource-host_last');
@@ -570,7 +586,9 @@ function AdvancedEnvironmentCtrl($scope, environmentService, trackerSrv, SweetAl
 					var gPos = placeRhSimple( models[i] );
 
 					cellView.model.set('rh', { model: models[i].id, x: gPos.x, y: gPos.y});
-					cellView.model.set('position', { x: rPos.x + gPos.x * GRID_SIZE + GRID_SPACING, y: rPos.y + gPos.y * GRID_SIZE + GRID_SPACING });
+					var x = (rPos.x + gPos.x * GRID_SIZE + GRID_SPACING) + 23;
+					var y = (rPos.y + gPos.y * GRID_SIZE + GRID_SPACING) + 49;					
+					cellView.model.set('position', { x: x, y: y });
 
 					models[i].embed(cellView.model);
 
@@ -687,18 +705,95 @@ function placeRhSimple( model ) {
 		}
 	}
 
-	if(children >= (size * size)) {
-		var currentModelSize = model.get('size');
-		model.resize(currentModelSize.width + 60, currentModelSize.height + 60);
-		model.attr('g.element-tool-remove/ref-x', model.get('size').width + 1);
-	}
-
 	array[size] = new Array();
 	array[size][0] = 1;
 	size++;
 	sizeObj.size = size;
 
 	return { x : size - 1, y : 0 };
+}
+
+function growResourceHost(model) {
+	var currentModelSize = model.get('size');
+	model.resize(currentModelSize.width + 60, currentModelSize.height + 60);
+	model.attr('g.element-tool-remove/ref-x', model.get('size').width + 1);
+}
+
+function movePeer(peerId, posMod, counter) {
+	if(counter == undefined || counter == null) counter = false;
+	var peerKeys = Object.keys(PEER_MAP);
+	var peerIndex = peerKeys.indexOf(peerId);				
+	for(var i = peerIndex + 1; i < peerKeys.length; i++) {
+
+		var x = posMod;
+		if(counter && counter > 0) {
+			x = counter * posMod;
+			counter++;
+		}
+
+		for(var key in PEER_MAP[peerKeys[i]].rh) {
+			var resourceHost = graph.getCell(PEER_MAP[peerKeys[i]].rh[key]);
+			var resourceHostPosition = resourceHost.get('position');
+			resourceHost.set('position', {x: resourceHostPosition.x + x, y: resourceHostPosition.y});
+			changePositionToEmbeds(resourceHost.get('embeds'), x, false);
+		}
+	}
+}
+
+function changePositionToEmbeds(embeds, posX, posY) {
+	if(embeds) {
+		for(var i = 0; i < embeds.length; i++) {
+			var container = graph.getCell(embeds[i]);
+			var containerPosition = container.get('position');
+
+			var x = containerPosition.x;
+			if(posX) {
+				x = x + posX;
+			}
+
+			var y = containerPosition.y;
+			if(posY) {
+				y = y + posY;
+			}
+
+			container.set('position', {x: x, y: y});
+		}
+	}
+}
+
+function checkResourceHost(model) {
+	var sizeObj = model.attributes.gridSize;
+	var children = model.get('children');
+	var size = sizeObj.size;
+
+	if(children >= (size * size)) {
+
+		var peerId = model.get('peerId');
+		var hostId = model.get('hostId');
+		var rhKeys = Object.keys(PEER_MAP[peerId].rh);
+		var hostIndex = rhKeys.indexOf(model.get('hostId'));
+
+		var counter = 0;
+		for(var key in PEER_MAP[peerId].rh) {
+			var resourceHost = graph.getCell(PEER_MAP[peerId].rh[key]);
+			growResourceHost(resourceHost);
+
+			if(key !== hostId) {
+				resourceHost.attributes.gridSize.size = size + 1;
+			}
+
+			if(counter > 0) {
+				var resourceHostPosition = resourceHost.get('position');
+				var yPosMod = (counter * 60);
+				resourceHost.set('position', {x: resourceHostPosition.x, y: (resourceHostPosition.y + yPosMod)});
+				changePositionToEmbeds(resourceHost.get('embeds'), false, yPosMod);
+			}
+
+			counter++;
+		}
+		movePeer(peerId, 60, 1);
+	}
+	
 }
 
 function startDrag( event ) {
@@ -722,8 +817,9 @@ function drop(event) {
 	{
 		if( models[i].attributes.hostId !== undefined )
 		{
+			checkResourceHost(models[i]);
 			var rPos = models[i].attributes.position;
-			var gPos = placeRhSimple( models[i], models );
+			var gPos = placeRhSimple( models[i] );
 
 			var x = (rPos.x + gPos.x * GRID_SIZE + GRID_SPACING) + 23;
 			var y = (rPos.y + gPos.y * GRID_SIZE + GRID_SPACING) + 49;

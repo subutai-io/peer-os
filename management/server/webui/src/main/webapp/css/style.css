@@ -3123,13 +3123,14 @@ td.b-main-table__status-col {
     position: relative;
     border: 2px solid #ccceee;
     border-radius: 2px;
-    width: 50px;
+    /*width: 50px;*/
     height: 26px;
     line-height: 26px;
     vertical-align: middle;
     text-align: center;
     text-decoration: none;
     font-size: 12px;
+	padding: 0 7px;
 }
 .b-hub-status__btn_active {
     border-color: #4bbc6e;
@@ -3209,6 +3210,7 @@ td.b-main-table__status-col {
     padding: 10px 0;
     border-bottom: 1px dashed #CCCEEE;
     font-size: 13px;
+	line-height: normal;
 }
 .b-hub-status__dropdown .list li:last-child {
     border-bottom: none;
@@ -3257,5 +3259,13 @@ td.b-main-table__status-col {
 
 .js-public-key-manager_show {
 	right: -2px;
+}
+
+.b-dropdown-buttons .b-btn {
+	margin-right: 5px;
+}
+
+.b-dropdown-buttons .b-btn:last-child {
+	margin-right: 0;
 }
 
