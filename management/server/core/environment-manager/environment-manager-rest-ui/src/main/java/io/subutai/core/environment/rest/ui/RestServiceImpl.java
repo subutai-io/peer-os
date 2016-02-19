@@ -99,14 +99,7 @@ public class RestServiceImpl implements RestService
         Set<String> templates =
                 templateRegistry.list().stream().map( TemplateKurjun::getName ).collect( Collectors.toSet() );
 
-        if ( !templates.isEmpty() )
-        {
-            return Response.ok().entity( gson.toJson( templates ) ).build();
-        }
-        else
-        {
-            return Response.status( Response.Status.NOT_FOUND ).build();
-        }
+        return Response.ok().entity( gson.toJson( templates ) ).build();
     }
 
 
@@ -150,7 +143,6 @@ public class RestServiceImpl implements RestService
         {
             ContainerPlacementStrategy placementStrategy = strategyManager.findStrategyById( UnlimitedStrategy.ID );
 
-
             List<NodeSchema> schema =
                     JsonUtil.fromJson( containersJson, new TypeToken<List<NodeSchema>>() {}.getType() );
 
@@ -170,125 +162,31 @@ public class RestServiceImpl implements RestService
         return Response.ok( JsonUtil.toJson( environment.getId() ) ).build();
     }
 
+    @Override
+    public Response buildAdvanced( final String name, final String containersJson )
+    {
 
-    //    @Override
-    //    public Response setupStrategyRequisites( final String name, final String strategy, int sshId, int hostId,
-    //                                             String peerIdList )
-    //    {
-    //        EnvironmentDto environmentDto = null;
-    //
-    //        try
-    //        {
-    //            List<String> peerIds = JsonUtil.fromJson( peerIdList, new TypeToken<List<String>>() {}.getType() );
-    //
-    //            ContainerPlacementStrategy placementStrategy = strategyManager.findStrategyById( strategy );
-    //
-    //            final List<PeerResources> resources = new ArrayList<>();
-    //            for ( String peerId : peerIds )
-    //            {
-    //                if ( "local".equals( peerId ) )
-    //                {
-    //                    resources.add( peerManager.getLocalPeer().getResourceLimits( peerManager.getLocalPeer()
-    // .getId() ) );
-    //                    continue;
-    //                }
-    //
-    //                PeerResources peerResources =
-    //                        peerManager.getPeer( peerId ).getResourceLimits( peerManager.getLocalPeer().getId() );
-    //                resources.add( peerResources );
-    //            }
-    //
-    //            final PeerGroupResources peerGroupResources = new PeerGroupResources( resources );
-    //
-    //            final Map<ContainerSize, ContainerQuota> quotas = quotaManager.getDefaultQuotas();
-    //
-    //            Topology topology = placementStrategy.distribute( name, sshId, hostId, peerGroupResources, quotas );
-    //
-    //            Environment environment = environmentManager.setupRequisites( topology );
-    //
-    //            environmentDto = new EnvironmentDto( environment.getId(), environment.getName(), environment
-    // .getStatus(),
-    //                    Sets.newHashSet(), environment.getRelationDeclaration() );
-    //        }
-    //        catch ( Exception e )
-    //        {
-    //            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
-    //        }
-    //
-    //        return Response.ok( JsonUtil.toJson( environmentDto ) ).build();
-    //    }
+        Environment environment = null;
+
+        try
+        {
+            List<NodeGroup> schema =
+                    JsonUtil.fromJson( containersJson, new TypeToken<List<NodeGroup>>() {}.getType() );
+
+            Topology topology = new Topology( name, 0, 0 );
 
 
-    //    @Override
-    //    public Response buildTopology(final String name, final String topologyJson )
-    //    {
-    //        EnvironmentDto environmentDto;
-    //        try
-    //        {
-    //            Map<String, Set<NodeGroup>> nodeGroupPlacement =
-    //                    gson.fromJson( topologyJson, new TypeToken<Map<String, Set<NodeGroup>>>() {}.getType() );
-    //
-    //
-    //            Topology topology = new Topology( name, 0, 0 );
-    //
-    //
-    //            Iterator it = nodeGroupPlacement.entrySet().iterator();
-    //            while ( it.hasNext() )
-    //            {
-    //                Map.Entry pair = ( Map.Entry ) it.next();
-    //
-    //                for ( NodeGroup nodeGroup : ( Set<NodeGroup> ) pair.getValue() )
-    //                {
-    //                    topology.addNodeGroupPlacement( ( String ) pair.getKey(), nodeGroup );
-    //                }
-    //            }
-    //
-    //
-    //            Environment environment = environmentManager.setupRequisites( topology );
-    //            environmentDto = new EnvironmentDto( environment.getId(), environment.getName(), environment
-    // .getStatus(),
-    //                    Sets.newHashSet(), environment.getRelationDeclaration() );
-    //        }
-    //        catch ( EnvironmentCreationException e )
-    //        {
-    //            LOG.error( "Error creating environment #createEnvironment", e );
-    //            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
-    //        }
-    //        catch ( JsonParseException e )
-    //        {
-    //            LOG.error( "Error validating parameters #createEnvironment", e );
-    //            return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( ERROR_KEY, e
-    // .getMessage() ) )
-    //                           .build();
-    //        }
-    //
-    //        return Response.ok( JsonUtil.toJson( environmentDto ) ).build();
-    //    }
+            schema.forEach( s -> topology.addNodeGroupPlacement(s.getPeerId(), s) );
 
+            environment = environmentManager.createEnvironment( topology, true );
+        }
+        catch ( Exception e )
+        {
+            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+        }
 
-    //    @Override
-    //    public Response startEnvironmentBuild( final String environmentId, final String signedMessage )
-    //    {
-    //        try
-    //        {
-    //            Environment environment = environmentManager.startEnvironmentBuild( environmentId, signedMessage,
-    // false );
-    //        }
-    //        catch ( EnvironmentCreationException e )
-    //        {
-    //            LOG.error( "Error creating environment #createEnvironment", e );
-    //            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
-    //        }
-    //        catch ( JsonParseException e )
-    //        {
-    //            LOG.error( "Error validating parameters #createEnvironment", e );
-    //            return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( ERROR_KEY, e
-    // .getMessage() ) )
-    //                           .build();
-    //        }
-    //
-    //        return Response.ok().build();
-    //    }
+        return Response.ok( JsonUtil.toJson( environment.getId() ) ).build();
+    }
 
 
     @Override

@@ -107,7 +107,13 @@ public class IdentityManagerImpl implements IdentityManager
         sessionManager = new SessionManagerImpl( identityDataService );
         sessionManager.startSessionController();
 
-        createDefaultUsers();
+        try
+        {
+            createDefaultUsers();
+        }
+        catch (Exception e) {
+            LOGGER.error( "***** Error! Error creating users:" + e.toString(), e );
+        }
     }
 
 
@@ -119,8 +125,7 @@ public class IdentityManagerImpl implements IdentityManager
 
 
     //*****************************************************
-    private void createDefaultUsers()
-    {
+    private void createDefaultUsers() throws Exception {
         if ( identityDataService.getAllUsers().size() < 1 )
         {
             PermissionObject permsp[] = PermissionObject.values();
@@ -922,7 +927,7 @@ public class IdentityManagerImpl implements IdentityManager
     @RolesAllowed( "Identity-Management|Write" )
     @Override
     public User createUser( String userName, String password, String fullName, String email, int type, int trustLevel,
-                            boolean generateKeyPair,boolean createUserDelegate)
+                            boolean generateKeyPair,boolean createUserDelegate) throws Exception
     {
         User user   = new UserEntity();
         String salt = "";
@@ -974,7 +979,20 @@ public class IdentityManagerImpl implements IdentityManager
         catch ( Exception ex )
         {
             LOGGER.error( "***** Error! Error creating user:" + ex.toString(), ex );
+            throw ex;
         }
+
+        return user;
+    }
+
+
+    /* *************************************************
+     */
+    @RolesAllowed( "Identity-Management|Write" )
+    @Override
+    public User modifyUser( User user ) throws Exception
+    {
+        identityDataService.updateUser( user );
 
         return user;
     }

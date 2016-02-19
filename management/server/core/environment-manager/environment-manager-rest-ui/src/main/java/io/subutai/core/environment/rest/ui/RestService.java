@@ -48,6 +48,12 @@ public interface RestService
 
 
     @POST
+    @Path( "build/advanced" )
+    @Produces( { MediaType.TEXT_PLAIN } )
+    Response buildAdvanced( @FormParam( "name" ) String name, @FormParam( "containers" ) String containersJson );
+
+
+    @POST
     @Path( "{environmentId}/modify" )
     Response modifyEnvironment(@PathParam( "environmentId" ) String environmentId,
                                @FormParam( "topology" ) String topology,
