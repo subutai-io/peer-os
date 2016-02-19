@@ -11,6 +11,8 @@ import (
 	"github.com/codegangsta/cli"
 )
 
+var TIMESTAMP string = "-unknown"
+
 func init() {
 	os.Setenv("PATH", "/apps/subutai/current/bin:/apps/subutai-mng/current/bin:"+os.Getenv("PATH"))
 	if len(os.Args) > 1 {
@@ -23,7 +25,7 @@ func init() {
 func main() {
 	app := cli.NewApp()
 	app.Name = "Subutai"
-	app.Version = "v4.0.0-RC6"
+	app.Version = "v4.0.0-RC6"+TIMESTAMP
 	app.Usage = "daemon and command line interface binary"
 
 	app.Flags = []cli.Flag{cli.BoolFlag{
