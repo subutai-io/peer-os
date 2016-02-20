@@ -8,7 +8,7 @@ angular.module('subutai.identity-user.controller', [])
 	.directive('colSelect2', colSelect2);
 
 IdentityUserCtrl.$inject = ['$scope', 'identitySrv', 'SweetAlert', 'ngDialog', 'cfpLoadingBar', 'DTOptionsBuilder', 'DTColumnBuilder', '$resource', '$compile'];
-IdentityUserFormCtrl.$inject = ['$scope', 'identitySrv', 'ngDialog'];
+IdentityUserFormCtrl.$inject = ['$scope', 'identitySrv', 'ngDialog', 'SweetAlert'];
 
 var trustedLevels = {
 	1: "Never Trust",
@@ -283,7 +283,7 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 
 };
 
-function IdentityUserFormCtrl($scope, identitySrv, ngDialog) {
+function IdentityUserFormCtrl($scope, identitySrv, ngDialog, SweetAlert) {
 
 	var vm = this;
 	vm.user2Add = {};
