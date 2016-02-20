@@ -119,11 +119,13 @@ function CurrentUserCtrl($location, $rootScope, $http) {
 function SubutaiController($rootScope) {
 	var vm = this;
 	vm.bodyClass = '';
+	vm.activeState = '';
 
 	$rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams){
 		vm.layoutType = 'subutai-app/common/layouts/' + toState.data.layout + '.html';
 		if (angular.isDefined(toState.data.bodyClass)) {
 			vm.bodyClass = toState.data.bodyClass;
+			vm.activeState = toState.name;
 			return;
 		}
 
@@ -721,21 +723,20 @@ app.directive('dropdownMenu', function() {
 			//colEqualHeight();
 
 			$('.b-nav-menu-link').on('click', function(){
+				$('.b-nav-menu__sub').slideUp(300);
 				if($(this).next('.b-nav-menu__sub').length > 0) {
 					if($(this).parent().hasClass('b-nav-menu_active')) {
 						$(this).parent().removeClass('b-nav-menu_active');
-						$(this).next('.b-nav-menu__sub').slideUp(300, function(){
-							//colEqualHeight();
-						});
+						$(this).next('.b-nav-menu__sub').slideUp(300);
 					} else {
 						$('.b-nav-menu_active').removeClass('b-nav-menu_active')
-						$('.b-nav-menu__sub').slideUp(200);
 						$(this).parent().addClass('b-nav-menu_active');
-						$(this).next('.b-nav-menu__sub').slideDown(300, function(){
-							//colEqualHeight();
-						});
+						$(this).next('.b-nav-menu__sub').slideDown(300);
 					}
 					return false;
+				} else {
+					$('.b-nav-menu__sub').slideUp(300);
+					$('.b-nav-menu_active').removeClass('b-nav-menu_active');
 				}
 			});
 		}

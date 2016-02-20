@@ -81,6 +81,12 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder,
 	function rejectPeerRequest(peerId) {
 		peerRegistrationService.rejectPeerRequest(peerId).success(function (data) {
 			vm.dtInstance.reloadData(null, false);
+		}).error(function(error){
+			if(error.ERROR !== undefined) {
+				SweetAlert.swal("ERROR!", error.ERROR, "error");
+			} else {
+				SweetAlert.swal("ERROR!", error, "error");
+			}
 		});
 	}
 
