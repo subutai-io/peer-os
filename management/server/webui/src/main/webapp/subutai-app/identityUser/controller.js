@@ -133,9 +133,8 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 		if(userId) {
 			user = vm.users[userId];
 		}
-		/*identitySrv.getKey(user.securityKeyId).success(function(data) {
-			user.public_key = data;
-		});*/
+
+
 		ngDialog.open({
 			template: 'subutai-app/identityUser/partials/userForm.html',
 			controller: 'IdentityUserFormCtrl',
