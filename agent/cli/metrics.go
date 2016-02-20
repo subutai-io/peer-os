@@ -3,9 +3,13 @@ package lib
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/influxdb/influxdb/client/v2"
-	"github.com/subutai-io/Subutai/agent/config"
 	"os"
+	"time"
+
+	"github.com/influxdb/influxdb/client/v2"
+
+	"github.com/subutai-io/Subutai/agent/config"
+	"github.com/subutai-io/Subutai/agent/log"
 )
 
 var (
@@ -13,6 +17,9 @@ var (
 	tableNet  = "host_net"
 	tableMem  = "host_memory"
 	tableDisk = "host_disk"
+
+	timeRange = "day"
+	timeGroup = "1m"
 )
 
 // queryDB convenience function to query the database
@@ -45,27 +52,41 @@ func HostMetrics(host, start, end string) {
 		tableMem = "lxc_memory"
 		tableDisk = "lxc_disk"
 	}
+	a, err := time.Parse("2006-01-02 15:04:05", start)
+	log.Check(log.ErrorLevel, "Parsing start date", err)
+	b, err := time.Parse("2006-01-02 15:04:05", end)
+	log.Check(log.ErrorLevel, "Parsing end date", err)
+
+	delta := b.Sub(a)
+	if delta.Hours() <= 1 {
+		timeRange = "hour"
+		timeGroup = "30s"
+	} else if delta.Hours() > 24 {
+		timeRange = "week"
+		timeGroup = "5m"
+	}
+
 	fmt.Println("{\"Metrics\":")
 	res, _ := queryInfluxDB(c, `
 			SELECT non_negative_derivative(mean(value),1s) as value
-			FROM day.`+tableCPU+`
+			FROM `+timeRange+`.`+tableCPU+`
 			WHERE hostname = '`+host+`' AND time > '`+start+`' AND time < '`+end+`'
-			GROUP BY time(1m), type fill(none);
+			GROUP BY time(`+timeGroup+`), type fill(none);
 
 			SELECT non_negative_derivative(mean(value),1s) as value
-			FROM day.`+tableNet+`
+			FROM `+timeRange+`.`+tableNet+`
 			WHERE hostname = '`+host+`' AND time > '`+start+`' AND time < '`+end+`'
-			GROUP BY time(1m), iface, type fill(none);
+			GROUP BY time(`+timeGroup+`), iface, type fill(none);
 
 			SELECT mean(value) as value
-			FROM day.`+tableMem+`
+			FROM `+timeRange+`.`+tableMem+`
 			WHERE hostname = '`+host+`' AND time > '`+start+`' AND time < '`+end+`'
-			GROUP BY time(1m), type fill(none);
+			GROUP BY time(`+timeGroup+`), type fill(none);
 
 			SELECT mean(value) as value
-			FROM day.`+tableDisk+`
+			FROM `+timeRange+`.`+tableDisk+`
 			WHERE hostname = '`+host+`' AND time > '`+start+`' AND time < '`+end+`'
-			GROUP BY time(1m), mount, type fill(none);
+			GROUP BY time(`+timeGroup+`), mount, type fill(none);
 		`)
 	out, _ := json.Marshal(res)
 	fmt.Println(string(out))

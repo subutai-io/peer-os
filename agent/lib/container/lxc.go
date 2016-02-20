@@ -161,9 +161,9 @@ func Clone(parent, child string) {
 	err = c.Clone(child, lxc.CloneOptions{Backend: backend})
 	log.Check(log.FatalLevel, "Cloning container", err)
 
-	fs.SubvolumeClone(config.Agent.LxcPrefix + parent+"/home", config.Agent.LxcPrefix + child+"/home")
-	fs.SubvolumeClone(config.Agent.LxcPrefix + parent+"/opt", config.Agent.LxcPrefix + child+"/opt")
-	fs.SubvolumeClone(config.Agent.LxcPrefix + parent+"/var", config.Agent.LxcPrefix + child+"/var")
+	fs.SubvolumeClone(config.Agent.LxcPrefix+parent+"/home", config.Agent.LxcPrefix+child+"/home")
+	fs.SubvolumeClone(config.Agent.LxcPrefix+parent+"/opt", config.Agent.LxcPrefix+child+"/opt")
+	fs.SubvolumeClone(config.Agent.LxcPrefix+parent+"/var", config.Agent.LxcPrefix+child+"/var")
 
 	SetContainerConf(child, [][]string{
 		{"lxc.network.link", ""},
@@ -173,6 +173,7 @@ func Clone(parent, child string) {
 		{"lxc.mount.entry", config.Agent.LxcPrefix + child + "/home home none bind,rw 0 0"},
 		{"lxc.mount.entry", config.Agent.LxcPrefix + child + "/opt opt none bind,rw 0 0"},
 		{"lxc.mount.entry", config.Agent.LxcPrefix + child + "/var var none bind,rw 0 0"},
+		{"lxc.network.mtu", ""},
 	})
 }
 
