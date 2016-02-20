@@ -25,6 +25,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 import io.subutai.common.settings.ChannelSettings;
+import io.subutai.common.settings.SystemSettings;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
@@ -88,21 +89,21 @@ public class MessageContentUtil
         String basePath = req.getRequestURI();
 
 
-        if ( inPort == ChannelSettings.SECURE_PORT_X1 )
+        if ( inPort == SystemSettings.getSecurePortX1() )
         {
             if ( ChannelSettings.checkURLAccess( basePath, ChannelSettings.URL_ACCESS_PX1 ) == 0 )
             {
                 status = 1;
             }
         }
-        else if ( inPort == ChannelSettings.OPEN_PORT )
+        else if ( inPort == SystemSettings.getOpenPort() )
         {
             if ( ChannelSettings.checkURLAccess( basePath, ChannelSettings.URL_ACCESS_PX1 ) == 0 )
             {
                 status = 1;
             }
         }
-        else if ( inPort ==  ChannelSettings.SPECIAL_PORT_X1 ) //file server
+        else if ( inPort ==  SystemSettings.getSpecialPortX1() ) //file server
         {
             if ( basePath.startsWith( "/rest/kurjun" ) )
             {

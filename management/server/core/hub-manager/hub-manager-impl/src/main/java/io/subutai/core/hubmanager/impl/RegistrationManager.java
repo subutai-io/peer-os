@@ -28,8 +28,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
-import io.subutai.common.settings.PeerSettings;
 import io.subutai.common.settings.SubutaiInfo;
+import io.subutai.common.settings.SystemSettings;
 import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.hub.share.dto.PeerInfoDto;
 import io.subutai.hub.share.dto.RegistrationDto;
@@ -140,7 +140,7 @@ public class RegistrationManager
                 manager.getConfigDataService().saveHubConfig( configManager.getHubConfiguration() );
                 LOG.debug( "Hub configuration saved successfully." );
                 LOG.debug( "Peer registered successfully." );
-                PeerSettings.setRegisterToHubState( true );
+                SystemSettings.setRegisterToHubState( true );
             }
             else
             {

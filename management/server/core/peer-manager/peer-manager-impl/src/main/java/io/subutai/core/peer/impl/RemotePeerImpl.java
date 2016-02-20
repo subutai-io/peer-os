@@ -66,8 +66,8 @@ import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.PublicKeyContainer;
-import io.subutai.common.settings.ChannelSettings;
 import io.subutai.common.settings.SecuritySettings;
+import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
@@ -114,7 +114,7 @@ public class RemotePeerImpl implements RemotePeer
 
         int port = peerInfo.getPort();
 
-        if ( port == ChannelSettings.SPECIAL_PORT_X1 || port == ChannelSettings.OPEN_PORT )
+        if ( port == SystemSettings.getSpecialPortX1() || port == SystemSettings.getOpenPort() )
         {
             url = String.format( "http://%s:%s/rest/v1/peer", peerInfo.getIp(), peerInfo.getPort() );
         }

@@ -9,12 +9,17 @@
 				<li class="b-tabs-menu__item"
 					ng-click="bazaarCtrl.activeTab = 'hub'"
 					ng-class="bazaarCtrl.activeTab == 'hub' ? 'b-tabs-menu__item_active' : ''">
-					Bazaar
+					Available
+				</li>
+				<li class="b-tabs-menu__item"
+					ng-click="bazaarCtrl.activeTab = 'plugins'"
+					ng-class="bazaarCtrl.activeTab == 'plugins' ? 'b-tabs-menu__item_active' : ''">
+					Installed
 				</li>
 				<li class="b-tabs-menu__item"
 					ng-click="bazaarCtrl.activeTab = 'other'"
 					ng-class="bazaarCtrl.activeTab == 'other' ? 'b-tabs-menu__item_active' : ''">
-					Plugin integrator
+					Advanced
 				</li>
 			</ul>
 		</div>
@@ -27,6 +32,10 @@
 		<div
 				ng-if="bazaarCtrl.activeTab == 'hub'"
 				ng-include="'subutai-app/bazaar/partials/hub.html'">
+		</div>
+		<div
+				ng-if="bazaarCtrl.activeTab == 'plugins'"
+				ng-include="'subutai-app/bazaar/partials/plugins.html'">
 		</div>
 		<div
 				ng-if="bazaarCtrl.activeTab == 'other'"
