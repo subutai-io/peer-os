@@ -286,7 +286,7 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 function IdentityUserFormCtrl($scope, identitySrv, ngDialog, SweetAlert) {
 
 	var vm = this;
-	vm.user2Add = {};
+	vm.user2Add = {"trustLevel": 2};
 	vm.roles = [];
 	vm.currentUserRoles = [];
 	vm.editUserName = false;

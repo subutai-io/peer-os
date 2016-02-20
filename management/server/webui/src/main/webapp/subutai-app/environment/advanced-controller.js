@@ -43,15 +43,15 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 	vm.showResources = showResources;
 	vm.addResource2Build = addResource2Build;
 
-	/*environmentService.getTemplates()
+	environmentService.getTemplates()
 		.success(function (data) {
 			vm.templates = data;
 		})
 		.error(function (data) {
 			VARS_MODAL_ERROR( SweetAlert, 'Error on getting templates ' + data );
-		});*/
+		});
 
-	vm.templates = ['mongo', 'cassandra', 'master', 'hadoop'];
+	//vm.templates = ['mongo', 'cassandra', 'master', 'hadoop'];
 
 	environmentService.getStrategies().success(function (data) {
 		vm.strategies = data;
@@ -66,6 +66,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 		//vm.peerIds['testPeer'] = ['rh1', 'rh2', 'rh3'];
 		console.log(vm.peerIds);
 	});
+	clearWorkspace();
 
 	/*peerRegistrationService.getResourceHosts().success(function (data) {
 		vm.resourceHosts = data;
@@ -393,6 +394,8 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 			switch (className) {
 				case 'element-tool-remove':
 					var rh = this.model.attributes.rh;
+					var resourceHost = graph.getCell(rh.model);
+					resourceHost.set('children', resourceHost.get('children') - 1);
 					delete graph.getCell(rh.model).attributes.grid[rh.x][rh.y];
 					this.model.remove();
 					return;
