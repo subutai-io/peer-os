@@ -762,6 +762,10 @@ input[type=checkbox] {
     display: none;
 }
 
+.b-nav-menu_active .b-nav-menu__sub {
+	display: block;
+}
+
 .b-nav-menu-sub {
     box-sizing: border-box;
     height: 25px;

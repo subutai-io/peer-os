@@ -5,7 +5,7 @@
 		</a>
 	</div>
 	<ul class="b-nav__menu">
-		<li class="b-nav-menu">
+		<li class="b-nav-menu" ng-class="subutaiController.activeState == 'home' ? 'b-nav-menu_active' : ''">
 			<a ui-sref="home" class="b-nav-menu-link" id="subt-link__monitoring">
 				<span class="b-nav-menu__icon b-nav-menu-link__item">
 					<svg class="b-nav-menu-icon">
@@ -20,7 +20,7 @@
 				</span>-->
 			</a>
 		</li>
-		<li class="b-nav-menu">
+		<li class="b-nav-menu" ng-class="subutaiController.activeState == 'environments' || subutaiController.activeState == 'containers' ? 'b-nav-menu_active' : ''">
 			<a class="b-nav-menu-link" href id="subt-link__environment">
 				<span class="b-nav-menu__icon b-nav-menu-link__item">
 					<svg class="b-nav-menu-icon">
@@ -46,7 +46,7 @@
 				</li>
 			</ul>
 		</li>
-		<li class="b-nav-menu">
+		<li class="b-nav-menu" ng-class="subutaiController.activeState == 'kurjun' ? 'b-nav-menu_active' : ''">
 			<a ui-sref="kurjun" class="b-nav-menu-link" id="subt-link__kurjun">
 				<span class="b-nav-menu__icon b-nav-menu-link__item">
 					<svg class="b-nav-menu-icon">
@@ -58,7 +58,7 @@
 				</span>
 			</a>
 		</li>
-		<li class="b-nav-menu">
+		<li class="b-nav-menu" ng-class="subutaiController.activeState == 'console' ? 'b-nav-menu_active' : ''">
 			<a ui-sref="console" class="b-nav-menu-link" id="subt-link__console">
 				<span class="b-nav-menu__icon b-nav-menu-link__item">
 					<svg class="b-nav-menu-icon">
@@ -70,7 +70,8 @@
 				</span>
 			</a>
 		</li>
-		<li class="b-nav-menu">
+		<li class="b-nav-menu" 
+		ng-class="subutaiController.activeState == 'identity-user' || subutaiController.activeState == 'identity-role' || subutaiController.activeState == 'account-settings' || subutaiController.activeState == 'tokens' ? 'b-nav-menu_active' : ''">
 			<a class="b-nav-menu-link" href id="subt-link__user-identity">
 				<span class="b-nav-menu__icon b-nav-menu-link__item">
 					<svg class="b-nav-menu-icon">
@@ -99,7 +100,7 @@
 				</li>
 			</ul>
 		</li>
-		<li class="b-nav-menu">
+		<li class="b-nav-menu" ng-class="subutaiController.activeState == 'peer-registration' ? 'b-nav-menu_active' : ''">
 			<a ui-sref="peer-registration" class="b-nav-menu-link" id="subt-link__peer-registration">
 				<span class="b-nav-menu__icon b-nav-menu-link__item">
 					<svg class="b-nav-menu-icon">
@@ -111,7 +112,7 @@
 				</span>
 			</a>
 		</li>
-		<li class="b-nav-menu">
+		<li class="b-nav-menu" ng-class="subutaiController.activeState == 'nodeReg' ? 'b-nav-menu_active' : ''">
 			<a ui-sref="nodeReg" class="b-nav-menu-link" id="subt-link__resource-node">
 				<span class="b-nav-menu__icon b-nav-menu-link__item">
 					<svg class="b-nav-menu-icon">
@@ -123,7 +124,7 @@
 				</span>
 			</a>
 		</li>
-		<li class="b-nav-menu">
+		<li class="b-nav-menu" ng-class="subutaiController.activeState == 'tracker' ? 'b-nav-menu_active' : ''">
 			<a ui-sref="tracker" class="b-nav-menu-link" id="subt-link__treaker">
 				<span class="b-nav-menu__icon b-nav-menu-link__item">
 					<svg class="b-nav-menu-icon">
@@ -135,7 +136,7 @@
 				</span>
 			</a>
 		</li>
-		<li class="b-nav-menu">
+		<li class="b-nav-menu" ng-class="subutaiController.activeState == 'bazaar' ? 'b-nav-menu_active' : ''">
 			<a ui-sref="bazaar" class="b-nav-menu-link" id="subt-link__bazaar">
 				<span class="b-nav-menu__icon b-nav-menu-link__item">
 					<svg class="b-nav-menu-icon">
@@ -147,7 +148,8 @@
 				</span>
 			</a>
 		</li>
-		<li class="b-nav-menu">
+		<li class="b-nav-menu" 
+		ng-class="subutaiController.activeState == 'about' || subutaiController.activeState == 'settings-peer' || subutaiController.activeState == 'settings-kurjun' || subutaiController.activeState == 'settings-network' || subutaiController.activeState == 'updates' ? 'b-nav-menu_active' : ''">
 			<a class="b-nav-menu-link" href id="subt-link__settings">
 				<span class="b-nav-menu__icon b-nav-menu-link__item">
 					<svg class="b-nav-menu-icon">

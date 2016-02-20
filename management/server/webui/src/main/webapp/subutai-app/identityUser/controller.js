@@ -133,9 +133,8 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 		if(userId) {
 			user = vm.users[userId];
 		}
-		/*identitySrv.getKey(user.securityKeyId).success(function(data) {
-			user.public_key = data;
-		});*/
+
+
 		ngDialog.open({
 			template: 'subutai-app/identityUser/partials/userForm.html',
 			controller: 'IdentityUserFormCtrl',
@@ -286,7 +285,7 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 function IdentityUserFormCtrl($scope, identitySrv, ngDialog, SweetAlert) {
 
 	var vm = this;
-	vm.user2Add = {};
+	vm.user2Add = {"trustLevel": 2};
 	vm.roles = [];
 	vm.currentUserRoles = [];
 	vm.editUserName = false;

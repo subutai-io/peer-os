@@ -3,6 +3,7 @@ package io.subutai.core.metric.rest.ui;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 
 import javax.ws.rs.core.Response;
 
@@ -49,9 +50,9 @@ public class RestServiceImpl implements RestService
         try
         {
             Calendar calendar = Calendar.getInstance();
-            Date current = new Date( calendar.getTime().getTime() );
+            Date current = new Date( calendar.getTime().getTime() - Calendar.getInstance().getTimeZone().getRawOffset() );
             calendar.add( Calendar.HOUR, (-interval) );
-            Date start = calendar.getTime();
+            Date start = new Date( calendar.getTime().getTime() - Calendar.getInstance().getTimeZone().getRawOffset() );
 
             Host host;
             if( environmentId != null && hostId != null )
