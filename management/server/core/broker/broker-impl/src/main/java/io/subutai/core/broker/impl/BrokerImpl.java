@@ -352,6 +352,15 @@ public class BrokerImpl implements Broker
         kahaDBPersistenceAdapter.setEnableJournalDiskSyncs( false );
         kahaDBPersistenceAdapter.setDirectory( getBrokerDbPath() );
 
+//        kahaDBPersistenceAdapter.setForceRecoverIndex( true );
+        kahaDBPersistenceAdapter.setIgnoreMissingJournalfiles( true );
+//        kahaDBPersistenceAdapter.setEnableIndexRecoveryFile( true );
+        kahaDBPersistenceAdapter.setCheckForCorruptJournalFiles( true );
+//        kahaDBPersistenceAdapter.setArchiveCorruptedIndex( true );
+        kahaDBPersistenceAdapter.setChecksumJournalFiles( true );
+        kahaDBPersistenceAdapter.deleteAllMessages();
+
+
         getBroker().setPersistenceAdapter( kahaDBPersistenceAdapter );
 
 
