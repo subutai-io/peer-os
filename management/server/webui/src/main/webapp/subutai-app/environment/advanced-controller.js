@@ -64,6 +64,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 	environmentService.getPeers().success(function (data) {
 		vm.peerIds = data;
 		//vm.peerIds['testPeer'] = ['rh1', 'rh2', 'rh3'];
+		console.log(vm.peerIds);
 	});
 
 	/*peerRegistrationService.getResourceHosts().success(function (data) {
