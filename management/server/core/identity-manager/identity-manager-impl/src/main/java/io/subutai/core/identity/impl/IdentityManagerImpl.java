@@ -936,7 +936,7 @@ public class IdentityManagerImpl implements IdentityManager
         {
             if ( isValidUserName( userName ) != 0)
             {
-                throw new IllegalArgumentException( "Error!!! Invalid username:" + userName);
+                throw new IllegalArgumentException( "Error!!! Invalid username, username must be more than 4 symbols and doesn't contain any system names:" + userName);
             }
 
             if ( isValidPassword( userName, password ) != 0)

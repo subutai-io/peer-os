@@ -21,20 +21,3 @@ $('body').on('click', '.js-hide-resources', function(){
 
 var UPDATE_NIGHTLY_BUILD_STATUS;
 
-//document.getElementById("uploadBtn").onchange = function () {
-//	document.getElementById("uploadFile").value = this.value;
-//};
-/*$('a.js-cbox-modal').colorbox({
-	title: " ",
-	transition: "none",
-	previous: false,
-	next: false,
-	arrowKey: false,
-	rel: false,
-	overlayClose: true,
-	opacity: 0.8,
-	closeButton: false,
-	onComplete: function() {
-		$.colorbox.resize();
-	}
-});*/
