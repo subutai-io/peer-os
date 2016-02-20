@@ -1,9 +1,7 @@
 package io.subutai.core.peer.impl;
 
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
@@ -166,7 +164,8 @@ public class PeerManagerImpl implements PeerManager
                 else
                 {
                     localPeerInfo.setPublicUrl( SystemSettings.getPublicUrl() );
-                    localPeerInfo.setName( String.format( "Peer %s on %s", localPeerId, SystemSettings.getPublicUrl() ) );
+                    localPeerInfo
+                            .setName( String.format( "Peer %s on %s", localPeerId, SystemSettings.getPublicUrl() ) );
                 }
 
                 PeerPolicy policy = getDefaultPeerPolicy( localPeerId );
@@ -266,9 +265,8 @@ public class PeerManagerImpl implements PeerManager
         {
             byte[] key = SecurityUtilities.generateKey( keyPhrase.getBytes( "UTF-8" ) );
             String decryptedCert = encryptedData.decrypt( key, String.class );
-            securityManager.getKeyStoreManager()
-                           .importCertAsTrusted( SystemSettings.getSecurePortX2(), registrationData.getPeerInfo().getId(),
-                                   decryptedCert );
+            securityManager.getKeyStoreManager().importCertAsTrusted( SystemSettings.getSecurePortX2(),
+                    registrationData.getPeerInfo().getId(), decryptedCert );
             securityManager.getHttpContextManager().reloadKeyStore();
 
             PeerPolicy policy = getDefaultPeerPolicy( registrationData.getPeerInfo().getId() );
@@ -1024,6 +1022,7 @@ public class PeerManagerImpl implements PeerManager
             }
         }
 
+
         private void checkPeers()
         {
             try
@@ -1086,23 +1085,6 @@ public class PeerManagerImpl implements PeerManager
             Host rh = localPeer.getResourceHostByContainerName( "management" );
 
             return rh.getInterfaceByName( SystemSettings.getExternalIpInterface() ).getIp();
-        }
-
-
-        private String getPublicIp()
-        {
-            String result = null;
-            try
-            {
-                URL url = new URL( "http://checkip.amazonaws.com" );
-                BufferedReader in = new BufferedReader( new InputStreamReader( url.openStream() ) );
-                result = in.readLine();
-            }
-            catch ( IOException e )
-            {
-                // ignore
-            }
-            return result;
         }
     }
 
