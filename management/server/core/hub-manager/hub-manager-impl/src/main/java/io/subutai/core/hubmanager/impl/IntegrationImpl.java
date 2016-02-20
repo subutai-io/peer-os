@@ -99,7 +99,7 @@ public class IntegrationImpl implements Integration
 
 
             this.hearbeatExecutorService.scheduleWithFixedDelay( heartbeatProcessor, 10, 120, TimeUnit.SECONDS );
-            this.resourceHostConfExecutorService.scheduleWithFixedDelay( resourceHostConfProcessor, 180, 10800,
+            this.resourceHostConfExecutorService.scheduleWithFixedDelay( resourceHostConfProcessor, 180, 900,
                     TimeUnit.SECONDS ); // Executes every 3 hours
             this.resourceHostMonitorExecutorService
                     .scheduleWithFixedDelay( resourceHostMonitorProcessor, 30, 300, TimeUnit.SECONDS );
