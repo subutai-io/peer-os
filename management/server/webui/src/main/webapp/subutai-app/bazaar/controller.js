@@ -15,6 +15,11 @@ function BazaarCtrl($scope, BazaarSrv, ngDialog, SweetAlert, $location, cfpLoadi
 /*	vm.plugins = [{name: "test", version: "BETA", description: "Some desc...", installed: true, img: "http://twimgs.com/informationweek/galleries/automated/723/01_Hadoop_full.jpg"}, {name: "test2", version: "ALPHA", description: "Some desc...", installed: false, img: "https://flume.apache.org/_static/flume-logo.png"}];*/
 	vm.plugins = [];
 	vm.activeTab = "hub";
+	vm.changeTab = changeTab;
+	function changeTab (tab) {
+		vm.activeTab = tab;
+		getHubPlugins();
+	}
 	vm.installedPlugins = [];
 	vm.installedHubPlugins = [];
 	vm.notRegistered = true;
@@ -45,6 +50,11 @@ function BazaarCtrl($scope, BazaarSrv, ngDialog, SweetAlert, $location, cfpLoadi
 							}
 						}
 						$scope.$applyAsync (function() {
+							var toScroll = document.getElementById (localStorage.getItem ("bazaarScroll"));
+							if (toScroll !== null) {
+								toScroll.scrollIntoView();
+							}
+							localStorage.removeItem ("bazaarScroll");
 							var index = 0;
 							var counter = 0;
 							[].slice.call (document.querySelectorAll (".progress-button")).forEach (function (bttn, pos) {
@@ -393,7 +403,8 @@ function BazaarCtrl($scope, BazaarSrv, ngDialog, SweetAlert, $location, cfpLoadi
 					instance.stop (1);
 					clearInterval (interval);
 					setTimeout (function() {
-						getInstalledHubPlugins();
+						localStorage.setItem ("bazaarScroll", plugin.id);
+						location.reload();
 					}, 2000);
 				}, 2000);
 			}).error (function (error) {
@@ -423,7 +434,8 @@ function BazaarCtrl($scope, BazaarSrv, ngDialog, SweetAlert, $location, cfpLoadi
 					instance.stop (1);
 					clearInterval (interval);
 					setTimeout (function() {
-						getInstalledHubPlugins();
+						localStorage.setItem ("bazaarScroll", plugin.id);
+						location.reload();
 					}, 2000);
 				}, 2000);
 			}).error (function (error) {
