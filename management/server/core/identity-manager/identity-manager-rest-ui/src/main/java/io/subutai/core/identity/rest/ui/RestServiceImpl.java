@@ -171,6 +171,12 @@ public class RestServiceImpl implements RestService
         Preconditions.checkArgument( !Strings.isNullOrEmpty( fullName ), "fullname is missing" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( email ), "email must be set" );
 
+        if(  username.equalsIgnoreCase( "sys" ) || username.toLowerCase().contains( "sys" ) )
+        {
+            LOGGER.error( "Error setting bad username #saveUser" );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( "bad username" ) ).build();
+        }
+
         try
         {
             User newUser;

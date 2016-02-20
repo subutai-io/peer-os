@@ -1130,9 +1130,7 @@ public class IdentityManagerImpl implements IdentityManager
             }
             else if ( userName.equalsIgnoreCase( "token" )  ||
                     userName.equalsIgnoreCase( "administrator" ) ||
-                    userName.equalsIgnoreCase( "system" ) ||
-                    userName.equalsIgnoreCase( "sys" ) ||
-                    !"sys".contains( userName.toLowerCase() ))
+                    userName.equalsIgnoreCase( "system" ))
             {
                 return 1;
             }
