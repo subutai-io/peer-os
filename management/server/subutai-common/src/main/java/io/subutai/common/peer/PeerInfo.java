@@ -23,10 +23,10 @@ public class PeerInfo implements Serializable
     private String ownerId;
 
     @JsonProperty( "publicUrl" )
-    private String publicUrl = "";
+    private String publicUrl;
 
     @JsonProperty( "ip" )
-    private String ip = "UNKNOWN";
+    private String ip;
 
     @JsonProperty( "name" )
     private String name;

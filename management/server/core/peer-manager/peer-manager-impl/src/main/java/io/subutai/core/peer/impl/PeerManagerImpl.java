@@ -166,6 +166,7 @@ public class PeerManagerImpl implements PeerManager
                     localPeerInfo.setPublicUrl( SystemSettings.getPublicUrl() );
                     localPeerInfo
                             .setName( String.format( "Peer %s on %s", localPeerId, SystemSettings.getPublicUrl() ) );
+                    localPeerInfo.setPublicUrl("https://127.0.0.1:8443");
                 }
 
                 PeerPolicy policy = getDefaultPeerPolicy( localPeerId );
@@ -1034,7 +1035,7 @@ public class PeerManagerImpl implements PeerManager
                         if ( peer.isLocal() )
                         {
                             LocalPeer localPeer = ( LocalPeer ) peer;
-                            if ( "UNKNOWN".equals( localPeer.getPeerInfo().getIp() ) )
+                            if ( "127.0.0.1".equals( localPeer.getPeerInfo().getIp() ) )
                             {
                                 setDefaultPublicUrl( localPeer );
                             }
