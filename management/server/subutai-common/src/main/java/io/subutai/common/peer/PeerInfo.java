@@ -22,7 +22,7 @@ public class PeerInfo implements Serializable
     @JsonProperty( "ownerId" )
     private String ownerId;
 
-    @JsonProperty( "publicURL" )
+    @JsonProperty( "publicUrl" )
     private String publicUrl = "";
 
     @JsonProperty( "ip" )
@@ -36,7 +36,7 @@ public class PeerInfo implements Serializable
 
 
     public PeerInfo( @JsonProperty( "id" ) final String id, @JsonProperty( "ownerId" ) final String ownerId,
-                     @JsonProperty( "publicURL" ) final String publicUrl, @JsonProperty( "ip" ) final String ip,
+                     @JsonProperty( "publicUrl" ) final String publicUrl, @JsonProperty( "ip" ) final String ip,
                      @JsonProperty( "name" ) final String name, @JsonProperty( "port" ) final int port )
     {
         this.id = id;

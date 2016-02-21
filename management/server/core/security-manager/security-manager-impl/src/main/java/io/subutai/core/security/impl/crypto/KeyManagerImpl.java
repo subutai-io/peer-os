@@ -122,10 +122,10 @@ public class KeyManagerImpl implements KeyManager
 
         try
         {
-            InputStream peerSecStream = PGPEncryptionUtil.getFileInputStream(
-                    System.getenv( "SUBUTAI_APP_KEYSTORE_PATH" ) + "/peer.secret.key" );
-            InputStream peerPubStream = PGPEncryptionUtil.getFileInputStream(
-                    System.getenv( "SUBUTAI_APP_KEYSTORE_PATH" ) + "/peer.signed.public.key" );
+            InputStream peerSecStream = PGPEncryptionUtil
+                    .getFileInputStream( System.getenv( "SUBUTAI_APP_KEYSTORE_PATH" ) + "/peer.secret.key" );
+            InputStream peerPubStream = PGPEncryptionUtil
+                    .getFileInputStream( System.getenv( "SUBUTAI_APP_KEYSTORE_PATH" ) + "/peer.signed.public.key" );
 
             if ( peerPubStream == null || peerSecStream == null )
             {
@@ -134,22 +134,22 @@ public class KeyManagerImpl implements KeyManager
             }
             else
             {
-                PGPPublicKeyRing peerPubRing  = PGPKeyUtil.readPublicKeyRing( peerPubStream );
-                PGPSecretKeyRing peerSecRing  = PGPKeyUtil.readSecretKeyRing( peerSecStream );
+                PGPPublicKeyRing peerPubRing = PGPKeyUtil.readPublicKeyRing( peerPubStream );
+                PGPSecretKeyRing peerSecRing = PGPKeyUtil.readSecretKeyRing( peerSecStream );
 
-                String peerId  = PGPKeyUtil.getFingerprint( peerPubRing.getPublicKey().getFingerprint() );
+                String peerId = PGPKeyUtil.getFingerprint( peerPubRing.getPublicKey().getFingerprint() );
 
                 keyData.setManHostId( peerId );
 
-                saveSecretKeyRing( peerId, SecurityKeyType.PeerKey.getId(),peerSecRing);
+                saveSecretKeyRing( peerId, SecurityKeyType.PeerKey.getId(), peerSecRing );
                 savePublicKeyRing( peerId, SecurityKeyType.PeerKey.getId(), peerPubRing );
                 //************************************************************
             }
-                //************************************************************
+            //************************************************************
         }
         catch ( Exception ex )
         {
-            LOG.error( " **** Error creating Keypair for LocalPeer **** :" + ex.toString(),ex );
+            LOG.error( " **** Error creating Keypair for LocalPeer **** :" + ex.toString(), ex );
         }
     }
 
@@ -168,10 +168,11 @@ public class KeyManagerImpl implements KeyManager
      *
      */
     @Override
-    public void setPeerOwnerId(String id)
+    public void setPeerOwnerId( String id )
     {
         keyData.setPeerOwnerId( id );
     }
+
 
     /* ***************************************************************
      *
@@ -181,6 +182,7 @@ public class KeyManagerImpl implements KeyManager
     {
         return keyData.getPeerOwnerId();
     }
+
 
     /* ***************************************************************
      *
@@ -1148,34 +1150,34 @@ public class KeyManagerImpl implements KeyManager
      * Get Public key and save it in the local KeyServer
      */
     @Override
-    public PGPPublicKey getRemoteHostPublicKey( String remoteHostId, String ip )
+    public PGPPublicKey getRemoteHostPublicKey( /*String remoteHostId,*/ PeerInfo peerInfo )
     {
         try
         {
             PGPPublicKeyRing pubRing;
 
-            if ( Strings.isNullOrEmpty( remoteHostId ) )
-            {
-                remoteHostId = getRemoteHostId( ip );
-            }
+            //            if ( Strings.isNullOrEmpty( remoteHostId ) )
+            //            {
+            //                remoteHostId = getRemoteHostId( ip );
+            //            }
 
-            pubRing = getPublicKeyRing( remoteHostId );
+            pubRing = getPublicKeyRing( peerInfo.getId() );
 
             if ( pubRing == null ) // Get from HTTP
             {
-                String baseUrl = String.format( "https://%s:%s/rest/v1", ip, SystemSettings.getSecurePortX1() );
+                String baseUrl = String.format( "https://%s:%s/rest/v1", peerInfo.getIp(), peerInfo.getPort() );
                 WebClient client = RestUtil.createTrustedWebClient( baseUrl, keyData.getJsonProvider() );
                 client.type( MediaType.MULTIPART_FORM_DATA ).accept( MediaType.APPLICATION_JSON );
 
                 Response response =
-                        client.path( "security/keyman/getpublickeyring" ).query( "hostid", remoteHostId ).get();
+                        client.path( "security/keyman/getpublickeyring" ).query( "hostid", peerInfo.getId() ).get();
 
                 if ( response.getStatus() == Response.Status.OK.getStatusCode() )
                 {
                     String publicKeyring = response.readEntity( String.class );
-                    savePublicKeyRing( remoteHostId, ( short ) 3, publicKeyring );
+                    savePublicKeyRing( peerInfo.getId(), ( short ) 3, publicKeyring );
                 }
-                return getPublicKey( remoteHostId );
+                return getPublicKey( peerInfo.getId() );
             }
             else
             {
@@ -1189,27 +1191,49 @@ public class KeyManagerImpl implements KeyManager
     }
 
 
+    @Override
+    public PGPPublicKey getRemoteHostPublicKey( final String hostIdTarget )
+    {
+        try
+        {
+            PGPPublicKeyRing pubRing;
+
+            pubRing = getPublicKeyRing( hostIdTarget );
+
+            if ( pubRing != null )
+            {
+                return PGPKeyUtil.readPublicKey( pubRing );
+            }
+        }
+        catch ( Exception ex )
+        {
+            // ignore
+        }
+        return null;
+    }
+
+
     /* *************************************************************
      * Get HOST ID key
      */
-    private String getRemoteHostId( String ip )
-    {
-        // Get Remote peer Public Key and save in the local keystore
-
-        String peerId = "";
-
-        String baseUrl = String.format( "https://%s:%s/rest/v1/peer", ip, SystemSettings.getSecurePortX1() );
-        WebClient clientPeerId = RestUtil.createTrustedWebClient( baseUrl, keyData.getJsonProvider() );
-        clientPeerId.type( MediaType.APPLICATION_JSON ).accept( MediaType.APPLICATION_JSON );
-        PeerInfo peerInfo = clientPeerId.path( "/info" ).get( PeerInfo.class );
-
-        if ( clientPeerId.getResponse().getStatus() == Response.Status.OK.getStatusCode() )
-        {
-            peerId = peerInfo.getId();
-        }
-
-        return peerId;
-    }
+    //    private String getRemoteHostId( String ip )
+    //    {
+    //        // Get Remote peer Public Key and save in the local keystore
+    //
+    //        String peerId = "";
+    //
+    //        String baseUrl = String.format( "https://%s:%s/rest/v1/peer", ip, SystemSettings.getSecurePortX1() );
+    //        WebClient clientPeerId = RestUtil.createTrustedWebClient( baseUrl, keyData.getJsonProvider() );
+    //        clientPeerId.type( MediaType.APPLICATION_JSON ).accept( MediaType.APPLICATION_JSON );
+    //        PeerInfo peerInfo = clientPeerId.path( "/info" ).get( PeerInfo.class );
+    //
+    //        if ( clientPeerId.getResponse().getStatus() == Response.Status.OK.getStatusCode() )
+    //        {
+    //            peerId = peerInfo.getId();
+    //        }
+    //
+    //        return peerId;
+    //    }
 
 
     /* *************************************************************

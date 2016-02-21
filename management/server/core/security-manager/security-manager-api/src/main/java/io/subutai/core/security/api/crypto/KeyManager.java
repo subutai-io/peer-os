@@ -11,6 +11,7 @@ import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKey;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
 
+import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.security.crypto.pgp.KeyPair;
 import io.subutai.core.security.api.model.SecurityKey;
 import io.subutai.core.security.api.model.SecurityKeyTrust;
@@ -253,7 +254,7 @@ public interface KeyManager
     /* *****************************
      *
      */
-    public PGPPublicKey getRemoteHostPublicKey( String identityId, String ip );
+    public PGPPublicKey getRemoteHostPublicKey( /*String identityId,*/ PeerInfo peerInfo );
 
 
 
@@ -284,4 +285,6 @@ public interface KeyManager
      *
      */
     void updatePublicKeyRing( PGPPublicKeyRing publicKeyRing );
+
+    PGPPublicKey getRemoteHostPublicKey( String hostIdTarget );
 }

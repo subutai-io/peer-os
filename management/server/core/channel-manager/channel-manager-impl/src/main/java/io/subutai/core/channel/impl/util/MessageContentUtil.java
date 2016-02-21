@@ -281,7 +281,7 @@ public class MessageContentUtil
             {
                 EncryptionTool encTool = securityManager.getEncryptionTool();
                 KeyManager keyMan = securityManager.getKeyManager();
-                PGPPublicKey pubKey = keyMan.getRemoteHostPublicKey( hostIdTarget, "UNKNOWN" );
+                PGPPublicKey pubKey = keyMan.getRemoteHostPublicKey( hostIdTarget);
 
                 if ( pubKey != null )
                 {

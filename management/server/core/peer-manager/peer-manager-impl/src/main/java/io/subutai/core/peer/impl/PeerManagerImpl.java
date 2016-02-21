@@ -594,8 +594,8 @@ public class PeerManagerImpl implements PeerManager
         }
         register( initRequest.getKeyPhrase(), registrationData );
         removeRequest( registrationData.getPeerInfo().getId() );
-        securityManager.getKeyManager().getRemoteHostPublicKey( registrationData.getPeerInfo().getId(),
-                registrationData.getPeerInfo().getIp() );
+        securityManager.getKeyManager().getRemoteHostPublicKey( /*registrationData.getPeerInfo().getId(),*/
+                registrationData.getPeerInfo() );
     }
 
 
@@ -732,7 +732,7 @@ public class PeerManagerImpl implements PeerManager
 
             removeRequest( request.getPeerInfo().getId() );
             securityManager.getKeyManager()
-                           .getRemoteHostPublicKey( request.getPeerInfo().getId(), request.getPeerInfo().getIp() );
+                           .getRemoteHostPublicKey( /*request.getPeerInfo().getId(),*/ request.getPeerInfo() );
         }
         catch ( Exception e )
         {
@@ -1140,7 +1140,7 @@ public class PeerManagerImpl implements PeerManager
         {
             PeerInfo peerInfo = fromJson( peerData.getInfo(), PeerInfo.class );
             peerInfo.setPublicUrl( publicUrl );
-            peerInfo.setPort(securePort);
+            peerInfo.setPort( securePort );
             peerData.setInfo( toJson( peerInfo ) );
             peerDataService.saveOrUpdate( peerData );
             Peer peer = createPeer( peerData );
