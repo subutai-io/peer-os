@@ -64,7 +64,6 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 	environmentService.getPeers().success(function (data) {
 		vm.peerIds = data;
 		//vm.peerIds['testPeer'] = ['rh1', 'rh2', 'rh3'];
-		console.log(vm.peerIds);
 	});
 	clearWorkspace();
 
@@ -803,8 +802,29 @@ function checkResourceHost(model) {
 }
 
 function startDrag( event ) {
+
+	var containerImage = $(event.target).parent().find('img');
+
+	var ghostImage = document.createElement("span");
+	ghostImage.className = 'b-cloud-item b-hidden-object';
+	ghostImage.id = 'js-ghost-image';
+	ghostImage.style.backgroundImage = "url('" + containerImage.attr('src') + "')";
+	document.body.appendChild(ghostImage);
+	event.dataTransfer.setDragImage(document.createElement("span"), 0, 0);
+
 	event.dataTransfer.setData( "template", $(event.target).data('template') );
-	event.dataTransfer.setData( "img", $(event.target).find('img').attr('src') );
+	event.dataTransfer.setData( "img", containerImage.attr('src') );
+}
+
+function dragOver( event ) {
+	var ghostImage = document.getElementById('js-ghost-image');	
+	ghostImage.style.left = event.pageX + 'px';
+	ghostImage.style.top = event.pageY + 'px';
+	event.preventDefault();
+}
+
+function endtDrag( event ) {
+	document.getElementById('js-ghost-image').remove();
 }
 
 var containerCounter = 1;
@@ -854,9 +874,5 @@ function drop(event) {
 			models[i].set('children', models[i].get('children') + 1);
 		}
 	}
-}
-
-function dragOver( event ) {
-	event.preventDefault();
 }
 

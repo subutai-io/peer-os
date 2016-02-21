@@ -1,4 +1,4 @@
-<div class="b-cloud" ng-controller="AdvancedEnvironmentCtrl as advEnvCtrl">
+<div class="b-cloud" ng-controller="AdvancedEnvironmentCtrl as advEnvCtrl" ondragover="dragOver(event)">
 	<div class="b-cloud__tools">
 		<div class="b-cloud-tools">
 			<div class="b-tabs-menu b-tabs-menu_cloud-env">
@@ -18,7 +18,6 @@
 			<div class="b-tools-menu b-tools-menu_custom-scroll-huc js-scrollbar" ng-show="advEnvCtrl.activeCloudTab == 'templates'">
 				<ul class="">
 					<li ng-repeat="template in advEnvCtrl.templates" 
-						ondragstart="startDrag(event)" ondrop="drop(event)" draggable="true" 
 						data-template="{{ template }}">
 						<span class="b-tools-menu__item">
 							<span class="b-cloud-item">
@@ -29,6 +28,10 @@
 							</span>
 							<span class="b-cloud-item-text">{{ template }}</span>
 						</span>
+						<div class="b-dragAndDrop-item"
+							ondragstart="startDrag(event)" ondrop="drop(event)" ondragend="endtDrag(event)" draggable="true" 
+							data-template="{{ template }}">
+						</div>
 					</li>
 				</ul>
 			</div>
@@ -114,7 +117,7 @@
 				class="b-cloud-space-work"
 				id="js-environment-creation"
 				ng-init="advEnvCtrl.initJointJs()" 
-				ondragover="dragOver(event)" ondrop="drop(event)">
+				ondrop="drop(event)">
 					<div
 						class="js-dropen-menu"
 						style="width: 100px; height: 100px; background-color: red; position: absolute; display: none;">
