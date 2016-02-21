@@ -160,13 +160,14 @@ public class PeerManagerImpl implements PeerManager
                 if ( StringUtils.isEmpty( SystemSettings.getPublicUrl() ) )
                 {
                     localPeerInfo.setName( String.format( "Peer %s ", localPeerId ) );
+                    localPeerInfo.setPublicUrl("https://127.0.0.1:8443");
                 }
                 else
                 {
                     localPeerInfo.setPublicUrl( SystemSettings.getPublicUrl() );
                     localPeerInfo
                             .setName( String.format( "Peer %s on %s", localPeerId, SystemSettings.getPublicUrl() ) );
-                    localPeerInfo.setPublicUrl("https://127.0.0.1:8443");
+
                 }
 
                 PeerPolicy policy = getDefaultPeerPolicy( localPeerId );
