@@ -1165,7 +1165,7 @@ public class KeyManagerImpl implements KeyManager
 
             if ( pubRing == null ) // Get from HTTP
             {
-                String baseUrl = String.format( "https://%s:%s/rest/v1", peerInfo.getIp(), peerInfo.getPort() );
+                String baseUrl = String.format( "%s/rest/v1", peerInfo.getPublicUrl() );
                 WebClient client = RestUtil.createTrustedWebClient( baseUrl, keyData.getJsonProvider() );
                 client.type( MediaType.MULTIPART_FORM_DATA ).accept( MediaType.APPLICATION_JSON );
 
