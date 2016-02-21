@@ -16,41 +16,42 @@ import io.subutai.common.settings.SystemSettings;
  */
 public class PeerInfo implements Serializable
 {
-    @JsonProperty
+    @JsonProperty( "id" )
     private String id;
 
-    @JsonProperty
+    @JsonProperty( "ownerId" )
     private String ownerId;
 
-    @JsonProperty
+    @JsonProperty( "publicUrl" )
     private String publicUrl = "";
 
-    @JsonProperty
+    @JsonProperty( "ip" )
     private String ip = "UNKNOWN";
 
-    //    @JsonProperty
-    //    private String gatewayIp;
-    //
-    //    @JsonProperty
-    //    private String keyPhrase = "";
-
-    //    @JsonProperty
-    //    private PeerStatus status;
-
-    //    @JsonProperty
-    //    private PeerPolicy grantedPolicy;
-
-    @JsonProperty
+    @JsonProperty( "name" )
     private String name;
 
-    @JsonProperty
+    @JsonProperty( "port" )
     private int port = SystemSettings.getSecurePortX2();
 
-    //    @JsonProperty
-    //    private int lastUsedVlanId = 100;
 
-    //    @JsonProperty
-    //    private String keyId;
+    public PeerInfo( @JsonProperty( "id" ) final String id, @JsonProperty( "ownerId" ) final String ownerId,
+                     @JsonProperty( "publicUrl" ) final String publicUrl, @JsonProperty( "ip" ) final String ip,
+                     @JsonProperty( "name" ) final String name, @JsonProperty( "port" ) final int port )
+    {
+        this.id = id;
+        this.ownerId = ownerId;
+        this.publicUrl = publicUrl;
+        this.ip = ip;
+        this.name = name;
+        this.port = port;
+    }
+
+
+    public PeerInfo()
+    {
+
+    }
 
 
     public String getId()
@@ -130,6 +131,12 @@ public class PeerInfo implements Serializable
     public int getPort()
     {
         return port;
+    }
+
+
+    public void setPort( final int port )
+    {
+        this.port = port;
     }
 
 
