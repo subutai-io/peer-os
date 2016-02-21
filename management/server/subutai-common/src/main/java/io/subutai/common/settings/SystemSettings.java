@@ -311,7 +311,7 @@ public class SystemSettings
 
     public static String getPublicUrl()
     {
-        return String.valueOf( PROPERTIES.getProperty( "publicURL" ) );
+        return ( String ) PROPERTIES.getProperty( "publicURL" );
     }
 
 
