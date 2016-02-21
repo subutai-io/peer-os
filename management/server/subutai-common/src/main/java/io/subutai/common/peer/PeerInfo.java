@@ -133,6 +133,12 @@ public class PeerInfo implements Serializable
     }
 
 
+    public void setPort( final int port )
+    {
+        this.port = port;
+    }
+
+
     @Override
     public int hashCode()
     {

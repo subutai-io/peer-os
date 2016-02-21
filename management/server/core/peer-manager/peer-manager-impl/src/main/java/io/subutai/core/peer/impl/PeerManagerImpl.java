@@ -1127,7 +1127,7 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
-    public void setPublicUrl( final String peerId, final String publicUrl ) throws PeerException
+    public void setPublicUrl( final String peerId, final String publicUrl, final int securePort ) throws PeerException
     {
         Preconditions.checkNotNull( peerId );
 
@@ -1140,6 +1140,7 @@ public class PeerManagerImpl implements PeerManager
         {
             PeerInfo peerInfo = fromJson( peerData.getInfo(), PeerInfo.class );
             peerInfo.setPublicUrl( publicUrl );
+            peerInfo.setPort(securePort);
             peerData.setInfo( toJson( peerInfo ) );
             peerDataService.saveOrUpdate( peerData );
             Peer peer = createPeer( peerData );
