@@ -295,6 +295,8 @@ function IdentityUserFormCtrl($scope, identitySrv, ngDialog, SweetAlert) {
 	//functions
 	vm.addUser = addUser;
 	vm.colSelectUserRole = colSelectUserRole;
+	vm.selectAll = selectAll;
+	vm.unselectAll = unselectAll;
 
 	if($scope.ngDialogData !== undefined) {
 		vm.user2Add = $scope.ngDialogData;
@@ -342,6 +344,17 @@ function IdentityUserFormCtrl($scope, identitySrv, ngDialog, SweetAlert) {
 		} else {
 			vm.user2Add.roles.push(id);
 		}
+	}
+
+	function selectAll() {
+		vm.user2Add.roles = [];
+		for (var i = 0; i < vm.roles.length; i++) {
+			vm.user2Add.roles.push(vm.roles[i].id);
+		}
+	}
+
+	function unselectAll() {
+		vm.user2Add.roles = [];
 	}
 
 }
