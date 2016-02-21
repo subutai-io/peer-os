@@ -49,7 +49,9 @@ function AccountCtrl(identitySrv, $scope, $rootScope, ngDialog, SweetAlert, cfpL
 		identitySrv.checkUserKey(vm.activeUser.id).success(function (data) {
 			if(data <= 1 && $rootScope.$state.current.name != 'account-settings') {
 				$('.js-auto-set-key').addClass('bp-set-pub-key');
-			}
+			} /*else {
+				$('.js-public-key-manager').remove();
+			}*/
 		});
 	});
 
