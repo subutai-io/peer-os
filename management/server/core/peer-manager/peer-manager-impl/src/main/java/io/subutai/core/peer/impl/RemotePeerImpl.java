@@ -32,6 +32,7 @@ import io.subutai.common.environment.CreateEnvironmentContainerGroupResponse;
 import io.subutai.common.environment.DestroyEnvironmentContainerGroupRequest;
 import io.subutai.common.environment.DestroyEnvironmentContainerGroupResponse;
 import io.subutai.common.exception.HTTPException;
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
@@ -418,6 +419,15 @@ public class RemotePeerImpl implements RemotePeer
         {
             return new EnvironmentWebClient( provider ).getState( peerInfo.getIp(), containerId );
         }
+    }
+
+
+    @Override
+    public Set<ContainerHostInfo> getEnvironmentContainers( final EnvironmentId environmentId ) throws PeerException
+    {
+        Preconditions.checkNotNull( environmentId, "Environment id is null" );
+
+        return new PeerWebClient( peerInfo, provider ).getEnvironmentContainers(environmentId);
     }
 
 

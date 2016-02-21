@@ -335,6 +335,38 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
+    @Override
+    public Set<ContainerHostInfo> getEnvironmentContainers( final EnvironmentId environmentId ) throws PeerException
+    {
+        Preconditions.checkNotNull( environmentId );
+
+        Set<ContainerHostInfo> result = new HashSet<>();
+        try
+        {
+            Set<ContainerHost> containers = findContainersByEnvironmentId( environmentId.getId() );
+
+            for ( ContainerHost c : containers )
+            {
+                ContainerHostInfo info;
+                try
+                {
+                    info = hostRegistry.getContainerHostInfoById( c.getId() );
+                }
+                catch ( HostDisconnectedException e )
+                {
+                    info = new ContainerHostInfoModel( c );
+                }
+                result.add( info );
+            }
+            return result;
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Error getting container state ", e );
+        }
+    }
+
+
     protected ExecutorService getFixedPoolExecutor( int numOfThreads )
     {
         return Executors.newFixedThreadPool( numOfThreads );
@@ -355,8 +387,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     @RolesAllowed( "Environment-Management|Write" )
     @Override
-    public Set<ContainerHostInfoModel> createEnvironmentContainerGroup(
-            final CreateEnvironmentContainerGroupRequest request ) throws PeerException
+    public void createEnvironmentContainerGroup( final CreateEnvironmentContainerGroupRequest request )
+            throws PeerException
     {
         Preconditions.checkNotNull( request );
 
@@ -374,7 +406,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         Set<String> containerDistribution = generateCloneNames( request.getTemplateName(), 1 );
         final String networkPrefix = cidr.getInfo().getCidrSignature().split( "/" )[1];
         String[] allAddresses = cidr.getInfo().getAllAddresses();
-        String gateway = cidr.getInfo().getLowAddress();
+        //        String gateway = cidr.getInfo().getLowAddress();
         int currentIpAddressOffset = 0;
         final Vni environmentVni = findVniByEnvironmentId( request.getEnvironmentId() );
 
@@ -384,7 +416,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                     String.format( "No reserved vni found for environment %s", request.getEnvironmentId() ) );
         }
 
-        Set<ContainerHostInfoModel> result = Sets.newHashSet();
+        //        Set<ContainerHostInfoModel> result = Sets.newHashSet();
 
         ContainerQuota containerQuota = quotaManager.getDefaultContainerQuota( request.getContainerSize() );
         if ( containerQuota == null )
@@ -443,27 +475,133 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
             currentIpAddressOffset++;
         }
-
-        for ( String ignored : containerDistribution )
-        {
-            try
-            {
-                Future<ContainerHostInfo> futures = taskCompletionService.take();
-                ContainerHostInfo hostInfo = futures.get();
-                if ( hostInfo != null )
-                {
-                    result.add( new ContainerHostInfoModel( hostInfo ) );
-                }
-            }
-            catch ( ExecutionException | InterruptedException e )
-            {
-
-            }
-        }
-
-
-        return result;
     }
+
+
+    public void registerContainer( ResourceHost resourceHost, ContainerHostEntity containerHostEntity )
+            throws PeerException
+    {
+
+        resourceHost.addContainerHost( containerHostEntity );
+
+        signContainerKeyWithPEK( containerHostEntity.getId(), containerHostEntity.getEnvironmentId() );
+
+        resourceHostDataService.saveOrUpdate( resourceHost );
+    }
+
+
+    //       @RolesAllowed( "Environment-Management|Write" )
+    //    @Override
+    //    public void createEnvironmentContainerGroup(
+    //            final CreateEnvironmentContainerGroupRequest request ) throws PeerException
+    //    {
+    //        Preconditions.checkNotNull( request );
+    //
+    //        SubnetUtils cidr;
+    //        try
+    //        {
+    //            cidr = new SubnetUtils( request.getSubnetCidr() );
+    //        }
+    //        catch ( IllegalArgumentException e )
+    //        {
+    //            throw new PeerException( "Failed to parse subnet CIDR", e );
+    //        }
+    //
+    //        final ResourceHost resourceHost = getResourceHostById( request.getHost() );
+    //        Set<String> containerDistribution = generateCloneNames( request.getTemplateName(), 1 );
+    //        final String networkPrefix = cidr.getInfo().getCidrSignature().split( "/" )[1];
+    //        String[] allAddresses = cidr.getInfo().getAllAddresses();
+    ////        String gateway = cidr.getInfo().getLowAddress();
+    //        int currentIpAddressOffset = 0;
+    //        final Vni environmentVni = findVniByEnvironmentId( request.getEnvironmentId() );
+    //
+    //        if ( environmentVni == null )
+    //        {
+    //            throw new PeerException(
+    //                    String.format( "No reserved vni found for environment %s", request.getEnvironmentId() ) );
+    //        }
+    //
+    ////        Set<ContainerHostInfoModel> result = Sets.newHashSet();
+    //
+    //        ContainerQuota containerQuota = quotaManager.getDefaultContainerQuota( request.getContainerSize() );
+    //        if ( containerQuota == null )
+    //        {
+    //            LOG.warn( "Quota not found for container type: " + request.getContainerSize() );
+    //            containerQuota = quotaManager.getDefaultContainerQuota( ContainerSize.SMALL );
+    //        }
+    //
+    //        final TemplateKurjun template = getTemplateByName( request.getTemplateName() );
+    //        ExecutorService taskExecutor = getExecutor( containerDistribution.size() );
+    //        CompletionService<ContainerHostInfo> taskCompletionService = getCompletionService( taskExecutor );
+    //
+    //        for ( final String cloneName : containerDistribution )
+    //        {
+    //            final String ipAddress = allAddresses[request.getIpAddressOffset() + currentIpAddressOffset];
+    //
+    //            //TODO create a separate class out of this anonymous
+    //            taskCompletionService.submit( new Callable<ContainerHostInfo>()
+    //            {
+    //                @Override
+    //                public ContainerHostInfo call() throws Exception
+    //                {
+    //                    try
+    //                    {
+    //                        //TODO add quota switch to clone binding
+    //                        quotaManager.getDefaultContainerQuota( request.getContainerSize() );
+    //                        ContainerHostInfo hostInfo = resourceHost.createContainer( request.getTemplateName(),
+    // cloneName,
+    //                                quotaManager.getDefaultContainerQuota( request.getContainerSize() ),
+    //                                String.format( "%s/%s", ipAddress, networkPrefix ), environmentVni.getVlan(),
+    //                                Common.WAIT_CONTAINER_CONNECTION_SEC, request.getEnvironmentId() );
+    //
+    //
+    //                        ContainerHostEntity containerHostEntity =
+    //                                new ContainerHostEntity( getId(), hostInfo, template.getName(),
+    //                                        template.getArchitecture() );
+    //                        containerHostEntity.setEnvironmentId( request.getEnvironmentId() );
+    //                        containerHostEntity.setOwnerId( request.getOwnerId() );
+    //                        containerHostEntity.setInitiatorPeerId( request.getInitiatorPeerId() );
+    //                        containerHostEntity.setContainerSize( request.getContainerSize() );
+    //
+    //                        resourceHost.addContainerHost( containerHostEntity );
+    //
+    //                        signContainerKeyWithPEK( containerHostEntity.getId(), containerHostEntity
+    // .getEnvironmentId() );
+    //
+    //                        resourceHostDataService.saveOrUpdate( resourceHost );
+    //
+    //                        return hostInfo;
+    //                    }
+    //                    catch ( ResourceHostException e )
+    //                    {
+    //                        LOG.error( "Error creating container", e );
+    //                    }
+    //                    return null;
+    //                }
+    //            } );
+    //
+    //            currentIpAddressOffset++;
+    //        }
+    //
+    //        for ( String ignored : containerDistribution )
+    //        {
+    //            try
+    //            {
+    //                Future<ContainerHostInfo> futures = taskCompletionService.take();
+    //                ContainerHostInfo hostInfo = futures.get();
+    //                if ( hostInfo != null )
+    //                {
+    //                    result.add( new ContainerHostInfoModel( hostInfo ) );
+    //                }
+    //            }
+    //            catch ( ExecutionException | InterruptedException e )
+    //            {
+    //
+    //            }
+    //        }
+    //
+    //
+    //    }
 
 
     private void signContainerKeyWithPEK( String containerId, EnvironmentId envId ) throws PeerException
@@ -483,65 +621,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             throw new PeerException( ex );
         }
-    }
-
-
-    protected Map<ResourceHost, Set<String>> distributeContainersToResourceHosts(
-            final CreateEnvironmentContainerGroupRequest request ) throws PeerException
-    {
-        //temporarily disabled metric calculation
-        //todo use new monitor binding and new approach to calculate container placement
-        //todo approach should consider instance types requested in blueprint @TimurB see this
-        Map<ResourceHost, Integer> slots = Maps.newHashMap();
-        Set<ResourceHost> resourceHosts = getResourceHosts();
-        Iterator<ResourceHost> rhIt = resourceHosts.iterator();
-        while ( rhIt.hasNext() )
-        {
-            ResourceHost rh = rhIt.next();
-            if ( !rh.isConnected() )
-            {
-                rhIt.remove();
-            }
-        }
-        if ( resourceHosts.isEmpty() )
-        {
-            throw new PeerException( "There are no connected resource hosts" );
-        }
-        int numOfRequestedContainers = /*request.getNumberOfContainers()*/1;
-        int j = 0;
-        int leftOver = numOfRequestedContainers;
-        int avgNumOfContainersPerRh = numOfRequestedContainers / resourceHosts.size();
-        for ( final ResourceHost resourceHost : resourceHosts )
-        {
-            j++;
-            if ( j < resourceHosts.size() )
-            {
-                slots.put( resourceHost, avgNumOfContainersPerRh );
-                leftOver -= avgNumOfContainersPerRh;
-            }
-            else
-            {
-                slots.put( resourceHost, leftOver );
-            }
-        }
-
-        //distribute new containers' names across selected resource hosts
-        Map<ResourceHost, Set<String>> containerDistribution = Maps.newHashMap();
-
-        for ( Map.Entry<ResourceHost, Integer> e : slots.entrySet() )
-        {
-            Set<String> hostCloneNames = new HashSet<>();
-            for ( int i = 0; i < e.getValue(); i++ )
-            {
-                String newContainerName = StringUtil.trimToSize(
-                        String.format( "%s%s", request.getTemplateName(), UUID.randomUUID() ).replace( "-", "" ),
-                        Common.MAX_CONTAINER_NAME_LEN );
-                hostCloneNames.add( newContainerName );
-            }
-            ResourceHost resourceHost = getResourceHostByName( e.getKey().getHostname() );
-            containerDistribution.put( resourceHost, hostCloneNames );
-        }
-        return containerDistribution;
     }
 
 

@@ -18,6 +18,7 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ProcessResourceUsage;
@@ -568,5 +569,17 @@ public class PeerWebClient
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
         client.post( pubKeyRing );
+    }
+
+
+    public Set<ContainerHostInfo> getEnvironmentContainers( final EnvironmentId environmentId )
+    {
+        String path = String.format( "/containers/%s", environmentId.getId() );
+
+        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo.getIp(), path, provider, 500, 7000, 1 );
+        client.type( MediaType.APPLICATION_JSON );
+        client.accept( MediaType.APPLICATION_JSON );
+        Collection response = client.getCollection( ContainerHostInfo.class );
+        return new HashSet<ContainerHostInfo>( response );
     }
 }

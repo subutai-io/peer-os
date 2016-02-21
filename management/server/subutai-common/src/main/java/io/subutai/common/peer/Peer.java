@@ -2,6 +2,7 @@ package io.subutai.common.peer;
 
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -12,6 +13,7 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
@@ -63,9 +65,8 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
      *
      * @param request - container creation request
      *
-     * @return - set of metadaobjects of created containers
      */
-    public Set<ContainerHostInfoModel> createEnvironmentContainerGroup(
+    public void createEnvironmentContainerGroup(
             final CreateEnvironmentContainerGroupRequest request ) throws PeerException;
 
 
@@ -182,6 +183,11 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
      * Returns state of container
      */
     public ContainerHostState getContainerState( ContainerId containerId ) throws PeerException;
+
+    /**
+     * Returns set of container information of the environment
+     */
+    public Set<ContainerHostInfo> getEnvironmentContainers( EnvironmentId environmentId ) throws PeerException;
 
     //******** Quota functions ***********
 

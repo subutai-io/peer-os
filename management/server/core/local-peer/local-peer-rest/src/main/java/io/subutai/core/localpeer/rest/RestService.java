@@ -113,6 +113,10 @@ public interface RestService
     Response getContainerHostInfoById( @QueryParam( "containerId" ) String containerId );
 
     @GET
+    @Path( "containers/{environmentId}" )
+    Response getEnvironmentContainers( @PathParam( "environmentId" ) EnvironmentId environmentId );
+
+    @GET
     @Path( "resources" )
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
