@@ -302,7 +302,8 @@ function IdentityUserFormCtrl($scope, identitySrv, ngDialog, SweetAlert) {
 		vm.user2Add = $scope.ngDialogData;
 		vm.editUser = true;
 		vm.currentUserRoles = angular.copy(vm.user2Add.roles);
-		vm.user2Add.confirm_password = angular.copy(vm.user2Add.password);
+		vm.user2Add.password = '';
+		//vm.user2Add.confirm_password = angular.copy(vm.user2Add.password);
 
 		vm.user2Add.roles = [];
 		for(var i = 0; i < vm.currentUserRoles.length; i++) {
@@ -318,6 +319,7 @@ function IdentityUserFormCtrl($scope, identitySrv, ngDialog, SweetAlert) {
 	getRolesFromAPI();
 
 	function addUser() {
+		console.log($scope.addUserForm.$valid);
 		if ($scope.addUserForm.$valid) {
 			var postData = userPostData(vm.user2Add);
 			LOADING_SCREEN();

@@ -3288,8 +3288,9 @@ td.b-main-table__status-col {
 
 .b-hidden-object {
 	position: absolute;
+	z-index: 100;
 	top: -150px;
 	left: 0;
-	opacity: 0.6;
+	opacity: 0.8;
 }
 
