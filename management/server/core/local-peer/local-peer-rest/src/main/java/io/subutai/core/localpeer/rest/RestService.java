@@ -45,6 +45,7 @@ public interface RestService
 
     @GET
     @Path( "/info" )
+    @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
     public PeerInfo getPeerInfo() throws PeerException;
 
