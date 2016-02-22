@@ -1144,7 +1144,7 @@ public class IdentityManagerImpl implements IdentityManager
      */
     private void isValidPassword( String userName, String password)
     {
-        if(Strings.isNullOrEmpty(password))
+        if(Strings.isNullOrEmpty(password) && password.length() < 4)
         {
             throw new IllegalArgumentException( "Password cannot be shorter than 4 characters" );
         }
