@@ -10,10 +10,10 @@ import java.util.concurrent.TimeUnit;
  */
 public interface KurjunSettings
 {
-    public List<String> getGlobalKurjunUrls();
+    public String[] getGlobalKurjunUrls();
 
 
-    public void setGlobalKurjunUrls( final List<String> globalKurjunUrls );
+    public void setGlobalKurjunUrls( final String[] globalKurjunUrls );
 
 
     public Long getPublicDiskQuota();

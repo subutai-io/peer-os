@@ -82,6 +82,8 @@ import io.subutai.core.security.api.SecurityManager;
 
 /**
  * Remote Peer implementation
+ *
+ * TODO use environment web client for environment specific operations!
  */
 @PermitAll
 public class RemotePeerImpl implements RemotePeer
@@ -110,31 +112,19 @@ public class RemotePeerImpl implements RemotePeer
         this.messenger = messenger;
         this.commandResponseListener = commandResponseListener;
         this.messageResponseListener = messageResponseListener;
-        String url = "";
+        String url;
 
         int port = peerInfo.getPort();
 
         if ( port == SystemSettings.getSpecialPortX1() || port == SystemSettings.getOpenPort() )
         {
-            url = String.format( "http://%s:%s/rest/v1/peer", peerInfo.getIp(), peerInfo.getPort() );
+            url = String.format( "http://%s:%s/rest/v1/peer", peerInfo, peerInfo.getPort() );
         }
         else
         {
-            url = String.format( "https://%s:%s/rest/v1/peer", peerInfo.getIp(), peerInfo.getPort() );
+            url = String.format( "https://%s:%s/rest/v1/peer", peerInfo, peerInfo.getPort() );
         }
 
-        //        switch ( peerInfo.getPort() )
-        //        {
-        //            case OPEN_PORT:
-        //            case SPECIAL_PORT_X1:
-        //                url = String.format( "http://%s:%s/rest/v1/peer", peerInfo.getIp(), peerInfo.getPort() );
-        //                break;
-        //            case SECURE_PORT_X1:
-        //            case SECURE_PORT_X2:
-        //            case SECURE_PORT_X3:
-        //                url = String.format( "https://%s:%s/rest/v1/peer", peerInfo.getIp(), peerInfo.getPort() );
-        //                break;
-        //        }
         this.baseUrl = url;
         this.provider = provider;
     }
@@ -284,7 +274,7 @@ public class RemotePeerImpl implements RemotePeer
         }
         else
         {
-            new EnvironmentWebClient( provider ).startContainer( peerInfo.getIp(), containerId );
+            new EnvironmentWebClient( provider ).startContainer( peerInfo, containerId );
         }
     }
 
@@ -302,7 +292,7 @@ public class RemotePeerImpl implements RemotePeer
         }
         else
         {
-            new EnvironmentWebClient( provider ).stopContainer( peerInfo.getIp(), containerId );
+            new EnvironmentWebClient( provider ).stopContainer( peerInfo, containerId );
         }
     }
 
@@ -318,7 +308,7 @@ public class RemotePeerImpl implements RemotePeer
         }
         else
         {
-            new EnvironmentWebClient( provider ).destroyContainer( peerInfo.getIp(), containerId );
+            new EnvironmentWebClient( provider ).destroyContainer( peerInfo, containerId );
         }
     }
 
@@ -399,7 +389,7 @@ public class RemotePeerImpl implements RemotePeer
         }
         else
         {
-            return new EnvironmentWebClient( provider ).getProcessResourceUsage( peerInfo.getIp(), containerId, pid );
+            return new EnvironmentWebClient( provider ).getProcessResourceUsage( peerInfo, containerId, pid );
         }
     }
 
@@ -416,7 +406,7 @@ public class RemotePeerImpl implements RemotePeer
         }
         else
         {
-            return new EnvironmentWebClient( provider ).getState( peerInfo.getIp(), containerId );
+            return new EnvironmentWebClient( provider ).getState( peerInfo, containerId );
         }
     }
 
@@ -427,7 +417,7 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkNotNull( containerHost, "Container host is null" );
         Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
 
-        return new EnvironmentWebClient( provider ).getCpuSet( peerInfo.getIp(), containerHost.getContainerId() );
+        return new EnvironmentWebClient( provider ).getCpuSet( peerInfo, containerHost.getContainerId() );
     }
 
 
@@ -437,11 +427,9 @@ public class RemotePeerImpl implements RemotePeer
     {
         Preconditions.checkNotNull( containerHost, "Container host is null" );
         Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
-
-        EnvironmentContainerHost host = ( EnvironmentContainerHost ) containerHost;
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( cpuSet ), "Empty cpu set" );
 
-        new EnvironmentWebClient( provider ).setCpuSet( peerInfo.getIp(), containerHost.getContainerId(), cpuSet );
+        new EnvironmentWebClient( provider ).setCpuSet( peerInfo, containerHost.getContainerId(), cpuSet );
     }
 
 
@@ -450,7 +438,7 @@ public class RemotePeerImpl implements RemotePeer
     {
         Preconditions.checkNotNull( containerId, "Container id is null" );
 
-        return new EnvironmentWebClient( provider ).getQuota( peerInfo.getIp(), containerId );
+        return new EnvironmentWebClient( provider ).getQuota( peerInfo, containerId );
     }
 
 
@@ -460,7 +448,7 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkNotNull( containerId, "Container id is null" );
         Preconditions.checkNotNull( containerQuota, "Container quota is null" );
 
-        new EnvironmentWebClient( provider ).setQuota( peerInfo.getIp(), containerId, containerQuota );
+        new EnvironmentWebClient( provider ).setQuota( peerInfo, containerId, containerQuota );
     }
 
 
@@ -469,7 +457,7 @@ public class RemotePeerImpl implements RemotePeer
     {
         Preconditions.checkNotNull( containerId, "Container id is null" );
 
-        return new EnvironmentWebClient( provider ).getAvailableQuota( peerInfo.getIp(), containerId );
+        return new EnvironmentWebClient( provider ).getAvailableQuota( peerInfo, containerId );
     }
 
 
@@ -722,8 +710,6 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkArgument( !peerIps.isEmpty(), "Invalid peer ips set" );
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
-        String path = "/tunnels";
-
         try
         {
             return new PeerWebClient( peerInfo, provider ).setupTunnels( peerIps, environmentId );
@@ -851,6 +837,23 @@ public class RemotePeerImpl implements RemotePeer
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment ID" );
         new PeerWebClient( peerInfo, provider ).removeP2PConnection( environmentId );
+    }
+
+
+    @Override
+    public HostId getResourceHostIdByContainerId( final ContainerId containerId ) throws PeerException
+    {
+        Preconditions.checkNotNull( containerId, "Container id is null" );
+        Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );
+
+        if ( containerId.getEnvironmentId() == null )
+        {
+            return new PeerWebClient( peerInfo, provider ).getResourceHosIdByContainerId( containerId );
+        }
+        else
+        {
+            return new EnvironmentWebClient( provider ).getResourceHostIdByContainerId( peerInfo, containerId );
+        }
     }
 
 

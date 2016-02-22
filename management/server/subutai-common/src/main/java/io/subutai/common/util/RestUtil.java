@@ -77,7 +77,7 @@ public class RestUtil
     }
 
 
-    public static enum RequestType
+    public enum RequestType
     {
         GET, DELETE, POST
     }

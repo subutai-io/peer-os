@@ -35,7 +35,7 @@ import io.subutai.common.security.PublicKeyContainer;
 /**
  * Peer interface
  */
-public interface Peer extends PeerSpecific, EnvironmentSpecific
+public interface Peer
 {
 
     /**
@@ -306,4 +306,6 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
     PingDistances getCommunityDistances( String communityName, Integer maxAddress ) throws PeerException;
 
     void addPeerEnvironmentPubKey( String keyId, PGPPublicKeyRing pek );
+
+    HostId getResourceHostIdByContainerId( ContainerId id ) throws PeerException;
 }

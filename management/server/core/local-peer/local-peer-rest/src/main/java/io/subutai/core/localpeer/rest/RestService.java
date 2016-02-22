@@ -17,11 +17,13 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.AlertEvent;
+import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
@@ -45,6 +47,7 @@ public interface RestService
 
     @GET
     @Path( "/info" )
+    @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
     public PeerInfo getPeerInfo() throws PeerException;
 
@@ -180,4 +183,11 @@ public interface RestService
     @Produces( MediaType.APPLICATION_JSON )
     Response getCommunityDistances( @PathParam( "communityName" ) final String communityName,
                                     @PathParam( "count" ) final Integer count );
+
+
+    @GET
+    @Path( "container/{containerId}/rhId" )
+    @Consumes( MediaType.APPLICATION_JSON )
+    @Produces( MediaType.APPLICATION_JSON )
+    HostId getResourceHostIdByContainerId( @PathParam( "containerId" ) final ContainerId containerId );
 }

@@ -834,6 +834,7 @@ public class RestServiceImpl implements RestService
 
         try
         {
+            //todo filter online peer in parallel using completionservice
             for ( Peer peer : peerManager.getPeers() )
             {
                 if ( peer.isOnline() )

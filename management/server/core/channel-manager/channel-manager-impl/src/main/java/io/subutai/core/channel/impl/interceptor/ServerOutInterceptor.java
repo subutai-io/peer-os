@@ -61,7 +61,8 @@ public class ServerOutInterceptor extends AbstractPhaseInterceptor<Message>
                 HttpServletRequest req = ( HttpServletRequest ) message.getExchange().getInMessage()
                                                                        .get( AbstractHTTPDestination.HTTP_REQUEST );
 
-                if ( req.getLocalPort() == SystemSettings.getSecurePortX2() )
+                if ( req.getLocalPort() == /*SystemSettings.getSecurePortX2()*/ peerManager.getLocalPeer().getPeerInfo()
+                                                                                                      .getPort())
                 {
                     //LOG.info( " *** URL:" + url.getPath() );
                     HttpHeaders headers = new HttpHeadersImpl( message.getExchange().getInMessage() );

@@ -29,7 +29,6 @@
     <dependency>
       <groupId>io.subutai</groupId>
       <artifactId>system-manager-api</artifactId>
-      <version>4.0.0-RC6</version>
     </dependency>
 
     <!--CXF-->

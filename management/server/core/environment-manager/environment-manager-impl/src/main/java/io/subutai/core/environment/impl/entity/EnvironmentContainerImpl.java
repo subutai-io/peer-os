@@ -38,6 +38,7 @@ import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostArchitecture;
+import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaceModel;
@@ -191,6 +192,13 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
         Preconditions.checkNotNull( environment );
 
         this.environment = environment;
+    }
+
+
+    @Override
+    public HostId getResourceHostId() throws PeerException
+    {
+        return getPeer().getResourceHostIdByContainerId( getContainerId() );
     }
 
 
@@ -468,16 +476,6 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     public String getMacByInterfaceName( final String interfaceName )
     {
         return getHostInterfaces().findByName( interfaceName ).getMac();
-
-        //        for ( HostInterface iface : hostInterfaces )
-        //        {
-        //            if ( iface.getName().equalsIgnoreCase( interfaceName ) )
-        //            {
-        //                return iface.getMac();
-        //            }
-        //        }
-        //
-        //        return null;
     }
 
 
@@ -485,18 +483,6 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     public HostInterface getInterfaceByName( final String interfaceName )
     {
         return getHostInterfaces().findByName( interfaceName );
-        //        HostInterface result = NullHostInterface.getInstance();
-        //        for ( Iterator<HostInterface> i = getHostInterfaces().iterator(); result instanceof
-        // NullHostInterface && i.hasNext(); )
-        //        {
-        //            HostInterface n = i.next();
-        //            if ( n.getName().equalsIgnoreCase( interfaceName ) )
-        //            {
-        //                result = n;
-        //            }
-        //        }
-        //
-        //        return result;
     }
 
 
