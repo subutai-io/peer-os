@@ -1,9 +1,7 @@
 package io.subutai.core.peer.impl;
 
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
@@ -42,6 +40,8 @@ import org.apache.commons.net.util.SubnetUtils;
 import com.google.common.base.Preconditions;
 
 import io.subutai.common.dao.DaoManager;
+import io.subutai.common.host.HostInterface;
+import io.subutai.common.host.NullHostInterface;
 import io.subutai.common.peer.Encrypted;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
@@ -162,11 +162,13 @@ public class PeerManagerImpl implements PeerManager
                 if ( StringUtils.isEmpty( SystemSettings.getPublicUrl() ) )
                 {
                     localPeerInfo.setName( String.format( "Peer %s ", localPeerId ) );
+                    localPeerInfo.setPublicUrl( "https://127.0.0.1:8443" );
                 }
                 else
                 {
                     localPeerInfo.setPublicUrl( SystemSettings.getPublicUrl() );
-                    localPeerInfo.setName( String.format( "Peer %s on %s", localPeerId, SystemSettings.getPublicUrl() ) );
+                    localPeerInfo
+                            .setName( String.format( "Peer %s on %s", localPeerId, SystemSettings.getPublicUrl() ) );
                 }
 
                 PeerPolicy policy = getDefaultPeerPolicy( localPeerId );
@@ -266,9 +268,8 @@ public class PeerManagerImpl implements PeerManager
         {
             byte[] key = SecurityUtilities.generateKey( keyPhrase.getBytes( "UTF-8" ) );
             String decryptedCert = encryptedData.decrypt( key, String.class );
-            securityManager.getKeyStoreManager()
-                           .importCertAsTrusted( SystemSettings.getSecurePortX2(), registrationData.getPeerInfo().getId(),
-                                   decryptedCert );
+            securityManager.getKeyStoreManager().importCertAsTrusted( SystemSettings.getSecurePortX2(),
+                    registrationData.getPeerInfo().getId(), decryptedCert );
             securityManager.getHttpContextManager().reloadKeyStore();
 
             PeerPolicy policy = getDefaultPeerPolicy( registrationData.getPeerInfo().getId() );
@@ -596,8 +597,8 @@ public class PeerManagerImpl implements PeerManager
         }
         register( initRequest.getKeyPhrase(), registrationData );
         removeRequest( registrationData.getPeerInfo().getId() );
-        securityManager.getKeyManager().getRemoteHostPublicKey( registrationData.getPeerInfo().getId(),
-                registrationData.getPeerInfo().getIp() );
+        securityManager.getKeyManager().getRemoteHostPublicKey( /*registrationData.getPeerInfo().getId(),*/
+                registrationData.getPeerInfo() );
     }
 
 
@@ -734,7 +735,7 @@ public class PeerManagerImpl implements PeerManager
 
             removeRequest( request.getPeerInfo().getId() );
             securityManager.getKeyManager()
-                           .getRemoteHostPublicKey( request.getPeerInfo().getId(), request.getPeerInfo().getIp() );
+                           .getRemoteHostPublicKey( /*request.getPeerInfo().getId(),*/ request.getPeerInfo() );
         }
         catch ( Exception e )
         {
@@ -1024,6 +1025,7 @@ public class PeerManagerImpl implements PeerManager
             }
         }
 
+
         private void checkPeers()
         {
             try
@@ -1035,7 +1037,7 @@ public class PeerManagerImpl implements PeerManager
                         if ( peer.isLocal() )
                         {
                             LocalPeer localPeer = ( LocalPeer ) peer;
-                            if ( "UNKNOWN".equals( localPeer.getPeerInfo().getIp() ) )
+                            if ( "127.0.0.1".equals( localPeer.getPeerInfo().getIp() ) )
                             {
                                 setDefaultPublicUrl( localPeer );
                             }
@@ -1060,16 +1062,19 @@ public class PeerManagerImpl implements PeerManager
 
         private void setDefaultPublicUrl( final LocalPeer localPeer ) throws PeerException, IOException
         {
-
+            HostInterface externalInterface = getExternalInterface( localPeer );
+            if ( externalInterface == null || externalInterface instanceof NullHostInterface )
+            {
+                return;
+            }
             PeerData peerData = peerDataService.find( localPeer.getPeerInfo().getId() );
 
             PeerInfo peerInfo = fromJson( peerData.getInfo(), PeerInfo.class );
 
-            String publicIp = getExternalIp( localPeer );
 
-            peerInfo.setPublicUrl( publicIp );
+            peerInfo.setPublicUrl( externalInterface.getIp() );
 
-            peerInfo.setName( String.format( "Peer %s on %s", localPeerId, publicIp ) );
+            peerInfo.setName( String.format( "Peer %s on %s", localPeerId, externalInterface.getIp() ) );
 
             peerData.setInfo( toJson( peerInfo ) );
 
@@ -1081,28 +1086,11 @@ public class PeerManagerImpl implements PeerManager
         }
 
 
-        private String getExternalIp( final LocalPeer localPeer ) throws HostNotFoundException
+        private HostInterface getExternalInterface( final LocalPeer localPeer ) throws HostNotFoundException
         {
             Host rh = localPeer.getResourceHostByContainerName( "management" );
 
-            return rh.getInterfaceByName( SystemSettings.getExternalIpInterface() ).getIp();
-        }
-
-
-        private String getPublicIp()
-        {
-            String result = null;
-            try
-            {
-                URL url = new URL( "http://checkip.amazonaws.com" );
-                BufferedReader in = new BufferedReader( new InputStreamReader( url.openStream() ) );
-                result = in.readLine();
-            }
-            catch ( IOException e )
-            {
-                // ignore
-            }
-            return result;
+            return rh.getInterfaceByName( SystemSettings.getExternalIpInterface() );
         }
     }
 
@@ -1145,7 +1133,7 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
-    public void setPublicUrl( final String peerId, final String publicUrl ) throws PeerException
+    public void setPublicUrl( final String peerId, final String publicUrl, final int securePort ) throws PeerException
     {
         Preconditions.checkNotNull( peerId );
 
@@ -1158,6 +1146,7 @@ public class PeerManagerImpl implements PeerManager
         {
             PeerInfo peerInfo = fromJson( peerData.getInfo(), PeerInfo.class );
             peerInfo.setPublicUrl( publicUrl );
+            peerInfo.setPort( securePort );
             peerData.setInfo( toJson( peerInfo ) );
             peerDataService.saveOrUpdate( peerData );
             Peer peer = createPeer( peerData );

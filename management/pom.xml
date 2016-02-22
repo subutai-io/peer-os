@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.subutai</groupId>
   <artifactId>mgmt-parent</artifactId>
@@ -488,7 +489,6 @@
         <version>${project.version}</version>
       </dependency>
 
-
       <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
       <!--plugin-manager -->
       <dependency>
@@ -521,10 +521,15 @@
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>bazaar-plugin-impl</artifactId>
+        <artifactId>bazaar-plugin-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
 
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>test-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
       <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
       <!--hub-manager -->
@@ -543,7 +548,6 @@
         <artifactId>hub-manager-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
-
 
       <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
       <!--system-manager -->
@@ -1023,12 +1027,12 @@
     <plugins>
 
       <!--<plugin>-->
-        <!--<groupId>org.apache.maven.plugins</groupId>-->
-        <!--<artifactId>maven-release-plugin</artifactId>-->
-        <!--<version>2.5.3</version>-->
-        <!--<configuration>-->
-          <!--<tagNameFormat>v@{project.version}</tagNameFormat>-->
-        <!--</configuration>-->
+      <!--<groupId>org.apache.maven.plugins</groupId>-->
+      <!--<artifactId>maven-release-plugin</artifactId>-->
+      <!--<version>2.5.3</version>-->
+      <!--<configuration>-->
+      <!--<tagNameFormat>v@{project.version}</tagNameFormat>-->
+      <!--</configuration>-->
       <!--</plugin>-->
 
       <plugin>

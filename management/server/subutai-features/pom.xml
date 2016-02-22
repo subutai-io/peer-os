@@ -44,7 +44,6 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>test-cli</artifactId>
-      <version>4.0.0-RC6</version>
     </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
@@ -346,7 +345,6 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>bazaar-plugin-rest</artifactId>
-      <version>4.0.0-RC6</version>
     </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
@@ -355,7 +353,6 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>plugin-common-core</artifactId>
     </dependency>
-
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- plugin-manager -->
@@ -373,7 +370,7 @@
     </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-     <!--hub-manager-->
+    <!--hub-manager-->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>hub-manager-api</artifactId>

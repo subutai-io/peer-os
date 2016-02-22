@@ -18,10 +18,10 @@ function AccountCtrl(identitySrv, $scope, $rootScope, ngDialog, SweetAlert, cfpL
 		vm.hasPGPplugin = hasPGPplugin();
 		if(!vm.hasPGPplugin) {
 			$rootScope.notifications = {
-				"message": "You dosent have PGP plugin, plese setup you public Key manualy or just install plugin and it will automaticaly add key", 
+				"message": "Life is hard when you're stupid dude! Install the subutai browser plugin for added security with end to end encryption.", 
 				"date": moment().format('MMMM Do YYYY, HH:mm:ss'),
 				"links": [
-					{"text": "PGPlugin", "href": "https://github.com/subutai-io/Tooling-pgp-plugin/releases/latest"},
+					{"text": "Take it!", "href": "https://github.com/subutai-io/Tooling-pgp-plugin/releases/latest"},
 					{"text": "Set manualy", "href": "/#/account-settings"}
 				]
 			};
@@ -47,9 +47,11 @@ function AccountCtrl(identitySrv, $scope, $rootScope, ngDialog, SweetAlert, cfpL
 		});
 
 		identitySrv.checkUserKey(vm.activeUser.id).success(function (data) {
-			if(data <= 1) {
+			if(data <= 1 && $rootScope.$state.current.name != 'account-settings') {
 				$('.js-auto-set-key').addClass('bp-set-pub-key');
-			}
+			} /*else {
+				$('.js-public-key-manager').remove();
+			}*/
 		});
 	});
 

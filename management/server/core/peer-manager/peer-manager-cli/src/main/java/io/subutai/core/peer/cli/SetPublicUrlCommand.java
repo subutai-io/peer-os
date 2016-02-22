@@ -20,6 +20,10 @@ public class SetPublicUrlCommand extends SubutaiShellCommandSupport
             description = "New public URL" )
     private String publicUrl;
 
+    @Argument( index = 2, name = "securePort", required = true, multiValued = false,
+            description = "Secure port. Default: 8443" )
+    private String securePort;
+
     private PeerManager peerManager;
 
 
@@ -41,10 +45,16 @@ public class SetPublicUrlCommand extends SubutaiShellCommandSupport
     }
 
 
+    public void setSecurePort( final String securePort )
+    {
+        this.securePort = securePort;
+    }
+
+
     @Override
     protected Object doExecute() throws PeerException
     {
-        peerManager.setPublicUrl( peerId, publicUrl );
+        peerManager.setPublicUrl( peerId, publicUrl, Integer.parseInt( securePort ) );
         System.out.println( "Public URL successfully updated." );
         return null;
     }

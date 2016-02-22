@@ -1,7 +1,10 @@
 package io.subutai.core.localpeer.impl;
 
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -2378,6 +2381,38 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         catch ( NetworkManagerException e )
         {
             throw new PeerException( "Error retrieving peer tunnels", e );
+        }
+    }
+
+
+    @Override
+    public String getPublicIp() throws PeerException
+    {
+        BufferedReader in = null;
+        try
+        {
+            URL url = new URL( "http://checkip.amazonaws.com" );
+            in = new BufferedReader( new InputStreamReader( url.openStream() ) );
+            return in.readLine();
+        }
+        catch ( IOException e )
+        {
+            throw new PeerException( "Error getting public IP", e );
+        }
+        finally
+        {
+            if ( in != null )
+            {
+
+                try
+                {
+                    in.close();
+                }
+                catch ( IOException e )
+                {
+                    //ignore
+                }
+            }
         }
     }
 

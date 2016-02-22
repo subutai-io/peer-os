@@ -181,4 +181,5 @@ function identitySrv($http) {
 	function checkUserKey(userId) {
 		return $http.get(USERS_URL + 'check-user-key/' + userId, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
 	}
+
 }

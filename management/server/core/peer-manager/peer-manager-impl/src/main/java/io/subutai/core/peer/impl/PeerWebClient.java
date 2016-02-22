@@ -63,7 +63,7 @@ public class PeerWebClient
     {
         String path = "/info";
 
-        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo.getIp(), path, provider, 4000, 7000, 1 );
+        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 4000, 7000, 1 );
 
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
@@ -83,7 +83,7 @@ public class PeerWebClient
     {
 
         String path = "/container/start";
-        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo.getIp(), path, provider );
+        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
 
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
@@ -101,7 +101,7 @@ public class PeerWebClient
     void stopContainer( ContainerId containerId ) throws PeerException
     {
         String path = "/container/stop";
-        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo.getIp(), path, provider );
+        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
 
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
@@ -119,7 +119,7 @@ public class PeerWebClient
     void destroyContainer( ContainerId containerId ) throws PeerException
     {
         String path = "/container/destroy";
-        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo.getIp(), path, provider );
+        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
 
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
@@ -137,7 +137,7 @@ public class PeerWebClient
     public ContainerHostState getState( final ContainerId containerId ) throws PeerException
     {
         String path = "/container/state";
-        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo.getIp(), path, provider );
+        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
 
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
@@ -155,7 +155,7 @@ public class PeerWebClient
     public ProcessResourceUsage getProcessResourceUsage( final ContainerId containerId, int pid ) throws PeerException
     {
         String path = String.format( "/container/%s/usage/%d", containerId.getId(), pid );
-        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo.getIp(), path, provider );
+        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
 
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
@@ -175,7 +175,7 @@ public class PeerWebClient
 
         String path = String.format( "/network/%s", environmentId.getId() );
 
-        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo.getIp(), path, provider );
+        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
 
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
@@ -195,7 +195,7 @@ public class PeerWebClient
         String path = "/pek";
 
 
-        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo.getIp(), path, provider );
+        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
 
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
@@ -215,7 +215,7 @@ public class PeerWebClient
         String path = "/pek";
 
 
-        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo.getIp(), path, provider );
+        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
 
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
@@ -237,7 +237,7 @@ public class PeerWebClient
         String path = String.format( "/pek/%s", environmentId.getId() );
 
 
-        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo.getIp(), path, provider );
+        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
 
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
@@ -256,7 +256,7 @@ public class PeerWebClient
     {
         String path = "/interfaces";
 
-        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo.getIp(), path, provider );
+        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
 
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
@@ -281,7 +281,7 @@ public class PeerWebClient
 
         String path = "/p2presetkey";
 
-        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo.getIp(), path, provider );
+        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
 
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
@@ -303,7 +303,7 @@ public class PeerWebClient
 
         String path = "/p2ptunnel";
 
-        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo.getIp(), path, provider );
+        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
 
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
@@ -325,7 +325,7 @@ public class PeerWebClient
 
         String path = String.format( "/p2ptunnel/%s", environmentId.getId() );
 
-        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo.getIp(), path, provider );
+        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
 
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
@@ -345,7 +345,7 @@ public class PeerWebClient
     {
         String path = "/resources";
 
-        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo.getIp(), path, provider );
+        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
 
@@ -364,7 +364,7 @@ public class PeerWebClient
     {
         String path = "/gateways";
 
-        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo.getIp(), path, provider );
+        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
 
@@ -384,7 +384,7 @@ public class PeerWebClient
     {
         String path = "/vni";
 
-        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo.getIp(), path, provider );
+        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
 
@@ -395,7 +395,7 @@ public class PeerWebClient
         }
         catch ( Exception e )
         {
-            throw new PeerException( String.format( "Error obtaining reserved VNIs from peer %s", peerInfo.getIp() ),
+            throw new PeerException( String.format( "Error obtaining reserved VNIs from peer %s", peerInfo ),
                     e );
         }
     }
@@ -405,7 +405,7 @@ public class PeerWebClient
     {
         String path = "/vni";
 
-        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo.getIp(), path, provider );
+        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
 
@@ -424,7 +424,7 @@ public class PeerWebClient
     {
         String path = "/alert";
 
-        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo.getIp(), path, provider );
+        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
 
@@ -453,7 +453,7 @@ public class PeerWebClient
             String path = String.format( "/hmetrics/%s/%s/%s/%s/%s", hostName, startParam.getDateString(),
                     startParam.getTimeString(), endParam.getDateString(), endParam.getTimeString() );
 
-            WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo.getIp(), path, provider );
+            WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
             return client.get( HistoricalMetrics.class );
@@ -471,7 +471,7 @@ public class PeerWebClient
         {
             String path = String.format( "/limits/%s", peerId );
 
-            WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo.getIp(), path, provider, 4000, 7000, 1 );
+            WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 4000, 7000, 1 );
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
             return client.get( PeerResources.class );
@@ -489,7 +489,7 @@ public class PeerWebClient
         {
             String path = String.format( "/control/config/%s", localPeerId );
 
-            WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo.getIp(), path, provider, 4000, 7000, 1 );
+            WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 4000, 7000, 1 );
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
             return client.get( ControlNetworkConfig.class );
@@ -513,7 +513,7 @@ public class PeerWebClient
         {
             String path = "/control/update";
 
-            WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo.getIp(), path, provider, 4000, 7000, 1 );
+            WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 4000, 7000, 1 );
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
             return client.put( config, Boolean.class );
@@ -534,7 +534,7 @@ public class PeerWebClient
         {
             String path = String.format( "/control/%s/%d/distance", communityName, maxAddress );
 
-            WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo.getIp(), path, provider, 4000, 7000, 1 );
+            WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 4000, 7000, 1 );
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
             return client.get( PingDistances.class );
@@ -552,7 +552,7 @@ public class PeerWebClient
         Preconditions.checkNotNull( environmentId );
         String path = String.format( "/tunnels/%s", environmentId );
 
-        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo.getIp(), path, provider, 500, 7000, 1 );
+        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 500, 7000, 1 );
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.TEXT_PLAIN );
         return client.post( peerIps, Integer.class );
@@ -565,7 +565,7 @@ public class PeerWebClient
         Preconditions.checkNotNull( pubKeyRing );
         String path = String.format( "/pek/add/%s", keyId );
 
-        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo.getIp(), path, provider, 500, 7000, 1 );
+        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 500, 7000, 1 );
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
         client.post( pubKeyRing );

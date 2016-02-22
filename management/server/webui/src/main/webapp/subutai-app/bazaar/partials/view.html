@@ -7,17 +7,17 @@
 		<div class="b-tabs-menu b-tabs-menu_header">
 			<ul>
 				<li class="b-tabs-menu__item"
-					ng-click="bazaarCtrl.activeTab = 'hub'"
+					ng-click="bazaarCtrl.changeTab ('hub')"
 					ng-class="bazaarCtrl.activeTab == 'hub' ? 'b-tabs-menu__item_active' : ''">
 					Available
 				</li>
 				<li class="b-tabs-menu__item"
-					ng-click="bazaarCtrl.activeTab = 'plugins'"
+					ng-click="bazaarCtrl.changeTab ('plugins')"
 					ng-class="bazaarCtrl.activeTab == 'plugins' ? 'b-tabs-menu__item_active' : ''">
 					Installed
 				</li>
 				<li class="b-tabs-menu__item"
-					ng-click="bazaarCtrl.activeTab = 'other'"
+					ng-click="bazaarCtrl.changeTab ('other')"
 					ng-class="bazaarCtrl.activeTab == 'other' ? 'b-tabs-menu__item_active' : ''">
 					Advanced
 				</li>

@@ -21,7 +21,6 @@ import io.subutai.common.security.crypto.keystore.KeyStoreTool;
 import io.subutai.common.security.crypto.ssl.SSLManager;
 import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SecuritySettings;
-import io.subutai.common.settings.SystemSettings;
 
 
 /**
@@ -37,10 +36,10 @@ public class WebClientBuilder
     private static final String ENVIRONMENT_URL_TEMPLATE = "https://%s:%s/rest/v1/env%s";
 
 
-    public static WebClient buildPeerWebClient( final String host, final String path, final Object provider,
+    public static WebClient buildPeerWebClient( final PeerInfo peerInfo, final String path, final Object provider,
                                                 long connectTimeoutMs, long readTimeoutMs, int maxAttempts )
     {
-        String effectiveUrl = String.format( PEER_URL_TEMPLATE, host, SystemSettings.getSecurePortX2(),
+        String effectiveUrl = String.format( PEER_URL_TEMPLATE, peerInfo.getIp(), peerInfo.getPort(),
                 ( path.startsWith( "/" ) ? path : "/" + path ) );
         WebClient client;
         if ( provider == null )
@@ -88,16 +87,17 @@ public class WebClientBuilder
     }
 
 
-    public static WebClient buildPeerWebClient( final String host, final String path, final Object provider )
+    public static WebClient buildPeerWebClient( final PeerInfo peerInfo, final String path, final Object provider )
     {
-        return buildPeerWebClient( host, path, provider, DEFAULT_CONNECTION_TIMEOUT, DEFAULT_RECEIVE_TIMEOUT,
+        return buildPeerWebClient( peerInfo, path, provider, DEFAULT_CONNECTION_TIMEOUT, DEFAULT_RECEIVE_TIMEOUT,
                 DEFAULT_MAX_RETRANSMITS );
     }
 
 
-    public static WebClient buildEnvironmentWebClient( final String host, final String path, final Object provider )
+    public static WebClient buildEnvironmentWebClient( final PeerInfo peerInfo, final String path,
+                                                       final Object provider )
     {
-        String effectiveUrl = String.format( ENVIRONMENT_URL_TEMPLATE, host, SystemSettings.getSecurePortX2(),
+        String effectiveUrl = String.format( ENVIRONMENT_URL_TEMPLATE, peerInfo.getIp(), peerInfo.getPort(),
                 ( path.startsWith( "/" ) ? path : "/" + path ) );
         WebClient client = WebClient.create( effectiveUrl, Arrays.asList( provider ) );
         HTTPConduit httpConduit = ( HTTPConduit ) WebClient.getConfig( client ).getConduit();
@@ -134,8 +134,8 @@ public class WebClientBuilder
     }
 
 
-    public static WebClient buildPeerWebClient( final PeerInfo host, final String path )
+    public static WebClient buildPeerWebClient( final PeerInfo peerInfo, final String path )
     {
-        return buildPeerWebClient( host.getIp(), path, null );
+        return buildPeerWebClient( peerInfo, path, null );
     }
 }

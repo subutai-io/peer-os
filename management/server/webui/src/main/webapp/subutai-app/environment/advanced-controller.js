@@ -32,6 +32,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 	vm.environment2BuildName = 'Environment name';
 	vm.currentPeer = false;
 	vm.currentPeerIndex = false;
+	vm.buildCompleted = false;
 
 	// functions
 
@@ -42,6 +43,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
 	vm.showResources = showResources;
 	vm.addResource2Build = addResource2Build;
+	vm.closePopup = closePopup;
 
 	environmentService.getTemplates()
 		.success(function (data) {
@@ -64,12 +66,17 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 	environmentService.getPeers().success(function (data) {
 		vm.peerIds = data;
 		//vm.peerIds['testPeer'] = ['rh1', 'rh2', 'rh3'];
-		console.log(vm.peerIds);
 	});
+	clearWorkspace();
 
 	/*peerRegistrationService.getResourceHosts().success(function (data) {
 		vm.resourceHosts = data;
 	});*/
+
+	function closePopup() {
+		vm.buildCompleted = false;
+		ngDialog.closeAll();
+	}
 
 	function getLogsFromTracker(environmentId) {
 		trackerSrv.getOperations('ENVIRONMENT MANAGER', moment().format('YYYY-MM-DD'), moment().format('YYYY-MM-DD'), 100)
@@ -149,8 +156,16 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 					if(data.state == 'FAILED') {
 						checkLastLog(false);
 					} else {
-						SweetAlert.swal("Success!", "Your environment has been built successfully.", "success");
+						//SweetAlert.swal("Success!", "Your environment has been built successfully.", "success");
 						checkLastLog(true);
+						var currentLog = {
+							"time": moment().format('HH:mm:ss'),
+							"status": 'success',
+							"classes": ['fa-check', 'g-text-green'],
+							"text": 'Your environment has been built successfully'
+						};
+						vm.logMessages.push(currentLog);						
+						vm.buildCompleted = true;
 					}
 				}
 			}).error(function(error) {
@@ -393,6 +408,8 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 			switch (className) {
 				case 'element-tool-remove':
 					var rh = this.model.attributes.rh;
+					var resourceHost = graph.getCell(rh.model);
+					resourceHost.set('children', resourceHost.get('children') - 1);
 					delete graph.getCell(rh.model).attributes.grid[rh.x][rh.y];
 					this.model.remove();
 					return;
@@ -800,8 +817,29 @@ function checkResourceHost(model) {
 }
 
 function startDrag( event ) {
+
+	var containerImage = $(event.target).parent().find('img');
+
+	var ghostImage = document.createElement("span");
+	ghostImage.className = 'b-cloud-item b-hidden-object';
+	ghostImage.id = 'js-ghost-image';
+	ghostImage.style.backgroundImage = "url('" + containerImage.attr('src') + "')";
+	document.body.appendChild(ghostImage);
+	event.dataTransfer.setDragImage(document.createElement("span"), 0, 0);
+
 	event.dataTransfer.setData( "template", $(event.target).data('template') );
-	event.dataTransfer.setData( "img", $(event.target).find('img').attr('src') );
+	event.dataTransfer.setData( "img", containerImage.attr('src') );
+}
+
+function dragOver( event ) {
+	var ghostImage = document.getElementById('js-ghost-image');	
+	ghostImage.style.left = event.pageX + 'px';
+	ghostImage.style.top = event.pageY + 'px';
+	event.preventDefault();
+}
+
+function endtDrag( event ) {
+	document.getElementById('js-ghost-image').remove();
 }
 
 var containerCounter = 1;
@@ -851,9 +889,5 @@ function drop(event) {
 			models[i].set('children', models[i].get('children') + 1);
 		}
 	}
-}
-
-function dragOver( event ) {
-	event.preventDefault();
 }
 

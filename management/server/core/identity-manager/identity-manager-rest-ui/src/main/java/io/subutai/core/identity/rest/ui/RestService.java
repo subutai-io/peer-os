@@ -50,6 +50,12 @@ public interface RestService
                        @FormParam( "trustLevel" ) String trustLevel );
 
     @POST
+    @Path("/new-password")
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response changePassword( @FormParam("old") String oldPass, @FormParam("new") String newPass);
+
+
+    @POST
     @Path("/approve-delegate")
     @Produces( { MediaType.APPLICATION_JSON } )
     Response approveDelegatedUser( @FormParam( "signedDocument" ) String trustMessage);

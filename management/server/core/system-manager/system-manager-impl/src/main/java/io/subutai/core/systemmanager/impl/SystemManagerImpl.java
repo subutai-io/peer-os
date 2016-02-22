@@ -3,6 +3,8 @@ package io.subutai.core.systemmanager.impl;
 
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.configuration.ConfigurationException;
+
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
@@ -40,33 +42,34 @@ public class SystemManagerImpl implements SystemManager
     //                              final int securePortX2, final int securePortX3, final int specialPortX1  )
 
 
-    public SystemManagerImpl( final String globalKurjunUrls, final int securePortX1,
-                              final int securePortX2, final int securePortX3 )
+    public SystemManagerImpl( /*final String globalKurjunUrls, final int securePortX1, final int securePortX2,
+                              final int securePortX3*/ ) throws ConfigurationException
 
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( globalKurjunUrls ), "Invalid Global Kurjun URLs" );
+//        Preconditions.checkNotNull( globalKurjunUrls, "Invalid Global Kurjun URLs could not be null." );
+//        Preconditions.checkArgument( globalKurjunUrls.length > 0, "Invalid Global Kurjun URLs could not be empty." );
 
-//        SystemSettings.setExternalIpInterface( externalInterfaceName );
-//        SystemSettings.setPublicUrl( publicURL );
-//        SystemSettings.setRegisterToHubState( isRegisteredToHub );
-//
-//        SystemSettings.setEncryptionState( encryptionEnabled );
-//        SystemSettings.setRestEncryptionState( restEncryptionEnabled );
-//        SystemSettings.setIntegrationState( integrationEnabled );
-//        SystemSettings.setKeyTrustCheckState( keyTrustCheckEnabled );
+        //        SystemSettings.setExternalIpInterface( externalInterfaceName );
+        //        SystemSettings.setPublicUrl( publicURL );
+        //        SystemSettings.setRegisterToHubState( isRegisteredToHub );
+        //
+        //        SystemSettings.setEncryptionState( encryptionEnabled );
+        //        SystemSettings.setRestEncryptionState( restEncryptionEnabled );
+        //        SystemSettings.setIntegrationState( integrationEnabled );
+        //        SystemSettings.setKeyTrustCheckState( keyTrustCheckEnabled );
 
 
-        SystemSettings.setGlobalKurjunUrls( globalKurjunUrls );
-//        SystemSettings.setOpenPort( openPort );
-        SystemSettings.setSecurePortX1( securePortX1 );
-        SystemSettings.setSecurePortX2( securePortX2 );
-        SystemSettings.setSecurePortX3( securePortX3 );
-//        SystemSettings.setSpecialPortX1( specialPortX1 );
+//        SystemSettings.setGlobalKurjunUrls( globalKurjunUrls );
+//        //        SystemSettings.setOpenPort( openPort );
+//        SystemSettings.setSecurePortX1( securePortX1 );
+//        SystemSettings.setSecurePortX2( securePortX2 );
+//        SystemSettings.setSecurePortX3( securePortX3 );
+        //        SystemSettings.setSpecialPortX1( specialPortX1 );
     }
 
 
     @Override
-    public KurjunSettings getKurjunSettings()
+    public KurjunSettings getKurjunSettings() throws ConfigurationException
     {
         KurjunSettings pojo = new KurjunSettingsPojo();
 
@@ -91,7 +94,7 @@ public class SystemManagerImpl implements SystemManager
             pojo.setTrustTimeUnit( trustTransferQuota.getTimeUnit() );
         }
 
-        pojo.setGlobalKurjunUrls( io.subutai.common.settings.SystemSettings.getGlobalKurjunUrls() );
+        pojo.setGlobalKurjunUrls( SystemSettings.getGlobalKurjunUrls() );
 
         return pojo;
     }
@@ -148,11 +151,12 @@ public class SystemManagerImpl implements SystemManager
 
 
     @Override
-    public boolean setKurjunSettings( final String globalKurjunUrls, final long publicDiskQuota,
+    public boolean setKurjunSettings( final String[] globalKurjunUrls, final long publicDiskQuota,
                                       final long publicThreshold, final long publicTimeFrame, final long trustDiskQuota,
                                       final long trustThreshold, final long trustTimeFrame )
+            throws ConfigurationException
     {
-        io.subutai.common.settings.SystemSettings.setGlobalKurjunUrls( globalKurjunUrls );
+        SystemSettings.setGlobalKurjunUrls( globalKurjunUrls );
 
         templateManager.setDiskQuota( publicDiskQuota, "public" );
         templateManager.setDiskQuota( trustDiskQuota, "trust" );

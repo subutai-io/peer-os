@@ -6,16 +6,23 @@ angular.module('subutai.login.controller', [])
 	.directive('pwCheck', pwCheck);
 
 LoginCtrl.$inject = ['loginSrv', '$http', '$location', '$rootScope', '$state'];
-ChangePassCtrl.$inject = ['$scope', 'loginSrv', '$http', '$location', '$rootScope', '$state'];
+ChangePassCtrl.$inject = ['$scope', 'loginSrv', '$http', '$location', '$rootScope', '$state', 'SweetAlert'];
 
-function ChangePassCtrl( $scope, loginSrv, $http, $location, $rootScope, $state) {
+function ChangePassCtrl( $scope, loginSrv, $http, $location, $rootScope, $state, SweetAlert) {
 	var vm = this;
 
 	vm.changePass = changePass;
 
-	function changePass(newPassword) {
+	function changePass(passObj) {
 		if ($scope.changePassForm.$valid) {		
-			console.log(newPassword);
+			LOADING_SCREEN();
+			loginSrv.changePass(passObj).success(function(data){
+				LOADING_SCREEN('none');
+				SweetAlert.swal ("Success!", "You have successfully changed password.", "success");
+			}).error(function(error){
+				LOADING_SCREEN('none');
+				SweetAlert.swal ("ERROR!", "Error: " + error, "error");
+			});
 		}
 	}
 }

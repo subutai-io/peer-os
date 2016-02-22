@@ -6,7 +6,6 @@ import java.util.Set;
 
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.network.Vni;
-import io.subutai.common.protocol.ControlNetworkConfig;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.TemplateKurjun;
 
@@ -16,6 +15,12 @@ import io.subutai.common.protocol.TemplateKurjun;
  */
 public interface LocalPeer extends Peer
 {
+
+
+    /**
+     * Returns public IP of peer determined by internet service
+     */
+    String getPublicIp() throws PeerException;
 
     /**
      * Adds remote apt repository to local apt sources
