@@ -2719,9 +2719,14 @@ td.b-main-table__status-col {
     height: 40px;
     line-height: 37px;
     border: 1px solid #CCCEEE;
-    border-radius: 50%;
+    border-radius: 50px;
     text-align: center;
     box-sizing: border-box;
+	background-size: 25px 25px;
+	background-position: 50% 50%;
+	background-repeat: no-repeat;
+	overflow: hidden;
+	background-color: #FFF;
 }
 .b-cloud-item {
     display: inline-block;
@@ -3271,5 +3276,20 @@ td.b-main-table__status-col {
 
 .b-dropdown-buttons .b-btn:last-child {
 	margin-right: 0;
+}
+
+.b-dragAndDrop-item {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+
+.b-hidden-object {
+	position: absolute;
+	top: -150px;
+	left: 0;
+	opacity: 0.6;
 }
 
