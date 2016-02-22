@@ -395,8 +395,7 @@ public class PeerWebClient
         }
         catch ( Exception e )
         {
-            throw new PeerException( String.format( "Error obtaining reserved VNIs from peer %s", peerInfo ),
-                    e );
+            throw new PeerException( String.format( "Error obtaining reserved VNIs from peer %s", peerInfo ), e );
         }
     }
 
@@ -576,7 +575,7 @@ public class PeerWebClient
     {
         String path = String.format( "/containers/%s", environmentId.getId() );
 
-        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo.getIp(), path, provider, 500, 7000, 1 );
+        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 500, 7000, 1 );
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
         Collection response = client.getCollection( ContainerHostInfo.class );

@@ -1,7 +1,5 @@
-package io.subutai.core.localpeer.api;
+package io.subutai.common.task;
 
-
-import java.util.List;
 
 import io.subutai.common.peer.Host;
 
@@ -13,6 +11,8 @@ public interface Task<T>
 {
     int getTimeout();
 
+    void checkTimeout();
+
     enum State
     {
         PENDING, RUNNING, SUCCESS, FAILURE;
@@ -23,6 +23,8 @@ public interface Task<T>
     State getState();
 
     Exception getException();
+
+    CommandBatch getCommandBatch() throws Exception;
 
     T getResult();
 

@@ -70,11 +70,11 @@ public class CreatePeerNodeGroupsTask implements Callable<Set<NodeGroupBuildResu
                         localPeer.getOwnerId(), environment.getSubnetCidr(), ipAddressOffset + currentIpAddressOffset,
                         nodeGroup.getTemplateName(), nodeGroup.getHostId(), nodeGroup.getType() );
 
-                Set<ContainerHostInfoModel> newHosts = peer.createEnvironmentContainerGroup( request );
+                /*Set<ContainerHostInfoModel> newHosts =*/ peer.createEnvironmentContainerGroup( request );
 
                 currentIpAddressOffset++;
 
-                for ( ContainerHostInfoModel newHost : newHosts )
+/*                for ( ContainerHostInfoModel newHost : newHosts )
                 {
 
                     containers.add( new EnvironmentContainerImpl( localPeer.getId(), peer, nodeGroup.getName(), newHost,
@@ -85,7 +85,7 @@ public class CreatePeerNodeGroupsTask implements Callable<Set<NodeGroupBuildResu
                 if ( containers.isEmpty() )
                 {
                     exception = new NodeGroupBuildException( "Requested container has not been created", null );
-                }
+                }*/
             }
             catch ( Exception e )
             {

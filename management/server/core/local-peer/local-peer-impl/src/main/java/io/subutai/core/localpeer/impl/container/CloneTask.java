@@ -1,10 +1,6 @@
 package io.subutai.core.localpeer.impl.container;
 
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
 import javax.naming.NamingException;
 
 import org.slf4j.Logger;
@@ -14,14 +10,13 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
-import io.subutai.common.command.CommandException;
+import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandResultParser;
+import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.HostInfo;
-import io.subutai.common.host.NullHostInterface;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.Host;
-import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.TemplateKurjun;
@@ -32,15 +27,14 @@ import io.subutai.common.util.NumUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
-import io.subutai.core.localpeer.api.Command;
-import io.subutai.core.localpeer.api.CommandBatch;
-import io.subutai.core.localpeer.api.Task;
+import io.subutai.common.task.Command;
+import io.subutai.common.task.CommandBatch;
 import io.subutai.core.localpeer.impl.LocalPeerImpl;
 import io.subutai.core.localpeer.impl.entity.ContainerHostEntity;
 import io.subutai.core.registration.api.RegistrationManager;
 
 
-public class CloneTask extends AbstractTask<HostInfo>
+public class CloneTask extends AbstractTask<HostInfo> implements CommandResultParser<HostInfo>
 {
     protected static final Logger LOG = LoggerFactory.getLogger( CloneTask.class );
 
@@ -95,7 +89,8 @@ public class CloneTask extends AbstractTask<HostInfo>
         CommandBatch result = new CommandBatch();
 
         Command cloneAction = new Command( "clone",
-                Lists.newArrayList( template.getName(), hostname, "-i", String.format( "%s %s", ip, vlan ), "-t",
+                Lists.newArrayList( template.getName(), hostname, "-i", String.format( "%s %s", ip, vlan ), "-e",
+                        environmentId, "-t",
                         getRegistrationManager().generateContainerTTLToken( ( TIMEOUT + 10 ) * 1000L ).getToken() ) );
 
         result.addCommand( cloneAction );
@@ -116,20 +111,6 @@ public class CloneTask extends AbstractTask<HostInfo>
 
 
     @Override
-    public void parseCommandResult()
-    {
-        try
-        {
-            result = hostRegistry.getContainerHostInfoByHostname( hostname );
-        }
-        catch ( HostDisconnectedException e )
-        {
-            // ignore
-        }
-    }
-
-
-    @Override
     public Host getHost()
     {
         return resourceHost;
@@ -137,9 +118,51 @@ public class CloneTask extends AbstractTask<HostInfo>
 
 
     @Override
+    public void start()
+    {
+        this.started = System.currentTimeMillis();
+        setState( State.RUNNING );
+        try
+        {
+            RequestBuilder builder = getRequestBuilder();
+
+            commandResult = commandUtil.execute( builder, getHost() );
+
+            if ( !commandResult.hasSucceeded() )
+            {
+                setState( State.FAILURE );
+            }
+        }
+
+        catch ( Exception e )
+        {
+            this.exception = e;
+            setState( State.FAILURE );
+        }
+    }
+
+
+    @Override
     public CommandResultParser<HostInfo> getCommandResultParser()
     {
-        throw new UnsupportedOperationException( "Command result parser for clone task unsupported." );
+        return this;
+    }
+
+
+    @Override
+    public HostInfo parse( final CommandResult commandResult )
+    {
+        HostInfo result = null;
+        try
+        {
+            result = hostRegistry.getContainerHostInfoByHostname( hostname );
+        }
+        catch ( HostDisconnectedException e )
+        {
+            //ignore
+        }
+
+        return result;
     }
 
 
@@ -159,7 +182,6 @@ public class CloneTask extends AbstractTask<HostInfo>
 
     public void onSuccess()
     {
-
         ContainerHostEntity containerHostEntity =
                 new ContainerHostEntity( result.getId(), result, template.getName(), template.getArchitecture() );
         containerHostEntity.setEnvironmentId( environmentId );

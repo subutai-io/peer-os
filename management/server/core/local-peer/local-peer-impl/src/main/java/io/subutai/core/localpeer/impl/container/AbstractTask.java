@@ -1,7 +1,6 @@
 package io.subutai.core.localpeer.impl.container;
 
 
-import java.text.MessageFormat;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -13,8 +12,7 @@ import io.subutai.common.command.CommandResultParser;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.Host;
-import io.subutai.core.localpeer.api.CommandBatch;
-import io.subutai.core.localpeer.api.Task;
+import io.subutai.common.task.Task;
 
 
 /**
@@ -30,13 +28,14 @@ public abstract class AbstractTask<T> implements Task<T>
     protected Exception exception;
     private Task.State state = Task.State.PENDING;
     protected CommandUtil commandUtil = new CommandUtil();
-    private CommandResult commandResult;
+    protected CommandResult commandResult;
     protected long started;
 
 
     protected RequestBuilder getRequestBuilder() throws Exception
     {
-        return new RequestBuilder( String.format( "subutai batch -json '%s'", getCommandBatch().asJson() ) )
+        return new RequestBuilder( isChain() ? getCommandBatch().asChain() :
+                                   String.format( "subutai batch -json '%s'", getCommandBatch().asJson() ) )
                 .withTimeout( getTimeout() );
     }
 
@@ -75,9 +74,6 @@ public abstract class AbstractTask<T> implements Task<T>
     {
         return exception;
     }
-
-
-    abstract CommandBatch getCommandBatch() throws Exception;
 
 
     private void parseCommandResult()
@@ -123,8 +119,8 @@ public abstract class AbstractTask<T> implements Task<T>
         return false;
     }
 
-
-    protected void checkTimeout()
+    @Override
+    public void checkTimeout()
     {
         if ( this.state == State.RUNNING )
         {
@@ -139,7 +135,7 @@ public abstract class AbstractTask<T> implements Task<T>
 
     protected void onSuccess()
     {
-       //empty
+        //empty
     }
 
 
@@ -176,5 +172,11 @@ public abstract class AbstractTask<T> implements Task<T>
                     LOG.error( e.getMessage(), e );
                 }
         }
+    }
+
+
+    public boolean isChain()
+    {
+        return true;
     }
 }

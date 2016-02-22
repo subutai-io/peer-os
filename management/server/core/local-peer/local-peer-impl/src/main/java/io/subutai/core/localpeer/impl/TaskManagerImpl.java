@@ -7,21 +7,33 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
-import io.subutai.core.localpeer.api.Task;
-import io.subutai.core.localpeer.api.TaskManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import io.subutai.common.task.Task;
+import io.subutai.common.task.TaskManager;
 
 
 /**
  * Task Manager
  */
-public class TaskManagerImpl implements TaskManager
+public class TaskManagerImpl implements TaskManager, Runnable
 {
+    private static final Logger LOG = LoggerFactory.getLogger( TaskManagerImpl.class );
     private Map<Integer, Task> tasks = new ConcurrentHashMap<>();
     private Map<String, Executor> executors = new ConcurrentHashMap<>();
     private AtomicInteger counter = new AtomicInteger( 0 );
+    private ScheduledExecutorService timeoutService = Executors.newSingleThreadScheduledExecutor();
+
+
+    public TaskManagerImpl()
+    {
+        timeoutService.scheduleWithFixedDelay( this, 10, 10, TimeUnit.SECONDS );
+    }
 
 
     @Override
@@ -86,5 +98,25 @@ public class TaskManagerImpl implements TaskManager
             result.add( task );
         }
         return result;
+    }
+
+
+    @Override
+    public void run()
+    {
+        for ( Task task : tasks.values() )
+        {
+            if ( task.getState() == Task.State.RUNNING )
+            {
+                try
+                {
+                    task.checkTimeout();
+                }
+                catch ( Exception e )
+                {
+                    LOG.error( e.getMessage(), e );
+                }
+            }
+        }
     }
 }

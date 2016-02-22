@@ -35,13 +35,15 @@ public class CreateEnvironmentContainerGroupRequestListener extends RequestListe
     @Override
     public Object onRequest( final Payload payload ) throws Exception
     {
-        CreateEnvironmentContainerGroupRequest request = payload.getMessage( CreateEnvironmentContainerGroupRequest.class );
+        CreateEnvironmentContainerGroupRequest request =
+                payload.getMessage( CreateEnvironmentContainerGroupRequest.class );
         if ( request != null )
         {
 
-            Set<ContainerHostInfoModel> containerHosts = localPeer.createEnvironmentContainerGroup( request );
+           /* Set<ContainerHostInfoModel> containerHosts =*/
+            localPeer.createEnvironmentContainerGroup( request );
 
-            return new CreateEnvironmentContainerGroupResponse( containerHosts );
+            return null;
         }
         else
         {

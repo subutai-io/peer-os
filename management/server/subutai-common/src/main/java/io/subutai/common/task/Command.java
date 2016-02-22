@@ -1,4 +1,4 @@
-package io.subutai.core.localpeer.api;
+package io.subutai.common.task;
 
 
 import java.util.ArrayList;
@@ -36,5 +36,11 @@ public class Command
     public void addArgument( final String arg )
     {
         this.args.add( arg );
+    }
+
+
+    public List<String> getArguments()
+    {
+        return args;
     }
 }
