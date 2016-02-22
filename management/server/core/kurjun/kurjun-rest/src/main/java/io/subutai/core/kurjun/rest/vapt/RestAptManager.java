@@ -71,8 +71,8 @@ public interface RestAptManager
     @GET
     @Path( "get" )
     Response getPackage( @QueryParam( MD5_PARAM ) String md5 );
-  
-
+    
+    
     @GET
     @Path( "list" )
     Response listPackages();

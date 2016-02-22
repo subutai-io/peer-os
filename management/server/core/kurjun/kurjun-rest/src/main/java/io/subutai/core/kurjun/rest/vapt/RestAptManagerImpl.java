@@ -42,8 +42,8 @@ public class RestAptManagerImpl extends RestManagerBase implements RestAptManage
     public Response getRelease( String release )
     {
         String releaseIndex = aptManager.getRelease( release, null, null );
-        return ( releaseIndex != null ) ? Response.ok( releaseIndex ).build() :
-               notFoundResponse( "Release not found." );
+        return ( releaseIndex != null ) ? Response.ok( releaseIndex ).build()
+                : notFoundResponse( "Release not found." );
     }
 
 
@@ -86,8 +86,8 @@ public class RestAptManagerImpl extends RestManagerBase implements RestAptManage
                 {
                     DefaultPackageMetadata pm = MetadataUtils.JSON.fromJson( serialized, DefaultPackageMetadata.class );
                     return Response.ok( is )
-                                   .header( "Content-Disposition", "attachment; filename=" + makePackageFilename( pm ) )
-                                   .header( "Content-Type", "application/octet-stream" ).build();
+                            .header( "Content-Disposition", "attachment; filename=" + makePackageFilename( pm ) )
+                            .header( "Content-Type", "application/octet-stream" ).build();
                 }
             }
         }
@@ -169,8 +169,8 @@ public class RestAptManagerImpl extends RestManagerBase implements RestAptManage
             {
                 DefaultPackageMetadata pm = MetadataUtils.JSON.fromJson( serialized, DefaultPackageMetadata.class );
                 return Response.ok( is )
-                               .header( "Content-Disposition", "attachment; filename=" + makePackageFilename( pm ) )
-                               .header( "Content-Type", "application/octet-stream" ).build();
+                        .header( "Content-Disposition", "attachment; filename=" + makePackageFilename( pm ) )
+                        .header( "Content-Type", "application/octet-stream" ).build();
             }
         }
         return packageNotFoundResponse();

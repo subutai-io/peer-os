@@ -10,8 +10,8 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>object-relation-manager</artifactId>
-  <name>Subutai Object Relation Manager Impl</name>
-  <description>Subutai Object Relation Manager Impl</description>
+  <name>Subutai Object Relation Manager Parent</name>
+  <description>Subutai Object Relation Manager Parent</description>
   <packaging>pom</packaging>
   <modules>
     <module>object-relation-manager-api</module>

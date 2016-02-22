@@ -1,19 +1,21 @@
 package io.subutai.core.kurjun.impl;
 
 
+import io.subutai.core.kurjun.impl.store.RepoUrlStore;
+import io.subutai.core.kurjun.impl.model.RepoUrl;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
+import java.net.MalformedURLException;
 import java.net.SocketException;
 import java.net.URL;
 import java.nio.file.Path;
-import java.security.AccessControlException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +34,6 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.commons.codec.binary.Hex;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.inject.Injector;
 
@@ -45,16 +46,16 @@ import ai.subut.kurjun.common.utils.InetUtils;
 import ai.subut.kurjun.index.PackagesIndexParserModule;
 import ai.subut.kurjun.metadata.common.DefaultMetadata;
 import ai.subut.kurjun.metadata.common.subutai.DefaultTemplate;
+import ai.subut.kurjun.metadata.common.subutai.TemplateId;
+import ai.subut.kurjun.metadata.common.utils.IdValidators;
 import ai.subut.kurjun.metadata.factory.PackageMetadataStoreFactory;
 import ai.subut.kurjun.metadata.factory.PackageMetadataStoreModule;
-import ai.subut.kurjun.model.metadata.Metadata;
 import ai.subut.kurjun.model.metadata.SerializableMetadata;
+import ai.subut.kurjun.model.metadata.template.SubutaiTemplateMetadata;
 import ai.subut.kurjun.model.repository.LocalRepository;
 import ai.subut.kurjun.model.repository.NonLocalRepository;
 import ai.subut.kurjun.model.repository.Repository;
 import ai.subut.kurjun.model.repository.UnifiedRepository;
-import ai.subut.kurjun.model.security.Identity;
-import ai.subut.kurjun.model.security.Permission;
 import ai.subut.kurjun.quota.DataUnit;
 import ai.subut.kurjun.quota.QuotaException;
 import ai.subut.kurjun.quota.QuotaInfoStore;
@@ -64,23 +65,29 @@ import ai.subut.kurjun.quota.disk.DiskQuota;
 import ai.subut.kurjun.quota.disk.DiskQuotaManager;
 import ai.subut.kurjun.quota.transfer.TransferQuota;
 import ai.subut.kurjun.quota.transfer.TransferQuotaManager;
+import ai.subut.kurjun.repo.LocalTemplateRepository;
 import ai.subut.kurjun.repo.RepositoryFactory;
 import ai.subut.kurjun.repo.RepositoryModule;
 import ai.subut.kurjun.riparser.ReleaseIndexParserModule;
 import ai.subut.kurjun.security.SecurityModule;
-import ai.subut.kurjun.security.service.AuthManager;
 import ai.subut.kurjun.snap.SnapMetadataParserModule;
 import ai.subut.kurjun.storage.factory.FileStoreFactory;
 import ai.subut.kurjun.storage.factory.FileStoreModule;
 import ai.subut.kurjun.subutai.SubutaiTemplateParserModule;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.protocol.SharedTemplate;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.kurjun.api.KurjunTransferQuota;
 import io.subutai.core.kurjun.api.TemplateManager;
+import io.subutai.core.kurjun.api.template.TemplateRepository;
+import io.subutai.core.kurjun.impl.model.SharedTemplateInfo;
+import io.subutai.core.kurjun.impl.model.UserRepoContext;
+import io.subutai.core.kurjun.impl.store.UserRepoContextStore;
+import io.subutai.core.object.relation.api.RelationManager;
 
 
 @PermitAll
@@ -89,39 +96,35 @@ public class TemplateManagerImpl implements TemplateManager
 
     private static final Logger LOGGER = LoggerFactory.getLogger( TemplateManagerImpl.class );
 
-    private static final Set<KurjunContext> CONTEXTS = new HashSet<>();
+    private Set<UserRepoContext> GLOBAL_CONTEXTS;
+    private Set<UserRepoContext> PRIVATE_CONTEXTS;
 
     // url list read from kurjun.cfg file on bundle start up
     private final List<String> globalKurjunUrlList = new ArrayList<>();
 
     private Injector injector;
 
-    private AuthManager authManager;
-
-    private final io.subutai.core.security.api.SecurityManager securityManager;
-
-    private ai.subut.kurjun.security.service.IdentityManager kurjunIdentityManager;
-
     private Set<RepoUrl> remoteRepoUrls = new HashSet<>();
 
-    private Set<RepoUrl> globalRepoUrls = new LinkedHashSet<>();
+    // private Set<RepoUrl> globalRepoUrls = new LinkedHashSet<>();
 
     private final LocalPeer localPeer;
 
-    private final IdentityManager subutaiIdentityManager;
-
     private final RepoUrlStore repoUrlStore = new RepoUrlStore( Common.SUBUTAI_APP_DATA_PATH );
+
+    private final UserRepoContextStore userRepoContextStore = new UserRepoContextStore( Common.SUBUTAI_APP_DATA_PATH );
 
     private ScheduledExecutorService metadataCacheUpdater;
 
+    private final SubutaiSecurityHelper securityHelper;
 
-    public TemplateManagerImpl( LocalPeer localPeer, IdentityManager identityManager,
-                                io.subutai.core.security.api.SecurityManager securityManager, String globalKurjunUrl )
+
+    public TemplateManagerImpl( LocalPeer localPeer, IdentityManager identityManager, RelationManager relationManager,
+            io.subutai.core.security.api.SecurityManager securityManager, String globalKurjunUrl )
     {
         this.localPeer = localPeer;
-        this.subutaiIdentityManager = identityManager;
-        this.securityManager = securityManager;
-        parseGlobalKurjunUrls( globalKurjunUrl );
+        this.securityHelper = new SubutaiSecurityHelper( identityManager, relationManager, securityManager );
+        // parseGlobalKurjunUrls( globalKurjunUrl );
     }
 
 
@@ -129,40 +132,24 @@ public class TemplateManagerImpl implements TemplateManager
     {
         injector = bootstrapDI();
 
-        // init repo urls
-        try
-        {
-            // Load remote repo urls from store
-            remoteRepoUrls = repoUrlStore.getRemoteTemplateUrls();
+        KurjunProperties properties = injector.getInstance( KurjunProperties.class );
 
-            // Refresh global urls
-            repoUrlStore.removeAllGlobalTemplateUrl();
-            for ( String url : SystemSettings.getGlobalKurjunUrls() )
-            {
-                repoUrlStore.addGlobalTemplateUrl( new RepoUrl( new URL( url ), null ) );
-            }
+        initRepoUrls();
 
-            // Load global repo urls from store
-            globalRepoUrls = repoUrlStore.getGlobalTemplateUrls();
-        }
-        catch ( IOException e )
-        {
-            LOGGER.error( "Failed to get remote repo urls", e );
-        }
+        initUserRepoContexts( properties );
 
         logAllUrlsInUse();
 
-        kurjunIdentityManager = injector.getInstance( ai.subut.kurjun.security.service.IdentityManager.class );
-
-        authManager = injector.getInstance( AuthManager.class );
-
-        // init contexts
-        KurjunProperties properties = injector.getInstance( KurjunProperties.class );
-        setContexts( properties );
-
         // schedule metadata cache updater
         metadataCacheUpdater = Executors.newSingleThreadScheduledExecutor();
-        metadataCacheUpdater.scheduleWithFixedDelay( () -> refreshMetadataCache(), 5, 30, TimeUnit.SECONDS );
+        metadataCacheUpdater.scheduleWithFixedDelay( ()
+                -> 
+                {
+                    for ( KurjunContext context : GLOBAL_CONTEXTS )
+                    {
+                        refreshMetadataCache( context.getName() );
+                    }
+        }, 5, 30, TimeUnit.SECONDS );
     }
 
 
@@ -174,24 +161,20 @@ public class TemplateManagerImpl implements TemplateManager
 
     @Override
     @RolesAllowed( "Template-Management|Read" )
-    public TemplateKurjun getTemplate( String context, byte[] md5, boolean isKurjunClient ) throws IOException
+    public TemplateKurjun getTemplate( String repository, byte[] md5, String templateOwner, boolean isKurjunClient )
+            throws IOException
     {
+        UserRepoContext context = getUserRepoContext( repository );
+        securityHelper.checkGetPermission( context, md5, templateOwner );
 
-        checkPermission( context, Permission.GET_PACKAGE, Hex.encodeHexString( md5 ) );
-
-        DefaultMetadata m = new DefaultMetadata();
-        m.setMd5sum( md5 );
+        DefaultTemplate m = new DefaultTemplate();
+        m.setId( templateOwner, md5 );
 
         UnifiedRepository repo = getRepository( context, isKurjunClient );
-        DefaultTemplate meta = ( DefaultTemplate ) repo.getPackageInfo( m );
+        SubutaiTemplateMetadata meta = ( SubutaiTemplateMetadata ) repo.getPackageInfo( m );
         if ( meta != null )
         {
-            TemplateKurjun template =
-                    new TemplateKurjun( Hex.encodeHexString( meta.getMd5Sum() ), meta.getName(), meta.getVersion(),
-                            meta.getArchitecture().name(), meta.getParent(), meta.getPackage() );
-            template.setConfigContents( meta.getConfigContents() );
-            template.setPackagesContents( meta.getPackagesContents() );
-            return template;
+            return convertToSubutaiTemplate( meta );
         }
         return null;
     }
@@ -199,26 +182,21 @@ public class TemplateManagerImpl implements TemplateManager
 
     @Override
     @RolesAllowed( "Template-Management|Read" )
-    public TemplateKurjun getTemplate( String context, String name, String version, boolean isKurjunClient )
+    public TemplateKurjun getTemplate( String repository, String name, String version, boolean isKurjunClient )
             throws IOException
     {
         DefaultMetadata m = new DefaultMetadata();
         m.setName( name );
         m.setVersion( version );
 
+        UserRepoContext context = getUserRepoContext( repository );
         UnifiedRepository repo = getRepository( context, isKurjunClient );
 
-        DefaultTemplate meta = ( DefaultTemplate ) repo.getPackageInfo( m );
+        SubutaiTemplateMetadata meta = ( SubutaiTemplateMetadata ) repo.getPackageInfo( m );
         if ( meta != null )
         {
-            checkPermission( context, Permission.GET_PACKAGE, Hex.encodeHexString( meta.getMd5Sum() ) );
-
-            TemplateKurjun template =
-                    new TemplateKurjun( Hex.encodeHexString( meta.getMd5Sum() ), meta.getName(), meta.getVersion(),
-                            meta.getArchitecture().name(), meta.getParent(), meta.getPackage() );
-            template.setConfigContents( meta.getConfigContents() );
-            template.setPackagesContents( meta.getPackagesContents() );
-            return template;
+            securityHelper.checkGetPermission( context, meta.getMd5Sum(), meta.getOwnerFprint() );
+            return convertToSubutaiTemplate( meta );
         }
         return null;
     }
@@ -230,7 +208,7 @@ public class TemplateManagerImpl implements TemplateManager
     {
         try
         {
-            return getTemplate( PUBLIC_REPO, name, null, false );
+            return getTemplate( TemplateRepository.PUBLIC, name, null, false );
         }
         catch ( IOException e )
         {
@@ -243,12 +221,13 @@ public class TemplateManagerImpl implements TemplateManager
 
     @Override
     @RolesAllowed( "Template-Management|Read" )
-    public InputStream getTemplateData( String context, byte[] md5, boolean isKurjunClient ) throws IOException
+    public InputStream getTemplateData( String repository, byte[] md5, String templateOwner, boolean isKurjunClient ) throws IOException
     {
-        checkPermission( context, Permission.GET_PACKAGE, Hex.encodeHexString( md5 ) );
+        UserRepoContext context = getUserRepoContext( repository );
+        securityHelper.checkGetPermission( context, md5, templateOwner );
 
-        DefaultMetadata m = new DefaultMetadata();
-        m.setMd5sum( md5 );
+        DefaultTemplate m = new DefaultTemplate();
+        m.setId( templateOwner, md5 );
 
         UnifiedRepository repo = getRepository( context, isKurjunClient );
         InputStream is = repo.getPackageStream( m );
@@ -256,7 +235,7 @@ public class TemplateManagerImpl implements TemplateManager
         if ( is != null )
         {
             QuotaManagerFactory quotaManagerFactory = injector.getInstance( QuotaManagerFactory.class );
-            TransferQuotaManager qm = quotaManagerFactory.createTransferQuotaManager( new KurjunContext( context ) );
+            TransferQuotaManager qm = quotaManagerFactory.createTransferQuotaManager( context );
             return qm.createManagedStream( is );
         }
         return null;
@@ -265,66 +244,123 @@ public class TemplateManagerImpl implements TemplateManager
 
     @Override
     @RolesAllowed( "Template-Management|Read" )
-    public List<TemplateKurjun> list( String context, boolean isKurjunClient ) throws IOException
+    public List<TemplateKurjun> list( String repository, boolean isKurjunClient ) throws IOException
     {
+        UserRepoContext context = getUserRepoContext( repository );
         UnifiedRepository repo = getRepository( context, isKurjunClient );
         Set<SerializableMetadata> metadatas = listPackagesFromCache( repo );
 
         List<TemplateKurjun> result = new LinkedList<>();
+
         for ( SerializableMetadata metadata : metadatas )
         {
-            if ( !isAllowed( context, Permission.GET_PACKAGE, Hex.encodeHexString( metadata.getMd5Sum() ) ) )
+            DefaultTemplate templateMeta = ( DefaultTemplate ) metadata;
+            if ( securityHelper.isGetAllowed( context, templateMeta.getMd5Sum(), templateMeta.getOwnerFprint() ) )
             {
-                continue;
+                result.add( convertToSubutaiTemplate( templateMeta ) );
             }
-
-            DefaultTemplate meta = ( DefaultTemplate ) metadata;
-            TemplateKurjun t =
-                    new TemplateKurjun( Hex.encodeHexString( meta.getMd5Sum() ), meta.getName(), meta.getVersion(),
-                            meta.getArchitecture().name(), meta.getParent(), meta.getPackage() );
-            t.setConfigContents( meta.getConfigContents() );
-            t.setPackagesContents( meta.getPackagesContents() );
-            result.add( t );
         }
+
         return result;
     }
 
 
     @Override
     @RolesAllowed( "Template-Management|Read" )
-    public List<Map<String, Object>> listAsSimple( String context ) throws IOException
+    public List<Map<String, Object>> getSharedTemplateInfos( byte[] md5, String templateOwner ) throws IOException
     {
+        String md5Str = Hex.encodeHexString( md5 );
+        List<SharedTemplateInfo> list = securityHelper.getSharedTemplateInfos( new TemplateId( templateOwner, md5Str ) );
+        List<Map<String, Object>> shared = new ArrayList<>();
+
+        for ( SharedTemplateInfo info : list )
+        {
+            Map<String, Object> simple = new HashMap<>();
+            simple.put( "id", info.getTemplateId() );
+            simple.put( "from_user", info.getFromUserFprint() );
+            simple.put( "from_name", securityHelper.getUserName( info.getFromUserFprint() ) );
+            simple.put( "to_user", info.getToUserfprint() );
+            simple.put( "to_name", securityHelper.getUserName( info.getToUserfprint() ) );
+
+            shared.add( simple );
+        }
+
+        return shared;
+    }
+
+
+    private List<DefaultTemplate> getSharedTemplates() throws IOException
+    {
+        String userFprint = securityHelper.getActiveUserFingerprint();
+        List<SharedTemplateInfo> list = securityHelper.getSharedTemplatesToUser( userFprint );
+
+        List<DefaultTemplate> shared = new ArrayList<>();
+        for ( SharedTemplateInfo info : list )
+        {
+            UserRepoContext context = getUserRepoContext( info.getFromUserFprint() );
+            LocalRepository repo = getLocalRepository( context );
+            TemplateId id = IdValidators.Template.validate( info.getTemplateId() );
+            DefaultTemplate m = new DefaultTemplate();
+            m.setId( id.getOwnerFprint(), securityHelper.decodeMd5( id.getMd5() ) );
+            DefaultTemplate meta = ( DefaultTemplate ) repo.getPackageInfo( m );
+            if ( meta != null )
+            {
+                shared.add( meta );
+            }
+        }
+
+        return shared;
+    }
+
+
+    @Override
+    @RolesAllowed( "Template-Management|Read" )
+    public List<Map<String, Object>> listAsSimple( String repository ) throws IOException
+    {
+        UserRepoContext context = getUserRepoContext( repository );
         List<Map<String, Object>> simpleList = new ArrayList<>();
 
-        LocalRepository localRepo = getLocalRepository( context );
-
-        List<SerializableMetadata> localList = localRepo.listPackages();
-
-        for ( SerializableMetadata metadata : localList )
+        if ( TemplateRepository.SHARED.equals( context.getName() ) )
         {
-            if ( !isAllowed( context, Permission.GET_PACKAGE, Hex.encodeHexString( metadata.getMd5Sum() ) ) )
+            List<DefaultTemplate> sharedList = getSharedTemplates();
+            for ( DefaultTemplate shared : sharedList )
             {
-                continue;
+                simpleList.add( convertToSimple( shared, false ) );
+            }
+        }
+        else
+        {
+            LocalRepository localRepo = getLocalRepository( context );
+            List<SerializableMetadata> localList = localRepo.listPackages();
+            String currFprint = securityHelper.getActiveUserFingerprint();
+
+            for ( SerializableMetadata metadata : localList )
+            {
+                DefaultTemplate templateMeta = ( DefaultTemplate ) metadata;
+                if ( securityHelper.isGetAllowed( context, templateMeta.getMd5Sum(), templateMeta.getOwnerFprint() ) )
+                {
+                    simpleList.add( convertToSimple( templateMeta, currFprint.equals( templateMeta.getOwnerFprint() ) ) );
+                }
             }
 
-            simpleList.add( convertToSimple( ( DefaultTemplate ) metadata, true ) );
-        }
-
-        UnifiedRepository unifiedRepo = getRepository( context, false );
-
-        List<SerializableMetadata> unifiedList = unifiedRepo.listPackages();
-
-        unifiedList.removeAll( localList );
-
-        for ( SerializableMetadata metadata : unifiedList )
-        {
-            if ( !isAllowed( context, Permission.GET_PACKAGE, Hex.encodeHexString( metadata.getMd5Sum() ) ) )
+            if ( !TemplateRepository.MY.equals( context.getName() ) )
             {
-                continue;
-            }
+                UnifiedRepository unifiedRepo = getRepository( context, false );
+                List<SerializableMetadata> unifiedList = unifiedRepo.listPackages();
 
-            simpleList.add( convertToSimple( ( DefaultTemplate ) metadata, false ) );
+                unifiedList.removeAll( localList );
+
+                for ( SerializableMetadata metadata : unifiedList )
+                {
+                    DefaultTemplate templateMeta = ( DefaultTemplate ) metadata;
+                    if ( securityHelper.isGetAllowed( context, templateMeta.getMd5Sum(), templateMeta.getOwnerFprint() ) )
+                    {
+                        simpleList.add( convertToSimple( templateMeta, false ) );
+                    }
+                }
+            }
         }
+
         return simpleList;
     }
 
@@ -335,7 +371,7 @@ public class TemplateManagerImpl implements TemplateManager
     {
         try
         {
-            return list( PUBLIC_REPO, false );
+            return list( TemplateRepository.PUBLIC, false );
         }
         catch ( IOException e )
         {
@@ -346,22 +382,24 @@ public class TemplateManagerImpl implements TemplateManager
 
 
     @Override
-    public boolean isUploadAllowed( String context )
+    @RolesAllowed( "Template-Management|Write" )
+    public boolean isUploadAllowed( String repository )
     {
-        return isAllowed( context, Permission.ADD_PACKAGE, "*" );
+        UserRepoContext context = getUserRepoContext( repository );
+        return securityHelper.isAddAllowed( context );
     }
 
 
     @Override
     @RolesAllowed( "Template-Management|Write" )
-    public byte[] upload( String context, InputStream inputStream ) throws IOException
+    public String upload( String repository, InputStream inputStream ) throws IOException
     {
+        UserRepoContext context = getUserRepoContext( repository );
+        securityHelper.checkAddPermission( context );
 
-        checkPermission( context, Permission.ADD_PACKAGE, "*" );
-
-        LocalRepository repo = getLocalRepository( context );
+        LocalTemplateRepository repo = getLocalRepository( context );
         QuotaManagerFactory quotaManagerFactory = injector.getInstance( QuotaManagerFactory.class );
-        DiskQuotaManager diskQuotaManager = quotaManagerFactory.createDiskQuotaManager( new KurjunContext( context ) );
+        DiskQuotaManager diskQuotaManager = quotaManagerFactory.createDiskQuotaManager( context );
 
         Path dump = null;
         try
@@ -375,19 +413,13 @@ public class TemplateManagerImpl implements TemplateManager
 
         try ( InputStream is = new FileInputStream( dump.toFile() ) )
         {
-            Metadata m = repo.put( is, CompressionType.GZIP );
+            String ownerFprint = securityHelper.getActiveUserFingerprint();
+            SubutaiTemplateMetadata m = ( SubutaiTemplateMetadata ) repo.put( is, CompressionType.GZIP, ownerFprint );
 
-            if ( !PUBLIC_REPO.equals( context ) )
-            {
-                String keyId = subutaiIdentityManager.getActiveUser().getSecurityKeyId();
-                String fprint = securityManager.getKeyManager().getKeyData( keyId ).getPublicKeyFingerprint();
+            TemplateId tid = new TemplateId( m.getOwnerFprint(), Hex.encodeHexString( m.getMd5Sum() ) );
+            securityHelper.grantOwnerPermissions( tid, ownerFprint );
 
-                Identity iden = kurjunIdentityManager.getIdentity( fprint );
-                String md5 = Hex.encodeHexString( m.getMd5Sum() );
-                kurjunIdentityManager.addResourcePermission( Permission.GET_PACKAGE, iden, md5 );
-                kurjunIdentityManager.addResourcePermission( Permission.DEL_PACKAGE, iden, md5 );
-            }
-            return m.getMd5Sum();
+            return tid.get();
         }
         catch ( IOException ex )
         {
@@ -403,14 +435,16 @@ public class TemplateManagerImpl implements TemplateManager
 
     @Override
     @RolesAllowed( "Template-Management|Delete" )
-    public boolean delete( String context, byte[] md5 ) throws IOException
+    public boolean delete( String repository, String templateOwner, byte[] md5 ) throws IOException
     {
-        checkPermission( context, Permission.DEL_PACKAGE, Hex.encodeHexString( md5 ) );
+        UserRepoContext context = getUserRepoContext( repository );
+        securityHelper.checkDeletePermission( context, md5, templateOwner );
 
         LocalRepository repo = getLocalRepository( context );
         try
         {
-            repo.delete( md5 );
+            TemplateId tid = new TemplateId( templateOwner, Hex.encodeHexString( md5 ) );
+            repo.delete( tid.get(), md5 );
             return true;
         }
         catch ( IOException ex )
@@ -418,6 +452,24 @@ public class TemplateManagerImpl implements TemplateManager
             LOGGER.error( "Failed to delete template", ex );
             return false;
         }
+    }
+
+
+    @Override
+    public void shareTemplate( String templateIdStr, String targetUserName )
+    {
+        TemplateId templateId = IdValidators.Template.validate( templateIdStr );
+        String targetUserFingerprint = securityHelper.getUserFingerprintByUsername( targetUserName );
+        securityHelper.grantReadPermissionFromActiveUser( templateId, targetUserFingerprint );
+    }
+
+
+    @Override
+    public void unshareTemplate( String templateIdStr, String targetUserName )
+    {
+        TemplateId templateId = IdValidators.Template.validate( templateIdStr );
+        String targetUserFingerprint = securityHelper.getUserFingerprintByUsername( targetUserName );
+        securityHelper.revokeReadPermission( templateId, targetUserFingerprint );
     }
 
 
@@ -436,7 +488,7 @@ public class TemplateManagerImpl implements TemplateManager
                 urls.add( map );
             }
 
-            for ( RepoUrl r : repoUrlStore.getGlobalTemplateUrls() )
+            for ( RepoUrl r : getGlobalKurjunUrls() )
             {
                 Map<String, Object> map = new HashMap<>( 3 );
                 map.put( "url", r.getUrl().toExternalForm() );
@@ -507,16 +559,19 @@ public class TemplateManagerImpl implements TemplateManager
 
     @Override
     @RolesAllowed( "Template-Management|Read" )
-    public Set<String> getContexts()
+    public Set<String> getRepositories()
     {
-        return Collections.unmodifiableSet( CONTEXTS.stream().map( c -> c.getName() ).collect( Collectors.toSet() ) );
+        Set<String> set = GLOBAL_CONTEXTS.stream().map( c -> c.getName() ).collect( Collectors.toSet() );
+        set.add( TemplateRepository.SHARED );
+        set.add( TemplateRepository.MY );
+        return Collections.unmodifiableSet( set );
     }
 
 
     @Override
-    public Long getDiskQuota( String context )
+    public Long getDiskQuota( String repository )
     {
-        KurjunContext c = getContext( context );
+        KurjunContext c = getUserRepoContext( repository );
         QuotaInfoStore quotaInfoStore = injector.getInstance( QuotaInfoStore.class );
         try
         {
@@ -535,9 +590,9 @@ public class TemplateManagerImpl implements TemplateManager
 
 
     @Override
-    public boolean setDiskQuota( long size, String context )
+    public boolean setDiskQuota( long size, String repository )
     {
-        KurjunContext kurjunContext = getContext( context );
+        KurjunContext kurjunContext = getUserRepoContext( repository );
 
         DiskQuota diskQuota = new DiskQuota( size, DataUnit.MB );
         QuotaInfoStore quotaInfoStore = injector.getInstance( QuotaInfoStore.class );
@@ -555,9 +610,9 @@ public class TemplateManagerImpl implements TemplateManager
 
 
     @Override
-    public KurjunTransferQuota getTransferQuota( String context )
+    public KurjunTransferQuota getTransferQuota( String repository )
     {
-        KurjunContext c = getContext( context );
+        KurjunContext c = getUserRepoContext( repository );
         QuotaInfoStore quotaInfoStore = injector.getInstance( QuotaInfoStore.class );
         try
         {
@@ -576,9 +631,9 @@ public class TemplateManagerImpl implements TemplateManager
 
 
     @Override
-    public boolean setTransferQuota( KurjunTransferQuota quota, String context )
+    public boolean setTransferQuota( KurjunTransferQuota quota, String repository )
     {
-        KurjunContext kurjunContext = getContext( context );
+        KurjunContext kurjunContext = getUserRepoContext( repository );
 
         TransferQuota transferQuota = new TransferQuota();
         transferQuota.setThreshold( quota.getThreshold() );
@@ -645,13 +700,87 @@ public class TemplateManagerImpl implements TemplateManager
     }
 
 
-    private LocalRepository getLocalRepository( String context ) throws IOException
+    private void initRepoUrls()
     {
         try
         {
-            KurjunContext c = getContext( context );
+            // Load remote repo urls from store
+            remoteRepoUrls = repoUrlStore.getRemoteTemplateUrls();
+
+//            // Refresh global urls
+//            repoUrlStore.removeAllGlobalTemplateUrl();
+//            for ( String url : SystemSettings.getGlobalKurjunUrls() )
+//            {
+//                repoUrlStore.addGlobalTemplateUrl( new RepoUrl( new URL( url ), null ) );
+//            }
+//
+//            // Load global repo urls from store
+//            globalRepoUrls = repoUrlStore.getGlobalTemplateUrls();
+        }
+        catch ( IOException e )
+        {
+            LOGGER.error( "Failed to get remote repository URLs", e );
+        }
+    }
+    
+    
+    private void initUserRepoContexts( KurjunProperties properties )
+    {
+        // init repo urls
+        try
+        {
+            // Load user repository contexts from store
+            GLOBAL_CONTEXTS = userRepoContextStore.getUserRepoContexts();
+
+            // add default repository contexts
+            // TODO: should we need to save default UserRepoContext ??
+            GLOBAL_CONTEXTS.add( new UserRepoContext( TemplateRepository.PUBLIC, TemplateRepository.PUBLIC ) );
+            GLOBAL_CONTEXTS.add( new UserRepoContext( TemplateRepository.TRUST, TemplateRepository.TRUST ) );
+
+            // add user private repositories
+            PRIVATE_CONTEXTS = new HashSet<>();
+            PRIVATE_CONTEXTS.add( new UserRepoContext( TemplateRepository.SHARED, TemplateRepository.SHARED ) );
+            
+            List<String> fprints = securityHelper.getUserFingerprints();
+            for ( String fprint : fprints )
+            {
+                // Treat private repos as a template object with id = owner fprint
+                TemplateId privateRepositoryId = new TemplateId( fprint, fprint );
+                securityHelper.grantOwnerPermissions( privateRepositoryId, fprint );
+                PRIVATE_CONTEXTS.add( new UserRepoContext( fprint, fprint ) );
+            }
+
+            // init common
+            for ( UserRepoContext kc : GLOBAL_CONTEXTS )
+            {
+                Properties kcp = properties.getContextProperties( kc );
+                kcp.setProperty( FileStoreFactory.TYPE, FileStoreFactory.FILE_SYSTEM );
+                kcp.setProperty( PackageMetadataStoreModule.PACKAGE_METADATA_STORE_TYPE,
+                        PackageMetadataStoreFactory.FILE_DB );
+            }
+
+            // init private
+            for ( UserRepoContext kc : PRIVATE_CONTEXTS )
+            {
+                Properties kcp = properties.getContextProperties( kc );
+                kcp.setProperty( FileStoreFactory.TYPE, FileStoreFactory.FILE_SYSTEM );
+                kcp.setProperty( PackageMetadataStoreModule.PACKAGE_METADATA_STORE_TYPE,
+                        PackageMetadataStoreFactory.FILE_DB );
+            }
+        }
+        catch ( IOException e )
+        {
+            LOGGER.error( "Failed to get user repository contexts", e );
+        }
+    }
+
+
+    private LocalTemplateRepository getLocalRepository( KurjunContext context ) throws IOException
+    {
+        try
+        {
             RepositoryFactory repositoryFactory = injector.getInstance( RepositoryFactory.class );
-            return repositoryFactory.createLocalTemplate( c );
+            return ( LocalTemplateRepository ) repositoryFactory.createLocalTemplate( context );
         }
         catch ( IllegalArgumentException ex )
         {
@@ -660,7 +789,7 @@ public class TemplateManagerImpl implements TemplateManager
     }
 
 
-    private UnifiedRepository getRepository( String context, boolean isKurjunClient ) throws IOException
+    private UnifiedRepository getRepository( KurjunContext context, boolean isKurjunClient ) throws IOException
     {
         RepositoryFactory repositoryFactory = injector.getInstance( RepositoryFactory.class );
         UnifiedRepository unifiedRepo = repositoryFactory.createUnifiedRepo();
@@ -671,105 +800,86 @@ public class TemplateManagerImpl implements TemplateManager
             for ( RepoUrl repoUrl : remoteRepoUrls )
             {
                 unifiedRepo.getRepositories().add( repositoryFactory
-                        .createNonLocalTemplate( repoUrl.getUrl().toString(), null, repoUrl.getToken() ) );
+                        .createNonLocalTemplate( repoUrl.getUrl().toString(), null, context.getName(), repoUrl.getToken() ) );
             }
 
             // shuffle the global repo list to randomize and normalize usage of them
-            List<RepoUrl> list = new ArrayList<>( globalRepoUrls );
+            List<RepoUrl> list = new ArrayList<>( getGlobalKurjunUrls() );
             Collections.shuffle( list );
 
             for ( RepoUrl repoUrl : list )
             {
-                unifiedRepo.getSecondaryRepositories().add( repositoryFactory
-                        .createNonLocalTemplate( repoUrl.getUrl().toString(), null, repoUrl.getToken() ) );
+                unifiedRepo.getSecondaryRepositories().add( repositoryFactory.createNonLocalTemplate(
+                        repoUrl.getUrl().toString(), null, context.getName(), repoUrl.getToken() ) );
             }
         }
         return unifiedRepo;
     }
 
-
-    private static void setContexts( KurjunProperties properties )
+    
+    private List<RepoUrl> getGlobalKurjunUrls()
     {
-        // init template type contexts
-        CONTEXTS.add( new KurjunContext( "public" ) );
-        CONTEXTS.add( new KurjunContext( "trust" ) );
-
-        for ( KurjunContext kc : CONTEXTS )
+        try
         {
-            Properties kcp = properties.getContextProperties( kc );
-            kcp.setProperty( FileStoreFactory.TYPE, FileStoreFactory.FILE_SYSTEM );
-            kcp.setProperty( PackageMetadataStoreModule.PACKAGE_METADATA_STORE_TYPE,
-                             PackageMetadataStoreFactory.FILE_DB );
+            List<RepoUrl> list = new ArrayList<>();
+            for ( String url : SystemSettings.getGlobalKurjunUrls() )
+            {
+                list.add( new RepoUrl( new URL( url ), null ) );
+            }
+            return list;
+        }
+        catch ( MalformedURLException e )
+        {
+            throw new IllegalArgumentException( "Invalid global kurjun url", e );
         }
     }
-
+    
 
     /**
-     * Gets Kurjun context for templates repository type.
+     * Gets user repository context for templates repository.
      *
-     * @return context instance
-     * @throws IllegalArgumentException if invalid/unknown context value is supplied
+     * @return user repository context instance
+     * @throws IllegalArgumentException if invalid/unknown repository value is supplied
      */
-    private KurjunContext getContext( String context )
+    private UserRepoContext getUserRepoContext( String repository )
     {
-        Set<KurjunContext> set = CONTEXTS;
-        for ( KurjunContext c : set )
+        String repo = TemplateRepository.MY.equals( repository )
+                ? securityHelper.getActiveUserFingerprint() : repository;
+
+        Set<UserRepoContext> set = GLOBAL_CONTEXTS;
+        for ( UserRepoContext c : set )
         {
-            if ( c.getName().equals( context ) )
+            if ( c.getName().equals( repo ) )
             {
                 return c;
             }
         }
-        throw new IllegalArgumentException( "Invalid context" );
-    }
 
-
-    private void checkPermission( String context, Permission permission, String resource ) throws AccessControlException
-    {
-        if ( !isAllowed( context, permission, resource ) )
+        set = PRIVATE_CONTEXTS;
+        for ( UserRepoContext c : set )
         {
-            throw new AccessControlException(
-                    String.format( "Action denied for resource %s with permission %s of identity %s", resource,
-                            permission, getActiveUserFingerprint() ) );
-        }
-    }
-
-
-    private boolean isAllowed( String context, Permission permission, String resource )
-    {
-        if ( !PUBLIC_REPO.equals( context ) )
-        {
-            if ( authManager != null )
+            if ( c.getName().equals( repo ) )
             {
-                return authManager.isAllowed( getActiveUserFingerprint(), permission, resource );
-            }
-            // authManager must exist, otherwise don't allow
-            return false;
-        }
-        return true;
-    }
-
-
-    private String getActiveUserFingerprint()
-    {
-        String keyId = subutaiIdentityManager.getActiveUser().getSecurityKeyId();
-        return securityManager.getKeyManager().getKeyData( keyId ).getPublicKeyFingerprint();
-    }
-
-
-    private void parseGlobalKurjunUrls( String globalKurjunUrl )
-    {
-        if ( !Strings.isNullOrEmpty( globalKurjunUrl ) )
-        {
-            String urls[] = globalKurjunUrl.split( "," );
-
-            for ( int x = 0; x < urls.length; x++ )
-            {
-                urls[x] = urls[x].trim();
-                globalKurjunUrlList.add( urls[x] );
+                return c;
             }
         }
+        throw new IllegalArgumentException( "Invalid repository " + repository );
     }
+
+
+//    private void parseGlobalKurjunUrls( String globalKurjunUrl )
+//    {
+//        if ( !Strings.isNullOrEmpty( globalKurjunUrl ) )
+//        {
+//            String urls[] = globalKurjunUrl.split( "," );
+//
+//            for ( int x = 0; x < urls.length; x++ )
+//            {
+//                urls[x] = urls[x].trim();
+//                globalKurjunUrlList.add( urls[x] );
+//            }
+//        }
+//    }
 
 
     private void logAllUrlsInUse()
@@ -780,7 +890,7 @@ public class TemplateManagerImpl implements TemplateManager
             LOGGER.info( r.toString() );
         }
 
-        for ( RepoUrl r : globalRepoUrls )
+        for ( RepoUrl r : getGlobalKurjunUrls() )
         {
             LOGGER.info( r.toString() );
         }
@@ -791,11 +901,29 @@ public class TemplateManagerImpl implements TemplateManager
     {
         Map<String, Object> simple = new HashMap<>();
         simple.put( "name", template.getName() );
-        simple.put( "md5Sum", Hex.encodeHexString( template.getMd5Sum() ) );
+        simple.put( "id", template.getId() );
         simple.put( "parent", template.getParent() );
         simple.put( "architecture", template.getArchitecture() );
         simple.put( "version", template.getVersion() );
         simple.put( "deletable", deletable );
+        simple.put( "owner_fprint", template.getOwnerFprint() );
+        simple.put( "owner_name", securityHelper.getUserName( template.getOwnerFprint() ) );
+
+        return simple;
+    }
+
+
+    private Map<String, Object> convertToSimple( SharedTemplate template, boolean deletable )
+    {
+        Map<String, Object> simple = new HashMap<>();
+        simple.put( "name", template.getName() );
+        simple.put( "id", template.getId() );
+        simple.put( "parent", template.getParent() );
+        simple.put( "architecture", template.getArchitecture() );
+        simple.put( "version", template.getVersion() );
+        simple.put( "deletable", deletable );
+        simple.put( "owner_fprint", template.getOwnerFprint() );
+        simple.put( "owner_name", securityHelper.getUserName( template.getOwnerFprint() ) );
 
         return simple;
     }
@@ -833,18 +961,18 @@ public class TemplateManagerImpl implements TemplateManager
     /**
      * Refreshes metadata cache for each remote repository.
      */
-    private void refreshMetadataCache()
+    private void refreshMetadataCache( String repository )
     {
         Set<NonLocalRepository> remotes = new HashSet<>();
         RepositoryFactory repoFactory = injector.getInstance( RepositoryFactory.class );
 
         for ( RepoUrl url : remoteRepoUrls )
         {
-            remotes.add( repoFactory.createNonLocalTemplate( url.getUrl().toString(), null, url.getToken() ) );
+            remotes.add( repoFactory.createNonLocalTemplate( url.getUrl().toString(), null, repository, url.getToken() ) );
         }
-        for ( RepoUrl url : globalRepoUrls )
+        for ( RepoUrl url : getGlobalKurjunUrls() )
         {
-            remotes.add( repoFactory.createNonLocalTemplate( url.getUrl().toString(), null, url.getToken() ) );
+            remotes.add( repoFactory.createNonLocalTemplate( url.getUrl().toString(), null, repository, url.getToken() ) );
         }
 
         for ( NonLocalRepository remote : remotes )
@@ -853,5 +981,16 @@ public class TemplateManagerImpl implements TemplateManager
         }
     }
 
+
+    private TemplateKurjun convertToSubutaiTemplate( SubutaiTemplateMetadata meta )
+    {
+        TemplateKurjun template = new TemplateKurjun( String.valueOf( meta.getId() ),
+                Hex.encodeHexString( meta.getMd5Sum() ), meta.getName(),
+                meta.getVersion(), meta.getArchitecture().name(),
+                meta.getParent(), meta.getPackage(), meta.getOwnerFprint() );
+        template.setConfigContents( meta.getConfigContents() );
+        template.setPackagesContents( meta.getPackagesContents() );
+        return template;
+    }
 
 }

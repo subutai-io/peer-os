@@ -60,8 +60,8 @@ import io.subutai.common.protocol.AptPackage;
 import io.subutai.common.settings.Common;
 import io.subutai.core.kurjun.api.KurjunTransferQuota;
 import io.subutai.core.kurjun.api.vapt.AptManager;
-import io.subutai.core.kurjun.impl.RepoUrl;
-import io.subutai.core.kurjun.impl.RepoUrlStore;
+import io.subutai.core.kurjun.impl.model.RepoUrl;
+import io.subutai.core.kurjun.impl.store.RepoUrlStore;
 import io.subutai.core.kurjun.impl.TrustedWebClientFactoryModule;
 
 
