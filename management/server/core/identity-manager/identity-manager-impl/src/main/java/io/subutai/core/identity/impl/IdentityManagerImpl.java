@@ -932,22 +932,14 @@ public class IdentityManagerImpl implements IdentityManager
         User user   = new UserEntity();
         String salt = "";
 
+        isValidUserName(userName);
+        isValidPassword( userName, password );
+
         try
         {
-            if ( isValidUserName( userName ) != 0)
-            {
-                throw new IllegalArgumentException( "Error!!! Invalid username, username must be more than 4 symbols and doesn't contain any system names:" + userName);
-            }
+            salt = SecurityUtil.generateSecureRandom();
+            password = SecurityUtil.generateSecurePassword( password, salt );
 
-            if ( isValidPassword( userName, password ) != 0)
-            {
-                throw new IllegalArgumentException( "Error!!! Invalid password" );
-            }
-            else
-            {
-                salt = SecurityUtil.generateSecureRandom();
-                password = SecurityUtil.generateSecurePassword( password, salt );
-            }
 
             user.setUserName( userName );
             user.setPassword( password );
@@ -976,10 +968,9 @@ public class IdentityManagerImpl implements IdentityManager
             }
             //***************************************
         }
-        catch ( Exception ex )
+        catch ( Exception e )
         {
-            LOGGER.error( "***** Error! Error creating user:" + ex.toString(), ex );
-            throw ex;
+            throw new Exception( "Internal error" );
         }
 
         return user;
@@ -990,9 +981,31 @@ public class IdentityManagerImpl implements IdentityManager
      */
     @RolesAllowed( "Identity-Management|Write" )
     @Override
-    public User modifyUser( User user ) throws Exception
+    public User modifyUser( User user, String password ) throws Exception
     {
-        identityDataService.updateUser( user );
+        try {
+
+            if( !Strings.isNullOrEmpty( password ) )
+            {
+                isValidPassword( user.getUserName(), password );
+
+                String salt = user.getSalt();
+                password = SecurityUtil.generateSecurePassword(password, salt);
+
+                user.setPassword(password);
+            }
+
+            identityDataService.updateUser(user);
+        }
+        catch ( IllegalArgumentException e )
+        {
+            throw e;
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "modify user exception", e );
+            throw new Exception( "Internal error" );
+        }
 
         return user;
     }
@@ -1022,7 +1035,7 @@ public class IdentityManagerImpl implements IdentityManager
      */
     @PermitAll
     @Override
-    public boolean changeUserPassword( long userId, String oldPassword, String newPassword )
+    public boolean changeUserPassword( long userId, String oldPassword, String newPassword ) throws Exception
     {
         User user = identityDataService.getUser( userId );
         String salt;
@@ -1038,23 +1051,19 @@ public class IdentityManagerImpl implements IdentityManager
         {
             throw new AccessControlException( "Invalid old password specified" );
         }
-        else
+
+        isValidPassword( user.getUserName(), newPassword );
+
+        try
         {
-            if ( isValidPassword( user.getUserName(), newPassword ) != 0 )
-            {
-                throw new IllegalArgumentException( "Error!!! Invalid password" );
-            }
-            else
-            {
-                try
-                {
-                    salt = SecurityUtil.generateSecureRandom();
-                    newPassword = SecurityUtil.generateSecurePassword( newPassword, salt );
-                    user.setPassword( newPassword );
-                    identityDataService.updateUser( user );
-                }
-                catch ( NoSuchAlgorithmException | NoSuchProviderException e ){}
-            }
+            salt = SecurityUtil.generateSecureRandom();
+            newPassword = SecurityUtil.generateSecurePassword( newPassword, salt );
+            user.setSalt( salt );
+            user.setPassword( newPassword );
+            identityDataService.updateUser( user );
+        }
+        catch ( NoSuchAlgorithmException | NoSuchProviderException e ){
+            throw new Exception( "Internal error" );
         }
 
         return true;
@@ -1115,59 +1124,36 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    private int isValidUserName( String userName)
+    private void isValidUserName( String userName)
     {
-        if(Strings.isNullOrEmpty(userName))
+        if ( Strings.isNullOrEmpty(userName) || userName.length() < 4)
         {
-            return 1;
+            throw new IllegalArgumentException( "User name cannot be shorter than 4 characters." );
         }
-        else
-        {
-            //***************Cannot use TOKEN keyword *******
-            if ( userName.length() < 4)
-            {
-                return 2;
-            }
-            else if ( userName.equalsIgnoreCase( "token" )  ||
+
+        if ( userName.equalsIgnoreCase( "token" )  ||
                     userName.equalsIgnoreCase( "administrator" ) ||
                     userName.equalsIgnoreCase( "system" ))
-            {
-                return 1;
-            }
-            else
-            {
-                return 0;
-            }
-            //***********************************************
+        {
+            throw new IllegalArgumentException( "User name is reserved by the system." );
         }
     }
 
 
     /* *************************************************
      */
-    private int isValidPassword( String userName, String password)
+    private void isValidPassword( String userName, String password)
     {
         if(Strings.isNullOrEmpty(password))
         {
-            return 1;
+            throw new IllegalArgumentException( "Password cannot be shorter than 4 characters" );
         }
-        else
+
+        if ( password.equalsIgnoreCase( userName ) ||
+                  password.equalsIgnoreCase( "password" ) ||
+                  password.equalsIgnoreCase( "system" ) )
         {
-            //***************Cannot use TOKEN keyword *******
-            if ( password.length() < 4 )
-            {
-                return 2;
-            }
-            else if ( password.equalsIgnoreCase( userName ) ||
-                      password.equalsIgnoreCase( "password" ) ||
-                      password.equalsIgnoreCase( "system" ) )
-            {
-                return 1;
-            }
-            else
-            {
-                return 0;
-            }
+            throw new IllegalArgumentException( "Password doesn't match security measures" );
         }
     }
 
