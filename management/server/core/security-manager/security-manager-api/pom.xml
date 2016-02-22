@@ -9,8 +9,6 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <version>4.0.0-RC6</version>
-
   <artifactId>security-manager-api</artifactId>
   <packaging>bundle</packaging>
   <name>Subutai Security Manager Api</name>
