@@ -1,4 +1,4 @@
-<div ng-controller="CurrentUserCtrl as currentUserCtrl">
+<div ng-controller="CurrentUserCtrl as currentUserCtrl" class="b-personal-space">
 	<div class="b-header__userbar b-header__userbar_right">
 		<span id="js-plugin-version" class="b-plugin-version"></span>
 		<script>
@@ -34,7 +34,7 @@
 			Login
 		</a>
 	</div>
-	<div class="b-hub-status g-right">
+	<div class="b-hub-status js-header-dropdown g-right">
 		<a href="#" ng-class="{'b-hub-status__btn_active' : currentUserCtrl.hubStatus }" class="b-hub-status__btn g-margin-right-half js-notification">hub <i class="fa fa-angle-down"></i></a>
 		<div class="b-hub-status__dropdown">
 			<div ng-if="!currentUserCtrl.hubStatus">
@@ -52,17 +52,23 @@
 					</div>
 				</div>
 				<div class="footer">
-					<a href="https://hub.subut.ai" class="b-form-label">Sign Up</a>
+					<a href="https://hub.subut.ai" target="_blank" class="b-form-label">Sign Up</a>
 					<button class="b-btn b-btn_green g-right" ng-click="currentUserCtrl.hubRegister()">Register</button>
 				</div>
 			</div>
 			<div ng-if="currentUserCtrl.hubStatus">
-				Already registered
+				<ul class="list">
+					<li style="text-align: center;">
+						<a href>Already registered</a>
+						<div class="date"></div>
+					</li>
+				</ul>
+				<a href ng-click="currentUserCtrl.unregisterHub()" class="show-more">Unregister</a>
 			</div>
 		</div>
 	</div>
 
-	<div class="b-hub-status g-right">
+	<div class="b-hub-status js-header-dropdown g-right">
 		<a href="#" 
 		ng-class="{'b-hub-status__btn_active' : currentUserCtrl.notificationNew }" 
 		class="b-hub-status__btn g-margin-right-half js-notification" 

@@ -34,6 +34,7 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 	vm.templateGrid = [];
 	vm.cubeGrowth = 1;
 	vm.environment2BuildName = 'Environment name';
+	vm.buildCompleted = false;
 
 	// functions
 
@@ -47,6 +48,7 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 	vm.addSettingsToTemplate = addSettingsToTemplate;
 
 	vm.addContainer = addContainer;
+	vm.closePopup = closePopup;
 
 	environmentService.getTemplates()
 		.success(function (data) {
@@ -67,6 +69,11 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 	environmentService.getPeers().success(function (data) {
 		vm.peerIds = data;
 	});
+
+	function closePopup() {
+		vm.buildCompleted = false;
+		ngDialog.closeAll();
+	}
 
 	function getLogsFromTracker(environmentId) {
 		trackerSrv.getOperations('ENVIRONMENT MANAGER', moment().format('YYYY-MM-DD'), moment().format('YYYY-MM-DD'), 100)
@@ -147,8 +154,16 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 					if(data.state == 'FAILED') {
 						checkLastLog(false);
 					} else {
-						SweetAlert.swal("Success!", "Your environment has been built successfully.", "success");
+						//SweetAlert.swal("Success!", "Your environment has been built successfully.", "success");
 						checkLastLog(true);
+						var currentLog = {
+							"time": moment().format('HH:mm:ss'),
+							"status": 'success',
+							"classes": ['fa-check', 'g-text-green'],
+							"text": 'Your environment has been built successfully'
+						};
+						vm.logMessages.push(currentLog);						
+						vm.buildCompleted = true;
 					}
 				}
 			}).error(function(error) {
