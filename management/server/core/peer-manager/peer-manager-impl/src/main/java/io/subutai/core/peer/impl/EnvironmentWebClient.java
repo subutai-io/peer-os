@@ -14,6 +14,7 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import com.google.common.base.Preconditions;
 
 import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.host.HostId;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.PeerException;
@@ -102,7 +103,7 @@ public class EnvironmentWebClient
         WebClient client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
 
         client.type( MediaType.APPLICATION_JSON );
-        client.accept( MediaType.APPLICATION_JSON);
+        client.accept( MediaType.APPLICATION_JSON );
         try
         {
             return client.get( ContainerHostState.class );
@@ -114,8 +115,8 @@ public class EnvironmentWebClient
     }
 
 
-    public ProcessResourceUsage getProcessResourceUsage( final PeerInfo peerInfo, final ContainerId containerId, int pid )
-            throws PeerException
+    public ProcessResourceUsage getProcessResourceUsage( final PeerInfo peerInfo, final ContainerId containerId,
+                                                         int pid ) throws PeerException
     {
         String path =
                 String.format( "/%s/container/%s/usage/%d", containerId.getEnvironmentId().getId(), containerId.getId(),
@@ -176,7 +177,8 @@ public class EnvironmentWebClient
     }
 
 
-    public ContainerQuota getAvailableQuota( final PeerInfo peerInfo, final ContainerId containerId ) throws PeerException
+    public ContainerQuota getAvailableQuota( final PeerInfo peerInfo, final ContainerId containerId )
+            throws PeerException
     {
         String path = String.format( "/%s/container/%s/quota/available", containerId.getEnvironmentId().getId(),
                 containerId.getId() );
@@ -234,6 +236,26 @@ public class EnvironmentWebClient
         catch ( Exception e )
         {
             throw new PeerException( "Error on setting quota: " + e.getMessage() );
+        }
+    }
+
+
+    public HostId getResourceHostIdByContainerId( final PeerInfo peerInfo, final ContainerId containerId )
+            throws PeerException
+    {
+        String path =
+                String.format( "/%s/container/%s/rhId", containerId.getEnvironmentId().getId(), containerId.getId() );
+        WebClient client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
+
+        client.type( MediaType.APPLICATION_JSON );
+        client.accept( MediaType.APPLICATION_JSON );
+        try
+        {
+            return client.get( HostId.class );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Error on obtaining resource host id by container id", e );
         }
     }
 }
