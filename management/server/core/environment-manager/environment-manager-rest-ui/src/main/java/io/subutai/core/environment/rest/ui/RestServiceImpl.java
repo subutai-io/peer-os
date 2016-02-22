@@ -854,13 +854,16 @@ public class RestServiceImpl implements RestService
             for ( Peer peer : peers )
             {
                 taskCompletionService.submit( () -> {
-                    Collection<ResourceHostMetric> collection = peer.getResourceHostMetrics().getResources();
-                    peerHostMap.put( peer.getId(), Lists.newArrayList() );
-                    for ( ResourceHostMetric metric : collection.toArray( new ResourceHostMetric[collection.size()] ) )
+                    if ( peer.isOnline() )
                     {
-                        peerHostMap.get( peer.getId() ).add( metric.getHostInfo().getId() );
+                        Collection<ResourceHostMetric> collection = peer.getResourceHostMetrics().getResources();
+                        peerHostMap.put( peer.getId(), Lists.newArrayList() );
+                        for ( ResourceHostMetric metric : collection
+                                .toArray( new ResourceHostMetric[collection.size()] ) )
+                        {
+                            peerHostMap.get( peer.getId() ).add( metric.getHostInfo().getId() );
+                        }
                     }
-
                     return true;
                 } );
             }
