@@ -11,7 +11,7 @@ public interface Task<T>
 {
     int getTimeout();
 
-    void checkTimeout();
+//    void checkTimeout();
 
     enum State
     {
