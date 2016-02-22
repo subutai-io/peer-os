@@ -93,6 +93,10 @@ public interface EnvironmentManager
             throws EnvironmentModificationException, EnvironmentNotFoundException;
 
 
+    @RolesAllowed( "Environment-Management|Write" )
+    Set<EnvironmentContainerHost> modifyEnvironment(String environmentId, Topology topology, List<String> removedContainers, boolean async)
+            throws EnvironmentModificationException, EnvironmentNotFoundException;
+
     /**
      * Assigns ssh key to environment and inserts it into authorized_keys file of all the containers within the
      * environment

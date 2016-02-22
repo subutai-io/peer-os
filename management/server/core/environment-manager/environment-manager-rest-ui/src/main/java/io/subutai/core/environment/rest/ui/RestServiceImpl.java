@@ -185,7 +185,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response modifyEnvironment( final String environmentId, final String topologyJson, final String containers )
+    public Response modifyEnvironment( final String environmentId, final String topologyJson, final String containersJson )
     {
         try
         {
@@ -198,12 +198,14 @@ public class RestServiceImpl implements RestService
 
             List<NodeSchema> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<NodeSchema>>() {}.getType() );
 
+            List<String> containers = JsonUtil.fromJson( containersJson, new TypeToken<List<String>>() {}.getType() );
+
             final PeerGroupResources peerGroupResources = peerManager.getPeerGroupResources();
             final Map<ContainerSize, ContainerQuota> quotas = quotaManager.getDefaultQuotas();
 
             Topology topology = placementStrategy.distribute( name, 0, 0, schema, peerGroupResources, quotas );
 
-            environmentManager.setupRequisites( topology );
+            environmentManager.modifyEnvironment( environmentId, topology, containers, true );
         }
         catch ( Exception e )
         {
@@ -974,9 +976,11 @@ public class RestServiceImpl implements RestService
             HostInterface iface = containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE );
 
 
+
             containerDtos.add( new ContainerDto( containerHost.getId(), containerHost.getEnvironmentId().getId(),
                     containerHost.getHostname(), state, iface.getIp(), iface.getMac(), containerHost.getTemplateName(),
-                    containerHost.getContainerSize(), containerHost.getArch().toString(), containerHost.getTags() ) );
+                    containerHost.getContainerSize(), containerHost.getArch().toString(), containerHost.getTags(),
+                    containerHost.getPeerId(), containerHost.getHostname() ) );
         }
         return containerDtos;
     }
