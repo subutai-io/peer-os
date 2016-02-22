@@ -13,7 +13,6 @@ import com.google.common.collect.Lists;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandResultParser;
 import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.Host;
@@ -34,11 +33,11 @@ import io.subutai.core.localpeer.impl.entity.ContainerHostEntity;
 import io.subutai.core.registration.api.RegistrationManager;
 
 
-public class CloneTask extends AbstractTask<HostInfo> implements CommandResultParser<HostInfo>
+public class CloneTask extends DaemonTask<HostInfo> implements CommandResultParser<HostInfo>
 {
     protected static final Logger LOG = LoggerFactory.getLogger( CloneTask.class );
 
-    private static final int TIMEOUT = 60 * 24; // 24 hour
+    private static final int CLONE_TIMEOUT = 60 * 24; // 24 hour
     private final ResourceHost resourceHost;
     private final String hostname;
     private final TemplateKurjun template;
@@ -89,9 +88,10 @@ public class CloneTask extends AbstractTask<HostInfo> implements CommandResultPa
         CommandBatch result = new CommandBatch();
 
         Command cloneAction = new Command( "clone",
-                Lists.newArrayList( template.getName(), hostname, "-i", String.format( "%s %s", ip, vlan ), "-e",
+                Lists.newArrayList( template.getName(), hostname, "-i", String.format( "\"%s %s\"", ip, vlan ), "-e",
                         environmentId, "-t",
-                        getRegistrationManager().generateContainerTTLToken( ( TIMEOUT + 10 ) * 1000L ).getToken() ) );
+                        getRegistrationManager().generateContainerTTLToken( ( CLONE_TIMEOUT + 10 ) * 1000L )
+                                                .getToken() ) );
 
         result.addCommand( cloneAction );
 
@@ -114,31 +114,6 @@ public class CloneTask extends AbstractTask<HostInfo> implements CommandResultPa
     public Host getHost()
     {
         return resourceHost;
-    }
-
-
-    @Override
-    public void start()
-    {
-        this.started = System.currentTimeMillis();
-        setState( State.RUNNING );
-        try
-        {
-            RequestBuilder builder = getRequestBuilder();
-
-            commandResult = commandUtil.execute( builder, getHost() );
-
-            if ( !commandResult.hasSucceeded() )
-            {
-                setState( State.FAILURE );
-            }
-        }
-
-        catch ( Exception e )
-        {
-            this.exception = e;
-            setState( State.FAILURE );
-        }
     }
 
 
@@ -169,7 +144,7 @@ public class CloneTask extends AbstractTask<HostInfo> implements CommandResultPa
     @Override
     public int getTimeout()
     {
-        return DEFAULT_TIMEOUT;
+        return CLONE_TIMEOUT;
     }
 
 

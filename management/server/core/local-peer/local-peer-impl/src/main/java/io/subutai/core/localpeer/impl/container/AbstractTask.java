@@ -90,6 +90,7 @@ public abstract class AbstractTask<T> implements Task<T>
             exception = new CommandException( "Command result parse exception: " + e.getMessage() );
             setState( State.FAILURE );
         }
+
     }
 
 
@@ -119,18 +120,17 @@ public abstract class AbstractTask<T> implements Task<T>
         return false;
     }
 
-    @Override
-    public void checkTimeout()
-    {
-        if ( this.state == State.RUNNING )
-        {
-            if ( started + TimeUnit.SECONDS.toMillis( getTimeout() ) < System.currentTimeMillis() )
-            {
-                this.exception = new CommandException( "Command execution timeout." );
-                setState( State.FAILURE );
-            }
-        }
-    }
+//    public void checkTimeout()
+//    {
+//        if ( this.state == State.RUNNING )
+//        {
+//            if ( started + TimeUnit.SECONDS.toMillis( getTimeout() ) < System.currentTimeMillis() )
+//            {
+//                this.exception = new CommandException( "Command execution timeout." );
+//                setState( State.FAILURE );
+//            }
+//        }
+//    }
 
 
     protected void onSuccess()

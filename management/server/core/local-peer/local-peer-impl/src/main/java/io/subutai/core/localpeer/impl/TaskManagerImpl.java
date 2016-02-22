@@ -7,8 +7,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
@@ -21,18 +19,18 @@ import io.subutai.common.task.TaskManager;
 /**
  * Task Manager
  */
-public class TaskManagerImpl implements TaskManager, Runnable
+public class TaskManagerImpl implements TaskManager
 {
     private static final Logger LOG = LoggerFactory.getLogger( TaskManagerImpl.class );
     private Map<Integer, Task> tasks = new ConcurrentHashMap<>();
     private Map<String, Executor> executors = new ConcurrentHashMap<>();
     private AtomicInteger counter = new AtomicInteger( 0 );
-    private ScheduledExecutorService timeoutService = Executors.newSingleThreadScheduledExecutor();
+    //private ScheduledExecutorService timeoutService = Executors.newSingleThreadScheduledExecutor();
 
 
     public TaskManagerImpl()
     {
-        timeoutService.scheduleWithFixedDelay( this, 10, 10, TimeUnit.SECONDS );
+        //timeoutService.scheduleWithFixedDelay( this, 10, 10, TimeUnit.SECONDS );
     }
 
 
@@ -101,22 +99,24 @@ public class TaskManagerImpl implements TaskManager, Runnable
     }
 
 
-    @Override
-    public void run()
-    {
-        for ( Task task : tasks.values() )
-        {
-            if ( task.getState() == Task.State.RUNNING )
-            {
-                try
-                {
-                    task.checkTimeout();
-                }
-                catch ( Exception e )
-                {
-                    LOG.error( e.getMessage(), e );
-                }
-            }
-        }
-    }
+//    @Override
+//    public void run()
+//    {
+//        LOG.debug( "Timeout check..." );
+//        for ( Task task : tasks.values() )
+//        {
+//            if ( task.getState() == Task.State.RUNNING )
+//            {
+//                try
+//                {
+//                    task.checkTimeout();
+//                }
+//                catch ( Exception e )
+//                {
+//                    LOG.error( e.getMessage(), e );
+//                }
+//            }
+//        }
+//        LOG.debug( "Timeout check...done." );
+//    }
 }

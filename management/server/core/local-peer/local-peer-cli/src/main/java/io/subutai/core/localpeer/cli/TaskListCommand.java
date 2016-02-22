@@ -26,9 +26,22 @@ public class TaskListCommand extends SubutaiShellCommandSupport
     {
         for ( Task task : localPeer.getTaskList() )
         {
-            System.out.println(
-                    String.format( "%s\t%s\t%d\t%s", task.getHost().getHostname(), task.getState(), task.getTimeout(),
-                            task.getCommandBatch().asJson() ) );
+            final String s = task.getCommandBatch().asChain();
+            System.out.println( String.format( "%s\t%d\t%s...", task.getHost().getId(), task.getTimeout(),
+                    s.substring( 0, Math.min( 50, s.length() ) ) ) );
+
+            if ( task.getState() == Task.State.SUCCESS )
+            {
+                System.out.println( String.format( "\t\t%s\t%s", task.getState(), task.getResult() ) );
+            }
+            else if ( task.getState() == Task.State.FAILURE )
+            {
+                System.out.println( String.format( "\t\t%s\t%s", task.getState(), task.getException() ) );
+            }
+            else
+            {
+                System.out.println( String.format( "\t\t%s", task.getState() ) );
+            }
         }
         return null;
     }
