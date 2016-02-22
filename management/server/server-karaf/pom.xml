@@ -205,7 +205,7 @@
                 <artifactItem>
                   <groupId>${project.groupId}</groupId>
                   <artifactId>webui</artifactId>
-                  <destFileName>webui-4.0.0-RC6.war</destFileName>
+                  <destFileName>webui-${project.version}.war</destFileName>
                   <outputDirectory>target/assembly/deploy</outputDirectory>
                   <type>war</type>
                 </artifactItem>
