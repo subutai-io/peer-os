@@ -18,12 +18,10 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>node-registration-api</artifactId>
-      <version>4.0.0-RC6</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>security-manager-api</artifactId>
-      <version>4.0.0-RC6</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
