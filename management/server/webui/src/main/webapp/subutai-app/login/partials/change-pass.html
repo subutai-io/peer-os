@@ -4,8 +4,6 @@
 
 		<div class="b-tabs-menu b-tabs-menu_header">
 
-			<div ng-include="'subutai-app/common/partials/login-header.html'"></div>
-			
 			<ul>
 				<li class="b-tabs-menu__item" ui-sref="account-settings">
 					Public key
@@ -21,18 +19,18 @@
 
 		<div class="b-main-form b-main-form_change-pass">
 
-			<form ng-submit="changePassCtrl.changePass(changePassCtrl.newPassword)" name="changePassForm">
+			<form ng-submit="changePassCtrl.changePass(changePassCtrl.pass)" name="changePassForm">
 				<div class="b-main-form__element">
 					<label class="b-popup-body-label b-popup-body-label_inline">Old password</label>
 					<input type="password"
-								 ng-model="changePassCtrl.oldPassword"
+								 ng-model="changePassCtrl.pass.oldPassword"
 								 class="b-popup-body-input"
 								 required>
 				</div>
 				<div class="b-main-form__element">
 					<label class="b-popup-body-label b-popup-body-label_inline">New password</label>
 					<input type="password" 
-						ng-model="changePassCtrl.newPassword" 
+						ng-model="changePassCtrl.pass.newPassword" 
 						id="js-password" 
 						class="b-popup-body-input" 
 						required>
@@ -41,18 +39,18 @@
 				--><div class="b-main-form__element">
 					<label class="b-popup-body-label b-popup-body-label_inline">Confirm password</label>
 					<input type="password" 
-						ng-model="changePassCtrl.newToken.period" 
+						ng-model="changePassCtrl.pass.confirmPass" 
 						pw-check="js-password" 
 						name="confirm_password" 
 						class="b-popup-body-input" 
 						required>
+					<span class="b-form-hint b-form-hint_red" ng-show="changePassForm.confirm_password.$error.pwmatch">Passwords don't match.</span>
 				</div><!--
 
 				--><div class="b-main-form__element">
 					<button class="b-btn b-btn_green" type="submit">Save</button>
 					<div class="clear"></div>
 				</div>
-				<span class="b-form-hint b-form-hint_red" ng-show="changePassForm.confirm_password.$error.pwmatch">Passwords don't match.</span>
 			</form>
 
 		</div>
