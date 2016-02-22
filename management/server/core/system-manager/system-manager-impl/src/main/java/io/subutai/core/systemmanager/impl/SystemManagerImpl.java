@@ -42,12 +42,12 @@ public class SystemManagerImpl implements SystemManager
     //                              final int securePortX2, final int securePortX3, final int specialPortX1  )
 
 
-    public SystemManagerImpl( final String[] globalKurjunUrls, final int securePortX1, final int securePortX2,
-                              final int securePortX3 ) throws ConfigurationException
+    public SystemManagerImpl( /*final String globalKurjunUrls, final int securePortX1, final int securePortX2,
+                              final int securePortX3*/ ) throws ConfigurationException
 
     {
-        Preconditions.checkNotNull( globalKurjunUrls, "Invalid Global Kurjun URLs could not be null." );
-        Preconditions.checkArgument( globalKurjunUrls.length > 0, "Invalid Global Kurjun URLs could not be empty." );
+//        Preconditions.checkNotNull( globalKurjunUrls, "Invalid Global Kurjun URLs could not be null." );
+//        Preconditions.checkArgument( globalKurjunUrls.length > 0, "Invalid Global Kurjun URLs could not be empty." );
 
         //        SystemSettings.setExternalIpInterface( externalInterfaceName );
         //        SystemSettings.setPublicUrl( publicURL );
@@ -59,11 +59,11 @@ public class SystemManagerImpl implements SystemManager
         //        SystemSettings.setKeyTrustCheckState( keyTrustCheckEnabled );
 
 
-        SystemSettings.setGlobalKurjunUrls( globalKurjunUrls );
-        //        SystemSettings.setOpenPort( openPort );
-        SystemSettings.setSecurePortX1( securePortX1 );
-        SystemSettings.setSecurePortX2( securePortX2 );
-        SystemSettings.setSecurePortX3( securePortX3 );
+//        SystemSettings.setGlobalKurjunUrls( globalKurjunUrls );
+//        //        SystemSettings.setOpenPort( openPort );
+//        SystemSettings.setSecurePortX1( securePortX1 );
+//        SystemSettings.setSecurePortX2( securePortX2 );
+//        SystemSettings.setSecurePortX3( securePortX3 );
         //        SystemSettings.setSpecialPortX1( specialPortX1 );
     }
 
