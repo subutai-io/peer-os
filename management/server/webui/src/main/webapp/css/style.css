@@ -34,6 +34,13 @@ input[type=checkbox] {
 
 /*Header*/
 
+.b-personal-space {
+	position: absolute;
+	top: 10px;
+	right: 16px;
+	z-index: 10;
+}
+
 .b-header {
     height: 45px;
     padding: 15px 30px 0;
@@ -61,6 +68,7 @@ input[type=checkbox] {
 .b-header__userbar_right {
     float: right;
     display: inline-block;
+	padding: 4px 0 0 0;
 }
 .b-header-userbar__icon {
     color: #838093;
@@ -789,6 +797,11 @@ input[type=checkbox] {
 
 .b-nav-menu-sub a:hover {
     text-decoration: none;
+}
+
+.b-nav-menu-sub_active a {
+	color: #078DD0;
+	text-decoration: none;
 }
 
 /*Icons*/
@@ -3120,7 +3133,8 @@ td.b-main-table__status-col {
 /*Hub status*/
 .b-hub-status {
     line-height: normal;
-    padding: 11px;
+    /*padding: 11px;*/
+	margin: 0 11px 0 0;
     position: relative;
 }
 .b-hub-statu.b-switchers {
@@ -3165,7 +3179,7 @@ td.b-main-table__status-col {
 	display: none;
     line-height: normal;
     position: absolute;
-    top: 52px;
+    top: 40px;
     right: 0;
     width: 225px;
     border: 1px solid #CCCEEE;
