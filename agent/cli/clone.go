@@ -63,19 +63,13 @@ func setDns(name string) {
 		dns = "10.10.0.254"
 	}
 
-	conf, err := ioutil.ReadFile(config.Agent.LxcPrefix + name + "/rootfs/etc/resolvconf/resolv.conf.d/original")
-	log.Check(log.ErrorLevel, "Opening resolv.conf", err)
+	resolv := []byte("domain\tintra.lan\nsearch\tintra.lan\nnameserver\t" + dns)
+	log.Check(log.ErrorLevel, "Writing resolv.conf",
+		ioutil.WriteFile(config.Agent.LxcPrefix+name+"/rootfs/etc/resolvconf/resolv.conf.d/original", resolv, 0644))
 
-	lines := strings.Split(string(conf), "\n")
-
-	for k, line := range lines {
-		if strings.Contains(line, "nameserver 10.10.10.1") {
-			lines[k] = "nameserver " + dns
-		}
-	}
-	result := strings.Join(lines, "\n")
-	err = ioutil.WriteFile(config.Agent.LxcPrefix+name+"/rootfs/etc/resolvconf/resolv.conf.d/original", []byte(result), 0644)
-	log.Check(log.ErrorLevel, "Writing resolv.conf", err)
+	resolv2 := []byte("domain\tintra.lan\nsearch\tintra.lan\nnameserver\t" + dns)
+	log.Check(log.ErrorLevel, "Writing resolv.conf",
+		ioutil.WriteFile(config.Agent.LxcPrefix+name+"/rootfs/etc/resolv.conf", resolv2, 0644))
 }
 
 func setStaticNetwork(name string) {

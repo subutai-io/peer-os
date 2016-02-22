@@ -270,6 +270,89 @@
           </execution>
         </executions>
       </plugin>
+<!-- DEB-related plugins -->
+      <plugin>
+      <artifactId>maven-resources-plugin</artifactId>
+      <version>2.6</version>
+      <executions>
+        <execution>
+          <id>copy-deb-content</id>
+          <phase>prepare-package</phase>
+          <goals><goal>copy-resources</goal></goals>
+          <configuration>
+            <overwrite>true</overwrite>
+	    <!-- Copying Management files to deb source folder -->
+            <outputDirectory>target/deb/opt/subutai-mng</outputDirectory>
+            <resources>
+              <resource>
+                <directory>${assembly.directory}</directory>
+              </resource>
+            </resources>
+          </configuration>
+        </execution>
+	<execution>
+          <id>copy-deb-scripts</id>
+          <phase>prepare-package</phase>
+          <goals><goal>copy-resources</goal></goals>
+          <configuration>
+            <overwrite>true</overwrite>
+	    <!-- Copying install scripts to deb source folder -->
+            <outputDirectory>target/deb/DEBIAN</outputDirectory>
+            <resources>
+              <resource>
+                <directory>src/main/scripts</directory>
+              </resource>
+            </resources>
+          </configuration>
+        </execution>
+      </executions>
+     </plugin>
+
+     <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-antrun-plugin</artifactId>
+      <version>1.8</version>
+      <executions>
+        <execution>
+	  <!-- Setting proper permissions -->
+          <id>fix-permissions</id>
+          <phase>prepare-package</phase>
+          <configuration>
+            <target>
+              <chmod perm="ugo+x">
+                <fileset dir="target/deb">
+                  <include name="opt/subutai-mng/bin/**"/>
+                  <include name="DEBIAN/post*"/>
+                  <include name="DEBIAN/pre*"/>
+                </fileset>
+              </chmod>
+            </target>
+          </configuration>
+         <goals><goal>run</goal></goals>
+        </execution>
+      </executions>
+    </plugin>
+
+     <plugin>
+     <groupId>net.sf.debian-maven</groupId>
+     <artifactId>debian-maven-plugin</artifactId>
+     <version>1.0.6</version>
+     <executions>
+       <execution>
+	 <!-- Building deb package -->
+         <id>build-deb-package</id>
+         <phase>prepare-package</phase>
+         <goals><goal>package</goal></goals>
+           <configuration>
+             <packageName>management</packageName>
+             <packageVersion>${project.version}</packageVersion>
+	     <maintainerName>Subutai Social</maintainerName>
+	     <excludeAllArtifacts>true</excludeAllArtifacts>
+           </configuration>
+      </execution>
+    </executions>
+    </plugin>
+<!-- DEB-related plugins -->
     </plugins>
   </build>
 
