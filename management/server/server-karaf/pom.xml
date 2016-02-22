@@ -345,7 +345,7 @@
          <goals><goal>package</goal></goals>
            <configuration>
              <packageName>management</packageName>
-             <packageVersion>4.0.0-RC6</packageVersion>
+             <packageVersion>${project.version}</packageVersion>
 	     <maintainerName>Subutai Social</maintainerName>
 	     <excludeAllArtifacts>true</excludeAllArtifacts>
            </configuration>
