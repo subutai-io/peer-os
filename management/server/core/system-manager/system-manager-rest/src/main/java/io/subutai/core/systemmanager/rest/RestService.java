@@ -9,6 +9,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.configuration.ConfigurationException;
+
 
 /**
  * Created by ermek on 2/6/16.
@@ -40,7 +42,7 @@ public interface RestService
     @GET
     @Path( "kurjun_settings" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getKurjunSettings();
+    public Response getKurjunSettings() throws ConfigurationException;
 
 
     @POST
@@ -52,7 +54,8 @@ public interface RestService
                                        @FormParam( "publicTimeFrame" ) String publicTimeFrame,
                                        @FormParam( "trustDiskQuota" ) String trustDiskQuota,
                                        @FormParam( "trustThreshold" ) String trustThreshold,
-                                       @FormParam( "trustTimeFrame" ) String trustTimeFrame );
+                                       @FormParam( "trustTimeFrame" ) String trustTimeFrame )
+            throws ConfigurationException;
 
 
     @GET
