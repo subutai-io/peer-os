@@ -32,6 +32,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 	vm.environment2BuildName = 'Environment name';
 	vm.currentPeer = false;
 	vm.currentPeerIndex = false;
+	vm.buildCompleted = false;
 
 	// functions
 
@@ -42,16 +43,17 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
 	vm.showResources = showResources;
 	vm.addResource2Build = addResource2Build;
+	vm.closePopup = closePopup;
 
-	/*environmentService.getTemplates()
+	environmentService.getTemplates()
 		.success(function (data) {
 			vm.templates = data;
 		})
 		.error(function (data) {
 			VARS_MODAL_ERROR( SweetAlert, 'Error on getting templates ' + data );
-		});*/
+		});
 
-	vm.templates = ['mongo', 'cassandra', 'master', 'hadoop'];
+	//vm.templates = ['mongo', 'cassandra', 'master', 'hadoop'];
 
 	environmentService.getStrategies().success(function (data) {
 		vm.strategies = data;
@@ -70,6 +72,11 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 	/*peerRegistrationService.getResourceHosts().success(function (data) {
 		vm.resourceHosts = data;
 	});*/
+
+	function closePopup() {
+		vm.buildCompleted = false;
+		ngDialog.closeAll();
+	}
 
 	function getLogsFromTracker(environmentId) {
 		trackerSrv.getOperations('ENVIRONMENT MANAGER', moment().format('YYYY-MM-DD'), moment().format('YYYY-MM-DD'), 100)
@@ -149,8 +156,16 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 					if(data.state == 'FAILED') {
 						checkLastLog(false);
 					} else {
-						SweetAlert.swal("Success!", "Your environment has been built successfully.", "success");
+						//SweetAlert.swal("Success!", "Your environment has been built successfully.", "success");
 						checkLastLog(true);
+						var currentLog = {
+							"time": moment().format('HH:mm:ss'),
+							"status": 'success',
+							"classes": ['fa-check', 'g-text-green'],
+							"text": 'Your environment has been built successfully'
+						};
+						vm.logMessages.push(currentLog);						
+						vm.buildCompleted = true;
 					}
 				}
 			}).error(function(error) {
