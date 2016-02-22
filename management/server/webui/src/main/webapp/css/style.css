@@ -287,6 +287,12 @@ input[type=checkbox] {
     margin-right: 20px;
 }
 
+.b-btn_search-field-level {
+	margin-bottom: -45px;
+	position: relative;
+	z-index: 2;
+}
+
 
 .b-btn_blue {
     background-color: #179cee;
