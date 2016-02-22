@@ -81,6 +81,9 @@ func Start(name string) {
 
 	c.Start()
 
+	if _, err := os.Stat(config.Agent.LxcPrefix + name + "/.stop"); err == nil {
+		log.Check(log.FatalLevel, "Creating .start file to "+name, os.Remove(config.Agent.LxcPrefix+name+"/.stop"))
+	}
 	if _, err := os.Stat(config.Agent.LxcPrefix + name + "/.start"); os.IsNotExist(err) {
 		f, err := os.Create(config.Agent.LxcPrefix + name + "/.start")
 		log.Check(log.FatalLevel, "Creating .start file to "+name, err)
@@ -95,6 +98,9 @@ func Stop(name string) {
 
 	c.Stop()
 
+	if _, err := os.Stat(config.Agent.LxcPrefix + name + "/.start"); err == nil {
+		log.Check(log.FatalLevel, "Creating .start file to "+name, os.Remove(config.Agent.LxcPrefix+name+"/.start"))
+	}
 	if _, err := os.Stat(config.Agent.LxcPrefix + name + "/.stop"); os.IsNotExist(err) {
 		f, err := os.Create(config.Agent.LxcPrefix + name + "/.stop")
 		log.Check(log.FatalLevel, "Creating .stop file to "+name, err)
