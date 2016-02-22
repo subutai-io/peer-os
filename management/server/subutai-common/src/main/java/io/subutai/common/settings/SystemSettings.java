@@ -19,10 +19,16 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 public class SystemSettings
 {
     private static final Logger LOG = LoggerFactory.getLogger( SystemSettings.class );
-    private static PropertiesConfiguration PROPERTIES = loadProperties();
+    private static PropertiesConfiguration PROPERTIES;
+    private static List<String> GLOBAL_KURJUN_URLS;
+   
+    static
+    {
+        loadProperties();
+    }
 
 
-    public static PropertiesConfiguration loadProperties()
+    public static void loadProperties()
     {
         PropertiesConfiguration config = null;
         try
@@ -34,19 +40,17 @@ public class SystemSettings
             LOG.error( "Error in loading subutaisettings.cfg file." );
             e.printStackTrace();
         }
-        return config;
+        
+        PROPERTIES = config;
+        
+        parseGlobalKurjunUrls();
     }
 
     // Kurjun Settings
 
-
     public static List<String> getGlobalKurjunUrls()
     {
-        String urls = String.valueOf( PROPERTIES.getProperty( "globalKurjunUrls" ) );
-        String replace = urls.replace( "[", "" );
-        String replace1 = replace.replace( "]", "" );
-
-        return new ArrayList<String>( Arrays.asList( replace1.split( "," ) ) );
+        return GLOBAL_KURJUN_URLS;
     }
 
 
@@ -56,12 +60,22 @@ public class SystemSettings
         {
             PROPERTIES.setProperty( "globalKurjunUrls", urls );
             PROPERTIES.save();
+            parseGlobalKurjunUrls();
         }
         catch ( ConfigurationException e )
         {
             LOG.error( "Error in saving kurjun.cfg file." );
             e.printStackTrace();
         }
+    }
+
+
+    private static void parseGlobalKurjunUrls()
+    {
+        String urls = String.valueOf( PROPERTIES.getProperty( "globalKurjunUrls" ) );
+        String replace = urls.replace( "[", "" ).replace( "]", "" );
+
+        GLOBAL_KURJUN_URLS = new ArrayList<>( Arrays.asList( replace.split( "," ) ) );
     }
 
     // Network Settings
