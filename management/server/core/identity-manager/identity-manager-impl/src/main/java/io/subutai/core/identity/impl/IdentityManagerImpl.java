@@ -156,7 +156,7 @@ public class IdentityManagerImpl implements IdentityManager
             //*********************************************
             role = createRole( "Administrator", UserType.Regular.getId() );
             assignUserRole( admin.getId(), role );
-
+            
             for ( int a = 0; a < permsp.length; a++ )
             {
                 per = createPermission( permsp[a].getId(), 1, true, true, true, true );
@@ -983,6 +983,15 @@ public class IdentityManagerImpl implements IdentityManager
         }
 
         return user;
+    }
+    
+    /* *************************************************
+     */
+    @RolesAllowed( "Identity-Management|Read" )
+    @Override
+    public User getUserByUsername( String userName )
+    {
+        return identityDataService.getUserByUsername( userName );
     }
 
 

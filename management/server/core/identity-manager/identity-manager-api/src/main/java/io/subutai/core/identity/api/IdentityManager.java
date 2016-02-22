@@ -169,6 +169,9 @@ public interface IdentityManager
 
     void createIdentityDelegationDocument();
 
+        
+    User getUserByUsername( String userName );
+
 
     /* *************************************************
      */
