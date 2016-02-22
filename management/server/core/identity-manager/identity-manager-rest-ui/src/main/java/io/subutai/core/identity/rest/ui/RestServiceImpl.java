@@ -170,19 +170,20 @@ public class RestServiceImpl implements RestService
         Preconditions.checkArgument( !Strings.isNullOrEmpty( fullName ), "fullname is missing" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( email ), "email must be set" );
 
-        if( username.toLowerCase().contains( "sys" ) || username.toLowerCase().contains( "admin" ) )
-        {
-            LOGGER.warn( "#saveUser forbidden, username is reserved" );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( "User name is reserved by the system." ) ).build();
-        }
-
         try
         {
             User newUser;
 
             if ( userId == null || userId <= 0 )
             {
-                Preconditions.checkArgument( !Strings.isNullOrEmpty( password ), "Password must be set" );
+
+
+                if( username.toLowerCase().contains( "sys" ) || username.toLowerCase().contains( "admin" ) )
+                {
+                    LOGGER.warn( "#saveUser forbidden, username is reserved" );
+                    return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( "User name is reserved by the system." ) ).build();
+                }
+
                 newUser = identityManager
                         .createUser( username, password, fullName, email, UserType.Regular.getId(), Integer.parseInt( trustLevel ), false, true );
 
