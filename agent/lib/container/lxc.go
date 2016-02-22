@@ -80,6 +80,12 @@ func Start(name string) {
 	log.Check(log.FatalLevel, "Looking for container "+name, err)
 
 	c.Start()
+
+	if _, err := os.Stat(config.Agent.LxcPrefix + name + "/.start"); os.IsNotExist(err) {
+		f, err := os.Create(config.Agent.LxcPrefix + name + "/.start")
+		log.Check(log.FatalLevel, "Creating .start file to "+name, err)
+		defer f.Close()
+	}
 	// err = c.Start()
 	// log.Check(log.FatalLevel, "Starting container "+name, err)
 }
@@ -88,6 +94,12 @@ func Stop(name string) {
 	log.Check(log.FatalLevel, "Looking for container "+name, err)
 
 	c.Stop()
+
+	if _, err := os.Stat(config.Agent.LxcPrefix + name + "/.stop"); os.IsNotExist(err) {
+		f, err := os.Create(config.Agent.LxcPrefix + name + "/.stop")
+		log.Check(log.FatalLevel, "Creating .stop file to "+name, err)
+		defer f.Close()
+	}
 }
 
 func AttachExec(name string, command []string) (output []string, err error) {
