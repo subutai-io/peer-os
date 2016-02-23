@@ -6,6 +6,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
@@ -856,26 +863,54 @@ public class RestServiceImpl implements RestService
     }
 
 
+    protected CompletionService<Boolean> getCompletionService( Executor executor )
+    {
+        return new ExecutorCompletionService<>( executor );
+    }
+
+
     /** Peers **************************************************** */
     @Override
     public Response getPeers()
     {
+        List<Peer> peers = peerManager.getPeers();
+
+        ExecutorService taskExecutor = Executors.newFixedThreadPool( peers.size() );
+
+        CompletionService<Boolean> taskCompletionService = getCompletionService( taskExecutor );
+
         Map<String, List<String>> peerHostMap = Maps.newHashMap();
 
         try
         {
-            //todo filter online peer in parallel using completionservice
-            for ( Peer peer : peerManager.getPeers() )
+            for ( Peer peer : peers )
             {
-                if ( peer.isOnline() )
-                {
-                    peerHostMap.put( peer.getId(), Lists.newArrayList() );
-
-                    Collection<ResourceHostMetric> collection = peer.getResourceHostMetrics().getResources();
-                    for ( ResourceHostMetric metric : collection.toArray( new ResourceHostMetric[collection.size()] ) )
+                taskCompletionService.submit( () -> {
+                    if ( peer.isOnline() )
                     {
-                        peerHostMap.get( peer.getId() ).add( metric.getHostInfo().getId() );
+                        Collection<ResourceHostMetric> collection = peer.getResourceHostMetrics().getResources();
+                        peerHostMap.put( peer.getId(), Lists.newArrayList() );
+                        for ( ResourceHostMetric metric : collection
+                                .toArray( new ResourceHostMetric[collection.size()] ) )
+                        {
+                            peerHostMap.get( peer.getId() ).add( metric.getHostInfo().getId() );
+                        }
                     }
+                    return true;
+                } );
+            }
+
+            taskExecutor.shutdown();
+
+            for ( Peer ignored : peers )
+            {
+                try
+                {
+                    Future<Boolean> future = taskCompletionService.take();
+                    future.get();
+                }
+                catch ( ExecutionException | InterruptedException e )
+                {
                 }
             }
         }

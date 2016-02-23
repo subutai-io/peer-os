@@ -10,7 +10,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -45,7 +44,6 @@ import org.apache.commons.net.util.SubnetUtils;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.command.CommandCallback;
@@ -239,12 +237,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         initialized = true;
     }
-
-    //
-    //    public void setExternalIpInterface( final String externalIpInterface )
-    //    {
-    //        this.externalIpInterface = externalIpInterface;
-    //    }
 
 
     @Override
@@ -486,65 +478,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             throw new PeerException( ex );
         }
-    }
-
-
-    protected Map<ResourceHost, Set<String>> distributeContainersToResourceHosts(
-            final CreateEnvironmentContainerGroupRequest request ) throws PeerException
-    {
-        //temporarily disabled metric calculation
-        //todo use new monitor binding and new approach to calculate container placement
-        //todo approach should consider instance types requested in blueprint @TimurB see this
-        Map<ResourceHost, Integer> slots = Maps.newHashMap();
-        Set<ResourceHost> resourceHosts = getResourceHosts();
-        Iterator<ResourceHost> rhIt = resourceHosts.iterator();
-        while ( rhIt.hasNext() )
-        {
-            ResourceHost rh = rhIt.next();
-            if ( !rh.isConnected() )
-            {
-                rhIt.remove();
-            }
-        }
-        if ( resourceHosts.isEmpty() )
-        {
-            throw new PeerException( "There are no connected resource hosts" );
-        }
-        int numOfRequestedContainers = /*request.getNumberOfContainers()*/1;
-        int j = 0;
-        int leftOver = numOfRequestedContainers;
-        int avgNumOfContainersPerRh = numOfRequestedContainers / resourceHosts.size();
-        for ( final ResourceHost resourceHost : resourceHosts )
-        {
-            j++;
-            if ( j < resourceHosts.size() )
-            {
-                slots.put( resourceHost, avgNumOfContainersPerRh );
-                leftOver -= avgNumOfContainersPerRh;
-            }
-            else
-            {
-                slots.put( resourceHost, leftOver );
-            }
-        }
-
-        //distribute new containers' names across selected resource hosts
-        Map<ResourceHost, Set<String>> containerDistribution = Maps.newHashMap();
-
-        for ( Map.Entry<ResourceHost, Integer> e : slots.entrySet() )
-        {
-            Set<String> hostCloneNames = new HashSet<>();
-            for ( int i = 0; i < e.getValue(); i++ )
-            {
-                String newContainerName = StringUtil.trimToSize(
-                        String.format( "%s%s", request.getTemplateName(), UUID.randomUUID() ).replace( "-", "" ),
-                        Common.MAX_CONTAINER_NAME_LEN );
-                hostCloneNames.add( newContainerName );
-            }
-            ResourceHost resourceHost = getResourceHostByName( e.getKey().getHostname() );
-            containerDistribution.put( resourceHost, hostCloneNames );
-        }
-        return containerDistribution;
     }
 
 

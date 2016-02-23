@@ -93,6 +93,9 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @Column( name = "template_arch", nullable = false )
     private String templateArch;
 
+    @Column( name = "rh_id", nullable = false )
+    private String resourceHostId;
+
     @ElementCollection( targetClass = String.class, fetch = FetchType.EAGER )
     private Set<String> tags = new HashSet<>();
 
@@ -143,7 +146,8 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
     public EnvironmentContainerImpl( final String localPeerId, final Peer peer, final String nodeGroupName,
                                      final ContainerHostInfoModel hostInfo, final TemplateKurjun template,
-                                     int sshGroupId, int hostsGroupId, String domainName, ContainerSize containerSize )
+                                     int sshGroupId, int hostsGroupId, String domainName, ContainerSize containerSize,
+                                     String resourceHostId )
     {
         Preconditions.checkNotNull( peer );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( nodeGroupName ) );
@@ -167,6 +171,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
         this.hostsGroupId = hostsGroupId;
         this.domainName = domainName;
         this.containerSize = containerSize;
+        this.resourceHostId = resourceHostId;
         setHostInterfaces( hostInfo.getHostInterfaces() );
     }
 
@@ -198,7 +203,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @Override
     public HostId getResourceHostId() throws PeerException
     {
-        return getPeer().getResourceHostIdByContainerId( getContainerId() );
+        return new HostId( resourceHostId );
     }
 
 
