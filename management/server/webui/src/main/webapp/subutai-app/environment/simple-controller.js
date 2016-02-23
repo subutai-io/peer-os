@@ -381,23 +381,15 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 				case 'element-tool-remove':
 					if (this.model.attributes.containerId) {
 						vm.currentEnvironment.excludedContainers.push(this.model);
-						$('.js-add-dev-element[data-type=' + this.model.attributes.devType + ']')
-							.removeClass('b-devops-menu__li-link_active');
-						this.model.remove();
-						$('.js-devops-item-info-block').hide();
-						delete vm.templateGrid[Math.floor(x / GRID_CELL_SIZE)][Math.floor(y / GRID_CELL_SIZE)];
 					} else {
 						var object =
 							vm.currentEnvironment.includedContainers ?
 								getElementByField('id', this.model.id, vm.currentEnvironment.includedContainers) :
 								null;
 						object !== null ? vm.currentEnvironment.includedContainers.splice(object.index, 1): null;
-						$('.js-add-dev-element[data-type=' + this.model.attributes.devType + ']')
-							.removeClass('b-devops-menu__li-link_active');
-						this.model.remove();
-						$('.js-devops-item-info-block').hide();
-						delete vm.templateGrid[Math.floor(x / GRID_CELL_SIZE)][Math.floor(y / GRID_CELL_SIZE)];
 					}
+					this.model.remove();
+					delete vm.templateGrid[Math.floor(x / GRID_CELL_SIZE)][Math.floor(y / GRID_CELL_SIZE)];
 					return;
 					break;
 				case 'element-call-menu':
