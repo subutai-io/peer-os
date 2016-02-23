@@ -23,11 +23,15 @@ public class ContainerDto
     private String arch;
     private Set<String> tags;
 
+    private String peerId;
+    private String hostId;
+
 
 
     public ContainerDto( final String id, final String environmentId, final String hostname,
                          final ContainerHostState state, final String ip, final String mac, final String templateName,
-                         final ContainerSize type, final String arch, final Set<String> tags )
+                         final ContainerSize type, final String arch, final Set<String> tags, final String peerId,
+                         final String hostId )
     {
         this.id = id;
         this.environmentId = environmentId;
@@ -39,6 +43,8 @@ public class ContainerDto
         this.type = type;
         this.arch = arch;
         this.tags = tags;
+        this.peerId = peerId;
+        this.hostId = hostId;
     }
 
 
@@ -159,5 +165,21 @@ public class ContainerDto
     public void setArch( final String arch )
     {
         this.arch = arch;
+    }
+
+    public String getPeerId() {
+        return peerId;
+    }
+
+    public void setPeerId(String peerId) {
+        this.peerId = peerId;
+    }
+
+    public String getHostId() {
+        return hostId;
+    }
+
+    public void setHostId(String hostId) {
+        this.hostId = hostId;
     }
 }

@@ -4,6 +4,8 @@ package io.subutai.core.systemmanager.rest;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.configuration.ConfigurationException;
+
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.util.JsonUtil;
@@ -61,7 +63,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getKurjunSettings()
+    public Response getKurjunSettings() throws ConfigurationException
     {
         KurjunSettings pojo = systemManager.getKurjunSettings();
         String kurjunSettingsInfo = JsonUtil.GSON.toJson( pojo );
@@ -74,10 +76,10 @@ public class RestServiceImpl implements RestService
     public Response setKurjunSettings( final String globalKurjunUrls, final String publicDiskQuota,
                                        final String publicThreshold, final String publicTimeFrame,
                                        final String trustDiskQuota, final String trustThreshold,
-                                       final String trustTimeFrame )
+                                       final String trustTimeFrame ) throws ConfigurationException
     {
 
-        boolean isSaved = systemManager.setKurjunSettings( globalKurjunUrls, Long.parseLong( publicDiskQuota ),
+        boolean isSaved = systemManager.setKurjunSettings( globalKurjunUrls.split( "," ), Long.parseLong( publicDiskQuota ),
                 Long.parseLong( publicThreshold ), Long.parseLong( publicTimeFrame ), Long.parseLong( trustDiskQuota ),
                 Long.parseLong( trustThreshold ), Long.parseLong( trustTimeFrame ) );
 

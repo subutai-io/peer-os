@@ -12,6 +12,7 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.RegistrationData;
+import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.peer.api.RegistrationClient;
 
@@ -45,6 +46,7 @@ public class RegistrationClientImpl implements RegistrationClient
         {
             Response response = client.get();
 
+            String s = response.readEntity( String.class );
             if ( response.getStatus() != Response.Status.OK.getStatusCode() )
             {
                 throw new PeerException(
@@ -53,7 +55,8 @@ public class RegistrationClientImpl implements RegistrationClient
             }
             else
             {
-                return response.readEntity( PeerInfo.class );
+                //                return response.readEntity( PeerInfo.class );
+                return JsonUtil.fromJson( s, PeerInfo.class );
             }
         }
         catch ( Exception e )

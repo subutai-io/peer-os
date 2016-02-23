@@ -2346,6 +2346,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
+    public HostId getResourceHostIdByContainerId( final ContainerId id ) throws PeerException
+    {
+        return new HostId( getResourceHostByContainerId( id.getId() ).getId() );
+    }
+
+
+    @Override
     public PingDistances getCommunityDistances( final String communityName, final Integer maxAddress )
             throws PeerException
     {
