@@ -32,6 +32,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.cbor.CBORFactory;
 
 import io.subutai.common.dao.DaoManager;
+import io.subutai.common.settings.SystemSettings;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.core.hubmanager.api.Integration;
@@ -115,6 +116,7 @@ public class IntegrationImpl implements Integration
     public void sendHeartbeat() throws HubPluginException
     {
         heartbeatProcessor.sendHeartbeat();
+        resourceHostConfProcessor.sendResourceHostConf();
     }
 
 
@@ -132,7 +134,7 @@ public class IntegrationImpl implements Integration
         RegistrationManager registrationManager = new RegistrationManager( this, configManager );
 
         registrationManager.registerPeer( email, password );
-        sendHeartbeat();
+        heartbeatProcessor.sendHeartbeat();
     }
 
 
@@ -212,6 +214,36 @@ public class IntegrationImpl implements Integration
             LOG.debug( file.getName() + " is removed." );
         }
         LOG.debug( "Product uninstalled successfully..." );
+    }
+
+
+    @Override
+    public void unregisterPeer() throws HubPluginException
+    {
+        try
+        {
+            String path = String.format( "/rest/v1/peers/%s/delete", configManager.getPeerId() );
+
+            WebClient client = configManager.getTrustedWebClientWithAuth( path );
+
+            Response r = client.delete();
+
+
+            if ( r.getStatus() == HttpStatus.SC_NO_CONTENT )
+            {
+                LOG.debug( "Peer unregistered successfully." );
+                SystemSettings.setRegisterToHubState( false );
+            }
+            else
+            {
+                LOG.error( r.readEntity( String.class ) );
+                throw new HubPluginException( "Could not unregister peer" );
+            }
+        }
+        catch ( UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException e )
+        {
+            throw new HubPluginException( "Could not unregister peer", e );
+        }
     }
 
 

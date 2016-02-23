@@ -1,6 +1,7 @@
 package io.subutai.core.hubmanager.rest;
 
 
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -36,4 +37,10 @@ public interface RestService
     @Path( "/dns" )
     @Produces( { MediaType.TEXT_PLAIN } )
     public Response getHubDns();
+
+    //Unregister to HUB
+    @DELETE
+    @Path( "/unregister" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response unregister( );
 }

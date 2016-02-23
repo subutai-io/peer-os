@@ -83,4 +83,21 @@ public class RestServiceImpl implements RestService
                     entity( "Could not get Hub IP" ).build();
         }
     }
+
+
+    @Override
+    public Response unregister()
+    {
+        try
+        {
+            integration.unregisterPeer();
+        }
+        catch ( HubPluginException e )
+        {
+            LOG.error( e.getMessage() );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
+                    entity( e.getMessage() ).build();
+        }
+        return Response.ok().build();
+    }
 }
