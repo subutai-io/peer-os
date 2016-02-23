@@ -155,7 +155,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
     public EnvironmentCreationPhase CLONE_CONTAINERS()
     {
-        operationTracker.addLog( "Cloning containers" );
+        operationTracker.addLog( "Downloading templates and cloning containers" );
 
         try
         {

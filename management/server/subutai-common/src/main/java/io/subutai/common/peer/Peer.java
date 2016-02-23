@@ -66,7 +66,7 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
      * @param request - container creation request
      *
      */
-    public void createEnvironmentContainerGroup(
+    public Set<ContainerHostInfoModel> createEnvironmentContainerGroup(
             final CreateEnvironmentContainerGroupRequest request ) throws PeerException;
 
 

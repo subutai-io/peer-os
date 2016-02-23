@@ -31,4 +31,5 @@ public interface Task<T>
     Host getHost();
 
     boolean isSequential();
+
 }

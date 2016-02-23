@@ -37,7 +37,7 @@ public class CloneTask extends DaemonTask<HostInfo> implements CommandResultPars
 {
     protected static final Logger LOG = LoggerFactory.getLogger( CloneTask.class );
 
-    private static final int CLONE_TIMEOUT = 60 * 24; // 24 hour
+    private static final int CLONE_TIMEOUT = 60 * 10; // 10 min
     private final ResourceHost resourceHost;
     private final String hostname;
     private final TemplateKurjun template;

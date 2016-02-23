@@ -427,7 +427,7 @@ public class RemotePeerImpl implements RemotePeer
     {
         Preconditions.checkNotNull( environmentId, "Environment id is null" );
 
-        return new PeerWebClient( peerInfo, provider ).getEnvironmentContainers(environmentId);
+        return new PeerWebClient( peerInfo, provider ).getEnvironmentContainers( environmentId );
     }
 
 
@@ -666,7 +666,7 @@ public class RemotePeerImpl implements RemotePeer
 
     @RolesAllowed( "Environment-Management|Write" )
     @Override
-    public void createEnvironmentContainerGroup(
+    public Set<ContainerHostInfoModel> createEnvironmentContainerGroup(
             final CreateEnvironmentContainerGroupRequest request ) throws PeerException
     {
         Preconditions.checkNotNull( request, "Invalid request" );
@@ -681,14 +681,14 @@ public class RemotePeerImpl implements RemotePeer
                         Timeouts.CREATE_CONTAINER_REQUEST_TIMEOUT, CreateEnvironmentContainerGroupResponse.class,
                         Timeouts.CREATE_CONTAINER_RESPONSE_TIMEOUT, headers );
 
-//        if ( response != null )
-//        {
-//            return response.getHosts();
-//        }
-//        else
-//        {
-//            throw new PeerException( "Command timed out" );
-//        }
+        if ( response != null )
+        {
+            return response.getHosts();
+        }
+        else
+        {
+            throw new PeerException( "Command timed out" );
+        }
     }
 
 

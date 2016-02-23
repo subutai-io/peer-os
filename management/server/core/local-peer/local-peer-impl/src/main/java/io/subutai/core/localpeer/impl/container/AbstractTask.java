@@ -26,7 +26,7 @@ public abstract class AbstractTask<T> implements Task<T>
 
     protected T result;
     protected Exception exception;
-    private Task.State state = Task.State.PENDING;
+    private volatile Task.State state = Task.State.PENDING;
     protected CommandUtil commandUtil = new CommandUtil();
     protected CommandResult commandResult;
     protected long started;
@@ -90,14 +90,6 @@ public abstract class AbstractTask<T> implements Task<T>
             exception = new CommandException( "Command result parse exception: " + e.getMessage() );
             setState( State.FAILURE );
         }
-
-    }
-
-
-    @Override
-    public T getResult()
-    {
-        return result;
     }
 
 
@@ -119,18 +111,6 @@ public abstract class AbstractTask<T> implements Task<T>
     {
         return false;
     }
-
-//    public void checkTimeout()
-//    {
-//        if ( this.state == State.RUNNING )
-//        {
-//            if ( started + TimeUnit.SECONDS.toMillis( getTimeout() ) < System.currentTimeMillis() )
-//            {
-//                this.exception = new CommandException( "Command execution timeout." );
-//                setState( State.FAILURE );
-//            }
-//        }
-//    }
 
 
     protected void onSuccess()
@@ -178,5 +158,23 @@ public abstract class AbstractTask<T> implements Task<T>
     public boolean isChain()
     {
         return true;
+    }
+
+
+    @Override
+    public T getResult()
+    {
+        while ( this.state != State.SUCCESS || this.state == State.FAILURE )
+        {
+            try
+            {
+                TimeUnit.MICROSECONDS.sleep( 500 );
+            }
+            catch ( InterruptedException e )
+            {
+                // ignore
+            }
+        }
+        return result;
     }
 }

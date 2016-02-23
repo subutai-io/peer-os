@@ -170,6 +170,35 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     }
 
 
+    public EnvironmentContainerImpl( final String hostId, final String hostname, final String containerName,
+                                     final HostArchitecture hostArchitecture, final HostInterfaces hostInterfaces,
+                                     final String localPeerId, final Peer peer, final String nodeGroupName,
+                                     final String templateName, final String templateArch, int sshGroupId,
+                                     int hostsGroupId, String domainName, ContainerSize containerSize )
+    {
+        Preconditions.checkNotNull( peer );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( nodeGroupName ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( domainName ) );
+        Preconditions.checkNotNull( containerSize );
+
+        this.hostId = hostId;
+        this.hostname = hostname;
+        this.peer = peer;
+        this.creatorPeerId = localPeerId;
+        this.peerId = peer.getId();
+        this.containerName = containerName;
+        this.hostArchitecture = hostArchitecture;
+        this.nodeGroupName = nodeGroupName;
+        this.templateName = templateName;
+        this.templateArch = templateArch;
+        this.sshGroupId = sshGroupId;
+        this.hostsGroupId = hostsGroupId;
+        this.domainName = domainName;
+        this.containerSize = containerSize;
+        setHostInterfaces( hostInterfaces );
+    }
+
+
     public void setPeer( final Peer peer )
     {
         Preconditions.checkNotNull( peer );

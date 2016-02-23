@@ -390,8 +390,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     @RolesAllowed( "Environment-Management|Write" )
     @Override
-    public void createEnvironmentContainerGroup( final CreateEnvironmentContainerGroupRequest request )
-            throws PeerException
+    public Set<ContainerHostInfoModel> createEnvironmentContainerGroup(
+            final CreateEnvironmentContainerGroupRequest request ) throws PeerException
     {
         Preconditions.checkNotNull( request );
 
@@ -406,10 +406,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
 
         final ResourceHost resourceHost = getResourceHostById( request.getHost() );
-        Set<String> containerDistribution = generateCloneNames( request.getTemplateName(), 1 );
+        //        Set<String> containerDistribution = generateCloneNames( request.getTemplateName(), 1 );
         final String networkPrefix = cidr.getInfo().getCidrSignature().split( "/" )[1];
         String[] allAddresses = cidr.getInfo().getAllAddresses();
-        int currentIpAddressOffset = 0;
+        //        int currentIpAddressOffset = 0;
         final Vni environmentVni = findVniByEnvironmentId( request.getEnvironmentId() );
 
         if ( environmentVni == null )
@@ -429,19 +429,27 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         final TemplateKurjun template = getTemplateByName( request.getTemplateName() );
 
-        for ( final String cloneName : containerDistribution )
+        //        for ( final String cloneName : containerDistribution )
+        //        {
+        final String ipAddress = allAddresses[request.getIpAddressOffset()];
+
+        CloneTask task = new CloneTask( this, hostRegistry, resourceHost, template, request.getHostname(),
+                request.getEnvironmentId(), request.getOwnerId(), request.getInitiatorPeerId(), containerQuota,
+                String.format( "%s/%s", ipAddress, networkPrefix ), environmentVni.getVlan() );
+
+        taskManager.schedule( task );
+
+        final HashSet result = new HashSet<>();
+        final HostInfo info = task.getResult();
+        if ( info == null )
         {
-            final String ipAddress = allAddresses[request.getIpAddressOffset() + currentIpAddressOffset];
-
-            CloneTask task =
-                    new CloneTask( this, hostRegistry, resourceHost, template, cloneName, request.getEnvironmentId(),
-                            request.getOwnerId(), request.getInitiatorPeerId(),
-                            quotaManager.getDefaultContainerQuota( request.getContainerSize() ),
-                            String.format( "%s/%s", ipAddress, networkPrefix ), environmentVni.getVlan() );
-
-            taskManager.schedule( task );
-            currentIpAddressOffset++;
+            throw new PeerException( "Clone container error." );
         }
+        result.add( info );
+        return result;
+
+        //            currentIpAddressOffset++;
+        //        }
     }
 
 
