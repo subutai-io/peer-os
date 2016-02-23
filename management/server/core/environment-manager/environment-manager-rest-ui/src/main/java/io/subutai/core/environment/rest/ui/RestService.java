@@ -59,6 +59,13 @@ public interface RestService
                                @FormParam( "topology" ) String topology,
                                @FormParam( "containers" ) String containers );
 
+    @POST
+    @Path( "{environmentId}/modify/advanced" )
+    Response modifyEnvironmentAdvanced(@PathParam( "environmentId" ) String environmentId,
+                               @FormParam( "topology" ) String topology,
+                               @FormParam( "containers" ) String containers );
+
+
     @DELETE
     @Path( "{environmentId}" )
     Response destroyEnvironment( @PathParam( "environmentId" ) String environmentId );
