@@ -72,6 +72,10 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
 							vm.charts.push({data: [], name: "NO DATA"}) :
 							vm.charts.push(getChartData(data['metrics'][i]));
 					}
+				} else {
+					for (var i = 0; i < 4; i++) {
+						vm.charts.push({data: [], name: "NO DATA"});
+					}
 				}
                 LOADING_SCREEN('none');
             }).error(function (error) {
