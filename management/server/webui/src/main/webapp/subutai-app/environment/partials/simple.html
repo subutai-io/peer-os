@@ -97,7 +97,7 @@
 							<td>
 								<span class="g-circle-label g-circle-label_blue g-margin-left-quarter"
 									  ng-repeat="(key, value) in environment.containersByQuota"
-									  ng-style="{'background-color' : environmentSimpleViewCtrl.getQuotaColor(key)}"
+									  ng-style="{'background-color' : environmentViewCtrl.getQuotaColor(key)}"
 									  tooltips
 									  tooltip-template="{{value.tooltip}}">
 									{{value.quantity}}

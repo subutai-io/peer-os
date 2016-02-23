@@ -11,34 +11,67 @@
 			<input type="text" 
 				class="b-form-input b-form-input_fix-size-3" 
 				id="env-name" 
-				ng-model="advEnvCtrl.environment2BuildName">
+				ng-model="advEnvCtrl.environment2BuildName" 
+				ng-readonly="advEnvCtrl.editingEnv">
 		</div>
 
-		<div class="g-text g-margin-bottom-half">Create environment with following containers</div>
-		<div class="b-main-table-border">
-			<table class="b-main-table b-main-table_custom-1 g-margin-bottom-half">
+		<div ng-if="advEnvCtrl.containers2Remove.length > 0">
+			<div class="g-text g-margin-bottom-half">Following containers will be removed from your environment</div>
+			<div class="b-main-table-border" style="margin-bottom: 10px;">
+				<table class="b-main-table b-main-table_custom-1 g-margin-bottom-half">
 
-				<tr ng-repeat="(templateName, templateInfo) in advEnvCtrl.env2Build">
-					<td class="b-main-table__20 g-text-center">
-						<img 
-							src="assets/templates/{{ templateName }}.jpg" 
-							alt="{{ templateName }}" 
-							onError="this.onerror=null;this.src='assets/templates/no-image.jpg';">
-					</td>
-					<td>{{ templateName }}</td>
-					<td class="b-main-table__right">
-						<span 
-						class="g-circle-label g-margin-left-quarter" 
-						ng-repeat="(sizeName, count) in templateInfo.sizes" 
-						style="background-color: {{ advEnvCtrl.colors[sizeName] }}" 
-						tooltips 
-						tooltip-template="{{ sizeName }}">
-							{{ count }}
-						</span>
-					</td>
-				</tr>
+					<tr ng-repeat="(templateName, templateInfo) in advEnvCtrl.env2Remove">
+						<td class="b-main-table__20 g-text-center">
+							<img 
+								src="assets/templates/{{ templateName }}.jpg" 
+								alt="{{ templateName }}" 
+								onError="this.onerror=null;this.src='assets/templates/no-image.jpg';">
+						</td>
+						<td>{{ templateName }}</td>
+						<td class="b-main-table__right">
+							<span 
+							class="g-circle-label g-margin-left-quarter" 
+							ng-repeat="(sizeName, count) in templateInfo.sizes" 
+							style="background-color: {{ advEnvCtrl.colors[sizeName] }}" 
+							tooltips 
+							tooltip-template="{{ sizeName }}">
+								{{ count }}
+							</span>
+						</td>
+					</tr>
 
-			</table>
+				</table>
+			</div>
+		</div>
+
+		<div ng-if="advEnvCtrl.containers2Build.length > 0">
+			<div ng-if="advEnvCtrl.editingEnv" class="g-text g-margin-bottom-half">Following containers will be added to your environment</div>
+			<div ng-if="!advEnvCtrl.editingEnv" class="g-text g-margin-bottom-half">Create environment with following containers</div>
+			<div class="b-main-table-border">
+				<table class="b-main-table b-main-table_custom-1 g-margin-bottom-half">
+
+					<tr ng-repeat="(templateName, templateInfo) in advEnvCtrl.env2Build">
+						<td class="b-main-table__20 g-text-center">
+							<img 
+								src="assets/templates/{{ templateName }}.jpg" 
+								alt="{{ templateName }}" 
+								onError="this.onerror=null;this.src='assets/templates/no-image.jpg';">
+						</td>
+						<td>{{ templateName }}</td>
+						<td class="b-main-table__right">
+							<span 
+							class="g-circle-label g-margin-left-quarter" 
+							ng-repeat="(sizeName, count) in templateInfo.sizes" 
+							style="background-color: {{ advEnvCtrl.colors[sizeName] }}" 
+							tooltips 
+							tooltip-template="{{ sizeName }}">
+								{{ count }}
+							</span>
+						</td>
+					</tr>
+
+				</table>
+			</div>
 		</div>
 	</div>
 
@@ -54,9 +87,15 @@
 	<div class="b-popup__footer b-popup__footer_undertable">
 
 		<button class="b-btn b-btn_green js-environment-build" 
-		ng-if="advEnvCtrl.buildStep == 'confirm'" 
+		ng-if="advEnvCtrl.buildStep == 'confirm' && !advEnvCtrl.editingEnv" 
 		ng-click="advEnvCtrl.buildEnvironment()">
 			Build
+		</button>
+
+		<button class="b-btn b-btn_green js-environment-build" 
+		ng-if="advEnvCtrl.buildStep == 'confirm' && advEnvCtrl.editingEnv" 
+		ng-click="advEnvCtrl.buildEditedEnvironment()">
+			Apply changes
 		</button>
 
 		<button class="b-btn b-btn_green js-environment-build" 

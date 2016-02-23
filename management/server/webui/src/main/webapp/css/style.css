@@ -3124,15 +3124,15 @@ td.b-main-table__status-col {
 }
 
 .b-untrusted-user {
-	background-color: #FFE5E5;
+	background-color: rgba(242, 242, 242, 0.05);
 }
 
 .b-trusted-user {
-	background-color: #BCE8D5;
+	background-color: rgba(204, 204, 204, 0.05);
 }
 
 .b-midletrusted-user {
-	background-color: #FEEFD7;
+	background-color: rgba(255, 29, 37, 0.05);
 }
 
 

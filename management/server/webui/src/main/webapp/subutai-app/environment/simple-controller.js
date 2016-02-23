@@ -19,7 +19,6 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 	vm.editEnvironment = editEnvironment;
 	vm.notifyChanges = notifyChanges;
 	vm.applyChanges = applyChanges;
-	vm.getQuotaColor = getQuotaColor;
 
 	vm.environments = [];
 	vm.domainStrategies = [];
@@ -38,10 +37,6 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 
 	// functions
 
-	vm.addNewNode = addNewNode;
-	vm.removeNodeGroup = removeNodeGroup;
-	vm.setNodeData = setNodeData;
-	vm.setupAdvancedEnvironment = setupAdvancedEnvironment;
 	vm.initJointJs = initJointJs;
 	vm.buildEnvironmentByJoint = buildEnvironmentByJoint;
 	vm.clearWorkspace = clearWorkspace;
@@ -299,123 +294,6 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 		});
 	}
 
-	function editEnvironment(environment) {
-		vm.clearWorkspace();
-		vm.isApplyingChanges = false;
-		vm.currentEnvironment = environment;
-		vm.currentEnvironment.excludedContainers = [];
-		vm.currentEnvironment.includedContainers = [];
-		vm.isEditing = true;
-		for(var container in environment.containers) {
-			var pos = vm.findEmptyCubePostion();
-			var devElement = new joint.shapes.tm.devElement({
-				position: { x: (GRID_CELL_SIZE * pos.x) + 20, y: (GRID_CELL_SIZE * pos.y) + 20 },
-				templateName: environment.containers[container].templateName,
-				quotaSize: environment.containers[container].type,
-				hostname: environment.containers[container].hostname,
-				containerId: environment.containers[container].id,
-				attrs: {
-					image: { 'xlink:href': 'assets/templates/' + environment.containers[container].templateName + '.jpg' },
-					title: {text: environment.containers[container].templateName}
-				}
-			});
-			graph.addCell(devElement);
-		}
-	}
-
-	function addNewNode() {
-		if(vm.nodeStatus == 'Add to') {
-			var tempNode = vm.advancedEnv.currentNode;
-
-			if(tempNode === undefined) return;
-			if(tempNode.name === undefined || tempNode.name.length < 1) return;
-			if(tempNode.numberOfContainers === undefined || tempNode.numberOfContainers < 1) return;
-			if(tempNode.sshGroupId === undefined) return;
-			if(tempNode.hostsGroupId === undefined) return;
-
-			if( jQuery.grep( vm.nodeList, function( i ) {
-					return tempNode.name == i.name;
-				}).length != 0
-			) return;
-
-			vm.nodeList.push(tempNode);
-		} else {
-			vm.nodeStatus = 'Add to';
-		}
-
-
-		vm.advancedEnv.currentNode = angular.copy( vm.advancedEnv.currentNode );
-		vm.advancedEnv.currentNode.name = "";
-	}
-
-	function setNodeData(key) {
-		vm.nodeStatus = 'Update in';
-		vm.advancedEnv.currentNode = vm.nodeList[key];
-	}
-
-	function removeNodeGroup(key)
-	{
-		vm.nodeList.splice(key, 1);
-	}
-
-	function getDefaultValues() {
-		var defaultVal = {
-			'templateName': 'master',
-			'numberOfContainers': 2,
-			'sshGroupId': 0,
-			'hostsGroupId': 0,
-			'type': 'TINY'
-		};
-		return defaultVal;
-	}
-
-	function setupAdvancedEnvironment() {
-		if(vm.advancedEnv.name === undefined) return;
-		if(vm.nodeList === undefined || vm.nodeList.length == 0) return;
-
-		var finalEnvironment = vm.advancedEnv;
-		finalEnvironment.nodeGroups = vm.nodeList;
-		if(finalEnvironment.currentNod !== undefined) {
-			finalEnvironment.nodeGroups.push(finalEnvironment.currentNode);
-		}
-		delete finalEnvironment.currentNode;
-
-		var cloneContainers = {};
-
-		for( var i = 0; i < finalEnvironment.nodeGroups.length; i++ )
-		{
-			var node = finalEnvironment.nodeGroups[i];
-			for( var j = 0; j < node.numberOfContainers; j++ )
-			{
-				if( j < 0 ) break;
-
-				if( cloneContainers[node.peerId] === undefined )
-				{
-					cloneContainers[node.peerId] = [];
-				}
-
-				cloneContainers[node.peerId].push(node);
-			}
-		}
-
-		console.log(cloneContainers);
-		LOADING_SCREEN();
-		ngDialog.closeAll();
-		environmentService.setupAdvancedEnvironment(finalEnvironment.name, cloneContainers)
-			.success(function(data){
-				console.log(data);
-				loadEnvironments();
-				LOADING_SCREEN('none');
-			}).error(function(error){
-				console.log(error);
-				LOADING_SCREEN('none');
-			});
-
-		vm.nodeList = [];
-		vm.advancedEnv = {};
-		vm.advancedEnv.currentNode = getDefaultValues();
-	}
-
 	var graph = new joint.dia.Graph;
 	
 	//custom shapes
@@ -503,23 +381,15 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 				case 'element-tool-remove':
 					if (this.model.attributes.containerId) {
 						vm.currentEnvironment.excludedContainers.push(this.model);
-						$('.js-add-dev-element[data-type=' + this.model.attributes.devType + ']')
-							.removeClass('b-devops-menu__li-link_active');
-						this.model.remove();
-						$('.js-devops-item-info-block').hide();
-						delete vm.templateGrid[Math.floor(x / GRID_CELL_SIZE)][Math.floor(y / GRID_CELL_SIZE)];
 					} else {
 						var object =
 							vm.currentEnvironment.includedContainers ?
 								getElementByField('id', this.model.id, vm.currentEnvironment.includedContainers) :
 								null;
 						object !== null ? vm.currentEnvironment.includedContainers.splice(object.index, 1): null;
-						$('.js-add-dev-element[data-type=' + this.model.attributes.devType + ']')
-							.removeClass('b-devops-menu__li-link_active');
-						this.model.remove();
-						$('.js-devops-item-info-block').hide();
-						delete vm.templateGrid[Math.floor(x / GRID_CELL_SIZE)][Math.floor(y / GRID_CELL_SIZE)];
 					}
+					this.model.remove();
+					delete vm.templateGrid[Math.floor(x / GRID_CELL_SIZE)][Math.floor(y / GRID_CELL_SIZE)];
 					return;
 					break;
 				case 'element-call-menu':
@@ -723,6 +593,7 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 	}
 
 	function editEnvironment(environment) {
+		console.log(environment);
 		clearWorkspace();
 		vm.isApplyingChanges = false;
 		vm.currentEnvironment = environment;
@@ -739,6 +610,7 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 				containerId: environment.containers[container].id,
 				attrs: {
 					image: { 'xlink:href': 'assets/templates/' + environment.containers[container].templateName + '.jpg' },
+					'rect.b-magnet': {fill: vm.colors[environment.containers[container].type]},
 					title: {text: environment.containers[container].templateName}
 				}
 			});
@@ -770,10 +642,6 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 			}
 		}
 		return null;
-	}
-
-	function getQuotaColor(quotaSize) {
-		return quotaColors[quotaSize];
 	}
 }
 
