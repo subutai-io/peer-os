@@ -6,6 +6,15 @@ angular.module('subutai.environment.adv-controller', [])
 AdvancedEnvironmentCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'trackerSrv', 'SweetAlert', 'ngDialog'];
 
 var graph = new joint.dia.Graph;
+var GRID_SIZE = 60;
+var GRID_SPACING = 5;
+
+var PEER_MAP = {};
+var PEER_WIDTH = 155;
+var PEER_SPACE = 30;
+
+var RH_WIDTH = 100;
+var RH_SPACE = 10;
 
 function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, trackerSrv, SweetAlert, ngDialog) {
 
@@ -38,6 +47,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
 	vm.initJointJs = initJointJs;
 	vm.buildEnvironmentByJoint = buildEnvironmentByJoint;
+	vm.editEnvironment = editEnvironment;
 	vm.clearWorkspace = clearWorkspace;
 	vm.addSettingsToTemplate = addSettingsToTemplate;
 
@@ -235,32 +245,32 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 	}
 
 	//add resource host
-	function addResource2Build(currentResource, index) {
+	function addResource2Build(currentResource, peerId, index) {
 		var posX = calculatePeerPos();
 
-		if( PEER_MAP[vm.currentPeer] !== undefined ) {
-			if( PEER_MAP[vm.currentPeer].rh[currentResource] !== undefined ) {
-				return PEER_MAP[vm.currentPeer].rh[currentResource];
+		if( PEER_MAP[peerId] !== undefined ) {
+			if( PEER_MAP[peerId].rh[currentResource] !== undefined ) {
+				return PEER_MAP[peerId].rh[currentResource];
 			}
 		} else {
-			PEER_MAP[vm.currentPeer] = { rh: [], position : posX };
+			PEER_MAP[peerId] = { rh: [], position : posX };
 		}
 
-		if(Object.keys(PEER_MAP[vm.currentPeer].rh).length > 0) {
-			var lastResourceInPeer = graph.getCell(PEER_MAP[vm.currentPeer].rh[
-				Object.keys(PEER_MAP[vm.currentPeer].rh)[
-					Object.keys(PEER_MAP[vm.currentPeer].rh).length - 1
+		if(Object.keys(PEER_MAP[peerId].rh).length > 0) {
+			var lastResourceInPeer = graph.getCell(PEER_MAP[peerId].rh[
+				Object.keys(PEER_MAP[peerId].rh)[
+					Object.keys(PEER_MAP[peerId].rh).length - 1
 				]
 			]);
 			lastResourceInPeer.set('addClass', '');
 			lastResourceInPeer.set('removeClass', 'b-resource-host_last');
 		}
-		var posY = calculateResourceHostPos(vm.currentPeer);
+		var posY = calculateResourceHostPos(peerId);
 
 		var resourceHost = new joint.shapes.resourceHostHtml.Element({
-			position: { x: PEER_MAP[vm.currentPeer].position * ( PEER_WIDTH + PEER_SPACE ), y: posY },
+			position: { x: PEER_MAP[peerId].position * ( PEER_WIDTH + PEER_SPACE ), y: posY },
 			size: { width: 155, height: 173 },
-			peerId: vm.currentPeer,
+			peerId: peerId,
 			hostId: currentResource,
 			children: 0,
 			grid: [],
@@ -271,9 +281,9 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 		});
 
 		graph.addCell(resourceHost);
-		PEER_MAP[vm.currentPeer].rh[currentResource] = resourceHost.id;
+		PEER_MAP[peerId].rh[currentResource] = resourceHost.id;
 
-		return false;
+		return resourceHost.id;
 	}
 
 	function calculateResourceHostPos(peerId) {
@@ -678,6 +688,21 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 		});
 	}
 
+	function editEnvironment(environment) {
+		clearWorkspace();
+		console.log(environment);
+		for(var i = 0; i < environment.containers.length; i++) {
+			var container = environment.containers[i];
+			var resourceHostItemId = addResource2Build(container.hostId, container.peerId, i);
+			var resourceHost = graph.getCell(resourceHostItemId);
+			var img = 'assets/templates/' + container.templateName + '.jpg';
+			if(!imageExists(img)) {
+				img = 'assets/templates/no-image.jpg';
+			}
+			addContainerToHost(resourceHost, container.templateName, img, container.type);
+		}
+	}
+
 	function clearWorkspace() {
 		vm.cubeGrowth = 0;
 		PEER_MAP = [];
@@ -693,15 +718,16 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 	}
 }
 
-var GRID_SIZE = 60;
-var GRID_SPACING = 5;
+function imageExists(image_url){
 
-var PEER_MAP = {};
-var PEER_WIDTH = 155;
-var PEER_SPACE = 30;
+    var http = new XMLHttpRequest();
 
-var RH_WIDTH = 100;
-var RH_SPACE = 10;
+    http.open('HEAD', image_url, false);
+    http.send();
+
+    return http.status != 404;
+
+}
 
 function placeRhSimple( model ) {
 	var array = model.attributes.grid;
@@ -816,6 +842,15 @@ function checkResourceHost(model) {
 	
 }
 
+function imageExists(image_url){
+	var http = new XMLHttpRequest();
+
+	http.open('HEAD', image_url, false);
+	http.send();
+
+	return http.status != 404;
+}
+
 function startDrag( event ) {
 
 	var containerImage = $(event.target).parent().find('img');
@@ -846,7 +881,7 @@ var containerCounter = 1;
 function drop(event) {
 	event.preventDefault();
 
-	var data = event.dataTransfer.getData("template");
+	var template = event.dataTransfer.getData("template");
 	var img = event.dataTransfer.getData("img");
 
 	var posX = event.offsetX;
@@ -854,40 +889,43 @@ function drop(event) {
 
 	var models = graph.findModelsFromPoint({x :posX, y: posY});
 
-	for( var i = 0; i < models.length; i++ )
-	{
-		if( models[i].attributes.hostId !== undefined )
-		{
-			checkResourceHost(models[i]);
-			var rPos = models[i].attributes.position;
-			var gPos = placeRhSimple( models[i] );
-
-			var x = (rPos.x + gPos.x * GRID_SIZE + GRID_SPACING) + 23;
-			var y = (rPos.y + gPos.y * GRID_SIZE + GRID_SPACING) + 49;
-
-			var devElement = new joint.shapes.tm.devElement({
-				position: { x: x, y: y },
-				templateName: data,
-				parentPeerId: models[i].get('peerId'),
-				parentHostId: models[i].get('hostId'),
-				quotaSize: 'SMALL',
-				containerName: 'Container ' + (containerCounter++).toString(),
-				attrs: {
-					image: { 'xlink:href': img },
-					'rect.b-magnet': {fill: quotaColors['SMALL']},
-					title: {text: $(this).data('template')}
-				},
-				rh: {
-					model: models[i].id,
-					x: gPos.x,
-					y: gPos.y
-				}
-			});
-
-			graph.addCell(devElement);
-			models[i].embed(devElement);
-			models[i].set('children', models[i].get('children') + 1);
+	for( var i = 0; i < models.length; i++ ) {
+		if( models[i].attributes.hostId !== undefined )	{
+			addContainerToHost(models[i], template, img);
 		}
 	}
+}
+
+function addContainerToHost(model, template, img, size) {
+	if(size == undefined || size == null) size = 'SMALL';
+	checkResourceHost(model);
+	var rPos = model.attributes.position;
+	var gPos = placeRhSimple( model );
+
+	var x = (rPos.x + gPos.x * GRID_SIZE + GRID_SPACING) + 23;
+	var y = (rPos.y + gPos.y * GRID_SIZE + GRID_SPACING) + 49;
+
+	var devElement = new joint.shapes.tm.devElement({
+		position: { x: x, y: y },
+		templateName: template,
+		parentPeerId: model.get('peerId'),
+		parentHostId: model.get('hostId'),
+		quotaSize: 'SMALL',
+		containerName: 'Container ' + (containerCounter++).toString(),
+		attrs: {
+			image: { 'xlink:href': img },
+			'rect.b-magnet': {fill: quotaColors[size]},
+			title: {text: template}
+		},
+		rh: {
+			model: model.id,
+			x: gPos.x,
+			y: gPos.y
+		}
+	});
+
+	graph.addCell(devElement);
+	model.embed(devElement);
+	model.set('children', model.get('children') + 1);
 }
 
