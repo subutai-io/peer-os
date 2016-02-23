@@ -4,6 +4,7 @@ package io.subutai.common.peer;
 import java.util.Set;
 
 import io.subutai.common.host.ContainerHostInfo;
+import io.subutai.common.host.HostId;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.quota.ContainerQuota;
@@ -90,4 +91,6 @@ public interface ContainerHost extends Host, ContainerHostInfo, RelationLink
      * Sets quota values
      */
     void setQuota( ContainerQuota containerQuota ) throws PeerException;
+
+    public HostId getResourceHostId() throws PeerException;
 }
