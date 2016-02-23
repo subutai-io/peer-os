@@ -19,11 +19,13 @@ import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
+import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.AlertEvent;
+import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerException;
@@ -288,6 +290,25 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             throw new WebApplicationException( e );
+        }
+    }
+
+
+    @Override
+    public HostId getResourceHostIdByContainerId( final ContainerId containerId )
+    {
+        Preconditions.checkNotNull( containerId );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId.getId() ) );
+        try
+        {
+
+            return localPeer.getResourceHostIdByContainerId( containerId );
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error getting resource host id by container id #getResourceHostIdByContainerId", e );
+            throw new WebApplicationException(
+                    Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build() );
         }
     }
 
