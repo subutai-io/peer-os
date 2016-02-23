@@ -1,11 +1,7 @@
 package io.subutai.core.hubmanager.rest;
 
 
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -22,8 +18,8 @@ public interface RestService
     @POST
     @Path( "/register" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response register( @QueryParam( "hubIp" ) String hubIp, @QueryParam( "email" ) String email,
-                              @QueryParam( "password" ) String password );
+    public Response register(@FormParam ( "hubIp" ) String hubIp, @FormParam( "email" ) String email,
+							 @FormParam( "password" ) String password );
 
     //Send resource host configurations
     @POST
@@ -36,4 +32,10 @@ public interface RestService
     @Path( "/dns" )
     @Produces( { MediaType.TEXT_PLAIN } )
     public Response getHubDns();
+
+    //Unregister to HUB
+    @DELETE
+    @Path( "/unregister" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response unregister( );
 }

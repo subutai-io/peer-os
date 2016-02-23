@@ -62,8 +62,13 @@
 						<a href>Already registered</a>
 						<div class="date"></div>
 					</li>
+					<li>
+						<div style = "width: 100%; text-align: center">
+						<button class = "b-btn b-btn_green" ng-click = "currentUserCtrl.hubHeartbeat()">Send Heartbeat</button>
+						</div>
+					</li>
 				</ul>
-				<a href ng-click="currentUserCtrl.unregisterHub()" class="show-more">Unregister</a>
+				<a href ng-click="currentUserCtrl.hubUnregister()" class="show-more">Unregister</a>
 			</div>
 		</div>
 	</div>

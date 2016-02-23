@@ -182,6 +182,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 						vm.buildCompleted = true;
 						vm.editingEnv = false;
 					}
+					$scope.$emit('reloadEnvironmentsList');
 				}
 			}).error(function(error) {
 				console.log(error);
@@ -219,8 +220,8 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 				};
 				vm.logMessages.push(currentLog);
 
-				//var logId = getLogsFromTracker(vm.newEnvID);
-				var logId = getLogsFromTracker(vm.environment2BuildName);
+				//var logId = getLogsFromTracker(vm.environment2BuildName);
+				getLogById(JSON.parse(data), true);
 
 			}).error(function(error){
 				if(error && error.ERROR === undefined) {
@@ -259,10 +260,9 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 					"date": moment().format('MMMM Do YYYY, HH:mm:ss')
 				};
 
-				checkLastLog(true);
-
-				//var logId = getLogsFromTracker(vm.newEnvID);
-				var logId = getLogsFromTracker(vm.environment2BuildName);
+				//console.log(JSON.parse(data));
+				getLogById(data, true);
+				$scope.$emit('reloadEnvironmentsList');
 
 			}).error(function(error){
 				if(error && error.ERROR === undefined) {
@@ -271,6 +271,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 					VARS_MODAL_ERROR( SweetAlert, 'Error: ' + error.ERROR );
 				}
 				checkLastLog(false);
+				$scope.$emit('reloadEnvironmentsList');
 
 				$rootScope.notifications = {
 					"message": "Error on changing environment. " + error, 
@@ -697,7 +698,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 		vm.containers2Build = addContainers.containersList;
 
 		if(vm.editingEnv) {
-			var removeContainers = getContainers2Build(vm.excludedContainers);
+			var removeContainers = getContainers2Build(vm.excludedContainers, false, true);
 			console.log(removeContainers);
 			vm.env2Remove = removeContainers.containersObj;
 			vm.containers2Remove = removeContainers.containersList;
@@ -728,29 +729,34 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 		}
 	}
 
-	function getContainers2Build(models, removed) {
-		if(removed == undefined || removed == null) removed = false;
+	function getContainers2Build(models, onlyNew, getRemoved) {
+		if(onlyNew == undefined || onlyNew == null) onlyNew = false;
+		if(getRemoved == undefined || getRemoved == null) getRemoved = false;
 		var result = {"containersObj": {}, "containersList": []};
 
 		for(var i = 0; i < models.length; i++) {
 			if(models[i].get('type') == 'tm.devElement') {
 
-				if(removed && models[i].get('containerId')) {
+				var currentElement = models[i];
+				if(onlyNew && currentElement.get('containerId')) {
 					continue;
 				}
 
-				var currentElement = models[i];
-				var container2Build = {
-					"size": currentElement.get('quotaSize'),
-					"templateName": currentElement.get('templateName'),
-					"name": currentElement.get('containerName'),
-					"peerId": currentElement.get('parentPeerId'),
-					"hostId": currentElement.get('parentHostId'),
-					"position": currentElement.get('position'),
-					"sshGroupId" : 0,
-					"hostsGroupId" : 0
-				};
-				result.containersList.push(container2Build);
+				if(getRemoved) {
+					result.containersList.push(currentElement.get('containerId'));
+				} else {
+					var container2Build = {
+						"type": currentElement.get('quotaSize'),
+						"templateName": currentElement.get('templateName'),
+						"name": currentElement.get('containerName'),
+						"peerId": currentElement.get('parentPeerId'),
+						"hostId": currentElement.get('parentHostId'),
+						"position": currentElement.get('position'),
+						"sshGroupId" : 0,
+						"hostsGroupId" : 0
+					};
+					result.containersList.push(container2Build);
+				}
 
 				if (result.containersObj[currentElement.get('templateName')] === undefined) {
 					result.containersObj[currentElement.get('templateName')] = {};

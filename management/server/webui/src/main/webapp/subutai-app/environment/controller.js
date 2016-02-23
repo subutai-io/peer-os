@@ -113,6 +113,10 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	}
 	loadEnvironments();
 
+	$scope.$on('reloadEnvironmentsList', function(event) {
+		loadEnvironments();
+	});
+
 	environmentService.getStrategies().success(function (data) {
 		vm.strategies = data;
 	});

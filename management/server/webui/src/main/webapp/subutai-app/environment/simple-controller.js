@@ -160,6 +160,7 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 						vm.logMessages.push(currentLog);						
 						vm.buildCompleted = true;
 					}
+					$scope.$emit('reloadEnvironmentsList');
 				}
 			}).error(function(error) {
 				console.log(error);
@@ -194,8 +195,8 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 				};
 				vm.logMessages.push(currentLog);
 
-				//var logId = getLogsFromTracker(vm.newEnvID);
-				var logId = getLogsFromTracker(vm.environment2BuildName);
+				//var logId = getLogsFromTracker(vm.environment2BuildName);
+				getLogById(JSON.parse(data), true);
 
 			}).error(function(error){
 				if(error && error.ERROR === undefined) {
@@ -269,8 +270,8 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 			});
 		}
 		vm.currentEnvironment.modificationData = {
-			included: includedContainers,
-			excluded: excludedContainers,
+			topology: includedContainers,
+			removedContainers: excludedContainers,
 			environmentId: vm.currentEnvironment.id
 		};
 
@@ -280,17 +281,30 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 			className: 'b-build-environment-info'
 		});
 
+		vm.logMessages = [];
+		var currentLog = {
+			"time": '',
+			"status": 'in-progress',
+			"classes": ['fa-spinner', 'fa-pulse'],
+			"text": 'Registering environment'
+		};
+		vm.logMessages.push(currentLog);
+
 		vm.currentEnvironment.modifyStatus = 'modifying';
+		console.log(vm.currentEnvironment.modificationData);
 		environmentService.modifyEnvironment(vm.currentEnvironment.modificationData).success(function (data) {
 			vm.currentEnvironment.modifyStatus = 'modified';
 			clearWorkspace();
 			vm.isEditing = false;
 			vm.isApplyingChanges = false;
+
+			getLogById(data, true);
 		}).error(function (data) {
 			vm.currentEnvironment.modifyStatus = 'error';
 			clearWorkspace();
 			vm.isEditing = false;
 			vm.isApplyingChanges = false;
+			checkLastLog(false);
 		});
 	}
 
@@ -303,7 +317,7 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 	joint.shapes.tm.toolElement = joint.shapes.basic.Generic.extend({
 
 		toolMarkup: [
-			'<g class="element-tools">',
+			'<g class="element-tools element-tools_big">',
 				'<g class="element-tool-remove">',
 					'<circle fill="#F8FBFD" r="8" stroke="#dcdcdc"/>',
 					'<polygon transform="scale(1.2) translate(-5, -5)" fill="#292F6C" points="8.4,2.4 7.6,1.6 5,4.3 2.4,1.6 1.6,2.4 4.3,5 1.6,7.6 2.4,8.4 5,5.7 7.6,8.4 8.4,7.6 5.7,5 "/>',
