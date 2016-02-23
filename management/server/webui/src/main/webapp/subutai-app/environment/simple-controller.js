@@ -317,7 +317,7 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 	joint.shapes.tm.toolElement = joint.shapes.basic.Generic.extend({
 
 		toolMarkup: [
-			'<g class="element-tools">',
+			'<g class="element-tools element-tools_big">',
 				'<g class="element-tool-remove">',
 					'<circle fill="#F8FBFD" r="8" stroke="#dcdcdc"/>',
 					'<polygon transform="scale(1.2) translate(-5, -5)" fill="#292F6C" points="8.4,2.4 7.6,1.6 5,4.3 2.4,1.6 1.6,2.4 4.3,5 1.6,7.6 2.4,8.4 5,5.7 7.6,8.4 8.4,7.6 5.7,5 "/>',
