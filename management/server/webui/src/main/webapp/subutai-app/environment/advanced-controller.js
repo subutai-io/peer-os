@@ -42,6 +42,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 	vm.currentPeer = false;
 	vm.currentPeerIndex = false;
 	vm.buildCompleted = false;
+	vm.isEditing = false;
 
 	// functions
 
@@ -50,6 +51,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 	vm.editEnvironment = editEnvironment;
 	vm.clearWorkspace = clearWorkspace;
 	vm.addSettingsToTemplate = addSettingsToTemplate;
+	vm.notifyChanges = notifyChanges;
 
 	vm.showResources = showResources;
 	vm.addResource2Build = addResource2Build;
@@ -701,6 +703,19 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 			}
 			addContainerToHost(resourceHost, container.templateName, img, container.type);
 		}
+	}
+
+	function notifyChanges() {
+		vm.currentEnvironment.excludedContainersByQuota =
+			getSortedContainersByQuota(vm.currentEnvironment.excludedContainers);
+		vm.currentEnvironment.includedContainersByQuota =
+			getSortedContainersByQuota(vm.currentEnvironment.includedContainers);
+
+		ngDialog.open({
+			template: 'subutai-app/environment/partials/popups/environment-modification-info-advanced.html',
+			scope: $scope,
+			className: 'b-build-environment-info'
+		});
 	}
 
 	function clearWorkspace() {

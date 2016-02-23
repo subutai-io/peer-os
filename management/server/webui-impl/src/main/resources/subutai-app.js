@@ -18,9 +18,6 @@ var app = angular.module('subutai-app', [
 	.controller('SubutaiController', SubutaiController)
 	.controller('CurrentUserCtrl', CurrentUserCtrl)
 
-	.controller('LiveTrackerCtrl', LiveTrackerCtrl)
-	.factory('liveTrackerSrv', liveTrackerSrv)
-
 	.controller('AccountCtrl', AccountCtrl)
 	.factory('identitySrv', identitySrv)
 

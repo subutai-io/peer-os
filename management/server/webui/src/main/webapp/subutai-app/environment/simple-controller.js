@@ -19,7 +19,6 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 	vm.editEnvironment = editEnvironment;
 	vm.notifyChanges = notifyChanges;
 	vm.applyChanges = applyChanges;
-	vm.getQuotaColor = getQuotaColor;
 
 	vm.environments = [];
 	vm.domainStrategies = [];
@@ -651,10 +650,6 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 			}
 		}
 		return null;
-	}
-
-	function getQuotaColor(quotaSize) {
-		return quotaColors[quotaSize];
 	}
 }
 
