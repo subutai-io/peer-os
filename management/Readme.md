@@ -54,7 +54,7 @@ To build the project, you need to have the following tools:
   If you want to create a Debian package add additional flag
   
     ```bash
-    mvn clean install -P deb
+  mvn clean install -P deb
     ```
 
 After this you will have `management/server/server-karaf/target` directory with **subutai-{version}.tar.gz** archive
