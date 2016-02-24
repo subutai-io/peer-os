@@ -11,7 +11,8 @@ To build the project, you need to have the following tools:
 - Oracle JDK 8 or later
   [Download Page](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
   [Installation](http://askubuntu.com/questions/56104/how-can-i-install-sun-oracles-proprietary-java-jdk-6-7-8-or-jre)
-  ###### Setting JAVA_HOME
+
+###### Setting JAVA_HOME
   ```bash
   update-java-alternatives -l
   sudo nano /etc/profile
