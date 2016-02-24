@@ -16,12 +16,20 @@ public class ContainerHostInfoModel extends HostInfoModel implements ContainerHo
     @SerializedName( "containerName" )
     @JsonProperty( "containerName" )
     protected String containerName;
+
     @SerializedName( "status" )
     @JsonProperty( "status" )
     protected ContainerHostState state;
-//    @SerializedName( "alert" )
-//    @JsonProperty( "alert" )
-//    protected Alert alert;
+
+
+    public ContainerHostInfoModel( @JsonProperty( "id" ) final String id,
+                                   @JsonProperty( "hostname" ) final String hostname,
+                                   @JsonProperty( "interfaces" ) final HostInterfaces hostInterfaces,
+                                   @JsonProperty( "arch" ) final HostArchitecture hostArchitecture )
+    {
+        super( id, hostname, hostInterfaces, hostArchitecture );
+        state=ContainerHostState.CLONING;
+    }
 
 
     public ContainerHostInfoModel( final ContainerHostInfo containerHost )

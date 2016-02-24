@@ -138,6 +138,23 @@ public class RestServiceImpl implements RestService
 
 
     @Override
+    public Response getEnvironmentContainers( final EnvironmentId environmentId )
+    {
+        try
+        {
+            Preconditions.checkNotNull( environmentId );
+
+            return Response.ok( localPeer.getEnvironmentContainers( environmentId ) ).build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error getting containers of environment", e );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
     public Collection<Vni> getReservedVnis()
     {
         try
