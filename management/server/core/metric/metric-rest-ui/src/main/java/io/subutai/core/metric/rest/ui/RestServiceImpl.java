@@ -10,9 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
-import com.google.gson.Gson;
 
-import io.subutai.common.gson.required.RequiredDeserializer;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.util.JsonUtil;
@@ -23,8 +21,6 @@ import io.subutai.core.metric.api.Monitor;
 public class RestServiceImpl implements RestService
 {
     private static final Logger LOG = LoggerFactory.getLogger( RestServiceImpl.class );
-
-    private Gson gson = RequiredDeserializer.createValidatingGson();
 
     private Monitor monitor;
     private EnvironmentManager environmentManager;
@@ -49,9 +45,9 @@ public class RestServiceImpl implements RestService
         try
         {
             Calendar calendar = Calendar.getInstance();
-            Date current = new Date( calendar.getTime().getTime() );
+            Date current = new Date( calendar.getTime().getTime() - Calendar.getInstance().getTimeZone().getRawOffset() );
             calendar.add( Calendar.HOUR, (-interval) );
-            Date start = calendar.getTime();
+            Date start = new Date( calendar.getTime().getTime() - Calendar.getInstance().getTimeZone().getRawOffset() );
 
             Host host;
             if( environmentId != null && hostId != null )

@@ -1,40 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint default-activation="eager"
            xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-           xmlns:jpa="http://aries.apache.org/xmlns/jpa/v1.0.0"
            xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
-           xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0"
            xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0
             http://www.w3.org/2001/XMLSchema-instance http://www.w3.org/2001/XMLSchema-instance
-            http://aries.apache.org/xmlns/jpa/v1.0.0 http://aries.apache.org/xmlns/jpa/v1.0.0">
+            0">
 
   <cm:property-placeholder persistent-id="subutaisystem" update-strategy="reload" />
-
 
   <reference id="templateManager" availability="mandatory"
              interface="io.subutai.core.kurjun.api.TemplateManager" />
   <reference id="identityManager" availability="mandatory"
              interface="io.subutai.core.identity.api.IdentityManager" />
 
-
   <bean id="systemManagerImpl" scope="singleton"
         class="io.subutai.core.systemmanager.impl.SystemManagerImpl">
     <property name="templateManager" ref="templateManager" />
     <property name="identityManager" ref="identityManager" />
 
-    <!--<argument value="${externalInterfaceName}" />-->
-    <!--<argument value="${publicURL}" />-->
-    <!--<argument value="${isRegisteredToHub}" />-->
-    <!--<argument value="${encryptionEnabled}" />-->
-    <!--<argument value="${restEncryptionEnabled}" />-->
-    <!--<argument value="${integrationEnabled}" />-->
-    <!--<argument value="${keyTrustCheckEnabled}" />-->
     <argument value="${globalKurjunUrls}" />
-    <!--<argument value="${openPort}" />-->
     <argument value="${securePortX1}" />
     <argument value="${securePortX2}" />
     <argument value="${securePortX3}" />
-    <!--<argument value="${specialPortX1}" />-->
+    <!--<argument value="${publicURL}" />-->
 
   </bean>
 

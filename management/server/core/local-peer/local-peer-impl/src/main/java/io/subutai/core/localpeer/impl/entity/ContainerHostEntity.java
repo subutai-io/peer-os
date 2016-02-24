@@ -28,6 +28,7 @@ import com.google.common.base.Strings;
 
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerGateway;
@@ -96,6 +97,13 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
 
     protected ContainerHostEntity()
     {
+    }
+
+
+    @Override
+    public HostId getResourceHostId() throws PeerException
+    {
+        return new HostId( parent.getId() );
     }
 
 
@@ -302,14 +310,14 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     @Override
     public ContainerQuota getAvailableQuota() throws PeerException
     {
-        return getPeer().getAvailableQuota( this.getContainerId());
+        return getPeer().getAvailableQuota( this.getContainerId() );
     }
 
 
     @Override
-    public ContainerQuota getQuota( ) throws PeerException
+    public ContainerQuota getQuota() throws PeerException
     {
-        return getPeer().getQuota( this.getContainerId());
+        return getPeer().getQuota( this.getContainerId() );
     }
 
 
@@ -363,10 +371,11 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
         return containerId;
     }
 
+
     @Override
     public String getLinkId()
     {
-        return String.format("%s|%s", getClassPath(), getUniqueIdentifier() );
+        return String.format( "%s|%s", getClassPath(), getUniqueIdentifier() );
     }
 
 

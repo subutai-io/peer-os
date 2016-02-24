@@ -13,6 +13,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.host.HostId;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.LocalPeer;
@@ -215,6 +216,26 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         {
             LOGGER.error( "Error setting disk quota #setDiskQuota", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+        }
+    }
+
+
+    @Override
+    public HostId getResourceHostIdByContainerId( final ContainerId containerId )
+    {
+        Preconditions.checkNotNull( containerId );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId.getId() ) );
+
+        try
+        {
+
+            return localPeer.getResourceHostIdByContainerId( containerId );
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error getting resource host id by container id #getResourceHostIdByContainerId", e );
+            throw new WebApplicationException(
+                    Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build() );
         }
     }
 }

@@ -11,7 +11,7 @@
 					</li>
 				</ul>
 			</div>
-			<div class="b-tools-menu js-scrollbar">
+			<div class="b-tools-menu js-scrollbar b-tools-menu_custom-scroll-huc">
 				<ul>
 					<li ng-repeat="template in environmentSimpleViewCtrl.templates">
 						<span class="b-tools-menu__item" ng-click="environmentSimpleViewCtrl.addContainer(template, $event)">
@@ -61,7 +61,7 @@
 			</div>
 			<div class="b-cloud-space__table">
 				<table datatable="ng"
-				dt-options="environmentSimpleViewCtrl.dtOptionsInstallTable"
+				dt-options="environmentViewCtrl.dtOptionsInstallTable"
 				dt-column-defs="environmentViewCtrl.dtColumnDefsInstallTable"
 				class="row-border hover subt_table-containers-table">
 					<thead>
@@ -97,7 +97,7 @@
 							<td>
 								<span class="g-circle-label g-circle-label_blue g-margin-left-quarter"
 									  ng-repeat="(key, value) in environment.containersByQuota"
-									  ng-style="{'background-color' : environmentSimpleViewCtrl.getQuotaColor(key)}"
+									  ng-style="{'background-color' : environmentViewCtrl.getQuotaColor(key)}"
 									  tooltips
 									  tooltip-template="{{value.tooltip}}">
 									{{value.quantity}}

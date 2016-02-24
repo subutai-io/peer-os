@@ -46,12 +46,6 @@ public class HostInfoModel implements HostInfo
             hostArchitecture = HostArchitecture.AMD64;
         }
         this.hostInterfaces = hostInfo.getHostInterfaces().getAll();
-
-        //        this.hostInterfaces = hostInfo.getHostInterfaces();
-        //        for ( HostInterface anHostInterface : hostInfo.getHostInterfaces() )
-        //        {
-        //            this.hostInterfaces.addHostInterface( new HostInterfaceModel( anHostInterface ) );
-        //        }
     }
 
 

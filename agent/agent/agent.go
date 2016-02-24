@@ -116,6 +116,7 @@ var requestHandler mqtt.MessageHandler = func(client *mqtt.Client, msg mqtt.Mess
 }
 
 func Start(c *cli.Context) {
+	go container.ContainersRestoreState()
 	initAgent()
 	opts := InitClientOptions(c.String("server"), c.String("port"), c.String("user"), c.String("secret"))
 	hostname, _ := os.Hostname()

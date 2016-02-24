@@ -41,7 +41,6 @@ function environmentService($http) {
 		getEnvironments : getEnvironments,
 		startEnvironmentAdvancedBuild : startEnvironmentAdvancedBuild,
 		startEnvironmentAutoBuild: startEnvironmentAutoBuild,
-		growEnvironment : growEnvironment,
 		destroyEnvironment: destroyEnvironment,
 		modifyEnvironment: modifyEnvironment,
 
@@ -124,7 +123,7 @@ function environmentService($http) {
 
 
 	function startEnvironmentAutoBuild(environmentName, containers) {
-		var postData = 'name=' + environmentName + "&containers=" + containers;
+		var postData = 'name=' + environmentName + "&topology=" + containers;
 		return $http.post(
 			ENVIRONMENT_START_BUILD,
 			postData,
@@ -133,20 +132,10 @@ function environmentService($http) {
 	}
 
 	function startEnvironmentAdvancedBuild(environmentName, containers) {
-		var postData = 'name=' + environmentName + "&containers=" + containers;
+		var postData = 'name=' + environmentName + "&topology=" + containers;
 		return $http.post(
 			ENVIRONMENT_ADVANCED_BUILD,
 			postData,
-			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
-		);
-	}
-
-
-	function growEnvironment(environmentId, topology) {
-		var postData = 'topology=' + JSON.stringify( topology );
-		return $http.post(
-			ENVIRONMENTS_URL + environmentId + '/grow',
-			postData, 
 			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
 		);
 	}
@@ -155,17 +144,18 @@ function environmentService($http) {
 		return $http.delete(ENVIRONMENTS_URL + environmentId);
 	}
 
-	function modifyEnvironment(containers) {
-		var postData = 'include=' + JSON.stringify( containers.included ) + '&exclude=' + JSON.stringify( containers.excluded );
+	function modifyEnvironment(containers, advanced) {
+		if(advanced == undefined || advanced == null) advanced = '';
+		var postData = 'topology=' + JSON.stringify( containers.topology ) + '&removedContainers=' + JSON.stringify( containers.removedContainers );
 		return $http.post(
-			ENVIRONMENTS_URL + containers.environmentId + '/modify',
+			ENVIRONMENTS_URL + containers.environmentId + '/modify/' + advanced,
 			postData,
 			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
 		);
 	}
 
 	function switchContainer(containerId, type) {
-		return $http.post(
+		return $http.put(
 			CONTAINERS_URL + containerId + '/' + type,
 			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
 		);
@@ -184,9 +174,9 @@ function environmentService($http) {
 
 
 	function setSshKey(sshKey, environmentId) {
-		var postData = 'environmentId=' + environmentId + '&key=' + window.btoa(sshKey);
+		var postData = 'key=' + window.btoa(sshKey);
 		return $http.post(
-			SSH_KEY_URL,
+			ENVIRONMENTS_URL + environmentId + '/keys',
 			postData, 
 			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
 		);
@@ -230,13 +220,12 @@ function environmentService($http) {
 
 	function setDomain(domain, envId, file) {
 		var fd = new FormData();
-		fd.append('environmentId', envId);
 		fd.append('hostName', domain.name);
 		fd.append('strategy', domain.strategy);
 		fd.append('file', file);
 
 		return $http.post(
-			ENVIRONMENTS_URL + 'domains',
+			ENVIRONMENTS_URL + envId + '/domains',
 			fd,
 			{transformRequest: angular.identity, headers: {'Content-Type': undefined}}
 		);
@@ -295,9 +284,9 @@ function environmentService($http) {
 	}
 
 	function share (users, environmentId) {
-		var postData = "users=" + users + "&environmentId=" + environmentId;
+		var postData = "users=" + users;
 		return $http.post(
-			ENVIRONMENTS_URL + "share",
+			ENVIRONMENTS_URL + environmentId + "/share",
 			postData,
 			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
 		);

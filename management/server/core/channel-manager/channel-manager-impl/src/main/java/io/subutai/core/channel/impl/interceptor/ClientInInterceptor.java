@@ -60,7 +60,8 @@ public class ClientInInterceptor extends AbstractPhaseInterceptor<Message>
 
                 URL url = new URL( ( String ) message.getExchange().getOutMessage().get( Message.ENDPOINT_ADDRESS ) );
 
-                if ( url.getPort() == SystemSettings.getSecurePortX2() )
+                if ( url.getPort() == /*SystemSettings.getSecurePortX2()*/ peerManager.getLocalPeer().getPeerInfo()
+                                                                                      .getPort() )
                 {
                     String path = url.getPath();
                     String ip = url.getHost();
@@ -84,7 +85,7 @@ public class ClientInInterceptor extends AbstractPhaseInterceptor<Message>
                         }
                         else
                         {
-//                            LOG.warn( "Path is not handled by crypto handler: " + path );
+                            //                            LOG.warn( "Path is not handled by crypto handler: " + path );
                         }
                     }
                 }

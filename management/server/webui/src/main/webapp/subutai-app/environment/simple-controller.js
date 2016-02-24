@@ -19,7 +19,6 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 	vm.editEnvironment = editEnvironment;
 	vm.notifyChanges = notifyChanges;
 	vm.applyChanges = applyChanges;
-	vm.getQuotaColor = getQuotaColor;
 
 	vm.environments = [];
 	vm.domainStrategies = [];
@@ -34,19 +33,17 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 	vm.templateGrid = [];
 	vm.cubeGrowth = 1;
 	vm.environment2BuildName = 'Environment name';
+	vm.buildCompleted = false;
 
 	// functions
 
-	vm.addNewNode = addNewNode;
-	vm.removeNodeGroup = removeNodeGroup;
-	vm.setNodeData = setNodeData;
-	vm.setupAdvancedEnvironment = setupAdvancedEnvironment;
 	vm.initJointJs = initJointJs;
 	vm.buildEnvironmentByJoint = buildEnvironmentByJoint;
 	vm.clearWorkspace = clearWorkspace;
 	vm.addSettingsToTemplate = addSettingsToTemplate;
 
 	vm.addContainer = addContainer;
+	vm.closePopup = closePopup;
 
 	environmentService.getTemplates()
 		.success(function (data) {
@@ -67,6 +64,11 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 	environmentService.getPeers().success(function (data) {
 		vm.peerIds = data;
 	});
+
+	function closePopup() {
+		vm.buildCompleted = false;
+		ngDialog.closeAll();
+	}
 
 	function getLogsFromTracker(environmentId) {
 		trackerSrv.getOperations('ENVIRONMENT MANAGER', moment().format('YYYY-MM-DD'), moment().format('YYYY-MM-DD'), 100)
@@ -147,9 +149,18 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 					if(data.state == 'FAILED') {
 						checkLastLog(false);
 					} else {
-						SweetAlert.swal("Success!", "Your environment has been built successfully.", "success");
+						//SweetAlert.swal("Success!", "Your environment has been built successfully.", "success");
 						checkLastLog(true);
+						var currentLog = {
+							"time": moment().format('HH:mm:ss'),
+							"status": 'success',
+							"classes": ['fa-check', 'g-text-green'],
+							"text": 'Your environment has been built successfully'
+						};
+						vm.logMessages.push(currentLog);						
+						vm.buildCompleted = true;
 					}
+					$scope.$emit('reloadEnvironmentsList');
 				}
 			}).error(function(error) {
 				console.log(error);
@@ -184,8 +195,8 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 				};
 				vm.logMessages.push(currentLog);
 
-				//var logId = getLogsFromTracker(vm.newEnvID);
-				var logId = getLogsFromTracker(vm.environment2BuildName);
+				//var logId = getLogsFromTracker(vm.environment2BuildName);
+				getLogById(data, true);
 
 			}).error(function(error){
 				if(error && error.ERROR === undefined) {
@@ -247,7 +258,7 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 
 		var excludedContainers = [];
 		for (var i = 0; i < vm.currentEnvironment.excludedContainers.length; i++) {
-			excludedContainers.push(vm.currentEnvironment.excludedContainers[i].get('id'));
+			excludedContainers.push(vm.currentEnvironment.excludedContainers[i].get('containerId'));
 		}
 		var includedContainers = [];
 		for (var i = 0; i < vm.currentEnvironment.includedContainers.length; i++) {
@@ -259,8 +270,8 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 			});
 		}
 		vm.currentEnvironment.modificationData = {
-			included: includedContainers,
-			excluded: excludedContainers,
+			topology: includedContainers,
+			removedContainers: excludedContainers,
 			environmentId: vm.currentEnvironment.id
 		};
 
@@ -270,135 +281,31 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 			className: 'b-build-environment-info'
 		});
 
+		vm.logMessages = [];
+		var currentLog = {
+			"time": '',
+			"status": 'in-progress',
+			"classes": ['fa-spinner', 'fa-pulse'],
+			"text": 'Registering environment'
+		};
+		vm.logMessages.push(currentLog);
+
 		vm.currentEnvironment.modifyStatus = 'modifying';
+		console.log(vm.currentEnvironment.modificationData);
 		environmentService.modifyEnvironment(vm.currentEnvironment.modificationData).success(function (data) {
 			vm.currentEnvironment.modifyStatus = 'modified';
 			clearWorkspace();
 			vm.isEditing = false;
 			vm.isApplyingChanges = false;
+
+			getLogById(data, true);
 		}).error(function (data) {
 			vm.currentEnvironment.modifyStatus = 'error';
 			clearWorkspace();
 			vm.isEditing = false;
 			vm.isApplyingChanges = false;
+			checkLastLog(false);
 		});
-	}
-
-	function editEnvironment(environment) {
-		vm.clearWorkspace();
-		vm.isApplyingChanges = false;
-		vm.currentEnvironment = environment;
-		vm.currentEnvironment.excludedContainers = [];
-		vm.currentEnvironment.includedContainers = [];
-		vm.isEditing = true;
-		for(var container in environment.containers) {
-			var pos = vm.findEmptyCubePostion();
-			var devElement = new joint.shapes.tm.devElement({
-				position: { x: (GRID_CELL_SIZE * pos.x) + 20, y: (GRID_CELL_SIZE * pos.y) + 20 },
-				templateName: environment.containers[container].templateName,
-				quotaSize: environment.containers[container].type,
-				hostname: environment.containers[container].hostname,
-				containerId: environment.containers[container].id,
-				attrs: {
-					image: { 'xlink:href': 'assets/templates/' + environment.containers[container].templateName + '.jpg' },
-					title: {text: environment.containers[container].templateName}
-				}
-			});
-			graph.addCell(devElement);
-		}
-	}
-
-	function addNewNode() {
-		if(vm.nodeStatus == 'Add to') {
-			var tempNode = vm.advancedEnv.currentNode;
-
-			if(tempNode === undefined) return;
-			if(tempNode.name === undefined || tempNode.name.length < 1) return;
-			if(tempNode.numberOfContainers === undefined || tempNode.numberOfContainers < 1) return;
-			if(tempNode.sshGroupId === undefined) return;
-			if(tempNode.hostsGroupId === undefined) return;
-
-			if( jQuery.grep( vm.nodeList, function( i ) {
-					return tempNode.name == i.name;
-				}).length != 0
-			) return;
-
-			vm.nodeList.push(tempNode);
-		} else {
-			vm.nodeStatus = 'Add to';
-		}
-
-
-		vm.advancedEnv.currentNode = angular.copy( vm.advancedEnv.currentNode );
-		vm.advancedEnv.currentNode.name = "";
-	}
-
-	function setNodeData(key) {
-		vm.nodeStatus = 'Update in';
-		vm.advancedEnv.currentNode = vm.nodeList[key];
-	}
-
-	function removeNodeGroup(key)
-	{
-		vm.nodeList.splice(key, 1);
-	}
-
-	function getDefaultValues() {
-		var defaultVal = {
-			'templateName': 'master',
-			'numberOfContainers': 2,
-			'sshGroupId': 0,
-			'hostsGroupId': 0,
-			'type': 'TINY'
-		};
-		return defaultVal;
-	}
-
-	function setupAdvancedEnvironment() {
-		if(vm.advancedEnv.name === undefined) return;
-		if(vm.nodeList === undefined || vm.nodeList.length == 0) return;
-
-		var finalEnvironment = vm.advancedEnv;
-		finalEnvironment.nodeGroups = vm.nodeList;
-		if(finalEnvironment.currentNod !== undefined) {
-			finalEnvironment.nodeGroups.push(finalEnvironment.currentNode);
-		}
-		delete finalEnvironment.currentNode;
-
-		var cloneContainers = {};
-
-		for( var i = 0; i < finalEnvironment.nodeGroups.length; i++ )
-		{
-			var node = finalEnvironment.nodeGroups[i];
-			for( var j = 0; j < node.numberOfContainers; j++ )
-			{
-				if( j < 0 ) break;
-
-				if( cloneContainers[node.peerId] === undefined )
-				{
-					cloneContainers[node.peerId] = [];
-				}
-
-				cloneContainers[node.peerId].push(node);
-			}
-		}
-
-		console.log(cloneContainers);
-		LOADING_SCREEN();
-		ngDialog.closeAll();
-		environmentService.setupAdvancedEnvironment(finalEnvironment.name, cloneContainers)
-			.success(function(data){
-				console.log(data);
-				loadEnvironments();
-				LOADING_SCREEN('none');
-			}).error(function(error){
-				console.log(error);
-				LOADING_SCREEN('none');
-			});
-
-		vm.nodeList = [];
-		vm.advancedEnv = {};
-		vm.advancedEnv.currentNode = getDefaultValues();
 	}
 
 	var graph = new joint.dia.Graph;
@@ -410,7 +317,7 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 	joint.shapes.tm.toolElement = joint.shapes.basic.Generic.extend({
 
 		toolMarkup: [
-			'<g class="element-tools">',
+			'<g class="element-tools element-tools_big">',
 				'<g class="element-tool-remove">',
 					'<circle fill="#F8FBFD" r="8" stroke="#dcdcdc"/>',
 					'<polygon transform="scale(1.2) translate(-5, -5)" fill="#292F6C" points="8.4,2.4 7.6,1.6 5,4.3 2.4,1.6 1.6,2.4 4.3,5 1.6,7.6 2.4,8.4 5,5.7 7.6,8.4 8.4,7.6 5.7,5 "/>',
@@ -488,23 +395,15 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 				case 'element-tool-remove':
 					if (this.model.attributes.containerId) {
 						vm.currentEnvironment.excludedContainers.push(this.model);
-						$('.js-add-dev-element[data-type=' + this.model.attributes.devType + ']')
-							.removeClass('b-devops-menu__li-link_active');
-						this.model.remove();
-						$('.js-devops-item-info-block').hide();
-						delete vm.templateGrid[Math.floor(x / GRID_CELL_SIZE)][Math.floor(y / GRID_CELL_SIZE)];
 					} else {
 						var object =
 							vm.currentEnvironment.includedContainers ?
 								getElementByField('id', this.model.id, vm.currentEnvironment.includedContainers) :
 								null;
 						object !== null ? vm.currentEnvironment.includedContainers.splice(object.index, 1): null;
-						$('.js-add-dev-element[data-type=' + this.model.attributes.devType + ']')
-							.removeClass('b-devops-menu__li-link_active');
-						this.model.remove();
-						$('.js-devops-item-info-block').hide();
-						delete vm.templateGrid[Math.floor(x / GRID_CELL_SIZE)][Math.floor(y / GRID_CELL_SIZE)];
 					}
+					this.model.remove();
+					delete vm.templateGrid[Math.floor(x / GRID_CELL_SIZE)][Math.floor(y / GRID_CELL_SIZE)];
 					return;
 					break;
 				case 'element-call-menu':
@@ -708,6 +607,7 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 	}
 
 	function editEnvironment(environment) {
+		console.log(environment);
 		clearWorkspace();
 		vm.isApplyingChanges = false;
 		vm.currentEnvironment = environment;
@@ -724,6 +624,7 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 				containerId: environment.containers[container].id,
 				attrs: {
 					image: { 'xlink:href': 'assets/templates/' + environment.containers[container].templateName + '.jpg' },
+					'rect.b-magnet': {fill: vm.colors[environment.containers[container].type]},
 					title: {text: environment.containers[container].templateName}
 				}
 			});
@@ -755,10 +656,6 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 			}
 		}
 		return null;
-	}
-
-	function getQuotaColor(quotaSize) {
-		return quotaColors[quotaSize];
 	}
 }
 

@@ -32,11 +32,20 @@
 			<div class="popup-body-box">
 				<label class="b-popup-body-label">SSL certificate</label>
 				<div class="b-file-uploader">
-					<div class="fileUpload b-btn b-btn_light-grey">
-						<span>Upload SSL cert</span>
-						<input id="js-uploadBtn" type="file" class="upload" file-model="test"/>
-					</div>
-					<input id="js-uploadFile" class="b-form-input b-form-input_fix-size-1" placeholder="Choose File" disabled="disabled" />
+					<input type="text"
+						id="js-uploadFile" 
+						placeholder="Choose File"
+						class="b-popup-body-input"
+						disabled="disabled">
+					
+					<label for="js-uploadBtn" class="b-popup-body-label">Upload SSL cert</label>
+
+					<input id="js-uploadBtn"
+						type="file"
+						class="upload"
+						ng-hide="true" 
+						ngf-select 
+						file-model="test" />
 				</div>
 				<div class="clear"></div>
 			</div>
