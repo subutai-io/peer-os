@@ -30,7 +30,7 @@ public class RestAptManagerImpl extends RestManagerBase implements RestAptManage
     private static final Logger LOGGER = LoggerFactory.getLogger( RestAptManagerImpl.class );
 
     private final AptManager aptManager;
-
+    
 
     public RestAptManagerImpl( AptManager aptManager )
     {
@@ -41,9 +41,17 @@ public class RestAptManagerImpl extends RestManagerBase implements RestAptManage
     @Override
     public Response getRelease( String release )
     {
-        String releaseIndex = aptManager.getRelease( release, null, null );
-        return ( releaseIndex != null ) ? Response.ok( releaseIndex ).build() :
-               notFoundResponse( "Release not found." );
+        try
+        {
+            String releaseIndex = aptManager.getRelease( release, null, null );
+            return ( releaseIndex != null ) ? Response.ok( releaseIndex ).build()
+                    : notFoundResponse( "Release not found." );
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Failed to get release package", e );
+        }
+        return Response.serverError().entity( "Failed to get release package." ).build();
     }
 
 
@@ -86,8 +94,8 @@ public class RestAptManagerImpl extends RestManagerBase implements RestAptManage
                 {
                     DefaultPackageMetadata pm = MetadataUtils.JSON.fromJson( serialized, DefaultPackageMetadata.class );
                     return Response.ok( is )
-                                   .header( "Content-Disposition", "attachment; filename=" + makePackageFilename( pm ) )
-                                   .header( "Content-Type", "application/octet-stream" ).build();
+                            .header( "Content-Disposition", "attachment; filename=" + makePackageFilename( pm ) )
+                            .header( "Content-Type", "application/octet-stream" ).build();
                 }
             }
         }
@@ -169,8 +177,8 @@ public class RestAptManagerImpl extends RestManagerBase implements RestAptManage
             {
                 DefaultPackageMetadata pm = MetadataUtils.JSON.fromJson( serialized, DefaultPackageMetadata.class );
                 return Response.ok( is )
-                               .header( "Content-Disposition", "attachment; filename=" + makePackageFilename( pm ) )
-                               .header( "Content-Type", "application/octet-stream" ).build();
+                        .header( "Content-Disposition", "attachment; filename=" + makePackageFilename( pm ) )
+                        .header( "Content-Type", "application/octet-stream" ).build();
             }
         }
         return packageNotFoundResponse();
