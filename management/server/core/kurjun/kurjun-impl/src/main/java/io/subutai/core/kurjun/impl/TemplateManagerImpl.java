@@ -33,7 +33,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.configuration.ConfigurationException;
 
 import com.google.common.collect.Lists;
 import com.google.inject.Injector;

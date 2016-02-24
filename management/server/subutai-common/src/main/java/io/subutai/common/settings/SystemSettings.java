@@ -20,56 +20,43 @@ public class SystemSettings
 
     public static final String DEFAULT_EXTERNAL_INTERFACE = "wan";
     public static final String DEFAULT_PUBLIC_URL = "https://127.0.0.1:8443";
-    public static final String DEFAULT_KURJUN_REPO =
-            "http://repo.critical-factor.com:8080/rest/kurjun/templates/public";
+    public static final String DEFAULT_KURJUN_REPO = "http://repo.critical-factor.com:8080/rest/kurjun/templates";
 
-    private static PropertiesConfiguration PROPERTIES = loadProperties();
+    private static PropertiesConfiguration PROPERTIES = null;
+    private static String[] GLOBAL_KURJUN_URLS = null;
 
+    static
+    {
+        loadProperties();
+    }
 
     public static void loadProperties()
     {
-        PropertiesConfiguration config = null;
         try
         {
-            config = new PropertiesConfiguration( String.format( "%s/subutaisystem.cfg", Common.KARAF_ETC ) );
+            PROPERTIES = new PropertiesConfiguration( String.format( "%s/subutaisystem.cfg", Common.KARAF_ETC ) );
+            loadGlobalKurjunUrls();
         }
         catch ( ConfigurationException e )
         {
-            LOG.error( "Error in loading subutaisettings.cfg file.", e );
+            throw new RuntimeException( "Failed to load subutaisettings.cfg file.", e );
         }
-        
-        PROPERTIES = config;
-        
-        parseGlobalKurjunUrls();
     }
 
     // Kurjun Settings
 
 
-    public static String[] getGlobalKurjunUrls() throws ConfigurationException
+    public static String[] getGlobalKurjunUrls()
     {
-
-        String[] globalKurjunUrls = PROPERTIES.getStringArray( "globalKurjunUrls" );
-        if ( globalKurjunUrls.length < 1 )
-        {
-            globalKurjunUrls = new String[] { DEFAULT_KURJUN_REPO };
-        }
-        validateGlobalKurjunUrls( globalKurjunUrls );
-
-        return globalKurjunUrls;
-
-        //        String urls = String.valueOf( PROPERTIES.getProperty( "globalKurjunUrls" ) );
-        //        String replace = urls.replace( "[", "" );
-        //        String replace1 = replace.replace( "]", "" );
-        //
-        //        return new ArrayList<String>( Arrays.asList( replace1.split( "," ) ) );
+        return GLOBAL_KURJUN_URLS;
     }
 
-
+    
     public static void setGlobalKurjunUrls( String[] urls ) throws ConfigurationException
     {
         validateGlobalKurjunUrls( urls );
         saveProperty( "globalKurjunUrls", urls );
+        loadGlobalKurjunUrls();
     }
 
 
@@ -87,15 +74,30 @@ public class SystemSettings
             }
         }
     }
-
-
-    private static void parseGlobalKurjunUrls()
+    
+    
+    private static void loadGlobalKurjunUrls() throws ConfigurationException
     {
-        String urls = String.valueOf( PROPERTIES.getProperty( "globalKurjunUrls" ) );
-        String replace = urls.replace( "[", "" ).replace( "]", "" );
+        String[] globalKurjunUrls = PROPERTIES.getStringArray( "globalKurjunUrls" );
+        if ( globalKurjunUrls.length < 1 )
+        {
+            globalKurjunUrls = new String[]
+            {
+                DEFAULT_KURJUN_REPO
+            };
+        }
 
-        GLOBAL_KURJUN_URLS = new ArrayList<>( Arrays.asList( replace.split( "," ) ) );
+        validateGlobalKurjunUrls( globalKurjunUrls );
+
+        GLOBAL_KURJUN_URLS = globalKurjunUrls;
+
+        //        String urls = String.valueOf( PROPERTIES.getProperty( "globalKurjunUrls" ) );
+        //        String replace = urls.replace( "[", "" );
+        //        String replace1 = replace.replace( "]", "" );
+        //
+        //        return new ArrayList<String>( Arrays.asList( replace1.split( "," ) ) );
     }
+
 
     // Network Settings
 
