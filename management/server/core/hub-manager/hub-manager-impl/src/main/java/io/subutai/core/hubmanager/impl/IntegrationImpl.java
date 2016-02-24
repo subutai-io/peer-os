@@ -47,7 +47,7 @@ import io.subutai.core.hubmanager.impl.proccessors.SystemConfProcessor;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
-import io.subutai.hub.share.dto.ProductsDto;
+import io.subutai.hub.share.dto.product.ProductsDto;
 import io.subutai.hub.share.json.JsonUtil;
 
 
@@ -179,6 +179,7 @@ public class IntegrationImpl implements Integration
         catch ( UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException | PGPException | IOException
                 e )
         {
+            e.printStackTrace();
             throw new HubPluginException( "Could not retrieve product data", e );
         }
     }
