@@ -15,6 +15,13 @@ To build the project, you need to have the following tools:
   
   [Installation](http://askubuntu.com/questions/56104/how-can-i-install-sun-oracles-proprietary-java-jdk-6-7-8-or-jre)
 
+  ###### Ubuntu: Installing Java 8
+  ```bash
+  sudo add-apt-repository ppa:webupd8team/java
+  sudo apt-get update
+  sudo apt-get install oracle-java8-installer
+  ```
+
   ###### Setting JAVA_HOME
   ```bash
   update-java-alternatives -l
