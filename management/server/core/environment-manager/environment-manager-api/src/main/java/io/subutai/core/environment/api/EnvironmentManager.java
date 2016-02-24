@@ -63,6 +63,10 @@ public interface EnvironmentManager
     @RolesAllowed( "Environment-Management|Write" )
     Environment createEnvironment( Topology topology, boolean async ) throws EnvironmentCreationException;
 
+    @RolesAllowed( "Environment-Management|Write" )
+    UUID createEnvironmentViaTracker(Topology topology, boolean async)
+            throws EnvironmentCreationException;
+
     /**
      * Imports environment based on a passed topology
      *
@@ -92,6 +96,10 @@ public interface EnvironmentManager
     Set<EnvironmentContainerHost> growEnvironment( String environmentId, Topology topology, boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException;
 
+
+    @RolesAllowed( "Environment-Management|Write" )
+    UUID modifyEnvironment(String environmentId, Topology topology, List<String> removedContainers, boolean async)
+            throws EnvironmentModificationException, EnvironmentNotFoundException;
 
     /**
      * Assigns ssh key to environment and inserts it into authorized_keys file of all the containers within the
