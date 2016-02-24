@@ -28,6 +28,8 @@ To build the project, you need to have the following tools:
   [Download Page (JDK 8)](http://www.oracle.com/technetwork/java/javase/downloads/jce8-download-2133166.html)
   
   ```bash
+  unzip jce_policy-8.zip
+  cp UnlimitedJCEPolicyJDK8
   cp local_policy.jar US_export_policy.jar $JAVA_HOME/jre/lib/security
   ```
   
