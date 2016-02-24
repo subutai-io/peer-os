@@ -221,7 +221,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 				vm.logMessages.push(currentLog);
 
 				//var logId = getLogsFromTracker(vm.environment2BuildName);
-				getLogById(JSON.parse(data), true);
+				getLogById(data, true);
 
 			}).error(function(error){
 				if(error && error.ERROR === undefined) {
@@ -260,7 +260,6 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 					"date": moment().format('MMMM Do YYYY, HH:mm:ss')
 				};
 
-				//console.log(JSON.parse(data));
 				getLogById(data, true);
 				$scope.$emit('reloadEnvironmentsList');
 

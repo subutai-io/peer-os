@@ -196,7 +196,7 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 				vm.logMessages.push(currentLog);
 
 				//var logId = getLogsFromTracker(vm.environment2BuildName);
-				getLogById(JSON.parse(data), true);
+				getLogById(data, true);
 
 			}).error(function(error){
 				if(error && error.ERROR === undefined) {
@@ -258,7 +258,7 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 
 		var excludedContainers = [];
 		for (var i = 0; i < vm.currentEnvironment.excludedContainers.length; i++) {
-			excludedContainers.push(vm.currentEnvironment.excludedContainers[i].get('id'));
+			excludedContainers.push(vm.currentEnvironment.excludedContainers[i].get('containerId'));
 		}
 		var includedContainers = [];
 		for (var i = 0; i < vm.currentEnvironment.includedContainers.length; i++) {
