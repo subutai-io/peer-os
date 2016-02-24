@@ -419,12 +419,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             if ( success == null || !success )
             {
                 return new PrepareTemplatesResponse( false,
-                        String.format( "Error on importing template %s in %s on peer %s", task.getTemplate(),
-                                task.getHost().getHostname(), peerInfo.getId() ) );
+                        String.format( "Error on importing template %s in %s on %s", task.getTemplate(),
+                                task.getHost().getHostname(), peerInfo.getPublicUrl() ) );
             }
         }
         return new PrepareTemplatesResponse( true,
-                String.format( "All required templates ready on peer %s", peerInfo.getId() ) );
+                String.format( "Templates are ready on %s", peerInfo.getPublicUrl() ) );
     }
 
 
