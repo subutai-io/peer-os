@@ -62,4 +62,4 @@ which contains custom Karaf distribution of SS Console application.
 
 Untar it to some directory and execute `{distr}/bin/karaf`.
 
-After that go to `https://you_host_ip:8443` in your browser.
+After that go to `https://your_host_ip:8443` in your browser.
