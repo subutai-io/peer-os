@@ -3,7 +3,6 @@ package io.subutai.core.metric.rest.ui;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.TimeZone;
 
 import javax.ws.rs.core.Response;
 
@@ -11,9 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
-import com.google.gson.Gson;
 
-import io.subutai.common.gson.required.RequiredDeserializer;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.util.JsonUtil;
@@ -24,8 +21,6 @@ import io.subutai.core.metric.api.Monitor;
 public class RestServiceImpl implements RestService
 {
     private static final Logger LOG = LoggerFactory.getLogger( RestServiceImpl.class );
-
-    private Gson gson = RequiredDeserializer.createValidatingGson();
 
     private Monitor monitor;
     private EnvironmentManager environmentManager;

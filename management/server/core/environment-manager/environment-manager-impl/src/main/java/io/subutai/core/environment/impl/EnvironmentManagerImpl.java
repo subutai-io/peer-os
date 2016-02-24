@@ -16,6 +16,7 @@ import java.util.concurrent.ExecutorService;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 
+import io.subutai.core.environment.impl.workflow.modification.*;
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
@@ -84,10 +85,6 @@ import io.subutai.core.environment.impl.workflow.construction.EnvironmentImportW
 import io.subutai.core.environment.impl.workflow.creation.EnvironmentCreationWorkflow;
 import io.subutai.core.environment.impl.workflow.destruction.ContainerDestructionWorkflow;
 import io.subutai.core.environment.impl.workflow.destruction.EnvironmentDestructionWorkflow;
-import io.subutai.core.environment.impl.workflow.modification.EnvironmentGrowingWorkflow;
-import io.subutai.core.environment.impl.workflow.modification.P2PSecretKeyModificationWorkflow;
-import io.subutai.core.environment.impl.workflow.modification.SshKeyAdditionWorkflow;
-import io.subutai.core.environment.impl.workflow.modification.SshKeyRemovalWorkflow;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserDelegate;
@@ -484,6 +481,97 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         }
     }
 
+    @RolesAllowed( "Environment-Management|Write" )
+    @Override
+    public UUID createEnvironmentViaTracker(final Topology topology, final boolean async)
+            throws EnvironmentCreationException
+    {
+        Preconditions.checkNotNull( topology, "Invalid topology" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( topology.getEnvironmentName() ), "Invalid name" );
+        Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
+
+        //create operation tracker
+        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
+                String.format( "Creating environment %s ", topology.getEnvironmentName() ) );
+
+        //collect participating peers
+        Set<Peer> allPeers;
+        try
+        {
+            allPeers = getPeers( topology );
+        }
+        catch ( PeerException e )
+        {
+            operationTracker.addLogFailed( e.getMessage() );
+            throw new EnvironmentCreationException( e.getMessage() );
+        }
+
+        //check if peers are accessible
+        for ( Peer peer : allPeers )
+        {
+            if ( !peer.isOnline() )
+            {
+                operationTracker.addLogFailed( String.format( "Peer %s is offline", peer.getId() ) );
+                throw new EnvironmentCreationException( String.format( "Peer %s is offline", peer.getId() ) );
+            }
+        }
+
+        topology.setSubnet( calculateCidr( allPeers ) );
+
+        try
+        {
+            //create empty environment
+            final EnvironmentImpl environment = createEmptyEnvironment( topology );
+            // TODO add additional step for receiving trust message
+
+
+            //launch environment creation workflow
+            final EnvironmentCreationWorkflow environmentCreationWorkflow =
+                    getEnvironmentCreationWorkflow( environment, topology, topology.getSshKey(), operationTracker );
+
+            //start environment creation workflow
+            executor.execute( new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    environmentCreationWorkflow.start();
+                }
+            } );
+
+            //notify environment event listeners
+            environmentCreationWorkflow.onStop( new Runnable()
+            {
+                @Override
+                public void run()
+                {
+
+                    notifyOnEnvironmentCreated( environment );
+                }
+            } );
+
+            //wait
+            if ( !async )
+            {
+                environmentCreationWorkflow.join();
+
+                if ( environmentCreationWorkflow.isFailed() )
+                {
+                    throw new EnvironmentCreationException(
+                            exceptionUtil.getRootCause( environmentCreationWorkflow.getFailedException() ) );
+                }
+            }
+
+            //return created environment
+            return operationTracker.getId();
+        }
+        catch ( EnvironmentCreationException e )
+        {
+            operationTracker.addLogFailed( e.getMessage() );
+            throw new EnvironmentCreationException( e );
+        }
+    }
+
 
     // TODO refactor to pass one Blueprint parameter from subutai-common
     @Override
@@ -670,6 +758,120 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         }
 
         return Sets.newHashSet();
+    }
+
+
+    @RolesAllowed( "Environment-Management|Write" )
+    @Override
+    public UUID modifyEnvironment(final String environmentId, final Topology topology, final List<String> removedContainers, final boolean async)
+            throws EnvironmentModificationException, EnvironmentNotFoundException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+        Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
+
+        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
+        if ( !relationManager.getRelationInfoManager().groupHasUpdatePermissions( environment ) )
+        {
+            throw new EnvironmentNotFoundException();
+        }
+
+        TrackerOperation operationTracker =
+                tracker.createTrackerOperation( MODULE_NAME, String.format( "Modifying environment %s", environmentId ) );
+
+        Set<Peer> allPeers = new HashSet<>();
+        final Set<EnvironmentContainerHost> oldContainers = Sets.newHashSet( environment.getContainerHosts() );
+
+
+        try
+        {
+            allPeers.addAll( getPeers( topology ) );
+            allPeers.addAll( environment.getPeers() );
+        }
+        catch ( PeerException e )
+        {
+            operationTracker.addLogFailed( e.getMessage() );
+            throw new EnvironmentModificationException( e.getMessage() );
+        }
+
+        //check if peers are accessible
+        for ( Peer peer : allPeers )
+        {
+            if ( !peer.isOnline() )
+            {
+                operationTracker.addLogFailed( String.format( "Peer %s is offline", peer.getId() ) );
+                throw new EnvironmentModificationException( String.format( "Peer %s is offline", peer.getId() ) );
+            }
+        }
+
+        if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
+        {
+            operationTracker.addLogFailed( String.format( "Environment status is %s", environment.getStatus() ) );
+
+            throw new EnvironmentModificationException(
+                    String.format( "Environment status is %s", environment.getStatus() ) );
+        }
+
+
+        if( topology != null )
+            topology.setSubnet( environment.getSubnetCidr() );
+
+
+        //launch environment growing workflow
+
+        final EnvironmentModifyWorkflow environmentModifyWorkflow =
+                getEnvironmentModifyingWorkflow( environment, topology, operationTracker, removedContainers, false );
+
+        //start environment growing workflow
+        executor.execute( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                environmentModifyWorkflow.start();
+            }
+        } );
+
+        //notify environment event listeners
+        environmentModifyWorkflow.onStop( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    Set<EnvironmentContainerHost> newContainers = Sets.newHashSet( environment.getContainerHosts() );
+                    newContainers.removeAll( oldContainers );
+                    notifyOnEnvironmentGrown( loadEnvironment( environment.getId() ), newContainers );
+                }
+                catch ( EnvironmentNotFoundException e )
+                {
+                    LOG.error( "Error notifying environment event listeners", e );
+                }
+            }
+        } );
+
+        //wait
+        if ( !async )
+        {
+            environmentModifyWorkflow.join();
+
+            if ( environmentModifyWorkflow.getError() != null )
+            {
+                throw new EnvironmentModificationException(
+                        exceptionUtil.getRootCause( environmentModifyWorkflow.getError() ) );
+            }
+            else
+            {
+                if( topology != null )
+                {
+                    Set<EnvironmentContainerHost> newContainers =
+                            Sets.newHashSet( loadEnvironment( environment.getId() ).getContainerHosts() );
+                    newContainers.removeAll( oldContainers );
+                }
+            }
+        }
+
+        return operationTracker.getId();
     }
 
 
@@ -1584,6 +1786,17 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     {
         return new EnvironmentGrowingWorkflow( Common.DEFAULT_DOMAIN_NAME, templateRegistry, networkManager,
                 peerManager, environment, topology, operationTracker, this );
+    }
+
+    protected EnvironmentModifyWorkflow getEnvironmentModifyingWorkflow( final EnvironmentImpl environment,
+                                                                        final Topology topology,
+                                                                        final TrackerOperation operationTracker,
+                                                                        final List<String> removedContainers,
+                                                                        final boolean removeMetaData )
+
+    {
+        return new EnvironmentModifyWorkflow( Common.DEFAULT_DOMAIN_NAME, templateRegistry, networkManager,
+                peerManager, environment, topology, removedContainers, operationTracker, this, removeMetaData );
     }
 
 

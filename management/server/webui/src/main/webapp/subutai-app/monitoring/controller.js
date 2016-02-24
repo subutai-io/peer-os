@@ -66,11 +66,17 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
             LOADING_SCREEN();
             monitoringSrv.getInfo(vm.selectedEnvironment, vm.currentHost, vm.period).success(function (data) {
                 vm.charts = [];
-                for (var i = 0; i < data['metrics'].length; i++) {
-                    angular.equals(data['metrics'][i], {}) ?
-                        vm.charts.push({data: [], name: "NO DATA"}) :
-                        vm.charts.push(getChartData(data['metrics'][i]));
-                }
+				if(data['metrics']) {
+					for (var i = 0; i < data['metrics'].length; i++) {
+						angular.equals(data['metrics'][i], {}) ?
+							vm.charts.push({data: [], name: "NO DATA"}) :
+							vm.charts.push(getChartData(data['metrics'][i]));
+					}
+				} else {
+					for (var i = 0; i < 4; i++) {
+						vm.charts.push({data: [], name: "NO DATA"});
+					}
+				}
                 LOADING_SCREEN('none');
             }).error(function (error) {
                 console.log(error);
