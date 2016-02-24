@@ -9,7 +9,9 @@ This is a multi-module maven Java project.
 
 To build the project, you need to have the following tools:
 - Oracle JDK 8 or later
+
   [Download Page](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
+  
   [Installation](http://askubuntu.com/questions/56104/how-can-i-install-sun-oracles-proprietary-java-jdk-6-7-8-or-jre)
 
 ###### Setting JAVA_HOME
@@ -21,12 +23,17 @@ To build the project, you need to have the following tools:
   export PATH=$JAVA_HOME/bin:$PATH
   ```
 - Unlimited strength files (specific or Java version)
+
   [Download Page](http://www.oracle.com/technetwork/java/javase/downloads/jce8-download-2133166.html)
+  
   ```bash
   cp local_policy.jar US_export_policy.jar $JAVA_HOME/jre/lib/security
   ```
+  
 - Maven version 3.2.2 or later
+
   [Download Page](https://maven.apache.org/download.cgi)
+  
   [Installation](http://basicgroundwork.blogspot.com/2015/05/installing-maven-333-on-ubuntu-1504.html)
 
 ###Build steps
