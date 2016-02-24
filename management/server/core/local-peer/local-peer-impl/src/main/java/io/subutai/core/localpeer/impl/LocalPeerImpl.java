@@ -54,6 +54,7 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.ContainersDestructionResultImpl;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
+import io.subutai.common.environment.CreateEnvironmentContainerGroupResponse;
 import io.subutai.common.environment.PrepareTemplatesRequest;
 import io.subutai.common.environment.PrepareTemplatesResponse;
 import io.subutai.common.host.ContainerHostInfo;
@@ -406,25 +407,30 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 }
                 catch ( HostNotFoundException e )
                 {
-                    return new PrepareTemplatesResponse( false );
+                    return new PrepareTemplatesResponse( false,
+                            String.format( "Resource host %s not found.", resourceHostId ) );
                 }
             }
         }
 
         for ( ImportTask task : tasks )
         {
-            if ( !task.getResult() )
+            final Boolean success = task.getResult();
+            if ( success == null || !success )
             {
-                return new PrepareTemplatesResponse( false );
+                return new PrepareTemplatesResponse( false,
+                        String.format( "Error on importing template %s in %s on peer %s", task.getTemplate(),
+                                task.getHost(), peerInfo.getId() ) );
             }
         }
-        return new PrepareTemplatesResponse( true );
+        return new PrepareTemplatesResponse( true,
+                String.format( "All required templates ready on peer %s", peerInfo.getId() ) );
     }
 
 
     @RolesAllowed( "Environment-Management|Write" )
     @Override
-    public Set<ContainerHostInfoModel> createEnvironmentContainerGroup(
+    public CreateEnvironmentContainerGroupResponse createEnvironmentContainerGroup(
             final CreateEnvironmentContainerGroupRequest request ) throws PeerException
     {
         Preconditions.checkNotNull( request );
@@ -480,7 +486,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             throw new PeerException( "Clone container error." );
         }
         result.add( info );
-        return result;
+        return new CreateEnvironmentContainerGroupResponse( result );
 
         //            currentIpAddressOffset++;
         //        }

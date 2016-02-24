@@ -13,6 +13,7 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
+import io.subutai.common.environment.CreateEnvironmentContainerGroupResponse;
 import io.subutai.common.environment.PrepareTemplatesRequest;
 import io.subutai.common.environment.PrepareTemplatesResponse;
 import io.subutai.common.host.ContainerHostInfo;
@@ -67,7 +68,7 @@ public interface Peer
      *
      * @param request - container creation request
      */
-    public Set<ContainerHostInfoModel> createEnvironmentContainerGroup(
+    public CreateEnvironmentContainerGroupResponse createEnvironmentContainerGroup(
             final CreateEnvironmentContainerGroupRequest request ) throws PeerException;
 
 

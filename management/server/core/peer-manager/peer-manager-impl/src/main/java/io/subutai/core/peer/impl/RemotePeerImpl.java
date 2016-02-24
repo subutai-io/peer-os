@@ -656,7 +656,7 @@ public class RemotePeerImpl implements RemotePeer
 
     @RolesAllowed( "Environment-Management|Write" )
     @Override
-    public Set<ContainerHostInfoModel> createEnvironmentContainerGroup(
+    public CreateEnvironmentContainerGroupResponse createEnvironmentContainerGroup(
             final CreateEnvironmentContainerGroupRequest request ) throws PeerException
     {
         Preconditions.checkNotNull( request, "Invalid request" );
@@ -673,7 +673,7 @@ public class RemotePeerImpl implements RemotePeer
 
         if ( response != null )
         {
-            return response.getHosts();
+            return response;
         }
         else
         {

@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
+import io.subutai.common.environment.CreateEnvironmentContainerGroupResponse;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.host.ContainerHostInfoModel;
@@ -72,11 +73,11 @@ public class CreatePeerNodeGroupsTask implements Callable<Set<NodeGroupBuildResu
                         localPeer.getOwnerId(), environment.getSubnetCidr(), ipAddressOffset + currentIpAddressOffset,
                         nodeGroup.getTemplateName(), nodeGroup.getHostId(), nodeGroup.getType() );
 
-                Set<ContainerHostInfoModel> newHosts = peer.createEnvironmentContainerGroup( request );
+                CreateEnvironmentContainerGroupResponse newHosts = peer.createEnvironmentContainerGroup( request );
 
                 currentIpAddressOffset++;
 
-                for ( ContainerHostInfoModel newHost : newHosts )
+                for ( ContainerHostInfoModel newHost : newHosts.getHosts() )
                 {
                     containers.add( new EnvironmentContainerImpl( localPeer.getId(), peer, nodeGroup.getName(), newHost,
                             templateRegistry.getTemplate( nodeGroup.getTemplateName() ), nodeGroup.getSshGroupId(),

@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.NodeGroup;
+import io.subutai.common.environment.PrepareTemplatesResponse;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
@@ -48,7 +49,7 @@ public class PrepareTemplatesStep
 
         ExecutorService taskExecutor = Executors.newFixedThreadPool( placement.size() );
 
-        CompletionService<Boolean> taskCompletionService = getCompletionService( taskExecutor );
+        CompletionService<PrepareTemplatesResponse> taskCompletionService = getCompletionService( taskExecutor );
 
 
         for ( Map.Entry<String, Set<NodeGroup>> peerPlacement : placement.entrySet() )
@@ -68,11 +69,13 @@ public class PrepareTemplatesStep
         {
             try
             {
-                Future<Boolean> futures = taskCompletionService.take();
-                if ( !futures.get() )
+                Future<PrepareTemplatesResponse> futures = taskCompletionService.take();
+                final PrepareTemplatesResponse prepareTemplatesResponse = futures.get();
+                if ( !prepareTemplatesResponse.getResult() )
                 {
-                    throw new EnvironmentCreationException(
-                            String.format( "There were errors during preparation of templates." ) );
+                    throw new EnvironmentCreationException( String.format(
+                            "There were errors during preparation of templates. " + prepareTemplatesResponse
+                                    .getDescription() ) );
                 }
             }
             catch ( ExecutionException | InterruptedException e )
@@ -84,7 +87,7 @@ public class PrepareTemplatesStep
     }
 
 
-    protected CompletionService<Boolean> getCompletionService( Executor executor )
+    protected CompletionService<PrepareTemplatesResponse> getCompletionService( Executor executor )
     {
         return new ExecutorCompletionService<>( executor );
     }

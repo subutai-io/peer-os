@@ -82,4 +82,10 @@ public class ImportTask extends AbstractTask<Boolean> implements CommandResultPa
     {
         return false;
     }
+
+
+    public String getTemplate()
+    {
+        return templateName;
+    }
 }
