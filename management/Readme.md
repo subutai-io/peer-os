@@ -10,7 +10,7 @@ This is a multi-module maven Java project.
 To build the project, you need to have the following tools:
 - Maven version 3.2.2 or later
 - Oracle JDK 1.7 or later
-- Unlimited strength files (specific or Java version). See http://stackoverflow.com/a/6481658
+- Unlimited strength files (specific for Java version). See http://stackoverflow.com/a/6481658
 
 ###Build steps
 
