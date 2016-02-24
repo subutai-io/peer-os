@@ -4,6 +4,9 @@ package io.subutai.core.systemmanager.rest;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.core.Response;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.apache.commons.configuration.ConfigurationException;
 
 import io.subutai.common.peer.PeerException;
@@ -22,6 +25,8 @@ import io.subutai.core.systemmanager.api.pojo.SystemInfo;
  */
 public class RestServiceImpl implements RestService
 {
+    private static final Logger LOG = LoggerFactory.getLogger( RestServiceImpl.class.getName() );
+
     private SystemManager systemManager;
     private PeerManager peerManager;
 
@@ -29,10 +34,20 @@ public class RestServiceImpl implements RestService
     @Override
     public Response getSubutaiInfo()
     {
-        SystemInfo pojo = systemManager.getSystemInfo();
-        String projectInfo = JsonUtil.GSON.toJson( pojo );
+        try
+        {
+            SystemInfo pojo = systemManager.getSystemInfo();
+            String projectInfo = JsonUtil.GSON.toJson( pojo );
 
-        return Response.status( Response.Status.OK ).entity( projectInfo ).build();
+            return Response.status( Response.Status.OK ).entity( projectInfo ).build();
+        }
+        catch ( ConfigurationException e )
+        {
+            LOG.error( e.getMessage() );
+            e.printStackTrace();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
+                    entity( e.getMessage() ).build();
+        }
     }
 
 
@@ -63,12 +78,22 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getKurjunSettings() throws ConfigurationException
+    public Response getKurjunSettings()
     {
-        KurjunSettings pojo = systemManager.getKurjunSettings();
-        String kurjunSettingsInfo = JsonUtil.GSON.toJson( pojo );
+        try
+        {
+            KurjunSettings pojo = systemManager.getKurjunSettings();
+            String kurjunSettingsInfo = JsonUtil.GSON.toJson( pojo );
 
-        return Response.status( Response.Status.OK ).entity( kurjunSettingsInfo ).build();
+            return Response.status( Response.Status.OK ).entity( kurjunSettingsInfo ).build();
+        }
+        catch ( ConfigurationException e )
+        {
+            LOG.error( e.getMessage() );
+            e.printStackTrace();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
+                    entity( e.getMessage() ).build();
+        }
     }
 
 
@@ -79,9 +104,11 @@ public class RestServiceImpl implements RestService
                                        final String trustTimeFrame ) throws ConfigurationException
     {
 
-        boolean isSaved = systemManager.setKurjunSettings( globalKurjunUrls.split( "," ), Long.parseLong( publicDiskQuota ),
-                Long.parseLong( publicThreshold ), Long.parseLong( publicTimeFrame ), Long.parseLong( trustDiskQuota ),
-                Long.parseLong( trustThreshold ), Long.parseLong( trustTimeFrame ) );
+        boolean isSaved = systemManager
+                .setKurjunSettings( globalKurjunUrls.split( "," ), Long.parseLong( publicDiskQuota ),
+                        Long.parseLong( publicThreshold ), Long.parseLong( publicTimeFrame ),
+                        Long.parseLong( trustDiskQuota ), Long.parseLong( trustThreshold ),
+                        Long.parseLong( trustTimeFrame ) );
 
         if ( isSaved )
         {
@@ -128,10 +155,20 @@ public class RestServiceImpl implements RestService
     @Override
     public Response getNetworkSettings()
     {
-        NetworkSettings pojo = systemManager.getNetworkSettings();
-        String networkSettingsInfo = JsonUtil.GSON.toJson( pojo );
+        try
+        {
+            NetworkSettings pojo = systemManager.getNetworkSettings();
+            String networkSettingsInfo = JsonUtil.GSON.toJson( pojo );
 
-        return Response.status( Response.Status.OK ).entity( networkSettingsInfo ).build();
+            return Response.status( Response.Status.OK ).entity( networkSettingsInfo ).build();
+        }
+        catch ( ConfigurationException e )
+        {
+            LOG.error( e.getMessage() );
+            e.printStackTrace();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
+                    entity( e.getMessage() ).build();
+        }
     }
 
 
@@ -139,7 +176,17 @@ public class RestServiceImpl implements RestService
     public Response setNetworkSettings( final String securePortX1, final String securePortX2,
                                         final String securePortX3 )
     {
-        systemManager.setNetworkSettings( securePortX1, securePortX2, securePortX3 );
+        try
+        {
+            systemManager.setNetworkSettings( securePortX1, securePortX2, securePortX3 );
+        }
+        catch ( ConfigurationException e )
+        {
+            LOG.error( e.getMessage() );
+            e.printStackTrace();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
+                    entity( e.getMessage() ).build();
+        }
         return Response.status( Response.Status.OK ).build();
     }
 
