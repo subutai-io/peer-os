@@ -2,6 +2,7 @@ package io.subutai.core.environment.impl.workflow.creation.steps.helpers;
 
 
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.Callable;
 
 import org.slf4j.Logger;
@@ -10,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
+import io.subutai.common.environment.CreateEnvironmentContainerGroupResponse;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.host.ContainerHostInfoModel;
@@ -65,16 +67,17 @@ public class CreatePeerNodeGroupsTask implements Callable<Set<NodeGroupBuildResu
             try
             {
                 final CreateEnvironmentContainerGroupRequest request;
-
-                request = new CreateEnvironmentContainerGroupRequest( environment.getId(), localPeer.getId(),
+                final String hostname =
+                        String.format( "%s_%s", nodeGroup.getTemplateName(), UUID.randomUUID().toString() );
+                request = new CreateEnvironmentContainerGroupRequest( hostname, environment.getId(), localPeer.getId(),
                         localPeer.getOwnerId(), environment.getSubnetCidr(), ipAddressOffset + currentIpAddressOffset,
                         nodeGroup.getTemplateName(), nodeGroup.getHostId(), nodeGroup.getType() );
 
-                Set<ContainerHostInfoModel> newHosts = peer.createEnvironmentContainerGroup( request );
+                CreateEnvironmentContainerGroupResponse newHosts = peer.createEnvironmentContainerGroup( request );
 
                 currentIpAddressOffset++;
 
-                for ( ContainerHostInfoModel newHost : newHosts )
+                for ( ContainerHostInfoModel newHost : newHosts.getHosts() )
                 {
                     containers.add( new EnvironmentContainerImpl( localPeer.getId(), peer, nodeGroup.getName(), newHost,
                             templateRegistry.getTemplate( nodeGroup.getTemplateName() ), nodeGroup.getSshGroupId(),
@@ -94,6 +97,7 @@ public class CreatePeerNodeGroupsTask implements Callable<Set<NodeGroupBuildResu
             }
             results.add( new NodeGroupBuildResult( containers, exception ) );
         }
+
 
         return results;
     }

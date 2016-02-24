@@ -8,6 +8,7 @@ import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.network.Vni;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.TemplateKurjun;
+import io.subutai.common.task.Task;
 
 
 /**
@@ -191,4 +192,6 @@ public interface LocalPeer extends Peer
     List<ContainerHost> getPeerContainers( String peerId );
 
     String getCurrentControlNetwork() throws PeerException;
+
+    List<Task> getTaskList();
 }
