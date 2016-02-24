@@ -1,11 +1,32 @@
 <div class="b-popup b-popup_log">
-  <div class="b-popup__header">
-    SSH Keys
-    <a href ng-click="closeThisDialog()">
-      <img src="assets/elements/buttons/b-icon-close.svg" class="b-icon g-right"/>
-    </a>
-  </div>
-  <div ng-repeat="sshKey as environmentViewCtrl.sshKeys">
-    {{ sshKey }}
-  </div>
+	<script>
+		$(document).ready(function(){
+			$('.js-accordion').on('click', function() {
+				if($(this).hasClass('js-accordion_open')) {
+					$(this).height(34);
+					$(this).removeClass('js-accordion_open');
+				} else {
+					$(this).height('auto');
+					$(this).addClass('js-accordion_open');
+				}
+			});
+		});
+	</script>
+	<div class="b-popup__header">
+		SSH Keys
+		<a href ng-click="closeThisDialog()">
+			<img src="assets/elements/buttons/b-icon-close.svg" class="b-icon g-right"/>
+		</a>
+	</div>
+	<div class="b-popup__body">
+		<div ng-repeat="sshKey in environmentViewCtrl.sshKeysList" class="b-accordion js-accordion">
+			<div class="b-accordion__sub">
+				{{ sshKey }}
+			</div>
+			<a href="" class="b-icon b-icon_remove" ng-click="environmentViewCtrl.deleteSSHKey(sshKey, $index)"></a>
+		</div>
+		<div ng-if="environmentViewCtrl.sshKeysList.length == 0" class="b-empty-list-alert">
+			No SSH Keys on environment
+		</div>
+	</div>
 </div>

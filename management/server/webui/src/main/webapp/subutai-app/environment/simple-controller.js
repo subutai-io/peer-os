@@ -148,6 +148,11 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 				} else {
 					if(data.state == 'FAILED') {
 						checkLastLog(false);
+						$rootScope.notifications = {
+							"message": "Error on building environment", 
+							"date": moment().format('MMMM Do YYYY, HH:mm:ss'),
+							"type": "error"
+						};
 					} else {
 						//SweetAlert.swal("Success!", "Your environment has been built successfully.", "success");
 						checkLastLog(true);
@@ -159,6 +164,11 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 						};
 						vm.logMessages.push(currentLog);						
 						vm.buildCompleted = true;
+
+						$rootScope.notifications = {
+							"message": "Environment has been created", 
+							"date": moment().format('MMMM Do YYYY, HH:mm:ss')
+						};
 					}
 					$scope.$emit('reloadEnvironmentsList');
 				}
@@ -207,6 +217,12 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 				currentLog.status = 'fail';
 				currentLog.classes = ['fa-times', 'g-text-red'];
 				currentLog.time = moment().format('HH:mm:ss');				
+
+				$rootScope.notifications = {
+					"message": "Error on creating environment. " + error, 
+					"date": moment().format('MMMM Do YYYY, HH:mm:ss'),
+					"type": "error"
+				};
 			});
 	}
 

@@ -169,6 +169,11 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 				} else {
 					if(data.state == 'FAILED') {
 						checkLastLog(false);
+						$rootScope.notifications = {
+							"message": "Error on building environment", 
+							"date": moment().format('MMMM Do YYYY, HH:mm:ss'),
+							"type": "error"
+						};
 					} else {
 						//SweetAlert.swal("Success!", "Your environment has been built successfully.", "success");
 						checkLastLog(true);
@@ -181,6 +186,11 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 						vm.logMessages.push(currentLog);						
 						vm.buildCompleted = true;
 						vm.editingEnv = false;
+
+						$rootScope.notifications = {
+							"message": "Environment has been created", 
+							"date": moment().format('MMMM Do YYYY, HH:mm:ss')
+						};
 					}
 					$scope.$emit('reloadEnvironmentsList');
 				}
@@ -205,11 +215,6 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 			.success(function(data){
 				vm.newEnvID = data;
 
-				$rootScope.notifications = {
-					"message": "Environment(" + data + ") creation has been started", 
-					"date": moment().format('MMMM Do YYYY, HH:mm:ss')
-				};
-
 				checkLastLog(true);
 
 				currentLog = {
@@ -233,7 +238,8 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
 				$rootScope.notifications = {
 					"message": "Error on creating environment. " + error, 
-					"date": moment().format('MMMM Do YYYY, HH:mm:ss')
+					"date": moment().format('MMMM Do YYYY, HH:mm:ss'),
+					"type": "error"
 				};
 			});
 	}
@@ -254,11 +260,6 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 		environmentService.modifyEnvironment(conteiners, 'advanced')
 			.success(function(data){
 				vm.newEnvID = data;
-
-				$rootScope.notifications = {
-					"message": "Environment(" + data + ") creation has been started", 
-					"date": moment().format('MMMM Do YYYY, HH:mm:ss')
-				};
 
 				getLogById(data, true);
 				$scope.$emit('reloadEnvironmentsList');
