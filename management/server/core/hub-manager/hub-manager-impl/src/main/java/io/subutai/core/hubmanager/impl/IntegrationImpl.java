@@ -233,6 +233,7 @@ public class IntegrationImpl implements Integration
             if ( r.getStatus() == HttpStatus.SC_NO_CONTENT )
             {
                 LOG.debug( "Peer unregistered successfully." );
+                configDataService.deleteConfig( configManager.getPeerId() );
                 SystemSettings.setRegisterToHubState( false );
             }
             else

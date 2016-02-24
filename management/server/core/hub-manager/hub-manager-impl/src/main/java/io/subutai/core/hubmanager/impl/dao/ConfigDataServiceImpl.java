@@ -71,4 +71,30 @@ public class ConfigDataServiceImpl implements ConfigDataService
             daoManager.closeEntityManager( em );
         }
     }
+
+
+    @Override
+    public void deleteConfig( final String peerId )
+    {
+        EntityManager em = daoManager.getEntityManagerFromFactory();
+
+        try
+        {
+            daoManager.startTransaction( em );
+            ConfigEntity entity = em.find( ConfigEntity.class, peerId );
+            em.remove( entity );
+            em.flush();
+            daoManager.commitTransaction( em );
+        }
+        catch ( Exception ex )
+        {
+            daoManager.rollBackTransaction( em );
+            LOG.error( "ConfigDataService deleteOperation:" + ex.toString() );
+        }
+        finally
+        {
+            daoManager.closeEntityManager( em );
+        }
+
+    }
 }
