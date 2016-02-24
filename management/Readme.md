@@ -51,6 +51,11 @@ To build the project, you need to have the following tools:
     ```bash
     mvn clean install
     ```
+  If you want to create a Debian package add additional flag
+  
+    ```bash
+  mvn clean install -P deb
+    ```
 
 After this you will have `management/server/server-karaf/target` directory with **subutai-{version}.tar.gz** archive
 which contains custom Karaf distribution of SS Console application.
