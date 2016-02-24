@@ -9,7 +9,9 @@ import io.subutai.core.hubmanager.api.model.Config;
  */
 public interface ConfigDataService
 {
-    public void saveHubConfig( final Config config );
+    void saveHubConfig( final Config config );
 
-    public Config getHubConfig( String peerId );
+    Config getHubConfig( String peerId );
+
+    void deleteConfig( final String peerId );
 }
