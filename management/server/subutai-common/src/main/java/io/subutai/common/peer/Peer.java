@@ -2,6 +2,7 @@ package io.subutai.common.peer;
 
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -12,6 +13,10 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
+import io.subutai.common.environment.CreateEnvironmentContainerGroupResponse;
+import io.subutai.common.environment.PrepareTemplatesRequest;
+import io.subutai.common.environment.PrepareTemplatesResponse;
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
@@ -62,10 +67,8 @@ public interface Peer
      * Creates environment container group on the peer
      *
      * @param request - container creation request
-     *
-     * @return - set of metadaobjects of created containers
      */
-    public Set<ContainerHostInfoModel> createEnvironmentContainerGroup(
+    public CreateEnvironmentContainerGroupResponse createEnvironmentContainerGroup(
             final CreateEnvironmentContainerGroupRequest request ) throws PeerException;
 
 
@@ -182,6 +185,11 @@ public interface Peer
      * Returns state of container
      */
     public ContainerHostState getContainerState( ContainerId containerId ) throws PeerException;
+
+    /**
+     * Returns set of container information of the environment
+     */
+    public Set<ContainerHostInfo> getEnvironmentContainers( EnvironmentId environmentId ) throws PeerException;
 
     //******** Quota functions ***********
 
@@ -308,4 +316,6 @@ public interface Peer
     void addPeerEnvironmentPubKey( String keyId, PGPPublicKeyRing pek );
 
     HostId getResourceHostIdByContainerId( ContainerId id ) throws PeerException;
+
+    PrepareTemplatesResponse prepareTemplates( final PrepareTemplatesRequest request ) throws PeerException;
 }
