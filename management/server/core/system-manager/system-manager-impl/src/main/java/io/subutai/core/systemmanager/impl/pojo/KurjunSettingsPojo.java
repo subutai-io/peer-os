@@ -12,7 +12,7 @@ import io.subutai.core.systemmanager.api.pojo.KurjunSettings;
  */
 public class KurjunSettingsPojo implements KurjunSettings
 {
-    private List<String> globalKurjunUrls;
+    private String[] globalKurjunUrls;
     private Long publicDiskQuota;
     private Long publicThreshold;
     private Long publicTimeFrame;
@@ -119,13 +119,13 @@ public class KurjunSettingsPojo implements KurjunSettings
     }
 
 
-    public List<String> getGlobalKurjunUrls()
+    public String[] getGlobalKurjunUrls()
     {
         return globalKurjunUrls;
     }
 
 
-    public void setGlobalKurjunUrls( final List<String> globalKurjunUrls )
+    public void setGlobalKurjunUrls( final String[] globalKurjunUrls )
     {
         this.globalKurjunUrls = globalKurjunUrls;
     }

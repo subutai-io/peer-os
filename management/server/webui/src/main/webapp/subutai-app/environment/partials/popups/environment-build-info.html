@@ -59,6 +59,12 @@
 			Build
 		</button>
 
+		<button class="b-btn b-btn_green js-environment-build" 
+		ng-if="environmentSimpleViewCtrl.buildCompleted" 
+		ng-click="environmentSimpleViewCtrl.closePopup()">
+			Close
+		</button>
+
 		<div class="clear"></div>
 	</div>
 	<div class="b-loading-screen js-popup-loading-screen">

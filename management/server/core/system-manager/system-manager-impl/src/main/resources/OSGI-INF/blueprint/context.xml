@@ -29,11 +29,11 @@
     <!--<argument value="${restEncryptionEnabled}" />-->
     <!--<argument value="${integrationEnabled}" />-->
     <!--<argument value="${keyTrustCheckEnabled}" />-->
-    <argument value="${globalKurjunUrls}" />
+    <!--<argument value="${globalKurjunUrls}" />-->
     <!--<argument value="${openPort}" />-->
-    <argument value="${securePortX1}" />
+<!--    <argument value="${securePortX1}" />
     <argument value="${securePortX2}" />
-    <argument value="${securePortX3}" />
+    <argument value="${securePortX3}" />-->
     <!--<argument value="${specialPortX1}" />-->
 
   </bean>

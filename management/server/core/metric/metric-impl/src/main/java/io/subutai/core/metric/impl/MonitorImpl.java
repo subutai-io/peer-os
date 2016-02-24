@@ -339,13 +339,6 @@ public class MonitorImpl implements Monitor, HostListener
             }
             catch ( Exception ignore )
             {
-                // ignore
-                //                HostInfoModel defaultHostInfo =
-                //                        new HostInfoModel( resourceHost.getId(), resourceHost.getHostname(), new
-                // HostInterfaces(),
-                //                                HostArchitecture.UNKNOWN );
-                //                resourceHostMetric.setHostInfo( defaultHostInfo );
-                //                resourceHostMetric.setConnected( false );
             }
         }
 

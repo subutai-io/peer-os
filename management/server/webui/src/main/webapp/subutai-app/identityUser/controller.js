@@ -295,12 +295,15 @@ function IdentityUserFormCtrl($scope, identitySrv, ngDialog, SweetAlert) {
 	//functions
 	vm.addUser = addUser;
 	vm.colSelectUserRole = colSelectUserRole;
+	vm.selectAll = selectAll;
+	vm.unselectAll = unselectAll;
 
 	if($scope.ngDialogData !== undefined) {
 		vm.user2Add = $scope.ngDialogData;
 		vm.editUser = true;
 		vm.currentUserRoles = angular.copy(vm.user2Add.roles);
-		vm.user2Add.confirm_password = angular.copy(vm.user2Add.password);
+		vm.user2Add.password = '';
+		//vm.user2Add.confirm_password = angular.copy(vm.user2Add.password);
 
 		vm.user2Add.roles = [];
 		for(var i = 0; i < vm.currentUserRoles.length; i++) {
@@ -316,6 +319,7 @@ function IdentityUserFormCtrl($scope, identitySrv, ngDialog, SweetAlert) {
 	getRolesFromAPI();
 
 	function addUser() {
+		console.log($scope.addUserForm.$valid);
 		if ($scope.addUserForm.$valid) {
 			var postData = userPostData(vm.user2Add);
 			LOADING_SCREEN();
@@ -342,6 +346,17 @@ function IdentityUserFormCtrl($scope, identitySrv, ngDialog, SweetAlert) {
 		} else {
 			vm.user2Add.roles.push(id);
 		}
+	}
+
+	function selectAll() {
+		vm.user2Add.roles = [];
+		for (var i = 0; i < vm.roles.length; i++) {
+			vm.user2Add.roles.push(vm.roles[i].id);
+		}
+	}
+
+	function unselectAll() {
+		vm.user2Add.roles = [];
 	}
 
 }

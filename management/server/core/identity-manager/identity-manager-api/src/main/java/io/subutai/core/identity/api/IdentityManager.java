@@ -161,7 +161,7 @@ public interface IdentityManager
     User createUser( String userName, String password, String fullName, String email, int type, int trustLevel,
                      boolean generateKeyPair, boolean createUserDelegate ) throws Exception;
 
-    User modifyUser( User user ) throws Exception;
+    User modifyUser( User user, String password ) throws Exception;
 
 
     void approveDelegatedUser( String trustMessage );
@@ -185,7 +185,7 @@ public interface IdentityManager
 
     /* *************************************************
      */
-    boolean changeUserPassword( long userId, String oldPassword, String newPassword );
+    boolean changeUserPassword( long userId, String oldPassword, String newPassword ) throws Exception;
 
 
     /* *************************************************
