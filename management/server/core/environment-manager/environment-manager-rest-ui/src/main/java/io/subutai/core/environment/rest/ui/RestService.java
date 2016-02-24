@@ -43,27 +43,29 @@ public interface RestService
 
     @POST
     @Path( "build" )
-    @Produces( { MediaType.TEXT_PLAIN } )
-    Response buildAuto( @FormParam( "name" ) String name, @FormParam( "containers" ) String containersJson );
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response build(@FormParam( "name" ) String name, @FormParam( "topology" ) String topologyJson );
 
 
     @POST
     @Path( "build/advanced" )
-    @Produces( { MediaType.TEXT_PLAIN } )
-    Response buildAdvanced( @FormParam( "name" ) String name, @FormParam( "containers" ) String containersJson );
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response buildAdvanced( @FormParam( "name" ) String name, @FormParam( "topology" ) String topologyJson );
 
 
     @POST
+    @Produces( { MediaType.APPLICATION_JSON } )
     @Path( "{environmentId}/modify" )
-    Response modifyEnvironment(@PathParam( "environmentId" ) String environmentId,
-                               @FormParam( "topology" ) String topology,
-                               @FormParam( "containers" ) String containers );
+    Response modify(@PathParam( "environmentId" ) String environmentId,
+                    @FormParam( "topology" ) String topologyJson,
+                    @FormParam( "removedContainers" ) String removedContainers );
 
     @POST
+    @Produces( { MediaType.APPLICATION_JSON } )
     @Path( "{environmentId}/modify/advanced" )
-    Response modifyEnvironmentAdvanced(@PathParam( "environmentId" ) String environmentId,
-                               @FormParam( "topology" ) String topology,
-                               @FormParam( "containers" ) String containers );
+    Response modifyAdvanced(@PathParam( "environmentId" ) String environmentId,
+                            @FormParam( "topology" ) String topologyJson,
+                            @FormParam( "removedContainers" ) String removedContainers );
 
 
     @DELETE
@@ -73,19 +75,20 @@ public interface RestService
 
     /** Environments SSH keys **************************************************** */
 
+    @GET
+    @Path( "{environmentId}/keys" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response getSshKeys(@PathParam( "environmentId" ) String environmentId );
+
+
     @POST
-    @Path( "keys" )
-    Response addSshKey( @FormParam( "environmentId" ) String environmentId, @FormParam( "key" ) String key );
+    @Path( "{environmentId}/keys" )
+    Response addSshKey( @PathParam( "environmentId" ) String environmentId, @FormParam( "key" ) String key );
 
 
     @DELETE
     @Path( "{environmentId}/keys" )
     Response removeSshKey( @PathParam( "environmentId" ) String environmentId, @QueryParam( "key" ) String key );
-
-    @GET
-    @Path( "{environmentId}/keys" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    Response getEnvironmentSShKeys( @PathParam( "environmentId" ) String environmentId );
 
 
     /** Environment domains **************************************************** */
@@ -102,8 +105,8 @@ public interface RestService
 
     @POST
     @Consumes( MediaType.MULTIPART_FORM_DATA )
-    @Path( "/domains" )
-    Response addEnvironmentDomain( @Multipart( "environmentId" ) String environmentId,
+    @Path( "{environmentId}/domains" )
+    Response addEnvironmentDomain( @PathParam( "environmentId" ) String environmentId,
                                    @Multipart( "hostName" ) String hostName,
                                    @Multipart( "strategy" ) String strategyJson,
                                    @Multipart( value = "file" ) Attachment attr );
@@ -142,12 +145,12 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     Response getContainerState( @PathParam( "containerId" ) String containerId );
 
-    @POST
+    @PUT
     @Path( "containers/{containerId}/start" )
     @Produces( { MediaType.APPLICATION_JSON } )
     Response startContainer( @PathParam( "containerId" ) String containerId );
 
-    @POST
+    @PUT
     @Path( "containers/{containerId}/stop" )
     @Produces( { MediaType.APPLICATION_JSON } )
     Response stopContainer( @PathParam( "containerId" ) String containerId );
@@ -159,50 +162,6 @@ public interface RestService
     @Path( "containers/types" )
     @Produces( { MediaType.APPLICATION_JSON } )
     Response listContainerTypes();
-
-
-    /** Container quota **************************************************** */
-
-    @GET
-    @Path( "containers/{containerId}/quota" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    Response getContainerQuota( @PathParam( "containerId" ) String containerId );
-
-    @POST
-    @Path( "containers/{containerId}/quota" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    Response setContainerQuota( @PathParam( "containerId" ) String containerId, @FormParam( "cpu" ) int cpu,
-                                @FormParam( "ram" ) int ram, @FormParam( "disk_home" ) Double diskHome,
-                                @FormParam( "disk_var" ) Double diskVar, @FormParam( "disk_root" ) Double diskRoot,
-                                @FormParam( "disk_opt" ) Double diskOpt );
-
-    @GET
-    @Path( "containers/{containerId}/quota/ram" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    Response getRamQuota( @PathParam( "containerId" ) String containerId );
-
-    @POST
-    @Path( "containers/{containerId}/quota/ram" )
-    Response setRamQuota( @PathParam( "containerId" ) String containerId, @FormParam( "ram" ) int ram );
-
-    @GET
-    @Path( "containers/{containerId}/quota/cpu" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    Response getCpuQuota( @PathParam( "containerId" ) String containerId );
-
-    @POST
-    @Path( "containers/{containerId}/quota/cpu" )
-    Response setCpuQuota( @PathParam( "containerId" ) String containerId, @FormParam( "cpu" ) int cpu );
-
-    @GET
-    @Path( "containers/{containerId}/quota/disk/{diskPartition}" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    Response getDiskQuota( @PathParam( "containerId" ) String containerId,
-                           @PathParam( "diskPartition" ) String diskPartition );
-
-    @POST
-    @Path( "containers/{containerId}/quota/disk" )
-    Response setDiskQuota( @PathParam( "containerId" ) String containerId, @FormParam( "diskQuota" ) String diskQuota );
 
 
     /** Peers strategy **************************************************** */
@@ -249,6 +208,6 @@ public interface RestService
 
 
     @POST
-    @Path( "share" )
-    Response shareEnvironment( @FormParam( "users" ) String users, @FormParam( "environmentId" ) String environmentId );
+    @Path( "{environmentId}/share" )
+    Response share(@FormParam( "users" ) String users, @PathParam( "environmentId" ) String environmentId );
 }

@@ -1,11 +1,6 @@
 package io.subutai.core.environment.impl.workflow.modification;
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.apache.servicemix.beanflow.Workflow;
-
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.tracker.TrackerOperation;
@@ -14,27 +9,36 @@ import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.creation.steps.ContainerCloneStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterHostsStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterSshStep;
+import io.subutai.core.environment.impl.workflow.modification.steps.ContainerDestroyStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.PEKGenerationStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.SetupP2PStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.VNISetupStep;
 import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerManager;
+import org.apache.servicemix.beanflow.Workflow;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
-public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkflow.EnvironmentGrowingPhase>
+public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflow.EnvironmentGrowingPhase>
 {
 
-    private static final Logger LOG = LoggerFactory.getLogger( EnvironmentGrowingWorkflow.class );
+    private static final Logger LOG = LoggerFactory.getLogger( EnvironmentModifyWorkflow.class );
 
     private final TemplateManager templateRegistry;
     private final NetworkManager networkManager;
     private final PeerManager peerManager;
     private EnvironmentImpl environment;
     private final Topology topology;
+    private List<String> removedContainers;
     private final String defaultDomain;
     private final TrackerOperation operationTracker;
     private final EnvironmentManagerImpl environmentManager;
+    private boolean forceMetadataRemoval;
 
     private Throwable error;
 
@@ -43,6 +47,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
     public static enum EnvironmentGrowingPhase
     {
         INIT,
+        DESTROY_CONTAINERS,
         GENERATE_KEYS,
         SETUP_VNI,
         SETUP_P2P,
@@ -54,11 +59,13 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
     }
 
 
-    public EnvironmentGrowingWorkflow( String defaultDomain, TemplateManager templateRegistry,
-                                       NetworkManager networkManager, PeerManager peerManager,
-                                       EnvironmentImpl environment, Topology topology,
-                                       TrackerOperation operationTracker, EnvironmentManagerImpl environmentManager )
+    public EnvironmentModifyWorkflow(String defaultDomain, TemplateManager templateRegistry,
+                                     NetworkManager networkManager, PeerManager peerManager,
+                                     EnvironmentImpl environment, Topology topology, List<String> removedContainers,
+                                     TrackerOperation operationTracker, EnvironmentManagerImpl environmentManager,
+                                     boolean forceMetadataRemoval)
     {
+
         super( EnvironmentGrowingPhase.INIT );
 
         this.templateRegistry = templateRegistry;
@@ -69,6 +76,10 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
         this.operationTracker = operationTracker;
         this.defaultDomain = defaultDomain;
         this.environmentManager = environmentManager;
+        this.removedContainers = new ArrayList<>();
+        this.forceMetadataRemoval = false;
+        this.removedContainers = removedContainers;
+        this.forceMetadataRemoval = forceMetadataRemoval;
     }
 
 
@@ -83,7 +94,31 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
 
         environment = environmentManager.saveOrUpdate( environment );
 
-        return EnvironmentGrowingPhase.GENERATE_KEYS;
+        return EnvironmentGrowingPhase.DESTROY_CONTAINERS;
+    }
+
+
+    public EnvironmentGrowingPhase DESTROY_CONTAINERS()
+    {
+        operationTracker.addLog( "Removing containers" );
+
+        try
+        {
+            new ContainerDestroyStep( environment, environmentManager, removedContainers, forceMetadataRemoval, operationTracker ).execute();
+
+            environment = environmentManager.saveOrUpdate( environment );
+
+            if( topology == null )
+                return EnvironmentGrowingPhase.FINALIZE;
+
+            return EnvironmentGrowingPhase.GENERATE_KEYS;
+        }
+        catch ( Exception e )
+        {
+            setError( e );
+
+            return null;
+        }
     }
 
 

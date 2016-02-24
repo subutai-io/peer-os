@@ -46,7 +46,7 @@ public class Login extends HttpServlet
                     User user = identityManager.authenticateByToken( token );
                     request.getSession().setAttribute( "userSessionData", token );
                     Cookie sptoken = new Cookie( "sptoken", token );
-                    sptoken.setMaxAge( 1800 );
+//                    sptoken.setMaxAge( 3600 * 24 * 7 * 365 * 10 );
 
                     logger.info(user.getFingerprint());
                     logger.info(user.getEmail());
@@ -54,7 +54,7 @@ public class Login extends HttpServlet
                     logger.info(user.getSecurityKeyId());
                     logger.info(user.getUserName());
                     Cookie fingerprint = new Cookie( "su_fingerprint", user.getFingerprint() );
-                    fingerprint.setMaxAge( 1800 );
+//                    fingerprint.setMaxAge( 3600 * 24 * 7 * 365 * 10 );
 
                     response.addCookie( sptoken );
                     response.addCookie( fingerprint );

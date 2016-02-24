@@ -2,10 +2,7 @@ package io.subutai.core.environment.rest.ui;
 
 
 import java.io.File;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
@@ -136,17 +133,17 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response buildAuto( final String name, final String containersJson )
+    public Response build(final String name, final String topologyJson )
     {
 
-        Environment environment = null;
+        UUID eventId = null;
 
         try
         {
             ContainerPlacementStrategy placementStrategy = strategyManager.findStrategyById( UnlimitedStrategy.ID );
 
             List<NodeSchema> schema =
-                    JsonUtil.fromJson( containersJson, new TypeToken<List<NodeSchema>>() {}.getType() );
+                    JsonUtil.fromJson( topologyJson, new TypeToken<List<NodeSchema>>() {}.getType() );
 
 
             final PeerGroupResources peerGroupResources = peerManager.getPeerGroupResources();
@@ -154,46 +151,46 @@ public class RestServiceImpl implements RestService
 
             Topology topology = placementStrategy.distribute( name, 0, 0, schema, peerGroupResources, quotas );
 
-            environment = environmentManager.createEnvironment( topology, true );
+            eventId = environmentManager.createEnvironmentViaTracker( topology, true );
         }
         catch ( Exception e )
         {
             return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
         }
 
-        return Response.ok( JsonUtil.toJson( environment.getId() ) ).build();
+        return Response.ok( JsonUtil.toJson( eventId ) ).build();
     }
 
 
     @Override
-    public Response buildAdvanced( final String name, final String containersJson )
+    public Response buildAdvanced( final String name, final String topologyJson )
     {
-
-        Environment environment = null;
+        UUID eventId = null;
 
         try
         {
-            List<NodeGroup> schema = JsonUtil.fromJson( containersJson, new TypeToken<List<NodeGroup>>() {}.getType() );
+            List<NodeGroup> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<NodeGroup>>() {}.getType() );
 
             Topology topology = new Topology( name, 0, 0 );
 
 
             schema.forEach( s -> topology.addNodeGroupPlacement( s.getPeerId(), s ) );
 
-            environment = environmentManager.createEnvironment( topology, true );
+            eventId = environmentManager.createEnvironmentViaTracker( topology, true );
         }
         catch ( Exception e )
         {
             return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
         }
 
-        return Response.ok( JsonUtil.toJson( environment.getId() ) ).build();
+        return Response.ok( JsonUtil.toJson( eventId ) ).build();
     }
 
 
     @Override
-    public Response modifyEnvironment( final String environmentId, final String topologyJson, final String containersJson )
+    public Response modify(final String environmentId, final String topologyJson, final String removedContainers )
     {
+        UUID eventId = null;
         try
         {
             String name = environmentManager.getEnvironments().stream()
@@ -205,28 +202,34 @@ public class RestServiceImpl implements RestService
 
             List<NodeSchema> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<NodeSchema>>() {}.getType() );
 
-            List<String> containers = JsonUtil.fromJson( containersJson, new TypeToken<List<String>>() {}.getType() );
+            List<String> containers = JsonUtil.fromJson( removedContainers, new TypeToken<List<String>>() {}.getType() );
 
-            final PeerGroupResources peerGroupResources = peerManager.getPeerGroupResources();
-            final Map<ContainerSize, ContainerQuota> quotas = quotaManager.getDefaultQuotas();
 
-            Topology topology = placementStrategy.distribute( name, 0, 0, schema, peerGroupResources, quotas );
+            Topology topology = null;
+            if( schema.size() > 0 )
+            {
+                final PeerGroupResources peerGroupResources = peerManager.getPeerGroupResources();
+                final Map<ContainerSize, ContainerQuota> quotas = quotaManager.getDefaultQuotas();
 
-            environmentManager.modifyEnvironment( environmentId, topology, containers, true );
+                topology = placementStrategy.distribute( name, 0, 0, schema, peerGroupResources, quotas );
+            }
+
+            eventId = environmentManager.modifyEnvironment( environmentId, topology, containers, true );
         }
         catch ( Exception e )
         {
-            LOG.error( "Error validating parameters #modifyEnvrionment", e );
             return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) )
                            .build();
         }
 
-        return Response.ok().build();
+        return Response.ok( JsonUtil.toJson(eventId) ).build();
     }
 
     @Override
-    public Response modifyEnvironmentAdvanced( final String environmentId, final String topologyJson, final String containersJson )
+    public Response modifyAdvanced(final String environmentId, final String topologyJson, final String removedContainers )
     {
+        UUID eventId = null;
+
         try
         {
             String name = environmentManager.getEnvironments().stream()
@@ -234,7 +237,7 @@ public class RestServiceImpl implements RestService
                     .findFirst().get().getName();
 
             List<NodeGroup> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<NodeGroup>>() {}.getType() );
-            List<String> containers = JsonUtil.fromJson( containersJson, new TypeToken<List<String>>() {}.getType() );
+            List<String> containers = JsonUtil.fromJson( removedContainers, new TypeToken<List<String>>() {}.getType() );
 
 
             Topology topology = new Topology( name, 0, 0 );
@@ -242,16 +245,15 @@ public class RestServiceImpl implements RestService
 
             schema.forEach( s -> topology.addNodeGroupPlacement( s.getPeerId(), s ) );
 
-            environmentManager.modifyEnvironment( environmentId, topology, containers, true );
+            eventId = environmentManager.modifyEnvironment( environmentId, topology, containers, true );
         }
         catch ( Exception e )
         {
-            LOG.error( "Error validating parameters #modifyEnvrionment", e );
             return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) )
                     .build();
         }
 
-        return Response.ok().build();
+        return Response.ok( JsonUtil.toJson(eventId) ).build();
     }
 
 
@@ -262,14 +264,8 @@ public class RestServiceImpl implements RestService
         {
             environmentManager.destroyEnvironment( environmentId, false, false );
         }
-        catch ( EnvironmentNotFoundException e )
+        catch ( Exception e )
         {
-            LOG.warn( "Error getting environment by id {}", environmentId );
-            return Response.status( Response.Status.NOT_FOUND ).build();
-        }
-        catch ( EnvironmentDestructionException e )
-        {
-            LOG.error( "Error destroying environment #destroyEnvironment", e );
             return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
         }
 
@@ -278,7 +274,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getEnvironmentSShKeys( final String environmentId )
+    public Response getSshKeys(final String environmentId )
     {
         try
         {
@@ -286,9 +282,8 @@ public class RestServiceImpl implements RestService
 
             return Response.ok( JsonUtil.toJson( environment.getSshKeys() ) ).build();
         }
-        catch ( EnvironmentNotFoundException e )
+        catch ( Exception e )
         {
-            LOG.error( "Cannot find environment ", e );
             return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
         }
     }
@@ -314,19 +309,8 @@ public class RestServiceImpl implements RestService
             byte[] bytesEncoded = Base64.decodeBase64( key.getBytes() );
             environmentManager.addSshKey( environmentId, new String( bytesEncoded ), false );
         }
-        catch ( EnvironmentNotFoundException e )
-        {
-            LOG.warn( "Environment not found by id {}", environmentId );
-            return Response.status( Response.Status.NOT_FOUND ).build();
-        }
-        catch ( EnvironmentModificationException e )
-        {
-            LOG.error( "Environment modification failed", e );
-            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
-        }
         catch ( Exception e )
         {
-            LOG.error( "Exception setting ssh key", e );
             return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
         }
 
@@ -356,14 +340,8 @@ public class RestServiceImpl implements RestService
             byte[] bytesEncoded = Base64.decodeBase64( key.getBytes() );
             environmentManager.removeSshKey( environmentId, new String( bytesEncoded ), false );
         }
-        catch ( EnvironmentNotFoundException e )
+        catch ( Exception e )
         {
-            LOG.warn( "Exception getting environment by id {}", environmentId );
-            return Response.status( Response.Status.NOT_FOUND ).build();
-        }
-        catch ( EnvironmentModificationException e )
-        {
-            LOG.error( "Error modifying environment", e );
             return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
         }
 
@@ -380,7 +358,6 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
-            LOG.error( "getEnvironmentDomain error", e );
             return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( e.getMessage() ) ).build();
         }
     }
@@ -429,14 +406,8 @@ public class RestServiceImpl implements RestService
         {
             environmentManager.removeEnvironmentDomain( environmentId );
         }
-        catch ( EnvironmentModificationException e )
+        catch ( Exception e )
         {
-            LOG.error( "Error removing sshKey ", e );
-            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
-        }
-        catch ( EnvironmentNotFoundException e )
-        {
-            LOG.error( "Cannot find environment ", e );
             return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
         }
 
@@ -454,7 +425,6 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
-            LOG.error( "Cannot check domain status of container", e );
             return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( e.getMessage() ) ).build();
         }
     }
@@ -643,218 +613,6 @@ public class RestServiceImpl implements RestService
     }
 
 
-    /** Container quota **************************************************** */
-    @Override
-    public Response getContainerQuota( final String containerId )
-    {
-        //        try
-        //        {
-        //            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
-        //
-        //            LocalPeer localPeer = peerManager.getLocalPeer();
-        //
-        //            return Response.ok( String.format("{\"cpu\": %s, \"ram\": %s, \"disk\": {\"HOME\": %s, \"VAR\":
-        // %s, \"ROOT_FS\": %s, \"OPT\": %s}}",
-        //                    localPeer.getContainerHostById( containerId ).getCpuQuota(),
-        //                    localPeer.getContainerHostById( containerId ).getRamQuota(),
-        //                    JsonUtil.toJson(
-        //                        localPeer.getContainerHostById(containerId).getDiskQuota(
-        //                            JsonUtil.<DiskPartition>fromJson("HOME", new TypeToken<DiskPartition>() {}
-        // .getType())
-        //                        )
-        //                    ),
-        //                    JsonUtil.toJson(
-        //                        localPeer.getContainerHostById(containerId).getDiskQuota(
-        //                            JsonUtil.<DiskPartition>fromJson("VAR", new TypeToken<DiskPartition>() {}
-        // .getType())
-        //                        )
-        //                    ),
-        //                    JsonUtil.toJson(
-        //                        localPeer.getContainerHostById(containerId).getDiskQuota(
-        //                            JsonUtil.<DiskPartition>fromJson("ROOT_FS", new TypeToken<DiskPartition>() {}
-        // .getType())
-        //                        )
-        //                    ),
-        //                    JsonUtil.toJson(
-        //                        localPeer.getContainerHostById(containerId).getDiskQuota(
-        //                            JsonUtil.<DiskPartition>fromJson("OPT", new TypeToken<DiskPartition>() {}
-        // .getType())
-        //                        )
-        //                    )
-        //            ) ).build();
-        //        }
-        //        catch ( Exception e )
-        //        {
-        //            LOG.error( "Error getting container quota #getContainerQuota", e );
-        //            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
-        //        }
-        return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
-    }
-
-
-    @Override
-    public Response setContainerQuota( final String containerId, final int cpu, final int ram, final Double diskHome,
-                                       final Double diskVar, final Double diskRoot, final Double diskOpt )
-    {
-        //        try
-        //        {
-        //            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
-        //
-        //            LocalPeer localPeer = peerManager.getLocalPeer();
-        //            localPeer.getContainerHostById( containerId ).setCpuQuota( cpu );
-        //
-        //            localPeer.getContainerHostById( containerId ).setRamQuota( ram );
-        //
-        //            if(diskHome > 0) {
-        //                DiskQuota homeDiskQuota = new DiskQuota(DiskPartition.HOME, DiskQuotaUnit.GB, diskHome);
-        //                localPeer.getContainerHostById(containerId).setDiskQuota(homeDiskQuota);
-        //            }
-        //
-        //            if(diskVar > 0) {
-        //                DiskQuota varDiskQuota = new DiskQuota(DiskPartition.HOME, DiskQuotaUnit.GB, diskVar);
-        //                localPeer.getContainerHostById(containerId).setDiskQuota(varDiskQuota);
-        //            }
-        //
-        //            if(diskRoot > 0) {
-        //                DiskQuota rootDiskQuota = new DiskQuota(DiskPartition.HOME, DiskQuotaUnit.GB, diskRoot);
-        //                localPeer.getContainerHostById(containerId).setDiskQuota(rootDiskQuota);
-        //            }
-        //
-        //            if(diskOpt > 0) {
-        //                DiskQuota optDiskQuota = new DiskQuota(DiskPartition.HOME, DiskQuotaUnit.GB, diskOpt);
-        //                localPeer.getContainerHostById(containerId).setDiskQuota(optDiskQuota);
-        //            }
-        //            return Response.ok().build();
-        //        }
-        //        catch ( Exception e )
-        //        {
-        //            LOG.error( "Error setting container quota #setContainerQuota", e );
-        //            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
-        //        }
-
-        return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
-    }
-
-
-    @Override
-    public Response getRamQuota( final String containerId )
-    {
-        //        try
-        //        {
-        //            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
-        //
-        //            LocalPeer localPeer = peerManager.getLocalPeer();
-        //            return Response.ok( localPeer.getContainerHostById( containerId ).getRamQuota() ).build();
-        //        } catch (Exception e) {
-        //            LOG.error( "Error getting ram quota #getRamQuota", e );
-        //            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
-        //        }
-        return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
-    }
-
-
-    @Override
-    public Response setRamQuota( final String containerId, final int ram )
-    {
-        //        try
-        //        {
-        //            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
-        //
-        //            LocalPeer localPeer = peerManager.getLocalPeer();
-        //            localPeer.getContainerHostById( containerId ).setRamQuota( ram );
-        //            return Response.ok().build();
-        //        }
-        //        catch ( Exception e )
-        //        {
-        //            LOG.error( "Error setting ram quota #setRamQuota", e );
-        //            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
-        //        }
-        return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
-    }
-
-
-    @Override
-    public Response getCpuQuota( final String containerId )
-    {
-        //        try
-        //        {
-        //            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
-        //
-        //            LocalPeer localPeer = peerManager.getLocalPeer();
-        //            return Response.ok( localPeer.getContainerHostById( containerId ).getCpuQuota() ).build();
-        //        }
-        //        catch ( Exception e )
-        //        {
-        //            LOG.error( "Error getting cpu quota #getCpuQuota", e );
-        //            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
-        //        }
-        return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
-    }
-
-
-    @Override
-    public Response setCpuQuota( final String containerId, final int cpu )
-    {
-        //        try
-        //        {
-        //            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
-        //
-        //            LocalPeer localPeer = peerManager.getLocalPeer();
-        //            localPeer.getContainerHostById( containerId ).setCpuQuota( cpu );
-        //            return Response.ok().build();
-        //        }
-        //        catch ( Exception e )
-        //        {
-        //            LOG.error( "Error setting cpu quota #setCpuQuota", e );
-        //            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
-        //        }
-        return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
-    }
-
-
-    @Override
-    public Response getDiskQuota( final String containerId, final String diskPartition )
-    {
-        //        try
-        //        {
-        //            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
-        //
-        //            LocalPeer localPeer = peerManager.getLocalPeer();
-        //            return Response.ok( JsonUtil.toJson(localPeer.getContainerHostById(containerId).getDiskQuota(
-        //                    JsonUtil.<DiskPartition>fromJson(diskPartition, new TypeToken<DiskPartition>() {
-        //                    }.getType()))) ).build();
-        //        }
-        //        catch ( Exception e )
-        //        {
-        //            LOG.error( "Error getting disk quota #getDiskQuota", e );
-        //            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
-        //        }
-        return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
-    }
-
-
-    @Override
-    public Response setDiskQuota( final String containerId, final String diskQuota )
-    {
-        //        try
-        //        {
-        //            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
-        //
-        //            LocalPeer localPeer = peerManager.getLocalPeer();
-        //            localPeer.getContainerHostById( containerId )
-        //                    .setDiskQuota( JsonUtil.<DiskQuota>fromJson(diskQuota, new TypeToken<DiskQuota>() {
-        //                    }.getType()) );
-        //            return Response.ok().build();
-        //        }
-        //        catch ( Exception e )
-        //        {
-        //            LOG.error( "Error setting disk quota #setDiskQuota", e );
-        //            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
-        //        }
-        return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
-    }
-
-
     /** Peers strategy **************************************************** */
     @Override
     public Response listPlacementStrategies()
@@ -1003,7 +761,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response shareEnvironment( final String users, final String environmentId )
+    public Response share(final String users, final String environmentId )
     {
         ShareDto[] shareDto = gson.fromJson( users, ShareDto[].class );
 
