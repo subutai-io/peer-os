@@ -483,7 +483,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     @RolesAllowed( "Environment-Management|Write" )
     @Override
-    public UUID createEnvironmentViaTracker(final Topology topology, final boolean async)
+    public UUID createEnvironmentAndGetTrackerID(final Topology topology, final boolean async)
             throws EnvironmentCreationException
     {
         Preconditions.checkNotNull( topology, "Invalid topology" );
@@ -763,7 +763,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     @RolesAllowed( "Environment-Management|Write" )
     @Override
-    public UUID modifyEnvironment(final String environmentId, final Topology topology, final List<String> removedContainers, final boolean async)
+    public UUID modifyEnvironmentAndGetTrackerID(final String environmentId, final Topology topology, final List<String> removedContainers, final boolean async)
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );

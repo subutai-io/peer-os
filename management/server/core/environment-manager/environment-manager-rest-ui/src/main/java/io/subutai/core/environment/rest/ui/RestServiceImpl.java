@@ -51,7 +51,6 @@ import io.subutai.common.settings.Common;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.api.ShareDto.ShareDto;
-import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
 import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.peer.api.PeerManager;
@@ -151,7 +150,7 @@ public class RestServiceImpl implements RestService
 
             Topology topology = placementStrategy.distribute( name, 0, 0, schema, peerGroupResources, quotas );
 
-            eventId = environmentManager.createEnvironmentViaTracker( topology, true );
+            eventId = environmentManager.createEnvironmentAndGetTrackerID( topology, true );
         }
         catch ( Exception e )
         {
@@ -176,7 +175,7 @@ public class RestServiceImpl implements RestService
 
             schema.forEach( s -> topology.addNodeGroupPlacement( s.getPeerId(), s ) );
 
-            eventId = environmentManager.createEnvironmentViaTracker( topology, true );
+            eventId = environmentManager.createEnvironmentAndGetTrackerID( topology, true );
         }
         catch ( Exception e )
         {
@@ -214,7 +213,7 @@ public class RestServiceImpl implements RestService
                 topology = placementStrategy.distribute( name, 0, 0, schema, peerGroupResources, quotas );
             }
 
-            eventId = environmentManager.modifyEnvironment( environmentId, topology, containers, true );
+            eventId = environmentManager.modifyEnvironmentAndGetTrackerID( environmentId, topology, containers, true );
         }
         catch ( Exception e )
         {
@@ -245,7 +244,7 @@ public class RestServiceImpl implements RestService
 
             schema.forEach( s -> topology.addNodeGroupPlacement( s.getPeerId(), s ) );
 
-            eventId = environmentManager.modifyEnvironment( environmentId, topology, containers, true );
+            eventId = environmentManager.modifyEnvironmentAndGetTrackerID( environmentId, topology, containers, true );
         }
         catch ( Exception e )
         {
