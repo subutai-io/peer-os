@@ -26,46 +26,91 @@ var app = angular.module('subutai-app', [
 
 	.run(startup);
 
-CurrentUserCtrl.$inject = ['$location', '$rootScope', '$http'];
+CurrentUserCtrl.$inject = ['$location', '$rootScope', '$http', 'SweetAlert'];
 routesConf.$inject = ['$httpProvider', '$stateProvider', '$urlRouterProvider', '$ocLazyLoadProvider'];
 startup.$inject = ['$rootScope', '$state', '$location', '$http'];
 
-function CurrentUserCtrl($location, $rootScope, $http) {
+function CurrentUserCtrl($location, $rootScope, $http, SweetAlert) {
 	var vm = this;
 	vm.currentUser = localStorage.getItem('currentUser');
-	vm.hubStatus = localStorage.getItem('hubRegistered');
+	vm.hubStatus = false;
 	vm.notifications = localStorage.getItem('notifications');
 	vm.notificationNew = false;
 	vm.currentUserRoles = [];
 	$rootScope.notifications = {};
 
-	if( vm.hubStatus != "true" ) {
-		vm.hubStatus = false;
-	}
-	else {
-		vm.hubStatus = true;
-	}
 
-
-	vm.login;
-	vm.pass;
+	function checkIfRegistered() {
+		$http.get (SERVER_URL + "rest/v1/system/peer_settings", {withCredentials: true, headers: {'Content-Type': 'application/json'}}).success (function (data) {
+			console.log (data);
+			vm.hubStatus = data.isRegisteredToHub;
+			if( vm.hubStatus != "true" && vm.hubStatus != true ) {
+				console.log ("wrong check");
+				vm.hubStatus = false;
+			}
+			else {
+				console.log ("something else");
+				vm.hubStatus = true;
+			}
+		});
+	}
+	checkIfRegistered();
+	vm.login = "";
+	vm.pass = "";
 
 
 	//function
 	vm.logout = logout;
 	vm.hubRegister = hubRegister;
+	vm.hubUnregister = hubUnregister;
+	vm.hubHeartbeat = hubHeartbeat;
 	vm.clearLogs = clearLogs;
 
 
 	function hubRegister()
 	{
         //should be rest/v1/hub no need to change
-        $http.post( SERVER_URL + 'rest/v1/hub/register?hubIp=hub.subut.ai&email=' + vm.login + '&password=' + vm.pass, {withCredentials: true} )
+        LOADING_SCREEN();
+		var postData = 'hubIp=hub.subut.ai&email=' + vm.login + '&password=' + vm.pass;
+        $http.post( SERVER_URL + 'rest/v1/hub/register', postData, {withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
 			.success(function () {
+				LOADING_SCREEN('none');
 				localStorage.setItem('hubRegistered', true);
 				vm.hubStatus = true;
+				SweetAlert.swal ("Success!", "Your peer was registered to Hub.", "success");
 			}).error (function (error) {
-				console.log('hub/register error: ', error);
+				LOADING_SCREEN('none');
+				SweetAlert.swal ("ERROR!", "Hub register error: " + error.replace(/\\n/g, " "), "error");
+			});
+	}
+
+	function hubUnregister() {
+		LOADING_SCREEN();
+	    $http.delete( SERVER_URL + 'rest/v1/hub/unregister' )
+			.success(function () {
+				LOADING_SCREEN('none');
+				localStorage.removeItem('hubRegistered');
+				vm.hubStatus = false;
+				SweetAlert.swal ("Success!", "Your peer was unregistered from Hub.", "success");
+			}).error (function (error) {
+				LOADING_SCREEN('none');
+				SweetAlert.swal ("ERROR!", "Error while registering to Hub.\nPlease check your credentials and try again.", "error");
+			});
+	}
+
+	function hubHeartbeat()
+	{
+        //should be rest/v1/hub no need to change
+        LOADING_SCREEN();
+        $http.post( SERVER_URL + 'rest/v1/hub/send-heartbeat', {withCredentials: true} )
+			.success(function () {
+				LOADING_SCREEN('none');
+				localStorage.setItem('hubRegistered', true);
+				vm.hubStatus = true;
+				SweetAlert.swal ("Success!", "Heartbeat sent successfully.", "success");
+			}).error (function (error) {
+				LOADING_SCREEN('none');
+				SweetAlert.swal ("ERROR!", "Hub heartbeat error: " + error.replace(/\\n/g, " "), "error");
 			});
 	}
 
