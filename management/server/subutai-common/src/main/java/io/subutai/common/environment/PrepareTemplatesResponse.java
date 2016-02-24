@@ -1,24 +1,19 @@
 package io.subutai.common.environment;
 
 
-import java.util.Set;
-
-import io.subutai.common.host.ContainerHostInfoModel;
-
-
 public class PrepareTemplatesResponse
 {
-    private Set<ContainerHostInfoModel> hosts;
+    private Boolean result;
 
 
-    public PrepareTemplatesResponse( final Set<ContainerHostInfoModel> hosts )
+    public PrepareTemplatesResponse( final Boolean result )
     {
-        this.hosts = hosts;
+        this.result = result;
     }
 
 
-    public Set<ContainerHostInfoModel> getHosts()
+    public Boolean getResult()
     {
-        return hosts;
+        return result;
     }
 }
