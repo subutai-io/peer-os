@@ -151,7 +151,7 @@ public class IntegrationImpl implements Integration
         ProductsDto result;
         try
         {
-            WebClient client = configManager.getTrustedWebClientWithAuth( "/rest/v1/marketplace/products" );
+            WebClient client = configManager.getTrustedWebClientWithAuth( "/rest/v1.1/marketplace/products" );
 
             Response r = client.get();
 
