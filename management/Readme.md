@@ -51,6 +51,7 @@ To build the project, you need to have the following tools:
 After this you will have `management/server/server-karaf/target` directory with **subutai-{version}.tar.gz** archive
 which container custom Karaf distribution of SS Console application.
 Untar it to some directory and execute
+
     ```bash
     {distr}/bin/karaf
     ```
