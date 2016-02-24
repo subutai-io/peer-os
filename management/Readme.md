@@ -31,6 +31,7 @@ To build the project, you need to have the following tools:
   unzip jce_policy-8.zip
   cd UnlimitedJCEPolicyJDK8
   sudo cp local_policy.jar US_export_policy.jar $JAVA_HOME/jre/lib/security
+  Enter password for root
   ```
   
 - Maven version 3.2.2 or later
