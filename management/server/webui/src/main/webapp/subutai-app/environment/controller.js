@@ -62,6 +62,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	vm.togglePeer = togglePeer;
 	vm.setupStrategyRequisites = setupStrategyRequisites;
 	vm.minimizeLogs = minimizeLogs;
+	vm.getQuotaColor = getQuotaColor;
 
 	//share environment functions
 	vm.shareEnvironmentWindow = shareEnvironmentWindow;
@@ -111,6 +112,10 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 		});
 	}
 	loadEnvironments();
+
+	$scope.$on('reloadEnvironmentsList', function(event) {
+		loadEnvironments();
+	});
 
 	environmentService.getStrategies().success(function (data) {
 		vm.strategies = data;
@@ -294,10 +299,9 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 		for(var item in sortedContainers) {
 			sortedContainers[item].tooltip = "";
 			for(var container in sortedContainers[item].containers) {
-				sortedContainers[item].tooltip += container + ":&nbsp;<b>" + sortedContainers[item].containers[container] + "</b><br/>";
+				sortedContainers[item].tooltip += container + ":&nbsp;<b>" + sortedContainers[item].containers[container] + "</b><br/>Quota: <b>" + item + "</b>";
 			}
 		}
-		console.log();
 		return sortedContainers;
 	}
 
