@@ -18,16 +18,16 @@ public interface SystemManager
     KurjunSettings getKurjunSettings() throws ConfigurationException;
 
 
-    NetworkSettings getNetworkSettings();
+    NetworkSettings getNetworkSettings() throws ConfigurationException;
 
-    SystemInfo getSystemInfo();
+    SystemInfo getSystemInfo() throws ConfigurationException;
 
     void setPeerSettings();
 
     PeerSettings getPeerSettings();
 
     void setNetworkSettings( String securePortX1, String securePortX2,
-                             String securePortX3);
+                             String securePortX3) throws ConfigurationException;
 
     boolean setKurjunSettings( String[] globalKurjunUrls, long publicDiskQuota, long publicThreshold,
                                long publicTimeFrame, long trustDiskQuota, long trustThreshold, long trustTimeFrame )
