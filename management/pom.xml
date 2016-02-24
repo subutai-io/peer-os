@@ -19,30 +19,6 @@
   <repositories>
 
     <repository>
-      <id>archiva-internal</id>
-      <name>Archiva Managed Internal Repository</name>
-      <url>http://archiva.critical-factor.com/archiva/repository/internal/</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-
-    <repository>
-      <id>archiva-snapshots</id>
-      <name>Archiva Managed Internal Repository</name>
-      <url>http://archiva.critical-factor.com/archiva/repository/snapshots/</url>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-
-    <repository>
       <id>MavenCentral</id>
       <name>Maven repository</name>
       <url>http://repo1.maven.org/maven2</url>
@@ -95,8 +71,8 @@
     <jackson-jaxrs.version>1.9.13</jackson-jaxrs.version>
 
     <!-- Database  -->
-    <h2database.version>1.4.184</h2database.version>
     <openjpa.version>2.3.0</openjpa.version>
+    <derby.version>10.12.1.1</derby.version>
 
     <org.apache.httpcomonents.httpclient.version>4.5</org.apache.httpcomonents.httpclient.version>
     <org.apache.httpcomonents.httpcore.version>4.4.1</org.apache.httpcomonents.httpcore.version>
@@ -120,12 +96,6 @@
         <artifactId>subutai-common</artifactId>
         <version>${project.version}</version>
       </dependency>
-
-      <!--<dependency>-->
-      <!--<groupId>${project.groupId}</groupId>-->
-      <!--<artifactId>subutai-common-datasource</artifactId>-->
-      <!--<version>${project.version}</version>-->
-      <!--</dependency>-->
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
@@ -662,6 +632,26 @@
         <version>${project.version}</version>
       </dependency>
 
+      <!-- webui -->
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>webui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>webui</artifactId>
+        <classifier>classes</classifier>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>webui-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!--Internal karaf dependencies-->
       <dependency>
@@ -785,16 +775,6 @@
         <version>1.9.5</version>
       </dependency>
       <dependency>
-        <groupId>org.objenesis</groupId>
-        <artifactId>objenesis</artifactId>
-        <version>1.4</version>
-      </dependency>
-      <dependency>
-        <groupId>org.cassandraunit</groupId>
-        <artifactId>cassandra-unit</artifactId>
-        <version>2.0.2.1</version>
-      </dependency>
-      <dependency>
         <groupId>com.jayway.awaitility</groupId>
         <artifactId>awaitility</artifactId>
         <version>1.6.1</version>
@@ -840,6 +820,11 @@
         <groupId>commons-net</groupId>
         <artifactId>commons-net</artifactId>
         <version>3.3</version>
+      </dependency>
+      <dependency>
+        <groupId>commons-configuration</groupId>
+        <artifactId>commons-configuration</artifactId>
+        <version>1.10</version>
       </dependency>
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>
@@ -918,20 +903,8 @@
         <artifactId>commons-pool</artifactId>
         <version>1.6</version>
       </dependency>
-      <dependency>
-        <groupId>org.apache.servicemix.bundles</groupId>
-        <artifactId>org.apache.servicemix.bundles.junit</artifactId>
-        <version>4.10_1</version>
-      </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!-- Database -->
-      <dependency>
-        <groupId>com.h2database</groupId>
-        <artifactId>h2</artifactId>
-        <version>${h2database.version}</version>
-      </dependency>
-
       <dependency>
         <groupId>org.apache.openjpa</groupId>
         <artifactId>openjpa-all</artifactId>
@@ -941,6 +914,12 @@
         <groupId>org.apache.openjpa</groupId>
         <artifactId>openjpa</artifactId>
         <version>${openjpa.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.derby</groupId>
+        <artifactId>derby</artifactId>
+        <version>${derby.version}</version>
       </dependency>
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <dependency>
@@ -988,25 +967,6 @@
       </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!-- webui -->
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>webui</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>webui</artifactId>
-        <classifier>classes</classifier>
-        <version>${project.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>webui-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
 
       <dependency>
         <groupId>com.nimbusds</groupId>
@@ -1025,15 +985,6 @@
 
   <build>
     <plugins>
-
-      <!--<plugin>-->
-      <!--<groupId>org.apache.maven.plugins</groupId>-->
-      <!--<artifactId>maven-release-plugin</artifactId>-->
-      <!--<version>2.5.3</version>-->
-      <!--<configuration>-->
-      <!--<tagNameFormat>v@{project.version}</tagNameFormat>-->
-      <!--</configuration>-->
-      <!--</plugin>-->
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
