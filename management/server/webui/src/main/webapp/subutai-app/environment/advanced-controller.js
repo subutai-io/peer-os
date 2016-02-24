@@ -176,6 +176,19 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 						};
 					} else {
 						//SweetAlert.swal("Success!", "Your environment has been built successfully.", "success");
+
+						if(vm.editingEnv) {
+							$rootScope.notifications = {
+								"message": "Environment has been changed successfully", 
+								"date": moment().format('MMMM Do YYYY, HH:mm:ss')
+							};
+						} else {
+							$rootScope.notifications = {
+								"message": "Environment has been created", 
+								"date": moment().format('MMMM Do YYYY, HH:mm:ss')
+							};
+						}
+
 						checkLastLog(true);
 						var currentLog = {
 							"time": moment().format('HH:mm:ss'),
@@ -187,12 +200,9 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 						vm.buildCompleted = true;
 						vm.editingEnv = false;
 
-						$rootScope.notifications = {
-							"message": "Environment has been created", 
-							"date": moment().format('MMMM Do YYYY, HH:mm:ss')
-						};
 					}
 					$scope.$emit('reloadEnvironmentsList');
+					clearWorkspace();
 				}
 			}).error(function(error) {
 				console.log(error);
@@ -202,6 +212,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 	function buildEnvironment() {
 		vm.buildStep = 'showLogs';
 
+		vm.buildCompleted = false;
 		vm.logMessages = [];
 		var currentLog = {
 			"time": '',
@@ -247,6 +258,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 	function buildEditedEnvironment() {
 		vm.buildStep = 'showLogs';
 
+		vm.buildCompleted = false;
 		vm.logMessages = [];
 		var currentLog = {
 			"time": '',
