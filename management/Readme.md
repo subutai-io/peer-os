@@ -1,13 +1,14 @@
 # Subutai Social repository
 
-This repository containes source code of Subutai Social Console Project.
-This is a multi-module maven Java project.
+This repository contains source code of Subutai Social Console Project.
+This is a multi-module Maven Java project.
 
 ## Building the project
 
 ###Prerequisites
 
 To build the project, you need to have the following tools:
+
 - Oracle JDK 7 or later
 
   [Download Page (JDK 8)](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
@@ -49,11 +50,7 @@ To build the project, you need to have the following tools:
     ```
 
 After this you will have `management/server/server-karaf/target` directory with **subutai-{version}.tar.gz** archive
-which container custom Karaf distribution of SS Console application.
-Untar it to some directory and execute
+which contains custom Karaf distribution of SS Console application.
+Untar it to some directory and execute `{distr}/bin/karaf`.
 
-    ```bash
-    {distr}/bin/karaf
-    ```
-
-After that got to `https://you_host_ip:8443` in your browser.
+After that go to `https://you_host_ip:8443` in your browser.
