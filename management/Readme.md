@@ -51,6 +51,7 @@ To build the project, you need to have the following tools:
 
 After this you will have `management/server/server-karaf/target` directory with **subutai-{version}.tar.gz** archive
 which contains custom Karaf distribution of SS Console application.
+
 Untar it to some directory and execute `{distr}/bin/karaf`.
 
 After that go to `https://you_host_ip:8443` in your browser.
