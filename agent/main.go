@@ -25,7 +25,7 @@ func init() {
 func main() {
 	app := cli.NewApp()
 	app.Name = "Subutai"
-	app.Version = "v4.0.0-RC6"+TIMESTAMP
+	app.Version = "v4.0.0-RC6" + TIMESTAMP
 	app.Usage = "daemon and command line interface binary"
 
 	app.Flags = []cli.Flag{cli.BoolFlag{
@@ -198,7 +198,7 @@ func main() {
 					cli.StringFlag{Name: "policy, p", Usage: "set load balance policy (rr|lb|hash)"},
 					cli.StringFlag{Name: "file, f", Usage: "specify pem certificate file"}},
 				Action: func(c *cli.Context) {
-					lib.ProxyAdd(c.Args().Get(0), c.String("d"), c.String("h"), c.String("p"), c.String("c"))
+					lib.ProxyAdd(c.Args().Get(0), c.String("d"), c.String("h"), c.String("p"), c.String("f"))
 				},
 			},
 			{

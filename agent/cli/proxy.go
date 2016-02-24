@@ -9,7 +9,9 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
+	"time"
 )
 
 var (
@@ -90,6 +92,8 @@ func addDomain(vlan, domain, cert string) {
 		}
 	}
 	if cert != "" && gpg.ValidatePem(cert) {
+		currentDT := strconv.Itoa(int(time.Now().Unix()))
+
 		if _, err := os.Stat(config.Agent.DataPrefix + "/web/ssl/"); os.IsNotExist(err) {
 			err := os.MkdirAll(config.Agent.DataPrefix+"/web/ssl/", 0755)
 			if err != nil {
@@ -99,20 +103,20 @@ func addDomain(vlan, domain, cert string) {
 		}
 		lib.CopyFile(conftmpl+"vhost-ssl.example", confinc+vlan+".conf")
 		crt, key := gpg.ParsePem(cert)
-		err := ioutil.WriteFile(config.Agent.DataPrefix+"web/ssl/"+domain+".crt", crt, 0644)
+		err := ioutil.WriteFile(config.Agent.DataPrefix+"web/ssl/"+currentDT+".crt", crt, 0644)
 		if err != nil {
-			log.Info("Cannot create crt file " + config.Agent.DataPrefix + "web/ssl/" + domain + ".crt")
+			log.Info("Cannot create crt file " + config.Agent.DataPrefix + "web/ssl/" + currentDT + ".crt")
 			os.Exit(1)
 		}
-		err = ioutil.WriteFile(config.Agent.DataPrefix+"web/ssl/"+domain+".key", key, 0644)
+		err = ioutil.WriteFile(config.Agent.DataPrefix+"web/ssl/"+currentDT+".key", key, 0644)
 		if err != nil {
-			log.Info("Cannot create key file " + config.Agent.DataPrefix + "web/ssl/" + domain + ".key")
+			log.Info("Cannot create key file " + config.Agent.DataPrefix + "web/ssl/" + currentDT + ".key")
 			os.Exit(1)
 		}
-		addLine(confinc+vlan+".conf", "ssl_certificate /var/lib/apps/subutai-mng/current/web/ssl/DOMAIN.crt;",
-			"	ssl_certificate "+config.Agent.DataPrefix+"web/ssl/"+domain+".crt;", true)
-		addLine(confinc+vlan+".conf", "ssl_certificate_key /var/lib/apps/subutai-mng/current/web/ssl/DOMAIN.key;",
-			"	ssl_certificate_key "+config.Agent.DataPrefix+"web/ssl/"+domain+".key;", true)
+		addLine(confinc+vlan+".conf", "ssl_certificate /var/lib/apps/subutai/current/web/ssl/UNIXDATE.crt;",
+			"	ssl_certificate "+config.Agent.DataPrefix+"web/ssl/"+currentDT+".crt;", true)
+		addLine(confinc+vlan+".conf", "ssl_certificate_key /var/lib/apps/subutai/current/web/ssl/UNIXDATE.key;",
+			"	ssl_certificate_key "+config.Agent.DataPrefix+"web/ssl/"+currentDT+".key;", true)
 	} else {
 		lib.CopyFile(conftmpl+"vhost.example", confinc+vlan+".conf")
 	}
