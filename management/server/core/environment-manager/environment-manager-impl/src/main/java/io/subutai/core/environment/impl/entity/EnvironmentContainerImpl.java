@@ -38,6 +38,7 @@ import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostArchitecture;
+import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaceModel;
@@ -92,6 +93,9 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @Column( name = "template_arch", nullable = false )
     private String templateArch;
 
+    @Column( name = "rh_id", nullable = false )
+    private String resourceHostId;
+
     @ElementCollection( targetClass = String.class, fetch = FetchType.EAGER )
     private Set<String> tags = new HashSet<>();
 
@@ -142,7 +146,8 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
     public EnvironmentContainerImpl( final String localPeerId, final Peer peer, final String nodeGroupName,
                                      final ContainerHostInfoModel hostInfo, final TemplateKurjun template,
-                                     int sshGroupId, int hostsGroupId, String domainName, ContainerSize containerSize )
+                                     int sshGroupId, int hostsGroupId, String domainName, ContainerSize containerSize,
+                                     String resourceHostId )
     {
         Preconditions.checkNotNull( peer );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( nodeGroupName ) );
@@ -166,6 +171,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
         this.hostsGroupId = hostsGroupId;
         this.domainName = domainName;
         this.containerSize = containerSize;
+        this.resourceHostId = resourceHostId;
         setHostInterfaces( hostInfo.getHostInterfaces() );
     }
 
@@ -220,6 +226,13 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
         Preconditions.checkNotNull( environment );
 
         this.environment = environment;
+    }
+
+
+    @Override
+    public HostId getResourceHostId() throws PeerException
+    {
+        return new HostId( resourceHostId );
     }
 
 
@@ -497,16 +510,6 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     public String getMacByInterfaceName( final String interfaceName )
     {
         return getHostInterfaces().findByName( interfaceName ).getMac();
-
-        //        for ( HostInterface iface : hostInterfaces )
-        //        {
-        //            if ( iface.getName().equalsIgnoreCase( interfaceName ) )
-        //            {
-        //                return iface.getMac();
-        //            }
-        //        }
-        //
-        //        return null;
     }
 
 
@@ -514,18 +517,6 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     public HostInterface getInterfaceByName( final String interfaceName )
     {
         return getHostInterfaces().findByName( interfaceName );
-        //        HostInterface result = NullHostInterface.getInstance();
-        //        for ( Iterator<HostInterface> i = getHostInterfaces().iterator(); result instanceof
-        // NullHostInterface && i.hasNext(); )
-        //        {
-        //            HostInterface n = i.next();
-        //            if ( n.getName().equalsIgnoreCase( interfaceName ) )
-        //            {
-        //                result = n;
-        //            }
-        //        }
-        //
-        //        return result;
     }
 
 

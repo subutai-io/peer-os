@@ -164,7 +164,7 @@ public abstract class AbstractTask<T> implements Task<T>
     @Override
     public T getResult()
     {
-        while ( this.state != State.SUCCESS || this.state == State.FAILURE )
+        while ( !isDone() )
         {
             try
             {
@@ -177,4 +177,8 @@ public abstract class AbstractTask<T> implements Task<T>
         }
         return result;
     }
+
+
+    @Override
+    public boolean isDone() {return this.state == State.SUCCESS || this.state == State.FAILURE;}
 }

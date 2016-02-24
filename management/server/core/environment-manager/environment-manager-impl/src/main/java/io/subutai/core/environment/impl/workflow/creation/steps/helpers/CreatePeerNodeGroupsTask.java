@@ -78,10 +78,9 @@ public class CreatePeerNodeGroupsTask implements Callable<Set<NodeGroupBuildResu
 
                 for ( ContainerHostInfoModel newHost : newHosts )
                 {
-
                     containers.add( new EnvironmentContainerImpl( localPeer.getId(), peer, nodeGroup.getName(), newHost,
                             templateRegistry.getTemplate( nodeGroup.getTemplateName() ), nodeGroup.getSshGroupId(),
-                            nodeGroup.getHostsGroupId(), defaultDomain, containerSize ) );
+                            nodeGroup.getHostsGroupId(), defaultDomain, containerSize, nodeGroup.getHostId() ) );
                 }
 
                 if ( containers.isEmpty() )

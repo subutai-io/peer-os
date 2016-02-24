@@ -1,30 +1,26 @@
 package io.subutai.core.localpeer.impl.container;
 
 
-import java.util.Set;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
-import io.subutai.common.environment.CreateEnvironmentContainerGroupResponse;
-import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.RecipientType;
 import io.subutai.common.peer.Payload;
 import io.subutai.common.peer.RequestListener;
 
 
-public class CreateEnvironmentContainerGroupRequestListener extends RequestListener
+public class PrepareTemplateRequestListener extends RequestListener
 {
 
     private static final Logger LOG =
-            LoggerFactory.getLogger( CreateEnvironmentContainerGroupRequestListener.class.getName() );
+            LoggerFactory.getLogger( PrepareTemplateRequestListener.class.getName() );
 
     private LocalPeer localPeer;
 
 
-    public CreateEnvironmentContainerGroupRequestListener( LocalPeer localPeer )
+    public PrepareTemplateRequestListener( LocalPeer localPeer )
     {
         super( RecipientType.CREATE_ENVIRONMENT_CONTAINER_GROUP_REQUEST.name() );
 
@@ -40,9 +36,10 @@ public class CreateEnvironmentContainerGroupRequestListener extends RequestListe
         if ( request != null )
         {
 
-            Set<ContainerHostInfoModel> containerHosts = localPeer.createEnvironmentContainerGroup( request );
+           /* Set<ContainerHostInfoModel> containerHosts =*/
+            localPeer.createEnvironmentContainerGroup( request );
 
-            return containerHosts;
+            return null;
         }
         else
         {

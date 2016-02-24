@@ -20,6 +20,7 @@ import com.google.common.base.Strings;
 
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
@@ -571,14 +572,38 @@ public class PeerWebClient
     }
 
 
-    public Set<ContainerHostInfo> getEnvironmentContainers( final EnvironmentId environmentId )
+    public HostId getResourceHosIdByContainerId( final ContainerId containerId ) throws PeerException
     {
-        String path = String.format( "/containers/%s", environmentId.getId() );
+        String path = String.format( "/container/%s/rhId", containerId.getId() );
+        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
 
-        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 500, 7000, 1 );
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
-        Collection response = client.getCollection( ContainerHostInfo.class );
-        return new HashSet<ContainerHostInfo>( response );
+        try
+        {
+            return client.get( HostId.class );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Error on obtaining resource host id by container id", e );
+        }
+    }
+
+
+    public Set<ContainerHostInfo> getEnvironmentContainers( final EnvironmentId environmentId ) throws PeerException
+    {
+        String path = String.format( "/containers/%s", environmentId.getId() );
+        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
+
+        client.type( MediaType.APPLICATION_JSON );
+        client.accept( MediaType.APPLICATION_JSON );
+        try
+        {
+            return new HashSet<>( client.getCollection( ContainerHostInfo.class ) );
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Error on obtaining environment containers.", e );
+        }
     }
 }

@@ -54,6 +54,8 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.ContainersDestructionResultImpl;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
+import io.subutai.common.environment.PrepareTemplatesRequest;
+import io.subutai.common.environment.PrepareTemplatesResponse;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.ContainerHostState;
@@ -127,6 +129,8 @@ import io.subutai.core.localpeer.impl.container.CloneTask;
 import io.subutai.core.localpeer.impl.container.CreateEnvironmentContainerGroupRequestListener;
 import io.subutai.core.localpeer.impl.container.DestroyContainerWrapperTask;
 import io.subutai.core.localpeer.impl.container.DestroyEnvironmentContainerGroupRequestListener;
+import io.subutai.core.localpeer.impl.container.ImportTask;
+import io.subutai.core.localpeer.impl.container.PrepareTemplateRequestListener;
 import io.subutai.core.localpeer.impl.dao.ResourceHostDataService;
 import io.subutai.core.localpeer.impl.dao.TunnelDataService;
 import io.subutai.core.localpeer.impl.entity.AbstractSubutaiHost;
@@ -210,6 +214,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         //add destroy environment containers requests listener
         addRequestListener( new DestroyEnvironmentContainerGroupRequestListener( this ) );
 
+        //add prepare templates listener
+        addRequestListener( new PrepareTemplateRequestListener( this ) );
+
 
         try
         {
@@ -237,12 +244,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         taskManager = new TaskManagerImpl();
         initialized = true;
     }
-
-    //
-    //    public void setExternalIpInterface( final String externalIpInterface )
-    //    {
-    //        this.externalIpInterface = externalIpInterface;
-    //    }
 
 
     @Override
@@ -385,6 +386,39 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     protected CompletionService<ContainerHostInfo> getCompletionService( Executor executor )
     {
         return new ExecutorCompletionService<>( executor );
+    }
+
+
+    @RolesAllowed( "Environment-Management|Write" )
+    @Override
+    public PrepareTemplatesResponse prepareTemplates( final PrepareTemplatesRequest request ) throws PeerException
+    {
+        List<ImportTask> tasks = new ArrayList<>();
+        for ( String resourceHostId : request.getTemplates().keySet() )
+        {
+            for ( String templateName : request.getTemplates().get( resourceHostId ) )
+            {
+                try
+                {
+                    ImportTask task = new ImportTask( getResourceHostById( resourceHostId ), templateName );
+                    taskManager.schedule( task );
+                    tasks.add( task );
+                }
+                catch ( HostNotFoundException e )
+                {
+                    return new PrepareTemplatesResponse( false );
+                }
+            }
+        }
+
+        for ( ImportTask task : tasks )
+        {
+            if ( !task.getResult() )
+            {
+                return new PrepareTemplatesResponse( false );
+            }
+        }
+        return new PrepareTemplatesResponse( true );
     }
 
 
@@ -2402,6 +2436,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public String getExternalIp() throws PeerException
     {
         return getPeerInfo().getIp();
+    }
+
+
+    @Override
+    public HostId getResourceHostIdByContainerId( final ContainerId id ) throws PeerException
+    {
+        return new HostId( getResourceHostByContainerId( id.getId() ).getId() );
     }
 
 

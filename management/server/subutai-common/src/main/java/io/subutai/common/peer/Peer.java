@@ -13,6 +13,8 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
+import io.subutai.common.environment.PrepareTemplatesRequest;
+import io.subutai.common.environment.PrepareTemplatesResponse;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.ContainerHostState;
@@ -37,7 +39,7 @@ import io.subutai.common.security.PublicKeyContainer;
 /**
  * Peer interface
  */
-public interface Peer extends PeerSpecific, EnvironmentSpecific
+public interface Peer
 {
 
     /**
@@ -64,7 +66,6 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
      * Creates environment container group on the peer
      *
      * @param request - container creation request
-     *
      */
     public Set<ContainerHostInfoModel> createEnvironmentContainerGroup(
             final CreateEnvironmentContainerGroupRequest request ) throws PeerException;
@@ -312,4 +313,8 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
     PingDistances getCommunityDistances( String communityName, Integer maxAddress ) throws PeerException;
 
     void addPeerEnvironmentPubKey( String keyId, PGPPublicKeyRing pek );
+
+    HostId getResourceHostIdByContainerId( ContainerId id ) throws PeerException;
+
+    PrepareTemplatesResponse prepareTemplates( final PrepareTemplatesRequest request ) throws PeerException;
 }

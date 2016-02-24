@@ -13,9 +13,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.host.HostId;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.quota.ContainerQuota;
+
+//TODO make all methods consistent about parameters
 
 
 public interface EnvironmentRestService
@@ -81,4 +84,10 @@ public interface EnvironmentRestService
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
     Response getAvailableQuota( @PathParam( "containerId" ) ContainerId containerId );
+
+    @GET
+    @Path( "{environmentId}/container/{containerId}/rhId" )
+    @Consumes( MediaType.APPLICATION_JSON )
+    @Produces( MediaType.APPLICATION_JSON )
+    HostId getResourceHostIdByContainerId( @PathParam( "containerId" ) ContainerId containerId );
 }
