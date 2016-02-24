@@ -23,9 +23,9 @@ To build the project, you need to have the following tools:
   export JAVA_HOME="path that you found"
   export PATH=$JAVA_HOME/bin:$PATH
   ```
-- Unlimited strength files (specific or Java version)
+- Unlimited strength files (specific for Java version)
 
-  [Download Page](http://www.oracle.com/technetwork/java/javase/downloads/jce8-download-2133166.html)
+  [Download Page (JDK 8)](http://www.oracle.com/technetwork/java/javase/downloads/jce8-download-2133166.html)
   
   ```bash
   cp local_policy.jar US_export_policy.jar $JAVA_HOME/jre/lib/security
