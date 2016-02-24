@@ -4,12 +4,14 @@ package io.subutai.core.environment.impl.workflow.creation;
 import org.apache.servicemix.beanflow.Workflow;
 
 import io.subutai.common.environment.EnvironmentStatus;
+import io.subutai.common.environment.PrepareTemplatesRequest;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.creation.steps.ContainerCloneStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.PEKGenerationStep;
+import io.subutai.core.environment.impl.workflow.creation.steps.PrepareTemplatesStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterHostsStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterSshStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.SetupP2PStep;
@@ -47,7 +49,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         GENERATE_KEYS,
         SETUP_VNI,
         SETUP_P2P,
-        CLONE_CONTAINERS,
+        PREPARE_TEMPLATES, CLONE_CONTAINERS,
         CONFIGURE_HOSTS,
         CONFIGURE_SSH,
         FINALIZE
@@ -139,6 +141,27 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         try
         {
             new SetupP2PStep( topology, environment, peerManager ).execute();
+
+            environment = environmentManager.saveOrUpdate( environment );
+
+            return EnvironmentCreationPhase.PREPARE_TEMPLATES;
+        }
+        catch ( Exception e )
+        {
+            //            setError( e );
+            fail( e.getMessage(), e );
+            return null;
+        }
+    }
+
+
+    public EnvironmentCreationPhase PREPARE_TEMPLATES()
+    {
+        operationTracker.addLog( "Downloading templates" );
+
+        try
+        {
+            new PrepareTemplatesStep( peerManager, topology, operationTracker ).execute();
 
             environment = environmentManager.saveOrUpdate( environment );
 
