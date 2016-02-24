@@ -420,7 +420,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             {
                 return new PrepareTemplatesResponse( false,
                         String.format( "Error on importing template %s in %s on peer %s", task.getTemplate(),
-                                task.getHost(), peerInfo.getId() ) );
+                                task.getHost().getHostname(), peerInfo.getId() ) );
             }
         }
         return new PrepareTemplatesResponse( true,

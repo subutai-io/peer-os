@@ -21,6 +21,7 @@ import io.subutai.common.environment.PrepareTemplatesResponse;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.impl.workflow.creation.steps.helpers.CreatePeerTemplatePrepareTask;
 import io.subutai.core.peer.api.PeerManager;
@@ -34,12 +35,15 @@ public class PrepareTemplatesStep
     private static final Logger LOGGER = LoggerFactory.getLogger( PrepareTemplatesStep.class );
     private final Topology topology;
     private PeerManager peerManager;
+    private TrackerOperation operationTracker;
 
 
-    public PrepareTemplatesStep( final PeerManager peerManager, final Topology topology )
+    public PrepareTemplatesStep( final PeerManager peerManager, final Topology topology,
+                                 final TrackerOperation operationTracker )
     {
         this.topology = topology;
         this.peerManager = peerManager;
+        this.operationTracker = operationTracker;
     }
 
 
@@ -71,6 +75,10 @@ public class PrepareTemplatesStep
             {
                 Future<PrepareTemplatesResponse> futures = taskCompletionService.take();
                 final PrepareTemplatesResponse prepareTemplatesResponse = futures.get();
+                if ( prepareTemplatesResponse.getDescription() != null )
+                {
+                    operationTracker.addLog( prepareTemplatesResponse.getDescription() );
+                }
                 if ( !prepareTemplatesResponse.getResult() )
                 {
                     throw new EnvironmentCreationException( String.format(

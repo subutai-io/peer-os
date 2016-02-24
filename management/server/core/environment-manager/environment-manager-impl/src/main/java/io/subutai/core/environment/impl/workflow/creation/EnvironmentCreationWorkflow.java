@@ -161,7 +161,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
         try
         {
-            new PrepareTemplatesStep( peerManager, topology ).execute();
+            new PrepareTemplatesStep( peerManager, topology, operationTracker ).execute();
 
             environment = environmentManager.saveOrUpdate( environment );
 
