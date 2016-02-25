@@ -25,7 +25,9 @@ import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.Gateway;
+import io.subutai.common.network.Gateways;
 import io.subutai.common.network.Vni;
+import io.subutai.common.network.Vnis;
 import io.subutai.common.protocol.ControlNetworkConfig;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
@@ -240,7 +242,7 @@ public interface Peer
     /* ************************************************
      * Returns all existing gateways of the peer
      */
-    public Set<Gateway> getGateways() throws PeerException;
+    public Gateways getGateways() throws PeerException;
 
 
     /* ************************************************
@@ -252,7 +254,7 @@ public interface Peer
     /* ************************************************
      * Returns all reserved vnis on the peer
      */
-    public Set<Vni> getReservedVnis() throws PeerException;
+    public Vnis getReservedVnis() throws PeerException;
 
     /**
      * Gets containerHost by Id specified

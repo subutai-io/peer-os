@@ -14,6 +14,7 @@ import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.Topology;
 import io.subutai.common.network.Gateway;
+import io.subutai.common.network.Gateways;
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
@@ -52,7 +53,7 @@ public class VNISetupStep
         peers.add( peerManager.getLocalPeer() );
 
         //obtain reserved gateways
-        Map<Peer, Set<Gateway>> reservedGateways = Maps.newHashMap();
+        Map<Peer, Gateways> reservedGateways = Maps.newHashMap();
         for ( Peer peer : peers )
         {
             reservedGateways.put( peer, peer.getGateways() );
@@ -62,18 +63,16 @@ public class VNISetupStep
         SubnetUtils subnetUtils = new SubnetUtils( environment.getSubnetCidr() );
         String environmentGatewayIp = subnetUtils.getInfo().getLowAddress();
 
-        for ( Map.Entry<Peer, Set<Gateway>> peerGateways : reservedGateways.entrySet() )
+        for ( Map.Entry<Peer, Gateways> peerGateways : reservedGateways.entrySet() )
         {
             Peer peer = peerGateways.getKey();
-            Set<Gateway> gateways = peerGateways.getValue();
-            for ( Gateway gateway : gateways )
+            Gateways gateways = peerGateways.getValue();
+
+            if ( gateways.findGatewayByIp( environmentGatewayIp ) != null )
             {
-                if ( gateway.getIp().equals( environmentGatewayIp ) )
-                {
-                    throw new EnvironmentCreationException(
-                            String.format( "Subnet %s is already used on peer %s", environment.getSubnetCidr(),
-                                    peer.getName() ) );
-                }
+                throw new EnvironmentCreationException(
+                        String.format( "Subnet %s is already used on peer %s", environment.getSubnetCidr(),
+                                peer.getName() ) );
             }
         }
 
@@ -88,7 +87,7 @@ public class VNISetupStep
         LOGGER.debug( "Creating gateways..." );
         for ( final Peer peer : peers )
         {
-           peer.reserveVni( newVni );
+            peer.reserveVni( newVni );
         }
 
         //store vni in environment metadata
@@ -102,7 +101,7 @@ public class VNISetupStep
         Set<Long> reservedVnis = Sets.newHashSet();
         for ( Peer peer : peers )
         {
-            for ( Vni vni : peer.getReservedVnis() )
+            for ( Vni vni : peer.getReservedVnis().list() )
             {
                 reservedVnis.add( vni.getVni() );
             }
