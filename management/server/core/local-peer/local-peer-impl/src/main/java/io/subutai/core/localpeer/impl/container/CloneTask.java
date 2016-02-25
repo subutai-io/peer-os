@@ -33,7 +33,7 @@ import io.subutai.core.localpeer.impl.entity.ContainerHostEntity;
 import io.subutai.core.registration.api.RegistrationManager;
 
 
-public class CloneTask extends DaemonTask<HostInfo> implements CommandResultParser<HostInfo>
+public class CloneTask extends DaemonTask<HostInfo>
 {
     protected static final Logger LOG = LoggerFactory.getLogger( CloneTask.class );
 
@@ -116,16 +116,8 @@ public class CloneTask extends DaemonTask<HostInfo> implements CommandResultPars
         return resourceHost;
     }
 
-
     @Override
-    public CommandResultParser<HostInfo> getCommandResultParser()
-    {
-        return this;
-    }
-
-
-    @Override
-    public HostInfo parse( final CommandResult commandResult )
+    public HostInfo lookupResult()
     {
         HostInfo result = null;
         try
@@ -139,7 +131,6 @@ public class CloneTask extends DaemonTask<HostInfo> implements CommandResultPars
 
         return result;
     }
-
 
     @Override
     public int getTimeout()
