@@ -79,7 +79,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 		$('.js-peer-load-screen').show();
 		environmentService.getPeers().success(function (data) {
 			vm.peerIds = data;
-			vm.peerIds['testPeer'] = ['rh1', 'rh2', 'rh3'];
+			//vm.peerIds['testPeer'] = ['rh1', 'rh2', 'rh3'];
 			$('.js-peer-load-screen').hide();
 		}).error(function(error){
 			$('.js-peer-load-screen').hide();
