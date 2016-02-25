@@ -121,11 +121,7 @@ public class ContainerCloneStep
                     new CreatePeerNodeGroupsTask( peer, peerPlacement.getValue(), peerManager.getLocalPeer(),
                             environment, currentLastUsedIpIndex + 1, templateRegistry, defaultDomain ) );
 
-            for ( NodeGroup nodeGroup : peerPlacement.getValue() )
-            {
-                currentLastUsedIpIndex++;
-            }
-
+            currentLastUsedIpIndex += peerPlacement.getValue().size();
 
             environment.setLastUsedIpIndex( currentLastUsedIpIndex );
         }

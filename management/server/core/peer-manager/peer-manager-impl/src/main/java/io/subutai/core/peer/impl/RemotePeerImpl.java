@@ -31,7 +31,10 @@ import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupResponse;
 import io.subutai.common.environment.DestroyEnvironmentContainerGroupRequest;
 import io.subutai.common.environment.DestroyEnvironmentContainerGroupResponse;
+import io.subutai.common.environment.PrepareTemplatesRequest;
+import io.subutai.common.environment.PrepareTemplatesResponse;
 import io.subutai.common.exception.HTTPException;
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
@@ -412,6 +415,15 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
+    public Set<ContainerHostInfo> getEnvironmentContainers( final EnvironmentId environmentId ) throws PeerException
+    {
+        Preconditions.checkNotNull( environmentId, "Environment id is null" );
+
+        return new PeerWebClient( peerInfo, provider ).getEnvironmentContainers( environmentId );
+    }
+
+
+    @Override
     public Set<Integer> getCpuSet( final ContainerHost containerHost ) throws PeerException
     {
         Preconditions.checkNotNull( containerHost, "Container host is null" );
@@ -644,7 +656,7 @@ public class RemotePeerImpl implements RemotePeer
 
     @RolesAllowed( "Environment-Management|Write" )
     @Override
-    public Set<ContainerHostInfoModel> createEnvironmentContainerGroup(
+    public CreateEnvironmentContainerGroupResponse createEnvironmentContainerGroup(
             final CreateEnvironmentContainerGroupRequest request ) throws PeerException
     {
         Preconditions.checkNotNull( request, "Invalid request" );
@@ -661,7 +673,33 @@ public class RemotePeerImpl implements RemotePeer
 
         if ( response != null )
         {
-            return response.getHosts();
+            return response;
+        }
+        else
+        {
+            throw new PeerException( "Command timed out" );
+        }
+    }
+
+
+    @RolesAllowed( "Environment-Management|Write" )
+    @Override
+    public PrepareTemplatesResponse prepareTemplates( final PrepareTemplatesRequest request ) throws PeerException
+    {
+        Preconditions.checkNotNull( request, "Invalid request" );
+
+
+        //*********construct Secure Header ****************************
+        Map<String, String> headers = Maps.newHashMap();
+        //************************************************************************
+
+        PrepareTemplatesResponse response = sendRequest( request, RecipientType.PREPARE_TEMPLATE_REQUEST.name(),
+                Timeouts.CREATE_CONTAINER_REQUEST_TIMEOUT, PrepareTemplatesResponse.class,
+                Timeouts.CREATE_CONTAINER_RESPONSE_TIMEOUT, headers );
+
+        if ( response != null )
+        {
+            return response;
         }
         else
         {
