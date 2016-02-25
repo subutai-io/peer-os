@@ -1,6 +1,8 @@
 package io.subutai.core.localpeer.impl.container;
 
 
+import java.util.concurrent.TimeUnit;
+
 import javax.naming.NamingException;
 
 import org.slf4j.Logger;
@@ -11,8 +13,10 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 import io.subutai.common.command.CommandResult;
+import io.subutai.common.command.CommandResultParseException;
 import io.subutai.common.command.CommandResultParser;
 import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.Host;
@@ -33,7 +37,7 @@ import io.subutai.core.localpeer.impl.entity.ContainerHostEntity;
 import io.subutai.core.registration.api.RegistrationManager;
 
 
-public class CloneTask extends DaemonTask<HostInfo>
+public class CloneTask extends AbstractTask<HostInfo> implements CommandResultParser<HostInfo>
 {
     protected static final Logger LOG = LoggerFactory.getLogger( CloneTask.class );
 
@@ -116,21 +120,46 @@ public class CloneTask extends DaemonTask<HostInfo>
         return resourceHost;
     }
 
+
     @Override
-    public HostInfo lookupResult()
+    public CommandResultParser<HostInfo> getCommandResultParser()
+    {
+        return this;
+    }
+
+
+    @Override
+    public HostInfo parse( final CommandResult commandResult ) throws CommandResultParseException
     {
         HostInfo result = null;
-        try
+        int counter = 0;
+        while ( result == null && counter < Common.WAIT_CONTAINER_CONNECTION_SEC )
         {
-            result = hostRegistry.getContainerHostInfoByHostname( hostname );
-        }
-        catch ( HostDisconnectedException e )
-        {
-            //ignore
+            try
+            {
+                result = findHostInfo();
+                TimeUnit.SECONDS.sleep( 1 );
+            }
+            catch ( HostDisconnectedException | InterruptedException e )
+            {
+                // ignore
+            }
+            counter++;
         }
 
+        if ( result == null )
+        {
+            throw new CommandResultParseException( "Heartbeat not received from: " + hostname );
+        }
         return result;
     }
+
+
+    private ContainerHostInfo findHostInfo() throws HostDisconnectedException
+    {
+        return hostRegistry.getContainerHostInfoByHostname( hostname );
+    }
+
 
     @Override
     public int getTimeout()
