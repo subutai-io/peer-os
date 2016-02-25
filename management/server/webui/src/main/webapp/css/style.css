@@ -2734,6 +2734,7 @@ td.b-main-table__status-col {
     display: block;
     vertical-align: middle;
 	color: #04346E;
+	padding: 0 0 8px 0;
 }
 
 .b-cloud-item-resource-name {
