@@ -36,7 +36,7 @@ public class TaskListCommand extends SubutaiShellCommandSupport
             }
             else if ( task.getState() == Task.State.FAILURE )
             {
-                System.out.println( String.format( "\t\t%s\t%s", task.getState(), task.getException() ) );
+                System.out.println( String.format( "\t\t%s\t%s", task.getState(), task.getExceptions() ) );
             }
             else
             {
