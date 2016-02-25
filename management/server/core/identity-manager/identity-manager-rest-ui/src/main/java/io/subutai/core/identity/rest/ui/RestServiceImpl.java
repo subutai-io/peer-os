@@ -162,7 +162,6 @@ public class RestServiceImpl implements RestService
 
 
 
-    // @todo convert to User object
     @Override
     public Response saveUser( final String username, final String fullName, final String password, final String email,
                               final String rolesJson, final Long userId, final String trustLevel )
@@ -171,19 +170,20 @@ public class RestServiceImpl implements RestService
         Preconditions.checkArgument( !Strings.isNullOrEmpty( fullName ), "fullname is missing" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( email ), "email must be set" );
 
-        if(  username.equalsIgnoreCase( "sys" ) || username.toLowerCase().contains( "sys" ) )
-        {
-            LOGGER.error( "Error setting bad username #saveUser" );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( "bad username" ) ).build();
-        }
-
         try
         {
             User newUser;
 
             if ( userId == null || userId <= 0 )
             {
-                Preconditions.checkArgument( !Strings.isNullOrEmpty( password ), "Password must be set" );
+
+
+                if( username.toLowerCase().contains( "sys" ) || username.toLowerCase().contains( "admin" ) )
+                {
+                    LOGGER.warn( "#saveUser forbidden, username is reserved" );
+                    return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( "User name is reserved by the system." ) ).build();
+                }
+
                 newUser = identityManager
                         .createUser( username, password, fullName, email, UserType.Regular.getId(), Integer.parseInt( trustLevel ), false, true );
 
@@ -208,7 +208,7 @@ public class RestServiceImpl implements RestService
 
                 newUser.setRoles( roleIds.stream().map( r -> identityManager.getRole( r )).collect( Collectors.toList()));
 
-                identityManager.modifyUser(newUser);
+                identityManager.modifyUser(newUser, password);
             }
 
 
@@ -218,6 +218,23 @@ public class RestServiceImpl implements RestService
             LOGGER.error( "Error setting new user #setUser", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( e.toString() ) ).build();
         }
+
+        return Response.ok().build();
+    }
+
+
+    @Override
+    public Response changePassword( final String oldPass, final String newPass )
+    {
+        try
+        {
+            identityManager.changeUserPassword( identityManager.getActiveUser().getId(), oldPass, newPass );
+        }
+        catch ( Exception e )
+        {
+            return Response.serverError().entity( JsonUtil.toJson( e.toString() ) ).build();
+        }
+
 
         return Response.ok().build();
     }

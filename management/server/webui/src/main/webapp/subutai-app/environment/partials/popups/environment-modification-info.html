@@ -17,7 +17,7 @@
                         <td class="b-main-table__right">
                             <span class="g-circle-label g-margin-left-quarter"
                                   ng-repeat="(quotaName, quantity) in container.quotas"
-                                  ng-style="{'background-color' : environmentSimpleViewCtrl.getQuotaColor(quotaName)}"
+                                  ng-style="{'background-color' : environmentViewCtrl.getQuotaColor(quotaName)}"
                                   tooltips
                                   tooltip-template="{{ quotaName }}">
                                 {{quantity}}
@@ -40,7 +40,7 @@
                         <td class="b-main-table__right">
                             <span class="g-circle-label g-circle-label_blue g-margin-left-quarter"
                                   ng-repeat="(quotaName, quantity) in container.quotas"
-                                  ng-style="{'background-color' : environmentSimpleViewCtrl.getQuotaColor(quotaName)}"
+                                  ng-style="{'background-color' : environmentViewCtrl.getQuotaColor(quotaName)}"
                                   tooltips
                                   tooltip-template="{{quotaName}}">
                                 {{quantity}}

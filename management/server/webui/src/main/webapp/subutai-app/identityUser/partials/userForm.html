@@ -48,7 +48,7 @@
 					   class="b-popup-body-input b-popup-body-input_full b-popup-body-input_margin-bttm" 
 					   ng-model="identityUserFormCtrl.user2Add.password"
 					   id="js-password"
-					   required>
+					   ng-required="!identityUserFormCtrl.editUser">
 
 				<label class="b-popup-body-label b-popup-body-label_block">Confirm password:</label>
 				<input type="password"
@@ -57,7 +57,7 @@
 					   ng-model="identityUserFormCtrl.user2Add.confirm_password" 
 					   pw-check="js-password"
 					   name="confirm_password"
-					   ng-attr-required="identityUserFormCtrl.user2Add.password.length > 0">
+					   ng-required="identityUserFormCtrl.user2Add.password.length > 0">
 				<span class="b-form-hint b-form-hint_red" ng-show="addUserForm.confirm_password.$error.pwmatch">Passwords don't match.</span>
 
 

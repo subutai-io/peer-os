@@ -5,9 +5,14 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.SocketException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -27,6 +32,7 @@ import ai.subut.kurjun.cfparser.ControlFileParserModule;
 import ai.subut.kurjun.common.KurjunBootstrap;
 import ai.subut.kurjun.common.service.KurjunContext;
 import ai.subut.kurjun.common.service.KurjunProperties;
+import ai.subut.kurjun.common.utils.InetUtils;
 import ai.subut.kurjun.index.PackagesIndexParserModule;
 import ai.subut.kurjun.metadata.common.DefaultMetadata;
 import ai.subut.kurjun.metadata.common.apt.DefaultPackageMetadata;
@@ -58,6 +64,7 @@ import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.AptPackage;
 import io.subutai.common.settings.Common;
+import io.subutai.common.settings.SystemSettings;
 import io.subutai.core.kurjun.api.KurjunTransferQuota;
 import io.subutai.core.kurjun.api.vapt.AptManager;
 import io.subutai.core.kurjun.impl.RepoUrl;
@@ -69,14 +76,14 @@ public class AptManagerImpl implements AptManager
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( AptManagerImpl.class );
 
-    private static final KurjunContext context = new KurjunContext( "my" );
+    private static final KurjunContext APT_CONTEXT = new KurjunContext( "vapt" );
 
     private Injector injector;
 
     private final LocalPeer localPeer;
     private Set<RepoUrl> remoteRepoUrls;
     private final RepoUrlStore repoUrlStore = new RepoUrlStore( Common.SUBUTAI_APP_DATA_PATH );
-
+    
 
     public AptManagerImpl( LocalPeer localPeer )
     {
@@ -90,18 +97,11 @@ public class AptManagerImpl implements AptManager
 
         KurjunProperties properties = injector.getInstance( KurjunProperties.class );
         setContexts( properties );
-
-        try
-        {
-            remoteRepoUrls = repoUrlStore.getRemoteAptUrls();
-        }
-        catch ( IOException ex )
-        {
-            LOGGER.error( "Failed to load remote apt repositories", ex );
-        }
+        
+        initRepoUrls();
     }
-
-
+    
+    
     public void dispose()
     {
     }
@@ -139,7 +139,7 @@ public class AptManagerImpl implements AptManager
         if ( rel.isPresent() )
         {
             AptIndexBuilderFactory indexBuilderFactory = injector.getInstance( AptIndexBuilderFactory.class );
-            ReleaseIndexBuilder rib = indexBuilderFactory.createReleaseIndexBuilder( repo, context );
+            ReleaseIndexBuilder rib = indexBuilderFactory.createReleaseIndexBuilder( repo, APT_CONTEXT );
             return rib.build( rel.get(), repo.isKurjun() );
         }
         return null;
@@ -174,7 +174,7 @@ public class AptManagerImpl implements AptManager
         PackagesProviderFactory packagesProviderFactory = injector.getInstance( PackagesProviderFactory.class );
         AptIndexBuilderFactory indexBuilderFactory = injector.getInstance( AptIndexBuilderFactory.class );
 
-        PackagesIndexBuilder packagesIndexBuilder = indexBuilderFactory.createPackagesIndexBuilder( context );
+        PackagesIndexBuilder packagesIndexBuilder = indexBuilderFactory.createPackagesIndexBuilder( APT_CONTEXT );
         try ( ByteArrayOutputStream os = new ByteArrayOutputStream() )
         {
             packagesIndexBuilder
@@ -340,15 +340,19 @@ public class AptManagerImpl implements AptManager
     @Override
     public void addRemoteRepository( URL url, String token )
     {
+        if ( isEmbedded() )
+        {
+            return;
+        }
         try
         {
-            if ( url != null && !url.getHost().equals( localPeer.getExternalIp() ) )
+            if ( url != null && !url.getHost().equals( getExternalIp() ) )
             {
                 repoUrlStore.addRemoteAptUrl( new RepoUrl( url, token ) );
                 remoteRepoUrls = repoUrlStore.getRemoteAptUrls();
             }
         }
-        catch ( PeerException | IOException ex )
+        catch ( IOException ex )
         {
             LOGGER.error( "Failed to add remote apt repo: {}", url, ex );
         }
@@ -372,6 +376,29 @@ public class AptManagerImpl implements AptManager
             LOGGER.error( "Failed to remove remote apr repo: {}", url, ex );
         }
     }
+    
+    
+    private String getExternalIp()
+    {
+        try
+        {
+            if ( isEmbedded() )
+            {
+                List<InetAddress> ips = InetUtils.getLocalIPAddresses();
+                return ips.get( 0 ).getHostAddress();
+            }
+            else
+            {
+                return localPeer.getExternalIp();
+            }
+        }
+        catch ( PeerException | SocketException | IndexOutOfBoundsException ex )
+        {
+            LOGGER.error( "Cannot get external ip. Returning null.", ex );
+            return null;
+        }
+    }
+    
 
     @Override
     public Long getDiskQuota( String context )
@@ -379,7 +406,7 @@ public class AptManagerImpl implements AptManager
         QuotaInfoStore quotaInfoStore = injector.getInstance( QuotaInfoStore.class );
         try
         {
-            DiskQuota diskQuota = quotaInfoStore.getDiskQuota( AptManagerImpl.context );
+            DiskQuota diskQuota = quotaInfoStore.getDiskQuota( AptManagerImpl.APT_CONTEXT );
             if ( diskQuota != null )
             {
                 return diskQuota.getThreshold() * diskQuota.getUnit().toBytes() / DataUnit.MB.toBytes();
@@ -400,7 +427,7 @@ public class AptManagerImpl implements AptManager
         QuotaInfoStore quotaInfoStore = injector.getInstance( QuotaInfoStore.class );
         try
         {
-            quotaInfoStore.saveDiskQuota( diskQuota, AptManagerImpl.context );
+            quotaInfoStore.saveDiskQuota( diskQuota, AptManagerImpl.APT_CONTEXT );
             return true;
         }
         catch ( IOException ex )
@@ -417,7 +444,7 @@ public class AptManagerImpl implements AptManager
         QuotaInfoStore quotaInfoStore = injector.getInstance( QuotaInfoStore.class );
         try
         {
-            TransferQuota q = quotaInfoStore.getTransferQuota( AptManagerImpl.context );
+            TransferQuota q = quotaInfoStore.getTransferQuota( AptManagerImpl.APT_CONTEXT );
             if ( q != null )
             {
                 return new KurjunTransferQuota( q.getThreshold(), q.getTime(), q.getTimeUnit() );
@@ -443,7 +470,7 @@ public class AptManagerImpl implements AptManager
         QuotaInfoStore quotaInfoStore = injector.getInstance( QuotaInfoStore.class );
         try
         {
-            quotaInfoStore.saveTransferQuota( transferQuota, AptManagerImpl.context );
+            quotaInfoStore.saveTransferQuota( transferQuota, AptManagerImpl.APT_CONTEXT );
             return true;
         }
         catch ( IOException ex )
@@ -453,18 +480,28 @@ public class AptManagerImpl implements AptManager
         }
     }
 
-
+    
     private UnifiedRepository getRepository()
     {
         RepositoryFactory repositoryFactory = injector.getInstance( RepositoryFactory.class );
 
         UnifiedRepository unifiedRepo = repositoryFactory.createUnifiedRepo();
-        unifiedRepo.getRepositories().add( repositoryFactory.createLocalApt( context ) );
+        unifiedRepo.getRepositories().add( getLocalRepository() );
 
         for ( RepoUrl remote : remoteRepoUrls )
         {
             unifiedRepo.getRepositories().add( repositoryFactory.createNonLocalApt( remote.getUrl() ) );
         }
+
+        // shuffle the global repo list to randomize and normalize usage of them
+        List<RepoUrl> list = new ArrayList<>( getGlobalKurjunUrls() );
+        Collections.shuffle( list );
+
+        for ( RepoUrl repoUrl : list )
+        {
+            unifiedRepo.getSecondaryRepositories().add( repositoryFactory.createNonLocalApt( repoUrl.getUrl() ) );
+        }
+
         return unifiedRepo;
     }
 
@@ -472,15 +509,61 @@ public class AptManagerImpl implements AptManager
     private LocalRepository getLocalRepository()
     {
         RepositoryFactory repositoryFactory = injector.getInstance( RepositoryFactory.class );
-        return repositoryFactory.createLocalApt( context );
+        return repositoryFactory.createLocalApt( APT_CONTEXT );
     }
 
 
     private void setContexts( KurjunProperties properties )
     {
         // init apt type context
-        Properties kcp = properties.getContextProperties( context );
+        Properties kcp = properties.getContextProperties( APT_CONTEXT );
         kcp.setProperty( FileStoreFactory.TYPE, FileStoreFactory.FILE_SYSTEM );
         kcp.setProperty( PackageMetadataStoreModule.PACKAGE_METADATA_STORE_TYPE, PackageMetadataStoreFactory.FILE_DB );
     }
+    
+    
+    private void initRepoUrls()
+    {
+        try
+        {
+            // Load remote repo urls from store
+            remoteRepoUrls = repoUrlStore.getRemoteAptUrls();
+        }
+        catch ( IOException e )
+        {
+            LOGGER.error( "Failed to load remote apt repositories", e );
+        }
+    }
+
+
+    private boolean isEmbedded()
+    {
+        return localPeer == null;
+    }
+
+
+    private List<RepoUrl> getGlobalKurjunUrls()
+    {
+        if ( isEmbedded() )
+        {
+            return Collections.emptyList();
+        }
+
+        try
+        {
+            List<RepoUrl> list = new ArrayList<>();
+            for ( String url : SystemSettings.getGlobalKurjunUrls() )
+            {
+                // TODO: refactor url
+                String aptUrl = url.replace( "templates/public", "vapt" );
+                list.add( new RepoUrl( new URL( aptUrl ), null ) );
+            }
+            return list;
+        }
+        catch ( MalformedURLException e )
+        {
+            throw new IllegalArgumentException( "Invalid global kurjun url", e );
+        }
+    }
+    
 }

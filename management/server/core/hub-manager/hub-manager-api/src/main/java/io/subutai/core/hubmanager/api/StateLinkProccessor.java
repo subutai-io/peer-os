@@ -6,5 +6,5 @@ import java.util.Set;
 
 public interface StateLinkProccessor
 {
-    public void proccessStateLinks( Set<String> stateLinks ) throws HubPluginException;
+    void proccessStateLinks( Set<String> stateLinks ) throws HubPluginException;
 }

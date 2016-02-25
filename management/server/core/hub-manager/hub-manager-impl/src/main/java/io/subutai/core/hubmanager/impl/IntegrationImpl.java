@@ -32,6 +32,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.cbor.CBORFactory;
 
 import io.subutai.common.dao.DaoManager;
+import io.subutai.common.settings.SystemSettings;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.core.hubmanager.api.Integration;
@@ -46,7 +47,7 @@ import io.subutai.core.hubmanager.impl.proccessors.SystemConfProcessor;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
-import io.subutai.hub.share.dto.ProductsDto;
+import io.subutai.hub.share.dto.product.ProductsDto;
 import io.subutai.hub.share.json.JsonUtil;
 
 
@@ -115,6 +116,7 @@ public class IntegrationImpl implements Integration
     public void sendHeartbeat() throws HubPluginException
     {
         heartbeatProcessor.sendHeartbeat();
+        resourceHostConfProcessor.sendResourceHostConf();
     }
 
 
@@ -132,7 +134,7 @@ public class IntegrationImpl implements Integration
         RegistrationManager registrationManager = new RegistrationManager( this, configManager );
 
         registrationManager.registerPeer( email, password );
-        sendHeartbeat();
+        heartbeatProcessor.sendHeartbeat();
     }
 
 
@@ -149,7 +151,7 @@ public class IntegrationImpl implements Integration
         ProductsDto result;
         try
         {
-            WebClient client = configManager.getTrustedWebClientWithAuth( "/rest/v1/marketplace/products" );
+            WebClient client = configManager.getTrustedWebClientWithAuth( "/rest/v1.1/marketplace/products" );
 
             Response r = client.get();
 
@@ -177,6 +179,7 @@ public class IntegrationImpl implements Integration
         catch ( UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException | PGPException | IOException
                 e )
         {
+            e.printStackTrace();
             throw new HubPluginException( "Could not retrieve product data", e );
         }
     }
@@ -212,6 +215,37 @@ public class IntegrationImpl implements Integration
             LOG.debug( file.getName() + " is removed." );
         }
         LOG.debug( "Product uninstalled successfully..." );
+    }
+
+
+    @Override
+    public void unregisterPeer() throws HubPluginException
+    {
+        try
+        {
+            String path = String.format( "/rest/v1/peers/%s/delete", configManager.getPeerId() );
+
+            WebClient client = configManager.getTrustedWebClientWithAuth( path );
+
+            Response r = client.delete();
+
+
+            if ( r.getStatus() == HttpStatus.SC_NO_CONTENT )
+            {
+                LOG.debug( "Peer unregistered successfully." );
+                configDataService.deleteConfig( configManager.getPeerId() );
+                SystemSettings.setRegisterToHubState( false );
+            }
+            else
+            {
+                LOG.error( r.readEntity( String.class ) );
+                throw new HubPluginException( "Could not unregister peer" );
+            }
+        }
+        catch ( UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException e )
+        {
+            throw new HubPluginException( "Could not unregister peer", e );
+        }
     }
 
 

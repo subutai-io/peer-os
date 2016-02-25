@@ -34,6 +34,13 @@ input[type=checkbox] {
 
 /*Header*/
 
+.b-personal-space {
+	position: absolute;
+	top: 10px;
+	right: 16px;
+	z-index: 10;
+}
+
 .b-header {
     height: 45px;
     padding: 15px 30px 0;
@@ -61,6 +68,7 @@ input[type=checkbox] {
 .b-header__userbar_right {
     float: right;
     display: inline-block;
+	padding: 4px 0 0 0;
 }
 .b-header-userbar__icon {
     color: #838093;
@@ -277,6 +285,12 @@ input[type=checkbox] {
 
 .b-btn_margin-r {
     margin-right: 20px;
+}
+
+.b-btn_search-field-level {
+	margin-bottom: -45px;
+	position: relative;
+	z-index: 2;
 }
 
 
@@ -789,6 +803,11 @@ input[type=checkbox] {
 
 .b-nav-menu-sub a:hover {
     text-decoration: none;
+}
+
+.b-nav-menu-sub_active a {
+	color: #078DD0;
+	text-decoration: none;
 }
 
 /*Icons*/
@@ -2719,9 +2738,14 @@ td.b-main-table__status-col {
     height: 40px;
     line-height: 37px;
     border: 1px solid #CCCEEE;
-    border-radius: 50%;
+    border-radius: 50px;
     text-align: center;
     box-sizing: border-box;
+	background-size: 25px 25px;
+	background-position: 50% 50%;
+	background-repeat: no-repeat;
+	overflow: hidden;
+	background-color: #FFF;
 }
 .b-cloud-item {
     display: inline-block;
@@ -3100,22 +3124,23 @@ td.b-main-table__status-col {
 }
 
 .b-untrusted-user {
-	background-color: #FFE5E5;
+	background-color: rgba(239, 63, 97, 0.05);
 }
 
 .b-trusted-user {
-	background-color: #BCE8D5;
+	background-color: rgba(75, 188, 110, 0.05);
 }
 
 .b-midletrusted-user {
-	background-color: #FEEFD7;
+	background-color: rgba(252, 238, 33, 0.05);
 }
 
 
 /*Hub status*/
 .b-hub-status {
     line-height: normal;
-    padding: 11px;
+    /*padding: 11px;*/
+	margin: 0 11px 0 0;
     position: relative;
 }
 .b-hub-statu.b-switchers {
@@ -3160,7 +3185,7 @@ td.b-main-table__status-col {
 	display: none;
     line-height: normal;
     position: absolute;
-    top: 52px;
+    top: 40px;
     right: 0;
     width: 225px;
     border: 1px solid #CCCEEE;
@@ -3271,5 +3296,21 @@ td.b-main-table__status-col {
 
 .b-dropdown-buttons .b-btn:last-child {
 	margin-right: 0;
+}
+
+.b-dragAndDrop-item {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+
+.b-hidden-object {
+	position: absolute;
+	z-index: 100;
+	top: -150px;
+	left: 0;
+	opacity: 0.8;
 }
 
