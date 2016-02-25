@@ -1,82 +1,86 @@
 <div ng-controller="CurrentUserCtrl as currentUserCtrl" class="b-personal-space">
-	<div class="b-header__userbar b-header__userbar_right">
-		<span id="js-plugin-version" class="b-plugin-version"></span>
-		<script>
-			$(document).ready(function(){
+  <div class="b-header__userbar b-header__userbar_right">
+    <span id="js-plugin-version" class="b-plugin-version"></span>
+    <script>
+      $(document).ready(function () {
 
-				function addPluginVersion(pluginVersion) {
-					$('#js-plugin-version').text('plugin version: ' + pluginVersion + ' / ');
-				}
+        function addPluginVersion(pluginVersion) {
+          $('#js-plugin-version').text('plugin version: ' + pluginVersion + ' / ');
+        }
 
-				setTimeout(function(){
-					if($('#bp-plugin-version').val().length > 0) {
-						addPluginVersion($('#bp-plugin-version').val());
-					}
-				}, 2000);
+        setTimeout(function () {
+          if ($('#bp-plugin-version').val().length > 0) {
+            addPluginVersion($('#bp-plugin-version').val());
+          }
+        }, 2000);
 
-				$('body').on('change', '#bp-plugin-version', function(){
-					if($(this).val().length > 0) {
-						addPluginVersion($(this).val());
-					}
-				});
+        $('body').on('change', '#bp-plugin-version', function () {
+          if ($(this).val().length > 0) {
+            addPluginVersion($(this).val());
+          }
+        });
 
-			});
-		</script>
-		<!--<i class="fa fa-sign-in b-plugin-version"></i>-->
+      });
+    </script>
+    <!--<i class="fa fa-sign-in b-plugin-version"></i>-->
 		<span ng-if="currentUserCtrl.currentUser" class="b-header-userbar-name">
 			<a href ng-click="currentUserCtrl.logout()" class="b-header-userbar-name">
-				{{ currentUserCtrl.currentUser }} <i class="fa fa-sign-out b-header-userbar__icon"></i>
-			</a>
+        {{ currentUserCtrl.currentUser }} <i class="fa fa-sign-out b-header-userbar__icon"></i>
+      </a>
 		</span>
-		<a href ui-sref="login"
-			class="b-header-userbar-name"
-			ng-if="!currentUserCtrl.currentUser">
-			Login
-		</a>
-	</div>
+    <a href ui-sref="login"
+       class="b-header-userbar-name"
+       ng-if="!currentUserCtrl.currentUser">
+      Login
+    </a>
+  </div>
 
-	<div class="b-hub-status b-notification js-header-dropdown g-right" 
-		ng-class="{'b-notification_active' : currentUserCtrl.notificationNew }" 
-	>
-		<div class="b-notification-count">{{ currentUserCtrl.notificationsCount }}</div>
-		<a href="#" 
-			class="b-icon b-icon_bell js-notification" 
-			ng-click="currentUserCtrl.notificationNew = false">
-		</a>
-		<div class="b-hub-status__dropdown">
-			<ul class="list">
-				<li ng-repeat="notification in currentUserCtrl.notifications" ng-class="{'b-notification__error' : notification.type == 'error' }">
-					<a href="#">
-						{{ notification.message }}
-					</a>
-					<div class="date">
-						{{ notification.date }}
-					</div>
-					<div class="b-dropdown-buttons" ng-if="notification.links">
-						<a ng-repeat="link in notification.links" href="{{ link.href }}" class="b-btn b-btn_green">{{ link.text }}</a>
-					</div>
-				</li>
-				<li ng-if="currentUserCtrl.notifications.length <= 0" style="text-align: center;">
-					<a href>No logs</a>
-				</li>
-				<!--<li><a href="#">Your SS version is obsolete, please update
-					it to 4.0.0-RC7</a>
-					<div class="date">8 February at 22:25</div>
-					<div class="buttons">
-						<a href="#" class="b-btn b-btn_green">Register</a>
-						<a href="#" class="b-btn b-btn_white">Ignore</a>
-					</div>
-				</li>-->
-			</ul>
-			<a href ng-click="currentUserCtrl.clearLogs()" class="show-more">Clear</a>
-		</div>
-	</div>
+  <div class="b-hub-status b-notification js-header-dropdown g-right"
+       ng-class="{'b-notification_active' : currentUserCtrl.notificationNew }"
+      >
+    <div class="b-notification-count">{{ currentUserCtrl.notificationsCount }}</div>
+    <a href="#"
+       class="b-icon b-icon_bell js-notification"
+       ng-click="currentUserCtrl.notificationNew = false">
+    </a>
 
-	<div class="b-hub-status js-header-dropdown g-right" 
-		ng-class="{'b-hub-status_active' : currentUserCtrl.hubStatus }" 
-	>
-		<div class="b-hub-menu js-notification">
-			<svg class="b-hub-menu-icon" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 7 7" enable-background="new 0 0 7 7" xml:space="preserve">
+    <div class="b-hub-status__dropdown">
+      <ul class="list">
+        <li ng-repeat="notification in currentUserCtrl.notifications"
+            ng-class="{'b-notification__error' : notification.type == 'error' }">
+          <a href="#">
+            {{ notification.message }}
+          </a>
+
+          <div class="date">
+            {{ notification.date }}
+          </div>
+          <div class="b-dropdown-buttons" ng-if="notification.links">
+            <a ng-repeat="link in notification.links" href="{{ link.href }}" class="b-btn b-btn_green">{{ link.text
+              }}</a>
+          </div>
+        </li>
+        <li ng-if="currentUserCtrl.notifications.length <= 0" style="text-align: center;">
+          <a href>No logs</a>
+        </li>
+        <!--<li><a href="#">Your SS version is obsolete, please update
+          it to X version</a>
+          <div class="date">8 February at 22:25</div>
+          <div class="buttons">
+            <a href="#" class="b-btn b-btn_green">Register</a>
+            <a href="#" class="b-btn b-btn_white">Ignore</a>
+          </div>
+        </li>-->
+      </ul>
+      <a href ng-click="currentUserCtrl.clearLogs()" class="show-more">Clear</a>
+    </div>
+  </div>
+
+  <div class="b-hub-status js-header-dropdown g-right"
+       ng-class="{'b-hub-status_active' : currentUserCtrl.hubStatus }"
+      >
+    <div class="b-hub-menu js-notification">
+      <svg class="b-hub-menu-icon" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"  x="0px" y="0px" viewBox="0 0 7 7" enable-background="new 0 0 7 7" xml:space="preserve">
 				<path fill="#E6EAF5" d="M6.1,7H0.9C0.5,7,0.1,6.6,0.1,6.2V0.8C0.1,0.4,0.5,0,0.9,0h5.1c0.5,0,0.8,0.4,0.8,0.8v5.3
 				C6.9,6.6,6.5,7,6.1,7z M0.9,0.3c-0.3,0-0.5,0.2-0.5,0.5v5.3c0,0.3,0.2,0.5,0.5,0.5h5.1c0.3,0,0.5-0.2,0.5-0.5V0.8
 				c0-0.3-0.2-0.5-0.5-0.5H0.9z"/>
@@ -103,84 +107,89 @@
 					C2.8,1.5,2.9,1.6,2.9,1.6z"/>
 				</g>
 			</svg>
-			<div class="b-hub-menu__text" ng-if="currentUserCtrl.hubStatus">
-				Online
-			</div>
+      <div class="b-hub-menu__text" ng-if="currentUserCtrl.hubStatus">
+        Online
+      </div>
 			<span class="b-hub-menu__text" ng-if="!currentUserCtrl.hubStatus">
 				Register on hub
 			</span>
-		</div>
-		<div class="b-hub-status__dropdown">
-			<div ng-if="!currentUserCtrl.hubStatus">
-				<div class="header">
-					Register to Hub
-				</div>
-				<div class="body">
-					<div class="b-form-group g-margin-bottom">
-						<div class="g-text g-margin-bottom-half">Login</div>
-						<input type="text" class="b-form-input b-form-input_full" ng-model="currentUserCtrl.login">
-					</div>
-					<div class="b-form-group">
-						<div class="g-text g-margin-bottom-half">Password</div>
-						<input type="password" class="b-form-input b-form-input_full" value="******" ng-model="currentUserCtrl.pass">
-					</div>
-				</div>
-				<div class="footer">
-					<a href="https://hub.subut.ai" target="_blank" class="b-form-label">Sign Up</a>
-					<button class="b-btn b-btn_green g-right" ng-click="currentUserCtrl.hubRegister()">Register</button>
-				</div>
-			</div>
-			<div ng-if="currentUserCtrl.hubStatus">
-				<ul class="list">
-					<li style="text-align: center;">
-						<a href="https://hub.subut.ai/" target="_blank">Go to HUB</a>
-						<div class="date"></div>
-					</li>
-					<li>
-						<div style = "width: 100%; text-align: center">
-						<button class = "b-btn b-btn_green" ng-click = "currentUserCtrl.hubHeartbeat()">Send Heartbeat</button>
-						</div>
-					</li>
-				</ul>
-				<a href ng-click="currentUserCtrl.hubUnregister()" class="show-more">Unregister</a>
-			</div>
-		</div>
-	</div>
+    </div>
+    <div class="b-hub-status__dropdown">
+      <div ng-if="!currentUserCtrl.hubStatus">
+        <div class="header">
+          Register to Hub
+        </div>
+        <div class="body">
+          <div class="b-form-group g-margin-bottom">
+            <div class="g-text g-margin-bottom-half">Login</div>
+            <input type="text" class="b-form-input b-form-input_full" ng-model="currentUserCtrl.login">
+          </div>
+          <div class="b-form-group">
+            <div class="g-text g-margin-bottom-half">Password</div>
+            <input type="password" class="b-form-input b-form-input_full" value="******"
+                   ng-model="currentUserCtrl.pass">
+          </div>
+        </div>
+        <div class="footer">
+          <a href="https://hub.subut.ai" target="_blank" class="b-form-label">Sign Up</a>
+          <button class="b-btn b-btn_green g-right" ng-click="currentUserCtrl.hubRegister()">Register</button>
+        </div>
+      </div>
+      <div ng-if="currentUserCtrl.hubStatus">
+        <ul class="list">
+          <li style="text-align: center;">
+            <a href="https://hub.subut.ai/" target="_blank">Go to HUB</a>
 
-	<div class="b-hub-status js-header-dropdown g-right">
-		<a href="#" 
-		ng-class="{'b-hub-status__btn_active' : currentUserCtrl.notificationNew }" 
-		class="b-hub-status__btn g-margin-right-half js-notification" 
-		ng-click="currentUserCtrl.notificationNew = false">
-			Notifications 
-			<i class="fa fa-angle-down"></i>
-		</a>
-		<div class="b-hub-status__dropdown">
-			<ul class="list">
-				<li ng-repeat="notification in currentUserCtrl.notifications">
-					<a href="#">
-						{{ notification.message }}
-					</a>
-					<div class="date">
-						{{ notification.date }}
-					</div>
-					<div class="b-dropdown-buttons" ng-if="notification.links">
-						<a ng-repeat="link in notification.links" href="{{ link.href }}" class="b-btn b-btn_green">{{ link.text }}</a>
-					</div>
-				</li>
-				<li ng-if="currentUserCtrl.notifications.length <= 0" style="text-align: center;">
-					<a href>No logs</a>
-				</li>
-				<!--<li><a href="#">Your SS version is obsolete, please update
-					it to 4.0.0-RC7</a>
-					<div class="date">8 February at 22:25</div>
-					<div class="buttons">
-						<a href="#" class="b-btn b-btn_green">Register</a>
-						<a href="#" class="b-btn b-btn_white">Ignore</a>
-					</div>
-				</li>-->
-			</ul>
-			<a href ng-click="currentUserCtrl.clearLogs()" class="show-more">Clear</a>
-		</div>
-	</div>
+            <div class="date"></div>
+          </li>
+          <li>
+            <div style="width: 100%; text-align: center">
+              <button class="b-btn b-btn_green" ng-click="currentUserCtrl.hubHeartbeat()">Send Heartbeat</button>
+            </div>
+          </li>
+        </ul>
+        <a href ng-click="currentUserCtrl.hubUnregister()" class="show-more">Unregister</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="b-hub-status js-header-dropdown g-right">
+    <a href="#"
+       ng-class="{'b-hub-status__btn_active' : currentUserCtrl.notificationNew }"
+       class="b-hub-status__btn g-margin-right-half js-notification"
+       ng-click="currentUserCtrl.notificationNew = false">
+      Notifications
+      <i class="fa fa-angle-down"></i>
+    </a>
+
+    <div class="b-hub-status__dropdown">
+      <ul class="list">
+        <li ng-repeat="notification in currentUserCtrl.notifications">
+          <a href="#">
+            {{ notification.message }}
+          </a>
+
+          <div class="date">
+            {{ notification.date }}
+          </div>
+          <div class="b-dropdown-buttons" ng-if="notification.links">
+            <a ng-repeat="link in notification.links" href="{{ link.href }}" class="b-btn b-btn_green">{{ link.text
+              }}</a>
+          </div>
+        </li>
+        <li ng-if="currentUserCtrl.notifications.length <= 0" style="text-align: center;">
+          <a href>No logs</a>
+        </li>
+        <!--<li><a href="#">Your SS version is obsolete, please update
+          it to X version</a>
+          <div class="date">8 February at 22:25</div>
+          <div class="buttons">
+            <a href="#" class="b-btn b-btn_green">Register</a>
+            <a href="#" class="b-btn b-btn_white">Ignore</a>
+          </div>
+        </li>-->
+      </ul>
+      <a href ng-click="currentUserCtrl.clearLogs()" class="show-more">Clear</a>
+    </div>
+  </div>
 </div>
