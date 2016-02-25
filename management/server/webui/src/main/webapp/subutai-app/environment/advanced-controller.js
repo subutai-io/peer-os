@@ -79,7 +79,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
 	environmentService.getPeers().success(function (data) {
 		vm.peerIds = data;
-		//vm.peerIds['testPeer'] = ['rh1', 'rh2', 'rh3'];
+		vm.peerIds['testPeer'] = ['rh1', 'rh2', 'rh3'];
 	});
 	clearWorkspace();
 
@@ -664,23 +664,28 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
 			for( var i = 0; i < models.length; i++ ) {
 				if (models[i].get('hostId') !== undefined) {
-					if( cellView.model.get("parent") != models[i].id )
-					{
+					if( cellView.model.get("parent") != models[i].id ) {
+
 						var rh = cellView.model.get('rh');
 						var prevParent = graph.getCell(cellView.model.get("parent"));
 						prevParent.unembed(cellView.model);
+						prevParent.set('children', prevParent.get('children') - 1);						
+						console.log(prevParent);
 						delete prevParent.get('grid')[rh.x][rh.y];
 
+						checkResourceHost(models[i]);
 						var rPos = models[i].get('position');
 						var gPos = placeRhSimple( models[i] );
 
 						cellView.model.set('rh', { model: models[i].id, x: gPos.x, y: gPos.y});
 						var x = (rPos.x + gPos.x * GRID_SIZE + GRID_SPACING) + 23;
 						var y = (rPos.y + gPos.y * GRID_SIZE + GRID_SPACING) + 49;					
+						console.log(x);
+						console.log(y);
 						cellView.model.set('position', { x: x, y: y });
 
 						models[i].embed(cellView.model);
-
+						models[i].set('children', models[i].get('children') + 1);						
 
 						return;
 					}
