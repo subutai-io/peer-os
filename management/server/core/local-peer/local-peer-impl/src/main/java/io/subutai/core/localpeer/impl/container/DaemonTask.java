@@ -4,6 +4,7 @@ package io.subutai.core.localpeer.impl.container;
 import java.util.concurrent.TimeUnit;
 
 import io.subutai.common.command.CommandException;
+import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandResultParser;
 import io.subutai.common.command.RequestBuilder;
 
@@ -11,7 +12,7 @@ import io.subutai.common.command.RequestBuilder;
 /**
  * Abstract task implementation
  */
-public abstract class DaemonTask<T> extends AbstractTask<T>
+public abstract class DaemonTask<T> extends AbstractTask<T> implements CommandResultParser<T>
 {
     private long endTime;
 
@@ -24,6 +25,49 @@ public abstract class DaemonTask<T> extends AbstractTask<T>
                 .withTimeout( 1 ).daemon();
     }
 
+
+    @Override
+    public CommandResultParser<T> getCommandResultParser()
+    {
+        return this;
+    }
+
+
+    @Override
+    public T parse( final CommandResult commandResult )
+    {
+        // waiting for result
+        try
+        {
+            while ( result == null )
+            {
+                try
+                {
+                    TimeUnit.SECONDS.sleep( 1 );
+                }
+                catch ( InterruptedException e )
+                {
+                    // ignore
+                }
+                result = lookupResult();
+                if ( result == null )
+                {
+                    checkTimeout();
+                }
+            }
+        }
+
+        catch ( Exception e )
+        {
+            failure( e.getMessage(), e );
+        }
+        return result;
+    }
+
+
+    public abstract T lookupResult();
+
+/*
 
     @Override
     public void start()
@@ -46,7 +90,7 @@ public abstract class DaemonTask<T> extends AbstractTask<T>
                     // ignore
                 }
 
-                checkState();
+                checkTimeout();
             }
         }
 
@@ -55,13 +99,7 @@ public abstract class DaemonTask<T> extends AbstractTask<T>
             failure( e.getMessage(), e );
         }
     }
-
-
-    /**
-     * This method should look up of running command. If the result is found it should returns this result, otherwise
-     * returns null.
-     */
-    public abstract T lookupResult();
+*/
 
 
     @Override
@@ -71,35 +109,13 @@ public abstract class DaemonTask<T> extends AbstractTask<T>
     }
 
 
-    @Override
-    public CommandResultParser<T> getCommandResultParser()
-    {
-        return null;
-    }
-
-
-    protected void checkState() throws CommandException
+    protected void checkTimeout() throws CommandException
     {
         if ( getState() == State.RUNNING )
         {
             if ( endTime < System.currentTimeMillis() )
             {
                 throw new CommandException( "Command execution timed out." );
-            }
-        }
-        if ( result == null )
-        {
-            try
-            {
-                result = lookupResult();
-                if ( result != null )
-                {
-                    success();
-                }
-            }
-            catch ( Exception e )
-            {
-                throw new CommandException( "Error on looking up daemon process result." );
             }
         }
     }
