@@ -131,14 +131,22 @@ func addNode(vlan, node string) {
 }
 
 func delDomain(vlan string) {
-	domain := getDomain(vlan)
+	// get and remove cert files
+	f, err := ioutil.ReadFile(confinc + vlan + ".conf")
+	if err != nil {
+		log.Fatal("Cannot read nginx virtualhost file:" + confinc + vlan + ".conf")
+	}
+	lines := strings.Split(string(f), "\n")
+	for _, v := range lines {
+		if strings.Contains(v, "ssl_certificate") || strings.Contains(v, "ssl_certificate_key") {
+			line := strings.Fields(v)
+			if len(line) > 1 {
+				os.Remove(strings.Trim(line[1], ";"))
+			}
+		}
+	}
+
 	os.Remove(confinc + vlan + ".conf")
-	if _, err := os.Stat(config.Agent.DataPrefix + "web/ssl/" + domain + ".crt"); err == nil {
-		os.Remove(config.Agent.DataPrefix + "web/ssl/" + domain + ".crt")
-	}
-	if _, err := os.Stat(config.Agent.DataPrefix + "web/ssl/" + domain + ".key"); err == nil {
-		os.Remove(config.Agent.DataPrefix + "web/ssl/" + domain + ".key")
-	}
 }
 
 func delNode(vlan, node string) {
