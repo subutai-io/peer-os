@@ -206,13 +206,18 @@ class SubutaiSecurityHelper
         List<SharedTemplateInfo> list = new ArrayList<>();
         for ( Relation relation : relationsByTarget )
         {
-            long fromUserId = subutaiIdentityManager.getUserDelegate( relation.getSource().getUniqueIdentifier() ).getUserId();
-            User fromUser = subutaiIdentityManager.getUser( fromUserId );
-            String fromUserFprint = getUserFingerprint( fromUser.getSecurityKeyId() );
-            if ( !toUserFingerprint.equals( fromUserFprint ) )
+            UserDelegate uDl = subutaiIdentityManager.getUserDelegate( relation.getSource().getUniqueIdentifier() );
+
+            if(uDl != null)
             {
-                list.add( new SharedTemplateInfo( fromUserFprint, toUserFingerprint,
-                        relation.getTrustedObject().getUniqueIdentifier() ) );
+                long fromUserId = uDl.getUserId();
+                User fromUser = subutaiIdentityManager.getUser( fromUserId );
+                String fromUserFprint = getUserFingerprint( fromUser.getSecurityKeyId() );
+                if ( !toUserFingerprint.equals( fromUserFprint ) )
+                {
+                    list.add( new SharedTemplateInfo( fromUserFprint, toUserFingerprint,
+                            relation.getTrustedObject().getUniqueIdentifier() ) );
+                }
             }
         }
 
@@ -228,17 +233,22 @@ class SubutaiSecurityHelper
         List<SharedTemplateInfo> list = new ArrayList<>();
         for ( Relation relation : relationsByObject )
         {
-            long fromUserId = subutaiIdentityManager.getUserDelegate( relation.getSource().getUniqueIdentifier() ).getUserId();
-            User fromUser = subutaiIdentityManager.getUser( fromUserId );
-            String fromUserFprint = getUserFingerprint( fromUser.getSecurityKeyId() );
+            UserDelegate uDl = subutaiIdentityManager.getUserDelegate( relation.getSource().getUniqueIdentifier() );
 
-            long toUserId = subutaiIdentityManager.getUserDelegate( relation.getTarget().getUniqueIdentifier() ).getUserId();
-            User toUser = subutaiIdentityManager.getUser( toUserId );
-            String toUserFprint = getUserFingerprint( toUser.getSecurityKeyId() );
-            if ( !fromUserFprint.equals( toUserFprint ) )
+            if(uDl != null)
             {
-                list.add( new SharedTemplateInfo( fromUserFprint, toUserFprint,
-                        relation.getTrustedObject().getUniqueIdentifier() ) );
+                long fromUserId = uDl.getUserId();
+                User fromUser = subutaiIdentityManager.getUser( fromUserId );
+                String fromUserFprint = getUserFingerprint( fromUser.getSecurityKeyId() );
+
+                long toUserId = subutaiIdentityManager.getUserDelegate( relation.getTarget().getUniqueIdentifier() ).getUserId();
+                User toUser = subutaiIdentityManager.getUser( toUserId );
+                String toUserFprint = getUserFingerprint( toUser.getSecurityKeyId() );
+                if ( !fromUserFprint.equals( toUserFprint ) )
+                {
+                    list.add( new SharedTemplateInfo( fromUserFprint, toUserFprint,
+                            relation.getTrustedObject().getUniqueIdentifier() ) );
+                }
             }
         }
 
