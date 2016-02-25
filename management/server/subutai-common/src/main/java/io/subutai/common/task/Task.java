@@ -1,6 +1,8 @@
 package io.subutai.common.task;
 
 
+import java.util.List;
+
 import io.subutai.common.peer.Host;
 
 
@@ -15,6 +17,7 @@ public interface Task<T>
 
     //    void checkTimeout();
 
+
     enum State
     {
         PENDING, RUNNING, SUCCESS, FAILURE;
@@ -24,7 +27,7 @@ public interface Task<T>
 
     State getState();
 
-    Exception getException();
+    List<Throwable> getExceptions();
 
     CommandBatch getCommandBatch() throws Exception;
 
@@ -33,5 +36,4 @@ public interface Task<T>
     Host getHost();
 
     boolean isSequential();
-
 }

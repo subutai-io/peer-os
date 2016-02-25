@@ -1,6 +1,8 @@
 package io.subutai.core.localpeer.impl.container;
 
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -8,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
+import io.subutai.common.command.CommandResultParseException;
 import io.subutai.common.command.CommandResultParser;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
@@ -25,7 +28,7 @@ public abstract class AbstractTask<T> implements Task<T>
     protected static final Logger LOG = LoggerFactory.getLogger( AbstractTask.class );
 
     protected T result;
-    protected Exception exception;
+    protected List<Throwable> exceptions = new ArrayList<>();
     private volatile Task.State state = Task.State.PENDING;
     protected CommandUtil commandUtil = new CommandUtil();
     protected CommandResult commandResult;
@@ -51,14 +54,68 @@ public abstract class AbstractTask<T> implements Task<T>
 
             commandResult = commandUtil.execute( builder, getHost() );
 
-            setState( commandResult.hasSucceeded() ? State.SUCCESS : State.FAILURE );
-        }
 
+            switch ( commandResult.getStatus() )
+            {
+                case SUCCEEDED:
+                    success();
+                    break;
+
+                case FAILED:
+                    throw new CommandException( commandResult.getStdErr() );
+
+                case KILLED:
+                    throw new CommandException( "Command killed." );
+
+                case TIMEOUT:
+                    throw new CommandException( "Command execution timed out." );
+
+                default:
+                    throw new CommandException( "Unexpected error on executing command." );
+            }
+        }
         catch ( Exception e )
         {
-            this.exception = e;
-            setState( State.FAILURE );
+            failure( e.getMessage(), e );
         }
+    }
+
+
+    protected void success()
+    {
+        try
+        {
+            parseCommandResult();
+            onSuccess();
+            this.state = State.SUCCESS;
+        }
+        catch ( Exception e )
+        {
+            addException( e );
+            this.state = State.FAILURE;
+        }
+    }
+
+
+    protected void addException( final Throwable e )
+    {
+        this.exceptions.add( e );
+    }
+
+
+    protected void failure( String message, Throwable throwable )
+    {
+
+        addException( throwable );
+        try
+        {
+            onFailure();
+        }
+        catch ( Exception e )
+        {
+            addException( e );
+        }
+        this.state = State.FAILURE;
     }
 
 
@@ -70,25 +127,24 @@ public abstract class AbstractTask<T> implements Task<T>
 
 
     @Override
-    public Exception getException()
+    public List<Throwable> getExceptions()
     {
-        return exception;
+        return exceptions;
     }
 
 
-    private void parseCommandResult()
+    private void parseCommandResult() throws CommandResultParseException
     {
-        try
+        if ( result == null && getCommandResultParser() != null )
         {
-            if ( result == null && getCommandResultParser() != null )
+            try
             {
                 result = getCommandResultParser().parse( commandResult );
             }
-        }
-        catch ( Exception e )
-        {
-            exception = new CommandException( "Command result parse exception: " + e.getMessage() );
-            setState( State.FAILURE );
+            catch ( Exception e )
+            {
+                throw new CommandResultParseException( e );
+            }
         }
     }
 
@@ -122,36 +178,6 @@ public abstract class AbstractTask<T> implements Task<T>
     protected void onFailure()
     {
         // empty
-    }
-
-
-    protected void setState( final State state )
-    {
-        this.state = state;
-        switch ( state )
-        {
-            case SUCCESS:
-                try
-                {
-                    parseCommandResult();
-                    onSuccess();
-                }
-                catch ( Exception e )
-                {
-                    LOG.error( e.getMessage(), e );
-                }
-                break;
-            case FAILURE:
-                try
-                {
-                    parseCommandResult();
-                    onFailure();
-                }
-                catch ( Exception e )
-                {
-                    LOG.error( e.getMessage(), e );
-                }
-        }
     }
 
 

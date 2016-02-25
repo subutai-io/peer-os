@@ -1,12 +1,21 @@
 package io.subutai.core.environment.impl.workflow.modification;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.apache.servicemix.beanflow.Workflow;
+
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.creation.steps.ContainerCloneStep;
+import io.subutai.core.environment.impl.workflow.creation.steps.PrepareTemplatesStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterHostsStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterSshStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.ContainerDestroyStep;
@@ -16,12 +25,6 @@ import io.subutai.core.environment.impl.workflow.modification.steps.VNISetupStep
 import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerManager;
-import org.apache.servicemix.beanflow.Workflow;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflow.EnvironmentGrowingPhase>
@@ -40,9 +43,6 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
     private final EnvironmentManagerImpl environmentManager;
     private boolean forceMetadataRemoval;
 
-    private Throwable error;
-
-
     //environment creation phases
     public static enum EnvironmentGrowingPhase
     {
@@ -51,6 +51,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
         GENERATE_KEYS,
         SETUP_VNI,
         SETUP_P2P,
+        PREPARE_TEMPLATES,
         CLONE_CONTAINERS,
         CONFIGURE_HOSTS,
         CONFIGURE_SSH,
@@ -59,11 +60,11 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
     }
 
 
-    public EnvironmentModifyWorkflow(String defaultDomain, TemplateManager templateRegistry,
-                                     NetworkManager networkManager, PeerManager peerManager,
-                                     EnvironmentImpl environment, Topology topology, List<String> removedContainers,
-                                     TrackerOperation operationTracker, EnvironmentManagerImpl environmentManager,
-                                     boolean forceMetadataRemoval)
+    public EnvironmentModifyWorkflow( String defaultDomain, TemplateManager templateRegistry,
+                                      NetworkManager networkManager, PeerManager peerManager,
+                                      EnvironmentImpl environment, Topology topology, List<String> removedContainers,
+                                      TrackerOperation operationTracker, EnvironmentManagerImpl environmentManager,
+                                      boolean forceMetadataRemoval )
     {
 
         super( EnvironmentGrowingPhase.INIT );
@@ -104,18 +105,21 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
 
         try
         {
-            new ContainerDestroyStep( environment, environmentManager, removedContainers, forceMetadataRemoval, operationTracker ).execute();
+            new ContainerDestroyStep( environment, environmentManager, removedContainers, forceMetadataRemoval,
+                    operationTracker ).execute();
 
             environment = environmentManager.saveOrUpdate( environment );
 
-            if( topology == null )
+            if ( topology == null )
+            {
                 return EnvironmentGrowingPhase.FINALIZE;
+            }
 
             return EnvironmentGrowingPhase.GENERATE_KEYS;
         }
         catch ( Exception e )
         {
-            setError( e );
+            fail( e.getMessage(), e );
 
             return null;
         }
@@ -136,7 +140,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
         }
         catch ( Exception e )
         {
-            setError( e );
+            fail( e.getMessage(), e );
 
             return null;
         }
@@ -157,7 +161,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
         }
         catch ( Exception e )
         {
-            setError( e );
+            fail( e.getMessage(), e );
 
             return null;
         }
@@ -174,12 +178,32 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
 
             environment = environmentManager.saveOrUpdate( environment );
 
+            return EnvironmentGrowingPhase.PREPARE_TEMPLATES;
+        }
+        catch ( Exception e )
+        {
+            fail( e.getMessage(), e );
+
+            return null;
+        }
+    }
+
+
+    public EnvironmentGrowingPhase PREPARE_TEMPLATES()
+    {
+        operationTracker.addLog( "Cloning containers" );
+
+        try
+        {
+            new PrepareTemplatesStep( peerManager, topology, operationTracker ).execute();
+
+            environment = environmentManager.saveOrUpdate( environment );
+
             return EnvironmentGrowingPhase.CLONE_CONTAINERS;
         }
         catch ( Exception e )
         {
-            setError( e );
-
+            fail( e.getMessage(), e );
             return null;
         }
     }
@@ -200,7 +224,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
         }
         catch ( Exception e )
         {
-            setError( e );
+            fail( e.getMessage(), e );
 
             return null;
         }
@@ -221,7 +245,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
         }
         catch ( Exception e )
         {
-            setError( e );
+            fail( e.getMessage(), e );
 
             return null;
         }
@@ -242,7 +266,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
         }
         catch ( Exception e )
         {
-            setError( e );
+            fail( e.getMessage(), e );
 
             return null;
         }
@@ -264,21 +288,19 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
     }
 
 
-    public Throwable getError()
+    @Override
+    public void fail( final String message, final Throwable e )
     {
-        return error;
+        super.fail( message, e );
+        saveFailState();
     }
 
 
-    public void setError( final Throwable error )
+    private void saveFailState()
     {
         environment.setStatus( EnvironmentStatus.UNHEALTHY );
         environment = environmentManager.saveOrUpdate( environment );
-
-        this.error = error;
-        LOG.error( "Error growing environment", error );
-        operationTracker.addLogFailed( error.getMessage() );
-        //stop the workflow
-        stop();
+        operationTracker.addLogFailed( getFailedReason() );
+        LOG.error( "Error modifying environment", getFailedException() );
     }
 }
