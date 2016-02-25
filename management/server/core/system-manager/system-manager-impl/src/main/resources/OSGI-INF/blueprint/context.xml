@@ -18,10 +18,10 @@
     <property name="templateManager" ref="templateManager" />
     <property name="identityManager" ref="identityManager" />
 
-    <argument value="${globalKurjunUrls}" />
-    <argument value="${securePortX1}" />
-    <argument value="${securePortX2}" />
-    <argument value="${securePortX3}" />
+    <!--<argument value="${globalKurjunUrls}" />-->
+    <!--<argument value="${securePortX1}" />-->
+    <!--<argument value="${securePortX2}" />-->
+    <!--<argument value="${securePortX3}" />-->
     <!--<argument value="${publicURL}" />-->
 
   </bean>

@@ -31,7 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.configuration.ConfigurationException;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -146,7 +145,7 @@ public class TemplateManagerImpl implements TemplateManager
             // Load global repo urls from store
             globalRepoUrls = repoUrlStore.getGlobalTemplateUrls();
         }
-        catch ( IOException | ConfigurationException e )
+        catch ( IOException e )
         {
             LOGGER.error( "Failed to get remote repo urls", e );
         }

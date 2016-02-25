@@ -38,24 +38,24 @@ public class SystemManagerImpl implements SystemManager
     private IdentityManager identityManager;
 
 
-    public SystemManagerImpl( final String globalKurjunUrls, final int securePortX1, final int securePortX2,
-                              final int securePortX3 ) throws ConfigurationException
+    public SystemManagerImpl( /*final String globalKurjunUrls, final int securePortX1, final int securePortX2,
+                              final int securePortX3 */) throws ConfigurationException
 
     {
-        Preconditions.checkNotNull( globalKurjunUrls, "Invalid Global Kurjun URLs could not be null." );
-
-        String[] urls = new String[] { globalKurjunUrls };
-
-        if ( urls.length < 1 )
-        {
-            urls = new String[] { DEFAULT_KURJUN_REPO };
-        }
-        validateGlobalKurjunUrls( urls );
-
-        SystemSettings.setGlobalKurjunUrls( urls );
-        SystemSettings.setSecurePortX1( securePortX1 );
-        SystemSettings.setSecurePortX2( securePortX2 );
-        SystemSettings.setSecurePortX3( securePortX3 );
+//        Preconditions.checkNotNull( globalKurjunUrls, "Invalid Global Kurjun URLs could not be null." );
+//
+//        String[] urls = new String[] { globalKurjunUrls };
+//
+//        if ( urls.length < 1 )
+//        {
+//            urls = new String[] { DEFAULT_KURJUN_REPO };
+//        }
+//        validateGlobalKurjunUrls( urls );
+//
+//        SystemSettings.setGlobalKurjunUrls( urls );
+//        SystemSettings.setSecurePortX1( securePortX1 );
+//        SystemSettings.setSecurePortX2( securePortX2 );
+//        SystemSettings.setSecurePortX3( securePortX3 );
     }
 
 
