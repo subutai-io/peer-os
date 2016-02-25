@@ -854,7 +854,7 @@ public class KeyManagerImpl implements KeyManager
         }
         catch ( Exception ex )
         {
-            LOG.error( " ***** Error getting public key fingerprint", ex );
+            LOG.error( " ***** Error getting public key by fingerprint: " + identityId );
             return null;
         }
     }

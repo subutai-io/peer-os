@@ -23,7 +23,9 @@ import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.Gateway;
+import io.subutai.common.network.Gateways;
 import io.subutai.common.network.Vni;
+import io.subutai.common.network.Vnis;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
@@ -155,7 +157,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Collection<Vni> getReservedVnis()
+    public Vnis getReservedVnis()
     {
         try
         {
@@ -170,7 +172,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Collection<Gateway> getGateways()
+    public Gateways getGateways()
     {
         try
         {

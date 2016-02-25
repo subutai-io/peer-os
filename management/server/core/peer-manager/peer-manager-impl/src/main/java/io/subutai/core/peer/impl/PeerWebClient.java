@@ -1,7 +1,6 @@
 package io.subutai.core.peer.impl;
 
 
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
@@ -24,8 +23,9 @@ import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
-import io.subutai.common.network.Gateway;
+import io.subutai.common.network.Gateways;
 import io.subutai.common.network.Vni;
+import io.subutai.common.network.Vnis;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
@@ -75,6 +75,7 @@ public class PeerWebClient
         }
         catch ( Exception e )
         {
+            LOG.error( e.getMessage(), e );
             throw new PeerException( "Error getting peer info", e );
         }
     }
@@ -94,6 +95,7 @@ public class PeerWebClient
         }
         catch ( Exception e )
         {
+            LOG.error( e.getMessage(), e );
             throw new PeerException( "Error starting container", e );
         }
     }
@@ -112,6 +114,7 @@ public class PeerWebClient
         }
         catch ( Exception e )
         {
+            LOG.error( e.getMessage(), e );
             throw new PeerException( "Error stopping container", e );
         }
     }
@@ -130,6 +133,7 @@ public class PeerWebClient
         }
         catch ( Exception e )
         {
+            LOG.error( e.getMessage(), e );
             throw new PeerException( "Error destroying container", e );
         }
     }
@@ -148,6 +152,7 @@ public class PeerWebClient
         }
         catch ( Exception e )
         {
+            LOG.error( e.getMessage(), e );
             throw new PeerException( "Error getting container state ", e );
         }
     }
@@ -166,6 +171,7 @@ public class PeerWebClient
         }
         catch ( Exception e )
         {
+            LOG.error( e.getMessage(), e );
             throw new PeerException( "Error on obtaining process resource usage", e );
         }
     }
@@ -186,6 +192,7 @@ public class PeerWebClient
         }
         catch ( Exception e )
         {
+            LOG.error( e.getMessage(), e );
             throw new PeerException( "Error on cleaning up network settings", e );
         }
     }
@@ -206,6 +213,7 @@ public class PeerWebClient
         }
         catch ( Exception e )
         {
+            LOG.error( e.getMessage(), e );
             throw new PeerException( "Error on creating peer environment key", e );
         }
     }
@@ -226,6 +234,7 @@ public class PeerWebClient
         }
         catch ( Exception e )
         {
+            LOG.error( e.getMessage(), e );
             throw new PeerException( "Error on updating  peer environment key", e );
         }
     }
@@ -248,6 +257,7 @@ public class PeerWebClient
         }
         catch ( Exception e )
         {
+            LOG.error( e.getMessage(), e );
             throw new PeerException( "Error on removing peer environment key", e );
         }
     }
@@ -267,6 +277,7 @@ public class PeerWebClient
         }
         catch ( Exception e )
         {
+            LOG.error( e.getMessage(), e );
             throw new PeerException( "Error getting interfaces", e );
         }
     }
@@ -292,6 +303,7 @@ public class PeerWebClient
         }
         catch ( Exception e )
         {
+            LOG.error( e.getMessage(), e );
             throw new PeerException( "Error resetting P2P secret key", e );
         }
     }
@@ -315,6 +327,7 @@ public class PeerWebClient
         }
         catch ( Exception e )
         {
+            LOG.error( e.getMessage(), e );
             throw new PeerException( "Error setting up P2P connection", e );
         }
     }
@@ -337,6 +350,7 @@ public class PeerWebClient
         }
         catch ( Exception e )
         {
+            LOG.error( e.getMessage(), e );
             throw new PeerException( "Error removing p2p connection", e );
         }
     }
@@ -356,12 +370,13 @@ public class PeerWebClient
         }
         catch ( Exception e )
         {
+            LOG.error( e.getMessage(), e );
             throw new PeerException( "Error getting rh metrics", e );
         }
     }
 
 
-    public Set<Gateway> getGateways() throws PeerException
+    public Gateways getGateways() throws PeerException
     {
         String path = "/gateways";
 
@@ -371,17 +386,17 @@ public class PeerWebClient
 
         try
         {
-            Collection response = client.getCollection( Gateway.class );
-            return new HashSet<>( response );
+            return client.get( Gateways.class );
         }
         catch ( Exception e )
         {
+            LOG.error( e.getMessage(), e );
             throw new PeerException( "Error getting gateways", e );
         }
     }
 
 
-    public Set<Vni> getReservedVnis() throws PeerException
+    public Vnis getReservedVnis() throws PeerException
     {
         String path = "/vni";
 
@@ -391,11 +406,11 @@ public class PeerWebClient
 
         try
         {
-            final Collection response = client.getCollection( Vni.class );
-            return new HashSet<>( response );
+            return client.get( Vnis.class );
         }
         catch ( Exception e )
         {
+            LOG.error( e.getMessage(), e );
             throw new PeerException( String.format( "Error obtaining reserved VNIs from peer %s", peerInfo ), e );
         }
     }

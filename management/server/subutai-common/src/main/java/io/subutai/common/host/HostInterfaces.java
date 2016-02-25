@@ -110,8 +110,7 @@ public class HostInterfaces
     public Set<HostInterfaceModel> filterByName( final String pattern )
     {
         Preconditions.checkNotNull( pattern );
-        Set<HostInterfaceModel> result = new HashSet<>();
-        result = Sets.filter( interfaces, new Predicate<HostInterfaceModel>()
+        return Sets.filter( interfaces, new Predicate<HostInterfaceModel>()
         {
             @Override
             public boolean apply( final HostInterfaceModel intf )
@@ -119,8 +118,6 @@ public class HostInterfaces
                 return intf.getName().matches( pattern );
             }
         } );
-
-        return result;
     }
 
 

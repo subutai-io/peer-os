@@ -6,6 +6,7 @@ import java.util.Set;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.network.Vni;
 import io.subutai.common.network.VniVlanMapping;
+import io.subutai.common.network.Vnis;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
@@ -144,7 +145,7 @@ public interface NetworkManager
     /**
      * Returns all reserved VNIs on management host
      */
-    public Set<Vni> getReservedVnis() throws NetworkManagerException;
+    public Vnis getReservedVnis() throws NetworkManagerException;
 
     /**
      * Enables passwordless ssh access between containers

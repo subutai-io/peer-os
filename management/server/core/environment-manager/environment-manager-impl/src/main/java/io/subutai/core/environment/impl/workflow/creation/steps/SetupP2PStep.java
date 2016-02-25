@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
@@ -73,7 +74,7 @@ public class SetupP2PStep
                 throw new IllegalStateException( "Could not calculate tunnel network." );
             }
             env.setTunnelNetwork( freeTunnelNetwork );
-            String sharedKey = DigestUtils.md5Hex( "secret" );
+            String sharedKey = DigestUtils.md5Hex( UUID.randomUUID().toString() );
             SubnetUtils.SubnetInfo subnetInfo = new SubnetUtils( freeTunnelNetwork, P2PUtil.P2P_SUBNET_MASK ).getInfo();
             final String[] addresses = subnetInfo.getAllAddresses();
             int counter = 0;

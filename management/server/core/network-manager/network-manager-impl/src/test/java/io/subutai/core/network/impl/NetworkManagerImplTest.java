@@ -17,6 +17,7 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.network.Vni;
 import io.subutai.common.network.VniVlanMapping;
+import io.subutai.common.network.Vnis;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.HostNotFoundException;
@@ -373,9 +374,10 @@ public class NetworkManagerImplTest
     {
         when( commandResult.getStdOut() ).thenReturn( RESERVED_VNIS_OUTPUT );
 
-        Set<Vni> vnis = networkManager.getReservedVnis();
+        Vnis vnis = networkManager.getReservedVnis();
 
-        assertTrue( vnis.contains( new Vni( VNI, VLAN_ID, ENVIRONMENT_ID ) ) );
+        assertNotNull( vnis.findVlanByVni( VNI ) );
+        assertNotNull( vnis.findVniByEnvironmentId( ENVIRONMENT_ID ) );
     }
 
 

@@ -20,6 +20,7 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.network.Vni;
 import io.subutai.common.network.VniVlanMapping;
+import io.subutai.common.network.Vnis;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
@@ -195,9 +196,6 @@ public class NetworkManagerImpl implements NetworkManager
     }
 
 
-
-
-
     @Override
     public void removeGateway( final int vLanId ) throws NetworkManagerException
     {
@@ -212,9 +210,7 @@ public class NetworkManagerImpl implements NetworkManager
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
-        Set<Vni> reservedVnis = getReservedVnis();
-
-        for ( Vni vni : reservedVnis )
+        for ( Vni vni : getReservedVnis().list() )
         {
             if ( vni.getEnvironmentId().equals( environmentId.getId() ) )
             {
@@ -445,9 +441,9 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public Set<Vni> getReservedVnis() throws NetworkManagerException
+    public Vnis getReservedVnis() throws NetworkManagerException
     {
-        Set<Vni> reservedVnis = Sets.newHashSet();
+        Vnis reservedVnis = new Vnis();
 
         CommandResult result = execute( getManagementHost(), commands.getListReservedVnisCommand() );
 
