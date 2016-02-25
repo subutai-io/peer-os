@@ -21,7 +21,9 @@ import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.Gateway;
+import io.subutai.common.network.Gateways;
 import io.subutai.common.network.Vni;
+import io.subutai.common.network.Vnis;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
@@ -59,7 +61,7 @@ public interface RestService
     @GET
     @Path( "vni" )
     @Produces( MediaType.APPLICATION_JSON )
-    Collection<Vni> getReservedVnis();
+    Vnis getReservedVnis();
 
     @POST
     @Path( "vni" )
@@ -71,7 +73,7 @@ public interface RestService
     @Path( "gateways" )
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
-    Collection<Gateway> getGateways();
+    Gateways getGateways();
 
 
     @POST

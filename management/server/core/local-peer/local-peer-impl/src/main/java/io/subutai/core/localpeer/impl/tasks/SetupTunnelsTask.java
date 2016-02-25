@@ -40,7 +40,7 @@ public class SetupTunnelsTask implements Callable<Integer>
     public Integer call() throws Exception
     {
         //fail if vni is not reserved
-        Vni environmentVni = localPeer.findVniByEnvironmentId( environmentId );
+        Vni environmentVni = localPeer.getReservedVnis().findVniByEnvironmentId( environmentId );
 
         if ( environmentVni == null )
         {

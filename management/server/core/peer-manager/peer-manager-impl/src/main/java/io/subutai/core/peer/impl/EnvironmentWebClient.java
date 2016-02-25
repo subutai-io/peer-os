@@ -52,6 +52,8 @@ public class EnvironmentWebClient
         }
         catch ( Exception e )
         {
+            LOG.error( e.getMessage(), e );
+
             throw new PeerException( "Error starting container: " + e.getMessage() );
         }
     }
@@ -70,6 +72,7 @@ public class EnvironmentWebClient
         }
         catch ( Exception e )
         {
+            LOG.error( e.getMessage(), e );
             throw new PeerException( "Error stopping container:" + e.getMessage() );
         }
     }
@@ -88,6 +91,7 @@ public class EnvironmentWebClient
         }
         catch ( Exception e )
         {
+            LOG.error( e.getMessage(), e );
             throw new PeerException( "Error destroying container: " + e.getMessage() );
         }
     }
@@ -110,6 +114,7 @@ public class EnvironmentWebClient
         }
         catch ( Exception e )
         {
+            LOG.error( e.getMessage(), e );
             throw new PeerException( "Error getting container state: " + e.getMessage() );
         }
     }
@@ -131,6 +136,7 @@ public class EnvironmentWebClient
         }
         catch ( Exception e )
         {
+            LOG.error( e.getMessage(), e );
             throw new PeerException( "Error on obtaining process resource usage: " + e.getMessage() );
         }
     }
@@ -151,6 +157,7 @@ public class EnvironmentWebClient
         }
         catch ( Exception e )
         {
+            LOG.error( e.getMessage(), e );
             throw new PeerException( "Error on obtaining cpu set" + e.getMessage() );
         }
     }
@@ -172,6 +179,7 @@ public class EnvironmentWebClient
         }
         catch ( Exception e )
         {
+            LOG.error( e.getMessage(), e );
             throw new PeerException( "Error on setting cpu set: " + e.getMessage() );
         }
     }
@@ -193,6 +201,7 @@ public class EnvironmentWebClient
         }
         catch ( Exception e )
         {
+            LOG.error( e.getMessage(), e );
             throw new PeerException( "Error on obtaining available quota: " + e.getMessage() );
         }
     }
@@ -213,6 +222,7 @@ public class EnvironmentWebClient
         }
         catch ( Exception e )
         {
+            LOG.error( e.getMessage(), e );
             throw new PeerException( "Error on obtaining available quota: " + e.getMessage() );
         }
     }
@@ -235,6 +245,7 @@ public class EnvironmentWebClient
         }
         catch ( Exception e )
         {
+            LOG.error( e.getMessage(), e );
             throw new PeerException( "Error on setting quota: " + e.getMessage() );
         }
     }
@@ -255,6 +266,7 @@ public class EnvironmentWebClient
         }
         catch ( Exception e )
         {
+            LOG.error( e.getMessage(), e );
             throw new PeerException( "Error on obtaining resource host id by container id", e );
         }
     }
