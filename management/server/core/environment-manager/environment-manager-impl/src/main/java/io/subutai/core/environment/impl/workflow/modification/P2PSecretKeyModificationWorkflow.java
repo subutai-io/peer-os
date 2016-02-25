@@ -25,10 +25,8 @@ public class P2PSecretKeyModificationWorkflow
     private final TrackerOperation operationTracker;
     private final EnvironmentManagerImpl environmentManager;
 
-    private Throwable error;
 
-
-    public static enum P2PSecretKeyModificationPhase
+    public enum P2PSecretKeyModificationPhase
     {
         INIT, REPLACE_KEY, FINALIZE
     }
@@ -80,7 +78,7 @@ public class P2PSecretKeyModificationWorkflow
         }
         catch ( Exception e )
         {
-            setError( e );
+            fail( e.getMessage(), e );
 
             return null;
         }
@@ -102,22 +100,19 @@ public class P2PSecretKeyModificationWorkflow
     }
 
 
-    public Throwable getError()
+    @Override
+    public void fail( final String message, final Throwable e )
     {
-        return error;
+        super.fail( message, e );
+        saveFailState();
     }
 
 
-    public void setError( final Throwable error )
+    private void saveFailState()
     {
         environment.setStatus( EnvironmentStatus.UNHEALTHY );
-
         environment = environmentManager.saveOrUpdate( environment );
-
-        this.error = error;
-        LOG.error( "Error modifying P2P secret key", error );
-        operationTracker.addLogFailed( error.getMessage() );
-        //stop the workflow
-        stop();
+        operationTracker.addLogFailed( getFailedReason() );
+        LOG.error( "Error modifying P2P secret key", getFailedException() );
     }
 }
