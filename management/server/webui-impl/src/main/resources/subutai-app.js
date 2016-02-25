@@ -31,7 +31,8 @@ function CurrentUserCtrl($location, $rootScope, $http, SweetAlert) {
 	var vm = this;
 	vm.currentUser = localStorage.getItem('currentUser');
 	vm.hubStatus = false;
-	vm.notifications = localStorage.getItem('notifications');
+	vm.notifications = [];
+	vm.notificationsCount = 0;
 	vm.notificationNew = false;
 	vm.currentUserRoles = [];
 	$rootScope.notifications = {};
@@ -131,20 +132,22 @@ function CurrentUserCtrl($location, $rootScope, $http, SweetAlert) {
 		var notifications = localStorage.getItem('notifications');
 		console.log(notifications);
 		if(
-			notifications == null ||
-			notifications == undefined ||
-			notifications == 'null' ||
+			notifications == null || 
+			notifications == undefined || 
+			notifications == 'null' || 
 			notifications.length <= 0
 		) {
-			var notifications = [];
+			notifications = [];
 			localStorage.setItem('notifications', notifications);
 		} else {
 			notifications = JSON.parse(notifications);
+			vm.notificationsCount = notifications.length;
 		}
 
 		if($rootScope.notifications.message) {
 			if(!localStorage.getItem('notifications').includes(JSON.stringify($rootScope.notifications.message))) {
 				notifications.push($rootScope.notifications);
+				vm.notificationsCount++;
 				localStorage.setItem('notifications', JSON.stringify(notifications));
 			}
 			vm.notificationNew = true;
@@ -154,6 +157,7 @@ function CurrentUserCtrl($location, $rootScope, $http, SweetAlert) {
 
 	function clearLogs() {
 		vm.notifications = [];
+		vm.notificationsCount = 0;
 		localStorage.removeItem('notifications');
 	}
 }

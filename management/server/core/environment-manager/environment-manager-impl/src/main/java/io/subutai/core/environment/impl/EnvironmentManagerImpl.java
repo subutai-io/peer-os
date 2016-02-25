@@ -16,6 +16,7 @@ import java.util.concurrent.ExecutorService;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 
+import io.subutai.core.environment.impl.workflow.modification.*;
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
@@ -84,11 +85,6 @@ import io.subutai.core.environment.impl.workflow.construction.EnvironmentImportW
 import io.subutai.core.environment.impl.workflow.creation.EnvironmentCreationWorkflow;
 import io.subutai.core.environment.impl.workflow.destruction.ContainerDestructionWorkflow;
 import io.subutai.core.environment.impl.workflow.destruction.EnvironmentDestructionWorkflow;
-import io.subutai.core.environment.impl.workflow.modification.EnvironmentGrowingWorkflow;
-import io.subutai.core.environment.impl.workflow.modification.EnvironmentModifyWorkflow;
-import io.subutai.core.environment.impl.workflow.modification.P2PSecretKeyModificationWorkflow;
-import io.subutai.core.environment.impl.workflow.modification.SshKeyAdditionWorkflow;
-import io.subutai.core.environment.impl.workflow.modification.SshKeyRemovalWorkflow;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserDelegate;
@@ -485,10 +481,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         }
     }
 
-
     @RolesAllowed( "Environment-Management|Write" )
     @Override
-    public UUID createEnvironmentViaTracker( final Topology topology, final boolean async )
+    public UUID createEnvironmentAndGetTrackerID(final Topology topology, final boolean async)
             throws EnvironmentCreationException
     {
         Preconditions.checkNotNull( topology, "Invalid topology" );
@@ -748,10 +743,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             environmentGrowingWorkflow.join();
 
-            if ( environmentGrowingWorkflow.isFailed() )
+            if ( environmentGrowingWorkflow.getError() != null )
             {
                 throw new EnvironmentModificationException(
-                        exceptionUtil.getRootCause( environmentGrowingWorkflow.getFailedException() ) );
+                        exceptionUtil.getRootCause( environmentGrowingWorkflow.getError() ) );
             }
             else
             {
@@ -768,8 +763,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     @RolesAllowed( "Environment-Management|Write" )
     @Override
-    public UUID modifyEnvironment( final String environmentId, final Topology topology,
-                                   final List<String> removedContainers, final boolean async )
+    public UUID modifyEnvironmentAndGetTrackerID(final String environmentId, final Topology topology, final List<String> removedContainers, final boolean async)
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
@@ -781,8 +775,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             throw new EnvironmentNotFoundException();
         }
 
-        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
-                String.format( "Modifying environment %s", environmentId ) );
+        TrackerOperation operationTracker =
+                tracker.createTrackerOperation( MODULE_NAME, String.format( "Modifying environment %s", environmentId ) );
 
         Set<Peer> allPeers = new HashSet<>();
         final Set<EnvironmentContainerHost> oldContainers = Sets.newHashSet( environment.getContainerHosts() );
@@ -818,10 +812,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         }
 
 
-        if ( topology != null )
-        {
+        if( topology != null )
             topology.setSubnet( environment.getSubnetCidr() );
-        }
 
 
         //launch environment growing workflow
@@ -863,14 +855,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             environmentModifyWorkflow.join();
 
-            if ( environmentModifyWorkflow.isFailed() )
+            if ( environmentModifyWorkflow.getError() != null )
             {
                 throw new EnvironmentModificationException(
-                        exceptionUtil.getRootCause( environmentModifyWorkflow.getFailedException() ) );
+                        exceptionUtil.getRootCause( environmentModifyWorkflow.getError() ) );
             }
             else
             {
-                if ( topology != null )
+                if( topology != null )
                 {
                     Set<EnvironmentContainerHost> newContainers =
                             Sets.newHashSet( loadEnvironment( environment.getId() ).getContainerHosts() );
@@ -918,10 +910,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             sshKeyAdditionWorkflow.join();
 
-            if ( sshKeyAdditionWorkflow.isFailed() )
+            if ( sshKeyAdditionWorkflow.getError() != null )
             {
                 throw new EnvironmentModificationException(
-                        exceptionUtil.getRootCause( sshKeyAdditionWorkflow.getFailedException() ) );
+                        exceptionUtil.getRootCause( sshKeyAdditionWorkflow.getError() ) );
             }
         }
     }
@@ -962,10 +954,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             sshKeyRemovalWorkflow.join();
 
-            if ( sshKeyRemovalWorkflow.isFailed() )
+            if ( sshKeyRemovalWorkflow.getError() != null )
             {
                 throw new EnvironmentModificationException(
-                        exceptionUtil.getRootCause( sshKeyRemovalWorkflow.getFailedException() ) );
+                        exceptionUtil.getRootCause( sshKeyRemovalWorkflow.getError() ) );
             }
         }
     }
@@ -1007,10 +999,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             p2PSecretKeyModificationWorkflow.join();
 
-            if ( p2PSecretKeyModificationWorkflow.isFailed() )
+            if ( p2PSecretKeyModificationWorkflow.getError() != null )
             {
                 throw new EnvironmentModificationException(
-                        exceptionUtil.getRootCause( p2PSecretKeyModificationWorkflow.getFailedException() ) );
+                        exceptionUtil.getRootCause( p2PSecretKeyModificationWorkflow.getError() ) );
             }
         }
     }
@@ -1593,7 +1585,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             throw new AccessControlException( "You don't have enough permissions to create environment" );
         }
         return new EnvironmentCreationWorkflow( Common.DEFAULT_DOMAIN_NAME, templateRegistry, this, networkManager,
-                peerManager, securityManager, environment, topology, sshKey, operationTracker );
+                peerManager, securityManager, identityManager, environment, topology, sshKey, operationTracker );
     }
 
 
@@ -1796,16 +1788,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                 peerManager, environment, topology, operationTracker, this );
     }
 
-
     protected EnvironmentModifyWorkflow getEnvironmentModifyingWorkflow( final EnvironmentImpl environment,
-                                                                         final Topology topology,
-                                                                         final TrackerOperation operationTracker,
-                                                                         final List<String> removedContainers,
-                                                                         final boolean removeMetaData )
+                                                                        final Topology topology,
+                                                                        final TrackerOperation operationTracker,
+                                                                        final List<String> removedContainers,
+                                                                        final boolean removeMetaData )
 
     {
-        return new EnvironmentModifyWorkflow( Common.DEFAULT_DOMAIN_NAME, templateRegistry, networkManager, peerManager,
-                environment, topology, removedContainers, operationTracker, this, removeMetaData );
+        return new EnvironmentModifyWorkflow( Common.DEFAULT_DOMAIN_NAME, templateRegistry, networkManager,
+                peerManager, environment, topology, removedContainers, operationTracker, this, removeMetaData );
     }
 
 

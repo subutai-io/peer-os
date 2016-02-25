@@ -19,6 +19,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 
 	vm.currentEnvironment = {};
 
+	vm.sshKeysList = [];
 	vm.environments = [];
 	vm.domainStrategies = [];
 	vm.strategies = [];
@@ -56,6 +57,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	vm.setSSHKey = setSSHKey;
 	vm.showSSHKeyForm = showSSHKeyForm;
 	vm.showSSHKeysPopup = showSSHKeysPopup;
+	vm.deleteSSHKey = deleteSSHKey;
 	vm.showDomainForm = showDomainForm;
 	vm.setDomain = setDomain;
 	vm.removeDomain = removeDomain;
@@ -403,20 +405,33 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 
 	function showSSHKeysPopup(environmentId) {
 
+		vm.sshKeysList = [];
+		vm.sshKeyForEnvironment = environmentId;
 		environmentService.getSshKey(environmentId).success( function (data) {
-			console.log( data );
-		})
-		.error( function(data) {
-			SweetAlert.swal("Cancelled", "Error: " + data.ERROR, "error");
+			vm.sshKeysList = data;
+			ngDialog.open({
+				template: 'subutai-app/environment/partials/popups/sshKeysPopup.html',
+				scope: $scope
+			});
+		}).error( function(data) {
+			SweetAlert.swal("Error", "Error: " + data.ERROR, "error");
 			ngDialog.closeAll();
 			LOADING_SCREEN('none');
 		});
 
+	}
 
-		//ngDialog.open({
-		//	template: 'subutai-app/environment/partials/popups/sshKeysPopup.html',
-		//	scope: $scope
-		//});
+	function deleteSSHKey(sshKey, index) {
+		LOADING_SCREEN();
+		environmentService.removeSshKey(vm.sshKeyForEnvironment, sshKey).success( function (data) {
+			console.log(data);
+			vm.sshKeysList.splice(index, 1);
+			LOADING_SCREEN('none');
+		}).error( function(error) {
+			SweetAlert.swal("Error", "Error: " + error, "error");
+			ngDialog.closeAll();
+			LOADING_SCREEN('none');
+		});
 	}
 
 	function showDomainForm(environmentId) {
@@ -474,12 +489,15 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 
 	function setSSHKey(sshKey) {
 		if(sshKey === undefined || sshKey.length <= 0 || sshKey === null) return;
+		LOADING_SCREEN();
 		environmentService.setSshKey(sshKey, vm.sshKeyForEnvironment).success(function (data) {
 			SweetAlert.swal("Success!", "You have successfully added SSH key for " + vm.sshKeyForEnvironment + " environment!", "success");
 			ngDialog.closeAll();
+			LOADING_SCREEN('none');
 		}).error(function (data) {
 			SweetAlert.swal("Cancelled", "Error: " + data.ERROR, "error");
 			ngDialog.closeAll();
+			LOADING_SCREEN('none');
 		});
 	}
 

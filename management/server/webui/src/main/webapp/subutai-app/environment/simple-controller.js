@@ -3,9 +3,9 @@
 angular.module('subutai.environment.simple-controller', [])
 	.controller('EnvironmentSimpleViewCtrl', EnvironmentSimpleViewCtrl);
 
-EnvironmentSimpleViewCtrl.$inject = ['$scope', 'environmentService', 'trackerSrv', 'SweetAlert', 'ngDialog', '$timeout'];
+EnvironmentSimpleViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'trackerSrv', 'SweetAlert', 'ngDialog', '$timeout'];
 
-function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, SweetAlert, ngDialog, $timeout) {
+function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, trackerSrv, SweetAlert, ngDialog, $timeout) {
 
 	var vm = this;
 	var GRID_CELL_SIZE = 100;
@@ -148,8 +148,26 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 				} else {
 					if(data.state == 'FAILED') {
 						checkLastLog(false);
+						$rootScope.notifications = {
+							"message": "Error on building environment", 
+							"date": moment().format('MMMM Do YYYY, HH:mm:ss'),
+							"type": "error"
+						};
 					} else {
 						//SweetAlert.swal("Success!", "Your environment has been built successfully.", "success");
+
+						if(vm.isEditing) {
+							$rootScope.notifications = {
+								"message": "Environment has been changed successfully", 
+								"date": moment().format('MMMM Do YYYY, HH:mm:ss')
+							};
+						} else {
+							$rootScope.notifications = {
+								"message": "Environment has been created", 
+								"date": moment().format('MMMM Do YYYY, HH:mm:ss')
+							};
+						}
+
 						checkLastLog(true);
 						var currentLog = {
 							"time": moment().format('HH:mm:ss'),
@@ -159,8 +177,10 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 						};
 						vm.logMessages.push(currentLog);						
 						vm.buildCompleted = true;
+						vm.isEditing = false;
 					}
 					$scope.$emit('reloadEnvironmentsList');
+					clearWorkspace();
 				}
 			}).error(function(error) {
 				console.log(error);
@@ -171,6 +191,7 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 	function buildEnvironment() {
 		vm.buildStep = 'showLogs';
 
+		vm.buildCompleted = false;
 		vm.logMessages = [];
 		var currentLog = {
 			"time": '',
@@ -207,6 +228,12 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 				currentLog.status = 'fail';
 				currentLog.classes = ['fa-times', 'g-text-red'];
 				currentLog.time = moment().format('HH:mm:ss');				
+
+				$rootScope.notifications = {
+					"message": "Error on creating environment. " + error, 
+					"date": moment().format('MMMM Do YYYY, HH:mm:ss'),
+					"type": "error"
+				};
 			});
 	}
 
@@ -281,29 +308,29 @@ function EnvironmentSimpleViewCtrl($scope, environmentService, trackerSrv, Sweet
 			className: 'b-build-environment-info'
 		});
 
+		vm.currentEnvironment.modifyStatus = 'modifying';
+
+		vm.buildCompleted = false;
 		vm.logMessages = [];
 		var currentLog = {
 			"time": '',
 			"status": 'in-progress',
 			"classes": ['fa-spinner', 'fa-pulse'],
-			"text": 'Registering environment'
+			"text": 'Applying your changes...'
 		};
 		vm.logMessages.push(currentLog);
 
-		vm.currentEnvironment.modifyStatus = 'modifying';
-		console.log(vm.currentEnvironment.modificationData);
 		environmentService.modifyEnvironment(vm.currentEnvironment.modificationData).success(function (data) {
 			vm.currentEnvironment.modifyStatus = 'modified';
 			clearWorkspace();
-			vm.isEditing = false;
 			vm.isApplyingChanges = false;
 
 			getLogById(data, true);
 		}).error(function (data) {
 			vm.currentEnvironment.modifyStatus = 'error';
 			clearWorkspace();
-			vm.isEditing = false;
 			vm.isApplyingChanges = false;
+			
 			checkLastLog(false);
 		});
 	}

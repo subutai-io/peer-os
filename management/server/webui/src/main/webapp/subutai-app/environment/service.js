@@ -186,8 +186,8 @@ function environmentService($http) {
 		return $http.get(ENVIRONMENTS_URL + environmentId + '/keys');
 	}
 
-	function removeSshKey(environmentId) {
-		return $http.delete(ENVIRONMENTS_URL + environmentId + '/keys');
+	function removeSshKey(environmentId, sshKey) {
+		return $http.delete(ENVIRONMENTS_URL + environmentId + '/keys?key=' + sshKey);
 	}
 
 
