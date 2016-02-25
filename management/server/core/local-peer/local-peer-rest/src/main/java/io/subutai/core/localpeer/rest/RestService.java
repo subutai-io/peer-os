@@ -2,6 +2,7 @@ package io.subutai.core.localpeer.rest;
 
 
 import java.util.Collection;
+import java.util.Map;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -16,15 +17,21 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.Gateway;
+import io.subutai.common.network.Gateways;
 import io.subutai.common.network.Vni;
-import io.subutai.common.peer.AlertPack;
+import io.subutai.common.network.Vnis;
+import io.subutai.common.peer.AlertEvent;
+import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
+import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
-import io.subutai.common.protocol.N2NConfig;
-import io.subutai.common.resource.HistoricalMetrics;
+import io.subutai.common.protocol.ControlNetworkConfig;
+import io.subutai.common.protocol.P2PConfig;
+import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.util.DateTimeParam;
 
@@ -42,13 +49,9 @@ public interface RestService
 
     @GET
     @Path( "/info" )
+    @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
-    public PeerInfo getPeerInfo();
-
-    @GET
-    @Path( "peer_policy" )
-    @Produces( MediaType.APPLICATION_JSON )
-    public Response getPeerPolicy( @QueryParam( "peerId" ) String peerId );
+    public PeerInfo getPeerInfo() throws PeerException;
 
     @GET
     @Path( "template/get" )
@@ -58,7 +61,7 @@ public interface RestService
     @GET
     @Path( "vni" )
     @Produces( MediaType.APPLICATION_JSON )
-    Collection<Vni> getReservedVnis();
+    Vnis getReservedVnis();
 
     @POST
     @Path( "vni" )
@@ -70,7 +73,7 @@ public interface RestService
     @Path( "gateways" )
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
-    Collection<Gateway> getGateways();
+    Gateways getGateways();
 
 
     @POST
@@ -78,17 +81,11 @@ public interface RestService
     Response setDefaultGateway( @FormParam( "containerId" ) String containerId,
                                 @FormParam( "gatewayIp" ) String gatewayIp );
 
-
     @POST
-    @Path( "gateways" )
+    @Path( "tunnels/{environmentId}" )
     @Consumes( MediaType.APPLICATION_JSON )
-    Response createGateway( Gateway gateway );
-
-
-    @POST
-    @Path( "tunnels" )
-    @Produces( { MediaType.TEXT_PLAIN } )
-    Response setupTunnels( @FormParam( "peerIps" ) String peerIps, @FormParam( "environmentId" ) String environmentId );
+    @Produces( MediaType.TEXT_PLAIN )
+    Response setupTunnels( @PathParam( "environmentId" ) String environmentId, Map<String, String> peerIps );
 
     @POST
     @Path( "pek" )
@@ -106,20 +103,23 @@ public interface RestService
     @Path( "pek/{environmentId}" )
     void removeEnvironmentKeyPair( @PathParam( "environmentId" ) EnvironmentId environmentId );
 
+    @POST
+    @Path( "pek/add/{keyId}" )
+    @Produces( MediaType.APPLICATION_JSON )
+    @Consumes( MediaType.APPLICATION_JSON )
+    void addInitiatorPeerEnvironmentPubKey( @PathParam( "keyId" ) String keyId, String pek );
+
     @DELETE
     @Path( "network/{environmentId}" )
     void cleanupNetwork( @PathParam( "environmentId" ) EnvironmentId environmentId );
-
-    @PUT
-    @Path( "update" )
-    @Consumes( MediaType.APPLICATION_JSON )
-    @Produces( MediaType.APPLICATION_JSON )
-    public Response updatePeer( PeerInfo peerInfo );
 
     @GET
     @Path( "container/info" )
     Response getContainerHostInfoById( @QueryParam( "containerId" ) String containerId );
 
+    @GET
+    @Path( "containers/{environmentId}" )
+    Response getEnvironmentContainers( @PathParam( "environmentId" ) EnvironmentId environmentId );
 
     @GET
     @Path( "resources" )
@@ -134,28 +134,66 @@ public interface RestService
     HostInterfaces getNetworkInterfaces();
 
     @POST
-    @Path( "n2ntunnel" )
+    @Path( "p2presetkey" )
     @Produces( MediaType.APPLICATION_JSON )
     @Consumes( MediaType.APPLICATION_JSON )
-    void setupN2NConnection( N2NConfig config );
+    void resetP2PSecretKey( P2PCredentials p2PCredentials );
+
+    @POST
+    @Path( "p2ptunnel" )
+    @Produces( MediaType.APPLICATION_JSON )
+    @Consumes( MediaType.APPLICATION_JSON )
+    void setupP2PConnection( P2PConfig config );
 
     @DELETE
-    @Path( "n2ntunnel/{environmentId}" )
+    @Path( "p2ptunnel/{environmentId}" )
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
-    void removeN2NConnection( @PathParam( "environmentId" ) EnvironmentId environmentId );
+    void removeP2PConnection( @PathParam( "environmentId" ) EnvironmentId environmentId );
 
     @POST
     @Path( "alert" )
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
-    Response putAlert( AlertPack alertPack );
+    Response putAlert( AlertEvent alertEvent );
 
     @GET
     @Path( "hmetrics/{hostname}/{startTime}/{endTime}" )
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
     Response getHistoricalMetrics( @PathParam( "hostname" ) final String hostName,
-                                            @PathParam( "startTime" ) final DateTimeParam startTime,
-                                            @PathParam( "endTime" ) final DateTimeParam endTime );
+                                   @PathParam( "startTime" ) final DateTimeParam startTime,
+                                   @PathParam( "endTime" ) final DateTimeParam endTime );
+
+    @GET
+    @Path( "limits/{peerId}" )
+    @Consumes( MediaType.APPLICATION_JSON )
+    @Produces( MediaType.APPLICATION_JSON )
+    Response getResourceLimits( @PathParam( "peerId" ) final String peerId );
+
+    @GET
+    @Path( "control/config/{peerId}" )
+    @Consumes( MediaType.APPLICATION_JSON )
+    @Produces( MediaType.APPLICATION_JSON )
+    Response getControlNetworkConfig( @PathParam( "peerId" ) final String peerId );
+
+    @PUT
+    @Path( "control/update" )
+    @Consumes( MediaType.APPLICATION_JSON )
+    @Produces( MediaType.APPLICATION_JSON )
+    Response updateControlNetworkConfig( ControlNetworkConfig config );
+
+    @GET
+    @Path( "control/{communityName}/{count}/distance/" )
+    @Consumes( MediaType.APPLICATION_JSON )
+    @Produces( MediaType.APPLICATION_JSON )
+    Response getCommunityDistances( @PathParam( "communityName" ) final String communityName,
+                                    @PathParam( "count" ) final Integer count );
+
+
+    @GET
+    @Path( "container/{containerId}/rhId" )
+    @Consumes( MediaType.APPLICATION_JSON )
+    @Produces( MediaType.APPLICATION_JSON )
+    HostId getResourceHostIdByContainerId( @PathParam( "containerId" ) final ContainerId containerId );
 }

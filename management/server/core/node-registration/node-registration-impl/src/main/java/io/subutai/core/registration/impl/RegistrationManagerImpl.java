@@ -2,18 +2,20 @@ package io.subutai.core.registration.impl;
 
 
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
-import io.subutai.common.host.HostInterface;
-import io.subutai.common.host.HostInterfaceModel;
-import io.subutai.common.peer.*;
-import io.subutai.common.util.N2NUtil;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Transformer;
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Transformer;
 import org.apache.commons.net.util.SubnetUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 
@@ -30,14 +32,20 @@ import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.host.ContainerHostInfo;
+import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.HostInterface;
+import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.ResourceHostInfo;
-import io.subutai.common.metric.ResourceAlert;
+import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.ContainerSize;
+import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.peer.ManagementHost;
+import io.subutai.common.peer.Peer;
+import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
-import io.subutai.common.protocol.PlacementStrategy;
+import io.subutai.common.util.P2PUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.broker.api.Broker;
 import io.subutai.core.broker.api.BrokerException;
@@ -46,7 +54,6 @@ import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
-import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registration.api.RegistrationManager;
 import io.subutai.core.registration.api.RegistrationStatus;
 import io.subutai.core.registration.api.exception.NodeRegistrationException;
@@ -74,7 +81,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
     private DaoManager daoManager;
     private Broker broker;
     private String domainName;
-    private PeerManager peerManager;
+    private LocalPeer localPeer;
     private EnvironmentManager environmentManager;
     private NetworkManager networkManager;
 
@@ -108,33 +115,15 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
     }
 
 
-    public EnvironmentManager getEnvironmentManager()
-    {
-        return environmentManager;
-    }
-
-
     public void setEnvironmentManager( final EnvironmentManager environmentManager )
     {
         this.environmentManager = environmentManager;
     }
 
 
-    public PeerManager getPeerManager()
+    public void setLocalPeer( final LocalPeer localPeer )
     {
-        return peerManager;
-    }
-
-
-    public void setPeerManager( final PeerManager peerManager )
-    {
-        this.peerManager = peerManager;
-    }
-
-
-    public Broker getBroker()
-    {
-        return broker;
+        this.localPeer = localPeer;
     }
 
 
@@ -193,6 +182,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
             {
                 throw new NodeRegistrationException( "Failed adding resource host registration request to queue", ex );
             }
+            checkManagement( registrationRequest );
         }
     }
 
@@ -224,31 +214,40 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
         client.query( "Message", encoded ).delete();
     }
 
-    private Set<String> getTunnelNetworks(final Set<Peer> peers) {
+
+    private Set<String> getTunnelNetworks( final Set<Peer> peers )
+    {
         Set<String> result = new HashSet<>();
 
-        for (Peer peer : peers) {
+        for ( Peer peer : peers )
+        {
             Set<HostInterfaceModel> r = null;
-            try {
-                r = peer.getInterfaces().filterByIp(N2NUtil.N2N_INTERFACE_IP_PATTERN);
-            } catch (PeerException e) {
+            try
+            {
+                r = peer.getInterfaces().filterByIp( P2PUtil.P2P_INTERFACE_IP_PATTERN );
+            }
+            catch ( PeerException e )
+            {
                 e.printStackTrace();
             }
 
-            Collection tunnels = CollectionUtils.collect(r, new Transformer() {
+            Collection tunnels = CollectionUtils.collect( r, new Transformer()
+            {
                 @Override
-                public Object transform(final Object o) {
-                    HostInterface i = (HostInterface) o;
-                    SubnetUtils u = new SubnetUtils(i.getIp(), N2NUtil.N2N_SUBNET_MASK);
+                public Object transform( final Object o )
+                {
+                    HostInterface i = ( HostInterface ) o;
+                    SubnetUtils u = new SubnetUtils( i.getIp(), P2PUtil.P2P_SUBNET_MASK );
                     return u.getInfo().getNetworkAddress();
                 }
-            });
+            } );
 
-            result.addAll(tunnels);
+            result.addAll( tunnels );
         }
 
         return result;
     }
+
 
     @Override
     public void approveRequest( final String requestId )
@@ -269,10 +268,14 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
 
         for ( final ContainerInfo containerInfo : registrationRequest.getHostInfos() )
         {
-            importHostPublicKey( containerInfo.getId(), containerInfo.getPublicKey() );
+            if ( !"management".equals( containerInfo.getHostname() ) )
+            {
+                importHostPublicKey( containerInfo.getId(), containerInfo.getPublicKey() );
+            }
         }
 
-        processEnvironmentImport( registrationRequest );
+        //TODO @Talas implement this method correctly asap. Temporarily disabling it
+        //processEnvironmentImport( registrationRequest );
     }
 
 
@@ -329,7 +332,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
             }
 
 
-            if ( containerInfo.getVlan() != 0 )
+            if ( containerInfo.getVlan() != null && containerInfo.getVlan() != 0 )
             {
                 groupedContainers.put( containerInfo.getTemplateName(), group );
                 groupedContainersByVlan.put( containerInfo.getVlan(), groupedContainers );
@@ -344,12 +347,10 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
         Map<Integer, Map<String, Set<ContainerInfo>>> groupedContainersByVlan =
                 groupContainersByVlan( registrationRequest.getHostInfos() );
 
-        LocalPeer localPeer = peerManager.getLocalPeer();
-
         for ( final Map.Entry<Integer, Map<String, Set<ContainerInfo>>> mapEntry : groupedContainersByVlan.entrySet() )
         {
             //TODO: check this run. Topology constructor changed
-            Topology topology = new Topology( "Imported-environment", null, null, null );
+            Topology topology = new Topology( "Imported-environment", 0, 0 );
             Map<String, Set<ContainerInfo>> rawNodeGroup = mapEntry.getValue();
             Map<NodeGroup, Set<ContainerHostInfo>> classification = Maps.newHashMap();
 
@@ -357,10 +358,11 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
             {
                 //place where to create node groups
                 String templateName = entry.getKey();
+                //TODO: please change this distribution
                 NodeGroup nodeGroup =
-                        new NodeGroup( String.format( "%s_group", templateName ), templateName, entry.getValue().size(),
-                                1, 1, new PlacementStrategy( "ROUND_ROBIN" ), localPeer.getId() );
-                topology.addNodeGroupPlacement( localPeer, nodeGroup );
+                        new NodeGroup( String.format( "%s_group", templateName ), templateName, ContainerSize.SMALL, 1,
+                                1, localPeer.getId(), registrationRequest.getId() );
+                topology.addNodeGroupPlacement( localPeer.getId(), nodeGroup );
 
                 Set<ContainerHostInfo> converter = Sets.newHashSet();
                 converter.addAll( entry.getValue() );
@@ -371,7 +373,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
             {
                 Environment environment = environmentManager
                         .importEnvironment( String.format( "environment_%d", mapEntry.getKey() ), topology,
-                                classification, "", mapEntry.getKey() );
+                                classification, mapEntry.getKey() );
 
                 //Save container gateway from environment configuration to update container network configuration
                 // later when it will be available
@@ -408,19 +410,18 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
 
 
     @Override
-    public void onHeartbeat( final ResourceHostInfo resourceHostInfo, Set<ResourceAlert> alerts )
+    public void onHeartbeat( final ResourceHostInfo resourceHostInfo, Set<QuotaAlertValue> alerts )
     {
         RequestedHostImpl requestedHost = requestDataService.find( resourceHostInfo.getId() );
         if ( requestedHost != null && requestedHost.getStatus() == RegistrationStatus.APPROVED )
         {
-            LocalPeer localPeer = peerManager.getLocalPeer();
             try
             {
                 ResourceHost resourceHost = localPeer.getResourceHostById( resourceHostInfo.getId() );
                 Map<Integer, Set<ContainerHost>> containerHostList = Maps.newHashMap();
                 for ( final ContainerInfo containerInfo : requestedHost.getHostInfos() )
                 {
-                    if ( containerInfo.getState().equals( RegistrationStatus.APPROVED )
+                    if ( RegistrationStatus.APPROVED.equals( containerInfo.getState() )
                             && containerInfo.getVlan() != 0 )
                     {
 
@@ -465,7 +466,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
         //so pick one container's domain name as the group domain name
         networkManager.registerHosts( containerHosts, domainName );
 
-        networkManager.exchangeSshKeys( containerHosts );
+        networkManager.exchangeSshKeys( containerHosts, Sets.<String>newHashSet() );
     }
 
 
@@ -477,46 +478,50 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
 
 
     @Override
-    public void deployResourceHost(List<String> args) throws NodeRegistrationException {
-        ManagementHost managementHost = null;
+    public void deployResourceHost( List<String> args ) throws NodeRegistrationException
+    {
+        Host managementHost = null;
         CommandResult result;
 
-        try {
-            managementHost = peerManager.getLocalPeer().getManagementHost();
+        try
+        {
+            managementHost = localPeer.getManagementHost();
 
-            Set<Peer> peers = Sets.newHashSet(managementHost.getPeer());
+            Set<Peer> peers = Sets.newHashSet( managementHost.getPeer() );
 
-            Set<String> existingNetworks = getTunnelNetworks(peers);
+            Set<String> existingNetworks = getTunnelNetworks( peers );
 
-            String freeTunnelNetwork = N2NUtil.findFreeTunnelNetwork(existingNetworks);
-            args.add("-I");
-            freeTunnelNetwork = freeTunnelNetwork.substring(0, freeTunnelNetwork.length() - 1)+
-            (Integer.valueOf(freeTunnelNetwork.substring(freeTunnelNetwork.length()-1))+1);
-            args.add(freeTunnelNetwork);
+            String freeTunnelNetwork = P2PUtil.findFreeTunnelNetwork( existingNetworks );
+            args.add( "-I" );
+            freeTunnelNetwork = freeTunnelNetwork.substring( 0, freeTunnelNetwork.length() - 1 ) + (
+                    Integer.valueOf( freeTunnelNetwork.substring( freeTunnelNetwork.length() - 1 ) ) + 1 );
+            args.add( freeTunnelNetwork );
 
-            int ipOctet = (Integer.valueOf(freeTunnelNetwork.substring(freeTunnelNetwork.length()-1))+1);
-            String ipRh = freeTunnelNetwork.substring(0, freeTunnelNetwork.length() - 1) + ipOctet;
-            args.add("-i");
-            args.add(ipRh);
+            int ipOctet = ( Integer.valueOf( freeTunnelNetwork.substring( freeTunnelNetwork.length() - 1 ) ) + 1 );
+            String ipRh = freeTunnelNetwork.substring( 0, freeTunnelNetwork.length() - 1 ) + ipOctet;
+            args.add( "-i" );
+            args.add( ipRh );
 
-            String communityName = N2NUtil.generateCommunityName(freeTunnelNetwork);
-            args.add("-n");
-            args.add(communityName);
+            String communityName = P2PUtil.generateCommunityName( freeTunnelNetwork );
+            args.add( "-n" );
+            args.add( communityName );
 
-            String deviceName = N2NUtil.generateInterfaceName(freeTunnelNetwork);
-            args.add("-d");
-            args.add(deviceName);
+            String deviceName = P2PUtil.generateInterfaceName( freeTunnelNetwork );
+            args.add( "-d" );
+            args.add( deviceName );
             String runUser = "root";
-            result = managementHost
-                    .execute(new RequestBuilder("/apps/subutai-mng/current/awsdeploy/awsdeploy")
-                            .withCmdArgs(args)
-                            .withRunAs(runUser)
-                            .withTimeout(600));
+            result = managementHost.execute(
+                    new RequestBuilder( "/apps/subutai-mng/current/awsdeploy/awsdeploy" ).withCmdArgs( args )
+                                                                                         .withRunAs( runUser )
+                                                                                         .withTimeout( 600 ) );
 
-            if (result.getExitCode() != 0) {
-                throw new NodeRegistrationException(result.getStdErr());
+            if ( result.getExitCode() != 0 )
+            {
+                throw new NodeRegistrationException( result.getStdErr() );
             }
-        } catch (HostNotFoundException | CommandException e) {
+        }
+        catch ( HostNotFoundException | CommandException e )
+        {
             e.printStackTrace();
         }
     }
@@ -565,5 +570,48 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
             throw new NodeRegistrationException( "Failed to store container pubkey", ex );
         }
         return containerToken;
+    }
+
+
+    private void checkManagement( RequestedHost requestedHost )
+    {
+        try
+        {
+            try
+            {
+                localPeer.getManagementHost();
+            }
+            catch ( HostNotFoundException nfe )
+            {
+                String requestId = findManagementNode( requestedHost );
+                if ( requestId != null
+                        && requestedHost.getStatus() == io.subutai.core.registration.api.RegistrationStatus.REQUESTED )
+                {
+                    approveRequest( requestId );
+                }
+            }
+        }
+        catch ( Exception e )
+        {
+            // ignore
+        }
+    }
+
+
+    private String findManagementNode( RequestedHost h )
+    {
+        String result = null;
+        if ( h.getStatus() == io.subutai.core.registration.api.RegistrationStatus.REQUESTED )
+        {
+            for ( HostInfo info : h.getHostInfos() )
+            {
+                if ( "management".equalsIgnoreCase( info.getHostname() ) )
+                {
+                    result = h.getId();
+                    break;
+                }
+            }
+        }
+        return result;
     }
 }

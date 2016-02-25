@@ -1,6 +1,7 @@
 package io.subutai.core.broker.impl;
 
 
+import java.io.File;
 import java.io.PrintStream;
 import java.util.concurrent.ExecutorService;
 
@@ -102,6 +103,8 @@ public class BrokerImplTest
     TimeStampingBrokerPlugin timeStampingBrokerPlugin;
     @Mock
     ExecutorService messageSender;
+    @Mock
+    File mockDbFile;
 
     BrokerImpl broker;
 
@@ -193,6 +196,7 @@ public class BrokerImplTest
     @Test
     public void testInit() throws Exception
     {
+        doReturn( mockDbFile ).when( broker ).getBrokerDbPath();
         broker.init();
     }
 

@@ -1,7 +1,6 @@
 package io.subutai.core.network.impl;
 
 
-import java.util.List;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -9,7 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
@@ -30,7 +29,7 @@ public class SshManager
     private Set<ContainerHost> containerHosts;
     private Commands commands;
 
-    protected List<String> keys;
+    protected Set<String> keys;
     protected CommandUtil commandUtil;
 
 
@@ -40,7 +39,7 @@ public class SshManager
         this.containerHosts = containerHosts;
         this.commands = new Commands();
         this.commandUtil = new CommandUtil();
-        this.keys = Lists.newArrayList();
+        this.keys = Sets.newHashSet();
     }
 
 
@@ -103,39 +102,24 @@ public class SshManager
     }
 
 
-    public void execute() throws NetworkManagerException
+    public void execute( Set<String> additionalSshKeys, boolean justAdd ) throws NetworkManagerException
     {
-        create();
-        read();
-        write();
+        if ( !justAdd )
+        {
+            createAndRead();
+        }
+        write( additionalSshKeys );
         config();
     }
 
 
-    protected void create() throws NetworkManagerException
+    protected void createAndRead() throws NetworkManagerException
     {
         for ( ContainerHost host : containerHosts )
         {
             try
             {
-                commandUtil.execute( commands.getCreateSSHCommand(), host );
-            }
-            catch ( CommandException e )
-            {
-                LOG.error( String.format( "Error in create: %s", e.getMessage() ), e );
-                throw new NetworkManagerException( e );
-            }
-        }
-    }
-
-
-    protected void read() throws NetworkManagerException
-    {
-        for ( ContainerHost host : containerHosts )
-        {
-            try
-            {
-                CommandResult command = commandUtil.execute( commands.getReadSSHCommand(), host );
+                CommandResult command = commandUtil.execute( commands.getCreateNReadSSHCommand(), host );
                 if ( !Strings.isNullOrEmpty( command.getStdOut() ) )
                 {
                     keys.add( command.getStdOut() );
@@ -143,7 +127,7 @@ public class SshManager
             }
             catch ( CommandException e )
             {
-                LOG.error( String.format( "Error in read: %s", e.getMessage() ), e );
+                LOG.error( String.format( "Error in createAndRead: %s", e.getMessage() ), e );
                 throw new NetworkManagerException( e );
             }
         }
@@ -155,23 +139,28 @@ public class SshManager
     }
 
 
-    protected void write() throws NetworkManagerException
+    protected void write( Set<String> additionalSshKeys ) throws NetworkManagerException
     {
+        if ( !CollectionUtil.isCollectionEmpty( additionalSshKeys ) )
+        {
+            keys.addAll( additionalSshKeys );
+        }
+
         for ( ContainerHost host : containerHosts )
         {
             int i = 0;
-            StringBuilder keyBuilder = new StringBuilder();
+            StringBuilder keysString = new StringBuilder();
             for ( String key : keys )
             {
-                keyBuilder.append( key );
+                keysString.append( key );
                 i++;
                 if ( i % 5 == 0 || i == keys.size() )
                 {
                     try
                     {
-                        commandUtil.execute( commands.getAppendSshKeyCommand( keyBuilder.toString() ), host );
+                        commandUtil.execute( commands.getCreateNewAuthKeysFileCommand( keysString.toString() ), host );
 
-                        keyBuilder.setLength( 0 );
+                        keysString.setLength( 0 );
                     }
                     catch ( CommandException e )
                     {

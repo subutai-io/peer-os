@@ -74,6 +74,63 @@
     </command>
   </command-bundle>
 
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="peer/policy">
+      <action class="io.subutai.core.peer.cli.PeerPolicyCommand">
+        <property name="peerManager" ref="peerManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="peer/limits">
+      <action class="io.subutai.core.peer.cli.GetResourceLimits">
+        <argument ref="peerManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="peer/control-network-update">
+      <action class="io.subutai.core.peer.cli.UpdateControlNetworkCommand">
+        <property name="peerManager" ref="peerManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="peer/distances">
+      <action class="io.subutai.core.peer.cli.GetCommunityDistancesCommand">
+        <property name="peerManager" ref="peerManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="peer/set-public-url">
+      <action class="io.subutai.core.peer.cli.SetPublicUrlCommand">
+        <argument ref="peerManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="peer/reject">
+      <action class="io.subutai.core.peer.cli.RejectPeerCommand">
+        <property name="peerManager" ref="peerManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="peer/unregister">
+      <action class="io.subutai.core.peer.cli.UnregisterPeerCommand">
+        <property name="peerManager" ref="peerManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+
   <reference id="peerManager" availability="mandatory" interface="io.subutai.core.peer.api.PeerManager" />
   <reference id="identityManager" availability="mandatory"
              interface="io.subutai.core.identity.api.IdentityManager" />

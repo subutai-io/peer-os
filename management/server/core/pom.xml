@@ -5,7 +5,7 @@
   <parent>
     <groupId>io.subutai</groupId>
     <artifactId>mgmt-server-parent</artifactId>
-    <version>4.0.0-RC5</version>
+    <version>4.0.0-RC6</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
@@ -30,7 +30,6 @@
     <module>broker</module>
     <module>host-registry</module>
     <module>command-executor</module>
-    <module>plugin-manager</module>
     <module>identity-manager</module>
     <module>channel-manager</module>
     <module>cli-controller</module>
@@ -40,6 +39,11 @@
     <module>environment-manager</module>
     <module>test</module>
     <module>kurjun</module>
+    <module>object-relation-manager</module>
+    <module>system-manager</module>
+    <module>bazaar-integration</module>
+    <module>hub-manager</module>
+    <module>common-plugin</module>
   </modules>
 
 </project>

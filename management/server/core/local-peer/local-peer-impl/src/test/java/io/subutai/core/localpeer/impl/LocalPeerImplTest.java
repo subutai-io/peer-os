@@ -2,8 +2,12 @@ package io.subutai.core.localpeer.impl;
 
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
 import org.junit.Before;
 import org.junit.Ignore;
@@ -25,10 +29,15 @@ import io.subutai.common.dao.DaoManager;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.HostInterfaceModel;
+import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.ResourceHostInfo;
-import io.subutai.common.metric.ResourceAlert;
+import io.subutai.common.metric.QuotaAlertValue;
+import io.subutai.common.network.Gateways;
 import io.subutai.common.network.Vni;
+import io.subutai.common.network.Vnis;
 import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
@@ -43,36 +52,40 @@ import io.subutai.common.peer.RequestListener;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.protocol.TemplateKurjun;
+import io.subutai.common.protocol.Tunnel;
+import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.quota.QuotaException;
-import io.subutai.common.resource.ResourceType;
-import io.subutai.common.resource.ResourceValue;
+import io.subutai.common.resource.ByteValueResource;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.ExceptionUtil;
+import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.kurjun.api.TemplateManager;
-import io.subutai.core.localpeer.impl.dao.ManagementHostDataService;
 import io.subutai.core.localpeer.impl.dao.ResourceHostDataService;
 import io.subutai.core.localpeer.impl.entity.ContainerHostEntity;
-import io.subutai.core.localpeer.impl.entity.ManagementHostEntity;
 import io.subutai.core.localpeer.impl.entity.ResourceHostEntity;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
+import io.subutai.core.network.api.NetworkManager;
+import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.peer.api.PeerManager;
+import io.subutai.core.repository.api.RepositoryManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.strategy.api.StrategyManager;
-import junit.framework.TestCase;
 
-import static junit.framework.Assert.assertTrue;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertNotNull;
+import static junit.framework.TestCase.assertNull;
+import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.fail;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anySet;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -108,17 +121,32 @@ public class LocalPeerImplTest
     private static final int QUOTA = 123;
     private static final String ALIAS = "alias";
     private static final String CERT = "cert";
-    private static final String N2N_IP = "10.11.0.1";
+    private static final String P2P_IP = "10.11.0.1";
     private static final String RAMQUOTA = "123M";
     private static final String CPUQUOTA = "123";
+    private static final String HOST_ID = UUID.randomUUID().toString();
+    private static final String ENV_ID = UUID.randomUUID().toString();
+    private static final String NAME = "name";
+    private static final String HOSTNAME = "hostname";
+    private static final HostArchitecture ARCH = HostArchitecture.AMD64;
+    private static final String INTERFACE_NAME = "eth0";
+    private static final String MAC = "mac";
+    private static final int VLAN = 100;
+    private static final int VNI = 10000;
+    private static final int TUNNEL_ID = 123;
 
+    @Mock
+    NetworkManager networkManager;
+
+    @Mock
+    RepositoryManager repositoryManager;
 
     @Mock
     PeerManager peerManager;
     @Mock
     TemplateManager templateRegistry;
     @Mock
-    ManagementHostEntity managementHost;
+    Host managementHost;
     @Mock
     CommandExecutor commandExecutor;
     @Mock
@@ -130,16 +158,10 @@ public class LocalPeerImplTest
     @Mock
     IdentityManager identityManager;
     @Mock
-    ManagementHostDataService managementHostDataService;
-    @Mock
     HostRegistry hostRegistry;
     @Mock
     RequestListener requestListener;
 
-    //    @Mock
-    //    ContainerHostDataService containerHostDataService;
-    //    @Mock
-    //    ContainerGroupDataService containerGroupDataService;
     @Mock
     ResourceHostDataService resourceHostDataService;
     @Mock
@@ -162,8 +184,7 @@ public class LocalPeerImplTest
     TemplateKurjun template;
     @Mock
     ContainerHostInfoModel containerHostInfoModel;
-    //    @Mock
-    //    ContainerGroupEntity containerGroup;
+
     @Mock
     CommandException commandException;
     @Mock
@@ -192,32 +213,60 @@ public class LocalPeerImplTest
     private ContainerGateway containerGateway;
 
     @Mock
-    private ResourceValue cpuQuota;
+    private ByteValueResource cpuQuota;
     @Mock
     private EnvironmentId environmentId;
 
     @Mock
-    private ResourceAlert resourceAlert;
+    private QuotaAlertValue quotaAlertValue;
+
+    @Mock
+    private ServiceLocator serviceLocator;
+
+    @Mock
+    private HostInterfaces hostInterfaces;
+
+    @Mock
+    private HostInterfaceModel anHostInterface;
+
+    @Mock
+    private ExecutorService singleThreadExecutorService;
+
+    @Mock
+    Callable callable;
+
+    @Mock
+    Future future;
 
 
     @Before
     public void setUp() throws Exception
     {
+        when( peerInfo.getId() ).thenReturn( LOCAL_PEER_ID );
+        when( peerInfo.getName() ).thenReturn( LOCAL_PEER_NAME );
+        when( peerInfo.getOwnerId() ).thenReturn( OWNER_ID );
+        when( peerInfo.getIp() ).thenReturn( IP );
+
+        when( anHostInterface.getName() ).thenReturn( INTERFACE_NAME );
+        when( anHostInterface.getIp() ).thenReturn( IP );
+        when( anHostInterface.getMac() ).thenReturn( MAC );
+
         peerMap = new HashMap<>();
-        peerMap.put( IP, N2N_IP );
-        localPeer =
-                spy( new LocalPeerImpl( daoManager, templateRegistry, quotaManager, strategyManager, commandExecutor,
-                        hostRegistry, monitor, securityManager ) );
+        peerMap.put( IP, P2P_IP );
+        localPeer = spy( new LocalPeerImpl( daoManager, templateRegistry, quotaManager,/* strategyManager,*/
+                commandExecutor, hostRegistry, monitor, securityManager ) );
 
         //        localPeer.containerHostDataService = containerHostDataService;
         //        localPeer.containerGroupDataService = containerGroupDataService;
         localPeer.resourceHostDataService = resourceHostDataService;
-        localPeer.managementHostDataService = managementHostDataService;
+        //        localPeer.managementHostDataService = managementHostDataService;
         localPeer.resourceHosts = Sets.newHashSet( ( ResourceHost ) resourceHost );
         localPeer.commandUtil = commandUtil;
         localPeer.exceptionUtil = exceptionUtil;
         localPeer.managementHost = managementHost;
         localPeer.requestListeners = Sets.newHashSet( requestListener );
+        localPeer.setPeerInfo( peerInfo );
+        //        localPeer.setExternalIpInterface( INTERFACE_NAME );
 
         //        when( cpuQuota.getValue( MeasureUnit.PERCENT ).intValue() ).thenReturn( Integer.parseInt( CPUQUOTA
         // ) );
@@ -226,6 +275,9 @@ public class LocalPeerImplTest
 
         when( daoManager.getEntityManagerFactory() ).thenReturn( entityManagerFactory );
         when( managementHost.getId() ).thenReturn( MANAGEMENT_HOST_ID );
+        when( managementHost.getHostInterfaces() ).thenReturn( hostInterfaces );
+        when( managementHost.getInterfaceByName( INTERFACE_NAME ) ).thenReturn( anHostInterface );
+
         when( resourceHost.getId() ).thenReturn( RESOURCE_HOST_ID );
         when( containerHost.getId() ).thenReturn( CONTAINER_HOST_ID );
         when( containerHost.getContainerId() ).thenReturn( containerId );
@@ -235,14 +287,8 @@ public class LocalPeerImplTest
         when( containerId.getPeerId() ).thenReturn( peerId );
         when( resourceHost.getContainerHostById( CONTAINER_HOST_ID ) ).thenReturn( containerHost );
         when( resourceHost.getHostname() ).thenReturn( RESOURCE_HOST_NAME );
-        when( localPeer.getPeerInfo() ).thenReturn( peerInfo );
         when( securityManager.getKeyManager() ).thenReturn( keyManager );
-        localPeer.peerInfo = peerInfo;
-        when( peerInfo.getId() ).thenReturn( LOCAL_PEER_ID );
-        when( peerInfo.getName() ).thenReturn( LOCAL_PEER_NAME );
-        when( peerInfo.getOwnerId() ).thenReturn( OWNER_ID );
         when( resourceHostDataService.getAll() ).thenReturn( Sets.newHashSet( resourceHost ) );
-        when( managementHostDataService.getAll() ).thenReturn( Sets.newHashSet( managementHost ) );
         when( templateRegistry.getTemplate( TEMPLATE_NAME ) ).thenReturn( template );
         when( template.getName() ).thenReturn( TEMPLATE_NAME );
         when( resourceHost.isConnected() ).thenReturn( true );
@@ -264,25 +310,41 @@ public class LocalPeerImplTest
         when( resourceHost.getContainerHosts() ).thenReturn( Sets.<ContainerHost>newHashSet( containerHost ) );
         when( requestListener.getRecipient() ).thenReturn( RECIPIENT );
         doReturn( RESPONSE ).when( requestListener ).onRequest( any( Payload.class ) );
+
+        peerMap = new HashMap<>();
+        peerMap.put( IP, P2P_IP );
+        when( environmentId.getId() ).thenReturn( ENV_ID );
+        when( hostInfo.getId() ).thenReturn( HOST_ID );
+        when( hostInfo.getHostname() ).thenReturn( HOSTNAME );
+        when( hostInfo.getArch() ).thenReturn( ARCH );
+        when( hostInterfaces.getAll() ).thenReturn( Sets.newHashSet( anHostInterface ) );
+        when( hostInfo.getHostInterfaces() ).thenReturn( hostInterfaces );
+
+        localPeer.singleThreadExecutorService = singleThreadExecutorService;
+        localPeer.serviceLocator = serviceLocator;
+        when( singleThreadExecutorService.submit( any( Callable.class ) ) ).thenReturn( future );
+        when( serviceLocator.getService( RepositoryManager.class ) ).thenReturn( repositoryManager );
+        when( serviceLocator.getService( NetworkManager.class ) ).thenReturn( networkManager );
+        //        when( localPeer.getManagementHost() ).thenReturn( managementHost );
     }
 
 
     @Test
     public void testInit() throws Exception
     {
-        doReturn( managementHostDataService ).when( localPeer ).createManagementHostDataService();
+        //        doReturn( managementHostDataService ).when( localPeer ).createManagementHostDataService();
         doReturn( resourceHostDataService ).when( localPeer ).createResourceHostDataService();
         //        doNothing().when( localPeer ).initPeerInfo( any( PeerDAO.class ) );
 
         localPeer.init();
     }
 
-
-    @Test
-    public void testGetManagementHostDataService() throws Exception
-    {
-        assertNotNull( localPeer.createManagementHostDataService() );
-    }
+    //
+    //    @Test
+    //    public void testGetManagementHostDataService() throws Exception
+    //    {
+    //        assertNotNull( localPeer.createManagementHostDataService() );
+    //    }
 
 
     @Test
@@ -296,8 +358,6 @@ public class LocalPeerImplTest
     public void testDispose() throws Exception
     {
         localPeer.dispose();
-
-        verify( managementHost ).dispose();
 
         verify( resourceHost ).dispose();
     }
@@ -327,7 +387,7 @@ public class LocalPeerImplTest
     @Test
     public void testGetPeerInfo() throws Exception
     {
-        assertEquals( peerInfo, localPeer.getPeerInfo() );
+        //        assertEquals( peerInfo, localPeer.getPeerInfo() );
     }
 
 
@@ -474,8 +534,6 @@ public class LocalPeerImplTest
     public void testBindHost() throws Exception
     {
 
-        assertEquals( managementHost, localPeer.bindHost( MANAGEMENT_HOST_ID ) );
-
         assertEquals( resourceHost, localPeer.bindHost( RESOURCE_HOST_ID ) );
 
         assertEquals( containerHost, localPeer.bindHost( CONTAINER_HOST_ID ) );
@@ -574,7 +632,7 @@ public class LocalPeerImplTest
 
         when( hostRegistry.getHostInfoById( CONTAINER_HOST_ID ) ).thenReturn( hostInfo );
 
-        TestCase.assertTrue( localPeer.isConnected( containerHost.getContainerId() ) );
+        assertTrue( localPeer.isConnected( containerHost.getContainerId() ) );
 
         HostDisconnectedException hostDisconnectedException = mock( HostDisconnectedException.class );
 
@@ -590,28 +648,28 @@ public class LocalPeerImplTest
     @Ignore
     public void testGetQuotaInfo() throws Exception
     {
-        localPeer.getQuota( containerHost, ResourceType.CPU );
+        localPeer.getQuota( containerId );
 
-        verify( quotaManager ).getQuota( containerId, ResourceType.CPU );
+        verify( quotaManager ).getQuota( containerId );
 
-        doThrow( new QuotaException( "" ) ).when( quotaManager ).getQuota( containerId, ResourceType.CPU );
+        doThrow( new QuotaException( "" ) ).when( quotaManager ).getQuota( containerId );
 
-        localPeer.getQuota( containerHost, ResourceType.CPU );
+        localPeer.getQuota( containerId );
     }
 
 
     @Test( expected = PeerException.class )
     public void testSetQuota() throws Exception
     {
-        ResourceValue quotaInfo = mock( ResourceValue.class );
+        ContainerQuota quotaInfo = mock( ContainerQuota.class );
 
-        localPeer.setQuota( containerHost, ResourceType.RAM, quotaInfo );
+        localPeer.setQuota( containerId, quotaInfo );
 
-        verify( quotaManager ).setQuota( containerId, ResourceType.RAM, quotaInfo );
+        verify( quotaManager ).setQuota( containerId, quotaInfo );
 
-        doThrow( new QuotaException( "" ) ).when( quotaManager ).setQuota( containerId, ResourceType.RAM, quotaInfo );
+        doThrow( new QuotaException( "" ) ).when( quotaManager ).setQuota( containerId, quotaInfo );
 
-        localPeer.setQuota( containerHost, ResourceType.RAM, quotaInfo );
+        localPeer.setQuota( containerId, quotaInfo );
     }
 
 
@@ -753,7 +811,6 @@ public class LocalPeerImplTest
     }
 
 
-    @Ignore
     @Test
     public void testOnHeartbeat() throws Exception
     {
@@ -761,20 +818,16 @@ public class LocalPeerImplTest
         when( resourceHostInfo.getId() ).thenReturn( MANAGEMENT_HOST_ID );
 
         localPeer.initialized = true;
-        localPeer.onHeartbeat( resourceHostInfo, Sets.newHashSet( resourceAlert ) );
-
-        verify( managementHost ).updateHostInfo( resourceHostInfo );
+        localPeer.onHeartbeat( resourceHostInfo, Sets.newHashSet( quotaAlertValue ) );
 
         localPeer.managementHost = null;
 
-        localPeer.onHeartbeat( resourceHostInfo, Sets.newHashSet( resourceAlert ) );
-
-        verify( managementHostDataService ).persist( any( ManagementHostEntity.class ) );
+        localPeer.onHeartbeat( resourceHostInfo, Sets.newHashSet( quotaAlertValue ) );
 
         when( resourceHostInfo.getHostname() ).thenReturn( RESOURCE_HOST_NAME );
         when( resourceHostInfo.getId() ).thenReturn( RESOURCE_HOST_ID );
 
-        localPeer.onHeartbeat( resourceHostInfo, Sets.newHashSet( resourceAlert ) );
+        localPeer.onHeartbeat( resourceHostInfo, Sets.newHashSet( quotaAlertValue ) );
 
         verify( resourceHost ).updateHostInfo( resourceHostInfo );
 
@@ -791,22 +844,14 @@ public class LocalPeerImplTest
 
         when( resourceHostInfo.getContainers() ).thenReturn( Sets.newHashSet( containerHostInfo1 ) );
 
-        //        localPeer.updateResourceHostContainers( resourceHost, resourceHostInfo.getContainers() );
 
         resourceHost.updateHostInfo( resourceHostInfo );
 
-        //        verify( containerHostDataService ).persist( any( ContainerHostEntity.class ) );
-        //
-        //        verify( containerHostDataService ).remove( CONTAINER_HOST_ID.toString() );
 
         when( resourceHostInfo.getContainers() ).thenReturn( Sets.newHashSet( containerHostInfo ) );
 
-        //        doReturn( containerHost ).when( containerHostDataService ).find( anyString() );
 
-        //        localPeer.updateResourceHostContainers( resourceHost, resourceHostInfo.getContainers() );
         resourceHost.updateHostInfo( resourceHostInfo );
-
-        //        verify( containerHostDataService ).update( any( ContainerHostEntity.class ) );
     }
 
 
@@ -826,13 +871,13 @@ public class LocalPeerImplTest
     @Test( expected = PeerException.class )
     public void testGetRamQuota() throws Exception
     {
-        localPeer.getQuota( containerHost, ResourceType.RAM );
+        localPeer.getQuota( containerId );
 
-        verify( quotaManager ).getQuota( containerId, ResourceType.RAM );
+        verify( quotaManager ).getQuota( containerId );
 
-        doThrow( new QuotaException( "" ) ).when( quotaManager ).getQuota( containerId, ResourceType.RAM );
+        doThrow( new QuotaException( "" ) ).when( quotaManager ).getQuota( containerId );
 
-        localPeer.getQuota( containerHost, ResourceType.RAM );
+        localPeer.getQuota( containerId );
     }
 
 
@@ -862,40 +907,65 @@ public class LocalPeerImplTest
     }
 
 
+    @Test( expected = PeerException.class )
+    public void testRemoveGateway() throws Exception
+    {
+        localPeer.removeGateway( VLAN );
+
+        verify( networkManager ).removeGateway( VLAN );
+
+        doThrow( new NetworkManagerException( "" ) ).when( networkManager ).removeGateway( VLAN );
+
+        localPeer.removeGateway( VLAN );
+    }
+
+
+    @Test( expected = PeerException.class )
+    public void testCleanupEnvironmentNetworkSettings() throws Exception
+    {
+        localPeer.cleanupEnvironmentNetworkSettings( environmentId );
+
+        verify( networkManager ).cleanupEnvironmentNetworkSettings( environmentId );
+
+        doThrow( new NetworkManagerException( "" ) ).when( networkManager )
+                                                    .cleanupEnvironmentNetworkSettings( environmentId );
+
+        localPeer.cleanupEnvironmentNetworkSettings( environmentId );
+    }
+
+
+    @Test( expected = PeerException.class )
+    public void testListTunnels() throws Exception
+    {
+        localPeer.listTunnels();
+
+        verify( networkManager ).listTunnels();
+
+        doThrow( new NetworkManagerException( "" ) ).when( networkManager ).listTunnels();
+
+        localPeer.listTunnels();
+    }
+
+
     @Test
+    public void testRemoveTunnel() throws Exception
+    {
+        Tunnel tunnel = mock( Tunnel.class );
+        when( networkManager.listTunnels() ).thenReturn( Sets.newHashSet( tunnel ) );
+        when( tunnel.getTunnelIp() ).thenReturn( IP );
+
+        localPeer.removeTunnel( IP );
+
+        verify( networkManager ).removeTunnel( anyInt() );
+    }
+
+
+    @Test
+    @Ignore
     public void testGetGateways() throws Exception
     {
-        localPeer.getGateways();
+        Gateways gateways = localPeer.getGateways();
 
-        verify( managementHost ).getGateways();
-    }
-
-
-    @Test
-    public void testReserveVni() throws Exception
-    {
-        Vni vni = mock( Vni.class );
-
-        localPeer.reserveVni( vni );
-
-        verify( managementHost ).reserveVni( vni );
-    }
-
-
-    @Test
-    public void testGetReservedVnis() throws Exception
-    {
-        localPeer.getReservedVnis();
-
-        verify( managementHost ).getReservedVnis();
-    }
-
-
-    @Test
-    public void testSetupTunnels() throws Exception
-    {
-        localPeer.setupTunnels( peerMap, ENVIRONMENT_ID );
-
-        verify( managementHost ).setupTunnels( peerMap, ENVIRONMENT_ID );
+        assertEquals( 1, gateways.list().size() );
     }
 }

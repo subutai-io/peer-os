@@ -7,7 +7,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.command.CommandException;
@@ -17,12 +16,10 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.core.network.api.NetworkManagerException;
 
-import static junit.framework.TestCase.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -49,7 +46,7 @@ public class SshManagerTest
         when( commandUtil.execute( any( RequestBuilder.class ), any( ContainerHost.class ) ) ).thenReturn( result );
         when( result.getStdOut() ).thenReturn( SSH_KEY );
         sshManager.commandUtil = commandUtil;
-        sshManager.keys = Lists.newArrayList( SSH_KEY );
+        sshManager.keys = Sets.newHashSet( SSH_KEY );
     }
 
 
@@ -113,55 +110,15 @@ public class SshManagerTest
 
 
     @Test( expected = NetworkManagerException.class )
-    public void testCreate() throws Exception
-    {
-        sshManager.create();
-
-        verifyCommandUtilExec();
-
-        throwCommandException();
-
-        sshManager.create();
-    }
-
-
-    @Test( expected = NetworkManagerException.class )
-    public void testRead() throws Exception
-    {
-        sshManager.read();
-
-        verifyCommandUtilExec();
-
-        sshManager.keys.clear();
-        reset( result );
-
-        try
-        {
-            sshManager.read();
-
-            fail( "Expected NetworkManagerException" );
-        }
-        catch ( NetworkManagerException e )
-        {
-
-        }
-
-        throwCommandException();
-
-        sshManager.read();
-    }
-
-
-    @Test( expected = NetworkManagerException.class )
     public void testWrite() throws Exception
     {
-        sshManager.write();
+        sshManager.write( Sets.<String>newHashSet() );
 
         verifyCommandUtilExec();
 
         throwCommandException();
 
-        sshManager.write();
+        sshManager.write( Sets.<String>newHashSet() );
     }
 
 
@@ -181,7 +138,7 @@ public class SshManagerTest
     @Test
     public void testExecute() throws Exception
     {
-        sshManager.execute();
+        sshManager.execute( Sets.<String>newHashSet(), false );
 
         verifyCommandUtilExec();
     }

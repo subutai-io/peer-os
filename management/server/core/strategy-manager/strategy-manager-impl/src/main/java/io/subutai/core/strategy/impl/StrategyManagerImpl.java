@@ -2,25 +2,18 @@ package io.subutai.core.strategy.impl;
 
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
-import io.subutai.common.metric.ResourceHostMetric;
-import io.subutai.common.metric.ResourceHostMetrics;
-import io.subutai.common.protocol.Criteria;
-import io.subutai.core.strategy.api.ContainerPlacementStrategy;
-import io.subutai.core.strategy.api.StrategyException;
-import io.subutai.core.strategy.api.StrategyManager;
-import io.subutai.core.strategy.api.StrategyNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
+
+import io.subutai.core.strategy.api.ContainerPlacementStrategy;
+import io.subutai.core.strategy.api.StrategyManager;
+import io.subutai.core.strategy.api.StrategyNotFoundException;
 
 
 /**
@@ -65,30 +58,30 @@ public class StrategyManagerImpl implements StrategyManager
     }
 
 
-    @Override
-    public Map<ResourceHostMetric, Integer> getPlacementDistribution( ResourceHostMetrics serverMetrics,
-                                                                      int nodesCount, String strategyId,
-                                                                      List<Criteria> criteria ) throws StrategyException
-    {
-        ContainerPlacementStrategy containerPlacementStrategy = findStrategyById( strategyId );
-
-        containerPlacementStrategy.calculatePlacement( nodesCount, serverMetrics, criteria );
-
-        Map<ResourceHostMetric, Integer> result = containerPlacementStrategy.getPlacementDistribution();
-        int totalSlots = 0;
-
-        for ( int slotCount : result.values() )
-        {
-            totalSlots += slotCount;
-        }
-
-        if ( totalSlots < nodesCount )
-        {
-            throw new StrategyException( String.format( "Only %d containers can be created", totalSlots ) );
-        }
-
-        return result;
-    }
+//    @Override
+//    public Map<ResourceHostMetric, Integer> getPlacementDistribution( ResourceHostMetrics serverMetrics,
+//                                                                      int nodesCount, String strategyId,
+//                                                                      List<Criteria> criteria ) throws StrategyException
+//    {
+//        ContainerPlacementStrategy containerPlacementStrategy = findStrategyById( strategyId );
+//
+//        containerPlacementStrategy.calculatePlacement( nodesCount, serverMetrics, criteria );
+//
+//        Map<ResourceHostMetric, Integer> result = containerPlacementStrategy.getPlacementDistribution();
+//        int totalSlots = 0;
+//
+//        for ( int slotCount : result.values() )
+//        {
+//            totalSlots += slotCount;
+//        }
+//
+//        if ( totalSlots < nodesCount )
+//        {
+//            throw new StrategyException( String.format( "Only %d containers can be created", totalSlots ) );
+//        }
+//
+//        return result;
+//    }
 
 
     @Override

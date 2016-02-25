@@ -11,6 +11,7 @@ import io.subutai.common.peer.MessageRequest;
 import io.subutai.common.peer.MessageResponse;
 import io.subutai.common.peer.Payload;
 import io.subutai.common.peer.Peer;
+import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.RecipientType;
 import io.subutai.common.peer.RequestListener;
 import io.subutai.common.peer.Timeouts;
@@ -89,7 +90,7 @@ public class RequestNotifier implements Runnable
                 messenger.sendMessage( sourcePeer, responseMessage, RecipientType.PEER_RESPONSE_LISTENER.name(),
                         Timeouts.PEER_MESSAGE_TIMEOUT, messageRequest.getHeaders() );
             }
-            catch ( MessageException e )
+            catch ( PeerException | MessageException e )
             {
                 LOG.error( "Error sending response to peer message", e );
             }

@@ -41,9 +41,5 @@
     <reference-listener ref="monitor"
                         bind-method="addAlertListener" unbind-method="removeAlertListener" />
   </reference-list>
-  <bean id="masterAlertListener" class="io.subutai.core.metric.impl.MasterAlertListener" scope="singleton"
-        activation="eager">
 
-  </bean>
-  <service ref="masterAlertListener" interface="io.subutai.common.peer.AlertListener" />
 </blueprint>

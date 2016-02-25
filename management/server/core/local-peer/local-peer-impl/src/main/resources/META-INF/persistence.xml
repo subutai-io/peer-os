@@ -7,7 +7,6 @@
     <non-jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=openjpa/subutaiDS)
     </non-jta-data-source>
     <class>io.subutai.core.localpeer.impl.entity.AbstractSubutaiHost</class>
-    <class>io.subutai.core.localpeer.impl.entity.ManagementHostEntity</class>
     <class>io.subutai.core.localpeer.impl.entity.ResourceHostEntity</class>
     <class>io.subutai.core.localpeer.impl.entity.ContainerHostEntity</class>
     <class>io.subutai.core.localpeer.impl.entity.TunnelEntity</class>
@@ -17,7 +16,7 @@
       <property name="openjpa.ConnectionFactoryProperties" value="PrintParameters=true" />
       <property name="openjpa.RuntimeUnenhancedClasses" value="supported" />
       <property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema" />
-      <property name="openjpa.jdbc.DBDictionary" value="h2" />
+      <property name="openjpa.jdbc.DBDictionary" value="derby" />
     </properties>
   </persistence-unit>
 

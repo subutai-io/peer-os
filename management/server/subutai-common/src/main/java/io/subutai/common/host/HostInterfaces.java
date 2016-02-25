@@ -23,18 +23,30 @@ public class HostInterfaces
 {
     private static final Logger LOG = LoggerFactory.getLogger( HostInterfaces.class );
 
-    @JsonProperty
+    @JsonProperty( "hostId" )
+    private String hostId;
+
+    @JsonProperty( "interfaces" )
     private Set<HostInterfaceModel> interfaces = new HashSet<>();
+
+
+    public HostInterfaces( @JsonProperty( "hostId" ) final String hostId,
+                           @JsonProperty( "interfaces" ) final Set<HostInterfaceModel> interfaces )
+    {
+        this.hostId = hostId;
+        this.interfaces = interfaces;
+    }
 
 
     public HostInterfaces()
     {
+
     }
 
 
-    public HostInterfaces( final Set<HostInterfaceModel> interfaces )
+    public String getHostId()
     {
-        this.interfaces = interfaces;
+        return hostId;
     }
 
 
@@ -60,7 +72,10 @@ public class HostInterfaces
     {
         Preconditions.checkNotNull( name );
         HostInterfaceModel result = NullHostInterface.getInstance();
-
+        if ( interfaces == null )
+        {
+            return result;
+        }
         for ( Iterator<HostInterfaceModel> i = interfaces.iterator();
               i.hasNext() && result instanceof NullHostInterface; )
         {
@@ -95,8 +110,7 @@ public class HostInterfaces
     public Set<HostInterfaceModel> filterByName( final String pattern )
     {
         Preconditions.checkNotNull( pattern );
-        Set<HostInterfaceModel> result = new HashSet<>();
-        result = Sets.filter( interfaces, new Predicate<HostInterfaceModel>()
+        return Sets.filter( interfaces, new Predicate<HostInterfaceModel>()
         {
             @Override
             public boolean apply( final HostInterfaceModel intf )
@@ -104,8 +118,6 @@ public class HostInterfaces
                 return intf.getName().matches( pattern );
             }
         } );
-
-        return result;
     }
 
 

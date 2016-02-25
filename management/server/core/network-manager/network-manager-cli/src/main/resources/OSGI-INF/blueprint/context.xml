@@ -4,15 +4,8 @@
              interface="io.subutai.core.network.api.NetworkManager" />
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="net/setup-n2n">
-      <action class="io.subutai.core.network.cli.SetupN2NCommand">
-        <argument ref="networkManager" />
-      </action>
-    </command>
-  </command-bundle>
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="net/remove-n2n">
-      <action class="io.subutai.core.network.cli.RemoveN2NCommand">
+    <command name="net/setup-p2p">
+      <action class="io.subutai.core.network.cli.SetupP2PCommand">
         <argument ref="networkManager" />
       </action>
     </command>
@@ -41,6 +34,20 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="net/remove-container-ip">
       <action class="io.subutai.core.network.cli.RemoveContainerIpCommand">
+        <argument ref="networkManager" />
+      </action>
+    </command>
+  </command-bundle>
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="p2p/list">
+      <action class="io.subutai.core.network.cli.ListP2PCommand">
+        <argument ref="networkManager" />
+      </action>
+    </command>
+  </command-bundle>
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="p2p/remove">
+      <action class="io.subutai.core.network.cli.RemoveP2PCommand">
         <argument ref="networkManager" />
       </action>
     </command>

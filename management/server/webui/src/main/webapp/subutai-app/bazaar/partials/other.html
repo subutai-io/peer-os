@@ -1,0 +1,29 @@
+<button
+		class="b-btn b-btn_green b-btn_search-field-level"
+		ng-click="bazaarCtrl.uploadPluginWindow()">
+	<i class="fa fa-plus"></i> Upload new plugin
+</button>
+<div class="b-workspace-content__row">
+	<div class="b-main-table-border">
+		<table class="b-main-table b-main-table_with-header">
+			<tr>
+				<th>Plugins</th>
+				<th>Version</th>
+				<th>Actions</th>
+				<th></th>
+			</tr>
+			<td colspan="4" class="b-main-table__empty-item" ng-show="bazaarCtrl.installedPlugins.length ===0">
+				No data available in table
+			</td>
+			<tr ng-repeat="plugin in bazaarCtrl.installedPlugins">
+				<td>{{ plugin.name }}</td>
+				<td>{{ plugin.version }}</td>
+				<td class="b-main-table__container-status">
+					<a href class="b-icon b-icon_edit" ng-click="bazaarCtrl.editPermissionsWindow (plugin, false)"></a>
+				<td class="b-main-table__controls">
+					<a href class="b-icon b-icon_remove" ng-click="bazaarCtrl.deletePlugin (plugin)"></a></td>
+				</td>
+			</tr>
+		</table>
+	</div>
+</div>

@@ -19,6 +19,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import com.google.common.collect.Sets;
+import com.google.gson.annotations.Expose;
 
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInterface;
@@ -34,38 +35,47 @@ public class RequestedHostImpl implements RequestedHost, Serializable
 {
     @Id
     @Column( name = "host_id", nullable = false )
+    @Expose
     private String id;
 
     @Column( name = "hostname" )
+    @Expose
     private String hostname;
 
     @JoinColumn( name = "net_interfaces" )
     @OneToMany( orphanRemoval = true,
-            targetEntity = HostHostInterface.class,
+            targetEntity = HostInterfaceImpl.class,
             cascade = CascadeType.ALL,
             fetch = FetchType.EAGER )
+    @Expose
     private Set<HostInterface> netHostInterfaces = Sets.newHashSet();
 
     @Column( name = "arch" )
     @Enumerated( EnumType.STRING )
+    @Expose
     private HostArchitecture arch = HostArchitecture.AMD64;
 
     @Column( name = "secret" )
+    @Expose
     private String secret;
 
     @Lob
     @Column( name = "public_key" )
+    @Expose
     private String publicKey;
 
     @Lob
     @Column( name = "cert" )
+    @Expose
     private String cert;
 
     @Column( name = "rest_hook" )
+    @Expose
     private String restHook;
 
     @Column( name = "status" )
     @Enumerated( EnumType.STRING )
+    @Expose
     private RegistrationStatus status = RegistrationStatus.REQUESTED;
 
     @OneToMany( targetEntity = ContainerInfoImpl.class,
@@ -73,6 +83,7 @@ public class RequestedHostImpl implements RequestedHost, Serializable
             cascade = CascadeType.ALL,
             fetch = FetchType.EAGER,
             orphanRemoval = true )
+    @Expose
     private Set<ContainerInfo> hostInfos = Sets.newHashSet();
 
 
@@ -100,9 +111,9 @@ public class RequestedHostImpl implements RequestedHost, Serializable
         Set<HostInterface> netHostInterfaces = requestedHost.getNetHostInterfaces();
         for ( final HostInterface netHostInterface : netHostInterfaces )
         {
-            HostHostInterface hostHostInterface =
-                    new HostHostInterface( netHostInterface );
-            this.netHostInterfaces.add( hostHostInterface );
+            HostInterfaceImpl hostInterfaceImpl =
+                    new HostInterfaceImpl( netHostInterface );
+            this.netHostInterfaces.add( hostInterfaceImpl );
         }
 
         Set<ContainerInfo> hostInfoSet = requestedHost.getHostInfos();
@@ -130,7 +141,7 @@ public class RequestedHostImpl implements RequestedHost, Serializable
 
         for ( final HostInterface anHostInterface : netHostInterfaces )
         {
-            this.netHostInterfaces.add( new HostHostInterface( anHostInterface ) );
+            this.netHostInterfaces.add( new HostInterfaceImpl( anHostInterface ) );
         }
 
         if ( this.arch == null )

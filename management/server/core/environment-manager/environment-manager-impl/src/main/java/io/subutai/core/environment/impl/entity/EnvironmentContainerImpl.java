@@ -38,6 +38,7 @@ import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostArchitecture;
+import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaceModel;
@@ -45,21 +46,23 @@ import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerId;
-import io.subutai.common.peer.ContainerType;
+import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerId;
 import io.subutai.common.protocol.TemplateKurjun;
-import io.subutai.common.resource.ResourceType;
-import io.subutai.common.resource.ResourceValue;
-import io.subutai.common.security.objects.KeyTrustLevel;
+import io.subutai.common.quota.ContainerQuota;
+import io.subutai.common.security.objects.PermissionObject;
+import io.subutai.common.settings.SystemSettings;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
-import io.subutai.core.security.api.crypto.KeyManager;
+import io.subutai.core.identity.api.model.UserDelegate;
+import io.subutai.core.object.relation.api.RelationManager;
+import io.subutai.core.object.relation.api.model.RelationMeta;
 
 
 /**
@@ -90,10 +93,13 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @Column( name = "template_arch", nullable = false )
     private String templateArch;
 
+    @Column( name = "rh_id", nullable = false )
+    private String resourceHostId;
+
     @ElementCollection( targetClass = String.class, fetch = FetchType.EAGER )
     private Set<String> tags = new HashSet<>();
 
-    @ManyToOne( targetEntity = EnvironmentImpl.class )
+    @ManyToOne( targetEntity = EnvironmentImpl.class, fetch = FetchType.EAGER )
     @JoinColumn( name = "environment_id" )
     private Environment environment;
 
@@ -114,7 +120,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
     @Column( name = "type" )
     @Enumerated( EnumType.STRING )
-    private ContainerType containerType;
+    private ContainerSize containerSize;
 
 
     @Transient
@@ -140,14 +146,15 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
     public EnvironmentContainerImpl( final String localPeerId, final Peer peer, final String nodeGroupName,
                                      final ContainerHostInfoModel hostInfo, final TemplateKurjun template,
-                                     int sshGroupId, int hostsGroupId, String domainName, ContainerType containerType )
+                                     int sshGroupId, int hostsGroupId, String domainName, ContainerSize containerSize,
+                                     String resourceHostId )
     {
         Preconditions.checkNotNull( peer );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( nodeGroupName ) );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( domainName ) );
         Preconditions.checkNotNull( hostInfo );
         Preconditions.checkNotNull( template );
-        Preconditions.checkNotNull( containerType );
+        Preconditions.checkNotNull( containerSize );
 
 
         this.peer = peer;
@@ -163,8 +170,38 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
         this.sshGroupId = sshGroupId;
         this.hostsGroupId = hostsGroupId;
         this.domainName = domainName;
-        this.containerType = containerType;
+        this.containerSize = containerSize;
+        this.resourceHostId = resourceHostId;
         setHostInterfaces( hostInfo.getHostInterfaces() );
+    }
+
+
+    public EnvironmentContainerImpl( final String hostId, final String hostname, final String containerName,
+                                     final HostArchitecture hostArchitecture, final HostInterfaces hostInterfaces,
+                                     final String localPeerId, final Peer peer, final String nodeGroupName,
+                                     final String templateName, final String templateArch, int sshGroupId,
+                                     int hostsGroupId, String domainName, ContainerSize containerSize )
+    {
+        Preconditions.checkNotNull( peer );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( nodeGroupName ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( domainName ) );
+        Preconditions.checkNotNull( containerSize );
+
+        this.hostId = hostId;
+        this.hostname = hostname;
+        this.peer = peer;
+        this.creatorPeerId = localPeerId;
+        this.peerId = peer.getId();
+        this.containerName = containerName;
+        this.hostArchitecture = hostArchitecture;
+        this.nodeGroupName = nodeGroupName;
+        this.templateName = templateName;
+        this.templateArch = templateArch;
+        this.sshGroupId = sshGroupId;
+        this.hostsGroupId = hostsGroupId;
+        this.domainName = domainName;
+        this.containerSize = containerSize;
+        setHostInterfaces( hostInterfaces );
     }
 
 
@@ -189,6 +226,13 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
         Preconditions.checkNotNull( environment );
 
         this.environment = environment;
+    }
+
+
+    @Override
+    public HostId getResourceHostId() throws PeerException
+    {
+        return new HostId( resourceHostId );
     }
 
 
@@ -223,7 +267,15 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @Override
     public ContainerHostState getState()
     {
-        return getPeer().getContainerState( getContainerId() );
+        try
+        {
+            return getPeer().getContainerState( getContainerId() );
+        }
+        catch ( PeerException e )
+        {
+            logger.error( "Error getting container state #getState", e );
+            return ContainerHostState.UNKNOWN;
+        }
     }
 
 
@@ -338,27 +390,30 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
         this.hostname = hostname;
     }
 
+
     private void validateTrustChain() throws CommandException
     {
-        if(environmentManager instanceof EnvironmentManagerImpl)
+        if ( environmentManager instanceof EnvironmentManagerImpl )
         {
             logger.warn( "Trust chain validation is on..." );
-            EnvironmentManagerImpl envImpl = (EnvironmentManagerImpl) environmentManager;
-            if ( envImpl.isKeyTrustCheckEnabled() )
+            // TODO call relationManager validation here instead
+            EnvironmentManagerImpl envImpl = ( EnvironmentManagerImpl ) environmentManager;
+            if ( SystemSettings.getKeyTrustCheckState() )
             {
                 IdentityManager identityManager = envImpl.getIdentityManager();
-                io.subutai.core.security.api.SecurityManager securityManager = envImpl.getSecurityManager();
+                RelationManager relationManager = envImpl.getRelationManager();
+
                 User activeUser = identityManager.getActiveUser();
+                UserDelegate userDelegate = identityManager.getUserDelegate( activeUser );
+
                 if ( activeUser != null )
                 {
-                    KeyManager keyManager = securityManager.getKeyManager();
-                    EnvironmentId environmentId = this.getEnvironmentId();
+                    RelationMeta relationMeta =
+                            new RelationMeta( userDelegate, userDelegate, environment, environment.getId() );
+                    boolean trustedRelation =
+                            relationManager.getRelationInfoManager().groupHasWritePermissions( relationMeta );
 
-                    String environmentFingerprint = keyManager.getFingerprint( environmentId.getId() );
-                    String userFingerprint = keyManager.getFingerprint( activeUser.getSecurityKeyId() );
-
-                    if ( keyManager.getTrustLevel( userFingerprint, environmentFingerprint ) == KeyTrustLevel.Never
-                            .getId() )
+                    if ( !trustedRelation )
                     {
                         throw new CommandException( "Host was revoked to execute commands" );
                     }
@@ -366,6 +421,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
             }
         }
     }
+
 
     @Override
     public CommandResult execute( final RequestBuilder requestBuilder ) throws CommandException
@@ -454,16 +510,6 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     public String getMacByInterfaceName( final String interfaceName )
     {
         return getHostInterfaces().findByName( interfaceName ).getMac();
-
-        //        for ( HostInterface iface : hostInterfaces )
-        //        {
-        //            if ( iface.getName().equalsIgnoreCase( interfaceName ) )
-        //            {
-        //                return iface.getMac();
-        //            }
-        //        }
-        //
-        //        return null;
     }
 
 
@@ -471,18 +517,6 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     public HostInterface getInterfaceByName( final String interfaceName )
     {
         return getHostInterfaces().findByName( interfaceName );
-        //        HostInterface result = NullHostInterface.getInstance();
-        //        for ( Iterator<HostInterface> i = getHostInterfaces().iterator(); result instanceof
-        // NullHostInterface && i.hasNext(); )
-        //        {
-        //            HostInterface n = i.next();
-        //            if ( n.getName().equalsIgnoreCase( interfaceName ) )
-        //            {
-        //                result = n;
-        //            }
-        //        }
-        //
-        //        return result;
     }
 
 
@@ -515,23 +549,23 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
 
     @Override
-    public ResourceValue getAvailableQuota( final ResourceType resourceType ) throws PeerException
+    public ContainerQuota getAvailableQuota() throws PeerException
     {
-        return getPeer().getAvailableQuota( this.getContainerId(), resourceType );
+        return getPeer().getAvailableQuota( this.getContainerId() );
     }
 
 
     @Override
-    public ResourceValue getQuota( final ResourceType resourceType ) throws PeerException
+    public ContainerQuota getQuota() throws PeerException
     {
-        return getPeer().getQuota( this.getContainerId(), resourceType );
+        return getPeer().getQuota( this.getContainerId() );
     }
 
 
     @Override
-    public void setQuota( final ResourceType resourceType, final ResourceValue resourceValue ) throws PeerException
+    public void setQuota( final ContainerQuota containerQuota ) throws PeerException
     {
-        getPeer().setQuota( this.getContainerId(), resourceType, resourceValue );
+        getPeer().setQuota( this.getContainerId(), containerQuota );
     }
 
 
@@ -609,9 +643,9 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
 
     @Override
-    public ContainerType getContainerType()
+    public ContainerSize getContainerSize()
     {
-        return containerType;
+        return containerSize;
     }
 
 
@@ -644,5 +678,33 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
             return hostname.compareTo( o.getHostname() );
         }
         return -1;
+    }
+
+
+    @Override
+    public String getLinkId()
+    {
+        return String.format( "%s|%s", getClassPath(), getUniqueIdentifier() );
+    }
+
+
+    @Override
+    public String getUniqueIdentifier()
+    {
+        return getId();
+    }
+
+
+    @Override
+    public String getClassPath()
+    {
+        return this.getClass().getSimpleName();
+    }
+
+
+    @Override
+    public String getContext()
+    {
+        return PermissionObject.EnvironmentManagement.getName();
     }
 }

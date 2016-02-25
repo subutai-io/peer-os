@@ -8,8 +8,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import io.subutai.common.resource.MeasureUnit;
-import io.subutai.common.resource.ResourceValue;
+import io.subutai.common.resource.ByteUnit;
+import io.subutai.common.resource.ByteValueResource;
+import io.subutai.common.resource.DiskResource;
+import io.subutai.common.resource.ResourceType;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -18,40 +20,24 @@ import static org.junit.Assert.assertNotNull;
 @RunWith( MockitoJUnitRunner.class )
 public class DiskQuotaTest
 {
-    private ResourceValue diskQuota;
-    private ResourceValue diskQuota2;
-    private ResourceValue diskQuota3;
+    private DiskResource diskQuota;
 
 
     @Before
     public void setUp() throws Exception
     {
-        diskQuota = new ResourceValue( new BigDecimal( "5.5" ), MeasureUnit.UNLIMITED );
-        diskQuota2 = new ResourceValue( new BigDecimal( "1.0" ), MeasureUnit.EB );
-        diskQuota3 = new ResourceValue( new BigDecimal( "1.0" ), MeasureUnit.GB );
+        diskQuota = new DiskResource( new BigDecimal( "1024" ), 0.0, "model", 123, 123, true );
     }
 
 
-    @Test( expected = IllegalStateException.class )
+    @Test
     public void testProperties() throws Exception
     {
-        assertNotNull( diskQuota.getMeasureUnit() );
-        assertNotNull( diskQuota2.getWriteValue( MeasureUnit.MB ) );
-        assertNotNull( diskQuota2.getMeasureUnit() );
-        assertNotNull( diskQuota3.getWriteValue( MeasureUnit.MB ) );
-        assertNotNull( diskQuota3.getMeasureUnit() );
-        assertEquals( 1024, diskQuota2.getValue( MeasureUnit.PB ).intValue() );
-        assertEquals( 1024 * 1024, diskQuota2.getValue( MeasureUnit.TB ).intValue() );
-        assertEquals( 1024 * 1024 * 1024, diskQuota2.getValue( MeasureUnit.GB ).intValue() );
-        assertEquals( 1.0, diskQuota3.getValue( MeasureUnit.GB ).doubleValue(), 0.0 );
-        assertEquals( 1024, diskQuota3.getValue( MeasureUnit.MB ).intValue() );
-        assertEquals( 1024 * 1024, diskQuota3.getValue( MeasureUnit.KB ).intValue() );
-        assertEquals( 1024 * 1024 * 1024, diskQuota3.getValue( MeasureUnit.BYTE ).intValue() );
-        diskQuota.hashCode();
-        diskQuota.equals( "test" );
-        diskQuota.equals( diskQuota );
-        MeasureUnit.UNLIMITED.getName();
+        assertNotNull( diskQuota.getResourceType() );
+        assertEquals( ResourceType.DISK, diskQuota.getResourceType() );
+        assertEquals( 1024, diskQuota.getResourceValue().getValue().intValue() );
+        assertEquals( 1, diskQuota.getResourceValue().getValue( ByteUnit.KB ).intValue() );
         assertNotNull( diskQuota.getPrintValue() );
-        assertNotNull( diskQuota.getWriteValue( MeasureUnit.UNLIMITED ) );
+        assertNotNull( diskQuota.getWriteValue() );
     }
 }

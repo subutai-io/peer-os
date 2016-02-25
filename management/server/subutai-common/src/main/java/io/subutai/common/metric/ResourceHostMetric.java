@@ -7,7 +7,6 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.host.ResourceHostInfoModel;
 
 
@@ -16,22 +15,31 @@ import io.subutai.common.host.ResourceHostInfoModel;
  */
 public class ResourceHostMetric extends BaseMetric
 {
+    public static double DEFAULT_RESERVED_RAM = 1024 * 1024 * 1024;  // reserving 1 GB RAM for system stability
+    public static double DEFAULT_RESERVED_CPU = 5.0;     // reserving 5% CPU usage for system stability
+    public static double DEFAULT_RESERVED_DISK = 20 * 1024 * 1024 * 1024;
+    // reserving 20 GB diskLimit space for system stability
+
     @Expose
     @SerializedName( "host" )
     @JsonProperty( "host" )
     protected String hostName;
+
     @Expose
     @SerializedName( "RAM" )
     @JsonProperty( "RAM" )
     protected Ram ram;
+
     @Expose
     @SerializedName( "CPU" )
     @JsonProperty( "CPU" )
     protected Cpu cpu;
+
     @Expose
     @SerializedName( "Disk" )
     @JsonProperty( "Disk" )
     protected Disk disk;
+
     @JsonProperty
     private Integer containersCount;
 
@@ -70,14 +78,14 @@ public class ResourceHostMetric extends BaseMetric
     @JsonIgnore
     public Double getTotalRam()
     {
-        return ram != null ? ram.getTotal() : 0;
+        return ram != null && ram.total != null ? ram.total : 0;
     }
 
 
     @JsonIgnore
     public Double getAvailableRam()
     {
-        return ram != null ? ram.getFree() : 0;
+        return ram != null && ram.free != null ? ram.free : 0;
     }
 
 
@@ -85,7 +93,7 @@ public class ResourceHostMetric extends BaseMetric
     public Double getUsedCpu()
     {
 
-        return cpu != null ? cpu.idle : null;
+        return cpu != null ? 100 - cpu.idle : null;
     }
 
 
@@ -106,14 +114,14 @@ public class ResourceHostMetric extends BaseMetric
     @JsonIgnore
     public Double getFreeRam()
     {
-        return ram != null ? ram.free : 0;
+        return ram != null && ram.free != null ? ram.free : 0;
     }
 
 
     @JsonIgnore
     public Double getTotalSpace()
     {
-        return disk != null ? disk.getTotal() : 0;
+        return disk != null && disk.total != null ? disk.total : 0;
     }
 
 
@@ -124,11 +132,22 @@ public class ResourceHostMetric extends BaseMetric
     }
 
 
+    @JsonIgnore
+    public double getCpuFrequency()
+    {
+        return cpu.getFrequency();
+    }
+
+
     public void updateMetrics( final ResourceHostMetric resourceHostMetric )
     {
         this.hostName = resourceHostMetric.hostName;
         this.cpu = resourceHostMetric.cpu;
-        this.ram = resourceHostMetric.ram;
+        this.ram = new Ram( resourceHostMetric.ram.total != null ? resourceHostMetric.ram.total : 0.0,
+                resourceHostMetric.ram.free != null ? resourceHostMetric.ram.free : 0.0 );
+
+        this.disk = new Disk( resourceHostMetric.ram.total != null ? resourceHostMetric.ram.total : 0.0,
+                resourceHostMetric.disk.used != null ? resourceHostMetric.disk.used : 0.0 );
         this.disk = resourceHostMetric.disk;
     }
 
@@ -136,6 +155,8 @@ public class ResourceHostMetric extends BaseMetric
     @Override
     public String toString()
     {
-        return String.format( "%s %s %s %s", super.toString(), this.cpu, this.ram, this.disk );
+        return String
+                .format( "%s %s, CPU used:%f, Free ram: %f, Available disk space: %f", super.toString(), getCpuModel(),
+                        getUsedCpu(), getFreeRam(), getAvailableSpace() );
     }
 }

@@ -23,10 +23,10 @@ public class EnvironmentAlert
     private Map<String, State> subscribers = new HashMap<>();
 
     private EnvironmentId environmentId;
-    private AlertResource alert;
+    private Alert alert;
 
 
-    public EnvironmentAlert( final EnvironmentId environmentId , final AlertResource alert )
+    public EnvironmentAlert( final EnvironmentId environmentId , final Alert alert )
     {
         Preconditions.checkNotNull( alert );
         this.alert = alert;
@@ -40,7 +40,7 @@ public class EnvironmentAlert
     }
 
 
-    public AlertResource getAlert()
+    public Alert getAlert()
     {
         return alert;
     }

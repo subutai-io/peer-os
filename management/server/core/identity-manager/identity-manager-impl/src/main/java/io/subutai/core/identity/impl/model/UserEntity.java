@@ -16,9 +16,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-import javax.persistence.Transient;
-import javax.security.auth.Subject;
 
+import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.objects.UserStatus;
 import io.subutai.common.security.objects.UserType;
 import io.subutai.core.identity.api.model.Role;
@@ -29,7 +28,7 @@ import io.subutai.core.identity.api.model.User;
  * Implementation of User interface. Used for storing user information.
  */
 @Entity
-@Table( name = "user" )
+@Table( name = "userl" )
 @Access( AccessType.FIELD )
 public class UserEntity implements User
 {
@@ -62,6 +61,12 @@ public class UserEntity implements User
     @Column( name = "security_key_id" )
     private String securityKeyId = ""; // PGP KeyID
 
+    @Column( name = "trust_level" )
+    private int trustLevel = 3; //Default Full Trust
+
+    @Column( name = "fingerprint" )
+    private String fingerprint = ""; // User key fingerprint
+
 
     //*********************************************
     @ManyToMany( targetEntity = RoleEntity.class, fetch = FetchType.EAGER )
@@ -71,6 +76,19 @@ public class UserEntity implements User
     private List<Role> roles = new ArrayList<>();
     //*********************************************
 
+
+    @Override
+    public int getTrustLevel()
+    {
+        return trustLevel;
+    }
+
+
+    @Override
+    public void setTrustLevel( final int trustLevel )
+    {
+        this.trustLevel = trustLevel;
+    }
 
 
     @Override
@@ -211,10 +229,25 @@ public class UserEntity implements User
         return securityKeyId;
     }
 
+
     @Override
     public void setSecurityKeyId( final String securityKeyId )
     {
         this.securityKeyId = securityKeyId;
+    }
+
+
+    @Override
+    public void setFingerprint( final String fingerprint )
+    {
+        this.fingerprint = fingerprint;
+    }
+
+
+    @Override
+    public String getFingerprint()
+    {
+        return fingerprint;
     }
 
 
@@ -231,4 +264,31 @@ public class UserEntity implements User
         return UserType.values()[type - 1].getName();
     }
 
+
+    @Override
+    public String getLinkId()
+    {
+        return String.format("%s|%s", getClassPath(), getUniqueIdentifier() );
+    }
+
+
+    @Override
+    public String getUniqueIdentifier()
+    {
+        return String.valueOf( getId() );
+    }
+
+
+    @Override
+    public String getClassPath()
+    {
+        return this.getClass().getSimpleName();
+    }
+
+
+    @Override
+    public String getContext()
+    {
+        return PermissionObject.IdentityManagement.getName();
+    }
 }

@@ -1,0 +1,38 @@
+<div ng-controller="SettingsKurjunCtrl as settingsKurjunCtrl">
+
+  <div class="b-workspace__header">
+    <h1 class="b-title"><span class="b-title_breadcrumbs">Kurjun Settings</span></h1>
+  </div>
+
+  <div class="b-workspace__content">
+    <div class="b-tabs-menu">
+      <ul>
+        <li class="b-tabs-menu__item"
+            ng-click="settingsKurjunCtrl.activeTab = 'urls'"
+            ng-class="settingsKurjunCtrl.activeTab == 'urls' ? 'b-tabs-menu__item_active' : ''">
+          URLs
+        </li>
+        <li class="b-tabs-menu__item"
+            ng-click="settingsKurjunCtrl.activeTab = 'quotas'"
+            ng-class="settingsKurjunCtrl.activeTab == 'quotas' ? 'b-tabs-menu__item_active' : ''">
+          Quotas
+        </li>
+      </ul>
+    </div>
+    <div
+        ng-if="settingsKurjunCtrl.activeTab == 'urls'"
+        ng-include="'subutai-app/settingsKurjun/partials/urls.html'">
+    </div>
+
+    <div
+        ng-if="settingsKurjunCtrl.activeTab == 'quotas'"
+        ng-include="'subutai-app/settingsKurjun/partials/quotas.html'">
+    </div>
+    <button
+        class="b-btn b-btn_green g-left g-margin-bottom"
+        ng-click="settingsKurjunCtrl.updateConfig()"
+        style="margin-top: 15px">
+      <i class="fa fa-floppy-o"></i>&#160;&#160;Save
+    </button>
+  </div>
+</div>

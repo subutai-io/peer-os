@@ -1,25 +1,26 @@
 package io.subutai.common.metric;
 
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import com.google.gson.annotations.Expose;
 
 
-@XmlRootElement
-@XmlAccessorType( XmlAccessType.FIELD )
 public class Ram
 {
     @Expose
-    @JsonProperty
+    @JsonProperty( "total" )
     Double total;
     @Expose
-    @JsonProperty
+    @JsonProperty( "free" )
     Double free;
+
+
+    public Ram( @JsonProperty( "total" ) final Double total, @JsonProperty( "free" ) final Double free )
+    {
+        this.total = total;
+        this.free = free;
+    }
 
 
     public Double getTotal()

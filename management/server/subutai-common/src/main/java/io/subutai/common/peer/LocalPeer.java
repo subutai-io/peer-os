@@ -5,8 +5,9 @@ import java.util.List;
 import java.util.Set;
 
 import io.subutai.common.network.DomainLoadBalanceStrategy;
-import io.subutai.common.protocol.N2NConfig;
+import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.TemplateKurjun;
+import io.subutai.common.task.Task;
 
 
 /**
@@ -14,6 +15,43 @@ import io.subutai.common.protocol.TemplateKurjun;
  */
 public interface LocalPeer extends Peer
 {
+
+
+    /**
+     * Returns public IP of peer determined by internet service
+     */
+    String getPublicIp() throws PeerException;
+
+    /**
+     * Adds remote apt repository to local apt sources
+     */
+    @Deprecated
+    void addRepository( final String ip ) throws PeerException;
+
+    /**
+     * Removes remote apt repository from local apt sources
+     */
+    @Deprecated
+    void removeRepository( final String host, final String ip ) throws PeerException;
+
+    /**
+     * Removes a gateway
+     */
+    void removeGateway( int vlan ) throws PeerException;
+
+
+    /**
+     * Removes a tunnel to remote peer
+     */
+    void removeTunnel( String tunnelIp );
+
+
+    /**
+     * Returns external IP of mgmt host
+     */
+    String getExternalIp() throws PeerException;
+
+
     /**
      * Binds host with given ID
      *
@@ -25,7 +63,6 @@ public interface LocalPeer extends Peer
 
     public Host bindHost( ContainerId id ) throws HostNotFoundException;
 
-    //    ContainerHost bindHost( ContainerId containerId ) throws HostNotFoundException;
 
     /**
      * Returns implementation of ResourceHost interface.
@@ -69,15 +106,11 @@ public interface LocalPeer extends Peer
      */
     public ContainerHost getContainerHostById( String hostId ) throws HostNotFoundException;
 
-    //    Quota getQuota( ContainerHost host, QuotaType quota ) throws PeerException;
-
-    //    @RolesAllowed( "Environment-Management|A|Update" )
-    //    void setQuota( ContainerHost host, Quota quota ) throws PeerException;
 
     /**
      * Returns instance of management host
      */
-    public ManagementHost getManagementHost() throws HostNotFoundException;
+    public Host getManagementHost() throws HostNotFoundException;
 
     /**
      * Returns all local peer's resource hosts
@@ -85,50 +118,6 @@ public interface LocalPeer extends Peer
     public Set<ResourceHost> getResourceHosts();
 
 
-    /**
-     * Creates container on the local peer
-     *
-     * @param resourceHost - target resource host where to host container
-     * @param template - source template from which to clone container
-     * @param containerName - container name
-     */
-    //    public ContainerHost createContainer( final ResourceHost resourceHost, final Template template,
-    //                                          final String containerName, final ContainerQuota containerQuota )
-    //            throws PeerException;
-
-
-    /**
-     * Returns container group by container id
-     *
-     * @param containerId - id of container
-     *
-     * @return - {@code ContainerGroup}
-     *
-     * @throws ContainerGroupNotFoundException - thrown if container is created not as a part of environment
-     */
-    //    public ContainerGroup findContainerGroupByContainerId( String containerId ) throws
-    // ContainerGroupNotFoundException;
-
-    /**
-     * Returns container group by environment id
-     *
-     * @param environmentId - id of environment
-     *
-     * @return - {@code ContainerGroup}
-     *
-     * @throws ContainerGroupNotFoundException - thrown if group is not found
-     */
-    //    public ContainerGroup findContainerGroupByEnvironmentId( String environmentId )
-    //            throws ContainerGroupNotFoundException;
-
-    /**
-     * Returns set of container groups by owner id
-     *
-     * //     * @param ownerId - id of owner
-     *
-     * @return - set of {@code ContainerGroup}
-     */
-    //    public Set<ContainerGroup> findContainerGroupsByOwnerId( String ownerId );
     public void addRequestListener( RequestListener listener );
 
     public void removeRequestListener( RequestListener listener );
@@ -164,6 +153,7 @@ public interface LocalPeer extends Peer
     public void setVniDomain( Long vni, String domain, DomainLoadBalanceStrategy domainLoadBalanceStrategy,
                               String sslCertPath ) throws PeerException;
 
+
     /**
      * Returns true if hostIp is added to domain by vni
      *
@@ -176,13 +166,15 @@ public interface LocalPeer extends Peer
 
     public void removeIpFromVniDomain( String hostIp, Long vni ) throws PeerException;
 
+    void setPeerInfo( PeerInfo peerInfo );
+
     Set<ContainerHost> findContainersByEnvironmentId( final String environmentId );
 
     Set<ContainerHost> findContainersByOwnerId( final String ownerId );
 
-    List<N2NConfig> setupN2NConnection( String environmentId, Set<Peer> peers ) throws PeerException;
+    List<P2PConfig> setupP2PConnection( String environmentId, Set<Peer> peers ) throws PeerException;
 
-    void addToTunnel( N2NConfig config ) throws PeerException;
+    void addToTunnel( P2PConfig config ) throws PeerException;
 
     List<TemplateKurjun> getTemplates();
 
@@ -190,5 +182,11 @@ public interface LocalPeer extends Peer
 
     ContainerHost findContainerById( ContainerId containerId );
 
-    int setupContainerSsh( String containerHostId, int sshIdleTimeout) throws PeerException;
+    int setupContainerSsh( String containerHostId, int sshIdleTimeout ) throws PeerException;
+
+    List<ContainerHost> getPeerContainers( String peerId );
+
+    String getCurrentControlNetwork() throws PeerException;
+
+    List<Task> getTaskList();
 }

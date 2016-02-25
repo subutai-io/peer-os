@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Maps;
 
 import io.subutai.common.peer.Peer;
+import io.subutai.common.peer.PeerException;
 
 
 /**
@@ -114,31 +115,40 @@ public class MessageSender
 
 
         //try to send messages in parallel - one thread per peer
-        for ( Map.Entry<String, Set<Envelope>> envelopsPerPeer : peerEnvelopesMap.entrySet() )
-        {
-            Peer targetPeer = messenger.getPeerManager().getPeer( envelopsPerPeer.getKey() );
-            if ( targetPeer.isLocal() )
-            {
-                completer.submit( new LocalPeerMessageSender( messenger, messengerDao, envelopsPerPeer.getValue() ) );
-            }
-            else
-            {
-                completer.submit( new RemotePeerMessageSender( messengerDao, targetPeer, envelopsPerPeer.getValue() ) );
-            }
-        }
-
-        //wait for completion
         try
         {
-            for ( int i = 0; i < peerEnvelopesMap.size(); i++ )
+            for ( Map.Entry<String, Set<Envelope>> envelopsPerPeer : peerEnvelopesMap.entrySet() )
             {
-                Future<Boolean> future = completer.take();
-                future.get();
+                Peer targetPeer = messenger.getPeerManager().getPeer( envelopsPerPeer.getKey() );
+                if ( targetPeer.isLocal() )
+                {
+                    completer.submit(
+                            new LocalPeerMessageSender( messenger, messengerDao, envelopsPerPeer.getValue() ) );
+                }
+                else
+                {
+                    completer.submit(
+                            new RemotePeerMessageSender( messengerDao, targetPeer, envelopsPerPeer.getValue() ) );
+                }
+            }
+
+            //wait for completion
+            try
+            {
+                for ( int i = 0; i < peerEnvelopesMap.size(); i++ )
+                {
+                    Future<Boolean> future = completer.take();
+                    future.get();
+                }
+            }
+            catch ( InterruptedException | ExecutionException e )
+            {
+                LOG.warn( "ignore", e );
             }
         }
-        catch ( InterruptedException | ExecutionException e )
+        catch ( PeerException e )
         {
-            LOG.warn( "ignore", e );
+            LOG.error( e.getMessage(), e );
         }
     }
 }

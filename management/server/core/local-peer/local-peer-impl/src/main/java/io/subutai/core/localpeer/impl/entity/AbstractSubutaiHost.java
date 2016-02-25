@@ -50,7 +50,7 @@ public abstract class AbstractSubutaiHost implements Host
     private HostArchitecture hostArchitecture;
 
     @Transient
-    protected HostInterfaces hostInterfaces /*= new CopyOnWriteArraySet<>()*/;
+    protected HostInterfaces hostInterfaces = new HostInterfaces();
 
     @Transient
     protected volatile long lastHeartbeat = 0;
@@ -76,10 +76,6 @@ public abstract class AbstractSubutaiHost implements Host
         this.hostname = hostInfo.getHostname();
         this.hostArchitecture = hostInfo.getArch();
         this.hostInterfaces = hostInfo.getHostInterfaces();
-        //        for ( HostInterface s : hostInfo.getHostInterfaces() )
-        //        {
-        //            addInterface( new HostInterfaceModel( s ) );
-        //        }
     }
 
 
@@ -156,21 +152,12 @@ public abstract class AbstractSubutaiHost implements Host
     {
         this.lastHeartbeat = System.currentTimeMillis();
         this.hostInterfaces = hostInfo.getHostInterfaces();
-        //        // add interfaces
-        //        for ( HostInterface intf : hostInfo.getHostInterfaces() )
-        //        {
-        //            hostInterfaces.add( new HostInterfaceModel( intf ) );
-        //        }
         return false;
     }
 
 
     @Override
     public abstract boolean isConnected();
-    //    {
-    //        return getPeer().isConnected( this );
-    //    }
-    //
 
 
     public long getLastHeartbeat()
@@ -190,15 +177,6 @@ public abstract class AbstractSubutaiHost implements Host
     public String getIpByInterfaceName( String interfaceName )
     {
         return getHostInterfaces().findByName( interfaceName ).getIp();
-        //        for ( HostInterface iface : getHostInterfaces(). )
-        //        {
-        //            if ( interfaceName.equalsIgnoreCase( iface.getName() ) )
-        //            {
-        //                return iface.getIp();
-        //            }
-        //        }
-        //
-        //        return null;
     }
 
 
@@ -206,15 +184,6 @@ public abstract class AbstractSubutaiHost implements Host
     public String getMacByInterfaceName( final String interfaceName )
     {
         return getHostInterfaces().findByName( interfaceName ).getMac();
-        //        for ( HostInterface iface : getHostInterfaces() )
-        //        {
-        //            if ( iface.getName().equalsIgnoreCase( interfaceName ) )
-        //            {
-        //                return iface.getMac();
-        //            }
-        //        }
-        //
-        //        return null;
     }
 
 
@@ -222,26 +191,14 @@ public abstract class AbstractSubutaiHost implements Host
     public HostInterface getInterfaceByName( final String interfaceName )
     {
         return getHostInterfaces().findByName( interfaceName );
-        //        HostInterface result = NullHostInterface.getInstance();
-        //        for ( Iterator<HostInterface> i = getHostInterfaces().iterator();
-        //              result instanceof NullHostInterface && i.hasNext(); )
-        //        {
-        //            HostInterface n = i.next();
-        //            if ( n.getName().equalsIgnoreCase( interfaceName ) )
-        //            {
-        //                result = n;
-        //            }
-        //        }
-        //
-        //        return result;
     }
 
 
-    public void addInterface( HostInterfaceModel hostHostInterface )
+    public void addInterface( HostInterfaceModel hostInterface )
     {
-        Preconditions.checkNotNull( hostHostInterface, "HostInterface could not be null." );
+        Preconditions.checkNotNull( hostInterface, "HostInterface could not be null." );
 
-        hostInterfaces.addHostInterface( hostHostInterface );
+        hostInterfaces.addHostInterface( hostInterface );
     }
 
 

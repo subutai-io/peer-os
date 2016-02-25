@@ -1,8 +1,0 @@
-sudo service subutai-agent start
-if grep -Fxq "/etc/init.d/subutai-agent start" /etc/rc.local
-then
-	echo " "
-else
-	sed -i '12 a\/etc/init.d/subutai-agent start' /etc/rc.local
-fi
-#sed -i '1 a\/etc/init.d/subutai-agent start' /etc/rc.local

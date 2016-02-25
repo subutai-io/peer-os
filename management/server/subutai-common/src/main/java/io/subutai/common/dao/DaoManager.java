@@ -14,6 +14,7 @@ public class DaoManager
 {
     private EntityManager entityManager;
     private EntityManagerFactory entityManagerFactory;
+    private boolean autoCommit = true;
 
 
     public void init()
@@ -230,5 +231,17 @@ public class DaoManager
         }
 
         return 1;
+    }
+
+
+    public boolean isAutoCommit()
+    {
+        return autoCommit;
+    }
+
+
+    public void setAutoCommit( final boolean autoCommit )
+    {
+        this.autoCommit = autoCommit;
     }
 }
