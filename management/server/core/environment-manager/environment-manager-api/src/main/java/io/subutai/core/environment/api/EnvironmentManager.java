@@ -64,7 +64,7 @@ public interface EnvironmentManager
     Environment createEnvironment( Topology topology, boolean async ) throws EnvironmentCreationException;
 
     @RolesAllowed( "Environment-Management|Write" )
-    UUID createEnvironmentViaTracker(Topology topology, boolean async)
+    UUID createEnvironmentAndGetTrackerID(Topology topology, boolean async)
             throws EnvironmentCreationException;
 
     /**
@@ -98,7 +98,7 @@ public interface EnvironmentManager
 
 
     @RolesAllowed( "Environment-Management|Write" )
-    UUID modifyEnvironment(String environmentId, Topology topology, List<String> removedContainers, boolean async)
+    UUID modifyEnvironmentAndGetTrackerID(String environmentId, Topology topology, List<String> removedContainers, boolean async)
             throws EnvironmentModificationException, EnvironmentNotFoundException;
 
     /**

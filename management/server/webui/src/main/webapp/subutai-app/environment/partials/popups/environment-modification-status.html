@@ -1,30 +1,26 @@
 <div class="b-popup b-popup_middle">
-    <div class="b-popup__header">
-        Applying changes
-        <a href ng-click="closeThisDialog()"><i class="fa fa-times g-right"></i></a>
-    </div>
-    <div class="b-popup__body">
-        <table class="b-main-table b-main-table_none-border g-margin-bottom-half">
-            <tr>
-                <td></td>
-                <td>
-                    <i class="fa"
-                       ng-class="environmentSimpleViewCtrl.currentEnvironment.modifyStatus == 'modified' ?
-                       'fa-check g-text-green' : environmentSimpleViewCtrl.currentEnvironment.modifyStatus == 'modifying' ?
-                       'fa-spinner fa-pulse' : 'fa fa-times g-text-red'">
-                    </i>
-                </td>
-                <td>Applying your changes...</td>
-            </tr>
-        </table>
+	<div class="b-popup__header">
+		Applying changes
+		<a href ng-click="closeThisDialog()"><i class="fa fa-times g-right"></i></a>
+	</div>
+	<div class="b-popup__body">
+		<table class="b-main-table b-main-table_none-border g-margin-bottom-half">
+			<tr ng-repeat="(key, log) in environmentSimpleViewCtrl.logMessages">
+				<td>{{ log.time }}</td>
+				<td class="b-main-table__mini-icon"><i class="fa" ng-class="log.classes"></i></td>
+				<td>{{ log.text }}</td>
+			</tr>
+		</table>
+	</div>
 
-        <div>
-            <a href="#" class="b-btn b-btn_green g-right"
-               ng-disabled="vm.currentEnvironment.modifyStatus = 'modifying'"
-               ng-click="closeThisDialog()">
-                Ok
-            </a>
-            <div class="clear"></div>
-        </div>
-    </div>
+	<div class="b-popup__footer b-popup__footer_undertable">
+
+		<button class="b-btn b-btn_green js-environment-build" 
+		ng-if="environmentSimpleViewCtrl.buildCompleted" 
+		ng-click="environmentSimpleViewCtrl.closePopup()">
+			Close
+		</button>
+
+		<div class="clear"></div>
+	</div>	
 </div>
