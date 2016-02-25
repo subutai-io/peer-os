@@ -24,7 +24,6 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 	vm.domainStrategies = [];
 	vm.strategies = [];
 
-	vm.peerIds = [];
 	vm.colors = quotaColors;
 	vm.templates = [];
 
@@ -59,10 +58,6 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 
 	environmentService.getDomainStrategies().success(function (data) {
 		vm.domainStrategies = data;
-	});
-
-	environmentService.getPeers().success(function (data) {
-		vm.peerIds = data;
 	});
 
 	function closePopup() {

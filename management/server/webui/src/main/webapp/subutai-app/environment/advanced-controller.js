@@ -75,10 +75,20 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 		vm.domainStrategies = data;
 	});
 
-	environmentService.getPeers().success(function (data) {
-		vm.peerIds = data;
-		vm.peerIds['testPeer'] = ['rh1', 'rh2', 'rh3'];
-	});
+	function getPeers() {
+		$('.js-peer-load-screen').show();
+		environmentService.getPeers().success(function (data) {
+			vm.peerIds = data;
+			//vm.peerIds['testPeer'] = ['rh1', 'rh2', 'rh3'];
+			$('.js-peer-load-screen').hide();
+		}).error(function(error){
+			$('.js-peer-load-screen').hide();
+			VARS_MODAL_ERROR( SweetAlert, 'Error on getting peers: ' + error );
+		});
+	}
+	getPeers();
+
+
 	clearWorkspace();
 
 	/*peerRegistrationService.getResourceHosts().success(function (data) {

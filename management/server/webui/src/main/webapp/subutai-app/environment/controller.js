@@ -26,13 +26,10 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	vm.sshKeyForEnvironment = '';
 	vm.environmentForDomain = '';
 	vm.currentDomain = {};
-	vm.selectedPeers = [];
 	vm.installed = false;
 	vm.pending = false;
 	vm.isEditing = false;
-	vm.isDataValid = isDataValid;
 
-	vm.peerIds = [];
 	vm.advancedEnv = {};
 	vm.advancedEnv.currentNode = getDefaultValues();
 	vm.advancedModeEnabled = false;
@@ -61,8 +58,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	vm.showDomainForm = showDomainForm;
 	vm.setDomain = setDomain;
 	vm.removeDomain = removeDomain;
-	vm.togglePeer = togglePeer;
-	vm.setupStrategyRequisites = setupStrategyRequisites;
 	vm.minimizeLogs = minimizeLogs;
 	vm.getQuotaColor = getQuotaColor;
 
@@ -125,10 +120,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 
 	environmentService.getDomainStrategies().success(function (data) {
 		vm.domainStrategies = data;
-	});
-
-	environmentService.getPeers().success(function (data) {
-		vm.peerIds = data;
 	});
 
 	//installed environment table options
@@ -236,30 +227,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 		});
 	}
 
-	function setupStrategyRequisites(environment) {
-		LOADING_SCREEN();
-		ngDialog.closeAll();
-		environmentService.setupStrategyRequisites(
-			environment.name,
-			environment.strategy,
-			environment.sshGroupId,
-			environment.hostGroupId,
-			vm.selectedPeers
-		).success(function () {
-			vm.selectedPeers = [];
-			SweetAlert.swal("Success!!", "Your environment was successfully configured, please approve it.", "success");
-			LOADING_SCREEN("none");
-		}).error(function (data) {
-			ngDialog.closeAll();
-			SweetAlert.swal("ERROR!", "Your container is safe :). Error: " + data.ERROR, "error");
-			LOADING_SCREEN("none");
-		});
-	}
-
-	function isDataValid() {
-		return vm.selectedPeers.length > 0;
-	}
-
 	function actionSwitch (data, type, full, meta) {
 		if (typeof (data.revoke) === "boolean") {
 			return '<div class = "toggle"><input type = "checkbox" class="check" ng-click="environmentViewCtrl.revoke(\'' + data.id + '\')" ng-checked=\'' + data.revoke + '\'><div class = "toggle-bg"></div><b class = "b switch"></b></div>'
@@ -305,12 +272,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 			}
 		}
 		return sortedContainers;
-	}
-
-	function togglePeer(peerId) {
-		vm.selectedPeers.indexOf(peerId) === -1 ?
-				vm.selectedPeers.push(peerId) :
-				vm.selectedPeers.splice(vm.selectedPeers.indexOf(peerId), 1);
 	}
 
 	function destroyEnvironment(environmentId) {
