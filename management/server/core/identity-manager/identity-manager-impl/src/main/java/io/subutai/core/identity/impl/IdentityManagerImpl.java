@@ -125,7 +125,8 @@ public class IdentityManagerImpl implements IdentityManager
 
 
     //*****************************************************
-    private void createDefaultUsers() throws Exception {
+    private void createDefaultUsers() throws Exception
+    {
         if ( identityDataService.getAllUsers().size() < 1 )
         {
             PermissionObject permsp[] = PermissionObject.values();
