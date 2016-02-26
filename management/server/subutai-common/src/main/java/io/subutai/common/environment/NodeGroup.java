@@ -38,11 +38,6 @@ public class NodeGroup
     private String hostId;
 
 
-    private NodeGroup()
-    {
-    }
-
-
     public NodeGroup( @JsonProperty( "name" ) final String name,
                       @JsonProperty( "templateName" ) final String templateName,
                       @JsonProperty( "type" ) ContainerSize type, @JsonProperty( "sshGroupId" ) final int sshGroupId,
@@ -51,6 +46,8 @@ public class NodeGroup
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid node group name" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ), "Invalid peer id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostId ), "Invalid host id" );
         Preconditions.checkNotNull( type );
 
         this.name = name;
