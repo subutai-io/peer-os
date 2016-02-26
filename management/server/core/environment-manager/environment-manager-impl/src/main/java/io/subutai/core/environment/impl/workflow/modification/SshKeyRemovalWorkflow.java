@@ -27,7 +27,7 @@ public class SshKeyRemovalWorkflow extends Workflow<SshKeyRemovalWorkflow.SshKey
     private Throwable error;
 
 
-    public static enum SshKeyAdditionPhase
+    public enum SshKeyAdditionPhase
     {
         INIT, REMOVE_KEY, FINALIZE
     }
@@ -77,7 +77,7 @@ public class SshKeyRemovalWorkflow extends Workflow<SshKeyRemovalWorkflow.SshKey
         }
         catch ( Exception e )
         {
-            setError( e );
+            fail( e.getMessage(), e );
 
             return null;
         }
@@ -99,22 +99,19 @@ public class SshKeyRemovalWorkflow extends Workflow<SshKeyRemovalWorkflow.SshKey
     }
 
 
-    public Throwable getError()
+    @Override
+    public void fail( final String message, final Throwable e )
     {
-        return error;
+        super.fail( message, e );
+        saveFailState();
     }
 
 
-    public void setError( final Throwable error )
+    private void saveFailState()
     {
         environment.setStatus( EnvironmentStatus.UNHEALTHY );
-
         environment = environmentManager.saveOrUpdate( environment );
-
-        this.error = error;
-        LOG.error( "Error removing ssh key", error );
-        operationTracker.addLogFailed( error.getMessage() );
-        //stop the workflow
-        stop();
+        operationTracker.addLogFailed( getFailedReason() );
+        LOG.error( "Error removing ssh key", getFailedException() );
     }
 }
