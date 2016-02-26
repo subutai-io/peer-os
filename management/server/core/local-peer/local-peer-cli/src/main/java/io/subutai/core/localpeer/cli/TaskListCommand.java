@@ -30,7 +30,7 @@ public class TaskListCommand extends SubutaiShellCommandSupport
             final String s = task.getCommandBatch().asChain();
             System.out.println( String.format( "%s\t%d\t%s...\t%s\t%s", task.getHost().getId(), task.getTimeout(),
                     s.substring( 0, Math.min( 50, s.length() ) ), task.getState(),
-                    StringUtil.convertSecondToHHMM( task.getElapsedTime() ) ) );
+                    StringUtil.convertMillisToHHMMSS( task.getElapsedTime() ) ) );
 
             if ( task.getState() == Task.State.SUCCESS )
             {

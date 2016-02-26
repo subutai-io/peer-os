@@ -397,6 +397,29 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public PrepareTemplatesResponse prepareTemplates( final PrepareTemplatesRequest request ) throws PeerException
     {
         List<ImportTask> tasks = new ArrayList<>();
+        StringBuilder sb =
+                new StringBuilder( String.format( "Preparing templates on %s...\n", peerInfo.getPublicUrl() ) );
+        List<String> exceptions = new ArrayList<>();
+        for ( String resourceHostId : request.getTemplates().keySet() )
+        {
+            for ( String ignore : request.getTemplates().get( resourceHostId ) )
+            {
+                try
+                {
+                    getResourceHostById( resourceHostId );
+                }
+                catch ( HostNotFoundException e )
+                {
+                    exceptions.add( e.getMessage() );
+                }
+            }
+        }
+
+        if ( exceptions.size() > 0 )
+        {
+            return new PrepareTemplatesResponse( false, sb.toString(), exceptions );
+        }
+
         for ( String resourceHostId : request.getTemplates().keySet() )
         {
             for ( String templateName : request.getTemplates().get( resourceHostId ) )
@@ -409,18 +432,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 }
                 catch ( HostNotFoundException e )
                 {
-                    return new PrepareTemplatesResponse( false,
-                            String.format( "Resource host %s not found.", resourceHostId ) );
+                    exceptions.add( e.getMessage() );
                 }
             }
         }
 
-        //        return new PrepareTemplatesResponse( false,
-        //                String.format( "Error on importing template %s in %s on %s", task.getTemplate(),
-        //                        task.getHost().getHostname(), peerInfo.getPublicUrl() ) );
 
-        StringBuilder sb =
-                new StringBuilder( String.format( "Preparing templates on %s...\n", peerInfo.getPublicUrl() ) );
         for ( ImportTask task : tasks )
         {
             final Boolean success = task.getResult();
@@ -429,9 +446,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                     task.getHost().getHostname() ) );
             if ( success == null || !success )
             {
+                sb.append( "failed." );
                 for ( Throwable e : task.getExceptions() )
                 {
-                    sb.append( String.format( "failed. [%s].", e.getMessage() ) );
+                    exceptions.add( e.getMessage() );
                 }
             }
             else
@@ -439,9 +457,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 sb.append( "succeeded." );
             }
             sb.append(
-                    String.format( " Elapsed time: %s\n", StringUtil.convertSecondToHHMM( task.getElapsedTime() ) ) );
+                    String.format( " Elapsed time: %s\n", StringUtil.convertMillisToHHMMSS( task.getElapsedTime() ) ) );
         }
-        return new PrepareTemplatesResponse( true, sb.toString() );
+        return new PrepareTemplatesResponse( exceptions.size() == 0, sb.toString(), exceptions );
     }
 
 
@@ -496,7 +514,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         final HostInfo info = task.getResult();
         if ( info == null )
         {
-            throw new PeerException( "Container clone error: " + task.getExceptions() );
+            StringBuilder sb = new StringBuilder();
+            for ( Throwable throwable : task.getExceptions() )
+            {
+                sb.append( String.format( "%s\n", throwable.getMessage() ) );
+            }
+            throw new PeerException( "Container clone error. " + sb.toString() );
         }
         result.add( info );
         return new CreateEnvironmentContainerGroupResponse( result );
