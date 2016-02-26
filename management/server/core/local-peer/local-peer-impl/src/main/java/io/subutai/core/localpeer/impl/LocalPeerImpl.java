@@ -425,20 +425,21 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             final Boolean success = task.getResult();
 
-
+            sb.append( String.format( "Importing template %s on %s...", task.getTemplate(),
+                    task.getHost().getHostname() ) );
             if ( success == null || !success )
             {
                 for ( Throwable e : task.getExceptions() )
                 {
-                    sb.append( e.getMessage() );
-                    sb.append( "\n" );
+                    sb.append( String.format( "failed. [%s].", e.getMessage() ) );
                 }
             }
             else
             {
-                sb.append( String.format( "Template %s is ready in %s.\n", task.getTemplate(),
-                        task.getHost().getHostname() ) );
+                sb.append( "succeeded." );
             }
+            sb.append(
+                    String.format( " Elapsed time: %s\n", StringUtil.convertSecondToHHMM( task.getElapsedTime() ) ) );
         }
         return new PrepareTemplatesResponse( true, sb.toString() );
     }
