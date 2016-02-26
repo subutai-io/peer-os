@@ -152,7 +152,7 @@ public class ContainerCloneStep
                     }
                 }
             }
-            catch ( ExecutionException | InterruptedException e )
+            catch ( Exception e )
             {
                 errors.add( exceptionUtil.getRootCauseMessage( e ) );
             }

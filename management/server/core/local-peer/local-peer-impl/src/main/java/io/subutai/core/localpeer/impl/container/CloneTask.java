@@ -15,7 +15,6 @@ import com.google.common.collect.Lists;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandResultParseException;
 import io.subutai.common.command.CommandResultParser;
-import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.peer.ContainerSize;
@@ -26,12 +25,12 @@ import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.quota.ContainerResource;
 import io.subutai.common.settings.Common;
+import io.subutai.common.task.Command;
+import io.subutai.common.task.CommandBatch;
 import io.subutai.common.util.NumUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
-import io.subutai.common.task.Command;
-import io.subutai.common.task.CommandBatch;
 import io.subutai.core.localpeer.impl.LocalPeerImpl;
 import io.subutai.core.localpeer.impl.entity.ContainerHostEntity;
 import io.subutai.core.registration.api.RegistrationManager;
@@ -60,9 +59,16 @@ public class CloneTask extends AbstractTask<HostInfo> implements CommandResultPa
                       final String ownerId, final String initiatorPeerId, final ContainerQuota quota, final String ip,
                       final int vlan )
     {
+        Preconditions.checkNotNull( localPeer );
+        Preconditions.checkNotNull( hostRegistry );
         Preconditions.checkNotNull( resourceHost );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ) );
         Preconditions.checkNotNull( template );
+        Preconditions.checkNotNull( quota );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( ownerId ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( initiatorPeerId ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( ip ) );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( ip ) && ip.matches( Common.CIDR_REGEX ) );
         Preconditions.checkArgument( NumUtil.isIntBetween( vlan, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
 
