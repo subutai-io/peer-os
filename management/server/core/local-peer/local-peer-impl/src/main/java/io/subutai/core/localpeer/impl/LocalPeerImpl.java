@@ -2242,6 +2242,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
+    @Override
+    public Task getTask( final Integer id )
+    {
+        return taskManager.getTask( id );
+    }
+
+
     private class SetupP2PConnectionTask implements Callable<P2PConfig>
     {
         private Peer peer;

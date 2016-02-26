@@ -22,6 +22,8 @@ public interface LocalPeer extends Peer
      */
     String getPublicIp() throws PeerException;
 
+    Task getTask( Integer id );
+
     /**
      * Adds remote apt repository to local apt sources
      */

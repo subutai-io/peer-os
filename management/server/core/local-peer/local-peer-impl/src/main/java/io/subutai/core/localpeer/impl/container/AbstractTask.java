@@ -26,13 +26,14 @@ public abstract class AbstractTask<T> implements Task<T>
     public static int DEFAULT_TIMEOUT = 30;
 
     protected static final Logger LOG = LoggerFactory.getLogger( AbstractTask.class );
-
+    private int id;
     protected T result;
     protected List<Throwable> exceptions = new ArrayList<>();
     private volatile Task.State state = Task.State.PENDING;
     protected CommandUtil commandUtil = new CommandUtil();
     protected CommandResult commandResult;
     protected long started;
+    protected long finished;
 
 
     protected RequestBuilder getRequestBuilder() throws Exception
@@ -43,9 +44,16 @@ public abstract class AbstractTask<T> implements Task<T>
     }
 
 
-    @Override
-    public void start()
+    public int getId()
     {
+        return id;
+    }
+
+
+    @Override
+    public void start( final int id )
+    {
+        this.id = id;
         this.started = System.currentTimeMillis();
         this.state = State.RUNNING;
         try
@@ -78,6 +86,7 @@ public abstract class AbstractTask<T> implements Task<T>
         {
             failure( e.getMessage(), e );
         }
+        this.finished = System.currentTimeMillis();
     }
 
 

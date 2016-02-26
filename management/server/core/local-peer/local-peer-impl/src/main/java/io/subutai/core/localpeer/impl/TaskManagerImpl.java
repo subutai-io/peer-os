@@ -25,12 +25,10 @@ public class TaskManagerImpl implements TaskManager
     private Map<Integer, Task> tasks = new ConcurrentHashMap<>();
     private Map<String, Executor> executors = new ConcurrentHashMap<>();
     private AtomicInteger counter = new AtomicInteger( 0 );
-    //private ScheduledExecutorService timeoutService = Executors.newSingleThreadScheduledExecutor();
 
 
     public TaskManagerImpl()
     {
-        //timeoutService.scheduleWithFixedDelay( this, 10, 10, TimeUnit.SECONDS );
     }
 
 
@@ -38,16 +36,16 @@ public class TaskManagerImpl implements TaskManager
     public int schedule( final Task task )
     {
         Executor executor = getExecutor( task );
+        final int taskId = counter.incrementAndGet();
         executor.execute( new Runnable()
         {
             @Override
             public void run()
             {
-                task.start();
+                task.start(taskId);
             }
         } );
 
-        Integer taskId = counter.incrementAndGet();
         tasks.put( taskId, task );
         return taskId;
     }
@@ -99,24 +97,9 @@ public class TaskManagerImpl implements TaskManager
     }
 
 
-//    @Override
-//    public void run()
-//    {
-//        LOG.debug( "Timeout check..." );
-//        for ( Task task : tasks.values() )
-//        {
-//            if ( task.getState() == Task.State.RUNNING )
-//            {
-//                try
-//                {
-//                    task.checkTimeout();
-//                }
-//                catch ( Exception e )
-//                {
-//                    LOG.error( e.getMessage(), e );
-//                }
-//            }
-//        }
-//        LOG.debug( "Timeout check...done." );
-//    }
+    @Override
+    public Task getTask( final int id )
+    {
+        return tasks.get( id );
+    }
 }
