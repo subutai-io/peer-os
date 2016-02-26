@@ -6,5 +6,5 @@ package io.subutai.common.command;
  */
 public interface CommandResultParser<T>
 {
-    T parse( final CommandResult commandResult );
+    T parse( final CommandResult commandResult ) throws CommandResultParseException;
 }

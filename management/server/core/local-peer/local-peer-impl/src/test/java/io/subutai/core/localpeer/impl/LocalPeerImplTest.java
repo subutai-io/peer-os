@@ -2,8 +2,8 @@ package io.subutai.core.localpeer.impl;
 
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -35,8 +35,9 @@ import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.QuotaAlertValue;
-import io.subutai.common.network.Gateway;
+import io.subutai.common.network.Gateways;
 import io.subutai.common.network.Vni;
+import io.subutai.common.network.Vnis;
 import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
@@ -265,7 +266,7 @@ public class LocalPeerImplTest
         localPeer.managementHost = managementHost;
         localPeer.requestListeners = Sets.newHashSet( requestListener );
         localPeer.setPeerInfo( peerInfo );
-//        localPeer.setExternalIpInterface( INTERFACE_NAME );
+        //        localPeer.setExternalIpInterface( INTERFACE_NAME );
 
         //        when( cpuQuota.getValue( MeasureUnit.PERCENT ).intValue() ).thenReturn( Integer.parseInt( CPUQUOTA
         // ) );
@@ -386,7 +387,7 @@ public class LocalPeerImplTest
     @Test
     public void testGetPeerInfo() throws Exception
     {
-//        assertEquals( peerInfo, localPeer.getPeerInfo() );
+        //        assertEquals( peerInfo, localPeer.getPeerInfo() );
     }
 
 
@@ -963,27 +964,8 @@ public class LocalPeerImplTest
     @Ignore
     public void testGetGateways() throws Exception
     {
-        HostInterfaceModel hostInterfaceModelModel = mock( HostInterfaceModel.class );
-        when( hostInterfaceModelModel.getName() ).thenReturn( "br-100" );
+        Gateways gateways = localPeer.getGateways();
 
-        Set<Gateway> gateways = localPeer.getGateways();
-
-        assertFalse( gateways.isEmpty() );
-    }
-
-
-    @Test
-    public void testFindVniByEnvironmentById() throws Exception
-    {
-
-        assertNull( localPeer.findVniByEnvironmentId( ENV_ID ) );
-
-        Vni vni = mock( Vni.class );
-        when( vni.getEnvironmentId() ).thenReturn( ENV_ID );
-        when( networkManager.getReservedVnis() ).thenReturn( Sets.newHashSet( vni ) );
-
-        Vni vni2 = localPeer.findVniByEnvironmentId( ENV_ID );
-
-        assertEquals( vni, vni2 );
+        assertEquals( 1, gateways.list().size() );
     }
 }

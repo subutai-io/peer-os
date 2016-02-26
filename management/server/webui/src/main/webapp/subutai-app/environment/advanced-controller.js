@@ -19,8 +19,6 @@ var RH_SPACE = 10;
 function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, trackerSrv, SweetAlert, ngDialog) {
 
 	var vm = this;
-	var GRID_CELL_SIZE = 100;
-	var GRID_SIZE = 100;
 
 	vm.buildEnvironment = buildEnvironment;
 	vm.buildEditedEnvironment = buildEditedEnvironment;
@@ -77,10 +75,20 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 		vm.domainStrategies = data;
 	});
 
-	environmentService.getPeers().success(function (data) {
-		vm.peerIds = data;
-		//vm.peerIds['testPeer'] = ['rh1', 'rh2', 'rh3'];
-	});
+	function getPeers() {
+		$('.js-peer-load-screen').show();
+		environmentService.getPeers().success(function (data) {
+			vm.peerIds = data;
+			//vm.peerIds['testPeer'] = ['rh1', 'rh2', 'rh3'];
+			$('.js-peer-load-screen').hide();
+		}).error(function(error){
+			$('.js-peer-load-screen').hide();
+			VARS_MODAL_ERROR( SweetAlert, 'Error on getting peers: ' + error );
+		});
+	}
+	getPeers();
+
+
 	clearWorkspace();
 
 	/*peerRegistrationService.getResourceHosts().success(function (data) {
@@ -169,8 +177,26 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 				} else {
 					if(data.state == 'FAILED') {
 						checkLastLog(false);
+						$rootScope.notifications = {
+							"message": "Error on building environment", 
+							"date": moment().format('MMMM Do YYYY, HH:mm:ss'),
+							"type": "error"
+						};
 					} else {
 						//SweetAlert.swal("Success!", "Your environment has been built successfully.", "success");
+
+						if(vm.editingEnv) {
+							$rootScope.notifications = {
+								"message": "Environment has been changed successfully", 
+								"date": moment().format('MMMM Do YYYY, HH:mm:ss')
+							};
+						} else {
+							$rootScope.notifications = {
+								"message": "Environment has been created", 
+								"date": moment().format('MMMM Do YYYY, HH:mm:ss')
+							};
+						}
+
 						checkLastLog(true);
 						var currentLog = {
 							"time": moment().format('HH:mm:ss'),
@@ -181,8 +207,10 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 						vm.logMessages.push(currentLog);						
 						vm.buildCompleted = true;
 						vm.editingEnv = false;
+
 					}
 					$scope.$emit('reloadEnvironmentsList');
+					clearWorkspace();
 				}
 			}).error(function(error) {
 				console.log(error);
@@ -192,6 +220,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 	function buildEnvironment() {
 		vm.buildStep = 'showLogs';
 
+		vm.buildCompleted = false;
 		vm.logMessages = [];
 		var currentLog = {
 			"time": '',
@@ -204,11 +233,6 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 		environmentService.startEnvironmentAdvancedBuild(vm.environment2BuildName, JSON.stringify(vm.containers2Build))
 			.success(function(data){
 				vm.newEnvID = data;
-
-				$rootScope.notifications = {
-					"message": "Environment(" + data + ") creation has been started", 
-					"date": moment().format('MMMM Do YYYY, HH:mm:ss')
-				};
 
 				checkLastLog(true);
 
@@ -233,7 +257,8 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
 				$rootScope.notifications = {
 					"message": "Error on creating environment. " + error, 
-					"date": moment().format('MMMM Do YYYY, HH:mm:ss')
+					"date": moment().format('MMMM Do YYYY, HH:mm:ss'),
+					"type": "error"
 				};
 			});
 	}
@@ -241,6 +266,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 	function buildEditedEnvironment() {
 		vm.buildStep = 'showLogs';
 
+		vm.buildCompleted = false;
 		vm.logMessages = [];
 		var currentLog = {
 			"time": '',
@@ -254,11 +280,6 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 		environmentService.modifyEnvironment(conteiners, 'advanced')
 			.success(function(data){
 				vm.newEnvID = data;
-
-				$rootScope.notifications = {
-					"message": "Environment(" + data + ") creation has been started", 
-					"date": moment().format('MMMM Do YYYY, HH:mm:ss')
-				};
 
 				getLogById(data, true);
 				$scope.$emit('reloadEnvironmentsList');
@@ -651,23 +672,25 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
 			for( var i = 0; i < models.length; i++ ) {
 				if (models[i].get('hostId') !== undefined) {
-					if( cellView.model.get("parent") != models[i].id )
-					{
+					if( cellView.model.get("parent") != models[i].id ) {
+
 						var rh = cellView.model.get('rh');
 						var prevParent = graph.getCell(cellView.model.get("parent"));
 						prevParent.unembed(cellView.model);
+						prevParent.set('children', prevParent.get('children') - 1);						
 						delete prevParent.get('grid')[rh.x][rh.y];
 
+						checkResourceHost(models[i]);
 						var rPos = models[i].get('position');
 						var gPos = placeRhSimple( models[i] );
 
 						cellView.model.set('rh', { model: models[i].id, x: gPos.x, y: gPos.y});
 						var x = (rPos.x + gPos.x * GRID_SIZE + GRID_SPACING) + 23;
-						var y = (rPos.y + gPos.y * GRID_SIZE + GRID_SPACING) + 49;					
+						var y = (rPos.y + gPos.y * GRID_SIZE + GRID_SPACING) + 49;
 						cellView.model.set('position', { x: x, y: y });
 
 						models[i].embed(cellView.model);
-
+						models[i].set('children', models[i].get('children') + 1);						
 
 						return;
 					}
@@ -816,7 +839,6 @@ function imageExists(image_url){
 function placeRhSimple( model ) {
 	var array = model.attributes.grid;
 	var sizeObj = model.attributes.gridSize;
-	var children = model.get('children');
 	var size = sizeObj.size;
 
 	for( var j = 0; j < size; j++ ) {

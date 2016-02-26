@@ -12,6 +12,7 @@ import com.google.common.collect.Maps;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.network.Gateway;
+import io.subutai.common.network.Gateways;
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
@@ -43,7 +44,7 @@ public class VNISetupStep
         newPeers.remove( peerManager.getLocalPeer() );
 
         //obtain reserved gateways
-        Map<Peer, Set<Gateway>> reservedGateways = Maps.newHashMap();
+        Map<Peer, Gateways> reservedGateways = Maps.newHashMap();
         for ( Peer peer : newPeers )
         {
             reservedGateways.put( peer, peer.getGateways() );
@@ -53,18 +54,16 @@ public class VNISetupStep
         SubnetUtils subnetUtils = new SubnetUtils( environment.getSubnetCidr() );
         String environmentGatewayIp = subnetUtils.getInfo().getLowAddress();
 
-        for ( Map.Entry<Peer, Set<Gateway>> peerGateways : reservedGateways.entrySet() )
+        for ( Map.Entry<Peer, Gateways> peerGateways : reservedGateways.entrySet() )
         {
             Peer peer = peerGateways.getKey();
-            Set<Gateway> gateways = peerGateways.getValue();
-            for ( Gateway gateway : gateways )
+            Gateways gateways = peerGateways.getValue();
+
+            if ( gateways.findGatewayByIp( environmentGatewayIp ) != null )
             {
-                if ( gateway.getIp().equals( environmentGatewayIp ) )
-                {
-                    throw new EnvironmentModificationException(
-                            String.format( "Subnet %s is already used on peer %s", environment.getSubnetCidr(),
-                                    peer.getName() ) );
-                }
+                throw new EnvironmentModificationException(
+                        String.format( "Subnet %s is already used on peer %s", environment.getSubnetCidr(),
+                                peer.getName() ) );
             }
         }
 
@@ -74,7 +73,7 @@ public class VNISetupStep
 
         for ( final Peer peer : newPeers )
         {
-            for ( final Vni vni : peer.getReservedVnis() )
+            for ( final Vni vni : peer.getReservedVnis().list() )
             {
                 if ( vni.getVni() == environmentVni.getVni() && !Objects
                         .equals( vni.getEnvironmentId(), environmentVni.getEnvironmentId() ) )

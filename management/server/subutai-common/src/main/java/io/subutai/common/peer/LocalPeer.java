@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Set;
 
 import io.subutai.common.network.DomainLoadBalanceStrategy;
-import io.subutai.common.network.Vni;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.task.Task;
@@ -34,10 +33,6 @@ public interface LocalPeer extends Peer
      */
     @Deprecated
     void removeRepository( final String host, final String ip ) throws PeerException;
-
-
-    Vni findVniByEnvironmentId( String environmentId ) throws PeerException;
-
 
     /**
      * Removes a gateway

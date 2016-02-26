@@ -26,10 +26,8 @@ public class SshKeyAdditionWorkflow extends Workflow<SshKeyAdditionWorkflow.SshK
     private final TrackerOperation operationTracker;
     private final EnvironmentManagerImpl environmentManager;
 
-    private Throwable error;
 
-
-    public static enum SshKeyAdditionPhase
+    public enum SshKeyAdditionPhase
     {
         INIT, ADD_KEY, FINALIZE
     }
@@ -79,7 +77,7 @@ public class SshKeyAdditionWorkflow extends Workflow<SshKeyAdditionWorkflow.SshK
         }
         catch ( Exception e )
         {
-            setError( e );
+            fail( e.getMessage(), e );
 
             return null;
         }
@@ -101,22 +99,19 @@ public class SshKeyAdditionWorkflow extends Workflow<SshKeyAdditionWorkflow.SshK
     }
 
 
-    public Throwable getError()
+    @Override
+    public void fail( final String message, final Throwable e )
     {
-        return error;
+        super.fail( message, e );
+        saveFailState();
     }
 
 
-    public void setError( final Throwable error )
+    private void saveFailState()
     {
         environment.setStatus( EnvironmentStatus.UNHEALTHY );
-
         environment = environmentManager.saveOrUpdate( environment );
-
-        this.error = error;
-        LOG.error( "Error adding ssh key", error );
-        operationTracker.addLogFailed( error.getMessage() );
-        //stop the workflow
-        stop();
+        operationTracker.addLogFailed( getFailedReason() );
+        LOG.error( "Error adding ssh key", getFailedException() );
     }
 }

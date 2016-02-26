@@ -4,15 +4,17 @@ package io.subutai.core.localpeer.impl.container;
 import java.util.concurrent.TimeUnit;
 
 import io.subutai.common.command.CommandException;
+import io.subutai.common.command.CommandResult;
+import io.subutai.common.command.CommandResultParser;
 import io.subutai.common.command.RequestBuilder;
 
 
 /**
  * Abstract task implementation
  */
-public abstract class DaemonTask<T> extends AbstractTask<T>
+public abstract class DaemonTask<T> extends AbstractTask<T> implements CommandResultParser<T>
 {
-    private boolean run = true;
+    private long endTime;
 
 
     @Override
@@ -25,42 +27,79 @@ public abstract class DaemonTask<T> extends AbstractTask<T>
 
 
     @Override
-    public void start()
+    public CommandResultParser<T> getCommandResultParser()
     {
-        this.started = System.currentTimeMillis();
-        setState( State.RUNNING );
+        return this;
+    }
+
+
+    @Override
+    public T parse( final CommandResult commandResult )
+    {
+        // waiting for result
         try
         {
-            RequestBuilder builder = getRequestBuilder();
-
-            commandResult = commandUtil.execute( builder, getHost() );
-
-            if ( !commandResult.hasSucceeded() )
+            while ( result == null )
             {
-                setState( State.FAILURE );
+                try
+                {
+                    TimeUnit.SECONDS.sleep( 1 );
+                }
+                catch ( InterruptedException e )
+                {
+                    // ignore
+                }
+                result = lookupResult();
+                if ( result == null )
+                {
+                    checkTimeout();
+                }
             }
         }
 
         catch ( Exception e )
         {
-            this.exception = e;
-            setState( State.FAILURE );
+            failure( e.getMessage(), e );
+        }
+        return result;
+    }
+
+
+    public abstract T lookupResult();
+
+/*
+
+    @Override
+    public void start()
+    {
+        super.start();
+
+        endTime = started + TimeUnit.SECONDS.toMillis( getTimeout() );
+
+        // waiting the result
+        try
+        {
+            while ( !isDone() )
+            {
+                try
+                {
+                    TimeUnit.SECONDS.sleep( 1 );
+                }
+                catch ( InterruptedException e )
+                {
+                    // ignore
+                }
+
+                checkTimeout();
+            }
         }
 
-        while ( run && getState() == State.RUNNING )
+        catch ( Exception e )
         {
-            try
-            {
-                TimeUnit.SECONDS.sleep( 1 );
-            }
-            catch ( InterruptedException e )
-            {
-                // ignore
-            }
-
-            checkTimeout();
+            failure( e.getMessage(), e );
         }
     }
+*/
 
 
     @Override
@@ -70,38 +109,13 @@ public abstract class DaemonTask<T> extends AbstractTask<T>
     }
 
 
-    public void stop()
-    {
-        this.run = false;
-    }
-
-
-    private void checkTimeout()
+    protected void checkTimeout() throws CommandException
     {
         if ( getState() == State.RUNNING )
         {
-            if ( started + TimeUnit.SECONDS.toMillis( getTimeout() ) < System.currentTimeMillis() )
+            if ( endTime < System.currentTimeMillis() )
             {
-                this.exception = new CommandException( "Command execution timeout." );
-                setState( State.FAILURE );
-            }
-        }
-        if ( result == null )
-        {
-            if ( getCommandResultParser() != null )
-            {
-                try
-                {
-                    result = getCommandResultParser().parse( commandResult );
-                    if ( result != null )
-                    {
-                        setState( State.SUCCESS );
-                    }
-                }
-                catch ( Exception e )
-                {
-                    // ignore
-                }
+                throw new CommandException( "Command execution timed out." );
             }
         }
     }

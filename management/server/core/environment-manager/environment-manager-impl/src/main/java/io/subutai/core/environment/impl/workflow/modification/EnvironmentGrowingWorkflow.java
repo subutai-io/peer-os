@@ -12,6 +12,7 @@ import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.creation.steps.ContainerCloneStep;
+import io.subutai.core.environment.impl.workflow.creation.steps.PrepareTemplatesStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterHostsStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterSshStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.PEKGenerationStep;
@@ -24,7 +25,6 @@ import io.subutai.core.peer.api.PeerManager;
 
 public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkflow.EnvironmentGrowingPhase>
 {
-
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentGrowingWorkflow.class );
 
     private final TemplateManager templateRegistry;
@@ -36,9 +36,6 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
     private final TrackerOperation operationTracker;
     private final EnvironmentManagerImpl environmentManager;
 
-    private Throwable error;
-
-
     //environment creation phases
     public static enum EnvironmentGrowingPhase
     {
@@ -46,6 +43,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
         GENERATE_KEYS,
         SETUP_VNI,
         SETUP_P2P,
+        PREPARE_TEMPLATES,
         CLONE_CONTAINERS,
         CONFIGURE_HOSTS,
         CONFIGURE_SSH,
@@ -101,7 +99,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
         }
         catch ( Exception e )
         {
-            setError( e );
+            fail( e.getMessage(), e );
 
             return null;
         }
@@ -122,7 +120,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
         }
         catch ( Exception e )
         {
-            setError( e );
+            fail( e.getMessage(), e );
 
             return null;
         }
@@ -139,11 +137,32 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
 
             environment = environmentManager.saveOrUpdate( environment );
 
+            return EnvironmentGrowingPhase.PREPARE_TEMPLATES;
+        }
+        catch ( Exception e )
+        {
+            fail( e.getMessage(), e );
+
+            return null;
+        }
+    }
+
+
+    public EnvironmentGrowingPhase PREPARE_TEMPLATES()
+    {
+        operationTracker.addLog( "Preparing templates" );
+
+        try
+        {
+            new PrepareTemplatesStep( peerManager, topology, operationTracker ).execute();
+
+            environment = environmentManager.saveOrUpdate( environment );
+
             return EnvironmentGrowingPhase.CLONE_CONTAINERS;
         }
         catch ( Exception e )
         {
-            setError( e );
+            fail( e.getMessage(), e );
 
             return null;
         }
@@ -165,7 +184,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
         }
         catch ( Exception e )
         {
-            setError( e );
+            fail( e.getMessage(), e );
 
             return null;
         }
@@ -186,7 +205,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
         }
         catch ( Exception e )
         {
-            setError( e );
+            fail( e.getMessage(), e );
 
             return null;
         }
@@ -207,8 +226,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
         }
         catch ( Exception e )
         {
-            setError( e );
-
+            fail( e.getMessage(), e );
             return null;
         }
     }
@@ -229,21 +247,19 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
     }
 
 
-    public Throwable getError()
+    @Override
+    public void fail( final String message, final Throwable e )
     {
-        return error;
+        super.fail( message, e );
+        saveFailState();
     }
 
 
-    public void setError( final Throwable error )
+    private void saveFailState()
     {
         environment.setStatus( EnvironmentStatus.UNHEALTHY );
         environment = environmentManager.saveOrUpdate( environment );
-
-        this.error = error;
-        LOG.error( "Error growing environment", error );
-        operationTracker.addLogFailed( error.getMessage() );
-        //stop the workflow
-        stop();
+        operationTracker.addLogFailed( getFailedReason() );
+        LOG.error( "Error growing environment", getFailedException() );
     }
 }
