@@ -1,17 +1,14 @@
 package io.subutai.core.localpeer.impl.container;
 
 
-import java.util.Set;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupResponse;
-import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.peer.RecipientType;
 import io.subutai.common.peer.Payload;
+import io.subutai.common.peer.RecipientType;
 import io.subutai.common.peer.RequestListener;
 
 
@@ -40,9 +37,9 @@ public class CreateEnvironmentContainerGroupRequestListener extends RequestListe
         if ( request != null )
         {
 
-            CreateEnvironmentContainerGroupResponse containerHosts = localPeer.createEnvironmentContainerGroup( request );
+            CreateEnvironmentContainerGroupResponse response = localPeer.createEnvironmentContainerGroup( request );
 
-            return containerHosts;
+            return response;
         }
         else
         {

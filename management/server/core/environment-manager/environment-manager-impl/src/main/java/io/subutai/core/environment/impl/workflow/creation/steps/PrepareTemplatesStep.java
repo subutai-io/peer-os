@@ -81,9 +81,9 @@ public class PrepareTemplatesStep
                 }
                 if ( !prepareTemplatesResponse.getResult() )
                 {
-                    throw new EnvironmentCreationException( String.format(
-                            "There were errors during preparation of templates. " + prepareTemplatesResponse
-                                    .getDescription() ) );
+                    throw new EnvironmentCreationException(
+                            String.format( "There were errors during preparation of templates: %s ",
+                                    prepareTemplatesResponse.getDescription() ) );
                 }
             }
             catch ( ExecutionException | InterruptedException e )

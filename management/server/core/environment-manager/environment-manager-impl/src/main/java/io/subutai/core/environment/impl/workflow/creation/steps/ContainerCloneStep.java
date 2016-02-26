@@ -23,6 +23,8 @@ import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.security.objects.Ownership;
+import io.subutai.common.tracker.OperationMessage;
+import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
@@ -55,13 +57,15 @@ public class ContainerCloneStep
     private final EnvironmentImpl environment;
     private final RelationManager relationManager;
     private final IdentityManager identityManager;
+    private final TrackerOperation operationTracker;
     protected ExceptionUtil exceptionUtil = new ExceptionUtil();
     private PeerManager peerManager;
 
 
     public ContainerCloneStep( final TemplateManager templateRegistry, final String defaultDomain,
                                final Topology topology, final EnvironmentImpl environment,
-                               final PeerManager peerManager, final EnvironmentManagerImpl environmentManager )
+                               final PeerManager peerManager, final EnvironmentManagerImpl environmentManager,
+                               final TrackerOperation operationTracker )
     {
         this.templateRegistry = templateRegistry;
         this.defaultDomain = defaultDomain;
@@ -70,6 +74,7 @@ public class ContainerCloneStep
         this.peerManager = peerManager;
         this.relationManager = environmentManager.getRelationManager();
         this.identityManager = environmentManager.getIdentityManager();
+        this.operationTracker = operationTracker;
     }
 
 
@@ -140,6 +145,18 @@ public class ContainerCloneStep
                 for ( NodeGroupBuildResult result : results )
                 {
                     LOGGER.debug( String.format( "Node group build result: %s", result ) );
+
+                    for ( OperationMessage message : result.getResponse().getMessages() )
+                    {
+                        if ( message.getType() == OperationMessage.Type.SUCCEEDED )
+                        {
+                            operationTracker.addLogDone( message.getValue() );
+                        }
+                        else
+                        {
+                            operationTracker.addLogFailed( message.getValue() );
+                        }
+                    }
                     if ( !CollectionUtil.isCollectionEmpty( result.getContainers() ) )
                     {
                         environment.addContainers( result.getContainers() );
@@ -160,7 +177,6 @@ public class ContainerCloneStep
 
         if ( !errors.isEmpty() )
         {
-
             throw new EnvironmentCreationException(
                     String.format( "There were errors during container creation:  %s", errors ) );
         }

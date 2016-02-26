@@ -65,6 +65,7 @@ public class CreatePeerNodeGroupsTask implements Callable<Set<NodeGroupBuildResu
             NodeGroupBuildException exception = null;
             Set<EnvironmentContainerImpl> containers = Sets.newHashSet();
             final String hostname = String.format( "%s_%s", nodeGroup.getTemplateName(), UUID.randomUUID().toString() );
+            CreateEnvironmentContainerGroupResponse response = new CreateEnvironmentContainerGroupResponse();
             try
             {
                 final CreateEnvironmentContainerGroupRequest request;
@@ -73,11 +74,11 @@ public class CreatePeerNodeGroupsTask implements Callable<Set<NodeGroupBuildResu
                         localPeer.getOwnerId(), environment.getSubnetCidr(), ipAddressOffset + currentIpAddressOffset,
                         nodeGroup.getTemplateName(), nodeGroup.getHostId(), nodeGroup.getType() );
 
-                CreateEnvironmentContainerGroupResponse newHosts = peer.createEnvironmentContainerGroup( request );
+                response = peer.createEnvironmentContainerGroup( request );
 
                 currentIpAddressOffset++;
 
-                for ( ContainerHostInfoModel newHost : newHosts.getHosts() )
+                for ( ContainerHostInfoModel newHost : response.getHosts() )
                 {
                     containers.add( new EnvironmentContainerImpl( localPeer.getId(), peer, nodeGroup.getName(), newHost,
                             templateRegistry.getTemplate( nodeGroup.getTemplateName() ), nodeGroup.getSshGroupId(),
@@ -96,7 +97,7 @@ public class CreatePeerNodeGroupsTask implements Callable<Set<NodeGroupBuildResu
                         String.format( "Error creating node group %s on peer %s. Container host name: %s.", nodeGroup,
                                 peer.getName(), hostname ), exceptionUtil.getRootCause( e ) );
             }
-            results.add( new NodeGroupBuildResult( containers, exception ) );
+            results.add( new NodeGroupBuildResult( containers, exception, response ) );
         }
 
 

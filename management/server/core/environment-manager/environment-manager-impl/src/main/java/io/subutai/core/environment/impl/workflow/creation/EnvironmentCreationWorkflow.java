@@ -171,7 +171,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         try
         {
             new ContainerCloneStep( templateRegistry, defaultDomain, topology, environment, peerManager,
-                    environmentManager ).execute();
+                    environmentManager, operationTracker ).execute();
 
             environment = environmentManager.saveOrUpdate( environment );
 

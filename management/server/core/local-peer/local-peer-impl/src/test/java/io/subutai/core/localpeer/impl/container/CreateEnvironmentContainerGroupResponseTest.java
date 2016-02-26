@@ -18,6 +18,7 @@ import static junit.framework.TestCase.assertEquals;
 @RunWith( MockitoJUnitRunner.class )
 public class CreateEnvironmentContainerGroupResponseTest
 {
+    private static final String DESC = "description";
     @Mock
     ContainerHostInfoModel containerHostInfoModel;
 
@@ -27,7 +28,8 @@ public class CreateEnvironmentContainerGroupResponseTest
     @Before
     public void setUp() throws Exception
     {
-        response = new CreateEnvironmentContainerGroupResponse( Sets.newHashSet( containerHostInfoModel ) );
+        response = new CreateEnvironmentContainerGroupResponse(  );
+        response.addHostInfo( containerHostInfoModel );
     }
 
 
@@ -35,5 +37,13 @@ public class CreateEnvironmentContainerGroupResponseTest
     public void testGetHosts() throws Exception
     {
         assertEquals( Sets.newHashSet( containerHostInfoModel ), response.getHosts() );
+    }
+
+
+    @Test
+    public void testGetDescription() throws Exception
+    {
+        assertEquals( 1, response.getMessages().size() );
+        assertEquals( DESC, response.getMessages().get(0).getValue() );
     }
 }

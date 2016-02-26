@@ -3,6 +3,7 @@ package io.subutai.core.environment.impl.workflow.creation.steps.helpers;
 
 import java.util.Set;
 
+import io.subutai.common.environment.CreateEnvironmentContainerGroupResponse;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.exception.NodeGroupBuildException;
 
@@ -12,15 +13,18 @@ import io.subutai.core.environment.impl.exception.NodeGroupBuildException;
  */
 public class NodeGroupBuildResult
 {
+    private final CreateEnvironmentContainerGroupResponse response;
     private Set<EnvironmentContainerImpl> containers;
     private NodeGroupBuildException exception;
 
 
     public NodeGroupBuildResult( final Set<EnvironmentContainerImpl> containers,
-                                 final NodeGroupBuildException exception )
+                                 final NodeGroupBuildException exception,
+                                 final CreateEnvironmentContainerGroupResponse response )
     {
         this.containers = containers;
         this.exception = exception;
+        this.response = response;
     }
 
 
@@ -33,6 +37,12 @@ public class NodeGroupBuildResult
     public NodeGroupBuildException getException()
     {
         return exception;
+    }
+
+
+    public CreateEnvironmentContainerGroupResponse getResponse()
+    {
+        return response;
     }
 
 

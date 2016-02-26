@@ -48,6 +48,7 @@ public class CloneTask extends AbstractTask<HostInfo> implements CommandResultPa
     private final String ip;
     private final int vlan;
     private final ContainerQuota quota;
+    private final ContainerSize size;
     private final String environmentId;
     private final LocalPeerImpl localPeer;
     private HostRegistry hostRegistry;
@@ -57,8 +58,8 @@ public class CloneTask extends AbstractTask<HostInfo> implements CommandResultPa
 
     public CloneTask( LocalPeerImpl localPeer, HostRegistry hostRegistry, final ResourceHost resourceHost,
                       final TemplateKurjun template, final String hostname, final String environmentId,
-                      final String ownerId, final String initiatorPeerId, final ContainerQuota quota, final String ip,
-                      final int vlan )
+                      final String ownerId, final String initiatorPeerId, final ContainerSize size,
+                      final ContainerQuota quota, final String ip, final int vlan )
     {
         Preconditions.checkNotNull( resourceHost );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ) );
@@ -77,6 +78,7 @@ public class CloneTask extends AbstractTask<HostInfo> implements CommandResultPa
         this.ip = ip;
         this.vlan = vlan;
         this.quota = quota;
+        this.size = size;
     }
 
 
@@ -171,7 +173,7 @@ public class CloneTask extends AbstractTask<HostInfo> implements CommandResultPa
     @Override
     public boolean isSequential()
     {
-        return true;
+        return false;
     }
 
 
@@ -182,8 +184,7 @@ public class CloneTask extends AbstractTask<HostInfo> implements CommandResultPa
         containerHostEntity.setEnvironmentId( environmentId );
         containerHostEntity.setOwnerId( ownerId );
         containerHostEntity.setInitiatorPeerId( initiatorPeerId );
-        //todo: containerSize
-        containerHostEntity.setContainerSize( ContainerSize.MEDIUM );
+        containerHostEntity.setContainerSize( size );
 
         try
         {
