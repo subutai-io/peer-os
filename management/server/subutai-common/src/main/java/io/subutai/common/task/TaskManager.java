@@ -20,4 +20,6 @@ public interface TaskManager
     void cancelAll();
 
     List<Task> getAllTasks();
+
+    Task getTask( int id );
 }
