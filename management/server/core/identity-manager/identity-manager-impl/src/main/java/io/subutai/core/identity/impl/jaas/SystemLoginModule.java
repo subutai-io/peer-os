@@ -89,13 +89,12 @@ public class SystemLoginModule extends AbstractKarafLoginModule
                 //******************************************
                 principals = new HashSet<>();
                 principals.add( new UserPrincipal( user ) );
-                principals.add( new RolePrincipal( "webconsole" ) );
                 //******************************************
 
                 if ( userSession.getSubject() != null ) //restore
                 {
                     principals.addAll( userSession.getSubject().getPrincipals() );
-//                    LOGGER.debug( "Session restored" );
+                //LOGGER.debug( "Session restored" );
                 }
                 else //create new subject
                 {
@@ -116,7 +115,7 @@ public class SystemLoginModule extends AbstractKarafLoginModule
                         }
                     }
                     //******************************************
-//                    LOGGER.debug( "Successful login." );
+                //LOGGER.debug( "Successful login." );
                 }
 
                 //******************************************
