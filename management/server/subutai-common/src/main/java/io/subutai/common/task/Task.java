@@ -11,19 +11,14 @@ import io.subutai.common.peer.Host;
  */
 public interface Task<T>
 {
-    int getTimeout();
-
-    boolean isDone();
-
-    //    void checkTimeout();
-
+    long getElapsedTime();
 
     enum State
     {
         PENDING, RUNNING, SUCCESS, FAILURE;
     }
 
-    void start();
+    void start( final int taskId );
 
     State getState();
 
@@ -36,4 +31,9 @@ public interface Task<T>
     Host getHost();
 
     boolean isSequential();
+
+    int getTimeout();
+
+    boolean isDone();
+
 }

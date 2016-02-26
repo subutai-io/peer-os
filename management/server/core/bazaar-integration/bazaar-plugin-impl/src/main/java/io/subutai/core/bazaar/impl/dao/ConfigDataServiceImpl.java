@@ -25,7 +25,7 @@ public class ConfigDataServiceImpl implements ConfigDataService
 
 
 	@Override
-	public void savePlugin (String name, String version, String kar, String url)
+	public void savePlugin (String name, String version, String kar, String url, String uid)
 	{
 		EntityManager em = daoManager.getEntityManagerFactory ().createEntityManager ();
 		Plugin newPlugin = new PluginEntity ();
@@ -33,6 +33,7 @@ public class ConfigDataServiceImpl implements ConfigDataService
 		newPlugin.setVersion (version);
 		newPlugin.setKar (kar);
 		newPlugin.setUrl (url);
+		newPlugin.setUid (uid);
 		try
 		{
 			daoManager.startTransaction( em );

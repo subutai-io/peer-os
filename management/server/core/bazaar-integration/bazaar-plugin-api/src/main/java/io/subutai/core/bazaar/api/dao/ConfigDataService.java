@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface ConfigDataService
 {
-	void savePlugin (final String name, final String version, final String kar, final String url);
+	void savePlugin (final String name, final String version, final String kar, final String url, final String uid);
 
 	void deletePlugin (final Long id);
 

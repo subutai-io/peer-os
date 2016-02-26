@@ -1,9 +1,12 @@
 package io.subutai.common.util;
 
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.TimeZone;
 
 import com.google.common.collect.Lists;
 
@@ -117,5 +120,14 @@ public class StringUtil
             return str.length();
         }
         return 0;
+    }
+
+
+    public static String convertSecondToHHMM( long seconds )
+    {
+        TimeZone tz = TimeZone.getTimeZone( "UTC" );
+        SimpleDateFormat df = new SimpleDateFormat( "HH:mm:ss" );
+        df.setTimeZone( tz );
+        return df.format( new Date( seconds * 1000L ) );
     }
 }

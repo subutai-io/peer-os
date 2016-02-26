@@ -19,7 +19,7 @@ public interface RestService
 	@POST
 	@Path( "install" )
 	@Produces( { MediaType.TEXT_PLAIN } )
-	public Response installPlugin (@FormParam ("name") String name, @FormParam ("version") String version, @FormParam ("kar") String kar, @FormParam ("url") String url);
+	public Response installPlugin (@FormParam ("name") String name, @FormParam ("version") String version, @FormParam ("kar") String kar, @FormParam ("url") String url, @FormParam ("uid") String uid);
 
 	@POST
 	@Path( "uninstall" )
