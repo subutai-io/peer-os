@@ -1,0 +1,24 @@
+<div ng-controller="SettingsAdvancedCtrl as settingsAdvancedCtrl">
+
+  <div class="b-workspace__header">
+    <h1 class="b-title"><span class="b-title_breadcrumbs">Advanced Settings</span></h1>
+  </div>
+
+  <div class="b-workspace__content">
+    <div class="b-workspace-content__row">
+      <div class="b-main-table-border" style="width: 500px">
+        <table class="b-main-table b-main-table_with-header" style="width: 500px" align="center">
+          <tr>
+            <th>
+              <div style="display: inline-block; float: left; margin-top: 8px">Karaf Log</div>
+              &#160;&#160;&#160;&#160;
+            </th>
+            <td style="padding-right: 18px"><textarea rows="50" cols="100" ng-model="settingsAdvancedCtrl.config.karafLogs">  </textarea>
+              <!--<input class="b-form-input b-form-input_full" type="text" ng-model="settingsAdvancedCtrl.config.karafLogs" required>-->
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
