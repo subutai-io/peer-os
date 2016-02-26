@@ -179,7 +179,7 @@ function SubutaiController($rootScope) {
 	});
 }
 
-
+var $stateProviderRef = null;
 function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 
 	$urlRouterProvider.otherwise('/404');
@@ -706,6 +706,8 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 		})
 		.state();
 
+	$stateProviderRef = $stateProvider;
+
 	$httpProvider.interceptors.push(function($q, $location) {
 		return {
 			'responseError': function(rejection) {
@@ -735,6 +737,38 @@ function startup($rootScope, $state, $location, $http) {
 			localStorage.removeItem('currentUser');
 			$location.path('/login');
 		}
+	});
+
+	$rootScope.$on('reloadPluginsStates', function(event) {
+		location.reload();
+		/*var state = {
+			url: '/console/{containerId}',
+			templateUrl: 'subutai-app/console/partials/view.html',
+			data: {
+				bodyClass: '',
+				layout: 'default'
+			},
+			resolve: {
+				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+					return $ocLazyLoad.load([
+						{
+							name: 'vtortola.ng-terminal'
+						},
+						{
+							name: 'subutai.console',
+							files: [
+								'subutai-app/console/console.js',
+								'subutai-app/console/controller.js',
+								'subutai-app/console/service.js',
+								'subutai-app/environment/service.js',
+								'subutai-app/peerRegistration/service.js'
+							]
+						}
+					]);
+				}]
+			}
+		};
+		$stateProviderRef.state('console', state);*/
 	});
 
 	$rootScope.$state = $state;
