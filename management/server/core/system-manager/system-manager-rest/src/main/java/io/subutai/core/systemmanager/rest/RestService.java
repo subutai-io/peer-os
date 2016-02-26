@@ -84,5 +84,11 @@ public interface RestService
     @Produces( { MediaType.TEXT_PLAIN } )
     public Response setNetworkSettings( @FormParam( "securePortX1" ) String securePortX1,
                                         @FormParam( "securePortX2" ) String securePortX2,
-                                        @FormParam( "securePortX3" ) String securePortX3 ) throws ConfigurationException;
+                                        @FormParam( "securePortX3" ) String securePortX3 )
+            throws ConfigurationException;
+
+    @GET
+    @Path( "advanced_settings" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getAdvancedSettings();
 }
