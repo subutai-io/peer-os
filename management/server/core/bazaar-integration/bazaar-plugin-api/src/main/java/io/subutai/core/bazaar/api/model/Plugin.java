@@ -22,4 +22,8 @@ public interface Plugin
 	public String getUrl();
 
 	public void setUrl (final String url);
+
+	public String getUid ();
+
+	public void setUid (String uid);
 }

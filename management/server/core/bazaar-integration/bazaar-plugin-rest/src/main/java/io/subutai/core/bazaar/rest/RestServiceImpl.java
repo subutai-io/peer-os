@@ -24,11 +24,11 @@ public class RestServiceImpl implements RestService
 	}
 
 	@Override
-	public Response installPlugin (String name, String version, String kar, String url)
+	public Response installPlugin (String name, String version, String kar, String url, String uid)
 	{
 		try
 		{
-			bazaar.installPlugin (name, version, kar, url);
+			bazaar.installPlugin (name, version, kar, url, uid);
 		}
 		catch (HubPluginException e)
 		{
