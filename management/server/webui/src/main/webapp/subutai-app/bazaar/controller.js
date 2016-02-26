@@ -36,6 +36,7 @@ function BazaarCtrl($scope, BazaarSrv, ngDialog, SweetAlert, $location, cfpLoadi
 					console.log (vm.plugins);
 					BazaarSrv.getInstalledHubPlugins().success (function (data) {
 						vm.installedHubPlugins = data;
+						console.log (vm.installedHubPlugins);
 						for (var i = 0; i < vm.plugins.length; ++i) {
 							vm.plugins[i].img = "https://s3-eu-west-1.amazonaws.com/subutai-hub/products/" + vm.plugins[i].id + "/logo/logo.png";
 							vm.plugins[i].installed = false;
@@ -391,7 +392,17 @@ function BazaarCtrl($scope, BazaarSrv, ngDialog, SweetAlert, $location, cfpLoadi
 	vm.installPlugin = installPlugin;
 	function installPlugin (plugin) {
 		plugin.installButton.options.callback = function (instance) {
-			if (plugin.dependencies.length > 0) {
+			var arr = plugin.dependencies.slice();
+			for (var i = 0; i < vm.installedHubPlugins.length; ++i) {
+				for (var j = 0; j < plugin.dependencies.length; ++j) {
+					if (vm.installedHubPlugins[i].uid === plugin.dependencies[j]) {
+						var index = arr.indexOf (plugin.dependencies[j]);
+						arr.splice (index, 1);
+					}
+				}
+			}
+			console.log (plugin.dependencies, arr);
+			if (arr.length > 0) {
 				SweetAlert.swal({
 					title: "Additional dependencies",
 					text: "It seems that there are dependencies that need to be installed. Are you sure you want to continue?",
@@ -417,11 +428,19 @@ function BazaarCtrl($scope, BazaarSrv, ngDialog, SweetAlert, $location, cfpLoadi
 								}*/
 							}, 150);
 						var installPluginDependencies = function (dependencies, callback) {
-							console.log (dependencies);
-							console.log (callback);
-							for (var i = 0; i < dependencies.length; ++i) {
+							var arr = dependencies.slice();
+							for (var i = 0; i < vm.installedHubPlugins.length; ++i) {
+								for (var j = 0; j < dependencies.length; ++j) {
+									if (vm.installedHubPlugins[i].uid === dependencies[j]) {
+										var index = arr.indexOf (dependencies[j]);
+										arr.splice (index, 1);
+									}
+								}
+							}
+							console.log (dependencies, arr);
+							for (var i = 0; i < arr.length; ++i) {
 								for (var j = 0; j < vm.plugins.length; ++j) {
-									if (dependencies[i] === vm.plugins[j].id) {
+									if (arr[i] === vm.plugins[j].id) {
 										installPluginDependencies (vm.plugins[j].dependencies, function() {
 											return;
 										});
@@ -432,7 +451,7 @@ function BazaarCtrl($scope, BazaarSrv, ngDialog, SweetAlert, $location, cfpLoadi
 								}
 							}
 						}
-						installPluginDependencies (plugin.dependencies, function() {
+						installPluginDependencies (arr, function() {
 							BazaarSrv.installHubPlugin (plugin).success (function (data) {
 								setTimeout (function() {
 									progress = 1;

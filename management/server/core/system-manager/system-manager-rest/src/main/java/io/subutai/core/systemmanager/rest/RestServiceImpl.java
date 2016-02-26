@@ -14,6 +14,7 @@ import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.systemmanager.api.SystemManager;
+import io.subutai.core.systemmanager.api.pojo.AdvancedSettings;
 import io.subutai.core.systemmanager.api.pojo.KurjunSettings;
 import io.subutai.core.systemmanager.api.pojo.NetworkSettings;
 import io.subutai.core.systemmanager.api.pojo.PeerSettings;
@@ -188,6 +189,16 @@ public class RestServiceImpl implements RestService
                     entity( e.getMessage() ).build();
         }
         return Response.status( Response.Status.OK ).build();
+    }
+
+
+    @Override
+    public Response getAdvancedSettings()
+    {
+        AdvancedSettings pojo = systemManager.getAdvancedSettings();
+        String advancedSettingsInfo = JsonUtil.GSON.toJson( pojo );
+
+        return Response.status( Response.Status.OK ).entity( advancedSettingsInfo ).build();
     }
 
 

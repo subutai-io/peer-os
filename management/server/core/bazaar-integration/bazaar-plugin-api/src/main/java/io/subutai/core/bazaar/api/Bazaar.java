@@ -12,7 +12,7 @@ public interface Bazaar
 
 	List <Plugin> getPlugins();
 
-	void installPlugin (String name, String version, String kar, String url) throws HubPluginException;
+	void installPlugin (String name, String version, String kar, String url, String uid) throws HubPluginException;
 
 	void uninstallPlugin (Long id, String kar);
 }

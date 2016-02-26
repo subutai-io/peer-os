@@ -415,18 +415,33 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
         }
 
+        //        return new PrepareTemplatesResponse( false,
+        //                String.format( "Error on importing template %s in %s on %s", task.getTemplate(),
+        //                        task.getHost().getHostname(), peerInfo.getPublicUrl() ) );
+
+        StringBuilder sb =
+                new StringBuilder( String.format( "Preparing templates on %s...\n", peerInfo.getPublicUrl() ) );
         for ( ImportTask task : tasks )
         {
             final Boolean success = task.getResult();
+
+            sb.append( String.format( "Importing template %s on %s...", task.getTemplate(),
+                    task.getHost().getHostname() ) );
             if ( success == null || !success )
             {
-                return new PrepareTemplatesResponse( false,
-                        String.format( "Error on importing template %s in %s on %s", task.getTemplate(),
-                                task.getHost().getHostname(), peerInfo.getPublicUrl() ) );
+                for ( Throwable e : task.getExceptions() )
+                {
+                    sb.append( String.format( "failed. [%s].", e.getMessage() ) );
+                }
             }
+            else
+            {
+                sb.append( "succeeded." );
+            }
+            sb.append(
+                    String.format( " Elapsed time: %s\n", StringUtil.convertSecondToHHMM( task.getElapsedTime() ) ) );
         }
-        return new PrepareTemplatesResponse( true,
-                String.format( "Templates are ready on %s", peerInfo.getPublicUrl() ) );
+        return new PrepareTemplatesResponse( true, sb.toString() );
     }
 
 
@@ -460,8 +475,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                     String.format( "No reserved vni found for environment %s", request.getEnvironmentId() ) );
         }
 
-        //        Set<ContainerHostInfoModel> result = Sets.newHashSet();
-
         ContainerQuota containerQuota = quotaManager.getDefaultContainerQuota( request.getContainerSize() );
         if ( containerQuota == null )
         {
@@ -471,8 +484,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         final TemplateKurjun template = getTemplateByName( request.getTemplateName() );
 
-        //        for ( final String cloneName : containerDistribution )
-        //        {
         final String ipAddress = allAddresses[request.getIpAddressOffset()];
 
         CloneTask task = new CloneTask( this, hostRegistry, resourceHost, template, request.getHostname(),
@@ -485,13 +496,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         final HostInfo info = task.getResult();
         if ( info == null )
         {
-            throw new PeerException( "Clone container error." );
+            throw new PeerException( "Container clone error: " + task.getExceptions() );
         }
         result.add( info );
         return new CreateEnvironmentContainerGroupResponse( result );
-
-        //            currentIpAddressOffset++;
-        //        }
     }
 
 
@@ -2239,6 +2247,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public List<Task> getTaskList()
     {
         return taskManager.getAllTasks();
+    }
+
+
+    @Override
+    public Task getTask( final Integer id )
+    {
+        return taskManager.getTask( id );
     }
 
 
