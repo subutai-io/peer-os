@@ -11,6 +11,8 @@ import io.subutai.common.peer.Host;
  */
 public interface Task<T>
 {
+    long getElapsedTime();
+
     enum State
     {
         PENDING, RUNNING, SUCCESS, FAILURE;
