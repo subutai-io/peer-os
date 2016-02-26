@@ -1,8 +1,11 @@
 package io.subutai.core.localpeer.impl.container;
 
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -216,4 +219,18 @@ public abstract class AbstractTask<T> implements Task<T>
 
     @Override
     public boolean isDone() {return this.state == State.SUCCESS || this.state == State.FAILURE;}
+
+
+    @Override
+    public long getElapsedTime()
+    {
+        if ( isDone() )
+        {
+            return this.finished - this.started;
+        }
+        else
+        {
+            return System.currentTimeMillis() - this.started;
+        }
+    }
 }
