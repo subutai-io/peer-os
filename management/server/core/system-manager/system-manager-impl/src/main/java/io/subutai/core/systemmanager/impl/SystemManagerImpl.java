@@ -10,12 +10,18 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.configuration.ConfigurationException;
 
+import io.subutai.common.command.CommandException;
+import io.subutai.common.command.CommandResult;
+import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.peer.Host;
+import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.settings.SubutaiInfo;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.kurjun.api.KurjunTransferQuota;
 import io.subutai.core.kurjun.api.TemplateManager;
+import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.systemmanager.api.SystemManager;
 import io.subutai.core.systemmanager.api.pojo.AdvancedSettings;
 import io.subutai.core.systemmanager.api.pojo.KurjunSettings;
@@ -39,7 +45,7 @@ public class SystemManagerImpl implements SystemManager
 
     private TemplateManager templateManager;
     private IdentityManager identityManager;
-
+    private PeerManager peerManager;
 
     public SystemManagerImpl( /*final String globalKurjunUrls, final int securePortX1, final int securePortX2,
                               final int securePortX3 */ ) throws ConfigurationException
@@ -95,8 +101,16 @@ public class SystemManagerImpl implements SystemManager
 
 
     @Override
-    public SystemInfo getSystemInfo() throws ConfigurationException
+    public SystemInfo getSystemInfo() throws ConfigurationException, HostNotFoundException, CommandException
     {
+        CommandResult result = null;
+
+        RequestBuilder requestBuilder = new RequestBuilder( "subutai -v" );
+        Host host = peerManager.getLocalPeer().getManagementHost();
+        result = peerManager.getLocalPeer().execute( requestBuilder, host );
+
+        result.getStdOut();
+
         SystemInfo pojo = new SystemInfoPojo();
 
         pojo.setGitCommitId( SubutaiInfo.getCommitId() );
@@ -227,5 +241,11 @@ public class SystemManagerImpl implements SystemManager
     public void setIdentityManager( final IdentityManager identityManager )
     {
         this.identityManager = identityManager;
+    }
+
+
+    public void setPeerManager( final PeerManager peerManager )
+    {
+        this.peerManager = peerManager;
     }
 }
