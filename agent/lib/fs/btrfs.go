@@ -21,8 +21,10 @@ func IsSubvolumeReadonly(path string) bool {
 }
 
 func SubvolumeCreate(dst string) {
-	err := exec.Command("btrfs", "subvolume", "create", dst).Run()
-	log.Check(log.FatalLevel, "Creating subvolume "+dst, err)
+	if id(dst) == "" {
+		err := exec.Command("btrfs", "subvolume", "create", dst).Run()
+		log.Check(log.FatalLevel, "Creating subvolume "+dst, err)
+	}
 }
 
 func SubvolumeClone(src, dst string) {

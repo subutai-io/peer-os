@@ -27,6 +27,11 @@ func BackupContainer(container string, full bool) {
 		currentDT = currentDT + "_Full"
 	}
 
+	// create backupDir
+	if _, err := os.Stat(backupDir + container); os.IsNotExist(err) {
+		os.MkdirAll(backupDir, 0755)
+	}
+
 	// for easy removal of backup directory
 	if _, err := os.Stat(backupDir + container); os.IsNotExist(err) {
 		fs.SubvolumeCreate(backupDir + container)
