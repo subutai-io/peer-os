@@ -391,67 +391,95 @@ function BazaarCtrl($scope, BazaarSrv, ngDialog, SweetAlert, $location, cfpLoadi
 	vm.installPlugin = installPlugin;
 	function installPlugin (plugin) {
 		plugin.installButton.options.callback = function (instance) {
-			SweetAlert.swal({
-				title: "Additional dependencies",
-				text: "It seems that there are dependencies that need to be installed. Are you sure you want to continue?",
-				type: "warning",
-				showCancelButton: true,
-				confirmButtonColor: "#ff3f3c",
-				confirmButtonText: "Install",
-				cancelButtonText: "Cancel",
-				closeOnConfirm: true,
-				closeOnCancel: true,
-				showLoaderOnConfirm: false
-			},
-			function (isConfirm) {
-				if (isConfirm) {
-					var progress = 0,
-						interval = setInterval (function() {
-							progress = Math.min (progress + Math.random() * 0.1, 0.99);
-							instance.setProgress (progress);
-		/*					if( progress === 0.99 ) {
-								progress = 1;
-								instance.stop(  -1 );
-								clearInterval( interval );
-							}*/
-						}, 150);
-					var installPluginDependencies = function (dependencies, callback) {
-						console.log (dependencies);
-						console.log (callback);
-						for (var i = 0; i < dependencies.length; ++i) {
-							for (var j = 0; j < vm.plugins.length; ++j) {
-								if (dependencies[i] === vm.plugins[j].id) {
-									installPluginDependencies (vm.plugins[j].dependencies, function() {
-										return;
-									});
-									BazaarSrv.installHubPlugin (vm.plugins[j]).success (function (data) {;
-										callback();
-									});
+			if (plugin.dependencies.length > 0) {
+				SweetAlert.swal({
+					title: "Additional dependencies",
+					text: "It seems that there are dependencies that need to be installed. Are you sure you want to continue?",
+					type: "warning",
+					showCancelButton: true,
+					confirmButtonColor: "#ff3f3c",
+					confirmButtonText: "Install",
+					cancelButtonText: "Cancel",
+					closeOnConfirm: true,
+					closeOnCancel: true,
+					showLoaderOnConfirm: false
+				},
+				function (isConfirm) {
+					if (isConfirm) {
+						var progress = 0,
+							interval = setInterval (function() {
+								progress = Math.min (progress + Math.random() * 0.1, 0.99);
+								instance.setProgress (progress);
+			/*					if( progress === 0.99 ) {
+									progress = 1;
+									instance.stop(  -1 );
+									clearInterval( interval );
+								}*/
+							}, 150);
+						var installPluginDependencies = function (dependencies, callback) {
+							console.log (dependencies);
+							console.log (callback);
+							for (var i = 0; i < dependencies.length; ++i) {
+								for (var j = 0; j < vm.plugins.length; ++j) {
+									if (dependencies[i] === vm.plugins[j].id) {
+										installPluginDependencies (vm.plugins[j].dependencies, function() {
+											return;
+										});
+										BazaarSrv.installHubPlugin (vm.plugins[j]).success (function (data) {;
+											callback();
+										});
+									}
 								}
 							}
 						}
-					}
-					installPluginDependencies (plugin.dependencies, function() {
-						BazaarSrv.installHubPlugin (plugin).success (function (data) {
-							setTimeout (function() {
-								progress = 1;
-								instance.stop (1);
-								clearInterval (interval);
+						installPluginDependencies (plugin.dependencies, function() {
+							BazaarSrv.installHubPlugin (plugin).success (function (data) {
 								setTimeout (function() {
-									localStorage.setItem ("bazaarScroll", plugin.id);
-									location.reload();
+									progress = 1;
+									instance.stop (1);
+									clearInterval (interval);
+									setTimeout (function() {
+										localStorage.setItem ("bazaarScroll", plugin.id);
+										location.reload();
+									}, 2000);
 								}, 2000);
-							}, 2000);
-						}).error (function (error) {
-							instance.stop (-1);
-							clearInterval (interval);
+							}).error (function (error) {
+								instance.stop (-1);
+								clearInterval (interval);
+							});
 						});
-					});
-				}
-				else {
+					}
+					else {
+						instance.stop (-1);
+					}
+				});
+			}
+			else {
+				var progress = 0,
+					interval = setInterval (function() {
+						progress = Math.min (progress + Math.random() * 0.1, 0.99);
+						instance.setProgress (progress);
+	/*					if( progress === 0.99 ) {
+							progress = 1;
+							instance.stop(  1 );
+							clearInterval( interval );
+						}*/
+					}, 150);
+				BazaarSrv.installHubPlugin (plugin).success (function (data) {
+					setTimeout (function() {
+						progress = 1;
+						instance.stop (1);
+						clearInterval (interval);
+						setTimeout (function() {
+							localStorage.setItem ("bazaarScroll", plugin.id);
+							location.reload();
+						}, 2000);
+					}, 2000);
+				}).error (function (error) {
 					instance.stop (-1);
-				}
-			});
+					clearInterval (interval);
+				});
+			}
 		};
 	}
 
