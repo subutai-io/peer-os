@@ -12,6 +12,8 @@
   <artifactId>sol-appender</artifactId>
   <version>4.0.0-RC7-SNAPSHOT</version>
   <packaging>bundle</packaging>
+  <name>SOL APPENDER</name>
+  <description>SOL APPENDER</description>
 
   <dependencies>
     <dependency>
@@ -34,10 +36,11 @@
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.core.test.appender</Bundle-SymbolicName>
             <Import-Package />
+            <!--<Import-Package>*</Import-Package>-->
             <Export-Package>${project.groupId}.core.test.appender</Export-Package>
             <Private-Package>org.apache.log4j</Private-Package>
             <Fragment-Host>org.ops4j.pax.logging.pax-logging-service</Fragment-Host>
-            <!--<Embed-Dependency>*;scope=compile|runtime;inline=true</Embed-Dependency>-->
+            <Embed-Dependency>*;scope=compile|runtime;inline=true</Embed-Dependency>
             <_failok>true</_failok>
           </instructions>
         </configuration>

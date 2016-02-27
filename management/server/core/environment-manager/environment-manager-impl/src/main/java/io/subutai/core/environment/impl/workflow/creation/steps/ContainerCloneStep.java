@@ -150,7 +150,7 @@ public class ContainerCloneStep
                 CreateEnvironmentContainerGroupResponse response = futures.get();
                 processResponse( placement.get( response.getPeerId() ), response );
             }
-            catch ( ExecutionException | InterruptedException e )
+            catch ( Exception e )
             {
                 LOGGER.error( e.getMessage(), e );
                 errors.add( exceptionUtil.getRootCauseMessage( e ) );

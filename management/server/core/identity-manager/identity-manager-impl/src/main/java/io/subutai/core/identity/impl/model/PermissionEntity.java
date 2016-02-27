@@ -163,6 +163,7 @@ public class PermissionEntity implements Permission
         {
             perms.add( "admin" );
             perms.add( "manager" );
+            perms.add( "webconsole" );
         }
         else
         {

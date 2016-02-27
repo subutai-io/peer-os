@@ -4,7 +4,6 @@ package io.subutai.core.registration.impl;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -45,6 +44,7 @@ import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.settings.Common;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.broker.api.Broker;
@@ -176,7 +176,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
             registrationRequest.setStatus( RegistrationStatus.REQUESTED );
             try
             {
-                requestDataService.persist( registrationRequest );
+                requestDataService.update( registrationRequest );
             }
             catch ( Exception ex )
             {
@@ -268,7 +268,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
 
         for ( final ContainerInfo containerInfo : registrationRequest.getHostInfos() )
         {
-            if ( !"management".equals( containerInfo.getHostname() ) )
+            if ( !Common.MANAGEMENT_HOSTNAME.equals( containerInfo.getHostname() ) )
             {
                 importHostPublicKey( containerInfo.getId(), containerInfo.getPublicKey() );
             }
