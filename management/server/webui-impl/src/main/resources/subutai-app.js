@@ -36,6 +36,7 @@ function CurrentUserCtrl($location, $rootScope, $http, SweetAlert) {
 	vm.notificationNew = false;
 	vm.currentUserRoles = [];
 	$rootScope.notifications = {};
+	vm.hubRegisterError = false;
 
 
 	function checkIfRegistered() {
@@ -65,49 +66,58 @@ function CurrentUserCtrl($location, $rootScope, $http, SweetAlert) {
 	vm.clearLogs = clearLogs;
 
 
-	function hubRegister()
-	{
-        //should be rest/v1/hub no need to change
-        LOADING_SCREEN();
+	function hubPopupLoadScreen(show) {
+		if(show == undefined || show == null) show = false;
+		if(show) {
+			$('.js-hub-screen').show();
+		} else {
+			$('.js-hub-screen').hide();
+		}
+	}
+
+
+	function hubRegister() {
+		vm.hubRegisterError = false;
+		hubPopupLoadScreen(true);
 		var postData = 'hubIp=hub.subut.ai&email=' + vm.login + '&password=' + vm.pass;
-        $http.post( SERVER_URL + 'rest/v1/hub/register', postData, {withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
+		$http.post( SERVER_URL + 'rest/v1/hub/register', postData, {withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
 			.success(function () {
-				LOADING_SCREEN('none');
 				localStorage.setItem('hubRegistered', true);
 				vm.hubStatus = true;
-				SweetAlert.swal ("Success!", "Your peer was registered to Hub.", "success");
+				hubPopupLoadScreen();
+				//SweetAlert.swal ("Success!", "Your peer was registered to Hub.", "success");
 			}).error (function (error) {
-				LOADING_SCREEN('none');
-				SweetAlert.swal ("ERROR!", "Hub register error: " + error.replace(/\\n/g, " "), "error");
+				console.log('hub/register error: ', error);
+				vm.hubRegisterError = error;
+				hubPopupLoadScreen();
 			});
 	}
 
 	function hubUnregister() {
-		LOADING_SCREEN();
-	    $http.delete( SERVER_URL + 'rest/v1/hub/unregister' )
+		hubPopupLoadScreen(true);
+		$http.delete( SERVER_URL + 'rest/v1/hub/unregister' )
 			.success(function () {
-				LOADING_SCREEN('none');
+				hubPopupLoadScreen();
 				localStorage.removeItem('hubRegistered');
 				vm.hubStatus = false;
-				SweetAlert.swal ("Success!", "Your peer was unregistered from Hub.", "success");
+				//SweetAlert.swal ("Success!", "Your peer was unregistered from Hub.", "success");
 			}).error (function (error) {
-				LOADING_SCREEN('none');
+				hubPopupLoadScreen();
 				SweetAlert.swal ("ERROR!", "Error while registering to Hub.\nPlease check your credentials and try again.", "error");
 			});
 	}
 
-	function hubHeartbeat()
-	{
-        //should be rest/v1/hub no need to change
-        LOADING_SCREEN();
-        $http.post( SERVER_URL + 'rest/v1/hub/send-heartbeat', {withCredentials: true} )
+	function hubHeartbeat() {
+		//should be rest/v1/hub no need to change
+		hubPopupLoadScreen(true);
+		$http.post( SERVER_URL + 'rest/v1/hub/send-heartbeat', {withCredentials: true} )
 			.success(function () {
-				LOADING_SCREEN('none');
+				hubPopupLoadScreen();
 				localStorage.setItem('hubRegistered', true);
 				vm.hubStatus = true;
 				SweetAlert.swal ("Success!", "Heartbeat sent successfully.", "success");
 			}).error (function (error) {
-				LOADING_SCREEN('none');
+				hubPopupLoadScreen();
 				SweetAlert.swal ("ERROR!", "Hub heartbeat error: " + error.replace(/\\n/g, " "), "error");
 			});
 	}

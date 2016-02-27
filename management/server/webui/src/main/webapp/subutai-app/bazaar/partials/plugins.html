@@ -1,7 +1,6 @@
 <div class="b-plugins-list">
 
 	<div class="b-plugins-list__item" ng-repeat="plugin in bazaarCtrl.refOldPlugins">
-		{{ plugin }}
 		<div class="b-plugins-list-item">
 			<div class="b-plugins-list-item__img">
 				<table class="b-vertical-helper">
@@ -20,6 +19,7 @@
 					Open
 				</a>
 			</div>
+			<button class="b-plugins-list-item__delete" ng-click="bazaarCtrl.uninstallPlugin (plugin)"></button>
 		</div>
 	</div>
 </div>
