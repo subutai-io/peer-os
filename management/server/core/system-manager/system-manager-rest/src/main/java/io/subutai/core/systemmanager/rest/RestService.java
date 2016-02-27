@@ -20,7 +20,7 @@ public interface RestService
     @GET
     @Path( "about" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getSubutaiInfo();
+    public Response getSubutaiInfo() throws ConfigurationException;
 
     @GET
     @Path( "peer_settings" )
@@ -77,12 +77,12 @@ public interface RestService
     @GET
     @Path( "network_settings" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getNetworkSettings();
+    public Response getNetworkSettings() throws ConfigurationException;
 
     @POST
     @Path( "update_network_settings" )
     @Produces( { MediaType.TEXT_PLAIN } )
     public Response setNetworkSettings( @FormParam( "securePortX1" ) String securePortX1,
                                         @FormParam( "securePortX2" ) String securePortX2,
-                                        @FormParam( "securePortX3" ) String securePortX3 );
+                                        @FormParam( "securePortX3" ) String securePortX3 ) throws ConfigurationException;
 }

@@ -73,7 +73,9 @@ import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.network.Gateway;
+import io.subutai.common.network.Gateways;
 import io.subutai.common.network.Vni;
+import io.subutai.common.network.Vnis;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerHost;
@@ -450,7 +452,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         final String networkPrefix = cidr.getInfo().getCidrSignature().split( "/" )[1];
         String[] allAddresses = cidr.getInfo().getAllAddresses();
         //        int currentIpAddressOffset = 0;
-        final Vni environmentVni = findVniByEnvironmentId( request.getEnvironmentId() );
+        final Vni environmentVni = getReservedVnis().findVniByEnvironmentId( request.getEnvironmentId() );
 
         if ( environmentVni == null )
         {
@@ -1346,20 +1348,16 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public Set<Gateway> getGateways() throws PeerException
+    public Gateways getGateways() throws PeerException
     {
-        Set<Gateway> gateways = Sets.newHashSet();
+        Gateways gateways = new Gateways();
 
-        //TODO: use findByName method
         for ( HostInterface iface : getManagementHost().getHostInterfaces().getAll() )
         {
             Matcher matcher = GATEWAY_INTERFACE_NAME_PATTERN.matcher( iface.getName().trim() );
             if ( matcher.find() )
             {
-                int vlan = Integer.parseInt( matcher.group( 1 ) );
-                String ip = iface.getIp();
-
-                gateways.add( new Gateway( vlan, ip ) );
+                gateways.add( new Gateway( Integer.parseInt( matcher.group( 1 ) ), iface.getIp() ) );
             }
         }
 
@@ -1396,7 +1394,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public Set<Vni> getReservedVnis() throws PeerException
+    public Vnis getReservedVnis() throws PeerException
     {
         try
         {
@@ -1412,7 +1410,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public String getVniDomain( final Long vni ) throws PeerException
     {
-        Integer vlan = getVlanByVni( vni );
+        Integer vlan = getReservedVnis().findVlanByVni( vni );
 
         if ( vlan != null )
         {
@@ -1437,7 +1435,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public void removeVniDomain( final Long vni ) throws PeerException
     {
-        Integer vlan = getVlanByVni( vni );
+        Integer vlan = getReservedVnis().findVlanByVni( vni );
 
         if ( vlan != null )
         {
@@ -1467,7 +1465,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         Preconditions.checkArgument( !Strings.isNullOrEmpty( domain ) );
         Preconditions.checkNotNull( domainLoadBalanceStrategy );
 
-        Integer vlan = getVlanByVni( vni );
+        Integer vlan = getReservedVnis().findVlanByVni( vni );
 
         if ( vlan != null )
         {
@@ -1493,7 +1491,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostIp ) );
 
-        Integer vlan = getVlanByVni( vni );
+        Integer vlan = getReservedVnis().findVlanByVni( vni );
 
         if ( vlan != null )
         {
@@ -1521,7 +1519,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostIp ) );
 
-        Integer vlan = getVlanByVni( vni );
+        Integer vlan = getReservedVnis().findVlanByVni( vni );
 
         if ( vlan != null )
         {
@@ -1548,7 +1546,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostIp ) );
 
-        Integer vlan = getVlanByVni( vni );
+        Integer vlan = getReservedVnis().findVlanByVni( vni );
 
         if ( vlan != null )
         {
@@ -1733,22 +1731,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
 
         return true;
-    }
-
-
-    protected Integer getVlanByVni( long vni ) throws PeerException
-    {
-        Set<Vni> reservedVnis = getReservedVnis();
-
-        for ( Vni reservedVni : reservedVnis )
-        {
-            if ( reservedVni.getVni() == vni )
-            {
-                return reservedVni.getVlan();
-            }
-        }
-
-        return null;
     }
 
 
@@ -1996,7 +1978,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     private void cleanup( final EnvironmentId environmentId ) throws PeerException
     {
-        Vni vni = findVniByEnvironmentId( environmentId.getId() );
+        Vni vni = getReservedVnis().findVniByEnvironmentId( environmentId.getId() );
         if ( vni == null )
         {
             return;
@@ -2349,22 +2331,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @Override
-    public Vni findVniByEnvironmentId( String environmentId ) throws PeerException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ) );
-
-        //check if vni is already reserved
-        for ( Vni aVni : getReservedVnis() )
-        {
-            if ( aVni.getEnvironmentId().equals( environmentId ) )
-            {
-                return aVni;
-            }
-        }
-
-        return null;
-    }
+    //    @Override
+    //    public Vni findVniByEnvironmentId( String environmentId ) throws PeerException
+    //    {
+    //        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ) );
+    //
+    //        return getReservedVnis().findVniByEnvironmentId( environmentId );
+    //    }
 
 
     @Override

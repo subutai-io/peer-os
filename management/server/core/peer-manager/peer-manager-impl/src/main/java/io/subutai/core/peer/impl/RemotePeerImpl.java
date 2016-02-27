@@ -42,8 +42,9 @@ import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
-import io.subutai.common.network.Gateway;
+import io.subutai.common.network.Gateways;
 import io.subutai.common.network.Vni;
+import io.subutai.common.network.Vnis;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerHost;
@@ -773,7 +774,7 @@ public class RemotePeerImpl implements RemotePeer
 
     @RolesAllowed( "Environment-Management|Read" )
     @Override
-    public Set<Gateway> getGateways() throws PeerException
+    public Gateways getGateways() throws PeerException
     {
         try
         {
@@ -787,7 +788,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public Set<Vni> getReservedVnis() throws PeerException
+    public Vnis getReservedVnis() throws PeerException
     {
         return new PeerWebClient( peerInfo, provider ).getReservedVnis();
     }

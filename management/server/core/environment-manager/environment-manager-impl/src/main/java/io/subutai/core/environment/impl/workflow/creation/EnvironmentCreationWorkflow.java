@@ -4,7 +4,6 @@ package io.subutai.core.environment.impl.workflow.creation;
 import org.apache.servicemix.beanflow.Workflow;
 
 import io.subutai.common.environment.EnvironmentStatus;
-import io.subutai.common.environment.PrepareTemplatesRequest;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
@@ -16,7 +15,6 @@ import io.subutai.core.environment.impl.workflow.creation.steps.RegisterHostsSte
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterSshStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.SetupP2PStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.VNISetupStep;
-import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerManager;
@@ -25,8 +23,6 @@ import io.subutai.core.security.api.SecurityManager;
 
 public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWorkflow.EnvironmentCreationPhase>
 {
-    //    private static final Logger LOG = LoggerFactory.getLogger( EnvironmentCreationWorkflow.class );
-
     private final TemplateManager templateRegistry;
     private final NetworkManager networkManager;
     private final PeerManager peerManager;
@@ -37,9 +33,6 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
     private final String defaultDomain;
     private final TrackerOperation operationTracker;
     private final EnvironmentManagerImpl environmentManager;
-
-    //    private Throwable error;
-    private IdentityManager identityManager;
 
 
     //environment creation phases
@@ -60,12 +53,11 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
     public EnvironmentCreationWorkflow( String defaultDomain, TemplateManager templateRegistry,
                                         EnvironmentManagerImpl environmentManager, NetworkManager networkManager,
                                         PeerManager peerManager, SecurityManager securityManager,
-                                        IdentityManager identityManager, EnvironmentImpl environment, Topology topology,
-                                        String sshKey, TrackerOperation operationTracker )
+                                        EnvironmentImpl environment, Topology topology, String sshKey,
+                                        TrackerOperation operationTracker )
     {
         super( EnvironmentCreationPhase.INIT );
 
-        this.identityManager = identityManager;
         this.environmentManager = environmentManager;
         this.templateRegistry = templateRegistry;
         this.peerManager = peerManager;
@@ -106,7 +98,6 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         }
         catch ( Exception e )
         {
-            //            setError( e );
             fail( e.getMessage(), e );
             return null;
         }
@@ -127,7 +118,6 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         }
         catch ( Exception e )
         {
-            //            setError( e );
             fail( e.getMessage(), e );
             return null;
         }
@@ -148,7 +138,6 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         }
         catch ( Exception e )
         {
-            //            setError( e );
             fail( e.getMessage(), e );
             return null;
         }
@@ -157,7 +146,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
     public EnvironmentCreationPhase PREPARE_TEMPLATES()
     {
-        operationTracker.addLog( "Downloading templates" );
+        operationTracker.addLog( "Preparing templates" );
 
         try
         {
@@ -169,7 +158,6 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         }
         catch ( Exception e )
         {
-            //            setError( e );
             fail( e.getMessage(), e );
             return null;
         }
@@ -191,7 +179,6 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         }
         catch ( Exception e )
         {
-            //            setError( e );
             fail( e.getMessage(), e );
             return null;
         }
@@ -212,7 +199,6 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         }
         catch ( Exception e )
         {
-            //            setError( e );
             fail( e.getMessage(), e );
             return null;
         }
@@ -235,7 +221,6 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         }
         catch ( Exception e )
         {
-            //            setError( e );
             fail( e.getMessage(), e );
             return null;
         }
@@ -256,11 +241,6 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         stop();
     }
 
-    //    public Throwable getError()
-    //    {
-    //        return error;
-    //    }
-
 
     @Override
     public void fail( final String message, final Throwable e )
@@ -276,16 +256,4 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         environment = environmentManager.saveOrUpdate( environment );
         operationTracker.addLogFailed( getFailedReason() );
     }
-
-
-    //    public void setError( final Throwable error )
-    //    {
-    //        environment.setStatus( EnvironmentStatus.UNHEALTHY );
-    //        environment = environmentManager.saveOrUpdate( environment );
-    //        this.error = error;
-    //        LOG.error( "Error creating environment", error );
-    //        operationTracker.addLogFailed( error.getMessage() );
-    //        //stop the workflow
-    //        stop();
-    //    }
 }

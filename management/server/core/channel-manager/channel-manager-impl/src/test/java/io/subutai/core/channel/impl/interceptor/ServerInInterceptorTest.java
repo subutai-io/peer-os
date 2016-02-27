@@ -2,6 +2,7 @@ package io.subutai.core.channel.impl.interceptor;
 
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -17,6 +18,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
 
+@Ignore
 @RunWith( MockitoJUnitRunner.class )
 public class ServerInInterceptorTest
 {
@@ -45,7 +47,7 @@ public class ServerInInterceptorTest
     @Test
     public void testHandleMessageException() throws Exception
     {
-//        cxfInterceptor.handleMessage( message );
+        //        cxfInterceptor.handleMessage( message );
     }
 
 

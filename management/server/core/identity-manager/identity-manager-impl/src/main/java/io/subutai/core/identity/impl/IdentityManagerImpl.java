@@ -215,6 +215,13 @@ public class IdentityManagerImpl implements IdentityManager
             setPeerOwner( admin );
             //**********************************************
         }
+        else
+        {
+            User admin = identityDataService.getUserByUsername( "admin" );
+            //***** setPeer Owner By Default ***************
+            setPeerOwner( admin );
+            //**********************************************
+        }
     }
 
 
