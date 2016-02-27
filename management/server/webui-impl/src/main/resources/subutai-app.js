@@ -85,7 +85,7 @@ function CurrentUserCtrl($location, $rootScope, $http, SweetAlert) {
 				localStorage.setItem('hubRegistered', true);
 				vm.hubStatus = true;
 				hubPopupLoadScreen();
-				SweetAlert.swal ("Success!", "Your peer was registered to Hub.", "success");
+				//SweetAlert.swal ("Success!", "Your peer was registered to Hub.", "success");
 			}).error (function (error) {
 				console.log('hub/register error: ', error);
 				vm.hubRegisterError = error;
@@ -100,7 +100,7 @@ function CurrentUserCtrl($location, $rootScope, $http, SweetAlert) {
 				hubPopupLoadScreen();
 				localStorage.removeItem('hubRegistered');
 				vm.hubStatus = false;
-				SweetAlert.swal ("Success!", "Your peer was unregistered from Hub.", "success");
+				//SweetAlert.swal ("Success!", "Your peer was unregistered from Hub.", "success");
 			}).error (function (error) {
 				hubPopupLoadScreen();
 				SweetAlert.swal ("ERROR!", "Error while registering to Hub.\nPlease check your credentials and try again.", "error");
