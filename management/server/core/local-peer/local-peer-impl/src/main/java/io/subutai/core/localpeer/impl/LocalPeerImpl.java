@@ -15,9 +15,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -380,18 +378,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    protected ExecutorService getExecutor( int numOfThreads )
-    {
-        return Executors.newFixedThreadPool( numOfThreads );
-    }
-
-
-    protected CompletionService<ContainerHostInfo> getCompletionService( Executor executor )
-    {
-        return new ExecutorCompletionService<>( executor );
-    }
-
-
     @RolesAllowed( "Environment-Management|Write" )
     @Override
     public PrepareTemplatesResponse prepareTemplates( final PrepareTemplatesRequest request ) throws PeerException
@@ -474,55 +460,61 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         try
         {
             cidr = new SubnetUtils( request.getSubnetCidr() );
-        }
-        catch ( IllegalArgumentException e )
-        {
-            throw new PeerException( "Failed to parse subnet CIDR", e );
-        }
 
-        final ResourceHost resourceHost = getResourceHostById( request.getHost() );
-        //        Set<String> containerDistribution = generateCloneNames( request.getTemplateName(), 1 );
-        final String networkPrefix = cidr.getInfo().getCidrSignature().split( "/" )[1];
-        String[] allAddresses = cidr.getInfo().getAllAddresses();
-        //        int currentIpAddressOffset = 0;
-        final Vni environmentVni = getReservedVnis().findVniByEnvironmentId( request.getEnvironmentId() );
 
-        if ( environmentVni == null )
-        {
-            throw new PeerException(
-                    String.format( "No reserved vni found for environment %s", request.getEnvironmentId() ) );
-        }
+            final ResourceHost resourceHost = getResourceHostById( request.getHost() );
+            final String networkPrefix = cidr.getInfo().getCidrSignature().split( "/" )[1];
+            String[] allAddresses = cidr.getInfo().getAllAddresses();
+            final Vni environmentVni = getReservedVnis().findVniByEnvironmentId( request.getEnvironmentId() );
 
-        ContainerQuota containerQuota = quotaManager.getDefaultContainerQuota( request.getContainerSize() );
-        if ( containerQuota == null )
-        {
-            LOG.warn( "Quota not found for container type: " + request.getContainerSize() );
-            containerQuota = quotaManager.getDefaultContainerQuota( ContainerSize.SMALL );
-        }
-
-        final TemplateKurjun template = getTemplateByName( request.getTemplateName() );
-
-        final String ipAddress = allAddresses[request.getIpAddressOffset()];
-
-        CloneTask task = new CloneTask( this, hostRegistry, resourceHost, template, request.getHostname(),
-                request.getEnvironmentId(), request.getOwnerId(), request.getInitiatorPeerId(), containerQuota,
-                String.format( "%s/%s", ipAddress, networkPrefix ), environmentVni.getVlan() );
-
-        taskManager.schedule( task );
-
-        final HashSet result = new HashSet<>();
-        final HostInfo info = task.getResult();
-        if ( info == null )
-        {
-            StringBuilder sb = new StringBuilder();
-            for ( Throwable throwable : task.getExceptions() )
+            if ( environmentVni == null )
             {
-                sb.append( String.format( "%s\n", throwable.getMessage() ) );
+                throw new PeerException(
+                        String.format( "No reserved vni found for environment %s", request.getEnvironmentId() ) );
             }
-            throw new PeerException( "Container clone error. " + sb.toString() );
+
+            ContainerQuota containerQuota = quotaManager.getDefaultContainerQuota( request.getContainerSize() );
+            if ( containerQuota == null )
+            {
+                LOG.warn( "Quota not found for container type: " + request.getContainerSize() );
+                containerQuota = quotaManager.getDefaultContainerQuota( ContainerSize.SMALL );
+            }
+
+            final TemplateKurjun template = getTemplateByName( request.getTemplateName() );
+
+            final String ipAddress = allAddresses[request.getIpAddressOffset()];
+
+            CloneTask task = new CloneTask( this, hostRegistry, resourceHost, template, request.getHostname(),
+                    request.getEnvironmentId(), request.getOwnerId(), request.getInitiatorPeerId(), containerQuota,
+                    String.format( "%s/%s", ipAddress, networkPrefix ), environmentVni.getVlan() );
+
+            taskManager.schedule( task );
+
+            final Set<ContainerHostInfoModel> result = Sets.newHashSet();
+            final HostInfo info = task.getResult();
+            if ( info == null )
+            {
+                StringBuilder sb = new StringBuilder();
+                for ( Throwable throwable : task.getExceptions() )
+                {
+                    sb.append( String.format( "%s\n", throwable.getMessage() ) );
+                }
+                throw new PeerException( "Container clone error. " + sb.toString() );
+            }
+            else
+            {
+                result.add( ( ContainerHostInfoModel ) info );
+                return new CreateEnvironmentContainerGroupResponse( result );
+            }
         }
-        result.add( info );
-        return new CreateEnvironmentContainerGroupResponse( result );
+        catch ( Exception e )
+        {
+            if ( e instanceof PeerException )
+            {
+                throw e;
+            }
+            throw new PeerException( "Failed to create environment container group", e );
+        }
     }
 
 
@@ -538,120 +530,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         LOG.debug( "New container host registered: " + containerHostEntity.getHostname() );
     }
-
-
-    //       @RolesAllowed( "Environment-Management|Write" )
-    //    @Override
-    //    public void createEnvironmentContainerGroup(
-    //            final CreateEnvironmentContainerGroupRequest request ) throws PeerException
-    //    {
-    //        Preconditions.checkNotNull( request );
-    //
-    //        SubnetUtils cidr;
-    //        try
-    //        {
-    //            cidr = new SubnetUtils( request.getSubnetCidr() );
-    //        }
-    //        catch ( IllegalArgumentException e )
-    //        {
-    //            throw new PeerException( "Failed to parse subnet CIDR", e );
-    //        }
-    //
-    //        final ResourceHost resourceHost = getResourceHostById( request.getHost() );
-    //        Set<String> containerDistribution = generateCloneNames( request.getTemplateName(), 1 );
-    //        final String networkPrefix = cidr.getInfo().getCidrSignature().split( "/" )[1];
-    //        String[] allAddresses = cidr.getInfo().getAllAddresses();
-    ////        String gateway = cidr.getInfo().getLowAddress();
-    //        int currentIpAddressOffset = 0;
-    //        final Vni environmentVni = findVniByEnvironmentId( request.getEnvironmentId() );
-    //
-    //        if ( environmentVni == null )
-    //        {
-    //            throw new PeerException(
-    //                    String.format( "No reserved vni found for environment %s", request.getEnvironmentId() ) );
-    //        }
-    //
-    ////        Set<ContainerHostInfoModel> result = Sets.newHashSet();
-    //
-    //        ContainerQuota containerQuota = quotaManager.getDefaultContainerQuota( request.getContainerSize() );
-    //        if ( containerQuota == null )
-    //        {
-    //            LOG.warn( "Quota not found for container type: " + request.getContainerSize() );
-    //            containerQuota = quotaManager.getDefaultContainerQuota( ContainerSize.SMALL );
-    //        }
-    //
-    //        final TemplateKurjun template = getTemplateByName( request.getTemplateName() );
-    //        ExecutorService taskExecutor = getExecutor( containerDistribution.size() );
-    //        CompletionService<ContainerHostInfo> taskCompletionService = getCompletionService( taskExecutor );
-    //
-    //        for ( final String cloneName : containerDistribution )
-    //        {
-    //            final String ipAddress = allAddresses[request.getIpAddressOffset() + currentIpAddressOffset];
-    //
-    //            //TODO create a separate class out of this anonymous
-    //            taskCompletionService.submit( new Callable<ContainerHostInfo>()
-    //            {
-    //                @Override
-    //                public ContainerHostInfo call() throws Exception
-    //                {
-    //                    try
-    //                    {
-    //                        //TODO add quota switch to clone binding
-    //                        quotaManager.getDefaultContainerQuota( request.getContainerSize() );
-    //                        ContainerHostInfo hostInfo = resourceHost.createContainer( request.getTemplateName(),
-    // cloneName,
-    //                                quotaManager.getDefaultContainerQuota( request.getContainerSize() ),
-    //                                String.format( "%s/%s", ipAddress, networkPrefix ), environmentVni.getVlan(),
-    //                                Common.WAIT_CONTAINER_CONNECTION_SEC, request.getEnvironmentId() );
-    //
-    //
-    //                        ContainerHostEntity containerHostEntity =
-    //                                new ContainerHostEntity( getId(), hostInfo, template.getName(),
-    //                                        template.getArchitecture() );
-    //                        containerHostEntity.setEnvironmentId( request.getEnvironmentId() );
-    //                        containerHostEntity.setOwnerId( request.getOwnerId() );
-    //                        containerHostEntity.setInitiatorPeerId( request.getInitiatorPeerId() );
-    //                        containerHostEntity.setContainerSize( request.getContainerSize() );
-    //
-    //                        resourceHost.addContainerHost( containerHostEntity );
-    //
-    //                        signContainerKeyWithPEK( containerHostEntity.getId(), containerHostEntity
-    // .getEnvironmentId() );
-    //
-    //                        resourceHostDataService.saveOrUpdate( resourceHost );
-    //
-    //                        return hostInfo;
-    //                    }
-    //                    catch ( ResourceHostException e )
-    //                    {
-    //                        LOG.error( "Error creating container", e );
-    //                    }
-    //                    return null;
-    //                }
-    //            } );
-    //
-    //            currentIpAddressOffset++;
-    //        }
-    //
-    //        for ( String ignored : containerDistribution )
-    //        {
-    //            try
-    //            {
-    //                Future<ContainerHostInfo> futures = taskCompletionService.take();
-    //                ContainerHostInfo hostInfo = futures.get();
-    //                if ( hostInfo != null )
-    //                {
-    //                    result.add( new ContainerHostInfoModel( hostInfo ) );
-    //                }
-    //            }
-    //            catch ( ExecutionException | InterruptedException e )
-    //            {
-    //
-    //            }
-    //        }
-    //
-    //
-    //    }
 
 
     private void signContainerKeyWithPEK( String containerId, EnvironmentId envId ) throws PeerException
@@ -671,22 +549,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             throw new PeerException( ex );
         }
-    }
-
-
-    protected Set<String> generateCloneNames( String templateName, int count ) throws PeerException
-    {
-        Set<String> result = new HashSet<>();
-
-        for ( int i = 0; i < count; i++ )
-        {
-            String newContainerName = StringUtil
-                    .trimToSize( String.format( "%s%s", templateName, UUID.randomUUID() ).replace( "-", "" ),
-                            Common.MAX_CONTAINER_NAME_LEN );
-            result.add( newContainerName );
-        }
-
-        return result;
     }
 
 
