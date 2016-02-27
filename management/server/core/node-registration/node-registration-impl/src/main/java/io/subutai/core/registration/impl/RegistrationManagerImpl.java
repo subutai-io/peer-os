@@ -4,7 +4,6 @@ package io.subutai.core.registration.impl;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -176,7 +175,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
             registrationRequest.setStatus( RegistrationStatus.REQUESTED );
             try
             {
-                requestDataService.persist( registrationRequest );
+                requestDataService.update( registrationRequest );
             }
             catch ( Exception ex )
             {
