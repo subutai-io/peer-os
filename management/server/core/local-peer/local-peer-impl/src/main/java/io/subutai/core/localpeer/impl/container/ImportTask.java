@@ -6,10 +6,8 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 
-import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandResultParser;
-import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.task.Command;
@@ -80,7 +78,7 @@ public class ImportTask extends AbstractTask<Boolean> implements CommandResultPa
     @Override
     public boolean isSequential()
     {
-        return false;
+        return true;
     }
 
 

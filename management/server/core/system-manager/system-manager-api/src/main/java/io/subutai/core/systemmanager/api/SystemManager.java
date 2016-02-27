@@ -3,6 +3,7 @@ package io.subutai.core.systemmanager.api;
 
 import org.apache.commons.configuration.ConfigurationException;
 
+import io.subutai.core.systemmanager.api.pojo.AdvancedSettings;
 import io.subutai.core.systemmanager.api.pojo.KurjunSettings;
 import io.subutai.core.systemmanager.api.pojo.NetworkSettings;
 import io.subutai.core.systemmanager.api.pojo.PeerSettings;
@@ -32,4 +33,6 @@ public interface SystemManager
     boolean setKurjunSettings( String[] globalKurjunUrls, long publicDiskQuota, long publicThreshold,
                                long publicTimeFrame, long trustDiskQuota, long trustThreshold, long trustTimeFrame )
             throws ConfigurationException;
+
+    AdvancedSettings getAdvancedSettings();
 }

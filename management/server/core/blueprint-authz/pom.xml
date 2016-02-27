@@ -98,7 +98,7 @@
     <dependency>
       <groupId>io.subutai</groupId>
       <artifactId>subutai-common</artifactId>
-      <version>4.0.0-RC6</version>
+      <version>4.0.0-RC7-SNAPSHOT</version>
     </dependency>
 
   </dependencies>

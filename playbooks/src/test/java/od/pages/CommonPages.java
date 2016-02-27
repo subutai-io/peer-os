@@ -16,6 +16,11 @@ public class CommonPages extends PageObject {
     //region WEB ELEMENTS: Buttons
 
     //endregion
+    //region SIKULI IMAGES: Buttons
+
+    public String sikuliButtonLogin = "src/test/resources/imgs/buttons/buttonLogin.png";
+
+    //endregion
 
     //region WEB ELEMENTS: Checkboxes
 
@@ -72,6 +77,16 @@ public class CommonPages extends PageObject {
     public WebElementFacade linkAbout;
 
     //endregion
+    //region SIKULI IMAGES: Menu Links
+
+    public String sikuliMenuItemEnvironment = "src/test/resources/imgs/menuItems/menuItemEnvironment.png";
+    public String sikuliMenuItemEnvironments = "src/test/resources/imgs/menuItems/menuItemEnvironments.png";
+    public String sikuliMenuItemUserManagement = "src/test/resources/imgs/menuItems/menuItemUserIdentity.png";
+    public String sikuliMenuItemAccountSettings = "src/test/resources/imgs/menuItems/menuItemAccountSettings.png";
+
+//    public String sikuliTest = returnAbsoluteFilePath.GetPath("src/test/resources/imgs/menuItems/menuItemEnvironment.png");
+
+    //endregion
 
     //region WEB ELEMENTS: Tables
 
@@ -94,6 +109,16 @@ public class CommonPages extends PageObject {
     //endregion
 
     //region WEB ELEMENTS: Headers
+
+    //endregion
+
+    //region WEB ELEMENTS: Text
+
+    @FindBy(xpath = "*//p[contains(text(), \"Your environment has been built successfully.\")]")
+    public WebElementFacade textEnvironmentHasBeenBuiltSuccessfully;
+
+    @FindBy(xpath = "*//p[contains(text(), \"Your environment has been destroyed.\")]")
+    public WebElementFacade textEnvironmentHasBeenDestroyed;
 
     //endregion
 }

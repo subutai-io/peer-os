@@ -3,6 +3,7 @@ package od.steps;
 import net.thucydides.core.annotations.Steps;
 import od.steps.serenity.SubutaiSteps;
 import org.jbehave.core.annotations.When;
+import org.sikuli.script.FindFailed;
 
 public class DefSubutaiStepsWhen {
 
@@ -15,7 +16,7 @@ public class DefSubutaiStepsWhen {
     }
 
     @When("the user clicks on the menu item: Environment")
-    public void user_click_environment(){
+    public void user_click_environment() throws FindFailed {
         subutaiSteps.clickOnMenuEnvironment();
     }
 
@@ -25,7 +26,7 @@ public class DefSubutaiStepsWhen {
     }
 
     @When("the user clicks on the menu item: Environments")
-    public void user_clicks_environment() {
+    public void user_clicks_environment() throws FindFailed {
         subutaiSteps.clickOnMenuItemEnvironments();
     }
 
@@ -57,7 +58,7 @@ public class DefSubutaiStepsWhen {
     }
 
     @When("the user clicks on the menu item: User management")
-    public void user_clicks_user_management() {
+    public void user_clicks_user_management() throws FindFailed {
         subutaiSteps.clickOnMenuUserIdentity();
         subutaiSteps.clickOnMenuItemUserManagement();
     }
@@ -100,5 +101,27 @@ public class DefSubutaiStepsWhen {
     @When("the user clicks on the menu item: About")
     public void user_click_about(){
         subutaiSteps.clickOnMenuItemAbout();
+    }
+
+    @When("the user sets pgp Key")
+    public void user_sets_pgp_key() throws FindFailed {
+        subutaiSteps.clickOnMenuItemUserManagement();
+        subutaiSteps.clickOnMenuItemAccountSettings();
+        subutaiSteps.waitFor(5000);
+        subutaiSteps.clickOnButtonSetPublicKey();
+    }
+
+    @When("the user creates environment using template: Mongo")
+    public void user_creates_environment_using_template_mongo() throws FindFailed {
+        subutaiSteps.clickOnIconTemplateMongo();
+        subutaiSteps.clickOnButtonApply();
+        subutaiSteps.inputEnvironmentName("Test Environment Mongo");
+        subutaiSteps.clickOnButtonBuild();
+        subutaiSteps.clickOnButtonCloseBuildPopup();
+        subutaiSteps.waitFor(5000);
+        subutaiSteps.clickOnIconDeleteEnvironment();
+        subutaiSteps.clickOnButtonDelete();
+        subutaiSteps.clickOnButtonOkPopupEnvironmentHasBeenDestroyed();
+        subutaiSteps.waitFor(5000);
     }
 }
