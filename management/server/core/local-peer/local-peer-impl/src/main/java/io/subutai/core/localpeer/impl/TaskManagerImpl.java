@@ -12,6 +12,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.subutai.common.command.CommandResult;
+import io.subutai.common.command.CommandResultImpl;
+import io.subutai.common.command.CommandStatus;
+import io.subutai.common.command.CommandUtil;
+import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.peer.HostNotFoundException;
+import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.task.Task;
 import io.subutai.common.task.TaskManager;
 
@@ -22,13 +30,16 @@ import io.subutai.common.task.TaskManager;
 public class TaskManagerImpl implements TaskManager
 {
     private static final Logger LOG = LoggerFactory.getLogger( TaskManagerImpl.class );
+    private final LocalPeer localPeer;
     private Map<Integer, Task> tasks = new ConcurrentHashMap<>();
     private Map<String, Executor> executors = new ConcurrentHashMap<>();
     private AtomicInteger counter = new AtomicInteger( 0 );
+    protected CommandUtil commandUtil = new CommandUtil();
 
 
-    public TaskManagerImpl()
+    public TaskManagerImpl( LocalPeer localPeer )
     {
+        this.localPeer = localPeer;
     }
 
 
@@ -42,7 +53,22 @@ public class TaskManagerImpl implements TaskManager
             @Override
             public void run()
             {
-                task.start( taskId );
+                CommandResult commandResult;
+                try
+                {
+                    RequestBuilder builder = task.getRequestBuilder();
+                    final ResourceHost resourceHost =
+                            localPeer.getResourceHostById( task.getRequest().getResourceHostId() );
+
+                    task.start( taskId );
+                    commandResult = commandUtil.execute( builder, resourceHost );
+                }
+                catch ( Exception e )
+                {
+                    commandResult = new CommandResultImpl( -1, "", e.getMessage(), CommandStatus.FAILED );
+                }
+
+                task.done( commandResult );
             }
         } );
 
@@ -53,7 +79,7 @@ public class TaskManagerImpl implements TaskManager
 
     private Executor getExecutor( final Task task )
     {
-        String executorId = task.getHost().getId() + ( task.isSequential() ? "S" : "C" );
+        String executorId = task.getRequest().getResourceHostId() + ( task.isSequential() ? "S" : "C" );
         Executor executor = executors.get( executorId );
         if ( executor == null )
         {
