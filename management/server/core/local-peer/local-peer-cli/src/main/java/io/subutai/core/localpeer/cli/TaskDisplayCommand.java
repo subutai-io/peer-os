@@ -6,6 +6,7 @@ import org.apache.karaf.shell.commands.Command;
 
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.task.Task;
+import io.subutai.common.tracker.OperationMessage;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 
 
@@ -42,16 +43,24 @@ public class TaskDisplayCommand extends SubutaiShellCommandSupport
             return null;
         }
         final String s = task.getCommandBatch().asChain();
-        System.out.println( String.format( "%s\t%d\t%s...\t%s", task.getHost().getId(), task.getTimeout(),
-                s.substring( 0, Math.min( 50, s.length() ) ), task.getState() ) );
+        System.out.println(
+                String.format( "%s\t%d\t%s...\t%s", task.getRequest().getResourceHostId(), task.getTimeout(),
+                        s.substring( 0, Math.min( 50, s.length() ) ), task.getState() ) );
 
         if ( task.getState() == Task.State.SUCCESS )
         {
-            System.out.println( String.format( "\t\t%s\t%s", task.getState(), task.getResult() ) );
+            System.out.println( String.format( "\t\t%s\t%s", task.getState(), task.getResponse() ) );
         }
         else if ( task.getState() == Task.State.FAILURE )
         {
             System.out.println( String.format( "\t\t%s\t%s", task.getState(), task.getExceptions() ) );
+        }
+
+        System.out.println( "Operation messages:" );
+
+        for ( OperationMessage message : task.getResponse().getOperationMessages() )
+        {
+            System.out.println( message.toString() );
         }
 
         return null;
