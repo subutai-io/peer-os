@@ -474,13 +474,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         for ( final CloneRequest request : requestGroup.getRequests() )
         {
             ContainerSize size = request.getContainerSize();
-            //            String ip = request.getIp();
-            //            final String successMsg = String.format( CLONING_FORMAT, request.getHostname(), "succeeded
-            // ." );
-            //            final String failMsg = String.format( CLONING_FORMAT, request.getHostname(), "failed." );
             try
             {
-                final ResourceHost resourceHost = getResourceHostById( request.getResourceHostId() );
                 final Vni environmentVni = getReservedVnis().findVniByEnvironmentId( request.getEnvironmentId() );
 
                 if ( environmentVni == null )
@@ -496,8 +491,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                     size = ContainerSize.SMALL;
                     containerQuota = quotaManager.getDefaultContainerQuota( size );
                 }
-
-                //                final TemplateKurjun template = getTemplateByName( request.getTemplateName() );
 
                 CloneTask task = new CloneTask( this, hostRegistry, containerQuota, environmentVni.getVlan(), request );
 

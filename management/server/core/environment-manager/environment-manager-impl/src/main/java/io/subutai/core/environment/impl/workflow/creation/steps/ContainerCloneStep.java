@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletionService;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
@@ -230,17 +229,6 @@ public class ContainerCloneStep
             operationTracker.addLog(
                     String.format( "%s %s %s.\n", message.getType(), message.getValue(), message.getDescription() ) );
         }
-        //        for ( OperationMessage message : cloneResponse.getOperationMessages() )
-        //        {
-        //            if ( message.getType() == OperationMessage.Type.SUCCEEDED )
-        //            {
-        //                operationTracker.addLogDone( message.getValue() );
-        //            }
-        //            else
-        //            {
-        //                operationTracker.addLogFailed( message.getValue() );
-        //            }
-        //        }
     }
 
 

@@ -1776,15 +1776,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             environmentContainer.setEnvironmentManager( this );
 
             String peerId = environmentContainer.getPeerId();
-//            try
-//            {
-//                Peer peer = peerManager.getPeer( peerId );
-//                environmentContainer.setPeer( peer );
-//            }
-//            catch ( PeerException e )
-//            {
-//                LOG.error( e.getMessage(), e );
-//            }
         }
         // remove containers which doesn't have trust relation
     }

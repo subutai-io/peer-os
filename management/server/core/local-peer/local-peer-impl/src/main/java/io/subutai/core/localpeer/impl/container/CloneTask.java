@@ -131,14 +131,8 @@ public class CloneTask extends AbstractTask<CloneRequest, CloneResponse> impleme
             throw new CommandResultParseException( "IP not assigned: " + request.getContainerName() );
         }
 
-        final CloneResponse result =
-                new CloneResponse( request.getResourceHostId(), request.getHostname(), request.getContainerName(),
-                        r.getId(), request.getIp(), request.getTemplateName(), request.getTemplateArch() );
-        result.addSucceededMessage(
-                String.format( "Container %s on %s successfully created.", request.getContainerName(),
-                        request.getResourceHostId() ) );
-
-        return result;
+        return new CloneResponse( request.getResourceHostId(), request.getHostname(), request.getContainerName(),
+                r.getId(), request.getIp(), request.getTemplateName(), request.getTemplateArch() );
     }
 
 

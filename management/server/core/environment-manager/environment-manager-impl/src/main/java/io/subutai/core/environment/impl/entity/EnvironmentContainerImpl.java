@@ -121,10 +121,6 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @Enumerated( EnumType.STRING )
     private ContainerSize containerSize;
 
-    //
-    //    @Transient
-    //    private Peer peer;
-
     @Transient
     private EnvironmentManagerImpl environmentManager;
 
@@ -200,15 +196,6 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
         this.containerSize = containerSize;
         setHostInterfaces( hostInterfaces );
     }
-
-    //
-    //    public void setPeer( final Peer peer )
-    //    {
-    //        Preconditions.checkNotNull( peer );
-    //
-    //        this.peer = peer;
-    //    }
-
 
     public void setEnvironmentManager( final EnvironmentManagerImpl environmentManager )
     {
