@@ -13,10 +13,6 @@ import com.google.gson.annotations.SerializedName;
 
 public class ContainerHostInfoModel extends HostInfoModel implements ContainerHostInfo
 {
-    @SerializedName( "containerName" )
-    @JsonProperty( "containerName" )
-    protected String containerName;
-
     @SerializedName( "status" )
     @JsonProperty( "status" )
     protected ContainerHostState state;
@@ -25,16 +21,18 @@ public class ContainerHostInfoModel extends HostInfoModel implements ContainerHo
     public ContainerHostInfoModel( @JsonProperty( "id" ) final String id,
                                    @JsonProperty( "hostname" ) final String hostname,
                                    @JsonProperty( "interfaces" ) final HostInterfaces hostInterfaces,
-                                   @JsonProperty( "arch" ) final HostArchitecture hostArchitecture )
+                                   @JsonProperty( "arch" ) final HostArchitecture hostArchitecture,
+                                   @JsonProperty( "status" ) final ContainerHostState state )
     {
         super( id, hostname, hostInterfaces, hostArchitecture );
-        state=ContainerHostState.CLONING;
+        this.state = state;
     }
 
 
-    public ContainerHostInfoModel( final ContainerHostInfo containerHost )
+    public ContainerHostInfoModel( final ContainerHostInfo info )
     {
-        super( containerHost );
+        super( info );
+        this.state = info.getState();
     }
 
 
@@ -46,18 +44,11 @@ public class ContainerHostInfoModel extends HostInfoModel implements ContainerHo
 
 
     @Override
-    public String getContainerName()
-    {
-        return containerName;
-    }
-
-
-    @Override
     public String toString()
     {
         return MoreObjects.toStringHelper( this ).add( "id", id ).add( "hostname", hostname )
-                          .add( "containerName", containerName ).add( "interfaces", hostInterfaces )
-                          .add( "status", state ).add( "arch", hostArchitecture ).toString();
+                          .add( "interfaces", hostInterfaces ).add( "status", state ).add( "arch", hostArchitecture )
+                          .toString();
     }
 
 

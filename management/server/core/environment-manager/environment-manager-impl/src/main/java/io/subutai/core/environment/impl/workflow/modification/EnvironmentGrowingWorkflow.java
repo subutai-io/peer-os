@@ -36,6 +36,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
     private final TrackerOperation operationTracker;
     private final EnvironmentManagerImpl environmentManager;
 
+
     //environment creation phases
     public static enum EnvironmentGrowingPhase
     {
@@ -176,7 +177,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
         try
         {
             new ContainerCloneStep( templateRegistry, defaultDomain, topology, environment, peerManager,
-                    environmentManager ).execute();
+                    environmentManager, operationTracker ).execute();
 
             environment = environmentManager.saveOrUpdate( environment );
 

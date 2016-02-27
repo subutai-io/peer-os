@@ -175,9 +175,9 @@ public class ExamplePlacementStrategy implements ExampleStrategy
             {
                 for ( ResourceAllocator.AllocatedContainer container : containers )
                 {
-                    NodeGroup nodeGroup =
-                            new NodeGroup( container.getName(), container.getTemplateName(), container.getSize(), 0, 0,
-                                    container.getPeerId(), container.getHostId() );
+                    NodeGroup nodeGroup = new NodeGroup( UUID.randomUUID().toString(), container.getName(),
+                            container.getTemplateName(), container.getSize(), 0, 0, container.getPeerId(),
+                            container.getHostId() );
                     nodeGroups.add( nodeGroup );
                 }
             }

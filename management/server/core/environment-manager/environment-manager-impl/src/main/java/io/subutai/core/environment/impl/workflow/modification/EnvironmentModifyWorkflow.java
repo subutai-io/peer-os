@@ -43,6 +43,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
     private final EnvironmentManagerImpl environmentManager;
     private boolean forceMetadataRemoval;
 
+
     //environment creation phases
     public static enum EnvironmentGrowingPhase
     {
@@ -216,7 +217,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
         try
         {
             new ContainerCloneStep( templateRegistry, defaultDomain, topology, environment, peerManager,
-                    environmentManager ).execute();
+                    environmentManager, operationTracker ).execute();
 
             environment = environmentManager.saveOrUpdate( environment );
 

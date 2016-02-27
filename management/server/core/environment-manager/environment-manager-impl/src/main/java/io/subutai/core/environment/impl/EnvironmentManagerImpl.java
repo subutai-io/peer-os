@@ -40,6 +40,7 @@ import io.subutai.common.environment.PeerConf;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostInfoModel;
+import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.mdc.SubutaiExecutors;
@@ -623,11 +624,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                 ContainerSize containerType = entry.getKey().getType();
 
                 environment.addContainers( Sets.newHashSet(
-                        new EnvironmentContainerImpl( peerManager.getLocalPeer().getId(), peerManager.getLocalPeer(),
+                        new EnvironmentContainerImpl( peerManager.getLocalPeer().getId(), entry.getKey().getPeerId(),
                                 entry.getKey().getName(), new ContainerHostInfoModel( newHost ),
-                                templateRegistry.getTemplate( entry.getKey().getTemplateName() ),
+                                entry.getKey().getTemplateName(), HostArchitecture.AMD64,
                                 entry.getKey().getSshGroupId(), entry.getKey().getHostsGroupId(),
-                                Common.DEFAULT_DOMAIN_NAME, containerType, entry.getKey().getHostId() ) ) );
+                                Common.DEFAULT_DOMAIN_NAME, containerType, entry.getKey().getHostId(),
+                                entry.getKey().getName() ) ) );
             }
         }
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
@@ -1774,15 +1776,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             environmentContainer.setEnvironmentManager( this );
 
             String peerId = environmentContainer.getPeerId();
-            try
-            {
-                Peer peer = peerManager.getPeer( peerId );
-                environmentContainer.setPeer( peer );
-            }
-            catch ( PeerException e )
-            {
-                LOG.error( e.getMessage(), e );
-            }
+//            try
+//            {
+//                Peer peer = peerManager.getPeer( peerId );
+//                environmentContainer.setPeer( peer );
+//            }
+//            catch ( PeerException e )
+//            {
+//                LOG.error( e.getMessage(), e );
+//            }
         }
         // remove containers which doesn't have trust relation
     }

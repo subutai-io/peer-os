@@ -36,6 +36,9 @@ public class NodeGroup
     @GsonRequired
     @JsonProperty( "hostId" )
     private String hostId;
+    @GsonRequired
+    @JsonProperty( "hostname" )
+    private String hostname;
 
 
     private NodeGroup()
@@ -43,7 +46,7 @@ public class NodeGroup
     }
 
 
-    public NodeGroup( @JsonProperty( "name" ) final String name,
+    public NodeGroup( @JsonProperty( "hostname" ) final String hostname, @JsonProperty( "name" ) final String name,
                       @JsonProperty( "templateName" ) final String templateName,
                       @JsonProperty( "type" ) ContainerSize type, @JsonProperty( "sshGroupId" ) final int sshGroupId,
                       @JsonProperty( "hostsGroupId" ) final int hostsGroupId,
@@ -53,6 +56,7 @@ public class NodeGroup
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
         Preconditions.checkNotNull( type );
 
+        this.hostname = hostname;
         this.name = name;
         this.templateName = templateName;
         this.type = type;
@@ -118,5 +122,11 @@ public class NodeGroup
         sb.append( ", hostId='" ).append( hostId ).append( '\'' );
         sb.append( '}' );
         return sb.toString();
+    }
+
+
+    public String getHostname()
+    {
+        return hostname;
     }
 }

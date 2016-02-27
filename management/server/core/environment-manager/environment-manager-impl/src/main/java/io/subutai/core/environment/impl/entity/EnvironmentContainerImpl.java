@@ -56,7 +56,6 @@ import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.settings.SystemSettings;
-import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
@@ -91,7 +90,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @Column( name = "template_name", nullable = false )
     private String templateName;
     @Column( name = "template_arch", nullable = false )
-    private String templateArch;
+    private HostArchitecture templateArch;
 
     @Column( name = "rh_id", nullable = false )
     private String resourceHostId;
@@ -122,12 +121,12 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @Enumerated( EnumType.STRING )
     private ContainerSize containerSize;
 
+    //
+    //    @Transient
+    //    private Peer peer;
 
     @Transient
-    private Peer peer;
-
-    @Transient
-    private EnvironmentManager environmentManager;
+    private EnvironmentManagerImpl environmentManager;
 
     @Transient
     private ContainerId containerId;
@@ -144,29 +143,28 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     }
 
 
-    public EnvironmentContainerImpl( final String localPeerId, final Peer peer, final String nodeGroupName,
-                                     final ContainerHostInfoModel hostInfo, final TemplateKurjun template,
-                                     int sshGroupId, int hostsGroupId, String domainName, ContainerSize containerSize,
-                                     String resourceHostId )
+    public EnvironmentContainerImpl( final String creatorPeerId, final String peerId, final String nodeGroupName,
+                                     final ContainerHostInfoModel hostInfo, final String templateName,
+                                     final HostArchitecture templateArch, int sshGroupId, int hostsGroupId,
+                                     String domainName, ContainerSize containerSize, String resourceHostId,
+                                     final String containerName )
     {
-        Preconditions.checkNotNull( peer );
+        Preconditions.checkNotNull( peerId );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( nodeGroupName ) );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( domainName ) );
         Preconditions.checkNotNull( hostInfo );
-        Preconditions.checkNotNull( template );
+        Preconditions.checkNotNull( templateName );
         Preconditions.checkNotNull( containerSize );
 
-
-        this.peer = peer;
-        this.creatorPeerId = localPeerId;
-        this.peerId = peer.getId();
+        this.creatorPeerId = creatorPeerId;
+        this.peerId = peerId;
         this.hostId = hostInfo.getId();
         this.hostname = hostInfo.getHostname();
-        this.containerName = hostInfo.getContainerName();
+        this.containerName = containerName;
         this.hostArchitecture = hostInfo.getArch();
         this.nodeGroupName = nodeGroupName;
-        this.templateName = template.getName();
-        this.templateArch = template.getArchitecture();
+        this.templateName = templateName;
+        this.templateArch = templateArch;
         this.sshGroupId = sshGroupId;
         this.hostsGroupId = hostsGroupId;
         this.domainName = domainName;
@@ -178,20 +176,19 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
     public EnvironmentContainerImpl( final String hostId, final String hostname, final String containerName,
                                      final HostArchitecture hostArchitecture, final HostInterfaces hostInterfaces,
-                                     final String localPeerId, final Peer peer, final String nodeGroupName,
-                                     final String templateName, final String templateArch, int sshGroupId,
+                                     final String localPeerId, final String peerId, final String nodeGroupName,
+                                     final String templateName, final HostArchitecture templateArch, int sshGroupId,
                                      int hostsGroupId, String domainName, ContainerSize containerSize )
     {
-        Preconditions.checkNotNull( peer );
+        Preconditions.checkNotNull( peerId );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( nodeGroupName ) );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( domainName ) );
         Preconditions.checkNotNull( containerSize );
 
         this.hostId = hostId;
         this.hostname = hostname;
-        this.peer = peer;
         this.creatorPeerId = localPeerId;
-        this.peerId = peer.getId();
+        this.peerId = peerId;
         this.containerName = containerName;
         this.hostArchitecture = hostArchitecture;
         this.nodeGroupName = nodeGroupName;
@@ -204,16 +201,16 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
         setHostInterfaces( hostInterfaces );
     }
 
+    //
+    //    public void setPeer( final Peer peer )
+    //    {
+    //        Preconditions.checkNotNull( peer );
+    //
+    //        this.peer = peer;
+    //    }
 
-    public void setPeer( final Peer peer )
-    {
-        Preconditions.checkNotNull( peer );
 
-        this.peer = peer;
-    }
-
-
-    public void setEnvironmentManager( final EnvironmentManager environmentManager )
+    public void setEnvironmentManager( final EnvironmentManagerImpl environmentManager )
     {
         Preconditions.checkNotNull( environmentManager );
 
@@ -323,7 +320,14 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @Override
     public Peer getPeer()
     {
-        return peer;
+        try
+        {
+            return environmentManager.resolvePeer( peerId );
+        }
+        catch ( PeerException e )
+        {
+            throw new RuntimeException( e.getMessage(), e );
+        }
     }
 
 

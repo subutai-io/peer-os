@@ -360,7 +360,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
                 String templateName = entry.getKey();
                 //TODO: please change this distribution
                 NodeGroup nodeGroup =
-                        new NodeGroup( String.format( "%s_group", templateName ), templateName, ContainerSize.SMALL, 1,
+                        new NodeGroup( UUID.randomUUID().toString(), String.format( "%s_group", templateName ), templateName, ContainerSize.SMALL, 1,
                                 1, localPeer.getId(), registrationRequest.getId() );
                 topology.addNodeGroupPlacement( localPeer.getId(), nodeGroup );
 

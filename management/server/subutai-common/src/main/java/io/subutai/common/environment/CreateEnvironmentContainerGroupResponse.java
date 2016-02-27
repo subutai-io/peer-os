@@ -1,67 +1,61 @@
 package io.subutai.common.environment;
 
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-
-import io.subutai.common.host.HostInfo;
-import io.subutai.common.tracker.OperationMessage;
+import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class CreateEnvironmentContainerGroupResponse
 {
-    private Set<HostInfo> hosts = new HashSet<>();
-    private List<OperationMessage> messages = new ArrayList<>();
+    private Set<CloneResponse> responses = new CopyOnWriteArraySet<>();
+    private String peerId;
+    private AtomicInteger counter = new AtomicInteger( 0 );
 
 
-    public CreateEnvironmentContainerGroupResponse()
+    public CreateEnvironmentContainerGroupResponse( final String peerId )
     {
+        this.peerId = peerId;
     }
 
 
-    public List<OperationMessage> getMessages()
+    public void addResponse( CloneResponse response )
     {
-        return messages;
-    }
-
-
-    public Set<HostInfo> getHosts()
-    {
-        return hosts;
-    }
-
-
-    public void addHostInfo( final HostInfo hostInfo )
-    {
-        if ( hostInfo == null )
+        if ( response == null )
         {
-            throw new IllegalArgumentException( "ContainerHostInfoModel could not be null." );
+            throw new IllegalArgumentException( "Clone response could not be null." );
         }
-
-        this.hosts.add( hostInfo );
+        responses.add( response );
+        counter.incrementAndGet();
     }
 
 
-    public void addFailMessage( final String msg )
+    public Set<CloneResponse> getResponses()
     {
-        if ( msg == null )
-        {
-            throw new IllegalArgumentException( "Fail message could not be null." );
-        }
-
-        this.messages.add( new OperationMessage( msg, OperationMessage.Type.FAILED ) );
+        return responses;
     }
 
 
-    public void addSucceededMessages( final String msg )
+    public String getPeerId()
     {
-        if ( msg == null )
-        {
-            throw new IllegalArgumentException( "Message could not be null." );
-        }
+        return peerId;
+    }
 
-        this.messages.add( new OperationMessage( msg, OperationMessage.Type.SUCCEEDED ) );
+
+    public void waitResponses( final int count )
+    {
+        while ( counter.intValue() < count )
+        {
+            try
+            {
+                TimeUnit.SECONDS.sleep( 3 );
+            }
+            catch ( InterruptedException e )
+            {
+                //ignore
+            }
+        }
     }
 }

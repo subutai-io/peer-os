@@ -12,6 +12,7 @@ import java.security.UnrecoverableKeyException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -200,8 +201,8 @@ public class EnvironmentProccessor implements StateLinkProccessor
                 try
                 {
                     String token = getToken( "admin", "secret" );
-                    WebClient client = RestUtil
-                            .createTrustedWebClient( "https://127.0.0.1:8443/rest/ui/peers?sptoken=" + token );
+                    WebClient client =
+                            RestUtil.createTrustedWebClient( "https://127.0.0.1:8443/rest/ui/peers?sptoken=" + token );
                     client.accept( MediaType.APPLICATION_JSON );
                     client.type( MediaType.APPLICATION_FORM_URLENCODED );
 
@@ -226,8 +227,8 @@ public class EnvironmentProccessor implements StateLinkProccessor
                 try
                 {
                     String token = getToken( "admin", "secret" );
-                    WebClient client = RestUtil
-                            .createTrustedWebClient( "https://127.0.0.1:8443/rest/ui/peers/approve?sptoken=" + token );
+                    WebClient client = RestUtil.createTrustedWebClient(
+                            "https://127.0.0.1:8443/rest/ui/peers/approve?sptoken=" + token );
                     client.accept( MediaType.TEXT_PLAIN );
                     client.type( MediaType.APPLICATION_FORM_URLENCODED );
 
@@ -250,8 +251,7 @@ public class EnvironmentProccessor implements StateLinkProccessor
     }
 
 
-    private EnvironmentDto processUnregisteringViaAPI( final EnvironmentDto environmentDto )
-            throws HubPluginException
+    private EnvironmentDto processUnregisteringViaAPI( final EnvironmentDto environmentDto ) throws HubPluginException
     {
 
         for ( EnvPeerDto registerPeerDataDto : environmentDto.getPeers() )
@@ -291,7 +291,8 @@ public class EnvironmentProccessor implements StateLinkProccessor
         for ( EnvPeerDto envPeer : environmentDto.getPeers() )
         {
             LOG.debug( "Sending peer unregister request to %s", envPeer.getPeerId() );
-            if ( envPeer.getState().equals( EnvPeerDto.PeerState.UNREGISTER ) && !envPeer.getPeerId().equals( environmentDto.getInitiatorPeerId() ) )
+            if ( envPeer.getState().equals( EnvPeerDto.PeerState.UNREGISTER ) && !envPeer.getPeerId().equals(
+                    environmentDto.getInitiatorPeerId() ) )
             {
                 try
                 {
@@ -308,7 +309,6 @@ public class EnvironmentProccessor implements StateLinkProccessor
                     {
                         envPeer.setState( EnvPeerDto.PeerState.UNREGISTERED );
                     }
-
                 }
                 catch ( AuthenticationException e )
                 {
@@ -351,16 +351,17 @@ public class EnvironmentProccessor implements StateLinkProccessor
             {
                 PlacementStrategy placementStrategy = new PlacementStrategy( nodeDto.getContainerPlacementStrategy() );
                 NodeGroup nodeGroup =
-                        new NodeGroup( nodeDto.getName(), nodeDto.getTemplateName(),
+                        new NodeGroup( UUID.randomUUID().toString(), nodeDto.getName(), nodeDto.getTemplateName(),
                                 ContainerSize.SMALL, Integer.valueOf( nodeDto.getSshGroupId() ),
-                                Integer.valueOf( nodeDto.getHostsGroupId() ), nodeDto.getPeerId(), nodeDto.getHostId() );
+                                Integer.valueOf( nodeDto.getHostsGroupId() ), nodeDto.getPeerId(),
+                                nodeDto.getHostId() );
                 nodeGroups.add( nodeGroup );
             }
             Blueprint blueprint = new Blueprint( environmentDto.getName(), nodeGroups );
             //TODO refactor after EnvironmentManagement will be ready
-//            Topology topology = new Topology(environmentDto.getName(), environmentDto.get);
-//
-//            Environment environment = environmentManager.createEnvironment( blueprint, false );
+            //            Topology topology = new Topology(environmentDto.getName(), environmentDto.get);
+            //
+            //            Environment environment = environmentManager.createEnvironment( blueprint, false );
             LOG.debug( "Environment Successfully created." );
         }
         catch ( Exception e )

@@ -8,23 +8,22 @@ import java.util.concurrent.Callable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.net.util.SubnetUtils;
+
 import com.google.common.collect.Sets;
 
+import io.subutai.common.environment.CloneRequest;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupResponse;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.NodeGroup;
-import io.subutai.common.host.ContainerHostInfoModel;
-import io.subutai.common.peer.ContainerSize;
+import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.util.ExceptionUtil;
-import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
-import io.subutai.core.environment.impl.exception.NodeGroupBuildException;
-import io.subutai.core.kurjun.api.TemplateManager;
 
 
-public class CreatePeerNodeGroupsTask implements Callable<Set<NodeGroupBuildResult>>
+public class CreatePeerNodeGroupsTask implements Callable<CreateEnvironmentContainerGroupResponse>
 {
     private static final Logger LOG = LoggerFactory.getLogger( CreatePeerNodeGroupsTask.class );
 
@@ -33,74 +32,79 @@ public class CreatePeerNodeGroupsTask implements Callable<Set<NodeGroupBuildResu
     private final LocalPeer localPeer;
     private final Environment environment;
     private final int ipAddressOffset;
-    private final TemplateManager templateRegistry;
-    private final String defaultDomain;
+    //    private final TemplateManager templateRegistry;
+    //    private final String defaultDomain;
     protected ExceptionUtil exceptionUtil = new ExceptionUtil();
 
 
     public CreatePeerNodeGroupsTask( final Peer peer, final Set<NodeGroup> nodeGroups, final LocalPeer localPeer,
-                                     final Environment environment, final int ipAddressOffset,
-                                     final TemplateManager templateRegistry, final String defaultDomain )
+                                     final Environment environment, final int ipAddressOffset/*,
+                                     final TemplateManager templateRegistry, final String defaultDomai*/ )
     {
         this.peer = peer;
         this.nodeGroups = nodeGroups;
         this.localPeer = localPeer;
         this.environment = environment;
         this.ipAddressOffset = ipAddressOffset;
-        this.templateRegistry = templateRegistry;
-        this.defaultDomain = defaultDomain;
+        //        this.templateRegistry = templateRegistry;
+        //        this.defaultDomain = defaultDomain;
     }
 
 
     @Override
-    public Set<NodeGroupBuildResult> call() throws Exception
+    public CreateEnvironmentContainerGroupResponse call() throws Exception
     {
         final Set<NodeGroupBuildResult> results = Sets.newHashSet();
         int currentIpAddressOffset = 0;
 
-        for ( NodeGroup nodeGroup : nodeGroups )
+        SubnetUtils.SubnetInfo subnetInfo = new SubnetUtils( environment.getSubnetCidr() ).getInfo();
+        /*environment.getSubnetCidr().substring( environment.getSubnetCidr().indexOf( "/" ) + 1 );*/
+        String maskLength = subnetInfo.getCidrSignature().split( "/" )[1];
+        //        Set<EnvironmentContainerImpl> containers = Sets.newHashSet();
+
+        final CreateEnvironmentContainerGroupRequest request = new CreateEnvironmentContainerGroupRequest();
+        try
         {
-            LOG.debug( String.format( "Scheduling on %s %s", nodeGroup.getPeerId(), nodeGroup.getName() ) );
-            ContainerSize containerSize = nodeGroup.getType();
-            NodeGroupBuildException exception = null;
-            Set<EnvironmentContainerImpl> containers = Sets.newHashSet();
-            final String hostname = String.format( "%s_%s", nodeGroup.getTemplateName(), UUID.randomUUID().toString() );
-            CreateEnvironmentContainerGroupResponse response = new CreateEnvironmentContainerGroupResponse();
-            try
+            for ( NodeGroup nodeGroup : nodeGroups )
             {
-                final CreateEnvironmentContainerGroupRequest request;
+                LOG.debug( String.format( "Scheduling on %s %s", nodeGroup.getPeerId(), nodeGroup.getName() ) );
+                //                ContainerSize containerSize = nodeGroup.getType();
 
-                request = new CreateEnvironmentContainerGroupRequest( hostname, environment.getId(), localPeer.getId(),
-                        localPeer.getOwnerId(), environment.getSubnetCidr(), ipAddressOffset + currentIpAddressOffset,
-                        nodeGroup.getTemplateName(), nodeGroup.getHostId(), nodeGroup.getType() );
+                final String ip = subnetInfo.getAllAddresses()[( ipAddressOffset + currentIpAddressOffset )];
 
-                response = peer.createEnvironmentContainerGroup( request );
+                CloneRequest cloneRequest =
+                        new CloneRequest( nodeGroup.getHostId(), nodeGroup.getHostname(), nodeGroup.getName(), ip + "/" + maskLength,
+                                environment.getId(), localPeer.getId(), localPeer.getOwnerId(),
+                                nodeGroup.getTemplateName(), HostArchitecture.AMD64, nodeGroup.getType() );
+
+
+                request.addRequest( cloneRequest );
 
                 currentIpAddressOffset++;
+                //
+                //                for ( ContainerHostInfoModel newHost : response.getHosts() )
+                //                {
+                //                    containers
+                //                            .add( new EnvironmentContainerImpl( localPeer.getId(), peer, newHost
+                // .getHostname(), newHost,
+                //                                    templateRegistry.getTemplate( nodeGroup.getTemplateName() ),
+                //                                    nodeGroup.getSshGroupId(), nodeGroup.getHostsGroupId(),
+                // defaultDomain,
+                //                                    containerSize, nodeGroup.getHostId(), nodeGroup.getName() ) );
+                //                }
+                //
+                //                if ( containers.isEmpty() )
+                //                {
+                //                    exception = new NodeGroupBuildException( "Requested container has not been
+                // created", null );
+                //                }
 
-                for ( ContainerHostInfoModel newHost : response.getHosts() )
-                {
-                    containers.add( new EnvironmentContainerImpl( localPeer.getId(), peer, nodeGroup.getName(), newHost,
-                            templateRegistry.getTemplate( nodeGroup.getTemplateName() ), nodeGroup.getSshGroupId(),
-                            nodeGroup.getHostsGroupId(), defaultDomain, containerSize, nodeGroup.getHostId() ) );
-                }
-
-                if ( containers.isEmpty() )
-                {
-                    exception = new NodeGroupBuildException( "Requested container has not been created", null );
-                }
             }
-            catch ( Exception e )
-            {
-                LOG.error( e.getMessage(), e );
-                exception = new NodeGroupBuildException(
-                        String.format( "Error creating node group %s on peer %s. Container host name: %s.", nodeGroup,
-                                peer.getName(), hostname ), exceptionUtil.getRootCause( e ) );
-            }
-            results.add( new NodeGroupBuildResult( containers, exception, response ) );
         }
-
-
-        return results;
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+        }
+        return peer.createEnvironmentContainerGroup( request );
     }
 }

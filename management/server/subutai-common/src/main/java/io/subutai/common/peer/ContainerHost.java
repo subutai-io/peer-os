@@ -3,6 +3,10 @@ package io.subutai.common.peer;
 
 import java.util.Set;
 
+import org.codehaus.jackson.annotate.JsonProperty;
+
+import com.google.gson.annotations.SerializedName;
+
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.HostId;
 import io.subutai.common.metric.ProcessResourceUsage;
@@ -93,4 +97,7 @@ public interface ContainerHost extends Host, ContainerHostInfo, RelationLink
     void setQuota( ContainerQuota containerQuota ) throws PeerException;
 
     public HostId getResourceHostId() throws PeerException;
+
+    public String getContainerName();
+
 }

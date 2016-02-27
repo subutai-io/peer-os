@@ -7,18 +7,23 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandResultParser;
 import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.task.TaskRequest;
+import io.subutai.common.task.TaskResponse;
 
 
 /**
  * Abstract task implementation
  */
-public abstract class DaemonTask<T> extends AbstractTask<T> implements CommandResultParser<T>
+public abstract class DaemonTask<R extends TaskRequest, T extends TaskResponse> extends AbstractTask<R, T> implements CommandResultParser<T>
 {
-    private long endTime;
+    public DaemonTask( final R request )
+    {
+        super( request );
+    }
 
 
     @Override
-    protected RequestBuilder getRequestBuilder() throws Exception
+    public RequestBuilder getRequestBuilder() throws Exception
     {
         return new RequestBuilder( isChain() ? getCommandBatch().asChain() :
                                    String.format( "subutai batch -json '%s'", getCommandBatch().asJson() ) )
@@ -39,7 +44,7 @@ public abstract class DaemonTask<T> extends AbstractTask<T> implements CommandRe
         // waiting for result
         try
         {
-            while ( result == null )
+            while ( response == null )
             {
                 try
                 {
@@ -49,8 +54,8 @@ public abstract class DaemonTask<T> extends AbstractTask<T> implements CommandRe
                 {
                     // ignore
                 }
-                result = lookupResult();
-                if ( result == null )
+                response = lookupResult();
+                if ( response == null )
                 {
                     checkTimeout();
                 }
@@ -61,7 +66,7 @@ public abstract class DaemonTask<T> extends AbstractTask<T> implements CommandRe
         {
             failure( e.getMessage(), e );
         }
-        return result;
+        return response;
     }
 
 
@@ -113,7 +118,7 @@ public abstract class DaemonTask<T> extends AbstractTask<T> implements CommandRe
     {
         if ( getState() == State.RUNNING )
         {
-            if ( endTime < System.currentTimeMillis() )
+            if ( finished < System.currentTimeMillis() )
             {
                 throw new CommandException( "Command execution timed out." );
             }

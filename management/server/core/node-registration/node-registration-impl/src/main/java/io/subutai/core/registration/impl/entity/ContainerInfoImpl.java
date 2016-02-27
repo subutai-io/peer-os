@@ -51,10 +51,6 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable
     @Expose
     private String hostname;
 
-    @Column( name = "container_name" )
-    @Expose
-    private String containerName;
-
     @Column( name = "vlan" )
     @Expose
     private Integer vlan;
@@ -120,13 +116,6 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable
         {
             this.netHostInterfaces.add( new HostInterfaceImpl( anHostInterface ) );
         }
-    }
-
-
-    @Override
-    public String getContainerName()
-    {
-        return containerName;
     }
 
 

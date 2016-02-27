@@ -42,6 +42,7 @@ import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.InstanceType;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.ResourceHost;
@@ -459,7 +460,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         }
 
         Future<ContainerHostInfo> containerHostFuture = queueSequentialTask(
-                new CreateContainerTask( hostRegistry, this, template, hostname, quota, ip, vlan, timeout, environmentId ) );
+                new CreateContainerTask( hostRegistry, this, template, hostname, quota, ip, vlan, timeout,
+                        environmentId ) );
 
         try
         {
@@ -547,11 +549,9 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             {
                 if ( "management".equals( info.getHostname() ) )
                 {
-                    containerHost = new ContainerHostEntity( peerId, info, "master", "amd64" );
-                    //                    containerHost.setEnvironmentId( request.getEnvironmentId() );
-                    //                    containerHost.setOwnerId( request.getOwnerId() );
-                    //                    containerHost.setInitiatorPeerId( request.getInitiatorPeerId() );
-                    //                    containerHost.setContainerSize( request.getContainerSize() );
+                    containerHost = new ContainerHostEntity( peerId, info.getId(), info.getHostname(), info.getArch(),
+                            info.getHostInterfaces(), info.getHostname(), "management", info.getArch().name(),
+                            "management", null, null, ContainerSize.SMALL, info.getState() );
                     addContainerHost( containerHost );
                     result = true;
                 }
@@ -560,13 +560,6 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
                     LOG.warn( String.format( "Found not registered container host: %s %s", info.getId(),
                             info.getHostname() ) );
                 }
-                //                if ( !Strings.isNullOrEmpty( info.getId() ) )
-                //                {
-                //                    containerHost = new ContainerHostEntity( peerId, info );
-                //                    addContainerHost( containerHost );
-                //                    containerHost.setHostInfo( info );
-                //                    result = true;
-                //                }
             }
         }
 
