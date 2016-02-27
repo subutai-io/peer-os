@@ -100,7 +100,7 @@ function choice_stories(){
 }
 
 function run_tests(){
-    mvn clean; mvn integration-test; mvn serenity:aggregate;
+    mvn clean; mvn integration-test -Dwebdriver.firefox.profile=src/test/resources/profilePgpFF; mvn serenity:aggregate;
 }
 
 if [ $# = 0 ]; then

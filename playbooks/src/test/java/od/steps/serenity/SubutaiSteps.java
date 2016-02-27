@@ -11,6 +11,7 @@ import java.io.FileNotFoundException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import org.sikuli.script.*;
 
 
 public class SubutaiSteps extends ScenarioSteps {
@@ -33,6 +34,8 @@ public class SubutaiSteps extends ScenarioSteps {
     PluginsPage pluginsPage;
     PluginIntegratorPage pluginIntegratorPage;
     AboutPage aboutPage;
+    PgpPlugin pgpPlugin;
+    Screen screen = new Screen();
     //endregion
 
     //region ACTION: Open Page
@@ -63,14 +66,19 @@ public class SubutaiSteps extends ScenarioSteps {
         loginPage.inputPassword.type(password);
     }
 
+    @Step
+    public void inputEnvironmentName(String env_name){
+        environmentsPage.inputEnvironmentName.type(env_name);
+    }
+
     //endregion
 
     //region ACTION: Click
 
     @Step
-    public void clickOnButtonLogin(){
-        loginPage.buttonLogin.click();
-        waitABit(5000);
+    public void clickOnButtonLogin() throws FindFailed {
+//        loginPage.buttonLogin.click();
+        screen.click(commonPage.sikuliButtonLogin);
     }
 
     @Step
@@ -84,8 +92,10 @@ public class SubutaiSteps extends ScenarioSteps {
     }
 
     @Step
-    public void clickOnMenuEnvironment() {
-        commonPage.linkEnvironment.click();
+    public void clickOnMenuEnvironment() throws FindFailed {
+//        commonPage.linkEnvironment.click();
+        screen.click(commonPage.sikuliMenuItemEnvironment);
+        commonPage.waitFor(2000);
     }
 
     @Step
@@ -94,8 +104,9 @@ public class SubutaiSteps extends ScenarioSteps {
     }
 
     @Step
-    public void clickOnMenuItemEnvironments() {
-        commonPage.linkEnvironments.click();
+    public void clickOnMenuItemEnvironments() throws FindFailed {
+//        commonPage.linkEnvironments.click();
+        screen.click(commonPage.sikuliMenuItemEnvironments);
     }
 
     @Step
@@ -128,8 +139,8 @@ public class SubutaiSteps extends ScenarioSteps {
     }
 
     @Step
-    public void clickOnMenuItemUserManagement() {
-        commonPage.linkUserManagement.click();
+    public void clickOnMenuItemUserManagement() throws FindFailed {
+        screen.click(commonPage.sikuliMenuItemUserManagement);
     }
 
     @Step
@@ -171,6 +182,94 @@ public class SubutaiSteps extends ScenarioSteps {
     public void clickOnMenuItemAbout() {
         commonPage.linkAbout.click();
     }
+
+    @Step
+    public void clickOnIconTemplateMongo() throws FindFailed {
+        screen.click(environmentsPage.sikuliTemplateMongo);
+    }
+
+    @Step
+    public void clickOnButtonApply() throws FindFailed {
+        screen.click(environmentsPage.sikuliButtonApply);
+    }
+
+    @Step
+    public void clickOnButtonBuild() throws FindFailed {
+        screen.click(environmentsPage.sikuliButtonBuild);
+    }
+
+    @Step
+    public void clickOnButtonCloseBuildPopup() throws FindFailed {
+        commonPage.waitFor(environmentsPage.buttonClose);
+        screen.click(environmentsPage.sikuliButtonClosePopupBuild);
+    }
+
+    @Step
+    public void clickOnIconDeleteEnvironment() throws FindFailed {
+        screen.click(environmentsPage.sikuliIconDeleteEnvironment);
+    }
+
+    @Step
+    public void clickOnButtonDelete() throws FindFailed {
+        screen.click(environmentsPage.sikuliButtonDelete);
+    }
+
+    @Step
+    public void clickOnButtonOkPopupEnvironmentHasBeenDestroyed() throws FindFailed {
+        commonPage.waitFor(commonPage.textEnvironmentHasBeenDestroyed);
+        screen.click(environmentsPage.sikuliButtonOk);
+    }
+
+    @Step
+    public void clickOnIconPgp() throws FindFailed {
+        screen.click(pgpPlugin.sikuliIconPgp);
+    }
+
+    @Step
+    public void clickOnButtonOptions() throws FindFailed {
+        screen.click(pgpPlugin.sikuliButtonOptions);
+    }
+
+    @Step
+    public void clickOnButtonGenerate() throws FindFailed {
+        screen.click(pgpPlugin.sikuliButtonGenerate);
+    }
+
+    @Step
+    public void typeInFieldsPgp(){
+        screen.type(pgpPlugin.sikuliFieldEnterKeyName, "test");
+        screen.type(pgpPlugin.sikuliFieldEnterEmail, "test@test.com");
+        screen.type(pgpPlugin.sikuliFieldEnterPassword, "secret");
+        screen.type(pgpPlugin.sikuliFieldConfirmPassword, "secret");
+    }
+
+    @Step
+    public void clickOnButtonSubmit() throws FindFailed {
+        screen.click(pgpPlugin.sikuliButtonSubmit);
+    }
+
+    @Step
+    public void clickOnButtonOk() throws FindFailed {
+        screen.click(pgpPlugin.sikuliButtonOk);
+        screen.wait(pgpPlugin.sikuliMessageKeyPairSuccessfullyGenerated, 60000);
+        screen.click(pgpPlugin.sikuliButtonOk);
+    }
+
+    @Step
+    public void clickOnSubutaiSocialTab() throws FindFailed {
+        screen.click(pgpPlugin.sikuliSubutaiSocialTab);
+    }
+
+    @Step
+    public void clickOnMenuItemAccountSettings() throws FindFailed {
+        screen.click(commonPage.sikuliMenuItemAccountSettings);
+    }
+
+    @Step
+    public void clickOnButtonSetPublicKey() throws FindFailed {
+        screen.click(userManagementPage.sikuliButtonSetPublicKey);
+    }
+
 
     //endregion
 
@@ -327,7 +426,6 @@ public class SubutaiSteps extends ScenarioSteps {
     public void seeOutputOfPwdCommand() {
         assertThat(consolePage.outputOfPwdCommand.isVisible(), Matchers.is(true));
     }
-
 
     //endregion
 }
