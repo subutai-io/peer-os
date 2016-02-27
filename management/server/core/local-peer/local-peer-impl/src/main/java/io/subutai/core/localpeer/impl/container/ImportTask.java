@@ -4,34 +4,26 @@ package io.subutai.core.localpeer.impl.container;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Preconditions;
-
-import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandResultParser;
-import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.peer.Host;
-import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.environment.ImportTemplateRequest;
+import io.subutai.common.environment.ImportTemplateResponse;
 import io.subutai.common.task.Command;
 import io.subutai.common.task.CommandBatch;
+import io.subutai.common.util.StringUtil;
 
 
-public class ImportTask extends AbstractTask<Boolean> implements CommandResultParser<Boolean>
+public class ImportTask extends AbstractTask<ImportTemplateRequest, ImportTemplateResponse>
+        implements CommandResultParser<ImportTemplateResponse>
 {
     protected static final Logger LOG = LoggerFactory.getLogger( ImportTask.class );
 
     private static final int DOWNLOAD_TIMEOUT = 60 * 60 * 5; // 5 hour
-    private final ResourceHost resourceHost;
-    private String templateName;
 
 
-    public ImportTask( final ResourceHost resourceHost, final String templateName )
+    public ImportTask( final ImportTemplateRequest request )
     {
-        Preconditions.checkNotNull( resourceHost );
-        Preconditions.checkNotNull( templateName );
-
-        this.resourceHost = resourceHost;
-        this.templateName = templateName;
+        super( request );
     }
 
 
@@ -41,7 +33,7 @@ public class ImportTask extends AbstractTask<Boolean> implements CommandResultPa
 
         Command importAction = new Command( "import" );
 
-        importAction.addArgument( templateName );
+        importAction.addArgument( request.getTemplateName() );
 
         result.addCommand( importAction );
 
@@ -50,23 +42,32 @@ public class ImportTask extends AbstractTask<Boolean> implements CommandResultPa
 
 
     @Override
-    public Host getHost()
-    {
-        return resourceHost;
-    }
-
-
-    @Override
-    public CommandResultParser<Boolean> getCommandResultParser()
+    public CommandResultParser<ImportTemplateResponse> getCommandResultParser()
     {
         return this;
     }
 
 
     @Override
-    public Boolean parse( final CommandResult commandResult )
+    public ImportTemplateResponse parse( final CommandResult commandResult )
     {
-        return commandResult != null && commandResult.hasSucceeded();
+        final boolean succeeded = commandResult != null && commandResult.hasSucceeded();
+        final ImportTemplateResponse importTemplateResponse =
+                new ImportTemplateResponse( request.getResourceHostId(), request.getTemplateName(), succeeded );
+        final String time = StringUtil.convertMillisToHHMMSS( getElapsedTime() );
+        if ( succeeded )
+        {
+            importTemplateResponse.addSucceededMessage(
+                    String.format( "Importing template %s on %s succeeded.", request.getTemplateName(),
+                            request.getResourceHostId() ), commandResult.getStdOut() );
+        }
+        else
+        {
+            importTemplateResponse.addFailMessage(
+                    String.format( "Importing template %s on %s failed.", request.getTemplateName(),
+                            request.getResourceHostId() ), commandResult != null ? commandResult.getStdErr() : "" );
+        }
+        return importTemplateResponse;
     }
 
 
@@ -81,11 +82,5 @@ public class ImportTask extends AbstractTask<Boolean> implements CommandResultPa
     public boolean isSequential()
     {
         return false;
-    }
-
-
-    public String getTemplate()
-    {
-        return templateName;
     }
 }
