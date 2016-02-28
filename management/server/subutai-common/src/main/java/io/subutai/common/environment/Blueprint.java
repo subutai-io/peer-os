@@ -11,18 +11,18 @@ import java.util.UUID;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 
-import io.subutai.common.gson.required.GsonRequired;
-import io.subutai.common.util.CollectionUtil;
-
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
+
+import io.subutai.common.gson.required.GsonRequired;
+import io.subutai.common.util.CollectionUtil;
 
 
 /**
  * Blueprint for environment creation stores nodeGroups.
  *
- * @see NodeGroup
+ * @see Node
  */
 public class Blueprint
 {
@@ -35,26 +35,31 @@ public class Blueprint
     private String sshKey;
     @JsonProperty( "nodegroups" )
     @GsonRequired
-    private Set<NodeGroup> nodeGroups;
+    private Set<Node> nodes;
+//    @JsonProperty( "strategyId" )
+//    private String strategyId;
+//    @JsonProperty( "containerDistributionType" )
+//    private ContainerDistributionType distributionType = ContainerDistributionType.AUTO;
 
 
     public Blueprint( @JsonProperty( "name" ) final String name, @JsonProperty( "sshKey" ) final String sshKey,
-                      @JsonProperty( "nodegroups" ) final Set<NodeGroup> nodeGroups )
+                      @JsonProperty( "nodegroups" ) final Set<Node> nodes/*, final String strategyId*/ )
     {
         this.name = name;
-        this.nodeGroups = nodeGroups;
+        this.nodes = nodes;
         this.sshKey = sshKey;
+//        this.strategyId = strategyId;
     }
 
 
-    public Blueprint( final String name, final Set<NodeGroup> nodeGroups )
+    public Blueprint( final String name, final Set<Node> nodes )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid name" );
-        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( nodeGroups ), "Invalid node group set" );
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( nodes ), "Invalid node group set" );
 
         this.id = UUID.randomUUID();
         this.name = name;
-        this.nodeGroups = nodeGroups;
+        this.nodes = nodes;
     }
 
 
@@ -76,27 +81,52 @@ public class Blueprint
     }
 
 
-    public Set<NodeGroup> getNodeGroups()
+//    public String getStrategyId()
+//    {
+//        return strategyId;
+//    }
+//
+//
+//    public ContainerDistributionType getDistributionType()
+//    {
+//        return distributionType;
+//    }
+
+
+    public Set<Node> getNodes()
     {
-        return nodeGroups == null ? Sets.<NodeGroup>newHashSet() : Collections.unmodifiableSet( nodeGroups );
+        return nodes == null ? Sets.<Node>newHashSet() : Collections.unmodifiableSet( nodes );
     }
 
 
     @JsonIgnore
-    public Map<String, Set<NodeGroup>> getNodeGroupsMap()
+    public Map<String, Set<Node>> getNodeGroupsMap()
     {
-        Map<String, Set<NodeGroup>> result = new HashMap<>();
+        Map<String, Set<Node>> result = new HashMap<>();
 
-        for ( NodeGroup nodeGroup : nodeGroups )
+        for ( Node node : nodes )
         {
-            String key = nodeGroup.getPeerId();
-            Set<NodeGroup> nodes = result.get( key );
+            String key = node.getPeerId();
+            Set<Node> nodes = result.get( key );
             if ( nodes == null )
             {
                 nodes = new HashSet<>();
                 result.put( key, nodes );
             }
-            nodes.add( nodeGroup );
+            nodes.add( node );
+        }
+        return result;
+    }
+
+
+    @JsonIgnore
+    public Set<String> getPeers()
+    {
+        Set<String> result = new HashSet<>();
+
+        for ( Node node : nodes )
+        {
+            result.add( node.getPeerId() );
         }
         return result;
     }
@@ -105,5 +135,33 @@ public class Blueprint
     public String getSshKey()
     {
         return sshKey;
+    }
+
+
+    @JsonIgnore
+    public boolean isDistributed()
+    {
+        for ( Node node : nodes )
+        {
+            if ( node.getPeerId() == null || node.getHostId() == null )
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+    @Override
+    public String toString()
+    {
+        final StringBuffer sb = new StringBuffer( "Blueprint{" );
+        sb.append( "id=" ).append( id );
+        sb.append( ", name='" ).append( name ).append( '\'' );
+        sb.append( ", sshKey='" ).append( sshKey ).append( '\'' );
+        sb.append( ", nodeGroups=" ).append( nodes );
+//        sb.append( ", distributionType=" ).append( distributionType );
+        sb.append( '}' );
+        return sb.toString();
     }
 }

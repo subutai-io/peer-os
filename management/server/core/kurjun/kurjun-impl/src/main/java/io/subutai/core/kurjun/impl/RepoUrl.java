@@ -8,13 +8,13 @@ import java.net.URL;
 public class RepoUrl implements Serializable
 {
     private URL url;
-    private boolean useToken;
+    private String token;
 
 
-    public RepoUrl( URL url, boolean useToken )
+    public RepoUrl( URL url, String token )
     {
         this.url = url;
-        this.useToken = useToken;
+        this.token = token;
     }
 
 
@@ -30,22 +30,22 @@ public class RepoUrl implements Serializable
     }
 
 
-    public boolean isUseToken()
+    public String getToken()
     {
-        return useToken;
+        return token;
     }
 
 
-    public void setUseToken( boolean useToken )
+    public void setToken( String token )
     {
-        this.useToken = useToken;
+        this.token = token;
     }
 
 
     @Override
     public String toString()
     {
-        return "RepoUrl{" + "url=" + url + ", useToken=" + useToken + '}';
+        return "RepoUrl{" + "url=" + url + ", useToken=" + ( token != null ) + '}';
     }
 
 }

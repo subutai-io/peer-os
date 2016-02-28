@@ -7,7 +7,6 @@ import java.util.Set;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
-import io.subutai.common.command.OutputRedirection;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.peer.ContainerHost;
@@ -23,6 +22,8 @@ public class Commands
     private static final String MANAGEMENT_HOST_NETWORK_BINDING = "subutai management_network";
     private static final String RESOURCE_HOST_NETWORK_BINDING = "subutai network";
     private static final String MANAGEMENT_PROXY_BINDING = "subutai proxy";
+    private static final String SSH_FOLDER = "/root/.ssh";
+    private static final String SSH_FILE = String.format( "%s/authorized_keys", SSH_FOLDER );
 
 
     //container commands
@@ -53,26 +54,39 @@ public class Commands
     //management host commands
 
 
-    public RequestBuilder getSetupN2NConnectionCommand( String superNodeIp, int superNodePort, String interfaceName,
-                                                        String communityName, String localIp, String keyType,
-                                                        String pathToKeyFile )
-    {
-        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs(
-                Lists.newArrayList( "-N", superNodeIp, String.valueOf( superNodePort ), interfaceName, communityName,
-                        localIp, keyType, pathToKeyFile ) ).withTimeout( 15 ).daemon();
-    }
-
-
-    public RequestBuilder getRemoveN2NConnectionCommand( String interfaceName, String communityName )
+    public RequestBuilder getListPeersInEnvironmentCommand( String communityName )
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
-                .withCmdArgs( Lists.newArrayList( "-R", interfaceName, communityName ) );
+                .withCmdArgs( Lists.newArrayList( "p2p", "-p", communityName ) );
     }
 
 
-    public RequestBuilder getListN2NConnectionsCommand()
+    public RequestBuilder getSetupP2PConnectionCommand( String interfaceName, String localIp, String communityName,
+                                                        String secretKey, long secretKeyTtlSec )
     {
-        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs( Lists.newArrayList( "-L" ) );
+        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs(
+                Lists.newArrayList( "p2p", "-c", interfaceName, localIp, communityName, secretKey,
+                        String.valueOf( secretKeyTtlSec ) ) );
+    }
+
+
+    public RequestBuilder getRemoveP2PConnectionCommand( String communityName )
+    {
+        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
+                .withCmdArgs( Lists.newArrayList( "p2p", "-d", communityName ) );
+    }
+
+
+    public RequestBuilder getResetP2PSecretKey( String p2pHash, String newSecretKey, long ttlSeconds )
+    {
+        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
+                .withCmdArgs( Lists.newArrayList( "p2p", "-u", p2pHash, newSecretKey, String.valueOf( ttlSeconds ) ) );
+    }
+
+
+    public RequestBuilder getListP2PConnectionsCommand()
+    {
+        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs( Lists.newArrayList( "p2p", "-l" ) );
     }
 
 
@@ -93,14 +107,6 @@ public class Commands
     public RequestBuilder getListTunnelsCommand()
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs( Lists.newArrayList( "-l" ) );
-    }
-
-
-    public RequestBuilder getSetupGatewayCommand( String gatewayIp, int vLanId )
-    {
-        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
-                .withCmdArgs( Lists.newArrayList( "-T", gatewayIp, String.valueOf( vLanId ) ) ).withTimeout( 90 )
-                .withStdOutRedirection( OutputRedirection.NO );
     }
 
 
@@ -218,45 +224,61 @@ public class Commands
     // ssh and hosts
 
 
-    public RequestBuilder getCreateSSHCommand()
+    public RequestBuilder getCreateNReadSSHCommand()
     {
-        return new RequestBuilder( "rm -rf /root/.ssh && " +
-                "mkdir -p /root/.ssh && " +
-                "chmod 700 /root/.ssh && " +
-                "ssh-keygen -t dsa -P '' -f /root/.ssh/id_dsa" );
+        return new RequestBuilder( String.format( "rm -rf %1$s && " +
+                "mkdir -p %1$s && " +
+                "chmod 700 %1$s && " +
+                "ssh-keygen -t dsa -P '' -f %1$s/id_dsa && " + "cat %1$s/id_dsa.pub", SSH_FOLDER ) );
     }
 
 
-    public RequestBuilder getReadSSHCommand()
+    public RequestBuilder getCreateNewAuthKeysFileCommand( String keys )
     {
-        return new RequestBuilder( "cat /root/.ssh/id_dsa.pub" );
+        return new RequestBuilder( String.format( "mkdir -p %1$s && " +
+                "chmod 700 %1$s && " +
+                "echo '%3$s' >> %2$s && " +
+                "chmod 644 %2$s", SSH_FOLDER, SSH_FILE, keys ) );
     }
 
 
     public RequestBuilder getAppendSshKeyCommand( String key )
     {
-        return new RequestBuilder( String.format( "mkdir -p /root/.ssh && " +
-                "chmod 700 /root/.ssh && " +
-                "echo '%s' >> /root/.ssh/authorized_keys && " +
-                "chmod 644 /root/.ssh/authorized_keys", key ) );
+        return new RequestBuilder( String.format(
+                "mkdir -p '%1$s' && " + "echo '%3$s' >> '%2$s' && " + "chmod 700 -R '%1$s' && "
+                        + "sort -u '%2$s' -o '%2$s'", SSH_FOLDER, SSH_FILE, key ) );
     }
 
 
     public RequestBuilder getReplaceSshKeyCommand( String oldKey, String newKey )
     {
-        return new RequestBuilder( String.format( "mkdir -p /root/.ssh && " +
-                "chmod 700 /root/.ssh && " +
-                "sed -i \"\\,%s,d\" /root/.ssh/authorized_keys ; " +
-                "echo '%s' >> /root/.ssh/authorized_keys && " +
-                "chmod 644 /root/.ssh/authorized_keys", oldKey, newKey ) );
+        return new RequestBuilder( String.format( "mkdir -p %1$s && " +
+                "chmod 700 %1$s && " +
+                "sed -i \"\\,%3$s,d\" %2$s ; " +
+                "echo '%4$s' >> %2$s && " +
+                "chmod 644 %2$s", SSH_FOLDER, SSH_FILE, oldKey, newKey ) );
     }
 
 
     public RequestBuilder getConfigSSHCommand()
     {
-        return new RequestBuilder( "echo 'Host *' > /root/.ssh/config && " +
-                "echo '    StrictHostKeyChecking no' >> /root/.ssh/config && " +
-                "chmod 644 /root/.ssh/config" );
+        return new RequestBuilder( String.format( "echo 'Host *' > %1$s/config && " +
+                "echo '    StrictHostKeyChecking no' >> %1$s/config && " +
+                "chmod 644 %1$s/config", SSH_FOLDER ) );
+    }
+
+
+    public RequestBuilder getRemoveSshKeyCommand( final String key )
+    {
+        return new RequestBuilder( String.format( "chmod 700 %1$s && " +
+                "sed -i \"\\,%3$s,d\" %2$s && " +
+                "chmod 644 %2$s", SSH_FOLDER, SSH_FILE, key ) );
+    }
+
+
+    public RequestBuilder getSetupContainerSshCommand( final String containerIp, final int sshIdleTimeout )
+    {
+        return new RequestBuilder( String.format( "subutai tunnel %s %d", containerIp, sshIdleTimeout ) );
     }
 
 
@@ -267,7 +289,7 @@ public class Commands
 
         for ( ContainerHost host : containerHosts )
         {
-            String ip = host.getIpByInterfaceName( Common.DEFAULT_CONTAINER_INTERFACE );
+            String ip = host.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp();
             String hostname = host.getHostname();
             cleanHosts.append( ip ).append( "|" ).append( hostname ).append( "|" );
             appendHosts.append( "/bin/echo '" ).
@@ -292,16 +314,8 @@ public class Commands
     }
 
 
-    public RequestBuilder getRemoveSshKeyCommand( final String key )
+    public RequestBuilder getPingDistanceCommand( final String ip )
     {
-        return new RequestBuilder( String.format( "chmod 700 /root/.ssh && " +
-                "sed -i \"\\,%s,d\" /root/.ssh/authorized_keys && " +
-                "chmod 644 /root/.ssh/authorized_keys", key ) );
-    }
-
-
-    public RequestBuilder getSetupContainerSshCommand( final String containerIp, final int sshIdleTimeout )
-    {
-        return new RequestBuilder( String.format( "subutai tunnel %s %d", containerIp, sshIdleTimeout ) );
+        return new RequestBuilder( "ping -c 10 -i 0.2 -w 3 " + ip );
     }
 }

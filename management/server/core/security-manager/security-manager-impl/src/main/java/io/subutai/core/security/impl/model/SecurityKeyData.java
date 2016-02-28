@@ -9,37 +9,11 @@ import io.subutai.core.security.api.crypto.EncryptionTool;
  */
 public class SecurityKeyData
 {
-    private String publicKeyringFile;
-    private String secretKeyringFile;
     private String secretKeyringPwd;
     private String manHostId;
     private String manHostKeyFingerprint;
-    private String ownerPublicKeyringFile;
+    private String peerOwnerId;
     private Object jsonProvider;
-
-
-    public String getPublicKeyringFile()
-    {
-        return publicKeyringFile;
-    }
-
-
-    public void setPublicKeyringFile( final String publicKeyringFile )
-    {
-        this.publicKeyringFile = publicKeyringFile;
-    }
-
-
-    public String getSecretKeyringFile()
-    {
-        return secretKeyringFile;
-    }
-
-
-    public void setSecretKeyringFile( final String secretKeyringFile )
-    {
-        this.secretKeyringFile = secretKeyringFile;
-    }
 
 
     public String getSecretKeyringPwd()
@@ -77,18 +51,6 @@ public class SecurityKeyData
     }
 
 
-    public String getOwnerPublicKeyringFile()
-    {
-        return ownerPublicKeyringFile;
-    }
-
-
-    public void setOwnerPublicKeyringFile( final String ownerPublicKeyringFile )
-    {
-        this.ownerPublicKeyringFile = ownerPublicKeyringFile;
-    }
-
-
     public Object getJsonProvider()
     {
         return jsonProvider;
@@ -100,4 +62,15 @@ public class SecurityKeyData
         this.jsonProvider = jsonProvider;
     }
 
+
+    public String getPeerOwnerId()
+    {
+        return peerOwnerId;
+    }
+
+
+    public void setPeerOwnerId( final String peerOwnerId )
+    {
+        this.peerOwnerId = peerOwnerId;
+    }
 }

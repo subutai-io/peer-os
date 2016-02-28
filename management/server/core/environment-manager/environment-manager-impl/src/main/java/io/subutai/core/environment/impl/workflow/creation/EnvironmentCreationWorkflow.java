@@ -1,25 +1,20 @@
 package io.subutai.core.environment.impl.workflow.creation;
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.apache.servicemix.beanflow.Workflow;
 
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.Topology;
-import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.creation.steps.ContainerCloneStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.PEKGenerationStep;
+import io.subutai.core.environment.impl.workflow.creation.steps.PrepareTemplatesStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterHostsStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterSshStep;
-import io.subutai.core.environment.impl.workflow.creation.steps.SetSshKeyStep;
-import io.subutai.core.environment.impl.workflow.creation.steps.SetupN2NStep;
+import io.subutai.core.environment.impl.workflow.creation.steps.SetupP2PStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.VNISetupStep;
-import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerManager;
@@ -28,8 +23,6 @@ import io.subutai.core.security.api.SecurityManager;
 
 public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWorkflow.EnvironmentCreationPhase>
 {
-    private static final Logger LOG = LoggerFactory.getLogger( EnvironmentCreationWorkflow.class );
-
     private final TemplateManager templateRegistry;
     private final NetworkManager networkManager;
     private final PeerManager peerManager;
@@ -41,21 +34,17 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
     private final TrackerOperation operationTracker;
     private final EnvironmentManagerImpl environmentManager;
 
-    private Throwable error;
-    private IdentityManager identityManager;
-
 
     //environment creation phases
-    public static enum EnvironmentCreationPhase
+    public enum EnvironmentCreationPhase
     {
         INIT,
         GENERATE_KEYS,
         SETUP_VNI,
-        SETUP_N2N,
-        CLONE_CONTAINERS,
+        SETUP_P2P,
+        PREPARE_TEMPLATES, CLONE_CONTAINERS,
         CONFIGURE_HOSTS,
         CONFIGURE_SSH,
-        SET_ENVIRONMENT_SSH_KEY,
         FINALIZE
 
     }
@@ -64,12 +53,11 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
     public EnvironmentCreationWorkflow( String defaultDomain, TemplateManager templateRegistry,
                                         EnvironmentManagerImpl environmentManager, NetworkManager networkManager,
                                         PeerManager peerManager, SecurityManager securityManager,
-                                        IdentityManager identityManager, EnvironmentImpl environment, Topology topology,
-                                        String sshKey, TrackerOperation operationTracker )
+                                        EnvironmentImpl environment, Topology topology, String sshKey,
+                                        TrackerOperation operationTracker )
     {
         super( EnvironmentCreationPhase.INIT );
 
-        this.identityManager = identityManager;
         this.environmentManager = environmentManager;
         this.templateRegistry = templateRegistry;
         this.peerManager = peerManager;
@@ -91,8 +79,6 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         operationTracker.addLog( "Initializing environment creation" );
 
         environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
-        environment.setSuperNode( peerManager.getLocalPeerInfo().getIp() );
-        environment.setSuperNodePort( Common.SUPER_NODE_PORT );
         environment = environmentManager.saveOrUpdate( environment );
         return EnvironmentCreationPhase.GENERATE_KEYS;
     }
@@ -104,8 +90,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
         try
         {
-            new PEKGenerationStep( topology, environment, peerManager.getLocalPeer(), securityManager,
-                    identityManager.getActiveUser() ).execute();
+            new PEKGenerationStep( topology, environment, peerManager, securityManager ).execute();
 
             environment = environmentManager.saveOrUpdate( environment );
 
@@ -113,8 +98,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         }
         catch ( Exception e )
         {
-            setError( e );
-
+            fail( e.getMessage(), e );
             return null;
         }
     }
@@ -126,28 +110,47 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
         try
         {
-            new VNISetupStep( topology, environment, peerManager.getLocalPeer() ).execute();
+            new VNISetupStep( topology, environment, peerManager ).execute();
 
             environment = environmentManager.saveOrUpdate( environment );
 
-            return EnvironmentCreationPhase.SETUP_N2N;
+            return EnvironmentCreationPhase.SETUP_P2P;
         }
         catch ( Exception e )
         {
-            setError( e );
-
+            fail( e.getMessage(), e );
             return null;
         }
     }
 
 
-    public EnvironmentCreationPhase SETUP_N2N()
+    public EnvironmentCreationPhase SETUP_P2P()
     {
-        operationTracker.addLog( "Setting up N2N" );
+        operationTracker.addLog( "Setting up P2P" );
 
         try
         {
-            new SetupN2NStep( topology, environment, peerManager.getLocalPeer() ).execute();
+            new SetupP2PStep( topology, environment, peerManager ).execute();
+
+            environment = environmentManager.saveOrUpdate( environment );
+
+            return EnvironmentCreationPhase.PREPARE_TEMPLATES;
+        }
+        catch ( Exception e )
+        {
+            fail( e.getMessage(), e );
+            return null;
+        }
+    }
+
+
+    public EnvironmentCreationPhase PREPARE_TEMPLATES()
+    {
+        operationTracker.addLog( "Preparing templates" );
+
+        try
+        {
+            new PrepareTemplatesStep( peerManager, topology, operationTracker ).execute();
 
             environment = environmentManager.saveOrUpdate( environment );
 
@@ -155,8 +158,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         }
         catch ( Exception e )
         {
-            setError( e );
-
+            fail( e.getMessage(), e );
             return null;
         }
     }
@@ -168,8 +170,8 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
         try
         {
-            new ContainerCloneStep( templateRegistry, defaultDomain, topology, environment, peerManager.getLocalPeer() )
-                    .execute();
+            new ContainerCloneStep( templateRegistry, defaultDomain, topology, environment, peerManager,
+                    environmentManager, operationTracker ).execute();
 
             environment = environmentManager.saveOrUpdate( environment );
 
@@ -177,8 +179,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         }
         catch ( Exception e )
         {
-            setError( e );
-
+            fail( e.getMessage(), e );
             return null;
         }
     }
@@ -198,8 +199,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         }
         catch ( Exception e )
         {
-            setError( e );
-
+            fail( e.getMessage(), e );
             return null;
         }
     }
@@ -211,28 +211,9 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
         try
         {
-            new RegisterSshStep( environment, networkManager ).execute();
+            environment.addSshKey( sshKey );
 
-            environment = environmentManager.saveOrUpdate( environment );
-
-            return EnvironmentCreationPhase.SET_ENVIRONMENT_SSH_KEY;
-        }
-        catch ( Exception e )
-        {
-            setError( e );
-
-            return null;
-        }
-    }
-
-
-    public EnvironmentCreationPhase SET_ENVIRONMENT_SSH_KEY()
-    {
-        operationTracker.addLog( "Setting environment ssh key to containers" );
-
-        try
-        {
-            new SetSshKeyStep( sshKey, environment, networkManager ).execute();
+            new RegisterSshStep( environment, networkManager ).execute( environment.getSshKeys() );
 
             environment = environmentManager.saveOrUpdate( environment );
 
@@ -240,8 +221,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         }
         catch ( Exception e )
         {
-            setError( e );
-
+            fail( e.getMessage(), e );
             return null;
         }
     }
@@ -249,7 +229,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
     public void FINALIZE()
     {
-        LOG.info( "Finalizing environment creation" );
+        //        LOG.info( "Finalizing environment creation" );
 
         environment.setStatus( EnvironmentStatus.HEALTHY );
 
@@ -262,20 +242,18 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
     }
 
 
-    public Throwable getError()
+    @Override
+    public void fail( final String message, final Throwable e )
     {
-        return error;
+        super.fail( message, e );
+        saveFailState();
     }
 
 
-    public void setError( final Throwable error )
+    private void saveFailState()
     {
         environment.setStatus( EnvironmentStatus.UNHEALTHY );
         environment = environmentManager.saveOrUpdate( environment );
-        this.error = error;
-        LOG.error( "Error creating environment", error );
-        operationTracker.addLogFailed( error.getMessage() );
-        //stop the workflow
-        stop();
+        operationTracker.addLogFailed( getFailedReason() );
     }
 }

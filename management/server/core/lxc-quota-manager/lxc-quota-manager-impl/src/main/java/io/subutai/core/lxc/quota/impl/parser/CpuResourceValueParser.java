@@ -6,13 +6,12 @@ import java.util.regex.Pattern;
 
 import com.google.common.base.Preconditions;
 
-import io.subutai.common.resource.MeasureUnit;
-import io.subutai.common.resource.ResourceValue;
+import io.subutai.common.resource.NumericValueResource;
 import io.subutai.common.resource.ResourceValueParser;
 
 
 /**
- * CPU resource parser
+ * Percent value resource parser
  */
 public class CpuResourceValueParser implements ResourceValueParser
 {
@@ -35,7 +34,7 @@ public class CpuResourceValueParser implements ResourceValueParser
 
 
     @Override
-    public ResourceValue parse( final String resource )
+    public NumericValueResource parse( String resource )
     {
         Preconditions.checkNotNull( resource );
 
@@ -44,12 +43,11 @@ public class CpuResourceValueParser implements ResourceValueParser
         {
             String value = quotaMatcher.group( 1 );
             String acronym = quotaMatcher.group( 2 );
-            MeasureUnit measureUnit = MeasureUnit.parseFromAcronym( acronym );
-            if ( measureUnit != null && measureUnit != MeasureUnit.PERCENT )
+            if ( acronym != null && "%".equals( acronym.trim() ) )
             {
                 throw new IllegalArgumentException( "Invalid measure unit." );
             }
-            return new ResourceValue( value, measureUnit == null ? MeasureUnit.PERCENT : measureUnit );
+            return new NumericValueResource( value );
         }
         else
         {

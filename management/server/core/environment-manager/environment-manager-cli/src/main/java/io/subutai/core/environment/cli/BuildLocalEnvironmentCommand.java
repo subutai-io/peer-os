@@ -1,19 +1,19 @@
 package io.subutai.core.environment.cli;
 
 
+import java.util.Set;
 import java.util.UUID;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Sets;
 
-import io.subutai.common.environment.Blueprint;
 import io.subutai.common.environment.Environment;
-import io.subutai.common.environment.NodeGroup;
+import io.subutai.common.environment.Node;
 import io.subutai.common.environment.Topology;
-import io.subutai.common.protocol.PlacementStrategy;
+import io.subutai.common.peer.ContainerSize;
+import io.subutai.common.peer.ResourceHost;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.peer.api.PeerManager;
@@ -73,12 +73,23 @@ public class BuildLocalEnvironmentCommand extends SubutaiShellCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        NodeGroup nodeGroup = new NodeGroup( "NodeGroup1", templateName, numberOfContainers, 1, 1,
-                new PlacementStrategy( "ROUND_ROBIN" ), peerManager.getLocalPeer().getId() );
+        String peerId = peerManager.getLocalPeer().getId();
+        final Set<ResourceHost> resourceHosts = peerManager.getLocalPeer().getResourceHosts();
 
-        Blueprint blueprint = new Blueprint( "Dummy environment name", null, Sets.newHashSet( nodeGroup ) );
+        if ( resourceHosts.size() < 1 )
+        {
+            System.out.println( "There are no resource hosts to build environment" );
+            return null;
+        }
+        String hostId = resourceHosts.iterator().next().getId();
+        Node node =
+                new Node( UUID.randomUUID().toString(), "NodeGroup1", templateName, ContainerSize.TINY, 1, 1,
+                        peerId, hostId );
 
-        Environment environment = environmentManager.createEnvironment( blueprint, async );
+        Topology topology = new Topology( "Dummy environment name", 1, 1 );
+        topology.addNodePlacement( peerId, node );
+
+        Environment environment = environmentManager.createEnvironment( topology, async );
 
         System.out.println( String.format( "Environment created with id %s", environment.getId() ) );
 

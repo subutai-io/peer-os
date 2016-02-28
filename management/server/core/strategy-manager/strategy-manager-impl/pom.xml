@@ -6,12 +6,12 @@
   <parent>
     <groupId>io.subutai</groupId>
     <artifactId>strategy-manager-parent</artifactId>
-    <version>4.0.0-RC5</version>
+    <version>4.0.0-RC7-SNAPSHOT</version>
   </parent>
 
   <artifactId>strategy-manager-impl</artifactId>
   <packaging>bundle</packaging>
-  <name>Subutai Strategy Manager</name>
+  <name>Subutai Strategy Manager Impl</name>
   <description>Subutai Strategy Manager Impl</description>
 
   <dependencies>
@@ -25,7 +25,14 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>strategy-manager-api</artifactId>
     </dependency>
-
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>peer-manager-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>lxc-quota-manager-api</artifactId>
+    </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>

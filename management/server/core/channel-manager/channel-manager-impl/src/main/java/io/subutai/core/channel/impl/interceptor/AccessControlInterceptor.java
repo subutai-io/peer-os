@@ -1,8 +1,6 @@
 package io.subutai.core.channel.impl.interceptor;
 
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.security.PrivilegedAction;
 
 import javax.security.auth.Subject;
@@ -13,6 +11,8 @@ import javax.ws.rs.core.HttpHeaders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
@@ -21,8 +21,9 @@ import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 import com.google.common.base.Strings;
 
-import io.subutai.common.settings.ChannelSettings;
+import io.subutai.common.settings.SystemSettings;
 import io.subutai.core.channel.impl.ChannelManagerImpl;
+import io.subutai.core.channel.impl.util.InterceptorState;
 import io.subutai.core.channel.impl.util.MessageContentUtil;
 import io.subutai.core.identity.api.model.Session;
 
@@ -52,74 +53,79 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
     {
         try
         {
-            URL url = new URL( ( String ) message.get( Message.REQUEST_URL ) );
-            Session userSession = null;
+            if ( InterceptorState.SERVER_IN.isActive( message ) )
+            {
+                HttpServletRequest req = ( HttpServletRequest ) message.get( AbstractHTTPDestination.HTTP_REQUEST );
+                Session userSession = null;
 
-            if ( url.getPort() == Integer.parseInt( ChannelSettings.SECURE_PORT_X2 ) )
-            {
-                userSession = authenticateAccess( null );
-            }
-            else
-            {
-                int status = 0;
-                status = MessageContentUtil.checkUrlAccessibility( status, url );
-                //----------------------------------------------------------------------------------------------
-                if ( status == 1 ) //require tokenauth
-                    userSession = authenticateAccess( message );
-                else if ( status == 0 ) // auth with system user
-                    userSession = authenticateAccess( null );
-                else if ( status == 2 )
+                if ( req.getLocalPort() == SystemSettings.getSecurePortX2() )
                 {
-                    MessageContentUtil.abortChain( message, 403, "Permission denied" );
+                    userSession = authenticateAccess( null,null );
+                }
+                else
+                {
+                    int status = 0;
+                    status = MessageContentUtil.checkUrlAccessibility( status, req );
+                    //----------------------------------------------------------------------------------------------
+                    if ( status == 1 ) //require tokenauth
+                    {
+                        userSession = authenticateAccess( message,req );
+                    }
+                    else if ( status == 0 ) // auth with system user
+                    {
+                        userSession = authenticateAccess( null,null );
+                    }
+                    else if ( status == 2 )
+                    {
+                        MessageContentUtil.abortChain( message, 403, "Permission denied" );
+                    }
+                }
+
+                //******Authenticate************************************************
+                if ( userSession != null )
+                {
+                    Subject.doAs( userSession.getSubject(), new PrivilegedAction<Void>()
+                    {
+                        @Override
+                        public Void run()
+                        {
+                            try
+                            {
+                                message.getInterceptorChain().doIntercept( message );
+                            }
+                            catch ( Exception ex )
+                            {
+                                Throwable t = ExceptionUtils.getRootCause( ex );
+                                MessageContentUtil.abortChain( message, t );
+                            }
+                            return null;
+                        }
+                    } );
+                }
+                else
+                {
+                    MessageContentUtil.abortChain( message, 401, "User is not authorized" );
                 }
             }
-
-            //******Authenticate************************************************
-            if ( userSession != null )
-            {
-                Subject.doAs( userSession.getSubject(), new PrivilegedAction<Void>()
-                {
-                    @Override
-                    public Void run()
-                    {
-                        try
-                        {
-                            message.getInterceptorChain().doIntercept( message );
-                        }
-                        catch ( Exception ex )
-                        {
-                            MessageContentUtil.abortChain( message, ex );
-                        }
-                        return null;
-                    }
-                } );
-            }
-            else
-            {
-                MessageContentUtil.abortChain( message, 401, "User is not authorized" );
-            }
-            //-----------------------------------------------------------------------------------------------
+                //-----------------------------------------------------------------------------------------------
         }
-        catch ( MalformedURLException ignore )
+        catch ( Exception e )
         {
-            LOG.debug( "MalformedURLException", ignore.toString() );
+            throw new Fault( e );
         }
     }
 
 
     //******************************************************************
-    private Session authenticateAccess( Message message )
+    private Session authenticateAccess( Message message, HttpServletRequest req )
     {
         if ( message == null )
         {
             //***********internal auth ********* for regisration and 8444 port
-            return channelManagerImpl.getIdentityManager().login( "internal", "internal" );
+            return channelManagerImpl.getIdentityManager().login( "internal", "secretSubutai" );
         }
         else
         {
-            HttpServletRequest req = ( HttpServletRequest ) message.getExchange().getInMessage()
-                                                                   .get( AbstractHTTPDestination.HTTP_REQUEST );
-
             String sptoken = req.getParameter( "sptoken" );
 
             if ( Strings.isNullOrEmpty( sptoken ) )
@@ -143,9 +149,13 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
             }
 
             if ( Strings.isNullOrEmpty( sptoken ) )
+            {
                 return null;
+            }
             else
+            {
                 return channelManagerImpl.getIdentityManager().login( "token", sptoken );
+            }
         }
     }
     //******************************************************************

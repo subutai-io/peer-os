@@ -1,26 +1,27 @@
 package io.subutai.common.metric;
 
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import com.google.gson.annotations.Expose;
 
 
-@XmlRootElement
-@XmlAccessorType( XmlAccessType.FIELD )
 public class Disk
 {
     @Expose
-    @JsonProperty
+    @JsonProperty( "total" )
     Double total = 0.0;
     @Expose
-    @JsonProperty
+    @JsonProperty( "used" )
     Double used = 0.0;
+
+
+    public Disk( @JsonProperty( "total" ) final Double total, @JsonProperty( "used" ) final Double used )
+    {
+        this.total = total;
+        this.used = used;
+    }
 
 
     public Double getTotal()
@@ -45,6 +46,7 @@ public class Disk
     {
         this.used = used;
     }
+
 
     @JsonIgnore
     public Double getAvailableSpace()

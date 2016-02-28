@@ -1,0 +1,34 @@
+<link rel="stylesheet" href="subutai-app/settingsPeer/partials/switch.css">
+<div ng-controller="SettingsPeerCtrl as settingsPeerCtrl">
+
+  <div class="b-workspace__header">
+    <h1 class="b-title"><span class="b-title_breadcrumbs">Peer Settings</span></h1>
+  </div>
+	<div class="b-workspace__content">
+		<div class="b-tabs-menu">
+			<ul>
+				<li class="b-tabs-menu__item"
+					ng-click="settingsPeerCtrl.activeTab = 'settings'"
+					ng-class="settingsPeerCtrl.activeTab == 'settings' ? 'b-tabs-menu__item_active' : ''">
+					Settings
+				</li>
+				<li class="b-tabs-menu__item"
+					ng-click="settingsPeerCtrl.activeTab = 'policy'"
+					ng-class="settingsPeerCtrl.activeTab == 'policy' ? 'b-tabs-menu__item_active' : ''">
+					Policy
+				</li>
+			</ul>
+		</div>
+		<div
+				ng-if="settingsPeerCtrl.activeTab == 'settings'"
+				ng-include="'subutai-app/settingsPeer/partials/settings.html'">
+		</div>
+
+		<div
+				ng-if="settingsPeerCtrl.activeTab == 'policy'"
+				ng-include="'subutai-app/settingsPeer/partials/policy.html'">
+		</div>
+	</div>
+
+  </div>
+</div>

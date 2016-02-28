@@ -11,9 +11,11 @@ import org.mockito.runners.MockitoJUnitRunner;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.host.HostInterface;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.TemplateKurjun;
+import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.settings.Common;
 import io.subutai.core.hostregistry.api.HostRegistry;
 
@@ -45,21 +47,30 @@ public class CreateContainerTaskTest
     ContainerHost containerHost;
 
     CreateContainerTask task;
+
     @Mock
     private HostRegistry hostRegistry;
+
+    @Mock
+    private HostInterface hostInterface;
+
+    @Mock
+    private ContainerQuota quota;
 
 
     @Before
     public void setUp() throws Exception
     {
-        task = new CreateContainerTask( hostRegistry, resourceHost, template, HOSTNAME, CIDR, VLAN, TIMEOUT, ENV_ID );
+        task = new CreateContainerTask( hostRegistry, resourceHost, template, HOSTNAME, quota, CIDR, VLAN, TIMEOUT,
+                ENV_ID );
         task.commandUtil = commandUtil;
+        when( hostInterface.getIp() ).thenReturn( IP );
         when( resourceHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
         when( commandResult.hasSucceeded() ).thenReturn( true );
         when( commandResult.getStdOut() ).thenReturn( OUT );
         when( template.getName() ).thenReturn( TEMPLATE_NAME );
         when( resourceHost.getContainerHostByName( HOSTNAME ) ).thenReturn( containerHost );
-        when( containerHost.getIpByInterfaceName( Common.DEFAULT_CONTAINER_INTERFACE ) ).thenReturn( IP );
+        when( containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ) ).thenReturn( hostInterface );
     }
 
 
@@ -70,7 +81,8 @@ public class CreateContainerTaskTest
         task.call();
 
         CreateContainerTask task =
-                new CreateContainerTask( hostRegistry, resourceHost, template, HOSTNAME, CIDR, VLAN, TIMEOUT, ENV_ID );
+                new CreateContainerTask( hostRegistry, resourceHost, template, HOSTNAME, quota, CIDR, VLAN, TIMEOUT,
+                        ENV_ID );
         task.commandUtil = commandUtil;
 
         task.call();

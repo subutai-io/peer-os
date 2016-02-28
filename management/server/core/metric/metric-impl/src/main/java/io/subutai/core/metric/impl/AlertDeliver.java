@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 
-import io.subutai.common.peer.AlertPack;
+import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.Peer;
 
 
@@ -17,11 +17,11 @@ public class AlertDeliver implements Runnable
 {
     protected Logger LOG = LoggerFactory.getLogger( AlertDeliver.class );
 
-    protected AlertPack alert;
+    protected AlertEvent alert;
     protected Peer peer;
 
 
-    public AlertDeliver( Peer peer, final AlertPack alert )
+    public AlertDeliver( Peer peer, final AlertEvent alert )
     {
         Preconditions.checkNotNull( alert, "Alert is null" );
         Preconditions.checkNotNull( peer, "Peer is null" );

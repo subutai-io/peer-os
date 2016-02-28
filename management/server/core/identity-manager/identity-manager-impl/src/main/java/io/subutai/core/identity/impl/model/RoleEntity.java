@@ -100,7 +100,6 @@ public class RoleEntity implements Role
     }
 
 
-    // TODO: delete these methods
     @Override
     public List<Permission> getPermissions()
     {

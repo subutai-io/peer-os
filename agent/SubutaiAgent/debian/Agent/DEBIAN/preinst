@@ -1,5 +1,0 @@
-if [ -f /var/run/subutai-agent.pid ]; 
-	then
-	sudo start-stop-daemon --stop --pidfile /var/run/subutai-agent.pid
-	echo "Agent($mydaemonstatus) is stopping now.."
-fi

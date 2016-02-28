@@ -108,6 +108,16 @@ public class SecurityDataServiceImpl implements SecurityDataService
      *
      */
     @Override
+    public List<SecurityKey> getKeyDataByType( int type )
+    {
+        return securityKeyDAO.findByType( type );
+    }
+
+
+    /******************************************
+     *
+     */
+    @Override
     public SecurityKey getKeyDataByFingerprint( final String fingerprint )
     {
         return securityKeyDAO.findByFingerprint( fingerprint );
@@ -115,6 +125,8 @@ public class SecurityDataServiceImpl implements SecurityDataService
 
 
     // ********** Secret Key Store ***************
+
+
     /******************************************
      *
      */
@@ -228,6 +240,7 @@ public class SecurityDataServiceImpl implements SecurityDataService
         securityKeyTrustDAO.removeBySourceId( sourceFingerprint );
     }
 
+
     /******************************************
      *
      */
@@ -262,7 +275,7 @@ public class SecurityDataServiceImpl implements SecurityDataService
      *
      */
     @Override
-    public SecurityKeyTrust getKeyTrustData( String sourceFingerprint, String targetFingerprint)
+    public SecurityKeyTrust getKeyTrustData( String sourceFingerprint, String targetFingerprint )
     {
         return securityKeyTrustDAO.findBySourceId( sourceFingerprint, targetFingerprint );
     }
@@ -272,8 +285,11 @@ public class SecurityDataServiceImpl implements SecurityDataService
      *
      */
     @Override
-    public List<SecurityKeyTrust> getKeyTrustData( String sourceFingerprint)
+    public List<SecurityKeyTrust> getKeyTrustData( String sourceFingerprint )
     {
         return securityKeyTrustDAO.findBySourceId( sourceFingerprint );
     }
+
+
+
 }

@@ -8,43 +8,43 @@ import java.util.Set;
 import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.network.Gateway;
+import io.subutai.common.network.Gateways;
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
-import io.subutai.common.peer.LocalPeer;
+import io.subutai.core.peer.api.PeerManager;
 
 
 public class VNISetupStep
 {
     private final Topology topology;
     private final EnvironmentImpl environment;
-    private final LocalPeer localPeer;
+    private final PeerManager peerManager;
 
 
-    public VNISetupStep( final Topology topology, final EnvironmentImpl environment, final LocalPeer localPeer )
+    public VNISetupStep( final Topology topology, final EnvironmentImpl environment, final PeerManager peerManager )
     {
         this.topology = topology;
         this.environment = environment;
-        this.localPeer = localPeer;
+        this.peerManager = peerManager;
     }
 
 
     public void execute() throws EnvironmentModificationException, PeerException
     {
 
-        Set<Peer> newPeers = Sets.newHashSet( topology.getAllPeers() );
+        Set<Peer> newPeers = peerManager.resolve( topology.getAllPeers() );
         //remove already participating peers
         newPeers.removeAll( environment.getPeers() );
-        newPeers.remove( localPeer );
+        newPeers.remove( peerManager.getLocalPeer() );
 
         //obtain reserved gateways
-        Map<Peer, Set<Gateway>> reservedGateways = Maps.newHashMap();
+        Map<Peer, Gateways> reservedGateways = Maps.newHashMap();
         for ( Peer peer : newPeers )
         {
             reservedGateways.put( peer, peer.getGateways() );
@@ -54,18 +54,16 @@ public class VNISetupStep
         SubnetUtils subnetUtils = new SubnetUtils( environment.getSubnetCidr() );
         String environmentGatewayIp = subnetUtils.getInfo().getLowAddress();
 
-        for ( Map.Entry<Peer, Set<Gateway>> peerGateways : reservedGateways.entrySet() )
+        for ( Map.Entry<Peer, Gateways> peerGateways : reservedGateways.entrySet() )
         {
             Peer peer = peerGateways.getKey();
-            Set<Gateway> gateways = peerGateways.getValue();
-            for ( Gateway gateway : gateways )
+            Gateways gateways = peerGateways.getValue();
+
+            if ( gateways.findGatewayByIp( environmentGatewayIp ) != null )
             {
-                if ( gateway.getIp().equals( environmentGatewayIp ) )
-                {
-                    throw new EnvironmentModificationException(
-                            String.format( "Subnet %s is already used on peer %s", environment.getSubnetCidr(),
-                                    peer.getName() ) );
-                }
+                throw new EnvironmentModificationException(
+                        String.format( "Subnet %s is already used on peer %s", environment.getSubnetCidr(),
+                                peer.getName() ) );
             }
         }
 
@@ -75,7 +73,7 @@ public class VNISetupStep
 
         for ( final Peer peer : newPeers )
         {
-            for ( final Vni vni : peer.getReservedVnis() )
+            for ( final Vni vni : peer.getReservedVnis().list() )
             {
                 if ( vni.getVni() == environmentVni.getVni() && !Objects
                         .equals( vni.getEnvironmentId(), environmentVni.getEnvironmentId() ) )
@@ -91,9 +89,7 @@ public class VNISetupStep
 
         for ( final Peer peer : newPeers )
         {
-            Vni reservedVni = peer.reserveVni( environmentVni );
-
-            peer.createGateway( new Gateway( reservedVni.getVlan(), environmentGatewayIp ) );
+            peer.reserveVni( environmentVni );
         }
     }
 }

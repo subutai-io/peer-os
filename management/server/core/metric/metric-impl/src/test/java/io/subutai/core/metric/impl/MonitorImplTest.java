@@ -2,8 +2,7 @@ package io.subutai.core.metric.impl;
 
 
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
@@ -18,7 +17,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.command.CommandException;
@@ -26,15 +24,12 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.Environment;
-import io.subutai.common.metric.HistoricalMetric;
-import io.subutai.common.metric.MetricType;
 import io.subutai.common.peer.AlertListener;
-import io.subutai.common.peer.AlertPack;
+import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
-import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
@@ -66,7 +61,7 @@ import static org.mockito.Mockito.when;
 @RunWith( MockitoJUnitRunner.class )
 public class MonitorImplTest
 {
-    private static final String TEMPLATE_NAME = "master";
+    private static final String SUBSCRIBER_ID = "master";
     private static final String ENVIRONMENT_ID = UUID.randomUUID().toString();
     private static final String LOCAL_PEER_ID = UUID.randomUUID().toString();
     private static final String REMOTE_PEER_ID = UUID.randomUUID().toString();
@@ -97,10 +92,11 @@ public class MonitorImplTest
     @Mock
     DaoManager daoManager;
     @Mock
-    AlertPack alert;
+    AlertEvent alert;
+    @Mock
+    Set<AlertListener> alertListeners;
     @Mock
     AlertListener alertListener;
-    Map<String, AlertListener> alertListeners;
     MonitorImplExt monitor;
 
     @Mock
@@ -147,12 +143,13 @@ public class MonitorImplTest
         public void setMonitorDao( MonitorDao monitorDao ) {this.monitorDao = monitorDao;}
 
 
-//        public void setNotificationExecutor( ExecutorService executor ) {this.notificationExecutor = executor;}
+        //        public void setNotificationExecutor( ExecutorService executor ) {this.notificationExecutor =
+        // executor;}
 
 
-        public void setAlertListeners( Map<String, AlertListener> alertListeners )
+        public void setAlertListeners( Set<AlertListener> alertHandlers )
         {
-            this.alertListeners = alertListeners;
+            this.alertListeners = alertHandlers;
         }
     }
 
@@ -170,17 +167,14 @@ public class MonitorImplTest
         monitor.setMonitorDao( monitorDao );
 
 
-        alert = mock( AlertPack.class );
+        alert = mock( AlertEvent.class );
         when( environmentId.getId() ).thenReturn( ENVIRONMENT_ID );
         //        when( alert.getEnvironmentId() ).thenReturn( environmentId );
         //        when( alert.getContainerId() ).thenReturn( containerId );
-        when( alertListener.getTemplateName() ).thenReturn( TEMPLATE_NAME );
-        alertListeners = Maps.newHashMap();
-        alertListeners.put( TEMPLATE_NAME, alertListener );
-        monitor.setAlertListeners( alertListeners );
-//        monitor.setNotificationExecutor( notificationService );
-        when( monitorDao.getEnvironmentSubscribersIds( ENVIRONMENT_ID ) )
-                .thenReturn( Sets.newHashSet( TEMPLATE_NAME ) );
+        when( alertListener.getId() ).thenReturn( SUBSCRIBER_ID );
+        monitor.setAlertListeners( Sets.newHashSet( alertListener ) );
+        //        monitor.setNotificationExecutor( notificationService );
+        when( monitorDao.findHandlersByEnvironment( ENVIRONMENT_ID ) ).thenReturn( Sets.newHashSet( SUBSCRIBER_ID ) );
         when( environment.getId() ).thenReturn( ENVIRONMENT_ID );
         when( environment.getUserId() ).thenReturn( USER_ID );
         //when( identityManager.getUser( USER_ID ) ).thenReturn( user );
@@ -211,12 +205,12 @@ public class MonitorImplTest
     @Test
     public void testAddAlertListener() throws Exception
     {
-        Map<String, AlertListener> alertListeners = Maps.newHashMap();
+        Set<AlertListener> alertListeners = Sets.newHashSet();
         monitor.setAlertListeners( alertListeners );
 
         monitor.addAlertListener( alertListener );
 
-        assertTrue( alertListeners.values().contains( alertListener ) );
+        assertTrue( alertListeners.contains( alertListener ) );
     }
 
 
@@ -225,7 +219,7 @@ public class MonitorImplTest
     {
         monitor.removeAlertListener( alertListener );
 
-        assertFalse( alertListeners.values().contains( alertListener ) );
+        assertFalse( alertListeners.contains( alertListener ) );
     }
 
 
@@ -235,7 +229,7 @@ public class MonitorImplTest
 
         ArgumentCaptor<AlertNotifier> alertNotifierArgumentCaptor = ArgumentCaptor.forClass( AlertNotifier.class );
 
-        monitor.notifyListener( alert );
+        monitor.notifyAlertListeners();
 
         verify( notificationService ).execute( alertNotifierArgumentCaptor.capture() );
         assertEquals( alertListener, alertNotifierArgumentCaptor.getValue().listener );
@@ -256,7 +250,7 @@ public class MonitorImplTest
     //    @Test( expected = MonitorException.class )
     //    public void testAlertThresholdExcessException() throws Exception
     //    {
-    //        doThrow( new DaoException( "" ) ).when( monitorDao ).getEnvironmentSubscribersIds( ENVIRONMENT_ID );
+    //        doThrow( new DaoException( "" ) ).when( monitorDao ).findHandlersByEnvironment( ENVIRONMENT_ID );
     //
     //        monitor.notifyOnAlert( alert );
     //    }
@@ -273,7 +267,7 @@ public class MonitorImplTest
 
         //        monitor.alert( METRIC_JSON );
 
-        //        verify( monitorDao ).getEnvironmentSubscribersIds( ENVIRONMENT_ID );
+        //        verify( monitorDao ).findHandlersByEnvironment( ENVIRONMENT_ID );
     }
 
 

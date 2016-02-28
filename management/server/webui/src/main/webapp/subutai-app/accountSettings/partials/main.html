@@ -1,0 +1,28 @@
+<div class="b-public-key-manager" ng-controller="AccountCtrl as accountCtrl" id="js-public-key-manager">
+
+	<div class="b-form">
+
+		<div class="b-pgp-page-row">
+			<div class="b-pgp-page-row_list">
+				<div class="b-form-label">Public key</div>
+				<textarea class="b-form-input b-form-input_textarea js-auto-set-key" 
+					ng-model="publicKey" 
+					ng-change="accountCtrl.setPublicKey(publicKey)" 
+					style="width: 420px; height: 160px; font-family: monospace;">
+				</textarea>
+			</div>
+
+			<div class="b-pgp-page-row" style="display: none;" >
+				<div class="b-form-label">Message</div>
+				<textarea class="b-form-input b-form-input_full b-form-input_textarea bp-sign-input" 
+					ng-model="accountCtrl.message" 
+					ng-change="accountCtrl.autoSign()"
+					style="width: 420px; height: 160px; font-family: monospace;">
+				</textarea>
+			</div>
+
+		</div>
+
+	</div>
+</div>
+

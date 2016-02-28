@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 #    Licensed to the Apache Software Foundation (ASF) under one or more
 #    contributor license agreements.  See the NOTICE file distributed with
@@ -15,9 +15,24 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
+#Include enviroment variables
+. $(cd `dirname "${BASH_SOURCE[0]}"` && pwd)/subutai.env
 
+if [ "`grep -c '10.10.10.1 management gw.intra.lan' /etc/hosts`" == "0" ]; then echo "10.10.10.1 management gw.intra.lan" >> /etc/hosts; fi
+echo "management" > /etc/hostname
+
+# Line to add commands by autobuild (do not change it)
+
+DIRNAME=`dirname "$0"`
+if [ -f "$DIRNAME/setenv" ]; then
+  . "$DIRNAME/setenv"
+fi
 
 #Generate certificates before any configuration is applied
+export JAVA_HOME=/opt/subutai-mng/java
+export PATH=$PATH:$JAVA_HOME/bin
+
+/opt/subutai-mng/bin/certgen
 
 #Function to generate self signed certificate for peer
 generate_keystore_certificate() {
@@ -57,6 +72,12 @@ generate_keystore (){
        generate_keystore_certificate "root_server_px2" $folder"/keystore_server_px2.jks"
        generate_keystore_certificate "root_special_px1" $folder"/keystore_special_px1.jks"
        generate_truststore_certificate "root_server_px2" $folder"/keystore_server_px2.jks" $folder"/truststore_server_px2.jks"
+
+       java -jar /opt/subutai-mng/keys/peer-key-generator-1.0-SNAPSHOT.jar $folder subutai`date +%s`@subutai.io
+
+       cp $DIRNAME/../data/certs/test.*kr $folder
+       cp $DIRNAME/../keys/h.public.gpg $folder
+
 
     fi
 }
@@ -137,7 +158,7 @@ locateBase() {
 locateData() {
     if [ "x$KARAF_DATA" != "x" ]; then
         if [ ! -d "$KARAF_DATA" ]; then
-            die "KARAF_DATA is not valid: $KARAF_DATA"
+		mkdir -p "$KARAF_DATA/"
         fi
     else
         KARAF_DATA=$KARAF_BASE/data
@@ -197,7 +218,7 @@ run() {
     if [ ! -d "$KARAF_DATA/log" ]; then
         mkdir -p "$KARAF_DATA/log"
     fi
-    exec "$KARAF_HOME"/bin/karaf server "$@" >> "$KARAF_REDIRECT" 2>&1 &
+    exec "$KARAF_HOME"/bin/karaf server "$@" >> "$KARAF_REDIRECT" 2>&1 #&
 }
 
 main() {

@@ -10,4 +10,10 @@ public class EnvironmentManagerException extends Exception
     {
         super( message, cause );
     }
+
+
+    public EnvironmentManagerException( final String s )
+    {
+        super(s);
+    }
 }

@@ -8,10 +8,14 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.CollectionUtil;
@@ -20,11 +24,7 @@ import io.subutai.core.git.api.GitChangedFile;
 import io.subutai.core.git.api.GitException;
 import io.subutai.core.git.api.GitFileStatus;
 import io.subutai.core.git.api.GitManager;
-import io.subutai.common.peer.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
-
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 
 
 /**
@@ -148,8 +148,8 @@ public class GitManagerImpl implements GitManager
         Preconditions.checkArgument( !Strings.isNullOrEmpty( filePath ), "File path is null or empty" );
 
         CommandResult result = execute( new RequestBuilder(
-                        String.format( "git diff -U10000 %s %s -- %s", branchName1, branchName2, filePath ) )
-                        .withCwd( repositoryRoot ), false );
+                String.format( "git diff -U10000 %s %s -- %s", branchName1, branchName2, filePath ) )
+                .withCwd( repositoryRoot ), false );
 
         return result.getStdOut();
     }
@@ -172,8 +172,9 @@ public class GitManagerImpl implements GitManager
         Preconditions.checkArgument( !Strings.isNullOrEmpty( branchName ), "Branch name 1 is null or empty" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( filePath ), "File path is null or empty" );
 
-        CommandResult result = execute( new RequestBuilder( String.format( "git show %s:%s", branchName, filePath ) )
-                        .withCwd( repositoryRoot ), false );
+        CommandResult result = execute(
+                new RequestBuilder( String.format( "git show %s:%s", branchName, filePath ) ).withCwd( repositoryRoot ),
+                false );
 
         return result.getStdOut();
     }
@@ -643,7 +644,7 @@ public class GitManagerImpl implements GitManager
     }
 
 
-    public ManagementHost getManagementHost() throws GitException
+    public Host getManagementHost() throws GitException
     {
         try
         {

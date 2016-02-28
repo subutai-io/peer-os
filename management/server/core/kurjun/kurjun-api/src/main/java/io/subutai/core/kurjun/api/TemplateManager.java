@@ -5,16 +5,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import io.subutai.common.protocol.TemplateKurjun;
-import java.util.Set;
 
 
 /**
  * TemplateKurjun manager interface that wraps Kurjun repositories. <p> This is the first version and further changes
  * will be applied.
  */
-public interface TemplateManager
+public interface TemplateManager extends QuotaManagedRepository
 {
 
     /**
@@ -57,11 +58,11 @@ public interface TemplateManager
     TemplateKurjun getTemplate( String name );
     
     /**
-     * Gets the set of remote repo urls
+     * Gets the list of remote repo urls
      *
      * @return Set of urls
      */
-    Set<URL> getRemoteRepoUrls();
+    List<Map<String, Object>> getRemoteRepoUrls();
 
 
     /**
@@ -85,6 +86,9 @@ public interface TemplateManager
      * @return list of JSON encoded meta data
      */
     List<TemplateKurjun> list( String context, boolean isKurjunClient ) throws IOException;
+    
+    
+    List<Map<String, Object>> listAsSimple( String context ) throws IOException;
 
     /**
      * Lists packages in public repository context.
@@ -95,6 +99,15 @@ public interface TemplateManager
     List<TemplateKurjun> list();
 
 
+    /**
+     * Checks whether current active user session can do upload to the given context
+     *
+     * @param context
+     * @return
+     */
+    public boolean isUploadAllowed( String context );
+    
+    
     /**
      * Uploads package data from supplied input stream to the repository defined by supplied context.
      *
@@ -119,23 +132,12 @@ public interface TemplateManager
 
     /**
      * Adds remote repository located at supplied URL. Repositories added with this method will be used to fulfill
-     * requests in case the local repository can not handle requests. <code>useToken</code> is true for this method.
-     * To set <code>useToken</code> explicitly 
-     * use {@link #addRemoteRepository(URL, boolean) addRemoteRepository( URL url, boolean useToken )} method.
-     *
-     * @param url URL of the remote repository
-     */
-    void addRemoteRepository( URL url );
-    
-    /**
-     * Adds remote repository located at supplied URL. Repositories added with this method will be used to fulfill
      * requests in case the local repository can not handle requests.
      *
      * @param url URL of the remote repository
-     * @param useToken flag to indicate where to request access token from remote url and add this token
-     * to query parameters
+     * @param token access token to be used for the given remote repo url
      */
-    void addRemoteRepository( URL url, boolean useToken );
+    void addRemoteRepository( URL url, String token );
 
     /**
      * Removes remote repository located at supplied URL.
@@ -143,5 +145,11 @@ public interface TemplateManager
      * @param url URL of the remote repository
      */
     void removeRemoteRepository( URL url );
+    
+    /**
+     * Gets the set of contexts
+     * @return 
+     */
+    Set<String> getContexts();
 }
 

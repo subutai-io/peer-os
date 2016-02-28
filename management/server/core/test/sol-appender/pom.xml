@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <parent>
+    <artifactId>test-parent</artifactId>
+    <groupId>io.subutai</groupId>
+    <version>4.0.0-RC7-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>sol-appender</artifactId>
+  <version>4.0.0-RC7-SNAPSHOT</version>
+  <packaging>bundle</packaging>
+  <name>SOL APPENDER</name>
+  <description>SOL APPENDER</description>
+
+  <dependencies>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>1.2.17</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <Bundle-SymbolicName>${project.groupId}.core.test.appender</Bundle-SymbolicName>
+            <Import-Package />
+            <!--<Import-Package>*</Import-Package>-->
+            <Export-Package>${project.groupId}.core.test.appender</Export-Package>
+            <Private-Package>org.apache.log4j</Private-Package>
+            <Fragment-Host>org.ops4j.pax.logging.pax-logging-service</Fragment-Host>
+            <Embed-Dependency>*;scope=compile|runtime;inline=true</Embed-Dependency>
+            <_failok>true</_failok>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

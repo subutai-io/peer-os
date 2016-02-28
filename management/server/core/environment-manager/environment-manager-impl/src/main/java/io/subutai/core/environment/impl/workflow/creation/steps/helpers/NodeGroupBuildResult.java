@@ -1,8 +1,12 @@
 package io.subutai.core.environment.impl.workflow.creation.steps.helpers;
 
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+import io.subutai.common.environment.CreateEnvironmentContainerGroupResponse;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.exception.NodeGroupBuildException;
 
@@ -12,43 +16,28 @@ import io.subutai.core.environment.impl.exception.NodeGroupBuildException;
  */
 public class NodeGroupBuildResult
 {
-    private Set<EnvironmentContainerImpl> containers;
-    private NodeGroupBuildException exception;
+    private final List<CreateEnvironmentContainerGroupResponse> responses = new ArrayList<>();
+    //    private Set<EnvironmentContainerImpl> containers = new HashSet<>();
+    //    private NodeGroupBuildException exception;
 
 
-    public NodeGroupBuildResult( final Set<EnvironmentContainerImpl> containers,
-                                 final NodeGroupBuildException exception )
+    public List<CreateEnvironmentContainerGroupResponse> getResponses()
     {
-        this.containers = containers;
-        this.exception = exception;
+        return responses;
     }
 
 
-    public Set<EnvironmentContainerImpl> getContainers()
-    {
-        return containers;
-    }
-
-
-    public NodeGroupBuildException getException()
-    {
-        return exception;
-    }
-
-
-    @Override
-    public String toString()
-    {
-        final StringBuffer sb = new StringBuffer( "NodeGroupBuildResult:\n" );
-
-        for ( EnvironmentContainerImpl c : containers )
-        {
-            sb.append( String.format( "EnvironmentContainer: id=%s, name=%s\n", c.getId(), c.getHostname() ) );
-        }
-        if ( exception != null )
-        {
-            sb.append( "Exception: " + exception.toString() );
-        }
-        return sb.toString();
-    }
+//    public boolean isSucceeded()
+//    {
+//
+//        for ( CreateEnvironmentContainerGroupResponse response : responses )
+//        {
+//            if ( !response.isSucceeded() )
+//            {
+//                return false;
+//            }
+//        }
+//
+//        return true;
+//    }
 }

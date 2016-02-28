@@ -30,6 +30,7 @@ import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.protocol.TemplateKurjun;
+import io.subutai.common.quota.ContainerQuota;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.metric.api.Monitor;
@@ -100,6 +101,9 @@ public class ResourceHostEntityTest
     ResourceHostEntity resourceHostEntity;
     @Mock
     private HostInterfaces hostInterfaces;
+
+    @Mock
+    private ContainerQuota quota;
 
 
     @Before
@@ -364,7 +368,7 @@ public class ResourceHostEntityTest
 
         try
         {
-            resourceHostEntity.createContainer( TEMPLATE_NAME, HOSTNAME, IP, VLAN, TIMEOUT, ENV_ID );
+            resourceHostEntity.createContainer( TEMPLATE_NAME, HOSTNAME, quota, IP, VLAN, TIMEOUT, ENV_ID );
             fail( "Expected HostNotFoundException" );
         }
         catch ( ResourceHostException e )
@@ -378,7 +382,7 @@ public class ResourceHostEntityTest
 
         try
         {
-            resourceHostEntity.createContainer( TEMPLATE_NAME, HOSTNAME, IP, VLAN, TIMEOUT, ENV_ID );
+            resourceHostEntity.createContainer( TEMPLATE_NAME, HOSTNAME, quota, IP, VLAN, TIMEOUT, ENV_ID );
             fail( "Expected HostNotFoundException" );
         }
         catch ( ResourceHostException e )
@@ -388,14 +392,14 @@ public class ResourceHostEntityTest
         resourceHostEntity.removeContainerHost( containerHost );
 
 
-        resourceHostEntity.createContainer( TEMPLATE_NAME, HOSTNAME, IP, VLAN, TIMEOUT, ENV_ID );
+        resourceHostEntity.createContainer( TEMPLATE_NAME, HOSTNAME, quota, IP, VLAN, TIMEOUT, ENV_ID );
 
         verify( future ).get();
 
         doThrow( new ExecutionException( null ) ).when( future ).get();
 
 
-        resourceHostEntity.createContainer( TEMPLATE_NAME, HOSTNAME, IP, VLAN, TIMEOUT, ENV_ID );
+        resourceHostEntity.createContainer( TEMPLATE_NAME, HOSTNAME, quota, IP, VLAN, TIMEOUT, ENV_ID );
     }
 }
 

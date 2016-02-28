@@ -4,30 +4,37 @@ package io.subutai.common.environment;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
+
+import org.apache.commons.lang.StringUtils;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import io.subutai.common.peer.Peer;
-
 
 public class Topology
 {
-    private final Map<Peer, Set<NodeGroup>> nodeGroupPlacement = Maps.newHashMap();
+    private UUID id = UUID.randomUUID();
+    private final Map<String, Set<Node>> nodeGroupPlacement = Maps.newHashMap();
     private String environmentName;
-    private String environmentId;
     private String subnet;
     private String sshKey;
+    private int sshGroupId;
+    private int hostGroupId;
 
 
-    public Topology( final String environmentName, final String environmentId, final String subnet,
-                     final String sshKey )
+    public Topology( final String environmentName, final int sshGroupId, final int hostGroupId )
     {
         this.environmentName = environmentName;
-        this.environmentId = environmentId;
-        this.subnet = subnet;
-        this.sshKey = sshKey;
+        this.sshGroupId = sshGroupId;
+        this.hostGroupId = hostGroupId;
+    }
+
+
+    public UUID getId()
+    {
+        return id;
     }
 
 
@@ -37,49 +44,78 @@ public class Topology
     }
 
 
-    public String getSubnet()
-    {
-        return subnet;
-    }
-
-
-    public String getEnvironmentId()
-    {
-        return environmentId;
-    }
-
-
-    public Map<Peer, Set<NodeGroup>> getNodeGroupPlacement()
+    public Map<String, Set<Node>> getNodeGroupPlacement()
     {
         return Collections.unmodifiableMap( nodeGroupPlacement );
     }
 
 
-    public Set<Peer> getAllPeers()
+    public Set<String> getAllPeers()
     {
         return Collections.unmodifiableSet( nodeGroupPlacement.keySet() );
     }
 
 
-    public void addNodeGroupPlacement( Peer peer, NodeGroup nodeGroup )
+    public void addNodePlacement( String peerId, Node node )
     {
-        Preconditions.checkNotNull( peer, "Invalid peer" );
-        Preconditions.checkNotNull( nodeGroup, "Invalid node group" );
+        Preconditions.checkNotNull( peerId, "Invalid peer" );
+        Preconditions.checkNotNull( node, "Invalid node group" );
 
-        Set<NodeGroup> peerNodeGroups = nodeGroupPlacement.get( peer );
-
-        if ( peerNodeGroups == null )
+        if ( StringUtils.isEmpty( node.getHostname() ) )
         {
-            peerNodeGroups = Sets.newHashSet();
-            nodeGroupPlacement.put( peer, peerNodeGroups );
+            node.setHostname( UUID.randomUUID().toString() );
         }
 
-        peerNodeGroups.add( nodeGroup );
+        Set<Node> peerNodes = nodeGroupPlacement.get( peerId );
+
+        if ( peerNodes == null )
+        {
+            peerNodes = Sets.newHashSet();
+            nodeGroupPlacement.put( peerId, peerNodes );
+        }
+
+        peerNodes.add( node );
     }
 
 
     public String getSshKey()
     {
         return sshKey;
+    }
+
+
+    public void setSshKey( final String sshKey )
+    {
+        this.sshKey = sshKey;
+    }
+
+
+    public String getSubnet()
+    {
+        return subnet;
+    }
+
+
+    public void setSubnet( final String subnet )
+    {
+        this.subnet = subnet;
+    }
+
+
+    public int getSshGroupId()
+    {
+        return sshGroupId;
+    }
+
+
+    public int getHostGroupId()
+    {
+        return hostGroupId;
+    }
+
+
+    public void setId( final UUID id )
+    {
+        this.id = id;
     }
 }
