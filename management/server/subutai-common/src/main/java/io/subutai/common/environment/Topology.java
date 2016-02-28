@@ -10,13 +10,11 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import io.subutai.common.peer.Peer;
-
 
 public class Topology
 {
     private UUID id = UUID.randomUUID();
-    private final Map<String, Set<NodeGroup>> nodeGroupPlacement = Maps.newHashMap();
+    private final Map<String, Set<Node>> nodeGroupPlacement = Maps.newHashMap();
     private String environmentName;
     private String subnet;
     private String sshKey;
@@ -44,7 +42,7 @@ public class Topology
     }
 
 
-    public Map<String, Set<NodeGroup>> getNodeGroupPlacement()
+    public Map<String, Set<Node>> getNodeGroupPlacement()
     {
         return Collections.unmodifiableMap( nodeGroupPlacement );
     }
@@ -56,20 +54,20 @@ public class Topology
     }
 
 
-    public void addNodeGroupPlacement( String peerId, NodeGroup nodeGroup )
+    public void addNodeGroupPlacement( String peerId, Node node )
     {
         Preconditions.checkNotNull( peerId, "Invalid peer" );
-        Preconditions.checkNotNull( nodeGroup, "Invalid node group" );
+        Preconditions.checkNotNull( node, "Invalid node group" );
 
-        Set<NodeGroup> peerNodeGroups = nodeGroupPlacement.get( peerId );
+        Set<Node> peerNodes = nodeGroupPlacement.get( peerId );
 
-        if ( peerNodeGroups == null )
+        if ( peerNodes == null )
         {
-            peerNodeGroups = Sets.newHashSet();
-            nodeGroupPlacement.put( peerId, peerNodeGroups );
+            peerNodes = Sets.newHashSet();
+            nodeGroupPlacement.put( peerId, peerNodes );
         }
 
-        peerNodeGroups.add( nodeGroup );
+        peerNodes.add( node );
     }
 
 

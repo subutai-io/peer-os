@@ -12,14 +12,16 @@ import io.subutai.common.peer.ContainerSize;
 /**
  * Node
  */
-public class NodeGroup
+public class Node
 {
     @GsonRequired
     @JsonProperty( "name" )
     private String name;
+
     @GsonRequired
     @JsonProperty( "templateName" )
     private String templateName;
+
     @GsonRequired
     @JsonProperty( "type" )
     private ContainerSize type = ContainerSize.SMALL;
@@ -27,31 +29,36 @@ public class NodeGroup
     @GsonRequired
     @JsonProperty( "sshGroupId" )
     private int sshGroupId;
+
     @GsonRequired
     @JsonProperty( "hostsGroupId" )
     private int hostsGroupId;
+
     @GsonRequired
     @JsonProperty( "peerId" )
     private String peerId;
+
     @GsonRequired
     @JsonProperty( "hostId" )
     private String hostId;
+
     @GsonRequired
     @JsonProperty( "hostname" )
     private String hostname;
 
 
-    private NodeGroup()
+    private Node()
     {
     }
 
 
-    public NodeGroup( @JsonProperty( "hostname" ) final String hostname, @JsonProperty( "name" ) final String name,
-                      @JsonProperty( "templateName" ) final String templateName,
-                      @JsonProperty( "type" ) ContainerSize type, @JsonProperty( "sshGroupId" ) final int sshGroupId,
-                      @JsonProperty( "hostsGroupId" ) final int hostsGroupId,
-                      @JsonProperty( "peerId" ) final String peerId, @JsonProperty( "hostId" ) final String hostId )
+    public Node( @JsonProperty( "hostname" ) final String hostname, @JsonProperty( "name" ) final String name,
+                 @JsonProperty( "templateName" ) final String templateName, @JsonProperty( "type" ) ContainerSize type,
+                 @JsonProperty( "sshGroupId" ) final int sshGroupId,
+                 @JsonProperty( "hostsGroupId" ) final int hostsGroupId, @JsonProperty( "peerId" ) final String peerId,
+                 @JsonProperty( "hostId" ) final String hostId )
     {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid host name" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid node group name" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
         Preconditions.checkNotNull( type );
