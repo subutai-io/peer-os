@@ -1,7 +1,10 @@
 package io.subutai.core.localpeer.impl.container;
 
 
+import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.naming.NamingException;
 
@@ -25,7 +28,6 @@ import io.subutai.common.settings.Common;
 import io.subutai.common.task.Command;
 import io.subutai.common.task.CommandBatch;
 import io.subutai.common.util.ServiceLocator;
-import io.subutai.common.util.StringUtil;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.localpeer.impl.LocalPeerImpl;
@@ -36,6 +38,8 @@ public class CloneTask extends AbstractTask<CloneRequest, CloneResponse> impleme
 {
     protected static final Logger LOG = LoggerFactory.getLogger( CloneTask.class );
 
+    private static final String LINE_DELIMITER = "\n";
+    private static Pattern CLONE_OUTPUT_PATTERN = Pattern.compile( "with ID (.*) successfully cloned" );
     private static final int CLONE_TIMEOUT = 60 * 10; // 10 min
 
     private final LocalPeerImpl localPeer;
@@ -95,6 +99,36 @@ public class CloneTask extends AbstractTask<CloneRequest, CloneResponse> impleme
         return this;
     }
 
+
+    //@Override
+    public CloneResponse parseN( final CommandResult commandResult ) throws CommandResultParseException
+    {
+        StringTokenizer st = new StringTokenizer( commandResult.getStdOut(), LINE_DELIMITER );
+
+        String agentId = null;
+        while ( st.hasMoreTokens() )
+        {
+
+            final String nextToken = st.nextToken();
+
+            Matcher m = CLONE_OUTPUT_PATTERN.matcher( nextToken );
+
+            LOG.debug( String.format( "Token: %s", nextToken ));
+            if ( m.find() && m.groupCount() == 1 )
+            {
+                agentId = m.group( 1 );
+                break;
+            }
+        }
+
+        if ( agentId == null )
+        {
+            throw new CommandResultParseException( "ID not found in clone output: " + request.getContainerName() );
+        }
+
+        return new CloneResponse( request.getResourceHostId(), request.getHostname(), request.getContainerName(),
+                agentId, request.getIp(), request.getTemplateName(), request.getTemplateArch() );
+    }
 
     @Override
     public CloneResponse parse( final CommandResult commandResult ) throws CommandResultParseException
