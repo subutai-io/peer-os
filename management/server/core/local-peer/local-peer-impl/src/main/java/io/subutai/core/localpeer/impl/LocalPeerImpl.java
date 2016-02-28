@@ -566,12 +566,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             @Override
             public void handle( Task task, CloneRequest request, CloneResponse response ) throws Exception
             {
-                if ( response == null )
-                {
-                    throw new IllegalArgumentException( "Task response could not be null." );
-                }
-
-
                 response.addFailMessage(
                         String.format( "Cloning container %s failed. Elapsed time: %s", request.getContainerName(),
                                 StringUtil.convertMillisToHHMMSS( task.getElapsedTime() ) ),

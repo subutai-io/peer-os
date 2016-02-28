@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -54,10 +56,15 @@ public class Topology
     }
 
 
-    public void addNodeGroupPlacement( String peerId, Node node )
+    public void addNodePlacement( String peerId, Node node )
     {
         Preconditions.checkNotNull( peerId, "Invalid peer" );
         Preconditions.checkNotNull( node, "Invalid node group" );
+
+        if ( StringUtils.isEmpty( node.getHostname() ) )
+        {
+            node.setHostname( UUID.randomUUID().toString() );
+        }
 
         Set<Node> peerNodes = nodeGroupPlacement.get( peerId );
 

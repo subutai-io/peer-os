@@ -54,7 +54,6 @@ public class ImportTask extends AbstractTask<ImportTemplateRequest, ImportTempla
         final boolean succeeded = commandResult != null && commandResult.hasSucceeded();
         final ImportTemplateResponse importTemplateResponse =
                 new ImportTemplateResponse( request.getResourceHostId(), request.getTemplateName(), succeeded );
-        final String time = StringUtil.convertMillisToHHMMSS( getElapsedTime() );
         if ( succeeded )
         {
             importTemplateResponse.addSucceededMessage(

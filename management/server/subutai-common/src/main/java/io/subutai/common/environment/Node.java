@@ -136,4 +136,10 @@ public class Node
     {
         return hostname;
     }
+
+
+    public void setHostname( final String hostname )
+    {
+        this.hostname = hostname;
+    }
 }

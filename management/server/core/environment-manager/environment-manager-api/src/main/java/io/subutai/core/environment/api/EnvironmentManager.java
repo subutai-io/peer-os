@@ -13,7 +13,7 @@ import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
-import io.subutai.common.environment.NodeGroup;
+import io.subutai.common.environment.Node;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
@@ -78,7 +78,7 @@ public interface EnvironmentManager
      *
      * @throws EnvironmentCreationException - thrown if error occurs during environment creation
      */
-    Environment importEnvironment( String name, Topology topology, Map<NodeGroup, Set<ContainerHostInfo>> containers,
+    Environment importEnvironment( String name, Topology topology, Map<Node, Set<ContainerHostInfo>> containers,
                                    Integer vlan ) throws EnvironmentCreationException;
 
 

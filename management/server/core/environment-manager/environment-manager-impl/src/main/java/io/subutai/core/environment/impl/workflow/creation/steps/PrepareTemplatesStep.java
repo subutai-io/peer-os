@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Sets;
 
-import io.subutai.common.environment.NodeGroup;
+import io.subutai.common.environment.Node;
 import io.subutai.common.environment.PrepareTemplatesResponse;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.Peer;
@@ -49,14 +49,14 @@ public class PrepareTemplatesStep
 
     public void execute() throws EnvironmentCreationException, PeerException
     {
-        Map<String, Set<NodeGroup>> placement = topology.getNodeGroupPlacement();
+        Map<String, Set<Node>> placement = topology.getNodeGroupPlacement();
 
         ExecutorService taskExecutor = Executors.newFixedThreadPool( placement.size() );
 
         CompletionService<PrepareTemplatesResponse> taskCompletionService = getCompletionService( taskExecutor );
 
 
-        for ( Map.Entry<String, Set<NodeGroup>> peerPlacement : placement.entrySet() )
+        for ( Map.Entry<String, Set<Node>> peerPlacement : placement.entrySet() )
         {
             Peer peer = peerManager.getPeer( peerPlacement.getKey() );
             LOGGER.debug( String.format( "Scheduling template preparation task on peer %s", peer.getId() ) );

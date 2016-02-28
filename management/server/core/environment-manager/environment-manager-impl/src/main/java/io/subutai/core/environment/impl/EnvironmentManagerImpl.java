@@ -35,7 +35,7 @@ import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.EnvironmentStatus;
-import io.subutai.common.environment.NodeGroup;
+import io.subutai.common.environment.Node;
 import io.subutai.common.environment.PeerConf;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.host.ContainerHostInfo;
@@ -582,14 +582,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     // TODO refactor to pass one Blueprint parameter from subutai-common
     @Override
     public Environment importEnvironment( final String name, final Topology topology,
-                                          final Map<NodeGroup, Set<ContainerHostInfo>> containers, final Integer vlan )
+                                          final Map<Node, Set<ContainerHostInfo>> containers, final Integer vlan )
             throws EnvironmentCreationException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid name" );
         Preconditions.checkNotNull( topology, "Invalid topology" );
         Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
 
-        Map.Entry<NodeGroup, Set<ContainerHostInfo>> containersEntry = containers.entrySet().iterator().next();
+        Map.Entry<Node, Set<ContainerHostInfo>> containersEntry = containers.entrySet().iterator().next();
         Iterator<ContainerHostInfo> hostIterator = containersEntry.getValue().iterator();
 
         String ip = "";
@@ -617,7 +617,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         //create empty environment
         final EnvironmentImpl environment = createEmptyEnvironment( name, ip, topology.getSshKey() );
-        for ( Map.Entry<NodeGroup, Set<ContainerHostInfo>> entry : containers.entrySet() )
+        for ( Map.Entry<Node, Set<ContainerHostInfo>> entry : containers.entrySet() )
         {
             for ( ContainerHostInfo newHost : entry.getValue() )
             {

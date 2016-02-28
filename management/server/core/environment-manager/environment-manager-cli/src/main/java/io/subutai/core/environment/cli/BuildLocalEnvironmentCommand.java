@@ -8,15 +8,12 @@ import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Sets;
 
-import io.subutai.common.environment.Blueprint;
 import io.subutai.common.environment.Environment;
-import io.subutai.common.environment.NodeGroup;
+import io.subutai.common.environment.Node;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.ResourceHost;
-import io.subutai.common.protocol.PlacementStrategy;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.peer.api.PeerManager;
@@ -85,12 +82,12 @@ public class BuildLocalEnvironmentCommand extends SubutaiShellCommandSupport
             return null;
         }
         String hostId = resourceHosts.iterator().next().getId();
-        NodeGroup nodeGroup =
-                new NodeGroup( UUID.randomUUID().toString(), "NodeGroup1", templateName, ContainerSize.TINY, 1, 1,
+        Node node =
+                new Node( UUID.randomUUID().toString(), "NodeGroup1", templateName, ContainerSize.TINY, 1, 1,
                         peerId, hostId );
 
         Topology topology = new Topology( "Dummy environment name", 1, 1 );
-        topology.addNodeGroupPlacement( peerId, nodeGroup );
+        topology.addNodePlacement( peerId, node );
 
         Environment environment = environmentManager.createEnvironment( topology, async );
 

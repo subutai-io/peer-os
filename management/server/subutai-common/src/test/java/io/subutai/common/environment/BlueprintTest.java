@@ -11,9 +11,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import io.subutai.common.environment.Blueprint;
-import io.subutai.common.environment.NodeGroup;
-
 import static org.junit.Assert.assertNotNull;
 
 
@@ -21,16 +18,16 @@ import static org.junit.Assert.assertNotNull;
 public class BlueprintTest
 {
     private Blueprint blueprint;
-    private Set<NodeGroup> mySet;
+    private Set<Node> mySet;
 
     @Mock
-    NodeGroup nodeGroup;
+    Node node;
 
     @Before
     public void setUp() throws Exception
     {
         mySet = new HashSet<>(  );
-        mySet.add( nodeGroup );
+        mySet.add( node );
 
         blueprint = new Blueprint( "test", mySet );
         blueprint.setId( UUID.randomUUID() );
@@ -42,6 +39,6 @@ public class BlueprintTest
     {
         assertNotNull( blueprint.getId() );
         assertNotNull( blueprint.getName() );
-        assertNotNull( blueprint.getNodeGroups() );
+        assertNotNull( blueprint.getNodes() );
     }
 }

@@ -12,7 +12,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.Environment;
-import io.subutai.common.environment.NodeGroup;
+import io.subutai.common.environment.Node;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.tracker.TrackerOperation;
@@ -65,7 +65,7 @@ public class EnvironmentManagerTest
     @Mock
     Peer peer;
     @Mock
-    NodeGroup nodeGroup;
+    Node node;
     @Mock
     User user;
     @Mock
@@ -88,7 +88,7 @@ public class EnvironmentManagerTest
     @Before
     public void setUp() throws Exception
     {
-        when( nodeGroup.getPeerId() ).thenReturn( PEER_ID );
+        when( node.getPeerId() ).thenReturn( PEER_ID );
         when( peerManager.getPeer( PEER_ID ) ).thenReturn( peer );
         doReturn( true ).when( peer ).isOnline();
 

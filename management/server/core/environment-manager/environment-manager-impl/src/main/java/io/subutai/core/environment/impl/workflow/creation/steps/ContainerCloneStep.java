@@ -20,7 +20,7 @@ import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.CloneResponse;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupResponse;
-import io.subutai.common.environment.NodeGroup;
+import io.subutai.common.environment.Node;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.ContainerHostState;
@@ -88,7 +88,7 @@ public class ContainerCloneStep
     public void execute() throws EnvironmentCreationException, PeerException
     {
 
-        Map<String, Set<NodeGroup>> placement = topology.getNodeGroupPlacement();
+        Map<String, Set<Node>> placement = topology.getNodeGroupPlacement();
 
         SubnetUtils cidr = new SubnetUtils( environment.getSubnetCidr() );
 
@@ -100,9 +100,9 @@ public class ContainerCloneStep
 
         //obtain used ip address count
         int requestedContainerCount = 0;
-        for ( Set<NodeGroup> nodeGroups : placement.values() )
+        for ( Set<Node> nodes : placement.values() )
         {
-            requestedContainerCount += nodeGroups.size();
+            requestedContainerCount += nodes.size();
         }
 
         //check if available ip addresses are enough
@@ -122,7 +122,7 @@ public class ContainerCloneStep
 
 
         //submit parallel environment part creation tasks across peers
-        for ( Map.Entry<String, Set<NodeGroup>> peerPlacement : placement.entrySet() )
+        for ( Map.Entry<String, Set<Node>> peerPlacement : placement.entrySet() )
         {
             Peer peer = peerManager.getPeer( peerPlacement.getKey() );
             LOGGER.debug( String.format( "Scheduling node group task on peer %s", peer.getId() ) );
@@ -164,7 +164,7 @@ public class ContainerCloneStep
     }
 
 
-    private void processResponse( final Set<NodeGroup> nodeGroups,
+    private void processResponse( final Set<Node> nodes,
                                   final CreateEnvironmentContainerGroupResponse result )
     {
         final Set<EnvironmentContainerImpl> containers = new HashSet<>();
@@ -174,10 +174,10 @@ public class ContainerCloneStep
 
             logMessages( cloneResponse );
 
-            final NodeGroup nodeGroup = findNodeGroup( cloneResponse.getHostname(), nodeGroups );
-            if ( nodeGroup != null )
+            final Node node = findNodeGroup( cloneResponse.getHostname(), nodes );
+            if ( node != null )
             {
-                EnvironmentContainerImpl c = buildContainerEntity( result.getPeerId(), nodeGroup, cloneResponse );
+                EnvironmentContainerImpl c = buildContainerEntity( result.getPeerId(), node, cloneResponse );
                 containers.add( c );
             }
             else
@@ -191,7 +191,7 @@ public class ContainerCloneStep
     }
 
 
-    private EnvironmentContainerImpl buildContainerEntity( final String peerId, final NodeGroup nodeGroup,
+    private EnvironmentContainerImpl buildContainerEntity( final String peerId, final Node node,
                                                            final CloneResponse cloneResponse )
     {
 
@@ -202,19 +202,19 @@ public class ContainerCloneStep
                 new ContainerHostInfoModel( cloneResponse.getAgentId(), cloneResponse.getHostname(), interfaces,
                         cloneResponse.getTemplateArch(), ContainerHostState.CLONING );
         return new EnvironmentContainerImpl( localPeerId, peerId, cloneResponse.getHostname(), infoModel,
-                cloneResponse.getTemplateName(), cloneResponse.getTemplateArch(), nodeGroup.getSshGroupId(),
-                nodeGroup.getHostsGroupId(), defaultDomain, nodeGroup.getType(), nodeGroup.getHostId(),
-                nodeGroup.getName() );
+                cloneResponse.getTemplateName(), cloneResponse.getTemplateArch(), node.getSshGroupId(),
+                node.getHostsGroupId(), defaultDomain, node.getType(), node.getHostId(),
+                node.getName() );
     }
 
 
-    private NodeGroup findNodeGroup( final String hostname, final Set<NodeGroup> nodeGroups )
+    private Node findNodeGroup( final String hostname, final Set<Node> nodes )
     {
-        for ( NodeGroup nodeGroup : nodeGroups )
+        for ( Node node : nodes )
         {
-            if ( hostname.equals( nodeGroup.getHostname() ) )
+            if ( hostname.equals( node.getHostname() ) )
             {
-                return nodeGroup;
+                return node;
             }
         }
 

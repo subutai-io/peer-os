@@ -35,7 +35,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.gson.Gson;
 
 import io.subutai.common.environment.Blueprint;
-import io.subutai.common.environment.NodeGroup;
+import io.subutai.common.environment.Node;
 import io.subutai.common.gson.required.RequiredDeserializer;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.PeerException;
@@ -346,18 +346,18 @@ public class EnvironmentProccessor implements StateLinkProccessor
     {
         try
         {
-            Set<NodeGroup> nodeGroups = new HashSet<>();
+            Set<Node> nodes = new HashSet<>();
             for ( EnvironmentNodeDto nodeDto : environmentDto.getNodes() )
             {
                 PlacementStrategy placementStrategy = new PlacementStrategy( nodeDto.getContainerPlacementStrategy() );
-                NodeGroup nodeGroup =
-                        new NodeGroup( UUID.randomUUID().toString(), nodeDto.getName(), nodeDto.getTemplateName(),
+                Node node =
+                        new Node( UUID.randomUUID().toString(), nodeDto.getName(), nodeDto.getTemplateName(),
                                 ContainerSize.SMALL, Integer.valueOf( nodeDto.getSshGroupId() ),
                                 Integer.valueOf( nodeDto.getHostsGroupId() ), nodeDto.getPeerId(),
                                 nodeDto.getHostId() );
-                nodeGroups.add( nodeGroup );
+                nodes.add( node );
             }
-            Blueprint blueprint = new Blueprint( environmentDto.getName(), nodeGroups );
+            Blueprint blueprint = new Blueprint( environmentDto.getName(), nodes );
             //TODO refactor after EnvironmentManagement will be ready
             //            Topology topology = new Topology(environmentDto.getName(), environmentDto.get);
             //
