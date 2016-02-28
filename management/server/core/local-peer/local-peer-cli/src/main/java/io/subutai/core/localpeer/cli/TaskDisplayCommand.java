@@ -43,6 +43,12 @@ public class TaskDisplayCommand extends SubutaiShellCommandSupport
             return null;
         }
 
+        if ( !task.isDone())
+        {
+            System.out.println( "Task is running. Please try later." );
+            return null;
+        }
+
         System.out.println( String.format( "Request: %s\n", task.getRequest() ) );
         System.out.println( String.format( "Response: %s\n", task.getResponse() ) );
         final String s = task.getCommandBatch().asChain();
