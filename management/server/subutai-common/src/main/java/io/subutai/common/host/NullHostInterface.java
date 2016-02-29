@@ -34,9 +34,4 @@ public class NullHostInterface extends HostInterfaceModel
     }
 
 
-    @Override
-    public String getMac()
-    {
-        return "00:00:00:00:00";
-    }
 }

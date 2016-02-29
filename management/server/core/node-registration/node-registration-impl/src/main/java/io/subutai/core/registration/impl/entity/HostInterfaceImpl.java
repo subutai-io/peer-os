@@ -17,9 +17,6 @@ import com.google.common.base.Preconditions;
 import io.subutai.common.host.HostInterface;
 
 
-/**
- * Created by talas on 8/25/15.
- */
 @Entity
 @Table( name = "node_net_interfaces" )
 @Access( AccessType.FIELD )
@@ -35,9 +32,6 @@ public class HostInterfaceImpl implements HostInterface, Serializable
     @Column( name = "ip_addr" )
     private String ip;
 
-    @Column( name = "mac" )
-    private String mac;
-
 
     public HostInterfaceImpl()
     {
@@ -45,11 +39,10 @@ public class HostInterfaceImpl implements HostInterface, Serializable
     }
 
 
-    public HostInterfaceImpl( final String interfaceName, final String ip, final String mac )
+    public HostInterfaceImpl( final String interfaceName, final String ipc )
     {
         this.interfaceName = interfaceName;
         this.ip = ip;
-        this.mac = mac;
     }
 
 
@@ -59,7 +52,6 @@ public class HostInterfaceImpl implements HostInterface, Serializable
 
         this.interfaceName = aHostInterface.getName();
         this.ip = aHostInterface.getIp();
-        this.mac = aHostInterface.getMac();
     }
 
 
@@ -72,12 +64,6 @@ public class HostInterfaceImpl implements HostInterface, Serializable
     public void setIp( final String ip )
     {
         this.ip = ip;
-    }
-
-
-    public void setMac( final String mac )
-    {
-        this.mac = mac;
     }
 
 
@@ -114,13 +100,6 @@ public class HostInterfaceImpl implements HostInterface, Serializable
 
 
     @Override
-    public String getMac()
-    {
-        return mac;
-    }
-
-
-    @Override
     public boolean equals( final Object o )
     {
         if ( this == o )
@@ -134,7 +113,7 @@ public class HostInterfaceImpl implements HostInterface, Serializable
 
         final HostInterfaceImpl that = ( HostInterfaceImpl ) o;
 
-        return interfaceName.equals( that.interfaceName ) && ip.equals( that.ip ) && mac.equals( that.mac );
+        return interfaceName.equals( that.interfaceName ) && ip.equals( that.ip );
     }
 
 
@@ -143,7 +122,6 @@ public class HostInterfaceImpl implements HostInterface, Serializable
     {
         int result = interfaceName.hashCode();
         result = 31 * result + ip.hashCode();
-        result = 31 * result + mac.hashCode();
         return result;
     }
 
@@ -154,7 +132,6 @@ public class HostInterfaceImpl implements HostInterface, Serializable
         return "InterfaceModel{" +
                 "interfaceName='" + interfaceName + '\'' +
                 ", ip='" + ip + '\'' +
-                ", mac='" + mac + '\'' +
                 '}';
     }
 }

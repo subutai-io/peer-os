@@ -29,7 +29,6 @@ public class HostInterfaceImplImplTest
         HostInterface iface = mock( HostInterface.class );
         when( iface.getName() ).thenReturn( iname );
         when( iface.getIp() ).thenReturn( ip );
-        when( iface.getMac() ).thenReturn( mac );
         hostInterface = new HostInterfaceImpl( iface );
     }
 
@@ -52,13 +51,6 @@ public class HostInterfaceImplImplTest
     }
 
 
-    @Test
-    public void testSetMac() throws Exception
-    {
-        String newMac = "mac2";
-        hostInterface.setMac( newMac );
-        assertNotEquals( mac, hostInterface.getMac() );
-    }
 
 
     @Test

@@ -249,7 +249,6 @@ public class LocalPeerImplTest
 
         when( anHostInterface.getName() ).thenReturn( INTERFACE_NAME );
         when( anHostInterface.getIp() ).thenReturn( IP );
-        when( anHostInterface.getMac() ).thenReturn( MAC );
 
         peerMap = new HashMap<>();
         peerMap.put( IP, P2P_IP );
