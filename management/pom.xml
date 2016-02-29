@@ -324,6 +324,11 @@
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
+        <artifactId>command-executor-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
         <artifactId>command-executor-rest-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
