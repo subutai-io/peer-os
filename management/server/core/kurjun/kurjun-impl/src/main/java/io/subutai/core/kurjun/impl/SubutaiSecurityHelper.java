@@ -37,6 +37,8 @@ class SubutaiSecurityHelper
 {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( SubutaiSecurityHelper.class );
+    
+    private static final String TEMPLATE_ACCESS_CLASS = TemplateAccess.class.getSimpleName();
 
     private final IdentityManager subutaiIdentityManager;
 
@@ -206,11 +208,9 @@ class SubutaiSecurityHelper
         List<SharedTemplateInfo> list = new ArrayList<>();
         for ( Relation relation : relationsByTarget )
         {
-            UserDelegate uDl = subutaiIdentityManager.getUserDelegate( relation.getSource().getUniqueIdentifier() );
-
-            if(uDl != null)
+            if ( TEMPLATE_ACCESS_CLASS.equals( relation.getTrustedObject().getClassPath() ) )
             {
-                long fromUserId = uDl.getUserId();
+                long fromUserId = subutaiIdentityManager.getUserDelegate( relation.getSource().getUniqueIdentifier() ).getUserId();
                 User fromUser = subutaiIdentityManager.getUser( fromUserId );
                 String fromUserFprint = getUserFingerprint( fromUser.getSecurityKeyId() );
                 if ( !toUserFingerprint.equals( fromUserFprint ) )
@@ -233,11 +233,10 @@ class SubutaiSecurityHelper
         List<SharedTemplateInfo> list = new ArrayList<>();
         for ( Relation relation : relationsByObject )
         {
-            UserDelegate uDl = subutaiIdentityManager.getUserDelegate( relation.getSource().getUniqueIdentifier() );
 
-            if(uDl != null)
+            if ( TEMPLATE_ACCESS_CLASS.equals( relation.getTrustedObject().getClassPath() ) )
             {
-                long fromUserId = uDl.getUserId();
+                long fromUserId = subutaiIdentityManager.getUserDelegate( relation.getSource().getUniqueIdentifier() ).getUserId();
                 User fromUser = subutaiIdentityManager.getUser( fromUserId );
                 String fromUserFprint = getUserFingerprint( fromUser.getSecurityKeyId() );
 

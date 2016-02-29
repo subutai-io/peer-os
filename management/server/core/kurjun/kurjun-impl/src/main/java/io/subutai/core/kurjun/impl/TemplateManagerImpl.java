@@ -343,7 +343,7 @@ public class TemplateManagerImpl implements TemplateManager
                 }
             }
 
-            if ( !TemplateRepository.MY.equals( context.getName() ) )
+            if ( !TemplateRepository.MY.equals( repository ) )
             {
                 UnifiedRepository unifiedRepo = getRepository( context, false );
                 List<SerializableMetadata> unifiedList = unifiedRepo.listPackages();
@@ -824,7 +824,8 @@ public class TemplateManagerImpl implements TemplateManager
             List<RepoUrl> list = new ArrayList<>();
             for ( String url : SystemSettings.getGlobalKurjunUrls() )
             {
-                list.add( new RepoUrl( new URL( url ), null ) );
+                String templateUrl = url + "/templates";
+                list.add( new RepoUrl( new URL( templateUrl ), null ) );
             }
             return list;
         }

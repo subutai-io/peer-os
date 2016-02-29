@@ -554,8 +554,7 @@ public class AptManagerImpl implements AptManager
             List<RepoUrl> list = new ArrayList<>();
             for ( String url : SystemSettings.getGlobalKurjunUrls() )
             {
-                // TODO: refactor url
-                String aptUrl = url.replace( "templates/public", "vapt" );
+                String aptUrl = url + "/vapt";
                 list.add( new RepoUrl( new URL( aptUrl ), null ) );
             }
             return list;
