@@ -66,6 +66,7 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
             String decryptedMessage = new String( decrypted, "UTF-8" );
             RequestedHost requestedHost = JsonUtil.fromJson( decryptedMessage, RequestedHostJson.class );
 
+
             registrationManager.queueRequest( requestedHost );
 
             //temp workaround to approve MH automatically

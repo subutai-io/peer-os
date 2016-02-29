@@ -148,9 +148,9 @@ func Destroy(name string) {
 		log.Check(log.FatalLevel, "Stopping container", err)
 	}
 
-	//fs.SubvolumeDestroy(config.Agent.LxcPrefix + name + "/opt")
-	//fs.SubvolumeDestroy(config.Agent.LxcPrefix + name + "/home")
-	//fs.SubvolumeDestroy(config.Agent.LxcPrefix + name + "/var")
+	fs.SubvolumeDestroy(config.Agent.LxcPrefix + name + "/opt")
+	fs.SubvolumeDestroy(config.Agent.LxcPrefix + name + "/home")
+	fs.SubvolumeDestroy(config.Agent.LxcPrefix + name + "/var")
 
 	err = c.Destroy()
 	log.Check(log.FatalLevel, "Destroying container", err)

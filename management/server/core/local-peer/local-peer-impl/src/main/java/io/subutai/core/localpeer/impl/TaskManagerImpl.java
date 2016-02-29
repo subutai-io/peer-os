@@ -9,9 +9,6 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.subutai.common.task.Task;
 import io.subutai.common.task.TaskManager;
 
@@ -21,7 +18,6 @@ import io.subutai.common.task.TaskManager;
  */
 public class TaskManagerImpl implements TaskManager
 {
-    private static final Logger LOG = LoggerFactory.getLogger( TaskManagerImpl.class );
     private Map<Integer, Task> tasks = new ConcurrentHashMap<>();
     private Map<String, Executor> executors = new ConcurrentHashMap<>();
     private AtomicInteger counter = new AtomicInteger( 0 );

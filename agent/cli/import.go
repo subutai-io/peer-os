@@ -87,6 +87,7 @@ func download(file, md5, token string) string {
 	if md5 == md5sum(config.Agent.LxcPrefix+"lxc-data/tmpdir/"+file) {
 		return config.Agent.LxcPrefix + "lxc-data/tmpdir/" + file
 	}
+	log.Error("Failed to check MD5 after download. Please check your connection and try again.")
 	return ""
 }
 
@@ -117,7 +118,7 @@ func LxcImport(templ, version, token string) {
 	templdir := config.Agent.LxcPrefix + "lxc-data/tmpdir/" + templ
 	parent := container.GetConfigItem(templdir+"/config", "subutai.parent")
 	if parent != "" && parent != templ && !container.IsTemplate(parent) {
-		log.Info("Parent template: " + parent)
+		log.Info("Parent template required: " + parent)
 		LxcImport(parent, "", token)
 	}
 
