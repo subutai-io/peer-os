@@ -2,7 +2,11 @@ package io.subutai.core.environment.rest.ui;
 
 
 import java.io.File;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
@@ -132,7 +136,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response build(final String name, final String topologyJson )
+    public Response build( final String name, final String topologyJson )
     {
 
         UUID eventId = null;
@@ -141,8 +145,7 @@ public class RestServiceImpl implements RestService
         {
             ContainerPlacementStrategy placementStrategy = strategyManager.findStrategyById( UnlimitedStrategy.ID );
 
-            List<NodeSchema> schema =
-                    JsonUtil.fromJson( topologyJson, new TypeToken<List<NodeSchema>>() {}.getType() );
+            List<NodeSchema> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<NodeSchema>>() {}.getType() );
 
 
             final PeerGroupResources peerGroupResources = peerManager.getPeerGroupResources();
@@ -187,7 +190,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response modify(final String environmentId, final String topologyJson, final String removedContainers )
+    public Response modify( final String environmentId, final String topologyJson, final String removedContainers )
     {
         UUID eventId = null;
         try
@@ -201,11 +204,12 @@ public class RestServiceImpl implements RestService
 
             List<NodeSchema> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<NodeSchema>>() {}.getType() );
 
-            List<String> containers = JsonUtil.fromJson( removedContainers, new TypeToken<List<String>>() {}.getType() );
+            List<String> containers =
+                    JsonUtil.fromJson( removedContainers, new TypeToken<List<String>>() {}.getType() );
 
 
             Topology topology = null;
-            if( schema.size() > 0 )
+            if ( schema.size() > 0 )
             {
                 final PeerGroupResources peerGroupResources = peerManager.getPeerGroupResources();
                 final Map<ContainerSize, ContainerQuota> quotas = quotaManager.getDefaultQuotas();
@@ -221,22 +225,25 @@ public class RestServiceImpl implements RestService
                            .build();
         }
 
-        return Response.ok( JsonUtil.toJson(eventId) ).build();
+        return Response.ok( JsonUtil.toJson( eventId ) ).build();
     }
 
+
     @Override
-    public Response modifyAdvanced(final String environmentId, final String topologyJson, final String removedContainers )
+    public Response modifyAdvanced( final String environmentId, final String topologyJson,
+                                    final String removedContainers )
     {
         UUID eventId = null;
 
         try
         {
             String name = environmentManager.getEnvironments().stream()
-                    .filter( e -> e.getEnvironmentId().getId().equals( environmentId ) )
-                    .findFirst().get().getName();
+                                            .filter( e -> e.getEnvironmentId().getId().equals( environmentId ) )
+                                            .findFirst().get().getName();
 
             List<NodeGroup> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<NodeGroup>>() {}.getType() );
-            List<String> containers = JsonUtil.fromJson( removedContainers, new TypeToken<List<String>>() {}.getType() );
+            List<String> containers =
+                    JsonUtil.fromJson( removedContainers, new TypeToken<List<String>>() {}.getType() );
 
 
             Topology topology = new Topology( name, 0, 0 );
@@ -249,10 +256,10 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) )
-                    .build();
+                           .build();
         }
 
-        return Response.ok( JsonUtil.toJson(eventId) ).build();
+        return Response.ok( JsonUtil.toJson( eventId ) ).build();
     }
 
 
@@ -273,7 +280,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getSshKeys(final String environmentId )
+    public Response getSshKeys( final String environmentId )
     {
         try
         {
@@ -760,7 +767,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response share(final String users, final String environmentId )
+    public Response share( final String users, final String environmentId )
     {
         ShareDto[] shareDto = gson.fromJson( users, ShareDto[].class );
 
@@ -800,15 +807,15 @@ public class RestServiceImpl implements RestService
 
 
             String rhId = null;
-            for( Peer peer : peerManager.getPeers() )
+            for ( Peer peer : peerManager.getPeers() )
             {
-                if( peer.getId().equals( containerHost.getPeerId() ) )
+                if ( peer.getId().equals( containerHost.getPeerId() ) )
                 {
                     try
                     {
                         rhId = peer.getResourceHostIdByContainerId( containerHost.getContainerId() ).getId();
                     }
-                    catch (PeerException e)
+                    catch ( PeerException e )
                     {
                         LOG.error( "cannot get resourceHostByContainerId", e );
                     }
@@ -817,7 +824,7 @@ public class RestServiceImpl implements RestService
 
 
             containerDtos.add( new ContainerDto( containerHost.getId(), containerHost.getEnvironmentId().getId(),
-                    containerHost.getHostname(), state, iface.getIp(), iface.getMac(), containerHost.getTemplateName(),
+                    containerHost.getHostname(), state, iface.getIp(), containerHost.getTemplateName(),
                     containerHost.getContainerSize(), containerHost.getArch().toString(), containerHost.getTags(),
                     containerHost.getPeerId(), rhId ) );
         }
