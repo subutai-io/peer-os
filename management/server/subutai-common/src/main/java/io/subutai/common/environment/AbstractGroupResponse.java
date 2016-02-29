@@ -23,8 +23,7 @@ public class AbstractGroupResponse<R extends TaskRequest, T extends TaskResponse
 {
     private final String peerId;
     private List<T> responses = new ArrayList<>();
-    @Expose( deserialize = false, serialize = false )
-    private List<Task<R, T>> tasks = new ArrayList<>();
+    transient private List<Task<R, T>> tasks = new ArrayList<>();
     private AtomicInteger counter = new AtomicInteger( 0 );
     private boolean succeeded = true;
     private List<OperationMessage> messages = new ArrayList<>();
