@@ -150,7 +150,7 @@ func Run(req RequestOptions, out_c chan<- ResponseOptions) {
 			if cmd.ProcessState != nil {
 				response.ExitCode = strconv.Itoa(cmd.ProcessState.Sys().(syscall.WaitStatus).ExitStatus())
 			} else {
-				response.ExitCode = "unknown"
+				response.ExitCode = "-1"
 			}
 			out_c <- response
 		}

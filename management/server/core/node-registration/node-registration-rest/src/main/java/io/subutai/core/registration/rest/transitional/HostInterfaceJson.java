@@ -6,12 +6,10 @@ import com.google.common.base.Preconditions;
 import io.subutai.common.host.HostInterface;
 
 
-
 public class HostInterfaceJson implements HostInterface
 {
     private String interfaceName;
     private String ip;
-    private String mac;
 
 
     public HostInterfaceJson( final HostInterface aHostInterface )
@@ -19,8 +17,8 @@ public class HostInterfaceJson implements HostInterface
         Preconditions.checkNotNull( aHostInterface, "Invalid null argument aInterface" );
         this.interfaceName = aHostInterface.getName();
         this.ip = aHostInterface.getIp();
-        this.mac = aHostInterface.getMac();
     }
+
 
     @Override
     public String getName()
@@ -33,13 +31,6 @@ public class HostInterfaceJson implements HostInterface
     public String getIp()
     {
         return ip;
-    }
-
-
-    @Override
-    public String getMac()
-    {
-        return mac;
     }
 
 
@@ -57,7 +48,7 @@ public class HostInterfaceJson implements HostInterface
 
         final HostInterfaceJson that = ( HostInterfaceJson ) o;
 
-        return interfaceName.equals( that.interfaceName ) && ip.equals( that.ip ) && mac.equals( that.mac );
+        return interfaceName.equals( that.interfaceName ) && ip.equals( that.ip );
     }
 
 
@@ -66,7 +57,6 @@ public class HostInterfaceJson implements HostInterface
     {
         int result = interfaceName.hashCode();
         result = 31 * result + ip.hashCode();
-        result = 31 * result + mac.hashCode();
         return result;
     }
 }

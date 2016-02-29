@@ -6,14 +6,17 @@ import (
 	"github.com/subutai-io/Subutai/agent/lib/container"
 	"github.com/subutai-io/Subutai/agent/log"
 	lxc "gopkg.in/lxc/go-lxc.v2"
+	"io"
+	"os"
 	"strings"
+	"text/tabwriter"
 )
 
-func printHeader(c, t, r, i, a, f, p bool) {
+func printHeader(w io.Writer, c, t, r, i, a, f, p bool) {
 	var header, line string
 	if i {
-		header = "NAME\tSTATE\tHWADDR\t\t\tIP\t\tInterface"
-		line = "-----------------------------------------------------------------"
+		header = "NAME\tSTATE\tIP\tInterface"
+		line = "----\t-----\t--\t---------"
 	} else if c == t {
 		header = "CONT/TEMP"
 		line = "---------"
@@ -25,22 +28,25 @@ func printHeader(c, t, r, i, a, f, p bool) {
 		line = "--------"
 	}
 	if p {
-		header = header + "\t" + "PARENT"
-		line = line + "\t" + "------"
+		header = header + "\tPARENT"
+		line = line + "\t------"
 	}
 	if a {
-		header = header + "\t" + "ANCESTORS"
-		line = line + "\t" + "---------"
+		header = header + "\tANCESTORS"
+		line = line + "\t---------"
 	}
-	fmt.Println(header)
-	fmt.Println(line)
+	fmt.Fprintln(w, header)
+	fmt.Fprintln(w, line)
 }
 
 func printList(list []string, c, t, r, i, a, f, p bool) {
-	printHeader(c, t, r, i, a, f, p)
+	w := new(tabwriter.Writer)
+	w.Init(os.Stdout, 0, 8, 1, '\t', 0)
+	printHeader(w, c, t, r, i, a, f, p)
 	for _, item := range list {
-		fmt.Println(item)
+		fmt.Fprintln(w, item)
 	}
+	w.Flush()
 }
 
 // LxcList list the containers
@@ -81,15 +87,15 @@ func LxcList(name string, c, t, r, i, a, f, p bool) {
 }
 func addParent(list []string) []string {
 	for i := range list {
-		parent := container.GetParent(list[i])
-		list[i] = list[i] + "\t\t" + parent
+		parent := container.GetParent(strings.Fields(list[i])[0])
+		list[i] = list[i] + "\t" + parent
 	}
 	return list
 }
 
 func addAncestors(list []string) []string {
 	for i := range list {
-		child := list[i]
+		child := strings.Fields(list[i])[0]
 		result := ""
 		for child != container.GetParent(child) {
 			if result != "" {
@@ -99,7 +105,7 @@ func addAncestors(list []string) []string {
 			}
 			child = container.GetParent(child)
 		}
-		list[i] = list[i] + "\t\t" + result
+		list[i] = list[i] + "\t" + result
 	}
 	return list
 }
@@ -112,7 +118,6 @@ func info(name string) (result []string) {
 
 	listip, _ := c.IPAddress(nic)
 	ip := strings.Join(listip, " ")
-	mac := container.GetConfigItem(config.Agent.LxcPrefix+"/"+name+"/config", "lxc.network.hwaddr")
 
-	return append(result, name+"\t"+container.State(name)+"\t"+mac+"\t"+ip+"\t"+nic)
+	return append(result, name+"\t"+container.State(name)+"\t"+ip+"\t"+nic)
 }

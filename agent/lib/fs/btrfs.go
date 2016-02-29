@@ -22,14 +22,14 @@ func IsSubvolumeReadonly(path string) bool {
 
 func SubvolumeCreate(dst string) {
 	if id(dst) == "" {
-		err := exec.Command("btrfs", "subvolume", "create", dst).Run()
-		log.Check(log.FatalLevel, "Creating subvolume "+dst, err)
+		out, err := exec.Command("btrfs", "subvolume", "create", dst).CombinedOutput()
+		log.Check(log.FatalLevel, "Creating subvolume "+dst+": "+string(out), err)
 	}
 }
 
 func SubvolumeClone(src, dst string) {
-	err := exec.Command("btrfs", "subvolume", "snapshot", src, dst).Run()
-	log.Check(log.FatalLevel, "Creating snapshot", err)
+	out, err := exec.Command("btrfs", "subvolume", "snapshot", src, dst).CombinedOutput()
+	log.Check(log.FatalLevel, "Creating snapshot: "+string(out), err)
 }
 
 func SubvolumeDestroy(path string) {
@@ -46,14 +46,14 @@ func SubvolumeDestroy(path string) {
 		}
 	}
 	qgroupDestroy(path)
-	err = exec.Command("btrfs", "subvolume", "delete", path).Run()
-	log.Check(log.WarnLevel, "Destroying subvolume "+path, err)
+	out, err := exec.Command("btrfs", "subvolume", "delete", path).CombinedOutput()
+	log.Check(log.WarnLevel, "Destroying subvolume "+path+": "+string(out), err)
 }
 
 func qgroupDestroy(path string) {
 	index := id(path)
-	err := exec.Command("btrfs", "qgroup", "destroy", index, config.Agent.LxcPrefix).Run()
-	log.Check(log.WarnLevel, "Destroying qgroup "+path+" "+index, err)
+	out, err := exec.Command("btrfs", "qgroup", "destroy", index, config.Agent.LxcPrefix).CombinedOutput()
+	log.Check(log.WarnLevel, "Destroying qgroup "+path+" "+index+": "+string(out), err)
 }
 
 // NEED REFACTORING
@@ -82,7 +82,8 @@ func Receive(src, dst, delta string, parent bool) {
 	input, err := os.Open(config.Agent.LxcPrefix + "lxc-data/tmpdir/" + delta)
 	receive.Stdin = input
 	log.Check(log.FatalLevel, "Opening delta "+delta, err)
-	log.Check(log.FatalLevel, "Receiving delta "+delta, receive.Run())
+	out, err := receive.CombinedOutput()
+	log.Check(log.FatalLevel, "Receiving delta "+delta+": "+string(out), err)
 }
 
 func Send(src, dst, delta string) {
@@ -94,19 +95,22 @@ func Send(src, dst, delta string) {
 	}
 	send := exec.Command("btrfs", args...)
 	send.Stdout = newdelta
-	log.Check(log.FatalLevel, "Sending delta "+delta, send.Run())
+	out, err := send.CombinedOutput()
+	log.Check(log.FatalLevel, "Sending delta "+delta+": "+string(out), err)
 }
 
 func ReadOnly(container string, flag bool) {
 	for _, path := range []string{container + "/rootfs/", container + "/opt", container + "/var", container + "/home"} {
 		arg := []string{"property", "set", "-ts", config.Agent.LxcPrefix + path, "ro", strconv.FormatBool(flag)}
-		log.Check(log.FatalLevel, "Setting readonly: "+strconv.FormatBool(flag), exec.Command("btrfs", arg...).Run())
+		out, err := exec.Command("btrfs", arg...).CombinedOutput()
+		log.Check(log.FatalLevel, "Setting readonly: "+strconv.FormatBool(flag)+": "+string(out), err)
 	}
 }
 
 func SetVolReadOnly(subvol string, flag bool) {
 	arg := []string{"property", "set", "-ts", subvol, "ro", strconv.FormatBool(flag)}
-	log.Check(log.FatalLevel, "Setting readonly: "+strconv.FormatBool(flag), exec.Command("btrfs", arg...).Run())
+	out, err := exec.Command("btrfs", arg...).CombinedOutput()
+	log.Check(log.FatalLevel, "Setting readonly: "+strconv.FormatBool(flag)+": "+string(out), err)
 }
 
 func Stat(path, index string, raw bool) string {

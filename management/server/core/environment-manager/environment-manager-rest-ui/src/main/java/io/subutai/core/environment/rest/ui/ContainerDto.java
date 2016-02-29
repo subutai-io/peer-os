@@ -17,7 +17,6 @@ public class ContainerDto
     private String hostname;
     private ContainerHostState state;
     private String ip;
-    private String mac;
     private String templateName;
     private ContainerSize type;
     private String arch;
@@ -27,9 +26,8 @@ public class ContainerDto
     private String hostId;
 
 
-
     public ContainerDto( final String id, final String environmentId, final String hostname,
-                         final ContainerHostState state, final String ip, final String mac, final String templateName,
+                         final ContainerHostState state, final String ip, final String templateName,
                          final ContainerSize type, final String arch, final Set<String> tags, final String peerId,
                          final String hostId )
     {
@@ -38,7 +36,6 @@ public class ContainerDto
         this.hostname = hostname;
         this.state = state;
         this.ip = ip;
-        this.mac = mac;
         this.templateName = templateName;
         this.type = type;
         this.arch = arch;
@@ -144,18 +141,6 @@ public class ContainerDto
     }
 
 
-    public String getMac()
-    {
-        return mac;
-    }
-
-
-    public void setMac( final String mac )
-    {
-        this.mac = mac;
-    }
-
-
     public String getArch()
     {
         return arch;
@@ -167,19 +152,27 @@ public class ContainerDto
         this.arch = arch;
     }
 
-    public String getPeerId() {
+
+    public String getPeerId()
+    {
         return peerId;
     }
 
-    public void setPeerId(String peerId) {
+
+    public void setPeerId( String peerId )
+    {
         this.peerId = peerId;
     }
 
-    public String getHostId() {
+
+    public String getHostId()
+    {
         return hostId;
     }
 
-    public void setHostId(String hostId) {
+
+    public void setHostId( String hostId )
+    {
         this.hostId = hostId;
     }
 }
