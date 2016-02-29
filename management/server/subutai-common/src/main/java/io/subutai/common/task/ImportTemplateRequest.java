@@ -1,9 +1,6 @@
 package io.subutai.common.task;
 
 
-import io.subutai.common.task.TaskRequest;
-
-
 public class ImportTemplateRequest implements TaskRequest
 {
     private final String resourceHostId;

@@ -1,12 +1,11 @@
 package io.subutai.common.task;
 
 
-import java.util.List;
-
-import io.subutai.common.tracker.OperationMessage;
-
-
-public interface TaskResponse
+public interface TaskResponse<R extends TaskRequest>
 {
-    List<OperationMessage> getOperationMessages();
+    String getLog();
+
+    boolean hasSucceeded();
+
+    long getElapsedTime();
 }

@@ -37,13 +37,16 @@ public interface Task<R extends TaskRequest, T extends TaskResponse>
 
     R getRequest();
 
-    T getResponse();
+    //    T getResponse();
+
+    T waitAndGetResponse();
 
     boolean isSequential();
 
     String getExceptionsAsString();
 
     int getTimeout();
+
 
     boolean isDone();
 }

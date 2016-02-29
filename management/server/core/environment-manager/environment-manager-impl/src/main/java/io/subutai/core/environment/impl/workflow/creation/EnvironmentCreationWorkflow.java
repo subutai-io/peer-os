@@ -16,6 +16,7 @@ import io.subutai.core.environment.impl.workflow.creation.steps.RegisterSshStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.SetupP2PStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.VNISetupStep;
 import io.subutai.core.kurjun.api.TemplateManager;
+import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
@@ -33,6 +34,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
     private final String defaultDomain;
     private final TrackerOperation operationTracker;
     private final EnvironmentManagerImpl environmentManager;
+    private QuotaManager quotaManager;
 
 
     //environment creation phases
@@ -68,6 +70,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         this.sshKey = sshKey;
         this.operationTracker = operationTracker;
         this.defaultDomain = defaultDomain;
+        this.quotaManager = quotaManager;
     }
 
 

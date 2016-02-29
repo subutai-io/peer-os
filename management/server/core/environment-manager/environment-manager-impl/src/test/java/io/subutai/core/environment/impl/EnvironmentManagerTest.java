@@ -92,11 +92,11 @@ public class EnvironmentManagerTest
         when( peerManager.getPeer( PEER_ID ) ).thenReturn( peer );
         doReturn( true ).when( peer ).isOnline();
 
-//        blueprint = new Blueprint( "env", null, Sets.newHashSet( nodeGroup ) );
+        //        blueprint = new Blueprint( "env", null, Sets.newHashSet( nodeGroup ) );
 
         environmentManager =
                 spy( new EnvironmentManagerImpl( templateRegistry, peerManager, securityManager, networkManager,
-                        daoManager, identityManager, tracker, relationManager/*, strategyManager, quotaManager*/) );
+                        daoManager, identityManager, tracker, relationManager/*, strategyManager, quotaManager*/ ) );
         doReturn( environment ).when( environmentManager )
                                .createEmptyEnvironment( anyString(), anyString(), anyString() );
         //        doReturn( topology ).when( environmentManager ).buildTopology( blueprint );

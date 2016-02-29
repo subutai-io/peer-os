@@ -14,13 +14,12 @@ import java.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Sets;
-
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.PrepareTemplatesResponse;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.task.ImportTemplateResponse;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.impl.workflow.creation.steps.helpers.CreatePeerTemplatePrepareTask;
@@ -67,30 +66,38 @@ public class PrepareTemplatesStep
         taskExecutor.shutdown();
 
         //collect results
-        Set<String> errors = Sets.newHashSet();
-
         for ( int i = 0; i < placement.size(); i++ )
         {
             try
             {
                 Future<PrepareTemplatesResponse> futures = taskCompletionService.take();
                 final PrepareTemplatesResponse prepareTemplatesResponse = futures.get();
-                if ( prepareTemplatesResponse.getDescription() != null )
+
+                processResponse( prepareTemplatesResponse );
+
+                if ( !prepareTemplatesResponse.hasSucceeded() )
                 {
-                    operationTracker.addLog( prepareTemplatesResponse.getDescription() );
-                }
-                if ( !prepareTemplatesResponse.getResult() )
-                {
-                    throw new EnvironmentCreationException(
-                            String.format( "There were errors during preparation of templates: %s ",
-                                    prepareTemplatesResponse.getDescription() ) );
+                    throw new EnvironmentCreationException( "There were errors during preparation of templates." );
                 }
             }
             catch ( ExecutionException | InterruptedException e )
             {
+                final Throwable cause = e.getCause();
+                LOGGER.error( cause.getMessage(), cause );
                 throw new EnvironmentCreationException(
-                        String.format( "There were errors during preparation templates:  %s", errors ) );
+                        String.format( "There were errors during preparation templates:  %s", cause.getMessage() ) );
             }
+        }
+    }
+
+
+    private void processResponse( final PrepareTemplatesResponse response )
+    {
+        for ( ImportTemplateResponse importTemplateResponse : response.getResponses() )
+        {
+            LOGGER.debug( String.format( "Import response: %s", importTemplateResponse ) );
+
+            operationTracker.addLog( importTemplateResponse.getLog() );
         }
     }
 

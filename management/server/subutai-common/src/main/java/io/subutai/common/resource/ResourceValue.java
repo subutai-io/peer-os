@@ -7,9 +7,4 @@ package io.subutai.common.resource;
 public interface ResourceValue<T>
 {
     T getValue();
-//    boolean isNumeric();
-
-//    String getWriteValue();
-//
-//    String getPrintValue();
 }

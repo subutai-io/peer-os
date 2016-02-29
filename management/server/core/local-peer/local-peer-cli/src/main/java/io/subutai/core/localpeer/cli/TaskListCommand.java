@@ -29,8 +29,8 @@ public class TaskListCommand extends SubutaiShellCommandSupport
         {
             final String s = task.getCommandBatch().asChain();
             System.out.println(
-                    String.format( "%d\t%s\t%d\t%s...\t%s\t%s", task.getId(), task.getRequest().getResourceHostId(),
-                            task.getTimeout(), s.substring( 0, Math.min( 50, s.length() ) ), task.getState(),
+                    String.format( "%d\t%s\t%d\t%s\t%s...\t%s", task.getId(), task.getRequest().getResourceHostId(),
+                            task.getTimeout(), task.getState(), s.substring( 0, Math.min( 25, s.length() ) ),
                             StringUtil.convertMillisToHHMMSS( task.getElapsedTime() ) ) );
         }
         return null;

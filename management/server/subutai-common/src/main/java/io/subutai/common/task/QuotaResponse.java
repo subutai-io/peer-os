@@ -1,19 +1,22 @@
 package io.subutai.common.task;
 
 
-public class QuotaResponse implements TaskResponse
+import io.subutai.common.command.CommandResult;
+
+
+public class QuotaResponse implements TaskResponse<QuotaRequest>
 {
-    private final String resourceHostId;
-    private final String containerName;
-    private final boolean succeeded;
-    private final long elapsedTime;
+    private String resourceHostId;
+    private String hostname;
+    private boolean succeeded;
+    private long elapsedTime;
 
 
-    public QuotaResponse( final String resourceHostId, final String containerName, final boolean succeeded,
+    public QuotaResponse( final String resourceHostId, final String hostname, final boolean succeeded,
                           final long elapsedTime )
     {
         this.resourceHostId = resourceHostId;
-        this.containerName = containerName;
+        this.hostname = hostname;
         this.succeeded = succeeded;
         this.elapsedTime = elapsedTime;
     }
@@ -25,9 +28,9 @@ public class QuotaResponse implements TaskResponse
     }
 
 
-    public String getContainerName()
+    public String getHostname()
     {
-        return containerName;
+        return hostname;
     }
 
 
@@ -44,10 +47,21 @@ public class QuotaResponse implements TaskResponse
     }
 
 
+//    @Override
+//    public void processCommandResult( final QuotaRequest request, final CommandResult commandResult,
+//                                      final long elapsedTime )
+//    {
+//        this.succeeded = commandResult != null && commandResult.hasSucceeded();
+//        this.resourceHostId = getResourceHostId();
+//        this.hostname = request.getHostname();
+//        this.elapsedTime = elapsedTime;
+//    }
+
+
     @Override
     public String getLog()
     {
-        return succeeded ? String.format( "Setting quota %s succeeded.", containerName ) :
-               String.format( "Setting quota %s failed.", containerName );
+        return succeeded ? String.format( "Setting quota %s succeeded.", hostname ) :
+               String.format( "Setting quota %s failed.", hostname );
     }
 }

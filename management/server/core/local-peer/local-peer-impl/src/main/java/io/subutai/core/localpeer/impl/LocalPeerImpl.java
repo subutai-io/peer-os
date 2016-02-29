@@ -52,13 +52,9 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
-import io.subutai.common.task.CloneRequest;
-import io.subutai.common.task.CloneResponse;
 import io.subutai.common.environment.ContainersDestructionResultImpl;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupResponse;
-import io.subutai.common.task.ImportTemplateRequest;
-import io.subutai.common.task.ImportTemplateResponse;
 import io.subutai.common.environment.PrepareTemplatesRequest;
 import io.subutai.common.environment.PrepareTemplatesResponse;
 import io.subutai.common.host.ContainerHostInfo;
@@ -118,9 +114,13 @@ import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.KeyTrustLevel;
 import io.subutai.common.security.objects.SecurityKeyType;
 import io.subutai.common.settings.Common;
+import io.subutai.common.task.CloneRequest;
+import io.subutai.common.task.CloneResponse;
+import io.subutai.common.task.ImportTemplateRequest;
+import io.subutai.common.task.ImportTemplateResponse;
+import io.subutai.common.task.QuotaRequest;
 import io.subutai.common.task.Task;
 import io.subutai.common.task.TaskCallbackHandler;
-import io.subutai.common.tracker.OperationMessage;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.ControlNetworkUtil;
 import io.subutai.common.util.ExceptionUtil;
@@ -128,7 +128,6 @@ import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.NumUtil;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.common.util.ServiceLocator;
-import io.subutai.common.util.StringUtil;
 import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostListener;
@@ -141,6 +140,7 @@ import io.subutai.core.localpeer.impl.container.DestroyContainerWrapperTask;
 import io.subutai.core.localpeer.impl.container.DestroyEnvironmentContainerGroupRequestListener;
 import io.subutai.core.localpeer.impl.container.ImportTask;
 import io.subutai.core.localpeer.impl.container.PrepareTemplateRequestListener;
+import io.subutai.core.localpeer.impl.container.QuotaTask;
 import io.subutai.core.localpeer.impl.dao.ResourceHostDataService;
 import io.subutai.core.localpeer.impl.dao.TunnelDataService;
 import io.subutai.core.localpeer.impl.entity.AbstractSubutaiHost;
@@ -404,54 +404,21 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public PrepareTemplatesResponse prepareTemplates( final PrepareTemplatesRequest request ) throws PeerException
     {
-        List<ImportTask> tasks = new ArrayList<>();
-        StringBuilder sb =
-                new StringBuilder( String.format( "Preparing templates on %s...\n", peerInfo.getPublicUrl() ) );
-        //        List<String> exceptions = new ArrayList<>();
-        //        for ( String resourceHostId : request.getTemplates().keySet() )
-        //        {
-        //            for ( String ignore : request.getTemplates().get( resourceHostId ) )
-        //            {
-        //                try
-        //                {
-        //                    getResourceHostById( resourceHostId );
-        //                }
-        //                catch ( HostNotFoundException e )
-        //                {
-        //                    exceptions.add( e.getMessage() );
-        //                }
-        //            }
-        //        }
-        //
-        //        if ( exceptions.size() > 0 )
-        //        {
-        //            return new PrepareTemplatesResponse( false, sb.toString() );
-        //        }
-
+        int taskCounter = 0;
         for ( String resourceHostId : request.getTemplates().keySet() )
         {
             for ( String templateName : request.getTemplates().get( resourceHostId ) )
             {
                 ImportTask task = new ImportTask( new ImportTemplateRequest( resourceHostId, templateName ) );
                 taskManager.schedule( task );
-                tasks.add( task );
+                taskCounter++;
             }
         }
 
 
-        boolean succeeded = true;
-        for ( ImportTask task : tasks )
-        {
-            final ImportTemplateResponse response = task.getResponse();
-
-            succeeded = succeeded && response.isSucceeded();
-            for ( OperationMessage message : response.getOperationMessages() )
-            {
-                sb.append( String.format( "%s %s %s. Elapsed time: %s\n", message.getType(), message.getValue(),
-                        message.getDescription(), StringUtil.convertMillisToHHMMSS( task.getElapsedTime() ) ) );
-            }
-        }
-        return new PrepareTemplatesResponse( succeeded, sb.toString() );
+        final PrepareTemplatesResponse prepareTemplatesResponse = new PrepareTemplatesResponse( getId() );
+        prepareTemplatesResponse.waitResponses( taskCounter );
+        return prepareTemplatesResponse;
     }
 
 
@@ -471,9 +438,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 getCloneFailedHandler( this, response );
 
 
+        int taskCounter=0;
         for ( final CloneRequest request : requestGroup.getRequests() )
         {
-            ContainerSize size = request.getContainerSize();
+            //            ContainerSize size = request.getContainerSize();
             try
             {
                 final Vni environmentVni = getReservedVnis().findVniByEnvironmentId( request.getEnvironmentId() );
@@ -484,21 +452,14 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                             String.format( "No reserved vni found for environment %s", request.getEnvironmentId() ) );
                 }
 
-                ContainerQuota containerQuota = quotaManager.getDefaultContainerQuota( size );
-                if ( containerQuota == null )
-                {
-                    LOG.warn( "Quota not found for container type: " + request.getContainerSize() );
-                    size = ContainerSize.SMALL;
-                    containerQuota = quotaManager.getDefaultContainerQuota( size );
-                }
 
-                CloneTask task = new CloneTask( this, hostRegistry, containerQuota, environmentVni.getVlan(), request );
+                CloneTask task = new CloneTask( request, environmentVni.getVlan() );
 
                 task.onSuccess( successResultHandler );
                 task.onFailure( failedResultHandler );
 
                 taskManager.schedule( task );
-                tasks.add( task );
+                taskCounter++;
             }
             catch ( Exception e )
             {
@@ -506,7 +467,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
         }
 
-        response.waitResponses( requestGroup.getRequests().size() );
+        response.waitResponses( taskCounter );
         return response;
     }
 
@@ -527,6 +488,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
                 try
                 {
+                    QuotaTask quotaTask = new QuotaTask( quotaManager,
+                            new QuotaRequest( request.getResourceHostId(), request.getHostname(),
+                                    request.getContainerSize() ) );
+
+                    taskManager.schedule( quotaTask );
+
                     final HostInterfaces interfaces = new HostInterfaces();
                     interfaces.addHostInterface(
                             new HostInterfaceModel( Common.DEFAULT_CONTAINER_INTERFACE, response.getIp(),
@@ -542,9 +509,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                                     request.getContainerSize(), ContainerHostState.CLONING );
 
                     registerContainer( request.getResourceHostId(), containerHostEntity );
-                    response.addSucceededMessage(
-                            String.format( "Container %s successfully created in %s", request.getContainerName(),
-                                    StringUtil.convertMillisToHHMMSS( task.getElapsedTime() ) ) );
+
                     responseGroup.addResponse( response );
                 }
                 catch ( PeerException e )
@@ -566,11 +531,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             @Override
             public void handle( Task task, CloneRequest request, CloneResponse response ) throws Exception
             {
-                response.addFailMessage(
-                        String.format( "Cloning container %s failed. Elapsed time: %s", request.getContainerName(),
-                                StringUtil.convertMillisToHHMMSS( task.getElapsedTime() ) ),
-                        task.getExceptionsAsString() );
-
                 responseGroup.addResponse( response );
             }
         };

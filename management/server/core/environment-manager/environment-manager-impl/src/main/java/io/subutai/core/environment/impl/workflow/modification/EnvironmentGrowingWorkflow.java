@@ -19,6 +19,7 @@ import io.subutai.core.environment.impl.workflow.modification.steps.PEKGeneratio
 import io.subutai.core.environment.impl.workflow.modification.steps.SetupP2PStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.VNISetupStep;
 import io.subutai.core.kurjun.api.TemplateManager;
+import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerManager;
 
@@ -56,7 +57,8 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
     public EnvironmentGrowingWorkflow( String defaultDomain, TemplateManager templateRegistry,
                                        NetworkManager networkManager, PeerManager peerManager,
                                        EnvironmentImpl environment, Topology topology,
-                                       TrackerOperation operationTracker, EnvironmentManagerImpl environmentManager )
+                                       TrackerOperation operationTracker, EnvironmentManagerImpl environmentManager
+                                        )
     {
         super( EnvironmentGrowingPhase.INIT );
 

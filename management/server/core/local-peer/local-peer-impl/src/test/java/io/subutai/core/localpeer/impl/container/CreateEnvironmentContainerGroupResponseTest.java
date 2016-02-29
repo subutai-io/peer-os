@@ -38,21 +38,8 @@ public class CreateEnvironmentContainerGroupResponseTest
     {
         responseGroup = new CreateEnvironmentContainerGroupResponse( PEER_ID );
         responseGroup.addResponse( response );
-        response.addSucceededMessage( DESC );
     }
 
 
-    @Test
-    public void testGetResponse() throws Exception
-    {
-        assertEquals( Sets.newHashSet( containerHostInfoModel ), responseGroup.getResponses() );
-    }
 
-
-    @Test
-    public void testGetDescription() throws Exception
-    {
-        assertEquals( 1, response.getOperationMessages().size() );
-        assertEquals( DESC, response.getOperationMessages().get(0).getValue() );
-    }
 }

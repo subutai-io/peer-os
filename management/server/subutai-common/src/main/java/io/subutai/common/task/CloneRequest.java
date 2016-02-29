@@ -7,7 +7,6 @@ import com.google.common.base.Strings;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.settings.Common;
-import io.subutai.common.task.TaskRequest;
 
 
 public class CloneRequest implements TaskRequest

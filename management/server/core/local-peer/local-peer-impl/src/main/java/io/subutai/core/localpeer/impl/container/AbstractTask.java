@@ -10,13 +10,12 @@ import org.slf4j.LoggerFactory;
 
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
-import io.subutai.common.command.CommandResultParseException;
-import io.subutai.common.command.CommandResultParser;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.task.Task;
 import io.subutai.common.task.TaskCallbackHandler;
 import io.subutai.common.task.TaskRequest;
 import io.subutai.common.task.TaskResponse;
+import io.subutai.common.task.TaskResponseBuilder;
 
 
 /**
@@ -37,6 +36,8 @@ public abstract class AbstractTask<R extends TaskRequest, T extends TaskResponse
     protected long finished;
     protected TaskCallbackHandler<R, T> onSuccessHandler;
     protected TaskCallbackHandler<R, T> onFailureHandler;
+    private boolean isResultProcessed = false;
+
 
     public AbstractTask( final R request )
     {
@@ -74,24 +75,8 @@ public abstract class AbstractTask<R extends TaskRequest, T extends TaskResponse
         this.commandResult = commandResult;
         try
         {
-            switch ( this.commandResult.getStatus() )
-            {
-                case SUCCEEDED:
-                    success();
-                    break;
-
-                case FAILED:
-                    throw new CommandException( this.commandResult.getStdErr() );
-
-                case KILLED:
-                    throw new CommandException( "Command killed." );
-
-                case TIMEOUT:
-                    throw new CommandException( "Command execution timed out." );
-
-                default:
-                    throw new CommandException( "Unexpected error on executing command." );
-            }
+            processCommandResult();
+            success();
         }
         catch ( Exception e )
         {
@@ -103,45 +88,13 @@ public abstract class AbstractTask<R extends TaskRequest, T extends TaskResponse
 
     protected void success()
     {
-        try
-        {
-            parseCommandResult();
-            if ( onSuccessHandler != null )
-            {
-                onSuccessHandler.handle( this, request, response );
-            }
-            this.state = State.SUCCESS;
-        }
-        catch ( Exception e )
-        {
-            failure( e.getMessage(), e );
-        }
+        this.state = State.SUCCESS;
     }
 
 
-    protected void addException( final Throwable e )
+    protected void failure( String message, Exception exeption )
     {
-        this.exceptions.add( e );
-    }
-
-
-    protected void failure( String message, Throwable throwable )
-    {
-        LOG.error( throwable.getMessage(), throwable );
-
-        addException( throwable );
-        try
-        {
-            if ( onFailureHandler != null )
-            {
-                onFailureHandler.handle( this, request, response );
-            }
-        }
-        catch ( Exception e )
-        {
-            LOG.error( throwable.getMessage(), throwable );
-            addException( e );
-        }
+        LOG.error( message, exeption );
         this.state = State.FAILURE;
     }
 
@@ -172,30 +125,11 @@ public abstract class AbstractTask<R extends TaskRequest, T extends TaskResponse
     }
 
 
-    private void parseCommandResult() throws CommandResultParseException
-    {
-        if ( response == null && getCommandResultParser() != null )
-        {
-            try
-            {
-                response = getCommandResultParser().parse( commandResult );
-            }
-            catch ( Exception e )
-            {
-                throw new CommandResultParseException( e );
-            }
-        }
-    }
-
-
     @Override
     public int getTimeout()
     {
         return DEFAULT_TIMEOUT;
     }
-
-
-    abstract public CommandResultParser<T> getCommandResultParser();
 
 
     @Override
@@ -219,7 +153,7 @@ public abstract class AbstractTask<R extends TaskRequest, T extends TaskResponse
 
 
     @Override
-    public T getResponse()
+    public T waitAndGetResponse()
     {
         while ( !isDone() )
         {
@@ -232,7 +166,36 @@ public abstract class AbstractTask<R extends TaskRequest, T extends TaskResponse
                 // ignore
             }
         }
+
+        //        if ( !isResultProcessed )
+        //        {
+        //            processCommandResult();
+        //            isResultProcessed = true;
+        //        }
+
         return response;
+    }
+
+
+    private void processCommandResult() throws Exception
+    {
+        response = getResponseBuilder().build( request, commandResult, getElapsedTime() );
+
+        if ( commandResult.hasSucceeded() )
+        {
+            if ( onSuccessHandler != null )
+            {
+                onSuccessHandler.handle( this, request, response );
+            }
+        }
+        else
+        {
+
+            if ( onFailureHandler != null )
+            {
+                onFailureHandler.handle( this, request, response );
+            }
+        }
     }
 
 
@@ -264,4 +227,13 @@ public abstract class AbstractTask<R extends TaskRequest, T extends TaskResponse
     {
         this.onFailureHandler = handler;
     }
+
+
+    public boolean isSucceeded()
+    {
+        return this.state == State.SUCCESS;
+    }
+
+
+    abstract public TaskResponseBuilder<R, T> getResponseBuilder();
 }

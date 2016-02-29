@@ -1,27 +1,34 @@
 package io.subutai.common.task;
 
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
-
-import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.quota.ContainerQuota;
-import io.subutai.common.settings.Common;
 
 
 public class QuotaRequest implements TaskRequest
 {
     private final String resourceHostId;
     private final String hostname;
-    private final ContainerQuota quota;
+    private final ContainerSize size;
 
 
-    public QuotaRequest( final ContainerQuota quota, final String hostname, final String resourceHostId )
+    public QuotaRequest( final String resourceHostId, final String hostname, final ContainerSize size )
     {
-        this.quota = quota;
-        this.hostname = hostname;
         this.resourceHostId = resourceHostId;
+        this.hostname = hostname;
+        this.size = size;
+    }
+
+
+    public ContainerSize getSize()
+    {
+        return size;
+    }
+
+
+    public String getHostname()
+    {
+        return hostname;
     }
 
 
@@ -31,7 +38,7 @@ public class QuotaRequest implements TaskRequest
         final StringBuffer sb = new StringBuffer( "QuotaRequest{" );
         sb.append( "resourceHostId='" ).append( resourceHostId ).append( '\'' );
         sb.append( ", hostname='" ).append( hostname ).append( '\'' );
-        sb.append( ", quota=" ).append( quota );
+        sb.append( ", size=" ).append( size );
         sb.append( '}' );
         return sb.toString();
     }

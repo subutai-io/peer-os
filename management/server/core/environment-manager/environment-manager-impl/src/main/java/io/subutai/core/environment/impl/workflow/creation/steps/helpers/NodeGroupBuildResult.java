@@ -27,12 +27,12 @@ public class NodeGroupBuildResult
     }
 
 
-//    public boolean isSucceeded()
+//    public boolean hasSucceeded()
 //    {
 //
 //        for ( CreateEnvironmentContainerGroupResponse response : responses )
 //        {
-//            if ( !response.isSucceeded() )
+//            if ( !response.hasSucceeded() )
 //            {
 //                return false;
 //            }

@@ -1,26 +1,21 @@
 package io.subutai.common.task;
 
 
-import java.util.ArrayList;
-import java.util.List;
-
-import io.subutai.common.task.TaskResponse;
-import io.subutai.common.tracker.OperationMessage;
-
-
-public class ImportTemplateResponse implements TaskResponse
+public class ImportTemplateResponse implements TaskResponse<ImportTemplateRequest>
 {
-    private final String resourceHostId;
-    private final String templateName;
-    private final boolean succeeded;
-    private List<OperationMessage> messages = new ArrayList<>();
+    private String resourceHostId;
+    private String templateName;
+    private boolean succeeded = false;
+    private long elapsedTime;
 
 
-    public ImportTemplateResponse( final String resourceHostId, final String templateName, final boolean succeeded )
+    public ImportTemplateResponse( final String resourceHostId, final String templateName, final boolean succeeded,
+                                   final long elapsedTime )
     {
         this.resourceHostId = resourceHostId;
         this.templateName = templateName;
         this.succeeded = succeeded;
+        this.elapsedTime = elapsedTime;
     }
 
 
@@ -36,52 +31,23 @@ public class ImportTemplateResponse implements TaskResponse
     }
 
 
-    public boolean isSucceeded()
+    public boolean hasSucceeded()
     {
         return succeeded;
     }
 
 
     @Override
-    public List<OperationMessage> getOperationMessages()
+    public long getElapsedTime()
     {
-        if ( messages == null )
-        {
-            messages = new ArrayList<>();
-        }
-        return messages;
+        return elapsedTime;
     }
 
 
-    public void addFailMessage( final String msg, String description )
+    @Override
+    public String getLog()
     {
-        if ( msg == null )
-        {
-            throw new IllegalArgumentException( "Fail message could not be null." );
-        }
-
-        this.messages.add( new OperationMessage( msg, OperationMessage.Type.FAILED, description ) );
-    }
-
-
-    public void addSucceededMessage( final String msg )
-    {
-        if ( msg == null )
-        {
-            throw new IllegalArgumentException( "Message could not be null." );
-        }
-
-        this.messages.add( new OperationMessage( msg, OperationMessage.Type.SUCCEEDED, "OK" ) );
-    }
-
-
-    public void addSucceededMessage( final String msg, String description )
-    {
-        if ( msg == null )
-        {
-            throw new IllegalArgumentException( "Message could not be null." );
-        }
-
-        this.messages.add( new OperationMessage( msg, OperationMessage.Type.SUCCEEDED, description ) );
+        return succeeded ? String.format( "Importing %s succeeded.", templateName ) :
+               String.format( "Importing %s failed.", templateName );
     }
 }

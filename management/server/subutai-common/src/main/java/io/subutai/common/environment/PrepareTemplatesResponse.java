@@ -1,30 +1,13 @@
 package io.subutai.common.environment;
 
 
-import java.util.List;
+import io.subutai.common.task.ImportTemplateResponse;
 
 
-public class PrepareTemplatesResponse
+public class PrepareTemplatesResponse extends AbstractGroupResponse<ImportTemplateResponse>
 {
-    private boolean result;
-    private String description;
-
-
-    public PrepareTemplatesResponse( final boolean result, final String description )
+    public PrepareTemplatesResponse( final String peerId )
     {
-        this.result = result;
-        this.description = description;
-    }
-
-
-    public boolean getResult()
-    {
-        return result;
-    }
-
-
-    public String getDescription()
-    {
-        return description;
+        super( peerId );
     }
 }

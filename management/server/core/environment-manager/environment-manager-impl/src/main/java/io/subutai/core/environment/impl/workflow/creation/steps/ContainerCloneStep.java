@@ -16,8 +16,6 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.commons.net.util.SubnetUtils;
 
-import com.google.common.collect.Sets;
-
 import io.subutai.common.task.CloneResponse;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupResponse;
 import io.subutai.common.environment.Node;
@@ -30,7 +28,6 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.security.objects.Ownership;
 import io.subutai.common.settings.Common;
-import io.subutai.common.tracker.OperationMessage;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
@@ -42,6 +39,7 @@ import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserDelegate;
 import io.subutai.core.kurjun.api.TemplateManager;
+import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.object.relation.api.RelationManager;
 import io.subutai.core.object.relation.api.model.Relation;
 import io.subutai.core.object.relation.api.model.RelationInfo;
@@ -128,8 +126,8 @@ public class ContainerCloneStep
             LOGGER.debug( String.format( "Scheduling node group task on peer %s", peer.getId() ) );
 
             taskCompletionService.submit(
-                    new CreatePeerNodeGroupsTask( peer, peerPlacement.getValue(), peerManager.getLocalPeer(),
-                            environment, currentLastUsedIpIndex + 1 ) );
+                    new CreatePeerNodeGroupsTask( peer, peerManager.getLocalPeer(), environment,
+                            currentLastUsedIpIndex + 1, peerPlacement.getValue() ) );
 
             currentLastUsedIpIndex += peerPlacement.getValue().size();
 
@@ -139,7 +137,7 @@ public class ContainerCloneStep
         taskExecutor.shutdown();
 
         //collect results
-        Set<String> errors = Sets.newHashSet();
+        //        Set<String> errors = Sets.newHashSet();
 
         for ( int i = 0; i < placement.size(); i++ )
         {
@@ -152,27 +150,21 @@ public class ContainerCloneStep
             catch ( Exception e )
             {
                 LOGGER.error( e.getMessage(), e );
-                errors.add( exceptionUtil.getRootCauseMessage( e ) );
+                throw new EnvironmentCreationException(
+                        String.format( "There were errors during container creation:  %s", e.getMessage() ) );
             }
-        }
-
-        if ( !errors.isEmpty() )
-        {
-            throw new EnvironmentCreationException(
-                    String.format( "There were errors during container creation:  %s", errors ) );
         }
     }
 
 
-    private void processResponse( final Set<Node> nodes,
-                                  final CreateEnvironmentContainerGroupResponse result )
+    private void processResponse( final Set<Node> nodes, final CreateEnvironmentContainerGroupResponse result )
     {
         final Set<EnvironmentContainerImpl> containers = new HashSet<>();
         for ( CloneResponse cloneResponse : result.getResponses() )
         {
             LOGGER.debug( String.format( "Clone response: %s", cloneResponse ) );
 
-            logMessages( cloneResponse );
+            operationTracker.addLog( cloneResponse.getLog() );
 
             final Node node = findNodeGroup( cloneResponse.getHostname(), nodes );
             if ( node != null )
@@ -203,8 +195,7 @@ public class ContainerCloneStep
                         cloneResponse.getTemplateArch(), ContainerHostState.CLONING );
         return new EnvironmentContainerImpl( localPeerId, peerId, cloneResponse.getHostname(), infoModel,
                 cloneResponse.getTemplateName(), cloneResponse.getTemplateArch(), node.getSshGroupId(),
-                node.getHostsGroupId(), defaultDomain, node.getType(), node.getHostId(),
-                node.getName() );
+                node.getHostsGroupId(), defaultDomain, node.getType(), node.getHostId(), node.getName() );
     }
 
 
@@ -219,16 +210,6 @@ public class ContainerCloneStep
         }
 
         return null;
-    }
-
-
-    private void logMessages( final CloneResponse cloneResponse )
-    {
-        for ( OperationMessage message : cloneResponse.getOperationMessages() )
-        {
-            operationTracker.addLog(
-                    String.format( "%s %s %s.\n", message.getType(), message.getValue(), message.getDescription() ) );
-        }
     }
 
 
@@ -258,7 +239,7 @@ public class ContainerCloneStep
         }
         catch ( Exception ex )
         {
-            LOGGER.info( "Error building relation", ex );
+            LOGGER.error( "Error building relation", ex );
         }
     }
 

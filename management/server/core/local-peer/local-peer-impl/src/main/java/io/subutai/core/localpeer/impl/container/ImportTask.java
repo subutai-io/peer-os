@@ -5,15 +5,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.subutai.common.command.CommandResult;
-import io.subutai.common.command.CommandResultParser;
-import io.subutai.common.task.ImportTemplateRequest;
-import io.subutai.common.task.ImportTemplateResponse;
 import io.subutai.common.task.Command;
 import io.subutai.common.task.CommandBatch;
+import io.subutai.common.task.ImportTemplateRequest;
+import io.subutai.common.task.ImportTemplateResponse;
+import io.subutai.common.task.TaskResponseBuilder;
 
 
 public class ImportTask extends AbstractTask<ImportTemplateRequest, ImportTemplateResponse>
-        implements CommandResultParser<ImportTemplateResponse>
+        implements TaskResponseBuilder<ImportTemplateRequest, ImportTemplateResponse>
+
 {
     protected static final Logger LOG = LoggerFactory.getLogger( ImportTask.class );
 
@@ -41,35 +42,6 @@ public class ImportTask extends AbstractTask<ImportTemplateRequest, ImportTempla
 
 
     @Override
-    public CommandResultParser<ImportTemplateResponse> getCommandResultParser()
-    {
-        return this;
-    }
-
-
-    @Override
-    public ImportTemplateResponse parse( final CommandResult commandResult )
-    {
-        final boolean succeeded = commandResult != null && commandResult.hasSucceeded();
-        final ImportTemplateResponse importTemplateResponse =
-                new ImportTemplateResponse( request.getResourceHostId(), request.getTemplateName(), succeeded );
-        if ( succeeded )
-        {
-            importTemplateResponse.addSucceededMessage(
-                    String.format( "Importing template %s on %s succeeded.", request.getTemplateName(),
-                            request.getResourceHostId() ), commandResult.getStdOut() );
-        }
-        else
-        {
-            importTemplateResponse.addFailMessage(
-                    String.format( "Importing template %s on %s failed.", request.getTemplateName(),
-                            request.getResourceHostId() ), commandResult != null ? commandResult.getStdErr() : "" );
-        }
-        return importTemplateResponse;
-    }
-
-
-    @Override
     public int getTimeout()
     {
         return DOWNLOAD_TIMEOUT;
@@ -80,5 +52,33 @@ public class ImportTask extends AbstractTask<ImportTemplateRequest, ImportTempla
     public boolean isSequential()
     {
         return false;
+    }
+
+
+    @Override
+    public TaskResponseBuilder<ImportTemplateRequest, ImportTemplateResponse> getResponseBuilder()
+    {
+        return this;
+    }
+
+//
+    //    @Override
+    //    public void processCommandResult( final ImportTemplateRequest request, final CommandResult commandResult,
+    //                                      long elapsedTime )
+    //    {
+    //
+    //        this.resourceHostId = request.getResourceHostId();
+    //        this.templateName = request.getTemplateName();
+    //        this.elapsedTime = elapsedTime;
+    //    }
+
+
+    @Override
+    public ImportTemplateResponse build( final ImportTemplateRequest request, final CommandResult commandResult,
+                                         final long elapsedTime )
+    {
+        boolean succeeded = commandResult != null && commandResult.hasSucceeded();
+        return new ImportTemplateResponse( request.getResourceHostId(), request.getTemplateName(), succeeded,
+                elapsedTime );
     }
 }
