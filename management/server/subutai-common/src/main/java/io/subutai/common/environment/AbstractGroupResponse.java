@@ -7,6 +7,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import io.subutai.common.task.ImportTemplateResponse;
+import io.subutai.common.task.Task;
+import io.subutai.common.task.TaskRequest;
 import io.subutai.common.task.TaskResponse;
 import io.subutai.common.tracker.OperationMessage;
 import io.subutai.common.util.StringUtil;
@@ -15,10 +17,11 @@ import io.subutai.common.util.StringUtil;
 /**
  * Abstract group response
  */
-public class AbstractGroupResponse<T extends TaskResponse>
+public class AbstractGroupResponse<R extends TaskRequest, T extends TaskResponse>
 {
     private final String peerId;
     private List<T> responses = new ArrayList<>();
+    private List<Task<R, T>> tasks = new ArrayList<>();
     private AtomicInteger counter = new AtomicInteger( 0 );
     private boolean succeeded = true;
     private List<OperationMessage> messages = new ArrayList<>();
@@ -98,18 +101,18 @@ public class AbstractGroupResponse<T extends TaskResponse>
     }
 
 
-    public void waitResponses( final int count )
+    public void addTask( Task<R, T> task )
     {
-        while ( counter.intValue() < count )
+        this.tasks.add( task );
+    }
+
+
+    public void waitResponses()
+    {
+        for ( Task<R, T> task : tasks )
         {
-            try
-            {
-                TimeUnit.SECONDS.sleep( 2 );
-            }
-            catch ( InterruptedException e )
-            {
-                //ignore
-            }
+            T response = task.waitAndGetResponse();
+            addResponse( response );
         }
     }
 

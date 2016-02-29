@@ -404,20 +404,20 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public PrepareTemplatesResponse prepareTemplates( final PrepareTemplatesRequest request ) throws PeerException
     {
-        int taskCounter = 0;
+        final PrepareTemplatesResponse prepareTemplatesResponse = new PrepareTemplatesResponse( getId() );
         for ( String resourceHostId : request.getTemplates().keySet() )
         {
             for ( String templateName : request.getTemplates().get( resourceHostId ) )
             {
                 ImportTask task = new ImportTask( new ImportTemplateRequest( resourceHostId, templateName ) );
                 taskManager.schedule( task );
-                taskCounter++;
+                prepareTemplatesResponse.addTask( task );
             }
         }
 
 
-        final PrepareTemplatesResponse prepareTemplatesResponse = new PrepareTemplatesResponse( getId() );
-        prepareTemplatesResponse.waitResponses( taskCounter );
+
+        prepareTemplatesResponse.waitResponses( );
         return prepareTemplatesResponse;
     }
 
@@ -429,7 +429,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         Preconditions.checkNotNull( requestGroup );
 
-        final List<CloneTask> tasks = new ArrayList<>();
+        final List<Task> tasks = new ArrayList<>();
 
         final CreateEnvironmentContainerGroupResponse response = new CreateEnvironmentContainerGroupResponse( getId() );
         final TaskCallbackHandler<CloneRequest, CloneResponse> successResultHandler =
@@ -438,7 +438,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 getCloneFailedHandler( this, response );
 
 
-        int taskCounter=0;
         for ( final CloneRequest request : requestGroup.getRequests() )
         {
             //            ContainerSize size = request.getContainerSize();
@@ -459,7 +458,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 task.onFailure( failedResultHandler );
 
                 taskManager.schedule( task );
-                taskCounter++;
+                response.addTask( task );
             }
             catch ( Exception e )
             {
@@ -467,7 +466,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
         }
 
-        response.waitResponses( taskCounter );
+        response.waitResponses( );
         return response;
     }
 
@@ -496,8 +495,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
                     final HostInterfaces interfaces = new HostInterfaces();
                     interfaces.addHostInterface(
-                            new HostInterfaceModel( Common.DEFAULT_CONTAINER_INTERFACE, response.getIp(),
-                                    "00:00:00:00:00:00" ) );
+                            new HostInterfaceModel( Common.DEFAULT_CONTAINER_INTERFACE, response.getIp() ) );
                     final String hostId = response.getAgentId();
                     final String localPeerId = localPeer.getId();
                     final HostArchitecture arch = request.getTemplateArch();

@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.commons.net.util.SubnetUtils;
 
-import io.subutai.common.task.CloneResponse;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupResponse;
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.Topology;
@@ -28,6 +27,7 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.security.objects.Ownership;
 import io.subutai.common.settings.Common;
+import io.subutai.common.task.CloneResponse;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
@@ -39,7 +39,6 @@ import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserDelegate;
 import io.subutai.core.kurjun.api.TemplateManager;
-import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.object.relation.api.RelationManager;
 import io.subutai.core.object.relation.api.model.Relation;
 import io.subutai.core.object.relation.api.model.RelationInfo;
@@ -125,8 +124,7 @@ public class ContainerCloneStep
             Peer peer = peerManager.getPeer( peerPlacement.getKey() );
             LOGGER.debug( String.format( "Scheduling node group task on peer %s", peer.getId() ) );
 
-            taskCompletionService.submit(
-                    new CreatePeerNodeGroupsTask( peer, peerManager.getLocalPeer(), environment,
+            taskCompletionService.submit( new CreatePeerNodeGroupsTask( peer, peerManager.getLocalPeer(), environment,
                             currentLastUsedIpIndex + 1, peerPlacement.getValue() ) );
 
             currentLastUsedIpIndex += peerPlacement.getValue().size();
@@ -188,8 +186,8 @@ public class ContainerCloneStep
     {
 
         final HostInterfaces interfaces = new HostInterfaces();
-        interfaces.addHostInterface( new HostInterfaceModel( Common.DEFAULT_CONTAINER_INTERFACE, cloneResponse.getIp(),
-                "00:00:00:00:00:00" ) );
+        interfaces.addHostInterface(
+                new HostInterfaceModel( Common.DEFAULT_CONTAINER_INTERFACE, cloneResponse.getIp() ) );
         final ContainerHostInfoModel infoModel =
                 new ContainerHostInfoModel( cloneResponse.getAgentId(), cloneResponse.getHostname(), interfaces,
                         cloneResponse.getTemplateArch(), ContainerHostState.CLONING );
