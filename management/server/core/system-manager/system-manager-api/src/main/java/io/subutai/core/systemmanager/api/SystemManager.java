@@ -29,12 +29,15 @@ public interface SystemManager
 
     PeerSettings getPeerSettings();
 
-    void setNetworkSettings( String securePortX1, String securePortX2,
-                             String securePortX3) throws ConfigurationException;
+    void setNetworkSettings( String securePortX1, String securePortX2, String securePortX3, final String publicUrl ) throws ConfigurationException;
 
     boolean setKurjunSettings( String[] globalKurjunUrls, long publicDiskQuota, long publicThreshold,
                                long publicTimeFrame, long trustDiskQuota, long trustThreshold, long trustTimeFrame )
             throws ConfigurationException;
 
     AdvancedSettings getAdvancedSettings();
+
+    void setKurjunSettingsUrls( String[] globalKurjunUrls ) throws ConfigurationException;
+
+    boolean setKurjunSettingsQuotas( long publicDiskQuota, long publicThreshold, long publicTimeFrame, long trustDiskQuota, long trustThreshold, long trustTimeFrame );
 }

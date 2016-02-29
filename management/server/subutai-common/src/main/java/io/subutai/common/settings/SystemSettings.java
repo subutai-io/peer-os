@@ -75,6 +75,19 @@ public class SystemSettings
             }
         }
     }
+
+
+    protected static void validatePublicUrl( String publicUrl ) throws ConfigurationException
+    {
+        try
+        {
+            new URL( publicUrl );
+        }
+        catch ( MalformedURLException e )
+        {
+            throw  new ConfigurationException( "Invalid URL: " + publicUrl );
+        }
+    }
     
     
     private static void loadGlobalKurjunUrls() throws ConfigurationException
@@ -91,12 +104,6 @@ public class SystemSettings
         validateGlobalKurjunUrls( globalKurjunUrls );
 
         GLOBAL_KURJUN_URLS = globalKurjunUrls;
-
-        //        String urls = String.valueOf( PROPERTIES.getProperty( "globalKurjunUrls" ) );
-        //        String replace = urls.replace( "[", "" );
-        //        String replace1 = replace.replace( "]", "" );
-        //
-        //        return new ArrayList<String>( Arrays.asList( replace1.split( "," ) ) );
     }
 
 
@@ -247,9 +254,10 @@ public class SystemSettings
     }
 
 
-    public static void setPublicUrl( String publicUrl )
+    public static void setPublicUrl( String publicUrl ) throws ConfigurationException
     {
-        saveProperty( "publicUrl", publicUrl );
+        validatePublicUrl( publicUrl );
+        saveProperty( "publicURL", publicUrl );
     }
 
 
