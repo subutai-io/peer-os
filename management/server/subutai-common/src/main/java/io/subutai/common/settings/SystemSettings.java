@@ -80,6 +80,19 @@ public class SystemSettings
         }
         return arr;
     }
+
+
+    protected static void validatePublicUrl( String publicUrl ) throws ConfigurationException
+    {
+        try
+        {
+            new URL( publicUrl );
+        }
+        catch ( MalformedURLException e )
+        {
+            throw  new ConfigurationException( "Invalid URL: " + publicUrl );
+        }
+    }
     
     
     private static void loadGlobalKurjunUrls() throws ConfigurationException
@@ -244,9 +257,10 @@ public class SystemSettings
     }
 
 
-    public static void setPublicUrl( String publicUrl )
+    public static void setPublicUrl( String publicUrl ) throws ConfigurationException
     {
-        saveProperty( "publicUrl", publicUrl );
+        validatePublicUrl( publicUrl );
+        saveProperty( "publicURL", publicUrl );
     }
 
 

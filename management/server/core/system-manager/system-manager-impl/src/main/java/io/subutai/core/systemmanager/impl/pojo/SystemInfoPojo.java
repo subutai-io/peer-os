@@ -11,6 +11,7 @@ public class SystemInfoPojo implements SystemInfo
     private String gitCommitUserName;
     private String gitCommitUserEmail;
     private String projectVersion;
+    private String rhVersion;
 
     private String gitBuildUserName;
     private String gitBuildUserEmail;
@@ -189,5 +190,17 @@ public class SystemInfoPojo implements SystemInfo
     public void setGitCommitUserEmail( final String gitCommitUserEmail )
     {
         this.gitCommitUserEmail = gitCommitUserEmail;
+    }
+
+
+    public String getRhVersion()
+    {
+        return rhVersion;
+    }
+
+
+    public void setRhVersion( final String rhVersion )
+    {
+        this.rhVersion = rhVersion;
     }
 }
