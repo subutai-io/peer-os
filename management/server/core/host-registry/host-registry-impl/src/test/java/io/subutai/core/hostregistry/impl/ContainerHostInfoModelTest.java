@@ -62,7 +62,6 @@ public class ContainerHostInfoModelTest
         assertEquals( ARCH, containerHostInfo.getArch() );
         assertEquals( Common.DEFAULT_CONTAINER_INTERFACE,
                 containerHostInfo.getHostInterfaces().getAll().iterator().next().getName() );
-        assertEquals( MAC, containerHostInfo.getHostInterfaces().getAll().iterator().next().getMac() );
         assertEquals( IP, containerHostInfo.getHostInterfaces().getAll().iterator().next().getIp() );
     }
 
