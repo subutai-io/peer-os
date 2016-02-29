@@ -40,8 +40,6 @@ func UpdateNetwork(iface, vlan string) {
 }
 
 func ConfigureOVS(iface string) {
-	// check: get port name from mac address
-	// log.Check(log.FatalLevel, "Deleting OVS port", exec.Command("ovs-vsctl", "--if-exists", "del-port", "br-int", iface).Run())
 	exec.Command("ovs-vsctl", "--if-exists", "del-port", "br-int", iface).Run()
 	exec.Command("ovs-vsctl", "--if-exists", "del-port", "br-mng", iface).Run()
 }

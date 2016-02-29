@@ -14,7 +14,6 @@ import (
 type Iface struct {
 	InterfaceName string `json:"interfaceName"`
 	Ip            string `json:"ip"`
-	Mac           string `json:"mac"`
 }
 
 func GetInterfaces() []Iface {
@@ -28,7 +27,6 @@ func GetInterfaces() []Iface {
 		}
 		inter := new(Iface)
 		inter.InterfaceName = ifac.Name
-		inter.Mac = ifac.HardwareAddr.String()
 
 		addrs, err := ifac.Addrs()
 		log.Check(log.WarnLevel, "Getting network addresses", err)
