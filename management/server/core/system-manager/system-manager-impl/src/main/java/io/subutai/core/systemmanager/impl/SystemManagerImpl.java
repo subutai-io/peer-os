@@ -109,7 +109,7 @@ public class SystemManagerImpl implements SystemManager
         Host host = peerManager.getLocalPeer().getManagementHost();
         result = peerManager.getLocalPeer().execute( requestBuilder, host );
 
-        result.getStdOut();
+        String[] version = result.getStdOut().split( "\\s" );
 
         SystemInfo pojo = new SystemInfoPojo();
 
@@ -121,6 +121,7 @@ public class SystemManagerImpl implements SystemManager
         pojo.setGitBuildUserEmail( SubutaiInfo.getBuilderUserEmail() );
         pojo.setGitBuildTime( SubutaiInfo.getBuildTime() );
         pojo.setProjectVersion( SubutaiInfo.getVersion() );
+        pojo.setRhVersion( version[2] );
 
         return pojo;
     }
