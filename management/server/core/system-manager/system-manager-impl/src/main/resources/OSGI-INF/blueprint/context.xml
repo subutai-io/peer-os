@@ -12,11 +12,14 @@
              interface="io.subutai.core.kurjun.api.TemplateManager" />
   <reference id="identityManager" availability="mandatory"
              interface="io.subutai.core.identity.api.IdentityManager" />
+  <reference id="peerManager" availability="mandatory"
+             interface="io.subutai.core.peer.api.PeerManager" />
 
   <bean id="systemManagerImpl" scope="singleton"
         class="io.subutai.core.systemmanager.impl.SystemManagerImpl">
     <property name="templateManager" ref="templateManager" />
     <property name="identityManager" ref="identityManager" />
+    <property name="peerManager" ref="peerManager" />
 
     <!--<argument value="${globalKurjunUrls}" />-->
     <!--<argument value="${securePortX1}" />-->

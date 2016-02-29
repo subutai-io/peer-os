@@ -85,4 +85,9 @@ public interface SystemInfo
 
 
     public void setGitCommitUserEmail( final String gitCommitUserEmail );
+
+    public String getRhVersion();
+
+
+    public void setRhVersion( final String rhVersion );
 }

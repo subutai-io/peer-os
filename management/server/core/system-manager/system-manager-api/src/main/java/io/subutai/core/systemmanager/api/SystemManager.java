@@ -3,6 +3,8 @@ package io.subutai.core.systemmanager.api;
 
 import org.apache.commons.configuration.ConfigurationException;
 
+import io.subutai.common.command.CommandException;
+import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.core.systemmanager.api.pojo.AdvancedSettings;
 import io.subutai.core.systemmanager.api.pojo.KurjunSettings;
 import io.subutai.core.systemmanager.api.pojo.NetworkSettings;
@@ -21,7 +23,7 @@ public interface SystemManager
 
     NetworkSettings getNetworkSettings() throws ConfigurationException;
 
-    SystemInfo getSystemInfo() throws ConfigurationException;
+    SystemInfo getSystemInfo() throws ConfigurationException, HostNotFoundException, CommandException;
 
     void setPeerSettings();
 
