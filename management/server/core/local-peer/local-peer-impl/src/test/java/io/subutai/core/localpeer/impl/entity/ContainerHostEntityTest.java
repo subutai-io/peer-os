@@ -94,7 +94,7 @@ public class ContainerHostEntityTest
         when( containerHostInfo.getState() ).thenReturn( CONTAINER_HOST_STATE );
         when( anHostInterface.getName() ).thenReturn( INTERFACE_NAME );
         when( anHostInterface.getIp() ).thenReturn( IP );
-        when( anHostInterface.getMac() ).thenReturn( MAC );
+//        when( anHostInterface.getMac() ).thenReturn( MAC );
         when( hostRegistry.getHostInfoById( anyString() ) ).thenReturn( containerHostInfo );
 
 //        containerHostEntity =
