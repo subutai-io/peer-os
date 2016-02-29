@@ -1,11 +1,12 @@
 package io.subutai.common.environment;
 
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import io.subutai.common.task.CloneResponse;
 
 
 public class CreateEnvironmentContainerGroupResponse

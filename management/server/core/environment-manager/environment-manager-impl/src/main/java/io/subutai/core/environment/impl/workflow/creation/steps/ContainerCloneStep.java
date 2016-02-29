@@ -18,7 +18,7 @@ import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.collect.Sets;
 
-import io.subutai.common.environment.CloneResponse;
+import io.subutai.common.task.CloneResponse;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupResponse;
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.Topology;

@@ -4,6 +4,8 @@ package io.subutai.common.environment;
 import java.util.HashSet;
 import java.util.Set;
 
+import io.subutai.common.task.CloneRequest;
+
 
 public class CreateEnvironmentContainerGroupRequest
 {

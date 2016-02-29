@@ -10,8 +10,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import io.subutai.common.environment.CloneRequest;
-import io.subutai.common.environment.CloneResponse;
+import io.subutai.common.task.CloneResponse;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupResponse;
 import io.subutai.common.host.ContainerHostInfoModel;
 

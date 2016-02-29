@@ -6,11 +6,10 @@ import org.slf4j.LoggerFactory;
 
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandResultParser;
-import io.subutai.common.environment.ImportTemplateRequest;
-import io.subutai.common.environment.ImportTemplateResponse;
+import io.subutai.common.task.ImportTemplateRequest;
+import io.subutai.common.task.ImportTemplateResponse;
 import io.subutai.common.task.Command;
 import io.subutai.common.task.CommandBatch;
-import io.subutai.common.util.StringUtil;
 
 
 public class ImportTask extends AbstractTask<ImportTemplateRequest, ImportTemplateResponse>
