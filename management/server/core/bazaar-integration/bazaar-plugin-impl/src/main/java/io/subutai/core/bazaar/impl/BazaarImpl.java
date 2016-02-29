@@ -60,10 +60,10 @@ public class BazaarImpl implements Bazaar
 
 
     @Override
-    public void installPlugin( String name, String version, String kar, String url ) throws HubPluginException
+    public void installPlugin( String name, String version, String kar, String url, String uid ) throws HubPluginException
     {
         this.integration.installPlugin( kar );
-        this.configDataService.savePlugin( name, version, kar, url );
+        this.configDataService.savePlugin( name, version, kar, url, uid );
     }
 
 

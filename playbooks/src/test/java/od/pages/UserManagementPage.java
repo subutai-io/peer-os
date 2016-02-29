@@ -50,5 +50,7 @@ public class UserManagementPage extends PageObject {
     @FindBy(xpath = "*//h1[contains(text(),\"User management\")]")
     public WebElementFacade headerUserManagement;
 
+    public String sikuliButtonSetPublicKey = "src/test/resources/imgs/buttons/buttonSetPublicKey.png";
+
     //endregion
 }

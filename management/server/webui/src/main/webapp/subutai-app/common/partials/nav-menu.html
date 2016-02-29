@@ -182,9 +182,13 @@
 				ng-class="subutaiController.activeState == 'settings-network' ? 'b-nav-menu-sub_active' : ''">
 					<a ui-sref="settings-network" id="subt-link__settings-network">Network Settings</a>
 				</li>
-				<!--<li class="b-nav-menu-sub b-nav-menu-sub_disabled">
-					<a ui-sref="updates" id="subt-link__updates">Updates</a>
-				</li>-->
+        <li class="b-nav-menu-sub b-nav-menu-sub_disabled"
+            ng-class="subutaiController.activeState == 'settings-advanced' ? 'b-nav-menu-sub_active' : ''">
+          <a ui-sref="settings-advanced" id="subt-link__settings-advanced">Advanced</a>
+        </li>
+        <!--<li class="b-nav-menu-sub b-nav-menu-sub_disabled">
+          <a ui-sref="updates" id="subt-link__updates">Updates</a>
+        </li>-->
 				<li class="b-nav-menu-sub b-nav-menu-sub_disabled" 
 				ng-class="subutaiController.activeState == 'about' ? 'b-nav-menu-sub_active' : ''">
 					<a ui-sref="about" id="subt-link__about">About</a>

@@ -12,8 +12,6 @@ import org.codehaus.jackson.annotate.JsonCreator;
 
 import com.google.common.base.Preconditions;
 
-import sun.misc.CharacterEncoder;
-
 
 /**
  * Date & time parameter class

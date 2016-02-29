@@ -76,7 +76,7 @@ function BazaarSrv($http) {
 		else {
 			kar = plugin.metadata[1];
 		}
-		var postData = "name=" + plugin.name + "&version=" + plugin.version + "&kar=" + kar + "&url=" + plugin.name.toLowerCase();
+		var postData = "name=" + plugin.name + "&version=" + plugin.version + "&kar=" + kar + "&url=" + plugin.name.toLowerCase() + "&uid=" + plugin.id;
 		console.log (postData);
 		return $http.post(
 			BAZAAR_URL + "install",

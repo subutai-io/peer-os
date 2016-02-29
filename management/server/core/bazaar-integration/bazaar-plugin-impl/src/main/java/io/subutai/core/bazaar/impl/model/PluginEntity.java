@@ -26,6 +26,9 @@ public class PluginEntity implements Plugin
 	@Column (name = "url")
 	private String url;
 
+	@Column (name = "uid")
+	private String uid;
+
 	public Long getId()
 	{
 		return id;
@@ -73,15 +76,23 @@ public class PluginEntity implements Plugin
 		this.version = version;
 	}
 
-	@Override
 	public String getUrl ()
 	{
 		return this.url;
 	}
 
-	@Override
 	public void setUrl (String url)
 	{
 		this.url = url;
+	}
+
+	public String getUid ()
+	{
+		return uid;
+	}
+
+	public void setUid (String uid)
+	{
+		this.uid = uid;
 	}
 }

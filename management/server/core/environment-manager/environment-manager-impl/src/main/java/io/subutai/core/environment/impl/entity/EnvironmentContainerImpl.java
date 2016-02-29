@@ -150,8 +150,10 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
                                      String resourceHostId )
     {
         Preconditions.checkNotNull( peer );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( localPeerId ) );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( nodeGroupName ) );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( domainName ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( resourceHostId ) );
         Preconditions.checkNotNull( hostInfo );
         Preconditions.checkNotNull( template );
         Preconditions.checkNotNull( containerSize );
@@ -183,8 +185,16 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
                                      int hostsGroupId, String domainName, ContainerSize containerSize )
     {
         Preconditions.checkNotNull( peer );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostId ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerName ) );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( nodeGroupName ) );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( domainName ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( localPeerId ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateArch ) );
+        Preconditions.checkNotNull( hostArchitecture );
+        Preconditions.checkNotNull( hostInterfaces );
         Preconditions.checkNotNull( containerSize );
 
         this.hostId = hostId;
@@ -488,28 +498,6 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
             hostInterface.setHost( this );
             this.hostInterfaces.add( hostInterface );
         }
-    }
-
-
-    @Override
-    public String getIpByInterfaceName( String interfaceName )
-    {
-        for ( HostInterface iface : hostInterfaces )
-        {
-            if ( iface.getName().equalsIgnoreCase( interfaceName ) )
-            {
-                return iface.getIp();
-            }
-        }
-
-        return null;
-    }
-
-
-    @Override
-    public String getMacByInterfaceName( final String interfaceName )
-    {
-        return getHostInterfaces().findByName( interfaceName ).getMac();
     }
 
 

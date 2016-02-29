@@ -26,7 +26,6 @@ public class HostInterfaceModelImplTest
     @Before
     public void setUp() throws Exception
     {
-        when( anHostInterface.getMac() ).thenReturn( "testMac" );
         when( anHostInterface.getName() ).thenReturn( "testInterfaceName" );
         when( anHostInterface.getIp() ).thenReturn( "testIp" );
 
@@ -39,7 +38,6 @@ public class HostInterfaceModelImplTest
     {
         assertNotNull( interfaceModel.getName() );
         assertNotNull( interfaceModel.getIp() );
-        assertNotNull( interfaceModel.getMac());
         interfaceModel.hashCode();
         interfaceModel.equals( "test" );
         interfaceModel.equals( interfaceModel );

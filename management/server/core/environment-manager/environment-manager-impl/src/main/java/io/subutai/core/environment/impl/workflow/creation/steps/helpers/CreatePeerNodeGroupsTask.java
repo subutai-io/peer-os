@@ -64,14 +64,14 @@ public class CreatePeerNodeGroupsTask implements Callable<Set<NodeGroupBuildResu
             ContainerSize containerSize = nodeGroup.getType();
             NodeGroupBuildException exception = null;
             Set<EnvironmentContainerImpl> containers = Sets.newHashSet();
+            final String hostname = String.format( "%s_%s", nodeGroup.getTemplateName(), UUID.randomUUID().toString() );
             try
             {
-                final CreateEnvironmentContainerGroupRequest request;
-                final String hostname =
-                        String.format( "%s_%s", nodeGroup.getTemplateName(), UUID.randomUUID().toString() );
-                request = new CreateEnvironmentContainerGroupRequest( hostname, environment.getId(), localPeer.getId(),
-                        localPeer.getOwnerId(), environment.getSubnetCidr(), ipAddressOffset + currentIpAddressOffset,
-                        nodeGroup.getTemplateName(), nodeGroup.getHostId(), nodeGroup.getType() );
+                final CreateEnvironmentContainerGroupRequest request =
+                        new CreateEnvironmentContainerGroupRequest( hostname, environment.getId(), localPeer.getId(),
+                                localPeer.getOwnerId(), environment.getSubnetCidr(),
+                                ipAddressOffset + currentIpAddressOffset, nodeGroup.getTemplateName(),
+                                nodeGroup.getHostId(), nodeGroup.getType() );
 
                 CreateEnvironmentContainerGroupResponse newHosts = peer.createEnvironmentContainerGroup( request );
 
@@ -91,8 +91,10 @@ public class CreatePeerNodeGroupsTask implements Callable<Set<NodeGroupBuildResu
             }
             catch ( Exception e )
             {
+                LOG.error( e.getMessage(), e );
                 exception = new NodeGroupBuildException(
-                        String.format( "Error creating node group %s on peer %s", nodeGroup, peer.getName() ),
+                        String.format( "Error creating node group %s on peer %s. Container host name: %s. %s",
+                                nodeGroup, peer.getName(), hostname, exceptionUtil.getRootCause( e ).getMessage() ),
                         exceptionUtil.getRootCause( e ) );
             }
             results.add( new NodeGroupBuildResult( containers, exception ) );

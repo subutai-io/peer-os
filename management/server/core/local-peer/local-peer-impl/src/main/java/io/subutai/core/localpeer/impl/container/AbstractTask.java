@@ -1,8 +1,11 @@
 package io.subutai.core.localpeer.impl.container;
 
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -26,13 +29,14 @@ public abstract class AbstractTask<T> implements Task<T>
     public static int DEFAULT_TIMEOUT = 30;
 
     protected static final Logger LOG = LoggerFactory.getLogger( AbstractTask.class );
-
+    private int id;
     protected T result;
     protected List<Throwable> exceptions = new ArrayList<>();
     private volatile Task.State state = Task.State.PENDING;
     protected CommandUtil commandUtil = new CommandUtil();
     protected CommandResult commandResult;
     protected long started;
+    protected long finished;
 
 
     protected RequestBuilder getRequestBuilder() throws Exception
@@ -43,9 +47,16 @@ public abstract class AbstractTask<T> implements Task<T>
     }
 
 
-    @Override
-    public void start()
+    public int getId()
     {
+        return id;
+    }
+
+
+    @Override
+    public void start( final int id )
+    {
+        this.id = id;
         this.started = System.currentTimeMillis();
         this.state = State.RUNNING;
         try
@@ -78,6 +89,7 @@ public abstract class AbstractTask<T> implements Task<T>
         {
             failure( e.getMessage(), e );
         }
+        this.finished = System.currentTimeMillis();
     }
 
 
@@ -207,4 +219,18 @@ public abstract class AbstractTask<T> implements Task<T>
 
     @Override
     public boolean isDone() {return this.state == State.SUCCESS || this.state == State.FAILURE;}
+
+
+    @Override
+    public long getElapsedTime()
+    {
+        if ( isDone() )
+        {
+            return this.finished - this.started;
+        }
+        else
+        {
+            return System.currentTimeMillis() - this.started;
+        }
+    }
 }

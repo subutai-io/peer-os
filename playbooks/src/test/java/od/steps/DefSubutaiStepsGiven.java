@@ -3,6 +3,7 @@ package od.steps;
 import net.thucydides.core.annotations.Steps;
 import od.steps.serenity.SubutaiSteps;
 import org.jbehave.core.annotations.Given;
+import org.sikuli.script.FindFailed;
 
 import java.io.FileNotFoundException;
 
@@ -28,8 +29,19 @@ public class DefSubutaiStepsGiven {
     }
 
     @Given("the user clicks on the button: Login")
-    public void clicks_button_login(){
+    public void clicks_button_login() throws FindFailed {
         subutaiSteps.clickOnButtonLogin();
+    }
+
+    @Given("the user configure pgp plugin")
+    public void configurePgpPlugin() throws FindFailed {
+        subutaiSteps.clickOnIconPgp();
+        subutaiSteps.clickOnButtonOptions();
+        subutaiSteps.clickOnButtonGenerate();
+        subutaiSteps.typeInFieldsPgp();
+        subutaiSteps.clickOnButtonSubmit();
+        subutaiSteps.clickOnButtonOk();
+        subutaiSteps.clickOnSubutaiSocialTab();
     }
 
 

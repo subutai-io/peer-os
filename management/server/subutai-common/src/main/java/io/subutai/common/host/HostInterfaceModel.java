@@ -18,9 +18,6 @@ public class HostInterfaceModel implements HostInterface
     @SerializedName( "ip" )
     @JsonProperty( "ip" )
     private String ip;
-    @SerializedName( "mac" )
-    @JsonProperty( "mac" )
-    private String mac;
 
 
     public HostInterfaceModel()
@@ -28,11 +25,10 @@ public class HostInterfaceModel implements HostInterface
     }
 
 
-    public HostInterfaceModel( final String name, final String ip, final String mac )
+    public HostInterfaceModel( final String name, final String ip )
     {
         this.name = name;
         this.ip = ip;
-        this.mac = mac;
     }
 
 
@@ -40,7 +36,6 @@ public class HostInterfaceModel implements HostInterface
     {
         this.name = hostInterface.getName();
         this.ip = hostInterface.getIp();
-        this.mac = hostInterface.getMac();
     }
 
 
@@ -59,15 +54,8 @@ public class HostInterfaceModel implements HostInterface
 
 
     @Override
-    public String getMac()
-    {
-        return mac;
-    }
-
-
-    @Override
     public String toString()
     {
-        return MoreObjects.toStringHelper( this ).add( "name", name ).add( "ip", ip ).add( "mac", mac ).toString();
+        return MoreObjects.toStringHelper( this ).add( "name", name ).add( "ip", ip ).toString();
     }
 }

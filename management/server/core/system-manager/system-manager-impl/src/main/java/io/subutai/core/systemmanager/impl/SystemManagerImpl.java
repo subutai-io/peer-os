@@ -1,13 +1,14 @@
 package io.subutai.core.systemmanager.impl;
 
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.configuration.ConfigurationException;
-
-import com.google.common.base.Preconditions;
 
 import io.subutai.common.settings.SubutaiInfo;
 import io.subutai.common.settings.SystemSettings;
@@ -16,10 +17,12 @@ import io.subutai.core.identity.api.model.User;
 import io.subutai.core.kurjun.api.KurjunTransferQuota;
 import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.systemmanager.api.SystemManager;
+import io.subutai.core.systemmanager.api.pojo.AdvancedSettings;
 import io.subutai.core.systemmanager.api.pojo.KurjunSettings;
 import io.subutai.core.systemmanager.api.pojo.NetworkSettings;
 import io.subutai.core.systemmanager.api.pojo.PeerSettings;
 import io.subutai.core.systemmanager.api.pojo.SystemInfo;
+import io.subutai.core.systemmanager.impl.pojo.AdvancedSettingsPojo;
 import io.subutai.core.systemmanager.impl.pojo.KurjunSettingsPojo;
 import io.subutai.core.systemmanager.impl.pojo.NetworkSettingsPojo;
 import io.subutai.core.systemmanager.impl.pojo.PeerSettingsPojo;
@@ -39,23 +42,23 @@ public class SystemManagerImpl implements SystemManager
 
 
     public SystemManagerImpl( /*final String globalKurjunUrls, final int securePortX1, final int securePortX2,
-                              final int securePortX3 */) throws ConfigurationException
+                              final int securePortX3 */ ) throws ConfigurationException
 
     {
-//        Preconditions.checkNotNull( globalKurjunUrls, "Invalid Global Kurjun URLs could not be null." );
-//
-//        String[] urls = new String[] { globalKurjunUrls };
-//
-//        if ( urls.length < 1 )
-//        {
-//            urls = new String[] { DEFAULT_KURJUN_REPO };
-//        }
-//        validateGlobalKurjunUrls( urls );
-//
-//        SystemSettings.setGlobalKurjunUrls( urls );
-//        SystemSettings.setSecurePortX1( securePortX1 );
-//        SystemSettings.setSecurePortX2( securePortX2 );
-//        SystemSettings.setSecurePortX3( securePortX3 );
+        //        Preconditions.checkNotNull( globalKurjunUrls, "Invalid Global Kurjun URLs could not be null." );
+        //
+        //        String[] urls = new String[] { globalKurjunUrls };
+        //
+        //        if ( urls.length < 1 )
+        //        {
+        //            urls = new String[] { DEFAULT_KURJUN_REPO };
+        //        }
+        //        validateGlobalKurjunUrls( urls );
+        //
+        //        SystemSettings.setGlobalKurjunUrls( urls );
+        //        SystemSettings.setSecurePortX1( securePortX1 );
+        //        SystemSettings.setSecurePortX2( securePortX2 );
+        //        SystemSettings.setSecurePortX3( securePortX3 );
     }
 
 
@@ -162,6 +165,27 @@ public class SystemManagerImpl implements SystemManager
         boolean isTrustQuotaSaved = templateManager.setTransferQuota( trustTransferQuota, "trust" );
 
         return isPublicQuotaSaved && isTrustQuotaSaved;
+    }
+
+
+    @Override
+    public AdvancedSettings getAdvancedSettings()
+    {
+        AdvancedSettings pojo = new AdvancedSettingsPojo();
+
+        String content = null;
+        try
+        {
+            content = new String( Files.readAllBytes(
+                    Paths.get( System.getenv( "SUBUTAI_APP_DATA_PATH" ) + "/data/log/karaf.log" ) ) );
+            pojo.setKarafLogs( content );
+        }
+        catch ( IOException e )
+        {
+            e.printStackTrace();
+        }
+
+        return pojo;
     }
 
 
