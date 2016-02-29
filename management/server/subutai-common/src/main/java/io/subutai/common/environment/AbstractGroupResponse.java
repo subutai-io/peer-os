@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.google.gson.annotations.Expose;
+
 import io.subutai.common.task.ImportTemplateResponse;
 import io.subutai.common.task.Task;
 import io.subutai.common.task.TaskRequest;
@@ -21,6 +23,7 @@ public class AbstractGroupResponse<R extends TaskRequest, T extends TaskResponse
 {
     private final String peerId;
     private List<T> responses = new ArrayList<>();
+    @Expose( deserialize = false, serialize = false )
     private List<Task<R, T>> tasks = new ArrayList<>();
     private AtomicInteger counter = new AtomicInteger( 0 );
     private boolean succeeded = true;
