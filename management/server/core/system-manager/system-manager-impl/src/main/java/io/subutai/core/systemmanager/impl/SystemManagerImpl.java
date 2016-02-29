@@ -34,8 +34,8 @@ import io.subutai.core.systemmanager.impl.pojo.SystemInfoPojo;
  */
 public class SystemManagerImpl implements SystemManager
 {
-    public static final String DEFAULT_KURJUN_REPO =
-            "http://repo.critical-factor.com:8080/rest/kurjun/templates/public";
+//    public static final String DEFAULT_KURJUN_REPO =
+//            "http://repo.critical-factor.com:8080/rest/kurjun";
 
     private TemplateManager templateManager;
     private IdentityManager identityManager;
