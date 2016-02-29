@@ -34,6 +34,9 @@ type Heartbeat struct {
 }
 
 func initAgent() {
+	// move .gnupg dir to app home
+	os.Setenv("GNUPGHOME", config.Agent.DataPrefix+".gnupg")
+
 	if cont.State("management") == "STOPPED" {
 		cont.Start("management")
 	}

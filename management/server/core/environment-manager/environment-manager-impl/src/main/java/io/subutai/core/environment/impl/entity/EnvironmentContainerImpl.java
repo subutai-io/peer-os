@@ -483,28 +483,6 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
 
     @Override
-    public String getIpByInterfaceName( String interfaceName )
-    {
-        for ( HostInterface iface : hostInterfaces )
-        {
-            if ( iface.getName().equalsIgnoreCase( interfaceName ) )
-            {
-                return iface.getIp();
-            }
-        }
-
-        return null;
-    }
-
-
-    @Override
-    public String getMacByInterfaceName( final String interfaceName )
-    {
-        return getHostInterfaces().findByName( interfaceName ).getMac();
-    }
-
-
-    @Override
     public HostInterface getInterfaceByName( final String interfaceName )
     {
         return getHostInterfaces().findByName( interfaceName );

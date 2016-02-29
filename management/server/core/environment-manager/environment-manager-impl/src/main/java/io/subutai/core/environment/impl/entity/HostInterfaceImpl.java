@@ -17,9 +17,9 @@ import io.subutai.common.host.HostInterface;
 
 
 /**
- * {@link HostInterfaceImpl} stores host network interface information. <p> {@link #interfaceName} - host interface name</p>
- * <p> {@link #ip} - ip address</p> <p> {@link #mac} - mac address</p> <p> {@link #host} - target host whose metadata
- * being saved</p>
+ * {@link HostInterfaceImpl} stores host network interface information. <p> {@link #interfaceName} - host interface
+ * name</p> <p> {@link #ip} - ip address</p> <p> {@link #mac} - mac address</p> <p> {@link #host} - target host whose
+ * metadata being saved</p>
  *
  * @see HostInterface
  * @see EnvironmentContainerImpl
@@ -37,8 +37,6 @@ public class HostInterfaceImpl implements HostInterface, Serializable
     private String interfaceName;
     @Column( name = "ip", nullable = false )
     private String ip;
-    @Column( name = "mac", nullable = false )
-    private String mac;
 
     @ManyToOne
     @JoinColumn( name = "host_id" )
@@ -54,7 +52,6 @@ public class HostInterfaceImpl implements HostInterface, Serializable
     {
         this.interfaceName = s.getName();
         this.ip = s.getIp().replace( "addr:", "" );
-        this.mac = s.getMac();
     }
 
 
@@ -81,13 +78,6 @@ public class HostInterfaceImpl implements HostInterface, Serializable
     public String getIp()
     {
         return ip;
-    }
-
-
-    @Override
-    public String getMac()
-    {
-        return mac;
     }
 
 

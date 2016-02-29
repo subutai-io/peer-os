@@ -38,19 +38,5 @@ public interface Host extends HostInfo, Serializable
     public boolean isConnected();
 
 
-    /**
-     * @deprecated use {@link #getInterfaceByName(String)} (String interfaceName)} instead.
-     */
-    @Deprecated
-    public String getIpByInterfaceName( String interfaceName );
-
-    /**
-     * @deprecated use {@link #getInterfaceByName(String)} (String interfaceName)} instead.
-     */
-    @Deprecated
-    public String getMacByInterfaceName( String interfaceName );
-
     HostInterface getInterfaceByName( String interfaceName );
-
-//    HostMetric getHostMetric();
 }
