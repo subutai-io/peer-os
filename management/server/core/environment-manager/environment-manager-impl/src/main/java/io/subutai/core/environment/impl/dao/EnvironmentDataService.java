@@ -24,11 +24,13 @@ public class EnvironmentDataService implements DataService<String, EnvironmentIm
 {
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentDataService.class );
     private DaoManager daoManager;
+    EntityManager em;
 
 
     public EnvironmentDataService( DaoManager daoManager )
     {
         this.daoManager = daoManager;
+        this.em = daoManager.getEntityManagerFromFactory();
     }
 
 
@@ -41,7 +43,7 @@ public class EnvironmentDataService implements DataService<String, EnvironmentIm
     public EnvironmentImpl find( final String id )
     {
         EnvironmentImpl result = null;
-        EntityManager em = daoManager.getEntityManagerFromFactory();
+        //        EntityManager em = daoManager.getEntityManagerFromFactory();
         try
         {
             result = em.find( EnvironmentImpl.class, id );
@@ -52,7 +54,7 @@ public class EnvironmentDataService implements DataService<String, EnvironmentIm
         }
         finally
         {
-            daoManager.closeEntityManager( em );
+            //            daoManager.closeEntityManager( em );
         }
         return result;
     }
@@ -67,7 +69,7 @@ public class EnvironmentDataService implements DataService<String, EnvironmentIm
     public Collection<EnvironmentImpl> getAll()
     {
         Collection<EnvironmentImpl> result = Lists.newArrayList();
-        EntityManager em = daoManager.getEntityManagerFromFactory();
+        //        EntityManager em = daoManager.getEntityManagerFromFactory();
         try
         {
             result = em.createQuery( "select e from EnvironmentImpl e left join fetch e.containers" ).getResultList();
@@ -78,7 +80,7 @@ public class EnvironmentDataService implements DataService<String, EnvironmentIm
         }
         finally
         {
-            daoManager.closeEntityManager( em );
+            //            daoManager.closeEntityManager( em );
         }
         return result;
     }
@@ -93,7 +95,7 @@ public class EnvironmentDataService implements DataService<String, EnvironmentIm
     @Override
     public void persist( final EnvironmentImpl item )
     {
-        EntityManager em = daoManager.getEntityManagerFromFactory();
+        //        EntityManager em = daoManager.getEntityManagerFromFactory();
         try
         {
             daoManager.startTransaction( em );
@@ -108,7 +110,7 @@ public class EnvironmentDataService implements DataService<String, EnvironmentIm
         }
         finally
         {
-            daoManager.closeEntityManager( em );
+            //            daoManager.closeEntityManager( em );
         }
     }
 
@@ -121,7 +123,7 @@ public class EnvironmentDataService implements DataService<String, EnvironmentIm
     @Override
     public void remove( final String id )
     {
-        EntityManager em = daoManager.getEntityManagerFromFactory();
+        //        EntityManager em = daoManager.getEntityManagerFromFactory();
         try
         {
             EnvironmentImpl item = em.find( EnvironmentImpl.class, id );
@@ -137,14 +139,14 @@ public class EnvironmentDataService implements DataService<String, EnvironmentIm
         }
         finally
         {
-            daoManager.closeEntityManager( em );
+            //            daoManager.closeEntityManager( em );
         }
     }
 
 
     public void remove( EnvironmentImpl item )
     {
-        EntityManager em = daoManager.getEntityManagerFromFactory();
+        //        EntityManager em = daoManager.getEntityManagerFromFactory();
 
         try
         {
@@ -160,7 +162,7 @@ public class EnvironmentDataService implements DataService<String, EnvironmentIm
         }
         finally
         {
-            daoManager.closeEntityManager( em );
+            //            daoManager.closeEntityManager( em );
         }
     }
 
@@ -187,14 +189,14 @@ public class EnvironmentDataService implements DataService<String, EnvironmentIm
         }
         finally
         {
-            daoManager.closeEntityManager( em );
+            //            daoManager.closeEntityManager( em );
         }
     }
 
 
     public synchronized EnvironmentImpl saveOrUpdate( Environment item )
     {
-        EntityManager em = daoManager.getEntityManagerFromFactory();
+
         try
         {
             daoManager.startTransaction( em );
@@ -216,7 +218,7 @@ public class EnvironmentDataService implements DataService<String, EnvironmentIm
         }
         finally
         {
-            daoManager.closeEntityManager( em );
+            //            daoManager.closeEntityManager( em );
         }
 
         return ( EnvironmentImpl ) item;

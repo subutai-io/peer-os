@@ -173,7 +173,7 @@ public abstract class AbstractTask<R extends TaskRequest, T extends TaskResponse
     {
         response = getResponseBuilder().build( request, commandResult, getElapsedTime() );
 
-        if ( commandResult.hasSucceeded() )
+        if ( response != null && response.hasSucceeded() )
         {
             if ( onSuccessHandler != null )
             {
