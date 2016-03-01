@@ -33,5 +33,9 @@ public interface RelationManager
 
     List<Relation> getRelationsByObject( RelationLink objectRelationLink );
 
+    List<Relation> getRelationsBySource( final RelationLink sourceRelationLink );
+
+    List<Relation> getRelationsByTarget( final RelationLink targetRelationLink );
+
     void removeRelation( long relationId );
 }

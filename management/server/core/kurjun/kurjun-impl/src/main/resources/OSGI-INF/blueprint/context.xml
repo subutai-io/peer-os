@@ -24,6 +24,9 @@
   <reference id="identityManager" availability="mandatory"
              interface="io.subutai.core.identity.api.IdentityManager" />
   
+  <reference id="relationManager" availability="mandatory"
+             interface="io.subutai.core.object.relation.api.RelationManager" />
+  
   <reference id="securityManager" availability="mandatory"
              interface="io.subutai.core.security.api.SecurityManager" />
 
@@ -32,6 +35,7 @@
           class="io.subutai.core.kurjun.impl.TemplateManagerImpl">
     <argument ref="locaPeer" />
     <argument ref="identityManager" />
+    <argument ref="relationManager" />
     <argument ref="securityManager" />
     <argument value="${globalKurjunUrls}" />
   </bean>
