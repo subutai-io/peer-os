@@ -87,7 +87,7 @@ public class PeerManagerImpl implements PeerManager
     final static int CONTROL_NETWORK_TTL_IN_MIN = 10;
 
     private static final Logger LOG = LoggerFactory.getLogger( PeerManagerImpl.class );
-    private static final String KURJUN_URL_PATTERN = "https://%s:%s/rest/kurjun/templates/public";
+    private static final String KURJUN_URL_PATTERN = "https://%s:%s/rest/kurjun";
     final int MAX_CONTAINER_LIMIT = 20;
     final int MAX_ENVIRONMENT_LIMIT = 20;
 

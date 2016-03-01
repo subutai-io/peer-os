@@ -67,8 +67,8 @@ import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.core.kurjun.api.KurjunTransferQuota;
 import io.subutai.core.kurjun.api.vapt.AptManager;
-import io.subutai.core.kurjun.impl.RepoUrl;
-import io.subutai.core.kurjun.impl.RepoUrlStore;
+import io.subutai.core.kurjun.impl.model.RepoUrl;
+import io.subutai.core.kurjun.impl.store.RepoUrlStore;
 import io.subutai.core.kurjun.impl.TrustedWebClientFactoryModule;
 
 
@@ -254,7 +254,7 @@ public class AptManagerImpl implements AptManager
         catch ( IOException | URISyntaxException ex )
         {
             LOGGER.error( "Failed to upload", ex );
-            throw new IllegalArgumentException( "Failed to upload", ex );
+            throw new IllegalArgumentException( ex.getMessage(), ex );
         }
     }
 
@@ -554,8 +554,7 @@ public class AptManagerImpl implements AptManager
             List<RepoUrl> list = new ArrayList<>();
             for ( String url : SystemSettings.getGlobalKurjunUrls() )
             {
-                // TODO: refactor url
-                String aptUrl = url.replace( "templates/public", "vapt" );
+                String aptUrl = url + "/vapt";
                 list.add( new RepoUrl( new URL( aptUrl ), null ) );
             }
             return list;
