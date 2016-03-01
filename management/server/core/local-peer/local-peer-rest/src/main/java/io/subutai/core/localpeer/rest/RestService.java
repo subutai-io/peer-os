@@ -151,6 +151,12 @@ public interface RestService
     @Produces( MediaType.APPLICATION_JSON )
     void removeP2PConnection( @PathParam( "environmentId" ) EnvironmentId environmentId );
 
+    @DELETE
+    @Path( "cleanup/{environmentId}" )
+    @Consumes( MediaType.APPLICATION_JSON )
+    @Produces( MediaType.APPLICATION_JSON )
+    void cleanupEnvironment( @PathParam( "environmentId" ) EnvironmentId environmentId );
+
     @POST
     @Path( "alert" )
     @Consumes( MediaType.APPLICATION_JSON )

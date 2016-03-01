@@ -209,6 +209,13 @@ public abstract class AbstractTask<R extends TaskRequest, T extends TaskResponse
     }
 
 
+    @Override
+    public long getFinished()
+    {
+        return finished;
+    }
+
+
     public void onSuccess( TaskCallbackHandler<R, T> handler )
     {
         this.onSuccessHandler = handler;

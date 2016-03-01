@@ -6,13 +6,12 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 
 
-public class RemoveKeysStep
+public class CleanupEnvironmentStep
 {
-
     private final EnvironmentImpl environment;
 
 
-    public RemoveKeysStep( final EnvironmentImpl environment )
+    public CleanupEnvironmentStep( final EnvironmentImpl environment )
     {
         this.environment = environment;
     }
@@ -20,9 +19,9 @@ public class RemoveKeysStep
 
     public void execute() throws PeerException
     {
-        for ( final Peer peer : environment.getPeers() )
+        for ( Peer peer : environment.getPeers() )
         {
-            peer.removePeerEnvironmentKeyPair( environment.getEnvironmentId() );
+            peer.cleanupEnvironment( environment.getEnvironmentId() );
         }
     }
 }

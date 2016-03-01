@@ -878,6 +878,13 @@ public class RemotePeerImpl implements RemotePeer
         new PeerWebClient( peerInfo, provider ).removeP2PConnection( environmentId );
     }
 
+    @Override
+    public void cleanupEnvironment( final EnvironmentId environmentId ) throws PeerException
+    {
+        Preconditions.checkNotNull( environmentId, "Invalid environment ID" );
+        new PeerWebClient( peerInfo, provider ).cleanupEnvironment( environmentId );
+    }
+
 
     @Override
     public HostId getResourceHostIdByContainerId( final ContainerId containerId ) throws PeerException

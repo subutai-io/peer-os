@@ -386,9 +386,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     @RolesAllowed( "Environment-Management|Write" )
     @Override
-    public PrepareTemplatesResponseCollector prepareTemplates( final PrepareTemplatesRequest request ) throws PeerException
+    public PrepareTemplatesResponseCollector prepareTemplates( final PrepareTemplatesRequest request )
+            throws PeerException
     {
-        final PrepareTemplatesResponseCollector prepareTemplatesResponse = new PrepareTemplatesResponseCollector( getId() );
+        final PrepareTemplatesResponseCollector prepareTemplatesResponse =
+                new PrepareTemplatesResponseCollector( getId() );
         for ( String resourceHostId : request.getTemplates().keySet() )
         {
             for ( String templateName : request.getTemplates().get( resourceHostId ) )
@@ -410,7 +412,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         Preconditions.checkNotNull( requestGroup );
 
-        final CreateEnvironmentContainerResponseCollector response = new CreateEnvironmentContainerResponseCollector( getId() );
+        final CreateEnvironmentContainerResponseCollector response =
+                new CreateEnvironmentContainerResponseCollector( getId() );
         final TaskCallbackHandler<CloneRequest, CloneResponse> successResultHandler =
                 getCloneSuccessHandler( this, response );
 
@@ -445,7 +448,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     private TaskCallbackHandler<CloneRequest, CloneResponse> getCloneSuccessHandler( final LocalPeer localPeer,
-                                                                                     final CreateEnvironmentContainerResponseCollector responseGroup )
+                                                                                     final
+                                                                                     CreateEnvironmentContainerResponseCollector responseGroup )
     {
         return new TaskCallbackHandler<CloneRequest, CloneResponse>()
         {
@@ -479,7 +483,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                                     request.getContainerSize(), ContainerHostState.CLONING );
 
                     registerContainer( request.getResourceHostId(), containerHostEntity );
-
                 }
                 catch ( PeerException e )
                 {
@@ -1957,34 +1960,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    private void cleanup( final EnvironmentId environmentId ) throws PeerException
-    {
-        Vni vni = getReservedVnis().findVniByEnvironmentId( environmentId.getId() );
-        if ( vni == null )
-        {
-            return;
-        }
-        for ( ResourceHost resourceHost : getResourceHosts() )
-        {
-            try
-            {
-                resourceHost.cleanup( environmentId, vni.getVlan() );
-            }
-            catch ( ResourceHostException e )
-            {
-                throw new PeerException( e.getMessage() );
-            }
-        }
-    }
-
-
     @RolesAllowed( "Environment-Management|Delete" )
     @Override
     public void removeP2PConnection( final EnvironmentId environmentId ) throws PeerException
     {
         Preconditions.checkNotNull( environmentId );
-
-        cleanup( environmentId );
 
         Collection<TunnelEntity> tunnels = tunnelDataService.findByEnvironmentId( environmentId );
 
@@ -2011,6 +1991,34 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             catch ( Exception e )
             {
                 LOG.warn( e.getMessage(), e );
+            }
+        }
+    }
+
+
+    @RolesAllowed( "Environment-Management|Delete" )
+    @Override
+    public void cleanupEnvironment( final EnvironmentId environmentId ) throws PeerException
+    {
+        Preconditions.checkNotNull( environmentId );
+
+        Vni vni = getReservedVnis().findVniByEnvironmentId( environmentId.getId() );
+        if ( vni == null )
+        {
+            LOG.warn(
+                    "Environment VNI not found to cleanup resources hosts. Environment ID: " + environmentId.getId() );
+            return;
+        }
+
+        for ( ResourceHost resourceHost : getResourceHosts() )
+        {
+            try
+            {
+                resourceHost.cleanup( environmentId, vni.getVlan() );
+            }
+            catch ( ResourceHostException e )
+            {
+                throw new PeerException( e.getMessage() );
             }
         }
     }

@@ -289,6 +289,8 @@ public interface Peer
 
     void removeP2PConnection( EnvironmentId environmentId ) throws PeerException;
 
+    void cleanupEnvironment( final EnvironmentId environmentId ) throws PeerException;
+
     void removePeerEnvironmentKeyPair( EnvironmentId environmentId ) throws PeerException;
 
     ResourceHostMetrics getResourceHostMetrics() throws PeerException;
