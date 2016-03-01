@@ -9,6 +9,7 @@ import java.util.concurrent.Executors;
 
 import javax.ws.rs.core.Response;
 
+import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,32 +74,9 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            String decryptedHeartbeat = heartbeat;
+            String decryptedHeartbeat = decrypt( heartbeat );
 
-            if ( SystemSettings.getEncryptionState() )
-            {
-
-                EncryptionTool encryptionTool = securityManager.getEncryptionTool();
-
-                EncryptedResponseWrapper responseWrapper =
-                        JsonUtil.fromJson( heartbeat, EncryptedResponseWrapper.class );
-
-                ContentAndSignatures contentAndSignatures =
-                        encryptionTool.decryptAndReturnSignatures( responseWrapper.getResponse().getBytes() );
-
-                PGPPublicKey hostKeyForVerifying =
-                        securityManager.getKeyManager().getPublicKey( responseWrapper.getHostId() );
-
-                if ( encryptionTool.verifySignature( contentAndSignatures, hostKeyForVerifying ) )
-                {
-                    decryptedHeartbeat = new String( contentAndSignatures.getDecryptedContent() );
-                }
-                else
-                {
-                    throw new IllegalArgumentException( String.format( "Verification failed%nDecrypted Message: %s",
-                            new String( contentAndSignatures.getDecryptedContent() ) ) );
-                }
-            }
+            LOG.info( String.format( "DECRYPTING:%n%s", decryptedHeartbeat ) );
 
             final HeartBeat heartBeat = JsonUtil.fromJson( decryptedHeartbeat, HeartBeat.class );
 
@@ -128,5 +106,37 @@ public class RestServiceImpl implements RestService
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
                     entity( e.getMessage() ).build();
         }
+    }
+
+
+    //todo move this method to SecurityManager
+    protected String decrypt( String message ) throws PGPException
+    {
+
+        if ( SystemSettings.getEncryptionState() )
+        {
+
+            EncryptionTool encryptionTool = securityManager.getEncryptionTool();
+
+            EncryptedResponseWrapper responseWrapper = JsonUtil.fromJson( message, EncryptedResponseWrapper.class );
+
+            ContentAndSignatures contentAndSignatures =
+                    encryptionTool.decryptAndReturnSignatures( responseWrapper.getResponse().getBytes() );
+
+            PGPPublicKey hostKeyForVerifying =
+                    securityManager.getKeyManager().getPublicKey( responseWrapper.getHostId() );
+
+            if ( encryptionTool.verifySignature( contentAndSignatures, hostKeyForVerifying ) )
+            {
+                message = new String( contentAndSignatures.getDecryptedContent() );
+            }
+            else
+            {
+                throw new IllegalArgumentException( String.format( "Verification failed%nDecrypted Message: %s",
+                        new String( contentAndSignatures.getDecryptedContent() ) ) );
+            }
+        }
+
+        return message;
     }
 }
