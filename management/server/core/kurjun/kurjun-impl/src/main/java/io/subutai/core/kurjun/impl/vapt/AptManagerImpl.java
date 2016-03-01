@@ -254,7 +254,7 @@ public class AptManagerImpl implements AptManager
         catch ( IOException | URISyntaxException ex )
         {
             LOGGER.error( "Failed to upload", ex );
-            throw new IllegalArgumentException( "Failed to upload", ex );
+            throw new IllegalArgumentException( ex.getMessage(), ex );
         }
     }
 
