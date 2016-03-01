@@ -6,8 +6,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -18,7 +16,6 @@ import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.FileUtils;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 
@@ -26,6 +23,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import ai.subut.kurjun.metadata.common.subutai.DefaultTemplate;
+import ai.subut.kurjun.metadata.common.subutai.TemplateId;
+import ai.subut.kurjun.metadata.common.utils.IdValidators;
 import ai.subut.kurjun.model.metadata.Architecture;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.core.kurjun.api.TemplateManager;
@@ -51,49 +50,65 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
     @Override
     public Response getRepositories()
     {
-        Set<String> list = templateManager.getContexts();
+        Set<String> list = templateManager.getRepositories();
         return Response.ok( GSON.toJson( list ) ).build();
     }
-    
-    
+
+
     @Override
     public Response checkUploadAllowed( String repository )
     {
-        return Response.ok( templateManager.isUploadAllowed( repository ) ).build();
+        try
+        {
+            return Response.ok( templateManager.isUploadAllowed( repository ) ).build();
+        }
+        catch ( IllegalArgumentException ex )
+        {
+            return badRequest( ex.getMessage() );
+        }
     }
 
 
     @Override
-    public Response getTemplate( String repository, String md5, String name, String version,
+    public Response getTemplate( String repository, String id, String name, String version,
             String type, boolean isKurjunClient )
     {
         try
         {
-            byte[] md5bytes = decodeMd5( md5 );
-            if ( md5bytes != null )
+            if ( id != null )
             {
-                TemplateKurjun template = templateManager.getTemplate( repository, md5bytes, isKurjunClient );
-                if ( template != null )
+                TemplateId tid = IdValidators.Template.validate( id );
+                byte[] md5bytes = decodeMd5( tid.getMd5() );
+                if ( md5bytes != null )
                 {
-                    InputStream is = templateManager.getTemplateData( repository, md5bytes, isKurjunClient );
-                    if ( is != null )
+                    TemplateKurjun template = templateManager.getTemplate( repository, md5bytes, tid.getOwnerFprint(), isKurjunClient );
+                    if ( template != null )
                     {
-                        return Response.ok( is )
-                                .header( "Content-Disposition", "attachment; filename=" + makeFilename( template ) )
-                                .header( "Content-Type", "application/octet-stream" )
-                                .build();
+                        InputStream is = templateManager.getTemplateData( repository, md5bytes, tid.getOwnerFprint(), isKurjunClient );
+                        if ( is != null )
+                        {
+                            return Response.ok( is )
+                                    .header( "Content-Disposition", "attachment; filename=" + makeFilename( template ) )
+                                    .header( "Content-Type", "application/octet-stream" )
+                                    .build();
+                        }
                     }
                 }
             }
-            else
+            else if ( RestTemplateManager.RESPONSE_TYPE_ID.equals( type ) )
             {
                 TemplateKurjun template = templateManager.getTemplate( repository, name, version, isKurjunClient );
 
-                if ( template != null && RestTemplateManager.RESPONSE_TYPE_MD5.equals( type ) )
+                if ( template != null )
                 {
-                    return Response.ok( template.getMd5Sum() ).build();
+                    return Response.ok( template.getId() ).build();
                 }
             }
+        }
+        catch ( IllegalArgumentException ex )
+        {
+            LOGGER.error( "", ex );
+            return badRequest( ex.getMessage() );
         }
         catch ( IOException ex )
         {
@@ -106,17 +121,21 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
 
 
     @Override
-    public Response getTemplateInfo( String repository, String md5, String name, String version, boolean isKurjunClient )
+    public Response getTemplateInfo( String repository, String id, String name, String version, boolean isKurjunClient )
     {
         try
         {
-            byte[] md5bytes = decodeMd5( md5 );
-            if ( md5bytes != null )
+            if ( id != null )
             {
-                TemplateKurjun template = templateManager.getTemplate( repository, md5bytes, isKurjunClient );
-                if ( template != null )
+                TemplateId tid = IdValidators.Template.validate( id );
+                byte[] md5bytes = decodeMd5( tid.getMd5() );
+                if ( md5bytes != null )
                 {
-                    return Response.ok( GSON.toJson( convertToDefaultTemplate( template ) ) ).build();
+                    TemplateKurjun template = templateManager.getTemplate( repository, md5bytes, tid.getOwnerFprint(), isKurjunClient );
+                    if ( template != null )
+                    {
+                        return Response.ok( GSON.toJson( convertToDefaultTemplate( template ) ) ).build();
+                    }
                 }
             }
 
@@ -126,6 +145,11 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
             {
                 return Response.ok( GSON.toJson( convertToDefaultTemplate( template ) ) ).build();
             }
+        }
+        catch ( IllegalArgumentException ex )
+        {
+            LOGGER.error( "", ex );
+            return badRequest( ex.getMessage() );
         }
         catch ( IOException ex )
         {
@@ -149,6 +173,11 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
                 return Response.ok( GSON.toJson( deflist ) ).build();
             }
         }
+        catch ( IllegalArgumentException ex )
+        {
+            LOGGER.error( "", ex );
+            return badRequest( ex.getMessage() );
+        }
         catch ( IOException ex )
         {
             String msg = "Failed to get template list info";
@@ -157,8 +186,37 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
         }
         return Response.ok( "No templates" ).build();
     }
+    
+    
+    @Override
+    public Response getSharedTemplateInfos( String id )
+    {
+        try
+        {
+            TemplateId tid = IdValidators.Template.validate( id );
+            byte[] md5bytes = decodeMd5( tid.getMd5() );
+            if ( md5bytes != null )
+            {
+                List<Map<String, Object>> list = templateManager.getSharedTemplateInfos( md5bytes, tid.getOwnerFprint() );
+                return Response.ok( GSON.toJson( list ) ).build();
+            }
+        }
+        catch ( IllegalArgumentException ex )
+        {
+            LOGGER.error( "", ex );
+            return badRequest( ex.getMessage() );
+        }
+        catch ( IOException ex )
+        {
+            String msg = "Failed to get shared info";
+            LOGGER.error( msg, ex );
+            return Response.serverError().entity( msg ).build();
+        }
+        return packageNotFoundResponse();
+    }
+    
+    
 
-   
     @Override
     public Response getTemplateListSimple( String repository )
     {
@@ -169,6 +227,11 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
             {
                 return Response.ok( GSON.toJson( simpleList ) ).build();
             }
+        }
+        catch ( IllegalArgumentException ex )
+        {
+            LOGGER.error( "", ex );
+            return badRequest( ex.getMessage() );
         }
         catch ( IOException ex )
         {
@@ -191,16 +254,21 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
 
             try ( InputStream is = new FileInputStream( temp ) )
             {
-                byte[] md5 = templateManager.upload( repository, is );
-                if ( md5 != null )
+                String tid = templateManager.upload( repository, is );
+                if ( tid != null )
                 {
-                    return Response.ok( Hex.encodeHexString( md5 ) ).build();
+                    return Response.ok( tid ).build();
                 }
                 else
                 {
                     return Response.serverError().entity( "Failed to put template" ).build();
                 }
             }
+        }
+        catch ( IllegalArgumentException ex )
+        {
+            LOGGER.error( "", ex );
+            return badRequest( ex.getMessage() );
         }
         catch ( IOException ex )
         {
@@ -216,28 +284,71 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
 
 
     @Override
-    public Response deleteTemplate( String repository, String md5 )
+    public Response deleteTemplate( String repository, String id )
     {
-        byte[] md5bytes = decodeMd5( md5 );
-        if ( md5bytes != null )
+        try
         {
-            String err = "Failed to delete template";
-            try
+            TemplateId tid = IdValidators.Template.validate( id );
+            byte[] md5bytes = decodeMd5( tid.getMd5() );
+            if ( md5bytes != null )
             {
-                boolean deleted = templateManager.delete( repository, md5bytes );
-                if ( deleted )
+                String err = "Failed to delete template";
+                try
                 {
-                    return Response.ok( "Template deleted" ).build();
+                    boolean deleted = templateManager.delete( repository, tid.getOwnerFprint(), md5bytes );
+                    if ( deleted )
+                    {
+                        return Response.ok( "Template deleted" ).build();
+                    }
+                    return Response.serverError().entity( err ).build();
                 }
-                return Response.serverError().entity( err ).build();
+                catch ( IOException ex )
+                {
+                    LOGGER.error( err, ex );
+                    return Response.serverError().entity( err ).build();
+                }
             }
-            catch ( IOException ex )
-            {
-                LOGGER.error( err, ex );
-                return Response.serverError().entity( err ).build();
-            }
+            return badRequest( "Invalid md5 checksum" );
         }
-        return badRequest( "Invalid md5 checksum" );
+        catch ( IllegalArgumentException ex )
+        {
+            LOGGER.error( "", ex );
+            return badRequest( ex.getMessage() );
+        }
+    }
+
+
+    @Override
+    public Response shareTemplate( String targetUserName, String id )
+    {
+        try
+        {
+            TemplateId tid = IdValidators.Template.validate( id );
+            templateManager.shareTemplate( tid.get(), targetUserName );
+            return Response.ok( "Template shared" ).build();
+        }
+        catch ( IllegalArgumentException ex )
+        {
+            LOGGER.error( "", ex );
+            return badRequest( ex.getMessage() );
+        }
+    }
+
+
+    @Override
+    public Response unshareTemplate( String targetUserName, String id )
+    {
+        try
+        {
+            TemplateId tid = IdValidators.Template.validate( id );
+            templateManager.unshareTemplate( tid.get(), targetUserName );
+            return Response.ok( "Template unshared" ).build();
+        }
+        catch ( IllegalArgumentException ex )
+        {
+            LOGGER.error( "", ex );
+            return badRequest( ex.getMessage() );
+        }
     }
 
 
@@ -250,6 +361,7 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
     private DefaultTemplate convertToDefaultTemplate( TemplateKurjun template, boolean includeFileContents )
     {
         DefaultTemplate defaultTemplate = new DefaultTemplate();
+        defaultTemplate.setOwnerFprint( template.getOwnerFprint() );
         defaultTemplate.setName( template.getName() );
         defaultTemplate.setVersion( template.getVersion() );
         defaultTemplate.setMd5Sum( decodeMd5( template.getMd5Sum() ) );

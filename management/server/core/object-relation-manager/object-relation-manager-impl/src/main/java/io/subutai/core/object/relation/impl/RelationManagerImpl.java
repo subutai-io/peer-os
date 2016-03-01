@@ -194,7 +194,24 @@ public class RelationManagerImpl implements RelationManager
     @Override
     public List<Relation> getRelationsByObject( final RelationLink objectRelationLink )
     {
-        return relationDataService.findByObject( ( RelationLinkImpl ) objectRelationLink );
+        RelationLinkImpl object = new RelationLinkImpl( objectRelationLink );
+        return relationDataService.findByObject( object );
+    }
+    
+    
+    @Override
+    public List<Relation> getRelationsBySource( final RelationLink sourceRelationLink )
+    {
+        RelationLinkImpl source = new RelationLinkImpl( sourceRelationLink );
+        return relationDataService.findBySource( source );
+    }
+
+
+    @Override
+    public List<Relation> getRelationsByTarget( final RelationLink targetRelationLink )
+    {
+        RelationLinkImpl target = new RelationLinkImpl( targetRelationLink );
+        return relationDataService.findByTarget( target );
     }
 
 
