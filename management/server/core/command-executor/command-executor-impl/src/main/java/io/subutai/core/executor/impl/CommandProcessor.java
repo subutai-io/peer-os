@@ -125,9 +125,9 @@ public class CommandProcessor implements ByteMessageListener
 
             EncryptionTool encryptionTool = getSecurityManager().getEncryptionTool();
 
-            RequestWrapper requestWrapper = JsonUtil.fromJson( message, RequestWrapper.class );
+            RequestImplWrapper requestImplWrapper = JsonUtil.fromJson( message, RequestImplWrapper.class );
 
-            Request originalRequest = requestWrapper.getRequest();
+            Request originalRequest = requestImplWrapper.getRequest();
 
             //obtain target host pub key for encrypting
             PGPPublicKey hostKeyForEncrypting =
