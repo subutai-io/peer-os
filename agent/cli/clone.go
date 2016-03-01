@@ -40,7 +40,8 @@ func LxcClone(parent, child, envId, addr, token string) {
 
 	container.AptUpdate(child)
 	// container.Start(child)
-	// log.Info(child + " successfully cloned")
+	log.Info(child + " with ID " + gpg.GetFingerprint(child) + " successfully cloned ")
+
 }
 
 func setEnvironmentId(name, envId string) {

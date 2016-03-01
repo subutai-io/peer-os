@@ -40,7 +40,7 @@ func MngInit() {
 	wan, err := net.InterfaceByName("wan")
 	log.Check(log.ErrorLevel, "Getting WAN interface info", err)
 	wanIP, err := wan.Addrs()
-	log.Check(log.ErrorLevel, "Getting WAN interface adresses", err)
+	log.Check(log.ErrorLevel, "Getting WAN interface addresses", err)
 	if len(wanIP) > 0 {
 		ip := strings.Split(wanIP[0].String(), "/")
 		if len(ip) > 0 {

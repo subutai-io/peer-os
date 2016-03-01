@@ -14,6 +14,21 @@ public class NetworkSettingsPojo implements NetworkSettings
     public int securePortX3;
 
 
+    public String getPublicUrl()
+    {
+        return publicUrl;
+    }
+
+
+    public void setPublicUrl( final String publicUrl )
+    {
+        this.publicUrl = publicUrl;
+    }
+
+
+    public String publicUrl;
+
+
     public int getSecurePortX1()
     {
         return securePortX1;

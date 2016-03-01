@@ -8,7 +8,7 @@ import (
 
 	"github.com/subutai-io/Subutai/agent/log"
 
-	"code.google.com/p/gcfg"
+	"gopkg.in/gcfg.v1"
 )
 
 type agentConfig struct {

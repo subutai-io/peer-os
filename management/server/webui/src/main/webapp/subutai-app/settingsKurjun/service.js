@@ -8,7 +8,8 @@ SettingsKurjunSrv.$inject = ["$http"];
 function SettingsKurjunSrv($http) {
     var SettingsKurjunSrv = {
         getConfig: getConfig,
-        updateConfig: updateConfig
+        updateConfigUrls: updateConfigUrls,
+        updateConfigQuotas: updateConfigQuotas
     };
 
     function getConfig() {
@@ -18,10 +19,19 @@ function SettingsKurjunSrv($http) {
         });
     }
 
-    function updateConfig(config) {
-        var postData = "globalKurjunUrls=" + config.globalKurjunUrls + "&publicDiskQuota=" + config.publicDiskQuota + "&publicThreshold=" + config.publicThreshold + "&publicTimeFrame=" + config.publicTimeFrame + "&trustDiskQuota=" + config.trustDiskQuota + "&trustThreshold=" + config.trustThreshold + "&trustTimeFrame=" + config.trustTimeFrame;
+    function updateConfigUrls(config) {
+        var postData = "globalKurjunUrls=" + config.globalKurjunUrls;
         return $http.post(
-            SERVER_URL + "rest/v1/system/update_kurjun_settings",
+            SERVER_URL + "rest/v1/system/update_kurjun_settings_urls",
+            postData,
+            {withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+        );
+    }
+
+    function updateConfigQuotas(config) {
+        var postData = "&publicDiskQuota=" + config.publicDiskQuota + "&publicThreshold=" + config.publicThreshold + "&publicTimeFrame=" + config.publicTimeFrame + "&trustDiskQuota=" + config.trustDiskQuota + "&trustThreshold=" + config.trustThreshold + "&trustTimeFrame=" + config.trustTimeFrame;
+        return $http.post(
+            SERVER_URL + "rest/v1/system/update_kurjun_settings_quotas",
             postData,
             {withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
         );
