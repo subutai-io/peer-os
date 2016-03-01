@@ -17,9 +17,11 @@ public interface Task<R extends TaskRequest, T extends TaskResponse>
     enum State
     {
         PENDING, RUNNING, SUCCESS, FAILURE;
-    }
 
+    }
     long getElapsedTime();
+
+    long getFinished();
 
     int getId();
 
