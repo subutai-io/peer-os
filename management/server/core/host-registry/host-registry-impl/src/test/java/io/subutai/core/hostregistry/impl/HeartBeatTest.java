@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.host.HeartBeat;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.JsonUtil;
