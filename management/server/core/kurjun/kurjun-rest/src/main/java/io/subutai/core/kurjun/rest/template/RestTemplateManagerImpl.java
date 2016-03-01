@@ -58,7 +58,14 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
     @Override
     public Response checkUploadAllowed( String repository )
     {
-        return Response.ok( templateManager.isUploadAllowed( repository ) ).build();
+        try
+        {
+            return Response.ok( templateManager.isUploadAllowed( repository ) ).build();
+        }
+        catch ( IllegalArgumentException ex )
+        {
+            return badRequest( ex.getMessage() );
+        }
     }
 
 
@@ -166,6 +173,11 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
                 return Response.ok( GSON.toJson( deflist ) ).build();
             }
         }
+        catch ( IllegalArgumentException ex )
+        {
+            LOGGER.error( "", ex );
+            return badRequest( ex.getMessage() );
+        }
         catch ( IOException ex )
         {
             String msg = "Failed to get template list info";
@@ -189,6 +201,11 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
                 return Response.ok( GSON.toJson( list ) ).build();
             }
         }
+        catch ( IllegalArgumentException ex )
+        {
+            LOGGER.error( "", ex );
+            return badRequest( ex.getMessage() );
+        }
         catch ( IOException ex )
         {
             String msg = "Failed to get shared info";
@@ -210,6 +227,11 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
             {
                 return Response.ok( GSON.toJson( simpleList ) ).build();
             }
+        }
+        catch ( IllegalArgumentException ex )
+        {
+            LOGGER.error( "", ex );
+            return badRequest( ex.getMessage() );
         }
         catch ( IOException ex )
         {
@@ -242,6 +264,11 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
                     return Response.serverError().entity( "Failed to put template" ).build();
                 }
             }
+        }
+        catch ( IllegalArgumentException ex )
+        {
+            LOGGER.error( "", ex );
+            return badRequest( ex.getMessage() );
         }
         catch ( IOException ex )
         {

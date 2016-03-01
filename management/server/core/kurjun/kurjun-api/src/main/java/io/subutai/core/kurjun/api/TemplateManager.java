@@ -158,6 +158,13 @@ public interface TemplateManager extends QuotaManagedRepository
      * @return
      */
     Set<String> getRepositories();
+    
+    
+    /**
+     * Create repository for the user with the given user name
+     * @param userName 
+     */
+    void createUserRepository( String userName );
 
 
     /**

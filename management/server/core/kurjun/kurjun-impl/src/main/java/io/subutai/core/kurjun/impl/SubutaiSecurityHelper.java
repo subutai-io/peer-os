@@ -73,6 +73,13 @@ class SubutaiSecurityHelper
         }
         return fprints;
     }
+    
+  
+    boolean isUserHasKeyId( String fprint )
+    {
+        User user = subutaiIdentityManager.getUserByFingerprint( fprint.toUpperCase( Locale.US ) );
+        return user != null && user.getSecurityKeyId() != null && !user.getSecurityKeyId().isEmpty();
+    }
 
 
     String getActiveUserFingerprint()
@@ -332,7 +339,7 @@ class SubutaiSecurityHelper
         switch ( context.getName() )
         {
             case TemplateRepository.PUBLIC:
-                return true;
+                return isUserHasKeyId( getActiveUserFingerprint() );
 
             default:
                 TemplateAccess templateAccess = new TemplateAccess( context.getName(), context.getName() );

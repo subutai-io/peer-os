@@ -562,9 +562,33 @@ public class TemplateManagerImpl implements TemplateManager
     public Set<String> getRepositories()
     {
         Set<String> set = GLOBAL_CONTEXTS.stream().map( c -> c.getName() ).collect( Collectors.toSet() );
-        set.add( TemplateRepository.SHARED );
-        set.add( TemplateRepository.MY );
+        if ( securityHelper.isUserHasKeyId( securityHelper.getActiveUserFingerprint() ) )
+        {
+            set.add( TemplateRepository.SHARED );
+            set.add( TemplateRepository.MY );
+        }
         return Collections.unmodifiableSet( set );
+    }
+  
+
+    @Override
+    @RolesAllowed( "Template-Management|Write" )
+    public void createUserRepository( String userName )
+    {
+        String fprint = securityHelper.getUserFingerprintByUsername( userName );
+        TemplateId privateRepositoryId = new TemplateId( fprint, fprint );
+        securityHelper.grantOwnerPermissions( privateRepositoryId, fprint );
+        UserRepoContext newcontext = new UserRepoContext( fprint, fprint );
+
+        KurjunProperties properties = injector.getInstance( KurjunProperties.class );
+        Properties kcp = properties.getContextProperties( newcontext );
+        kcp.setProperty( FileStoreFactory.TYPE, FileStoreFactory.FILE_SYSTEM );
+        kcp.setProperty( PackageMetadataStoreModule.PACKAGE_METADATA_STORE_TYPE,
+                PackageMetadataStoreFactory.FILE_DB );
+
+        PRIVATE_CONTEXTS.add( newcontext );
+        
+        LOGGER.info( "Kurjun repository '{}' created for the userName {}", fprint, userName );
     }
 
 
@@ -653,8 +677,8 @@ public class TemplateManagerImpl implements TemplateManager
             return false;
         }
     }
-
-
+    
+    
     private String getExternalIp()
     {
         try
@@ -846,7 +870,7 @@ public class TemplateManagerImpl implements TemplateManager
     {
         String repo = TemplateRepository.MY.equals( repository )
                 ? securityHelper.getActiveUserFingerprint() : repository;
-
+        
         Set<UserRepoContext> set = GLOBAL_CONTEXTS;
         for ( UserRepoContext c : set )
         {
@@ -864,7 +888,7 @@ public class TemplateManagerImpl implements TemplateManager
                 return c;
             }
         }
-        throw new IllegalArgumentException( "Invalid repository " + repository );
+        throw new IllegalArgumentException( "Invalid repository " + repo );
     }
 
 
