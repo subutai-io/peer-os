@@ -2,13 +2,9 @@ package io.subutai.core.environment.impl.workflow.creation.steps.helpers;
 
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-import io.subutai.common.environment.CreateEnvironmentContainerGroupResponse;
-import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
-import io.subutai.core.environment.impl.exception.NodeGroupBuildException;
+import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
 
 
 /**
@@ -16,12 +12,12 @@ import io.subutai.core.environment.impl.exception.NodeGroupBuildException;
  */
 public class NodeGroupBuildResult
 {
-    private final List<CreateEnvironmentContainerGroupResponse> responses = new ArrayList<>();
+    private final List<CreateEnvironmentContainerResponseCollector> responses = new ArrayList<>();
     //    private Set<EnvironmentContainerImpl> containers = new HashSet<>();
     //    private NodeGroupBuildException exception;
 
 
-    public List<CreateEnvironmentContainerGroupResponse> getResponses()
+    public List<CreateEnvironmentContainerResponseCollector> getResponses()
     {
         return responses;
     }

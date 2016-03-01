@@ -198,7 +198,7 @@ public class EnvironmentDataService implements DataService<String, EnvironmentIm
         try
         {
             daoManager.startTransaction( em );
-            if ( em.find( EnvironmentImpl.class, item.getId() ) == null )
+            if ( !em.contains( item ) )
             {
                 em.persist( item );
                 em.refresh( item );

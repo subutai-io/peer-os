@@ -3,12 +3,14 @@ package io.subutai.common.environment;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.google.gson.annotations.Expose;
+import org.apache.commons.lang.StringUtils;
 
-import io.subutai.common.task.ImportTemplateResponse;
+import io.subutai.common.task.ResponseCollector;
 import io.subutai.common.task.Task;
 import io.subutai.common.task.TaskRequest;
 import io.subutai.common.task.TaskResponse;
@@ -19,23 +21,25 @@ import io.subutai.common.util.StringUtil;
 /**
  * Abstract group response
  */
-public class AbstractGroupResponse<R extends TaskRequest, T extends TaskResponse>
+public class AbstractResponseCollector<R extends TaskRequest, T extends TaskResponse> implements ResponseCollector
 {
     private final String peerId;
     private List<T> responses = new ArrayList<>();
-    transient private List<Task<R, T>> tasks = new ArrayList<>();
+    transient private List<Future<Task>> tasks = new ArrayList<>();
     private AtomicInteger counter = new AtomicInteger( 0 );
     private boolean succeeded = true;
-    private List<OperationMessage> messages = new ArrayList<>();
+    private List<OperationMessage> messages = new CopyOnWriteArrayList<>();
 
 
-    public AbstractGroupResponse( final String peerId )
+    public AbstractResponseCollector( final String peerId )
     {
         this.peerId = peerId;
     }
 
 
-    public void addResponse( T response )
+    @Override
+    @SuppressWarnings( "unchecked" )
+    public void onResponse( final TaskResponse response )
     {
         counter.incrementAndGet();
         if ( response == null )
@@ -44,17 +48,20 @@ public class AbstractGroupResponse<R extends TaskRequest, T extends TaskResponse
             succeeded = false;
             return;
         }
-        responses.add( response );
+        responses.add( ( T ) response );
         succeeded = succeeded && response.hasSucceeded();
         final String message = String.format( "%s [%s]", response.getLog(),
                 StringUtil.convertMillisToHHMMSS( response.getElapsedTime() ) );
+        final String description = StringUtils.isNotBlank( response.getDescription() ) ?
+                                   String.format( "%s:%s [%s]", getPeerId(), response.getResourceHostId(),
+                                           response.getDescription() ) : "";
         if ( response.hasSucceeded() )
         {
-            addMessage( OperationMessage.Type.SUCCEEDED, message );
+            addMessage( OperationMessage.Type.SUCCEEDED, message, description );
         }
         else
         {
-            addMessage( OperationMessage.Type.FAILED, message );
+            addMessage( OperationMessage.Type.FAILED, message, description );
         }
     }
 
@@ -103,7 +110,7 @@ public class AbstractGroupResponse<R extends TaskRequest, T extends TaskResponse
     }
 
 
-    public void addTask( Task<R, T> task )
+    public void addTask( Future<Task> task )
     {
         this.tasks.add( task );
     }
@@ -111,10 +118,25 @@ public class AbstractGroupResponse<R extends TaskRequest, T extends TaskResponse
 
     public void waitResponses()
     {
-        for ( Task<R, T> task : tasks )
+        int size = tasks.size();
+        while ( counter.get() < size && succeeded )
         {
-            T response = task.waitAndGetResponse();
-            addResponse( response );
+            try
+            {
+                TimeUnit.MILLISECONDS.sleep( 500 );
+            }
+            catch ( InterruptedException e )
+            {
+                // ignore
+            }
+        }
+
+        for ( Future f : tasks )
+        {
+            if ( !f.isDone() )
+            {
+                f.cancel( false );
+            }
         }
     }
 

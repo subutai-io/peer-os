@@ -13,16 +13,12 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Lists;
 
 import io.subutai.common.command.CommandResult;
-import io.subutai.common.host.ContainerHostInfo;
-import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.task.CloneRequest;
 import io.subutai.common.task.CloneResponse;
 import io.subutai.common.task.Command;
 import io.subutai.common.task.CommandBatch;
 import io.subutai.common.task.TaskResponseBuilder;
 import io.subutai.common.util.ServiceLocator;
-import io.subutai.core.hostregistry.api.HostDisconnectedException;
-import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.registration.api.RegistrationManager;
 
 
@@ -138,7 +134,7 @@ public class CloneTask extends AbstractTask<CloneRequest, CloneResponse>
     @Override
     public boolean isSequential()
     {
-        return false;
+        return true;
     }
 
 
@@ -156,7 +152,7 @@ public class CloneTask extends AbstractTask<CloneRequest, CloneResponse>
 
         if ( commandResult != null && commandResult.hasSucceeded() )
         {
-            StringTokenizer st = new StringTokenizer( commandResult.getStdErr(), LINE_DELIMITER );
+            StringTokenizer st = new StringTokenizer( getStdErr(), LINE_DELIMITER );
 
 
             while ( st.hasMoreTokens() )
@@ -174,11 +170,13 @@ public class CloneTask extends AbstractTask<CloneRequest, CloneResponse>
                 }
             }
         }
+
         if ( agentId == null )
         {
-            LOG.error( "Agent ID not found in output of subutai clone command. %s ", commandResult.getStdOut() );
+            LOG.error( "Agent ID not found in output of subutai clone command. %s ", getStdErr() );
         }
         return new CloneResponse( request.getResourceHostId(), request.getHostname(), request.getContainerName(),
-                request.getTemplateName(), request.getTemplateArch(), request.getIp(), agentId, elapsedTime );
+                request.getTemplateName(), request.getTemplateArch(), request.getIp(), agentId, elapsedTime,
+                agentId != null ? getStdOut() : getStdErr() );
     }
 }

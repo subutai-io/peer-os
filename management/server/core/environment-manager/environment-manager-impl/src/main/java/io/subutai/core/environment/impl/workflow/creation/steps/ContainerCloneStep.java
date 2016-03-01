@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.commons.net.util.SubnetUtils;
 
-import io.subutai.common.environment.CreateEnvironmentContainerGroupResponse;
+import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.host.ContainerHostInfoModel;
@@ -28,6 +28,7 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.security.objects.Ownership;
 import io.subutai.common.settings.Common;
 import io.subutai.common.task.CloneResponse;
+import io.subutai.common.tracker.OperationMessage;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
@@ -112,7 +113,7 @@ public class ContainerCloneStep
 
         ExecutorService taskExecutor = Executors.newFixedThreadPool( placement.size() );
 
-        CompletionService<CreateEnvironmentContainerGroupResponse> taskCompletionService =
+        CompletionService<CreateEnvironmentContainerResponseCollector> taskCompletionService =
                 getCompletionService( taskExecutor );
 
         int currentLastUsedIpIndex = environment.getLastUsedIpIndex();
@@ -125,7 +126,7 @@ public class ContainerCloneStep
             LOGGER.debug( String.format( "Scheduling node group task on peer %s", peer.getId() ) );
 
             taskCompletionService.submit( new CreatePeerNodeGroupsTask( peer, peerManager.getLocalPeer(), environment,
-                            currentLastUsedIpIndex + 1, peerPlacement.getValue() ) );
+                    currentLastUsedIpIndex + 1, peerPlacement.getValue() ) );
 
             currentLastUsedIpIndex += peerPlacement.getValue().size();
 
@@ -135,34 +136,32 @@ public class ContainerCloneStep
         taskExecutor.shutdown();
 
         //collect results
-        //        Set<String> errors = Sets.newHashSet();
 
         for ( int i = 0; i < placement.size(); i++ )
         {
             try
             {
-                Future<CreateEnvironmentContainerGroupResponse> futures = taskCompletionService.take();
-                CreateEnvironmentContainerGroupResponse response = futures.get();
+                Future<CreateEnvironmentContainerResponseCollector> futures = taskCompletionService.take();
+                CreateEnvironmentContainerResponseCollector response = futures.get();
+                addLogs( response );
                 processResponse( placement.get( response.getPeerId() ), response );
             }
             catch ( Exception e )
             {
                 LOGGER.error( e.getMessage(), e );
                 throw new EnvironmentCreationException(
-                        String.format( "There were errors during container creation:  %s", e.getMessage() ) );
+                        String.format( "There were errors during container creation. Unexpected error." ) );
             }
         }
     }
 
 
-    private void processResponse( final Set<Node> nodes, final CreateEnvironmentContainerGroupResponse result )
+    private void processResponse( final Set<Node> nodes, final CreateEnvironmentContainerResponseCollector result )
     {
         final Set<EnvironmentContainerImpl> containers = new HashSet<>();
         for ( CloneResponse cloneResponse : result.getResponses() )
         {
             LOGGER.debug( String.format( "Clone response: %s", cloneResponse ) );
-
-            operationTracker.addLog( cloneResponse.getLog() );
 
             final Node node = findNodeGroup( cloneResponse.getHostname(), nodes );
             if ( node != null )
@@ -178,6 +177,15 @@ public class ContainerCloneStep
 
         environment.addContainers( containers );
         buildRelationChain( environment, containers );
+    }
+
+
+    private void addLogs( final CreateEnvironmentContainerResponseCollector result )
+    {
+        for ( OperationMessage message : result.getOperationMessages() )
+        {
+            operationTracker.addLog( message.getValue() );
+        }
     }
 
 
@@ -242,7 +250,7 @@ public class ContainerCloneStep
     }
 
 
-    protected CompletionService<CreateEnvironmentContainerGroupResponse> getCompletionService( Executor executor )
+    protected CompletionService<CreateEnvironmentContainerResponseCollector> getCompletionService( Executor executor )
     {
         return new ExecutorCompletionService<>( executor );
     }

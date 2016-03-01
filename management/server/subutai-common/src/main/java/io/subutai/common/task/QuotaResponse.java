@@ -1,27 +1,27 @@
 package io.subutai.common.task;
 
 
-import io.subutai.common.command.CommandResult;
-
-
 public class QuotaResponse implements TaskResponse<QuotaRequest>
 {
     private String resourceHostId;
     private String hostname;
     private boolean succeeded;
     private long elapsedTime;
+    private String description;
 
 
     public QuotaResponse( final String resourceHostId, final String hostname, final boolean succeeded,
-                          final long elapsedTime )
+                          final long elapsedTime, final String description )
     {
         this.resourceHostId = resourceHostId;
         this.hostname = hostname;
         this.succeeded = succeeded;
         this.elapsedTime = elapsedTime;
+        this.description = description;
     }
 
 
+    @Override
     public String getResourceHostId()
     {
         return resourceHostId;
@@ -47,21 +47,30 @@ public class QuotaResponse implements TaskResponse<QuotaRequest>
     }
 
 
-//    @Override
-//    public void processCommandResult( final QuotaRequest request, final CommandResult commandResult,
-//                                      final long elapsedTime )
-//    {
-//        this.succeeded = commandResult != null && commandResult.hasSucceeded();
-//        this.resourceHostId = getResourceHostId();
-//        this.hostname = request.getHostname();
-//        this.elapsedTime = elapsedTime;
-//    }
-
-
     @Override
     public String getLog()
     {
         return succeeded ? String.format( "Setting quota %s succeeded.", hostname ) :
                String.format( "Setting quota %s failed.", hostname );
+    }
+
+
+    @Override
+    public String getDescription()
+    {
+        return description;
+    }
+
+
+    @Override
+    public String toString()
+    {
+        final StringBuffer sb = new StringBuffer( "QuotaResponse{" );
+        sb.append( "resourceHostId='" ).append( resourceHostId ).append( '\'' );
+        sb.append( ", hostname='" ).append( hostname ).append( '\'' );
+        sb.append( ", succeeded=" ).append( succeeded );
+        sb.append( ", elapsedTime=" ).append( elapsedTime );
+        sb.append( '}' );
+        return sb.toString();
     }
 }

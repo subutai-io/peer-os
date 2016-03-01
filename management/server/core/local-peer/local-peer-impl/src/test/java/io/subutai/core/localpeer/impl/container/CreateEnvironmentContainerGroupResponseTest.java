@@ -5,16 +5,13 @@ import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Ignore;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import io.subutai.common.task.CloneResponse;
-import io.subutai.common.environment.CreateEnvironmentContainerGroupResponse;
+import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
 import io.subutai.common.host.ContainerHostInfoModel;
-
-import com.google.common.collect.Sets;
 
 import static junit.framework.TestCase.assertEquals;
 
@@ -28,7 +25,7 @@ public class CreateEnvironmentContainerGroupResponseTest
     @Mock
     ContainerHostInfoModel containerHostInfoModel;
 
-    CreateEnvironmentContainerGroupResponse responseGroup;
+    CreateEnvironmentContainerResponseCollector responseGroup;
 
     @Mock
     CloneResponse response;
@@ -36,8 +33,8 @@ public class CreateEnvironmentContainerGroupResponseTest
     @Before
     public void setUp() throws Exception
     {
-        responseGroup = new CreateEnvironmentContainerGroupResponse( PEER_ID );
-        responseGroup.addResponse( response );
+        responseGroup = new CreateEnvironmentContainerResponseCollector( PEER_ID );
+        responseGroup.onResponse( response );
     }
 
 

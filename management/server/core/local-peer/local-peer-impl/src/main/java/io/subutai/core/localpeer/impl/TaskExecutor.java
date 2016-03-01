@@ -13,7 +13,9 @@ import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.task.ResponseCollector;
 import io.subutai.common.task.Task;
+import io.subutai.common.task.TaskResponse;
 
 
 public class TaskExecutor implements Callable<Task>
@@ -22,14 +24,16 @@ public class TaskExecutor implements Callable<Task>
     private LocalPeer localPeer;
     private Task task;
     private int taskId;
+    private ResponseCollector collector;
     protected CommandUtil commandUtil = new CommandUtil();
 
 
-    public TaskExecutor( final LocalPeer localPeer, final Task task, final int taskId )
+    public TaskExecutor( final LocalPeer localPeer, final Task task, final int taskId, ResponseCollector collector )
     {
         this.localPeer = localPeer;
         this.task = task;
         this.taskId = taskId;
+        this.collector = collector;
     }
 
 
@@ -52,6 +56,12 @@ public class TaskExecutor implements Callable<Task>
         }
         LOG.debug( String.format( "Task %s finished", taskId ) );
         task.done( commandResult );
+        if ( collector != null )
+        {
+            TaskResponse response = task.waitAndGetResponse();
+            collector.onResponse( response );
+        }
+
         return task;
     }
 }

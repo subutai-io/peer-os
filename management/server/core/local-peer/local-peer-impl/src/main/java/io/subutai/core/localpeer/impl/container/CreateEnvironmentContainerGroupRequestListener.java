@@ -5,7 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
-import io.subutai.common.environment.CreateEnvironmentContainerGroupResponse;
+import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Payload;
 import io.subutai.common.peer.RecipientType;
@@ -37,7 +37,7 @@ public class CreateEnvironmentContainerGroupRequestListener extends RequestListe
         if ( request != null )
         {
 
-            CreateEnvironmentContainerGroupResponse response = localPeer.createEnvironmentContainerGroup( request );
+            CreateEnvironmentContainerResponseCollector response = localPeer.createEnvironmentContainerGroup( request );
 
             return response;
         }

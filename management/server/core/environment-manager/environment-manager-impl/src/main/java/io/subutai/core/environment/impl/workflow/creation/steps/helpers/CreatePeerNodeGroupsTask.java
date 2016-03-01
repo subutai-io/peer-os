@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.apache.commons.net.util.SubnetUtils;
 
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
-import io.subutai.common.environment.CreateEnvironmentContainerGroupResponse;
+import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.Node;
 import io.subutai.common.host.HostArchitecture;
@@ -21,7 +21,7 @@ import io.subutai.common.task.CloneRequest;
 import io.subutai.common.util.ExceptionUtil;
 
 
-public class CreatePeerNodeGroupsTask implements Callable<CreateEnvironmentContainerGroupResponse>
+public class CreatePeerNodeGroupsTask implements Callable<CreateEnvironmentContainerResponseCollector>
 {
     private static final Logger LOG = LoggerFactory.getLogger( CreatePeerNodeGroupsTask.class );
 
@@ -47,7 +47,7 @@ public class CreatePeerNodeGroupsTask implements Callable<CreateEnvironmentConta
 
 
     @Override
-    public CreateEnvironmentContainerGroupResponse call() throws Exception
+    public CreateEnvironmentContainerResponseCollector call() throws Exception
     {
         SubnetUtils.SubnetInfo subnetInfo = new SubnetUtils( environment.getSubnetCidr() ).getInfo();
         String maskLength = subnetInfo.getCidrSignature().split( "/" )[1];

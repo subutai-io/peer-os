@@ -61,17 +61,6 @@ public class ImportTask extends AbstractTask<ImportTemplateRequest, ImportTempla
         return this;
     }
 
-//
-    //    @Override
-    //    public void processCommandResult( final ImportTemplateRequest request, final CommandResult commandResult,
-    //                                      long elapsedTime )
-    //    {
-    //
-    //        this.resourceHostId = request.getResourceHostId();
-    //        this.templateName = request.getTemplateName();
-    //        this.elapsedTime = elapsedTime;
-    //    }
-
 
     @Override
     public ImportTemplateResponse build( final ImportTemplateRequest request, final CommandResult commandResult,
@@ -79,6 +68,6 @@ public class ImportTask extends AbstractTask<ImportTemplateRequest, ImportTempla
     {
         boolean succeeded = commandResult != null && commandResult.hasSucceeded();
         return new ImportTemplateResponse( request.getResourceHostId(), request.getTemplateName(), succeeded,
-                elapsedTime );
+                elapsedTime, succeeded ? getStdOut() : getStdErr() );
     }
 }

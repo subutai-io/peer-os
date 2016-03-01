@@ -14,12 +14,15 @@ import java.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang.StringUtils;
+
 import io.subutai.common.environment.Node;
-import io.subutai.common.environment.PrepareTemplatesResponse;
+import io.subutai.common.environment.PrepareTemplatesResponseCollector;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.task.ImportTemplateResponse;
+import io.subutai.common.tracker.OperationMessage;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.impl.workflow.creation.steps.helpers.CreatePeerTemplatePrepareTask;
@@ -52,7 +55,8 @@ public class PrepareTemplatesStep
 
         ExecutorService taskExecutor = Executors.newFixedThreadPool( placement.size() );
 
-        CompletionService<PrepareTemplatesResponse> taskCompletionService = getCompletionService( taskExecutor );
+        CompletionService<PrepareTemplatesResponseCollector> taskCompletionService =
+                getCompletionService( taskExecutor );
 
 
         for ( Map.Entry<String, Set<Node>> peerPlacement : placement.entrySet() )
@@ -70,39 +74,52 @@ public class PrepareTemplatesStep
         {
             try
             {
-                Future<PrepareTemplatesResponse> futures = taskCompletionService.take();
-                final PrepareTemplatesResponse prepareTemplatesResponse = futures.get();
+                Future<PrepareTemplatesResponseCollector> futures = taskCompletionService.take();
+                final PrepareTemplatesResponseCollector prepareTemplatesResponse = futures.get();
 
+                addLogs( prepareTemplatesResponse );
                 processResponse( prepareTemplatesResponse );
 
                 if ( !prepareTemplatesResponse.hasSucceeded() )
                 {
-                    throw new EnvironmentCreationException( "There were errors during preparation of templates." );
+                    throw new EnvironmentCreationException(
+                            "There were errors during preparation of templates on peer " + prepareTemplatesResponse
+                                    .getPeerId() );
                 }
             }
             catch ( ExecutionException | InterruptedException e )
             {
-                final Throwable cause = e.getCause();
-                LOGGER.error( cause.getMessage(), cause );
+                LOGGER.error( e.getMessage(), e );
                 throw new EnvironmentCreationException(
-                        String.format( "There were errors during preparation templates:  %s", cause.getMessage() ) );
+                        "There were errors during preparation templates. Unexpected error." );
             }
         }
     }
 
 
-    private void processResponse( final PrepareTemplatesResponse response )
+    private void processResponse( final PrepareTemplatesResponseCollector response )
     {
         for ( ImportTemplateResponse importTemplateResponse : response.getResponses() )
         {
             LOGGER.debug( String.format( "Import response: %s", importTemplateResponse ) );
-
-            operationTracker.addLog( importTemplateResponse.getLog() );
         }
     }
 
 
-    protected CompletionService<PrepareTemplatesResponse> getCompletionService( Executor executor )
+    private void addLogs( final PrepareTemplatesResponseCollector result )
+    {
+        for ( OperationMessage message : result.getOperationMessages() )
+        {
+            operationTracker.addLog( message.getValue() );
+            if ( !result.hasSucceeded() && StringUtils.isNotBlank( message.getDescription() ))
+            {
+                LOGGER.error( message.getDescription() );
+            }
+        }
+    }
+
+
+    protected CompletionService<PrepareTemplatesResponseCollector> getCompletionService( Executor executor )
     {
         return new ExecutorCompletionService<>( executor );
     }

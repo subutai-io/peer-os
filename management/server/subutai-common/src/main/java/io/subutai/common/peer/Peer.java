@@ -2,7 +2,6 @@ package io.subutai.common.peer;
 
 
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -13,18 +12,16 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
-import io.subutai.common.environment.CreateEnvironmentContainerGroupResponse;
+import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
 import io.subutai.common.environment.PrepareTemplatesRequest;
-import io.subutai.common.environment.PrepareTemplatesResponse;
+import io.subutai.common.environment.PrepareTemplatesResponseCollector;
 import io.subutai.common.host.ContainerHostInfo;
-import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
-import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Gateways;
 import io.subutai.common.network.Vni;
 import io.subutai.common.network.Vnis;
@@ -70,7 +67,7 @@ public interface Peer
      *
      * @param request - container creation request
      */
-    public CreateEnvironmentContainerGroupResponse createEnvironmentContainerGroup(
+    public CreateEnvironmentContainerResponseCollector createEnvironmentContainerGroup(
             final CreateEnvironmentContainerGroupRequest request ) throws PeerException;
 
 
@@ -319,5 +316,5 @@ public interface Peer
 
     HostId getResourceHostIdByContainerId( ContainerId id ) throws PeerException;
 
-    PrepareTemplatesResponse prepareTemplates( final PrepareTemplatesRequest request ) throws PeerException;
+    PrepareTemplatesResponseCollector prepareTemplates( final PrepareTemplatesRequest request ) throws PeerException;
 }

@@ -17,9 +17,6 @@ public class CloneResponse implements TaskResponse
 {
     protected static final Logger LOG = LoggerFactory.getLogger( CloneResponse.class );
 
-    private static final String LINE_DELIMITER = "\n";
-    private static Pattern CLONE_OUTPUT_PATTERN = Pattern.compile( "with ID (.*) successfully cloned" );
-
     private String resourceHostId;
     private String hostname;
     private String templateName;
@@ -28,11 +25,12 @@ public class CloneResponse implements TaskResponse
     private String ip;
     private String agentId;
     private long elapsedTime;
+    private String description;
 
 
-    public CloneResponse( final String resourceHostId, final String hostname, final String containerName, final String templateName,
-                          final HostArchitecture templateArch,  final String ip,
-                          final String agentId, final long elapsedTime )
+    public CloneResponse( final String resourceHostId, final String hostname, final String containerName,
+                          final String templateName, final HostArchitecture templateArch, final String ip,
+                          final String agentId, final long elapsedTime, final String description )
     {
         this.resourceHostId = resourceHostId;
         this.hostname = hostname;
@@ -42,9 +40,10 @@ public class CloneResponse implements TaskResponse
         this.ip = ip;
         this.agentId = agentId;
         this.elapsedTime = elapsedTime;
+        this.description = description;
     }
 
-
+    @Override
     public String getResourceHostId()
     {
         return resourceHostId;
@@ -87,53 +86,11 @@ public class CloneResponse implements TaskResponse
     }
 
 
-    //    @Override
-    //    public void processCommandResult( final CloneRequest request, final CommandResult commandResult,
-    //                                      final long elapsedTime )
-    //    {
-    //        StringTokenizer st = new StringTokenizer( commandResult.getStdOut(), LINE_DELIMITER );
-    //
-    //        String agentId = null;
-    //        while ( st.hasMoreTokens() )
-    //        {
-    //
-    //            final String nextToken = st.nextToken();
-    //
-    //            Matcher m = CLONE_OUTPUT_PATTERN.matcher( nextToken );
-    //
-    //            //             LOG.debug( String.format( "Token: %s", nextToken ) );
-    //            if ( m.find() && m.groupCount() == 1 )
-    //            {
-    //                agentId = m.group( 1 );
-    //                break;
-    //            }
-    //        }
-    //
-    //        if ( agentId == null )
-    //        {
-    //            succeeded = false;
-    //            //             LOG.error( "Agent ID not found in output of subutai clone command. %s ", commandResult
-    //            // .getStdOut() );
-    //            //             new CloneResponse( false, request.getResourceHostId(), request.getHostname(), request
-    //            // .getContainerName(),
-    //            //                     null, request.getIp(), request.getTemplateName(), request.getTemplateArch(),
-    //            // getElapsedTime() );
-    //        }
-    //        else
-    //        {
-    //            this.resourceHostId = request.getResourceHostId();
-    //            this.hostname = request.getHostname();
-    //            this.agentId = agentId;
-    //            this.ip = request.getIp();
-    //            this.succeeded = true;
-    //        }
-    //
-    //        this.elapsedTime = elapsedTime;
-    //        //         return new CloneResponse( true, request.getResourceHostId(), request.getHostname(), request
-    //        // .getContainerName(),
-    //        //                 agentId, request.getIp(), request.getTemplateName(), request.getTemplateArch(),
-    //        // getElapsedTime() );
-    //    }
+    @Override
+    public String getDescription()
+    {
+        return description;
+    }
 
 
     @Override

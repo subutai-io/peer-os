@@ -8,7 +8,6 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.task.Task;
@@ -36,7 +35,6 @@ public abstract class AbstractTask<R extends TaskRequest, T extends TaskResponse
     protected long finished;
     protected TaskCallbackHandler<R, T> onSuccessHandler;
     protected TaskCallbackHandler<R, T> onFailureHandler;
-    private boolean isResultProcessed = false;
 
 
     public AbstractTask( final R request )
@@ -167,12 +165,6 @@ public abstract class AbstractTask<R extends TaskRequest, T extends TaskResponse
             }
         }
 
-        //        if ( !isResultProcessed )
-        //        {
-        //            processCommandResult();
-        //            isResultProcessed = true;
-        //        }
-
         return response;
     }
 
@@ -236,4 +228,16 @@ public abstract class AbstractTask<R extends TaskRequest, T extends TaskResponse
 
 
     abstract public TaskResponseBuilder<R, T> getResponseBuilder();
+
+
+    public String getStdOut()
+    {
+        return ( commandResult != null && commandResult.getStdOut() != null ? commandResult.getStdOut() : "" );
+    }
+
+
+    public String getStdErr()
+    {
+        return ( commandResult != null && commandResult.getStdErr() != null ? commandResult.getStdErr() : "" );
+    }
 }

@@ -15,9 +15,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -54,9 +52,9 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.ContainersDestructionResultImpl;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
-import io.subutai.common.environment.CreateEnvironmentContainerGroupResponse;
+import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
 import io.subutai.common.environment.PrepareTemplatesRequest;
-import io.subutai.common.environment.PrepareTemplatesResponse;
+import io.subutai.common.environment.PrepareTemplatesResponseCollector;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.ContainerHostState;
@@ -81,7 +79,6 @@ import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
-import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.ContainersDestructionResult;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
@@ -117,7 +114,6 @@ import io.subutai.common.settings.Common;
 import io.subutai.common.task.CloneRequest;
 import io.subutai.common.task.CloneResponse;
 import io.subutai.common.task.ImportTemplateRequest;
-import io.subutai.common.task.ImportTemplateResponse;
 import io.subutai.common.task.QuotaRequest;
 import io.subutai.common.task.Task;
 import io.subutai.common.task.TaskCallbackHandler;
@@ -388,59 +384,38 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    protected ExecutorService getExecutor( int numOfThreads )
-    {
-        return Executors.newFixedThreadPool( numOfThreads );
-    }
-
-
-    protected CompletionService<ContainerHostInfo> getCompletionService( Executor executor )
-    {
-        return new ExecutorCompletionService<>( executor );
-    }
-
-
     @RolesAllowed( "Environment-Management|Write" )
     @Override
-    public PrepareTemplatesResponse prepareTemplates( final PrepareTemplatesRequest request ) throws PeerException
+    public PrepareTemplatesResponseCollector prepareTemplates( final PrepareTemplatesRequest request ) throws PeerException
     {
-        final PrepareTemplatesResponse prepareTemplatesResponse = new PrepareTemplatesResponse( getId() );
+        final PrepareTemplatesResponseCollector prepareTemplatesResponse = new PrepareTemplatesResponseCollector( getId() );
         for ( String resourceHostId : request.getTemplates().keySet() )
         {
             for ( String templateName : request.getTemplates().get( resourceHostId ) )
             {
                 ImportTask task = new ImportTask( new ImportTemplateRequest( resourceHostId, templateName ) );
-                taskManager.schedule( task );
-                prepareTemplatesResponse.addTask( task );
+                prepareTemplatesResponse.addTask( taskManager.schedule( task, prepareTemplatesResponse ) );
             }
         }
 
-
-
-        prepareTemplatesResponse.waitResponses( );
+        prepareTemplatesResponse.waitResponses();
         return prepareTemplatesResponse;
     }
 
 
     @RolesAllowed( "Environment-Management|Write" )
     @Override
-    public CreateEnvironmentContainerGroupResponse createEnvironmentContainerGroup(
+    public CreateEnvironmentContainerResponseCollector createEnvironmentContainerGroup(
             final CreateEnvironmentContainerGroupRequest requestGroup ) throws PeerException
     {
         Preconditions.checkNotNull( requestGroup );
 
-        final List<Task> tasks = new ArrayList<>();
-
-        final CreateEnvironmentContainerGroupResponse response = new CreateEnvironmentContainerGroupResponse( getId() );
+        final CreateEnvironmentContainerResponseCollector response = new CreateEnvironmentContainerResponseCollector( getId() );
         final TaskCallbackHandler<CloneRequest, CloneResponse> successResultHandler =
                 getCloneSuccessHandler( this, response );
-        final TaskCallbackHandler<CloneRequest, CloneResponse> failedResultHandler =
-                getCloneFailedHandler( this, response );
-
 
         for ( final CloneRequest request : requestGroup.getRequests() )
         {
-            //            ContainerSize size = request.getContainerSize();
             try
             {
                 final Vni environmentVni = getReservedVnis().findVniByEnvironmentId( request.getEnvironmentId() );
@@ -455,10 +430,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 CloneTask task = new CloneTask( request, environmentVni.getVlan() );
 
                 task.onSuccess( successResultHandler );
-                task.onFailure( failedResultHandler );
 
-                taskManager.schedule( task );
-                response.addTask( task );
+                response.addTask( taskManager.schedule( task, response ) );
             }
             catch ( Exception e )
             {
@@ -466,14 +439,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
         }
 
-        response.waitResponses( );
+        response.waitResponses();
         return response;
     }
 
 
     private TaskCallbackHandler<CloneRequest, CloneResponse> getCloneSuccessHandler( final LocalPeer localPeer,
-                                                                                     final
-                                                                                     CreateEnvironmentContainerGroupResponse responseGroup )
+                                                                                     final CreateEnvironmentContainerResponseCollector responseGroup )
     {
         return new TaskCallbackHandler<CloneRequest, CloneResponse>()
         {
@@ -491,7 +463,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                             new QuotaRequest( request.getResourceHostId(), request.getHostname(),
                                     request.getContainerSize() ) );
 
-                    taskManager.schedule( quotaTask );
+                    taskManager.schedule( quotaTask, null );
 
                     final HostInterfaces interfaces = new HostInterfaces();
                     interfaces.addHostInterface(
@@ -508,28 +480,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
                     registerContainer( request.getResourceHostId(), containerHostEntity );
 
-                    responseGroup.addResponse( response );
                 }
                 catch ( PeerException e )
                 {
                     LOG.error( "Error on registering container.", e );
                     throw new PeerException( "Error on registering container.", e );
                 }
-            }
-        };
-    }
-
-
-    private TaskCallbackHandler<CloneRequest, CloneResponse> getCloneFailedHandler( final LocalPeerImpl localPeer,
-                                                                                    final
-                                                                                    CreateEnvironmentContainerGroupResponse responseGroup )
-    {
-        return new TaskCallbackHandler<CloneRequest, CloneResponse>()
-        {
-            @Override
-            public void handle( Task task, CloneRequest request, CloneResponse response ) throws Exception
-            {
-                responseGroup.addResponse( response );
             }
         };
     }
@@ -682,22 +638,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             throw new PeerException( ex );
         }
     }
-
-
-    //    protected Set<String> generateCloneNames( String templateName, int count ) throws PeerException
-    //    {
-    //        Set<String> result = new HashSet<>();
-    //
-    //        for ( int i = 0; i < count; i++ )
-    //        {
-    //            String newContainerName = StringUtil
-    //                    .trimToSize( String.format( "%s%s", templateName, UUID.randomUUID() ).replace( "-", "" ),
-    //                            Common.MAX_CONTAINER_NAME_LEN );
-    //            result.add( newContainerName );
-    //        }
-    //
-    //        return result;
-    //    }
 
 
     @PermitAll

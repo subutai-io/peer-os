@@ -5,7 +5,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.subutai.common.command.CommandResult;
-import io.subutai.common.command.CommandResultParser;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.quota.ContainerResource;
 import io.subutai.common.task.Command;
@@ -68,6 +67,7 @@ public class QuotaTask extends AbstractTask<QuotaRequest, QuotaResponse>
     public QuotaResponse build( final QuotaRequest request, final CommandResult commandResult, final long elapsedTime )
     {
         final boolean succeeded = commandResult != null && commandResult.hasSucceeded();
-        return new QuotaResponse( request.getResourceHostId(), request.getHostname(), succeeded, getElapsedTime() );
+        return new QuotaResponse( request.getResourceHostId(), request.getHostname(), succeeded, getElapsedTime(),
+                succeeded ? getStdOut() : getStdErr() );
     }
 }
