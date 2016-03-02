@@ -4,18 +4,26 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
-	"github.com/pivotal-golang/archiver/extractor"
-	"github.com/subutai-io/Subutai/agent/config"
-	"github.com/subutai-io/Subutai/agent/lib/container"
-	"github.com/subutai-io/Subutai/agent/lib/gpg"
-	"github.com/subutai-io/Subutai/agent/lib/template"
-	"github.com/subutai-io/Subutai/agent/log"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"runtime"
 	"strings"
+	"time"
+
+	"github.com/nightlyone/lockfile"
+	"github.com/pivotal-golang/archiver/extractor"
+
+	"github.com/subutai-io/Subutai/agent/config"
+	"github.com/subutai-io/Subutai/agent/lib/container"
+	"github.com/subutai-io/Subutai/agent/lib/gpg"
+	"github.com/subutai-io/Subutai/agent/lib/template"
+	"github.com/subutai-io/Subutai/agent/log"
+)
+
+var (
+	lock lockfile.Lockfile
 )
 
 func templId(templ, arch, version, token string) string {
