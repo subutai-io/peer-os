@@ -105,7 +105,7 @@ public class CloneResponse implements TaskResponse
     public String getLog()
     {
         return hasSucceeded() ? String.format( "Cloning '%s' using '%s' succeeded.", containerName, templateName ) :
-               String.format( "Cloning %s failed.", containerName );
+               String.format( "Cloning %s failed on %s.", containerName, getResourceHostId() );
     }
 
 
