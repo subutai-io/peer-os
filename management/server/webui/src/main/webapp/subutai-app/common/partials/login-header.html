@@ -4,21 +4,21 @@
 		<script>
 			$(document).ready(function () {
 
-			function addPluginVersion(pluginVersion) {
-			$('#js-plugin-version').text('plugin version: ' + pluginVersion + ' / ');
-			}
+				function addPluginVersion(pluginVersion) {
+					$('#js-plugin-version').text('plugin version: ' + pluginVersion + ' / ');
+				}
 
-			setTimeout(function () {
-			if ($('#bp-plugin-version').val().length > 0) {
-			addPluginVersion($('#bp-plugin-version').val());
-			}
-			}, 2000);
+				setTimeout(function () {
+					if ($('#bp-plugin-version').val().length > 0) {
+						addPluginVersion($('#bp-plugin-version').val());
+					}
+				}, 2000);
 
-			$('body').on('change', '#bp-plugin-version', function () {
-			if ($(this).val().length > 0) {
-			addPluginVersion($(this).val());
-			}
-			});
+				$('body').on('change', '#bp-plugin-version', function () {
+					if ($(this).val().length > 0) {
+						addPluginVersion($(this).val());
+					}
+				});
 
 			});
 		</script>
@@ -45,35 +45,35 @@
 		</a>
 
 		<div class="b-hub-status__dropdown">
-		<ul class="list">
-			<li ng-repeat="notification in currentUserCtrl.notifications"
-			ng-class="{'b-notification__error' : notification.type == 'error' }">
-				<a href="#">
-					{{ notification.message }}
-				</a>
-
-				<div class="date">
-					{{ notification.date }}
-				</div>
-				<div class="b-dropdown-buttons" ng-if="notification.links">
-					<a ng-repeat="link in notification.links" href="{{ link.href }}" class="b-btn b-btn_green">
-						{{ link.text }}
+			<ul class="list">
+				<li ng-repeat="notification in currentUserCtrl.notifications"
+				ng-class="{'b-notification__error' : notification.type == 'error' }">
+					<a href="#">
+						{{ notification.message }}
 					</a>
-				</div>
-			</li>
-			<li ng-if="currentUserCtrl.notifications.length <= 0" style="text-align: center;">
-				<a href>No logs</a>
-			</li>
-				<!--<li><a href="#">Your SS version is obsolete, please update
-				it to X version</a>
-				<div class="date">8 February at 22:25</div>
-				<div class="buttons">
-				<a href="#" class="b-btn b-btn_green">Register</a>
-				<a href="#" class="b-btn b-btn_white">Ignore</a>
-				</div>
-				</li>-->
-		</ul>
-		<a href ng-click="currentUserCtrl.clearLogs()" class="show-more">Clear</a>
+
+					<div class="date">
+						{{ notification.date }}
+					</div>
+					<div class="b-dropdown-buttons" ng-if="notification.links">
+						<a ng-repeat="link in notification.links" href="{{ link.href }}" class="b-btn b-btn_green">
+							{{ link.text }}
+						</a>
+					</div>
+				</li>
+				<li ng-if="currentUserCtrl.notifications.length <= 0" style="text-align: center;">
+					<a href>No logs</a>
+				</li>
+					<!--<li><a href="#">Your SS version is obsolete, please update
+					it to X version</a>
+					<div class="date">8 February at 22:25</div>
+					<div class="buttons">
+					<a href="#" class="b-btn b-btn_green">Register</a>
+					<a href="#" class="b-btn b-btn_white">Ignore</a>
+					</div>
+					</li>-->
+			</ul>
+			<a href ng-click="currentUserCtrl.clearLogs()" class="show-more">Clear</a>
 		</div>
 	</div>
 
@@ -112,15 +112,18 @@
 				Online
 			</div>
 			<span class="b-hub-menu__text" ng-if="!currentUserCtrl.hubStatus">
-				Register on hub
+				Register Peer
 			</span>
 		</div>
 		<div class="b-hub-status__dropdown">
 			<div ng-if="!currentUserCtrl.hubStatus">
 				<div class="header">
-					Register to Hub
+					Register Peer
 				</div>
 				<div class="body">
+					<div class="b-form__error-message" ng-if="currentUserCtrl.hubRegisterError">
+						{{ currentUserCtrl.hubRegisterError }}
+					</div>
 					<div class="b-form-group g-margin-bottom">
 						<div class="g-text g-margin-bottom-half">Login</div>
 						<input type="text" class="b-form-input b-form-input_full" ng-model="currentUserCtrl.login">
@@ -150,6 +153,9 @@
 					</li>
 				</ul>
 				<a href ng-click="currentUserCtrl.hubUnregister()" class="show-more">Unregister</a>
+			</div>
+			<div class="b-loading-screen js-hub-screen">
+				<div class="b-load-icon"></div>
 			</div>
 		</div>
 	</div>

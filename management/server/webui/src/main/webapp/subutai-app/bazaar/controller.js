@@ -7,8 +7,8 @@ angular.module('subutai.bazaar.controller', [])
 fileModel.$inject = ["$parse"];
 
 var karUploader = {};
-BazaarCtrl.$inject = ['$scope', 'BazaarSrv', 'ngDialog', 'SweetAlert', '$location', 'cfpLoadingBar'];
-function BazaarCtrl($scope, BazaarSrv, ngDialog, SweetAlert, $location, cfpLoadingBar) {
+BazaarCtrl.$inject = ['$scope', '$rootScope', 'BazaarSrv', 'ngDialog', 'SweetAlert', '$location', 'cfpLoadingBar'];
+function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $location, cfpLoadingBar) {
 
 	var vm = this;
 
@@ -459,7 +459,7 @@ function BazaarCtrl($scope, BazaarSrv, ngDialog, SweetAlert, $location, cfpLoadi
 									clearInterval (interval);
 									setTimeout (function() {
 										localStorage.setItem ("bazaarScroll", plugin.id);
-										location.reload();
+										$rootScope.$emit('reloadPluginsStates');
 									}, 2000);
 								}, 2000);
 							}).error (function (error) {
@@ -491,7 +491,7 @@ function BazaarCtrl($scope, BazaarSrv, ngDialog, SweetAlert, $location, cfpLoadi
 						clearInterval (interval);
 						setTimeout (function() {
 							localStorage.setItem ("bazaarScroll", plugin.id);
-							location.reload();
+							$rootScope.$emit('reloadPluginsStates');
 						}, 2000);
 					}, 2000);
 				}).error (function (error) {
@@ -524,7 +524,7 @@ function BazaarCtrl($scope, BazaarSrv, ngDialog, SweetAlert, $location, cfpLoadi
 					clearInterval (interval);
 					setTimeout (function() {
 						localStorage.setItem ("bazaarScroll", plugin.id);
-						location.reload();
+						$rootScope.$emit('reloadPluginsStates');
 					}, 2000);
 				}, 2000);
 			}).error (function (error) {

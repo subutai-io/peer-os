@@ -11,7 +11,11 @@
 			No data available in table
 		</td>
 		<tr ng-repeat="plugin in bazaarCtrl.plugins" id = "{{ plugin.id }}">
-			<td><img src = "{{ plugin.img }}" style = "height: 60px; width: 60px" ng-show = "plugin.metadata.length !== 0 && plugin.name !== 'Big data' && plugin.name !== 'Plugin-common'"/></td>
+			<td>
+				<img src = "{{ plugin.img }}" 
+					style = "height: 60px; width: 60px" 
+					ng-show = "plugin.metadata.length !== 0 && plugin.name !== 'Big data' && plugin.name !== 'Plugin-common'"/>
+			</td>
 			<td>{{ plugin.name }}</td>
 			<td>{{ plugin.version }}</td>
 			<td>{{ plugin.description }}</td>

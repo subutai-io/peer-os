@@ -217,7 +217,7 @@ func main() {
 				Usage:    "check existing domain or host",
 				HideHelp: true,
 				Flags: []cli.Flag{
-					cli.BoolFlag{Name: "domain,d", Usage: "check domains on vlan"},
+					cli.BoolFlag{Name: "domain, d", Usage: "check domains on vlan"},
 					cli.StringFlag{Name: "host, h", Usage: "check hosts on vlan"}},
 				Action: func(c *cli.Context) {
 					lib.ProxyCheck(c.Args().Get(0), c.String("h"), c.Bool("d"))
@@ -258,9 +258,11 @@ func main() {
 			lib.LxcStop(c.Args().Get(0))
 		}}, {
 
-		Name: "tunnel", Usage: "create SSH tunnel to container",
+		Name: "tunnel", Usage: "create SSH tunnel",
+		Flags: []cli.Flag{
+			cli.BoolFlag{Name: "g", Usage: "global accessible tunnel"}},
 		Action: func(c *cli.Context) {
-			lib.SshTunnel(c.Args().Get(0), c.Args().Get(1))
+			lib.Tunnel(c.Args().Get(0), c.Args().Get(1), c.Args().Get(2), c.Bool("g"))
 		}}, {
 
 		Name: "unregister", Usage: "unregister Subutai container",

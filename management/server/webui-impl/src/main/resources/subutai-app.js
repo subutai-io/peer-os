@@ -28,14 +28,15 @@ routesConf.$inject = ['$httpProvider', '$stateProvider', '$urlRouterProvider', '
 startup.$inject = ['$rootScope', '$state', '$location', '$http'];
 
 function CurrentUserCtrl($location, $rootScope, $http, SweetAlert) {
-    var vm = this;
-    vm.currentUser = localStorage.getItem('currentUser');
-    vm.hubStatus = false;
-    vm.notifications = [];
-    vm.notificationsCount = 0;
-    vm.notificationNew = false;
-    vm.currentUserRoles = [];
-    $rootScope.notifications = {};
+	var vm = this;
+	vm.currentUser = localStorage.getItem('currentUser');
+	vm.hubStatus = false;
+	vm.notifications = [];
+	vm.notificationsCount = 0;
+	vm.notificationNew = false;
+	vm.currentUserRoles = [];
+	$rootScope.notifications = {};
+	vm.hubRegisterError = false;
 
 
     function checkIfRegistered() {
@@ -69,53 +70,61 @@ function CurrentUserCtrl($location, $rootScope, $http, SweetAlert) {
     vm.clearLogs = clearLogs;
 
 
-    function hubRegister() {
-        //should be rest/v1/hub no need to change
-        LOADING_SCREEN();
-        var postData = 'hubIp=hub.subut.ai&email=' + vm.login + '&password=' + vm.pass;
-        $http.post(SERVER_URL + 'rest/v1/hub/register', postData, {
-            withCredentials: true,
-            headers: {'Content-Type': 'application/x-www-form-urlencoded'}
-        })
-            .success(function () {
-                LOADING_SCREEN('none');
-                localStorage.setItem('hubRegistered', true);
-                vm.hubStatus = true;
-                SweetAlert.swal("Success!", "Your peer was registered to Hub.", "success");
-            }).error(function (error) {
-            LOADING_SCREEN('none');
-            SweetAlert.swal("ERROR!", "Hub register error: " + error.replace(/\\n/g, " "), "error");
-        });
-    }
+	function hubPopupLoadScreen(show) {
+		if(show == undefined || show == null) show = false;
+		if(show) {
+			$('.js-hub-screen').show();
+		} else {
+			$('.js-hub-screen').hide();
+		}
+	}
 
-    function hubUnregister() {
-        LOADING_SCREEN();
-        $http.delete(SERVER_URL + 'rest/v1/hub/unregister')
-            .success(function () {
-                LOADING_SCREEN('none');
-                localStorage.removeItem('hubRegistered');
-                vm.hubStatus = false;
-                SweetAlert.swal("Success!", "Your peer was unregistered from Hub.", "success");
-            }).error(function (error) {
-            LOADING_SCREEN('none');
-            SweetAlert.swal("ERROR!", "Error while registering to Hub.\nPlease check your credentials and try again.", "error");
-        });
-    }
 
-    function hubHeartbeat() {
-        //should be rest/v1/hub no need to change
-        LOADING_SCREEN();
-        $http.post(SERVER_URL + 'rest/v1/hub/send-heartbeat', {withCredentials: true})
-            .success(function () {
-                LOADING_SCREEN('none');
-                localStorage.setItem('hubRegistered', true);
-                vm.hubStatus = true;
-                SweetAlert.swal("Success!", "Heartbeat sent successfully.", "success");
-            }).error(function (error) {
-            LOADING_SCREEN('none');
-            SweetAlert.swal("ERROR!", "Hub heartbeat error: " + error.replace(/\\n/g, " "), "error");
-        });
-    }
+	function hubRegister() {
+		vm.hubRegisterError = false;
+		hubPopupLoadScreen(true);
+		var postData = 'hubIp=hub.subut.ai&email=' + vm.login + '&password=' + vm.pass;
+		$http.post( SERVER_URL + 'rest/v1/hub/register', postData, {withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
+			.success(function () {
+				localStorage.setItem('hubRegistered', true);
+				vm.hubStatus = true;
+				hubPopupLoadScreen();
+				//SweetAlert.swal ("Success!", "Your peer was registered to Hub.", "success");
+			}).error (function (error) {
+				console.log('hub/register error: ', error);
+				vm.hubRegisterError = error;
+				hubPopupLoadScreen();
+			});
+	}
+
+	function hubUnregister() {
+		hubPopupLoadScreen(true);
+		$http.delete( SERVER_URL + 'rest/v1/hub/unregister' )
+			.success(function () {
+				hubPopupLoadScreen();
+				localStorage.removeItem('hubRegistered');
+				vm.hubStatus = false;
+				//SweetAlert.swal ("Success!", "Your peer was unregistered from Hub.", "success");
+			}).error (function (error) {
+				hubPopupLoadScreen();
+				SweetAlert.swal ("ERROR!", "Error while registering to Hub.\nPlease check your credentials and try again.", "error");
+			});
+	}
+
+	function hubHeartbeat() {
+		//should be rest/v1/hub no need to change
+		hubPopupLoadScreen(true);
+		$http.post( SERVER_URL + 'rest/v1/hub/send-heartbeat', {withCredentials: true} )
+			.success(function () {
+				hubPopupLoadScreen();
+				localStorage.setItem('hubRegistered', true);
+				vm.hubStatus = true;
+				SweetAlert.swal ("Success!", "Heartbeat sent successfully.", "success");
+			}).error (function (error) {
+				hubPopupLoadScreen();
+				SweetAlert.swal ("ERROR!", "Hub heartbeat error: " + error.replace(/\\n/g, " "), "error");
+			});
+	}
 
     function logout() {
         removeCookie('sptoken');
@@ -184,7 +193,7 @@ function SubutaiController($rootScope) {
     });
 }
 
-
+var $stateProviderRef = null;
 function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 
     $urlRouterProvider.otherwise('/404');
@@ -736,16 +745,18 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
         })
         .state();
 
-    $httpProvider.interceptors.push(function ($q, $location) {
-        return {
-            'responseError': function (rejection) {
-                if (rejection.status == 401 && $.inArray($location.path(), ['/login']) === -1) {
-                    $location.path('/login');
-                }
-                return $q.reject(rejection);
-            }
-        };
-    });
+	$stateProviderRef = $stateProvider;
+
+	$httpProvider.interceptors.push(function($q, $location) {
+		return {
+			'responseError': function(rejection) {
+				if (rejection.status == 401 && $.inArray($location.path(), ['/login']) === -1) {
+					$location.path('/login');
+				}
+				return $q.reject(rejection);
+			}
+		};
+	});
 }
 
 function startup($rootScope, $state, $location, $http) {
@@ -767,7 +778,39 @@ function startup($rootScope, $state, $location, $http) {
         }
     });
 
-    $rootScope.$state = $state;
+	$rootScope.$on('reloadPluginsStates', function(event) {
+		location.reload();
+		/*var state = {
+			url: '/console/{containerId}',
+			templateUrl: 'subutai-app/console/partials/view.html',
+			data: {
+				bodyClass: '',
+				layout: 'default'
+			},
+			resolve: {
+				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+					return $ocLazyLoad.load([
+						{
+							name: 'vtortola.ng-terminal'
+						},
+						{
+							name: 'subutai.console',
+							files: [
+								'subutai-app/console/console.js',
+								'subutai-app/console/controller.js',
+								'subutai-app/console/service.js',
+								'subutai-app/environment/service.js',
+								'subutai-app/peerRegistration/service.js'
+							]
+						}
+					]);
+				}]
+			}
+		};
+		$stateProviderRef.state('console', state);*/
+	});
+
+	$rootScope.$state = $state;
 }
 
 function getCookie(cname) {
