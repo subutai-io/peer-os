@@ -1,7 +1,4 @@
-package io.subutai.core.executor.impl;
-
-
-import io.subutai.common.command.ResponseImpl;
+package io.subutai.common.command;
 
 
 /**

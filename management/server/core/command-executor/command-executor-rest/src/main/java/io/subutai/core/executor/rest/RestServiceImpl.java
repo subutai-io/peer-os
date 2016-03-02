@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Preconditions;
 
 import io.subutai.common.command.ResponseImpl;
+import io.subutai.common.command.ResponseWrapper;
 import io.subutai.common.host.HeartBeat;
 import io.subutai.common.host.HeartbeatListener;
 import io.subutai.common.security.crypto.pgp.ContentAndSignatures;
@@ -81,6 +82,8 @@ public class RestServiceImpl implements RestService
 
             final HeartBeat heartBeat = JsonUtil.fromJson( decryptedHeartbeat, HeartBeat.class );
 
+            LOG.info( String.format( "Heartbeat: %s", heartBeat.getHostInfo() ) );
+
             for ( final HeartbeatListener listener : listeners )
             {
                 notifier.submit( new Runnable()
@@ -119,7 +122,9 @@ public class RestServiceImpl implements RestService
 
             LOG.info( String.format( "DECRYPTING:%n%s", decryptedResponse ) );
 
-            final ResponseImpl responseImpl = JsonUtil.fromJson( decryptedResponse, ResponseImpl.class );
+            ResponseWrapper responseWrapper = JsonUtil.fromJson( decryptedResponse, ResponseWrapper.class );
+
+            final ResponseImpl responseImpl = responseWrapper.getResponse();
 
             LOG.info( String.format( "RESPONSE:%s", responseImpl ) );
 

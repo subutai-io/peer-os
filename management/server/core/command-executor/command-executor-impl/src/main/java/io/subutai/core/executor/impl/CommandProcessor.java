@@ -18,6 +18,7 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.Request;
 import io.subutai.common.command.ResponseImpl;
+import io.subutai.common.command.ResponseWrapper;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.ResourceHostInfo;
@@ -182,7 +183,6 @@ public class CommandProcessor implements ByteMessageListener
         try
         {
             String responseString = new String( message, "UTF-8" );
-
 
             ResponseWrapper responseWrapper = JsonUtil.fromJson( responseString, ResponseWrapper.class );
 
