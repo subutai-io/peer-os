@@ -17,6 +17,7 @@ import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.Request;
+import io.subutai.common.command.Response;
 import io.subutai.common.command.ResponseImpl;
 import io.subutai.common.command.ResponseWrapper;
 import io.subutai.common.host.ContainerHostInfo;
@@ -29,6 +30,7 @@ import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.broker.api.Broker;
 import io.subutai.core.broker.api.ByteMessageListener;
 import io.subutai.core.broker.api.Topic;
+import io.subutai.core.executor.api.ResponseHandler;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.identity.api.IdentityManager;
@@ -40,7 +42,7 @@ import io.subutai.core.security.api.crypto.EncryptionTool;
 /**
  * Executes commands and processes responses
  */
-public class CommandProcessor implements ByteMessageListener
+public class CommandProcessor implements ByteMessageListener, ResponseHandler
 {
     private static final Logger LOG = LoggerFactory.getLogger( CommandProcessor.class.getName() );
     private final Broker broker;
@@ -178,17 +180,11 @@ public class CommandProcessor implements ByteMessageListener
 
 
     @Override
-    public void onMessage( final byte[] message )
+    public void handleResponse( final Response response )
     {
         try
         {
-            String responseString = new String( message, "UTF-8" );
-
-            ResponseWrapper responseWrapper = JsonUtil.fromJson( responseString, ResponseWrapper.class );
-
-            LOG.info( String.format( "Received:%n%s", JsonUtil.toJson( responseWrapper ) ) );
-
-            ResponseImpl response = responseWrapper.getResponse();
+            Preconditions.checkNotNull( response );
 
             CommandProcess commandProcess = commands.get( response.getCommandId() );
 
@@ -205,6 +201,28 @@ public class CommandProcessor implements ByteMessageListener
         catch ( Exception e )
         {
             LOG.error( "Error processing response", e );
+        }
+    }
+
+
+    @Override
+    public void onMessage( final byte[] message )
+    {
+        try
+        {
+            String responseString = new String( message, "UTF-8" );
+
+            ResponseWrapper responseWrapper = JsonUtil.fromJson( responseString, ResponseWrapper.class );
+
+            LOG.info( String.format( "Received:%n%s", JsonUtil.toJson( responseWrapper ) ) );
+
+            ResponseImpl response = responseWrapper.getResponse();
+
+            handleResponse( response );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error parsing response", e );
         }
     }
 

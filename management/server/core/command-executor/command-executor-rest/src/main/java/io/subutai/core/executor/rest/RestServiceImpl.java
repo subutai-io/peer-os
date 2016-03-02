@@ -23,6 +23,7 @@ import io.subutai.common.host.HeartbeatListener;
 import io.subutai.common.security.crypto.pgp.ContentAndSignatures;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.JsonUtil;
+import io.subutai.core.executor.api.ResponseHandler;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 
@@ -33,17 +34,20 @@ public class RestServiceImpl implements RestService
 {
     private static final Logger LOG = LoggerFactory.getLogger( RestServiceImpl.class.getName() );
     private final SecurityManager securityManager;
+    private final ResponseHandler responseHandler;
 
     protected Set<HeartbeatListener> listeners =
             Collections.newSetFromMap( new ConcurrentHashMap<HeartbeatListener, Boolean>() );
     protected ExecutorService notifier = Executors.newCachedThreadPool();
 
 
-    public RestServiceImpl( final SecurityManager securityManager )
+    public RestServiceImpl( final SecurityManager securityManager, final ResponseHandler responseHandler )
     {
         Preconditions.checkNotNull( securityManager );
+        Preconditions.checkNotNull( responseHandler );
 
         this.securityManager = securityManager;
+        this.responseHandler = responseHandler;
     }
 
 
@@ -78,11 +82,7 @@ public class RestServiceImpl implements RestService
         {
             String decryptedHeartbeat = decrypt( heartbeat );
 
-            LOG.info( String.format( "DECRYPTING:%n%s", decryptedHeartbeat ) );
-
             final HeartBeat heartBeat = JsonUtil.fromJson( decryptedHeartbeat, HeartBeat.class );
-
-            LOG.info( String.format( "Heartbeat: %s", heartBeat.getHostInfo() ) );
 
             for ( final HeartbeatListener listener : listeners )
             {
@@ -120,13 +120,11 @@ public class RestServiceImpl implements RestService
         {
             String decryptedResponse = decrypt( response );
 
-            LOG.info( String.format( "DECRYPTING:%n%s", decryptedResponse ) );
-
             ResponseWrapper responseWrapper = JsonUtil.fromJson( decryptedResponse, ResponseWrapper.class );
 
             final ResponseImpl responseImpl = responseWrapper.getResponse();
 
-            processResponse( responseImpl );
+            responseHandler.handleResponse( responseImpl );
 
             return Response.accepted().build();
         }
@@ -135,13 +133,6 @@ public class RestServiceImpl implements RestService
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
                     entity( e.getMessage() ).build();
         }
-    }
-
-
-    protected void processResponse( ResponseImpl response )
-    {
-        //todo feed command-executor with response here
-        LOG.info( String.format( "RESPONSE:%s", response ) );
     }
 
 

@@ -13,10 +13,13 @@
 
   <reference id="securityManager" availability="mandatory"
              interface="io.subutai.core.security.api.SecurityManager" />
+  <reference id="responseHandler" availability="mandatory"
+             interface="io.subutai.core.executor.api.ResponseHandler" />
 
   <bean id="commandExecutorRest" class="io.subutai.core.executor.rest.RestServiceImpl" scope="singleton"
         destroy-method="dispose">
     <argument ref="securityManager" />
+    <argument ref="responseHandler" />
   </bean>
 
   <jaxrs:server address="/v1/agent" id="commandExecutorRestService">
