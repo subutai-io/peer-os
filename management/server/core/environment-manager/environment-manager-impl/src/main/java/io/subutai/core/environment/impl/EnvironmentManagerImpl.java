@@ -94,7 +94,6 @@ import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserDelegate;
 import io.subutai.core.kurjun.api.TemplateManager;
-import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.object.relation.api.RelationManager;
 import io.subutai.core.object.relation.api.model.Relation;
@@ -1656,7 +1655,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             throw new EnvironmentCreationException( e );
         }
 
-        environment = saveOrUpdate( environment );
+        environment = save( environment );
 
         setEnvironmentTransientFields( environment );
 
@@ -1891,7 +1890,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     @Override
     public void notifyOnContainerStateChanged( final Environment environment, final ContainerHost containerHost )
     {
-        saveOrUpdate( environment );
+        update((EnvironmentImpl) environment );
     }
 
 
@@ -1920,7 +1919,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                 new EnvironmentImpl( name, subnetCidr, sshKey, getUserId(), peerManager.getLocalPeer().getId() );
 
         environment.setUserId( identityManager.getActiveUser().getId() );
-        environment = saveOrUpdate( environment );
+        environment = save( environment );
 
         setEnvironmentTransientFields( environment );
 
@@ -1942,12 +1941,21 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    public EnvironmentImpl saveOrUpdate( final Environment environment )
+    public EnvironmentImpl save( final Environment environment )
     {
-        EnvironmentImpl env = environmentDataService.saveOrUpdate( environment );
+        EnvironmentImpl env = environmentDataService.save( environment );
         setEnvironmentTransientFields( env );
         setContainersTransientFields( env );
         return env;
+    }
+
+
+    public EnvironmentImpl update( final EnvironmentImpl environment )
+    {
+        environmentDataService.update( ( EnvironmentImpl ) environment );
+        setEnvironmentTransientFields( environment );
+        setContainersTransientFields( environment );
+        return environment;
     }
 
 
@@ -2097,7 +2105,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
             environment.addAlertHandler( new EnvironmentAlertHandlerImpl( handlerId, handlerPriority ) );
 
-            saveOrUpdate( environment );
+            update( (EnvironmentImpl)environment );
         }
         catch ( Exception e )
         {
@@ -2123,7 +2131,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             Environment environment = environmentDataService.find( environmentId );
             environment.removeAlertHandler( new EnvironmentAlertHandlerImpl( handlerId, handlerPriority ) );
-            environmentDataService.saveOrUpdate( environment );
+            environmentDataService.save( environment );
         }
         catch ( Exception e )
         {

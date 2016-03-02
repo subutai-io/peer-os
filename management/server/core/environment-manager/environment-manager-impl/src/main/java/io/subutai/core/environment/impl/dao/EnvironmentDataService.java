@@ -24,7 +24,7 @@ public class EnvironmentDataService implements DataService<String, EnvironmentIm
 {
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentDataService.class );
     private DaoManager daoManager;
-    EntityManager em;
+    private EntityManager em;
 
 
     public EnvironmentDataService( DaoManager daoManager )
@@ -173,9 +173,9 @@ public class EnvironmentDataService implements DataService<String, EnvironmentIm
      * @param item - entity to update
      */
     @Override
-    public void update( EnvironmentImpl item )
+    public synchronized void update( EnvironmentImpl item )
     {
-        EntityManager em = daoManager.getEntityManagerFromFactory();
+//        EntityManager em = daoManager.getEntityManagerFromFactory();
         try
         {
             daoManager.startTransaction( em );
@@ -194,21 +194,14 @@ public class EnvironmentDataService implements DataService<String, EnvironmentIm
     }
 
 
-    public synchronized EnvironmentImpl saveOrUpdate( Environment item )
+    public synchronized EnvironmentImpl save( Environment item )
     {
 
         try
         {
             daoManager.startTransaction( em );
-            if ( !em.contains( item ) )
-            {
-                em.persist( item );
-                em.refresh( item );
-            }
-            else
-            {
-                item = em.merge( item );
-            }
+            em.persist( item );
+            em.refresh( item );
             daoManager.commitTransaction( em );
         }
         catch ( Exception e )

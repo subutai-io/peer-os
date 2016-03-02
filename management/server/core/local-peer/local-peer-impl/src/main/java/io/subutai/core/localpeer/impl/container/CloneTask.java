@@ -72,7 +72,7 @@ public class CloneTask extends AbstractTask<CloneRequest, CloneResponse>
     @Override
     public boolean isSequential()
     {
-        return true;
+        return false;
     }
 
 
