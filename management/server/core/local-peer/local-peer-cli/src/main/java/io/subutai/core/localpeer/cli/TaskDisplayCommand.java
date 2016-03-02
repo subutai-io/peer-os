@@ -1,12 +1,12 @@
 package io.subutai.core.localpeer.cli;
 
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.task.Task;
-import io.subutai.common.tracker.OperationMessage;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 
 
@@ -49,23 +49,22 @@ public class TaskDisplayCommand extends SubutaiShellCommandSupport
             return null;
         }
 
-        System.out.println( String.format( "Request: %s\n", task.getRequest() ) );
-//        System.out.println( String.format( "Response: %s\n", task.getResponse() ) );
         final String s = task.getCommandBatch().toString();
         System.out.println(
                 String.format( "%s\t%d\t%s...\t%s", task.getRequest().getResourceHostId(), task.getTimeout(),
                         s.substring( 0, Math.min( 50, s.length() ) ), task.getState() ) );
 
-        if ( task.getState() == Task.State.SUCCESS )
-        {
-            System.out.println( String.format( "\t\t%s\t%s", task.getState(), task.waitAndGetResponse() ) );
-        }
-        else if ( task.getState() == Task.State.FAILURE )
-        {
-            System.out.println( String.format( "\t\t%s\t%s", task.getState(), task.getExceptions() ) );
-        }
+        System.out.println( String.format( "Request: %s", task.getRequest() ) );
+        System.out.println( String.format( "Response: %s", task.waitAndGetResponse() ) );
+        System.out.println( "ExitCode: " + task.getExitCode() );
+        System.out.println( "StdOut: " + task.getStdOut() );
+        System.out.println( "StdErr: " + task.getStdErr() );
+        final String exceptions = task.getExceptionsAsString();
 
-        System.out.println( "Operation messages:" );
+        if ( StringUtils.isNotBlank( exceptions ) )
+        {
+            System.out.println( "Exceptions:\n" + exceptions );
+        }
 
         return null;
     }

@@ -65,7 +65,7 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
 
         environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
 
-        environment = environmentManager.saveOrUpdate( environment );
+        environment = environmentManager.update( environment );
 
         return EnvironmentDestructionPhase.CLEANUP_ENVIRONMENT;
     }
@@ -79,7 +79,7 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
         {
             new CleanupEnvironmentStep( environment ).execute();
 
-            environment = environmentManager.saveOrUpdate( environment );
+            environment = environmentManager.update( environment );
 
             return EnvironmentDestructionPhase.CLEANUP_P2P;
         }
@@ -100,7 +100,7 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
         {
             new CleanupP2PStep( environment ).execute();
 
-            environment = environmentManager.saveOrUpdate( environment );
+            environment = environmentManager.update( environment );
 
             return EnvironmentDestructionPhase.REMOVE_KEYS;
         }
@@ -121,7 +121,7 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
     //        {
     //            new DestroyContainersStep( environment, environmentManager, forceMetadataRemoval ).execute();
     //
-    //            environment = environmentManager.saveOrUpdate( environment );
+    //            environment = environmentManager.save( environment );
     //
     //            return EnvironmentDestructionPhase.CLEANUP_NETWORKING;
     //        }
@@ -142,7 +142,7 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
     //        {
     //            new CleanUpNetworkStep( environment ).execute();
     //
-    //            environment = environmentManager.saveOrUpdate( environment );
+    //            environment = environmentManager.save( environment );
     //
     //            return EnvironmentDestructionPhase.REMOVE_KEYS;
     //        }
@@ -163,7 +163,7 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
         {
             new RemoveKeysStep( environment ).execute();
 
-            environment = environmentManager.saveOrUpdate( environment );
+            environment = environmentManager.update( environment );
 
             return EnvironmentDestructionPhase.FINALIZE;
         }
@@ -198,7 +198,7 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
     public void setError( final Throwable error )
     {
         environment.setStatus( EnvironmentStatus.UNHEALTHY );
-        environment = environmentManager.saveOrUpdate( environment );
+        environment = environmentManager.update( environment );
         this.error = error;
         LOG.error( "Error destroying environment", error );
         operationTracker.addLogFailed( error.getMessage() );
