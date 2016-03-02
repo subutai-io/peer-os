@@ -43,6 +43,8 @@ import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.common.util.RestUtil;
+import io.subutai.common.util.ServiceLocator;
+import io.subutai.core.broker.api.Broker;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
@@ -259,6 +261,9 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
         {
             securityManager.getKeyStoreManager().importCertAsTrusted( SystemSettings.getSecurePortX2(), hostId, cert );
             securityManager.getHttpContextManager().reloadKeyStore();
+
+            //temporarily add this
+            ServiceLocator.getServiceNoCache( Broker.class ).registerClientCertificate( hostId, cert );
         }
         catch ( Exception e )
         {
