@@ -126,7 +126,7 @@ public class RestServiceImpl implements RestService
 
             final ResponseImpl responseImpl = responseWrapper.getResponse();
 
-            LOG.info( String.format( "RESPONSE:%s", responseImpl ) );
+            processResponse( responseImpl );
 
             return Response.accepted().build();
         }
@@ -140,7 +140,8 @@ public class RestServiceImpl implements RestService
 
     protected void processResponse( ResponseImpl response )
     {
-
+        //todo feed command-executor with response here
+        LOG.info( String.format( "RESPONSE:%s", response ) );
     }
 
 
