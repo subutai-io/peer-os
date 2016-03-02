@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/influxdb/influxdb/client/v2"
+	"github.com/influxdata/influxdb/client/v2"
 	"github.com/subutai-io/Subutai/agent/config"
 	"github.com/subutai-io/Subutai/agent/lib/container"
 	"github.com/subutai-io/Subutai/agent/lib/fs"

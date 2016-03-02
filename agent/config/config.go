@@ -21,6 +21,7 @@ type agentConfig struct {
 	Debug       bool
 }
 type managementConfig struct {
+	Cdn           string
 	Host          string
 	Port          string
 	Login         string
@@ -82,6 +83,7 @@ const defaultConfig = `
 	restPublicKey = /rest/v1/registration/public-key
 	restVerify = /rest/v1/registration/verify/container-token
 	kurjun = http://10.10.10.1:8551/rest/kurjun/templates
+        cdn = cdn.helper.subutai.io
 
 	[broker]
 	port = 8883

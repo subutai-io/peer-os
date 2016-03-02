@@ -4,30 +4,38 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
-	"github.com/pivotal-golang/archiver/extractor"
-	"github.com/subutai-io/Subutai/agent/config"
-	"github.com/subutai-io/Subutai/agent/lib/container"
-	"github.com/subutai-io/Subutai/agent/lib/gpg"
-	"github.com/subutai-io/Subutai/agent/lib/template"
-	"github.com/subutai-io/Subutai/agent/log"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"runtime"
 	"strings"
+	"time"
+
+	"github.com/nightlyone/lockfile"
+	"github.com/pivotal-golang/archiver/extractor"
+
+	"github.com/subutai-io/Subutai/agent/config"
+	"github.com/subutai-io/Subutai/agent/lib/container"
+	"github.com/subutai-io/Subutai/agent/lib/gpg"
+	"github.com/subutai-io/Subutai/agent/lib/template"
+	"github.com/subutai-io/Subutai/agent/log"
 )
 
-func templMd5(templ, arch, version, token string) string {
+var (
+	lock lockfile.Lockfile
+)
+
+func templId(templ, arch, version, token string) string {
 	// tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
 	// client := &http.Client{Transport: tr}
 	client := &http.Client{}
-	url := config.Management.Kurjun + "/public/get?name=" + templ + "&type=md5&sptoken=" + token
+	url := config.Management.Kurjun + "/get?name=" + templ + "&type=id&sptoken=" + token
 	if len(version) != 0 {
-		url = config.Management.Kurjun + "/public/get?name=" + templ + "&version=" + version + "&type=md5&sptoken=" + token
+		url = config.Management.Kurjun + "/get?name=" + templ + "&version=" + version + "&type=id&sptoken=" + token
 	}
 	response, err := client.Get(url)
-	log.Debug(config.Management.Kurjun + "/public/get?name=" + templ + "&type=md5&sptoken=" + token)
+	log.Debug(config.Management.Kurjun + "/get?name=" + templ + "&type=id&sptoken=" + token)
 	if log.Check(log.WarnLevel, "Getting kurjun response", err) || response.StatusCode != 200 {
 		return ""
 	}
@@ -38,6 +46,7 @@ func templMd5(templ, arch, version, token string) string {
 		return ""
 	}
 
+	log.Debug("Template id: " + string(hash))
 	return string(hash)
 }
 
@@ -72,28 +81,53 @@ func checkLocal(templ, md5, arch string) string {
 	return ""
 }
 
-func download(file, md5, token string) string {
+func download(file, id, token string) string {
 	out, err := os.Create(config.Agent.LxcPrefix + "lxc-data/tmpdir/" + file)
 	log.Check(log.FatalLevel, "Creating file "+file, err)
 	defer out.Close()
 	// tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
 	// client := &http.Client{Transport: tr}
 	client := &http.Client{}
-	response, err := client.Get(config.Management.Kurjun + "/public/get?md5=" + md5 + "&sptoken=" + token)
+	response, err := client.Get(config.Management.Kurjun + "/get?id=" + id + "&sptoken=" + token)
 	log.Check(log.FatalLevel, "Getting "+file, err)
 	defer response.Body.Close()
 	_, err = io.Copy(out, response.Body)
 	log.Check(log.FatalLevel, "Writing file "+file, err)
-	if md5 == md5sum(config.Agent.LxcPrefix+"lxc-data/tmpdir/"+file) {
+	if strings.Split(id, ".")[1] == md5sum(config.Agent.LxcPrefix+"lxc-data/tmpdir/"+file) {
 		return config.Agent.LxcPrefix + "lxc-data/tmpdir/" + file
 	}
 	log.Error("Failed to check MD5 after download. Please check your connection and try again.")
 	return ""
 }
+func lockImport(templ string) bool {
+	var err error
+
+	lock, err = lockfile.New("/var/run/lock/subutai-" + templ + ".import")
+	if log.Check(log.DebugLevel, "Init lock file for "+templ, err) {
+		return false
+	}
+
+	err = lock.TryLock()
+	if log.Check(log.DebugLevel, "Locking file for "+templ, err) {
+		return false
+	}
+
+	return true
+}
+
+func unlockImport(templ string) {
+	lock.Unlock()
+}
 
 func LxcImport(templ, version, token string) {
-	if container.IsTemplate(templ) {
-		log.Info(templ + " template exist")
+	log.Info("Importing " + templ)
+	for !lockImport(templ) {
+		time.Sleep(time.Second * 1)
+	}
+	defer unlockImport(templ)
+
+	if container.IsContainer(templ) {
+		log.Info(templ + " container exist")
 		return
 	}
 
@@ -102,12 +136,16 @@ func LxcImport(templ, version, token string) {
 	// if len(token) == 0 {
 	token = gpg.GetToken()
 	// }
-	md5 := templMd5(templ, runtime.GOARCH, version, token)
+	id := templId(templ, runtime.GOARCH, version, token)
+	md5 := ""
+	if len(strings.Split(id, ".")) > 1 {
+		md5 = strings.Split(id, ".")[1]
+	}
 
 	archive := checkLocal(templ, md5, runtime.GOARCH)
 	if len(archive) == 0 && len(md5) != 0 {
 		log.Info("Downloading " + templ)
-		archive = download(fullname, md5, token)
+		archive = download(fullname, id, token)
 	} else if len(archive) == 0 && len(md5) == 0 {
 		log.Error(templ + " " + version + " template not found")
 	}
