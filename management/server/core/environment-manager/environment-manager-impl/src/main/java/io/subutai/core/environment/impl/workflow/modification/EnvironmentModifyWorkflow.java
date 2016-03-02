@@ -23,6 +23,7 @@ import io.subutai.core.environment.impl.workflow.modification.steps.PEKGeneratio
 import io.subutai.core.environment.impl.workflow.modification.steps.SetupP2PStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.VNISetupStep;
 import io.subutai.core.kurjun.api.TemplateManager;
+import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerManager;
 
@@ -42,6 +43,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
     private final TrackerOperation operationTracker;
     private final EnvironmentManagerImpl environmentManager;
     private boolean forceMetadataRemoval;
+
 
     //environment creation phases
     public static enum EnvironmentGrowingPhase
@@ -216,7 +218,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
         try
         {
             new ContainerCloneStep( templateRegistry, defaultDomain, topology, environment, peerManager,
-                    environmentManager ).execute();
+                    environmentManager, operationTracker ).execute();
 
             environment = environmentManager.saveOrUpdate( environment );
 

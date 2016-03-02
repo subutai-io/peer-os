@@ -94,13 +94,6 @@ public class ContainerInfoJson implements ContainerInfo
 
 
     @Override
-    public String getContainerName()
-    {
-        return null;
-    }
-
-
-    @Override
     public HostInterfaces getHostInterfaces()
     {
         HostInterfaces result = new HostInterfaces();

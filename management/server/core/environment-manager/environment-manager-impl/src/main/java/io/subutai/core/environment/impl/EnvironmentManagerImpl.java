@@ -35,11 +35,12 @@ import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.EnvironmentStatus;
-import io.subutai.common.environment.NodeGroup;
+import io.subutai.common.environment.Node;
 import io.subutai.common.environment.PeerConf;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostInfoModel;
+import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.mdc.SubutaiExecutors;
@@ -93,6 +94,7 @@ import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserDelegate;
 import io.subutai.core.kurjun.api.TemplateManager;
+import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.object.relation.api.RelationManager;
 import io.subutai.core.object.relation.api.model.Relation;
@@ -581,14 +583,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     // TODO refactor to pass one Blueprint parameter from subutai-common
     @Override
     public Environment importEnvironment( final String name, final Topology topology,
-                                          final Map<NodeGroup, Set<ContainerHostInfo>> containers, final Integer vlan )
+                                          final Map<Node, Set<ContainerHostInfo>> containers, final Integer vlan )
             throws EnvironmentCreationException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid name" );
         Preconditions.checkNotNull( topology, "Invalid topology" );
         Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
 
-        Map.Entry<NodeGroup, Set<ContainerHostInfo>> containersEntry = containers.entrySet().iterator().next();
+        Map.Entry<Node, Set<ContainerHostInfo>> containersEntry = containers.entrySet().iterator().next();
         Iterator<ContainerHostInfo> hostIterator = containersEntry.getValue().iterator();
 
         String ip = "";
@@ -616,18 +618,19 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         //create empty environment
         final EnvironmentImpl environment = createEmptyEnvironment( name, ip, topology.getSshKey() );
-        for ( Map.Entry<NodeGroup, Set<ContainerHostInfo>> entry : containers.entrySet() )
+        for ( Map.Entry<Node, Set<ContainerHostInfo>> entry : containers.entrySet() )
         {
             for ( ContainerHostInfo newHost : entry.getValue() )
             {
                 ContainerSize containerType = entry.getKey().getType();
 
                 environment.addContainers( Sets.newHashSet(
-                        new EnvironmentContainerImpl( peerManager.getLocalPeer().getId(), peerManager.getLocalPeer(),
+                        new EnvironmentContainerImpl( peerManager.getLocalPeer().getId(), entry.getKey().getPeerId(),
                                 entry.getKey().getName(), new ContainerHostInfoModel( newHost ),
-                                templateRegistry.getTemplate( entry.getKey().getTemplateName() ),
+                                entry.getKey().getTemplateName(), HostArchitecture.AMD64,
                                 entry.getKey().getSshGroupId(), entry.getKey().getHostsGroupId(),
-                                Common.DEFAULT_DOMAIN_NAME, containerType, entry.getKey().getHostId() ) ) );
+                                Common.DEFAULT_DOMAIN_NAME, containerType, entry.getKey().getHostId(),
+                                entry.getKey().getName() ) ) );
             }
         }
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
@@ -1775,15 +1778,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             environmentContainer.setEnvironmentManager( this );
 
             String peerId = environmentContainer.getPeerId();
-            try
-            {
-                Peer peer = peerManager.getPeer( peerId );
-                environmentContainer.setPeer( peer );
-            }
-            catch ( PeerException e )
-            {
-                LOG.error( e.getMessage(), e );
-            }
         }
         // remove containers which doesn't have trust relation
     }

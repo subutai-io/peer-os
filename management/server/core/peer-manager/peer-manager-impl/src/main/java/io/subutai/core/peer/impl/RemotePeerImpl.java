@@ -28,11 +28,11 @@ import io.subutai.common.command.CommandStatus;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.environment.ContainersDestructionResultImpl;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
-import io.subutai.common.environment.CreateEnvironmentContainerGroupResponse;
+import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
 import io.subutai.common.environment.DestroyEnvironmentContainerGroupRequest;
 import io.subutai.common.environment.DestroyEnvironmentContainerGroupResponse;
 import io.subutai.common.environment.PrepareTemplatesRequest;
-import io.subutai.common.environment.PrepareTemplatesResponse;
+import io.subutai.common.environment.PrepareTemplatesResponseCollector;
 import io.subutai.common.exception.HTTPException;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostInfoModel;
@@ -657,7 +657,7 @@ public class RemotePeerImpl implements RemotePeer
 
     @RolesAllowed( "Environment-Management|Write" )
     @Override
-    public CreateEnvironmentContainerGroupResponse createEnvironmentContainerGroup(
+    public CreateEnvironmentContainerResponseCollector createEnvironmentContainerGroup(
             final CreateEnvironmentContainerGroupRequest request ) throws PeerException
     {
         Preconditions.checkNotNull( request, "Invalid request" );
@@ -667,9 +667,9 @@ public class RemotePeerImpl implements RemotePeer
         Map<String, String> headers = Maps.newHashMap();
         //************************************************************************
 
-        CreateEnvironmentContainerGroupResponse response =
+        CreateEnvironmentContainerResponseCollector response =
                 sendRequest( request, RecipientType.CREATE_ENVIRONMENT_CONTAINER_GROUP_REQUEST.name(),
-                        Timeouts.CREATE_CONTAINER_REQUEST_TIMEOUT, CreateEnvironmentContainerGroupResponse.class,
+                        Timeouts.CREATE_CONTAINER_REQUEST_TIMEOUT, CreateEnvironmentContainerResponseCollector.class,
                         Timeouts.CREATE_CONTAINER_RESPONSE_TIMEOUT, headers );
 
         if ( response != null )
@@ -685,7 +685,7 @@ public class RemotePeerImpl implements RemotePeer
 
     @RolesAllowed( "Environment-Management|Write" )
     @Override
-    public PrepareTemplatesResponse prepareTemplates( final PrepareTemplatesRequest request ) throws PeerException
+    public PrepareTemplatesResponseCollector prepareTemplates( final PrepareTemplatesRequest request ) throws PeerException
     {
         Preconditions.checkNotNull( request, "Invalid request" );
 
@@ -694,8 +694,8 @@ public class RemotePeerImpl implements RemotePeer
         Map<String, String> headers = Maps.newHashMap();
         //************************************************************************
 
-        PrepareTemplatesResponse response = sendRequest( request, RecipientType.PREPARE_TEMPLATE_REQUEST.name(),
-                Timeouts.CREATE_CONTAINER_REQUEST_TIMEOUT, PrepareTemplatesResponse.class,
+        PrepareTemplatesResponseCollector response = sendRequest( request, RecipientType.PREPARE_TEMPLATE_REQUEST.name(),
+                Timeouts.CREATE_CONTAINER_REQUEST_TIMEOUT, PrepareTemplatesResponseCollector.class,
                 Timeouts.CREATE_CONTAINER_RESPONSE_TIMEOUT, headers );
 
         if ( response != null )
@@ -876,6 +876,13 @@ public class RemotePeerImpl implements RemotePeer
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment ID" );
         new PeerWebClient( peerInfo, provider ).removeP2PConnection( environmentId );
+    }
+
+    @Override
+    public void cleanupEnvironment( final EnvironmentId environmentId ) throws PeerException
+    {
+        Preconditions.checkNotNull( environmentId, "Invalid environment ID" );
+        new PeerWebClient( peerInfo, provider ).cleanupEnvironment( environmentId );
     }
 
 

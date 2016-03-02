@@ -4,7 +4,6 @@ package io.subutai.core.strategy.api;
 import java.util.List;
 import java.util.Map;
 
-import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.quota.ContainerQuota;

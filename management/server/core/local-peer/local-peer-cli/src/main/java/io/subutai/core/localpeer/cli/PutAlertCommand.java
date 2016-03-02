@@ -13,8 +13,8 @@ import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.resource.ByteUnit;
-import io.subutai.common.resource.ContainerResourceType;
 import io.subutai.common.resource.ByteValueResource;
+import io.subutai.common.resource.ContainerResourceType;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 
 

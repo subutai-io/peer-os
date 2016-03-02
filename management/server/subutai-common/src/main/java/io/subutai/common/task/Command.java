@@ -10,32 +10,36 @@ import java.util.List;
  */
 public class Command
 {
-    private String name;
+    private String action;
     private List<String> args = new ArrayList<>();
 
 
-    public Command( final String name, final List<String> args )
+    public Command( final String action, final List<String> args )
     {
-        this.name = name;
+        this.action = action;
         this.args = args;
     }
 
 
-    public Command( final String name )
+    public Command( final String action )
     {
-        this.name = name;
+        this.action = action;
     }
 
 
-    public String getName()
+    public String getAction()
     {
-        return name;
+        return action;
     }
 
 
     public void addArgument( final String arg )
     {
-        this.args.add( arg );
+        if ( arg == null )
+        {
+            throw new IllegalArgumentException( "Command argument could not be null." );
+        }
+        this.args.add( arg.trim() );
     }
 
 

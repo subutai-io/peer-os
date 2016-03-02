@@ -7,17 +7,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.subutai.common.environment.NodeGroup;
+import io.subutai.common.environment.Node;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.resource.PeerGroupResources;
 import io.subutai.common.resource.PeerResources;
-import io.subutai.core.strategy.api.ExampleStrategy;
 import io.subutai.core.strategy.api.NodeSchema;
 import io.subutai.core.strategy.api.StrategyException;
 import io.subutai.core.strategy.api.UnlimitedStrategy;
@@ -73,10 +73,10 @@ public class UnlimitedPlacementStrategy implements UnlimitedStrategy
     {
         Topology result = new Topology( environmentName, sshGroupId, hostGroupId );
 
-        Set<NodeGroup> nodeGroups = distribute( getScheme(), peerGroupResources, quotas );
-        for ( NodeGroup nodeGroup : nodeGroups )
+        Set<Node> nodes = distribute( getScheme(), peerGroupResources, quotas );
+        for ( Node node : nodes )
         {
-            result.addNodeGroupPlacement( nodeGroup.getPeerId(), nodeGroup );
+            result.addNodePlacement( node.getPeerId(), node );
         }
 
         return result;
@@ -90,10 +90,10 @@ public class UnlimitedPlacementStrategy implements UnlimitedStrategy
     {
         Topology result = new Topology( environmentName, sshGroupId, hostGroupId );
 
-        Set<NodeGroup> ng = distribute( nodeSchema, peerGroupResources, quotas );
-        for ( NodeGroup nodeGroup : ng )
+        Set<Node> ng = distribute( nodeSchema, peerGroupResources, quotas );
+        for ( Node node : ng )
         {
-            result.addNodeGroupPlacement( nodeGroup.getPeerId(), nodeGroup );
+            result.addNodePlacement( node.getPeerId(), node );
         }
 
         return result;
@@ -107,7 +107,7 @@ public class UnlimitedPlacementStrategy implements UnlimitedStrategy
     }
 
 
-    protected Set<NodeGroup> distribute( List<NodeSchema> nodeSchemas, PeerGroupResources peerGroupResources,
+    protected Set<Node> distribute( List<NodeSchema> nodeSchemas, PeerGroupResources peerGroupResources,
                                          Map<ContainerSize, ContainerQuota> quotas ) throws StrategyException
     {
 
@@ -150,7 +150,7 @@ public class UnlimitedPlacementStrategy implements UnlimitedStrategy
             }
         }
 
-        Set<NodeGroup> nodeGroups = new HashSet<>();
+        Set<Node> nodes = new HashSet<>();
 
         for ( RandomAllocator resourceAllocator : allocators )
         {
@@ -159,16 +159,16 @@ public class UnlimitedPlacementStrategy implements UnlimitedStrategy
             {
                 for ( RandomAllocator.AllocatedContainer container : containers )
                 {
-                    NodeGroup nodeGroup =
-                            new NodeGroup( container.getName(), container.getTemplateName(), container.getSize(), 0, 0,
-                                    container.getPeerId(), container.getHostId() );
-                    nodeGroups.add( nodeGroup );
+                    Node node = new Node( UUID.randomUUID().toString(), container.getName(),
+                            container.getTemplateName(), container.getSize(), 0, 0, container.getPeerId(),
+                            container.getHostId() );
+                    nodes.add( node );
                 }
             }
         }
 
 
-        return nodeGroups;
+        return nodes;
     }
 
 
