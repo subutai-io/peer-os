@@ -56,7 +56,7 @@ public class SshKeyAdditionWorkflow extends Workflow<SshKeyAdditionWorkflow.SshK
 
         environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
 
-        environment = environmentManager.saveOrUpdate( environment );
+        environment = environmentManager.update( environment );
 
         return SshKeyAdditionPhase.ADD_KEY;
     }
@@ -71,7 +71,7 @@ public class SshKeyAdditionWorkflow extends Workflow<SshKeyAdditionWorkflow.SshK
         {
             new AddSshKeyStep( Sets.newHashSet( sshKey ), environment, networkManager ).execute();
 
-            environment = environmentManager.saveOrUpdate( environment );
+            environment = environmentManager.update( environment );
 
             return SshKeyAdditionPhase.FINALIZE;
         }
@@ -90,7 +90,7 @@ public class SshKeyAdditionWorkflow extends Workflow<SshKeyAdditionWorkflow.SshK
 
         environment.setStatus( EnvironmentStatus.HEALTHY );
 
-        environment = environmentManager.saveOrUpdate( environment );
+        environment = environmentManager.update( environment );
 
         operationTracker.addLogDone( "Ssh key is added" );
 
@@ -110,7 +110,7 @@ public class SshKeyAdditionWorkflow extends Workflow<SshKeyAdditionWorkflow.SshK
     private void saveFailState()
     {
         environment.setStatus( EnvironmentStatus.UNHEALTHY );
-        environment = environmentManager.saveOrUpdate( environment );
+        environment = environmentManager.update( environment );
         operationTracker.addLogFailed( getFailedReason() );
         LOG.error( "Error adding ssh key", getFailedException() );
     }

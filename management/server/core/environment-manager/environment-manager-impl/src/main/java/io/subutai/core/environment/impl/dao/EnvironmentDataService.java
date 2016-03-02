@@ -194,21 +194,14 @@ public class EnvironmentDataService implements DataService<String, EnvironmentIm
     }
 
 
-    public synchronized EnvironmentImpl saveOrUpdate( Environment item )
+    public synchronized EnvironmentImpl save( Environment item )
     {
 
         try
         {
             daoManager.startTransaction( em );
-            if ( !em.contains( item ) )
-            {
-                em.persist( item );
-                em.refresh( item );
-            }
-            else
-            {
-                item = em.merge( item );
-            }
+            em.persist( item );
+            em.refresh( item );
             daoManager.commitTransaction( em );
         }
         catch ( Exception e )
