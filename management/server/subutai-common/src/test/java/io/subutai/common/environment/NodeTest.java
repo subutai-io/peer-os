@@ -16,12 +16,12 @@ import static org.junit.Assert.assertNotNull;
 
 @RunWith( MockitoJUnitRunner.class )
 @Ignore
-public class NodeGroupTest
+public class NodeTest
 {
     private static final String PEER_ID = "peer_id";
     private static final String TEMPLATE_NAME = "template_name";
     private static final String NODEGROUP_NAME = "test_node_group";
-    private NodeGroup nodeGroup;
+    private Node node;
 
     @Mock
     PlacementStrategy placementStrategy;
@@ -39,13 +39,13 @@ public class NodeGroupTest
     {
 //        assertNotNull( nodeGroup.getNumberOfContainers() );
 //        assertNotNull( nodeGroup.getContainerPlacementStrategy() );
-        assertNotNull( nodeGroup.getHostsGroupId() );
-        assertNotNull( nodeGroup.getName() );
-        assertNotNull( nodeGroup.getSshGroupId() );
-        assertNotNull( nodeGroup.getTemplateName() );
-        assertNotNull( nodeGroup.getPeerId() );
-        assertEquals( nodeGroup.getName(), NODEGROUP_NAME );
-        assertEquals( nodeGroup.getPeerId(), PEER_ID );
-        assertEquals( nodeGroup.getTemplateName(), TEMPLATE_NAME );
+        assertNotNull( node.getHostsGroupId() );
+        assertNotNull( node.getName() );
+        assertNotNull( node.getSshGroupId() );
+        assertNotNull( node.getTemplateName() );
+        assertNotNull( node.getPeerId() );
+        assertEquals( node.getName(), NODEGROUP_NAME );
+        assertEquals( node.getPeerId(), PEER_ID );
+        assertEquals( node.getTemplateName(), TEMPLATE_NAME );
     }
 }

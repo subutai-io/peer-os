@@ -28,8 +28,10 @@ import com.google.common.base.Strings;
 
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerHost;
@@ -114,15 +116,21 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     }
 
 
-    public ContainerHostEntity( String peerId, HostInfo hostInfo, String templateName, String templateArch )
+    public ContainerHostEntity( final String peerId, final String hostId, final String hostname,
+                                HostArchitecture architecture, HostInterfaces hostInterfaces,
+                                final String containerName, final String templateName, final String templateArch,
+                                final String environmentId, final String ownerId, final String initiatorPeerId,
+                                final ContainerSize containerSize, final ContainerHostState state )
     {
-        super( peerId, hostInfo );
-
-        updateHostInfo( hostInfo );
-
-        this.containerName = ( ( ContainerHostInfo ) hostInfo ).getContainerName();
+        super( peerId, hostId, hostname, architecture, hostInterfaces );
+        this.containerName = containerName;
         this.templateName = templateName;
         this.templateArch = templateArch;
+        this.environmentId = environmentId;
+        this.initiatorPeerId = initiatorPeerId;
+        this.ownerId = ownerId;
+        this.containerSize = containerSize;
+        this.state = state;
     }
 
 

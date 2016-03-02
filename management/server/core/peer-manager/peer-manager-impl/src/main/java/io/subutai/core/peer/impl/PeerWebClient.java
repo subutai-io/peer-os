@@ -355,6 +355,28 @@ public class PeerWebClient
         }
     }
 
+    public void cleanupEnvironment( final EnvironmentId environmentId ) throws PeerException
+    {
+        LOG.debug( String.format( "Cleaning up environment: %s", environmentId.getId() ) );
+
+        String path = String.format( "/cleanup/%s", environmentId.getId() );
+
+        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
+
+        client.type( MediaType.APPLICATION_JSON );
+        client.accept( MediaType.APPLICATION_JSON );
+
+        try
+        {
+            client.delete();
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( "Error cleaning up environment.", e );
+        }
+    }
+
 
     public ResourceHostMetrics getResourceHostMetrics() throws PeerException
     {

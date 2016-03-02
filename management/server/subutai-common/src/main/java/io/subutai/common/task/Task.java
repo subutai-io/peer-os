@@ -3,22 +3,33 @@ package io.subutai.common.task;
 
 import java.util.List;
 
+import io.subutai.common.command.CommandResult;
+import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.Host;
+import io.subutai.common.peer.ResourceHost;
 
 
 /**
  * Task interface
  */
-public interface Task<T>
+public interface Task<R extends TaskRequest, T extends TaskResponse>
 {
-    long getElapsedTime();
-
     enum State
     {
         PENDING, RUNNING, SUCCESS, FAILURE;
-    }
 
-    void start( final int taskId );
+    }
+    long getElapsedTime();
+
+    long getFinished();
+
+    int getId();
+
+    RequestBuilder getRequestBuilder() throws Exception;
+
+    void start( int id );
+
+    void done( final CommandResult commandResult );
 
     State getState();
 
@@ -26,14 +37,18 @@ public interface Task<T>
 
     CommandBatch getCommandBatch() throws Exception;
 
-    T getResult();
+    R getRequest();
 
-    Host getHost();
+    //    T getResponse();
+
+    T waitAndGetResponse();
 
     boolean isSequential();
 
+    String getExceptionsAsString();
+
     int getTimeout();
 
-    boolean isDone();
 
+    boolean isDone();
 }

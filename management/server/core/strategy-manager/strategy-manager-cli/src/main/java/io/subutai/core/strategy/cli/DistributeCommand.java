@@ -1,10 +1,8 @@
 package io.subutai.core.strategy.cli;
 
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,11 +10,9 @@ import org.slf4j.LoggerFactory;
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 
-import io.subutai.common.environment.Blueprint;
-import io.subutai.common.environment.NodeGroup;
+import io.subutai.common.environment.Node;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.ContainerSize;
-import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.resource.PeerGroupResources;
@@ -82,7 +78,7 @@ public class DistributeCommand extends SubutaiShellCommandSupport
             System.out.println( topology.getEnvironmentName() );
             for ( String peer : topology.getNodeGroupPlacement().keySet() )
             {
-                for ( NodeGroup ng : topology.getNodeGroupPlacement().get( peer ) )
+                for ( Node ng : topology.getNodeGroupPlacement().get( peer ) )
                 {
                     System.out.println(
                             String.format( "%s\t%s\t\t%s\t\t%s\t%s", ng.getPeerId(), ng.getHostId(), ng.getName(),

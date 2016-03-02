@@ -115,7 +115,7 @@ public class EnvironmentWebClient
         catch ( Exception e )
         {
             LOG.error( e.getMessage(), e );
-            throw new PeerException( "Error getting container state: " + e.getMessage() );
+            throw new PeerException( "Error on reading container state: " + e.getMessage() );
         }
     }
 

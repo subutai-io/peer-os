@@ -277,10 +277,12 @@ public class QuotaManagerImpl implements QuotaManager
 
     private BigDecimal[] getUsedResources( final ResourceHost resourceHost, final String peerId ) throws QuotaException
     {
-        Collection<ContainerHost> containerHosts = resourceHost.getContainerHostsByPeerId( peerId );
         BigDecimal cpuAccumulo = BigDecimal.ZERO;
         BigDecimal ramAccumulo = BigDecimal.ZERO;
         BigDecimal diskAccumulo = BigDecimal.ZERO;
+        // todo: extract from DB
+/*
+        Collection<ContainerHost> containerHosts = resourceHost.getContainerHostsByPeerId( peerId );
         for ( ContainerHost containerHost : containerHosts )
         {
             ContainerQuota containerQuota = getQuota( containerHost.getContainerId() );
@@ -299,6 +301,7 @@ public class QuotaManagerImpl implements QuotaManager
             disk = disk.add( rootfs.getResource().getValue() );
             diskAccumulo = diskAccumulo.add( disk );
         }
+*/
 
 
         return new BigDecimal[] { cpuAccumulo, ramAccumulo, diskAccumulo };

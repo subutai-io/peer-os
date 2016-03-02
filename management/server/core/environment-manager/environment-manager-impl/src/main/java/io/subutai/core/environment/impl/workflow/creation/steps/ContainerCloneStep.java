@@ -1,10 +1,10 @@
 package io.subutai.core.environment.impl.workflow.creation.steps;
 
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletionService;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
@@ -16,21 +16,26 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.commons.net.util.SubnetUtils;
 
-import com.google.common.collect.Sets;
-
-import io.subutai.common.environment.NodeGroup;
+import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
+import io.subutai.common.environment.Node;
 import io.subutai.common.environment.Topology;
+import io.subutai.common.host.ContainerHostInfoModel;
+import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.host.HostInterfaceModel;
+import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.security.objects.Ownership;
-import io.subutai.common.util.CollectionUtil;
+import io.subutai.common.settings.Common;
+import io.subutai.common.task.CloneResponse;
+import io.subutai.common.tracker.OperationMessage;
+import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.creation.steps.helpers.CreatePeerNodeGroupsTask;
-import io.subutai.core.environment.impl.workflow.creation.steps.helpers.NodeGroupBuildResult;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserDelegate;
@@ -55,13 +60,16 @@ public class ContainerCloneStep
     private final EnvironmentImpl environment;
     private final RelationManager relationManager;
     private final IdentityManager identityManager;
+    private final TrackerOperation operationTracker;
+    private final String localPeerId;
     protected ExceptionUtil exceptionUtil = new ExceptionUtil();
     private PeerManager peerManager;
 
 
     public ContainerCloneStep( final TemplateManager templateRegistry, final String defaultDomain,
                                final Topology topology, final EnvironmentImpl environment,
-                               final PeerManager peerManager, final EnvironmentManagerImpl environmentManager )
+                               final PeerManager peerManager, final EnvironmentManagerImpl environmentManager,
+                               final TrackerOperation operationTracker )
     {
         this.templateRegistry = templateRegistry;
         this.defaultDomain = defaultDomain;
@@ -70,13 +78,15 @@ public class ContainerCloneStep
         this.peerManager = peerManager;
         this.relationManager = environmentManager.getRelationManager();
         this.identityManager = environmentManager.getIdentityManager();
+        this.operationTracker = operationTracker;
+        this.localPeerId = peerManager.getLocalPeer().getId();
     }
 
 
     public void execute() throws EnvironmentCreationException, PeerException
     {
 
-        Map<String, Set<NodeGroup>> placement = topology.getNodeGroupPlacement();
+        Map<String, Set<Node>> placement = topology.getNodeGroupPlacement();
 
         SubnetUtils cidr = new SubnetUtils( environment.getSubnetCidr() );
 
@@ -88,12 +98,9 @@ public class ContainerCloneStep
 
         //obtain used ip address count
         int requestedContainerCount = 0;
-        for ( Set<NodeGroup> nodeGroups : placement.values() )
+        for ( Set<Node> nodes : placement.values() )
         {
-            for ( NodeGroup nodeGroup : nodeGroups )
-            {
-                requestedContainerCount++;
-            }
+            requestedContainerCount += nodes.size();
         }
 
         //check if available ip addresses are enough
@@ -106,20 +113,20 @@ public class ContainerCloneStep
 
         ExecutorService taskExecutor = Executors.newFixedThreadPool( placement.size() );
 
-        CompletionService<Set<NodeGroupBuildResult>> taskCompletionService = getCompletionService( taskExecutor );
+        CompletionService<CreateEnvironmentContainerResponseCollector> taskCompletionService =
+                getCompletionService( taskExecutor );
 
         int currentLastUsedIpIndex = environment.getLastUsedIpIndex();
 
 
         //submit parallel environment part creation tasks across peers
-        for ( Map.Entry<String, Set<NodeGroup>> peerPlacement : placement.entrySet() )
+        for ( Map.Entry<String, Set<Node>> peerPlacement : placement.entrySet() )
         {
             Peer peer = peerManager.getPeer( peerPlacement.getKey() );
             LOGGER.debug( String.format( "Scheduling node group task on peer %s", peer.getId() ) );
 
-            taskCompletionService.submit(
-                    new CreatePeerNodeGroupsTask( peer, peerPlacement.getValue(), peerManager.getLocalPeer(),
-                            environment, currentLastUsedIpIndex + 1, templateRegistry, defaultDomain ) );
+            taskCompletionService.submit( new CreatePeerNodeGroupsTask( peer, peerManager.getLocalPeer(), environment,
+                    currentLastUsedIpIndex + 1, peerPlacement.getValue() ) );
 
             currentLastUsedIpIndex += peerPlacement.getValue().size();
 
@@ -129,41 +136,86 @@ public class ContainerCloneStep
         taskExecutor.shutdown();
 
         //collect results
-        Set<String> errors = Sets.newHashSet();
 
         for ( int i = 0; i < placement.size(); i++ )
         {
             try
             {
-                Future<Set<NodeGroupBuildResult>> futures = taskCompletionService.take();
-                Set<NodeGroupBuildResult> results = futures.get();
-                for ( NodeGroupBuildResult result : results )
-                {
-                    LOGGER.debug( String.format( "Node group build result: %s", result ) );
-                    if ( !CollectionUtil.isCollectionEmpty( result.getContainers() ) )
-                    {
-                        environment.addContainers( result.getContainers() );
-                        buildRelationChain( environment, result.getContainers() );
-                    }
-
-                    if ( result.getException() != null )
-                    {
-                        errors.add( exceptionUtil.getRootCauseMessage( result.getException() ) );
-                    }
-                }
+                Future<CreateEnvironmentContainerResponseCollector> futures = taskCompletionService.take();
+                CreateEnvironmentContainerResponseCollector response = futures.get();
+                addLogs( response );
+                processResponse( placement.get( response.getPeerId() ), response );
             }
             catch ( Exception e )
             {
-                errors.add( exceptionUtil.getRootCauseMessage( e ) );
+                LOGGER.error( e.getMessage(), e );
+                throw new EnvironmentCreationException(
+                        String.format( "There were errors during container creation. Unexpected error." ) );
+            }
+        }
+    }
+
+
+    private void processResponse( final Set<Node> nodes, final CreateEnvironmentContainerResponseCollector result )
+    {
+        final Set<EnvironmentContainerImpl> containers = new HashSet<>();
+        for ( CloneResponse cloneResponse : result.getResponses() )
+        {
+            LOGGER.debug( String.format( "Clone response: %s", cloneResponse ) );
+
+            final Node node = findNodeGroup( cloneResponse.getHostname(), nodes );
+            if ( node != null )
+            {
+                EnvironmentContainerImpl c = buildContainerEntity( result.getPeerId(), node, cloneResponse );
+                containers.add( c );
+            }
+            else
+            {
+                LOGGER.error( "Node group not found." );
             }
         }
 
-        if ( !errors.isEmpty() )
-        {
+        environment.addContainers( containers );
+        buildRelationChain( environment, containers );
+    }
 
-            throw new EnvironmentCreationException(
-                    String.format( "There were errors during container creation:  %s", errors ) );
+
+    private void addLogs( final CreateEnvironmentContainerResponseCollector result )
+    {
+        for ( OperationMessage message : result.getOperationMessages() )
+        {
+            operationTracker.addLog( message.getValue() );
         }
+    }
+
+
+    private EnvironmentContainerImpl buildContainerEntity( final String peerId, final Node node,
+                                                           final CloneResponse cloneResponse )
+    {
+
+        final HostInterfaces interfaces = new HostInterfaces();
+        interfaces.addHostInterface(
+                new HostInterfaceModel( Common.DEFAULT_CONTAINER_INTERFACE, cloneResponse.getIp() ) );
+        final ContainerHostInfoModel infoModel =
+                new ContainerHostInfoModel( cloneResponse.getAgentId(), cloneResponse.getHostname(), interfaces,
+                        cloneResponse.getTemplateArch(), ContainerHostState.CLONING );
+        return new EnvironmentContainerImpl( localPeerId, peerId, cloneResponse.getHostname(), infoModel,
+                cloneResponse.getTemplateName(), cloneResponse.getTemplateArch(), node.getSshGroupId(),
+                node.getHostsGroupId(), defaultDomain, node.getType(), node.getHostId(), node.getName() );
+    }
+
+
+    private Node findNodeGroup( final String hostname, final Set<Node> nodes )
+    {
+        for ( Node node : nodes )
+        {
+            if ( hostname.equals( node.getHostname() ) )
+            {
+                return node;
+            }
+        }
+
+        return null;
     }
 
 
@@ -193,12 +245,12 @@ public class ContainerCloneStep
         }
         catch ( Exception ex )
         {
-            LOGGER.info( "Error building relation", ex );
+            LOGGER.error( "Error building relation", ex );
         }
     }
 
 
-    protected CompletionService<Set<NodeGroupBuildResult>> getCompletionService( Executor executor )
+    protected CompletionService<CreateEnvironmentContainerResponseCollector> getCompletionService( Executor executor )
     {
         return new ExecutorCompletionService<>( executor );
     }
