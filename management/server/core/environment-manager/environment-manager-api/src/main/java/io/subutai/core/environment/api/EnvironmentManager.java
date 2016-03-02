@@ -1,11 +1,14 @@
 package io.subutai.core.environment.api;
 
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import io.subutai.common.environment.Blueprint;
+import javax.annotation.security.RolesAllowed;
+
 import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
@@ -14,8 +17,13 @@ import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
+import io.subutai.common.peer.AlertHandler;
+import io.subutai.common.peer.AlertHandlerPriority;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.EnvironmentAlertHandlers;
 import io.subutai.common.peer.EnvironmentContainerHost;
+import io.subutai.common.peer.EnvironmentId;
+import io.subutai.core.environment.api.ShareDto.ShareDto;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
@@ -26,6 +34,7 @@ import io.subutai.core.environment.api.exception.EnvironmentManagerException;
  */
 public interface EnvironmentManager
 {
+    //TODO implement startContainer, stopContainer and resetP2PSecretKey methods
 
     /**
      * Returns all existing environments
@@ -34,25 +43,35 @@ public interface EnvironmentManager
      */
     Set<Environment> getEnvironments();
 
+
+    Environment setupRequisites( Topology topology ) throws EnvironmentCreationException;
+
+
+    Environment startEnvironmentBuild( String environmentId, String signedMessage, boolean async )
+            throws EnvironmentCreationException;
+
     /**
      * Creates environment based on a passed topology
      *
-     * @param blueprint - {@code Blueprint}
+     * @param topology - {@code Topology}
      * @param async - indicates whether environment is created synchronously or asynchronously to the calling party
      *
      * @return - created environment
      *
      * @throws EnvironmentCreationException - thrown if error occurs during environment creation
      */
-    Environment createEnvironment( Blueprint blueprint, boolean async ) throws EnvironmentCreationException;
+    @RolesAllowed( "Environment-Management|Write" )
+    Environment createEnvironment( Topology topology, boolean async ) throws EnvironmentCreationException;
 
+    @RolesAllowed( "Environment-Management|Write" )
+    UUID createEnvironmentAndGetTrackerID(Topology topology, boolean async)
+            throws EnvironmentCreationException;
 
     /**
      * Imports environment based on a passed topology
      *
      * @param name - environment name
      * @param topology - {@code Topology} //@param subnetCidr - subnet in CIDR-notation string, e.g. "192.168.0.1/16"
-     * @param ssh - optional ssh key content //@param async - indicates whether environment is created synchronously or
      * asynchronously to the calling party
      *
      * @return - created environment
@@ -60,13 +79,13 @@ public interface EnvironmentManager
      * @throws EnvironmentCreationException - thrown if error occurs during environment creation
      */
     Environment importEnvironment( String name, Topology topology, Map<NodeGroup, Set<ContainerHostInfo>> containers,
-                                   String ssh, Integer vlan ) throws EnvironmentCreationException;
+                                   Integer vlan ) throws EnvironmentCreationException;
 
 
     /**
      * Grows environment based on a passed topology
      *
-     * @param blueprint - {@code Blueprint}
+     * @param topology - {@code Topology}
      * @param async - indicates whether environment is grown synchronously or asynchronously to the calling party
      *
      * @return - set of newly created {@code ContainerHost} or empty set if operation is async
@@ -74,7 +93,12 @@ public interface EnvironmentManager
      * @throws EnvironmentModificationException - thrown if error occurs during environment modification
      * @throws EnvironmentNotFoundException - thrown if environment not found
      */
-    Set<EnvironmentContainerHost> growEnvironment( String environmentId, Blueprint blueprint, boolean async )
+    Set<EnvironmentContainerHost> growEnvironment( String environmentId, Topology topology, boolean async )
+            throws EnvironmentModificationException, EnvironmentNotFoundException;
+
+
+    @RolesAllowed( "Environment-Management|Write" )
+    UUID modifyEnvironmentAndGetTrackerID(String environmentId, Topology topology, List<String> removedContainers, boolean async)
             throws EnvironmentModificationException, EnvironmentNotFoundException;
 
     /**
@@ -83,15 +107,30 @@ public interface EnvironmentManager
      *
      * @param environmentId - environment id
      * @param sshKey - ssh key content
-     * @param async - indicates whether ssh key is applied synchronously or asynchronously to the calling party
-     *
-     * @throws io.subutai.common.environment.EnvironmentNotFoundException - thrown if environment not found
-     * @throws io.subutai.common.environment.EnvironmentModificationException - thrown if error occurs during key
-     * insertion
+     * @param async - indicates whether ssh key is added synchronously or asynchronously to the calling party
      */
-    void setSshKey( String environmentId, String sshKey, boolean async )
+    void addSshKey( String environmentId, String sshKey, boolean async )
             throws EnvironmentNotFoundException, EnvironmentModificationException;
 
+    /**
+     * Removes ssh key from environment containers authorized_keys file
+     *
+     * @param environmentId - environment id
+     * @param sshKey - ssh key content
+     * @param async - indicates whether ssh key is removed synchronously or asynchronously to the calling party
+     */
+    void removeSshKey( String environmentId, String sshKey, boolean async )
+            throws EnvironmentNotFoundException, EnvironmentModificationException;
+
+    /**
+     * Allows to change p2p network's secret key
+     *
+     * @param environmentId - environment id
+     * @param newP2pSecretKey - new secret key
+     * @param p2pSecretKeyTtlSec - new secret key's time-to-live in seconds
+     */
+    void resetP2PSecretKey( String environmentId, String newP2pSecretKey, long p2pSecretKeyTtlSec, boolean async )
+            throws EnvironmentNotFoundException, EnvironmentModificationException;
 
     /**
      * Destroys environment by id.
@@ -154,11 +193,11 @@ public interface EnvironmentManager
 
 
     /**
-     * Save environment blueprint
+     * Save environment topology
      *
-     * @param blueprint - blueprint to save
+     * @param topology - topology to save
      */
-    void saveBlueprint( Blueprint blueprint ) throws EnvironmentManagerException;
+    void saveTopology( Topology topology ) throws EnvironmentManagerException;
 
     /**
      * Loads environment blueprint from DB
@@ -167,7 +206,7 @@ public interface EnvironmentManager
      *
      * @return environment blueprint
      */
-    Blueprint getBlueprint( UUID id ) throws EnvironmentManagerException;
+    Topology getTopology( UUID id ) throws EnvironmentManagerException;
 
     ;
 
@@ -175,9 +214,9 @@ public interface EnvironmentManager
     /**
      * Remove blueprint from database
      *
-     * @param blueprintId - blueprint id to remove
+     * @param topologyId - blueprint id to remove
      */
-    void removeBlueprint( UUID blueprintId ) throws EnvironmentManagerException;
+    void removeTopology( UUID topologyId ) throws EnvironmentManagerException;
 
 
     /**
@@ -185,7 +224,7 @@ public interface EnvironmentManager
      *
      * @return - set of blueprints
      */
-    Set<Blueprint> getBlueprints() throws EnvironmentManagerException;
+    Set<Topology> getBlueprints() throws EnvironmentManagerException;
 
 
     /**
@@ -243,7 +282,7 @@ public interface EnvironmentManager
      *
      * @return port for ssh connection
      */
-    int setupContainerSsh( final String containerHostId, final String environmentId )
+    int setupContainerSsh( String containerHostId, String environmentId )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException;
 
     void removeContainerFromEnvironmentDomain( String containerHostId, String environmentId )
@@ -253,8 +292,22 @@ public interface EnvironmentManager
 
     void notifyOnContainerStateChanged( Environment environment, ContainerHost containerHost );
 
-    void addAlertListener( EnvironmentAlertListener alertListener );
+    void addAlertHandler( AlertHandler alertHandler );
 
+    void removeAlertHandler( AlertHandler alertHandler );
 
-    void removeAlertListener( EnvironmentAlertListener alertListener );
+    Collection<AlertHandler> getRegisteredAlertHandlers();
+
+    EnvironmentAlertHandlers getEnvironmentAlertHandlers( EnvironmentId environmentId )
+            throws EnvironmentNotFoundException;
+
+    void startMonitoring( String handlerId, AlertHandlerPriority handlerPriority, String environmentId )
+            throws EnvironmentManagerException;
+
+    void stopMonitoring( String handlerId, AlertHandlerPriority handlerPriority, String environmentId )
+            throws EnvironmentManagerException;
+
+    List<ShareDto> getSharedUsers( String objectId ) throws EnvironmentNotFoundException;
+
+    void shareEnvironment( ShareDto[] shareDto, String environmentId );
 }

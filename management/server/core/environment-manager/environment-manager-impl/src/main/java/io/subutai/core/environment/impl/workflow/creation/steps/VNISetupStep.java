@@ -4,6 +4,9 @@ package io.subutai.core.environment.impl.workflow.creation.steps;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.collect.Maps;
@@ -11,6 +14,7 @@ import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.Topology;
 import io.subutai.common.network.Gateway;
+import io.subutai.common.network.Gateways;
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
@@ -18,6 +22,7 @@ import io.subutai.common.settings.Common;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.common.peer.LocalPeer;
+import io.subutai.core.peer.api.PeerManager;
 
 
 /**
@@ -25,26 +30,30 @@ import io.subutai.common.peer.LocalPeer;
  */
 public class VNISetupStep
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger( VNISetupStep.class );
     private final Topology topology;
     private final EnvironmentImpl environment;
-    private final LocalPeer localPeer;
+    private final PeerManager peerManager;
 
 
-    public VNISetupStep( final Topology topology, final EnvironmentImpl environment, final LocalPeer localPeer )
+    public VNISetupStep( final Topology topology, final EnvironmentImpl environment, final PeerManager peerManager )
     {
         this.topology = topology;
         this.environment = environment;
-        this.localPeer = localPeer;
+        this.peerManager = peerManager;
     }
 
 
     public void execute() throws EnvironmentCreationException, PeerException
     {
-        Set<Peer> peers = Sets.newHashSet( topology.getAllPeers() );
-        peers.add( localPeer );
+        LOGGER.debug( "VNI setup started..." );
+
+        Set<Peer> peers = peerManager.resolve( topology.getAllPeers() );
+
+        peers.add( peerManager.getLocalPeer() );
 
         //obtain reserved gateways
-        Map<Peer, Set<Gateway>> reservedGateways = Maps.newHashMap();
+        Map<Peer, Gateways> reservedGateways = Maps.newHashMap();
         for ( Peer peer : peers )
         {
             reservedGateways.put( peer, peer.getGateways() );
@@ -54,21 +63,20 @@ public class VNISetupStep
         SubnetUtils subnetUtils = new SubnetUtils( environment.getSubnetCidr() );
         String environmentGatewayIp = subnetUtils.getInfo().getLowAddress();
 
-        for ( Map.Entry<Peer, Set<Gateway>> peerGateways : reservedGateways.entrySet() )
+        for ( Map.Entry<Peer, Gateways> peerGateways : reservedGateways.entrySet() )
         {
             Peer peer = peerGateways.getKey();
-            Set<Gateway> gateways = peerGateways.getValue();
-            for ( Gateway gateway : gateways )
+            Gateways gateways = peerGateways.getValue();
+
+            if ( gateways.findGatewayByIp( environmentGatewayIp ) != null )
             {
-                if ( gateway.getIp().equals( environmentGatewayIp ) )
-                {
-                    throw new EnvironmentCreationException(
-                            String.format( "Subnet %s is already used on peer %s", environment.getSubnetCidr(),
-                                    peer.getName() ) );
-                }
+                throw new EnvironmentCreationException(
+                        String.format( "Subnet %s is already used on peer %s", environment.getSubnetCidr(),
+                                peer.getName() ) );
             }
         }
 
+        LOGGER.debug( "Find free VNI..." );
         //calculate new vni
         long freeVni = findFreeVni( peers );
 
@@ -76,12 +84,10 @@ public class VNISetupStep
         Vni newVni = new Vni( freeVni, environment.getId() );
 
         //reserve new vni and create gateway
-
+        LOGGER.debug( "Creating gateways..." );
         for ( final Peer peer : peers )
         {
-            Vni reservedVni = peer.reserveVni( newVni );
-
-            peer.createGateway( new Gateway( reservedVni.getVlan(), environmentGatewayIp ) );
+            peer.reserveVni( newVni );
         }
 
         //store vni in environment metadata
@@ -95,7 +101,7 @@ public class VNISetupStep
         Set<Long> reservedVnis = Sets.newHashSet();
         for ( Peer peer : peers )
         {
-            for ( Vni vni : peer.getReservedVnis() )
+            for ( Vni vni : peer.getReservedVnis().list() )
             {
                 reservedVnis.add( vni.getVni() );
             }

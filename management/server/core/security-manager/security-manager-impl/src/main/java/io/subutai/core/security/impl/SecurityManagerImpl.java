@@ -43,14 +43,10 @@ public class SecurityManagerImpl implements SecurityManager
     /* *****************************
      *
      */
-    public SecurityManagerImpl( String ownerPublicKeyringFile, String secretKeyringFile, String publicKeyringFile,
-                                String secretKeyringPwd, Object provider )
+    public SecurityManagerImpl( String secretKeyringPwd, Object provider )
     {
         keyData = new SecurityKeyData();
 
-        keyData.setOwnerPublicKeyringFile( ownerPublicKeyringFile );
-        keyData.setSecretKeyringFile( secretKeyringFile );
-        keyData.setPublicKeyringFile( publicKeyringFile );
         keyData.setSecretKeyringPwd( secretKeyringPwd );
         keyData.setJsonProvider( provider );
 
@@ -216,6 +212,4 @@ public class SecurityManagerImpl implements SecurityManager
     {
         return httpContextManager;
     }
-
-
 }

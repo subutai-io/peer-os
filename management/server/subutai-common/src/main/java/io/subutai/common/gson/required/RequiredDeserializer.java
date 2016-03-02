@@ -94,7 +94,6 @@ public class RequiredDeserializer<T> implements JsonDeserializer<T>
     {
         return new GsonBuilder()
                 .registerTypeAdapter( NodeGroup.class, new RequiredDeserializer<NodeGroup>() )
-                .registerTypeAdapter( Blueprint.class, new RequiredDeserializer<Blueprint>() )
                 .setPrettyPrinting().create();
     }
 }

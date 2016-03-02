@@ -9,16 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 
-import com.google.common.collect.Sets;
-
-import io.subutai.common.command.CommandCallback;
-import io.subutai.common.command.CommandResult;
-import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.command.Response;
-import io.subutai.common.host.ContainerHostInfo;
-import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.host.ResourceHostInfoModel;
-import io.subutai.common.metric.Alert;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.LocalPeer;
@@ -27,7 +18,6 @@ import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.broker.api.ByteMessageListener;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
-import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 
 

@@ -5,7 +5,7 @@
   <parent>
     <groupId>io.subutai</groupId>
     <artifactId>mgmt-server-parent</artifactId>
-    <version>4.0.0-RC5</version>
+    <version>4.0.0-RC7-SNAPSHOT</version>
   </parent>
 
   <artifactId>subutai</artifactId>
@@ -66,6 +66,12 @@
       <scope>runtime</scope>
     </dependency>
 
+    <dependency>
+      <groupId>pl.project13.maven</groupId>
+      <artifactId>git-commit-id-plugin</artifactId>
+      <version>2.2.0</version>
+    </dependency>
+
     <!-- ***********************************************
     <dependency>
       <groupId>org.apache.aries.blueprint</groupId>
@@ -75,11 +81,31 @@
       <scope>system</scope>
     </dependency>
      *********************************************** -->
-
   </dependencies>
 
   <build>
     <plugins>
+      <plugin>
+        <groupId>pl.project13.maven</groupId>
+        <artifactId>git-commit-id-plugin</artifactId>
+        <version>2.2.0</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>revision</goal>
+            </goals>
+          </execution>
+        </executions>
+
+        <configuration>
+          <dotGitDirectory>../../${project.basedir}/.git</dotGitDirectory>
+          <generateGitPropertiesFile>true</generateGitPropertiesFile>
+          <generateGitPropertiesFilename>${project.basedir}/src/main/assembly/etc/git.properties
+          </generateGitPropertiesFilename>
+        </configuration>
+
+      </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
@@ -96,6 +122,23 @@
               <resources>
                 <resource>
                   <directory>${project.basedir}/src/main/assembly/bin</directory>
+                  <filtering>false</filtering>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+          <execution>
+            <id>copy-lib</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.basedir}/target/assembly/lib</outputDirectory>
+              <overwrite>true</overwrite>
+              <resources>
+                <resource>
+                  <directory>${project.basedir}/src/main/assembly/lib</directory>
                   <filtering>false</filtering>
                 </resource>
               </resources>
@@ -124,6 +167,7 @@
           </execution>
         </executions>
       </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-antrun-plugin</artifactId>
@@ -138,6 +182,9 @@
               <tasks>
                 <delete>
                   <fileset dir="${project.basedir}/target/assembly/etc" includes="*.*" />
+                </delete>
+                <delete>
+                  <fileset dir="${project.basedir}/src/main/assembly/etc" includes="git.properties" />
                 </delete>
               </tasks>
             </configuration>
@@ -159,7 +206,7 @@
                 <artifactItem>
                   <groupId>${project.groupId}</groupId>
                   <artifactId>webui</artifactId>
-                  <destFileName>webui-4.0.0-RC5.war</destFileName>
+                  <destFileName>webui-${project.version}.war</destFileName>
                   <outputDirectory>target/assembly/deploy</outputDirectory>
                   <type>war</type>
                 </artifactItem>
@@ -180,13 +227,14 @@
             <feature>war</feature>
             <feature>ssh</feature>
             <feature>subutai-application</feature>
+            <feature>jpa/2.0.0</feature>
             <feature>openjpa</feature>
-            <feature>aries-annotation</feature>fea
+            <feature>aries-annotation</feature>
             <feature>http</feature>
             <feature>jndi</feature>
             <feature>transaction</feature>
             <feature>jdbc</feature>
-
+            <feature>webconsole</feature>
           </bootFeatures>
         </configuration>
         <executions>
@@ -218,13 +266,116 @@
                 <feature>pax-http</feature>
                 <feature>pax-http-whiteboard</feature>
                 <feature>pax-war</feature>
+                <feature>webconsole</feature>
               </features>
               <repository>${assembly.directory}/system</repository>
             </configuration>
           </execution>
         </executions>
       </plugin>
+
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>deb</id>
+      <build>
+        <plugins>
+          <!-- DEB-related plugins -->
+          <plugin>
+            <artifactId>maven-resources-plugin</artifactId>
+            <version>2.6</version>
+            <executions>
+              <execution>
+                <id>copy-deb-content</id>
+                <phase>prepare-package</phase>
+                <goals>
+                  <goal>copy-resources</goal>
+                </goals>
+                <configuration>
+                  <overwrite>true</overwrite>
+                  <!-- Copying Management files to deb source folder -->
+                  <outputDirectory>target/deb/opt/subutai-mng</outputDirectory>
+                  <resources>
+                    <resource>
+                      <directory>${assembly.directory}</directory>
+                    </resource>
+                  </resources>
+                </configuration>
+              </execution>
+              <execution>
+                <id>copy-deb-scripts</id>
+                <phase>prepare-package</phase>
+                <goals>
+                  <goal>copy-resources</goal>
+                </goals>
+                <configuration>
+                  <overwrite>true</overwrite>
+                  <!-- Copying install scripts to deb source folder -->
+                  <outputDirectory>target/deb/DEBIAN</outputDirectory>
+                  <resources>
+                    <resource>
+                      <directory>src/main/scripts</directory>
+                    </resource>
+                  </resources>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>1.8</version>
+            <executions>
+              <execution>
+                <!-- Setting proper permissions -->
+                <id>fix-permissions</id>
+                <phase>prepare-package</phase>
+                <configuration>
+                  <target>
+                    <chmod perm="ugo+x">
+                      <fileset dir="target/deb">
+                        <include name="opt/subutai-mng/bin/**" />
+                        <include name="DEBIAN/post*" />
+                        <include name="DEBIAN/pre*" />
+                      </fileset>
+                    </chmod>
+                  </target>
+                </configuration>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>net.sf.debian-maven</groupId>
+            <artifactId>debian-maven-plugin</artifactId>
+            <version>1.0.6</version>
+            <executions>
+              <execution>
+                <!-- Building deb package -->
+                <id>build-deb-package</id>
+                <phase>prepare-package</phase>
+                <goals>
+                  <goal>package</goal>
+                </goals>
+                <configuration>
+                  <packageName>management</packageName>
+                  <packageVersion>${project.version}</packageVersion>
+                  <maintainerName>Subutai Social</maintainerName>
+                  <excludeAllArtifacts>true</excludeAllArtifacts>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <!-- DEB-related plugins -->
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
 </project>

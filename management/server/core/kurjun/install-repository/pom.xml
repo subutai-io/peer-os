@@ -4,7 +4,7 @@
     <parent>
         <groupId>io.subutai</groupId>
         <artifactId>kurjun</artifactId>
-        <version>4.0.0-RC5</version>
+        <version>4.0.0-RC7-SNAPSHOT</version>
     </parent>
     
     <artifactId>install-repository</artifactId>
@@ -312,6 +312,18 @@
                         <configuration>
                             <file>${lib.dir}/sql-meta-store-${ai.subut.kurjun.version}.jar</file>
                             <pomFile>${lib.dir}/poms/sql-meta-store/${ai.subut.kurjun.version}/sql-meta-store-${ai.subut.kurjun.version}.pom</pomFile>
+                        </configuration>
+                    </execution>
+                    
+                    <execution>
+                        <id>install_25</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <file>${lib.dir}/kurjun-quota-${ai.subut.kurjun.version}.jar</file>
+                            <pomFile>${lib.dir}/poms/kurjun-quota/${ai.subut.kurjun.version}/kurjun-quota-${ai.subut.kurjun.version}.pom</pomFile>
                         </configuration>
                     </execution>
                     

@@ -13,7 +13,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Peer;
-import io.subutai.common.resource.ResourceType;
+import io.subutai.common.resource.ContainerResourceType;
 import io.subutai.common.test.SystemOutRedirectTest;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.peer.api.PeerManager;
@@ -50,7 +50,7 @@ public class GetContainerQuotaCommandTest extends SystemOutRedirectTest
         when( environmentManager.loadEnvironment( any( String.class ) ) ).thenReturn( environment );
         when( environment.getContainerHostByHostname( anyString() ) ).thenReturn( containerHost );
         command.environmentId = UUID.randomUUID().toString();
-        command.quotaType = ResourceType.CPU.getKey();
+        command.quotaType = ContainerResourceType.CPU.getKey();
         command.containerName = CONTAINER_NAME;
     }
 

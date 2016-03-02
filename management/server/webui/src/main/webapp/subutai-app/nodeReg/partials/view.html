@@ -1,6 +1,7 @@
 <div ng-controller="NodeRegCtrl as nodeRegCtrl">
 	<div class="b-workspace__header">
-		<h1 class="b-title">Nodes/<span class="b-title_breadcrumbs">Adding</span></h1>
+
+		<h1 class="b-title">Resource Hosts</h1>
 	</div>
 	<div class="b-workspace__content">
 
@@ -25,7 +26,7 @@
 					<td class="b-main-table__container-status">
 						<div
 							tooltips
-							tooltip-title="{{ clusterNode.status }}"
+							tooltip-template="{{ clusterNode.status }}"
 							class="b-status-icon b-status-icon_{{ clusterNode.status }}">
 						</div>
 					</td>

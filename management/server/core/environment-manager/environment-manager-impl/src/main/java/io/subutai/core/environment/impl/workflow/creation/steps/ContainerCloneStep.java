@@ -20,15 +20,27 @@ import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.NodeGroup;
 import io.subutai.common.environment.Topology;
-import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
+import io.subutai.common.peer.PeerException;
+import io.subutai.common.security.objects.Ownership;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
+import io.subutai.core.environment.impl.EnvironmentManagerImpl;
+import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.creation.steps.helpers.CreatePeerNodeGroupsTask;
 import io.subutai.core.environment.impl.workflow.creation.steps.helpers.NodeGroupBuildResult;
+import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.model.User;
+import io.subutai.core.identity.api.model.UserDelegate;
 import io.subutai.core.kurjun.api.TemplateManager;
+import io.subutai.core.object.relation.api.RelationManager;
+import io.subutai.core.object.relation.api.model.Relation;
+import io.subutai.core.object.relation.api.model.RelationInfo;
+import io.subutai.core.object.relation.api.model.RelationInfoMeta;
+import io.subutai.core.object.relation.api.model.RelationMeta;
+import io.subutai.core.peer.api.PeerManager;
 
 
 /**
@@ -36,30 +48,35 @@ import io.subutai.core.kurjun.api.TemplateManager;
  */
 public class ContainerCloneStep
 {
-    private static final Logger LOG = LoggerFactory.getLogger( ContainerCloneStep.class );
+    private static final Logger LOGGER = LoggerFactory.getLogger( ContainerCloneStep.class );
     private final TemplateManager templateRegistry;
     private final String defaultDomain;
     private final Topology topology;
     private final EnvironmentImpl environment;
-    private final LocalPeer localPeer;
+    private final RelationManager relationManager;
+    private final IdentityManager identityManager;
     protected ExceptionUtil exceptionUtil = new ExceptionUtil();
+    private PeerManager peerManager;
 
 
     public ContainerCloneStep( final TemplateManager templateRegistry, final String defaultDomain,
-                               final Topology topology, final EnvironmentImpl environment, final LocalPeer localPeer )
+                               final Topology topology, final EnvironmentImpl environment,
+                               final PeerManager peerManager, final EnvironmentManagerImpl environmentManager )
     {
         this.templateRegistry = templateRegistry;
         this.defaultDomain = defaultDomain;
         this.topology = topology;
         this.environment = environment;
-        this.localPeer = localPeer;
+        this.peerManager = peerManager;
+        this.relationManager = environmentManager.getRelationManager();
+        this.identityManager = environmentManager.getIdentityManager();
     }
 
 
-    public void execute() throws EnvironmentCreationException
+    public void execute() throws EnvironmentCreationException, PeerException
     {
 
-        Map<Peer, Set<NodeGroup>> placement = topology.getNodeGroupPlacement();
+        Map<String, Set<NodeGroup>> placement = topology.getNodeGroupPlacement();
 
         SubnetUtils cidr = new SubnetUtils( environment.getSubnetCidr() );
 
@@ -75,7 +92,7 @@ public class ContainerCloneStep
         {
             for ( NodeGroup nodeGroup : nodeGroups )
             {
-                requestedContainerCount += nodeGroup.getNumberOfContainers();
+                requestedContainerCount++;
             }
         }
 
@@ -83,11 +100,11 @@ public class ContainerCloneStep
         if ( requestedContainerCount > totalAvailableIpCount )
         {
             throw new EnvironmentCreationException(
-                    String.format( "Requested %d containers but only %d ip addresses available",
+                    String.format( "Requested %d containers but only %d ip " + "" + "" + "" + "addresses available",
                             requestedContainerCount, totalAvailableIpCount ) );
         }
 
-        ExecutorService taskExecutor = getExecutor( placement.size() );
+        ExecutorService taskExecutor = Executors.newFixedThreadPool( placement.size() );
 
         CompletionService<Set<NodeGroupBuildResult>> taskCompletionService = getCompletionService( taskExecutor );
 
@@ -95,23 +112,21 @@ public class ContainerCloneStep
 
 
         //submit parallel environment part creation tasks across peers
-        for ( Map.Entry<Peer, Set<NodeGroup>> peerPlacement : placement.entrySet() )
+        for ( Map.Entry<String, Set<NodeGroup>> peerPlacement : placement.entrySet() )
         {
-            Peer peer = peerPlacement.getKey();
-            LOG.debug( String.format( "Scheduling node group task on peer %s", peer.getId() ) );
+            Peer peer = peerManager.getPeer( peerPlacement.getKey() );
+            LOGGER.debug( String.format( "Scheduling node group task on peer %s", peer.getId() ) );
 
             taskCompletionService.submit(
-                    new CreatePeerNodeGroupsTask( peer, peerPlacement.getValue(), localPeer, environment,
-                            currentLastUsedIpIndex + 1, templateRegistry, defaultDomain ) );
+                    new CreatePeerNodeGroupsTask( peer, peerPlacement.getValue(), peerManager.getLocalPeer(),
+                            environment, currentLastUsedIpIndex + 1, templateRegistry, defaultDomain ) );
 
-            for ( NodeGroup nodeGroup : peerPlacement.getValue() )
-            {
-                currentLastUsedIpIndex += nodeGroup.getNumberOfContainers();
-            }
-
+            currentLastUsedIpIndex += peerPlacement.getValue().size();
 
             environment.setLastUsedIpIndex( currentLastUsedIpIndex );
         }
+
+        taskExecutor.shutdown();
 
         //collect results
         Set<String> errors = Sets.newHashSet();
@@ -124,10 +139,11 @@ public class ContainerCloneStep
                 Set<NodeGroupBuildResult> results = futures.get();
                 for ( NodeGroupBuildResult result : results )
                 {
-                    LOG.debug( String.format( "Node group build result: %s", result ) );
+                    LOGGER.debug( String.format( "Node group build result: %s", result ) );
                     if ( !CollectionUtil.isCollectionEmpty( result.getContainers() ) )
                     {
                         environment.addContainers( result.getContainers() );
+                        buildRelationChain( environment, result.getContainers() );
                     }
 
                     if ( result.getException() != null )
@@ -136,13 +152,11 @@ public class ContainerCloneStep
                     }
                 }
             }
-            catch ( ExecutionException | InterruptedException e )
+            catch ( Exception e )
             {
                 errors.add( exceptionUtil.getRootCauseMessage( e ) );
             }
         }
-
-        taskExecutor.shutdown();
 
         if ( !errors.isEmpty() )
         {
@@ -153,9 +167,34 @@ public class ContainerCloneStep
     }
 
 
-    protected ExecutorService getExecutor( int numOfThreads )
+    private void buildRelationChain( EnvironmentImpl environment, Set<EnvironmentContainerImpl> containers )
     {
-        return Executors.newFixedThreadPool( numOfThreads );
+        try
+        {
+            User activeUser = identityManager.getActiveUser();
+            UserDelegate delegatedUser = identityManager.getUserDelegate( activeUser.getId() );
+            for ( final EnvironmentContainerImpl container : containers )
+            {
+                //TODO create environment <-> container ownership
+
+                RelationMeta relationMeta = new RelationMeta();
+                relationMeta.setSource( delegatedUser );
+                relationMeta.setTarget( environment );
+                relationMeta.setObject( container );
+
+                RelationInfoMeta relationInfoMeta =
+                        new RelationInfoMeta( true, true, true, true, Ownership.USER.getLevel() );
+                RelationInfo relationInfo = relationManager.createTrustRelationship( relationInfoMeta );
+
+                Relation relation = relationManager.buildTrustRelation( relationInfo, relationMeta );
+
+                relationManager.saveRelation( relation );
+            }
+        }
+        catch ( Exception ex )
+        {
+            LOGGER.info( "Error building relation", ex );
+        }
     }
 
 

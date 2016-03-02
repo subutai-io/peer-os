@@ -8,6 +8,8 @@ public class TemplateKurjun
 {
 
     @Expose
+    private String id;
+    @Expose
     private String md5Sum;
     @Expose
     private String name;
@@ -20,15 +22,31 @@ public class TemplateKurjun
 
     private String packageName;
 
+    @Expose
+    private String ownerFprint;
+    @Expose
+    private String configContents;
+    @Expose
+    private String packagesContents;
 
-    public TemplateKurjun( String md5Sum, String name, String version, String architecture, String parent, String packageName )
+
+    public TemplateKurjun( String id, String md5Sum, String name, String version, String architecture, String parent,
+            String packageName, String ownerFprint )
     {
+        this.id = id;
         this.md5Sum = md5Sum;
         this.name = name;
         this.version = version;
         this.architecture = architecture;
         this.parent = parent;
         this.packageName = packageName;
+        this.ownerFprint = ownerFprint;
+    }
+
+
+    public String getId()
+    {
+        return id;
     }
 
 
@@ -104,10 +122,47 @@ public class TemplateKurjun
     }
 
 
+    public String getConfigContents()
+    {
+        return configContents;
+    }
+
+
+    public void setConfigContents( String configContents )
+    {
+        this.configContents = configContents;
+    }
+
+
+    public String getPackagesContents()
+    {
+        return packagesContents;
+    }
+
+
+    public void setPackagesContents( String packagesContents )
+    {
+        this.packagesContents = packagesContents;
+    }
+
+
+    public String getOwnerFprint()
+    {
+        return ownerFprint;
+    }
+
+
+    public void setOwnerFprint( String ownerFprint )
+    {
+        this.ownerFprint = ownerFprint;
+    }
+
+
     @Override
     public String toString()
     {
-        return "TemplateKurjun{" + "md5Sum=" + md5Sum + ", name=" + name + ", version=" + version + ", architecture=" + architecture + ", parent=" + parent + ", packageName=" + packageName + '}';
+        return "TemplateKurjun{" + "md5Sum=" + md5Sum + ", name=" + name + ", version=" + version + ", architecture=" + architecture
+                + ", parent=" + parent + ", packageName=" + packageName + ", ownerFprint=" + ownerFprint + '}';
     }
 
 }

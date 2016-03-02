@@ -4,12 +4,17 @@ angular.module('subutai.peer-registration.controller', [])
 	.controller('PeerRegistrationCtrl', PeerRegistrationCtrl)
 	.controller('PeerRegistrationPopupCtrl', PeerRegistrationPopupCtrl);
 
-PeerRegistrationCtrl.$inject = ['$scope', 'peerRegistrationService', 'DTOptionsBuilder', 'DTColumnBuilder', '$resource', '$compile', 'SweetAlert', 'ngDialog'];
+PeerRegistrationCtrl.$inject = ['$scope', 'peerRegistrationService', 'DTOptionsBuilder', 'DTColumnBuilder', '$resource', '$compile', 'SweetAlert', 'ngDialog', 'cfpLoadingBar'];
 PeerRegistrationPopupCtrl.$inject = ['$scope', 'peerRegistrationService', 'ngDialog', 'SweetAlert'];
 
-function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder, DTColumnBuilder, $resource, $compile, SweetAlert, ngDialog) {
+function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder, DTColumnBuilder, $resource, $compile, SweetAlert, ngDialog, cfpLoadingBar) {
 
 	var vm = this;
+
+	cfpLoadingBar.start();
+	angular.element(document).ready(function () {
+		cfpLoadingBar.complete();
+	});
 
 	// functions
 	vm.peerFrom = peerFrom;
@@ -76,6 +81,12 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder,
 	function rejectPeerRequest(peerId) {
 		peerRegistrationService.rejectPeerRequest(peerId).success(function (data) {
 			vm.dtInstance.reloadData(null, false);
+		}).error(function(error){
+			if(error.ERROR !== undefined) {
+				SweetAlert.swal("ERROR!", error.ERROR, "error");
+			} else {
+				SweetAlert.swal("ERROR!", error, "error");
+			}
 		});
 	}
 

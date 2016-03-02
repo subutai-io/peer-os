@@ -1,21 +1,13 @@
 package io.subutai.core.test.cli;
 
 
-import javax.naming.NamingException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.karaf.shell.commands.Command;
 
-import io.subutai.common.command.CommandCallback;
-import io.subutai.common.command.CommandResult;
-import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.command.Response;
-import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.util.ServiceLocator;
-import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
+import io.subutai.core.test.appender.SolAppender;
 
 
 @Command( scope = "test", name = "do", description = "test command" )
@@ -34,24 +26,10 @@ public class TestCommand extends SubutaiShellCommandSupport
 
         try
         {
-            LocalPeer localPeer = ServiceLocator.getServiceNoCache( LocalPeer.class );
-
-            localPeer.getManagementHost().execute( new RequestBuilder( "pwd" ), new CommandCallback()
+            for ( String loggingEvent : SolAppender.getLoggingEvents() )
             {
-                @Override
-                public void onResponse( final Response response, final CommandResult commandResult )
-                {
-                    IdentityManager identityManager = null;
-                    try
-                    {
-                        identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
-                    }
-                    catch ( NamingException e )
-                    {
-                    }
-                    LOG.error( identityManager.getActiveUser().toString() );
-                }
-            } );
+                System.out.println( loggingEvent );
+            }
         }
         catch ( Exception e )
         {

@@ -20,6 +20,14 @@
   </command-bundle>
   
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="kurjun/remove-url">
+      <action class="io.subutai.core.kurjun.cli.RemoveRemoteRepoUrlCommand">
+        <argument ref="templateManager" />
+      </action>
+    </command>
+  </command-bundle>
+  
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="kurjun/list-remote-urls">
       <action class="io.subutai.core.kurjun.cli.ListRemoteRepoUrlsCommand">
         <argument ref="templateManager" />

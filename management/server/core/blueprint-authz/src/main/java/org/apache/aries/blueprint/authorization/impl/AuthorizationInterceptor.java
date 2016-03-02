@@ -18,6 +18,7 @@
  */
 package org.apache.aries.blueprint.authorization.impl;
 
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.security.AccessControlContext;
@@ -32,65 +33,111 @@ import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.security.auth.Subject;
 
-import org.apache.aries.blueprint.Interceptor;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class AuthorizationInterceptor implements Interceptor {
-    private static final Logger LOGGER = LoggerFactory.getLogger(AuthorizationInterceptor.class);
+import org.apache.aries.blueprint.Interceptor;
+
+import io.subutai.common.datatypes.RelationDeclaration;
+
+
+public class AuthorizationInterceptor implements Interceptor
+{
+    private static final Logger LOGGER = LoggerFactory.getLogger( AuthorizationInterceptor.class );
     private Class<?> beanClass;
 
-    public AuthorizationInterceptor(Class<?> beanClass) {
+
+    public AuthorizationInterceptor( Class<?> beanClass )
+    {
         this.beanClass = beanClass;
     }
 
-    public int getRank() {
+
+    public int getRank()
+    {
         return 0;
     }
 
-    public void postCallWithException(ComponentMetadata cm, Method m, Throwable ex, Object preCallToken) {
+
+    public void postCallWithException( ComponentMetadata cm, Method m, Throwable ex, Object preCallToken )
+    {
     }
 
-    public void postCallWithReturn(ComponentMetadata cm, Method m, Object returnType, Object preCallToken)
-        throws Exception {
+
+    public void postCallWithReturn( ComponentMetadata cm, Method m, Object returnType, Object preCallToken )
+            throws Exception
+    {
     }
 
-    public Object preCall(ComponentMetadata cm, Method m, Object... parameters) throws Throwable {
-        Annotation ann = new SecurityAnotationParser().getEffectiveAnnotation(beanClass, m);
 
-        if (ann instanceof PermitAll) {
+    public Object preCall( ComponentMetadata cm, Method m, Object... parameters ) throws Throwable
+    {
+        Annotation ann = new SecurityAnotationParser().getEffectiveAnnotation( beanClass, m );
+
+        if ( ann instanceof PermitAll )
+        {
             return null;
         }
         String[] rolesAr = new String[] {}; // Also applies for @DenyAll
-        if (ann instanceof RolesAllowed) {
-            rolesAr = ((RolesAllowed) ann).value();
+        if ( ann instanceof RolesAllowed )
+        {
+            rolesAr = ( ( RolesAllowed ) ann ).value();
         }
-        Set<String> roles = new HashSet<String>(Arrays.asList(rolesAr));
+
+        // check parameters for annotation existence
+        Annotation[][] parameterAnnotations = m.getParameterAnnotations();
+        Class[] parameterTypes = m.getParameterTypes();
+
+        int i = 0;
+        for ( Annotation[] annotations : parameterAnnotations )
+        {
+            Object parameter = parameters[i];
+            Class parameterType = parameterTypes[i++];
+
+            for ( Annotation annotation : annotations )
+            {
+                if ( annotation instanceof RelationDeclaration )
+                {
+                    RelationDeclaration myAnnotation = ( RelationDeclaration ) annotation;
+                    LOGGER.debug( parameterType.getName() );
+                    LOGGER.debug( parameter.toString() );
+                    //                    LOGGER.debug( myAnnotation.context() );
+                }
+            }
+        }
+
+        Set<String> roles = new HashSet<String>( Arrays.asList( rolesAr ) );
         AccessControlContext acc = AccessController.getContext();
-        Subject subject = Subject.getSubject(acc);
-        if (subject == null) {
-            throw new AccessControlException("Method call " + m.getDeclaringClass() + "." + m.getName() + " denied. No JAAS login present");
+        Subject subject = Subject.getSubject( acc );
+        if ( subject == null )
+        {
+            throw new AccessControlException(
+                    "Method call " + m.getDeclaringClass() + "." + m.getName() + " denied. No JAAS login present" );
         }
         Set<Principal> principals = subject.getPrincipals();
 
-        for (Principal principal : principals) {
-            if (roles.contains(principal.getName())) {
-                LOGGER.debug("Granting access to Method: {} for {}.", m, principal);
+        for ( Principal principal : principals )
+        {
+            if ( roles.contains( principal.getName() ) )
+            {
+                LOGGER.debug( "Granting access to Method: {} for {}.", m, principal );
                 return null;
             }
         }
-        String msg = String.format("Method call %s.%s denied. Roles allowed are %s. Your principals are %s.",
-                                   m.getDeclaringClass(), m.getName(), roles, getNames(principals));
-        throw new AccessControlException(msg);
+        String msg = String.format( "Method call %s.%s denied. Roles allowed are %s. Your principals are %s.",
+                m.getDeclaringClass(), m.getName(), roles, getNames( principals ) );
+        throw new AccessControlException( msg );
     }
 
-    private String getNames(Set<Principal> principals) {
+
+    private String getNames( Set<Principal> principals )
+    {
         StringBuilder sb = new StringBuilder();
-        for (Principal principal : principals) {
-            sb.append(principal.getName() + " ");
+        for ( Principal principal : principals )
+        {
+            sb.append( principal.getName() + " " );
         }
         return sb.toString();
     }
-
 }

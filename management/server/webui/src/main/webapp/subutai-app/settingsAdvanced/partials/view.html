@@ -1,0 +1,22 @@
+<div ng-controller="SettingsAdvancedCtrl as settingsAdvancedCtrl">
+
+  <div class="b-workspace__header">
+    <h1 class="b-title"><span class="b-title_breadcrumbs">Advanced Settings</span></h1>
+  </div>
+
+  <div class="b-workspace__content">
+    <div class="b-tabs-menu">
+      <ul>
+        <li class="b-tabs-menu__item"
+            ng-click="settingsAdvancedCtrl.activeTab = 'karaflogs'"
+            ng-class="settingsAdvancedCtrl.activeTab == 'karaflogs' ? 'b-tabs-menu__item_active' : ''">
+          Karaf Logs
+        </li>
+      </ul>
+    </div>
+    <div
+        ng-if="settingsAdvancedCtrl.activeTab == 'karaflogs'"
+        ng-include="'subutai-app/settingsAdvanced/partials/karaflogs.html'">
+    </div>
+  </div>
+</div>

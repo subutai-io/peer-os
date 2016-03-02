@@ -6,7 +6,7 @@
   <parent>
     <groupId>io.subutai</groupId>
     <artifactId>test-parent</artifactId>
-    <version>4.0.0-RC5</version>
+    <version>4.0.0-RC7-SNAPSHOT</version>
   </parent>
 
   <artifactId>test-cli</artifactId>
@@ -30,6 +30,10 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>host-registry-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>sol-appender</artifactId>
     </dependency>
   </dependencies>
 

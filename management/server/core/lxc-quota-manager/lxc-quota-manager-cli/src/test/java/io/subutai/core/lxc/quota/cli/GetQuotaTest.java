@@ -13,8 +13,7 @@ import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.quota.QuotaException;
-import io.subutai.common.resource.ResourceType;
-import io.subutai.common.resource.ResourceValue;
+import io.subutai.common.resource.ByteValueResource;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.peer.api.PeerManager;
 
@@ -41,11 +40,11 @@ public class GetQuotaTest
     ContainerHost containerHost;
 
     @Mock
-    ResourceValue diskQuotaValue;
+    ByteValueResource diskQuotaValue;
     @Mock
-    ResourceValue cpuQuotaValue;
+    ByteValueResource cpuQuotaValue;
     @Mock
-    ResourceValue ramQuotaValue;
+    ByteValueResource ramQuotaValue;
 
 
     @Mock
@@ -60,12 +59,13 @@ public class GetQuotaTest
         when( peerManager.getLocalPeer() ).thenReturn( localPeer );
         when( localPeer.getContainerHostByName( CONTAINER_HOST_NAME ) ).thenReturn( containerHost );
         when( containerHost.getId() ).thenReturn( CONTAINER_HOST_ID );
-        when( quotaManager.getQuota( containerId, ResourceType.RAM ) ).thenReturn( ramQuotaValue );
-        when( quotaManager.getQuota( containerId, ResourceType.HOME ) ).thenReturn( diskQuotaValue );
-        when( quotaManager.getQuota( containerId, ResourceType.OPT ) ).thenReturn( diskQuotaValue );
-        when( quotaManager.getQuota( containerId, ResourceType.ROOTFS ) ).thenReturn( diskQuotaValue );
-        when( quotaManager.getQuota( containerId, ResourceType.VAR ) ).thenReturn( diskQuotaValue );
-        when( quotaManager.getQuota( containerId, ResourceType.CPU ) ).thenReturn( cpuQuotaValue );
+        //        when( quotaManager.getQuota( containerId, ContainerResourceType.RAM ) ).thenReturn( ramQuotaValue );
+        //        when( quotaManager.getQuota( containerId, ContainerResourceType.HOME ) ).thenReturn( diskQuotaValue );
+        //        when( quotaManager.getQuota( containerId, ContainerResourceType.OPT ) ).thenReturn( diskQuotaValue );
+        //        when( quotaManager.getQuota( containerId, ContainerResourceType.ROOTFS ) ).thenReturn(
+        // diskQuotaValue );
+        //        when( quotaManager.getQuota( containerId, ContainerResourceType.VAR ) ).thenReturn( diskQuotaValue );
+        //        when( quotaManager.getQuota( containerId, ContainerResourceType.CPU ) ).thenReturn( cpuQuotaValue );
 
         getQuota = new GetQuota( quotaManager, localPeer );
         getQuota.setContainerName( CONTAINER_HOST_NAME );
@@ -75,28 +75,10 @@ public class GetQuotaTest
     @Test
     public void testDoExecute() throws Exception
     {
-        getQuota.setResourceType( ResourceType.RAM.name() );
-        getQuota.doExecute();
-
-        getQuota.setResourceType( ResourceType.CPU.name() );
-        getQuota.doExecute();
-
-        getQuota.setResourceType( ResourceType.HOME.name() );
-        getQuota.doExecute();
-
-        getQuota.setResourceType( ResourceType.ROOTFS.name() );
-        getQuota.doExecute();
-
-        getQuota.setResourceType( ResourceType.OPT.name() );
-        getQuota.doExecute();
-
-        getQuota.setResourceType( ResourceType.VAR.name() );
         getQuota.doExecute();
 
         //For exception handling purposes
-        when( quotaManager.getQuota( containerId, ResourceType.CPU ) )
-                .thenThrow( new QuotaException( "Some quota exception" ) );
-        getQuota.setResourceType( ResourceType.CPU.name() );
+        when( quotaManager.getQuota( containerId ) ).thenThrow( new QuotaException( "Some quota exception" ) );
         getQuota.doExecute();
     }
 }

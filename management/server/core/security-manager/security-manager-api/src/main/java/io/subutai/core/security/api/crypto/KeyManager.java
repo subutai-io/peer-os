@@ -4,12 +4,14 @@ package io.subutai.core.security.api.crypto;
 import java.io.InputStream;
 import java.util.List;
 
+import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPrivateKey;
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKey;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
 
+import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.security.crypto.pgp.KeyPair;
 import io.subutai.core.security.api.model.SecurityKey;
 import io.subutai.core.security.api.model.SecurityKeyTrust;
@@ -58,9 +60,10 @@ public interface KeyManager
      */
     void removeKeyData( String identityId );
 
+
     /* *****************************
-                 * Gets KeyRing from the store and returns Publickey object
-                 */
+     * Gets KeyRing from the store and returns Publickey object
+     */
     public PGPPublicKey getPublicKey( String identityId );
 
 
@@ -68,12 +71,6 @@ public interface KeyManager
      *
      */
     public String getPeerId();
-
-
-    /* *****************************
-     *
-     */
-    public String getOwnerId();
 
 
     /* *****************************
@@ -109,6 +106,16 @@ public interface KeyManager
     /* ***************************************************************
      *
      */
+    void setPeerOwnerId( String id );
+
+    /* ***************************************************************
+     *
+     */
+    String getPeerOwnerId();
+
+    /* ***************************************************************
+             *
+             */
     PGPPublicKeyRing signKey( PGPSecretKeyRing sourceSecRing, PGPPublicKeyRing targetPubRing, int trustLevel );
 
 
@@ -133,6 +140,9 @@ public interface KeyManager
          *
          */
     PGPPublicKeyRing setKeyTrust( String sourceFingerprint, String targetFingerprint, int trustLevel );
+
+    PGPPublicKeyRing setKeyTrust( String sourceFingerprint, String targetFingerprint, String encryptedMessage )
+            throws PGPException;
 
 
     /* ***************************************************************
@@ -244,7 +254,7 @@ public interface KeyManager
     /* *****************************
      *
      */
-    public PGPPublicKey getRemoteHostPublicKey( String identityId, String ip );
+    public PGPPublicKey getRemoteHostPublicKey( /*String identityId,*/ PeerInfo peerInfo );
 
 
 
@@ -275,4 +285,6 @@ public interface KeyManager
      *
      */
     void updatePublicKeyRing( PGPPublicKeyRing publicKeyRing );
+
+    PGPPublicKey getRemoteHostPublicKey( String hostIdTarget );
 }

@@ -1,0 +1,41 @@
+<div class="b-main-table-border">
+	<table class="b-main-table b-main-table_with-header">
+		<tr>
+			<th></th>
+			<th>Plugins</th>
+			<th>Version</th>
+			<th>Description</th>
+			<th>Actions</th>
+		</tr>
+		<td colspan="6" class="b-main-table__empty-item" ng-show="bazaarCtrl.plugins.length ===0">
+			No data available in table
+		</td>
+		<tr ng-repeat="plugin in bazaarCtrl.plugins" id = "{{ plugin.id }}">
+			<td>
+				<img src = "{{ plugin.img }}" 
+					style = "height: 60px; width: 60px" 
+					ng-show = "plugin.metadata.length !== 0 && plugin.name !== 'Big data' && plugin.name !== 'Plugin-common'"/>
+			</td>
+			<td>{{ plugin.name }}</td>
+			<td>{{ plugin.version }}</td>
+			<td>{{ plugin.description }}</td>
+			<td class="b-main-table_200">
+				<div class="progress-button" ng-show = "!plugin.installed && plugin.metadata.length !== 0">
+					<button class = "loading-button" ng-show = "plugin.name !== 'Plugin-common'" ng-click = "bazaarCtrl.installPlugin (plugin)"><span>Install</span></button>
+					<svg class="progress-circle" width="30" height="30"><path d="M 15 15 m 0, -13.5 a 13.5,13.5 0 0,1 0,27 a 13.5,13.5 0 0,1 0,-27 " stroke-width = "1.5"/></svg>
+					<svg class="checkmark" width="30" height="30"><path d="M7.5,15 L13.5,22.5 "/><path d="M13.5,22.5 L22.5,7.5 "/></svg>
+					<svg class="cross" width="30" height="30"><path d="M7.5,7.5 L15,15 "/><path d="M15,15 L22.5,22.5"/><path d="M15,15 L22.5,7.5 "/><path d="M7.5,22.5 L15,15 "/></svg>
+				</div>
+				<div class = "launch-button g-block-inline">
+					<a ng-click = "bazaarCtrl.redirectToPlugin (plugin.url)" class = "loading-button" ng-show = "plugin.launch">Launch</a>
+				</div>
+				<div class="progress-button" ng-show = "plugin.installed">
+					<button class = "loading-button" ng-show = "plugin.name !== 'Plugin-common'" ng-click = "bazaarCtrl.uninstallPlugin (plugin)"><span>Uninstall</span></button>
+					<svg class="progress-circle" width="30" height="30"><path d="M 15 15 m 0, -13.5 a 13.5,13.5 0 0,1 0,27 a 13.5,13.5 0 0,1 0,-27 " stroke-width = "1.5"/></svg>
+					<svg class="checkmark" width="30" height="30"><path d="M7.5,15 L13.5,22.5 "/><path d="M13.5,22.5 L22.5,7.5 "/></svg>
+					<svg class="cross" width="30" height="30"><path d="M7.5,7.5 L15,15 "/><path d="M15,15 L22.5,22.5"/><path d="M15,15 L22.5,7.5 "/><path d="M7.5,22.5 L15,15 "/></svg>
+				</div>
+			</td>
+		</tr>
+	</table>
+</div>

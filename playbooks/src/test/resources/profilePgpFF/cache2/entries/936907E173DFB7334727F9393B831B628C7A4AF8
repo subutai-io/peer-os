@@ -1,0 +1,363 @@
+ï»¿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>Install a Firefox Add-on Manually</title>
+<meta http-equiv="Content-Type" content="text/html;  charset=UTF-8">
+<meta name="author" content="Ken Saunders and Michael Buckley">
+<link rel="stylesheet" type="text/css" href="/css/style.css" title="Access Firefox Default">
+<link type="text/css" rel="stylesheet" href="/css/menu.css">
+<link rel="shortcut icon" href="/favicon.ico">
+<!--[if lt IE 7.]><script type="text/javascript" src="/javascript/pngfix.js"></script><![endif]-->
+<meta name="keywords" content="Manually Install a Firefox Add-on">
+<meta name="description" content="Detailed instructions on how to install a Firefox Add-on manually. Several different methods are provided"></head>
+<body>
+<div id="stateye">
+<!-- stateye.gif (http://www.stateye.com/) -->
+<script type="text/javascript">
+var stateye_prefix = "";
+</script>
+<script type="text/javascript" src="/stateye/stateye.js"></script>
+<noscript><div><img src="/stateye/stateye.gif?docloc=referer&amp;docref=noscript" width="1" height="1" alt="" style="margin:0;border:0;padding:0;display:block;"></div></noscript>
+<!-- end stateye.gif --></div>
+
+
+<div id="header">
+
+<div class="top-bar-content" id="top-bar">
+
+
+<div id="menu">
+	<ul id="toplevel" role="navigation">
+
+<li><img src="css/images/hot-dog-menu.png" ><a class="fly" href="#url" style="font-size: 1.5em; line-height: 48px">MENU</a>
+<ul>
+<li>
+<a href="/AFx_Translate.php">Site Language Choices</a>
+</li>
+<li>
+<a href="/Firefox_Accessibility_Features.php">Firefox Accessibility Features</a>
+</li>
+<li>
+<a href="/Firefox_Accessibility_Extensions.php">Accessibility Extensions</a></li>
+<li>
+<a href="/Firefox_Accessibility_Themes.php">Accessibility Themes</a>
+</li>
+
+
+
+
+<li><a class="fly" href="#url">Firefox Guide &#x25ba;</a>
+<ul>
+<li>
+<a href="/Firefox_Beginners_Guide.php">Firefox Beginner's Guide</a>
+</li>
+<li>
+<a href="/Firefox_Addons_Intro.php">Firefox Add-ons Intro</a>
+</li>
+<li>
+<a href="/Addons_Installation_Guide.php">Installing Add-ons</a>
+</li>
+<li>
+<a href="/Install_Addon_Manually.php">Installing Add-ons Manually </a>
+</li>
+<li>
+<a href="/Firefox_Addons_Options.php">Firefox Add-on Options</a>
+</li>
+
+</ul>
+
+
+</li> 
+</li> 
+</ul>
+
+</div>
+
+
+<ul class="horizontal">
+
+<li id="logo"><a  href="index.php" title="Access Firefox front page">
+<img src="/css/images/AFx-Logo-top=bar.png" alt="Access Firefox logo" title="Access Firefox front page"></a>
+</li>
+<li class="toplinks">
+<a href="/Firefox_Accessibility_Features.php">Firefox Accessibility</a>
+</li>
+<li class="toplinks">
+<a href="/Firefox_Accessibility_Extensions.php">Firefox Add-ons</a>
+</li>
+<li class="toplinks">
+<a href="/Firefox_Beginners_Guide.php">Firefox Tips</a>
+</li>
+
+
+<li id="q">
+ <form method="get" id="search" action="http://duckduckgo.com/">
+           <input type="hidden" name="sites"value="http://www.accessfirefox.org/"/>
+             <input type="hidden" name="ka" value="a"/>
+           <input type="hidden" name="k7" value="#FFFFFF"/>
+            <input type="hidden" name="kj" value="#BCC6CF"/>
+			         <input type="hidden" name="ks" value="t"/>
+			            <input type="hidden" name="kaa" value="#0000CC"/>
+							            <input type="hidden" name="kab" value="#CCCCCC"/>
+             <input type="hidden" name="ky" value="-1"/>
+			              <input type="hidden" name="kh" value="1"/>
+            <input type="hidden" name="k1" value="-1"/>
+			            <input type="hidden" name="kx" value="#0000CC"/>
+            <input type="hidden" name="kt" value="a"/>
+           <input type="text" name="q" maxlength="255"  placeholder="SEARCH" title="Click to search"/>
+            <input type="submit" value="DuckDuckGo Search" style="visibility: hidden;" />
+ </form>
+</li>
+
+
+
+</ul>
+
+
+</div>
+</div>
+
+
+<div id="content" role="main">
+
+<h1>Install a Firefox Add-on Manually</h1>
+
+<p id="author_h1">
+<a href="/AFx_About_Ken_Saunders.php">
+<img src="/images/authors/KenSaunders-Article-Avatar.png" alt="Ken Saunders avatar" ></a> by <a href="http://www.accessfirefox.org/AFx_About_Ken_Saunders.php">Ken Saunders</a>
+</p>
+
+<p>
+<img src="/Addons_Install_Pics/manually_install_addons/Install-Add-ons-Graphic-by-KenSaunders.png" alt="A crane lowering a puzzle piece onto the Firefox logo">
+</p>
+<p>
+Here are a few quick and easy ways to install Firefox add-ons manually. Some are quicker than others, you'll just have to pick the one that you like the most.
+</p>
+
+<p>
+<a href="/Install_Addon_Manually.php#first">First Things First</a> - <a href="/Install_Addon_Manually.php#methods">Install methods</a> - <a href="/Install_Addon_Manually.php#Mtheme">Install a Firefox Theme Manually</a>
+</p>
+<hr>
+
+<p id="first" style="width: 210px; margin-bottom: -10px; padding: 0px 0px 7px 0px; font-size: 1.2em; font-weight: 900; box-shadow: 0px 1px 0px 0px rgba(0, 0, 0, 0.1)">First Things First</p>
+<p>
+If you have already saved an extension to your desktop (or other location), you can skip this.<br><br>
+Download the extension that you want to your computer. For security reasons, it is highly recommended that you only save/install add-ons from the official <a href="https://addons.mozilla.org">Firefox Add-ons site</a>, from an official Mozilla site, from a <a href="https://github.com/mozilla">Mozilla repository on github</a>, or from a trusted Mozilla employee or volunteer.<br>
+If a download option isn't available, right click on the extension's install link and select "Save Link As..". Be sure not to change the file extension. A Firefox extension will be an .XPI file.<br>
+Example: web_developer_tools_toolbar_button-0.9.5-fx.xpi<br>
+Once you have downloaded the extension, there are several ways that you can install it. 
+</p>
+<p id="installlocation">
+<strong>Tip:</strong>
+To find the location where add-ons are installed by default, press Alt + h > t (Help > Troubleshooting Information) > Profile Folder > Show Folder > extensions.
+</p>
+<hr>
+
+<p id="methods" style="width: 280px; margin-bottom: -10px; padding: 0px 0px 7px 0px; font-size: 1.2em; font-weight: 900; box-shadow: 0px 1px 0px 0px rgba(0, 0, 0, 0.1)">Manual Install Methods</p>
+<p>
+<strong>Method:</strong><br>
+Since Firefox 4, there has been an option to manually, and easily install saved add-ons.
+</p>
+<p>
+<img src="/Addons_Install_Pics/manually_install_addons/Install-Add-ons-Dialog.png" alt="Firefox Add-ons Manager Tools for all add-ons menu">
+</p>
+<p>
+Open the Add-ons Manger > (Alt + t > a) click on the gear icon (Tools for all add-ons) > Install Add-on From File.. > browse to the add-on > double click the add-on (or select Open) > Install Now<br>
+Despite this, the following tips may still be better and/or quicker options for you.
+</p>
+<hr>
+
+<p>
+<strong>Method:</strong><br>
+With Firefox open, hit Ctrl+ o (or Cmd+ o) > browse to the extension > double click the extension (or select Open) > Install Now.
+</p>
+<hr>
+
+<p>
+<strong>Method:</strong><br>
+Press Alt + f > o > browse to the extension > double click the extension (or select Open) > Install Now.
+</p>
+<hr>
+
+<p>
+<strong>Method:</strong><br>
+Drag the extension to the instance of Firefox on the taskbar > wait for Firefox to appear > drop onto the browser window > Install Now.
+</p>
+<hr>
+
+<p>
+<strong>Method:</strong><br>
+Drag the extension to the Firefox desktop (or other) program shortcut. If Firefox is running, you'll see the Software Installation window appear > Install Now. If Firefox is not running, it will start up and the Software Installation window appear > Install Now.<br>
+If you have a Firefox desktop shortcut with -no-remote -p appended to it (allows for running multiple instances of Mozilla apps), you can install the extension into whatever profile that you'd like if Firefox is not currently running. 
+</p>
+<hr>
+
+<p>
+<strong>Tip:</strong><br>
+If you do run multiple, simultaneous instances of Firefox (e.g., Release, Aurora, Nightly, etc), you can drag and drop an XPI link, or the "Add to Firefox" button (from the Firefox Add-ons site) from one running instance of Firefox to another running instance of Firefox and the add-on will be installed in that version of Firefox (if of course, it's compatible).
+</p>
+<hr>
+
+<p id="Mtheme" style="width: 370px; margin-bottom: -10px; padding: 0px 0px 7px 0px; font-size: 1.2em; font-weight: 900; box-shadow: 0px 1px 0px 0px rgba(0, 0, 0, 0.1)">Install a Firefox Theme Manually </p>
+
+<p>
+<strong>Method:</strong><br>
+Firefox 4 and higher.<br>
+Open the Add-ons Manger > (Alt + t > a) click on the gear icon (Tools for all add-ons) > Install Add-on From File.. > browse to the theme file > double click the file (or select Open) > Install Now<br>
+</p>
+
+<p>
+<strong>Method:</strong><br>
+Open the Add-ons Manger > (Alt + t > a) click on Appearance > drag the theme file that you saved to the instance of Firefox on the taskbar > wait for Firefox to appear > drop onto the browser window > Install Now.
+</p>
+
+<h4>Selecting a Theme</h4>
+<p style="margin-top: -15px">
+Open the Add-ons Manger > (Alt + t > a) click Appearance > select a theme (single click on one), click Enable, restart Firefox. Your selected theme will be visible after Firefox is restarted.
+</p>
+<hr>
+
+<p>
+Install Add-on graphic by Ken Saunders<br>
+Hand used in graphic by <a href="http://mossi889.deviantart.com/">mossi889</a> of devaintART.com
+
+
+
+
+
+</div>
+<div id="s-menu"> 
+
+<p>
+<strong>Notice:</strong><br>
+This site is in the process of a major upgrade.<br>
+We apologize for the current lack of compatibility with mobile devices.
+</p>
+<hr>
+
+<p class="fx-sb-promo-img">
+<a href="https://www.mozilla.org/firefox/products">
+<img src="/css/images/menu-bar-Fx-logo.png" alt="Firefox logo " title="Download Mozilla Firefox from Mozilla.org">
+</a>
+</p>
+<p class="fx-sb-promo-p">
+<a href="https://www.mozilla.org/firefox/products"  title="Download Mozilla Firefox from Mozilla.org">Download Mozilla Firefox</a>
+</p>
+<hr>
+
+<div id="q">
+ <form method="get" id="search" action="http://duckduckgo.com/">
+           <input type="hidden" name="sites"value="http://www.accessfirefox.org/"/>
+             <input type="hidden" name="ka" value="a"/>
+           <input type="hidden" name="k7" value="#FFFFFF"/>
+            <input type="hidden" name="kj" value="#BCC6CF"/>
+			         <input type="hidden" name="ks" value="t"/>
+			            <input type="hidden" name="kaa" value="#0000CC"/>
+							            <input type="hidden" name="kab" value="#CCCCCC"/>
+             <input type="hidden" name="ky" value="-1"/>
+			              <input type="hidden" name="kh" value="1"/>
+            <input type="hidden" name="k1" value="-1"/>
+			            <input type="hidden" name="kx" value="#0000CC"/>
+            <input type="hidden" name="kt" value="a"/>
+           <input type="text" name="q" maxlength="255" placeholder="Search"/>
+            <input type="submit" value="DuckDuckGo Search" style="visibility: hidden;" />
+ </form>
+</div>
+
+ <p id="search-info">
+ Search Provided by:<br>
+ <a href="https://duckduckgo.com/privacy" title="DuckDuckGo does not collect or share personal information. Link opens in new tab" onclick="window.open(this.href,'newwin'); return false;">DuckDuckGo</a>
+ </p>
+
+<ul style="list-style: none; line-height: 32px">
+<li>
+<a href="https://www.mozilla.org/firefox/android" >Firefox for Android</a>
+</li>
+<li>
+<a href="https://www.mozilla.org/firefox/ios" >Firefox for iOS</a>
+</li>
+<li>
+<a href="https://www.mozilla.org/firefox/channel/">Firefox Beta</a>
+</li>
+
+<li>
+<a href="https://www.mozilla.org/firefox/developer/">Firefox Developer Edition</a>
+</li>
+
+<li>
+<a href="http://nightly.mozilla.org/">Firefox Nightly</a>
+</li>
+
+<li>
+<a href="http://portableapps.com/apps/internet/firefox_portable">Portable Edition</a>
+</li>
+
+</ul>
+
+<p id="also">
+Also from Mozilla
+</p>
+
+<p id="tbird-promo">
+<a href="http://www.mozilla.org/thunderbird" title="Get Thunderbird from Mozilla.org">
+<img class="tbird-promo-img" src="/images/footer_graphics/Thunderbird-Logo-SB.png" alt="very small Mozilla Thunderbird logo"></a>
+<a href="http://www.mozilla.org/thunderbird" title="Get Thunderbird from Mozilla.org">Mozilla Thunderbird</a>
+</p>
+
+<p class="tbird-promo-des">
+Manage multiple email<br>
+accounts in one place.<br>
+Fetaures secure, tabbed <br>
+email, plus free Add-ons (like Firefox)
+</p>
+
+<p class="moz-img">
+<a href="http://www.mozilla.org/contribute/">
+<img src="/images/footer_graphics/Mozilla-Sidebar-Logo.png" alt="Mozilla Foundation logo" title="Get involved with the Mozilla Project">
+</a><br>
+<a href="http://www.mozilla.org/contribute/" title="Volunteer for Mozilla">Become a Volunteer</a>
+</p>
+
+</div>
+
+<div id="footer">
+<hr>
+<div class="footer-p" role="contentinfo"> 
+
+
+<p style=" font-size: 1.1em;">
+<strong>Access Firefox, a <a href="http://www.mozilla.org/community/directory.html">Mozilla community</a> run project.</strong>
+</p>
+<p> 
+<strong>Project Team:</strong><br>
+<a href="AFx_About_Ken_Saunders.php">Ken&nbsp;Saunders</a> - <a href="/About_Otto_de_Voogd.php">Otto&nbsp;de&nbsp;Voogd</a><br>
+<a href="/About_Michael_Buckley.php">Michael&nbsp;Buckley</a> - <a href="/About-Access-Firefox.php">Other&nbsp;Contributors</a>
+</p>
+<p>
+This site is not officially affiliated with the <a href="http://www.mozilla.org">Mozilla Foundation</a> or <a href="http://www.mozilla.com">Corporation</a>.<br>
+Domain name licensed by the Mozilla Corporation 7-17-2008.
+</p>
+<p>
+Where stated, some of this site's content is available <br>
+under the following Creative Commons license.<br>
+Attribution-NonCommercial-ShareAlike 3.0 Unported (CC BY-NC-SA 3.0)<br>
+All other content is &copy;2005-2015 www.AccessFirefox.org.<br>
+</p>
+<br>
+</div>
+</div>
+</div>
+</div>
+
+</body>
+</html>
+
+
+â)_îA      VÑ$ÿVÑ%<-K×VÓÇþ   5:https://accessfirefox.org/Install_Addon_Manually.php necko:classified 1 security-info FnhllAKWRHGAlo+ESXykKAAAAAAAAAAAwAAAAAAAAEaphjojH6pBabDSgSnsfLHeAAQAAgAAAAAAAAAAAAAAAAAAAAAB4vFIJp5wRkeyPxAQ9RJGKPqbqVvKO0mKuIl8ec8o/uhmCjImkVxP+7sgiYWmMt8F+O2DZM7ZTG6GukivU8OT5gAAAAAAAAUhMIIFHTCCBAWgAwIBAgISASOf/rZBCw5odCTb4tTFxua2MA0GCSqGSIb3DQEBCwUAMEoxCzAJBgNVBAYTAlVTMRYwFAYDVQQKEw1MZXQncyBFbmNyeXB0MSMwIQYDVQQDExpMZXQncyBFbmNyeXB0IEF1dGhvcml0eSBYMTAeFw0xNjAxMzAxMzA1MDBaFw0xNjA0MjkxMzA1MDBaMBwxGjAYBgNVBAMTEWFjY2Vzc2ZpcmVmb3gub3JnMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyjc6P3UYGKT3+Obyyd8dp/mJ0rIC4/MoidHulLvQj/GXtTkUCB0n7wDEanrS0L9gnDDzgGgU1yS6cEI5QVAosf+jLMdhWKgsoH70UgPYKSbosYAtykak1CxY6NEbIWzJN/SifWXN6v13YsVMvaIIJS6tzCGIF77i1aCFePdLUrwkHISD390rY3lwm+OfKP+Um9G0rycopMTSad2t5bRyUq1IUh1b2jrdZBM0QW3SFWSpSBXrbb8c5rBHvtAIsKq5HImP+dOPtbDZz8j6LybdzBNPfjraEAdxsaILJuh56CUf63I6AdC7vIf92/1lONkL3QRBlBcwaXrg0CCdw9UeqQIDAQABo4ICKTCCAiUwDgYDVR0PAQH/BAQDAgWgMB0GA1UdJQQWMBQGCCsGAQUFBwMBBggrBgEFBQcDAjAMBgNVHRMBAf8EAjAAMB0GA1UdDgQWBBQRGnVccRT6fhiOrgQLSFlHxRpmHDAfBgNVHSMEGDAWgBSoSmpjBH3duubRObemRWXv86jsoTBwBggrBgEFBQcBAQRkMGIwLwYIKwYBBQUHMAGGI2h0dHA6Ly9vY3NwLmludC14MS5sZXRzZW5jcnlwdC5vcmcvMC8GCCsGAQUFBzAChiNodHRwOi8vY2VydC5pbnQteDEubGV0c2VuY3J5cHQub3JnLzAzBgNVHREELDAqghV3d3cuYWNjZXNzZmlyZWZveC5vcmeCEWFjY2Vzc2ZpcmVmb3gub3JnMIH+BgNVHSAEgfYwgfMwCAYGZ4EMAQIBMIHmBgsrBgEEAYLfEwEBATCB1jAmBggrBgEFBQcCARYaaHR0cDovL2Nwcy5sZXRzZW5jcnlwdC5vcmcwgasGCCsGAQUFBwICMIGeDIGbVGhpcyBDZXJ0aWZpY2F0ZSBtYXkgb25seSBiZSByZWxpZWQgdXBvbiBieSBSZWx5aW5nIFBhcnRpZXMgYW5kIG9ubHkgaW4gYWNjb3JkYW5jZSB3aXRoIHRoZSBDZXJ0aWZpY2F0ZSBQb2xpY3kgZm91bmQgYXQgaHR0cHM6Ly9sZXRzZW5jcnlwdC5vcmcvcmVwb3NpdG9yeS8wDQYJKoZIhvcNAQELBQADggEBAEfKqYJC7ZzxOGyW7sofTXc9PmqVFRQZoxQ+6iXam0yB8LueC+1ypHS157/7p6gdvJGjfGcBH1w1jNHgdH0caiuTgLgT2+HK9xuLOqzePkKpUKoSvxgBmiZRkHf2YmA3TtKYkBruQmOcWTT6zVomosyyyp/4I+2OTx5yKGyNKf4x02865BZ/OGWrUaiCqKCY4PR0HzsXuXVr/wcmXNhcZdeTA3m2Qcqs5xAgSxRCSdb2/YkkrzuxHMC4UG0drmd3pwIh++rog+PuPRi/ut29WfnLJusc2EXLeixq4pROGuTxXh7XMZeKv8ou92Fvyo1t34SWEtRmY3+p7U4DjD5wdAzALwADAAAAAAEBAAA= request-method GET response-head HTTP/1.1 200 OK
+Date: Sat, 27 Feb 2016 04:24:32 GMT
+Server: Apache
+Cache-Control: max-age=172800
+Expires: Mon, 29 Feb 2016 04:24:32 GMT
+Content-Length: 13671
+Content-Type: text/html; charset=UTF-8
+ charset UTF-8 uncompressed-len 0 predictor::resource-count 17 predictor::https://accessfirefox.org/css/style.css 1,1,1456547071,0 predictor::https://accessfirefox.org/css/menu.css 1,1,1456547071,0 predictor::https://accessfirefox.org/stateye/stateye.js 1,1,1456547071,0 predictor::https://accessfirefox.org/css/images/hot-dog-menu.png 1,1,1456547071,0 predictor::https://accessfirefox.org/css/images/AFx-Logo-top=bar.png 1,1,1456547071,0 predictor::https://accessfirefox.org/images/authors/KenSaunders-Article-Avatar.png 1,1,1456547071,0 predictor::https://accessfirefox.org/Addons_Install_Pics/manually_install_addons/Install-Add-ons-Graphic-by-KenSaunders.png 1,1,1456547071,0 predictor::https://accessfirefox.org/Addons_Install_Pics/manually_install_addons/Install-Add-ons-Dialog.png 1,1,1456547071,0 predictor::https://accessfirefox.org/css/images/menu-bar-Fx-logo.png 1,1,1456547071,0 predictor::https://accessfirefox.org/images/footer_graphics/Thunderbird-Logo-SB.png 1,1,1456547071,0 predictor::https://accessfirefox.org/images/footer_graphics/Mozilla-Sidebar-Logo.png 1,1,1456547071,0 predictor::https://accessfirefox.org/css/OpenSans-Regular-webfont.ttf 1,1,1456547071,0 predictor::https://accessfirefox.org/stateye/stateye.cgi?docloc=https%3A//accessfirefox.org/Install_Addon_Manually.php&docref=https%3A//www.google.com&sess=1456547073899&ctr=1456547073899 1,1,1456547071,0 predictor::https://accessfirefox.org/css/images/main-menu.png 1,1,1456547071,0 predictor::https://accessfirefox.org/css/images/search.png 1,1,1456547071,0 predictor::https://accessfirefox.org/css/OpenSans-Semibold-webfont.ttf 1,1,1456547071,0 predictor::https://accessfirefox.org/css/OpenSans-Bold-webfont.ttf 1,1,1456547071,0   5g

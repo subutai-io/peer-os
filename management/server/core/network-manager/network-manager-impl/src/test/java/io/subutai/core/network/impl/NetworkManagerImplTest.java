@@ -17,19 +17,20 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.network.Vni;
 import io.subutai.common.network.VniVlanMapping;
+import io.subutai.common.network.Vnis;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.HostNotFoundException;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.protocol.P2PConnection;
+import io.subutai.common.protocol.Tunnel;
+import io.subutai.common.settings.Common;
 import io.subutai.core.network.api.ContainerInfo;
-import io.subutai.core.network.api.N2NConnection;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
-import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.peer.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.common.protocol.Tunnel;
 import junit.framework.TestCase;
 
 import static junit.framework.Assert.assertFalse;
@@ -37,7 +38,9 @@ import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
 import static junit.framework.TestCase.assertNotNull;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -53,8 +56,6 @@ import static org.mockito.Mockito.when;
 public class NetworkManagerImplTest
 {
 
-    private static final String SUPER_NODE_IP = "123.123.123.123";
-    private static final int SUPER_NODE_PORT = 1234;
     private static final String INTERFACE_NAME = "interface name";
     private static final String COMMUNITY_NAME = "community name";
     private static final String LOCAL_IP = "127.0.0.1";
@@ -73,23 +74,20 @@ public class NetworkManagerImplTest
                     + "Environment IP and VLAN ID.                                                                   "
                     + "[   OK    ]";
     private static final String LIST_TUNNELS_OUTPUT = "List of Tunnels\n" + "--------\n" + "tunnel1-10.2.1.3";
-    private static final String LIST_N2N_OUTPUT = "LocalPeerIP ServerIP Port LocalInterface Community\n"
-            + "10.1.2.3    212.167.154.154 5000    com community1 ";
-    private static final String KEY_TYPE = "key type";
-    private static final String PATH_TO_KEY_FILE = "/path/to/key/file";
+    private static final String LIST_P2P_OUTPUT = "Interface LocalPeerIP Hash\n" + "com 10.1.2.3 community1";
+    private static final String SECRET_KEY = "secret";
     private static final String RESERVED_VNIS_OUTPUT = String.format( "%s,%s,%s", VNI, VLAN_ID, ENVIRONMENT_ID );
     private static final String VNI_VLAN_MAPPING_OUTPUT =
-            String.format( "%s,%s,%s,%s", TUNNEL_NAME, VNI, VLAN_ID, ENVIRONMENT_ID );
+            String.format( "%s\t%s\t%s\t%s", TUNNEL_NAME, VNI, VLAN_ID, ENVIRONMENT_ID );
     private static final String SSH_KEY = "SSH-KEY";
     private static final String DOMAIN = "domain";
-    private static final String IP = "127.0.0.1";
 
     @Mock
     PeerManager peerManager;
     @Mock
     LocalPeer localPeer;
     @Mock
-    ManagementHost managementHost;
+    ResourceHost managementHost;
     @Mock
     ResourceHost resourceHost;
     @Mock
@@ -140,27 +138,25 @@ public class NetworkManagerImplTest
 
 
     @Test
-    public void testSetupN2NConnection() throws Exception
+    public void testSetupP2PConnection() throws Exception
     {
-        networkManager
-                .setupN2NConnection( SUPER_NODE_IP, SUPER_NODE_PORT, INTERFACE_NAME, COMMUNITY_NAME, LOCAL_IP, KEY_TYPE,
-                        PATH_TO_KEY_FILE );
+        networkManager.setupP2PConnection( INTERFACE_NAME, LOCAL_IP, COMMUNITY_NAME, SECRET_KEY,
+                Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC );
 
         verify( localPeer ).getManagementHost();
-        verify( commands )
-                .getSetupN2NConnectionCommand( SUPER_NODE_IP, SUPER_NODE_PORT, INTERFACE_NAME, COMMUNITY_NAME, LOCAL_IP,
-                        KEY_TYPE, PATH_TO_KEY_FILE );
+        verify( commands ).getSetupP2PConnectionCommand( eq( INTERFACE_NAME ), eq( LOCAL_IP ), eq( COMMUNITY_NAME ),
+                eq( SECRET_KEY ), anyLong() );
         verify( managementHost ).execute( any( RequestBuilder.class ) );
     }
 
 
     @Test
-    public void testRemoveN2NConnection() throws Exception
+    public void testRemoveP2PConnection() throws Exception
     {
-        networkManager.removeN2NConnection( INTERFACE_NAME, COMMUNITY_NAME );
+        networkManager.removeP2PConnection( COMMUNITY_NAME );
 
         verify( localPeer ).getManagementHost();
-        verify( commands ).getRemoveN2NConnectionCommand( INTERFACE_NAME, COMMUNITY_NAME );
+        verify( commands ).getRemoveP2PConnectionCommand( COMMUNITY_NAME );
         verify( managementHost ).execute( any( RequestBuilder.class ) );
     }
 
@@ -188,18 +184,6 @@ public class NetworkManagerImplTest
 
 
     @Test
-    public void testSetupGateway() throws Exception
-    {
-        networkManager.setupGateway( GATEWAY_IP, VLAN_ID );
-
-
-        verify( localPeer ).getManagementHost();
-        verify( commands ).getSetupGatewayCommand( GATEWAY_IP, VLAN_ID );
-        verify( managementHost ).execute( any( RequestBuilder.class ) );
-    }
-
-
-    @Test
     public void testRemoveGateway() throws Exception
     {
         networkManager.removeGateway( VLAN_ID );
@@ -208,18 +192,6 @@ public class NetworkManagerImplTest
         verify( localPeer ).getManagementHost();
         verify( commands ).getRemoveGatewayCommand( VLAN_ID );
         verify( managementHost ).execute( any( RequestBuilder.class ) );
-    }
-
-
-    @Test
-    public void testSetupGatewayOnContainer() throws Exception
-    {
-        networkManager.setupGatewayOnContainer( CONTAINER_NAME, GATEWAY_IP, INTERFACE_NAME );
-
-
-        verify( localPeer ).getContainerHostByName( CONTAINER_NAME );
-        verify( commands ).getSetupGatewayOnContainerCommand( GATEWAY_IP, INTERFACE_NAME );
-        verify( containerHost ).execute( any( RequestBuilder.class ) );
     }
 
 
@@ -309,12 +281,12 @@ public class NetworkManagerImplTest
 
 
     @Test
-    public void testListN2NConnections() throws Exception
+    public void testListP2PConnections() throws Exception
     {
-        when( commandResult.getStdOut() ).thenReturn( LIST_N2N_OUTPUT );
+        when( commandResult.getStdOut() ).thenReturn( LIST_P2P_OUTPUT );
 
 
-        Set<N2NConnection> connections = networkManager.listN2NConnections();
+        Set<P2PConnection> connections = networkManager.listP2PConnections();
 
         TestCase.assertFalse( connections.isEmpty() );
     }
@@ -402,9 +374,10 @@ public class NetworkManagerImplTest
     {
         when( commandResult.getStdOut() ).thenReturn( RESERVED_VNIS_OUTPUT );
 
-        Set<Vni> vnis = networkManager.getReservedVnis();
+        Vnis vnis = networkManager.getReservedVnis();
 
-        assertTrue( vnis.contains( new Vni( VNI, VLAN_ID, ENVIRONMENT_ID ) ) );
+        assertNotNull( vnis.findVlanByVni( VNI ) );
+        assertNotNull( vnis.findVniByEnvironmentId( ENVIRONMENT_ID ) );
     }
 
 
@@ -423,9 +396,9 @@ public class NetworkManagerImplTest
     @Test
     public void testExchangeSshKeys() throws Exception
     {
-        spyNetworkManager.exchangeSshKeys( containers );
+        spyNetworkManager.exchangeSshKeys( containers, Sets.<String>newHashSet() );
 
-        verify( sshManager ).execute();
+        verify( sshManager ).execute( Sets.<String>newHashSet(), false );
     }
 
 
