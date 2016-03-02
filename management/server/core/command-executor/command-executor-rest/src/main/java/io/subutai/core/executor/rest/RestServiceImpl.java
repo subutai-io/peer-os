@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 
+import io.subutai.common.command.ResponseImpl;
 import io.subutai.common.host.HeartBeat;
 import io.subutai.common.host.HeartbeatListener;
 import io.subutai.common.security.crypto.pgp.ContentAndSignatures;
@@ -106,6 +107,35 @@ public class RestServiceImpl implements RestService
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
                     entity( e.getMessage() ).build();
         }
+    }
+
+
+    @Override
+    public Response processResponse( final String response )
+    {
+        try
+        {
+            String decryptedResponse = decrypt( response );
+
+            LOG.info( String.format( "DECRYPTING:%n%s", decryptedResponse ) );
+
+            final ResponseImpl responseImpl = JsonUtil.fromJson( decryptedResponse, ResponseImpl.class );
+
+            LOG.info( String.format( "RESPONSE:%s", responseImpl ) );
+
+            return Response.accepted().build();
+        }
+        catch ( Exception e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
+                    entity( e.getMessage() ).build();
+        }
+    }
+
+
+    protected void processResponse( ResponseImpl response )
+    {
+
     }
 
 

@@ -16,4 +16,9 @@ public interface RestService
     @Path( "heartbeat" )
     @Produces( { MediaType.TEXT_PLAIN } )
     Response processHeartbeat( @FormParam( "heartbeat" ) String heartbeat );
+
+    @POST
+    @Path( "response" )
+    @Produces( { MediaType.TEXT_PLAIN } )
+    Response processResponse( @FormParam( "response" ) String response );
 }

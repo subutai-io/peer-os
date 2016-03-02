@@ -19,6 +19,7 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.OutputRedirection;
 import io.subutai.common.command.Request;
 import io.subutai.common.command.RequestType;
+import io.subutai.common.command.ResponseImpl;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.ResourceHostInfo;

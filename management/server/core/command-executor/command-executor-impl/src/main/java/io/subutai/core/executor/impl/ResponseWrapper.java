@@ -1,6 +1,9 @@
 package io.subutai.core.executor.impl;
 
 
+import io.subutai.common.command.ResponseImpl;
+
+
 /**
  * Wrapper to serialize a response
  */
