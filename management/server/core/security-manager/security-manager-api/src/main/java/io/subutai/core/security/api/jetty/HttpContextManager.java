@@ -10,13 +10,15 @@ public interface HttpContextManager
 
 
     /* *******************************************
-     *
+     * todo delete this
      */
+    @Deprecated
     public void reloadTrustStore();
 
 
     /* *******************************************
-     *
+     *  todo delete this
      */
+    @Deprecated
     public Object getSSLContext();
 }
