@@ -88,7 +88,7 @@ public class CommandProcessorTest
     @Before
     public void setUp() throws Exception
     {
-        commandProcessor = spy( new CommandProcessor( broker, hostRegistry, identityManager ) );
+        commandProcessor = spy( new CommandProcessor( hostRegistry, identityManager ) );
         commandProcessor.commands = commands;
         doThrow( new HostDisconnectedException( "" ) ).when( hostRegistry ).getResourceHostInfoById( HOST_ID );
         when( hostRegistry.getContainerHostInfoById( HOST_ID ) ).thenReturn( containerHostInfo );
@@ -97,16 +97,18 @@ public class CommandProcessorTest
         when( request.getCommandId() ).thenReturn( COMMAND_ID );
         doReturn( session ).when( commandProcessor ).getActiveSession();
         doReturn( RESPONSE_JSON ).when( commandProcessor ).encrypt( anyString() );
+        doReturn( broker ).when( commandProcessor ).getBroker();
     }
 
 
     @Test
     public void testConstructor() throws Exception
     {
+
         try
         {
 
-            new CommandProcessor( null, hostRegistry, identityManager );
+            new CommandProcessor( null, identityManager );
             fail( "Expected NullPointerException" );
         }
         catch ( NullPointerException e )
@@ -115,16 +117,7 @@ public class CommandProcessorTest
         try
         {
 
-            new CommandProcessor( broker, null, identityManager );
-            fail( "Expected NullPointerException" );
-        }
-        catch ( NullPointerException e )
-        {
-        }
-        try
-        {
-
-            new CommandProcessor( broker, hostRegistry, null );
+            new CommandProcessor( hostRegistry, null );
             fail( "Expected NullPointerException" );
         }
         catch ( NullPointerException e )

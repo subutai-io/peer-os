@@ -2,8 +2,6 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
     >
 
-  <reference id="broker" availability="mandatory"
-             interface="io.subutai.core.broker.api.Broker" />
   <reference id="hostRegistry" availability="mandatory"
              interface="io.subutai.core.hostregistry.api.HostRegistry" />
   <reference id="identityManager" availability="mandatory"
@@ -11,7 +9,6 @@
 
   <bean id="commandProcessor" class="io.subutai.core.executor.impl.CommandProcessor"
         destroy-method="dispose">
-    <argument ref="broker" />
     <argument ref="hostRegistry" />
     <argument ref="identityManager" />
   </bean>

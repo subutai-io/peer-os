@@ -45,21 +45,17 @@ import io.subutai.core.security.api.crypto.EncryptionTool;
 public class CommandProcessor implements ByteMessageListener, ResponseHandler
 {
     private static final Logger LOG = LoggerFactory.getLogger( CommandProcessor.class.getName() );
-    private final Broker broker;
     private final HostRegistry hostRegistry;
     private IdentityManager identityManager;
 
     protected ExpiringCache<UUID, CommandProcess> commands = new ExpiringCache<>();
 
 
-    public CommandProcessor( final Broker broker, final HostRegistry hostRegistry,
-                             final IdentityManager identityManager )
+    public CommandProcessor( final HostRegistry hostRegistry, final IdentityManager identityManager )
     {
-        Preconditions.checkNotNull( broker );
         Preconditions.checkNotNull( hostRegistry );
         Preconditions.checkNotNull( identityManager );
 
-        this.broker = broker;
         this.hostRegistry = hostRegistry;
         this.identityManager = identityManager;
     }
@@ -106,7 +102,7 @@ public class CommandProcessor implements ByteMessageListener, ResponseHandler
 
             //TODO here use REST to send message to target RH instead of broker
 
-            broker.sendTextMessage( targetHost.getId(), command );
+            getBroker().sendTextMessage( targetHost.getId(), command );
 
             LOG.info( String.format( "ENCRYPTING:%n%s", encrypt( command ) ) );
         }
@@ -150,9 +146,15 @@ public class CommandProcessor implements ByteMessageListener, ResponseHandler
     }
 
 
-    public static SecurityManager getSecurityManager() throws NamingException
+    protected SecurityManager getSecurityManager() throws NamingException
     {
         return ServiceLocator.getServiceNoCache( SecurityManager.class );
+    }
+
+
+    protected Broker getBroker() throws NamingException
+    {
+        return ServiceLocator.getServiceNoCache( Broker.class );
     }
 
 
