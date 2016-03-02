@@ -1459,7 +1459,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             ContainerHost containerHost = environment.getContainerHostById( containerHostId );
 
             return peerManager.getLocalPeer().isIpInVniDomain(
-                    containerHost.getIpByInterfaceName( Common.DEFAULT_CONTAINER_INTERFACE ), environment.getVni() );
+                    containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp(),
+                    environment.getVni() );
         }
         catch ( ContainerHostNotFoundException | PeerException e )
         {
@@ -1551,14 +1552,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             if ( add )
             {
-                peerManager.getLocalPeer()
-                           .addIpToVniDomain( containerHost.getIpByInterfaceName( Common.DEFAULT_CONTAINER_INTERFACE ),
-                                   environment.getVni() );
+                peerManager.getLocalPeer().addIpToVniDomain(
+                        containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp(),
+                        environment.getVni() );
             }
             else
             {
                 peerManager.getLocalPeer().removeIpFromVniDomain(
-                        containerHost.getIpByInterfaceName( Common.DEFAULT_CONTAINER_INTERFACE ),
+                        containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp(),
                         environment.getVni() );
             }
 

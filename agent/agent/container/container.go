@@ -95,7 +95,6 @@ func GetContainerIfaces(name string) []utils.Iface {
 	iface.InterfaceName = "eth0"
 	listip, _ := c.IPAddress(iface.InterfaceName)
 	iface.Ip = strings.Join(listip, " ")
-	iface.Mac = cont.GetConfigItem(config.Agent.LxcPrefix+"/"+name+"/config", "lxc.network.hwaddr")
 
 	return []utils.Iface{*iface}
 }

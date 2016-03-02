@@ -1,4 +1,4 @@
-package io.subutai.core.kurjun.impl;
+package io.subutai.core.kurjun.impl.model;
 
 
 import java.io.Serializable;

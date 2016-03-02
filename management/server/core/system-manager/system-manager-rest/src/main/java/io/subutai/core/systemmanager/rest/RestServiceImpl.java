@@ -9,6 +9,8 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.commons.configuration.ConfigurationException;
 
+import io.subutai.common.command.CommandException;
+import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.util.JsonUtil;
@@ -42,7 +44,7 @@ public class RestServiceImpl implements RestService
 
             return Response.status( Response.Status.OK ).entity( projectInfo ).build();
         }
-        catch ( ConfigurationException e )
+        catch ( ConfigurationException | CommandException | HostNotFoundException e )
         {
             LOG.error( e.getMessage() );
             e.printStackTrace();
@@ -99,17 +101,16 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response setKurjunSettings( final String globalKurjunUrls, final String publicDiskQuota,
-                                       final String publicThreshold, final String publicTimeFrame,
-                                       final String trustDiskQuota, final String trustThreshold,
-                                       final String trustTimeFrame ) throws ConfigurationException
+    public Response setKurjunSettingsQuotas( final String publicDiskQuota, final String publicThreshold,
+                                             final String publicTimeFrame, final String trustDiskQuota,
+                                             final String trustThreshold, final String trustTimeFrame )
+            throws ConfigurationException
     {
 
         boolean isSaved = systemManager
-                .setKurjunSettings( globalKurjunUrls.split( "," ), Long.parseLong( publicDiskQuota ),
-                        Long.parseLong( publicThreshold ), Long.parseLong( publicTimeFrame ),
-                        Long.parseLong( trustDiskQuota ), Long.parseLong( trustThreshold ),
-                        Long.parseLong( trustTimeFrame ) );
+                .setKurjunSettingsQuotas( Long.parseLong( publicDiskQuota ), Long.parseLong( publicThreshold ),
+                        Long.parseLong( publicTimeFrame ), Long.parseLong( trustDiskQuota ),
+                        Long.parseLong( trustThreshold ), Long.parseLong( trustTimeFrame ) );
 
         if ( isSaved )
         {
@@ -154,6 +155,26 @@ public class RestServiceImpl implements RestService
 
 
     @Override
+    public Response setKurjunSettingsUrls( final String globalKurjunUrls )
+    {
+
+        try
+        {
+            systemManager
+                    .setKurjunSettingsUrls( globalKurjunUrls.split( "," ) );
+        }
+        catch ( ConfigurationException e )
+        {
+            LOG.error( e.getMessage() );
+            e.printStackTrace();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
+        }
+
+        return Response.status( Response.Status.OK ).build();
+    }
+
+
+    @Override
     public Response getNetworkSettings()
     {
         try
@@ -174,12 +195,12 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response setNetworkSettings( final String securePortX1, final String securePortX2,
-                                        final String securePortX3 )
+    public Response setNetworkSettings( final String securePortX1, final String securePortX2, final String securePortX3,
+                                        final String publicUrl )
     {
         try
         {
-            systemManager.setNetworkSettings( securePortX1, securePortX2, securePortX3 );
+            systemManager.setNetworkSettings( securePortX1, securePortX2, securePortX3, publicUrl );
         }
         catch ( ConfigurationException e )
         {

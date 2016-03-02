@@ -132,6 +132,7 @@ public class RestAptManagerImpl extends RestManagerBase implements RestAptManage
         catch ( IOException | IllegalArgumentException ex )
         {
             LOGGER.error( "Failed to upload", ex );
+            return badRequest( ex.getMessage() );
         }
         finally
         {

@@ -21,9 +21,4 @@ public interface HostInterface
      * returns ip address
      */
     public String getIp();
-
-    /**
-     * returns MAC address
-     */
-    public String getMac();
 }
