@@ -57,7 +57,7 @@ public class TaskDisplayCommand extends SubutaiShellCommandSupport
         System.out.println( String.format( "Request: %s", task.getRequest() ) );
         System.out.println( String.format( "Response: %s", task.waitAndGetResponse() ) );
         System.out.println( "ExitCode: " + task.getExitCode() );
-        System.out.println( "StdOut: " + task.getStdErr() );
+        System.out.println( "StdOut: " + task.getStdOut() );
         System.out.println( "StdErr: " + task.getStdErr() );
         final String exceptions = task.getExceptionsAsString();
 
