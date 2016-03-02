@@ -43,6 +43,7 @@ public class CloneResponse implements TaskResponse
         this.description = description;
     }
 
+
     @Override
     public String getResourceHostId()
     {
@@ -103,7 +104,7 @@ public class CloneResponse implements TaskResponse
     @Override
     public String getLog()
     {
-        return hasSucceeded() ? String.format( "Cloning %s succeeded.", containerName ) :
+        return hasSucceeded() ? String.format( "Cloning '%s' using '%s' succeeded.", containerName, templateName ) :
                String.format( "Cloning %s failed.", containerName );
     }
 

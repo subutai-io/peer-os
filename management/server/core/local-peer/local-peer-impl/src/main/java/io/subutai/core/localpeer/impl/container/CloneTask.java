@@ -27,7 +27,7 @@ public class CloneTask extends AbstractTask<CloneRequest, CloneResponse>
 {
     protected static final Logger LOG = LoggerFactory.getLogger( CloneTask.class );
 
-    private static final int CLONE_TIMEOUT = 60 * 10; // 10 min
+    private static final int CLONE_TIMEOUT = 60 * 5; // 5 min
     private static final String LINE_DELIMITER = "\n";
     private static Pattern CLONE_OUTPUT_PATTERN = Pattern.compile( "with ID (.*) successfully cloned" );
 
@@ -59,70 +59,8 @@ public class CloneTask extends AbstractTask<CloneRequest, CloneResponse>
 
         result.addCommand( cloneAction );
 
-        //        for ( ContainerResource r : quota.getAllResources() )
-        //        {
-        //
-        //            Command quotaCommand = new Command( "quota" );
-        //            quotaCommand.addArgument( request.getHostname() );
-        //            quotaCommand.addArgument( r.getContainerResourceType().getKey() );
-        //            quotaCommand.addArgument( "-s" );
-        //            quotaCommand.addArgument( r.getWriteValue() );
-        //            result.addCommand( quotaCommand );
-        //        }
-
         return result;
     }
-
-
-    //    @Override
-    //    public CloneResponse parse1( final CommandResult commandResult ) throws CommandResultParseException
-    //    {
-    //        ContainerHostInfoModel r = null;
-    //        int counter = 0;
-    //        String ip = null;
-    //        while ( ip == null && counter < Common.WAIT_CONTAINER_CONNECTION_SEC )
-    //        {
-    //            try
-    //            {
-    //                r = findHostInfo();
-    //                HostInterface i = r.getHostInterfaces().findByName( Common.DEFAULT_CONTAINER_INTERFACE );
-    //                if ( !( i instanceof NullHostInterface ) )
-    //                {
-    //                    ip = i.getIp();
-    //                }
-    //                TimeUnit.SECONDS.sleep( 1 );
-    //            }
-    //            catch ( HostDisconnectedException | InterruptedException e )
-    //            {
-    //                // ignore
-    //            }
-    //            counter++;
-    //        }
-    //
-    //        if ( r == null )
-    //        {
-    //            throw new CommandResultParseException( "Heartbeat not received from: " + request.getContainerName() );
-    //        }
-    //
-    //        if ( ip == null )
-    //        {
-    //            throw new CommandResultParseException( "IP not assigned: " + request.getContainerName() );
-    //        }
-    //
-    //        return new CloneResponse( true, request.getResourceHostId(), request.getHostname(), request
-    // .getContainerName(),
-    //                r.getId(), request.getIp(), request.getTemplateName(), request.getTemplateArch(),
-    // getElapsedTime() );
-    //    }
-
-
-    //    private ContainerHostInfoModel findHostInfo() throws HostDisconnectedException
-    //    {
-    //        final ContainerHostInfo info = hostRegistry.getContainerHostInfoByHostname( request.getHostname() );
-    //
-    //        return new ContainerHostInfoModel( info );
-    //    }
-
 
     @Override
     public int getTimeout()
@@ -152,6 +90,7 @@ public class CloneTask extends AbstractTask<CloneRequest, CloneResponse>
 
         if ( commandResult != null && commandResult.hasSucceeded() )
         {
+            // why stdErr()?
             StringTokenizer st = new StringTokenizer( getStdErr(), LINE_DELIMITER );
 
 

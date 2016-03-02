@@ -51,7 +51,7 @@ public class TaskDisplayCommand extends SubutaiShellCommandSupport
 
         System.out.println( String.format( "Request: %s\n", task.getRequest() ) );
 //        System.out.println( String.format( "Response: %s\n", task.getResponse() ) );
-        final String s = task.getCommandBatch().asChain();
+        final String s = task.getCommandBatch().toString();
         System.out.println(
                 String.format( "%s\t%d\t%s...\t%s", task.getRequest().getResourceHostId(), task.getTimeout(),
                         s.substring( 0, Math.min( 50, s.length() ) ), task.getState() ) );

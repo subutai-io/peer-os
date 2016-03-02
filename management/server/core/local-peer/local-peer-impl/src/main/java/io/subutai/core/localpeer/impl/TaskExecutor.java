@@ -55,11 +55,18 @@ public class TaskExecutor implements Callable<Task>
             commandResult = new CommandResultImpl( -1, "", e.getMessage(), CommandStatus.FAILED );
         }
         LOG.debug( String.format( "Task %s finished", taskId ) );
-        task.done( commandResult );
-        if ( collector != null )
+        try
         {
-            TaskResponse response = task.waitAndGetResponse();
-            collector.onResponse( response );
+            task.done( commandResult );
+            if ( collector != null )
+            {
+                TaskResponse response = task.waitAndGetResponse();
+                collector.onResponse( response );
+            }
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
         }
 
         return task;

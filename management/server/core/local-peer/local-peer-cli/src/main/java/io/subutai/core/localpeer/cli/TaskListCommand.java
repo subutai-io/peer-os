@@ -27,11 +27,12 @@ public class TaskListCommand extends SubutaiShellCommandSupport
     {
         for ( Task task : localPeer.getTaskList() )
         {
-            final String s = task.getCommandBatch().asChain();
+            final String s = task.getCommandBatch().toString();
             System.out.println(
-                    String.format( "%d\t%s\t%d\t%s\t%s...\t%s", task.getId(), task.getRequest().getResourceHostId(),
-                            task.getTimeout(), task.getState(), s.substring( 0, Math.min( 25, s.length() ) ),
-                            StringUtil.convertMillisToHHMMSS( task.getElapsedTime() ) ) );
+                    String.format( "%d\t%s\t%d\t%s\t%s\t%s...", task.getId(), task.getRequest().getResourceHostId(),
+                            task.getTimeout(), task.getState(),
+                            StringUtil.convertMillisToHHMMSS( task.getElapsedTime() ),
+                            s.substring( 0, Math.min( 50, s.length() ) ) ) );
         }
         return null;
     }

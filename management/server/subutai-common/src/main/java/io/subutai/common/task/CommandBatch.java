@@ -12,7 +12,7 @@ import io.subutai.common.util.JsonUtil;
  */
 public class CommandBatch
 {
-    enum Type
+    public enum Type
     {
         STANDARD, CHAIN, JSON;
     }
@@ -41,7 +41,7 @@ public class CommandBatch
     {
         if ( this.type == Type.STANDARD && commands.size() > 0 )
         {
-            throw new IllegalArgumentException( "Standrad command already contain command." );
+            throw new IllegalArgumentException( "Standard command already contain command." );
         }
 
         commands.add( comm );
@@ -58,7 +58,7 @@ public class CommandBatch
 
         if ( type == Type.JSON )
         {
-            return JsonUtil.toJson( commands );
+            return String.format( "subutai batch -json '%s'", asJson() );
         }
         else
         {
@@ -67,15 +67,18 @@ public class CommandBatch
     }
 
 
-    private String asChain()
+    public String asJson() {return JsonUtil.toJson( commands );}
+
+
+    public String asChain()
     {
         StringBuilder sb = new StringBuilder();
         for ( Command command : commands )
         {
-            sb.append( "&& subutai " + command.getName() );
+            sb.append( "&& subutai " ).append( command.getAction() );
             for ( String arg : command.getArguments() )
             {
-                sb.append( " " + arg );
+                sb.append( " " ).append( arg );
             }
         }
         return sb.toString().substring( 3 );
