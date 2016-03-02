@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
+import io.subutai.common.command.CommandStatus;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.task.Task;
 import io.subutai.common.task.TaskCallbackHandler;
@@ -106,6 +107,7 @@ public abstract class AbstractTask<R extends TaskRequest, T extends TaskResponse
                 catch ( Exception e )
                 {
                     LOG.warn( "Exception on executing success handler.", e );
+                    exceptions.add( e );
                     throw e;
                 }
             }
@@ -126,6 +128,7 @@ public abstract class AbstractTask<R extends TaskRequest, T extends TaskResponse
             catch ( Exception e )
             {
                 LOG.warn( "Exception on executing failure handler.", e );
+                exceptions.add( e );
             }
         }
         this.state = State.FAILURE;
@@ -244,12 +247,28 @@ public abstract class AbstractTask<R extends TaskRequest, T extends TaskResponse
     abstract public TaskResponseBuilder<R, T> getResponseBuilder();
 
 
+    @Override
+    public CommandStatus getCommandStatus()
+    {
+        return commandResult != null ? commandResult.getStatus() : null;
+    }
+
+
+    @Override
+    public Integer getExitCode()
+    {
+        return commandResult != null ? commandResult.getExitCode() : null;
+    }
+
+
+    @Override
     public String getStdOut()
     {
         return ( commandResult != null && commandResult.getStdOut() != null ? commandResult.getStdOut() : "" );
     }
 
 
+    @Override
     public String getStdErr()
     {
         return ( commandResult != null && commandResult.getStdErr() != null ? commandResult.getStdErr() : "" );
