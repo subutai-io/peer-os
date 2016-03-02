@@ -91,12 +91,38 @@ func download(file, id, token string) string {
 	log.Error("Failed to check MD5 after download. Please check your connection and try again.")
 	return ""
 }
+func lockImport(templ string) bool {
+	var err error
+
+	lock, err = lockfile.New("/var/run/lock/subutai-" + templ + ".import")
+	if log.Check(log.DebugLevel, "Init lock file for "+templ, err) {
+		return false
+	}
+
+	err = lock.TryLock()
+	if log.Check(log.DebugLevel, "Locking file for "+templ, err) {
+		return false
+	}
+
+	return true
+}
+
+func unlockImport(templ string) {
+	lock.Unlock()
+}
 
 func LxcImport(templ, version, token string) {
-	if container.IsTemplate(templ) {
-		log.Info(templ + " template exist")
+	log.Info("Importing " + templ)
+	for !lockImport(templ) {
+		time.Sleep(time.Second * 1)
+	}
+	defer unlockImport(templ)
+
+	if container.IsContainer(templ) {
+		log.Info(templ + " container exist")
 		return
 	}
+
 	config.CheckKurjun()
 	fullname := templ + "-subutai-template_" + config.Misc.Version + "_" + config.Misc.Arch + ".tar.gz"
 	// if len(token) == 0 {
