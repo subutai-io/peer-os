@@ -75,6 +75,8 @@ import io.subutai.core.kurjun.impl.TrustedWebClientFactoryModule;
 public class AptManagerImpl implements AptManager
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( AptManagerImpl.class );
+    
+    private static final String VAPT_PATH = "/vapt";
 
     private static final KurjunContext APT_CONTEXT = new KurjunContext( "vapt" );
 
@@ -554,7 +556,7 @@ public class AptManagerImpl implements AptManager
             List<RepoUrl> list = new ArrayList<>();
             for ( String url : SystemSettings.getGlobalKurjunUrls() )
             {
-                String aptUrl = url + "/vapt";
+                String aptUrl = url + VAPT_PATH;
                 list.add( new RepoUrl( new URL( aptUrl ), null ) );
             }
             return list;

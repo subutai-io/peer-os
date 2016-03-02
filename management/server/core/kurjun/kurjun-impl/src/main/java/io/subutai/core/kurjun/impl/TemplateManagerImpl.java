@@ -95,6 +95,8 @@ public class TemplateManagerImpl implements TemplateManager
 {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( TemplateManagerImpl.class );
+    
+    private static final String TEMPLATE_PATH = "/templates";
 
     private Set<UserRepoContext> GLOBAL_CONTEXTS;
     private Set<UserRepoContext> PRIVATE_CONTEXTS;
@@ -513,9 +515,12 @@ public class TemplateManagerImpl implements TemplateManager
         {
             if ( url != null && !url.getHost().equals( getExternalIp() ) )
             {
-                repoUrlStore.addRemoteTemplateUrl( new RepoUrl( url, token ) );
+                String urlStr = url.toExternalForm();
+                String u = urlStr.endsWith( "/" ) ? urlStr.replaceAll( "/+$", "" ) : urlStr;
+                String templateUrl = u + TEMPLATE_PATH;
+                repoUrlStore.addRemoteTemplateUrl( new RepoUrl( new URL( templateUrl ), token ) );
                 remoteRepoUrls = repoUrlStore.getRemoteTemplateUrls();
-                LOGGER.info( "Remote template host url is added: {}", url );
+                LOGGER.info( "Remote template host url is added: {}", templateUrl );
             }
             else
             {
@@ -848,7 +853,7 @@ public class TemplateManagerImpl implements TemplateManager
             List<RepoUrl> list = new ArrayList<>();
             for ( String url : SystemSettings.getGlobalKurjunUrls() )
             {
-                String templateUrl = url + "/templates";
+                String templateUrl = url + TEMPLATE_PATH;
                 list.add( new RepoUrl( new URL( templateUrl ), null ) );
             }
             return list;
