@@ -137,6 +137,10 @@ public class CommandProcessor implements ByteMessageListener, RestProcessor
 
                 webClient.form( new Form() );
             }
+            catch ( Exception e )
+            {
+                //ignore for now
+            }
             finally
             {
                 if ( webClient != null )
