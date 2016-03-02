@@ -20,7 +20,7 @@
   </bean>
 
   <service ref="commandProcessor" interface="io.subutai.core.broker.api.ByteMessageListener" />
-  <service ref="commandProcessor" interface="io.subutai.core.executor.api.ResponseHandler" />
+  <service ref="commandProcessor" interface="io.subutai.core.executor.api.RestProcessor" />
 
   <service ref="executor" interface="io.subutai.core.executor.api.CommandExecutor" />
 

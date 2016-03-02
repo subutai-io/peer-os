@@ -5,6 +5,7 @@ import org.bouncycastle.openpgp.PGPPublicKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.subutai.common.command.EncryptedResponseWrapper;
 import io.subutai.common.security.crypto.pgp.ContentAndSignatures;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.JsonUtil;

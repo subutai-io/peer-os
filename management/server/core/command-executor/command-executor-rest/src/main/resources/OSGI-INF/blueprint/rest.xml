@@ -14,7 +14,7 @@
   <reference id="securityManager" availability="mandatory"
              interface="io.subutai.core.security.api.SecurityManager" />
   <reference id="responseHandler" availability="mandatory"
-             interface="io.subutai.core.executor.api.ResponseHandler" />
+             interface="io.subutai.core.executor.api.RestProcessor" />
 
   <bean id="commandExecutorRest" class="io.subutai.core.executor.rest.RestServiceImpl" scope="singleton"
         destroy-method="dispose">

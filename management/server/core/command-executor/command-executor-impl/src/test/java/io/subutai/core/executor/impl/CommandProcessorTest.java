@@ -13,6 +13,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import org.apache.cxf.jaxrs.client.WebClient;
+
 import io.subutai.common.cache.ExpiringCache;
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
@@ -57,6 +59,7 @@ public class CommandProcessorTest
                     + "      \"commandId\":\"%s\"," + "      \"pid\":123," + "      \"responseNumber\":2,"
                     + "      \"stdOut\":\"output\"," + "      \"stdErr\":\"err\"," + "      \"exitCode\" : 0" + "  } }",
             HOST_ID, COMMAND_ID.toString() );
+    private static final String IP = "IP";
 
     @Mock
     Broker broker;
@@ -138,7 +141,7 @@ public class CommandProcessorTest
     public void testRemove() throws Exception
     {
 
-        commandProcessor.remove( COMMAND_ID );
+        commandProcessor.remove( request );
 
         verify( commands ).remove( COMMAND_ID );
     }
@@ -321,7 +324,9 @@ public class CommandProcessorTest
         catch ( CommandException e )
         {
         }
-
+        WebClient webClient = mock( WebClient.class );
+        doReturn( webClient ).when( commandProcessor )
+                             .getWebClient( any( Request.class ), any( ResourceHostInfo.class ) );
 
         when( commands.put( eq( COMMAND_ID ), any( CommandProcess.class ), anyInt(),
                 any( CommandProcessExpiryCallback.class ) ) ).thenReturn( true );

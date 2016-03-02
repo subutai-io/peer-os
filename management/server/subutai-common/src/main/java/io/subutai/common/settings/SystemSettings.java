@@ -11,9 +11,6 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
 
-/**
- * Created by ermek on 2/19/16.
- */
 public class SystemSettings
 {
     private static final Logger LOG = LoggerFactory.getLogger( SystemSettings.class );
@@ -25,10 +22,15 @@ public class SystemSettings
     private static PropertiesConfiguration PROPERTIES = null;
     private static String[] GLOBAL_KURJUN_URLS = null;
 
+
     static
     {
         loadProperties();
     }
+
+
+    private static int agentPort;
+
 
     public static void loadProperties()
     {
@@ -51,14 +53,14 @@ public class SystemSettings
         return GLOBAL_KURJUN_URLS;
     }
 
-    
+
     public static void setGlobalKurjunUrls( String[] urls ) throws ConfigurationException
     {
         String[] validated = validateGlobalKurjunUrls( urls );
         saveProperty( "globalKurjunUrls", validated );
         loadGlobalKurjunUrls();
     }
-    
+
 
     protected static String[] validateGlobalKurjunUrls( final String[] urls ) throws ConfigurationException
     {
@@ -90,19 +92,18 @@ public class SystemSettings
         }
         catch ( MalformedURLException e )
         {
-            throw  new ConfigurationException( "Invalid URL: " + publicUrl );
+            throw new ConfigurationException( "Invalid URL: " + publicUrl );
         }
     }
-    
-    
+
+
     private static void loadGlobalKurjunUrls() throws ConfigurationException
     {
         String[] globalKurjunUrls = PROPERTIES.getStringArray( "globalKurjunUrls" );
         if ( globalKurjunUrls.length < 1 )
         {
-            globalKurjunUrls = new String[]
-            {
-                DEFAULT_KURJUN_REPO
+            globalKurjunUrls = new String[] {
+                    DEFAULT_KURJUN_REPO
             };
         }
 
@@ -155,6 +156,12 @@ public class SystemSettings
     }
 
 
+    public static int getAgentPort()
+    {
+        return PROPERTIES.getInt( "agentPort", ChannelSettings.AGENT_PORT );
+    }
+
+
     public static void setOpenPort( int openPort )
     {
         saveProperty( "openPort", openPort );
@@ -182,6 +189,12 @@ public class SystemSettings
     public static void setSpecialPortX1( int specialPortX1 )
     {
         saveProperty( "specialPortX1", specialPortX1 );
+    }
+
+
+    public static void setAgentPort( int agentPort )
+    {
+        saveProperty( "agentPort", agentPort );
     }
 
 

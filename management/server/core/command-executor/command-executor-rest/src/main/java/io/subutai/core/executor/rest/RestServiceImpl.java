@@ -16,38 +16,42 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 
+import io.subutai.common.command.EncryptedRequestWrapper;
+import io.subutai.common.command.EncryptedResponseWrapper;
+import io.subutai.common.command.Request;
 import io.subutai.common.command.ResponseImpl;
 import io.subutai.common.command.ResponseWrapper;
 import io.subutai.common.host.HeartBeat;
 import io.subutai.common.host.HeartbeatListener;
 import io.subutai.common.security.crypto.pgp.ContentAndSignatures;
 import io.subutai.common.settings.SystemSettings;
+import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.JsonUtil;
-import io.subutai.core.executor.api.ResponseHandler;
+import io.subutai.core.executor.api.RestProcessor;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 
 
 //temporarily made rest-impl as subscription service for heartbeat listeners
-//TODO extract separate service/class for this purpose^
+//TODO extract separate service/class for this purpose^, move it to command-executor-impl
 public class RestServiceImpl implements RestService
 {
     private static final Logger LOG = LoggerFactory.getLogger( RestServiceImpl.class.getName() );
     private final SecurityManager securityManager;
-    private final ResponseHandler responseHandler;
+    private final RestProcessor restProcessor;
 
     protected Set<HeartbeatListener> listeners =
             Collections.newSetFromMap( new ConcurrentHashMap<HeartbeatListener, Boolean>() );
     protected ExecutorService notifier = Executors.newCachedThreadPool();
 
 
-    public RestServiceImpl( final SecurityManager securityManager, final ResponseHandler responseHandler )
+    public RestServiceImpl( final SecurityManager securityManager, final RestProcessor restProcessor )
     {
         Preconditions.checkNotNull( securityManager );
-        Preconditions.checkNotNull( responseHandler );
+        Preconditions.checkNotNull( restProcessor );
 
         this.securityManager = securityManager;
-        this.responseHandler = responseHandler;
+        this.restProcessor = restProcessor;
     }
 
 
@@ -124,7 +128,7 @@ public class RestServiceImpl implements RestService
 
             final ResponseImpl responseImpl = responseWrapper.getResponse();
 
-            responseHandler.handleResponse( responseImpl );
+            restProcessor.handleResponse( responseImpl );
 
             return Response.accepted().build();
         }
@@ -133,6 +137,61 @@ public class RestServiceImpl implements RestService
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
                     entity( e.getMessage() ).build();
         }
+    }
+
+
+    @Override
+    public Response getRequests( String hostId )
+    {
+        try
+        {
+            Set<Request> hostRequests = restProcessor.getRequests( hostId );
+
+            if ( CollectionUtil.isCollectionEmpty( hostRequests ) )
+            {
+                return Response.noContent().build();
+            }
+            else
+            {
+                return Response.ok( encrypt( JsonUtil.toJson( hostRequests ), hostId ) ).build();
+            }
+        }
+        catch ( Exception e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
+                    entity( e.getMessage() ).build();
+        }
+    }
+
+
+    //todo move this method to SecurityManager
+    protected String encrypt( String message, String hostId )
+    {
+        if ( SystemSettings.getEncryptionState() )
+        {
+            try
+            {
+                EncryptionTool encryptionTool = securityManager.getEncryptionTool();
+
+
+                //obtain target host pub key for encrypting
+                PGPPublicKey hostKeyForEncrypting = securityManager.getKeyManager().getPublicKey( hostId );
+
+                String encryptedRequestString = new String( encryptionTool
+                        .signAndEncrypt( JsonUtil.toJson( message ).getBytes(), hostKeyForEncrypting, true ) );
+
+                EncryptedRequestWrapper encryptedRequestWrapper =
+                        new EncryptedRequestWrapper( encryptedRequestString, hostId );
+
+                return JsonUtil.toJson( encryptedRequestWrapper );
+            }
+            catch ( Exception e )
+            {
+                LOG.error( "Error in process", e );
+            }
+        }
+
+        return message;
     }
 
 

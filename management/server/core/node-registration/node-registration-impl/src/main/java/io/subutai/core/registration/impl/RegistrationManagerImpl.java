@@ -238,7 +238,9 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
         {
             return;
         }
+
         registrationRequest.setStatus( RegistrationStatus.APPROVED );
+
         requestDataService.update( registrationRequest );
 
         importHostPublicKey( registrationRequest.getId(), registrationRequest.getPublicKey() );
