@@ -29,7 +29,7 @@ public class ImportTask extends AbstractTask<ImportTemplateRequest, ImportTempla
 
     public CommandBatch getCommandBatch() throws Exception
     {
-        CommandBatch result = new CommandBatch();
+        CommandBatch result = new CommandBatch( CommandBatch.Type.STANDARD );
 
         Command importAction = new Command( "import" );
 

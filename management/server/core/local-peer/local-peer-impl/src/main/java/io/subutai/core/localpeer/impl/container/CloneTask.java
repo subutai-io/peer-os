@@ -49,7 +49,7 @@ public class CloneTask extends AbstractTask<CloneRequest, CloneResponse>
 
     public CommandBatch getCommandBatch() throws Exception
     {
-        CommandBatch result = new CommandBatch();
+        CommandBatch result = new CommandBatch( CommandBatch.Type.STANDARD);
 
         Command cloneAction = new Command( "clone",
                 Lists.newArrayList( request.getTemplateName(), request.getHostname(), "-i",

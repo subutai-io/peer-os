@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.task.Task;
@@ -46,9 +47,7 @@ public abstract class AbstractTask<R extends TaskRequest, T extends TaskResponse
     @Override
     public RequestBuilder getRequestBuilder() throws Exception
     {
-        return new RequestBuilder( isChain() ? getCommandBatch().asChain() :
-                                   String.format( "subutai batch -json '%s'", getCommandBatch().asJson() ) )
-                .withTimeout( getTimeout() );
+        return new RequestBuilder( getCommandBatch().toString() ).withTimeout( getTimeout() );
     }
 
 
@@ -73,7 +72,7 @@ public abstract class AbstractTask<R extends TaskRequest, T extends TaskResponse
         this.commandResult = commandResult;
         try
         {
-            processCommandResult();
+            buildResponse();
             success();
         }
         catch ( Exception e )
@@ -84,15 +83,51 @@ public abstract class AbstractTask<R extends TaskRequest, T extends TaskResponse
     }
 
 
-    protected void success()
+    protected void buildResponse() throws Exception
     {
+        if ( getResponseBuilder() == null )
+        {
+            throw new CommandException( "Response builder not found." );
+        }
+        response = getResponseBuilder().build( request, commandResult, getElapsedTime() );
+    }
+
+
+    protected void success() throws Exception
+    {
+        if ( response != null && response.hasSucceeded() )
+        {
+            if ( onSuccessHandler != null )
+            {
+                try
+                {
+                    onSuccessHandler.handle( this, request, response );
+                }
+                catch ( Exception e )
+                {
+                    LOG.warn( "Exception on executing success handler.", e );
+                    throw e;
+                }
+            }
+        }
         this.state = State.SUCCESS;
     }
 
 
-    protected void failure( String message, Exception exeption )
+    protected void failure( String message, Exception exception )
     {
-        LOG.error( message, exeption );
+        LOG.error( message, exception );
+        if ( onFailureHandler != null )
+        {
+            try
+            {
+                onFailureHandler.handle( this, request, response );
+            }
+            catch ( Exception e )
+            {
+                LOG.warn( "Exception on executing failure handler.", e );
+            }
+        }
         this.state = State.FAILURE;
     }
 
@@ -137,12 +172,6 @@ public abstract class AbstractTask<R extends TaskRequest, T extends TaskResponse
     }
 
 
-    public boolean isChain()
-    {
-        return true;
-    }
-
-
     @Override
     public R getRequest()
     {
@@ -166,28 +195,6 @@ public abstract class AbstractTask<R extends TaskRequest, T extends TaskResponse
         }
 
         return response;
-    }
-
-
-    private void processCommandResult() throws Exception
-    {
-        response = getResponseBuilder().build( request, commandResult, getElapsedTime() );
-
-        if ( response != null && response.hasSucceeded() )
-        {
-            if ( onSuccessHandler != null )
-            {
-                onSuccessHandler.handle( this, request, response );
-            }
-        }
-        else
-        {
-
-            if ( onFailureHandler != null )
-            {
-                onFailureHandler.handle( this, request, response );
-            }
-        }
     }
 
 

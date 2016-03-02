@@ -31,7 +31,7 @@ public class QuotaTask extends AbstractTask<QuotaRequest, QuotaResponse>
 
     public CommandBatch getCommandBatch() throws Exception
     {
-        CommandBatch result = new CommandBatch();
+        CommandBatch result = new CommandBatch( CommandBatch.Type.JSON );
 
         ContainerQuota quota = quotaManager.getDefaultContainerQuota( request.getSize() );
         for ( ContainerResource r : quota.getAllResources() )
