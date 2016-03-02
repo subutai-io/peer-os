@@ -18,16 +18,16 @@ import (
 	"strings"
 )
 
-func templMd5(templ, arch, version, token string) string {
+func templId(templ, arch, version, token string) string {
 	// tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
 	// client := &http.Client{Transport: tr}
 	client := &http.Client{}
-	url := config.Management.Kurjun + "/public/get?name=" + templ + "&type=md5&sptoken=" + token
+	url := config.Management.Kurjun + "/get?name=" + templ + "&type=id&sptoken=" + token
 	if len(version) != 0 {
-		url = config.Management.Kurjun + "/public/get?name=" + templ + "&version=" + version + "&type=md5&sptoken=" + token
+		url = config.Management.Kurjun + "/get?name=" + templ + "&version=" + version + "&type=id&sptoken=" + token
 	}
 	response, err := client.Get(url)
-	log.Debug(config.Management.Kurjun + "/public/get?name=" + templ + "&type=md5&sptoken=" + token)
+	log.Debug(config.Management.Kurjun + "/get?name=" + templ + "&type=id&sptoken=" + token)
 	if log.Check(log.WarnLevel, "Getting kurjun response", err) || response.StatusCode != 200 {
 		return ""
 	}
@@ -38,6 +38,7 @@ func templMd5(templ, arch, version, token string) string {
 		return ""
 	}
 
+	log.Debug("Template id: " + string(hash))
 	return string(hash)
 }
 
@@ -72,19 +73,19 @@ func checkLocal(templ, md5, arch string) string {
 	return ""
 }
 
-func download(file, md5, token string) string {
+func download(file, id, token string) string {
 	out, err := os.Create(config.Agent.LxcPrefix + "lxc-data/tmpdir/" + file)
 	log.Check(log.FatalLevel, "Creating file "+file, err)
 	defer out.Close()
 	// tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
 	// client := &http.Client{Transport: tr}
 	client := &http.Client{}
-	response, err := client.Get(config.Management.Kurjun + "/public/get?md5=" + md5 + "&sptoken=" + token)
+	response, err := client.Get(config.Management.Kurjun + "/get?id=" + id + "&sptoken=" + token)
 	log.Check(log.FatalLevel, "Getting "+file, err)
 	defer response.Body.Close()
 	_, err = io.Copy(out, response.Body)
 	log.Check(log.FatalLevel, "Writing file "+file, err)
-	if md5 == md5sum(config.Agent.LxcPrefix+"lxc-data/tmpdir/"+file) {
+	if strings.Split(id, ".")[1] == md5sum(config.Agent.LxcPrefix+"lxc-data/tmpdir/"+file) {
 		return config.Agent.LxcPrefix + "lxc-data/tmpdir/" + file
 	}
 	log.Error("Failed to check MD5 after download. Please check your connection and try again.")
@@ -96,18 +97,21 @@ func LxcImport(templ, version, token string) {
 		log.Info(templ + " template exist")
 		return
 	}
-
 	config.CheckKurjun()
 	fullname := templ + "-subutai-template_" + config.Misc.Version + "_" + config.Misc.Arch + ".tar.gz"
 	// if len(token) == 0 {
 	token = gpg.GetToken()
 	// }
-	md5 := templMd5(templ, runtime.GOARCH, version, token)
+	id := templId(templ, runtime.GOARCH, version, token)
+	md5 := ""
+	if len(strings.Split(id, ".")) > 1 {
+		md5 = strings.Split(id, ".")[1]
+	}
 
 	archive := checkLocal(templ, md5, runtime.GOARCH)
 	if len(archive) == 0 && len(md5) != 0 {
 		log.Info("Downloading " + templ)
-		archive = download(fullname, md5, token)
+		archive = download(fullname, id, token)
 	} else if len(archive) == 0 && len(md5) == 0 {
 		log.Error(templ + " " + version + " template not found")
 	}
