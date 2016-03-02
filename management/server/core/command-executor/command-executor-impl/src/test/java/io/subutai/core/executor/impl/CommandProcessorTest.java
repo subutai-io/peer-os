@@ -56,7 +56,7 @@ public class CommandProcessorTest
             " { response: {" + "      \"type\":\"EXECUTE_RESPONSE\"," + "      \"id\":\"%s\","
                     + "      \"commandId\":\"%s\"," + "      \"pid\":123," + "      \"responseNumber\":2,"
                     + "      \"stdOut\":\"output\"," + "      \"stdErr\":\"err\"," + "      \"exitCode\" : 0" + "  } }",
-            HOST_ID.toString(), COMMAND_ID.toString() );
+            HOST_ID, COMMAND_ID.toString() );
 
     @Mock
     Broker broker;
@@ -328,9 +328,9 @@ public class CommandProcessorTest
 
         commandProcessor.execute( request1, callback );
 
-        verify( broker ).sendTextMessage( eq( HOST_ID.toString() ), anyString() );
+        verify( broker ).sendTextMessage( eq( HOST_ID ), anyString() );
 
-        doThrow( new BrokerException( "" ) ).when( broker ).sendTextMessage( eq( HOST_ID.toString() ), anyString() );
+        doThrow( new BrokerException( "" ) ).when( broker ).sendTextMessage( eq( HOST_ID ), anyString() );
 
         try
         {
