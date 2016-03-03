@@ -33,6 +33,7 @@ import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.identity.api.model.User;
+import io.subutai.core.security.api.SecurityManager;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.TestCase.fail;
@@ -83,6 +84,8 @@ public class CommandProcessorTest
     Session session;
     @Mock
     IdentityManager identityManager;
+    @Mock
+    SecurityManager securityManager;
 
 
     CommandProcessor commandProcessor;
@@ -326,6 +329,8 @@ public class CommandProcessorTest
         WebClient webClient = mock( WebClient.class );
         doReturn( webClient ).when( commandProcessor )
                              .getWebClient( any( Request.class ), any( ResourceHostInfo.class ) );
+
+        doReturn( securityManager ).when( commandProcessor ).getSecurityManager();
 
         when( commands.put( eq( COMMAND_ID ), any( CommandProcess.class ), anyInt(),
                 any( CommandProcessExpiryCallback.class ) ) ).thenReturn( true );

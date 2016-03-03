@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 
-import io.subutai.common.command.Request;
 import io.subutai.common.command.ResponseImpl;
 import io.subutai.common.command.ResponseWrapper;
 import io.subutai.common.host.HeartBeat;
@@ -140,7 +139,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            Set<Request> hostRequests = restProcessor.getRequests( hostId );
+            Set<String> hostRequests = restProcessor.getRequests( hostId );
 
             if ( CollectionUtil.isCollectionEmpty( hostRequests ) )
             {
@@ -148,7 +147,7 @@ public class RestServiceImpl implements RestService
             }
             else
             {
-                return Response.ok( encrypt( JsonUtil.toJson( hostRequests ), hostId ) ).build();
+                return Response.ok( JsonUtil.toJson( hostRequests ) ).build();
             }
         }
         catch ( Exception e )
@@ -156,17 +155,6 @@ public class RestServiceImpl implements RestService
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
                     entity( e.getMessage() ).build();
         }
-    }
-
-
-    protected String encrypt( String message, String hostId ) throws PGPException
-    {
-        if ( SystemSettings.getEncryptionState() )
-        {
-            message = securityManager.signNEncryptRequestToHost( message, hostId );
-        }
-
-        return message;
     }
 
 

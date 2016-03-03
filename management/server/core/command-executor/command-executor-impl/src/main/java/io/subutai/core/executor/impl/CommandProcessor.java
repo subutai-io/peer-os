@@ -7,6 +7,7 @@ import java.util.UUID;
 import javax.naming.NamingException;
 import javax.ws.rs.core.Form;
 
+import org.bouncycastle.openpgp.PGPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +29,6 @@ import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SystemSettings;
-import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.common.util.ServiceLocator;
@@ -40,6 +40,7 @@ import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Session;
+import io.subutai.core.security.api.SecurityManager;
 
 
 /**
@@ -52,7 +53,7 @@ public class CommandProcessor implements ByteMessageListener, RestProcessor
     private IdentityManager identityManager;
 
     protected ExpiringCache<UUID, CommandProcess> commands = new ExpiringCache<>();
-    protected ExpiringCache<String, Set<Request>> requests = new ExpiringCache<>();
+    protected ExpiringCache<String, Set<String>> requests = new ExpiringCache<>();
 
 
     public CommandProcessor( final HostRegistry hostRegistry, final IdentityManager identityManager )
@@ -130,19 +131,21 @@ public class CommandProcessor implements ByteMessageListener, RestProcessor
 
 
     protected void queueRequest( ResourceHostInfo resourceHostInfo, Request request )
+            throws NamingException, PGPException
     {
         //add request to outgoing agent queue
         synchronized ( requests )
         {
-            Set<Request> hostRequests = requests.get( resourceHostInfo.getId() );
+            Set<String> hostRequests = requests.get( resourceHostInfo.getId() );
             if ( hostRequests == null )
             {
                 hostRequests = Sets.newLinkedHashSet();
                 requests.put( resourceHostInfo.getId(), hostRequests,
                         Common.INACTIVE_COMMAND_DROP_TIMEOUT_SEC * 1000 + 1000 );
             }
-            //todo encrypt request here with associated pgp key ch/rh
-            hostRequests.add( request );
+            String encryptedRequest =
+                    getSecurityManager().signNEncryptRequestToHost( JsonUtil.toJson( request ), request.getId() );
+            hostRequests.add( encryptedRequest );
         }
     }
 
@@ -214,6 +217,12 @@ public class CommandProcessor implements ByteMessageListener, RestProcessor
     }
 
 
+    protected SecurityManager getSecurityManager() throws NamingException
+    {
+        return ServiceLocator.getServiceNoCache( SecurityManager.class );
+    }
+
+
     protected Session getActiveSession()
     {
         return identityManager.getActiveSession();
@@ -240,7 +249,6 @@ public class CommandProcessor implements ByteMessageListener, RestProcessor
     @Override
     public void handleResponse( final Response response )
     {
-        //todo update timestamp of host in cache of host registry
         try
         {
             Preconditions.checkNotNull( response );
@@ -256,6 +264,11 @@ public class CommandProcessor implements ByteMessageListener, RestProcessor
             {
                 LOG.warn( String.format( "Callback not found for response: %s", response ) );
             }
+
+            //update rh timestamp
+            ResourceHostInfo resourceHostInfo = getResourceHostInfo( response.getId() );
+
+            hostRegistry.updateResourceHostEntryTimestamp( resourceHostInfo.getId() );
         }
         catch ( Exception e )
         {
@@ -265,11 +278,11 @@ public class CommandProcessor implements ByteMessageListener, RestProcessor
 
 
     @Override
-    public Set<Request> getRequests( final String hostId )
+    public Set<String> getRequests( final String hostId )
     {
-        Set<Request> hostRequests = requests.remove( hostId );
+        Set<String> hostRequests = requests.remove( hostId );
 
-        return hostRequests == null ? Sets.<Request>newHashSet() : hostRequests;
+        return hostRequests == null ? Sets.<String>newHashSet() : hostRequests;
     }
 
 
@@ -323,24 +336,6 @@ public class CommandProcessor implements ByteMessageListener, RestProcessor
         Preconditions.checkNotNull( request );
 
         commands.remove( request.getCommandId() );
-
-        try
-        {
-            ResourceHostInfo resourceHostInfo = getResourceHostInfo( request.getId() );
-
-            synchronized ( requests )
-            {
-                Set<Request> hostRequests = requests.get( resourceHostInfo.getId() );
-                if ( !CollectionUtil.isCollectionEmpty( hostRequests ) )
-                {
-                    hostRequests.remove( request );
-                }
-            }
-        }
-        catch ( HostDisconnectedException e )
-        {
-            //ignore
-        }
     }
 
 

@@ -40,6 +40,15 @@ public class HostRegistryImpl implements HostRegistry
 
 
     @Override
+    public void updateResourceHostEntryTimestamp( final String resourceHostId )
+    {
+        Preconditions.checkNotNull( resourceHostId, " Resource host id is null" );
+
+        hosts.getIfPresent( resourceHostId );
+    }
+
+
+    @Override
     public ContainerHostInfo getContainerHostInfoById( final String id ) throws HostDisconnectedException
     {
         Preconditions.checkNotNull( id, "Id is null" );
@@ -206,7 +215,7 @@ public class HostRegistryImpl implements HostRegistry
     public void init() throws HostRegistryException
     {
         hosts = CacheBuilder.newBuilder().
-                expireAfterWrite( hostExpiration, TimeUnit.SECONDS ).
+                expireAfterAccess( hostExpiration, TimeUnit.SECONDS ).
                                     build();
     }
 
