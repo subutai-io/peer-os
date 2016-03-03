@@ -185,7 +185,7 @@ public class CommandProcessor implements ByteMessageListener, RestProcessor
                     }
                     catch ( Exception e )
                     {
-                        LOG.error( String.format( "Error notifying host with id %s", resourceHostId ), e );
+//                        LOG.error( String.format( "Error notifying host with id %s", resourceHostId ), e );
                     }
                 }
             } );
