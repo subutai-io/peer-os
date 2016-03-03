@@ -328,7 +328,7 @@ public class CommandProcessorTest
         }
         WebClient webClient = mock( WebClient.class );
         doReturn( webClient ).when( commandProcessor )
-                             .getWebClient( any( Request.class ), any( ResourceHostInfo.class ) );
+                             .getWebClient( any( ResourceHostInfo.class ) );
 
         doReturn( securityManager ).when( commandProcessor ).getSecurityManager();
 

@@ -3,6 +3,10 @@ package io.subutai.core.executor.impl;
 
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.naming.NamingException;
 import javax.ws.rs.core.Form;
@@ -48,12 +52,17 @@ import io.subutai.core.security.api.SecurityManager;
  */
 public class CommandProcessor implements ByteMessageListener, RestProcessor
 {
+    private static final int NOTIFIER_INTERVAL_MS = 500;
     private static final Logger LOG = LoggerFactory.getLogger( CommandProcessor.class.getName() );
+    private static final long COMMAND_ENTRY_TIMEOUT =
+            ( Common.INACTIVE_COMMAND_DROP_TIMEOUT_SEC + Common.DEFAULT_AGENT_RESPONSE_CHUNK_INTERVAL ) * 1000
+                    + NOTIFIER_INTERVAL_MS + 1000;
     private final HostRegistry hostRegistry;
     private IdentityManager identityManager;
-
     protected ExpiringCache<UUID, CommandProcess> commands = new ExpiringCache<>();
     protected final ExpiringCache<String, Set<String>> requests = new ExpiringCache<>();
+    protected ScheduledExecutorService notifier = Executors.newSingleThreadScheduledExecutor();
+    protected ExecutorService notifierPool = Executors.newCachedThreadPool();
 
 
     public CommandProcessor( final HostRegistry hostRegistry, final IdentityManager identityManager )
@@ -63,6 +72,21 @@ public class CommandProcessor implements ByteMessageListener, RestProcessor
 
         this.hostRegistry = hostRegistry;
         this.identityManager = identityManager;
+
+        notifier.scheduleWithFixedDelay( new Runnable()
+        {
+            public void run()
+            {
+                try
+                {
+                    notifyAgents();
+                }
+                catch ( Exception e )
+                {
+                    LOG.error( "Error in notifier task", e );
+                }
+            }
+        }, 0, NOTIFIER_INTERVAL_MS, TimeUnit.MILLISECONDS );
     }
 
 
@@ -90,14 +114,12 @@ public class CommandProcessor implements ByteMessageListener, RestProcessor
 
         //create command process
         CommandProcess commandProcess = new CommandProcess( this, callback, request, getActiveSession() );
-        boolean queued =
-                commands.put( request.getCommandId(), commandProcess, Common.INACTIVE_COMMAND_DROP_TIMEOUT_SEC * 1000,
-                        new CommandProcessExpiryCallback() );
+        boolean queued = commands.put( request.getCommandId(), commandProcess, COMMAND_ENTRY_TIMEOUT,
+                new CommandProcessExpiryCallback() );
         if ( !queued )
         {
             throw new CommandException( "This command is already queued for execution" );
         }
-
 
         //send command
         try
@@ -140,8 +162,7 @@ public class CommandProcessor implements ByteMessageListener, RestProcessor
             if ( hostRequests == null )
             {
                 hostRequests = Sets.newLinkedHashSet();
-                requests.put( resourceHostInfo.getId(), hostRequests,
-                        Common.INACTIVE_COMMAND_DROP_TIMEOUT_SEC * 1000 + 1000 );
+                requests.put( resourceHostInfo.getId(), hostRequests, Common.INACTIVE_COMMAND_DROP_TIMEOUT_SEC * 1000 );
             }
             String encryptedRequest =
                     getSecurityManager().signNEncryptRequestToHost( JsonUtil.toJson( request ), request.getId() );
@@ -150,19 +171,41 @@ public class CommandProcessor implements ByteMessageListener, RestProcessor
     }
 
 
+    protected void notifyAgents()
+    {
+
+        for ( final String resourceHostId : requests.getEntries().keySet() )
+        {
+            notifierPool.execute( new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        ResourceHostInfo resourceHostInfo = getResourceHostInfo( resourceHostId );
+
+                        notifyAgent( resourceHostInfo );
+                    }
+                    catch ( Exception e )
+                    {
+                        LOG.error( String.format( "Error notifying host with id %s", resourceHostId ), e );
+                    }
+                }
+            } );
+        }
+    }
+
+
     protected void notifyAgent( ResourceHostInfo resourceHostInfo )
     {
-        //TODO use queue for notifications
+
         WebClient webClient = null;
         try
         {
             webClient = getWebClient( resourceHostInfo );
 
             webClient.form( new Form() );
-        }
-        catch ( Exception e )
-        {
-            //ignore for now
         }
         finally
         {
@@ -344,5 +387,9 @@ public class CommandProcessor implements ByteMessageListener, RestProcessor
         commands.dispose();
 
         requests.dispose();
+
+        notifier.shutdown();
+
+        notifierPool.shutdown();
     }
 }
