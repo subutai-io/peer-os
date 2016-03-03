@@ -36,7 +36,7 @@ import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
-import io.subutai.common.environment.NodeGroup;
+import io.subutai.common.environment.Node;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.gson.required.RequiredDeserializer;
 import io.subutai.common.host.ContainerHostState;
@@ -171,12 +171,12 @@ public class RestServiceImpl implements RestService
 
         try
         {
-            List<NodeGroup> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<NodeGroup>>() {}.getType() );
+            List<Node> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<Node>>() {}.getType() );
 
             Topology topology = new Topology( name, 0, 0 );
 
 
-            schema.forEach( s -> topology.addNodeGroupPlacement( s.getPeerId(), s ) );
+            schema.forEach( s -> topology.addNodePlacement( s.getPeerId(), s ) );
 
             eventId = environmentManager.createEnvironmentAndGetTrackerID( topology, true );
         }
@@ -241,7 +241,7 @@ public class RestServiceImpl implements RestService
                                             .filter( e -> e.getEnvironmentId().getId().equals( environmentId ) )
                                             .findFirst().get().getName();
 
-            List<NodeGroup> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<NodeGroup>>() {}.getType() );
+            List<Node> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<Node>>() {}.getType() );
             List<String> containers =
                     JsonUtil.fromJson( removedContainers, new TypeToken<List<String>>() {}.getType() );
 
@@ -249,7 +249,7 @@ public class RestServiceImpl implements RestService
             Topology topology = new Topology( name, 0, 0 );
 
 
-            schema.forEach( s -> topology.addNodeGroupPlacement( s.getPeerId(), s ) );
+            schema.forEach( s -> topology.addNodePlacement( s.getPeerId(), s ) );
 
             eventId = environmentManager.modifyEnvironmentAndGetTrackerID( environmentId, topology, containers, true );
         }

@@ -12,7 +12,6 @@ public abstract class ContainerResource<T extends ResourceValue>
     private ContainerResourceType containerResourceType;
     protected T resource;
 
-
     public ContainerResource( final ContainerResourceType containerResourceType, final T resource )
     {
         this.containerResourceType = containerResourceType;

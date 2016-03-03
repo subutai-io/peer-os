@@ -46,15 +46,21 @@ public interface RestService
 
 
     @POST
-    @Path( "update_kurjun_settings" )
+    @Path( "update_kurjun_settings_urls" )
     @Produces( { MediaType.TEXT_PLAIN } )
-    public Response setKurjunSettings( @FormParam( "globalKurjunUrls" ) String globalKurjunUrls,
-                                       @FormParam( "publicDiskQuota" ) String publicDiskQuota,
-                                       @FormParam( "publicThreshold" ) String publicThreshold,
-                                       @FormParam( "publicTimeFrame" ) String publicTimeFrame,
-                                       @FormParam( "trustDiskQuota" ) String trustDiskQuota,
-                                       @FormParam( "trustThreshold" ) String trustThreshold,
-                                       @FormParam( "trustTimeFrame" ) String trustTimeFrame )
+    public Response setKurjunSettingsUrls( @FormParam( "globalKurjunUrls" ) String globalKurjunUrls )
+            throws ConfigurationException;
+
+
+    @POST
+    @Path( "update_kurjun_settings_quotas" )
+    @Produces( { MediaType.TEXT_PLAIN } )
+    public Response setKurjunSettingsQuotas( @FormParam( "publicDiskQuota" ) String publicDiskQuota,
+                                             @FormParam( "publicThreshold" ) String publicThreshold,
+                                             @FormParam( "publicTimeFrame" ) String publicTimeFrame,
+                                             @FormParam( "trustDiskQuota" ) String trustDiskQuota,
+                                             @FormParam( "trustThreshold" ) String trustThreshold,
+                                             @FormParam( "trustTimeFrame" ) String trustTimeFrame )
             throws ConfigurationException;
 
 
@@ -84,8 +90,8 @@ public interface RestService
     @Produces( { MediaType.TEXT_PLAIN } )
     public Response setNetworkSettings( @FormParam( "securePortX1" ) String securePortX1,
                                         @FormParam( "securePortX2" ) String securePortX2,
-                                        @FormParam( "securePortX3" ) String securePortX3 )
-            throws ConfigurationException;
+                                        @FormParam( "securePortX3" ) String securePortX3,
+                                        @FormParam( "publicUrl" ) String publicUrl ) throws ConfigurationException;
 
     @GET
     @Path( "advanced_settings" )

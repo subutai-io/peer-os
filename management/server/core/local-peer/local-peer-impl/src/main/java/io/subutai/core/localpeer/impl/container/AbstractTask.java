@@ -1,11 +1,8 @@
 package io.subutai.core.localpeer.impl.container;
 
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -13,37 +10,45 @@ import org.slf4j.LoggerFactory;
 
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
-import io.subutai.common.command.CommandResultParseException;
-import io.subutai.common.command.CommandResultParser;
-import io.subutai.common.command.CommandUtil;
+import io.subutai.common.command.CommandStatus;
 import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.peer.Host;
 import io.subutai.common.task.Task;
+import io.subutai.common.task.TaskCallbackHandler;
+import io.subutai.common.task.TaskRequest;
+import io.subutai.common.task.TaskResponse;
+import io.subutai.common.task.TaskResponseBuilder;
 
 
 /**
  * Abstract task implementation
  */
-public abstract class AbstractTask<T> implements Task<T>
+public abstract class AbstractTask<R extends TaskRequest, T extends TaskResponse> implements Task<R, T>
 {
     public static int DEFAULT_TIMEOUT = 30;
 
     protected static final Logger LOG = LoggerFactory.getLogger( AbstractTask.class );
     private int id;
-    protected T result;
+    protected R request;
+    protected T response;
     protected List<Throwable> exceptions = new ArrayList<>();
     private volatile Task.State state = Task.State.PENDING;
-    protected CommandUtil commandUtil = new CommandUtil();
     protected CommandResult commandResult;
     protected long started;
     protected long finished;
+    protected TaskCallbackHandler<R, T> onSuccessHandler;
+    protected TaskCallbackHandler<R, T> onFailureHandler;
 
 
-    protected RequestBuilder getRequestBuilder() throws Exception
+    public AbstractTask( final R request )
     {
-        return new RequestBuilder( isChain() ? getCommandBatch().asChain() :
-                                   String.format( "subutai batch -json '%s'", getCommandBatch().asJson() ) )
-                .withTimeout( getTimeout() );
+        this.request = request;
+    }
+
+
+    @Override
+    public RequestBuilder getRequestBuilder() throws Exception
+    {
+        return new RequestBuilder( getCommandBatch().toString() ).withTimeout( getTimeout() );
     }
 
 
@@ -56,34 +61,20 @@ public abstract class AbstractTask<T> implements Task<T>
     @Override
     public void start( final int id )
     {
-        this.id = id;
         this.started = System.currentTimeMillis();
+        this.id = id;
         this.state = State.RUNNING;
+    }
+
+
+    @Override
+    public void done( final CommandResult commandResult )
+    {
+        this.commandResult = commandResult;
         try
         {
-            RequestBuilder builder = getRequestBuilder();
-
-            commandResult = commandUtil.execute( builder, getHost() );
-
-
-            switch ( commandResult.getStatus() )
-            {
-                case SUCCEEDED:
-                    success();
-                    break;
-
-                case FAILED:
-                    throw new CommandException( commandResult.getStdErr() );
-
-                case KILLED:
-                    throw new CommandException( "Command killed." );
-
-                case TIMEOUT:
-                    throw new CommandException( "Command execution timed out." );
-
-                default:
-                    throw new CommandException( "Unexpected error on executing command." );
-            }
+            buildResponse();
+            success();
         }
         catch ( Exception e )
         {
@@ -93,39 +84,52 @@ public abstract class AbstractTask<T> implements Task<T>
     }
 
 
-    protected void success()
+    protected void buildResponse() throws Exception
     {
-        try
+        if ( getResponseBuilder() == null )
         {
-            parseCommandResult();
-            onSuccess();
-            this.state = State.SUCCESS;
+            throw new CommandException( "Response builder not found." );
         }
-        catch ( Exception e )
-        {
-            addException( e );
-            this.state = State.FAILURE;
-        }
+        response = getResponseBuilder().build( request, commandResult, getElapsedTime() );
     }
 
 
-    protected void addException( final Throwable e )
+    protected void success() throws Exception
     {
-        this.exceptions.add( e );
+        if ( response != null && response.hasSucceeded() )
+        {
+            if ( onSuccessHandler != null )
+            {
+                try
+                {
+                    onSuccessHandler.handle( this, request, response );
+                }
+                catch ( Exception e )
+                {
+                    LOG.warn( "Exception on executing success handler.", e );
+                    exceptions.add( e );
+                    throw e;
+                }
+            }
+        }
+        this.state = State.SUCCESS;
     }
 
 
-    protected void failure( String message, Throwable throwable )
+    protected void failure( String message, Exception exception )
     {
-
-        addException( throwable );
-        try
+        LOG.error( message, exception );
+        if ( onFailureHandler != null )
         {
-            onFailure();
-        }
-        catch ( Exception e )
-        {
-            addException( e );
+            try
+            {
+                onFailureHandler.handle( this, request, response );
+            }
+            catch ( Exception e )
+            {
+                LOG.warn( "Exception on executing failure handler.", e );
+                exceptions.add( e );
+            }
         }
         this.state = State.FAILURE;
     }
@@ -145,19 +149,15 @@ public abstract class AbstractTask<T> implements Task<T>
     }
 
 
-    private void parseCommandResult() throws CommandResultParseException
+    @Override
+    public String getExceptionsAsString()
     {
-        if ( result == null && getCommandResultParser() != null )
+        StringBuilder b = new StringBuilder();
+        for ( Throwable throwable : exceptions )
         {
-            try
-            {
-                result = getCommandResultParser().parse( commandResult );
-            }
-            catch ( Exception e )
-            {
-                throw new CommandResultParseException( e );
-            }
+            b.append( String.format( "%s\n", throwable.getMessage() ) );
         }
+        return b.toString();
     }
 
 
@@ -168,12 +168,6 @@ public abstract class AbstractTask<T> implements Task<T>
     }
 
 
-    abstract public Host getHost();
-
-
-    abstract public CommandResultParser<T> getCommandResultParser();
-
-
     @Override
     public boolean isSequential()
     {
@@ -181,26 +175,15 @@ public abstract class AbstractTask<T> implements Task<T>
     }
 
 
-    protected void onSuccess()
+    @Override
+    public R getRequest()
     {
-        //empty
-    }
-
-
-    protected void onFailure()
-    {
-        // empty
-    }
-
-
-    public boolean isChain()
-    {
-        return true;
+        return request;
     }
 
 
     @Override
-    public T getResult()
+    public T waitAndGetResponse()
     {
         while ( !isDone() )
         {
@@ -213,7 +196,8 @@ public abstract class AbstractTask<T> implements Task<T>
                 // ignore
             }
         }
-        return result;
+
+        return response;
     }
 
 
@@ -232,5 +216,61 @@ public abstract class AbstractTask<T> implements Task<T>
         {
             return System.currentTimeMillis() - this.started;
         }
+    }
+
+
+    @Override
+    public long getFinished()
+    {
+        return finished;
+    }
+
+
+    public void onSuccess( TaskCallbackHandler<R, T> handler )
+    {
+        this.onSuccessHandler = handler;
+    }
+
+
+    public void onFailure( TaskCallbackHandler<R, T> handler )
+    {
+        this.onFailureHandler = handler;
+    }
+
+
+    public boolean isSucceeded()
+    {
+        return this.state == State.SUCCESS;
+    }
+
+
+    abstract public TaskResponseBuilder<R, T> getResponseBuilder();
+
+
+    @Override
+    public CommandStatus getCommandStatus()
+    {
+        return commandResult != null ? commandResult.getStatus() : null;
+    }
+
+
+    @Override
+    public Integer getExitCode()
+    {
+        return commandResult != null ? commandResult.getExitCode() : null;
+    }
+
+
+    @Override
+    public String getStdOut()
+    {
+        return ( commandResult != null && commandResult.getStdOut() != null ? commandResult.getStdOut() : "" );
+    }
+
+
+    @Override
+    public String getStdErr()
+    {
+        return ( commandResult != null && commandResult.getStdErr() != null ? commandResult.getStdErr() : "" );
     }
 }

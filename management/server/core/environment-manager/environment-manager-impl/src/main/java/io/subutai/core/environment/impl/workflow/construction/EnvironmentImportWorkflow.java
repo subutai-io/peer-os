@@ -79,7 +79,7 @@ public class EnvironmentImportWorkflow extends Workflow<EnvironmentImportWorkflo
 
         environment.setStatus( EnvironmentStatus.IMPORTING );
 
-        environment = environmentManager.saveOrUpdate( environment );
+        environment = environmentManager.update( environment );
 
         return Phase.GENERATE_KEYS;
     }
@@ -93,7 +93,7 @@ public class EnvironmentImportWorkflow extends Workflow<EnvironmentImportWorkflo
         {
             new PEKGenerationStep( topology, environment, peerManager, securityManager ).execute();
 
-            environment = environmentManager.saveOrUpdate( environment );
+            environment = environmentManager.update( environment );
 
             return Phase.SETUP_VNI;
         }
@@ -114,7 +114,7 @@ public class EnvironmentImportWorkflow extends Workflow<EnvironmentImportWorkflo
         {
             new VNISetupStep( topology, environment, peerManager ).execute();
 
-            environment = environmentManager.saveOrUpdate( environment );
+            environment = environmentManager.update( environment );
 
             return Phase.SETUP_P2P;
         }
@@ -135,7 +135,7 @@ public class EnvironmentImportWorkflow extends Workflow<EnvironmentImportWorkflo
         {
             new SetupP2PStep( topology, environment, peerManager ).execute();
 
-            environment = environmentManager.saveOrUpdate( environment );
+            environment = environmentManager.update( environment );
 
             return Phase.CONFIGURE_HOSTS;
         }
@@ -156,7 +156,7 @@ public class EnvironmentImportWorkflow extends Workflow<EnvironmentImportWorkflo
         {
             new RegisterHostsStep( environment, networkManager ).execute();
 
-            environment = environmentManager.saveOrUpdate( environment );
+            environment = environmentManager.update( environment );
 
             return Phase.CONFIGURE_SSH;
         }
@@ -177,7 +177,7 @@ public class EnvironmentImportWorkflow extends Workflow<EnvironmentImportWorkflo
         {
             new RegisterSshStep( environment, networkManager ).execute( environment.getSshKeys() );
 
-            environment = environmentManager.saveOrUpdate( environment );
+            environment = environmentManager.update( environment );
 
             return Phase.FINALIZE;
         }
@@ -196,7 +196,7 @@ public class EnvironmentImportWorkflow extends Workflow<EnvironmentImportWorkflo
 
         environment.setStatus( EnvironmentStatus.HEALTHY );
 
-        environment = environmentManager.saveOrUpdate( environment );
+        environment = environmentManager.update( environment );
 
         operationTracker.addLogDone( "Environment is created" );
 
@@ -214,7 +214,7 @@ public class EnvironmentImportWorkflow extends Workflow<EnvironmentImportWorkflo
     public void setError( final Throwable error )
     {
         environment.setStatus( EnvironmentStatus.UNHEALTHY );
-        environment = environmentManager.saveOrUpdate( environment );
+        environment = environmentManager.update( environment );
         this.error = error;
         LOG.error( "Error creating environment", error );
         operationTracker.addLogFailed( error.getMessage() );

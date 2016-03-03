@@ -56,7 +56,7 @@ public class SshKeyRemovalWorkflow extends Workflow<SshKeyRemovalWorkflow.SshKey
 
         environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
 
-        environment = environmentManager.saveOrUpdate( environment );
+        environment = environmentManager.update( environment );
 
         return SshKeyAdditionPhase.REMOVE_KEY;
     }
@@ -71,7 +71,7 @@ public class SshKeyRemovalWorkflow extends Workflow<SshKeyRemovalWorkflow.SshKey
         {
             new RemoveSshKeyStep( sshKey, environment, networkManager ).execute();
 
-            environment = environmentManager.saveOrUpdate( environment );
+            environment = environmentManager.update( environment );
 
             return SshKeyAdditionPhase.FINALIZE;
         }
@@ -90,7 +90,7 @@ public class SshKeyRemovalWorkflow extends Workflow<SshKeyRemovalWorkflow.SshKey
 
         environment.setStatus( EnvironmentStatus.HEALTHY );
 
-        environment = environmentManager.saveOrUpdate( environment );
+        environment = environmentManager.update( environment );
 
         operationTracker.addLogDone( "Ssh key is removed" );
 
@@ -110,7 +110,7 @@ public class SshKeyRemovalWorkflow extends Workflow<SshKeyRemovalWorkflow.SshKey
     private void saveFailState()
     {
         environment.setStatus( EnvironmentStatus.UNHEALTHY );
-        environment = environmentManager.saveOrUpdate( environment );
+        environment = environmentManager.update( environment );
         operationTracker.addLogFailed( getFailedReason() );
         LOG.error( "Error removing ssh key", getFailedException() );
     }

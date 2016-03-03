@@ -20,8 +20,7 @@ public class SystemSettings
 
     public static final String DEFAULT_EXTERNAL_INTERFACE = "wan";
     public static final String DEFAULT_PUBLIC_URL = "https://127.0.0.1:8443";
-    public static final String DEFAULT_KURJUN_REPO =
-            "http://repo.critical-factor.com:8080/rest/kurjun/templates/public";
+    public static final String DEFAULT_KURJUN_REPO = "http://repo.critical-factor.com:8080/rest/kurjun";
 
     private static PropertiesConfiguration PROPERTIES = null;
     private static String[] GLOBAL_KURJUN_URLS = null;
@@ -55,24 +54,43 @@ public class SystemSettings
     
     public static void setGlobalKurjunUrls( String[] urls ) throws ConfigurationException
     {
-        validateGlobalKurjunUrls( urls );
-        saveProperty( "globalKurjunUrls", urls );
+        String[] validated = validateGlobalKurjunUrls( urls );
+        saveProperty( "globalKurjunUrls", validated );
         loadGlobalKurjunUrls();
     }
+    
 
-
-    protected static void validateGlobalKurjunUrls( final String[] urls ) throws ConfigurationException
+    protected static String[] validateGlobalKurjunUrls( final String[] urls ) throws ConfigurationException
     {
-        for ( String url : urls )
+        String[] arr = new String[urls.length];
+
+        for ( int i = 0; i < urls.length; i++ )
         {
+            String url = urls[i];
             try
             {
                 new URL( url );
+                String u = url.endsWith( "/" ) ? url.replaceAll( "/+$", "" ) : url;
+                arr[i] = u;
             }
             catch ( MalformedURLException e )
             {
                 throw new ConfigurationException( "Invalid URL: " + url );
             }
+        }
+        return arr;
+    }
+
+
+    protected static void validatePublicUrl( String publicUrl ) throws ConfigurationException
+    {
+        try
+        {
+            new URL( publicUrl );
+        }
+        catch ( MalformedURLException e )
+        {
+            throw  new ConfigurationException( "Invalid URL: " + publicUrl );
         }
     }
     
@@ -88,15 +106,7 @@ public class SystemSettings
             };
         }
 
-        validateGlobalKurjunUrls( globalKurjunUrls );
-
-        GLOBAL_KURJUN_URLS = globalKurjunUrls;
-
-        //        String urls = String.valueOf( PROPERTIES.getProperty( "globalKurjunUrls" ) );
-        //        String replace = urls.replace( "[", "" );
-        //        String replace1 = replace.replace( "]", "" );
-        //
-        //        return new ArrayList<String>( Arrays.asList( replace1.split( "," ) ) );
+        GLOBAL_KURJUN_URLS = validateGlobalKurjunUrls( globalKurjunUrls );
     }
 
 
@@ -247,9 +257,10 @@ public class SystemSettings
     }
 
 
-    public static void setPublicUrl( String publicUrl )
+    public static void setPublicUrl( String publicUrl ) throws ConfigurationException
     {
-        saveProperty( "publicUrl", publicUrl );
+        validatePublicUrl( publicUrl );
+        saveProperty( "publicURL", publicUrl );
     }
 
 

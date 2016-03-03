@@ -2,6 +2,7 @@ package io.subutai.common.task;
 
 
 import java.util.List;
+import java.util.concurrent.Future;
 
 
 /**
@@ -13,7 +14,7 @@ public interface TaskManager
 
     int RESULT_SUCCESS = 1;
 
-    int schedule( Task task );
+    Future<Task> schedule( Task task, ResponseCollector collector );
 
     void cancel( int taskId );
 

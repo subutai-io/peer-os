@@ -10,8 +10,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import io.subutai.common.peer.Peer;
-
 
 @RunWith( MockitoJUnitRunner.class )
 @Ignore
@@ -23,7 +21,7 @@ public class TopologyTest
     @Mock
     String peer;
     @Mock
-    NodeGroup nodeGroup;
+    Node node;
 
 
     @Before
@@ -43,6 +41,6 @@ public class TopologyTest
     @Test
     public void testAddNodeGroupPlacement() throws Exception
     {
-        topology.addNodeGroupPlacement( peer, nodeGroup );
+        topology.addNodePlacement( peer, node );
     }
 }

@@ -17,14 +17,24 @@ function SettingsKurjunCtrl($scope, SettingsKurjunSrv, SweetAlert) {
     getConfig();
 
 
-    vm.updateConfig = updateConfig;
-    function updateConfig() {
-        SettingsKurjunSrv.updateConfig(vm.config).success(function (data) {
+    vm.updateConfigQuotas = updateConfigQuotas;
+    function updateConfigQuotas() {
+        SettingsKurjunSrv.updateConfigQuotas(vm.config).success(function (data) {
             SweetAlert.swal("Success!", "Your settings were saved.", "success");
         }).error(function (error) {
             SweetAlert.swal("ERROR!", "Save config error: " + error.replace(/\\n/g, " "), "error");
         });
     }
+
+    vm.updateConfigUrls = updateConfigUrls;
+    function updateConfigUrls() {
+        SettingsKurjunSrv.updateConfigUrls(vm.config).success(function (data) {
+            SweetAlert.swal("Success!", "Your settings were saved.", "success");
+        }).error(function (error) {
+            SweetAlert.swal("ERROR!", "Save config error: " + error.replace(/\\n/g, " "), "error");
+        });
+    }
+
 
 
     vm.addUrl = addUrl;

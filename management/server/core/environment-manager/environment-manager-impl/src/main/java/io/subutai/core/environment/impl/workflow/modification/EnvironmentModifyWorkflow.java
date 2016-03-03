@@ -23,6 +23,7 @@ import io.subutai.core.environment.impl.workflow.modification.steps.PEKGeneratio
 import io.subutai.core.environment.impl.workflow.modification.steps.SetupP2PStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.VNISetupStep;
 import io.subutai.core.kurjun.api.TemplateManager;
+import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerManager;
 
@@ -42,6 +43,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
     private final TrackerOperation operationTracker;
     private final EnvironmentManagerImpl environmentManager;
     private boolean forceMetadataRemoval;
+
 
     //environment creation phases
     public static enum EnvironmentGrowingPhase
@@ -93,7 +95,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
 
         environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
 
-        environment = environmentManager.saveOrUpdate( environment );
+        environment = environmentManager.update( environment );
 
         return EnvironmentGrowingPhase.DESTROY_CONTAINERS;
     }
@@ -108,7 +110,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
             new ContainerDestroyStep( environment, environmentManager, removedContainers, forceMetadataRemoval,
                     operationTracker ).execute();
 
-            environment = environmentManager.saveOrUpdate( environment );
+            environment = environmentManager.update( environment );
 
             if ( topology == null )
             {
@@ -134,7 +136,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
         {
             new PEKGenerationStep( topology, environment, peerManager ).execute();
 
-            environment = environmentManager.saveOrUpdate( environment );
+            environment = environmentManager.update( environment );
 
             return EnvironmentGrowingPhase.SETUP_VNI;
         }
@@ -155,7 +157,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
         {
             new VNISetupStep( topology, environment, peerManager ).execute();
 
-            environment = environmentManager.saveOrUpdate( environment );
+            environment = environmentManager.update( environment );
 
             return EnvironmentGrowingPhase.SETUP_P2P;
         }
@@ -176,7 +178,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
         {
             new SetupP2PStep( topology, environment, peerManager ).execute();
 
-            environment = environmentManager.saveOrUpdate( environment );
+            environment = environmentManager.update( environment );
 
             return EnvironmentGrowingPhase.PREPARE_TEMPLATES;
         }
@@ -197,7 +199,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
         {
             new PrepareTemplatesStep( peerManager, topology, operationTracker ).execute();
 
-            environment = environmentManager.saveOrUpdate( environment );
+            environment = environmentManager.update( environment );
 
             return EnvironmentGrowingPhase.CLONE_CONTAINERS;
         }
@@ -216,9 +218,9 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
         try
         {
             new ContainerCloneStep( templateRegistry, defaultDomain, topology, environment, peerManager,
-                    environmentManager ).execute();
+                    environmentManager, operationTracker ).execute();
 
-            environment = environmentManager.saveOrUpdate( environment );
+            environment = environmentManager.update( environment );
 
             return EnvironmentGrowingPhase.CONFIGURE_HOSTS;
         }
@@ -239,7 +241,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
         {
             new RegisterHostsStep( environment, networkManager ).execute();
 
-            environment = environmentManager.saveOrUpdate( environment );
+            environment = environmentManager.update( environment );
 
             return EnvironmentGrowingPhase.CONFIGURE_SSH;
         }
@@ -260,7 +262,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
         {
             new RegisterSshStep( environment, networkManager ).execute( environment.getSshKeys() );
 
-            environment = environmentManager.saveOrUpdate( environment );
+            environment = environmentManager.update( environment );
 
             return EnvironmentGrowingPhase.FINALIZE;
         }
@@ -279,7 +281,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
 
         environment.setStatus( EnvironmentStatus.HEALTHY );
 
-        environment = environmentManager.saveOrUpdate( environment );
+        environment = environmentManager.update( environment );
 
         operationTracker.addLogDone( "Environment is grown" );
 
@@ -299,7 +301,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
     private void saveFailState()
     {
         environment.setStatus( EnvironmentStatus.UNHEALTHY );
-        environment = environmentManager.saveOrUpdate( environment );
+        environment = environmentManager.update( environment );
         operationTracker.addLogFailed( getFailedReason() );
         LOG.error( "Error modifying environment", getFailedException() );
     }

@@ -66,6 +66,23 @@ public abstract class AbstractSubutaiHost implements Host
     }
 
 
+    protected AbstractSubutaiHost( final String peerId, final String hostId, final String hostname,
+                                   HostArchitecture architecture, HostInterfaces hostInterfaces )
+    {
+        Preconditions.checkNotNull( peerId );
+        Preconditions.checkNotNull( hostId );
+        Preconditions.checkNotNull( hostname );
+        Preconditions.checkNotNull( architecture );
+        Preconditions.checkNotNull( hostInterfaces );
+
+        this.peerId = peerId;
+        this.hostId = hostId;
+        this.hostname = hostname;
+        this.hostArchitecture = architecture;
+        this.hostInterfaces = hostInterfaces;
+    }
+
+
     protected AbstractSubutaiHost( final String peerId, final HostInfo hostInfo )
     {
         Preconditions.checkNotNull( hostInfo, "Host information is null" );

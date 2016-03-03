@@ -14,13 +14,15 @@ import java.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Sets;
+import org.apache.commons.lang.StringUtils;
 
-import io.subutai.common.environment.NodeGroup;
-import io.subutai.common.environment.PrepareTemplatesResponse;
+import io.subutai.common.environment.Node;
+import io.subutai.common.environment.PrepareTemplatesResponseCollector;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.task.ImportTemplateResponse;
+import io.subutai.common.tracker.OperationMessage;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.impl.workflow.creation.steps.helpers.CreatePeerTemplatePrepareTask;
@@ -49,14 +51,15 @@ public class PrepareTemplatesStep
 
     public void execute() throws EnvironmentCreationException, PeerException
     {
-        Map<String, Set<NodeGroup>> placement = topology.getNodeGroupPlacement();
+        Map<String, Set<Node>> placement = topology.getNodeGroupPlacement();
 
         ExecutorService taskExecutor = Executors.newFixedThreadPool( placement.size() );
 
-        CompletionService<PrepareTemplatesResponse> taskCompletionService = getCompletionService( taskExecutor );
+        CompletionService<PrepareTemplatesResponseCollector> taskCompletionService =
+                getCompletionService( taskExecutor );
 
 
-        for ( Map.Entry<String, Set<NodeGroup>> peerPlacement : placement.entrySet() )
+        for ( Map.Entry<String, Set<Node>> peerPlacement : placement.entrySet() )
         {
             Peer peer = peerManager.getPeer( peerPlacement.getKey() );
             LOGGER.debug( String.format( "Scheduling template preparation task on peer %s", peer.getId() ) );
@@ -67,35 +70,56 @@ public class PrepareTemplatesStep
         taskExecutor.shutdown();
 
         //collect results
-        Set<String> errors = Sets.newHashSet();
-
         for ( int i = 0; i < placement.size(); i++ )
         {
             try
             {
-                Future<PrepareTemplatesResponse> futures = taskCompletionService.take();
-                final PrepareTemplatesResponse prepareTemplatesResponse = futures.get();
-                if ( prepareTemplatesResponse.getDescription() != null )
+                Future<PrepareTemplatesResponseCollector> futures = taskCompletionService.take();
+                final PrepareTemplatesResponseCollector prepareTemplatesResponse = futures.get();
+
+                addLogs( prepareTemplatesResponse );
+                processResponse( prepareTemplatesResponse );
+
+                if ( !prepareTemplatesResponse.hasSucceeded() )
                 {
-                    operationTracker.addLog( prepareTemplatesResponse.getDescription() );
-                }
-                if ( !prepareTemplatesResponse.getResult() )
-                {
-                    throw new EnvironmentCreationException( String.format(
-                            "There were errors during preparation of templates. " + prepareTemplatesResponse
-                                    .getDescription() ) );
+                    throw new EnvironmentCreationException(
+                            "There were errors during preparation of templates on peer " + prepareTemplatesResponse
+                                    .getPeerId() );
                 }
             }
             catch ( ExecutionException | InterruptedException e )
             {
+                LOGGER.error( e.getMessage(), e );
                 throw new EnvironmentCreationException(
-                        String.format( "There were errors during preparation templates:  %s", errors ) );
+                        "There were errors during preparation templates. Unexpected error." );
             }
         }
     }
 
 
-    protected CompletionService<PrepareTemplatesResponse> getCompletionService( Executor executor )
+    private void processResponse( final PrepareTemplatesResponseCollector response )
+    {
+        for ( ImportTemplateResponse importTemplateResponse : response.getResponses() )
+        {
+            LOGGER.debug( String.format( "Import response: %s", importTemplateResponse ) );
+        }
+    }
+
+
+    private void addLogs( final PrepareTemplatesResponseCollector result )
+    {
+        for ( OperationMessage message : result.getOperationMessages() )
+        {
+            operationTracker.addLog( message.getValue() );
+            if ( !result.hasSucceeded() && StringUtils.isNotBlank( message.getDescription() ))
+            {
+                LOGGER.error( message.getDescription() );
+            }
+        }
+    }
+
+
+    protected CompletionService<PrepareTemplatesResponseCollector> getCompletionService( Executor executor )
     {
         return new ExecutorCompletionService<>( executor );
     }

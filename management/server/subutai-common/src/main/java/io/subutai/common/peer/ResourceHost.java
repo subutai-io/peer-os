@@ -67,6 +67,7 @@ public interface ResourceHost extends Host, ResourceHostInfo
      * @param timeout - timeout to wait until container connects to server
      * @param environmentId - id of environment to which the container will belong
      */
+    @Deprecated
     public ContainerHostInfo createContainer( String templateName, String hostname, ContainerQuota quota, String ip, int vlan, int timeout,
                                      String environmentId ) throws ResourceHostException;
 

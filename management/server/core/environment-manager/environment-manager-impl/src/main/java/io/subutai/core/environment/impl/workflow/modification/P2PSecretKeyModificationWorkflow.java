@@ -55,7 +55,7 @@ public class P2PSecretKeyModificationWorkflow
 
         environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
 
-        environment = environmentManager.saveOrUpdate( environment );
+        environment = environmentManager.update( environment );
 
         return P2PSecretKeyModificationPhase.REPLACE_KEY;
     }
@@ -72,7 +72,7 @@ public class P2PSecretKeyModificationWorkflow
                     new P2PCredentials( environment.getTunnelCommunityName(), p2pSecretKey, p2pSecretKeyTtlSeconds ) )
                     .execute();
 
-            environment = environmentManager.saveOrUpdate( environment );
+            environment = environmentManager.update( environment );
 
             return P2PSecretKeyModificationPhase.FINALIZE;
         }
@@ -91,7 +91,7 @@ public class P2PSecretKeyModificationWorkflow
 
         environment.setStatus( EnvironmentStatus.HEALTHY );
 
-        environment = environmentManager.saveOrUpdate( environment );
+        environment = environmentManager.update( environment );
 
         operationTracker.addLogDone( "P2P secret key is modified" );
 
@@ -111,7 +111,7 @@ public class P2PSecretKeyModificationWorkflow
     private void saveFailState()
     {
         environment.setStatus( EnvironmentStatus.UNHEALTHY );
-        environment = environmentManager.saveOrUpdate( environment );
+        environment = environmentManager.update( environment );
         operationTracker.addLogFailed( getFailedReason() );
         LOG.error( "Error modifying P2P secret key", getFailedException() );
     }

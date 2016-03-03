@@ -1,6 +1,7 @@
 package io.subutai.core.localpeer.cli;
 
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 
@@ -41,17 +42,28 @@ public class TaskDisplayCommand extends SubutaiShellCommandSupport
             System.out.println( "Task not found." );
             return null;
         }
-        final String s = task.getCommandBatch().asChain();
-        System.out.println( String.format( "%s\t%d\t%s...\t%s", task.getHost().getId(), task.getTimeout(),
-                s.substring( 0, Math.min( 50, s.length() ) ), task.getState() ) );
 
-        if ( task.getState() == Task.State.SUCCESS )
+        if ( !task.isDone() )
         {
-            System.out.println( String.format( "\t\t%s\t%s", task.getState(), task.getResult() ) );
+            System.out.println( "Task is running. Please try later." );
+            return null;
         }
-        else if ( task.getState() == Task.State.FAILURE )
+
+        final String s = task.getCommandBatch().toString();
+        System.out.println(
+                String.format( "%s\t%d\t%s...\t%s", task.getRequest().getResourceHostId(), task.getTimeout(),
+                        s.substring( 0, Math.min( 50, s.length() ) ), task.getState() ) );
+
+        System.out.println( String.format( "Request: %s", task.getRequest() ) );
+        System.out.println( String.format( "Response: %s", task.waitAndGetResponse() ) );
+        System.out.println( "ExitCode: " + task.getExitCode() );
+        System.out.println( "StdOut: " + task.getStdOut() );
+        System.out.println( "StdErr: " + task.getStdErr() );
+        final String exceptions = task.getExceptionsAsString();
+
+        if ( StringUtils.isNotBlank( exceptions ) )
         {
-            System.out.println( String.format( "\t\t%s\t%s", task.getState(), task.getExceptions() ) );
+            System.out.println( "Exceptions:\n" + exceptions );
         }
 
         return null;

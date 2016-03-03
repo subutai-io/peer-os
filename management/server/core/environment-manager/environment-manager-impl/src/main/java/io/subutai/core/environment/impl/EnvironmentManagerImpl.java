@@ -35,11 +35,12 @@ import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.EnvironmentStatus;
-import io.subutai.common.environment.NodeGroup;
+import io.subutai.common.environment.Node;
 import io.subutai.common.environment.PeerConf;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostInfoModel;
+import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.mdc.SubutaiExecutors;
@@ -581,14 +582,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     // TODO refactor to pass one Blueprint parameter from subutai-common
     @Override
     public Environment importEnvironment( final String name, final Topology topology,
-                                          final Map<NodeGroup, Set<ContainerHostInfo>> containers, final Integer vlan )
+                                          final Map<Node, Set<ContainerHostInfo>> containers, final Integer vlan )
             throws EnvironmentCreationException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid name" );
         Preconditions.checkNotNull( topology, "Invalid topology" );
         Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
 
-        Map.Entry<NodeGroup, Set<ContainerHostInfo>> containersEntry = containers.entrySet().iterator().next();
+        Map.Entry<Node, Set<ContainerHostInfo>> containersEntry = containers.entrySet().iterator().next();
         Iterator<ContainerHostInfo> hostIterator = containersEntry.getValue().iterator();
 
         String ip = "";
@@ -616,18 +617,19 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         //create empty environment
         final EnvironmentImpl environment = createEmptyEnvironment( name, ip, topology.getSshKey() );
-        for ( Map.Entry<NodeGroup, Set<ContainerHostInfo>> entry : containers.entrySet() )
+        for ( Map.Entry<Node, Set<ContainerHostInfo>> entry : containers.entrySet() )
         {
             for ( ContainerHostInfo newHost : entry.getValue() )
             {
                 ContainerSize containerType = entry.getKey().getType();
 
                 environment.addContainers( Sets.newHashSet(
-                        new EnvironmentContainerImpl( peerManager.getLocalPeer().getId(), peerManager.getLocalPeer(),
+                        new EnvironmentContainerImpl( peerManager.getLocalPeer().getId(), entry.getKey().getPeerId(),
                                 entry.getKey().getName(), new ContainerHostInfoModel( newHost ),
-                                templateRegistry.getTemplate( entry.getKey().getTemplateName() ),
+                                entry.getKey().getTemplateName(), HostArchitecture.AMD64,
                                 entry.getKey().getSshGroupId(), entry.getKey().getHostsGroupId(),
-                                Common.DEFAULT_DOMAIN_NAME, containerType, entry.getKey().getHostId() ) ) );
+                                Common.DEFAULT_DOMAIN_NAME, containerType, entry.getKey().getHostId(),
+                                entry.getKey().getName() ) ) );
             }
         }
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
@@ -1653,7 +1655,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             throw new EnvironmentCreationException( e );
         }
 
-        environment = saveOrUpdate( environment );
+        environment = save( environment );
 
         setEnvironmentTransientFields( environment );
 
@@ -1775,15 +1777,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             environmentContainer.setEnvironmentManager( this );
 
             String peerId = environmentContainer.getPeerId();
-            try
-            {
-                Peer peer = peerManager.getPeer( peerId );
-                environmentContainer.setPeer( peer );
-            }
-            catch ( PeerException e )
-            {
-                LOG.error( e.getMessage(), e );
-            }
         }
         // remove containers which doesn't have trust relation
     }
@@ -1897,7 +1890,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     @Override
     public void notifyOnContainerStateChanged( final Environment environment, final ContainerHost containerHost )
     {
-        saveOrUpdate( environment );
+        update((EnvironmentImpl) environment );
     }
 
 
@@ -1926,7 +1919,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                 new EnvironmentImpl( name, subnetCidr, sshKey, getUserId(), peerManager.getLocalPeer().getId() );
 
         environment.setUserId( identityManager.getActiveUser().getId() );
-        environment = saveOrUpdate( environment );
+        environment = save( environment );
 
         setEnvironmentTransientFields( environment );
 
@@ -1948,12 +1941,21 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    public EnvironmentImpl saveOrUpdate( final Environment environment )
+    public EnvironmentImpl save( final Environment environment )
     {
-        EnvironmentImpl env = environmentDataService.saveOrUpdate( environment );
+        EnvironmentImpl env = environmentDataService.save( environment );
         setEnvironmentTransientFields( env );
         setContainersTransientFields( env );
         return env;
+    }
+
+
+    public EnvironmentImpl update( final EnvironmentImpl environment )
+    {
+        environmentDataService.update( ( EnvironmentImpl ) environment );
+        setEnvironmentTransientFields( environment );
+        setContainersTransientFields( environment );
+        return environment;
     }
 
 
@@ -2103,7 +2105,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
             environment.addAlertHandler( new EnvironmentAlertHandlerImpl( handlerId, handlerPriority ) );
 
-            saveOrUpdate( environment );
+            update( (EnvironmentImpl)environment );
         }
         catch ( Exception e )
         {
@@ -2129,7 +2131,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             Environment environment = environmentDataService.find( environmentId );
             environment.removeAlertHandler( new EnvironmentAlertHandlerImpl( handlerId, handlerPriority ) );
-            environmentDataService.saveOrUpdate( environment );
+            environmentDataService.save( environment );
         }
         catch ( Exception e )
         {

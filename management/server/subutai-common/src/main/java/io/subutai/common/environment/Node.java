@@ -12,14 +12,16 @@ import io.subutai.common.peer.ContainerSize;
 /**
  * Node
  */
-public class NodeGroup
+public class Node
 {
     @GsonRequired
     @JsonProperty( "name" )
     private String name;
+
     @GsonRequired
     @JsonProperty( "templateName" )
     private String templateName;
+
     @GsonRequired
     @JsonProperty( "type" )
     private ContainerSize type = ContainerSize.SMALL;
@@ -27,29 +29,41 @@ public class NodeGroup
     @GsonRequired
     @JsonProperty( "sshGroupId" )
     private int sshGroupId;
+
     @GsonRequired
     @JsonProperty( "hostsGroupId" )
     private int hostsGroupId;
+
     @GsonRequired
     @JsonProperty( "peerId" )
     private String peerId;
+
     @GsonRequired
     @JsonProperty( "hostId" )
     private String hostId;
 
+    @GsonRequired
+    @JsonProperty( "hostname" )
+    private String hostname;
 
-    public NodeGroup( @JsonProperty( "name" ) final String name,
-                      @JsonProperty( "templateName" ) final String templateName,
-                      @JsonProperty( "type" ) ContainerSize type, @JsonProperty( "sshGroupId" ) final int sshGroupId,
-                      @JsonProperty( "hostsGroupId" ) final int hostsGroupId,
-                      @JsonProperty( "peerId" ) final String peerId, @JsonProperty( "hostId" ) final String hostId )
+
+    private Node()
     {
+    }
+
+
+    public Node( @JsonProperty( "hostname" ) final String hostname, @JsonProperty( "name" ) final String name,
+                 @JsonProperty( "templateName" ) final String templateName, @JsonProperty( "type" ) ContainerSize type,
+                 @JsonProperty( "sshGroupId" ) final int sshGroupId,
+                 @JsonProperty( "hostsGroupId" ) final int hostsGroupId, @JsonProperty( "peerId" ) final String peerId,
+                 @JsonProperty( "hostId" ) final String hostId )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid host name" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid node group name" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ), "Invalid peer id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostId ), "Invalid host id" );
         Preconditions.checkNotNull( type );
 
+        this.hostname = hostname;
         this.name = name;
         this.templateName = templateName;
         this.type = type;
@@ -115,5 +129,17 @@ public class NodeGroup
         sb.append( ", hostId='" ).append( hostId ).append( '\'' );
         sb.append( '}' );
         return sb.toString();
+    }
+
+
+    public String getHostname()
+    {
+        return hostname;
+    }
+
+
+    public void setHostname( final String hostname )
+    {
+        this.hostname = hostname;
     }
 }

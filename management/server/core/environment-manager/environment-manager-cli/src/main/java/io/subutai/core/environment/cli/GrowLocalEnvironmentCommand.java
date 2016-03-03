@@ -2,22 +2,20 @@ package io.subutai.core.environment.cli;
 
 
 import java.util.Set;
+import java.util.UUID;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
 
-import io.subutai.common.environment.Blueprint;
 import io.subutai.common.environment.Environment;
-import io.subutai.common.environment.NodeGroup;
+import io.subutai.common.environment.Node;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.ResourceHost;
-import io.subutai.common.protocol.PlacementStrategy;
 import io.subutai.common.settings.Common;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
@@ -95,11 +93,12 @@ public class GrowLocalEnvironmentCommand extends SubutaiShellCommandSupport
         }
         String hostId = resourceHosts.iterator().next().getId();
         Environment environment = environmentManager.loadEnvironment( environmentId );
-        NodeGroup nodeGroup = new NodeGroup( String.format( "NodeGroup%s", System.currentTimeMillis() ), templateName,
-                ContainerSize.TINY, 1, 1, peerId, hostId );
+        Node node =
+                new Node( UUID.randomUUID().toString(), String.format( "NodeGroup%s", System.currentTimeMillis() ),
+                        templateName, ContainerSize.TINY, 1, 1, peerId, hostId );
         //
         Topology topology = new Topology( environment.getName(), 1, 1 );
-        topology.addNodeGroupPlacement( peerId, nodeGroup );
+        topology.addNodePlacement( peerId, node );
 
         Set<EnvironmentContainerHost> newContainers =
                 environmentManager.growEnvironment( environmentId, topology, async );

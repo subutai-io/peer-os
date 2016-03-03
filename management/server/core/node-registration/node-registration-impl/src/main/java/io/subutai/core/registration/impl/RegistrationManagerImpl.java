@@ -28,7 +28,7 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.Environment;
-import io.subutai.common.environment.NodeGroup;
+import io.subutai.common.environment.Node;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.HostInfo;
@@ -352,21 +352,21 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
             //TODO: check this run. Topology constructor changed
             Topology topology = new Topology( "Imported-environment", 0, 0 );
             Map<String, Set<ContainerInfo>> rawNodeGroup = mapEntry.getValue();
-            Map<NodeGroup, Set<ContainerHostInfo>> classification = Maps.newHashMap();
+            Map<Node, Set<ContainerHostInfo>> classification = Maps.newHashMap();
 
             for ( final Map.Entry<String, Set<ContainerInfo>> entry : rawNodeGroup.entrySet() )
             {
                 //place where to create node groups
                 String templateName = entry.getKey();
                 //TODO: please change this distribution
-                NodeGroup nodeGroup =
-                        new NodeGroup( String.format( "%s_group", templateName ), templateName, ContainerSize.SMALL, 1,
+                Node node =
+                        new Node( UUID.randomUUID().toString(), String.format( "%s_group", templateName ), templateName, ContainerSize.SMALL, 1,
                                 1, localPeer.getId(), registrationRequest.getId() );
-                topology.addNodeGroupPlacement( localPeer.getId(), nodeGroup );
+                topology.addNodePlacement( localPeer.getId(), node );
 
                 Set<ContainerHostInfo> converter = Sets.newHashSet();
                 converter.addAll( entry.getValue() );
-                classification.put( nodeGroup, converter );
+                classification.put( node, converter );
             }
             //trigger environment import task
             try
