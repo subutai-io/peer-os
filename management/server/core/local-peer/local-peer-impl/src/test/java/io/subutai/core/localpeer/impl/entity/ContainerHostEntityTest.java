@@ -93,11 +93,10 @@ public class ContainerHostEntityTest
         when( containerHostInfo.getState() ).thenReturn( CONTAINER_HOST_STATE );
         when( anHostInterface.getName() ).thenReturn( INTERFACE_NAME );
         when( anHostInterface.getIp() ).thenReturn( IP );
-        when( anHostInterface.getMac() ).thenReturn( MAC );
         when( hostRegistry.getHostInfoById( anyString() ) ).thenReturn( containerHostInfo );
 
         containerHostEntity =
-                new ContainerHostEntity( PEER_ID.toString(), containerHostInfo, TEMPLATE_NAME, TEMP_ARCH );
+                new ContainerHostEntity( PEER_ID, containerHostInfo, TEMPLATE_NAME, TEMP_ARCH );
         //        containerHostEntity.setLocalPeer( localPeer );
         //        containerHostEntity.setDataService( dataService );
         containerHostEntity.setParent( resourceHost );

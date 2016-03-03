@@ -31,6 +31,10 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>kurjun-api</artifactId>
     </dependency>
+    <dependency>
+      <groupId>io.subutai</groupId>
+      <artifactId>peer-manager-api</artifactId>
+    </dependency>
   </dependencies>
 
   <build>

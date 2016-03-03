@@ -65,6 +65,7 @@ import io.subutai.core.identity.impl.model.UserDelegateEntity;
 import io.subutai.core.identity.impl.model.UserEntity;
 import io.subutai.core.identity.impl.model.UserTokenEntity;
 import io.subutai.core.identity.impl.utils.SecurityUtil;
+import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.object.relation.api.RelationManager;
 import io.subutai.core.object.relation.api.RelationVerificationException;
 import io.subutai.core.object.relation.api.model.Relation;
@@ -90,6 +91,7 @@ public class IdentityManagerImpl implements IdentityManager
     private DaoManager daoManager = null;
     private SecurityManager securityManager = null;
     private SessionManager sessionManager = null;
+    private boolean inited = false;
 
 
     /* *************************************************
@@ -111,9 +113,12 @@ public class IdentityManagerImpl implements IdentityManager
         {
             createDefaultUsers();
         }
-        catch (Exception e) {
+        catch ( Exception e )
+        {
             LOGGER.error( "***** Error! Error creating users:" + e.toString(), e );
         }
+
+        inited = true;
     }
 
 
@@ -157,7 +162,7 @@ public class IdentityManagerImpl implements IdentityManager
             //*********************************************
             role = createRole( "Administrator", UserType.Regular.getId() );
             assignUserRole( admin.getId(), role );
-
+            
             for ( int a = 0; a < permsp.length; a++ )
             {
                 per = createPermission( permsp[a].getId(), 1, true, true, true, true );
@@ -975,13 +980,28 @@ public class IdentityManagerImpl implements IdentityManager
                 createUserDelegate( user,null,true );
             }
             //***************************************
+            
+            if ( generateKeyPair && inited )
+            {
+                TemplateManager templateManager = ServiceLocator.getServiceNoCache( TemplateManager.class );
+                templateManager.createUserRepository( user.getUserName() );
+            }
         }
         catch ( Exception e )
         {
-            throw new Exception( "Internal error" );
+            throw new Exception( "Internal error", e );
         }
 
         return user;
+    }
+    
+    /* *************************************************
+     */
+    @RolesAllowed( "Identity-Management|Read" )
+    @Override
+    public User getUserByUsername( String userName )
+    {
+        return identityDataService.getUserByUsername( userName );
     }
 
 

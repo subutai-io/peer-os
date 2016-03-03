@@ -1,0 +1,25 @@
+<script src="scripts/libs/nprogress.js"></script>
+<div class="b-workspace-content b-workspace-content_border">
+  <div class="b-workspace-content__row">
+    <div class="b-main-table-border" style="width: 500px">
+      <table class="b-main-table b-main-table_with-header" style="width: 500px" align="center">
+        <tr>
+          <!--<td>{{settingsAdvancedCtrl.config.karafLogs}} </td>-->
+          <td><textarea rows="50" cols="100" ng-model="settingsAdvancedCtrl.config.karafLogs">  </textarea>
+        </tr>
+      </table>
+      <button
+          class="b-btn b-btn_green g-left g-margin-bottom"
+          ng-click="settingsAdvancedCtrl.getConfig()"
+          style="margin-top: 15px">
+        <i class="fa fa-floppy-o"></i>&#160;&#160;Refresh
+      </button>
+      <button
+          class="b-btn b-btn_green g-left g-margin-bottom"
+          ng-click="settingsAdvancedCtrl.saveLogs()"
+          style="margin-top: 15px">
+        <i class="fa fa-floppy-o"></i>&#160;&#160;Export
+      </button>
+    </div>
+  </div>
+</div>

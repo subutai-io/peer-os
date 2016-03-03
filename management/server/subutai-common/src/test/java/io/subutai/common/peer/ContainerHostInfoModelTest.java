@@ -49,7 +49,6 @@ public class ContainerHostInfoModelTest
         when( containerHost.getHostInterfaces() ).thenReturn( hostInterfaces );
         when( anHostInterface.getName() ).thenReturn( "testInterFace" );
         when( anHostInterface.getIp() ).thenReturn( "testIp" );
-        when( anHostInterface.getMac() ).thenReturn( "testMac" );
         when( hostInfo.getHostname() ).thenReturn( "testHostName" );
         when( hostInfo.getHostInterfaces() ).thenReturn( hostInterfaces );
 

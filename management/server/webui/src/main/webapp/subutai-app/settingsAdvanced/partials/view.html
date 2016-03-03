@@ -5,20 +5,18 @@
   </div>
 
   <div class="b-workspace__content">
-    <div class="b-workspace-content__row">
-      <div class="b-main-table-border" style="width: 500px">
-        <table class="b-main-table b-main-table_with-header" style="width: 500px" align="center">
-          <tr>
-            <th>
-              <div style="display: inline-block; float: left; margin-top: 8px">Karaf Log</div>
-              &#160;&#160;&#160;&#160;
-            </th>
-            <td style="padding-right: 18px"><textarea rows="50" cols="100" ng-model="settingsAdvancedCtrl.config.karafLogs">  </textarea>
-              <!--<input class="b-form-input b-form-input_full" type="text" ng-model="settingsAdvancedCtrl.config.karafLogs" required>-->
-            </td>
-          </tr>
-        </table>
-      </div>
+    <div class="b-tabs-menu">
+      <ul>
+        <li class="b-tabs-menu__item"
+            ng-click="settingsAdvancedCtrl.activeTab = 'karaflogs'"
+            ng-class="settingsAdvancedCtrl.activeTab == 'karaflogs' ? 'b-tabs-menu__item_active' : ''">
+          Karaf Logs
+        </li>
+      </ul>
+    </div>
+    <div
+        ng-if="settingsAdvancedCtrl.activeTab == 'karaflogs'"
+        ng-include="'subutai-app/settingsAdvanced/partials/karaflogs.html'">
     </div>
   </div>
 </div>
