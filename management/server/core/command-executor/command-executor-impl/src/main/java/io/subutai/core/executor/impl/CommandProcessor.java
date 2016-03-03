@@ -110,48 +110,13 @@ public class CommandProcessor implements ByteMessageListener, RestProcessor
             //leave this call temporarily to be compatible with MQTT clients
             getBroker().sendTextMessage( targetHost.getId(), command );
 
-            //add request to outgoing agent queue
-            synchronized ( requests )
-            {
-                Set<Request> hostRequests = requests.get( request.getId() );
-                if ( hostRequests == null )
-                {
-                    hostRequests = Sets.newLinkedHashSet();
-                    requests.put( request.getId(), hostRequests, Common.INACTIVE_COMMAND_DROP_TIMEOUT_SEC * 1000 );
-                }
-                hostRequests.add( request );
-            }
+            ResourceHostInfo resourceHostInfo = getResourceHostInfo( request.getId() );
+
+            //queue request
+            queueRequest( resourceHostInfo, request );
 
             //notify agent about requests
-            //TODO use queue for notifications
-            WebClient webClient = null;
-            try
-            {
-                ResourceHostInfo resourceHostInfo = getResourceHostInfo( request.getId() );
-
-                webClient = getWebClient( request, resourceHostInfo );
-
-                webClient.form( new Form() );
-            }
-            catch ( Exception e )
-            {
-                //ignore for now
-            }
-            finally
-            {
-                if ( webClient != null )
-                {
-                    try
-                    {
-                        webClient.close();
-                    }
-                    catch ( Exception ignore )
-                    {
-                        //ignore
-                        LOG.warn( "Error disposing web client", ignore );
-                    }
-                }
-            }
+            notifyAgent( resourceHostInfo, request );
         }
         catch ( Exception e )
         {
@@ -164,11 +129,61 @@ public class CommandProcessor implements ByteMessageListener, RestProcessor
     }
 
 
+    protected void queueRequest( ResourceHostInfo resourceHostInfo, Request request )
+    {
+        //add request to outgoing agent queue
+        synchronized ( requests )
+        {
+            Set<Request> hostRequests = requests.get( resourceHostInfo.getId() );
+            if ( hostRequests == null )
+            {
+                hostRequests = Sets.newLinkedHashSet();
+                requests.put( resourceHostInfo.getId(), hostRequests,
+                        Common.INACTIVE_COMMAND_DROP_TIMEOUT_SEC * 1000 + 1000 );
+            }
+            //todo encrypt request here with associated pgp key ch/rh
+            hostRequests.add( request );
+        }
+    }
+
+
+    protected void notifyAgent( ResourceHostInfo resourceHostInfo, Request request )
+    {
+        //TODO use queue for notifications
+        WebClient webClient = null;
+        try
+        {
+            webClient = getWebClient( request, resourceHostInfo );
+
+            webClient.form( new Form() );
+        }
+        catch ( Exception e )
+        {
+            //ignore for now
+        }
+        finally
+        {
+            if ( webClient != null )
+            {
+                try
+                {
+                    webClient.close();
+                }
+                catch ( Exception ignore )
+                {
+                    //ignore
+                    LOG.warn( "Error disposing web client", ignore );
+                }
+            }
+        }
+    }
+
+
     protected WebClient getWebClient( Request request, ResourceHostInfo resourceHostInfo )
     {
         return RestUtil.createTrustedWebClientWithAuth(
-                String.format( "https://%s:%d/execute/%s", getResourceHostIp( resourceHostInfo ),
-                        SystemSettings.getAgentPort(), request.getId() ), resourceHostInfo.getId() );
+                String.format( "https://%s:%d/trigger", getResourceHostIp( resourceHostInfo ),
+                        SystemSettings.getAgentPort() ), resourceHostInfo.getId() );
     }
 
 
@@ -225,6 +240,7 @@ public class CommandProcessor implements ByteMessageListener, RestProcessor
     @Override
     public void handleResponse( final Response response )
     {
+        //todo update timestamp of host in cache of host registry
         try
         {
             Preconditions.checkNotNull( response );
