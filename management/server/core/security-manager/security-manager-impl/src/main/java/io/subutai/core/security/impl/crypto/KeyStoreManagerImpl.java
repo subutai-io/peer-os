@@ -18,7 +18,7 @@ public class KeyStoreManagerImpl implements KeyStoreManager
      *
      */
     @Override
-    public void importCertAsTrusted( int port, String storeAlias, String certificateHEX )
+    public synchronized void importCertAsTrusted( int port, String storeAlias, String certificateHEX )
     {
         KeyStore keyStore;
         KeyStoreData keyStoreData;
