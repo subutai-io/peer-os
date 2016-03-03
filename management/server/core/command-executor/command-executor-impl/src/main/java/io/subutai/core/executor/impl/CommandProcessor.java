@@ -53,7 +53,7 @@ public class CommandProcessor implements ByteMessageListener, RestProcessor
     private IdentityManager identityManager;
 
     protected ExpiringCache<UUID, CommandProcess> commands = new ExpiringCache<>();
-    protected ExpiringCache<String, Set<String>> requests = new ExpiringCache<>();
+    protected final ExpiringCache<String, Set<String>> requests = new ExpiringCache<>();
 
 
     public CommandProcessor( final HostRegistry hostRegistry, final IdentityManager identityManager )
@@ -117,7 +117,7 @@ public class CommandProcessor implements ByteMessageListener, RestProcessor
             queueRequest( resourceHostInfo, request );
 
             //notify agent about requests
-            notifyAgent( resourceHostInfo, request );
+            notifyAgent( resourceHostInfo );
         }
         catch ( Exception e )
         {
@@ -150,13 +150,13 @@ public class CommandProcessor implements ByteMessageListener, RestProcessor
     }
 
 
-    protected void notifyAgent( ResourceHostInfo resourceHostInfo, Request request )
+    protected void notifyAgent( ResourceHostInfo resourceHostInfo )
     {
         //TODO use queue for notifications
         WebClient webClient = null;
         try
         {
-            webClient = getWebClient( request, resourceHostInfo );
+            webClient = getWebClient( resourceHostInfo );
 
             webClient.form( new Form() );
         }
@@ -182,7 +182,7 @@ public class CommandProcessor implements ByteMessageListener, RestProcessor
     }
 
 
-    protected WebClient getWebClient( Request request, ResourceHostInfo resourceHostInfo )
+    protected WebClient getWebClient( ResourceHostInfo resourceHostInfo )
     {
         return RestUtil.createTrustedWebClientWithAuth(
                 String.format( "https://%s:%d/trigger", getResourceHostIp( resourceHostInfo ),
