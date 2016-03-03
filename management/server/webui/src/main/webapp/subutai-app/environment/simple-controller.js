@@ -45,15 +45,15 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 	vm.addContainer = addContainer;
 	vm.closePopup = closePopup;
 
-	/*environmentService.getTemplates()
+	environmentService.getTemplates()
 		.success(function (data) {
 			vm.templates = data;
 		})
 		.error(function (data) {
 			VARS_MODAL_ERROR( SweetAlert, 'Error on getting templates ' + data );
-		});*/
+		});
 
-	vm.templates = ['mongo', 'cassandra', 'master', 'hadoop'];		
+	//vm.templates = ['mongo', 'cassandra', 'master', 'hadoop'];		
 
 	environmentService.getStrategies().success(function (data) {
 		vm.strategies = data;
@@ -438,7 +438,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 					currentTemplate = this.model;
 					$('#js-container-name').val(currentTemplate.get('containerName'));
 					$('#js-container-size').val(currentTemplate.get('quotaSize'));
-					containerSettingMenu.find('.header').text(this.model.get('templateName'));
+					containerSettingMenu.find('.header').text('Settings ' + this.model.get('templateName'));
 					var elementPos = this.model.get('position');
 					containerSettingMenu.css({
 						'left': (elementPos.x + 12) + 'px',
