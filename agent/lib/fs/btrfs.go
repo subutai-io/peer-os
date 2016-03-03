@@ -95,8 +95,7 @@ func Send(src, dst, delta string) {
 	}
 	send := exec.Command("btrfs", args...)
 	send.Stdout = newdelta
-	out, err := send.CombinedOutput()
-	log.Check(log.FatalLevel, "Sending delta "+delta+": "+string(out), err)
+	log.Check(log.FatalLevel, "Sending delta "+delta, send.Run())
 }
 
 func ReadOnly(container string, flag bool) {
