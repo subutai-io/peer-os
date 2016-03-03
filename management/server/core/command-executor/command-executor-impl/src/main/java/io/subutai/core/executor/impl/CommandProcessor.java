@@ -173,7 +173,6 @@ public class CommandProcessor implements ByteMessageListener, RestProcessor
 
     protected void notifyAgents()
     {
-
         for ( final String resourceHostId : requests.getEntries().keySet() )
         {
             notifierPool.execute( new Runnable()
