@@ -137,9 +137,6 @@ public class CommandProcessor implements ByteMessageListener, RestProcessor
 
             //queue request
             queueRequest( resourceHostInfo, request );
-
-            //notify agent about requests
-            notifyAgent( resourceHostInfo );
         }
         catch ( Exception e )
         {
