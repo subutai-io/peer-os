@@ -7,8 +7,6 @@ import java.util.UUID;
 import javax.naming.NamingException;
 import javax.ws.rs.core.Form;
 
-import org.bouncycastle.openpgp.PGPException;
-import org.bouncycastle.openpgp.PGPPublicKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,8 +40,6 @@ import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Session;
-import io.subutai.core.security.api.SecurityManager;
-import io.subutai.core.security.api.crypto.EncryptionTool;
 
 
 /**
@@ -112,7 +108,6 @@ public class CommandProcessor implements ByteMessageListener, RestProcessor
             LOG.info( String.format( "Sending:%n%s", command ) );
 
             //leave this call temporarily to be compatible with MQTT clients
-            //todo remove this after REST tested
             getBroker().sendTextMessage( targetHost.getId(), command );
 
             //add request to outgoing agent queue
@@ -124,6 +119,7 @@ public class CommandProcessor implements ByteMessageListener, RestProcessor
                     hostRequests = Sets.newLinkedHashSet();
                     requests.put( request.getId(), hostRequests, Common.INACTIVE_COMMAND_DROP_TIMEOUT_SEC * 1000 );
                 }
+                hostRequests.add( request );
             }
 
             //notify agent about requests
@@ -194,41 +190,6 @@ public class CommandProcessor implements ByteMessageListener, RestProcessor
 
             return hostRegistry.getResourceHostByContainerHost( containerHostInfo );
         }
-    }
-
-
-    //todo move this method to SecurityManager
-    protected String encrypt( String message ) throws PGPException, NamingException
-    {
-        if ( SystemSettings.getEncryptionState() )
-        {
-
-            EncryptionTool encryptionTool = getSecurityManager().getEncryptionTool();
-
-            RequestImplWrapper requestImplWrapper = JsonUtil.fromJson( message, RequestImplWrapper.class );
-
-            Request originalRequest = requestImplWrapper.getRequest();
-
-            //obtain target host pub key for encrypting
-            PGPPublicKey hostKeyForEncrypting =
-                    getSecurityManager().getKeyManager().getPublicKey( originalRequest.getId() );
-
-            String encryptedRequestString = new String( encryptionTool
-                    .signAndEncrypt( JsonUtil.toJson( originalRequest ).getBytes(), hostKeyForEncrypting, true ) );
-
-            EncryptedRequestWrapper encryptedRequestWrapper =
-                    new EncryptedRequestWrapper( encryptedRequestString, originalRequest.getId() );
-
-            return JsonUtil.toJson( encryptedRequestWrapper );
-        }
-
-        return message;
-    }
-
-
-    protected SecurityManager getSecurityManager() throws NamingException
-    {
-        return ServiceLocator.getServiceNoCache( SecurityManager.class );
     }
 
 

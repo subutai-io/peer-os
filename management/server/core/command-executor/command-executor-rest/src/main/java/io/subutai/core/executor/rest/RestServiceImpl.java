@@ -10,26 +10,21 @@ import java.util.concurrent.Executors;
 import javax.ws.rs.core.Response;
 
 import org.bouncycastle.openpgp.PGPException;
-import org.bouncycastle.openpgp.PGPPublicKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 
-import io.subutai.common.command.EncryptedRequestWrapper;
-import io.subutai.common.command.EncryptedResponseWrapper;
 import io.subutai.common.command.Request;
 import io.subutai.common.command.ResponseImpl;
 import io.subutai.common.command.ResponseWrapper;
 import io.subutai.common.host.HeartBeat;
 import io.subutai.common.host.HeartbeatListener;
-import io.subutai.common.security.crypto.pgp.ContentAndSignatures;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.executor.api.RestProcessor;
 import io.subutai.core.security.api.SecurityManager;
-import io.subutai.core.security.api.crypto.EncryptionTool;
 
 
 //temporarily made rest-impl as subscription service for heartbeat listeners
@@ -164,63 +159,24 @@ public class RestServiceImpl implements RestService
     }
 
 
-    //todo move this method to SecurityManager
-    protected String encrypt( String message, String hostId )
+    protected String encrypt( String message, String hostId ) throws PGPException
     {
         if ( SystemSettings.getEncryptionState() )
         {
-            try
-            {
-                EncryptionTool encryptionTool = securityManager.getEncryptionTool();
-
-
-                //obtain target host pub key for encrypting
-                PGPPublicKey hostKeyForEncrypting = securityManager.getKeyManager().getPublicKey( hostId );
-
-                String encryptedRequestString = new String( encryptionTool
-                        .signAndEncrypt( JsonUtil.toJson( message ).getBytes(), hostKeyForEncrypting, true ) );
-
-                EncryptedRequestWrapper encryptedRequestWrapper =
-                        new EncryptedRequestWrapper( encryptedRequestString, hostId );
-
-                return JsonUtil.toJson( encryptedRequestWrapper );
-            }
-            catch ( Exception e )
-            {
-                LOG.error( "Error in process", e );
-            }
+            message = securityManager.signNEncryptRequestToHost( message, hostId );
         }
 
         return message;
     }
 
 
-    //todo move this method to SecurityManager
     protected String decrypt( String message ) throws PGPException
     {
 
         if ( SystemSettings.getEncryptionState() )
         {
 
-            EncryptionTool encryptionTool = securityManager.getEncryptionTool();
-
-            EncryptedResponseWrapper responseWrapper = JsonUtil.fromJson( message, EncryptedResponseWrapper.class );
-
-            ContentAndSignatures contentAndSignatures =
-                    encryptionTool.decryptAndReturnSignatures( responseWrapper.getResponse().getBytes() );
-
-            PGPPublicKey hostKeyForVerifying =
-                    securityManager.getKeyManager().getPublicKey( responseWrapper.getHostId() );
-
-            if ( encryptionTool.verifySignature( contentAndSignatures, hostKeyForVerifying ) )
-            {
-                message = new String( contentAndSignatures.getDecryptedContent() );
-            }
-            else
-            {
-                throw new IllegalArgumentException( String.format( "Verification failed%nDecrypted Message: %s",
-                        new String( contentAndSignatures.getDecryptedContent() ) ) );
-            }
+            message = securityManager.decryptNVerifyResponseFromHost( message );
         }
 
         return message;

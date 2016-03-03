@@ -99,7 +99,6 @@ public class CommandProcessorTest
         when( request.getId() ).thenReturn( HOST_ID );
         when( request.getCommandId() ).thenReturn( COMMAND_ID );
         doReturn( session ).when( commandProcessor ).getActiveSession();
-        doReturn( RESPONSE_JSON ).when( commandProcessor ).encrypt( anyString() );
         doReturn( broker ).when( commandProcessor ).getBroker();
     }
 
