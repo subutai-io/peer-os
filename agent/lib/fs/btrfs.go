@@ -34,26 +34,23 @@ func SubvolumeClone(src, dst string) {
 
 func SubvolumeDestroy(path string) {
 	nestedvol, err := exec.Command("btrfs", "subvolume", "list", "-o", path).Output()
-	log.Check(log.WarnLevel, "Getting nested subvolumes in "+path, err)
+	log.Check(log.DebugLevel, "Getting nested subvolumes in "+path, err)
 	scanner := bufio.NewScanner(bytes.NewReader(nestedvol))
 	for scanner.Scan() {
 		line := strings.Fields(scanner.Text())
 		if len(line) > 8 {
-			// subvol := strings.Split(line[8], path)
-			if len(line[8]) > 1 {
-				SubvolumeDestroy(GetBtrfsRoot(path) + line[8])
-			}
+			SubvolumeDestroy(GetBtrfsRoot() + line[8])
 		}
 	}
 	qgroupDestroy(path)
 	out, err := exec.Command("btrfs", "subvolume", "delete", path).CombinedOutput()
-	log.Check(log.WarnLevel, "Destroying subvolume "+path+": "+string(out), err)
+	log.Check(log.DebugLevel, "Destroying subvolume "+path+": "+string(out), err)
 }
 
 func qgroupDestroy(path string) {
 	index := id(path)
 	out, err := exec.Command("btrfs", "qgroup", "destroy", index, config.Agent.LxcPrefix).CombinedOutput()
-	log.Check(log.WarnLevel, "Destroying qgroup "+path+" "+index+": "+string(out), err)
+	log.Check(log.DebugLevel, "Destroying qgroup "+path+" "+index+": "+string(out), err)
 }
 
 // NEED REFACTORING
@@ -190,18 +187,11 @@ func GetChildren(uuid string) []string {
 	return child
 }
 
-// GetBtrfsRoot	NEED TO FIX
-// working only one btrfs mount on system
-func GetBtrfsRoot(path string) string {
-	data, err := exec.Command("mount").Output()
-	log.Check(log.FatalLevel, "Find btrfs mount point "+path, err)
+// GetBtrfsRoot	returns BTRFS root
+func GetBtrfsRoot() string {
+	data, err := exec.Command("findmnt", "-nT", config.Agent.LxcPrefix).Output()
+	log.Check(log.FatalLevel, "Find btrfs mount point", err)
 
-	scanner := bufio.NewScanner(bytes.NewReader(data))
-	for scanner.Scan() {
-		line := strings.Fields(scanner.Text())
-		if strings.Contains(line[3], "btrfs") {
-			return (line[2] + "/")
-		}
-	}
-	return ""
+	line := strings.Fields(string(data))
+	return (line[0] + "/")
 }

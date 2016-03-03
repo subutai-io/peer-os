@@ -139,21 +139,10 @@ func AttachExec(name string, command []string) (output []string, err error) {
 
 func Destroy(name string) {
 	c, err := lxc.NewContainer(name, config.Agent.LxcPrefix)
-	if log.Check(log.WarnLevel, "Creating container object", err) {
-		return
+	if !log.Check(log.WarnLevel, "Creating container object", err) && c.State() == lxc.RUNNING {
+		log.Check(log.FatalLevel, "Stopping container", c.Stop())
 	}
-
-	if c.State() == lxc.RUNNING {
-		err := c.Stop()
-		log.Check(log.FatalLevel, "Stopping container", err)
-	}
-
-	fs.SubvolumeDestroy(config.Agent.LxcPrefix + name + "/opt")
-	fs.SubvolumeDestroy(config.Agent.LxcPrefix + name + "/home")
-	fs.SubvolumeDestroy(config.Agent.LxcPrefix + name + "/var")
-
-	err = c.Destroy()
-	log.Check(log.FatalLevel, "Destroying container", err)
+	fs.SubvolumeDestroy(config.Agent.LxcPrefix + name)
 
 	log.Info(name + " destroyed")
 }
