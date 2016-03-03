@@ -324,13 +324,22 @@ public class CommandProcessor implements ByteMessageListener, RestProcessor
 
         commands.remove( request.getCommandId() );
 
-        synchronized ( requests )
+        try
         {
-            Set<Request> hostRequests = requests.get( request.getId() );
-            if ( !CollectionUtil.isCollectionEmpty( hostRequests ) )
+            ResourceHostInfo resourceHostInfo = getResourceHostInfo( request.getId() );
+
+            synchronized ( requests )
             {
-                hostRequests.remove( request );
+                Set<Request> hostRequests = requests.get( resourceHostInfo.getId() );
+                if ( !CollectionUtil.isCollectionEmpty( hostRequests ) )
+                {
+                    hostRequests.remove( request );
+                }
             }
+        }
+        catch ( HostDisconnectedException e )
+        {
+            //ignore
         }
     }
 
