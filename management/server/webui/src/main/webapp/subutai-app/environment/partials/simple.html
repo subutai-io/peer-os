@@ -35,10 +35,38 @@
 					class="b-cloud-space-work"
 					id="js-environment-creation"
 					ng-init="environmentSimpleViewCtrl.initJointJs()">
-					<div
-						class="js-dropen-menu"
-						style="width: 100px; height: 100px; background-color: red; position: absolute; display: none;">
+
+					<div class="b-template-settings__dropdown js-dropen-menu">
+						<form ng-submit="environmentSimpleViewCtrl.addSettingsToTemplate(templateSettings)">
+							<div class="header"></div>
+							<div class="body">
+								<div class="b-form-group">
+									<div class="b-form-group__label">Container name</div>
+									<input type="text" 
+										id="js-container-name" 
+										class="b-form-input b-form-input_full" 
+										ng-model="templateSettings.containerName" required>									
+								</div>
+								<div class="b-form-group">
+									<div class="b-form-group__label">Select quota size</div>
+									<select class="b-form-input b-form-input_full" 
+										id="js-container-size" 
+										ng-model="templateSettings.quotaSize"
+									>
+										<option 
+										ng-repeat="type in environmentViewCtrl.containersType" 
+										value="{{ type }}" >
+											{{ type }}
+										</option>
+									</select>
+								</div>
+							</div>
+							<div class="footer">
+								<button type="submit" class="b-btn b-btn_green">Save</button>
+							</div>
+						</form>
 					</div>
+
 				</div>
 				<div class="b-cloud-create-buttons">
 					<button class="b-btn b-btn_white"
