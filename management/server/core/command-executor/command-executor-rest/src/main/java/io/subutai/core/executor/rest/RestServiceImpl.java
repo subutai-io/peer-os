@@ -26,8 +26,9 @@ import io.subutai.core.executor.api.RestProcessor;
 import io.subutai.core.security.api.SecurityManager;
 
 
-//temporarily made rest-impl as subscription service for heartbeat listeners
-//TODO extract separate service/class for this purpose^, move it to command-executor-impl
+//todo temporarily made rest-impl as subscription service for heartbeat listeners
+//todo extract separate service/class for this purpose^, move it to command-executor-impl
+//todo close the URLS for 8444 port only in AccessControlInterceptor
 public class RestServiceImpl implements RestService
 {
     private static final Logger LOG = LoggerFactory.getLogger( RestServiceImpl.class.getName() );

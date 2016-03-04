@@ -185,7 +185,8 @@ public class CommandProcessor implements ByteMessageListener, RestProcessor
                     }
                     catch ( Exception e )
                     {
-//                        LOG.error( String.format( "Error notifying host with id %s", resourceHostId ), e );
+                        //                        LOG.error( String.format( "Error notifying host with id %s",
+                        // resourceHostId ), e );
                     }
                 }
             } );
@@ -223,9 +224,11 @@ public class CommandProcessor implements ByteMessageListener, RestProcessor
 
     protected WebClient getWebClient( ResourceHostInfo resourceHostInfo )
     {
-        return RestUtil.createTrustedWebClientWithAuth(
-                String.format( "https://%s:%d/trigger", getResourceHostIp( resourceHostInfo ),
-                        SystemSettings.getAgentPort() ), resourceHostInfo.getId() );
+        //        return RestUtil.createTrustedWebClientWithAuth(
+        //                String.format( "https://%s:%d/trigger", getResourceHostIp( resourceHostInfo ),
+        //                        SystemSettings.getAgentPort() ), resourceHostInfo.getId() );
+        return RestUtil.createWebClient( String.format( "http://%s:%d/trigger", getResourceHostIp( resourceHostInfo ),
+                SystemSettings.getAgentPort() ) );
     }
 
 
