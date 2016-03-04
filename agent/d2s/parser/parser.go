@@ -9,7 +9,7 @@ import (
 
 func parceEnv(line []string) string {
 	if len(line) > 2 {
-		return "export " + line[1] + "=" + line[2] + "\n"
+		return "export " + line[1] + "=" + strings.Join(line[2:], " ") + "\n"
 	}
 	return ""
 }
@@ -44,7 +44,16 @@ func parceFrom(line []string) string {
 	return ""
 }
 
-func Parce(name string) (out, image string) {
+func parceCmd(line []string) string {
+	if len(line) > 1 {
+		str, _ := strconv.Unquote(strings.Join(line[1:], " "))
+		str = strings.Replace(str, "\t", " ", -1)
+		return `sed -i -e '$i \` + str + ` &\n' /etc/rc.local`
+	}
+	return ""
+}
+
+func Parce(name string) (out, env, image string) {
 	file, _ := os.Open(name)
 	node, _ := docker.Parse(file)
 	file.Close()
@@ -53,18 +62,20 @@ func Parce(name string) (out, image string) {
 		if str := strings.Fields(n.Dump()); len(str) > 0 {
 			switch str[0] {
 			case "env":
-				out = out + parceEnv(str)
+				env = env + parceEnv(str)
 			case "run":
 				out = out + parceRun(str)
 			case "add", "copy":
 				out = out + parceCopy(str)
 			case "from":
 				image = parceFrom(str)
-			}
+			// case "cmd":
+			// 	out = out + parceCmd(str)
+			// }
 		}
 	}
 	if len(out) > 0 {
-		return "#!/bin/bash\n" + out, image
+		return out, env, image
 	}
 	return
 }
