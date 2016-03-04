@@ -178,7 +178,6 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 					}
 					user.roles = userRoles;
 					var postData = userPostData(user);
-					console.log(postData);
 					identitySrv.addUser(postData).success(function (data) {
 						SweetAlert.swal("Removed!", "Role has been removed.", "success");
 						vm.dtInstance.reloadData(null, false);
