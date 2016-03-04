@@ -39,7 +39,6 @@ import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
-import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.common.util.RestUtil;
@@ -249,10 +248,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
 
         for ( final ContainerInfo containerInfo : registrationRequest.getHostInfos() )
         {
-            if ( !Common.MANAGEMENT_HOSTNAME.equals( containerInfo.getHostname() ) )
-            {
-                importHostPublicKey( containerInfo.getId(), containerInfo.getPublicKey() );
-            }
+            importHostPublicKey( containerInfo.getId(), containerInfo.getPublicKey() );
         }
     }
 
