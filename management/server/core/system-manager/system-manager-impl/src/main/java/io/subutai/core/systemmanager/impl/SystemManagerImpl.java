@@ -148,7 +148,6 @@ public class SystemManagerImpl implements SystemManager
 
         pojo.setPeerOwnerId( peerOwnerId );
         pojo.setUserPeerOwnerName( user.getUserName() );
-        pojo.setRegisteredToHub( io.subutai.common.settings.SystemSettings.isRegisteredToHub() );
 
         return pojo;
     }

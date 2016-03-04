@@ -81,7 +81,7 @@ public class ProductProccessor implements StateLinkProccessor
     {
         try
         {
-            WebClient client = configManager.getTrustedWebClientWithAuth( link );
+            WebClient client = configManager.getTrustedWebClientWithAuth( link, configManager.getHubIp() );
 
             LOG.debug( "Sending request for getting PeerProductDTO..." );
             Response r = client.get();
@@ -201,7 +201,7 @@ public class ProductProccessor implements StateLinkProccessor
             String removePath = String.format( "/rest/v1/peers/%s/products/%s", configManager.getPeerId(),
                     peerProductDataDTO.getProductId() );
 
-            WebClient client = configManager.getTrustedWebClientWithAuth( removePath );
+            WebClient client = configManager.getTrustedWebClientWithAuth( removePath, configManager.getHubIp() );
 
             Response r = client.delete();
 
@@ -220,7 +220,7 @@ public class ProductProccessor implements StateLinkProccessor
         String path = String.format( "/rest/v1/marketplace/products/%s", productId );
         try
         {
-            WebClient client = configManager.getTrustedWebClientWithAuth( path );
+            WebClient client = configManager.getTrustedWebClientWithAuth( path, configManager.getHubIp() );
 
             Response r = client.get();
 
@@ -260,7 +260,7 @@ public class ProductProccessor implements StateLinkProccessor
 
         try
         {
-            WebClient client = configManager.getTrustedWebClientWithAuth( updatePath );
+            WebClient client = configManager.getTrustedWebClientWithAuth( updatePath, configManager.getHubIp() );
 
             byte[] plainData = JsonUtil.toCbor( peerProductDataDTO );
             byte[] encryptedData = configManager.getMessenger().produce( plainData );

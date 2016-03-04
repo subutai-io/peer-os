@@ -38,4 +38,10 @@ public interface RestService
     @Path( "/unregister" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response unregister( );
+
+    //Check registration state
+    @GET
+    @Path( "/registration_state" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getRegistrationState();
 }
