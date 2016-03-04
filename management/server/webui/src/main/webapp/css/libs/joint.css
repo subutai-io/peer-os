@@ -259,3 +259,8 @@ Do not allow adding new vertices: .connection-wrap { pointer-events: none; }
 	display: inline;
 }
 
+.element-call-menu, 
+.element-tool-remove {
+	cursor: pointer;
+}
+
