@@ -1,21 +1,30 @@
 <script src="scripts/libs/nprogress.js"></script>
 <div class="b-main-table-border">
-  <table class="b-main-table b-main-table_with-header" align="center">
-    <tr>
-      <!--<td>{{settingsAdvancedCtrl.config.karafLogs}} </td>-->
-      <td><textarea rows="50" cols="100" ng-model="settingsAdvancedCtrl.config.karafLogs">  </textarea>
-    </tr>
-  </table>
-  <button
-      class="b-btn b-btn_green g-left g-margin-bottom"
-      ng-click="settingsAdvancedCtrl.getConfig()"
-      style="margin-top: 15px">
-    <i class="fa fa-floppy-o"></i>&#160;&#160;Refresh
-  </button>
-  <button
-      class="b-btn b-btn_green g-left g-margin-bottom"
-      ng-click="settingsAdvancedCtrl.saveLogs()"
-      style="margin-top: 15px">
-    <i class="fa fa-floppy-o"></i>&#160;&#160;Export
-  </button>
+	<table class="b-main-table b-main-table_auto-width" align="center" ng-init="settingsAdvancedCtrl.getConfig()">
+		<tr>
+			<!--<td>{{settingsAdvancedCtrl.config.karafLogs}} </td>-->
+			<td>
+				<textarea class="b-text-logs" ng-model="settingsAdvancedCtrl.config.karafLogs"></textarea>
+			</td>
+
+			<td>
+
+				<button
+				class="b-btn b-btn_blue g-margin-bottom"
+				ng-click="settingsAdvancedCtrl.getConfig()">
+					<i class="fa fa-refresh"></i>&#160;&#160;Refresh
+				</button><br>
+
+				<button
+				class="b-btn b-btn_green"
+				ng-click="settingsAdvancedCtrl.saveLogs()">
+					<i class="fa fa-floppy-o"></i>&#160;&#160;Export
+				</button>
+				
+			</td>
+		</tr>
+	</table>
+	<div class="b-loading-screen js-karaflogs-load-screen">
+		<div class="b-load-icon"></div>
+	</div>
 </div>
