@@ -1,22 +1,27 @@
 <div ng-controller="SettingsAdvancedCtrl as settingsAdvancedCtrl">
 
-  <div class="b-workspace__header">
-    <h1 class="b-title"><span class="b-title_breadcrumbs">Advanced Settings</span></h1>
-  </div>
-
-  <div class="b-workspace__content">
-    <div class="b-tabs-menu">
+  <div class="b-workspace__header b-workspace__header_tabs">
+    <div class="b-tabs-menu b-tabs-menu_header">
       <ul>
+        <li class="b-tabs-menu__item"
+            ng-click="settingsAdvancedCtrl.activeTab = 'karafconsole'"
+            ng-class="settingsAdvancedCtrl.activeTab == 'karafconsole' ? 'b-tabs-menu__item_active' : ''">
+          Console
+        </li>
         <li class="b-tabs-menu__item"
             ng-click="settingsAdvancedCtrl.activeTab = 'karaflogs'"
             ng-class="settingsAdvancedCtrl.activeTab == 'karaflogs' ? 'b-tabs-menu__item_active' : ''">
-          Karaf Logs
+          Logs
         </li>
       </ul>
     </div>
-    <div
-        ng-if="settingsAdvancedCtrl.activeTab == 'karaflogs'"
+  </div>
+
+
+  <div ng-if="settingsAdvancedCtrl.activeTab == 'karaflogs'"
         ng-include="'subutai-app/settingsAdvanced/partials/karaflogs.html'">
-    </div>
+  </div>
+  <div ng-if="settingsAdvancedCtrl.activeTab == 'karafconsole'" style="display:block;overflow:hidden;height:600px; width: 880px; margin: 10px;">
+    <iframe src="https://192.168.1.100:8443/system/console/gogo" style="position: relative; top:-120px; left: -60px; width:1060px;height:1000px;" scrolling="no"></iframe>
   </div>
 </div>
