@@ -52,8 +52,8 @@ import io.subutai.core.security.api.SecurityManager;
  */
 public class CommandProcessor implements ByteMessageListener, RestProcessor
 {
-    private static final int NOTIFIER_INTERVAL_MS = 500;
     private static final Logger LOG = LoggerFactory.getLogger( CommandProcessor.class.getName() );
+    private static final int NOTIFIER_INTERVAL_MS = 500;
     private static final long COMMAND_ENTRY_TIMEOUT =
             ( Common.INACTIVE_COMMAND_DROP_TIMEOUT_SEC + Common.DEFAULT_AGENT_RESPONSE_CHUNK_INTERVAL ) * 1000
                     + NOTIFIER_INTERVAL_MS + 1000;
@@ -185,8 +185,7 @@ public class CommandProcessor implements ByteMessageListener, RestProcessor
                     }
                     catch ( Exception e )
                     {
-                        //                        LOG.error( String.format( "Error notifying host with id %s",
-                        // resourceHostId ), e );
+                        //ignore
                     }
                 }
             } );
@@ -224,11 +223,8 @@ public class CommandProcessor implements ByteMessageListener, RestProcessor
 
     protected WebClient getWebClient( ResourceHostInfo resourceHostInfo )
     {
-        //        return RestUtil.createTrustedWebClientWithAuth(
-        //                String.format( "https://%s:%d/trigger", getResourceHostIp( resourceHostInfo ),
-        //                        SystemSettings.getAgentPort() ), resourceHostInfo.getId() );
         return RestUtil.createWebClient( String.format( "http://%s:%d/trigger", getResourceHostIp( resourceHostInfo ),
-                SystemSettings.getAgentPort() ) );
+                SystemSettings.getAgentPort() ), 1000, 1000, 3 );
     }
 
 

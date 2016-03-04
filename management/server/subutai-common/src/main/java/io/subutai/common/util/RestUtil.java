@@ -176,19 +176,25 @@ public class RestUtil
     }
 
 
-    public static WebClient createWebClient( String url )
+    public static WebClient createWebClient( String url, long connectTimeout, long receiveTimeout, int maxRetries )
     {
         WebClient client = WebClient.create( url );
 
         HTTPConduit httpConduit = ( HTTPConduit ) WebClient.getConfig( client ).getConduit();
 
         HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
-        httpClientPolicy.setConnectionTimeout( defaultConnectionTimeout );
-        httpClientPolicy.setReceiveTimeout( defaultReceiveTimeout );
-        httpClientPolicy.setMaxRetransmits( defaultMaxRetransmits );
+        httpClientPolicy.setConnectionTimeout( connectTimeout );
+        httpClientPolicy.setReceiveTimeout( receiveTimeout );
+        httpClientPolicy.setMaxRetransmits( maxRetries );
 
         httpConduit.setClient( httpClientPolicy );
         return client;
+    }
+
+
+    public static WebClient createWebClient( String url )
+    {
+        return createWebClient( url, defaultConnectionTimeout, defaultReceiveTimeout, defaultMaxRetransmits );
     }
 
 
