@@ -2161,7 +2161,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    private Host findHostByName( final String hostname ) throws HostNotFoundException
+    @Override
+    public Host findHostByName( final String hostname ) throws HostNotFoundException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ) );
 

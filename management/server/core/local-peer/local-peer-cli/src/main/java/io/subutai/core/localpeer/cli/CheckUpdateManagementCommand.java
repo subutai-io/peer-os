@@ -29,7 +29,7 @@ public class CheckUpdateManagementCommand extends SubutaiShellCommandSupport
     {
         final RequestBuilder requestBuilder = new RequestBuilder( "/opt/subutai-mng/bin/update-management --check" );
 
-        CommandResult commandResult = localPeer.getManagementHost().execute( requestBuilder );
+        CommandResult commandResult = localPeer.findHostByName( "management" ).execute( requestBuilder );
 
         System.out.println( commandResult.toString() );
         return null;
