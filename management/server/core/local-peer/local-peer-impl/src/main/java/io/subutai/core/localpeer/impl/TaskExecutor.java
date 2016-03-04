@@ -61,7 +61,14 @@ public class TaskExecutor implements Callable<Task>
             if ( collector != null )
             {
                 TaskResponse response = task.waitAndGetResponse();
-                collector.onResponse( response );
+                if ( task.getState() == Task.State.FAILURE && response == null )
+                {
+                    collector.onFailure( task.getRequest(), task.getExceptions() );
+                }
+                else
+                {
+                    collector.onSuccess( task.getRequest(), response );
+                }
             }
         }
         catch ( Exception e )

@@ -1,8 +1,14 @@
 package io.subutai.common.environment;
 
 
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+
 import io.subutai.common.task.CloneRequest;
 import io.subutai.common.task.CloneResponse;
+import io.subutai.common.tracker.OperationMessage;
+import io.subutai.common.util.StringUtil;
 
 
 public class CreateEnvironmentContainerResponseCollector extends AbstractResponseCollector<CloneRequest, CloneResponse>
@@ -11,4 +17,23 @@ public class CreateEnvironmentContainerResponseCollector extends AbstractRespons
     {
         super( peerId );
     }
+
+
+    @Override
+    public void onSuccess( final CloneRequest request, final CloneResponse response )
+    {
+        final String message = String.format( "Cloning %s succeeded on %s. [%s]", request.getContainerName(),
+                request.getResourceHostId(), StringUtil.convertMillisToHHMMSS( response.getElapsedTime() ) );
+        addResponse( response, message );
+    }
+
+
+    @Override
+    public void onFailure( final CloneRequest request, final List<Throwable> exceptions )
+    {
+        addFailure( String.format( "Cloning %s failed on %s.", request.getContainerName(),
+                            request.getResourceHostId() ), exceptions );
+    }
+
+
 }

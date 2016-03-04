@@ -1,15 +1,9 @@
 package io.subutai.common.task;
 
 
-import java.util.StringTokenizer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.subutai.common.command.CommandResult;
-import io.subutai.common.command.CommandResultParseException;
 import io.subutai.common.host.HostArchitecture;
 
 
@@ -25,12 +19,11 @@ public class CloneResponse implements TaskResponse
     private String ip;
     private String agentId;
     private long elapsedTime;
-    private String description;
 
 
     public CloneResponse( final String resourceHostId, final String hostname, final String containerName,
                           final String templateName, final HostArchitecture templateArch, final String ip,
-                          final String agentId, final long elapsedTime, final String description )
+                          final String agentId, final long elapsedTime )
     {
         this.resourceHostId = resourceHostId;
         this.hostname = hostname;
@@ -40,7 +33,6 @@ public class CloneResponse implements TaskResponse
         this.ip = ip;
         this.agentId = agentId;
         this.elapsedTime = elapsedTime;
-        this.description = description;
     }
 
 
@@ -84,28 +76,6 @@ public class CloneResponse implements TaskResponse
     public HostArchitecture getTemplateArch()
     {
         return templateArch;
-    }
-
-
-    @Override
-    public String getDescription()
-    {
-        return description;
-    }
-
-
-    @Override
-    public boolean hasSucceeded()
-    {
-        return agentId != null;
-    }
-
-
-    @Override
-    public String getLog()
-    {
-        return hasSucceeded() ? String.format( "Cloning '%s' using '%s' succeeded.", containerName, templateName ) :
-               String.format( "Cloning %s failed on %s.", containerName, getResourceHostId() );
     }
 
 
