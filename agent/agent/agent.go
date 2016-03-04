@@ -2,8 +2,16 @@ package agent
 
 import (
 	"encoding/json"
+	"net/http"
+	"os"
+	"runtime"
+	"strings"
+	"time"
+
 	mqtt "git.eclipse.org/gitroot/paho/org.eclipse.paho.mqtt.golang.git"
 	"github.com/codegangsta/cli"
+	"github.com/didip/tollbooth"
+
 	"github.com/subutai-io/Subutai/agent/agent/alert"
 	"github.com/subutai-io/Subutai/agent/agent/container"
 	"github.com/subutai-io/Subutai/agent/agent/executer"
@@ -12,10 +20,6 @@ import (
 	cont "github.com/subutai-io/Subutai/agent/lib/container"
 	"github.com/subutai-io/Subutai/agent/lib/gpg"
 	"github.com/subutai-io/Subutai/agent/log"
-	"os"
-	"runtime"
-	"strings"
-	"time"
 )
 
 type Response struct {
@@ -119,6 +123,10 @@ var requestHandler mqtt.MessageHandler = func(client *mqtt.Client, msg mqtt.Mess
 }
 
 func Start(c *cli.Context) {
+	http.Handle("/trigger", tollbooth.LimitFuncHandler(tollbooth.NewLimiter(5, time.Second*10), trigger))
+	http.Handle("/ping", tollbooth.LimitFuncHandler(tollbooth.NewLimiter(5, time.Second*10), ping))
+	go http.ListenAndServe(":7070", nil)
+
 	go container.ContainersRestoreState()
 	initAgent()
 	opts := InitClientOptions(c.String("server"), c.String("port"), c.String("user"), c.String("secret"))
@@ -168,5 +176,21 @@ func Start(c *cli.Context) {
 
 		client.Publish(config.Broker.HeartbeatTopic, 0, false, message)
 		time.Sleep(5 * time.Second)
+	}
+}
+
+func ping(rw http.ResponseWriter, request *http.Request) {
+	if request.Method == http.MethodGet && strings.Split(request.RemoteAddr, ":")[0] == config.Management.Host {
+		rw.WriteHeader(http.StatusOK)
+	} else {
+		rw.WriteHeader(http.StatusForbidden)
+	}
+}
+
+func trigger(rw http.ResponseWriter, request *http.Request) {
+	if request.Method == http.MethodPost && strings.Split(request.RemoteAddr, ":")[0] == config.Management.Host {
+		rw.WriteHeader(http.StatusAccepted)
+	} else {
+		rw.WriteHeader(http.StatusForbidden)
 	}
 }

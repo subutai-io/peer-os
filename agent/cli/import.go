@@ -30,12 +30,12 @@ func templId(templ, arch, version, token string) string {
 	// tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
 	// client := &http.Client{Transport: tr}
 	client := &http.Client{}
-	url := config.Management.Kurjun + "/get?name=" + templ + "&type=id&sptoken=" + token
+	url := config.Management.Kurjun + "/public/get?name=" + templ + "&type=id&sptoken=" + token
 	if len(version) != 0 {
-		url = config.Management.Kurjun + "/get?name=" + templ + "&version=" + version + "&type=id&sptoken=" + token
+		url = config.Management.Kurjun + "/public/get?name=" + templ + "&version=" + version + "&type=id&sptoken=" + token
 	}
 	response, err := client.Get(url)
-	log.Debug(config.Management.Kurjun + "/get?name=" + templ + "&type=id&sptoken=" + token)
+	log.Debug(config.Management.Kurjun + "/public/get?name=" + templ + "&type=id&sptoken=" + token)
 	if log.Check(log.WarnLevel, "Getting kurjun response", err) || response.StatusCode != 200 {
 		return ""
 	}
@@ -88,8 +88,8 @@ func download(file, id, token string) string {
 	// tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
 	// client := &http.Client{Transport: tr}
 	client := &http.Client{}
-	response, err := client.Get(config.Management.Kurjun + "/get?id=" + id + "&sptoken=" + token)
-	log.Check(log.FatalLevel, "Getting "+file, err)
+	response, err := client.Get(config.Management.Kurjun + "/public/get?id=" + id + "&sptoken=" + token)
+	log.Check(log.FatalLevel, "Getting "+config.Management.Kurjun+"/public/get?id="+id+"&sptoken="+token, err)
 	defer response.Body.Close()
 	_, err = io.Copy(out, response.Body)
 	log.Check(log.FatalLevel, "Writing file "+file, err)

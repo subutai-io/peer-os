@@ -82,8 +82,8 @@ const defaultConfig = `
 	restToken = /rest/v1/identity/gettoken
 	restPublicKey = /rest/v1/registration/public-key
 	restVerify = /rest/v1/registration/verify/container-token
-	kurjun = http://10.10.10.1:8551/rest/kurjun/templates
-        cdn = cdn.helper.subutai.io
+	kurjun = http://repo.critical-factor.com:8081/rest/kurjun/templates
+    cdn = cdn.helper.subutai.io
 
 	[broker]
 	port = 8883

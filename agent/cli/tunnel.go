@@ -26,7 +26,7 @@ func Tunnel(dst, timeout, dstport string, global bool) {
 		cdn, err := net.LookupIP(config.Management.Cdn)
 		tunsrv = cdn[0].String()
 		log.Check(log.ErrorLevel, "Resolving nearest tunnel node address", err)
-		args = []string{"-i", config.Agent.AppPrefix + "etc/ssh.pem", "-N", "-f", "-R", "0:" + dst + ":" + dstport, "-o", "StrictHostKeyChecking=no", "tunnel@" + tunsrv, "sleep", timeout}
+		args = []string{"-i", config.Agent.AppPrefix + "etc/ssh.pem", "-N", "-R", "0:" + dst + ":" + dstport, "-o", "StrictHostKeyChecking=no", "tunnel@" + tunsrv, "sleep", timeout}
 	} else {
 		wan, err := net.InterfaceByName("wan")
 		log.Check(log.ErrorLevel, "Getting WAN interface info", err)
@@ -38,7 +38,7 @@ func Tunnel(dst, timeout, dstport string, global bool) {
 				tunsrv = ip[0]
 			}
 		}
-		args = []string{"-N", "-f", "-R", "0:" + dst + ":" + dstport, "-o", "StrictHostKeyChecking=no", "ubuntu@" + tunsrv, "sleep", timeout}
+		args = []string{"-N", "-R", "0:" + dst + ":" + dstport, "-o", "StrictHostKeyChecking=no", "ubuntu@" + tunsrv, "sleep", timeout}
 	}
 
 	cmd := exec.Command("ssh", args...)
