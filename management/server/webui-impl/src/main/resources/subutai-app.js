@@ -273,58 +273,6 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
                 }]
             }
         })
-        .state('blueprints', {
-            url: '/blueprints',
-            templateUrl: 'subutai-app/blueprints/partials/view.html',
-            data: {
-                bodyClass: '',
-                layout: 'default'
-            },
-            resolve: {
-                loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
-                    return $ocLazyLoad.load([
-                        {
-                            name: 'subutai.blueprints',
-                            files: [
-                                'subutai-app/blueprints/blueprints.js',
-                                'subutai-app/blueprints/controller.js',
-                                'subutai-app/environment/service.js'
-                            ]
-                        }
-                    ]);
-                }]
-            }
-        })
-        .state('blueprintsActions', {
-            url: '/blueprints/{blueprintId}/{action}/',
-            templateUrl: 'subutai-app/blueprintsBuild/partials/view.html',
-            data: {
-                bodyClass: '',
-                layout: 'default'
-            },
-            resolve: {
-                loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
-                    return $ocLazyLoad.load([
-                        {
-                            name: 'ya.nouislider',
-                            files: [
-                                'scripts/libs/wNumb.js',
-                                'scripts/libs/nouislider.min.js',
-                                'assets/js/plugins/nouislider.min.js'
-                            ]
-                        },
-                        {
-                            name: 'subutai.blueprints-build',
-                            files: [
-                                'subutai-app/blueprintsBuild/blueprintsBuild.js',
-                                'subutai-app/blueprintsBuild/controller.js',
-                                'subutai-app/environment/service.js'
-                            ]
-                        }
-                    ]);
-                }]
-            }
-        })
         .state('environments', {
             url: '/environments/{activeTab}',
             templateUrl: 'subutai-app/environment/partials/view.html',
@@ -728,7 +676,9 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
                                 'subutai-app/bazaar/bazaar.js',
                                 'subutai-app/bazaar/controller.js',
                                 'subutai-app/bazaar/service.js',
-                                'subutai-app/identity/service.js'
+                                'subutai-app/identity/service.js',
+                                'subutai-app/bazaar/partials/css/demo.css',
+                                'subutai-app/bazaar/partials/css/component.css'
                             ]
                         }
                     ]);

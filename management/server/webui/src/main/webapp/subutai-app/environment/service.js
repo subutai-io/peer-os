@@ -18,8 +18,6 @@ function environmentService($http) {
 	var CONTAINER_TYPES_URL = CONTAINERS_URL + 'types/';
 	var DOMAINS_URL = ENVIRONMENTS_URL + 'domains/';
 
-	var BLUEPRINT_URL = ENVIRONMENTS_URL + 'blueprints/';
-
 	var STRATEGIES_URL = ENVIRONMENTS_URL + 'strategies/';
 
 	var TEMPLATES_URL = ENVIRONMENTS_URL + 'templates/';
@@ -30,11 +28,6 @@ function environmentService($http) {
 	var environmentService = {
 		getTemplates: getTemplates,
 
-
-		getBlueprints: getBlueprints,
-		getBlueprintById: getBlueprintById,
-		saveBlueprint : saveBlueprint,
-		deleteBlueprint : deleteBlueprint,
 		getStrategies : getStrategies,
 
 
@@ -92,27 +85,6 @@ function environmentService($http) {
 
 	function getTemplates() {
 		return $http.get(TEMPLATES_URL, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
-	}
-
-	function getBlueprints() {
-		return $http.get(BLUEPRINT_URL, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
-	}
-
-	function getBlueprintById(blueprintId) {
-		return $http.get(BLUEPRINT_URL + blueprintId, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
-	}
-
-	function saveBlueprint(blueprint_json) {
-		var data = 'blueprint_json=' + blueprint_json;
-		return $http.post(
-			BLUEPRINT_URL,
-			data,
-			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
-		);
-	}
-
-	function deleteBlueprint(blueprintId) {
-		return $http.delete(BLUEPRINT_URL + blueprintId);
 	}
 
 
