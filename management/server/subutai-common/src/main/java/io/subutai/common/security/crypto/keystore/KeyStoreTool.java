@@ -1,7 +1,6 @@
 package io.subutai.common.security.crypto.keystore;
 
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -25,14 +24,16 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 
-import io.subutai.common.security.utils.io.HexUtil;
-import io.subutai.common.security.utils.io.SafeCloseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.subutai.common.security.crypto.certificate.CertificateTool;
+import io.subutai.common.security.utils.io.HexUtil;
+import io.subutai.common.security.utils.io.SafeCloseUtil;
+
+
 /**
  * Main Class for keystore management. Manages Keystores and Truststores
- *
  */
 public class KeyStoreTool
 {
@@ -40,10 +41,11 @@ public class KeyStoreTool
     private static final Logger LOGGER = LoggerFactory.getLogger( KeyStoreTool.class );
     private FileInputStream finStream = null;
     private FileOutputStream foutStream = null;
+    private CertificateTool certificateTool = new CertificateTool();
+
 
     /**
      * KeyStoreManager constructor
-     *
      */
     public KeyStoreTool()
     {
@@ -51,9 +53,9 @@ public class KeyStoreTool
     }
 
 
-
-    /**************************************************************************************
-     * Load keystore and create KeyStore object
+    /**
+     * *********************************************************************************** Load keystore and create
+     * KeyStore object
      *
      * @param keyStoreData KeyStoreData
      *
@@ -82,7 +84,7 @@ public class KeyStoreTool
                 else
                 {
                     File keyStoresFolder = new File( file.getParent() );
-                    if(keyStoresFolder.mkdirs())
+                    if ( keyStoresFolder.mkdirs() )
                     {
                         file.createNewFile();
                     }
@@ -124,13 +126,11 @@ public class KeyStoreTool
     }
 
 
-    /**************************************************************************************
-     * Save changes in the keystore
+    /**
+     * *********************************************************************************** Save changes in the keystore
      *
      * @param keyStore KeyStore
      * @param keyStoreData, KeyStoreData
-     *
-     *
      */
     public void save( KeyStore keyStore, KeyStoreData keyStoreData )
     {
@@ -158,8 +158,8 @@ public class KeyStoreTool
     }
 
 
-    /**************************************************************************************
-     * Get Keypair object
+    /**
+     * *********************************************************************************** Get Keypair object
      *
      * @param keyStore KeyStore
      * @param keyStoreData KeyStoreData
@@ -190,14 +190,14 @@ public class KeyStoreTool
     }
 
 
-    /**************************************************************************************
-     * Save x509 Certificate in Keystore
+    /**
+     * *********************************************************************************** Save x509 Certificate in
+     * Keystore
      *
      * @param keyStore KeyStore
      * @param keyStoreData KeyStoreData
      * @param x509Cert X509Certificate
      * @param keyPair KeyPair
-     *
      */
     public void saveX509Certificate( KeyStore keyStore, KeyStoreData keyStoreData, X509Certificate x509Cert,
                                      KeyPair keyPair )
@@ -216,8 +216,8 @@ public class KeyStoreTool
     }
 
 
-    /**************************************************************************************
-     *
+    /**
+     * ***********************************************************************************
      *
      * @param keyStore KeyStore
      *
@@ -249,8 +249,8 @@ public class KeyStoreTool
     }
 
 
-    /**************************************************************************************
-     * Delete entry in the Keystore
+    /**
+     * *********************************************************************************** Delete entry in the Keystore
      *
      * @param keyStore KeyStore
      * @param keyStoreData KeyStoreData
@@ -274,12 +274,12 @@ public class KeyStoreTool
     }
 
 
-    /**************************************************************************************
-     * import Hexadecimal format certificate into Keystore
+    /**
+     * *********************************************************************************** import Hexadecimal format
+     * certificate into Keystore
      *
      * @param keyStore KeyStore
      * @param keyStoreData KeyStoreData
-     *
      */
     public void importCertificate( KeyStore keyStore, KeyStoreData keyStoreData )
     {
@@ -316,12 +316,12 @@ public class KeyStoreTool
     }
 
 
-    /**************************************************************************************
-     * Export Certificate as a .cer file.
+    /**
+     * *********************************************************************************** Export Certificate as a .cer
+     * file.
      *
      * @param keyStore KeyStore
      * @param keyStoreData KeyStoreData
-     *
      */
     @SuppressWarnings( "restriction" )
     public void exportCertificate( KeyStore keyStore, KeyStoreData keyStoreData )
@@ -369,8 +369,8 @@ public class KeyStoreTool
     }
 
 
-    /**************************************************************************************
-     * Export Certificate
+    /**
+     * *********************************************************************************** Export Certificate
      *
      * @param keyStore KeyStore ,
      * @param keyStoreData KeyStoreData
@@ -398,12 +398,12 @@ public class KeyStoreTool
     }
 
 
-    /**************************************************************************************
-     * Import Certificate(HEX) into Keystore
+    /**
+     * *********************************************************************************** Import Certificate(HEX) into
+     * Keystore
      *
      * @param keyStore KeyStore
      * @param keyStoreData KeyStoreData
-     *
      */
     public void importCertificateHEXString( KeyStore keyStore, KeyStoreData keyStoreData )
     {
@@ -411,12 +411,13 @@ public class KeyStoreTool
 
         try
         {
-            byte[] buffer = HexUtil.hexStringToByteArray( keyStoreData.getHEXCert() );
-            inputStream = new ByteArrayInputStream( buffer );
-
-            //****************************************************************
-            CertificateFactory cf = CertificateFactory.getInstance( "X.509" );
-            X509Certificate cert = ( X509Certificate ) cf.generateCertificate( inputStream );
+            X509Certificate cert = certificateTool.convertX509PemToCert( keyStoreData.getHEXCert() );
+            //            byte[] buffer = HexUtil.hexStringToByteArray(  );
+            //            inputStream = new ByteArrayInputStream( buffer );
+            //
+            //            //****************************************************************
+            //            CertificateFactory cf = CertificateFactory.getInstance( "X.509" );
+            //            X509Certificate cert = ( X509Certificate ) cf.generateCertificate( inputStream );
 
             keyStore.setCertificateEntry( keyStoreData.getAlias(), cert );
 
@@ -434,8 +435,9 @@ public class KeyStoreTool
     }
 
 
-    /**************************************************************************************
-     * Check if keystore entry type is a keypair entry
+    /**
+     * *********************************************************************************** Check if keystore entry type
+     * is a keypair entry
      *
      * @param keyStore KeyStore
      * @param alias String
@@ -449,10 +451,9 @@ public class KeyStoreTool
     }
 
 
-    /**************************************************************************************
-     * Check if keystore entry type is a key entry
-     *
-     * @param
+    /**
+     * *********************************************************************************** Check if keystore entry type
+     * is a key entry
      *
      * @return boolean
      */
@@ -463,8 +464,9 @@ public class KeyStoreTool
     }
 
 
-    /**************************************************************************************
-     * Check if keystore entry type is a Trusted Certificate
+    /**
+     * *********************************************************************************** Check if keystore entry type
+     * is a Trusted Certificate
      *
      * @param alias Sring
      * @param keyStoreParam keyStoreParam
@@ -477,8 +479,9 @@ public class KeyStoreTool
     }
 
 
-    /**************************************************************************************
-     * Check if Keystore contains any key data
+    /**
+     * *********************************************************************************** Check if Keystore contains
+     * any key data
      *
      * @param keyStore KeyStore
      *
