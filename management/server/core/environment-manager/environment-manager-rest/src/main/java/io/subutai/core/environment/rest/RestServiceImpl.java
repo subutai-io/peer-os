@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
+import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.Topology;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
@@ -50,7 +51,7 @@ public class RestServiceImpl implements RestService
 
     @Override
     public Response growEnvironment( final String environmentId, final Topology topology )
-            throws EnvironmentModificationException
+            throws EnvironmentModificationException, EnvironmentNotFoundException
     {
         try
         {
