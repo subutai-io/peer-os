@@ -28,7 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.subutai.common.security.crypto.certificate.CertificateTool;
-import io.subutai.common.security.utils.io.HexUtil;
 import io.subutai.common.security.utils.io.SafeCloseUtil;
 
 
@@ -377,24 +376,17 @@ public class KeyStoreTool
      *
      * @return String
      */
-    public String exportCertificateHEXString( KeyStore keyStore, KeyStoreData keyStoreData )
+    public String exportCertificateInPem( KeyStore keyStore, KeyStoreData keyStoreData )
     {
-        String HEX = "";
-
         try
         {
             X509Certificate cert = ( X509Certificate ) keyStore.getCertificate( keyStoreData.getAlias() );
-            byte[] buf = cert.getEncoded();
-
-            HEX = HexUtil.byteArrayToHexString( buf );
-            //getHexString(  buf );
+            return certificateTool.convertX509CertToPem( cert );
         }
-        catch ( Exception ex )
+        catch ( KeyStoreException e )
         {
-            LOGGER.error( "Error KeyStoreManager#exportCertificateHEXString", ex );
+            throw new RuntimeException( "Error getting certificate", e );
         }
-
-        return HEX;
     }
 
 
@@ -405,28 +397,22 @@ public class KeyStoreTool
      * @param keyStore KeyStore
      * @param keyStoreData KeyStoreData
      */
-    public void importCertificateHEXString( KeyStore keyStore, KeyStoreData keyStoreData )
+    public void importCertificateInPem( KeyStore keyStore, KeyStoreData keyStoreData )
     {
         InputStream inputStream = null;
 
         try
         {
             X509Certificate cert = certificateTool.convertX509PemToCert( keyStoreData.getHEXCert() );
-            //            byte[] buffer = HexUtil.hexStringToByteArray(  );
-            //            inputStream = new ByteArrayInputStream( buffer );
-            //
-            //            //****************************************************************
-            //            CertificateFactory cf = CertificateFactory.getInstance( "X.509" );
-            //            X509Certificate cert = ( X509Certificate ) cf.generateCertificate( inputStream );
 
             keyStore.setCertificateEntry( keyStoreData.getAlias(), cert );
 
             //save Keystore file
             this.save( keyStore, keyStoreData );
         }
-        catch ( Exception ex )
+        catch ( Exception e )
         {
-            LOGGER.error( "Error KeyStoreManager#importCertificateHEXString", ex );
+            throw new RuntimeException( "Error importing certificate", e );
         }
         finally
         {
