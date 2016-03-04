@@ -24,7 +24,6 @@ import com.google.common.collect.Sets;
 
 import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.core.hubmanager.api.StateLinkProccessor;
-import io.subutai.core.hubmanager.api.model.Config;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.hubmanager.impl.IntegrationImpl;
 import io.subutai.hub.share.dto.HeartbeatResponseDto;
@@ -54,15 +53,11 @@ public class HeartbeatProcessor implements Runnable
     {
         try
         {
-            if ( manager.getConfigDataService().getHubConfig( configManager.getPeerId() ) != null )
-            {
-                Config config = manager.getConfigDataService().getHubConfig( configManager.getPeerId() );
-                LOG.debug( "Heartbeat sending started..." );
-                configManager.setHubIp( config.getHubIp() );
-                configManager.setSuperNodeIp( config.getSuperNodeIp() );
-                sendHeartbeat();
-                LOG.debug( "Heartbeat sending finished successfully." );
-            }
+            LOG.debug( "Heartbeat sending started..." );
+
+            sendHeartbeat();
+
+            LOG.debug( "Heartbeat sending finished successfully." );
         }
         catch ( Exception e )
         {
@@ -74,62 +69,58 @@ public class HeartbeatProcessor implements Runnable
 
     public void sendHeartbeat() throws HubPluginException
     {
-        final Set<String> result = new HashSet<>();
-        try
+        if ( manager.getRegistrationState() )
         {
-            String path = String.format( "/rest/v1.1/peers/%s/heartbeat", configManager.getPeerId() );
 
-            WebClient client = configManager.getTrustedWebClientWithAuth( path );
-
-            Response r = client.put( null );
-
-
-            if ( r.getStatus() != HttpStatus.SC_OK )
+            final Set<String> result = new HashSet<>();
+            try
             {
-                throw new HubPluginException( "Could not send heartbeat: " + r.readEntity( String.class ) );
-            }
+                String path = String.format( "/rest/v1.1/peers/%s/heartbeat", configManager.getPeerId() );
 
-            byte[] data = readContent( r );
+                WebClient client = configManager.getTrustedWebClientWithAuth( path, configManager.getHubIp() );
 
-            if ( data != null )
-            {
-                HeartbeatResponseDto response =
-                        JsonUtil.fromCbor( configManager.getMessenger().consume( data ), HeartbeatResponseDto.class );
+                Response r = client.put( null );
 
-                LOG.debug( "State links from HUB: "  + response.getStateLinks().toString() );
 
-                result.addAll( new HashSet<String>( response.getStateLinks() ) );
-
-//                ExecutorService executor = Executors.newCachedThreadPool();
-
-                for ( final StateLinkProccessor proccessor : proccessors )
+                if ( r.getStatus() != HttpStatus.SC_OK )
                 {
-//                    executor.submit( new Runnable()
-//                    {
-//                        @Override
-//                        public void run()
-//                        {
-                            try
-                            {
-                                proccessor.proccessStateLinks( result );
-                            }
-                            catch ( HubPluginException e )
-                            {
-                                LOG.error( e.getMessage() );
-                            }
-//                        }
-//                    } );
+                    throw new HubPluginException( "Could not send heartbeat: " + r.readEntity( String.class ) );
+                }
+
+                byte[] data = readContent( r );
+
+                if ( data != null )
+                {
+                    HeartbeatResponseDto response = JsonUtil.fromCbor( configManager.getMessenger().consume( data ),
+                            HeartbeatResponseDto.class );
+
+
+                    LOG.debug( "State links from HUB: " + response.getStateLinks().toString() );
+
+                    result.addAll( new HashSet<String>( response.getStateLinks() ) );
+
+                    for ( final StateLinkProccessor proccessor : proccessors )
+                    {
+                        try
+                        {
+                            proccessor.proccessStateLinks( result );
+                        }
+                        catch ( HubPluginException e )
+                        {
+                            LOG.error( e.getMessage() );
+                        }
+                    }
+                }
+                else
+                {
+                    LOG.debug( "Data is null." );
                 }
             }
-            else
+            catch ( PGPException | IOException | KeyStoreException | UnrecoverableKeyException |
+                    NoSuchAlgorithmException e )
             {
-                LOG.debug( "Data is null." );
+                LOG.error( "Could not send heartbeat.", e );
             }
-        }
-        catch ( PGPException | IOException | KeyStoreException | UnrecoverableKeyException | NoSuchAlgorithmException
-                e )
-        {
-            LOG.error( "Could not send heartbeat.", e );
         }
     }
 

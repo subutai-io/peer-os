@@ -1,7 +1,6 @@
 package io.subutai.core.systemmanager.rest;
 
 
-import javax.ws.rs.FormParam;
 import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
@@ -58,14 +57,6 @@ public class RestServiceImpl implements RestService
     public Response setPeerSettings()
     {
         systemManager.setPeerSettings();
-        return Response.status( Response.Status.OK ).build();
-    }
-
-
-    @Override
-    public Response setRegistrationStatus( @FormParam( "status" ) final String status )
-    {
-        io.subutai.common.settings.SystemSettings.setRegisterToHubState( Boolean.valueOf( status ) );
         return Response.status( Response.Status.OK ).build();
     }
 
@@ -160,8 +151,7 @@ public class RestServiceImpl implements RestService
 
         try
         {
-            systemManager
-                    .setKurjunSettingsUrls( globalKurjunUrls.split( "," ) );
+            systemManager.setKurjunSettingsUrls( globalKurjunUrls.split( "," ) );
         }
         catch ( ConfigurationException e )
         {

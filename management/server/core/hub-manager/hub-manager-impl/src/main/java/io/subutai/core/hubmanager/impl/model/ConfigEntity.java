@@ -26,8 +26,8 @@ public class ConfigEntity implements Config
     @Column( name = "server_ip" )
     private String serverIp;
 
-    @Column( name = "supernode_ip" )
-    private String superNodeIp;
+//    @Column( name = "supernode_ip" )
+//    private String superNodeIp;
 
 
     public String getPeerId()
@@ -54,14 +54,14 @@ public class ConfigEntity implements Config
     }
 
 
-    public String getSuperNodeIp()
-    {
-        return superNodeIp;
-    }
-
-
-    public void setSuperNodeIp( final String superNodeIp )
-    {
-        this.superNodeIp = superNodeIp;
-    }
+//    public String getSuperNodeIp()
+//    {
+//        return superNodeIp;
+//    }
+//
+//
+//    public void setSuperNodeIp( final String superNodeIp )
+//    {
+//        this.superNodeIp = superNodeIp;
+//    }
 }

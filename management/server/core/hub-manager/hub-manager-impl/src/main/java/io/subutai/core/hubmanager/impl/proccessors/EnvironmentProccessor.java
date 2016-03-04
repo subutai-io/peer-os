@@ -98,7 +98,7 @@ public class EnvironmentProccessor implements StateLinkProccessor
     {
         try
         {
-            WebClient client = configManager.getTrustedWebClientWithAuth( link );
+            WebClient client = configManager.getTrustedWebClientWithAuth( link, configManager.getHubIp() );
 
             LOG.debug( "Getting EnvironmentData from Hub..." );
 
@@ -461,7 +461,7 @@ public class EnvironmentProccessor implements StateLinkProccessor
         String path = String.format( "/rest/v1/environments/%s", envId );
         try
         {
-            WebClient client = configManager.getTrustedWebClientWithAuth( path );
+            WebClient client = configManager.getTrustedWebClientWithAuth( path, configManager.getHubIp() );
 
             byte[] plainData = JsonUtil.toCbor( environmentDto );
             byte[] encryptedData = configManager.getMessenger().produce( plainData );

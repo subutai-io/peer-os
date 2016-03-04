@@ -11,7 +11,6 @@ public class PeerSettingsPojo implements PeerSettings
 {
     private String peerOwnerId;
     private String userPeerOwnerName;
-    private boolean isRegisteredToHub;
 
 
     public String getPeerOwnerId()
@@ -35,17 +34,5 @@ public class PeerSettingsPojo implements PeerSettings
     public void setUserPeerOwnerName( final String userPeerOwnerName )
     {
         this.userPeerOwnerName = userPeerOwnerName;
-    }
-
-
-    public boolean isRegisteredToHub()
-    {
-        return isRegisteredToHub;
-    }
-
-
-    public void setRegisteredToHub( final boolean isRegisteredToHub )
-    {
-        this.isRegisteredToHub = isRegisteredToHub;
     }
 }

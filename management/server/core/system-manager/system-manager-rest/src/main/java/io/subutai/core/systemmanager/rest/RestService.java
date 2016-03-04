@@ -33,12 +33,6 @@ public interface RestService
     public Response setPeerSettings();
 
 
-    @POST
-    @Path( "update_registration_status" )
-    @Produces( { MediaType.TEXT_PLAIN } )
-    public Response setRegistrationStatus( @FormParam( "status" ) String status );
-
-
     @GET
     @Path( "kurjun_settings" )
     @Produces( { MediaType.APPLICATION_JSON } )
