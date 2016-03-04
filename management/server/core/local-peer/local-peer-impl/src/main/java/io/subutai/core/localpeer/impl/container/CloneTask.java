@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 
+import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.task.CloneRequest;
 import io.subutai.common.task.CloneResponse;
@@ -49,7 +50,7 @@ public class CloneTask extends AbstractTask<CloneRequest, CloneResponse>
 
     public CommandBatch getCommandBatch() throws Exception
     {
-        CommandBatch result = new CommandBatch( CommandBatch.Type.STANDARD);
+        CommandBatch result = new CommandBatch( CommandBatch.Type.STANDARD );
 
         Command cloneAction = new Command( "clone",
                 Lists.newArrayList( request.getTemplateName(), request.getHostname(), "-i",
@@ -61,6 +62,7 @@ public class CloneTask extends AbstractTask<CloneRequest, CloneResponse>
 
         return result;
     }
+
 
     @Override
     public int getTimeout()
@@ -85,6 +87,7 @@ public class CloneTask extends AbstractTask<CloneRequest, CloneResponse>
 
     @Override
     public CloneResponse build( final CloneRequest request, final CommandResult commandResult, final long elapsedTime )
+            throws Exception
     {
         String agentId = null;
 
@@ -113,9 +116,9 @@ public class CloneTask extends AbstractTask<CloneRequest, CloneResponse>
         if ( agentId == null )
         {
             LOG.error( "Agent ID not found in output of subutai clone command. %s ", getStdErr() );
+            throw new CommandException( "Agent ID not found in output of subutai clone command." );
         }
         return new CloneResponse( request.getResourceHostId(), request.getHostname(), request.getContainerName(),
-                request.getTemplateName(), request.getTemplateArch(), request.getIp(), agentId, elapsedTime,
-                agentId != null ? getStdOut() : getStdErr() );
+                request.getTemplateName(), request.getTemplateArch(), request.getIp(), agentId, elapsedTime );
     }
 }

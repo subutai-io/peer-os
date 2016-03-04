@@ -11,4 +11,20 @@
     </cxf:features>
   </cxf:bus>
 
+  <jaxrs:server address="/v1/environments" id="identityRestService">
+    <jaxrs:serviceBeans>
+      <ref component-id="environmentManagerService" />
+    </jaxrs:serviceBeans>
+    <jaxrs:providers>
+      <bean class="org.codehaus.jackson.jaxrs.JacksonJsonProvider" />
+    </jaxrs:providers>
+  </jaxrs:server>
+
+  <bean id="environmentManagerService" class="io.subutai.core.environment.rest.RestServiceImpl">
+    <argument ref="environmentManager" />
+  </bean>
+
+  <reference id="environmentManager" availability="mandatory"
+             interface="io.subutai.core.environment.api.EnvironmentManager" />
+
 </blueprint>

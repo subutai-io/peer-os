@@ -190,5 +190,9 @@ public interface LocalPeer extends Peer
 
     String getCurrentControlNetwork() throws PeerException;
 
+    Host findHostByName( String hostname ) throws HostNotFoundException;
+
     List<Task> getTaskList();
+
+
 }

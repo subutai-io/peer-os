@@ -1,23 +1,21 @@
 package io.subutai.common.task;
 
 
-public class QuotaResponse implements TaskResponse<QuotaRequest>
+public class QuotaResponse implements TaskResponse
 {
     private String resourceHostId;
     private String hostname;
     private boolean succeeded;
     private long elapsedTime;
-    private String description;
 
 
     public QuotaResponse( final String resourceHostId, final String hostname, final boolean succeeded,
-                          final long elapsedTime, final String description )
+                          final long elapsedTime )
     {
         this.resourceHostId = resourceHostId;
         this.hostname = hostname;
         this.succeeded = succeeded;
         this.elapsedTime = elapsedTime;
-        this.description = description;
     }
 
 
@@ -44,21 +42,6 @@ public class QuotaResponse implements TaskResponse<QuotaRequest>
     public long getElapsedTime()
     {
         return elapsedTime;
-    }
-
-
-    @Override
-    public String getLog()
-    {
-        return succeeded ? String.format( "Setting quota %s succeeded.", hostname ) :
-               String.format( "Setting quota %s failed.", hostname );
-    }
-
-
-    @Override
-    public String getDescription()
-    {
-        return description;
     }
 
 
