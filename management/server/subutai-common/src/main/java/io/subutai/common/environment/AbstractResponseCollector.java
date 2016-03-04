@@ -8,26 +8,24 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.commons.lang.StringUtils;
-
 import io.subutai.common.task.ResponseCollector;
 import io.subutai.common.task.Task;
 import io.subutai.common.task.TaskRequest;
 import io.subutai.common.task.TaskResponse;
 import io.subutai.common.tracker.OperationMessage;
-import io.subutai.common.util.StringUtil;
 
 
 /**
  * Abstract group response
  */
-public class AbstractResponseCollector<R extends TaskRequest, T extends TaskResponse> implements ResponseCollector
+public abstract class AbstractResponseCollector<R extends TaskRequest, T extends TaskResponse>
+        implements ResponseCollector<R, T>
 {
     private final String peerId;
     private List<T> responses = new ArrayList<>();
     transient private List<Future<Task>> tasks = new ArrayList<>();
-    private AtomicInteger counter = new AtomicInteger( 0 );
-    private boolean succeeded = true;
+    protected AtomicInteger counter = new AtomicInteger( 0 );
+    protected boolean succeeded = true;
     private List<OperationMessage> messages = new CopyOnWriteArrayList<>();
 
 
@@ -39,30 +37,35 @@ public class AbstractResponseCollector<R extends TaskRequest, T extends TaskResp
 
     @Override
     @SuppressWarnings( "unchecked" )
-    public void onResponse( final TaskResponse response )
+    abstract public void onSuccess( R request, final T response );
+
+
+    @Override
+    abstract public void onFailure( R request, final List<Throwable> exceptions );
+
+
+    public void addResponse( T response, final String message )
     {
-        counter.incrementAndGet();
         if ( response == null )
         {
-            addMessage( OperationMessage.Type.FAILED, "Task response empty. Something goes wrong." );
-            succeeded = false;
-            return;
+            throw new IllegalArgumentException( "Task response could not be null." );
         }
-        responses.add( ( T ) response );
-        succeeded = succeeded && response.hasSucceeded();
-        final String message = String.format( "%s [%s]", response.getLog(),
-                StringUtil.convertMillisToHHMMSS( response.getElapsedTime() ) );
-        final String description = StringUtils.isNotBlank( response.getDescription() ) ?
-                                   String.format( "%s:%s [%s]", getPeerId(), response.getResourceHostId(),
-                                           response.getDescription() ) : "";
-        if ( response.hasSucceeded() )
+        this.responses.add( response );
+        counter.incrementAndGet();
+        addMessage( OperationMessage.Type.SUCCEEDED, message );
+    }
+
+
+    public void addFailure( final String message, final List<Throwable> exceptions )
+    {
+        counter.incrementAndGet();
+        StringBuilder sb = new StringBuilder();
+        for ( Throwable throwable : exceptions )
         {
-            addMessage( OperationMessage.Type.SUCCEEDED, message, description );
+            sb.append( throwable.getMessage() );
         }
-        else
-        {
-            addMessage( OperationMessage.Type.FAILED, message, description );
-        }
+        addMessage( OperationMessage.Type.FAILED, message, sb.toString() );
+        succeeded = false;
     }
 
 

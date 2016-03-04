@@ -96,22 +96,21 @@ public abstract class AbstractTask<R extends TaskRequest, T extends TaskResponse
 
     protected void success() throws Exception
     {
-        if ( response != null && response.hasSucceeded() )
+
+        if ( onSuccessHandler != null )
         {
-            if ( onSuccessHandler != null )
+            try
             {
-                try
-                {
-                    onSuccessHandler.handle( this, request, response );
-                }
-                catch ( Exception e )
-                {
-                    LOG.warn( "Exception on executing success handler.", e );
-                    exceptions.add( e );
-                    throw e;
-                }
+                onSuccessHandler.handle( this, request, response );
+            }
+            catch ( Exception e )
+            {
+                LOG.warn( "Exception on executing success handler.", e );
+                exceptions.add( e );
+                throw e;
             }
         }
+
         this.state = State.SUCCESS;
     }
 

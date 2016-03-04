@@ -8,7 +8,7 @@ SettingsAdvancedCtrl.$inject = ["$scope", "SettingsAdvancedSrv", "SweetAlert"];
 function SettingsAdvancedCtrl($scope, SettingsAdvancedSrv, SweetAlert) {
     var vm = this;
     vm.config = {};
-    vm.activeTab = "karaflogs";
+    vm.activeTab = "karafconsole";
     vm.getConfig = getConfig;
     vm.updateConfig = updateConfig;
     vm.saveLogs = saveLogs;

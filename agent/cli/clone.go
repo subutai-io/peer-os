@@ -65,11 +65,11 @@ func setDns(name string) {
 	}
 
 	resolv := []byte("domain\tintra.lan\nsearch\tintra.lan\nnameserver\t" + dns)
-	log.Check(log.ErrorLevel, "Writing resolv.conf",
+	log.Check(log.DebugLevel, "Writing resolv.conf",
 		ioutil.WriteFile(config.Agent.LxcPrefix+name+"/rootfs/etc/resolvconf/resolv.conf.d/original", resolv, 0644))
 
 	resolv2 := []byte("domain\tintra.lan\nsearch\tintra.lan\nnameserver\t" + dns)
-	log.Check(log.ErrorLevel, "Writing resolv.conf",
+	log.Check(log.DebugLevel, "Writing resolv.conf",
 		ioutil.WriteFile(config.Agent.LxcPrefix+name+"/rootfs/etc/resolv.conf", resolv2, 0644))
 }
 

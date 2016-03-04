@@ -95,7 +95,7 @@ func Run(req RequestOptions, out_c chan<- ResponseOptions) {
 			if !isPrefix {
 				response.StdOut = response.StdOut + "\n"
 			}
-			if len(response.StdOut) > 50000 || now()-start > 10 {
+			if len(response.StdOut) > 50000 {
 				out_c <- response
 				start = now()
 				response.StdErr, response.StdOut = "", ""
@@ -113,7 +113,7 @@ func Run(req RequestOptions, out_c chan<- ResponseOptions) {
 		scanErr := bufio.NewScanner(rep)
 		for scanErr.Scan() {
 			response.StdErr = response.StdErr + scanErr.Text() + "\n"
-			if len(response.StdErr) > 50000 || now()-start > 10 {
+			if len(response.StdErr) > 50000 {
 				out_c <- response
 				start = now()
 				response.StdErr, response.StdOut = "", ""
@@ -124,6 +124,18 @@ func Run(req RequestOptions, out_c chan<- ResponseOptions) {
 			}
 		}
 		flagErr = false
+	}()
+
+	go func() {
+		for end-now() > 0 && (flagOut || flagErr) {
+			if now()-start > 10 {
+				out_c <- response
+				start = now()
+				response.StdErr, response.StdOut = "", ""
+				response.ResponseNumber++
+			}
+			time.Sleep(time.Second)
+		}
 	}()
 
 	done := make(chan error)
