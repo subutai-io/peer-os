@@ -40,7 +40,7 @@ function CurrentUserCtrl($location, $rootScope, $http, SweetAlert) {
 
 
     function checkIfRegistered() {
-        $http.get(SERVER_URL + "rest/v1/system/peer_settings", {
+        $http.get(SERVER_URL + "rest/v1/hub/registration_state", {
             withCredentials: true,
             headers: {'Content-Type': 'application/json'}
         }).success(function (data) {
@@ -764,7 +764,7 @@ function startup($rootScope, $state, $location, $http) {
     $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
         LOADING_SCREEN('none');
 
-        $http.get(SERVER_URL + 'rest/v1/system/peer_settings', {withCredentials: true})
+        $http.get(SERVER_URL + 'rest/v1/hub/registration_state', {withCredentials: true})
             .success(function (data) {
                 localStorage.setItem('hubRegistered', data.isRegisteredToHub);
             }).error(function (error) {

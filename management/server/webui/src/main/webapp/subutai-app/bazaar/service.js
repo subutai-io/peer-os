@@ -115,7 +115,7 @@ function BazaarSrv($http) {
 	}
 
 	function checkRegistration() {
-		return $http.get (SERVER_URL + "rest/v1/system/peer_settings", {withCredentials: true, headers: {'Content-Type': 'application/json'}});
+		return $http.get (SERVER_URL + "rest/v1/hub/registration_state", {withCredentials: true, headers: {'Content-Type': 'application/json'}});
 	}
 
 	function getRefOldPlugins() {
