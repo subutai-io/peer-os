@@ -161,10 +161,15 @@ public class CommandProcessor implements ByteMessageListener, RestProcessor
                 hostRequests = Sets.newLinkedHashSet();
                 requests.put( resourceHostInfo.getId(), hostRequests, Common.INACTIVE_COMMAND_DROP_TIMEOUT_SEC * 1000 );
             }
-            String encryptedRequest =
-                    getSecurityManager().signNEncryptRequestToHost( JsonUtil.toJson( request ), request.getId() );
+            String encryptedRequest = encrypt( JsonUtil.toJson( request ), request.getId() );
             hostRequests.add( encryptedRequest );
         }
+    }
+
+
+    protected String encrypt( String message, String hostId ) throws NamingException, PGPException
+    {
+        return getSecurityManager().signNEncryptRequestToHost( message, hostId );
     }
 
 

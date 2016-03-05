@@ -275,6 +275,15 @@ public class SubutaiSteps extends ScenarioSteps {
 
     //region ACTION: Wait
 
+    @Step
+    public void waitForIconTemplateMongo(){
+        environmentsPage.waitFor(environmentsPage.iconTemplateMongo);
+    }
+
+    @Step
+    public void waitForIconDeleteEnvironment(){
+        environmentsPage.waitFor(environmentsPage.iconDeleteEnvironment);
+    }
     //endregion
 
     //region VERIFICATION: AssertThat

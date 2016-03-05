@@ -19,7 +19,6 @@ import io.subutai.common.command.ResponseImpl;
 import io.subutai.common.command.ResponseWrapper;
 import io.subutai.common.host.HeartBeat;
 import io.subutai.common.host.HeartbeatListener;
-import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.executor.api.RestProcessor;
@@ -161,14 +160,6 @@ public class RestServiceImpl implements RestService
 
     protected String decrypt( String message ) throws PGPException
     {
-
-        //todo use this check SystemSettings.getEncryptionState() inside SecurityManager
-        if ( SystemSettings.getEncryptionState() )
-        {
-
-            message = securityManager.decryptNVerifyResponseFromHost( message );
-        }
-
-        return message;
+        return securityManager.decryptNVerifyResponseFromHost( message );
     }
 }
