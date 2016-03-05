@@ -11,13 +11,11 @@ public enum ContainerResourceType
     ROOTFS( "diskRootfs" );
 
     private String key;
-//    private MeasureUnit defaultMeasureUnit;
 
 
     ContainerResourceType( String key )
     {
         this.key = key;
-//        this.defaultMeasureUnit = defaultMeasureUnit;
     }
 
 
@@ -27,8 +25,38 @@ public enum ContainerResourceType
     }
 
 
-//    public MeasureUnit getDefaultMeasureUnit()
-    //    {
-    //        return defaultMeasureUnit;
-    //    }
+    public static ContainerResourceType parse( String key )
+    {
+        if ( key.equals( RAM.getKey() ) )
+        {
+            return RAM;
+        }
+
+        if ( key.equals( CPU.getKey() ) )
+        {
+            return CPU;
+        }
+
+        if ( key.equals( OPT.getKey() ) )
+        {
+            return OPT;
+        }
+
+        if ( key.equals( HOME.getKey() ) )
+        {
+            return HOME;
+        }
+
+        if ( key.equals( VAR.getKey() ) )
+        {
+            return VAR;
+        }
+
+        if ( key.equals( ROOTFS.getKey() ) )
+        {
+            return ROOTFS;
+        }
+
+        throw new IllegalArgumentException( "No such key for container resoutce type enum." );
+    }
 }
