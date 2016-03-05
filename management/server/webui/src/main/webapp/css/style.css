@@ -177,7 +177,7 @@ input[type=checkbox] {
     background-color: #fff;
 }
 .b-title {
-    font-size: 16px !important;
+    font-size: 14px !important;
     padding: 0 0 0 0;
     margin: 0 0 0 0;
     color: #04346E;
@@ -2105,8 +2105,8 @@ td.b-main-table__status-col {
 }
 .b-tabs-menu_header ul .b-tabs-menu__item {
     margin-bottom: -1px;
-    padding: 18px 35px;
-    font-size: 16px;
+    padding: 18px 15px;
+    font-size: 14px;
 }
 .b-tabs-menu__item:hover {
     background-color: #fbfbfb;

@@ -1,111 +1,155 @@
-<div class="b-workspace-content b-workspace-content_border" style = "height: 450px">
-	<div class="b-workspace-content__row">
-		<div class="b-main-table-border" style = "width: 550px">
-			<table class="b-main-table b-main-table_with-header" style = "width: 550px" align = "center">
-				<tr>
-					<th><div style = "display: inline-block; float: left; margin-top: 8px">Peer ID</div>&#160;&#160;<div style = "display: inline-block; float: left; margin-top: 9px" tooltips tooltip-template="<div style = 'width: 200px'><label class = 'b-form-label'>Unique identifier of the peer</label></div>"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" viewBox="0 0 14 14" style="enable-background:new 0 0 14 14; height: 15px; width: 15px" xml:space="preserve">
-<style type="text/css">
-	.st0{fill:none;stroke:#04346E;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
-</style>
-<g>
-	<circle class="st0" cx="7" cy="7" r="6.4"/>
-	<path class="st0" d="M7,8.7V8.3c0-0.6,0.3-1.2,0.8-1.5c0.6-0.3,1-1.1,0.9-1.8C8.6,4.2,8,3.7,7.3,3.5C6.2,3.3,5.3,4.2,5.3,5.3"/>
-	<circle class="st0" cx="7" cy="10.5" r="0.6"/>
-</g>
-</svg></div></th>
-					<td style = "padding-right: 18px"><input class="b-form-input b-form-input_full" type="text" ng-model="settingsPeerCtrl.policyConfig.peerId" required></td>
-				</tr>
-				<tr>
-					<th><div style = "display: inline-block; float: left; margin-top: 8px">Disk Usage Limit</div>&#160;&#160;<div style = "display: inline-block; float: left; margin-top: 9px" tooltips tooltip-template="<div style = 'width: 250px'><label class = 'b-form-label'>Limit of provided disk space</label></div>"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" viewBox="0 0 14 14" style="enable-background:new 0 0 14 14; height: 15px; width: 15px" xml:space="preserve">
-<style type="text/css">
-	.st0{fill:none;stroke:#04346E;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
-</style>
-<g>
-	<circle class="st0" cx="7" cy="7" r="6.4"/>
-	<path class="st0" d="M7,8.7V8.3c0-0.6,0.3-1.2,0.8-1.5c0.6-0.3,1-1.1,0.9-1.8C8.6,4.2,8,3.7,7.3,3.5C6.2,3.3,5.3,4.2,5.3,5.3"/>
-	<circle class="st0" cx="7" cy="10.5" r="0.6"/>
-</g>
-</svg></div></th>
-					<td style = "padding-right: 18px; width: 340px">
-						<div>
-							<input class="b-form-input b-form-input_full" type="text" ng-model="settingsPeerCtrl.policyConfig.diskUsageLimit" onkeypress = "return event.charCode >= 48 && event.charCode <= 57" style = "display: inline; width: 290px">
-							<label style = "font-style: italic; width: 40px; float: right; margin-top: 7px">in GB</label>
+<div class="b-workspace-content__row">
+	<div class="b-main-table-border" style = "width: 550px">
+		<table class="b-main-table b-main-table_with-header" style = "width: 550px" align = "center">
+			<tr>
+				<th>
+					<div style = "display: inline-block; float: left; margin-top: 8px">Peer ID</div>
+						&#160;&#160;
+						<div style = "display: inline-block; float: left; margin-top: 9px" 
+							tooltips tooltip-template="<div style = 'width: 200px'><label class = 'b-form-label'>Unique identifier of the peer</label></div>">
+							<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" viewBox="0 0 14 14" style="enable-background:new 0 0 14 14; height: 15px; width: 15px" xml:space="preserve">
+								<style type="text/css">
+									.st0{fill:none;stroke:#04346E;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+								</style>
+								<g>
+									<circle class="st0" cx="7" cy="7" r="6.4"/>
+									<path class="st0" d="M7,8.7V8.3c0-0.6,0.3-1.2,0.8-1.5c0.6-0.3,1-1.1,0.9-1.8C8.6,4.2,8,3.7,7.3,3.5C6.2,3.3,5.3,4.2,5.3,5.3"/>
+									<circle class="st0" cx="7" cy="10.5" r="0.6"/>
+								</g>
+							</svg>
 						</div>
-					</td>
-				</tr>
-				<tr>
-					<th><div style = "display: inline-block; float: left; margin-top: 8px">CPU Usage Limit</div>&#160;&#160;<div style = "display: inline-block; float: left; margin-top: 9px" tooltips tooltip-template="<div style = 'width: 250px'><label class = 'b-form-label'>Limit of provided CPU usage</label></div>"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" viewBox="0 0 14 14" style="enable-background:new 0 0 14 14; height: 15px; width: 15px" xml:space="preserve">
-<style type="text/css">
-	.st0{fill:none;stroke:#04346E;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
-</style>
-<g>
-	<circle class="st0" cx="7" cy="7" r="6.4"/>
-	<path class="st0" d="M7,8.7V8.3c0-0.6,0.3-1.2,0.8-1.5c0.6-0.3,1-1.1,0.9-1.8C8.6,4.2,8,3.7,7.3,3.5C6.2,3.3,5.3,4.2,5.3,5.3"/>
-	<circle class="st0" cx="7" cy="10.5" r="0.6"/>
-</g>
-</svg></div></th>
-					<td style = "padding-right: 18px; width: 340px">
-						<div>
-							<input class="b-form-input b-form-input_full" type="text" ng-model="settingsPeerCtrl.policyConfig.cpuUsageLimit" required style = "display: inline; width: 290px" onkeypress = "return event.charCode >= 48 && event.charCode <= 57">
-							<label style = "font-style: italic; width: 40px; float: right; margin-top: 7px">in %</label>
-						</div>
-					</td>
-				</tr>
-				<tr>
-					<th><div style = "display: inline-block; float: left; margin-top: 8px">Memory Usage Limit</div>&#160;&#160;<div style = "display: inline-block; float: left; margin-top: 9px" tooltips tooltip-template="<div style = 'width: 250px'><label class = 'b-form-label'>Limit of provided RAM</label></div>"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" viewBox="0 0 14 14" style="enable-background:new 0 0 14 14; height: 15px; width: 15px" xml:space="preserve">
-<style type="text/css">
-	.st0{fill:none;stroke:#04346E;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
-</style>
-<g>
-	<circle class="st0" cx="7" cy="7" r="6.4"/>
-	<path class="st0" d="M7,8.7V8.3c0-0.6,0.3-1.2,0.8-1.5c0.6-0.3,1-1.1,0.9-1.8C8.6,4.2,8,3.7,7.3,3.5C6.2,3.3,5.3,4.2,5.3,5.3"/>
-	<circle class="st0" cx="7" cy="10.5" r="0.6"/>
-</g>
-</svg></div></th>
-					<td style = "padding-right: 18px; width: 340px">
-						<div>
-							<input class="b-form-input b-form-input_full" type="text" ng-model="settingsPeerCtrl.policyConfig.memoryUsageLimit" required style = "display: inline; width: 290px" onkeypress = "return event.charCode >= 48 && event.charCode <= 57">
-							<label style = "font-style: italic; width: 40px; float: right; margin-top: 7px">in MB</label>
-						</div>
-					</td>
-				</tr>
-				<!--<tr>
-					<th>Network Usage Limit</th>
-					<td style = "padding-right: 18px"><input class="b-form-input b-form-input_full" type="text" ng-model="settingsPeerCtrl.policyConfig.networkUsageLimit" required></td>
-				</tr>-->
-				<tr>
-					<th><div style = "display: inline-block; float: left; margin-top: 8px">Environment Limit</div>&#160;&#160;<div style = "display: inline-block; float: left; margin-top: 9px" tooltips tooltip-template="<div style = 'width: 250px'><label class = 'b-form-label'>Limit of total number of environments that can be created</label></div>"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" viewBox="0 0 14 14" style="enable-background:new 0 0 14 14; height: 15px; width: 15px" xml:space="preserve">
-<style type="text/css">
-	.st0{fill:none;stroke:#04346E;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
-</style>
-<g>
-	<circle class="st0" cx="7" cy="7" r="6.4"/>
-	<path class="st0" d="M7,8.7V8.3c0-0.6,0.3-1.2,0.8-1.5c0.6-0.3,1-1.1,0.9-1.8C8.6,4.2,8,3.7,7.3,3.5C6.2,3.3,5.3,4.2,5.3,5.3"/>
-	<circle class="st0" cx="7" cy="10.5" r="0.6"/>
-</g>
-</svg></div></th>
-					<td style = "padding-right: 18px"><input class="b-form-input b-form-input_full" type="text" ng-model="settingsPeerCtrl.policyConfig.environmentLimit" required onkeypress = "return event.charCode >= 48 && event.charCode <= 57"></td>
-				</tr>
-				<tr>
-					<th><div style = "display: inline-block; float: left; margin-top: 8px">Container Limit</div>&#160;&#160;<div style = "display: inline-block; float: left; margin-top: 9px" tooltips tooltip-template="<div style = 'width: 250px'><label class = 'b-form-label'>Limit of total number of containers that can be created</label></div>"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" viewBox="0 0 14 14" style="enable-background:new 0 0 14 14; height: 15px; width: 15px" xml:space="preserve">
-<style type="text/css">
-	.st0{fill:none;stroke:#04346E;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
-</style>
-<g>
-	<circle class="st0" cx="7" cy="7" r="6.4"/>
-	<path class="st0" d="M7,8.7V8.3c0-0.6,0.3-1.2,0.8-1.5c0.6-0.3,1-1.1,0.9-1.8C8.6,4.2,8,3.7,7.3,3.5C6.2,3.3,5.3,4.2,5.3,5.3"/>
-	<circle class="st0" cx="7" cy="10.5" r="0.6"/>
-</g>
-</svg></div></th>
-					<td style = "padding-right: 18px"><input class="b-form-input b-form-input_full" type="text" ng-model="settingsPeerCtrl.policyConfig.containerLimit" required onkeypress = "return event.charCode >= 48 && event.charCode <= 57"></td>
-				</tr>
-			</table>
-		</div>
+				</th>
+				<td style = "padding-right: 18px">
+					<input class="b-form-input b-form-input_full" type="text" ng-model="settingsPeerCtrl.policyConfig.peerId" required>
+				</td>
+			</tr>
+			<tr>
+				<th>
+					<div style = "display: inline-block; float: left; margin-top: 8px">Disk Usage Limit</div>
+					&#160;&#160;
+					<div style = "display: inline-block; float: left; margin-top: 9px" 
+						tooltips tooltip-template="<div style = 'width: 250px'><label class = 'b-form-label'>Limit of provided disk space</label></div>">
+						<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" viewBox="0 0 14 14" style="enable-background:new 0 0 14 14; height: 15px; width: 15px" xml:space="preserve">
+							<style type="text/css">
+								.st0{fill:none;stroke:#04346E;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+							</style>
+							<g>
+								<circle class="st0" cx="7" cy="7" r="6.4"/>
+								<path class="st0" d="M7,8.7V8.3c0-0.6,0.3-1.2,0.8-1.5c0.6-0.3,1-1.1,0.9-1.8C8.6,4.2,8,3.7,7.3,3.5C6.2,3.3,5.3,4.2,5.3,5.3"/>
+								<circle class="st0" cx="7" cy="10.5" r="0.6"/>
+							</g>
+						</svg>
+					</div>
+				</th>
+				<td style = "padding-right: 18px; width: 340px">
+					<div>
+						<input class="b-form-input b-form-input_full" type="text" ng-model="settingsPeerCtrl.policyConfig.diskUsageLimit" onkeypress = "return event.charCode >= 48 && event.charCode <= 57" style = "display: inline; width: 290px">
+						<label style = "font-style: italic; width: 40px; float: right; margin-top: 7px">in GB</label>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<th>
+					<div style = "display: inline-block; float: left; margin-top: 8px">CPU Usage Limit</div>
+					&#160;&#160;
+					<div style = "display: inline-block; float: left; margin-top: 9px" 
+						tooltips tooltip-template="<div style = 'width: 250px'><label class = 'b-form-label'>Limit of provided CPU usage</label></div>">
+						<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" viewBox="0 0 14 14" style="enable-background:new 0 0 14 14; height: 15px; width: 15px" xml:space="preserve">
+							<style type="text/css">
+								.st0{fill:none;stroke:#04346E;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+							</style>
+							<g>
+								<circle class="st0" cx="7" cy="7" r="6.4"/>
+								<path class="st0" d="M7,8.7V8.3c0-0.6,0.3-1.2,0.8-1.5c0.6-0.3,1-1.1,0.9-1.8C8.6,4.2,8,3.7,7.3,3.5C6.2,3.3,5.3,4.2,5.3,5.3"/>
+								<circle class="st0" cx="7" cy="10.5" r="0.6"/>
+							</g>
+						</svg>
+					</div>
+				</th>
+				<td style = "padding-right: 18px; width: 340px">
+					<div>
+						<input class="b-form-input b-form-input_full" type="text" ng-model="settingsPeerCtrl.policyConfig.cpuUsageLimit" required style = "display: inline; width: 290px" onkeypress = "return event.charCode >= 48 && event.charCode <= 57">
+						<label style = "font-style: italic; width: 40px; float: right; margin-top: 7px">in %</label>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<th>
+					<div style = "display: inline-block; float: left; margin-top: 8px">Memory Usage Limit</div>
+					&#160;&#160;
+					<div style = "display: inline-block; float: left; margin-top: 9px" 
+						tooltips tooltip-template="<div style = 'width: 250px'><label class = 'b-form-label'>Limit of provided RAM</label></div>">
+						<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" viewBox="0 0 14 14" style="enable-background:new 0 0 14 14; height: 15px; width: 15px" xml:space="preserve">
+							<style type="text/css">
+								.st0{fill:none;stroke:#04346E;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+							</style>
+							<g>
+								<circle class="st0" cx="7" cy="7" r="6.4"/>
+								<path class="st0" d="M7,8.7V8.3c0-0.6,0.3-1.2,0.8-1.5c0.6-0.3,1-1.1,0.9-1.8C8.6,4.2,8,3.7,7.3,3.5C6.2,3.3,5.3,4.2,5.3,5.3"/>
+								<circle class="st0" cx="7" cy="10.5" r="0.6"/>
+							</g>
+						</svg>
+					</div>
+				</th>
+				<td style = "padding-right: 18px; width: 340px">
+					<div>
+						<input class="b-form-input b-form-input_full" type="text" ng-model="settingsPeerCtrl.policyConfig.memoryUsageLimit" required style = "display: inline; width: 290px" onkeypress = "return event.charCode >= 48 && event.charCode <= 57">
+						<label style = "font-style: italic; width: 40px; float: right; margin-top: 7px">in MB</label>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<th>
+					<div style = "display: inline-block; float: left; margin-top: 8px">Environment Limit</div>
+					&#160;&#160;
+					<div style = "display: inline-block; float: left; margin-top: 9px" 
+						tooltips tooltip-template="<div style = 'width: 250px'><label class = 'b-form-label'>Limit of total number of environments that can be created</label></div>">
+						<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" viewBox="0 0 14 14" style="enable-background:new 0 0 14 14; height: 15px; width: 15px" xml:space="preserve">
+							<style type="text/css">
+								.st0{fill:none;stroke:#04346E;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+							</style>
+							<g>
+								<circle class="st0" cx="7" cy="7" r="6.4"/>
+								<path class="st0" d="M7,8.7V8.3c0-0.6,0.3-1.2,0.8-1.5c0.6-0.3,1-1.1,0.9-1.8C8.6,4.2,8,3.7,7.3,3.5C6.2,3.3,5.3,4.2,5.3,5.3"/>
+								<circle class="st0" cx="7" cy="10.5" r="0.6"/>
+							</g>
+						</svg>
+					</div>
+				</th>
+				<td style = "padding-right: 18px">
+					<input class="b-form-input b-form-input_full" type="text" ng-model="settingsPeerCtrl.policyConfig.environmentLimit" required onkeypress = "return event.charCode >= 48 && event.charCode <= 57">
+				</td>
+			</tr>
+			<tr>
+				<th>
+					<div style = "display: inline-block; float: left; margin-top: 8px">Container Limit</div>
+					&#160;&#160;
+					<div style = "display: inline-block; float: left; margin-top: 9px" 
+						tooltips tooltip-template="<div style = 'width: 250px'><label class = 'b-form-label'>Limit of total number of containers that can be created</label></div>">
+						<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" viewBox="0 0 14 14" style="enable-background:new 0 0 14 14; height: 15px; width: 15px" xml:space="preserve">
+							<style type="text/css">
+								.st0{fill:none;stroke:#04346E;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+							</style>
+							<g>
+								<circle class="st0" cx="7" cy="7" r="6.4"/>
+								<path class="st0" d="M7,8.7V8.3c0-0.6,0.3-1.2,0.8-1.5c0.6-0.3,1-1.1,0.9-1.8C8.6,4.2,8,3.7,7.3,3.5C6.2,3.3,5.3,4.2,5.3,5.3"/>
+								<circle class="st0" cx="7" cy="10.5" r="0.6"/>
+							</g>
+						</svg>
+					</div>
+				</th>
+				<td style = "padding-right: 18px">
+					<input class="b-form-input b-form-input_full" type="text" ng-model="settingsPeerCtrl.policyConfig.containerLimit" required onkeypress = "return event.charCode >= 48 && event.charCode <= 57">
+				</td>
+			</tr>
+		</table>
 	</div>
-  <button
-      class="b-btn b-btn_green g-left g-margin-bottom"
-      ng-click="settingsPeerCtrl.updatePolicyConfig()"
-      style="margin-top: 15px">
-    <i class="fa fa-floppy-o"></i>&#160;&#160;Save
-  </button>
+
+	<button
+		class="b-btn b-btn_green"
+		ng-click="settingsPeerCtrl.updatePolicyConfig()"
+		style="margin-top: 15px">
+		<i class="fa fa-floppy-o"></i>&#160;&#160;Save
+	</button>	
+
 </div>
