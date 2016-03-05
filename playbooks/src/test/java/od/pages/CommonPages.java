@@ -16,6 +16,7 @@ public class CommonPages extends PageObject {
     //region WEB ELEMENTS: Buttons
 
     //endregion
+
     //region SIKULI IMAGES: Buttons
 
     public String sikuliButtonLogin = "src/test/resources/imgs/buttons/buttonLogin.png";
