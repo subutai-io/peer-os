@@ -21,4 +21,8 @@ public interface NetworkSettings
     public String getPublicUrl();
 
     public void setPublicUrl( final String publicUrl );
+
+    public int getAgentPort();
+
+    public void setAgentPort( final int agentPort );
 }

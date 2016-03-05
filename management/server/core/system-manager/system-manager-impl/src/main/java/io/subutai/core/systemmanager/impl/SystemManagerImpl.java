@@ -155,12 +155,13 @@ public class SystemManagerImpl implements SystemManager
 
     @Override
     public void setNetworkSettings( final String securePortX1, final String securePortX2, final String securePortX3,
-                                    final String publicUrl ) throws ConfigurationException
+                                    final String publicUrl, final String agentPort ) throws ConfigurationException
     {
         SystemSettings.setSecurePortX1( Integer.parseInt( securePortX1 ) );
         SystemSettings.setSecurePortX2( Integer.parseInt( securePortX2 ) );
         SystemSettings.setSecurePortX3( Integer.parseInt( securePortX3 ) );
         SystemSettings.setPublicUrl( publicUrl );
+        SystemSettings.setAgentPort( Integer.parseInt( agentPort ) );
     }
 
 
@@ -244,6 +245,7 @@ public class SystemManagerImpl implements SystemManager
         pojo.setSecurePortX2( SystemSettings.getSecurePortX2() );
         pojo.setSecurePortX3( SystemSettings.getSecurePortX3() );
         pojo.setPublicUrl( SystemSettings.getPublicUrl() );
+        pojo.setAgentPort( SystemSettings.getAgentPort() );
 
         return pojo;
     }
