@@ -17,12 +17,12 @@ public interface RestService
 
     @POST
     @Path( "heartbeat" )
-    @Consumes( { MediaType.APPLICATION_JSON } )
+    @Consumes( { MediaType.APPLICATION_FORM_URLENCODED } )
     Response processHeartbeat( @FormParam( "heartbeat" ) String heartbeat );
 
     @POST
     @Path( "response" )
-    @Consumes( { MediaType.APPLICATION_JSON } )
+    @Consumes( { MediaType.APPLICATION_FORM_URLENCODED } )
     Response processResponse( @FormParam( "response" ) String response );
 
     @GET
