@@ -29,8 +29,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.settings.SubutaiInfo;
-import io.subutai.common.settings.SystemSettings;
 import io.subutai.core.hubmanager.api.HubPluginException;
+import io.subutai.core.hubmanager.api.model.Config;
+import io.subutai.core.hubmanager.impl.model.ConfigEntity;
 import io.subutai.hub.share.dto.PeerInfoDto;
 import io.subutai.hub.share.dto.RegistrationDto;
 import io.subutai.hub.share.dto.TrustDataDto;
@@ -44,12 +45,14 @@ public class RegistrationManager
 
     private ConfigManager configManager;
     private IntegrationImpl manager;
+    private String hubIp;
 
 
-    public RegistrationManager( final IntegrationImpl manager, final ConfigManager configManager )
+    public RegistrationManager( final IntegrationImpl manager, final ConfigManager configManager, final String hupIp )
     {
         this.configManager = configManager;
         this.manager = manager;
+        this.hubIp = hupIp;
     }
 
 
@@ -66,7 +69,7 @@ public class RegistrationManager
 
         String ssVersion = String.valueOf( SubutaiInfo.getVersion() );
         PeerInfoDto peerInfoDto = new PeerInfoDto();
-        peerInfoDto.setId( configManager.getPeerManager().getLocalPeer().getId() );
+        peerInfoDto.setId( configManager.getPeerId() );
         peerInfoDto.setVersion( ssVersion );
         peerInfoDto.setName( configManager.getPeerManager().getLocalPeer().getName() );
         registrationData.setPeerInfo( peerInfoDto );
@@ -92,7 +95,7 @@ public class RegistrationManager
 
             keyStore.load( new FileInputStream( ConfigManager.PEER_KEYSTORE ), "subutai".toCharArray() );
 
-            WebClient client = configManager.getTrustedWebClientWithAuth( path );
+            WebClient client = configManager.getTrustedWebClientWithAuth( path, hubIp );
 
             byte[] cborData = JsonUtil.toCbor( trustDataDto );
 
@@ -124,7 +127,7 @@ public class RegistrationManager
         try
         {
             String path = String.format( "/rest/v1/peers/%s", peerId );
-            WebClient client = configManager.getTrustedWebClientWithAuth( path );
+            WebClient client = configManager.getTrustedWebClientWithAuth( path, hubIp );
 
             byte[] cborData = JsonUtil.toCbor( registrationData );
 
@@ -137,10 +140,13 @@ public class RegistrationManager
 
             if ( r.getStatus() == HttpStatus.SC_NO_CONTENT )
             {
-                manager.getConfigDataService().saveHubConfig( configManager.getHubConfiguration() );
+                Config config = new ConfigEntity();
+                config.setHubIp( hubIp );
+                config.setPeerId( configManager.getPeerId() );
+
+                manager.getConfigDataService().saveHubConfig( config );
                 LOG.debug( "Hub configuration saved successfully." );
                 LOG.debug( "Peer registered successfully." );
-                SystemSettings.setRegisterToHubState( true );
             }
             else
             {
@@ -159,7 +165,7 @@ public class RegistrationManager
 
     public void registerOwnerPubKey() throws HubPluginException
     {
-        WebClient client = configManager.getTrustedWebClient();
+        WebClient client = configManager.getTrustedWebClient( hubIp );
         client.type( MediaType.APPLICATION_FORM_URLENCODED ).accept( MediaType.APPLICATION_JSON );
 
         Form form = new Form();
@@ -192,7 +198,7 @@ public class RegistrationManager
 
     public void registerPeerPubKey() throws HubPluginException
     {
-        WebClient client = configManager.getTrustedWebClient();
+        WebClient client = configManager.getTrustedWebClient( hubIp );
         client.type( MediaType.APPLICATION_FORM_URLENCODED ).accept( MediaType.APPLICATION_JSON );
 
         Form form = new Form();

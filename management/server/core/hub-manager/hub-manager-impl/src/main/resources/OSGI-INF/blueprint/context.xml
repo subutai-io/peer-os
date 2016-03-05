@@ -37,7 +37,7 @@
   </cm:property-placeholder>
 
 
-  <bean id="hubImpl" scope="singleton" init-method="init" activation="eager"
+  <bean id="hubImpl" scope="singleton" init-method="init" destroy-method="destroy" activation="eager"
         class="io.subutai.core.hubmanager.impl.IntegrationImpl">
     <property name="securityManager" ref="securityManager" />
     <property name="peerManager" ref="peerManager" />

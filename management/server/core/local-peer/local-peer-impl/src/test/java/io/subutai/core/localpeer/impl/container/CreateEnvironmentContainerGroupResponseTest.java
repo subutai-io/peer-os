@@ -34,7 +34,6 @@ public class CreateEnvironmentContainerGroupResponseTest
     public void setUp() throws Exception
     {
         responseGroup = new CreateEnvironmentContainerResponseCollector( PEER_ID );
-        responseGroup.onResponse( response );
     }
 
 

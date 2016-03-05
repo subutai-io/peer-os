@@ -39,6 +39,8 @@ public class EnvironmentsPage extends PageObject {
     public String sikuliButtonDelete = "src/test/resources/imgs/buttons/buttonDelete.png";
     public String sikuliButtonOk = "src/test/resources/imgs/buttons/buttonOk.png";
 
+
+
     //endregion
 
     //region WEB ELEMENTS: Checkboxes
@@ -68,6 +70,12 @@ public class EnvironmentsPage extends PageObject {
     //region SIKULI IMAGES: Icons
 
     public String sikuliIconDeleteEnvironment = "src/test/resources/imgs/icons/iconDeleteEnvironment.png";
+
+    @FindBy(xpath = "*//span[contains(text(), \"mongo\")]")
+    public WebElementFacade iconTemplateMongo;
+
+    @FindBy(xpath = "//a[@class=\"b-icon b-icon_remove\"]")
+    public WebElementFacade iconDeleteEnvironment;
 
     //endregion
 

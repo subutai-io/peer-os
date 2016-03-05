@@ -17,7 +17,6 @@ import org.apache.http.HttpStatus;
 
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.core.hubmanager.api.HubPluginException;
-import io.subutai.core.hubmanager.api.model.Config;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.hubmanager.impl.IntegrationImpl;
 import io.subutai.core.metric.api.Monitor;
@@ -54,15 +53,8 @@ public class ResourceHostConfProcessor implements Runnable
     {
         try
         {
-            if ( manager.getConfigDataService().getHubConfig( configManager.getPeerId() ) != null )
-            {
-                Config config = manager.getConfigDataService().getHubConfig( configManager.getPeerId() );
-                LOG.debug( "Sending resource hosts configurations started..." );
-                configManager.setHubIp( config.getHubIp() );
-                configManager.setSuperNodeIp( config.getSuperNodeIp() );
-                sendResourceHostConf();
-                LOG.debug( "Sending resource hosts configurations finished successfully..." );
-            }
+            sendResourceHostConf();
+            LOG.debug( "Sending resource hosts configurations finished successfully..." );
         }
         catch ( Exception e )
         {
@@ -74,78 +66,86 @@ public class ResourceHostConfProcessor implements Runnable
 
     public void sendResourceHostConf() throws HubPluginException
     {
-        try
+        if ( manager.getRegistrationState() )
         {
-            for ( ResourceHostMetric resourceHostMetric : monitor.getResourceHostMetrics().getResources() )
+            LOG.debug( "Sending resource hosts configurations started..." );
+            try
             {
-                ResourceHostMetricDto resourceHostMetricDto = new ResourceHostMetricDto();
-                resourceHostMetricDto.setPeerId( peerManager.getLocalPeer().getId() );
-                resourceHostMetricDto.setName( resourceHostMetric.getHostInfo().getHostname() );
-                resourceHostMetricDto.setHostId( resourceHostMetric.getHostInfo().getId() );
-                resourceHostMetricDto.setHasAccessFromInternet( DiscoveryNAT.isOpenAccess( "jstun.javawi.de", 3478 ) );
-
-                try
+                for ( ResourceHostMetric resourceHostMetric : monitor.getResourceHostMetrics().getResources() )
                 {
-                    resourceHostMetricDto.setCpuModel( resourceHostMetric.getCpuModel() );
-                }
-                catch(Exception e)
-                {
-                    LOG.info( e.getMessage(), "No info about CPU model" );
-                }
+                    ResourceHostMetricDto resourceHostMetricDto = new ResourceHostMetricDto();
+                    resourceHostMetricDto.setPeerId( peerManager.getLocalPeer().getId() );
+                    resourceHostMetricDto.setName( resourceHostMetric.getHostInfo().getHostname() );
+                    resourceHostMetricDto.setHostId( resourceHostMetric.getHostInfo().getId() );
+                    resourceHostMetricDto
+                            .setHasAccessFromInternet( DiscoveryNAT.isOpenAccess( "jstun.javawi.de", 3478 ) );
 
-                try
-                {
-                    resourceHostMetricDto.setMemory( resourceHostMetric.getTotalRam() );
-                }
-                catch(Exception e)
-                {
-                    LOG.info( e.getMessage(), "No info about total RAM" );
-                }
+                    try
+                    {
+                        resourceHostMetricDto.setCpuModel( resourceHostMetric.getCpuModel() );
+                    }
+                    catch ( Exception e )
+                    {
+                        LOG.info( e.getMessage(), "No info about CPU model" );
+                    }
 
-                try
-                {
-                    resourceHostMetricDto.setDisk( resourceHostMetric.getTotalSpace() );
-                }
-                catch(Exception e)
-                {
-                    LOG.info( e.getMessage(), "No info about total Space" );
-                }
+                    try
+                    {
+                        resourceHostMetricDto.setMemory( resourceHostMetric.getTotalRam() );
+                    }
+                    catch ( Exception e )
+                    {
+                        LOG.info( e.getMessage(), "No info about total RAM" );
+                    }
 
-                try
-                {
-                    resourceHostMetricDto.setCpuCore( resourceHostMetric.getCpuCore() );
-                }
-                catch(Exception e)
-                {
-                    LOG.info( e.getMessage(), "No info about CPU core" );
-                }
+                    try
+                    {
+                        resourceHostMetricDto.setDisk( resourceHostMetric.getTotalSpace() );
+                    }
+                    catch ( Exception e )
+                    {
+                        LOG.info( e.getMessage(), "No info about total Space" );
+                    }
 
-                String path = String.format( "/rest/v1/peers/%s/resource-hosts/%s", configManager.getPeerId(),
-                        resourceHostMetricDto.getHostId() );
+                    try
+                    {
+                        resourceHostMetricDto.setCpuCore( resourceHostMetric.getCpuCore() );
+                    }
+                    catch ( Exception e )
+                    {
+                        LOG.info( e.getMessage(), "No info about CPU core" );
+                    }
 
-                WebClient client = configManager.getTrustedWebClientWithAuth( path );
+                    String path = String.format( "/rest/v1/peers/%s/resource-hosts/%s", configManager.getPeerId(),
+                            resourceHostMetricDto.getHostId() );
 
-                byte[] cborData = JsonUtil.toCbor( resourceHostMetricDto );
+                    WebClient client = configManager.getTrustedWebClientWithAuth( path, configManager.getHubIp() );
 
-                byte[] encryptedData = configManager.getMessenger().produce( cborData );
+                    byte[] cborData = JsonUtil.toCbor( resourceHostMetricDto );
 
-                Response r = client.post( encryptedData );
+                    byte[] encryptedData = configManager.getMessenger().produce( cborData );
 
-                if ( r.getStatus() == HttpStatus.SC_NO_CONTENT )
-                {
-                    LOG.debug( "Resource hosts configurations sent successfully." );
-                }
-                else
-                {
-                    throw new HubPluginException(
-                            "Could not send resource hosts configurations: " + r.readEntity( String.class ) );
+                    Response r = client.post( encryptedData );
+
+                    if ( r.getStatus() == HttpStatus.SC_NO_CONTENT )
+                    {
+                        LOG.debug( "Resource hosts configurations sent successfully." );
+                    }
+                    else
+                    {
+                        throw new HubPluginException(
+                                "Could not send resource hosts configurations: " + r.readEntity( String.class ) );
+                    }
                 }
             }
-        }
-        catch ( PGPException | IOException | KeyStoreException | UnrecoverableKeyException | NoSuchAlgorithmException
-                e )
-        {
-            LOG.error( "Could not send resource hosts configurations.", e );
+            catch ( PGPException | IOException | KeyStoreException | UnrecoverableKeyException |
+                    NoSuchAlgorithmException e )
+            {
+                LOG.error( "Could not send resource hosts configurations.", e );
+            }
+
+
+            LOG.debug( "Sending resource hosts configurations finished successfully..." );
         }
     }
 }

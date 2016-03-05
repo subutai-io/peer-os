@@ -25,10 +25,12 @@ public class SystemSettings
     private static PropertiesConfiguration PROPERTIES = null;
     private static String[] GLOBAL_KURJUN_URLS = null;
 
+
     static
     {
         loadProperties();
     }
+
 
     public static void loadProperties()
     {
@@ -51,14 +53,14 @@ public class SystemSettings
         return GLOBAL_KURJUN_URLS;
     }
 
-    
+
     public static void setGlobalKurjunUrls( String[] urls ) throws ConfigurationException
     {
         String[] validated = validateGlobalKurjunUrls( urls );
         saveProperty( "globalKurjunUrls", validated );
         loadGlobalKurjunUrls();
     }
-    
+
 
     protected static String[] validateGlobalKurjunUrls( final String[] urls ) throws ConfigurationException
     {
@@ -90,19 +92,18 @@ public class SystemSettings
         }
         catch ( MalformedURLException e )
         {
-            throw  new ConfigurationException( "Invalid URL: " + publicUrl );
+            throw new ConfigurationException( "Invalid URL: " + publicUrl );
         }
     }
-    
-    
+
+
     private static void loadGlobalKurjunUrls() throws ConfigurationException
     {
         String[] globalKurjunUrls = PROPERTIES.getStringArray( "globalKurjunUrls" );
         if ( globalKurjunUrls.length < 1 )
         {
-            globalKurjunUrls = new String[]
-            {
-                DEFAULT_KURJUN_REPO
+            globalKurjunUrls = new String[] {
+                    DEFAULT_KURJUN_REPO
             };
         }
 
@@ -237,18 +238,6 @@ public class SystemSettings
 
 
     // Peer Settings
-
-
-    public static boolean isRegisteredToHub()
-    {
-        return PROPERTIES.getBoolean( "isRegisteredToHub", false );
-    }
-
-
-    public static void setRegisterToHubState( boolean registrationState )
-    {
-        saveProperty( "isRegisteredToHub", registrationState );
-    }
 
 
     public static String getPublicUrl()

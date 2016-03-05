@@ -32,12 +32,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.cbor.CBORFactory;
 
 import io.subutai.common.dao.DaoManager;
-import io.subutai.common.settings.SystemSettings;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.core.hubmanager.api.Integration;
 import io.subutai.core.hubmanager.api.StateLinkProccessor;
 import io.subutai.core.hubmanager.api.dao.ConfigDataService;
+import io.subutai.core.hubmanager.api.model.Config;
 import io.subutai.core.hubmanager.impl.dao.ConfigDataServiceImpl;
 import io.subutai.core.hubmanager.impl.proccessors.EnvironmentProccessor;
 import io.subutai.core.hubmanager.impl.proccessors.HeartbeatProcessor;
@@ -85,7 +85,8 @@ public class IntegrationImpl implements Integration
         {
             configDataService = new ConfigDataServiceImpl( daoManager );
 
-            this.configManager = new ConfigManager( securityManager, peerManager, peerSecretKeyringPwd );
+            this.configManager =
+                    new ConfigManager( securityManager, peerManager, peerSecretKeyringPwd, configDataService );
             heartbeatProcessor = new HeartbeatProcessor( this, configManager );
             resourceHostConfProcessor = new ResourceHostConfProcessor( this, peerManager, configManager, monitor );
             resourceHostMonitorProcessor =
@@ -100,8 +101,8 @@ public class IntegrationImpl implements Integration
 
 
             this.hearbeatExecutorService.scheduleWithFixedDelay( heartbeatProcessor, 10, 120, TimeUnit.SECONDS );
-            this.resourceHostConfExecutorService.scheduleWithFixedDelay( resourceHostConfProcessor, 50, 900,
-                    TimeUnit.SECONDS ); // Executes every 3 hours
+            this.resourceHostConfExecutorService.scheduleWithFixedDelay( resourceHostConfProcessor, 20, 900,
+                    TimeUnit.SECONDS ); // Executes every 15 minutes
             this.resourceHostMonitorExecutorService
                     .scheduleWithFixedDelay( resourceHostMonitorProcessor, 30, 300, TimeUnit.SECONDS );
         }
@@ -109,6 +110,14 @@ public class IntegrationImpl implements Integration
         {
             LOG.error( e.getMessage() );
         }
+    }
+
+
+    public void destroy()
+    {
+        hearbeatExecutorService.shutdown();
+        resourceHostConfExecutorService.shutdown();
+        resourceHostMonitorExecutorService.shutdown();
     }
 
 
@@ -131,17 +140,27 @@ public class IntegrationImpl implements Integration
     public void registerPeer( String hupIp, String email, String password ) throws HubPluginException
     {
         configManager.addHubConfig( hupIp );
-        RegistrationManager registrationManager = new RegistrationManager( this, configManager );
+        RegistrationManager registrationManager = new RegistrationManager( this, configManager, hupIp );
 
         registrationManager.registerPeer( email, password );
         heartbeatProcessor.sendHeartbeat();
+        resourceHostConfProcessor.sendResourceHostConf();
     }
 
 
     @Override
     public String getHubDns() throws HubPluginException
     {
-        return configManager.getHubIp();
+        Config config = getConfigDataService().getHubConfig( configManager.getPeerId() );
+
+        if ( config != null )
+        {
+            return config.getHubIp();
+        }
+        else
+        {
+            return null;
+        }
     }
 
 
@@ -151,7 +170,8 @@ public class IntegrationImpl implements Integration
         ProductsDto result;
         try
         {
-            WebClient client = configManager.getTrustedWebClientWithAuth( "/rest/v1.1/marketplace/products" );
+            String hubIp = configDataService.getHubConfig( configManager.getPeerId() ).getHubIp();
+            WebClient client = configManager.getTrustedWebClientWithAuth( "/rest/v1.1/marketplace/products", hubIp );
 
             Response r = client.get();
 
@@ -223,9 +243,10 @@ public class IntegrationImpl implements Integration
     {
         try
         {
+            String hubIp = configDataService.getHubConfig( configManager.getPeerId() ).getHubIp();
             String path = String.format( "/rest/v1/peers/%s/delete", configManager.getPeerId() );
 
-            WebClient client = configManager.getTrustedWebClientWithAuth( path );
+            WebClient client = configManager.getTrustedWebClientWithAuth( path, hubIp );
 
             Response r = client.delete();
 
@@ -234,7 +255,6 @@ public class IntegrationImpl implements Integration
             {
                 LOG.debug( "Peer unregistered successfully." );
                 configDataService.deleteConfig( configManager.getPeerId() );
-                SystemSettings.setRegisterToHubState( false );
             }
             else
             {
@@ -246,6 +266,13 @@ public class IntegrationImpl implements Integration
         {
             throw new HubPluginException( "Could not unregister peer", e );
         }
+    }
+
+
+    @Override
+    public boolean getRegistrationState()
+    {
+        return getConfigDataService().getHubConfig( configManager.getPeerId() ) != null;
     }
 
 
