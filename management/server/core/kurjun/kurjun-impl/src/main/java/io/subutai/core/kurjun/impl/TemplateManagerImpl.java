@@ -1,9 +1,6 @@
 package io.subutai.core.kurjun.impl;
 
 
-import io.subutai.core.kurjun.impl.store.RepoUrlStore;
-import io.subutai.core.kurjun.impl.model.RepoUrl;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -53,7 +50,7 @@ import ai.subut.kurjun.metadata.factory.PackageMetadataStoreModule;
 import ai.subut.kurjun.model.metadata.SerializableMetadata;
 import ai.subut.kurjun.model.metadata.template.SubutaiTemplateMetadata;
 import ai.subut.kurjun.model.repository.LocalRepository;
-import ai.subut.kurjun.model.repository.NonLocalRepository;
+import ai.subut.kurjun.model.repository.RemoteRepository;
 import ai.subut.kurjun.model.repository.Repository;
 import ai.subut.kurjun.model.repository.UnifiedRepository;
 import ai.subut.kurjun.quota.DataUnit;
@@ -84,8 +81,10 @@ import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.kurjun.api.KurjunTransferQuota;
 import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.kurjun.api.template.TemplateRepository;
+import io.subutai.core.kurjun.impl.model.RepoUrl;
 import io.subutai.core.kurjun.impl.model.SharedTemplateInfo;
 import io.subutai.core.kurjun.impl.model.UserRepoContext;
+import io.subutai.core.kurjun.impl.store.RepoUrlStore;
 import io.subutai.core.kurjun.impl.store.UserRepoContextStore;
 import io.subutai.core.object.relation.api.RelationManager;
 
@@ -972,9 +971,9 @@ public class TemplateManagerImpl implements TemplateManager
 
         for ( Repository repo : repos )
         {
-            if ( repo instanceof NonLocalRepository )
+            if ( repo instanceof RemoteRepository )
             {
-                NonLocalRepository remote = ( NonLocalRepository ) repo;
+                RemoteRepository remote = ( RemoteRepository ) repo;
                 List<SerializableMetadata> ls = remote.getMetadataCache().getMetadataList();
                 result.addAll( ls );
             }
@@ -993,7 +992,7 @@ public class TemplateManagerImpl implements TemplateManager
      */
     private void refreshMetadataCache( String repository )
     {
-        Set<NonLocalRepository> remotes = new HashSet<>();
+        Set<RemoteRepository> remotes = new HashSet<>();
         RepositoryFactory repoFactory = injector.getInstance( RepositoryFactory.class );
 
         for ( RepoUrl url : remoteRepoUrls )
@@ -1005,7 +1004,7 @@ public class TemplateManagerImpl implements TemplateManager
             remotes.add( repoFactory.createNonLocalTemplate( url.getUrl().toString(), null, repository, url.getToken() ) );
         }
 
-        for ( NonLocalRepository remote : remotes )
+        for ( RemoteRepository remote : remotes )
         {
             remote.getMetadataCache().refresh();
         }
