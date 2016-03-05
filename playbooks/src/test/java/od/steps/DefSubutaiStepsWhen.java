@@ -107,21 +107,20 @@ public class DefSubutaiStepsWhen {
     public void user_sets_pgp_key() throws FindFailed {
         subutaiSteps.clickOnMenuItemUserManagement();
         subutaiSteps.clickOnMenuItemAccountSettings();
-        subutaiSteps.waitFor(5000);
         subutaiSteps.clickOnButtonSetPublicKey();
     }
 
     @When("the user creates environment using template: Mongo")
     public void user_creates_environment_using_template_mongo() throws FindFailed {
+        subutaiSteps.waitForIconTemplateMongo();
         subutaiSteps.clickOnIconTemplateMongo();
         subutaiSteps.clickOnButtonApply();
         subutaiSteps.inputEnvironmentName("Test Environment Mongo");
         subutaiSteps.clickOnButtonBuild();
         subutaiSteps.clickOnButtonCloseBuildPopup();
-        subutaiSteps.waitFor(5000);
+        subutaiSteps.waitForIconDeleteEnvironment();
         subutaiSteps.clickOnIconDeleteEnvironment();
         subutaiSteps.clickOnButtonDelete();
         subutaiSteps.clickOnButtonOkPopupEnvironmentHasBeenDestroyed();
-        subutaiSteps.waitFor(5000);
     }
 }
