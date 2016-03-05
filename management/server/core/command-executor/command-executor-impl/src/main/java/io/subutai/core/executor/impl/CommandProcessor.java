@@ -169,9 +169,15 @@ public class CommandProcessor implements ByteMessageListener, RestProcessor
     }
 
 
-    protected String encrypt( String message, String hostId ) throws NamingException, PGPException
+    @Override
+    public Set<String> getRequests( final String hostId )
     {
-        return getSecurityManager().signNEncryptRequestToHost( message, hostId );
+        Set<String> hostRequests;
+        synchronized ( requests )
+        {
+            hostRequests = requests.remove( hostId );
+        }
+        return hostRequests == null ? Sets.<String>newHashSet() : hostRequests;
     }
 
 
@@ -199,6 +205,12 @@ public class CommandProcessor implements ByteMessageListener, RestProcessor
                 }
             } );
         }
+    }
+
+
+    protected String encrypt( String message, String hostId ) throws NamingException, PGPException
+    {
+        return getSecurityManager().signNEncryptRequestToHost( message, hostId );
     }
 
 
@@ -324,18 +336,6 @@ public class CommandProcessor implements ByteMessageListener, RestProcessor
         {
             LOG.error( "Error processing response", e );
         }
-    }
-
-
-    @Override
-    public Set<String> getRequests( final String hostId )
-    {
-        Set<String> hostRequests;
-        synchronized ( requests )
-        {
-            hostRequests = requests.remove( hostId );
-        }
-        return hostRequests == null ? Sets.<String>newHashSet() : hostRequests;
     }
 
 
