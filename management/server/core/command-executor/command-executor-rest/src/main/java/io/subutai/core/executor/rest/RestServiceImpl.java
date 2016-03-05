@@ -148,7 +148,7 @@ public class RestServiceImpl implements RestService
             }
             else
             {
-                return Response.ok( JsonUtil.toJson( hostRequests ) ).build();
+                return Response.ok( hostRequests.toString() ).build();
             }
         }
         catch ( Exception e )
