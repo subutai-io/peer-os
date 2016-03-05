@@ -3,14 +3,16 @@ package template
 import (
 	"crypto/rand"
 	"fmt"
-	"github.com/subutai-io/Subutai/agent/config"
-	"github.com/subutai-io/Subutai/agent/lib/container"
-	"github.com/subutai-io/Subutai/agent/lib/fs"
-	"github.com/subutai-io/Subutai/agent/log"
 	"net"
 	"os"
 	"os/exec"
 	"strings"
+
+	"github.com/subutai-io/Subutai/agent/config"
+	"github.com/subutai-io/Subutai/agent/lib/container"
+	"github.com/subutai-io/Subutai/agent/lib/fs"
+	"github.com/subutai-io/Subutai/agent/lib/gpg"
+	"github.com/subutai-io/Subutai/agent/log"
 )
 
 func Mac() string {
@@ -34,6 +36,7 @@ func MngInit() {
 		{"lxc.mount.entry", config.Agent.LxcPrefix + "management/var var none bind,rw 0 0"},
 	})
 
+	gpg.GenerateKey("management")
 	container.Start("management")
 	exec.Command("dhclient", "mng-net").Run()
 
