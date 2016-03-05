@@ -162,6 +162,7 @@ public class RestServiceImpl implements RestService
     protected String decrypt( String message ) throws PGPException
     {
 
+        //todo use this check SystemSettings.getEncryptionState() inside SecurityManager
         if ( SystemSettings.getEncryptionState() )
         {
 
