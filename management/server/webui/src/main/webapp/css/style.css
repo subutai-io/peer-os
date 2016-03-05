@@ -1073,6 +1073,10 @@ tip.description-tooltip {
     width: 430px;
 }
 
+.b-popup_auto-width {
+	width: auto;
+}
+
 .b-popup-header-controls {
 	float: right;
 	margin: 0 0 0 10px;
@@ -1545,6 +1549,10 @@ td.b-main-table__status-col {
 
 .b-main-table__buttons-group .b-btn {
     margin-left: 10px;
+}
+
+.b-main-table_logs td:first-child {
+	padding-right: 7px;
 }
 
 .b-load-icon {
