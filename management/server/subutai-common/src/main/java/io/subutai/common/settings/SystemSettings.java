@@ -198,12 +198,14 @@ public class SystemSettings
     // Security Settings
 
 
+    //todo remove this since communication is always encrypted
+    @Deprecated
     public static boolean getEncryptionState()
     {
         return PROPERTIES.getBoolean( "encryptionEnabled", false );
     }
 
-
+    //todo remove
     public static boolean getRestEncryptionState()
     {
         return PROPERTIES.getBoolean( "restEncryptionEnabled", false );
