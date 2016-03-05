@@ -1,6 +1,7 @@
 package io.subutai.core.executor.rest;
 
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -16,12 +17,12 @@ public interface RestService
 
     @POST
     @Path( "heartbeat" )
-    @Produces( { MediaType.TEXT_PLAIN } )
+    @Consumes( { MediaType.APPLICATION_JSON } )
     Response processHeartbeat( @FormParam( "heartbeat" ) String heartbeat );
 
     @POST
     @Path( "response" )
-    @Produces( { MediaType.TEXT_PLAIN } )
+    @Consumes( { MediaType.APPLICATION_JSON } )
     Response processResponse( @FormParam( "response" ) String response );
 
     @GET
