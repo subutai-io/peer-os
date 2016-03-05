@@ -11,7 +11,7 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.OptionalBinder;
 
-import ai.subut.kurjun.model.repository.NonLocalRepository;
+import ai.subut.kurjun.model.repository.RemoteRepository;
 import ai.subut.kurjun.repo.util.http.WebClientFactory;
 import io.subutai.common.settings.SecuritySettings;
 import io.subutai.common.util.RestUtil;
@@ -26,7 +26,7 @@ public class TrustedWebClientFactoryModule extends AbstractModule implements Web
 
 
     @Override
-    public WebClient make( NonLocalRepository remoteRepository, String path, Map<String, String> queryParams )
+    public WebClient make( RemoteRepository remoteRepository, String path, Map<String, String> queryParams )
     {
         try
         {
