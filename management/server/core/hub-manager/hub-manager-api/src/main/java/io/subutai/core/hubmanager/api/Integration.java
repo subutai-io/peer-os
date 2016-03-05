@@ -18,4 +18,6 @@ public interface Integration
     void uninstallPlugin( String url );
 
     void unregisterPeer() throws HubPluginException;
+
+    boolean getRegistrationState();
 }

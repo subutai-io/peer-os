@@ -14,7 +14,7 @@ public interface Config
 
     public void setHubIp( final String serverIp );
 
-    public String getSuperNodeIp();
-
-    public void setSuperNodeIp( final String superNodeIp );
+//    public String getSuperNodeIp();
+//
+//    public void setSuperNodeIp( final String superNodeIp );
 }

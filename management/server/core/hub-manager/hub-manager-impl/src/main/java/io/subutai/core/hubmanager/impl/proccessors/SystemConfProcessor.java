@@ -71,7 +71,7 @@ public class SystemConfProcessor implements StateLinkProccessor
     {
         try
         {
-            WebClient client = configManager.getTrustedWebClientWithAuth( link );
+            WebClient client = configManager.getTrustedWebClientWithAuth( link, configManager.getHubIp() );
 
             LOG.debug( "Sending request for getting System Info DTO..." );
             Response r = client.get();

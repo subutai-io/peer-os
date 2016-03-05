@@ -62,13 +62,6 @@ public class CreatePeerNodeGroupsTask implements Callable<CreateEnvironmentConta
 
                 final String ip = subnetInfo.getAllAddresses()[( ipAddressOffset + currentIpAddressOffset )];
                 ContainerSize size = node.getType();
-                //                ContainerQuota containerQuota = quotaManager.getDefaultContainerQuota( size );
-                //
-                //                if ( containerQuota == null )
-                //                {
-                //                    LOG.warn( "Quota not found for container type: " + node.getType() );
-                //                    size = ContainerSize.SMALL;
-                //                }
                 CloneRequest cloneRequest =
                         new CloneRequest( node.getHostId(), node.getHostname(), node.getName(), ip + "/" + maskLength,
                                 environment.getId(), localPeer.getId(), localPeer.getOwnerId(), node.getTemplateName(),

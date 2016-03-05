@@ -30,8 +30,7 @@ import io.subutai.common.security.crypto.keystore.KeyStoreType;
 import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.settings.Common;
-import io.subutai.core.hubmanager.api.model.Config;
-import io.subutai.core.hubmanager.impl.model.ConfigEntity;
+import io.subutai.core.hubmanager.api.dao.ConfigDataService;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.hub.share.pgp.key.PGPKeyHelper;
@@ -61,6 +60,7 @@ public class ConfigManager
 
     private SecurityManager securityManager;
     private PeerManager peerManager;
+    private ConfigDataService configDataService;
 
     private PGPPublicKey hPublicKey;
     private PGPPublicKey ownerPublicKey;
@@ -69,17 +69,16 @@ public class ConfigManager
     private KeyStore keyStore;
     private String peerId;
     private PGPMessenger messenger;
-    private Config hubConfiguration = new ConfigEntity();
     private String hubIp;
-    private String superNodeIp;
 
 
     public ConfigManager( final SecurityManager securityManager, final PeerManager peerManager,
-                          final String peerSecretKeyringPwd )
+                          final String peerSecretKeyringPwd, final ConfigDataService configDataService )
             throws IOException, PGPException, KeyStoreException, CertificateException, NoSuchAlgorithmException
     {
         this.peerManager = peerManager;
         this.securityManager = securityManager;
+        this.configDataService = configDataService;
 
         if ( sender == null )
         {
@@ -102,7 +101,7 @@ public class ConfigManager
 
         if ( ownerPublicKey == null )
         {
-//            this.ownerPublicKey = securityManager.getKeyManager().getPublicKey( "owner-" + peerId );
+            //            this.ownerPublicKey = securityManager.getKeyManager().getPublicKey( "owner-" + peerId );
             this.ownerPublicKey =
                     securityManager.getKeyManager().getPublicKeyRing( securityManager.getKeyManager().getPeerOwnerId() )
                                    .getPublicKey();
@@ -154,8 +153,7 @@ public class ConfigManager
 
             CertificateTool certificateTool = new CertificateTool();
 
-            X509Certificate x509cert = certificateTool
-                    .generateSelfSignedCertificate( sslKeyPair,certificateData );
+            X509Certificate x509cert = certificateTool.generateSelfSignedCertificate( sslKeyPair, certificateData );
 
             keyStoreTool.saveX509Certificate( sslkeyStore, keyStoreData, x509cert, sslKeyPair );
         }
@@ -208,57 +206,30 @@ public class ConfigManager
     }
 
 
-    public WebClient getTrustedWebClientWithAuth( String path )
+    public WebClient getTrustedWebClientWithAuth( String path, final String hubIp )
             throws UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException
     {
-        String baseUrl = String.format( "https://%s", getHubIp() );
+        String baseUrl = String.format( "https://%s", hubIp );
         return HttpClient.createTrustedWebClientWithAuth( baseUrl + path, keyStore, "subutai".toCharArray(),
                 hPublicKey.getFingerprint() );
     }
 
 
-    public WebClient getTrustedWebClient()
+    public WebClient getTrustedWebClient( final String hubIp )
     {
-        String baseUrl = String.format( "https://%s", getHubIp() );
+        String baseUrl = String.format( "https://%s", hubIp );
         return HttpClient.createTrustedWebClient( baseUrl );
     }
 
 
     public void addHubConfig( final String hubIp )
     {
-        hubConfiguration.setHubIp( hubIp );
-        hubConfiguration.setPeerId( getPeerId() );
-        setHubIp( hubIp );
-        setSuperNodeIp( superNodeIp );
-    }
-
-
-    public Config getHubConfiguration()
-    {
-        return hubConfiguration;
-    }
-
-    public String getHubIp()
-    {
-        return hubIp;
-    }
-
-
-    public void setHubIp( final String hubIp )
-    {
         this.hubIp = hubIp;
     }
 
 
-    public String getSuperNodeIp()
+    public String getHubIp()
     {
-        return superNodeIp;
+        return configDataService.getHubConfig( peerId ).getHubIp();
     }
-
-
-    public void setSuperNodeIp( final String superNodeIp )
-    {
-        this.superNodeIp = superNodeIp;
-    }
-
 }
