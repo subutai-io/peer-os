@@ -300,6 +300,9 @@ public class CommandProcessor implements ByteMessageListener, RestProcessor
 
             if ( commandProcess != null )
             {
+
+                LOG.info( String.format( "Received:%n%s", JsonUtil.toJson( response ) ) );
+
                 //process response
                 commandProcess.processResponse( response );
             }
@@ -337,8 +340,6 @@ public class CommandProcessor implements ByteMessageListener, RestProcessor
             String responseString = new String( message, "UTF-8" );
 
             ResponseWrapper responseWrapper = JsonUtil.fromJson( responseString, ResponseWrapper.class );
-
-            LOG.info( String.format( "Received:%n%s", JsonUtil.toJson( responseWrapper ) ) );
 
             ResponseImpl response = responseWrapper.getResponse();
 
