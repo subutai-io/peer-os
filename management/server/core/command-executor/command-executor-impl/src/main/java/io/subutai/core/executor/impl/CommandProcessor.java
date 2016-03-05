@@ -177,28 +177,27 @@ public class CommandProcessor implements ByteMessageListener, RestProcessor
 
     protected void notifyAgents()
     {
-        synchronized ( requests )
-        {
-            for ( final String resourceHostId : requests.getEntries().keySet() )
-            {
-                notifierPool.execute( new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        try
-                        {
-                            ResourceHostInfo resourceHostInfo = getResourceHostInfo( resourceHostId );
+        Set<String> resourceHostIds = requests.getEntries().keySet();
 
-                            notifyAgent( resourceHostInfo );
-                        }
-                        catch ( Exception e )
-                        {
-                            //ignore
-                        }
+        for ( final String resourceHostId : resourceHostIds )
+        {
+            notifierPool.execute( new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        ResourceHostInfo resourceHostInfo = getResourceHostInfo( resourceHostId );
+
+                        notifyAgent( resourceHostInfo );
                     }
-                } );
-            }
+                    catch ( Exception e )
+                    {
+                        //ignore
+                    }
+                }
+            } );
         }
     }
 
@@ -331,12 +330,12 @@ public class CommandProcessor implements ByteMessageListener, RestProcessor
     @Override
     public Set<String> getRequests( final String hostId )
     {
+        Set<String> hostRequests;
         synchronized ( requests )
         {
-            Set<String> hostRequests = requests.remove( hostId );
-
-            return hostRequests == null ? Sets.<String>newHashSet() : hostRequests;
+            hostRequests = requests.remove( hostId );
         }
+        return hostRequests == null ? Sets.<String>newHashSet() : hostRequests;
     }
 
 
