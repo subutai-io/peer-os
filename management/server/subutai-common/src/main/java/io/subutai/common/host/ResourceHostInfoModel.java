@@ -211,6 +211,19 @@ public class ResourceHostInfoModel extends HostInfoModel implements ResourceHost
         {
             return hdd;
         }
+
+
+        @Override
+        public String toString()
+        {
+            final StringBuffer sb = new StringBuffer( "Alert{" );
+            sb.append( "id='" ).append( id ).append( '\'' );
+            sb.append( ", cpu=" ).append( cpu );
+            sb.append( ", ram=" ).append( ram );
+            sb.append( ", hdd=" ).append( hdd );
+            sb.append( '}' );
+            return sb.toString();
+        }
     }
 
 
@@ -263,6 +276,17 @@ public class ResourceHostInfoModel extends HostInfoModel implements ResourceHost
         {
             return quota;
         }
+
+
+        @Override
+        public String toString()
+        {
+            final StringBuffer sb = new StringBuffer( "Ram{" );
+            sb.append( "current='" ).append( current ).append( '\'' );
+            sb.append( ", quota='" ).append( quota ).append( '\'' );
+            sb.append( '}' );
+            return sb.toString();
+        }
     }
 
 
@@ -296,6 +320,18 @@ public class ResourceHostInfoModel extends HostInfoModel implements ResourceHost
         public String getQuota()
         {
             return quota;
+        }
+
+
+        @Override
+        public String toString()
+        {
+            final StringBuffer sb = new StringBuffer( "Hdd{" );
+            sb.append( "partition='" ).append( partition ).append( '\'' );
+            sb.append( ", current='" ).append( current ).append( '\'' );
+            sb.append( ", quota='" ).append( quota ).append( '\'' );
+            sb.append( '}' );
+            return sb.toString();
         }
     }
 

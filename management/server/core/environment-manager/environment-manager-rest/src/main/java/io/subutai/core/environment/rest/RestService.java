@@ -2,6 +2,7 @@ package io.subutai.core.environment.rest;
 
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -34,7 +35,7 @@ public interface RestService
             throws EnvironmentModificationException, EnvironmentNotFoundException;
 
     @Path( "/" )
-    @POST
+    @GET
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
     Response listEnvironments();
