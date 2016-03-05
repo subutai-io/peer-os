@@ -66,7 +66,7 @@ public class HeartBeat
             }
             catch ( Exception e )
             {
-                LOG.warn( "CPU alert parse error: " + e.getMessage() );
+                LOG.warn( String.format( "CPU alert parse error: %s. %s", e.getMessage(), a.getCpu() ) );
             }
         }
     }
@@ -87,7 +87,7 @@ public class HeartBeat
             }
             catch ( Exception e )
             {
-                LOG.warn( "RAM alert parse error: " + e.getMessage() );
+                LOG.warn( String.format( "RAM alert parse error: %s. %s", e.getMessage(), a.getRam() ) );
             }
         }
     }
@@ -95,19 +95,23 @@ public class HeartBeat
 
     private void processHddAlert( final ResourceHostInfoModel.Alert a )
     {
-        if ( a.getRam() != null )
+        if ( a.getHdd() != null )
         {
-            try
+
+            for ( ResourceHostInfoModel.Hdd hdd : a.getHdd() )
             {
-                QuotaAlertValue cpuAlert = new QuotaAlertValue(
-                        new ExceededQuota( new HostId( a.getId() ), ContainerResourceType.RAM,
-                                new ByteValueResource( a.getRam().getCurrent(), ByteUnit.MB ),
-                                new ByteValueResource( a.getRam().getQuota(), ByteUnit.MB ) ) );
-                alerts.add( cpuAlert );
-            }
-            catch ( Exception e )
-            {
-                LOG.warn( "HDD alert parse error: " + e.getMessage() );
+                try
+                {
+                    QuotaAlertValue hddAlert = new QuotaAlertValue( new ExceededQuota( new HostId( a.getId() ),
+                            ContainerResourceType.parse( hdd.getPartition() ),
+                            new ByteValueResource( hdd.getCurrent(), ByteUnit.GB ),
+                            new ByteValueResource( hdd.getQuota(), ByteUnit.GB ) ) );
+                    alerts.add( hddAlert );
+                }
+                catch ( Exception e )
+                {
+                    LOG.warn( String.format( "HDD alert parse error: %s. %s", e.getMessage(), hdd ) );
+                }
             }
         }
     }
