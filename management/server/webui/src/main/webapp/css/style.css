@@ -177,7 +177,7 @@ input[type=checkbox] {
     background-color: #fff;
 }
 .b-title {
-    font-size: 16px !important;
+    font-size: 14px !important;
     padding: 0 0 0 0;
     margin: 0 0 0 0;
     color: #04346E;
@@ -550,6 +550,19 @@ input[type=checkbox] {
 }
 .b-main-table tr:hover {
     background-color: #fbfbfb;
+}
+
+.b-main-table_auto-width {
+	width: auto;
+	margin: 0 0 0 0;
+}
+
+.b-main-table_auto-width td {
+	vertical-align: top;
+}
+
+.b-main-table_auto-width tr:hover {
+	background-color: transparent;
 }
 
 .b-main-table tr:hover .b-main-table__edit-icon .b-icon {
@@ -1060,6 +1073,10 @@ tip.description-tooltip {
     width: 430px;
 }
 
+.b-popup_auto-width {
+	width: auto;
+}
+
 .b-popup-header-controls {
 	float: right;
 	margin: 0 0 0 10px;
@@ -1532,6 +1549,10 @@ td.b-main-table__status-col {
 
 .b-main-table__buttons-group .b-btn {
     margin-left: 10px;
+}
+
+.b-main-table_logs td:first-child {
+	padding-right: 7px;
 }
 
 .b-load-icon {
@@ -2092,8 +2113,8 @@ td.b-main-table__status-col {
 }
 .b-tabs-menu_header ul .b-tabs-menu__item {
     margin-bottom: -1px;
-    padding: 18.5px 35px;
-    font-size: 16px;
+    padding: 18px 15px;
+    font-size: 14px;
 }
 .b-tabs-menu__item:hover {
     background-color: #fbfbfb;
@@ -3468,5 +3489,17 @@ td.b-main-table__status-col {
     font-size: 13px;
 	color: #3d3d3d;
 	background: transparent;
+}
+
+.b-text-logs {
+	background-color: #f8fbfd;
+    padding: 10px 14px;
+    overflow: auto;
+    height: 340px;
+    font-size: 13px;
+    color: #5a5a5a;
+	width: 800px;
+	height: 550px;
+	border: 1px solid #CCCEEE;
 }
 
