@@ -79,6 +79,7 @@
     <org.apache.commons.lang3.version>3.4</org.apache.commons.lang3.version>
     <org.apache.commons.io.version>2.4</org.apache.commons.io.version>
     <org.apache.activemq.version>5.11.0</org.apache.activemq.version>
+    <slf4j.version>1.7.12</slf4j.version>
   </properties>
 
   <dependencyManagement>
@@ -854,12 +855,12 @@
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
-        <version>1.7.7</version>
+        <version>${slf4j.version}</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-simple</artifactId>
-        <version>1.7.7</version>
+        <version>${slf4j.version}</version>
       </dependency>
       <dependency>
         <groupId>commons-codec</groupId>
