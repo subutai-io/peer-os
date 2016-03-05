@@ -140,6 +140,8 @@ public class CommandProcessor implements ByteMessageListener, RestProcessor
         }
         catch ( Exception e )
         {
+            LOG.error( "Error sending request", e );
+
             remove( request );
 
             commandProcess.stop();
@@ -175,25 +177,28 @@ public class CommandProcessor implements ByteMessageListener, RestProcessor
 
     protected void notifyAgents()
     {
-        for ( final String resourceHostId : requests.getEntries().keySet() )
+        synchronized ( requests )
         {
-            notifierPool.execute( new Runnable()
+            for ( final String resourceHostId : requests.getEntries().keySet() )
             {
-                @Override
-                public void run()
+                notifierPool.execute( new Runnable()
                 {
-                    try
+                    @Override
+                    public void run()
                     {
-                        ResourceHostInfo resourceHostInfo = getResourceHostInfo( resourceHostId );
+                        try
+                        {
+                            ResourceHostInfo resourceHostInfo = getResourceHostInfo( resourceHostId );
 
-                        notifyAgent( resourceHostInfo );
+                            notifyAgent( resourceHostInfo );
+                        }
+                        catch ( Exception e )
+                        {
+                            //ignore
+                        }
                     }
-                    catch ( Exception e )
-                    {
-                        //ignore
-                    }
-                }
-            } );
+                } );
+            }
         }
     }
 
@@ -326,9 +331,12 @@ public class CommandProcessor implements ByteMessageListener, RestProcessor
     @Override
     public Set<String> getRequests( final String hostId )
     {
-        Set<String> hostRequests = requests.remove( hostId );
+        synchronized ( requests )
+        {
+            Set<String> hostRequests = requests.remove( hostId );
 
-        return hostRequests == null ? Sets.<String>newHashSet() : hostRequests;
+            return hostRequests == null ? Sets.<String>newHashSet() : hostRequests;
+        }
     }
 
 
