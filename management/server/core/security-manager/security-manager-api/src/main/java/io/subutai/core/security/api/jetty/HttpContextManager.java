@@ -3,22 +3,8 @@ package io.subutai.core.security.api.jetty;
 
 public interface HttpContextManager
 {
-    /* *******************************************
-    *
-    */
+    /**
+     * Reloads Jetty keystores
+     */
     public void reloadKeyStore();
-
-
-    /* *******************************************
-     * todo delete this
-     */
-    @Deprecated
-    public void reloadTrustStore();
-
-
-    /* *******************************************
-     *  todo delete this
-     */
-    @Deprecated
-    public Object getSSLContext();
 }

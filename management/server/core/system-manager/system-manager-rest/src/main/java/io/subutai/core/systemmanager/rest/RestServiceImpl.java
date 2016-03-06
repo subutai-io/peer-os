@@ -22,9 +22,6 @@ import io.subutai.core.systemmanager.api.pojo.PeerSettings;
 import io.subutai.core.systemmanager.api.pojo.SystemInfo;
 
 
-/**
- * Created by ermek on 2/6/16.
- */
 public class RestServiceImpl implements RestService
 {
     private static final Logger LOG = LoggerFactory.getLogger( RestServiceImpl.class.getName() );

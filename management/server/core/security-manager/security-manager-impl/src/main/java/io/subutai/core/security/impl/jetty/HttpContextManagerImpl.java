@@ -8,24 +8,9 @@ import io.subutai.core.security.api.jetty.HttpContextManager;
 public class HttpContextManagerImpl implements HttpContextManager
 {
 
-
     @Override
     public void reloadKeyStore()
     {
         CustomSslContextFactory.getLastInstance().reloadStores();
-    }
-
-
-    @Override
-    public void reloadTrustStore()
-    {
-        CustomSslContextFactory.getLastInstance().reloadStores();
-    }
-
-
-    @Override
-    public Object getSSLContext()
-    {
-        return CustomSslContextFactory.getLastInstance();
     }
 }

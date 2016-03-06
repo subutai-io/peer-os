@@ -12,9 +12,6 @@ import io.subutai.core.systemmanager.api.pojo.PeerSettings;
 import io.subutai.core.systemmanager.api.pojo.SystemInfo;
 
 
-/**
- * Created by ermek on 2/6/16.
- */
 public interface SystemManager
 {
 
@@ -40,5 +37,6 @@ public interface SystemManager
 
     void setKurjunSettingsUrls( String[] globalKurjunUrls ) throws ConfigurationException;
 
-    boolean setKurjunSettingsQuotas( long publicDiskQuota, long publicThreshold, long publicTimeFrame, long trustDiskQuota, long trustThreshold, long trustTimeFrame );
+    boolean setKurjunSettingsQuotas( long publicDiskQuota, long publicThreshold, long publicTimeFrame,
+                                     long trustDiskQuota, long trustThreshold, long trustTimeFrame );
 }

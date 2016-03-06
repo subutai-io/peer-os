@@ -18,15 +18,10 @@ import io.subutai.core.object.relation.impl.model.RelationImpl;
 import io.subutai.core.object.relation.impl.model.RelationLinkImpl;
 
 
-/**
- * Created by talas on 12/8/15.
- */
 public class RelationDataService
 {
     private static final Logger logger = LoggerFactory.getLogger( RelationDataService.class );
     private DaoManager daoManager = null;
-
-    //CRUD
 
 
     public RelationDataService( final DaoManager daoManager )
@@ -178,7 +173,8 @@ public class RelationDataService
         List<Relation> result = Lists.newArrayList();
         try
         {
-            Query qr = em.createQuery( "select ss from RelationImpl AS ss" + " where ss.trustedObject.linkId=:trustedObject" );
+            Query qr = em.createQuery(
+                    "select ss from RelationImpl AS ss" + " where ss.trustedObject.linkId=:trustedObject" );
             qr.setParameter( "trustedObject", object.getLinkId() );
             result.addAll( qr.getResultList() );
         }

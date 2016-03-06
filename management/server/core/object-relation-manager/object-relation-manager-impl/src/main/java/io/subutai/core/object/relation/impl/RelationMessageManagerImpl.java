@@ -9,18 +9,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.subutai.common.util.JsonUtil;
+import io.subutai.core.object.relation.api.RelationMessageManager;
+import io.subutai.core.object.relation.api.RelationVerificationException;
+import io.subutai.core.object.relation.api.model.Relation;
 import io.subutai.core.object.relation.impl.model.RelationImpl;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
-import io.subutai.core.object.relation.api.RelationMessageManager;
-import io.subutai.core.object.relation.api.RelationVerificationException;
-import io.subutai.core.object.relation.api.model.Relation;
 
 
-/**
- * Created by talas on 12/10/15.
- */
 public class RelationMessageManagerImpl implements RelationMessageManager
 {
     private static final Logger logger = LoggerFactory.getLogger( RelationMessageManagerImpl.class );

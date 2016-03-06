@@ -4,9 +4,6 @@ package io.subutai.core.systemmanager.impl.pojo;
 import io.subutai.core.systemmanager.api.pojo.NetworkSettings;
 
 
-/**
- * Created by ermek on 2/9/16.
- */
 public class NetworkSettingsPojo implements NetworkSettings
 {
     public int securePortX1;

@@ -37,9 +37,6 @@ import io.subutai.core.systemmanager.impl.pojo.PeerSettingsPojo;
 import io.subutai.core.systemmanager.impl.pojo.SystemInfoPojo;
 
 
-/**
- * Created by ermek on 2/6/16.
- */
 public class SystemManagerImpl implements SystemManager
 {
     private static final String DEFAULT_KURJUN_REPO = "http://repo.critical-factor.com:8080/rest/kurjun";

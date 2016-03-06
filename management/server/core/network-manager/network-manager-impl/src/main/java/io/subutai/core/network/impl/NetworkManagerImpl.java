@@ -26,6 +26,8 @@ import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.protocol.P2PConnection;
+import io.subutai.common.protocol.P2PPeerInfo;
 import io.subutai.common.protocol.PingDistance;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.settings.Common;
@@ -33,8 +35,6 @@ import io.subutai.common.util.NumUtil;
 import io.subutai.core.network.api.ContainerInfo;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
-import io.subutai.common.protocol.P2PConnection;
-import io.subutai.common.protocol.P2PPeerInfo;
 import io.subutai.core.peer.api.PeerManager;
 
 
@@ -122,7 +122,6 @@ public class NetworkManagerImpl implements NetworkManager
     public PingDistance getPingDistance( final Host host, final String sourceHostIp, final String targetHostIp )
             throws NetworkManagerException
     {
-        // rtt min/avg/max/mdev = 0.012/0.023/0.042/0.011 ms
 
         CommandResult result = execute( host, commands.getPingDistanceCommand( targetHostIp ) );
 

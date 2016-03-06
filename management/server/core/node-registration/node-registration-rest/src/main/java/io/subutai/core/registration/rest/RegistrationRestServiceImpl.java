@@ -91,7 +91,6 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
             decryptedMessage = decryptedMessage.substring( decryptedMessage.indexOf( lineSeparator ) + 1 );
 
             String containerId = decryptedMessage.substring( 0, decryptedMessage.indexOf( lineSeparator ) );
-            //decryptedMessage = decryptedMessage.substring( decryptedMessage.indexOf( lineSeparator ) + 1 );
 
             String publicKey = decryptedMessage.substring( decryptedMessage.indexOf( lineSeparator ) + 1 );
 

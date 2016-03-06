@@ -14,9 +14,6 @@ import javax.persistence.Table;
 import io.subutai.core.registration.api.service.ContainerToken;
 
 
-/**
- * Created by talas on 8/28/15.
- */
 @Entity
 @Table( name = "node_containers_token" )
 @Access( AccessType.FIELD )
