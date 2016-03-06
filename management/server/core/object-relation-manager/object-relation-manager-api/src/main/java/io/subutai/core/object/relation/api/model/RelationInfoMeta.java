@@ -4,9 +4,6 @@ package io.subutai.core.object.relation.api.model;
 import io.subutai.common.security.objects.Ownership;
 
 
-/**
- * Created by talas on 1/12/16.
- */
 public class RelationInfoMeta
 {
     //read, write, delete, update
