@@ -6,9 +6,6 @@ import java.io.IOException;
 import org.apache.cxf.io.CachedOutputStream;
 
 
-/**
- * Created by dilshat on 9/7/15.
- */
 public class CachedStream extends CachedOutputStream
 {
     public CachedStream()

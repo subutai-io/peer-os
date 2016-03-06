@@ -32,15 +32,6 @@ public class PluginDetailsEntity implements PluginDetails
     @Column( name = "kar" )
     private String kar;
 
-    //    @Column( name = "user_id" )
-    //    private Long userId;
-    //
-    //    @Column( name = "role_id" )
-    //    private Long roleId;
-    //
-    //    @Column( name = "token" )
-    //    private String token;
-
 
     public Long getId()
     {
@@ -88,41 +79,4 @@ public class PluginDetailsEntity implements PluginDetails
     {
         this.version = version;
     }
-
-    //    public Long getUserId()
-    //    {
-    //        return userId;
-    //    }
-    //
-    //
-    //    public void setUserId( final Long userId )
-    //    {
-    //        this.userId = userId;
-    //    }
-    //
-    //
-    //    public String getToken()
-    //    {
-    //        return token;
-    //    }
-    //
-    //
-    //    public void setToken( final String token )
-    //    {
-    //        this.token = token;
-    //    }
-    //
-    //
-    //
-    //
-    //    public Long getRoleId()
-    //    {
-    //        return roleId;
-    //    }
-    //
-    //
-    //    public void setRoleId( final Long roleId )
-    //    {
-    //        this.roleId = roleId;
-    //    }
 }

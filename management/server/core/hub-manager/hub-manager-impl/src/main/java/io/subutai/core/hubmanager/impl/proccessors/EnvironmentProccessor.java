@@ -54,9 +54,6 @@ import io.subutai.hub.share.dto.EnvironmentNodeDto;
 import io.subutai.hub.share.json.JsonUtil;
 
 
-/**
- * Created by ${Zubaidullo} on 12/12/15.
- */
 public class EnvironmentProccessor implements StateLinkProccessor
 {
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentProccessor.class.getName() );
@@ -350,11 +347,9 @@ public class EnvironmentProccessor implements StateLinkProccessor
             for ( EnvironmentNodeDto nodeDto : environmentDto.getNodes() )
             {
                 PlacementStrategy placementStrategy = new PlacementStrategy( nodeDto.getContainerPlacementStrategy() );
-                Node node =
-                        new Node( UUID.randomUUID().toString(), nodeDto.getName(), nodeDto.getTemplateName(),
-                                ContainerSize.SMALL, Integer.valueOf( nodeDto.getSshGroupId() ),
-                                Integer.valueOf( nodeDto.getHostsGroupId() ), nodeDto.getPeerId(),
-                                nodeDto.getHostId() );
+                Node node = new Node( UUID.randomUUID().toString(), nodeDto.getName(), nodeDto.getTemplateName(),
+                        ContainerSize.SMALL, Integer.valueOf( nodeDto.getSshGroupId() ),
+                        Integer.valueOf( nodeDto.getHostsGroupId() ), nodeDto.getPeerId(), nodeDto.getHostId() );
                 nodes.add( node );
             }
             Blueprint blueprint = new Blueprint( environmentDto.getName(), nodes );
