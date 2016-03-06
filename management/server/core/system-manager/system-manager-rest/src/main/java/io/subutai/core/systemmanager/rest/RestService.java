@@ -12,9 +12,6 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.configuration.ConfigurationException;
 
 
-/**
- * Created by ermek on 2/6/16.
- */
 public interface RestService
 {
     @GET
@@ -85,7 +82,8 @@ public interface RestService
     public Response setNetworkSettings( @FormParam( "securePortX1" ) String securePortX1,
                                         @FormParam( "securePortX2" ) String securePortX2,
                                         @FormParam( "securePortX3" ) String securePortX3,
-                                        @FormParam( "publicUrl" ) String publicUrl ) throws ConfigurationException;
+                                        @FormParam( "publicUrl" ) String publicUrl,
+                                        @FormParam( "agentPort" ) String agentPort ) throws ConfigurationException;
 
     @GET
     @Path( "advanced_settings" )

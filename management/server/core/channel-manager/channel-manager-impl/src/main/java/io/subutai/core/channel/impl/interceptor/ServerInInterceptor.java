@@ -24,7 +24,6 @@ import io.subutai.core.peer.api.PeerManager;
  */
 public class ServerInInterceptor extends AbstractPhaseInterceptor<Message>
 {
-    //    private static final Logger LOG = LoggerFactory.getLogger( ServerInInterceptor.class );
     private ChannelManagerImpl channelManagerImpl = null;
     private PeerManager peerManager;
 
@@ -57,7 +56,7 @@ public class ServerInInterceptor extends AbstractPhaseInterceptor<Message>
                 HttpServletRequest req = ( HttpServletRequest ) message.get( AbstractHTTPDestination.HTTP_REQUEST );
 
                 if ( req.getLocalPort() == /*SystemSettings.getSecurePortX2()*/ peerManager.getLocalPeer().getPeerInfo()
-                                                                                                      .getPort())
+                                                                                           .getPort() )
                 {
                     HttpHeaders headers = new HttpHeadersImpl( message.getExchange().getInMessage() );
                     String subutaiHeader = headers.getHeaderString( Common.SUBUTAI_HTTP_HEADER );

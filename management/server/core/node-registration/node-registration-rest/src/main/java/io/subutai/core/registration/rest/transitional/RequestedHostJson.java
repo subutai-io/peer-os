@@ -74,7 +74,6 @@ public class RequestedHostJson implements RequestedHost
         Set<HostInterface> temp = Sets.newHashSet();
         temp.addAll( interfaces );
         return temp;
-        //        return Sets.newHashSet();
     }
 
 

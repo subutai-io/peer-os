@@ -13,12 +13,15 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import org.apache.cxf.jaxrs.client.WebClient;
+
 import io.subutai.common.cache.ExpiringCache;
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.OutputRedirection;
 import io.subutai.common.command.Request;
 import io.subutai.common.command.RequestType;
+import io.subutai.common.command.ResponseImpl;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.ResourceHostInfo;
@@ -30,6 +33,7 @@ import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.identity.api.model.User;
+import io.subutai.core.security.api.SecurityManager;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.TestCase.fail;
@@ -55,7 +59,8 @@ public class CommandProcessorTest
             " { response: {" + "      \"type\":\"EXECUTE_RESPONSE\"," + "      \"id\":\"%s\","
                     + "      \"commandId\":\"%s\"," + "      \"pid\":123," + "      \"responseNumber\":2,"
                     + "      \"stdOut\":\"output\"," + "      \"stdErr\":\"err\"," + "      \"exitCode\" : 0" + "  } }",
-            HOST_ID.toString(), COMMAND_ID.toString() );
+            HOST_ID, COMMAND_ID.toString() );
+    private static final String IP = "IP";
 
     @Mock
     Broker broker;
@@ -79,6 +84,8 @@ public class CommandProcessorTest
     Session session;
     @Mock
     IdentityManager identityManager;
+    @Mock
+    SecurityManager securityManager;
 
 
     CommandProcessor commandProcessor;
@@ -87,7 +94,7 @@ public class CommandProcessorTest
     @Before
     public void setUp() throws Exception
     {
-        commandProcessor = spy( new CommandProcessor( broker, hostRegistry, identityManager ) );
+        commandProcessor = spy( new CommandProcessor( hostRegistry, identityManager ) );
         commandProcessor.commands = commands;
         doThrow( new HostDisconnectedException( "" ) ).when( hostRegistry ).getResourceHostInfoById( HOST_ID );
         when( hostRegistry.getContainerHostInfoById( HOST_ID ) ).thenReturn( containerHostInfo );
@@ -95,16 +102,18 @@ public class CommandProcessorTest
         when( request.getId() ).thenReturn( HOST_ID );
         when( request.getCommandId() ).thenReturn( COMMAND_ID );
         doReturn( session ).when( commandProcessor ).getActiveSession();
+        doReturn( broker ).when( commandProcessor ).getBroker();
     }
 
 
     @Test
     public void testConstructor() throws Exception
     {
+
         try
         {
 
-            new CommandProcessor( null, hostRegistry, identityManager );
+            new CommandProcessor( null, identityManager );
             fail( "Expected NullPointerException" );
         }
         catch ( NullPointerException e )
@@ -113,16 +122,7 @@ public class CommandProcessorTest
         try
         {
 
-            new CommandProcessor( broker, null, identityManager );
-            fail( "Expected NullPointerException" );
-        }
-        catch ( NullPointerException e )
-        {
-        }
-        try
-        {
-
-            new CommandProcessor( broker, hostRegistry, null );
+            new CommandProcessor( hostRegistry, null );
             fail( "Expected NullPointerException" );
         }
         catch ( NullPointerException e )
@@ -143,7 +143,7 @@ public class CommandProcessorTest
     public void testRemove() throws Exception
     {
 
-        commandProcessor.remove( COMMAND_ID );
+        commandProcessor.remove( request );
 
         verify( commands ).remove( COMMAND_ID );
     }
@@ -326,16 +326,20 @@ public class CommandProcessorTest
         catch ( CommandException e )
         {
         }
+        WebClient webClient = mock( WebClient.class );
+        doReturn( webClient ).when( commandProcessor )
+                             .getWebClient( any( ResourceHostInfo.class ) );
 
+        doReturn( securityManager ).when( commandProcessor ).getSecurityManager();
 
         when( commands.put( eq( COMMAND_ID ), any( CommandProcess.class ), anyInt(),
                 any( CommandProcessExpiryCallback.class ) ) ).thenReturn( true );
 
         commandProcessor.execute( request1, callback );
 
-        verify( broker ).sendTextMessage( eq( HOST_ID.toString() ), anyString() );
+        verify( broker ).sendTextMessage( eq( HOST_ID ), anyString() );
 
-        doThrow( new BrokerException( "" ) ).when( broker ).sendTextMessage( eq( HOST_ID.toString() ), anyString() );
+        doThrow( new BrokerException( "" ) ).when( broker ).sendTextMessage( eq( HOST_ID ), anyString() );
 
         try
         {

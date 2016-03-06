@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.host.HeartBeat;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.host.ResourceHostInfo;
 

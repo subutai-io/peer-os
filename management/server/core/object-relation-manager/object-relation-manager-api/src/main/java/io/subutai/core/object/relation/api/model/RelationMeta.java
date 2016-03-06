@@ -4,9 +4,6 @@ package io.subutai.core.object.relation.api.model;
 import io.subutai.common.security.relation.RelationLink;
 
 
-/**
- * Created by talas on 12/10/15.
- */
 public class RelationMeta
 {
     private RelationLink source;
@@ -18,12 +15,14 @@ public class RelationMeta
     // Key id to verify relation
     private String keyId;
 
+
     public RelationMeta()
     {
     }
 
+
     public RelationMeta( final RelationLink source, final RelationLink target, final RelationLink object,
-                         final String keyId)
+                         final String keyId )
     {
         this.source = source;
         this.target = target;
@@ -32,7 +31,7 @@ public class RelationMeta
     }
 
 
-    public RelationMeta( final RelationLink source, final RelationLink object, final String keyId)
+    public RelationMeta( final RelationLink source, final RelationLink object, final String keyId )
     {
         this.source = source;
         this.target = source;

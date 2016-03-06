@@ -14,9 +14,6 @@ import io.subutai.core.registration.api.RegistrationStatus;
 import io.subutai.core.registration.api.service.ContainerInfo;
 
 
-/**
- * Created by talas on 9/15/15.
- */
 public class ContainerInfoJson implements ContainerInfo
 {
     private String id;

@@ -14,8 +14,6 @@ import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import io.subutai.common.settings.Common;
-import io.subutai.common.util.IPUtil;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.registration.api.RegistrationManager;
 import io.subutai.core.registration.api.service.RequestedHost;
@@ -66,15 +64,7 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
             String decryptedMessage = new String( decrypted, "UTF-8" );
             RequestedHost requestedHost = JsonUtil.fromJson( decryptedMessage, RequestedHostJson.class );
 
-
             registrationManager.queueRequest( requestedHost );
-
-            //temp workaround to approve MH automatically
-            if ( IPUtil.getLocalIps().contains( getClientIP() ) && Common.MANAGEMENT_HOSTNAME
-                    .equalsIgnoreCase( requestedHost.getHostname() ) )
-            {
-                registrationManager.approveRequest( requestedHost.getId() );
-            }
         }
         catch ( Exception e )
         {
@@ -101,7 +91,6 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
             decryptedMessage = decryptedMessage.substring( decryptedMessage.indexOf( lineSeparator ) + 1 );
 
             String containerId = decryptedMessage.substring( 0, decryptedMessage.indexOf( lineSeparator ) );
-            //decryptedMessage = decryptedMessage.substring( decryptedMessage.indexOf( lineSeparator ) + 1 );
 
             String publicKey = decryptedMessage.substring( decryptedMessage.indexOf( lineSeparator ) + 1 );
 

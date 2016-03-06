@@ -28,15 +28,6 @@ public interface RestAptManager
     public static final String PACKAGE_FILE_PART_NAME = "package";
 
 
-//    @GET
-//    @Path( "dists/{release}/{component}/{arch: binary-\\w+}/Release" )
-//    @Produces( MediaType.TEXT_PLAIN )
-//    Response getRelease(
-//            @PathParam( "release" ) String release,
-//            @PathParam( "component" ) String component,
-//            @PathParam( "arch" ) String arch
-//    );
-    
     @GET
     @Path( "dists/{release}/Release" )
     @Produces( MediaType.TEXT_PLAIN )
@@ -46,12 +37,8 @@ public interface RestAptManager
     @GET
     @Path( "dists/{release}/{component}/{arch: binary-\\w+}/{packages: Packages(\\.\\w+)?}" )
     @Produces( MediaType.TEXT_PLAIN )
-    Response getPackagesIndex(
-            @PathParam( "release" ) String release,
-            @PathParam( "component" ) String component,
-            @PathParam( "arch" ) String arch,
-            @PathParam( "packages" ) String packagesIndex
-    );
+    Response getPackagesIndex( @PathParam( "release" ) String release, @PathParam( "component" ) String component,
+                               @PathParam( "arch" ) String arch, @PathParam( "packages" ) String packagesIndex );
 
 
     @GET
@@ -63,16 +50,15 @@ public interface RestAptManager
     @GET
     @Path( "info" )
     @Produces( MediaType.APPLICATION_JSON )
-    Response getPackageInfo( @QueryParam( MD5_PARAM ) String md5,
-            @QueryParam( NAME_PARAM ) String name,
-            @QueryParam( VERSION_PARAM ) String version );
+    Response getPackageInfo( @QueryParam( MD5_PARAM ) String md5, @QueryParam( NAME_PARAM ) String name,
+                             @QueryParam( VERSION_PARAM ) String version );
 
 
     @GET
     @Path( "get" )
     Response getPackage( @QueryParam( MD5_PARAM ) String md5 );
-    
-    
+
+
     @GET
     @Path( "list" )
     Response listPackages();

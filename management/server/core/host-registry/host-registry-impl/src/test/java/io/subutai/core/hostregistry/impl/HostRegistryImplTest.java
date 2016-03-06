@@ -80,7 +80,7 @@ public class HostRegistryImplTest
     {
         registry = new HostRegistryImpl( );
         registry.hostListeners = hostListeners;
-        registry.notifier = notifier;
+        registry.threadPool = notifier;
         registry.hosts = hosts;
         when( hosts.asMap() ).thenReturn( map );
         when( map.values() ).thenReturn( Sets.newHashSet( resourceHostInfo ) );

@@ -41,13 +41,8 @@ public class HostsCommand extends SubutaiShellCommandSupport
     protected Object doExecute() throws Exception
     {
 
-        //User user = identityManager.getUser();
-
         LocalPeer localPeer = peerManager.getLocalPeer();
 
-
-        //System.out.println( String.format( "Current user %s. Time: %s", user.getUsername(),
-        //fmt.format( System.currentTimeMillis() ) ) );
         System.out.println( "List of hosts in local peer:" );
         for ( ResourceHost resourceHost : localPeer.getResourceHosts() )
         {

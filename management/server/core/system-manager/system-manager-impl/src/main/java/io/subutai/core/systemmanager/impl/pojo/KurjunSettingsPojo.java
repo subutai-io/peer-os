@@ -1,15 +1,11 @@
 package io.subutai.core.systemmanager.impl.pojo;
 
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.subutai.core.systemmanager.api.pojo.KurjunSettings;
 
 
-/**
- * Created by ermek on 2/6/16.
- */
 public class KurjunSettingsPojo implements KurjunSettings
 {
     private String[] globalKurjunUrls;
