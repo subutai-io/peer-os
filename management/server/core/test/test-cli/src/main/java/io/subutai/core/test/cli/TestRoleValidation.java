@@ -10,9 +10,6 @@ import org.apache.karaf.shell.commands.Command;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 
 
-/**
- * Created by talas on 12/6/15.
- */
 @Command( scope = "test", name = "verify", description = "test command" )
 public class TestRoleValidation extends SubutaiShellCommandSupport
 {

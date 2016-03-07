@@ -5,9 +5,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 
-/**
- * Created by talas on 11/29/15.
- */
 public class KeyManagerImplTest
 {
 

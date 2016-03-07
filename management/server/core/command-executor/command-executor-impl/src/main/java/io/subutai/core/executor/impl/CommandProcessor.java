@@ -26,8 +26,6 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.Request;
 import io.subutai.common.command.Response;
-import io.subutai.common.command.ResponseImpl;
-import io.subutai.common.command.ResponseWrapper;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.ResourceHostInfo;
@@ -36,9 +34,6 @@ import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.common.util.ServiceLocator;
-import io.subutai.core.broker.api.Broker;
-import io.subutai.core.broker.api.ByteMessageListener;
-import io.subutai.core.broker.api.Topic;
 import io.subutai.core.executor.api.RestProcessor;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
@@ -50,7 +45,7 @@ import io.subutai.core.security.api.SecurityManager;
 /**
  * Executes commands and processes responses
  */
-public class CommandProcessor implements ByteMessageListener, RestProcessor
+public class CommandProcessor implements RestProcessor
 {
     private static final Logger LOG = LoggerFactory.getLogger( CommandProcessor.class.getName() );
     private static final int NOTIFIER_INTERVAL_MS = 500;
@@ -90,22 +85,14 @@ public class CommandProcessor implements ByteMessageListener, RestProcessor
     }
 
 
-    @Override
-    public Topic getTopic()
-    {
-        return Topic.RESPONSE_TOPIC;
-    }
-
-
     public void execute( final Request request, CommandCallback callback ) throws CommandException
     {
-        //TODO refactor this method when broker is gone
 
         //find target host
-        ResourceHostInfo targetHost;
+        ResourceHostInfo resourceHostInfo;
         try
         {
-            targetHost = getTargetHost( request.getId() );
+            resourceHostInfo = getResourceHostInfo( request.getId() );
         }
         catch ( HostDisconnectedException e )
         {
@@ -129,11 +116,6 @@ public class CommandProcessor implements ByteMessageListener, RestProcessor
             String command = JsonUtil.toJson( new RequestWrapper( request ) );
 
             LOG.info( String.format( "Sending:%n%s", command ) );
-
-            //leave this call temporarily to be compatible with MQTT clients
-            getBroker().sendTextMessage( targetHost.getId(), command );
-
-            ResourceHostInfo resourceHostInfo = getResourceHostInfo( request.getId() );
 
             //queue request
             queueRequest( resourceHostInfo, request );
@@ -270,12 +252,6 @@ public class CommandProcessor implements ByteMessageListener, RestProcessor
     }
 
 
-    protected Broker getBroker() throws NamingException
-    {
-        return ServiceLocator.getServiceNoCache( Broker.class );
-    }
-
-
     protected SecurityManager getSecurityManager() throws NamingException
     {
         return ServiceLocator.getServiceNoCache( SecurityManager.class );
@@ -335,26 +311,6 @@ public class CommandProcessor implements ByteMessageListener, RestProcessor
         catch ( Exception e )
         {
             LOG.error( "Error processing response", e );
-        }
-    }
-
-
-    @Override
-    public void onMessage( final byte[] message )
-    {
-        try
-        {
-            String responseString = new String( message, "UTF-8" );
-
-            ResponseWrapper responseWrapper = JsonUtil.fromJson( responseString, ResponseWrapper.class );
-
-            ResponseImpl response = responseWrapper.getResponse();
-
-            handleResponse( response );
-        }
-        catch ( Exception e )
-        {
-            LOG.error( "Error parsing response", e );
         }
     }
 

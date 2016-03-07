@@ -15,7 +15,6 @@
   <cm:property-placeholder persistent-id="peer" update-strategy="none">
     <cm:default-properties>
       <cm:property name="peerSecretKeyringPwd" value="" />
-      <!-- broker security -->
       <cm:property name="encryptionEnabled" value="false" />
     </cm:default-properties>
   </cm:property-placeholder>
@@ -48,20 +47,4 @@
 
   <service ref="securityManager" interface="io.subutai.core.security.api.SecurityManager" />
 
-  <!-- ************************************************************************************************** -->
-
-  <!-- broker security start -->
-  <bean id="encryptor" scope="singleton" class="io.subutai.core.security.broker.MessageEncryptor">
-    <argument value="${encryptionEnabled}" />
-  </bean>
-
-  <bean id="decryptor" scope="singleton" class="io.subutai.core.security.broker.MessageDecryptor">
-    <argument value="${encryptionEnabled}" />
-  </bean>
-
-  <service ref="encryptor" interface="io.subutai.core.broker.api.TextMessagePostProcessor" />
-
-  <service ref="decryptor" interface="io.subutai.core.broker.api.ByteMessagePreProcessor" />
-
-  <!-- broker security end -->
 </blueprint>
