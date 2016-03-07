@@ -1,9 +1,6 @@
 package io.subutai.core.object.relation.api;
 
 
-/**
- * Created by talas on 12/13/15.
- */
 public class RelationVerificationException extends Exception
 {
     public RelationVerificationException()

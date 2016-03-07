@@ -42,10 +42,6 @@ public class UserTokenEntity implements UserToken
     @Column( name = "valid_date" )
     private Date validDate;
 
-	/*@OneToOne (cascade = CascadeType.ALL, targetEntity = UserEntity.class)
-    @JoinColumn (name = "user_id", nullable = true, insertable = true, updatable = true)
-	private User user;*/
-
 
     @Column( name = "user_id" )
     private long userId;
@@ -154,20 +150,6 @@ public class UserTokenEntity implements UserToken
     {
         this.validDate = validDate;
     }
-
-
-	/*@Override
-    public User getUser ()
-	{
-		return user;
-	}
-
-
-	@Override
-	public void setUser (final User user)
-	{
-		this.user = user;
-	}*/
 
 
     @Override

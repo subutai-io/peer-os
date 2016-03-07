@@ -13,9 +13,6 @@ import org.slf4j.LoggerFactory;
 import org.apache.commons.lang.StringUtils;
 
 
-/**
- * Created by tzhamakeev on 9/7/15.
- */
 public class FingerprintTrustManager implements X509TrustManager
 {
     private static final Logger LOG = LoggerFactory.getLogger( FingerprintTrustManager.class );
@@ -42,10 +39,6 @@ public class FingerprintTrustManager implements X509TrustManager
     {
         LOG.debug( String.format( "Chain length: %d. AuthType: %s", chain.length, authType ) );
 
-//        if ( chain.length != 1 )
-//        {
-//            throw new CertificateException( "Chain not supported." );
-//        }
 
         X509Certificate cert = chain[0];
         LOG.debug( cert.toString() );
@@ -56,11 +49,6 @@ public class FingerprintTrustManager implements X509TrustManager
             Principal p = cert.getSubjectDN();
             String fingerPrint = StringUtils.substringBetween( p.getName(), "CN=", "," );
             LOG.debug( "Fingerprint: " + fingerPrint );
-
-//            if ( !Arrays.equals( serverFingerprint, Hex.decodeHex( fingerPrint.toCharArray() ) ) )
-//            {
-//                throw new CertificateException( "Invalid fingerprint" );
-//            }
         }
         catch ( Exception e )
         {

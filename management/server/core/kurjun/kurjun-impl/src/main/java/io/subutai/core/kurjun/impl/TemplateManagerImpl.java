@@ -1,9 +1,6 @@
 package io.subutai.core.kurjun.impl;
 
 
-import io.subutai.core.kurjun.impl.store.RepoUrlStore;
-import io.subutai.core.kurjun.impl.model.RepoUrl;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -53,7 +50,7 @@ import ai.subut.kurjun.metadata.factory.PackageMetadataStoreModule;
 import ai.subut.kurjun.model.metadata.SerializableMetadata;
 import ai.subut.kurjun.model.metadata.template.SubutaiTemplateMetadata;
 import ai.subut.kurjun.model.repository.LocalRepository;
-import ai.subut.kurjun.model.repository.NonLocalRepository;
+import ai.subut.kurjun.model.repository.RemoteRepository;
 import ai.subut.kurjun.model.repository.Repository;
 import ai.subut.kurjun.model.repository.UnifiedRepository;
 import ai.subut.kurjun.quota.DataUnit;
@@ -84,8 +81,10 @@ import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.kurjun.api.KurjunTransferQuota;
 import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.kurjun.api.template.TemplateRepository;
+import io.subutai.core.kurjun.impl.model.RepoUrl;
 import io.subutai.core.kurjun.impl.model.SharedTemplateInfo;
 import io.subutai.core.kurjun.impl.model.UserRepoContext;
+import io.subutai.core.kurjun.impl.store.RepoUrlStore;
 import io.subutai.core.kurjun.impl.store.UserRepoContextStore;
 import io.subutai.core.object.relation.api.RelationManager;
 
@@ -95,7 +94,7 @@ public class TemplateManagerImpl implements TemplateManager
 {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( TemplateManagerImpl.class );
-    
+
     private static final String TEMPLATE_PATH = "/templates";
 
     private Set<UserRepoContext> GLOBAL_CONTEXTS;
@@ -108,7 +107,6 @@ public class TemplateManagerImpl implements TemplateManager
 
     private Set<RepoUrl> remoteRepoUrls = new HashSet<>();
 
-    // private Set<RepoUrl> globalRepoUrls = new LinkedHashSet<>();
 
     private final LocalPeer localPeer;
 
@@ -122,11 +120,10 @@ public class TemplateManagerImpl implements TemplateManager
 
 
     public TemplateManagerImpl( LocalPeer localPeer, IdentityManager identityManager, RelationManager relationManager,
-            io.subutai.core.security.api.SecurityManager securityManager, String globalKurjunUrl )
+                                io.subutai.core.security.api.SecurityManager securityManager, String globalKurjunUrl )
     {
         this.localPeer = localPeer;
         this.securityHelper = new SubutaiSecurityHelper( identityManager, relationManager, securityManager );
-        // parseGlobalKurjunUrls( globalKurjunUrl );
     }
 
 
@@ -144,13 +141,11 @@ public class TemplateManagerImpl implements TemplateManager
 
         // schedule metadata cache updater
         metadataCacheUpdater = Executors.newSingleThreadScheduledExecutor();
-        metadataCacheUpdater.scheduleWithFixedDelay( ()
-                -> 
-                {
-                    for ( KurjunContext context : GLOBAL_CONTEXTS )
-                    {
-                        refreshMetadataCache( context.getName() );
-                    }
+        metadataCacheUpdater.scheduleWithFixedDelay( () -> {
+            for ( KurjunContext context : GLOBAL_CONTEXTS )
+            {
+                refreshMetadataCache( context.getName() );
+            }
         }, 5, 30, TimeUnit.SECONDS );
     }
 
@@ -223,7 +218,8 @@ public class TemplateManagerImpl implements TemplateManager
 
     @Override
     @RolesAllowed( "Template-Management|Read" )
-    public InputStream getTemplateData( String repository, byte[] md5, String templateOwner, boolean isKurjunClient ) throws IOException
+    public InputStream getTemplateData( String repository, byte[] md5, String templateOwner, boolean isKurjunClient )
+            throws IOException
     {
         UserRepoContext context = getUserRepoContext( repository );
         securityHelper.checkGetPermission( context, md5, templateOwner );
@@ -272,7 +268,8 @@ public class TemplateManagerImpl implements TemplateManager
     public List<Map<String, Object>> getSharedTemplateInfos( byte[] md5, String templateOwner ) throws IOException
     {
         String md5Str = Hex.encodeHexString( md5 );
-        List<SharedTemplateInfo> list = securityHelper.getSharedTemplateInfos( new TemplateId( templateOwner, md5Str ) );
+        List<SharedTemplateInfo> list =
+                securityHelper.getSharedTemplateInfos( new TemplateId( templateOwner, md5Str ) );
         List<Map<String, Object>> shared = new ArrayList<>();
 
         for ( SharedTemplateInfo info : list )
@@ -341,7 +338,8 @@ public class TemplateManagerImpl implements TemplateManager
                 DefaultTemplate templateMeta = ( DefaultTemplate ) metadata;
                 if ( securityHelper.isGetAllowed( context, templateMeta.getMd5Sum(), templateMeta.getOwnerFprint() ) )
                 {
-                    simpleList.add( convertToSimple( templateMeta, currFprint.equals( templateMeta.getOwnerFprint() ) ) );
+                    simpleList
+                            .add( convertToSimple( templateMeta, currFprint.equals( templateMeta.getOwnerFprint() ) ) );
                 }
             }
 
@@ -355,7 +353,8 @@ public class TemplateManagerImpl implements TemplateManager
                 for ( SerializableMetadata metadata : unifiedList )
                 {
                     DefaultTemplate templateMeta = ( DefaultTemplate ) metadata;
-                    if ( securityHelper.isGetAllowed( context, templateMeta.getMd5Sum(), templateMeta.getOwnerFprint() ) )
+                    if ( securityHelper
+                            .isGetAllowed( context, templateMeta.getMd5Sum(), templateMeta.getOwnerFprint() ) )
                     {
                         simpleList.add( convertToSimple( templateMeta, false ) );
                     }
@@ -574,7 +573,7 @@ public class TemplateManagerImpl implements TemplateManager
         }
         return Collections.unmodifiableSet( set );
     }
-  
+
 
     @Override
     @RolesAllowed( "Template-Management|Write" )
@@ -588,11 +587,10 @@ public class TemplateManagerImpl implements TemplateManager
         KurjunProperties properties = injector.getInstance( KurjunProperties.class );
         Properties kcp = properties.getContextProperties( newcontext );
         kcp.setProperty( FileStoreFactory.TYPE, FileStoreFactory.FILE_SYSTEM );
-        kcp.setProperty( PackageMetadataStoreModule.PACKAGE_METADATA_STORE_TYPE,
-                PackageMetadataStoreFactory.FILE_DB );
+        kcp.setProperty( PackageMetadataStoreModule.PACKAGE_METADATA_STORE_TYPE, PackageMetadataStoreFactory.FILE_DB );
 
         PRIVATE_CONTEXTS.add( newcontext );
-        
+
         LOGGER.info( "Kurjun repository '{}' created for the userName {}", fprint, userName );
     }
 
@@ -682,8 +680,8 @@ public class TemplateManagerImpl implements TemplateManager
             return false;
         }
     }
-    
-    
+
+
     private String getExternalIp()
     {
         try
@@ -736,23 +734,23 @@ public class TemplateManagerImpl implements TemplateManager
             // Load remote repo urls from store
             remoteRepoUrls = repoUrlStore.getRemoteTemplateUrls();
 
-//            // Refresh global urls
-//            repoUrlStore.removeAllGlobalTemplateUrl();
-//            for ( String url : SystemSettings.getGlobalKurjunUrls() )
-//            {
-//                repoUrlStore.addGlobalTemplateUrl( new RepoUrl( new URL( url ), null ) );
-//            }
-//
-//            // Load global repo urls from store
-//            globalRepoUrls = repoUrlStore.getGlobalTemplateUrls();
+            //            // Refresh global urls
+            //            repoUrlStore.removeAllGlobalTemplateUrl();
+            //            for ( String url : SystemSettings.getGlobalKurjunUrls() )
+            //            {
+            //                repoUrlStore.addGlobalTemplateUrl( new RepoUrl( new URL( url ), null ) );
+            //            }
+            //
+            //            // Load global repo urls from store
+            //            globalRepoUrls = repoUrlStore.getGlobalTemplateUrls();
         }
         catch ( IOException e )
         {
             LOGGER.error( "Failed to get remote repository URLs", e );
         }
     }
-    
-    
+
+
     private void initUserRepoContexts( KurjunProperties properties )
     {
         // init repo urls
@@ -769,7 +767,7 @@ public class TemplateManagerImpl implements TemplateManager
             // add user private repositories
             PRIVATE_CONTEXTS = new HashSet<>();
             PRIVATE_CONTEXTS.add( new UserRepoContext( TemplateRepository.SHARED, TemplateRepository.SHARED ) );
-            
+
             List<String> fprints = securityHelper.getUserFingerprints();
             for ( String fprint : fprints )
             {
@@ -829,7 +827,8 @@ public class TemplateManagerImpl implements TemplateManager
             for ( RepoUrl repoUrl : remoteRepoUrls )
             {
                 unifiedRepo.getRepositories().add( repositoryFactory
-                        .createNonLocalTemplate( repoUrl.getUrl().toString(), null, context.getName(), repoUrl.getToken() ) );
+                        .createNonLocalTemplate( repoUrl.getUrl().toString(), null, context.getName(),
+                                repoUrl.getToken() ) );
             }
 
             // shuffle the global repo list to randomize and normalize usage of them
@@ -838,14 +837,15 @@ public class TemplateManagerImpl implements TemplateManager
 
             for ( RepoUrl repoUrl : list )
             {
-                unifiedRepo.getSecondaryRepositories().add( repositoryFactory.createNonLocalTemplate(
-                        repoUrl.getUrl().toString(), null, context.getName(), repoUrl.getToken() ) );
+                unifiedRepo.getSecondaryRepositories().add( repositoryFactory
+                        .createNonLocalTemplate( repoUrl.getUrl().toString(), null, context.getName(),
+                                repoUrl.getToken() ) );
             }
         }
         return unifiedRepo;
     }
 
-    
+
     private List<RepoUrl> getGlobalKurjunUrls()
     {
         try
@@ -863,19 +863,20 @@ public class TemplateManagerImpl implements TemplateManager
             throw new IllegalArgumentException( "Invalid global kurjun url", e );
         }
     }
-    
+
 
     /**
      * Gets user repository context for templates repository.
      *
      * @return user repository context instance
+     *
      * @throws IllegalArgumentException if invalid/unknown repository value is supplied
      */
     private UserRepoContext getUserRepoContext( String repository )
     {
-        String repo = TemplateRepository.MY.equals( repository )
-                ? securityHelper.getActiveUserFingerprint() : repository;
-        
+        String repo =
+                TemplateRepository.MY.equals( repository ) ? securityHelper.getActiveUserFingerprint() : repository;
+
         Set<UserRepoContext> set = GLOBAL_CONTEXTS;
         for ( UserRepoContext c : set )
         {
@@ -895,21 +896,6 @@ public class TemplateManagerImpl implements TemplateManager
         }
         throw new IllegalArgumentException( "Invalid repository " + repo );
     }
-
-
-//    private void parseGlobalKurjunUrls( String globalKurjunUrl )
-//    {
-//        if ( !Strings.isNullOrEmpty( globalKurjunUrl ) )
-//        {
-//            String urls[] = globalKurjunUrl.split( "," );
-//
-//            for ( int x = 0; x < urls.length; x++ )
-//            {
-//                urls[x] = urls[x].trim();
-//                globalKurjunUrlList.add( urls[x] );
-//            }
-//        }
-//    }
 
 
     private void logAllUrlsInUse()
@@ -972,9 +958,9 @@ public class TemplateManagerImpl implements TemplateManager
 
         for ( Repository repo : repos )
         {
-            if ( repo instanceof NonLocalRepository )
+            if ( repo instanceof RemoteRepository )
             {
-                NonLocalRepository remote = ( NonLocalRepository ) repo;
+                RemoteRepository remote = ( RemoteRepository ) repo;
                 List<SerializableMetadata> ls = remote.getMetadataCache().getMetadataList();
                 result.addAll( ls );
             }
@@ -993,19 +979,21 @@ public class TemplateManagerImpl implements TemplateManager
      */
     private void refreshMetadataCache( String repository )
     {
-        Set<NonLocalRepository> remotes = new HashSet<>();
+        Set<RemoteRepository> remotes = new HashSet<>();
         RepositoryFactory repoFactory = injector.getInstance( RepositoryFactory.class );
 
         for ( RepoUrl url : remoteRepoUrls )
         {
-            remotes.add( repoFactory.createNonLocalTemplate( url.getUrl().toString(), null, repository, url.getToken() ) );
+            remotes.add(
+                    repoFactory.createNonLocalTemplate( url.getUrl().toString(), null, repository, url.getToken() ) );
         }
         for ( RepoUrl url : getGlobalKurjunUrls() )
         {
-            remotes.add( repoFactory.createNonLocalTemplate( url.getUrl().toString(), null, repository, url.getToken() ) );
+            remotes.add(
+                    repoFactory.createNonLocalTemplate( url.getUrl().toString(), null, repository, url.getToken() ) );
         }
 
-        for ( NonLocalRepository remote : remotes )
+        for ( RemoteRepository remote : remotes )
         {
             remote.getMetadataCache().refresh();
         }
@@ -1014,13 +1002,12 @@ public class TemplateManagerImpl implements TemplateManager
 
     private TemplateKurjun convertToSubutaiTemplate( SubutaiTemplateMetadata meta )
     {
-        TemplateKurjun template = new TemplateKurjun( String.valueOf( meta.getId() ),
-                Hex.encodeHexString( meta.getMd5Sum() ), meta.getName(),
-                meta.getVersion(), meta.getArchitecture().name(),
-                meta.getParent(), meta.getPackage(), meta.getOwnerFprint() );
+        TemplateKurjun template =
+                new TemplateKurjun( String.valueOf( meta.getId() ), Hex.encodeHexString( meta.getMd5Sum() ),
+                        meta.getName(), meta.getVersion(), meta.getArchitecture().name(), meta.getParent(),
+                        meta.getPackage(), meta.getOwnerFprint() );
         template.setConfigContents( meta.getConfigContents() );
         template.setPackagesContents( meta.getPackagesContents() );
         return template;
     }
-
 }

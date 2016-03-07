@@ -15,9 +15,6 @@ import com.google.common.base.Preconditions;
 import io.subutai.common.security.relation.RelationLink;
 
 
-/**
- * Created by talas on 12/8/15.
- */
 @Entity
 @Table( name = "relation_link" )
 @Access( AccessType.FIELD )
@@ -25,7 +22,7 @@ public class RelationLinkImpl implements RelationLink
 {
     @Id
     @GeneratedValue( strategy = GenerationType.IDENTITY )
-    @Column(name = "rl_id")
+    @Column( name = "rl_id" )
     private long id;
 
     @Column( name = "link_id" )

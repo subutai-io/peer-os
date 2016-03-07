@@ -154,13 +154,10 @@ public class RemotePeerImplTest
         params.put( PARAM_NAME, PARAM_VALUE );
         headers = Maps.newHashMap();
         headers.put( HEADER_NAME, HEADER_VALUE );
-        remotePeer = spy( new RemotePeerImpl( localPeer.getId(), securityManager, peerInfo, messenger, commandResponseListener,
-                messageResponseListener, null ) );
+        remotePeer = spy( new RemotePeerImpl( localPeer.getId(), securityManager, peerInfo, messenger,
+                commandResponseListener, messageResponseListener, null ) );
         remotePeer.restUtil = restUtil;
         remotePeer.jsonUtil = jsonUtil;
-
-        when( restUtil.createTrustedWebClientWithAuthAndProviders( anyString(), anyString(), any() ) )
-                .thenReturn( webClient );
         when( containerHost.getId() ).thenReturn( CONTAINER_ID );
         when( containerHost.getContainerId() ).thenReturn( containerId );
         when( containerId.getId() ).thenReturn( CONTAINER_ID );
@@ -568,8 +565,6 @@ public class RemotePeerImplTest
     {
         Vni vni = mock( Vni.class );
         when( vni.getEnvironmentId() ).thenReturn( ENV_ID );
-        when( restUtil.request( eq( RestUtil.RequestType.POST ), anyString(), anyString(), anyMap(), anyMap() ) )
-                .thenReturn( String.valueOf( VLAN ) );
 
 
         assertEquals( VLAN, remotePeer.reserveVni( vni ) );
@@ -577,19 +572,6 @@ public class RemotePeerImplTest
         throwException();
 
         remotePeer.reserveVni( vni );
-    }
-
-
-    @Test( expected = PeerException.class )
-    public void testGetContainerHostInfoById() throws Exception
-    {
-        remotePeer.getContainerHostInfoById( CONTAINER_ID );
-
-        verify( restUtil ).request( eq( RestUtil.RequestType.GET ), anyString(), anyString(), anyMap(), anyMap() );
-
-        throwException();
-
-        remotePeer.getContainerHostInfoById( CONTAINER_ID );
     }
 
 

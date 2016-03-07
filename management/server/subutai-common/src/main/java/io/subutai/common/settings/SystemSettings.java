@@ -11,9 +11,6 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
 
-/**
- * Created by ermek on 2/19/16.
- */
 public class SystemSettings
 {
     private static final Logger LOG = LoggerFactory.getLogger( SystemSettings.class );
@@ -156,6 +153,12 @@ public class SystemSettings
     }
 
 
+    public static int getAgentPort()
+    {
+        return PROPERTIES.getInt( "agentPort", ChannelSettings.AGENT_PORT );
+    }
+
+
     public static void setOpenPort( int openPort )
     {
         saveProperty( "openPort", openPort );
@@ -186,15 +189,23 @@ public class SystemSettings
     }
 
 
+    public static void setAgentPort( int agentPort )
+    {
+        saveProperty( "agentPort", agentPort );
+    }
+
+
     // Security Settings
 
 
+    //todo remove this since communication is always encrypted
+    @Deprecated
     public static boolean getEncryptionState()
     {
         return PROPERTIES.getBoolean( "encryptionEnabled", false );
     }
 
-
+    //todo remove
     public static boolean getRestEncryptionState()
     {
         return PROPERTIES.getBoolean( "restEncryptionEnabled", false );

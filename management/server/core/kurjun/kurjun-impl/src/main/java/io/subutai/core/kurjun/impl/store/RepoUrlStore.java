@@ -1,8 +1,6 @@
 package io.subutai.core.kurjun.impl.store;
 
 
-import io.subutai.core.kurjun.impl.model.RepoUrl;
-
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
@@ -10,11 +8,11 @@ import java.util.Set;
 import com.google.common.collect.Sets;
 
 import ai.subut.kurjun.db.file.FileDb;
+import io.subutai.core.kurjun.impl.model.RepoUrl;
 
 
 /**
  * Handles persisting and accessing remote repository urls. Leverages FileDb.
- *
  */
 public class RepoUrlStore
 {
@@ -68,25 +66,6 @@ public class RepoUrlStore
     {
         return getUrls( MAP_NAME_APT );
     }
-
-
-    ///////////////// Global template methods /////////////////////
-//    public void addGlobalTemplateUrl( RepoUrl repoUrl ) throws IOException
-//    {
-//        addUrl( repoUrl, MAP_NAME_GLOBAL );
-//    }
-//
-//
-//    public void removeAllGlobalTemplateUrl() throws IOException
-//    {
-//        removeAllUrls( MAP_NAME_GLOBAL );
-//    }
-//
-//
-//    public Set<RepoUrl> getGlobalTemplateUrls() throws IOException
-//    {
-//        return getUrls( MAP_NAME_GLOBAL );
-//    }
 
 
     ///////////////// Common private methods /////////////////////

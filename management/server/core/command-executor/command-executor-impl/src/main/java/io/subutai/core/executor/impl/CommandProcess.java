@@ -18,10 +18,10 @@ import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandStatus;
+import io.subutai.common.command.Request;
 import io.subutai.common.command.Response;
 import io.subutai.common.command.ResponseType;
 import io.subutai.core.identity.api.model.Session;
-import io.subutai.core.identity.api.model.User;
 
 
 /**
@@ -39,10 +39,12 @@ public class CommandProcess
     protected volatile CommandStatus status;
     protected Semaphore semaphore;
     protected ExecutorService executor;
+    private Request request;
     private Session userSession;
 
 
-    public CommandProcess( final CommandProcessor commandProcessor, final CommandCallback callback, final Session userSession )
+    public CommandProcess( final CommandProcessor commandProcessor, final CommandCallback callback,
+                           final Request request, final Session userSession )
     {
         Preconditions.checkNotNull( commandProcessor );
         Preconditions.checkNotNull( callback );
@@ -55,7 +57,14 @@ public class CommandProcess
         status = CommandStatus.NEW;
         semaphore = new Semaphore( 0 );
 
+        this.request = request;
         this.userSession = userSession;
+    }
+
+
+    public Request getRequest()
+    {
+        return request;
     }
 
 
@@ -100,7 +109,7 @@ public class CommandProcess
                 {
                     try
                     {
-                        executor.execute( new ResponseProcessor( response, THIS, commandProcessor ) );
+                        executor.execute( new ResponseProcessor( response, THIS, commandProcessor, request ) );
                     }
                     catch ( Exception e )
                     {
@@ -113,7 +122,7 @@ public class CommandProcess
         else
         {
             //TODO: check user
-            executor.execute( new ResponseProcessor( response, THIS, commandProcessor ) );
+            executor.execute( new ResponseProcessor( response, THIS, commandProcessor, request ) );
         }
     }
 

@@ -4,6 +4,7 @@ package io.subutai.core.hostregistry.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.subutai.common.host.HeartBeat;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.broker.api.ByteMessageListener;
 import io.subutai.core.broker.api.Topic;
@@ -38,9 +39,10 @@ public class HeartBeatListener implements ByteMessageListener
         try
         {
             String response = new String( message, "UTF-8" );
-            HeartBeat heartBeat = jsonUtil.from( response, HeartBeat.class );
 
-            //            LOG.info( String.format( "%n<<<HEARTBEAT>>>%n%s%n", heartBeat.getHostInfo().toString() ) );
+            LOG.debug( String.format( "<<HEARTBEAT>><<%s>>", response ) );
+
+            HeartBeat heartBeat = jsonUtil.from( response, HeartBeat.class );
 
             registry.registerHost( heartBeat.getHostInfo(), heartBeat.getAlerts() );
         }

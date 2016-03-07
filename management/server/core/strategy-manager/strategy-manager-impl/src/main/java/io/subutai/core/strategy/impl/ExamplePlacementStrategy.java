@@ -34,19 +34,6 @@ public class ExamplePlacementStrategy implements ExampleStrategy
     private static ExamplePlacementStrategy instance;
 
 
-    //    static
-    //    {
-    ///*
-    //        scheme.add( new NodeSchema( "Huge master", ContainerSize.HUGE, "master" ) );
-    //        scheme.add( new NodeSchema( "Large master", ContainerSize.LARGE, "master" ) );
-    //        scheme.add( new NodeSchema( "Medium master", ContainerSize.MEDIUM, "master" ) );
-    //*/
-    //        scheme.add( new NodeSchema( "master", ContainerSize.TINY, "master" ) );
-    //        scheme.add( new NodeSchema( "hadoop", ContainerSize.TINY, "hadoop" ) );
-    //        scheme.add( new NodeSchema( "cassandra", ContainerSize.TINY, "cassandra" ) );
-    //    }
-
-
     public static ExamplePlacementStrategy getInstance()
     {
         if ( instance == null )
@@ -121,7 +108,7 @@ public class ExamplePlacementStrategy implements ExampleStrategy
 
 
     protected Set<Node> distribute( List<NodeSchema> nodeSchemas, PeerGroupResources peerGroupResources,
-                                         Map<ContainerSize, ContainerQuota> quotas ) throws StrategyException
+                                    Map<ContainerSize, ContainerQuota> quotas ) throws StrategyException
     {
 
         // build list of allocators
@@ -171,9 +158,9 @@ public class ExamplePlacementStrategy implements ExampleStrategy
             {
                 for ( ResourceAllocator.AllocatedContainer container : containers )
                 {
-                    Node node = new Node( UUID.randomUUID().toString(), container.getName(),
-                            container.getTemplateName(), container.getSize(), 0, 0, container.getPeerId(),
-                            container.getHostId() );
+                    Node node =
+                            new Node( UUID.randomUUID().toString(), container.getName(), container.getTemplateName(),
+                                    container.getSize(), 0, 0, container.getPeerId(), container.getHostId() );
                     nodes.add( node );
                 }
             }
@@ -196,42 +183,4 @@ public class ExamplePlacementStrategy implements ExampleStrategy
     {
         return nodeSchema.getName().replaceAll( "\\s+", "_" );
     }
-
-
-    //    protected Topology buildTopology( final Blueprint blueprint, final String cidr, final String strategyId )
-    //            throws StrategyException, PeerException
-    //    {
-    //        LOGGER.debug( "Building topology..." );
-    //
-    //        Topology topology = new Topology( blueprint.getName(), cidr, blueprint.getSshKey() );
-    //
-    //        Set<String> peers = blueprint.getPeers();
-    //        ContainerPlacementStrategy strategy = strategyManager.findStrategyById( strategyId );
-    //        PeerGroupResources groupResources = new PeerGroupResources();
-    //        for ( String peerId : peers )
-    //        {
-    //            Peer peer = peerManager.getPeer( peerId );
-    //
-    //
-    //            groupResources.addPeerResources( peer.getResourceLimits( peerManager.getLocalPeer().getId() ) );
-    //        }
-    //
-    //
-    //        final Map<ContainerSize, ContainerQuota> quotas = quotaManager.getDefaultQuotas();
-    //        Blueprint newBlueprint = strategy.distribute( groupResources, quotas );
-    //
-    //        for ( Map.Entry<String, Set<NodeGroup>> placementEntry : newBlueprint.getNodeGroupsMap().entrySet() )
-    //        {
-    //            Peer peer = peerManager.getPeer( placementEntry.getKey() );
-    //            for ( NodeGroup nodeGroup : placementEntry.getValue() )
-    //            {
-    //                topology.addNodePlacement( peer, nodeGroup );
-    //            }
-    //        }
-    //
-    //
-    //        LOGGER.debug( "Topology built." );
-    //
-    //        return topology;
-    //    }
 }

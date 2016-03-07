@@ -101,7 +101,6 @@ public class ConfigManager
 
         if ( ownerPublicKey == null )
         {
-            //            this.ownerPublicKey = securityManager.getKeyManager().getPublicKey( "owner-" + peerId );
             this.ownerPublicKey =
                     securityManager.getKeyManager().getPublicKeyRing( securityManager.getKeyManager().getPeerOwnerId() )
                                    .getPublicKey();

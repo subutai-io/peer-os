@@ -4,9 +4,6 @@ package io.subutai.core.channel.impl.interceptor;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.HttpHeaders;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.message.Message;
@@ -28,7 +25,6 @@ import io.subutai.core.peer.api.PeerManager;
 public class ServerOutInterceptor extends AbstractPhaseInterceptor<Message>
 {
 
-    private static final Logger LOG = LoggerFactory.getLogger( ServerOutInterceptor.class );
     private PeerManager peerManager;
     private ChannelManagerImpl channelManagerImpl = null;
 
@@ -62,7 +58,7 @@ public class ServerOutInterceptor extends AbstractPhaseInterceptor<Message>
                                                                        .get( AbstractHTTPDestination.HTTP_REQUEST );
 
                 if ( req.getLocalPort() == /*SystemSettings.getSecurePortX2()*/ peerManager.getLocalPeer().getPeerInfo()
-                                                                                                      .getPort())
+                                                                                           .getPort() )
                 {
                     //LOG.info( " *** URL:" + url.getPath() );
                     HttpHeaders headers = new HttpHeadersImpl( message.getExchange().getInMessage() );

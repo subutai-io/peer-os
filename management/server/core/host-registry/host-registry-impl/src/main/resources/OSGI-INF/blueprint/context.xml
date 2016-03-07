@@ -14,12 +14,22 @@
                         bind-method="addHostListener" unbind-method="removeHostListener" />
   </reference-list>
 
+  <!--heartbeat processor-->
+  <bean id="heartbeatProcessor" class="io.subutai.core.hostregistry.impl.HeartbeatProcessor" scope="singleton"
+        activation="eager">
+    <argument ref="hostRegistry" />
+  </bean>
+  <!--deprecated heartbeat listener-->
   <bean id="heartbeatListener" class="io.subutai.core.hostregistry.impl.HeartBeatListener" scope="singleton">
     <argument ref="hostRegistry" />
   </bean>
 
   <service ref="hostRegistry" interface="io.subutai.core.hostregistry.api.HostRegistry" />
 
+  <!--deprecated heartbeat listener-->
   <service ref="heartbeatListener" interface="io.subutai.core.broker.api.ByteMessageListener" />
+
+  <!--heartbeat listener-->
+  <service ref="heartbeatProcessor" interface="io.subutai.common.host.HeartbeatListener" />
 
 </blueprint>

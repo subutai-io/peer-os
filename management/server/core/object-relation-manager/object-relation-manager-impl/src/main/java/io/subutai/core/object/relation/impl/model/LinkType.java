@@ -13,9 +13,6 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 
-/**
- * Created by talas on 1/11/16.
- */
 @Entity
 @Table( name = "link_type" )
 @Access( AccessType.FIELD )

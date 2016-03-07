@@ -1,4 +1,4 @@
-package io.subutai.core.hostregistry.impl;
+package io.subutai.common.host;
 
 
 import java.util.HashSet;
@@ -7,9 +7,6 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.subutai.common.host.HostId;
-import io.subutai.common.host.ResourceHostInfo;
-import io.subutai.common.host.ResourceHostInfoModel;
 import io.subutai.common.metric.ExceededQuota;
 import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.resource.ByteUnit;
