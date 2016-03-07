@@ -25,7 +25,7 @@ var app = angular.module('subutai-app', [
 
 CurrentUserCtrl.$inject = ['$location', '$rootScope', '$http', 'SweetAlert'];
 routesConf.$inject = ['$httpProvider', '$stateProvider', '$urlRouterProvider', '$ocLazyLoadProvider'];
-startup.$inject = ['$rootScope', '$state', '$location', '$http'];
+startup.$inject = ['$rootScope', '$state', '$location', '$http', 'SweetAlert', 'ngDialog'];
 
 function CurrentUserCtrl($location, $rootScope, $http, SweetAlert) {
 	var vm = this;
@@ -709,10 +709,13 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 	});
 }
 
-function startup($rootScope, $state, $location, $http) {
+function startup($rootScope, $state, $location, $http, SweetAlert, ngDialog) {
 
     $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
         LOADING_SCREEN('none');
+		ngDialog.closeAll();
+		$('.sweet-overlay').remove();
+		$('.sweet-alert').remove();
 
         $http.get(SERVER_URL + 'rest/v1/hub/registration_state', {withCredentials: true})
             .success(function (data) {

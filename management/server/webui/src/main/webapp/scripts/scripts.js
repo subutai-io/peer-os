@@ -34,8 +34,10 @@ $(".b-form-input-dropdown-list").click(function(e) {
 	e.stopPropagation();
 });
 
-$('.js-scrollbar').perfectScrollbar();
-$('.js-scrollbar-cloud').perfectScrollbar();
+$('.js-scrollbar').perfectScrollbar({
+	"wheelPropagation": true,
+	"swipePropagation": false
+});
 
 $('body').on('click', '.js-hide-resources', function(){
 	$('.b-cloud-add-tools').animate({'left': 0}, 300);

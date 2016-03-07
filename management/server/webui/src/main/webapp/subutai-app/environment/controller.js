@@ -268,7 +268,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 		for(var item in sortedContainers) {
 			sortedContainers[item].tooltip = "";
 			for(var container in sortedContainers[item].containers) {
-				sortedContainers[item].tooltip += container + ":&nbsp;<b>" + sortedContainers[item].containers[container] + "</b><br/>Quota: <b>" + item + "</b>";
+				sortedContainers[item].tooltip += container + ":&nbsp;" + sortedContainers[item].containers[container] + "<br/>Quota: " + item;
 			}
 		}
 		return sortedContainers;

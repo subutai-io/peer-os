@@ -35,7 +35,7 @@
 					</li>
 				</ul>
 			</div>
-			<div class="b-tools-menu b-tools-menu_custom-scroll-huc b-tools-menu_advanced js-scrollbar-cloud" 
+			<div class="b-tools-menu b-tools-menu_custom-scroll-huc b-tools-menu_advanced js-scrollbar" 
 			ng-show="advEnvCtrl.activeCloudTab == 'peers'">
 				<ul>
 					<li ng-repeat="(peerId, peersResources) in advEnvCtrl.peerIds"
@@ -202,7 +202,7 @@
 							</td>
 							<td>
 								<span tooltips
-									tooltip-template='<span class="b-nowrap">ID: <b>{{ environment.id }}</b></span>'
+									tooltip-template='<span class="b-nowrap">ID: {{ environment.id }}</span>'
 									tooltip-side="right"
 								>
 									{{ environment.name }}
