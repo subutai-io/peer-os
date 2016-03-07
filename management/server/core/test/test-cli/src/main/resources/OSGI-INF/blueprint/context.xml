@@ -10,12 +10,6 @@
   </command-bundle>
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="test/hearbeat">
-      <action class="io.subutai.core.test.cli.SendHeartbeatCommand" />
-    </command>
-  </command-bundle>
-
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="test/verify">
       <action class="io.subutai.core.test.cli.TestRoleValidation" />
     </command>
