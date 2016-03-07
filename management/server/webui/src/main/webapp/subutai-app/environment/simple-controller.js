@@ -678,7 +678,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 
 		currentTemplate.set('quotaSize', settings.quotaSize);
 		currentTemplate.attr('rect.b-magnet/fill', vm.colors[settings.quotaSize]);
-		currentTemplate.set('containerName', name);
+		currentTemplate.set('containerName', settings.containerName);
 		//ngDialog.closeAll();
 		containerSettingMenu.hide();
 	}
