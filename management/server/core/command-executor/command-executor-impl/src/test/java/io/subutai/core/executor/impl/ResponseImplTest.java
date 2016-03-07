@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 
+import io.subutai.common.command.ResponseImpl;
 import io.subutai.common.command.ResponseType;
 import io.subutai.common.util.JsonUtil;
 

@@ -55,19 +55,6 @@ public interface QuotaManager
 
 
     /**
-     * Returns resource value parser by resource type.
-     *
-     * @param containerResourceType resource type
-     *
-     * @return resource value parser
-     */
-    //    ResourceValueParser getResourceValueParser( ContainerResourceType containerResourceType ) throws
-    // QuotaException;
-
-    //    <T extends ContainerResource> T getAvailableQuota( ContainerId containerId, Class<T> type ) throws
-    // QuotaException;
-
-    /**
      * Returns predefined quotas of container type
      *
      * @param containerSize @see ContainerType container type
@@ -97,9 +84,8 @@ public interface QuotaManager
 
     /**
      * Removes quota setting when container destroyed
-     * @param containerId
      */
     void removeQuota( ContainerId containerId );
 
-    Map<ContainerSize,ContainerQuota> getDefaultQuotas();
+    Map<ContainerSize, ContainerQuota> getDefaultQuotas();
 }

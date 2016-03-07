@@ -54,14 +54,6 @@ public interface UserToken
     //***********************************
     void setValidDate( Date validDate );
 
-    //***********************************
-    /*User getUser ();
-
-	/*/
-
-    /***********************************
-     * void setUser (User user);
-     */
 
     String getTypeName();
 

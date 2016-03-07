@@ -21,6 +21,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,56 +77,84 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     private static final Logger logger = LoggerFactory.getLogger( EnvironmentContainerImpl.class );
 
     @Column( name = "peer_id", nullable = false )
+    @JsonIgnore
     private String peerId;
+
     @Id
     @Column( name = "host_id", nullable = false )
+    @JsonProperty("hostId")
     private String hostId;
+
     @Column( name = "hostname", nullable = false )
+    @JsonProperty("hostname")
     private String hostname;
+
     @Column( name = "containerName", nullable = true )
+    @JsonProperty("containerName")
     private String containerName;
+
     @Column( name = "node_group_name", nullable = false )
+    @JsonIgnore
     private String nodeGroupName;
+
     @Column( name = "creator_peer_id", nullable = false )
+    @JsonIgnore
     private String creatorPeerId;
+
     @Column( name = "template_name", nullable = false )
+    @JsonProperty("template")
     private String templateName;
+
     @Column( name = "template_arch", nullable = false )
+    @JsonIgnore
     private HostArchitecture templateArch;
 
     @Column( name = "rh_id", nullable = false )
+    @JsonProperty("resourceHostId")
     private String resourceHostId;
 
     @ElementCollection( targetClass = String.class, fetch = FetchType.EAGER )
+    @JsonIgnore
     private Set<String> tags = new HashSet<>();
 
     @ManyToOne( targetEntity = EnvironmentImpl.class, fetch = FetchType.EAGER )
     @JoinColumn( name = "environment_id" )
+    @JsonIgnore
     private Environment environment;
 
     @Column( name = "arch", nullable = false )
     @Enumerated
+    @JsonIgnore
     private HostArchitecture hostArchitecture;
 
     @OneToMany( mappedBy = "host", fetch = FetchType.EAGER, cascade = CascadeType.ALL, targetEntity =
             HostInterfaceImpl.class, orphanRemoval = true )
+    @JsonIgnore
     protected Set<HostInterface> hostInterfaces = new HashSet<>();
 
     @Column( name = "ssh_group_id" )
+    @JsonIgnore
     private int sshGroupId;
+
     @Column( name = "hosts_group_id" )
+    @JsonIgnore
     private int hostsGroupId;
+
     @Column( name = "domain_name" )
+    @JsonProperty("domainName")
     private String domainName;
 
     @Column( name = "type" )
     @Enumerated( EnumType.STRING )
+    @JsonProperty("size")
     private ContainerSize containerSize;
 
     @Transient
+    @JsonIgnore
     private EnvironmentManagerImpl environmentManager;
 
     @Transient
+    @JsonIgnore
     private ContainerId containerId;
 
 

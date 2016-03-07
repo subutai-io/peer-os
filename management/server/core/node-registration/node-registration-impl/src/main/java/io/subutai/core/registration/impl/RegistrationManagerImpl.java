@@ -27,30 +27,23 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
-import io.subutai.common.environment.Environment;
-import io.subutai.common.environment.Node;
-import io.subutai.common.environment.Topology;
-import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
-import io.subutai.common.settings.Common;
+import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.common.util.RestUtil;
+import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.broker.api.Broker;
-import io.subutai.core.broker.api.BrokerException;
-import io.subutai.core.environment.api.EnvironmentManager;
-import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
@@ -79,10 +72,8 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
     private ContainerInfoDataService containerInfoDataService;
     private ContainerTokenDataService containerTokenDataService;
     private DaoManager daoManager;
-    private Broker broker;
     private String domainName;
     private LocalPeer localPeer;
-    private EnvironmentManager environmentManager;
     private NetworkManager networkManager;
 
 
@@ -115,21 +106,9 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
     }
 
 
-    public void setEnvironmentManager( final EnvironmentManager environmentManager )
-    {
-        this.environmentManager = environmentManager;
-    }
-
-
     public void setLocalPeer( final LocalPeer localPeer )
     {
         this.localPeer = localPeer;
-    }
-
-
-    public void setBroker( final Broker broker )
-    {
-        this.broker = broker;
     }
 
 
@@ -258,24 +237,19 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
         {
             return;
         }
+
         registrationRequest.setStatus( RegistrationStatus.APPROVED );
+
         requestDataService.update( registrationRequest );
 
-        //todo sign RH key with Peer Key
         importHostPublicKey( registrationRequest.getId(), registrationRequest.getPublicKey() );
 
         importHostSslCert( registrationRequest.getId(), registrationRequest.getCert() );
 
         for ( final ContainerInfo containerInfo : registrationRequest.getHostInfos() )
         {
-            if ( !Common.MANAGEMENT_HOSTNAME.equals( containerInfo.getHostname() ) )
-            {
-                importHostPublicKey( containerInfo.getId(), containerInfo.getPublicKey() );
-            }
+            importHostPublicKey( containerInfo.getId(), containerInfo.getPublicKey() );
         }
-
-        //TODO @Talas implement this method correctly asap. Temporarily disabling it
-        //processEnvironmentImport( registrationRequest );
     }
 
 
@@ -283,9 +257,13 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
     {
         try
         {
-            broker.registerClientCertificate( hostId, cert );
+            securityManager.getKeyStoreManager().importCertAsTrusted( SystemSettings.getSecurePortX2(), hostId, cert );
+            securityManager.getHttpContextManager().reloadKeyStore();
+
+            //temporarily add this
+            ServiceLocator.getServiceNoCache( Broker.class ).registerClientCertificate( hostId, cert );
         }
-        catch ( BrokerException e )
+        catch ( Exception e )
         {
             LOGGER.error( "Error importing host SSL certificate", e );
         }
@@ -302,109 +280,6 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
         catch ( Exception ex )
         {
             LOGGER.error( "Error importing host public key", ex );
-        }
-    }
-
-
-    private Map<Integer, Map<String, Set<ContainerInfo>>> groupContainersByVlan( Set<ContainerInfo> containerInfoSet )
-    {
-        Map<Integer, Map<String, Set<ContainerInfo>>> groupedContainersByVlan = Maps.newHashMap();
-
-        for ( final ContainerInfo containerInfo : containerInfoSet )
-        {
-            //Group containers by environment relation
-            // and group into node groups.
-            Map<String, Set<ContainerInfo>> groupedContainers = groupedContainersByVlan.get( containerInfo.getVlan() );
-            if ( groupedContainers == null )
-            {
-                groupedContainers = Maps.newHashMap();
-            }
-
-            //Group by container infos by container name
-            Set<ContainerInfo> group = groupedContainers.get( containerInfo.getTemplateName() );
-            if ( group != null )
-            {
-                group.add( containerInfo );
-            }
-            else
-            {
-                group = Sets.newHashSet( containerInfo );
-            }
-
-
-            if ( containerInfo.getVlan() != null && containerInfo.getVlan() != 0 )
-            {
-                groupedContainers.put( containerInfo.getTemplateName(), group );
-                groupedContainersByVlan.put( containerInfo.getVlan(), groupedContainers );
-            }
-        }
-        return groupedContainersByVlan;
-    }
-
-
-    private void processEnvironmentImport( RequestedHostImpl registrationRequest )
-    {
-        Map<Integer, Map<String, Set<ContainerInfo>>> groupedContainersByVlan =
-                groupContainersByVlan( registrationRequest.getHostInfos() );
-
-        for ( final Map.Entry<Integer, Map<String, Set<ContainerInfo>>> mapEntry : groupedContainersByVlan.entrySet() )
-        {
-            //TODO: check this run. Topology constructor changed
-            Topology topology = new Topology( "Imported-environment", 0, 0 );
-            Map<String, Set<ContainerInfo>> rawNodeGroup = mapEntry.getValue();
-            Map<Node, Set<ContainerHostInfo>> classification = Maps.newHashMap();
-
-            for ( final Map.Entry<String, Set<ContainerInfo>> entry : rawNodeGroup.entrySet() )
-            {
-                //place where to create node groups
-                String templateName = entry.getKey();
-                //TODO: please change this distribution
-                Node node =
-                        new Node( UUID.randomUUID().toString(), String.format( "%s_group", templateName ), templateName, ContainerSize.SMALL, 1,
-                                1, localPeer.getId(), registrationRequest.getId() );
-                topology.addNodePlacement( localPeer.getId(), node );
-
-                Set<ContainerHostInfo> converter = Sets.newHashSet();
-                converter.addAll( entry.getValue() );
-                classification.put( node, converter );
-            }
-            //trigger environment import task
-            try
-            {
-                Environment environment = environmentManager
-                        .importEnvironment( String.format( "environment_%d", mapEntry.getKey() ), topology,
-                                classification, mapEntry.getKey() );
-
-                //Save container gateway from environment configuration to update container network configuration
-                // later when it will be available
-                SubnetUtils cidr;
-
-                try
-                {
-                    cidr = new SubnetUtils( environment.getSubnetCidr() );
-                }
-                catch ( IllegalArgumentException e )
-                {
-                    throw new RuntimeException( "Failed to parse subnet CIDR", e );
-                }
-
-                String gateway = cidr.getInfo().getLowAddress();
-                for ( final Set<ContainerHostInfo> infos : classification.values() )
-                {
-                    //TODO: sign CH key with PEK (identified by LocalPeerId+environment.getId())
-                    for ( final ContainerHostInfo hostInfo : infos )
-                    {
-                        ContainerInfoImpl containerInfo = containerInfoDataService.find( hostInfo.getId() );
-                        containerInfo.setGateway( gateway );
-                        containerInfo.setStatus( RegistrationStatus.APPROVED );
-                        containerInfoDataService.update( containerInfo );
-                    }
-                }
-            }
-            catch ( EnvironmentCreationException e )
-            {
-                LOGGER.error( "Error importing environment", e );
-            }
         }
     }
 

@@ -18,9 +18,6 @@ import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import io.subutai.common.security.crypto.ssl.SSLManager;
 
 
-/**
- * Created by ermek on 9/6/15.
- */
 public class HttpClient
 {
     private static long defaultReceiveTimeout = 1000 * 60 * 5;

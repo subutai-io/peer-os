@@ -7,7 +7,9 @@ import org.bouncycastle.openpgp.PGPPublicKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.subutai.common.command.EncryptedRequestWrapper;
 import io.subutai.common.command.Request;
+import io.subutai.common.command.RequestWrapper;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.ServiceLocator;

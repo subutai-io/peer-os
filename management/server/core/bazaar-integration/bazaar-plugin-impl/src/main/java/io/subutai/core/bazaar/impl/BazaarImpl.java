@@ -25,14 +25,6 @@ public class BazaarImpl implements Bazaar
         this.daoManager = daoManager;
         this.configDataService = new ConfigDataServiceImpl( this.daoManager );
         this.integration = integration;
-        //		try
-        //		{
-        //			this.integration.registerPeer ("hub.subut.ai");
-        //		}
-        //		catch (HubPluginException e)
-        //		{
-        //			e.printStackTrace ();
-        //		}
     }
 
 

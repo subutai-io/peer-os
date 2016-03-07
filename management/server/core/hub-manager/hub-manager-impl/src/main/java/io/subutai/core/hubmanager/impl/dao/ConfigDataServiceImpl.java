@@ -12,9 +12,6 @@ import io.subutai.core.hubmanager.api.model.Config;
 import io.subutai.core.hubmanager.impl.model.ConfigEntity;
 
 
-/**
- * Created by ermek on 10/27/15.
- */
 public class ConfigDataServiceImpl implements ConfigDataService
 {
     private static final Logger LOG = LoggerFactory.getLogger( ConfigDataServiceImpl.class );
@@ -95,6 +92,5 @@ public class ConfigDataServiceImpl implements ConfigDataService
         {
             daoManager.closeEntityManager( em );
         }
-
     }
 }

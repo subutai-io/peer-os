@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.host.HeartBeat;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.metric.QuotaAlert;
 import io.subutai.common.metric.QuotaAlertValue;

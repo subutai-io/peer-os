@@ -4,9 +4,6 @@ package io.subutai.core.systemmanager.impl.pojo;
 import io.subutai.core.systemmanager.api.pojo.PeerSettings;
 
 
-/**
- * Created by ermek on 2/11/16.
- */
 public class PeerSettingsPojo implements PeerSettings
 {
     private String peerOwnerId;

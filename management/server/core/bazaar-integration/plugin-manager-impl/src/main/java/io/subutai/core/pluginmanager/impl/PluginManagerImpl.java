@@ -47,25 +47,9 @@ public class PluginManagerImpl implements PluginManager
         cal.setTime( newDate );
         cal.add( Calendar.YEAR, 1 );
 
-//        this.user = identityManager
-//                .createUser( name, name, "Plugin User", String.format( "%s@subutai.io", name ), UserType.Plugin.getId(),
-//                        "test", true );
-//        UserToken token = identityManager.createUserToken( user, null, null, "subutai.io", 2, cal.getTime() );
-//        User currentUser = identityManager.getUser( name );
 
-//        Role role = identityManager.createRole( name, UserType.Plugin.getId() );
-//        identityManager.assignUserRole( currentUser.getId(), role );
-//
-//        for ( final PermissionJson permission : permissions )
-//        {
-//            identityManager.removeAllRolePermissions( role.getId() );
-//            Permission per = identityManager
-//                    .createPermission( permission.getObject(), permission.getScope(), permission.getRead(),
-//                            permission.getWrite(), permission.getUpdate(), permission.getDelete() );
-//            identityManager.assignRolePermission( role.getId(), per );
-//        }
-
-        configDataService.saveDetails( name, version, pathToKar/*, currentUser.getId(), role.getId(), token.getToken() */);
+        configDataService
+                .saveDetails( name, version, pathToKar/*, currentUser.getId(), role.getId(), token.getToken() */ );
     }
 
 

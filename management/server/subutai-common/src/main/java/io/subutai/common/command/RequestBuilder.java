@@ -476,5 +476,35 @@ public class RequestBuilder
         {
             return pid;
         }
+
+
+        @Override
+        public boolean equals( final Object o )
+        {
+            if ( this == o )
+            {
+                return true;
+            }
+            if ( !( o instanceof RequestImpl ) )
+            {
+                return false;
+            }
+
+            final RequestImpl request = ( RequestImpl ) o;
+
+            if ( !commandId.equals( request.commandId ) )
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+
+        @Override
+        public int hashCode()
+        {
+            return commandId.hashCode();
+        }
     }
 }

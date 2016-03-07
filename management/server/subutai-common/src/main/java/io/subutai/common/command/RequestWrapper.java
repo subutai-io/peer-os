@@ -1,7 +1,4 @@
-package io.subutai.core.security.broker;
-
-
-import io.subutai.common.command.RequestBuilder;
+package io.subutai.common.command;
 
 
 public class RequestWrapper

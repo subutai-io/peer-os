@@ -22,9 +22,6 @@ import io.subutai.core.systemmanager.api.pojo.PeerSettings;
 import io.subutai.core.systemmanager.api.pojo.SystemInfo;
 
 
-/**
- * Created by ermek on 2/6/16.
- */
 public class RestServiceImpl implements RestService
 {
     private static final Logger LOG = LoggerFactory.getLogger( RestServiceImpl.class.getName() );
@@ -186,11 +183,11 @@ public class RestServiceImpl implements RestService
 
     @Override
     public Response setNetworkSettings( final String securePortX1, final String securePortX2, final String securePortX3,
-                                        final String publicUrl )
+                                        final String publicUrl, final String agentPort )
     {
         try
         {
-            systemManager.setNetworkSettings( securePortX1, securePortX2, securePortX3, publicUrl );
+            systemManager.setNetworkSettings( securePortX1, securePortX2, securePortX3, publicUrl, agentPort );
         }
         catch ( ConfigurationException e )
         {

@@ -1,11 +1,13 @@
 package io.subutai.core.executor.impl;
 
 
-import io.subutai.common.command.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
+
+import io.subutai.common.command.Request;
+import io.subutai.common.command.Response;
 
 
 /**
@@ -18,9 +20,11 @@ public class ResponseProcessor implements Runnable
     private Response response;
     private CommandProcess process;
     private CommandProcessor processor;
+    private Request request;
 
 
-    public ResponseProcessor( final Response response, final CommandProcess process, final CommandProcessor processor )
+    public ResponseProcessor( final Response response, final CommandProcess process, final CommandProcessor processor,
+                              final Request request )
     {
         Preconditions.checkNotNull( response );
         Preconditions.checkNotNull( process );
@@ -29,6 +33,7 @@ public class ResponseProcessor implements Runnable
         this.response = response;
         this.process = process;
         this.processor = processor;
+        this.request = request;
     }
 
 
@@ -44,7 +49,7 @@ public class ResponseProcessor implements Runnable
             if ( process.isDone() )
             {
                 //remove process from command processor
-                processor.remove( response.getCommandId() );
+                processor.remove( request );
                 //stop process
                 process.stop();
             }

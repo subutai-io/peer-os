@@ -24,19 +24,6 @@ public interface NetworkManager
 
 
     /**
-     *
-     subutai management_network p2p -c interfaceName localPeepIPAddr hash key ttl
-     subutai management_network p2p -d hash
-     subutai management_network p2p -u hash newkey ttl
-     subutai management_network p2p -l
-
-     c - create p2p instance
-     d - delete p2p instance
-     u - update p2p instance encryption key
-     l - list of p2p instances
-     */
-
-    /**
      * Sets up an P2P connection to super node on management host
      */
     public void setupP2PConnection( String interfaceName, String localIp, String communityName, String secretKey,
