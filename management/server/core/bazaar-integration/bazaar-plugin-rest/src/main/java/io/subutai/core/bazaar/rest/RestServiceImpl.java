@@ -39,9 +39,9 @@ public class RestServiceImpl implements RestService
 	}
 
 	@Override
-	public Response uninstallPlugin (Long id, String kar)
+	public Response uninstallPlugin (Long id, String kar, String name)
 	{
-		bazaar.uninstallPlugin (id, kar);
+		bazaar.uninstallPlugin (id, kar, name);
 		return Response.status (Response.Status.OK).build();
 	}
 
