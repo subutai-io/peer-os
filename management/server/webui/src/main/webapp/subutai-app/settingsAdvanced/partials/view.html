@@ -1,27 +1,27 @@
 <div ng-controller="SettingsAdvancedCtrl as settingsAdvancedCtrl">
 
-  <div class="b-workspace__header b-workspace__header_tabs">
-    <div class="b-tabs-menu b-tabs-menu_header">
-      <ul>
-        <li class="b-tabs-menu__item"
-            ng-click="settingsAdvancedCtrl.activeTab = 'karafconsole'"
-            ng-class="settingsAdvancedCtrl.activeTab == 'karafconsole' ? 'b-tabs-menu__item_active' : ''">
-          Console
-        </li>
-        <li class="b-tabs-menu__item"
-            ng-click="settingsAdvancedCtrl.activeTab = 'karaflogs'"
-            ng-class="settingsAdvancedCtrl.activeTab == 'karaflogs' ? 'b-tabs-menu__item_active' : ''">
-          Logs
-        </li>
-      </ul>
-    </div>
-  </div>
+	<div class="b-workspace__header b-workspace__header_tabs">
+		<div class="b-tabs-menu b-tabs-menu_header">
+			<ul>
+				<li class="b-tabs-menu__item"
+				ng-click="settingsAdvancedCtrl.activeTab = 'karafconsole'"
+				ng-class="settingsAdvancedCtrl.activeTab == 'karafconsole' ? 'b-tabs-menu__item_active' : ''">
+					Console
+				</li>
+				<li class="b-tabs-menu__item"
+				ng-click="settingsAdvancedCtrl.activeTab = 'karaflogs'"
+				ng-class="settingsAdvancedCtrl.activeTab == 'karaflogs' ? 'b-tabs-menu__item_active' : ''">
+					Logs
+				</li>
+			</ul>
+		</div>
+	</div>
 
 
-  <div ng-if="settingsAdvancedCtrl.activeTab == 'karaflogs'"
-        ng-include="'subutai-app/settingsAdvanced/partials/karaflogs.html'">
-  </div>
-  <div ng-if="settingsAdvancedCtrl.activeTab == 'karafconsole'" style="display:block;overflow:hidden;height:600px; width: 880px; margin: 10px;">
-    <iframe src="system/console/gogo" style="position: relative; top:-120px; left: -60px; width:1060px;height:1000px;" scrolling="no"></iframe>
-  </div>
+	<div ng-if="settingsAdvancedCtrl.activeTab == 'karaflogs'" 
+		ng-include="'subutai-app/settingsAdvanced/partials/karaflogs.html'">
+	</div>
+	<div ng-if="settingsAdvancedCtrl.activeTab == 'karafconsole'" style="display:block;overflow:hidden;height:600px; width: 880px; margin: 10px;">
+		<iframe src="system/console/gogo" style="position: relative; top:-120px; left: -60px; width:1060px;height:1000px;" scrolling="no"></iframe>
+	</div>
 </div>

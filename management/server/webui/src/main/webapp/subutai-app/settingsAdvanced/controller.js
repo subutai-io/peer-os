@@ -14,12 +14,16 @@ function SettingsAdvancedCtrl($scope, SettingsAdvancedSrv, SweetAlert) {
     vm.saveLogs = saveLogs;
 
     function getConfig() {
+		$('.js-karaflogs-load-screen').addClass('lololo').show();
         SettingsAdvancedSrv.getConfig().success(function (data) {
+			$('.js-karaflogs-load-screen').hide();
             vm.config = data;
-        });
+        }).error(function(error){
+            SweetAlert.swal("ERROR!", error.replace(/\\n/g, " "), "error");
+			$('.js-karaflogs-load-screen').hide();
+		});
     }
-
-    getConfig();
+    //getConfig();
 
     function updateConfig() {
         SettingsAdvancedSrv.updateConfig(vm.config).success(function (data) {

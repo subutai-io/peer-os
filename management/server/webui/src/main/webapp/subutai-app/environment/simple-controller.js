@@ -558,7 +558,10 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 			}
 		);
 
-		$('.js-scrollbar').perfectScrollbar();
+		$('.js-scrollbar').perfectScrollbar({
+			"wheelPropagation": true,
+			"swipePropagation": false
+		});
 
 		//zoom on scroll
 		/*paper.$el.on('mousewheel DOMMouseScroll', onMouseWheel);

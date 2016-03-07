@@ -1,8 +1,22 @@
 <div ng-controller="MonitoringCtrl as monitoringCtrl">
 
-	<div class="b-workspace__header">
+	<div class="b-workspace__header b-workspace__header_tabs">
 
-		<h1 class="b-title">Monitoring</h1>
+		<div class="b-tabs-menu b-tabs-menu_header">
+
+			<ul>
+				<li class="b-tabs-menu__item"
+					ng-class="monitoringCtrl.currentType == 'peer' ? 'b-tabs-menu__item_active' : ''"
+					ng-click="monitoringCtrl.setCurrentType('peer')">
+					Peer
+				</li>
+				<li class="b-tabs-menu__item"
+					ng-class="monitoringCtrl.currentType == 'environments' ? 'b-tabs-menu__item_active' : ''"
+					ng-click="monitoringCtrl.setCurrentType('environments')">
+					Environment
+				</li>
+			</ul>
+		</div>
 	</div>
 
 	<div class="b-workspace__content">
@@ -12,19 +26,6 @@
 			<div class="b-console-selects">
 
 				<div class="b-console-selects__item b-main-form__wrapper"
-					ng-show="monitoringCtrl.containers.length > 0">
-					<select class="b-popup-body-input"
-						ng-model="monitoringCtrl.currentHost"
-						ng-change="monitoringCtrl.getServerData()">
-						<option value="">Select container</option>
-						<option ng-repeat="container in monitoringCtrl.containers" value="{{ container.id }}">
-							{{ container.hostname }}
-						</option>
-					</select>
-					<div class="clear"></div>
-				</div>
-
-				<div class="b-console-selects__item b-main-form__wrapper"
 					ng-show="monitoringCtrl.currentType == 'environments'">
 					<select class="b-popup-body-input"
 						ng-model="monitoringCtrl.selectedEnvironment"
@@ -32,6 +33,19 @@
 						<option value="">Select environment</option>
 						<option ng-repeat="environment in monitoringCtrl.environments" value="{{ environment.id }}">
 							{{ environment.name }}
+						</option>
+					</select>
+					<div class="clear"></div>
+				</div>
+
+				<div class="b-console-selects__item b-main-form__wrapper"
+					ng-show="monitoringCtrl.containers.length > 0">
+					<select class="b-popup-body-input"
+						ng-model="monitoringCtrl.currentHost"
+						ng-change="monitoringCtrl.getServerData()">
+						<option value="">Select container</option>
+						<option ng-repeat="container in monitoringCtrl.containers" value="{{ container.id }}">
+							{{ container.hostname }}
 						</option>
 					</select>
 					<div class="clear"></div>
@@ -52,7 +66,7 @@
 			</div>
 
 			<div class="b-toggle-buttons">
-				<ul>
+				<!--<ul>
 					<li class="b-toggle-buttons__item"
 					ng-class="monitoringCtrl.currentType == 'peer' ? 'b-toggle-buttons__item_active' : ''"
 					ng-click="monitoringCtrl.setCurrentType('peer')">
@@ -63,7 +77,7 @@
 					ng-click="monitoringCtrl.setCurrentType('environments')">
 						Environment
 					</li>
-				</ul>
+				</ul>-->
 
 				<div class="b-main-form__wrapper b-main-form__wrapper_min">
 					<label class="b-popup-body-label b-popup-body-label_inline">Period (h)</label>

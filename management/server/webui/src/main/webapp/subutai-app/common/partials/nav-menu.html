@@ -73,7 +73,7 @@
 			</a>
 		</li>
 		<li class="b-nav-menu" 
-		ng-class="subutaiController.activeState == 'identity-user' || subutaiController.activeState == 'identity-role' || subutaiController.activeState == 'account-settings' || subutaiController.activeState == 'tokens' ? 'b-nav-menu_active' : ''">
+		ng-class="subutaiController.activeState == 'identity-user' || subutaiController.activeState == 'identity-role' || subutaiController.activeState == 'account-settings' || subutaiController.activeState == 'change-pass' || subutaiController.activeState == 'tokens' ? 'b-nav-menu_active' : ''">
 			<a class="b-nav-menu-link" href id="subt-link__user-identity">
 				<span class="b-nav-menu__icon b-nav-menu-link__item">
 					<svg class="b-nav-menu-icon">
@@ -97,7 +97,7 @@
 					<a ui-sref="identity-role" id="subt-link__role-management">Role management</a>
 				</li>
 				<li class="b-nav-menu-sub b-nav-menu-sub_disabled" 
-				ng-class="subutaiController.activeState == 'account-settings' ? 'b-nav-menu-sub_active' : ''">
+				ng-class="subutaiController.activeState == 'account-settings' || subutaiController.activeState == 'change-pass' ? 'b-nav-menu-sub_active' : ''">
 					<a ui-sref="account-settings" id="subt-link__account-settings">Account Settings</a>
 				</li>
 				<li class="b-nav-menu-sub b-nav-menu-sub_disabled" 
