@@ -15,19 +15,8 @@ public interface PluginDetails
 
     public void setKar( final String kar );
 
-//    public Long getUserId();
-//
-//    public void setUserId( final Long userId );
-//
-//    public String getToken();
-//
-//    public void setToken( final String token );
 
     public String getVersion();
 
     public void setVersion( final String version );
-
-//    public Long getRoleId();
-//
-//    public void setRoleId( final Long roleId );
 }

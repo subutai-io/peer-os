@@ -23,9 +23,6 @@ public class GetQuota extends SubutaiShellCommandSupport
             description = "container name" )
     private String containerName;
 
-//    @Argument( index = 1, name = "resource type", required = true, multiValued = false,
-//            description = "resource type to get specific quota" )
-//    private String resourceType;
 
     private QuotaManager quotaManager;
     private LocalPeer localPeer;
@@ -44,19 +41,11 @@ public class GetQuota extends SubutaiShellCommandSupport
     }
 
 
-//    public void setResourceType( final String resourceType )
-//    {
-//        this.resourceType = resourceType;
-//    }
-
-
     @Override
     protected Object doExecute()
     {
         try
         {
-//            ContainerResourceType quotaType = ContainerResourceType.valueOf( this.resourceType );
-
             ContainerHost containerHost = localPeer.getContainerHostByName( containerName );
             System.out.println( quotaManager.getQuota( containerHost.getContainerId() ) );
         }

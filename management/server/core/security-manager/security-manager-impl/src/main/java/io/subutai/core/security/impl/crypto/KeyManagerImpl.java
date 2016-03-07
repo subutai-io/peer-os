@@ -33,7 +33,6 @@ import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.KeyTrustLevel;
 import io.subutai.common.security.objects.SecurityKeyType;
-import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.keyserver.api.KeyServer;
 import io.subutai.core.security.api.crypto.EncryptionTool;
@@ -86,39 +85,6 @@ public class KeyManagerImpl implements KeyManager
      */
     private void init()
     {
-
-        /*
-        try
-        {
-            //Generate KeyPair for Peer **************************
-
-            String peerId = "";
-            List<SecurityKey> keys = securityDataService.getKeyDataByType( SecurityKeyType.ManagementHostKey.getId() );
-
-            if ( keys.size() < 1)
-            {
-                KeyPair keyPair = generateKeyPair( String.format( "Peer%1$s <ss%1$s@subutai.io>",
-                        UUID.randomUUID().toString().replace( "-", "" ) ), false );
-                PGPPublicKeyRing peerPubRing = PGPKeyUtil.readPublicKeyRing( keyPair.getPubKeyring() );
-                peerId = PGPKeyUtil.getFingerprint( peerPubRing.getPublicKey().getFingerprint() );
-                saveKeyPair( peerId, SecurityKeyType.ManagementHostKey.getId(), keyPair );
-            }
-            else
-            {
-                PGPPublicKeyRing peerPubRing = getPublicKeyRing(  keys.get( 0 ).getIdentityId() );
-                peerId = PGPKeyUtil.getFingerprint( peerPubRing.getPublicKey().getFingerprint() );
-            }
-
-
-            // *****setPeerID******************
-            keyData.setManHostId( peerId );
-            //*********************************
-        }
-        catch ( Exception ex )
-        {
-            LOG.error( " **** Error creating Keypair for LocalPeer **** :" + ex.toString(), ex );
-        }*/
-
 
         try
         {
@@ -305,9 +271,6 @@ public class KeyManagerImpl implements KeyManager
     public PGPPublicKeyRing setKeyTrust( final String sourceFingerprint, final String targetFingerprint,
                                          final String encryptedMessage ) throws PGPException
     {
-        //        byte[] decrypted = encryptionTool
-        //                .decryptAndVerify( encryptedMessage.getBytes(), targetFingerprint, "12345678",
-        // sourceFingerprint );
 
         byte[] decrypted = encryptionTool.decrypt( encryptedMessage.getBytes() );
 
@@ -1150,16 +1113,12 @@ public class KeyManagerImpl implements KeyManager
      * Get Public key and save it in the local KeyServer
      */
     @Override
-    public PGPPublicKey getRemoteHostPublicKey( /*String remoteHostId,*/ PeerInfo peerInfo )
+    public PGPPublicKey getRemoteHostPublicKey( PeerInfo peerInfo )
     {
         try
         {
             PGPPublicKeyRing pubRing;
 
-            //            if ( Strings.isNullOrEmpty( remoteHostId ) )
-            //            {
-            //                remoteHostId = getRemoteHostId( ip );
-            //            }
 
             pubRing = getPublicKeyRing( peerInfo.getId() );
 
@@ -1211,29 +1170,6 @@ public class KeyManagerImpl implements KeyManager
         }
         return null;
     }
-
-
-    /* *************************************************************
-     * Get HOST ID key
-     */
-    //    private String getRemoteHostId( String ip )
-    //    {
-    //        // Get Remote peer Public Key and save in the local keystore
-    //
-    //        String peerId = "";
-    //
-    //        String baseUrl = String.format( "https://%s:%s/rest/v1/peer", ip, SystemSettings.getSecurePortX1() );
-    //        WebClient clientPeerId = RestUtil.createTrustedWebClient( baseUrl, keyData.getJsonProvider() );
-    //        clientPeerId.type( MediaType.APPLICATION_JSON ).accept( MediaType.APPLICATION_JSON );
-    //        PeerInfo peerInfo = clientPeerId.path( "/info" ).get( PeerInfo.class );
-    //
-    //        if ( clientPeerId.getResponse().getStatus() == Response.Status.OK.getStatusCode() )
-    //        {
-    //            peerId = peerInfo.getId();
-    //        }
-    //
-    //        return peerId;
-    //    }
 
 
     /* *************************************************************

@@ -25,9 +25,6 @@ import io.subutai.core.object.relation.impl.model.RelationInfoImpl;
 import io.subutai.core.object.relation.impl.model.RelationLinkImpl;
 
 
-/**
- * Created by talas on 12/11/15.
- */
 public class RelationInfoManagerImpl implements RelationInfoManager
 {
     private static final Logger logger = LoggerFactory.getLogger( RelationInfoManagerImpl.class );

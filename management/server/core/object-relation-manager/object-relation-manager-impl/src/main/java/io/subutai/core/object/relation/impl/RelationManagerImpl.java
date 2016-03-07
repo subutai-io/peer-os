@@ -23,9 +23,6 @@ import io.subutai.core.object.relation.impl.model.RelationLinkImpl;
 import io.subutai.core.security.api.SecurityManager;
 
 
-/**
- * Created by talas on 12/10/15.
- */
 public class RelationManagerImpl implements RelationManager
 {
     private static final Logger logger = LoggerFactory.getLogger( RelationManagerImpl.class );
@@ -99,8 +96,7 @@ public class RelationManagerImpl implements RelationManager
 
             // Verification check have to be applied to verify that stored data is the same as the one being supported
             Relation storedRelation = relationDataService
-                    .findBySourceTargetObject                                ( ( RelationLinkImpl ) relation
-                            .getSource(),
+                    .findBySourceTargetObject( ( RelationLinkImpl ) relation.getSource(),
                             ( RelationLinkImpl ) relation.getTarget(),
                             ( RelationLinkImpl ) relation.getTrustedObject() );
 
@@ -197,8 +193,8 @@ public class RelationManagerImpl implements RelationManager
         RelationLinkImpl object = new RelationLinkImpl( objectRelationLink );
         return relationDataService.findByObject( object );
     }
-    
-    
+
+
     @Override
     public List<Relation> getRelationsBySource( final RelationLink sourceRelationLink )
     {

@@ -1,4 +1,4 @@
-package io.subutai.core.security.broker;
+package io.subutai.common.command;
 
 
 public class EncryptedRequestWrapper

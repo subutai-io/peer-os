@@ -326,14 +326,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         final EnvironmentImpl environment = environmentDataService.find( environmentId );
 
         // TODO should be handled on server side when user sends signed message
-        //        try
-        //        {
-        //            relationManager.processTrustMessage( signedMessage, environment.getId() );
-        //        }
-        //        catch ( RelationVerificationException e )
-        //        {
-        //            throw new EnvironmentCreationException( e );
-        //        }
 
         Topology topology = JsonUtil.fromJson( environment.getRawTopology(), Topology.class );
 
@@ -1622,8 +1614,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         createEnvironmentKeyPair( environment.getEnvironmentId(), delegatedUser.getId() );
         try
         {
-            //            KeyManager keyManager = securityManager.getKeyManager();
-            //            EncryptionTool encryptionTool = securityManager.getEncryptionTool();
 
             // TODO user should send signed trust message between delegatedUser and himself
             RelationInfoMeta relationInfoMeta =
@@ -1637,17 +1627,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             Relation relation = relationManager.buildTrustRelation( relationInfo, relationMeta );
             relation.setRelationStatus( RelationStatus.VERIFIED );
             relationManager.saveRelation( relation );
-
-            //            String relationJson = JsonUtil.toJson( relation );
-
-            //            PGPPublicKey publicKey = keyManager.getPublicKey( environment.getEnvironmentId().getId() );
-            //            byte[] relationEncrypted = encryptionTool.encrypt( relationJson.getBytes(), publicKey, true );
-
-            //            String encryptedMessage = "\n" + new String( relationEncrypted, "UTF-8" );
-
-            // relation declaration is created only once so if user signature verification is failed then environment
-            // creation have to fail. Declaration will be saved in encrypted format where relation information is saved
-            //            environment.setRelationDeclaration( encryptedMessage );
         }
         catch ( Exception e )
         {
@@ -1682,10 +1661,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             keyManager.saveSecretKeyRing( pairId, SecurityKeyType.EnvironmentKey.getId(), secRing );
             keyManager.savePublicKeyRing( pairId, SecurityKeyType.EnvironmentKey.getId(), pubRing );
 
-            //***************Sign Keys *********************************************************
-            // User private key is no longer in system
-            //            securityManager.getKeyManager().setKeyTrust( userSecKeyRing, pubRing, KeyTrustLevel.Full
-            // .getId() );
 
             return secRing;
         }
@@ -1704,7 +1679,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             usedIps.addAll( getUsedIps( peerManager.getLocalPeer() ) );
             for ( Peer peer : peers )
             {
-                //                Peer peer = peerManager.getPeer( peerId );
                 usedIps.addAll( getUsedIps( peer ) );
             }
 
@@ -1890,7 +1864,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     @Override
     public void notifyOnContainerStateChanged( final Environment environment, final ContainerHost containerHost )
     {
-        update((EnvironmentImpl) environment );
+        update( ( EnvironmentImpl ) environment );
     }
 
 
@@ -2090,10 +2064,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         Preconditions.checkArgument( !Strings.isNullOrEmpty( handlerId ), "Invalid alert handler id." );
         Preconditions.checkNotNull( handlerPriority, "Invalid alert priority." );
 
-/*
-            //make sure subscriber id is truncated to 100 characters
-            String trimmedSubscriberId = StringUtil.trimToSize( handlerId, Constants.MAX_SUBSCRIBER_ID_LEN );
-*/
         AlertHandler alertHandler = alertHandlers.get( handlerId );
         if ( alertHandler == null )
         {
@@ -2105,7 +2075,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
             environment.addAlertHandler( new EnvironmentAlertHandlerImpl( handlerId, handlerPriority ) );
 
-            update( (EnvironmentImpl)environment );
+            update( ( EnvironmentImpl ) environment );
         }
         catch ( Exception e )
         {
@@ -2122,10 +2092,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         Preconditions.checkArgument( !Strings.isNullOrEmpty( handlerId ), "Invalid alert handler id." );
         Preconditions.checkNotNull( handlerPriority, "Invalid alert priority." );
 
-/*
-            //make sure subscriber id is truncated to 100 characters
-            String trimmedSubscriberId = StringUtil.trimToSize( handlerId, Constants.MAX_SUBSCRIBER_ID_LEN );
-*/
         //remove subscription from database
         try
         {

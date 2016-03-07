@@ -18,7 +18,7 @@ public class KeyStoreManagerImpl implements KeyStoreManager
      *
      */
     @Override
-    public void importCertAsTrusted( int port, String storeAlias, String certificateHEX )
+    public synchronized void importCertAsTrusted( int port, String storeAlias, String certificateHEX )
     {
         KeyStore keyStore;
         KeyStoreData keyStoreData;
@@ -41,7 +41,7 @@ public class KeyStoreManagerImpl implements KeyStoreManager
         keyStoreTool = new KeyStoreTool();
         keyStore = keyStoreTool.load( keyStoreData );
 
-        keyStoreTool.importCertificateHEXString( keyStore, keyStoreData );
+        keyStoreTool.importCertificateInPem( keyStore, keyStoreData );
     }
 
 
@@ -72,7 +72,7 @@ public class KeyStoreManagerImpl implements KeyStoreManager
         keyStoreTool = new KeyStoreTool();
         keyStore = keyStoreTool.load( keyStoreData );
 
-        cert = keyStoreTool.exportCertificateHEXString( keyStore, keyStoreData );
+        cert = keyStoreTool.exportCertificateInPem( keyStore, keyStoreData );
 
         return cert;
     }

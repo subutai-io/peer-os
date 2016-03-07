@@ -3,7 +3,6 @@ package io.subutai.core.lxc.quota.impl;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,18 +33,10 @@ import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.peer.ResourceHost;
-import io.subutai.common.quota.ContainerCpuResource;
-import io.subutai.common.quota.ContainerHomeResource;
-import io.subutai.common.quota.ContainerOptResource;
 import io.subutai.common.quota.ContainerQuota;
-import io.subutai.common.quota.ContainerRamResource;
 import io.subutai.common.quota.ContainerResource;
 import io.subutai.common.quota.ContainerResourceFactory;
-import io.subutai.common.quota.ContainerRootfsResource;
-import io.subutai.common.quota.ContainerVarResource;
 import io.subutai.common.quota.QuotaException;
-import io.subutai.common.resource.ByteUnit;
-import io.subutai.common.resource.ByteValueResource;
 import io.subutai.common.resource.ContainerResourceType;
 import io.subutai.common.resource.CpuResource;
 import io.subutai.common.resource.DiskResource;
@@ -245,32 +236,18 @@ public class QuotaManagerImpl implements QuotaManager
 
     private BigDecimal getRamLimit( final BigDecimal total, final PeerPolicy peerPolicy )
     {
-        //        final BigDecimal reserved = ByteValueResource.toBytes( new BigDecimal( DEFAULT_RESERVED_RAM ),
-        // ByteUnit.GB );
-        //
-        //        BigDecimal available = total.subtract( reserved );
-
         return percentage( total, new BigDecimal( peerPolicy.getMemoryUsageLimit() ) );
     }
 
 
     private BigDecimal getDiskLimit( final BigDecimal total, final PeerPolicy peerPolicy )
     {
-        //        final BigDecimal reserved = ByteValueResource.toBytes( new BigDecimal( DEFAULT_RESERVED_DISK ),
-        // ByteUnit.GB );
-        //
-        //        BigDecimal available = total.subtract( reserved );
-
         return percentage( total, new BigDecimal( peerPolicy.getDiskUsageLimit() ) );
     }
 
 
     private BigDecimal getCpuLimit( final PeerPolicy peerPolicy )
     {
-        //        final BigDecimal reserved = new BigDecimal( DEFAULT_RESERVED_CPU );
-        //
-        //        BigDecimal available = ONE_HUNDRED.subtract( reserved );
-
         return percentage( ONE_HUNDRED, new BigDecimal( peerPolicy.getCpuUsageLimit() ) );
     }
 
@@ -281,28 +258,6 @@ public class QuotaManagerImpl implements QuotaManager
         BigDecimal ramAccumulo = BigDecimal.ZERO;
         BigDecimal diskAccumulo = BigDecimal.ZERO;
         // todo: extract from DB
-/*
-        Collection<ContainerHost> containerHosts = resourceHost.getContainerHostsByPeerId( peerId );
-        for ( ContainerHost containerHost : containerHosts )
-        {
-            ContainerQuota containerQuota = getQuota( containerHost.getContainerId() );
-
-            final ContainerCpuResource cpu = containerQuota.getCpu();
-            final ContainerRamResource ram = containerQuota.getRam();
-            final ContainerHomeResource home = containerQuota.getHome();
-            final ContainerOptResource opt = containerQuota.getOpt();
-            final ContainerVarResource var = containerQuota.getVar();
-            final ContainerRootfsResource rootfs = containerQuota.getRootfs();
-            cpuAccumulo = cpuAccumulo.add( cpu.getResource().getValue() );
-            ramAccumulo = ramAccumulo.add( ram.getResource().getValue() );
-            BigDecimal disk = home.getResource().getValue();
-            disk = disk.add( opt.getResource().getValue() );
-            disk = disk.add( var.getResource().getValue() );
-            disk = disk.add( rootfs.getResource().getValue() );
-            diskAccumulo = diskAccumulo.add( disk );
-        }
-*/
-
 
         return new BigDecimal[] { cpuAccumulo, ramAccumulo, diskAccumulo };
     }

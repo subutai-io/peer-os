@@ -1429,6 +1429,7 @@ input.b-popup-body-checkbox {
 .b-main-form__wrapper_min {
     margin-right: 20px;
     line-height: 24px;
+	vertical-align: top;
 }
 
 .b-main-place {
@@ -1948,6 +1949,7 @@ td.b-main-table__status-col {
 .b-toggle-buttons {
     font-size: 0;
     line-height: 0;
+	vertical-align: top;
 }
 
 .b-toggle-buttons ul {
@@ -1990,7 +1992,8 @@ td.b-main-table__status-col {
 }
 
 .b-console-selects {
-    float: right;
+    float: left;
+	padding: 0 20px 0 0;
 }
 
 .b-console-selects__item {

@@ -15,36 +15,17 @@ import io.subutai.common.resource.PeerGroupResources;
 
 public interface PeerManager
 {
-    //    public static final String SOURCE_REMOTE_PEER = "PEER_REMOTE";
-    //    public static final String SOURCE_LOCAL_PEER = "PEER_LOCAL";
+
 
     void registerPeerActionListener( PeerActionListener peerActionListener );
 
     void unregisterPeerActionListener( PeerActionListener peerActionListener );
 
-    /**
-     * Updates peer metadata
-     */
-    //    boolean update( PeerInfo peerInfo );
-
-    /**
-     * Returns all registered peers metadata objects
-     */
-    //    public List<PeerInfo> getPeerInfos();
 
     void doUnregisterRequest( RegistrationData request ) throws PeerException;
 
     List<RegistrationData> getRegistrationRequests();
 
-    /**
-     * Returns local peer's metadata
-     */
-    //    public PeerInfo getLocalPeerInfo();
-
-    /**
-     * Returns peer metadata by peer id
-     */
-    //    public PeerInfo getPeerInfo( String id );
 
     /**
      * Returns peer instance by peer id
