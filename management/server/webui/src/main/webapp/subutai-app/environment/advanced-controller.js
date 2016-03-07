@@ -745,8 +745,8 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
 	function editEnvironment(environment) {
 		clearWorkspace();
-		console.log(environment);
 		vm.editingEnv = environment;
+		vm.environment2BuildName = environment.name;
 		vm.excludedContainers = [];
 		for(var i = 0; i < environment.containers.length; i++) {
 			var container = environment.containers[i];
