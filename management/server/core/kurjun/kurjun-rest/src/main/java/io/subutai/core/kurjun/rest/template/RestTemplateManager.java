@@ -23,13 +23,13 @@ import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 public interface RestTemplateManager
 {
     // TODO: copied from TemplateServlet. Put to some common place 
-    static final String ID_PARAM = "id";
-    static final String NAME_PARAM = "name";
-    static final String VERSION_PARAM = "version";
-    static final String PACKAGE_FILE_PART_NAME = "package";
-    static final String TYPE_PARAM = "type";
-    static final String IS_KURJUN_CLIENT_PARAM = "kc";
-    static final String RESPONSE_TYPE_ID = "id";
+    String ID_PARAM = "id";
+    String NAME_PARAM = "name";
+    String VERSION_PARAM = "version";
+    String PACKAGE_FILE_PART_NAME = "package";
+    String TYPE_PARAM = "type";
+    String IS_KURJUN_CLIENT_PARAM = "kc";
+    String RESPONSE_TYPE_ID = "id";
 
     @GET
     @Path( "repositories" )
