@@ -5,7 +5,7 @@
 		<h1 class="b-title">Containers</h1>
 	</div>
 
-	<div class="b-workspace__content" style = "min-height: 220px">
+	<div class="b-workspace__content">
 
 		<div class="b-main-form">
 			<div class="b-main-form__wrapper b-main-form__wrapper_margin-r">
@@ -61,7 +61,7 @@
 
 		<div class="b-data-table">
 
-			<table datatable="ng" ng-show="containerViewCtrl.containers.length > 0" 
+			<table datatable="ng" 
 				dt-options="containerViewCtrl.dtOptions" 
 				dt-column-defs="containerViewCtrl.dtColumnDefs" 
 				class="row-border hover subt_table-containers-table">
@@ -90,9 +90,9 @@
 							<a  ui-sref="console({ containerId: container.id })" 
 								tooltips 
 								tooltip-template='
-									<span class="b-nowrap">EnvironmentId: <b>{{ container.environmentId }}</b></span><br>
-									<span class="b-nowrap">ID: <b>{{ container.id }}</b></span><br>
-									<span class="b-nowrap">Host Name: <b>{{ container.hostname }}</b></span>
+									<span class="b-nowrap">EnvironmentId: {{ container.environmentId }}</span><br>
+									<span class="b-nowrap">ID: {{ container.id }}</span><br>
+									<span class="b-nowrap">Host Name: {{ container.hostname }}</span>
 								' 
 								tooltip-side="right">
 								{{ container.templateName }}
@@ -101,7 +101,7 @@
 						<td class="subt_text__container-ip">
 							<span 
 								tooltips 
-								tooltip-template='<span class="b-nowrap">mac: <b>{{ container.environmentId }}</b></span>'>
+								tooltip-template='<span class="b-nowrap">mac: {{ container.environmentId }}</span>'>
 								{{ container.ip }}
 							</span>
 						</td>

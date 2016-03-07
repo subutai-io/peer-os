@@ -1,8 +1,22 @@
 <div ng-controller="ConsoleViewCtrl as consoleViewCtrl">
 
-	<div class="b-workspace__header">
+	<div class="b-workspace__header b-workspace__header_tabs">
 
-		<h1 class="b-title">Console</h1>
+		<div class="b-tabs-menu b-tabs-menu_header">
+
+			<ul>
+				<li class="b-tabs-menu__item"
+					ng-class="consoleViewCtrl.currentType == 'peer' ? 'b-tabs-menu__item_active' : ''" 
+					ng-click="consoleViewCtrl.setCurrentType('peer')">
+					Peer
+				</li>
+				<li class="b-tabs-menu__item"
+					ng-class="consoleViewCtrl.currentType == 'environments' ? 'b-tabs-menu__item_active' : ''" 
+					ng-click="consoleViewCtrl.setCurrentType('environments')">
+					Environment
+				</li>
+			</ul>
+		</div>
 	</div>
 
 	<div class="b-workspace__content">
@@ -12,19 +26,6 @@
 			<div class="b-console-selects">
 
 				<div class="b-console-selects__item b-main-form__wrapper" 
-				ng-show="consoleViewCtrl.containers.length > 0">
-					<select class="b-popup-body-input" 
-						ng-model="selectedContainer" 
-						ng-change="consoleViewCtrl.setConsole(selectedContainer, 'container')">
-						<option value="">Select container</option>
-						<option ng-repeat="container in consoleViewCtrl.containers" value="{{ container.id }}">
-							{{ container.hostname }}
-						</option>
-					</select>
-					<div class="clear"></div>
-				</div>
-
-				<div class="b-console-selects__item b-main-form__wrapper" 
 				ng-show="consoleViewCtrl.currentType == 'environments'">
 					<select class="b-popup-body-input" 
 						ng-model="consoleViewCtrl.selectedEnvironment" 
@@ -32,6 +33,19 @@
 						<option value="">Select environment</option>
 						<option ng-repeat="environment in consoleViewCtrl.environments" value="{{ environment.id }}">
 							{{ environment.name }}
+						</option>
+					</select>
+					<div class="clear"></div>
+				</div>
+
+				<div class="b-console-selects__item b-main-form__wrapper" 
+				ng-show="consoleViewCtrl.containers.length > 0">
+					<select class="b-popup-body-input" 
+						ng-model="selectedContainer" 
+						ng-change="consoleViewCtrl.setConsole(selectedContainer, 'container')">
+						<option value="">Select container</option>
+						<option ng-repeat="container in consoleViewCtrl.containers" value="{{ container.id }}">
+							{{ container.hostname }}
 						</option>
 					</select>
 					<div class="clear"></div>
@@ -53,7 +67,7 @@
 			</div>
 
 			<div class="b-toggle-buttons">
-				<ul>
+				<!--<ul>
 					<li class="b-toggle-buttons__item" 
 					ng-class="consoleViewCtrl.currentType == 'peer' ? 'b-toggle-buttons__item_active' : ''" 
 					ng-click="consoleViewCtrl.setCurrentType('peer')">
@@ -64,7 +78,7 @@
 					ng-click="consoleViewCtrl.setCurrentType('environments')">
 						Environment
 					</li>
-				</ul>
+				</ul>-->
 
 				<div class="b-main-form__wrapper b-main-form__wrapper_min">
 					<label class="b-popup-body-label b-popup-body-label_inline">Timeout</label>

@@ -35,7 +35,7 @@
 					</li>
 				</ul>
 			</div>
-			<div class="b-tools-menu b-tools-menu_custom-scroll-huc b-tools-menu_advanced js-scrollbar-cloud" 
+			<div class="b-tools-menu b-tools-menu_custom-scroll-huc b-tools-menu_advanced js-scrollbar" 
 			ng-show="advEnvCtrl.activeCloudTab == 'peers'">
 				<ul>
 					<li ng-repeat="(peerId, peersResources) in advEnvCtrl.peerIds"
@@ -123,7 +123,7 @@
 				ondrop="drop(event)">
 
 					<div class="b-template-settings__dropdown js-dropen-menu">
-						<form ng-submit="advEnvCtrl.addSettingsToTemplate(templateSettings)">
+						<form ng-submit="advEnvCtrl.addSettingsToTemplate(environmentViewCtrl.templateSettings)">
 							<div class="header"></div>
 							<div class="body">
 								<div class="b-form-group">
@@ -131,13 +131,13 @@
 									<input type="text" 
 										id="js-container-name" 
 										class="b-form-input b-form-input_full" 
-										ng-model="templateSettings.containerName" required>									
+										ng-model="environmentViewCtrl.templateSettings.containerName" required>
 								</div>
 								<div class="b-form-group">
 									<div class="b-form-group__label">Select quota size</div>
 									<select class="b-form-input b-form-input_full" 
 										id="js-container-size" 
-										ng-model="templateSettings.quotaSize"
+										ng-model="environmentViewCtrl.templateSettings.quotaSize"
 									>
 										<option 
 										ng-repeat="type in environmentViewCtrl.containersType" 
@@ -202,7 +202,7 @@
 							</td>
 							<td>
 								<span tooltips
-									tooltip-template='<span class="b-nowrap">ID: <b>{{ environment.id }}</b></span>'
+									tooltip-template='<span class="b-nowrap">ID: {{ environment.id }}</span>'
 									tooltip-side="right"
 								>
 									{{ environment.name }}
