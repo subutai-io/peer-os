@@ -25,6 +25,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 	vm.logMessages = [];
 	var containerSettingMenu = $('.js-dropen-menu');
 	var currentTemplate = {};
+	vm.templateSettings = {};
 
 	vm.domainStrategies = [];
 	vm.strategies = [];
@@ -67,8 +68,6 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 			VARS_MODAL_ERROR( SweetAlert, 'Error on getting templates ' + data );
 		});
 
-	//vm.templates = ['mongo', 'cassandra', 'master', 'hadoop'];
-
 	environmentService.getStrategies().success(function (data) {
 		vm.strategies = data;
 	});
@@ -92,10 +91,6 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
 
 	clearWorkspace();
-
-	/*peerRegistrationService.getResourceHosts().success(function (data) {
-		vm.resourceHosts = data;
-	});*/
 
 	function closePopup() {
 		vm.buildCompleted = false;
@@ -501,8 +496,8 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 				case 'element-call-menu':
 				case 'b-container-plus-icon':
 					currentTemplate = this.model;
-					$('#js-container-name').val(currentTemplate.get('containerName'));
-					$('#js-container-size').val(currentTemplate.get('quotaSize'));
+					vm.templateSettings.containerName = currentTemplate.get('containerName');
+					vm.templateSettings.quotaSize = currentTemplate.get('quotaSize');
 					containerSettingMenu.find('.header').text('Settings ' + this.model.get('templateName'));
 					var elementPos = this.model.get('position');
 					containerSettingMenu.css({
@@ -510,6 +505,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 						'top': (elementPos.y + 45) + 'px',
 						'display': 'block'
 					});
+					$('#js-container-name').trigger();
 					return;
 					break;
 				case 'rotatable':
@@ -745,8 +741,8 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
 	function editEnvironment(environment) {
 		clearWorkspace();
-		console.log(environment);
 		vm.editingEnv = environment;
+		vm.environment2BuildName = environment.name;
 		vm.excludedContainers = [];
 		for(var i = 0; i < environment.containers.length; i++) {
 			var container = environment.containers[i];

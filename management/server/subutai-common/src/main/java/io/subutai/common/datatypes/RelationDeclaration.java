@@ -7,9 +7,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 
-/**
- * Created by talas on 12/7/15.
- */
 @Retention( RetentionPolicy.RUNTIME )
 @Target( ElementType.PARAMETER )
 public @interface RelationDeclaration

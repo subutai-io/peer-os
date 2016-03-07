@@ -213,19 +213,5 @@ public class CommandProcessTest
         verify( response, times( 2 ) ).getStdErr();
         verify( response ).getExitCode();
         assertEquals( CommandStatus.KILLED, commandProcess.status );
-
-
-        reset( response );
-        when( response.getStdOut() ).thenReturn( OUTPUT );
-        when( response.getStdErr() ).thenReturn( OUTPUT );
-        when( response.getExitCode() ).thenReturn( null );
-        when( response.getType() ).thenReturn( ResponseType.PS_RESPONSE );
-
-        commandProcess.appendResponse( response );
-
-        verify( response, times( 2 ) ).getStdOut();
-        verify( response, times( 2 ) ).getStdErr();
-        verify( response ).getExitCode();
-        assertEquals( CommandStatus.SUCCEEDED, commandProcess.status );
     }
 }

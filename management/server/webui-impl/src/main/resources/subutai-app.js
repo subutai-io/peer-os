@@ -25,7 +25,7 @@ var app = angular.module('subutai-app', [
 
 CurrentUserCtrl.$inject = ['$location', '$rootScope', '$http', 'SweetAlert'];
 routesConf.$inject = ['$httpProvider', '$stateProvider', '$urlRouterProvider', '$ocLazyLoadProvider'];
-startup.$inject = ['$rootScope', '$state', '$location', '$http'];
+startup.$inject = ['$rootScope', '$state', '$location', '$http', 'SweetAlert', 'ngDialog'];
 
 function CurrentUserCtrl($location, $rootScope, $http, SweetAlert) {
 	var vm = this;
@@ -89,13 +89,38 @@ function CurrentUserCtrl($location, $rootScope, $http, SweetAlert) {
 				localStorage.setItem('hubRegistered', true);
 				vm.hubStatus = true;
 				hubPopupLoadScreen();
-				//SweetAlert.swal ("Success!", "Your peer was registered to Hub.", "success");
-			}).error (function (error) {
+
+                $http.post( SERVER_URL + 'rest/v1/hub/send-heartbeat?hubIp=hub.subut.ai', {withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
+                    .success(function () {
+                        //localStorage.setItem('hubRegistered', true);
+                        //vm.hubStatus = true;
+                        //hubPopupLoadScreen();
+                        //SweetAlert.swal ("Success!", "Your peer was registered to Hub.", "success");
+                    }).error (function (error) {
+                    console.log('hub/register error: ', error);
+                    vm.hubRegisterError = error;
+                    //hubPopupLoadScreen();
+                });
+
+                $http.post( SERVER_URL + 'rest/v1/hub/send-rh-configurations?hubIp=hub.subut.ai', {withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
+                    .success(function () {
+                        //localStorage.setItem('hubRegistered', true);
+                        //vm.hubStatus = true;
+                        //hubPopupLoadScreen();
+                        //SweetAlert.swal ("Success!", "Your peer was registered to Hub.", "success");
+                    }).error (function (error) {
+                    console.log('hub/register error: ', error);
+                    vm.hubRegisterError = error;
+                    //hubPopupLoadScreen();
+                });
+
+
+            }).error (function (error) {
 				console.log('hub/register error: ', error);
 				vm.hubRegisterError = error;
 				hubPopupLoadScreen();
 			});
-	}
+    }
 
 	function hubUnregister() {
 		hubPopupLoadScreen(true);
@@ -709,10 +734,13 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 	});
 }
 
-function startup($rootScope, $state, $location, $http) {
+function startup($rootScope, $state, $location, $http, SweetAlert, ngDialog) {
 
     $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
         LOADING_SCREEN('none');
+		ngDialog.closeAll();
+		$('.sweet-overlay').remove();
+		$('.sweet-alert').remove();
 
         $http.get(SERVER_URL + 'rest/v1/hub/registration_state', {withCredentials: true})
             .success(function (data) {

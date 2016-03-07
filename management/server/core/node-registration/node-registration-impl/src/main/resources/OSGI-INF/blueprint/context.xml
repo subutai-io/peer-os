@@ -21,9 +21,9 @@
         init-method="init">
     <argument ref="securityManagerRef" />
     <argument ref="daoManager" />
+    <argument ref="networkRef" />
+    <argument ref="localPeerRef" />
     <argument value="${defaultDomain}" />
-    <property name="networkManager" ref="networkRef" />
-    <property name="localPeer" ref="localPeerRef" />
   </bean>
 
   <service ref="registrationManager" interface="io.subutai.core.registration.api.RegistrationManager" />

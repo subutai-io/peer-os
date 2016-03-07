@@ -13,6 +13,8 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 	var containerSettingMenu = $('.js-dropen-menu');
 	var currentTemplate = {};
 
+	vm.templateSettings = {};
+
 	vm.popupLogState = 'full';
 
 	vm.currentEnvironment = {};
@@ -52,8 +54,6 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 		.error(function (data) {
 			VARS_MODAL_ERROR( SweetAlert, 'Error on getting templates ' + data );
 		});
-
-	//vm.templates = ['mongo', 'cassandra', 'master', 'hadoop'];		
 
 	environmentService.getStrategies().success(function (data) {
 		vm.strategies = data;
@@ -436,8 +436,8 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 				case 'element-call-menu':
 				case 'b-container-plus-icon':
 					currentTemplate = this.model;
-					$('#js-container-name').val(currentTemplate.get('containerName'));
-					$('#js-container-size').val(currentTemplate.get('quotaSize'));
+					vm.templateSettings.containerName = currentTemplate.get('containerName');
+					vm.templateSettings.quotaSize = currentTemplate.get('quotaSize');
 					containerSettingMenu.find('.header').text('Settings ' + this.model.get('templateName'));
 					var elementPos = this.model.get('position');
 					containerSettingMenu.css({
@@ -558,7 +558,10 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 			}
 		);
 
-		$('.js-scrollbar').perfectScrollbar();
+		$('.js-scrollbar').perfectScrollbar({
+			"wheelPropagation": true,
+			"swipePropagation": false
+		});
 
 		//zoom on scroll
 		/*paper.$el.on('mousewheel DOMMouseScroll', onMouseWheel);
@@ -672,6 +675,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 	}
 
 	function addSettingsToTemplate(settings) {
+
 		currentTemplate.set('quotaSize', settings.quotaSize);
 		currentTemplate.attr('rect.b-magnet/fill', vm.colors[settings.quotaSize]);
 		currentTemplate.set('containerName', settings.containerName);
@@ -691,4 +695,3 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 		return null;
 	}
 }
-

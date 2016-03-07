@@ -140,8 +140,7 @@ public class IntegrationImpl implements Integration
         RegistrationManager registrationManager = new RegistrationManager( this, configManager, hupIp );
 
         registrationManager.registerPeer( email, password );
-        heartbeatProcessor.sendHeartbeat();
-        resourceHostConfProcessor.sendResourceHostConf();
+//        sendHeartbeat();
     }
 
 

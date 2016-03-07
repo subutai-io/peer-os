@@ -157,7 +157,8 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
-            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, (e.getMessage() == null ?
+                    "Internal error" : e.getMessage()) ) ).build();
         }
 
         return Response.ok( JsonUtil.toJson( eventId ) ).build();
