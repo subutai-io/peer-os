@@ -1,9 +1,6 @@
 package io.subutai.common.peer;
 
 
-/**
- * Created by tzhamakeev on 10/19/15.
- */
 public class ApproveRequest
 {
     PeerInfo peerInfo;
