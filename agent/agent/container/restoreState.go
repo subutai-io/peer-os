@@ -1,10 +1,11 @@
 package container
 
 import (
-	"github.com/subutai-io/Subutai/agent/config"
-	lxcContainer "github.com/subutai-io/Subutai/agent/lib/container"
-	"github.com/subutai-io/Subutai/agent/log"
+	"github.com/subutai-io/base/agent/config"
+	lxcContainer "github.com/subutai-io/base/agent/lib/container"
+	"github.com/subutai-io/base/agent/log"
 	"os"
+	"os/exec"
 	"time"
 )
 
@@ -49,13 +50,13 @@ func ContainersRestoreState() {
 					case start && lxcContainer.State(container) != "RUNNING":
 						{
 							log.Debug("Trying start " + container)
-							lxcContainer.Start(container)
+							exec.Command("subutai", "start", container).Run()
 							containersStatus[container]++
 						}
 					case stop && lxcContainer.State(container) != "STOPPED":
 						{
 							log.Debug("Trying stop " + container)
-							lxcContainer.Stop(container)
+							exec.Command("subutai", "stop", container).Run()
 							containersStatus[container]--
 
 						}

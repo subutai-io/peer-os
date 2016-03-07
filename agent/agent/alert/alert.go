@@ -3,9 +3,9 @@ package alert
 import (
 	"bufio"
 	"bytes"
-	"github.com/subutai-io/Subutai/agent/agent/container"
-	"github.com/subutai-io/Subutai/agent/config"
-	"github.com/subutai-io/Subutai/agent/log"
+	"github.com/subutai-io/base/agent/agent/container"
+	"github.com/subutai-io/base/agent/config"
+	"github.com/subutai-io/base/agent/log"
 	"gopkg.in/lxc/go-lxc.v2"
 	"io/ioutil"
 	"os"

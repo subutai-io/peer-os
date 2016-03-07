@@ -3,15 +3,16 @@ package executer
 import (
 	"bufio"
 	"bytes"
-	"github.com/subutai-io/Subutai/agent/agent/container"
-	"github.com/subutai-io/Subutai/agent/config"
-	"github.com/subutai-io/Subutai/agent/log"
+	"github.com/subutai-io/base/agent/agent/container"
+	"github.com/subutai-io/base/agent/config"
+	"github.com/subutai-io/base/agent/log"
 	"gopkg.in/lxc/go-lxc.v2"
 	"io"
 	"os"
 	"os/exec"
 	"os/user"
 	"strconv"
+	// "strings"
 	"syscall"
 	"time"
 	"unsafe"
@@ -79,7 +80,7 @@ func Run(req RequestOptions, out_c chan<- ResponseOptions) {
 		cmd.SysProcAttr.Credential = &syscall.Credential{Uid: 0, Gid: 0}
 	}
 	err := cmd.Start()
-	log.Check(log.WarnLevel, "Executing command", err)
+	log.Check(log.WarnLevel, "Executing command: restdebug "+req.CommandId, err)
 	wop.Close()
 	wep.Close()
 

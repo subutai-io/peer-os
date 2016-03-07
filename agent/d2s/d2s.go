@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/subutai-io/Subutai/agent/d2s/parser"
-	"github.com/subutai-io/Subutai/agent/lib/template"
+	"github.com/subutai-io/base/agent/d2s/parser"
+	"github.com/subutai-io/base/agent/lib/template"
 	"io/ioutil"
 	"os"
 	"os/exec"

@@ -12,10 +12,10 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/subutai-io/Subutai/agent/config"
-	"github.com/subutai-io/Subutai/agent/lib/fs"
-	"github.com/subutai-io/Subutai/agent/lib/net"
-	"github.com/subutai-io/Subutai/agent/log"
+	"github.com/subutai-io/base/agent/config"
+	"github.com/subutai-io/base/agent/lib/fs"
+	"github.com/subutai-io/base/agent/lib/net"
+	"github.com/subutai-io/base/agent/log"
 
 	"gopkg.in/lxc/go-lxc.v2"
 )

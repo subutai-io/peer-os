@@ -15,11 +15,11 @@ import (
 	"github.com/nightlyone/lockfile"
 	"github.com/pivotal-golang/archiver/extractor"
 
-	"github.com/subutai-io/Subutai/agent/config"
-	"github.com/subutai-io/Subutai/agent/lib/container"
-	"github.com/subutai-io/Subutai/agent/lib/gpg"
-	"github.com/subutai-io/Subutai/agent/lib/template"
-	"github.com/subutai-io/Subutai/agent/log"
+	"github.com/subutai-io/base/agent/config"
+	"github.com/subutai-io/base/agent/lib/container"
+	"github.com/subutai-io/base/agent/lib/gpg"
+	"github.com/subutai-io/base/agent/lib/template"
+	"github.com/subutai-io/base/agent/log"
 )
 
 var (

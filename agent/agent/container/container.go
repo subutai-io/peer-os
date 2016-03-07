@@ -2,11 +2,11 @@ package container
 
 import (
 	"bufio"
-	"github.com/subutai-io/Subutai/agent/agent/utils"
-	"github.com/subutai-io/Subutai/agent/config"
-	cont "github.com/subutai-io/Subutai/agent/lib/container"
-	"github.com/subutai-io/Subutai/agent/lib/gpg"
-	"github.com/subutai-io/Subutai/agent/log"
+	"github.com/subutai-io/base/agent/agent/utils"
+	"github.com/subutai-io/base/agent/config"
+	cont "github.com/subutai-io/base/agent/lib/container"
+	"github.com/subutai-io/base/agent/lib/gpg"
+	"github.com/subutai-io/base/agent/log"
 	lxc "gopkg.in/lxc/go-lxc.v2"
 	"os"
 	"strconv"

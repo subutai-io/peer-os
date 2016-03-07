@@ -2,8 +2,8 @@ package connect
 
 import (
 	"crypto/tls"
-	"github.com/subutai-io/Subutai/agent/config"
-	"github.com/subutai-io/Subutai/agent/log"
+	"github.com/subutai-io/base/agent/config"
+	"github.com/subutai-io/base/agent/log"
 	"io/ioutil"
 	"net/http"
 	"strconv"
