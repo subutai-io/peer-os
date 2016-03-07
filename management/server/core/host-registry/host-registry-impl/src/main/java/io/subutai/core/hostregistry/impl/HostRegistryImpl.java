@@ -36,8 +36,6 @@ import io.subutai.core.hostregistry.api.HostRegistryException;
 
 /**
  * Implementation of HostRegistry
- *
- * TODO iterate over RHs and ping them once every 30 sec if ping is ok then update timestamp
  */
 public class HostRegistryImpl implements HostRegistry
 {
@@ -276,13 +274,21 @@ public class HostRegistryImpl implements HostRegistry
 
     protected void updateHost( ResourceHostInfo resourceHostInfo )
     {
-        WebClient webClient = getWebClient( resourceHostInfo );
-
-        Response response = webClient.get();
-
-        if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+        WebClient webClient = null;
+        try
         {
-            updateResourceHostEntryTimestamp( resourceHostInfo.getId() );
+            webClient = getWebClient( resourceHostInfo );
+
+            Response response = webClient.get();
+
+            if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+            {
+                updateResourceHostEntryTimestamp( resourceHostInfo.getId() );
+            }
+        }
+        finally
+        {
+            RestUtil.closeClient( webClient );
         }
     }
 

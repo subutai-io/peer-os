@@ -192,6 +192,23 @@ public class RestUtil
     }
 
 
+    public static void closeClient( WebClient webClient )
+    {
+        if ( webClient != null )
+        {
+            try
+            {
+                webClient.close();
+            }
+            catch ( Exception e )
+            {
+                //ignore
+                LOG.warn( "Error disposing web client", e );
+            }
+        }
+    }
+
+
     public static WebClient createWebClient( String url )
     {
         return createWebClient( url, defaultConnectionTimeout, defaultReceiveTimeout, defaultMaxRetransmits );
