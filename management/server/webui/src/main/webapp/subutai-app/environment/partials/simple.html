@@ -37,21 +37,21 @@
 					ng-init="environmentSimpleViewCtrl.initJointJs()">
 
 					<div class="b-template-settings__dropdown js-dropen-menu">
-						<form ng-submit="environmentSimpleViewCtrl.addSettingsToTemplate(environmentSimpleViewCtrl.templateSettings)">
+						<form ng-submit="environmentSimpleViewCtrl.addSettingsToTemplate(templateSettings)">
 							<div class="header"></div>
 							<div class="body">
 								<div class="b-form-group">
 									<div class="b-form-group__label">Container name</div>
 									<input type="text" 
 										id="js-container-name" 
-										class="b-form-input b-form-input_full"
-										ng-model="environmentSimpleViewCtrl.templateSettings.containerName" required>
+										class="b-form-input b-form-input_full" 
+										ng-model="templateSettings.containerName" required>									
 								</div>
 								<div class="b-form-group">
 									<div class="b-form-group__label">Select quota size</div>
 									<select class="b-form-input b-form-input_full" 
 										id="js-container-size" 
-										ng-model="environmentSimpleViewCtrl.templateSettings.quotaSize"
+										ng-model="templateSettings.quotaSize"
 									>
 										<option 
 										ng-repeat="type in environmentViewCtrl.containersType" 

@@ -13,8 +13,6 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 	var containerSettingMenu = $('.js-dropen-menu');
 	var currentTemplate = {};
 
-	vm.templateSettings = {};
-
 	vm.popupLogState = 'full';
 
 	vm.currentEnvironment = {};
@@ -436,8 +434,8 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 				case 'element-call-menu':
 				case 'b-container-plus-icon':
 					currentTemplate = this.model;
-					vm.templateSettings.containerName = currentTemplate.get('containerName');
-					vm.templateSettings.quotaSize = currentTemplate.get('quotaSize');
+					$('#js-container-name').val(currentTemplate.get('containerName')).trigger('change');
+					$('#js-container-size').val(currentTemplate.get('quotaSize'));
 					containerSettingMenu.find('.header').text('Settings ' + this.model.get('templateName'));
 					var elementPos = this.model.get('position');
 					containerSettingMenu.css({

@@ -25,7 +25,6 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 	vm.logMessages = [];
 	var containerSettingMenu = $('.js-dropen-menu');
 	var currentTemplate = {};
-	vm.templateSettings = {};
 
 	vm.domainStrategies = [];
 	vm.strategies = [];
@@ -496,8 +495,8 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 				case 'element-call-menu':
 				case 'b-container-plus-icon':
 					currentTemplate = this.model;
-					vm.templateSettings.containerName = currentTemplate.get('containerName');
-					vm.templateSettings.quotaSize = currentTemplate.get('quotaSize');
+					$('#js-container-name').val(currentTemplate.get('containerName')).trigger('change');
+					$('#js-container-size').val(currentTemplate.get('quotaSize'));
 					containerSettingMenu.find('.header').text('Settings ' + this.model.get('templateName'));
 					var elementPos = this.model.get('position');
 					containerSettingMenu.css({
@@ -505,7 +504,6 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 						'top': (elementPos.y + 45) + 'px',
 						'display': 'block'
 					});
-					$('#js-container-name').trigger();
 					return;
 					break;
 				case 'rotatable':
