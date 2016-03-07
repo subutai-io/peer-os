@@ -8,7 +8,6 @@ import (
 	"github.com/subutai-io/base/agent/log"
 	"gopkg.in/lxc/go-lxc.v2"
 	"io/ioutil"
-	"os"
 	"os/exec"
 	"runtime"
 	"strconv"
@@ -38,29 +37,22 @@ var (
 )
 
 func read(path string) (i int) {
-	f, err := os.Open(path)
-	log.Check(log.DebugLevel, "Reading "+path, err)
-
-	scanner := bufio.NewScanner(bufio.NewReader(f))
-	for scanner.Scan() {
-		i, err = strconv.Atoi(scanner.Text())
-		log.Check(log.DebugLevel, "Converting string", err)
-	}
+	out, _ := ioutil.ReadFile(path)
+	i, _ = strconv.Atoi(strings.TrimSpace(string(out)))
 	return
 }
 
-func id(path string) string {
+func id() (list map[string]string) {
+	list = map[string]string{}
 	out, _ := exec.Command("btrfs", "subvolume", "list", config.Agent.LxcPrefix).Output()
 	scanner := bufio.NewScanner(bytes.NewReader(out))
 	for scanner.Scan() {
 		line := strings.Fields(scanner.Text())
 		if len(line) > 8 {
-			if line[8] == path {
-				return line[1]
-			}
+			list[line[8]] = line[1]
 		}
 	}
-	return ""
+	return
 }
 
 func stat() string {
@@ -95,7 +87,7 @@ func cpuLoad(cont string) []int {
 		cpu[cont] = []int{0, 0, 0, 0, 0}
 	}
 	ticks, err := ioutil.ReadFile("/sys/fs/cgroup/cpuacct/lxc/" + cont + "/cpuacct.stat")
-	if log.Check(log.WarnLevel, "Reading "+cont+" cpuacct", err) {
+	if err != nil {
 		return avgload
 	}
 
@@ -147,14 +139,15 @@ func diskQuota(mountid, diskMap string) []int {
 	return diskUsage
 }
 
-func Alert() []Load {
+func Alert(list []container.Container) []Load {
 	var load []Load
 	var item Load
 	var hdd HDD
 	var tmp []int
 	diskMap := stat()
+	diskIDs := id()
 
-	for _, cont := range container.GetActiveContainers(false) {
+	for _, cont := range list {
 		trigger := false
 		if cont.Status != "RUNNING" {
 			continue
@@ -173,22 +166,22 @@ func Alert() []Load {
 		}
 		hdd.Current = tmp[0]
 		hdd.Quota = tmp[1]
-		if tmp = diskQuota(id(cont.Name+"/rootfs"), diskMap); tmp[0] > 80 {
+		if tmp = diskQuota(diskIDs[cont.Name+"/rootfs"], diskMap); tmp[0] > 80 {
 			hdd.Partition = "Rootfs"
 			trigger = true
 			item.Disk = append(item.Disk, hdd)
 		}
-		if tmp = diskQuota(id(cont.Name+"/opt"), diskMap); tmp[0] > 80 {
+		if tmp = diskQuota(diskIDs[cont.Name+"/opt"], diskMap); tmp[0] > 80 {
 			hdd.Partition = "Opt"
 			trigger = true
 			item.Disk = append(item.Disk, hdd)
 		}
-		if tmp = diskQuota(id(cont.Name+"/var"), diskMap); tmp[0] > 80 {
+		if tmp = diskQuota(diskIDs[cont.Name+"/var"], diskMap); tmp[0] > 80 {
 			hdd.Partition = "Var"
 			trigger = true
 			item.Disk = append(item.Disk, hdd)
 		}
-		if tmp = diskQuota(id(cont.Name+"/home"), diskMap); tmp[0] > 80 {
+		if tmp = diskQuota(diskIDs[cont.Name+"/home"], diskMap); tmp[0] > 80 {
 			hdd.Partition = "Home"
 			trigger = true
 			item.Disk = append(item.Disk, hdd)

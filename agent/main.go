@@ -85,12 +85,6 @@ func main() {
 		Action: func(c *cli.Context) {
 			config.InitAgentDebug()
 			agent.Start(c)
-		},
-		Flags: []cli.Flag{
-			cli.StringFlag{Name: "server", Value: config.Management.Host, Usage: "management host ip address/host name"},
-			cli.StringFlag{Name: "port", Value: config.Management.Port, Usage: "management host port number"},
-			cli.StringFlag{Name: "user", Value: config.Agent.GpgUser, Usage: "gpg user name/email to encrypt/decrypt messages"},
-			cli.StringFlag{Name: "secret", Value: config.Management.Secret, Usage: "send secret passphrase via flag"},
 		}}, {
 
 		Name: "demote", Usage: "demote Subutai container",

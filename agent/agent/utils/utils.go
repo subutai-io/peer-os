@@ -29,7 +29,9 @@ func GetInterfaces() []Iface {
 		inter.InterfaceName = ifac.Name
 
 		addrs, err := ifac.Addrs()
-		log.Check(log.WarnLevel, "Getting network addresses", err)
+		if err != nil {
+			log.Check(log.WarnLevel, "Getting network addresses", err)
+		}
 		var ip net.IP
 		var ipv4 string
 		for _, addr := range addrs {

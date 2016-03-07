@@ -2,13 +2,14 @@ package agent
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
 	"runtime"
+	// "strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/codegangsta/cli"
@@ -39,6 +40,11 @@ type Heartbeat struct {
 	Alert      []alert.Load          `json:"alert, omitempty"`
 }
 
+var (
+	lastHeartbeat []byte
+	mutex         sync.Mutex
+)
+
 func initAgent() {
 	// move .gnupg dir to app home
 	os.Setenv("GNUPGHOME", config.Agent.DataPrefix+".gnupg")
@@ -58,42 +64,60 @@ func Start(c *cli.Context) {
 	// go container.ContainersRestoreState()
 	initAgent()
 
-	client := tlsConfig()
+	for {
+		// log.Debug("NumGoroutine " + strconv.Itoa(runtime.NumGoroutine()))
+		Instance()
+		if !heartbeat() {
+			time.Sleep(5 * time.Second)
+		} else {
+			time.Sleep(30 * time.Second)
+		}
+	}
+}
 
+func heartbeat() bool {
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	client := tlsConfig()
 	hostname, _ := os.Hostname()
 	instancetype := utils.InstanceType()
 	fingerprint := gpg.GetFingerprint(hostname + "@subutai.io")
 
-	for {
-		Instance()
-		beat := Heartbeat{
-			Type:       "HEARTBEAT",
-			Hostname:   hostname,
-			Id:         fingerprint,
-			Arch:       strings.ToUpper(runtime.GOARCH),
-			Instance:   instancetype,
-			Containers: container.GetActiveContainers(false),
-			Interfaces: utils.GetInterfaces(),
-			Alert:      alert.Alert(),
-		}
-		res := Response{Beat: beat}
-		jbeat, _ := json.Marshal(&res)
+	list := container.GetActiveContainers(false)
 
-		message, err := json.Marshal(map[string]string{
-			"hostId":   fingerprint,
-			"response": gpg.EncryptWrapper(config.Agent.GpgUser, config.Management.GpgUser, string(jbeat)),
-		})
-		log.Check(log.WarnLevel, "Marshal response json", err)
-
-		resp, err := client.PostForm("https://10.10.10.1:8444/rest/v1/agent/heartbeat", url.Values{"heartbeat": {string(message)}})
-		if !log.Check(log.WarnLevel, "Sending heartbeat: ", err) && resp.StatusCode == http.StatusAccepted {
-			resp.Body.Close()
-		} else {
-			connect.Connect(c.String("server"), c.String("port"), c.String("user"), c.String("secret"))
-
-		}
-		time.Sleep(5 * time.Second)
+	beat := Heartbeat{
+		Type:       "HEARTBEAT",
+		Hostname:   hostname,
+		Id:         fingerprint,
+		Arch:       strings.ToUpper(runtime.GOARCH),
+		Instance:   instancetype,
+		Containers: list,
+		Interfaces: utils.GetInterfaces(),
+		Alert:      alert.Alert(list),
 	}
+	res := Response{Beat: beat}
+	jbeat, _ := json.Marshal(&res)
+
+	if string(jbeat) == string(lastHeartbeat) {
+		return true
+	}
+	lastHeartbeat = jbeat
+
+	message, err := json.Marshal(map[string]string{
+		"hostId":   fingerprint,
+		"response": gpg.EncryptWrapper(config.Agent.GpgUser, config.Management.GpgUser, string(jbeat)),
+	})
+	log.Check(log.WarnLevel, "Marshal response json", err)
+
+	resp, err := client.PostForm("https://10.10.10.1:8444/rest/v1/agent/heartbeat", url.Values{"heartbeat": {string(message)}})
+	if !log.Check(log.WarnLevel, "Sending heartbeat: ", err) && resp.StatusCode == http.StatusAccepted {
+		resp.Body.Close()
+	} else {
+		connect.Connect(config.Management.Host, config.Management.Port, config.Agent.GpgUser, config.Management.Secret)
+		return false
+	}
+	return true
 }
 
 func execute(rsp executer.EncRequest) {
@@ -158,13 +182,14 @@ func execute(rsp executer.EncRequest) {
 					"hostId":   elem.Id,
 					"response": payload,
 				})
-				log.Check(log.WarnLevel, "Marshal response json restdebug "+elem.CommandId, err)
+				log.Check(log.WarnLevel, "Marshal response json "+elem.CommandId, err)
 				response(message)
 			} else {
 				sOut = nil
 			}
 		}
 	}
+	heartbeat()
 }
 
 func tlsConfig() *http.Client {
@@ -200,12 +225,10 @@ func command() {
 	if log.Check(log.WarnLevel, "Getting requests", err) {
 		return
 	}
-	fmt.Println("restdebug", resp)
+	defer resp.Body.Close()
 	if resp.StatusCode == http.StatusNoContent {
 		return
 	}
-
-	defer resp.Body.Close()
 
 	data, err := ioutil.ReadAll(resp.Body)
 	if !log.Check(log.WarnLevel, "Reading body", err) {
@@ -214,7 +237,6 @@ func command() {
 			execute(request)
 		}
 	}
-
 }
 
 func ping(rw http.ResponseWriter, request *http.Request) {
@@ -228,7 +250,7 @@ func ping(rw http.ResponseWriter, request *http.Request) {
 func trigger(rw http.ResponseWriter, request *http.Request) {
 	if request.Method == http.MethodPost && strings.Split(request.RemoteAddr, ":")[0] == config.Management.Host {
 		rw.WriteHeader(http.StatusAccepted)
-		go command()
+		command()
 	} else {
 		rw.WriteHeader(http.StatusForbidden)
 	}

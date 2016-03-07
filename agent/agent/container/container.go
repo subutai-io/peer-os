@@ -6,7 +6,6 @@ import (
 	"github.com/subutai-io/base/agent/config"
 	cont "github.com/subutai-io/base/agent/lib/container"
 	"github.com/subutai-io/base/agent/lib/gpg"
-	"github.com/subutai-io/base/agent/log"
 	lxc "gopkg.in/lxc/go-lxc.v2"
 	"os"
 	"strconv"
@@ -57,7 +56,7 @@ func GetActiveContainers(details bool) []Container {
 	for _, c := range aCont {
 		container := new(Container)
 		lxc_c, err := lxc.NewContainer(c, config.Agent.LxcPrefix)
-		if log.Check(log.WarnLevel, "Getting container "+c, err) {
+		if err != nil {
 			continue
 		}
 
@@ -88,10 +87,13 @@ func GetActiveContainers(details bool) []Container {
 }
 
 func GetContainerIfaces(name string) []utils.Iface {
-	c, err := lxc.NewContainer(name, config.Agent.LxcPrefix)
-	log.Check(log.FatalLevel, "Looking for container "+name, err)
-
 	iface := new(utils.Iface)
+
+	c, err := lxc.NewContainer(name, config.Agent.LxcPrefix)
+	if err != nil {
+		return []utils.Iface{*iface}
+	}
+
 	iface.InterfaceName = "eth0"
 	listip, _ := c.IPAddress(iface.InterfaceName)
 	iface.Ip = strings.Join(listip, " ")

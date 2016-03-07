@@ -80,7 +80,7 @@ func Run(req RequestOptions, out_c chan<- ResponseOptions) {
 		cmd.SysProcAttr.Credential = &syscall.Credential{Uid: 0, Gid: 0}
 	}
 	err := cmd.Start()
-	log.Check(log.WarnLevel, "Executing command: restdebug "+req.CommandId, err)
+	log.Check(log.WarnLevel, "Executing command: "+req.CommandId, err)
 	wop.Close()
 	wep.Close()
 
