@@ -211,24 +211,6 @@
       </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!-- git-manager -->
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>git-manager-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>git-manager-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>git-manager-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- lxc-quota-manager -->
       <dependency>
         <groupId>${project.groupId}</groupId>
@@ -243,24 +225,6 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>lxc-quota-manager-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!-- repository manager -->
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>repository-manager-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>repository-manager-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>repository-manager-cli</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -849,14 +813,14 @@
         <version>1.9</version>
       </dependency>
       <!--<dependency>-->
-        <!--<groupId>org.apache.geronimo.specs</groupId>-->
-        <!--<artifactId>geronimo-jta_1.1_spec</artifactId>-->
-        <!--<version>1.1.1</version>-->
+      <!--<groupId>org.apache.geronimo.specs</groupId>-->
+      <!--<artifactId>geronimo-jta_1.1_spec</artifactId>-->
+      <!--<version>1.1.1</version>-->
       <!--</dependency>-->
       <!--<dependency>-->
-        <!--<groupId>org.apache.geronimo.specs</groupId>-->
-        <!--<artifactId>geronimo-jpa_2.0_spec</artifactId>-->
-        <!--<version>1.1</version>-->
+      <!--<groupId>org.apache.geronimo.specs</groupId>-->
+      <!--<artifactId>geronimo-jpa_2.0_spec</artifactId>-->
+      <!--<version>1.1</version>-->
       <!--</dependency>-->
       <dependency>
         <groupId>commons-validator</groupId>
