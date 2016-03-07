@@ -14,7 +14,10 @@ import (
 var TIMESTAMP string = "-unknown"
 
 func init() {
-	os.Setenv("PATH", "/apps/subutai/current/bin:/apps/subutai-mng/current/bin:"+os.Getenv("PATH"))
+	if os.Getenv("USER") != "root" {
+		log.Error("Please run as root")
+	}
+	os.Setenv("PATH", "/apps/subutai/current/bin:"+os.Getenv("PATH"))
 	if len(os.Args) > 1 {
 		if os.Args[1] == "-d" {
 			log.Level(log.DebugLevel)
