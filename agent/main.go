@@ -14,7 +14,7 @@ import (
 var TIMESTAMP string = "-unknown"
 
 func init() {
-	if os.Getenv("USER") != "root" {
+	if os.Getuid() != 0 {
 		log.Error("Please run as root")
 	}
 	os.Setenv("PATH", "/apps/subutai/current/bin:"+os.Getenv("PATH"))
