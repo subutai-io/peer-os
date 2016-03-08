@@ -48,7 +48,7 @@ import io.subutai.core.security.api.SecurityManager;
 public class CommandProcessor implements RestProcessor
 {
     private static final Logger LOG = LoggerFactory.getLogger( CommandProcessor.class.getName() );
-    private static final int NOTIFIER_INTERVAL_MS = 500;
+    private static final int NOTIFIER_INTERVAL_MS = 300;
     private static final long COMMAND_ENTRY_TIMEOUT =
             ( Common.INACTIVE_COMMAND_DROP_TIMEOUT_SEC + Common.DEFAULT_AGENT_RESPONSE_CHUNK_INTERVAL ) * 1000
                     + NOTIFIER_INTERVAL_MS + 1000;
@@ -198,28 +198,22 @@ public class CommandProcessor implements RestProcessor
 
     protected void notifyAgent( ResourceHostInfo resourceHostInfo )
     {
-
         WebClient webClient = null;
         try
         {
             webClient = getWebClient( resourceHostInfo );
 
-            webClient.form( new Form() );
+            javax.ws.rs.core.Response response = webClient.form( new Form() );
+
+            if ( response.getStatus() == javax.ws.rs.core.Response.Status.OK.getStatusCode()
+                    || response.getStatus() == javax.ws.rs.core.Response.Status.ACCEPTED.getStatusCode() )
+            {
+                hostRegistry.updateResourceHostEntryTimestamp( resourceHostInfo.getId() );
+            }
         }
         finally
         {
-            if ( webClient != null )
-            {
-                try
-                {
-                    webClient.close();
-                }
-                catch ( Exception ignore )
-                {
-                    //ignore
-                    LOG.warn( "Error disposing web client", ignore );
-                }
-            }
+            RestUtil.closeClient( webClient );
         }
     }
 
