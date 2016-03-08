@@ -61,7 +61,7 @@ func Start(c *cli.Context) {
 	http.HandleFunc("/ping", ping)
 	go http.ListenAndServe(":7070", nil)
 
-	// go container.ContainersRestoreState()
+	go container.ContainersRestoreState()
 	initAgent()
 
 	for {
@@ -70,7 +70,7 @@ func Start(c *cli.Context) {
 		if !heartbeat() {
 			time.Sleep(5 * time.Second)
 		} else {
-			time.Sleep(30 * time.Second)
+			time.Sleep(5 * time.Second)
 		}
 	}
 }
@@ -111,7 +111,7 @@ func heartbeat() bool {
 	log.Check(log.WarnLevel, "Marshal response json", err)
 
 	resp, err := client.PostForm("https://10.10.10.1:8444/rest/v1/agent/heartbeat", url.Values{"heartbeat": {string(message)}})
-	if !log.Check(log.WarnLevel, "Sending heartbeat: ", err) && resp.StatusCode == http.StatusAccepted {
+	if !log.Check(log.WarnLevel, "Sending heartbeat: "+string(jbeat), err) {
 		resp.Body.Close()
 	} else {
 		connect.Connect(config.Management.Host, config.Management.Port, config.Agent.GpgUser, config.Management.Secret)

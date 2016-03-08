@@ -29,9 +29,9 @@ func Connect(host, port, user, pass string) {
 	rh.Containers = container.GetActiveContainers(true)
 	log.Info(rh.Json())
 
-	for _, cont := range rh.Containers {
-		gpg.ImportMHKeyNoDefaultKeyring(cont.Name)
-	}
+	// for _, cont := range rh.Containers {
+	// 	gpg.ImportMHKeyNoDefaultKeyring(cont.Name)
+	// }
 
 	enMsg := ""
 	for len(enMsg) == 0 {

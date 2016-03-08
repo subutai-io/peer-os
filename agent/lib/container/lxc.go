@@ -60,11 +60,27 @@ func IsContainer(name string) bool {
 }
 
 func State(name string) (state string) {
-	containers := lxc.Containers(config.Agent.LxcPrefix)
-	for i := range containers {
-		if containers[i].Name() == name {
-			return containers[i].State().String()
-		}
+	c, err := lxc.NewContainer(name, config.Agent.LxcPrefix)
+	if err != nil {
+		return "UNKNOWN"
+	}
+	switch c.State() {
+	case lxc.STOPPED:
+		return "STOPPED"
+	case lxc.RUNNING:
+		return "RUNNING"
+	case lxc.STARTING:
+		return "STARTING"
+	case lxc.STOPPING:
+		return "STOPPING"
+	case lxc.ABORTING:
+		return "ABORTING"
+	case lxc.FREEZING:
+		return "FREEZING"
+	case lxc.FROZEN:
+		return "FROZEN"
+	case lxc.THAWED:
+		return "THAWED"
 	}
 	return "UNKNOWN"
 }
@@ -82,11 +98,11 @@ func Start(name string) {
 	c.Start()
 
 	if _, err := os.Stat(config.Agent.LxcPrefix + name + "/.stop"); err == nil {
-		log.Check(log.FatalLevel, "Creating .start file to "+name, os.Remove(config.Agent.LxcPrefix+name+"/.stop"))
+		log.Check(log.WarnLevel, "Creating .start file to "+name, os.Remove(config.Agent.LxcPrefix+name+"/.stop"))
 	}
 	if _, err := os.Stat(config.Agent.LxcPrefix + name + "/.start"); os.IsNotExist(err) {
 		f, err := os.Create(config.Agent.LxcPrefix + name + "/.start")
-		log.Check(log.FatalLevel, "Creating .start file to "+name, err)
+		log.Check(log.WarnLevel, "Creating .start file to "+name, err)
 		defer f.Close()
 	}
 	// err = c.Start()
@@ -99,11 +115,11 @@ func Stop(name string) {
 	c.Stop()
 
 	if _, err := os.Stat(config.Agent.LxcPrefix + name + "/.start"); err == nil {
-		log.Check(log.FatalLevel, "Creating .start file to "+name, os.Remove(config.Agent.LxcPrefix+name+"/.start"))
+		log.Check(log.WarnLevel, "Creating .start file to "+name, os.Remove(config.Agent.LxcPrefix+name+"/.start"))
 	}
 	if _, err := os.Stat(config.Agent.LxcPrefix + name + "/.stop"); os.IsNotExist(err) {
 		f, err := os.Create(config.Agent.LxcPrefix + name + "/.stop")
-		log.Check(log.FatalLevel, "Creating .stop file to "+name, err)
+		log.Check(log.WarnLevel, "Creating .stop file to "+name, err)
 		defer f.Close()
 	}
 }

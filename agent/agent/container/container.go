@@ -50,38 +50,30 @@ func parsePasswd(path, name string) (uid string, gid string) {
 }
 
 func GetActiveContainers(details bool) []Container {
-	aCont := cont.Containers()
 	contArr := []Container{}
 
-	for _, c := range aCont {
+	for _, c := range cont.Containers() {
 		container := new(Container)
-		lxc_c, err := lxc.NewContainer(c, config.Agent.LxcPrefix)
-		if err != nil {
-			continue
-		}
-
 		container.Id = gpg.GetFingerprint(c)
 		if details {
 			container.Pk = gpg.GetContainerPk(c)
 		}
 		configpath := config.Agent.LxcPrefix + c + "/config"
+		container.Name = c
 		container.Arch = strings.ToUpper(cont.GetConfigItem(configpath, "lxc.arch"))
-		container.Name = cont.GetConfigItem(configpath, "lxc.utsname")
 		container.Parent = cont.GetConfigItem(configpath, "subutai.parent")
-		container.Status = lxc_c.State().String()
+		container.Status = cont.State(c)
 		container.Hostname = c
-		container.Interfaces = GetContainerIfaces(container.Name)
+		container.Interfaces = GetContainerIfaces(c)
 
-		PoolInstance().AddHost(container.Id, container.Name)
-		vlan_id := cont.GetConfigItem(configpath, "#vlan_id")
-		if len(vlan_id) > 0 {
-			container.Vlan, _ = strconv.Atoi(vlan_id)
-		} else {
-			container.Vlan = 0
-		}
+		// PoolInstance().AddHost(container.Id, container.Name)
+		// vlan_id := cont.GetConfigItem(configpath, "#vlan_id")
+		// if len(vlan_id) > 0 {
+		// 	container.Vlan, _ = strconv.Atoi(vlan_id)
+		// } else {
+		// 	container.Vlan = 0
+		// }
 		contArr = append(contArr, *container)
-
-		lxc.Release(lxc_c)
 	}
 	return contArr
 }

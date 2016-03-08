@@ -166,22 +166,22 @@ func Alert(list []container.Container) []Load {
 		}
 		hdd.Current = tmp[0]
 		hdd.Quota = tmp[1]
-		if tmp = diskQuota(diskIDs[cont.Name+"/rootfs"], diskMap); tmp[0] > 80 {
+		if diskQuota(diskIDs[cont.Name+"/rootfs"], diskMap)[0] > 80 {
 			hdd.Partition = "Rootfs"
 			trigger = true
 			item.Disk = append(item.Disk, hdd)
 		}
-		if tmp = diskQuota(diskIDs[cont.Name+"/opt"], diskMap); tmp[0] > 80 {
+		if diskQuota(diskIDs[cont.Name+"/opt"], diskMap)[0] > 80 {
 			hdd.Partition = "Opt"
 			trigger = true
 			item.Disk = append(item.Disk, hdd)
 		}
-		if tmp = diskQuota(diskIDs[cont.Name+"/var"], diskMap); tmp[0] > 80 {
+		if diskQuota(diskIDs[cont.Name+"/var"], diskMap)[0] > 80 {
 			hdd.Partition = "Var"
 			trigger = true
 			item.Disk = append(item.Disk, hdd)
 		}
-		if tmp = diskQuota(diskIDs[cont.Name+"/home"], diskMap); tmp[0] > 80 {
+		if diskQuota(diskIDs[cont.Name+"/home"], diskMap)[0] > 80 {
 			hdd.Partition = "Home"
 			trigger = true
 			item.Disk = append(item.Disk, hdd)

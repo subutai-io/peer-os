@@ -13,7 +13,7 @@ func ContainersRestoreState() {
 	containersStatus := make(map[string]int)
 
 	for {
-		Containerslist := lxcContainer.All()
+		Containerslist := lxcContainer.Containers()
 		for _, container := range Containerslist {
 			var start, stop bool
 
