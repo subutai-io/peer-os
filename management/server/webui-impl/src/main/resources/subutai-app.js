@@ -89,13 +89,38 @@ function CurrentUserCtrl($location, $rootScope, $http, SweetAlert) {
 				localStorage.setItem('hubRegistered', true);
 				vm.hubStatus = true;
 				hubPopupLoadScreen();
-				//SweetAlert.swal ("Success!", "Your peer was registered to Hub.", "success");
-			}).error (function (error) {
+
+                $http.post( SERVER_URL + 'rest/v1/hub/send-heartbeat?hubIp=hub.subut.ai', {withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
+                    .success(function () {
+                        //localStorage.setItem('hubRegistered', true);
+                        //vm.hubStatus = true;
+                        //hubPopupLoadScreen();
+                        //SweetAlert.swal ("Success!", "Your peer was registered to Hub.", "success");
+                    }).error (function (error) {
+                    console.log('hub/register error: ', error);
+                    vm.hubRegisterError = error;
+                    //hubPopupLoadScreen();
+                });
+
+                $http.post( SERVER_URL + 'rest/v1/hub/send-rh-configurations?hubIp=hub.subut.ai', {withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
+                    .success(function () {
+                        //localStorage.setItem('hubRegistered', true);
+                        //vm.hubStatus = true;
+                        //hubPopupLoadScreen();
+                        //SweetAlert.swal ("Success!", "Your peer was registered to Hub.", "success");
+                    }).error (function (error) {
+                    console.log('hub/register error: ', error);
+                    vm.hubRegisterError = error;
+                    //hubPopupLoadScreen();
+                });
+
+
+            }).error (function (error) {
 				console.log('hub/register error: ', error);
 				vm.hubRegisterError = error;
 				hubPopupLoadScreen();
 			});
-	}
+    }
 
 	function hubUnregister() {
 		hubPopupLoadScreen(true);

@@ -94,7 +94,7 @@ function BazaarSrv($http) {
 		else {
 			kar = plugin.metadata[1];
 		}
-		var postData = "id=" + plugin.hubId + "&kar=" + kar;
+		var postData = "id=" + plugin.hubId + "&kar=" + kar + "&name=" + plugin.name.toLowerCase();
 		console.log (postData);
 		return $http.post(
 			BAZAAR_URL + "uninstall",

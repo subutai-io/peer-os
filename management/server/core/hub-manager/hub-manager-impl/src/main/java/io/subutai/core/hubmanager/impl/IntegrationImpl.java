@@ -1,10 +1,7 @@
 package io.subutai.core.hubmanager.impl;
 
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -143,8 +140,7 @@ public class IntegrationImpl implements Integration
         RegistrationManager registrationManager = new RegistrationManager( this, configManager, hupIp );
 
         registrationManager.registerPeer( email, password );
-        heartbeatProcessor.sendHeartbeat();
-        resourceHostConfProcessor.sendResourceHostConf();
+//        sendHeartbeat();
     }
 
 
@@ -225,12 +221,34 @@ public class IntegrationImpl implements Integration
 
 
     @Override
-    public void uninstallPlugin( String url )
+    public void uninstallPlugin( final String url, final String name )
     {
         int indexOfStr = url.indexOf( "/package/" );
         String fileName = url.substring( indexOfStr + 9, url.length() );
         File file = new File( String.format( "%s/deploy", System.getProperty( "karaf.home" ) ) + "/" + fileName );
-        if ( file.delete() )
+        File repo = new File ("/var/lib/subutai-mng/data/repository/io/subutai/");
+        File[] dirs = repo.listFiles (new FileFilter ()
+		{
+			@Override
+			public boolean accept (File pathname)
+			{
+				return pathname.getName ().matches (".*" + name + ".*" );
+			}
+		});
+		for (File f : dirs)
+		{
+			LOG.info (f.getAbsolutePath ());
+			try
+			{
+				FileUtils.deleteDirectory (f);
+				LOG.debug( f.getName() + " is removed." );
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace ();
+			}
+		}
+		if ( file.delete() )
         {
             LOG.debug( file.getName() + " is removed." );
         }

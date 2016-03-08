@@ -1,9 +1,6 @@
 package io.subutai.common.security.objects;
 
 
-/**
- * Created by talas on 12/11/15.
- */
 public enum Ownership
 {
     ALL( 1, "All" ),
