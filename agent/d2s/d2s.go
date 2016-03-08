@@ -30,7 +30,6 @@ uudecode $0 |tar zxf -
 `
 
 	//parse
-	// out, env, img := parser.Parce(dockerfile)
 	out, env, cmd, _ := parser.Parce(dockerfile)
 
 	// if img != "" {
@@ -115,6 +114,6 @@ EndOfUpstart
 	ioutil.WriteFile(tmpdir+"install.sh", []byte(out), 0755)
 
 	// clean
-	// _ = os.Remove(tmpdir + "archive.tar.gz")
+	_ = os.Remove(tmpdir + "archive.tar.gz")
 
 }

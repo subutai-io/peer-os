@@ -10,19 +10,11 @@ import (
 
 func parceEnv(line []string) string {
 	if len(line) > 2 {
-		fmt.Println(line)
-		// str, _ := strconv.Unquote(strings.Join(line[1:], " "))
-		// str := strings.Replace(strings.Join(line[1:], " "), "\t", " ", -1)
-		str := strings.Join(line[1:], " ")
-		fmt.Println(str)
-		str = strings.Replace(str, `"`, "", -1)
-		fmt.Println(str)
-		// str, _ = strconv.Unquote(str)
+		str := strings.Join(line[2:], " ")
+		str = strings.Replace(str, `\t`, " ", -1)
 		// fmt.Println(str)
-		str = strings.Replace(str, "\t", " ", -1)
-		fmt.Println(str)
-		// return `sed -i -e '$i \` + str + ` &\n' /etc/rc.local`
-		return "export " + str + "\n"
+		// str = strings.Replace(str, `\t`, " ", -1)
+		return "export " + line[1] + "=" + str + "\n"
 	}
 	return ""
 }
@@ -62,17 +54,7 @@ func parceCmd(line []string) string {
 	if len(line) > 1 {
 		str := strings.Join(line[1:], " ")
 		str = strings.Replace(str, "\t", " ", -1)
-		// return `sed -i -e '$i \` + str + ` &\n' /etc/rc.local`
 		return str + " "
-		// `#create cmd file
-		// cat > /opt/docker2subutai/cmd <<- EndOfCMD
-		// #!/bin/bash
-		// . /opt/docker2subutai/.env
-		// ` + str + `
-		// EndOfCMD
-		// chmod a+x /opt/docker2subutai/cmd
-		// `
-
 	}
 	return ""
 }
