@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"fmt"
 	docker "github.com/docker/docker/builder/dockerfile/parser"
 	"os"
 	"strconv"
@@ -9,7 +10,19 @@ import (
 
 func parceEnv(line []string) string {
 	if len(line) > 2 {
-		return "export " + line[1] + "=" + strings.Join(line[2:], " ") + "\n"
+		fmt.Println(line)
+		// str, _ := strconv.Unquote(strings.Join(line[1:], " "))
+		// str := strings.Replace(strings.Join(line[1:], " "), "\t", " ", -1)
+		str := strings.Join(line[1:], " ")
+		fmt.Println(str)
+		str = strings.Replace(str, `"`, "", -1)
+		fmt.Println(str)
+		// str, _ = strconv.Unquote(str)
+		// fmt.Println(str)
+		str = strings.Replace(str, "\t", " ", -1)
+		fmt.Println(str)
+		// return `sed -i -e '$i \` + str + ` &\n' /etc/rc.local`
+		return "export " + str + "\n"
 	}
 	return ""
 }
@@ -24,9 +37,10 @@ func parceCopy(line []string) string {
 func parceRun(line []string) string {
 	if len(line) > 1 {
 		str, _ := strconv.Unquote(strings.Join(line[1:], " "))
+		fmt.Println(str)
 		if !(strings.Contains(str, "ln") && (strings.Contains(str, "/dev/stdout") || strings.Contains(str, "/dev/stderr"))) {
 			str = strings.Replace(str, "\t", " ", -1)
-			str = strings.Replace(str, " && ", "\n", -1)
+			// str = strings.Replace(str, " && ", "\n", -1)
 			return str + "\n"
 		}
 	}
@@ -46,14 +60,24 @@ func parceFrom(line []string) string {
 
 func parceCmd(line []string) string {
 	if len(line) > 1 {
-		str, _ := strconv.Unquote(strings.Join(line[1:], " "))
+		str := strings.Join(line[1:], " ")
 		str = strings.Replace(str, "\t", " ", -1)
-		return `sed -i -e '$i \` + str + ` &\n' /etc/rc.local`
+		// return `sed -i -e '$i \` + str + ` &\n' /etc/rc.local`
+		return str + " "
+		// `#create cmd file
+		// cat > /opt/docker2subutai/cmd <<- EndOfCMD
+		// #!/bin/bash
+		// . /opt/docker2subutai/.env
+		// ` + str + `
+		// EndOfCMD
+		// chmod a+x /opt/docker2subutai/cmd
+		// `
+
 	}
 	return ""
 }
 
-func Parce(name string) (out, env, image string) {
+func Parce(name string) (out, env, cmd, image string) {
 	file, _ := os.Open(name)
 	node, _ := docker.Parse(file)
 	file.Close()
@@ -69,13 +93,15 @@ func Parce(name string) (out, env, image string) {
 				out = out + parceCopy(str)
 			case "from":
 				image = parceFrom(str)
-			// case "cmd":
-			// 	out = out + parceCmd(str)
-			// }
+			case "cmd":
+				cmd = cmd + parceCmd(str)
+			case "entrypoint":
+				cmd = cmd + parceCmd(str)
+			}
 		}
 	}
 	if len(out) > 0 {
-		return out, env, image
+		return out, env, cmd, image
 	}
 	return
 }
