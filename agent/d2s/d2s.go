@@ -61,8 +61,7 @@ if [ -f "/etc/systemd/system/default.target" ]; then
 fi
 
 if [ -f "/etc/init/rc-sysinit.conf" ]; then
-	sed -i 's/env DEFAULT_RUNLEVEL=2/env DEFAULT_RUNLEVEL=1/g'
-
+	sed -i 's/env DEFAULT_RUNLEVEL=2/env DEFAULT_RUNLEVEL=1/g' /etc/init/rc-sysinit.conf
 fi
 
 #create systemd service
@@ -84,6 +83,7 @@ EndOfSystemD
 
 mkdir /etc/systemd/system/rescue.target.wants
 ln -s /etc/systemd/system/docker2subutai.service /etc/systemd/system/rescue.target.wants/docker2subutai.service
+ln -s /lib/systemd/system/ssh.service /etc/systemd/system/rescue.target.wants/
 
 #create upstart service
 cat > /etc/init/docker2subutai.conf <<- EndOfUpstart
@@ -96,6 +96,9 @@ respawn
 
 exec /opt/docker2subutai/cmd
 EndOfUpstart
+if [ -f "/etc/init/ssh.conf" ]; then
+	sed -i 's/start on runlevel \[2/start on runlevel \[12/g' /etc/init/ssh.conf
+fi
 `
 
 	// create .env

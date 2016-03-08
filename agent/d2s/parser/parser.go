@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"fmt"
 	docker "github.com/docker/docker/builder/dockerfile/parser"
 	"os"
 	"strconv"
@@ -12,8 +11,6 @@ func parceEnv(line []string) string {
 	if len(line) > 2 {
 		str := strings.Join(line[2:], " ")
 		str = strings.Replace(str, `\t`, " ", -1)
-		// fmt.Println(str)
-		// str = strings.Replace(str, `\t`, " ", -1)
 		return "export " + line[1] + "=" + str + "\n"
 	}
 	return ""
@@ -29,7 +26,6 @@ func parceCopy(line []string) string {
 func parceRun(line []string) string {
 	if len(line) > 1 {
 		str, _ := strconv.Unquote(strings.Join(line[1:], " "))
-		fmt.Println(str)
 		if !(strings.Contains(str, "ln") && (strings.Contains(str, "/dev/stdout") || strings.Contains(str, "/dev/stderr"))) {
 			str = strings.Replace(str, "\t", " ", -1)
 			// str = strings.Replace(str, " && ", "\n", -1)
