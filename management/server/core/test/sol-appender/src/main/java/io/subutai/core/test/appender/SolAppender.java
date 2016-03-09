@@ -91,8 +91,6 @@ public class SolAppender extends AppenderSkeleton
     }
 
 
-    /** ************* */
-
     @Override
     public void close()
     {
