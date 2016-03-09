@@ -10,6 +10,7 @@ import io.subutai.common.command.EncryptedRequestWrapper;
 import io.subutai.common.command.EncryptedResponseWrapper;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.security.crypto.pgp.ContentAndSignatures;
+import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.keyserver.api.KeyServer;
 import io.subutai.core.security.api.SecurityManager;
@@ -49,11 +50,10 @@ public class SecurityManagerImpl implements SecurityManager
     /* *****************************
      *
      */
-    public SecurityManagerImpl( String secretKeyringPwd, Object provider )
+    public SecurityManagerImpl( Object provider )
     {
         keyData = new SecurityKeyData();
-
-        keyData.setSecretKeyringPwd( secretKeyringPwd );
+        keyData.setSecretKeyringPwd( SystemSettings.getPeerSecretKeyringPwd() );
         keyData.setJsonProvider( provider );
 
         httpContextManager = new HttpContextManagerImpl();

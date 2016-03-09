@@ -108,11 +108,9 @@ public class PeerManagerImpl implements PeerManager
     private String ownerId;
     private RegistrationClient registrationClient;
     protected ScheduledExecutorService backgroundTasksExecutorService;
-    private String publicUrl;
 
     private String controlNetwork;
     private long controlNetworkTtl = 0;
-    private String externalInterfaceName;
     private PingDistances distances;
 
 
@@ -192,18 +190,6 @@ public class PeerManagerImpl implements PeerManager
     {
         commandResponseListener.dispose();
         backgroundTasksExecutorService.shutdown();
-    }
-
-
-    public void setPublicUrl( final String publicUrl )
-    {
-        this.publicUrl = publicUrl;
-    }
-
-
-    public void setExternalInterfaceName( final String externalInterfaceName )
-    {
-        this.externalInterfaceName = externalInterfaceName;
     }
 
 
@@ -726,8 +712,7 @@ public class PeerManagerImpl implements PeerManager
             register( keyPhrase, request );
 
             removeRequest( request.getPeerInfo().getId() );
-            securityManager.getKeyManager()
-                           .getRemoteHostPublicKey(  request.getPeerInfo() );
+            securityManager.getKeyManager().getRemoteHostPublicKey( request.getPeerInfo() );
         }
         catch ( Exception e )
         {
@@ -746,7 +731,6 @@ public class PeerManagerImpl implements PeerManager
         {
             registrationClient.sendRejectRequest( request.getPeerInfo().getPublicUrl(),
                     buildRegistrationData( request.getKeyPhrase(), RegistrationStatus.REJECTED ) );
-
         }
         catch ( Exception e )
         {
