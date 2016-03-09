@@ -49,5 +49,7 @@ function SettingsAdvancedCtrl($scope, SettingsAdvancedSrv, SweetAlert, $sce) {
 		$('pre code').each(function(i, block) {
 			hljs.highlightBlock(block);
 		});
+		var codeBlock = document.getElementById('js-highlight-block');
+		codeBlock.scrollTop = codeBlock.scrollHeight;
 	}
 }
