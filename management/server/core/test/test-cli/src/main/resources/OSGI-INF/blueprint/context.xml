@@ -16,5 +16,5 @@
   </command-bundle>
 
   <bean id="errLstnr" scope="singleton" class="io.subutai.core.test.cli.SubutaiEventListenerImpl" />
-  <service ref="errLstnr" interface="io.subutai.core.test.appender.SubutaiErrorEventListener" />
+  <service ref="errLstnr" interface="io.subutai.core.hubmanager.logger.SubutaiErrorEventListener" />
 </blueprint>

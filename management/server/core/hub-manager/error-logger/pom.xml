@@ -3,17 +3,17 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
-    <artifactId>test-parent</artifactId>
+    <artifactId>hub-manager</artifactId>
     <groupId>io.subutai</groupId>
     <version>4.0.0-RC7-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>subutai-appender</artifactId>
+  <artifactId>error-logger</artifactId>
   <version>4.0.0-RC7-SNAPSHOT</version>
   <packaging>bundle</packaging>
-  <name>Subutai Appender</name>
-  <description>Subutai Appender</description>
+  <name>Error Logger</name>
+  <description>Error Logger</description>
 
   <dependencies>
     <dependency>
@@ -34,9 +34,9 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.groupId}.core.test.appender</Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.groupId}.core.hubmanager.logger</Bundle-SymbolicName>
             <Import-Package />
-            <Export-Package>${project.groupId}.core.test.appender</Export-Package>
+            <Export-Package>${project.groupId}.core.hubmanager.logger</Export-Package>
             <Private-Package>org.apache.log4j</Private-Package>
             <Fragment-Host>org.ops4j.pax.logging.pax-logging-service</Fragment-Host>
             <Embed-Dependency>*;scope=compile|runtime;inline=true</Embed-Dependency>

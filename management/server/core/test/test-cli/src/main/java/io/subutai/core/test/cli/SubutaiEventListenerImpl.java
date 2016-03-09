@@ -4,8 +4,8 @@ package io.subutai.core.test.cli;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.subutai.core.test.appender.SubutaiErrorEvent;
-import io.subutai.core.test.appender.SubutaiErrorEventListener;
+import io.subutai.core.hubmanager.logger.SubutaiErrorEvent;
+import io.subutai.core.hubmanager.logger.SubutaiErrorEventListener;
 
 
 public class SubutaiEventListenerImpl implements SubutaiErrorEventListener

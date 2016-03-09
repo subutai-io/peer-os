@@ -15,6 +15,7 @@
     <module>hub-manager-api</module>
     <module>hub-manager-impl</module>
     <module>hub-manager-rest</module>
+    <module>error-logger</module>
   </modules>
 
 </project>

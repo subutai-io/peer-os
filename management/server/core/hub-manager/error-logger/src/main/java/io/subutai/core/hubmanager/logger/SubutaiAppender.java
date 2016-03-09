@@ -1,4 +1,4 @@
-package io.subutai.core.test.appender;
+package io.subutai.core.hubmanager.logger;
 
 
 import java.io.PrintWriter;
@@ -19,20 +19,7 @@ public class SubutaiAppender extends AppenderSkeleton
     protected static Set<SubutaiErrorEventListener> listeners =
             Collections.newSetFromMap( new ConcurrentHashMap<SubutaiErrorEventListener, Boolean>() );
 
-    protected ExecutorService notifierPool;
-
-
-    public SubutaiAppender()
-    {
-        //this ctr for fragment bundle
-        notifierPool = Executors.newCachedThreadPool();
-    }
-
-
-    public SubutaiAppender( boolean bundle )
-    {
-        //this ctr for service bundle
-    }
+    protected ExecutorService notifierPool = Executors.newCachedThreadPool();
 
 
     public void dispose()

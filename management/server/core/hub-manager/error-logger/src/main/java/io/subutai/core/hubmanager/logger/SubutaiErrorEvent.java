@@ -1,4 +1,4 @@
-package io.subutai.core.test.appender;
+package io.subutai.core.hubmanager.logger;
 
 
 public class SubutaiErrorEvent
