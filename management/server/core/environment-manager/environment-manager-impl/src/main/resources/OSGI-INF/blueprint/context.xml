@@ -15,12 +15,6 @@
   <authz:enable />
   <!-- ***************************************************************** -->
 
-  <cm:property-placeholder persistent-id="peer" update-strategy="none">
-    <cm:default-properties>
-      <cm:property name="keyTrustCheckEnabled" value="false" />
-    </cm:default-properties>
-  </cm:property-placeholder>
-
   <reference id="templateRegistry" availability="mandatory"
              interface="io.subutai.core.kurjun.api.TemplateManager" />
   <reference id="peerManager"
@@ -68,7 +62,6 @@
 -->
     <!--    <argument ref="strategyManager" />
         <argument ref="quotaManager" />-->
-    <property name="keyTrustCheckEnabled" value="${keyTrustCheckEnabled}" />
   </bean>
 
   <service ref="environmentManager" interface="io.subutai.core.environment.api.EnvironmentManager" />

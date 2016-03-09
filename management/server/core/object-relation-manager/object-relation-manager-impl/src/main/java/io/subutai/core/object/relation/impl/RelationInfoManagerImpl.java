@@ -28,17 +28,15 @@ import io.subutai.core.object.relation.impl.model.RelationLinkImpl;
 public class RelationInfoManagerImpl implements RelationInfoManager
 {
     private static final Logger logger = LoggerFactory.getLogger( RelationInfoManagerImpl.class );
-    private boolean keyTrustCheckEnabled;
     private RelationDataService relationDataService;
     private IdentityManager identityManager;
 
 
-    public RelationInfoManagerImpl( final RelationDataService relationDataService, final boolean keyTrustCheckEnabled,
+    public RelationInfoManagerImpl( final RelationDataService relationDataService,
                                     final IdentityManager identityManager )
     {
         this.identityManager = identityManager;
         this.relationDataService = relationDataService;
-        this.keyTrustCheckEnabled = keyTrustCheckEnabled;
     }
 
 
