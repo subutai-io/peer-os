@@ -66,11 +66,6 @@ func main() {
 			lib.Cleanup(c.Args().Get(0))
 		}}, {
 
-		Name: "collect", Usage: "collect performance stats",
-		Action: func(c *cli.Context) {
-			lib.CollectStats()
-		}}, {
-
 		Name: "config", Usage: "containerName add/del key value",
 		Flags: []cli.Flag{
 			cli.StringFlag{Name: "o", Usage: "add/del key value"},

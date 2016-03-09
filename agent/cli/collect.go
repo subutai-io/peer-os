@@ -4,8 +4,6 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"github.com/influxdata/influxdb/client/v2"
-	"github.com/subutai-io/base/agent/config"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -14,6 +12,10 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/influxdata/influxdb/client/v2"
+
+	"github.com/subutai-io/base/agent/config"
 )
 
 var (
@@ -26,6 +28,13 @@ var (
 	lxcmemory   = map[string]bool{"cache": true, "rss": true, "Cached": true, "MemFree": true}
 	memory      = map[string]bool{"Active": true, "Buffers": true, "Cached": true, "MemFree": true}
 )
+
+func Collect() {
+	for {
+		CollectStats()
+		time.Sleep(time.Second * 30)
+	}
+}
 
 func CollectStats() {
 	clnt, bp, err := initInfluxdb()
@@ -173,44 +182,27 @@ func netStat(clnt client.Client, bp client.BatchPoints) {
 
 func btrfsStat(clnt client.Client, bp client.BatchPoints) {
 	list := make(map[string]string)
-	out, _ := exec.Command("sudo", "btrfs", "subvolume", "list", config.Agent.LxcPrefix).Output()
+	out, _ := exec.Command("btrfs", "subvolume", "list", config.Agent.LxcPrefix).Output()
 	scanner := bufio.NewScanner(bytes.NewReader(out))
 	for scanner.Scan() {
 		line := strings.Fields(scanner.Text())
 		list["0/"+line[1]] = line[8]
 	}
-	out, _ = exec.Command("sudo", "btrfs", "qgroup", "show", "-r", "--raw", config.Agent.LxcPrefix).Output()
+	out, _ = exec.Command("btrfs", "qgroup", "show", "-r", "--raw", config.Agent.LxcPrefix).Output()
 	scanner = bufio.NewScanner(bytes.NewReader(out))
 	for scanner.Scan() {
 		line := strings.Fields(scanner.Text())
-		lxc, mount := parseSubutaiSubvolume(list[line[0]])
-		if lxc != "" {
-			value, _ := strconv.ParseInt(line[2], 10, 64)
+		path := strings.Split(list[line[0]], "/")
+		if len(path) > 3 {
+			value, _ := strconv.Atoi(line[2])
 			point, _ := client.NewPoint("lxc_disk",
-				map[string]string{"hostname": lxc, "mount": mount, "type": "used"},
+				map[string]string{"hostname": path[2], "mount": path[3], "type": "used"},
 				map[string]interface{}{"value": value},
 				time.Now())
 			bp.AddPoint(point)
 		}
 	}
 	clnt.Write(bp)
-}
-
-func parseSubutaiSubvolume(path string) (lxc, mount string) {
-	lxc, mount = "", ""
-	p, _ := regexp.Compile("(/|-)")
-	ps := p.Split(path, -1)
-	pl := len(ps)
-	if pl >= 1 {
-		for _, item := range btrfsmounts {
-			if item == ps[pl-1] {
-				lxc = ps[pl-2]
-				mount = ps[pl-1]
-				break
-			}
-		}
-	}
-	return lxc, mount
 }
 
 func diskFree(clnt client.Client, bp client.BatchPoints) {

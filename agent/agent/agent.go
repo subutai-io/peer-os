@@ -19,6 +19,7 @@ import (
 	"github.com/subutai-io/base/agent/agent/container"
 	"github.com/subutai-io/base/agent/agent/executer"
 	"github.com/subutai-io/base/agent/agent/utils"
+	"github.com/subutai-io/base/agent/cli"
 	"github.com/subutai-io/base/agent/config"
 	cont "github.com/subutai-io/base/agent/lib/container"
 	"github.com/subutai-io/base/agent/lib/gpg"
@@ -62,6 +63,7 @@ func Start(c *cli.Context) {
 	go http.ListenAndServe(":7070", nil)
 
 	go container.ContainersRestoreState()
+	go lib.Collect()
 	initAgent()
 
 	for {
