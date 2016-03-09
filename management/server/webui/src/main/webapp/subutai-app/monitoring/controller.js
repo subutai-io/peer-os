@@ -48,6 +48,7 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
     function setCurrentType(type) {
         vm.containers = [];
         vm.selectedEnvironment = '';
+		vm.currentHost = '';
         vm.currentType = type;
     }
 
