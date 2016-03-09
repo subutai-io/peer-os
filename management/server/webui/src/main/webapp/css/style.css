@@ -3509,10 +3509,12 @@ td.b-main-table__status-col {
 pre {
 	margin: 0 0 0 0;
 	line-height: 0;
+	overflow: hidden;
 }
 
 pre code {
 	line-height: normal;
+	position: relative;
 }
 
 .b-highlight-block {
