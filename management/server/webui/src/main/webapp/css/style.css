@@ -3508,6 +3508,11 @@ td.b-main-table__status-col {
 
 pre {
 	margin: 0 0 0 0;
+	line-height: 0;
+}
+
+pre code {
+	line-height: normal;
 }
 
 .b-highlight-block {
