@@ -35,7 +35,7 @@ public class RestServiceImpl implements RestService
         {
             LOG.error( e.getMessage() );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
-                    entity( e.getMessage() ).build();
+                    entity( JsonUtil.GSON.toJson (e.getMessage()) ).build();
         }
     }
 
@@ -51,7 +51,7 @@ public class RestServiceImpl implements RestService
         {
             LOG.error( e.getMessage() );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
-                    entity( e.getMessage() ).build();
+                    entity( JsonUtil.GSON.toJson (e.getMessage()) ).build();
         }
     }
 
@@ -67,7 +67,7 @@ public class RestServiceImpl implements RestService
         {
             LOG.error( e.getMessage() );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
-                    entity( e.getMessage() ).build();
+                    entity( JsonUtil.GSON.toJson (e.getMessage()) ).build();
         }
     }
 
@@ -98,7 +98,7 @@ public class RestServiceImpl implements RestService
         {
             LOG.error( e.getMessage() );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
-                    entity( e.getMessage() ).build();
+                    entity( JsonUtil.GSON.toJson (e.getMessage()) ).build();
         }
         return Response.ok().build();
     }
