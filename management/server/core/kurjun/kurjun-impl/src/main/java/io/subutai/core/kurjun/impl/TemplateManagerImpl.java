@@ -445,13 +445,12 @@ public class TemplateManagerImpl implements TemplateManager
         try
         {
             TemplateId tid = new TemplateId( templateOwner, Hex.encodeHexString( md5 ) );
-            repo.delete( tid.get(), md5 );
-            return true;
+            return repo.delete( tid.get(), md5 );
         }
         catch ( IOException ex )
         {
             LOGGER.error( "Failed to delete template", ex );
-            return false;
+            throw ex;
         }
     }
 
