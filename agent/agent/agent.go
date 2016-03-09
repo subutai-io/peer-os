@@ -147,7 +147,7 @@ func execute(rsp executer.EncRequest) {
 
 		pub = config.Agent.LxcPrefix + contName + "/public.pub"
 		keyring = config.Agent.LxcPrefix + contName + "/secret.sec"
-		log.Info("Getting puyblic keyring", "keyring", keyring)
+		log.Info("Getting public keyring", "keyring", keyring)
 		md = gpg.DecryptNoDefaultKeyring(rsp.Request, keyring, pub)
 	}
 

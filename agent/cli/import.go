@@ -126,6 +126,11 @@ func LxcImport(templ, version, token string) {
 	}
 	defer unlockImport(templ)
 
+	if container.IsContainer(templ) && templ == "management" && len(token) > 1 {
+		gpg.ExchageAndEncrypt("management", token)
+		return
+	}
+
 	if container.IsContainer(templ) {
 		log.Info(templ + " container exist")
 		return
