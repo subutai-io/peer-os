@@ -25,6 +25,7 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.Version;
 
+import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.slf4j.Logger;
@@ -69,11 +70,14 @@ import io.subutai.core.object.relation.api.model.RelationMeta;
 @Entity
 @Table( name = "env" )
 @Access( AccessType.FIELD )
+@JsonAutoDetect( fieldVisibility = JsonAutoDetect.Visibility.ANY, getterVisibility = JsonAutoDetect.Visibility.NONE,
+        setterVisibility = JsonAutoDetect.Visibility.NONE )
 public class EnvironmentImpl implements Environment, Serializable
 {
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentImpl.class );
 
     @Transient
+    @JsonIgnore
     private EnvironmentManagerImpl environmentManager;
 
     @Id
@@ -116,7 +120,7 @@ public class EnvironmentImpl implements Environment, Serializable
 
     @OneToMany( mappedBy = "environment", fetch = FetchType.EAGER, targetEntity = EnvironmentContainerImpl.class,
             cascade = CascadeType.ALL, orphanRemoval = true )
-    @JsonProperty("containers")
+    @JsonIgnore
     private Set<EnvironmentContainerHost> containers = Sets.newHashSet();
 
     @OneToMany( mappedBy = "environment", fetch = FetchType.EAGER, targetEntity = PeerConfImpl.class,
@@ -153,6 +157,7 @@ public class EnvironmentImpl implements Environment, Serializable
     private Set<String> sshKeys = new HashSet<>();
 
     @Transient
+    @JsonIgnore
     private EnvironmentId envId;
 
 

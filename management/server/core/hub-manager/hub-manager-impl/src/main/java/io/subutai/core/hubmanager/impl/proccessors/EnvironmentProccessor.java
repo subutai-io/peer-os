@@ -34,7 +34,7 @@ import org.apache.http.auth.AuthenticationException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.gson.Gson;
 
-import io.subutai.common.environment.Blueprint;
+import io.subutai.core.strategy.api.Blueprint;
 import io.subutai.common.environment.Node;
 import io.subutai.common.gson.required.RequiredDeserializer;
 import io.subutai.common.peer.ContainerSize;
@@ -352,7 +352,7 @@ public class EnvironmentProccessor implements StateLinkProccessor
                         Integer.valueOf( nodeDto.getHostsGroupId() ), nodeDto.getPeerId(), nodeDto.getHostId() );
                 nodes.add( node );
             }
-            Blueprint blueprint = new Blueprint( environmentDto.getName(), nodes );
+//            Blueprint blueprint = new Blueprint( environmentDto.getName(), nodes, sshGroupId );
             //TODO refactor after EnvironmentManagement will be ready
             //            Topology topology = new Topology(environmentDto.getName(), environmentDto.get);
             //
