@@ -9,17 +9,17 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>sol-appender</artifactId>
+  <artifactId>subutai-appender</artifactId>
   <version>4.0.0-RC7-SNAPSHOT</version>
   <packaging>bundle</packaging>
-  <name>SOL APPENDER</name>
-  <description>SOL APPENDER</description>
+  <name>Subutai Appender</name>
+  <description>Subutai Appender</description>
 
   <dependencies>
     <dependency>
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
-      <version>1.2.17</version>
+      <version>${log4j.version}</version>
     </dependency>
   </dependencies>
 
@@ -36,7 +36,6 @@
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.core.test.appender</Bundle-SymbolicName>
             <Import-Package />
-            <!--<Import-Package>*</Import-Package>-->
             <Export-Package>${project.groupId}.core.test.appender</Export-Package>
             <Private-Package>org.apache.log4j</Private-Package>
             <Fragment-Host>org.ops4j.pax.logging.pax-logging-service</Fragment-Host>

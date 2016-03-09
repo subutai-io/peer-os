@@ -13,7 +13,7 @@ import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.spi.LoggingEvent;
 
 
-public class SolAppender extends AppenderSkeleton
+public class SubutaiAppender extends AppenderSkeleton
 {
 
     protected static Set<SubutaiErrorEventListener> listeners =
@@ -22,14 +22,14 @@ public class SolAppender extends AppenderSkeleton
     protected ExecutorService notifierPool;
 
 
-    public SolAppender()
+    public SubutaiAppender()
     {
         //this ctr for fragment bundle
         notifierPool = Executors.newCachedThreadPool();
     }
 
 
-    public SolAppender( boolean bundle )
+    public SubutaiAppender( boolean bundle )
     {
         //this ctr for service bundle
     }

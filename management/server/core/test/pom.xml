@@ -16,6 +16,6 @@
 
   <modules>
     <module>test-cli</module>
-    <module>sol-appender</module>
+    <module>subutai-appender</module>
   </modules>
 </project>

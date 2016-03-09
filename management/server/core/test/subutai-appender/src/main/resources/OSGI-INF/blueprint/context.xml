@@ -2,7 +2,7 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
     >
 
-  <bean id="errEventService" class="io.subutai.core.test.appender.SolAppender"
+  <bean id="errEventService" class="io.subutai.core.test.appender.SubutaiAppender"
         scope="singleton" destroy-method="dispose">
     <argument value="true" />
   </bean>
