@@ -3506,3 +3506,16 @@ td.b-main-table__status-col {
 	border: 1px solid #CCCEEE;
 }
 
+pre {
+	margin: 0 0 0 0;
+}
+
+.b-highlight-block {
+	background-color: #f8fbfd;
+    padding: 10px 14px;
+    overflow: auto;
+	width: 800px;
+	height: 550px;
+	border: 1px solid #CCCEEE;
+}
+

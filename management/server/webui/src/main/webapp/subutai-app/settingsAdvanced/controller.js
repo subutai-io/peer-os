@@ -4,14 +4,15 @@ angular.module("subutai.settings-advanced.controller", [])
     .controller("SettingsAdvancedCtrl", SettingsAdvancedCtrl);
 
 
-SettingsAdvancedCtrl.$inject = ["$scope", "SettingsAdvancedSrv", "SweetAlert"];
-function SettingsAdvancedCtrl($scope, SettingsAdvancedSrv, SweetAlert) {
+SettingsAdvancedCtrl.$inject = ["$scope", "SettingsAdvancedSrv", "SweetAlert", "$sce"];
+function SettingsAdvancedCtrl($scope, SettingsAdvancedSrv, SweetAlert, $sce) {
     var vm = this;
     vm.config = {};
     vm.activeTab = "karafconsole";
     vm.getConfig = getConfig;
     vm.updateConfig = updateConfig;
     vm.saveLogs = saveLogs;
+    vm.renderHtml = renderHtml;
 
     function getConfig() {
 		$('.js-karaflogs-load-screen').addClass('lololo').show();
@@ -19,7 +20,7 @@ function SettingsAdvancedCtrl($scope, SettingsAdvancedSrv, SweetAlert) {
 			$('.js-karaflogs-load-screen').hide();
             vm.config = data;
         }).error(function(error){
-            SweetAlert.swal("ERROR!", error.replace(/\\n/g, " "), "error");
+            SweetAlert.swal("ERROR!", error, "error");
 			$('.js-karaflogs-load-screen').hide();
 		});
     }
@@ -29,7 +30,7 @@ function SettingsAdvancedCtrl($scope, SettingsAdvancedSrv, SweetAlert) {
         SettingsAdvancedSrv.updateConfig(vm.config).success(function (data) {
             SweetAlert.swal("Success!", "Your settings were saved.", "success");
         }).error(function (error) {
-            SweetAlert.swal("ERROR!", "Save config error: " + error.replace(/\\n/g, " "), "error");
+            SweetAlert.swal("ERROR!", error, "error");
         });
     }
 
@@ -38,4 +39,15 @@ function SettingsAdvancedCtrl($scope, SettingsAdvancedSrv, SweetAlert) {
         var blob = new Blob([text], {type: "text/plain;charset=utf-8"});
         saveAs(blob, "karaflogs" + moment().format('YYYY-MM-DD HH:mm:ss') + ".txt");
     }
+
+	function renderHtml(html_code) {
+		initHighlighting();
+		return $sce.trustAsHtml(html_code);
+	};
+
+	function initHighlighting() {
+		$('pre code').each(function(i, block) {
+			hljs.highlightBlock(block);
+		});
+	}
 }

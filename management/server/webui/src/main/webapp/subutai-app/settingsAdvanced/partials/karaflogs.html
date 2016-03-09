@@ -4,7 +4,8 @@
 		<tr>
 			<!--<td>{{settingsAdvancedCtrl.config.karafLogs}} </td>-->
 			<td>
-				<textarea class="b-text-logs" ng-model="settingsAdvancedCtrl.config.karafLogs" spellcheck="false"></textarea>
+				<!--<textarea class="b-text-logs" ng-model="settingsAdvancedCtrl.config.karafLogs" spellcheck="false"></textarea>-->
+				<pre><code class="apache b-highlight-block" ng-bind-html="settingsAdvancedCtrl.renderHtml(settingsAdvancedCtrl.config.karafLogs)"></code></pre>
 			</td>
 
 			<td>
