@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" style="width:0; height:0; visibility:hidden;">
-<g id="nav-monitoring">
+<symbol id="nav-monitoring" viewBox="0 0 15 15">
     <line stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="0.7" y1="1.1" x2="14.3" y2="1.1"/>
     <line stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="0.7" y1="11.3" x2="14.3" y2="11.3"/>
     <line stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="2" y1="1.4" x2="2" y2="11"/>
@@ -8,7 +8,7 @@
     <line stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="7.5" y1="13.9" x2="7.5" y2="12.9"/>
     <polyline stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" points="3.8,7.5
     6.7,5.6 7.4,7.5 10.6,5.4 	"/>
-</g>
+</symbol>
 <symbol id="nav-environment" viewBox="0 0 15 15">
     <line stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="11.2" y1="9.8" x2="8.4" y2="9.8"/>
     <circle stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" cx="3" cy="7.5" r="1.8"/>
