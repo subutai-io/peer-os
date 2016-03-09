@@ -1,0 +1,38 @@
+<blueprint xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:jaxrs="http://cxf.apache.org/blueprint/jaxrs"
+           xmlns:cxf="http://cxf.apache.org/blueprint/core" xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+
+  http://cxf.apache.org/blueprint/jaxrs http://cxf.apache.org/schemas/blueprint/jaxrs.xsd">
+
+  <cxf:bus id="cxfBusStrategyManager">
+    <cxf:features>
+      <cxf:logging />
+    </cxf:features>
+  </cxf:bus>
+
+  <jaxrs:server address="/v1/strategy" id="strategyRestService">
+    <jaxrs:serviceBeans>
+      <ref component-id="strategyManagerService" />
+    </jaxrs:serviceBeans>
+    <jaxrs:providers>
+      <bean class="org.codehaus.jackson.jaxrs.JacksonJsonProvider" />
+    </jaxrs:providers>
+  </jaxrs:server>
+
+  <bean id="strategyManagerService" class="io.subutai.core.strategy.rest.RestServiceImpl">
+    <property name="strategyManager" ref="strategyManager" />
+    <property name="peerManager" ref="peerManager" />
+    <property name="quotaManager" ref="quotaManager" />
+  </bean>
+
+  <reference id="strategyManager" availability="mandatory"
+             interface="io.subutai.core.strategy.api.StrategyManager" />
+
+  <reference id="peerManager" availability="mandatory"
+             interface="io.subutai.core.peer.api.PeerManager" />
+
+  <reference id="quotaManager" availability="mandatory"
+             interface="io.subutai.core.lxc.quota.api.QuotaManager" />
+
+</blueprint>
