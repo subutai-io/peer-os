@@ -4,6 +4,7 @@ package io.subutai.core.test.cli;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
@@ -15,9 +16,9 @@ public class TestCommand extends SubutaiShellCommandSupport
 {
     private static final Logger LOG = LoggerFactory.getLogger( TestCommand.class.getName() );
 
-    //    @Argument( index = 0, name = "term", required = true, multiValued = false,
-    //            description = "term to search" )
-    //    String term;
+    @Argument( index = 0, name = "log error", required = false, multiValued = false,
+            description = "log error" )
+    boolean logError = false;
 
 
     @Override
@@ -26,9 +27,16 @@ public class TestCommand extends SubutaiShellCommandSupport
 
         try
         {
-            for ( String loggingEvent : SolAppender.getLoggingEvents() )
+            if ( logError )
             {
-                System.out.println( loggingEvent );
+                LOG.error( "REQUESTED ERROR", new RuntimeException( "blablabla" ) );
+            }
+            else
+            {
+                for ( SolAppender.SubutaiLogEvent loggingEvent : SolAppender.getLoggingEvents() )
+                {
+                    System.out.println( loggingEvent );
+                }
             }
         }
         catch ( Exception e )

@@ -1,4 +1,4 @@
 #!/bin/bash
 
 service management stop
-rm -rf /var/lib/subutai-mng/data/
+rm -rf /opt/subutai-mng/data/*
