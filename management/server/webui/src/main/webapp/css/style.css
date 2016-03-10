@@ -3506,13 +3506,13 @@ td.b-main-table__status-col {
 	border: 1px solid #CCCEEE;
 }
 
-pre {
+.b-karaf-logs {
 	margin: 0 0 0 0;
 	line-height: 0;
 	overflow: hidden;
 }
 
-pre code {
+.b-karaf-logs code {
 	line-height: normal;
 	position: relative;
 }
