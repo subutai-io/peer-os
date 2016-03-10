@@ -35,7 +35,7 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.core.appender</Bundle-SymbolicName>
-            <Import-Package />
+            <Import-Package>!*</Import-Package>
             <Export-Package>${project.groupId}.core.appender</Export-Package>
             <Private-Package>org.apache.log4j</Private-Package>
             <Fragment-Host>org.ops4j.pax.logging.pax-logging-service</Fragment-Host>
