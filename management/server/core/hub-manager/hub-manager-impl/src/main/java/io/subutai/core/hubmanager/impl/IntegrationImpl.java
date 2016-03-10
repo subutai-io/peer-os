@@ -1,7 +1,11 @@
 package io.subutai.core.hubmanager.impl;
 
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -56,7 +60,6 @@ public class IntegrationImpl implements Integration
     private EnvironmentManager environmentManager;
     private PeerManager peerManager;
     private ConfigManager configManager;
-    private String peerSecretKeyringPwd;
     private ScheduledExecutorService hearbeatExecutorService = Executors.newSingleThreadScheduledExecutor();
     private ScheduledExecutorService resourceHostConfExecutorService = Executors.newSingleThreadScheduledExecutor();
     private ScheduledExecutorService resourceHostMonitorExecutorService = Executors.newSingleThreadScheduledExecutor();
@@ -69,9 +72,8 @@ public class IntegrationImpl implements Integration
     private Monitor monitor;
 
 
-    public IntegrationImpl( String peerSecretKeyringPwd, DaoManager daoManager )
+    public IntegrationImpl( DaoManager daoManager )
     {
-        this.peerSecretKeyringPwd = peerSecretKeyringPwd;
         this.daoManager = daoManager;
     }
 
@@ -83,7 +85,7 @@ public class IntegrationImpl implements Integration
             configDataService = new ConfigDataServiceImpl( daoManager );
 
             this.configManager =
-                    new ConfigManager( securityManager, peerManager, peerSecretKeyringPwd, configDataService );
+                    new ConfigManager( securityManager, peerManager, configDataService );
             heartbeatProcessor = new HeartbeatProcessor( this, configManager );
             resourceHostConfProcessor = new ResourceHostConfProcessor( this, peerManager, configManager, monitor );
             resourceHostMonitorProcessor =
@@ -140,7 +142,7 @@ public class IntegrationImpl implements Integration
         RegistrationManager registrationManager = new RegistrationManager( this, configManager, hupIp );
 
         registrationManager.registerPeer( email, password );
-//        sendHeartbeat();
+        //        sendHeartbeat();
     }
 
 
@@ -226,29 +228,29 @@ public class IntegrationImpl implements Integration
         int indexOfStr = url.indexOf( "/package/" );
         String fileName = url.substring( indexOfStr + 9, url.length() );
         File file = new File( String.format( "%s/deploy", System.getProperty( "karaf.home" ) ) + "/" + fileName );
-        File repo = new File ("/var/lib/subutai-mng/data/repository/io/subutai/");
-        File[] dirs = repo.listFiles (new FileFilter ()
-		{
-			@Override
-			public boolean accept (File pathname)
-			{
-				return pathname.getName ().matches (".*" + name + ".*" );
-			}
-		});
-		for (File f : dirs)
-		{
-			LOG.info (f.getAbsolutePath ());
-			try
-			{
-				FileUtils.deleteDirectory (f);
-				LOG.debug( f.getName() + " is removed." );
-			}
-			catch (IOException e)
-			{
-				e.printStackTrace ();
-			}
-		}
-		if ( file.delete() )
+        File repo = new File( "/var/lib/subutai-mng/data/repository/io/subutai/" );
+        File[] dirs = repo.listFiles( new FileFilter()
+        {
+            @Override
+            public boolean accept( File pathname )
+            {
+                return pathname.getName().matches( ".*" + name + ".*" );
+            }
+        } );
+        for ( File f : dirs )
+        {
+            LOG.info( f.getAbsolutePath() );
+            try
+            {
+                FileUtils.deleteDirectory( f );
+                LOG.debug( f.getName() + " is removed." );
+            }
+            catch ( IOException e )
+            {
+                e.printStackTrace();
+            }
+        }
+        if ( file.delete() )
         {
             LOG.debug( file.getName() + " is removed." );
         }
