@@ -16,6 +16,7 @@
   <packaging>pom</packaging>
 
   <modules>
+    <module>subutai-appender</module>
     <module>blueprint-authz</module>
     <module>lxc-quota-manager</module>
     <module>network-manager</module>
