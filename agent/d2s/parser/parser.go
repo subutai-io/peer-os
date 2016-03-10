@@ -8,13 +8,28 @@ import (
 )
 
 func parceEnv(line []string) string {
-	if len(line) > 2 {
-		str := strings.Join(line[2:], " ")
+	if len(line) > 1 {
+		line = line[1:]
+		for i := range line {
+			if i%2 == 0 {
+				line[i] = line[i] + "="
+				if i != 0 {
+					line[i] = " " + line[i]
+				}
+			}
+		}
+		str := strings.Join(line, "")
 		str = strings.Replace(str, `\t`, " ", -1)
-		return "export " + line[1] + "=" + str + "\n"
+		return "export " + str + "\n"
+
 	}
 	return ""
 }
+
+// func parceEnv(line string) string {
+// 	// ENV GPG_KEYS 	DFFA3DCF326E302C4787673A01C4E7FAAAB2461C 	42F3E95A2C4F08279C4960ADD68FA50FEA312927
+// 	if len(line) > 1 {
+// }
 
 func parceCopy(line []string) string {
 	if len(line) > 1 {
@@ -50,7 +65,7 @@ func parceCmd(line []string) string {
 	if len(line) > 1 {
 		str := strings.Join(line[1:], " ")
 		str = strings.Replace(str, "\t", " ", -1)
-		return str + " "
+		return str
 	}
 	return ""
 }
@@ -74,9 +89,17 @@ func Parce(name string) (out, env, cmd, image string) {
 			case "cmd":
 				cmd = cmd + parceCmd(str)
 			case "entrypoint":
-				cmd = cmd + parceCmd(str)
+				cmd = cmd + parceCmd(str) + " "
 			}
 		}
+	}
+	if len(cmd) > 1 {
+		slice := strings.Split(cmd, " ")
+		for i, _ := range slice {
+			slice[i] = strings.Replace(slice[i], `"`, "", -1)
+		}
+
+		cmd = slice[0] + ` "` + strings.Join(slice[1:], " ") + `"`
 	}
 	if len(out) > 0 {
 		return out, env, cmd, image
