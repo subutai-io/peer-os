@@ -29,7 +29,8 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>error-logger</artifactId>
+      <artifactId>subutai-appender</artifactId>
+      <version>4.0.0-RC7-SNAPSHOT</version>
     </dependency>
   </dependencies>
 

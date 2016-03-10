@@ -454,7 +454,7 @@
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>error-logger</artifactId>
+        <artifactId>subutai-appender</artifactId>
         <version>${project.version}</version>
       </dependency>
 
