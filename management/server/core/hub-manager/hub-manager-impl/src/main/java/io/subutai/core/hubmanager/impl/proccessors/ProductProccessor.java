@@ -34,9 +34,6 @@ import io.subutai.hub.share.dto.ProductDto;
 import io.subutai.hub.share.json.JsonUtil;
 
 
-/**
- * Created by ermek on 10/21/15.
- */
 public class ProductProccessor implements StateLinkProccessor
 {
     private static final Logger LOG = LoggerFactory.getLogger( ProductProccessor.class.getName() );
@@ -81,7 +78,7 @@ public class ProductProccessor implements StateLinkProccessor
     {
         try
         {
-            WebClient client = configManager.getTrustedWebClientWithAuth( link );
+            WebClient client = configManager.getTrustedWebClientWithAuth( link, configManager.getHubIp() );
 
             LOG.debug( "Sending request for getting PeerProductDTO..." );
             Response r = client.get();
@@ -149,11 +146,11 @@ public class ProductProccessor implements StateLinkProccessor
             String fileName;
             if ( indexOfStr != -1 )
             {
-                fileName = url.substring( indexOfStr+9, url.length());
+                fileName = url.substring( indexOfStr + 9, url.length() );
             }
             else
             {
-                fileName = productDTO.getId()+".kar";
+                fileName = productDTO.getId() + ".kar";
             }
             File file = new File( PATH_TO_DEPLOY + "/" + fileName );
             URL website = new URL( url );
@@ -181,11 +178,11 @@ public class ProductProccessor implements StateLinkProccessor
             String fileName;
             if ( indexOfStr != -1 )
             {
-                fileName = url.substring( indexOfStr+9, url.length());
+                fileName = url.substring( indexOfStr + 9, url.length() );
             }
             else
             {
-                fileName = productDTO.getId()+".kar";
+                fileName = productDTO.getId() + ".kar";
             }
             File file = new File( PATH_TO_DEPLOY + "/" + fileName );
             if ( file.delete() )
@@ -195,13 +192,13 @@ public class ProductProccessor implements StateLinkProccessor
             }
         }
 
-        if (deleteFileCounter == productDTO.getMetadata().size())
+        if ( deleteFileCounter == productDTO.getMetadata().size() )
         {
             LOG.debug( " Product uninstalled successfully." );
             String removePath = String.format( "/rest/v1/peers/%s/products/%s", configManager.getPeerId(),
                     peerProductDataDTO.getProductId() );
 
-            WebClient client = configManager.getTrustedWebClientWithAuth( removePath );
+            WebClient client = configManager.getTrustedWebClientWithAuth( removePath, configManager.getHubIp() );
 
             Response r = client.delete();
 
@@ -210,7 +207,6 @@ public class ProductProccessor implements StateLinkProccessor
                 LOG.debug( "Status: " + "no content" );
             }
         }
-
     }
 
 
@@ -220,7 +216,7 @@ public class ProductProccessor implements StateLinkProccessor
         String path = String.format( "/rest/v1/marketplace/products/%s", productId );
         try
         {
-            WebClient client = configManager.getTrustedWebClientWithAuth( path );
+            WebClient client = configManager.getTrustedWebClientWithAuth( path, configManager.getHubIp() );
 
             Response r = client.get();
 
@@ -260,7 +256,7 @@ public class ProductProccessor implements StateLinkProccessor
 
         try
         {
-            WebClient client = configManager.getTrustedWebClientWithAuth( updatePath );
+            WebClient client = configManager.getTrustedWebClientWithAuth( updatePath, configManager.getHubIp() );
 
             byte[] plainData = JsonUtil.toCbor( peerProductDataDTO );
             byte[] encryptedData = configManager.getMessenger().produce( plainData );

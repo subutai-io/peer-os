@@ -12,9 +12,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 
-/**
- * Created by talas on 8/26/15.
- */
 public class HostInterfaceImplImplTest
 {
 
@@ -49,8 +46,6 @@ public class HostInterfaceImplImplTest
         hostInterface.setIp( newIp );
         assertNotEquals( ip, hostInterface.getIp() );
     }
-
-
 
 
     @Test

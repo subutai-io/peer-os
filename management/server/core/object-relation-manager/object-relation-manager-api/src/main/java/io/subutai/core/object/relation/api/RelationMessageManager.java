@@ -9,12 +9,7 @@ import io.subutai.core.object.relation.api.model.Relation;
 
 
 /**
- * Created by talas on 12/7/15.
- */
-
-
-/**
- * TrustMEssageManager is needed to process incoming signed messages to construct trust relationships
+ * RelationMessageManager is needed to process incoming signed messages to construct trust relationships
  */
 public interface RelationMessageManager
 {
@@ -22,7 +17,6 @@ public interface RelationMessageManager
      * Decrypt with management private key
      *
      * @param encryptedMessage - Encrypted message where trust relationship is declared
-     * @param secretKeyId
      */
     Relation decryptAndVerifyMessage( String encryptedMessage, final String secretKeyId )
             throws PGPException, UnsupportedEncodingException, RelationVerificationException;

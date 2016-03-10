@@ -2,7 +2,6 @@ package io.subutai.core.localpeer.impl.container;
 
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
@@ -14,7 +13,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 import io.subutai.common.command.CommandUtil;
@@ -86,13 +84,6 @@ public class CreateContainerTask implements Callable<ContainerHostInfo>
     @Override
     public ContainerHostInfo call() throws Exception
     {
-
-        //        commandUtil.execute( new RequestBuilder( "subutai clone" ).withCmdArgs(
-        //                Lists.newArrayList( template.getName(), hostname, "-i", String.format( "\"%s %s\"", ip,
-        // vlan ), "-t",
-        //                        getRegistrationManager().generateContainerTTLToken( ( timeoutSec + 10 ) * 1000L )
-        // .getToken() ) )
-        //                                                                  .withTimeout( 1 ).daemon(), resourceHost );
 
         List<BatchAction> actions = new ArrayList<>();
 

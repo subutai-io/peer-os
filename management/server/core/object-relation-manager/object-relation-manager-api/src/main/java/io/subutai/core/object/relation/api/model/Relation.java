@@ -6,9 +6,6 @@ import java.io.Serializable;
 import io.subutai.common.security.relation.RelationLink;
 
 
-/**
- * Created by talas on 12/10/15.
- */
 public interface Relation extends Serializable
 {
     long getId();

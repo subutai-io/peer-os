@@ -20,14 +20,24 @@ $(document).on('click', function(event) {
 		$('.b-hub-status__dropdown').slideUp(100);
 		$('.b-hub-status__dropdown_open').removeClass('b-hub-status__dropdown_open');
 	}
+
+	if(
+		!$(event.target).closest('.js-dropen-menu').hasClass('js-dropen-menu') && 
+		$(event.target).closest('g').attr('class') != 'element-call-menu' && 
+		$(event.target).closest('g').attr('class') != 'b-container-plus-icon'
+	){
+		$('.b-template-settings__dropdown').slideUp(100);
+	}
 });
 
 $(".b-form-input-dropdown-list").click(function(e) {
 	e.stopPropagation();
 });
 
-$('.js-scrollbar').perfectScrollbar();
-$('.js-scrollbar-cloud').perfectScrollbar();
+$('.js-scrollbar').perfectScrollbar({
+	"wheelPropagation": true,
+	"swipePropagation": false
+});
 
 $('body').on('click', '.js-hide-resources', function(){
 	$('.b-cloud-add-tools').animate({'left': 0}, 300);

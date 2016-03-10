@@ -15,7 +15,7 @@
 					</li>
 				</ul>
 			</div>
-			<div class="b-tools-menu b-tools-menu_custom-scroll-huc js-scrollbar" ng-show="advEnvCtrl.activeCloudTab == 'templates'">
+			<div class="b-tools-menu js-scrollbar" ng-show="advEnvCtrl.activeCloudTab == 'templates'">
 				<ul class="">
 					<li ng-repeat="template in advEnvCtrl.templates" 
 						data-template="{{ template }}">
@@ -34,8 +34,9 @@
 						</div>
 					</li>
 				</ul>
+				<div style="height: 46px;"></div>
 			</div>
-			<div class="b-tools-menu b-tools-menu_custom-scroll-huc b-tools-menu_advanced js-scrollbar-cloud" 
+			<div class="b-tools-menu b-tools-menu_custom-scroll-huc b-tools-menu_advanced js-scrollbar" 
 			ng-show="advEnvCtrl.activeCloudTab == 'peers'">
 				<ul>
 					<li ng-repeat="(peerId, peersResources) in advEnvCtrl.peerIds"
@@ -121,10 +122,38 @@
 				id="js-environment-creation"
 				ng-init="advEnvCtrl.initJointJs()" 
 				ondrop="drop(event)">
-					<div
-						class="js-dropen-menu"
-						style="width: 100px; height: 100px; background-color: red; position: absolute; display: none;">
+
+					<div class="b-template-settings__dropdown js-dropen-menu">
+						<form ng-submit="advEnvCtrl.addSettingsToTemplate(templateSettings)">
+							<div class="header"></div>
+							<div class="body">
+								<div class="b-form-group">
+									<div class="b-form-group__label">Container name</div>
+									<input type="text" 
+										id="js-container-name" 
+										class="b-form-input b-form-input_full" 
+										ng-model="templateSettings.containerName" required>									
+								</div>
+								<div class="b-form-group">
+									<div class="b-form-group__label">Select quota size</div>
+									<select class="b-form-input b-form-input_full" 
+										id="js-container-size" 
+										ng-model="templateSettings.quotaSize"
+									>
+										<option 
+										ng-repeat="type in environmentViewCtrl.containersType" 
+										value="{{ type }}" >
+											{{ type }}
+										</option>
+									</select>
+								</div>
+							</div>
+							<div class="footer">
+								<button type="submit" class="b-btn b-btn_green">Save</button>
+							</div>
+						</form>
 					</div>
+
 				</div>
 				<div class="b-cloud-create-buttons">
 
@@ -174,7 +203,7 @@
 							</td>
 							<td>
 								<span tooltips
-									tooltip-template='<span class="b-nowrap">ID: <b>{{ environment.id }}</b></span>'
+									tooltip-template='<span class="b-nowrap">ID: {{ environment.id }}</span>'
 									tooltip-side="right"
 								>
 									{{ environment.name }}

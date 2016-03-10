@@ -18,7 +18,6 @@ import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.task.CloneRequest;
-import io.subutai.common.util.ExceptionUtil;
 
 
 public class CreatePeerNodeGroupsTask implements Callable<CreateEnvironmentContainerResponseCollector>
@@ -30,9 +29,6 @@ public class CreatePeerNodeGroupsTask implements Callable<CreateEnvironmentConta
     private final LocalPeer localPeer;
     private final Environment environment;
     private final int ipAddressOffset;
-    //    private final TemplateManager templateRegistry;
-    //    private final String defaultDomain;
-    protected ExceptionUtil exceptionUtil = new ExceptionUtil();
 
 
     public CreatePeerNodeGroupsTask( final Peer peer, final LocalPeer localPeer, final Environment environment,
@@ -62,13 +58,6 @@ public class CreatePeerNodeGroupsTask implements Callable<CreateEnvironmentConta
 
                 final String ip = subnetInfo.getAllAddresses()[( ipAddressOffset + currentIpAddressOffset )];
                 ContainerSize size = node.getType();
-                //                ContainerQuota containerQuota = quotaManager.getDefaultContainerQuota( size );
-                //
-                //                if ( containerQuota == null )
-                //                {
-                //                    LOG.warn( "Quota not found for container type: " + node.getType() );
-                //                    size = ContainerSize.SMALL;
-                //                }
                 CloneRequest cloneRequest =
                         new CloneRequest( node.getHostId(), node.getHostname(), node.getName(), ip + "/" + maskLength,
                                 environment.getId(), localPeer.getId(), localPeer.getOwnerId(), node.getTemplateName(),

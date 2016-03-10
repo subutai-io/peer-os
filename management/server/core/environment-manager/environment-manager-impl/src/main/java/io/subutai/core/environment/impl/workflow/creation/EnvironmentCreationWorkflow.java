@@ -44,7 +44,8 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         GENERATE_KEYS,
         SETUP_VNI,
         SETUP_P2P,
-        PREPARE_TEMPLATES, CLONE_CONTAINERS,
+        PREPARE_TEMPLATES,
+        CLONE_CONTAINERS,
         CONFIGURE_HOSTS,
         CONFIGURE_SSH,
         FINALIZE

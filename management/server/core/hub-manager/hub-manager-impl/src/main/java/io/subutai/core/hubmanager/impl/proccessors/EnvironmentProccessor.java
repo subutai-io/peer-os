@@ -34,7 +34,7 @@ import org.apache.http.auth.AuthenticationException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.gson.Gson;
 
-import io.subutai.common.environment.Blueprint;
+import io.subutai.core.strategy.api.Blueprint;
 import io.subutai.common.environment.Node;
 import io.subutai.common.gson.required.RequiredDeserializer;
 import io.subutai.common.peer.ContainerSize;
@@ -54,9 +54,6 @@ import io.subutai.hub.share.dto.EnvironmentNodeDto;
 import io.subutai.hub.share.json.JsonUtil;
 
 
-/**
- * Created by ${Zubaidullo} on 12/12/15.
- */
 public class EnvironmentProccessor implements StateLinkProccessor
 {
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentProccessor.class.getName() );
@@ -98,7 +95,7 @@ public class EnvironmentProccessor implements StateLinkProccessor
     {
         try
         {
-            WebClient client = configManager.getTrustedWebClientWithAuth( link );
+            WebClient client = configManager.getTrustedWebClientWithAuth( link, configManager.getHubIp() );
 
             LOG.debug( "Getting EnvironmentData from Hub..." );
 
@@ -350,14 +347,12 @@ public class EnvironmentProccessor implements StateLinkProccessor
             for ( EnvironmentNodeDto nodeDto : environmentDto.getNodes() )
             {
                 PlacementStrategy placementStrategy = new PlacementStrategy( nodeDto.getContainerPlacementStrategy() );
-                Node node =
-                        new Node( UUID.randomUUID().toString(), nodeDto.getName(), nodeDto.getTemplateName(),
-                                ContainerSize.SMALL, Integer.valueOf( nodeDto.getSshGroupId() ),
-                                Integer.valueOf( nodeDto.getHostsGroupId() ), nodeDto.getPeerId(),
-                                nodeDto.getHostId() );
+                Node node = new Node( UUID.randomUUID().toString(), nodeDto.getName(), nodeDto.getTemplateName(),
+                        ContainerSize.SMALL, Integer.valueOf( nodeDto.getSshGroupId() ),
+                        Integer.valueOf( nodeDto.getHostsGroupId() ), nodeDto.getPeerId(), nodeDto.getHostId() );
                 nodes.add( node );
             }
-            Blueprint blueprint = new Blueprint( environmentDto.getName(), nodes );
+//            Blueprint blueprint = new Blueprint( environmentDto.getName(), nodes, sshGroupId );
             //TODO refactor after EnvironmentManagement will be ready
             //            Topology topology = new Topology(environmentDto.getName(), environmentDto.get);
             //
@@ -461,7 +456,7 @@ public class EnvironmentProccessor implements StateLinkProccessor
         String path = String.format( "/rest/v1/environments/%s", envId );
         try
         {
-            WebClient client = configManager.getTrustedWebClientWithAuth( path );
+            WebClient client = configManager.getTrustedWebClientWithAuth( path, configManager.getHubIp() );
 
             byte[] plainData = JsonUtil.toCbor( environmentDto );
             byte[] encryptedData = configManager.getMessenger().produce( plainData );

@@ -6,11 +6,6 @@ import io.subutai.core.object.relation.api.model.RelationMeta;
 
 
 /**
- * Created by talas on 12/7/15.
- */
-
-
-/**
  * The reason why in relation chain must participate three elements because each link will have relation info and for
  * transitional checks we will verify that each relation link does have authority to build new relation
  */

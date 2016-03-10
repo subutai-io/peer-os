@@ -16,11 +16,6 @@ import io.subutai.core.object.relation.api.model.RelationInfoMeta;
 
 
 /**
- * Created by talas on 12/8/15.
- */
-
-
-/**
  * Relation info is simple string presentation of propertyKey=propertyValue where each pair will describe relation with
  * other object. When verifying transitive relation, relation validity is checked upon key=pair existence.
  */

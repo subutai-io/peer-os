@@ -108,7 +108,7 @@ public class UnlimitedPlacementStrategy implements UnlimitedStrategy
 
 
     protected Set<Node> distribute( List<NodeSchema> nodeSchemas, PeerGroupResources peerGroupResources,
-                                         Map<ContainerSize, ContainerQuota> quotas ) throws StrategyException
+                                    Map<ContainerSize, ContainerQuota> quotas ) throws StrategyException
     {
 
         // build list of allocators
@@ -159,9 +159,9 @@ public class UnlimitedPlacementStrategy implements UnlimitedStrategy
             {
                 for ( RandomAllocator.AllocatedContainer container : containers )
                 {
-                    Node node = new Node( UUID.randomUUID().toString(), container.getName(),
-                            container.getTemplateName(), container.getSize(), 0, 0, container.getPeerId(),
-                            container.getHostId() );
+                    Node node =
+                            new Node( UUID.randomUUID().toString(), container.getName(), container.getTemplateName(),
+                                    container.getSize(), 0, 0, container.getPeerId(), container.getHostId() );
                     nodes.add( node );
                 }
             }

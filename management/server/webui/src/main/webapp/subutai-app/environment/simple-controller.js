@@ -10,11 +10,12 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 	var vm = this;
 	var GRID_CELL_SIZE = 100;
 	var GRID_SIZE = 100;
+	var containerSettingMenu = $('.js-dropen-menu');
+	var currentTemplate = {};
 
 	vm.popupLogState = 'full';
 
 	vm.currentEnvironment = {};
-	vm.currentTemplate = {};
 	vm.buildEnvironment = buildEnvironment;
 	vm.editEnvironment = editEnvironment;
 	vm.notifyChanges = notifyChanges;
@@ -345,18 +346,21 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 					'<polygon transform="scale(1.2) translate(-5, -5)" fill="#292F6C" points="8.4,2.4 7.6,1.6 5,4.3 2.4,1.6 1.6,2.4 4.3,5 1.6,7.6 2.4,8.4 5,5.7 7.6,8.4 8.4,7.6 5.7,5 "/>',
 					'<title>Remove</title>',
 				'</g>',
-				/*'<g class="element-call-menu">',
-					'<circle fill="#F8FBFD" r="8" stroke="#dcdcdc"/>',
-					'<polygon transform="scale(1.2) translate(-5, -5)" fill="#292F6C" points="8.4,2.4 7.6,1.6 5,4.3 2.4,1.6 1.6,2.4 4.3,5 1.6,7.6 2.4,8.4 5,5.7 7.6,8.4 8.4,7.6 5.7,5 "/>',
-					'<title>Menu</title>',
-				'</g>',*/
-			'</g>'
+			'</g>',
+			'<g class="element-call-menu">',
+				'<rect class="b-magnet"/>',
+				'<g class="b-container-plus-icon">',
+					'<line fill="none" stroke="#FFFFFF" stroke-miterlimit="10" x1="0" y1="4.5" x2="9" y2="4.5"/>',
+					'<line fill="none" stroke="#FFFFFF" stroke-miterlimit="10" x1="4.5" y1="0" x2="4.5" y2="9"/>',
+				'</g>',
+			'</g>'				
 		].join(''),
 
 		defaults: joint.util.deepSupplement({
 			attrs: {
 				text: { 'font-weight': 400, 'font-size': 'small', fill: 'black', 'text-anchor': 'middle', 'ref-x': .5, 'ref-y': .5, 'y-alignment': 'middle' },
-				'g.element-call-menu': {'ref-x': 18, 'ref-y': 25}
+				'rect.b-magnet': {fill: '#04346E', width: 15, height: 15, rx: 50, ry: 50, transform: 'translate(26,51)'},
+				'g.b-container-plus-icon': {'ref-x': 29, 'ref-y': 54.5, ref: 'rect', transform: 'scale(1)'}
 			},
 		}, joint.shapes.basic.Generic.prototype.defaults)
 
@@ -371,7 +375,6 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 				'</g>',
 				'<title/>',
 				'<image/>',
-				'<rect class="b-magnet"/>',
 			'</g>'
 		].join(''),
 
@@ -381,7 +384,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 			attrs: {
 				title: {text: 'Static Tooltip'},
 				'rect.b-border': {fill: '#fff', stroke: '#dcdcdc', 'stroke-width': 1, width: 70, height: 70, rx: 50, ry: 50},
-				'rect.b-magnet': {fill: '#04346E', width: 10, height: 10, rx: 50, ry: 50, magnet: true, transform: 'translate(30,53)'},
+				//'rect.b-magnet': {fill: '#04346E', width: 10, height: 10, rx: 50, ry: 50, magnet: true, transform: 'translate(30,53)'},
 				image: {'ref-x': 9, 'ref-y': 9, ref: 'rect', width: 50, height: 50},
 			}
 		}, joint.shapes.tm.toolElement.prototype.defaults)
@@ -429,10 +432,15 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 					return;
 					break;
 				case 'element-call-menu':
+				case 'b-container-plus-icon':
+					currentTemplate = this.model;
+					$('#js-container-name').val(currentTemplate.get('containerName')).trigger('change');
+					$('#js-container-size').val(currentTemplate.get('quotaSize'));
+					containerSettingMenu.find('.header').text('Settings ' + this.model.get('templateName'));
 					var elementPos = this.model.get('position');
-					$('.js-dropen-menu').css({
-						'left': (elementPos.x + 70) + 'px',
-						'top': (elementPos.y + 83) + 'px',
+					containerSettingMenu.css({
+						'left': (elementPos.x + 12) + 'px',
+						'top': (elementPos.y + 73) + 'px',
 						'display': 'block'
 					});
 					return;
@@ -441,11 +449,11 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 					if(this.model.attributes.containerId) {
 						return;
 					}
-					vm.currentTemplate = this.model;
+					/*vm.currentTemplate = this.model;
 					ngDialog.open({
 						template: 'subutai-app/environment/partials/popups/templateSettings.html',
 						scope: $scope
-					});
+					});*/
 					return;
 					break;
 				default:
@@ -548,7 +556,10 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 			}
 		);
 
-		$('.js-scrollbar').perfectScrollbar();
+		$('.js-scrollbar').perfectScrollbar({
+			"wheelPropagation": true,
+			"swipePropagation": false
+		});
 
 		//zoom on scroll
 		/*paper.$el.on('mousewheel DOMMouseScroll', onMouseWheel);
@@ -662,10 +673,12 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 	}
 
 	function addSettingsToTemplate(settings) {
-		vm.currentTemplate.set('quotaSize', settings.quotaSize);
-		vm.currentTemplate.attr('rect.b-magnet/fill', vm.colors[settings.quotaSize]);
-		vm.currentTemplate.set('containerName', settings.containerName);
-		ngDialog.closeAll();
+
+		currentTemplate.set('quotaSize', settings.quotaSize);
+		currentTemplate.attr('rect.b-magnet/fill', vm.colors[settings.quotaSize]);
+		currentTemplate.set('containerName', settings.containerName);
+		//ngDialog.closeAll();
+		containerSettingMenu.hide();
 	}
 
 	function getElementByField(field, value, collection) {
@@ -680,4 +693,3 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 		return null;
 	}
 }
-

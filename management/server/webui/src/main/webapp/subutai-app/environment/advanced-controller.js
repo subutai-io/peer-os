@@ -23,6 +23,8 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 	vm.buildEnvironment = buildEnvironment;
 	vm.buildEditedEnvironment = buildEditedEnvironment;
 	vm.logMessages = [];
+	var containerSettingMenu = $('.js-dropen-menu');
+	var currentTemplate = {};
 
 	vm.domainStrategies = [];
 	vm.strategies = [];
@@ -65,8 +67,6 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 			VARS_MODAL_ERROR( SweetAlert, 'Error on getting templates ' + data );
 		});
 
-	//vm.templates = ['mongo', 'cassandra', 'master', 'hadoop'];
-
 	environmentService.getStrategies().success(function (data) {
 		vm.strategies = data;
 	});
@@ -90,10 +90,6 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
 
 	clearWorkspace();
-
-	/*peerRegistrationService.getResourceHosts().success(function (data) {
-		vm.resourceHosts = data;
-	});*/
 
 	function closePopup() {
 		vm.buildCompleted = false;
@@ -404,18 +400,21 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 					'<polygon transform="scale(1.2) translate(-5, -5)" fill="#292F6C" points="8.4,2.4 7.6,1.6 5,4.3 2.4,1.6 1.6,2.4 4.3,5 1.6,7.6 2.4,8.4 5,5.7 7.6,8.4 8.4,7.6 5.7,5 "/>',
 					'<title>Remove</title>',
 				'</g>',
-				/*'<g class="element-call-menu">',
-					'<circle fill="#F8FBFD" r="8" stroke="#dcdcdc"/>',
-					'<polygon transform="scale(1.2) translate(-5, -5)" fill="#292F6C" points="8.4,2.4 7.6,1.6 5,4.3 2.4,1.6 1.6,2.4 4.3,5 1.6,7.6 2.4,8.4 5,5.7 7.6,8.4 8.4,7.6 5.7,5 "/>',
-					'<title>Menu</title>',
-				'</g>',*/
+			'</g>',
+			'<g class="element-call-menu">',
+				'<rect class="b-magnet"/>',
+				'<g class="b-container-plus-icon">',
+					'<line fill="none" stroke="#FFFFFF" stroke-miterlimit="10" x1="0" y1="4.5" x2="9" y2="4.5"/>',
+					'<line fill="none" stroke="#FFFFFF" stroke-miterlimit="10" x1="4.5" y1="0" x2="4.5" y2="9"/>',
+				'</g>',
 			'</g>'
 		].join(''),
 
 		defaults: joint.util.deepSupplement({
 			attrs: {
 				text: { 'font-weight': 400, 'font-size': 'small', fill: 'black', 'text-anchor': 'middle', 'ref-x': .5, 'ref-y': .5, 'y-alignment': 'middle' },
-				'g.element-call-menu': {'ref-x': 18, 'ref-y': 25}
+				'rect.b-magnet': {fill: '#04346E', width: 10, height: 10, rx: 50, ry: 50, transform: 'translate(16,28)'},
+				'g.b-container-plus-icon': {'ref-x': 17.5, 'ref-y': 30, ref: 'rect', transform: 'scale(0.8)'}
 			},
 		}, joint.shapes.basic.Generic.prototype.defaults)
 
@@ -494,22 +493,26 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 					return;
 					break;
 				case 'element-call-menu':
-					console.log(this.model);
+				case 'b-container-plus-icon':
+					currentTemplate = this.model;
+					$('#js-container-name').val(currentTemplate.get('containerName')).trigger('change');
+					$('#js-container-size').val(currentTemplate.get('quotaSize'));
+					containerSettingMenu.find('.header').text('Settings ' + this.model.get('templateName'));
 					var elementPos = this.model.get('position');
-					$('.js-dropen-menu').css({
-						'left': (elementPos.x + 70) + 'px',
-						'top': (elementPos.y + 83) + 'px',
+					containerSettingMenu.css({
+						'left': (elementPos.x - 2) + 'px',
+						'top': (elementPos.y + 45) + 'px',
 						'display': 'block'
 					});
 					return;
 					break;
 				case 'rotatable':
 					console.log(this.model);
-					vm.currentTemplate = this.model;
+					/*vm.currentTemplate = this.model;
 					ngDialog.open({
 						template: 'subutai-app/environment/partials/popups/templateSettingsAdvanced.html',
 						scope: $scope
-					});
+					});*/
 					return;
 					break;
 				default:
@@ -700,7 +703,10 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 			cellView.model.set('position', cellView.prevPos);
 		});
 
-		$('.js-scrollbar').perfectScrollbar();
+		$('.js-scrollbar').perfectScrollbar({
+			"wheelPropagation": true,
+			"swipePropagation": false
+		});
 	}
 
 	vm.buildStep = 'confirm';
@@ -736,8 +742,8 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
 	function editEnvironment(environment) {
 		clearWorkspace();
-		console.log(environment);
 		vm.editingEnv = environment;
+		vm.environment2BuildName = environment.name;
 		vm.excludedContainers = [];
 		for(var i = 0; i < environment.containers.length; i++) {
 			var container = environment.containers[i];
@@ -818,10 +824,11 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 	}
 
 	function addSettingsToTemplate(settings) {
-		vm.currentTemplate.set('quotaSize', settings.quotaSize);
-		vm.currentTemplate.attr('rect.b-magnet/fill', vm.colors[settings.quotaSize]);
-		vm.currentTemplate.set('containerName', settings.containerName);
-		ngDialog.closeAll();
+		currentTemplate.set('quotaSize', settings.quotaSize);
+		currentTemplate.attr('rect.b-magnet/fill', vm.colors[settings.quotaSize]);
+		currentTemplate.set('containerName', settings.containerName);
+		//ngDialog.closeAll();
+		containerSettingMenu.hide();
 	}
 }
 

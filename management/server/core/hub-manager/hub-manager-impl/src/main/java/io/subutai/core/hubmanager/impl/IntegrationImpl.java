@@ -3,6 +3,7 @@ package io.subutai.core.hubmanager.impl;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -32,12 +33,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.cbor.CBORFactory;
 
 import io.subutai.common.dao.DaoManager;
-import io.subutai.common.settings.SystemSettings;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.core.hubmanager.api.Integration;
 import io.subutai.core.hubmanager.api.StateLinkProccessor;
 import io.subutai.core.hubmanager.api.dao.ConfigDataService;
+import io.subutai.core.hubmanager.api.model.Config;
 import io.subutai.core.hubmanager.impl.dao.ConfigDataServiceImpl;
 import io.subutai.core.hubmanager.impl.proccessors.EnvironmentProccessor;
 import io.subutai.core.hubmanager.impl.proccessors.HeartbeatProcessor;
@@ -59,7 +60,6 @@ public class IntegrationImpl implements Integration
     private EnvironmentManager environmentManager;
     private PeerManager peerManager;
     private ConfigManager configManager;
-    private String peerSecretKeyringPwd;
     private ScheduledExecutorService hearbeatExecutorService = Executors.newSingleThreadScheduledExecutor();
     private ScheduledExecutorService resourceHostConfExecutorService = Executors.newSingleThreadScheduledExecutor();
     private ScheduledExecutorService resourceHostMonitorExecutorService = Executors.newSingleThreadScheduledExecutor();
@@ -72,9 +72,8 @@ public class IntegrationImpl implements Integration
     private Monitor monitor;
 
 
-    public IntegrationImpl( String peerSecretKeyringPwd, DaoManager daoManager )
+    public IntegrationImpl( DaoManager daoManager )
     {
-        this.peerSecretKeyringPwd = peerSecretKeyringPwd;
         this.daoManager = daoManager;
     }
 
@@ -85,7 +84,8 @@ public class IntegrationImpl implements Integration
         {
             configDataService = new ConfigDataServiceImpl( daoManager );
 
-            this.configManager = new ConfigManager( securityManager, peerManager, peerSecretKeyringPwd );
+            this.configManager =
+                    new ConfigManager( securityManager, peerManager, configDataService );
             heartbeatProcessor = new HeartbeatProcessor( this, configManager );
             resourceHostConfProcessor = new ResourceHostConfProcessor( this, peerManager, configManager, monitor );
             resourceHostMonitorProcessor =
@@ -100,8 +100,8 @@ public class IntegrationImpl implements Integration
 
 
             this.hearbeatExecutorService.scheduleWithFixedDelay( heartbeatProcessor, 10, 120, TimeUnit.SECONDS );
-            this.resourceHostConfExecutorService.scheduleWithFixedDelay( resourceHostConfProcessor, 50, 900,
-                    TimeUnit.SECONDS ); // Executes every 3 hours
+            this.resourceHostConfExecutorService.scheduleWithFixedDelay( resourceHostConfProcessor, 20, 900,
+                    TimeUnit.SECONDS ); // Executes every 15 minutes
             this.resourceHostMonitorExecutorService
                     .scheduleWithFixedDelay( resourceHostMonitorProcessor, 30, 300, TimeUnit.SECONDS );
         }
@@ -109,6 +109,14 @@ public class IntegrationImpl implements Integration
         {
             LOG.error( e.getMessage() );
         }
+    }
+
+
+    public void destroy()
+    {
+        hearbeatExecutorService.shutdown();
+        resourceHostConfExecutorService.shutdown();
+        resourceHostMonitorExecutorService.shutdown();
     }
 
 
@@ -131,17 +139,26 @@ public class IntegrationImpl implements Integration
     public void registerPeer( String hupIp, String email, String password ) throws HubPluginException
     {
         configManager.addHubConfig( hupIp );
-        RegistrationManager registrationManager = new RegistrationManager( this, configManager );
+        RegistrationManager registrationManager = new RegistrationManager( this, configManager, hupIp );
 
         registrationManager.registerPeer( email, password );
-        heartbeatProcessor.sendHeartbeat();
+        //        sendHeartbeat();
     }
 
 
     @Override
     public String getHubDns() throws HubPluginException
     {
-        return configManager.getHubIp();
+        Config config = getConfigDataService().getHubConfig( configManager.getPeerId() );
+
+        if ( config != null )
+        {
+            return config.getHubIp();
+        }
+        else
+        {
+            return null;
+        }
     }
 
 
@@ -151,7 +168,8 @@ public class IntegrationImpl implements Integration
         ProductsDto result;
         try
         {
-            WebClient client = configManager.getTrustedWebClientWithAuth( "/rest/v1.1/marketplace/products" );
+            String hubIp = configDataService.getHubConfig( configManager.getPeerId() ).getHubIp();
+            WebClient client = configManager.getTrustedWebClientWithAuth( "/rest/v1.1/marketplace/products", hubIp );
 
             Response r = client.get();
 
@@ -205,11 +223,33 @@ public class IntegrationImpl implements Integration
 
 
     @Override
-    public void uninstallPlugin( String url )
+    public void uninstallPlugin( final String url, final String name )
     {
         int indexOfStr = url.indexOf( "/package/" );
         String fileName = url.substring( indexOfStr + 9, url.length() );
         File file = new File( String.format( "%s/deploy", System.getProperty( "karaf.home" ) ) + "/" + fileName );
+        File repo = new File( "/opt/subutai-mng/data/repository/io/subutai/" );
+        File[] dirs = repo.listFiles( new FileFilter()
+        {
+            @Override
+            public boolean accept( File pathname )
+            {
+                return pathname.getName().matches( ".*" + name + ".*" );
+            }
+        } );
+        for ( File f : dirs )
+        {
+            LOG.info( f.getAbsolutePath() );
+            try
+            {
+                FileUtils.deleteDirectory( f );
+                LOG.debug( f.getName() + " is removed." );
+            }
+            catch ( IOException e )
+            {
+                e.printStackTrace();
+            }
+        }
         if ( file.delete() )
         {
             LOG.debug( file.getName() + " is removed." );
@@ -223,9 +263,10 @@ public class IntegrationImpl implements Integration
     {
         try
         {
+            String hubIp = configDataService.getHubConfig( configManager.getPeerId() ).getHubIp();
             String path = String.format( "/rest/v1/peers/%s/delete", configManager.getPeerId() );
 
-            WebClient client = configManager.getTrustedWebClientWithAuth( path );
+            WebClient client = configManager.getTrustedWebClientWithAuth( path, hubIp );
 
             Response r = client.delete();
 
@@ -234,7 +275,6 @@ public class IntegrationImpl implements Integration
             {
                 LOG.debug( "Peer unregistered successfully." );
                 configDataService.deleteConfig( configManager.getPeerId() );
-                SystemSettings.setRegisterToHubState( false );
             }
             else
             {
@@ -246,6 +286,13 @@ public class IntegrationImpl implements Integration
         {
             throw new HubPluginException( "Could not unregister peer", e );
         }
+    }
+
+
+    @Override
+    public boolean getRegistrationState()
+    {
+        return getConfigDataService().getHubConfig( configManager.getPeerId() ) != null;
     }
 
 

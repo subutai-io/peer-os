@@ -4,9 +4,6 @@ package io.subutai.core.registration.impl.entity;
 import org.junit.Test;
 
 
-/**
- * Created by talas on 8/26/15.
- */
 public class RequestDataServiceTest
 {
 

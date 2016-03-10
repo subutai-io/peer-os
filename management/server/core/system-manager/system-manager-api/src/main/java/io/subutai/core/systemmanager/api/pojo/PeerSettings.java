@@ -1,9 +1,6 @@
 package io.subutai.core.systemmanager.api.pojo;
 
 
-/**
- * Created by ermek on 2/11/16.
- */
 public interface PeerSettings
 {
     public String getPeerOwnerId();
@@ -16,10 +13,4 @@ public interface PeerSettings
 
 
     public void setUserPeerOwnerName( final String userPeerOwnerName );
-
-
-    public boolean isRegisteredToHub();
-
-
-    public void setRegisteredToHub( final boolean isRegisteredToHub );
 }

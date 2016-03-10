@@ -6,8 +6,10 @@ import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.subutai.common.util.JsonUtil;
 import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.core.hubmanager.api.Integration;
+import io.subutai.core.hubmanager.rest.pojo.RegistrationPojo;
 
 
 public class RestServiceImpl implements RestService
@@ -33,7 +35,7 @@ public class RestServiceImpl implements RestService
         {
             LOG.error( e.getMessage() );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
-                    entity( e.getMessage() ).build();
+                    entity( JsonUtil.GSON.toJson (e.getMessage()) ).build();
         }
     }
 
@@ -49,7 +51,7 @@ public class RestServiceImpl implements RestService
         {
             LOG.error( e.getMessage() );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
-                    entity( e.getMessage() ).build();
+                    entity( JsonUtil.GSON.toJson (e.getMessage()) ).build();
         }
     }
 
@@ -65,7 +67,7 @@ public class RestServiceImpl implements RestService
         {
             LOG.error( e.getMessage() );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
-                    entity( e.getMessage() ).build();
+                    entity( JsonUtil.GSON.toJson (e.getMessage()) ).build();
         }
     }
 
@@ -96,8 +98,19 @@ public class RestServiceImpl implements RestService
         {
             LOG.error( e.getMessage() );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
-                    entity( e.getMessage() ).build();
+                    entity( JsonUtil.GSON.toJson (e.getMessage()) ).build();
         }
         return Response.ok().build();
+    }
+
+
+    @Override
+    public Response getRegistrationState()
+    {
+        RegistrationPojo pojo = new RegistrationPojo();
+        pojo.setRegisteredToHub( integration.getRegistrationState() );
+        String hubRegistrationInfo = JsonUtil.GSON.toJson( pojo );
+
+        return Response.status( Response.Status.OK ).entity( hubRegistrationInfo ).build();
     }
 }

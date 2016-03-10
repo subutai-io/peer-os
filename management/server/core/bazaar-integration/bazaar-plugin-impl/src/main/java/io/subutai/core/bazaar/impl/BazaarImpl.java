@@ -25,14 +25,6 @@ public class BazaarImpl implements Bazaar
         this.daoManager = daoManager;
         this.configDataService = new ConfigDataServiceImpl( this.daoManager );
         this.integration = integration;
-        //		try
-        //		{
-        //			this.integration.registerPeer ("hub.subut.ai");
-        //		}
-        //		catch (HubPluginException e)
-        //		{
-        //			e.printStackTrace ();
-        //		}
     }
 
 
@@ -68,9 +60,9 @@ public class BazaarImpl implements Bazaar
 
 
     @Override
-    public void uninstallPlugin( Long id, String kar )
+    public void uninstallPlugin( Long id, String kar, String name )
     {
-        this.integration.uninstallPlugin( kar );
+        this.integration.uninstallPlugin( kar, name );
         this.configDataService.deletePlugin( id );
     }
 }

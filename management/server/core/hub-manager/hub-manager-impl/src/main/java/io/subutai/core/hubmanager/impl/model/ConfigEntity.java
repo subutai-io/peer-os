@@ -11,9 +11,6 @@ import javax.persistence.Table;
 import io.subutai.core.hubmanager.api.model.Config;
 
 
-/**
- * Created by ermek on 10/27/15.
- */
 @Entity
 @Table( name = "h_config" )
 @Access( AccessType.FIELD )
@@ -25,9 +22,6 @@ public class ConfigEntity implements Config
 
     @Column( name = "server_ip" )
     private String serverIp;
-
-    @Column( name = "supernode_ip" )
-    private String superNodeIp;
 
 
     public String getPeerId()
@@ -51,17 +45,5 @@ public class ConfigEntity implements Config
     public void setHubIp( final String serverIp )
     {
         this.serverIp = serverIp;
-    }
-
-
-    public String getSuperNodeIp()
-    {
-        return superNodeIp;
-    }
-
-
-    public void setSuperNodeIp( final String superNodeIp )
-    {
-        this.superNodeIp = superNodeIp;
     }
 }

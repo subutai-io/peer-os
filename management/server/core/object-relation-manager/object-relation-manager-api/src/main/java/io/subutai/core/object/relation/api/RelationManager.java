@@ -10,9 +10,6 @@ import io.subutai.core.object.relation.api.model.RelationInfoMeta;
 import io.subutai.core.object.relation.api.model.RelationMeta;
 
 
-/**
- * Created by talas on 12/7/15.
- */
 public interface RelationManager
 {
     String getContext();
@@ -23,7 +20,7 @@ public interface RelationManager
 
     Relation buildTrustRelation( RelationInfo relationInfo, RelationMeta relationMeta );
 
-    Relation getRelation(RelationMeta relationMeta);
+    Relation getRelation( RelationMeta relationMeta );
 
     void saveRelation( Relation relation );
 

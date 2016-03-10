@@ -1,7 +1,6 @@
 package io.subutai.core.systemmanager.rest;
 
 
-import javax.ws.rs.FormParam;
 import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
@@ -23,9 +22,6 @@ import io.subutai.core.systemmanager.api.pojo.PeerSettings;
 import io.subutai.core.systemmanager.api.pojo.SystemInfo;
 
 
-/**
- * Created by ermek on 2/6/16.
- */
 public class RestServiceImpl implements RestService
 {
     private static final Logger LOG = LoggerFactory.getLogger( RestServiceImpl.class.getName() );
@@ -58,14 +54,6 @@ public class RestServiceImpl implements RestService
     public Response setPeerSettings()
     {
         systemManager.setPeerSettings();
-        return Response.status( Response.Status.OK ).build();
-    }
-
-
-    @Override
-    public Response setRegistrationStatus( @FormParam( "status" ) final String status )
-    {
-        io.subutai.common.settings.SystemSettings.setRegisterToHubState( Boolean.valueOf( status ) );
         return Response.status( Response.Status.OK ).build();
     }
 
@@ -160,8 +148,7 @@ public class RestServiceImpl implements RestService
 
         try
         {
-            systemManager
-                    .setKurjunSettingsUrls( globalKurjunUrls.split( "," ) );
+            systemManager.setKurjunSettingsUrls( globalKurjunUrls.split( "," ) );
         }
         catch ( ConfigurationException e )
         {
@@ -196,11 +183,11 @@ public class RestServiceImpl implements RestService
 
     @Override
     public Response setNetworkSettings( final String securePortX1, final String securePortX2, final String securePortX3,
-                                        final String publicUrl )
+                                        final String publicUrl, final String agentPort )
     {
         try
         {
-            systemManager.setNetworkSettings( securePortX1, securePortX2, securePortX3, publicUrl );
+            systemManager.setNetworkSettings( securePortX1, securePortX2, securePortX3, publicUrl, agentPort );
         }
         catch ( ConfigurationException e )
         {

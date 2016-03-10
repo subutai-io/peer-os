@@ -9,7 +9,7 @@
 			<a ui-sref="home" class="b-nav-menu-link" id="subt-link__monitoring">
 				<span class="b-nav-menu__icon b-nav-menu-link__item">
 					<svg class="b-nav-menu-icon">
-						<use xlink:href="assets\elements\icons.svg#nav-monitoring"></use>
+						<use xlink:href="assets/elements/icons.svg#nav-monitoring"></use>
 					</svg>
 				</span><!--z
 					--><span class="b-nav-menu__title b-nav-menu-link__item">
@@ -24,7 +24,7 @@
 			<a class="b-nav-menu-link" href id="subt-link__environment">
 				<span class="b-nav-menu__icon b-nav-menu-link__item">
 					<svg class="b-nav-menu-icon">
-						<use xlink:href="assets\elements\icons.svg#nav-environment"></use>
+						<use xlink:href="assets/elements/icons.svg#nav-environment"></use>
 					</svg>
 				</span><!--
 					--><span class="b-nav-menu__title b-nav-menu-link__item">
@@ -52,7 +52,7 @@
 			<a ui-sref="kurjun" class="b-nav-menu-link" id="subt-link__kurjun">
 				<span class="b-nav-menu__icon b-nav-menu-link__item">
 					<svg class="b-nav-menu-icon">
-						<use xlink:href="assets\elements\icons.svg#nav-kurjun"></use>
+						<use xlink:href="assets/elements/icons.svg#nav-kurjun"></use>
 					</svg>
 				</span><!--
 				--><span class="b-nav-menu__title b-nav-menu-link__item">
@@ -64,7 +64,7 @@
 			<a ui-sref="console" class="b-nav-menu-link" id="subt-link__console">
 				<span class="b-nav-menu__icon b-nav-menu-link__item">
 					<svg class="b-nav-menu-icon">
-						<use xlink:href="assets\elements\icons.svg#nav-console"></use>
+						<use xlink:href="assets/elements/icons.svg#nav-console"></use>
 					</svg>
 				</span><!--
 					--><span class="b-nav-menu__title b-nav-menu-link__item">
@@ -73,11 +73,11 @@
 			</a>
 		</li>
 		<li class="b-nav-menu" 
-		ng-class="subutaiController.activeState == 'identity-user' || subutaiController.activeState == 'identity-role' || subutaiController.activeState == 'account-settings' || subutaiController.activeState == 'tokens' ? 'b-nav-menu_active' : ''">
+		ng-class="subutaiController.activeState == 'identity-user' || subutaiController.activeState == 'identity-role' || subutaiController.activeState == 'account-settings' || subutaiController.activeState == 'change-pass' || subutaiController.activeState == 'tokens' ? 'b-nav-menu_active' : ''">
 			<a class="b-nav-menu-link" href id="subt-link__user-identity">
 				<span class="b-nav-menu__icon b-nav-menu-link__item">
 					<svg class="b-nav-menu-icon">
-						<use xlink:href="assets\elements\icons.svg#nav-user-identity"></use>
+						<use xlink:href="assets/elements/icons.svg#nav-user-identity"></use>
 					</svg>
 				</span><!--
 					--><span class="b-nav-menu__title b-nav-menu-link__item">
@@ -97,7 +97,7 @@
 					<a ui-sref="identity-role" id="subt-link__role-management">Role management</a>
 				</li>
 				<li class="b-nav-menu-sub b-nav-menu-sub_disabled" 
-				ng-class="subutaiController.activeState == 'account-settings' ? 'b-nav-menu-sub_active' : ''">
+				ng-class="subutaiController.activeState == 'account-settings' || subutaiController.activeState == 'change-pass' ? 'b-nav-menu-sub_active' : ''">
 					<a ui-sref="account-settings" id="subt-link__account-settings">Account Settings</a>
 				</li>
 				<li class="b-nav-menu-sub b-nav-menu-sub_disabled" 
@@ -110,7 +110,7 @@
 			<a ui-sref="peer-registration" class="b-nav-menu-link" id="subt-link__peer-registration">
 				<span class="b-nav-menu__icon b-nav-menu-link__item">
 					<svg class="b-nav-menu-icon">
-						<use xlink:href="assets\elements\icons.svg#nav-peer-registration"></use>
+						<use xlink:href="assets/elements/icons.svg#nav-peer-registration"></use>
 					</svg>
 				</span><!--
 					--><span class="b-nav-menu__title b-nav-menu-link__item">
@@ -122,7 +122,7 @@
 			<a ui-sref="nodeReg" class="b-nav-menu-link" id="subt-link__resource-node">
 				<span class="b-nav-menu__icon b-nav-menu-link__item">
 					<svg class="b-nav-menu-icon">
-						<use xlink:href="assets\elements\icons.svg#nav-resource-host"></use>
+						<use xlink:href="assets/elements/icons.svg#nav-resource-host"></use>
 					</svg>
 				</span><!--
 					--><span class="b-nav-menu__title b-nav-menu-link__item">
@@ -134,7 +134,7 @@
 			<a ui-sref="tracker" class="b-nav-menu-link" id="subt-link__treaker">
 				<span class="b-nav-menu__icon b-nav-menu-link__item">
 					<svg class="b-nav-menu-icon">
-						<use xlink:href="assets\elements\icons.svg#nav-tracker"></use>
+						<use xlink:href="assets/elements/icons.svg#nav-tracker"></use>
 					</svg>
 				</span><!--
 					--><span class="b-nav-menu__title b-nav-menu-link__item">
@@ -146,7 +146,7 @@
 			<a ui-sref="bazaar" class="b-nav-menu-link" id="subt-link__bazaar">
 				<span class="b-nav-menu__icon b-nav-menu-link__item">
 					<svg class="b-nav-menu-icon">
-						<use xlink:href="assets\elements\icons.svg#nav-bazaar"></use>
+						<use xlink:href="assets/elements/icons.svg#nav-bazaar"></use>
 					</svg>
 				</span><!--
 					--><span class="b-nav-menu__title b-nav-menu-link__item">
@@ -159,7 +159,7 @@
 			<a class="b-nav-menu-link" href id="subt-link__settings">
 				<span class="b-nav-menu__icon b-nav-menu-link__item">
 					<svg class="b-nav-menu-icon">
-						<use xlink:href="assets\elements\icons.svg#nav-system-settings"></use>
+						<use xlink:href="assets/elements/icons.svg#nav-system-settings"></use>
 					</svg>
 				</span><!--
 					--><span class="b-nav-menu__title b-nav-menu-link__item">

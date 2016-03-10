@@ -25,7 +25,7 @@ var app = angular.module('subutai-app', [
 
 CurrentUserCtrl.$inject = ['$location', '$rootScope', '$http', 'SweetAlert'];
 routesConf.$inject = ['$httpProvider', '$stateProvider', '$urlRouterProvider', '$ocLazyLoadProvider'];
-startup.$inject = ['$rootScope', '$state', '$location', '$http'];
+startup.$inject = ['$rootScope', '$state', '$location', '$http', 'SweetAlert', 'ngDialog'];
 
 function CurrentUserCtrl($location, $rootScope, $http, SweetAlert) {
 	var vm = this;
@@ -40,7 +40,7 @@ function CurrentUserCtrl($location, $rootScope, $http, SweetAlert) {
 
 
     function checkIfRegistered() {
-        $http.get(SERVER_URL + "rest/v1/system/peer_settings", {
+        $http.get(SERVER_URL + "rest/v1/hub/registration_state", {
             withCredentials: true,
             headers: {'Content-Type': 'application/json'}
         }).success(function (data) {
@@ -89,13 +89,38 @@ function CurrentUserCtrl($location, $rootScope, $http, SweetAlert) {
 				localStorage.setItem('hubRegistered', true);
 				vm.hubStatus = true;
 				hubPopupLoadScreen();
-				//SweetAlert.swal ("Success!", "Your peer was registered to Hub.", "success");
-			}).error (function (error) {
+
+                $http.post( SERVER_URL + 'rest/v1/hub/send-heartbeat?hubIp=hub.subut.ai', {withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
+                    .success(function () {
+                        //localStorage.setItem('hubRegistered', true);
+                        //vm.hubStatus = true;
+                        //hubPopupLoadScreen();
+                        //SweetAlert.swal ("Success!", "Your peer was registered to Hub.", "success");
+                    }).error (function (error) {
+                    console.log('hub/register error: ', error);
+                    vm.hubRegisterError = error;
+                    //hubPopupLoadScreen();
+                });
+
+                $http.post( SERVER_URL + 'rest/v1/hub/send-rh-configurations?hubIp=hub.subut.ai', {withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
+                    .success(function () {
+                        //localStorage.setItem('hubRegistered', true);
+                        //vm.hubStatus = true;
+                        //hubPopupLoadScreen();
+                        //SweetAlert.swal ("Success!", "Your peer was registered to Hub.", "success");
+                    }).error (function (error) {
+                    console.log('hub/register error: ', error);
+                    vm.hubRegisterError = error;
+                    //hubPopupLoadScreen();
+                });
+
+
+            }).error (function (error) {
 				console.log('hub/register error: ', error);
 				vm.hubRegisterError = error;
 				hubPopupLoadScreen();
 			});
-	}
+    }
 
 	function hubUnregister() {
 		hubPopupLoadScreen(true);
@@ -267,58 +292,6 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
                                 'subutai-app/monitoring/service.js',
                                 'subutai-app/environment/service.js',
                                 'subutai-app/peerRegistration/service.js'
-                            ]
-                        }
-                    ]);
-                }]
-            }
-        })
-        .state('blueprints', {
-            url: '/blueprints',
-            templateUrl: 'subutai-app/blueprints/partials/view.html',
-            data: {
-                bodyClass: '',
-                layout: 'default'
-            },
-            resolve: {
-                loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
-                    return $ocLazyLoad.load([
-                        {
-                            name: 'subutai.blueprints',
-                            files: [
-                                'subutai-app/blueprints/blueprints.js',
-                                'subutai-app/blueprints/controller.js',
-                                'subutai-app/environment/service.js'
-                            ]
-                        }
-                    ]);
-                }]
-            }
-        })
-        .state('blueprintsActions', {
-            url: '/blueprints/{blueprintId}/{action}/',
-            templateUrl: 'subutai-app/blueprintsBuild/partials/view.html',
-            data: {
-                bodyClass: '',
-                layout: 'default'
-            },
-            resolve: {
-                loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
-                    return $ocLazyLoad.load([
-                        {
-                            name: 'ya.nouislider',
-                            files: [
-                                'scripts/libs/wNumb.js',
-                                'scripts/libs/nouislider.min.js',
-                                'assets/js/plugins/nouislider.min.js'
-                            ]
-                        },
-                        {
-                            name: 'subutai.blueprints-build',
-                            files: [
-                                'subutai-app/blueprintsBuild/blueprintsBuild.js',
-                                'subutai-app/blueprintsBuild/controller.js',
-                                'subutai-app/environment/service.js'
                             ]
                         }
                     ]);
@@ -676,7 +649,11 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
                 loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
                     return $ocLazyLoad.load([
                         {
-                            files: ['scripts/libs/FileSaver.min.js']
+							files: [
+								'scripts/libs/FileSaver.min.js',
+								'scripts/libs/highlight.pack.js',
+								'css/libs/highlight.default.css',
+							]
                         },
                         {
                             name: 'subutai.settings-advanced',
@@ -728,7 +705,9 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
                                 'subutai-app/bazaar/bazaar.js',
                                 'subutai-app/bazaar/controller.js',
                                 'subutai-app/bazaar/service.js',
-                                'subutai-app/identity/service.js'
+                                'subutai-app/identity/service.js',
+                                'subutai-app/bazaar/partials/css/demo.css',
+                                'subutai-app/bazaar/partials/css/component.css'
                             ]
                         }
                     ]);
@@ -759,12 +738,15 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 	});
 }
 
-function startup($rootScope, $state, $location, $http) {
+function startup($rootScope, $state, $location, $http, SweetAlert, ngDialog) {
 
     $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
         LOADING_SCREEN('none');
+		ngDialog.closeAll();
+		$('.sweet-overlay').remove();
+		$('.sweet-alert').remove();
 
-        $http.get(SERVER_URL + 'rest/v1/system/peer_settings', {withCredentials: true})
+        $http.get(SERVER_URL + 'rest/v1/hub/registration_state', {withCredentials: true})
             .success(function (data) {
                 localStorage.setItem('hubRegistered', data.isRegisteredToHub);
             }).error(function (error) {

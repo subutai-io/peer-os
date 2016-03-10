@@ -67,7 +67,6 @@ public class QuotaTask extends AbstractTask<QuotaRequest, QuotaResponse>
     public QuotaResponse build( final QuotaRequest request, final CommandResult commandResult, final long elapsedTime )
     {
         final boolean succeeded = commandResult != null && commandResult.hasSucceeded();
-        return new QuotaResponse( request.getResourceHostId(), request.getHostname(), succeeded, getElapsedTime(),
-                succeeded ? getStdOut() : getStdErr() );
+        return new QuotaResponse( request.getResourceHostId(), request.getHostname(), succeeded, getElapsedTime() );
     }
 }

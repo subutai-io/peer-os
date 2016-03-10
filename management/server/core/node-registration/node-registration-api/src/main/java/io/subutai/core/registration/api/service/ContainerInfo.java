@@ -7,29 +7,7 @@ import io.subutai.core.registration.api.RegistrationStatus;
 
 public interface ContainerInfo extends ContainerHostInfo
 {
-    /**
-     * Returns id of host
-     */
-//    public String getId();
 
-
-    /**
-     * Returns hostname of host
-     */
-//    public String getHostname();
-//
-//
-//    /**
-//     * Returns network interfaces of host
-//     */
-//    public Set<Interface> getUsedNetworks();
-//
-//
-//    /**
-//     * Returns architecture of host
-//     */
-//    public HostArchitecture getArch();
-//
     /**
      * Return container template name
      */

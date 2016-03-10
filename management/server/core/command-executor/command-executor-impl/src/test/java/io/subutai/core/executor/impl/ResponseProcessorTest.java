@@ -2,15 +2,16 @@ package io.subutai.core.executor.impl;
 
 
 import java.io.PrintStream;
-import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandResult;
+import io.subutai.common.command.Request;
 import io.subutai.common.command.Response;
 
 import static junit.framework.TestCase.fail;
@@ -33,6 +34,8 @@ public class ResponseProcessorTest
     Response response;
     @Mock
     CommandCallback callback;
+    @Mock
+    Request request;
 
     ResponseProcessor responseProcessor;
 
@@ -40,7 +43,7 @@ public class ResponseProcessorTest
     @Before
     public void setUp() throws Exception
     {
-        responseProcessor = new ResponseProcessor( response, commandProcess, commandProcessor );
+        responseProcessor = new ResponseProcessor( response, commandProcess, commandProcessor, request );
         when( commandProcess.getCallback() ).thenReturn( callback );
         when( commandProcess.isDone() ).thenReturn( true );
     }
@@ -51,7 +54,7 @@ public class ResponseProcessorTest
     {
         try
         {
-            new ResponseProcessor( null, commandProcess, commandProcessor );
+            new ResponseProcessor( null, commandProcess, commandProcessor, request );
             fail( "Expected NullPointerException" );
         }
         catch ( NullPointerException e )
@@ -59,7 +62,7 @@ public class ResponseProcessorTest
         }
         try
         {
-            new ResponseProcessor( response, null, commandProcessor );
+            new ResponseProcessor( response, null, commandProcessor, request );
             fail( "Expected NullPointerException" );
         }
         catch ( NullPointerException e )
@@ -67,7 +70,7 @@ public class ResponseProcessorTest
         }
         try
         {
-            new ResponseProcessor( response, commandProcess, null );
+            new ResponseProcessor( response, commandProcess, null, request );
             fail( "Expected NullPointerException" );
         }
         catch ( NullPointerException e )
@@ -86,7 +89,7 @@ public class ResponseProcessorTest
         verify( commandProcess ).getCallback();
         verify( callback ).onResponse( eq( response ), any( CommandResult.class ) );
         verify( commandProcess ).isDone();
-        verify( commandProcessor ).remove( any( UUID.class ) );
+        verify( commandProcessor ).remove( any( Request.class ) );
         verify( commandProcess ).stop();
 
 

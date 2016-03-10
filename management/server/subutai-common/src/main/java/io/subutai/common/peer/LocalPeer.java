@@ -24,17 +24,6 @@ public interface LocalPeer extends Peer
 
     Task getTask( Integer id );
 
-    /**
-     * Adds remote apt repository to local apt sources
-     */
-    @Deprecated
-    void addRepository( final String ip ) throws PeerException;
-
-    /**
-     * Removes remote apt repository from local apt sources
-     */
-    @Deprecated
-    void removeRepository( final String host, final String ip ) throws PeerException;
 
     /**
      * Removes a gateway
@@ -189,6 +178,8 @@ public interface LocalPeer extends Peer
     List<ContainerHost> getPeerContainers( String peerId );
 
     String getCurrentControlNetwork() throws PeerException;
+
+    Host findHostByName( String hostname ) throws HostNotFoundException;
 
     List<Task> getTaskList();
 }

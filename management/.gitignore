@@ -18,7 +18,6 @@ git.properties
 *.war
 *.ear
 /server/server-karaf/nb-configuration.xml
-server/core/broker/broker-impl/activemq-data
 *.uml
 out
 .DS_Store

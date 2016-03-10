@@ -4,6 +4,7 @@ package io.subutai.core.localpeer.impl.container;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.task.Command;
 import io.subutai.common.task.CommandBatch;
@@ -64,10 +65,12 @@ public class ImportTask extends AbstractTask<ImportTemplateRequest, ImportTempla
 
     @Override
     public ImportTemplateResponse build( final ImportTemplateRequest request, final CommandResult commandResult,
-                                         final long elapsedTime )
+                                         final long elapsedTime ) throws Exception
     {
-        boolean succeeded = commandResult != null && commandResult.hasSucceeded();
-        return new ImportTemplateResponse( request.getResourceHostId(), request.getTemplateName(), succeeded,
-                elapsedTime, succeeded ? getStdOut() : getStdErr() );
+        if ( commandResult.hasSucceeded() )
+        {
+            return new ImportTemplateResponse( request.getResourceHostId(), request.getTemplateName(), elapsedTime );
+        }
+        throw new CommandException( commandResult.getStdErr() );
     }
 }

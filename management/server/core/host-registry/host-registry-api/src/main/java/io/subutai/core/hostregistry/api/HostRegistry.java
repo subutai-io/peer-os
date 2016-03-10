@@ -13,6 +13,14 @@ import io.subutai.common.host.ResourceHostInfo;
  */
 public interface HostRegistry
 {
+
+    /**
+     * Updates timestamp of resource host cache entry so that it does not get evicted
+     *
+     * @param resourceHostId - id of resource host
+     */
+    public void updateResourceHostEntryTimestamp( String resourceHostId );
+
     /**
      * Returns container host info by id
      *

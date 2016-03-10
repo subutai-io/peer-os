@@ -11,9 +11,6 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
 
-/**
- * Created by ermek on 2/19/16.
- */
 public class SystemSettings
 {
     private static final Logger LOG = LoggerFactory.getLogger( SystemSettings.class );
@@ -21,14 +18,17 @@ public class SystemSettings
     public static final String DEFAULT_EXTERNAL_INTERFACE = "wan";
     public static final String DEFAULT_PUBLIC_URL = "https://127.0.0.1:8443";
     public static final String DEFAULT_KURJUN_REPO = "http://repo.critical-factor.com:8080/rest/kurjun";
+    public static final String DEFAULT_PEER_PWD = "12345678";
 
     private static PropertiesConfiguration PROPERTIES = null;
     private static String[] GLOBAL_KURJUN_URLS = null;
+
 
     static
     {
         loadProperties();
     }
+
 
     public static void loadProperties()
     {
@@ -51,14 +51,14 @@ public class SystemSettings
         return GLOBAL_KURJUN_URLS;
     }
 
-    
+
     public static void setGlobalKurjunUrls( String[] urls ) throws ConfigurationException
     {
         String[] validated = validateGlobalKurjunUrls( urls );
         saveProperty( "globalKurjunUrls", validated );
         loadGlobalKurjunUrls();
     }
-    
+
 
     protected static String[] validateGlobalKurjunUrls( final String[] urls ) throws ConfigurationException
     {
@@ -90,19 +90,18 @@ public class SystemSettings
         }
         catch ( MalformedURLException e )
         {
-            throw  new ConfigurationException( "Invalid URL: " + publicUrl );
+            throw new ConfigurationException( "Invalid URL: " + publicUrl );
         }
     }
-    
-    
+
+
     private static void loadGlobalKurjunUrls() throws ConfigurationException
     {
         String[] globalKurjunUrls = PROPERTIES.getStringArray( "globalKurjunUrls" );
         if ( globalKurjunUrls.length < 1 )
         {
-            globalKurjunUrls = new String[]
-            {
-                DEFAULT_KURJUN_REPO
+            globalKurjunUrls = new String[] {
+                    DEFAULT_KURJUN_REPO
             };
         }
 
@@ -155,6 +154,12 @@ public class SystemSettings
     }
 
 
+    public static int getAgentPort()
+    {
+        return PROPERTIES.getInt( "agentPort", ChannelSettings.AGENT_PORT );
+    }
+
+
     public static void setOpenPort( int openPort )
     {
         saveProperty( "openPort", openPort );
@@ -185,15 +190,24 @@ public class SystemSettings
     }
 
 
+    public static void setAgentPort( int agentPort )
+    {
+        saveProperty( "agentPort", agentPort );
+    }
+
+
     // Security Settings
 
 
+    //todo remove this since communication is always encrypted
+    @Deprecated
     public static boolean getEncryptionState()
     {
         return PROPERTIES.getBoolean( "encryptionEnabled", false );
     }
 
 
+    //todo remove
     public static boolean getRestEncryptionState()
     {
         return PROPERTIES.getBoolean( "restEncryptionEnabled", false );
@@ -239,18 +253,6 @@ public class SystemSettings
     // Peer Settings
 
 
-    public static boolean isRegisteredToHub()
-    {
-        return PROPERTIES.getBoolean( "isRegisteredToHub", false );
-    }
-
-
-    public static void setRegisterToHubState( boolean registrationState )
-    {
-        saveProperty( "isRegisteredToHub", registrationState );
-    }
-
-
     public static String getPublicUrl()
     {
         return PROPERTIES.getString( "publicURL", DEFAULT_PUBLIC_URL );
@@ -261,6 +263,19 @@ public class SystemSettings
     {
         validatePublicUrl( publicUrl );
         saveProperty( "publicURL", publicUrl );
+    }
+
+
+    public static String getPeerSecretKeyringPwd()
+    {
+        return PROPERTIES.getString( "peerSecretKeyringPwd", DEFAULT_PEER_PWD );
+    }
+
+
+    public static void setPeerSecretKeyringPwd( String pwd ) throws ConfigurationException
+    {
+        validatePublicUrl( pwd );
+        saveProperty( "peerSecretKeyringPwd", pwd );
     }
 
 

@@ -1,7 +1,9 @@
 package io.subutai.common.security.crypto.certificate;
 
 
+import java.io.IOException;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -17,6 +19,7 @@ import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.openssl.PEMParser;
+import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
@@ -137,7 +140,25 @@ public class CertificateTool
         }
         catch ( Exception e )
         {
-            throw new RuntimeException( "Failed to convert object to PEM format", e );
+            throw new RuntimeException( "Failed to convert PEM to certificate", e );
+        }
+    }
+
+
+    public String convertX509CertToPem( X509Certificate x509Cert )
+    {
+        try
+        {
+            StringWriter sw = new StringWriter();
+            try ( JcaPEMWriter pw = new JcaPEMWriter( sw ) )
+            {
+                pw.writeObject( x509Cert );
+            }
+            return sw.toString();
+        }
+        catch ( IOException e )
+        {
+            throw new RuntimeException( "Failed to convert certificate to PEM", e );
         }
     }
 }

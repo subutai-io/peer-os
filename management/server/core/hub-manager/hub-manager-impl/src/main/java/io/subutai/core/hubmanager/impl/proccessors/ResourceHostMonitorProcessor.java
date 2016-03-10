@@ -17,7 +17,6 @@ import org.apache.http.HttpStatus;
 
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.core.hubmanager.api.HubPluginException;
-import io.subutai.core.hubmanager.api.model.Config;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.hubmanager.impl.IntegrationImpl;
 import io.subutai.core.metric.api.Monitor;
@@ -26,9 +25,6 @@ import io.subutai.hub.share.dto.ResourceHostMonitorDto;
 import io.subutai.hub.share.json.JsonUtil;
 
 
-/**
- * Created by ${Zubaidullo} on 11/20/15.
- */
 public class ResourceHostMonitorProcessor implements Runnable
 {
     private static final Logger LOG = LoggerFactory.getLogger( ResourceHostMonitorProcessor.class );
@@ -53,15 +49,9 @@ public class ResourceHostMonitorProcessor implements Runnable
     {
         try
         {
-            if ( manager.getConfigDataService().getHubConfig( configManager.getPeerId() ) != null )
-            {
-                Config config = manager.getConfigDataService().getHubConfig( configManager.getPeerId() );
-                LOG.debug( "Sending resource hosts monitoring data started..." );
-                configManager.setHubIp( config.getHubIp() );
-                configManager.setSuperNodeIp( config.getSuperNodeIp() );
-                sendResourceHostMonitoringData();
-                LOG.debug( "Sending resource hosts monitoring data finished successfully..." );
-            }
+            LOG.debug( "Sending resource hosts monitoring data started..." );
+            sendResourceHostMonitoringData();
+            LOG.debug( "Sending resource hosts monitoring data finished successfully..." );
         }
         catch ( Exception e )
         {
@@ -73,100 +63,104 @@ public class ResourceHostMonitorProcessor implements Runnable
 
     public void sendResourceHostMonitoringData() throws HubPluginException
     {
-        try
+        if ( manager.getRegistrationState() )
         {
-            for ( ResourceHostMetric resourceHostMetric : monitor.getResourceHostMetrics().getResources() )
+            try
             {
-                ResourceHostMonitorDto resourceHostMonitorDto = new ResourceHostMonitorDto();
+                for ( ResourceHostMetric resourceHostMetric : monitor.getResourceHostMetrics().getResources() )
+                {
+                    ResourceHostMonitorDto resourceHostMonitorDto = new ResourceHostMonitorDto();
 
-                resourceHostMonitorDto.setPeerId( peerManager.getLocalPeer().getId() );
-                resourceHostMonitorDto.setName( resourceHostMetric.getHostInfo().getHostname() );
-                resourceHostMonitorDto.setHostId( resourceHostMetric.getHostInfo().getId() );
+                    resourceHostMonitorDto.setPeerId( peerManager.getLocalPeer().getId() );
+                    resourceHostMonitorDto.setName( resourceHostMetric.getHostInfo().getHostname() );
+                    resourceHostMonitorDto.setHostId( resourceHostMetric.getHostInfo().getId() );
 
-                try
-                {
-                    resourceHostMonitorDto.setAvailableRam( resourceHostMetric.getAvailableRam() );
-                }
-                catch(Exception e)
-                {
-                    resourceHostMonitorDto.setAvailableRam( 0.0 );
-                    LOG.info( e.getMessage(), "No info about available RAM" );
-                }
+                    try
+                    {
+                        resourceHostMonitorDto.setAvailableRam( resourceHostMetric.getAvailableRam() );
+                    }
+                    catch ( Exception e )
+                    {
+                        resourceHostMonitorDto.setAvailableRam( 0.0 );
+                        LOG.info( e.getMessage(), "No info about available RAM" );
+                    }
 
-                try
-                {
-                    resourceHostMonitorDto.setAvailableSpace( resourceHostMetric.getAvailableSpace() );
-                }
-                catch(Exception e)
-                {
-                    resourceHostMonitorDto.setAvailableSpace( 0.0 );
-                    LOG.info( e.getMessage(), "No info about available Space" );
-                }
+                    try
+                    {
+                        resourceHostMonitorDto.setAvailableSpace( resourceHostMetric.getAvailableSpace() );
+                    }
+                    catch ( Exception e )
+                    {
+                        resourceHostMonitorDto.setAvailableSpace( 0.0 );
+                        LOG.info( e.getMessage(), "No info about available Space" );
+                    }
 
-                try
-                {
-                    resourceHostMonitorDto.setFreeRam( resourceHostMetric.getFreeRam() );
-                }
-                catch(Exception e)
-                {
-                    resourceHostMonitorDto.setFreeRam( 0.0 );
-                    LOG.info( e.getMessage(), "No info about free RAM" );
-                }
+                    try
+                    {
+                        resourceHostMonitorDto.setFreeRam( resourceHostMetric.getFreeRam() );
+                    }
+                    catch ( Exception e )
+                    {
+                        resourceHostMonitorDto.setFreeRam( 0.0 );
+                        LOG.info( e.getMessage(), "No info about free RAM" );
+                    }
 
-                try
-                {
-                    resourceHostMonitorDto.setTotalRam( resourceHostMetric.getTotalRam() );
-                }
-                catch(Exception e)
-                {
-                    resourceHostMonitorDto.setTotalRam( 0.0 );
-                    LOG.info( e.getMessage(), "No info about total RAM" );
-                }
-                try
-                {
-                    resourceHostMonitorDto.setTotalSpace( resourceHostMetric.getTotalSpace() );
-                }
-                catch(Exception e)
-                {
-                    resourceHostMonitorDto.setTotalSpace( 0.0 );
-                    LOG.info( e.getMessage(), "No info about total Space" );
-                }
-                try
-                {
-                    resourceHostMonitorDto.setUsedCpu( resourceHostMetric.getUsedCpu() );
-                }
-                catch(Exception e)
-                {
-                    resourceHostMonitorDto.setUsedCpu( 0.0 );
-                    LOG.info( e.getMessage(), "No info about used CPU" );
-                }
+                    try
+                    {
+                        resourceHostMonitorDto.setTotalRam( resourceHostMetric.getTotalRam() );
+                    }
+                    catch ( Exception e )
+                    {
+                        resourceHostMonitorDto.setTotalRam( 0.0 );
+                        LOG.info( e.getMessage(), "No info about total RAM" );
+                    }
+                    try
+                    {
+                        resourceHostMonitorDto.setTotalSpace( resourceHostMetric.getTotalSpace() );
+                    }
+                    catch ( Exception e )
+                    {
+                        resourceHostMonitorDto.setTotalSpace( 0.0 );
+                        LOG.info( e.getMessage(), "No info about total Space" );
+                    }
+                    try
+                    {
+                        resourceHostMonitorDto.setUsedCpu( resourceHostMetric.getUsedCpu() );
+                    }
+                    catch ( Exception e )
+                    {
+                        resourceHostMonitorDto.setUsedCpu( 0.0 );
+                        LOG.info( e.getMessage(), "No info about used CPU" );
+                    }
 
-                String path = String.format( "/rest/v1/peers/%s/resource-hosts/%s/monitor", configManager.getPeerId(),
-                        resourceHostMonitorDto.getHostId() );
+                    String path =
+                            String.format( "/rest/v1/peers/%s/resource-hosts/%s/monitor", configManager.getPeerId(),
+                                    resourceHostMonitorDto.getHostId() );
 
-                WebClient client = configManager.getTrustedWebClientWithAuth( path );
+                    WebClient client = configManager.getTrustedWebClientWithAuth( path, configManager.getHubIp() );
 
-                byte[] cborData = JsonUtil.toCbor( resourceHostMonitorDto );
+                    byte[] cborData = JsonUtil.toCbor( resourceHostMonitorDto );
 
-                byte[] encryptedData = configManager.getMessenger().produce( cborData );
+                    byte[] encryptedData = configManager.getMessenger().produce( cborData );
 
-                Response r = client.post( encryptedData );
+                    Response r = client.post( encryptedData );
 
-                if ( r.getStatus() == HttpStatus.SC_NO_CONTENT )
-                {
-                    LOG.debug( "Resource hosts monitoring data sent successfully." );
-                }
-                else
-                {
-                    throw new HubPluginException(
-                            "Could not send resource hosts monitoring data: " + r.readEntity( String.class ) );
+                    if ( r.getStatus() == HttpStatus.SC_NO_CONTENT )
+                    {
+                        LOG.debug( "Resource hosts monitoring data sent successfully." );
+                    }
+                    else
+                    {
+                        throw new HubPluginException(
+                                "Could not send resource hosts monitoring data: " + r.readEntity( String.class ) );
+                    }
                 }
             }
-        }
-        catch ( PGPException | IOException | KeyStoreException | UnrecoverableKeyException | NoSuchAlgorithmException
-                e )
-        {
-            LOG.error( "Could not send resource hosts monitoring data.", e );
+            catch ( PGPException | IOException | KeyStoreException | UnrecoverableKeyException |
+                    NoSuchAlgorithmException e )
+            {
+                LOG.error( "Could not send resource hosts monitoring data.", e );
+            }
         }
     }
 }
