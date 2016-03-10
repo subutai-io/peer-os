@@ -11,17 +11,6 @@
   <authz:enable />
   <!-- ***************************************************************** -->
 
-  <!-- Allow the use of system properties -->
-
-  <ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]" />
-
-  <cm:property-placeholder persistent-id="peer" update-strategy="none">
-    <cm:default-properties>
-      <cm:property name="publicURL" value="" />
-      <cm:property name="externalInterfaceName" value="wan" />
-    </cm:default-properties>
-  </cm:property-placeholder>
-
   <!-- ***************************************************************** -->
   <bean id="daoManagerPeer" init-method="init" class="io.subutai.common.dao.DaoManager" scope="prototype">
     <jpa:unit unitname="peerManagerPUnit" property="entityManagerFactory" />
@@ -71,9 +60,6 @@
     <argument ref="templateRegistry" />
     <argument ref="identityManager" />
     <argument ref="jsonProvider" />
-    <property name="publicUrl" value="${publicURL}" />
-    <property name="externalInterfaceName" value="${externalInterfaceName}" />
-
   </bean>
 
   <service ref="messageResponseListener" interface="io.subutai.core.messenger.api.MessageListener" />

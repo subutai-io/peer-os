@@ -24,7 +24,7 @@ function SettingsAdvancedCtrl($scope, SettingsAdvancedSrv, SweetAlert, $sce) {
 			$('.js-karaflogs-load-screen').hide();
 		});
     }
-    //getConfig();
+    getConfig();
 
     function updateConfig() {
         SettingsAdvancedSrv.updateConfig(vm.config).success(function (data) {

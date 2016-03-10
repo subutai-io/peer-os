@@ -18,5 +18,6 @@
     <module>strategy-manager-api</module>
     <module>strategy-manager-impl</module>
     <module>strategy-manager-cli</module>
+    <module>strategy-manager-rest</module>
   </modules>
 </project>
