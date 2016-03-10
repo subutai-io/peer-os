@@ -649,7 +649,11 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
                 loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
                     return $ocLazyLoad.load([
                         {
-                            files: ['scripts/libs/FileSaver.min.js']
+							files: [
+								'scripts/libs/FileSaver.min.js',
+								'scripts/libs/highlight.pack.js',
+								'css/libs/highlight.default.css',
+							]
                         },
                         {
                             name: 'subutai.settings-advanced',
