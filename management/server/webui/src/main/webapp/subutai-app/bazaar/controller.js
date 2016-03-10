@@ -539,7 +539,7 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 	vm.uninstallPluginWOButton = uninstallPluginWOButton;
 	function uninstallPluginWOButton (plugin) {
 		LOADING_SCREEN();
-		BazaarSrv.uninstallHubPlugin (plugin).success (function (data) {
+		BazaarSrv.uninstallHubPluginWOButton (plugin).success (function (data) {
 			LOADING_SCREEN('none');
 			SweetAlert.swal ("Success!", "Your plugin was uninstalled.", "success");
 		}).error (function (error) {

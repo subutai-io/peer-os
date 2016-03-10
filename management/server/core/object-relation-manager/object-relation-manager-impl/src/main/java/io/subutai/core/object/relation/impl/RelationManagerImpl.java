@@ -32,7 +32,6 @@ public class RelationManagerImpl implements RelationManager
     private RelationMessageManagerImpl trustMessageManager;
     private RelationInfoManagerImpl relationInfoManager;
     private DaoManager daoManager = null;
-    private boolean keyTrustCheckEnabled;
     private RelationDataService relationDataService;
 
 
@@ -41,7 +40,7 @@ public class RelationManagerImpl implements RelationManager
     {
         relationDataService = new RelationDataService( daoManager );
         trustMessageManager = new RelationMessageManagerImpl( securityManager );
-        relationInfoManager = new RelationInfoManagerImpl( relationDataService, keyTrustCheckEnabled, identityManager );
+        relationInfoManager = new RelationInfoManagerImpl( relationDataService, identityManager );
     }
 
 
@@ -60,18 +59,6 @@ public class RelationManagerImpl implements RelationManager
     public void setSecurityManager( final SecurityManager securityManager )
     {
         this.securityManager = securityManager;
-    }
-
-
-    public boolean isKeyTrustCheckEnabled()
-    {
-        return keyTrustCheckEnabled;
-    }
-
-
-    public void setKeyTrustCheckEnabled( final boolean keyTrustCheckEnabled )
-    {
-        this.keyTrustCheckEnabled = keyTrustCheckEnabled;
     }
 
 

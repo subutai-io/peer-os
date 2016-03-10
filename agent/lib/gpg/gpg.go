@@ -5,9 +5,9 @@ import (
 	"bytes"
 	"crypto/tls"
 	"errors"
-	"github.com/subutai-io/Subutai/agent/config"
-	"github.com/subutai-io/Subutai/agent/lib/container"
-	"github.com/subutai-io/Subutai/agent/log"
+	"github.com/subutai-io/base/agent/config"
+	"github.com/subutai-io/base/agent/lib/container"
+	"github.com/subutai-io/base/agent/log"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -96,7 +96,7 @@ func DecryptWrapper(message string) string {
 	stdin.Close()
 
 	output, err := command.Output()
-	log.Check(log.WarnLevel, "Decrypting message "+string(output), err)
+	log.Check(log.WarnLevel, "Decrypting message ", err)
 
 	return string(output)
 }

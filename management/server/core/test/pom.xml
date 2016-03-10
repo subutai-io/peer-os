@@ -16,6 +16,5 @@
 
   <modules>
     <module>test-cli</module>
-    <module>sol-appender</module>
   </modules>
 </project>

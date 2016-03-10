@@ -3,10 +3,10 @@ package connect
 import (
 	"bytes"
 	"crypto/tls"
-	"github.com/subutai-io/Subutai/agent/agent/container"
-	"github.com/subutai-io/Subutai/agent/agent/utils"
-	"github.com/subutai-io/Subutai/agent/lib/gpg"
-	"github.com/subutai-io/Subutai/agent/log"
+	"github.com/subutai-io/base/agent/agent/container"
+	"github.com/subutai-io/base/agent/agent/utils"
+	"github.com/subutai-io/base/agent/lib/gpg"
+	"github.com/subutai-io/base/agent/log"
 	"net/http"
 	"strconv"
 	"time"
@@ -29,18 +29,19 @@ func Connect(host, port, user, pass string) {
 	rh.Containers = container.GetActiveContainers(true)
 	log.Info(rh.Json())
 
-	for _, cont := range rh.Containers {
-		gpg.ImportMHKeyNoDefaultKeyring(cont.Name)
-	}
+	// for _, cont := range rh.Containers {
+	// 	gpg.ImportMHKeyNoDefaultKeyring(cont.Name)
+	// }
 
 	enMsg := ""
 	for len(enMsg) == 0 {
 		log.Debug("Adding management host PK")
-		time.Sleep(time.Second * 5)
 		pk := mgn.GetKey()
 		if pk != nil {
 			pk.Store()
 			enMsg = gpg.EncryptWrapper(user, pk.Id, rh.Json())
+		} else {
+			time.Sleep(time.Second * 2)
 		}
 	}
 

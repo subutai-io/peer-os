@@ -79,6 +79,7 @@
     <org.apache.commons.lang3.version>3.4</org.apache.commons.lang3.version>
     <org.apache.commons.io.version>2.4</org.apache.commons.io.version>
     <slf4j.version>1.7.12</slf4j.version>
+    <log4j.version>1.2.17</log4j.version>
   </properties>
 
   <dependencyManagement>
@@ -453,7 +454,7 @@
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>sol-appender</artifactId>
+        <artifactId>subutai-appender</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -508,6 +509,11 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>strategy-manager-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>strategy-manager-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
 
