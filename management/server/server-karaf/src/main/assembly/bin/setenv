@@ -48,7 +48,7 @@ export KARAF_DATA="${SUBUTAI_APP_DATA_PATH}/data" # Karaf data folder
 # export KARAF_OPTS # Additional available Karaf options
 # export KARAF_DEBUG # Enable debug mode
 # export KARAF_REDIRECT # Enable/set the std/err redirection when using bin/start
-export SUBUTAI_APP_DATA_PATH="/var/lib/subutai-mng/"
+export SUBUTAI_APP_DATA_PATH="/opt/subutai-mng/"
 #export SUBUTAI_APP_DATA_PATH="/var/lib/subutai"
 export SUBUTAI_APP_KEYSTORE_PATH="${SUBUTAI_APP_DATA_PATH}/keystores"
 export SUBUTAI_APP_CERTS_PATH="${SUBUTAI_APP_DATA_PATH}/certs"
