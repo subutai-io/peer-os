@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"fmt"
 	docker "github.com/docker/docker/builder/dockerfile/parser"
 	"os"
 	"strconv"
@@ -8,28 +9,18 @@ import (
 )
 
 func parceEnv(line []string) string {
-	if len(line) > 1 {
-		line = line[1:]
-		for i := range line {
-			if i%2 == 0 {
-				line[i] = line[i] + "="
-				if i != 0 {
-					line[i] = " " + line[i]
-				}
-			}
-		}
-		str := strings.Join(line, "")
-		str = strings.Replace(str, `\t`, " ", -1)
-		return "export " + str + "\n"
+	line = line[1:]
+	str := ""
+	if strings.Contains(line[0], "=") {
+		str = strings.Join(line, " ")
+	} else {
+		str = line[0] + "=" + strings.Join(line[1:], " ")
 
 	}
-	return ""
+	str = strings.Replace(str, `\t`, " ", -1)
+	fmt.Println(str)
+	return "export " + str + "\n"
 }
-
-// func parceEnv(line string) string {
-// 	// ENV GPG_KEYS 	DFFA3DCF326E302C4787673A01C4E7FAAAB2461C 	42F3E95A2C4F08279C4960ADD68FA50FEA312927
-// 	if len(line) > 1 {
-// }
 
 func parceCopy(line []string) string {
 	if len(line) > 1 {
