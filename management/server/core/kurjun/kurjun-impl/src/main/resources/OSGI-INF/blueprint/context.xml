@@ -7,16 +7,6 @@
   
   <!-- Enable Authorization -->
   <authz:enable />
-    
-  <!-- Allow the use of system properties -->
-  <ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]" />
-
-  <cm:property-placeholder persistent-id="kurjun" update-strategy="none">
-    <cm:default-properties>
-      <cm:property name="globalKurjunUrls" value="" />
-    </cm:default-properties>
-  </cm:property-placeholder>
-  
 
   <reference id="locaPeer" availability="mandatory"
              interface="io.subutai.common.peer.LocalPeer" />
@@ -37,7 +27,6 @@
     <argument ref="identityManager" />
     <argument ref="relationManager" />
     <argument ref="securityManager" />
-    <argument value="${globalKurjunUrls}" />
   </bean>
     
   <bean id="aptManager" scope="singleton" activation="eager" 

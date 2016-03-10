@@ -220,9 +220,14 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 		}
 
 		environmentService.switchContainer(vm.containers[key].id, action).success(function (data) {
-			environmentService.getContainerStatus(vm.containers[key].id).success(function (data) {
+			/*environmentService.getContainerStatus(vm.containers[key].id).success(function (data) {
 				vm.containers[key].state = data.STATE;
-			});
+			});*/
+			if(vm.containers[key].state == 'STOPPING') {
+				vm.containers[key].state = 'STOPPED';
+			} else {
+				vm.containers[key].state = 'RUNNING';
+			}
 		});		
 	}
 

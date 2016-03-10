@@ -703,7 +703,10 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 			cellView.model.set('position', cellView.prevPos);
 		});
 
-		$('.js-scrollbar').perfectScrollbar();
+		$('.js-scrollbar').perfectScrollbar({
+			"wheelPropagation": true,
+			"swipePropagation": false
+		});
 	}
 
 	vm.buildStep = 'confirm';

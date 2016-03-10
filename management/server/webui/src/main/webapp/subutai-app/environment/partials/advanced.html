@@ -15,7 +15,7 @@
 					</li>
 				</ul>
 			</div>
-			<div class="b-tools-menu b-tools-menu_custom-scroll-huc js-scrollbar" ng-show="advEnvCtrl.activeCloudTab == 'templates'">
+			<div class="b-tools-menu js-scrollbar" ng-show="advEnvCtrl.activeCloudTab == 'templates'">
 				<ul class="">
 					<li ng-repeat="template in advEnvCtrl.templates" 
 						data-template="{{ template }}">
@@ -34,6 +34,7 @@
 						</div>
 					</li>
 				</ul>
+				<div style="height: 46px;"></div>
 			</div>
 			<div class="b-tools-menu b-tools-menu_custom-scroll-huc b-tools-menu_advanced js-scrollbar" 
 			ng-show="advEnvCtrl.activeCloudTab == 'peers'">

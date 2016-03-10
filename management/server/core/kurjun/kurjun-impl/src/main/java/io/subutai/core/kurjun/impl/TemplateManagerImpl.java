@@ -100,9 +100,6 @@ public class TemplateManagerImpl implements TemplateManager
     private Set<UserRepoContext> GLOBAL_CONTEXTS;
     private Set<UserRepoContext> PRIVATE_CONTEXTS;
 
-    // url list read from kurjun.cfg file on bundle start up
-    private final List<String> globalKurjunUrlList = new ArrayList<>();
-
     private Injector injector;
 
     private Set<RepoUrl> remoteRepoUrls = new HashSet<>();
@@ -120,7 +117,7 @@ public class TemplateManagerImpl implements TemplateManager
 
 
     public TemplateManagerImpl( LocalPeer localPeer, IdentityManager identityManager, RelationManager relationManager,
-                                io.subutai.core.security.api.SecurityManager securityManager, String globalKurjunUrl )
+                                io.subutai.core.security.api.SecurityManager securityManager )
     {
         this.localPeer = localPeer;
         this.securityHelper = new SubutaiSecurityHelper( identityManager, relationManager, securityManager );
