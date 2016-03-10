@@ -69,8 +69,8 @@ func Start(c *cli.Context) {
 	for {
 		// log.Debug("NumGoroutine " + strconv.Itoa(runtime.NumGoroutine()))
 		Instance()
-		if !heartbeat() {
-			time.Sleep(5 * time.Second)
+		if heartbeat() {
+			time.Sleep(30 * time.Second)
 		} else {
 			time.Sleep(5 * time.Second)
 		}
@@ -112,7 +112,7 @@ func heartbeat() bool {
 	})
 	log.Check(log.WarnLevel, "Marshal response json", err)
 
-	resp, err := client.PostForm("https://10.10.10.1:8444/rest/v1/agent/heartbeat", url.Values{"heartbeat": {string(message)}})
+	resp, err := client.PostForm("https://"+config.Management.Host+":8444/rest/v1/agent/heartbeat", url.Values{"heartbeat": {string(message)}})
 	if !log.Check(log.WarnLevel, "Sending heartbeat: "+string(jbeat), err) {
 		resp.Body.Close()
 	} else {
@@ -211,7 +211,7 @@ func tlsConfig() *http.Client {
 
 func response(msg []byte) {
 	client := tlsConfig()
-	resp, err := client.PostForm("https://10.10.10.1:8444/rest/v1/agent/response", url.Values{"response": {string(msg)}})
+	resp, err := client.PostForm("https://"+config.Management.Host+":8444/rest/v1/agent/response", url.Values{"response": {string(msg)}})
 	if !log.Check(log.WarnLevel, "Sending response "+string(msg), err) {
 		resp.Body.Close()
 	}
@@ -223,7 +223,7 @@ func command() {
 	hostname, _ := os.Hostname()
 	fingerprint := gpg.GetFingerprint(hostname + "@subutai.io")
 
-	resp, err := client.Get("https://10.10.10.1:8444/rest/v1/agent/requests/" + fingerprint)
+	resp, err := client.Get("https://" + config.Management.Host + ":8444/rest/v1/agent/requests/" + fingerprint)
 	if log.Check(log.WarnLevel, "Getting requests", err) {
 		return
 	}
