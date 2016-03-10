@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"fmt"
 	docker "github.com/docker/docker/builder/dockerfile/parser"
 	"os"
 	"strconv"
@@ -8,10 +9,17 @@ import (
 )
 
 func parceEnv(line []string) string {
-	if len(line) > 2 {
-		return "export " + line[1] + "=" + strings.Join(line[2:], " ") + "\n"
+	line = line[1:]
+	str := ""
+	if strings.Contains(line[0], "=") {
+		str = strings.Join(line, " ")
+	} else {
+		str = line[0] + "=" + strings.Join(line[1:], " ")
+
 	}
-	return ""
+	str = strings.Replace(str, `\t`, " ", -1)
+	fmt.Println(str)
+	return "export " + str + "\n"
 }
 
 func parceCopy(line []string) string {
@@ -26,7 +34,7 @@ func parceRun(line []string) string {
 		str, _ := strconv.Unquote(strings.Join(line[1:], " "))
 		if !(strings.Contains(str, "ln") && (strings.Contains(str, "/dev/stdout") || strings.Contains(str, "/dev/stderr"))) {
 			str = strings.Replace(str, "\t", " ", -1)
-			str = strings.Replace(str, " && ", "\n", -1)
+			// str = strings.Replace(str, " && ", "\n", -1)
 			return str + "\n"
 		}
 	}
@@ -46,14 +54,14 @@ func parceFrom(line []string) string {
 
 func parceCmd(line []string) string {
 	if len(line) > 1 {
-		str, _ := strconv.Unquote(strings.Join(line[1:], " "))
+		str := strings.Join(line[1:], " ")
 		str = strings.Replace(str, "\t", " ", -1)
-		return `sed -i -e '$i \` + str + ` &\n' /etc/rc.local`
+		return str
 	}
 	return ""
 }
 
-func Parce(name string) (out, env, image string) {
+func Parce(name string) (out, env, cmd, image string) {
 	file, _ := os.Open(name)
 	node, _ := docker.Parse(file)
 	file.Close()
@@ -69,13 +77,23 @@ func Parce(name string) (out, env, image string) {
 				out = out + parceCopy(str)
 			case "from":
 				image = parceFrom(str)
-			// case "cmd":
-			// 	out = out + parceCmd(str)
-			// }
+			case "cmd":
+				cmd = cmd + parceCmd(str)
+			case "entrypoint":
+				cmd = cmd + parceCmd(str) + " "
+			}
 		}
 	}
+	if len(cmd) > 1 {
+		slice := strings.Split(cmd, " ")
+		for i, _ := range slice {
+			slice[i] = strings.Replace(slice[i], `"`, "", -1)
+		}
+
+		cmd = slice[0] + ` "` + strings.Join(slice[1:], " ") + `"`
+	}
 	if len(out) > 0 {
-		return out, env, image
+		return out, env, cmd, image
 	}
 	return
 }

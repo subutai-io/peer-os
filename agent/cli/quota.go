@@ -2,8 +2,8 @@ package lib
 
 import (
 	"fmt"
-	"github.com/subutai-io/Subutai/agent/lib/container"
-	"github.com/subutai-io/Subutai/agent/lib/fs"
+	"github.com/subutai-io/base/agent/lib/container"
+	"github.com/subutai-io/base/agent/lib/fs"
 )
 
 // LxcQuota sets quotas for containers

@@ -2,10 +2,10 @@ package container
 
 import (
 	"errors"
-	"github.com/subutai-io/Subutai/agent/config"
-	cont "github.com/subutai-io/Subutai/agent/lib/container"
-	"github.com/subutai-io/Subutai/agent/lib/gpg"
-	"github.com/subutai-io/Subutai/agent/log"
+	"github.com/subutai-io/base/agent/config"
+	cont "github.com/subutai-io/base/agent/lib/container"
+	"github.com/subutai-io/base/agent/lib/gpg"
+	"github.com/subutai-io/base/agent/log"
 	fs "gopkg.in/fsnotify.v1"
 	"strings"
 	"time"

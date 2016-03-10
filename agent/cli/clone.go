@@ -1,10 +1,10 @@
 package lib
 
 import (
-	"github.com/subutai-io/Subutai/agent/config"
-	"github.com/subutai-io/Subutai/agent/lib/container"
-	"github.com/subutai-io/Subutai/agent/lib/gpg"
-	"github.com/subutai-io/Subutai/agent/log"
+	"github.com/subutai-io/base/agent/config"
+	"github.com/subutai-io/base/agent/lib/container"
+	"github.com/subutai-io/base/agent/lib/gpg"
+	"github.com/subutai-io/base/agent/log"
 	"io/ioutil"
 	"net"
 	"os"
