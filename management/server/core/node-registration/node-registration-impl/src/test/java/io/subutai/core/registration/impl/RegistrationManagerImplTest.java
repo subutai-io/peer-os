@@ -13,6 +13,8 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import io.subutai.common.dao.DaoManager;
+import io.subutai.common.peer.LocalPeer;
+import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.registration.api.service.RequestedHost;
 import io.subutai.core.registration.impl.dao.ContainerTokenDataService;
 import io.subutai.core.registration.impl.dao.RequestDataService;
@@ -28,9 +30,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 
-/**
- * Created by talas on 8/26/15.
- */
 @RunWith( MockitoJUnitRunner.class )
 public class RegistrationManagerImplTest
 {
@@ -48,6 +47,10 @@ public class RegistrationManagerImplTest
 
     @Mock
     SecurityManager securityManager;
+    @Mock
+    NetworkManager networkManager;
+    @Mock
+    LocalPeer localPeer;
 
     RegistrationManagerImpl registrationManager;
 
@@ -57,7 +60,7 @@ public class RegistrationManagerImplTest
     @Before
     public void setUp() throws Exception
     {
-        registrationManager = new RegistrationManagerImpl( securityManager, daoManager, "" );
+        registrationManager = new RegistrationManagerImpl( securityManager, daoManager, networkManager, localPeer, "" );
         registrationManager.setRequestDataService( requestDataService );
 
         RequestedHostImpl host1 = mock( RequestedHostImpl.class );
@@ -144,6 +147,4 @@ public class RegistrationManagerImplTest
     {
         registrationManager.removeRequest( uuid.toString() );
     }
-
-
 }

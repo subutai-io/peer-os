@@ -168,13 +168,6 @@ public class CommandProcess
             {
                 status = CommandStatus.KILLED;
             }
-            else if ( response.getType() == ResponseType.LIST_INOTIFY_RESPONSE
-                    || response.getType() == ResponseType.PS_RESPONSE
-                    || response.getType() == ResponseType.SET_INOTIFY_RESPONSE
-                    || response.getType() == ResponseType.UNSET_INOTIFY_RESPONSE )
-            {
-                status = CommandStatus.SUCCEEDED;
-            }
         }
     }
 

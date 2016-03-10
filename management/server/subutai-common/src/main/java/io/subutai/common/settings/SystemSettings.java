@@ -18,6 +18,7 @@ public class SystemSettings
     public static final String DEFAULT_EXTERNAL_INTERFACE = "wan";
     public static final String DEFAULT_PUBLIC_URL = "https://127.0.0.1:8443";
     public static final String DEFAULT_KURJUN_REPO = "http://repo.critical-factor.com:8080/rest/kurjun";
+    public static final String DEFAULT_PEER_PWD = "12345678";
 
     private static PropertiesConfiguration PROPERTIES = null;
     private static String[] GLOBAL_KURJUN_URLS = null;
@@ -205,6 +206,7 @@ public class SystemSettings
         return PROPERTIES.getBoolean( "encryptionEnabled", false );
     }
 
+
     //todo remove
     public static boolean getRestEncryptionState()
     {
@@ -261,6 +263,19 @@ public class SystemSettings
     {
         validatePublicUrl( publicUrl );
         saveProperty( "publicURL", publicUrl );
+    }
+
+
+    public static String getPeerSecretKeyringPwd()
+    {
+        return PROPERTIES.getString( "peerSecretKeyringPwd", DEFAULT_PEER_PWD );
+    }
+
+
+    public static void setPeerSecretKeyringPwd( String pwd ) throws ConfigurationException
+    {
+        validatePublicUrl( pwd );
+        saveProperty( "peerSecretKeyringPwd", pwd );
     }
 
 

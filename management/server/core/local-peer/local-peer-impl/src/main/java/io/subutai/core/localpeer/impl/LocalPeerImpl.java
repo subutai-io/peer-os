@@ -150,8 +150,6 @@ import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
-import io.subutai.core.repository.api.RepositoryException;
-import io.subutai.core.repository.api.RepositoryManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
@@ -168,7 +166,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public static final String PEER_SUBNET_MASK = "255.255.255.0";
     private static final String GATEWAY_INTERFACE_NAME_REGEX = "^br-(\\d+)$";
     private static final Pattern GATEWAY_INTERFACE_NAME_PATTERN = Pattern.compile( GATEWAY_INTERFACE_NAME_REGEX );
-    public static final String CLONING_FORMAT = "Cloning %s...%s";
 
     private DaoManager daoManager;
     private TemplateManager templateRegistry;
@@ -2085,19 +2082,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    protected RepositoryManager getRepositoryManager() throws PeerException
-    {
-        try
-        {
-            return serviceLocator.getService( RepositoryManager.class );
-        }
-        catch ( NamingException e )
-        {
-            throw new PeerException( e );
-        }
-    }
-
-
     protected NetworkManager getNetworkManager() throws PeerException
     {
         try
@@ -2146,39 +2130,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             peer.setupP2PConnection( p2PConfig );
             return p2PConfig;
-        }
-    }
-
-
-    public void addRepository( final String ip ) throws PeerException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( ip ) );
-
-        try
-        {
-            getRepositoryManager().addRepository( ip );
-        }
-        catch ( RepositoryException e )
-        {
-            //            throw new PeerException( "Error adding repository", e );
-            LOG.error( "Error adding repository", e );
-        }
-    }
-
-
-    public void removeRepository( final String host, final String ip ) throws PeerException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( host ) );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( ip ) );
-
-        try
-        {
-            getRepositoryManager().removeRepository( ip );
-        }
-        catch ( RepositoryException e )
-        {
-            //            throw new PeerException( "Error removing repository", e );
-            LOG.error( "Error removing repository", e );
         }
     }
 

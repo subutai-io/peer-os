@@ -1,7 +1,6 @@
 package io.subutai.core.executor.impl;
 
 
-import java.io.PrintStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -21,13 +20,9 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.OutputRedirection;
 import io.subutai.common.command.Request;
 import io.subutai.common.command.RequestType;
-import io.subutai.common.command.ResponseImpl;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.ResourceHostInfo;
-import io.subutai.core.broker.api.Broker;
-import io.subutai.core.broker.api.BrokerException;
-import io.subutai.core.broker.api.Topic;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.identity.api.IdentityManager;
@@ -39,9 +34,7 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.TestCase.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -62,8 +55,6 @@ public class CommandProcessorTest
             HOST_ID, COMMAND_ID.toString() );
     private static final String IP = "IP";
 
-    @Mock
-    Broker broker;
     @Mock
     HostRegistry hostRegistry;
     @Mock
@@ -102,7 +93,6 @@ public class CommandProcessorTest
         when( request.getId() ).thenReturn( HOST_ID );
         when( request.getCommandId() ).thenReturn( COMMAND_ID );
         doReturn( session ).when( commandProcessor ).getActiveSession();
-        doReturn( broker ).when( commandProcessor ).getBroker();
     }
 
 
@@ -132,14 +122,6 @@ public class CommandProcessorTest
 
 
     @Test
-    public void testGetTopic() throws Exception
-    {
-
-        assertEquals( Topic.RESPONSE_TOPIC, commandProcessor.getTopic() );
-    }
-
-
-    @Test
     public void testRemove() throws Exception
     {
 
@@ -157,30 +139,6 @@ public class CommandProcessorTest
         ResourceHostInfo targetHost = commandProcessor.getTargetHost( HOST_ID );
 
         assertEquals( resourceHostInfo, targetHost );
-    }
-
-
-    @Test
-    public void testOnMessage() throws Exception
-    {
-        byte[] message = RESPONSE_JSON.getBytes( "UTF-8" );
-
-        commandProcessor.onMessage( message );
-
-
-        when( commands.get( COMMAND_ID ) ).thenReturn( process );
-
-        commandProcessor.onMessage( message );
-
-        verify( process ).processResponse( isA( ResponseImpl.class ) );
-
-
-        RuntimeException exception = mock( RuntimeException.class );
-        doThrow( exception ).when( commands ).get( COMMAND_ID );
-
-        commandProcessor.onMessage( message );
-
-        verify( exception ).printStackTrace( any( PrintStream.class ) );
     }
 
 
@@ -327,28 +285,13 @@ public class CommandProcessorTest
         {
         }
         WebClient webClient = mock( WebClient.class );
-        doReturn( webClient ).when( commandProcessor )
-                             .getWebClient( any( ResourceHostInfo.class ) );
+        doReturn( webClient ).when( commandProcessor ).getWebClient( any( ResourceHostInfo.class ) );
 
         doReturn( securityManager ).when( commandProcessor ).getSecurityManager();
 
         when( commands.put( eq( COMMAND_ID ), any( CommandProcess.class ), anyInt(),
                 any( CommandProcessExpiryCallback.class ) ) ).thenReturn( true );
 
-        commandProcessor.execute( request1, callback );
-
-        verify( broker ).sendTextMessage( eq( HOST_ID ), anyString() );
-
-        doThrow( new BrokerException( "" ) ).when( broker ).sendTextMessage( eq( HOST_ID ), anyString() );
-
-        try
-        {
-            commandProcessor.execute( request1, callback );
-            fail( "Expected CommandException" );
-        }
-        catch ( CommandException e )
-        {
-        }
 
         doThrow( new HostDisconnectedException( "" ) ).when( hostRegistry )
                                                       .getResourceHostByContainerHost( containerHostInfo );

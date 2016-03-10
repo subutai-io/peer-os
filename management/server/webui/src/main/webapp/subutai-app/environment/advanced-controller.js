@@ -67,8 +67,6 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 			VARS_MODAL_ERROR( SweetAlert, 'Error on getting templates ' + data );
 		});
 
-	//vm.templates = ['mongo', 'cassandra', 'master', 'hadoop'];
-
 	environmentService.getStrategies().success(function (data) {
 		vm.strategies = data;
 	});
@@ -92,10 +90,6 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
 
 	clearWorkspace();
-
-	/*peerRegistrationService.getResourceHosts().success(function (data) {
-		vm.resourceHosts = data;
-	});*/
 
 	function closePopup() {
 		vm.buildCompleted = false;
@@ -501,7 +495,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 				case 'element-call-menu':
 				case 'b-container-plus-icon':
 					currentTemplate = this.model;
-					$('#js-container-name').val(currentTemplate.get('containerName'));
+					$('#js-container-name').val(currentTemplate.get('containerName')).trigger('change');
 					$('#js-container-size').val(currentTemplate.get('quotaSize'));
 					containerSettingMenu.find('.header').text('Settings ' + this.model.get('templateName'));
 					var elementPos = this.model.get('position');
@@ -709,7 +703,10 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 			cellView.model.set('position', cellView.prevPos);
 		});
 
-		$('.js-scrollbar').perfectScrollbar();
+		$('.js-scrollbar').perfectScrollbar({
+			"wheelPropagation": true,
+			"swipePropagation": false
+		});
 	}
 
 	vm.buildStep = 'confirm';

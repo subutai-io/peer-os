@@ -133,7 +133,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     protected ExceptionUtil exceptionUtil = new ExceptionUtil();
     protected Map<String, AlertHandler> alertHandlers = new ConcurrentHashMap<String, AlertHandler>();
     private SecurityManager securityManager;
-    private boolean keyTrustCheckEnabled;
 
 
     public EnvironmentManagerImpl( final TemplateManager templateRegistry, final PeerManager peerManager,
@@ -172,18 +171,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     public void dispose()
     {
         executor.shutdown();
-    }
-
-
-    public void setKeyTrustCheckEnabled( final boolean keyTrustCheckEnabled )
-    {
-        this.keyTrustCheckEnabled = keyTrustCheckEnabled;
-    }
-
-
-    public boolean isKeyTrustCheckEnabled()
-    {
-        return keyTrustCheckEnabled;
     }
 
 

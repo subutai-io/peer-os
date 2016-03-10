@@ -9,11 +9,13 @@ import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Table;
 
+import io.subutai.core.strategy.api.Blueprint;
+
 
 /**
- * Environment Blueprint class is basic wrapper over {@link io.subutai.common.environment.Blueprint} to simplify data storing functionality.
+ * Environment Blueprint class is basic wrapper over {@link Blueprint} to simplify data storing functionality.
  * Where Blueprint is stored in {@link #getInfo()} BLob field
- * @see io.subutai.common.environment.Blueprint
+ * @see Blueprint
  */
 @Entity
 @Table( name = "env_topology" )
