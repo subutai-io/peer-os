@@ -172,16 +172,27 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
         var minutes, start, end, diff, leftLimit, duration;
         var stubValues = [];
 
+        /** Exclude "available" field from HOST_DISK series **/
+        if(series[0].name == 'host_disk') {
+            var temp = [];
+            for(var serie in series) {
+                if(series[serie].tags.type != 'available') {
+                    temp.push(series[serie]);
+                }
+            }
+            series = temp;
+        }
+
         /** Calculate amount of incomplete data received form rest **/
-        start = moment(obj.series[0].values[0][0]);
+        start = moment(series[0].values[0][0]);
         end = moment(getEndDate(obj));
         duration = moment.duration(end.diff(start)).asMinutes();
         diff = vm.period * 60 - duration;
-        leftLimit = moment(obj.series[0].values[0][0]).subtract(diff, 'minutes');
+        leftLimit = moment(series[0].values[0][0]).subtract(diff, 'minutes');
 
         /** Generate stub values if data is incomplete at the begining **/
         if (diff > 0) {
-            var startPoint = moment(obj.series[0].values[0][0]);
+            var startPoint = moment(series[0].values[0][0]);
             while (startPoint.subtract(1, "minutes") >= leftLimit) {
                 stubValues.unshift({
                     x: startPoint.valueOf(),
