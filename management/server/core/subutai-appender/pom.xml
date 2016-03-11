@@ -20,6 +20,7 @@
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
       <version>${log4j.version}</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 
@@ -39,7 +40,7 @@
             <Export-Package>${project.groupId}.core.appender</Export-Package>
             <Private-Package>org.apache.log4j</Private-Package>
             <Fragment-Host>org.ops4j.pax.logging.pax-logging-service</Fragment-Host>
-            <Embed-Dependency>*;scope=compile|runtime;inline=true</Embed-Dependency>
+            <!--<Embed-Dependency>*;scope=compile|runtime;inline=true</Embed-Dependency>-->
             <_failok>true</_failok>
           </instructions>
         </configuration>
