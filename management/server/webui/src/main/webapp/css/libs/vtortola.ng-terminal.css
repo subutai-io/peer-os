@@ -10,7 +10,8 @@
     font-family: "Ubuntu Mono", monospace;
 }
 .terminal {
-    background-color: #210819;
+    /*background-color: #210819;*/
+    background-color: #2D3436;
     height: 500px;
     color: #fff;
     font-family: "Ubuntu Mono", monospace;
@@ -19,6 +20,10 @@
     font-size: 14px;
     position:relative;
     padding:10px;
+}
+
+.terminal-prompt {
+	color: #8AE234;
 }
 
 .terminal-target{
