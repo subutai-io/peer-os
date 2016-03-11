@@ -18,7 +18,6 @@ func parceEnv(line []string) string {
 
 	}
 	str = strings.Replace(str, `\t`, " ", -1)
-	fmt.Println(str)
 	return "export " + str + "\n"
 }
 
