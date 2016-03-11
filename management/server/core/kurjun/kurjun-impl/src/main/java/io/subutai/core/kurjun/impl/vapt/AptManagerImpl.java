@@ -277,13 +277,12 @@ public class AptManagerImpl implements AptManager
         LocalRepository repo = getLocalRepository();
         try
         {
-            repo.delete( md5 );
-            return true;
+            return repo.delete( md5 );
         }
         catch ( IOException ex )
         {
             LOGGER.error( "Failed to delete apt package", ex );
-            return false;
+            throw ex;
         }
     }
 
