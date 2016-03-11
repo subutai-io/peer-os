@@ -133,6 +133,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         init();
     }
 
+
     @Override
     public Set<HostInterface> getNetInterfaces()
     {
@@ -565,6 +566,11 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     public boolean updateHostInfo( final HostInfo hostInfo )
     {
         boolean result = super.updateHostInfo( hostInfo );
+        if ( this.netInterfaces == null || this.netInterfaces.size() == 0 )
+        {
+            setNetInterfaces( hostInfo.getHostInterfaces() );
+            result = true;
+        }
 
         ResourceHostInfo resourceHostInfo = ( ResourceHostInfo ) hostInfo;
         for ( ContainerHostInfo info : resourceHostInfo.getContainers() )
