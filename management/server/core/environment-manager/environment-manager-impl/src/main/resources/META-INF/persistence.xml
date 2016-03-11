@@ -15,7 +15,10 @@
     <class>io.subutai.core.environment.impl.entity.EnvironmentTopologyEntity</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
+<!--
       <property name="openjpa.Log" value="DefaultLevel=WARN, Tool=INFO, SQL=TRACE" />
+-->
+      <property name="openjpa.Log" value="DefaultLevel=WARN" />
       <property name="openjpa.ConnectionFactoryProperties" value="PrintParameters=true" />
       <property name="openjpa.RuntimeUnenhancedClasses" value="supported" />
       <property name="openjpa.jdbc.DBDictionary" value="derby" />

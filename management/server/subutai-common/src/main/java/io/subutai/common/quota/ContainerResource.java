@@ -30,4 +30,15 @@ public abstract class ContainerResource<T extends ResourceValue>
 
 
     public ContainerResourceType getContainerResourceType() {return containerResourceType;}
+
+
+    @Override
+    public String toString()
+    {
+        final StringBuffer sb = new StringBuffer( "ContainerResource{" );
+        sb.append( "containerResourceType=" ).append( containerResourceType );
+        sb.append( ", resource=" ).append( resource );
+        sb.append( '}' );
+        return sb.toString();
+    }
 }
