@@ -385,7 +385,7 @@ public class RestServiceImpl implements RestService
         try
         {
             DomainLoadBalanceStrategy strategy = JsonUtil.fromJson( strategyJson, DomainLoadBalanceStrategy.class );
-            if ( attr == null )
+            if ( attr == null && attr.getDataHandler().getContent() == null )
             {
                 throw new Exception( "Error, cannot read an attachment", null );
             }

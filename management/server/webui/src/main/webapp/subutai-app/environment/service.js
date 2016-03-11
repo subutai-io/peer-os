@@ -13,7 +13,6 @@ function environmentService($http) {
 	var ENVIRONMENT_START_BUILD = ENVIRONMENTS_URL + 'build/';
 	var ENVIRONMENT_ADVANCED_BUILD = ENVIRONMENTS_URL + 'build/advanced';
 
-	var SSH_KEY_URL = ENVIRONMENTS_URL + 'keys/';
 	var CONTAINERS_URL = ENVIRONMENTS_URL + 'containers/';
 	var CONTAINER_TYPES_URL = CONTAINERS_URL + 'types/';
 	var DOMAINS_URL = ENVIRONMENTS_URL + 'domains/';
@@ -194,7 +193,10 @@ function environmentService($http) {
 		var fd = new FormData();
 		fd.append('hostName', domain.name);
 		fd.append('strategy', domain.strategy);
-		fd.append('file', file);
+		if( jQuery.isEmptyObject(file) )
+		{
+			fd.append('file', file);
+		}
 
 		return $http.post(
 			ENVIRONMENTS_URL + envId + '/domains',
