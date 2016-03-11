@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"fmt"
 	docker "github.com/docker/docker/builder/dockerfile/parser"
 	"os"
 	"strconv"
