@@ -129,7 +129,15 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
                     },
                     padding: 20
                 },
-                useInteractiveGuideline: true,
+				useInteractiveGuideline: true,
+				interactiveLayer: {
+					tooltip: {
+						/*contentGenerator: function(d) {
+							console.log(d);
+							return '<h3>HELLO WORLD</h3>';
+						}*/
+					}
+				},
                 yAxis: {
                     showMaxMin: false,
                     tickFormat: function (d) {
@@ -152,6 +160,7 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
                 }
             }
         };
+
         var chartSeries = {
             name: seriesName,
             unit: null,
