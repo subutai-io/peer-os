@@ -5,16 +5,18 @@
     background-color:transparent;
     border: none;
     border-radius: 0;
-	color: green;
+	color: #fff;
+    font-size: 14px;
+    font-family: "Ubuntu Mono", monospace;
 }
 .terminal {
-    background-color:#000;
+    background-color: #210819;
     height: 500px;
-    color: green;
-    font-family: monospace;
+    color: #fff;
+    font-family: "Ubuntu Mono", monospace;
     overflow-x: hidden;
     overflow-y:hidden;
-    font-size: 12px;
+    font-size: 14px;
     position:relative;
     padding:10px;
 }
