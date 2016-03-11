@@ -3,20 +3,23 @@ package parser
 import (
 	docker "github.com/docker/docker/builder/dockerfile/parser"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 )
 
-func parceEnv(line []string) string {
-	line = line[1:]
-	str := ""
-	if strings.Contains(line[0], "=") {
-		str = strings.Join(line, " ")
-	} else {
-		str = line[0] + "=" + strings.Join(line[1:], " ")
+func parceEnv(line string) string {
+	var tokenWhitespace = regexp.MustCompile(`[\t\v\f\r ]+`)
+	var str string
 
+	line = strings.Replace(line, "ENV ", "", -1)
+	if strings.Contains(line, "=") {
+		str = line
+	} else {
+		slice := tokenWhitespace.Split(line, 2)
+		str = slice[0] + "=" + `"` + strings.Join(slice[1:], " ") + `"`
 	}
-	str = strings.Replace(str, `\t`, " ", -1)
+	str = strings.Replace(str, "\t", " ", -1)
 	return "export " + str + "\n"
 }
 
@@ -68,7 +71,8 @@ func Parce(name string) (out, env, cmd, image string) {
 		if str := strings.Fields(n.Dump()); len(str) > 0 {
 			switch str[0] {
 			case "env":
-				env = env + parceEnv(str)
+				// env = env + parceEnv(str)
+				env = env + parceEnv(n.Original)
 			case "run":
 				out = out + parceRun(str)
 			case "add", "copy":
