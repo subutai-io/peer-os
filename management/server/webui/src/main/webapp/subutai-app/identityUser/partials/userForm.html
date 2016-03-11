@@ -14,8 +14,8 @@
 					placeholder="Username"
 					class="b-popup-body-input b-popup-body-input_full b-popup-body-input_margin-bttm" 
 					ng-model="identityUserFormCtrl.user2Add.userName" 
-					pattern="(?=^.{4,}$)(^(?!(admin|sys)).*)" 
-					title="Min length 4. Can't start with sys* and admin*" 
+					pattern="(?=^.{4,}$)(^(?!(admin|sys|token)).*)" 
+					title="Min length 4. Can't start with sys, admin and token" 
 					required 
 					ng-readonly="identityUserFormCtrl.editUser">
 
