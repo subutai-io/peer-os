@@ -31,31 +31,38 @@ public class SubutaiAppender extends AppenderSkeleton
     @Override
     protected void append( final LoggingEvent event )
     {
-        if ( event.getThrowableInformation() != null && event.getThrowableInformation().getThrowable() != null )
+        try
         {
-            StringWriter errors = new StringWriter();
-            event.getThrowableInformation().getThrowable().printStackTrace( new PrintWriter( errors ) );
-            final String stacktrace = errors.toString();
-
-            for ( final SubutaiErrorEventListener listener : listeners )
+            if ( event.getThrowableInformation() != null && event.getThrowableInformation().getThrowable() != null )
             {
-                notifierPool.execute( new Runnable()
+                StringWriter errors = new StringWriter();
+                event.getThrowableInformation().getThrowable().printStackTrace( new PrintWriter( errors ) );
+                final String stacktrace = errors.toString();
+
+                for ( final SubutaiErrorEventListener listener : listeners )
                 {
-                    @Override
-                    public void run()
+                    notifierPool.execute( new Runnable()
                     {
-                        try
+                        @Override
+                        public void run()
                         {
-                            listener.onEvent( new SubutaiErrorEvent( event.getTimeStamp(), event.getLoggerName(),
-                                    event.getRenderedMessage(), stacktrace ) );
+                            try
+                            {
+                                listener.onEvent( new SubutaiErrorEvent( event.getTimeStamp(), event.getLoggerName(),
+                                        event.getRenderedMessage(), stacktrace ) );
+                            }
+                            catch ( Exception e )
+                            {
+                                //ignore to exclude cycling
+                            }
                         }
-                        catch ( Exception e )
-                        {
-                            //ignore to exclude cycling
-                        }
-                    }
-                } );
+                    } );
+                }
             }
+        }
+        catch ( Exception e )
+        {
+            //ignore
         }
     }
 
