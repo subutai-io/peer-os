@@ -53,10 +53,13 @@ func parceFrom(line []string) string {
 	return ""
 }
 
-func parceCmd(line []string) string {
+func parceCmd(line []string, isEntrypoint bool) string {
 	if len(line) > 1 {
 		str := strings.Join(line[1:], " ")
 		str = strings.Replace(str, "\t", " ", -1)
+		if isEntrypoint {
+			str, _ = strconv.Unquote(str)
+		}
 		return str
 	}
 	return ""
@@ -80,19 +83,11 @@ func Parce(name string) (out, env, cmd, image string) {
 			case "from":
 				image = parceFrom(str)
 			case "cmd":
-				cmd = cmd + parceCmd(str)
+				cmd = cmd + parceCmd(str, false)
 			case "entrypoint":
-				cmd = cmd + parceCmd(str) + " "
+				cmd = cmd + parceCmd(str, true) + " "
 			}
 		}
-	}
-	if len(cmd) > 1 {
-		slice := strings.Split(cmd, " ")
-		for i, _ := range slice {
-			slice[i] = strings.Replace(slice[i], `"`, "", -1)
-		}
-
-		cmd = slice[0] + ` "` + strings.Join(slice[1:], " ") + `"`
 	}
 	if len(out) > 0 {
 		return out, env, cmd, image
