@@ -85,6 +85,13 @@ func State(name string) (state string) {
 	return "UNKNOWN"
 }
 
+func SetApt(name string) {
+	repo := []byte("deb [arch=amd64,all] http://" + config.Management.Host + ":8551/rest/kurjun/vapt trusty main contrib\n" +
+		"deb [arch=amd64,all] http://repo.critical-factor.com:8081/rest/kurjun/vapt trusty main contrib\n")
+	log.Check(log.DebugLevel, "Writing source repo list",
+		ioutil.WriteFile(config.Agent.LxcPrefix+name+"/rootfs/etc/apt/sources.list.d/subutai-repo.list", repo, 0644))
+}
+
 func AptUpdate(name string) {
 	c, err := lxc.NewContainer(name, config.Agent.LxcPrefix)
 	log.Check(log.FatalLevel, "Looking for container "+name, err)
