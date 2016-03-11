@@ -3,10 +3,10 @@ package main
 import (
 	"os"
 
-	"github.com/subutai-io/Subutai/agent/agent"
-	"github.com/subutai-io/Subutai/agent/cli"
-	"github.com/subutai-io/Subutai/agent/config"
-	"github.com/subutai-io/Subutai/agent/log"
+	"github.com/subutai-io/base/agent/agent"
+	"github.com/subutai-io/base/agent/cli"
+	"github.com/subutai-io/base/agent/config"
+	"github.com/subutai-io/base/agent/log"
 
 	"github.com/codegangsta/cli"
 )
@@ -14,7 +14,10 @@ import (
 var TIMESTAMP string = "-unknown"
 
 func init() {
-	os.Setenv("PATH", "/apps/subutai/current/bin:/apps/subutai-mng/current/bin:"+os.Getenv("PATH"))
+	if os.Getuid() != 0 {
+		log.Error("Please run as root")
+	}
+	os.Setenv("PATH", "/apps/subutai/current/bin:"+os.Getenv("PATH"))
 	if len(os.Args) > 1 {
 		if os.Args[1] == "-d" {
 			log.Level(log.DebugLevel)
@@ -63,11 +66,6 @@ func main() {
 			lib.Cleanup(c.Args().Get(0))
 		}}, {
 
-		Name: "collect", Usage: "collect performance stats",
-		Action: func(c *cli.Context) {
-			lib.CollectStats()
-		}}, {
-
 		Name: "config", Usage: "containerName add/del key value",
 		Flags: []cli.Flag{
 			cli.StringFlag{Name: "o", Usage: "add/del key value"},
@@ -82,12 +80,6 @@ func main() {
 		Action: func(c *cli.Context) {
 			config.InitAgentDebug()
 			agent.Start(c)
-		},
-		Flags: []cli.Flag{
-			cli.StringFlag{Name: "server", Value: config.Management.Host, Usage: "management host ip address/host name"},
-			cli.StringFlag{Name: "port", Value: config.Management.Port, Usage: "management host port number"},
-			cli.StringFlag{Name: "user", Value: config.Agent.GpgUser, Usage: "gpg user name/email to encrypt/decrypt messages"},
-			cli.StringFlag{Name: "secret", Value: config.Management.Secret, Usage: "send secret passphrase via flag"},
 		}}, {
 
 		Name: "demote", Usage: "demote Subutai container",

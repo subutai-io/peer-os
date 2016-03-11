@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/subutai-io/Subutai/agent/log"
+	"github.com/subutai-io/base/agent/log"
 
 	"gopkg.in/gcfg.v1"
 )

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+    >
+
+  <bean id="errEventService" class="io.subutai.core.appender.SubutaiAppender"
+        scope="singleton" destroy-method="dispose">
+  </bean>
+
+  <reference-list id="listener"
+                  interface="io.subutai.core.appender.SubutaiErrorEventListener"
+                  availability="optional">
+    <reference-listener ref="errEventService"
+                        bind-method="addListener" unbind-method="removeListener" />
+  </reference-list>
+
+</blueprint>
