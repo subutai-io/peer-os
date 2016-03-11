@@ -57,7 +57,7 @@ public class CloneResponse implements TaskResponse
 
     public String getIp()
     {
-        return ip;
+        return ip.split( "/" )[0];
     }
 
 
