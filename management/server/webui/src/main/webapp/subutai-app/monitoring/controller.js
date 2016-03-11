@@ -139,15 +139,6 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
 						return d;
 					}
 				},
-				yAxis: {
-					showMaxMin: false,
-					tickFormat: function (d) {
-						if (seriesName.indexOf('cpu') > -1 && d > 100) {
-							return "";
-						}
-						return d;
-					}
-				},
 				forceY: null,
 				xAxis: {
 					showMaxMin: false,
@@ -162,23 +153,61 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
 			}
 		};
 
-		/*if(seriesName == 'host_disk') {
+		if(seriesName == 'host_disk') {
 			chartOptions.chart.interactiveLayer = {"tooltip": {"contentGenerator": function(d) {
-				console.log(d);
+				//console.log(d);
+
+				var values = {};
+				for (var i = 0; i < d.series.length; i++) {
+					var currentSerieKey = d.series[i].key.split(' ');
+					if(values[currentSerieKey[0]] == undefined) {
+						values[currentSerieKey[0]] = {};
+					}
+					values[currentSerieKey[0]][currentSerieKey[1]] = {"value": d.series[i].value, "color": d.series[i].color};
+				}
+
 				var tooltipTable = [
 					'<table>',
 						'<thead>',
 							'<tr>',
-								'<td colspan="3">',
+								'<td>',
 									'<strong class="x-value">' + d.value + '</strong>',
+								'</td>',
+								'<td class="value_left">',
+									'used',
+								'</td>',
+								'<td class="value_left">',
+									'/',
+								'</td>',
+								'<td class="value_left">',
+									'total',
 								'</td>',
 							'</tr>',
 						'</thead>',
-					'</table>',
-				].join('');
-				return tooltipTable;
+						'<tbody>',
+				];
+
+				for(var key in values) {
+					var row = [
+					'<tr>',
+						'<td class="key">' + key + '</td>',
+						'<td class="value_left legend-color-guide">',
+							'<div style="background-color: ' + values[key]['used'].color + '"></div> ' + values[key]['used'].value,
+						'</td>',
+						'<td class="value_left">/</td>',
+						'<td class="value_left legend-color-guide">',
+							'<div style="background-color: ' + values[key]['total'].color + '"></div> ' + values[key]['total'].value,
+						'</td>',
+					'</tr>'
+					].join('');
+					tooltipTable.push(row);
+				}
+
+				tooltipTable.push('</tbody>');
+				tooltipTable.push('</table>');
+				return tooltipTable.join('');
 			}}};
-		}*/
+		}
 
 		var chartSeries = {
 			name: seriesName,
