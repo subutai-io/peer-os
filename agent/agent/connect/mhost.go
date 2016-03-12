@@ -32,10 +32,8 @@ func Instance() *mhost {
 }
 
 func (m *mhost) GetToken() string {
-	log.Debug("Mhost is " + m.Ipv4 + ":" + m.Port)
-
 	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
-	client := &http.Client{Transport: tr}
+	client := &http.Client{Transport: tr, Timeout: time.Second * 3}
 	resp, err := client.Get("https://" + m.Ipv4 + ":" + m.Port + m.Url + "?username=" + config.Management.Login + "&password=" + config.Management.Password)
 	if log.Check(log.WarnLevel, "Getting security token", err) {
 		return ""
