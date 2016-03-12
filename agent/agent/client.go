@@ -24,8 +24,8 @@ func Instance() {
 
 		pk := mgn.GetKey()
 		for pk == nil {
-			log.Info("Failed to get management key, sleeping 10 secs")
-			time.Sleep(time.Second * 10)
+			log.Info("Failed to get management key, sleeping 5 secs")
+			time.Sleep(time.Second * 5)
 			pk = mgn.GetKey()
 		}
 		email = pk.ExtractKeyEmail()
