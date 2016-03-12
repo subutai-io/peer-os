@@ -3515,6 +3515,8 @@ td.b-main-table__status-col {
 .b-karaf-logs code {
 	line-height: normal;
 	position: relative;
+	overflow-x: auto;
+	display: block;
 }
 
 .b-highlight-block {
@@ -3524,5 +3526,9 @@ td.b-main-table__status-col {
 	width: 800px;
 	height: 550px;
 	border: 1px solid #CCCEEE;
+}
+
+.b-error-log {
+	color: #fa0000;
 }
 

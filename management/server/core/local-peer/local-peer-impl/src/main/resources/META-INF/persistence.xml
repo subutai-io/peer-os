@@ -8,6 +8,7 @@
     </non-jta-data-source>
     <class>io.subutai.core.localpeer.impl.entity.AbstractSubutaiHost</class>
     <class>io.subutai.core.localpeer.impl.entity.ResourceHostEntity</class>
+    <class>io.subutai.core.localpeer.impl.entity.HostInterfaceEntity</class>
     <class>io.subutai.core.localpeer.impl.entity.ContainerHostEntity</class>
     <class>io.subutai.core.localpeer.impl.entity.TunnelEntity</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>

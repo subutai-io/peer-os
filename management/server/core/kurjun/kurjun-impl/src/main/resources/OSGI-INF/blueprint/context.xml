@@ -34,11 +34,19 @@
         class="io.subutai.core.kurjun.impl.vapt.AptManagerImpl">
     <argument ref="locaPeer" />
   </bean>
+  
+  <bean id="rawManager" scope="singleton" activation="eager" 
+        init-method="init" destroy-method="dispose"
+        class="io.subutai.core.kurjun.impl.raw.RawManagerImpl">
+  </bean>
 
   <service ref="templateManager"
              interface="io.subutai.core.kurjun.api.TemplateManager" />
     
   <service ref="aptManager"
              interface="io.subutai.core.kurjun.api.vapt.AptManager" />
+  
+  <service ref="rawManager"
+             interface="io.subutai.core.kurjun.api.raw.RawManager" />
 
 </blueprint>

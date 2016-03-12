@@ -187,7 +187,6 @@ public class RestAptManagerImpl extends RestManagerBase implements RestAptManage
         byte[] md5bytes = decodeMd5( md5 );
         if ( md5bytes != null )
         {
-            String err = "Failed to delete apt package";
             try
             {
                 boolean deleted = aptManager.delete( md5bytes );
@@ -195,10 +194,14 @@ public class RestAptManagerImpl extends RestManagerBase implements RestAptManage
                 {
                     return Response.ok( "Apt package deleted" ).build();
                 }
-                return Response.serverError().entity( err ).build();
+                else
+                {
+                    return packageNotFoundResponse();
+                }
             }
             catch ( IOException ex )
             {
+                String err = "Failed to delete apt package";
                 LOGGER.error( err, ex );
                 return Response.serverError().entity( err ).build();
             }

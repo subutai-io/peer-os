@@ -23,6 +23,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +40,8 @@ import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.HostInterface;
+import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.InstanceType;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.peer.ContainerHost;
@@ -82,6 +85,11 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     @Enumerated( EnumType.STRING )
     private InstanceType instanceType;
 
+    @OneToMany( mappedBy = "host", fetch = FetchType.EAGER, cascade = CascadeType.ALL, targetEntity =
+            HostInterfaceEntity.class, orphanRemoval = true )
+    @JsonIgnore
+    protected Set<HostInterface> netInterfaces = new HashSet<>();
+
     @Transient
     protected ExecutorService singleThreadExecutorService;
 
@@ -120,7 +128,30 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
         this.instanceType = resourceHostInfo.getInstanceType();
 
+        setNetInterfaces( resourceHostInfo.getHostInterfaces() );
+
         init();
+    }
+
+
+    @Override
+    public Set<HostInterface> getNetInterfaces()
+    {
+        return netInterfaces;
+    }
+
+
+    public void setNetInterfaces( HostInterfaces hostInterfaces )
+    {
+        Preconditions.checkNotNull( hostInterfaces );
+
+        this.netInterfaces.clear();
+        for ( HostInterface iface : hostInterfaces.getAll() )
+        {
+            HostInterfaceEntity netInterface = new HostInterfaceEntity( iface );
+            netInterface.setHost( this );
+            this.netInterfaces.add( netInterface );
+        }
     }
 
 
@@ -534,9 +565,12 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     @Override
     public boolean updateHostInfo( final HostInfo hostInfo )
     {
-        boolean result = super.updateHostInfo( hostInfo );
+        super.updateHostInfo( hostInfo );
+
+        setNetInterfaces( hostInfo.getHostInterfaces() );
 
         ResourceHostInfo resourceHostInfo = ( ResourceHostInfo ) hostInfo;
+
         for ( ContainerHostInfo info : resourceHostInfo.getContainers() )
         {
             ContainerHostEntity containerHost;
@@ -553,7 +587,6 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
                             info.getHostInterfaces(), info.getHostname(), "management", info.getArch().name(),
                             "management", null, null, ContainerSize.SMALL, info.getState() );
                     addContainerHost( containerHost );
-                    result = true;
                 }
                 else
                 {
@@ -581,8 +614,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             }
         }
 
-
-        return result;
+        return true;
     }
 
 
