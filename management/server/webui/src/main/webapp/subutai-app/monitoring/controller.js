@@ -164,7 +164,7 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
 		
 		function getCustomTooltip(firstValue, secondValue) {
 			return {"tooltip": {"contentGenerator": function(d) {
-				//console.log(d);
+				console.log(d);
 
 				var values = {};
 				for (var i = 0; i < d.series.length; i++) {
@@ -197,15 +197,25 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
 				];
 
 				for(var key in values) {
+
+					var firstValueHtml = '';
+					var secondValueHtml = '';
+					if(values[key][firstValue] !== undefined) {
+						firstValueHtml = '<div style="background-color: ' + values[key][firstValue].color + '"></div> ' + values[key][firstValue].value;
+					}
+					if(values[key][secondValue] !== undefined) {
+						secondValueHtml = '<div style="background-color: ' + values[key][secondValue].color + '"></div> ' + values[key][secondValue].value;
+					}
+
 					var row = [
 					'<tr>',
 						'<td class="key">' + key + '</td>',
 						'<td class="value_left legend-color-guide">',
-							'<div style="background-color: ' + values[key][firstValue].color + '"></div> ' + values[key][firstValue].value,
+							firstValueHtml,
 						'</td>',
 						'<td class="value_left">/</td>',
 						'<td class="value_left legend-color-guide">',
-							'<div style="background-color: ' + values[key][secondValue].color + '"></div> ' + values[key][secondValue].value,
+							secondValueHtml,
 						'</td>',
 					'</tr>'
 					].join('');
