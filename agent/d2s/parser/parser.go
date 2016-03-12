@@ -25,6 +25,7 @@ func parceEnv(line string) string {
 
 func parceCopy(line []string) string {
 	if len(line) > 1 {
+		line[1] = `"/opt/docker2subutai/` + strings.Replace(line[1], `"`, "", -1) + `"`
 		return "cp -rf " + strings.Join(line[1:], " ") + "\n"
 	}
 	return ""
