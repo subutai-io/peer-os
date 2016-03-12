@@ -245,7 +245,6 @@ func command() {
 func ping(rw http.ResponseWriter, request *http.Request) {
 	if request.Method == http.MethodGet && strings.Split(request.RemoteAddr, ":")[0] == config.Management.Host {
 		rw.WriteHeader(http.StatusOK)
-		heartbeat()
 	} else {
 		rw.WriteHeader(http.StatusForbidden)
 	}
