@@ -260,8 +260,11 @@ public class HostRegistryImpl implements HostRegistry
         {
             checkAndUpdateHosts( getResourceHostsInfo() );
 
-            checkAndUpdateHosts( Sets.<ResourceHostInfo>newHashSet(
-                    ServiceLocator.getServiceNoCache( LocalPeer.class ).getResourceHosts() ) );
+            LocalPeer localPeer = ServiceLocator.getServiceNoCache( LocalPeer.class );
+            if ( localPeer != null )
+            {
+                checkAndUpdateHosts( Sets.<ResourceHostInfo>newHashSet( localPeer.getResourceHosts() ) );
+            }
         }
         catch ( Exception e )
         {
