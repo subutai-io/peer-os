@@ -37,7 +37,7 @@
 #
 # export JAVA_HOME # Location of Java installation
 export JAVA_MIN_MEM=512M # Minimum memory for the JVM
-export JAVA_MAX_MEM=1G # Maximum memory for the JVM
+export JAVA_MAX_MEM=2G # Maximum memory for the JVM
 # export JAVA_PERM_MEM # Minimum perm memory for the JVM
 # export JAVA_MAX_PERM_MEM # Maximum perm memory for the JVM
 # export EXTRA_JAVA_OPTS # Additional JVM options

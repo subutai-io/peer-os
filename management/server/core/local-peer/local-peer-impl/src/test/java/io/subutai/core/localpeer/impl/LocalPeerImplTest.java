@@ -689,6 +689,7 @@ public class LocalPeerImplTest
     {
         when( resourceHostInfo.getHostname() ).thenReturn( Common.MANAGEMENT_HOSTNAME );
         when( resourceHostInfo.getId() ).thenReturn( MANAGEMENT_HOST_ID );
+        when( resourceHostInfo.getHostInterfaces() ).thenReturn( hostInterfaces );
 
         localPeer.initialized = true;
         localPeer.onHeartbeat( resourceHostInfo, Sets.newHashSet( quotaAlertValue ) );

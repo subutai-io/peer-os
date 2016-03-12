@@ -310,7 +310,6 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
             byte[] md5bytes = decodeMd5( tid.getMd5() );
             if ( md5bytes != null )
             {
-                String err = "Failed to delete template";
                 try
                 {
                     boolean deleted = templateManager.delete( repository, tid.getOwnerFprint(), md5bytes );
@@ -318,10 +317,14 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
                     {
                         return Response.ok( "Template deleted" ).build();
                     }
-                    return Response.serverError().entity( err ).build();
+                    else
+                    {
+                        return packageNotFoundResponse();
+                    }
                 }
                 catch ( IOException ex )
                 {
+                    String err = "Failed to delete template";
                     LOGGER.error( err, ex );
                     return Response.serverError().entity( err ).build();
                 }

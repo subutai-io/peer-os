@@ -18,6 +18,8 @@
 #Include enviroment variables
 . $(cd `dirname "${BASH_SOURCE[0]}"` && pwd)/subutai.env
 
+rm -rf /opt/subutai-mng/data/cache/
+
 if [ "`grep -c '10.10.10.1 management gw.intra.lan' /etc/hosts`" == "0" ]; then echo "10.10.10.1 management gw.intra.lan" >> /etc/hosts; fi
 echo "management" > /etc/hostname
 
