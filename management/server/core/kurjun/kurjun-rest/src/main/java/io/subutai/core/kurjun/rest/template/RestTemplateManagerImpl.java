@@ -1,10 +1,12 @@
 package io.subutai.core.kurjun.rest.template;
 
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +14,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,6 +76,7 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
     public Response getTemplate( String repository, String id, String name, String version,
             String type, boolean isKurjunClient )
     {
+        byte[] buffer = new byte[8192];
         try
         {
             if ( id != null )
@@ -87,7 +91,21 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
                         InputStream is = templateManager.getTemplateData( repository, md5bytes, tid.getOwnerFprint(), isKurjunClient );
                         if ( is != null )
                         {
-                            return Response.ok( is )
+                            StreamingOutput stream = output -> {
+
+                                OutputStream outputStream = new BufferedOutputStream( output );
+
+                                int bytesRead;
+
+                                while ( ( bytesRead = is.read( buffer ) ) > 0 )
+                                {
+                                    outputStream.write( buffer, 0, bytesRead );
+                                }
+
+                                outputStream.flush();
+                            };
+
+                            return Response.ok( stream )
                                     .header( "Content-Disposition", "attachment; filename=" + makeFilename( template ) )
                                     .header( "Content-Type", "application/octet-stream" )
                                     .build();
