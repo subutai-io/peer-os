@@ -227,7 +227,7 @@ public class CommandProcessor implements RestProcessor
 
     protected String getResourceHostIp( ResourceHostInfo resourceHostInfo )
     {
-        return resourceHostInfo.getHostInterfaces().findByName( SystemSettings.getExternalIpInterface() ).getIp();
+        return resourceHostInfo.getHostInterfaces().findByName( SystemSettings.getMgmtInterface() ).getIp();
     }
 
 
