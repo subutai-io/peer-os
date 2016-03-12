@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.transport.http.asyncclient.AsyncHTTPConduit;
 
 import io.subutai.common.settings.ChannelSettings;
 import io.subutai.core.channel.impl.ChannelManagerImpl;
@@ -30,6 +31,7 @@ public class ServerBusListener extends AbstractFeature
         bus.setProperty( "bus.io.CachedOutputStream.Threshold", "500000" );
         System.setProperty( "org.apache.cxf.io.CachedOutputStream.Threshold", "500000" );
         LOG.info( "Setting CXF CachedOutputStream.Threshold size to: 500Kb " );
+        bus.setProperty( AsyncHTTPConduit.USE_ASYNC, Boolean.TRUE);
         //***************************************************************
 
         if ( !ChannelSettings.SPECIAL_REST_BUS.contains(bus.getId()) ) {

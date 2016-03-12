@@ -39,7 +39,6 @@ public class SecurityUtil
         }
         catch (NoSuchAlgorithmException e)
         {
-            e.printStackTrace();
         }
 
         return generatedPassword;
@@ -61,7 +60,6 @@ public class SecurityUtil
         }
         catch ( NoSuchAlgorithmException e )
         {
-            e.printStackTrace();
         }
         return generatedPassword;
     }
