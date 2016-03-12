@@ -154,7 +154,16 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
 		};
 
 		if(seriesName == 'host_disk') {
-			chartOptions.chart.interactiveLayer = {"tooltip": {"contentGenerator": function(d) {
+			chartOptions.chart.interactiveLayer = getCustomTooltip('used', 'total');
+		}
+
+		if(seriesName == 'host_net') {
+			chartOptions.chart.interactiveLayer = getCustomTooltip('in', 'out');
+		}
+
+		
+		function getCustomTooltip(firstValue, secondValue) {
+			return {"tooltip": {"contentGenerator": function(d) {
 				//console.log(d);
 
 				var values = {};
@@ -174,13 +183,13 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
 									'<strong class="x-value">' + d.value + '</strong>',
 								'</td>',
 								'<td class="value_left">',
-									'used',
+									firstValue,
 								'</td>',
 								'<td class="value_left">',
 									'/',
 								'</td>',
 								'<td class="value_left">',
-									'total',
+									secondValue,
 								'</td>',
 							'</tr>',
 						'</thead>',
@@ -192,11 +201,11 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
 					'<tr>',
 						'<td class="key">' + key + '</td>',
 						'<td class="value_left legend-color-guide">',
-							'<div style="background-color: ' + values[key]['used'].color + '"></div> ' + values[key]['used'].value,
+							'<div style="background-color: ' + values[key][firstValue].color + '"></div> ' + values[key][firstValue].value,
 						'</td>',
 						'<td class="value_left">/</td>',
 						'<td class="value_left legend-color-guide">',
-							'<div style="background-color: ' + values[key]['total'].color + '"></div> ' + values[key]['total'].value,
+							'<div style="background-color: ' + values[key][secondValue].color + '"></div> ' + values[key][secondValue].value,
 						'</td>',
 					'</tr>'
 					].join('');
