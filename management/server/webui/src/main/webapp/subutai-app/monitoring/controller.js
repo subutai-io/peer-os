@@ -164,7 +164,7 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
 		
 		function getCustomTooltip(firstValue, secondValue) {
 			return {"tooltip": {"contentGenerator": function(d) {
-				console.log(d);
+				//console.log(d);
 
 				var values = {};
 				for (var i = 0; i < d.series.length; i++) {
