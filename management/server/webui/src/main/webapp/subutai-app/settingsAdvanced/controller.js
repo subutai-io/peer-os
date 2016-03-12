@@ -42,18 +42,23 @@ function SettingsAdvancedCtrl($scope, SettingsAdvancedSrv, SweetAlert, $sce) {
 
 	function renderHtml(html_code) {
 		//initHighlighting();
-		var html_code_array = html_code.match(/[^\r\n]+/g);
-		for(var i = 0; i < html_code_array.length; i++) {
-			if(html_code_array[i].includes('ERROR')) {
-				html_code_array[i] = '<span class="b-error-log">' + html_code_array[i] + '</span>';
-			}
+		if(html_code && html_code.length > 0) {
+			var html_code_array = html_code.match(/[^\r\n]+/g);
+			for(var i = 0; i < html_code_array.length; i++) {
+				if(html_code_array[i].includes('ERROR')) {
+					html_code_array[i] = '<span class="b-error-log">' + html_code_array[i] + '</span>';
+				}
 
-			if(html_code_array[i].includes('WARN')) {
-				console.log('lololo');
-				html_code_array[i] = '<span class="b-error-log">' + html_code_array[i] + '</span>';
+				if(html_code_array[i].includes('WARN')) {
+					html_code_array[i] = '<span class="b-error-log">' + html_code_array[i] + '</span>';
+				}
 			}
+			var codeBlock = document.getElementById('js-highlight-block');
+			codeBlock.scrollTop = codeBlock.scrollHeight;
+			return $sce.trustAsHtml(html_code_array.join('\n'));
+		} else {
+			return $sce.trustAsHtml(html_code);
 		}
-		return $sce.trustAsHtml(html_code_array.join('\n'));
 	};
 
 	function initHighlighting() {
