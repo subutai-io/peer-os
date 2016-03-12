@@ -66,7 +66,7 @@ func checkLocal(templ, md5, arch string) string {
 		file := strings.Split(f.Name(), "-subutai-template_")
 		if len(file) == 2 && file[0] == templ && strings.Contains(file[1], arch) {
 			if len(md5) == 0 {
-				fmt.Println("Cannot check md5 of local template. Trust anyway? (y/n)")
+				fmt.Print("Cannot check md5 of local template. Trust anyway? (y/n)")
 				_, err := fmt.Scanln(&response)
 				log.Check(log.FatalLevel, "Reading input", err)
 				if response == "y" {

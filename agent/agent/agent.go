@@ -60,6 +60,7 @@ func initAgent() {
 func Start(c *cli.Context) {
 	http.HandleFunc("/trigger", trigger)
 	http.HandleFunc("/ping", ping)
+	http.HandleFunc("/heartbeat", heartbeatCall)
 	go http.ListenAndServe(":7070", nil)
 
 	go container.ContainersRestoreState()
@@ -244,6 +245,7 @@ func command() {
 func ping(rw http.ResponseWriter, request *http.Request) {
 	if request.Method == http.MethodGet && strings.Split(request.RemoteAddr, ":")[0] == config.Management.Host {
 		rw.WriteHeader(http.StatusOK)
+		heartbeat()
 	} else {
 		rw.WriteHeader(http.StatusForbidden)
 	}
@@ -253,6 +255,16 @@ func trigger(rw http.ResponseWriter, request *http.Request) {
 	if request.Method == http.MethodPost && strings.Split(request.RemoteAddr, ":")[0] == config.Management.Host {
 		rw.WriteHeader(http.StatusAccepted)
 		command()
+	} else {
+		rw.WriteHeader(http.StatusForbidden)
+	}
+}
+
+func heartbeatCall(rw http.ResponseWriter, request *http.Request) {
+	if request.Method == http.MethodGet && strings.Split(request.RemoteAddr, ":")[0] == config.Management.Host {
+		rw.WriteHeader(http.StatusOK)
+		lastHeartbeat = []byte{}
+		heartbeat()
 	} else {
 		rw.WriteHeader(http.StatusForbidden)
 	}
