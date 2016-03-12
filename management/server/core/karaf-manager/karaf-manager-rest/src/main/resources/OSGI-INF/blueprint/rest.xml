@@ -19,7 +19,7 @@
 
   <reference id="karafManager" availability="mandatory" interface="io.subutai.core.karaf.manager.api.KarafManager" />
 
-  <bean id="keyServerRestImpl" class="io.subutai.core.karaf.manager.rest.KarafManagerRestImpl">
+  <bean id="KarafManagerRestImpl" class="io.subutai.core.karaf.manager.rest.KarafManagerRestImpl">
     <argument ref="karafManager" />
   </bean>
 

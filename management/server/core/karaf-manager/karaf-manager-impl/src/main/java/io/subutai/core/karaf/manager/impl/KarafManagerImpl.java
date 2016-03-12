@@ -33,39 +33,50 @@ public class KarafManagerImpl implements KarafManager
     @Override
     public String executeShellCommand( final String commandStr )
     {
-        String response;
+        String response = "";
         final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         final PrintStream printStream = new PrintStream( byteArrayOutputStream );
         final CommandSession commandSession = commandProcessor.createSession( System.in, printStream, System.err );
+
+
+        //************************************************
         FutureTask<String> commandFuture = new FutureTask<String>( new Callable<String>()
         {
             public String call()
             {
                 try
                 {
-                    //for ( String command : commands )
-                    //{
-                        System.err.println( commandStr );
-                        commandSession.execute( commandStr );
-                    //}
+                    System.err.println( commandStr );
+                    commandSession.execute( commandStr );
                 }
                 catch ( Exception e )
                 {
-                    e.printStackTrace( System.err );
                 }
+
+                printStream.flush();
                 return byteArrayOutputStream.toString();
             }
         } );
+        //************************************************
 
         try
         {
             executor.submit( commandFuture );
-            response = commandFuture. get( 5000, TimeUnit.MILLISECONDS );
+
+            do
+            {
+                response += commandFuture.get(2,TimeUnit.SECONDS);
+            }
+            while(!commandFuture.isDone());
         }
         catch ( Exception e )
         {
-            e.printStackTrace( System.err );
-            response = "SHELL COMMAND TIMED OUT: ";
+            response += "Command Timout: ";
+
+            if(byteArrayOutputStream != null)
+            {
+                response += byteArrayOutputStream.toString();
+            }
         }
 
         return response;
