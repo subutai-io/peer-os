@@ -566,8 +566,12 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     public boolean updateHostInfo( final HostInfo hostInfo )
     {
         boolean result = super.updateHostInfo( hostInfo );
-        if ( this.netInterfaces == null || this.netInterfaces.size() == 0 )
+        if ( this.netInterfaces.size() > 0 )
         {
+            if ( this.netInterfaces != null )
+            {
+                this.netInterfaces.clear();
+            }
             setNetInterfaces( hostInfo.getHostInterfaces() );
             result = true;
         }
