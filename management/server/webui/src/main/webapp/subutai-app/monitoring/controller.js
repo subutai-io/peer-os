@@ -41,7 +41,7 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
 
 	monitoringSrv.getResourceHosts().success(function (data) {
 		vm.hosts = data;
-		vm.currentHost = vm.hosts.length > 0 ? vm.hosts[0].id : null;
+		vm.currentHost = vm.hosts.length > 0 ? vm.hosts[0].id : '';
 		getServerData();
 	});
 
