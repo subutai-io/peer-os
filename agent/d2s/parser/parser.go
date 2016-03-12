@@ -66,7 +66,7 @@ func parceCmd(line []string, isEntrypoint bool) string {
 	return ""
 }
 
-func Parce(name string) (out, env, cmd, image string) {
+func Parce(name string) (out, env, cmd, image, user string) {
 	file, _ := os.Open(name)
 	node, _ := docker.Parse(file)
 	file.Close()
@@ -87,11 +87,13 @@ func Parce(name string) (out, env, cmd, image string) {
 				cmd = cmd + parceCmd(str, false)
 			case "entrypoint":
 				cmd = cmd + parceCmd(str, true) + " "
+			case "user":
+				user, _ = strconv.Unquote(strings.Join(str[1:], ""))
 			}
 		}
 	}
 	if len(out) > 0 {
-		return out, env, cmd, image
+		return out, env, cmd, image, user
 	}
 	return
 }

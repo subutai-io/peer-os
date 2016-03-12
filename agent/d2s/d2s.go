@@ -29,7 +29,7 @@ cd /opt/docker2subutai/
 `
 
 	//parse
-	out, env, cmd, _ := parser.Parce(dockerfile)
+	out, env, cmd, _, user := parser.Parce(dockerfile)
 
 	// if img != "" {
 	// 	cmd := exec.Command("subutai", "import", img)
@@ -99,6 +99,10 @@ if [ -f "/etc/init/ssh.conf" ]; then
 	sed -i 's/start on runlevel \[2/start on runlevel \[12/g' /etc/init/ssh.conf
 fi
 `
+	if user != "" {
+		out = out + "sed -i 's/User=root/User=" + user + "/g' /etc/systemd/system/docker2subutai.service\n"
+		out = out + "sed -i -e '$i setuid=" + user + "\n' /etc/init/docker2subutai.conf\n"
+	}
 	out = head + out + "\nexit 0\n\n"
 	// create .env
 	ioutil.WriteFile(strings.Trim(dockerfile, "Dockerfile")+".env", []byte(env), 0644)
