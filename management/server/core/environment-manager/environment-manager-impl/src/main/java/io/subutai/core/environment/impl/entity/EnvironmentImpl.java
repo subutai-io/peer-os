@@ -19,11 +19,16 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.Version;
+import javax.persistence.UniqueConstraint;
 
+import org.codehaus.jackson.annotate.JsonAutoDetect;
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,74 +69,97 @@ import io.subutai.core.object.relation.api.model.RelationMeta;
  * @see ContainerHost
  */
 @Entity
-@Table( name = "env" )
+@Table( name = "env",
+        uniqueConstraints=@UniqueConstraint(columnNames={"name", "user_id"}))
 @Access( AccessType.FIELD )
+@JsonAutoDetect( fieldVisibility = JsonAutoDetect.Visibility.ANY, getterVisibility = JsonAutoDetect.Visibility.NONE,
+        setterVisibility = JsonAutoDetect.Visibility.NONE )
 public class EnvironmentImpl implements Environment, Serializable
 {
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentImpl.class );
 
     @Transient
+    @JsonIgnore
     private EnvironmentManagerImpl environmentManager;
 
     @Id
     @Column( name = "environment_id" )
+    @JsonProperty("environmentId")
     private String environmentId;
 
     @Version
+    @JsonIgnore
     private Long version;
 
     @Column( name = "peer_id", nullable = false )
+    @JsonProperty("peerId")
     private String peerId;
 
     @Column( name = "name", nullable = false )
+    @JsonProperty("name")
     private String name;
 
     @Column( name = "create_time", nullable = false )
+    @JsonProperty("created")
     private long creationTimestamp = System.currentTimeMillis();
 
     @Column( name = "subnet_cidr" )
+    @JsonProperty("subnet")
     private String subnetCidr;
 
     @Column( name = "last_used_ip_idx" )
+    @JsonIgnore
     private int lastUsedIpIndex;
 
     @Column( name = "vni" )
+    @JsonIgnore
     private Long vni;
 
 
     @Column( name = "tunnel_network" )
+    @JsonIgnore
     private String tunnelNetwork;
 
     @OneToMany( mappedBy = "environment", fetch = FetchType.EAGER, targetEntity = EnvironmentContainerImpl.class,
             cascade = CascadeType.ALL, orphanRemoval = true )
+    @JsonIgnore
     private Set<EnvironmentContainerHost> containers = Sets.newHashSet();
 
     @OneToMany( mappedBy = "environment", fetch = FetchType.EAGER, targetEntity = PeerConfImpl.class,
             cascade = CascadeType.ALL, orphanRemoval = false )
+    @JsonIgnore
     private Set<PeerConf> peerConfs = Sets.newHashSet();
 
     @Enumerated( EnumType.STRING )
     @Column( name = "status", nullable = false )
+    @JsonProperty("status")
     private EnvironmentStatus status = EnvironmentStatus.EMPTY;
 
     @Column( name = "relation_declaration", length = 3000 )
+    @JsonIgnore
     private String relationDeclaration;
 
-    @Column( name = "initial_blueprint", length = 3000 )
+    @Column( name = "initial_blueprint" )
+    @JsonIgnore
+    @Lob
     private String rawBlueprint;
 
     @Column( name = "user_id" )
+    @JsonIgnore
     private Long userId;
 
     @OneToMany( mappedBy = "environment", fetch = FetchType.EAGER, targetEntity = EnvironmentAlertHandlerImpl.class,
             cascade = CascadeType.ALL, orphanRemoval = true )
+    @JsonIgnore
     private Set<EnvironmentAlertHandler> alertHandlers = Sets.newHashSet();
 
 
     @ElementCollection( targetClass = String.class, fetch = FetchType.EAGER )
+    @JsonIgnore
     private Set<String> sshKeys = new HashSet<>();
 
     @Transient
+    @JsonIgnore
     private EnvironmentId envId;
 
 

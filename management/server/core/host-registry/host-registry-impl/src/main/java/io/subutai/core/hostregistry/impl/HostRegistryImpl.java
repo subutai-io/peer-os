@@ -6,7 +6,15 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import javax.ws.rs.core.Response;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.apache.cxf.jaxrs.client.WebClient;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -16,8 +24,15 @@ import com.google.common.collect.Sets;
 
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.HostInterface;
+import io.subutai.common.host.NullHostInterface;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.QuotaAlertValue;
+import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.settings.SystemSettings;
+import io.subutai.common.util.RestUtil;
+import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hostregistry.api.HostRegistry;
@@ -25,18 +40,31 @@ import io.subutai.core.hostregistry.api.HostRegistryException;
 
 
 /**
- * Implementation of ContainerRegistry
+ * Implementation of HostRegistry
  */
 public class HostRegistryImpl implements HostRegistry
 {
+    private static final Logger LOG = LoggerFactory.getLogger( HostRegistryImpl.class.getName() );
+
     private static final String HOST_NOT_CONNECTED_MSG = "Host %s is not connected";
     //timeout after which host expires in seconds
-    private static final int hostExpiration = 40;
+    private static final int HOST_EXPIRATION_SEC = 30;
+    private static final long HOST_UPDATER_INTERVAL_SEC = 10;
 
     protected Set<HostListener> hostListeners =
             Collections.newSetFromMap( new ConcurrentHashMap<HostListener, Boolean>() );
-    protected ExecutorService notifier = Executors.newCachedThreadPool();
+    protected ScheduledExecutorService hostUpdater = Executors.newSingleThreadScheduledExecutor();
+    protected ExecutorService threadPool = Executors.newCachedThreadPool();
     protected Cache<String, ResourceHostInfo> hosts;
+
+
+    @Override
+    public void updateResourceHostEntryTimestamp( final String resourceHostId )
+    {
+        Preconditions.checkNotNull( resourceHostId, " Resource host id is null" );
+
+        hosts.getIfPresent( resourceHostId );
+    }
 
 
     @Override
@@ -198,7 +226,7 @@ public class HostRegistryImpl implements HostRegistry
         //notify listeners
         for ( HostListener listener : hostListeners )
         {
-            notifier.execute( new HostNotifier( listener, info, alerts ) );
+            threadPool.execute( new HostNotifier( listener, info, alerts ) );
         }
     }
 
@@ -206,14 +234,143 @@ public class HostRegistryImpl implements HostRegistry
     public void init() throws HostRegistryException
     {
         hosts = CacheBuilder.newBuilder().
-                expireAfterWrite( hostExpiration, TimeUnit.SECONDS ).
+                expireAfterAccess( HOST_EXPIRATION_SEC, TimeUnit.SECONDS ).
                                     build();
+
+        hostUpdater.scheduleWithFixedDelay( new Runnable()
+        {
+            public void run()
+            {
+                try
+                {
+                    updateHosts();
+                }
+                catch ( Exception e )
+                {
+                    LOG.error( "Error in updater task", e );
+                }
+            }
+        }, HOST_UPDATER_INTERVAL_SEC, HOST_UPDATER_INTERVAL_SEC, TimeUnit.SECONDS );
+    }
+
+
+    protected void updateHosts()
+    {
+        try
+        {
+            checkAndUpdateHosts( getResourceHostsInfo() );
+
+            LocalPeer localPeer = ServiceLocator.getServiceNoCache( LocalPeer.class );
+            if ( localPeer != null )
+            {
+                checkAndUpdateHosts( Sets.<ResourceHostInfo>newHashSet( localPeer.getResourceHosts() ) );
+            }
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error checking hosts", e );
+        }
+    }
+
+
+    protected void checkAndUpdateHosts( Set<ResourceHostInfo> resourceHosts )
+    {
+        for ( final ResourceHostInfo resourceHostInfo : resourceHosts )
+        {
+            threadPool.execute( new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        updateHost( resourceHostInfo );
+                    }
+                    catch ( Exception e )
+                    {
+                        //ignore
+                        LOG.error( String.format( "Error checking host %s", resourceHostInfo ), e );
+                    }
+                }
+            } );
+        }
+    }
+
+
+    protected void updateHost( ResourceHostInfo resourceHostInfo )
+    {
+        WebClient webClient = null;
+        try
+        {
+            webClient = getWebClient( resourceHostInfo, "ping" );
+
+            Response response = webClient.get();
+
+            if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+            {
+                if ( resourceHostInfo instanceof ResourceHost )
+                {
+                    try
+                    {
+                        getResourceHostInfoById( resourceHostInfo.getId() );
+                    }
+                    catch ( HostDisconnectedException e )
+                    {
+                        getWebClient( resourceHostInfo, "heartbeat" ).get();
+                    }
+                }
+                else
+                {
+                    updateResourceHostEntryTimestamp( resourceHostInfo.getId() );
+                }
+            }
+        }
+        finally
+        {
+            RestUtil.closeClient( webClient );
+        }
+    }
+
+
+    protected WebClient getWebClient( ResourceHostInfo resourceHostInfo, String action )
+    {
+        return RestUtil.createWebClient(
+                String.format( "http://%s:%d/%s", getResourceHostIp( resourceHostInfo ), SystemSettings.getAgentPort(),
+                        action ), 2000, 2000, 3 );
+    }
+
+
+    protected String getResourceHostIp( ResourceHostInfo resourceHostInfo )
+    {
+        if ( resourceHostInfo instanceof ResourceHost )
+        {
+            for ( HostInterface hostInterface : ( ( ResourceHost ) resourceHostInfo ).getNetInterfaces() )
+            {
+                if ( SystemSettings.getMgmtInterface().equals( hostInterface.getName() ) )
+                {
+                    return hostInterface.getIp();
+                }
+            }
+
+            throw new RuntimeException( "Network interface not found" );
+        }
+        else
+        {
+            HostInterface hostInterface =
+                    resourceHostInfo.getHostInterfaces().findByName( SystemSettings.getMgmtInterface() );
+            if ( hostInterface instanceof NullHostInterface )
+            {
+                throw new RuntimeException( "Network interface not found" );
+            }
+            return hostInterface.getIp();
+        }
     }
 
 
     public void dispose()
     {
         hosts.invalidateAll();
-        notifier.shutdown();
+        threadPool.shutdown();
+        hostUpdater.shutdown();
     }
 }

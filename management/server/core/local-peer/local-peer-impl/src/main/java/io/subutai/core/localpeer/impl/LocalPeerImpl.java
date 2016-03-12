@@ -150,8 +150,6 @@ import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
-import io.subutai.core.repository.api.RepositoryException;
-import io.subutai.core.repository.api.RepositoryManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
@@ -168,7 +166,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public static final String PEER_SUBNET_MASK = "255.255.255.0";
     private static final String GATEWAY_INTERFACE_NAME_REGEX = "^br-(\\d+)$";
     private static final Pattern GATEWAY_INTERFACE_NAME_PATTERN = Pattern.compile( GATEWAY_INTERFACE_NAME_REGEX );
-    public static final String CLONING_FORMAT = "Cloning %s...%s";
 
     private DaoManager daoManager;
     private TemplateManager templateRegistry;
@@ -507,120 +504,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         LOG.debug( "New container host registered: " + containerHostEntity.getHostname() );
     }
-
-
-    //       @RolesAllowed( "Environment-Management|Write" )
-    //    @Override
-    //    public void createEnvironmentContainerGroup(
-    //            final CreateEnvironmentContainerGroupRequest request ) throws PeerException
-    //    {
-    //        Preconditions.checkNotNull( request );
-    //
-    //        SubnetUtils cidr;
-    //        try
-    //        {
-    //            cidr = new SubnetUtils( request.getSubnetCidr() );
-    //        }
-    //        catch ( IllegalArgumentException e )
-    //        {
-    //            throw new PeerException( "Failed to parse subnet CIDR", e );
-    //        }
-    //
-    //        final ResourceHost resourceHost = getResourceHostById( request.getHost() );
-    //        Set<String> containerDistribution = generateCloneNames( request.getTemplateName(), 1 );
-    //        final String networkPrefix = cidr.getInfo().getCidrSignature().split( "/" )[1];
-    //        String[] allAddresses = cidr.getInfo().getAllAddresses();
-    ////        String gateway = cidr.getInfo().getLowAddress();
-    //        int currentIpAddressOffset = 0;
-    //        final Vni environmentVni = findVniByEnvironmentId( request.getEnvironmentId() );
-    //
-    //        if ( environmentVni == null )
-    //        {
-    //            throw new PeerException(
-    //                    String.format( "No reserved vni found for environment %s", request.getEnvironmentId() ) );
-    //        }
-    //
-    ////        Set<ContainerHostInfoModel> result = Sets.newHashSet();
-    //
-    //        ContainerQuota containerQuota = quotaManager.getDefaultContainerQuota( request.getContainerSize() );
-    //        if ( containerQuota == null )
-    //        {
-    //            LOG.warn( "Quota not found for container type: " + request.getContainerSize() );
-    //            containerQuota = quotaManager.getDefaultContainerQuota( ContainerSize.SMALL );
-    //        }
-    //
-    //        final TemplateKurjun template = getTemplateByName( request.getTemplateName() );
-    //        ExecutorService taskExecutor = getExecutor( containerDistribution.size() );
-    //        CompletionService<ContainerHostInfo> taskCompletionService = getCompletionService( taskExecutor );
-    //
-    //        for ( final String cloneName : containerDistribution )
-    //        {
-    //            final String ipAddress = allAddresses[request.getIpAddressOffset() + currentIpAddressOffset];
-    //
-    //            //TODO create a separate class out of this anonymous
-    //            taskCompletionService.submit( new Callable<ContainerHostInfo>()
-    //            {
-    //                @Override
-    //                public ContainerHostInfo call() throws Exception
-    //                {
-    //                    try
-    //                    {
-    //                        //TODO add quota switch to clone binding
-    //                        quotaManager.getDefaultContainerQuota( request.getContainerSize() );
-    //                        ContainerHostInfo hostInfo = resourceHost.createContainer( request.getTemplateName(),
-    // cloneName,
-    //                                quotaManager.getDefaultContainerQuota( request.getContainerSize() ),
-    //                                String.format( "%s/%s", ipAddress, networkPrefix ), environmentVni.getVlan(),
-    //                                Common.WAIT_CONTAINER_CONNECTION_SEC, request.getEnvironmentId() );
-    //
-    //
-    //                        ContainerHostEntity containerHostEntity =
-    //                                new ContainerHostEntity( getId(), hostInfo, template.getName(),
-    //                                        template.getArchitecture() );
-    //                        containerHostEntity.setEnvironmentId( request.getEnvironmentId() );
-    //                        containerHostEntity.setOwnerId( request.getOwnerId() );
-    //                        containerHostEntity.setInitiatorPeerId( request.getInitiatorPeerId() );
-    //                        containerHostEntity.setContainerSize( request.getContainerSize() );
-    //
-    //                        resourceHost.addContainerHost( containerHostEntity );
-    //
-    //                        signContainerKeyWithPEK( containerHostEntity.getId(), containerHostEntity
-    // .getEnvironmentId() );
-    //
-    //                        resourceHostDataService.saveOrUpdate( resourceHost );
-    //
-    //                        return hostInfo;
-    //                    }
-    //                    catch ( ResourceHostException e )
-    //                    {
-    //                        LOG.error( "Error creating container", e );
-    //                    }
-    //                    return null;
-    //                }
-    //            } );
-    //
-    //            currentIpAddressOffset++;
-    //        }
-    //
-    //        for ( String ignored : containerDistribution )
-    //        {
-    //            try
-    //            {
-    //                Future<ContainerHostInfo> futures = taskCompletionService.take();
-    //                ContainerHostInfo hostInfo = futures.get();
-    //                if ( hostInfo != null )
-    //                {
-    //                    result.add( new ContainerHostInfoModel( hostInfo ) );
-    //                }
-    //            }
-    //            catch ( ExecutionException | InterruptedException e )
-    //            {
-    //
-    //            }
-    //        }
-    //
-    //
-    //    }
 
 
     private void signContainerKeyWithPEK( String containerId, EnvironmentId envId ) throws PeerException
@@ -2199,19 +2082,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    protected RepositoryManager getRepositoryManager() throws PeerException
-    {
-        try
-        {
-            return serviceLocator.getService( RepositoryManager.class );
-        }
-        catch ( NamingException e )
-        {
-            throw new PeerException( e );
-        }
-    }
-
-
     protected NetworkManager getNetworkManager() throws PeerException
     {
         try
@@ -2264,39 +2134,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    public void addRepository( final String ip ) throws PeerException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( ip ) );
-
-        try
-        {
-            getRepositoryManager().addRepository( ip );
-        }
-        catch ( RepositoryException e )
-        {
-            //            throw new PeerException( "Error adding repository", e );
-            LOG.error( "Error adding repository", e );
-        }
-    }
-
-
-    public void removeRepository( final String host, final String ip ) throws PeerException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( host ) );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( ip ) );
-
-        try
-        {
-            getRepositoryManager().removeRepository( ip );
-        }
-        catch ( RepositoryException e )
-        {
-            //            throw new PeerException( "Error removing repository", e );
-            LOG.error( "Error removing repository", e );
-        }
-    }
-
-
     @RolesAllowed( "Environment-Management|Write" )
     @Override
     public int setupTunnels( final Map<String, String> peerIps, final String environmentId ) throws PeerException
@@ -2326,15 +2163,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             throw new PeerException( "Error setting up tunnels", e.getCause() );
         }
     }
-
-
-    //    @Override
-    //    public Vni findVniByEnvironmentId( String environmentId ) throws PeerException
-    //    {
-    //        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ) );
-    //
-    //        return getReservedVnis().findVniByEnvironmentId( environmentId );
-    //    }
 
 
     @Override

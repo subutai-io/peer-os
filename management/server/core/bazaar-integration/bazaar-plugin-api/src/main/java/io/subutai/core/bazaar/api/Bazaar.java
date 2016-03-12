@@ -14,5 +14,5 @@ public interface Bazaar
 
 	void installPlugin (String name, String version, String kar, String url, String uid) throws HubPluginException;
 
-	void uninstallPlugin (Long id, String kar);
+	void uninstallPlugin (Long id, String kar, String name);
 }

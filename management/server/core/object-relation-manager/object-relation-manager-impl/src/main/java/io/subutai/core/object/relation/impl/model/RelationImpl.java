@@ -20,9 +20,6 @@ import io.subutai.core.object.relation.api.model.Relation;
 import io.subutai.core.object.relation.api.model.RelationStatus;
 
 
-/**
- * Created by talas on 12/8/15.
- */
 @Entity
 @Table( name = "relation" )
 @Access( AccessType.FIELD )

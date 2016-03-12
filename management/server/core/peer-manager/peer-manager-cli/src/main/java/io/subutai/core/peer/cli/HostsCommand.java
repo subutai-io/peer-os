@@ -41,13 +41,8 @@ public class HostsCommand extends SubutaiShellCommandSupport
     protected Object doExecute() throws Exception
     {
 
-        //User user = identityManager.getUser();
-
         LocalPeer localPeer = peerManager.getLocalPeer();
 
-
-        //System.out.println( String.format( "Current user %s. Time: %s", user.getUsername(),
-        //fmt.format( System.currentTimeMillis() ) ) );
         System.out.println( "List of hosts in local peer:" );
         for ( ResourceHost resourceHost : localPeer.getResourceHosts() )
         {
@@ -72,9 +67,20 @@ public class HostsCommand extends SubutaiShellCommandSupport
 
         System.out
                 .println( String.format( "%s+--%s %s %s", padding, host.getHostname(), host.getId(), containerInfo ) );
+
+
         for ( HostInterface hostInterface : host.getHostInterfaces().getAll() )
         {
             System.out.println( String.format( "\t%s %s", hostInterface.getName(), hostInterface.getIp() ) );
+        }
+
+        if ( host instanceof ResourceHost && host.getHostInterfaces().getAll().isEmpty() )
+        {
+
+            for ( HostInterface hostInterface : ( ( ResourceHost ) host ).getNetInterfaces() )
+            {
+                System.out.println( String.format( "\t%s %s", hostInterface.getName(), hostInterface.getIp() ) );
+            }
         }
     }
 }

@@ -25,6 +25,7 @@ public class ConfigDataServiceImpl implements ConfigDataService
     private DaoManager daoManager;
     private IdentityManager identityManager;
 
+
     public ConfigDataServiceImpl( final DaoManager daoManager, final IdentityManager identityManager )
     {
         this.daoManager = daoManager;
@@ -33,15 +34,13 @@ public class ConfigDataServiceImpl implements ConfigDataService
 
 
     @Override
-    public void saveDetails( final String name, final String version, final String pathToKar/*, final Long userId, final Long roleId, final String token */)
+    public void saveDetails( final String name, final String version, final String pathToKar/*, final Long userId,
+    final Long roleId, final String token */ )
     {
         PluginDetails pluginDetails = new PluginDetailsEntity();
         pluginDetails.setName( name );
         pluginDetails.setVersion( version );
         pluginDetails.setKar( pathToKar );
-//        pluginDetails.setUserId( userId );
-//        pluginDetails.setRoleId( roleId );
-//        pluginDetails.setToken( token );
 
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
 
@@ -64,7 +63,7 @@ public class ConfigDataServiceImpl implements ConfigDataService
 
 
     @Override
-    public List<PluginDetails> getInstalledPlugins( )
+    public List<PluginDetails> getInstalledPlugins()
     {
         List<PluginDetails> result = Lists.newArrayList();
 
@@ -102,8 +101,6 @@ public class ConfigDataServiceImpl implements ConfigDataService
 
             if ( karFile.delete() )
             {
-//                identityManager.removeUser( entity.getUserId() );
-//                identityManager.removeRole( entity.getRoleId() );
                 em.remove( entity );
                 em.flush();
                 daoManager.commitTransaction( em );

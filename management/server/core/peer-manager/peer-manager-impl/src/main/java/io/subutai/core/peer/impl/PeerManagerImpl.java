@@ -90,9 +90,6 @@ public class PeerManagerImpl implements PeerManager
     private static final String KURJUN_URL_PATTERN = "https://%s:%s/rest/kurjun";
     final int MAX_CONTAINER_LIMIT = 20;
     final int MAX_ENVIRONMENT_LIMIT = 20;
-
-
-    //    protected PeerDAO peerDAO;
     protected PeerDataService peerDataService;
     protected LocalPeer localPeer;
     protected Messenger messenger;
@@ -106,17 +103,14 @@ public class PeerManagerImpl implements PeerManager
     private TemplateManager templateManager;
     private IdentityManager identityManager;
     private Map<String, Peer> peers = new ConcurrentHashMap<>();
-    //    private Map<String, PeerPolicy> policies = new ConcurrentHashMap<>();
     private ObjectMapper mapper = new ObjectMapper();
     private String localPeerId;
     private String ownerId;
     private RegistrationClient registrationClient;
     protected ScheduledExecutorService backgroundTasksExecutorService;
-    private String publicUrl;
 
     private String controlNetwork;
     private long controlNetworkTtl = 0;
-    private String externalInterfaceName;
     private PingDistances distances;
 
 
@@ -181,7 +175,6 @@ public class PeerManagerImpl implements PeerManager
 
             for ( PeerData peerData : this.peerDataService.getAll() )
             {
-                //                PeerInfo peerInfo = mapper.readValue( peerData.getInfo(), PeerInfo.class );
                 Peer peer = createPeer( peerData );
                 addPeer( peer );
             }
@@ -197,18 +190,6 @@ public class PeerManagerImpl implements PeerManager
     {
         commandResponseListener.dispose();
         backgroundTasksExecutorService.shutdown();
-    }
-
-
-    public void setPublicUrl( final String publicUrl )
-    {
-        this.publicUrl = publicUrl;
-    }
-
-
-    public void setExternalInterfaceName( final String externalInterfaceName )
-    {
-        this.externalInterfaceName = externalInterfaceName;
     }
 
 
@@ -422,7 +403,6 @@ public class PeerManagerImpl implements PeerManager
 
         try
         {
-            //            mgmHost.removeRepository( p.getId(), p.getIp() );
             templateManager.removeRemoteRepository( new URL(
                     String.format( KURJUN_URL_PATTERN, registrationData.getPeerInfo().getIp(),
                             SystemSettings.getSecurePortX1() ) ) );
@@ -431,7 +411,6 @@ public class PeerManagerImpl implements PeerManager
         {
             throw new PeerException( "Could not unregister peer.", e );
         }
-        //        return peerDAO.deleteInfo( SOURCE_REMOTE_PEER, p.getId() );
         removePeerData( registrationData.getPeerInfo().getId() );
         removePeer( registrationData.getPeerInfo().getId() );
     }
@@ -636,7 +615,6 @@ public class PeerManagerImpl implements PeerManager
                 {
                     LOG.warn( e.getMessage(), e );
                 }
-                //                result.setCert( cert );
                 break;
         }
         return result;
@@ -734,8 +712,7 @@ public class PeerManagerImpl implements PeerManager
             register( keyPhrase, request );
 
             removeRequest( request.getPeerInfo().getId() );
-            securityManager.getKeyManager()
-                           .getRemoteHostPublicKey( /*request.getPeerInfo().getId(),*/ request.getPeerInfo() );
+            securityManager.getKeyManager().getRemoteHostPublicKey( request.getPeerInfo() );
         }
         catch ( Exception e )
         {
@@ -754,8 +731,6 @@ public class PeerManagerImpl implements PeerManager
         {
             registrationClient.sendRejectRequest( request.getPeerInfo().getPublicUrl(),
                     buildRegistrationData( request.getKeyPhrase(), RegistrationStatus.REJECTED ) );
-
-            //            removeRequest( request.getPeerInfo().getId() );
         }
         catch ( Exception e )
         {
@@ -789,7 +764,6 @@ public class PeerManagerImpl implements PeerManager
         catch ( Exception e )
         {
             LOG.warn( e.getMessage(), e );
-            //            throw new PeerException( e.getMessage() );
         }
 
         unregister( request );

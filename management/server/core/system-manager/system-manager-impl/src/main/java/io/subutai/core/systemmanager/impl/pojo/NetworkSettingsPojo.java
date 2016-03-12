@@ -4,14 +4,25 @@ package io.subutai.core.systemmanager.impl.pojo;
 import io.subutai.core.systemmanager.api.pojo.NetworkSettings;
 
 
-/**
- * Created by ermek on 2/9/16.
- */
 public class NetworkSettingsPojo implements NetworkSettings
 {
     public int securePortX1;
     public int securePortX2;
     public int securePortX3;
+    public String publicUrl;
+    public int agentPort;
+
+
+    public int getAgentPort()
+    {
+        return agentPort;
+    }
+
+
+    public void setAgentPort( final int agentPort )
+    {
+        this.agentPort = agentPort;
+    }
 
 
     public String getPublicUrl()
@@ -24,9 +35,6 @@ public class NetworkSettingsPojo implements NetworkSettings
     {
         this.publicUrl = publicUrl;
     }
-
-
-    public String publicUrl;
 
 
     public int getSecurePortX1()

@@ -26,9 +26,6 @@ import io.subutai.hub.share.json.JsonUtil;
 import jstun.DiscoveryNAT;
 
 
-/**
- * Created by ${Zubaidullo} on 11/20/15.
- */
 public class ResourceHostConfProcessor implements Runnable
 {
     private static final Logger LOG = LoggerFactory.getLogger( ResourceHostConfProcessor.class );

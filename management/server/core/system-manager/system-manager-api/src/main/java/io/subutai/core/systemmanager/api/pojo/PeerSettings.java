@@ -1,9 +1,6 @@
 package io.subutai.core.systemmanager.api.pojo;
 
 
-/**
- * Created by ermek on 2/11/16.
- */
 public interface PeerSettings
 {
     public String getPeerOwnerId();

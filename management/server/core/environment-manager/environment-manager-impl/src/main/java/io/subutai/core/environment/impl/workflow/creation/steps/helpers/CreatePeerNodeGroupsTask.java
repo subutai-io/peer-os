@@ -18,7 +18,6 @@ import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.task.CloneRequest;
-import io.subutai.common.util.ExceptionUtil;
 
 
 public class CreatePeerNodeGroupsTask implements Callable<CreateEnvironmentContainerResponseCollector>
@@ -30,9 +29,6 @@ public class CreatePeerNodeGroupsTask implements Callable<CreateEnvironmentConta
     private final LocalPeer localPeer;
     private final Environment environment;
     private final int ipAddressOffset;
-    //    private final TemplateManager templateRegistry;
-    //    private final String defaultDomain;
-    protected ExceptionUtil exceptionUtil = new ExceptionUtil();
 
 
     public CreatePeerNodeGroupsTask( final Peer peer, final LocalPeer localPeer, final Environment environment,

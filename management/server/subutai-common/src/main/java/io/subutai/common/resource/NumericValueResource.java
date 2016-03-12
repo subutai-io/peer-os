@@ -71,4 +71,15 @@ public class NumericValueResource implements ResourceValue<BigDecimal>
             return false;
         }
     }
+
+
+    @Override
+    public String toString()
+    {
+        final StringBuffer sb = new StringBuffer( "NumericValueResource{" );
+        sb.append( "value=" ).append( value );
+        sb.append( ", allocatedValue=" ).append( allocatedValue );
+        sb.append( '}' );
+        return sb.toString();
+    }
 }

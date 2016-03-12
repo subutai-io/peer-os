@@ -58,32 +58,6 @@ public class StrategyManagerImpl implements StrategyManager
     }
 
 
-//    @Override
-//    public Map<ResourceHostMetric, Integer> getPlacementDistribution( ResourceHostMetrics serverMetrics,
-//                                                                      int nodesCount, String strategyId,
-//                                                                      List<Criteria> criteria ) throws StrategyException
-//    {
-//        ContainerPlacementStrategy containerPlacementStrategy = findStrategyById( strategyId );
-//
-//        containerPlacementStrategy.calculatePlacement( nodesCount, serverMetrics, criteria );
-//
-//        Map<ResourceHostMetric, Integer> result = containerPlacementStrategy.getPlacementDistribution();
-//        int totalSlots = 0;
-//
-//        for ( int slotCount : result.values() )
-//        {
-//            totalSlots += slotCount;
-//        }
-//
-//        if ( totalSlots < nodesCount )
-//        {
-//            throw new StrategyException( String.format( "Only %d containers can be created", totalSlots ) );
-//        }
-//
-//        return result;
-//    }
-
-
     @Override
     public ContainerPlacementStrategy findStrategyById( String strategyId ) throws StrategyNotFoundException
     {
@@ -103,9 +77,10 @@ public class StrategyManagerImpl implements StrategyManager
         return placementStrategy;
     }
 
+
     public List<String> getPlacementStrategyTitles()
     {
-        return this.getPlacementStrategies().stream().filter( n -> Strings.isNullOrEmpty( n.getId() ) == false ).map( n -> n.getId() ).collect(
-                Collectors.toList() );
+        return this.getPlacementStrategies().stream().filter( n -> Strings.isNullOrEmpty( n.getId() ) == false )
+                   .map( n -> n.getId() ).collect( Collectors.toList() );
     }
 }

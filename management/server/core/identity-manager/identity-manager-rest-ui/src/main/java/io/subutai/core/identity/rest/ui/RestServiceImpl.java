@@ -178,7 +178,7 @@ public class RestServiceImpl implements RestService
             {
 
 
-                if( username.toLowerCase().contains( "sys" ) || username.toLowerCase().contains( "admin" ) )
+                if( username.toLowerCase().indexOf( "sys" ) == 0 || username.toLowerCase().indexOf( "admin" ) == 0 )
                 {
                     LOGGER.warn( "#saveUser forbidden, username is reserved" );
                     return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( JsonUtil.toJson( "User name is reserved by the system." ) ).build();

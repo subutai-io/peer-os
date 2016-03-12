@@ -30,6 +30,7 @@ import io.subutai.common.security.crypto.keystore.KeyStoreType;
 import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.settings.Common;
+import io.subutai.common.settings.SystemSettings;
 import io.subutai.core.hubmanager.api.dao.ConfigDataService;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
@@ -72,8 +73,8 @@ public class ConfigManager
     private String hubIp;
 
 
-    public ConfigManager( final SecurityManager securityManager, final PeerManager peerManager,
-                          final String peerSecretKeyringPwd, final ConfigDataService configDataService )
+    public ConfigManager( final SecurityManager securityManager, final PeerManager peerManager, final
+    ConfigDataService configDataService )
             throws IOException, PGPException, KeyStoreException, CertificateException, NoSuchAlgorithmException
     {
         this.peerManager = peerManager;
@@ -84,7 +85,7 @@ public class ConfigManager
         {
             PGPSecretKeyRing signingKeyRing = PGPKeyUtil.readSecretKeyRing( new FileInputStream( PEER_SECRET_KEY ) );
             PGPSecretKey signingKey = signingKeyRing.getSecretKey();
-            this.sender = PGPEncryptionUtil.getPrivateKey( signingKey, peerSecretKeyringPwd );
+            this.sender = PGPEncryptionUtil.getPrivateKey( signingKey, SystemSettings.getPeerSecretKeyringPwd() );
         }
 
         if ( peerId == null )
@@ -101,7 +102,6 @@ public class ConfigManager
 
         if ( ownerPublicKey == null )
         {
-            //            this.ownerPublicKey = securityManager.getKeyManager().getPublicKey( "owner-" + peerId );
             this.ownerPublicKey =
                     securityManager.getKeyManager().getPublicKeyRing( securityManager.getKeyManager().getPeerOwnerId() )
                                    .getPublicKey();

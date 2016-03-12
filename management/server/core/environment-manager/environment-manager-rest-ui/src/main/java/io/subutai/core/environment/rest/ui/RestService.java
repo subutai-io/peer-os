@@ -119,6 +119,7 @@ public interface RestService
 
     @GET
     @Path( "{environmentId}/containers/{containerId}/domain" )
+    @Produces( { MediaType.APPLICATION_JSON } )
     Response isContainerDomain( @PathParam( "environmentId" ) String environmentId,
                                 @PathParam( "containerId" ) String containerId );
 

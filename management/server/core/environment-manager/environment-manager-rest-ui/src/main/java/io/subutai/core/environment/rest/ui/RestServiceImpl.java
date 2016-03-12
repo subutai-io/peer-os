@@ -143,6 +143,8 @@ public class RestServiceImpl implements RestService
 
         try
         {
+            checkName( name );
+
             ContainerPlacementStrategy placementStrategy = strategyManager.findStrategyById( UnlimitedStrategy.ID );
 
             List<NodeSchema> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<NodeSchema>>() {}.getType() );
@@ -157,7 +159,8 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
-            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
+            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, (e.getMessage() == null ?
+                    "Internal error" : e.getMessage()) ) ).build();
         }
 
         return Response.ok( JsonUtil.toJson( eventId ) ).build();
@@ -171,6 +174,8 @@ public class RestServiceImpl implements RestService
 
         try
         {
+            checkName( name );
+
             List<Node> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<Node>>() {}.getType() );
 
             Topology topology = new Topology( name, 0, 0 );
@@ -384,7 +389,7 @@ public class RestServiceImpl implements RestService
         try
         {
             DomainLoadBalanceStrategy strategy = JsonUtil.fromJson( strategyJson, DomainLoadBalanceStrategy.class );
-            if ( attr == null )
+            if ( attr == null && attr.getDataHandler().getContent() == null )
             {
                 throw new Exception( "Error, cannot read an attachment", null );
             }
@@ -426,7 +431,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            return Response.ok( environmentManager.isContainerInEnvironmentDomain( containerId, environmentId ) )
+            return Response.ok( JsonUtil.toJson( environmentManager.isContainerInEnvironmentDomain( containerId, environmentId ) ) )
                            .build();
         }
         catch ( Exception e )
@@ -829,5 +834,13 @@ public class RestServiceImpl implements RestService
                     containerHost.getPeerId(), rhId ) );
         }
         return containerDtos;
+    }
+
+    private void checkName( final String name ) throws Exception
+    {
+        if( environmentManager.getEnvironments().stream().filter( e -> e.getName().equals(name) ).count() > 0 )
+        {
+            throw new Exception("Duplicated environment name");
+        }
     }
 }

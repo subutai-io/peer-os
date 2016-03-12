@@ -7,11 +7,9 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/pem"
-	"git.eclipse.org/gitroot/paho/org.eclipse.paho.mqtt.golang.git"
-	"github.com/subutai-io/Subutai/agent/agent/connect"
-	"github.com/subutai-io/Subutai/agent/agent/utils"
-	"github.com/subutai-io/Subutai/agent/config"
-	"github.com/subutai-io/Subutai/agent/log"
+	"github.com/subutai-io/base/agent/agent/connect"
+	"github.com/subutai-io/base/agent/config"
+	"github.com/subutai-io/base/agent/log"
 	"io/ioutil"
 	"math/big"
 	"os"
@@ -116,25 +114,4 @@ func newTLSConfig() *tls.Config {
 		InsecureSkipVerify: true,
 		Certificates:       []tls.Certificate{cert},
 	}
-}
-
-func InitClientOptions(host, port, user, secret string) *mqtt.ClientOptions {
-	log.Debug("Initializing MQTT client options")
-	tlsconfig := newTLSConfig()
-	for tlsconfig == nil || len(tlsconfig.Certificates[0].Certificate) == 0 {
-		for utils.PublicCert() == "" {
-			x509generate()
-		}
-		tlsconfig = newTLSConfig()
-		time.Sleep(time.Second * 2)
-	}
-	connect.Connect(host, port, user, secret)
-
-	hostname, _ := os.Hostname()
-	opts := mqtt.NewClientOptions()
-	opts.AddBroker(config.Broker.Url + ":" + config.Broker.Port)
-	opts.SetPassword(config.Broker.Password)
-	opts.SetClientID(hostname).SetTLSConfig(tlsconfig)
-
-	return opts
 }

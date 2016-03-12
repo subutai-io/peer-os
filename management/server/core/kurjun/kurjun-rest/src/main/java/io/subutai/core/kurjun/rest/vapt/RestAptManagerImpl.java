@@ -30,7 +30,7 @@ public class RestAptManagerImpl extends RestManagerBase implements RestAptManage
     private static final Logger LOGGER = LoggerFactory.getLogger( RestAptManagerImpl.class );
 
     private final AptManager aptManager;
-    
+
 
     public RestAptManagerImpl( AptManager aptManager )
     {
@@ -44,8 +44,8 @@ public class RestAptManagerImpl extends RestManagerBase implements RestAptManage
         try
         {
             String releaseIndex = aptManager.getRelease( release, null, null );
-            return ( releaseIndex != null ) ? Response.ok( releaseIndex ).build()
-                    : notFoundResponse( "Release not found." );
+            return ( releaseIndex != null ) ? Response.ok( releaseIndex ).build() :
+                   notFoundResponse( "Release not found." );
         }
         catch ( Exception e )
         {
@@ -94,8 +94,8 @@ public class RestAptManagerImpl extends RestManagerBase implements RestAptManage
                 {
                     DefaultPackageMetadata pm = MetadataUtils.JSON.fromJson( serialized, DefaultPackageMetadata.class );
                     return Response.ok( is )
-                            .header( "Content-Disposition", "attachment; filename=" + makePackageFilename( pm ) )
-                            .header( "Content-Type", "application/octet-stream" ).build();
+                                   .header( "Content-Disposition", "attachment; filename=" + makePackageFilename( pm ) )
+                                   .header( "Content-Type", "application/octet-stream" ).build();
                 }
             }
         }
@@ -110,10 +110,6 @@ public class RestAptManagerImpl extends RestManagerBase implements RestAptManage
     @Override
     public Response upload( Attachment attachment )
     {
-        //        if ( checkAuthentication( Permission.ADD_PACKAGE ) )
-        //        {
-        //            return forbiddenResponse();
-        //        }
 
         File temp = null;
         try
@@ -145,10 +141,6 @@ public class RestAptManagerImpl extends RestManagerBase implements RestAptManage
     @Override
     public Response getPackageInfo( String md5, String name, String version )
     {
-        //        if ( checkAuthentication( Permission.GET_PACKAGE ) )
-        //        {
-        //            return forbiddenResponse();
-        //        }
 
         String str = aptManager.getPackageInfo( decodeMd5( md5 ), name, version );
 
@@ -163,10 +155,6 @@ public class RestAptManagerImpl extends RestManagerBase implements RestAptManage
     @Override
     public Response getPackage( String md5 )
     {
-        //        if ( checkAuthentication( Permission.GET_PACKAGE ) )
-        //        {
-        //            return forbiddenResponse();
-        //        }
 
         String serialized = aptManager.getSerializedPackageInfo( decodeMd5( md5 ) );
 
@@ -178,8 +166,8 @@ public class RestAptManagerImpl extends RestManagerBase implements RestAptManage
             {
                 DefaultPackageMetadata pm = MetadataUtils.JSON.fromJson( serialized, DefaultPackageMetadata.class );
                 return Response.ok( is )
-                        .header( "Content-Disposition", "attachment; filename=" + makePackageFilename( pm ) )
-                        .header( "Content-Type", "application/octet-stream" ).build();
+                               .header( "Content-Disposition", "attachment; filename=" + makePackageFilename( pm ) )
+                               .header( "Content-Type", "application/octet-stream" ).build();
             }
         }
         return packageNotFoundResponse();
@@ -199,7 +187,6 @@ public class RestAptManagerImpl extends RestManagerBase implements RestAptManage
         byte[] md5bytes = decodeMd5( md5 );
         if ( md5bytes != null )
         {
-            String err = "Failed to delete apt package";
             try
             {
                 boolean deleted = aptManager.delete( md5bytes );
@@ -207,10 +194,14 @@ public class RestAptManagerImpl extends RestManagerBase implements RestAptManage
                 {
                     return Response.ok( "Apt package deleted" ).build();
                 }
-                return Response.serverError().entity( err ).build();
+                else
+                {
+                    return packageNotFoundResponse();
+                }
             }
             catch ( IOException ex )
             {
+                String err = "Failed to delete apt package";
                 LOGGER.error( err, ex );
                 return Response.serverError().entity( err ).build();
             }
@@ -230,11 +221,6 @@ public class RestAptManagerImpl extends RestManagerBase implements RestAptManage
     }
 
 
-    //    @Override
-    //    protected AuthManager getAuthManager()
-    //    {
-    //        return authManager;
-    //    }
     @Override
     protected Logger getLogger()
     {

@@ -1,4 +1,4 @@
-<div class="b-popup b-popup_middle">
+<div class="b-popup b-popup_auto-width">
 	<div class="b-popup__header">
 		Build Environment
 		<a href ng-click="closeThisDialog()" class="b-popup-header-controls"><i class="fa fa-times"></i></a>
@@ -43,7 +43,7 @@
 	</div>
 
 	<div class="b-popup__body" ng-if="environmentSimpleViewCtrl.buildStep == 'showLogs'">
-		<table class="b-main-table b-main-table_none-border g-margin-bottom-half">
+		<table class="b-main-table b-main-table_none-border b-main-table_logs g-margin-bottom-half">
 			<tr ng-repeat="(key, log) in environmentSimpleViewCtrl.logMessages">
 				<td>{{ log.time }}</td>
 				<td class="b-main-table__mini-icon"><i class="fa" ng-class="log.classes"></i></td>

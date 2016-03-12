@@ -452,20 +452,22 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 							}
 						}
 						installPluginDependencies (arr, function() {
-							BazaarSrv.installHubPlugin (plugin).success (function (data) {
-								setTimeout (function() {
-									progress = 1;
-									instance.stop (1);
-									clearInterval (interval);
+							setTimeout (function() {
+								BazaarSrv.installHubPlugin (plugin).success (function (data) {
 									setTimeout (function() {
-										localStorage.setItem ("bazaarScroll", plugin.id);
-										$rootScope.$emit('reloadPluginsStates');
+										progress = 1;
+										instance.stop (1);
+										clearInterval (interval);
+										setTimeout (function() {
+											localStorage.setItem ("bazaarScroll", plugin.id);
+											$rootScope.$emit('reloadPluginsStates');
+										}, 2000);
 									}, 2000);
-								}, 2000);
-							}).error (function (error) {
-								instance.stop (-1);
-								clearInterval (interval);
-							});
+								}).error (function (error) {
+									instance.stop (-1);
+									clearInterval (interval);
+								});
+							}, 2000);
 						});
 					}
 					else {
@@ -532,6 +534,17 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 				clearInterval (interval);
 			});
 		};
+	}
+
+	vm.uninstallPluginWOButton = uninstallPluginWOButton;
+	function uninstallPluginWOButton (plugin) {
+		LOADING_SCREEN();
+		BazaarSrv.uninstallHubPluginWOButton (plugin).success (function (data) {
+			LOADING_SCREEN('none');
+			SweetAlert.swal ("Success!", "Your plugin was uninstalled.", "success");
+		}).error (function (error) {
+			SweetAlert.swal ("ERROR!", "Plugin uninstall error: " + error.replace(/\\n/g, " "), "error");
+		});
 	}
 
 	vm.redirectToPlugin = redirectToPlugin;

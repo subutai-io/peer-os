@@ -29,7 +29,6 @@ public class PluginDAOImpl implements PluginDAO
 
     private static final Logger LOG = LoggerFactory.getLogger( PluginDAOImpl.class.getName() );
     private Gson gson = new GsonBuilder().serializeNulls().setPrettyPrinting().disableHtmlEscaping().create();
-    //private EmfUtil emfUtil = new EmfUtil();
     private PluginDataService dataService;
     private EntityManagerFactory entityManagerFactory = null;
 

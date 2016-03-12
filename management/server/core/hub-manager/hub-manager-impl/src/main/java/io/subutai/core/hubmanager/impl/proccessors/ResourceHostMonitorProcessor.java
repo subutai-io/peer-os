@@ -25,9 +25,6 @@ import io.subutai.hub.share.dto.ResourceHostMonitorDto;
 import io.subutai.hub.share.json.JsonUtil;
 
 
-/**
- * Created by ${Zubaidullo} on 11/20/15.
- */
 public class ResourceHostMonitorProcessor implements Runnable
 {
     private static final Logger LOG = LoggerFactory.getLogger( ResourceHostMonitorProcessor.class );

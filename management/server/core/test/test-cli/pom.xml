@@ -21,10 +21,6 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>broker-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
       <artifactId>cli-controller</artifactId>
     </dependency>
     <dependency>
@@ -33,7 +29,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>sol-appender</artifactId>
+      <artifactId>subutai-appender</artifactId>
     </dependency>
   </dependencies>
 

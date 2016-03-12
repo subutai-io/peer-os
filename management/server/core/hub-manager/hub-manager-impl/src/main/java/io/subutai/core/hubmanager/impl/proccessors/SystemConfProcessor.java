@@ -28,9 +28,6 @@ import io.subutai.hub.share.dto.SystemConfDto;
 import io.subutai.hub.share.json.JsonUtil;
 
 
-/**
- * Created by ${Zubaidullo} on 21/01/16.
- */
 public class SystemConfProcessor implements StateLinkProccessor
 {
     private static final Logger LOG = LoggerFactory.getLogger( SystemConfProcessor.class.getName() );
@@ -111,7 +108,7 @@ public class SystemConfProcessor implements StateLinkProccessor
     {
         switch ( systemConfDto.getKey() )
         {
-            //TODO write casses for System types
+            //TODO write cases for System types
         }
     }
 

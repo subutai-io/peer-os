@@ -55,7 +55,6 @@ public class RegistrationClientImpl implements RegistrationClient
             }
             else
             {
-                //                return response.readEntity( PeerInfo.class );
                 return JsonUtil.fromJson( s, PeerInfo.class );
             }
         }

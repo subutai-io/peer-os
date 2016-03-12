@@ -11,7 +11,7 @@
 					</li>
 				</ul>
 			</div>
-			<div class="b-tools-menu js-scrollbar b-tools-menu_custom-scroll-huc">
+			<div class="b-tools-menu js-scrollbar">
 				<ul>
 					<li ng-repeat="template in environmentSimpleViewCtrl.templates">
 						<span class="b-tools-menu__item" ng-click="environmentSimpleViewCtrl.addContainer(template, $event)">
@@ -25,6 +25,7 @@
 						</span>
 					</li>
 				</ul>
+				<div style="height: 46px;"></div>
 			</div>
 		</div>
 	</div>
@@ -51,6 +52,7 @@
 									<div class="b-form-group__label">Select quota size</div>
 									<select class="b-form-input b-form-input_full" 
 										id="js-container-size" 
+										ng-init="templateSettings.quotaSize = 'SMALL'" 
 										ng-model="templateSettings.quotaSize"
 									>
 										<option 
@@ -113,7 +115,7 @@
 							</td>
 							<td>
 								<span tooltips
-									tooltip-template='<span class="b-nowrap">ID: <b>{{ environment.id }}</b></span>'
+									tooltip-template='<span class="b-nowrap">ID: {{ environment.id }}</span>'
 									tooltip-side="right"
 								>
 									{{ environment.name }}

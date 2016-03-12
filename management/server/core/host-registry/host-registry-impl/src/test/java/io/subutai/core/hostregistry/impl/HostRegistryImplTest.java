@@ -17,10 +17,10 @@ import com.google.common.cache.Cache;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.host.ContainerHostInfo;
+import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostListener;
-import io.subutai.common.host.ResourceHostInfo;
 
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
@@ -41,7 +41,6 @@ public class HostRegistryImplTest
     private static final String CONTAINER_ID = UUID.randomUUID().toString();
     private static final String CONTAINER_HOSTNAME = "container";
     private static final String DUMMY_HOSTNAME = "dummy";
-    private static final int HOST_EXPIRATION = 30;
 
     @Mock
     Set<HostListener> hostListeners;
@@ -49,8 +48,6 @@ public class HostRegistryImplTest
     @Mock
     ExecutorService notifier;
 
-    @Mock
-    HeartBeatListener heartBeatListener;
 
     @Mock
     Cache<String, ResourceHostInfo> hosts;
@@ -75,12 +72,13 @@ public class HostRegistryImplTest
 
     Set<QuotaAlertValue> alerts;
 
+
     @Before
     public void setUp() throws Exception
     {
-        registry = new HostRegistryImpl( );
+        registry = new HostRegistryImpl();
         registry.hostListeners = hostListeners;
-        registry.notifier = notifier;
+        registry.threadPool = notifier;
         registry.hosts = hosts;
         when( hosts.asMap() ).thenReturn( map );
         when( map.values() ).thenReturn( Sets.newHashSet( resourceHostInfo ) );
@@ -95,8 +93,6 @@ public class HostRegistryImplTest
         when( hostListenerIterator.next() ).thenReturn( hostListener );
         alerts = Sets.newHashSet( quotaAlertValue );
     }
-
-
 
 
     @Test
