@@ -11,11 +11,13 @@
 			<div class="b-popup-body b-popup-body_col-2">
 				<label class="b-popup-body-label b-popup-body-label_block">Username:</label>
 				<input type="text"
-					   placeholder="Username"
-					   class="b-popup-body-input b-popup-body-input_full b-popup-body-input_margin-bttm"
-					   ng-model="identityUserFormCtrl.user2Add.userName"
-					   required
-					   ng-readonly="identityUserFormCtrl.editUser">
+					placeholder="Username"
+					class="b-popup-body-input b-popup-body-input_full b-popup-body-input_margin-bttm" 
+					ng-model="identityUserFormCtrl.user2Add.userName" 
+					pattern="(?=^.{4,}$)(^(?!(admin|sys|token)).*)" 
+					title="Min length 4. Can't start with sys, admin and token" 
+					required 
+					ng-readonly="identityUserFormCtrl.editUser">
 
 				<label class="b-popup-body-label b-popup-body-label_block">Full name:</label>
 				<input type="text"
@@ -44,11 +46,13 @@
 
 				<label class="b-popup-body-label b-popup-body-label_block">Password:</label>
 				<input type="password"
-					   placeholder="***********"
-					   class="b-popup-body-input b-popup-body-input_full b-popup-body-input_margin-bttm" 
-					   ng-model="identityUserFormCtrl.user2Add.password"
-					   id="js-password"
-					   ng-required="!identityUserFormCtrl.editUser">
+					placeholder="***********"
+					class="b-popup-body-input b-popup-body-input_full b-popup-body-input_margin-bttm" 
+					ng-model="identityUserFormCtrl.user2Add.password"
+					id="js-password" 
+					pattern="(?=^.{4,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[a-z]).*$" 
+					title="Min length 4. Chars and numbers" 
+					ng-required="!identityUserFormCtrl.editUser">
 
 				<label class="b-popup-body-label b-popup-body-label_block">Confirm password:</label>
 				<input type="password"
