@@ -143,6 +143,8 @@ public class RestServiceImpl implements RestService
 
         try
         {
+            checkName( name );
+
             ContainerPlacementStrategy placementStrategy = strategyManager.findStrategyById( UnlimitedStrategy.ID );
 
             List<NodeSchema> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<NodeSchema>>() {}.getType() );
@@ -172,6 +174,8 @@ public class RestServiceImpl implements RestService
 
         try
         {
+            checkName( name );
+
             List<Node> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<Node>>() {}.getType() );
 
             Topology topology = new Topology( name, 0, 0 );
@@ -830,5 +834,13 @@ public class RestServiceImpl implements RestService
                     containerHost.getPeerId(), rhId ) );
         }
         return containerDtos;
+    }
+
+    private void checkName( final String name ) throws Exception
+    {
+        if( environmentManager.getEnvironments().stream().filter( e -> e.getName().equals(name) ).count() > 0 )
+        {
+            throw new Exception("Duplicated environment name");
+        }
     }
 }
