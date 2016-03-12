@@ -24,6 +24,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.Version;
+import javax.persistence.UniqueConstraint;
 
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.annotate.JsonIgnore;
@@ -68,7 +69,8 @@ import io.subutai.core.object.relation.api.model.RelationMeta;
  * @see ContainerHost
  */
 @Entity
-@Table( name = "env" )
+@Table( name = "env",
+        uniqueConstraints=@UniqueConstraint(columnNames={"name", "user_id"}))
 @Access( AccessType.FIELD )
 @JsonAutoDetect( fieldVisibility = JsonAutoDetect.Visibility.ANY, getterVisibility = JsonAutoDetect.Visibility.NONE,
         setterVisibility = JsonAutoDetect.Visibility.NONE )
