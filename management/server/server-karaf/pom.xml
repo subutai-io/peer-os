@@ -168,7 +168,7 @@
             <feature>jndi</feature>
             <feature>transaction</feature>
             <feature>jdbc</feature>
-            <feature>webconsole</feature>
+            <!--<feature>webconsole</feature> -->
           </bootFeatures>
         </configuration>
         <executions>
@@ -200,7 +200,7 @@
                 <feature>pax-http</feature>
                 <feature>pax-http-whiteboard</feature>
                 <feature>pax-war</feature>
-                <feature>webconsole</feature>
+                <!-- <feature>webconsole</feature> -->
               </features>
               <repository>${assembly.directory}/system</repository>
             </configuration>
