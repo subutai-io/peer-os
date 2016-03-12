@@ -431,7 +431,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            return Response.ok( environmentManager.isContainerInEnvironmentDomain( containerId, environmentId ) )
+            return Response.ok( JsonUtil.toJson( environmentManager.isContainerInEnvironmentDomain( containerId, environmentId ) ) )
                            .build();
         }
         catch ( Exception e )
