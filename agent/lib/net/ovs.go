@@ -3,7 +3,7 @@ package net
 import (
 	"bufio"
 	"bytes"
-	"github.com/subutai-io/Subutai/agent/log"
+	"github.com/subutai-io/base/agent/log"
 	"os/exec"
 	"strconv"
 	"strings"

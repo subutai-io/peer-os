@@ -20,8 +20,8 @@ files=(
 'lib'
 'system'
 'deploy/webui-4.0.0-RC7-SNAPSHOT.war'
-'etc/subutai-mng/git.properties' 
-'etc/subutai-mng/quota.cfg'
+'etc/git.properties'
+'etc/quota.cfg'
 )
 
 for file in "${files[@]}";
@@ -30,12 +30,6 @@ do
 	cp -rf $folder/$file $snappy_repo/subutai-mng/$file; 
 done
 
-
-# for file in 'lib' 'system' 'deploy/webui-4.0.0-RC7-SNAPSHOT.war' 'etc/subutai-mng/git.properties' 'etc/subutai-mng/quota.cfg';
-# do 
-# 	rm -rf $snappy_repo/subutai-mng/$file; 
-# 	cp -rf $folder/$file $snappy_repo/subutai-mng/$file; 
-# done
 
 pushd $snappy_repo
 ./autobuild.sh -t mng -b
