@@ -42,6 +42,11 @@ function SettingsAdvancedCtrl($scope, SettingsAdvancedSrv, SweetAlert, $sce, cfp
 		$scope.$$phase || $scope.$apply();*/
 
 		$scope.$apply();
+
+		$('.terminal-viewport').perfectScrollbar({
+			"wheelPropagation": true,
+			"swipePropagation": false
+		});
 	}, 100);
 
 	$scope.session = {
@@ -109,7 +114,7 @@ function SettingsAdvancedCtrl($scope, SettingsAdvancedSrv, SweetAlert, $sce, cfp
 			$('.js-karaflogs-load-screen').hide();
 		});
 	}
-	getConfig();
+	//getConfig();
 
 	function updateConfig() {
 		SettingsAdvancedSrv.updateConfig(vm.config).success(function (data) {
