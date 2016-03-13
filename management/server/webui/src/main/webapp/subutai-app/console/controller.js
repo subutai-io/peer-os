@@ -52,6 +52,7 @@ function ConsoleViewCtrl($scope, consoleService, peerRegistrationService, $state
 	});
 
 	//Console UI
+	console.log($scope);
 	$scope.theme = 'modern';
 	setTimeout(function () {
 		$scope.$broadcast('terminal-output', {

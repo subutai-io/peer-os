@@ -648,13 +648,9 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
             resolve: {
                 loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
                     return $ocLazyLoad.load([
-                        {
-							files: [
-								'scripts/libs/FileSaver.min.js',
-								'scripts/libs/highlight.pack.js',
-								'css/libs/highlight.default.css',
-							]
-                        },
+						{
+							name: 'vtortola.ng-terminal'
+						},
                         {
                             name: 'subutai.settings-advanced',
                             files: [

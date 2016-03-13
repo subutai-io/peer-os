@@ -46,7 +46,6 @@ public class KarafManagerImpl implements KarafManager
             {
                 try
                 {
-                    System.err.println( commandStr );
                     commandSession.execute( commandStr );
                 }
                 catch ( Exception e )
