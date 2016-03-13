@@ -201,7 +201,7 @@ public class ContainerCloneStep
                         cloneResponse.getTemplateArch(), ContainerHostState.CLONING );
         return new EnvironmentContainerImpl( localPeerId, peerId, cloneResponse.getHostname(), infoModel,
                 cloneResponse.getTemplateName(), cloneResponse.getTemplateArch(), node.getSshGroupId(),
-                node.getHostsGroupId(), defaultDomain, node.getType(), node.getResourceHostId(), node.getName() );
+                node.getHostsGroupId(), defaultDomain, node.getType(), node.getHostId(), node.getName() );
     }
 
 

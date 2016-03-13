@@ -59,7 +59,7 @@ public class CreatePeerNodeGroupsTask implements Callable<CreateEnvironmentConta
                 final String ip = subnetInfo.getAllAddresses()[( ipAddressOffset + currentIpAddressOffset )];
                 ContainerSize size = node.getType();
                 CloneRequest cloneRequest =
-                        new CloneRequest( node.getResourceHostId(), node.getHostname(), node.getName(), ip + "/" + maskLength,
+                        new CloneRequest( node.getHostId(), node.getHostname(), node.getName(), ip + "/" + maskLength,
                                 environment.getId(), localPeer.getId(), localPeer.getOwnerId(), node.getTemplateName(),
                                 HostArchitecture.AMD64, size );
 

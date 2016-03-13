@@ -39,8 +39,8 @@ public class Node
     private String peerId;
 
     @GsonRequired
-    @JsonProperty( "resourceHostId" )
-    private String resourceHostId;
+    @JsonProperty( "hostId" )
+    private String hostId;
 
     @GsonRequired
     @JsonProperty( "hostname" )
@@ -56,11 +56,12 @@ public class Node
                  @JsonProperty( "templateName" ) final String templateName, @JsonProperty( "type" ) ContainerSize type,
                  @JsonProperty( "sshGroupId" ) final int sshGroupId,
                  @JsonProperty( "hostsGroupId" ) final int hostsGroupId, @JsonProperty( "peerId" ) final String peerId,
-                 @JsonProperty( "resourceHostId" ) final String resourceHostId )
+                 @JsonProperty( "hostId" ) final String hostId )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid host name" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid node group name" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostId ), "Resource host id is null" );
         Preconditions.checkNotNull( type );
 
         this.hostname = hostname;
@@ -70,7 +71,7 @@ public class Node
         this.sshGroupId = sshGroupId;
         this.hostsGroupId = hostsGroupId;
         this.peerId = peerId;
-        this.resourceHostId = resourceHostId;
+        this.hostId = hostId;
     }
 
 
@@ -110,9 +111,9 @@ public class Node
     }
 
 
-    public String getResourceHostId()
+    public String getHostId()
     {
-        return resourceHostId;
+        return hostId;
     }
 
 
@@ -126,7 +127,7 @@ public class Node
         sb.append( ", sshGroupId=" ).append( sshGroupId );
         sb.append( ", hostsGroupId=" ).append( hostsGroupId );
         sb.append( ", peerId='" ).append( peerId ).append( '\'' );
-        sb.append( ", resourceHostId='" ).append( resourceHostId ).append( '\'' );
+        sb.append( ", hostId='" ).append( hostId ).append( '\'' );
         sb.append( '}' );
         return sb.toString();
     }

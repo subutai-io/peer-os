@@ -37,11 +37,11 @@ public class CreatePeerTemplatePrepareTask implements Callable<PrepareTemplatesR
         Map<String, Set<String>> rhTemplates = new HashMap<>();
         for ( Node node : nodes )
         {
-            Set<String> templates = rhTemplates.get( node.getResourceHostId() );
+            Set<String> templates = rhTemplates.get( node.getHostId() );
             if ( templates == null )
             {
                 templates = new HashSet<>();
-                rhTemplates.put( node.getResourceHostId(), templates );
+                rhTemplates.put( node.getHostId(), templates );
             }
             templates.add( node.getTemplateName() );
         }
