@@ -81,7 +81,7 @@ public class DistributeCommand extends SubutaiShellCommandSupport
                 for ( Node ng : topology.getNodeGroupPlacement().get( peer ) )
                 {
                     System.out.println(
-                            String.format( "%s\t%s\t\t%s\t\t%s\t%s", ng.getPeerId(), ng.getResourceHostId(), ng.getName(),
+                            String.format( "%s\t%s\t\t%s\t\t%s\t%s", ng.getPeerId(), ng.getHostId(), ng.getName(),
                                     ng.getTemplateName(), ng.getType() ) );
                 }
             }
