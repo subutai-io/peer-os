@@ -26,6 +26,7 @@ function SettingsAdvancedCtrl($scope, SettingsAdvancedSrv, SweetAlert, $sce, cfp
 
 	//Console UI
 	$scope.theme = 'modern';
+	console.log($scope);
 	setTimeout(function () {
 		$scope.$broadcast('terminal-output', {
 			output: true,
