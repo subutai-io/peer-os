@@ -36,10 +36,10 @@ function SettingsAdvancedCtrl($scope, SettingsAdvancedSrv, SweetAlert, $sce, cfp
 			breakLine: true
 		});
 		$scope.prompt.path('/');
-
-		$scope.results.splice(0, $scope.results.length);
-		$scope.$$phase || $scope.$apply();
 		$scope.prompt.user('karaf');
+
+		/*$scope.results.splice(0, $scope.results.length);
+		$scope.$$phase || $scope.$apply();*/
 
 		$scope.$apply();
 	}, 100);
