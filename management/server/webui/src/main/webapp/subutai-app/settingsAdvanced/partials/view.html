@@ -21,7 +21,9 @@
 	<div ng-if="settingsAdvancedCtrl.activeTab == 'karaflogs'" 
 		ng-include="'subutai-app/settingsAdvanced/partials/karaflogs.html'">
 	</div>
-	<div ng-if="settingsAdvancedCtrl.activeTab == 'karafconsole'" style="display:block;overflow:hidden;height:600px; width: 880px; margin: 10px;">
-		<iframe src="system/console/gogo" style="position: relative; top:-120px; left: -60px; width:1060px;height:1000px;" scrolling="no"></iframe>
+	<div ng-show="settingsAdvancedCtrl.activeTab == 'karafconsole'" class="b-workspace__content">
+		<div class="b-terminal">
+			<terminal terminal-class="modern-terminal" terminal-config="modern"></terminal>
+		</div>		
 	</div>
 </div>

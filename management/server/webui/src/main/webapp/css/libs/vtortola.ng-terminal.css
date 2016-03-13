@@ -8,6 +8,8 @@
 	color: #fff;
     font-size: 14px;
     font-family: "Ubuntu Mono", monospace;
+	position: relative;
+	overflow-x: hidden;
 }
 .terminal {
     /*background-color: #210819;*/
@@ -45,6 +47,7 @@
     overflow-x: hidden;
     overflow-y: auto;
     padding:0;
+	position: relative;
 }
 
 .terminal-cursor{
